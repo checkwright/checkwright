@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: lifecycle-kit  [stage: close]
+## Iteration: queue-kit  [stage: scope]
 
 The lifecycle-kit gates read the header above and
 `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,12 +11,23 @@ iteration per kit, in the extraction order [README.md](README.md) records.
 
 ## New Features
 
+- **queue-kit-extraction** — extract the git-native, agent-readable task
+  tracker (kit 3) per queue-kit/SPEC.md: lib/queue.sh config loader
+  (QUEUE_KIT_* knobs, platform values as defaults) + templates/queue-config.sh,
+  bin/queue-index.sh with the deferred tally de-hardcoded to a generic
+  per-subsection count, six gates (queue-hygiene, queue-wrap,
+  blocked-by-lead-line, task-names, task-conservation,
+  queue-prose-precondition) with good/bad fixture pairs (task-conservation
+  keeps its no-fixture annotation), help texts re-cited from the platform
+  rulebook to queue-kit/SPEC.md, a starter templates/TASK-QUEUE.md skeleton,
+  kit README, gates.list registration, and this repo's own queue made
+  conformant (the column-0 preamble prose under the iteration header gets
+  indented).
+
 ## Technical Debt
 
 ## Deferred
 
-- **queue-kit-extraction** — the TASK-QUEUE format, slug namespace,
-  blocked-by/needs-spec tag algebra, queue index, hygiene gates (kit 3).
 - **spec-kit-extraction** — amendment lifecycle, causal-completeness
   checklist, content-tiering star topology, merge procedure (kit 4).
 - **delegation-kit-extraction** — agent-execution protocol template, usage

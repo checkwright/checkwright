@@ -4,7 +4,4 @@
 
 ---
 
-lifecycle-kit scope 7e20f718 2026-07-04
-lifecycle-kit build 7e20f718 2026-07-04
-lifecycle-kit validate b86114f5 2026-07-04
-lifecycle-kit close 10ff4e60 2026-07-04
+queue-kit scope 2bc9a536 2026-07-04
