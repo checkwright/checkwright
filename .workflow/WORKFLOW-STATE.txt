@@ -6,3 +6,4 @@
 
 lifecycle-kit scope 7e20f718 2026-07-04
 lifecycle-kit build 7e20f718 2026-07-04
+lifecycle-kit validate b86114f5 2026-07-04
