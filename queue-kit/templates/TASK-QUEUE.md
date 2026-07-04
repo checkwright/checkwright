@@ -3,8 +3,8 @@
 ## New Features
 
 - **example-feature** — a top-level active entry: a bold kebab-case slug, an
-  em-dash, then free prose. Selection picks the first entry with no
-  `[blocked-by:]` tag, in section order.
+  em-dash, then free prose. Selection picks the first entry with no blocked-by
+  tag, in section order (see downstream-feature).
 - **downstream-feature** — an entry blocked on another. [blocked-by: example-feature]
   - **example-subtask** — an indented bold bullet is a sub-task (same grammar,
     same slug namespace).
