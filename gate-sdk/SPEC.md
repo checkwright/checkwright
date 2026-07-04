@@ -18,9 +18,11 @@ override with `GATE_SDK_GATES_DIR`) holding:
 
 - `gates.list` — the registry: one gate name per line (`#` comments and blank
   lines ignored). A listed name resolves to `<gates-dir>/<name>.sh` first, then
-  the kit's `checks/<name>.sh` — so the kit's shipped meta-gates are registered
-  by name alone, and a consumer can shadow one by dropping a same-named file in
-  its own gates dir.
+  each vendored kit's `checks/<name>.sh` — so any kit's shipped gates are
+  registered by name alone, and a consumer can shadow one by dropping a
+  same-named file in its own gates dir. The kit set defaults to gate-sdk plus
+  every sibling directory holding a `checks/` (a vendored Checkwright kit);
+  override with `GATE_SDK_KIT_DIRS` (space-separated kit roots).
 - the consumer's own `check-*.sh` gates (copy-edits of
   `templates/check-skeleton.sh`).
 - `gate-tests/` — the consumer's fixture tree (see §run-gate-tests).
@@ -34,7 +36,8 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `.workflow`), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
 (default `TASK-QUEUE.md`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
-`<gates-dir>/graph-vocab.sh`). Paths are repo-root-relative; every entry point
+`<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
+siblings holding a `checks/`). Paths are repo-root-relative; every entry point
 `cd`s to `git rev-parse --show-toplevel` before resolving them.
 
 ## The gate model
@@ -209,7 +212,8 @@ The family's single sourced library — values + adapters, never gate structure.
 Owns `fail_closed`, `GATE_PRUNE_DIRS` + the `gate_find` /
 `GATE_GREP_EXCLUDES` / `gate_path_pruned` walk adapters, and the registry
 helpers `gate_sdk_root`, `gate_sdk_gates_dir`, `gates_list_members`,
-`gate_resolve`. `fail_closed` must be passed *only* a status that genuinely
+`gate_resolve`, `gate_kit_roots`, `gate_check_dirs` (the multi-kit resolution
+path other kits' gates ride). `fail_closed` must be passed *only* a status that genuinely
 means the check could not execute (an awk/jq/parser crash) — never `grep`'s
 exit 1, which is the expected "no match"; the caller draws that line at the
 capture site.
@@ -225,7 +229,7 @@ nowhere is a failure, not a skip. Exit 0 only when every member passed.
 
 Golden-fixture runner. Each `<tests-dir>/<gate>/` holds `good/` + `bad/` case
 dirs; the runner `cd`s into the case dir and invokes the gate (resolved against
-the consumer gates dir, then the kit's `checks/`) with the args in the case's
+the consumer gates dir, then each vendored kit's `checks/`) with the args in the case's
 `args` file (`#` lines stripped). `good/` must exit 0 (and, when
 `good/expect.txt` exists, print its substring); `bad/` must exit 1 and print
 `bad/expect.txt`'s substring — a rejection substring is required, so the *right*
@@ -252,9 +256,9 @@ at a nonexistent hooks dir — generate the hook first.
 
 ### check-shellcheck
 
-Invariant: every `*.sh` directly under the consumer gates dir and the kit's
-`lib/`, `bin/`, and `checks/` passes ShellCheck at `-S warning` (the self-lint
-contract). A missing `shellcheck` binary is exit 2 — a gate that cannot run is
+Invariant: every `*.sh` directly under the consumer gates dir and each
+vendored kit's `lib/`, `bin/`, and `checks/` passes ShellCheck at `-S warning`
+(the self-lint contract). A missing `shellcheck` binary is exit 2 — a gate that cannot run is
 not clean.
 
 ### check-gate-output
@@ -278,8 +282,8 @@ visible to this static scan; the opt-out covers residual false positives.
 ### check-gate-fixture-coverage
 
 Invariant: every `gates.list` member either ships a `{good,bad}/` fixture pair
-(searched across the consumer tests dir, then the kit's `gate-tests/`) or
-carries a `# no-fixture: <reason>` header annotation. The authority set is the
+(searched across the consumer tests dir, then each vendored kit's
+`gate-tests/`) or carries a `# no-fixture: <reason>` header annotation. The authority set is the
 registry — the gates that gate the tree — not every `check-*.sh` file. A
 half-built pair is a defect regardless of any opt-out. The gate cannot
 mechanically distinguish "infeasible" from "stopgap"; honesty is upheld by the
@@ -300,9 +304,9 @@ Discovery is first-paragraph-scoped, requires the enumeration noun
 (`two`…`nine`), and requires the first following parenthetical to be a
 single-char `(X)` label — four filters that exclude sibling-gate mentions,
 follow-on sentences, hierarchical axis/sub-rule contracts, and count-words
-with non-enumeration nouns. The SPEC defaults to `<gates-dir>/SPEC.md` when
-present, else the kit's own; each matched heading resolves to its gate source
-through the registry path. Honest residual: the marker catches editing one
+with non-enumeration nouns. With no spec argument the gate scans
+`<gates-dir>/SPEC.md` when present plus each vendored kit's own `SPEC.md`;
+each matched heading resolves to its gate source through the registry path. Honest residual: the marker catches editing one
 side without the other, but not adding an assertion while forgetting *both*
 its marker and the contract. A first paragraph that embeds the literal pattern
 in example prose self-matches — the failure is loud (a false positive forcing

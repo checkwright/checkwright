@@ -1,0 +1,8 @@
+# contract: lifecycle-kit/SPEC.md §check-stage-evidence
+# One data line per stage-skill invocation: <iteration> <stage> <session-id> <date>.
+# /scope truncates this file at the iteration boundary; later stages append.
+
+---
+
+lifecycle-kit scope 7e20f718 2026-07-04
+lifecycle-kit build 7e20f718 2026-07-04

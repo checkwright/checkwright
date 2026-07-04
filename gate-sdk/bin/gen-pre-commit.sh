@@ -24,15 +24,19 @@ cd "$REPO_ROOT" || exit 2
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"
 HOOK="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}/pre-commit"
-SDK_REL="$(realpath --relative-to="$REPO_ROOT" "$SDK")"
-
 [[ -f "$LIST" ]] || { echo "gen-pre-commit: no registry at $LIST" >&2; exit 2; }
 
 mapfile -t CHECKS < <(gates_list_members "$LIST")
 
+# Kit check dirs, relativized so the emitted hook invokes repo-relative paths.
+REL_DIRS=("$GATES_DIR")
+while IFS= read -r k; do
+    REL_DIRS+=("$(realpath --relative-to="$REPO_ROOT" "$k")/checks")
+done < <(gate_kit_roots)
+
 # Resolve a member to the repo-relative path the emitted hook will invoke.
 resolve_rel() {
-    gate_resolve "$1" "$GATES_DIR" "$SDK_REL/checks"
+    gate_resolve "$1" "${REL_DIRS[@]}"
 }
 
 declare -A MANUAL=()

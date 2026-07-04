@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-fail-closed — every awk/jq capture in the gate family handles subprocess exit status
 #
 # usage: check-gate-fail-closed.sh [dir...]
 #   Scans check-*.sh under each given dir. Default: the consumer gates dir plus
-#   the kit's checks/.
+#   each vendored kit's checks/.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,7 +14,7 @@ source "$SDK/lib/gate.sh"
 if [[ $# -gt 0 ]]; then
     DIRS=("$@")
 else
-    DIRS=("$(gate_sdk_gates_dir)" "$SDK/checks")
+    mapfile -t DIRS < <(gate_check_dirs)
 fi
 gates=()
 shopt -s nullglob

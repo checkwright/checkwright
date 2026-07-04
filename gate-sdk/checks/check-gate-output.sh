@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-output — every gates.list member emits a machine-keyable success line and a help: remedy
 #
 # usage: check-gate-output.sh [gates-dir]
@@ -16,14 +16,17 @@ LIST="$DIR/gates.list"
 members="$(gates_list_members "$LIST")"
 [[ -n "$members" ]] || { echo "check-gate-output: no members parsed from $LIST" >&2; exit 2; }
 
+RESOLVE_DIRS=("$DIR")
+while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
+
 missing=()
 no_help=()
 total=0
 while IFS= read -r m; do
     [[ -n "$m" ]] || continue
     total=$((total + 1))
-    if ! src="$(gate_resolve "$m" "$DIR" "$SDK/checks")"; then
-        missing+=("$m (source resolves in neither $DIR/ nor the kit's checks/)")
+    if ! src="$(gate_resolve "$m" "${RESOLVE_DIRS[@]}")"; then
+        missing+=("$m (source resolves in none of: ${RESOLVE_DIRS[*]})")
         continue
     fi
     if ! grep -Eq '(echo|printf).*: clean' "$src"; then

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
 #
 # The consumer's surface vocabulary (the platform rule content the extraction
@@ -47,8 +47,9 @@ layer_specs() {
     fi
 }
 
+mapfile -t RESOLVE_DIRS < <(gate_check_dirs)
 resolve_member() {
-    gate_resolve "$1" "$GATES_DIR" "$SDK/checks"
+    gate_resolve "$1" "${RESOLVE_DIRS[@]}"
 }
 
 emit_graph() {
@@ -371,7 +372,7 @@ errors=()
 
 for c in "${CHECKS[@]}"; do
     if ! script="$(resolve_member "$c")"; then
-        errors+=("MANIFEST: $c is in gates.list but resolves in neither $GATES_DIR/ nor the kit's checks/")
+        errors+=("MANIFEST: $c is in gates.list but resolves in none of: ${RESOLVE_DIRS[*]}")
         continue
     fi
     man="$(grep -m1 '^# graph: ' "$script" || true)"

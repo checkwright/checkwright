@@ -68,32 +68,45 @@ graph LR
   subgraph surfaces["governed surfaces"]
     n0["*/SPEC-*.md"]
     n1[".workflow/CHECK-GRAPH.html"]
-    n2["SPEC-*.md"]
-    n3["TASK-QUEUE.md"]
-    n4["gate-sdk/*.sh"]
-    n5["gate-sdk/SPEC.md"]
-    n6["scripts/*.sh"]
-    n7["scripts/gate-tests/*"]
-    n8["scripts/gates.list"]
-    n9["scripts/git-hooks/pre-commit"]
+    n2[".workflow/WORKFLOW-STATE.txt"]
+    n3["SPEC-*.md"]
+    n4["TASK-QUEUE.md"]
+    n5["gate-sdk/*.sh"]
+    n6["gate-sdk/SPEC.md"]
+    n7["lifecycle-kit/*.sh"]
+    n8["lifecycle-kit/SPEC.md"]
+    n9["scripts/*.sh"]
+    n10["scripts/gate-tests/*"]
+    n11["scripts/gates.list"]
+    n12["scripts/git-hooks/pre-commit"]
   end
-  n5 <-->|"check-gate-assertions"| n6
-  n5 <-->|"check-gate-assertions"| n4
-  n6 -->|"check-gate-exemption-tasks"| n4
-  n6 -->|"check-gate-exemption-tasks"| n3
-  n6 -->|"check-gate-fail-closed"| n4
-  n8 -->|"check-gate-fixture-coverage"| n6
-  n8 -->|"check-gate-fixture-coverage"| n7
-  n8 -->|"check-gate-fixture-coverage"| n4
-  n8 -->|"check-gate-output"| n6
-  n8 -->|"check-gate-output"| n4
-  n8 -->|"check-graph"| n6
-  n8 -->|"check-graph"| n4
-  n8 -->|"check-graph"| n9
-  n8 -->|"check-graph"| n1
-  n8 -->|"check-graph"| n2
-  n8 -->|"check-graph"| n0
-  n6 -->|"check-shellcheck"| n4
+  n6 <-->|"check-gate-assertions"| n8
+  n6 <-->|"check-gate-assertions"| n9
+  n6 <-->|"check-gate-assertions"| n5
+  n6 <-->|"check-gate-assertions"| n7
+  n9 -->|"check-gate-exemption-tasks"| n5
+  n9 -->|"check-gate-exemption-tasks"| n7
+  n9 -->|"check-gate-exemption-tasks"| n4
+  n9 -->|"check-gate-fail-closed"| n5
+  n9 -->|"check-gate-fail-closed"| n7
+  n11 -->|"check-gate-fixture-coverage"| n9
+  n11 -->|"check-gate-fixture-coverage"| n10
+  n11 -->|"check-gate-fixture-coverage"| n5
+  n11 -->|"check-gate-fixture-coverage"| n7
+  n11 -->|"check-gate-output"| n9
+  n11 -->|"check-gate-output"| n5
+  n11 -->|"check-gate-output"| n7
+  n11 -->|"check-graph"| n9
+  n11 -->|"check-graph"| n5
+  n11 -->|"check-graph"| n7
+  n11 -->|"check-graph"| n12
+  n11 -->|"check-graph"| n1
+  n11 -->|"check-graph"| n3
+  n11 -->|"check-graph"| n0
+  n9 -->|"check-shellcheck"| n5
+  n9 -->|"check-shellcheck"| n7
+  n4 -->|"check-stage-entry"| n2
+  n4 -->|"check-stage-evidence"| n2
 `;
     mermaid.initialize({ startOnLoad: false });
     const { svg } = await mermaid.render('graph', graph);

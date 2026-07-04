@@ -27,9 +27,18 @@ The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
 dogfooding is day-one, not optional. Before committing:
 
 ```bash
-bash gate-sdk/bin/run-gates.sh                                          # full battery
-bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks # kit fixtures
+bash gate-sdk/bin/run-gates.sh                                                      # full battery
+bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
+bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
 ```
+
+The repo also runs lifecycle-kit's iteration state machine on itself — one
+iteration per kit extraction. `TASK-QUEUE.md` carries the
+`## Iteration: <name>  [stage: <stage>]` header; each stage session invokes
+the matching `.claude/commands/<stage>.md` skill, which stamps
+`.workflow/WORKFLOW-STATE.txt` and flips the header as its first step
+(`check-stage-evidence` / `check-stage-entry` enforce the flip+stamp
+protocol — see lifecycle-kit/SPEC.md).
 
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and run
@@ -48,8 +57,10 @@ and enforced by the meta-gates — a red gate is fixed, never bypassed with
 
 - **Registry, not array:** `gates.list` (one name per line, `#` comments)
   replaces the platform's `CHECKS=()`; names resolve against the consumer
-  gates dir first, then the kit's `checks/` — a consumer shadows a kit gate by
-  dropping a same-named file in its gates dir.
+  gates dir first, then each vendored kit's `checks/` (`gate_kit_roots`, env
+  `GATE_SDK_KIT_DIRS`) — a consumer shadows a kit gate by dropping a
+  same-named file in its gates dir, and a new kit's gates register by name
+  alone.
 - **Config via env, platform values as defaults:** `GATE_SDK_GATES_DIR`
   (`scripts`), `GATE_SDK_TESTS_DIR`, `GATE_SDK_HOOKS_DIR`
   (`scripts/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (`.workflow`),

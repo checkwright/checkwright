@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh,TASK-QUEUE.md dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,TASK-QUEUE.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every exception-list element carries a live until: task or permanent: reason
 #
 # usage: check-gate-exemption-tasks.sh [queue-file [dir...]]
 #   queue-file defaults to $GATE_SDK_QUEUE_FILE (default: TASK-QUEUE.md); dirs
-#   default to the consumer gates dir plus the kit's checks/. A missing queue
-#   file simply yields zero live slugs, so every '# until:' reads stale.
+#   default to the consumer gates dir plus each vendored kit's checks/. A
+#   missing queue file simply yields zero live slugs, so every '# until:'
+#   reads stale.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,7 +17,7 @@ QUEUE="${1:-${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}}"
 if [[ $# -gt 1 ]]; then
     DIRS=("${@:2}")
 else
-    DIRS=("$(gate_sdk_gates_dir)" "$SDK/checks")
+    mapfile -t DIRS < <(gate_check_dirs)
 fi
 
 declare -A IS_LIVE=()

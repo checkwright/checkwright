@@ -37,28 +37,36 @@ hook_fail() {
     exit 1
 }
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh'; then
     gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh'; then
     gate-sdk/checks/check-gate-output.sh || hook_fail check-gate-output
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh'; then
     gate-sdk/checks/check-gate-fail-closed.sh || hook_fail check-gate-fail-closed
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh'; then
     gate-sdk/checks/check-gate-fixture-coverage.sh || hook_fail check-gate-fixture-coverage
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'TASK-QUEUE.md'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'TASK-QUEUE.md'; then
     gate-sdk/checks/check-gate-exemption-tasks.sh || hook_fail check-gate-exemption-tasks
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
     gate-sdk/checks/check-graph.sh || hook_fail check-graph
+fi
+
+if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
+    lifecycle-kit/checks/check-stage-evidence.sh || hook_fail check-stage-evidence
+fi
+
+if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
+    lifecycle-kit/checks/check-stage-entry.sh || hook_fail check-stage-entry
 fi
 
 exit 0

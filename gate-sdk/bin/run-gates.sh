@@ -3,8 +3,8 @@
 #
 # usage: run-gates.sh [gates-dir]
 #   gates-dir defaults to $GATE_SDK_GATES_DIR (default: scripts), relative to
-#   the repo root. Members resolve against gates-dir first, then the kit's
-#   checks/ directory. Per-gate + total timings land in
+#   the repo root. Members resolve against gates-dir first, then each vendored
+#   kit's checks/ directory (gate_kit_roots). Per-gate + total timings land in
 #   $GATE_SDK_TMP_DIR/gate-timings.txt (default: .tmp/) — a measurement, not
 #   state; never committed.
 set -uo pipefail
@@ -26,6 +26,9 @@ LIST="$GATES_DIR/gates.list"
 mapfile -t MEMBERS < <(gates_list_members "$LIST")
 [[ ${#MEMBERS[@]} -gt 0 ]] || { echo "run-gates: $LIST names no gates" >&2; exit 2; }
 
+RESOLVE_DIRS=("$GATES_DIR")
+while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
+
 failed=()
 TIMINGS="${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt"
 mkdir -p "$(dirname "$TIMINGS")" && : > "$TIMINGS"
@@ -33,7 +36,7 @@ total_ms=0
 for c in "${MEMBERS[@]}"; do
     printf '\n===== %s =====\n' "$c"
     start_ns=$(date +%s%N)
-    if gate_path="$(gate_resolve "$c" "$GATES_DIR" "$SDK/checks")"; then
+    if gate_path="$(gate_resolve "$c" "${RESOLVE_DIRS[@]}")"; then
         if "$gate_path"; then
             printf '  PASS: %s\n' "$c"
         else
@@ -42,8 +45,8 @@ for c in "${MEMBERS[@]}"; do
             failed+=("$c")
         fi
     else
-        printf '  FAIL: %s (listed in %s but resolves in neither %s/ nor %s/checks/)\n' \
-            "$c" "$LIST" "$GATES_DIR" "$SDK"
+        printf '  FAIL: %s (listed in %s but resolves in none of: %s)\n' \
+            "$c" "$LIST" "${RESOLVE_DIRS[*]}"
         failed+=("$c")
     fi
     elapsed_ms=$(( ($(date +%s%N) - start_ns) / 1000000 ))

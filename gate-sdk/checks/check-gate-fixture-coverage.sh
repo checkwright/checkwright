@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,scripts/gate-tests/*,gate-sdk/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,scripts/gate-tests/*,gate-sdk/*.sh,lifecycle-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — every gates.list member has a fixture pair or a no-fixture opt-out
 #
 # usage: check-gate-fixture-coverage.sh [gates-dir [tests-dir...]]
 #   Fixture pairs are searched across the given tests dirs. Default:
-#   <gates-dir>/gate-tests plus the kit's own gate-tests/ (the shipped
-#   meta-gates carry their pairs there).
+#   <gates-dir>/gate-tests plus each vendored kit's own gate-tests/ (a kit's
+#   shipped gates carry their pairs there).
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,8 +16,11 @@ DIR="${1:-$(gate_sdk_gates_dir)}"
 if [[ $# -gt 1 ]]; then
     TESTS_DIRS=("${@:2}")
 else
-    TESTS_DIRS=("${GATE_SDK_TESTS_DIR:-$DIR/gate-tests}" "$SDK/gate-tests")
+    TESTS_DIRS=("${GATE_SDK_TESTS_DIR:-$DIR/gate-tests}")
+    while IFS= read -r k; do TESTS_DIRS+=("$k/gate-tests"); done < <(gate_kit_roots)
 fi
+RESOLVE_DIRS=("$DIR")
+while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
 LIST="$DIR/gates.list"
 [[ -f "$LIST" ]] || { echo "check-gate-fixture-coverage: no registry at $LIST" >&2; exit 2; }
 
@@ -50,8 +53,8 @@ while IFS= read -r m; do
         fi
         continue
     fi
-    if ! src="$(gate_resolve "$m" "$DIR" "$SDK/checks")"; then
-        neither+=("$m (no fixture pair, and source resolves in neither $DIR/ nor the kit's checks/)")
+    if ! src="$(gate_resolve "$m" "${RESOLVE_DIRS[@]}")"; then
+        neither+=("$m (no fixture pair, and source resolves in none of: ${RESOLVE_DIRS[*]})")
         continue
     fi
     if grep -Eq '^# no-fixture:' "$src"; then

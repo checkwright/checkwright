@@ -5,7 +5,7 @@
 #   tests-dir defaults to $GATE_SDK_TESTS_DIR (default: <gates-dir>/gate-tests).
 #   Each <tests-dir>/<gate>/ holds a good/ + bad/ case pair; the gate under
 #   test resolves against the given gate-dirs (default: the consumer gates dir,
-#   then the kit's checks/). <tests-dir>/*.test.sh unit tests also run.
+#   then each vendored kit's checks/). <tests-dir>/*.test.sh unit tests also run.
 #
 # The kit's own fixtures run as:
 #   gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
@@ -20,7 +20,7 @@ TESTS_DIR="${1:-${GATE_SDK_TESTS_DIR:-$GATES_DIR_DEFAULT/gate-tests}}"
 if [[ $# -gt 1 ]]; then
     GATE_DIRS=("${@:2}")
 else
-    GATE_DIRS=("$GATES_DIR_DEFAULT" "$SDK/checks")
+    mapfile -t GATE_DIRS < <(gate_check_dirs)
 fi
 # Absolute-ize so resolution survives the per-case cd.
 resolved=()

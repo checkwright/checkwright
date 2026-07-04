@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# graph: couples=gate-sdk/SPEC.md,scripts/*.sh,gate-sdk/*.sh dir=bi valve=none tier=align-only
+# graph: couples=gate-sdk/SPEC.md,lifecycle-kit/SPEC.md,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh dir=bi valve=none tier=align-only
 # spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion span+count to the gate code's `# assertion` markers
 #
 # usage: check-gate-assertions.sh [spec [scripts-dir]]
-#   spec defaults to <gates-dir>/SPEC.md if present, else the kit's own SPEC.md.
-#   With no scripts-dir, each §<gate> resolves against the consumer gates dir,
-#   then the kit's checks/. Requires GNU awk (3-arg match).
+#   With no spec argument, scans <gates-dir>/SPEC.md when present plus each
+#   vendored kit's own SPEC.md. With no scripts-dir, each §<gate> resolves
+#   against the consumer gates dir, then each kit's checks/. Requires GNU awk
+#   (3-arg match).
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -13,17 +14,22 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SDK/lib/gate.sh"
 
 GATES_DIR="$(gate_sdk_gates_dir)"
+SPECS=()
 if [[ $# -gt 0 ]]; then
-    SPEC="$1"
-elif [[ -f "$GATES_DIR/SPEC.md" ]]; then
-    SPEC="$GATES_DIR/SPEC.md"
+    SPECS=("$1")
 else
-    SPEC="$SDK/SPEC.md"
+    [[ -f "$GATES_DIR/SPEC.md" ]] && SPECS+=("$GATES_DIR/SPEC.md")
+    while IFS= read -r k; do
+        [[ -f "$k/SPEC.md" ]] && SPECS+=("$k/SPEC.md")
+    done < <(gate_kit_roots)
 fi
 SCRIPTS_DIR="${2:-}"
-[[ -f "$SPEC" ]] || { echo "check-gate-assertions: not found: $SPEC (run from repo root)" >&2; exit 2; }
+[[ ${#SPECS[@]} -gt 0 ]] || { echo "check-gate-assertions: no SPEC.md found (run from repo root)" >&2; exit 2; }
+for s in "${SPECS[@]}"; do
+    [[ -f "$s" ]] || { echo "check-gate-assertions: not found: $s (run from repo root)" >&2; exit 2; }
+done
 
-contracts="$(awk '
+extract_contracts() { awk '
   function wn(w) {
     if (w=="two")return 2; if (w=="three")return 3; if (w=="four")return 4
     if (w=="five")return 5; if (w=="six")return 6; if (w=="seven")return 7
@@ -56,52 +62,58 @@ contracts="$(awk '
     }
     if (cnt >= 2) printf "%s|%d|%s\n", h, n, csv
   }
-' "$SPEC")"; st=$?
-fail_closed "$st" check-gate-assertions awk
+' "$1"; }
 
 resolve_gate_file() {
     if [[ -n "$SCRIPTS_DIR" ]]; then
         [[ -f "$SCRIPTS_DIR/$1.sh" ]] && { printf '%s\n' "$SCRIPTS_DIR/$1.sh"; return 0; }
         return 1
     fi
-    gate_resolve "$1" "$GATES_DIR" "$SDK/checks"
+    local -a dirs
+    mapfile -t dirs < <(gate_check_dirs)
+    gate_resolve "$1" "${dirs[@]}"
 }
 
 findings=()
 coupled=0
-while IFS='|' read -r gate n labels; do
-    [[ -z "$gate" ]] && continue
-    coupled=$((coupled + 1))
+for spec in "${SPECS[@]}"; do
+    contracts="$(extract_contracts "$spec")"; st=$?
+    fail_closed "$st" check-gate-assertions awk
 
-    lcount="$(awk -F, '{print NF}' <<< "$labels")"
-    if [[ "$lcount" -ne "$n" ]]; then
-        findings+=("§$gate: count-word says $n but the (X) span enumerates $lcount label(s) [$labels] — the contract is internally inconsistent")
-    fi
+    while IFS='|' read -r gate n labels; do
+        [[ -z "$gate" ]] && continue
+        coupled=$((coupled + 1))
 
-    if ! file="$(resolve_gate_file "$gate")"; then
-        findings+=("§$gate: enumerated contract but no gate code resolves for '$gate' (heading must name the script)")
-        continue
-    fi
+        lcount="$(awk -F, '{print NF}' <<< "$labels")"
+        if [[ "$lcount" -ne "$n" ]]; then
+            findings+=("$spec §$gate: count-word says $n but the (X) span enumerates $lcount label(s) [$labels] — the contract is internally inconsistent")
+        fi
 
-    markers="$(grep -oE '#[[:space:]]*assertion[[:space:]]+[A-Za-z0-9]+:' "$file" \
-        | sed -E 's/#[[:space:]]*assertion[[:space:]]+([A-Za-z0-9]+):/\1/' | sort -u | paste -sd, -)"
+        if ! file="$(resolve_gate_file "$gate")"; then
+            findings+=("$spec §$gate: enumerated contract but no gate code resolves for '$gate' (heading must name the script)")
+            continue
+        fi
 
-    if [[ -z "$markers" ]]; then
-        findings+=("§$gate: contract enumerates [$labels] but $file carries zero \`# assertion\` markers (retrofit obligation)")
-        continue
-    fi
+        markers="$(grep -oE '#[[:space:]]*assertion[[:space:]]+[A-Za-z0-9]+:' "$file" \
+            | sed -E 's/#[[:space:]]*assertion[[:space:]]+([A-Za-z0-9]+):/\1/' | sort -u | paste -sd, -)"
 
-    want="$(tr ',' '\n' <<< "$labels" | sort -u | paste -sd, -)"
-    have="$markers"
-    if [[ "$want" != "$have" ]]; then
-        missing="$(comm -23 <(tr ',' '\n' <<< "$want") <(tr ',' '\n' <<< "$have") | paste -sd, -)"
-        extra="$(comm -13 <(tr ',' '\n' <<< "$want") <(tr ',' '\n' <<< "$have") | paste -sd, -)"
-        msg="§$gate: marker set [$have] != contract span [$want]"
-        [[ -n "$missing" ]] && msg="$msg; missing marker(s): $missing"
-        [[ -n "$extra" ]] && msg="$msg; extra marker(s): $extra"
-        findings+=("$msg")
-    fi
-done <<< "$contracts"
+        if [[ -z "$markers" ]]; then
+            findings+=("$spec §$gate: contract enumerates [$labels] but $file carries zero \`# assertion\` markers (retrofit obligation)")
+            continue
+        fi
+
+        want="$(tr ',' '\n' <<< "$labels" | sort -u | paste -sd, -)"
+        have="$markers"
+        if [[ "$want" != "$have" ]]; then
+            missing="$(comm -23 <(tr ',' '\n' <<< "$want") <(tr ',' '\n' <<< "$have") | paste -sd, -)"
+            extra="$(comm -13 <(tr ',' '\n' <<< "$want") <(tr ',' '\n' <<< "$have") | paste -sd, -)"
+            msg="$spec §$gate: marker set [$have] != contract span [$want]"
+            [[ -n "$missing" ]] && msg="$msg; missing marker(s): $missing"
+            [[ -n "$extra" ]] && msg="$msg; extra marker(s): $extra"
+            findings+=("$msg")
+        fi
+    done <<< "$contracts"
+done
 
 if [[ ${#findings[@]} -gt 0 ]]; then
     echo "check-gate-assertions: §<gate> assertion enumeration ↔ gate-code marker mismatch:"

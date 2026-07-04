@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning (the self-lint contract)
 #
 # usage: check-shellcheck.sh [dir...]
 #   Lints *.sh directly under each given dir. Default: the consumer gates dir
-#   plus the kit's own lib/, bin/, and checks/ — the family lints itself by the
-#   standard it enforces.
+#   plus each vendored kit's lib/, bin/, and checks/ — the family lints itself
+#   by the standard it enforces.
 
 set -uo pipefail
 
@@ -16,7 +16,10 @@ source "$SDK/lib/gate.sh"
 if [[ $# -gt 0 ]]; then
     DIRS=("$@")
 else
-    DIRS=("$(gate_sdk_gates_dir)" "$SDK/lib" "$SDK/bin" "$SDK/checks")
+    DIRS=("$(gate_sdk_gates_dir)")
+    while IFS= read -r k; do
+        DIRS+=("$k/lib" "$k/bin" "$k/checks")
+    done < <(gate_kit_roots)
 fi
 
 if ! command -v shellcheck >/dev/null 2>&1; then

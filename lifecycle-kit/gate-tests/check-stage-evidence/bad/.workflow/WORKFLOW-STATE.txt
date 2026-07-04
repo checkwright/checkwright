@@ -1,0 +1,5 @@
+# contract: lifecycle-kit/SPEC.md §check-stage-evidence
+
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01

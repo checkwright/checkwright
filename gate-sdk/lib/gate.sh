@@ -81,3 +81,36 @@ gate_resolve() {
     done
     return 1
 }
+
+# gate_kit_roots — the vendored kit roots, one per line, in resolution order:
+# this kit (gate-sdk) first, then its sibling kits — any directory beside it
+# holding a checks/ — sorted by name. Override with GATE_SDK_KIT_DIRS
+# (space-separated paths, resolved from the caller's cwd — the entry points
+# cd to the repo root first).
+gate_kit_roots() {
+    local d
+    if [[ -n "${GATE_SDK_KIT_DIRS:-}" ]]; then
+        for d in $GATE_SDK_KIT_DIRS; do printf '%s\n' "$d"; done
+        return 0
+    fi
+    local sdk parent
+    sdk="$(gate_sdk_root)"
+    printf '%s\n' "$sdk"
+    parent="${sdk%/*}"
+    for d in "$parent"/*/checks; do
+        [[ -d "$d" ]] || continue
+        [[ "${d%/checks}" == "$sdk" ]] && continue
+        printf '%s\n' "${d%/checks}"
+    done
+    return 0
+}
+
+# gate_check_dirs — the registry member resolution path, one dir per line:
+# the consumer gates dir, then each vendored kit's checks/.
+gate_check_dirs() {
+    gate_sdk_gates_dir
+    local k
+    while IFS= read -r k; do
+        printf '%s/checks\n' "$k"
+    done < <(gate_kit_roots)
+}

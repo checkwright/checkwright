@@ -20,7 +20,7 @@ own kits, day one.
 | Kit | Status | What it is |
 |---|---|---|
 | [gate-sdk/](gate-sdk/) | **landed** | A self-testing lint framework for prose/spec/config surfaces: the gate contracts (output, fail-closed, fixture-pair, self-lint), the fixture runner, `# graph:` coupling manifests, and a generated pre-commit hook. |
-| lifecycle-kit/ | planned | The iteration stage state machine: stage skills (scope/align/build/validate/close), exit conditions as config, evidence stamps. |
+| [lifecycle-kit/](lifecycle-kit/) | **landed** | The iteration stage state machine for stateless agent sessions: a stage header + evidence-stamp file, five stage-skill templates (scope/align/build/validate/close — stages are config), and the two gates that make skipping a stage fail the commit. |
 | queue-kit/ | planned | A git-native, agent-readable task tracker: the TASK-QUEUE format, slug namespace, blocked-by/needs-spec tag algebra, hygiene gates. |
 | spec-kit/ | planned | Spec amendment lifecycle, causal-completeness checklist, content-tiering star topology (one owner per fact; cite, never restate). |
 | delegation-kit/ | planned | Agent-execution protocol templates, usage gating, resume-journal mechanics. |
@@ -36,7 +36,9 @@ adoption.
 The gates registered in [`scripts/gates.list`](scripts/gates.list) run on this
 tree: `bash gate-sdk/bin/run-gates.sh` for the full battery,
 `bash gate-sdk/bin/install-hooks.sh` to opt this clone into the generated
-pre-commit hook.
+pre-commit hook. The repo also runs lifecycle-kit's own iteration state
+machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the stage header, one
+iteration per kit extraction.
 
 ## License
 
