@@ -53,6 +53,11 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    section names, or file paths. Defaults are the extracted platform's
    five-stage lifecycle.
 
+After install the battery is red at `check-stage-evidence` until your first
+`/scope` session runs (it names the iteration and stamps the evidence file as
+its first step) — the bootstrap header is a stage like any other, fail-closed
+by design.
+
 ## Test
 
 ```bash
