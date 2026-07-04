@@ -28,10 +28,4 @@ iteration per kit, in the extraction order [README.md](README.md) records.
 
 ## Done
 
-- **lifecycle-kit-extraction** — stage state machine (header +
-  WORKFLOW-STATE evidence), check-stage-evidence + check-stage-entry
-  de-hardcoded onto stages-as-config, five stage-skill templates, fixture
-  pairs + two behavioral test suites; gate-sdk resolution generalized from
-  single-kit to every vendored kit's checks/.
-
 ## Lessons Learned
