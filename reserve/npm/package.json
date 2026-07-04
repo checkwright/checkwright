@@ -1,0 +1,12 @@
+{
+  "name": "checkwright",
+  "version": "0.0.1",
+  "description": "Name reservation for Checkwright — a coding-agent-assisted delivery methodology (gate SDK, evidence-stamped lifecycle, agent context economics). Real releases will start at 0.1.0.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/checkwright/checkwright.git"
+  },
+  "homepage": "https://checkwright.dev",
+  "files": ["README.md"]
+}

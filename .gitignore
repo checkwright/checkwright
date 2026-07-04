@@ -1,0 +1,6 @@
+target/
+node_modules/
+Cargo.lock
+.tmp/
+# private extraction brief — local working notes, never tracked
+EXTRACTION.md
