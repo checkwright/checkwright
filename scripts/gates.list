@@ -1,0 +1,10 @@
+# Checkwright gate registry — gate-sdk/SPEC.md §Layout and configuration.
+# Names resolve against scripts/ first, then gate-sdk/checks/. The kit governs
+# this repo too, day one: the seven shipped meta-gates run on the kit itself.
+check-shellcheck
+check-gate-output
+check-gate-fail-closed
+check-gate-fixture-coverage
+check-gate-exemption-tasks
+check-gate-assertions
+check-graph

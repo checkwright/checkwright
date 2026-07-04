@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# pre-commit - GENERATED, DO NOT EDIT (except gen=manual regions between sentinels).
+#
+# Emitted from the per-gate `# graph:` manifests by:
+#     bash gate-sdk/bin/gen-pre-commit.sh --write
+# Edit a gate's manifest (couples=/trigger=/mode=/gen=), or a gen=manual region
+# below, then regenerate. check-graph asserts this file equals --emit. Each gate
+# prints its own per-finding + `help:` lines before this hook reports the failure.
+#
+# Install (opt-in, per clone):   bash gate-sdk/bin/install-hooks.sh
+# Bypass once (use sparingly):   git commit --no-verify
+#
+# This is the *triggered subset* of the gates.list battery: every check here
+# also runs whole-tree via gate-sdk/bin/run-gates.sh.
+set -euo pipefail
+
+mapfile -t staged_all < <(git diff --cached --name-only --diff-filter=ACMR)
+[[ ${#staged_all[@]} -eq 0 ]] && exit 0
+
+# True if any staged path matches one of the given globs (bash glob: `*` spans '/').
+staged_matches() {
+    local f pat
+    for f in "${staged_all[@]}"; do
+        for pat in "$@"; do
+            # shellcheck disable=SC2053
+            [[ "$f" == $pat ]] && return 0
+        done
+    done
+    return 1
+}
+
+# Uniform failure: the gate already printed its findings + help: line above.
+hook_fail() {
+    echo ""
+    echo "pre-commit: $1 failed (see above)."
+    echo "  Bypass once (use sparingly): git commit --no-verify"
+    exit 1
+}
+
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh'; then
+    gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
+fi
+
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh'; then
+    gate-sdk/checks/check-gate-output.sh || hook_fail check-gate-output
+fi
+
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh'; then
+    gate-sdk/checks/check-gate-fail-closed.sh || hook_fail check-gate-fail-closed
+fi
+
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh'; then
+    gate-sdk/checks/check-gate-fixture-coverage.sh || hook_fail check-gate-fixture-coverage
+fi
+
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'TASK-QUEUE.md'; then
+    gate-sdk/checks/check-gate-exemption-tasks.sh || hook_fail check-gate-exemption-tasks
+fi
+
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
+    gate-sdk/checks/check-graph.sh || hook_fail check-graph
+fi
+
+exit 0

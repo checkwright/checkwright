@@ -1,0 +1,3 @@
+# Fixture registry (scanned as text, never executed): names one member that
+# DOES carry a '<NAME>: clean' success line — check-gate-output must ACCEPT.
+check-sample

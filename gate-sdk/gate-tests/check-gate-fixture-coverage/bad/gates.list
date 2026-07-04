@@ -1,0 +1,4 @@
+# Fixture registry: check-gamma has neither a fixture pair nor an opt-out —
+# check-gate-fixture-coverage must REJECT.
+check-alpha
+check-gamma

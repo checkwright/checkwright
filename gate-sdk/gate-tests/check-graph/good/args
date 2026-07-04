@@ -1,0 +1,3 @@
+# Validate only amendment-body manifests under this fixture dir (hermetic;
+# the default whole-tree run anchors to the real repo root and is unfixturable).
+--amend-only

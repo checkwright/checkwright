@@ -1,0 +1,1 @@
+amendment-body '# graph:' manifests well-formed
