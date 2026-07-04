@@ -36,3 +36,12 @@
 - queue-kit-extraction
 
 ## Lessons Learned
+
+- A kit's starter template must pass the kit's own gates when copied verbatim.
+  queue-kit's `templates/TASK-QUEUE.md` tripped check-blocked-by-lead-line as a
+  live queue — explanatory prose carried a bracketed blocked-by tag on a
+  continuation line. The template is not a governed file, so the repo's own
+  battery never sees it; only the validate-stage consumer-install proof does.
+  Later kits ship templates too (spec/delegation/context/drift) — check each
+  template as a live surface during that kit's validate. Fixed for queue-kit in
+  commit 0b38879.
