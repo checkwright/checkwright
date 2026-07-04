@@ -21,7 +21,7 @@ own kits, day one.
 |---|---|---|
 | [gate-sdk/](gate-sdk/) | **landed** | A self-testing lint framework for prose/spec/config surfaces: the gate contracts (output, fail-closed, fixture-pair, self-lint), the fixture runner, `# graph:` coupling manifests, and a generated pre-commit hook. |
 | [lifecycle-kit/](lifecycle-kit/) | **landed** | The iteration stage state machine for stateless agent sessions: a stage header + evidence-stamp file, five stage-skill templates (scope/align/build/validate/close — stages are config), and the two gates that make skipping a stage fail the commit. |
-| queue-kit/ | planned | A git-native, agent-readable task tracker: the TASK-QUEUE format, slug namespace, blocked-by/needs-spec tag algebra, hygiene gates. |
+| [queue-kit/](queue-kit/) | **landed** | A git-native, agent-readable task tracker: the TASK-QUEUE format, one slug namespace, the blocked-by/needs-spec/spec tag algebra, `queue-index.sh`, and six gates holding the grammar an agent selects work by. |
 | spec-kit/ | planned | Spec amendment lifecycle, causal-completeness checklist, content-tiering star topology (one owner per fact; cite, never restate). |
 | delegation-kit/ | planned | Agent-execution protocol templates, usage gating, resume-journal mechanics. |
 | context-kit/ | planned | Markdown/pub indexes, session-context hooks, always-loaded-baseline metering. |

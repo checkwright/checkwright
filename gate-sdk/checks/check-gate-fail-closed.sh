@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-fail-closed — every awk/jq capture in the gate family handles subprocess exit status
 #
 # usage: check-gate-fail-closed.sh [dir...]

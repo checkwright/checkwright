@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-output — every gates.list member emits a machine-keyable success line and a help: remedy
 #
 # usage: check-gate-output.sh [gates-dir]

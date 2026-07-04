@@ -12,3 +12,9 @@ check-gate-assertions
 check-graph
 check-stage-evidence
 check-stage-entry
+check-queue-hygiene
+check-queue-wrap
+check-blocked-by-lead-line
+check-task-names
+check-task-conservation
+check-queue-prose-precondition
