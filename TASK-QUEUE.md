@@ -11,28 +11,15 @@
 
 ## New Features
 
-- **consumer-smoke-harness** [spec: SPEC-smoke.md] [blocked-by: spec-kit-vendored-spec-dod-scope]
+- **consumer-smoke-harness** [spec: SPEC-smoke.md]
   — mechanize the validate-stage scratch-consumer proof as
   `gate-sdk/bin/run-consumer-smoke.sh` plus a per-kit `smoke/` contract; the
-  design, causal completeness, and DoD live in the amendment. Blocked on the
-  DoD-scope fix: zero-config green on a vendored tree is unsatisfiable until
-  the finders prune kit roots.
+  design, causal completeness, and DoD live in the amendment. The finder
+  kit-root prune (spec-kit-vendored-spec-dod-scope) is in, so zero-config
+  green on a vendored tree is now satisfiable.
 
 ## Technical Debt
 
-- **spec-kit-vendored-spec-dod-scope** — spec-kit's platform-default
-  `exactly-one` DoD mode fails out of the box for every consumer: the vendored
-  kits land as a DoD-less reference-spec corpus beside gate-sdk, and the spec
-  finders prune `templates/` but not sibling kit roots, so
-  `check-spec-dod-singleton` flags every kit `SPEC.md`. Ruling: vendored kits
-  are dependencies, not governed content — prune `gate_kit_roots` from the
-  shared finders (`spec_canonical_specs`/`spec_amendments` in
-  `spec-kit/lib/spec.sh`) by default, so every finder-based spec gate skips
-  them and the `exactly-one` default holds out of the box. New knob
-  `SPEC_KIT_SCAN_KIT_ROOTS=1` re-includes kit roots: this repo sets it in
-  `scripts/spec-config.sh` (its kit SPECs are first-party content) and keeps
-  `at-most-one`. The fixture pair drives the prune via `GATE_SDK_KIT_DIRS`.
-  Surfaced by the spec-kit validate scratch-consumer proof.
 - **mechanize-session-id-stamp** — the stage skills hand-pick the
   `<session-id>` for the WORKFLOW-STATE stamp and the source diverged in
   practice (transcript UUID vs. code-session URL). Ruling: the canonical id
@@ -77,5 +64,6 @@
 ## Done
 
 - lifecycle-amendment-scan-prunes-templates
+- spec-kit-vendored-spec-dod-scope
 
 ## Lessons Learned

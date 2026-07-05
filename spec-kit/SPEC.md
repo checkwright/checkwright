@@ -168,6 +168,12 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 - `SPEC_KIT_DOD_HEADING` — default `Definition of Done`;
   `SPEC_KIT_DOD_MODE` — `exactly-one` (platform default) or `at-most-one`
   (a reference-spec corpus like this repo's kits carries no DoD).
+- `SPEC_KIT_SCAN_KIT_ROOTS` — `0` (default) or `1`. At `0` the shared finders
+  skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` is
+  a dependency's documentation, not governed content, so the `exactly-one`
+  default holds out of the box on a tree that merely vendored the kits beside
+  gate-sdk. Set `1` when the kit SPECs are the consumer's own first-party
+  content (this repo does, and keeps `at-most-one` for them).
 - `SPEC_KIT_BANNED_HEADINGS` — array, default
   `("Directory Structure" "Public API" "Cargo.toml Dependencies")`;
   `SPEC_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced);
@@ -197,9 +203,12 @@ consumer renaming its sections sets both. Valve and marker spellings
 The sourced config loader plus shared adapters: section-regex builders for
 the queue-facing gate (queue-kit's rule — both sides of a section boundary
 must parse identically), and the canonical-spec/amendment finders the
-spec-scanning gates share (a `templates/` skeleton is a copyable stub, not
-governed content, so the finders skip it — the same rationale as the
-gate-tests prune). Values and adapters only, never gate structure.
+spec-scanning gates share. The finders skip a `templates/` skeleton (a
+copyable stub, not governed content — the same rationale as the gate-tests
+prune) and, unless `SPEC_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under
+the scan root (a dependency's docs; an ancestor kit root — the case when a
+kit's own gate fixture dir is the scan root — never prunes). Values and
+adapters only, never gate structure.
 
 ### check-amendment-queue
 
@@ -225,7 +234,10 @@ also flagged.
 
 Calibration: heading match is level-insensitive within `##`–`####`;
 `at-most-one` exists because a reference-spec corpus legitimately has no
-DoD. `align-only` tier.
+DoD. The good/bad pair covers the DoD count; `check-spec-dod-singleton.test.sh`
+covers the finder's kit-root scoping — a DoD-less vendored kit `SPEC.md` is
+pruned by default (so `exactly-one` holds on a vendored tree) and re-included
+by `SPEC_KIT_SCAN_KIT_ROOTS=1`. `align-only` tier.
 
 ### check-spec-derivable-section
 

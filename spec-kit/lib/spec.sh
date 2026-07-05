@@ -56,6 +56,14 @@ declare -p SPEC_KIT_ACTIVE_SECTIONS  &>/dev/null || SPEC_KIT_ACTIVE_SECTIONS=("N
 [[ -v SPEC_KIT_DOD_HEADING ]] || SPEC_KIT_DOD_HEADING="Definition of Done"
 [[ -v SPEC_KIT_DOD_MODE ]]    || SPEC_KIT_DOD_MODE="exactly-one"
 
+# Whether the shared finders descend into vendored kit roots (gate_kit_roots).
+# Default 0: a vendored kit's SPEC.md/SPEC-*.md is a dependency's documentation,
+# not governed content, so every finder-based spec gate skips it and the
+# 'exactly-one' default holds out of the box on a tree that vendored the kits
+# beside gate-sdk. A consumer whose kit SPECs are its own first-party content
+# (this repo) sets SPEC_KIT_SCAN_KIT_ROOTS=1 to re-include them.
+[[ -v SPEC_KIT_SCAN_KIT_ROOTS ]] || SPEC_KIT_SCAN_KIT_ROOTS=0
+
 # The code-derivable heading set and the fenced-density budget (percent) above
 # which such a section is a code dump. The pointer regex names the one-line
 # index reference that exempts a shed section (consumer index tooling).
@@ -110,16 +118,57 @@ SPEC_SECTION_RE="^## "
 
 # --- shared spec/amendment finders (the collectors the gates share) ----------
 
+# _spec_prune_kit_roots <scan-root> — filter finder stdout to drop any path
+# under a vendored kit root (gate_kit_roots) that lies *within* the scan root,
+# unless SPEC_KIT_SCAN_KIT_ROOTS=1. Vendored kits are dependencies, not governed
+# content. Only kit roots strictly under the scan root prune — an ancestor kit
+# root (e.g. when the scan root is itself a fixture dir physically nested under a
+# kit) must not, or a kit's own gate fixtures would vanish. Paths compare
+# absolute so the finder's root-relative output and gate_kit_roots' absolute (or
+# GATE_SDK_KIT_DIRS relative) forms all match. Needs gate-sdk's lib/gate.sh.
+_spec_prune_kit_roots() {
+    if [[ "$SPEC_KIT_SCAN_KIT_ROOTS" == "1" ]]; then cat; return 0; fi
+    local root="${1:-.}" root_abs
+    case "$root" in
+        /*)  root_abs="$root" ;;
+        .)   root_abs="$PWD" ;;
+        ./*) root_abs="$PWD/${root#./}" ;;
+        *)   root_abs="$PWD/$root" ;;
+    esac
+    root_abs="${root_abs%/}"
+    local -a roots=()
+    local r rabs f fabs keep
+    while IFS= read -r r; do
+        [[ -n "$r" ]] || continue
+        [[ "$r" == /* ]] && rabs="$r" || rabs="$PWD/$r"
+        rabs="${rabs%/}"
+        [[ "$rabs" == "$root_abs/"* ]] || continue   # only a vendored subtree prunes
+        roots+=("$rabs")
+    done < <(gate_kit_roots)
+    [[ ${#roots[@]} -eq 0 ]] && { cat; return 0; }
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        [[ "$f" == /* ]] && fabs="$f" || fabs="$PWD/${f#./}"
+        keep=1
+        for r in "${roots[@]}"; do
+            [[ "$fabs" == "$r/"* ]] && { keep=0; break; }
+        done
+        [[ "$keep" == "1" ]] && printf '%s\n' "$f"
+    done
+}
+
 # spec_canonical_specs <root> — every canonical spec under root (gate_find
 # prunes the tree-walk exclusion set, so kit fixtures never leak into a
 # whole-tree run). Requires gate-sdk's lib/gate.sh already sourced. A skeleton
 # under a templates/ directory is a copyable stub, not governed content (same
 # rationale as the gate-tests prune) — the finders skip it so a shipped
-# SPEC-amendment.md template never reads as a live orphan amendment.
-spec_canonical_specs() { gate_find "$1" -name "$SPEC_KIT_SPEC_NAME" -type f 2>/dev/null | grep -v '/templates/' || true; }
+# SPEC-amendment.md template never reads as a live orphan amendment; a vendored
+# kit root under the scan root is skipped too by default (SPEC_KIT_SCAN_KIT_ROOTS).
+spec_canonical_specs() { gate_find "$1" -name "$SPEC_KIT_SPEC_NAME" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
 
-# spec_amendments <root> — every amendment file under root (templates skipped).
-spec_amendments() { gate_find "$1" -name "$SPEC_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' || true; }
+# spec_amendments <root> — every amendment file under root (templates + vendored
+# kit roots skipped; see spec_canonical_specs).
+spec_amendments() { gate_find "$1" -name "$SPEC_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
 
 # --- config validation (a malformed machine must not gate anything) ----------
 
@@ -132,6 +181,8 @@ _sk_errs=()
 [[ -n "$SPEC_KIT_DOD_HEADING" ]]      || _sk_errs+=("SPEC_KIT_DOD_HEADING is empty")
 [[ "$SPEC_KIT_DOD_MODE" == "exactly-one" || "$SPEC_KIT_DOD_MODE" == "at-most-one" ]] \
     || _sk_errs+=("SPEC_KIT_DOD_MODE must be exactly-one|at-most-one (got '$SPEC_KIT_DOD_MODE')")
+[[ "$SPEC_KIT_SCAN_KIT_ROOTS" == "0" || "$SPEC_KIT_SCAN_KIT_ROOTS" == "1" ]] \
+    || _sk_errs+=("SPEC_KIT_SCAN_KIT_ROOTS must be 0|1 (got '$SPEC_KIT_SCAN_KIT_ROOTS')")
 [[ "$SPEC_KIT_DERIVABLE_DENSITY" =~ ^[0-9]+$ && "$SPEC_KIT_DERIVABLE_DENSITY" -ge 0 && "$SPEC_KIT_DERIVABLE_DENSITY" -le 100 ]] \
     || _sk_errs+=("SPEC_KIT_DERIVABLE_DENSITY must be 0..100 (got '$SPEC_KIT_DERIVABLE_DENSITY')")
 [[ "$SPEC_KIT_EMBED_THRESHOLD" =~ ^0?\.[0-9]+$|^1(\.0+)?$ ]] \
