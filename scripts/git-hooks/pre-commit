@@ -37,27 +37,27 @@ hook_fail() {
     exit 1
 }
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-output.sh || hook_fail check-gate-output
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-fail-closed.sh || hook_fail check-gate-fail-closed
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-fixture-coverage.sh || hook_fail check-gate-fixture-coverage
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'TASK-QUEUE.md'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'TASK-QUEUE.md'; then
     gate-sdk/checks/check-gate-exemption-tasks.sh || hook_fail check-gate-exemption-tasks
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
     gate-sdk/checks/check-graph.sh || hook_fail check-graph
 fi
 
@@ -91,6 +91,14 @@ fi
 
 if staged_matches 'TASK-QUEUE.md'; then
     queue-kit/checks/check-queue-prose-precondition.sh || hook_fail check-queue-prose-precondition
+fi
+
+if staged_matches 'TASK-QUEUE.md' 'SPEC-*.md' '*/SPEC-*.md'; then
+    spec-kit/checks/check-amendment-queue.sh || hook_fail check-amendment-queue
+fi
+
+if staged_matches '*SPEC*.md' '*.rs' '*.toml' '*.sql' '*.rego' '*.ts' '*.tsx' '*.yaml' '*.yml' '*.proto' '*.sh' 'Dockerfile'; then
+    spec-kit/checks/check-spec-embedded-source.sh || hook_fail check-spec-embedded-source
 fi
 
 exit 0

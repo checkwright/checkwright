@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# graph: couples=*SPEC*.md dir=one valve=none tier=align-only
+# spec: spec-kit/SPEC.md §check-spec-dod-singleton — a canonical spec carries the Definition-of-Done heading the configured number of times
+#
+# usage: check-spec-dod-singleton.sh [scan-root]
+#   Scans every canonical spec (SPEC_KIT_SPEC_NAME) under the root (default '.').
+set -uo pipefail
+
+KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
+# shellcheck source=../lib/spec.sh
+source "$KIT/lib/spec.sh"
+
+ROOT="${1:-.}"
+[[ -d "$ROOT" ]] || { echo "check-spec-dod-singleton: not a directory: $ROOT" >&2; exit 2; }
+
+mapfile -t specs < <(spec_canonical_specs "$ROOT" | sort)
+[[ ${#specs[@]} -eq 0 ]] && { echo "SPEC-DOD-SINGLETON: clean (0 $SPEC_KIT_SPEC_NAME found)"; exit 0; }
+
+# Heading match: level-insensitive within ##–####, the configured heading text
+# as a case-insensitive substring of the heading body.
+dod_lc="$(printf '%s' "$SPEC_KIT_DOD_HEADING" | tr '[:upper:]' '[:lower:]')"
+
+errors=()
+for f in "${specs[@]}"; do
+    n="$(awk -v want="$dod_lc" '
+        /^#{2,4}[[:space:]]/ {
+            h = tolower($0); sub(/^#{2,4}[[:space:]]+/, "", h)
+            if (index(h, want) > 0) c++
+        }
+        END { print c + 0 }
+    ' "$f")"; st=$?
+    fail_closed "$st" check-spec-dod-singleton awk
+    if [[ "$SPEC_KIT_DOD_MODE" == "exactly-one" && "$n" -ne 1 ]]; then
+        errors+=("$f has $n \"$SPEC_KIT_DOD_HEADING\" heading(s) (need exactly 1)")
+    elif [[ "$SPEC_KIT_DOD_MODE" == "at-most-one" && "$n" -gt 1 ]]; then
+        errors+=("$f has $n \"$SPEC_KIT_DOD_HEADING\" heading(s) (need at most 1)")
+    fi
+done
+
+if [[ ${#errors[@]} -gt 0 ]]; then
+    echo "SPEC-DOD-SINGLETON: ${#errors[@]} violation(s) ($SPEC_KIT_DOD_MODE):"
+    printf '  %s\n' "${errors[@]}"
+    echo "  help: a duplicate Definition-of-Done checklist is two sources on the completion contract — fold the doubled/appended one into the canonical '## $SPEC_KIT_DOD_HEADING' heading${SPEC_KIT_DOD_MODE:+ (add one if missing under exactly-one)}"
+    exit 1
+fi
+echo "SPEC-DOD-SINGLETON: clean (${#specs[@]} $SPEC_KIT_SPEC_NAME scanned, $SPEC_KIT_DOD_MODE)"
+exit 0

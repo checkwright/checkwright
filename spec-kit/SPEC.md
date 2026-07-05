@@ -158,11 +158,16 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   (a reference-spec corpus like this repo's kits carries no DoD).
 - `SPEC_KIT_BANNED_HEADINGS` — array, default
   `("Directory Structure" "Public API" "Cargo.toml Dependencies")`;
-  `SPEC_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced).
+  `SPEC_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced);
+  `SPEC_KIT_DERIVABLE_POINTER_REGEX` — the index-pointer marker that exempts
+  a shed section, default `pub-index|proto-index` (consumer index tooling).
 - `SPEC_KIT_EMBED_THRESHOLD` / `SPEC_KIT_EMBED_MINLINES` — defaults `0.70`
-  / `8`; `SPEC_KIT_EMBED_LANGS` — the scanned-language fence set, default
-  = the platform list; `SPEC_KIT_EMBED_ILLUSTRATIVE` — fences
-  illustrative-by-default, default `(json)`.
+  / `8`; `SPEC_KIT_EMBED_LANGS` — the scanned fence-language → source
+  mapping, one `kind|fence-alias,…|file-glob,…` entry per language family,
+  default = the platform list; `SPEC_KIT_EMBED_ILLUSTRATIVE` — fences
+  illustrative-by-default, default `(json)`; `SPEC_KIT_EMBED_WIRE_KIND` — the
+  one fence an amendment may embed as a not-yet-merged contract delta,
+  default `proto`.
 - `SPEC_KIT_GLOSSARY_FILE` — default `GLOSSARY.md`;
   `SPEC_KIT_DUP_SURFACES` — array of surfaces scanned for foreign
   definitions, default `(VISION.md)` plus every component spec.
@@ -179,8 +184,10 @@ consumer renaming its sections sets both. Valve and marker spellings
 
 The sourced config loader plus shared adapters: section-regex builders for
 the queue-facing gate (queue-kit's rule — both sides of a section boundary
-must parse identically), amendment-glob find, and the fence walker the
-spec-scanning gates share. Values and adapters only, never gate structure.
+must parse identically), and the canonical-spec/amendment finders the
+spec-scanning gates share (a `templates/` skeleton is a copyable stub, not
+governed content, so the finders skip it — the same rationale as the
+gate-tests prune). Values and adapters only, never gate structure.
 
 ### check-amendment-queue
 

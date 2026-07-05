@@ -18,3 +18,7 @@ check-blocked-by-lead-line
 check-task-names
 check-task-conservation
 check-queue-prose-precondition
+check-amendment-queue
+check-spec-dod-singleton
+check-spec-derivable-section
+check-spec-embedded-source

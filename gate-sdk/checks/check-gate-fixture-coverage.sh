@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,scripts/gate-tests/*,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,scripts/gate-tests/*,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — every gates.list member has a fixture pair or a no-fixture opt-out
 #
 # usage: check-gate-fixture-coverage.sh [gates-dir [tests-dir...]]

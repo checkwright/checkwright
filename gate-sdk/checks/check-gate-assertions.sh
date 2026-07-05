@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=gate-sdk/SPEC.md,lifecycle-kit/SPEC.md,queue-kit/SPEC.md,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh dir=bi valve=none tier=align-only
+# graph: couples=gate-sdk/SPEC.md,lifecycle-kit/SPEC.md,queue-kit/SPEC.md,spec-kit/SPEC.md,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh dir=bi valve=none tier=align-only
 # spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion span+count to the gate code's `# assertion` markers
 #
 # usage: check-gate-assertions.sh [spec [scripts-dir]]

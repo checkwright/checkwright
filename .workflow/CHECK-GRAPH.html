@@ -66,63 +66,100 @@
     const graph = `%%{init:{'theme':'${dark ? 'dark' : 'base'}','themeVariables':{'fontSize':'13px'}}}%%
 graph LR
   subgraph surfaces["governed surfaces"]
-    n0["*/SPEC-*.md"]
-    n1[".workflow/CHECK-GRAPH.html"]
-    n2[".workflow/WORKFLOW-STATE.txt"]
-    n3["SPEC-*.md"]
-    n4["TASK-QUEUE.md"]
-    n5["gate-sdk/*.sh"]
-    n6["gate-sdk/SPEC.md"]
-    n7["lifecycle-kit/*.sh"]
-    n8["lifecycle-kit/SPEC.md"]
-    n9["queue-kit/*.sh"]
-    n10["queue-kit/SPEC.md"]
-    n11["scripts/*.sh"]
-    n12["scripts/gate-tests/*"]
-    n13["scripts/gates.list"]
-    n14["scripts/git-hooks/pre-commit"]
+    n0["*.proto"]
+    n1["*.rego"]
+    n2["*.rs"]
+    n3["*.sh"]
+    n4["*.sql"]
+    n5["*.toml"]
+    n6["*.ts"]
+    n7["*.tsx"]
+    n8["*.yaml"]
+    n9["*.yml"]
+    n10["*/SPEC-*.md"]
+    n11["*SPEC*.md"]
+    n12[".workflow/CHECK-GRAPH.html"]
+    n13[".workflow/WORKFLOW-STATE.txt"]
+    n14["Dockerfile"]
+    n15["SPEC-*.md"]
+    n16["TASK-QUEUE.md"]
+    n17["gate-sdk/*.sh"]
+    n18["gate-sdk/SPEC.md"]
+    n19["lifecycle-kit/*.sh"]
+    n20["lifecycle-kit/SPEC.md"]
+    n21["queue-kit/*.sh"]
+    n22["queue-kit/SPEC.md"]
+    n23["scripts/*.sh"]
+    n24["scripts/gate-tests/*"]
+    n25["scripts/gates.list"]
+    n26["scripts/git-hooks/pre-commit"]
+    n27["spec-kit/*.sh"]
+    n28["spec-kit/SPEC.md"]
   end
-  n4 -->|"check-blocked-by-lead-line"| n4
-  n6 <-->|"check-gate-assertions"| n8
-  n6 <-->|"check-gate-assertions"| n10
-  n6 <-->|"check-gate-assertions"| n11
-  n6 <-->|"check-gate-assertions"| n5
-  n6 <-->|"check-gate-assertions"| n7
-  n6 <-->|"check-gate-assertions"| n9
-  n11 -->|"check-gate-exemption-tasks"| n5
-  n11 -->|"check-gate-exemption-tasks"| n7
-  n11 -->|"check-gate-exemption-tasks"| n9
-  n11 -->|"check-gate-exemption-tasks"| n4
-  n11 -->|"check-gate-fail-closed"| n5
-  n11 -->|"check-gate-fail-closed"| n7
-  n11 -->|"check-gate-fail-closed"| n9
-  n13 -->|"check-gate-fixture-coverage"| n11
-  n13 -->|"check-gate-fixture-coverage"| n12
-  n13 -->|"check-gate-fixture-coverage"| n5
-  n13 -->|"check-gate-fixture-coverage"| n7
-  n13 -->|"check-gate-fixture-coverage"| n9
-  n13 -->|"check-gate-output"| n11
-  n13 -->|"check-gate-output"| n5
-  n13 -->|"check-gate-output"| n7
-  n13 -->|"check-gate-output"| n9
-  n13 -->|"check-graph"| n11
-  n13 -->|"check-graph"| n5
-  n13 -->|"check-graph"| n7
-  n13 -->|"check-graph"| n9
-  n13 -->|"check-graph"| n14
-  n13 -->|"check-graph"| n1
-  n13 -->|"check-graph"| n3
-  n13 -->|"check-graph"| n0
-  n4 -->|"check-queue-hygiene"| n4
-  n4 -->|"check-queue-prose-precondition"| n4
-  n4 -->|"check-queue-wrap"| n4
-  n11 -->|"check-shellcheck"| n5
-  n11 -->|"check-shellcheck"| n7
-  n11 -->|"check-shellcheck"| n9
-  n4 -->|"check-stage-entry"| n2
-  n4 -->|"check-stage-evidence"| n2
-  n4 -->|"check-task-conservation"| n4
-  n4 -->|"check-task-names"| n4
+  n16 <-->|"check-amendment-queue"| n15
+  n16 <-->|"check-amendment-queue"| n10
+  n16 -->|"check-blocked-by-lead-line"| n16
+  n18 <-->|"check-gate-assertions"| n20
+  n18 <-->|"check-gate-assertions"| n22
+  n18 <-->|"check-gate-assertions"| n28
+  n18 <-->|"check-gate-assertions"| n23
+  n18 <-->|"check-gate-assertions"| n17
+  n18 <-->|"check-gate-assertions"| n19
+  n18 <-->|"check-gate-assertions"| n21
+  n18 <-->|"check-gate-assertions"| n27
+  n23 -->|"check-gate-exemption-tasks"| n17
+  n23 -->|"check-gate-exemption-tasks"| n19
+  n23 -->|"check-gate-exemption-tasks"| n21
+  n23 -->|"check-gate-exemption-tasks"| n27
+  n23 -->|"check-gate-exemption-tasks"| n16
+  n23 -->|"check-gate-fail-closed"| n17
+  n23 -->|"check-gate-fail-closed"| n19
+  n23 -->|"check-gate-fail-closed"| n21
+  n23 -->|"check-gate-fail-closed"| n27
+  n25 -->|"check-gate-fixture-coverage"| n23
+  n25 -->|"check-gate-fixture-coverage"| n24
+  n25 -->|"check-gate-fixture-coverage"| n17
+  n25 -->|"check-gate-fixture-coverage"| n19
+  n25 -->|"check-gate-fixture-coverage"| n21
+  n25 -->|"check-gate-fixture-coverage"| n27
+  n25 -->|"check-gate-output"| n23
+  n25 -->|"check-gate-output"| n17
+  n25 -->|"check-gate-output"| n19
+  n25 -->|"check-gate-output"| n21
+  n25 -->|"check-gate-output"| n27
+  n25 -->|"check-graph"| n23
+  n25 -->|"check-graph"| n17
+  n25 -->|"check-graph"| n19
+  n25 -->|"check-graph"| n21
+  n25 -->|"check-graph"| n27
+  n25 -->|"check-graph"| n26
+  n25 -->|"check-graph"| n12
+  n25 -->|"check-graph"| n15
+  n25 -->|"check-graph"| n10
+  n16 -->|"check-queue-hygiene"| n16
+  n16 -->|"check-queue-prose-precondition"| n16
+  n16 -->|"check-queue-wrap"| n16
+  n23 -->|"check-shellcheck"| n17
+  n23 -->|"check-shellcheck"| n19
+  n23 -->|"check-shellcheck"| n21
+  n23 -->|"check-shellcheck"| n27
+  n11 -->|"check-spec-derivable-section"| n11
+  n11 -->|"check-spec-dod-singleton"| n11
+  n11 -->|"check-spec-embedded-source"| n2
+  n11 -->|"check-spec-embedded-source"| n5
+  n11 -->|"check-spec-embedded-source"| n4
+  n11 -->|"check-spec-embedded-source"| n1
+  n11 -->|"check-spec-embedded-source"| n6
+  n11 -->|"check-spec-embedded-source"| n7
+  n11 -->|"check-spec-embedded-source"| n8
+  n11 -->|"check-spec-embedded-source"| n9
+  n11 -->|"check-spec-embedded-source"| n0
+  n11 -->|"check-spec-embedded-source"| n3
+  n11 -->|"check-spec-embedded-source"| n14
+  n16 -->|"check-stage-entry"| n13
+  n16 -->|"check-stage-evidence"| n13
+  n16 -->|"check-task-conservation"| n16
+  n16 -->|"check-task-names"| n16
 `;
     mermaid.initialize({ startOnLoad: false });
     const { svg } = await mermaid.render('graph', graph);
