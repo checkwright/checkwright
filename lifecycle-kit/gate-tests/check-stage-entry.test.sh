@@ -137,9 +137,26 @@ demo-iteration build bbbbbbbb 2026-06-02
 EOF
 check_case "C4 single-component" "$c4" 0 "STAGE-ENTRY: clean"
 
+# C5 (good): a single real amendment (own dir) plus a templates/ stub amendment
+# in another dir — the stub is a copyable skeleton, not a live amendment, so it
+# is excluded from the scan and does not fabricate a second component.
+c5="$SANDBOX/c5"
+build_queue "$c5"
+mkdir -p "$c5/.workflow" "$c5/widget-service" "$c5/some-kit/templates"
+: >"$c5/widget-service/SPEC.md"
+printf 'delta stays within widget-service/SPEC.md\n' >"$c5/widget-service/SPEC-foo.md"
+: >"$c5/some-kit/templates/SPEC-amendment.md"
+cat >"$c5/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01
+demo-iteration build bbbbbbbb 2026-06-02
+EOF
+check_case "C5 templates-stub-not-counted" "$c5" 0 "STAGE-ENTRY: clean"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + assertion C cross-component align/waiver, 4 cases)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + assertion C cross-component align/waiver + templates-stub exclusion, 5 cases)"
 exit 0

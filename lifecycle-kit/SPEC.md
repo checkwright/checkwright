@@ -128,9 +128,12 @@ amendment signal but no `<iter> <audit-stage>` stamp demands either that
 stamp or an explicit recorded waiver line, mechanizing the audit stage's
 self-reported cross-component trigger so a missed trigger cannot silently
 skip the audit. The signal reads the on-disk amendment tree (cwd-relative,
-gate-sdk prune set applied): it fires when amendment files span ≥2 component
-dirs, OR when a single amendment's component set — its own dir ∪ the
-contract-surface tokens in its body that resolve to a roster dir — is ≥2. The
+gate-sdk prune set applied, and `templates/` paths excluded — a shipped
+`SPEC-amendment.md` skeleton is a copyable stub, not a live amendment, the
+same exclusion spec-kit's finders apply): it fires when amendment files span
+≥2 component dirs, OR when a single amendment's component set — its own dir ∪
+the contract-surface tokens in its body that resolve to a roster dir — is ≥2.
+The
 waiver rides the same file the stamps do (auditable) and is written only on
 an explicit user ruling — never self-issued by the entering session; it
 satisfies only assertion C (assertion A's predecessor scan matches the audit
@@ -146,9 +149,10 @@ component surfaces" — it can over-demand (the cheap waiver valve absorbs
 that) and can under-detect a purely semantic cross-component impact; it
 converts a silent skip into a stamp, a recorded waiver, or a narrow
 false-negative, strictly better than self-report. The good/bad pair covers
-assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over four
+assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over five
 sandbox scenarios (two-dir amendments ±waiver, a single-amendment
-cross-component body, a single-component amendment). Suite *runs* and other
+cross-component body, a single-component amendment, and a `templates/` stub
+that must not fabricate a second component). Suite *runs* and other
 non-static exits are not re-runnable as pre-commit gates and stay
 human-judged at the stage approval; the prerequisite-stamp floor is their
 mechanical residual.

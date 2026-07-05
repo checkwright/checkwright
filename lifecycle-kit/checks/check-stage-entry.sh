@@ -78,18 +78,23 @@ if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" 
     fail_closed "$st" STAGE-ENTRY "awk audit-stamp scan"
 
     if [[ "$audit_stamp" != "1" ]]; then
+        # A roster/amendment file under a templates/ directory is a copyable
+        # stub, not governed content — the same rationale spec-kit's finders
+        # apply (spec-kit/lib/spec.sh spec_amendments). Excluding it keeps a
+        # shipped SPEC-amendment.md template from reading as a live amendment
+        # in a second component dir and false-firing the cross-component signal.
         declare -A roster=()
         while IFS= read -r sf; do
             [[ -n "$sf" ]] || continue
             sf="${sf#./}"; roster["${sf%/*}"]=1
-        done < <(gate_find "." -name "$LIFECYCLE_ROSTER_BASENAME" -type f)
+        done < <(gate_find "." -name "$LIFECYCLE_ROSTER_BASENAME" -type f | grep -v '/templates/' || true)
 
         declare -A amend_dirs=()
         amend_files=()
         while IFS= read -r af; do
             [[ -n "$af" ]] || continue
             af="${af#./}"; amend_dirs["${af%/*}"]=1; amend_files+=("$af")
-        done < <(gate_find "." -name "$LIFECYCLE_AMENDMENT_GLOB" -type f)
+        done < <(gate_find "." -name "$LIFECYCLE_AMENDMENT_GLOB" -type f | grep -v '/templates/' || true)
 
         contract_alt=""
         for ct in "${LIFECYCLE_CONTRACT_TOKENS[@]}"; do

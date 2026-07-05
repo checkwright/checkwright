@@ -5,3 +5,4 @@
 ---
 
 kit-hardening scope bebc4a5c 2026-07-05
+kit-hardening build 818e6999 2026-07-05
