@@ -28,6 +28,14 @@
   line), running the entry preconditions as a pre-flight; the stage gates stay
   the independent verifier (the gen-pre-commit ↔ check-graph writer/asserter
   split). Judgment stays in the skill; only the mechanical stamp+flip moves.
+- **brace-expansion-guard-rule** [needs-spec] — extend the friction-kit generic
+  ruleset with a rule that pre-empts unquoted brace expansion the way rule 6
+  pre-empts `$(...)`: the harness prompts on the bare `{` glyph before allowlist
+  matching (git-ref shorthand `@{u}`/`HEAD@{n}`, `{a,b}`/`{a..b}` lists), so
+  steer to the explicit form (`origin/<branch>..HEAD`, written-out lists).
+  Scope call for /scope: how not to over-block legitimate brace-glob
+  convenience (`mkdir -p a/{b,c}`). Ships with guard-tests; updates SPEC
+  §ruleset.
 
 ## Done
 
