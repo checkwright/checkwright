@@ -15,11 +15,6 @@
   starter queue template battery-clean (relocate the teaching examples, drop the dangling
   spec-ref example) and switch queue-kit's smoke install to a verbatim template copy so the
   contract stays mechanically enforced.
-- **friction-kit-extraction** [spec: friction-kit/SPEC.md] — extract the permission-friction
-  loop: hook-guard framework + harness-generic ruleset, scan-prompts, compare-settings-allow,
-  wakeup-guard template, close-stage triage step; dogfood the guard and triage step on this
-  repo. Widen gate-sdk kit discovery to checks/-or-smoke/ siblings so the gateless kit is
-  vendored by the smoke harness and covered by the self-lint sweep.
 
 ## Technical Debt
 
@@ -33,5 +28,7 @@
   KPIs and lead/lag honesty labels (kit 7).
 
 ## Done
+
+- friction-kit-extraction
 
 ## Lessons Learned

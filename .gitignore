@@ -6,3 +6,6 @@ Cargo.lock
 EXTRACTION.md
 # per-user permission grants stay local; the stage skills in commands/ are tracked
 .claude/settings.local.json*
+# friction-kit per-iteration scratch logs (cleared at close-stage triage)
+.workflow/prompt-friction.log
+.workflow/wakeup-attempts.log

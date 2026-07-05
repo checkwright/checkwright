@@ -37,7 +37,7 @@ hook_fail() {
     exit 1
 }
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'friction-kit/*.sh'; then
     gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
 fi
 

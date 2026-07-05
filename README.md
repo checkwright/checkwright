@@ -23,15 +23,15 @@ own kits, day one.
 | [lifecycle-kit/](lifecycle-kit/) | **landed** | The iteration stage state machine for stateless agent sessions: a stage header + evidence-stamp file, five stage-skill templates (scope/align/build/validate/close — stages are config), and the two gates that make skipping a stage fail the commit. |
 | [queue-kit/](queue-kit/) | **landed** | A git-native, agent-readable task tracker: the TASK-QUEUE format, one slug namespace, the blocked-by/needs-spec/spec tag algebra, `queue-index.sh`, and six gates holding the grammar an agent selects work by. |
 | [spec-kit/](spec-kit/) | **landed** | Spec discipline for agent-authored components: one canonical spec per component, deltas as short-lived amendment files, a content-tiering star topology (one owner per fact; cite, never restate), and five gates over the copy-shaped failure modes. |
-| [friction-kit/](friction-kit/) | **in extraction** | Permission-friction tooling: a bash command-guard, tracked-vs-local settings curation, and a close-stage friction-triage step. |
+| [friction-kit/](friction-kit/) | **landed** | Permission-friction tooling for agent sessions: a `PreToolUse` guard framework (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers no gates. |
 | delegation-kit/ | planned | Agent-execution protocol templates, usage gating, resume-journal mechanics. |
 | context-kit/ | planned | Markdown/pub indexes, session-context hooks, always-loaded-baseline metering. |
 | drift-kit/ | planned | Drift reporting with pluggable KPIs and lead/lag honesty labels. |
 
 The **planned** kits are extracted in the order listed; each lands with its own
 fixtures and README. `friction-kit` entered as an unsequenced candidate, to be
-slotted only if permission friction kept compounding — it did, and the active
-iteration is extracting it ahead of the planned three. The repo is a monorepo
+slotted only if permission friction kept compounding — it did, and it landed
+ahead of the planned three. The repo is a monorepo
 — a kit is split out only if it earns independent adoption.
 
 ## This repo, governed

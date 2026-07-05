@@ -1,0 +1,41 @@
+# friction-kit guard decision table — <expected-decision><TAB><command>.
+# @ROOT@ is substituted with the git-sandbox root at run time. Every generic
+# rule (friction-kit/SPEC.md §The generic ruleset) has a firing + a non-firing
+# case. Columns are tab-separated; # and blank lines are ignored.
+
+# rule 1 — cd in a compound command
+block	cd deploy && ls
+fallthrough	cd deploy
+
+# rule 2 — git -C <repo-root> when cwd is the root
+block	git -C @ROOT@ status --short
+fallthrough	git -C @ROOT@/sub status
+
+# rule 3 — bare-name scratch redirect
+block	some-runner 2> op.err
+fallthrough	some-runner 2> .tmp/op.err
+
+# rule 4 — absolute-path read-only repo script (rewrite) vs other script (block)
+rewrite	bash @ROOT@/scripts/check-foo.sh
+rewrite	@ROOT@/scripts/check-env.sh --list
+block	bash @ROOT@/scripts/gen-configs.sh
+
+# rule 5 — repo-root absolute prefix (non-script) steered; foreign path untouched
+block	sed -n '1,5p' @ROOT@/notes/file.md
+fallthrough	sed -n '1,5p' /other/repo/file.md
+
+# rule 6 — shell expansion / assignment; single-quoted $ stays literal
+block	echo $(pwd)
+block	P=/tmp/x
+fallthrough	awk '$1' data.txt
+
+# rule 7 — `: > file` truncation auto-allowed iff every target is gitignored
+allow	: > scratch.txt
+fallthrough	: > tracked.txt
+
+# rule 8 — read-only pipeline auto-allow; a non-roster segment falls through
+allow	grep -rn foo src | head
+fallthrough	grep foo file | awk '{print}'
+
+# rule 9 — anything else falls through to the friction log
+fallthrough	make build

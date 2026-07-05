@@ -1,0 +1,243 @@
+# shellcheck shell=bash
+# spec: friction-kit/SPEC.md §The guard framework — sourced library: hook
+# primitives + the harness-generic ruleset. No project toolchain rule content.
+#
+# Extracted from the governance meta-layer of a private production platform;
+# every toolchain- and product-coupled guard rule stayed behind — this file
+# carries only the harness-generic mechanism.
+#
+# A consumer guard sets GUARD_NAME, then sources this file, then invokes the
+# primitives / guard_generic_rules. Sourcing has no effect beyond defining
+# functions and filling the FRICTION_KIT_* knobs (config file first, then
+# platform-value defaults) — it never decides or exits on its own.
+
+# ---- config: consumer file first, then platform-value defaults --------------
+
+_frik_cfg="${FRICTION_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/friction-config.sh}"
+if [[ -f "$_frik_cfg" ]]; then
+    # shellcheck source=/dev/null  # consumer config path is resolved at runtime
+    source "$_frik_cfg"
+fi
+unset _frik_cfg
+
+: "${FRICTION_KIT_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log}"
+: "${FRICTION_KIT_WAKEUP_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log}"
+: "${FRICTION_KIT_SETTINGS:=.claude/settings.json}"
+: "${FRICTION_KIT_SETTINGS_LOCAL:=.claude/settings.local.json}"
+declare -p FRICTION_KIT_RO_SCRIPTS >/dev/null 2>&1 || FRICTION_KIT_RO_SCRIPTS=("check-*.sh")
+declare -p FRICTION_KIT_SCRATCH_DIRS >/dev/null 2>&1 || FRICTION_KIT_SCRATCH_DIRS=(".tmp")
+declare -p FRICTION_KIT_RO_BINS >/dev/null 2>&1 || FRICTION_KIT_RO_BINS=(
+    grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls
+)
+
+# ---- primitives: each emits the harness PreToolUse hook protocol ------------
+
+# guard_read_command — parse the hook JSON on stdin, print .tool_input.command.
+# Returns non-zero (no output) on any parse problem or an empty command; the
+# caller pairs it with `|| exit 0` so a guard can never wedge the agent
+# (fail-open is the default posture).
+guard_read_command() {
+    local input cmd
+    input="$(cat 2>/dev/null)" || return 1
+    cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)" || return 1
+    [[ -z "$cmd" ]] && return 1
+    printf '%s' "$cmd"
+}
+
+# guard_block <msg> — deny (exit 2) with a self-describing message on stderr:
+# it names the offending pattern AND the corrective form, so the why of a rule
+# rides to the agent in the rejection itself.
+guard_block() {
+    printf '%s\n' "${GUARD_NAME:-guard}: $1" >&2
+    exit 2
+}
+
+# guard_advise <msg> — allow, but feed the message back as additionalContext
+# (steering without blocking).
+guard_advise() {
+    printf '%s' "$1" | jq -Rc '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:.}}'
+    exit 0
+}
+
+# guard_allow <reason> — silent grant via permissionDecision:allow.
+guard_allow() {
+    jq -nc --arg r "$1" \
+        '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow",permissionDecisionReason:$r}}'
+    exit 0
+}
+
+# guard_rewrite <cmd> <reason> — behavior-preserving rewrite via updatedInput
+# (grant the better spelling of the same command).
+guard_rewrite() {
+    jq -nc --arg c "$1" --arg r "$2" \
+        '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow",permissionDecisionReason:$r,updatedInput:{command:$c}}}'
+    exit 0
+}
+
+# guard_log_fallthrough <cmd> — append the (truncated, newline-flattened)
+# command to the friction log. Best-effort; never affects the decision.
+guard_log_fallthrough() {
+    local fline
+    fline="$(printf '%s' "$1" | tr '\n\t' '  ' | cut -c1-500)"
+    printf '%s\n' "$fline" >>"$FRICTION_KIT_LOG" 2>/dev/null || true
+}
+
+# ---- the harness-generic ruleset (order is load-bearing) --------------------
+
+# 1. `cd` in a compound command — cwd drift plus a permission prompt no
+#    allowlist entry suppresses.
+guard_rule_cd_compound() {
+    local cmd="$1"
+    if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then
+        guard_block "don't use 'cd' in a compound command (permission prompts / cwd drift). Pass absolute paths, or 'git -C <dir>' for git."
+    fi
+}
+
+# 2. `git -C <repo-root>` when cwd is the root — the absolute -C target matches
+#    no allowlist entry and re-prompts; the bare `git` form is allowlisted.
+#    Pinned with a trailing space to the exact root, so a subdir or foreign -C
+#    is untouched.
+guard_rule_git_c_root() {
+    local cmd="$1"
+    if grep -qF "git -C $PWD " <<<"$cmd"; then
+        guard_block "drop 'git -C $PWD ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and won't re-prompt. Reserve 'git -C <dir>' for a different repo."
+    fi
+}
+
+# 3. Bare-name scratch redirect — a >/>> to a slash-free *.err/*.out/*.log
+#    target lands in the tracked tree and risks a `git add -A`. The no-slash
+#    class lets path-bearing targets, /dev/null, and fd-dups through.
+guard_rule_scratch_redirect() {
+    local cmd="$1"
+    if grep -qE '(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\.(err|out|log)([[:space:]]|$)' <<<"$cmd"; then
+        guard_block "don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. ${FRICTION_KIT_SCRATCH_DIRS[0]}/<name>.err)."
+    fi
+}
+
+# 4. Absolute-path execution of a repo script — a read-only one (roster
+#    FRICTION_KIT_RO_SCRIPTS) is silently rewritten to the repo-relative form
+#    the allowlist globs match; any other absolute repo-script spelling gets a
+#    corrective block. Placed before rule 5, which would steer less precisely.
+guard_rule_abs_script() {
+    local cmd="$1" rest base g relcmd
+    case "$cmd" in
+        "bash $PWD/"*) rest="${cmd#bash "$PWD/"}" ;;
+        "$PWD/"*)      rest="${cmd#"$PWD/"}" ;;
+        *)             return 0 ;;
+    esac
+    rest="${rest%%[[:space:]]*}"            # first token = repo-relative script path
+    case "$rest" in *.sh) ;; *) return 0 ;; esac   # only .sh scripts; rule 5 handles the rest
+    base="${rest##*/}"
+    relcmd="${cmd//"$PWD/"/}"               # strip every repo-root prefix
+    for g in "${FRICTION_KIT_RO_SCRIPTS[@]}"; do
+        # shellcheck disable=SC2053  # intentional glob match: $g is a pattern, not a literal
+        if [[ "$base" == $g || "$rest" == $g ]]; then
+            guard_rewrite "$relcmd" "abs repo read-only script normalized to relative (${GUARD_NAME:-guard})"
+        fi
+    done
+    guard_block "use the repo-relative form '$rest' (cwd is the repo root) — it's allowlisted and won't re-prompt; the absolute spelling isn't. If you truly need the absolute path, run it yourself with !<command>."
+}
+
+# 5. Repo-root absolute prefix (non-script) — any other command carrying the
+#    literal repo-root prefix is steered to the repo-relative spelling. `git`
+#    is excluded; rule 2 already owns its -C handling.
+guard_rule_abs_prefix() {
+    local cmd="$1"
+    [[ "$cmd" == git\ * ]] && return 0
+    if grep -qF "$PWD/" <<<"$cmd"; then
+        guard_block "drop the repo-root absolute prefix '$PWD/' — cwd is the repo root, so the repo-relative path is allowlisted and won't re-prompt; the absolute spelling isn't. If you truly need the absolute path, run it yourself with !<command>."
+    fi
+}
+
+# 6. Shell expansion / assignment — a residual ${…}/$(…)/<(…)/$NAME after
+#    single-quoted regions are stripped is blocked (the harness prompts on
+#    every expansion before allowlist matching). Only single-quoted regions
+#    are stripped: inside single quotes $ is literal (awk '$1'), but a
+#    double-quoted "$x" still expands and must stay visible. A standalone
+#    NAME=value assignment is caught separately.
+guard_rule_expansion() {
+    local cmd="$1" sqexp expn
+    sqexp="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
+    if grep -qE '\$\{|\$\(|<\(|\$[A-Za-z_]' <<<"$sqexp"; then
+        guard_block "avoid shell variables/expansions (\$VAR, \${...}, \$(...), <(...)) — the harness prompts on every expansion and no allowlist entry can suppress it. Inline the literal path, use a relative path, or 'git -C <dir>'. If you genuinely need the expansion, run it yourself with !<command>."
+    fi
+    expn="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    if grep -qE '(^|[;(]|&&|\|\|)[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=[^[:space:];|&]*[[:space:]]*($|;)' <<<"$expn"; then
+        guard_block "avoid shell variable assignments (NAME=value; ... \$NAME) — they force a permission prompt that can't be allowlisted. Inline the literal value/path at each use site, or 'git -C <dir>'. If you genuinely need it, run it yourself with !<command>."
+    fi
+}
+
+# 7. Auto-allow `: > file` truncation — a leading `:` plus redirect defeats the
+#    permission matcher, so it always prompts. Granted silently when the
+#    command is only `:` followed by redirects and every target is gitignored:
+#    truncating scratch is safe; a tracked file must still prompt. Expansions
+#    (rule 6) are already blocked, so a surviving target is a literal path.
+guard_rule_truncate_scratch() {
+    local cmd="$1"
+    if [[ "$cmd" =~ ^[[:space:]]*:([[:space:]]+[0-9]*\>\>?[[:space:]]*[^[:space:]\&\|\;\<]+)+[[:space:]]*$ ]]; then
+        local all_ignored=1 tgt
+        while read -r tgt; do
+            [[ -z "$tgt" ]] && continue
+            git check-ignore --quiet -- "$tgt" || { all_ignored=0; break; }
+        done < <(grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]&|;<]+' <<<"$cmd" \
+            | sed -E 's/^[0-9]*>>?[[:space:]]*//')
+        if [[ "$all_ignored" == 1 ]]; then
+            guard_allow "truncate gitignored scratch (${GUARD_NAME:-guard} auto-allow)"
+        fi
+    fi
+}
+
+# 8. Auto-allow read-only pipeline — granted silently when every pipe segment
+#    leads with a roster binary (FRICTION_KIT_RO_BINS) and every redirect
+#    target is /dev/null or an fd-dup. Conservative by construction: command/
+#    process substitution, a leftover quote after stripping, any statement
+#    separator, a non-/dev/null redirect, or a `find` with a write action all
+#    refuse and fall through.
+guard_rule_ro_pipeline() {
+    local raw="$1"
+    grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    local s
+    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$raw")"
+    grep -q "['\"]" <<<"$s" && return 0
+    grep -qE '(&&|\|\||;|&)' <<<"$s" && return 0
+    local tgt
+    while read -r tgt; do
+        [[ -z "$tgt" ]] && continue
+        case "$tgt" in
+            /dev/null | '&'[0-9]*) ;;
+            *) return 0 ;;
+        esac
+    done < <(grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|]+' <<<"$s" \
+        | sed -E 's/^[0-9]*>>?[[:space:]]*//')
+    if grep -qE '(^|[[:space:]])find([[:space:]]|$)' <<<"$s" \
+        && grep -qE '\-(exec|execdir|ok|delete)\b' <<<"$s"; then
+        return 0
+    fi
+    local seg first b matched
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        [[ -z "$seg" ]] && continue
+        first="${seg%%[[:space:]]*}"
+        matched=0
+        for b in "${FRICTION_KIT_RO_BINS[@]}"; do
+            [[ "$first" == "$b" ]] && { matched=1; break; }
+        done
+        [[ "$matched" == 1 ]] || return 0
+    done < <(tr '|' '\n' <<<"$s")
+    guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
+}
+
+# guard_generic_rules <cmd> — run rules 1-8 in the load-bearing order. Rule 9
+# (fall-through logging) is the caller's last line, after this returns.
+guard_generic_rules() {
+    local cmd="$1"
+    guard_rule_cd_compound "$cmd"
+    guard_rule_git_c_root "$cmd"
+    guard_rule_scratch_redirect "$cmd"
+    guard_rule_abs_script "$cmd"
+    guard_rule_abs_prefix "$cmd"
+    guard_rule_expansion "$cmd"
+    guard_rule_truncate_scratch "$cmd"
+    guard_rule_ro_pipeline "$cmd"
+}

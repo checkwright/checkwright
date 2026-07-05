@@ -84,11 +84,13 @@ gate_resolve() {
 
 # gate_kit_roots — the vendored kit roots, one per line, in resolution order:
 # this kit (gate-sdk) first, then its sibling kits — any directory beside it
-# holding a checks/ — sorted by name. Override with GATE_SDK_KIT_DIRS
-# (space-separated paths, resolved from the caller's cwd — the entry points
-# cd to the repo root first).
+# holding a checks/ OR a smoke/ — sorted by name. A gateless kit (hooks/tools
+# only, no checks/) is still discovered by its smoke/, so its smoke/install.sh
+# runs under run-consumer-smoke.sh and its lib/ and bin/ are swept by
+# check-shellcheck. Override with GATE_SDK_KIT_DIRS (space-separated paths,
+# resolved from the caller's cwd — the entry points cd to the repo root first).
 gate_kit_roots() {
-    local d
+    local d kit
     if [[ -n "${GATE_SDK_KIT_DIRS:-}" ]]; then
         for d in $GATE_SDK_KIT_DIRS; do printf '%s\n' "$d"; done
         return 0
@@ -97,10 +99,11 @@ gate_kit_roots() {
     sdk="$(gate_sdk_root)"
     printf '%s\n' "$sdk"
     parent="${sdk%/*}"
-    for d in "$parent"/*/checks; do
-        [[ -d "$d" ]] || continue
-        [[ "${d%/checks}" == "$sdk" ]] && continue
-        printf '%s\n' "${d%/checks}"
+    for d in "$parent"/*/; do
+        kit="${d%/}"
+        [[ "$kit" == "$sdk" ]] && continue
+        [[ -d "$kit/checks" || -d "$kit/smoke" ]] || continue
+        printf '%s\n' "$kit"
     done
     return 0
 }

@@ -21,7 +21,8 @@ override with `GATE_SDK_GATES_DIR`) holding:
   each vendored kit's `checks/<name>.sh` — so any kit's shipped gates are
   registered by name alone, and a consumer can shadow one by dropping a
   same-named file in its own gates dir. The kit set defaults to gate-sdk plus
-  every sibling directory holding a `checks/` (a vendored Checkwright kit);
+  every sibling directory holding a `checks/` **or** a `smoke/` (a vendored
+  Checkwright kit — a gateless kit is discovered by its `smoke/` alone);
   override with `GATE_SDK_KIT_DIRS` (space-separated kit roots).
 - the consumer's own `check-*.sh` gates (copy-edits of
   `templates/check-skeleton.sh`).
@@ -37,7 +38,7 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 (default `TASK-QUEUE.md`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
-siblings holding a `checks/`). Paths are repo-root-relative; every entry point
+siblings holding a `checks/` or a `smoke/`). Paths are repo-root-relative; every entry point
 `cd`s to `git rev-parse --show-toplevel` before resolving them.
 
 ## The gate model
