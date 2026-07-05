@@ -11,7 +11,9 @@ flip the queue header's `[stage:]` line to `validate` and commit the flip
 together with this stamp — the arriving-stage flip; the line and its stamp
 must match, so they ride in one commit. (`check-stage-entry` additionally
 requires the active queue drained before this flip — build is not done until
-the queue is empty.)
+the queue is empty.) Take `<session-id>` from lifecycle-kit's
+`bin/session-id.sh` (it reads the id from the newest transcript — never
+hand-pick it); `<date>` is `date +%F`.
 
 ## Session ritual
 

@@ -22,7 +22,9 @@ the stamp proves invocation, not faithful execution). As the same first step,
 flip the queue header's `[stage:]` line to `build` and commit the flip
 together with this stamp — the arriving-stage flip; the line and its stamp
 must match, so they ride in one commit (the departing session left the line
-untouched).
+untouched). Take `<session-id>` from lifecycle-kit's `bin/session-id.sh` (it
+reads the id from the newest transcript — never hand-pick it); `<date>` is
+`date +%F`.
 
 Build runs one fresh session per task: a fresh session rehydrates the
 governing docs + queue state at full fidelity from disk, where an in-session

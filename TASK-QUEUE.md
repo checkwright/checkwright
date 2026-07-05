@@ -20,21 +20,7 @@
 
 ## Technical Debt
 
-- **mechanize-session-id-stamp** — the stage skills hand-pick the
-  `<session-id>` for the WORKFLOW-STATE stamp and the source diverged in
-  practice (transcript UUID vs. code-session URL). Ruling: the canonical id
-  is the transcript UUID's first 8 hex chars — it rotates per session,
-  including across a context clear, which is exactly what per-stage
-  provenance needs; the code-session URL does not. Mechanism: new
-  `lifecycle-kit/bin/session-id.sh` prints the id of the most recently
-  written transcript under the agent sessions dir (default: the Claude
-  projects dir derived from the config home and the cwd; override
-  `LIFECYCLE_SESSIONS_DIR`); newest-file selection is the documented
-  single-operator assumption. Wire the script into the stamp step of all
-  five `templates/skills/*.md` and this repo's `.claude/commands/*.md`, and
-  amend lifecycle-kit/SPEC.md's best-effort session-id wording — the id is
-  read, not guessed.
-- **enforce-distinct-stage-sessions** [blocked-by: mechanize-session-id-stamp]
+- **enforce-distinct-stage-sessions**
   — check-stage-evidence verifies stamps are well-formed and current but not
   that different stages carry different sessions, so a duplicate slid through
   green (build == validate). Ruling settled: distinct stages of the current
@@ -65,5 +51,6 @@
 
 - lifecycle-amendment-scan-prunes-templates
 - spec-kit-vendored-spec-dod-scope
+- mechanize-session-id-stamp
 
 ## Lessons Learned

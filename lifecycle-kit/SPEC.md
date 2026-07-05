@@ -51,9 +51,13 @@ Later stages only append.
 
 **Honest limit:** a stamp proves the stage skill was *invoked*, not that its
 work was done faithfully — strictly better than skip-and-no-trace, but not
-proof of done. The `<session-id>` field is best-effort (the real session id
-when known, else a short descriptive marker); the gates key only on
-`<iteration> <stage>` and never read it.
+proof of done. The `<session-id>` field is **read, not hand-picked**:
+`bin/session-id.sh` prints the canonical id — the first 8 hex of the newest
+agent-session transcript under the sessions dir, which rotates per session
+(including across a context clear) — and the stage skills stamp exactly what
+it prints, so each stage's provenance is observed, not guessed.
+`check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; the
+session id is provenance the file carries.
 
 ## Layout and configuration
 
@@ -86,6 +90,17 @@ then validation. Also owns the shared header adapters
 `lifecycle_stage_known`) — both gates must parse the header identically, and
 a shared adapter removes that drift axis. Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
+
+### bin/session-id.sh
+
+Prints the canonical stamp id so a stage skill reads it rather than guessing:
+the first 8 hex of the most recently written transcript under the sessions dir
+(default `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or
+`~/.claude`, and the cwd with every non-alphanumeric char mapped to `-`;
+override `LIFECYCLE_SESSIONS_DIR`). Newest-file selection is the documented
+single-operator assumption (one live session per project tree); an absent dir
+or transcript exits 2. Not a gate — a `bin/` helper the flip+stamp first step
+of every stage skill invokes for `<session-id>`.
 
 ### check-stage-evidence
 

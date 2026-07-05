@@ -10,7 +10,9 @@ stays platform rule content, what becomes consumer config.
 truncate `.workflow/WORKFLOW-STATE.txt` back to its header (git history keeps
 the prior iteration's stamps), append `— scope <session-id> <date>`, and set
 the TASK-QUEUE.md header to `## Iteration: —  [stage: scope]` — the
-arriving-stage flip, here bootstrapping an unnamed iteration.
+arriving-stage flip, here bootstrapping an unnamed iteration. Take
+`<session-id>` from `bash lifecycle-kit/bin/session-id.sh` (it reads the id
+from the newest transcript — never hand-pick it); `<date>` is `date +%F`.
 
 Scope rules for this repo: copy-first, never carve-out (the platform repo
 stays untouched); rule content never leaves the platform — term lists,

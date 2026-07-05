@@ -10,7 +10,9 @@ iteration exists in `.workflow/WORKFLOW-STATE.txt`, run
 **First step — stamp evidence.** Append `<iteration> build <session-id>
 <date>` to `.workflow/WORKFLOW-STATE.txt`; flip the TASK-QUEUE.md `[stage:]`
 line to `build` in the same commit (flip only on arrival — a same-stage
-re-entry stamps without flipping).
+re-entry stamps without flipping). Take `<session-id>` from
+`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
+transcript — never hand-pick it); `<date>` is `date +%F`.
 
 ## Session ritual
 

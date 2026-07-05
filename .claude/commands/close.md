@@ -3,7 +3,9 @@ Lessons Learned cleared.
 
 **First step — stamp evidence.** Append `<iteration> close <session-id>
 <date>` to `.workflow/WORKFLOW-STATE.txt`; flip the TASK-QUEUE.md `[stage:]`
-line to `close` in the same commit.
+line to `close` in the same commit. Take `<session-id>` from
+`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
+transcript — never hand-pick it); `<date>` is `date +%F`.
 
 ## Session ritual
 

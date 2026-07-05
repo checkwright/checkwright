@@ -13,7 +13,9 @@ the same reset commit>*. Then append one stamp line
 `<iteration> scope <session-id> <date>`, and set the queue header to
 `## Iteration: <name>  [stage: scope]` (naming the iteration + flipping the
 stage) — the arriving-stage flip the lifecycle mandates, here also naming the
-new iteration. A new iteration is `—` until `scope` names it, so the scope
+new iteration. Take `<session-id>` from lifecycle-kit's `bin/session-id.sh`
+(it reads the id from the newest transcript — never hand-pick it); `<date>` is
+`date +%F`. A new iteration is `—` until `scope` names it, so the scope
 stamp keys on `—` (e.g. `— scope ab12cd34 2026-06-06`). The later stage skills
 **append**; only `scope` truncates. This is what `check-stage-evidence`
 requires on a stage advance. Honest limit: the stamp proves the skill was

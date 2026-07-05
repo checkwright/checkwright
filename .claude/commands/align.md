@@ -4,7 +4,9 @@ condition: no unresolved cross-surface drift.
 
 **First step — stamp evidence.** Append `<iteration> align <session-id>
 <date>` to `.workflow/WORKFLOW-STATE.txt` and flip the TASK-QUEUE.md
-`[stage:]` line to `align`, committed together.
+`[stage:]` line to `align`, committed together. Take `<session-id>` from
+`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
+transcript — never hand-pick it); `<date>` is `date +%F`.
 
 ## Trigger
 

@@ -4,7 +4,9 @@ gate battery and every kit's fixture suite green, whole-tree.
 **First step — stamp evidence.** Append `<iteration> validate <session-id>
 <date>` to `.workflow/WORKFLOW-STATE.txt`; flip the TASK-QUEUE.md `[stage:]`
 line to `validate` in the same commit. (`check-stage-entry` requires the
-active queue drained before this flip.)
+active queue drained before this flip.) Take `<session-id>` from
+`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
+transcript — never hand-pick it); `<date>` is `date +%F`.
 
 ## Session ritual
 
