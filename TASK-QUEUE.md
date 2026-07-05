@@ -15,6 +15,15 @@
 
 ## Deferred
 
+- **spec-kit-vendored-spec-dod-scope** [needs-spec] — spec-kit's platform-default
+  `exactly-one` DoD mode fails out of the box for every consumer: the vendored
+  kits are a DoD-less reference-spec corpus that lands in each consumer's tree
+  beside gate-sdk, and the canonical-spec finder prunes `templates/`+`gate-tests/`
+  but not sibling kit roots, so `check-spec-dod-singleton` flags every kit
+  `SPEC.md`. The documented escape (`at-most-one`) weakens the gate for the
+  consumer's own specs. Ruling needed: prune vendored kit roots (`gate_kit_roots`)
+  from the spec finders by default, vs. document the constraint in spec-kit's
+  README install steps. Surfaced by the spec-kit validate scratch-consumer proof.
 - **delegation-kit-extraction** [needs-spec] — agent-execution protocol
   template, usage gating, resume-journal mechanics (kit 5).
 - **context-kit-extraction** [needs-spec] — markdown/pub indexes,
