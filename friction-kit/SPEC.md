@@ -246,6 +246,15 @@ There is no `smoke/violation.sh`: the kit registers no gates, so no
 battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
 makes that file conditional on exactly this).
 
+One gate-sdk reshape rides this extraction: `gate_kit_roots` recognizes a
+sibling kit by its `checks/` directory, which this gateless kit lacks —
+undiscovered, its `smoke/install.sh` never runs under
+`run-consumer-smoke.sh` and its `lib/` and `bin/` escape `check-shellcheck`'s
+self-lint sweep. Discovery widens to siblings holding `checks/` *or*
+`smoke/`; the gate-sdk SPEC and code change land in the same build commit as
+this kit's `smoke/install.sh` (the harness requires an install script from
+every discovered root, so the widening cannot precede it).
+
 ## What stayed on the platform
 
 Every toolchain- and product-coupled guard rule: build-cache hygiene,

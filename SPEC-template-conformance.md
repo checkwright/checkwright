@@ -1,7 +1,7 @@
 # SPEC amendment: template-conformance
 
 Root-level (a cross-kit workflow ruling with no single owning component).
-Merge target: gate-sdk/SPEC.md §Consumer smoke. Resolves the deferred task
+Merge target: gate-sdk/SPEC.md §Consumer smoke. Resolves the queue task
 `queue-starter-template-not-spec-kit-clean`.
 
 ## What changes
@@ -61,9 +61,12 @@ not ritual.
   where one exists).
 - queue-kit/SPEC.md §templates/ cites the contract (star topology — the
   owner is gate-sdk's §Consumer smoke).
-- This repo's Lessons-Learned entry on starter-template conformance is
-  superseded by the spec text and is retired at this iteration's close
-  (its harvest path).
+- The recorded lesson's prose harvests are already gone: the Lessons-Learned
+  entry was disposed into a validate-skill rule at queue-kit's close, and that
+  rule was retired when the consumer-smoke harness mechanized the ritual. The
+  lesson's only remaining trace is the minimal-queue workaround (body and
+  comment) in queue-kit's `smoke/install.sh`, which the producer change
+  replaces.
 
 ## Definition of Done
 
@@ -74,5 +77,6 @@ not ritual.
       §Consumer smoke; citation into queue-kit/SPEC.md §templates/.
 - [ ] **Amendment deleted** — this file removed on merge; `ls SPEC-*.md`
       clean at root.
-- [ ] **Removals propagated** — the superseded Lessons-Learned entry
-      retired; no spec still describes the minimal-queue smoke install.
+- [ ] **Removals propagated** — the minimal-queue workaround (install body
+      and comment) gone; no spec or skill still describes the minimal-queue
+      smoke install.

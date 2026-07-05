@@ -3,8 +3,8 @@
 # steps 1-2. Step 2 is "copy templates/TASK-QUEUE.md and fill it in"; the
 # filled-in result is a clean minimal queue (the verbatim example template
 # teaches queue grammar to a queue-only consumer, but its example [spec:]/
-# feature entries are not spec-kit-clean in a combined tree — see the debt task
-# queue-starter-template-not-spec-kit-clean).
+# feature entries are not spec-kit-clean in a combined tree — see the queue
+# task queue-starter-template-not-spec-kit-clean).
 # cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored queue-kit copy.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"

@@ -249,7 +249,9 @@ checklist; a kit root lacking `smoke/` is an environment error (exit 2).
   `git clean` (edit a tracked file or add an untracked one), and prints the
   expected gate name as its first stdout line (the harness's red-phase assertion
   reads it). A kit without one contributes install coverage only; the harness
-  prints a notice per such kit so the gap is visible in the evidence.
+  prints a notice per such kit so the gap is visible in the evidence. The file
+  is rightly absent only where no battery-reddening violation is craftable —
+  a kit that registers no gates has nothing to redden.
 
 Producers and consumers: `smoke/` content is produced by the kit author at
 kit-landing time and consumed by the harness's install and violation phases;

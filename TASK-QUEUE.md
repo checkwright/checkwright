@@ -18,7 +18,8 @@
 - **friction-kit-extraction** [spec: friction-kit/SPEC.md] — extract the permission-friction
   loop: hook-guard framework + harness-generic ruleset, scan-prompts, compare-settings-allow,
   wakeup-guard template, close-stage triage step; dogfood the guard and triage step on this
-  repo.
+  repo. Widen gate-sdk kit discovery to checks/-or-smoke/ siblings so the gateless kit is
+  vendored by the smoke harness and covered by the self-lint sweep.
 
 ## Technical Debt
 
