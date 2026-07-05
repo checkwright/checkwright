@@ -25,3 +25,10 @@ own gates pass on it, template prose and all. Gate on the positive success
 tokens (`clean`, `All N gates passed`), not the absence of failure text. A red that traces to a
 deferred queue entry stays red behind its slug; a new red is fixed or filed
 before validate completes. Report failures with their output.
+
+When filing a finding, place it by kind: nameable deliverable + done-state ⇒
+queue task (Deferred `[needs-spec]`; scope triages feature-vs-debt by the
+new-names litmus, spec-kit/SPEC.md §The amendment lifecycle); an observation
+about how the work should be done ⇒ Lessons Learned, dispositioned at close.
+Undone work parked as a lesson evaporates; a process insight parked as a
+task rots.

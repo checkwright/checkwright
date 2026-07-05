@@ -13,6 +13,12 @@ line to `close` in the same commit.
    slug), or →discard (state why). A lesson naming an unfixed gap becomes a
    queue entry, never evaporates. Extraction-methodology lessons that belong
    to the *platform's* seam ruling go to EXTRACTION.md (local-only).
+   Lesson-vs-task litmus (also at filing time, any stage): if the deliverable
+   and its done-state are nameable now, it is a task — file it in Deferred
+   `[needs-spec]` directly, never stage it in Lessons where it waits a stage
+   and risks →discard; Lessons is for observations about how the work should
+   be done, whose durable home (rule vs task vs nothing) genuinely needs the
+   close-stage call.
 2. **Clear Done.**
 3. Review README.md kit table, CLAUDE.md, and each kit README for staleness
    (*is it still true?*).

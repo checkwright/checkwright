@@ -18,6 +18,14 @@ vocabularies, glossary bodies become optional consumer config, never kit
 literals; platform values stay as defaults under `<KIT>_<KNOB>` env/config
 knobs.
 
+**Triage every task at filing** (spec-kit/SPEC.md §The amendment lifecycle):
+feature vs debt is the new-names litmus — a task adding any name to a
+governed surface (script, knob, file/dir convention, tag, cross-component
+contract) is a feature: write the SPEC amendment now (scope is the
+spec-writing stage) and promote it `[spec:]`; no new names ⇒ debt. A ruling
+longer than a few lines drafted into a queue entry is an amendment hiding
+from `check-amendment-queue` — move it into one.
+
 When done, name the iteration (no confirmation needed): replace `—` in the
 header AND in the scope stamp — they ride in one commit. Do **not** flip the
 `[stage:]` line; the arriving stage's skill flips it as its first step.

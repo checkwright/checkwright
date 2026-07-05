@@ -20,6 +20,12 @@ must match, so they ride in one commit.
    not evaporate. When a lesson claims it was "already filed under <slug>",
    verify the target task's **body** actually carries the specific finding
    before dispositioning →task — the slug merely existing is not enough.
+   Lesson-vs-task litmus (holds at filing time in any stage, not just here):
+   if the deliverable and its done-state are nameable now, it is a task —
+   file it in the deferred section directly, never stage it in Lessons where
+   it waits a stage and risks →discard; Lessons is for observations about
+   how the work should be done, whose durable home (rule vs task vs nothing)
+   genuinely needs this stage's call.
 2. *<Your housekeeping sweeps: deprecation scan, gate-runtime budget check,
    backlog-aging / premise-rot review, tooling-friction triage.>*
 3. **Clear Done.**

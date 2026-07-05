@@ -11,6 +11,13 @@
 
 ## New Features
 
+- **consumer-smoke-harness** [spec: SPEC-smoke.md] [blocked-by: spec-kit-vendored-spec-dod-scope]
+  — mechanize the validate-stage scratch-consumer proof as
+  `gate-sdk/bin/run-consumer-smoke.sh` plus a per-kit `smoke/` contract; the
+  design, causal completeness, and DoD live in the amendment. Blocked on the
+  DoD-scope fix: zero-config green on a vendored tree is unsatisfiable until
+  the finders prune kit roots.
+
 ## Technical Debt
 
 - **spec-kit-vendored-spec-dod-scope** — spec-kit's platform-default
@@ -51,23 +58,6 @@
   cross-stage distinctness pass, add the bad fixture (two stages, one id),
   and amend lifecycle-kit/SPEC.md §check-stage-evidence — the gate now reads
   the session-id field it previously ignored.
-- **consumer-smoke-harness** [blocked-by: spec-kit-vendored-spec-dod-scope]
-  — the validate-stage scratch-consumer proof is prose ritual: re-performed
-  by hand each validate, no committed evidence, and nobody exercises the
-  platform *defaults* on a vendored-kit tree (kit fixtures use contrived
-  trees; this repo's battery runs under its own spec-config overrides — the
-  gap the DoD defect slid through). Ruling: mechanize it as
-  `gate-sdk/bin/run-consumer-smoke.sh` — build a scratch consumer in a temp
-  dir (git init, vendor the kits by copy, run the documented install steps),
-  run the full battery under zero consumer config and assert the positive
-  green token, then per kit inject one crafted violation and assert red.
-  Each kit ships its violation material in its own `smoke/` dir so the
-  harness stays generic; the smoke script is the executable form of the
-  README install steps (README cites it — a coupling gate is a later task if
-  drift bites). Wire the harness into `.claude/commands/validate.md`'s
-  ritual in place of the prose paragraph; blocked on the DoD-scope fix
-  because zero-config green on a vendored tree is unsatisfiable until then.
-
 ## Deferred
 
 - **delegation-kit-extraction** [needs-spec] — agent-execution protocol

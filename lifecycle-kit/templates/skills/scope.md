@@ -27,6 +27,15 @@ update design-ahead projections (diagrams, models) in scope itself behind a
 gate-safe PROPOSED marker so review happens a stage before the code; ask
 clarifying questions about scope before proposing.>*
 
+**Triage every task at filing — feature vs debt by the new-names litmus.** A
+task that adds any name to a governed surface (a script, a config knob, a
+file or directory convention, a tag, a contract another component must
+honor) is a feature: author its design amendment in this stage, however
+small the diff looks. Debt converges behavior on names the specs already
+carry and needs no amendment. The tell for misfiling: a design ruling
+longer than a few lines drafted into a queue entry is an amendment inlined
+where no gate can see it — move it into one.
+
 Before declaring an amendment ready, verify causal completeness — every new
 state, event, or interface the amendment introduces names its **producer**
 (what code path or trigger creates it — and that the producer's enabling

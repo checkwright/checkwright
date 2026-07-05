@@ -26,6 +26,12 @@ usually already a filed task with the diagnosis written. If it's filed: note
 it and move on. Only excavate a failure that is genuinely new or a suspected
 regression from the current diff.
 
+When filing a finding, place it by kind: nameable deliverable + done-state ⇒
+queue task (the deferred section, design-pending); an observation about how
+the work should be done ⇒ the lessons section, dispositioned at close.
+Undone work parked as a lesson evaporates; a process insight parked as a
+task rots.
+
 **Record the evidence.** Append one line per suite to your per-iteration
 evidence manifest (suite, log digest, verdict, date) and commit it at validate
 completion — the evidence does not exist at the entry stamp, so it rides a

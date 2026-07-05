@@ -69,6 +69,18 @@ design *ruling* is design work — it goes to the deferred section
 `[needs-spec]` until scope rules on it. Enforced by
 `check-amendment-queue`.
 
+The feature/debt litmus is **new names**: a task that adds any name to a
+governed surface — a script, a config knob, a file or directory convention,
+a tag, a contract another component must honor — is a feature and needs the
+amendment, however small the diff; debt converges behavior on names the
+spec already carries. The tell for misfiling: a queue entry whose body
+carries more than a few lines of design ruling is an amendment inlined
+where this gate cannot see it — the entry format has no home for causal
+completeness, and the rationale evaporates when the done section is
+cleared. The gate cannot decide which section a task belongs in (that is
+the semantic residue); it enforces the pairing once the section is chosen,
+so the litmus runs at filing time, in the scope skill's triage.
+
 ### The causal-completeness check
 
 Before an amendment is ready, every new state, event, and interface it
