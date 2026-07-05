@@ -56,8 +56,9 @@ proof of done. The `<session-id>` field is **read, not hand-picked**:
 agent-session transcript under the sessions dir, which rotates per session
 (including across a context clear) — and the stage skills stamp exactly what
 it prints, so each stage's provenance is observed, not guessed.
-`check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; the
-session id is provenance the file carries.
+`check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it
+additionally reads the session id to enforce cross-stage distinctness (a stage
+flip must carry a fresh session — see §check-stage-evidence).
 
 ## Layout and configuration
 
@@ -114,6 +115,13 @@ configured stage set plus the waiver token (a stamp token but never a header
 stage), date `YYYY-MM-DD`; every data line's iteration must be the current
 one, stale lines from a prior iteration are rejected; and the `—`
 unnamed-iteration sentinel may appear only while the header itself is unnamed.
+It also reads the `<session-id>` field (which it once ignored) for one
+cross-stage invariant: within the current iteration, two *different* stages
+may not share one session id — a stage flip is a context boundary and demands
+a fresh session, so a duplicate (e.g. build == validate) is a self-reported
+skip and fails. Same-stage re-entries (a multi-session build) may share or
+rotate ids freely, and waiver-token stamps are exempt (never a stage, so never
+in the map).
 
 Calibration: the `—` sentinel is the bootstrap name for a new iteration
 before the first stage names it. Any stage past the first carrying `—` in the

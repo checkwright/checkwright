@@ -20,17 +20,6 @@
 
 ## Technical Debt
 
-- **enforce-distinct-stage-sessions**
-  — check-stage-evidence verifies stamps are well-formed and current but not
-  that different stages carry different sessions, so a duplicate slid through
-  green (build == validate). Ruling settled: distinct stages of the current
-  iteration must carry pairwise-distinct session ids — a stage flip demands a
-  fresh session (stage boundaries are context boundaries); same-stage
-  re-entry stamps (a multi-session build) may share or rotate ids freely, and
-  waiver-token stamps are exempt. Extend check-stage-evidence with the
-  cross-stage distinctness pass, add the bad fixture (two stages, one id),
-  and amend lifecycle-kit/SPEC.md §check-stage-evidence — the gate now reads
-  the session-id field it previously ignored.
 ## Deferred
 
 - **delegation-kit-extraction** [needs-spec] — agent-execution protocol
@@ -52,5 +41,6 @@
 - lifecycle-amendment-scan-prunes-templates
 - spec-kit-vendored-spec-dod-scope
 - mechanize-session-id-stamp
+- enforce-distinct-stage-sessions
 
 ## Lessons Learned

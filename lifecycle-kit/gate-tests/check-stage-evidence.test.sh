@@ -58,14 +58,30 @@ case_run "named-at-validate" \
 # E — a waiver line (check-stage-entry assertion C's recorded waiver) is a
 #     well-formed stamp token: the grammar accepts it, and it never satisfies
 #     the current-stage match (here the build stamp does), so the header is CLEAN.
+#     It also shares its id with build here — a waiver stamp is exempt from the
+#     stage-distinctness pass, so that reuse does not fire.
 case_run "waiver-token-accepted" \
     '## Iteration: demo-iteration  [stage: build]' \
-    'demo-iteration scope s1 2026-06-12\ndemo-iteration align-waived s2 2026-06-12\ndemo-iteration build s3 2026-06-12\n' \
+    'demo-iteration scope s1 2026-06-12\ndemo-iteration align-waived s3 2026-06-12\ndemo-iteration build s3 2026-06-12\n' \
+    0 "clean"
+
+# F — two distinct stages sharing one session id must FAIL: a stage flip is a
+#     context boundary, so scope and build cannot both be session s1.
+case_run "shared-session-across-stages" \
+    '## Iteration: demo-iteration  [stage: build]' \
+    'demo-iteration scope s1 2026-06-12\ndemo-iteration build s1 2026-06-13\n' \
+    1 "is shared by stages"
+
+# G — a multi-session build (same stage, two different ids) is CLEAN: same-stage
+#     re-entries may rotate the id freely.
+case_run "same-stage-multi-session" \
+    '## Iteration: demo-iteration  [stage: build]' \
+    'demo-iteration scope s1 2026-06-12\ndemo-iteration build s2 2026-06-13\ndemo-iteration build s3 2026-06-14\n' \
     0 "clean"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-evidence.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap rejected; bootstrap + named later stage + waiver token accepted)"
+echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages rejected; bootstrap + named later stage + waiver token + multi-session build accepted)"
 exit 0
