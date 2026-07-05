@@ -1,0 +1,2 @@
+# path-like, but no staged file matches it -> assertion B stays clean
+deploy/*.sh

@@ -1,0 +1,23 @@
+# usage-gate decision table — <verdict><TAB><exit><TAB><pct><TAB><age_off><TAB><reset_off><TAB><cred_age><TAB><desc>.
+# Columns are tab-separated; # and blank lines are ignored. Every verdict branch
+# carries a firing and a non-firing case (delegation-kit/SPEC.md §Testing).
+# Defaults under test: PAUSE_PCT=80, STALE_AGE=600, LOGIN_WINDOW=600.
+
+# OK — under threshold, fresh reading, live window
+OK	0	40	0	3600	-	integer under threshold
+OK	0	28.999	0	3600	-	fractional under threshold (non-firing PAUSE)
+
+# PAUSE — over threshold, fresh, live window, no recent login
+PAUSE	1	95	0	3600	-	integer over threshold
+PAUSE	1	82.5	0	3600	-	fractional over threshold (the float-compare regression)
+PAUSE	1	80.9	0	3600	-	fractional just over the boundary (int truncation would miss)
+PAUSE	1	95	0	3600	99999	over threshold with an old login (no lag reroute)
+
+# STALE — post-login lag, stale reading, and non-numeric fail-closed
+STALE	2	95	0	3600	60	over threshold but a fresh login -> STALE (server-fed pct lags)
+STALE	2	40	1200	3600	-	reading older than STALE_AGE
+STALE	2	abc	0	3600	-	non-numeric pct fails closed (never OK)
+
+# RESET-OK — the window rolled over; the pct is from the dead window
+RESET-OK	0	95	0	-100	-	dead window -> RESET-OK (a high pct must not read as PAUSE)
+RESET-OK	0	40	0	-1	-	window just rolled over

@@ -1,0 +1,5 @@
+# a legitimate gate-only commit: gate file + meta-layer paths only,
+# plus a newly added path exemption that matches nothing co-staged
+scripts/check-foo.sh
+scripts/SPEC.md
+TASK-QUEUE.md

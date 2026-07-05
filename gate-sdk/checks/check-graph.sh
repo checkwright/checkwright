@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
 #
 # The consumer's surface vocabulary (the platform rule content the extraction

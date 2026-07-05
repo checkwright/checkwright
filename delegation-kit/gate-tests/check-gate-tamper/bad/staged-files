@@ -1,0 +1,5 @@
+# the attested tamper shape: a gate file weakened in the same commit as the
+# product code it was blocking (default config: scripts/check-*.sh is a gate
+# file; a src/ path outside the meta prefixes is not meta-layer)
+scripts/check-foo.sh
+call-service/src/lib.rs

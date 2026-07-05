@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **delegation-kit-extraction** [spec: delegation-kit/SPEC.md] — extract the
-  safe-delegation protocol: agent-execution skill + resident CLAUDE.md
-  templates, usage-gate budget verdict with pluggable snapshot source,
-  resume-journal mechanics, check-gate-tamper as the validate-after-agent-
-  commit floor; dogfood the gate in this repo's battery (kit 5).
 - **brace-expansion-guard-rule** [spec: friction-kit/SPEC-brace-expansion-guard.md] —
   extend friction-kit's generic ruleset with the unquoted-brace-glyph rule
   (shape-aware block/rewrite, placed before the auto-allows); guard-tests
@@ -37,5 +32,7 @@
   the independent verifier (the gen-pre-commit ↔ check-graph writer/asserter
   split). Judgment stays in the skill; only the mechanical stamp+flip moves.
 ## Done
+
+- delegation-kit-extraction
 
 ## Lessons Learned

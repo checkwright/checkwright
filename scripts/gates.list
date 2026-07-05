@@ -22,3 +22,4 @@ check-amendment-queue
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source
+check-gate-tamper

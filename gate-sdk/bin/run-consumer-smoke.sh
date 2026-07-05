@@ -109,7 +109,11 @@ if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
 fi
 
 # --- violation phase ------------------------------------------------------
-restore() { ( cd "$SCRATCH" && git checkout -q -- . && git clean -qfd ); }
+# Full reset to the committed baseline: unstage + restore tracked files + drop
+# untracked. `git reset --hard` (not `checkout -- .`) is required because a
+# violation may `git add` its shape — an index-reading gate like check-gate-tamper
+# only sees staged changes, and checkout leaves the index dirty.
+restore() { ( cd "$SCRATCH" && git reset -q --hard && git clean -qfd ); }
 
 fired=0
 for r in "${roots[@]}"; do

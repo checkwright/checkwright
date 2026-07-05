@@ -32,6 +32,7 @@ bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks         
 bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks           # queue-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests spec-kit/checks             # spec-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
 ```
 
 The repo also runs lifecycle-kit's iteration state machine on itself — one

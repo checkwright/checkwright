@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,friction-kit/*.sh dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,friction-kit/*.sh,delegation-kit/*.sh dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning (the self-lint contract)
 #
 # usage: check-shellcheck.sh [dir...]
