@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: friction-kit  [stage: close]
+## Iteration: delegation-kit  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,12 +11,20 @@
 
 ## New Features
 
+- **delegation-kit-extraction** [spec: delegation-kit/SPEC.md] — extract the
+  safe-delegation protocol: agent-execution skill + resident CLAUDE.md
+  templates, usage-gate budget verdict with pluggable snapshot source,
+  resume-journal mechanics, check-gate-tamper as the validate-after-agent-
+  commit floor; dogfood the gate in this repo's battery (kit 5).
+- **brace-expansion-guard-rule** [spec: friction-kit/SPEC-brace-expansion-guard.md] —
+  extend friction-kit's generic ruleset with the unquoted-brace-glyph rule
+  (shape-aware block/rewrite, placed before the auto-allows); guard-tests
+  per shape; SPEC §ruleset renumbered.
+
 ## Technical Debt
 
 ## Deferred
 
-- **delegation-kit-extraction** [needs-spec] — agent-execution protocol
-  template, usage gating, resume-journal mechanics (kit 5).
 - **context-kit-extraction** [needs-spec] — markdown/pub indexes,
   session-context hook template, always-loaded baseline metering (kit 6).
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
@@ -28,15 +36,6 @@
   line), running the entry preconditions as a pre-flight; the stage gates stay
   the independent verifier (the gen-pre-commit ↔ check-graph writer/asserter
   split). Judgment stays in the skill; only the mechanical stamp+flip moves.
-- **brace-expansion-guard-rule** [needs-spec] — extend the friction-kit generic
-  ruleset with a rule that pre-empts unquoted brace expansion the way rule 6
-  pre-empts `$(...)`: the harness prompts on the bare `{` glyph before allowlist
-  matching (git-ref shorthand `@{u}`/`HEAD@{n}`, `{a,b}`/`{a..b}` lists), so
-  steer to the explicit form (`origin/<branch>..HEAD`, written-out lists).
-  Scope call for /scope: how not to over-block legitimate brace-glob
-  convenience (`mkdir -p a/{b,c}`). Ships with guard-tests; updates SPEC
-  §ruleset.
-
 ## Done
 
 ## Lessons Learned
