@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: spec-kit  [stage: build]
+## Iteration: spec-kit  [stage: validate]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);

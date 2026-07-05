@@ -6,3 +6,4 @@
 
 spec-kit scope 2cbdd29f 2026-07-05
 spec-kit build aa63ca9a 2026-07-05
+spec-kit validate 01YDDWnY 2026-07-05
