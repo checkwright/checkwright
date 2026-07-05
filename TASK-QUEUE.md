@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: friction-kit  [stage: validate]
+## Iteration: friction-kit  [stage: close]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -30,8 +30,5 @@
   split). Judgment stays in the skill; only the mechanical stamp+flip moves.
 
 ## Done
-
-- friction-kit-extraction
-- queue-starter-template-not-spec-kit-clean
 
 ## Lessons Learned

@@ -55,6 +55,14 @@ Caution: an allowlist entry can *mask* a steering opportunity — before
 blessing a form, confirm it is the one to reinforce; if a better form
 exists, steer to it in the guard rather than permitting the worse one.
 
+Note: the harness matches the allowlist **per segment** of a compound
+command, so a glob on the core command does not cover the `echo` banners,
+`wc`, redirects, or `;`-chained diagnostics wrapped around it — one
+unmatched segment re-prompts the whole line. The read-only banner/diagnostic
+tools an agent habitually chains (`echo`, `wc`, `grep`, `ls`, `command -v`)
+are therefore themselves legitimate allowlist entries; allowlist them, or
+run the core command bare.
+
 ## The guard framework (`lib/guard.sh`)
 
 Primitives a consumer guard composes; each emits the harness's

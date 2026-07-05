@@ -9,3 +9,4 @@ friction-kit align 934236df 2026-07-05
 friction-kit build 2381b8c0 2026-07-05
 friction-kit build 0d210c3a 2026-07-05
 friction-kit validate 592a4994 2026-07-05
+friction-kit close 60fd5594 2026-07-05

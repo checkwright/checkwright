@@ -1,4 +1,26 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(bash gate-sdk/bin/run-gates.sh)",
+      "Bash(bash gate-sdk/bin/run-gate-tests.sh *)",
+      "Bash(bash gate-sdk/bin/run-consumer-smoke.sh)",
+      "Bash(bash gate-sdk/checks/check-graph.sh)",
+      "Bash(bash gate-sdk/checks/check-graph.sh *)",
+      "Bash(bash gate-sdk/bin/gen-pre-commit.sh --write)",
+      "Bash(bash gate-sdk/bin/install-hooks.sh)",
+      "Bash(bash lifecycle-kit/bin/session-id.sh)",
+      "Bash(bash friction-kit/bin/scan-prompts.sh)",
+      "Bash(bash friction-kit/bin/scan-prompts.sh *)",
+      "Bash(bash friction-kit/bin/compare-settings-allow.sh)",
+      "Bash(bash friction-kit/bin/run-guard-tests.sh)",
+      "Bash(ls *)",
+      "Bash(grep *)",
+      "Bash(command -v *)",
+      "Bash(shellcheck *)",
+      "Bash(echo *)",
+      "Bash(wc *)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
