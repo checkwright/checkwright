@@ -18,6 +18,10 @@ honest:
   one shot, per-gate timings.
 - `bin/run-gate-tests.sh` — the golden-fixture runner: every gate proves it
   accepts a `good/` case and rejects a `bad/` case with the right error text.
+- `bin/run-consumer-smoke.sh` — the end-to-end check no fixture makes: builds a
+  fresh scratch consumer, runs each vendored kit's `smoke/` installer, and
+  asserts the battery is green under zero config (then red on each kit's crafted
+  violation). Each kit ships a `smoke/` directory to join the party.
 - `bin/gen-pre-commit.sh` + `bin/install-hooks.sh` — a pre-commit hook
   *generated* from per-gate `# graph:` coupling manifests; adding a gate to
   the hook is manifest-only, so hook membership cannot drift.

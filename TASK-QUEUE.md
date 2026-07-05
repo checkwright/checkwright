@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: kit-hardening  [stage: validate]
+## Iteration: kit-hardening  [stage: close]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -41,11 +41,5 @@
   keeps compounding.
 
 ## Done
-
-- lifecycle-amendment-scan-prunes-templates
-- spec-kit-vendored-spec-dod-scope
-- mechanize-session-id-stamp
-- enforce-distinct-stage-sessions
-- consumer-smoke-harness
 
 ## Lessons Learned
