@@ -195,8 +195,13 @@ attested silent pick on the source platform and the bounded scope.
 ### templates/
 
 `queue-config.sh` — the consumer config template documenting every knob.
-`TASK-QUEUE.md` — a starter queue skeleton (the sections in default order,
-one example entry per grammar shape).
+`TASK-QUEUE.md` — a starter queue skeleton: the sections in default order,
+one example entry per grammar shape shown under `Technical Debt` (the
+`[spec:]`-gated `New Features` carries teaching prose only, since a spec-ready
+example would dangle a ref). It ships battery-clean when copied verbatim — the
+starter-template conformance contract owned by gate-sdk/SPEC.md §Consumer smoke
+— and carries lifecycle-kit's iteration header as inert scaffold so a
+combined-tree copy clears the stage gates too.
 
 ## What stayed on the platform
 

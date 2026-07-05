@@ -254,6 +254,19 @@ checklist; a kit root lacking `smoke/` is an environment error (exit 2).
   is rightly absent only where no battery-reddening violation is craftable —
   a kit that registers no gates has nothing to redden.
 
+**Starter-template conformance.** A kit that ships a starter template (in
+`templates/`) ships it battery-clean: the template must pass the **full
+battery** — every vendored kit's gates — when copied verbatim into a
+combined-kit consumer, not merely the shipping kit's own gates. Kits compose,
+and the first combined tree is where a per-kit-clean template still reddens a
+foreign kit's gate. The obligation is mechanical, not ritual: where a kit ships
+such a template, its `smoke/install.sh` installs it **verbatim** (no fill-in)
+as the governed surface, so a template regression against any kit reddens the
+harness instead of waiting for a hand-run validate proof. A template that
+composes with a downstream kit's contract carries that kit's inert scaffold —
+queue-kit's starter queue ships lifecycle-kit's iteration header so the
+verbatim copy clears the stage gates too, and a single-kit adopter deletes it.
+
 Producers and consumers: `smoke/` content is produced by the kit author at
 kit-landing time and consumed by the harness's install and violation phases;
 the expected-gate name (violation.sh line 1) is read by the red-phase

@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **queue-starter-template-not-spec-kit-clean** [spec: SPEC-template-conformance.md] — make the
-  starter queue template battery-clean (relocate the teaching examples, drop the dangling
-  spec-ref example) and switch queue-kit's smoke install to a verbatim template copy so the
-  contract stays mechanically enforced.
-
 ## Technical Debt
 
 ## Deferred
@@ -30,5 +25,6 @@
 ## Done
 
 - friction-kit-extraction
+- queue-starter-template-not-spec-kit-clean
 
 ## Lessons Learned
