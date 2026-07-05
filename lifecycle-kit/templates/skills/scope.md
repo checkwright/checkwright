@@ -56,3 +56,10 @@ header and stamp to agree, so they ride in one commit). This sets only the
 skill flips it to its own stage as that skill's first step, committed
 atomically with its WORKFLOW-STATE stamp. Invoking the next skill is the
 stage-advance approval (the name itself needs none).
+
+Close by **recommending the next stage**: the trigger-gated audit stage when
+one of its triggers fired this session, otherwise the build stage. The
+cross-component trigger is mechanical — an amendment on disk spanning ≥2
+component dirs makes `check-stage-entry` assertion C demand the audit stamp
+(or a user-ruled waiver) at build entry — so a scope that promoted such an
+amendment should say so rather than let build discover it.

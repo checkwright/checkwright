@@ -31,3 +31,10 @@ from `check-amendment-queue` — move it into one.
 When done, name the iteration (no confirmation needed): replace `—` in the
 header AND in the scope stamp — they ride in one commit. Do **not** flip the
 `[stage:]` line; the arriving stage's skill flips it as its first step.
+
+**Close by recommending the next stage.** Default `build`; recommend `align`
+when one of its triggers fired (see `.claude/commands/align.md`). Trigger 3
+is mechanical: an amendment left on disk whose component span is ≥2 kits
+makes `check-stage-entry` assertion C red a build entry that lacks a
+`<iter> align` stamp or a user-ruled `align-waived` line — so when this
+scope promoted such an amendment, align is not optional, only waivable.
