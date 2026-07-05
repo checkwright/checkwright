@@ -16,17 +16,18 @@ bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
 bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
 
-Also exercise each landed kit as a consumer would: a fresh scratch repo,
-vendor the kits, follow the kit README's install steps, confirm the gates
-fire on a crafted violation (the fixture suites prove the gates; this proves
-the install docs). A kit that ships a starter template (queue-kit's
-`templates/TASK-QUEUE.md`; later spec/delegation/context/drift) escapes the
-repo's own battery — the template is not a governed file here — so run it as a
-live surface in the scratch consumer: copy it verbatim and confirm the kit's
-own gates pass on it, template prose and all. Gate on the positive success
-tokens (`clean`, `All N gates passed`), not the absence of failure text. A red that traces to a
-deferred queue entry stays red behind its slug; a new red is fixed or filed
-before validate completes. Report failures with their output.
+Also exercise the kits as a consumer would, mechanized: run
+`bash gate-sdk/bin/run-consumer-smoke.sh` and gate on its success token
+(`CONSUMER-SMOKE: clean (<n> kits installed, <m> violations fired)`). It
+builds a scratch consumer, installs each kit under **zero config**, asserts
+the full battery is green on the vendored tree, and fires each kit's crafted
+violation to confirm the right gate reddens (gate-sdk/SPEC.md §Consumer
+smoke) — the defaults-on-a-vendored-tree proof the fixture suites cannot make,
+and the executable form of the old copy-the-install-docs ritual. Gate on the
+positive success tokens (`clean`, `All N gates passed`), not the absence of
+failure text. A red that traces to a deferred queue entry stays red behind its
+slug; a new red is fixed or filed before validate completes. Report failures
+with their output.
 
 When filing a finding, place it by kind: nameable deliverable + done-state ⇒
 queue task (Deferred `[needs-spec]`; scope triages feature-vs-debt by the

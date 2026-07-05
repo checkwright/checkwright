@@ -11,16 +11,20 @@
 
 ## New Features
 
-- **consumer-smoke-harness** [spec: SPEC-smoke.md]
-  — mechanize the validate-stage scratch-consumer proof as
-  `gate-sdk/bin/run-consumer-smoke.sh` plus a per-kit `smoke/` contract; the
-  design, causal completeness, and DoD live in the amendment. The finder
-  kit-root prune (spec-kit-vendored-spec-dod-scope) is in, so zero-config
-  green on a vendored tree is now satisfiable.
-
 ## Technical Debt
 
 ## Deferred
+
+- **queue-starter-template-not-spec-kit-clean** [needs-spec] — queue-kit's
+  `templates/TASK-QUEUE.md` teaches queue grammar to a queue-only consumer, but
+  its example New-Features entries carry no spec tag and a Deferred example
+  points a spec ref at a nonexistent SPEC-example.md, so in a combined tree
+  spec-kit's check-amendment-queue reddens on a verbatim copy. Surfaced by the
+  consumer-smoke harness (whose queue install writes a minimal filled queue
+  instead of copying the template verbatim). Ruling not yet settled: make the
+  template cross-kit-clean (retag or relocate the teaching examples, or ship a
+  paired example amendment), or document that a spec-kit consumer fills the
+  template rather than copying it verbatim.
 
 - **delegation-kit-extraction** [needs-spec] — agent-execution protocol
   template, usage gating, resume-journal mechanics (kit 5).
@@ -42,5 +46,6 @@
 - spec-kit-vendored-spec-dod-scope
 - mechanize-session-id-stamp
 - enforce-distinct-stage-sessions
+- consumer-smoke-harness
 
 ## Lessons Learned

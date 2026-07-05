@@ -72,9 +72,10 @@ and enforced by the meta-gates — a red gate is fixed, never bypassed with
 - **Self-contained artifacts:** emitted HTML inlines its CSS (the platform's
   `diagram-assets/` did not leave); no kit output may reference a
   platform-only asset.
-- **Each kit lands with fixtures + its own README + SPEC.md**, and gets
-  registered in this repo's `gates.list` where applicable (the kits govern
-  this repo too).
+- **Each kit lands with fixtures + its own README + SPEC.md + a `smoke/`
+  directory** (`smoke/install.sh`, plus `smoke/violation.sh` where a violation
+  is craftable — gate-sdk/SPEC.md §Consumer smoke), and gets registered in this
+  repo's `gates.list` where applicable (the kits govern this repo too).
 
 ## Housekeeping
 

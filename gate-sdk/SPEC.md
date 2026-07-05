@@ -204,6 +204,61 @@ Every registered gate's header carries a one-line coupling manifest:
 - `gen=manual` — the gate's hook block is bespoke and round-trips verbatim
   between `# >>> manual: <gate>` / `# <<< manual: <gate>` sentinels.
 
+## Consumer smoke
+
+The fixture suites prove each gate in isolation on contrived case dirs, and a
+consumer repo's battery runs under that consumer's own config overrides. Two
+things go untested there: that a *fresh* consumer reaches green by following
+the kit READMEs, and that the **platform defaults** hold on a vendored-kit tree
+under zero config. The DoD-mode defect (`spec-kit-vendored-spec-dod-scope`)
+shipped through exactly that gap. `bin/run-consumer-smoke.sh` closes it,
+mechanizing what was a hand-repeated validate-stage prose ritual with no
+committed evidence.
+
+The harness (`run-consumer-smoke.sh [--keep] [kit-root...]`, a `bin/` tool,
+never a registered gate — it builds a repo and runs the battery repeatedly, so
+it is pre-commit-unfit by runtime budget): builds a scratch consumer in a fresh
+temp dir (`git init`, seed commit), vendors each kit root by copy (default:
+`gate_kit_roots`), and runs each kit's `smoke/install.sh` — gate-sdk first,
+then argument order. It then commits the installed baseline and asserts the
+full battery is green under **zero consumer config** (the positive green token
+`All N gates passed` — the defaults-on-a-vendored-tree assertion no fixture
+suite makes). Per kit shipping `smoke/violation.sh` it fires one crafted
+violation, re-runs the battery, asserts a non-zero exit **and** a `FAIL:`
+line naming the expected gate, then restores the tree (`git checkout . &&
+git clean -fd`) before the next kit; it asserts green once more after the last
+restore. Exit codes follow the gate convention (0 all hold, 1 an assertion
+failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
+(<n> kits installed, <m> violations fired)`. `--keep` retains the temp dir and
+prints its path (the temp-dir write's named reclaim path).
+
+**The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
+directory — shipping it joins fixtures + README + SPEC in the kit-landing
+checklist; a kit root lacking `smoke/` is an environment error (exit 2).
+
+- `smoke/install.sh` (required) — run with cwd = scratch-consumer root and env
+  `SMOKE_KIT_ROOT` = the vendored copy of the installing kit. The executable
+  form of that kit's README install steps: register its gates in
+  `scripts/gates.list`, establish the minimal governed surface its gates need
+  to be green, and regenerate the hook + graph artifacts. It may assume gate-sdk
+  is already installed (it runs first), nothing else. A non-zero exit aborts the
+  harness with exit 2 (a broken installer is an environment failure, not a gate
+  finding).
+- `smoke/violation.sh` (optional) — same cwd/env contract; mutates the scratch
+  tree to introduce exactly one violation restorable by `git checkout` +
+  `git clean` (edit a tracked file or add an untracked one), and prints the
+  expected gate name as its first stdout line (the harness's red-phase assertion
+  reads it). A kit without one contributes install coverage only; the harness
+  prints a notice per such kit so the gap is visible in the evidence.
+
+Producers and consumers: `smoke/` content is produced by the kit author at
+kit-landing time and consumed by the harness's install and violation phases;
+the expected-gate name (violation.sh line 1) is read by the red-phase
+assertion; `SMOKE_KIT_ROOT` is produced by the harness per invocation and read
+by the scripts to copy from their own kit; the harness verdict is consumed by
+the validate-stage ritual (which gates on the success token) and is the natural
+CI entry point (wiring CI is out of scope here).
+
 ## Per-component contracts
 
 ### lib/gate.sh
@@ -237,6 +292,15 @@ finding fired. Exit 2 from a gate marks the fixture malformed (harness error,
 distinct from logic failure). `<tests-dir>/*.test.sh` unit tests run after the
 pairs; each must exit 0. The runner is a test layer parallel to the gates,
 never a `gates.list` member.
+
+### run-consumer-smoke
+
+The scratch-consumer install+violation harness (§Consumer smoke): vendors the
+kit roots into a fresh temp repo, drives each `smoke/install.sh`, asserts the
+full battery is green under zero config, then fires each `smoke/violation.sh`
+and asserts the battery reddens at the named gate before restoring. A `bin/`
+tool, never a `gates.list` member — it is pre-commit-unfit by runtime budget
+and is the proof that the platform defaults hold on a vendored-kit tree.
 
 ### gen-pre-commit
 
