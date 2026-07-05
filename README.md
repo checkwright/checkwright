@@ -26,10 +26,12 @@ own kits, day one.
 | delegation-kit/ | planned | Agent-execution protocol templates, usage gating, resume-journal mechanics. |
 | context-kit/ | planned | Markdown/pub indexes, session-context hooks, always-loaded-baseline metering. |
 | drift-kit/ | planned | Drift reporting with pluggable KPIs and lead/lag honesty labels. |
+| friction-kit/ | candidate | Permission-friction tooling: a bash command-guard, tracked-vs-local settings curation, and a close-stage friction-triage step. Unsequenced — slotted only if the pain compounds. |
 
-Kits are extracted in this order; each lands with its own fixtures and README.
-The repo is a monorepo — a kit is split out only if it earns independent
-adoption.
+The **planned** kits are extracted in the order listed; each lands with its own
+fixtures and README. `friction-kit` is a **candidate** — out of that sequence,
+pulled in only if permission friction keeps compounding. The repo is a monorepo
+— a kit is split out only if it earns independent adoption.
 
 ## This repo, governed
 
