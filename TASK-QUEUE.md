@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: delegation-kit  [stage: validate]
+## Iteration: delegation-kit  [stage: close]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -15,6 +15,19 @@
 
 ## Deferred
 
+- **allowlist-chain-steer-rule** [needs-spec] — a friction-kit guard rule
+  (bash-guard) that reads the committed `.claude/settings.json` bare `Bash(<cmd>)`
+  allow entries (those without a `*` glob) and, when a submitted Bash command
+  chains/pipes/redirects a leading token-sequence that exactly matches one of
+  them (`&&`, `|`, `;`, `2>&1`, trailing redirect), *steers*: "run it bare — the
+  bare form is statically allowed; the decoration forces a prompt." Recurs
+  across stateless close/validate sessions (bit this iteration ~3x, including
+  on the promoted `: > prompt-friction.log` truncation itself); the durable
+  fix is mechanized steer, not a habit no session holds. Logic a glob can't
+  express (criterion b). Done: guard-test fixture pair — a decorated
+  allowlisted command steers, a bare one and a decorated non-allowlisted one
+  pass untouched. Scope decides whether the guard reading settings.json crosses
+  a coupling line worth avoiding.
 - **context-kit-extraction** [needs-spec] — markdown/pub indexes,
   session-context hook template, always-loaded baseline metering (kit 6).
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
@@ -38,8 +51,5 @@
   the owning section, never restate design" rule with no allowlist may be the
   whole extractable mechanism.
 ## Done
-
-- delegation-kit-extraction
-- brace-expansion-guard-rule
 
 ## Lessons Learned

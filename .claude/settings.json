@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(bash gate-sdk/bin/run-gates.sh)",
+      "Bash(bash gate-sdk/bin/run-gates.sh *)",
       "Bash(bash gate-sdk/bin/run-gate-tests.sh *)",
       "Bash(bash gate-sdk/bin/run-consumer-smoke.sh)",
       "Bash(bash gate-sdk/bin/run-consumer-smoke.sh *)",
@@ -23,7 +24,9 @@
       "Bash(shellcheck *)",
       "Bash(chmod +x *)",
       "Bash(echo *)",
-      "Bash(wc *)"
+      "Bash(wc *)",
+      "Bash(head *)",
+      "Bash(tail *)"
     ]
   },
   "hooks": {
