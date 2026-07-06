@@ -29,13 +29,21 @@ block	echo $(pwd)
 block	P=/tmp/x
 fallthrough	awk '$1' data.txt
 
-# rule 7 — `: > file` truncation auto-allowed iff every target is gitignored
+# rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked
+rewrite	find . -exec rm {} \;
+block	git log @{u}..
+block	echo {1..5}
+block	mkdir -p a/{b,c}
+fallthrough	awk '{print $1}'
+fallthrough	find . -exec grep foo '{}' +
+
+# rule 8 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 8 — read-only pipeline auto-allow; a non-roster segment falls through
+# rule 9 — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
 
-# rule 9 — anything else falls through to the friction log
+# rule 10 — anything else falls through to the friction log
 fallthrough	make build

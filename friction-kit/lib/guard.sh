@@ -167,11 +167,44 @@ guard_rule_expansion() {
     fi
 }
 
-# 7. Auto-allow `: > file` truncation — a leading `:` plus redirect defeats the
+# 7. Unquoted brace glyph — the harness prompts on the bare `{` glyph before
+#    allowlist matching, the same class rule 6 pre-empts for `$`-expansions. A
+#    `{` that survives rule 6's single-quote strip is handled by shape:
+#    a bare `{}` exec/xargs placeholder (every residual brace is exactly `{}`)
+#    is single-quoted in place — a behavior-preserving rewrite the matcher
+#    passes, since a literal `{}` inside single quotes reaches the tool
+#    unchanged; every expanding form is blocked with the written-out corrective
+#    (`@{…}` git-ref shorthand, `{a,b}`/`{a..b}` list/range, or any other
+#    residual `{`). There is no legitimate brace-glob convenience to preserve:
+#    every unquoted brace already costs an operator prompt no allowlist entry
+#    can suppress, so block-and-steer strictly dominates. Placed before both
+#    auto-allow rules (8, 9) so their literal-target premise holds for braces.
+guard_rule_brace_glyph() {
+    local cmd="$1" sqstripped resid ph='{}' q="'{}'"
+    sqstripped="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
+    case "$sqstripped" in *'{'*) ;; *) return 0 ;; esac
+    # Bare `{}` placeholder: nothing but `{}` braces survive → single-quote each.
+    resid="${sqstripped//"$ph"/}"
+    case "$resid" in
+        *'{'* | *'}'*) ;;   # a non-placeholder brace remains: fall to the blocks
+        *) guard_rewrite "${cmd//"$ph"/"$q"}" \
+               "bare {} placeholder single-quoted so the harness matcher passes it (${GUARD_NAME:-guard})" ;;
+    esac
+    if grep -qF '@{' <<<"$sqstripped"; then
+        guard_block "spell out the git-ref shorthand '@{...}' — the harness prompts on the '{' glyph. Use 'origin/<branch>..HEAD' for '@{u}..', or the resolved ref/hash for a reflog form."
+    fi
+    if grep -qE '\{[^}]*(,|\.\.)[^}]*\}' <<<"$sqstripped"; then
+        guard_block "write out the brace expansion '{a,b}'/'{a..b}' — the harness prompts on the '{' glyph and no allowlist entry suppresses it. Spell the members (e.g. 'mkdir -p a/b a/c') or use a loop for a long range."
+    fi
+    guard_block "single-quote the '{' if it's literal (an awk/sed program in double quotes), or write it out if it expands — the harness prompts on every bare '{' glyph before allowlist matching."
+}
+
+# 8. Auto-allow `: > file` truncation — a leading `:` plus redirect defeats the
 #    permission matcher, so it always prompts. Granted silently when the
 #    command is only `:` followed by redirects and every target is gitignored:
 #    truncating scratch is safe; a tracked file must still prompt. Expansions
-#    (rule 6) are already blocked, so a surviving target is a literal path.
+#    (rule 6) and brace forms (rule 7) are already blocked, so a surviving
+#    target is a literal path.
 guard_rule_truncate_scratch() {
     local cmd="$1"
     if [[ "$cmd" =~ ^[[:space:]]*:([[:space:]]+[0-9]*\>\>?[[:space:]]*[^[:space:]\&\|\;\<]+)+[[:space:]]*$ ]]; then
@@ -187,7 +220,7 @@ guard_rule_truncate_scratch() {
     fi
 }
 
-# 8. Auto-allow read-only pipeline — granted silently when every pipe segment
+# 9. Auto-allow read-only pipeline — granted silently when every pipe segment
 #    leads with a roster binary (FRICTION_KIT_RO_BINS) and every redirect
 #    target is /dev/null or an fd-dup. Conservative by construction: command/
 #    process substitution, a leftover quote after stripping, any statement
@@ -228,7 +261,7 @@ guard_rule_ro_pipeline() {
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
-# guard_generic_rules <cmd> — run rules 1-8 in the load-bearing order. Rule 9
+# guard_generic_rules <cmd> — run rules 1-9 in the load-bearing order. Rule 10
 # (fall-through logging) is the caller's last line, after this returns.
 guard_generic_rules() {
     local cmd="$1"
@@ -238,6 +271,7 @@ guard_generic_rules() {
     guard_rule_abs_script "$cmd"
     guard_rule_abs_prefix "$cmd"
     guard_rule_expansion "$cmd"
+    guard_rule_brace_glyph "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
 }

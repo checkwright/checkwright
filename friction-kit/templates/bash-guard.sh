@@ -27,6 +27,6 @@ cmd="$(guard_read_command)" || exit 0
 #   grep -qE '<your pattern>' <<<"$cmd" && guard_block "<what> — <corrective form>"
 # ===== end consumer rules ====================================================
 
-guard_generic_rules "$cmd"      # rules 1-8 (see friction-kit/SPEC.md)
-guard_log_fallthrough "$cmd"    # rule 9: log anything neither blocked nor auto-allowed
+guard_generic_rules "$cmd"      # rules 1-9 (see friction-kit/SPEC.md)
+guard_log_fallthrough "$cmd"    # rule 10: log anything neither blocked nor auto-allowed
 exit 0

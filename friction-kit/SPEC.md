@@ -121,22 +121,41 @@ load-bearing where noted.
    literal (`awk '$1'`), but a double-quoted `"$x"` still expands and must
    stay visible. A standalone `NAME=value` assignment is caught separately,
    since the expansion check only sees a *used* `$VAR`.
-7. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
+7. **Unquoted brace glyph** — the harness prompts on the bare `{` glyph
+   before allowlist matching, the same behavior class rule 6 pre-empts for
+   `$`-expansions, so a `{` surviving rule 6's single-quote strip is handled
+   by shape. A **bare `{}` placeholder** (`find … -exec cmd {} +`,
+   `xargs -I{}`), when every residual brace is exactly `{}`, is rewritten
+   via `guard_rewrite` — each `{}` single-quoted to `'{}'`,
+   behavior-preserving (the shell passes a literal `{}` either way) and
+   invisible to the matcher on the same premise as rule 6's strip. Every
+   expanding form is **blocked** with the written-out corrective:
+   git-ref shorthand (`@{u}`, `@{-n}`, `<ref>@{n}`) names the explicit
+   spelling (`origin/<branch>..HEAD`, or the resolved ref/hash);
+   list/range (`{a,b}`, `{a..b}`) names the spelled-out members or a loop;
+   any other residual `{` gets the generic corrective (single-quote if
+   literal — an awk/sed program in double quotes — write it out if it
+   expands). There is no legitimate brace-glob convenience to preserve:
+   since every bare `{` already costs an operator prompt no allowlist entry
+   can suppress, block-and-steer strictly dominates; only single-quoted
+   (literal) braces pass untouched. **Placed before both auto-allow rules**
+   so their literal-target premise holds for braces as well.
+8. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
    defeats the permission matcher, so it always prompts. Granted silently
    when the command is *only* `:` followed by redirects and every target is
    gitignored (`git check-ignore`): truncating scratch is safe; a tracked
    file must still prompt. The `git` subprocess is gated behind the rare
-   `:`-redirect match; expansions (rule 6) are already blocked, so a
-   surviving target is a literal path.
-8. **Auto-allow read-only pipeline** — granted silently when every pipe
+   `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
+   already blocked, so a surviving target is a literal path.
+9. **Auto-allow read-only pipeline** — granted silently when every pipe
    segment leads with a roster binary (`FRICTION_KIT_RO_BINS`, default the
    grep/head/cat/find/jq family) and every redirect target is `/dev/null`
    or an fd-dup. Conservative by construction: command/process
    substitution, a leftover quote after stripping, any statement separator,
    a non-`/dev/null` redirect, or a `find` with a write action all refuse
    and fall through.
-9. **Fall-through logging** — anything neither blocked nor auto-allowed is
-   appended to the friction log. Always last; never affects the decision.
+10. **Fall-through logging** — anything neither blocked nor auto-allowed is
+    appended to the friction log. Always last; never affects the decision.
 
 ### Consumer rules
 
@@ -227,7 +246,7 @@ what the consumer left unset. Knobs (platform values as defaults):
 - `FRICTION_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
 - `FRICTION_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
-- `FRICTION_KIT_RO_BINS` — read-only pipeline roster (rule 8); default the
+- `FRICTION_KIT_RO_BINS` — read-only pipeline roster (rule 9); default the
   grep/head/cat/find/jq family.
 - `FRICTION_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
   rule-3 corrective message; default `(".tmp")`.

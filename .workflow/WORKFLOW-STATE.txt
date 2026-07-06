@@ -6,3 +6,4 @@
 
 delegation-kit scope 86a2a335 2026-07-05
 delegation-kit build 3158aa0e 2026-07-05
+delegation-kit build bb4804e2 2026-07-06

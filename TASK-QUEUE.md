@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **brace-expansion-guard-rule** [spec: friction-kit/SPEC-brace-expansion-guard.md] —
-  extend friction-kit's generic ruleset with the unquoted-brace-glyph rule
-  (shape-aware block/rewrite, placed before the auto-allows); guard-tests
-  per shape; SPEC §ruleset renumbered.
-
 ## Technical Debt
 
 ## Deferred
@@ -34,5 +29,6 @@
 ## Done
 
 - delegation-kit-extraction
+- brace-expansion-guard-rule
 
 ## Lessons Learned
