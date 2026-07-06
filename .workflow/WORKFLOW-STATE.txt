@@ -4,8 +4,4 @@
 
 ---
 
-delegation-kit scope 86a2a335 2026-07-05
-delegation-kit build 3158aa0e 2026-07-05
-delegation-kit build bb4804e2 2026-07-06
-delegation-kit validate 92ccba47 2026-07-06
-delegation-kit close 5ca8f15c 2026-07-06
+context-kit scope ba4d2bca 2026-07-06
