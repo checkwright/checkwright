@@ -30,6 +30,10 @@
   check-comment-tier: comments must be machine/reason directives or exempted;
   kit-mechanism directive roster as default, consumer vocabulary via
   SPEC_KIT_COMMENT_* knobs; sweep this repo's kits (WHITELIST-drained).
+- **tag-lead-line-rename** [spec: queue-kit/SPEC-tag-lead-line.md] — rename
+  check-blocked-by-lead-line to check-tag-lead-line: the gate governs every
+  blocked-by/spec/needs-spec tag, the name claims only blocked-by; registry,
+  SPEC section, fixture dir, and the generated hook artifacts move with it.
 
 ## Technical Debt
 
@@ -37,6 +41,26 @@
 
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
   KPIs and lead/lag honesty labels (kit 7).
+- **kit-terminology-renames** [needs-spec] — user ruling wanted on the two
+  heavier renames: friction-kit to guard-kit (the kit's core is lib/guard.sh;
+  "friction" is platform insider vocabulary) and delegation-kit usage-gate.sh
+  to usage-verdict.sh (leave "gate" meaning one thing product-wide); cheapest
+  while no external consumer exists.
+- **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
+  config positioning Checkwright for DDD ubiquitous-language enforcement
+  (vocabulary via the check-graph/graph-vocab pattern, comment-tier
+  directives); mechanism kits stay DDD-neutral — the coupling lives in docs
+  and examples only; natural landing slot is alongside drift-kit (kit 7).
+- **scope-session-routing** [needs-spec] — iteration-ambiguity routing across
+  sessions: a build/align session forwards a question to the still-live scope
+  session and relays the reply back; design it atop the harness's native
+  agent-to-agent messaging (SendMessage/subagents) rather than bespoke
+  plumbing — the substrate is moving fast and bespoke plumbing would be
+  obsoleted; likely a companion tool or repo, not a kit; triage post kit 7.
+- **adoption-track** [needs-spec] — the outward-facing rung: docs site, demo
+  walkthrough, announcement post, plugin-marketplace presence; this is the
+  path that makes any absorption/standardization outcome possible; scope it
+  as its own iteration post kit 7.
 ## Done
 
 ## Lessons Learned
