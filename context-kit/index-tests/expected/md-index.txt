@@ -1,0 +1,6 @@
+corpus/sample.md  (23L)
+# Sample Document:1  — Intro paragraph with a link and trailing words.
+  ## Overview:5  — A short overview sentence.
+    ### Details:9  — Nested detail under the overview heading.
+  ## Code First:13  — Prose that follows the fence is the first sentence here.
+  ## Bulleted:20  — - not a heading, just a list item

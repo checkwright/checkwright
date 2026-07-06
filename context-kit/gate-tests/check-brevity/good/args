@@ -1,0 +1,2 @@
+# The gate reads its governed file from $1; cwd is this case dir.
+CLAUDE.md

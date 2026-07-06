@@ -105,4 +105,8 @@ if staged_matches 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-ki
     delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
 fi
 
+if staged_matches 'CLAUDE.md'; then
+    context-kit/checks/check-brevity.sh || hook_fail check-brevity
+fi
+
 exit 0

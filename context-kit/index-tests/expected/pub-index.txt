@@ -1,0 +1,10 @@
+corpus/sample.rs  (9)
+  const    EPSILON :18
+  enum     Beta :5
+  fn       delta :14
+  fn       theta :16
+  mod      things :1
+  static   ZETA :20
+  struct   Alpha :3
+  trait    Gamma :10
+  type     Eta :22

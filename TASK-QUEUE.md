@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **context-kit-extraction** [spec: context-kit/SPEC.md] — extract the
-  context-management kit: md-index/md-section/pub-index, the session-context
-  hook template, the always-loaded meter with its committed baseline, the
-  check-brevity gate, and the close-stage brevity-pass template; dogfood the
-  hook, gate, and baseline in this repo (kit 6).
 - **allowlist-chain-steer-rule** [spec: friction-kit/SPEC-allowlist-chain-steer.md] —
   generic ruleset rule 10: block-and-steer a decorated command whose lead
   matches a committed bare
@@ -62,5 +57,7 @@
   path that makes any absorption/standardization outcome possible; scope it
   as its own iteration post kit 7.
 ## Done
+
+- context-kit-extraction
 
 ## Lessons Learned

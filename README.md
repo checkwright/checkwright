@@ -25,7 +25,7 @@ own kits, day one.
 | [spec-kit/](spec-kit/) | **landed** | Spec discipline for agent-authored components: one canonical spec per component, deltas as short-lived amendment files, a content-tiering star topology (one owner per fact; cite, never restate), and five gates over the copy-shaped failure modes. |
 | [friction-kit/](friction-kit/) | **landed** | Permission-friction tooling for agent sessions: a `PreToolUse` guard framework (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers no gates. |
 | [delegation-kit/](delegation-kit/) | **landed** | Safe delegated-agent execution for budget-bounded sessions: the supervisor protocol (serialize on the shared git index, one commit per unit, resume journal, validate after every agent commit), a trustworthy budget verdict (`usage-gate`), and `check-gate-tamper` — a commit-shape gate blocking the two attested gate-weakening shapes. |
-| context-kit/ | planned | Markdown/pub indexes, session-context hooks, always-loaded-baseline metering. |
+| [context-kit/](context-kit/) | **landed** | Token-economics-aware context management: the index-first reading tools (md-index/md-section/pub-index), a session-start hook that assembles a compact brief, an always-loaded meter with its committed baseline, and `check-brevity` over the densest always-loaded section. |
 | drift-kit/ | planned | Drift reporting with pluggable KPIs and lead/lag honesty labels. |
 
 The **planned** kits are extracted in the order listed; each lands with its own

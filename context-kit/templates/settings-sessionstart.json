@@ -1,0 +1,12 @@
+{
+  "//": "context-kit SessionStart wiring — merge into .claude/settings.json. Assumes session-context.sh was copied into your gates dir (default scripts/). The hook assembles the session brief and always exits 0.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash scripts/session-context.sh" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+## Code First
+
+```
+let x = 1;
+```
+Prose that follows the fence is the first sentence here.
