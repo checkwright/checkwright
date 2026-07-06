@@ -5,3 +5,4 @@
 ---
 
 context-kit scope ba4d2bca 2026-07-06
+context-kit align 5251b93b 2026-07-06
