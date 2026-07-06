@@ -76,7 +76,8 @@ session. Steps, in order:
 harness session id, and its 8-char prefix equals what lifecycle-kit's
 `session-id.sh` computes, so the hook *could* inject the canonical stamp
 id with no shell-out. It does not: lifecycle-kit owns its id derivation
-end-to-end (stage skills call `session-id.sh`), and having those skills
+end-to-end (the stage-entry ritual derives it via `session-id.sh`,
+whatever invokes that script), and having the stage skills
 read a context-kit-injected value would wire an upstream kit's protocol to
 a downstream kit's hook for ergonomics only — the trust model gains
 nothing, since `check-stage-evidence` already enforces that the stamped id

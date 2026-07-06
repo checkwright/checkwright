@@ -29,7 +29,12 @@ Behavior:
   to the unnamed-iteration form `## Iteration: —  [stage: <stage>]`.
 - **Pre-flight, not enforcement:** before mutating anything, run
   `check-stage-entry` for the target stage and refuse (exit 1, findings
-  printed, no writes) when it is red. The refusal is advisory in the same
+  printed, no writes) when it is red. The gate reads the stage from the
+  queue header and takes no target-stage argument, so the pre-flight
+  evaluates the *entered* stage through the gate's existing positionals:
+  a header-flipped temp copy of the queue file (under
+  `${GATE_SDK_TMP_DIR:-.tmp}`) as `[queue-file]`, the real state file as
+  `[state-file]` — the gate itself stays untouched. The refusal is advisory in the same
   sense the gate is at commit time — the operator who intends an override
   performs the ritual by hand, exactly as today; the tool takes no
   `--force` flag, so the easy path is always the compliant one.
