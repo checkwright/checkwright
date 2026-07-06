@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- Monochrome Checkwright mark: single path, fills with currentColor so it
+       inherits the surrounding text color (terminal badges, docs, favicons). -->
+  <g transform="translate(120 120) scale(1.4) translate(-103 -65.9) rotate(-45 86 114)">
+    <path fill="currentColor" fill-rule="evenodd" d="M86,44 h26 v52 h92 v18 h-118 z M105,58 a6,6 0 1 1 -12,0 a6,6 0 1 1 12,0 z M124,96 h3 v9 h-3 z M136,96 h3 v6 h-3 z M148,96 h3 v9 h-3 z M160,96 h3 v6 h-3 z M172,96 h3 v9 h-3 z M184,96 h3 v6 h-3 z M196,96 h3 v9 h-3 z"/>
+  </g>
+</svg>

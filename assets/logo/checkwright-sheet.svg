@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 960 620" width="960" height="620">
+  <defs>
+    <!-- The mark: a carpenter's try square rotated 45° so it reads as a checkmark.
+         Stock (thick arm) = brass, blade (thin arm) = steel, with ruler graduations
+         cut out of the blade and a hang-hole cut out of the stock. 240x240 box. -->
+    <g id="mark-light">
+      <g transform="translate(120 120) scale(1.4) translate(-103 -65.9) rotate(-45 86 114)">
+        <path fill="#5B6B7F" fill-rule="evenodd" d="M86,96 H204 V114 H86 Z M124,96 h3 v9 h-3 z M136,96 h3 v6 h-3 z M148,96 h3 v9 h-3 z M160,96 h3 v6 h-3 z M172,96 h3 v9 h-3 z M184,96 h3 v6 h-3 z M196,96 h3 v9 h-3 z"/>
+        <path fill="#C19A3D" fill-rule="evenodd" d="M86,44 H112 V114 H86 Z M105,58 a6,6 0 1 1 -12,0 a6,6 0 1 1 12,0 z"/>
+      </g>
+    </g>
+    <g id="mark-dark">
+      <g transform="translate(120 120) scale(1.4) translate(-103 -65.9) rotate(-45 86 114)">
+        <path fill="#9FB2C6" fill-rule="evenodd" d="M86,96 H204 V114 H86 Z M124,96 h3 v9 h-3 z M136,96 h3 v6 h-3 z M148,96 h3 v9 h-3 z M160,96 h3 v6 h-3 z M172,96 h3 v9 h-3 z M184,96 h3 v6 h-3 z M196,96 h3 v9 h-3 z"/>
+        <path fill="#D4AF57" fill-rule="evenodd" d="M86,44 H112 V114 H86 Z M105,58 a6,6 0 1 1 -12,0 a6,6 0 1 1 12,0 z"/>
+      </g>
+    </g>
+    <g id="mark-mono">
+      <g transform="translate(120 120) scale(1.4) translate(-103 -65.9) rotate(-45 86 114)">
+        <path fill-rule="evenodd" d="M86,44 h26 v52 h92 v18 h-118 z M105,58 a6,6 0 1 1 -12,0 a6,6 0 1 1 12,0 z M124,96 h3 v9 h-3 z M136,96 h3 v6 h-3 z M148,96 h3 v9 h-3 z M160,96 h3 v6 h-3 z M172,96 h3 v9 h-3 z M184,96 h3 v6 h-3 z M196,96 h3 v9 h-3 z"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="960" height="620" fill="#FFFFFF"/>
+
+  <!-- Row 1: the mark on light / dark / mono -->
+  <rect x="40" y="40" width="280" height="280" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <use xlink:href="#mark-light" transform="translate(60 60)"/>
+  <text x="180" y="345" font-family="sans-serif" font-size="14" fill="#64748B" text-anchor="middle">color / light</text>
+
+  <rect x="340" y="40" width="280" height="280" rx="12" fill="#0F172A"/>
+  <use xlink:href="#mark-dark" transform="translate(360 60)"/>
+  <text x="480" y="345" font-family="sans-serif" font-size="14" fill="#64748B" text-anchor="middle">color / dark</text>
+
+  <rect x="640" y="40" width="280" height="280" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <use xlink:href="#mark-mono" transform="translate(660 60)" fill="#111827"/>
+  <text x="780" y="345" font-family="sans-serif" font-size="14" fill="#64748B" text-anchor="middle">monochrome (currentColor)</text>
+
+  <!-- Row 2: lockup -->
+  <rect x="40" y="380" width="580" height="200" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <g transform="translate(70 400) scale(0.68)">
+    <use xlink:href="#mark-light"/>
+    <text x="252" y="152" font-family="sans-serif" font-size="88" font-weight="600" letter-spacing="-2" fill="#24303E">checkwright</text>
+  </g>
+  <text x="330" y="600" font-family="sans-serif" font-size="14" fill="#64748B" text-anchor="middle">lockup</text>
+
+  <!-- Row 2: small sizes, light strip and dark strip -->
+  <rect x="640" y="380" width="280" height="96" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <use xlink:href="#mark-light" transform="translate(660 396) scale(0.2667)"/>
+  <use xlink:href="#mark-light" transform="translate(744 412) scale(0.1333)"/>
+  <use xlink:href="#mark-light" transform="translate(796 420) scale(0.0667)"/>
+  <text x="836" y="433" font-family="sans-serif" font-size="13" fill="#64748B">64 / 32 / 16</text>
+
+  <rect x="640" y="484" width="280" height="96" rx="12" fill="#0F172A"/>
+  <use xlink:href="#mark-dark" transform="translate(660 500) scale(0.2667)"/>
+  <use xlink:href="#mark-dark" transform="translate(744 516) scale(0.1333)"/>
+  <use xlink:href="#mark-dark" transform="translate(796 524) scale(0.0667)"/>
+  <text x="836" y="537" font-family="sans-serif" font-size="13" fill="#94A3B8">64 / 32 / 16</text>
+</svg>

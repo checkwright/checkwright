@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 240" width="790" height="240">
+  <!-- Checkwright lockup: mark + wordmark. Swap the text fill to #E2E8F0 for
+       dark backgrounds (mark colors hold on both). -->
+  <g transform="translate(120 120) scale(1.4) translate(-103 -65.9) rotate(-45 86 114)">
+    <path fill="#5B6B7F" fill-rule="evenodd" d="M86,96 H204 V114 H86 Z M124,96 h3 v9 h-3 z M136,96 h3 v6 h-3 z M148,96 h3 v9 h-3 z M160,96 h3 v6 h-3 z M172,96 h3 v9 h-3 z M184,96 h3 v6 h-3 z M196,96 h3 v9 h-3 z"/>
+    <path fill="#C19A3D" fill-rule="evenodd" d="M86,44 H112 V114 H86 Z M105,58 a6,6 0 1 1 -12,0 a6,6 0 1 1 12,0 z"/>
+  </g>
+  <text x="248" y="152" font-family="ui-sans-serif, system-ui, 'Segoe UI', 'DejaVu Sans', sans-serif" font-size="88" font-weight="600" letter-spacing="-2" fill="#24303E">checkwright</text>
+</svg>
