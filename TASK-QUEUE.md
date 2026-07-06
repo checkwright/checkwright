@@ -34,6 +34,23 @@
 
 ## Deferred
 
+- **core-file-presence-gate** [needs-spec] — gate-sdk gate blocking deletion of
+  a consumer repo's required core workflow files (moved from the platform
+  queue 2026-07-07 — generic by construction; the first born-in-checkwright
+  gate, proving the SDK supports new gates, not just extracted ones). Problem:
+  with no required-file inventory and no `--diff-filter=D` deletion check, a
+  lone `SPEC.md`, `TASK-QUEUE.md`, `WORKFLOW-STATE.txt`, or projection HTML
+  can be `git rm`'d and committed; downstream gates catch it only
+  incidentally (a hard-reference happens to dangle) and only at the next
+  stage that runs them; the platform's bash-guard blocks `find … -delete`
+  but not plain `rm`/`git rm`. Design owes: the inventory source (a committed
+  per-repo manifest vs deriving the set from gate hard-references vs a glob
+  of top-level `*.md` + `*.html` + the SPEC.md set), the tier (precommit, so
+  it fires without a stage skill), and the intentional-removal valve (how a
+  deliberately retired surface — e.g. a merged `SPEC-<feature>.md` — passes
+  without weakening the gate). First consumer: the platform, which adopts it
+  as `checkwright-kit-adoption` step 0 and whose cutover deletion sweep
+  exercises the valve. Surfaced in the platform 2026-07-04.
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
   KPIs and lead/lag honesty labels (kit 7).
 - **kit-terminology-renames** [needs-spec] — user ruling wanted on the two
