@@ -53,6 +53,18 @@
   exercises the valve. Surfaced in the platform 2026-07-04.
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
   KPIs and lead/lag honesty labels (kit 7).
+- **identity-assertion-check** [needs-spec] — a consumer repo commits its
+  expected git identity (committer email; remote host / SSH key identity) and
+  a cheap FP-free check verifies local config matches, at setup and/or
+  pre-push. Failure mode (hit twice on the platform, latest 2026-07-07): an
+  agent commits or pushes under the wrong identity — misattribution is silent
+  and unpurgeable without a SHA-breaking history rewrite, and the wrong-key
+  symptom is a misleading "Repository not found"; multi-identity (work +
+  personal GitHub) is common for the integrator/consultant audience. Scope
+  fence: the *mapping* stays git's job (core.sshCommand, includeIf) — this is
+  only the verification backstop for the fresh-clone gap, alongside
+  install-hooks' apply-and-verify rung; likely friction-kit (guard) or the
+  setup story. Surfaced in the platform 2026-07-07.
 - **kit-terminology-renames** [needs-spec] — user ruling wanted on the two
   heavier renames: friction-kit to guard-kit (the kit's core is lib/guard.sh;
   "friction" is platform insider vocabulary) and delegation-kit usage-gate.sh
