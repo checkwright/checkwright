@@ -5,3 +5,4 @@
 ---
 
 drift-kit scope 22daebca 2026-07-07
+drift-kit align 7a10f355 2026-07-08
