@@ -11,13 +11,6 @@
 
 ## New Features
 
-- **manifest-derivable-count-gate** [spec: spec-kit/SPEC-manifest-count.md] —
-  spec-kit's `check-manifest-count`: lexical tripwire over pinned integers
-  quantifying growing governed collections ("six gates") in manifest prose
-  — ban, don't validate; the count's owner is the collection. Threshold /
-  partition / fixed-set exemptions plus per-site marker; shares the
-  manifest-set finder and FP corpus with its sibling.
-
 ## Technical Debt
 
 ## Deferred
@@ -88,5 +81,6 @@
 - drift-kit-extraction
 - knowledge-friction-loop
 - manifest-temporal-gate
+- manifest-derivable-count-gate
 
 ## Lessons Learned

@@ -68,6 +68,16 @@ declare -p SPEC_KIT_TEMPORAL_MARKERS &>/dev/null || SPEC_KIT_TEMPORAL_MARKERS=(
 )
 declare -p SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS &>/dev/null || SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS=()
 
+declare -p SPEC_KIT_COUNT_COLLECTIONS &>/dev/null || SPEC_KIT_COUNT_COLLECTIONS=(
+    "gates"
+    "meta-gates"
+    "checks"
+    "kits"
+    "stages"
+    "KPIs"
+)
+declare -p SPEC_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || SPEC_KIT_COUNT_ALLOWED_PHRASES=("the four contracts")
+
 declare -p SPEC_KIT_COMMENT_MACHINE &>/dev/null || SPEC_KIT_COMMENT_MACHINE=()
 declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
 declare -p SPEC_KIT_COMMENT_SURFACE &>/dev/null || SPEC_KIT_COMMENT_SURFACE=()
@@ -185,6 +195,7 @@ _sk_errs=()
     || _sk_errs+=("SPEC_KIT_EMBED_MINLINES must be a positive integer (got '$SPEC_KIT_EMBED_MINLINES')")
 [[ -n "$SPEC_KIT_GLOSSARY_FILE" ]] || _sk_errs+=("SPEC_KIT_GLOSSARY_FILE is empty")
 [[ ${#SPEC_KIT_TEMPORAL_MARKERS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_TEMPORAL_MARKERS is empty")
+[[ ${#SPEC_KIT_COUNT_COLLECTIONS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_COUNT_COLLECTIONS is empty")
 if [[ ${#_sk_errs[@]} -gt 0 ]]; then
     printf 'spec-kit: malformed spec config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_sk_errs[@]}" >&2

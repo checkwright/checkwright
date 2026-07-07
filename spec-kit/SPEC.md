@@ -137,7 +137,9 @@ own instance and stays there); the kit's rules are the topology itself:
   surface that legitimately introduces a concept).
 - **Quantitative literals are code-owned.** A count or enumerated set
   transcribed into prose is a parallel copy; cite the owning source
-  instead. A literal stays verbatim only when load-bearing, and then only
+  instead (`check-manifest-count` bans a bare cardinal quantifying a
+  governed collection in a manifest — the collection is the count's owner).
+  A literal stays verbatim only when load-bearing, and then only
   gate-coupled.
 - **Comments cite, never restate.** The code surface is a tier too: a
   full-line comment on a governed source is a machine or reason directive,
@@ -148,9 +150,10 @@ own instance and stays there); the kit's rules are the topology itself:
   FP-prone trailing-comment judgment stays a review tripwire).
 - **Honest mechanizability.** Only the structural sub-rules gate (banned
   headings, fence density, duplicate definitions, verbatim copies,
-  temporal-narration markers); the core judgment — is this sentence a
-  definition or a narration, a why or a mechanism — is FP-prone and stays a
-  review tripwire, explicitly not a blocking gate.
+  temporal-narration markers, restated collection totals); the core
+  judgment — is this sentence a definition or a narration, a why or a
+  mechanism — is FP-prone and stays a review tripwire, explicitly not a
+  blocking gate.
 
 ## Layout and configuration
 
@@ -207,6 +210,12 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
   section is exempt, default empty (this repo sets `What stayed on the
   platform`).
+- `SPEC_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals
+  `check-manifest-count` treats as growing governed sets, default
+  `("gates" "meta-gates" "checks" "kits" "stages" "KPIs")` (a consumer appends
+  its own governed plurals); `SPEC_KIT_COUNT_ALLOWED_PHRASES` — exact-phrase
+  allowlist for fixed named sets a doc may cite inline, default
+  `("the four contracts")` (this repo adds its other fixed sets).
 - `SPEC_KIT_COMMENT_MACHINE` / `SPEC_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `SPEC_KIT_COMMENT_SURFACE` —
@@ -330,6 +339,50 @@ Calibration: the marker set is tuned against this repo as the FP corpus — bare
 `used to` is excluded (it collides with instrumental "used to build/filter").
 At build every hit is dispositioned: reword (preferred — narration is standing
 cost), section-exempt (provenance), or site-exempt with reason. `precommit`
+tier.
+
+### check-manifest-count
+
+Invariant: no bare cardinal immediately quantifying a governed collection noun
+in manifest prose outside an exempt site. A pinned total for a *growing*
+collection — `six gates`, `seven meta-gates` — is a second source no gate reads:
+the count's owner is the collection itself (`gates.list`, a `checks/` dir, the
+stages config), and a restated total drifts the moment the collection grows.
+Ban, don't validate — a validating gate (the platform's earlier approach) carries
+the standing token cost context-kit's brevity machinery rejects plus FP-prone
+entity mapping; a lexical tripwire eliminates the copy. The motivating find: this
+repo landed one gate and left the same total in four disagreeing copies (across
+two READMEs and a SPEC), caught only by close-stage review.
+
+The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh) —
+canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
+skipped, an inline-code cardinal a meta-reference (so this section may name its
+own examples). The cardinal grammar is digit sequences and the spelled
+`two`…`twelve`, case-insensitive; `one` is deliberately outside it — singleton and
+cardinality-rule idioms ("one owner per fact", "one iteration per kit") are
+invariants, not totals. Collection nouns are `SPEC_KIT_COUNT_COLLECTIONS`
+(default the plurals the kits themselves grow: `gates`, `meta-gates`, `checks`,
+`kits`, `stages`, `KPIs`) — the one place consumer vocabulary enters, and it
+enters as config. Four exempt contexts, mechanical first: a threshold/comparator
+on the same line (`≥ ≤ > <`, `at least` / `at most` / `up to` / `more than` /
+`fewer than`, or a following `per`-phrase) — a bound is a rule, not a total; the
+partition idiom `all but <cardinal>`; `SPEC_KIT_COUNT_ALLOWED_PHRASES`, an
+exact-phrase allowlist for fixed named sets a doc legitimately enumerates (default
+`("the four contracts")` — gate-sdk's shipped vocabulary, the one fixed set any
+consumer may cite; fixed-set naming is consumer judgment, config not mechanism);
+and the per-site `manifest-count-exempt: <reason>` on the line or the one above.
+Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the
+committing operator via the output contract; each hit read at the single scan
+transition (file, line, cardinal+noun in the message), no persistent state.
+Fail-closed on an unreadable manifest.
+
+Calibration shares the sibling's FP corpus and procedure
+(§check-manifest-temporal): the default noun list is tuned against this tree,
+every hit dispositioned — reword to cite the owning collection (preferred),
+extend `SPEC_KIT_COUNT_ALLOWED_PHRASES` (a genuinely fixed set), or site-exempt
+with reason. The good/bad pair covers detection and the mechanical exemptions;
+`check-manifest-count.test.sh` covers the config-driven paths (a consumer-governed
+noun and the allowlist containment) the stock defaults cannot reach. `precommit`
 tier.
 
 ### check-surface-duplication
