@@ -7,12 +7,13 @@ gates, fixtures, templates, README + SPEC.md landed, registered in
 iteration exists in `.workflow/WORKFLOW-STATE.txt`, run
 `bash gate-sdk/bin/run-gates.sh` and refuse to stamp/flip while red.
 
-**First step — stamp evidence.** Append `<iteration> build <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt`; flip the TASK-QUEUE.md `[stage:]`
-line to `build` in the same commit (flip only on arrival — a same-stage
-re-entry stamps without flipping). Take `<session-id>` from
-`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
-transcript — never hand-pick it); `<date>` is `date +%F`.
+**First step — stamp evidence.** Run
+`bash lifecycle-kit/bin/enter-stage.sh build`: it appends `<iteration> build
+<session-id> <date>` to `.workflow/WORKFLOW-STATE.txt` and flips the
+TASK-QUEUE.md `[stage:]` line to `build`, committed together (the flip is
+idempotent — a same-stage re-entry stamps without re-flipping). It reads
+`<session-id>` from `bin/session-id.sh` itself (never hand-picked), uses
+`date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
 
 ## Session ritual
 

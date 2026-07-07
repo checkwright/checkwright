@@ -43,11 +43,22 @@ exit is re-verified *at the flip* (`check-stage-evidence`), and
 complete" marker would prove a claim, not completion — the kit deliberately
 has none.
 
-The first stage is the iteration boundary: its skill *truncates* the evidence
-file back to its header (git history is the permanent audit trail; the gates
-only read the current iteration) and stamps under the unnamed-iteration
-sentinel `—`, rewritten to the real name when the stage names the iteration.
-Later stages only append.
+The **deterministic half** of that first step — read the iteration from the
+header, read the id from `session-id.sh`, append the stamp, flip the
+`[stage:]` field — is mechanized by `bin/enter-stage.sh <stage>`, the same
+writer/asserter split as `gen-pre-commit.sh` ↔ `check-graph`: the skill
+invokes it, **judgment stays in the skill** (what the stage means, its exit
+condition, when to enter it at all), and the stage gates stay the independent
+verifier. The tool takes no `--force` flag, so the compliant path is the easy
+one — an operator who intends to override runs the stamp+flip by hand, exactly
+as before the tool existed. Committing the flip+stamp remains the skill's
+business.
+
+The first stage is the iteration boundary: `enter-stage.sh` *truncates* the
+evidence file back to its header (git history is the permanent audit trail;
+the gates only read the current iteration) and stamps under the
+unnamed-iteration sentinel `—`, rewritten to the real name when the stage
+names the iteration. Later stages only append.
 
 **Honest limit:** a stamp proves the stage skill was *invoked*, not that its
 work was done faithfully — strictly better than skip-and-no-trace, but not
@@ -100,8 +111,34 @@ the first 8 hex of the most recently written transcript under the sessions dir
 `~/.claude`, and the cwd with every non-alphanumeric char mapped to `-`;
 override `LIFECYCLE_SESSIONS_DIR`). Newest-file selection is the documented
 single-operator assumption (one live session per project tree); an absent dir
-or transcript exits 2. Not a gate — a `bin/` helper the flip+stamp first step
-of every stage skill invokes for `<session-id>`.
+or transcript exits 2. Not a gate — a `bin/` helper invoked (now internally,
+by `enter-stage.sh`) for the `<session-id>` field; the stage skills reach it
+through `enter-stage.sh` rather than calling it directly.
+
+### bin/enter-stage.sh
+
+The deterministic writer for a stage transition: `enter-stage.sh <stage>`
+appends the invocation stamp and flips the `[stage:]` field in one invocation
+(honoring the flip+stamp-ride-together protocol), reading `session-id.sh` for
+the id — never an argument, so the no-hand-picking rule rides into the tool.
+`<stage>` must be a configured stage; anything else is a usage error (exit 2).
+An ordinary stage reads the iteration from the header, appends
+`<iteration> <stage> <id> <date>`, and swaps only the header's `[stage:]`
+token; the first stage (`LIFECYCLE_FIRST_STAGE`) performs the
+iteration-boundary reset instead — truncate the state file to its header,
+stamp under `—`, set the header to the unnamed-iteration form. **Pre-flight,
+not enforcement:** before writing, it runs `check-stage-entry` for the entered
+stage — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}` plus the real
+state file, through the gate's existing positionals, the gate itself
+untouched — and refuses (exit 1, findings printed, no writes) when it is red;
+the refusal is advisory in the same sense the gate is at commit time (no
+`--force`, so the easy path is the compliant one). **Idempotent:** if the
+state file already ends with a stamp for the same `<iteration> <stage> <id>`,
+it reports and exits 0 without appending, so a crashed-and-resumed session
+re-runs its entry step safely. No new config — it reads the existing
+`lib/stages.sh` knobs (`LIFECYCLE_QUEUE_FILE`, `LIFECYCLE_STATE_FILE`,
+`LIFECYCLE_STAGES`, `LIFECYCLE_FIRST_STAGE`). Advisory tooling, not a gate: no
+fixture pair is owed; it is exercised end-to-end in `smoke/install.sh`.
 
 ### check-stage-evidence
 
@@ -184,8 +221,9 @@ mechanical residual.
 
 The five stage-skill templates (`scope`/`align`/`build`/`validate`/`close`)
 — copy-edits into the consumer's skill directory, like gate-sdk's
-check-skeleton. Each carries the generic spine (the flip+stamp first step;
-scope's truncate-and-bootstrap protocol; align's trigger-gating and waiver
+check-skeleton. Each carries the generic spine (the flip+stamp first step,
+performed by invoking `enter-stage.sh <stage>` and stating in one line what it
+does; scope's truncate-and-bootstrap protocol; align's trigger-gating and waiver
 rule; build's step-0 audit recheck and stamp-per-session/flip-once rule;
 validate's baseline-diff discipline; close's disposition-per-lesson rule)
 with `<…>` placeholders where the consumer's rule content goes. Structure is

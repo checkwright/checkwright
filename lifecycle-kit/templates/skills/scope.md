@@ -4,23 +4,21 @@ suggest the iteration name. Exit condition: *<your scope exit condition — e.g.
 no design-pending tag left in the active queue; your amendment-readiness gate
 green>*.
 
-**First step — reset + stamp evidence.** `scope` is the iteration boundary, so
-it *resets* the evidence file: **truncate `.workflow/WORKFLOW-STATE.txt` back
-to its header** (dropping the prior iteration's stamps — git history is the
-permanent audit trail; the gates only ever read the current iteration)*<, and
-reset any other per-iteration evidence files your validate stage writes, in
-the same reset commit>*. Then append one stamp line
-`<iteration> scope <session-id> <date>`, and set the queue header to
-`## Iteration: <name>  [stage: scope]` (naming the iteration + flipping the
-stage) — the arriving-stage flip the lifecycle mandates, here also naming the
-new iteration. Take `<session-id>` from lifecycle-kit's `bin/session-id.sh`
-(it reads the id from the newest transcript — never hand-pick it); `<date>` is
-`date +%F`. A new iteration is `—` until `scope` names it, so the scope
-stamp keys on `—` (e.g. `— scope ab12cd34 2026-06-06`). The later stage skills
-**append**; only `scope` truncates. This is what `check-stage-evidence`
-requires on a stage advance. Honest limit: the stamp proves the skill was
-*invoked*, not that the work was done faithfully — it forces deliberate
-invocation and an audit trail, nothing more.
+**First step — reset + stamp evidence.** Run lifecycle-kit's
+`bin/enter-stage.sh scope`. `scope` is the iteration boundary, so the tool
+*resets* the evidence file: it truncates `.workflow/WORKFLOW-STATE.txt` back
+to its header (dropping the prior iteration's stamps — git history is the
+permanent audit trail; the gates only ever read the current iteration), stamps
+`— scope <session-id> <date>` under the unnamed-iteration sentinel, and sets
+the queue header to `## Iteration: —  [stage: scope]`. It reads `<session-id>`
+from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
+uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
+*<Reset any other per-iteration evidence files your validate stage writes in
+the same commit — the tool touches only the WORKFLOW-STATE file.>* A new
+iteration stays `—` until this skill names it (below); only `scope` resets,
+later stages append. Honest limit: the stamp proves the skill was *invoked*,
+not that the work was done faithfully — it forces deliberate invocation and an
+audit trail, nothing more.
 
 ## Session ritual
 

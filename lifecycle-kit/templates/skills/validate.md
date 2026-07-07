@@ -4,16 +4,17 @@ against a committed baseline" over bare "all pass", which is unsatisfiable
 while any suite is tracked-red on a deferred blocker; each held-constant red
 line carries the live task slug that blocks it>*.
 
-**First step — stamp evidence.** Append `<iteration> validate <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`;
-the stamp proves invocation, not faithful execution). As the same first step,
-flip the queue header's `[stage:]` line to `validate` and commit the flip
+**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
+validate`: it appends `<iteration> validate <session-id> <date>` to
+`.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
+proves invocation, not faithful execution) and flips the queue header's
+`[stage:]` line to `validate`, reading `<session-id>` from `bin/session-id.sh`
+(the newest transcript — never hand-picked), using `date +%F`. Commit the flip
 together with this stamp — the arriving-stage flip; the line and its stamp
-must match, so they ride in one commit. (`check-stage-entry` additionally
-requires the active queue drained before this flip — build is not done until
-the queue is empty.) Take `<session-id>` from lifecycle-kit's
-`bin/session-id.sh` (it reads the id from the newest transcript — never
-hand-pick it); `<date>` is `date +%F`.
+must match, so they ride in one commit. The tool refuses (writing nothing) if
+`check-stage-entry` is red — which for `validate` additionally requires the
+active queue drained before this flip (build is not done until the queue is
+empty).
 
 ## Session ritual
 

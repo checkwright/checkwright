@@ -2,14 +2,15 @@ The `close` stage of an iteration. Harvest lessons, housekeep, optionally
 merge. Exit condition: Done and Lessons Learned sections cleared (harvestable
 lessons promoted first).
 
-**First step — stamp evidence.** Append `<iteration> close <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`;
-the stamp proves invocation, not faithful execution). As the same first step,
-flip the queue header's `[stage:]` line to `close` and commit the flip
-together with this stamp — the arriving-stage flip; the line and its stamp
-must match, so they ride in one commit. Take `<session-id>` from lifecycle-kit's
-`bin/session-id.sh` (it reads the id from the newest transcript — never
-hand-pick it); `<date>` is `date +%F`.
+**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
+close`: it appends `<iteration> close <session-id> <date>` to
+`.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
+proves invocation, not faithful execution) and flips the queue header's
+`[stage:]` line to `close`, reading `<session-id>` from `bin/session-id.sh`
+(the newest transcript — never hand-picked), using `date +%F`, and refusing
+(writing nothing) if `check-stage-entry` is red. Commit the flip together with
+this stamp — the arriving-stage flip; the line and its stamp must match, so
+they ride in one commit.
 
 ## Session ritual
 

@@ -16,15 +16,15 @@ stamp or an explicit `<iter> align-waived <session> <date>` waiver line,
 written **only on the user's explicit ruling** — never self-issued by this
 entering session.
 
-**First step — stamp evidence.** Append `<iteration> build <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`;
-the stamp proves invocation, not faithful execution). As the same first step,
-flip the queue header's `[stage:]` line to `build` and commit the flip
-together with this stamp — the arriving-stage flip; the line and its stamp
-must match, so they ride in one commit (the departing session left the line
-untouched). Take `<session-id>` from lifecycle-kit's `bin/session-id.sh` (it
-reads the id from the newest transcript — never hand-pick it); `<date>` is
-`date +%F`.
+**First step — stamp evidence.** Run lifecycle-kit's
+`bin/enter-stage.sh build`: it appends `<iteration> build <session-id> <date>`
+to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
+stamp proves invocation, not faithful execution) and flips the queue header's
+`[stage:]` line to `build`, reading `<session-id>` from `bin/session-id.sh`
+(the newest transcript — never hand-picked), using `date +%F`, and refusing
+(writing nothing) if `check-stage-entry` is red. Commit the flip together with
+this stamp — the arriving-stage flip; the line and its stamp must match, so
+they ride in one commit (the departing session left the line untouched).
 
 Build runs one fresh session per task: a fresh session rehydrates the
 governing docs + queue state at full fidelity from disk, where an in-session
@@ -32,14 +32,16 @@ summary would lossily erode the approved plan and re-derived premises. Prefer
 a session reset at a task boundary; reach for mid-task summarization only as
 a fallback before a commit, never as the routine per-task reset.
 
-**Every session still stamps** — append a fresh `<iter> build <session-id>
-<date>` line with this session's id, so WORKFLOW-STATE keeps the per-session
-audit trail (`check-stage-evidence` tolerates multiple `build` stamps; it
-needs only one matching the header). What is once-per-stage is the
-**`[stage:]` flip**: on a same-stage re-entry the line is already `build`, so
-skip the flip (not the stamp). Prefer committing the new stamp standalone when
-the task will land as several commits, so the evidence is durable rather than
-sitting uncommitted across a long session.
+**Every session still stamps** — re-run `bin/enter-stage.sh build` each
+session: it appends a fresh `<iter> build <session-id> <date>` line with this
+session's id, so WORKFLOW-STATE keeps the per-session audit trail
+(`check-stage-evidence` tolerates multiple `build` stamps; it needs only one
+matching the header). The **`[stage:]` flip** is once-per-stage, and the tool
+handles that: on a same-stage re-entry the line is already `build`, so the
+flip is a no-op and only the stamp lands (a re-run within one session that
+already stamped is reported as an idempotent no-op). Prefer committing the new
+stamp standalone when the task will land as several commits, so the evidence
+is durable rather than sitting uncommitted across a long session.
 
 ## Session ritual
 

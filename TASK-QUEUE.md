@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **stage-entry-mechanization** [spec: lifecycle-kit/SPEC-enter-stage.md] —
-  `enter-stage.sh <stage>`: the stamp+flip ritual mechanized with a
-  check-stage-entry pre-flight, first-stage boundary reset included; skills
-  and templates invoke it as their first step; gates stay the independent
-  verifier.
 - **comment-tier-gate** [spec: spec-kit/SPEC-comment-tier.md] — spec-kit's
   check-comment-tier: comments must be machine/reason directives or exempted;
   kit-mechanism directive roster as default, consumer vocabulary via
@@ -100,5 +95,6 @@
 
 - allowlist-chain-steer-rule
 - context-kit-extraction
+- stage-entry-mechanization
 
 ## Lessons Learned

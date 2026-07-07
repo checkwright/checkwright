@@ -2,14 +2,15 @@ The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then
 *<your aggregate consistency gate — e.g. the full gate battery>* as one gate.
 Exit condition: no unresolved conflicts or terminology drift.
 
-**First step — stamp evidence.** Append `<iteration> align <session-id> <date>`
-to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
-stamp proves invocation, not faithful execution). As the same first step, flip
-the queue header's `[stage:]` line to `align` and commit the flip together
-with this stamp — the arriving-stage flip; the line and its stamp must match,
-so they ride in one commit. Take `<session-id>` from lifecycle-kit's
-`bin/session-id.sh` (it reads the id from the newest transcript — never
-hand-pick it); `<date>` is `date +%F`.
+**First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
+align`: it appends `<iteration> align <session-id> <date>` to
+`.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
+proves invocation, not faithful execution) and flips the queue header's
+`[stage:]` line to `align`, reading `<session-id>` from `bin/session-id.sh`
+(the newest transcript — never hand-picked), using `date +%F`, and refusing
+(writing nothing) if `check-stage-entry` is red. Commit the flip together with
+this stamp — the arriving-stage flip; the line and its stamp must match, so
+they ride in one commit.
 
 ## Trigger (align is trigger-gated)
 

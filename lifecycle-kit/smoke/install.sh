@@ -47,3 +47,65 @@ EOF
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
+
+# --- exercise bin/enter-stage.sh end-to-end (advisory tool; SPEC §Testing) ---
+# All under .tmp (gitignored) with its own queue/state/sessions, so the tool is
+# driven for real without perturbing the committed baseline the zero-config
+# battery then checks. A fake transcript gives session-id.sh a stable id.
+es="$PWD/.tmp/enter-stage-smoke"
+rm -rf "$es"; mkdir -p "$es/.workflow" "$es/sessions" "$es/tmp"
+: > "$es/sessions/aabbccdd-0000-0000-0000-000000000000.jsonl"
+cat > "$es/TASK-QUEUE.md" <<'EOF'
+# smoke queue
+## Iteration: prev-iter  [stage: close]
+
+---
+
+## New Features
+## Technical Debt
+## Deferred
+## Done
+EOF
+cat > "$es/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+# contract
+
+---
+
+prev-iter close ffffffff 2020-01-01
+EOF
+
+es_run() {
+    LIFECYCLE_QUEUE_FILE="$es/TASK-QUEUE.md" \
+    LIFECYCLE_STATE_FILE="$es/.workflow/WORKFLOW-STATE.txt" \
+    LIFECYCLE_SESSIONS_DIR="$es/sessions" \
+    GATE_SDK_TMP_DIR="$es/tmp" \
+    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+}
+esq="$es/TASK-QUEUE.md"; ess="$es/.workflow/WORKFLOW-STATE.txt"; d="$(date +%F)"
+
+# 1. first stage (scope): reset + stamp, header → unnamed, prior stamp dropped.
+es_run scope >/dev/null
+grep -q "^## Iteration: —  \[stage: scope\]\$" "$esq" || { echo "smoke(enter-stage): scope header wrong" >&2; exit 1; }
+grep -q "^— scope aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): scope stamp missing" >&2; exit 1; }
+if grep -q 'prev-iter' "$ess"; then echo "smoke(enter-stage): state not truncated on reset" >&2; exit 1; fi
+
+# 2. second stage (align): append + flip, the scope stamp retained.
+es_run align >/dev/null
+grep -q "^## Iteration: —  \[stage: align\]\$" "$esq" || { echo "smoke(enter-stage): align header wrong" >&2; exit 1; }
+grep -q "^— align aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): align stamp missing" >&2; exit 1; }
+grep -q "^— scope aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): scope stamp lost on append" >&2; exit 1; }
+
+# 3. idempotent re-entry: same session id ⇒ no duplicate stamp, exit 0.
+es_run align >/dev/null
+if [[ "$(grep -c "^— align aabbccdd " "$ess")" -ne 1 ]]; then
+    echo "smoke(enter-stage): idempotent re-entry duplicated the align stamp" >&2; exit 1
+fi
+
+# 4. header absent: the pre-flight refuses and writes nothing.
+grep -v '^## Iteration:' "$esq" > "$es/q.headerless"; cp "$es/q.headerless" "$esq"
+cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
+if es_run build >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a headerless queue" >&2; exit 1; fi
+cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on a refusal" >&2; exit 1; }
+cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): wrote queue on a refusal" >&2; exit 1; }
+
+rm -rf "$es"

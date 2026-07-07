@@ -1,12 +1,13 @@
 The `validate` stage of a Checkwright iteration. Exit condition: the full
 gate battery and every kit's fixture suite green, whole-tree.
 
-**First step — stamp evidence.** Append `<iteration> validate <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt`; flip the TASK-QUEUE.md `[stage:]`
-line to `validate` in the same commit. (`check-stage-entry` requires the
-active queue drained before this flip.) Take `<session-id>` from
-`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
-transcript — never hand-pick it); `<date>` is `date +%F`.
+**First step — stamp evidence.** Run
+`bash lifecycle-kit/bin/enter-stage.sh validate`: it appends `<iteration>
+validate <session-id> <date>` to `.workflow/WORKFLOW-STATE.txt` and flips the
+TASK-QUEUE.md `[stage:]` line to `validate`, committed together. It reads
+`<session-id>` from `bin/session-id.sh` itself (never hand-picked), uses
+`date +%F`, and refuses (writing nothing) if `check-stage-entry` is red —
+which for `validate` requires the active queue drained before this flip.
 
 ## Session ritual
 

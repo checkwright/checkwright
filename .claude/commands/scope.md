@@ -6,13 +6,15 @@ the kit. Exit condition: the design is written down (this session's plan or
 the kit SPEC draft) and the seam is ruled — what ships as mechanism, what
 stays platform rule content, what becomes consumer config.
 
-**First step — reset + stamp evidence.** `scope` is the iteration boundary:
-truncate `.workflow/WORKFLOW-STATE.txt` back to its header (git history keeps
-the prior iteration's stamps), append `— scope <session-id> <date>`, and set
-the TASK-QUEUE.md header to `## Iteration: —  [stage: scope]` — the
-arriving-stage flip, here bootstrapping an unnamed iteration. Take
-`<session-id>` from `bash lifecycle-kit/bin/session-id.sh` (it reads the id
-from the newest transcript — never hand-pick it); `<date>` is `date +%F`.
+**First step — reset + stamp evidence.** Run
+`bash lifecycle-kit/bin/enter-stage.sh scope`. `scope` is the iteration
+boundary, so it truncates `.workflow/WORKFLOW-STATE.txt` back to its header
+(git history keeps the prior iteration's stamps), stamps `— scope
+<session-id> <date>`, and sets the TASK-QUEUE.md header to
+`## Iteration: —  [stage: scope]` — the arriving-stage flip, here
+bootstrapping an unnamed iteration. It reads `<session-id>` from
+`bin/session-id.sh` itself (never hand-picked), uses `date +%F`, and refuses
+(writing nothing) if `check-stage-entry` is red.
 
 Scope rules for this repo: copy-first, never carve-out (the platform repo
 stays untouched); rule content never leaves the platform — term lists,

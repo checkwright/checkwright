@@ -1,11 +1,12 @@
 The `close` stage of a Checkwright iteration. Exit condition: Done and
 Lessons Learned cleared.
 
-**First step — stamp evidence.** Append `<iteration> close <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt`; flip the TASK-QUEUE.md `[stage:]`
-line to `close` in the same commit. Take `<session-id>` from
-`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
-transcript — never hand-pick it); `<date>` is `date +%F`.
+**First step — stamp evidence.** Run
+`bash lifecycle-kit/bin/enter-stage.sh close`: it appends `<iteration> close
+<session-id> <date>` to `.workflow/WORKFLOW-STATE.txt` and flips the
+TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
+`<session-id>` from `bin/session-id.sh` itself (never hand-picked), uses
+`date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
 
 ## Session ritual
 

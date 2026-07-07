@@ -2,11 +2,12 @@ The `align` (consistency-audit) stage of a Checkwright iteration —
 trigger-gated; most kit extractions go scope → build directly. Exit
 condition: no unresolved cross-surface drift.
 
-**First step — stamp evidence.** Append `<iteration> align <session-id>
-<date>` to `.workflow/WORKFLOW-STATE.txt` and flip the TASK-QUEUE.md
-`[stage:]` line to `align`, committed together. Take `<session-id>` from
-`bash lifecycle-kit/bin/session-id.sh` (it reads the id from the newest
-transcript — never hand-pick it); `<date>` is `date +%F`.
+**First step — stamp evidence.** Run
+`bash lifecycle-kit/bin/enter-stage.sh align`: it appends `<iteration> align
+<session-id> <date>` to `.workflow/WORKFLOW-STATE.txt` and flips the
+TASK-QUEUE.md `[stage:]` line to `align`, committed together. It reads
+`<session-id>` from `bin/session-id.sh` itself (never hand-picked), uses
+`date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
 
 ## Trigger
 
