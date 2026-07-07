@@ -13,6 +13,7 @@ CLAUDE.md
 # Gate registry + graph rule content + the checked pre-commit/graph projections.
 scripts/gates.list
 scripts/graph-vocab.sh
+scripts/identity.conf
 scripts/git-hooks/pre-commit
 .workflow/CHECK-GRAPH.html
 

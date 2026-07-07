@@ -1,0 +1,3 @@
+# injected `git remote get-url` results: <remote> <url>. The scp-like URL's
+# host part (github.com) is what the remote-host expectation matches.
+origin git@github.com:example/example.git

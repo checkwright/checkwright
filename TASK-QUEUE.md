@@ -11,12 +11,6 @@
 
 ## New Features
 
-- **identity-assertion-check** [spec: gate-sdk/SPEC-identity-assertion.md] —
-  `check-identity`: gate-sdk gate verifying local git identity (committer
-  email, remote host) against a committed `identity.conf`; `install-hooks.sh`
-  runs it once at opt-in as the apply-and-verify rung. Surfaced in the
-  platform 2026-07-07.
-
 ## Technical Debt
 
 ## Deferred
@@ -75,6 +69,7 @@
   SPECs as the FP corpus. Surfaced 2026-07-07.
 ## Done
 
+- identity-assertion-check
 - check-spec-pointer
 - core-file-presence-gate
 - kit-terminology-renames

@@ -1,0 +1,2 @@
+# only a personal remote is configured; the manifest's 'work' remote is absent.
+origin git@github.com:personal/personal.git

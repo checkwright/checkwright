@@ -32,13 +32,16 @@ override with `GATE_SDK_GATES_DIR`) holding:
 - `graph-vocab.sh` — optional rule content for `check-graph` (see there).
 - `core-files.list` — optional manifest for `check-core-files`: the
   repo-relative paths that must stay present and tracked (see there).
+- `identity.conf` — optional manifest for `check-identity`: the git identity
+  (committer email, remote host) this clone must resolve to (see there).
 
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
 `.workflow`), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
 (default `TASK-QUEUE.md`), `GATE_SDK_CORE_FILES_FILE` (default
-`<gates-dir>/core-files.list`), `GATE_SDK_PRUNE_DIRS` (default
+`<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default
+`<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
 siblings holding a `checks/` or a `smoke/`). Paths are repo-root-relative; every entry point
@@ -338,7 +341,12 @@ hook is byte-stable.
 
 One-time per-clone opt-in: sets `core.hooksPath → <hooks-dir>` (and
 `blame.ignoreRevsFile` when `.git-blame-ignore-revs` exists). Refuses to point
-at a nonexistent hooks dir — generate the hook first.
+at a nonexistent hooks dir — generate the hook first. Then, as the
+apply-and-verify rung, runs `check-identity` once immediately after enabling
+`core.hooksPath` (resolved through the registry, so a consumer shadow wins):
+the fresh clone learns of a wrong-identity or wrong-remote mapping before its
+first commit — the moment the push-identity half is cheapest to fix — and the
+gate's exit status surfaces through this script's.
 
 ### check-shellcheck
 
@@ -467,6 +475,44 @@ gate is re-scoped in the open, never weakened to pass. The gate's `# graph:`
 couples the manifest (`tier=precommit`), so an edit to `core-files.list`
 re-fires it; the whole-tree `run-gates.sh` battery is the backstop for a
 pure-deletion commit the `ACMR` pre-commit filter would skip.
+
+### check-identity
+
+Invariant: every expectation in the `identity.conf` manifest matches this
+clone's local git identity — a verification backstop for the fresh-clone gap
+where an agent commits or pushes under the wrong identity and fails silently
+(misattribution is unpurgeable without a SHA-breaking history rewrite; the
+wrong-SSH-key symptom is a misleading "Repository not found"). Multi-identity
+setups — a work and a personal account on one machine — make this the common
+case for the integrator audience. **Scope fence:** the identity *mapping* stays
+git's job (`includeIf`, `core.sshCommand`); this gate only asserts the mapping
+actually applied here.
+
+Two expectation kinds, both local reads (cheap, no network, no false positives
+from a settled corpus):
+
+- `email <expected>` — matches `git config user.email` exactly.
+- `remote-host <remote> <host>` — matches `<host>` against the host part of
+  `git remote get-url <remote>` by exact string. An SSH host alias is matched
+  as the alias — that *is* the identity selector in multi-identity setups, so a
+  scp-like `git@alias:path` compares as `alias`, and a `scheme://[user@]host/…`
+  URL as `host`. A configured remote that does not exist in this clone is red.
+
+The manifest is optional consumer config (the `graph-vocab.sh` pattern): the
+path knob is `GATE_SDK_IDENTITY_FILE` (default `<gates-dir>/identity.conf`),
+line-based `key value…` with `#` comments and blanks ignored. An absent, empty,
+or comment-only manifest is clean with a note; a mismatch (or a manifest-named
+remote that is absent) is a violation (exit 1); a malformed line — an unknown
+key or wrong field count — is fail-closed (exit 2), never a false clean on an
+uninterpretable manifest. Enforcement is dual: the `# graph:` couples the
+manifest at `tier=precommit` (a `git config` change to the mapping is not
+diff-visible, so the whole-tree `run-gates.sh` battery is the real backstop for
+the commit-identity half), and `install-hooks.sh` runs the gate once at opt-in
+to cover the push-identity half (no pre-push hook is added — gate-sdk generates
+only the pre-commit hook, and the setup rung plus the precommit tier already
+cover the surface). A `--fixture <dir>` mode injects the clone's actual identity
+(`git-config-email`, `git-remotes`) so the fixture pair is deterministic without
+touching real git config.
 
 ### templates/check-skeleton.sh
 

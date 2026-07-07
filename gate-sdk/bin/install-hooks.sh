@@ -29,7 +29,20 @@ if [[ -f .git-blame-ignore-revs ]]; then
     echo "Installed: blame.ignoreRevsFile = .git-blame-ignore-revs"
 fi
 
+# spec: gate-sdk/SPEC.md §install-hooks — apply-and-verify rung: run check-identity
+# once at opt-in so a fresh clone learns of a wrong-identity/wrong-remote mapping
+# before its first commit; the gate's exit status surfaces through this script's.
+identity_rc=0
+mapfile -t _check_dirs < <(gate_check_dirs)
+if identity_gate="$(gate_resolve check-identity "${_check_dirs[@]}")"; then
+    echo ""
+    echo "Verifying git identity (check-identity)…"
+    bash "$identity_gate" || identity_rc=$?
+fi
+
 echo "Active hooks:"
 ls -1 "$HOOKS_DIR" | sed 's/^/  /'
 echo ""
 echo "Disable with:  git config --unset core.hooksPath"
+
+exit "$identity_rc"
