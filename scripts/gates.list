@@ -24,5 +24,6 @@ check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source
 check-comment-tier
+check-spec-pointer
 check-gate-tamper
 check-brevity

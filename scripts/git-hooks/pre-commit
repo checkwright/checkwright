@@ -109,6 +109,10 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit
     spec-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi
 
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh' 'guard-kit/*.sh' 'context-kit/*.sh' '.workflow/*.txt'; then
+    spec-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
+fi
+
 if staged_matches 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh'; then
     delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
 fi

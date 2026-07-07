@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **check-spec-pointer** [spec: spec-kit/SPEC-spec-pointer.md] — spec-kit
-  gate resolving `spec:`/`contract:` pointer targets (file + `§` heading,
-  forward direction only) so a coupling cannot dangle silently; retires the
-  §check-comment-tier tripwire note. Surfaced 2026-07-07 dogfooding the
-  comment-tier sweep.
 - **identity-assertion-check** [spec: gate-sdk/SPEC-identity-assertion.md] —
   `check-identity`: gate-sdk gate verifying local git identity (committer
   email, remote host) against a committed `identity.conf`; `install-hooks.sh`
@@ -66,6 +61,7 @@
   surfaced dogfooding this repo's delegation nudge 2026-07-07.
 ## Done
 
+- check-spec-pointer
 - core-file-presence-gate
 - kit-terminology-renames
 

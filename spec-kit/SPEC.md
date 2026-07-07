@@ -155,7 +155,7 @@ own instance and stays there); the kit's rules are the topology itself:
 ## Layout and configuration
 
 The kit is vendored beside gate-sdk (conventionally at `spec-kit/`); its
-six gates are registered in the consumer's `gates.list` by name — each
+seven gates are registered in the consumer's `gates.list` by name — each
 where its surface exists (a consumer with no glossary does not register
 `check-surface-duplication`) — and resolve through gate-sdk's multi-kit
 path.
@@ -224,9 +224,12 @@ consumer renaming its sections sets both. Valve and marker spellings
 
 The sourced config loader plus shared adapters: section-regex builders for
 the queue-facing gate (queue-kit's rule — both sides of a section boundary
-must parse identically), and the canonical-spec/amendment finders the
-spec-scanning gates share. The finders skip a `templates/` skeleton (a
-copyable stub, not governed content — the same rationale as the gate-tests
+must parse identically), the canonical-spec/amendment finders the
+spec-scanning gates share, and the governed comment-surface adapters
+(`spec_comment_surface` / `spec_comment_whitelisted`) `check-comment-tier`
+and `check-spec-pointer` scan the same source set through. The finders skip
+a `templates/` skeleton (a copyable stub, not governed content — the same
+rationale as the gate-tests
 prune) and, unless `SPEC_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under
 the scan root (a dependency's docs; an ancestor kit root — the case when a
 kit's own gate fixture dir is the scan root — never prunes). Values and
@@ -316,10 +319,12 @@ directive earns its place by the coupling it makes — a bare pointer binding
 this code site to the requirement that governs it, as `contract:` / `assertion`
 / `graph:` bind a site to a manifest contract, an enumerated assertion, or the
 gate graph. The binding is the value: either side's drift breaks it visibly
-(gate-checked for `graph:` and `assertion`, a review tripwire for `spec:` /
-`contract:` until a pointer-resolver lands), which is why it blesses only its
-own one-line binding, never a relocated block — restatement couples nothing, it
-just forks the why into a second copy no gate reads. `comment-tier-exempt:
+(gate-checked both sides for `graph:` and `assertion`; for `spec:` /
+`contract:` `check-spec-pointer` gate-checks the forward side — the target
+resolves — leaving only the reverse, an uncovered requirement, a review
+concern), which is why it blesses only its own one-line binding, never a
+relocated block — restatement couples nothing, it just forks the why into a
+second copy no gate reads. `comment-tier-exempt:
 <reason>` is the honest directive for a genuinely-local fact below SPEC altitude
 that neither tier owns.
 
@@ -339,6 +344,37 @@ FP-prone half of the judgment stays a review tripwire. Not-yet-swept
 sources ride `SPEC_KIT_COMMENT_WHITELIST` (its array tagged
 `# exception-list:`, each `# until:` a live drain task per
 `check-gate-exemption-tasks`), draining kit by kit. `precommit` tier.
+
+### check-spec-pointer
+
+Invariant: every `spec:` / `contract:` pointer directive on a governed source
+resolves — forward direction only. The directive set is exactly what
+`check-comment-tier` blesses by shape: full-line `spec:` / `contract:` comments
+on the governed sources, plus the `.workflow/*.txt` `# contract:` headers. A
+directive's target grammar is `<path> [§<heading>]`: `<path>` (repo-relative)
+must be a tracked file, and when a `§<heading>` fragment is present the file
+must carry a matching markdown heading; a pointer without `§` resolves
+file-only. Reddens on a missing or untracked target file, on a named heading
+the target lacks, and — fail-closed — on a directive that matched the pointer
+shape but carries no target path.
+
+`check-comment-tier` owns the directive's *shape*; this gate adds *resolution*
+on top, the binding a `spec:` pointer makes being only as good as its liveness
+— a renamed or deleted heading leaves every inbound pointer dangling, otherwise
+caught only on review. Heading match tolerates a trailing `(qualifier)` on
+either side: a pointer narrowing a section to a labelled point (`§check-graph
+(assertion G)` → the `check-graph` heading) or a heading carrying a locator the
+pointer omits (`§The guard framework` → `## The guard framework
+(lib/guard.sh)`).
+
+Calibration: forward direction only. The reverse — flagging a requirement with
+no inbound pointer as uncovered code — needs a "what counts as a requirement"
+notion that risks false positives against the cheap-and-FP-free bar, so it is
+ruled out (a separate task with its own ruling if ever wanted; this gate
+reserves no syntax for it). Governed-surface discovery and configuration are
+`check-comment-tier`'s — the shared `spec_comment_surface` /
+`spec_comment_whitelisted` adapters in `lib/spec.sh` and the same
+`SPEC_KIT_COMMENT_*` knobs — so no new config knob. `precommit` tier.
 
 ### templates/
 

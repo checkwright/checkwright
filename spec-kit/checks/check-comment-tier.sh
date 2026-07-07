@@ -160,40 +160,19 @@ STYLE == "slash" {
 END { flush_block(0) }
 AWK
 
-# spec: spec-kit/SPEC.md §check-comment-tier — resolve the governed surface:
-# explicit globs when SPEC_KIT_COMMENT_SURFACE is set, else derive shell sources
-# (templates + kit-roots-per-knob pruned) plus the workflow *.txt state files.
+# spec: spec-kit/SPEC.md §check-comment-tier — the governed surface (shared with
+# check-spec-pointer via lib/spec.sh: SPEC_KIT_COMMENT_SURFACE globs, else derived
+# shell sources plus the workflow *.txt state files).
 declare -a SURFACE=()
-if [[ ${#SPEC_KIT_COMMENT_SURFACE[@]} -gt 0 ]]; then
-    shopt -s nullglob globstar
-    for g in "${SPEC_KIT_COMMENT_SURFACE[@]}"; do
-        for f in "$ROOT"/$g; do [[ -f "$f" ]] && SURFACE+=("$f"); done
-    done
-    shopt -u nullglob globstar
-else
-    while IFS= read -r f; do
-        [[ -n "$f" ]] && SURFACE+=("$f")
-    done < <(gate_find "$ROOT" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$ROOT" | sort)
-    wfdir="$ROOT/${GATE_SDK_WORKFLOW_DIR:-.workflow}"
-    shopt -s nullglob
-    for f in "$wfdir"/*.txt; do SURFACE+=("$f"); done
-    shopt -u nullglob
-fi
-
-in_whitelist() {  # true when the root-relative path matches a consumer whitelist glob
-    local rel="$1" g
-    for g in "${SPEC_KIT_COMMENT_WHITELIST[@]}"; do
-        # shellcheck disable=SC2053  # intentional glob match: $g is a pattern
-        [[ "$rel" == $g ]] && return 0
-    done
-    return 1
-}
+while IFS= read -r f; do
+    [[ -n "$f" ]] && SURFACE+=("$f")
+done < <(spec_comment_surface "$ROOT")
 
 errors=()
 scanned=0
 for f in "${SURFACE[@]}"; do
     rel="${f#"$ROOT"/}"; rel="${rel#./}"
-    in_whitelist "$rel" && continue
+    spec_comment_whitelisted "$rel" && continue
     case "$f" in
         *.sh|*.bash)              style="hash";  bless="$SHELL_BLESS"; pos="$POS_RE" ;;
         *.txt)                    style="hash";  bless="$TXT_BLESS";   pos="" ;;

@@ -110,6 +110,35 @@ spec_canonical_specs() { gate_find "$1" -name "$SPEC_KIT_SPEC_NAME" -type f 2>/d
 
 spec_amendments() { gate_find "$1" -name "$SPEC_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
 
+# spec: spec-kit/SPEC.md §lib/spec.sh — the governed comment surface shared by
+# check-comment-tier and check-spec-pointer: explicit globs when
+# SPEC_KIT_COMMENT_SURFACE is set, else derived shell sources (templates + the
+# per-knob vendored kit roots pruned) plus the workflow *.txt state files.
+spec_comment_surface() {
+    local root="${1:-.}" g f
+    if [[ ${#SPEC_KIT_COMMENT_SURFACE[@]} -gt 0 ]]; then
+        shopt -s nullglob globstar
+        for g in "${SPEC_KIT_COMMENT_SURFACE[@]}"; do
+            for f in "$root"/$g; do [[ -f "$f" ]] && printf '%s\n' "$f"; done
+        done
+        shopt -u nullglob globstar
+    else
+        gate_find "$root" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
+        shopt -s nullglob
+        for f in "$root/${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*.txt; do printf '%s\n' "$f"; done
+        shopt -u nullglob
+    fi
+}
+
+spec_comment_whitelisted() {  # $1=root-relative path — true when it matches a consumer whitelist glob
+    local rel="$1" g
+    for g in "${SPEC_KIT_COMMENT_WHITELIST[@]}"; do
+        # shellcheck disable=SC2053  # intentional glob match: $g is a pattern
+        [[ "$rel" == $g ]] && return 0
+    done
+    return 1
+}
+
 _sk_errs=()
 [[ -n "$SPEC_KIT_SPEC_NAME" ]]      || _sk_errs+=("SPEC_KIT_SPEC_NAME is empty")
 [[ -n "$SPEC_KIT_AMENDMENT_GLOB" ]] || _sk_errs+=("SPEC_KIT_AMENDMENT_GLOB is empty")
