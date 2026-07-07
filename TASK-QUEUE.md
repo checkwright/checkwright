@@ -101,11 +101,4 @@
   surfaced dogfooding this repo's delegation nudge 2026-07-07.
 ## Done
 
-- allowlist-chain-steer-rule
-- comment-tier-gate
-- comment-tier-sweep
-- context-kit-extraction
-- stage-entry-mechanization
-- tag-lead-line-rename
-
 ## Lessons Learned
