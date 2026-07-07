@@ -59,6 +59,20 @@
   as its own iteration post kit 7. Evidence artifact: upstream Claude Code
   issue #75214 (project config can't lift the Task ask-first default),
   surfaced dogfooding this repo's delegation nudge 2026-07-07.
+- **manifest-temporal-gate** [needs-spec] — spec-kit tiering-family gate: a
+  cheap lexical tripwire flagging old-behavior narration ("previously",
+  "formerly", "no longer", "used to", "renamed from") in tracked manifest
+  prose (SPEC*.md, README, the always-loaded surface). History is derivable
+  from git; a manifest states current behavior only, and a "formerly…" line is
+  standing context cost documenting the old cost — it taxes every session that
+  reads it. Mechanizes what close-brevity today leaves to manual judgment ("the
+  semantic residue check-brevity cannot decide",
+  context-kit/templates/close-brevity.md). Scope ruling owes the calibration:
+  the cheap-and-FP-free bar is the crux — this repo's own extraction prose is
+  deliberate provenance ("renamed from the platform's X"; every "What stayed on
+  the platform" section), so the gate needs an exempt escape (the
+  check-spec-embedded-source `-exempt:` pattern) and must be tuned against these
+  SPECs as the FP corpus. Surfaced 2026-07-07.
 ## Done
 
 - check-spec-pointer
