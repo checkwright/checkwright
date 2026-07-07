@@ -143,9 +143,9 @@ own instance and stays there); the kit's rules are the topology itself:
   full-line comment on a governed source is a machine or reason directive,
   rides the contiguous run a directive opens, or is exempt — design
   rationale lives in the owning SPEC section, not re-derived in a comment
-  block; the pointer names where the why lives, it never relocates the why
-  into the comment (`check-comment-tier`; the FP-prone trailing-comment
-  judgment stays a review tripwire).
+  block; the pointer names where the why lives and couples the code to it —
+  never relocating the why into the comment (`check-comment-tier`; the
+  FP-prone trailing-comment judgment stays a review tripwire).
 - **Honest mechanizability.** Only the structural sub-rules gate (banned
   headings, fence density, duplicate definitions, verbatim copies); the
   core judgment — is this sentence a definition or a narration, a why or a
@@ -312,10 +312,16 @@ comment immediately above a positional construct from the language roster.
 Anything else is flagged. Code is the WHAT, its SPEC the WHY — the seam the
 align stage checks each side against; a comment that restates the code, or
 paraphrases the SPEC section it cites, is deleted, not blessed. A `spec:`
-directive is a bare pointer to where the why lives (it blesses only its own
-one-line wording, not a relocated block); `comment-tier-exempt: <reason>` is
-the honest directive for a genuinely-local fact below SPEC altitude that
-neither tier owns.
+directive earns its place by the coupling it makes — a bare pointer binding
+this code site to the requirement that governs it, as `contract:` / `assertion`
+/ `graph:` bind a site to a manifest contract, an enumerated assertion, or the
+gate graph. The binding is the value: either side's drift breaks it visibly
+(gate-checked for `graph:` and `assertion`, a review tripwire for `spec:` /
+`contract:` until a pointer-resolver lands), which is why it blesses only its
+own one-line binding, never a relocated block — restatement couples nothing, it
+just forks the why into a second copy no gate reads. `comment-tier-exempt:
+<reason>` is the honest directive for a genuinely-local fact below SPEC altitude
+that neither tier owns.
 
 Calibration: the built-in roster is Checkwright's own kit-mechanism
 directive names; `SPEC_KIT_COMMENT_MACHINE` / `_REASON` append a consumer's
