@@ -58,6 +58,12 @@ fixture-pair, self-lint) are specified in [gate-sdk/SPEC.md](gate-sdk/SPEC.md)
 and enforced by the meta-gates — a red gate is fixed, never bypassed with
 `--no-verify` except as a one-off with cause.
 
+Comments are directives, else deleted — a passing `check-comment-tier` is the
+floor, not licence to keep a comment. Blessing a restatement (relocating prose
+behind a `spec:` or `comment-tier-exempt:` tag rather than deleting it) is
+itself the defect; the doctrine and the one-line-binding rule for `spec:` live
+in [spec-kit/SPEC.md](spec-kit/SPEC.md) §check-comment-tier.
+
 ## Conventions established in gate-sdk (keep later kits consistent)
 
 - **Registry, not array:** `gates.list` (one name per line, `#` comments)

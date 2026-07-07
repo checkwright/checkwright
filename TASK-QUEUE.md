@@ -73,6 +73,27 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **comment-restatement-gate** [needs-spec] — tighten spec-kit's
+  `check-comment-tier`: it blesses the whole contiguous comment run its lead
+  directive opens, so a `spec:` pointer trailed by relocated prose passes — yet
+  the SPEC says a `spec:` directive blesses only its own one-line binding, never
+  a relocated block. The gate is more permissive than its own SPEC; a build
+  session took the blessing path twice this iteration before deleting. The
+  mechanically-decidable core: drop run-blessing so every full-line comment
+  resolves on its own line as a directive or `comment-tier-exempt:`, forcing
+  relocated prose to delete-or-per-line-exempt. Scope must rule the FP tension —
+  the existing multi-line rationale blocks and the corpus sweep removal implies:
+  is the wrapped-rationale style restatement to delete or genuinely-local to
+  exempt? Sibling to the manifest-* narration gates. Surfaced 2026-07-08.
+- **budget-injection-automation** [needs-spec] — surface the fresh
+  `usage-verdict.sh` reading at decision time so the raw pct is never quoted
+  from memory (the charter forbids eyeballing it, yet a session stated ~5% when
+  the live verdict was 29%). The norm relies on the agent choosing to run the
+  tool; an automation removes the choice. Candidate shape: a PreToolUse hook on
+  the Agent tool (the guard-kit additionalContext pattern) injecting the verdict
+  before each dispatch, and/or the context-kit session brief carrying it. Scope
+  must rule: per-turn freshness vs SessionStart-only; delegation-kit vs
+  context-kit ownership; block-on-PAUSE vs advise-only. Surfaced 2026-07-08.
 
 ## Done
 
