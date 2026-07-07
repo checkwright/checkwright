@@ -39,6 +39,21 @@
   without weakening the gate). First consumer: the platform, which adopts it
   as `checkwright-kit-adoption` step 0 and whose cutover deletion sweep
   exercises the valve. Surfaced in the platform 2026-07-04.
+- **check-spec-pointer** [needs-spec] — spec-kit gate resolving `spec:` /
+  `contract:` pointer targets so a coupling cannot dangle silently.
+  check-comment-tier blesses a pointer directive by shape but never checks that
+  its `<SPEC> §<section>` resolves; a renamed or deleted heading leaves every
+  inbound pointer dangling, caught only on review (spec-kit/SPEC.md
+  §check-comment-tier records this as a tripwire "until a pointer-resolver
+  lands"). Forward direction is cheap and FP-free — each pointer's file +
+  heading must exist; check-graph's `graph:` couples / asset-href resolution is
+  the precedent. Design owes: whether the reverse direction (a requirement with
+  no inbound pointer = uncovered code) is in scope or needs a "what counts as a
+  requirement" notion (every `###`? tagged only?) that risks FPs; which
+  directives and manifests resolve (SPEC.md headings, the workflow
+  `# contract:` headers); the tier (precommit). Surfaced 2026-07-07 dogfooding
+  the comment-tier sweep — the coupling value the sweep leaned on is only as
+  good as the pointers being live.
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
   KPIs and lead/lag honesty labels (kit 7).
 - **knowledge-friction-loop** [needs-spec] — the friction log / scan-prompts /
