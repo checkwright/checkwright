@@ -2,7 +2,7 @@
 permission-friction loop a habit, not a one-off cleanup. Splice this in place
 of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 
-1. **Rank what prompted.** Run `bash friction-kit/bin/scan-prompts.sh` — it
+1. **Rank what prompted.** Run `bash guard-kit/bin/scan-prompts.sh` — it
    filters the friction log against the committed allowlist and the harness's
    built-in read-only auto-allows, then ranks the survivors by command pattern.
 2. **Resolve each recurring pattern by the triage criterion** — never default
@@ -17,7 +17,7 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 3. **Review the wakeup log** if the wakeup-guard is wired: read
    `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
 4. **Prune the local overlay.** Run
-   `bash friction-kit/bin/compare-settings-allow.sh` and remove every listed
+   `bash guard-kit/bin/compare-settings-allow.sh` and remove every listed
    `settings.local.json` entry (a committed glob already grants it). Then, by
    judgment, prune the remaining one-off exact-string local entries and promote
    recurring safe patterns to the committed `settings.json` as globs.

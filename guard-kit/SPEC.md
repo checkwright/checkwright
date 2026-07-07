@@ -1,4 +1,4 @@
-# friction-kit — permission-friction reduction for agent sessions
+# guard-kit — permission-friction reduction for agent sessions
 
 A permission prompt the human approves is invisible to the agent — nothing
 about it lands in the transcript, so the agent cannot notice, count, or fix
@@ -15,7 +15,7 @@ Extracted from the governance meta-layer of a private production platform.
 The kit carries the guard framework, the harness-generic ruleset, and the
 triage tooling; every project-specific guard rule (build-tool hygiene,
 container concurrency, test-suite serialization) is consumer rule content
-and never ships. Unlike the earlier kits, friction-kit registers **no
+and never ships. Unlike the earlier kits, guard-kit registers **no
 gates**: its runtime surfaces are hooks and advisory `bin/` tools, so
 nothing joins `gates.list`; it follows gate-sdk's layout and smoke
 conventions without depending on its registry.
@@ -110,11 +110,11 @@ load-bearing where noted.
    `*.err`/`*.out`/`*.log` target is blocked (it lands in the tracked tree
    and risks a `git add -A`); the no-slash class lets path-bearing targets,
    `/dev/null`, and fd-dups through. The corrective message points at the
-   consumer's gitignored scratch dirs (`FRICTION_KIT_SCRATCH_DIRS`).
+   consumer's gitignored scratch dirs (`GUARD_KIT_SCRATCH_DIRS`).
 4. **Absolute-path execution of a known read-only repo script** — silently
    rewritten to the repo-relative form via `guard_rewrite` (the relative
    spelling is what allowlist globs match). The roster is the
-   `FRICTION_KIT_RO_SCRIPTS` globs (default `check-*.sh`). Any other
+   `GUARD_KIT_RO_SCRIPTS` globs (default `check-*.sh`). Any other
    absolute repo-script spelling gets a corrective block. **Placed before**
    rule 5, which would otherwise steer the same command less precisely.
 5. **Repo-root absolute prefix (non-script)** — any other command carrying
@@ -154,7 +154,7 @@ load-bearing where noted.
    `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
    already blocked, so a surviving target is a literal path.
 9. **Auto-allow read-only pipeline** — granted silently when every pipe
-   segment leads with a roster binary (`FRICTION_KIT_RO_BINS`, default the
+   segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
    grep/head/cat/find/jq family) and every redirect target is `/dev/null`
    or an fd-dup. Conservative by construction: command/process
    substitution, a leftover quote after stripping, any statement separator,
@@ -177,7 +177,7 @@ load-bearing where noted.
     prompt and blocking it would regress — the rule therefore fires only when a
     non-leading segment (or a redirect on the lead) fails to match any committed
     allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
-    `FRICTION_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
+    `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
     the auto-allow rules (8, 9) so a silently granted read-only pipeline never
     reaches it.
@@ -246,7 +246,7 @@ durable pattern lives in the committed, reviewable allowlist.
 ## Layout and configuration
 
 ```
-friction-kit/
+guard-kit/
   lib/guard.sh              # primitives + generic ruleset functions
   bin/scan-prompts.sh
   bin/compare-settings-allow.sh
@@ -255,28 +255,28 @@ friction-kit/
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/wakeup-guard.sh
-  templates/friction-config.sh
+  templates/guard-config.sh
   templates/settings-hooks.json  # the PreToolUse wiring snippet
   templates/close-triage.md
   smoke/install.sh
 ```
 
 Config follows the established kit pattern: copy
-`templates/friction-config.sh` into the gates dir (or point
-`FRICTION_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
+`templates/guard-config.sh` into the gates dir (or point
+`GUARD_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
 what the consumer left unset. Knobs (platform values as defaults):
 
-- `FRICTION_KIT_LOG` — default
+- `GUARD_KIT_LOG` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
-- `FRICTION_KIT_WAKEUP_LOG` — default
+- `GUARD_KIT_WAKEUP_LOG` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log`.
-- `FRICTION_KIT_SETTINGS` — default `.claude/settings.json`.
-- `FRICTION_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
-- `FRICTION_KIT_RO_SCRIPTS` — array of globs eligible for the
+- `GUARD_KIT_SETTINGS` — default `.claude/settings.json`.
+- `GUARD_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
+- `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
-- `FRICTION_KIT_RO_BINS` — read-only pipeline roster (rule 9); default the
+- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 9); default the
   grep/head/cat/find/jq family.
-- `FRICTION_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
+- `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
   rule-3 corrective message; default `(".tmp")`.
 
 Both logs are per-iteration scratch: a consumer gitignores them even where

@@ -1,5 +1,5 @@
 {
-  "//": "friction-kit hook wiring — merge into .claude/settings.json. The bash-guard is the PreToolUse(Bash) hook; the wakeup-guard is optional (drop the second block to skip it). Paths assume the guards were copied into scripts/.",
+  "//": "guard-kit hook wiring — merge into .claude/settings.json. The bash-guard is the PreToolUse(Bash) hook; the wakeup-guard is optional (drop the second block to skip it). Paths assume the guards were copied into scripts/.",
   "hooks": {
     "PreToolUse": [
       {

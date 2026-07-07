@@ -1,4 +1,4 @@
-# friction-kit
+# guard-kit
 
 Permission-friction reduction for coding-agent sessions. A `PreToolUse` guard
 decides at call time — **block** with a corrective message, **steer** to a
@@ -15,7 +15,7 @@ fall-through set — exactly the commands that may have prompted — the one thi
 that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the nine generic
 rules, and the triage criterion.
 
-Unlike the other kits, friction-kit registers **no gates**: its surfaces are
+Unlike the other kits, guard-kit registers **no gates**: its surfaces are
 hooks and advisory `bin/` tools, so nothing joins `gates.list`. It follows
 gate-sdk's layout and smoke conventions without depending on its registry.
 
@@ -26,9 +26,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 1. Copy the guard framework into your gates dir (default `scripts/`):
 
    ```bash
-   cp friction-kit/templates/bash-guard.sh      scripts/bash-guard.sh
-   cp friction-kit/templates/wakeup-guard.sh    scripts/wakeup-guard.sh   # optional
-   cp friction-kit/templates/friction-config.sh scripts/friction-config.sh
+   cp guard-kit/templates/bash-guard.sh      scripts/bash-guard.sh
+   cp guard-kit/templates/wakeup-guard.sh    scripts/wakeup-guard.sh   # optional
+   cp guard-kit/templates/guard-config.sh    scripts/guard-config.sh
    ```
 
    Add your project's block/steer/allow rules in `bash-guard.sh`'s marked
@@ -46,20 +46,20 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
    lifecycle-kit's `tooling-friction triage` placeholder).
 
 Configuration follows the established kit pattern — override any knob in
-`friction-config.sh` (log paths, settings paths, `FRICTION_KIT_RO_SCRIPTS`,
-`FRICTION_KIT_RO_BINS`, `FRICTION_KIT_SCRATCH_DIRS`); defaults are the extracted
+`guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
+`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`); defaults are the extracted
 platform's.
 
 ## Use
 
 ```bash
-bash friction-kit/bin/scan-prompts.sh                  # rank what prompted, filtered by the allowlist
-bash friction-kit/bin/scan-prompts.sh --count          # <patterns>/<occurrences> token (drift KPI)
-bash friction-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants
+bash guard-kit/bin/scan-prompts.sh                  # rank what prompted, filtered by the allowlist
+bash guard-kit/bin/scan-prompts.sh --count          # <patterns>/<occurrences> token (drift KPI)
+bash guard-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants
 ```
 
 ## Test
 
 ```bash
-bash friction-kit/bin/run-guard-tests.sh               # decision-table over the generic ruleset
+bash guard-kit/bin/run-guard-tests.sh               # decision-table over the generic ruleset
 ```

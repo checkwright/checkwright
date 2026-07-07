@@ -64,7 +64,7 @@ invocation, but the safety rules must never be absent from a session that
 *could* delegate, so the load-bearing bullets ride in the always-loaded
 file and point at the skill for the full procedure. Consumer-specific
 material in both templates — the shared-file roster, the validate battery —
-lives in marked consumer sections, the same discipline as friction-kit's
+lives in marked consumer sections, the same discipline as guard-kit's
 consumer-rules block.
 
 ## Resume journal — agent writes, supervisor deletes
@@ -211,7 +211,7 @@ commit here.
 `run-gate-tests.sh`.
 
 `usage-gate` does not fit the gate contract (a three-state verdict, not a
-clean/violation pair), so — like friction-kit's guard-tests — the kit ships
+clean/violation pair), so — like guard-kit's guard-tests — the kit ships
 its own decision-table runner: `usage-tests/cases.tsv` pairs an expected
 verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario
 knobs (percentage, snapshot age offset, reset offset, credential age);

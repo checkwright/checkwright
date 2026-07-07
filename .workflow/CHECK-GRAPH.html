@@ -88,9 +88,9 @@ graph LR
     n19["context-kit/*.sh"]
     n20["delegation-kit/*.sh"]
     n21["delegation-kit/SPEC.md"]
-    n22["friction-kit/*.sh"]
-    n23["gate-sdk/*.sh"]
-    n24["gate-sdk/SPEC.md"]
+    n22["gate-sdk/*.sh"]
+    n23["gate-sdk/SPEC.md"]
+    n24["guard-kit/*.sh"]
     n25["lifecycle-kit/*.sh"]
     n26["lifecycle-kit/SPEC.md"]
     n27["queue-kit/*.sh"]
@@ -105,54 +105,54 @@ graph LR
   n18 <-->|"check-amendment-queue"| n17
   n18 <-->|"check-amendment-queue"| n10
   n15 -->|"check-brevity"| n15
-  n29 -->|"check-comment-tier"| n23
+  n29 -->|"check-comment-tier"| n22
   n29 -->|"check-comment-tier"| n25
   n29 -->|"check-comment-tier"| n27
   n29 -->|"check-comment-tier"| n33
   n29 -->|"check-comment-tier"| n20
-  n29 -->|"check-comment-tier"| n22
+  n29 -->|"check-comment-tier"| n24
   n29 -->|"check-comment-tier"| n19
   n29 -->|"check-comment-tier"| n12
-  n24 <-->|"check-gate-assertions"| n26
-  n24 <-->|"check-gate-assertions"| n28
-  n24 <-->|"check-gate-assertions"| n34
-  n24 <-->|"check-gate-assertions"| n21
-  n24 <-->|"check-gate-assertions"| n29
-  n24 <-->|"check-gate-assertions"| n23
-  n24 <-->|"check-gate-assertions"| n25
-  n24 <-->|"check-gate-assertions"| n27
-  n24 <-->|"check-gate-assertions"| n33
-  n24 <-->|"check-gate-assertions"| n20
-  n29 -->|"check-gate-exemption-tasks"| n23
+  n23 <-->|"check-gate-assertions"| n26
+  n23 <-->|"check-gate-assertions"| n28
+  n23 <-->|"check-gate-assertions"| n34
+  n23 <-->|"check-gate-assertions"| n21
+  n23 <-->|"check-gate-assertions"| n29
+  n23 <-->|"check-gate-assertions"| n22
+  n23 <-->|"check-gate-assertions"| n25
+  n23 <-->|"check-gate-assertions"| n27
+  n23 <-->|"check-gate-assertions"| n33
+  n23 <-->|"check-gate-assertions"| n20
+  n29 -->|"check-gate-exemption-tasks"| n22
   n29 -->|"check-gate-exemption-tasks"| n25
   n29 -->|"check-gate-exemption-tasks"| n27
   n29 -->|"check-gate-exemption-tasks"| n33
   n29 -->|"check-gate-exemption-tasks"| n20
   n29 -->|"check-gate-exemption-tasks"| n18
-  n29 -->|"check-gate-fail-closed"| n23
+  n29 -->|"check-gate-fail-closed"| n22
   n29 -->|"check-gate-fail-closed"| n25
   n29 -->|"check-gate-fail-closed"| n27
   n29 -->|"check-gate-fail-closed"| n33
   n29 -->|"check-gate-fail-closed"| n20
   n31 -->|"check-gate-fixture-coverage"| n29
   n31 -->|"check-gate-fixture-coverage"| n30
-  n31 -->|"check-gate-fixture-coverage"| n23
+  n31 -->|"check-gate-fixture-coverage"| n22
   n31 -->|"check-gate-fixture-coverage"| n25
   n31 -->|"check-gate-fixture-coverage"| n27
   n31 -->|"check-gate-fixture-coverage"| n33
   n31 -->|"check-gate-fixture-coverage"| n20
   n31 -->|"check-gate-output"| n29
-  n31 -->|"check-gate-output"| n23
+  n31 -->|"check-gate-output"| n22
   n31 -->|"check-gate-output"| n25
   n31 -->|"check-gate-output"| n27
   n31 -->|"check-gate-output"| n33
   n31 -->|"check-gate-output"| n20
-  n23 -->|"check-gate-tamper"| n25
-  n23 -->|"check-gate-tamper"| n27
-  n23 -->|"check-gate-tamper"| n33
-  n23 -->|"check-gate-tamper"| n20
+  n22 -->|"check-gate-tamper"| n25
+  n22 -->|"check-gate-tamper"| n27
+  n22 -->|"check-gate-tamper"| n33
+  n22 -->|"check-gate-tamper"| n20
   n31 -->|"check-graph"| n29
-  n31 -->|"check-graph"| n23
+  n31 -->|"check-graph"| n22
   n31 -->|"check-graph"| n25
   n31 -->|"check-graph"| n27
   n31 -->|"check-graph"| n33
@@ -164,11 +164,11 @@ graph LR
   n18 -->|"check-queue-hygiene"| n18
   n18 -->|"check-queue-prose-precondition"| n18
   n18 -->|"check-queue-wrap"| n18
-  n29 -->|"check-shellcheck"| n23
+  n29 -->|"check-shellcheck"| n22
   n29 -->|"check-shellcheck"| n25
   n29 -->|"check-shellcheck"| n27
   n29 -->|"check-shellcheck"| n33
-  n29 -->|"check-shellcheck"| n22
+  n29 -->|"check-shellcheck"| n24
   n29 -->|"check-shellcheck"| n20
   n11 -->|"check-spec-derivable-section"| n11
   n11 -->|"check-spec-dod-singleton"| n11

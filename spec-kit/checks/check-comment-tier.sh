@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,friction-kit/*.sh,context-kit/*.sh,.workflow/*.txt dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,guard-kit/*.sh,context-kit/*.sh,.workflow/*.txt dir=one valve=none tier=precommit
 # spec: spec-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's following run, is comment-tier-exempt, or justifies a positional construct
 #
 # usage: check-comment-tier.sh [scan-root]

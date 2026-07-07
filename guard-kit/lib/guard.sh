@@ -1,20 +1,20 @@
 # shellcheck shell=bash
-# spec: friction-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
+# spec: guard-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
 
-_frik_cfg="${FRICTION_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/friction-config.sh}"
+_frik_cfg="${GUARD_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/guard-config.sh}"
 if [[ -f "$_frik_cfg" ]]; then
     # shellcheck source=/dev/null  # consumer config path is resolved at runtime
     source "$_frik_cfg"
 fi
 unset _frik_cfg
 
-: "${FRICTION_KIT_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log}"
-: "${FRICTION_KIT_WAKEUP_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log}"
-: "${FRICTION_KIT_SETTINGS:=.claude/settings.json}"
-: "${FRICTION_KIT_SETTINGS_LOCAL:=.claude/settings.local.json}"
-declare -p FRICTION_KIT_RO_SCRIPTS >/dev/null 2>&1 || FRICTION_KIT_RO_SCRIPTS=("check-*.sh")
-declare -p FRICTION_KIT_SCRATCH_DIRS >/dev/null 2>&1 || FRICTION_KIT_SCRATCH_DIRS=(".tmp")
-declare -p FRICTION_KIT_RO_BINS >/dev/null 2>&1 || FRICTION_KIT_RO_BINS=(
+: "${GUARD_KIT_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log}"
+: "${GUARD_KIT_WAKEUP_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log}"
+: "${GUARD_KIT_SETTINGS:=.claude/settings.json}"
+: "${GUARD_KIT_SETTINGS_LOCAL:=.claude/settings.local.json}"
+declare -p GUARD_KIT_RO_SCRIPTS >/dev/null 2>&1 || GUARD_KIT_RO_SCRIPTS=("check-*.sh")
+declare -p GUARD_KIT_SCRATCH_DIRS >/dev/null 2>&1 || GUARD_KIT_SCRATCH_DIRS=(".tmp")
+declare -p GUARD_KIT_RO_BINS >/dev/null 2>&1 || GUARD_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls
 )
 
@@ -51,7 +51,7 @@ guard_rewrite() {
 guard_log_fallthrough() {
     local fline
     fline="$(printf '%s' "$1" | tr '\n\t' '  ' | cut -c1-500)"
-    printf '%s\n' "$fline" >>"$FRICTION_KIT_LOG" 2>/dev/null || true
+    printf '%s\n' "$fline" >>"$GUARD_KIT_LOG" 2>/dev/null || true
 }
 
 guard_allow_match() {
@@ -60,7 +60,7 @@ guard_allow_match() {
     [[ "$s" == $glob ]]
 }
 
-# spec: friction-kit/SPEC.md §The generic ruleset — rules 1-10 below; order is load-bearing
+# spec: guard-kit/SPEC.md §The generic ruleset — rules 1-10 below; order is load-bearing
 guard_rule_cd_compound() {
     local cmd="$1"
     if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then
@@ -78,7 +78,7 @@ guard_rule_git_c_root() {
 guard_rule_scratch_redirect() {
     local cmd="$1"
     if grep -qE '(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\.(err|out|log)([[:space:]]|$)' <<<"$cmd"; then
-        guard_block "don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. ${FRICTION_KIT_SCRATCH_DIRS[0]}/<name>.err)."
+        guard_block "don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. ${GUARD_KIT_SCRATCH_DIRS[0]}/<name>.err)."
     fi
 }
 
@@ -93,7 +93,7 @@ guard_rule_abs_script() {
     case "$rest" in *.sh) ;; *) return 0 ;; esac   # only .sh scripts; rule 5 handles the rest
     base="${rest##*/}"
     relcmd="${cmd//"$PWD/"/}"               # strip every repo-root prefix
-    for g in "${FRICTION_KIT_RO_SCRIPTS[@]}"; do
+    for g in "${GUARD_KIT_RO_SCRIPTS[@]}"; do
         # shellcheck disable=SC2053  # intentional glob match: $g is a pattern, not a literal
         if [[ "$base" == $g || "$rest" == $g ]]; then
             guard_rewrite "$relcmd" "abs repo read-only script normalized to relative (${GUARD_NAME:-guard})"
@@ -183,7 +183,7 @@ guard_rule_ro_pipeline() {
         [[ -z "$seg" ]] && continue
         first="${seg%%[[:space:]]*}"
         matched=0
-        for b in "${FRICTION_KIT_RO_BINS[@]}"; do
+        for b in "${GUARD_KIT_RO_BINS[@]}"; do
             [[ "$first" == "$b" ]] && { matched=1; break; }
         done
         [[ "$matched" == 1 ]] || return 0
@@ -194,10 +194,10 @@ guard_rule_ro_pipeline() {
 guard_rule_allowlist_chain() {
     local cmd="$1"
     command -v jq >/dev/null 2>&1 || return 0
-    [[ -f "$FRICTION_KIT_SETTINGS" ]] || return 0
+    [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
 
     local -a allow_entries
-    mapfile -t allow_entries < <(jq -r '.permissions.allow[]?' "$FRICTION_KIT_SETTINGS" 2>/dev/null) || return 0
+    mapfile -t allow_entries < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null) || return 0
     [[ ${#allow_entries[@]} -gt 0 ]] || return 0
 
     local e inner

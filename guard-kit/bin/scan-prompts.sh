@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# spec: friction-kit/SPEC.md §scan-prompts — rank recurring prompt sources from the friction log
+# spec: guard-kit/SPEC.md §scan-prompts — rank recurring prompt sources from the friction log
 set -uo pipefail
 
 BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../lib/guard.sh
 source "$BIN/../lib/guard.sh"
 
-LOG="$FRICTION_KIT_LOG"
-SETTINGS="$FRICTION_KIT_SETTINGS"
+LOG="$GUARD_KIT_LOG"
+SETTINGS="$GUARD_KIT_SETTINGS"
 
 COUNT=0
 case "${1:-}" in
@@ -101,7 +101,7 @@ done | sort -rn | while IFS=$'\t' read -r n key; do
     printf '%5dx  %s\n' "$n" "$key"
 done
 echo
-echo "Triage each by the criterion (friction-kit/SPEC.md §The triage criterion):"
+echo "Triage each by the criterion (guard-kit/SPEC.md §The triage criterion):"
 echo "  (a) allowlist entry — safe & already in the form to reinforce,"
 echo "  (b) guard rule — a better form exists (steer), or logic a glob can't express,"
 echo "  (c) habit change — a true one-off."

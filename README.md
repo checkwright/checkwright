@@ -23,13 +23,13 @@ own kits, day one.
 | [lifecycle-kit/](lifecycle-kit/) | **landed** | The iteration stage state machine for stateless agent sessions: a stage header + evidence-stamp file, five stage-skill templates (scope/align/build/validate/close — stages are config), and the two gates that make skipping a stage fail the commit. |
 | [queue-kit/](queue-kit/) | **landed** | A git-native, agent-readable task tracker: the TASK-QUEUE format, one slug namespace, the blocked-by/needs-spec/spec tag algebra, `queue-index.sh`, and six gates holding the grammar an agent selects work by. |
 | [spec-kit/](spec-kit/) | **landed** | Spec discipline for agent-authored components: one canonical spec per component, deltas as short-lived amendment files, a content-tiering star topology (one owner per fact; cite, never restate), and five gates over the copy-shaped failure modes. |
-| [friction-kit/](friction-kit/) | **landed** | Permission-friction tooling for agent sessions: a `PreToolUse` guard framework (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers no gates. |
+| [guard-kit/](guard-kit/) | **landed** | Permission-friction tooling for agent sessions: a `PreToolUse` guard framework (block/steer/rewrite/auto-allow) with a harness-generic ruleset, a prompt-source scanner, tracked-vs-local allowlist curation, an optional wakeup-guard, and a close-stage friction-triage step. Registers no gates. |
 | [delegation-kit/](delegation-kit/) | **landed** | Safe delegated-agent execution for budget-bounded sessions: the supervisor protocol (serialize on the shared git index, one commit per unit, resume journal, validate after every agent commit), a trustworthy budget verdict (`usage-gate`), and `check-gate-tamper` — a commit-shape gate blocking the two attested gate-weakening shapes. |
 | [context-kit/](context-kit/) | **landed** | Token-economics-aware context management: the index-first reading tools (md-index/md-section/pub-index), a session-start hook that assembles a compact brief, an always-loaded meter with its committed baseline, and `check-brevity` over the densest always-loaded section. |
 | drift-kit/ | planned | Drift reporting with pluggable KPIs and lead/lag honesty labels. |
 
 The **planned** kits are extracted in the order listed; each lands with its own
-fixtures and README. `friction-kit` entered as an unsequenced candidate, to be
+fixtures and README. `guard-kit` entered as an unsequenced candidate, to be
 slotted only if permission friction kept compounding — it did, and it landed
 ahead of the planned sequence. The repo is a monorepo
 — a kit is split out only if it earns independent adoption.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: friction-kit/SPEC.md §compare-settings-allow — list local allow entries
+# spec: guard-kit/SPEC.md §compare-settings-allow — list local allow entries
 # already granted by a committed glob (the deterministic prune-candidate set).
 #
 # Advisory, read-only — reports candidates, never mutates. A committed pattern
@@ -14,8 +14,8 @@ BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../lib/guard.sh
 source "$BIN/../lib/guard.sh"
 
-COMMITTED="$FRICTION_KIT_SETTINGS"
-LOCAL="$FRICTION_KIT_SETTINGS_LOCAL"
+COMMITTED="$GUARD_KIT_SETTINGS"
+LOCAL="$GUARD_KIT_SETTINGS_LOCAL"
 
 COUNT=0
 case "${1:-}" in

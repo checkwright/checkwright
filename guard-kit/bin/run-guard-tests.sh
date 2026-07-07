@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: friction-kit/SPEC.md §Testing — decision-table runner for the guard
+# spec: guard-kit/SPEC.md §Testing — decision-table runner for the guard
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -42,7 +42,7 @@ while IFS=$'\t' read -r want cmd; do
     cmd="${cmd//@ROOT@/$SANDBOX}"
     json="$(jq -nc --arg c "$cmd" '{tool_input:{command:$c}}')"
     out="$(cd "$SANDBOX" && printf '%s' "$json" \
-        | FRICTION_KIT_LIB="$LIB" FRICTION_KIT_LOG="$LOG" bash "$GUARD" 2>/dev/null)"
+        | GUARD_KIT_LIB="$LIB" GUARD_KIT_LOG="$LOG" bash "$GUARD" 2>/dev/null)"
     rc=$?
     got="$(classify "$rc" "$out")"
     ran=$((ran + 1))

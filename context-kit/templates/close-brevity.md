@@ -1,6 +1,6 @@
 **Always-loaded brevity pass** — the recurring close-stage step that reacts to
 the standing per-session context cost. Splice this into your close skill (the
-friction-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not
+guard-kit `close-triage.md` pattern). It reacts to the meter's *delta*, not
 its level: close is net-additive by design, so only growth since the iteration
 baseline is actionable.
 

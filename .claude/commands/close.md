@@ -22,12 +22,12 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    and risks →discard; Lessons is for observations about how the work should
    be done, whose durable home (rule vs task vs nothing) genuinely needs the
    close-stage call.
-2. **Tooling-friction triage** (friction-kit/templates/close-triage.md):
-   `bash friction-kit/bin/scan-prompts.sh` and resolve each recurring pattern
+2. **Tooling-friction triage** (guard-kit/templates/close-triage.md):
+   `bash guard-kit/bin/scan-prompts.sh` and resolve each recurring pattern
    by the triage criterion — allowlist (safe & already in the form to
    reinforce), guard rule (a better form exists, or logic a glob can't
    express), or habit change (a true one-off); `bash
-   friction-kit/bin/compare-settings-allow.sh` and prune the listed local
+   guard-kit/bin/compare-settings-allow.sh` and prune the listed local
    entries, then by judgment prune remaining one-off local entries and promote
    recurring safe patterns to committed `settings.json` globs; clear the log
    (`: > .workflow/prompt-friction.log`).

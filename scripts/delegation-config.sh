@@ -13,5 +13,5 @@ DELEGATION_KIT_GATE_FILES=(
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_META_PATHS=(
     scripts/ .workflow/ .claude/
-    gate-sdk/ lifecycle-kit/ queue-kit/ spec-kit/ friction-kit/ delegation-kit/ context-kit/
+    gate-sdk/ lifecycle-kit/ queue-kit/ spec-kit/ guard-kit/ delegation-kit/ context-kit/
 )

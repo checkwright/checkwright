@@ -1,6 +1,6 @@
-# friction-kit guard decision table — <expected-decision><TAB><command>.
+# guard-kit guard decision table — <expected-decision><TAB><command>.
 # @ROOT@ is substituted with the git-sandbox root at run time. Every generic
-# rule (friction-kit/SPEC.md §The generic ruleset) has a firing + a non-firing
+# rule (guard-kit/SPEC.md §The generic ruleset) has a firing + a non-firing
 # case. Columns are tab-separated; # and blank lines are ignored.
 
 # rule 1 — cd in a compound command

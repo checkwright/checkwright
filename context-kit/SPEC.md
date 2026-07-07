@@ -112,7 +112,7 @@ platform had no standalone name to keep).
   pointing here, then one data line
   `<total-lines> <surface-lines> <baseline-commit>`. Trailing extra
   fields are tolerated and preserved-ignored — the platform's file carries
-  a fourth (its settings-local count, a friction-kit-adjacent KPI owned by
+  a fourth (its settings-local count, a guard-kit-adjacent KPI owned by
   its drift report), so the kit reads the platform's file unchanged.
 
 ## The brevity gate
@@ -137,7 +137,7 @@ consumer's `gates.list` (this repo's included).
 ## The close-stage brevity pass
 
 `templates/close-brevity.md` is the recurring close-stage step a consumer
-splices into its close skill (the friction-kit `close-triage.md` pattern).
+splices into its close skill (the guard-kit `close-triage.md` pattern).
 The procedure: run `always-loaded.sh`; walk the growth since baseline
 asking two distinct questions — staleness (*is it still true?*) and
 brevity (*is each block worth its standing per-session token cost?*);
@@ -187,7 +187,7 @@ what the consumer left unset. Knobs (platform values as defaults):
   default `§`.
 
 The hook template itself is consumer-edited rather than knob-driven (the
-friction-kit guard precedent): its variation points are layout judgment,
+guard-kit guard precedent): its variation points are layout judgment,
 and a template with a dozen knobs is harder to own than a marked section.
 
 ## Testing
