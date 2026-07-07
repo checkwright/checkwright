@@ -17,8 +17,8 @@ source "$KIT/lib/queue.sh"
 FILE="${1:-$QUEUE_KIT_QUEUE_FILE}"
 [[ -f "$FILE" ]] || { echo "check-queue-wrap: file not found: $FILE" >&2; exit 2; }
 
-# spec: queue-kit/SPEC.md §check-queue-wrap — width is Unicode code points: LC_ALL=C
-# makes awk bytewise, cplen() subtracts UTF-8 continuation bytes (0x80–0xBF) to recover it.
+# comment-tier-exempt: the code-point width trick is below SPEC altitude
+# LC_ALL=C makes awk bytewise; cplen() subtracts UTF-8 continuation bytes (0x80–0xBF) to recover width.
 out="$(LC_ALL=C awk -v budget="$QUEUE_KIT_WRAP_BUDGET" '
     function cplen(s,   t, cont) {
         t = s

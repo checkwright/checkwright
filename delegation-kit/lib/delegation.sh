@@ -1,11 +1,5 @@
 # shellcheck shell=bash
-# spec: delegation-kit/SPEC.md §Layout and configuration — sourced config loader
-# shared by usage-gate + check-gate-tamper; carries values only (the gate-sdk
-# lib/gate.sh rule), the platform single-operator values as overridable defaults.
-
-# spec: delegation-kit/SPEC.md §Layout and configuration — consumer config wins
-# (its assignments fill first, the defaults below only what it left unset); the
-# loader is fail-closed, a named-but-absent config exits 2.
+# spec: delegation-kit/SPEC.md §Layout and configuration — sourced config loader for usage-gate + check-gate-tamper, values only
 _dk_cfg="${DELEGATION_KIT_CONFIG_FILE:-}"
 if [[ -n "$_dk_cfg" ]]; then
     [[ -f "$_dk_cfg" ]] || {
@@ -23,19 +17,12 @@ else
 fi
 unset _dk_cfg
 
-# spec: delegation-kit/SPEC.md §usage-gate — the budget-verdict knobs; the
-# positionals $1/$2 override USAGE_FILE/CRED_FILE for test injection, and a fresh
-# login within LOGIN_WINDOW of a would-be PAUSE routes to STALE (server-fed pct
-# lags the new window).
 [[ -v DELEGATION_KIT_USAGE_FILE ]] || DELEGATION_KIT_USAGE_FILE="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt"
 [[ -v DELEGATION_KIT_CRED_FILE ]] || DELEGATION_KIT_CRED_FILE="${DELEGATION_KIT_USAGE_FILE%/*}/.credentials.json"
 [[ -v DELEGATION_KIT_PAUSE_PCT ]] || DELEGATION_KIT_PAUSE_PCT=80
 [[ -v DELEGATION_KIT_STALE_AGE ]] || DELEGATION_KIT_STALE_AGE=600
 [[ -v DELEGATION_KIT_LOGIN_WINDOW ]] || DELEGATION_KIT_LOGIN_WINDOW=600
 
-# spec: delegation-kit/SPEC.md §Layout and configuration — check-gate-tamper
-# assertion-A rosters; the defaults are the platform single-gates-dir layout, a
-# gate-sdk consumer widens both to its kit checks/ dirs (templates/delegation-config.sh).
 declare -p DELEGATION_KIT_GATE_FILES &>/dev/null || DELEGATION_KIT_GATE_FILES=(
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.sh"
     "${GATE_SDK_GATES_DIR:-scripts}/lib/gate.sh"

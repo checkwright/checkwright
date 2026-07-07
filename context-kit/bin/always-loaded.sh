@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# spec: context-kit/SPEC.md §The always-loaded meter — measures the standing
-# per-session surface (configured surfaces + steady-state hook body) against a
-# committed baseline. Never runs the session-context hook itself: that hook
-# emits this meter's own line, so self-measurement would recurse.
+# spec: context-kit/SPEC.md §The always-loaded meter — standing per-session surface vs committed baseline
 #
 #   always-loaded.sh                     one line: total, per-part split, delta vs baseline
 #   always-loaded.sh --update-baseline   rewrite the baseline (a close-stage act)
@@ -25,10 +22,6 @@ unset _ck_cfg
 declare -p CONTEXT_KIT_SURFACES >/dev/null 2>&1 || CONTEXT_KIT_SURFACES=("CLAUDE.md")
 : "${CONTEXT_KIT_BASELINE_FILE:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt}"
 
-# spec: context-kit/SPEC.md §Layout and configuration — CONTEXT_KIT_HOOK_CMD
-# default: queue-kit's collapsed queue index when the script resolves (consumer
-# gates dir first, then a sibling queue-kit/bin); else empty. Unset means
-# "derive"; set-but-empty is honored (surfaces only).
 if [[ -z "${CONTEXT_KIT_HOOK_CMD+x}" ]]; then
     CONTEXT_KIT_HOOK_CMD=""
     for _qi in "${GATE_SDK_GATES_DIR:-scripts}/queue-index.sh" "$KIT/../queue-kit/bin/queue-index.sh"; do
@@ -58,9 +51,6 @@ fi
 
 total=$(( surface + hook ))
 
-# spec: context-kit/SPEC.md §The always-loaded meter — baseline data line is
-# '<total> <surface> <commit> [extra…]'; surface is re-measured not read back,
-# and extra trailing fields are preserved on update.
 base_total=""; base_commit=""; base_extra=""
 if [[ -f "$CONTEXT_KIT_BASELINE_FILE" ]]; then
     read -r base_total _ base_commit base_extra < <(

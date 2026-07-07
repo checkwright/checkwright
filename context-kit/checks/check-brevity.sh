@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=CLAUDE.md dir=one valve=none tier=precommit
 # spec: context-kit/SPEC.md §The brevity gate — over-budget bullets in the budgeted always-loaded section that cite a deeper doc
-#
-# Renamed from the platform's check-convention-brevity: the governed section is
-# now a knob (CONTEXT_KIT_BREVITY_SECTION), so the platform's section name left
-# the gate name. Scans one designated always-loaded file for a bulleted section
-# where each `- **name:**` bullet carries a line budget, and flags a bullet that
-# is over budget AND cites a deeper doc (carries a `§` pointer) — over-long while
-# admitting its detail already has a home elsewhere. Under-budget bullets, and
-# over-budget bullets with no pointer, pass; `<!-- brevity-exempt: <reason> -->`
-# on the bullet's first line or the line above blesses a load-bearing bullet.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -41,9 +32,6 @@ fi
 
 BUDGET="$CONTEXT_KIT_BREVITY_BUDGET"
 
-# spec: context-kit/SPEC.md §The brevity gate — one pass over the governed file:
-# find the budgeted section by heading, then per `- **name:**` bullet emit its
-# line span, whether it cites a deeper doc (pointer_re), and its exempt flag.
 read -r -d '' BREVITY_AWK <<'AWK' || true
 function hlevel(line,   n) {
     if (line !~ /^#+[[:space:]]/) return 0

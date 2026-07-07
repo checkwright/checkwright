@@ -2,10 +2,7 @@
 # graph: couples=gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh dir=one valve=none tier=precommit
 # spec: delegation-kit/SPEC.md §check-gate-tamper — a gate-weakening commit is blocked by shape (A gate edits stay meta-isolated; B a new path-exemption can't excuse a co-staged file)
 #
-# Extracted from the governance meta-layer of a private production platform; the
-# gate-file roster and meta-layer prefixes are config arrays (lib/delegation.sh),
-# platform layout as defaults. --fixture <dir> injects staged-files /
-# added-exemptions lists; live mode reads git diff --cached.
+# --fixture <dir> injects staged-files / added-exemptions lists; live mode reads git diff --cached.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-# spec: context-kit/SPEC.md §Testing — context-kit consumer-smoke install, the
-# executable form of README.md §Install: registers check-brevity, copies the
-# config + hook templates into the gates dir, wires the SessionStart hook, seeds
-# a minimal always-loaded surface with a clean budgeted section, then
-# self-verifies (hook runs end-to-end emitting the queue index; always-loaded
-# --update-baseline writes the baseline).
+# spec: context-kit/SPEC.md §Testing — context-kit consumer-smoke install (README.md §Install)
 # cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored context-kit copy.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
@@ -36,9 +31,6 @@ cat > CLAUDE.md <<'EOF'
 - **Terse:** one clean line, well within the four-line budget.
 EOF
 
-# spec: context-kit/SPEC.md §Testing — the hook's queue-index step needs a queue
-# file; reuse queue-kit's battery-clean template when queue-kit is co-vendored.
-# Absent it (install.sh may assume only gate-sdk), context-kit smokes without it.
 qtpl="$SMOKE_KIT_ROOT/../queue-kit/templates/TASK-QUEUE.md"
 [[ -f TASK-QUEUE.md || ! -f "$qtpl" ]] || cp "$qtpl" TASK-QUEUE.md
 
@@ -54,8 +46,6 @@ if ! grep -q 'Session context' <<<"$hook_out"; then
     echo "context-kit/smoke/install.sh: hook produced no session-context brief" >&2
     exit 1
 fi
-# spec: context-kit/SPEC.md §Testing — assert the queue integration only when
-# queue-kit is co-vendored; standalone, the hook rightly emits no queue line.
 if [[ -f queue-kit/bin/queue-index.sh ]] \
     && { grep -q 'queue-index unavailable' <<<"$hook_out" || ! grep -q 'Iteration:' <<<"$hook_out"; }; then
     echo "context-kit/smoke/install.sh: hook did not emit the queue index" >&2

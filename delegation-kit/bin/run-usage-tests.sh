@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
-# spec: delegation-kit/SPEC.md §Testing — decision-table runner for usage-gate.
-#
-# usage-gate emits a three-state verdict (OK/PAUSE/STALE/RESET-OK), not a
-# clean/violation pair, so it does not fit the gate contract's good/bad fixture
-# runner. Like friction-kit's guard-tests, the kit ships this decision-table
-# runner instead. cases.tsv pairs an expected verdict token + exit code with
-# scenario knobs; each case is materialized as a fresh snapshot file — the
-# timestamps MUST be computed relative to *now*, because a static fixture would
-# age past STALE_AGE into a permanent STALE. Every verdict branch carries a
-# firing and a non-firing case (the fixture-pair discipline, transplanted).
+# spec: delegation-kit/SPEC.md §Testing — decision-table runner for usage-gate
 #
 #   usage: run-usage-tests.sh [cases.tsv]
 set -uo pipefail
@@ -29,10 +20,6 @@ fails=0
 ran=0
 now="$(date +%s)"
 
-# spec: delegation-kit/SPEC.md §Testing — cases.tsv columns (tab-separated):
-#   age_off    seconds subtracted from now for updated_at (0 = fresh reading)
-#   reset_off  seconds added to now for resets_at (<=0 = dead window)
-#   cred_age   seconds; '-' means no credentials file (skip the login-lag check)
 while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age desc; do
     [[ -z "${verdict// }" ]] && continue
     [[ "$verdict" == \#* ]] && continue
@@ -49,8 +36,6 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age desc; do
         touch -d "@$(( now - cred_age ))" "$CRED"
     fi
 
-    # spec: delegation-kit/SPEC.md §Testing — cwd = SANDBOX so the config lookup
-    # finds nothing and the gate runs on its own defaults, hermetic to the host repo.
     out="$( cd "$SANDBOX" && bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
     ran=$((ran + 1))
 

@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-# spec: delegation-kit/SPEC.md §Testing — consumer-smoke install (the executable
-# form of README.md §Install): registers the tamper gate, regenerates the
-# coupling artifacts, and drives one crafted snapshot through usage-gate — the
-# other tools are invoked not gated, so coverage is the gate plus a live verdict
-# on the extracted tool. cwd = scratch-consumer root; SMOKE_KIT_ROOT = the
-# vendored delegation-kit copy.
+# spec: delegation-kit/SPEC.md §Testing — consumer-smoke install (README.md §Install)
+# cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored delegation-kit copy.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit

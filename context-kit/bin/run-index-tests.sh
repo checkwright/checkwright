@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §Testing — expected-output runner for the advisory bin tools
 #
-# The three index tools and the meter are advisory and speak plain text, so the
-# gate contracts (output/fail-closed/fixture-pair/self-lint) do not fit. This
-# runner drives each over the index-tests/ corpus and asserts exact output,
-# failing on any diff. `check-brevity` is a gate and carries the standard pair.
-#
 #   run-index-tests.sh            diff each tool's output against its golden
 #   run-index-tests.sh --update   rewrite the goldens from current output
-#
-# Run from the checkwright repo (the kit's own dev test):
-#   bash context-kit/bin/run-index-tests.sh
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -23,9 +15,6 @@ UPDATE=0
 
 mkdir -p "$EXPECTED"
 
-# spec: context-kit/SPEC.md §Testing — goldens carry corpus-relative paths so
-# they stay location-independent; normalize the git-top prefix, keeping from
-# `corpus/` on.
 norm() { sed 's#^[^ ]*/corpus/#corpus/#'; }
 
 pass=0; fail=0; harness=0
@@ -60,9 +49,6 @@ check md-index   "$EXPECTED/md-index.txt"   bash "$BIN/md-index.sh"   "$CORPUS/s
 check md-section "$EXPECTED/md-section.txt" bash "$BIN/md-section.sh" "$CORPUS/sample.md" "Code First"
 check pub-index  "$EXPECTED/pub-index.txt"  bash "$BIN/pub-index.sh"  "$CORPUS/sample.rs"
 
-# spec: context-kit/SPEC.md §Testing — always-loaded needs its array/command
-# knobs, so drive it through a throwaway config pointing every knob at the
-# corpus (absolute paths survive its cd).
 cfg="$(mktemp)"
 trap 'rm -f "$cfg"' EXIT
 {
