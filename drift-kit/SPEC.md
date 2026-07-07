@@ -59,8 +59,8 @@ A plugin is `kpi-<name>.sh`, resolved through the registry. Two modes:
 - **`--trend`** — at most one compact `<key> <value>` fragment, or nothing
   (a plugin may opt out of the trend line).
 
-Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR`-style
-scratch; a measurement needing state (a baseline, a log) reads a file some
+Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch;
+a measurement needing state (a baseline, a log) reads a file some
 *other* mechanism owns and stamps its reading-age caveat when the file is a
 past measurement rather than live state (the gate-runtime pattern below).
 
@@ -79,8 +79,9 @@ The generic set — each coupled to a kit-governed surface, each degrading to
 - **kpi-amendment-age** — age in days of the oldest amendment on disk
   (`SPEC-*.md`, git add-date); the pressure gauge behind spec-kit's
   short-lived-amendment rule.
-- **kpi-deferred-age** — age of the oldest `Surfaced <date>` mark in the
-  queue's deferred section: premise-rot pressure on design-pending work.
+- **kpi-deferred-age** — age of the oldest `Surfaced <date>` mark
+  (queue-kit's ungated convention) in the queue's deferred section:
+  premise-rot pressure on design-pending work.
 - **kpi-prompt-friction** — distinct/total prompting calls via guard-kit's
   `scan-prompts.sh --count`; `n/a` when guard-kit or its log is absent.
 - **kpi-always-loaded** — the standing per-session surface: level and
@@ -169,6 +170,8 @@ values as defaults):
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/knowledge-friction.log`.
 - `DRIFT_KIT_TIMINGS_FILE` — default
   `${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt`.
+- `DRIFT_KIT_TMP_DIR` — plugin scratch root; default
+  `${GATE_SDK_TMP_DIR:-.tmp}`.
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).

@@ -34,6 +34,7 @@ bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks       
 bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests spec-kit/checks             # spec-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
+bash guard-kit/bin/run-guard-tests.sh                                                # guard-kit decision table
 ```
 
 The repo also runs lifecycle-kit's iteration state machine on itself — one
@@ -74,10 +75,10 @@ and enforced by the meta-gates — a red gate is fixed, never bypassed with
 - **Self-contained artifacts:** emitted HTML inlines its CSS (the platform's
   `diagram-assets/` did not leave); no kit output may reference a
   platform-only asset.
-- **Each kit lands with fixtures + its own README + SPEC.md + a `smoke/`
-  directory** (`smoke/install.sh`, plus `smoke/violation.sh` where a violation
-  is craftable — gate-sdk/SPEC.md §Consumer smoke), and gets registered in this
-  repo's `gates.list` where applicable (the kits govern this repo too).
+- **Each kit lands with its own README + SPEC.md, fixtures for every gate
+  it ships, + a `smoke/` directory** (`smoke/install.sh`, plus
+  `smoke/violation.sh` where a violation is craftable — gate-sdk/SPEC.md
+  §Consumer smoke), and registers in this repo's `gates.list` where applicable.
 
 ## Agent execution (all stages)
 

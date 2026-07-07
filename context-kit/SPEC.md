@@ -60,8 +60,8 @@ session. Steps, in order:
    command live in a marked consumer section of the template — they are
    layout assumptions, not mechanism.
 3. **Drift line** — one `drift-report --trend` summary line when the
-   consumer has a drift report; silently absent otherwise (drift-kit is a
-   later extraction; the seam is this optional line).
+   consumer has a drift report; silently absent otherwise (drift-kit owns
+   the report; the seam is this optional line).
 4. **Stage-conditioned nudges** — short reminders keyed on the current
    stage header (the platform's delegation nudge is the exemplar). Marked
    consumer section: which stages get which nudge is consumer judgment.
@@ -96,9 +96,8 @@ so self-measurement would recurse and inflate.
 
 On the platform this meter lived inline in `drift-report.sh` as one KPI;
 it is extracted here because the *metric* is context economics and the
-*report* is drift reporting — when drift-kit lands (kit 7) it consumes
-this script for its always-loaded row instead of re-embedding the
-measurement. New name on a governed surface: `always-loaded.sh` (the
+*report* is drift reporting — drift-kit's `kpi-always-loaded` consumes
+this script for its row instead of re-embedding the measurement. New name on a governed surface: `always-loaded.sh` (the
 platform had no standalone name to keep).
 
 - **Default invocation** prints one line: total, per-part breakdown, and
@@ -221,8 +220,8 @@ possible later extraction, not this kit's) and `check-md-sections` (its
 required-heading map is rule content, and the queue surface it guards is
 already gated by queue-kit here). The close-stage harvest pipeline
 (`[pub]` lessons, publication paths) — product workflow, not context
-mechanism. `drift-report.sh` itself remains kit 7's extraction; only its
-always-loaded KPI moves now, and the platform's drift report keeps its
+mechanism. `drift-report.sh` itself is drift-kit's surface — only its
+always-loaded KPI moved here, and the platform's drift report keeps its
 inline copy until the platform migrates. The platform's session-context
 consumer content — its delegation nudge wording, component roster, and
 extra index commands — stays in its own copied hook.

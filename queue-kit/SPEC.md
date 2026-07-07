@@ -24,7 +24,9 @@ as `##` sections over column-0 bullets:
   pickable queue, in work-order. Selection discipline: pick the first entry
   carrying no `[blocked-by:]` tag, in section order; do not invent work order.
 - **The deferred section** (default `Deferred`) — parked tasks, excluded from
-  selection; `###` subsections are presentation, not semantics.
+  selection; `###` subsections are presentation, not semantics. An entry's
+  prose may carry a `Surfaced <date>` mark — an ungated convention recording
+  when the premise was filed; drift-kit's deferred-age KPI is its reader.
 - **The done section** (default `Done`) — one line per completed task, the
   bare slug only; prose about what happened lives in git history.
 - Any other section (an iteration header, a lessons section) is outside the
