@@ -10,7 +10,7 @@ silently. The remedy is a lifecycle (amendments are written at scope,
 merged and deleted at build) and gates over the copy-shaped failure modes.
 
 Extracted from the governance meta-layer of a private production platform.
-The kit carries the lifecycle, the checklists, and five gates; a consumer's
+The kit carries the lifecycle, the checklists, and its gates; a consumer's
 surface names, banned headings, and scan languages are config with the
 platform's values as defaults. Requires [gate-sdk](../gate-sdk/) (the gates
 follow its four contracts and resolve through its registry); the queue
@@ -155,7 +155,7 @@ own instance and stays there); the kit's rules are the topology itself:
 ## Layout and configuration
 
 The kit is vendored beside gate-sdk (conventionally at `spec-kit/`); its
-seven gates are registered in the consumer's `gates.list` by name — each
+gates are registered in the consumer's `gates.list` by name — each
 where its surface exists (a consumer with no glossary does not register
 `check-surface-duplication`) — and resolve through gate-sdk's multi-kit
 path.

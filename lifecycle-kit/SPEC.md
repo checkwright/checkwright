@@ -219,7 +219,7 @@ mechanical residual.
 
 ### templates/skills/
 
-The five stage-skill templates (`scope`/`align`/`build`/`validate`/`close`)
+The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`)
 — copy-edits into the consumer's skill directory, like gate-sdk's
 check-skeleton. Each carries the generic spine (the flip+stamp first step,
 performed by invoking `enter-stage.sh <stage>` and stating in one line what it

@@ -6,7 +6,7 @@ state machine. The problem the kit solves: a coding agent selects work by
 parsing, not by reading — so everything selection trusts (position, slugs,
 tags) is grammar a gate can enforce, and everything a human writes freely
 (task prose) is kept out of the parse path. Drift between what the prose says
-and what a parser sees is the failure mode; five of the six gates exist to
+and what a parser sees is the failure mode; all but one of the gates exist to
 close one instance of it each.
 
 Extracted from the governance meta-layer of a private production platform.

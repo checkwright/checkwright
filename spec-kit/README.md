@@ -3,7 +3,7 @@
 Spec discipline for agent-authored components: one canonical spec per component,
 deltas as short-lived amendment files, and a star topology across the prose
 surfaces — every fact has exactly one owning surface, and every other surface
-*cites* it rather than restating it. Six gates hold the copy-shaped failure
+*cites* it rather than restating it. Gates hold the copy-shaped failure
 modes; the irreducibly semantic judgment stays a review tripwire, not a gate.
 
 Why: when a coding agent authors the specs, design rationale gets re-derived
@@ -30,6 +30,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-spec-embedded-source   # needs canonical specs + tracked source
    check-surface-duplication    # needs a glossary (exits 2 without one)
    check-comment-tier           # classifies comments on shell/config sources
+   check-spec-pointer           # resolves spec:/contract: pointer targets
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then

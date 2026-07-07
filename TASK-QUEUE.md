@@ -67,11 +67,23 @@
   the platform" section), so the gate needs an exempt escape (the
   check-spec-embedded-source `-exempt:` pattern) and must be tuned against these
   SPECs as the FP corpus. Surfaced 2026-07-07.
+- **manifest-derivable-count-gate** [needs-spec] — spec-kit tiering-family gate,
+  sibling of manifest-temporal-gate: a cheap lexical tripwire flagging a pinned
+  integer that directly quantifies a *growing* governed collection (gates,
+  checks, stages, templates) in tracked manifest prose — "six gates", "seven
+  meta-gates". The count's owner is the checks dir / gates.list; a restated
+  integer is an un-gateable second source that drifts silently — this iteration
+  landed one spec-kit gate and left the same count in four disagreeing copies
+  (five/six/seven across two READMEs and a SPEC), the close-review find that
+  surfaced this. Ban, don't validate: a validating gate (the platform's earlier
+  approach) perpetuates the standing token cost context-kit brevity rejects and
+  needs NL entity-mapping (FP-prone); a lexical tripwire eliminates the cost
+  outright. Calibration crux — exempt (a) fixed named frameworks enumerated
+  inline ("the four contracts"), (b) partition/classification claims ("all but
+  one of the gates"), (c) thresholds ("≥2 gates"), (d) test fixtures and
+  pointer-target headings; flag only bare growing-collection totals. Shares the
+  `-exempt:` escape and FP-corpus tuning (this repo's own SPECs) with
+  manifest-temporal-gate. Surfaced 2026-07-07.
 ## Done
-
-- identity-assertion-check
-- check-spec-pointer
-- core-file-presence-gate
-- kit-terminology-renames
 
 ## Lessons Learned

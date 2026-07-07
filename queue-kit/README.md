@@ -3,14 +3,14 @@
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
 square-bracket tags (`[blocked-by:]`, `[needs-spec]`, `[spec:]`) are the state
-machine. Six gates hold the grammar a coding agent selects work by, and a
+machine. Gates hold the grammar a coding agent selects work by, and a
 `queue-index.sh` tool renders the compact selection surface.
 
 Why: an agent picks work by *parsing*, not reading — so everything selection
 trusts (section position, slugs, tags) must be grammar a gate can enforce, and
 everything a human writes freely (task prose) must stay off the parse path.
 Drift between what the prose says and what the parser sees is the failure mode;
-five of the six gates each close one instance of it — a tag reflowed off its
+all but one of the gates each close one instance of it — a tag reflowed off its
 lead line, a duplicate slug, a lost task, a forward precondition stated in
 prose but never tagged. See [SPEC.md](SPEC.md) for the full contracts.
 

@@ -25,7 +25,7 @@ honest:
 - `bin/gen-pre-commit.sh` + `bin/install-hooks.sh` — a pre-commit hook
   *generated* from per-gate `# graph:` coupling manifests; adding a gate to
   the hook is manifest-only, so hook membership cannot drift.
-- `checks/` — seven meta-gates that hold the family to its own standard:
+- `checks/` — the meta-gates that hold the family to its own standard:
   ShellCheck self-lint, the output contract, the fail-closed contract, fixture
   coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest
   / hook / graph-artifact freshness (`check-graph`).

@@ -2,9 +2,9 @@
 
 The iteration stage state machine for coding-agent-assisted delivery: a
 `## Iteration: <name>  [stage: <stage>]` header line in the task queue, an
-evidence file of `<iteration> <stage> <session-id> <date>` stamps, five stage
+evidence file of `<iteration> <stage> <session-id> <date>` stamps, stage
 skills (scope/align/build/validate/close by default — stages are config), and
-two gates that make skipping a stage, or flipping a header without running
+gates that make skipping a stage, or flipping a header without running
 its skill, fail the commit.
 
 Why: a stateless agent session doesn't reliably re-read process prose. So the
@@ -53,7 +53,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 4. Optional — reshape the machine: copy `templates/lifecycle-stages.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,
    section names, or file paths. Defaults are the extracted platform's
-   five-stage lifecycle.
+   own lifecycle.
 
 After install the battery is red at `check-stage-evidence` until your first
 `/scope` session runs (it names the iteration and stamps the evidence file as
