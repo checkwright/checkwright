@@ -8,7 +8,7 @@ uncommitted investigation dies with the session), and **untrustworthy
 self-reports** (a sub-agent's "passed" claim, or a gate quietly weakened to
 make its commit pass). The kit packages the supervisor-side protocol that
 closes all three, plus the two pieces that are mechanizable: a trustworthy
-budget verdict (`usage-gate`) and a commit-shape gate over gate tampering
+budget verdict (`usage-verdict`) and a commit-shape gate over gate tampering
 (`check-gate-tamper`).
 
 Extracted from the governance meta-layer of a private production platform.
@@ -48,7 +48,7 @@ protocol's load-bearing rules:
 7. **Validate after every agent commit** (below) — the self-report is not
    evidence.
 8. **Budget-check before *each* dispatch in a fan-out** with
-   `bin/usage-gate.sh`, not once at the start. Width is the kill axis: the
+   `bin/usage-verdict.sh`, not once at the start. Width is the kill axis: the
    window wall fires mid-flight and the agents that bank are the ones that
    *finished*. Project the next wave's burn from the last wave's, not from
    the current percentage alone — a read-heavy wave is far more
@@ -116,7 +116,7 @@ diff review of agent gate edits remains a supervisor duty. `--fixture
 <dir>` injects `staged-files` / `added-exemptions` lists (fixture-pair test
 capability); live mode reads `git diff --cached`.
 
-## usage-gate
+## usage-verdict
 
 Emits a trustworthy budget verdict from a usage snapshot file, closing the
 three failure modes a raw percentage reading leaves open:
@@ -161,7 +161,7 @@ single-operator `CLAUDE_CONFIG_DIR` assumption.
 
 ```
 delegation-kit/
-  bin/usage-gate.sh
+  bin/usage-verdict.sh
   bin/run-usage-tests.sh        # decision-table runner
   usage-tests/cases.tsv         # expected-verdict <TAB> scenario knobs
   checks/check-gate-tamper.sh
@@ -210,7 +210,7 @@ commit here.
 `good/`+`bad/` fixture pair driven through `--fixture` by gate-sdk's
 `run-gate-tests.sh`.
 
-`usage-gate` does not fit the gate contract (a three-state verdict, not a
+`usage-verdict` does not fit the gate contract (a three-state verdict, not a
 clean/violation pair), so — like guard-kit's guard-tests — the kit ships
 its own decision-table runner: `usage-tests/cases.tsv` pairs an expected
 verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario
@@ -226,7 +226,7 @@ firing and one non-firing case — the fixture-pair discipline, transplanted.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot
-through `usage-gate` asserting a verdict — self-verifying install.
+through `usage-verdict` asserting a verdict — self-verifying install.
 `smoke/violation.sh` stages a gate edit co-staged with a product file in
 the scratch consumer and asserts the battery reds (assertion A) — the
 violation is craftable, so the file is mandatory

@@ -23,7 +23,7 @@ mechanics, validate-after-commit command set, gate-driven worklist).
   commit** — a sub-agent's "passed" is not trustworthy, and an agent blocked by a
   gate weakens it rather than fix the code (diff every gate change;
   `check-gate-tamper` is the mechanical floor).
-- **Budget-check before *each* dispatch** (`bash delegation-kit/bin/usage-gate.sh`
+- **Budget-check before *each* dispatch** (`bash delegation-kit/bin/usage-verdict.sh`
   — it computes reading-age + window-validity and prints one verdict, exit 0 OK /
   1 PAUSE / 2 STALE; never eyeball the raw pct, a dead-window value reads
   stale-high. Pause if PAUSE; the 5h window is the only pause axis).

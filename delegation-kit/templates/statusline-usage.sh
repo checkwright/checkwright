@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# CONSUMER COPY — a minimal usage.txt producer (delegation-kit/SPEC.md §usage-gate,
+# CONSUMER COPY — a minimal usage.txt producer (delegation-kit/SPEC.md §usage-verdict,
 # The usage.txt contract). Wire it as your harness statusLine command: it reads
 # the rate-limit JSON on stdin and atomically writes the three-line snapshot that
-# usage-gate reads. Any producer honoring the contract works — this is the floor,
+# usage-verdict reads. Any producer honoring the contract works — this is the floor,
 # not the UX (the source platform's gauge bars and iteration display stayed
 # behind). Requires jq.
 input=$(cat)

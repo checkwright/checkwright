@@ -3,7 +3,7 @@
 Safe delegated-`Agent` execution for budget-bounded sessions. A supervisor
 dispatches sub-agents that are cheap to spawn and expensive to trust; this kit
 packages the supervisor-side protocol plus the two mechanizable pieces — a
-trustworthy budget verdict (`usage-gate`) and a commit-shape gate over gate
+trustworthy budget verdict (`usage-verdict`) and a commit-shape gate over gate
 tampering (`check-gate-tamper`).
 
 Why: three failure surfaces dominate delegation. **Shared mutable state** — two
@@ -13,7 +13,7 @@ agent, disjoint source files notwithstanding). **Interrupted long units** — a
 usage-window wall fires mid-flight and the uncommitted investigation dies with
 the session. **Untrustworthy self-reports** — a sub-agent's "passed" claim, or
 a gate quietly weakened to make its commit pass. The protocol closes all three;
-`usage-gate` and `check-gate-tamper` are its mechanical floors. See
+`usage-verdict` and `check-gate-tamper` are its mechanical floors. See
 [SPEC.md](SPEC.md) for the full contracts.
 
 ## Install
@@ -38,9 +38,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    - Fill the two marked consumer sections in both: the shared-file roster and
      the validate battery.
 
-3. Wire a `usage.txt` producer so `usage-gate` has a snapshot to read — copy
+3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — copy
    `templates/statusline-usage.sh` as your harness `statusLine` command, or have
-   any producer honour the three-line contract (SPEC §usage-gate).
+   any producer honour the three-line contract (SPEC §usage-verdict).
 
 4. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
    and override the budget thresholds, the gate-file globs, or the meta-layer
@@ -49,8 +49,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 ## Use
 
 ```bash
-bash delegation-kit/bin/usage-gate.sh            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
-bash delegation-kit/bin/usage-gate.sh <snapshot> # verdict for an explicit usage.txt (test injection)
+bash delegation-kit/bin/usage-verdict.sh            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
+bash delegation-kit/bin/usage-verdict.sh <snapshot> # verdict for an explicit usage.txt (test injection)
 ```
 
 `check-gate-tamper` runs from the pre-commit hook and the battery; invoke it
@@ -60,5 +60,5 @@ directly with `--fixture <dir>` only for testing.
 
 ```bash
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # check-gate-tamper fixtures
-bash delegation-kit/bin/run-usage-tests.sh                                           # usage-gate verdict table
+bash delegation-kit/bin/run-usage-tests.sh                                           # usage-verdict verdict table
 ```

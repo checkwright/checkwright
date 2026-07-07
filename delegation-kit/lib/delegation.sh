@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# spec: delegation-kit/SPEC.md §Layout and configuration — sourced config loader for usage-gate + check-gate-tamper, values only
+# spec: delegation-kit/SPEC.md §Layout and configuration — sourced config loader for usage-verdict + check-gate-tamper, values only
 _dk_cfg="${DELEGATION_KIT_CONFIG_FILE:-}"
 if [[ -n "$_dk_cfg" ]]; then
     [[ -f "$_dk_cfg" ]] || {

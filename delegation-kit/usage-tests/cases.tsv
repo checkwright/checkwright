@@ -1,4 +1,4 @@
-# usage-gate decision table — <verdict><TAB><exit><TAB><pct><TAB><age_off><TAB><reset_off><TAB><cred_age><TAB><desc>.
+# usage-verdict decision table — <verdict><TAB><exit><TAB><pct><TAB><age_off><TAB><reset_off><TAB><cred_age><TAB><desc>.
 # Columns are tab-separated; # and blank lines are ignored. Every verdict branch
 # carries a firing and a non-firing case (delegation-kit/SPEC.md §Testing).
 # Defaults under test: PAUSE_PCT=80, STALE_AGE=600, LOGIN_WINDOW=600.

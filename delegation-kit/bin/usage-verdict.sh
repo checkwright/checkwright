@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# spec: delegation-kit/SPEC.md §usage-gate — trustworthy budget verdict from usage.txt
+# spec: delegation-kit/SPEC.md §usage-verdict — trustworthy budget verdict from usage.txt
 #
 # Extracted from the governance meta-layer of a private production platform; the
 # single-operator source path and thresholds are config knobs (lib/delegation.sh),
 # platform values as defaults. Positional $1/$2 override the snapshot/credentials
 # path for test injection.
 #
-#   usage-gate.sh [usage-file [credentials-file]]
+#   usage-verdict.sh [usage-file [credentials-file]]
 # Exit: 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable (fail-closed).
 set -euo pipefail
 
@@ -21,7 +21,7 @@ STALE_AGE="$DELEGATION_KIT_STALE_AGE"
 LOGIN_WINDOW="$DELEGATION_KIT_LOGIN_WINDOW"
 
 if [[ ! -r "$USAGE_FILE" ]]; then
-  echo "usage-gate: cannot read $USAGE_FILE -> STALE"
+  echo "usage-verdict: cannot read $USAGE_FILE -> STALE"
   exit 2
 fi
 
@@ -35,12 +35,12 @@ while IFS='=' read -r key val; do
 done < "$USAGE_FILE"
 
 if [[ -z "$pct" || -z "$resets_at" || -z "$updated_at" ]]; then
-  echo "usage-gate: missing key(s) in $USAGE_FILE (pct='$pct' resets_at='$resets_at' updated_at='$updated_at') -> STALE"
+  echo "usage-verdict: missing key(s) in $USAGE_FILE (pct='$pct' resets_at='$resets_at' updated_at='$updated_at') -> STALE"
   exit 2
 fi
 
 if [[ ! "$pct" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-  echo "usage-gate: non-numeric five_hour_used_pct='$pct' in $USAGE_FILE -> STALE"
+  echo "usage-verdict: non-numeric five_hour_used_pct='$pct' in $USAGE_FILE -> STALE"
   exit 2
 fi
 

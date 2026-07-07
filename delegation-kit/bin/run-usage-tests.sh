@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# spec: delegation-kit/SPEC.md §Testing — decision-table runner for usage-gate
+# spec: delegation-kit/SPEC.md §Testing — decision-table runner for usage-verdict
 #
 #   usage: run-usage-tests.sh [cases.tsv]
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-GATE="$KIT/bin/usage-gate.sh"
+GATE="$KIT/bin/usage-verdict.sh"
 CASES="${1:-$KIT/usage-tests/cases.tsv}"
 
 [[ -x "$GATE" ]]  || { echo "run-usage-tests: missing or non-executable $GATE" >&2; exit 2; }

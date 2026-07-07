@@ -17,8 +17,8 @@ now="$(date +%s)"
     printf 'five_hour_resets_at=%s\n' "$(( now + 3600 ))"
     printf 'updated_at=%s\n' "$now"
 } > "$snap"
-if bash "$SMOKE_KIT_ROOT/bin/usage-gate.sh" "$snap" >/dev/null 2>&1; then
-    echo "delegation-kit/smoke: usage-gate did not PAUSE on a live 95% reading" >&2
+if bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$snap" >/dev/null 2>&1; then
+    echo "delegation-kit/smoke: usage-verdict did not PAUSE on a live 95% reading" >&2
     rm -f "$snap"; exit 1
 fi
 rm -f "$snap"

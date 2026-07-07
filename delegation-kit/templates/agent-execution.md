@@ -62,7 +62,7 @@ investigation). The load-bearing safety rules are also resident in CLAUDE.md
   semantic weakening inside a legitimate scripts-only commit, so the by-eye diff
   review remains your duty (delegation-kit/SPEC.md §check-gate-tamper honest limit).
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
-  `bash delegation-kit/bin/usage-gate.sh` (verdict exit 0/1/2 from `usage.txt` —
+  `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —
   it folds in the reading-age and window-validity checks so a dead-window pct
   can't read stale-high; the 5h window is the only pause axis — ignore any 7d
   keys). If the verdict is PAUSE and the work is large, pause for reset. Width is

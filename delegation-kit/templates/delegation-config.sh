@@ -5,9 +5,9 @@
 # keeps the kit default shown here. A malformed config exits 2 — a broken machine
 # must not gate anything. Array knobs (globs, prefixes) live here, not in env.
 
-# --- usage-gate ---------------------------------------------------------------
+# --- usage-verdict ---------------------------------------------------------------
 
-# The usage snapshot usage-gate reads (its positional $1 still overrides, for
+# The usage snapshot usage-verdict reads (its positional $1 still overrides, for
 # test injection). Default the single-operator harness config path.
 #DELEGATION_KIT_USAGE_FILE="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt"
 
