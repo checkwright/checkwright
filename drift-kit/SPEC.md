@@ -49,7 +49,9 @@ timings file) degrades to `n/a (<reason>)` in its own value, not by dying.
 
 ## The KPI plugin contract
 
-A plugin is `kpi-<name>.sh`, resolved through the registry. Two modes:
+A plugin is `kpi-<name>.sh`, resolved through the registry and invoked
+directly (`"$path"`, not `bash "$path"`) — so it must carry the execute bit or
+the report degrades that row to its fail-visible read. Two modes:
 
 - **Full (no args)** — one or more rows on stdout, each
   `lead|lag<TAB><label><TAB><value>`: the section tag, a short human label,

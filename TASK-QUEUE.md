@@ -78,9 +78,4 @@
 
 ## Done
 
-- drift-kit-extraction
-- knowledge-friction-loop
-- manifest-temporal-gate
-- manifest-derivable-count-gate
-
 ## Lessons Learned
