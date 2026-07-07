@@ -5,3 +5,4 @@
 ---
 
 hardening scope 061cb656 2026-07-07
+hardening align bec570d5 2026-07-07
