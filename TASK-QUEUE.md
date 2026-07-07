@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: context-kit  [stage: close]
+## Iteration: hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,44 +11,36 @@
 
 ## New Features
 
+- **kit-terminology-renames** [spec: SPEC-terminology-renames.md] — rename
+  friction-kit → guard-kit and delegation-kit `bin/usage-gate.sh` →
+  `bin/usage-verdict.sh` (both user-ruled 2026-07-07); one mechanical
+  grep-driven sweep per rename, done first so the iteration's other work
+  lands on the new names.
+- **core-file-presence-gate** [spec: gate-sdk/SPEC-core-file-presence.md] —
+  `check-core-files`: gate-sdk gate red when a path listed in the consumer's
+  `core-files.list` manifest is missing or untracked; the manifest edit is
+  the intentional-removal valve. The first born-in-checkwright gate; the
+  platform adopts it as `checkwright-kit-adoption` step 0. Surfaced in the
+  platform 2026-07-04.
+- **check-spec-pointer** [spec: spec-kit/SPEC-spec-pointer.md] — spec-kit
+  gate resolving `spec:`/`contract:` pointer targets (file + `§` heading,
+  forward direction only) so a coupling cannot dangle silently; retires the
+  §check-comment-tier tripwire note. Surfaced 2026-07-07 dogfooding the
+  comment-tier sweep.
+- **identity-assertion-check** [spec: gate-sdk/SPEC-identity-assertion.md] —
+  `check-identity`: gate-sdk gate verifying local git identity (committer
+  email, remote host) against a committed `identity.conf`; `install-hooks.sh`
+  runs it once at opt-in as the apply-and-verify rung. Surfaced in the
+  platform 2026-07-07.
+
 ## Technical Debt
 
 ## Deferred
 
-- **core-file-presence-gate** [needs-spec] — gate-sdk gate blocking deletion of
-  a consumer repo's required core workflow files (moved from the platform
-  queue 2026-07-07 — generic by construction; the first born-in-checkwright
-  gate, proving the SDK supports new gates, not just extracted ones). Problem:
-  with no required-file inventory and no `--diff-filter=D` deletion check, a
-  lone `SPEC.md`, `TASK-QUEUE.md`, `WORKFLOW-STATE.txt`, or projection HTML
-  can be `git rm`'d and committed; downstream gates catch it only
-  incidentally (a hard-reference happens to dangle) and only at the next
-  stage that runs them; the platform's bash-guard blocks `find … -delete`
-  but not plain `rm`/`git rm`. Design owes: the inventory source (a committed
-  per-repo manifest vs deriving the set from gate hard-references vs a glob
-  of top-level `*.md` + `*.html` + the SPEC.md set), the tier (precommit, so
-  it fires without a stage skill), and the intentional-removal valve (how a
-  deliberately retired surface — e.g. a merged `SPEC-<feature>.md` — passes
-  without weakening the gate). First consumer: the platform, which adopts it
-  as `checkwright-kit-adoption` step 0 and whose cutover deletion sweep
-  exercises the valve. Surfaced in the platform 2026-07-04.
-- **check-spec-pointer** [needs-spec] — spec-kit gate resolving `spec:` /
-  `contract:` pointer targets so a coupling cannot dangle silently.
-  check-comment-tier blesses a pointer directive by shape but never checks that
-  its `<SPEC> §<section>` resolves; a renamed or deleted heading leaves every
-  inbound pointer dangling, caught only on review (spec-kit/SPEC.md
-  §check-comment-tier records this as a tripwire "until a pointer-resolver
-  lands"). Forward direction is cheap and FP-free — each pointer's file +
-  heading must exist; check-graph's `graph:` couples / asset-href resolution is
-  the precedent. Design owes: whether the reverse direction (a requirement with
-  no inbound pointer = uncovered code) is in scope or needs a "what counts as a
-  requirement" notion (every `###`? tagged only?) that risks FPs; which
-  directives and manifests resolve (SPEC.md headings, the workflow
-  `# contract:` headers); the tier (precommit). Surfaced 2026-07-07 dogfooding
-  the comment-tier sweep — the coupling value the sweep leaned on is only as
-  good as the pointers being live.
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
-  KPIs and lead/lag honesty labels (kit 7).
+  KPIs and lead/lag honesty labels (kit 7). Scope ruling 2026-07-07: the next
+  iteration after `hardening`, bundled with knowledge-friction-loop (whose
+  re-derivations/session KPI is drift-kit's first pluggable-KPI consumer).
 - **knowledge-friction-loop** [needs-spec] — the friction log / scan-prompts /
   close-triage loop surfaces *permission* friction only; two classes escape it:
   knowledge friction (re-deriving a fact no doc owns — e.g. the merge-closure
@@ -64,24 +56,8 @@
   transcript LLM-scan is the heavy alternative; the writing-project reduction —
   keep only each party's messages, drop tool calls/results/reminders — shrinks
   the derived transcript substantially and makes a periodic scan affordable.
-  Surfaced 2026-07-07.
-- **identity-assertion-check** [needs-spec] — a consumer repo commits its
-  expected git identity (committer email; remote host / SSH key identity) and
-  a cheap FP-free check verifies local config matches, at setup and/or
-  pre-push. Failure mode (hit twice on the platform, latest 2026-07-07): an
-  agent commits or pushes under the wrong identity — misattribution is silent
-  and unpurgeable without a SHA-breaking history rewrite, and the wrong-key
-  symptom is a misleading "Repository not found"; multi-identity (work +
-  personal GitHub) is common for the integrator/consultant audience. Scope
-  fence: the *mapping* stays git's job (core.sshCommand, includeIf) — this is
-  only the verification backstop for the fresh-clone gap, alongside
-  install-hooks' apply-and-verify rung; likely friction-kit (guard) or the
-  setup story. Surfaced in the platform 2026-07-07.
-- **kit-terminology-renames** [needs-spec] — user ruling wanted on the two
-  heavier renames: friction-kit to guard-kit (the kit's core is lib/guard.sh;
-  "friction" is platform insider vocabulary) and delegation-kit usage-gate.sh
-  to usage-verdict.sh (leave "gate" meaning one thing product-wide); cheapest
-  while no external consumer exists.
+  Surfaced 2026-07-07. Scope ruling 2026-07-07: bundled into the drift-kit
+  iteration (see drift-kit-extraction).
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
