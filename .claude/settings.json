@@ -59,15 +59,6 @@
             "command": "bash scripts/bash-guard.sh"
           }
         ]
-      },
-      {
-        "matcher": "ScheduleWakeup|CronCreate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash scripts/wakeup-guard.sh"
-          }
-        ]
       }
     ]
   }

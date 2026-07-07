@@ -26,8 +26,7 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    `bash friction-kit/bin/scan-prompts.sh` and resolve each recurring pattern
    by the triage criterion — allowlist (safe & already in the form to
    reinforce), guard rule (a better form exists, or logic a glob can't
-   express), or habit change (a true one-off); review+delete
-   `.workflow/wakeup-attempts.log` if present; `bash
+   express), or habit change (a true one-off); `bash
    friction-kit/bin/compare-settings-allow.sh` and prune the listed local
    entries, then by judgment prune remaining one-off local entries and promote
    recurring safe patterns to committed `settings.json` globs; clear the log
