@@ -147,10 +147,10 @@ own instance and stays there); the kit's rules are the topology itself:
   never relocating the why into the comment (`check-comment-tier`; the
   FP-prone trailing-comment judgment stays a review tripwire).
 - **Honest mechanizability.** Only the structural sub-rules gate (banned
-  headings, fence density, duplicate definitions, verbatim copies); the
-  core judgment — is this sentence a definition or a narration, a why or a
-  mechanism — is FP-prone and stays a review tripwire, explicitly not a
-  blocking gate.
+  headings, fence density, duplicate definitions, verbatim copies,
+  temporal-narration markers); the core judgment — is this sentence a
+  definition or a narration, a why or a mechanism — is FP-prone and stays a
+  review tripwire, explicitly not a blocking gate.
 
 ## Layout and configuration
 
@@ -199,6 +199,14 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 - `SPEC_KIT_GLOSSARY_FILE` — default `GLOSSARY.md`;
   `SPEC_KIT_DUP_SURFACES` — array of surfaces scanned for foreign
   definitions, default `(VISION.md)` plus every component spec.
+- `SPEC_KIT_MANIFEST_FILES` — array of globs, default empty ⇒ derive the
+  manifest set (canonical specs, `README.md` at any depth, `CLAUDE.md`);
+  `SPEC_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by
+  `check-manifest-temporal`, default a generic-English list (`previously`,
+  `formerly`, `renamed from`, …), matched case-insensitively;
+  `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
+  section is exempt, default empty (this repo sets `What stayed on the
+  platform`).
 - `SPEC_KIT_COMMENT_MACHINE` / `SPEC_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `SPEC_KIT_COMMENT_SURFACE` —
@@ -225,7 +233,10 @@ consumer renaming its sections sets both. Valve and marker spellings
 The sourced config loader plus shared adapters: section-regex builders for
 the queue-facing gate (queue-kit's rule — both sides of a section boundary
 must parse identically), the canonical-spec/amendment finders the
-spec-scanning gates share, and the governed comment-surface adapters
+spec-scanning gates share, the manifest-set finder (`spec_manifest_files`) the
+narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`,
+amendments excluded — so its members read one identical set, and the governed
+comment-surface adapters
 (`spec_comment_surface` / `spec_comment_whitelisted`) `check-comment-tier`
 and `check-spec-pointer` scan the same source set through. The finders skip
 a `templates/` skeleton (a copyable stub, not governed content — the same
@@ -287,6 +298,39 @@ Calibration: blocks shorter than `SPEC_KIT_EMBED_MINLINES` are ignored;
 languages in `SPEC_KIT_EMBED_ILLUSTRATIVE` are skipped by default; the
 threshold is calibrated against real specs, not synthetic fixtures.
 `precommit` tier.
+
+### check-manifest-temporal
+
+Invariant: no temporal-narration marker in governed manifest prose outside an
+exempt site. A manifest states current behavior only — history is derivable
+from git, and a `formerly…` line is standing context cost documenting the old
+cost, taxing every session that reads it. This gate mechanizes the lexical
+share of that judgment; context-kit's close-stage brevity pass keeps the
+semantic residue (*is this sentence about the past?*), and the platform's
+by-eye narration-marker KPI is superseded, staying there (drift-kit/SPEC.md
+§What stayed on the platform).
+
+The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh):
+canonical specs, `README.md` at any depth, and `CLAUDE.md`; amendments are
+excluded by construction (a transition artifact describes change — that is its
+nature). Markers are `SPEC_KIT_TEMPORAL_MARKERS`, matched case-insensitively;
+fenced code blocks are skipped and a marker inside an inline-code span is a
+meta-reference, not narration — so a gate-output example or this section's own
+vocabulary may name one. Two valves suppress a legitimately past line: a
+per-site `manifest-temporal-exempt: <reason>` comment on the line or the one
+above, and `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole
+section (subsections included) is exempt, this repo's config naming
+`What stayed on the platform` (extraction provenance is this consumer's
+convention, not kit mechanism). Producer: the generated pre-commit hook /
+`run-gates.sh`; consumer: the committing operator via the output contract; each
+marker hit is read at the single scan transition (file, line, marker in the
+message), no persistent state. Fail-closed on an unreadable manifest.
+
+Calibration: the marker set is tuned against this repo as the FP corpus — bare
+`used to` is excluded (it collides with instrumental "used to build/filter").
+At build every hit is dispositioned: reword (preferred — narration is standing
+cost), section-exempt (provenance), or site-exempt with reason. `precommit`
+tier.
 
 ### check-surface-duplication
 

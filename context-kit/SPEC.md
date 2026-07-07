@@ -116,9 +116,9 @@ platform had no standalone name to keep).
 
 ## The brevity gate
 
-`checks/check-brevity.sh` — renamed from the platform's
-`check-convention-brevity`: the governed section is now a knob, so the
-platform's section name leaves the gate name. It scans one designated
+`checks/check-brevity.sh` — a section-agnostic name: the governed section
+is a knob, so no section name binds the gate (the platform's
+`check-convention-brevity` is its section-specific counterpart). It scans one designated
 always-loaded file for a bulleted section where each `- **name:**` bullet
 carries a line budget, and flags a bullet that is **over budget and cites
 a deeper doc** (carries a `§` pointer) — over-long while admitting its
@@ -141,9 +141,15 @@ The procedure: run `always-loaded.sh`; walk the growth since baseline
 asking two distinct questions — staleness (*is it still true?*) and
 brevity (*is each block worth its standing per-session token cost?*);
 resolve by rewording or deleting, never by annotating (outdated context
+<!-- manifest-temporal-exempt: names the "formerly…" note as the anti-pattern this pass forbids, not written as narration -->
 goes to git history, not to a "formerly…" note); on-demand files (SPECs,
 handbooks) are exempt — their cost is paid only when opened; finish with
 `always-loaded.sh --update-baseline` and commit the baseline.
+
+The lexical share of this narration judgment — a fixed set of `formerly…`-class
+markers in the manifest set — is a blocking gate
+(spec-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic
+residue (*is this sentence about the past?*) that no marker set can decide.
 
 ## Layout and configuration
 

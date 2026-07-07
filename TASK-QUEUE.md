@@ -11,12 +11,6 @@
 
 ## New Features
 
-- **manifest-temporal-gate** [spec: spec-kit/SPEC-manifest-temporal.md] —
-  spec-kit's `check-manifest-temporal`: lexical tripwire over old-behavior
-  narration ("previously", "renamed from", …) in tracked manifest prose;
-  section + per-site exempt valves, tuned against this repo's SPECs as the
-  FP corpus. Mechanizes the lexical share of close-brevity's narration
-  judgment.
 - **manifest-derivable-count-gate** [spec: spec-kit/SPEC-manifest-count.md] —
   spec-kit's `check-manifest-count`: lexical tripwire over pinned integers
   quantifying growing governed collections ("six gates") in manifest prose
@@ -93,5 +87,6 @@
 
 - drift-kit-extraction
 - knowledge-friction-loop
+- manifest-temporal-gate
 
 ## Lessons Learned

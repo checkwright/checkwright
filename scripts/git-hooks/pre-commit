@@ -109,6 +109,10 @@ if staged_matches '*SPEC*.md' '*.rs' '*.toml' '*.sql' '*.rego' '*.ts' '*.tsx' '*
     spec-kit/checks/check-spec-embedded-source.sh || hook_fail check-spec-embedded-source
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
+    spec-kit/checks/check-manifest-temporal.sh || hook_fail check-manifest-temporal
+fi
+
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh' 'guard-kit/*.sh' 'context-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi

@@ -57,6 +57,17 @@ declare -p SPEC_KIT_EMBED_ILLUSTRATIVE &>/dev/null || SPEC_KIT_EMBED_ILLUSTRATIV
 [[ -v SPEC_KIT_GLOSSARY_FILE ]] || SPEC_KIT_GLOSSARY_FILE="GLOSSARY.md"
 declare -p SPEC_KIT_DUP_SURFACES &>/dev/null || SPEC_KIT_DUP_SURFACES=("VISION.md")
 
+declare -p SPEC_KIT_MANIFEST_FILES &>/dev/null || SPEC_KIT_MANIFEST_FILES=()
+declare -p SPEC_KIT_TEMPORAL_MARKERS &>/dev/null || SPEC_KIT_TEMPORAL_MARKERS=(
+    "previously"
+    "formerly"
+    "renamed from"
+    "no longer"
+    "used to be"
+    "was (retired|removed|renamed|replaced)"
+)
+declare -p SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS &>/dev/null || SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS=()
+
 declare -p SPEC_KIT_COMMENT_MACHINE &>/dev/null || SPEC_KIT_COMMENT_MACHINE=()
 declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
 declare -p SPEC_KIT_COMMENT_SURFACE &>/dev/null || SPEC_KIT_COMMENT_SURFACE=()
@@ -110,6 +121,22 @@ spec_canonical_specs() { gate_find "$1" -name "$SPEC_KIT_SPEC_NAME" -type f 2>/d
 
 spec_amendments() { gate_find "$1" -name "$SPEC_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
 
+# spec: spec-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs (kit-root pruned per SPEC_KIT_SCAN_KIT_ROOTS) plus README.md at any depth and CLAUDE.md; explicit globs when SPEC_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change.
+spec_manifest_files() {
+    local root="${1:-.}" g f
+    if [[ ${#SPEC_KIT_MANIFEST_FILES[@]} -gt 0 ]]; then
+        shopt -s nullglob globstar
+        for g in "${SPEC_KIT_MANIFEST_FILES[@]}"; do
+            for f in "$root"/$g; do [[ -f "$f" ]] && printf '%s\n' "$f"; done
+        done
+        shopt -u nullglob globstar
+    else
+        spec_canonical_specs "$root"
+        gate_find "$root" -name 'README.md' -type f 2>/dev/null | grep -v '/templates/' || true
+        gate_find "$root" -name 'CLAUDE.md' -type f 2>/dev/null || true
+    fi
+}
+
 # spec: spec-kit/SPEC.md §lib/spec.sh — the governed comment surface shared by
 # check-comment-tier and check-spec-pointer: explicit globs when
 # SPEC_KIT_COMMENT_SURFACE is set, else derived shell sources (templates + the
@@ -157,6 +184,7 @@ _sk_errs=()
 [[ "$SPEC_KIT_EMBED_MINLINES" =~ ^[0-9]+$ && "$SPEC_KIT_EMBED_MINLINES" -gt 0 ]] \
     || _sk_errs+=("SPEC_KIT_EMBED_MINLINES must be a positive integer (got '$SPEC_KIT_EMBED_MINLINES')")
 [[ -n "$SPEC_KIT_GLOSSARY_FILE" ]] || _sk_errs+=("SPEC_KIT_GLOSSARY_FILE is empty")
+[[ ${#SPEC_KIT_TEMPORAL_MARKERS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_TEMPORAL_MARKERS is empty")
 if [[ ${#_sk_errs[@]} -gt 0 ]]; then
     printf 'spec-kit: malformed spec config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_sk_errs[@]}" >&2

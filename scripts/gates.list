@@ -24,6 +24,7 @@ check-amendment-queue
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source
+check-manifest-temporal
 check-comment-tier
 check-spec-pointer
 check-gate-tamper
