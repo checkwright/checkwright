@@ -13,5 +13,24 @@ check-spec-derivable-section
 check-spec-embedded-source
 EOF
 
+# spec: gate-sdk/SPEC.md §Consumer smoke — seed check-amendment-queue's surface (guarded; carries lifecycle-kit's inert header so the seed composes with the stage gates)
+if [[ ! -f TASK-QUEUE.md ]]; then
+    cat > TASK-QUEUE.md <<'EOF'
+# TASK-QUEUE.md — smoke consumer work queue
+
+## Iteration: —  [stage: scope]
+
+---
+
+## New Features
+
+## Technical Debt
+
+## Deferred
+
+## Done
+EOF
+fi
+
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
