@@ -8,3 +8,5 @@ EXTRACTION.md
 .claude/settings.local.json*
 # guard-kit per-iteration scratch log (cleared at close-stage triage)
 .workflow/prompt-friction.log
+# drift-kit per-iteration scratch log (cleared at close-stage knowledge-friction triage)
+.workflow/knowledge-friction.log

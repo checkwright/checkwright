@@ -44,6 +44,20 @@ Configuration follows the established kit pattern — override any knob in
 `drift-config.sh` (registry path, extra KPI dirs, the queue/log/timings surfaces,
 the Done/Deferred section headings); defaults are the extracted platform's.
 
+### The knowledge-friction loop (optional)
+
+`kpi-knowledge-friction` measures re-derivations a session had to make because no
+doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
+`n/a` until you install the capture half:
+
+1. Add one bullet to your always-loaded instructions file: *the moment you catch
+   yourself re-deriving a fact off a non-owning surface, append*
+   `<date> <fact> ← <surface>` *to `.workflow/knowledge-friction.log`.* That
+   bullet is the loop's only hook — earn its cost by the log actually filling.
+2. Gitignore the log (per-iteration scratch), and splice
+   `templates/close-knowledge.md` into your close skill so each entry becomes a
+   doc-owner tiering edit and the log is cleared — its reclaim path.
+
 ## Use
 
 ```bash
@@ -54,9 +68,10 @@ bash drift-kit/bin/drift-report.sh --trend    # one compact line (fragments join
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your
 gates dir and naming it in the registry; shadow a bundled one with a same-named
-file. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers the queue split,
-the gate backlog, amendment/deferred age, prompt friction, the always-loaded
-surface, the local permission overlay, and gate runtime.
+file. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers, as lead KPIs, the
+queue split, the gate backlog, amendment/deferred age, prompt friction, the
+always-loaded surface, the local permission overlay, and gate runtime; and one
+lag KPI, `kpi-knowledge-friction`, fed by the loop below.
 
 ## Test
 

@@ -126,5 +126,10 @@ validate-after-commit set, gate-driven worklist).
   brief).
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
+- **Knowledge-friction capture (any session):** catch yourself re-deriving a
+  fact no doc owns (off an implementation, a gate's source, a commit)? append
+  `<date> <fact> ← <surface>` to `.workflow/knowledge-friction.log` (gitignored
+  scratch) at that moment — deferred capture is no capture; close triages it
+  into doc-owner edits (drift-kit/SPEC.md §The knowledge-friction loop).
 - No per-user memory files for this repo: durable guidance goes in tracked
   manifests (this file, EXTRACTION.md, kit SPECs).

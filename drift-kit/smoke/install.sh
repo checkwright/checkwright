@@ -44,10 +44,13 @@ grep -q '^--- Lead'        <<<"$out" || fail "missing Lead section header"
 grep -q '^--- Lag'         <<<"$out" || fail "missing Lag section header"
 grep -q 'Read trend across sessions' <<<"$out" || fail "missing footer"
 
-lead_rows="$(awk '/^--- Lead/{f=1;next} /^--- Lag/{f=0} f && /^  [^ ]/{c++} END{print c+0}' <<<"$out")"
-[[ "$lead_rows" -eq "$registered" ]] || fail "expected one row per registered KPI ($registered), got $lead_rows"
+total_rows="$(awk '/^--- Lead/{f=1} /^Read trend/{f=0} f && /^  [^ ]/{c++} END{print c+0}' <<<"$out")"
+[[ "$total_rows" -eq "$registered" ]] || fail "expected one row per registered KPI ($registered), got $total_rows"
 
 grep -q 'kpi-does-not-exist.*n/a' <<<"$out" || fail "missing plugin did not yield a visible n/a row"
+
+awk '/^--- Lag/{f=1;next} /^Read trend/{f=0} f' <<<"$out" | grep -q 'knowledge friction.*n/a' \
+    || fail "kpi-knowledge-friction did not render an n/a row under the Lag section (log absent in the throwaway consumer)"
 
 set +e
 trend="$(report --trend)"; trc=$?

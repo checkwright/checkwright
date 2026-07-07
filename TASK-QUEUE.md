@@ -11,12 +11,6 @@
 
 ## New Features
 
-- **knowledge-friction-loop** [spec: drift-kit/SPEC.md] — the
-  knowledge-friction log convention (one-liner at the moment of
-  re-derivation), the close-stage triage template (remediation is a
-  doc-owner tiering edit, never a standing instruction), and
-  `kpi-knowledge-friction` — drift-kit's first pluggable-KPI consumer and
-  its one live lag KPI.
 - **manifest-temporal-gate** [spec: spec-kit/SPEC-manifest-temporal.md] —
   spec-kit's `check-manifest-temporal`: lexical tripwire over old-behavior
   narration ("previously", "renamed from", …) in tracked manifest prose;
@@ -98,5 +92,6 @@
 ## Done
 
 - drift-kit-extraction
+- knowledge-friction-loop
 
 ## Lessons Learned

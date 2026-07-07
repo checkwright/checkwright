@@ -31,11 +31,17 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    entries, then by judgment prune remaining one-off local entries and promote
    recurring safe patterns to committed `settings.json` globs; clear the log
    (`: > .workflow/prompt-friction.log`).
-3. **Clear Done.**
-4. Review README.md kit table, CLAUDE.md, and each kit README for staleness
+3. **Knowledge-friction triage** (drift-kit/templates/close-knowledge.md): walk
+   `.workflow/knowledge-friction.log` and remediate each captured re-derivation
+   as a **doc-owner edit** — give the fact a home under the tier contract, or a
+   pointer from where the session looked to where the owner is — never a
+   standing session-start instruction; clear the log
+   (`: > .workflow/knowledge-friction.log`).
+4. **Clear Done.**
+5. Review README.md kit table, CLAUDE.md, and each kit README for staleness
    (*is it still true?*).
-5. Runtime-artifact check: any new gitignored artifact has a reclaim path.
-6. Brevity pass on CLAUDE.md (the only always-loaded surface here): is each
+6. Runtime-artifact check: any new gitignored artifact has a reclaim path.
+7. Brevity pass on CLAUDE.md (the only always-loaded surface here): is each
    block worth its standing per-session token cost?
-7. Optionally push/merge — an iteration can close without publishing if a
+8. Optionally push/merge — an iteration can close without publishing if a
    follow-up is planned.
