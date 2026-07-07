@@ -100,6 +100,31 @@ declare -p SPEC_KIT_EMBED_ILLUSTRATIVE &>/dev/null || SPEC_KIT_EMBED_ILLUSTRATIV
 [[ -v SPEC_KIT_GLOSSARY_FILE ]] || SPEC_KIT_GLOSSARY_FILE="GLOSSARY.md"
 declare -p SPEC_KIT_DUP_SURFACES &>/dev/null || SPEC_KIT_DUP_SURFACES=("VISION.md")
 
+# check-comment-tier classifier. The built-in directive roster (the names
+# Checkwright's own kits parse — graph/shellcheck/contract, spec/assertion/…) is
+# the gate's own kit-mechanism vocabulary; these knobs carry only the *extras* a
+# consumer appends (its product directive set at migration time), the governed
+# file globs, and the positional-construct roster. SPEC_KIT_COMMENT_MACHINE and
+# SPEC_KIT_COMMENT_REASON default empty (append nothing). SPEC_KIT_COMMENT_SURFACE
+# empty means derive the default surface: shell sources under the root (kit roots
+# per SPEC_KIT_SCAN_KIT_ROOTS, templates skipped) plus the workflow *.txt state
+# files. SPEC_KIT_COMMENT_POSITIONAL is a language roster and defaults empty — the
+# kit is language-agnostic (its own surface is shell), so the positional-rescue
+# *mechanism* ships but its *tokens* are consumer config: a consumer whose surface
+# includes a language with justify-worthy constructs supplies them (a Rust
+# consumer sets `.unwrap( .expect( unsafe #[allow(`, the same way the platform's
+# product directive set becomes its consumer config). Empty ⇒ inert by
+# construction.
+declare -p SPEC_KIT_COMMENT_MACHINE &>/dev/null || SPEC_KIT_COMMENT_MACHINE=()
+declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
+declare -p SPEC_KIT_COMMENT_SURFACE &>/dev/null || SPEC_KIT_COMMENT_SURFACE=()
+declare -p SPEC_KIT_COMMENT_POSITIONAL &>/dev/null || SPEC_KIT_COMMENT_POSITIONAL=()
+# The not-yet-swept roster is consumer debt, never a kit literal (the extraction
+# seam): the gate ships with an empty whitelist, and a consumer names its own
+# unswept files here, tagging the array '# exception-list:' with '# until:
+# <drain-task>' so check-gate-exemption-tasks holds each entry to a live task.
+declare -p SPEC_KIT_COMMENT_WHITELIST &>/dev/null || SPEC_KIT_COMMENT_WHITELIST=()
+
 # --- shared section adapters (both sides of every boundary parse identically) -
 
 # spec_alt <name>... — a '|'-joined regex alternation body.

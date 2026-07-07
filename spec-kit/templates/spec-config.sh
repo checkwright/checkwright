@@ -64,3 +64,17 @@
 # Register the gate only where the glossary exists — it exits 2 otherwise.
 #SPEC_KIT_GLOSSARY_FILE=GLOSSARY.md
 #SPEC_KIT_DUP_SURFACES=("VISION.md")
+
+# check-comment-tier classifier. MACHINE/REASON append extra directive prefixes
+# to the built-in kit-mechanism roster (your product directive vocabulary).
+# SURFACE is the governed-file glob set; unset derives shell sources under the
+# root plus the workflow *.txt state files. POSITIONAL is the language construct
+# roster for positional rescue — empty by default (the kit is language-agnostic);
+# a consumer whose surface includes a construct-justifying language fills it
+# (e.g. Rust: '.unwrap(' '.expect(' 'unsafe' '#[allow('). WHITELIST names
+# not-yet-swept sources; tag the array '# exception-list:' with '# until: <task>'.
+#SPEC_KIT_COMMENT_MACHINE=()
+#SPEC_KIT_COMMENT_REASON=()
+#SPEC_KIT_COMMENT_SURFACE=()
+#SPEC_KIT_COMMENT_POSITIONAL=()
+#SPEC_KIT_COMMENT_WHITELIST=()

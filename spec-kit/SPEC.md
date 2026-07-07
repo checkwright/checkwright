@@ -139,6 +139,12 @@ own instance and stays there); the kit's rules are the topology itself:
   transcribed into prose is a parallel copy; cite the owning source
   instead. A literal stays verbatim only when load-bearing, and then only
   gate-coupled.
+- **Comments cite, never restate.** The code surface is a tier too: a
+  full-line comment on a governed source is a machine or reason directive,
+  rides the contiguous run a directive opens, or is exempt — design
+  rationale lives in the owning SPEC section, not re-derived in a comment
+  block (`check-comment-tier`; the FP-prone trailing-comment judgment stays
+  a review tripwire).
 - **Honest mechanizability.** Only the structural sub-rules gate (banned
   headings, fence density, duplicate definitions, verbatim copies); the
   core judgment — is this sentence a definition or a narration, a why or a
@@ -148,7 +154,7 @@ own instance and stays there); the kit's rules are the topology itself:
 ## Layout and configuration
 
 The kit is vendored beside gate-sdk (conventionally at `spec-kit/`); its
-five gates are registered in the consumer's `gates.list` by name — each
+six gates are registered in the consumer's `gates.list` by name — each
 where its surface exists (a consumer with no glossary does not register
 `check-surface-duplication`) — and resolve through gate-sdk's multi-kit
 path.
@@ -192,6 +198,18 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 - `SPEC_KIT_GLOSSARY_FILE` — default `GLOSSARY.md`;
   `SPEC_KIT_DUP_SURFACES` — array of surfaces scanned for foreign
   definitions, default `(VISION.md)` plus every component spec.
+- `SPEC_KIT_COMMENT_MACHINE` / `SPEC_KIT_COMMENT_REASON` — arrays, default
+  empty: extra directive prefixes appended to the built-in kit-mechanism
+  roster (a consumer's product vocabulary). `SPEC_KIT_COMMENT_SURFACE` —
+  array of globs, default empty ⇒ derive: shell sources under the root (kit
+  roots per `SPEC_KIT_SCAN_KIT_ROOTS`, `templates/` pruned) plus the
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/*.txt` state files.
+  `SPEC_KIT_COMMENT_POSITIONAL` — the language construct roster for
+  positional rescue, default empty (the kit is language-agnostic; a Rust
+  consumer sets `.unwrap( .expect( unsafe #[allow(`).
+  `SPEC_KIT_COMMENT_WHITELIST` — array of globs, default empty: the
+  consumer's not-yet-swept sources, its array tagged `# exception-list:`
+  with a per-entry `# until: <drain-task>`.
 
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
@@ -281,6 +299,35 @@ own spec, so there is nothing to restate; gate-test fixtures are excluded;
 exits 2 when the glossary file is absent (register the gate only where the
 topology exists). `align-only` tier.
 
+### check-comment-tier
+
+Invariant: every full-line comment on a governed source is one of — a
+machine directive (a comment a tool parses: `graph:`, `shellcheck`,
+`contract:`), a reason directive (a spec pointer or positional
+justification: `spec:`, `exception-list:`, `no-fixture:`, `assertion`,
+`permanent:`, `TODO(task:`, `TODO(spec-ambiguity)`, which also blesses the
+contiguous comment run it opens), `comment-tier-exempt: <reason>`, or the
+comment immediately above a positional construct from the language roster.
+Anything else is flagged: design rationale relocates to the owning SPEC,
+restated-code prose is deleted.
+
+Calibration: the built-in roster is Checkwright's own kit-mechanism
+directive names; `SPEC_KIT_COMMENT_MACHINE` / `_REASON` append a consumer's
+product vocabulary (the same split as `check-graph`'s vocab — the mechanism
+ships, the rule content is config). The default surface is shell (`#`),
+with the `.workflow/*.txt` state files blessing only `contract:`/`see`;
+slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships
+as mechanism and activates when a consumer widens `SPEC_KIT_COMMENT_SURFACE`
+to a language that needs it. Positional rescue is language-agnostic — its
+construct roster (`SPEC_KIT_COMMENT_POSITIONAL`) is consumer config, empty
+by default so inert on the shell surface (a Rust consumer supplies the
+`unwrap`/`allow`-class tokens; Rust is the platform's language, not a kit
+literal). Trailing inline comments are out of scope by construction — the
+FP-prone half of the judgment stays a review tripwire. Not-yet-swept
+sources ride `SPEC_KIT_COMMENT_WHITELIST` (its array tagged
+`# exception-list:`, each `# until:` a live drain task per
+`check-gate-exemption-tasks`), draining kit by kit. `precommit` tier.
+
 ### templates/
 
 `spec-config.sh` — the consumer config template documenting every knob.
@@ -297,9 +344,12 @@ glossary/vision structural gates (`check-glossary-tiering`,
 `check-retired-term-coupling`) encode that instance's surface roles,
 entry taxonomy, and ubiquitous-language couplings — rule content; their
 generic cross-surface axis ships here as `check-surface-duplication`.
-`check-comment-tier`'s blessed directive set is a coupling vocabulary
-(rule content), so the comment surface stays behind; the SPEC↔code
-tiering rule ships as prose only. `check-root-tiering` is a pure
-consumer-filename allowlist with no mechanism residue. Global-constant
+`check-comment-tier` splits: the platform's *product* directive vocabulary
+(`glossary:`, `diagram:`, `domain-enum`, …) is rule content and stays
+behind as that consumer's `SPEC_KIT_COMMENT_*` config, but the classifier,
+the kit-mechanism directive roster, and the surface/positional parsing
+machinery ship here — the comment surface now joins the enforced tiering
+surfaces. `check-root-tiering` is a pure consumer-filename allowlist with
+no mechanism residue. Global-constant
 literal gates (the pagination-literal pattern) are per-constant rule
 content. Diagram/spec annotation couplings are a later kit's scope.

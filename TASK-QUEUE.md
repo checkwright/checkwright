@@ -11,16 +11,19 @@
 
 ## New Features
 
-- **comment-tier-gate** [spec: spec-kit/SPEC-comment-tier.md] — spec-kit's
-  check-comment-tier: comments must be machine/reason directives or exempted;
-  kit-mechanism directive roster as default, consumer vocabulary via
-  SPEC_KIT_COMMENT_* knobs; sweep this repo's kits (WHITELIST-drained).
 - **tag-lead-line-rename** [spec: queue-kit/SPEC-tag-lead-line.md] — rename
   check-blocked-by-lead-line to check-tag-lead-line: the gate governs every
   blocked-by/spec/needs-spec tag, the name claims only blocked-by; registry,
   SPEC section, fixture dir, and the generated hook artifacts move with it.
 
 ## Technical Debt
+
+- **comment-tier-sweep** — drain SPEC_KIT_COMMENT_WHITELIST in
+  scripts/spec-config.sh: relocate each not-yet-swept source's design-rationale
+  comments into the owning SPEC section and delete restated-code prose, then drop
+  the file's exact path from the roster. Seeded by comment-tier-gate 2026-07-07
+  (46 sources predating check-comment-tier); drain kit by kit — each sweep session
+  clears one kit's entries and re-gates it. Done when the roster is empty.
 
 ## Deferred
 
@@ -94,6 +97,7 @@
 ## Done
 
 - allowlist-chain-steer-rule
+- comment-tier-gate
 - context-kit-extraction
 - stage-entry-mechanization
 

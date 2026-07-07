@@ -13,3 +13,61 @@ SPEC_KIT_DOD_MODE=at-most-one
 # gate-sdk — this repo is the exception that authors them).
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
 SPEC_KIT_SCAN_KIT_ROOTS=1
+
+# check-comment-tier landed after these sources were written, so their comment
+# blocks predate the content-home rule. The sweep to relocate design rationale
+# into the owning SPECs (and delete restated-code prose) is real prose work,
+# deferred to the comment-tier-sweep task and drained kit by kit; this roster is
+# the debt ledger — every clean and future source is gated now, and each exact
+# path drops as its kit is swept. exception-list entries stay held to a live task
+# by check-gate-exemption-tasks.
+# exception-list: not-yet-swept sources (drain: comment-tier-sweep)
+# shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
+SPEC_KIT_COMMENT_WHITELIST=(
+    context-kit/bin/always-loaded.sh               # until: comment-tier-sweep
+    context-kit/bin/run-index-tests.sh             # until: comment-tier-sweep
+    context-kit/checks/check-brevity.sh            # until: comment-tier-sweep
+    context-kit/smoke/install.sh                   # until: comment-tier-sweep
+    context-kit/smoke/violation.sh                 # until: comment-tier-sweep
+    delegation-kit/bin/run-usage-tests.sh          # until: comment-tier-sweep
+    delegation-kit/checks/check-gate-tamper.sh     # until: comment-tier-sweep
+    delegation-kit/lib/delegation.sh               # until: comment-tier-sweep
+    delegation-kit/smoke/install.sh                # until: comment-tier-sweep
+    delegation-kit/smoke/violation.sh              # until: comment-tier-sweep
+    friction-kit/bin/run-guard-tests.sh            # until: comment-tier-sweep
+    friction-kit/bin/scan-prompts.sh               # until: comment-tier-sweep
+    friction-kit/lib/guard.sh                      # until: comment-tier-sweep
+    friction-kit/smoke/install.sh                  # until: comment-tier-sweep
+    gate-sdk/bin/gen-pre-commit.sh                 # until: comment-tier-sweep
+    gate-sdk/bin/run-consumer-smoke.sh             # until: comment-tier-sweep
+    gate-sdk/bin/run-gate-tests.sh                 # until: comment-tier-sweep
+    gate-sdk/checks/check-graph.sh                 # until: comment-tier-sweep
+    gate-sdk/lib/gate.sh                           # until: comment-tier-sweep
+    gate-sdk/smoke/install.sh                      # until: comment-tier-sweep
+    gate-sdk/smoke/violation.sh                    # until: comment-tier-sweep
+    lifecycle-kit/bin/enter-stage.sh               # until: comment-tier-sweep
+    lifecycle-kit/bin/session-id.sh                # until: comment-tier-sweep
+    lifecycle-kit/checks/check-stage-entry.sh      # until: comment-tier-sweep
+    lifecycle-kit/checks/check-stage-evidence.sh   # until: comment-tier-sweep
+    lifecycle-kit/lib/stages.sh                    # until: comment-tier-sweep
+    lifecycle-kit/smoke/install.sh                 # until: comment-tier-sweep
+    lifecycle-kit/smoke/violation.sh               # until: comment-tier-sweep
+    queue-kit/checks/check-queue-wrap.sh           # until: comment-tier-sweep
+    queue-kit/checks/check-task-conservation.sh    # until: comment-tier-sweep
+    queue-kit/lib/queue.sh                         # until: comment-tier-sweep
+    queue-kit/smoke/install.sh                     # until: comment-tier-sweep
+    queue-kit/smoke/violation.sh                   # until: comment-tier-sweep
+    scripts/bash-guard.sh                          # until: comment-tier-sweep
+    scripts/context-config.sh                      # until: comment-tier-sweep
+    scripts/delegation-config.sh                   # until: comment-tier-sweep
+    scripts/friction-config.sh                     # until: comment-tier-sweep
+    scripts/session-context.sh                     # until: comment-tier-sweep
+    scripts/spec-config.sh                         # until: comment-tier-sweep
+    spec-kit/checks/check-spec-derivable-section.sh # until: comment-tier-sweep
+    spec-kit/checks/check-spec-dod-singleton.sh    # until: comment-tier-sweep
+    spec-kit/checks/check-spec-embedded-source.sh  # until: comment-tier-sweep
+    spec-kit/checks/check-surface-duplication.sh   # until: comment-tier-sweep
+    spec-kit/lib/spec.sh                           # until: comment-tier-sweep
+    spec-kit/smoke/install.sh                      # until: comment-tier-sweep
+    spec-kit/smoke/violation.sh                    # until: comment-tier-sweep
+)
