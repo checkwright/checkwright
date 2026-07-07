@@ -211,7 +211,7 @@ done
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "COMMENT-TIER: ${#errors[@]} violation(s):"
     printf '  %s\n' "${errors[@]}"
-    echo "  help: a comment cites its owning surface or is a parseable directive — lead the block with a 'spec: <SPEC> §<section>' (or another roster directive), delete restated-code prose, or tag '# comment-tier-exempt: <reason>' for the genuinely unavoidable. Not-yet-swept components ride the COMMENT_TIER_WHITELIST with a '# until:' drain task."
+    echo "  help: code is the WHAT, its SPEC the WHY — lead the block with a bare 'spec: <SPEC> §<section>' pointer (or another roster directive), delete prose that restates the code or paraphrases the SPEC it points at, or tag '# comment-tier-exempt: <reason>' for a genuinely-local fact below SPEC altitude. Not-yet-swept components ride the COMMENT_TIER_WHITELIST with a '# until:' drain task."
     exit 1
 fi
 echo "COMMENT-TIER: clean ($scanned governed source(s); every full-line comment is a directive, rides a directive run, is exempt, or justifies a positional construct)"
