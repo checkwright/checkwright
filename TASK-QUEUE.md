@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: hardening  [stage: close]
+## Iteration: drift-kit  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,31 +11,34 @@
 
 ## New Features
 
+- **drift-kit-extraction** [spec: drift-kit/SPEC.md] — extract the drift
+  kit: the drift-report skeleton (lead/lag sections with the honesty
+  labels, `--trend` line for the session hook), the `kpis.list` registry
+  with gate-sdk-style resolution, the kpi-plugin contract, and the bundled
+  generic KPI set; dogfood the report and registry in this repo (kit 7).
+- **knowledge-friction-loop** [spec: drift-kit/SPEC.md] — the
+  knowledge-friction log convention (one-liner at the moment of
+  re-derivation), the close-stage triage template (remediation is a
+  doc-owner tiering edit, never a standing instruction), and
+  `kpi-knowledge-friction` — drift-kit's first pluggable-KPI consumer and
+  its one live lag KPI.
+- **manifest-temporal-gate** [spec: spec-kit/SPEC-manifest-temporal.md] —
+  spec-kit's `check-manifest-temporal`: lexical tripwire over old-behavior
+  narration ("previously", "renamed from", …) in tracked manifest prose;
+  section + per-site exempt valves, tuned against this repo's SPECs as the
+  FP corpus. Mechanizes the lexical share of close-brevity's narration
+  judgment.
+- **manifest-derivable-count-gate** [spec: spec-kit/SPEC-manifest-count.md] —
+  spec-kit's `check-manifest-count`: lexical tripwire over pinned integers
+  quantifying growing governed collections ("six gates") in manifest prose
+  — ban, don't validate; the count's owner is the collection. Threshold /
+  partition / fixed-set exemptions plus per-site marker; shares the
+  manifest-set finder and FP corpus with its sibling.
+
 ## Technical Debt
 
 ## Deferred
 
-- **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
-  KPIs and lead/lag honesty labels (kit 7). Scope ruling 2026-07-07: the next
-  iteration after `hardening`, bundled with knowledge-friction-loop (whose
-  re-derivations/session KPI is drift-kit's first pluggable-KPI consumer).
-- **knowledge-friction-loop** [needs-spec] — the friction log / scan-prompts /
-  close-triage loop surfaces *permission* friction only; two classes escape it:
-  knowledge friction (re-deriving a fact no doc owns — e.g. the merge-closure
-  queue step read off check-amendment-queue rather than spec-kit's merge
-  procedure) and action friction (repeated low-value tool sequences). Cheap
-  design mirrors the friction log: capture a re-derivation as a one-liner the
-  moment it happens (a knowledge-friction.log) and triage it at close like
-  scan-prompts — but the remediation is always a doc-owner edit (give the fact a
-  home under the star topology), never a standing session-start instruction that
-  the context-kit brevity meter is built to reject. Detection is the loop;
-  elimination is a tiering edit. Aggregate view belongs in drift-kit (kit 7) as
-  a "re-derivations/session" lagging KPI that trends down as holes fill. A full
-  transcript LLM-scan is the heavy alternative; the writing-project reduction —
-  keep only each party's messages, drop tool calls/results/reminders — shrinks
-  the derived transcript substantially and makes a periodic scan affordable.
-  Surfaced 2026-07-07. Scope ruling 2026-07-07: bundled into the drift-kit
-  iteration (see drift-kit-extraction).
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
@@ -53,37 +56,7 @@
   as its own iteration post kit 7. Evidence artifact: upstream Claude Code
   issue #75214 (project config can't lift the Task ask-first default),
   surfaced dogfooding this repo's delegation nudge 2026-07-07.
-- **manifest-temporal-gate** [needs-spec] — spec-kit tiering-family gate: a
-  cheap lexical tripwire flagging old-behavior narration ("previously",
-  "formerly", "no longer", "used to", "renamed from") in tracked manifest
-  prose (SPEC*.md, README, the always-loaded surface). History is derivable
-  from git; a manifest states current behavior only, and a "formerly…" line is
-  standing context cost documenting the old cost — it taxes every session that
-  reads it. Mechanizes what close-brevity today leaves to manual judgment ("the
-  semantic residue check-brevity cannot decide",
-  context-kit/templates/close-brevity.md). Scope ruling owes the calibration:
-  the cheap-and-FP-free bar is the crux — this repo's own extraction prose is
-  deliberate provenance ("renamed from the platform's X"; every "What stayed on
-  the platform" section), so the gate needs an exempt escape (the
-  check-spec-embedded-source `-exempt:` pattern) and must be tuned against these
-  SPECs as the FP corpus. Surfaced 2026-07-07.
-- **manifest-derivable-count-gate** [needs-spec] — spec-kit tiering-family gate,
-  sibling of manifest-temporal-gate: a cheap lexical tripwire flagging a pinned
-  integer that directly quantifies a *growing* governed collection (gates,
-  checks, stages, templates) in tracked manifest prose — "six gates", "seven
-  meta-gates". The count's owner is the checks dir / gates.list; a restated
-  integer is an un-gateable second source that drifts silently — this iteration
-  landed one spec-kit gate and left the same count in four disagreeing copies
-  (five/six/seven across two READMEs and a SPEC), the close-review find that
-  surfaced this. Ban, don't validate: a validating gate (the platform's earlier
-  approach) perpetuates the standing token cost context-kit brevity rejects and
-  needs NL entity-mapping (FP-prone); a lexical tripwire eliminates the cost
-  outright. Calibration crux — exempt (a) fixed named frameworks enumerated
-  inline ("the four contracts"), (b) partition/classification claims ("all but
-  one of the gates"), (c) thresholds ("≥2 gates"), (d) test fixtures and
-  pointer-target headings; flag only bare growing-collection totals. Shares the
-  `-exempt:` escape and FP-corpus tuning (this repo's own SPECs) with
-  manifest-temporal-gate. Surfaced 2026-07-07.
+
 ## Done
 
 ## Lessons Learned
