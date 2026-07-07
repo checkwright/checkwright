@@ -9,7 +9,7 @@ cd "$REPO_ROOT" 2>/dev/null || exit 0
 QUEUE_INDEX="queue-kit/bin/queue-index.sh"       # queue-kit's queue surface
 CTX_BIN="context-kit/bin"                         # context-kit index tools
 QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
-DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-}"      # e.g. drift-kit/bin/drift-report.sh
+DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-drift-kit/bin/drift-report.sh}"  # drift-kit trend line
 
 echo "── Session context (context-kit session-context hook) ──────────────────"
 echo

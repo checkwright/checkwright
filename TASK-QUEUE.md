@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **drift-kit-extraction** [spec: drift-kit/SPEC.md] — extract the drift
-  kit: the drift-report skeleton (lead/lag sections with the honesty
-  labels, `--trend` line for the session hook), the `kpis.list` registry
-  with gate-sdk-style resolution, the kpi-plugin contract, and the bundled
-  generic KPI set; dogfood the report and registry in this repo (kit 7).
 - **knowledge-friction-loop** [spec: drift-kit/SPEC.md] — the
   knowledge-friction log convention (one-liner at the moment of
   re-derivation), the close-stage triage template (remediation is a
@@ -80,5 +75,7 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 
 ## Done
+
+- drift-kit-extraction
 
 ## Lessons Learned

@@ -1,0 +1,19 @@
+# drift-kit KPI registry — one plugin name per line, # comments (the gates.list
+# grammar). Names resolve against DRIFT_KIT_KPI_DIRS first (default: your gates
+# dir), then each vendored kit's kpis/. Drop a same-named file in your gates dir
+# to shadow a bundled KPI; delete a line to opt out. Copy this file to your
+# gates dir as kpis.list and prune to the surfaces you actually run.
+
+# Lead — weighted high; act before drift compounds.
+kpi-task-split
+kpi-gate-backlog
+kpi-amendment-age
+kpi-deferred-age
+kpi-prompt-friction
+kpi-always-loaded
+kpi-settings-local
+kpi-gate-runtime
+
+# Lag — weighted low; undercounts by construction. drift-kit's knowledge-friction
+# loop ships kpi-knowledge-friction; add it once that loop's log convention is in
+# your instructions file. A consumer with a structured lag source adds its own.
