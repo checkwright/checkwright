@@ -39,9 +39,7 @@ for entry in "${LOCAL_ALLOW[@]}"; do
     [[ -z "$entry" ]] && continue
     for pat in "${COMMITTED_ALLOW[@]}"; do
         [[ -z "$pat" ]] && continue
-        glob="${pat//:\*/\*}"
-        # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
-        if [[ "$entry" == $glob ]]; then
+        if guard_allow_match "$entry" "$pat"; then
             redundant+=("$entry  ⊆  $pat")
             break
         fi

@@ -82,6 +82,17 @@ guard_log_fallthrough() {
     printf '%s\n' "$fline" >>"$FRICTION_KIT_LOG" 2>/dev/null || true
 }
 
+# guard_allow_match <string> <pattern> — true when <string> matches the committed
+# allow <pattern> under shell-glob semantics, with the harness ':*' prefix idiom
+# (Bash(printf:*) ≡ any 'printf …') normalized to a trailing '*'. One
+# implementation shared by compare-settings-allow (redundancy detection) and
+# rule 10 (the silent-grant guard) so the two never drift.
+guard_allow_match() {
+    local s="$1" glob="${2//:\*/\*}"
+    # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
+    [[ "$s" == $glob ]]
+}
+
 # ---- the harness-generic ruleset (order is load-bearing) --------------------
 
 # 1. `cd` in a compound command — cwd drift plus a permission prompt no
@@ -261,7 +272,91 @@ guard_rule_ro_pipeline() {
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
-# guard_generic_rules <cmd> — run rules 1-9 in the load-bearing order. Rule 10
+# 10. Decorated allowlisted command — the leading command exactly matches a
+#     committed *bare* allow entry (a Bash(<cmd>) with no glob) but the command
+#     decorates it (&&/;/| chaining, a trailing redirect, 2>&1), which forces a
+#     permission prompt no allowlist entry suppresses. Blocked with a steer to
+#     the bare form. Fail-open: no jq, no settings file, or a parse error and the
+#     rule silently declines and falls through. Never intercepts a silent grant —
+#     it fires only when the decoration is not itself allowlisted (a compound
+#     whose every segment matches the committed allowlist is granted without a
+#     prompt, and blocking it would regress). Reads FRICTION_KIT_SETTINGS;
+#     segment matching reuses guard_allow_match (shared with compare-settings-
+#     allow). Placed after the auto-allow rules so a silently granted read-only
+#     pipeline (rule 9) never reaches it.
+guard_rule_allowlist_chain() {
+    local cmd="$1"
+    command -v jq >/dev/null 2>&1 || return 0
+    [[ -f "$FRICTION_KIT_SETTINGS" ]] || return 0
+
+    local -a allow_entries
+    mapfile -t allow_entries < <(jq -r '.permissions.allow[]?' "$FRICTION_KIT_SETTINGS" 2>/dev/null) || return 0
+    [[ ${#allow_entries[@]} -gt 0 ]] || return 0
+
+    # bare_leads: Bash(<cmd>) inners with no glob — the only entries a lead may
+    # match (glob-headed families coexist with allowlisted decorators; scope
+    # ruling "bare entries only for the lead"). pattern_inners: every inner,
+    # for matching the non-leading segments in the silent-grant guard.
+    local e inner
+    local -a bare_leads pattern_inners
+    for e in "${allow_entries[@]}"; do
+        case "$e" in Bash\(*\)) inner="${e#Bash(}"; inner="${inner%)}" ;; *) continue ;; esac
+        [[ -z "$inner" ]] && continue
+        pattern_inners+=("$inner")
+        case "$inner" in *'*'*) ;; *) bare_leads+=("$inner") ;; esac
+    done
+    [[ ${#bare_leads[@]} -gt 0 ]] || return 0
+
+    # Skeleton: single- and double-quoted regions dropped so a separator inside
+    # quotes never mis-splits the command — the safe direction (a shorter
+    # segment matches a glob more readily, so the guard errs toward declining,
+    # keeping false steers at zero per the scope ruling).
+    local skel
+    skel="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+
+    local -a segs
+    mapfile -t segs < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$skel")
+
+    local lead="${segs[0]}"
+    lead="${lead#"${lead%%[![:space:]]*}"}"; lead="${lead%"${lead##*[![:space:]]}"}"
+
+    # lead_core: the lead with any trailing redirect (>, >>, <, 2>&1, …) stripped.
+    local lead_core
+    lead_core="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$lead")"
+    lead_core="${lead_core#"${lead_core%%[![:space:]]*}"}"; lead_core="${lead_core%"${lead_core##*[![:space:]]}"}"
+
+    local bl matched_lead=0
+    for bl in "${bare_leads[@]}"; do
+        [[ "$lead_core" == "$bl" ]] && { matched_lead=1; break; }
+    done
+    [[ "$matched_lead" == 1 ]] || return 0
+
+    local steer="run '$lead_core' bare — it's a statically allowlisted command, but the decoration (chaining or a redirect) forces a permission prompt no allowlist entry suppresses. Run the allowlisted command on its own; issue the rest as separate calls."
+
+    # Redirect on the lead itself: the harness never granted this spelling, so
+    # blocking it costs no extra prompt and steers to the bare form.
+    [[ "$lead" != "$lead_core" ]] && guard_block "$steer"
+
+    # No chaining and no redirect: the bare form itself — nothing to steer.
+    [[ ${#segs[@]} -le 1 ]] && return 0
+
+    # Chaining: fire unless every non-leading segment is itself allowlisted (a
+    # full silent grant the harness passes without a prompt — never intercept it).
+    local seg p i seg_matched
+    for ((i = 1; i < ${#segs[@]}; i++)); do
+        seg="${segs[i]}"
+        seg="${seg#"${seg%%[![:space:]]*}"}"; seg="${seg%"${seg##*[![:space:]]}"}"
+        [[ -z "$seg" ]] && continue
+        seg_matched=0
+        for p in "${pattern_inners[@]}"; do
+            if guard_allow_match "$seg" "$p"; then seg_matched=1; break; fi
+        done
+        [[ "$seg_matched" == 1 ]] || guard_block "$steer"
+    done
+    return 0
+}
+
+# guard_generic_rules <cmd> — run rules 1-10 in the load-bearing order. Rule 11
 # (fall-through logging) is the caller's last line, after this returns.
 guard_generic_rules() {
     local cmd="$1"
@@ -274,4 +369,5 @@ guard_generic_rules() {
     guard_rule_brace_glyph "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
+    guard_rule_allowlist_chain "$cmd"
 }

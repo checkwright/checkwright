@@ -82,6 +82,12 @@ Primitives a consumer guard composes; each emits the harness's
   `updatedInput` (grant the better spelling of the same command).
 - `guard_log_fallthrough` — append the (truncated, newline-flattened)
   command to the friction log; best-effort, never affects the decision.
+- `guard_allow_match <string> <pattern>` — the shell-glob match core: true when
+  the string matches a committed allow pattern, with the harness `:*` prefix
+  idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
+  hook primitive — a shared helper, one implementation behind
+  compare-settings-allow's redundancy detection and rule 10's silent-grant
+  guard so the two never drift.
 
 Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
@@ -154,7 +160,28 @@ load-bearing where noted.
    substitution, a leftover quote after stripping, any statement separator,
    a non-`/dev/null` redirect, or a `find` with a write action all refuse
    and fall through.
-10. **Fall-through logging** — anything neither blocked nor auto-allowed is
+10. **Decorated allowlisted command** — the leading command exactly matches a
+    committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
+    the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
+    `2>&1` — which forces a permission prompt no allowlist entry suppresses.
+    **Blocked** with the steer *run it bare — the bare form is statically
+    allowed; the decoration forces a prompt.* Block, not advise: the rule fires
+    only on commands that would prompt anyway, so blocking converts the prompt
+    into a durable steer at no extra interrupt, and an advise would *grant* the
+    decorated command (its extra segments the allowlist never reviewed).
+    **Bare leads only:** a glob-headed family (`Bash(git log:*)`) coexists with
+    allowlisted decorators, so only an exact bare entry qualifies as the lead;
+    widening to glob leads is possible later without a new name. **Never
+    intercepts a silent grant:** the harness matches per segment, so a compound
+    whose every segment matches the committed allowlist is granted without a
+    prompt and blocking it would regress — the rule therefore fires only when a
+    non-leading segment (or a redirect on the lead) fails to match any committed
+    allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
+    `FRICTION_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
+    parse error and the rule silently declines and falls through. Placed after
+    the auto-allow rules (8, 9) so a silently granted read-only pipeline never
+    reaches it.
+11. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 ### Consumer rules
@@ -186,7 +213,8 @@ the committed settings — the deterministic prune-candidate set for the
 close-stage audit. A committed pattern subsumes a local entry when the
 local string matches it under shell-glob semantics; the harness `:*` prefix
 idiom (`Bash(printf:*)` ≡ any `printf …`) is normalized to a trailing `*`
-so one glob test covers both forms. Read-only — reports candidates, never
+so one glob test covers both forms — the match core is `guard_allow_match`
+in `lib/guard.sh`, shared with rule 10. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
 judgment. `--count` emits the bare count.

@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **allowlist-chain-steer-rule** [spec: friction-kit/SPEC-allowlist-chain-steer.md] —
-  generic ruleset rule 10: block-and-steer a decorated command whose lead
-  matches a committed bare
-  allow entry, unless every segment is allowlisted (silent-grant case); shared
-  glob-match helper with compare-settings-allow; guard-test rows per branch.
 - **stage-entry-mechanization** [spec: lifecycle-kit/SPEC-enter-stage.md] —
   `enter-stage.sh <stage>`: the stamp+flip ritual mechanized with a
   check-stage-entry pre-flight, first-stage boundary reset included; skills
@@ -87,6 +82,7 @@
   as its own iteration post kit 7.
 ## Done
 
+- allowlist-chain-steer-rule
 - context-kit-extraction
 
 ## Lessons Learned

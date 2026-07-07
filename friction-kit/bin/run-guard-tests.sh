@@ -28,6 +28,13 @@ trap 'rm -rf "$SANDBOX"' EXIT
 git -C "$SANDBOX" init -q
 printf 'scratch.txt\n.tmp/\nfriction.log\n' >"$SANDBOX/.gitignore"
 
+# Committed allowlist rule 10 (decorated allowlisted command) reads: a bare lead
+# (git status, ls), plus a glob-headed family (printf:*) so a granted tail
+# exercises guard_allow_match's :* normalization.
+mkdir -p "$SANDBOX/.claude"
+printf '%s\n' '{ "permissions": { "allow": ["Bash(git status)", "Bash(ls)", "Bash(printf:*)"] } }' \
+    >"$SANDBOX/.claude/settings.json"
+
 LOG="$SANDBOX/friction.log"
 
 # classify <rc> <stdout> — map an outcome onto a decision class.

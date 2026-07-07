@@ -45,5 +45,14 @@ fallthrough	: > tracked.txt
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
 
-# rule 10 — anything else falls through to the friction log
+# rule 10 — decorated allowlisted bare lead with an unmatched segment blocked;
+#           chaining steer, redirect steer, and the untouched non-firing cases
+block	git status && rm -rf tmp
+block	git status 2>&1
+fallthrough	git status
+fallthrough	frobnicate && git status
+fallthrough	git status && ls
+fallthrough	git status && printf done
+
+# rule 11 — anything else falls through to the friction log
 fallthrough	make build
