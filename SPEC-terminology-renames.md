@@ -13,10 +13,18 @@ external consumer exists.
    - the consumer config `scripts/friction-config.sh` → `scripts/guard-config.sh`,
      and the template `templates/friction-config.sh` → `templates/guard-config.sh`;
    - every `FRICTION_KIT_*` knob → `GUARD_KIT_*` (same `<KIT>_<KNOB>` shape);
-   - prose/registry references: README.md kit table, CLAUDE.md,
-     `.claude/commands/close.md` (friction-triage step), context-kit and
-     delegation-kit SPEC cross-references, `gate-sdk/checks/check-shellcheck.sh`
-     and `spec-kit/checks/check-comment-tier.sh` kit-root lists.
+   - prose/registry references: README.md kit table, `.claude/commands/close.md`
+     (friction-triage step), `.claude/settings.json` allowlist entries,
+     the `.gitignore` scratch-log comment, context-kit and delegation-kit SPEC
+     cross-references, `context-kit/templates/close-brevity.md`, and the
+     kit-root lists in `scripts/delegation-config.sh`,
+     `gate-sdk/checks/check-shellcheck.sh`, and
+     `spec-kit/checks/check-comment-tier.sh` (CLAUDE.md has no friction-kit
+     reference — only rename 2 touches it);
+   - the generated `scripts/git-hooks/pre-commit` and
+     `.workflow/CHECK-GRAPH.html` are **regenerated**
+     (`gen-pre-commit.sh --write`, `check-graph.sh --emit`), never
+     hand-edited, after the sweep.
    - **Not renamed:** the *concept* "permission friction" and the friction-log
      artifact names (`friction.log`, scan-prompts, close-stage friction
      triage) — the kit is the guard framework; friction is the phenomenon it
@@ -28,9 +36,11 @@ external consumer exists.
    (OK/PAUSE/STALE) for dispatch decisions — it blocks nothing. Renamed
    surfaces: the script, any `USAGE_GATE_*`-shaped knobs in
    `lib/delegation.sh` / `templates/delegation-config.sh` /
-   `scripts/delegation-config.sh`, `bin/run-usage-tests.sh`,
-   `templates/statusline-usage.sh`, the `/agent-execution` skill and its
-   templates, delegation-kit README/SPEC, CLAUDE.md.
+   `scripts/delegation-config.sh` (none exist today — the hedge is for
+   drift), `bin/run-usage-tests.sh`, `usage-tests/cases.tsv`,
+   `templates/statusline-usage.sh`, `smoke/install.sh`, the
+   `/agent-execution` skill and its templates, delegation-kit README/SPEC,
+   the root README.md kit-table row, CLAUDE.md.
 
 Both renames are one mechanical sweep each: `git mv` + a grep-driven
 reference pass; no behavior change.

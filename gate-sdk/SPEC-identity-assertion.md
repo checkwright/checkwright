@@ -12,7 +12,7 @@ mapping actually applied in this clone.
 ## What changes
 
 - **Component ruling: gate-sdk**, not the guard kit. The queue entry left
-  this open ("likely friction-kit (guard) or the setup story"); ruled
+  the owning kit open (the guard kit or the setup story); ruled
   gate-sdk because (a) guards intercept tool calls, while this is a
   repo-state assertion — gate territory; (b) the guard kit's
   registers-no-gates property is worth keeping; (c) the setup-story hook
