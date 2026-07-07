@@ -146,12 +146,18 @@ emit_graph() {
     header h1 { margin: 0 0 .35rem; font-size: 1.25rem; }
     header p { margin: .25rem 0; max-width: 68rem; }
     .status { font-size: .85rem; opacity: .7; }
-    main { padding: 1rem 1.5rem; overflow-x: auto; }
+    main { padding: 1rem 1.5rem; }
     .legend { margin-bottom: .75rem; font-size: .9rem; }
     .legend .valve { display: inline-block; width: 22px; border-top: 3px solid #d97706; }
+    .viewport { border: 1px solid #ddd; border-radius: 8px; padding: 16px;
+                background: #fafafa; overflow: auto; height: 78vh; cursor: grab; }
+    .viewport.grabbing { cursor: grabbing; }
+    .viewport svg { transform-origin: 0 0; max-width: none; }
+    .hint { margin: .5rem 0 0; font-size: .8rem; opacity: .6; }
     @media (prefers-color-scheme: dark) {
       body { background: #16181d; color: #e6e6e6; }
       header { border-color: #333; }
+      .viewport { border-color: #333; background: #0f1115; }
     }
   </style>
 </head>
@@ -174,7 +180,8 @@ emit_graph() {
     <div class="legend">
       <span><span class="valve"></span> cycle valve (valve=PROPOSED)</span>
     </div>
-    <div class="mermaid" id="diagram"></div>
+    <div class="mermaid viewport" id="diagram"></div>
+    <p class="hint">Ctrl/&#8984; + scroll to zoom &middot; drag to pan &middot; double-click to reset.</p>
   </main>
 
   <script type="module">
@@ -187,7 +194,40 @@ HEAD
 `;
     mermaid.initialize({ startOnLoad: false });
     const { svg } = await mermaid.render('graph', graph);
-    document.getElementById('diagram').innerHTML = svg;
+    const vp = document.getElementById('diagram');
+    vp.innerHTML = svg;
+
+    // Pan/zoom (self-contained; no external lib) — the platform diagram-assets
+    // approach: render the SVG at its natural, readable size in an overflow:auto
+    // box; Ctrl/Cmd+wheel scales the SVG, drag pans via native scroll, and
+    // double-click resets the zoom. Never shrink-to-fit — that makes a dense
+    // graph unreadable.
+    const el = vp.querySelector('svg');
+    el.style.transformOrigin = '0 0';
+    let zoom = 1;
+    const applyZoom = () => { el.style.transform = 'scale(' + zoom + ')'; };
+
+    vp.addEventListener('wheel', (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      zoom = Math.min(6, Math.max(0.4, zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1)));
+      applyZoom();
+    }, { passive: false });
+
+    let down = false, lx = 0, ly = 0;
+    vp.addEventListener('pointerdown', (e) => {
+      down = true; lx = e.clientX; ly = e.clientY;
+      vp.classList.add('grabbing'); vp.setPointerCapture(e.pointerId);
+    });
+    vp.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      vp.scrollLeft -= e.clientX - lx; vp.scrollTop -= e.clientY - ly;
+      lx = e.clientX; ly = e.clientY;
+    });
+    const end = () => { down = false; vp.classList.remove('grabbing'); };
+    vp.addEventListener('pointerup', end);
+    vp.addEventListener('pointercancel', end);
+    vp.addEventListener('dblclick', () => { zoom = 1; applyZoom(); });
   </script>
 </body>
 </html>
