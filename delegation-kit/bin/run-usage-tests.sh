@@ -29,7 +29,7 @@ fails=0
 ran=0
 now="$(date +%s)"
 
-# Columns (tab-separated): verdict exit pct age_off reset_off cred_age desc.
+# spec: delegation-kit/SPEC.md §Testing — cases.tsv columns (tab-separated):
 #   age_off    seconds subtracted from now for updated_at (0 = fresh reading)
 #   reset_off  seconds added to now for resets_at (<=0 = dead window)
 #   cred_age   seconds; '-' means no credentials file (skip the login-lag check)
@@ -49,8 +49,8 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age desc; do
         touch -d "@$(( now - cred_age ))" "$CRED"
     fi
 
-    # cwd = SANDBOX so the config lookup (scripts/delegation-config.sh) finds
-    # nothing and the gate runs on its own defaults, hermetic to the host repo.
+    # spec: delegation-kit/SPEC.md §Testing — cwd = SANDBOX so the config lookup
+    # finds nothing and the gate runs on its own defaults, hermetic to the host repo.
     out="$( cd "$SANDBOX" && bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
     ran=$((ran + 1))
 

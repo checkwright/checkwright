@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# delegation-kit consumer-smoke install — the executable form of README.md
-# §Install. Registers the tamper gate and regenerates the coupling artifacts.
-# The kit's other tools (usage-gate, the templates) need no registration — they
-# are invoked, not gated — so install coverage is the gate plus a live
-# usage-gate verdict on a crafted snapshot (self-verifying the extracted tool).
-# cwd = scratch-consumer root; SMOKE_KIT_ROOT = the vendored delegation-kit copy.
+# spec: delegation-kit/SPEC.md §Testing — consumer-smoke install (the executable
+# form of README.md §Install): registers the tamper gate, regenerates the
+# coupling artifacts, and drives one crafted snapshot through usage-gate — the
+# other tools are invoked not gated, so coverage is the gate plus a live verdict
+# on the extracted tool. cwd = scratch-consumer root; SMOKE_KIT_ROOT = the
+# vendored delegation-kit copy.
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
@@ -14,9 +14,6 @@ cat >> scripts/gates.list <<'EOF'
 check-gate-tamper
 EOF
 
-# Drive one crafted snapshot through usage-gate under zero config: a live,
-# over-threshold reading must PAUSE (exit 1). This self-verifies the extracted
-# tool inside the scratch consumer, not just the gate registration.
 snap="$(mktemp)"
 now="$(date +%s)"
 {
@@ -30,6 +27,5 @@ if bash "$SMOKE_KIT_ROOT/bin/usage-gate.sh" "$snap" >/dev/null 2>&1; then
 fi
 rm -f "$snap"
 
-# Regenerate the coupling artifacts check-graph asserts fresh (README steps).
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html

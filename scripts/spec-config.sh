@@ -24,11 +24,6 @@ SPEC_KIT_SCAN_KIT_ROOTS=1
 # exception-list: not-yet-swept sources (drain: comment-tier-sweep)
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
 SPEC_KIT_COMMENT_WHITELIST=(
-    delegation-kit/bin/run-usage-tests.sh          # until: comment-tier-sweep
-    delegation-kit/checks/check-gate-tamper.sh     # until: comment-tier-sweep
-    delegation-kit/lib/delegation.sh               # until: comment-tier-sweep
-    delegation-kit/smoke/install.sh                # until: comment-tier-sweep
-    delegation-kit/smoke/violation.sh              # until: comment-tier-sweep
     friction-kit/bin/run-guard-tests.sh            # until: comment-tier-sweep
     friction-kit/bin/scan-prompts.sh               # until: comment-tier-sweep
     friction-kit/lib/guard.sh                      # until: comment-tier-sweep

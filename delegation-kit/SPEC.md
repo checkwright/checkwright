@@ -177,7 +177,10 @@ delegation-kit/
 Config follows the established kit pattern: copy
 `templates/delegation-config.sh` into the gates dir (or point
 `DELEGATION_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults
-fill what the consumer left unset. Knobs (platform values as defaults):
+fill what the consumer left unset. The loader is fail-closed: a
+`DELEGATION_KIT_CONFIG_FILE` named but absent, or a config leaving any knob
+malformed, exits 2 (a broken machine gates nothing). Knobs (platform values
+as defaults):
 
 - `DELEGATION_KIT_USAGE_FILE` — default
   `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`; positional `$1`
@@ -214,9 +217,12 @@ verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario
 knobs (percentage, snapshot age offset, reset offset, credential age);
 `bin/run-usage-tests.sh` materializes each case as a generated snapshot
 file (timestamps must be computed relative to *now* — static fixtures
-would age into permanent STALE) and asserts verdict and exit code. Every
-verdict branch carries at least one firing and one non-firing case — the
-fixture-pair discipline, transplanted.
+would age into permanent STALE) and asserts verdict and exit code. Each
+case runs in a throwaway sandbox with no consumer config on the lookup
+path, so the gate exercises its own defaults hermetic to the host repo;
+`cases.tsv` columns are `verdict exit pct age_off reset_off cred_age desc`
+(the offsets seconds from *now*). Every verdict branch carries at least one
+firing and one non-firing case — the fixture-pair discipline, transplanted.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot

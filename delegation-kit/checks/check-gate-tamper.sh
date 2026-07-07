@@ -17,8 +17,7 @@ is_meta() {
     for pre in "${DELEGATION_KIT_META_PATHS[@]}"; do
         [[ "$p" == "$pre"* ]] && return 0
     done
-    # root-level *.md is always meta (a top-level doc, no directory prefix)
-    [[ "$p" == *.md && "$p" != */* ]] && return 0
+    [[ "$p" == *.md && "$p" != */* ]] && return 0  # root-level *.md is always meta
     return 1
 }
 
