@@ -1,17 +1,5 @@
 # shellcheck shell=bash
-# spec: friction-kit/SPEC.md §The guard framework — sourced library: hook
-# primitives + the harness-generic ruleset. No project toolchain rule content.
-#
-# Extracted from the governance meta-layer of a private production platform;
-# every toolchain- and product-coupled guard rule stayed behind — this file
-# carries only the harness-generic mechanism.
-#
-# A consumer guard sets GUARD_NAME, then sources this file, then invokes the
-# primitives / guard_generic_rules. Sourcing has no effect beyond defining
-# functions and filling the FRICTION_KIT_* knobs (config file first, then
-# platform-value defaults) — it never decides or exits on its own.
-
-# ---- config: consumer file first, then platform-value defaults --------------
+# spec: friction-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
 
 _frik_cfg="${FRICTION_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/friction-config.sh}"
 if [[ -f "$_frik_cfg" ]]; then
@@ -30,12 +18,6 @@ declare -p FRICTION_KIT_RO_BINS >/dev/null 2>&1 || FRICTION_KIT_RO_BINS=(
     grep egrep fgrep rg head tail cat wc sort uniq cut tr nl rev tac paste comm column diff jq find ls
 )
 
-# ---- primitives: each emits the harness PreToolUse hook protocol ------------
-
-# guard_read_command — parse the hook JSON on stdin, print .tool_input.command.
-# Returns non-zero (no output) on any parse problem or an empty command; the
-# caller pairs it with `|| exit 0` so a guard can never wedge the agent
-# (fail-open is the default posture).
 guard_read_command() {
     local input cmd
     input="$(cat 2>/dev/null)" || return 1
@@ -44,59 +26,41 @@ guard_read_command() {
     printf '%s' "$cmd"
 }
 
-# guard_block <msg> — deny (exit 2) with a self-describing message on stderr:
-# it names the offending pattern AND the corrective form, so the why of a rule
-# rides to the agent in the rejection itself.
 guard_block() {
     printf '%s\n' "${GUARD_NAME:-guard}: $1" >&2
     exit 2
 }
 
-# guard_advise <msg> — allow, but feed the message back as additionalContext
-# (steering without blocking).
 guard_advise() {
     printf '%s' "$1" | jq -Rc '{hookSpecificOutput:{hookEventName:"PreToolUse",additionalContext:.}}'
     exit 0
 }
 
-# guard_allow <reason> — silent grant via permissionDecision:allow.
 guard_allow() {
     jq -nc --arg r "$1" \
         '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow",permissionDecisionReason:$r}}'
     exit 0
 }
 
-# guard_rewrite <cmd> <reason> — behavior-preserving rewrite via updatedInput
-# (grant the better spelling of the same command).
 guard_rewrite() {
     jq -nc --arg c "$1" --arg r "$2" \
         '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"allow",permissionDecisionReason:$r,updatedInput:{command:$c}}}'
     exit 0
 }
 
-# guard_log_fallthrough <cmd> — append the (truncated, newline-flattened)
-# command to the friction log. Best-effort; never affects the decision.
 guard_log_fallthrough() {
     local fline
     fline="$(printf '%s' "$1" | tr '\n\t' '  ' | cut -c1-500)"
     printf '%s\n' "$fline" >>"$FRICTION_KIT_LOG" 2>/dev/null || true
 }
 
-# guard_allow_match <string> <pattern> — true when <string> matches the committed
-# allow <pattern> under shell-glob semantics, with the harness ':*' prefix idiom
-# (Bash(printf:*) ≡ any 'printf …') normalized to a trailing '*'. One
-# implementation shared by compare-settings-allow (redundancy detection) and
-# rule 10 (the silent-grant guard) so the two never drift.
 guard_allow_match() {
     local s="$1" glob="${2//:\*/\*}"
     # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
     [[ "$s" == $glob ]]
 }
 
-# ---- the harness-generic ruleset (order is load-bearing) --------------------
-
-# 1. `cd` in a compound command — cwd drift plus a permission prompt no
-#    allowlist entry suppresses.
+# spec: friction-kit/SPEC.md §The generic ruleset — rules 1-10 below; order is load-bearing
 guard_rule_cd_compound() {
     local cmd="$1"
     if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then
@@ -104,10 +68,6 @@ guard_rule_cd_compound() {
     fi
 }
 
-# 2. `git -C <repo-root>` when cwd is the root — the absolute -C target matches
-#    no allowlist entry and re-prompts; the bare `git` form is allowlisted.
-#    Pinned with a trailing space to the exact root, so a subdir or foreign -C
-#    is untouched.
 guard_rule_git_c_root() {
     local cmd="$1"
     if grep -qF "git -C $PWD " <<<"$cmd"; then
@@ -115,9 +75,6 @@ guard_rule_git_c_root() {
     fi
 }
 
-# 3. Bare-name scratch redirect — a >/>> to a slash-free *.err/*.out/*.log
-#    target lands in the tracked tree and risks a `git add -A`. The no-slash
-#    class lets path-bearing targets, /dev/null, and fd-dups through.
 guard_rule_scratch_redirect() {
     local cmd="$1"
     if grep -qE '(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\.(err|out|log)([[:space:]]|$)' <<<"$cmd"; then
@@ -125,10 +82,6 @@ guard_rule_scratch_redirect() {
     fi
 }
 
-# 4. Absolute-path execution of a repo script — a read-only one (roster
-#    FRICTION_KIT_RO_SCRIPTS) is silently rewritten to the repo-relative form
-#    the allowlist globs match; any other absolute repo-script spelling gets a
-#    corrective block. Placed before rule 5, which would steer less precisely.
 guard_rule_abs_script() {
     local cmd="$1" rest base g relcmd
     case "$cmd" in
@@ -149,9 +102,6 @@ guard_rule_abs_script() {
     guard_block "use the repo-relative form '$rest' (cwd is the repo root) — it's allowlisted and won't re-prompt; the absolute spelling isn't. If you truly need the absolute path, run it yourself with !<command>."
 }
 
-# 5. Repo-root absolute prefix (non-script) — any other command carrying the
-#    literal repo-root prefix is steered to the repo-relative spelling. `git`
-#    is excluded; rule 2 already owns its -C handling.
 guard_rule_abs_prefix() {
     local cmd="$1"
     [[ "$cmd" == git\ * ]] && return 0
@@ -160,12 +110,6 @@ guard_rule_abs_prefix() {
     fi
 }
 
-# 6. Shell expansion / assignment — a residual ${…}/$(…)/<(…)/$NAME after
-#    single-quoted regions are stripped is blocked (the harness prompts on
-#    every expansion before allowlist matching). Only single-quoted regions
-#    are stripped: inside single quotes $ is literal (awk '$1'), but a
-#    double-quoted "$x" still expands and must stay visible. A standalone
-#    NAME=value assignment is caught separately.
 guard_rule_expansion() {
     local cmd="$1" sqexp expn
     sqexp="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
@@ -178,23 +122,10 @@ guard_rule_expansion() {
     fi
 }
 
-# 7. Unquoted brace glyph — the harness prompts on the bare `{` glyph before
-#    allowlist matching, the same class rule 6 pre-empts for `$`-expansions. A
-#    `{` that survives rule 6's single-quote strip is handled by shape:
-#    a bare `{}` exec/xargs placeholder (every residual brace is exactly `{}`)
-#    is single-quoted in place — a behavior-preserving rewrite the matcher
-#    passes, since a literal `{}` inside single quotes reaches the tool
-#    unchanged; every expanding form is blocked with the written-out corrective
-#    (`@{…}` git-ref shorthand, `{a,b}`/`{a..b}` list/range, or any other
-#    residual `{`). There is no legitimate brace-glob convenience to preserve:
-#    every unquoted brace already costs an operator prompt no allowlist entry
-#    can suppress, so block-and-steer strictly dominates. Placed before both
-#    auto-allow rules (8, 9) so their literal-target premise holds for braces.
 guard_rule_brace_glyph() {
     local cmd="$1" sqstripped resid ph='{}' q="'{}'"
     sqstripped="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
     case "$sqstripped" in *'{'*) ;; *) return 0 ;; esac
-    # Bare `{}` placeholder: nothing but `{}` braces survive → single-quote each.
     resid="${sqstripped//"$ph"/}"
     case "$resid" in
         *'{'* | *'}'*) ;;   # a non-placeholder brace remains: fall to the blocks
@@ -210,12 +141,6 @@ guard_rule_brace_glyph() {
     guard_block "single-quote the '{' if it's literal (an awk/sed program in double quotes), or write it out if it expands — the harness prompts on every bare '{' glyph before allowlist matching."
 }
 
-# 8. Auto-allow `: > file` truncation — a leading `:` plus redirect defeats the
-#    permission matcher, so it always prompts. Granted silently when the
-#    command is only `:` followed by redirects and every target is gitignored:
-#    truncating scratch is safe; a tracked file must still prompt. Expansions
-#    (rule 6) and brace forms (rule 7) are already blocked, so a surviving
-#    target is a literal path.
 guard_rule_truncate_scratch() {
     local cmd="$1"
     if [[ "$cmd" =~ ^[[:space:]]*:([[:space:]]+[0-9]*\>\>?[[:space:]]*[^[:space:]\&\|\;\<]+)+[[:space:]]*$ ]]; then
@@ -231,12 +156,6 @@ guard_rule_truncate_scratch() {
     fi
 }
 
-# 9. Auto-allow read-only pipeline — granted silently when every pipe segment
-#    leads with a roster binary (FRICTION_KIT_RO_BINS) and every redirect
-#    target is /dev/null or an fd-dup. Conservative by construction: command/
-#    process substitution, a leftover quote after stripping, any statement
-#    separator, a non-/dev/null redirect, or a `find` with a write action all
-#    refuse and fall through.
 guard_rule_ro_pipeline() {
     local raw="$1"
     grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
@@ -272,18 +191,6 @@ guard_rule_ro_pipeline() {
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
-# 10. Decorated allowlisted command — the leading command exactly matches a
-#     committed *bare* allow entry (a Bash(<cmd>) with no glob) but the command
-#     decorates it (&&/;/| chaining, a trailing redirect, 2>&1), which forces a
-#     permission prompt no allowlist entry suppresses. Blocked with a steer to
-#     the bare form. Fail-open: no jq, no settings file, or a parse error and the
-#     rule silently declines and falls through. Never intercepts a silent grant —
-#     it fires only when the decoration is not itself allowlisted (a compound
-#     whose every segment matches the committed allowlist is granted without a
-#     prompt, and blocking it would regress). Reads FRICTION_KIT_SETTINGS;
-#     segment matching reuses guard_allow_match (shared with compare-settings-
-#     allow). Placed after the auto-allow rules so a silently granted read-only
-#     pipeline (rule 9) never reaches it.
 guard_rule_allowlist_chain() {
     local cmd="$1"
     command -v jq >/dev/null 2>&1 || return 0
@@ -293,10 +200,6 @@ guard_rule_allowlist_chain() {
     mapfile -t allow_entries < <(jq -r '.permissions.allow[]?' "$FRICTION_KIT_SETTINGS" 2>/dev/null) || return 0
     [[ ${#allow_entries[@]} -gt 0 ]] || return 0
 
-    # bare_leads: Bash(<cmd>) inners with no glob — the only entries a lead may
-    # match (glob-headed families coexist with allowlisted decorators; scope
-    # ruling "bare entries only for the lead"). pattern_inners: every inner,
-    # for matching the non-leading segments in the silent-grant guard.
     local e inner
     local -a bare_leads pattern_inners
     for e in "${allow_entries[@]}"; do
@@ -307,10 +210,6 @@ guard_rule_allowlist_chain() {
     done
     [[ ${#bare_leads[@]} -gt 0 ]] || return 0
 
-    # Skeleton: single- and double-quoted regions dropped so a separator inside
-    # quotes never mis-splits the command — the safe direction (a shorter
-    # segment matches a glob more readily, so the guard errs toward declining,
-    # keeping false steers at zero per the scope ruling).
     local skel
     skel="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
 
@@ -320,7 +219,6 @@ guard_rule_allowlist_chain() {
     local lead="${segs[0]}"
     lead="${lead#"${lead%%[![:space:]]*}"}"; lead="${lead%"${lead##*[![:space:]]}"}"
 
-    # lead_core: the lead with any trailing redirect (>, >>, <, 2>&1, …) stripped.
     local lead_core
     lead_core="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$lead")"
     lead_core="${lead_core#"${lead_core%%[![:space:]]*}"}"; lead_core="${lead_core%"${lead_core##*[![:space:]]}"}"
@@ -333,15 +231,10 @@ guard_rule_allowlist_chain() {
 
     local steer="run '$lead_core' bare — it's a statically allowlisted command, but the decoration (chaining or a redirect) forces a permission prompt no allowlist entry suppresses. Run the allowlisted command on its own; issue the rest as separate calls."
 
-    # Redirect on the lead itself: the harness never granted this spelling, so
-    # blocking it costs no extra prompt and steers to the bare form.
     [[ "$lead" != "$lead_core" ]] && guard_block "$steer"
 
-    # No chaining and no redirect: the bare form itself — nothing to steer.
     [[ ${#segs[@]} -le 1 ]] && return 0
 
-    # Chaining: fire unless every non-leading segment is itself allowlisted (a
-    # full silent grant the harness passes without a prompt — never intercept it).
     local seg p i seg_matched
     for ((i = 1; i < ${#segs[@]}; i++)); do
         seg="${segs[i]}"
@@ -356,8 +249,6 @@ guard_rule_allowlist_chain() {
     return 0
 }
 
-# guard_generic_rules <cmd> — run rules 1-10 in the load-bearing order. Rule 11
-# (fall-through logging) is the caller's last line, after this returns.
 guard_generic_rules() {
     local cmd="$1"
     guard_rule_cd_compound "$cmd"

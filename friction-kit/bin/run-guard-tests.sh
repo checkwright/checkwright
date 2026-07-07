@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
-# spec: friction-kit/SPEC.md §Testing — decision-table runner for the guard.
-#
-# The gate contracts do not fit a hook (a guard speaks exit-2 + hook JSON, not
-# OK:/FAIL: lines), so the kit ships this instead of gate-tests/. cases.tsv
-# pairs an expected decision (block/advise/allow/rewrite/fallthrough) with a
-# command; this feeds each through the *template* guard as hook JSON on stdin
-# and asserts the exit code + output class. Every generic rule carries at least
-# one firing and one non-firing case (the fixture-pair discipline).
-#
-# Cases run inside one git sandbox whose path replaces the literal @ROOT@, so a
-# $PWD-coupled rule (git -C <root>, abs-script, abs-prefix) resolves against a
-# known root and the `: >` gitignored auto-allow sees real git state.
+# spec: friction-kit/SPEC.md §Testing — decision-table runner for the guard
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -28,16 +17,12 @@ trap 'rm -rf "$SANDBOX"' EXIT
 git -C "$SANDBOX" init -q
 printf 'scratch.txt\n.tmp/\nfriction.log\n' >"$SANDBOX/.gitignore"
 
-# Committed allowlist rule 10 (decorated allowlisted command) reads: a bare lead
-# (git status, ls), plus a glob-headed family (printf:*) so a granted tail
-# exercises guard_allow_match's :* normalization.
 mkdir -p "$SANDBOX/.claude"
 printf '%s\n' '{ "permissions": { "allow": ["Bash(git status)", "Bash(ls)", "Bash(printf:*)"] } }' \
     >"$SANDBOX/.claude/settings.json"
 
 LOG="$SANDBOX/friction.log"
 
-# classify <rc> <stdout> — map an outcome onto a decision class.
 classify() {
     local rc="$1" out="$2"
     if [[ "$rc" -eq 2 ]]; then echo block; return; fi

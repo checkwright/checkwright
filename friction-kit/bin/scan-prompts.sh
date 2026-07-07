@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
-# spec: friction-kit/SPEC.md §scan-prompts — surface recurring permission-prompt
-# sources from the fall-through log.
-#
-# Advisory (triaged at close, never a gate). Filters the friction log against
-# the committed allowlist and the harness's built-in read-only git/docker
-# auto-allows, so only commands that actually prompted remain; groups and ranks
-# them by pattern. `--count` emits a compact <patterns>/<occurrences> token for
-# a drift-KPI consumer; an explicit file argument overrides the log path.
+# spec: friction-kit/SPEC.md §scan-prompts — rank recurring prompt sources from the friction log
 set -uo pipefail
 
 BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,9 +47,6 @@ allowed() {
     [[ "$t1" == "docker" && "$DOCKER_RO" == *" $t2 "* ]] && return 0
     for p in "${ALLOW[@]}"; do
         [[ -z "$p" ]] && continue
-        # Normalize the harness `:*` idiom to a trailing `*` (Bash(cargo build:*)
-        # ≡ any `cargo build …`), then glob-match — same semantics as
-        # compare-settings-allow.
         glob="${p//:\*/\*}"
         # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
         [[ "$c" == $glob ]] && return 0
