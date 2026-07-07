@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
 # spec: lifecycle-kit/SPEC.md §check-stage-evidence — the header's current stage carries a matching skill-invocation stamp; stamp grammar + staleness
-#
-# usage: check-stage-evidence.sh [queue-file [state-file]]
-#   Defaults: the configured queue and workflow-state files, resolved from the
-#   cwd (the pre-commit hook runs at the repo root; a fixture case dir carries
-#   its own copies).
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -44,11 +39,7 @@ fi
 
 errors=()
 found=0
-# Cross-stage session distinctness: a session id is a context boundary, so two
-# *different* stages of the current iteration may not share one — a stage flip
-# demands a fresh session. Same-stage re-entries (a multi-session build) may
-# share or rotate ids freely; waiver-token stamps are exempt (not a stage, so
-# they never enter this map). Keyed session-id → the one stage that owns it.
+# spec: lifecycle-kit/SPEC.md §check-stage-evidence — cross-stage session-id distinctness (a stage flip is a context boundary)
 declare -A stage_of_sid=()
 while IFS= read -r line; do
     read -r f1 f2 f3 f4 rest <<<"$line"

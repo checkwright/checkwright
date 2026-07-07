@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
 # spec: lifecycle-kit/SPEC.md §check-stage-entry — prior-stage invocation-stamp ordering + drain-entry queue-empty + audit-trigger signal
-#
-# usage: check-stage-entry.sh [queue-file [state-file]]
-#   Defaults: the configured queue and workflow-state files, resolved from the
-#   cwd (the pre-commit hook runs at the repo root; a fixture case dir carries
-#   its own copies).
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -78,11 +73,7 @@ if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" 
     fail_closed "$st" STAGE-ENTRY "awk audit-stamp scan"
 
     if [[ "$audit_stamp" != "1" ]]; then
-        # A roster/amendment file under a templates/ directory is a copyable
-        # stub, not governed content — the same rationale spec-kit's finders
-        # apply (spec-kit/lib/spec.sh spec_amendments). Excluding it keeps a
-        # shipped SPEC-amendment.md template from reading as a live amendment
-        # in a second component dir and false-firing the cross-component signal.
+        # spec: lifecycle-kit/SPEC.md §check-stage-entry — templates/ paths excluded (a shipped stub is not a live amendment)
         declare -A roster=()
         while IFS= read -r sf; do
             [[ -n "$sf" ]] || continue

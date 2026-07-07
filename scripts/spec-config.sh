@@ -35,13 +35,6 @@ SPEC_KIT_COMMENT_WHITELIST=(
     gate-sdk/lib/gate.sh                           # until: comment-tier-sweep
     gate-sdk/smoke/install.sh                      # until: comment-tier-sweep
     gate-sdk/smoke/violation.sh                    # until: comment-tier-sweep
-    lifecycle-kit/bin/enter-stage.sh               # until: comment-tier-sweep
-    lifecycle-kit/bin/session-id.sh                # until: comment-tier-sweep
-    lifecycle-kit/checks/check-stage-entry.sh      # until: comment-tier-sweep
-    lifecycle-kit/checks/check-stage-evidence.sh   # until: comment-tier-sweep
-    lifecycle-kit/lib/stages.sh                    # until: comment-tier-sweep
-    lifecycle-kit/smoke/install.sh                 # until: comment-tier-sweep
-    lifecycle-kit/smoke/violation.sh               # until: comment-tier-sweep
     scripts/bash-guard.sh                          # until: comment-tier-sweep
     scripts/context-config.sh                      # until: comment-tier-sweep
     scripts/delegation-config.sh                   # until: comment-tier-sweep
