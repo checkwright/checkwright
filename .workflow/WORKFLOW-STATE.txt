@@ -19,3 +19,4 @@ context-kit build 03b9e117 2026-07-07
 context-kit build 5f3c508f 2026-07-07
 context-kit build 0e54cba0 2026-07-07
 context-kit build 716cba8b 2026-07-07
+context-kit validate 79af51a5 2026-07-07
