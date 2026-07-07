@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
-#
-# The consumer's surface vocabulary (the platform rule content the extraction
-# seam keeps out of the kit) is optional config: <gates-dir>/graph-vocab.sh may
-# define GRAPH_VOCAB, GRAPH_LEADING, GRAPH_LAGGING, GRAPH_LAYERS, and
-# graph_surface_layer(). Absent config: vocabulary membership is not checked,
-# the leading/lagging sets are empty, and the graph renders as a single layer.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -200,18 +194,13 @@ HEAD
 TAIL
 }
 
-# spec: gate-sdk/SPEC.md §check-graph (assertion G) — validate `# graph:` manifests
-# embedded in SPEC-*.md amendment bodies at authoring time. couples=/trigger=
-# tokens are glob-syntax-only (the coupled surface may be design-ahead); tier/hook
-# parity is not applied (the gate they describe is unbuilt, no hook block to compare).
+# spec: gate-sdk/SPEC.md §check-graph (assertion G) — validate `# graph:` manifests in SPEC-*.md amendment bodies
 valid_glob_token() {
     local t="$1"
     [[ -n "$t" ]] || return 1
     [[ "$t" =~ ^[A-Za-z0-9._*?/-]+$ ]]
 }
 
-# Emit `<file>\t<kv-string>` for each `# graph: …` manifest body: inline
-# backtick spans + non-proto fenced lead lines.
 extract_amend_manifests() {
     awk '
     function emit_inline(line,   s, span) {
@@ -241,8 +230,6 @@ extract_amend_manifests() {
     ' "$@"
 }
 
-# Validate one manifest body, appending findings to g_errors. A `# graph:` span
-# with no recognized key= is a prose mention, not a manifest — skip it.
 validate_amend_manifest() {
     local file="$1" span="$2" tok
     [[ "$span" =~ (^|[[:space:]])(couples|dir|valve|tier|mode|trigger|gen)= ]] || return 0
@@ -305,8 +292,6 @@ validate_amend_manifest() {
     fi
 }
 
-# Scan SPEC-*.md amendments under $1 (cwd in --amend-only mode; the repo root
-# in the default run), gate-tests fixtures excluded.
 amendment_findings() {
     local root="$1" file span
     local -a files
@@ -318,8 +303,6 @@ amendment_findings() {
     done < <(extract_amend_manifests "${files[@]}")
 }
 
-# Fixturable mode: validate only amendment-body manifests under the given dir
-# (default cwd; used by the good/bad fixture pair).
 if [[ "${1:-}" == "--amend-only" ]]; then
     g_errors=()
     amendment_findings "${2:-.}"
@@ -338,8 +321,6 @@ fi
 [[ "${1:-}" == "--emit" ]] && { emit_graph; exit 0; }
 
 in_vocab() {
-    # No declared vocabulary -> membership is not checked (the vocabulary is
-    # consumer rule content, not kit mechanism).
     [[ ${#GRAPH_VOCAB[@]} -eq 0 ]] && return 0
     local t="$1" v
     for v in "${GRAPH_VOCAB[@]}"; do [[ "$t" == "$v" ]] && return 0; done
@@ -352,11 +333,8 @@ covered_by() {
     for t in "$@"; do
         [[ "$t" == "*" ]] && return 0
         [[ "$t" == "$s" ]] && return 0
-        # A literal-path surface matched by a trigger glob (bash glob; `*` spans '/',
-        # matching the generated hook's staged_matches semantics).
         # shellcheck disable=SC2053  # $t is deliberately unquoted: it is the glob
         [[ "$s" != *[\*\?]* && "$s" == $t ]] && return 0
-        # A `*.<suffix>` type-glob trigger covers any surface glob sharing the suffix.
         [[ "$t" == \*.* && "$s" == *"${t#\*}" ]] && return 0
     done
     return 1

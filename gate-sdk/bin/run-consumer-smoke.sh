@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §Consumer smoke — scratch-consumer install+violation harness (a bin/ tool, never a registered gate)
-#
-# usage: run-consumer-smoke.sh [--keep] [kit-root...]
-#   Builds a scratch consumer in a fresh temp dir, vendors each kit root by copy,
-#   runs each kit's smoke/install.sh (gate-sdk first, then argument order), and
-#   asserts the full battery is green under ZERO consumer config. Then, per kit
-#   shipping smoke/violation.sh, fires one crafted violation, asserts the battery
-#   goes red at the named gate, and restores the tree; asserts green once more
-#   after the last restore. Kit roots default to gate_kit_roots resolution.
-#
-#   It builds a repo and runs the battery repeatedly, so it is pre-commit-unfit
-#   by runtime budget and is never a registered gate. Exit 0 all assertions
-#   hold, 1 an assertion failed, 2 usage/environment.
-#
-#   --keep retains the temp dir and prints its path (the temp-dir write's named
-#   reclaim path); otherwise it is removed on exit.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -31,8 +16,6 @@ for a in "$@"; do
     esac
 done
 
-# Resolve kit roots: explicit args, else gate_kit_roots. gate-sdk (this kit)
-# installs first; the rest follow in resolution/argument order.
 roots=()
 if [[ ${#kit_args[@]} -gt 0 ]]; then
     for r in "${kit_args[@]}"; do
@@ -43,7 +26,6 @@ else
     while IFS= read -r r; do roots+=("$r"); done < <(gate_kit_roots)
 fi
 
-# Order gate-sdk first.
 ordered=("$SDK")
 for r in "${roots[@]}"; do
     [[ "$r" == "$SDK" ]] && continue
@@ -51,7 +33,6 @@ for r in "${roots[@]}"; do
 done
 roots=("${ordered[@]}")
 
-# Every kit root must ship smoke/install.sh (the kit-landing contract).
 for r in "${roots[@]}"; do
     [[ -f "$r/smoke/install.sh" ]] || {
         echo "run-consumer-smoke: $r has no smoke/install.sh — a vendored kit must ship one" >&2
@@ -76,12 +57,10 @@ git -C "$SCRATCH" add -A
 git -C "$SCRATCH" -c user.email=smoke@example.invalid -c user.name=smoke \
     commit -q --allow-empty -m "seed"
 
-# Vendor each kit root by copy (basename under the scratch root).
 for r in "${roots[@]}"; do
     cp -R "$r" "$SCRATCH/$(basename "$r")"
 done
 
-# --- install phase --------------------------------------------------------
 installed=0
 for r in "${roots[@]}"; do
     kit="$(basename "$r")"
@@ -92,12 +71,10 @@ for r in "${roots[@]}"; do
     installed=$((installed + 1))
 done
 
-# Commit the installed baseline (so a violation restore returns to green).
 git -C "$SCRATCH" add -A
 git -C "$SCRATCH" -c user.email=smoke@example.invalid -c user.name=smoke \
     commit -q --no-verify -m "installed baseline"
 
-# --- assert green under zero config ---------------------------------------
 run_battery() { ( cd "$SCRATCH" && bash gate-sdk/bin/run-gates.sh ) 2>&1; }
 
 out="$(run_battery)"; rc=$?
@@ -108,11 +85,7 @@ if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
     exit 1
 fi
 
-# --- violation phase ------------------------------------------------------
-# Full reset to the committed baseline: unstage + restore tracked files + drop
-# untracked. `git reset --hard` (not `checkout -- .`) is required because a
-# violation may `git add` its shape — an index-reading gate like check-gate-tamper
-# only sees staged changes, and checkout leaves the index dirty.
+# spec: gate-sdk/SPEC.md §Consumer smoke — hard reset (not checkout) so a violation that staged its shape is unstaged too
 restore() { ( cd "$SCRATCH" && git reset -q --hard && git clean -qfd ); }
 
 fired=0
@@ -146,7 +119,6 @@ for r in "${roots[@]}"; do
     fired=$((fired + 1))
 done
 
-# Green once more after the last restore.
 out="$(run_battery)"; rc=$?
 if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
     echo "CONSUMER-SMOKE: FAIL — the battery did not return to green after the final restore"

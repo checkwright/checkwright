@@ -24,13 +24,6 @@ SPEC_KIT_SCAN_KIT_ROOTS=1
 # exception-list: not-yet-swept sources (drain: comment-tier-sweep)
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
 SPEC_KIT_COMMENT_WHITELIST=(
-    gate-sdk/bin/gen-pre-commit.sh                 # until: comment-tier-sweep
-    gate-sdk/bin/run-consumer-smoke.sh             # until: comment-tier-sweep
-    gate-sdk/bin/run-gate-tests.sh                 # until: comment-tier-sweep
-    gate-sdk/checks/check-graph.sh                 # until: comment-tier-sweep
-    gate-sdk/lib/gate.sh                           # until: comment-tier-sweep
-    gate-sdk/smoke/install.sh                      # until: comment-tier-sweep
-    gate-sdk/smoke/violation.sh                    # until: comment-tier-sweep
     scripts/bash-guard.sh                          # until: comment-tier-sweep
     scripts/context-config.sh                      # until: comment-tier-sweep
     scripts/delegation-config.sh                   # until: comment-tier-sweep

@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §gen-pre-commit — generated pre-commit hook (emit from the
-# gate manifests; check-graph asserts the committed hook equals --emit).
-#
-# Emits <hooks-dir>/pre-commit from the per-gate `# graph:` manifests. A
-# tier=precommit gate becomes one trigger block; trigger=/mode= shape it; a
-# gen=manual gate's body is preserved from the sentinel region in the current
-# hook.
-#
-#   bash gate-sdk/bin/gen-pre-commit.sh --emit    # print to stdout (check-graph uses this)
-#   bash gate-sdk/bin/gen-pre-commit.sh --write   # rewrite <hooks-dir>/pre-commit
+# spec: gate-sdk/SPEC.md §gen-pre-commit — emit <hooks-dir>/pre-commit from the per-gate graph: manifests; check-graph asserts the committed hook equals --emit
 set -euo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -28,13 +19,11 @@ HOOK="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}/pre-commit"
 
 mapfile -t CHECKS < <(gates_list_members "$LIST")
 
-# Kit check dirs, relativized so the emitted hook invokes repo-relative paths.
 REL_DIRS=("$GATES_DIR")
 while IFS= read -r k; do
     REL_DIRS+=("$(realpath --relative-to="$REPO_ROOT" "$k")/checks")
 done < <(gate_kit_roots)
 
-# Resolve a member to the repo-relative path the emitted hook will invoke.
 resolve_rel() {
     gate_resolve "$1" "${REL_DIRS[@]}"
 }

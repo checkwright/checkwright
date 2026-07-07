@@ -226,8 +226,10 @@ full battery is green under **zero consumer config** (the positive green token
 `All N gates passed` — the defaults-on-a-vendored-tree assertion no fixture
 suite makes). Per kit shipping `smoke/violation.sh` it fires one crafted
 violation, re-runs the battery, asserts a non-zero exit **and** a `FAIL:`
-line naming the expected gate, then restores the tree (`git checkout . &&
-git clean -fd`) before the next kit; it asserts green once more after the last
+line naming the expected gate, then restores the tree (`git reset --hard &&
+git clean -fd` — a hard reset, not `git checkout`, so a violation that staged
+its shape is unstaged too: an index-reading gate like `check-gate-tamper` sees
+only the index) before the next kit; it asserts green once more after the last
 restore. Exit codes follow the gate convention (0 all hold, 1 an assertion
 failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
 (<n> kits installed, <m> violations fired)`. `--keep` retains the temp dir and
@@ -246,11 +248,12 @@ checklist; a kit root lacking `smoke/` is an environment error (exit 2).
   harness with exit 2 (a broken installer is an environment failure, not a gate
   finding).
 - `smoke/violation.sh` (optional) — same cwd/env contract; mutates the scratch
-  tree to introduce exactly one violation restorable by `git checkout` +
-  `git clean` (edit a tracked file or add an untracked one), and prints the
-  expected gate name as its first stdout line (the harness's red-phase assertion
-  reads it). A kit without one contributes install coverage only; the harness
-  prints a notice per such kit so the gap is visible in the evidence. The file
+  tree to introduce exactly one violation the harness restore (`git reset --hard`
+  + `git clean`) reverses (edit a tracked file, add an untracked one, or stage a
+  shape), and prints the expected gate name as its first stdout line (the
+  harness's red-phase assertion reads it). A kit without one contributes install
+  coverage only; the harness prints a notice per such kit so the gap is visible
+  in the evidence. The file
   is rightly absent only where no battery-reddening violation is craftable —
   a kit that registers no gates has nothing to redden.
 

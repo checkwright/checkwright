@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §run-gate-tests — golden-fixture test runner for the check-* gate family
-#
-# usage: run-gate-tests.sh [tests-dir [gate-dir...]]
-#   tests-dir defaults to $GATE_SDK_TESTS_DIR (default: <gates-dir>/gate-tests).
-#   Each <tests-dir>/<gate>/ holds a good/ + bad/ case pair; the gate under
-#   test resolves against the given gate-dirs (default: the consumer gates dir,
-#   then each vendored kit's checks/). <tests-dir>/*.test.sh unit tests also run.
-#
-# The kit's own fixtures run as:
-#   gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -22,7 +13,6 @@ if [[ $# -gt 1 ]]; then
 else
     mapfile -t GATE_DIRS < <(gate_check_dirs)
 fi
-# Absolute-ize so resolution survives the per-case cd.
 resolved=()
 for d in "${GATE_DIRS[@]}"; do
     [[ -d "$d" ]] && resolved+=("$(cd "$d" && pwd)")
