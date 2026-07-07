@@ -80,9 +80,10 @@ fi
 #    consumer judgment; the platform's delegation nudge is the exemplar.
 case "$stage" in
     align | build)
-        echo "Delegation is the primary token lever — read-heavy cross-SPEC audits and"
-        echo "mechanical rename/merge sweeps go to a sub-agent (delegation-kit/templates/"
-        echo "agent-execution.md is the protocol)."
+        echo "Delegation is the primary token lever and is pre-authorized here: send"
+        echo "read-heavy cross-SPEC audits and mechanical rename/merge sweeps to a sub-agent"
+        echo "without waiting to be asked — this standing licence satisfies the Agent tool's"
+        echo "ask-first default (delegation-kit/templates/agent-execution.md is the protocol)."
         echo
         ;;
 esac
