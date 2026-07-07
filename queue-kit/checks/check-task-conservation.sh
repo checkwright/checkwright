@@ -27,8 +27,6 @@ if ! git show "HEAD:$FILE" >"$head_tmp" 2>/dev/null; then
 fi
 [[ -f "$FILE" ]] || { echo "check-task-conservation: worktree file not found: $FILE" >&2; exit 2; }
 
-# Worktree present set = live ∪ done (a HEAD-live slug is conserved if it is
-# still live or has moved to done).
 declare -A present=()
 while IFS= read -r s; do [[ -n "$s" ]] && present["$s"]=1; done < <(queue_live_slugs "$FILE")
 while IFS= read -r s; do [[ -n "$s" ]] && present["$s"]=1; done < <(queue_done_slugs "$FILE")

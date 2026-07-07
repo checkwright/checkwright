@@ -42,11 +42,6 @@ SPEC_KIT_COMMENT_WHITELIST=(
     lifecycle-kit/lib/stages.sh                    # until: comment-tier-sweep
     lifecycle-kit/smoke/install.sh                 # until: comment-tier-sweep
     lifecycle-kit/smoke/violation.sh               # until: comment-tier-sweep
-    queue-kit/checks/check-queue-wrap.sh           # until: comment-tier-sweep
-    queue-kit/checks/check-task-conservation.sh    # until: comment-tier-sweep
-    queue-kit/lib/queue.sh                         # until: comment-tier-sweep
-    queue-kit/smoke/install.sh                     # until: comment-tier-sweep
-    queue-kit/smoke/violation.sh                   # until: comment-tier-sweep
     scripts/bash-guard.sh                          # until: comment-tier-sweep
     scripts/context-config.sh                      # until: comment-tier-sweep
     scripts/delegation-config.sh                   # until: comment-tier-sweep
