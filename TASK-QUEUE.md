@@ -93,7 +93,9 @@
 - **adoption-track** [needs-spec] — the outward-facing rung: docs site, demo
   walkthrough, announcement post, plugin-marketplace presence; this is the
   path that makes any absorption/standardization outcome possible; scope it
-  as its own iteration post kit 7.
+  as its own iteration post kit 7. Evidence artifact: upstream Claude Code
+  issue #75214 (project config can't lift the Task ask-first default),
+  surfaced dogfooding this repo's delegation nudge 2026-07-07.
 ## Done
 
 - allowlist-chain-steer-rule
