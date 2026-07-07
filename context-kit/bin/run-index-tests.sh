@@ -23,8 +23,9 @@ UPDATE=0
 
 mkdir -p "$EXPECTED"
 
-# Golden output carries repo-relative paths (git top-level based); normalize the
-# leading path so the goldens stay location-independent: keep from `corpus/` on.
+# spec: context-kit/SPEC.md §Testing — goldens carry corpus-relative paths so
+# they stay location-independent; normalize the git-top prefix, keeping from
+# `corpus/` on.
 norm() { sed 's#^[^ ]*/corpus/#corpus/#'; }
 
 pass=0; fail=0; harness=0
@@ -59,8 +60,9 @@ check md-index   "$EXPECTED/md-index.txt"   bash "$BIN/md-index.sh"   "$CORPUS/s
 check md-section "$EXPECTED/md-section.txt" bash "$BIN/md-section.sh" "$CORPUS/sample.md" "Code First"
 check pub-index  "$EXPECTED/pub-index.txt"  bash "$BIN/pub-index.sh"  "$CORPUS/sample.rs"
 
-# always-loaded needs its array/command knobs, so drive it through a throwaway
-# config pointing every knob at the corpus (absolute paths survive its cd).
+# spec: context-kit/SPEC.md §Testing — always-loaded needs its array/command
+# knobs, so drive it through a throwaway config pointing every knob at the
+# corpus (absolute paths survive its cd).
 cfg="$(mktemp)"
 trap 'rm -f "$cfg"' EXIT
 {

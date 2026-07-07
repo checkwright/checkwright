@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# context-kit consumer-smoke violation — appends an over-budget bullet that cites
-# a deeper doc to CLAUDE.md §"## Shared conventions" (the last section, so the
-# bullet lands inside it), reddening check-brevity. First stdout line names the
-# expected FAIL gate; git reset --hard restores the tree.
+# spec: context-kit/SPEC.md §Testing — context-kit consumer-smoke violation:
+# appends an over-budget bullet that cites a deeper doc to CLAUDE.md §"## Shared
+# conventions" (the last section, so it lands inside), reddening check-brevity.
+# First stdout line names the expected FAIL gate; git reset --hard restores the tree.
 set -euo pipefail
 
 echo "check-brevity"

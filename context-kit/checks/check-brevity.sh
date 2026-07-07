@@ -17,7 +17,6 @@ SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-# ---- config: consumer file first, then platform-value defaults --------------
 _ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/context-config.sh}"
 if [[ -f "$_ck_cfg" ]]; then
     # shellcheck source=/dev/null  # consumer config path is resolved at runtime
@@ -31,7 +30,6 @@ unset _ck_cfg
 [[ "$CONTEXT_KIT_BREVITY_BUDGET" =~ ^[0-9]+$ ]] \
     || { echo "check-brevity: CONTEXT_KIT_BREVITY_BUDGET must be an integer: $CONTEXT_KIT_BREVITY_BUDGET" >&2; exit 2; }
 
-# ---- resolve the governed file ----------------------------------------------
 if [[ $# -gt 0 ]]; then
     BREVITY_FILE="$1"
 else
@@ -43,53 +41,59 @@ fi
 
 BUDGET="$CONTEXT_KIT_BREVITY_BUDGET"
 
+# spec: context-kit/SPEC.md §The brevity gate — one pass over the governed file:
+# find the budgeted section by heading, then per `- **name:**` bullet emit its
+# line span, whether it cites a deeper doc (pointer_re), and its exempt flag.
+read -r -d '' BREVITY_AWK <<'AWK' || true
+function hlevel(line,   n) {
+    if (line !~ /^#+[[:space:]]/) return 0
+    n = 0
+    while (substr(line, n + 1, 1) == "#") n++
+    return n
+}
+function flush() {
+    if (!have) return
+    pointer = (body ~ pointer_re) ? 1 : 0
+    # last = span at the final non-blank line, so a trailing blank before the
+    # next heading (or EOF) never inflates the line count of the last bullet.
+    printf "%d\t%d\t%d\t%s\n", last, pointer, exempt, name
+    have = 0
+}
+# Enter the governed section: heading line whose text starts with the knob.
+!insec {
+    if (hlevel($0) > 0 && substr($0, 1, length(section)) == section) {
+        insec = 1; start_lvl = hlevel($0); prev = $0
+    }
+    next
+}
+# A heading at the same level or higher closes the section.
+insec && hlevel($0) > 0 && hlevel($0) <= start_lvl { flush(); insec = 0; next }
+insec {
+    if ($0 ~ /^- \*\*/) {
+        flush()
+        have = 1
+        name = $0
+        sub(/^- \*\*/, "", name)
+        sub(/\*\*.*/, "", name)
+        span = 1
+        last = 1
+        body = $0
+        exempt = ($0 ~ /brevity-exempt/ || prev ~ /brevity-exempt/) ? 1 : 0
+    } else if (have) {
+        span++
+        if ($0 ~ /[^[:space:]]/) last = span
+        body = body " " $0
+    }
+    prev = $0
+    next
+}
+END { flush() }
+AWK
+
 records="$(awk \
     -v section="$CONTEXT_KIT_BREVITY_SECTION" \
-    -v pointer_re="$CONTEXT_KIT_BREVITY_POINTER_RE" '
-    function hlevel(line,   n) {
-        if (line !~ /^#+[[:space:]]/) return 0
-        n = 0
-        while (substr(line, n + 1, 1) == "#") n++
-        return n
-    }
-    function flush() {
-        if (!have) return
-        pointer = (body ~ pointer_re) ? 1 : 0
-        # last = span at the final non-blank line, so a trailing blank before the
-        # next heading (or EOF) never inflates the line count of the last bullet.
-        printf "%d\t%d\t%d\t%s\n", last, pointer, exempt, name
-        have = 0
-    }
-    # Enter the governed section: heading line whose text starts with the knob.
-    !insec {
-        if (hlevel($0) > 0 && substr($0, 1, length(section)) == section) {
-            insec = 1; start_lvl = hlevel($0); prev = $0
-        }
-        next
-    }
-    # A heading at the same level or higher closes the section.
-    insec && hlevel($0) > 0 && hlevel($0) <= start_lvl { flush(); insec = 0; next }
-    insec {
-        if ($0 ~ /^- \*\*/) {
-            flush()
-            have = 1
-            name = $0
-            sub(/^- \*\*/, "", name)
-            sub(/\*\*.*/, "", name)
-            span = 1
-            last = 1
-            body = $0
-            exempt = ($0 ~ /brevity-exempt/ || prev ~ /brevity-exempt/) ? 1 : 0
-        } else if (have) {
-            span++
-            if ($0 ~ /[^[:space:]]/) last = span
-            body = body " " $0
-        }
-        prev = $0
-        next
-    }
-    END { flush() }
-' "$BREVITY_FILE")"; st=$?
+    -v pointer_re="$CONTEXT_KIT_BREVITY_POINTER_RE" \
+    "$BREVITY_AWK" "$BREVITY_FILE")"; st=$?
 fail_closed "$st" check-brevity awk
 
 total=0
