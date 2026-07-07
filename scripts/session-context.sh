@@ -83,7 +83,7 @@ case "$stage" in
         echo "Delegation is the primary token lever and is pre-authorized here: send"
         echo "read-heavy cross-SPEC audits and mechanical rename/merge sweeps to a sub-agent"
         echo "without waiting to be asked — this standing licence satisfies the Agent tool's"
-        echo "ask-first default (delegation-kit/templates/agent-execution.md is the protocol)."
+        echo "ask-first default (/agent-execution is the full protocol)."
         echo
         ;;
 esac

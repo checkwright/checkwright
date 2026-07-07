@@ -78,6 +78,39 @@ and enforced by the meta-gates — a red gate is fixed, never bypassed with
   is craftable — gate-sdk/SPEC.md §Consumer smoke), and gets registered in this
   repo's `gates.list` where applicable (the kits govern this repo too).
 
+## Agent execution (all stages)
+
+Delegation is pre-authorized for read-heavy audits and mechanical rename/merge
+sweeps (the session-context nudge). Resident safety rules for every delegated
+`Agent`; **full protocol: `/agent-execution`** (resume-journal mechanics,
+validate-after-commit set, gate-driven worklist).
+
+- **Supervisor owns SECURITY/design rulings; agents surface, never guess.**
+- **Background + notification, never poll** (`run_in_background`; don't read the
+  output file).
+- **Serialize on shared files** — the generated `scripts/git-hooks/pre-commit` +
+  `.workflow/CHECK-GRAPH.html`, `TASK-QUEUE.md`/`.workflow/WORKFLOW-STATE.txt`,
+  the `scripts/*-config.sh` + `gates.list`, an amendment under edit — **and the
+  git index/HEAD are shared for every committing agent** (serialize *or*
+  `isolation: worktree`); **≤2-wide otherwise**, read-only fan-outs only.
+- **One commit per unit; split** if >4 components, OR mixed
+  mechanical+architectural, OR >300 tool calls.
+- **Resume journal in the harness session dir** — never `.tmp/` (the
+  session-context hook sweeps it) and never a system temp dir (a restart wipes
+  it); grant the path explicitly before dispatch. Agent writes findings inline +
+  a `DONE` marker; supervisor deletes it post-commit. A background agent's
+  sandbox may block the write, so for a **read-only fan-out the return value is
+  the contract** — reserve the journal for file-mutating agents.
+- **Validate after every agent commit** — a sub-agent's "passed" is not
+  trustworthy: re-run `bash gate-sdk/bin/run-gates.sh` plus the touched kit's
+  fixture runner, and **diff every gate change** (an agent blocked by a gate
+  weakens it rather than fix the code; `check-gate-tamper` is only the
+  mechanical floor).
+- **Budget-check before *each* dispatch** (`bash delegation-kit/bin/usage-gate.sh`
+  — one verdict, exit 0 OK / 1 PAUSE / 2 STALE; never eyeball the raw pct).
+- **Never revert substantial completed delegated work on your own design
+  judgment** — surface the tension and wait for explicit go-ahead.
+
 ## Housekeeping
 
 - `.tmp/` is gitignored (measurements, e.g. gate timings); `.workflow/` is
