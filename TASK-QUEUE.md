@@ -13,13 +13,6 @@
 
 ## Technical Debt
 
-- **comment-tier-sweep** — drain SPEC_KIT_COMMENT_WHITELIST in
-  scripts/spec-config.sh: relocate each not-yet-swept source's design-rationale
-  comments into the owning SPEC section and delete restated-code prose, then drop
-  the file's exact path from the roster. Seeded by comment-tier-gate 2026-07-07
-  (46 sources predating check-comment-tier); drain kit by kit — each sweep session
-  clears one kit's entries and re-gates it. Done when the roster is empty.
-
 ## Deferred
 
 - **core-file-presence-gate** [needs-spec] — gate-sdk gate blocking deletion of
@@ -110,6 +103,7 @@
 
 - allowlist-chain-steer-rule
 - comment-tier-gate
+- comment-tier-sweep
 - context-kit-extraction
 - stage-entry-mechanization
 - tag-lead-line-rename

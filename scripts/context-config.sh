@@ -1,14 +1,10 @@
 # shellcheck shell=bash
-# context-kit consumer config for THIS repo (context-kit/SPEC.md §Layout and
-# configuration). always-loaded.sh and check-brevity.sh source it, then fill any
-# unset knob with the kit default. Only the knobs this repo diverges on are set.
+# spec: context-kit/SPEC.md §Layout and configuration — this repo's context-kit consumer config
 
-# This repo's budgeted always-loaded section is the gate-sdk conventions roster,
-# not the platform's "## Shared conventions".
+# comment-tier-exempt: this repo budgets the gate-sdk conventions roster as its always-loaded section, not the platform default "## Shared conventions"
 # shellcheck disable=SC2034  # consumed by context-kit/checks/check-brevity.sh after sourcing
 CONTEXT_KIT_BREVITY_SECTION="## Conventions established in gate-sdk (keep later kits consistent)"
 
-# The steady-state hook body: queue-kit lives at queue-kit/bin/ here (not the
-# consumer gates dir), so name it explicitly rather than lean on the default probe.
+# comment-tier-exempt: queue-kit lives at queue-kit/bin/ in this monorepo, so name the hook body explicitly rather than lean on the default gates-dir probe
 # shellcheck disable=SC2034  # consumed by context-kit/bin/always-loaded.sh after sourcing
 CONTEXT_KIT_HOOK_CMD="bash queue-kit/bin/queue-index.sh --collapse-deferred"
