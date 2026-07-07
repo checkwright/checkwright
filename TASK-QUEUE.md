@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **kit-terminology-renames** [spec: SPEC-terminology-renames.md] — rename
-  friction-kit → guard-kit and delegation-kit `bin/usage-gate.sh` →
-  `bin/usage-verdict.sh` (both user-ruled 2026-07-07); one mechanical
-  grep-driven sweep per rename, done first so the iteration's other work
-  lands on the new names.
 - **core-file-presence-gate** [spec: gate-sdk/SPEC-core-file-presence.md] —
   `check-core-files`: gate-sdk gate red when a path listed in the consumer's
   `core-files.list` manifest is missing or untracked; the manifest edit is
@@ -76,5 +71,7 @@
   issue #75214 (project config can't lift the Task ask-first default),
   surfaced dogfooding this repo's delegation nudge 2026-07-07.
 ## Done
+
+- kit-terminology-renames
 
 ## Lessons Learned
