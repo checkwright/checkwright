@@ -11,3 +11,4 @@ hardening build 9c9e3f0b 2026-07-07
 hardening build fc1067de 2026-07-07
 hardening build b0dfbafe 2026-07-07
 hardening validate f49b2648 2026-07-07
+hardening close 29bc2f32 2026-07-07
