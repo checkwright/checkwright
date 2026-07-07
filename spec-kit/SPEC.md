@@ -110,7 +110,10 @@ supplies the checklist they invoke and the gate behind the promotion rule.
    and the merged spec reads as one coherent document a reader who never
    saw the amendment can use alone.
 3. Delete the amendment file; verify none remain for the component.
-4. Propagate removals (grep every spec for names the change retired), file
+4. Move the queue entry to `## Done`, dropping its `[spec:]` tag — the
+   amendment it referenced is gone, and `check-amendment-queue` requires
+   every `[spec:]` ref to resolve to a file on disk.
+5. Propagate removals (grep every spec for names the change retired), file
    discovered gaps as debt tasks, and commit the merge with the work.
 
 The shipped amendment template ends in a Definition-of-Done checklist that

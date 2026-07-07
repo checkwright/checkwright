@@ -48,6 +48,22 @@
   exercises the valve. Surfaced in the platform 2026-07-04.
 - **drift-kit-extraction** [needs-spec] — drift-report skeleton with pluggable
   KPIs and lead/lag honesty labels (kit 7).
+- **knowledge-friction-loop** [needs-spec] — the friction log / scan-prompts /
+  close-triage loop surfaces *permission* friction only; two classes escape it:
+  knowledge friction (re-deriving a fact no doc owns — e.g. the merge-closure
+  queue step read off check-amendment-queue rather than spec-kit's merge
+  procedure) and action friction (repeated low-value tool sequences). Cheap
+  design mirrors the friction log: capture a re-derivation as a one-liner the
+  moment it happens (a knowledge-friction.log) and triage it at close like
+  scan-prompts — but the remediation is always a doc-owner edit (give the fact a
+  home under the star topology), never a standing session-start instruction that
+  the context-kit brevity meter is built to reject. Detection is the loop;
+  elimination is a tiering edit. Aggregate view belongs in drift-kit (kit 7) as
+  a "re-derivations/session" lagging KPI that trends down as holes fill. A full
+  transcript LLM-scan is the heavy alternative; the writing-project reduction —
+  keep only each party's messages, drop tool calls/results/reminders — shrinks
+  the derived transcript substantially and makes a periodic scan affordable.
+  Surfaced 2026-07-07.
 - **identity-assertion-check** [needs-spec] — a consumer repo commits its
   expected git identity (committer email; remote host / SSH key identity) and
   a cheap FP-free check verifies local config matches, at setup and/or
