@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
-# spec: queue-kit/SPEC.md §check-blocked-by-lead-line — every blocked-by/spec/needs-spec tag sits on its bullet's lead line, the only line the tag readers scan
+# spec: queue-kit/SPEC.md §check-tag-lead-line — every blocked-by/spec/needs-spec tag sits on its bullet's lead line, the only line the tag readers scan
 #
-# usage: check-blocked-by-lead-line.sh [queue-file]
+# usage: check-tag-lead-line.sh [queue-file]
 #   Defaults to the configured queue file (QUEUE_KIT_QUEUE_FILE).
 set -uo pipefail
 
@@ -14,7 +14,7 @@ source "$SDK/lib/gate.sh"
 source "$KIT/lib/queue.sh"
 
 FILE="${1:-$QUEUE_KIT_QUEUE_FILE}"
-[[ -f "$FILE" ]] || { echo "check-blocked-by-lead-line: file not found: $FILE" >&2; exit 2; }
+[[ -f "$FILE" ]] || { echo "check-tag-lead-line: file not found: $FILE" >&2; exit 2; }
 
 out="$(awk -v taskre="$QUEUE_TASK_RE" -v sectre="$QUEUE_SECTION_RE" '
     function classes(line, arr) {
@@ -40,10 +40,10 @@ out="$(awk -v taskre="$QUEUE_TASK_RE" -v sectre="$QUEUE_SECTION_RE" '
                 printf "%d\t%s\t%d\n", FNR, k, leadfnr
     }
 ' "$FILE")"; st=$?
-fail_closed "$st" BLOCKED-BY-LEAD-LINE awk
+fail_closed "$st" TAG-LEAD-LINE awk
 
 if [[ -n "$out" ]]; then
-    echo "check-blocked-by-lead-line: tag(s) pushed off the bullet lead line (a tag reader"
+    echo "check-tag-lead-line: tag(s) pushed off the bullet lead line (a tag reader"
     echo "scans only the lead; a tag on a continuation line silently stops counting):"
     while IFS=$'\t' read -r ln cls lead; do
         [[ -n "$ln" ]] || continue
@@ -54,5 +54,5 @@ if [[ -n "$out" ]]; then
     exit 1
 fi
 
-echo "BLOCKED-BY-LEAD-LINE: clean (every blocked-by/spec/needs-spec tag in the task sections is on its bullet lead line in $FILE)"
+echo "TAG-LEAD-LINE: clean (every blocked-by/spec/needs-spec tag in the task sections is on its bullet lead line in $FILE)"
 exit 0

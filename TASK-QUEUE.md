@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **tag-lead-line-rename** [spec: queue-kit/SPEC-tag-lead-line.md] — rename
-  check-blocked-by-lead-line to check-tag-lead-line: the gate governs every
-  blocked-by/spec/needs-spec tag, the name claims only blocked-by; registry,
-  SPEC section, fixture dir, and the generated hook artifacts move with it.
-
 ## Technical Debt
 
 - **comment-tier-sweep** — drain SPEC_KIT_COMMENT_WHITELIST in
@@ -102,5 +97,6 @@
 - comment-tier-gate
 - context-kit-extraction
 - stage-entry-mechanization
+- tag-lead-line-rename
 
 ## Lessons Learned

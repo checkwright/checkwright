@@ -78,7 +78,7 @@ if staged_matches 'TASK-QUEUE.md'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-blocked-by-lead-line.sh || hook_fail check-blocked-by-lead-line
+    queue-kit/checks/check-tag-lead-line.sh || hook_fail check-tag-lead-line
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then

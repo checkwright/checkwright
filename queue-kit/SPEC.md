@@ -42,7 +42,7 @@ line carries it verbatim. The slug grammar is kit mechanism, not config.
 
 Tags are square-bracket literals with fixed spelling (mechanism, not config);
 every tag sits on its bullet's **lead line** — the only line the parsing
-tools scan (enforced by `check-blocked-by-lead-line`).
+tools scan (enforced by `check-tag-lead-line`).
 
 - `[blocked-by: <slug>]` — the entry is unpickable until `<slug>` completes.
   Repeat per blocker. Must resolve to a live task (active or deferred — a
@@ -132,7 +132,7 @@ Calibration: three exemptions mirror the wrapping convention — table rows,
 fenced-code blocks, and lines over budget solely due to one unbreakable token
 (URL, path). Width is Unicode code points, not bytes.
 
-### check-blocked-by-lead-line
+### check-tag-lead-line
 
 Invariant: every `[blocked-by:]` / `[spec:]` / `[needs-spec]` tag inside the
 task sections (active + deferred) sits on its bullet's lead line — the only

@@ -13,7 +13,7 @@ cat >> scripts/gates.list <<'EOF'
 # queue-kit
 check-queue-hygiene
 check-queue-wrap
-check-blocked-by-lead-line
+check-tag-lead-line
 check-task-names
 check-task-conservation
 check-queue-prose-precondition

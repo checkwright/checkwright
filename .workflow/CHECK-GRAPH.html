@@ -104,7 +104,6 @@ graph LR
   end
   n18 <-->|"check-amendment-queue"| n17
   n18 <-->|"check-amendment-queue"| n10
-  n18 -->|"check-blocked-by-lead-line"| n18
   n15 -->|"check-brevity"| n15
   n29 -->|"check-comment-tier"| n23
   n29 -->|"check-comment-tier"| n25
@@ -186,6 +185,7 @@ graph LR
   n11 -->|"check-spec-embedded-source"| n16
   n18 -->|"check-stage-entry"| n14
   n18 -->|"check-stage-evidence"| n14
+  n18 -->|"check-tag-lead-line"| n18
   n18 -->|"check-task-conservation"| n18
   n18 -->|"check-task-names"| n18
 `;
