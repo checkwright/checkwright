@@ -36,7 +36,11 @@ cat > CLAUDE.md <<'EOF'
 - **Terse:** one clean line, well within the four-line budget.
 EOF
 
-[[ -f TASK-QUEUE.md ]] || cp "$SMOKE_KIT_ROOT/../queue-kit/templates/TASK-QUEUE.md" TASK-QUEUE.md  # context-kit installs before queue-kit, so reuse its queue template for the hook's queue-index step
+# spec: context-kit/SPEC.md §Testing — the hook's queue-index step needs a queue
+# file; reuse queue-kit's battery-clean template when queue-kit is co-vendored.
+# Absent it (install.sh may assume only gate-sdk), context-kit smokes without it.
+qtpl="$SMOKE_KIT_ROOT/../queue-kit/templates/TASK-QUEUE.md"
+[[ -f TASK-QUEUE.md || ! -f "$qtpl" ]] || cp "$qtpl" TASK-QUEUE.md
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
@@ -50,7 +54,10 @@ if ! grep -q 'Session context' <<<"$hook_out"; then
     echo "context-kit/smoke/install.sh: hook produced no session-context brief" >&2
     exit 1
 fi
-if grep -q 'queue-index unavailable' <<<"$hook_out" || ! grep -q 'Iteration:' <<<"$hook_out"; then
+# spec: context-kit/SPEC.md §Testing — assert the queue integration only when
+# queue-kit is co-vendored; standalone, the hook rightly emits no queue line.
+if [[ -f queue-kit/bin/queue-index.sh ]] \
+    && { grep -q 'queue-index unavailable' <<<"$hook_out" || ! grep -q 'Iteration:' <<<"$hook_out"; }; then
     echo "context-kit/smoke/install.sh: hook did not emit the queue index" >&2
     printf '%s\n' "$hook_out" >&2
     exit 1

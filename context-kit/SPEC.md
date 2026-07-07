@@ -203,7 +203,9 @@ standard fixture pair.
 
 `smoke/install.sh` copies the templates into the scratch consumer (config
 into the gates dir, hook wiring into the harness settings), runs the hook
-end-to-end asserting it exits zero and emits the queue index, and runs
+end-to-end asserting it exits zero (and, when queue-kit is co-vendored,
+emits the queue index — the installer assumes only gate-sdk, so the queue
+integration is exercised only alongside queue-kit), and runs
 `always-loaded.sh --update-baseline` asserting the baseline file appears.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
