@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md dir=one valve=none tier=align-only
 # spec: spec-kit/SPEC.md §check-spec-derivable-section — a banned-heading section may not be a fenced code dump above the density budget
-#
-# usage: check-spec-derivable-section.sh [scan-root]
-#   Scans every canonical spec (SPEC_KIT_SPEC_NAME) under the root (default '.').
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,7 +16,6 @@ ROOT="${1:-.}"
 mapfile -t specs < <(spec_canonical_specs "$ROOT" | sort)
 [[ ${#specs[@]} -eq 0 ]] && { echo "SPEC-DERIVABLE-SECTION: clean (0 $SPEC_KIT_SPEC_NAME found)"; exit 0; }
 
-# The banned heading set, lowercased and \x01-joined for exact-membership test.
 banned=""
 for h in "${SPEC_KIT_BANNED_HEADINGS[@]}"; do
     banned+=$'\x01'"$(printf '%s' "$h" | tr '[:upper:]' '[:lower:]')"

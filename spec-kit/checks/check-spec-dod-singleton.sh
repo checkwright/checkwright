@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md dir=one valve=none tier=align-only
 # spec: spec-kit/SPEC.md §check-spec-dod-singleton — a canonical spec carries the Definition-of-Done heading the configured number of times
-#
-# usage: check-spec-dod-singleton.sh [scan-root]
-#   Scans every canonical spec (SPEC_KIT_SPEC_NAME) under the root (default '.').
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,8 +16,6 @@ ROOT="${1:-.}"
 mapfile -t specs < <(spec_canonical_specs "$ROOT" | sort)
 [[ ${#specs[@]} -eq 0 ]] && { echo "SPEC-DOD-SINGLETON: clean (0 $SPEC_KIT_SPEC_NAME found)"; exit 0; }
 
-# Heading match: level-insensitive within ##–####, the configured heading text
-# as a case-insensitive substring of the heading body.
 dod_lc="$(printf '%s' "$SPEC_KIT_DOD_HEADING" | tr '[:upper:]' '[:lower:]')"
 
 errors=()

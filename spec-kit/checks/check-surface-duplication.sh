@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=GLOSSARY.md,VISION.md,*SPEC*.md dir=bi valve=none tier=align-only
 # spec: spec-kit/SPEC.md §check-surface-duplication — a non-glossary surface may not carry a glossary term's bold-lead-in definition
-#
-# usage: check-surface-duplication.sh [scan-root]
-#   Scans the configured non-glossary surfaces (SPEC_KIT_DUP_SURFACES + every
-#   component spec) under the root (default '.') for foreign bold-lead-in
-#   definitions of glossary terms. Exits 2 when the glossary is absent — register
-#   the gate only where the topology exists.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,9 +15,6 @@ ROOT="${1:-.}"
 GLOSS="$ROOT/$SPEC_KIT_GLOSSARY_FILE"
 [[ -f "$GLOSS" ]] || { echo "check-surface-duplication: no $SPEC_KIT_GLOSSARY_FILE at $GLOSS (register the gate only where the glossary topology exists)" >&2; exit 2; }
 
-# Surfaces to scan: the configured non-glossary surfaces present at the root,
-# each tagged with its introduce-valve (a spec surface uses spec-introduces,
-# anything else vision-introduces), plus every component spec under the root.
 declare -a SURFACES=()
 COMPONENTS=""
 for s in "${SPEC_KIT_DUP_SURFACES[@]}"; do
@@ -43,8 +34,6 @@ done < <(spec_canonical_specs "$ROOT" | sort)
 
 [[ ${#SURFACES[@]} -gt 0 ]] || { echo "SURFACE-DUPLICATION: clean (no configured surface present under $ROOT)"; exit 0; }
 
-# The glossary term set: the Quick-reference table's canonical column and every
-# bold-lead-in entry head.
 terms="$(awk '
     /^## Quick reference/ { inqr = 1 }
     inqr && /^---/ { inqr = 0 }

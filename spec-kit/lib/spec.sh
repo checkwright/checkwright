@@ -1,17 +1,6 @@
 # shellcheck shell=bash
 # spec: spec-kit/SPEC.md §lib/spec.sh — sourced config loader + shared section/spec adapters, never gate structure
-#
-# Extracted from the governance meta-layer of a private production platform; the
-# product's surface names, banned headings, and scanned languages are the
-# defaults below, overridable per consumer — the rule content (glossary bodies,
-# term lists, tier contract) stayed behind. This file carries values and parse
-# adapters only (gate-sdk's lib/gate.sh rule): the section-boundary regexes both
-# sides of the queue-facing gate must agree on, and the spec/amendment finders
-# and language map the spec-scanning gates share. Never gate structure.
 
-# Source the consumer config first so its assignments win; the defaults below
-# fill only what it left unset. A malformed config exits 2 — a broken grammar
-# must not gate anything.
 _sk_cfg="${SPEC_KIT_CONFIG_FILE:-}"
 if [[ -n "$_sk_cfg" ]]; then
     [[ -f "$_sk_cfg" ]] || {
@@ -29,53 +18,26 @@ else
 fi
 unset _sk_cfg
 
-# --- defaults (the platform's spec discipline) -------------------------------
-
-# The canonical spec filename and the amendment-file glob.
 [[ -v SPEC_KIT_SPEC_NAME ]]      || SPEC_KIT_SPEC_NAME="SPEC.md"
 [[ -v SPEC_KIT_AMENDMENT_GLOB ]] || SPEC_KIT_AMENDMENT_GLOB="SPEC-*.md"
 
-# The governed queue file (repo-root-relative; the queue-facing gate also takes
-# it as $1). Shares queue-kit's default; the two knobs are independent.
 [[ -v SPEC_KIT_QUEUE_FILE ]] || SPEC_KIT_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 
-# Active-queue sections whose entries require a [spec:] ref (feature sections),
-# and the broader active set where a [needs-spec] tag is a violation. Plain
-# text — each name is spliced into a '^## (…)$' heading regex, so avoid regex
-# metacharacters. Cross-kit note: queue-kit's QUEUE_KIT_ACTIVE_SECTIONS carries
-# the same default; a consumer renaming its sections sets both (independent).
 declare -p SPEC_KIT_FEATURE_SECTIONS &>/dev/null || SPEC_KIT_FEATURE_SECTIONS=("New Features")
 declare -p SPEC_KIT_ACTIVE_SECTIONS  &>/dev/null || SPEC_KIT_ACTIVE_SECTIONS=("New Features" "Technical Debt")
 
-# The parked section: every entry there requires [needs-spec].
 [[ -v SPEC_KIT_DEFERRED_SECTION ]] || SPEC_KIT_DEFERRED_SECTION="Deferred"
 
-# The Definition-of-Done heading and how many a canonical spec may carry.
-# 'exactly-one' (platform default) flags a spec with none; 'at-most-one' allows
-# zero (a reference-spec corpus like this repo's kits carries no DoD).
 [[ -v SPEC_KIT_DOD_HEADING ]] || SPEC_KIT_DOD_HEADING="Definition of Done"
 [[ -v SPEC_KIT_DOD_MODE ]]    || SPEC_KIT_DOD_MODE="exactly-one"
 
-# Whether the shared finders descend into vendored kit roots (gate_kit_roots).
-# Default 0: a vendored kit's SPEC.md/SPEC-*.md is a dependency's documentation,
-# not governed content, so every finder-based spec gate skips it and the
-# 'exactly-one' default holds out of the box on a tree that vendored the kits
-# beside gate-sdk. A consumer whose kit SPECs are its own first-party content
-# (this repo) sets SPEC_KIT_SCAN_KIT_ROOTS=1 to re-include them.
 [[ -v SPEC_KIT_SCAN_KIT_ROOTS ]] || SPEC_KIT_SCAN_KIT_ROOTS=0
 
-# The code-derivable heading set and the fenced-density budget (percent) above
-# which such a section is a code dump. The pointer regex names the one-line
-# index reference that exempts a shed section (consumer index tooling).
 declare -p SPEC_KIT_BANNED_HEADINGS &>/dev/null \
     || SPEC_KIT_BANNED_HEADINGS=("Directory Structure" "Public API" "Cargo.toml Dependencies")
 [[ -v SPEC_KIT_DERIVABLE_DENSITY ]]       || SPEC_KIT_DERIVABLE_DENSITY=60
 [[ -v SPEC_KIT_DERIVABLE_POINTER_REGEX ]] || SPEC_KIT_DERIVABLE_POINTER_REGEX='pub-index|proto-index'
 
-# check-spec-embedded-source calibration. SPEC_KIT_EMBED_LANGS is the scanned
-# fence-language → source mapping: one 'kind|fence-alias,…|file-glob,…' entry
-# per language family. A fence whose language is not a listed alias (or is in
-# SPEC_KIT_EMBED_ILLUSTRATIVE) is treated as illustrative and skipped.
 [[ -v SPEC_KIT_EMBED_THRESHOLD ]] || SPEC_KIT_EMBED_THRESHOLD="0.70"
 [[ -v SPEC_KIT_EMBED_MINLINES ]]  || SPEC_KIT_EMBED_MINLINES=8
 declare -p SPEC_KIT_EMBED_LANGS &>/dev/null || SPEC_KIT_EMBED_LANGS=(
@@ -90,67 +52,29 @@ declare -p SPEC_KIT_EMBED_LANGS &>/dev/null || SPEC_KIT_EMBED_LANGS=(
     "dockerfile|dockerfile|Dockerfile"
 )
 declare -p SPEC_KIT_EMBED_ILLUSTRATIVE &>/dev/null || SPEC_KIT_EMBED_ILLUSTRATIVE=("json")
-# The fence kind an amendment may embed as a not-yet-merged wire-contract delta
-# (its own valve — the design home for a contract that does not exist yet).
 [[ -v SPEC_KIT_EMBED_WIRE_KIND ]] || SPEC_KIT_EMBED_WIRE_KIND="proto"
 
-# check-surface-duplication topology. The glossary owns the canonical
-# definitions; the listed non-glossary surfaces are scanned for foreign
-# bold-lead-in definitions (every component SPEC.md is added automatically).
 [[ -v SPEC_KIT_GLOSSARY_FILE ]] || SPEC_KIT_GLOSSARY_FILE="GLOSSARY.md"
 declare -p SPEC_KIT_DUP_SURFACES &>/dev/null || SPEC_KIT_DUP_SURFACES=("VISION.md")
 
-# check-comment-tier classifier. The built-in directive roster (the names
-# Checkwright's own kits parse — graph/shellcheck/contract, spec/assertion/…) is
-# the gate's own kit-mechanism vocabulary; these knobs carry only the *extras* a
-# consumer appends (its product directive set at migration time), the governed
-# file globs, and the positional-construct roster. SPEC_KIT_COMMENT_MACHINE and
-# SPEC_KIT_COMMENT_REASON default empty (append nothing). SPEC_KIT_COMMENT_SURFACE
-# empty means derive the default surface: shell sources under the root (kit roots
-# per SPEC_KIT_SCAN_KIT_ROOTS, templates skipped) plus the workflow *.txt state
-# files. SPEC_KIT_COMMENT_POSITIONAL is a language roster and defaults empty — the
-# kit is language-agnostic (its own surface is shell), so the positional-rescue
-# *mechanism* ships but its *tokens* are consumer config: a consumer whose surface
-# includes a language with justify-worthy constructs supplies them (a Rust
-# consumer sets `.unwrap( .expect( unsafe #[allow(`, the same way the platform's
-# product directive set becomes its consumer config). Empty ⇒ inert by
-# construction.
 declare -p SPEC_KIT_COMMENT_MACHINE &>/dev/null || SPEC_KIT_COMMENT_MACHINE=()
 declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
 declare -p SPEC_KIT_COMMENT_SURFACE &>/dev/null || SPEC_KIT_COMMENT_SURFACE=()
 declare -p SPEC_KIT_COMMENT_POSITIONAL &>/dev/null || SPEC_KIT_COMMENT_POSITIONAL=()
-# The not-yet-swept roster is consumer debt, never a kit literal (the extraction
-# seam): the gate ships with an empty whitelist, and a consumer names its own
-# unswept files here, tagging the array '# exception-list:' with '# until:
-# <drain-task>' so check-gate-exemption-tasks holds each entry to a live task.
 declare -p SPEC_KIT_COMMENT_WHITELIST &>/dev/null || SPEC_KIT_COMMENT_WHITELIST=()
 
-# --- shared section adapters (both sides of every boundary parse identically) -
-
-# spec_alt <name>... — a '|'-joined regex alternation body.
 spec_alt() { local IFS='|'; printf '%s' "$*"; }
 
-# Ready-to-use section-boundary regexes, consumed by the sourcing gate.
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_FEATURE_RE="^## ($(spec_alt "${SPEC_KIT_FEATURE_SECTIONS[@]}"))[[:space:]]*$"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_ACTIVE_RE="^## ($(spec_alt "${SPEC_KIT_ACTIVE_SECTIONS[@]}"))[[:space:]]*$"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_DEFERRED_RE="^## ${SPEC_KIT_DEFERRED_SECTION}[[:space:]]*$"
-# Any '##' heading is a section boundary (closes whatever section we were in).
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_SECTION_RE="^## "
 
-# --- shared spec/amendment finders (the collectors the gates share) ----------
-
-# _spec_prune_kit_roots <scan-root> — filter finder stdout to drop any path
-# under a vendored kit root (gate_kit_roots) that lies *within* the scan root,
-# unless SPEC_KIT_SCAN_KIT_ROOTS=1. Vendored kits are dependencies, not governed
-# content. Only kit roots strictly under the scan root prune — an ancestor kit
-# root (e.g. when the scan root is itself a fixture dir physically nested under a
-# kit) must not, or a kit's own gate fixtures would vanish. Paths compare
-# absolute so the finder's root-relative output and gate_kit_roots' absolute (or
-# GATE_SDK_KIT_DIRS relative) forms all match. Needs gate-sdk's lib/gate.sh.
+# spec: spec-kit/SPEC.md §lib/spec.sh — finders skip templates/ stubs and vendored kit roots under the scan root (an ancestor kit root never prunes)
 _spec_prune_kit_roots() {
     if [[ "$SPEC_KIT_SCAN_KIT_ROOTS" == "1" ]]; then cat; return 0; fi
     local root="${1:-.}" root_abs
@@ -182,20 +106,9 @@ _spec_prune_kit_roots() {
     done
 }
 
-# spec_canonical_specs <root> — every canonical spec under root (gate_find
-# prunes the tree-walk exclusion set, so kit fixtures never leak into a
-# whole-tree run). Requires gate-sdk's lib/gate.sh already sourced. A skeleton
-# under a templates/ directory is a copyable stub, not governed content (same
-# rationale as the gate-tests prune) — the finders skip it so a shipped
-# SPEC-amendment.md template never reads as a live orphan amendment; a vendored
-# kit root under the scan root is skipped too by default (SPEC_KIT_SCAN_KIT_ROOTS).
 spec_canonical_specs() { gate_find "$1" -name "$SPEC_KIT_SPEC_NAME" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
 
-# spec_amendments <root> — every amendment file under root (templates + vendored
-# kit roots skipped; see spec_canonical_specs).
 spec_amendments() { gate_find "$1" -name "$SPEC_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
-
-# --- config validation (a malformed machine must not gate anything) ----------
 
 _sk_errs=()
 [[ -n "$SPEC_KIT_SPEC_NAME" ]]      || _sk_errs+=("SPEC_KIT_SPEC_NAME is empty")

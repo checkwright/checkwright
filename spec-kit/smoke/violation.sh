@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
-# spec-kit consumer-smoke violation — drops a consumer SPEC.md carrying two
-# Definition-of-Done headings (two sources on the completion contract). First
-# stdout line names the expected FAIL gate.
+# spec: gate-sdk/SPEC.md §Consumer smoke — spec-kit consumer-smoke violation: drops a consumer SPEC.md with two Definition-of-Done headings, reddening check-spec-dod-singleton
 set -euo pipefail
 
 echo "check-spec-dod-singleton"
 
-# A root-level consumer spec is scanned even with the kit-root prune on; two DoD
-# headings trip check-spec-dod-singleton. git clean -fd removes the file.
 cat > SPEC.md <<'EOF'
 # smoke consumer — SPEC
 

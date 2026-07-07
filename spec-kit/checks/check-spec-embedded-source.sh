@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*.rs,*.toml,*.sql,*.rego,*.ts,*.tsx,*.yaml,*.yml,*.proto,*.sh,Dockerfile dir=one valve=none tier=precommit
 # spec: spec-kit/SPEC.md §check-spec-embedded-source — a canonical spec's fenced block must not verbatim-copy a tracked source file
-#
-# usage: check-spec-embedded-source.sh [scan-root]
-#   Scans canonical specs + amendments under the root (default '.') against the
-#   tracked source files whose kind matches each fence's language.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -17,7 +13,6 @@ source "$KIT/lib/spec.sh"
 ROOT="${1:-.}"
 [[ -d "$ROOT" ]] || { echo "check-spec-embedded-source: scan root not found: $ROOT" >&2; exit 2; }
 
-# Build the language↔kind↔file maps from SPEC_KIT_EMBED_LANGS.
 declare -A LANG2KIND EXT2KIND BASE2KIND
 find_globs=()
 for entry in "${SPEC_KIT_EMBED_LANGS[@]}"; do
@@ -48,7 +43,6 @@ mapfile -t specs < <( { spec_canonical_specs "$ROOT"; printf '%s\n' "${amendfile
 
 [[ ${#specs[@]} -eq 0 ]] && { echo "SPEC-EMBEDDED-SOURCE: clean (0 spec files found)"; exit 0; }
 
-# The amendment set (newline-joined) marks the wire-delta exemption in awk.
 amendset=""; for a in "${amendfiles[@]+"${amendfiles[@]}"}"; do amendset+="$a"$'\n'; done
 
 flagged="$(awk -v threshold="$SPEC_KIT_EMBED_THRESHOLD" -v minlines="$SPEC_KIT_EMBED_MINLINES" \

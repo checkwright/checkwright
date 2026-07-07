@@ -37,11 +37,4 @@ SPEC_KIT_COMMENT_WHITELIST=(
     scripts/friction-config.sh                     # until: comment-tier-sweep
     scripts/session-context.sh                     # until: comment-tier-sweep
     scripts/spec-config.sh                         # until: comment-tier-sweep
-    spec-kit/checks/check-spec-derivable-section.sh # until: comment-tier-sweep
-    spec-kit/checks/check-spec-dod-singleton.sh    # until: comment-tier-sweep
-    spec-kit/checks/check-spec-embedded-source.sh  # until: comment-tier-sweep
-    spec-kit/checks/check-surface-duplication.sh   # until: comment-tier-sweep
-    spec-kit/lib/spec.sh                           # until: comment-tier-sweep
-    spec-kit/smoke/install.sh                      # until: comment-tier-sweep
-    spec-kit/smoke/violation.sh                    # until: comment-tier-sweep
 )
