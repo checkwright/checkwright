@@ -61,6 +61,10 @@ if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle
     gate-sdk/checks/check-graph.sh || hook_fail check-graph
 fi
 
+if staged_matches 'scripts/core-files.list'; then
+    gate-sdk/checks/check-core-files.sh || hook_fail check-core-files
+fi
+
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
     lifecycle-kit/checks/check-stage-evidence.sh || hook_fail check-stage-evidence
 fi

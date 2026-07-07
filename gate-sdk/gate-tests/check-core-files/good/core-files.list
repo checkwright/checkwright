@@ -1,0 +1,5 @@
+# fixture manifest — all listed paths exist in the worktree and are tracked.
+present.txt
+
+# comment and blank lines are ignored
+nested/also-present.txt

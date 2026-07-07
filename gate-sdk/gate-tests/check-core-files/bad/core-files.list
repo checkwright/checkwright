@@ -1,0 +1,3 @@
+# fixture manifest — one listed path was removed without a matching manifest edit.
+present.txt
+deleted-core-file.txt

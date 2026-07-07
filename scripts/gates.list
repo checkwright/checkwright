@@ -10,6 +10,7 @@ check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
 check-graph
+check-core-files
 check-stage-evidence
 check-stage-entry
 check-queue-hygiene

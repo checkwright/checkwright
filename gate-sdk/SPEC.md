@@ -30,12 +30,15 @@ override with `GATE_SDK_GATES_DIR`) holding:
 - `git-hooks/` — the generated `pre-commit` (see §gen-pre-commit) and any
   hand-written hooks.
 - `graph-vocab.sh` — optional rule content for `check-graph` (see there).
+- `core-files.list` — optional manifest for `check-core-files`: the
+  repo-relative paths that must stay present and tracked (see there).
 
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
 `.workflow`), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
-(default `TASK-QUEUE.md`), `GATE_SDK_PRUNE_DIRS` (default
+(default `TASK-QUEUE.md`), `GATE_SDK_CORE_FILES_FILE` (default
+`<gates-dir>/core-files.list`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
 siblings holding a `checks/` or a `smoke/`). Paths are repo-root-relative; every entry point
@@ -442,6 +445,28 @@ Coverage ruling inherited from the platform: a `couples ⊇ find-globs` parity
 check — verifying a gate's declared couples cover its real read-set — is *not*
 carried; it would require parsing arbitrary shell, neither cheap nor low-FP,
 and (B) already guarantees editing a coupled surface fires the gate.
+
+### check-core-files
+
+Invariant: every path in the consumer's `core-files.list` manifest exists in
+the worktree **and** is tracked (`git ls-files --error-unmatch`). Red on a
+missing or untracked listed path — one existence-plus-tracked test catches a
+plain `rm`, a `git rm`, and a listed-but-never-added path alike, with no
+`--diff-filter` timing window that only sees the loss at some later stage. The
+first gate born in Checkwright rather than extracted from the platform.
+
+The manifest is optional consumer config (the `graph-vocab.sh` pattern): the
+path knob is `GATE_SDK_CORE_FILES_FILE` (default
+`<gates-dir>/core-files.list`), registry-style — one repo-relative path per
+line, `#` comments and blanks ignored. An absent manifest is clean with a note;
+an empty or comment-only manifest is clean; a present-but-unreadable manifest
+is fail-closed (exit 2). Calibration: the intentional-removal valve is the
+manifest itself — retiring a surface means deleting its line in the same commit
+that removes the file, a diff-visible edit that needs no exemption tag, so the
+gate is re-scoped in the open, never weakened to pass. The gate's `# graph:`
+couples the manifest (`tier=precommit`), so an edit to `core-files.list`
+re-fires it; the whole-tree `run-gates.sh` battery is the backstop for a
+pure-deletion commit the `ACMR` pre-commit filter would skip.
 
 ### templates/check-skeleton.sh
 

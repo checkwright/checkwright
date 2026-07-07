@@ -11,12 +11,6 @@
 
 ## New Features
 
-- **core-file-presence-gate** [spec: gate-sdk/SPEC-core-file-presence.md] —
-  `check-core-files`: gate-sdk gate red when a path listed in the consumer's
-  `core-files.list` manifest is missing or untracked; the manifest edit is
-  the intentional-removal valve. The first born-in-checkwright gate; the
-  platform adopts it as `checkwright-kit-adoption` step 0. Surfaced in the
-  platform 2026-07-04.
 - **check-spec-pointer** [spec: spec-kit/SPEC-spec-pointer.md] — spec-kit
   gate resolving `spec:`/`contract:` pointer targets (file + `§` heading,
   forward direction only) so a coupling cannot dangle silently; retires the
@@ -72,6 +66,7 @@
   surfaced dogfooding this repo's delegation nudge 2026-07-07.
 ## Done
 
+- core-file-presence-gate
 - kit-terminology-renames
 
 ## Lessons Learned

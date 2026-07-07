@@ -1,0 +1,1 @@
+a nested core file that exists and is tracked

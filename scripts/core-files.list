@@ -1,0 +1,26 @@
+# Checkwright core-file manifest — gate-sdk/SPEC.md §check-core-files.
+# One repo-relative path per line (`#` comments, blank lines ignored). The gate
+# is red when a listed path is missing from the worktree or untracked. Retiring
+# a surface deliberately means deleting its line in the same commit that removes
+# the file — that manifest edit is the diff-visible intentional-removal valve.
+
+# Iteration state machine + governance charter.
+TASK-QUEUE.md
+.workflow/WORKFLOW-STATE.txt
+README.md
+CLAUDE.md
+
+# Gate registry + graph rule content + the checked pre-commit/graph projections.
+scripts/gates.list
+scripts/graph-vocab.sh
+scripts/git-hooks/pre-commit
+.workflow/CHECK-GRAPH.html
+
+# One SPEC.md per kit (each kit's canonical contract).
+gate-sdk/SPEC.md
+lifecycle-kit/SPEC.md
+queue-kit/SPEC.md
+spec-kit/SPEC.md
+delegation-kit/SPEC.md
+context-kit/SPEC.md
+guard-kit/SPEC.md
