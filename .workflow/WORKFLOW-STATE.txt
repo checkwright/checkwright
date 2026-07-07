@@ -10,3 +10,4 @@ drift-kit build 254c8eb3 2026-07-08
 drift-kit build af3bffce 2026-07-08
 drift-kit build 09dd26be 2026-07-08
 drift-kit build 5304b03b 2026-07-08
+drift-kit validate d28ee723 2026-07-08
