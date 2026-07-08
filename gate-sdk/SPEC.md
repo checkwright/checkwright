@@ -51,7 +51,9 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
 siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT_ALLOWLIST` (default
-`<gates-dir>/root-allowlist.list`), `GATE_SDK_MSG_PATTERN_FILES` (default
+`<gates-dir>/root-allowlist.list`), `GATE_SDK_REGISTRY_DOC` (default `README.md`)
+and `GATE_SDK_RUNNER_DOC` (default `CLAUDE.md`) for `check-kit-registration`,
+`GATE_SDK_MSG_PATTERN_FILES` (default
 `<gates-dir>/msg-patterns.list`; space-separated, each tracked and required —
 fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
 `<gates-dir>/msg-patterns.local.list`; gitignored, skipped when absent so a
@@ -520,6 +522,32 @@ what the gate requires. A lone named root is not a hand list (no completeness
 obligation); the check engages at two. Fail-closed: an unreadable manifest, an
 unresolvable registered gate, or a non-repo cwd is a red, not a skip. A member
 with no `# graph:` line is `check-graph`'s finding, not this gate's.
+
+### check-kit-registration
+
+Invariant: every kit root `gate_kit_roots` enumerates is registered in the
+consumer's human-facing docs — closing the prose-registry gap `check-kit-enum`
+leaves open (that gate guards gate-coupling hand-lists, so a landed kit can
+silently fall out of the registry docs). Two assertions: (A) **registry row** —
+the registry doc carries, for each root, a markdown link resolving to the
+kit-root directory `<kit>/` (matched as that repo-root-relative link target), so
+a landed kit missing from the public kit table is red; (B) **fixture-runner
+line** — every kit root with
+tracked `gate-tests/` files (`git ls-files <kit>/gate-tests/`) has a line in the
+runner doc naming `<kit>/gate-tests` (the documented fixture-runner
+invocation), so a kit whose fixtures never entered the battery is red. A kit
+without `gate-tests/` (guard-kit, drift-kit) owes nothing under B.
+
+Config, platform-pattern shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
+is A's doc, `GATE_SDK_RUNNER_DOC` (default `CLAUDE.md`) is B's; both resolve
+relative to the git toplevel, and an explicit positional argument
+(`[registry-doc [runner-doc]]`) overrides. Fail-closed: a configured doc that
+does not exist is a misconfiguration (exit 2, like `check-kit-enum`'s missing
+registry), as is a non-repo cwd or empty roster — never a false clean. A
+consumer keeping no prose registry opts out by not registering the gate in its
+`gates.list`; there is no empty-knob valve. This gate retires close's manual
+"does the kit table still reflect the kit set?" staleness check, narrowing that
+step to the un-gated remainder (row descriptions, per-kit READMEs).
 
 ### check-core-files
 

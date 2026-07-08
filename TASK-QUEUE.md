@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **kit-registration-gate** [spec: gate-sdk/SPEC-kit-registration.md] —
-  check-kit-registration: every kit root carries a registry-doc row and, when
-  it ships gate-tests, a fixture-runner line; retires close's manual registry
-  staleness check.
 - **budget-footprint-monitor** [spec: delegation-kit/SPEC-usage-trend.md] —
   usage-history sampling from usage-verdict plus usage-trend.sh (per-axis
   reset/login/tier segments, monotonicity noise flagging) and the 7-day
@@ -104,5 +100,7 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 
 ## Done
+
+- kit-registration-gate
 
 ## Lessons Learned

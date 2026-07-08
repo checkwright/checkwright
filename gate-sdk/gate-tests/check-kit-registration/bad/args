@@ -1,0 +1,4 @@
+# Registry doc missing the gate-sdk row; runner doc is the repo's real CLAUDE.md
+# (fixture-runner lines complete), so only assertion A trips.
+gate-sdk/gate-tests/check-kit-registration/bad/registry-doc.md
+CLAUDE.md

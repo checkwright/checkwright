@@ -38,8 +38,10 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    standing session-start instruction; clear the log
    (`: > .workflow/knowledge-friction.log`).
 4. **Clear Done.**
-5. Review README.md kit table, CLAUDE.md, and each kit README for staleness
-   (*is it still true?*).
+5. Review the docs' un-gated remainder for staleness (*is it still true?*):
+   README.md row descriptions, CLAUDE.md prose, and each kit README —
+   `check-kit-registration` already holds kit-table membership and the
+   fixture-runner lines, so this step is the prose those gates do not read.
 6. Runtime-artifact check: any new gitignored artifact has a reclaim path.
 7. Brevity pass on CLAUDE.md (the only always-loaded surface here): is each
    block worth its standing per-session token cost?
