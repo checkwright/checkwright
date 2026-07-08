@@ -488,6 +488,20 @@ reserves no syntax for it). Governed-surface discovery and configuration are
 `spec_comment_whitelisted` adapters in `lib/spec.sh` and the same
 `SPEC_KIT_COMMENT_*` knobs — so no new config knob. `precommit` tier.
 
+Retention ruling: the standing doubt — forward-only checking plus the
+basename↔§heading convention make the pointer largely redundant, its gloss a
+restatement risk — is answered and the roster slot kept. The convention
+derives a section's *name*, never its liveness: absent an inbound pointer,
+renaming or deleting a SPEC heading reddens nothing, and the pointer is the
+only mechanized code→prose coupling (the reverse direction stays a review
+concern per the paragraph above). Sites away from a file's header bind
+sections no naming convention can derive. Narrowing the directive to a bare
+pointer buys nothing: the gloss is already capped at the one-line binding
+(§check-comment-tier), and a gloss restating the cited section is deleted
+under that doctrine, not re-gated here. Dropping the slot would also orphan
+the citation coverage the convention carries — the reason a dedicated
+script↔doc citation gate stays unbuilt.
+
 ### templates/
 
 `spec-config.sh` — the consumer config template documenting every knob.

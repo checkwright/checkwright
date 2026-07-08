@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: norm-hardening  [stage: close]
+## Iteration: gap-closure  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,91 +12,30 @@
 
 ## New Features
 
+- **kit-enum-completeness-gate** [spec: gate-sdk/SPEC-kit-enum.md] — kill the
+  hand-maintained kit-set drift axis: `kit:` couples token expanded from
+  `gate_kit_roots`, meta-paths auto-union in delegation-kit's loader, and the
+  residual `check-kit-enum` meta-gate over hand-lists.
+- **extraction-completeness-gates** [spec: SPEC-completeness-gates.md] — the
+  admitted structural-gate set: check-spec-fence-balance + check-md-refs
+  (spec-kit), check-stage-skill-coverage (lifecycle-kit), check-hook-exec-bit +
+  check-root-tiering (gate-sdk), check-queue-sections (queue-kit); the ruled-out
+  candidates and rationale live in the amendment. Build after kit-enum (the new
+  gates' couples use the `kit:` token).
+- **commit-message-hygiene-gate** [spec: gate-sdk/SPEC-commit-msg.md] — a
+  generated `commit-msg` hook (`tier=commit-msg` in the graph grammar) running
+  check-commit-msg, plus check-tree-terms over the same pattern files; generic
+  patterns ship as kit defaults, private term lists stay local-only consumer
+  config.
+- **validate-evidence-layer** [spec: SPEC-evidence-kit.md] — evidence-kit, a new
+  kit: held-constant test baseline, committed per-run evidence manifest (the
+  versioned wire contract for the deferred attestation rung), run-validate
+  spine, and lifecycle-kit's generic boundary-truncate knob.
+
 ## Technical Debt
 
 ## Deferred
 
-- **kit-enum-completeness-gate** [needs-spec] — a meta-gate asserting the kit set
-  is enumerated completely wherever it is hand-listed: every `gate_kit_roots`
-  member appears in `DELEGATION_KIT_META_PATHS` and in each whole-tree gate's
-  `# graph:` couples (scoped to the kit files that gate's subject actually
-  covers). Surfaced by the drift-kit omission this iteration — the kit set is
-  hand-maintained across many manifests and silently drifted as kits 6–7 landed
-  (drift-kit fell out of META_PATHS plus the comment-tier / spec-pointer /
-  shellcheck couples, all fixed; context-kit's `check-brevity` is still uncoupled
-  from the gate-family meta-gates — an instance this gate must catch). Derive the
-  check from `gate_kit_roots`, the canonical enumeration. Surfaced 2026-07-08.
-- **validate-evidence-layer** [needs-spec] — the one large gap from
-  platform-second-scan: lifecycle-kit's stage-evidence proves a stage was
-  *invoked*, never that it produced its green result. The platform closes this
-  with three coupled mechanisms — a held-constant test-baseline manifest (each
-  known-red test marked fail/ignore and coupled to a live tracking slug, diffed
-  per-test so a new regression and an unpromoted recovery can't net to zero), a
-  committed per-run evidence manifest (one line per suite, a log-digest pinning
-  the producing run, gated at stage-close and merge, truncated at the iteration
-  boundary), and a run-validate contract (regenerate projection → run → diff
-  baseline → record verdict, never editing the baseline, failures surfaced
-  verbatim). Test-runner/suite/scenario globs are consumer config; the teardown
-  ops stay on the platform. Extends lifecycle-kit (validate stage) or a new
-  evidence-kit; the evidence-manifest format is also the natural wire contract
-  for the deferred hosted-attestation-service (its attestation payload).
-  Surfaced 2026-07-08.
-- **extraction-completeness-gates** [needs-spec] — the small missed-mechanism
-  cluster from platform-second-scan: content-free structural gates the first
-  extraction pass skipped. Not build-ready — scope must rule per-gate which earn a
-  slot on checkwright under §Minimal footprint (a real, cheap, non-redundant drift
-  axis on a surface this repo actually has) versus platform-only mechanism that
-  does not apply here or is already covered: handbook-coverage presumes an
-  always-loaded / on-demand doc split checkwright lacks; todo-refs presumes
-  `TODO(task:<slug>)` markers the tree may not use; md-refs / required-section
-  overlap `check-spec-pointer` and the queue-index heading dependency. The scan
-  map to rule against, closest kit in parens:
-  - spec-fence-balance (spec-kit) — assert an even fence-delimiter count; spec-kit's
-    fence-parsing gates desync and fail *open* on an odd count.
-  - md-refs (spec-kit/context-kit) — resolve internal markdown links + `#anchor`
-    heading slugs across a configured doc set (dead-link rot).
-  - stage-skill-coverage (lifecycle-kit) — couple the stage set to its
-    `.claude/commands/<stage>.md` files, both directions.
-  - handbook-coverage (context-kit) — hold an always-loaded directive's section
-    index and its on-demand reference's section set verbatim-identical.
-  - todo-refs (queue-kit) — resolve every `TODO(task:<slug>)` marker to a known
-    queue slug; ban bare FIXME/HACK on governed surfaces.
-  - backlog-aging (queue-kit → drift-kit) — advisory tripwire on deferred entries /
-    permanent exemptions aged past a git-derived re-verification window.
-  - gate-runtime-budget (gate-sdk → drift-kit) — advisory over the gate-timings
-    measurement; flag any gate over 2× budget or the battery over aggregate.
-  - hook-exec-bit (gate-sdk) — assert governed scripts + git hooks keep the exec
-    bit; git silently skips a non-executable hook.
-  - required-section-presence (queue-kit/spec-kit) — assert manifest files retain the
-    mandatory `##` headings the index tooling locates work by.
-  - slug-component-collision (queue-kit) — flag a live task slug equal to a
-    component-directory name.
-  - root-tiering (spec-kit/gate-sdk) — assert the repo root holds only an allowlisted
-    orientation set; workflow machinery stays under the workflow dir.
-  - script-names (gate-sdk) — the `check-<area>` naming convention plus bidirectional
-    script↔doc citation coverage. Surfaced 2026-07-08.
-- **commit-message-hygiene-gate** [needs-spec] — CLAUDE.md bans local paths, private
-  repo/project names, accounts, and internal session/commit references "in tracked
-  files or commit messages," and the practice strips the `claude.com/claude-code`
-  promo URL from commit footers (the `Co-Authored-By` trailer stays — the established
-  convention across the whole history). The tracked-files half is grep-able by an
-  ordinary whole-tree gate; the commit-message half has no enforcement — the gate
-  framework generates only a `pre-commit` hook, which never sees the message. Scope
-  must rule the enforcement surface (a generated `commit-msg` hook the gate-sdk learns
-  to emit and install, vs. a CI/history scan over `git log`) and split the
-  banned-pattern set per the extraction seam: the Claude-URL pattern is a generic kit
-  default, but private repo/project term lists are rule content — consumer config,
-  never a kit literal. Surfaced 2026-07-08.
-- **reconsider-spec-pointers** [needs-spec] — the operator's standing doubt that
-  `spec:` pointers earn their keep: only the forward side is gate-checked
-  (`check-spec-pointer` confirms the target resolves), the reverse (code still
-  satisfies the cited section) is a review concern, and the basename↔§heading
-  convention already derives most of the coupling — so the pointer is largely
-  redundant and its gloss is SPEC restatement. Rule whether to drop `spec:` from
-  the comment-tier roster, narrow it to a bare pointer (no gloss), or keep it as
-  a forcing-function slot; a large reversal (the star topology,
-  `check-spec-pointer`'s reason to exist, the pointers across the tree) that
-  belongs in scope, not a build session. Surfaced 2026-07-08.
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
@@ -138,5 +77,7 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 
 ## Done
+
+- reconsider-spec-pointers
 
 ## Lessons Learned
