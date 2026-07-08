@@ -22,7 +22,9 @@ queue holds more than one scoped task, build may span several sessions — a
 same-stage re-entry stamps without flipping (above). Land one self-contained
 task per session and commit it cleanly rather than forcing every active task
 into one changeset; the stage stays in `build` until the queue empties. Move a
-finished task to `## Done` as you go; leave the rest for the next `/build`.
+finished task to `## Done` as you go — a **bare-slug** line (`- <slug>`), never
+the active-section `- **slug** — prose` shape it sat in (queue-kit/SPEC.md §The
+queue format); leave the rest for the next `/build`.
 
 One kit extraction per session where feasible. Copy the platform mechanism,
 de-hardcode per the scope ruling (config via env/config-file, platform values
