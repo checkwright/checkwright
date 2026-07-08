@@ -6,3 +6,4 @@
 
 norm-hardening scope 9a8f2539 2026-07-08
 norm-hardening align 6639054d 2026-07-08
+norm-hardening build 7cb9c78c 2026-07-08
