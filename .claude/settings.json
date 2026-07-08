@@ -49,6 +49,10 @@
       "Bash(tail *)"
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash delegation-kit/templates/statusline-usage.sh"
+  },
   "hooks": {
     "SessionStart": [
       {

@@ -225,7 +225,7 @@ no subscription percentage applies). Optional keys are omitted when their
 source has no value, never written empty; keys the verdict does not read
 pass through unchanged.
 
-`templates/statusline-usage.sh` is a minimal producer: a statusline hook
+`templates/statusline-usage.sh` is the reference producer: a statusline hook
 that parses the harness's rate-limit JSON and atomically writes the
 snapshot (`tmp` + `mv`) to `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`.
 It also produces the weekly pair from the payload and `account` / `tier`
@@ -234,9 +234,14 @@ overridable via `DELEGATION_KIT_CRED_FILE` / `DELEGATION_KIT_ACCOUNT_CONFIG`).
 It ships no `tokens_in` / `tokens_out` producer: this harness's payload
 carries no cumulative token count, so under the dead-producer rule the keys
 stay defined here for third-party producers but no dead producer is shipped.
-Any producer honoring the contract works — the source is pluggable
-(`DELEGATION_KIT_USAGE_FILE`), which de-hardcodes the source platform's
-single-operator `CLAUDE_CONFIG_DIR` assumption.
+Beyond the snapshot write it renders a status bar — model/effort, a context
+gauge, the 5h and 7d windows with reset countdowns, and the `iteration@stage`
+readout parsed from the queue header — self-contained ANSI, no external asset
+(§What stayed on the platform). The snapshot write is the contract; the bar is
+reference UX a consumer may restyle or discard. Any producer honoring the
+contract works — the source is pluggable (`DELEGATION_KIT_USAGE_FILE`), which
+de-hardcodes the source platform's single-operator `CLAUDE_CONFIG_DIR`
+assumption.
 
 **The sample line.** With sampling enabled (§usage-verdict), `usage-verdict`
 appends one line per parsed snapshot — the trend log's wire contract between
@@ -305,7 +310,7 @@ delegation-kit/
   templates/agent-execution.md            # full protocol skill
   templates/claude-md-agent-execution.md  # resident CLAUDE.md section
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
-  templates/statusline-usage.sh           # minimal usage.txt producer
+  templates/statusline-usage.sh           # reference usage.txt producer + status bar
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh
   smoke/violation.sh
@@ -430,7 +435,10 @@ rename corruption sweeps), its shared-file roster, and its width/burn
 anecdotes tied to specific sweeps — consumer rule content, referenced only
 as marked-section examples. Its task-output tailer (`read-task-outputs.sh`)
 stays: it hardcodes local harness paths and exists to violate protocol
-rule 2 for debugging. The full statusline (gauge bars, iteration display)
-stays as platform UX — only the `usage.txt` write contract and the minimal
-producer template leave. The platform remains the exemplar consumer:
-protocol and mechanisms here, its rosters and batteries in its own copies.
+rule 2 for debugging. The `usage.txt` write contract and a reference producer
+that renders the gauge bars and `iteration@stage` readout both leave (the
+producer's ANSI is self-contained — no `diagram-assets/` crossed); what stays
+platform-side is the platform's *particular* statusline styling and any asset
+its own gauges pull, not the rendering mechanism. The platform remains the
+exemplar consumer: protocol and mechanisms here, its rosters, batteries, and
+bespoke UX in its own copies.

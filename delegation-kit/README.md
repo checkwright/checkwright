@@ -38,11 +38,12 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    - Fill the two marked consumer sections in both: the shared-file roster and
      the validate battery.
 
-3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — copy
-   `templates/statusline-usage.sh` as your harness `statusLine` command, or have
-   any producer honour the snapshot contract (SPEC §The usage.txt contract).
-   The three mandatory lines are the floor; supplying the optional weekly keys
-   arms the second (7-day) pause axis.
+3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — point
+   your harness `statusLine` at `templates/statusline-usage.sh` (or copy it), or
+   have any producer honour the snapshot contract (SPEC §The usage.txt contract).
+   The reference producer also renders a status bar (context + both rate windows +
+   iteration@stage); the three mandatory snapshot lines are the floor, and
+   supplying the optional weekly keys arms the second (7-day) pause axis.
 
 4. Optional — wire the Agent budget guard: copy `templates/agent-budget-guard.sh`
    into your gates dir and register it under `PreToolUse` matcher `Agent` in
