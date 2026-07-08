@@ -5,3 +5,4 @@
 ---
 
 operational-hardening scope 77e4104b 2026-07-08
+operational-hardening align 35bd7001 2026-07-08
