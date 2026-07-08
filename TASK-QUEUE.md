@@ -13,14 +13,6 @@
 
 ## Technical Debt
 
-- **platform-second-scan** — read-only audit of the source platform's
-  meta-layer against the shipped kits (the extraction completed with
-  drift-kit): surface generic mechanism the extraction missed; file small
-  finds as debt in this iteration, larger ones as deferred design-pending
-  entries. Ruled over prioritizing the platform's own kit-adoption task —
-  that stays a platform-queue task per the seam ruling, and this scan is
-  its prerequisite map: adoption lands on verified-complete kits.
-
 ## Deferred
 
 - **kit-enum-completeness-gate** [needs-spec] — a meta-gate asserting the kit set
@@ -33,6 +25,55 @@
   shellcheck couples, all fixed; context-kit's `check-brevity` is still uncoupled
   from the gate-family meta-gates — an instance this gate must catch). Derive the
   check from `gate_kit_roots`, the canonical enumeration. Surfaced 2026-07-08.
+- **validate-evidence-layer** [needs-spec] — the one large gap from
+  platform-second-scan: lifecycle-kit's stage-evidence proves a stage was
+  *invoked*, never that it produced its green result. The platform closes this
+  with three coupled mechanisms — a held-constant test-baseline manifest (each
+  known-red test marked fail/ignore and coupled to a live tracking slug, diffed
+  per-test so a new regression and an unpromoted recovery can't net to zero), a
+  committed per-run evidence manifest (one line per suite, a log-digest pinning
+  the producing run, gated at stage-close and merge, truncated at the iteration
+  boundary), and a run-validate contract (regenerate projection → run → diff
+  baseline → record verdict, never editing the baseline, failures surfaced
+  verbatim). Test-runner/suite/scenario globs are consumer config; the teardown
+  ops stay on the platform. Extends lifecycle-kit (validate stage) or a new
+  evidence-kit; the evidence-manifest format is also the natural wire contract
+  for the deferred hosted-attestation-service (its attestation payload).
+  Surfaced 2026-07-08.
+- **extraction-completeness-gates** [needs-spec] — the small missed-mechanism
+  cluster from platform-second-scan: content-free structural gates the first
+  extraction pass skipped. Not build-ready — scope must rule per-gate which earn a
+  slot on checkwright under §Minimal footprint (a real, cheap, non-redundant drift
+  axis on a surface this repo actually has) versus platform-only mechanism that
+  does not apply here or is already covered: handbook-coverage presumes an
+  always-loaded / on-demand doc split checkwright lacks; todo-refs presumes
+  `TODO(task:<slug>)` markers the tree may not use; md-refs / required-section
+  overlap `check-spec-pointer` and the queue-index heading dependency. The scan
+  map to rule against, closest kit in parens:
+  - spec-fence-balance (spec-kit) — assert an even fence-delimiter count; spec-kit's
+    fence-parsing gates desync and fail *open* on an odd count.
+  - md-refs (spec-kit/context-kit) — resolve internal markdown links + `#anchor`
+    heading slugs across a configured doc set (dead-link rot).
+  - stage-skill-coverage (lifecycle-kit) — couple the stage set to its
+    `.claude/commands/<stage>.md` files, both directions.
+  - handbook-coverage (context-kit) — hold an always-loaded directive's section
+    index and its on-demand reference's section set verbatim-identical.
+  - todo-refs (queue-kit) — resolve every `TODO(task:<slug>)` marker to a known
+    queue slug; ban bare FIXME/HACK on governed surfaces.
+  - backlog-aging (queue-kit → drift-kit) — advisory tripwire on deferred entries /
+    permanent exemptions aged past a git-derived re-verification window.
+  - gate-runtime-budget (gate-sdk → drift-kit) — advisory over the gate-timings
+    measurement; flag any gate over 2× budget or the battery over aggregate.
+  - hook-exec-bit (gate-sdk) — assert governed scripts + git hooks keep the exec
+    bit; git silently skips a non-executable hook.
+  - required-section-presence (queue-kit/spec-kit) — assert manifest files retain the
+    mandatory `##` headings the index tooling locates work by.
+  - slug-component-collision (queue-kit) — flag a live task slug equal to a
+    component-directory name.
+  - root-tiering (spec-kit/gate-sdk) — assert the repo root holds only an allowlisted
+    orientation set; workflow machinery stays under the workflow dir.
+  - script-names (gate-sdk) — the `check-<area>` naming convention plus bidirectional
+    script↔doc citation coverage. Surfaced 2026-07-08.
 - **reconsider-spec-pointers** [needs-spec] — the operator's standing doubt that
   `spec:` pointers earn their keep: only the forward side is gate-checked
   (`check-spec-pointer` confirms the target resolves), the reverse (code still
@@ -87,5 +128,6 @@
 
 - budget-injection-automation
 - comment-restatement-gate
+- platform-second-scan
 
 ## Lessons Learned
