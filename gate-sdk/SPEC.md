@@ -34,6 +34,8 @@ override with `GATE_SDK_GATES_DIR`) holding:
   repo-relative paths that must stay present and tracked (see there).
 - `identity.conf` — optional manifest for `check-identity`: the git identity
   (committer email, remote host) this clone must resolve to (see there).
+- `root-allowlist.list` — optional manifest for `check-root-tiering`: the
+  tracked top-level entries permitted at the repo root (see there).
 
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
@@ -44,7 +46,8 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
-siblings holding a `checks/` or a `smoke/`). Paths are repo-root-relative; every entry point
+siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT_ALLOWLIST` (default
+`<gates-dir>/root-allowlist.list`). Paths are repo-root-relative; every entry point
 `cd`s to `git rev-parse --show-toplevel` before resolving them.
 
 ## The gate model
@@ -565,6 +568,30 @@ non-repo cwd is fail-closed (exit 2); a hooks dir with no tracked files, or an
 absent hooks dir, is clean (nothing committed to skip). The `# graph:` couples
 the hooks dir at `tier=precommit`, and the whole-tree `run-gates.sh` battery is
 the backstop for a mode-only change no `ACMR` content filter would surface.
+
+### check-root-tiering
+
+Invariant: every tracked top-level entry of the scanned tree (`git ls-files`
+first-segment set; scan root is the optional second argument, default `.`) is
+covered by an allowlist entry — an exact name or a glob (`SPEC-*.md`). The repo
+root is the orientation surface a reader lands on; agent-authored repos
+accumulate root scratch by reflex, so the allowlist makes a genuinely new root
+surface a deliberate config edit rather than a silent drop, and keeps workflow
+machinery under the configured workflow/gates dirs. A non-repo cwd, or an
+unreadable allowlist, is fail-closed (exit 2).
+
+The allowlist is optional consumer config (the `graph-vocab.sh` pattern): the
+path knob is `GATE_SDK_ROOT_ALLOWLIST` (default `<gates-dir>/root-allowlist.list`),
+registry-style — one entry per line, `#` comments and blanks ignored. An absent
+file falls back to the built-in minimal orientation set (`README.md`, `LICENSE`,
+the configured queue file, `CLAUDE.md`, `.gitignore`, plus the `SPEC-*.md`
+amendment glob — a root-component amendment is a legitimate transient root
+surface for any spec-kit consumer, so a gate that reddened every scope stage
+would only train bypassing). The intentional-new-surface valve is the manifest
+itself: adding a root entry means adding its allowlist line in the same commit,
+a diff-visible edit needing no exemption tag. The `# graph:` couples the
+manifest at `tier=precommit`; the whole-tree `run-gates.sh` battery is the
+backstop for a pure-addition commit outside the trigger's staged view.
 
 ### templates/check-skeleton.sh
 

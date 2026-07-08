@@ -69,6 +69,10 @@ if staged_matches 'scripts/git-hooks/*'; then
     gate-sdk/checks/check-hook-exec-bit.sh || hook_fail check-hook-exec-bit
 fi
 
+if staged_matches 'scripts/root-allowlist.list'; then
+    gate-sdk/checks/check-root-tiering.sh || hook_fail check-root-tiering
+fi
+
 if staged_matches 'scripts/core-files.list'; then
     gate-sdk/checks/check-core-files.sh || hook_fail check-core-files
 fi

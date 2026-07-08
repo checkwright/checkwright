@@ -1,0 +1,35 @@
+# Root-tiering allowlist — gate-sdk/SPEC.md §check-root-tiering. One tracked
+# top-level entry per line (`#` comments and blanks ignored); a line may be a
+# glob. Every tracked entry at the repo root must be covered here — a new root
+# surface is a deliberate edit to this file, not a reflex scratch drop.
+
+# Orientation files
+README.md
+LICENSE
+CLAUDE.md
+TASK-QUEUE.md
+.gitignore
+
+# In-flight spec amendments (spec-kit lifecycle — transient root surface)
+SPEC-*.md
+
+# Workflow + gates machinery
+.claude
+.workflow
+scripts
+
+# Shared assets
+assets
+
+# Name-reservation placeholders (not developed in)
+reserve
+
+# The kits (this is a kit monorepo — each kit is a top-level root)
+gate-sdk
+lifecycle-kit
+queue-kit
+spec-kit
+guard-kit
+delegation-kit
+context-kit
+drift-kit
