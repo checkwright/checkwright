@@ -49,6 +49,7 @@ tmpdir="${GATE_SDK_TMP_DIR:-.tmp}"
 mkdir -p "$tmpdir"
 tmpqueue="$tmpdir/enter-stage.queue.$$"
 trap 'rm -f "$tmpqueue"' EXIT
+truncated=()
 
 if [[ "$first" == 1 ]]; then
     awk -v nh="## Iteration: —  [stage: $stage]" '
@@ -72,6 +73,14 @@ fi
 if [[ "$first" == 1 ]]; then
     header_only="$(awk '{ print } /^---[[:space:]]*$/ { exit }' "$STATE")"
     printf '%s\n\n%s\n' "$header_only" "$stamp_line" > "$STATE"
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_BOUNDARY_TRUNCATE: reset each listed file to its leading '# contract:' header at the iteration boundary
+    for bt in ${LIFECYCLE_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_BOUNDARY_TRUNCATE[@]}"}; do
+        [[ -f "$bt" ]] || continue
+        bttmp="$tmpdir/boundary-truncate.$$"
+        awk 'drop { next } /^#/ || /^[[:space:]]*$/ { print; next } { drop = 1 }' "$bt" > "$bttmp"
+        mv "$bttmp" "$bt"
+        truncated+=("$bt")
+    done
 else
     printf '%s\n' "$stamp_line" >> "$STATE"
 fi
@@ -84,3 +93,4 @@ else
     echo "enter-stage: stamped '$stamp_line'; header flipped to [stage: $stage]."
 fi
 echo "  next: commit $QUEUE and $STATE together (the flip+stamp ride in one commit)."
+[[ ${#truncated[@]} -gt 0 ]] && echo "  note: boundary-truncated to the '# contract:' header: ${truncated[*]} — commit alongside the reset."

@@ -1,0 +1,10 @@
+# held-constant validate baseline: <suite> <scenario> <status> [<slug>]
+gates gates pass
+gatesdk_fixtures gatesdk_fixtures pass
+lifecycle_fixtures lifecycle_fixtures pass
+queue_fixtures queue_fixtures pass
+spec_fixtures spec_fixtures pass
+delegation_fixtures delegation_fixtures pass
+context_fixtures context_fixtures pass
+evidence_fixtures evidence_fixtures pass
+guard_tests guard_tests pass

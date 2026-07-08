@@ -34,6 +34,7 @@ bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks       
 bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests spec-kit/checks             # spec-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
 bash guard-kit/bin/run-guard-tests.sh                                                # guard-kit decision table
 ```
 

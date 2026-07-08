@@ -26,3 +26,8 @@ delegation-kit/SPEC.md
 context-kit/SPEC.md
 guard-kit/SPEC.md
 drift-kit/SPEC.md
+evidence-kit/SPEC.md
+
+# Held-constant validate baseline + committed per-run evidence manifest.
+.workflow/validate-baseline.txt
+.workflow/validate-evidence.txt

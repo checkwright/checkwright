@@ -37,5 +37,7 @@ check-manifest-temporal
 check-manifest-count
 check-comment-tier
 check-spec-pointer
+check-evidence-baseline
+check-evidence-manifest
 check-gate-tamper
 check-brevity

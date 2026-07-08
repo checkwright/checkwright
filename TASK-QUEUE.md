@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **validate-evidence-layer** [spec: SPEC-evidence-kit.md] — evidence-kit, a new
-  kit: held-constant test baseline, committed per-run evidence manifest (the
-  versioned wire contract for the deferred attestation rung), run-validate
-  spine, and lifecycle-kit's generic boundary-truncate knob.
-
 ## Technical Debt
 
 ## Deferred
@@ -101,5 +96,6 @@
 - reconsider-spec-pointers
 - kit-enum-completeness-gate
 - extraction-completeness-gates
+- validate-evidence-layer
 
 ## Lessons Learned

@@ -84,6 +84,13 @@ stays uncommitted under the tmp dir; its digest pins which run produced the
 counts. The iteration key scopes the line so the boundary-truncate knob can
 clear the manifest at the start of the next iteration.
 
+The header is a wire-format version marker, not a doc pointer; `check-evidence-manifest`
+owns it (asserts the first line is `# contract: <version>`). A consumer that
+also runs spec-kit's `check-spec-pointer` / `check-comment-tier` over its
+workflow dir whitelists the baseline and manifest there (they are data files,
+`SPEC_KIT_COMMENT_WHITELIST`), so the `contract:` header is read as the wire
+marker it is rather than a dangling spec pointer.
+
 ### bin/run-validate.sh
 
 The codified spine: the optional per-suite pre-hook, then each suite run

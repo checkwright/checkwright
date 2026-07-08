@@ -155,6 +155,14 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-
     spec-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
 fi
 
+if staged_matches '.workflow/validate-baseline.txt' 'TASK-QUEUE.md'; then
+    evidence-kit/checks/check-evidence-baseline.sh || hook_fail check-evidence-baseline
+fi
+
+if staged_matches '.workflow/validate-evidence.txt' 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
+    evidence-kit/checks/check-evidence-manifest.sh || hook_fail check-evidence-manifest
+fi
+
 if staged_matches 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
 fi

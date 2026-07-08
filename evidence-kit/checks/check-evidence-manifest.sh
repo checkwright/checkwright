@@ -17,11 +17,18 @@ STATE="${3:-$EVIDENCE_KIT_STATE_FILE}"
     exit 1
 }
 
+want_header="# contract: $EVIDENCE_MANIFEST_CONTRACT"
+if [[ "$(head -n1 "$MANIFEST")" != "$want_header" ]]; then
+    echo "EVIDENCE-MANIFEST: first line is not the versioned wire-format header '$want_header' in $MANIFEST"
+    echo "  help: the manifest's first line declares the wire contract the attestation payload is versioned by; run-validate never rewrites it, and the iteration-boundary truncation preserves it"
+    exit 1
+fi
+
 iter=""; stage=""
 iter="$(ek_queue_iteration "$QUEUE" 2>/dev/null || true)"
 stage="$(ek_queue_stage "$QUEUE" 2>/dev/null || true)"
 
-# assertion B: every manifest line is the eight-field shape and carries the current iteration
+# assertion B: every manifest line carries the version header, the eight-field shape, and the current iteration
 grammar_errs=()
 declare -A clean_suite_date=()
 have_line_for_iter=0

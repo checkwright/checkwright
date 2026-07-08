@@ -88,7 +88,8 @@ queue sections, waiver token, amendment/roster shapes, the skills dir
 (`LIFECYCLE_SKILLS_DIR`, default `.claude/commands`, read by
 `check-stage-skill-coverage`), governed-file paths (`LIFECYCLE_QUEUE_FILE` /
 `LIFECYCLE_STATE_FILE`, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
-`GATE_SDK_WORKFLOW_DIR`). Knob semantics
+`GATE_SDK_WORKFLOW_DIR`), and `LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset
+to their header at the iteration boundary (§bin/enter-stage.sh). Knob semantics
 are documented in the template; the loader validates the machine (unknown
 stages in the map, a waiver token colliding with a stage name) and exits 2 on
 a malformed config — a broken machine must not gate anything.
@@ -128,7 +129,12 @@ An ordinary stage reads the iteration from the header, appends
 `<iteration> <stage> <id> <date>`, and swaps only the header's `[stage:]`
 token; the first stage (`LIFECYCLE_FIRST_STAGE`) performs the
 iteration-boundary reset instead — truncate the state file to its header,
-stamp under `—`, set the header to the unnamed-iteration form. **Pre-flight,
+stamp under `—`, set the header to the unnamed-iteration form, and reset every
+file in `LIFECYCLE_BOUNDARY_TRUNCATE` to its leading `# contract:` header the
+same way (a generic per-iteration reset knob — no consumer surface is named in
+the kit; a downstream kit whose per-iteration file must start each cycle from
+its contract header adds itself here, as evidence-kit's manifest does).
+**Pre-flight,
 not enforcement:** before writing, it runs `check-stage-entry` for the entered
 stage — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}` plus the real
 state file, through the gate's existing positionals, the gate itself
@@ -137,10 +143,11 @@ the refusal is advisory in the same sense the gate is at commit time (no
 `--force`, so the easy path is the compliant one). **Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,
 it reports and exits 0 without appending, so a crashed-and-resumed session
-re-runs its entry step safely. No new config — it reads the existing
-`lib/stages.sh` knobs (`LIFECYCLE_QUEUE_FILE`, `LIFECYCLE_STATE_FILE`,
-`LIFECYCLE_STAGES`, `LIFECYCLE_FIRST_STAGE`). Advisory tooling, not a gate: no
-fixture pair is owed; it is exercised end-to-end in `smoke/install.sh`.
+re-runs its entry step safely. It reads the `lib/stages.sh` knobs
+(`LIFECYCLE_QUEUE_FILE`, `LIFECYCLE_STATE_FILE`, `LIFECYCLE_STAGES`,
+`LIFECYCLE_FIRST_STAGE`, and `LIFECYCLE_BOUNDARY_TRUNCATE`). Advisory tooling,
+not a gate: no fixture pair is owed; it is exercised end-to-end in
+`smoke/install.sh`.
 
 ### check-stage-evidence
 
@@ -171,6 +178,13 @@ begins after the first `---` separator; prose above it is not validated
 line-by-line. Argument mode `$1 $2` (queue, state) with configured defaults
 makes the gate fixture-capable; the sentinel-scoping interplay that exceeds
 one good/bad pair is covered by `gate-tests/check-stage-evidence.test.sh`.
+
+Honest limit: the stamp proves the stage skill was *invoked*, never that it
+produced its green result — a validate stamp says validate ran, not that the
+suites passed. That gap is closed by evidence-kit, which commits a per-run
+evidence manifest (a suite verdict per line) and, via the optional
+`LIFECYCLE_BOUNDARY_TRUNCATE` integration, couples a `[stage: close]` entry to
+the full green block.
 
 ### check-stage-entry
 
@@ -242,6 +256,8 @@ check-skeleton. Each carries the generic spine (the flip+stamp first step,
 performed by invoking `enter-stage.sh <stage>` and stating in one line what it
 does; scope's truncate-and-bootstrap protocol; align's trigger-gating and waiver
 rule; build's step-0 audit recheck and stamp-per-session/flip-once rule;
-validate's baseline-diff discipline; close's disposition-per-lesson rule)
+validate's baseline-diff discipline plus the codified-spine + evidence-manifest
+commit step, recorded on a commit later than the entry flip; close's
+disposition-per-lesson rule)
 with `<…>` placeholders where the consumer's rule content goes. Structure is
 copied, not imported, so a consumer's skills stay legible and self-contained.

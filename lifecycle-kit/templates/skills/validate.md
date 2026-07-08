@@ -39,7 +39,11 @@ task rots.
 evidence manifest (suite, log digest, verdict, date) and commit it at validate
 completion — the evidence does not exist at the entry stamp, so it rides a
 later commit, not the entry flip. An iteration with a validate stamp but no
-evidence line is the recorded-nothing gap the manifest closes.
+evidence line is the recorded-nothing gap the manifest closes. If your kit
+provides a codified validate spine — a `run-validate` tool that runs each
+suite, diffs the held-constant baseline, and appends the evidence line —
+invoke it here rather than hand-running the suites and hand-writing the
+manifest.
 
 Do not declare validate complete until the baseline diff is clean: no
 baseline-pass item regressed, every held-constant red still carries a live

@@ -43,6 +43,8 @@ declare -p LIFECYCLE_CONTRACT_TOKENS &>/dev/null || LIFECYCLE_CONTRACT_TOKENS=("
 [[ -v LIFECYCLE_QUEUE_FILE ]] || LIFECYCLE_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 [[ -v LIFECYCLE_STATE_FILE ]] || LIFECYCLE_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
 
+declare -p LIFECYCLE_BOUNDARY_TRUNCATE &>/dev/null || LIFECYCLE_BOUNDARY_TRUNCATE=()
+
 lifecycle_header() {
     grep -m1 '^## Iteration:' "$1" 2>/dev/null || true
 }
