@@ -531,7 +531,14 @@ scope: the network is not a gate dependency. The doc set is the manifest set
 sources only, so an untracked local-only file (`BRIEF.local.md`) is a legitimate
 link *source* that is never scanned and, being git-ignored-and-present, a
 legitimate *target* that resolves without being tracked. A grep error is
-fail-closed (exit 2).
+fail-closed (exit 2). The link extractor is purely syntactic — it matches the
+bracket-then-paren link shape (a `]` immediately followed by a parenthesized
+target) without stripping code spans, so a literal markdown link written in
+governed prose is scanned as a real link even inside inline backticks; to name
+such a link in prose without tripping the gate, separate the `]` and the `(`
+(a space, or a line break — the scan is per-line). The amendment `SPEC-*.md`
+files escape only by lying outside the scanned doc set, not by any code-span
+exemption.
 
 ### templates/
 

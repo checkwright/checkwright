@@ -106,9 +106,4 @@
 
 ## Done
 
-- kit-registration-gate
-- budget-footprint-monitor
-- close-evidence-precondition-guard
-- delegation-tests-in-validate-battery
-
 ## Lessons Learned
