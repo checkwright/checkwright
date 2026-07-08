@@ -90,6 +90,10 @@ if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
+    queue-kit/checks/check-queue-sections.sh || hook_fail check-queue-sections
+fi
+
+if staged_matches 'TASK-QUEUE.md'; then
     queue-kit/checks/check-queue-hygiene.sh || hook_fail check-queue-hygiene
 fi
 

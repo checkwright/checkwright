@@ -61,7 +61,7 @@ tools scan (enforced by `check-tag-lead-line`).
 
 ## Layout and configuration
 
-The kit is vendored beside gate-sdk (conventionally at `queue-kit/`); its six
+The kit is vendored beside gate-sdk (conventionally at `queue-kit/`); its
 gates are registered in the consumer's `gates.list` by name and resolve
 through gate-sdk's multi-kit path. `bin/queue-index.sh` is a tool, not a gate
 (no `# graph:` manifest).
@@ -83,6 +83,11 @@ anything. Knobs:
   hygiene gate's no-prose axis, default `("Protocol:")`.
 - `QUEUE_KIT_PRECONDITION_REGEX` — the forward-precondition trigger set for
   `check-queue-prose-precondition`, default = the shipped phrase set.
+- `QUEUE_KIT_REQUIRED_SECTIONS` — array of `##` headings that must each appear
+  exactly once (`check-queue-sections`), default = the iteration header
+  (`Iteration:`, prefix-matched for its dynamic suffix) plus `New Features` /
+  `Technical Debt` / `Deferred` / `Done` / `Lessons Learned`. A trailing `:`
+  marks a prefix-matched heading; every other entry is matched exactly.
 
 Cross-kit note: lifecycle-kit's `LIFECYCLE_ACTIVE_SECTIONS` carries the same
 default. The knobs are independent (either kit runs without the other); a
@@ -121,7 +126,24 @@ column-0 line is a heading, a bullet, `---`, or a configured
 is banned, not semantic duplication, which is not mechanizable).
 
 Calibration: indented lines are never flagged on the prose axis; the
-lead-token allowance is a whole-line lead match, not a substring.
+lead-token allowance is a whole-line lead match, not a substring. Division of
+labour with `check-queue-sections`: hygiene owns line *shape* (what a column-0
+line may be), the sections gate owns heading *presence* (that each required
+`##` heading exists exactly once) — neither subsumes the other.
+
+### check-queue-sections
+
+Invariant: the queue file carries each `QUEUE_KIT_REQUIRED_SECTIONS` heading
+exactly once — zero occurrences (missing/typo'd) and two-or-more (accidental
+paste) are both red. This is the fail-closed floor under every section-scoped
+scanner: `check-amendment-queue`, `check-task-names`, `check-task-conservation`,
+and the session-context index all locate work by `## <section>` boundaries and
+silently find *nothing* — passing open — when a heading is dropped or
+misspelled. A trailing `:` on a required entry marks a dynamic-suffix heading
+(the iteration header, which carries its iteration name and `[stage:]`) and is
+prefix-matched; every other entry is matched exactly. A grep error (not a
+no-match) is fail-closed (exit 2). The `# graph:` couples the queue file at
+`tier=precommit`.
 
 ### check-queue-wrap
 

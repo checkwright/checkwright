@@ -17,6 +17,7 @@ check-core-files
 check-identity
 check-stage-evidence
 check-stage-entry
+check-queue-sections
 check-queue-hygiene
 check-queue-wrap
 check-tag-lead-line

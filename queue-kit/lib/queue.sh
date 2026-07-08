@@ -28,6 +28,9 @@ declare -p QUEUE_KIT_ACTIVE_SECTIONS &>/dev/null \
 
 [[ -v QUEUE_KIT_WRAP_BUDGET ]] || QUEUE_KIT_WRAP_BUDGET=100
 
+declare -p QUEUE_KIT_REQUIRED_SECTIONS &>/dev/null \
+    || QUEUE_KIT_REQUIRED_SECTIONS=("Iteration:" "New Features" "Technical Debt" "Deferred" "Done" "Lessons Learned")
+
 declare -p QUEUE_KIT_PROSE_LEADS &>/dev/null || QUEUE_KIT_PROSE_LEADS=("Protocol:")
 
 [[ -v QUEUE_KIT_PRECONDITION_REGEX ]] || QUEUE_KIT_PRECONDITION_REGEX='revisit when|once [^.]*(lands|ships|is (done|ready|merged))|gated on|contingent on|waiting on|pending [a-z]|blocked on'
@@ -76,6 +79,7 @@ _qk_errs=()
 [[ "$QUEUE_KIT_WRAP_BUDGET" =~ ^[0-9]+$ && "$QUEUE_KIT_WRAP_BUDGET" -gt 0 ]] \
     || _qk_errs+=("QUEUE_KIT_WRAP_BUDGET must be a positive integer (got '$QUEUE_KIT_WRAP_BUDGET')")
 [[ -n "$QUEUE_KIT_PRECONDITION_REGEX" ]] || _qk_errs+=("QUEUE_KIT_PRECONDITION_REGEX is empty")
+[[ ${#QUEUE_KIT_REQUIRED_SECTIONS[@]} -gt 0 ]] || _qk_errs+=("QUEUE_KIT_REQUIRED_SECTIONS is empty")
 if [[ ${#_qk_errs[@]} -gt 0 ]]; then
     printf 'queue-kit: malformed queue config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_qk_errs[@]}" >&2
