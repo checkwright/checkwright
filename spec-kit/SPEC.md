@@ -227,7 +227,9 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   consumer sets `.unwrap( .expect( unsafe #[allow(`).
   `SPEC_KIT_COMMENT_WHITELIST` — array of globs, default empty: the
   consumer's not-yet-swept sources, its array tagged `# exception-list:`
-  with a per-entry `# until: <drain-task>`.
+  with a per-entry `# until: <drain-task>`. `SPEC_KIT_COMMENT_RUN_CAP` —
+  positive integer, default 3: total physical comment lines a directive
+  blesses (its own line plus continuations, blank `#` lines counted).
 
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
@@ -404,10 +406,14 @@ topology exists). `align-only` tier.
 
 Invariant: every full-line comment on a governed source is one of — a
 machine directive (a comment a tool parses: `graph:`, `shellcheck`,
-`contract:`), a reason directive (a spec pointer or positional
-justification: `spec:`, `exception-list:`, `no-fixture:`, `assertion`,
-`permanent:`, `TODO(task:`, `TODO(spec-ambiguity)`, which also blesses the
-contiguous comment run it opens), `comment-tier-exempt: <reason>`, or the
+`contract:`), a reason directive (a spec pointer, usage synopsis, or
+positional justification: `spec:`, `usage:`, `exception-list:`,
+`no-fixture:`, `assertion`, `permanent:`, `TODO(task:`,
+`TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus
+continuation lines up to `SPEC_KIT_COMMENT_RUN_CAP` total physical comment
+lines, blank `#` lines counted; a directive mid-run opens a fresh window
+from its own line, and every comment line beyond a window classifies on its
+own), `comment-tier-exempt: <reason>`, or the
 comment immediately above a positional construct from the language roster.
 Anything else is flagged. Code is the WHAT, its SPEC the WHY — the seam the
 align stage checks each side against; a comment that restates the code, or
@@ -428,7 +434,16 @@ that neither tier owns.
 Calibration: the built-in roster is Checkwright's own kit-mechanism
 directive names; `SPEC_KIT_COMMENT_MACHINE` / `_REASON` append a consumer's
 product vocabulary (the same split as `check-graph`'s vocab — the mechanism
-ships, the rule content is config). The default surface is shell (`#`),
+ships, the rule content is config). The window cap is
+`SPEC_KIT_COMMENT_RUN_CAP` (default 3 — one wrapped sentence): a
+within-window continuation is the directive's own wording physically
+wrapped, blessed as such, while prose beyond the window is presumed
+relocated restatement and deleted. `comment-tier-exempt:` is reserved for a
+genuinely-local fact neither tier owns, and exempting a restatement rather
+than deleting it is itself the defect — a long roster (a `usage:` option
+list, a header) restructures into directive-anchored short paragraphs or
+trims, never launders prose past the cap. The default surface is shell
+(`#`),
 with the `.workflow/*.txt` state files blessing only `contract:`/`see`;
 slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships
 as mechanism and activates when a consumer widens `SPEC_KIT_COMMENT_SURFACE`

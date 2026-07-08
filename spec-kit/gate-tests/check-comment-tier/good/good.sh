@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # graph: couples=X dir=one valve=none tier=precommit
-# spec: some/SPEC.md §thing — the header block leads with directives
-#
-# usage: this prose rides the run the spec: directive opened, so it is
-#   blessed without carrying a directive of its own.
+# spec: some/SPEC.md §thing — the header leads with directives
+# usage: good.sh [--flag]   (usage: anchors its own window; this wrap is within cap)
 set -uo pipefail
 
-# spec: some/SPEC.md §helper — a mid-file block that leads with a directive
-# blesses its own continuation wording (the reason's run).
+# spec: some/SPEC.md §helper — a mid-file directive blesses its own line plus
+# its continuation wording up to the run cap, so this second line and the
+# third line here both ride within the three-line window.
 foo() { echo hi; }
 
 x=1  # a trailing inline comment is out of scope by construction

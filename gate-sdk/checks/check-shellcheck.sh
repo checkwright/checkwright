@@ -3,9 +3,7 @@
 # spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning (the self-lint contract)
 #
 # usage: check-shellcheck.sh [dir...]
-#   Lints *.sh directly under each given dir. Default: the consumer gates dir
-#   plus each vendored kit's lib/, bin/, and checks/ — the family lints itself
-#   by the standard it enforces.
+#   default dirs: consumer gates dir + each kit's lib/, bin/, checks/
 
 set -uo pipefail
 

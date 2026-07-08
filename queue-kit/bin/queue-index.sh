@@ -2,11 +2,8 @@
 # spec: queue-kit/SPEC.md §bin/queue-index.sh — compact queue surface for task selection (a tool, not a gate; no # graph: manifest)
 #
 # usage: queue-index.sh [--collapse-deferred] [--extent <slug>] [queue-file]
-#   (default)             iteration header + active entries (• ready / ✗ blocked)
-#                         + the deferred entries, one title per line.
-#   --collapse-deferred   replaces the deferred listing with a per-### tally.
-#   --extent <slug>       prints "<start> <end>" — the inclusive line range of
-#                         that entry's whole subtree (incl. the trailing blank).
+#   default: iteration header + active (• ready / ✗ blocked) + deferred titles;
+#   --collapse-deferred: per-### tally; --extent <slug>: "<start> <end>" line range
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

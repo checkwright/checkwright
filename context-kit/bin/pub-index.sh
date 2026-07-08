@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §Index-first reading — compact public API surface for Rust source files
-#
-# Extracted from the governance meta-layer of a private production platform;
-# the repo-root derivation is de-hardcoded (git top-level, cwd fallback). This
-# is the kit's one language-specific tool, shipped as the Rust extractor rather
-# than a plugin framework — a consumer in another language writes its own
-# <lang>-index and names it in the hook template (context-kit/SPEC.md).
+# usage: pub-index.sh [paths…]
 
 set -euo pipefail
 

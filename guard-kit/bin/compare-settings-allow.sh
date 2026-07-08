@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
-# spec: guard-kit/SPEC.md §compare-settings-allow — list local allow entries
-# already granted by a committed glob (the deterministic prune-candidate set).
-#
-# Advisory, read-only — reports candidates, never mutates. A committed pattern
-# subsumes a local entry when the local string matches it under shell-glob
-# semantics; the harness `:*` prefix idiom (`Bash(printf:*)` ≡ any `printf …`)
-# is normalized to a trailing `*` so one glob test covers both forms. It is the
-# detector, not the policy: a non-redundant local entry can still be one-off
-# junk worth pruning by judgment. `--count` emits the bare count.
+# spec: guard-kit/SPEC.md §compare-settings-allow — the deterministic prune-candidate set
+# usage: compare-settings-allow.sh [--count]
 set -uo pipefail
 
 BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

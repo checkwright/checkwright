@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-task-split: feature↔debt split of the queue's Done slugs
-#
-# Lead. Classifies each Done slug by its commit subject: feat → feature, fix /
-# refactor → debt. Trend is the direction of the ratio across iterations, not
-# the level. Degrades to n/a when nothing is Done yet.
 set -uo pipefail
 
 QUEUE="${DRIFT_KIT_QUEUE_FILE:-TASK-QUEUE.md}"

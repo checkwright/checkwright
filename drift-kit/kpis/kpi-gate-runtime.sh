@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-gate-runtime: full-battery runtime from the runner's timings file
-#
-# Lead. Reads $DRIFT_KIT_TIMINGS_FILE (the runner's per-gate + TOTAL lines):
-# total, the three slowest gates, and the file's reading age. A measurement,
-# not live state, so the age caveat rides the value. Degrades to n/a when no
-# timings file exists yet.
 set -uo pipefail
 
 TIMINGS="${DRIFT_KIT_TIMINGS_FILE:-${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt}"

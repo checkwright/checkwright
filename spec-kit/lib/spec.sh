@@ -83,6 +83,7 @@ declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
 declare -p SPEC_KIT_COMMENT_SURFACE &>/dev/null || SPEC_KIT_COMMENT_SURFACE=()
 declare -p SPEC_KIT_COMMENT_POSITIONAL &>/dev/null || SPEC_KIT_COMMENT_POSITIONAL=()
 declare -p SPEC_KIT_COMMENT_WHITELIST &>/dev/null || SPEC_KIT_COMMENT_WHITELIST=()
+[[ -v SPEC_KIT_COMMENT_RUN_CAP ]] || SPEC_KIT_COMMENT_RUN_CAP=3
 
 spec_alt() { local IFS='|'; printf '%s' "$*"; }
 
@@ -148,9 +149,8 @@ spec_manifest_files() {
 }
 
 # spec: spec-kit/SPEC.md §lib/spec.sh — the governed comment surface shared by
-# check-comment-tier and check-spec-pointer: explicit globs when
-# SPEC_KIT_COMMENT_SURFACE is set, else derived shell sources (templates + the
-# per-knob vendored kit roots pruned) plus the workflow *.txt state files.
+# check-comment-tier and check-spec-pointer (explicit SPEC_KIT_COMMENT_SURFACE
+# globs, else derived shell sources + workflow *.txt state files).
 spec_comment_surface() {
     local root="${1:-.}" g f
     if [[ ${#SPEC_KIT_COMMENT_SURFACE[@]} -gt 0 ]]; then
@@ -196,6 +196,8 @@ _sk_errs=()
 [[ -n "$SPEC_KIT_GLOSSARY_FILE" ]] || _sk_errs+=("SPEC_KIT_GLOSSARY_FILE is empty")
 [[ ${#SPEC_KIT_TEMPORAL_MARKERS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_TEMPORAL_MARKERS is empty")
 [[ ${#SPEC_KIT_COUNT_COLLECTIONS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_COUNT_COLLECTIONS is empty")
+[[ "$SPEC_KIT_COMMENT_RUN_CAP" =~ ^[0-9]+$ && "$SPEC_KIT_COMMENT_RUN_CAP" -gt 0 ]] \
+    || _sk_errs+=("SPEC_KIT_COMMENT_RUN_CAP must be a positive integer (got '$SPEC_KIT_COMMENT_RUN_CAP')")
 if [[ ${#_sk_errs[@]} -gt 0 ]]; then
     printf 'spec-kit: malformed spec config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_sk_errs[@]}" >&2

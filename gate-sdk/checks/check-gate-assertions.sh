@@ -2,11 +2,8 @@
 # graph: couples=gate-sdk/SPEC.md,lifecycle-kit/SPEC.md,queue-kit/SPEC.md,spec-kit/SPEC.md,delegation-kit/SPEC.md,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh dir=bi valve=none tier=align-only
 # spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion span+count to the gate code's `# assertion` markers
 #
-# usage: check-gate-assertions.sh [spec [scripts-dir]]
-#   With no spec argument, scans <gates-dir>/SPEC.md when present plus each
-#   vendored kit's own SPEC.md. With no scripts-dir, each §<gate> resolves
-#   against the consumer gates dir, then each kit's checks/. Requires GNU awk
-#   (3-arg match).
+# usage: check-gate-assertions.sh [spec [scripts-dir]]   (defaults: kit SPEC.md set; kit checks/ dirs)
+#   requires GNU awk (3-arg match)
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

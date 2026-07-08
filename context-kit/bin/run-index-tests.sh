@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §Testing — expected-output runner for the advisory bin tools
-#
-#   run-index-tests.sh            diff each tool's output against its golden
-#   run-index-tests.sh --update   rewrite the goldens from current output
+# usage: run-index-tests.sh [--update]   (bare: diff vs golden; --update: rewrite goldens)
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

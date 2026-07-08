@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-deferred-age: age of the oldest Surfaced mark in the deferred section
-#
-# Lead. Premise-rot pressure on design-pending work: the oldest `Surfaced
-# <date>` mark (queue-kit's ungated convention) in the queue's deferred
-# section, in days. Degrades to n/a when no mark is present.
 set -uo pipefail
 
 QUEUE="${DRIFT_KIT_QUEUE_FILE:-TASK-QUEUE.md}"

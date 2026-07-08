@@ -2,14 +2,7 @@
 # graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,guard-kit/*.sh,context-kit/*.sh,.workflow/*.txt dir=one valve=none tier=precommit
 # spec: spec-kit/SPEC.md §check-spec-pointer — every spec:/contract: pointer directive on a governed surface resolves: its target file is tracked and a §heading fragment names a heading the file carries
 #
-# usage: check-spec-pointer.sh [scan-root]
-#   For every full-line spec:/contract: directive on the governed sources under
-#   the root (default '.', the same surface check-comment-tier blesses by shape),
-#   resolve its `<path> [§<heading>]` target — forward direction only: <path>
-#   (root-relative) must be a tracked file, and a `§<heading>` fragment must name
-#   a markdown heading the file carries. A pointer without `§` resolves file-only.
-#   Reddens on a missing/untracked target, an absent named heading, or a directive
-#   that matched the pointer shape but carries no target path (fail-closed).
+# usage: check-spec-pointer.sh [scan-root]   (default '.')
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §run-gates — aggregate gate runner; runs every gates.list member in one shot
 #
-# usage: run-gates.sh [gates-dir]
-#   gates-dir defaults to $GATE_SDK_GATES_DIR (default: scripts), relative to
-#   the repo root. Members resolve against gates-dir first, then each vendored
-#   kit's checks/ directory (gate_kit_roots). Per-gate + total timings land in
-#   $GATE_SDK_TMP_DIR/gate-timings.txt (default: .tmp/) — a measurement, not
-#   state; never committed.
+# usage: run-gates.sh [gates-dir]   (default: $GATE_SDK_GATES_DIR, default 'scripts')
+#   per-gate + total timings → $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/);
+#   a measurement, never committed
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

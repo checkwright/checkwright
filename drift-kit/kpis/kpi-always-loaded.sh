@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-always-loaded: standing per-session surface via context-kit
-#
-# Lead. Level and since-baseline delta from context-kit's always-loaded.sh
-# meter. Degrades to n/a when context-kit is absent.
 set -uo pipefail
 
 kit_roots() {

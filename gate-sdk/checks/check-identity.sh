@@ -3,12 +3,8 @@
 # spec: gate-sdk/SPEC.md §check-identity — every expectation in the identity manifest matches this clone's local git identity
 #
 # usage: check-identity.sh [--fixture <dir>] [manifest]
-#   Defaults to GATE_SDK_IDENTITY_FILE (default <gates-dir>/identity.conf).
-#   Optional consumer config: an absent, empty, or comment-only manifest is
-#   clean; a mismatch (email, remote-host, or a configured remote that is
-#   absent) is a violation; a malformed manifest line is fail-closed (exit 2).
-#   --fixture <dir> injects the clone's actual identity (git-config-email,
-#   git-remotes) so the reads are deterministic in the fixtured tests.
+#   default manifest: GATE_SDK_IDENTITY_FILE (<gates-dir>/identity.conf);
+#   --fixture <dir> injects a clone's git identity for deterministic tests
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-prompt-friction: distinct/total prompting calls via guard-kit
-#
-# Lead. Reads guard-kit's scan-prompts.sh --count (distinct patterns / total
-# prompting calls from the friction log). Degrades to n/a when guard-kit or its
-# log is absent.
 set -uo pipefail
 
 kit_roots() {

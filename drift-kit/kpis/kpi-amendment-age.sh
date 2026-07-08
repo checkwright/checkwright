@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-amendment-age: age of the oldest amendment on disk
-#
-# Lead. The pressure gauge behind spec-kit's short-lived-amendment rule: the
-# git add-date age, in days, of the oldest SPEC-*.md amendment still tracked.
-# Degrades to n/a when no amendment is on disk.
 set -uo pipefail
 
 mapfile -t amends < <(git ls-files 2>/dev/null | grep -E '(^|/)SPEC-[^/]*\.md$')

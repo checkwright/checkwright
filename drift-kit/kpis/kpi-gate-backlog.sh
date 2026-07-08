@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-gate-backlog: proposed-but-absent gates over the live gate count
-#
-# Lead. check-*/scan-* names named anywhere in the queue with no file in any
-# gate-resolution dir (gates dir, each kit's checks/ + bin/). A name with a
-# file on disk is built and drops out of the numerator.
 set -uo pipefail
 
 QUEUE="${DRIFT_KIT_QUEUE_FILE:-TASK-QUEUE.md}"

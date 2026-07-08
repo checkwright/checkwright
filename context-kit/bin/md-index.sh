@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §Index-first reading — compact heading hierarchy with first sentence per section
-#
-# Extracted from the governance meta-layer of a private production platform;
-# the repo-root derivation is de-hardcoded (git top-level, cwd fallback) so the
-# tool runs from any consumer layout.
+# usage: md-index.sh [paths…]   (default: whole tree, build dirs skipped)
 
 set -euo pipefail
 

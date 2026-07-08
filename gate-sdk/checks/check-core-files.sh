@@ -3,9 +3,7 @@
 # spec: gate-sdk/SPEC.md §check-core-files — every path in the core-files manifest exists in the worktree and is tracked
 #
 # usage: check-core-files.sh [manifest]
-#   Defaults to GATE_SDK_CORE_FILES_FILE (default <gates-dir>/core-files.list).
-#   Optional consumer config: an absent, empty, or comment-only manifest is
-#   clean; a present-but-unreadable manifest is fail-closed (exit 2).
+#   default: GATE_SDK_CORE_FILES_FILE (<gates-dir>/core-files.list)
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

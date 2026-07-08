@@ -3,9 +3,7 @@
 # spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — every gates.list member has a fixture pair or a no-fixture opt-out
 #
 # usage: check-gate-fixture-coverage.sh [gates-dir [tests-dir...]]
-#   Fixture pairs are searched across the given tests dirs. Default:
-#   <gates-dir>/gate-tests plus each vendored kit's own gate-tests/ (a kit's
-#   shipped gates carry their pairs there).
+#   default tests dirs: <gates-dir>/gate-tests + each kit's gate-tests/
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -11,11 +11,6 @@
 
 ## New Features
 
-- **comment-restatement-gate** [spec: SPEC-comment-run-cap.md] — bound
-  check-comment-tier's run-blessing to a capped window so relocated prose
-  cannot ride a directive; add `usage:` to the roster; sweep the
-  over-window sites the scope measurement located.
-
 ## Technical Debt
 
 - **platform-second-scan** — read-only audit of the source platform's
@@ -28,6 +23,16 @@
 
 ## Deferred
 
+- **reconsider-spec-pointers** [needs-spec] — the operator's standing doubt that
+  `spec:` pointers earn their keep: only the forward side is gate-checked
+  (`check-spec-pointer` confirms the target resolves), the reverse (code still
+  satisfies the cited section) is a review concern, and the basename↔§heading
+  convention already derives most of the coupling — so the pointer is largely
+  redundant and its gloss is SPEC restatement. Rule whether to drop `spec:` from
+  the comment-tier roster, narrow it to a bare pointer (no gloss), or keep it as
+  a forcing-function slot; a large reversal (the star topology,
+  `check-spec-pointer`'s reason to exist, the pointers across the tree) that
+  belongs in scope, not a build session. Surfaced 2026-07-08.
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
@@ -71,5 +76,6 @@
 ## Done
 
 - budget-injection-automation
+- comment-restatement-gate
 
 ## Lessons Learned

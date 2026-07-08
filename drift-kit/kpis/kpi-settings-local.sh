@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-settings-local: entry count of the untracked local permission overlay
-#
-# Lead. The notice signal for guard-kit's close-stage prune/promote step: how
-# many allow/deny/ask entries the untracked .claude/settings.local.json carries.
-# Degrades to n/a when the overlay or jq is absent.
 set -uo pipefail
 
 LOCAL="${GUARD_KIT_SETTINGS_LOCAL:-.claude/settings.local.json}"

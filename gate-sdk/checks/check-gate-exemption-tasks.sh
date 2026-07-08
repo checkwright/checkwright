@@ -3,10 +3,7 @@
 # spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every exception-list element carries a live until: task or permanent: reason
 #
 # usage: check-gate-exemption-tasks.sh [queue-file [dir...]]
-#   queue-file defaults to $GATE_SDK_QUEUE_FILE (default: TASK-QUEUE.md); dirs
-#   default to the consumer gates dir plus each vendored kit's checks/. A
-#   missing queue file simply yields zero live slugs, so every '# until:'
-#   reads stale.
+#   defaults: $GATE_SDK_QUEUE_FILE (TASK-QUEUE.md); gates dir + each kit's checks/
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §Index-first reading — print one Markdown section by heading
-#
-# Extracted from the governance meta-layer of a private production platform;
-# already layout-agnostic (a file plus a heading), copied verbatim.
+# usage: md-section.sh <file> <heading>
 
 set -uo pipefail
 

@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,guard-kit/*.sh,context-kit/*.sh,.workflow/*.txt dir=one valve=none tier=precommit
-# spec: spec-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's following run, is comment-tier-exempt, or justifies a positional construct
+# spec: spec-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt, or justifies a positional construct
 #
 # usage: check-comment-tier.sh [scan-root]
-#   Classifies every full-line comment in the governed sources under the root
-#   (default '.'). A comment passes when it (a) carries a machine or reason
-#   directive from the roster, (b) is part of the contiguous comment run a
-#   directive opens (the reason's own wording), (c) is `comment-tier-exempt:
-#   <reason>`, or (d) sits immediately above a positional construct from the
-#   consumer-configured language roster (SPEC_KIT_COMMENT_POSITIONAL — empty by
-#   default, so inert until a consumer widens the surface to a language that needs
-#   it). Anything else is flagged: design rationale relocates to the owning SPEC,
-#   restated-code prose is deleted.
-#
-#   Trailing inline comments are out of scope by construction — the FP-prone
-#   half of the judgment stays a review tripwire (spec-kit/SPEC.md §Content
-#   tiering), so only full-line comment blocks gate.
+#   Classifies the full-line comments on every governed source under scan-root
+#   (default '.'); the tiering rule it enforces is the §check-comment-tier spec.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -62,10 +51,8 @@ join_alt() {  # a '|'-joined ERE alternation of bracket-escaped literals
 
 # spec: spec-kit/SPEC.md §check-comment-tier — the built-in kit-mechanism roster
 # (Checkwright's own directive names); the SPEC_KIT_COMMENT_* knobs append a
-# consumer's extras. Colon/paren needles match as literal substrings of the
-# comment body; word needles carry a boundary so a directive name inside a longer
-# word does not bless.
-shell_colon=(graph: spec: contract: exception-list: no-fixture: permanent: comment-tier-exempt: "TODO(task:" "TODO(spec-ambiguity)")
+# consumer's extras.
+shell_colon=(graph: spec: contract: usage: exception-list: no-fixture: permanent: comment-tier-exempt: "TODO(task:" "TODO(spec-ambiguity)")
 # shellcheck disable=SC2034  # nameref-consumed by build_bless
 shell_word=(shellcheck assertion)
 shell_colon+=("${SPEC_KIT_COMMENT_MACHINE[@]}" "${SPEC_KIT_COMMENT_REASON[@]}")
@@ -91,11 +78,9 @@ SHELL_BLESS="$(build_bless shell_colon shell_word)"
 TXT_BLESS="$(build_bless txt_colon txt_word)"
 POS_RE="$(join_alt "${SPEC_KIT_COMMENT_POSITIONAL[@]}")"
 
-# spec: spec-kit/SPEC.md §check-comment-tier — the classifier: one full-line
-# comment walk, respecting heredoc bodies (hash) and block comments (slash). STYLE
-# selects the syntax; BLESS is the blessing alternation; POS rescues a comment
-# block that sits immediately above a matching construct. Emits 'FILE:LINE:
-# <comment text>' per flagged comment.
+# spec: spec-kit/SPEC.md §check-comment-tier — the classifier walks full-line
+# comments (heredoc/block bodies skipped); a directive opens a CAP-wide window
+# blessing its line plus continuations, and POS rescues a block above a construct.
 read -r -d '' CLASSIFY <<'AWK' || true
 function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
 function flush_block(rescue,   i) {
@@ -103,7 +88,7 @@ function flush_block(rescue,   i) {
     if (rescue && nb >= 1 && bflag[nb]) bflag[nb] = 0
     for (i = 1; i <= nb; i++)
         if (bflag[i]) print bfile[i] ":" bline[i] ": " btext[i]
-    nb = 0; runbless = 0
+    nb = 0; window = 0
 }
 function detect_hd(   s, m, ch) {
     s = $0
@@ -118,8 +103,9 @@ function detect_hd(   s, m, ch) {
 function record(bodytext,   blessed) {
     nb++
     bfile[nb] = FILENAME; bline[nb] = FNR; btext[nb] = trim(bodytext)
-    blessed = (runbless || bodytext ~ BLESS)
-    if (bodytext ~ BLESS) runbless = 1
+    if (bodytext ~ BLESS) window = CAP
+    blessed = (window > 0)
+    if (window > 0) window--
     bflag[nb] = blessed ? 0 : 1
 }
 function noncomment(   ispos, isblank) {
@@ -180,7 +166,7 @@ for f in "${SURFACE[@]}"; do
         *)                        style="hash";  bless="$SHELL_BLESS"; pos="$POS_RE" ;;
     esac
     scanned=$((scanned + 1))
-    out="$(awk -v STYLE="$style" -v BLESS="$bless" -v POS="$pos" -v SQ="'" -v DQ='"' "$CLASSIFY" "$f")"; st=$?
+    out="$(awk -v STYLE="$style" -v BLESS="$bless" -v POS="$pos" -v CAP="$SPEC_KIT_COMMENT_RUN_CAP" -v SQ="'" -v DQ='"' "$CLASSIFY" "$f")"; st=$?
     fail_closed "$st" COMMENT-TIER "awk classifier ($rel)"
     while IFS= read -r line; do
         [[ -n "$line" ]] && errors+=("${line#"$ROOT"/}")
@@ -190,8 +176,8 @@ done
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "COMMENT-TIER: ${#errors[@]} violation(s):"
     printf '  %s\n' "${errors[@]}"
-    echo "  help: code is the WHAT, its SPEC the WHY — lead the block with a bare 'spec: <SPEC> §<section>' pointer (or another roster directive), delete prose that restates the code or paraphrases the SPEC it points at, or tag '# comment-tier-exempt: <reason>' for a genuinely-local fact below SPEC altitude. Not-yet-swept components ride the COMMENT_TIER_WHITELIST with a '# until:' drain task."
+    echo "  help: code is the WHAT, its SPEC the WHY — lead the block with a bare 'spec: <SPEC> §<section>' pointer (or another roster directive), delete prose that restates the code or paraphrases the SPEC it points at, or tag '# comment-tier-exempt: <reason>' for a genuinely-local fact below SPEC altitude. A directive blesses only its own window (its line plus continuations up to SPEC_KIT_COMMENT_RUN_CAP=$SPEC_KIT_COMMENT_RUN_CAP physical comment lines, blank '#' lines included); prose beyond the window re-anchors on its own directive, trims, or exempts. Not-yet-swept components ride the COMMENT_TIER_WHITELIST with a '# until:' drain task."
     exit 1
 fi
-echo "COMMENT-TIER: clean ($scanned governed source(s); every full-line comment is a directive, rides a directive run, is exempt, or justifies a positional construct)"
+echo "COMMENT-TIER: clean ($scanned governed source(s); every full-line comment is a directive, rides a directive window, is exempt, or justifies a positional construct)"
 exit 0

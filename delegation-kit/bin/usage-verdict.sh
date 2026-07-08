@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 # spec: delegation-kit/SPEC.md §usage-verdict — trustworthy budget verdict from usage.txt
-#
-# Extracted from the governance meta-layer of a private production platform; the
-# single-operator source path and thresholds are config knobs (lib/delegation.sh),
-# platform values as defaults. Positional $1/$2 override the snapshot/credentials
-# path for test injection.
-#
-#   usage-verdict.sh [usage-file [credentials-file]]
-# Exit: 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable (fail-closed).
+# usage: usage-verdict.sh [usage-file [credentials-file]]   ($1/$2 override paths for test injection)
+#   exit: 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable (fail-closed)
 set -euo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

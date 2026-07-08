@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §The always-loaded meter — standing per-session surface vs committed baseline
-#
-#   always-loaded.sh                     one line: total, per-part split, delta vs baseline
-#   always-loaded.sh --update-baseline   rewrite the baseline (a close-stage act)
+# usage: always-loaded.sh [--update-baseline]   (bare: total/per-part/delta; --update-baseline: rewrite it)
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

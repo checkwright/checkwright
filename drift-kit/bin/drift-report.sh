@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 # spec: drift-kit/SPEC.md §The report skeleton — the collator; owns the frame, every measurement lives in a plugin
-#
-#   drift-report.sh            full report: lead/lag sections under the honesty labels, one row per KPI
-#   drift-report.sh --trend    one compact line (fragments joined with ·) for the session-context hook
-#
-# Advisory by construction: exit is always 0, the report never joins gates.list.
+# usage: drift-report.sh [--trend]   (bare: full lead/lag report; --trend: one compact hook line)
+#   advisory by construction: exit is always 0, never joins gates.list
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
