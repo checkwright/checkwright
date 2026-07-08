@@ -18,7 +18,7 @@ write-time smoothing or correction is forbidden (a later corrective push is
 evidence about the earlier sample, and only the reader has both):
 
 ```
-updated_at=<epoch> pct=<float> resets_at=<epoch> verdict=<word> login_at=<epoch>[ tier=<word>][ pct_7d=<float> resets_7d=<epoch>][ tokens_in=<n> tokens_out=<n>]
+updated_at=<epoch> pct=<float> resets_at=<epoch> verdict=<word> login_at=<epoch>[ account=<word>][ tier=<word>][ pct_7d=<float> resets_7d=<epoch>][ tokens_in=<n> tokens_out=<n>]
 ```
 
 Space-separated `key=value`, order-insensitive; optional keys are omitted
@@ -35,7 +35,11 @@ deploys (session-context hook + the Agent budget guard already invoke
 `usage-verdict` per session and per dispatch).
 
 **usage.txt optional keys.** The three-line snapshot contract gains optional
-keys a producer writes when its source exposes them: `tier=<word>`
+keys a producer writes when its source exposes them: `account=<word>` (the
+logged-in account identity — `login_at` detects a switch, `account` says to
+whom, which is what lets the reporter group a multi-account operator's
+segments per account instead of treating every switch-back as a stranger),
+`tier=<word>`
 (subscription tier — Pro/Max5x/Max20x — the denominator behind the pct),
 `seven_day_used_pct=<float>`/`seven_day_resets_at=<epoch>` (the weekly
 window), and `tokens_in=<n>`/`tokens_out=<n>` (cumulative token counts, the
@@ -78,12 +82,12 @@ the window's physical constraint: *within one segment, true usage never
 decreases.* Mechanics:
 
 1. **Segment** samples per axis by (that axis's reset epoch, `login_at`,
-   `tier`): the 5h axis keys on `resets_at`, the weekly axis on `resets_7d`
-   — the windows roll independently, and a weekly segment spans many 5h
-   segments. A timer reset, a `/login` (multi-account operation legitimately
-   drops the pct mid-window), or a tier change each starts a segment; only
-   within-segment comparisons are meaningful, so an account switch is a
-   boundary, not a flagged anomaly.
+   `account`, `tier`): the 5h axis keys on `resets_at`, the weekly axis on
+   `resets_7d` — the windows roll independently, and a weekly segment spans
+   many 5h segments. A timer reset, a `/login` (multi-account operation
+   legitimately drops the pct mid-window), or an account or tier change each
+   starts a segment; only within-segment comparisons are meaningful, so an
+   account switch is a boundary, not a flagged anomaly.
 2. **Flag** any sample whose pct is below an earlier sample in the same
    segment (per axis) as a monotonicity violation: the downward correction
    indicts the elevated sample(s) before it as reader noise, and both sides
@@ -95,7 +99,12 @@ decreases.* Mechanics:
    unreliable and no number from that segment is trusted. The weekly axis
    additionally reports headroom against `DELEGATION_KIT_PAUSE_PCT_7D` at
    the current rate — the planning number for how much delegation the week
-   still affords.
+   still affords. When `account` is present, segments group under an
+   account heading, so a rotating multi-account operator reads one weekly
+   trajectory and one headroom number per account rather than an
+   interleaved stream; the history is an operator-local measurement under
+   the tmp-dir convention (gitignored), so the identifier never reaches a
+   tracked file.
 
 Exit codes: 0 report emitted; 2 knob unset or history missing/unreadable
 (fail-closed, mirroring usage-verdict's STALE discipline). Never 1 — it
@@ -107,18 +116,20 @@ renders no verdict; `usage-verdict` stays the sole pause authority.
   and per Agent dispatch in this repo; enabling config:
   `DELEGATION_KIT_USAGE_HISTORY` in `scripts/delegation-config.sh`),
   optionally by the statusline template. Consumed by `usage-trend.sh`.
-- Optional snapshot keys (`tier`, `seven_day_used_pct`,
+- Optional snapshot keys (`account`, `tier`, `seven_day_used_pct`,
   `seven_day_resets_at`, `tokens_in`, `tokens_out`) — produced by
-  `templates/statusline-usage.sh` from the harness payload (build verifies
-  which are actually exposed and ships only those). The `seven_day_*` pair
-  is read by `usage-verdict.sh` at the verdict transition (second pause
-  axis); the rest pass through into the sample line unread.
+  `templates/statusline-usage.sh` from the harness payload or the local
+  account config, whichever exposes each (build verifies and ships only
+  live producers). The `seven_day_*` pair is read by `usage-verdict.sh` at
+  the verdict transition (second pause axis); the rest pass through into
+  the sample line unread.
 - Field readers in `usage-trend.sh`: `updated_at` — sample ordering and the
   rate denominator; `pct` / `pct_7d` — the per-axis trend values;
-  `resets_at` / `resets_7d` plus `login_at` and `tier` — the per-axis
-  segment keys (read at segmentation); `verdict` — annotates where PAUSE
-  onsets fall in the report; `tokens_in`/`tokens_out` — the per-segment
-  token deltas. No field without a reader.
+  `resets_at` / `resets_7d` plus `login_at`, `account`, and `tier` — the
+  per-axis segment keys (read at segmentation; `account` again at report
+  grouping); `verdict` — annotates where PAUSE onsets fall in the report;
+  `tokens_in`/`tokens_out` — the per-segment token deltas. No field without
+  a reader.
 - `usage-trend.sh` output — consumed by the operator (and by drift-kit as a
   candidate KPI plugin later; not wired in this change).
 
@@ -129,7 +140,7 @@ renders no verdict; `usage-verdict` stays the sole pause authority.
   7-day keys are ignored" is replaced (7-day keys are the armed-when-present
   second axis). The failure-mode list gains the per-axis dead-window note.
 - §The usage.txt contract gains the optional-keys paragraph: the three
-  mandatory lines are unchanged; `tier`/`seven_day_used_pct`/
+  mandatory lines are unchanged; `account`/`tier`/`seven_day_used_pct`/
   `seven_day_resets_at`/`tokens_in`/`tokens_out` are documented optional,
   keys the verdict does not read pass through.
 - §Layout and configuration knob table gains `DELEGATION_KIT_USAGE_HISTORY`
@@ -139,9 +150,9 @@ renders no verdict; `usage-verdict` stays the sole pause authority.
   axis (weekly PAUSE while 5h is comfortable, axis named in the output,
   absent keys disarm, dead weekly window does not pause), and for the trend
   reporter over a fixture history (per-axis segmentation at a reset
-  boundary, at a `login_at` change, and at a tier change;
-  spike-then-correction flagged not averaged). No fixture pair owed —
-  neither script is a gate.
+  boundary, at a `login_at` change, and at an account or tier change;
+  per-account grouping reunites a switch-back; spike-then-correction
+  flagged not averaged). No fixture pair owed — neither script is a gate.
 - Consumer follow-through at build (this repo): the session-context hook's
   budget line and CLAUDE.md's budget-check bullet say "5h window" — reword
   to name the axis the verdict reports.
