@@ -11,6 +11,7 @@ check-gate-exemption-tasks
 check-gate-assertions
 check-graph
 check-kit-enum
+check-hook-exec-bit
 check-core-files
 check-identity
 check-stage-evidence

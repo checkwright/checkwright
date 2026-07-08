@@ -65,6 +65,10 @@ if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'context-kit/check
     gate-sdk/checks/check-kit-enum.sh || hook_fail check-kit-enum
 fi
 
+if staged_matches 'scripts/git-hooks/*'; then
+    gate-sdk/checks/check-hook-exec-bit.sh || hook_fail check-hook-exec-bit
+fi
+
 if staged_matches 'scripts/core-files.list'; then
     gate-sdk/checks/check-core-files.sh || hook_fail check-core-files
 fi

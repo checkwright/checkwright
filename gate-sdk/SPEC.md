@@ -551,6 +551,21 @@ cover the surface). A `--fixture <dir>` mode injects the clone's actual identity
 (`git-config-email`, `git-remotes`) so the fixture pair is deterministic without
 touching real git config.
 
+### check-hook-exec-bit
+
+Invariant: every tracked file in the hooks dir (`GATE_SDK_HOOKS_DIR`, default
+`<gates-dir>/git-hooks`; override with the gate's first argument) carries git
+*index* mode `100755`. The index is the checked surface because it is what a
+fresh clone receives: git silently skips a non-executable hook, so a
+`pre-commit` committed at mode `100644` disables the entire gate battery for
+every clone — a catastrophe-class, invisible failure — and `install-hooks.sh`'s
+per-clone `chmod` cannot repair a wrong committed mode. One `git ls-files -s`
+reads the mode a clone would get, sidestepping the worktree bit entirely. A
+non-repo cwd is fail-closed (exit 2); a hooks dir with no tracked files, or an
+absent hooks dir, is clean (nothing committed to skip). The `# graph:` couples
+the hooks dir at `tier=precommit`, and the whole-tree `run-gates.sh` battery is
+the backstop for a mode-only change no `ACMR` content filter would surface.
+
 ### templates/check-skeleton.sh
 
 The copy-paste reference skeleton — the canonical "how to write a gate"
