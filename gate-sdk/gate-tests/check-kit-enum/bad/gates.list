@@ -1,0 +1,4 @@
+# Fixture registry: check-sample hand-lists only two kit roots for the *.sh
+# suffix while other kit roots carry matching tracked files — the drift the
+# kit:*.sh token closes — so check-kit-enum must REJECT.
+check-sample

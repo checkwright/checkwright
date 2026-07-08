@@ -9,9 +9,8 @@ DELEGATION_KIT_GATE_FILES=(
     "gate-sdk/bin/run-gate-tests.sh"
 )
 
-# comment-tier-exempt: this repo is a monorepo of kits — every kit dir is meta-layer, since a gate edit legitimately rides with its kit's SPEC.md, README, and fixtures
+# comment-tier-exempt: the kit roots are auto-unioned by delegation.sh (a vendored kit's edits are meta-layer by definition), so only the non-kit prefixes are declared here
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_META_PATHS=(
     scripts/ .workflow/ .claude/
-    gate-sdk/ lifecycle-kit/ queue-kit/ spec-kit/ guard-kit/ delegation-kit/ context-kit/ drift-kit/
 )

@@ -234,7 +234,14 @@ as defaults):
 - `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
   assertion A; default `("${GATE_SDK_GATES_DIR:-scripts}/"
   "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is
-  always meta.
+  always meta. When `gate.sh` is resolvable (`GATE_SDK_LIB`, else the vendored
+  sibling), the loader unions every `gate_kit_roots` member into this array as a
+  root-relative `dir/` prefix — a vendored kit's edits are meta-layer by
+  definition, so the consumer's config need not name kit dirs at all (this
+  repo's keeps only the non-kit prefixes). The union is additive, never a
+  filter: a
+  prefix the consumer declared cannot be lost, and without `gate.sh` the config
+  is used exactly as written.
 
 `check-gate-tamper` registers in the consumer's `gates.list`
 (tier: precommit) — in this repo's too; dogfooding is day-one, and agents

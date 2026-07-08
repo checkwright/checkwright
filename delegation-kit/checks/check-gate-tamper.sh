@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh dir=one valve=none tier=precommit
+# graph: couples=kit:*.sh dir=one valve=none tier=precommit
 # spec: delegation-kit/SPEC.md §Validate after every agent commit — a gate-weakening commit is blocked by shape (A gate edits stay meta-isolated; B a new path-exemption can't excuse a co-staged file)
 #
 # --fixture <dir> injects staged-files / added-exemptions lists; live mode reads git diff --cached.

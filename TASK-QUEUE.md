@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **kit-enum-completeness-gate** [spec: gate-sdk/SPEC-kit-enum.md] — kill the
-  hand-maintained kit-set drift axis: `kit:` couples token expanded from
-  `gate_kit_roots`, meta-paths auto-union in delegation-kit's loader, and the
-  residual `check-kit-enum` meta-gate over hand-lists.
 - **extraction-completeness-gates** [spec: SPEC-completeness-gates.md] — the
   admitted structural-gate set: check-spec-fence-balance + check-md-refs
   (spec-kit), check-stage-skill-coverage (lifecycle-kit), check-hook-exec-bit +
@@ -79,5 +75,6 @@
 ## Done
 
 - reconsider-spec-pointers
+- kit-enum-completeness-gate
 
 ## Lessons Learned

@@ -193,7 +193,18 @@ Every registered gate's header carries a one-line coupling manifest:
 # graph: couples=<globs> dir=bi|one valve=none|PROPOSED tier=precommit|align-only [mode=staged|whole-tree] [trigger=<globs>] [gen=manual]
 ```
 
-- `couples=` — the surfaces the gate binds (comma-separated globs).
+- `couples=` — the surfaces the gate binds (comma-separated globs). One token
+  is special: `kit:<glob>`, which the shared manifest reader in `lib/gate.sh`
+  (`gate_expand_couples`) expands to `<kit-root>/<glob>` — repo-root-relative —
+  for every `gate_kit_roots` member at read time; the same reader feeds
+  `gen-pre-commit` (hook emission), `check-graph` (freshness + the HTML
+  projection), so emitter and checker cannot desync on the kit set. A
+  whole-tree gate writes `kit:*.sh` in place of a per-kit hand list; non-kit
+  couples (`scripts/*.sh`, `.workflow/*.txt`, `scripts/gates.list`) stay
+  literal. Expansion over-approximates by design — a kit is coupled even where
+  the gate's subject is narrower, so an extra trigger runs a green gate while a
+  missing one would skip a red — and `check-kit-enum` gates the residual
+  hand-lists derivation cannot reach.
 - `dir=` — `bi` for a coupling bijection (both sides must agree), `one` for a
   one-way audit.
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading
@@ -292,8 +303,12 @@ The family's single sourced library — values + adapters, never gate structure.
 Owns `fail_closed`, `GATE_PRUNE_DIRS` + the `gate_find` /
 `GATE_GREP_EXCLUDES` / `gate_path_pruned` walk adapters, and the registry
 helpers `gate_sdk_root`, `gate_sdk_gates_dir`, `gates_list_members`,
-`gate_resolve`, `gate_kit_roots`, `gate_check_dirs` (the multi-kit resolution
-path other kits' gates ride). `fail_closed` must be passed *only* a status that genuinely
+`gate_resolve`, `gate_kit_roots`, `gate_kit_roots_rel`, `gate_check_dirs` (the
+multi-kit resolution path other kits' gates ride) and the manifest reader
+`gate_expand_couples` (the `kit:<glob>` couples-token expansion §The `# graph:`
+manifest). `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
+the couples globs share — resolving absolute roots against the kits' parent and
+passing a relative `GATE_SDK_KIT_DIRS` override through unchanged. `fail_closed` must be passed *only* a status that genuinely
 means the check could not execute (an awk/jq/parser crash) — never `grep`'s
 exit 1, which is the expected "no match"; the caller draws that line at the
 capture site.
@@ -335,7 +350,10 @@ a `gen=manual` region round-trips from the current hook. `--emit` prints to
 stdout (`check-graph` compares against it); `--write` rewrites the hook.
 Adding a gate to the hook is manifest-only — there is no second hand-wiring
 step to drift. The emission is deterministic (no timestamps) so the committed
-hook is byte-stable.
+hook is byte-stable. A `trigger=`/`couples=` `kit:<glob>` token is emitted
+*expanded* (via `gate_expand_couples`), so adding a kit later reddens
+`check-graph` (committed hook ≠ `--emit`) until regeneration — the freshness
+gate keeps the static hook honest across a kit-set change.
 
 ### install-hooks
 
@@ -425,9 +443,12 @@ and consistent, and the pre-commit hook is the faithful generated projection
 of the manifests. Seven assertions: (A) every member carries a well-formed
 `# graph:` line — the four required keys (`couples`/`dir`/`valve`/`tier`) plus
 the optional `mode`/`trigger`/`gen` — with surfaces in the declared vocabulary
-when one exists; (B) couples⊆trigger parity — each `couples=` surface is
-covered by the gate's `trigger=` globs (trigger defaulting to couples), so
-editing a coupled surface always fires the gate; (C) cycle-valve consistency —
+when one exists; a `kit:<glob>` couples/trigger token is expanded
+(`gate_expand_couples`) before the vocabulary and parity checks, so both run on
+the same surfaces the hook and the HTML projection carry; (B) couples⊆trigger
+parity — each `couples=` surface is covered by the gate's `trigger=` globs
+(trigger defaulting to couples), so editing a coupled surface always fires the
+gate; (C) cycle-valve consistency —
 a `dir=bi` gate spanning a declared-leading and a declared-lagging surface
 must carry `valve=PROPOSED`; one with a leading surface but no lagging surface
 may carry either valve; one with no leading surface must carry `valve=none`;
@@ -437,7 +458,8 @@ matches `--emit` output; (F) every emitted asset href resolves under the
 artifact's own directory — a path wrong in both generator and artifact that
 (E) cannot detect; (G) every `# graph:` manifest embedded in a `SPEC-*.md`
 amendment body is well-formed, with each `couples=`/`trigger=` token a
-syntactically valid glob. Unlike (A), an amendment manifest's surfaces are not
+syntactically valid glob (the `kit:<glob>` form validates on its glob part).
+Unlike (A), an amendment manifest's surfaces are not
 required to be in the vocabulary (the coupled surface may itself be
 design-ahead), and hook parity is not applied — the gate it describes is
 unbuilt; parity re-fires through the normal registry path once it lands.
@@ -453,6 +475,21 @@ Coverage ruling inherited from the platform: a `couples ⊇ find-globs` parity
 check — verifying a gate's declared couples cover its real read-set — is *not*
 carried; it would require parsing arbitrary shell, neither cheap nor low-FP,
 and (B) already guarantees editing a coupled surface fires the gate.
+
+### check-kit-enum
+
+Invariant: for every `gates.list` member, a `couples=` set that literally names
+two or more `gate_kit_roots` members under a common glob suffix must name
+*every* kit root having tracked files matching that suffix. `kit:<glob>` deletes
+the drift axis by derivation (the reader expands it to all roots); this gate is
+the residual meta-check for the hand-list a future gate author writes anyway —
+the fix its help text names is the token, not a longer list. Completeness is
+measured against tracked files (`git ls-files` at the repo root), so a suffix no
+kit carries forces nothing and the over-approximating token stays a superset of
+what the gate requires. A lone named root is not a hand list (no completeness
+obligation); the check engages at two. Fail-closed: an unreadable manifest, an
+unresolvable registered gate, or a non-repo cwd is a red, not a skip. A member
+with no `# graph:` line is `check-graph`'s finding, not this gate's.
 
 ### check-core-files
 

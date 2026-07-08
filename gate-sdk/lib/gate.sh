@@ -87,3 +87,35 @@ gate_check_dirs() {
         printf '%s/checks\n' "$k"
     done < <(gate_kit_roots)
 }
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — gate_kit_roots as repo-root-relative dirs (the anchor the couples globs share); absolute roots resolve against the kits' parent, relative roots (a GATE_SDK_KIT_DIRS override) pass through
+gate_kit_roots_rel() {
+    local anchor root
+    anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"; anchor="${anchor%/*}"
+    while IFS= read -r root; do
+        if [[ "$root" == /* ]]; then
+            realpath --relative-to="$anchor" "$root" 2>/dev/null || printf '%s\n' "$root"
+        else
+            printf '%s\n' "$root"
+        fi
+    done < <(gate_kit_roots)
+}
+
+# spec: gate-sdk/SPEC.md §check-graph — expand each kit:<glob> token in a comma-joined couples/trigger field to <kit-root>/<glob> for every gate_kit_roots_rel member; non-kit tokens pass through verbatim. The single reader gen-pre-commit, check-graph, and the hook share, so emitter and checker cannot desync.
+gate_expand_couples() {
+    local field="$1"
+    local -a roots=() parts=() out=()
+    mapfile -t roots < <(gate_kit_roots_rel)
+    IFS=',' read -ra parts <<<"$field"
+    local tok r glob
+    for tok in "${parts[@]}"; do
+        if [[ "$tok" == kit:* ]]; then
+            glob="${tok#kit:}"
+            for r in "${roots[@]}"; do out+=("${r%/}/$glob"); done
+        else
+            out+=("$tok")
+        fi
+    done
+    local IFS=','
+    printf '%s\n' "${out[*]}"
+}

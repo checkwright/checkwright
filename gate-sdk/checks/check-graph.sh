@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
 set -uo pipefail
 
@@ -64,6 +64,7 @@ emit_graph() {
                 valve=*)   valve="${kv#valve=}" ;;
             esac
         done
+        couples="$(gate_expand_couples "$couples")"
         C_COUPLES[$c]="$couples"; C_DIR[$c]="$dir"; C_VALVE[$c]="$valve"
         local -a csurf; IFS=',' read -ra csurf <<<"$couples"
         for s in "${csurf[@]}"; do NODE_SEEN[$s]=1; done
@@ -238,6 +239,7 @@ TAIL
 valid_glob_token() {
     local t="$1"
     [[ -n "$t" ]] || return 1
+    t="${t#kit:}"  # the kit:<glob> couples form validates on its glob part
     [[ "$t" =~ ^[A-Za-z0-9._*?/-]+$ ]]
 }
 
@@ -411,6 +413,8 @@ for c in "${CHECKS[@]}"; do
             *) errors+=("MANIFEST: $script unknown manifest key '$kv'") ;;
         esac
     done
+    couples="$(gate_expand_couples "$couples")"
+    [[ -n "$trigger" ]] && trigger="$(gate_expand_couples "$trigger")"
     [[ "$dir" == bi || "$dir" == one ]]            || errors+=("MANIFEST: $script dir= must be bi|one (got '$dir')")
     [[ "$valve" == none || "$valve" == PROPOSED ]] || errors+=("MANIFEST: $script valve= must be none|PROPOSED (got '$valve')")
     [[ "$tier" == precommit || "$tier" == align-only ]] || errors+=("MANIFEST: $script tier= must be precommit|align-only (got '$tier')")

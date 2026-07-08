@@ -59,6 +59,7 @@ emit_block() {
     local gate="$1" couples trigger mode gen relpath
     couples="$(manifest_field "$gate" couples)"
     trigger="$(manifest_field "$gate" trigger)"; trigger="${trigger:-$couples}"
+    trigger="$(gate_expand_couples "$trigger")"
     mode="$(manifest_field "$gate" mode)"
     gen="$(manifest_field "$gate" gen)"
     relpath="$(resolve_rel "$gate")" || relpath="$GATES_DIR/$gate.sh"

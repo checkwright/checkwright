@@ -34,6 +34,24 @@ declare -p DELEGATION_KIT_META_PATHS &>/dev/null || DELEGATION_KIT_META_PATHS=(
     ".claude/"
 )
 
+# spec: delegation-kit/SPEC.md §Layout and configuration — a vendored kit's edits are meta-layer by definition; when gate.sh resolves, union every kit root into META_PATHS (additive, never a filter, so a declared prefix cannot be lost)
+_dk_gate_lib="${GATE_SDK_LIB:-${BASH_SOURCE[0]%/*}/../../gate-sdk/lib/gate.sh}"
+if [[ -f "$_dk_gate_lib" ]]; then
+    # shellcheck source=../../gate-sdk/lib/gate.sh
+    source "$_dk_gate_lib"
+    if declare -F gate_kit_roots_rel >/dev/null; then
+        while IFS= read -r _dk_root; do
+            _dk_root="${_dk_root%/}/"
+            _dk_seen=0
+            for _dk_p in "${DELEGATION_KIT_META_PATHS[@]}"; do
+                [[ "$_dk_p" == "$_dk_root" ]] && { _dk_seen=1; break; }
+            done
+            [[ "$_dk_seen" -eq 0 ]] && DELEGATION_KIT_META_PATHS+=("$_dk_root")
+        done < <(gate_kit_roots_rel)
+    fi
+fi
+unset _dk_gate_lib _dk_root _dk_seen _dk_p
+
 _dk_errs=()
 [[ -n "$DELEGATION_KIT_USAGE_FILE" ]] || _dk_errs+=("DELEGATION_KIT_USAGE_FILE is empty")
 [[ "$DELEGATION_KIT_PAUSE_PCT" =~ ^[0-9]+(\.[0-9]+)?$ ]] \

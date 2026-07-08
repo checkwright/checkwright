@@ -32,9 +32,9 @@
 #)
 
 # Path prefixes counted as meta-layer (assertion A). Root-level *.md is always
-# meta. Default the platform's governance surfaces; a monorepo of kits lists its
-# kit dirs, e.g.:
+# meta, and — when gate.sh resolves — every vendored kit root is auto-unioned in
+# (a kit's edits are meta by definition), so list only non-kit prefixes here.
+# Default the platform's governance surfaces, e.g.:
 #DELEGATION_KIT_META_PATHS=(
 #    scripts/ .workflow/ .claude/
-#    gate-sdk/ lifecycle-kit/ queue-kit/ spec-kit/ delegation-kit/
 #)
