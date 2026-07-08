@@ -89,6 +89,20 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **kit-registration-gate** [needs-spec] — a gate asserting every kit root
+  (`gate_kit_roots`) carries a README kit-table row and a CLAUDE.md
+  fixture-runner line, so a landed kit cannot fall out of the public registry
+  unnoticed; retires the manual "does the table still reflect the kit set?"
+  staleness check at close. check-kit-enum guards only gate-coupling
+  hand-lists, not the prose registry — the gap surfaced closing gap-closure
+  2026-07-08.
+- **budget-footprint-monitor** [needs-spec] — track limit/token usage
+  *evolution* across a session's prompts and tool calls, beyond the one-shot
+  usage-verdict snapshot, to monitor Checkwright's own footprint; a natural
+  extension of delegation-kit/usage-verdict from a verdict to a trend. The
+  source signal may be unreliable — rolling-window readings that spike and
+  revert — so the design must separate a real footprint from harness reading
+  noise before any number is trusted. Surfaced 2026-07-08.
 
 ## Done
 
