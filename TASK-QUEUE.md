@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: operational-hardening  [stage: close]
+## Iteration: adoption-track  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,7 +12,34 @@
 
 ## New Features
 
+- **docs-site** [spec: SPEC-docs-site.md] — docs/ on GitHub Pages: plain
+  Markdown, zero build; living-pages vs dated-posts drift classes; the docs
+  tier cites kit READMEs/SPECs, never restates; check-docs-kit-parity
+  wrapper gate; the announcement post is the first dated post.
+- **docs-cmd-gate** [spec: spec-kit/SPEC-docs-cmd.md] — check-docs-cmd:
+  fenced command paths and kit-prefixed env knobs in the governed doc set
+  resolve against the tree; check-md-refs' sibling, one shared governed set.
+- **demo-walkthrough** [spec: SPEC-demo-walkthrough.md] — demo/run-demo.sh
+  on the consumer-smoke harness: vendor → clean pass → violation blocked →
+  fix → green, self-narrating transcript; registered as a validate suite so
+  a bit-rotted demo is a red validate, not a stale docs page.
+- **drift-trajectory** [spec: drift-kit/SPEC-trajectory.md] — trajectory.sh
+  emits the per-iteration governed-trajectory table as a pure function of
+  committed history; committed at docs/evidence-data.md and pinned by the
+  check-trajectory-fresh consumer gate; self-referential evidence route
+  ruled, the controlled A/B split out as benchmark-ab-experiment.
+- **template-tiering** [spec: spec-kit/SPEC-template-tiering.md] — ruling:
+  kit SPECs travel (vendor-whole install), so check-comment-tier governs
+  templates/ while check-spec-pointer keeps a placeholders-by-design
+  exemption; template headers thin to directive lines, installer prose
+  single-sources in the owning kit's SPEC/README.
+
 ## Technical Debt
+
+- **kpi-amendment-age-fixture-noise** — the KPI's SPEC-*.md glob counts
+  gate-test fixture amendments (SPEC-example-gate.md reads as oldest, 4d);
+  exclude fixture/template paths, matching the trajectory extractor's
+  amendment-latency input ruling in drift-kit/SPEC-trajectory.md.
 
 ## Deferred
 
@@ -34,60 +61,25 @@
   with evidence stamps as the hand-off, so a live supervisor must leave the
   stamps authoritative — orchestration convenience must not become a second,
   ungated source of iteration state.
-- **adoption-track** [needs-spec] — the outward-facing rung: docs site, demo
-  walkthrough, announcement post, plugin-marketplace presence; this is the
-  path that makes any absorption/standardization outcome possible; scope it
-  as its own iteration post kit 7. Evidence artifact: upstream Claude Code
-  issue #75214 (project config can't lift the Task ask-first default),
-  surfaced dogfooding this repo's delegation nudge 2026-07-07.
-  - *Drift-benchmark evidence sub-rung* (surfaced 2026-07-08): the demo
-    walkthrough needs a benefits claim backed by data. Existing LLM/harness
-    benchmarks are the wrong shape — they measure a *model* drifting in
-    isolation (single-turn or single-trajectory), not a governance layer's
-    effect on drift across a *series* of dependent tasks; running one "with
-    Checkwright" is a category error (no repo/commit/spec for gates to bite).
-    Scope a **differential experiment**, not a leaderboard number: same model,
-    same multi-step task series, two arms — (A) ungoverned agent loop vs (B)
-    Checkwright-governed — measuring drift *accumulation across the series*.
-    - Metric axis: Drift-Bench's **"satisfiable drift"** (state stays
-      internally consistent while an output silently violates a commitment made
-      N turns/iterations earlier) — that is exactly what check-stage-evidence,
-      the spec fences, and validate-after-every-commit are built to catch.
-    - Substrate/vocab (cite primaries, not a chatbot gloss): seqBench
-      (arXiv 2509.16866, tunable logical depth/backtracking) and SWE-bench for
-      the dependent-task series; Drift-Bench (arXiv **2602.02455** — real title
-      "Diagnosing Cooperative Breakdowns in LLM Agents under Input Faults via
-      Multi-Turn Interaction"; the "Decomposing Reasoning Into Failure Types"
-      expansion is confabulated, do not repeat it) for the satisfiable-drift
-      framing; Lost-in-Conversation / FlowBench as supporting prior art.
-    - Failure-mode → mechanism table the doc must carry: Layering Effect
-      (patch-over-refactor/answer bloat) → check-comment-tier + spec-kit
-      anti-restatement doctrine; premature lock-in → lifecycle state machine
-      (scope gates build; check-stage-entry/evidence); satisfiable drift →
-      whole-battery re-run every commit + spec fences + validate-after-commit.
-    - Counterfactual (A) arm is the hard part — can't cheaply re-run real
-      dogfooding "without gates." Two honest routes: (1) a cheap synthetic
-      series (seqBench-style or a small sharded SWE set) run head-to-head in
-      both arms; (2) self-referential — this repo already instruments its own
-      (B) trajectory via drift-kit/bin/drift-report.sh + the knowledge-friction
-      log, so publish the governed trajectory and state plainly that the (A)
-      baseline is synthetic/held-out rather than faking a controlled A/B on
-      production work. Design decision for scope stage: which route, and which
-      drift-report fields feed the satisfiable-drift metric.
-  - *Template-pedagogy single-sourcing sub-note* (surfaced 2026-07-09): the
-    comment-tier template exemption lets template headers carry installer
-    prose (copy-into-gates-dir, wire-under-PreToolUse) that the docs rung
-    would restate — pick one source of truth: docs generated from or pointing
-    at the headers, or headers thinned to a docs pointer. Bound up with an
-    unruled question: does a kit reach a customer project *with* its SPEC? If
-    SPECs do not travel, the spec-pointer template exemption is already
-    correct (a copied-out template has no local SPEC to resolve). And the
-    optics wrinkle to face: Checkwright ships kits — spec-kit among them, the
-    very kit that *owns* check-comment-tier — whose own templates carry
-    comments that would fail that gate, passing only because templates/ is
-    exempt; an adopter reading the comment-restraint tool's own stubs sees
-    them flout its doctrine. Resolve the framing: explain the exemption, thin
-    the prose, or move the pedagogy into docs/SPECs.
+- **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
+  of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
+  surface parity. Design against the live manifest format at promotion — the
+  plugin substrate moves fast (the scope-session-routing ruling applies).
+  Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
+  upstream Claude Code issue #75214 (project config can't lift the Task
+  ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
+- **benchmark-ab-experiment** [needs-spec] — the controlled differential
+  experiment: same model, same dependent-task series, two arms (ungoverned
+  loop vs Checkwright-governed), drift *accumulation across the series* as
+  the metric — a governance layer's effect, not a model leaderboard number.
+  Metric axis: Drift-Bench's "satisfiable drift". Substrate/vocab primaries:
+  seqBench (arXiv 2509.16866), Drift-Bench (arXiv 2602.02455 — real title
+  "Diagnosing Cooperative Breakdowns in LLM Agents under Input Faults via
+  Multi-Turn Interaction"; the "Decomposing Reasoning Into Failure Types"
+  expansion is confabulated, do not repeat it), Lost-in-Conversation /
+  FlowBench as prior art. Surfaced 2026-07-08 inside adoption-track; split
+  out 2026-07-09 — the self-referential route (drift-trajectory) ships
+  first and this rung upgrades the claim only if demand attests it.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
@@ -105,5 +97,7 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 
 ## Done
+
+- adoption-track
 
 ## Lessons Learned

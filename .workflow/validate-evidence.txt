@@ -1,13 +1,1 @@
 # contract: evidence-manifest v1
-operational-hardening gates sha256=fa588508315c1713dcc26dc7b8d627647c6f33188a5f3a12a97ea595f44bbd97 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening gatesdk_fixtures sha256=706680e73f0a59dd602628f4973ac6222b3bcf83c2371d49f0000347c7469202 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening lifecycle_fixtures sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening queue_fixtures sha256=6ad80540c77d17de9feb0192a08c317d84c304801d82563e5a279bf965c0fd1f pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening spec_fixtures sha256=802df0d7a79c4695b01bb1431e024170399b4a72af982a77a77d404acc8c4ec2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening delegation_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening context_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening evidence_fixtures sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening guard_tests sha256=f8f6a4500b50822fbc35eb5627488f1e3dbcaaddf1ae77e1a54fafc6a65d3312 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening usage_tests sha256=ee1ba679b32085c711c528ef47fc5fcb0f378349d1f92ff70e35ae8c306b5256 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-operational-hardening trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
