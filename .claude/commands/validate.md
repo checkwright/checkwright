@@ -30,6 +30,17 @@ failure text. A red that traces to a deferred queue entry stays red behind its
 slug; a new red is fixed or filed before validate completes. Report failures
 with their output.
 
+Once the battery is green, record the evidence block the close-entry manifest
+requires: `bash evidence-kit/bin/run-validate.sh` (the codified validate spine
+— runs each configured suite, diffs the baseline slice, appends one
+`verdict=clean` line per suite to `.workflow/validate-evidence.txt`), then
+commit that file so the close flip inherits it. Run it while the header is
+still `[stage: validate]`: `check-evidence-manifest`'s close-entry and
+stamp-coupling assertions are disarmed in that window (evidence-kit/SPEC.md
+§check-evidence-manifest), so the self-referential `gates` suite records
+clean — deferring the run past the flip to `[stage: close]` arms those
+assertions and deadlocks the `gates` line against itself.
+
 When filing a finding, place it by kind: nameable deliverable + done-state ⇒
 queue task (Deferred `[needs-spec]`; scope triages feature-vs-debt by the
 new-names litmus, spec-kit/SPEC.md §The amendment lifecycle); an observation

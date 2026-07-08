@@ -92,10 +92,4 @@
 
 ## Done
 
-- commit-message-hygiene-gate
-- reconsider-spec-pointers
-- kit-enum-completeness-gate
-- extraction-completeness-gates
-- validate-evidence-layer
-
 ## Lessons Learned

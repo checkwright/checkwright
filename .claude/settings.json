@@ -34,6 +34,8 @@
       "Bash(bash */bin/run-*-tests.sh)",
       "Bash(bash */bin/run-*-tests.sh *)",
       "Bash(bash delegation-kit/bin/usage-verdict.sh)",
+      "Bash(bash evidence-kit/bin/run-validate.sh)",
+      "Bash(bash evidence-kit/bin/run-validate.sh *)",
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(: > .workflow/knowledge-friction.log)",
       "Bash(ls *)",
