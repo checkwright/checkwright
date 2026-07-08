@@ -93,4 +93,6 @@ else
     echo "enter-stage: stamped '$stamp_line'; header flipped to [stage: $stage]."
 fi
 echo "  next: commit $QUEUE and $STATE together (the flip+stamp ride in one commit)."
-[[ ${#truncated[@]} -gt 0 ]] && echo "  note: boundary-truncated to the '# contract:' header: ${truncated[*]} — commit alongside the reset."
+if [[ ${#truncated[@]} -gt 0 ]]; then
+    echo "  note: boundary-truncated to the '# contract:' header: ${truncated[*]} — commit alongside the reset."
+fi
