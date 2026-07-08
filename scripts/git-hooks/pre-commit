@@ -89,6 +89,10 @@ if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
     lifecycle-kit/checks/check-stage-entry.sh || hook_fail check-stage-entry
 fi
 
+if staged_matches '.claude/commands/*.md'; then
+    lifecycle-kit/checks/check-stage-skill-coverage.sh || hook_fail check-stage-skill-coverage
+fi
+
 if staged_matches 'TASK-QUEUE.md'; then
     queue-kit/checks/check-queue-sections.sh || hook_fail check-queue-sections
 fi

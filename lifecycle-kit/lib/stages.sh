@@ -38,6 +38,8 @@ declare -p LIFECYCLE_ACTIVE_SECTIONS &>/dev/null || LIFECYCLE_ACTIVE_SECTIONS=("
 [[ -v LIFECYCLE_ROSTER_BASENAME ]] || LIFECYCLE_ROSTER_BASENAME='SPEC.md'
 declare -p LIFECYCLE_CONTRACT_TOKENS &>/dev/null || LIFECYCLE_CONTRACT_TOKENS=("SPEC.md" "proto/")
 
+[[ -v LIFECYCLE_SKILLS_DIR ]] || LIFECYCLE_SKILLS_DIR=".claude/commands"
+
 [[ -v LIFECYCLE_QUEUE_FILE ]] || LIFECYCLE_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 [[ -v LIFECYCLE_STATE_FILE ]] || LIFECYCLE_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
 
@@ -62,6 +64,7 @@ lifecycle_stage_known() {
 
 _lc_errs=()
 [[ ${#LIFECYCLE_STAGES[@]} -gt 0 ]] || _lc_errs+=("LIFECYCLE_STAGES is empty")
+[[ -n "$LIFECYCLE_SKILLS_DIR" ]] || _lc_errs+=("LIFECYCLE_SKILLS_DIR is empty")
 lifecycle_stage_known "$LIFECYCLE_FIRST_STAGE" \
     || _lc_errs+=("LIFECYCLE_FIRST_STAGE '$LIFECYCLE_FIRST_STAGE' is not in LIFECYCLE_STAGES")
 for _lc_k in "${!LIFECYCLE_PREDECESSOR[@]}"; do

@@ -84,9 +84,11 @@ The stage machine itself is config with the platform's lifecycle as the
 default: copy `templates/lifecycle-stages.sh` into the gates dir as
 `lifecycle-stages.sh` (or point `LIFECYCLE_KIT_STAGES_FILE` elsewhere) and
 override any knob — stages, predecessor map, first/drain/audit stages, active
-queue sections, waiver token, amendment/roster shapes, governed-file paths
-(`LIFECYCLE_QUEUE_FILE` / `LIFECYCLE_STATE_FILE`, defaulting through
-gate-sdk's `GATE_SDK_QUEUE_FILE` / `GATE_SDK_WORKFLOW_DIR`). Knob semantics
+queue sections, waiver token, amendment/roster shapes, the skills dir
+(`LIFECYCLE_SKILLS_DIR`, default `.claude/commands`, read by
+`check-stage-skill-coverage`), governed-file paths (`LIFECYCLE_QUEUE_FILE` /
+`LIFECYCLE_STATE_FILE`, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
+`GATE_SDK_WORKFLOW_DIR`). Knob semantics
 are documented in the template; the loader validates the machine (unknown
 stages in the map, a waiver token colliding with a stage name) and exits 2 on
 a malformed config — a broken machine must not gate anything.
@@ -216,6 +218,21 @@ that must not fabricate a second component). Suite *runs* and other
 non-static exits are not re-runnable as pre-commit gates and stay
 human-judged at the stage approval; the prerequisite-stamp floor is their
 mechanical residual.
+
+### check-stage-skill-coverage
+
+Invariant: the configured stage set and the skills dir (`LIFECYCLE_SKILLS_DIR`,
+default `.claude/commands`; override with the first argument) cover each other,
+both directions. Forward: every `LIFECYCLE_STAGES` member has a `<stage>.md`
+skill file — a stage with no skill cannot be entered. Reverse: every skill file
+that invokes `enter-stage.sh` names a live stage in the token it passes. The
+`enter-stage.sh` invocation is the mechanical marker separating a stage skill
+from an ordinary one, so a retired stage's orphan skill (its `.md` still
+invoking a now-unknown stage) reddens without false-flagging a non-stage skill
+like `/agent-execution`, which never invokes `enter-stage.sh`. A skills dir that
+does not exist is fail-closed (exit 2). The `# graph:` couples the skills dir at
+`tier=precommit`; the whole-tree `run-gates.sh` battery backstops a stage-set
+edit (`lifecycle-stages.sh`), which is not itself in the coupled surface.
 
 ### templates/skills/
 
