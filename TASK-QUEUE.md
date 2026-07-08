@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **extraction-completeness-gates** [spec: SPEC-completeness-gates.md] — the
-  admitted structural-gate set: check-spec-fence-balance + check-md-refs
-  (spec-kit), check-stage-skill-coverage (lifecycle-kit), check-hook-exec-bit +
-  check-root-tiering (gate-sdk), check-queue-sections (queue-kit); the ruled-out
-  candidates and rationale live in the amendment. Build after kit-enum (the new
-  gates' couples use the `kit:` token).
 - **commit-message-hygiene-gate** [spec: gate-sdk/SPEC-commit-msg.md] — a
   generated `commit-msg` hook (`tier=commit-msg` in the graph grammar) running
   check-commit-msg, plus check-tree-terms over the same pattern files; generic
@@ -76,5 +70,6 @@
 
 - reconsider-spec-pointers
 - kit-enum-completeness-gate
+- extraction-completeness-gates
 
 ## Lessons Learned
