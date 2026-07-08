@@ -9,3 +9,4 @@ norm-hardening align 6639054d 2026-07-08
 norm-hardening build 7cb9c78c 2026-07-08
 norm-hardening build 4153aabf 2026-07-08
 norm-hardening build 6ebfd06f 2026-07-08
+norm-hardening validate 277d651f 2026-07-08
