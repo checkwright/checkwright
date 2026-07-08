@@ -4,11 +4,4 @@
 
 ---
 
-gap-closure scope 734d0ea6 2026-07-08
-gap-closure align 2b791b73 2026-07-08
-gap-closure build ce8119b0 2026-07-08
-gap-closure build 5e6620ea 2026-07-08
-gap-closure build 260f8c59 2026-07-08
-gap-closure build 1fc674c3 2026-07-08
-gap-closure validate 0b2bef60 2026-07-08
-gap-closure close 4057f784 2026-07-08
+operational-hardening scope 77e4104b 2026-07-08

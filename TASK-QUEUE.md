@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: gap-closure  [stage: close]
+## Iteration: operational-hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,18 @@
 ---
 
 ## New Features
+
+- **kit-registration-gate** [spec: gate-sdk/SPEC-kit-registration.md] —
+  check-kit-registration: every kit root carries a registry-doc row and, when
+  it ships gate-tests, a fixture-runner line; retires close's manual registry
+  staleness check.
+- **budget-footprint-monitor** [spec: delegation-kit/SPEC-usage-trend.md] —
+  usage-history sampling from usage-verdict plus usage-trend.sh: footprint
+  evolution per reset-window segment, monotonicity-based noise flagging.
+- **close-evidence-precondition-guard** [spec: lifecycle-kit/SPEC-entry-preflight.md]
+  — LIFECYCLE_ENTRY_PREFLIGHT knob on enter-stage; this repo wires close to
+  check-evidence-manifest so a missing green block refuses the flip instead
+  of deadlocking at pre-commit.
 
 ## Technical Debt
 
@@ -89,28 +101,6 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **kit-registration-gate** [needs-spec] — a gate asserting every kit root
-  (`gate_kit_roots`) carries a README kit-table row and a CLAUDE.md
-  fixture-runner line, so a landed kit cannot fall out of the public registry
-  unnoticed; retires the manual "does the table still reflect the kit set?"
-  staleness check at close. check-kit-enum guards only gate-coupling
-  hand-lists, not the prose registry — the gap surfaced closing gap-closure
-  2026-07-08.
-- **budget-footprint-monitor** [needs-spec] — track limit/token usage
-  *evolution* across a session's prompts and tool calls, beyond the one-shot
-  usage-verdict snapshot, to monitor Checkwright's own footprint; a natural
-  extension of delegation-kit/usage-verdict from a verdict to a trend. The
-  source signal may be unreliable — rolling-window readings that spike and
-  revert — so the design must separate a real footprint from harness reading
-  noise before any number is trusted. Surfaced 2026-07-08.
-- **close-evidence-precondition-guard** [needs-spec] — make the close flip fail
-  loudly instead of deadlocking when the validate evidence block is missing:
-  `enter-stage close` (or check-stage-entry's close predecessor rule) refuses
-  the flip when `.workflow/validate-evidence.txt` carries no clean line for the
-  iteration, pointing at run-validate, rather than letting the self-referential
-  `gates` suite deadlock against the pre-commit manifest gate. Belt-and-braces
-  behind the validate.md wiring; the deadlock this guards was hit closing
-  gap-closure 2026-07-08.
 
 ## Done
 
