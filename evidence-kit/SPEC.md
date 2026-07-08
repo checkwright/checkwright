@@ -144,14 +144,28 @@ close-entry and stamp-coupling assertions are covered by
 
 ## lifecycle-kit integration
 
-Integration is one generic knob on lifecycle-kit's side of the seam:
+Integration is two generic knobs on lifecycle-kit's side of the seam, each
+naming no evidence surface in the kit — the coupling lives entirely in the
+consumer's config and this gate's optional assertions.
+
 `LIFECYCLE_BOUNDARY_TRUNCATE` lists the files `bin/enter-stage.sh` truncates back
 to their `# contract:` header at the iteration boundary, exactly as it already
 resets the state file. A consumer sets it to the evidence manifest, so a new
 iteration starts with a manifest carrying only its contract header — which is
 what makes assertion (B)'s foreign-iteration test able to catch a skipped
-truncation. No evidence name appears in lifecycle-kit; the coupling lives
-entirely in the consumer's config and the manifest gate's optional assertions.
+truncation.
+
+`LIFECYCLE_ENTRY_PREFLIGHT` runs this gate as a close-entry pre-flight: a
+consumer sets `close=…/check-evidence-manifest.sh <manifest>`, and
+`bin/enter-stage.sh` appends the header-flipped temp queue and state file, so
+assertion (A)'s close-entry green-block check fires *before* the flip is
+written — the missing evidence becomes a refusal at the flip (pointing at
+run-validate) instead of a self-referential deadlock at pre-commit, where the
+`gates` suite that would produce the evidence re-runs this same red gate
+against the already-flipped header. Belt-and-braces behind the validate
+skill's run-validate wiring, not a replacement for it; for a consumer that
+wires it, assertion (A)'s enforcement point moves one step earlier, from
+commit to flip.
 
 The validate stage records evidence on a commit later than the entry flip
 (assertion C's re-arm scoping): the stamp proves invocation at entry, the

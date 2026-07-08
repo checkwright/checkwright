@@ -94,4 +94,52 @@ if es_run build >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a 
 cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on a refusal" >&2; exit 1; }
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): wrote queue on a refusal" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_ENTRY_PREFLIGHT: a red entry command refuses the flip (no writes), a green one lets it through
+cat > "$esq" <<'EOF'
+# smoke queue
+## Iteration: pf-iter  [stage: build]
+
+---
+
+## New Features
+## Technical Debt
+## Deferred
+## Done
+EOF
+cat > "$ess" <<EOF
+# contract
+
+---
+
+pf-iter build aabbccdd $d
+EOF
+cat > "$es/preflight-stub.sh" <<'STUB'
+#!/usr/bin/env bash
+[[ -f "$(dirname "$0")/preflight-ok" ]]
+STUB
+chmod +x "$es/preflight-stub.sh"
+cat > "$es/stages.sh" <<STAGES
+# shellcheck shell=bash
+LIFECYCLE_ENTRY_PREFLIGHT=('validate=$es/preflight-stub.sh')
+STAGES
+
+es_pf_run() {
+    LIFECYCLE_QUEUE_FILE="$esq" \
+    LIFECYCLE_STATE_FILE="$ess" \
+    LIFECYCLE_SESSIONS_DIR="$es/sessions" \
+    GATE_SDK_TMP_DIR="$es/tmp" \
+    LIFECYCLE_KIT_STAGES_FILE="$es/stages.sh" \
+    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+}
+
+cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
+if es_pf_run validate >/dev/null 2>&1; then echo "smoke(enter-stage): red preflight should refuse the flip" >&2; exit 1; fi
+cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on a preflight refusal" >&2; exit 1; }
+cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): wrote queue on a preflight refusal" >&2; exit 1; }
+
+touch "$es/preflight-ok"
+es_pf_run validate >/dev/null || { echo "smoke(enter-stage): green preflight should let the flip through" >&2; exit 1; }
+grep -q "^## Iteration: pf-iter  \[stage: validate\]\$" "$esq" || { echo "smoke(enter-stage): green preflight did not flip to validate" >&2; exit 1; }
+grep -q "^pf-iter validate aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): green preflight did not stamp" >&2; exit 1; }
+
 rm -rf "$es"

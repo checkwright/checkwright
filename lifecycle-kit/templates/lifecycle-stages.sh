@@ -46,3 +46,18 @@
 # Governed files (repo-root-relative; the gates also take them as $1/$2).
 #LIFECYCLE_QUEUE_FILE=TASK-QUEUE.md
 #LIFECYCLE_STATE_FILE=.workflow/WORKFLOW-STATE.txt
+
+# Extra files enter-stage.sh resets to their leading '# contract:' header at
+# the iteration boundary, exactly as it resets the state file — for a
+# downstream per-iteration file that must start each cycle from its contract
+# header. Empty (the default) truncates nothing beyond the state file.
+#LIFECYCLE_BOUNDARY_TRUNCATE=()
+
+# Per-stage entry pre-flights, '<stage>=<command and leading args>'. On each
+# matching stage entry, enter-stage.sh runs the command — after the built-in
+# check-stage-entry pre-flight — with the header-flipped temp queue and the
+# state file appended as its final two positionals; a non-zero exit refuses
+# the flip (exit 1, findings printed, nothing written), exactly as a red
+# check-stage-entry does. The stage key must be a configured stage. Empty
+# (the default) pre-flights nothing beyond the built-in.
+#LIFECYCLE_ENTRY_PREFLIGHT=()

@@ -70,6 +70,18 @@ if ! preflight="$(bash "$KIT/checks/check-stage-entry.sh" "$tmpqueue" "$STATE" 2
     exit 1
 fi
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_ENTRY_PREFLIGHT: each entry matching the entered stage runs after the built-in pre-flight with the flipped temp queue + state file appended; a non-zero exit refuses the flip, nothing written
+for pf in ${LIFECYCLE_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_ENTRY_PREFLIGHT[@]}"}; do
+    [[ "${pf%%=*}" == "$stage" ]] || continue
+    read -r -a pf_argv <<<"${pf#*=}"
+    if ! pf_out="$("${pf_argv[@]}" "$tmpqueue" "$STATE" 2>&1)"; then
+        echo "enter-stage: LIFECYCLE_ENTRY_PREFLIGHT command for '$stage' refuses the flip — nothing written:" >&2
+        printf '%s\n' "$pf_out" >&2
+        echo "  help: resolve the finding above, or (to override deliberately) perform the stamp+flip by hand." >&2
+        exit 1
+    fi
+done
+
 if [[ "$first" == 1 ]]; then
     header_only="$(awk '{ print } /^---[[:space:]]*$/ { exit }' "$STATE")"
     printf '%s\n\n%s\n' "$header_only" "$stamp_line" > "$STATE"

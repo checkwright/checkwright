@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **close-evidence-precondition-guard** [spec: lifecycle-kit/SPEC-entry-preflight.md]
-  — LIFECYCLE_ENTRY_PREFLIGHT knob on enter-stage; this repo wires close to
-  check-evidence-manifest so a missing green block refuses the flip instead
-  of deadlocking at pre-commit.
-
 ## Technical Debt
 
 - **delegation-tests-in-validate-battery** — delegation-kit's three
@@ -123,5 +118,6 @@
 
 - kit-registration-gate
 - budget-footprint-monitor
+- close-evidence-precondition-guard
 
 ## Lessons Learned

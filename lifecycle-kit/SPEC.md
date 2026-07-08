@@ -88,8 +88,10 @@ queue sections, waiver token, amendment/roster shapes, the skills dir
 (`LIFECYCLE_SKILLS_DIR`, default `.claude/commands`, read by
 `check-stage-skill-coverage`), governed-file paths (`LIFECYCLE_QUEUE_FILE` /
 `LIFECYCLE_STATE_FILE`, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
-`GATE_SDK_WORKFLOW_DIR`), and `LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset
-to their header at the iteration boundary (§bin/enter-stage.sh). Knob semantics
+`GATE_SDK_WORKFLOW_DIR`), `LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset
+to their header at the iteration boundary — and `LIFECYCLE_ENTRY_PREFLIGHT` —
+per-stage entry commands run alongside the built-in pre-flight
+(§bin/enter-stage.sh). Knob semantics
 are documented in the template; the loader validates the machine (unknown
 stages in the map, a waiver token colliding with a stage name) and exits 2 on
 a malformed config — a broken machine must not gate anything.
@@ -135,17 +137,25 @@ same way (a generic per-iteration reset knob — no consumer surface is named in
 the kit; a downstream kit whose per-iteration file must start each cycle from
 its contract header adds itself here, as evidence-kit's manifest does).
 **Pre-flight,
-not enforcement:** before writing, it runs `check-stage-entry` for the entered
-stage — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}` plus the real
-state file, through the gate's existing positionals, the gate itself
-untouched — and refuses (exit 1, findings printed, no writes) when it is red;
-the refusal is advisory in the same sense the gate is at commit time (no
-`--force`, so the easy path is the compliant one). **Idempotent:** if the
+not enforcement:** before writing, it runs the built-in `check-stage-entry`
+for the entered stage plus each `LIFECYCLE_ENTRY_PREFLIGHT` command whose
+stage key matches — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}`
+plus the real state file, appended as the final two positionals so the
+built-in gate and any configured command read the flip that has not yet been
+written, the commands themselves untouched — and refuses (exit 1, findings
+printed, no writes) when any is red; the refusal is advisory in the same sense
+the gate is at commit time (no `--force`, so the easy path is the compliant
+one). `LIFECYCLE_ENTRY_PREFLIGHT` is a generic per-stage hook — no consumer
+surface is named in the kit; a downstream kit whose gate is the real
+precondition for a stage wires itself here (as evidence-kit's manifest gate
+does for close entry), turning a would-be pre-commit deadlock into a loud
+refusal at the flip. **Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,
 it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 (`LIFECYCLE_QUEUE_FILE`, `LIFECYCLE_STATE_FILE`, `LIFECYCLE_STAGES`,
-`LIFECYCLE_FIRST_STAGE`, and `LIFECYCLE_BOUNDARY_TRUNCATE`). Advisory tooling,
+`LIFECYCLE_FIRST_STAGE`, `LIFECYCLE_BOUNDARY_TRUNCATE`, and
+`LIFECYCLE_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
 `smoke/install.sh`.
 

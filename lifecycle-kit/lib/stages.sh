@@ -45,6 +45,8 @@ declare -p LIFECYCLE_CONTRACT_TOKENS &>/dev/null || LIFECYCLE_CONTRACT_TOKENS=("
 
 declare -p LIFECYCLE_BOUNDARY_TRUNCATE &>/dev/null || LIFECYCLE_BOUNDARY_TRUNCATE=()
 
+declare -p LIFECYCLE_ENTRY_PREFLIGHT &>/dev/null || LIFECYCLE_ENTRY_PREFLIGHT=()
+
 lifecycle_header() {
     grep -m1 '^## Iteration:' "$1" 2>/dev/null || true
 }
@@ -84,9 +86,16 @@ done
 if [[ -n "$LIFECYCLE_WAIVER_TOKEN" ]] && lifecycle_stage_known "$LIFECYCLE_WAIVER_TOKEN"; then
     _lc_errs+=("LIFECYCLE_WAIVER_TOKEN '$LIFECYCLE_WAIVER_TOKEN' collides with a stage name")
 fi
+for _lc_pf in ${LIFECYCLE_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_ENTRY_PREFLIGHT[@]}"}; do
+    if [[ "$_lc_pf" != *=* ]]; then
+        _lc_errs+=("LIFECYCLE_ENTRY_PREFLIGHT entry '$_lc_pf' lacks the '<stage>=<command>' shape")
+    elif ! lifecycle_stage_known "${_lc_pf%%=*}"; then
+        _lc_errs+=("LIFECYCLE_ENTRY_PREFLIGHT stage key '${_lc_pf%%=*}' is not in LIFECYCLE_STAGES")
+    fi
+done
 if [[ ${#_lc_errs[@]} -gt 0 ]]; then
     printf 'lifecycle-kit: malformed stage-machine config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_lc_errs[@]}" >&2
     exit 2
 fi
-unset _lc_errs _lc_k
+unset _lc_errs _lc_k _lc_pf
