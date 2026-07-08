@@ -1,23 +1,35 @@
-# usage-verdict decision table — <verdict><TAB><exit><TAB><pct><TAB><age_off><TAB><reset_off><TAB><cred_age><TAB><desc>.
-# Columns are tab-separated; # and blank lines are ignored. Every verdict branch
-# carries a firing and a non-firing case (delegation-kit/SPEC.md §Testing).
-# Defaults under test: PAUSE_PCT=80, STALE_AGE=600, LOGIN_WINDOW=600.
+# usage-verdict decision table — columns (tab-separated):
+#   verdict  exit  pct  age_off  reset_off  cred_age  pct_7d  reset7d_off  append  axis  desc
+# Offsets are seconds from *now* (static fixtures would age into permanent STALE).
+# pct_7d '-' omits the seven_day keys (a three-line snapshot — today's behavior).
+# append is the sample-line count the run must leave in the history log (0 or 1);
+# axis ('-' / 5h / 7d) asserts which window a PAUSE names. # and blank lines ignored.
+# Every verdict branch and both pause axes carry a firing and a non-firing case
+# (delegation-kit/SPEC.md §Testing).
+# Defaults under test: PAUSE_PCT=80, PAUSE_PCT_7D=80, STALE_AGE=600, LOGIN_WINDOW=600.
 
 # OK — under threshold, fresh reading, live window
-OK	0	40	0	3600	-	integer under threshold
-OK	0	28.999	0	3600	-	fractional under threshold (non-firing PAUSE)
+OK	0	40	0	3600	-	-	0	1	-	integer under threshold
+OK	0	28.999	0	3600	-	-	0	1	-	fractional under threshold (non-firing PAUSE)
+OK	0	40	0	3600	-	30	500000	1	-	weekly present but comfortable — neither axis fires
+OK	0	40	0	3600	-	99	-100	1	-	dead weekly window does not pause (a high 7d pct from a rolled window)
 
-# PAUSE — over threshold, fresh, live window, no recent login
-PAUSE	1	95	0	3600	-	integer over threshold
-PAUSE	1	82.5	0	3600	-	fractional over threshold (the float-compare regression)
-PAUSE	1	80.9	0	3600	-	fractional just over the boundary (int truncation would miss)
-PAUSE	1	95	0	3600	99999	over threshold with an old login (no lag reroute)
+# PAUSE (5h) — over threshold, fresh, live window, no recent login
+PAUSE	1	95	0	3600	-	-	0	1	5h	integer over the 5h threshold
+PAUSE	1	82.5	0	3600	-	-	0	1	5h	fractional over 5h (the float-compare regression)
+PAUSE	1	80.9	0	3600	-	-	0	1	5h	fractional just over the 5h boundary (int truncation would miss)
+PAUSE	1	95	0	3600	99999	-	0	1	5h	over 5h with an old login (no lag reroute)
+
+# PAUSE (7-day) — the weekly axis fires while 5h sits comfortable, and dominates when both fire
+PAUSE	1	40	0	3600	-	92	500000	1	7d	weekly over while 5h comfortable -> PAUSE names the 7-day axis
+PAUSE	1	95	0	3600	-	95	500000	1	7d	both axes over -> the costlier weekly axis is named
 
 # STALE — post-login lag, stale reading, and non-numeric fail-closed
-STALE	2	95	0	3600	60	over threshold but a fresh login -> STALE (server-fed pct lags)
-STALE	2	40	1200	3600	-	reading older than STALE_AGE
-STALE	2	abc	0	3600	-	non-numeric pct fails closed (never OK)
+STALE	2	95	0	3600	60	-	0	1	-	over 5h but a fresh login -> STALE (server-fed pct lags), still a parsed sample
+STALE	2	40	0	3600	60	95	500000	1	-	a login reroutes a weekly PAUSE too (a switch swaps both windows)
+STALE	2	40	1200	3600	-	-	0	1	-	reading older than STALE_AGE — parsed, so it still logs
+STALE	2	abc	0	3600	-	-	0	0	-	non-numeric pct fails closed and appends nothing (not a parsed sample)
 
-# RESET-OK — the window rolled over; the pct is from the dead window
-RESET-OK	0	95	0	-100	-	dead window -> RESET-OK (a high pct must not read as PAUSE)
-RESET-OK	0	40	0	-1	-	window just rolled over
+# RESET-OK — the 5h window rolled over; the pct is from the dead window
+RESET-OK	0	95	0	-100	-	-	0	1	-	dead 5h window -> RESET-OK (a high pct must not read as PAUSE)
+RESET-OK	0	40	0	-1	-	-	0	1	-	5h window just rolled over

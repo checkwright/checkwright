@@ -1,0 +1,20 @@
+# Fixture usage-history for usage-trend (delegation-kit/SPEC.md §Testing). Static
+# epochs — the trend reporter measures within-segment deltas, never against *now*,
+# so unlike the verdict fixtures this one does not age. Comment lines carry no
+# key=value pair and are skipped by the parser.
+#
+# acctA (tier=pro, login=500, weekly window resets_7d=600000):
+#   a spike-then-correction inside one 5h window, then two 5h reset boundaries,
+#   its weekly trajectory reunited across the acctB excursion below.
+updated_at=1000 pct=10 resets_at=20000 verdict=OK login_at=500 account=acctA tier=pro pct_7d=30 resets_7d=600000 tokens_in=100 tokens_out=50
+updated_at=4600 pct=25 resets_at=20000 verdict=OK login_at=500 account=acctA tier=pro pct_7d=34 resets_7d=600000 tokens_in=300 tokens_out=120
+updated_at=8200 pct=90 resets_at=20000 verdict=OK login_at=500 account=acctA tier=pro pct_7d=36 resets_7d=600000 tokens_in=500 tokens_out=200
+updated_at=11800 pct=40 resets_at=20000 verdict=OK login_at=500 account=acctA tier=pro pct_7d=38 resets_7d=600000 tokens_in=700 tokens_out=260
+updated_at=30000 pct=15 resets_at=50000 verdict=OK login_at=500 account=acctA tier=pro pct_7d=45 resets_7d=600000 tokens_in=900 tokens_out=320
+updated_at=33600 pct=55 resets_at=50000 verdict=PAUSE login_at=500 account=acctA tier=pro pct_7d=52 resets_7d=600000 tokens_in=1100 tokens_out=400
+# acctB excursion (tier=max, its own weekly window): a login_at change between its
+# two 5h samples splits them into two segments even though the 5h window is unchanged.
+updated_at=40000 pct=20 resets_at=80000 verdict=OK login_at=9000 account=acctB tier=max pct_7d=12 resets_7d=900000
+updated_at=43600 pct=35 resets_at=80000 verdict=OK login_at=9100 account=acctB tier=max pct_7d=15 resets_7d=900000
+# back to acctA: a third 5h window, and the same weekly segment as before the excursion
+updated_at=90000 pct=65 resets_at=120000 verdict=OK login_at=500 account=acctA tier=pro pct_7d=70 resets_7d=600000 tokens_in=1300 tokens_out=460

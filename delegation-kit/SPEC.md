@@ -158,20 +158,48 @@ three failure modes a raw percentage reading leaves open:
 1. **Stale reading** — `now - updated_at` beyond `STALE_AGE` → STALE
    (exit 2): re-read before trusting.
 2. **Dead window** — `resets_at <= now` → RESET-OK (exit 0): the percentage
-   is from the dead window and must not be read as a pause signal.
+   is from the dead window and must not be read as a pause signal. The
+   weekly axis carries the same rule per-axis (`seven_day_resets_at <= now`
+   disarms the weekly pause without forcing the whole verdict to RESET-OK —
+   the axes are judged independently).
 3. **Post-login lag** — a fresh login starts a new window but the
    server-fed percentage lags it, and the file-write age check cannot see
    that. The gate reads the auth event from the credentials file's mtime
    (`LOGIN_WINDOW`); a would-be PAUSE with a that-recent login routes to
    STALE (re-read) instead of a wrongful pause. Self-limiting: once the
    mtime ages out, a genuine near-limit percentage re-reads back to PAUSE.
+   An account switch swaps both windows, so the reroute applies whichever
+   axis would have fired.
 
-Exit codes: **0** OK / RESET-OK, **1** PAUSE (over `PAUSE_PCT` of the live
-window), **2** STALE or unreadable. Fail-closed throughout: missing keys
-and a non-numeric percentage route to STALE, and the threshold compare uses
-`awk`, not integer-only bash arithmetic, so a fractional percentage cannot
-silently skip PAUSE. The five-hour window is the only pause axis; 7-day
-keys are ignored.
+Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable.
+Fail-closed throughout: missing keys and a non-numeric percentage route to
+STALE, and each threshold compare uses `awk`, not integer-only bash
+arithmetic, so a fractional percentage cannot silently skip PAUSE.
+
+**Two pause axes.** The five-hour window is the always-on axis; the weekly
+(7-day) window is a second axis, armed only when both `seven_day_used_pct`
+and `seven_day_resets_at` are present (a three-line snapshot keeps today's
+behavior — no retroactive contract break). The weekly limit can deplete
+while the 5h window sits comfortable, and a weekly PAUSE costs days, not
+hours, so it must gate delegation planning, not merely appear in a log —
+delegation is the discretionary spend, the first thing to stop near the
+weekly ceiling so the remaining week stays with the supervisor. The axes
+are judged independently against `PAUSE_PCT` and `PAUSE_PCT_7D`; either
+firing is a PAUSE (exit 1), and the message names the axis that fired
+(`PAUSE (7-day window)` vs `PAUSE (5h window)`, the weekly named when both
+fire) because the operator's remediation differs by days. No caller
+changes: the session-context hook and the per-dispatch Agent budget guard
+already consume the exit code, so the weekly axis flows into every dispatch
+decision the moment a producer supplies the keys.
+
+**Usage-history sampling.** When `DELEGATION_KIT_USAGE_HISTORY` is non-empty,
+`usage-verdict` appends one sample line (§The usage.txt contract) to that log
+after every successfully parsed snapshot, whatever the verdict — the raw
+harness-reported values verbatim; write-time smoothing or correction is
+forbidden (a later corrective push is evidence about the earlier sample, and
+only the reader has both). A STALE exit from an unreadable or unparseable
+snapshot appends nothing — a sample the gate would not trust is not history.
+`usage-trend` (§Trend reporter) reads the log.
 
 ### The usage.txt contract
 
@@ -184,22 +212,94 @@ five_hour_resets_at=<epoch-seconds>
 updated_at=<epoch-seconds>
 ```
 
+Beyond the three mandatory lines a producer may write optional keys when its
+source exposes them; `usage-verdict` reads the ones it interprets and passes
+the rest through: `seven_day_used_pct` / `seven_day_resets_at` (the weekly
+window — read at the verdict transition to arm the second pause axis),
+`account` (the logged-in account identity — `login_at` detects a switch,
+`account` says to whom, which lets `usage-trend` group a multi-account
+operator's segments per account), `tier` (subscription tier — the
+denominator behind the percentages), and `tokens_in` / `tokens_out`
+(cumulative token counts, the axis that binds API-billed consumers for whom
+no subscription percentage applies). Optional keys are omitted when their
+source has no value, never written empty; keys the verdict does not read
+pass through unchanged.
+
 `templates/statusline-usage.sh` is a minimal producer: a statusline hook
 that parses the harness's rate-limit JSON and atomically writes the
 snapshot (`tmp` + `mv`) to `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`.
+It also produces the weekly pair from the payload and `account` / `tier`
+from the local account config (`.credentials.json` / `~/.claude.json`,
+overridable via `DELEGATION_KIT_CRED_FILE` / `DELEGATION_KIT_ACCOUNT_CONFIG`).
+It ships no `tokens_in` / `tokens_out` producer: this harness's payload
+carries no cumulative token count, so under the dead-producer rule the keys
+stay defined here for third-party producers but no dead producer is shipped.
 Any producer honoring the contract works — the source is pluggable
 (`DELEGATION_KIT_USAGE_FILE`), which de-hardcodes the source platform's
 single-operator `CLAUDE_CONFIG_DIR` assumption.
+
+**The sample line.** With sampling enabled (§usage-verdict), `usage-verdict`
+appends one line per parsed snapshot — the trend log's wire contract between
+it and `usage-trend`:
+
+```
+updated_at=<epoch> pct=<float> resets_at=<epoch> verdict=<word> login_at=<epoch>[ account=<word>][ tier=<word>][ pct_7d=<float> resets_7d=<epoch>][ tokens_in=<n> tokens_out=<n>]
+```
+
+Space-separated `key=value`, order-insensitive; optional groups are omitted
+(never written empty) when the snapshot lacks them. `login_at` is the
+credentials-file mtime the post-login-lag check already reads, stamped per
+sample so an account switch becomes data; `pct` / `resets_at` are the 5h
+values verbatim and `pct_7d` / `resets_7d` the weekly ones. The log is
+append-only (the tmp-prune / boundary-truncate conventions own cleanup), and
+carries operator-local account identifiers, so it lives under the gitignored
+measurement dir and never reaches a tracked file.
+
+## Trend reporter
+
+`bin/usage-trend.sh` reads the history log and reports how the footprint
+evolves — advisory tooling, never a gate: exit **0** report emitted, **2**
+knob unset or history missing/unreadable (fail-closed, mirroring the
+verdict's STALE discipline), never **1** (it renders no verdict; the verdict
+stays the sole pause authority). The source signal is known-noisy — a
+rolling-window reading spikes and reverts-down when a harness over-report is
+corrected by the next push — so the design separates signal from noise by
+the window's one physical constraint: within a segment, true usage never
+decreases.
+
+1. **Segment** samples per axis by that axis's reset epoch, `login_at`,
+   `account`, and `tier`: the 5h axis keys on `resets_at`, the weekly axis
+   on `resets_7d` (the windows roll independently — a weekly segment spans
+   many 5h segments). A timer reset, a `/login`, or an account or tier
+   change each starts a segment; only within-segment comparisons are
+   meaningful, so an account switch is a boundary, not a flagged anomaly.
+2. **Flag** any sample whose pct is below an earlier one in the same segment
+   as a monotonicity violation: the downward correction indicts the elevated
+   sample(s) before it as reader noise, and both sides are excluded from rate
+   math, never averaged in. Median-of-3 smoothing resolves single-sample
+   spikes; segment endpoints keep their own value (no 2-window averaging).
+3. **Report** per segment and axis — first/last smoothed pct, pct-per-hour
+   rate, token deltas when token keys ride, tier, sample count, and
+   suspect-sample count (a high suspect ratio means the producer is
+   unreliable and no number from that segment is trusted). The weekly axis
+   additionally reports headroom against `PAUSE_PCT_7D` at the current rate —
+   the planning number for how much delegation the week still affords — and,
+   when `account` is present, segments group under an account heading so a
+   rotating operator reads one weekly trajectory per account rather than an
+   interleaved stream.
 
 ## Layout and configuration
 
 ```
 delegation-kit/
   bin/usage-verdict.sh
+  bin/usage-trend.sh              # footprint trend reporter over the history log
   bin/run-usage-tests.sh          # verdict decision-table runner
   bin/run-budget-guard-tests.sh   # budget-guard decision-table runner
+  bin/run-trend-tests.sh          # trend-reporter assertion runner
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
   usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
+  usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
   gate-tests/check-gate-tamper/{good,bad}/
   templates/agent-execution.md            # full protocol skill
@@ -225,8 +325,12 @@ as defaults):
 - `DELEGATION_KIT_CRED_FILE` — default the usage file's sibling
   `.credentials.json`; positional `$2` overrides.
 - `DELEGATION_KIT_PAUSE_PCT` — default `80`.
+- `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default the
+  `DELEGATION_KIT_PAUSE_PCT` value (one conservatism policy unless split).
 - `DELEGATION_KIT_STALE_AGE` — default `600` (seconds).
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
+- `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
+  off). This repo sets `.tmp/usage-history.log`, a gitignored measurement.
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
   `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh")` plus the gate-sdk lib and
@@ -275,9 +379,27 @@ file (timestamps must be computed relative to *now* — static fixtures
 would age into permanent STALE) and asserts verdict and exit code. Each
 case runs in a throwaway sandbox with no consumer config on the lookup
 path, so the gate exercises its own defaults hermetic to the host repo;
-`cases.tsv` columns are `verdict exit pct age_off reset_off cred_age desc`
-(the offsets seconds from *now*). Every verdict branch carries at least one
-firing and one non-firing case — the fixture-pair discipline, transplanted.
+`cases.tsv` columns are `verdict exit pct age_off reset_off cred_age pct_7d
+reset7d_off append axis desc` (the offsets seconds from *now*; `pct_7d` `-`
+omits the weekly keys, `append` is the expected sample-line count, `axis`
+asserts which window a PAUSE names). Every verdict branch and both pause axes
+carry a firing and a non-firing case — the fixture-pair discipline,
+transplanted — covering a weekly PAUSE while 5h is comfortable, the axis
+named in the output, absent keys disarming the weekly axis, a dead weekly
+window not pausing, and the sample-append discipline (a parsed snapshot
+appends one line whatever the verdict; a non-numeric snapshot appends none;
+`pct_7d` present-vs-omitted in the passed-through line).
+
+`usage-trend` is likewise not a gate (it renders no clean/violation
+verdict), so it ships an assertion runner, `bin/run-trend-tests.sh`, over a
+static fixture history `usage-tests/trend-history.log` (static epochs are
+safe — the reporter measures within-segment deltas, never against *now*). It
+asserts per-axis segmentation at a reset boundary, a `login_at` change, and
+an account change; per-account grouping reuniting a weekly trajectory across
+a switch-back; a spike-then-correction flagged and excluded rather than
+averaged; token deltas and weekly headroom on the report; and the
+fail-closed exits (knob unset / history missing → 2). No fixture pair owed —
+neither script is a gate.
 
 `agent-budget-guard.sh` is a hook, not a gate, so it speaks exit-2 + hook
 JSON rather than the gate output contract — and like the verdict it ships a

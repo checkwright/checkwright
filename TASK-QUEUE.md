@@ -12,16 +12,22 @@
 
 ## New Features
 
-- **budget-footprint-monitor** [spec: delegation-kit/SPEC-usage-trend.md] —
-  usage-history sampling from usage-verdict plus usage-trend.sh (per-axis
-  reset/login/tier segments, monotonicity noise flagging) and the 7-day
-  window as a second armed-when-present pause axis in the verdict.
 - **close-evidence-precondition-guard** [spec: lifecycle-kit/SPEC-entry-preflight.md]
   — LIFECYCLE_ENTRY_PREFLIGHT knob on enter-stage; this repo wires close to
   check-evidence-manifest so a missing green block refuses the flip instead
   of deadlocking at pre-commit.
 
 ## Technical Debt
+
+- **delegation-tests-in-validate-battery** — delegation-kit's three
+  decision-table runners (run-usage-tests, run-budget-guard-tests,
+  run-trend-tests) execute on-demand only, while guard-kit's run-guard-tests
+  already rides `EVIDENCE_KIT_SUITES` (`scripts/evidence-config.sh`). Add the
+  delegation runners as validate suites for parity, so the verdict,
+  budget-guard, and trend tables gate at validate rather than under manual
+  invocation; scope includes the matching `.workflow/validate-baseline.txt`
+  scenarios that `check-evidence-baseline` coverage asserts. Surfaced
+  2026-07-08 extracting budget-footprint-monitor.
 
 ## Deferred
 
@@ -102,5 +108,6 @@
 ## Done
 
 - kit-registration-gate
+- budget-footprint-monitor
 
 ## Lessons Learned

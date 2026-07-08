@@ -26,7 +26,8 @@ mechanics, validate-after-commit command set, gate-driven worklist).
 - **Budget-check before *each* dispatch** (`bash delegation-kit/bin/usage-verdict.sh`
   — it computes reading-age + window-validity and prints one verdict, exit 0 OK /
   1 PAUSE / 2 STALE; never eyeball the raw pct, a dead-window value reads
-  stale-high. Pause if PAUSE; the 5h window is the only pause axis).
+  stale-high. Pause if PAUSE; the verdict names the axis — a 5h wall clears in
+  hours, a 7-day wall in days).
 - **Never revert substantial completed work on your own design judgment** —
   especially an expensive delegated sweep. Surface the tension and wait for
   explicit go-ahead before discarding it.

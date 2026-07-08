@@ -15,12 +15,13 @@ SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 USAGE="$SANDBOX/usage.txt"
 CRED="$SANDBOX/.credentials.json"
+HIST="$SANDBOX/history.log"
 
 fails=0
 ran=0
 now="$(date +%s)"
 
-while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age desc; do
+while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age pct_7d reset7d_off append axis desc; do
     [[ -z "${verdict// }" ]] && continue
     [[ "$verdict" == \#* ]] && continue
 
@@ -28,6 +29,10 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age desc; do
         printf 'five_hour_used_pct=%s\n' "$pct"
         printf 'five_hour_resets_at=%s\n' "$(( now + reset_off ))"
         printf 'updated_at=%s\n' "$(( now - age_off ))"
+        if [[ "$pct_7d" != "-" ]]; then
+            printf 'seven_day_used_pct=%s\n' "$pct_7d"
+            printf 'seven_day_resets_at=%s\n' "$(( now + reset7d_off ))"
+        fi
     } > "$USAGE"
 
     rm -f "$CRED"
@@ -36,15 +41,37 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age desc; do
         touch -d "@$(( now - cred_age ))" "$CRED"
     fi
 
-    out="$( cd "$SANDBOX" && bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
+    rm -f "$HIST"
+    out="$( cd "$SANDBOX" && DELEGATION_KIT_USAGE_HISTORY="$HIST" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
     ran=$((ran + 1))
 
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$desc]: want exit $want, got $rc -- $out"
-        fails=$((fails + 1))
-    elif ! grep -qF -- "-> $verdict" <<<"$out"; then
+        fails=$((fails + 1)); continue
+    fi
+    if ! grep -qF -- "-> $verdict" <<<"$out"; then
         echo "  FAIL [$desc]: output missing verdict '-> $verdict': $out"
-        fails=$((fails + 1))
+        fails=$((fails + 1)); continue
+    fi
+    if [[ "$axis" != "-" ]]; then
+        case "$axis" in
+            5h) grep -qF -- "5h window" <<<"$out"     || { echo "  FAIL [$desc]: PAUSE did not name the 5h axis: $out"; fails=$((fails + 1)); continue; } ;;
+            7d) grep -qF -- "7-day window" <<<"$out"   || { echo "  FAIL [$desc]: PAUSE did not name the 7-day axis: $out"; fails=$((fails + 1)); continue; } ;;
+        esac
+    fi
+
+    got_lines=0
+    [[ -f "$HIST" ]] && got_lines="$(grep -c '' "$HIST")"
+    if [[ "$got_lines" -ne "$append" ]]; then
+        echo "  FAIL [$desc]: want $append appended sample(s), got $got_lines"
+        fails=$((fails + 1)); continue
+    fi
+    if [[ "$append" -eq 1 ]]; then
+        if [[ "$pct_7d" != "-" ]]; then
+            grep -qF -- "pct_7d=" "$HIST" || { echo "  FAIL [$desc]: sample line dropped the passed-through pct_7d: $(cat "$HIST")"; fails=$((fails + 1)); continue; }
+        else
+            grep -qF -- "pct_7d=" "$HIST" && { echo "  FAIL [$desc]: sample line invented a pct_7d from a three-line snapshot: $(cat "$HIST")"; fails=$((fails + 1)); continue; }
+        fi
     fi
 done < "$CASES"
 
@@ -56,5 +83,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "run-usage-tests: $fails/$ran case(s) failed"
     exit 1
 fi
-echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table)"
+echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes, and the sample-append discipline)"
 exit 0

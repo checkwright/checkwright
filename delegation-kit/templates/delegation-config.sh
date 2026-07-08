@@ -21,6 +21,17 @@
 #DELEGATION_KIT_STALE_AGE=600
 #DELEGATION_KIT_LOGIN_WINDOW=600
 
+# PAUSE above this percentage of the live *weekly* window — the second pause axis,
+# armed only when a producer supplies the seven_day keys. A weekly PAUSE costs days,
+# not hours, so it is the axis to raise most cautiously. Defaults to PAUSE_PCT unless
+# you split the two conservatism policies.
+#DELEGATION_KIT_PAUSE_PCT_7D=80
+
+# Append a footprint sample to this log after every parsed snapshot (empty = off).
+# usage-trend.sh reads it; keep it under the tmp/measurement dir (gitignored) — the
+# samples carry operator-local account identifiers that must not reach a tracked file.
+#DELEGATION_KIT_USAGE_HISTORY=".tmp/usage-history.log"
+
 # --- check-gate-tamper --------------------------------------------------------
 
 # Globs naming gate files (assertion A trigger). Default the platform's single

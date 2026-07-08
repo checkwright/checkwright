@@ -40,7 +40,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — copy
    `templates/statusline-usage.sh` as your harness `statusLine` command, or have
-   any producer honour the three-line contract (SPEC §usage-verdict).
+   any producer honour the snapshot contract (SPEC §The usage.txt contract).
+   The three mandatory lines are the floor; supplying the optional weekly keys
+   arms the second (7-day) pause axis.
 
 4. Optional — wire the Agent budget guard: copy `templates/agent-budget-guard.sh`
    into your gates dir and register it under `PreToolUse` matcher `Agent` in
@@ -57,7 +59,12 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 ```bash
 bash delegation-kit/bin/usage-verdict.sh            # budget verdict: exit 0 OK/RESET-OK, 1 PAUSE, 2 STALE
 bash delegation-kit/bin/usage-verdict.sh <snapshot> # verdict for an explicit usage.txt (test injection)
+bash delegation-kit/bin/usage-trend.sh              # footprint trend over the sample log (needs DELEGATION_KIT_USAGE_HISTORY)
 ```
+
+With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per
+call; `usage-trend` reads that log and reports per-window footprint evolution
+and weekly headroom (advisory — exit 0/2, never a pause verdict).
 
 `check-gate-tamper` runs from the pre-commit hook and the battery; invoke it
 directly with `--fixture <dir>` only for testing.
@@ -68,4 +75,5 @@ directly with `--fixture <dir>` only for testing.
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # check-gate-tamper fixtures
 bash delegation-kit/bin/run-usage-tests.sh                                           # usage-verdict verdict table
 bash delegation-kit/bin/run-budget-guard-tests.sh                                    # budget-guard action table
+bash delegation-kit/bin/run-trend-tests.sh                                           # usage-trend segmentation assertions
 ```

@@ -64,10 +64,11 @@ investigation). The load-bearing safety rules are also resident in CLAUDE.md
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
   `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —
   it folds in the reading-age and window-validity checks so a dead-window pct
-  can't read stale-high; the 5h window is the only pause axis — ignore any 7d
-  keys). If the verdict is PAUSE and the work is large, pause for reset. Width is
-  the kill axis: the 5h wall fires mid-flight, and the agents that bank are the
-  ones that *finished* — ≤2-wide bounds the loss to the in-flight pair.
+  can't read stale-high; a PAUSE names its axis — a 5h wall clears in hours, a
+  7-day wall in days). If the verdict is PAUSE and the work is large, pause for
+  reset. Width is the kill axis: the 5h wall fires mid-flight, and the agents
+  that bank are the ones that *finished* — ≤2-wide bounds the loss to the
+  in-flight pair.
   **Project the next wave's burn from the last wave's, not just the current
   pct** — a read-heavy 2-wide sweep is far more window-expensive than its
   subagent-token total suggests, so size waves to leave the next one headroom, or
