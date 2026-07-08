@@ -1,1 +1,10 @@
 # contract: evidence-manifest v1
+gap-closure gates sha256=cd541fad60a3628d5f22a559ae1d43bda701f1cd86eef6eab6c07f1b21d0445b pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure gatesdk_fixtures sha256=a2f3ec0b67acf01438a7a214e3644e29d37e6cdb68eec5de87a1187d56520b43 pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure lifecycle_fixtures sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure queue_fixtures sha256=6ad80540c77d17de9feb0192a08c317d84c304801d82563e5a279bf965c0fd1f pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure spec_fixtures sha256=802df0d7a79c4695b01bb1431e024170399b4a72af982a77a77d404acc8c4ec2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure delegation_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure context_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure evidence_fixtures sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
+gap-closure guard_tests sha256=f8f6a4500b50822fbc35eb5627488f1e3dbcaaddf1ae77e1a54fafc6a65d3312 pass=1 fail=0 ignore=0 verdict=clean 2026-07-08
