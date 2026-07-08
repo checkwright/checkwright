@@ -8,3 +8,6 @@ delegation_fixtures delegation_fixtures pass
 context_fixtures context_fixtures pass
 evidence_fixtures evidence_fixtures pass
 guard_tests guard_tests pass
+usage_tests usage_tests pass
+budget_guard_tests budget_guard_tests pass
+trend_tests trend_tests pass

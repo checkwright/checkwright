@@ -14,16 +14,6 @@
 
 ## Technical Debt
 
-- **delegation-tests-in-validate-battery** — delegation-kit's three
-  decision-table runners (run-usage-tests, run-budget-guard-tests,
-  run-trend-tests) execute on-demand only, while guard-kit's run-guard-tests
-  already rides `EVIDENCE_KIT_SUITES` (`scripts/evidence-config.sh`). Add the
-  delegation runners as validate suites for parity, so the verdict,
-  budget-guard, and trend tables gate at validate rather than under manual
-  invocation; scope includes the matching `.workflow/validate-baseline.txt`
-  scenarios that `check-evidence-baseline` coverage asserts. Surfaced
-  2026-07-08 extracting budget-footprint-monitor.
-
 ## Deferred
 
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
@@ -119,5 +109,6 @@
 - kit-registration-gate
 - budget-footprint-monitor
 - close-evidence-precondition-guard
+- delegation-tests-in-validate-battery
 
 ## Lessons Learned

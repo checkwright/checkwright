@@ -12,6 +12,9 @@ EVIDENCE_KIT_SUITES=(
     context_fixtures
     evidence_fixtures
     guard_tests
+    usage_tests
+    budget_guard_tests
+    trend_tests
 )
 EVIDENCE_KIT_PARSER=exit-code
 
@@ -24,3 +27,6 @@ EVIDENCE_KIT_RUN_delegation_fixtures='bash gate-sdk/bin/run-gate-tests.sh delega
 EVIDENCE_KIT_RUN_context_fixtures='bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks'
 EVIDENCE_KIT_RUN_evidence_fixtures='bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks'
 EVIDENCE_KIT_RUN_guard_tests='bash guard-kit/bin/run-guard-tests.sh'
+EVIDENCE_KIT_RUN_usage_tests='bash delegation-kit/bin/run-usage-tests.sh'
+EVIDENCE_KIT_RUN_budget_guard_tests='bash delegation-kit/bin/run-budget-guard-tests.sh'
+EVIDENCE_KIT_RUN_trend_tests='bash delegation-kit/bin/run-trend-tests.sh'
