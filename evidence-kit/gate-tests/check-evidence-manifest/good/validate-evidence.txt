@@ -1,0 +1,2 @@
+# contract: evidence-manifest v1
+demo-iter unit sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 pass=3 fail=0 ignore=0 verdict=clean 2026-07-06

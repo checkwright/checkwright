@@ -37,31 +37,31 @@ hook_fail() {
     exit 1
 }
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-output.sh || hook_fail check-gate-output
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-fail-closed.sh || hook_fail check-gate-fail-closed
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-fixture-coverage.sh || hook_fail check-gate-fixture-coverage
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'TASK-QUEUE.md'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'TASK-QUEUE.md'; then
     gate-sdk/checks/check-gate-exemption-tasks.sh || hook_fail check-gate-exemption-tasks
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
     gate-sdk/checks/check-graph.sh || hook_fail check-graph
 fi
 
-if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'spec-kit/checks/*.sh'; then
+if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'spec-kit/checks/*.sh'; then
     gate-sdk/checks/check-kit-enum.sh || hook_fail check-kit-enum
 fi
 
@@ -147,15 +147,15 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     spec-kit/checks/check-manifest-count.sh || hook_fail check-manifest-count
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
 fi
 
-if staged_matches 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
 fi
 
