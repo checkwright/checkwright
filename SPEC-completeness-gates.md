@@ -18,16 +18,19 @@ spec-kit:
   parsers across the kits (embedded-source, tag-lead-line, the queue
   scanners) all toggle a fence flag; an odd count desyncs the flag and the
   rest of the file fails *open*. This gate turns that silent hole into a
-  red. Surface: the spec/manifest set `lib/spec.sh` already computes — no
-  new knob.
+  red. Surface: the spec/manifest set `lib/spec.sh` already computes,
+  plus the configured queue file (`GATE_SDK_QUEUE_FILE`) — two of the
+  motivating parsers (tag-lead-line, queue-wrap) scan the queue, which
+  the manifest set excludes — no new knob.
 - **`check-md-refs`** (precommit) — every internal markdown link in the
   governed doc set resolves: relative path to a tracked file, `#anchor`
   to a heading slug in the target. External URLs are out of scope
   (network is not a gate dependency). Untracked local-only files
   (`BRIEF.local.md`) are legitimate link *sources* but never required
   targets — the scan runs over tracked files only. Doc set: the same
-  manifest set plus kit READMEs; `SPEC_KIT_MDREF_EXCLUDE` (glob list,
-  default empty) valves a consumer's generated docs.
+  manifest set (which already includes kit READMEs and CLAUDE.md);
+  `SPEC_KIT_MDREF_EXCLUDE` (glob list, default empty) valves a consumer's
+  generated docs.
 
 lifecycle-kit:
 
@@ -38,7 +41,8 @@ lifecycle-kit:
   (the invocation is the mechanical marker separating stage skills from
   ordinary skills, so a retired stage's orphan skill reddens without
   false-flagging `/agent-execution`). Knob for the dir:
-  `LIFECYCLE_KIT_SKILLS_DIR`.
+  `LIFECYCLE_SKILLS_DIR` (runtime knobs in lifecycle-kit carry the
+  `LIFECYCLE_` prefix; only the config-file pointer is `LIFECYCLE_KIT_`-named).
 
 gate-sdk:
 
@@ -56,7 +60,10 @@ gate-sdk:
   scratch by reflex; the allowlist makes a new root surface a deliberate
   config edit. The allowlist is consumer config (rule content); the kit
   default is the minimal orientation set (`README.md`, `LICENSE`, the
-  configured queue file, `CLAUDE.md`, `.gitignore`).
+  configured queue file, `CLAUDE.md`, `.gitignore`) plus the spec-kit
+  amendment glob (`SPEC-*.md`) — a root-component amendment is a
+  legitimate transient root surface for any spec-kit consumer, and a
+  gate that reddens every scope stage would train bypassing.
 
 queue-kit:
 
@@ -108,7 +115,7 @@ the kit-enum amendment — build order: kit-enum first).
 Each admitted gate is produced as a `checks/` member of its owning kit and
 consumed by name through `scripts/gates.list` and the generated pre-commit
 hook; fixture pairs are consumed by the kit's `gate-tests` runner. New
-knobs (`SPEC_KIT_MDREF_EXCLUDE`, `LIFECYCLE_KIT_SKILLS_DIR`,
+knobs (`SPEC_KIT_MDREF_EXCLUDE`, `LIFECYCLE_SKILLS_DIR`,
 `GATE_SDK_ROOT_ALLOWLIST`, `QUEUE_KIT_REQUIRED_SECTIONS`) are read by
 their kit's config loader with the defaults above; each has exactly one
 reader — its gate.

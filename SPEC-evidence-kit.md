@@ -71,7 +71,8 @@ platform surface names as defaults:
 
 lifecycle-kit delta (its side of the integration):
 
-- **`LIFECYCLE_KIT_BOUNDARY_TRUNCATE`** — a list of files
+- **`LIFECYCLE_BOUNDARY_TRUNCATE`** (runtime knobs in lifecycle-kit carry
+  the `LIFECYCLE_` prefix, not `LIFECYCLE_KIT_`) — a list of files
   `bin/enter-stage.sh` truncates back to their `# contract:` header at the
   iteration boundary, exactly as it already truncates the state file; this
   repo sets it to the evidence manifest. Generic mechanism — no evidence
@@ -99,7 +100,7 @@ per-iteration, at close entry, that the battery actually ran green.
 - Skip record: produced by a consumer harness that self-skips; consumed by
   `diff-baseline.sh`. Absent file = no skips (this repo writes none).
 - Truncation: produced by `enter-stage.sh` at the scope boundary reading
-  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`; consumed by assertion B's
+  `LIFECYCLE_BOUNDARY_TRUNCATE`; consumed by assertion B's
   foreign-iteration test, which is what makes skipping it visible.
 
 ## Existing sections updated
