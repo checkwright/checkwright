@@ -119,3 +119,22 @@ gate_expand_couples() {
     local IFS=','
     printf '%s\n' "${out[*]}"
 }
+
+# spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Emits one existing readable file path per line; returns 2 when a required tracked file is missing.
+gate_msg_pattern_files() {
+    if [[ $# -gt 0 ]]; then
+        printf '%s\n' "$@"
+        return 0
+    fi
+    local f gd
+    gd="$(gate_sdk_gates_dir)"
+    for f in ${GATE_SDK_MSG_PATTERN_FILES:-$gd/msg-patterns.list}; do
+        [[ -f "$f" ]] || { echo "gate_msg_pattern_files: required tracked pattern file missing: $f" >&2; return 2; }
+        [[ -r "$f" ]] || { echo "gate_msg_pattern_files: pattern file not readable: $f" >&2; return 2; }
+        printf '%s\n' "$f"
+    done
+    for f in ${GATE_SDK_MSG_PATTERN_FILES_LOCAL:-$gd/msg-patterns.local.list}; do
+        [[ -f "$f" && -r "$f" ]] && printf '%s\n' "$f"
+    done
+    return 0
+}

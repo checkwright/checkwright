@@ -12,6 +12,8 @@ check-gate-assertions
 check-graph
 check-kit-enum
 check-hook-exec-bit
+check-commit-msg
+check-tree-terms
 check-root-tiering
 check-core-files
 check-identity

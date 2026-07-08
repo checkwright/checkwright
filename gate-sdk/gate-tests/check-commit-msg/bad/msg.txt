@@ -1,0 +1,3 @@
+fix: correct the path resolver
+
+Reproduced against a checkout under /home/alice/work before the fix landed.

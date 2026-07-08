@@ -1,0 +1,12 @@
+# msg-patterns.list — banned-pattern template for check-commit-msg / check-tree-terms.
+# gate-sdk/SPEC.md §check-commit-msg. One grep -E pattern per line; '#' comments
+# and blank lines are ignored. Copy to your gates dir as msg-patterns.list
+# (tracked, generic) and keep private term lists in msg-patterns.local.list
+# (gitignored). Any file named msg-patterns* is self-exempt from check-tree-terms.
+
+# Absolute home paths — leak the local filesystem layout into a public surface.
+/(home|Users)/[A-Za-z0-9._-]+
+
+# The Claude Code promo URL — the marketing link that ends a generated PR body.
+# The Co-Authored-By trailer is a footer convention, not a leak: do not ban it.
+claude\.com/claude-code

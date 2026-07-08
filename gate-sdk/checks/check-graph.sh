@@ -305,8 +305,8 @@ validate_amend_manifest() {
     if (( have_valve )) && [[ "$valve" != none && "$valve" != PROPOSED ]]; then
         g_errors+=("$where: valve= must be none|PROPOSED (got '$valve')")
     fi
-    if (( have_tier )) && [[ "$tier" != precommit && "$tier" != align-only ]]; then
-        g_errors+=("$where: tier= must be precommit|align-only (got '$tier')")
+    if (( have_tier )) && [[ "$tier" != precommit && "$tier" != align-only && "$tier" != commit-msg ]]; then
+        g_errors+=("$where: tier= must be precommit|align-only|commit-msg (got '$tier')")
     fi
     if [[ -n "$mode" && "$mode" != staged && "$mode" != whole-tree ]]; then
         g_errors+=("$where: mode= must be staged|whole-tree (got '$mode')")
@@ -389,6 +389,7 @@ mapfile -t CHECKS < <(gates_list_members "$LIST")
 
 # assertion A: every gates.list member has a well-formed `# graph:` line
 errors=()
+has_msg_gate=0
 
 for c in "${CHECKS[@]}"; do
     if ! script="$(resolve_member "$c")"; then
@@ -417,7 +418,8 @@ for c in "${CHECKS[@]}"; do
     [[ -n "$trigger" ]] && trigger="$(gate_expand_couples "$trigger")"
     [[ "$dir" == bi || "$dir" == one ]]            || errors+=("MANIFEST: $script dir= must be bi|one (got '$dir')")
     [[ "$valve" == none || "$valve" == PROPOSED ]] || errors+=("MANIFEST: $script valve= must be none|PROPOSED (got '$valve')")
-    [[ "$tier" == precommit || "$tier" == align-only ]] || errors+=("MANIFEST: $script tier= must be precommit|align-only (got '$tier')")
+    [[ "$tier" == precommit || "$tier" == align-only || "$tier" == commit-msg ]] || errors+=("MANIFEST: $script tier= must be precommit|align-only|commit-msg (got '$tier')")
+    [[ "$tier" == commit-msg ]] && has_msg_gate=1
     [[ -z "$mode" || "$mode" == staged || "$mode" == whole-tree ]] || errors+=("MANIFEST: $script mode= must be staged|whole-tree (got '$mode')")
     [[ -z "$gen" || "$gen" == manual ]] || errors+=("MANIFEST: $script gen= must be manual (got '$gen')")
     [[ -n "$couples" ]] || { errors+=("MANIFEST: $script couples= is empty"); continue; }
@@ -464,6 +466,20 @@ elif [[ "$gen_st" -ne 0 ]]; then
     errors+=("ARTIFACT: gen-pre-commit.sh --emit failed (exit $gen_st); fix the generator before trusting the hook")
 elif [[ "$hook_emitted" != "$(cat "$HOOK")" ]]; then
     errors+=("ARTIFACT: $HOOK is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write")
+fi
+
+# assertion D (commit-msg surface): when any gate is tier=commit-msg, the
+# committed commit-msg hook equals gen-pre-commit.sh --emit-commit-msg
+MSG_HOOK="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}/commit-msg"
+if [[ "$has_msg_gate" -eq 1 ]]; then
+    msg_emitted="$(bash "$GEN" --emit-commit-msg 2>/dev/null)"; msg_st=$?
+    if [[ ! -f "$MSG_HOOK" ]]; then
+        errors+=("ARTIFACT: $MSG_HOOK does not exist but a tier=commit-msg gate is registered; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write")
+    elif [[ "$msg_st" -ne 0 ]]; then
+        errors+=("ARTIFACT: gen-pre-commit.sh --emit-commit-msg failed (exit $msg_st); fix the generator before trusting the hook")
+    elif [[ "$msg_emitted" != "$(cat "$MSG_HOOK")" ]]; then
+        errors+=("ARTIFACT: $MSG_HOOK is stale vs the '# graph:' manifests; regenerate: bash gate-sdk/bin/gen-pre-commit.sh --write")
+    fi
 fi
 
 # assertion E: CHECK-GRAPH.html matches --emit

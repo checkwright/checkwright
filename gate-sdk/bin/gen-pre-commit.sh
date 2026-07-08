@@ -14,7 +14,9 @@ cd "$REPO_ROOT" || exit 2
 
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"
-HOOK="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}/pre-commit"
+HOOKS_DIR="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}"
+HOOK="$HOOKS_DIR/pre-commit"
+MSG_HOOK="$HOOKS_DIR/commit-msg"
 [[ -f "$LIST" ]] || { echo "gen-pre-commit: no registry at $LIST" >&2; exit 2; }
 
 mapfile -t CHECKS < <(gates_list_members "$LIST")
@@ -152,13 +154,67 @@ HEAD
     printf '\nexit 0\n'
 }
 
+# spec: gate-sdk/SPEC.md §gen-pre-commit — the commit-msg surface: every tier=commit-msg gate becomes one unconditional invocation passing the hook's $1 (message path)
+commit_msg_gates() {
+    local c tier
+    local -A seen=()
+    for c in "${CHECKS[@]}"; do
+        [[ -n "${seen[$c]+x}" ]] && continue
+        seen[$c]=1
+        tier="$(manifest_field "$c" tier)"
+        [[ "$tier" == commit-msg ]] && printf '%s\n' "$c"
+    done
+}
+
+emit_commit_msg() {
+    cat <<'HEAD'
+#!/usr/bin/env bash
+# commit-msg - GENERATED, DO NOT EDIT.
+#
+# Emitted from the tier=commit-msg `# graph:` manifests by:
+#     bash gate-sdk/bin/gen-pre-commit.sh --write
+# Edit a gate's manifest, then regenerate. check-graph asserts this file equals
+# --emit-commit-msg. git feeds the prospective message file as $1; each gate
+# prints its own per-finding + `help:` lines before this hook reports failure.
+#
+# Install (opt-in, per clone):   bash gate-sdk/bin/install-hooks.sh
+# Bypass once (use sparingly):   git commit --no-verify
+set -euo pipefail
+
+msg_file="${1:?commit-msg: git did not pass the message-file path}"
+
+# Uniform failure: the gate already printed its findings + help: line above.
+hook_fail() {
+    echo ""
+    echo "commit-msg: $1 failed (see above)."
+    echo "  Bypass once (use sparingly): git commit --no-verify"
+    exit 1
+}
+HEAD
+
+    local c relpath
+    while IFS= read -r c; do
+        [[ -n "$c" ]] || continue
+        relpath="$(resolve_rel "$c")" || relpath="$GATES_DIR/$c.sh"
+        printf '\n%s "$msg_file" || hook_fail %s\n' "$relpath" "$c"
+    done < <(commit_msg_gates)
+
+    printf '\nexit 0\n'
+}
+
 case "${1:-}" in
     --emit) emit ;;
+    --emit-commit-msg) emit_commit_msg ;;
     --write)
-        mkdir -p "$(dirname "$HOOK")"
+        mkdir -p "$HOOKS_DIR"
         emit > "$HOOK"
         chmod +x "$HOOK"
         echo "gen-pre-commit: wrote $HOOK"
+        if [[ -n "$(commit_msg_gates)" ]]; then
+            emit_commit_msg > "$MSG_HOOK"
+            chmod +x "$MSG_HOOK"
+            echo "gen-pre-commit: wrote $MSG_HOOK"
+        fi
         ;;
-    *) echo "usage: gen-pre-commit.sh --emit|--write" >&2; exit 2 ;;
+    *) echo "usage: gen-pre-commit.sh --emit|--emit-commit-msg|--write" >&2; exit 2 ;;
 esac

@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **commit-message-hygiene-gate** [spec: gate-sdk/SPEC-commit-msg.md] — a
-  generated `commit-msg` hook (`tier=commit-msg` in the graph grammar) running
-  check-commit-msg, plus check-tree-terms over the same pattern files; generic
-  patterns ship as kit defaults, private term lists stay local-only consumer
-  config.
 - **validate-evidence-layer** [spec: SPEC-evidence-kit.md] — evidence-kit, a new
   kit: held-constant test baseline, committed per-run evidence manifest (the
   versioned wire contract for the deferred attestation rung), run-validate
@@ -68,6 +63,7 @@
 
 ## Done
 
+- commit-message-hygiene-gate
 - reconsider-spec-pointers
 - kit-enum-completeness-gate
 - extraction-completeness-gates

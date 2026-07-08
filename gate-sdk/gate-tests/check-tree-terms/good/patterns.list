@@ -1,0 +1,3 @@
+# banned-pattern fixture (grep -E, one per line; '#' + blank ignored)
+/(home|Users)/[A-Za-z0-9._-]+
+claude\.com/claude-code

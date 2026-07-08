@@ -36,6 +36,10 @@ override with `GATE_SDK_GATES_DIR`) holding:
   (committer email, remote host) this clone must resolve to (see there).
 - `root-allowlist.list` — optional manifest for `check-root-tiering`: the
   tracked top-level entries permitted at the repo root (see there).
+- `msg-patterns.list` — tracked banned-pattern list for `check-commit-msg` /
+  `check-tree-terms` (generic patterns; copy `templates/msg-patterns.list`);
+  `msg-patterns.local.list` — its gitignored companion for private terms, which
+  must never be tracked (tracking the banned terms would itself be the leak).
 
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
@@ -47,8 +51,13 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
 siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT_ALLOWLIST` (default
-`<gates-dir>/root-allowlist.list`). Paths are repo-root-relative; every entry point
-`cd`s to `git rev-parse --show-toplevel` before resolving them.
+`<gates-dir>/root-allowlist.list`), `GATE_SDK_MSG_PATTERN_FILES` (default
+`<gates-dir>/msg-patterns.list`; space-separated, each tracked and required —
+fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
+`<gates-dir>/msg-patterns.local.list`; gitignored, skipped when absent so a
+fresh clone without the operator's private list still commits). Paths are
+repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
+before resolving them.
 
 ## The gate model
 
@@ -193,7 +202,7 @@ Three concentric tiers, each an outer backstop for the one inside it:
 Every registered gate's header carries a one-line coupling manifest:
 
 ```
-# graph: couples=<globs> dir=bi|one valve=none|PROPOSED tier=precommit|align-only [mode=staged|whole-tree] [trigger=<globs>] [gen=manual]
+# graph: couples=<globs> dir=bi|one valve=none|PROPOSED tier=precommit|align-only|commit-msg [mode=staged|whole-tree] [trigger=<globs>] [gen=manual]
 ```
 
 - `couples=` — the surfaces the gate binds (comma-separated globs). One token
@@ -213,11 +222,17 @@ Every registered gate's header carries a one-line coupling manifest:
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading
   (design) surface may run ahead of a lagging (code) surface via a
   queue-tracked marker; `none` means the sides must agree now.
-- `tier=` — `precommit` gates emit a trigger block in the generated hook;
-  `align-only` gates run only in the full battery. Default to `precommit`; the
-  discriminator is not cost but whether the invariant is **restorable within
-  the single commit that perturbs it** — a settled-corpus audit would false-red
-  on work-in-progress and belongs to the full battery.
+- `tier=` — `precommit` gates emit a trigger block in the generated
+  `pre-commit` hook; `align-only` gates run only in the full battery;
+  `commit-msg` gates emit an unconditional invocation into the generated
+  `commit-msg` hook (the message-file surface, not a tracked path — see
+  §gen-pre-commit). Default to `precommit`; the discriminator between the first
+  two is not cost but whether the invariant is **restorable within the single
+  commit that perturbs it** — a settled-corpus audit would false-red on
+  work-in-progress and belongs to the full battery. A `commit-msg` gate's
+  `couples=` names its config files (the regeneration triggers), never a tree
+  path, and it no-ops cleanly under a no-argument full-battery run — the
+  prospective message exists only at commit time.
 - `mode=staged` — the hook passes the staged subset of the trigger globs as
   positional args; default (`whole-tree`) emits a bare invocation.
 - `trigger=` — hook guard globs when they diverge from `couples=`; `trigger=*`
@@ -347,22 +362,32 @@ and is the proof that the platform defaults hold on a vendored-kit tree.
 
 ### gen-pre-commit
 
-Emits `<hooks-dir>/pre-commit` from the per-gate `# graph:` manifests: a
-`tier=precommit` gate becomes one trigger block shaped by `trigger=`/`mode=`;
-a `gen=manual` region round-trips from the current hook. `--emit` prints to
-stdout (`check-graph` compares against it); `--write` rewrites the hook.
-Adding a gate to the hook is manifest-only — there is no second hand-wiring
-step to drift. The emission is deterministic (no timestamps) so the committed
-hook is byte-stable. A `trigger=`/`couples=` `kit:<glob>` token is emitted
-*expanded* (via `gate_expand_couples`), so adding a kit later reddens
-`check-graph` (committed hook ≠ `--emit`) until regeneration — the freshness
-gate keeps the static hook honest across a kit-set change.
+Emits the generated git hooks from the per-gate `# graph:` manifests. A
+`tier=precommit` gate becomes one trigger block in `<hooks-dir>/pre-commit`,
+shaped by `trigger=`/`mode=`; a `gen=manual` region round-trips from the
+current hook. A `tier=commit-msg` gate becomes one unconditional invocation in
+a second hook, `<hooks-dir>/commit-msg`, passing that hook's `$1` (the
+prospective-message file git supplies) through to the gate — the message is
+rejected before the commit exists, whereas a history scan would find a leak
+only after push, when the remedy is a destructive rewrite (that CI/history
+backstop stays with the deferred hosted-attestation rung). `--emit` prints the
+pre-commit hook to stdout and `--emit-commit-msg` the commit-msg hook
+(`check-graph` compares against each); `--write` rewrites `pre-commit` always
+and `commit-msg` only when a `tier=commit-msg` gate is registered. Adding a
+gate to either hook is manifest-only — there is no second hand-wiring step to
+drift. The emission is deterministic (no timestamps) so the committed hooks are
+byte-stable. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
+(via `gate_expand_couples`), so adding a kit later reddens `check-graph`
+(committed hook ≠ `--emit`) until regeneration — the freshness gate keeps the
+static hooks honest across a kit-set change.
 
 ### install-hooks
 
 One-time per-clone opt-in: sets `core.hooksPath → <hooks-dir>` (and
-`blame.ignoreRevsFile` when `.git-blame-ignore-revs` exists). Refuses to point
-at a nonexistent hooks dir — generate the hook first. Then, as the
+`blame.ignoreRevsFile` when `.git-blame-ignore-revs` exists). The wiring is
+hooks-dir granular, so it enables every generated hook (`pre-commit` and, when
+present, `commit-msg`) with no per-hook step. Refuses to point at a nonexistent
+hooks dir — generate the hook first. Then, as the
 apply-and-verify rung, runs `check-identity` once immediately after enabling
 `core.hooksPath` (resolved through the registry, so a consumer shadow wins):
 the fresh clone learns of a wrong-identity or wrong-remote mapping before its
@@ -456,7 +481,9 @@ a `dir=bi` gate spanning a declared-leading and a declared-lagging surface
 must carry `valve=PROPOSED`; one with a leading surface but no lagging surface
 may carry either valve; one with no leading surface must carry `valve=none`;
 (D) hook artifact freshness — the committed pre-commit equals
-`gen-pre-commit.sh --emit`; (E) the committed `CHECK-GRAPH.html` projection
+`gen-pre-commit.sh --emit`, and (when any gate is `tier=commit-msg`) the
+committed commit-msg hook equals `gen-pre-commit.sh --emit-commit-msg`;
+(E) the committed `CHECK-GRAPH.html` projection
 matches `--emit` output; (F) every emitted asset href resolves under the
 artifact's own directory — a path wrong in both generator and artifact that
 (E) cannot detect; (G) every `# graph:` manifest embedded in a `SPEC-*.md`
@@ -592,6 +619,47 @@ itself: adding a root entry means adding its allowlist line in the same commit,
 a diff-visible edit needing no exemption tag. The `# graph:` couples the
 manifest at `tier=precommit`; the whole-tree `run-gates.sh` battery is the
 backstop for a pure-addition commit outside the trigger's staged view.
+
+### check-commit-msg
+
+Invariant: the prospective commit message (the `commit-msg` hook's `$1`) matches
+no banned pattern. This is the message half of the CLAUDE.md ban on leaked
+local paths / private repo/project/account terms — the surface the `pre-commit`
+hook never sees, since the message does not exist until commit time. Enforcement
+is a generated `commit-msg` hook (`tier=commit-msg`), which rejects the message
+before the commit exists rather than a history scan finding the leak after push,
+when the only remedy is a destructive rewrite. Patterns come from
+`gate_msg_pattern_files` (lib/gate.sh): explicit positional pattern-file args
+win; otherwise `GATE_SDK_MSG_PATTERN_FILES` (tracked, must exist — fail-closed)
+plus `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (gitignored, skipped when absent, so a
+fresh clone without the operator's private list still commits). Each file is
+`grep -E` one-pattern-per-line, `#` comments and blanks ignored; the kit ships
+`templates/msg-patterns.list` with the generic defaults (absolute home paths,
+the Claude Code promo URL — the marketing link that ends a generated PR body,
+never the `Co-Authored-By` trailer). A no-argument run (the whole-tree battery)
+is a clean skip: the message is not a tracked surface and the history-scan
+backstop is deferred to the hosted-attestation rung. A missing message-file
+argument-with-value, or a missing required tracked pattern file, is fail-closed
+(exit 2). The `# graph:` couples the pattern file (the regeneration trigger),
+not a tree path — the gate is emitted into the commit-msg hook, not the
+pre-commit hook.
+
+### check-tree-terms
+
+Invariant: no tracked file matches the same banned-pattern set — the
+tracked-files half of the leak ban, sharing one pattern source with
+check-commit-msg (`gate_msg_pattern_files`) so the two halves cannot drift
+apart. It runs over `git ls-files` (scan root the optional first argument,
+default `.`; pattern-file overrides follow), at `tier=precommit` with
+`trigger=*` so it fires on every commit — any tracked file can carry a leak,
+not only an edited pattern list. Two skips keep it from flagging its own
+scaffolding: the shared prune dirs (so a fixture tree under `gate-tests/` is out
+of scope), and any file whose basename begins `msg-patterns` — a pattern list or
+its template contains, by construction, what it bans, and tracking a private
+list is caught by keeping it gitignored, not by this gate. A non-repo cwd, or a
+missing required tracked pattern file, is fail-closed (exit 2). When the pattern
+set is empty the tree is unchecked (clean) — the fail-closed obligation is on a
+missing file, not an empty one.
 
 ### templates/check-skeleton.sh
 

@@ -1,0 +1,1 @@
+matches a banned pattern

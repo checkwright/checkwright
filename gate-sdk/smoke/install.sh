@@ -16,7 +16,12 @@ check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
 check-graph
+check-commit-msg
+check-tree-terms
 EOF
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
+cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html

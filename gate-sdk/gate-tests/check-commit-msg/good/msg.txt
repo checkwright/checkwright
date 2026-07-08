@@ -1,0 +1,5 @@
+feat(widget): tighten the resize path
+
+Adjust the debounce so a fast drag coalesces into one layout pass.
+
+Co-Authored-By: A Contributor <noreply@example.com>

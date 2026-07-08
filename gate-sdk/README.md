@@ -22,9 +22,10 @@ honest:
   fresh scratch consumer, runs each vendored kit's `smoke/` installer, and
   asserts the battery is green under zero config (then red on each kit's crafted
   violation). Each kit ships a `smoke/` directory to join the party.
-- `bin/gen-pre-commit.sh` + `bin/install-hooks.sh` — a pre-commit hook
-  *generated* from per-gate `# graph:` coupling manifests; adding a gate to
-  the hook is manifest-only, so hook membership cannot drift.
+- `bin/gen-pre-commit.sh` + `bin/install-hooks.sh` — the `pre-commit` and
+  `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests
+  (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is
+  manifest-only, so hook membership cannot drift.
 - `checks/` — the meta-gates that hold the family to its own standard:
   ShellCheck self-lint, the output contract, the fail-closed contract, fixture
   coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest

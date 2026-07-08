@@ -1,0 +1,1 @@
+A tracked file with no local paths and no promo URL — nothing to leak here.
