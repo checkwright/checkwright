@@ -38,7 +38,8 @@ bash guard-kit/bin/run-guard-tests.sh                                           
 ```
 
 The repo also runs lifecycle-kit's iteration state machine on itself — one
-iteration per kit extraction. `TASK-QUEUE.md` carries the
+iteration per kit through extraction, and per hardening or roadmap unit
+thereafter. `TASK-QUEUE.md` carries the
 `## Iteration: <name>  [stage: <stage>]` header; each stage session invokes
 the matching `.claude/commands/<stage>.md` skill, which stamps
 `.workflow/WORKFLOW-STATE.txt` and flips the header as its first step

@@ -41,7 +41,7 @@ tree: `bash gate-sdk/bin/run-gates.sh` for the full battery,
 `bash gate-sdk/bin/install-hooks.sh` to opt this clone into the generated
 pre-commit hook. The repo also runs lifecycle-kit's own iteration state
 machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the stage header, one
-iteration per kit extraction.
+iteration per kit through extraction, then per hardening or roadmap unit.
 
 ## License
 

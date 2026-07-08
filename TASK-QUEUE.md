@@ -5,7 +5,8 @@
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
   queue-kit formalizes the queue format itself and gates this file. One
-  iteration per kit, in the extraction order [README.md](README.md) records.
+  iteration per kit through extraction, then per hardening or roadmap unit;
+  [README.md](README.md) records the extraction order.
 
 ---
 
