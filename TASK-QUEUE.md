@@ -17,8 +17,9 @@
   it ships gate-tests, a fixture-runner line; retires close's manual registry
   staleness check.
 - **budget-footprint-monitor** [spec: delegation-kit/SPEC-usage-trend.md] —
-  usage-history sampling from usage-verdict plus usage-trend.sh: footprint
-  evolution per reset-window segment, monotonicity-based noise flagging.
+  usage-history sampling from usage-verdict plus usage-trend.sh (per-axis
+  reset/login/tier segments, monotonicity noise flagging) and the 7-day
+  window as a second armed-when-present pause axis in the verdict.
 - **close-evidence-precondition-guard** [spec: lifecycle-kit/SPEC-entry-preflight.md]
   — LIFECYCLE_ENTRY_PREFLIGHT knob on enter-stage; this repo wires close to
   check-evidence-manifest so a missing green block refuses the flip instead
