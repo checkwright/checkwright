@@ -103,6 +103,14 @@
   source signal may be unreliable — rolling-window readings that spike and
   revert — so the design must separate a real footprint from harness reading
   noise before any number is trusted. Surfaced 2026-07-08.
+- **close-evidence-precondition-guard** [needs-spec] — make the close flip fail
+  loudly instead of deadlocking when the validate evidence block is missing:
+  `enter-stage close` (or check-stage-entry's close predecessor rule) refuses
+  the flip when `.workflow/validate-evidence.txt` carries no clean line for the
+  iteration, pointing at run-validate, rather than letting the self-referential
+  `gates` suite deadlock against the pre-commit manifest gate. Belt-and-braces
+  behind the validate.md wiring; the deadlock this guards was hit closing
+  gap-closure 2026-07-08.
 
 ## Done
 
