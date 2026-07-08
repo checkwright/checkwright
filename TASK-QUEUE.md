@@ -75,6 +75,18 @@
     orientation set; workflow machinery stays under the workflow dir.
   - script-names (gate-sdk) — the `check-<area>` naming convention plus bidirectional
     script↔doc citation coverage. Surfaced 2026-07-08.
+- **commit-message-hygiene-gate** [needs-spec] — CLAUDE.md bans local paths, private
+  repo/project names, accounts, and internal session/commit references "in tracked
+  files or commit messages," and the practice strips the `claude.com/claude-code`
+  promo URL from commit footers (the `Co-Authored-By` trailer stays — the established
+  convention across the whole history). The tracked-files half is grep-able by an
+  ordinary whole-tree gate; the commit-message half has no enforcement — the gate
+  framework generates only a `pre-commit` hook, which never sees the message. Scope
+  must rule the enforcement surface (a generated `commit-msg` hook the gate-sdk learns
+  to emit and install, vs. a CI/history scan over `git log`) and split the
+  banned-pattern set per the extraction seam: the Claude-URL pattern is a generic kit
+  default, but private repo/project term lists are rule content — consumer config,
+  never a kit literal. Surfaced 2026-07-08.
 - **reconsider-spec-pointers** [needs-spec] — the operator's standing doubt that
   `spec:` pointers earn their keep: only the forward side is gate-checked
   (`check-spec-pointer` confirms the target resolves), the reverse (code still
