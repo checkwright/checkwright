@@ -23,6 +23,16 @@
 
 ## Deferred
 
+- **kit-enum-completeness-gate** [needs-spec] — a meta-gate asserting the kit set
+  is enumerated completely wherever it is hand-listed: every `gate_kit_roots`
+  member appears in `DELEGATION_KIT_META_PATHS` and in each whole-tree gate's
+  `# graph:` couples (scoped to the kit files that gate's subject actually
+  covers). Surfaced by the drift-kit omission this iteration — the kit set is
+  hand-maintained across many manifests and silently drifted as kits 6–7 landed
+  (drift-kit fell out of META_PATHS plus the comment-tier / spec-pointer /
+  shellcheck couples, all fixed; context-kit's `check-brevity` is still uncoupled
+  from the gate-family meta-gates — an instance this gate must catch). Derive the
+  check from `gate_kit_roots`, the canonical enumeration. Surfaced 2026-07-08.
 - **reconsider-spec-pointers** [needs-spec] — the operator's standing doubt that
   `spec:` pointers earn their keep: only the forward side is gate-checked
   (`check-spec-pointer` confirms the target resolves), the reverse (code still

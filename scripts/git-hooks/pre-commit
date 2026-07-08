@@ -37,7 +37,7 @@ hook_fail() {
     exit 1
 }
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'guard-kit/*.sh' 'delegation-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'guard-kit/*.sh' 'delegation-kit/*.sh' 'context-kit/*.sh' 'drift-kit/*.sh'; then
     gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
 fi
 
@@ -117,11 +117,11 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     spec-kit/checks/check-manifest-count.sh || hook_fail check-manifest-count
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh' 'guard-kit/*.sh' 'context-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh' 'guard-kit/*.sh' 'context-kit/*.sh' 'drift-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh' 'guard-kit/*.sh' 'context-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'delegation-kit/*.sh' 'guard-kit/*.sh' 'context-kit/*.sh' 'drift-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
 fi
 

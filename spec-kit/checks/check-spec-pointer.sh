@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,guard-kit/*.sh,context-kit/*.sh,.workflow/*.txt dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,gate-sdk/*.sh,lifecycle-kit/*.sh,queue-kit/*.sh,spec-kit/*.sh,delegation-kit/*.sh,guard-kit/*.sh,context-kit/*.sh,drift-kit/*.sh,.workflow/*.txt dir=one valve=none tier=precommit
 # spec: spec-kit/SPEC.md §check-spec-pointer — every spec:/contract: pointer directive on a governed surface resolves: its target file is tracked and a §heading fragment names a heading the file carries
 #
 # usage: check-spec-pointer.sh [scan-root]   (default '.')
