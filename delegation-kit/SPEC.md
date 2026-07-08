@@ -52,7 +52,41 @@ protocol's load-bearing rules:
    window wall fires mid-flight and the agents that bank are the ones that
    *finished*. Project the next wave's burn from the last wave's, not from
    the current percentage alone — a read-heavy wave is far more
-   window-expensive than its token total suggests.
+   window-expensive than its token total suggests. The manual run is the
+   planning tool; `agent-budget-guard.sh` is its mechanical enforcement at the
+   dispatch point (below).
+
+`templates/agent-budget-guard.sh` closes the gap the manual run leaves: the
+budget-check norm relied on the agent *choosing* to run the tool, and a
+memory-quoted percentage acts in its place (a session quoted ~5% while the
+live verdict read 29%). It is a `PreToolUse` hook (matcher `Agent`) the
+harness fires on every dispatch once the consumer registers it in settings —
+per-dispatch freshness, not a start-of-session reading a mid-session window
+outlives. It runs `usage-verdict` at the decision point and routes on the exit
+code:
+
+- **PAUSE (1)** → `guard_block`: the verdict line plus its corrective (wait for
+  the window reset, or re-run with `DELEGATION_KIT_PAUSE_PCT` deliberately
+  raised). This is guard-kit's one sanctioned fail-closed deny — the hook
+  matcher proves the tool identity and PAUSE is reachable only through a fresh,
+  readable, over-threshold snapshot, so blocking cannot wedge a consumer with
+  no producer.
+- **STALE / unreadable (2)** and **OK / RESET-OK (0)** → `guard_advise`,
+  feeding the verdict line back as `additionalContext` so the live reading
+  rides in context at every dispatch and a memory-quoted percentage can never
+  be the acting source. STALE never blocks — budget-unknown is
+  decision-relevant, but a consumer with no snapshot producer must route to
+  advice, not out of delegation.
+
+The harness is the producer (it fires the hook once the settings registration
+is set); the consumers are the dispatching agent, which reads the verdict line
+off `additionalContext` at the dispatch-decision transition, and the
+supervising user, who consumes a block by ruling — raise the knob or wait; the
+agent never overrides. delegation-kit owns the verdict, its thresholds, and the
+routing; guard-kit supplies only the framework primitives (its second
+consumer). Registration is the opt-in valve: a consumer wanting pure advice
+does not wire the hook. No new persistent state and no new key on the
+`usage.txt` contract — the verdict line is the only interface.
 
 ### Two templates, one protocol
 
@@ -162,12 +196,15 @@ single-operator `CLAUDE_CONFIG_DIR` assumption.
 ```
 delegation-kit/
   bin/usage-verdict.sh
-  bin/run-usage-tests.sh        # decision-table runner
-  usage-tests/cases.tsv         # expected-verdict <TAB> scenario knobs
+  bin/run-usage-tests.sh          # verdict decision-table runner
+  bin/run-budget-guard-tests.sh   # budget-guard decision-table runner
+  usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
+  usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
   checks/check-gate-tamper.sh
   gate-tests/check-gate-tamper/{good,bad}/
   templates/agent-execution.md            # full protocol skill
   templates/claude-md-agent-execution.md  # resident CLAUDE.md section
+  templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
   templates/statusline-usage.sh           # minimal usage.txt producer
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh
@@ -203,6 +240,17 @@ as defaults):
 (tier: precommit) — in this repo's too; dogfooding is day-one, and agents
 commit here.
 
+`agent-budget-guard.sh` is not a gate — it is a hook, so it registers not in
+`gates.list` but under `PreToolUse` matcher `Agent` in the consumer's
+`.claude/settings.json` (beside the guard-kit Bash guard). Copy the template
+into the gates dir and wire `bash scripts/agent-budget-guard.sh`; it resolves
+`guard-kit/lib/guard.sh` and `bin/usage-verdict.sh` at their vendored paths,
+overridable with `GUARD_KIT_LIB` / `DELEGATION_KIT_VERDICT_BIN`. Registration
+is the whole opt-in: unwired, the guard is inert. This repo registers it, and
+its consumer session brief (`scripts/session-context.sh`) additionally prints
+the verdict line at SessionStart for planning-time visibility — a consumer-side
+edit; the context-kit template stays uncoupled from delegation-kit.
+
 ## Testing
 
 `check-gate-tamper` speaks the full gate contract (`GATE-TAMPER: clean
@@ -223,6 +271,20 @@ path, so the gate exercises its own defaults hermetic to the host repo;
 `cases.tsv` columns are `verdict exit pct age_off reset_off cred_age desc`
 (the offsets seconds from *now*). Every verdict branch carries at least one
 firing and one non-firing case — the fixture-pair discipline, transplanted.
+
+`agent-budget-guard.sh` is a hook, not a gate, so it speaks exit-2 + hook
+JSON rather than the gate output contract — and like the verdict it ships a
+decision-table runner beside the verdict tests: `usage-tests/budget-guard-cases.tsv`
+pairs an expected action (`block`/`advise`) with the same snapshot knobs
+(`action pct age_off reset_off cred_age desc`, `pct=UNREADABLE` for the
+no-snapshot case), and `bin/run-budget-guard-tests.sh` drives the *template*
+with each injected snapshot — feeding an Agent hook JSON on stdin, pointing
+`DELEGATION_KIT_USAGE_FILE` at the generated fixture — and classifies the
+result: PAUSE → `block` (exit 2, verdict on stderr), OK/RESET-OK/STALE/unreadable
+→ `advise` (exit 0, verdict in `additionalContext`). The block branch carries
+its firing (PAUSE) and non-firing (the four advise cases) — the fixture-pair
+discipline again — and every case asserts the live verdict text rides the
+output so a memory-quoted percentage cannot be the acting source.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot

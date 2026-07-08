@@ -55,6 +55,15 @@ if [[ -n "$DRIFT_REPORT" && -f "$DRIFT_REPORT" ]]; then
     fi
 fi
 
+VERDICT_BIN="delegation-kit/bin/usage-verdict.sh"       # delegation-kit budget verdict
+if [[ -f "$VERDICT_BIN" ]]; then
+    budget_line="$(bash "$VERDICT_BIN" 2>/dev/null)" || true
+    if [[ -n "$budget_line" ]]; then
+        echo "Budget (enforced per-dispatch by the Agent budget guard): $budget_line"
+        echo
+    fi
+fi
+
 case "$stage" in
     align | build)
         echo "Delegation is the primary token lever and is pre-authorized here: send"

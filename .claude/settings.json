@@ -62,6 +62,15 @@
             "command": "bash scripts/bash-guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/agent-budget-guard.sh"
+          }
+        ]
       }
     ]
   }

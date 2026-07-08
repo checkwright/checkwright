@@ -93,6 +93,11 @@ Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
 wakeup-guard): there, a logging or parse failure still denies.
 
+delegation-kit's `agent-budget-guard.sh` is a second framework consumer,
+composing these primitives into a `PreToolUse(Agent)` hook that blocks on a
+PAUSE budget verdict and advises otherwise (delegation-kit/SPEC.md §The
+delegation model) — cite-only; no guard-kit mechanism moves for it.
+
 ## The generic ruleset
 
 Rules that encode **harness behavior**, not any project's toolchain —

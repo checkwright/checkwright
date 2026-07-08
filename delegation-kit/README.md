@@ -42,7 +42,13 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    `templates/statusline-usage.sh` as your harness `statusLine` command, or have
    any producer honour the three-line contract (SPEC §usage-verdict).
 
-4. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
+4. Optional — wire the Agent budget guard: copy `templates/agent-budget-guard.sh`
+   into your gates dir and register it under `PreToolUse` matcher `Agent` in
+   `.claude/settings.json`. It fires `usage-verdict` at every dispatch, blocking
+   on a PAUSE verdict and advising otherwise (SPEC §The delegation model).
+   Unwired, it is inert.
+
+5. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
    and override the budget thresholds, the gate-file globs, or the meta-layer
    prefixes. Defaults are the extracted platform's single-operator layout.
 
@@ -61,4 +67,5 @@ directly with `--fixture <dir>` only for testing.
 ```bash
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # check-gate-tamper fixtures
 bash delegation-kit/bin/run-usage-tests.sh                                           # usage-verdict verdict table
+bash delegation-kit/bin/run-budget-guard-tests.sh                                    # budget-guard action table
 ```

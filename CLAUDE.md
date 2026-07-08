@@ -115,7 +115,8 @@ validate-after-commit set, gate-driven worklist).
   weakens it rather than fix the code; `check-gate-tamper` is only the
   mechanical floor).
 - **Budget-check before *each* dispatch** (`bash delegation-kit/bin/usage-verdict.sh`
-  — one verdict, exit 0 OK / 1 PAUSE / 2 STALE; never eyeball the raw pct).
+  — one verdict, exit 0 OK / 1 PAUSE / 2 STALE; never eyeball the raw pct;
+  enforced per-dispatch by the Agent budget guard).
 - **Never revert substantial completed delegated work on your own design
   judgment** — surface the tension and wait for explicit go-ahead.
 

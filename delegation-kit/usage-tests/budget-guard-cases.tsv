@@ -1,0 +1,19 @@
+# Agent budget-guard decision table — <action><TAB><pct><TAB><age_off><TAB><reset_off><TAB><cred_age><TAB><desc>.
+# The guard routes usage-verdict's exit code: PAUSE(1) -> block, everything
+# else -> advise. Tab-separated; # and blank lines ignored. Offsets are seconds
+# from *now* (static snapshots would age into permanent STALE). pct=UNREADABLE
+# writes no snapshot. cred_age '-' writes no credentials file.
+# Defaults under test: PAUSE_PCT=80, STALE_AGE=600, LOGIN_WINDOW=600.
+
+# advise — OK: under threshold, the fresh verdict rides as additionalContext
+advise	40	0	3600	-	OK under threshold -> advise (verdict rides in context)
+
+# block — PAUSE: over threshold, fresh, live window (the one sanctioned deny)
+block	95	0	3600	-	PAUSE over threshold -> block
+
+# advise — budget unknown is decision-relevant but must never wedge delegation
+advise	40	1200	3600	-	stale reading -> advise, never block
+advise	UNREADABLE	-	-	-	missing snapshot (no producer) -> advise, not wedged
+
+# advise — RESET-OK: dead-window pct must not read as a pause
+advise	95	0	-100	-	dead window -> advise, not block

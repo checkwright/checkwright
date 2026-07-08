@@ -11,10 +11,6 @@
 
 ## New Features
 
-- **budget-injection-automation** [spec: SPEC-budget-guard.md] — PreToolUse
-  guard on the Agent tool surfacing the live usage-verdict at every
-  dispatch: block on PAUSE, advise otherwise; delegation-kit template plus
-  this repo's registration and session-brief line.
 - **comment-restatement-gate** [spec: SPEC-comment-run-cap.md] — bound
   check-comment-tier's run-blessing to a capped window so relocated prose
   cannot ride a directive; add `usage:` to the roster; sweep the
@@ -73,5 +69,7 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 
 ## Done
+
+- budget-injection-automation
 
 ## Lessons Learned
