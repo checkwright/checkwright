@@ -126,8 +126,4 @@
 
 ## Done
 
-- budget-injection-automation
-- comment-restatement-gate
-- platform-second-scan
-
 ## Lessons Learned

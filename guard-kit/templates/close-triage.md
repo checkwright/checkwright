@@ -22,7 +22,10 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    judgment, prune the remaining one-off exact-string local entries and promote
    recurring safe patterns to the committed `settings.json` as globs.
 5. **Clear the friction log** — its named reclaim path:
-   `: > .workflow/prompt-friction.log`.
+   `: > .workflow/prompt-friction.log`. Run each clear as its own bare command:
+   the allowlist entry is an exact string, so compounding it (`&&`, `;`, a
+   trailing `echo`/`wc`) breaks the match and forces the very prompt this step
+   just triaged away.
 
 Goal: the local set stays small, and every durable pattern lives in the
 committed, reviewable allowlist.
