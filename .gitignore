@@ -2,8 +2,8 @@ target/
 node_modules/
 Cargo.lock
 .tmp/
-# private extraction brief — local working notes, never tracked
-EXTRACTION.md
+# private brief — local companion context (identity, seam, roadmap), never tracked
+BRIEF.local.md
 # per-user permission grants stay local; the stage skills in commands/ are tracked
 .claude/settings.local.json*
 # guard-kit per-iteration scratch log (cleared at close-stage triage)

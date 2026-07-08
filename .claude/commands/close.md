@@ -14,8 +14,8 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    (CLAUDE.md for cross-stage, a `.claude/commands/<stage>.md` for
    stage-local — preferred, it loads on demand), →task (name the new queue
    slug), or →discard (state why). A lesson naming an unfixed gap becomes a
-   queue entry, never evaporates. Extraction-methodology lessons that belong
-   to the *platform's* seam ruling go to EXTRACTION.md (local-only).
+   queue entry, never evaporates. Lessons that belong to the *platform's* seam
+   ruling go to BRIEF.local.md (local-only).
    Lesson-vs-task litmus (also at filing time, any stage): if the deliverable
    and its done-state are nameable now, it is a task — file it in Deferred
    `[needs-spec]` directly, never stage it in Lessons where it waits a stage

@@ -2,11 +2,11 @@
 
 Checkwright packages a coding-agent-assisted delivery methodology as
 installable kits, extracted from the governance meta-layer of a private
-production platform (the first dogfooding consumer). The extraction brief —
-kit order, seam ruling, de-hardcoding worklist — is `EXTRACTION.md`, which is
-**local-only and untracked** (it carries private context that must never be
-committed); read it before starting any kit work. Kit status lives in
-[README.md](README.md).
+production platform (the first dogfooding consumer). The private companion
+brief — seam boundary, identity/namespace ownership, forward design memory
+behind the deferred-queue rungs — is `BRIEF.local.md`, which is **local-only
+and untracked** (it carries private context that must never be committed);
+consult it before roadmap/seam work. Kit status lives in [README.md](README.md).
 
 This repo is public: no local paths, private repo/project names, accounts, or
 internal session/commit references in tracked files or commit messages.
@@ -122,7 +122,7 @@ validate-after-commit set, gate-driven worklist).
 ## Housekeeping
 
 - `.tmp/` is gitignored (measurements, e.g. gate timings); `.workflow/` is
-  committed (checked projections); `EXTRACTION.md` is gitignored (private
+  committed (checked projections); `BRIEF.local.md` is gitignored (private
   brief).
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
@@ -132,4 +132,5 @@ validate-after-commit set, gate-driven worklist).
   scratch) at that moment — deferred capture is no capture; close triages it
   into doc-owner edits (drift-kit/SPEC.md §The knowledge-friction loop).
 - No per-user memory files for this repo: durable guidance goes in tracked
-  manifests (this file, EXTRACTION.md, kit SPECs).
+  manifests (this file, kit SPECs), or `BRIEF.local.md` for local-only private
+  context.

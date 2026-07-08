@@ -1,5 +1,5 @@
 The `scope` (design) stage of a Checkwright iteration (one iteration per kit,
-in the extraction order README.md records). Read `EXTRACTION.md` (local-only
+in the extraction order README.md records). Read `BRIEF.local.md` (local-only
 brief) and the platform sources for the kit being extracted; decide the kit's
 layout, config surface, and de-hardcoding worklist; name the iteration after
 the kit. Exit condition: the design is written down (this session's plan or
