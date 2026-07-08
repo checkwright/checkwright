@@ -153,9 +153,15 @@ renders no verdict; `usage-verdict` stays the sole pause authority.
   boundary, at a `login_at` change, and at an account or tier change;
   per-account grouping reunites a switch-back; spike-then-correction
   flagged not averaged). No fixture pair owed — neither script is a gate.
-- Consumer follow-through at build (this repo): the session-context hook's
-  budget line and CLAUDE.md's budget-check bullet say "5h window" — reword
-  to name the axis the verdict reports.
+- Consumer follow-through at build: the 5h-only wording lives in the budget
+  guard's corrective text ("wait for the 5h window to reset, or re-run with
+  DELEGATION_KIT_PAUSE_PCT raised" — wrong twice under a weekly PAUSE: the
+  wait is days and the knob is `DELEGATION_KIT_PAUSE_PCT_7D`) and in
+  `templates/delegation-config.sh`'s `PAUSE_PCT` comment; reword both,
+  template and this repo's `scripts/` copies, to route by the axis the
+  verdict names. The exit-code contract is untouched. The session-context
+  hook prints the verdict line verbatim and CLAUDE.md's budget-check bullet
+  is axis-agnostic — neither needs an edit.
 
 ## Definition of Done
 

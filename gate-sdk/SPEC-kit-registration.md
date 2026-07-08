@@ -28,8 +28,9 @@ keeping no prose registry opts out by not registering the gate in its
 `gates.list` — no empty-knob valve.
 
 The gate retires the manual "does the kit table still reflect the kit set?"
-staleness check from the close ritual; the close skill's checklist drops
-that line when this merges.
+staleness check from the close ritual; the close skill's checklist narrows
+that line to the un-gated remainder (row descriptions, per-kit READMEs)
+when this merges.
 
 ## Producers and consumers
 
@@ -46,9 +47,11 @@ that line when this merges.
 - gate-sdk SPEC §Per-component contracts gains the `check-kit-registration`
   contract section (this delta).
 - gate-sdk SPEC §Layout and configuration knob table gains the two knobs.
-- `.claude/commands/close.md` (and lifecycle-kit's close skill template if it
-  carries the registry-staleness line): drop the manual registry check,
-  citing the gate.
+- `.claude/commands/close.md` step 5: kit-table membership and the
+  fixture-runner lines become gate-held — reword the step to the un-gated
+  remainder (row descriptions, CLAUDE.md prose, per-kit READMEs), citing
+  the gate. lifecycle-kit's close skill template carries only a generic
+  staleness line — no edit owed.
 
 Ships with a `good/`+`bad/` fixture pair (synthetic kit roots via
 `GATE_SDK_KIT_DIRS`, per the four gate contracts) and a `# graph:` manifest
