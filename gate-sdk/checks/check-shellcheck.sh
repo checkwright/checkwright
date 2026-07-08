@@ -3,7 +3,7 @@
 # spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning (the self-lint contract)
 #
 # usage: check-shellcheck.sh [dir...]
-#   default dirs: consumer gates dir + each kit's lib/, bin/, checks/
+#   default dirs: consumer gates dir + each kit's lib/, bin/, checks/, templates/
 
 set -uo pipefail
 
@@ -16,7 +16,7 @@ if [[ $# -gt 0 ]]; then
 else
     DIRS=("$(gate_sdk_gates_dir)")
     while IFS= read -r k; do
-        DIRS+=("$k/lib" "$k/bin" "$k/checks")
+        DIRS+=("$k/lib" "$k/bin" "$k/checks" "$k/templates")
     done < <(gate_kit_roots)
 fi
 

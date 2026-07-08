@@ -127,10 +127,13 @@ reason.
 ### Self-lint
 
 Every script in the family — the consumer's gates and the kit's own `lib/`,
-`bin/`, `checks/` — passes ShellCheck at `-S warning`, enforced by
-`check-shellcheck`. A false positive is silenced inline with
-`# shellcheck disable=SCxxxx` plus a justifying comment, never a blanket
-`.shellcheckrc`.
+`bin/`, `checks/`, `templates/` — passes ShellCheck at `-S warning`, enforced
+by `check-shellcheck`. Template stubs are lint-governed (they are runnable
+shell a consumer copies out) even though the prose gates `check-comment-tier`
+and `check-spec-pointer` skip them — a template's installer-facing comments
+and post-copy `source` paths are legitimate there. A false positive is
+silenced inline with `# shellcheck disable=SCxxxx` plus a justifying comment,
+never a blanket `.shellcheckrc`.
 
 ### Shared cross-gate values
 
@@ -399,9 +402,9 @@ gate's exit status surfaces through this script's.
 ### check-shellcheck
 
 Invariant: every `*.sh` directly under the consumer gates dir and each
-vendored kit's `lib/`, `bin/`, and `checks/` passes ShellCheck at `-S warning`
-(the self-lint contract). A missing `shellcheck` binary is exit 2 — a gate that cannot run is
-not clean.
+vendored kit's `lib/`, `bin/`, `checks/`, and `templates/` passes ShellCheck at
+`-S warning` (the self-lint contract). A missing `shellcheck` binary is exit 2
+— a gate that cannot run is not clean.
 
 ### check-gate-output
 

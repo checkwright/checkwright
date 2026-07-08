@@ -89,6 +89,20 @@
       baseline is synthetic/held-out rather than faking a controlled A/B on
       production work. Design decision for scope stage: which route, and which
       drift-report fields feed the satisfiable-drift metric.
+  - *Template-pedagogy single-sourcing sub-note* (surfaced 2026-07-09): the
+    comment-tier template exemption lets template headers carry installer
+    prose (copy-into-gates-dir, wire-under-PreToolUse) that the docs rung
+    would restate — pick one source of truth: docs generated from or pointing
+    at the headers, or headers thinned to a docs pointer. Bound up with an
+    unruled question: does a kit reach a customer project *with* its SPEC? If
+    SPECs do not travel, the spec-pointer template exemption is already
+    correct (a copied-out template has no local SPEC to resolve). And the
+    optics wrinkle to face: Checkwright ships kits — spec-kit among them, the
+    very kit that *owns* check-comment-tier — whose own templates carry
+    comments that would fail that gate, passing only because templates/ is
+    exempt; an adopter reading the comment-restraint tool's own stubs sees
+    them flout its doctrine. Resolve the framing: explain the exemption, thin
+    the prose, or move the pedagogy into docs/SPECs.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
