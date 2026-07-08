@@ -240,6 +240,8 @@ graph LR
   n12 -->|"check-manifest-count"| n17
   n12 -->|"check-manifest-temporal"| n11
   n12 -->|"check-manifest-temporal"| n17
+  n12 -->|"check-md-refs"| n11
+  n12 -->|"check-md-refs"| n17
   n20 -->|"check-queue-hygiene"| n20
   n20 -->|"check-queue-prose-precondition"| n20
   n20 -->|"check-queue-sections"| n20
@@ -266,6 +268,9 @@ graph LR
   n12 -->|"check-spec-embedded-source"| n0
   n12 -->|"check-spec-embedded-source"| n3
   n12 -->|"check-spec-embedded-source"| n18
+  n12 -->|"check-spec-fence-balance"| n11
+  n12 -->|"check-spec-fence-balance"| n17
+  n12 -->|"check-spec-fence-balance"| n20
   n42 -->|"check-spec-pointer"| n30
   n42 -->|"check-spec-pointer"| n21
   n42 -->|"check-spec-pointer"| n24

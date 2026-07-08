@@ -210,6 +210,9 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
   section is exempt, default empty (this repo sets `What stayed on the
   platform`).
+- `SPEC_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
+  `check-md-refs` skips (a consumer's generated documentation whose links a
+  build tool owns).
 - `SPEC_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals
   `check-manifest-count` treats as growing governed sets, default
   `("gates" "meta-gates" "checks" "kits" "stages" "KPIs")` (a consumer appends
@@ -501,6 +504,34 @@ pointer buys nothing: the gloss is already capped at the one-line binding
 under that doctrine, not re-gated here. Dropping the slot would also orphan
 the citation coverage the convention carries — the reason a dedicated
 script↔doc citation gate stays unbuilt.
+
+### check-spec-fence-balance
+
+Invariant: every governed markdown file carries an even count of code-fence
+delimiters (lines opening with ```` ``` ````). The fence-skipping parsers across
+the kits — `check-spec-embedded-source`, `check-tag-lead-line`, the queue
+scanners — all toggle a fence flag line by line; an odd count leaves the flag
+stuck and the rest of the file is read *inside* a phantom fence, so every later
+finding silently fails open. This gate turns that silent hole into a red. The
+surface is the manifest set (`spec_manifest_files`) plus the configured queue
+file (`SPEC_KIT_QUEUE_FILE`) — two motivating parsers (`check-tag-lead-line`,
+`check-queue-wrap`) scan the queue, which the manifest set excludes — with no
+new knob. A grep error (not a no-match) is fail-closed (exit 2).
+
+### check-md-refs
+
+Invariant: every internal markdown link in the governed doc set resolves. A
+relative-path target (with the source file's directory as the base) must be a
+tracked file, or a directory holding tracked files; a `#anchor` — alone
+(same-file) or trailing a path — must match the GitHub heading slug of a
+heading in the target file. External URLs (`scheme://`, `mailto:`) are out of
+scope: the network is not a gate dependency. The doc set is the manifest set
+(kit READMEs and CLAUDE.md included) minus the `SPEC_KIT_MDREF_EXCLUDE` globs
+(default empty, for a consumer's generated docs); the scan runs over tracked
+sources only, so an untracked local-only file (`BRIEF.local.md`) is a legitimate
+link *source* that is never scanned and, being git-ignored-and-present, a
+legitimate *target* that resolves without being tracked. A grep error is
+fail-closed (exit 2).
 
 ### templates/
 

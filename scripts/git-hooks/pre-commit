@@ -129,6 +129,14 @@ if staged_matches '*SPEC*.md' '*.rs' '*.toml' '*.sql' '*.rego' '*.ts' '*.tsx' '*
     spec-kit/checks/check-spec-embedded-source.sh || hook_fail check-spec-embedded-source
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'TASK-QUEUE.md'; then
+    spec-kit/checks/check-spec-fence-balance.sh || hook_fail check-spec-fence-balance
+fi
+
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
+    spec-kit/checks/check-md-refs.sh || hook_fail check-md-refs
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     spec-kit/checks/check-manifest-temporal.sh || hook_fail check-manifest-temporal
 fi
