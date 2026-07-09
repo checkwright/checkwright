@@ -19,3 +19,20 @@ SPEC_KIT_COMMENT_WHITELIST=(
     ".workflow/validate-baseline.txt"
     ".workflow/validate-evidence.txt"
 )
+
+# comment-tier-exempt: the docs/ site joins the governed manifest set by explicit wiring (SPEC-docs-site.md) — this knob replaces the default set, so it enumerates the prior default (CLAUDE.md, README.md at any depth, kit SPEC.md/README.md — single-level globs skip the gate-tests/ fixtures the finder pruned) plus the docs/ living pages and dated posts
+# shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
+SPEC_KIT_MANIFEST_FILES=(
+    "CLAUDE.md"
+    "README.md"
+    "*/SPEC.md"
+    "*/README.md"
+    "reserve/*/README.md"
+    "docs/*.md"
+    "docs/*/index.md"
+    "docs/posts/*.md"
+)
+
+# comment-tier-exempt: dated posts under docs/posts/ are immutable published artifacts whose dated narrative is their nature — a heading name cannot address a whole-file class, so the path valve exempts them from temporal-narration governance while link and command resolution still apply (SPEC-docs-site.md)
+# shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
+SPEC_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")

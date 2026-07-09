@@ -16,6 +16,23 @@ ROOT="${1:-.}"
 mapfile -t manifests < <(spec_manifest_files "$ROOT" | sed 's#^\./##' | sort -u)
 [[ ${#manifests[@]} -eq 0 ]] && { echo "MANIFEST-TEMPORAL: clean (0 manifest file(s) found)"; exit 0; }
 
+# spec: spec-kit/SPEC.md §check-manifest-temporal — path valve: a whole file
+# whose immutable dated narrative a heading name cannot address (dated posts).
+exempt_n=0
+if [[ ${#SPEC_KIT_TEMPORAL_EXEMPT_PATHS[@]} -gt 0 ]]; then
+    kept=()
+    for _m in "${manifests[@]}"; do
+        _ex=0
+        for _g in "${SPEC_KIT_TEMPORAL_EXEMPT_PATHS[@]}"; do
+            # shellcheck disable=SC2053  # $_g is the exempt path glob, matched unquoted on purpose
+            [[ "$_m" == $_g ]] && { _ex=1; break; }
+        done
+        if [[ $_ex -eq 1 ]]; then exempt_n=$((exempt_n + 1)); else kept+=("$_m"); fi
+    done
+    manifests=("${kept[@]+"${kept[@]}"}")
+    [[ ${#manifests[@]} -eq 0 ]] && { echo "MANIFEST-TEMPORAL: clean ($exempt_n path-exempt, no other manifest)"; exit 0; }
+fi
+
 markerlist="$(printf '%s\n' "${SPEC_KIT_TEMPORAL_MARKERS[@]}")"
 exemptset=$'\x01'
 for _s in "${SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS[@]+"${SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS[@]}"}"; do
@@ -60,5 +77,7 @@ if [[ -n "$out" ]]; then
     echo "  help: reword to state the current behavior only (drop the 'formerly…' framing); if the line is legitimately about the past, add a '<!-- manifest-temporal-exempt: <reason> -->' comment on it or the line directly above; a whole provenance section rides SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS"
     exit 1
 fi
-echo "MANIFEST-TEMPORAL: clean (${#manifests[@]} manifest file(s); no temporal-narration marker in governed prose outside an exempt site)"
+suffix=""
+[[ "$exempt_n" -gt 0 ]] && suffix=", $exempt_n path-exempt"
+echo "MANIFEST-TEMPORAL: clean (${#manifests[@]} manifest file(s)${suffix}; no temporal-narration marker in governed prose outside an exempt site)"
 exit 0

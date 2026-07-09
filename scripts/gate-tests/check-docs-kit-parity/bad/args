@@ -1,0 +1,4 @@
+# Registry doc missing the gate-sdk row. The wrapped gate resolves kit roots
+# from the real repo and re-checks CLAUDE.md for the fixture-runner lines (which
+# are complete), so only the docs-index registry assertion trips.
+scripts/gate-tests/check-docs-kit-parity/bad/docs-index.md

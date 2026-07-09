@@ -12,6 +12,7 @@ check-gate-assertions
 check-graph
 check-kit-enum
 check-kit-registration
+check-docs-kit-parity
 check-hook-exec-bit
 check-commit-msg
 check-tree-terms

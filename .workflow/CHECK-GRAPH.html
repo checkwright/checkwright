@@ -73,34 +73,34 @@
     const graph = `%%{init:{'theme':'${dark ? 'dark' : 'base'}','themeVariables':{'fontSize':'13px'}}}%%
 graph LR
   subgraph k_gate_sdk["gate-sdk"]
-    n40["gate-sdk/*.sh"]
-    n41["gate-sdk/SPEC.md"]
-    n42["gate-sdk/checks/*.sh"]
-    n43["gate-sdk/gate-tests/*"]
+    n41["gate-sdk/*.sh"]
+    n42["gate-sdk/SPEC.md"]
+    n43["gate-sdk/checks/*.sh"]
+    n44["gate-sdk/gate-tests/*"]
   end
   subgraph k_lifecycle["lifecycle-kit"]
-    n48["lifecycle-kit/*.sh"]
-    n49["lifecycle-kit/SPEC.md"]
-    n50["lifecycle-kit/checks/*.sh"]
-    n51["lifecycle-kit/gate-tests/*"]
+    n49["lifecycle-kit/*.sh"]
+    n50["lifecycle-kit/SPEC.md"]
+    n51["lifecycle-kit/checks/*.sh"]
+    n52["lifecycle-kit/gate-tests/*"]
   end
   subgraph k_queue["queue-kit"]
-    n52["queue-kit/*.sh"]
-    n53["queue-kit/SPEC.md"]
-    n54["queue-kit/checks/*.sh"]
-    n55["queue-kit/gate-tests/*"]
+    n53["queue-kit/*.sh"]
+    n54["queue-kit/SPEC.md"]
+    n55["queue-kit/checks/*.sh"]
+    n56["queue-kit/gate-tests/*"]
   end
   subgraph k_spec["spec-kit"]
-    n65["spec-kit/*.sh"]
-    n66["spec-kit/SPEC.md"]
-    n67["spec-kit/checks/*.sh"]
-    n68["spec-kit/gate-tests/*"]
+    n66["spec-kit/*.sh"]
+    n67["spec-kit/SPEC.md"]
+    n68["spec-kit/checks/*.sh"]
+    n69["spec-kit/gate-tests/*"]
   end
   subgraph k_guard["guard-kit"]
-    n44["guard-kit/*.sh"]
-    n45["guard-kit/SPEC.md"]
-    n46["guard-kit/checks/*.sh"]
-    n47["guard-kit/gate-tests/*"]
+    n45["guard-kit/*.sh"]
+    n46["guard-kit/SPEC.md"]
+    n47["guard-kit/checks/*.sh"]
+    n48["guard-kit/gate-tests/*"]
   end
   subgraph k_delegation["delegation-kit"]
     n28["delegation-kit/*.sh"]
@@ -139,143 +139,154 @@ graph LR
     n21["README.md"]
     n22["SPEC-*.md"]
     n23["TASK-QUEUE.md"]
-    n32["drift-kit/*.sh"]
-    n33["drift-kit/SPEC.md"]
-    n34["drift-kit/checks/*.sh"]
-    n35["drift-kit/gate-tests/*"]
-    n36["evidence-kit/*.sh"]
-    n37["evidence-kit/SPEC.md"]
-    n38["evidence-kit/checks/*.sh"]
-    n39["evidence-kit/gate-tests/*"]
-    n56["scripts/*.sh"]
-    n57["scripts/core-files.list"]
-    n58["scripts/gate-tests/*"]
-    n59["scripts/gates.list"]
-    n60["scripts/git-hooks/*"]
-    n61["scripts/git-hooks/pre-commit"]
-    n62["scripts/identity.conf"]
-    n63["scripts/msg-patterns.list"]
-    n64["scripts/root-allowlist.list"]
+    n32["docs/index.md"]
+    n33["drift-kit/*.sh"]
+    n34["drift-kit/SPEC.md"]
+    n35["drift-kit/checks/*.sh"]
+    n36["drift-kit/gate-tests/*"]
+    n37["evidence-kit/*.sh"]
+    n38["evidence-kit/SPEC.md"]
+    n39["evidence-kit/checks/*.sh"]
+    n40["evidence-kit/gate-tests/*"]
+    n57["scripts/*.sh"]
+    n58["scripts/core-files.list"]
+    n59["scripts/gate-tests/*"]
+    n60["scripts/gates.list"]
+    n61["scripts/git-hooks/*"]
+    n62["scripts/git-hooks/pre-commit"]
+    n63["scripts/identity.conf"]
+    n64["scripts/msg-patterns.list"]
+    n65["scripts/root-allowlist.list"]
   end
   n23 <-->|"check-amendment-queue"| n22
   n23 <-->|"check-amendment-queue"| n10
   n19 -->|"check-brevity"| n19
-  n56 -->|"check-comment-tier"| n40
-  n56 -->|"check-comment-tier"| n24
-  n56 -->|"check-comment-tier"| n28
-  n56 -->|"check-comment-tier"| n32
-  n56 -->|"check-comment-tier"| n36
-  n56 -->|"check-comment-tier"| n44
-  n56 -->|"check-comment-tier"| n48
-  n56 -->|"check-comment-tier"| n52
-  n56 -->|"check-comment-tier"| n65
-  n56 -->|"check-comment-tier"| n14
-  n63 -->|"check-commit-msg"| n63
-  n57 -->|"check-core-files"| n57
+  n57 -->|"check-comment-tier"| n41
+  n57 -->|"check-comment-tier"| n24
+  n57 -->|"check-comment-tier"| n28
+  n57 -->|"check-comment-tier"| n33
+  n57 -->|"check-comment-tier"| n37
+  n57 -->|"check-comment-tier"| n45
+  n57 -->|"check-comment-tier"| n49
+  n57 -->|"check-comment-tier"| n53
+  n57 -->|"check-comment-tier"| n66
+  n57 -->|"check-comment-tier"| n14
+  n64 -->|"check-commit-msg"| n64
+  n58 -->|"check-core-files"| n58
+  n32 -->|"check-docs-kit-parity"| n19
+  n32 -->|"check-docs-kit-parity"| n44
+  n32 -->|"check-docs-kit-parity"| n27
+  n32 -->|"check-docs-kit-parity"| n31
+  n32 -->|"check-docs-kit-parity"| n36
+  n32 -->|"check-docs-kit-parity"| n40
+  n32 -->|"check-docs-kit-parity"| n48
+  n32 -->|"check-docs-kit-parity"| n52
+  n32 -->|"check-docs-kit-parity"| n56
+  n32 -->|"check-docs-kit-parity"| n69
   n17 -->|"check-evidence-baseline"| n23
   n18 -->|"check-evidence-manifest"| n23
   n18 -->|"check-evidence-manifest"| n16
-  n41 <-->|"check-gate-assertions"| n25
-  n41 <-->|"check-gate-assertions"| n29
-  n41 <-->|"check-gate-assertions"| n33
-  n41 <-->|"check-gate-assertions"| n37
-  n41 <-->|"check-gate-assertions"| n45
-  n41 <-->|"check-gate-assertions"| n49
-  n41 <-->|"check-gate-assertions"| n53
-  n41 <-->|"check-gate-assertions"| n66
-  n41 <-->|"check-gate-assertions"| n56
-  n41 <-->|"check-gate-assertions"| n40
-  n41 <-->|"check-gate-assertions"| n24
-  n41 <-->|"check-gate-assertions"| n28
-  n41 <-->|"check-gate-assertions"| n32
-  n41 <-->|"check-gate-assertions"| n36
-  n41 <-->|"check-gate-assertions"| n44
-  n41 <-->|"check-gate-assertions"| n48
-  n41 <-->|"check-gate-assertions"| n52
-  n41 <-->|"check-gate-assertions"| n65
-  n56 -->|"check-gate-exemption-tasks"| n40
-  n56 -->|"check-gate-exemption-tasks"| n24
-  n56 -->|"check-gate-exemption-tasks"| n28
-  n56 -->|"check-gate-exemption-tasks"| n32
-  n56 -->|"check-gate-exemption-tasks"| n36
-  n56 -->|"check-gate-exemption-tasks"| n44
-  n56 -->|"check-gate-exemption-tasks"| n48
-  n56 -->|"check-gate-exemption-tasks"| n52
-  n56 -->|"check-gate-exemption-tasks"| n65
-  n56 -->|"check-gate-exemption-tasks"| n23
-  n56 -->|"check-gate-fail-closed"| n40
-  n56 -->|"check-gate-fail-closed"| n24
-  n56 -->|"check-gate-fail-closed"| n28
-  n56 -->|"check-gate-fail-closed"| n32
-  n56 -->|"check-gate-fail-closed"| n36
-  n56 -->|"check-gate-fail-closed"| n44
-  n56 -->|"check-gate-fail-closed"| n48
-  n56 -->|"check-gate-fail-closed"| n52
-  n56 -->|"check-gate-fail-closed"| n65
-  n59 -->|"check-gate-fixture-coverage"| n56
-  n59 -->|"check-gate-fixture-coverage"| n58
-  n59 -->|"check-gate-fixture-coverage"| n40
-  n59 -->|"check-gate-fixture-coverage"| n24
-  n59 -->|"check-gate-fixture-coverage"| n28
-  n59 -->|"check-gate-fixture-coverage"| n32
-  n59 -->|"check-gate-fixture-coverage"| n36
-  n59 -->|"check-gate-fixture-coverage"| n44
-  n59 -->|"check-gate-fixture-coverage"| n48
-  n59 -->|"check-gate-fixture-coverage"| n52
-  n59 -->|"check-gate-fixture-coverage"| n65
-  n59 -->|"check-gate-output"| n56
-  n59 -->|"check-gate-output"| n40
-  n59 -->|"check-gate-output"| n24
-  n59 -->|"check-gate-output"| n28
-  n59 -->|"check-gate-output"| n32
-  n59 -->|"check-gate-output"| n36
-  n59 -->|"check-gate-output"| n44
-  n59 -->|"check-gate-output"| n48
-  n59 -->|"check-gate-output"| n52
-  n59 -->|"check-gate-output"| n65
-  n40 -->|"check-gate-tamper"| n24
-  n40 -->|"check-gate-tamper"| n28
-  n40 -->|"check-gate-tamper"| n32
-  n40 -->|"check-gate-tamper"| n36
-  n40 -->|"check-gate-tamper"| n44
-  n40 -->|"check-gate-tamper"| n48
-  n40 -->|"check-gate-tamper"| n52
-  n40 -->|"check-gate-tamper"| n65
-  n59 -->|"check-graph"| n56
-  n59 -->|"check-graph"| n40
-  n59 -->|"check-graph"| n24
-  n59 -->|"check-graph"| n28
-  n59 -->|"check-graph"| n32
-  n59 -->|"check-graph"| n36
-  n59 -->|"check-graph"| n44
-  n59 -->|"check-graph"| n48
-  n59 -->|"check-graph"| n52
-  n59 -->|"check-graph"| n65
-  n59 -->|"check-graph"| n61
-  n59 -->|"check-graph"| n15
-  n59 -->|"check-graph"| n22
-  n59 -->|"check-graph"| n10
-  n60 -->|"check-hook-exec-bit"| n60
-  n62 -->|"check-identity"| n62
-  n59 -->|"check-kit-enum"| n42
-  n59 -->|"check-kit-enum"| n26
-  n59 -->|"check-kit-enum"| n30
-  n59 -->|"check-kit-enum"| n34
-  n59 -->|"check-kit-enum"| n38
-  n59 -->|"check-kit-enum"| n46
-  n59 -->|"check-kit-enum"| n50
-  n59 -->|"check-kit-enum"| n54
-  n59 -->|"check-kit-enum"| n67
+  n42 <-->|"check-gate-assertions"| n25
+  n42 <-->|"check-gate-assertions"| n29
+  n42 <-->|"check-gate-assertions"| n34
+  n42 <-->|"check-gate-assertions"| n38
+  n42 <-->|"check-gate-assertions"| n46
+  n42 <-->|"check-gate-assertions"| n50
+  n42 <-->|"check-gate-assertions"| n54
+  n42 <-->|"check-gate-assertions"| n67
+  n42 <-->|"check-gate-assertions"| n57
+  n42 <-->|"check-gate-assertions"| n41
+  n42 <-->|"check-gate-assertions"| n24
+  n42 <-->|"check-gate-assertions"| n28
+  n42 <-->|"check-gate-assertions"| n33
+  n42 <-->|"check-gate-assertions"| n37
+  n42 <-->|"check-gate-assertions"| n45
+  n42 <-->|"check-gate-assertions"| n49
+  n42 <-->|"check-gate-assertions"| n53
+  n42 <-->|"check-gate-assertions"| n66
+  n57 -->|"check-gate-exemption-tasks"| n41
+  n57 -->|"check-gate-exemption-tasks"| n24
+  n57 -->|"check-gate-exemption-tasks"| n28
+  n57 -->|"check-gate-exemption-tasks"| n33
+  n57 -->|"check-gate-exemption-tasks"| n37
+  n57 -->|"check-gate-exemption-tasks"| n45
+  n57 -->|"check-gate-exemption-tasks"| n49
+  n57 -->|"check-gate-exemption-tasks"| n53
+  n57 -->|"check-gate-exemption-tasks"| n66
+  n57 -->|"check-gate-exemption-tasks"| n23
+  n57 -->|"check-gate-fail-closed"| n41
+  n57 -->|"check-gate-fail-closed"| n24
+  n57 -->|"check-gate-fail-closed"| n28
+  n57 -->|"check-gate-fail-closed"| n33
+  n57 -->|"check-gate-fail-closed"| n37
+  n57 -->|"check-gate-fail-closed"| n45
+  n57 -->|"check-gate-fail-closed"| n49
+  n57 -->|"check-gate-fail-closed"| n53
+  n57 -->|"check-gate-fail-closed"| n66
+  n60 -->|"check-gate-fixture-coverage"| n57
+  n60 -->|"check-gate-fixture-coverage"| n59
+  n60 -->|"check-gate-fixture-coverage"| n41
+  n60 -->|"check-gate-fixture-coverage"| n24
+  n60 -->|"check-gate-fixture-coverage"| n28
+  n60 -->|"check-gate-fixture-coverage"| n33
+  n60 -->|"check-gate-fixture-coverage"| n37
+  n60 -->|"check-gate-fixture-coverage"| n45
+  n60 -->|"check-gate-fixture-coverage"| n49
+  n60 -->|"check-gate-fixture-coverage"| n53
+  n60 -->|"check-gate-fixture-coverage"| n66
+  n60 -->|"check-gate-output"| n57
+  n60 -->|"check-gate-output"| n41
+  n60 -->|"check-gate-output"| n24
+  n60 -->|"check-gate-output"| n28
+  n60 -->|"check-gate-output"| n33
+  n60 -->|"check-gate-output"| n37
+  n60 -->|"check-gate-output"| n45
+  n60 -->|"check-gate-output"| n49
+  n60 -->|"check-gate-output"| n53
+  n60 -->|"check-gate-output"| n66
+  n41 -->|"check-gate-tamper"| n24
+  n41 -->|"check-gate-tamper"| n28
+  n41 -->|"check-gate-tamper"| n33
+  n41 -->|"check-gate-tamper"| n37
+  n41 -->|"check-gate-tamper"| n45
+  n41 -->|"check-gate-tamper"| n49
+  n41 -->|"check-gate-tamper"| n53
+  n41 -->|"check-gate-tamper"| n66
+  n60 -->|"check-graph"| n57
+  n60 -->|"check-graph"| n41
+  n60 -->|"check-graph"| n24
+  n60 -->|"check-graph"| n28
+  n60 -->|"check-graph"| n33
+  n60 -->|"check-graph"| n37
+  n60 -->|"check-graph"| n45
+  n60 -->|"check-graph"| n49
+  n60 -->|"check-graph"| n53
+  n60 -->|"check-graph"| n66
+  n60 -->|"check-graph"| n62
+  n60 -->|"check-graph"| n15
+  n60 -->|"check-graph"| n22
+  n60 -->|"check-graph"| n10
+  n61 -->|"check-hook-exec-bit"| n61
+  n63 -->|"check-identity"| n63
+  n60 -->|"check-kit-enum"| n43
+  n60 -->|"check-kit-enum"| n26
+  n60 -->|"check-kit-enum"| n30
+  n60 -->|"check-kit-enum"| n35
+  n60 -->|"check-kit-enum"| n39
+  n60 -->|"check-kit-enum"| n47
+  n60 -->|"check-kit-enum"| n51
+  n60 -->|"check-kit-enum"| n55
+  n60 -->|"check-kit-enum"| n68
   n21 -->|"check-kit-registration"| n19
-  n21 -->|"check-kit-registration"| n43
+  n21 -->|"check-kit-registration"| n44
   n21 -->|"check-kit-registration"| n27
   n21 -->|"check-kit-registration"| n31
-  n21 -->|"check-kit-registration"| n35
-  n21 -->|"check-kit-registration"| n39
-  n21 -->|"check-kit-registration"| n47
-  n21 -->|"check-kit-registration"| n51
-  n21 -->|"check-kit-registration"| n55
-  n21 -->|"check-kit-registration"| n68
+  n21 -->|"check-kit-registration"| n36
+  n21 -->|"check-kit-registration"| n40
+  n21 -->|"check-kit-registration"| n48
+  n21 -->|"check-kit-registration"| n52
+  n21 -->|"check-kit-registration"| n56
+  n21 -->|"check-kit-registration"| n69
   n12 -->|"check-manifest-count"| n11
   n12 -->|"check-manifest-count"| n19
   n12 -->|"check-manifest-temporal"| n11
@@ -286,16 +297,16 @@ graph LR
   n23 -->|"check-queue-prose-precondition"| n23
   n23 -->|"check-queue-sections"| n23
   n23 -->|"check-queue-wrap"| n23
-  n64 -->|"check-root-tiering"| n64
-  n56 -->|"check-shellcheck"| n40
-  n56 -->|"check-shellcheck"| n24
-  n56 -->|"check-shellcheck"| n28
-  n56 -->|"check-shellcheck"| n32
-  n56 -->|"check-shellcheck"| n36
-  n56 -->|"check-shellcheck"| n44
-  n56 -->|"check-shellcheck"| n48
-  n56 -->|"check-shellcheck"| n52
-  n56 -->|"check-shellcheck"| n65
+  n65 -->|"check-root-tiering"| n65
+  n57 -->|"check-shellcheck"| n41
+  n57 -->|"check-shellcheck"| n24
+  n57 -->|"check-shellcheck"| n28
+  n57 -->|"check-shellcheck"| n33
+  n57 -->|"check-shellcheck"| n37
+  n57 -->|"check-shellcheck"| n45
+  n57 -->|"check-shellcheck"| n49
+  n57 -->|"check-shellcheck"| n53
+  n57 -->|"check-shellcheck"| n66
   n12 -->|"check-spec-derivable-section"| n12
   n12 -->|"check-spec-dod-singleton"| n12
   n12 -->|"check-spec-embedded-source"| n2
@@ -312,23 +323,23 @@ graph LR
   n12 -->|"check-spec-fence-balance"| n11
   n12 -->|"check-spec-fence-balance"| n19
   n12 -->|"check-spec-fence-balance"| n23
-  n56 -->|"check-spec-pointer"| n40
-  n56 -->|"check-spec-pointer"| n24
-  n56 -->|"check-spec-pointer"| n28
-  n56 -->|"check-spec-pointer"| n32
-  n56 -->|"check-spec-pointer"| n36
-  n56 -->|"check-spec-pointer"| n44
-  n56 -->|"check-spec-pointer"| n48
-  n56 -->|"check-spec-pointer"| n52
-  n56 -->|"check-spec-pointer"| n65
-  n56 -->|"check-spec-pointer"| n14
+  n57 -->|"check-spec-pointer"| n41
+  n57 -->|"check-spec-pointer"| n24
+  n57 -->|"check-spec-pointer"| n28
+  n57 -->|"check-spec-pointer"| n33
+  n57 -->|"check-spec-pointer"| n37
+  n57 -->|"check-spec-pointer"| n45
+  n57 -->|"check-spec-pointer"| n49
+  n57 -->|"check-spec-pointer"| n53
+  n57 -->|"check-spec-pointer"| n66
+  n57 -->|"check-spec-pointer"| n14
   n23 -->|"check-stage-entry"| n16
   n23 -->|"check-stage-evidence"| n16
   n13 -->|"check-stage-skill-coverage"| n13
   n23 -->|"check-tag-lead-line"| n23
   n23 -->|"check-task-conservation"| n23
   n23 -->|"check-task-names"| n23
-  n63 -->|"check-tree-terms"| n63
+  n64 -->|"check-tree-terms"| n64
 `;
     mermaid.initialize({ startOnLoad: false });
     const { svg } = await mermaid.render('graph', graph);

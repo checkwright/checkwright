@@ -330,12 +330,16 @@ excluded by construction (a transition artifact describes change — that is its
 nature). Markers are `SPEC_KIT_TEMPORAL_MARKERS`, matched case-insensitively;
 fenced code blocks are skipped and a marker inside an inline-code span is a
 meta-reference, not narration — so a gate-output example or this section's own
-vocabulary may name one. Two valves suppress a legitimately past line: a
+vocabulary may name one. Three valves suppress a legitimately past line: a
 per-site `manifest-temporal-exempt: <reason>` comment on the line or the one
-above, and `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole
+above; `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole
 section (subsections included) is exempt, this repo's config naming
 `What stayed on the platform` (extraction provenance is this consumer's
-convention, not kit mechanism). Producer: the generated pre-commit hook /
+convention, not kit mechanism); and `SPEC_KIT_TEMPORAL_EXEMPT_PATHS` — path
+globs whose whole file is exempt, for an immutable dated-narrative surface a
+heading name cannot address (this repo's config naming `docs/posts/*`, the
+dated announcement posts, which take link and command resolution but not
+narration governance). Producer: the generated pre-commit hook /
 `run-gates.sh`; consumer: the committing operator via the output contract; each
 marker hit is read at the single scan transition (file, line, marker in the
 message), no persistent state. Fail-closed on an unreadable manifest.

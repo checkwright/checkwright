@@ -69,6 +69,7 @@ declare -p SPEC_KIT_TEMPORAL_MARKERS &>/dev/null || SPEC_KIT_TEMPORAL_MARKERS=(
     "was (retired|removed|renamed|replaced)"
 )
 declare -p SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS &>/dev/null || SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS=()
+declare -p SPEC_KIT_TEMPORAL_EXEMPT_PATHS &>/dev/null || SPEC_KIT_TEMPORAL_EXEMPT_PATHS=()
 
 declare -p SPEC_KIT_COUNT_COLLECTIONS &>/dev/null || SPEC_KIT_COUNT_COLLECTIONS=(
     "gates"
