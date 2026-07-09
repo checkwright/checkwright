@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <!-- Checkwright social preview (GitHub Settings → General → Social preview;
+       also the LinkedIn/HN/Slack unfurl card). 1280x640 is GitHub's recommended
+       size. Rasterize for upload — GitHub takes PNG/JPG, not SVG:
+       rsvg-convert -w 1280 -h 640 assets/social-preview.svg -o /tmp/social.png
+       Text is centred by hand (text-anchor=middle); the lockup group is the
+       body of assets/logo/checkwright-lockup.svg with the wordmark fill
+       swapped to #E2E8F0 for the dark ground, per that file's own note. -->
+  <rect width="1280" height="640" fill="#16202B"/>
+  <rect x="0" y="0" width="1280" height="6" fill="#C19A3D"/>
+  <g transform="translate(295 150) scale(0.87)">
+    <g transform="translate(120 120) scale(1.4) translate(-103 -65.9) rotate(-45 86 114)">
+      <path fill="#5B6B7F" fill-rule="evenodd" d="M86,96 H204 V114 H86 Z M124,96 h3 v9 h-3 z M136,96 h3 v6 h-3 z M148,96 h3 v9 h-3 z M160,96 h3 v6 h-3 z M172,96 h3 v9 h-3 z M184,96 h3 v6 h-3 z M196,96 h3 v9 h-3 z"/>
+      <path fill="#C19A3D" fill-rule="evenodd" d="M86,44 H112 V114 H86 Z M105,58 a6,6 0 1 1 -12,0 a6,6 0 1 1 12,0 z"/>
+    </g>
+    <text x="248" y="152" font-family="ui-sans-serif, system-ui, 'Segoe UI', 'DejaVu Sans', sans-serif" font-size="88" font-weight="600" letter-spacing="-2" fill="#E2E8F0">checkwright</text>
+  </g>
+  <text x="640" y="452" text-anchor="middle" font-family="ui-sans-serif, system-ui, 'Segoe UI', 'DejaVu Sans', sans-serif" font-size="36" fill="#CBD5E1">Machine-gated delivery discipline for coding agents</text>
+  <text x="640" y="556" text-anchor="middle" font-family="ui-sans-serif, system-ui, 'Segoe UI', 'DejaVu Sans', sans-serif" font-size="26" letter-spacing="1" fill="#8496AB">checkwright.dev</text>
+</svg>
