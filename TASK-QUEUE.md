@@ -14,8 +14,6 @@
 
 ## Technical Debt
 
-- **readme-ci-badge** — add the gates workflow status badge to the top of
-  README.md, linking to the workflow's Actions page.
 - **docs-kit-page-links** — the docs pages must read in the GitHub tree
   view too (README's "same pages served in-repo" promise): kit-map rows
   link `<kit>/index.md` explicitly (a bare `<kit>/` opens a folder — tree
@@ -144,5 +142,6 @@
 - brevity-empty-section-fail-closed
 - contributing-support-model
 - docs-domain-cutover
+- readme-ci-badge
 
 ## Lessons Learned

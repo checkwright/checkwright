@@ -1,5 +1,7 @@
 # Checkwright
 
+[![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml)
+
 A coding-agent-assisted delivery methodology as installable kits: machine-gated
 documentation/spec consistency, an evidence-stamped iteration lifecycle
 designed for stateless agent sessions, and token-economics-aware context
