@@ -14,7 +14,10 @@ jobs:
   gates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # fetch-depth: 0 — check-trajectory-fresh reads the full commit graph.
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
       - name: gate-sdk fixtures
