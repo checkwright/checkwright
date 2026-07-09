@@ -1,3 +1,3 @@
 # No args: the wrapper runs against the repo's real docs/index.md, which carries
-# a ](<kit>/) row for every kit root — the invariant the gate keeps true, so the
-# good case is self-maintaining as kits are added.
+# a ](<kit>/index.md) page row for every kit root — the invariant the gate keeps
+# true, so the good case is self-maintaining as kits are added.

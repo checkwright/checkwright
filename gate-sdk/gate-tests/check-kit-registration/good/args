@@ -1,3 +1,4 @@
 # No args: the gate runs against the repo's own README.md / CLAUDE.md, which
 # register every gate_kit_roots kit — the invariant the gate keeps true, so the
-# good case is self-maintaining as kits are added.
+# good case is self-maintaining as kits are added. README links the bare kit
+# dir; bad/ covers the '](<kit>/index.md)' page form assertion A also accepts.

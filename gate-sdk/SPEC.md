@@ -538,9 +538,13 @@ Invariant: every kit root `gate_kit_roots` enumerates is registered in the
 consumer's human-facing docs — closing the prose-registry gap `check-kit-enum`
 leaves open (that gate guards gate-coupling hand-lists, so a landed kit can
 silently fall out of the registry docs). Two assertions: (A) **registry row** —
-the registry doc carries, for each root, a markdown link resolving to the
-kit-root directory `<kit>/` (matched as that repo-root-relative link target), so
-a landed kit missing from the public kit table is red; (B) **fixture-runner
+the registry doc carries, for each root, a markdown link *into* the kit root:
+any target under the repo-root-relative prefix `<kit>/`, whether the bare
+directory itself or a page beneath it such as `<kit>/index.md`. The prefix is
+the assertion because the two registries address a kit differently — a source
+tree browses to the directory, a rendered docs site must name the page — and
+both are the same registration. A landed kit missing from the public kit table
+is red; (B) **fixture-runner
 line** — every kit root with
 tracked `gate-tests/` files (`git ls-files <kit>/gate-tests/`) has a line in the
 runner doc naming `<kit>/gate-tests` (the documented fixture-runner

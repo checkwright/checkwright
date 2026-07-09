@@ -20,8 +20,8 @@ fi
 if [[ "$rc" -ne 0 ]]; then
     echo "check-docs-kit-parity: a kit root is missing its row in the docs index ($REG):"
     printf '%s\n' "$out"
-    echo "  help: add the kit's '[<kit>](<kit>/)' row to $REG (docs/<kit>/ is the"
-    echo "        kit's docs page dir), so a landed kit cannot fall out of the docs site."
+    echo "  help: add the kit's '[<kit>](<kit>/index.md)' row to $REG (docs/<kit>/ is"
+    echo "        the kit's docs page dir), so a landed kit cannot fall out of the docs site."
     exit 1
 fi
 
