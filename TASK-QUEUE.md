@@ -117,6 +117,26 @@
   commits (currently the last iteration; freezing leaves them unowned, which
   under-counts a cross-boundary amendment — an acceptable edge or not).
   Surfaced 2026-07-09 fixing the adoption-track CI backstop.
+- **site-health-monitor** [needs-spec] — a scheduled probe of the live docs
+  site, explicitly *not* a gate: it verifies a deployment, not a tree, so it
+  fails on causes no commit produced (DNS, a Pages incident, cert renewal) and
+  breaks both the low-false-positive gate contract and gates.yml's
+  "checkout + bash only" hermeticity. Ruling 2026-07-10: its own cron workflow,
+  failing to an opened/updated issue, never to a red merge — and no health
+  badge in README.md (readme-ci-badge's gates badge claims the code; a badge
+  claiming infrastructure we do not own would red the landing page on a
+  resolver hiccup, undercutting the pitch that page makes). Asserted contract:
+  apex 200 over HTTPS with a valid cert; www 301 → apex; http → https (proving
+  Enforce-HTTPS has not silently flipped); checkwright.com 301 → apex with the
+  path kept. The real payload is cert-expiry-in-N-days — the silent failure.
+  Surfaced 2026-07-10 at the cutover.
+- **docs-cname-parity** [needs-spec] — a hermetic gate making `docs/CNAME` the
+  single source of truth for the docs URL: any tracked doc naming a different
+  host reds. Offline and decidable, so it fits the gate contract that
+  site-health-monitor cannot. Would not have caught the 2026-07-10 cutover bug
+  (README.md and docs/CNAME agreed with each other; both named a host DNS never
+  delivered to Pages) — it prevents the *next* rename from half-landing.
+  Surfaced 2026-07-10 alongside site-health-monitor.
 
 ## Done
 
