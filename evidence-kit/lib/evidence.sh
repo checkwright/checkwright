@@ -69,7 +69,7 @@ ek_queue_stage() {
 
 ek_run_key() {
     local iter
-    if iter="$(ek_queue_iteration)" && [[ -n "$iter" && "$iter" != "—" ]]; then
+    if iter="$(ek_queue_iteration "$EVIDENCE_KIT_QUEUE_FILE")" && [[ -n "$iter" && "$iter" != "—" ]]; then
         printf '%s\n' "$iter"
         return 0
     fi

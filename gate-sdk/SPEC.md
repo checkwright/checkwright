@@ -609,7 +609,12 @@ line-based `key value…` with `#` comments and blanks ignored. An absent, empty
 or comment-only manifest is clean with a note; a mismatch (or a manifest-named
 remote that is absent) is a violation (exit 1); a malformed line — an unknown
 key or wrong field count — is fail-closed (exit 2), never a false clean on an
-uninterpretable manifest. Enforcement is dual: the `# graph:` couples the
+uninterpretable manifest. A live run under CI (the vendor-neutral `CI` env var)
+is clean-skipped ahead of the manifest reads: the server-side battery is not a
+committing clone, so there is no local identity to misattribute a commit or
+push with, and the CI runner's unset `user.email` is expected, not a violation
+(fixture mode is unaffected — it exercises the comparison deterministically).
+Enforcement is dual: the `# graph:` couples the
 manifest at `tier=precommit` (a `git config` change to the mapping is not
 diff-visible, so the whole-tree `run-gates.sh` battery is the real backstop for
 the commit-identity half), and `install-hooks.sh` runs the gate once at opt-in

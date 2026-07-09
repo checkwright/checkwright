@@ -36,6 +36,12 @@ fi
 [[ -r "$MANIFEST" ]] || { echo "check-identity: manifest not readable: $MANIFEST" >&2; exit 2; }
 
 if [[ "$MODE" == live ]]; then
+    # spec: gate-sdk/SPEC.md §check-identity — CI is not a committing clone (no
+    # local identity to misattribute a commit/push with), so the guard steps aside.
+    if [[ -n "${CI:-}" ]]; then
+        echo "IDENTITY: clean (CI context — not a committing clone; identity guard skipped)"
+        exit 0
+    fi
     git rev-parse --git-dir >/dev/null 2>&1 || {
         echo "check-identity: not a git repository — cannot verify identity" >&2; exit 2; }
 fi

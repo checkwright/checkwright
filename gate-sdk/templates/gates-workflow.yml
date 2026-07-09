@@ -28,7 +28,11 @@ jobs:
   gates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # fetch-depth: 0 — history-reading gates (e.g. drift-kit's trajectory
+      # extractor) need the full commit graph, not a shallow checkout.
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
       # PLACEHOLDER — replace with your consumer battery list: one step per kit
