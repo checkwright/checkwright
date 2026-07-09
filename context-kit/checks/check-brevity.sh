@@ -50,7 +50,7 @@ function flush() {
 # Enter the governed section: heading line whose text starts with the knob.
 !insec {
     if (hlevel($0) > 0 && substr($0, 1, length(section)) == section) {
-        insec = 1; start_lvl = hlevel($0); prev = $0
+        insec = 1; seen = 1; start_lvl = hlevel($0); prev = $0
     }
     next
 }
@@ -75,7 +75,7 @@ insec {
     prev = $0
     next
 }
-END { flush() }
+END { flush(); if (!seen) print "@@NOSECTION" }
 AWK
 
 records="$(awk \
@@ -83,6 +83,13 @@ records="$(awk \
     -v pointer_re="$CONTEXT_KIT_BREVITY_POINTER_RE" \
     "$BREVITY_AWK" "$BREVITY_FILE")"; st=$?
 fail_closed "$st" check-brevity awk
+
+if [[ "$records" == "@@NOSECTION" ]]; then
+    printf 'check-brevity: no heading matches %s in %s: %s\n' \
+        CONTEXT_KIT_BREVITY_SECTION "$BREVITY_FILE" "'$CONTEXT_KIT_BREVITY_SECTION'" >&2
+    printf 'check-brevity: help: a renamed or deleted section silently disarms this gate — repoint CONTEXT_KIT_BREVITY_SECTION at the live heading, or restore the heading it names\n' >&2
+    exit 2
+fi
 
 total=0
 within=0

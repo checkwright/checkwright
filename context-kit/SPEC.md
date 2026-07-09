@@ -126,6 +126,14 @@ bullets with no pointer pass (the latter may genuinely own their content);
 `<!-- brevity-exempt: <reason> -->` on the bullet's first line or the line
 above blesses a bullet whose every line is load-bearing.
 
+Section resolution fails closed: a `CONTEXT_KIT_BREVITY_SECTION` matching no
+heading in the governed file exits 2, never a clean 0. The knob and the heading
+are a coupling no other gate holds, so a renamed or deleted section would
+otherwise disarm the gate while it reported an empty section as clean — a gate
+whose target vanished is a broken machine, not a clean tree. A section that
+resolves and holds no bullets is clean: resolution is what fails closed, not
+emptiness.
+
 The pointer default is any `§`, not a single doc name like `HANDBOOK §`:
 "cites a deeper doc" is the mechanism-level meaning and a consumer's handbook
 is one instance of it, so the superset matches every such pointer. Ships with

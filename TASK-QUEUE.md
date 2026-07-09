@@ -14,14 +14,6 @@
 
 ## Technical Debt
 
-- **brevity-empty-section-fail-closed** — `check-brevity` exits 0 reporting
-  "0 bullets" when `CONTEXT_KIT_BREVITY_SECTION` matches no heading in the
-  governed file, so a renamed section silently disarms the gate (found when
-  extraction-desemantics reworded CLAUDE.md's heading; the config coupling
-  is unheld by any gate). Make an unmatched section exit 2 — a gate whose
-  target vanished is a broken machine, not a clean tree. Fixture pair: a
-  `bad/` tree whose config names an absent heading. Check the sibling
-  section-keyed gates for the same fail-open shape.
 - **contributing-support-model** — replace CONTRIBUTING.md §Bandwidth with
   a support-model section: community support is best-effort with no
   response SLA; paid support, consultancy, and training are offered — name
@@ -139,5 +131,6 @@
 ## Done
 
 - extraction-desemantics
+- brevity-empty-section-fail-closed
 
 ## Lessons Learned
