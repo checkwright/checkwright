@@ -15,6 +15,9 @@ judgment alone. Checkwright packages that machinery, extracted from a working
 platform's governance meta-layer — and this repository governs itself with its
 own kits, day one.
 
+Docs live at <https://docs.vasyltretiakov.dev> — the same pages served in-repo
+under [`docs/`](docs/index.md).
+
 ## Kits
 
 | Kit | Status | What it is |

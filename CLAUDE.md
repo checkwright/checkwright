@@ -134,6 +134,14 @@ validate-after-commit set, gate-driven worklist).
   (tracked, core-files-pinned); `CONTRIBUTING.md` joins the spec manifest so its
   links/commands resolve like any doc. The fixture is the unit of contribution —
   edit the guide, not GitHub UI settings, to change what arrives.
+- `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
+  `CNAME`), repo-root-governed with no owning kit. Living pages (everything
+  outside `docs/posts/`) are fully governed prose; dated posts under
+  `docs/posts/` are immutable published artifacts — temporal-exempt but still
+  link/command-resolved (`scripts/spec-config.sh`). A page owns orientation and
+  sequencing and cites downward: the anti-restatement doctrine applies to docs
+  as to comments — never restate an invariant a SPEC or README owns.
+  `check-docs-kit-parity` holds every kit's row in `docs/index.md`.
 - `demo/run-demo.sh` is the runnable adoption walkthrough — it builds a scratch
   consumer on the gate-sdk consumer-smoke mechanics and narrates the arc
   (vendor → clean pass → violation blocked → fix → green) on stdout, exiting 0

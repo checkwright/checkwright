@@ -14,13 +14,6 @@
 
 ## Technical Debt
 
-- **docs-site** [spec: SPEC-docs-site.md] — implementation landed (docs/ pages,
-  the check-docs-kit-parity gate, the SPEC_KIT_MANIFEST_FILES + temporal-path
-  wiring). Merge-close held as tech debt: fold the docs/ living-pages-vs-posts
-  and cite-never-restate convention into CLAUDE.md Housekeeping, add the README
-  docs-live line, repoint the sibling amendments that cite SPEC-docs-site.md
-  into their merged homes, then delete the amendment. Held here so it settles
-  alongside the sibling cluster whose slots (demo, evidence) it repoints.
 - **kpi-amendment-age-fixture-noise** — the KPI's SPEC-*.md glob counts
   gate-test fixture amendments (SPEC-example-gate.md reads as oldest, 4d);
   exclude fixture/template paths, matching the trajectory extractor's
@@ -73,8 +66,8 @@
   note's tightened-gates declaration; optionally a thin installer CLI
   wrapping the git-native vendor copy (registries stay namespace
   reservations, never a dependency channel). The two-phase upgrade
-  contract itself lands with docs-site (SPEC-docs-site.md); this rung is
-  buildable once a second tag exists. Surfaced 2026-07-09.
+  contract landed with docs-site (docs/install.md §The upgrade contract); this
+  rung is buildable once a second tag exists. Surfaced 2026-07-09.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
@@ -93,6 +86,7 @@
 
 ## Done
 
+- docs-site
 - template-tiering
 - contribution-surface
 - ci-backstop
