@@ -80,14 +80,4 @@
 
 ## Done
 
-- kpi-amendment-age-fixture-noise
-- docs-site
-- template-tiering
-- contribution-surface
-- ci-backstop
-- drift-trajectory
-- adoption-track
-- docs-cmd-gate
-- demo-walkthrough
-
 ## Lessons Learned

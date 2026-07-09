@@ -31,6 +31,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-surface-duplication    # needs a glossary (exits 2 without one)
    check-comment-tier           # classifies comments on shell/config sources
    check-spec-pointer           # resolves spec:/contract: pointer targets
+   check-docs-cmd               # invoked paths + kit knobs in docs resolve
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then
