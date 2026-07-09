@@ -127,7 +127,9 @@ validate-after-commit set, gate-driven worklist).
 
 - `.tmp/` is gitignored (measurements, e.g. gate timings); `.workflow/` is
   committed (checked projections); `BRIEF.local.md` is gitignored (private
-  brief).
+  brief); `OPS.local.md` is gitignored (private ops runbook — DNS records
+  and the GitHub repo-settings desired state; consult it for domain or
+  repo-settings work).
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates are governed repo-meta
