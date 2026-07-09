@@ -143,11 +143,74 @@ The heavy alternative — periodic LLM-scan of session transcripts reduced to
 each party's messages — is deliberately out of kit scope: it needs harness
 transcript access no kit mechanism owns.
 
+## The published-evidence extractor
+
+`bin/trajectory.sh` publishes this repo's own governed trajectory — the
+evidence behind the docs evidence page. The benefits claim is
+*self-referential* by ruling: the extractor emits the governed arm's real
+history and states plainly that no controlled ungoverned baseline exists; a
+synthetic controlled A/B experiment is the separate deferred
+`benchmark-ab-experiment` rung, not this mechanism.
+
+The extractor is a pure function of committed git history — it reads no
+now-relative field (no age-from-today), so re-emission over an unchanged
+history is byte-identical, which is exactly what the consumer freshness gate
+below byte-compares. It emits one row per **closed** iteration (one carrying a
+`close` stamp): an in-flight iteration's counts are still moving, so including
+it would stale the committed projection at every commit — the closed-only rule
+keeps the projection stable between iteration boundaries. Per closed iteration
+it harvests:
+
+- **iteration + stages run** — the stamp lines from `WORKFLOW-STATE.txt`'s git
+  history (the file truncates at each scope boundary; history keeps every
+  stamp), rendered as fixed stage slots so a skipped stage reads as a gap.
+- **validate attestations** — the evidence-manifest lines
+  (`validate-evidence.txt` history): the per-iteration suite roll-up and any
+  non-clean verdict. This is the primary satisfiable-drift surface — a
+  commitment made an iteration earlier that silently broke a surface shows as
+  a failing suite, not a consistent-looking pass.
+- **amendment latency** — per amendment file, git add-date to delete-date
+  (merge), the longest lag in the iteration: the commitment-to-merge gauge.
+  Fixture and template amendment paths are excluded from the harvest from day
+  one (`kpi-amendment-age` converges to the same exclusion — its
+  `kpi-amendment-age-fixture-noise` debt task).
+- **commit shape** — the feature/debt split of the iteration's commit subjects
+  (`kpi-task-split`'s classification, applied over the iteration's commit
+  range).
+- **gate-roster growth** — the `gates.list` member count at the iteration's
+  close commit; with the queue's proposed-gate mentions this bounds the
+  named-but-unbuilt backlog.
+
+Excluded, and stated as a limitation on the framing page: knowledge-friction
+counts — their log is gitignored per-iteration scratch, not committed history,
+so the extractor cannot harvest it and that KPI stays a session-local lower
+bound.
+
+Interface: `trajectory.sh --emit` writes the markdown table (one row per closed
+iteration, stable columns) to stdout — the shape the committed projection
+pins; bare invocation prepends a human-oriented header. The extractor degrades
+per surface to an `n/a (<reason>)` cell and exits 0 — drift-kit's fail-visible
+discipline, registering no gate. `DRIFT_KIT_TRAJECTORY_SURFACES` overrides the
+harvested state-file paths (§Layout and configuration).
+
+Consumer wiring (this repo, not kit mechanism): the emission is committed at
+`docs/evidence-data.md`, and the consumer gate
+`scripts/check-trajectory-fresh.sh` (registered in `gates.list`) re-emits and
+byte-compares — the gen-pre-commit/check-graph freshness pattern — so a
+hand-edited or stale number is red at commit. The gate carries its own
+`# graph:` manifest coupling `docs/evidence-data.md` to the harvested state
+files, and a `good/`+`bad/` fixture pair that exercises the byte-compare
+hermetically: because the harvest reads real git history, the fixture supplies
+a synthetic emission as a second argument rather than regenerating one.
+`docs/evidence.md` — the framing page, owned by the docs site — carries the
+narrative and cites the data file, hand-copying no numbers.
+
 ## Layout and configuration
 
 ```
 drift-kit/
   bin/drift-report.sh
+  bin/trajectory.sh              # the published-evidence extractor
   kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
   templates/kpis.list            # example registry (consumer copies + prunes)
@@ -177,6 +240,14 @@ values as defaults):
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
+- `DRIFT_KIT_TRAJECTORY_SURFACES` — the state-file paths the trajectory
+  extractor harvests, given as `<state-file> <evidence-file>`; default
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` and its
+  `validate-evidence.txt` sibling. A surface it cannot read degrades that
+  iteration's cell to `n/a`.
+- `DRIFT_KIT_GATES_FILE` — the registry whose member count the trajectory
+  extractor reads at each close commit (gate-roster growth); default
+  `${GATE_SDK_GATES_DIR:-scripts}/gates.list`.
 
 Per-KPI couplings (which meter, which log, which scan flag) are the
 plugins' own headers, not knobs — a consumer retargeting one edits its copy
@@ -191,8 +262,11 @@ contracts do not fit; context-kit's reasoning). `smoke/install.sh` builds
 the throwaway consumer, registers the bundled set, and asserts: exit 0 with
 both section headers and one row per registered KPI; a registry naming a
 missing plugin yields its visible `n/a` row without failing; `--trend`
-emits exactly one line. Gate-sdk's `check-shellcheck` lints all kit
-sources as usual.
+emits exactly one line. The trajectory extractor needs committed history the
+throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
+fake-history repo — one closed, range-bounded iteration — and asserts the
+table parses, that iteration's row is emitted, and the in-flight iteration's
+is not. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
 
 ## What stayed on the platform
 

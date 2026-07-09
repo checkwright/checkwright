@@ -73,6 +73,10 @@ if staged_matches 'docs/index.md' 'CLAUDE.md' 'gate-sdk/gate-tests/*' 'context-k
     scripts/check-docs-kit-parity.sh || hook_fail check-docs-kit-parity
 fi
 
+if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workflow/validate-evidence.txt' 'scripts/gates.list'; then
+    scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
+fi
+
 if staged_matches 'scripts/git-hooks/*'; then
     gate-sdk/checks/check-hook-exec-bit.sh || hook_fail check-hook-exec-bit
 fi

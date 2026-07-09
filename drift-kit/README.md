@@ -63,7 +63,14 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 ```bash
 bash drift-kit/bin/drift-report.sh            # full report: lead/lag rows under the honesty labels
 bash drift-kit/bin/drift-report.sh --trend    # one compact line (fragments joined with ·)
+bash drift-kit/bin/trajectory.sh --emit       # governed-trajectory table (one row per closed iteration)
 ```
+
+`bin/trajectory.sh` is the published-evidence extractor (drift-kit/SPEC.md §The
+published-evidence extractor): a pure function of committed git history that
+emits one row per closed iteration — stages run, commit shape, amendment
+latency, validate attestations, gate-roster growth — for a consumer to pin
+behind a freshness gate.
 
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your

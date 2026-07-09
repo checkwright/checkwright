@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **drift-trajectory** [spec: drift-kit/SPEC-trajectory.md] — trajectory.sh
-  emits the per-iteration governed-trajectory table as a pure function of
-  committed history; committed at docs/evidence-data.md and pinned by the
-  check-trajectory-fresh consumer gate; self-referential evidence route
-  ruled, the controlled A/B split out as benchmark-ab-experiment.
 - **ci-backstop** [spec: gate-sdk/SPEC-ci-backstop.md] — the server-side
   enforcement backstop: a gates-workflow template in gate-sdk (battery +
   consumer fixture-runner placeholder, checkout-and-bash only), wired in
@@ -45,7 +40,8 @@
 - **kpi-amendment-age-fixture-noise** — the KPI's SPEC-*.md glob counts
   gate-test fixture amendments (SPEC-example-gate.md reads as oldest, 4d);
   exclude fixture/template paths, matching the trajectory extractor's
-  amendment-latency input ruling in drift-kit/SPEC-trajectory.md.
+  amendment-latency input ruling in drift-kit/SPEC.md §The
+  published-evidence extractor.
 
 ## Deferred
 
@@ -113,6 +109,7 @@
 
 ## Done
 
+- drift-trajectory
 - adoption-track
 - docs-cmd-gate
 - demo-walkthrough

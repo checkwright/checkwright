@@ -33,10 +33,25 @@ Layout (new directory convention, repo-root governance — no owning kit):
 - `docs/demo.md` — the walkthrough page (the slot under `docs/`
   SPEC-demo-walkthrough.md cites; that amendment owns its content).
 - `docs/methodology.md` — the delivery-methodology essay surface.
-- `docs/evidence.md` — the drift-trajectory evidence page (see
-  drift-kit/SPEC-trajectory.md; this amendment owns only its slot).
-- `docs/evidence-data.md` — the generated trajectory table (see
-  drift-kit/SPEC-trajectory.md; this amendment owns only its slot).
+- `docs/evidence.md` — the drift-trajectory evidence page (the extractor and
+  its data file live at drift-kit/SPEC.md §The published-evidence extractor).
+  This amendment owns the page's framing, which cites the data file and
+  hand-copies no numbers: the honesty statement (governed-arm evidence only, no
+  controlled ungoverned baseline, the A/B experiment deferred to
+  `benchmark-ab-experiment`); a failure-mode → mechanism table (Layering Effect
+  → `check-comment-tier` and spec-kit's anti-restatement doctrine; premature
+  lock-in → the lifecycle state machine, `check-stage-entry`/`-evidence`;
+  satisfiable drift → the whole-battery re-run each commit, spec fences, and
+  validate-after-commit); and primary citations only — seqBench (arXiv
+  2509.16866) for dependent-task series vocabulary and Drift-Bench (arXiv
+  2602.02455, "Diagnosing Cooperative Breakdowns in LLM Agents under Input
+  Faults via Multi-Turn Interaction") for the satisfiable-drift framing, with
+  Lost-in-Conversation and FlowBench as supporting prior art. (A "Decomposing
+  Reasoning Into Failure Types" retitling of Drift-Bench circulates but is
+  confabulated — do not cite it.)
+- `docs/evidence-data.md` — the generated trajectory table, emitted by
+  `drift-kit/bin/trajectory.sh --emit` and pinned by `check-trajectory-fresh`
+  (drift-kit/SPEC.md §The published-evidence extractor).
 - `docs/posts/YYYY-MM-DD-<slug>.md` — dated artifacts; the announcement
   post is the first.
 

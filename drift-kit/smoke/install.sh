@@ -10,7 +10,8 @@ cp "$SMOKE_KIT_ROOT/templates/drift-config.sh" scripts/drift-config.sh
 cp "$SMOKE_KIT_ROOT/templates/kpis.list"       scripts/kpis.list
 
 work="$(mktemp -d "${TMPDIR:-/tmp}/drift-smoke.XXXXXX")"
-trap 'rm -rf "$work"' EXIT
+trepo="$(mktemp -d "${TMPDIR:-/tmp}/traj-smoke.XXXXXX")"
+trap 'rm -rf "$work" "$trepo"' EXIT
 
 cp "$SMOKE_KIT_ROOT/templates/kpis.list" "$work/kpis.list"
 echo 'kpi-does-not-exist' >> "$work/kpis.list"   # a registry naming a missing plugin
@@ -58,3 +59,24 @@ set -e
 [[ "$trc" -eq 0 ]] || fail "--trend exited $trc"
 trend_lines="$(printf '%s' "$trend" | grep -c '')"
 [[ "$trend_lines" -eq 1 ]] || fail "--trend must emit exactly one line, got $trend_lines"
+
+# spec: drift-kit/SPEC.md §The published-evidence extractor — a hermetic fake-history
+# repo with one closed, range-bounded iteration must emit exactly that iteration's row.
+git -C "$trepo" init -q
+mkdir -p "$trepo/.workflow"
+tcommit() {
+    git -C "$trepo" add -A
+    git -C "$trepo" -c user.email=smoke@example.invalid -c user.name=smoke commit -q -m "$1"
+}
+printf 'alpha scope s1 2025-01-01\n' > "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: alpha scope"
+printf 'alpha build s2 2025-01-01\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "feat: alpha build"
+printf 'alpha close s3 2025-01-02\n' >> "$trepo/.workflow/WORKFLOW-STATE.txt"; tcommit "fix: alpha close"
+printf 'beta scope s4 2025-01-03\n'  > "$trepo/.workflow/WORKFLOW-STATE.txt";  tcommit "feat: beta scope"
+
+set +e
+traj="$( cd "$trepo" && bash "$SMOKE_KIT_ROOT/bin/trajectory.sh" --emit )"; jrc=$?
+set -e
+[[ "$jrc" -eq 0 ]] || fail "trajectory --emit exited $jrc (advisory tool must exit 0)"
+grep -q '^| iteration |' <<<"$traj" || fail "trajectory missing table header"
+[[ "$(grep -c '^| alpha ' <<<"$traj")" -ge 1 ]] || fail "trajectory emitted no closed-iteration row (expected alpha)"
+if grep -q '^| beta ' <<<"$traj"; then fail "trajectory emitted the in-flight (unclosed) beta row"; fi

@@ -1,0 +1,4 @@
+# Hermetic freshness case: the committed projection byte-matches the emission.
+# Two args steer the gate off live git history onto pre-baked fixture files.
+projection.txt
+emit.txt

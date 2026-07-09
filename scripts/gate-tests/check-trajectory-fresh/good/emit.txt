@@ -1,0 +1,4 @@
+| iteration | stages (s a b v c) | commits (feat/debt) | amendments (merged · max lag) | validate (suites) | gates.list |
+| --- | --- | --- | --- | --- | --- |
+| kit-one | s · b v c | 2f/1d | 0 | n/a (pre-evidence-kit) | 12 |
+| kit-two | s a b v c | 3f/0d | 1 · ≤1d | 9s clean | 18 |
