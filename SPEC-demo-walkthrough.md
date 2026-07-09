@@ -51,6 +51,8 @@ exists to remove).
 - evidence-kit consumer config (`scripts/`): `EVIDENCE_KIT_SUITES` +=
   `demo`, `EVIDENCE_KIT_RUN_demo` set; `.workflow/validate-baseline.txt`
   gains the row — consumer wiring, no evidence-kit SPEC change.
+- `scripts/root-allowlist.list`: + `demo` (new tracked top-level entry;
+  check-root-tiering).
 
 ## Definition of Done
 

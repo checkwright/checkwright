@@ -6,8 +6,16 @@ A public docs site under `docs/` — plain Markdown, zero build toolchain,
 served by GitHub Pages from the `docs/` directory on master with a `CNAME`
 file (`docs.vasyltretiakov.dev`; 301 to the product domain at launch). No
 site-generator config ships; GitHub Pages' default rendering is the
-contract, revisited only on a concrete rendering failure. Every page is
-therefore a governed markdown surface the existing prose gates see.
+contract, revisited only on a concrete rendering failure. Every page joins
+the governed doc set by explicit wiring, not by default: the link/narration
+gate family reads `spec_manifest_files` (spec-kit/lib/spec.sh), whose
+default set is canonical SPECs plus `README.md`/`CLAUDE.md` — `docs/` pages
+enter only when `scripts/spec-config.sh` sets `SPEC_KIT_MANIFEST_FILES`,
+and that knob *replaces* the default set (explicit-globs mode), so the
+config enumerates the prior members plus the `docs/` globs (build resolves
+the exact globs; the finders' `templates/` exclusion must survive the
+switch). `check-tree-terms` needs no wiring — it already scans every
+tracked file.
 
 Layout (new directory convention, repo-root governance — no owning kit):
 
@@ -15,13 +23,20 @@ Layout (new directory convention, repo-root governance — no owning kit):
   per-kit pages), the reading order. Owns *sequencing*, cites contracts.
 - `docs/kits/<kit>.md` — one page per kit root: what it is, install
   (vendor-whole), quick-start; cites the kit's README/SPEC for contracts.
+- `docs/install.md` — repo-level install and upgrade: the vendor-whole
+  flow across kits, the two-phase upgrade contract (below), and the
+  branch-protection recipe section gate-sdk/SPEC-ci-backstop.md cites.
+- `docs/demo.md` — the walkthrough page (the `docs/kits/` sibling slot
+  SPEC-demo-walkthrough.md cites; that amendment owns its content).
 - `docs/methodology.md` — the delivery-methodology essay surface.
 - `docs/evidence.md` — the drift-trajectory evidence page (see
+  drift-kit/SPEC-trajectory.md; this amendment owns only its slot).
+- `docs/evidence-data.md` — the generated trajectory table (see
   drift-kit/SPEC-trajectory.md; this amendment owns only its slot).
 - `docs/posts/YYYY-MM-DD-<slug>.md` — dated artifacts; the announcement
   post is the first.
 
-Two page classes with different drift contracts:
+Three page classes with different drift contracts:
 
 - **Living pages** (everything outside `posts/`) — fully governed: link
   resolution, command/knob resolution (spec-kit/SPEC-docs-cmd.md), bare
@@ -33,6 +48,10 @@ Two page classes with different drift contracts:
   a path form if the current knob cannot express it — build resolves
   against the knob's real shape) while link and command resolution still
   apply. Post-publication edits are a new dated post, not a rewrite.
+- **Generated data** (`docs/evidence-data.md`) — emitted by a tool and
+  byte-pinned by a freshness gate, so a hand edit is red by construction;
+  narration-gate applicability resolves at build (exempted only if the
+  generated content trips a prose gate).
 
 Content tiering ruling (extends spec-kit's star topology with a docs tier):
 docs pages own orientation, sequencing, and pedagogy; kit READMEs own
@@ -46,7 +65,10 @@ wrapper invoking gate-sdk's existing `check-kit-registration.sh` with
 `docs/index.md` as the registry-doc argument — every kit root must carry a
 `](<kit>/)`-style link row in the docs index (assertion A); the wrapper
 passes only the registry-doc argument, so assertion B redundantly re-checks
-CLAUDE.md (harmless, noted). No gate-sdk change.
+CLAUDE.md (harmless, noted). No gate-sdk change. The wrapper ships a
+`good/`+`bad/` fixture pair under `scripts/gate-tests/check-docs-kit-parity/`
+(a synthetic registry doc missing a kit row), per
+check-gate-fixture-coverage.
 
 The announcement post's canonical copy lives in `docs/posts/`; external
 publication (newsletter/blog platforms) is a copy that links back — the
@@ -97,6 +119,10 @@ names — `check-tree-terms` already fences this mechanically and governs
 - `scripts/gates.list` registers `check-docs-kit-parity`; regenerate the
   pre-commit hook and CHECK-GRAPH artifact on land (the wrapper carries its
   own `# graph:` manifest line coupling `docs/index.md` to the kit roots).
+- `scripts/spec-config.sh`: `SPEC_KIT_MANIFEST_FILES` set as above (the
+  prior default members plus the `docs/` globs).
+- `scripts/root-allowlist.list`: + `docs` (new tracked top-level entry;
+  check-root-tiering).
 
 ## Definition of Done
 

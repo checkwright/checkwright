@@ -39,9 +39,10 @@ New files:
 - `.github/pull_request_template.md` — checklist: battery green,
   fixture pair included for gate changes, DCO sign-off present.
 
-Anti-drift wiring: `CONTRIBUTING.md` joins the governed doc set (link
-resolution today, command/knob resolution when `check-docs-cmd` lands —
-same set, no extra config); `CONTRIBUTING.md` and the three `.github/`
+Anti-drift wiring: `CONTRIBUTING.md` joins the governed doc set via the
+`SPEC_KIT_MANIFEST_FILES` wiring SPEC-docs-site.md establishes — one more
+glob, no second knob (link resolution on land, command/knob resolution
+when `check-docs-cmd` follows); `CONTRIBUTING.md` and the three `.github/`
 files register in `scripts/core-files.list` so silent deletion is red;
 `CONTRIBUTING.md` joins `scripts/root-allowlist.list` (`.github` enters
 via the ci-backstop amendment).

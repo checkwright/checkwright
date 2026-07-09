@@ -46,7 +46,13 @@ Consumer wiring (this repo, not kit mechanism): the emitted table is
 committed at `docs/evidence-data.md`; a thin consumer gate
 `scripts/check-trajectory-fresh.sh` (registered in `gates.list`)
 re-emits and byte-compares — the gen-pre-commit/check-graph freshness
-pattern — so hand-edited or stale numbers are red at commit.
+pattern — so hand-edited or stale numbers are red at commit. The gate
+carries its own `# graph:` manifest line (coupling `docs/evidence-data.md`
+to the harvested state files) and a `good/`+`bad/` fixture pair or a
+`# no-fixture:` opt-out per check-gate-fixture-coverage (build resolves
+which — the harvest reads real git history, so a synthetic pair may not
+be craftable); regenerate the pre-commit hook and CHECK-GRAPH artifact
+on land.
 `docs/evidence.md` (slot owned by SPEC-docs-site.md) carries the framing
 and cites the data file; it hand-copies no numbers. Framing content the
 page must carry, fixed at scope:

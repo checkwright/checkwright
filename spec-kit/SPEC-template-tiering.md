@@ -7,7 +7,7 @@ for adoption): **kit SPECs travel** — the install contract is
 vendor-the-whole-kit-directory, SPEC.md included, so a copied-out
 template's `spec:` pointer resolves against the vendored kit path in the
 consumer tree. The blanket `/templates/` exclusion in
-`spec_governed_sources()` therefore over-exempts, and it splits per gate:
+`spec_comment_surface()` therefore over-exempts, and it splits per gate:
 
 - **`check-comment-tier` governs `templates/`.** After the header
   thinning below, every full-line comment a template carries is a legal
@@ -23,8 +23,8 @@ consumer tree. The blanket `/templates/` exclusion in
   SPEC states this rationale (placeholders-by-design, not
   "SPECs don't travel").
 
-Mechanism: `spec_governed_sources()` gains a variant that keeps
-`templates/` paths — `spec_governed_sources_with_templates()` — and
+Mechanism: `spec_comment_surface()` gains a variant that keeps
+`templates/` paths — `spec_comment_surface_with_templates()` — and
 `check-comment-tier` switches to it; every other caller is untouched. No
 new knob: which finder a gate uses is kit contract, not consumer config
 (a consumer wanting the old behavior shadows the gate, the established
@@ -46,7 +46,7 @@ sections; it restates nothing (SPEC-docs-site.md's tiering ruling).
   is already registered).
 - Consumer: the committing session — findings on template comments now
   name real lines to fix instead of being invisible.
-- Inputs read: `spec_governed_sources_with_templates()` output; no new
+- Inputs read: `spec_comment_surface_with_templates()` output; no new
   state or message fields. The new finder's only caller at land is
   `check-comment-tier` (a finder with no caller is removed, per causal
   completeness — it ships wired).
@@ -56,8 +56,9 @@ sections; it restates nothing (SPEC-docs-site.md's tiering ruling).
 
 ## Existing sections updated
 
-- spec-kit SPEC §lib/spec.sh: the finder table gains the variant and the
-  per-gate split rationale.
+- spec-kit SPEC §lib/spec.sh: the finder prose gains the variant and the
+  per-gate split rationale (the two gates no longer scan one identical
+  set — the shared-surface sentence updates with it).
 - spec-kit SPEC §check-comment-tier: governed-set sentence updated
   (templates included); §check-spec-pointer: exemption rationale replaced
   with placeholders-by-design.
