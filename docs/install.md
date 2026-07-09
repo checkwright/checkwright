@@ -18,8 +18,8 @@ your repo root and wire it in:
 4. Opt each clone into the generated pre-commit hook with
    `bash gate-sdk/bin/install-hooks.sh`.
 
-Start with [gate-sdk](gate-sdk/) — the other kits register into its runner —
-then add kits in the order the [kit map](index.md) lists them.
+Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
+runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
 
 ## Versioning
 
@@ -54,4 +54,4 @@ CI on every pull request, and mark that check required in your host's
 branch-protection settings so a red battery blocks the merge. Keep the
 verifier neutral — enforcement that an author can edit is not enforcement.
 
-Back to the [kit map](index.md) or [why Checkwright](methodology.md).
+Back to the [kit map](index.md#the-kits) or [why Checkwright](methodology.md).

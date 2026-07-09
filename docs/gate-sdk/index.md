@@ -30,5 +30,5 @@ bash gate-sdk/bin/install-hooks.sh                   # opt this clone into the h
 The gate contracts — the output, fail-closed, fixture-pair, and self-lint
 disciplines every gate keeps — are defined in the kit's `SPEC.md`; its
 `README.md` lists the mechanism. Both ship inside the vendored `gate-sdk/`
-directory. Back to the [kit map](../index.md) or the
+directory. Back to the [kit map](../index.md#the-kits) or the
 [install guide](../install.md).

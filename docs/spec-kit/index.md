@@ -26,4 +26,4 @@ bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests spec-kit/checks
 
 The spec model — canonical-plus-amendment lifecycle, the tiering topology, and
 the anti-restatement doctrine — is defined in the kit's `SPEC.md`; its
-`README.md` lists the mechanism. Back to the [kit map](../index.md).
+`README.md` lists the mechanism. Back to the [kit map](../index.md#the-kits).

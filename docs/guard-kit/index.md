@@ -26,4 +26,4 @@ bash guard-kit/bin/run-guard-tests.sh                # exercise the decision tab
 
 The guard decision model and the friction-triage step are defined in the kit's
 `SPEC.md`; its `README.md` lists the mechanism. Back to the
-[kit map](../index.md).
+[kit map](../index.md#the-kits).

@@ -49,4 +49,4 @@ will not run is a slide deck; this one is dogfooded or it is nothing.
 ## Where to go next
 
 - [Install](install.md) — vendor the kits and wire the upgrade contract.
-- [The kits](index.md) — one page each, in reading order.
+- [The kits](index.md#the-kits) — one page each, in reading order.

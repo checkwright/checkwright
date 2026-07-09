@@ -27,4 +27,4 @@ bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/check
 
 The state-machine contract — the stamp grammar, the flip-and-stamp protocol,
 and the gates that enforce it — lives in the kit's `SPEC.md`; its `README.md`
-lists the mechanism. Back to the [kit map](../index.md).
+lists the mechanism. Back to the [kit map](../index.md#the-kits).

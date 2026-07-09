@@ -25,4 +25,4 @@ bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks
 
 The baseline grammar and the versioned manifest contract are defined in the
 kit's `SPEC.md`; its `README.md` lists the mechanism. Back to the
-[kit map](../index.md).
+[kit map](../index.md#the-kits).

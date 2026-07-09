@@ -14,17 +14,6 @@
 
 ## Technical Debt
 
-- **docs-kit-page-links** — the docs pages must read in the GitHub tree
-  view too (README's "same pages served in-repo" promise): kit-map rows
-  link `<kit>/index.md` explicitly (a bare `<kit>/` opens a folder — tree
-  view renders README.md, not index.md), and each kit page's back-link
-  targets `../index.md#the-kits`, not the page top. Ruling: the per-kit
-  dirs stay — stable per-kit URLs with room for extra pages beat one
-  bundled index; jekyll-relative-links maps the .md links on the rendered
-  site. Rides with it: relax check-kit-registration's row match from the
-  literal `](<kit>/)` to the `](<kit>/` prefix, fixture pair updated to
-  prove both link forms.
-
 ## Deferred
 
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
@@ -143,5 +132,6 @@
 - contributing-support-model
 - docs-domain-cutover
 - readme-ci-badge
+- docs-kit-page-links
 
 ## Lessons Learned

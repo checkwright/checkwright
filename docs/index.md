@@ -24,18 +24,18 @@ an invariant.
 
 Read in this order: each kit assumes the machinery of the ones above it.
 
-- [gate-sdk](gate-sdk/) — the lint framework the other kits register into.
-- [lifecycle-kit](lifecycle-kit/) — the iteration stage state machine for
+- [gate-sdk](gate-sdk/index.md) — the lint framework the other kits register into.
+- [lifecycle-kit](lifecycle-kit/index.md) — the iteration stage state machine for
   stateless sessions.
-- [queue-kit](queue-kit/) — the git-native, agent-readable task tracker.
-- [spec-kit](spec-kit/) — spec discipline for agent-authored components.
-- [guard-kit](guard-kit/) — permission-friction tooling for agent sessions.
-- [delegation-kit](delegation-kit/) — safe delegated-agent execution under a
+- [queue-kit](queue-kit/index.md) — the git-native, agent-readable task tracker.
+- [spec-kit](spec-kit/index.md) — spec discipline for agent-authored components.
+- [guard-kit](guard-kit/index.md) — permission-friction tooling for agent sessions.
+- [delegation-kit](delegation-kit/index.md) — safe delegated-agent execution under a
   token budget.
-- [context-kit](context-kit/) — token-economics-aware context management.
-- [drift-kit](drift-kit/) — advisory drift reporting across the governed
+- [context-kit](context-kit/index.md) — token-economics-aware context management.
+- [drift-kit](drift-kit/index.md) — advisory drift reporting across the governed
   surfaces.
-- [evidence-kit](evidence-kit/) — a held-constant test baseline and a
+- [evidence-kit](evidence-kit/index.md) — a held-constant test baseline and a
   committed per-run evidence manifest.
 
 The walkthrough and evidence pages join this map when their kits land.
