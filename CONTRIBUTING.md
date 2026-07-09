@@ -47,12 +47,14 @@ spec conventions first — [queue-kit](queue-kit/README.md) and
 [Discussion](https://github.com/checkwright/checkwright/discussions) before
 building, so the design is agreed before a PR exists.
 
-## Bandwidth
+## Support
 
-Checkwright is maintained by one person, as time allows. There is no response
-SLA, and stale-thread automation may close inactive issues and PRs. A clean
-fixture pair is the surest path to a merge — it asks the least of the
-maintainer.
+Community support is best-effort: there is no response SLA, and stale-thread
+automation may close inactive issues and PRs. A clean fixture pair is the
+surest path to a merge — it asks the least of a reviewer.
+
+Paid support, consultancy, and training are available — write to
+<hello@checkwright.dev>.
 
 ## License
 

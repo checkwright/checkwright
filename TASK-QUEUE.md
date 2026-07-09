@@ -14,10 +14,6 @@
 
 ## Technical Debt
 
-- **contributing-support-model** — replace CONTRIBUTING.md §Bandwidth with
-  a support-model section: community support is best-effort with no
-  response SLA; paid support, consultancy, and training are offered — name
-  a contact route, not an entity. Fixture-first doctrine unchanged.
 - **docs-domain-cutover** — move the docs site to checkwright.dev:
   first step dig-verifies the apex already resolves to GitHub Pages and
   stops red if it does not (DNS is a user-side step); then flip docs/CNAME,
@@ -132,5 +128,6 @@
 
 - extraction-desemantics
 - brevity-empty-section-fail-closed
+- contributing-support-model
 
 ## Lessons Learned
