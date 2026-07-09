@@ -542,7 +542,52 @@ governed prose is scanned as a real link even inside inline backticks; to name
 such a link in prose without tripping the gate, separate the `]` and the `(`
 (a space, or a line break — the scan is per-line). The amendment `SPEC-*.md`
 files escape only by lying outside the scanned doc set, not by any code-span
-exemption.
+exemption. Links are this gate's charge; the sibling `check-docs-cmd` takes the
+invoked commands and env knobs written inside fences and backticks, over the
+same governed doc set (one shared set, no second knob).
+
+### check-docs-cmd
+
+Invariant: every invoked repo-relative `.sh` path and every kit-prefixed env
+knob written inside a fence or inline backticks in the governed doc set resolves
+against the tree — the command/knob analog of `check-md-refs`, since a broken
+`bash <path>` line or a retired knob name drifts silently where a broken link
+would be caught. Two assertions:
+
+- **(A) invoked command paths.** Inside a fenced block, a `.sh` path in
+  *invocation* position — the first word of a `;`/`|`/`&&`-separated segment, or
+  the first non-flag argument when that word is `bash`/`sh`/`source`/`.` — must
+  resolve to a tracked file, tried doc-directory-relative first (a kit SPEC's
+  own `bin/x.sh`) then repo-root-relative (a cross-kit `gate-sdk/bin/x.sh`).
+  Only invocations are checked, so a path in argument position — a `cp
+  templates/x.sh scripts/x.sh` install *destination*, which the consumer
+  creates and this repo need not track — is never a finding. That is the
+  deliberate calibration: the invariant's failure mode is a broken invocation,
+  and scoping to the two named forms (a bare `<dir>/…/<name>.sh` and the `bash
+  <path>` form) drops the hypothetical-install-target class by construction,
+  with no whole-file exemption.
+- **(B) env knobs.** Any backticked or fenced ALL-CAPS name carrying a kit
+  prefix (the roster is each `gate_kit_roots` member's basename uppercased,
+  hyphens to underscores, trailing `_`: `gate-sdk` → `GATE_SDK_`) must occur in
+  the kits' tracked *code* — their shell sources and config templates, never
+  their own prose, so a knob name-dropped only in markdown cannot self-satisfy.
+  The corpus is the union across all kits, not the prefix owner alone: a
+  namespaced knob may be read by a dependent kit (`GATE_SDK_LIB` is gate-sdk's,
+  resolved in delegation-kit and evidence-kit), and the prefix marks scope, not
+  location. A family stem — a caps run ending `_` because a placeholder or glob
+  follows it (`EVIDENCE_KIT_RUN_<suite>`, `SPEC_KIT_COMMENT_*`) — resolves when
+  any code name extends it. Names with no kit prefix are out of scope, so
+  generic shell vars never false-positive.
+
+The governed doc set is exactly `check-md-refs`' — the manifest set minus
+`SPEC_KIT_MDREF_EXCLUDE` — shared, with no gate-specific knob. Prose outside
+fences and backticks is never scanned; a hypothetical example path is written
+unfenced, or its whole doc joins the per-file `SPEC_KIT_MDREF_EXCLUDE` valve.
+The knob set is built by a repo-root-anchored `git grep`, so it holds when the
+fixture runner invokes from a case directory. Not a git repository, or a
+`git grep` that errors, is fail-closed (exit 2). The `# graph:` manifest couples
+the doc set to `scripts/*.sh` and every kit's shell sources (`kit:*.sh`), so a
+script rename or a knob retirement re-fires the gate over the docs.
 
 ### templates/
 

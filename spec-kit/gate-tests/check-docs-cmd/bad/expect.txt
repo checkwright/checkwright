@@ -1,0 +1,1 @@
+invoked script 'bin/ghost.sh' is not a tracked file

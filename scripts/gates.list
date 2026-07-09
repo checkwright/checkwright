@@ -35,6 +35,7 @@ check-spec-derivable-section
 check-spec-embedded-source
 check-spec-fence-balance
 check-md-refs
+check-docs-cmd
 check-manifest-temporal
 check-manifest-count
 check-comment-tier

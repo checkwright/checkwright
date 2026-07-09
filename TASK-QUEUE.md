@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **docs-cmd-gate** [spec: spec-kit/SPEC-docs-cmd.md] — check-docs-cmd:
-  fenced command paths and kit-prefixed env knobs in the governed doc set
-  resolve against the tree; check-md-refs' sibling, one shared governed set.
 - **demo-walkthrough** [spec: SPEC-demo-walkthrough.md] — demo/run-demo.sh
   on the consumer-smoke harness: vendor → clean pass → violation blocked →
   fix → green, self-narrating transcript; registered as a validate suite so
@@ -121,5 +118,6 @@
 ## Done
 
 - adoption-track
+- docs-cmd-gate
 
 ## Lessons Learned

@@ -43,7 +43,7 @@ Layout (new directory convention, repo-root governance — no owning kit):
 Three page classes with different drift contracts:
 
 - **Living pages** (everything outside `posts/`) — fully governed: link
-  resolution, command/knob resolution (spec-kit/SPEC-docs-cmd.md), bare
+  resolution, command/knob resolution (spec-kit/SPEC.md §check-docs-cmd), bare
   cardinals, temporal narration, fence balance, kit↔page parity.
 - **Dated posts** (`docs/posts/`) — immutable after publication; dated
   narrative is their nature, so the class is exempt from
