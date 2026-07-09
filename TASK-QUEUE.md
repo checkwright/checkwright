@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **demo-walkthrough** [spec: SPEC-demo-walkthrough.md] — demo/run-demo.sh
-  on the consumer-smoke harness: vendor → clean pass → violation blocked →
-  fix → green, self-narrating transcript; registered as a validate suite so
-  a bit-rotted demo is a red validate, not a stale docs page.
 - **drift-trajectory** [spec: drift-kit/SPEC-trajectory.md] — trajectory.sh
   emits the per-iteration governed-trajectory table as a pure function of
   committed history; committed at docs/evidence-data.md and pinned by the
@@ -119,5 +115,6 @@
 
 - adoption-track
 - docs-cmd-gate
+- demo-walkthrough
 
 ## Lessons Learned

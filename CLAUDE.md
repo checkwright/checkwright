@@ -130,6 +130,13 @@ validate-after-commit set, gate-driven worklist).
   brief).
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
+- `demo/run-demo.sh` is the runnable adoption walkthrough — it builds a scratch
+  consumer on the gate-sdk consumer-smoke mechanics and narrates the arc
+  (vendor → clean pass → violation blocked → fix → green) on stdout, exiting 0
+  only when every act behaved (the violation act *was* blocked). It writes
+  nothing in-tree and `DEMO_TMP_DIR` is its only knob. Registered as the
+  evidence-kit `demo` validate suite, so a bit-rotted walkthrough is a red
+  validate, not a stale docs page.
 - **Knowledge-friction capture (any session):** catch yourself re-deriving a
   fact no doc owns (off an implementation, a gate's source, a commit)? append
   `<date> <fact> ← <surface>` to `.workflow/knowledge-friction.log` (gitignored

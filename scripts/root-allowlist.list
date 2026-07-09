@@ -24,6 +24,9 @@ assets
 # Public docs site (GitHub Pages serves this directory as the site root)
 docs
 
+# Runnable adoption walkthrough (registered as the evidence-kit demo suite)
+demo
+
 # Name-reservation placeholders (not developed in)
 reserve
 

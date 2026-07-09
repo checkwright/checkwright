@@ -15,6 +15,7 @@ EVIDENCE_KIT_SUITES=(
     usage_tests
     budget_guard_tests
     trend_tests
+    demo
 )
 EVIDENCE_KIT_PARSER=exit-code
 
@@ -30,3 +31,4 @@ EVIDENCE_KIT_RUN_guard_tests='bash guard-kit/bin/run-guard-tests.sh'
 EVIDENCE_KIT_RUN_usage_tests='bash delegation-kit/bin/run-usage-tests.sh'
 EVIDENCE_KIT_RUN_budget_guard_tests='bash delegation-kit/bin/run-budget-guard-tests.sh'
 EVIDENCE_KIT_RUN_trend_tests='bash delegation-kit/bin/run-trend-tests.sh'
+EVIDENCE_KIT_RUN_demo='bash demo/run-demo.sh'
