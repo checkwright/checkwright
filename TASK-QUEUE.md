@@ -77,6 +77,17 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **trajectory-closed-row-freeze** [needs-spec] — a closed iteration's
+  published-evidence row must be immutable, but `trajectory.sh` anchors only
+  the gate-count column at the close commit; feat/debt and amendment-latency
+  run to HEAD for the *last* iteration, so any post-close commit mutates a
+  closed row and reds `check-trajectory-fresh` until a regen. Freeze a closed
+  iteration's whole range at its close boundary (align the feat/debt/amendment
+  windows with the gate-count precedent), so post-close hotfixes never disturb
+  a published row. Design note: decide the owner of post-close, pre-next-scope
+  commits (currently the last iteration; freezing leaves them unowned, which
+  under-counts a cross-boundary amendment — an acceptable edge or not).
+  Surfaced 2026-07-09 fixing the adoption-track CI backstop.
 
 ## Done
 
