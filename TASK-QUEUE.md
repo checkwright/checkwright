@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **docs-site** [spec: SPEC-docs-site.md] — docs/ on GitHub Pages: plain
-  Markdown, zero build; living-pages vs dated-posts drift classes; the docs
-  tier cites kit READMEs/SPECs, never restates; check-docs-kit-parity
-  wrapper gate; the announcement post is the first dated post.
 - **docs-cmd-gate** [spec: spec-kit/SPEC-docs-cmd.md] — check-docs-cmd:
   fenced command paths and kit-prefixed env knobs in the governed doc set
   resolve against the tree; check-md-refs' sibling, one shared governed set.
@@ -46,6 +42,13 @@
 
 ## Technical Debt
 
+- **docs-site** [spec: SPEC-docs-site.md] — implementation landed (docs/ pages,
+  the check-docs-kit-parity gate, the SPEC_KIT_MANIFEST_FILES + temporal-path
+  wiring). Merge-close held as tech debt: fold the docs/ living-pages-vs-posts
+  and cite-never-restate convention into CLAUDE.md Housekeeping, add the README
+  docs-live line, repoint the sibling amendments that cite SPEC-docs-site.md
+  into their merged homes, then delete the amendment. Held here so it settles
+  alongside the sibling cluster whose slots (demo, evidence) it repoints.
 - **kpi-amendment-age-fixture-noise** — the KPI's SPEC-*.md glob counts
   gate-test fixture amendments (SPEC-example-gate.md reads as oldest, 4d);
   exclude fixture/template paths, matching the trajectory extractor's
