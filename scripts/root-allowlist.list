@@ -21,6 +21,9 @@ scripts
 # Shared assets
 assets
 
+# Public docs site (GitHub Pages serves this directory as the site root)
+docs
+
 # Name-reservation placeholders (not developed in)
 reserve
 

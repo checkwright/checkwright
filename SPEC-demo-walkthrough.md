@@ -28,7 +28,7 @@ suite — a `demo demo pass` row in `.workflow/validate-baseline.txt` and an
 walkthrough end-to-end and a bit-rotted demo is a red validate, not a
 stale docs page.
 
-The docs demo page (`docs/kits/` sibling, slot owned by SPEC-docs-site.md)
+The docs demo page (`docs/demo.md`, slot owned by SPEC-docs-site.md)
 cites `demo/run-demo.sh` and describes the acts; it embeds no transcript
 (cite-never-restate — a pasted transcript is the drift vector this design
 exists to remove).

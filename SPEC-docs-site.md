@@ -21,12 +21,16 @@ Layout (new directory convention, repo-root governance — no owning kit):
 
 - `docs/index.md` — orientation: what Checkwright is, the kit map (links to
   per-kit pages), the reading order. Owns *sequencing*, cites contracts.
-- `docs/kits/<kit>.md` — one page per kit root: what it is, install
-  (vendor-whole), quick-start; cites the kit's README/SPEC for contracts.
+- `docs/<kit>/index.md` — one page per kit root, each a tracked directory so
+  the `](<kit>/)` row resolves both in-repo and on the Pages site: what it is,
+  install (vendor-whole), quick-start; cites the kit's README/SPEC for
+  contracts. md-refs plus Pages-root scoping (GitHub Pages serves `docs/` as
+  the site root) force docs-internal link targets — a link that escapes `docs/`
+  is a dead link on the published site — so kit pages cite source textually.
 - `docs/install.md` — repo-level install and upgrade: the vendor-whole
   flow across kits, the two-phase upgrade contract (below), and the
   branch-protection recipe section gate-sdk/SPEC-ci-backstop.md cites.
-- `docs/demo.md` — the walkthrough page (the `docs/kits/` sibling slot
+- `docs/demo.md` — the walkthrough page (the slot under `docs/`
   SPEC-demo-walkthrough.md cites; that amendment owns its content).
 - `docs/methodology.md` — the delivery-methodology essay surface.
 - `docs/evidence.md` — the drift-trajectory evidence page (see
