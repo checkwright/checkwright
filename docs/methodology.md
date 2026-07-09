@@ -28,7 +28,7 @@ judgment — is this the right design, does this prose actually explain the thin
 So every cheap, low-false-positive, mechanically-decidable axis becomes a
 **gate**: a small program that scans a surface and blocks the commit when it
 finds a violation, naming the finding and the fix. The residue — the judgment a
-gate cannot make — is left to a reviewer who is no longer also playing linter.
+gate cannot make — is left to a reviewer who is freed from also playing linter.
 
 A gate earns its place only when it is cheap, rarely wrong, and guards a real
 failure mode. A gate that cries wolf trains its readers to bypass it, so a false
