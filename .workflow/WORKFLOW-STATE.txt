@@ -5,3 +5,4 @@
 ---
 
 adoption-track scope fdc16678 2026-07-09
+adoption-track align b6ec4574 2026-07-09
