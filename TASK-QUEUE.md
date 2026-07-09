@@ -28,6 +28,16 @@
   committed history; committed at docs/evidence-data.md and pinned by the
   check-trajectory-fresh consumer gate; self-referential evidence route
   ruled, the controlled A/B split out as benchmark-ab-experiment.
+- **ci-backstop** [spec: gate-sdk/SPEC-ci-backstop.md] — the server-side
+  enforcement backstop: a gates-workflow template in gate-sdk (battery +
+  consumer fixture-runner placeholder, checkout-and-bash only), wired in
+  this repo day-one; consumer CI stops bypass, verifier neutrality stays
+  the hosted-attestation rung and the docs say so.
+- **contribution-surface** [spec: SPEC-contribution-surface.md] — the
+  fixture-first contribution contract: bug report = failing fixture pair
+  verified by CI, PRs battery-green, DCO sign-off, honest bandwidth
+  statement; issue/PR templates route non-fixture reports to Discussions;
+  Apache-2.0 untouched (license is not a contribution lever).
 - **template-tiering** [spec: spec-kit/SPEC-template-tiering.md] — ruling:
   kit SPECs travel (vendor-whole install), so check-comment-tier governs
   templates/ while check-spec-pointer keeps a placeholders-by-design
