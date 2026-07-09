@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **ci-backstop** [spec: gate-sdk/SPEC-ci-backstop.md] — the server-side
-  enforcement backstop: a gates-workflow template in gate-sdk (battery +
-  consumer fixture-runner placeholder, checkout-and-bash only), wired in
-  this repo day-one; consumer CI stops bypass, verifier neutrality stays
-  the hosted-attestation rung and the docs say so.
 - **contribution-surface** [spec: SPEC-contribution-surface.md] — the
   fixture-first contribution contract: bug report = failing fixture pair
   verified by CI, PRs battery-green, DCO sign-off, honest bandwidth
@@ -109,6 +104,7 @@
 
 ## Done
 
+- ci-backstop
 - drift-trajectory
 - adoption-track
 - docs-cmd-gate

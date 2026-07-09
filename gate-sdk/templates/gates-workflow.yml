@@ -1,0 +1,41 @@
+# gate-sdk CI backstop — the server-side enforcement tier (gate-sdk/SPEC.md
+# §Enforcement tiers). The local pre-commit hook is opt-in and bypassable by
+# design (`git commit --no-verify`, or a clone that never ran install-hooks.sh);
+# this workflow is the authoritative outer backstop that closes both gaps on
+# every push and pull request.
+#
+# Scope boundary: consumer-owned CI stops *bypass* — it cannot stop an agent
+# editing this workflow itself in the same change. A tamper-proof verifier
+# (verifier neutrality) is the deferred hosted-attestation-service rung, out of
+# scope here rather than overclaimed.
+#
+# Copied out like every gate-sdk template. Checkout + bash only: no caching, no
+# matrix, no third-party actions, so the surface an agent could tamper with
+# stays minimal and reviewable. To adopt: copy to .github/workflows/gates.yml,
+# set your default-branch name below, fill the fixture-runner placeholder with
+# your battery list, and require this workflow's status check before merge
+# (branch-protection recipe: the install-page docs). A filled example is this
+# repo's own .github/workflows/gates.yml.
+name: gates
+
+on:
+  push:
+    branches: [main]           # set to your default branch (e.g. master)
+  pull_request:
+    branches: [main]           # set to your default branch (e.g. master)
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: full battery
+        run: bash gate-sdk/bin/run-gates.sh
+      # PLACEHOLDER — replace with your consumer battery list: one step per kit
+      # fixture runner and guard-test runner your CLAUDE.md names, e.g.
+      #   - name: gate-sdk fixtures
+      #     run: bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
+      - name: fixture runners
+        run: |
+          echo "PLACEHOLDER: replace this step with your fixture/guard-test runners" >&2
+          exit 1

@@ -196,7 +196,10 @@ Three concentric tiers, each an outer backstop for the one inside it:
   whole-tree before the work leaves the machine.
 - **CI** (server-side, authoritative) — `run-gates.sh` + `run-gate-tests.sh`
   on every push, with branch protection making a merge conditional on them.
-  Only this tier is a guarantee; the inner tiers are latency optimizations.
+  The copy-out is `templates/gates-workflow.yml` (see there); only this tier is
+  a guarantee, and it stops bypass but not workflow self-edit — the tamper-proof
+  verifier is the deferred hosted-attestation rung. The inner tiers are latency
+  optimizations.
   `run-gate-tests.sh` runs as its own step, not folded into the battery —
   `check-gate-fixture-coverage` asserts fixtures *exist* but never *executes*
   them; the execution is the gate-authority backstop, kept separate so a
@@ -699,3 +702,29 @@ template (structure + fail-closed + output contract). A new gate is a
 copy-edit of it, shipping with its fixture pair. It is a template, never a
 registry member; structure is copied, not imported, so it stays per-gate and
 legible.
+
+### templates/gates-workflow.yml
+
+The CI backstop template — the server-side outer tier of §Enforcement tiers,
+copied out to a consumer's `.github/workflows/gates.yml`. It closes the two
+gaps the local hook cannot by construction: a `--no-verify` commit, and a clone
+that never ran `install-hooks.sh`. Trigger is push + pull_request on the
+consumer's default branch (a fill-in — the template ships `main` and says so);
+step one is `run-gates.sh` (the full battery); step two is a fail-closed
+placeholder the consumer replaces with its own fixture/guard-test runners (an
+unfilled copy reddens CI, the fill-me signal). Checkout + bash only — no
+caching, no matrix, no third-party actions — so the workflow surface an agent
+could tamper with stays minimal and reviewable. This repo's own
+`.github/workflows/gates.yml` is the filled example; both files register in
+`core-files.list` so their silent deletion is red, and the instance needs no
+freshness gate — a workflow invoking a retired script reddens in CI on its next
+run, the drift signal working as designed.
+
+Scope boundary, stated in the template header rather than overclaimed:
+consumer-owned CI stops *bypass*, but cannot stop an agent editing the workflow
+itself in the same change. A tamper-proof verifier (verifier neutrality) is the
+deferred hosted-attestation-service rung. CI is not a smoke surface — it runs
+the real battery, so it is not installed by any kit's `smoke/` (§Consumer
+smoke); the branch-protection recipe that makes the check a required merge gate
+is a GitHub setting, so it lands as install-page docs, not committable
+mechanism.

@@ -15,6 +15,7 @@ SPEC-*.md
 
 # Workflow + gates machinery
 .claude
+.github
 .workflow
 scripts
 

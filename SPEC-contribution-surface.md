@@ -20,7 +20,7 @@ New files:
   - bug report = failing fixture pair: a gate missing a violation
     arrives as a `bad/` case the gate wrongly passes; a false positive
     arrives as a `good/` case it wrongly flags — submitted as a PR the
-    CI backstop (gate-sdk/SPEC-ci-backstop.md) verifies mechanically;
+    CI backstop (gate-sdk/SPEC.md §templates/gates-workflow.yml) verifies mechanically;
   - PRs must be battery-green in CI; a PR that weakens a gate instead of
     fixing the tree is the defect (`check-gate-tamper`'s doctrine, cited
     not restated);
@@ -44,8 +44,9 @@ Anti-drift wiring: `CONTRIBUTING.md` joins the governed doc set via the
 glob, no second knob (link resolution on land, command/knob resolution
 when `check-docs-cmd` follows); `CONTRIBUTING.md` and the three `.github/`
 files register in `scripts/core-files.list` so silent deletion is red;
-`CONTRIBUTING.md` joins `scripts/root-allowlist.list` (`.github` enters
-via the ci-backstop amendment).
+`CONTRIBUTING.md` joins `scripts/root-allowlist.list` (`.github` is already
+allowlisted — the CI backstop, gate-sdk/SPEC.md §templates/gates-workflow.yml,
+put it there).
 
 ## Producers and consumers
 

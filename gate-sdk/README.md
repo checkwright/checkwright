@@ -31,7 +31,14 @@ honest:
   coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest
   / hook / graph-artifact freshness (`check-graph`).
 - `templates/check-skeleton.sh` — the copy-paste skeleton a new gate starts
-  from.
+  from; `templates/gates-workflow.yml` — the CI workflow a consumer copies to
+  `.github/workflows/gates.yml`.
+
+Enforcement runs in three concentric tiers: the generated `pre-commit` hook is
+the local, bypassable inner tier; the CI workflow is the server-side backstop
+that catches a `--no-verify` or a clone that never opted in; a tamper-proof
+hosted verifier (so CI cannot be edited away in the same change) is out of
+scope here, a deferred rung.
 
 The design contracts, the manifest grammar, and each component's full contract
 live in [SPEC.md](SPEC.md).

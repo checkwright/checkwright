@@ -29,7 +29,7 @@ Layout (new directory convention, repo-root governance — no owning kit):
   is a dead link on the published site — so kit pages cite source textually.
 - `docs/install.md` — repo-level install and upgrade: the vendor-whole
   flow across kits, the two-phase upgrade contract (below), and the
-  branch-protection recipe section gate-sdk/SPEC-ci-backstop.md cites.
+  branch-protection recipe section gate-sdk/SPEC.md §templates/gates-workflow.yml cites.
 - `docs/demo.md` — the walkthrough page (the slot under `docs/`
   SPEC-demo-walkthrough.md cites; that amendment owns its content).
 - `docs/methodology.md` — the delivery-methodology essay surface.

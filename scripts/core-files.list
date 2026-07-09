@@ -10,6 +10,10 @@ TASK-QUEUE.md
 README.md
 CLAUDE.md
 
+# CI backstop: the workflow template + this repo's filled instance (§ci-backstop).
+gate-sdk/templates/gates-workflow.yml
+.github/workflows/gates.yml
+
 # Gate registry + graph rule content + the checked pre-commit/graph projections.
 scripts/gates.list
 scripts/graph-vocab.sh
