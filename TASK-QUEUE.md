@@ -37,6 +37,16 @@
   DNS-side, not in-repo.
 - **readme-ci-badge** — add the gates workflow status badge to the top of
   README.md, linking to the workflow's Actions page.
+- **docs-kit-page-links** — the docs pages must read in the GitHub tree
+  view too (README's "same pages served in-repo" promise): kit-map rows
+  link `<kit>/index.md` explicitly (a bare `<kit>/` opens a folder — tree
+  view renders README.md, not index.md), and each kit page's back-link
+  targets `../index.md#the-kits`, not the page top. Ruling: the per-kit
+  dirs stay — stable per-kit URLs with room for extra pages beat one
+  bundled index; jekyll-relative-links maps the .md links on the rendered
+  site. Rides with it: relax check-kit-registration's row match from the
+  literal `](<kit>/)` to the `](<kit>/` prefix, fixture pair updated to
+  prove both link forms.
 
 ## Deferred
 
@@ -103,6 +113,12 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **docs-link-convention-gate** [needs-spec] — a docs-scoped gate holding
+  the link conventions docs-kit-page-links settles: no directory-target
+  relative link in docs/ living pages (name the file), kit-page back-links
+  carry their section anchor. Cheap and decidable, but let the convention
+  prove stable first — promote once the sweep has landed and held through
+  an iteration. Surfaced 2026-07-09 in public-positioning scope.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
