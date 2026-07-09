@@ -80,6 +80,15 @@
   FlowBench as prior art. Surfaced 2026-07-08 inside adoption-track; split
   out 2026-07-09 — the self-referential route (drift-trajectory) ships
   first and this rung upgrades the claim only if demand attests it.
+- **upgrade-path** [needs-spec] — the upgrade demo/tooling rung: an upgrade
+  smoke that vendors tag N into a scratch consumer, re-vendors N+1 over it,
+  and asserts phase-A determinism (nothing changes outside kit dirs plus
+  generated artifacts) and that the battery's red set matches the release
+  note's tightened-gates declaration; optionally a thin installer CLI
+  wrapping the git-native vendor copy (registries stay namespace
+  reservations, never a dependency channel). The two-phase upgrade
+  contract itself lands with docs-site (SPEC-docs-site.md); this rung is
+  buildable once a second tag exists. Surfaced 2026-07-09.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and

@@ -52,6 +52,24 @@ The announcement post's canonical copy lives in `docs/posts/`; external
 publication (newsletter/blog platforms) is a copy that links back — the
 repo copy is the one under gates.
 
+Versioning and upgrade contract (ruling, scope 2026-07-09): repo-level
+semver via git tags, kits in lockstep — a kit gets its own version only
+if it is split out; the first tag (`v0.1.0`) rides the announcement.
+Distribution stays git-native and vendored-committed: the gates read
+tracked files and the audit story needs the governance layer inside the
+reviewed tree, so the package registries remain namespace reservations,
+never a dependency channel. The install page documents upgrades as two
+phases — (A) deterministic: replace the vendored kit directories
+wholesale at the target tag (consumers never edit kit files, so the
+sync is lossless) and regenerate the generated artifacts; (B)
+gate-driven: run the full battery and reconcile the red set, which *is*
+the migration worklist, reading the release note for intent. Release
+notes are dated posts, each carrying tightened-gates and renamed-knobs
+sections; the consumer-owned residue phase A never touches — shadowed
+gates, copied-out templates, knob renames in consumer config — is the
+release note's checklist. Upgrade tooling (the tag-N→N+1 upgrade smoke,
+an optional thin installer CLI) is the deferred `upgrade-path` rung.
+
 Seam: docs describe mechanism with placeholder vocabulary only (the
 graph-vocab pattern); no platform rule content, term lists, or private
 names — `check-tree-terms` already fences this mechanically and governs
