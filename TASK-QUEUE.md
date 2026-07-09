@@ -14,12 +14,6 @@
 
 ## Technical Debt
 
-- **docs-domain-cutover** — move the docs site to checkwright.dev:
-  first step dig-verifies the apex already resolves to GitHub Pages and
-  stops red if it does not (DNS is a user-side step); then flip docs/CNAME,
-  update the docs URL in README.md and any page that names it, and confirm
-  Pages re-issues the cert. The retiring docs.vasyltretiakov.dev 301 is
-  DNS-side, not in-repo.
 - **readme-ci-badge** — add the gates workflow status badge to the top of
   README.md, linking to the workflow's Actions page.
 - **docs-kit-page-links** — the docs pages must read in the GitHub tree
@@ -129,5 +123,6 @@
 - extraction-desemantics
 - brevity-empty-section-fail-closed
 - contributing-support-model
+- docs-domain-cutover
 
 ## Lessons Learned

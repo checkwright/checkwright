@@ -14,7 +14,7 @@ commit, and the human (or agent) residue is held to the irreducibly semantic
 judgment alone. Checkwright packages that machinery — and this repository
 governs itself with its own kits, day one.
 
-Docs live at <https://docs.vasyltretiakov.dev> — the same pages served in-repo
+Docs live at <https://checkwright.dev> — the same pages served in-repo
 under [`docs/`](docs/index.md).
 
 ## Kits
