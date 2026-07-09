@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Behavioral cases the one-pair good/bad harness cannot hold: the slash-comment
 # surface, positional-construct rescue (with a consumer-supplied language
-# roster), and the .txt state-file restricted roster. Each needs a per-case
-# SPEC_KIT_CONFIG_FILE carrying array knobs, which run-gate-tests passes to
-# neither. The good/bad pair covers the shell classifier (directive run, exempt,
-# heredoc skip); these cover the mechanism a consumer activates by widening the
-# surface.
+# roster), the .txt state-file restricted roster, and the templates/ surface
+# (this gate governs template stubs via _with_templates where check-spec-pointer
+# exempts them — a difference only the derived surface shows, since an explicit
+# SPEC_KIT_COMMENT_SURFACE bypasses the split). Each needs a per-case
+# SPEC_KIT_CONFIG_FILE, which run-gate-tests passes to neither. The good/bad pair
+# covers the shell classifier (directive run, exempt, heredoc skip); these cover
+# the mechanism a consumer activates by widening the surface.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -54,9 +56,25 @@ mkcfg "$SANDBOX/rs.sh" 'SPEC_KIT_COMMENT_SURFACE=(ok.rs)'   'SPEC_KIT_COMMENT_PO
 mkcfg "$SANDBOX/bad.sh" 'SPEC_KIT_COMMENT_SURFACE=(bad.rs)' 'SPEC_KIT_COMMENT_POSITIONAL=(unsafe)'
 mkcfg "$SANDBOX/txt.sh" 'SPEC_KIT_COMMENT_SURFACE=(state.txt)'
 
-check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring
-    local label="$1" cfg="$2" want="$3" sub="$4" out rc
-    out="$(env SPEC_KIT_CONFIG_FILE="$SANDBOX/$cfg" "$GATE" "$SANDBOX" 2>&1)"; rc=$?
+# Derived-surface trees (no SPEC_KIT_COMMENT_SURFACE) so the templates/ prune
+# axis is live. A thinned template stub passes; a narrating one is red.
+: >"$SANDBOX/derived.sh"
+mkdir -p "$SANDBOX/tmpl-good/templates" "$SANDBOX/tmpl-bad/templates"
+cat >"$SANDBOX/tmpl-good/templates/thin.sh" <<'EOF'
+# shellcheck shell=bash
+# spec: your-kit/SPEC.md §Layout and configuration — knob table + install; set only what you override
+EOF
+cat >"$SANDBOX/tmpl-bad/templates/narration.sh" <<'EOF'
+# shellcheck shell=bash
+# This standalone header narrates the config and restates the design rationale
+# that belongs in the owning kit SPEC — exactly the prose a governed template
+# must not carry once the tier gate scans templates/.
+#YOUR_KIT_KNOB=default
+EOF
+
+check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring $5=root(default SANDBOX)
+    local label="$1" cfg="$2" want="$3" sub="$4" root="${5:-$SANDBOX}" out rc
+    out="$(env SPEC_KIT_CONFIG_FILE="$SANDBOX/$cfg" "$GATE" "$root" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -69,10 +87,12 @@ check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring
 check_case "slash-positional-rescue" rs.sh  0 "COMMENT-TIER: clean"
 check_case "slash-standalone-flag"    bad.sh 1 "standalone slash block restates"
 check_case "txt-restricted-roster"    txt.sh 1 "not in the roster"
+check_case "templates-thinned-ok"  derived.sh 0 "COMMENT-TIER: clean"          "$SANDBOX/tmpl-good"
+check_case "templates-narration-red" derived.sh 1 "the tier gate scans templates" "$SANDBOX/tmpl-bad"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster, 3 cases)"
+echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance, 5 cases)"
 exit 0

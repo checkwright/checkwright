@@ -151,11 +151,11 @@ spec_manifest_files() {
     fi
 }
 
-# spec: spec-kit/SPEC.md §lib/spec.sh — the governed comment surface shared by
-# check-comment-tier and check-spec-pointer (explicit SPEC_KIT_COMMENT_SURFACE
-# globs, else derived shell sources + workflow *.txt state files).
-spec_comment_surface() {
-    local root="${1:-.}" g f
+# spec: spec-kit/SPEC.md §lib/spec.sh — the two governed comment surfaces: the
+#   tier gate scans _with_templates, the pointer gate scans the pruned surface
+#   (templates exempt as placeholders-by-design).
+_spec_comment_surface() {  # $1=root  $2=1 keeps templates/ shell sources, else prunes them
+    local root="${1:-.}" incl="${2:-0}" g f
     if [[ ${#SPEC_KIT_COMMENT_SURFACE[@]} -gt 0 ]]; then
         shopt -s nullglob globstar
         for g in "${SPEC_KIT_COMMENT_SURFACE[@]}"; do
@@ -163,12 +163,20 @@ spec_comment_surface() {
         done
         shopt -u nullglob globstar
     else
-        gate_find "$root" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
+        if [[ "$incl" == "1" ]]; then
+            gate_find "$root" -name '*.sh' -type f 2>/dev/null | _spec_prune_kit_roots "$root" | sort
+        else
+            gate_find "$root" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
+        fi
         shopt -s nullglob
         for f in "$root/${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*.txt; do printf '%s\n' "$f"; done
         shopt -u nullglob
     fi
 }
+
+spec_comment_surface() { _spec_comment_surface "$1" 0; }
+
+spec_comment_surface_with_templates() { _spec_comment_surface "$1" 1; }
 
 spec_comment_whitelisted() {  # $1=root-relative path — true when it matches a consumer whitelist glob
     local rel="$1" g

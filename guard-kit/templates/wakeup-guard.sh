@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
-# spec: guard-kit/SPEC.md §wakeup-guard — PreToolUse(ScheduleWakeup|CronCreate)
-# hook: deny self-scheduled wakeups, log the attempt.
-#
-# CONSUMER COPY. Optional second guard, same framework, opposite posture:
-# fail-CLOSED. Its hook *matcher* already proves the tool identity, so a
-# logging or parse failure still denies. Deliberate scheduling stays possible
-# by disabling the hook for a session — the block is the default, not a
-# capability removal.
+# spec: guard-kit/SPEC.md §wakeup-guard — consumer-copy PreToolUse(ScheduleWakeup|CronCreate) hook: deny self-scheduled wakeups fail-closed, log the attempt
 set -uo pipefail
 
 # shellcheck disable=SC2034  # consumed by the sourced lib/guard.sh (guard_block et al.)

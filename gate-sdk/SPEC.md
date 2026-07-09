@@ -129,11 +129,15 @@ reason.
 Every script in the family — the consumer's gates and the kit's own `lib/`,
 `bin/`, `checks/`, `templates/` — passes ShellCheck at `-S warning`, enforced
 by `check-shellcheck`. Template stubs are lint-governed (they are runnable
-shell a consumer copies out) even though the prose gates `check-comment-tier`
-and `check-spec-pointer` skip them — a template's installer-facing comments
-and post-copy `source` paths are legitimate there. A false positive is
-silenced inline with `# shellcheck disable=SCxxxx` plus a justifying comment,
-never a blanket `.shellcheckrc`.
+shell a consumer copies out) — and `check-comment-tier` governs their comments
+too: a copied-out template's `spec:` line resolves against the vendored kit
+path, so its comments are directives like any source, thinned to the
+`# graph:`/`# spec:` lines and the placeholder scaffolding the consumer fills
+in (spec-kit/SPEC.md §check-comment-tier). Only `check-spec-pointer` skips a
+template, its `spec:` line being a placeholder unresolvable by design
+(§check-spec-pointer). A template's post-copy `source` paths are legitimate. A
+false positive is silenced inline with `# shellcheck disable=SCxxxx` plus a
+justifying comment, never a blanket `.shellcheckrc`.
 
 ### Shared cross-gate values
 

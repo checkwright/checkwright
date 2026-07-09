@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
-# spec: delegation-kit/SPEC.md §The delegation model — PreToolUse(Agent) budget guard: block on PAUSE, advise otherwise
-#
-# CONSUMER COPY. Copy into your gates dir (default scripts/) and register under
-# PreToolUse matcher `Agent` (delegation-kit/SPEC.md §Layout and configuration).
-# Composes guard-kit's lib/guard.sh primitives and delegation-kit's
-# bin/usage-verdict.sh; override the vendored paths with GUARD_KIT_LIB /
-# DELEGATION_KIT_VERDICT_BIN if the kits are vendored elsewhere. Registration is
-# the opt-in valve: a consumer wanting pure advice simply does not wire it.
+# spec: delegation-kit/SPEC.md §The delegation model — consumer-copy PreToolUse(Agent) budget guard: block on PAUSE, advise otherwise; register under matcher `Agent` (§Layout and configuration)
 set -uo pipefail
 
 # shellcheck disable=SC2034  # consumed by the sourced lib/guard.sh (guard_block/guard_advise)

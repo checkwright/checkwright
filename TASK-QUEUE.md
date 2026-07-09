@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **template-tiering** [spec: spec-kit/SPEC-template-tiering.md] — ruling:
-  kit SPECs travel (vendor-whole install), so check-comment-tier governs
-  templates/ while check-spec-pointer keeps a placeholders-by-design
-  exemption; template headers thin to directive lines, installer prose
-  single-sources in the owning kit's SPEC/README.
-
 ## Technical Debt
 
 - **docs-site** [spec: SPEC-docs-site.md] — implementation landed (docs/ pages,
@@ -99,6 +93,7 @@
 
 ## Done
 
+- template-tiering
 - contribution-surface
 - ci-backstop
 - drift-trajectory

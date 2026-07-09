@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
-# CONSUMER COPY — a full-UX usage.txt producer (delegation-kit/SPEC.md §usage-verdict,
-# §The usage.txt contract). Wire it as your harness statusLine command (or copy it
-# into your gates dir and wire that): it reads the harness rate-limit JSON on stdin,
-# atomically writes the snapshot usage-verdict reads, AND renders a status bar —
-# model/effort, a context gauge, the 5h and 7d rate windows with reset countdowns,
-# and the iteration@stage readout. The snapshot write is the contract; the bar is
-# reference UX a consumer may restyle. Requires jq.
+# spec: delegation-kit/SPEC.md §The usage.txt contract — consumer-copy statusLine producer: writes the snapshot usage-verdict reads and renders the reference status bar; requires jq
 input=$(cat)
 
 MODEL=$(echo "$input" | jq -r '.model.display_name // empty')
@@ -14,15 +8,9 @@ EFFORT=$(echo "$input" | jq -r '.effort.level // empty')
 CTX=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
 FIVE_H=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
 FIVE_H_RESETS=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
-# The weekly pair arms usage-verdict's second pause axis; account/tier feed usage-trend's
-# per-account/tier segmentation. tokens_in/tokens_out stay defined in the contract for
-# third-party producers but ship no producer here — this payload carries no cumulative
-# token count (the dead-producer rule).
 SEVEN_D=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
 SEVEN_D_RESETS=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
-# A 10-cell gauge: the pct centered in the bar, filled cells colored green/amber/red
-# by threshold, the remainder dim. Pure ANSI — no external asset (§Self-contained).
 _gauge() {
   local pct=${1%%.*} width=10 filled bg fg=$'\033[1;38;5;231m' lbl left right out="" i
   pct=${pct:-0}
@@ -54,7 +42,6 @@ _remaining() {
   else                      printf '%dh%dm' "$hours" "$minutes"; fi
 }
 
-# iteration@stage from the queue header (queue-kit's format — generic mechanism).
 ITER=""; STAGE=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ -n "$ROOT" ] && [ -f "$ROOT/TASK-QUEUE.md" ]; then
@@ -64,9 +51,6 @@ if [ -n "$ROOT" ] && [ -f "$ROOT/TASK-QUEUE.md" ]; then
 fi
 
 USAGE_FILE="${DELEGATION_KIT_USAGE_FILE:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt}"
-# account/tier live in the local account config, not the stdin payload: the account
-# UUID identifies whom a login switch is to (usage-trend groups per account); the
-# subscription tier is the denominator behind the percentages.
 CRED_FILE="${DELEGATION_KIT_CRED_FILE:-${USAGE_FILE%/*}/.credentials.json}"
 ACCOUNT_CONFIG="${DELEGATION_KIT_ACCOUNT_CONFIG:-$HOME/.claude.json}"
 TIER=""; ACCOUNT=""
@@ -83,11 +67,7 @@ TIER=""; ACCOUNT=""
   [ -n "$TIER" ]           && printf 'tier=%s\n'                "$TIER"
 } > "${USAGE_FILE}.tmp" && mv "${USAGE_FILE}.tmp" "$USAGE_FILE"
 
-# Optional dense sampling: statusLine fires far more often than the per-session /
-# per-dispatch usage-verdict calls, so a consumer wanting a denser trend history can
-# append a sample every render (usage-verdict logs one line when DELEGATION_KIT_USAGE_HISTORY
-# is set, whatever the verdict) — the verdict path is the single append author:
-#   [ -n "${DELEGATION_KIT_USAGE_HISTORY:-}" ] && bash delegation-kit/bin/usage-verdict.sh >/dev/null 2>&1 || true
+# spec: delegation-kit/SPEC.md §The usage.txt contract — optional dense sampling drives usage-verdict from the render path (the single append author); a consumer opts in with DELEGATION_KIT_USAGE_HISTORY set
 
 SB="[${MODEL:-?}${EFFORT:+-$EFFORT}]·ctx $(_gauge "$CTX")"
 SB="$SB·5h $(_gauge "${FIVE_H:-0}")"; [ -n "$FIVE_H_RESETS" ] && SB="$SB $(_remaining "$FIVE_H_RESETS")"

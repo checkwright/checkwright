@@ -146,13 +146,13 @@ STYLE == "slash" {
 END { flush_block(0) }
 AWK
 
-# spec: spec-kit/SPEC.md §check-comment-tier — the governed surface (shared with
-# check-spec-pointer via lib/spec.sh: SPEC_KIT_COMMENT_SURFACE globs, else derived
-# shell sources plus the workflow *.txt state files).
+# spec: spec-kit/SPEC.md §check-comment-tier — the governed surface via
+#   lib/spec.sh; the _with_templates variant adds templates/ shell sources
+#   this gate governs where check-spec-pointer exempts them.
 declare -a SURFACE=()
 while IFS= read -r f; do
     [[ -n "$f" ]] && SURFACE+=("$f")
-done < <(spec_comment_surface "$ROOT")
+done < <(spec_comment_surface_with_templates "$ROOT")
 
 errors=()
 scanned=0

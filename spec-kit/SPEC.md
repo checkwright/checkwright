@@ -250,12 +250,20 @@ must parse identically), the canonical-spec/amendment finders the
 spec-scanning gates share, the manifest-set finder (`spec_manifest_files`) the
 narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`,
 amendments excluded — so its members read one identical set, and the governed
-comment-surface adapters
-(`spec_comment_surface` / `spec_comment_whitelisted`) `check-comment-tier`
-and `check-spec-pointer` scan the same source set through. The finders skip
-a `templates/` skeleton (a copyable stub, not governed content — the same
-rationale as the gate-tests
-prune) and, unless `SPEC_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under
+comment-surface adapters (`spec_comment_whitelisted` plus two finders that
+`check-comment-tier` and `check-spec-pointer` scan through). The two comment
+gates read *different* surfaces: `spec_comment_surface` prunes `templates/`
+shell sources, and `spec_comment_surface_with_templates` keeps them.
+`check-spec-pointer` scans the pruned set — a template's `spec:` line is a
+placeholder unresolvable by design (§check-spec-pointer). `check-comment-tier`
+scans the with-templates set — a copied-out template's `spec:` pointer resolves
+against the vendored kit path (kit SPECs travel with the vendor-whole install),
+so its comments are governed like any source (§check-comment-tier). Which
+finder a gate uses is kit contract, not consumer config — a consumer wanting
+the old blanket exemption shadows the gate. The canonical-spec/amendment
+finders skip a `templates/` skeleton (a copyable stub, not governed content —
+the same rationale as the gate-tests prune) and, unless
+`SPEC_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under
 the scan root (a dependency's docs; an ancestor kit root — the case when a
 kit's own gate fixture dir is the scan root — never prunes). Values and
 adapters only, never gate structure.
@@ -450,8 +458,12 @@ genuinely-local fact neither tier owns, and exempting a restatement rather
 than deleting it is itself the defect — a long roster (a `usage:` option
 list, a header) restructures into directive-anchored short paragraphs or
 trims, never launders prose past the cap. The default surface is shell
-(`#`),
-with the `.workflow/*.txt` state files blessing only `contract:`/`see`;
+(`#`) — `templates/` stubs included: a copied-out template's `spec:` line
+resolves against the vendored kit path (kit SPECs travel with the
+vendor-whole install), so its comments are directives like any source and
+this gate governs them (`spec_comment_surface_with_templates`), where
+`check-spec-pointer` exempts them as placeholders-by-design — with the
+`.workflow/*.txt` state files blessing only `contract:`/`see`;
 slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships
 as mechanism and activates when a consumer widens `SPEC_KIT_COMMENT_SURFACE`
 to a language that needs it. Positional rescue is language-agnostic — its
@@ -490,10 +502,17 @@ Calibration: forward direction only. The reverse — flagging a requirement with
 no inbound pointer as uncovered code — needs a "what counts as a requirement"
 notion that risks false positives against the cheap-and-FP-free bar, so it is
 ruled out (a separate task with its own ruling if ever wanted; this gate
-reserves no syntax for it). Governed-surface discovery and configuration are
-`check-comment-tier`'s — the shared `spec_comment_surface` /
-`spec_comment_whitelisted` adapters in `lib/spec.sh` and the same
-`SPEC_KIT_COMMENT_*` knobs — so no new config knob. `precommit` tier.
+reserves no syntax for it). Configuration is shared with `check-comment-tier` —
+the `spec_comment_whitelisted` adapter in `lib/spec.sh` and the same
+`SPEC_KIT_COMMENT_*` knobs, so no new config knob — but this gate scans
+`spec_comment_surface`, which prunes `templates/` shell sources where
+`check-comment-tier` keeps them. The split is by design, not a "SPECs don't
+travel" claim: a template's `spec: <your SPEC> §check-<area>` line is a
+placeholder the consumer fills in, unresolvable *by design* in the kit's own
+tree — resolving it there would check the consumer's homework against a stub.
+The tier gate still governs those template comments by *shape* (they must be
+directives), so each gate draws the `templates/` line where its own semantics
+put it. `precommit` tier.
 
 Retention ruling: the standing doubt — forward-only checking plus the
 basename↔§heading convention make the pointer largely redundant, its gloss a

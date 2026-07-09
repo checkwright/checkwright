@@ -241,7 +241,11 @@ readout parsed from the queue header — self-contained ANSI, no external asset
 reference UX a consumer may restyle or discard. Any producer honoring the
 contract works — the source is pluggable (`DELEGATION_KIT_USAGE_FILE`), which
 de-hardcodes the source platform's single-operator `CLAUDE_CONFIG_DIR`
-assumption.
+assumption. Because the statusline fires far more often than the per-session /
+per-dispatch verdict calls, a consumer wanting a denser trend history can drive
+sampling from the render path — `usage-verdict` stays the single append author
+(§usage-verdict), so the statusline calls it (with `DELEGATION_KIT_USAGE_HISTORY`
+set) rather than appending the log itself.
 
 **The sample line.** With sampling enabled (§usage-verdict), `usage-verdict`
 appends one line per parsed snapshot — the trend log's wire contract between
