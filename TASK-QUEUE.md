@@ -135,3 +135,9 @@
 - docs-kit-page-links
 
 ## Lessons Learned
+
+- Committing the `enter-stage` flip+stamp with `--no-verify` is a reflex, not a
+  cause. `enter-stage.sh` already refuses when `check-stage-entry` is red, so
+  the hook it skips is exactly the battery that would have confirmed the stamp
+  it just wrote. The bypass is reserved for a one-off with stated cause; a
+  stage flip is never that.
