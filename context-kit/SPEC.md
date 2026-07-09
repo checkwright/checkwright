@@ -11,10 +11,10 @@ meter that tracks the always-loaded surface against a per-iteration
 baseline, a brevity gate over the densest always-loaded section, and the
 close-stage brevity pass that reacts to the meter's delta.
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the index mechanism, the hook skeleton, the meter, and the
-brevity machinery; the platform's product-shaped surfaces (proto and
-diagram indexes, its doc roster, its harvest pipeline) stay behind.
+brevity machinery; a consumer's product-shaped surfaces (proto and diagram
+indexes, its doc roster, its harvest pipeline) stay in the consumer repo
+(§Out of scope).
 
 ## Index-first reading
 
@@ -63,7 +63,7 @@ session. Steps, in order:
    consumer has a drift report; silently absent otherwise (drift-kit owns
    the report; the seam is this optional line).
 4. **Stage-conditioned nudges** — short reminders keyed on the current
-   stage header (the platform's delegation nudge is the exemplar). Marked
+   stage header (this repo's delegation nudge is the exemplar). Marked
    consumer section: which stages get which nudge is consumer judgment.
 5. **Scratch sweep** — reclaim `${GATE_SDK_TMP_DIR:-.tmp}` entries older
    than a day, depth-first (`-mindepth 1 -depth`) so stray directories are
@@ -94,11 +94,10 @@ resolvable). The approximation is deliberate: the meter must never run the
 session-context hook itself — the hook emits this meter's own output line,
 so self-measurement would recurse and inflate.
 
-On the platform this meter lived inline in `drift-report.sh` as one KPI;
-it is extracted here because the *metric* is context economics and the
-*report* is drift reporting — drift-kit's `kpi-always-loaded` consumes
-this script for its row instead of re-embedding the measurement. New name on a governed surface: `always-loaded.sh` (the
-platform had no standalone name to keep).
+The meter lives here, not in `drift-report.sh`, because the *metric* is
+context economics and the *report* is drift reporting — drift-kit's
+`kpi-always-loaded` consumes this script for its row instead of re-embedding
+the measurement.
 
 - **Default invocation** prints one line: total, per-part breakdown, and
   the delta against the baseline when one exists.
@@ -110,15 +109,15 @@ platform had no standalone name to keep).
   `always-loaded-baseline.txt`, committed): a `# contract:` header
   pointing here, then one data line
   `<total-lines> <surface-lines> <baseline-commit>`. Trailing extra
-  fields are tolerated and preserved-ignored — the platform's file carries
-  a fourth (its settings-local count, a guard-kit-adjacent KPI owned by
-  its drift report), so the kit reads the platform's file unchanged.
+  fields are tolerated and preserved-ignored — a consumer's file may carry
+  a fourth (a settings-local count, say, a guard-kit-adjacent KPI owned by
+  its drift report), and the kit reads such a file unchanged.
 
 ## The brevity gate
 
 `checks/check-brevity.sh` — a section-agnostic name: the governed section
-is a knob, so no section name binds the gate (the platform's
-`check-convention-brevity` is its section-specific counterpart). It scans one designated
+is a knob, so no section name binds the gate (a consumer's
+`check-convention-brevity` would be its section-specific counterpart). It scans one designated
 always-loaded file for a bulleted section where each `- **name:**` bullet
 carries a line budget, and flags a bullet that is **over budget and cites
 a deeper doc** (carries a `§` pointer) — over-long while admitting its
@@ -127,10 +126,10 @@ bullets with no pointer pass (the latter may genuinely own their content);
 `<!-- brevity-exempt: <reason> -->` on the bullet's first line or the line
 above blesses a bullet whose every line is load-bearing.
 
-The pointer default widens from the platform's `HANDBOOK §` to any `§`:
-"cites a deeper doc" is the mechanism-level meaning, the platform's
-handbook was its instance, and the superset still matches every platform
-pointer. Ships with a `good/`+`bad/` fixture pair and registers in the
+The pointer default is any `§`, not a single doc name like `HANDBOOK §`:
+"cites a deeper doc" is the mechanism-level meaning and a consumer's handbook
+is one instance of it, so the superset matches every such pointer. Ships with
+a `good/`+`bad/` fixture pair and registers in the
 consumer's `gates.list` (this repo's included).
 
 ## The close-stage brevity pass
@@ -174,7 +173,7 @@ context-kit/
 Config follows the established kit pattern: copy
 `templates/context-config.sh` into the gates dir (or point
 `CONTEXT_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset. Knobs (platform values as defaults):
+what the consumer left unset. Knobs (this repo's layout as defaults):
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`.
@@ -218,16 +217,14 @@ consumer's brevity file and asserts the battery reddens via
 
 ## Out of scope
 
-`proto-index` and `diagram-index` — indexes over platform-shaped surfaces
-(its proto layout, its two architecture HTML diagrams); a consumer names
-its own extra indexes in the hook template's footer. `check-md-refs` (its
-orientation-doc roster is rule content; the link-resolution mechanism is a
-possible later extraction, not this kit's) and `check-md-sections` (its
-required-heading map is rule content, and the queue surface it guards is
-already gated by queue-kit here). The close-stage harvest pipeline
-(`[pub]` lessons, publication paths) — product workflow, not context
-mechanism. `drift-report.sh` itself is drift-kit's surface — only its
-always-loaded KPI moved here, and the platform's drift report keeps its
-inline copy until the platform migrates. The platform's session-context
-consumer content — its delegation nudge wording, component roster, and
-extra index commands — stays in its own copied hook.
+Product-shaped indexes — a `proto-index` over a proto layout, a
+`diagram-index` over architecture HTML — are consumer surfaces; a consumer
+names its own extra indexes in the hook template's footer. `check-md-refs`
+(an orientation-doc roster is rule content; the link-resolution mechanism is
+unclaimed, not this kit's) and `check-md-sections` (a required-heading map is
+rule content, and the queue surface it guards is already gated by queue-kit).
+A close-stage harvest pipeline (`[pub]` lessons, publication paths) is
+product workflow, not context mechanism. `drift-report.sh` itself is
+drift-kit's surface — only the always-loaded KPI lives here. A consumer's
+session-context content — its delegation nudge wording, component roster,
+and extra index commands — stays in its own copied hook.

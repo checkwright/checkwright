@@ -53,7 +53,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 5. Optional — retune: copy `templates/delegation-config.sh` into your gates dir
    and override the budget thresholds, the gate-file globs, or the meta-layer
-   prefixes. Defaults are the extracted platform's single-operator layout.
+   prefixes. Defaults are this repo's single-operator layout.
 
 ## Use
 

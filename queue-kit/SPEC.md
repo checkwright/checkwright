@@ -9,11 +9,10 @@ tags) is grammar a gate can enforce, and everything a human writes freely
 and what a parser sees is the failure mode; all but one of the gates exist to
 close one instance of it each.
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the queue grammar and its gates only; a consumer's section
-names, wrap budget, and protocol vocabulary are config with the platform's
-values as defaults. Requires [gate-sdk](../gate-sdk/) (the gates follow its
-four contracts and resolve through its registry).
+names, wrap budget, and protocol vocabulary are config, with this repo's
+layout as the defaults. Requires [gate-sdk](../gate-sdk/) (the gates follow
+its four contracts and resolve through its registry).
 
 ## The queue format
 
@@ -113,7 +112,7 @@ slug → whole subtree; boundary = next sibling-or-shallower bullet, heading,
 `---`, or EOF, including the trailing blank so a range deletion leaves no
 double blank). `--collapse-deferred` replaces the deferred listing with a
 per-`###`-subsection tally — generic over whatever subsection names the file
-has (the platform's hardcoded tally table does not leave the platform), with
+has (a hardcoded tally table would be consumer rule content), with
 entries under no subsection tallied as `(top)`.
 
 ### check-queue-hygiene
@@ -213,8 +212,8 @@ Calibration: the trigger set (`QUEUE_KIT_PRECONDITION_REGEX`) is deliberately
 narrow — forward-looking phrasing only, past-tense narration stripped before
 matching — and scoped to the active sections (the deferred section uses
 "revisit when" as normal vocabulary and is exempt). FP-bearing by
-construction (parsing prose intent); the blocking grade is justified by an
-attested silent pick on the source platform and the bounded scope.
+construction (parsing prose intent); the blocking grade is justified by a
+silent pick attested in production use and the bounded scope.
 
 ### templates/
 
@@ -232,7 +231,7 @@ combined-tree copy clears the stage gates too.
 The amendment lifecycle around `[needs-spec]`/`[spec:]` (section-wide
 enforcement, promotion procedure, `check-amendment-queue`) is spec-kit's
 scope. Code-comment TODO scanning (`TODO(task:<slug>)` resolution against
-the queue) couples to source-file conventions and stays behind until a later
-kit rules on it. Task-output readers and delegation tooling are
-delegation-kit's scope. The platform's protocol prose, deferred-subsection
-taxonomy, and task bodies are rule content and never leave.
+the queue) couples to source-file conventions and is unclaimed until a kit
+rules on it. Task-output readers and delegation tooling are delegation-kit's
+scope. A consumer's protocol prose, deferred-subsection taxonomy, and task
+bodies are rule content and never ship.

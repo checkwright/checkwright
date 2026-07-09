@@ -19,10 +19,10 @@ The kit is vendored beside [gate-sdk](../gate-sdk/) (required); its gates
 register in the consumer's `gates.list` by name and resolve through gate-sdk's
 multi-kit path. Config is a sourced file, `evidence-config.sh` in the gates dir
 (or `EVIDENCE_KIT_CONFIG_FILE` elsewhere); the loader fills every unset knob
-with a platform default, then validates and exits 2 on a malformed machine (a
+with a default, then validates and exits 2 on a malformed machine (a
 suite name that is not a valid variable suffix) — a broken config gates nothing.
 
-Knobs, platform surface names as defaults:
+Knobs, this repo's surface names as defaults:
 
 - `EVIDENCE_KIT_SUITES` — the ordered suite names.
 - `EVIDENCE_KIT_RUN_<suite>` — the command that runs a suite (captured to a log
@@ -48,7 +48,7 @@ Knobs, platform surface names as defaults:
 
 ### lib/evidence.sh
 
-The sourced config loader: consumer config first, platform defaults fill what it
+The sourced config loader: consumer config first, kit defaults fill what it
 left unset, then validation. It also owns the shared adapters — `ek_parse` (the
 parser dispatch), `ek_diff` (the per-scenario baseline diff, §bin/diff-baseline.sh),
 `ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_queue_stage`
@@ -59,7 +59,7 @@ gate-sdk vendored beside it.
 
 The parser adapters map a captured log — and, for `exit-code`, the suite's exit
 status — to `<scenario> <pass|fail|ignore>` lines: `libtest` reads per-test
-result lines (the platform's Rust suites), `exit-code` emits one scenario per
+result lines (a Rust `cargo test` suite), `exit-code` emits one scenario per
 suite keyed off the suite command's exit (the adapter this repo dogfoods). Any
 other value is a consumer command run on the log.
 

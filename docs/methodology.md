@@ -42,10 +42,9 @@ discipline, permission friction, delegation, context economics, drift, and
 evidence. A kit is vendored into your repository whole and governs it from the
 inside. You adopt the ones that pay for themselves and leave the rest.
 
-The kits were extracted from a working platform's governance layer, and this
-repository governs itself with them from day one — the same gates that ship to
-you run on the tree that builds them. A methodology that its own authors will
-not run is a slide deck; this one is dogfooded or it is nothing.
+This repository governs itself with the kits from day one — the same gates that
+ship to you run on the tree that builds them. A methodology that its own authors
+will not run is a slide deck; this one is dogfooded or it is nothing.
 
 ## Where to go next
 

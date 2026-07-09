@@ -14,10 +14,9 @@ Advisory by construction: the report never fails a session, never joins
 `gates.list`, and reads *trend, not level* — a KPI's absolute value is
 noise, its direction across sessions is the signal.
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the report skeleton, the KPI plugin contract, a bundled set
-of kit-coupled generic KPIs, and the knowledge-friction loop; the
-platform's product- and toolchain-shaped KPIs stay behind (§Out of scope).
+of kit-coupled generic KPIs, and the knowledge-friction loop; a consumer's
+product- and toolchain-shaped KPIs stay in the consumer repo (§Out of scope).
 
 ## The report skeleton
 
@@ -223,8 +222,8 @@ Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
 
 Config follows the established kit pattern: copy `templates/drift-config.sh`
 into the gates dir (or point `DRIFT_KIT_CONFIG_FILE` elsewhere) and override
-any knob; defaults fill what the consumer left unset. Knobs (platform
-values as defaults):
+any knob; defaults fill what the consumer left unset. Knobs (this repo's
+layout as defaults):
 
 - `DRIFT_KIT_KPIS_FILE` — the registry; default
   `${GATE_SDK_GATES_DIR:-scripts}/kpis.list`.
@@ -270,14 +269,13 @@ is not. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
 
 ## Out of scope
 
-The platform's toolchain-shaped KPIs: orphan-crate and bare-`#[allow]`
-scans (Rust-specific dead-surface detection) and the `TODO(spec-ambiguity)`
-marker count (its marker convention is platform vocabulary; extract the
-convention first if it ever generalizes). Its product-workflow KPIs: gate
-exemptions (`scan-exceptions` disposition split) and backlog-aging finding
-counts — both read platform gates that were not extracted. The
-narration-marker by-eye count: superseded here by spec-kit's
-`check-manifest-temporal`, which gates the same axis instead of trending
-it; the platform keeps its by-eye copy until it adopts the gate. The
-always-loaded baseline mechanics moved to context-kit in kit 6; the
-platform's report keeps its inline copy until migration.
+Toolchain-shaped KPIs are consumer content: orphan-crate and bare-`#[allow]`
+scans (Rust-specific dead-surface detection) and a `TODO(spec-ambiguity)`
+marker count (a marker convention is consumer vocabulary; generalize the
+convention first if it ever ships). So are product-workflow KPIs: gate
+exemptions (a `scan-exceptions` disposition split) and backlog-aging finding
+counts — both read consumer gates. A narration-marker by-eye count is
+superseded by spec-kit's `check-manifest-temporal`, which gates the same axis
+instead of trending it. The always-loaded baseline mechanics are context-kit's
+surface; drift-kit ships only the `kpi-always-loaded` plugin that reads its
+meter.

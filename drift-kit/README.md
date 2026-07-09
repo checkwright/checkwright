@@ -42,7 +42,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
 Configuration follows the established kit pattern — override any knob in
 `drift-config.sh` (registry path, extra KPI dirs, the queue/log/timings surfaces,
-the Done/Deferred section headings); defaults are the extracted platform's.
+the Done/Deferred section headings); defaults are this repo's layout.
 
 ### The knowledge-friction loop (optional)
 

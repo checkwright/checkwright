@@ -1,10 +1,9 @@
-The `scope` (design) stage of a Checkwright iteration (one iteration per kit,
-in the extraction order README.md records). Read `BRIEF.local.md` (local-only
-brief) and the platform sources for the kit being extracted; decide the kit's
-layout, config surface, and de-hardcoding worklist; name the iteration after
-the kit. Exit condition: the design is written down (this session's plan or
-the kit SPEC draft) and the seam is ruled — what ships as mechanism, what
-stays platform rule content, what becomes consumer config.
+The `scope` (design) stage of a Checkwright iteration (one iteration per
+hardening or roadmap unit). Read `BRIEF.local.md` (local-only brief); decide
+the unit's layout, config surface, and worklist; name the iteration after the
+unit. Exit condition: the design is written down (this session's plan or a
+SPEC draft) and the seam is ruled — what ships as mechanism, what stays
+private rule content, what becomes consumer config.
 
 **First step — reset + stamp evidence.** Run
 `bash lifecycle-kit/bin/enter-stage.sh scope`. `scope` is the iteration
@@ -16,11 +15,10 @@ bootstrapping an unnamed iteration. It reads `<session-id>` from
 `bin/session-id.sh` itself (never hand-picked), uses `date +%F`, and refuses
 (writing nothing) if `check-stage-entry` is red.
 
-Scope rules for this repo: copy-first, never carve-out (the platform repo
-stays untouched); rule content never leaves the platform — term lists,
+Scope rules for this repo: private rule content never lands here — term lists,
 vocabularies, glossary bodies become optional consumer config, never kit
-literals; platform values stay as defaults under `<KIT>_<KNOB>` env/config
-knobs.
+literals; this repo's layout stays as the defaults under `<KIT>_<KNOB>`
+env/config knobs.
 
 **Triage every task at filing** (spec-kit/SPEC.md §The amendment lifecycle):
 feature vs debt is the new-names litmus — a task adding any name to a

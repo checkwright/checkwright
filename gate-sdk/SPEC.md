@@ -6,9 +6,8 @@ text whose drift is mechanically decidable. A **gate** is a small shell script
 that checks one invariant across one or more governed surfaces and blocks the
 commit (or the merge) when they disagree.
 
-Extracted from the governance meta-layer of a private production platform. The
-kit carries the generic mechanism only; a consumer's rule content (term lists,
-coupling vocabularies, glossary bodies) stays in the consumer repo.
+The kit carries the generic mechanism only; a consumer's rule content (term
+lists, coupling vocabularies, glossary bodies) stays in the consumer repo.
 
 ## Layout and configuration
 
@@ -64,9 +63,9 @@ before resolving them.
 ## The gate model
 
 A gate family imposes test-grade rigor on prose and config surfaces, but a gate
-whose own correctness is unverified silently stops enforcing — the platform
-this kit was extracted from shipped two *self-broken* gates (a false-green on a
-crashed `awk`; two scanner crashes) before adopting the four contracts below.
+whose own correctness is unverified silently stops enforcing — production use
+attested two *self-broken* gates (a false-green on a crashed `awk`; two scanner
+crashes) before the four contracts below were adopted.
 The family tests, lints, and constrains itself by the same standard it holds
 the governed tree to.
 
@@ -257,7 +256,7 @@ Every registered gate's header carries a one-line coupling manifest:
 The fixture suites prove each gate in isolation on contrived case dirs, and a
 consumer repo's battery runs under that consumer's own config overrides. Two
 things go untested there: that a *fresh* consumer reaches green by following
-the kit READMEs, and that the **platform defaults** hold on a vendored-kit tree
+the kit READMEs, and that the **kit defaults** hold on a vendored-kit tree
 under zero config. The DoD-mode defect (`spec-kit-vendored-spec-dod-scope`)
 shipped through exactly that gap. `bin/run-consumer-smoke.sh` closes it,
 mechanizing what was a hand-repeated validate-stage prose ritual with no
@@ -370,7 +369,7 @@ kit roots into a fresh temp repo, drives each `smoke/install.sh`, asserts the
 full battery is green under zero config, then fires each `smoke/violation.sh`
 and asserts the battery reddens at the named gate before restoring. A `bin/`
 tool, never a `gates.list` member — it is pre-commit-unfit by runtime budget
-and is the proof that the platform defaults hold on a vendored-kit tree.
+and is the proof that the kit defaults hold on a vendored-kit tree.
 
 ### gen-pre-commit
 
@@ -513,7 +512,7 @@ disables cycle-valve classification, leaving the no-leading `valve=none` rule),
 and `GRAPH_LAYERS` + `graph_surface_layer()` (the projection's subgraph
 grouping; absent renders one layer). The `--amend-only [dir]` mode runs only
 (G) over a given directory, letting the fixture pair exercise it hermetically.
-Coverage ruling inherited from the platform: a `couples ⊇ find-globs` parity
+Coverage ruling, attested in production use: a `couples ⊇ find-globs` parity
 check — verifying a gate's declared couples cover its real read-set — is *not*
 carried; it would require parsing arbitrary shell, neither cheap nor low-FP,
 and (B) already guarantees editing a coupled surface fires the gate.
@@ -548,7 +547,7 @@ runner doc naming `<kit>/gate-tests` (the documented fixture-runner
 invocation), so a kit whose fixtures never entered the battery is red. A kit
 without `gate-tests/` (guard-kit, drift-kit) owes nothing under B.
 
-Config, platform-pattern shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
+Config, the standard kit shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 is A's doc, `GATE_SDK_RUNNER_DOC` (default `CLAUDE.md`) is B's; both resolve
 relative to the git toplevel, and an explicit positional argument
 (`[registry-doc [runner-doc]]`) overrides. Fail-closed: a configured doc that
@@ -565,8 +564,7 @@ Invariant: every path in the consumer's `core-files.list` manifest exists in
 the worktree **and** is tracked (`git ls-files --error-unmatch`). Red on a
 missing or untracked listed path — one existence-plus-tracked test catches a
 plain `rm`, a `git rm`, and a listed-but-never-added path alike, with no
-`--diff-filter` timing window that only sees the loss at some later stage. The
-first gate born in Checkwright rather than extracted from the platform.
+`--diff-filter` timing window that only sees the loss at some later stage.
 
 The manifest is optional consumer config (the `graph-vocab.sh` pattern): the
 path knob is `GATE_SDK_CORE_FILES_FILE` (default

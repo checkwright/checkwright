@@ -1,5 +1,5 @@
 The `align` (consistency-audit) stage of a Checkwright iteration —
-trigger-gated; most kit extractions go scope → build directly. Exit
+trigger-gated; most iterations go scope → build directly. Exit
 condition: no unresolved cross-surface drift.
 
 **First step — stamp evidence.** Run

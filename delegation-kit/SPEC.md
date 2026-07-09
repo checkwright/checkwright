@@ -11,7 +11,6 @@ closes all three, plus the two pieces that are mechanizable: a trustworthy
 budget verdict (`usage-verdict`) and a commit-shape gate over gate tampering
 (`check-gate-tamper`).
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the protocol templates, the budget-verdict tool, and the
 tamper gate; the consumer supplies its own validate battery, shared-file
 roster, and toolchain checks — those are project rule content and never
@@ -239,9 +238,9 @@ gauge, the 5h and 7d windows with reset countdowns, and the `iteration@stage`
 readout parsed from the queue header — self-contained ANSI, no external asset
 (§Out of scope). The snapshot write is the contract; the bar is
 reference UX a consumer may restyle or discard. Any producer honoring the
-contract works — the source is pluggable (`DELEGATION_KIT_USAGE_FILE`), which
-de-hardcodes the source platform's single-operator `CLAUDE_CONFIG_DIR`
-assumption. Because the statusline fires far more often than the per-session /
+contract works — the source is pluggable (`DELEGATION_KIT_USAGE_FILE`), so no
+single-operator `CLAUDE_CONFIG_DIR` assumption is baked in. Because the
+statusline fires far more often than the per-session /
 per-dispatch verdict calls, a consumer wanting a denser trend history can drive
 sampling from the render path — `usage-verdict` stays the single append author
 (§usage-verdict), so the statusline calls it (with `DELEGATION_KIT_USAGE_HISTORY`
@@ -325,8 +324,8 @@ Config follows the established kit pattern: copy
 `DELEGATION_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults
 fill what the consumer left unset. The loader is fail-closed: a
 `DELEGATION_KIT_CONFIG_FILE` named but absent, or a config leaving any knob
-malformed, exits 2 (a broken machine gates nothing). Knobs (platform values
-as defaults):
+malformed, exits 2 (a broken machine gates nothing). Knobs (this repo's
+layout as defaults):
 
 - `DELEGATION_KIT_USAGE_FILE` — default
   `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`; positional `$1`
@@ -434,15 +433,14 @@ violation is craftable, so the file is mandatory
 
 ## Out of scope
 
-The platform's validate battery (its compile/lint/test command set and
-rename corruption sweeps), its shared-file roster, and its width/burn
-anecdotes tied to specific sweeps — consumer rule content, referenced only
-as marked-section examples. Its task-output tailer (`read-task-outputs.sh`)
-stays: it hardcodes local harness paths and exists to violate protocol
-rule 2 for debugging. The `usage.txt` write contract and a reference producer
-that renders the gauge bars and `iteration@stage` readout both leave (the
-producer's ANSI is self-contained — no `diagram-assets/` crossed); what stays
-platform-side is the platform's *particular* statusline styling and any asset
-its own gauges pull, not the rendering mechanism. The platform remains the
-exemplar consumer: protocol and mechanisms here, its rosters, batteries, and
-bespoke UX in its own copies.
+A consumer's validate battery (its compile/lint/test command set and rename
+corruption sweeps), its shared-file roster, and its width/burn anecdotes tied
+to specific sweeps are rule content, referenced only as marked-section
+examples. A task-output tailer is not shipped: such a tool hardcodes local
+harness paths and exists to violate protocol rule 2 for debugging. The
+`usage.txt` write contract and a reference producer rendering the gauge bars
+and `iteration@stage` readout do ship (the producer's ANSI is self-contained,
+pulling no external asset); a consumer's *particular* statusline styling and
+any asset its own gauges pull are not the rendering mechanism and stay with
+it. The split is protocol and mechanisms here, a consumer's rosters,
+batteries, and bespoke UX in its own copies.

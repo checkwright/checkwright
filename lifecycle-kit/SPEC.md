@@ -7,7 +7,6 @@ remember, or even re-read, a process document — so the process state lives in
 two governed files a gate can read, and every stage transition leaves
 machine-checkable evidence.
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the generic state machine only; a consumer's stage names,
 exit conditions, and ritual content are config and skill-template fill-ins.
 Requires [gate-sdk](../gate-sdk/) (the gates follow its four contracts and
@@ -80,7 +79,7 @@ through gate-sdk's multi-kit path (consumer gates dir first, then each kit's
 consumer's agent-skill directory; the `<…>` placeholders hold the consumer's
 ritual content.
 
-The stage machine itself is config with the platform's lifecycle as the
+The stage machine itself is config with this repo's lifecycle as the
 default: copy `templates/lifecycle-stages.sh` into the gates dir as
 `lifecycle-stages.sh` (or point `LIFECYCLE_KIT_STAGES_FILE` elsewhere) and
 override any knob — stages, predecessor map, first/drain/audit stages, active
@@ -181,8 +180,8 @@ in the map).
 
 Calibration: the `—` sentinel is the bootstrap name for a new iteration
 before the first stage names it. Any stage past the first carrying `—` in the
-header is rejected (the header-name guard); admitting `—` at every stage — the
-original platform bug — would let an unnamed iteration reach the final stage
+header is rejected (the header-name guard); admitting `—` at every stage — an
+attested bug — would let an unnamed iteration reach the final stage
 undetected, so the allowance is stage-scoped, not global. The data section
 begins after the first `---` separator; prose above it is not validated
 line-by-line. Argument mode `$1 $2` (queue, state) with configured defaults

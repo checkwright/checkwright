@@ -11,11 +11,10 @@ keeps the committed allowlist durable and the per-user overlay small, and a
 recurring close-stage triage step makes the whole loop a habit instead of a
 one-off cleanup.
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the guard framework, the harness-generic ruleset, and the
 triage tooling; every project-specific guard rule (build-tool hygiene,
 container concurrency, test-suite serialization) is consumer rule content
-and never ships. Unlike the earlier kits, guard-kit registers **no
+and never ships. guard-kit registers **no
 gates**: its runtime surfaces are hooks and advisory `bin/` tools, so
 nothing joins `gates.list`; it follows gate-sdk's layout and smoke
 conventions without depending on its registry.
@@ -194,7 +193,7 @@ load-bearing where noted.
 Project rules — build-cache hygiene, container-build concurrency,
 test-suite serialization, disk reclaim, tool-specific steering — live in a
 marked section of the consumer's copied `bash-guard.sh`, before the generic
-ruleset. Two ordering disciplines from the source platform, kept as
+ruleset. Two ordering disciplines, attested in production use and kept as
 guidance: a command about to be *blocked* must never first trigger a
 side-effecting rule (place blocks before any reclaim/cleanup rule), and a
 steering rule must precede the broader rule that would catch the same
@@ -269,7 +268,7 @@ guard-kit/
 Config follows the established kit pattern: copy
 `templates/guard-config.sh` into the gates dir (or point
 `GUARD_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset. Knobs (platform values as defaults):
+what the consumer left unset. Knobs (this repo's layout as defaults):
 
 - `GUARD_KIT_LOG` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
@@ -306,22 +305,18 @@ There is no `smoke/violation.sh`: the kit registers no gates, so no
 battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
 makes that file conditional on exactly this).
 
-One gate-sdk reshape rides this extraction: `gate_kit_roots` recognizes a
-sibling kit by its `checks/` directory, which this gateless kit lacks —
-undiscovered, its `smoke/install.sh` never runs under
-`run-consumer-smoke.sh` and its `lib/` and `bin/` escape `check-shellcheck`'s
-self-lint sweep. Discovery widens to siblings holding `checks/` *or*
-`smoke/`; the gate-sdk SPEC and code change land in the same build commit as
-this kit's `smoke/install.sh` (the harness requires an install script from
-every discovered root, so the widening cannot precede it).
+A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
+sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`
+alone would leave this kit undiscovered — its `smoke/install.sh` would never
+run under `run-consumer-smoke.sh`, and its `lib/` and `bin/` would escape
+`check-shellcheck`'s self-lint sweep.
 
 ## Out of scope
 
-Every toolchain- and product-coupled guard rule: build-cache hygiene,
-container-build concurrency and restart discipline, test-suite
-serialization rosters, proactive disk reclaim, tool-preference steering,
-and the platform's expanded read-only script roster beyond `check-*.sh`.
-Its allowlist contents beyond the read-only core, and its memory-policy
-write guard (a product ruling, not friction mechanism), stay behind with
-it. The platform's guard remains the exemplar consumer: framework and
-generic rules here, its rules in its own copied guard.
+Every toolchain- and product-coupled guard rule is consumer rule content:
+build-cache hygiene, container-build concurrency and restart discipline,
+test-suite serialization rosters, proactive disk reclaim, tool-preference
+steering, and any read-only script roster beyond `check-*.sh`. So are
+allowlist contents beyond the read-only core, and a memory-policy write
+guard (a product ruling, not friction mechanism). The split is framework
+and generic rules here, a consumer's rules in its own copied guard.

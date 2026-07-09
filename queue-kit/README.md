@@ -40,7 +40,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 3. Optional — reshape the grammar: copy `templates/queue-config.sh` into your
    gates dir and override section names, the wrap budget, prose-lead tokens, or
-   the precondition trigger set. Defaults are the extracted platform's.
+   the precondition trigger set. Defaults are this repo's layout.
 
 ## Use
 

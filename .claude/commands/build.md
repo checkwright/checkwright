@@ -1,5 +1,5 @@
-The `build` (extraction) stage of a Checkwright iteration: extract the kit
-scoped for this iteration. Exit condition: active queue empty — the kit's
+The `build` (implementation) stage of a Checkwright iteration: build the unit
+scoped for this iteration. Exit condition: active queue empty — the unit's
 gates, fixtures, templates, README + SPEC.md landed, registered in
 `scripts/gates.list` where applicable, and dogfooded on this tree.
 
@@ -26,9 +26,9 @@ finished task to `## Done` as you go — a **bare-slug** line (`- <slug>`), neve
 the active-section `- **slug** — prose` shape it sat in (queue-kit/SPEC.md §The
 queue format); leave the rest for the next `/build`.
 
-One kit extraction per session where feasible. Copy the platform mechanism,
-de-hardcode per the scope ruling (config via env/config-file, platform values
-as defaults), never let rule content cross the seam. Every new gate is a
+One self-contained unit per session where feasible. Build per the scope ruling
+(config via env/config-file, this repo's layout as defaults), never let private
+rule content cross the seam. Every new gate is a
 copy-edit of `gate-sdk/templates/check-skeleton.sh` with a `good/`+`bad/`
 fixture pair; the four contracts (gate-sdk/SPEC.md) are enforced by the
 meta-gates — a red gate is fixed, never bypassed. Before committing:

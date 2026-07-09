@@ -52,8 +52,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 4. Optional — reshape the machine: copy `templates/lifecycle-stages.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,
-   section names, or file paths. Defaults are the extracted platform's
-   own lifecycle.
+   section names, or file paths. Defaults are this repo's own lifecycle.
 
 After install the battery is red at `check-stage-evidence` until your first
 `/scope` session runs (it names the iteration and stamps the evidence file as

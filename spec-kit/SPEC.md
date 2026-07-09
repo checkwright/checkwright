@@ -9,10 +9,9 @@ parallel copy of any gated fact is an un-gateable second source that drifts
 silently. The remedy is a lifecycle (amendments are written at scope,
 merged and deleted at build) and gates over the copy-shaped failure modes.
 
-Extracted from the governance meta-layer of a private production platform.
 The kit carries the lifecycle, the checklists, and its gates; a consumer's
-surface names, banned headings, and scan languages are config with the
-platform's values as defaults. Requires [gate-sdk](../gate-sdk/) (the gates
+surface names, banned headings, and scan languages are config, with this
+repo's layout as the defaults. Requires [gate-sdk](../gate-sdk/) (the gates
 follow its four contracts and resolve through its registry); the queue
 lifecycle gate reads the tag syntax [queue-kit](../queue-kit/) defines.
 
@@ -124,8 +123,8 @@ file-deleted assertions, and gap filing.
 
 Every governed prose surface owns exactly one content tier and *points to*
 — never restates — a fact owned by another surface. Which surfaces exist
-and what each owns is the consumer's tier contract (the platform's is its
-own instance and stays there); the kit's rules are the topology itself:
+and what each owns is the consumer's tier contract (each consumer's is its
+own instance); the kit's rules are the topology itself:
 
 - **One owner per fact.** A parallel copy of a gated fact is the defect —
   a second source no gate reads, drifting silently. The fix keeps each
@@ -179,7 +178,7 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 - `SPEC_KIT_DEFERRED_SECTION` — default `Deferred`: the section whose
   every entry requires `[needs-spec]`.
 - `SPEC_KIT_DOD_HEADING` — default `Definition of Done`;
-  `SPEC_KIT_DOD_MODE` — `exactly-one` (platform default) or `at-most-one`
+  `SPEC_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one`
   (a reference-spec corpus like this repo's kits carries no DoD).
 - `SPEC_KIT_SCAN_KIT_ROOTS` — `0` (default) or `1`. At `0` the shared finders
   skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` is
@@ -195,7 +194,7 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 - `SPEC_KIT_EMBED_THRESHOLD` / `SPEC_KIT_EMBED_MINLINES` — defaults `0.70`
   / `8`; `SPEC_KIT_EMBED_LANGS` — the scanned fence-language → source
   mapping, one `kind|fence-alias,…|file-glob,…` entry per language family,
-  default = the platform list; `SPEC_KIT_EMBED_ILLUSTRATIVE` — fences
+  default = the bundled list; `SPEC_KIT_EMBED_ILLUSTRATIVE` — fences
   illustrative-by-default, default `(json)`; `SPEC_KIT_EMBED_WIRE_KIND` — the
   one fence an amendment may embed as a not-yet-merged contract delta,
   default `proto`.
@@ -327,8 +326,8 @@ exempt site. A manifest states current behavior only — history is derivable
 from git, and a `formerly…` line is standing context cost documenting the old
 cost, taxing every session that reads it. This gate mechanizes the lexical
 share of that judgment; context-kit's close-stage brevity pass keeps the
-semantic residue (*is this sentence about the past?*), and the platform's
-by-eye narration-marker KPI is superseded, staying there (drift-kit/SPEC.md
+semantic residue (*is this sentence about the past?*); a by-eye
+narration-marker KPI is superseded by this gate (drift-kit/SPEC.md
 §Out of scope).
 
 The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh):
@@ -364,7 +363,7 @@ in manifest prose outside an exempt site. A pinned total for a *growing*
 collection — `six gates`, `seven meta-gates` — is a second source no gate reads:
 the count's owner is the collection itself (`gates.list`, a `checks/` dir, the
 stages config), and a restated total drifts the moment the collection grows.
-Ban, don't validate — a validating gate (the platform's earlier approach) carries
+Ban, don't validate — a validating gate carries
 the standing token cost context-kit's brevity machinery rejects plus FP-prone
 entity mapping; a lexical tripwire eliminates the copy. The motivating find: this
 repo landed one gate and left the same total in four disagreeing copies (across
@@ -468,7 +467,7 @@ as mechanism and activates when a consumer widens `SPEC_KIT_COMMENT_SURFACE`
 to a language that needs it. Positional rescue is language-agnostic — its
 construct roster (`SPEC_KIT_COMMENT_POSITIONAL`) is consumer config, empty
 by default so inert on the shell surface (a Rust consumer supplies the
-`unwrap`/`allow`-class tokens; Rust is the platform's language, not a kit
+`unwrap`/`allow`-class tokens; a consumer's language is not a kit
 literal). Trailing inline comments are out of scope by construction — the
 FP-prone half of the judgment stays a review tripwire. Not-yet-swept
 sources ride `SPEC_KIT_COMMENT_WHITELIST` (its array tagged
@@ -616,19 +615,18 @@ merge, amendment deleted, none remaining, gaps filed as debt).
 
 ## Out of scope
 
-The platform's tier contract — which surfaces exist and what each owns —
-is its own instance; spec-kit ships the topology rules, not the table. The
-glossary/vision structural gates (`check-glossary-tiering`,
+A consumer's tier contract — which surfaces exist and what each owns — is its
+own instance; spec-kit ships the topology rules, not the table. Glossary and
+vision structural gates (`check-glossary-tiering`,
 `check-glossary-entry-types`, `check-vision-tiering`,
-`check-retired-term-coupling`) encode that instance's surface roles,
-entry taxonomy, and ubiquitous-language couplings — rule content; their
-generic cross-surface axis ships here as `check-surface-duplication`.
-`check-comment-tier` splits: the platform's *product* directive vocabulary
-(`glossary:`, `diagram:`, `domain-enum`, …) is rule content and stays
-behind as that consumer's `SPEC_KIT_COMMENT_*` config, but the classifier,
-the kit-mechanism directive roster, and the surface/positional parsing
-machinery ship here — the comment surface now joins the enforced tiering
-surfaces. `check-root-tiering` is a pure consumer-filename allowlist with
-no mechanism residue. Global-constant
-literal gates (the pagination-literal pattern) are per-constant rule
-content. Diagram/spec annotation couplings are a later kit's scope.
+`check-retired-term-coupling`) encode one instance's surface roles, entry
+taxonomy, and ubiquitous-language couplings — rule content; their generic
+cross-surface axis ships here as `check-surface-duplication`.
+`check-comment-tier` splits: a consumer's *product* directive vocabulary
+(`glossary:`, `diagram:`, `domain-enum`, …) is rule content, supplied as
+`SPEC_KIT_COMMENT_*` config, while the classifier, the kit-mechanism directive
+roster, and the surface/positional parsing machinery ship here — the comment
+surface is one of the enforced tiering surfaces. A `check-root-tiering` is a
+pure consumer-filename allowlist with no mechanism residue. Global-constant
+literal gates (the pagination-literal pattern) are per-constant rule content.
+Diagram/spec annotation couplings are unclaimed, a later kit's scope.

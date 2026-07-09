@@ -47,8 +47,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
 Configuration follows the established kit pattern — override any knob in
 `guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
-`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`); defaults are the extracted
-platform's.
+`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`); defaults are this repo's
+layout.
 
 ## Use
 

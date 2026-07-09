@@ -49,7 +49,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    gates dir and override the spec/amendment names, section set, the
    Definition-of-Done mode (`exactly-one` / `at-most-one`), the banned-heading
    set and density budget, the embedded-source language map, or the glossary
-   surface list. Defaults are the extracted platform's.
+   surface list. Defaults are this repo's layout.
 
 ## Use
 

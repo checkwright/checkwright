@@ -5,8 +5,8 @@
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
   queue-kit formalizes the queue format itself and gates this file. One
-  iteration per kit through extraction, then per hardening or roadmap unit;
-  [README.md](README.md) records the extraction order.
+  iteration per hardening or roadmap unit; [README.md](README.md) maps the
+  kits.
 
 ---
 
@@ -14,17 +14,14 @@
 
 ## Technical Debt
 
-- **extraction-desemantics** — sweep the extraction narrative from public
-  surfaces: README drops the kit table's Status column and the
-  extracted-in-order framing; docs/index.md + docs/methodology.md provenance
-  lines go; kit README/SPEC "Extracted from the governance meta-layer…"
-  intros and "defaults are the extracted platform's" reword to name the
-  single-operator default layout without the origin story; lifecycle
-  phrasing simplifies to "one iteration per hardening or roadmap unit"
-  (extraction completed; the per-kit clause is history). The seam *rule*
-  stays: CLAUDE.md keeps the private-rule-content boundary (config, never
-  kit literals), reframed as a provenance/privacy rule rather than an
-  extraction story. docs/posts/ are immutable — leave them untouched.
+- **brevity-empty-section-fail-closed** — `check-brevity` exits 0 reporting
+  "0 bullets" when `CONTEXT_KIT_BREVITY_SECTION` matches no heading in the
+  governed file, so a renamed section silently disarms the gate (found when
+  extraction-desemantics reworded CLAUDE.md's heading; the config coupling
+  is unheld by any gate). Make an unmatched section exit 2 — a gate whose
+  target vanished is a broken machine, not a clean tree. Fixture pair: a
+  `bad/` tree whose config names an absent heading. Check the sibling
+  section-keyed gates for the same fail-open shape.
 - **contributing-support-model** — replace CONTRIBUTING.md §Bandwidth with
   a support-model section: community support is best-effort with no
   response SLA; paid support, consultancy, and training are offered — name
@@ -140,5 +137,7 @@
   Surfaced 2026-07-09 fixing the adoption-track CI backstop.
 
 ## Done
+
+- extraction-desemantics
 
 ## Lessons Learned

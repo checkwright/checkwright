@@ -35,7 +35,7 @@ hook approximation and the session-context template also expect
 
 4. Optional — retune: copy `templates/context-config.sh` into your gates dir and
    override any knob (surfaces, hook-body command, brevity file/section/budget/
-   pointer pattern). Defaults are the extracted platform's. Splice
+   pointer pattern). Defaults are this repo's layout. Splice
    `templates/close-brevity.md` into your close skill.
 
 ## Use

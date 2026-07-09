@@ -16,7 +16,7 @@ an invariant.
    goes wrong when agents write, and the shape of the remedy.
 2. [Install](install.md) — vendoring the kits into your repo and the
    upgrade contract.
-3. The kit map below — one page per kit, in the order the kits extract.
+3. The kit map below — one page per kit, in reading order.
 4. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the
    launch note.
 
