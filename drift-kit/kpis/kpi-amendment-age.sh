@@ -2,7 +2,7 @@
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-amendment-age: age of the oldest amendment on disk
 set -uo pipefail
 
-mapfile -t amends < <(git ls-files 2>/dev/null | grep -E '(^|/)SPEC-[^/]*\.md$')
+mapfile -t amends < <(git ls-files 2>/dev/null | grep -E '(^|/)SPEC-[^/]*\.md$' | grep -vE '/(gate-tests|templates)/')
 
 if [[ ${#amends[@]} -eq 0 ]]; then
     [[ "${1:-}" == "--trend" ]] && exit 0

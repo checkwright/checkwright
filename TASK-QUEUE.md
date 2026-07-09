@@ -14,12 +14,6 @@
 
 ## Technical Debt
 
-- **kpi-amendment-age-fixture-noise** — the KPI's SPEC-*.md glob counts
-  gate-test fixture amendments (SPEC-example-gate.md reads as oldest, 4d);
-  exclude fixture/template paths, matching the trajectory extractor's
-  amendment-latency input ruling in drift-kit/SPEC.md §The
-  published-evidence extractor.
-
 ## Deferred
 
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
@@ -86,6 +80,7 @@
 
 ## Done
 
+- kpi-amendment-age-fixture-noise
 - docs-site
 - template-tiering
 - contribution-surface

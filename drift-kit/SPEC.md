@@ -79,8 +79,9 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   dir, over the live gate count. A name with a file on disk is built and
   drops out of the numerator.
 - **kpi-amendment-age** — age in days of the oldest amendment on disk
-  (`SPEC-*.md`, git add-date); the pressure gauge behind spec-kit's
-  short-lived-amendment rule.
+  (`SPEC-*.md`, git add-date; fixture and template paths excluded, matching the
+  published-evidence extractor's amendment-latency harvest); the pressure gauge
+  behind spec-kit's short-lived-amendment rule.
 - **kpi-deferred-age** — age of the oldest `Surfaced <date>` mark
   (queue-kit's ungated convention) in the queue's deferred section:
   premise-rot pressure on design-pending work.
@@ -172,8 +173,8 @@ it harvests:
 - **amendment latency** — per amendment file, git add-date to delete-date
   (merge), the longest lag in the iteration: the commitment-to-merge gauge.
   Fixture and template amendment paths are excluded from the harvest from day
-  one (`kpi-amendment-age` converges to the same exclusion — its
-  `kpi-amendment-age-fixture-noise` debt task).
+  one (`kpi-amendment-age` applies the same `*/gate-tests/*`/`*/templates/*`
+  exclusion).
 - **commit shape** — the feature/debt split of the iteration's commit subjects
   (`kpi-task-split`'s classification, applied over the iteration's commit
   range).
