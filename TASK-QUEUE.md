@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: adoption-track  [stage: close]
+## Iteration: public-positioning  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -13,6 +13,30 @@
 ## New Features
 
 ## Technical Debt
+
+- **extraction-desemantics** — sweep the extraction narrative from public
+  surfaces: README drops the kit table's Status column and the
+  extracted-in-order framing; docs/index.md + docs/methodology.md provenance
+  lines go; kit README/SPEC "Extracted from the governance meta-layer…"
+  intros and "defaults are the extracted platform's" reword to name the
+  single-operator default layout without the origin story; lifecycle
+  phrasing simplifies to "one iteration per hardening or roadmap unit"
+  (extraction completed; the per-kit clause is history). The seam *rule*
+  stays: CLAUDE.md keeps the private-rule-content boundary (config, never
+  kit literals), reframed as a provenance/privacy rule rather than an
+  extraction story. docs/posts/ are immutable — leave them untouched.
+- **contributing-support-model** — replace CONTRIBUTING.md §Bandwidth with
+  a support-model section: community support is best-effort with no
+  response SLA; paid support, consultancy, and training are offered — name
+  a contact route, not an entity. Fixture-first doctrine unchanged.
+- **docs-domain-cutover** — move the docs site to checkwright.dev:
+  first step dig-verifies the apex already resolves to GitHub Pages and
+  stops red if it does not (DNS is a user-side step); then flip docs/CNAME,
+  update the docs URL in README.md and any page that names it, and confirm
+  Pages re-issues the cert. The retiring docs.vasyltretiakov.dev 301 is
+  DNS-side, not in-repo.
+- **readme-ci-badge** — add the gates workflow status badge to the top of
+  README.md, linking to the workflow's Actions page.
 
 ## Deferred
 
@@ -61,7 +85,9 @@
   wrapping the git-native vendor copy (registries stay namespace
   reservations, never a dependency channel). The two-phase upgrade
   contract landed with docs-site (docs/install.md §The upgrade contract); this
-  rung is buildable once a second tag exists. Surfaced 2026-07-09.
+  rung is buildable once a second tag exists. Surfaced 2026-07-09. Noted at
+  public-positioning scope: no tag exists at all yet — the first release tag
+  (a launch-comms prerequisite) is what starts this rung's clock.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
@@ -77,6 +103,14 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **launch-comms** [needs-spec] — the promotion arc, sequenced after
+  public-positioning lands, the checkwright.dev cutover is live, and a
+  first release tag exists: LinkedIn profile update + announcement post;
+  a methodology essay on the writing project's Substack cross-posted to
+  Dev.to and LinkedIn; one well-timed Show HN / Lobsters submission once
+  the demo and docs withstand that traffic; conference CfP targets picked
+  by lead time. In-repo residue only (docs/posts/ entries, the tag);
+  the campaign itself is operator work. Surfaced 2026-07-09.
 - **trajectory-closed-row-freeze** [needs-spec] — a closed iteration's
   published-evidence row must be immutable, but `trajectory.sh` anchors only
   the gate-count column at the close commit; feat/debt and amendment-latency

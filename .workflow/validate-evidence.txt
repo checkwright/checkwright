@@ -1,14 +1,1 @@
 # contract: evidence-manifest v1
-adoption-track gates sha256=60e292c916bc0f5518741490da81e99f1acafcfd8ec1aaddb5cc658bb3988e3c pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track gatesdk_fixtures sha256=706680e73f0a59dd602628f4973ac6222b3bcf83c2371d49f0000347c7469202 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track lifecycle_fixtures sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track queue_fixtures sha256=6ad80540c77d17de9feb0192a08c317d84c304801d82563e5a279bf965c0fd1f pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track spec_fixtures sha256=389930b352b8468f63f664b9a818088f05f1a3ec4e0410cfedf313cf962517d6 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track delegation_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track context_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track evidence_fixtures sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track guard_tests sha256=f8f6a4500b50822fbc35eb5627488f1e3dbcaaddf1ae77e1a54fafc6a65d3312 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track usage_tests sha256=ee1ba679b32085c711c528ef47fc5fcb0f378349d1f92ff70e35ae8c306b5256 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-09
-adoption-track demo sha256=736cf3d6ae9844d66f1335c6dd3e9dfdb80507e468133293f791e226b83ed42a pass=1 fail=0 ignore=0 verdict=clean 2026-07-09

@@ -4,15 +4,4 @@
 
 ---
 
-adoption-track scope fdc16678 2026-07-09
-adoption-track align b6ec4574 2026-07-09
-adoption-track build 87f78956 2026-07-09
-adoption-track build 1e8ba15e 2026-07-09
-adoption-track build 22b4c49a 2026-07-09
-adoption-track build def07b5e 2026-07-09
-adoption-track build e3eacc97 2026-07-09
-adoption-track build 45479c76 2026-07-09
-adoption-track build 3452afeb 2026-07-09
-adoption-track build 5c5c25a0 2026-07-09
-adoption-track validate 4edc33ac 2026-07-09
-adoption-track close 42217d98 2026-07-09
+public-positioning scope 9d10032a 2026-07-09
