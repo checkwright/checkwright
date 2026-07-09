@@ -9,9 +9,9 @@ SPEC_KIT_DOD_MODE=at-most-one
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
 SPEC_KIT_SCAN_KIT_ROOTS=1
 
-# comment-tier-exempt: deliberate extraction provenance is this repo's convention, not kit mechanism — a "What stayed on the platform" section narrates what the seam left behind, so the whole section is exempt from the temporal-narration gate
+# comment-tier-exempt: deliberate-absence rulings may narrate what the kit excludes — an "Out of scope" section states what a kit does not carry and why, so the whole section is exempt from the temporal-narration gate
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
-SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS=("What stayed on the platform")
+SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS=("Out of scope")
 
 # comment-tier-exempt: evidence-kit's baseline + manifest are data files whose leading '#' line is a wire-format contract header, not a source-comment directive or spec pointer — check-evidence-baseline/manifest own their grammar
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing

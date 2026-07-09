@@ -315,7 +315,7 @@ self-lint sweep. Discovery widens to siblings holding `checks/` *or*
 this kit's `smoke/install.sh` (the harness requires an install script from
 every discovered root, so the widening cannot precede it).
 
-## What stayed on the platform
+## Out of scope
 
 Every toolchain- and product-coupled guard rule: build-cache hygiene,
 container-build concurrency and restart discipline, test-suite

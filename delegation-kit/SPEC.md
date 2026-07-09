@@ -237,7 +237,7 @@ stay defined here for third-party producers but no dead producer is shipped.
 Beyond the snapshot write it renders a status bar — model/effort, a context
 gauge, the 5h and 7d windows with reset countdowns, and the `iteration@stage`
 readout parsed from the queue header — self-contained ANSI, no external asset
-(§What stayed on the platform). The snapshot write is the contract; the bar is
+(§Out of scope). The snapshot write is the contract; the bar is
 reference UX a consumer may restyle or discard. Any producer honoring the
 contract works — the source is pluggable (`DELEGATION_KIT_USAGE_FILE`), which
 de-hardcodes the source platform's single-operator `CLAUDE_CONFIG_DIR`
@@ -432,7 +432,7 @@ the scratch consumer and asserts the battery reds (assertion A) — the
 violation is craftable, so the file is mandatory
 (gate-sdk/SPEC.md §Consumer smoke).
 
-## What stayed on the platform
+## Out of scope
 
 The platform's validate battery (its compile/lint/test command set and
 rename corruption sweeps), its shared-file roster, and its width/burn

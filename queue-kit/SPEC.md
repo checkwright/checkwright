@@ -227,7 +227,7 @@ starter-template conformance contract owned by gate-sdk/SPEC.md §Consumer smoke
 — and carries lifecycle-kit's iteration header as inert scaffold so a
 combined-tree copy clears the stage gates too.
 
-## What stayed on the platform
+## Out of scope
 
 The amendment lifecycle around `[needs-spec]`/`[spec:]` (section-wide
 enforcement, promotion procedure, `check-amendment-queue`) is spec-kit's

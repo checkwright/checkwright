@@ -208,8 +208,7 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   `check-manifest-temporal`, default a generic-English list (`previously`,
   `formerly`, `renamed from`, …), matched case-insensitively;
   `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
-  section is exempt, default empty (this repo sets `What stayed on the
-  platform`).
+  section is exempt, default empty (this repo sets `Out of scope`).
 - `SPEC_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
   `check-md-refs` skips (a consumer's generated documentation whose links a
   build tool owns).
@@ -330,7 +329,7 @@ cost, taxing every session that reads it. This gate mechanizes the lexical
 share of that judgment; context-kit's close-stage brevity pass keeps the
 semantic residue (*is this sentence about the past?*), and the platform's
 by-eye narration-marker KPI is superseded, staying there (drift-kit/SPEC.md
-§What stayed on the platform).
+§Out of scope).
 
 The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh):
 canonical specs, `README.md` at any depth, and `CLAUDE.md`; amendments are
@@ -342,8 +341,8 @@ vocabulary may name one. Three valves suppress a legitimately past line: a
 per-site `manifest-temporal-exempt: <reason>` comment on the line or the one
 above; `SPEC_KIT_TEMPORAL_EXEMPT_SECTIONS` — heading names whose whole
 section (subsections included) is exempt, this repo's config naming
-`What stayed on the platform` (extraction provenance is this consumer's
-convention, not kit mechanism); and `SPEC_KIT_TEMPORAL_EXEMPT_PATHS` — path
+`Out of scope` (a deliberate-absence ruling may narrate what the kit
+excludes); and `SPEC_KIT_TEMPORAL_EXEMPT_PATHS` — path
 globs whose whole file is exempt, for an immutable dated-narrative surface a
 heading name cannot address (this repo's config naming `docs/posts/*`, the
 dated announcement posts, which take link and command resolution but not
@@ -615,7 +614,7 @@ script rename or a knob retirement re-fires the gate over the docs.
 Definition-of-Done checklist (causal completeness, no information lost on
 merge, amendment deleted, none remaining, gaps filed as debt).
 
-## What stayed on the platform
+## Out of scope
 
 The platform's tier contract — which surfaces exist and what each owns —
 is its own instance; spec-kit ships the topology rules, not the table. The

@@ -17,8 +17,7 @@ noise, its direction across sessions is the signal.
 Extracted from the governance meta-layer of a private production platform.
 The kit carries the report skeleton, the KPI plugin contract, a bundled set
 of kit-coupled generic KPIs, and the knowledge-friction loop; the
-platform's product- and toolchain-shaped KPIs stay behind (§What stayed on
-the platform).
+platform's product- and toolchain-shaped KPIs stay behind (§Out of scope).
 
 ## The report skeleton
 
@@ -269,7 +268,7 @@ fake-history repo — one closed, range-bounded iteration — and asserts the
 table parses, that iteration's row is emitted, and the in-flight iteration's
 is not. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
 
-## What stayed on the platform
+## Out of scope
 
 The platform's toolchain-shaped KPIs: orphan-crate and bare-`#[allow]`
 scans (Rust-specific dead-surface detection) and the `TODO(spec-ambiguity)`

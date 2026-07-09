@@ -216,7 +216,7 @@ integration is exercised only alongside queue-kit), and runs
 consumer's brevity file and asserts the battery reddens via
 `check-brevity`.
 
-## What stayed on the platform
+## Out of scope
 
 `proto-index` and `diagram-index` — indexes over platform-shaped surfaces
 (its proto layout, its two architecture HTML diagrams); a consumer names
