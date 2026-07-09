@@ -1,0 +1,29 @@
+name: Gate defect
+description: A gate misses a violation or flags a valid tree — name it and give a reproducing input.
+labels: ["gate-defect"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A gate defect you can reproduce with a fixture belongs in a pull request, not here — add the `good/`/`bad/` case and let CI verify it (see CONTRIBUTING.md). Open this issue only when you cannot craft the fixture. Questions and proposals go to Discussions.
+  - type: input
+    id: gate
+    attributes:
+      label: Gate name
+      description: The failing gate, e.g. check-comment-tier.
+    validations:
+      required: true
+  - type: input
+    id: input
+    attributes:
+      label: Fixture path or exact gate output
+      description: The good/ or bad/ case that reproduces it, or the verbatim gate output line.
+    validations:
+      required: true
+  - type: textarea
+    id: verdict
+    attributes:
+      label: Expected vs actual verdict
+      description: What the gate returned, and what it should have returned.
+    validations:
+      required: true

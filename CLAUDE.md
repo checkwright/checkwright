@@ -130,6 +130,10 @@ validate-after-commit set, gate-driven worklist).
   brief).
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
+- `CONTRIBUTING.md` + the `.github/` issue/PR templates are governed repo-meta
+  (tracked, core-files-pinned); `CONTRIBUTING.md` joins the spec manifest so its
+  links/commands resolve like any doc. The fixture is the unit of contribution —
+  edit the guide, not GitHub UI settings, to change what arrives.
 - `demo/run-demo.sh` is the runnable adoption walkthrough — it builds a scratch
   consumer on the gate-sdk consumer-smoke mechanics and narrates the arc
   (vendor → clean pass → violation blocked → fix → green) on stdout, exiting 0

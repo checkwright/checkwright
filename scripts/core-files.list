@@ -10,6 +10,12 @@ TASK-QUEUE.md
 README.md
 CLAUDE.md
 
+# Public contribution surface: guide + GitHub-rendered issue/PR templates.
+CONTRIBUTING.md
+.github/ISSUE_TEMPLATE/gate-defect.yml
+.github/ISSUE_TEMPLATE/config.yml
+.github/pull_request_template.md
+
 # CI backstop: the workflow template + this repo's filled instance (§ci-backstop).
 gate-sdk/templates/gates-workflow.yml
 .github/workflows/gates.yml

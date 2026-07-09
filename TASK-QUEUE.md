@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **contribution-surface** [spec: SPEC-contribution-surface.md] — the
-  fixture-first contribution contract: bug report = failing fixture pair
-  verified by CI, PRs battery-green, DCO sign-off, honest bandwidth
-  statement; issue/PR templates route non-fixture reports to Discussions;
-  Apache-2.0 untouched (license is not a contribution lever).
 - **template-tiering** [spec: spec-kit/SPEC-template-tiering.md] — ruling:
   kit SPECs travel (vendor-whole install), so check-comment-tier governs
   templates/ while check-spec-pointer keeps a placeholders-by-design
@@ -104,6 +99,7 @@
 
 ## Done
 
+- contribution-surface
 - ci-backstop
 - drift-trajectory
 - adoption-track

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & proposals
+    url: https://github.com/checkwright/checkwright/discussions
+    about: Anything that is not a reproducible gate defect — usage questions, design proposals, larger changes. Volume is harmless here.

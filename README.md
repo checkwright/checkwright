@@ -44,6 +44,9 @@ pre-commit hook. The repo also runs lifecycle-kit's own iteration state
 machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the stage header, one
 iteration per kit through extraction, then per hardening or roadmap unit.
 
+Contributing: the fixture is the unit of contribution — see
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## License
 
 [Apache-2.0](LICENSE).
