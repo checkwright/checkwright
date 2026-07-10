@@ -54,7 +54,11 @@
   rung. Design tension to rule: the lifecycle is built for stateless sessions
   with evidence stamps as the hand-off, so a live supervisor must leave the
   stamps authoritative — orchestration convenience must not become a second,
-  ungated source of iteration state.
+  ungated source of iteration state. Boundary note 2026-07-10: this rung is
+  communication, not topology — its sessions share one clone and one
+  lifecycle state by design; contributor-level branch/worktree strategy is
+  multi-operator-semantics' question, and that rung is upstream of any
+  team-flavored version of this one.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -98,7 +102,17 @@
   the committed baselines all carry single-writer semantics. Define merge and
   conflict behavior — concurrent stage sessions, branch-per-iteration vs
   shared master, who may flip the header — before any team pilot; the kits'
-  team-readiness rung. Surfaced 2026-07-07.
+  team-readiness rung. Surfaced 2026-07-07. Boundary note 2026-07-10, the
+  three-altitude split: sub-agents within one session are already ruled
+  (agent-execution's serialize-or-worktree rules, reusable prior art here
+  since a contributor's worktree looks the same to git as an agent's);
+  sessions within one iteration are scope-session-routing; this rung owns
+  the contributor altitude alone — the only one where branch/worktree
+  topology is a design decision, because the state surfaces are
+  single-writer. Fork contributors are out of scope: an outside PR never
+  flips the header or stamps state, it only has to pass the battery in CI
+  (the branch-protection/ruleset story), so multi-operator means a second
+  operator of the methodology, not a drive-by contributor.
 - **hosted-attestation-service** [needs-spec] — the team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
   hosted gate runs as a neutral attestation, cross-repo drift dashboards,
