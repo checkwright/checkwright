@@ -39,6 +39,8 @@ Read in this order: each kit assumes the machinery of the ones above it.
   surfaces.
 - [evidence-kit](evidence-kit/index.md) — a held-constant test baseline and a
   committed per-run evidence manifest.
+- [site-kit](site-kit/index.md) — deployment-truth governance for a repo-served
+  docs site: a CNAME-host parity gate and a live-site monitor template.
 
 The walkthrough and evidence pages join this map when their kits land.
 
