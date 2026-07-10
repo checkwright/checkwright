@@ -1,0 +1,4 @@
+# Point the gate at this fixture's synthetic docs tree: file-target links, an
+# anchored back-link to the kit SPEC, and an exempted directory link. The gate
+# must PASS.
+docs

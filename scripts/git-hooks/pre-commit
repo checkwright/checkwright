@@ -155,6 +155,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     spec-kit/checks/check-md-refs.sh || hook_fail check-md-refs
 fi
 
+if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/posts/*.md'; then
+    scripts/check-docs-link-convention.sh || hook_fail check-docs-link-convention
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
     spec-kit/checks/check-docs-cmd.sh || hook_fail check-docs-cmd
 fi

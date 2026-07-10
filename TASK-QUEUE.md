@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **docs-link-convention-gate** [spec: SPEC-docs-link-convention.md] —
-  consumer gate over the docs pages: no directory-target relative link
-  (name the file), kit-page back-links carry their section anchor; the
-  shape gate beside check-md-refs' resolution.
 - **docs-cname-parity** [spec: SPEC-docs-cname-parity.md] — consumer gate:
   docs/CNAME is the single source of truth for the docs host; a tracked
   URL naming a project host alias other than the CNAME host reds; posts
@@ -246,6 +242,7 @@
 
 ## Done
 
+- docs-link-convention-gate
 - manifest-count-shapes
 - comment-count-drift
 - trajectory-closed-row-freeze

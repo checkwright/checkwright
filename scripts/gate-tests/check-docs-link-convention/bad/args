@@ -1,0 +1,4 @@
+# Point the gate at this fixture's synthetic docs tree. The kit page carries
+# both violations: a directory-target link and an anchorless back-link to its
+# own kit SPEC. The gate must REJECT.
+docs
