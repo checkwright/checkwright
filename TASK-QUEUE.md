@@ -12,11 +12,7 @@
 
 ## New Features
 
-- **enforcement-map** [spec: SPEC-enforcement-map.md] — enforcement-map.sh
-  emits docs/enforcement.md (kit → surface → enforcement class) from the
-  class registries, the monitor class declaring itself via an `# enforce:`
-  marker; check-enforcement-fresh byte-compares the artifact.
-- **site-kit-extraction** [spec: SPEC-site-kit-extraction.md] [blocked-by: enforcement-map]
+- **site-kit-extraction** [spec: SPEC-site-kit-extraction.md]
   — the split lift: check-docs-link-convention joins spec-kit beside
   check-md-refs; CNAME parity and the site-health workflow template become
   site-kit; check-docs-kit-parity stays consumer.
@@ -228,6 +224,7 @@
 
 ## Done
 
+- enforcement-map
 - prose-enum-drift
 - commit-subject-grammar
 - find-glob-steer

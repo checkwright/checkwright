@@ -14,6 +14,7 @@ check-kit-enum
 check-kit-registration
 check-docs-kit-parity
 check-trajectory-fresh
+check-enforcement-fresh
 check-hook-exec-bit
 check-commit-msg
 check-commit-subject

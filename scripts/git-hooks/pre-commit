@@ -77,6 +77,10 @@ if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workf
     scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
 fi
 
+if staged_matches 'docs/enforcement.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml'; then
+    gate-sdk/checks/check-enforcement-fresh.sh || hook_fail check-enforcement-fresh
+fi
+
 if staged_matches 'scripts/git-hooks/*'; then
     gate-sdk/checks/check-hook-exec-bit.sh || hook_fail check-hook-exec-bit
 fi

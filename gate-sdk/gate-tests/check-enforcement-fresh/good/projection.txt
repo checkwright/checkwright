@@ -1,0 +1,14 @@
+# Enforcement map
+
+## Blocking gates
+
+| kit | gate | tier |
+| --- | --- | --- |
+| gate-sdk | check-graph | precommit |
+| (consumer) | check-trajectory-fresh | precommit |
+
+## Monitors
+
+| kit | surface |
+| --- | --- |
+| (consumer) | live docs-site deployment |

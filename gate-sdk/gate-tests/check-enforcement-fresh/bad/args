@@ -1,0 +1,4 @@
+# Stale case: the committed projection lags the emission (a hand-edited tier
+# and a dropped monitor row), so the byte-compare must reject.
+projection.txt
+emit.txt

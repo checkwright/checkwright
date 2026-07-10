@@ -1,0 +1,7 @@
+# Enforcement map
+
+## Blocking gates
+
+| kit | gate | tier |
+| --- | --- | --- |
+| gate-sdk | check-graph | align-only |
