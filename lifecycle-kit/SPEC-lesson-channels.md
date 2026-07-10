@@ -29,9 +29,15 @@ lead line is the only line the parsing tools scan). Two classes:
   a tag may serve any communication purpose (essay, talk, internal
   knowledge sharing) — hence a vocabulary, not a single literal.
 
-`check-tag-lead-line` widens its governed tag set with `[attend]` plus the
-configured lesson tags: a lesson tag off the lead line is silently unread
-by every reader below, exactly the no-op that gate exists to catch.
+`check-tag-lead-line` widens on two axes: the governed tag set gains
+`[attend]` plus the configured lesson tags, **and the scanned surface gains
+the Lessons section** — today the gate scans the task sections only, on the
+calibration rationale that tags elsewhere are parsed by no reader, and
+`queue-index.sh` reading Lessons lead lines retires that rationale for this
+section. A lesson tag off the lead line is silently unread by every reader
+below, exactly the no-op that gate exists to catch. The `## Lessons
+Learned` heading itself is fixed spelling (queue-kit's required-sections
+default), read by every mechanism in this amendment — no new knob.
 
 ### Inbound: session-context injection (queue-kit → hook)
 
@@ -51,7 +57,8 @@ The injected surface is always-loaded, so the cap is the budget:
 **Boundary death is mechanical, not hoped for.** A lesson that outlives
 its close becomes the standing per-session instruction
 drift-kit/templates/close-knowledge.md forbids. Two enforcers: close's
-exit condition clears the section, and `enter-stage.sh scope` — the
+exit condition clears the section, and first-stage entry
+(`enter-stage.sh` at `LIFECYCLE_FIRST_STAGE` — `scope` in this repo) — the
 iteration-boundary reset — now **refuses when `## Lessons Learned` is
 non-empty** (same refusal contract as its `check-stage-entry` precondition),
 so an untriaged lesson cannot cross into the next iteration and no
@@ -71,7 +78,8 @@ Evidence home ruling: **a stamped file, not the commit body** — the
 battery runs at pre-commit, when no commit message exists yet, so only a
 file is mechanically decidable (the `check-stage-evidence` fail-closed
 precedent: the claim must leave evidence). New governed surface
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, default
+`LIFECYCLE_LESSON_EVIDENCE_FILE` (the kit's `LIFECYCLE_` knob shape — the
+`_KIT_` infix is reserved for the pre-load config pointer), default
 `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`: a `# contract:`
 header (the `validate-evidence.txt` pattern), then one line per
 disposition —
@@ -80,8 +88,10 @@ disposition —
 <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 ```
 
-`enter-stage.sh scope` boundary-truncates it back to its header alongside
-the other evidence files (git history keeps the stamps; `trajectory.sh`
+The iteration-boundary reset truncates it back to its header as a
+**built-in member** — the state-file class, since the kit owns this
+surface — not via `LIFECYCLE_BOUNDARY_TRUNCATE`, which stays reserved for
+files the kit does not own (git history keeps the stamps; `trajectory.sh`
 may harvest them later — out of scope here).
 
 New gate `lifecycle-kit/checks/check-lesson-disposition.sh`: every Lessons
@@ -124,13 +134,13 @@ then cleared (the Housekeeping rule for gitignored artifacts).
 - `lesson-evidence.txt` lines — producer: the close session at triage
   (each field: disposition kind + ref read by `check-lesson-disposition`
   at the commit-time diff transition; the lead-line prefix is the join key
-  to the removed entry); second consumer: `enter-stage.sh scope`
-  (boundary-truncation).
+  to the removed entry); second consumer: `enter-stage.sh` first-stage
+  entry (boundary truncation).
 - `QUEUE_KIT_LESSON_TAGS` / `QUEUE_KIT_ATTEND_CAP` — read by queue-kit's
   loader (`lib/queue.sh`) at every gate/index invocation; this repo's
   `scripts/queue-config.sh` sets the tag list, so the config path is
   exercised by a deployed configuration from day one.
-- The scope-entry Lessons-empty refusal — producer: `enter-stage.sh`;
+- The first-stage-entry Lessons-empty refusal — producer: `enter-stage.sh`;
   consumer: the scope session operator (refusal message names the
   untriaged entries).
 
@@ -141,10 +151,14 @@ then cleared (the Housekeeping rule for gitignored artifacts).
   "fixed spelling", with the seam rationale (consumer channels are rule
   content, so their names cannot be kit literals).
 - queue-kit §bin/queue-index.sh: the attention block and its cap.
-- queue-kit §check-tag-lead-line: governed set widens.
+- queue-kit §check-tag-lead-line: governed set and scanned surface widen
+  (the Lessons section joins; the "parsed by no reader" calibration
+  sentence updates).
 - queue-kit §Layout and configuration: the two knobs.
-- lifecycle-kit §bin/enter-stage.sh: scope-boundary truncation of the
+- lifecycle-kit §bin/enter-stage.sh: built-in boundary truncation of the
   lesson-evidence file + the Lessons-empty refusal.
+- lifecycle-kit §Layout and configuration: `LIFECYCLE_LESSON_EVIDENCE_FILE`
+  joins the knob list.
 - lifecycle-kit §Per-component contracts: new §check-lesson-disposition.
 - lifecycle-kit §templates/skills/: close template's disposition step.
 - CLAUDE.md battery list is untouched (the new gate registers by name in
