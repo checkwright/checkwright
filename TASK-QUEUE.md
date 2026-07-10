@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **deprecation-lifecycle** [spec: SPEC-deprecation-lifecycle.md] —
-  check-deprecation-task binds deprecation markers to live tasks on the
-  todo-task-liveness grammar (roster is consumer config; clean skip here);
-  release-sweep skill template; deprecated-surface KPI template.
 - **enforcement-map** [spec: SPEC-enforcement-map.md] — enforcement-map.sh
   emits docs/enforcement.md (kit → surface → enforcement class) from the
   class registries, the monitor class declaring itself via an `# enforce:`
@@ -237,5 +233,6 @@
 - find-glob-steer
 - lesson-sink-config
 - memory-off-enforcement
+- deprecation-lifecycle
 
 ## Lessons Learned

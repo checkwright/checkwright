@@ -315,3 +315,15 @@ disposition-per-lesson rule — rule/task/harvest/discard, each stamped into
 harvest route to the consumer's named sink)
 with `<…>` placeholders where the consumer's rule content goes. Structure is
 copied, not imported, so a consumer's skills stay legible and self-contained.
+
+Beside the stage skills sits `release-sweep.md` — a **boundary skill**, not a
+stage: it invokes no `enter-stage.sh` and stamps no state, so
+`check-stage-skill-coverage` never reads it (it governs only the configured
+stage set). It is the deprecation disposition walk at a major, forcing every
+marker on the `SPEC_KIT_DEPRECATION_MARKERS` roster to a stamped disposition —
+decommission, carry-forward, or un-deprecate — the `check-lesson-disposition`
+contract shape at a release boundary. spec-kit's `check-deprecation-task` holds
+each marker bound to a live task between majors; this sweep forces the standing
+inventory to a decision at the boundary the deprecations were promised against.
+The stamp file is operator evidence riding the release commit — the kit wires no
+gate over it (a consumer may), the same `<…>`-placeholder copy-edit shape.

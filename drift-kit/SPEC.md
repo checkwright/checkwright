@@ -226,6 +226,7 @@ drift-kit/
   kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
   templates/kpis.list            # example registry (consumer copies + prunes)
+  templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
   templates/close-knowledge.md
   smoke/install.sh
 ```
@@ -285,7 +286,16 @@ is not. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
 Toolchain-shaped KPIs are consumer content: orphan-crate and bare-`#[allow]`
 scans (Rust-specific dead-surface detection) and a `TODO(spec-ambiguity)`
 marker count (a marker convention is consumer vocabulary; generalize the
-convention first if it ever ships). So are product-workflow KPIs: gate
+convention first if it ever ships). A deprecated-surface trend is the same
+shape — it counts markers over the consumer's `SPEC_KIT_DEPRECATION_MARKERS`
+roster (spec-kit's `check-deprecation-task` vocabulary), so it ships as
+`templates/kpi-deprecated-surface.sh`, an **example** the consumer registers in
+its `kpis.list` rather than a bundled plugin under `kpis/`: the marker spelling
+is a consumer literal, and the kit stays deprecation-neutral. Registered, it
+trends the live-marker backlog between majors so it surfaces gradually instead
+of at one release; it degrades to `n/a` when the roster is unset (the bundled
+plugins' fail-visible discipline). The release-boundary disposition walk over
+the same roster is lifecycle-kit's `release-sweep` skill template. So are product-workflow KPIs: gate
 exemptions (a `scan-exceptions` disposition split) and backlog-aging finding
 counts — both read consumer gates. A narration-marker by-eye count is
 superseded by spec-kit's `check-manifest-temporal`, which gates the same axis
