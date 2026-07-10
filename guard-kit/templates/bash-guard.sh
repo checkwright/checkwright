@@ -12,6 +12,6 @@ cmd="$(guard_read_command)" || exit 0
 
 # spec: guard-kit/SPEC.md §Consumer rules — add project block/steer/allow rules here (compose guard.sh primitives), before the generic ruleset [EDIT ME]
 
-guard_generic_rules "$cmd"      # rules 1-10 (see guard-kit/SPEC.md)
-guard_log_fallthrough "$cmd"    # rule 11: log anything neither blocked nor auto-allowed
+guard_generic_rules "$cmd"
+guard_log_fallthrough "$cmd"
 exit 0

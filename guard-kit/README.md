@@ -12,8 +12,8 @@ lands in the transcript, so the agent cannot notice, count, or fix the friction
 it causes. The cost lands on the operator, silently and per-prompt, and
 compounds as the command surface grows. The kit closes the loop by making the
 fall-through set — exactly the commands that may have prompted — the one thing
-that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the nine generic
-rules, and the triage criterion.
+that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the generic
+ruleset, and the triage criterion.
 
 Unlike the other kits, guard-kit registers **no gates**: its surfaces are
 hooks and advisory `bin/` tools, so nothing joins `gates.list`. It follows

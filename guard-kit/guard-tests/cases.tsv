@@ -21,8 +21,8 @@ rewrite	@ROOT@/scripts/check-env.sh --list
 block	bash @ROOT@/scripts/gen-configs.sh
 
 # rule 5 — repo-root absolute prefix (non-script) steered; foreign path untouched
-block	sed -n '1,5p' @ROOT@/notes/file.md
-fallthrough	sed -n '1,5p' /other/repo/file.md
+block	python3 @ROOT@/tools/report.py
+fallthrough	python3 /other/repo/tools/report.py
 
 # rule 6 — shell expansion / assignment; single-quoted $ stays literal
 block	echo $(pwd)
@@ -37,15 +37,21 @@ block	mkdir -p a/{b,c}
 fallthrough	awk '{print $1}'
 fallthrough	find . -exec grep foo '{}' +
 
-# rule 8 — `: > file` truncation auto-allowed iff every target is gitignored
+# rule 8 — sed reading or rewriting a file directly; a piped-into sed is a filter
+block	sed -n '1,60p' TASK-QUEUE.md
+block	sed -i 's/a/b/' notes.md
+fallthrough	sed -E 's/a/b/'
+fallthrough	grep foo file | sed -e s/a/b/
+
+# rule 9 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 9 — read-only pipeline auto-allow; a non-roster segment falls through
+# rule 10 — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
 
-# rule 10 — decorated allowlisted bare lead with an unmatched segment blocked;
+# rule 11 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
 block	git status 2>&1
@@ -54,5 +60,5 @@ fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
 
-# rule 11 — anything else falls through to the friction log
+# rule 12 — anything else falls through to the friction log
 fallthrough	make build

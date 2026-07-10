@@ -11,6 +11,6 @@ source "$GUARD_KIT_LIB" 2>/dev/null || exit 0
 cmd="$(guard_read_command)" || exit 0
 
 # spec: guard-kit/SPEC.md §Consumer rules — project block/steer/allow rules go here, before the generic ruleset (this repo adds none)
-guard_generic_rules "$cmd"      # rules 1-8 (see guard-kit/SPEC.md)
-guard_log_fallthrough "$cmd"    # rule 9: log anything neither blocked nor auto-allowed
+guard_generic_rules "$cmd"
+guard_log_fallthrough "$cmd"
 exit 0

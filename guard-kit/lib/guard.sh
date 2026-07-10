@@ -60,7 +60,7 @@ guard_allow_match() {
     [[ "$s" == $glob ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rules 1-10 below; order is load-bearing
+# spec: guard-kit/SPEC.md §The generic ruleset — rules 1-11 below; order is load-bearing
 guard_rule_cd_compound() {
     local cmd="$1"
     if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then
@@ -139,6 +139,44 @@ guard_rule_brace_glyph() {
         guard_block "write out the brace expansion '{a,b}'/'{a..b}' — the harness prompts on the '{' glyph and no allowlist entry suppresses it. Spell the members (e.g. 'mkdir -p a/b a/c') or use a loop for a long range."
     fi
     guard_block "single-quote the '{' if it's literal (an awk/sed program in double quotes), or write it out if it expands — the harness prompts on every bare '{' glyph before allowlist matching."
+}
+
+_guard_sed_segment() {
+    local seg="$1" tok skip=0 have_script=0
+    local -a toks
+    read -ra toks <<<"$seg"
+    for tok in "${toks[@]}"; do
+        if [[ "$skip" == 1 ]]; then skip=0; have_script=1; continue; fi
+        case "$tok" in
+            sed) ;;
+            -i | -i* | --in-place*)
+                guard_block "don't rewrite a file with 'sed -i' — use the Edit tool: it replaces an exact string, fails loudly when the match is missing or ambiguous, and keeps the harness's view of the file current. If you genuinely need the in-place edit, run it yourself with !<command>." ;;
+            -e | -f) skip=1 ;;
+            --expression=* | --file=*) have_script=1 ;;
+            --*) ;;
+            -[!-]*)
+                case "$tok" in
+                    *i*) guard_block "don't rewrite a file with 'sed -i' — use the Edit tool: it replaces an exact string, fails loudly when the match is missing or ambiguous, and keeps the harness's view of the file current. If you genuinely need the in-place edit, run it yourself with !<command>." ;;
+                esac ;;
+            *)
+                if [[ "$have_script" == 0 ]]; then
+                    have_script=1
+                else
+                    guard_block "don't read a file through 'sed' — use the Read tool (offset/limit for a line range): it returns numbered lines and registers the file for a later Edit. For a markdown section, the consumer's section extractor beats a line range. If you genuinely need sed, pipe into it or run it yourself with !<command>."
+                fi ;;
+        esac
+    done
+}
+
+guard_rule_sed_file() {
+    local cmd="$1" s seg
+    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        case "$seg" in
+            sed | sed[[:space:]]*) _guard_sed_segment "$seg" ;;
+        esac
+    done < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$s")
 }
 
 guard_rule_truncate_scratch() {
@@ -258,6 +296,7 @@ guard_generic_rules() {
     guard_rule_abs_prefix "$cmd"
     guard_rule_expansion "$cmd"
     guard_rule_brace_glyph "$cmd"
+    guard_rule_sed_file "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"

@@ -150,21 +150,33 @@ load-bearing where noted.
    can suppress, block-and-steer strictly dominates; only single-quoted
    (literal) braces pass untouched. **Placed before both auto-allow rules**
    so their literal-target premise holds for braces as well.
-8. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
+8. **`sed` reading or rewriting a file** — blocked with the steer to the
+   harness's file tools: `sed -i` (or any short bundle carrying `i`) to the
+   Edit tool, a **file operand** to the Read tool's offset/limit. A `sed` fed
+   by a pipe is a text filter with no tool equivalent and is untouched, so the
+   discriminator is the operand, not the binary — logic no allowlist glob can
+   express, which is why this is a rule and not a deny entry. Segments are
+   analyzed only when they *lead* with `sed`, so a `-i` flag on any other
+   command (`grep -i`) is invisible to it; within a segment, options are walked
+   so `-e`/`-f` consume their argument and the first bare operand is the script
+   — a *second* bare operand is the file that fires the rule. **Placed before
+   both auto-allow rules:** a consumer that widens `GUARD_KIT_RO_BINS` with
+   `sed` would otherwise have rule 10 silently grant an in-place rewrite.
+9. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
    defeats the permission matcher, so it always prompts. Granted silently
    when the command is *only* `:` followed by redirects and every target is
    gitignored (`git check-ignore`): truncating scratch is safe; a tracked
    file must still prompt. The `git` subprocess is gated behind the rare
    `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
    already blocked, so a surviving target is a literal path.
-9. **Auto-allow read-only pipeline** — granted silently when every pipe
-   segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
-   grep/head/cat/find/jq family) and every redirect target is `/dev/null`
-   or an fd-dup. Conservative by construction: command/process
-   substitution, a leftover quote after stripping, any statement separator,
-   a non-`/dev/null` redirect, or a `find` with a write action all refuse
-   and fall through.
-10. **Decorated allowlisted command** — the leading command exactly matches a
+10. **Auto-allow read-only pipeline** — granted silently when every pipe
+    segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
+    grep/head/cat/find/jq family) and every redirect target is `/dev/null`
+    or an fd-dup. Conservative by construction: command/process
+    substitution, a leftover quote after stripping, any statement separator,
+    a non-`/dev/null` redirect, or a `find` with a write action all refuse
+    and fall through.
+11. **Decorated allowlisted command** — the leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
     `2>&1` — which forces a permission prompt no allowlist entry suppresses.
@@ -183,9 +195,9 @@ load-bearing where noted.
     allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
-    the auto-allow rules (8, 9) so a silently granted read-only pipeline never
+    the auto-allow rules (9, 10) so a silently granted read-only pipeline never
     reaches it.
-11. **Fall-through logging** — anything neither blocked nor auto-allowed is
+12. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 ### Consumer rules
