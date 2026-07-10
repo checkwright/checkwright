@@ -30,6 +30,10 @@ they ride in one commit.
    not evaporate. When a lesson claims it was "already filed under <slug>",
    verify the target task's **body** actually carries the specific finding
    before dispositioning →task — the slug merely existing is not enough.
+   Gap generalization, per lesson recording drift no check caught: name the
+   check class that should have caught it, then either file the missing
+   check as a deferred task or state in one line why no scanner is
+   buildable — the disposition is not complete without one of the two.
    Lesson-vs-task litmus (holds at filing time in any stage, not just here):
    if the deliverable and its done-state are nameable now, it is a task —
    file it in the deferred section directly, never stage it in Lessons where
@@ -42,7 +46,11 @@ they ride in one commit.
 2. *<Your housekeeping sweeps: deprecation scan, gate-runtime budget check,
    backlog-aging / premise-rot review, tooling-friction triage.>*
 3. **Clear Done.**
-4. Review top-level docs for staleness (*is it still true?*).
+4. Review top-level docs for staleness (*is it still true?*). Same
+   gap-generalization obligation as step 1, per staleness actually found:
+   name the check class that should have caught it, and file the missing
+   check as a deferred task or state in one line why no scanner is
+   buildable — a silent fix forfeits the check.
 5. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path.
