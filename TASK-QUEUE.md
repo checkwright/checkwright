@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **site-health-monitor** [spec: SPEC-site-health-monitor.md] — own cron
-  workflow, deliberately not a gate: probes apex, www, http→https, the
-  alternate-domain redirect, and cert expiry against the live site,
-  failing to an opened/updated site-health issue, never a red merge; no
-  README badge.
-
 ## Technical Debt
 
 - **todo-task-liveness** — the one admitted TODO directive is never
@@ -92,6 +86,17 @@
   than forward singly, keep the lead's resident context lean (stamps
   stay authoritative, so the lead need not hold what tracked surfaces
   hold), and verify spend via usage-verdict, never assumed forgiveness.
+  Chatter-suppression note 2026-07-10: a background session's narration
+  never reaches the lead — only pushes cross — so verbosity control is
+  channel design: journal for routine findings (pull), SendMessage only
+  for the escalation class (the supervisor-owns ruling list, named in
+  agent-definition config per the policy-as-config ruling), escalations
+  decision-shaped (question/options/recommendation/evidence, budgeted —
+  which is also what makes batching natural), with a guard-kit
+  SendMessage rule as the mechanical floor (prompts request, guards
+  enforce). NOTE at sixth ruling: this entry is past the queue-entry
+  altitude — its scope session should open by graduating these notes
+  into the amendment rather than extending them.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -274,6 +279,7 @@
 
 ## Done
 
+- site-health-monitor
 - docs-cname-parity
 - docs-link-convention-gate
 - manifest-count-shapes

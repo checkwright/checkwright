@@ -20,6 +20,9 @@ CONTRIBUTING.md
 gate-sdk/templates/gates-workflow.yml
 .github/workflows/gates.yml
 
+# Live-site monitoring (not a gate): the scheduled deployment probe.
+.github/workflows/site-health.yml
+
 # Gate registry + graph rule content + the checked pre-commit/graph projections.
 scripts/gates.list
 scripts/graph-vocab.sh
