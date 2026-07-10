@@ -109,13 +109,12 @@
   skill template beside the smoke — the smoke stays bare bash so a
   harness-less consumer keeps the upgrade path, the skill narrates it
   (lifecycle-kit's templates/skills precedent); harness packaging stays
-  with plugin-marketplace. Extended 2026-07-10: a larger private
-  consumer's major-transition practice — sweeping deprecated surfaces for
-  decommissioning opportunities — joins this rung as release-prep
-  mechanics once a deprecation surface exists (post first tag): a
-  deprecated-surface inventory feeding the next major's decommission list
-  beside the tightened-gates declaration; a release-time sweep, not a
-  standing gate.
+  with plugin-marketplace. Extended 2026-07-10: this repo's own
+  release-prep decommission sweep rides this rung — a deprecated-surface
+  inventory beside the tightened-gates declaration, a release-time sweep,
+  not a standing gate; the consumer-facing mechanism (queue-bound
+  deprecation, the boundary-sweep skill step, the backlog KPI) is
+  deprecation-lifecycle's.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
@@ -173,6 +172,23 @@
   measured as a drift surface and its layer deprecated on a larger private
   consumer of this lifecycle; that consumer's memory-folder scan is the
   local half's prior art. Surfaced 2026-07-10 in build.
+- **deprecation-lifecycle** [needs-spec] — deprecation with teeth, for
+  consumers: the scan itself stays consumer toolchain (clippy/ESLint-class
+  linters already inventory deprecation markers, and drift-kit's Out of
+  scope pre-rules toolchain-shaped scans as consumer plugins — the marker
+  roster is consumer config, a consumer's language is never a kit
+  literal); the kit ships the governance coupling no linter has. Three
+  pieces: queue-binding — a deprecation marker on a governed surface
+  resolves to a live decommission task, the TODO(task:) analog with
+  todo-task-liveness' contract; a release-boundary sweep as a skill step —
+  at a major, walk the inventory and force a disposition per entry
+  (decommission, re-justify carrying the task forward, or un-deprecate;
+  the lesson-disposition contract shape at a release boundary),
+  upgrade-path's phase-B sibling; and a deprecated-surface example plugin
+  on drift-kit's KPI contract so the backlog trends between majors instead
+  of surprising at one. Demand-gated: attested practice on a larger
+  private consumer of this lifecycle, which is also the anticipated first
+  consumer and the prior-art source. Surfaced 2026-07-10 in build.
 - **commit-subject-grammar** [needs-spec] — check-commit-msg is a leak
   guard only (banned patterns); nothing asserts subject shape, yet the
   prefix is load-bearing in two mechanisms no gate backs: trajectory.sh's
