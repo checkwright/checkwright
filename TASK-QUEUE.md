@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: enforcement-sweep  [stage: close]
+## Iteration: convention-hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,21 @@
 ---
 
 ## New Features
+
+- **spec-kit-rename** [spec: SPEC-canon-rename.md] — rename the kit's brand
+  tokens (dir, knob prefix, config filename, docs page dir) spec-kit →
+  canon-kit, resolving the GitHub Spec Kit collision before the first
+  release tag makes it a breaking major; generic spec-artifact vocabulary
+  stays. A mechanical sweep the battery verifies; first in queue order so
+  the other units land against the settled name.
+- **skill-template-binding** [spec: SPEC-skill-binding.md] — named slots in
+  the stage-skill templates, a binding-shim grammar for
+  consume-by-reference consumers, `check-skill-binding` parity gate; this
+  repo's five stage skills convert to shims after the doctrine back-port.
+- **delegation-fan-width** [spec: SPEC-fan-width.md] — the ≤2-wide fan-out
+  literal becomes `DELEGATION_KIT_FAN_WIDTH` (default 2), surfaced as a
+  `width=` field on the usage-verdict line; the three prose sites cite the
+  knob; mechanical width enforcement ruled out this iteration.
 
 ## Technical Debt
 
@@ -159,57 +174,6 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **delegation-fan-width** [needs-spec] — the ≤2-wide fan-out bound is a
-  subscription-economics number restated as a kit literal in three prose
-  sites (delegation-kit SPEC rule 3, CLAUDE.md, the agent-execution
-  skill): the invariant is bound-the-in-flight-loss-to-what-the-window-
-  can-absorb, and 2 is that invariant at a Pro-class window — a Max-class
-  window yields more, and an API-billed operator has no mid-flight wall
-  at all, so the loss-bounding rationale vanishes there and spend rate
-  plus provider rate limits replace it. Ship the number as a
-  delegation-kit knob, default 2, the three prose sites citing the knob;
-  width governs read-only fan-outs only — committing agents serialize or
-  take a worktree regardless, which is correctness and never configurable
-  up. Design questions for scope: whether the Agent budget guard enforces
-  width mechanically (it fires per-dispatch and could count in-flight
-  dispatches) or the knob stays advisory prose; and the upgrade path —
-  usage-verdict already knows pct and reset horizon and could derive a
-  per-wave suggested width from last-wave burn, staying
-  billing-model-agnostic by consuming the verdict rather than window
-  semantics (the pluggable usage source is the precedent: an API
-  consumer's verdict carries different axes). Name the supervision
-  ceiling in the docs: attention over N concurrent reports does not
-  scale with budget. Surfaced 2026-07-10 in build.
-- **spec-kit-rename** [needs-spec] — the spec-kit component name collides
-  with GitHub Spec Kit, the most recognized name in spec-driven development
-  and aimed at the identical audience: at launch, "Checkwright includes
-  spec-kit" reads as wrapping or squatting it. Rename the kit dir and the
-  SPEC_KIT_ knob prefix (candidate: canon-kit, from the kit's own
-  "canonical spec" vocabulary); the SPEC.md filename convention, the spec:
-  source directive, and the spec-ready queue tag stay — generic vocabulary,
-  not the kit's brand. A pure
-  mechanical sweep the battery itself verifies (kit-registration, docs-cmd
-  knob resolution, md-refs, kit: glob tokens); its own micro-iteration,
-  and strictly before the first release tag — after a tag the upgrade
-  contract makes a kit-dir rename a breaking major. Surfaced 2026-07-10
-  at the competitive-landscape review; the identity note is in the
-  operator's local brief.
-- **skill-template-binding** [needs-spec] — the stage skills become thin
-  binding shims over lifecycle-kit's skill templates (read the template,
-  then apply the consumer bindings), making the templates the executed
-  surface. Today nothing runs them: the battery dogfoods kit gates in
-  place by name resolution, while the skill templates ship prose their own
-  vendor never executes, and the command copies restate template doctrine
-  — the template-vs-commands audit found generic doctrine that has never
-  run anywhere (build's question triage, align's read-site verification,
-  close's already-filed body check). One owner per layer: generic doctrine
-  in the template, consumer slot-fills in the shim; the back-port sweep
-  and the pair-edit rule both dissolve into this. Scope rules the shim
-  grammar, the template-placeholder audit (every slot a shim needs exists
-  as a placeholder), and lifecycle-kit SPEC documenting
-  consume-by-reference beside copy-and-specialize. Sequenced before a
-  second consumer vendors the kits, so it arrives to a settled convention.
-  Surfaced 2026-07-10 at the template-drift audit.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the

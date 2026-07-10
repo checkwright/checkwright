@@ -4,15 +4,4 @@
 
 ---
 
-enforcement-sweep scope 92a94cfc 2026-07-10
-enforcement-sweep align e7a8acf9 2026-07-10
-enforcement-sweep build d2cf8e69 2026-07-10
-enforcement-sweep build 0b9f74f4 2026-07-10
-enforcement-sweep build f8154122 2026-07-10
-enforcement-sweep build f1d2fe05 2026-07-10
-enforcement-sweep build d4c5b77f 2026-07-10
-enforcement-sweep build 178baf54 2026-07-10
-enforcement-sweep build 4c009331 2026-07-11
-enforcement-sweep build e959f3fc 2026-07-11
-enforcement-sweep validate 5fae88af 2026-07-11
-enforcement-sweep close 8a042ff4 2026-07-11
+convention-hardening scope 16b7a247 2026-07-11
