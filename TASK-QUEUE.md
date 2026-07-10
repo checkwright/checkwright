@@ -219,13 +219,4 @@
 
 ## Done
 
-- site-kit-extraction
-- enforcement-map
-- prose-enum-drift
-- commit-subject-grammar
-- find-glob-steer
-- lesson-sink-config
-- memory-off-enforcement
-- deprecation-lifecycle
-
 ## Lessons Learned
