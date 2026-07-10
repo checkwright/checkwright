@@ -199,6 +199,27 @@
   of surprising at one. Demand-gated: attested practice on a larger
   private consumer of this lifecycle, which is also the anticipated first
   consumer and the prior-art source. Surfaced 2026-07-10 in build.
+- **delegation-fan-width** [needs-spec] — the ≤2-wide fan-out bound is a
+  subscription-economics number restated as a kit literal in three prose
+  sites (delegation-kit SPEC rule 3, CLAUDE.md, the agent-execution
+  skill): the invariant is bound-the-in-flight-loss-to-what-the-window-
+  can-absorb, and 2 is that invariant at a Pro-class window — a Max-class
+  window yields more, and an API-billed operator has no mid-flight wall
+  at all, so the loss-bounding rationale vanishes there and spend rate
+  plus provider rate limits replace it. Ship the number as a
+  delegation-kit knob, default 2, the three prose sites citing the knob;
+  width governs read-only fan-outs only — committing agents serialize or
+  take a worktree regardless, which is correctness and never configurable
+  up. Design questions for scope: whether the Agent budget guard enforces
+  width mechanically (it fires per-dispatch and could count in-flight
+  dispatches) or the knob stays advisory prose; and the upgrade path —
+  usage-verdict already knows pct and reset horizon and could derive a
+  per-wave suggested width from last-wave burn, staying
+  billing-model-agnostic by consuming the verdict rather than window
+  semantics (the pluggable usage source is the precedent: an API
+  consumer's verdict carries different axes). Name the supervision
+  ceiling in the docs: attention over N concurrent reports does not
+  scale with budget. Surfaced 2026-07-10 in build.
 - **commit-subject-grammar** [needs-spec] — check-commit-msg is a leak
   guard only (banned patterns); nothing asserts subject shape, yet the
   prefix is load-bearing in two mechanisms no gate backs: trajectory.sh's
