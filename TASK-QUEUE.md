@@ -74,7 +74,24 @@
   generalizes to policy: a lead's delegation preferences land in the
   tracked surfaces sessions already read (agent-definition frontmatter,
   delegation config), never ad-hoc per-session instructions — else the
-  lead becomes a second, ungated source of delegation policy.
+  lead becomes a second, ungated source of delegation policy. Interaction
+  model note 2026-07-10: this rung is *orchestration* (a blocked session
+  pauses on its question and resumes in place when the answer arrives —
+  the SendMessage substrate), not *delegation* (fire-and-forget: a
+  delegated agent that hits a question surfaces it, terminates, and is
+  re-dispatched fresh — the resident agent-execution protocol, correct
+  for its bounded read/sweep units). The restart-vs-resume cost asymmetry
+  is this rung's reason to exist: without routing, a stage session
+  blocked on an iteration-ambiguity question forfeits its accumulated
+  working state to a terminate-and-redispatch. Economics note, measured
+  2026-07-10: subscription cache-forgiveness is NOT documented (API-side
+  cache reads are ~0.1x, not free; the window expense of read-heavy
+  sweeps is attested in /agent-execution), and the prompt-cache TTL is
+  ~5 minutes — so a sporadically-questioned lead pays a full context
+  re-warm per cold question. Design accordingly: batch questions rather
+  than forward singly, keep the lead's resident context lean (stamps
+  stay authoritative, so the lead need not hold what tracked surfaces
+  hold), and verify spend via usage-verdict, never assumed forgiveness.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
