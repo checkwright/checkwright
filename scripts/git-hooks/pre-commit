@@ -160,7 +160,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/posts/*.md'; then
-    scripts/check-docs-link-convention.sh || hook_fail check-docs-link-convention
+    spec-kit/checks/check-docs-link-convention.sh || hook_fail check-docs-link-convention
 fi
 
 scripts/check-docs-cname-parity.sh || hook_fail check-docs-cname-parity

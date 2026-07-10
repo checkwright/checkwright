@@ -61,6 +61,8 @@ declare -p SPEC_KIT_DUP_SURFACES &>/dev/null || SPEC_KIT_DUP_SURFACES=("VISION.m
 
 declare -p SPEC_KIT_MDREF_EXCLUDE &>/dev/null || SPEC_KIT_MDREF_EXCLUDE=()
 
+[[ -v SPEC_KIT_LINK_ROOT ]] || SPEC_KIT_LINK_ROOT="docs"
+
 declare -p SPEC_KIT_MANIFEST_FILES &>/dev/null || SPEC_KIT_MANIFEST_FILES=()
 declare -p SPEC_KIT_TEMPORAL_MARKERS &>/dev/null || SPEC_KIT_TEMPORAL_MARKERS=(
     "previously"

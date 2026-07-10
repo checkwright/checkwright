@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit
-# spec: CLAUDE.md §Housekeeping — docs pages cite downward: no directory-target relative link (name the file), a kit page's back-link to its own README/SPEC carries a #section anchor
+# spec: spec-kit/SPEC.md §check-docs-link-convention — docs pages cite downward: no directory-target relative link (name the file), a kit page's back-link to its own README/SPEC carries a #section anchor
 #
-# usage: check-docs-link-convention.sh [docs-root]   (default docs; the optional
-#   arg points the fixture pair at a synthetic docs tree)
+# usage: check-docs-link-convention.sh [docs-root]   (default SPEC_KIT_LINK_ROOT;
+#   the optional arg points the fixture pair at a synthetic docs tree)
 set -uo pipefail
 
-SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
-# shellcheck source=../gate-sdk/lib/gate.sh
+KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
+# shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
+# shellcheck source=../lib/spec.sh
+source "$KIT/lib/spec.sh"
 
-ROOT="${1:-docs}"; ROOT="${ROOT%/}"
+ROOT="${1:-$SPEC_KIT_LINK_ROOT}"; ROOT="${ROOT%/}"
 [[ -d "$ROOT" ]] || { echo "check-docs-link-convention: not a directory: $ROOT" >&2; exit 2; }
 
 mapfile -t pages < <(find "$ROOT" -type f -name '*.md' | sort)

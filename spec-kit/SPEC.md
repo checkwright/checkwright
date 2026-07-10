@@ -801,6 +801,32 @@ exemption. Links are this gate's charge; the sibling `check-docs-cmd` takes the
 invoked commands and env knobs written inside fences and backticks, over the
 same governed doc set (one shared set, no second knob).
 
+### check-docs-link-convention
+
+Invariant: every relative markdown link on a docs-site page obeys the
+downward-citation *shape* — the resolution of those links is `check-md-refs`'
+charge, and this gate owns shape alone. Each rule is scoped to the docs tree
+because the "kit page" it turns on (a `<root>/<kit>/index.md`) exists only
+there:
+
+- **No directory-target link.** A relative link whose target names a directory
+  (a trailing `/`, or a path that resolves to a tracked directory) must instead
+  name the file — `kit/index.md`, never `kit/`. A bare directory link is
+  ambiguous about what the page is citing and defeats anchor-level citation.
+- **Anchored kit back-links.** On a kit page (`<root>/<kit>/index.md`), a link
+  back to that same kit's own `README.md` or `SPEC.md` must carry a `#section`
+  anchor. A page cites downward into a *named* section, never at the whole spec —
+  the anti-restatement doctrine expressed as a link shape.
+
+The scanned tree is `SPEC_KIT_LINK_ROOT` (default `docs`; the fixture pair
+overrides it with a positional arg pointing at a synthetic tree), walked for
+every `*.md`. The link extractor is the same syntactic bracket-then-paren match
+`check-md-refs` uses; `scheme://` and `mailto:` targets are out of scope, and a
+pure `#anchor` (no path) satisfies neither rule. Per-site valve: a
+`docs-link-exempt: <reason>` HTML comment on the link line or the one directly
+above suppresses that one finding — for the rare legitimate directory link a
+consumer's layout demands. A missing scan root is fail-closed (exit 2).
+
 ### check-docs-cmd
 
 Invariant: every invoked repo-relative `.sh` path and every kit-prefixed env
