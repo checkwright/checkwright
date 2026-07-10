@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **site-kit-extraction** [spec: SPEC-site-kit-extraction.md]
-  — the split lift: check-docs-link-convention joins spec-kit beside
-  check-md-refs; CNAME parity and the site-health workflow template become
-  site-kit; check-docs-kit-parity stays consumer.
-
 ## Technical Debt
 
 ## Deferred
@@ -224,6 +219,7 @@
 
 ## Done
 
+- site-kit-extraction
 - enforcement-map
 - prose-enum-drift
 - commit-subject-grammar

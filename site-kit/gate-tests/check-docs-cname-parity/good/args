@@ -1,0 +1,5 @@
+# Point the gate at this fixture's synthetic tree, CNAME, and alias config. It
+# cites the apex host plus alias URLs, but every alias URL sits under an exempt
+# path class (*docs/posts/* immutable posts, */gate-tests/* fixtures). The gate
+# must PASS.
+tree tree/CNAME site-config.sh

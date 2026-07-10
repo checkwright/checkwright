@@ -1,18 +1,24 @@
 #!/usr/bin/env bash
 # graph: couples=docs/CNAME dir=one valve=none tier=precommit trigger=*
-# spec: CLAUDE.md §Housekeeping — docs/CNAME is the single gated source of truth for the docs host; no tracked file names a project host alias other than that host in a URL
+# spec: site-kit/SPEC.md §check-docs-cname-parity — the docs/CNAME host is the single gated source of truth for the docs host; no tracked file names a configured host alias other than that host in a URL
 #
-# usage: check-docs-cname-parity.sh [scan-root] [cname-file]
-#   scan-root via git ls-files (default '.'), cname-file supplies H (default
-#   docs/CNAME); fixtures pass both. Exempt: docs/posts/*, */gate-tests/*.
+# usage: check-docs-cname-parity.sh [scan-root] [cname-file] [config-file]
+#   defaults SITE_KIT_SCAN_ROOT / SITE_KIT_CNAME; config-file overrides
+#   SITE_KIT_CONFIG_FILE so a fixture supplies its own SITE_KIT_ALIASES.
 set -uo pipefail
 
-SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
-# shellcheck source=../gate-sdk/lib/gate.sh
+KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
+# shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-SCANROOT="${1:-.}"; SCANROOT="${SCANROOT%/}"
-CNAME="${2:-docs/CNAME}"
+SCANARG="${1:-}"; CNAMEARG="${2:-}"; CONFIGARG="${3:-}"
+[[ -n "$CONFIGARG" ]] && export SITE_KIT_CONFIG_FILE="$CONFIGARG"
+# shellcheck source=../lib/site.sh
+source "$KIT/lib/site.sh"
+
+SCANROOT="${SCANARG:-$SITE_KIT_SCAN_ROOT}"; SCANROOT="${SCANROOT%/}"
+CNAME="${CNAMEARG:-$SITE_KIT_CNAME}"
 
 git rev-parse --git-dir >/dev/null 2>&1 || {
     echo "check-docs-cname-parity: not a git repository — cannot enumerate tracked files" >&2; exit 2; }
@@ -24,18 +30,17 @@ mapfile -t hlines < <(grep -v '^[[:space:]]*$' "$CNAME")
 H="${hlines[0]//[[:space:]]/}"
 [[ -n "$H" ]] || { echo "check-docs-cname-parity: empty host in $CNAME" >&2; exit 2; }
 
-# exception-list: this repo's own project host aliases, legitimately hardcoded in a
-#   consumer gate — the provenance seam bars a kit literal from carrying rule content,
-#   never a scripts/ gate; each stays until a rename retires it, hence # permanent:.
-ALIASES=(
-    checkwright.dev        # permanent: canonical apex; equals H in this clone, skipped at compare
-    www.checkwright.dev    # permanent: www subdomain alias, never the cited docs host
-    checkwright.com        # permanent: .com redirect host, reachable but never cited
-    www.checkwright.com    # permanent: www .com alias, never cited
-    checkwright.github.io  # permanent: pre-CNAME Pages default host
-)
 declare -A IS_ALIAS=()
-for a in "${ALIASES[@]}"; do IS_ALIAS["$a"]=1; done
+for a in "${SITE_KIT_ALIASES[@]+"${SITE_KIT_ALIASES[@]}"}"; do IS_ALIAS["$a"]=1; done
+
+exempt_path() {  # $1=path — matches any SITE_KIT_EXEMPT_PATHS glob
+    local p="$1" g
+    for g in "${SITE_KIT_EXEMPT_PATHS[@]+"${SITE_KIT_EXEMPT_PATHS[@]}"}"; do
+        # shellcheck disable=SC2053  # $g is the exempt glob, matched unquoted on purpose
+        [[ "$p" == $g ]] && return 0
+    done
+    return 1
+}
 
 listing="$(git ls-files -- "$SCANROOT")"; st=$?
 fail_closed "$st" DOCS-CNAME-PARITY git-ls-files
@@ -44,9 +49,7 @@ files=()
 while IFS= read -r path; do
     [[ -n "$path" ]] || continue
     gate_path_pruned "$path" && continue
-    case "$path" in
-        */gate-tests/*|*docs/posts/*) continue ;;
-    esac
+    exempt_path "$path" && continue
     [[ -f "$path" ]] && files+=("$path")
 done <<< "$listing"
 
@@ -67,10 +70,10 @@ while IFS= read -r m; do
 done <<< "$matches"
 
 if [[ ${#bad[@]} -gt 0 ]]; then
-    echo "check-docs-cname-parity: tracked file(s) cite a project host alias other than the docs/CNAME host:"
+    echo "check-docs-cname-parity: tracked file(s) cite a configured host alias other than the docs/CNAME host:"
     printf '  %s\n' "${bad[@]}"
-    echo "  help: point the URL at the docs/CNAME host '$H' (a rename is a one-file edit to docs/CNAME"
-    echo "        that this gate then enumerates); docs/posts/* and */gate-tests/* are exempt."
+    echo "  help: point the URL at the docs/CNAME host '$H' (a rename is a one-file edit to the CNAME"
+    echo "        that this gate then enumerates); SITE_KIT_EXEMPT_PATHS sites are exempt."
     exit 1
 fi
 echo "DOCS-CNAME-PARITY: clean (${#files[@]} tracked file(s) under $SCANROOT; no alias but the docs host '$H' cited in a URL)"

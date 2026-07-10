@@ -144,7 +144,7 @@ suite_rows() {
     printf '\n'
 }
 
-# spec: gate-sdk/SPEC.md §enforcement-map — Monitors: the one class with no parseable registry, so a non-gate surface declares itself with a line-start `# enforce: class=monitor <free-text>` marker the emitter greps; sorted for a stable projection
+# spec: gate-sdk/SPEC.md §enforcement-map — Monitors: the one class with no parseable registry, so a non-gate surface declares itself with a line-start `# enforce: class=monitor <free-text>` marker the emitter greps; a marker is dormant in a template/fixture (an inert copy-source) and activates only where a consumer copies the file into a live path, so the walk prunes templates/ (grep -v, the sibling-finder idiom) atop the gate-tests exclusion GATE_GREP_EXCLUDES already carries; sorted for a stable projection
 monitor_rows() {
     local -a rows=()
     local line file rest surface
@@ -153,7 +153,7 @@ monitor_rows() {
         file="${line%%:*}"; rest="${line#*:}"; rest="${rest#*:}"
         surface="$(printf '%s' "$rest" | sed -E 's/^[[:space:]]*#[[:space:]]*enforce:[[:space:]]+class=monitor[[:space:]]+//; s/[[:space:]]+$//')"
         rows+=("| $(attribute_kit "$file") | $surface |")
-    done < <(grep -rHnI "${GATE_GREP_EXCLUDES[@]}" -E '^[[:space:]]*#[[:space:]]*enforce:[[:space:]]+class=monitor[[:space:]]' "$GATE_SDK_ENFORCE_SCAN_DIR" 2>/dev/null | sort)
+    done < <(grep -rHnI "${GATE_GREP_EXCLUDES[@]}" -E '^[[:space:]]*#[[:space:]]*enforce:[[:space:]]+class=monitor[[:space:]]' "$GATE_SDK_ENFORCE_SCAN_DIR" 2>/dev/null | grep -v '/templates/' | sort)
     [[ ${#rows[@]} -eq 0 ]] && return 0
     printf '## Monitors\n\n'
     printf '| kit | surface |\n| --- | --- |\n'

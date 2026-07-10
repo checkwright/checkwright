@@ -1,4 +1,0 @@
-# Point the gate at this fixture's synthetic tree + CNAME. A tracked doc cites
-# a .com redirect host and a github.io host — both project aliases other than
-# the CNAME host, neither under an exempt path. The gate must REJECT.
-tree tree/CNAME

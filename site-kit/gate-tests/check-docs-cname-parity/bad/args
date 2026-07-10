@@ -1,0 +1,4 @@
+# Point the gate at this fixture's synthetic tree, CNAME, and alias config. A
+# tracked doc cites two configured aliases in ://URL form, neither under an
+# exempt path. The gate must REJECT.
+tree tree/CNAME site-config.sh

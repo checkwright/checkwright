@@ -1,0 +1,164 @@
+# Scheduled probe of the live docs site — monitoring, NOT a gate. It verifies a
+# deployment, not a tree, so it reds on causes no commit produced (DNS, a Pages
+# incident, a stalled cert renewal), breaking both the low-false-positive gate
+# contract and the CI backstop's checkout+bash hermeticity — see
+# gate-sdk/SPEC.md §Enforcement tiers. It therefore lives beside your gates
+# workflow, never inside it: a failed probe opens (or updates, never duplicates)
+# a site-health issue and reds this run, never a merge. Recovery self-clears (a
+# green run closes the open issue). No README badge, by the standing ruling.
+#
+# Copy verbatim into .github/workflows/ and set ALT_DOMAIN below (or delete the
+# alternate-host probe if you serve no redirect alias). The apex host is read
+# from the CNAME file — no second place to keep it.
+# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, and cert expiry
+name: site-health
+
+on:
+  schedule:
+    - cron: '17 6 * * *'   # daily, off the hour to dodge cron congestion
+  workflow_dispatch:
+    inputs:
+      force_fail:
+        description: 'Inject a synthetic probe failure to exercise the issue path'
+        type: boolean
+        default: false
+
+# GITHUB_TOKEN is read-only by default (a setting worth keeping); the issue
+# open/update/close path needs issues:write, nothing more.
+permissions:
+  issues: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      # The CNAME file is the single source of truth for the apex host; reading
+      # it here gives the monitor a cutover for free.
+      - uses: actions/checkout@v5
+
+      - name: probe live site
+        id: probe
+        env:
+          # Alternate redirect host — a bare public hostname, never a URL
+          # literal (a docs-cname-parity gate bars the alias in ://url form);
+          # the probe builds the URL from this at run time. Set to your redirect
+          # alias, or delete this env and probe #4 below if you have none.
+          ALT_DOMAIN: alt.example.com
+          FORCE_FAIL: ${{ inputs.force_fail }}
+        run: |
+          # A probe expects individual checks to fail; -e would abort the battery
+          # on the first red, so disable it and collect failures explicitly.
+          set +e
+          set -uo pipefail
+
+          apex="$(tr -d '[:space:]' < docs/CNAME)"
+          if [ -z "$apex" ]; then
+            echo "docs/CNAME empty — cannot resolve apex host"
+            exit 1
+          fi
+          echo "apex host: $apex"
+
+          failures=()
+
+          # 1. apex answers 200 over HTTPS; curl validates the cert at handshake,
+          #    so a TLS fault also reds here.
+          code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "https://$apex/")"
+          [ "$code" = 200 ] || failures+=("apex https did not answer 200 (got '$code')")
+
+          # 2. www 301s to the apex.
+          read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://www.$apex/") || true
+          case "${code}::${loc}" in
+            301::*"//$apex/"*) ;;
+            *) failures+=("www did not 301 to apex (got '$code' -> '$loc')") ;;
+          esac
+
+          # 3. http:// 301s to https:// — proves Enforce-HTTPS has not silently flipped.
+          read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "http://$apex/") || true
+          case "${code}::${loc}" in
+            301::https://*) ;;
+            *) failures+=("http did not 301 to https (got '$code' -> '$loc')") ;;
+          esac
+
+          # 4. the alternate host 301s to the apex, request path kept. Delete this
+          #    block along with ALT_DOMAIN above if you serve no redirect alias.
+          read -r code loc < <(curl -sS -m 20 -o /dev/null -w '%{http_code} %{redirect_url}' "https://$ALT_DOMAIN/install.html") || true
+          case "${code}::${loc}" in
+            301::*"//$apex/install.html"*) ;;
+            *) failures+=("$ALT_DOMAIN did not 301 to apex keeping path (got '$code' -> '$loc')") ;;
+          esac
+
+          # 5. certificate expiry >= 14 days — the real payload. Pages renews ~30d
+          #    out, so inside 14 days means renewal has silently stalled. curl -v
+          #    prints the handshake's "expire date:", keeping this curl-only.
+          expire="$(curl -sSv -m 20 "https://$apex/" 2>&1 >/dev/null | sed -n 's/^\* *expire date: //p' | head -1)"
+          if [ -z "$expire" ]; then
+            failures+=("could not read certificate expiry for $apex")
+          else
+            exp_epoch="$(date -d "$expire" +%s 2>/dev/null)"
+            if [ -z "$exp_epoch" ]; then
+              failures+=("unparseable certificate expiry for $apex: '$expire'")
+            else
+              days=$(( (exp_epoch - $(date +%s)) / 86400 ))
+              [ "$days" -ge 14 ] || failures+=("certificate for $apex expires in $days day(s) (< 14): $expire")
+            fi
+          fi
+
+          # DoD hook: a workflow_dispatch with force_fail=true exercises the issue
+          # path on demand without waiting for a real outage.
+          if [ "$FORCE_FAIL" = true ]; then
+            failures+=("synthetic failure (force_fail dispatch input)")
+          fi
+
+          if [ "${#failures[@]}" -gt 0 ]; then
+            echo "status=fail" >> "$GITHUB_OUTPUT"
+            {
+              echo "report<<PROBE_EOF"
+              printf '%s\n' "${failures[@]}"
+              echo "PROBE_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "FAILED probe(s):"
+            printf '  - %s\n' "${failures[@]}"
+          else
+            echo "status=pass" >> "$GITHUB_OUTPUT"
+            echo "all probes green"
+          fi
+
+      - name: file or clear the site-health issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATUS: ${{ steps.probe.outputs.status }}
+          REPORT: ${{ steps.probe.outputs.report }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          label=site-health
+          # Idempotent: creates the label on first use, no-ops once it exists.
+          gh label create "$label" --color b60205 \
+            --description "Live-site monitoring probe failure" 2>/dev/null || true
+
+          open_num="$(gh issue list --label "$label" --state open \
+            --json number --jq '.[0].number // empty')"
+          now="$(date -u +'%Y-%m-%d %H:%MZ')"
+
+          if [ "$STATUS" = fail ]; then
+            body="$(printf 'Automated site-health probe failed on %s.\n\nFailed probe(s):\n\n```\n%s\n```\n\nRun log: %s\n' \
+              "$now" "$REPORT" "$RUN_URL")"
+            if [ -n "$open_num" ]; then
+              echo "updating open site-health issue #$open_num"
+              gh issue comment "$open_num" --body "$body"
+            else
+              echo "opening a site-health issue"
+              gh issue create --label "$label" \
+                --title "Site health: live-site probe failed" --body "$body"
+            fi
+            # Red this run as the operator's second signal (reds no merge).
+            exit 1
+          fi
+
+          if [ -n "$open_num" ]; then
+            echo "recovery: closing site-health issue #$open_num"
+            gh issue close "$open_num" \
+              --comment "Recovered: all probes green on $now. Run log: $RUN_URL"
+          else
+            echo "site healthy; no open issue to clear"
+          fi

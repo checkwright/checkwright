@@ -542,7 +542,13 @@ evidence-kit's suite config (`EVIDENCE_KIT_CONFIG_FILE`); and **monitors** — t
 one class with no parseable registry — from a line-start
 `# enforce: class=monitor <free-text>` marker a non-gate surface declares itself
 with, greped under `GATE_SDK_ENFORCE_SCAN_DIR` (this repo's first carrier is the
-site-health workflow — deployment truth, not tree truth). The `# enforce:`
+site-health workflow — deployment truth, not tree truth). A marker is **dormant
+in a template or fixture** — an inert copy-source — and **activates only where a
+consumer copies the file into a live path**: the walk therefore prunes
+`templates/` (a `grep -v`, the sibling-finder idiom) atop the `gate-tests`
+exclusion `GATE_GREP_EXCLUDES` already carries, so site-kit's shipped
+`templates/site-health.yml` marker projects no row while this repo's own copy of
+it under `.github/workflows/` does. The `# enforce:`
 grammar is the reusable name a future uncovered class adopts rather than growing
 a bespoke registry.
 

@@ -37,39 +37,39 @@ hook_fail() {
     exit 1
 }
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-output.sh || hook_fail check-gate-output
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-fail-closed.sh || hook_fail check-gate-fail-closed
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     gate-sdk/checks/check-gate-fixture-coverage.sh || hook_fail check-gate-fixture-coverage
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'TASK-QUEUE.md'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' 'TASK-QUEUE.md'; then
     gate-sdk/checks/check-gate-exemption-tasks.sh || hook_fail check-gate-exemption-tasks
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'SPEC-*.md' '*/SPEC-*.md'; then
     gate-sdk/checks/check-graph.sh || hook_fail check-graph
 fi
 
-if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'spec-kit/checks/*.sh'; then
+if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' 'spec-kit/checks/*.sh'; then
     gate-sdk/checks/check-kit-enum.sh || hook_fail check-kit-enum
 fi
 
-if staged_matches 'README.md' 'CLAUDE.md' 'gate-sdk/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'spec-kit/gate-tests/*'; then
+if staged_matches 'README.md' 'CLAUDE.md' 'gate-sdk/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*' 'spec-kit/gate-tests/*'; then
     gate-sdk/checks/check-kit-registration.sh || hook_fail check-kit-registration
 fi
 
-if staged_matches 'docs/index.md' 'CLAUDE.md' 'gate-sdk/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'spec-kit/gate-tests/*'; then
+if staged_matches 'docs/index.md' 'CLAUDE.md' 'gate-sdk/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*' 'spec-kit/gate-tests/*'; then
     scripts/check-docs-kit-parity.sh || hook_fail check-docs-kit-parity
 fi
 
@@ -77,7 +77,7 @@ if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workf
     scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
 fi
 
-if staged_matches 'docs/enforcement.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml'; then
+if staged_matches 'docs/enforcement.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml'; then
     gate-sdk/checks/check-enforcement-fresh.sh || hook_fail check-enforcement-fresh
 fi
 
@@ -163,9 +163,9 @@ if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/posts/*.md'; then
     spec-kit/checks/check-docs-link-convention.sh || hook_fail check-docs-link-convention
 fi
 
-scripts/check-docs-cname-parity.sh || hook_fail check-docs-cname-parity
+site-kit/checks/check-docs-cname-parity.sh || hook_fail check-docs-cname-parity
 
-if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     spec-kit/checks/check-docs-cmd.sh || hook_fail check-docs-cmd
 fi
 
@@ -177,23 +177,23 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     spec-kit/checks/check-manifest-count.sh || hook_fail check-manifest-count
 fi
 
-if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     spec-kit/checks/check-prose-enum.sh || hook_fail check-prose-enum
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
     spec-kit/checks/check-todo-task-liveness.sh || hook_fail check-todo-task-liveness
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
     spec-kit/checks/check-deprecation-task.sh || hook_fail check-deprecation-task
 fi
 
@@ -205,7 +205,7 @@ if staged_matches '.workflow/validate-evidence.txt' 'TASK-QUEUE.md' '.workflow/W
     evidence-kit/checks/check-evidence-manifest.sh || hook_fail check-evidence-manifest
 fi
 
-if staged_matches 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+if staged_matches 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'spec-kit/*.sh'; then
     delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
 fi
 

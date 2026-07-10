@@ -36,6 +36,17 @@ nomon="$(GATE_SDK_ENFORCE_SCAN_DIR="$emptydir" bash "$EMIT" --emit)"
 assert_absent no-monitors "## Monitors" "$nomon"
 assert_has    no-monitors "## Blocking gates" "$nomon"
 
+# spec: gate-sdk/SPEC.md §enforcement-map — a marker is dormant in a template
+# (an inert copy-source) and activates only where a consumer copies it live: a
+# live marker projects a row, an identical one under templates/ does not.
+scandir="$(mktemp -d)"; trap 'rm -rf "$emptydir" "$scandir"' EXIT
+mkdir -p "$scandir/live" "$scandir/templates"
+printf '# enforce: class=monitor live-surface-alpha\n' > "$scandir/live/probe.yml"
+printf '# enforce: class=monitor template-surface-beta\n' > "$scandir/templates/probe.yml"
+tmpl="$(GATE_SDK_ENFORCE_SCAN_DIR="$scandir" bash "$EMIT" --emit)"
+assert_has    template-inert "live-surface-alpha" "$tmpl"
+assert_absent template-inert "template-surface-beta" "$tmpl"
+
 [[ "$fails" -eq 0 ]] || { echo "enforcement-map.test: $fails assertion(s) failed"; exit 1; }
 echo "enforcement-map.test: clean (degraded-registry sections drop independently; gate registry always present)"
 exit 0
