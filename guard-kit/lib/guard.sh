@@ -60,7 +60,7 @@ guard_allow_match() {
     [[ "$s" == $glob ]]
 }
 
-# spec: guard-kit/SPEC.md §The generic ruleset — rules 1-11 below; order is load-bearing
+# spec: guard-kit/SPEC.md §The generic ruleset — the guard_rule_* run below; order is load-bearing
 guard_rule_cd_compound() {
     local cmd="$1"
     if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then

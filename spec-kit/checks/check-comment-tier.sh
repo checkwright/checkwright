@@ -77,6 +77,7 @@ build_bless() {  # $1=name of colon array  $2=name of word array -> prints ERE
 SHELL_BLESS="$(build_bless shell_colon shell_word)"
 TXT_BLESS="$(build_bless txt_colon txt_word)"
 POS_RE="$(join_alt "${SPEC_KIT_COMMENT_POSITIONAL[@]}")"
+EXEMPT_RE="$(join_alt comment-tier-exempt:)"
 
 # spec: spec-kit/SPEC.md §check-comment-tier — the classifier walks full-line
 # comments (heredoc/block bodies skipped); a directive opens a CAP-wide window
@@ -86,9 +87,11 @@ function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
 function flush_block(rescue,   i) {
     if (nb == 0) return
     if (rescue && nb >= 1 && bflag[nb]) bflag[nb] = 0
-    for (i = 1; i <= nb; i++)
+    for (i = 1; i <= nb; i++) {
         if (bflag[i]) print bfile[i] ":" bline[i] ": " btext[i]
-    nb = 0; window = 0
+        else if (cspan[i] != "") print bfile[i] ":" bline[i] ": restated collection total: " cspan[i]
+    }
+    nb = 0; window = 0; xwindow = 0
 }
 function detect_hd(   s, m, ch) {
     s = $0
@@ -100,13 +103,17 @@ function detect_hd(   s, m, ch) {
     if (ch == SQ || ch == DQ) m = substr(m, 2)
     if (match(m, /^[A-Za-z_][A-Za-z0-9_]*/)) hd = substr(m, 1, RLENGTH)
 }
-function record(bodytext,   blessed) {
+function record(bodytext,   blessed, exempt) {
     nb++
     bfile[nb] = FILENAME; bline[nb] = FNR; btext[nb] = trim(bodytext)
     if (bodytext ~ BLESS) window = CAP
+    if (bodytext ~ XRE) xwindow = CAP
     blessed = (window > 0)
+    exempt = (xwindow > 0)
     if (window > 0) window--
+    if (xwindow > 0) xwindow--
     bflag[nb] = blessed ? 0 : 1
+    cspan[nb] = exempt ? "" : sk_count_hit(bodytext)
 }
 function noncomment(   ispos, isblank) {
     isblank = ($0 ~ /^[ \t]*$/)
@@ -146,6 +153,13 @@ STYLE == "slash" {
 END { flush_block(0) }
 AWK
 
+# spec: spec-kit/SPEC.md §check-comment-tier — the count-shape override rides the shared adapter, so the noun vocabulary and wedge window enter once
+AWKSRC="$(spec_count_awk_lib)
+$CLASSIFY"
+COUNT_QRE="$(spec_count_quantifier_re)"
+COUNT_RRE="$(spec_count_range_re)"
+COUNT_PHRASES="$(spec_count_phraselist)"
+
 # spec: spec-kit/SPEC.md §check-comment-tier — the governed surface via
 #   lib/spec.sh; the _with_templates variant adds templates/ shell sources
 #   this gate governs where check-spec-pointer exempts them.
@@ -166,7 +180,7 @@ for f in "${SURFACE[@]}"; do
         *)                        style="hash";  bless="$SHELL_BLESS"; pos="$POS_RE" ;;
     esac
     scanned=$((scanned + 1))
-    out="$(awk -v STYLE="$style" -v BLESS="$bless" -v POS="$pos" -v CAP="$SPEC_KIT_COMMENT_RUN_CAP" -v SQ="'" -v DQ='"' "$CLASSIFY" "$f")"; st=$?
+    out="$(awk -v STYLE="$style" -v BLESS="$bless" -v POS="$pos" -v CAP="$SPEC_KIT_COMMENT_RUN_CAP" -v SQ="'" -v DQ='"' -v XRE="$EXEMPT_RE" -v SK_QRE="$COUNT_QRE" -v SK_RRE="$COUNT_RRE" -v SK_PHRASES="$COUNT_PHRASES" "$AWKSRC" "$f")"; st=$?
     fail_closed "$st" COMMENT-TIER "awk classifier ($rel)"
     while IFS= read -r line; do
         [[ -n "$line" ]] && errors+=("${line#"$ROOT"/}")
@@ -176,7 +190,7 @@ done
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "COMMENT-TIER: ${#errors[@]} violation(s):"
     printf '  %s\n' "${errors[@]}"
-    echo "  help: code is the WHAT, its SPEC the WHY — lead the block with a bare 'spec: <SPEC> §<section>' pointer (or another roster directive), delete prose that restates the code or paraphrases the SPEC it points at, or tag '# comment-tier-exempt: <reason>' for a genuinely-local fact below SPEC altitude. A directive blesses only its own window (its line plus continuations up to SPEC_KIT_COMMENT_RUN_CAP=$SPEC_KIT_COMMENT_RUN_CAP physical comment lines, blank '#' lines included); prose beyond the window re-anchors on its own directive, trims, or exempts. Not-yet-swept components ride the COMMENT_TIER_WHITELIST with a '# until:' drain task."
+    echo "  help: code is the WHAT, its SPEC the WHY — lead the block with a bare 'spec: <SPEC> §<section>' pointer (or another roster directive), delete prose that restates the code or paraphrases the SPEC it points at, or tag '# comment-tier-exempt: <reason>' for a genuinely-local fact below SPEC altitude. A directive blesses only its own window (its line plus continuations up to SPEC_KIT_COMMENT_RUN_CAP=$SPEC_KIT_COMMENT_RUN_CAP physical comment lines, blank '#' lines included); prose beyond the window re-anchors on its own directive, trims, or exempts. A 'restated collection total' is flagged inside a directive window too — a directive's blessing covers its own wording, never a pinned total: delete the count or cite the owning collection. Not-yet-swept components ride the COMMENT_TIER_WHITELIST with a '# until:' drain task."
     exit 1
 fi
 echo "COMMENT-TIER: clean ($scanned governed source(s); every full-line comment is a directive, rides a directive window, is exempt, or justifies a positional construct)"

@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **comment-count-drift** [spec: SPEC-comment-count.md] —
-  check-comment-tier gains the
-  count-shape override: a count in a full-line comment is flagged even
-  inside a blessed directive window, sharing the count grammar and noun
-  vocabulary; the source-coupled numeral scan is rejected as FP-heavy.
 - **trajectory-closed-row-freeze** [spec: SPEC-closed-row-freeze.md] —
   every range-scoped trajectory column freezes at the close boundary:
   iteration N harvests (close(N-1), close(N)], interstitial commits belong
@@ -52,6 +47,13 @@
   README badge.
 
 ## Technical Debt
+
+- **count-scan-wrap-blindness** —
+  the shared count adapter matches within one physical line, so a prose wrap
+  splitting cardinal from noun evades both restated-total gates: spec-kit's own
+  §lib/spec.sh carried "two comment / gates" across a line break, invisible to
+  check-manifest-count while its adjacent twin on one line reds. Candidate: a
+  paragraph-joined scan window reporting the first physical line of the span.
 
 ## Deferred
 
@@ -149,5 +151,6 @@
 ## Done
 
 - manifest-count-shapes
+- comment-count-drift
 
 ## Lessons Learned

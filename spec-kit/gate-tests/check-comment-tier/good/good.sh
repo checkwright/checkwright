@@ -21,3 +21,8 @@ EOF
 
 # comment-tier-exempt: a genuinely unavoidable note with no owning section
 bar() { echo bye; }
+
+# spec: some/SPEC.md §bounds — a directive blesses at most three checks per run,
+#   a bound rather than a total; three of the twelve gates below stay partitive,
+#   and the inline-code `six gates` reads as a meta-reference.
+tally() { echo n; }

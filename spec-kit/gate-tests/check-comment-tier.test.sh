@@ -4,10 +4,12 @@
 # roster), the .txt state-file restricted roster, and the templates/ surface
 # (this gate governs template stubs via _with_templates where check-spec-pointer
 # exempts them — a difference only the derived surface shows, since an explicit
-# SPEC_KIT_COMMENT_SURFACE bypasses the split). Each needs a per-case
-# SPEC_KIT_CONFIG_FILE, which run-gate-tests passes to neither. The good/bad pair
-# covers the shell classifier (directive run, exempt, heredoc skip); these cover
-# the mechanism a consumer activates by widening the surface.
+# SPEC_KIT_COMMENT_SURFACE bypasses the split), and the count-shape override's
+# two edges: the comment-tier-exempt valve suppresses it, positional rescue does
+# not. Each needs a per-case SPEC_KIT_CONFIG_FILE or scan root, which
+# run-gate-tests passes to neither. The good/bad pair covers the shell classifier
+# (directive run, exempt, heredoc skip) and the count override's mainline; these
+# cover the mechanism a consumer activates by widening the surface.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -56,6 +58,23 @@ mkcfg "$SANDBOX/rs.sh" 'SPEC_KIT_COMMENT_SURFACE=(ok.rs)'   'SPEC_KIT_COMMENT_PO
 mkcfg "$SANDBOX/bad.sh" 'SPEC_KIT_COMMENT_SURFACE=(bad.rs)' 'SPEC_KIT_COMMENT_POSITIONAL=(unsafe)'
 mkcfg "$SANDBOX/txt.sh" 'SPEC_KIT_COMMENT_SURFACE=(state.txt)'
 
+# The count-shape override's two edges. The exempt valve suppresses a count in
+# its window; positional rescue does not — it clears the tier flag a plain block
+# would raise, leaving the count to report on its own.
+cat >"$SANDBOX/exempt.sh" <<'EOF'
+# comment-tier-exempt: this note pins six gates on purpose, the valve engaged
+noop() { echo x; }
+EOF
+cat >"$SANDBOX/pos.sh" <<'EOF'
+# spec: some/SPEC.md §p — the header leads with a directive
+warm() { echo x; }
+
+# six gates guard the construct below
+run() { unsafe; }
+EOF
+mkcfg "$SANDBOX/exempt-cfg.sh" 'SPEC_KIT_COMMENT_SURFACE=(exempt.sh)'
+mkcfg "$SANDBOX/pos-cfg.sh" 'SPEC_KIT_COMMENT_SURFACE=(pos.sh)' 'SPEC_KIT_COMMENT_POSITIONAL=(unsafe)'
+
 # Derived-surface trees (no SPEC_KIT_COMMENT_SURFACE) so the templates/ prune
 # axis is live. A thinned template stub passes; a narrating one is red.
 : >"$SANDBOX/derived.sh"
@@ -89,10 +108,17 @@ check_case "slash-standalone-flag"    bad.sh 1 "standalone slash block restates"
 check_case "txt-restricted-roster"    txt.sh 1 "not in the roster"
 check_case "templates-thinned-ok"  derived.sh 0 "COMMENT-TIER: clean"          "$SANDBOX/tmpl-good"
 check_case "templates-narration-red" derived.sh 1 "the tier gate scans templates" "$SANDBOX/tmpl-bad"
+check_case "count-exempt-valve" exempt-cfg.sh 0 "COMMENT-TIER: clean"
+check_case "count-survives-positional-rescue" pos-cfg.sh 1 "restated collection total: six gates"
+
+# The bad fixture's expect.txt asserts the count override, so the window-spill
+# half of the pair keeps its assertion here.
+check_case "window-spill-flagged" derived.sh 1 "spills outside the window" \
+    "$DIR/gate-tests/check-comment-tier/bad"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance, 5 cases)"
+echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges, 8 cases)"
 exit 0

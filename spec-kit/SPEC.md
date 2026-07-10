@@ -252,11 +252,19 @@ narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`,
 amendments excluded — so its members read one identical set, and the governed
 comment-surface adapters (`spec_comment_whitelisted` plus two finders that
 `check-comment-tier` and `check-spec-pointer` scan through), and the
-count-grammar adapter (`SPEC_COUNT_CARDINAL_RE` plus the `spec_count_noun_alt`,
-`spec_count_quantifier_re` and `spec_count_range_re` regex builders) that the
-restated-total gates share, so a consumer's `SPEC_KIT_COUNT_COLLECTIONS`
-vocabulary enters once and every such gate matches the same shapes
-(§check-manifest-count). The two comment
+count adapter that the restated-total gates share, so a consumer's
+`SPEC_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate matches
+the same shapes (§check-manifest-count). The adapter has two halves: the shell
+regex builders (`SPEC_COUNT_CARDINAL_RE` plus `spec_count_noun_alt`,
+`spec_count_quantifier_re`, `spec_count_range_re`, and the lowercased
+`spec_count_phraselist`), and `spec_count_awk_lib` — an awk source fragment a
+gate prepends to its own program, exposing `sk_count_hit(text)`, which returns
+the offending span or the empty string. The boundary rule (no match glued to an
+adjacent word) and the mechanical exemptions (comparator, `all but`, partitive,
+`per`-phrase, inline code, allowed phrases) live in that fragment alone, so no
+sibling can drift from another in what it considers a total; each supplies its
+own surface walk (fences and per-site markers for the manifest gate, the comment
+classifier for its sibling). The comment
 gates read *different* surfaces: `spec_comment_surface` prunes `templates/`
 shell sources, and `spec_comment_surface_with_templates` keeps them.
 `check-spec-pointer` scans the pruned set — a template's `spec:` line is a
@@ -379,8 +387,10 @@ two READMEs and a SPEC), caught only by close-stage review.
 The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh) —
 canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
 skipped, an inline-code cardinal a meta-reference (so this section may name its
-own examples). The grammar comes from the shared count adapter (§lib/spec.sh),
-so this gate and its comment-tier sibling read one vocabulary. The cardinal
+own examples). Both the grammar and the matcher come from the shared count
+adapter (§lib/spec.sh) — this gate adds only the prose walk (fence skipping, the
+per-site marker), so it and its comment-tier sibling read one vocabulary and
+apply one set of exemptions. The cardinal
 grammar is digit sequences and the spelled
 `two`…`twelve`, case-insensitive; `one` is deliberately outside it — singleton and
 cardinality-rule idioms ("one owner per fact", "one iteration per kit") are
@@ -466,6 +476,22 @@ second copy no gate reads. `comment-tier-exempt:
 <reason>` is the honest directive for a genuinely-local fact below SPEC altitude
 that neither tier owns.
 
+One shape overrides the window: a full-line comment carrying a **restated
+collection total** — the count grammar of §check-manifest-count, over the same
+`SPEC_KIT_COUNT_COLLECTIONS` vocabulary — is flagged even where a directive
+blesses it, and positional rescue does not reach it either. A count is never
+directive wording. A directive's blessing covers its own wording physically
+wrapped, never a total pinned beside it, and such a total is exactly the second
+source the manifest gate bans: `# rules 1-8` sat stale in this repo's own guard
+while its ruleset grew past eight, invisible because no gate read comments for
+counts. The fix is deleting the count or citing the owning collection; the sole
+valve is `comment-tier-exempt: <reason>`, whose window suppresses the override
+as it suppresses the tier rule. The weighed alternative — a source-coupled
+numeral scan with an allowlist — is rejected: legitimate numerals abound in
+source (exit codes, indices, field positions) and the false-positive rate would
+exceed the catch. Counts in *code* stay a review concern; counts in *prose*,
+wherever the prose lives, are gated.
+
 Calibration: the built-in roster is Checkwright's own kit-mechanism
 directive names; `SPEC_KIT_COMMENT_MACHINE` / `_REASON` append a consumer's
 product vocabulary (the same split as `check-graph`'s vocab — the mechanism
@@ -477,7 +503,15 @@ relocated restatement and deleted. `comment-tier-exempt:` is reserved for a
 genuinely-local fact neither tier owns, and exempting a restatement rather
 than deleting it is itself the defect — a long roster (a `usage:` option
 list, a header) restructures into directive-anchored short paragraphs or
-trims, never launders prose past the cap. The default surface is shell
+trims, never launders prose past the cap. The count-shape override reads the
+shared count adapter (§lib/spec.sh) rather than a second grammar, so it
+inherits that gate's carve-outs unchanged: a comparator bound or a `per`-phrase
+in a directive is a rule and not a total, a partitive proportion exempts both
+its cardinals, and a cardinal in inline code is a meta-reference — which is why
+a directive may still say `at most three checks per run` or name a
+`` `six gates` `` example. No knob is added: the noun vocabulary enters through
+`SPEC_KIT_COUNT_COLLECTIONS` and the wedge window through
+`SPEC_KIT_COUNT_WEDGE_WORDS`. The default surface is shell
 (`#`) — `templates/` stubs included: a copied-out template's `spec:` line
 resolves against the vendored kit path (kit SPECs travel with the
 vendor-whole install), so its comments are directives like any source and

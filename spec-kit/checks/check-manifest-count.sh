@@ -16,70 +16,24 @@ ROOT="${1:-.}"
 mapfile -t manifests < <(spec_manifest_files "$ROOT" | sed 's#^\./##' | sort -u)
 [[ ${#manifests[@]} -eq 0 ]] && { echo "MANIFEST-COUNT: clean (0 manifest file(s) found)"; exit 0; }
 
-phraselist=""
-if [[ ${#SPEC_KIT_COUNT_ALLOWED_PHRASES[@]} -gt 0 ]]; then
-    phraselist="$(printf '%s\n' "${SPEC_KIT_COUNT_ALLOWED_PHRASES[@]}" | tr '[:upper:]' '[:lower:]')"
-fi
+# spec: spec-kit/SPEC.md §check-manifest-count — prose walk only: fences and per-site markers gate the line, the shared adapter judges it
+read -r -d '' SCAN <<'AWK' || true
+FNR == 1 { in_fence = 0; prev = "" }
+{
+    raw = $0
+    if (raw ~ /^[[:space:]]*```/) { in_fence = !in_fence; prev = raw; next }
+    if (in_fence) { prev = raw; next }
+    if (raw ~ /manifest-count-exempt:/ || prev ~ /manifest-count-exempt:/) { prev = raw; next }
+    hit = sk_count_hit(raw)
+    if (hit != "") printf "  %s:%d  restated collection total: %s\n", FILENAME, FNR, hit
+    prev = raw
+}
+AWK
 
-out="$(awk -v qre="$(spec_count_quantifier_re)" -v rre="$(spec_count_range_re)" -v phraselist="$phraselist" '
-    function phrase_exempt(low, ms, me,   i, p, lp, start, idx, pp) {
-        for (i = 1; i <= np; i++) {
-            p = phrases[i]; if (p == "") continue
-            lp = length(p); start = 1
-            while (1) {
-                idx = index(substr(low, start), p)
-                if (idx == 0) break
-                pp = start + idx - 1
-                if (ms >= pp && me <= pp + lp - 1) return 1
-                start = pp + 1
-            }
-        }
-        return 0
-    }
-    function report(low, scan, re, quantifier,   rest, off, ms, ml, me, bc, ac, ok, m, prefix, suffix) {
-        rest = low; off = 0
-        while (match(rest, re) > 0) {
-            ms = off + RSTART; ml = RLENGTH; me = ms + ml - 1
-            bc = (ms > 1) ? substr(low, ms - 1, 1) : " "
-            ac = (me < length(low)) ? substr(low, me + 1, 1) : " "
-            ok = 1
-            if (bc ~ /[[:alnum:]]/) ok = 0          # match glued to a preceding word or number
-            if (ac ~ /[[:alnum:]-]/) ok = 0         # noun glued to a following word (e.g. gatekeepers)
-            if (ok) {
-                m = substr(low, ms, ml)
-                prefix = substr(low, 1, ms - 1)
-                suffix = substr(low, me + 1)
-                if (phrase_exempt(low, ms, me)) ok = 0
-                else if (quantifier) {
-                    if (prefix ~ /(≥|≤|>|<|at least|at most|up to|more than|fewer than)[[:space:]]*$/) ok = 0
-                    else if (prefix ~ /all but[[:space:]]*$/) ok = 0
-                    else if (prefix ~ /(^|[^[:alnum:]])of[[:space:]]+(the[[:space:]]+)?$/) ok = 0
-                    else if (m ~ /(^|[[:space:]])of([[:space:]]|$)/) ok = 0
-                    else if (suffix ~ /^[[:space:]]+per([[:space:]]|$)/) ok = 0
-                }
-            }
-            if (ok) {
-                printf "  %s:%d  restated collection total: %s\n", FILENAME, FNR, substr(scan, ms, ml)
-                return 1
-            }
-            off = ms; rest = substr(low, ms + 1)
-        }
-        return 0
-    }
-    BEGIN { np = split(phraselist, phrases, "\n") }
-    FNR == 1 { in_fence = 0; prev = "" }
-    {
-        raw = $0
-        if (raw ~ /^[[:space:]]*```/) { in_fence = !in_fence; prev = raw; next }
-        if (in_fence) { prev = raw; next }
-        if (raw ~ /manifest-count-exempt:/ || prev ~ /manifest-count-exempt:/) { prev = raw; next }
-        scan = raw
-        gsub(/`[^`]*`/, "", scan)   # a cardinal in inline code is a meta-reference, not a restated total
-        low = tolower(scan)
-        if (!report(low, scan, qre, 1)) report(low, scan, rre, 0)
-        prev = raw
-    }
-' "${manifests[@]}")"; st=$?
+AWKSRC="$(spec_count_awk_lib)
+$SCAN"
+
+out="$(awk -v SK_QRE="$(spec_count_quantifier_re)" -v SK_RRE="$(spec_count_range_re)" -v SK_PHRASES="$(spec_count_phraselist)" "$AWKSRC" "${manifests[@]}")"; st=$?
 fail_closed "$st" check-manifest-count awk
 
 if [[ -n "$out" ]]; then

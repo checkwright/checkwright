@@ -12,3 +12,10 @@ frob() { echo x; }
 # It restates the design rationale that belongs in the SPEC, so both lines
 # are flagged: relocate to the owning section or delete restated prose.
 baz() { echo y; }
+
+# spec: some/SPEC.md §count — this window ships six gates today, and the pinned
+#   total is flagged even though the directive blesses the wording around it.
+qux() { echo z; }
+
+# usage: bad.sh --tally   (the ordered set is rules 1-8, pinned at both ends)
+quux() { echo w; }

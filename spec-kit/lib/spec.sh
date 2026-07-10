@@ -214,6 +214,67 @@ spec_count_range_re() {
     printf '(%s)[[:space:]]+[0-9]+-[0-9]+' "$(spec_count_noun_alt)"
 }
 
+# spec: spec-kit/SPEC.md §lib/spec.sh — the awk half of the count adapter: the matcher both restated-total gates prepend, so the boundary rule and the mechanical exemptions have one home. Callers pass SK_QRE, SK_RRE and SK_PHRASES; sk_count_hit returns the offending span, or "".
+spec_count_awk_lib() {
+    cat <<'AWK'
+BEGIN { SK_NP = split(SK_PHRASES, SK_PHRASE, "\n") }
+function _sk_phrase_exempt(low, ms, me,   i, p, lp, start, idx, pp) {
+    for (i = 1; i <= SK_NP; i++) {
+        p = SK_PHRASE[i]; if (p == "") continue
+        lp = length(p); start = 1
+        while (1) {
+            idx = index(substr(low, start), p)
+            if (idx == 0) break
+            pp = start + idx - 1
+            if (ms >= pp && me <= pp + lp - 1) return 1
+            start = pp + 1
+        }
+    }
+    return 0
+}
+function _sk_span(low, scan, re, quantifier,   rest, off, ms, ml, me, bc, ac, ok, m, prefix, suffix) {
+    rest = low; off = 0
+    while (match(rest, re) > 0) {
+        ms = off + RSTART; ml = RLENGTH; me = ms + ml - 1
+        bc = (ms > 1) ? substr(low, ms - 1, 1) : " "
+        ac = (me < length(low)) ? substr(low, me + 1, 1) : " "
+        ok = 1
+        if (bc ~ /[[:alnum:]]/) ok = 0          # match glued to a preceding word or number
+        if (ac ~ /[[:alnum:]-]/) ok = 0         # noun glued to a following word (e.g. gatekeepers)
+        if (ok) {
+            m = substr(low, ms, ml)
+            prefix = substr(low, 1, ms - 1)
+            suffix = substr(low, me + 1)
+            if (_sk_phrase_exempt(low, ms, me)) ok = 0
+            else if (quantifier) {
+                if (prefix ~ /(≥|≤|>|<|at least|at most|up to|more than|fewer than)[[:space:]]*$/) ok = 0
+                else if (prefix ~ /all but[[:space:]]*$/) ok = 0
+                else if (prefix ~ /(^|[^[:alnum:]])of[[:space:]]+(the[[:space:]]+)?$/) ok = 0
+                else if (m ~ /(^|[[:space:]])of([[:space:]]|$)/) ok = 0
+                else if (suffix ~ /^[[:space:]]+per([[:space:]]|$)/) ok = 0
+            }
+        }
+        if (ok) return substr(scan, ms, ml)
+        off = ms; rest = substr(low, ms + 1)
+    }
+    return ""
+}
+function sk_count_hit(text,   scan, low, s) {
+    scan = text
+    gsub(/`[^`]*`/, "", scan)   # a cardinal in inline code is a meta-reference, not a restated total
+    low = tolower(scan)
+    s = _sk_span(low, scan, SK_QRE, 1)
+    if (s != "") return s
+    return _sk_span(low, scan, SK_RRE, 0)
+}
+AWK
+}
+
+spec_count_phraselist() {
+    [[ ${#SPEC_KIT_COUNT_ALLOWED_PHRASES[@]} -eq 0 ]] && return 0
+    printf '%s\n' "${SPEC_KIT_COUNT_ALLOWED_PHRASES[@]}" | tr '[:upper:]' '[:lower:]'
+}
+
 _sk_errs=()
 [[ -n "$SPEC_KIT_SPEC_NAME" ]]      || _sk_errs+=("SPEC_KIT_SPEC_NAME is empty")
 [[ -n "$SPEC_KIT_AMENDMENT_GLOB" ]] || _sk_errs+=("SPEC_KIT_AMENDMENT_GLOB is empty")
