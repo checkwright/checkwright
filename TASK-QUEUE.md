@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **docs-cname-parity** [spec: SPEC-docs-cname-parity.md] — consumer gate:
-  docs/CNAME is the single source of truth for the docs host; a tracked
-  URL naming a project host alias other than the CNAME host reds; posts
-  and fixtures exempt.
 - **site-health-monitor** [spec: SPEC-site-health-monitor.md] — own cron
   workflow, deliberately not a gate: probes apex, www, http→https, the
   alternate-domain redirect, and cert expiry against the live site,
@@ -242,6 +238,7 @@
 
 ## Done
 
+- docs-cname-parity
 - docs-link-convention-gate
 - manifest-count-shapes
 - comment-count-drift

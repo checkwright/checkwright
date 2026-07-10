@@ -38,6 +38,7 @@ check-spec-embedded-source
 check-spec-fence-balance
 check-md-refs
 check-docs-link-convention
+check-docs-cname-parity
 check-docs-cmd
 check-manifest-temporal
 check-manifest-count

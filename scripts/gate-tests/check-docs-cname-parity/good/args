@@ -1,0 +1,4 @@
+# Point the gate at this fixture's synthetic tree + CNAME. It carries only
+# apex (H) URLs plus alias URLs that live under the two exempt path classes
+# (docs/posts/* immutable posts, */gate-tests/* fixtures). The gate must PASS.
+tree tree/CNAME
