@@ -107,6 +107,21 @@
   enforce). NOTE at sixth ruling: this entry is past the queue-entry
   altitude — its scope session should open by graduating these notes
   into the amendment rather than extending them.
+- **delegation-doctrine-single-source** [needs-spec] — collapse the
+  agent-execution doctrine to one source, the delegation-kit template:
+  CLAUDE.md §Agent execution shrinks to a resident pointer plus at most the
+  pre-authorization sentence, the claude-md-agent-execution.md digest
+  template shrinks with it or retires, and the consumer /agent-execution
+  skill becomes a binding shim over templates/agent-execution.md (the
+  skill-template-binding grammar; check-skill-binding as specced does not
+  restrict which kit owns the named template — sequenced after
+  skill-template-binding lands). Rests on the residency rule from the
+  convention-hardening align review: CLAUDE.md earns a rule's residency
+  only when the rule has no load trigger — anything triggered by a stage,
+  a skill, or a tool call lives in its owned doc behind a pointer, and the
+  Agent budget guard shows dispatch already has a mechanical hook seam.
+  Candidate owned home for that rule: context-kit's SPEC (it owns the
+  always-loaded-budget doctrine). Surfaced 2026-07-11.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
