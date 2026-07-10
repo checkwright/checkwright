@@ -5,3 +5,4 @@
 ---
 
 convention-hardening scope 16b7a247 2026-07-11
+convention-hardening align f671b3e3 2026-07-11
