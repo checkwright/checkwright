@@ -15,3 +15,6 @@ scripts/msg-patterns.local.list
 .workflow/prompt-friction.log
 # drift-kit per-iteration scratch log (cleared at close-stage knowledge-friction triage)
 .workflow/knowledge-friction.log
+# outbound lesson-harvest sink ([essay] tag) — operator material feeding the
+# launch-comms essay, reclaimed into it then cleared (never tracked)
+.workflow/essay-harvest.md
