@@ -103,7 +103,11 @@
   a published row. Design note: decide the owner of post-close, pre-next-scope
   commits (currently the last iteration; freezing leaves them unowned, which
   under-counts a cross-boundary amendment — an acceptable edge or not).
-  Surfaced 2026-07-09 fixing the adoption-track CI backstop.
+  Surfaced 2026-07-09 fixing the adoption-track CI backstop. Operator
+  constraint 2026-07-10: **filing a queue entry after close must stay
+  possible** — the queue is where a post-close finding lands, so a
+  queue-only commit must never disturb a published row; whatever the freeze
+  rules for hotfixes, it may not make `TASK-QUEUE.md` append-hostile.
 - **site-health-monitor** [needs-spec] — a scheduled probe of the live docs
   site, explicitly *not* a gate: it verifies a deployment, not a tree, so it
   fails on causes no commit produced (DNS, a Pages incident, cert renewal) and
@@ -117,6 +121,31 @@
   Enforce-HTTPS has not silently flipped); checkwright.com 301 → apex with the
   path kept. The real payload is cert-expiry-in-N-days — the silent failure.
   Surfaced 2026-07-10 at the cutover.
+- **manifest-count-shapes** [needs-spec] — `check-manifest-count` matches only
+  an adjacent `<cardinal> <collection-noun>`, so three restatement shapes pass
+  it: a modifier wedged between the two (`nine generic rules`, `three governed
+  surfaces`) — the shape natural prose reaches for first; a noun-then-range
+  (`rules 1-8`, `gates 1-42`), which pins both endpoints of an ordered
+  collection and so rots on every append; and any collection absent from
+  `SPEC_KIT_COUNT_COLLECTIONS`, which omits `rules` though guard-kit's generic
+  ruleset is exactly such a collection. Closing the modifier gap needs a
+  stoplist so `three of the twelve gates` and `nine out of ten kits` stay
+  clean. Evidence the adjacency hole was met before and papered over rather
+  than fixed: `the four contracts` sits in `SPEC_KIT_COUNT_ALLOWED_PHRASES`
+  where the gate should simply never have fired. A fixture pair per shape.
+  Surfaced 2026-07-10 at close, after a stale `the nine generic rules` in
+  guard-kit/README.md passed the gate.
+- **comment-count-drift** [needs-spec] — a restated count in a *comment* is
+  invisible to `check-manifest-count`, which couples manifests only: the
+  `# rules 1-8` in `scripts/bash-guard.sh` sat stale while the ruleset grew,
+  and no gate read it. Operator's read, for scope to rule on: **block the
+  shape** — a count in a comment is never a directive, so `check-comment-tier`
+  is its natural owner — rather than widen the manifest gate's coupling to
+  `*.sh`, where legitimate numerals abound and a scan would trade a real
+  false-positive rate for the catch. The alternative to weigh is a
+  source-coupled count scan with a numeral allowlist. Either route wants
+  `manifest-count-shapes`' noun list settled first. Surfaced 2026-07-10 at
+  close, deleting the stale comment rather than re-syncing its number.
 - **docs-cname-parity** [needs-spec] — a hermetic gate making `docs/CNAME` the
   single source of truth for the docs URL: any tracked doc naming a different
   host reds. Offline and decidable, so it fits the gate contract that
