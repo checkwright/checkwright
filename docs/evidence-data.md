@@ -13,3 +13,4 @@
 | gap-closure | s a b v c | 9f/1d | 4 · ≤0d | 9s clean | 38 |
 | operational-hardening | s a b v c | 6f/0d | 3 · ≤1d | 12s clean | 39 |
 | adoption-track | s a b v c | 6f/3d | 7 · ≤0d | 13s clean | 42 |
+| public-positioning | s · b v c | 3f/2d | 0 | 13s clean | 42 |

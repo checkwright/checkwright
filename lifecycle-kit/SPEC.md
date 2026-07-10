@@ -51,7 +51,10 @@ condition, when to enter it at all), and the stage gates stay the independent
 verifier. The tool takes no `--force` flag, so the compliant path is the easy
 one — an operator who intends to override runs the stamp+flip by hand, exactly
 as before the tool existed. Committing the flip+stamp remains the skill's
-business.
+business — **never with `--no-verify`**: `enter-stage.sh` refuses to write
+while `check-stage-entry` is red, so the hook a bypass skips is exactly the
+battery that would confirm the stamp just written. A stage flip is never the
+one-off-with-cause that a bypass is reserved for.
 
 The first stage is the iteration boundary: `enter-stage.sh` *truncates* the
 evidence file back to its header (git history is the permanent audit trail;

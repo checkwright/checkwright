@@ -28,7 +28,10 @@ queue format); leave the rest for the next `/build`.
 
 One self-contained unit per session where feasible. Build per the scope ruling
 (config via env/config-file, this repo's layout as defaults), never let private
-rule content cross the seam. Every new gate is a
+rule content cross the seam. **A question the scope ruling does not settle goes
+to the operator, not to a guess** — there is no session-to-session routing path
+to the (possibly finished) scope session, by design while `scope-session-routing`
+sits deferred; the operator relays it. Every new gate is a
 copy-edit of `gate-sdk/templates/check-skeleton.sh` with a `good/`+`bad/`
 fixture pair; the four contracts (gate-sdk/SPEC.md) are enforced by the
 meta-gates — a red gate is fixed, never bypassed. Before committing:
