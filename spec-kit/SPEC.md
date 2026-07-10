@@ -213,10 +213,12 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   build tool owns).
 - `SPEC_KIT_COUNT_COLLECTIONS` — array of collection-noun plurals
   `check-manifest-count` treats as growing governed sets, default
-  `("gates" "meta-gates" "checks" "kits" "stages" "KPIs")` (a consumer appends
-  its own governed plurals); `SPEC_KIT_COUNT_ALLOWED_PHRASES` — exact-phrase
-  allowlist for fixed named sets a doc may cite inline, default
-  `("the four contracts")` (this repo adds its other fixed sets).
+  `("gates" "meta-gates" "checks" "kits" "stages" "rules" "KPIs")` (a consumer
+  appends its own governed plurals); `SPEC_KIT_COUNT_WEDGE_WORDS` — how many
+  words may sit between the cardinal and the noun, default `2`;
+  `SPEC_KIT_COUNT_ALLOWED_PHRASES` — exact-phrase allowlist for fixed named
+  sets a doc may cite inline, default empty (a consumer names its own fixed
+  sets, and only a phrase whose noun it governs needs the valve).
 - `SPEC_KIT_COMMENT_MACHINE` / `SPEC_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `SPEC_KIT_COMMENT_SURFACE` —
@@ -249,7 +251,12 @@ spec-scanning gates share, the manifest-set finder (`spec_manifest_files`) the
 narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`,
 amendments excluded — so its members read one identical set, and the governed
 comment-surface adapters (`spec_comment_whitelisted` plus two finders that
-`check-comment-tier` and `check-spec-pointer` scan through). The two comment
+`check-comment-tier` and `check-spec-pointer` scan through), and the
+count-grammar adapter (`SPEC_COUNT_CARDINAL_RE` plus the `spec_count_noun_alt`,
+`spec_count_quantifier_re` and `spec_count_range_re` regex builders) that the
+restated-total gates share, so a consumer's `SPEC_KIT_COUNT_COLLECTIONS`
+vocabulary enters once and every such gate matches the same shapes
+(§check-manifest-count). The two comment
 gates read *different* surfaces: `spec_comment_surface` prunes `templates/`
 shell sources, and `spec_comment_surface_with_templates` keeps them.
 `check-spec-pointer` scans the pruned set — a template's `spec:` line is a
@@ -358,7 +365,7 @@ tier.
 
 ### check-manifest-count
 
-Invariant: no bare cardinal immediately quantifying a governed collection noun
+Invariant: no bare cardinal quantifying a governed collection noun
 in manifest prose outside an exempt site. A pinned total for a *growing*
 collection — `six gates`, `seven meta-gates` — is a second source no gate reads:
 the count's owner is the collection itself (`gates.list`, a `checks/` dir, the
@@ -372,30 +379,45 @@ two READMEs and a SPEC), caught only by close-stage review.
 The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh) —
 canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
 skipped, an inline-code cardinal a meta-reference (so this section may name its
-own examples). The cardinal grammar is digit sequences and the spelled
+own examples). The grammar comes from the shared count adapter (§lib/spec.sh),
+so this gate and its comment-tier sibling read one vocabulary. The cardinal
+grammar is digit sequences and the spelled
 `two`…`twelve`, case-insensitive; `one` is deliberately outside it — singleton and
 cardinality-rule idioms ("one owner per fact", "one iteration per kit") are
 invariants, not totals. Collection nouns are `SPEC_KIT_COUNT_COLLECTIONS`
 (default the plurals the kits themselves grow: `gates`, `meta-gates`, `checks`,
-`kits`, `stages`, `KPIs`) — the one place consumer vocabulary enters, and it
-enters as config. Four exempt contexts, mechanical first: a threshold/comparator
+`kits`, `stages`, `rules`, `KPIs`) — the one place consumer vocabulary enters,
+and it enters as config.
+
+Two match shapes carry the cardinal to the noun. The *quantifier* shape allows
+up to `SPEC_KIT_COUNT_WEDGE_WORDS` (default `2`) modifiers wedged between them,
+so `nine generic rules` pins a total as surely as the adjacent `six gates` —
+adjacency is the zero-wedge case of one regex, not a branch of its own. The
+*noun-then-range* shape (`rules 1-8`, `gates 1-42`) pins both endpoints of an
+ordered collection and rots on every append. Five exempt contexts, mechanical
+first: a threshold/comparator
 on the same line (`≥ ≤ > <`, `at least` / `at most` / `up to` / `more than` /
 `fewer than`, or a following `per`-phrase) — a bound is a rule, not a total; the
-partition idiom `all but <cardinal>`; `SPEC_KIT_COUNT_ALLOWED_PHRASES`, an
+partition idiom `all but <cardinal>`; a partitive marker (`of`, `out of`) on
+either side of the match — in `three of the twelve gates` neither cardinal is a
+restated total, so a wedge containing the marker and the denominator it
+introduces are both exempt, and the markers are fixed generic-English mechanism
+rather than config; `SPEC_KIT_COUNT_ALLOWED_PHRASES`, an
 exact-phrase allowlist for fixed named sets a doc legitimately enumerates (default
-`("the four contracts")` — gate-sdk's shipped vocabulary, the one fixed set any
-consumer may cite; fixed-set naming is consumer judgment, config not mechanism);
+empty — fixed-set naming is consumer judgment, config not mechanism, and the
+valve only bites on a phrase whose noun the consumer governs);
 and the per-site `manifest-count-exempt: <reason>` on the line or the one above.
 Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the
 committing operator via the output contract; each hit read at the single scan
-transition (file, line, cardinal+noun in the message), no persistent state.
+transition (file, line, matched span in the message), no persistent state.
 Fail-closed on an unreadable manifest.
 
 Calibration shares the sibling's FP corpus and procedure
 (§check-manifest-temporal): the default noun list is tuned against this tree,
 every hit dispositioned — reword to cite the owning collection (preferred),
 extend `SPEC_KIT_COUNT_ALLOWED_PHRASES` (a genuinely fixed set), or site-exempt
-with reason. The good/bad pair covers detection and the mechanical exemptions;
+with reason. The good/bad pair covers every match shape and the mechanical
+exemptions;
 `check-manifest-count.test.sh` covers the config-driven paths (a consumer-governed
 noun and the allowlist containment) the stock defaults cannot reach. `precommit`
 tier.

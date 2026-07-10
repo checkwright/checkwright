@@ -77,9 +77,11 @@ declare -p SPEC_KIT_COUNT_COLLECTIONS &>/dev/null || SPEC_KIT_COUNT_COLLECTIONS=
     "checks"
     "kits"
     "stages"
+    "rules"
     "KPIs"
 )
-declare -p SPEC_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || SPEC_KIT_COUNT_ALLOWED_PHRASES=("the four contracts")
+declare -p SPEC_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || SPEC_KIT_COUNT_ALLOWED_PHRASES=()
+[[ -v SPEC_KIT_COUNT_WEDGE_WORDS ]] || SPEC_KIT_COUNT_WEDGE_WORDS=2
 
 declare -p SPEC_KIT_COMMENT_MACHINE &>/dev/null || SPEC_KIT_COMMENT_MACHINE=()
 declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
@@ -187,6 +189,31 @@ spec_comment_whitelisted() {  # $1=root-relative path — true when it matches a
     return 1
 }
 
+# spec: spec-kit/SPEC.md §lib/spec.sh — the count grammar the restated-total gate family shares: one cardinal alternation, one consumer noun vocabulary, two match shapes
+SPEC_COUNT_CARDINAL_RE='([0-9]+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)'
+
+spec_count_noun_alt() {
+    local n out=""
+    for n in "${SPEC_KIT_COUNT_COLLECTIONS[@]}"; do
+        [[ -n "$n" ]] || continue
+        out="${out:+$out|}${n,,}"
+    done
+    printf '%s' "$out"
+}
+
+# spec: spec-kit/SPEC.md §check-manifest-count — the wedge groups are optional, so bare adjacency is this shape's zero-wedge case rather than a second branch
+spec_count_quantifier_re() {
+    local i opt=""
+    for ((i = 0; i < SPEC_KIT_COUNT_WEDGE_WORDS; i++)); do
+        opt+='([[:space:]]+[[:alnum:]_-]+)?'
+    done
+    printf '%s%s[[:space:]]+(%s)' "$SPEC_COUNT_CARDINAL_RE" "$opt" "$(spec_count_noun_alt)"
+}
+
+spec_count_range_re() {
+    printf '(%s)[[:space:]]+[0-9]+-[0-9]+' "$(spec_count_noun_alt)"
+}
+
 _sk_errs=()
 [[ -n "$SPEC_KIT_SPEC_NAME" ]]      || _sk_errs+=("SPEC_KIT_SPEC_NAME is empty")
 [[ -n "$SPEC_KIT_AMENDMENT_GLOB" ]] || _sk_errs+=("SPEC_KIT_AMENDMENT_GLOB is empty")
@@ -207,6 +234,8 @@ _sk_errs=()
 [[ -n "$SPEC_KIT_GLOSSARY_FILE" ]] || _sk_errs+=("SPEC_KIT_GLOSSARY_FILE is empty")
 [[ ${#SPEC_KIT_TEMPORAL_MARKERS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_TEMPORAL_MARKERS is empty")
 [[ ${#SPEC_KIT_COUNT_COLLECTIONS[@]} -gt 0 ]] || _sk_errs+=("SPEC_KIT_COUNT_COLLECTIONS is empty")
+[[ "$SPEC_KIT_COUNT_WEDGE_WORDS" =~ ^[0-9]+$ && "$SPEC_KIT_COUNT_WEDGE_WORDS" -gt 0 ]] \
+    || _sk_errs+=("SPEC_KIT_COUNT_WEDGE_WORDS must be a positive integer (got '$SPEC_KIT_COUNT_WEDGE_WORDS')")
 [[ "$SPEC_KIT_COMMENT_RUN_CAP" =~ ^[0-9]+$ && "$SPEC_KIT_COMMENT_RUN_CAP" -gt 0 ]] \
     || _sk_errs+=("SPEC_KIT_COMMENT_RUN_CAP must be a positive integer (got '$SPEC_KIT_COMMENT_RUN_CAP')")
 if [[ ${#_sk_errs[@]} -gt 0 ]]; then

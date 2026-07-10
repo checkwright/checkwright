@@ -12,12 +12,7 @@
 
 ## New Features
 
-- **manifest-count-shapes** [spec: spec-kit/SPEC-count-shapes.md] —
-  check-manifest-count widens to the wedged-modifier and noun-then-range
-  shapes with a partitive carve-out; `rules` joins the default collection
-  nouns; the dead allowed-phrases default is retired; the count grammar
-  factors into lib/spec.sh for the comment-count sibling.
-- **comment-count-drift** [blocked-by: manifest-count-shapes] [spec: SPEC-comment-count.md] —
+- **comment-count-drift** [spec: SPEC-comment-count.md] —
   check-comment-tier gains the
   count-shape override: a count in a full-line comment is flagged even
   inside a blessed directive window, sharing the count grammar and noun
@@ -152,5 +147,7 @@
   the campaign itself is operator work. Surfaced 2026-07-09.
 
 ## Done
+
+- manifest-count-shapes
 
 ## Lessons Learned

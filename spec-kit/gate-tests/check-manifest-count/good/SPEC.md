@@ -9,6 +9,14 @@ five gates per kit.
 
 Partitions classify, they do not count: all but two stages are idempotent.
 
+Proportions restate no total on either side, numerator or denominator:
+
+- three of the twelve gates were red last release
+- six of the gates are meta-gates
+- nine out of ten kits vendor the runner unchanged
+
+A modifier wedge wider than the window reads as prose: nine plainly generic scanning rules.
+
 A cardinal named in `six gates` inline code is a meta-reference, and a fenced
 example is skipped entirely:
 

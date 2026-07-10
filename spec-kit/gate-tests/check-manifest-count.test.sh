@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Behavioral test of the config-driven paths the one-pair good/bad harness
 # cannot hold with stock defaults: a consumer-appended collection noun and the
-# SPEC_KIT_COUNT_ALLOWED_PHRASES containment exemption. The default allowlist
-# entry ("the four contracts") names a set whose noun is not governed by
-# default, so only a config that governs that noun exercises the exemption —
-# which run-gate-tests passes to no fixture. The good/bad pair covers the
-# core cardinal+noun detection and the mechanical exemptions (threshold, per,
-# partition, inline-code, fence, per-site marker); these cases cover the knobs.
+# SPEC_KIT_COUNT_ALLOWED_PHRASES containment exemption. The allowlist ships
+# empty, so only a config that both governs a noun and allowlists a phrase
+# containing it exercises the exemption — which run-gate-tests passes to no
+# fixture. The good/bad pair covers the cardinal+noun shapes (adjacent, wedged,
+# noun-then-range) and the mechanical exemptions (threshold, per, partition,
+# partitive, inline-code, fence, per-site marker); these cases cover the knobs.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail

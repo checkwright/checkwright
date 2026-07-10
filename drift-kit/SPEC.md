@@ -91,7 +91,7 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   overlay (`.claude/settings.local.json` allow/deny/ask, via `jq`); the
   notice signal for guard-kit's close-stage prune/promote step.
 - **kpi-gate-runtime** — full-battery runtime from the runner's timings
-  file (`<tmp-dir>/gate-timings.txt`): total, the three slowest gates, and
+  file (`<tmp-dir>/gate-timings.txt`): total, the slowest gates by runtime, and
   the file's reading age — a *measurement*, not live state, so the age
   caveat rides the value.
 
