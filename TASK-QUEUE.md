@@ -215,6 +215,20 @@
   consumer's verdict carries different axes). Name the supervision
   ceiling in the docs: attention over N concurrent reports does not
   scale with budget. Surfaced 2026-07-10 in build.
+- **spec-kit-rename** [needs-spec] — the spec-kit component name collides
+  with GitHub Spec Kit, the most recognized name in spec-driven development
+  and aimed at the identical audience: at launch, "Checkwright includes
+  spec-kit" reads as wrapping or squatting it. Rename the kit dir and the
+  SPEC_KIT_ knob prefix (candidate: canon-kit, from the kit's own
+  "canonical spec" vocabulary); the SPEC.md filename convention, the spec:
+  source directive, and the spec-ready queue tag stay — generic vocabulary,
+  not the kit's brand. A pure
+  mechanical sweep the battery itself verifies (kit-registration, docs-cmd
+  knob resolution, md-refs, kit: glob tokens); its own micro-iteration,
+  and strictly before the first release tag — after a tag the upgrade
+  contract makes a kit-dir rename a breaking major. Surfaced 2026-07-10
+  at the competitive-landscape review; the identity note is in the
+  operator's local brief.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
