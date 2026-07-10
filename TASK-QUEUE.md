@@ -28,6 +28,20 @@
 
 ## Technical Debt
 
+- **todo-task-liveness** — the one admitted TODO directive is never
+  liveness-checked: check-comment-tier classifies TODO(task: <slug>) as a
+  directive but nothing resolves the slug, so a TODO bound to a completed,
+  cleared task passes forever — the staleness class its siblings already
+  guard (a blocked-by tag is flagged stale on a done slug; exemption
+  until: refs validate against live tasks). Converge: every TODO(task:) site on a
+  governed source resolves to a live queue slug, stale-flagged otherwise.
+  Latent today — no such site exists in the tree yet; land the check
+  before the first one does. Same neighborhood, small judgment at fix
+  time: whether a narrow trailing-comment scan for bare TODO/FIXME/HACK
+  markers is worth it (trailing comments are out of scope by documented
+  ruling, but these markers are rarely legitimate trailing content); if it
+  grows into a real design question, file it separately rather than rule
+  it here.
 - **count-scan-wrap-blindness** —
   the shared count adapter matches within one physical line, so a prose wrap
   splitting cardinal from noun evades both restated-total gates: spec-kit's own
@@ -95,7 +109,13 @@
   skill template beside the smoke — the smoke stays bare bash so a
   harness-less consumer keeps the upgrade path, the skill narrates it
   (lifecycle-kit's templates/skills precedent); harness packaging stays
-  with plugin-marketplace.
+  with plugin-marketplace. Extended 2026-07-10: a larger private
+  consumer's major-transition practice — sweeping deprecated surfaces for
+  decommissioning opportunities — joins this rung as release-prep
+  mechanics once a deprecation surface exists (post first tag): a
+  deprecated-surface inventory feeding the next major's decommission list
+  beside the tightened-gates declaration; a release-time sweep, not a
+  standing gate.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
