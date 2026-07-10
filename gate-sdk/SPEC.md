@@ -520,6 +520,55 @@ check — verifying a gate's declared couples cover its real read-set — is *no
 carried; it would require parsing arbitrary shell, neither cheap nor low-FP,
 and (B) already guarantees editing a coupled surface fires the gate.
 
+### enforcement-map
+
+`bin/enforcement-map.sh --emit` writes `docs/enforcement.md`: a kit-first map of
+every check surface — kit, governed surface, enforcement class — derived from
+the class registries so it cannot drift from what actually runs. It is
+check-graph's sibling in shape (an emitter whose output a freshness gate
+byte-compares), advisory by construction: exit is always 0 and it never joins
+`gates.list`. Bare it prints a human header before the page; `--emit` prints the
+page alone, for the committed projection.
+
+Each enforcement class reads one registry, every registry defaulting to this
+repo's layout through the owning kit's knob: **blocking gates** from
+`gates.list` plus each gate's `# graph:` `tier=` field, the owning kit taken
+from the same name-resolution walk the runner uses (a consumer-dir gate groups
+as the consumer's); **advisory KPIs** from the drift-kit `kpis.list` registry
+(`DRIFT_KIT_KPIS_FILE`); **guards** and **session warnings** from the
+`PreToolUse` / `SessionStart` command hooks in the tracked harness settings file
+(`CONTEXT_KIT_SETTINGS_FILE`, parsed with `jq`); **validate suites** from
+evidence-kit's suite config (`EVIDENCE_KIT_CONFIG_FILE`); and **monitors** — the
+one class with no parseable registry — from a line-start
+`# enforce: class=monitor <free-text>` marker a non-gate surface declares itself
+with, greped under `GATE_SDK_ENFORCE_SCAN_DIR` (this repo's first carrier is the
+site-health workflow — deployment truth, not tree truth). The `# enforce:`
+grammar is the reusable name a future uncovered class adopts rather than growing
+a bespoke registry.
+
+Cross-registry reads are a reporting surface (the drift-report precedent), and
+the emitter degrades per class: a registry a consumer has not adopted leaves its
+section absent, so a gates-only consumer still gets its gate map. The emitted
+page — not this SPEC — owns the enforcement-class **taxonomy** prose (what each
+class means and how hard it binds); the emitter's preamble heredoc is its single
+source, and this section documents the emitter contract and cites the page for
+the taxonomy.
+
+### check-enforcement-fresh
+
+Invariant: `docs/enforcement.md` byte-matches `enforcement-map.sh --emit` — the
+check-graph / trajectory-freshness byte-compare pattern. Bare, it runs the
+emitter and compares the committed page; given two arguments
+(`projection-file emit-file`) it compares pre-baked files, letting the fixture
+pair exercise it hermetically off the live registries. Fail-closed: a missing
+projection, a missing emitter, or a non-zero emit is a red (exit 2), never a
+false clean. Its `# graph:` manifest couples every class registry — the gate
+sources (so a `tier=` edit re-fires), `kpis.list`, the settings file, and the
+monitor-carrier workflows — beside the artifact itself, so any registry change
+re-runs the freshness compare. The corrective its help text names is the
+regeneration command, reachable because the gate rides the generated pre-commit
+hook (the check-graph contract exactly).
+
 ### check-kit-enum
 
 Invariant: for every `gates.list` member, a `couples=` set that literally names

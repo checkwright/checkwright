@@ -6,6 +6,7 @@
 # inside it: a failed probe opens (or updates, never duplicates) a site-health
 # issue and reds this run, never a merge. Recovery self-clears (a green run
 # closes the open issue). No README badge, by the standing ruling.
+# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, and cert expiry
 name: site-health
 
 on:

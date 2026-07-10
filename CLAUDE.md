@@ -55,6 +55,12 @@ artifact: `bash gate-sdk/checks/check-graph.sh --emit > .workflow/CHECK-GRAPH.ht
 (`check-graph` asserts both artifacts are fresh). Per-clone opt-in:
 `bash gate-sdk/bin/install-hooks.sh`.
 
+The enforcement map is a generated projection likewise — after a class-registry
+change (a gate's `tier=`, `kpis.list`, the settings hooks, a `# enforce:`
+marker), regenerate it:
+`bash gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`
+(`check-enforcement-fresh` byte-compares it).
+
 New gates copy `gate-sdk/templates/check-skeleton.sh` and ship with a
 `good/`+`bad/` fixture pair; the four contracts (output, fail-closed,
 fixture-pair, self-lint) are specified in [gate-sdk/SPEC.md](gate-sdk/SPEC.md)
