@@ -29,6 +29,30 @@ Because gate names are unchanged and `gates.list` resolves names against
 each vendored kit's `checks/` dir, the registry needs no edit — the renamed
 dir re-registers by name alone.
 
+**`check-kit-ref-liveness` (consumer gate, `scripts/`)** lands in the same
+unit — the removals-propagated grep made permanent: every kit-name
+reference in a tracked file resolves to a kit root on disk. Reference
+forms it resolves: a kit-shaped path segment (`(^|/)<name>-kit(/|$)`, plus
+`gate-sdk`) must name an existing root, and a kit-prefixed knob must
+resolve the way `check-docs-cmd` already resolves its knob mentions —
+borrow that resolver rather than re-derive the prefix mapping, which is
+not uniform (`SPEC_KIT_` but `LIFECYCLE_`). Bare prose tokens are out of
+scope: the align-audit inventory showed the tree's `<name>-kit` tokens are
+dominated by non-references (gate names like `check-kit-registration`,
+fixture placeholders like `alpha-kit`, compounds like `per-kit`), and the
+path/knob forms are the ones that dangle harmfully. Valves, each with
+precedent: `gate-tests/` fixture bodies (the manifest finder already
+prunes them), `docs/posts/*` and the generated `docs/evidence-data.md`
+(immutable history — both cite the old brand forever), and `SPEC-*.md`
+amendments (legitimately name retired and future paths). Consumer-local
+by operator ruling: the hazard it guards — a kit rename or retirement
+leaving dangles — is a kit-author hazard, not a consumer one, so it is
+not templated into gate-sdk; ships as a check-skeleton copy in `scripts/`
+with a `good/`+`bad/` fixture pair under `scripts/gate-tests/`, registered
+in `gates.list` with a `# graph:` manifest (hook + graph + enforcement map
+regenerate on landing). Promotion into gate-sdk stays a file move if it
+ever earns generality.
+
 ## Producers and consumers
 
 - **`CANON_KIT_*` knobs** — producer: the consumer config
@@ -59,6 +83,14 @@ dir re-registers by name alone.
   and `docs/enforcement.md` embed kit paths; all three regenerate after the
   sweep (`gen-pre-commit.sh --write`, `check-graph.sh --emit`,
   `enforcement-map.sh --emit`).
+- **`check-kit-ref-liveness`** — producer: `gates.list` registration (the
+  consumer gates dir resolves first, so no kit changes); consumers: the
+  battery (`run-gates.sh`), the consumer fixture runner
+  (`scripts/gate-tests`), and the pre-commit hook via its `# graph:`
+  manifest. Green on the pre-rename tree too (every `spec-kit` path
+  resolves until the dir moves), so it may land before, with, or after the
+  sweep — but inside this unit, because the rename is what turns today's
+  references into potential dangles.
 
 ## Existing sections updated
 
