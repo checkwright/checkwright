@@ -7,8 +7,10 @@ deliberate.
 
 It ships index-first reading tools that surface a file's shape before its body,
 a session-start hook that assembles a compact orienting brief, an always-loaded
-meter with a committed baseline, and a gate over the density of the densest
-always-loaded section.
+meter with a committed baseline, a gate over the density of the densest
+always-loaded section, and a memory-off gate pair that keeps the harness's
+ungoverned per-session memory surface disabled — the doctrine and both gates
+are defined in the kit's `SPEC.md`.
 
 ## Install
 
