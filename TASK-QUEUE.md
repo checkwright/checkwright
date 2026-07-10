@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: public-positioning  [stage: close]
+## Iteration: close-loop-hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,50 @@
 ---
 
 ## New Features
+
+- **manifest-count-shapes** [spec: spec-kit/SPEC-count-shapes.md] —
+  check-manifest-count widens to the wedged-modifier and noun-then-range
+  shapes with a partitive carve-out; `rules` joins the default collection
+  nouns; the dead allowed-phrases default is retired; the count grammar
+  factors into lib/spec.sh for the comment-count sibling.
+- **comment-count-drift** [blocked-by: manifest-count-shapes] [spec: SPEC-comment-count.md] —
+  check-comment-tier gains the
+  count-shape override: a count in a full-line comment is flagged even
+  inside a blessed directive window, sharing the count grammar and noun
+  vocabulary; the source-coupled numeral scan is rejected as FP-heavy.
+- **trajectory-closed-row-freeze** [spec: SPEC-closed-row-freeze.md] —
+  every range-scoped trajectory column freezes at the close boundary:
+  iteration N harvests (close(N-1), close(N)], interstitial commits belong
+  to the next row, and post-close queue filings and hotfixes alike leave
+  every published row byte-identical.
+- **lesson-disposition-traceability** [spec: SPEC-lesson-channels.md] —
+  a commit shrinking Lessons Learned must stamp a per-entry disposition
+  (rule/task/harvest/discard) into the lesson-evidence file;
+  check-lesson-disposition holds the fail-closed contract, hermetic via
+  override args.
+- **lesson-pub-harvest** [spec: SPEC-lesson-channels.md] — the outbound
+  channel: consumer-named harvest tags on a lesson lead line route the
+  entry's body to a consumer-configured sink at close triage; this repo
+  wires an essay tag into a gitignored harvest feeding the launch-comms
+  methodology essay.
+- **lesson-context-tag** [spec: SPEC-lesson-channels.md] — the inbound
+  channel: a fixed attend tag on a lesson lead line makes queue-index emit
+  the lead line into every later session of the same iteration, capped;
+  enter-stage scope refuses on a non-empty Lessons section, so the
+  injection mechanically dies at the iteration boundary.
+- **docs-link-convention-gate** [spec: SPEC-docs-link-convention.md] —
+  consumer gate over the docs pages: no directory-target relative link
+  (name the file), kit-page back-links carry their section anchor; the
+  shape gate beside check-md-refs' resolution.
+- **docs-cname-parity** [spec: SPEC-docs-cname-parity.md] — consumer gate:
+  docs/CNAME is the single source of truth for the docs host; a tracked
+  URL naming a project host alias other than the CNAME host reds; posts
+  and fixtures exempt.
+- **site-health-monitor** [spec: SPEC-site-health-monitor.md] — own cron
+  workflow, deliberately not a gate: probes apex, www, http→https, the
+  alternate-domain redirect, and cert expiry against the live site,
+  failing to an opened/updated site-health issue, never a red merge; no
+  README badge.
 
 ## Technical Debt
 
@@ -79,12 +123,6 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **docs-link-convention-gate** [needs-spec] — a docs-scoped gate holding
-  the link conventions docs-kit-page-links settles: no directory-target
-  relative link in docs/ living pages (name the file), kit-page back-links
-  carry their section anchor. Cheap and decidable, but let the convention
-  prove stable first — promote once the sweep has landed and held through
-  an iteration. Surfaced 2026-07-09 in public-positioning scope.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
@@ -93,114 +131,6 @@
   the demo and docs withstand that traffic; conference CfP targets picked
   by lead time. In-repo residue only (docs/posts/ entries, the tag);
   the campaign itself is operator work. Surfaced 2026-07-09.
-- **trajectory-closed-row-freeze** [needs-spec] — a closed iteration's
-  published-evidence row must be immutable, but `trajectory.sh` anchors only
-  the gate-count column at the close commit; feat/debt and amendment-latency
-  run to HEAD for the *last* iteration, so any post-close commit mutates a
-  closed row and reds `check-trajectory-fresh` until a regen. Freeze a closed
-  iteration's whole range at its close boundary (align the feat/debt/amendment
-  windows with the gate-count precedent), so post-close hotfixes never disturb
-  a published row. Design note: decide the owner of post-close, pre-next-scope
-  commits (currently the last iteration; freezing leaves them unowned, which
-  under-counts a cross-boundary amendment — an acceptable edge or not).
-  Surfaced 2026-07-09 fixing the adoption-track CI backstop. Operator
-  constraint 2026-07-10: **filing a queue entry after close must stay
-  possible** — the queue is where a post-close finding lands, so a
-  queue-only commit must never disturb a published row; whatever the freeze
-  rules for hotfixes, it may not make `TASK-QUEUE.md` append-hostile. Measured
-  the same day: the append path already holds — feat/debt harvests only
-  `feat*` and `fix*`/`refactor*` subjects, so a `docs(queue):` filing leaves
-  the row byte-identical. The freeze must *preserve* that property, not
-  establish it; the live hazard is a post-close `feat`/`fix` commit.
-- **site-health-monitor** [needs-spec] — a scheduled probe of the live docs
-  site, explicitly *not* a gate: it verifies a deployment, not a tree, so it
-  fails on causes no commit produced (DNS, a Pages incident, cert renewal) and
-  breaks both the low-false-positive gate contract and gates.yml's
-  "checkout + bash only" hermeticity. Ruling 2026-07-10: its own cron workflow,
-  failing to an opened/updated issue, never to a red merge — and no health
-  badge in README.md (readme-ci-badge's gates badge claims the code; a badge
-  claiming infrastructure we do not own would red the landing page on a
-  resolver hiccup, undercutting the pitch that page makes). Asserted contract:
-  apex 200 over HTTPS with a valid cert; www 301 → apex; http → https (proving
-  Enforce-HTTPS has not silently flipped); checkwright.com 301 → apex with the
-  path kept. The real payload is cert-expiry-in-N-days — the silent failure.
-  Surfaced 2026-07-10 at the cutover.
-- **manifest-count-shapes** [needs-spec] — `check-manifest-count` matches only
-  an adjacent `<cardinal> <collection-noun>`, so three restatement shapes pass
-  it: a modifier wedged between the two (`nine generic rules`, `three governed
-  surfaces`) — the shape natural prose reaches for first; a noun-then-range
-  (`rules 1-8`, `gates 1-42`), which pins both endpoints of an ordered
-  collection and so rots on every append; and any collection absent from
-  `SPEC_KIT_COUNT_COLLECTIONS`, which omits `rules` though guard-kit's generic
-  ruleset is exactly such a collection. Closing the modifier gap needs a
-  stoplist so `three of the twelve gates` and `nine out of ten kits` stay
-  clean. Evidence the adjacency hole was met before and papered over rather
-  than fixed: `the four contracts` sits in `SPEC_KIT_COUNT_ALLOWED_PHRASES`
-  where the gate should simply never have fired. A fixture pair per shape.
-  Surfaced 2026-07-10 at close, after a stale `the nine generic rules` in
-  guard-kit/README.md passed the gate.
-- **comment-count-drift** [needs-spec] — a restated count in a *comment* is
-  invisible to `check-manifest-count`, which couples manifests only: the
-  `# rules 1-8` in `scripts/bash-guard.sh` sat stale while the ruleset grew,
-  and no gate read it. Operator's read, for scope to rule on: **block the
-  shape** — a count in a comment is never a directive, so `check-comment-tier`
-  is its natural owner — rather than widen the manifest gate's coupling to
-  `*.sh`, where legitimate numerals abound and a scan would trade a real
-  false-positive rate for the catch. The alternative to weigh is a
-  source-coupled count scan with a numeral allowlist. Either route wants
-  `manifest-count-shapes`' noun list settled first. Surfaced 2026-07-10 at
-  close, deleting the stale comment rather than re-syncing its number.
-- **lesson-disposition-traceability** [needs-spec] — the close ritual mandates an
-  explicit disposition per Lessons entry, but nothing enforces it, so a lumpy
-  harvest under close-stage fatigue becomes discard-by-omission. Measured on a
-  larger private consumer of this lifecycle: 42 close commits cleared ~180 lesson
-  bullets; 23 landed a rule, 12 filed a task, and 12 commits left no trace in
-  tree or message — one cleared two lessons with an empty commit body, while
-  another named its dispositions in full (two tasks, three discards with cause).
-  Harvests ran as large as 14 entries at once. Shape: a commit that shrinks
-  `## Lessons Learned` must name a disposition per cleared entry — the same
-  fail-closed contract as `check-stage-evidence`, where the claim must leave
-  evidence. Decide the disposition vocabulary (rule/task/publish/discard) and
-  whether the evidence lives in the commit body or a stamped file. Surfaced
-  2026-07-10 auditing whether Lessons still earns its section.
-- **lesson-pub-harvest** [needs-spec] — a configurable **outbound** channel for
-  Lessons: an opt-in tag on a lesson lead line marks it communication-worthy, and
-  the close triage routes tagged entries to a harvest sink rather than only to a
-  rule, a task, or a discard. The slug says `pub`, but the scope is any
-  communication purpose — a published essay, conference or presentation
-  material, internal knowledge sharing — so the tag vocabulary is plural, not a
-  single `[pub]`. Mechanism only: the tag names, the sink paths, and the
-  per-tag handling instructions are all consumer config (the
-  `check-graph`/`graph-vocab` pattern); the kit ships neither a sink nor its
-  content, and a consumer states how its own tags are dealt with. Attested on a
-  larger private consumer, where most lessons carry such a tag and feed a
-  writing pipeline; this repo has no such channel, though `launch-comms` names a
-  methodology essay as a deliverable, so the lessons that would feed it are
-  today dispositioned to rules and lost as prose. Lands in lifecycle-kit beside
-  the close ritual. Surfaced 2026-07-10.
-- **lesson-context-tag** [needs-spec] — the **inbound** counterpart: a dedicated
-  tag by which the filing session (typically `/build`) marks a lesson as a live
-  point of attention, so `queue-index.sh` injects it into the session context of
-  later sessions *of the same iteration*. Closes the gap that Lessons is today a
-  write-only buffer between the filing session and the close session — the
-  section is absent from `session-context.sh`'s projection, so no following
-  session ever sees an entry it did not write. Load-bearing constraint: the
-  injection must die at the iteration boundary, since a lesson that outlives its
-  close becomes exactly the standing per-session instruction that
-  drift-kit/templates/close-knowledge.md forbids — a permanent token tax paid
-  for one session's observation. The injected surface is always-loaded, so
-  `check-brevity` governs it and a budget belongs in the design. Design tension
-  to rule with `lesson-pub-harvest`: both are one mechanism — a tag vocabulary
-  on the lesson lead line with a configurable sink, inbound here and outbound
-  there — and may want unifying rather than two bespoke tag readers. Surfaced
-  2026-07-10.
-- **docs-cname-parity** [needs-spec] — a hermetic gate making `docs/CNAME` the
-  single source of truth for the docs URL: any tracked doc naming a different
-  host reds. Offline and decidable, so it fits the gate contract that
-  site-health-monitor cannot. Would not have caught the 2026-07-10 cutover bug
-  (README.md and docs/CNAME agreed with each other; both named a host DNS never
-  delivered to Pages) — it prevents the *next* rename from half-landing.
-  Surfaced 2026-07-10 alongside site-health-monitor.
 
 ## Done
 
