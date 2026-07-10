@@ -1,1 +1,14 @@
 # contract: evidence-manifest v1
+enforcement-sweep gates sha256=6434bbeaba3c12d0dc94f111ce095b4b0c539c7f6d8ec6f3364ede524efaac73 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep gatesdk_fixtures sha256=8305f15cc496e458f6d3cd8aa1a53517db69f1e5ea83b0a3f5f182bfbdd20f2e pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep lifecycle_fixtures sha256=27fb134836d90057da194929a12b5689fd1fcaaba1376d9a004d5dba9daab9d5 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep queue_fixtures sha256=05c5274b5c3a846edb664ec9ca8b8b45fed95beb3cbffb3eacceb4243869031a pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep spec_fixtures sha256=a5673218f1ea6da2afa1da6f1498f04da2214105f103041c1c4158f359e8a156 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep delegation_fixtures sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep context_fixtures sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep evidence_fixtures sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep guard_tests sha256=b0525bc061bb5174dace1c84c6c4d8fae08607bc2c367442172dba2dab6f00b6 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep usage_tests sha256=ee1ba679b32085c711c528ef47fc5fcb0f378349d1f92ff70e35ae8c306b5256 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+enforcement-sweep demo sha256=6d1933981030ca11ddb9df17865fe9d47bc158cd6f2a386a8d46a088a4569052 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
