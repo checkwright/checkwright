@@ -31,6 +31,42 @@
 
 ## Deferred
 
+- **doctrine-kit** [needs-spec] — the experience-packaging rung, first
+  candidate at next scope: a kit-shipped, customer-deliverable doctrine file
+  carrying the generic battle-tested delivery rules — content-tiering/SSOT
+  (one tier per surface, point-never-restate, a gate forbids the slab
+  growing back), enforcement-first (the fix and its enforcing mechanism land
+  in one unit; a green instance fix is a stop signal), de-literalization
+  (prose cites names, code/SPEC own values), the always-loaded shape
+  (one-line rule per convention, detail behind the pointer) and the
+  load-trigger residency rule (the always-loaded file earns a rule only when
+  no stage/skill/tool-call trigger exists to load it). Install inserts a
+  reference block into the consumer's always-loaded agent file
+  (CLAUDE.md/AGENTS.md); a registration gate holds the reference present
+  (the check-kit-registration shape) and the doctrine file joins the spec
+  manifest so its links resolve. Scope includes the systematic sweep of the
+  private companion consumer's instruction corpus for generic practices not
+  yet banked — mechanism crosses the seam, rule content never does — and
+  converts this repo's CLAUDE.md to consumer-by-reference: the interim
+  §Single source of truth section relocates into the shipped file, CLAUDE.md
+  keeps the reference plus repo-specific bindings. Owning kit ruled at
+  scope. Surfaced 2026-07-11: sessions were re-deriving doctrine the
+  companion project already owns — packaging is what stops the re-derivation.
+- **knob-literal-citation-gate** [needs-spec] — the enforcement half of the
+  align knob-defaults finding: the instance is fixed (CLAUDE.md cites knob
+  names; each kit's SPEC owns its roster and default values) and this gate
+  forbids the slab growing back — no governed surface outside a kit's own
+  SPEC states a `<KIT>_` knob's default value. Calibrate on the low-FP
+  triad (knob token + default/value marker + non-owning surface); a bare
+  number in prose stays a tripwire, not a gate.
+- **fixture-suite-derivation** [needs-spec] — the fixture-suite roster is
+  derivable from disk (`*/gate-tests`) yet hand-enumerated on four surfaces:
+  the CLAUDE.md battery block (the only gated one — check-kit-registration),
+  the CI workflow, evidence-config's validate suites, and the
+  agent-execution validate-after-commit set. Mechanism: derive where the
+  surface is executable (CI and config loop over the dirs), cite where it is
+  prose. The three ungated instances are deliberately not bare-fixed — they
+  ride this unit as its first green case (enforcement-first corollary).
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
@@ -199,3 +235,16 @@
 ## Done
 
 ## Lessons Learned
+
+- [attend] [essay] golden-practice re-derivation: the convention-hardening
+  align review re-derived and initially violated doctrine the private
+  companion project already owns (content-tiering, enforcement-first, the
+  one-line-plus-pointer always-loaded shape) — gates were offered as
+  optional follow-ups, restatements were fixed instance-by-instance, and
+  extraction first targeted this repo's CLAUDE.md rather than a shipped
+  surface. The banking premise fails silently when extraction lands
+  repo-local: the experience must land in a customer-deliverable kit
+  surface (→ doctrine-kit) or every consumer, this repo included, re-hits
+  the same rock. Ruling wanted at close: a standing consultation step —
+  convention-shaping stages check the companion corpus inventory before
+  ruling, until doctrine-kit makes the corpus itself the shipped reference.

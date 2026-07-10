@@ -74,26 +74,37 @@ behind a `spec:` or `comment-tier-exempt:` tag rather than deleting it) is
 itself the defect; the doctrine and the one-line-binding rule for `spec:` live
 in [spec-kit/SPEC.md](spec-kit/SPEC.md) §check-comment-tier.
 
+## Single source of truth
+
+- **Content-tiering:** every governed prose surface owns exactly one content
+  tier and *points to* — never restates — a fact another surface owns; a
+  parallel copy is the defect, and the fix is one shape: replace the slab
+  with a pointer to the owner, then a gate forbids it growing back.
+  Quantitative literals (knob defaults, shared constants, derivable rosters)
+  are owned by code or the owning SPEC — prose cites the name, never the
+  value.
+- **Enforcement-first:** on any fix or redundancy finding, name the defect
+  class *and* its enforcing mechanism and land both in the same unit — never
+  offer the gate as a follow-up; a green instance fix is the stop signal to
+  ask what check should have caught it. When the gate cannot land in this
+  unit, the instance fix rides the gate's unit rather than landing bare.
+
 ## Conventions established in gate-sdk (keep every kit consistent)
 
-- **Registry, not array:** `gates.list` (one name per line, `#` comments), not
-  a `CHECKS=()` array; names resolve against the consumer
-  gates dir first, then each vendored kit's `checks/` (`gate_kit_roots`, env
-  `GATE_SDK_KIT_DIRS`) — a consumer shadows a kit gate by dropping a
-  same-named file in its gates dir, and a new kit's gates register by name
-  alone.
-- **Config via env, this repo's layout as defaults:** `GATE_SDK_GATES_DIR`
-  (`scripts`), `GATE_SDK_TESTS_DIR`, `GATE_SDK_HOOKS_DIR`
-  (`scripts/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (`.workflow`),
-  `GATE_SDK_TMP_DIR` (`.tmp`), `GATE_SDK_QUEUE_FILE` (`TASK-QUEUE.md`),
-  `GATE_SDK_PRUNE_DIRS`. Every kit follows the same `<KIT>_<KNOB>` shape and
-  keeps this repo's layout as the default.
+One-line rule per convention; mechanism, knob rosters, and default values
+live in the owning SPEC section — cited, never restated.
+
+- **Registry, not array:** gates register by name in `gates.list` and resolve
+  consumer-first with kit shadowing — resolution order and the kit-dirs knob:
+  gate-sdk/SPEC.md §Layout and configuration.
+- **Config via env:** every kit follows the same `<KIT>_<KNOB>` shape with
+  this repo's layout as the defaults; each kit's SPEC owns its knob roster
+  and default values.
 - **Self-contained artifacts:** emitted HTML inlines its CSS; no kit output may
   reference an asset outside the kit.
-- **Each kit lands with its own README + SPEC.md, fixtures for every gate
-  it ships, + a `smoke/` directory** (`smoke/install.sh`, plus
-  `smoke/violation.sh` where a violation is craftable — gate-sdk/SPEC.md
-  §Consumer smoke), and registers in this repo's `gates.list` where applicable.
+- **Kit-landing checklist:** README + SPEC.md, fixtures for every shipped
+  gate, `smoke/`, and registration in this repo's `gates.list` where
+  applicable — gate-sdk/SPEC.md §Consumer smoke owns the checklist.
 
 ## Agent execution (all stages)
 

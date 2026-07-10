@@ -73,7 +73,13 @@ scope.
   default for a consumer that diverges) and consume-by-reference (the shim
   grammar above, for a consumer that tracks the kit — this repo dogfoods
   it). The slot grammar lands here; the sentence claiming copy is the only
-  mode is retired.
+  mode is retired. The section's parenthetical enumerating each stage
+  template's spine (flip+stamp step, scope's bootstrap protocol, align's
+  trigger rule, …) does not survive the rewrite: it is a parallel copy of
+  the templates' own content (the content-tiering finding from the
+  convention-hardening align review) — the rewritten section states the
+  contract both modes must satisfy and cites the templates as the owned
+  surface, enumerating nothing they carry.
 - `lifecycle-kit/SPEC.md` §Per-component contracts: gains the
   `check-skill-binding` contract section.
 - The five stage templates: placeholders renamed to named slots; back-ported
