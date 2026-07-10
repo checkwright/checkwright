@@ -119,6 +119,26 @@
   health-workflow template) are the site-kit. Surfaced 2026-07-10 at
   close-loop-hardening scope, reading the root-amendment accumulation as the
   same copy-first extraction signal the kits themselves came from.
+- **memory-off-enforcement** [needs-spec] — the no-per-user-memory stance
+  graduates from a CLAUDE.md rule to public doctrine plus enforcement,
+  split by the tree-vs-deployment seam: a hermetic settings-parity gate
+  pinning the tracked harness config (.claude/settings.json) against a
+  desired-state file (the identity.conf pattern), and a
+  check-identity-class local gate scanning the harness's per-project
+  memory dir and settings.local.json — CI-neutral, clean where the surface
+  is absent, the fail-open-on-absent caveat stated honestly, and the paths
+  as config knobs (the harness layout moves; the plugin-marketplace ruling
+  applies); a session-context warning line backstops harness-layout drift.
+  Doctrine and mechanism land in context-kit — memory is an ungated
+  always-loaded surface its meter cannot read — with docs/methodology.md
+  citing downward. The replacement routes stay the star topology: durable
+  facts to doc owners via knowledge-friction, iteration-scoped attention
+  to the lesson channels, private context to the local brief. Blast radius
+  is bounded (gates hold the tree regardless of a polluted session), so
+  the build is a lightweight gate pair, not machinery. Evidence: memory
+  measured as a drift surface and its layer deprecated on a larger private
+  consumer of this lifecycle; that consumer's memory-folder scan is the
+  local half's prior art. Surfaced 2026-07-10 in build.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
