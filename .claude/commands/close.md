@@ -18,7 +18,11 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    stage-local — preferred, it loads on demand), →task (name the new queue
    slug), →harvest (route the entry's body per the table below), or →discard
    (state why). A lesson naming an unfixed gap becomes a
-   queue entry, never evaporates. A lesson belonging to the *private* seam
+   queue entry, never evaporates. Gap generalization, per lesson that
+   records drift no gate caught: name the enforcement class that should
+   have caught it, then either file the missing check as a Deferred
+   `[needs-spec]` task or state in one line why no scanner is buildable —
+   the disposition is not complete without one of the two. A lesson belonging to the *private* seam
    ruling stamps `discard private-seam (BRIEF.local.md)` and its content goes
    to BRIEF.local.md (local-only).
    Harvest routing (`QUEUE_KIT_LESSON_TAGS`, `scripts/queue-config.sh`):
@@ -52,6 +56,10 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    README.md row descriptions, CLAUDE.md prose, and each kit README —
    `check-kit-registration` already holds kit-table membership and the
    fixture-runner lines, so this step is the prose those gates do not read.
+   Same gap-generalization obligation as step 1, per staleness actually
+   found: name the enforcement class that should have caught it, and file
+   the missing check as a Deferred `[needs-spec]` task or state in one line
+   why no scanner is buildable — a silent fix forfeits the gate.
 6. Runtime-artifact check: any new gitignored artifact has a reclaim path.
 7. Brevity pass on CLAUDE.md (the only always-loaded surface here): is each
    block worth its standing per-session token cost?
