@@ -274,6 +274,40 @@
   fall-throughs in close-loop-hardening, every one a plain listing under a
   kit directory (`find <dir> -type f`, `find <kit> -name '*.test.sh'`).
   Surfaced 2026-07-10 at close, tooling-friction triage.
+- **prose-enum-drift** [needs-spec] — no gate holds a prose enumeration of a
+  governed literal set. `check-kit-enum` owns the doctrine (a hand list of
+  two-or-more members must name every member; the fix is a glob token, not a
+  longer list) but reads only `# graph:` couples tokens in gate manifests,
+  never prose. Attested 2026-07-10 at close: the README queue-kit row read
+  "the blocked-by/needs-spec/spec tag algebra" and silently went incomplete
+  when the attend tag and the harvest tags landed. Note the evasion shape —
+  `check-manifest-count` would have caught "the tag algebra's three tags"
+  (a bare cardinal over a governed collection); the row dodged it by
+  *enumerating instead of counting*. Same restatement, different surface
+  form, no scanner: the `count-scan-wrap-blindness` lesson at a new axis.
+  Buildable because the sets are machine-readable (queue-kit/SPEC.md §The
+  tag algebra bullets, `QUEUE_KIT_LESSON_TAGS`). Design tension to rule:
+  a legitimate subset citation exists ("e.g. `[blocked-by]`"), so the gate
+  needs the wedge/exempt escape `check-manifest-count` already carries, and
+  the governed sets must declare themselves somewhere parseable rather than
+  become a gate literal (the provenance seam).
+- **lesson-sink-config** [needs-spec] — the `[essay]` harvest sink is a
+  tracked literal, so the harvested material dead-ends in a staging file the
+  operator must remember to drain. queue-kit/SPEC.md already rules that a
+  tag's *sink* is consumer rule content, but this consumer's close skill
+  hardcodes `.workflow/essay-harvest.md` — and cannot do otherwise, because
+  `.claude/commands/close.md` is tracked and naming the downstream repo
+  there would publish a private path. Ship the sink as a knob read from an
+  untracked local config, default `.workflow/essay-harvest.md`: the
+  `scripts/msg-patterns.local.list` precedent exactly (gitignored value,
+  tracked name, "tracking it would itself be the leak"). Then a harvested
+  lesson body appends straight to the operator's downstream backlog and the
+  staging file disappears. Design questions for scope: whether the knob is a
+  path or a command (a command lets the sink reformat per its own backlog
+  grammar), and whether a missing local config is fail-open to the default
+  sink or a red close. Sequenced before `launch-comms` — every close until
+  then accumulates essay material in a file with a manual reclaim path.
+  Surfaced 2026-07-10 at close.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
