@@ -212,6 +212,25 @@
   consumer's verdict carries different axes). Name the supervision
   ceiling in the docs: attention over N concurrent reports does not
   scale with budget. Surfaced 2026-07-10 in build.
+- **enforcement-map** [needs-spec] — an emitted kit-first map of every
+  check surface: kit → governed surfaces → enforcement class, where the
+  class spectrum is wider than the gate graph knows — blocking gates by
+  tier (the graph manifests already carry precommit/commit-msg/align-only,
+  machine-readable today), advisory KPIs (drift-kit plugins, not gates by
+  ruling), guards (guard-kit PreToolUse steering), session-context
+  warnings, validate suites, and the monitor class (site-health:
+  deployment, not tree). Never hand-maintained — a hand-written table is
+  the restated projection the copy-gates exist to catch; extend the
+  check-graph emitter (or a sibling) to group by owning kit, with the
+  non-gate classes declaring their class somewhere parseable (the real
+  design work: today only gates carry machine-readable manifests). Emitted
+  at docs/ as an adoption page — what each kit enforces and how hard is
+  the evaluating adopter's first question, today spread across the kit
+  SPECs — freshness-gated by the proven byte-compare pattern (check-graph
+  and check-trajectory-fresh precedents). The page becomes the owning home
+  for the enforcement-class taxonomy itself, which no single surface owns
+  today. Surfaced 2026-07-10 in build, asking whether such a mapping
+  exists. Counts toward site-kit-extraction's docs-cluster criterion.
 - **commit-subject-grammar** [needs-spec] — check-commit-msg is a leak
   guard only (banned patterns); nothing asserts subject shape, yet the
   prefix is load-bearing in two mechanisms no gate backs: trajectory.sh's
