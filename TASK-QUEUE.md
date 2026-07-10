@@ -153,6 +153,21 @@
   measured as a drift surface and its layer deprecated on a larger private
   consumer of this lifecycle; that consumer's memory-folder scan is the
   local half's prior art. Surfaced 2026-07-10 in build.
+- **commit-subject-grammar** [needs-spec] — check-commit-msg is a leak
+  guard only (banned patterns); nothing asserts subject shape, yet the
+  prefix is load-bearing in two mechanisms no gate backs: trajectory.sh's
+  feat/debt column classifies commit subjects, so a mistyped prefix
+  silently drifts the published evidence rows, and the closed-row freeze
+  leans on docs/chore filings sitting outside that harvest — a property
+  held by subject-class convention alone. A subject that does not parse is
+  an unread write to a governed projection, not a style nit. Shape: a
+  sibling assertion in gate-sdk's commit-msg tier (the hook plumbing
+  exists) — subject matches type(scope)?: with the type set a knob whose
+  default aligns with kpi-task-split's classification vocabulary; the
+  design tension to rule is one vocabulary with two readers (share the
+  list vs restate it across gate-sdk and drift-kit). Carve-outs: merge
+  commits, reverts, fixup!/squash! autosquash subjects. Surfaced
+  2026-07-10 in build, asking whether the convention was already enforced.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
