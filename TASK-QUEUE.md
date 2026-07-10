@@ -107,7 +107,14 @@
   contract landed with docs-site (docs/install.md §The upgrade contract); this
   rung is buildable once a second tag exists. Surfaced 2026-07-09. Noted at
   public-positioning scope: no tag exists at all yet — the first release tag
-  (a launch-comms prerequisite) is what starts this rung's clock.
+  (a launch-comms prerequisite) is what starts this rung's clock. Ruled
+  2026-07-10 at close-loop-hardening scope: the phase-B disposition ritual
+  (read the tightened-gates declaration, disposition each new red as
+  fix-the-tree vs exempt-with-cause, never weaken the gate) ships as a kit
+  skill template beside the smoke — the smoke stays bare bash so a
+  harness-less consumer keeps the upgrade path, the skill narrates it
+  (lifecycle-kit's templates/skills precedent); harness packaging stays
+  with plugin-marketplace.
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
@@ -123,6 +130,18 @@
   adoption demand shows up — this entry is the public roadmap marker, not a
   scaffold; natural landing post adoption-track, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **site-kit-extraction** [needs-spec] — the docs/site governance cluster
+  keeps landing as root amendments and consumer gates (docs-site, the
+  link-shape and CNAME-parity gates, the site-health workflow): extract the
+  generic mechanism into kit form when demand attests it — a second consumer
+  vendoring the kits, or the next docs-scoped consumer gate landing. The seam
+  is pre-cut for the lift: conventions, host aliases, and sinks are already
+  consumer config, so extraction is mechanical. Likely a split rather than
+  one kit: link shape joins spec-kit beside check-md-refs (same governed doc
+  set and scan machinery); the deployment-truth pieces (CNAME parity, the
+  health-workflow template) are the site-kit. Surfaced 2026-07-10 at
+  close-loop-hardening scope, reading the root-amendment accumulation as the
+  same copy-first extraction signal the kits themselves came from.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
