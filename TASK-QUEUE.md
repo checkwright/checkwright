@@ -42,6 +42,22 @@
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
   directives); mechanism kits stay DDD-neutral — the coupling lives in docs
   and examples only; natural landing slot is alongside drift-kit (kit 7).
+- **orchestration-positioning-docs** [needs-spec] — the sibling positioning
+  page: Checkwright as the verification layer under agent orchestration —
+  coordination primitives answer who/when, the gates+stamps+tamper battery
+  answers whether the work is right without reading all of it; facilitator
+  today, prerequisite for unattended orchestration at scale. Grounded in
+  the mechanisms that already exist (validate-after-agent-commit,
+  check-gate-tamper, evidence stamps, budget guard) and honest about the
+  boundary: the coordination rungs themselves are deferred
+  (scope-session-routing, multi-operator-semantics) — the page claims the
+  trust layer, never the orchestration layer, and cites those rungs as the
+  roadmap rather than hiding them. Angle preserved as prose in the
+  orchestration-trust-framing lesson (essay-tagged for harvest); the docs
+  page and the essay share the argument, not the text. Like ddd-positioning-docs,
+  coupling lives in docs only — no kit gains orchestration vocabulary.
+  Surfaced 2026-07-10, asking whether Checkwright is an orchestration
+  prerequisite.
 - **scope-session-routing** [needs-spec] — iteration-ambiguity routing across
   sessions: a build/align session forwards a question to the still-live scope
   session and relays the reply back; design it atop the harness's native
@@ -300,3 +316,20 @@
   close. Recover by splitting the unpushed tip (amend-class, not a rebase:
   stash → `reset --soft HEAD~1` → two commits); if the tip is already pushed,
   file the misclassification as evidence on `commit-subject-grammar` instead.
+- **orchestration-trust-framing** [essay] — orchestration multiplies writers
+  but does nothing about trust: every delegation hop is a place where "the
+  agent said it passed" substitutes for verification, and drift compounds per
+  hop — so orchestration without a verification layer parallelizes drift
+  (wrong answers faster, with more confidence). Harness coordination
+  primitives answer *who does what, when*; none answer *how do you know the
+  work is right without reading all of it* — Checkwright is that second
+  answer: gates make done mechanically decidable, stamps make stage claims
+  checkable, gate-tamper handles the adversary, validate-after-agent-commit
+  is an orchestration doctrine wearing a delegation name. Facilitator today;
+  prerequisite specifically for *unattended* orchestration at scale. Honesty
+  boundary for any public use: our own coordination rungs sit in Deferred
+  (scope-session-routing, multi-operator-semantics) and this iteration hit
+  the shared-index limits twice — claim the verification layer, not the
+  orchestration layer. Live exhibit: the 2026-07-10 index collision was
+  caught and correctly resolved *because* the trajectory freeze made the
+  misclassification visible and the gates held through the history split.
