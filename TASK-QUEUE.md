@@ -229,6 +229,22 @@
   contract makes a kit-dir rename a breaking major. Surfaced 2026-07-10
   at the competitive-landscape review; the identity note is in the
   operator's local brief.
+- **skill-template-binding** [needs-spec] — the stage skills become thin
+  binding shims over lifecycle-kit's skill templates (read the template,
+  then apply the consumer bindings), making the templates the executed
+  surface. Today nothing runs them: the battery dogfoods kit gates in
+  place by name resolution, while the skill templates ship prose their own
+  vendor never executes, and the command copies restate template doctrine
+  — the template-vs-commands audit found generic doctrine that has never
+  run anywhere (build's question triage, align's read-site verification,
+  close's already-filed body check). One owner per layer: generic doctrine
+  in the template, consumer slot-fills in the shim; the back-port sweep
+  and the pair-edit rule both dissolve into this. Scope rules the shim
+  grammar, the template-placeholder audit (every slot a shim needs exists
+  as a placeholder), and lifecycle-kit SPEC documenting
+  consume-by-reference beside copy-and-specialize. Sequenced before a
+  second consumer vendors the kits, so it arrives to a settled convention.
+  Surfaced 2026-07-10 at the template-drift audit.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
