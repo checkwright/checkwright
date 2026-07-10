@@ -179,6 +179,20 @@ guard_rule_sed_file() {
     done < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$s")
 }
 
+guard_rule_find_glob() {
+    local cmd="$1" s first
+    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
+    case "$cmd" in *'`'*) return 0 ;; esac
+    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    grep -qE '(&&|\|\||;|\||&)' <<<"$s" && return 0
+    case "$s" in *'>'*) return 0 ;; esac
+    first="${s#"${s%%[![:space:]]*}"}"
+    first="${first%%[[:space:]]*}"
+    [[ "$first" == find ]] || return 0
+    grep -qE '\-(execdir|exec|okdir|ok|delete|fls|fprintf|fprint0|fprint)\b' <<<"$s" && return 0
+    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) with no shell prompt. A 'find' carrying an action predicate (-exec/-delete/…) or piped into a consumer is untouched; this fires only on a plain listing. If you genuinely need find, run it yourself with !<command>."
+}
+
 guard_rule_truncate_scratch() {
     local cmd="$1"
     if [[ "$cmd" =~ ^[[:space:]]*:([[:space:]]+[0-9]*\>\>?[[:space:]]*[^[:space:]\&\|\;\<]+)+[[:space:]]*$ ]]; then
@@ -297,6 +311,7 @@ guard_generic_rules() {
     guard_rule_expansion "$cmd"
     guard_rule_brace_glyph "$cmd"
     guard_rule_sed_file "$cmd"
+    guard_rule_find_glob "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"

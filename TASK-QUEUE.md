@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **find-glob-steer** [spec: SPEC-find-glob-steer.md] — guard-kit generic
-  rule steering a listing-only find (no action predicate, no consumer of
-  its output) to the Glob tool, placed before the auto-allow rules;
-  decision-table rows land for both sides of the line.
 - **lesson-sink-config** [spec: SPEC-lesson-sink-config.md] — harvest sinks
   become consumer config: bin/lesson-sink.sh resolves QUEUE_KIT_LESSON_SINKS
   from a gitignored config overlay, fail-open to the staging default; the
@@ -246,5 +242,6 @@
 
 - prose-enum-drift
 - commit-subject-grammar
+- find-glob-steer
 
 ## Lessons Learned

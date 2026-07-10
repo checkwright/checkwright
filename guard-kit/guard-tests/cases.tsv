@@ -43,15 +43,24 @@ block	sed -i 's/a/b/' notes.md
 fallthrough	sed -E 's/a/b/'
 fallthrough	grep foo file | sed -e s/a/b/
 
-# rule 9 — `: > file` truncation auto-allowed iff every target is gitignored
+# rule 9 — listing-only find steered to Glob; action-predicate / piped /
+#          redirected forms untouched
+block	find lib -type f
+block	find lib -name '*.sh'
+fallthrough	find . -name '*.tmp' -delete
+fallthrough	find src -type f -exec grep -q foo '{}' ';'
+allow	find . -type f | head
+fallthrough	find . -type f > listing.txt
+
+# rule 10 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 10 — read-only pipeline auto-allow; a non-roster segment falls through
+# rule 11 — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
 
-# rule 11 — decorated allowlisted bare lead with an unmatched segment blocked;
+# rule 12 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
 block	git status 2>&1
@@ -60,5 +69,5 @@ fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
 
-# rule 12 — anything else falls through to the friction log
+# rule 13 — anything else falls through to the friction log
 fallthrough	make build
