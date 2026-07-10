@@ -16,32 +16,23 @@ ROOT="${1:-.}"
 mapfile -t manifests < <(spec_manifest_files "$ROOT" | sed 's#^\./##' | sort -u)
 [[ ${#manifests[@]} -eq 0 ]] && { echo "MANIFEST-COUNT: clean (0 manifest file(s) found)"; exit 0; }
 
-# spec: spec-kit/SPEC.md §check-manifest-count — prose walk only: fences and per-site markers gate the line, the shared adapter judges it
-read -r -d '' SCAN <<'AWK' || true
-function pflush() {
-    if (sk_para_wrapped()) printf "  %s:%d  restated collection total: %s\n", curfile, SK_WRAP_FNR, SK_WRAP_SPAN
-    sk_para_reset()
-}
-FNR == 1 { pflush(); in_fence = 0; prev = "" }
-{
-    curfile = FILENAME
-    raw = $0
-    if (raw ~ /^[[:space:]]*```/) { pflush(); in_fence = !in_fence; prev = raw; next }
-    if (in_fence) { pflush(); prev = raw; next }
-    if (raw ~ /manifest-count-exempt:/ || prev ~ /manifest-count-exempt:/) { pflush(); prev = raw; next }
-    if (raw ~ /^[[:space:]]*$/) { pflush(); prev = raw; next }   # a blank line ends the paragraph
+# spec: spec-kit/SPEC.md §check-manifest-count — prose walk only: the shared driver gates fences and per-site markers, these hooks judge the line (sk_count_hit) and the wrapped paragraph (sk_para_wrapped)
+read -r -d '' HOOKS <<'AWK' || true
+function sk_on_line(file, fnr, raw,   hit) {
     hit = sk_count_hit(raw)
-    if (hit != "") printf "  %s:%d  restated collection total: %s\n", FILENAME, FNR, hit
-    sk_para_add(FNR, raw)
-    prev = raw
+    if (hit != "") printf "  %s:%d  restated collection total: %s\n", file, fnr, hit
 }
-END { pflush() }
+function sk_on_pflush() {
+    if (sk_para_wrapped()) printf "  %s:%d  restated collection total: %s\n", sk_curfile, SK_WRAP_FNR, SK_WRAP_SPAN
+}
 AWK
 
-AWKSRC="$(spec_count_awk_lib)
-$SCAN"
+AWKSRC="$(spec_para_accum_awk)
+$(spec_count_awk_lib)
+$(spec_manifest_walk_awk)
+$HOOKS"
 
-out="$(awk -v SK_QRE="$(spec_count_quantifier_re)" -v SK_RRE="$(spec_count_range_re)" -v SK_PHRASES="$(spec_count_phraselist)" "$AWKSRC" "${manifests[@]}")"; st=$?
+out="$(awk -v SK_QRE="$(spec_count_quantifier_re)" -v SK_RRE="$(spec_count_range_re)" -v SK_PHRASES="$(spec_count_phraselist)" -v SK_EXEMPT="manifest-count-exempt:" "$AWKSRC" "${manifests[@]}")"; st=$?
 fail_closed "$st" check-manifest-count awk
 
 if [[ -n "$out" ]]; then

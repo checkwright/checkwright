@@ -83,6 +83,8 @@ declare -p SPEC_KIT_COUNT_COLLECTIONS &>/dev/null || SPEC_KIT_COUNT_COLLECTIONS=
 declare -p SPEC_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || SPEC_KIT_COUNT_ALLOWED_PHRASES=()
 [[ -v SPEC_KIT_COUNT_WEDGE_WORDS ]] || SPEC_KIT_COUNT_WEDGE_WORDS=2
 
+[[ -v SPEC_KIT_ENUM_SETS_CMD ]] || SPEC_KIT_ENUM_SETS_CMD=""
+
 declare -p SPEC_KIT_COMMENT_MACHINE &>/dev/null || SPEC_KIT_COMMENT_MACHINE=()
 declare -p SPEC_KIT_COMMENT_REASON  &>/dev/null || SPEC_KIT_COMMENT_REASON=()
 declare -p SPEC_KIT_COMMENT_SURFACE &>/dev/null || SPEC_KIT_COMMENT_SURFACE=()
@@ -267,19 +269,12 @@ function sk_count_hit(text,   scan, low, s) {
     if (s != "") return s
     return _sk_span(low, scan, SK_RRE, 0)
 }
-# the paragraph-join window: sk_count_hit sees one physical line, so a total
-# whose cardinal and noun straddle a prose wrap ("two comment /\ngates") slips
-# both gates. A caller feeds a logical paragraph's lines in order (sk_para_add),
-# then reads back the first total whose span crosses a line boundary, at the
-# span's first physical line (SK_WRAP_FNR/SK_WRAP_SPAN). A same-line span
-# returns 0 here — the caller's per-line scan owns it, so no double report.
-function sk_para_reset() { sk_pn = 0 }
-function sk_para_add(fnr, text) { sk_pn++; sk_pfnr[sk_pn] = fnr; sk_pline[sk_pn] = text }
-function _sk_join(lo, hi,   k, s) {
-    s = ""
-    for (k = lo; k <= hi; k++) s = s (k > lo ? " " : "") sk_pline[k]
-    return s
-}
+# the paragraph-join window over the walk driver's accumulator (sk_para_add,
+# sk_pline/_sk_join): sk_count_hit sees one physical line, so a total whose
+# cardinal and noun straddle a prose wrap ("two comment /\ngates") slips both
+# gates. sk_para_wrapped reads back the first total whose span crosses a line
+# boundary, at the span's first physical line (SK_WRAP_FNR/SK_WRAP_SPAN). A
+# same-line span returns 0 here — the per-line scan owns it, so no double report.
 function sk_para_wrapped(   k, hit, compK, startK) {
     SK_WRAP_FNR = 0; SK_WRAP_SPAN = ""
     if (sk_pn < 2) return 0
@@ -298,6 +293,55 @@ AWK
 spec_count_phraselist() {
     [[ ${#SPEC_KIT_COUNT_ALLOWED_PHRASES[@]} -eq 0 ]] && return 0
     printf '%s\n' "${SPEC_KIT_COUNT_ALLOWED_PHRASES[@]}" | tr '[:upper:]' '[:lower:]'
+}
+
+# spec: spec-kit/SPEC.md §lib/spec.sh — the paragraph accumulator every manifest-prose gate shares: sk_para_add feeds physical lines, _sk_join reads back a logical window. Both walk drivers (the shared one and check-comment-tier's caller-owned comment walk) fill it; sk_para_wrapped and the enum paragraph read it.
+spec_para_accum_awk() {
+    cat <<'AWK'
+function sk_para_reset() { sk_pn = 0 }
+function sk_para_add(fnr, text) { sk_pn++; sk_pfnr[sk_pn] = fnr; sk_pline[sk_pn] = text }
+function _sk_join(lo, hi,   k, s) {
+    s = ""
+    for (k = lo; k <= hi; k++) s = s (k > lo ? " " : "") sk_pline[k]
+    return s
+}
+AWK
+}
+
+# spec: spec-kit/SPEC.md §lib/spec.sh — the manifest-prose walk driver both restated-manifest gates prepend: fence tracking, the blank-line paragraph reset, and the per-site exempt window (the line or the one above; the marker regex arrives in SK_EXEMPT). It calls the caller's sk_on_line(file,fnr,raw) per prose line and sk_on_pflush() at each paragraph boundary, over the shared accumulator (spec_para_accum_awk).
+spec_manifest_walk_awk() {
+    cat <<'AWK'
+function _sk_pflush() { sk_on_pflush(); sk_para_reset() }
+FNR == 1 { _sk_pflush(); sk_fence = 0; sk_prev = "" }
+{
+    sk_curfile = FILENAME
+    sk_raw = $0
+    if (sk_raw ~ /^[[:space:]]*```/) { _sk_pflush(); sk_fence = !sk_fence; sk_prev = sk_raw; next }
+    if (sk_fence) { _sk_pflush(); sk_prev = sk_raw; next }
+    if (sk_raw ~ SK_EXEMPT || sk_prev ~ SK_EXEMPT) { _sk_pflush(); sk_prev = sk_raw; next }
+    if (sk_raw ~ /^[[:space:]]*$/) { _sk_pflush(); sk_prev = sk_raw; next }
+    sk_on_line(sk_curfile, FNR, sk_raw)
+    sk_para_add(FNR, sk_raw)
+    sk_prev = sk_raw
+}
+END { _sk_pflush() }
+AWK
+}
+
+# spec: spec-kit/SPEC.md §check-prose-enum — run the consumer's declared sets command and echo its validated <set-name><TAB><member> lines; a command that fails or a line that does not parse (no tab, empty field, extra tab) returns 2 (fail-closed). Empty SPEC_KIT_ENUM_SETS_CMD is the caller's clean-skip signal, handled before this is called.
+spec_enum_sets() {
+    local out st line name member
+    out="$(bash -c "$SPEC_KIT_ENUM_SETS_CMD")"; st=$?
+    [[ $st -eq 0 ]] || { echo "spec_enum_sets: SPEC_KIT_ENUM_SETS_CMD exited $st" >&2; return 2; }
+    while IFS= read -r line; do
+        [[ -n "$line" ]] || continue
+        [[ "$line" == *$'\t'* ]] || { echo "spec_enum_sets: line has no tab: '$line'" >&2; return 2; }
+        name="${line%%$'\t'*}"; member="${line#*$'\t'}"
+        [[ -n "$name" && -n "$member" ]] || { echo "spec_enum_sets: empty set name or member: '$line'" >&2; return 2; }
+        [[ "$member" == *$'\t'* ]] && { echo "spec_enum_sets: extra tab in line: '$line'" >&2; return 2; }
+        printf '%s\t%s\n' "$name" "$member"
+    done <<< "$out"
+    return 0
 }
 
 _sk_errs=()

@@ -173,6 +173,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     spec-kit/checks/check-manifest-count.sh || hook_fail check-manifest-count
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh'; then
+    spec-kit/checks/check-prose-enum.sh || hook_fail check-prose-enum
+fi
+
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt'; then
     spec-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi

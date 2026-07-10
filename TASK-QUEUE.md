@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **prose-enum-drift** [spec: SPEC-prose-enum-drift.md] — check-prose-enum:
-  an incomplete prose enumeration of a declared governed set in manifest
-  prose is red; sets enter via a consumer command, and the paragraph walk
-  plus exempt-site plumbing move to lib/spec.sh adapters shared with
-  check-manifest-count.
 - **commit-subject-grammar** [spec: SPEC-commit-subject-grammar.md] —
   check-commit-subject in the commit-msg tier: the subject parses against
   the shared type roster (single home lib/gate.sh), carve-outs for git's
@@ -253,5 +248,7 @@
   2026-07-09.
 
 ## Done
+
+- prose-enum-drift
 
 ## Lessons Learned

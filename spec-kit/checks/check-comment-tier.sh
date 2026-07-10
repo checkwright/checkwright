@@ -166,7 +166,8 @@ END { flush_block(0) }
 AWK
 
 # spec: spec-kit/SPEC.md §check-comment-tier — the count-shape override rides the shared adapter, so the noun vocabulary and wedge window enter once
-AWKSRC="$(spec_count_awk_lib)
+AWKSRC="$(spec_para_accum_awk)
+$(spec_count_awk_lib)
 $CLASSIFY"
 COUNT_QRE="$(spec_count_quantifier_re)"
 COUNT_RRE="$(spec_count_range_re)"

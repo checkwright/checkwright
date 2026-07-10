@@ -37,3 +37,7 @@ SPEC_KIT_MANIFEST_FILES=(
 # comment-tier-exempt: dated posts under docs/posts/ are immutable published artifacts whose dated narrative is their nature — a heading name cannot address a whole-file class, so the path valve exempts them from temporal-narration governance while link and command resolution still apply
 # shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
 SPEC_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")
+
+# comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
+# shellcheck disable=SC2034  # consumed by spec-kit/lib/spec.sh after sourcing
+SPEC_KIT_ENUM_SETS_CMD="bash scripts/enum-sets.sh"

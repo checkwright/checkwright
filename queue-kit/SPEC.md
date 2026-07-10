@@ -266,6 +266,7 @@ combined-tree copy clears the stage gates too.
 
 ## Out of scope
 
+<!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
 The amendment lifecycle around `[needs-spec]`/`[spec:]` (section-wide
 enforcement, promotion procedure, `check-amendment-queue`) is spec-kit's
 scope. Code-comment TODO scanning (`TODO(task:<slug>)` resolution against

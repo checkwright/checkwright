@@ -42,6 +42,7 @@ check-docs-cname-parity
 check-docs-cmd
 check-manifest-temporal
 check-manifest-count
+check-prose-enum
 check-comment-tier
 check-spec-pointer
 check-todo-task-liveness

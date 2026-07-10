@@ -219,6 +219,11 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   `SPEC_KIT_COUNT_ALLOWED_PHRASES` — exact-phrase allowlist for fixed named
   sets a doc may cite inline, default empty (a consumer names its own fixed
   sets, and only a phrase whose noun it governs needs the valve).
+- `SPEC_KIT_ENUM_SETS_CMD` — a consumer command emitting the governed sets
+  `check-prose-enum` holds, one `<set-name>`⇥`<member>` line per member,
+  default empty ⇒ clean skip (no declared sets). This repo sets
+  `bash scripts/enum-sets.sh`, which derives the queue tag sets from
+  queue-kit's own parser rather than restating them.
 - `SPEC_KIT_COMMENT_MACHINE` / `SPEC_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `SPEC_KIT_COMMENT_SURFACE` —
@@ -236,7 +241,7 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
-consumer renaming its sections sets both. Valve and marker spellings
+consumer renaming its sections sets both. Valve and marker spellings <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
 (`[needs-spec]`, `[spec:]`, `vision-introduces` / `spec-introduces`,
 `spec-embedded-source-exempt: <reason>`) are mechanism, not config.
 
@@ -268,19 +273,34 @@ classifier for its sibling).
 
 `sk_count_hit` judges one physical line, so a total whose cardinal and noun
 straddle a prose wrap evades it — a blind spot both siblings inherited from the
-shared matcher, and one this repo's own §lib/spec.sh prose sat in. The fragment
-therefore also exposes a **paragraph-join window**: a caller feeds a logical
-paragraph's lines in order (`sk_para_reset`, `sk_para_add(fnr, text)`), then
-`sk_para_wrapped()` reports the first total whose span crosses a line boundary
-via `SK_WRAP_FNR` / `SK_WRAP_SPAN`. It reports at the span's *first* physical
-line — where the cardinal sits, and where the operator edits — and returns
-false for a span already on one line, so the caller's per-line scan stays the
-sole reporter of unwrapped totals and no hit is counted twice. A joined span
-carries its prefix with it, so the exemptions hold across the wrap unchanged: a
-comparator before the break still reads as a bound. What ends a paragraph is
-the caller's, since the surfaces disagree — a blank line, fence, or per-site
-marker for the manifest gate; a comment block's end or an exempt line for the
-comment classifier. The comment
+shared matcher, and one this repo's own §lib/spec.sh prose sat in. Two further
+awk adapters close it and factor the walk the manifest-prose gates share.
+`spec_para_accum_awk` is the **paragraph accumulator**: a caller feeds a logical
+paragraph's lines in order (`sk_para_reset`, `sk_para_add(fnr, text)`), and
+`_sk_join` reads a window back. On it the count fragment builds
+`sk_para_wrapped()`, which reports the first total whose span crosses a line
+boundary via `SK_WRAP_FNR` / `SK_WRAP_SPAN`, at the span's *first* physical line
+— where the cardinal sits, and where the operator edits — and returns false for
+a span already on one line, so the caller's per-line scan stays the sole
+reporter of unwrapped totals and no hit is counted twice. A joined span carries
+its prefix with it, so the exemptions hold across the wrap unchanged: a
+comparator before the break still reads as a bound.
+
+`spec_manifest_walk_awk` is the **manifest-prose walk driver** both
+restated-manifest gates (check-manifest-count, check-prose-enum) prepend: it
+tracks fences, resets the paragraph on a blank line, and skips a per-site exempt
+window (the line or the one above; the marker regex arrives in `SK_EXEMPT`),
+calling the caller's `sk_on_line(file, fnr, raw)` on each prose line and
+`sk_on_pflush()` at each boundary, over the shared accumulator. One walk, one
+exemption behavior for the manifest-prose surface — the count gate's
+`sk_on_line` reports the per-line total and its `sk_on_pflush` runs the wrap
+detector; the enum gate reads the whole flushed paragraph. `check-comment-tier`
+keeps its **caller-owned comment walk**, driving the same accumulator by hand
+because its surface disagrees — a comment block's end or an exempt line ends its
+paragraph, not a blank line or fence. The enum gate's declared sets arrive
+through `spec_enum_sets`, which runs the consumer's `SPEC_KIT_ENUM_SETS_CMD` and
+echoes its validated `<set>`⇥`<member>` lines, fail-closing (exit 2) on a
+command error or an unparsable line (§check-prose-enum). The comment
 gates read *different* surfaces: `spec_comment_surface` prunes `templates/`
 shell sources, and `spec_comment_surface_with_templates` keeps them.
 `check-spec-pointer` scans the pruned set — a template's `spec:` line is a
@@ -404,13 +424,14 @@ The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh) —
 canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
 skipped, an inline-code cardinal a meta-reference (so this section may name its
 own examples). Both the grammar and the matcher come from the shared count
-adapter (§lib/spec.sh) — this gate adds only the prose walk (fence skipping, the
-per-site marker), so it and its comment-tier sibling read one vocabulary and
-apply one set of exemptions. The walk feeds the adapter's paragraph-join window
-alongside the per-line scan, so a total wrapped across a prose break is caught
-and reported at its first physical line; a blank line, a fence, and an exempt
-site each end the paragraph — an exempted line cannot join its neighbours into
-a total. The cardinal
+adapter, and the prose walk itself is the shared `spec_manifest_walk_awk`
+driver (§lib/spec.sh) — this gate supplies only two hooks: `sk_on_line` runs
+the matcher per line, `sk_on_pflush` runs the paragraph-join window over the
+accumulator. So it, its `check-prose-enum` sibling, and its comment-tier cousin
+read one vocabulary and one exemption behavior, and a total wrapped across a
+prose break is caught and reported at its first physical line; a blank line, a
+fence, and a `manifest-count-exempt:` site each end the paragraph — an exempted
+line cannot join its neighbours into a total. The cardinal
 grammar is digit sequences and the spelled
 `two`…`twelve`, case-insensitive; `one` is deliberately outside it — singleton and
 cardinality-rule idioms ("one owner per fact", "one iteration per kit") are
@@ -451,6 +472,64 @@ exemptions;
 `check-manifest-count.test.sh` covers the config-driven paths (a consumer-governed
 noun and the allowlist containment) the stock defaults cannot reach. `precommit`
 tier.
+
+### check-prose-enum
+
+Invariant: within one manifest-prose paragraph, a delimited hand list naming two
+or more members of one declared governed set must name every member of that set,
+unless an exempt site holds; a member absent from the paragraph is reported as
+omitted. This is the enumeration sibling of check-manifest-count's restated
+totals and the prose analog of check-kit-enum's hand-list doctrine: the count
+gate catches a bare cardinal over a growing collection, but a row that
+*enumerates instead of counting* drifts just as silently when the set grows.
+The attested drift: a README row's `blocked-by/needs-spec/spec` tag algebra went
+incomplete when a sibling tag landed — same restatement, different surface form,
+no scanner. Engagement mirrors check-kit-enum — two members are a list, a lone
+member (or two scattered across a paragraph, not adjacent) is a mention, not a
+list.
+
+Set declarations are consumer config, never gate literals (the provenance seam):
+`SPEC_KIT_ENUM_SETS_CMD` (default empty — clean skip) names a consumer command
+emitting one `<set-name>`⇥`<member>` line per member, loaded through
+`spec_enum_sets` (§lib/spec.sh); a command that fails or a line that does not
+parse is fail-closed (exit 2). A member matches word-bounded — bracketed
+(`[spec:]`) or bare (`spec`), neither an alphanumeric nor a hyphen abutting, so a
+stem never matches inside a longer tag — and the attested drift used bare stems.
+
+The scanned set and the paragraph walk are the shared `spec_manifest_files`
+finder and `spec_manifest_walk_awk` driver (§lib/spec.sh); this gate's
+`sk_on_pflush` hook judges each flushed paragraph. Two or more members present
+count as a *hand list* only when a run of them is chained by list separators
+(comma, slash, brackets, whitespace, or `and`/`or`); members merely co-occurring
+in one paragraph with prose between them stay mentions. Omitted members are set
+members absent from the whole paragraph — the sibling that landed but never
+joined the list. Exempt contexts follow the count gate's family shape,
+mechanical markers first, per-site tag last: a subset marker in the window
+(`e.g.`, `such as`, `among them` — the list declares itself partial), a
+partitive marker on the match (`some of`, `one of`, `of the set` — a selection,
+not an enumeration), and the per-site `prose-enum-exempt: <reason>` on the line
+or the one above. The corrective names both legitimate fixes: cite the owning
+set by name, or complete the enumeration — never trim to a silent subset.
+
+Producer: the generated pre-commit hook / `run-gates.sh`, coupled to the
+manifest set plus the consumer's config and kit sources (a set change re-fires
+the gate over the docs). Consumer: the committing operator via the output
+contract — file, line, set name, count, and the omitted members all read once at
+the scan transition. `SPEC_KIT_ENUM_SETS_CMD` is read at startup; both fields of
+each emitted line are read at match time (set name in the report, member in the
+matcher). This repo's consumer config is `scripts/enum-sets.sh`, which derives
+the queue task-tag set and the Lessons-channel set from queue-kit's own
+lead-line tag parser plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the
+two roles are separate sets because a paragraph naming one role's tags is not
+enumerating the other. A set a consumer can only hand-list is that consumer's
+own drift to own; the kit contract asks only for the emit grammar.
+
+Calibration follows the count gate's procedure: tuned against this tree, every
+hit dispositioned — cite the set, complete the list, or site-exempt with reason.
+The good/bad pair covers a bare comma hand list dropping a member and the
+marked-subset cases; `check-prose-enum.test.sh` covers the config-driven paths
+(the empty-default skip, the fail-closed escapes, bracketed matching, multi-set
+independence, the exempt escapes) the pair cannot reach. `precommit` tier.
 
 ### check-surface-duplication
 
