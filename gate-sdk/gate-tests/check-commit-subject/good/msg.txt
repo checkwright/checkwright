@@ -1,0 +1,5 @@
+refactor(gate-sdk)!: split the subject-shape assertion off check-commit-msg
+
+The leak guard keeps its single job; subject grammar is a sibling gate.
+
+Co-Authored-By: A Contributor <noreply@example.com>

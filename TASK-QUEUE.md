@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **commit-subject-grammar** [spec: SPEC-commit-subject-grammar.md] —
-  check-commit-subject in the commit-msg tier: the subject parses against
-  the shared type roster (single home lib/gate.sh), carve-outs for git's
-  generated forms — the parse guarantee under trajectory.sh's feat/debt
-  column.
 - **find-glob-steer** [spec: SPEC-find-glob-steer.md] — guard-kit generic
   rule steering a listing-only find (no action predicate, no consumer of
   its output) to the Glob tool, placed before the auto-allow rules;
@@ -250,5 +245,6 @@
 ## Done
 
 - prose-enum-drift
+- commit-subject-grammar
 
 ## Lessons Learned

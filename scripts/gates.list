@@ -16,6 +16,7 @@ check-docs-kit-parity
 check-trajectory-fresh
 check-hook-exec-bit
 check-commit-msg
+check-commit-subject
 check-tree-terms
 check-root-tiering
 check-core-files

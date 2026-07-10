@@ -23,4 +23,6 @@ hook_fail() {
 
 gate-sdk/checks/check-commit-msg.sh "$msg_file" || hook_fail check-commit-msg
 
+gate-sdk/checks/check-commit-subject.sh "$msg_file" || hook_fail check-commit-subject
+
 exit 0

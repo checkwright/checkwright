@@ -335,7 +335,10 @@ helpers `gate_sdk_root`, `gate_sdk_gates_dir`, `gates_list_members`,
 `gate_resolve`, `gate_kit_roots`, `gate_kit_roots_rel`, `gate_check_dirs` (the
 multi-kit resolution path other kits' gates ride) and the manifest reader
 `gate_expand_couples` (the `kit:<glob>` couples-token expansion §The `# graph:`
-manifest). `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
+manifest). The commit-surface value adapters `gate_msg_pattern_files` and
+`gate_commit_types` also live here — the single home of the banned-pattern set
+and the commit-type roster — each documented at its gate (§check-commit-msg,
+§check-commit-subject). `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
 the couples globs share — resolving absolute roots against the kits' parent and
 passing a relative `GATE_SDK_KIT_DIRS` override through unchanged. `fail_closed` must be passed *only* a status that genuinely
 means the check could not execute (an awk/jq/parser crash) — never `grep`'s
@@ -687,7 +690,37 @@ backstop is deferred to the hosted-attestation rung. A missing message-file
 argument-with-value, or a missing required tracked pattern file, is fail-closed
 (exit 2). The `# graph:` couples the pattern file (the regeneration trigger),
 not a tree path — the gate is emitted into the commit-msg hook, not the
-pre-commit hook.
+pre-commit hook. Subject *shape* is the sibling check-commit-subject's job:
+this gate stays the leak guard, that one the parse guarantee.
+
+### check-commit-subject
+
+Invariant: the prospective commit message's subject line (the `commit-msg`
+hook's `$1`, first line) parses as `<type>(<scope>)?!?: <summary>` with
+`<type>` drawn from the shared roster and `<scope>` a `[a-z0-9./-]+` token, or
+matches a git-generated carve-out — `Merge `, `Revert ` and the `fixup! ` /
+`squash! ` autosquash forms. A subject that does not parse is an unread write
+to a governed projection, not a style nit: trajectory.sh's feat/debt column
+classifies commit subjects, and the closed-row freeze leans on docs/chore
+filings sitting outside that harvest — both properties held by convention
+until this gate made every subject carry a roster token, turning a mistyped
+prefix into a blocked commit rather than a silently drifted evidence row. It
+rides the generated `commit-msg` hook (`tier=commit-msg`) beside
+check-commit-msg, each an independent assertion with its own fixtures: the leak
+guard checks banned patterns, this one subject shape.
+
+The roster is `gate_commit_types` (lib/gate.sh), reading `GATE_SDK_COMMIT_TYPES`
+(default `feat fix refactor perf docs test build ci chore style`). The
+one-vocabulary/two-readers tension — this gate and the evidence classifiers
+both key off commit types — is ruled *share the roster, keep the mappings*: the
+roster's single home is lib/gate.sh; drift-kit's kpi-task-split and
+trajectory.sh keep their own class mapping (feat vs fix+refactor), a
+classification over roster tokens rather than a second roster. Edge behavior
+matches check-commit-msg: a no-argument run (the whole-tree battery) is a clean
+skip — the message is not a tracked surface; a missing message-file
+argument-with-value is fail-closed (exit 2). The `# graph:` couples the
+roster's config home (lib/gate.sh, the regeneration trigger), not a tree path —
+the gate is emitted into the commit-msg hook.
 
 ### check-tree-terms
 

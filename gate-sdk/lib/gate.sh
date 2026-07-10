@@ -138,3 +138,8 @@ gate_msg_pattern_files() {
     done
     return 0
 }
+
+# spec: gate-sdk/SPEC.md §check-commit-subject — the single home of the commit-type roster (check-commit-subject's type alternation; trajectory.sh and kpi-task-split classify over the same tokens). Emits the space-separated roster on one line: GATE_SDK_COMMIT_TYPES when set, else the shipped default.
+gate_commit_types() {
+    printf '%s\n' "${GATE_SDK_COMMIT_TYPES:-feat fix refactor perf docs test build ci chore style}"
+}

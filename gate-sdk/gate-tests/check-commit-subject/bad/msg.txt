@@ -1,0 +1,4 @@
+feature: tighten the resize path
+
+'feature' is not a roster type (feat is), and this line would also fail
+the ': ' grammar were the prefix dropped.

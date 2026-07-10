@@ -71,7 +71,9 @@ The generic set — each coupled to a kit-governed surface, each degrading to
 
 - **kpi-task-split** — the feature↔debt split of the queue's Done slugs,
   classified by their commit subjects (`feat` / `fix`+`refactor`); reads
-  the queue file and git.
+  the queue file and git. gate-sdk's check-commit-subject is the parse
+  guarantee this classification assumes — every subject carries a roster
+  type, so a mistyped prefix is a blocked commit, not a miscounted row.
 - **kpi-gate-backlog** — proposed-but-absent gates: `check-*`/`scan-*`
   names appearing anywhere in the queue with no file in any gate-resolution
   dir, over the live gate count. A name with a file on disk is built and
