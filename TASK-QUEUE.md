@@ -150,6 +150,30 @@
   source-coupled count scan with a numeral allowlist. Either route wants
   `manifest-count-shapes`' noun list settled first. Surfaced 2026-07-10 at
   close, deleting the stale comment rather than re-syncing its number.
+- **lesson-disposition-traceability** [needs-spec] — the close ritual mandates an
+  explicit disposition per Lessons entry, but nothing enforces it, so a lumpy
+  harvest under close-stage fatigue becomes discard-by-omission. Measured on a
+  larger private consumer of this lifecycle: 42 close commits cleared ~180 lesson
+  bullets; 23 landed a rule, 12 filed a task, and 12 commits left no trace in
+  tree or message — one cleared two lessons with an empty commit body, while
+  another named its dispositions in full (two tasks, three discards with cause).
+  Harvests ran as large as 14 entries at once. Shape: a commit that shrinks
+  `## Lessons Learned` must name a disposition per cleared entry — the same
+  fail-closed contract as `check-stage-evidence`, where the claim must leave
+  evidence. Decide the disposition vocabulary (rule/task/publish/discard) and
+  whether the evidence lives in the commit body or a stamped file. Surfaced
+  2026-07-10 auditing whether Lessons still earns its section.
+- **lesson-pub-harvest** [needs-spec] — a configurable publication channel for
+  Lessons: an opt-in tag on a lesson lead line marks it publication-worthy, and
+  the close triage routes tagged entries to a harvest log rather than only to a
+  rule, a task, or a discard. Mechanism only — the tag spelling and the harvest
+  log's path are consumer config (the `check-graph`/`graph-vocab` pattern); the
+  kit ships neither the log nor its content. Attested on a larger private
+  consumer, where most lessons carry such a tag and feed a writing pipeline;
+  this repo has no such channel, though `launch-comms` names a methodology essay
+  as a deliverable, so the lessons that would feed it are today dispositioned to
+  rules and lost as prose. Lands in lifecycle-kit beside the close ritual.
+  Surfaced 2026-07-10.
 - **docs-cname-parity** [needs-spec] — a hermetic gate making `docs/CNAME` the
   single source of truth for the docs URL: any tracked doc naming a different
   host reds. Offline and decidable, so it fits the gate contract that
