@@ -290,3 +290,13 @@
 - lesson-context-tag
 
 ## Lessons Learned
+
+- **shared-index-atomicity** [attend] — concurrent sessions share one git
+  index: check `git status` for a foreign staged path before any `git
+  add`/`commit`, or stage-and-commit atomically in one motion. This iteration a
+  parallel session's `add -A && commit` swept a build session's staged feature
+  files into a `docs(queue):` commit, misclassifying a feat row that
+  `trajectory-closed-row-freeze` would freeze into the published evidence at
+  close. Recover by splitting the unpushed tip (amend-class, not a rebase:
+  stash → `reset --soft HEAD~1` → two commits); if the tip is already pushed,
+  file the misclassification as evidence on `commit-subject-grammar` instead.
