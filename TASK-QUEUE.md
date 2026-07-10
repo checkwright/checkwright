@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **lesson-sink-config** [spec: SPEC-lesson-sink-config.md] — harvest sinks
-  become consumer config: bin/lesson-sink.sh resolves QUEUE_KIT_LESSON_SINKS
-  from a gitignored config overlay, fail-open to the staging default; the
-  tracked close skill stops naming the sink value.
 - **memory-off-enforcement** [spec: SPEC-memory-off-enforcement.md] —
   context-kit doctrine plus check-settings-pins (hermetic) and
   check-memory-off (local environment) with a session-context warning line;
@@ -243,5 +239,6 @@
 - prose-enum-drift
 - commit-subject-grammar
 - find-glob-steer
+- lesson-sink-config
 
 ## Lessons Learned

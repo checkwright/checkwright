@@ -25,11 +25,14 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
    the disposition is not complete without one of the two. A lesson belonging to the *private* seam
    ruling stamps `discard private-seam (BRIEF.local.md)` and its content goes
    to BRIEF.local.md (local-only).
-   Harvest routing (`QUEUE_KIT_LESSON_TAGS`, `scripts/queue-config.sh`):
-   - `[essay]` → append the body to `.workflow/essay-harvest.md` (gitignored
-     operator material feeding the `launch-comms` methodology essay; reclaim:
-     merged into the essay, then cleared — the Housekeeping gitignored-artifact
-     rule).
+   Harvest routing (`QUEUE_KIT_LESSON_TAGS`, `scripts/queue-config.sh`): stream
+   each tagged entry's body through `bash queue-kit/bin/lesson-sink.sh <tag>`,
+   which resolves the sink from the local `QUEUE_KIT_LESSON_SINKS` overlay or
+   falls open to the default `.workflow/<tag>-harvest.md` staging append.
+   - `[essay]` — no sink command is configured here, so the body stages to
+     `.workflow/essay-harvest.md` (gitignored operator material feeding the
+     `launch-comms` methodology essay; reclaim: merged into the essay, then
+     cleared — the Housekeeping gitignored-artifact rule).
    Lesson-vs-task litmus (also at filing time, any stage): if the deliverable
    and its done-state are nameable now, it is a task — file it in Deferred
    `[needs-spec]` directly, never stage it in Lessons where it waits a stage

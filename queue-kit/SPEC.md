@@ -74,8 +74,10 @@ plus `check-tag-lead-line` read that section's lead lines too:
   channel): the tag names, their sinks, and their handling are consumer rule
   content — a kit literal carrying them would publish a private vocabulary
   (the provenance seam, `check-graph`/`graph-vocab` pattern). The close ritual
-  routes a tagged entry's body to the sink the consumer's close skill names
-  for that tag; queue-kit only parses the tag's placement.
+  streams a tagged entry's body through `bin/lesson-sink.sh <tag>`
+  (§bin/lesson-sink.sh), which resolves the sink from `QUEUE_KIT_LESSON_SINKS`;
+  the tracked close skill names that mechanism, never a sink value. queue-kit
+  only parses the tag's placement.
 
 ## Layout and configuration
 
@@ -88,7 +90,9 @@ Config follows lifecycle-kit's pattern: copy `templates/queue-config.sh`
 into the gates dir as `queue-config.sh` (or point `QUEUE_KIT_CONFIG_FILE`
 elsewhere) and override any knob; defaults fill what the consumer left unset,
 and the loader exits 2 on a malformed config — a broken grammar must not gate
-anything. Knobs:
+anything. A gitignored `queue-config.local.sh` beside that file sources last
+(§lib/queue.sh) — the home for a private value a tracked config cannot carry.
+Knobs:
 
 - `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`;
   every gate also takes the file as `$1` (fixture capability).
@@ -110,6 +114,10 @@ anything. Knobs:
   consumer-named outbound lesson vocabulary (§The tag algebra), read by
   `check-tag-lead-line` for placement. Names, sinks, and handling are consumer
   rule content — the kit ships none.
+- `QUEUE_KIT_LESSON_SINKS` — associative array, harvest tag → sink command,
+  default empty; read by `bin/lesson-sink.sh`, which owns resolution and the
+  fail-open default (§bin/lesson-sink.sh). A private sink value belongs in the
+  local overlay, not this tracked file.
 - `QUEUE_KIT_ATTEND_CAP` — positive integer, default `3`; the maximum `[attend]`
   lead lines `bin/queue-index.sh` emits in its attention block before folding
   the rest into an overflow note.
@@ -127,6 +135,13 @@ the gates pass to awk (both sides of every section boundary must parse
 identically — a shared adapter removes that drift axis), and the slug/tag
 extraction helpers. Values and adapters only, never gate structure
 (gate-sdk's `lib/gate.sh` rule).
+
+The loader sources the consumer config, then a `<config>.local.sh` overlay
+beside it when present — last write wins. This is the tracked-name /
+gitignored-value split (the `msg-patterns.local.list` precedent): a private
+sink value tracked in `queue-config.sh` would itself be the leak, so it lands
+in the gitignored overlay instead. The overlay is optional — its absence is
+fail-open, not an error.
 
 ### bin/queue-index.sh
 
@@ -148,6 +163,22 @@ capped at `QUEUE_KIT_ATTEND_CAP` (default 3) with overflow noted as
 always-loaded through the session-context hook that embeds this output, so the
 cap is its token budget. This is the inbound lesson channel reaching every
 later session of the iteration with zero consumer-hook edits.
+
+### bin/lesson-sink.sh
+
+The outbound channel's router: reads a lesson body on stdin and resolves the
+sink for its `<tag>` argument from `QUEUE_KIT_LESSON_SINKS`. A configured entry
+runs as a **command** with the body streamed to its stdin — a command, not a
+path, so the sink may reformat the body into a downstream backlog's own
+grammar; the command's exit status becomes the tool's, so a failing sink is a
+red close step and harvest material is never half-routed to a silent fallback.
+An unconfigured tag falls **open** to appending the body to
+`${GATE_SDK_WORKFLOW_DIR:-.workflow}/<tag>-harvest.md` — the honest
+manual-drain default that keeps a fresh clone (no overlay) closing cleanly and
+preserves the staging file's documented reclaim path. A tool, not a gate (no
+`# graph:` manifest); the consumer close skill invokes it so the tracked skill
+names the mechanism, never a sink value, and a private sink command lives in
+the `queue-config.local.sh` overlay (§lib/queue.sh).
 
 ### check-queue-hygiene
 
@@ -255,7 +286,9 @@ silent pick attested in production use and the bounded scope.
 
 ### templates/
 
-`queue-config.sh` — the consumer config template documenting every knob.
+`queue-config.sh` — the consumer config template documenting every knob (the
+`# spec:` pointer to the §Layout knob table, which now includes
+`QUEUE_KIT_LESSON_SINKS` and its local-overlay reminder).
 `TASK-QUEUE.md` — a starter queue skeleton: the sections in default order,
 one example entry per grammar shape shown under `Technical Debt` (the
 `[spec:]`-gated `New Features` carries teaching prose only, since a spec-ready

@@ -16,7 +16,13 @@ else
         source "$_qk_cfg"
     fi
 fi
-unset _qk_cfg
+# spec: queue-kit/SPEC.md §lib/queue.sh — the local overlay: a gitignored <config>.local.sh beside the tracked config sources last, carrying private sink values a tracked config cannot
+_qk_local="${_qk_cfg%.sh}.local.sh"
+if [[ -f "$_qk_local" ]]; then
+    # shellcheck disable=SC1090  # consumer-supplied overlay, path is config
+    source "$_qk_local"
+fi
+unset _qk_cfg _qk_local
 
 [[ -v QUEUE_KIT_QUEUE_FILE ]] || QUEUE_KIT_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 
@@ -36,6 +42,8 @@ declare -p QUEUE_KIT_PROSE_LEADS &>/dev/null || QUEUE_KIT_PROSE_LEADS=("Protocol
 [[ -v QUEUE_KIT_PRECONDITION_REGEX ]] || QUEUE_KIT_PRECONDITION_REGEX='revisit when|once [^.]*(lands|ships|is (done|ready|merged))|gated on|contingent on|waiting on|pending [a-z]|blocked on'
 
 declare -p QUEUE_KIT_LESSON_TAGS &>/dev/null || QUEUE_KIT_LESSON_TAGS=()
+
+declare -p QUEUE_KIT_LESSON_SINKS &>/dev/null || declare -A QUEUE_KIT_LESSON_SINKS=()
 
 [[ -v QUEUE_KIT_ATTEND_CAP ]] || QUEUE_KIT_ATTEND_CAP=3
 
