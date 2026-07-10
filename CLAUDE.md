@@ -157,4 +157,7 @@ validate-after-commit set, gate-driven worklist).
   into doc-owner edits (drift-kit/SPEC.md §The knowledge-friction loop).
 - No per-user memory files for this repo: durable guidance goes in tracked
   manifests (this file, kit SPECs), or `BRIEF.local.md` for local-only private
-  context.
+  context. Harness auto-memory is disabled and enforced off — the settings
+  pins hold at commit (`check-settings-pins`), the memory dir and any local
+  override are scanned on the operator's machine (`check-memory-off`); the
+  doctrine is context-kit/SPEC.md §The memory-off doctrine.

@@ -8,13 +8,15 @@ line is a recurring per-session tax that grows silently, because no single
 session ever sees the trend. The kit attacks both: an index-first reading
 toolset, a session-start hook template that assembles a compact brief, a
 meter that tracks the always-loaded surface against a per-iteration
-baseline, a brevity gate over the densest always-loaded section, and the
-close-stage brevity pass that reacts to the meter's delta.
+baseline, a brevity gate over the densest always-loaded section, the
+close-stage brevity pass that reacts to the meter's delta, and a memory-off
+gate pair that keeps the ungoverned harness-memory surface disabled rather
+than left to accrete.
 
-The kit carries the index mechanism, the hook skeleton, the meter, and the
-brevity machinery; a consumer's product-shaped surfaces (proto and diagram
-indexes, its doc roster, its harvest pipeline) stay in the consumer repo
-(§Out of scope).
+The kit carries the index mechanism, the hook skeleton, the meter, the
+brevity machinery, and the memory-off enforcement; a consumer's product-shaped
+surfaces (proto and diagram indexes, its doc roster, its harvest pipeline)
+stay in the consumer repo (§Out of scope).
 
 ## Index-first reading
 
@@ -65,11 +67,16 @@ session. Steps, in order:
 4. **Stage-conditioned nudges** — short reminders keyed on the current
    stage header (this repo's delegation nudge is the exemplar). Marked
    consumer section: which stages get which nudge is consumer judgment.
-5. **Scratch sweep** — reclaim `${GATE_SDK_TMP_DIR:-.tmp}` entries older
+5. **Memory-off backstop** — one warning line when the harness memory dir
+   (`CONTEXT_KIT_MEMORY_DIRS`) holds content, pointing the durable fact at its
+   tracked home (§The memory-off doctrine). `check-memory-off` fires only at
+   commit; this surfaces pollution at session start, between commits. Silent
+   when the dir is empty or absent.
+6. **Scratch sweep** — reclaim `${GATE_SDK_TMP_DIR:-.tmp}` entries older
    than a day, depth-first (`-mindepth 1 -depth`) so stray directories are
    reclaimed too, never touching `.gitkeep`. Age-guarded so a concurrent
    same-checkout session's in-flight scratch survives.
-6. **Index-reminder footer** — the "index first" ritual with the
+7. **Index-reminder footer** — the "index first" ritual with the
    consumer's actual index commands listed (consumer-edited).
 
 **Ruled out — lifecycle stamp-id injection.** The hook payload carries the
@@ -158,6 +165,71 @@ markers in the manifest set — is a blocking gate
 (spec-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic
 residue (*is this sentence about the past?*) that no marker set can decide.
 
+## The memory-off doctrine
+
+Harness memory — the per-session store the harness offers to persist facts
+across sessions — is an always-loaded surface the meter cannot read and no
+gate scans: standing per-session context that accretes outside the tier
+contract, ungoverned by construction. The methodology already routes durable
+knowledge through a star topology, and those routes are the replacement —
+durable facts to their doc owner (the knowledge-friction loop), iteration-
+scoped attention to the lesson channels, private context to the operator's
+local brief. So the kit disables harness memory and enforces it off rather
+than governing its content.
+
+Blast-radius honesty rides the doctrine: the gates hold the tree regardless of
+a polluted session, so a memory that quietly re-accumulated degrades one
+session's judgment, never the committed baselines. This is therefore a
+lightweight gate pair — a hermetic pin and a local-environment scan — not
+machinery. Enforcement splits on the tree-vs-environment seam: what a commit
+can carry (the tracked settings file) is hermetic and CI-real
+(§check-settings-pins); what only the operator's machine holds (the memory
+dir, the untracked local settings) is a local-environment scan, CI-neutral
+(§check-memory-off).
+
+## check-settings-pins
+
+`checks/check-settings-pins.sh` (hermetic, `precommit`) is the identity.conf
+pattern pointed at harness config. Every pin in `CONTEXT_KIT_SETTINGS_PINS`
+(default `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`) holds against
+the tracked settings file `CONTEXT_KIT_SETTINGS_FILE` (default
+`.claude/settings.json`). Grammar: one `<jq path> = <expected JSON>` per line,
+`#` comments and blanks ignored; the expected side is the exact `jq -c`
+rendering (`false`, `"1"`, `{"k":1}`). General-purpose by construction — any
+settings key is pinnable — this consumer's first pins hold the
+auto-memory-disabling keys.
+
+Dispositions: a pin whose path resolves to the expected value passes; a path
+present with a different value is the legible violation (exit 1, each finding
+reading path, expected, and actual). Fail-closed (exit 2) on an unreadable or
+non-JSON settings file, no `jq`, a malformed pin line, or a pin naming a key
+**absent** from the settings file — an absent key is a desynced manifest (the
+pins and the settings are one repo's tracked config, edited together), not the
+legible drift a red is for. Absent pins file: the opt-in-off state, a clean
+skip. Ships a `good/`+`bad/` fixture pair and registers in the consumer's
+`gates.list` (this repo's included).
+
+## check-memory-off
+
+`checks/check-memory-off.sh` (local-environment class, the check-identity
+precedent) scans the operator's machine, not the tree — its `# graph:`
+manifest couples the pins file it reads and triggers on `*`, because the
+surfaces it guards (the memory dir and the untracked local settings) never
+stage. Two red conditions:
+
+- the harness's per-project memory dir holds content — any regular file that
+  is not the dir-preserving `.gitkeep`;
+- the untracked local settings file (`settings.local.json` beside the settings
+  file) sets a pinned key to a value other than its pin — the override the
+  hermetic gate cannot see, since it reads only the tracked file.
+
+`CONTEXT_KIT_MEMORY_DIRS` (a space-separated glob list) names the dirs to
+scan; its default derives the current project's dir from the harness layout
+(§Layout and configuration). CI-neutral: where the surface is absent the gate
+is clean, and the clean line states the fail-open caveat — an absent dir
+proves nothing about another clone. It fails closed only when it cannot read
+what is present to check: a local settings file with no `jq`.
+
 ## Layout and configuration
 
 ```
@@ -168,7 +240,12 @@ context-kit/
   bin/always-loaded.sh
   bin/run-index-tests.sh         # expected-output runner for the bin tools
   checks/check-brevity.sh
+  checks/check-settings-pins.sh  # hermetic: pins hold against the settings file
+  checks/check-memory-off.sh     # local-environment: memory dir + local overrides
   gate-tests/check-brevity/{good,bad}/
+  gate-tests/check-settings-pins/{good,bad}/
+  gate-tests/check-memory-off/{good,bad}/
+  gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
   templates/settings-sessionstart.json
@@ -197,6 +274,17 @@ what the consumer left unset. Knobs (this repo's layout as defaults):
 - `CONTEXT_KIT_BREVITY_BUDGET` — lines per bullet; default `4`.
 - `CONTEXT_KIT_BREVITY_POINTER_RE` — the "cites a deeper doc" pattern;
   default `§`.
+- `CONTEXT_KIT_SETTINGS_FILE` — the tracked harness settings file
+  check-settings-pins verifies and whose `.local.json` sibling check-memory-off
+  scans; default `.claude/settings.json`.
+- `CONTEXT_KIT_SETTINGS_PINS` — the pins manifest; default
+  `${GATE_SDK_GATES_DIR:-scripts}/settings-pins.conf`.
+- `CONTEXT_KIT_MEMORY_DIRS` — space-separated glob list of harness memory dirs
+  check-memory-off scans; default the current project's dir under the operator's
+  home, `$HOME/.claude/projects/<slug>/memory`, where `<slug>` is the project's
+  absolute path with every `/` and `.` folded to `-` (the harness's own
+  encoding). A knob because the layout moves (the plugin-marketplace ruling:
+  design against the live layout, keep it config).
 
 The hook template itself is consumer-edited rather than knob-driven (the
 guard-kit guard precedent): its variation points are layout judgment,
@@ -210,8 +298,15 @@ instead: `index-tests/` holds a small fixture corpus (Markdown with nested
 headings, fences, and link-bearing first sentences; Rust with the pub-item
 kinds; a baseline file) beside expected outputs, and
 `bin/run-index-tests.sh` runs each tool over the corpus and asserts exact
-output, failing on any diff. `check-brevity` is a gate and carries the
-standard fixture pair.
+output, failing on any diff. `check-brevity`, `check-settings-pins`, and
+`check-memory-off` are gates and carry the standard fixture pair. Both
+memory-off gates take a `--fixture <dir>` injection (the check-identity
+precedent): the settings-pins pair reads `<dir>/settings.json` against
+`<dir>/settings-pins.conf`; the memory-off pair scans `<dir>/memory` for
+content. The memory-off local-override axis — an untracked
+`settings.local.json` that re-enables a pinned key past an empty dir — cannot
+be a good/bad pair (the pair fixes the dir axis), so `check-memory-off.test.sh`
+holds it.
 
 `smoke/install.sh` copies the templates into the scratch consumer (config
 into the gates dir, hook wiring into the harness settings), runs the hook
@@ -235,4 +330,8 @@ A close-stage harvest pipeline (`[pub]` lessons, publication paths) is
 product workflow, not context mechanism. `drift-report.sh` itself is
 drift-kit's surface — only the always-loaded KPI lives here. A consumer's
 session-context content — its delegation nudge wording, component roster,
-and extra index commands — stays in its own copied hook.
+and extra index commands — stays in its own copied hook. Memory **content**
+is out of scope by construction: the memory-off gates govern presence (the
+dir stays empty) and pins (the disabling keys hold), never a live session's
+context, which is not a scannable surface — a session polluted mid-flight is
+caught by the tree the gates hold, not by reading the session.

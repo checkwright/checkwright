@@ -74,6 +74,16 @@ case "$stage" in
         ;;
 esac
 
+MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
+for _md in $MEM_DIRS; do
+    [[ -d "$_md" ]] || continue
+    if find "$_md" -type f ! -name .gitkeep -print -quit 2>/dev/null | grep -q .; then
+        echo "⚠ harness memory dir holds content ($_md) — durable facts belong in a tracked surface (context-kit/SPEC.md §The memory-off doctrine), not per-session memory."
+        echo
+        break
+    fi
+done
+
 TMP_DIR="${GATE_SDK_TMP_DIR:-.tmp}"
 if [[ -d "$TMP_DIR" ]]; then
     swept="$(find "$TMP_DIR" -mindepth 1 ! -name .gitkeep -mmin +1440 -depth -print -delete 2>/dev/null | wc -l | tr -d ' ')"

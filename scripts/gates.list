@@ -51,3 +51,5 @@ check-evidence-baseline
 check-evidence-manifest
 check-gate-tamper
 check-brevity
+check-settings-pins
+check-memory-off

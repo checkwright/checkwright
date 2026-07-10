@@ -3,8 +3,10 @@
 Token-economics-aware context management for stateless agent sessions: an
 index-first reading toolset, a session-start hook that assembles a compact
 brief, a meter that tracks the always-loaded surface against a committed
-baseline, one gate over the densest always-loaded section, and a close-stage
-brevity pass that reacts to the meter's delta.
+baseline, one gate over the densest always-loaded section, a close-stage
+brevity pass that reacts to the meter's delta, and a memory-off gate pair
+(settings pins plus a local memory-dir scan) that keeps the harness's
+ungoverned auto-memory surface disabled.
 
 Why: a stateless session pays for context twice. The *on-demand* cost is
 opening a whole SPEC or source file when one section was needed — the index
@@ -21,10 +23,14 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required); the meter's default
 hook approximation and the session-context template also expect
 [queue-kit](../queue-kit/). Then:
 
-1. Register the gate — add `check-brevity` to your `gates.list`. It resolves
-   through gate-sdk's registry path (your gates dir first, then each kit's
-   `checks/`), and its `# graph:` manifest puts it in the generated pre-commit
-   hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+1. Register the gates — add `check-brevity`, `check-settings-pins`, and
+   `check-memory-off` to your `gates.list`. They resolve through gate-sdk's
+   registry path (your gates dir first, then each kit's `checks/`), and their
+   `# graph:` manifests put them in the generated pre-commit hook:
+   `bash gate-sdk/bin/gen-pre-commit.sh --write`. The memory-off gates are
+   inert until you opt in — `check-settings-pins` skips clean with no pins file,
+   so create `settings-pins.conf` (one `<jq path> = <expected JSON>` per line)
+   naming the keys to hold, e.g. the auto-memory-disabling ones.
 
 2. Wire the session-start hook — copy `templates/session-context.sh` into your
    gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),
@@ -51,6 +57,6 @@ bash context-kit/bin/always-loaded.sh --update-baseline   # a close-stage act
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks  # the check-brevity pair
+bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks  # the gate fixture pairs
 bash context-kit/bin/run-index-tests.sh                                        # the advisory tools vs golden output
 ```

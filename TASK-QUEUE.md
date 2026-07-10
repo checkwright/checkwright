@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **memory-off-enforcement** [spec: SPEC-memory-off-enforcement.md] —
-  context-kit doctrine plus check-settings-pins (hermetic) and
-  check-memory-off (local environment) with a session-context warning line;
-  paths as knobs, the fail-open-on-absent caveat stated.
 - **deprecation-lifecycle** [spec: SPEC-deprecation-lifecycle.md] —
   check-deprecation-task binds deprecation markers to live tasks on the
   todo-task-liveness grammar (roster is consumer config; clean skip here);
@@ -240,5 +236,6 @@
 - commit-subject-grammar
 - find-glob-steer
 - lesson-sink-config
+- memory-off-enforcement
 
 ## Lessons Learned

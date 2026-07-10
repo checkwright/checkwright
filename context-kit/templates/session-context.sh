@@ -70,7 +70,18 @@ case "$stage" in
         ;;
 esac
 
-# spec: context-kit/SPEC.md §The session-context hook — step 5 scratch sweep
+# spec: context-kit/SPEC.md §The session-context hook — step 5 memory-off backstop; check-memory-off fires at commit, this surfaces pollution between commits
+MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
+for _md in $MEM_DIRS; do
+    [[ -d "$_md" ]] || continue
+    if find "$_md" -type f ! -name .gitkeep -print -quit 2>/dev/null | grep -q .; then
+        echo "⚠ harness memory dir holds content ($_md) — durable facts belong in a tracked surface (context-kit/SPEC.md §The memory-off doctrine), not per-session memory."
+        echo
+        break
+    fi
+done
+
+# spec: context-kit/SPEC.md §The session-context hook — step 6 scratch sweep
 TMP_DIR="${GATE_SDK_TMP_DIR:-.tmp}"
 if [[ -d "$TMP_DIR" ]]; then
     swept="$(find "$TMP_DIR" -mindepth 1 ! -name .gitkeep -mmin +1440 -depth -print -delete 2>/dev/null | wc -l | tr -d ' ')"
@@ -80,7 +91,7 @@ if [[ -d "$TMP_DIR" ]]; then
     fi
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — step 6 index-reminder footer; list your actual index commands [EDIT ME]
+# spec: context-kit/SPEC.md §The session-context hook — step 7 index-reminder footer; list your actual index commands [EDIT ME]
 cat <<EOF
 Before opening source for a task, run the matching surface index first
 (index, then read the one you need):

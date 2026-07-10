@@ -205,4 +205,10 @@ if staged_matches 'CLAUDE.md'; then
     context-kit/checks/check-brevity.sh || hook_fail check-brevity
 fi
 
+if staged_matches '.claude/settings.json' 'scripts/settings-pins.conf'; then
+    context-kit/checks/check-settings-pins.sh || hook_fail check-settings-pins
+fi
+
+context-kit/checks/check-memory-off.sh || hook_fail check-memory-off
+
 exit 0
