@@ -21,20 +21,9 @@ QUEUE="${2:-$SPEC_KIT_QUEUE_FILE}"
 [[ -d "$ROOT" ]] || { echo "check-todo-task-liveness: not a directory: $ROOT" >&2; exit 2; }
 [[ -f "$QUEUE" ]] || { echo "check-todo-task-liveness: queue file not found: $QUEUE" >&2; exit 2; }
 
-# spec: spec-kit/SPEC.md §check-todo-task-liveness — one queue pass splits the
-#   slug namespace: a bold lead-in in an active/deferred section is live, a
-#   bare-slug bullet outside those sections is the done shape (queue-kit format).
-qout="$(awk -v activere="$SPEC_ACTIVE_RE" -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
-    $0 ~ sectre { active = ($0 ~ activere || $0 ~ defre); next }
-    active && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
-        match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
-        printf "live\t%s\n", substr($0, RSTART + 2, RLENGTH - 4); next
-    }
-    !active && $0 ~ /^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$/ {
-        line = $0; sub(/^[[:space:]]*-[[:space:]]+/, "", line); sub(/[[:space:]]*$/, "", line)
-        printf "done\t%s\n", line
-    }
-' "$QUEUE")"; st=$?
+# spec: spec-kit/SPEC.md §check-todo-task-liveness — the queue-resolution pass is
+#   the shared lib adapter both liveness gates read: live slug versus done slug.
+qout="$(spec_queue_slugs "$QUEUE")"; st=$?
 fail_closed "$st" TODO-TASK-LIVENESS "queue awk"
 
 declare -A IS_LIVE=() IS_DONE=()

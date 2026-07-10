@@ -47,6 +47,7 @@ check-prose-enum
 check-comment-tier
 check-spec-pointer
 check-todo-task-liveness
+check-deprecation-task
 check-evidence-baseline
 check-evidence-manifest
 check-gate-tamper

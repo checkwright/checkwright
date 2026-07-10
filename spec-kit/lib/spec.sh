@@ -23,6 +23,8 @@ unset _sk_cfg
 
 [[ -v SPEC_KIT_QUEUE_FILE ]] || SPEC_KIT_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 
+declare -p SPEC_KIT_DEPRECATION_MARKERS &>/dev/null || SPEC_KIT_DEPRECATION_MARKERS=()
+
 declare -p SPEC_KIT_FEATURE_SECTIONS &>/dev/null || SPEC_KIT_FEATURE_SECTIONS=("New Features")
 declare -p SPEC_KIT_ACTIVE_SECTIONS  &>/dev/null || SPEC_KIT_ACTIVE_SECTIONS=("New Features" "Technical Debt")
 
@@ -102,6 +104,21 @@ SPEC_ACTIVE_RE="^## ($(spec_alt "${SPEC_KIT_ACTIVE_SECTIONS[@]}"))[[:space:]]*$"
 SPEC_DEFERRED_RE="^## ${SPEC_KIT_DEFERRED_SECTION}[[:space:]]*$"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_SECTION_RE="^## "
+
+# spec: spec-kit/SPEC.md §lib/spec.sh — the queue-resolution pass both liveness gates read: one walk emits "<live|done>\t<slug>", live for a bold lead-in bullet in an active/deferred section and done for a bare-slug bullet outside them (the queue-kit format). Each caller builds its own live/done map and fail-closes on the awk status.
+spec_queue_slugs() {  # $1=queue-file
+    awk -v activere="$SPEC_ACTIVE_RE" -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
+        $0 ~ sectre { active = ($0 ~ activere || $0 ~ defre); next }
+        active && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
+            match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
+            printf "live\t%s\n", substr($0, RSTART + 2, RLENGTH - 4); next
+        }
+        !active && $0 ~ /^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$/ {
+            line = $0; sub(/^[[:space:]]*-[[:space:]]+/, "", line); sub(/[[:space:]]*$/, "", line)
+            printf "done\t%s\n", line
+        }
+    ' "$1"
+}
 
 # spec: spec-kit/SPEC.md §lib/spec.sh — finders skip templates/ stubs and vendored kit roots under the scan root (an ancestor kit root never prunes)
 _spec_prune_kit_roots() {

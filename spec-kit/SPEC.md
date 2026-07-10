@@ -250,8 +250,13 @@ consumer renaming its sections sets both. Valve and marker spellings <!-- prose-
 ### lib/spec.sh
 
 The sourced config loader plus shared adapters: section-regex builders for
-the queue-facing gate (queue-kit's rule — both sides of a section boundary
-must parse identically), the canonical-spec/amendment finders the
+the queue-facing gates (queue-kit's rule — both sides of a section boundary
+must parse identically) plus the queue-resolution pass `spec_queue_slugs` built
+on them — one queue walk emitting a live slug for a bold lead-in bullet in an
+active or deferred section and a done slug for a bare-slug bullet outside them,
+so `check-todo-task-liveness` and `check-deprecation-task` resolve a
+`task: <slug>` binding through one grammar (each caller builds its own live/done
+map and fail-closes on the awk status), the canonical-spec/amendment finders the
 spec-scanning gates share, the manifest-set finder (`spec_manifest_files`) the
 narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`,
 amendments excluded — so its members read one identical set, and the governed
@@ -713,12 +718,51 @@ Placement: the marker is a comment directive on the governed comment surface, so
 it is spec-kit's, not queue-kit's (which disclaims source-file conventions in
 its Out of scope). The gate scans `spec_comment_surface`, pruning `templates/`
 as placeholders-by-design like `check-spec-pointer`, and reads the queue through
-`SPEC_KIT_QUEUE_FILE` with no new knob — the live/done split reuses the section
-regexes `lib/spec.sh` already builds, reading a bare-slug bullet outside the
-active and deferred sections as the queue's done shape. Latent at landing: no
-such marker exists in the tree yet — the gate ships before the first one, so a
-future `TODO(task:)` cannot outlive its task silently. A queue-read failure is
-fail-closed (exit 2). `precommit` tier.
+`SPEC_KIT_QUEUE_FILE` with no new knob — the live/done split is the shared
+`spec_queue_slugs` adapter (§lib/spec.sh), one queue walk reading a bare-slug
+bullet outside the active and deferred sections as the queue's done shape. That
+`task: <slug>` binding grammar — a `task:` key naming a slug that must resolve
+to a live queue entry — is one grammar both liveness gates share:
+`check-deprecation-task` is the twin, resolving the same binding on a
+deprecation marker through the same adapter (§check-deprecation-task). Latent at landing: no such marker exists in
+the tree yet — the gate ships before the first one, so a future `TODO(task:)`
+cannot outlive its task silently. A queue-read failure is fail-closed (exit 2).
+`precommit` tier.
+
+### check-deprecation-task
+
+Invariant: every deprecation marker on a governed source binds a `task: <slug>`
+that resolves to a live queue task. The marker vocabulary is consumer config —
+`SPEC_KIT_DEPRECATION_MARKERS`, a roster of regexes (one per element) matched
+against the governed comment surface. A language's marker spelling is never a
+kit literal: the roster ships empty, so a repo that sets none is clean-skipped
+(the `check-graph`/`graph-vocab` seam — the kit ships the resolution mechanism,
+the consumer names its own `#[deprecated]`, `@deprecated`, or `@Deprecated`).
+The scan itself stays consumer toolchain — a clippy/ESLint-class linter already
+inventories deprecation markers; this gate adds the governance coupling no
+linter ships: a deprecated surface that names no decommission task, or names a
+done or absent one, has nothing tracking its removal.
+
+A marker line carrying no `task: <slug>` is **unbound**; a bound slug sitting in
+`Done` is **stale** (the decommission finished, the marker did not); a bound
+slug absent from the queue is **unresolved**. All three redden — each finding
+names the file, the line, the matched marker, and the offending slug. The
+binding grammar and the queue-resolution pass are `check-todo-task-liveness`'s:
+the same `task: <slug>` key over the same `spec_queue_slugs` adapter
+(§check-todo-task-liveness, §lib/spec.sh), one grammar both liveness gates
+share. The gate scans `spec_comment_surface` (templates pruned as
+placeholders-by-design) and reads the queue through `SPEC_KIT_QUEUE_FILE`, no
+new knob beyond the roster. An unreadable queue or source is fail-closed
+(exit 2); an empty roster is the clean skip, not an error.
+
+This repo sets no roster, so the gate clean-skips here — the good/bad fixture
+pair and `check-deprecation-task.test.sh` carry the resolved and reddened paths
+under a fixture-local roster (the `check-manifest-count` config-path precedent).
+The release-boundary disposition walk over the standing marker inventory
+(decommission now, re-justify and carry the task forward, or un-deprecate) is
+lifecycle-kit's `release-sweep` skill template, and the between-major backlog
+trend over the same roster is drift-kit's `kpi-deprecated-surface` example
+(lifecycle-kit SPEC §templates, drift-kit SPEC §Out of scope). `precommit` tier.
 
 ### check-spec-fence-balance
 
