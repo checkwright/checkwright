@@ -269,7 +269,7 @@ combined-tree copy clears the stage gates too.
 The amendment lifecycle around `[needs-spec]`/`[spec:]` (section-wide
 enforcement, promotion procedure, `check-amendment-queue`) is spec-kit's
 scope. Code-comment TODO scanning (`TODO(task:<slug>)` resolution against
-the queue) couples to source-file conventions and is unclaimed until a kit
-rules on it. Task-output readers and delegation tooling are delegation-kit's
+the queue) couples to source-file conventions and is spec-kit's, on the
+governed comment surface (`check-todo-task-liveness`). Task-output readers and delegation tooling are delegation-kit's
 scope. A consumer's protocol prose, deferred-subsection taxonomy, and task
 bodies are rule content and never ship.

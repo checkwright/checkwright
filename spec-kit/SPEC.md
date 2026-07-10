@@ -582,6 +582,41 @@ under that doctrine, not re-gated here. Dropping the slot would also orphan
 the citation coverage the convention carries — the reason a dedicated
 script↔doc citation gate stays unbuilt.
 
+### check-todo-task-liveness
+
+Invariant: every `TODO(task: <slug>)` marker on a governed source resolves to a
+live queue task. A `<slug>` naming an active or deferred task resolves; a slug
+sitting in `Done` is **stale** (the work finished, the marker did not); a slug
+absent from the queue is **unresolved** (a typo or an unfiled task). Stale and
+unresolved both redden — a marker referencing nothing is a dangling forward
+reference, the source-side twin of a `blocked-by` tag left pointing at a
+completed task.
+
+`check-comment-tier` owns the marker's *shape* — it blesses `TODO(task:` as a
+reason directive — and this gate adds *resolution* on top, exactly as
+`check-spec-pointer` adds resolution to the `spec:` shape the same tier gate
+blesses. It closes the liveness gap those siblings already guard elsewhere:
+`check-task-names` flags a `blocked-by` gone stale on a done slug and
+`check-gate-exemption-tasks` resolves an exemption's `# until:` slug against the
+live set, but a `TODO(task:)` bound to a cleared task passed forever because
+nothing read the source side. The marker requires a resolvable slug after the
+colon, so a tool carrying the bare roster literal (`check-comment-tier`'s own
+directive name) never self-matches, and full-line versus trailing placement is
+immaterial: resolution governs the referent, not the comment tier. Bare
+`TODO`/`FIXME`/`HACK` markers are out of scope — trailing-comment scanning is a
+separate ruling if the need attests.
+
+Placement: the marker is a comment directive on the governed comment surface, so
+it is spec-kit's, not queue-kit's (which disclaims source-file conventions in
+its Out of scope). The gate scans `spec_comment_surface`, pruning `templates/`
+as placeholders-by-design like `check-spec-pointer`, and reads the queue through
+`SPEC_KIT_QUEUE_FILE` with no new knob — the live/done split reuses the section
+regexes `lib/spec.sh` already builds, reading a bare-slug bullet outside the
+active and deferred sections as the queue's done shape. Latent at landing: no
+such marker exists in the tree yet — the gate ships before the first one, so a
+future `TODO(task:)` cannot outlive its task silently. A queue-read failure is
+fail-closed (exit 2). `precommit` tier.
+
 ### check-spec-fence-balance
 
 Invariant: every governed markdown file carries an even count of code-fence

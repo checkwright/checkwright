@@ -44,6 +44,7 @@ check-manifest-temporal
 check-manifest-count
 check-comment-tier
 check-spec-pointer
+check-todo-task-liveness
 check-evidence-baseline
 check-evidence-manifest
 check-gate-tamper

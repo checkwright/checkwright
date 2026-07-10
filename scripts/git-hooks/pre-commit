@@ -181,6 +181,10 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-
     spec-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
 fi
 
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'spec-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
+    spec-kit/checks/check-todo-task-liveness.sh || hook_fail check-todo-task-liveness
+fi
+
 if staged_matches '.workflow/validate-baseline.txt' 'TASK-QUEUE.md'; then
     evidence-kit/checks/check-evidence-baseline.sh || hook_fail check-evidence-baseline
 fi
