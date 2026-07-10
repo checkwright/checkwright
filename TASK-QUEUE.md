@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **trajectory-closed-row-freeze** [spec: SPEC-closed-row-freeze.md] —
-  every range-scoped trajectory column freezes at the close boundary:
-  iteration N harvests (close(N-1), close(N)], interstitial commits belong
-  to the next row, and post-close queue filings and hotfixes alike leave
-  every published row byte-identical.
 - **lesson-disposition-traceability** [spec: SPEC-lesson-channels.md] —
   a commit shrinking Lessons Learned must stamp a per-entry disposition
   (rule/task/harvest/discard) into the lesson-evidence file;
@@ -152,5 +147,6 @@
 
 - manifest-count-shapes
 - comment-count-drift
+- trajectory-closed-row-freeze
 
 ## Lessons Learned

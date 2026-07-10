@@ -58,39 +58,30 @@ if git cat-file -e "HEAD:$STATE_FILE" 2>/dev/null; then
                  | grep -E '^COMMIT |^\+[a-z0-9-]+ (scope|align|build|validate|close) ')
 fi
 
-declare -A COMMIT_ITER   # commit hash -> owning iteration; each owns [start_i, start_{i+1}) in this linear history
-n=${#ITERS[@]}
-for ((i = 0; i < n; i++)); do
-    it="${ITERS[$i]}"
-    lower="${START_COMMIT[$it]}~1"
-    if ((i + 1 < n)); then
-        upper="${START_COMMIT[${ITERS[$((i + 1))]}]}~1"
-    else
-        upper="HEAD"
-    fi
-    while IFS= read -r h; do
-        [[ -n "$h" ]] && COMMIT_ITER["$h"]="$it"
-    done < <(git log --format='%H' "$lower..$upper" 2>/dev/null)
+# spec: drift-kit/SPEC.md §The published-evidence extractor — every range-scoped column freezes at (close(N-1), close(N)]; no column reads HEAD, so the emission is a pure function of closed history
+declare -A COMMIT_ITER FEAT DEBT   # commit -> owning closed iteration (range-attributed); per-iteration feat/debt subject split
+CLOSED_ITERS=()
+for it in "${ITERS[@]}"; do
+    [[ -n "${CLOSE_COMMIT[$it]:-}" ]] && CLOSED_ITERS+=("$it")
 done
-
-# spec: drift-kit/SPEC.md §The published-evidence extractor — commit-shape (feat/debt subject split) harvest
-declare -A FEAT DEBT
-for ((i = 0; i < n; i++)); do
-    it="${ITERS[$i]}"
-    lower="${START_COMMIT[$it]}~1"
-    if ((i + 1 < n)); then
-        upper="${START_COMMIT[${ITERS[$((i + 1))]}]}~1"
+prev_close=""
+for it in "${CLOSED_ITERS[@]}"; do
+    close_c="${CLOSE_COMMIT[$it]}"
+    if [[ -n "$prev_close" ]]; then
+        range="$prev_close..$close_c"    # (close(N-1), close(N)]
     else
-        upper="HEAD"
+        range="$close_c"                 # first row: close(0) is the empty boundary — every ancestor up to close(1)
     fi
     f=0; d=0
-    while IFS= read -r subj; do
+    while IFS=' ' read -r h subj; do
+        COMMIT_ITER["$h"]="$it"
         case "$subj" in
             feat*)            f=$((f + 1)) ;;
             fix* | refactor*) d=$((d + 1)) ;;
         esac
-    done < <(git log --format='%s' "$lower..$upper" 2>/dev/null)
+    done < <(git log --format='%H %s' "$range" 2>/dev/null)
     FEAT[$it]="$f"; DEBT[$it]="$d"
+    prev_close="$close_c"
 done
 
 # spec: drift-kit/SPEC.md §The published-evidence extractor — amendment-latency harvest, fixture/template paths excluded

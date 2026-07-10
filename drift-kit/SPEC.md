@@ -151,10 +151,18 @@ history and states plainly that no controlled ungoverned baseline exists; a
 synthetic controlled A/B experiment is the separate deferred
 `benchmark-ab-experiment` rung, not this mechanism.
 
-The extractor is a pure function of committed git history — it reads no
-now-relative field (no age-from-today), so re-emission over an unchanged
-history is byte-identical, which is exactly what the consumer freshness gate
-below byte-compares. It emits one row per **closed** iteration (one carrying a
+The extractor is a pure function of *closed* history — byte-stable across any
+commit that is not a close. Each closed iteration N owns the commit range
+`(close(N-1), close(N)]` (`close(0)` is the empty boundary — the first row runs
+from the root up to its close commit); no range-scoped column reads HEAD, so an
+interstitial commit — filed or hotfixed after a close, before the next scope —
+falls into the *next* iteration's range and surfaces only when that iteration
+closes, leaving every published row byte-identical until a new close lands.
+Totals conserve across rows: every commit up to the last close belongs to
+exactly one range. The extractor reads no now-relative field (no age-from-today)
+either, so re-emission over an unchanged closed history is byte-identical —
+exactly what the consumer freshness gate below byte-compares. It emits one row
+per **closed** iteration (one carrying a
 `close` stamp): an in-flight iteration's counts are still moving, so including
 it would stale the committed projection at every commit — the closed-only rule
 keeps the projection stable between iteration boundaries. Per closed iteration
@@ -169,13 +177,16 @@ it harvests:
   commitment made an iteration earlier that silently broke a surface shows as
   a failing suite, not a consistent-looking pass.
 - **amendment latency** — per amendment file, git add-date to delete-date
-  (merge), the longest lag in the iteration: the commitment-to-merge gauge.
-  Fixture and template amendment paths are excluded from the harvest from day
-  one (`kpi-amendment-age` applies the same `*/gate-tests/*`/`*/templates/*`
+  (merge), the longest lag in the iteration: the commitment-to-merge gauge. An
+  amendment is attributed to the iteration whose range contains its delete
+  (merge) commit; its add-date may precede the range start, since latency gauges
+  commitment-to-merge wherever the commitment was made. Fixture and template
+  amendment paths are excluded from the harvest from day one
+  (`kpi-amendment-age` applies the same `*/gate-tests/*`/`*/templates/*`
   exclusion).
 - **commit shape** — the feature/debt split of the iteration's commit subjects
-  (`kpi-task-split`'s classification, applied over the iteration's commit
-  range).
+  (`kpi-task-split`'s classification, applied over the same
+  `(close(N-1), close(N)]` range).
 - **gate-roster growth** — the `gates.list` member count at the iteration's
   close commit; with the queue's proposed-gate mentions this bounds the
   named-but-unbuilt backlog.
