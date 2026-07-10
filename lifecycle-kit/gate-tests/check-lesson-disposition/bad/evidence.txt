@@ -1,0 +1,2 @@
+# contract: lesson-disposition v1
+demo-iter lesson rule CLAUDE.md — **seam-note**

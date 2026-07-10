@@ -23,3 +23,6 @@
 - old-finished-task
 
 ## Lessons Learned
+
+- **lead-tagged-lesson** [attend] — the attend tag rides the lead line, as required.
+  a continuation line that merely mentions [attend] is tolerated (lead carries it).

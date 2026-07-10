@@ -27,13 +27,16 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    check-stage-evidence
    check-stage-entry
+   check-lesson-disposition
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
    generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
 
-2. Give the queue file its header and the evidence file its skeleton:
+2. Give the queue file its header and each evidence file its skeleton — the
+   stage-stamp file and the lesson-disposition file
+   (`LIFECYCLE_LESSON_EVIDENCE_FILE`, both boundary-reset to their header):
 
    ```
    ## Iteration: —  [stage: scope]
@@ -44,6 +47,10 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
    ---
 
+   ```
+
+   ```
+   # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
    ```
 
 3. Copy `templates/skills/*.md` into your agent-skill directory (e.g.

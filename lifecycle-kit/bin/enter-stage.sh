@@ -82,11 +82,26 @@ for pf in ${LIFECYCLE_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_ENTRY_PREFLIGHT[@]}"}; do
     fi
 done
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the iteration-boundary entry refuses on a non-empty ## Lessons Learned: an untriaged lesson must not cross into the next iteration (no [attend] injection may outlive its iteration), the same refusal contract as the check-stage-entry precondition
+if [[ "$first" == 1 ]]; then
+    lessons="$(awk '
+        /^## Lessons Learned[[:space:]]*$/ { inl = 1; next }
+        /^## / { inl = 0 }
+        inl && /^-[[:space:]]/ { print }
+    ' "$QUEUE")"
+    if [[ -n "$lessons" ]]; then
+        echo "enter-stage: iteration-boundary entry to '$stage' refused — ## Lessons Learned is non-empty; the close stage must disposition every lesson before the next iteration begins (nothing written):" >&2
+        printf '%s\n' "$lessons" >&2
+        echo "  help: run the close ritual's disposition step (rule/task/harvest/discard, stamping $LIFECYCLE_LESSON_EVIDENCE_FILE), clear the section, then re-run enter-stage $stage." >&2
+        exit 1
+    fi
+fi
+
 if [[ "$first" == 1 ]]; then
     header_only="$(awk '{ print } /^---[[:space:]]*$/ { exit }' "$STATE")"
     printf '%s\n\n%s\n' "$header_only" "$stamp_line" > "$STATE"
-    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_BOUNDARY_TRUNCATE: reset each listed file to its leading '# contract:' header at the iteration boundary
-    for bt in ${LIFECYCLE_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_BOUNDARY_TRUNCATE[@]}"}; do
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit-owned lesson-evidence file resets as a built-in member (kit owns this surface); LIFECYCLE_BOUNDARY_TRUNCATE stays reserved for files the kit does not own
+    for bt in "$LIFECYCLE_LESSON_EVIDENCE_FILE" ${LIFECYCLE_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_BOUNDARY_TRUNCATE[@]}"}; do
         [[ -f "$bt" ]] || continue
         bttmp="$tmpdir/boundary-truncate.$$"
         awk 'drop { next } /^#/ || /^[[:space:]]*$/ { print; next } { drop = 1 }' "$bt" > "$bttmp"

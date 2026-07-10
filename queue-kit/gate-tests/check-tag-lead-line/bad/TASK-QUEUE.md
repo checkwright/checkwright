@@ -15,3 +15,6 @@
 ## Done
 
 ## Lessons Learned
+
+- **off-lead-lesson** — this lesson's lead line carries no tag,
+  but it is really [attend] worthy for later sessions.

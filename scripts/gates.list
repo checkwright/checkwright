@@ -23,6 +23,7 @@ check-identity
 check-stage-evidence
 check-stage-entry
 check-stage-skill-coverage
+check-lesson-disposition
 check-queue-sections
 check-queue-hygiene
 check-queue-wrap

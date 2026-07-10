@@ -90,7 +90,11 @@ queue sections, waiver token, amendment/roster shapes, the skills dir
 (`LIFECYCLE_SKILLS_DIR`, default `.claude/commands`, read by
 `check-stage-skill-coverage`), governed-file paths (`LIFECYCLE_QUEUE_FILE` /
 `LIFECYCLE_STATE_FILE`, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
-`GATE_SDK_WORKFLOW_DIR`), `LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset
+`GATE_SDK_WORKFLOW_DIR`), `LIFECYCLE_LESSON_EVIDENCE_FILE` — the kit-owned
+lesson-disposition stamp file (default
+`${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`, read by
+`check-lesson-disposition` and boundary-reset built-in),
+`LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset
 to their header at the iteration boundary — and `LIFECYCLE_ENTRY_PREFLIGHT` —
 per-stage entry commands run alongside the built-in pre-flight
 (§bin/enter-stage.sh). Knob semantics
@@ -137,8 +141,15 @@ stamp under `—`, set the header to the unnamed-iteration form, and reset every
 file in `LIFECYCLE_BOUNDARY_TRUNCATE` to its leading `# contract:` header the
 same way (a generic per-iteration reset knob — no consumer surface is named in
 the kit; a downstream kit whose per-iteration file must start each cycle from
-its contract header adds itself here, as evidence-kit's manifest does).
-**Pre-flight,
+its contract header adds itself here, as evidence-kit's manifest does). The
+kit-owned `LIFECYCLE_LESSON_EVIDENCE_FILE` resets by the same rule as a
+**built-in member** — the kit owns that surface, so it does not ride the
+consumer knob (git history keeps the retired stamps). The boundary entry also
+**refuses outright when `## Lessons Learned` is non-empty** (exit 1, the
+untriaged entries printed, nothing written — the same refusal contract as the
+built-in pre-flight): an untriaged lesson must not cross into the next
+iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
+outlive the iteration that filed it. **Pre-flight,
 not enforcement:** before writing, it runs the built-in `check-stage-entry`
 for the entered stage plus each `LIFECYCLE_ENTRY_PREFLIGHT` command whose
 stage key matches — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}`
@@ -156,8 +167,8 @@ state file already ends with a stamp for the same `<iteration> <stage> <id>`,
 it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 (`LIFECYCLE_QUEUE_FILE`, `LIFECYCLE_STATE_FILE`, `LIFECYCLE_STAGES`,
-`LIFECYCLE_FIRST_STAGE`, `LIFECYCLE_BOUNDARY_TRUNCATE`, and
-`LIFECYCLE_ENTRY_PREFLIGHT`). Advisory tooling,
+`LIFECYCLE_FIRST_STAGE`, `LIFECYCLE_BOUNDARY_TRUNCATE`,
+`LIFECYCLE_LESSON_EVIDENCE_FILE`, and `LIFECYCLE_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
 `smoke/install.sh`.
 
@@ -260,6 +271,35 @@ does not exist is fail-closed (exit 2). The `# graph:` couples the skills dir at
 `tier=precommit`; the whole-tree `run-gates.sh` battery backstops a stage-set
 edit (`lifecycle-stages.sh`), which is not itself in the coupled surface.
 
+### check-lesson-disposition
+
+Invariant: every `## Lessons Learned` entry present at HEAD and absent from the
+worktree leaves a well-formed disposition stamp in
+`LIFECYCLE_LESSON_EVIDENCE_FILE` — a lesson cannot be cleared without a
+recorded rule/task/harvest/discard call. The evidence home is a stamped file,
+not the commit body, because the battery runs at pre-commit when no commit
+message exists yet, so only a file is mechanically decidable (the
+`check-stage-evidence` fail-closed precedent). Each data line is
+`<iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard
+<reason>> — <lead-line prefix>`; the ` — ` separates the disposition from the
+lead-line prefix that joins it to the removed entry (a stored prefix matches a
+removed entry when it is a leading substring of that entry's normalized lead
+line). Both grammar (each line well-formed, a known disposition kind) and
+per-entry matching (every removal has a stamp) hold; an unreadable evidence
+surface is fail-closed (exit 2). Shape validation only: `harvest <tag>` is not
+checked against `QUEUE_KIT_LESSON_TAGS` — that would cross-couple the kits'
+configs; the close skill and `check-tag-lead-line` hold the vocabulary.
+
+Calibration: diffing HEAD against the worktree is fixture-hostile (a committed
+fixture has HEAD == worktree, so the removal case has no static representation —
+the `check-task-conservation` precedent), so the gate takes optional
+`[queue-head] [queue-worktree] [evidence-file]` override args and its good/bad
+pair drives all three hermetically (the `check-trajectory-fresh` synthetic-args
+precedent); `gate-tests/check-lesson-disposition.test.sh` covers the malformed
+grammar, still-present-not-removed, and prefix-join cases the one pair cannot.
+The `# graph:` couples the queue file and the evidence file at
+`tier=precommit`.
+
 ### templates/skills/
 
 The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`)
@@ -270,6 +310,8 @@ does; scope's truncate-and-bootstrap protocol; align's trigger-gating and waiver
 rule; build's step-0 audit recheck and stamp-per-session/flip-once rule;
 validate's baseline-diff discipline plus the codified-spine + evidence-manifest
 commit step, recorded on a commit later than the entry flip; close's
-disposition-per-lesson rule)
+disposition-per-lesson rule — rule/task/harvest/discard, each stamped into
+`LIFECYCLE_LESSON_EVIDENCE_FILE` for `check-lesson-disposition`, with the
+harvest route to the consumer's named sink)
 with `<…>` placeholders where the consumer's rule content goes. Structure is
 copied, not imported, so a consumer's skills stay legible and self-contained.

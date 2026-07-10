@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
-# spec: queue-kit/SPEC.md §check-tag-lead-line — every blocked-by/spec/needs-spec tag sits on its bullet's lead line, the only line the tag readers scan
+# spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag (blocked-by/spec/needs-spec in the task sections, attend + configured lesson tags in Lessons) sits on its bullet's lead line, the only line the tag readers scan
 #
 # usage: check-tag-lead-line.sh [queue-file]
 #   Defaults to the configured queue file (QUEUE_KIT_QUEUE_FILE).
@@ -16,16 +16,23 @@ source "$KIT/lib/queue.sh"
 FILE="${1:-$QUEUE_KIT_QUEUE_FILE}"
 [[ -f "$FILE" ]] || { echo "check-tag-lead-line: file not found: $FILE" >&2; exit 2; }
 
-out="$(awk -v taskre="$QUEUE_TASK_RE" -v sectre="$QUEUE_SECTION_RE" '
-    function classes(line, arr) {
+lessontags="${QUEUE_KIT_LESSON_TAGS[*]+"${QUEUE_KIT_LESSON_TAGS[*]}"}"
+out="$(awk -v taskre="$QUEUE_TASK_RE" -v lessonsre="$QUEUE_LESSONS_RE" \
+    -v sectre="$QUEUE_SECTION_RE" -v lessontags="$lessontags" '
+    BEGIN { nlt = split(lessontags, lt, " ") }
+    function classes(line, arr,   i) {
         delete arr
         if (line ~ /\[blocked-by:/)  arr["blocked-by"] = 1
         if (line ~ /\[spec:/)        arr["spec"]       = 1
         if (line ~ /\[needs-spec\]/) arr["needs-spec"] = 1
+        if (line ~ /\[attend\]/)     arr["attend"]     = 1
+        for (i = 1; i <= nlt; i++)
+            if (index(line, "[" lt[i] "]")) arr[lt[i]] = 1
     }
-    $0 ~ taskre { intask = 1; leadfnr = 0; delete leadcls; next }
-    $0 ~ sectre { intask = 0; leadfnr = 0; delete leadcls; next }
-    !intask { next }
+    $0 ~ taskre    { inscan = 1; leadfnr = 0; delete leadcls; next }
+    $0 ~ lessonsre { inscan = 1; leadfnr = 0; delete leadcls; next }
+    $0 ~ sectre    { inscan = 0; leadfnr = 0; delete leadcls; next }
+    !inscan { next }
     /^[[:space:]]*```/ { fence = !fence; next }
     fence            { next }
     /^[[:space:]]*\|/ { next }                        # table row: exempt
@@ -54,5 +61,5 @@ if [[ -n "$out" ]]; then
     exit 1
 fi
 
-echo "TAG-LEAD-LINE: clean (every blocked-by/spec/needs-spec tag in the task sections is on its bullet lead line in $FILE)"
+echo "TAG-LEAD-LINE: clean (every governed tag in the task + Lessons sections is on its bullet lead line in $FILE)"
 exit 0

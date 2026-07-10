@@ -41,9 +41,10 @@ line carries it verbatim. The slug grammar is kit mechanism, not config.
 
 ### The tag algebra
 
-Tags are square-bracket literals with fixed spelling (mechanism, not config);
-every tag sits on its bullet's **lead line** — the only line the parsing
-tools scan (enforced by `check-tag-lead-line`).
+Tags are square-bracket literals with fixed spelling (mechanism, not config
+— the one exception is the consumer-named harvest vocabulary below); every tag
+sits on its bullet's **lead line** — the only line the parsing tools scan
+(enforced by `check-tag-lead-line`).
 
 - `[blocked-by: <slug>]` — the entry is unpickable until `<slug>` completes.
   Repeat per blocker. Must resolve to a live task (active or deferred — a
@@ -57,6 +58,24 @@ tools scan (enforced by `check-tag-lead-line`).
   semantics in spec-kit.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
+
+Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
+under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`
+plus `check-tag-lead-line` read that section's lead lines too:
+
+- `[attend]` — fixed spelling, kit mechanism (the inbound channel): the filing
+  session marks a lesson as a live attention point for later sessions *of the
+  same iteration*. `queue-index.sh` emits an attention block of `[attend]`
+  lead lines (§bin/queue-index.sh); the injection dies at the iteration
+  boundary because lifecycle-kit's first-stage entry refuses a non-empty
+  Lessons section.
+- **Harvest tags** — `QUEUE_KIT_LESSON_TAGS` (array of bare tag names, default
+  empty) is the *one* configured exception to fixed spelling (the outbound
+  channel): the tag names, their sinks, and their handling are consumer rule
+  content — a kit literal carrying them would publish a private vocabulary
+  (the provenance seam, `check-graph`/`graph-vocab` pattern). The close ritual
+  routes a tagged entry's body to the sink the consumer's close skill names
+  for that tag; queue-kit only parses the tag's placement.
 
 ## Layout and configuration
 
@@ -87,6 +106,13 @@ anything. Knobs:
   (`Iteration:`, prefix-matched for its dynamic suffix) plus `New Features` /
   `Technical Debt` / `Deferred` / `Done` / `Lessons Learned`. A trailing `:`
   marks a prefix-matched heading; every other entry is matched exactly.
+- `QUEUE_KIT_LESSON_TAGS` — array of bare harvest-tag names, default empty; the
+  consumer-named outbound lesson vocabulary (§The tag algebra), read by
+  `check-tag-lead-line` for placement. Names, sinks, and handling are consumer
+  rule content — the kit ships none.
+- `QUEUE_KIT_ATTEND_CAP` — positive integer, default `3`; the maximum `[attend]`
+  lead lines `bin/queue-index.sh` emits in its attention block before folding
+  the rest into an overflow note.
 
 Cross-kit note: lifecycle-kit's `LIFECYCLE_ACTIVE_SECTIONS` carries the same
 default. The knobs are independent (either kit runs without the other); a
@@ -114,6 +140,14 @@ double blank). `--collapse-deferred` replaces the deferred listing with a
 per-`###`-subsection tally — generic over whatever subsection names the file
 has (a hardcoded tally table would be consumer rule content), with
 entries under no subsection tallied as `(top)`.
+
+Both modes append an **attention block** when the `## Lessons Learned` section
+carries `[attend]` entries (§The tag algebra): each such entry's lead line,
+capped at `QUEUE_KIT_ATTEND_CAP` (default 3) with overflow noted as
+`(+N more [attend])`. Lead lines only, never bodies — the block is
+always-loaded through the session-context hook that embeds this output, so the
+cap is its token budget. This is the inbound lesson channel reaching every
+later session of the iteration with zero consumer-hook edits.
 
 ### check-queue-hygiene
 
@@ -157,16 +191,20 @@ fenced-code blocks, and lines over budget solely due to one unbreakable token
 
 ### check-tag-lead-line
 
-Invariant: every `[blocked-by:]` / `[spec:]` / `[needs-spec]` tag inside the
-task sections (active + deferred) sits on its bullet's lead line — the only
-line the tag-reading tools scan; a tag pushed to a continuation line by a
-reflow silently unblocks a task or masks a needs-spec state. Couples the
-width-only wrap gate to the tag-parsing tools over the same surface: gate the
-coupling, not just each side.
+Invariant: every governed tag sits on its bullet's lead line — the only line
+the tag-reading tools scan; a tag pushed to a continuation line by a reflow
+silently unblocks a task, masks a needs-spec state, or drops a lesson out of
+the attention block. The governed set and scanned surface both widen with the
+lesson channels: `[blocked-by:]` / `[spec:]` / `[needs-spec]` in the task
+sections (active + deferred), plus `[attend]` and every `QUEUE_KIT_LESSON_TAGS`
+name in the `## Lessons Learned` section — the section `queue-index.sh` now
+reads, which retires the old "parsed by no reader" exemption for it. Couples
+the width-only wrap gate to the tag-parsing tools over the same surface: gate
+the coupling, not just each side.
 
 Calibration: lead-class rule — a tag of class C on a continuation line is a
 violation only when the lead line lacks class C (prose that mentions a tag
-the lead already carries is tolerated); tags outside the task sections are
+the lead already carries is tolerated); tags outside the scanned sections are
 parsed by no reader and ignored. Fenced-code and table lines exempt.
 Residual accepted gap: a same-class duplicate sliding off while one stays on
 the lead — negligible severity, not reflow-realistic.

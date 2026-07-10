@@ -49,6 +49,7 @@ hdr="$(grep -m1 '^## Iteration:' "$FILE" || true)"
 [[ -n "$hdr" ]] && { echo "$hdr"; echo ""; }
 
 awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
+    -v lessonsre="$QUEUE_LESSONS_RE" -v cap="$QUEUE_KIT_ATTEND_CAP" \
     -v sectre="$QUEUE_SECTION_RE" -v collapse="$collapse" '
     function title(line,   t) {
         t = line
@@ -70,7 +71,14 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
     }
     $0 ~ activere   { sec = "active";   next }
     $0 ~ deferredre { sec = "deferred"; next }
+    $0 ~ lessonsre  { sec = "lessons";  next }
     $0 ~ sectre     { sec = "other";    next }
+
+    sec == "lessons" && /^-[[:space:]]/ && /\[attend\]/ {
+        nl++
+        if (nl <= cap) { line = $0; sub(/[[:space:]]+$/, "", line); att[nl] = line }
+        next
+    }
 
     sec == "active" && /^-[[:space:]]/ && match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/) {
         sl = substr($0, RSTART + 2, RLENGTH - 4)
@@ -104,6 +112,13 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
             print "Deferred:"
             if (dn == 0) print "  (none)"
             for (i = 1; i <= dn; i++) printf "  %s\n", dtitle[i]
+        }
+        if (nl > 0) {
+            print ""
+            print "Attention (Lessons [attend], this iteration):"
+            lim = (nl < cap ? nl : cap)
+            for (i = 1; i <= lim; i++) printf "  %s\n", att[i]
+            if (nl > cap) printf "  (+%d more [attend])\n", nl - cap
         }
     }
 ' "$FILE"

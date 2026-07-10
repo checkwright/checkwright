@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **lesson-disposition-traceability** [spec: SPEC-lesson-channels.md] —
-  a commit shrinking Lessons Learned must stamp a per-entry disposition
-  (rule/task/harvest/discard) into the lesson-evidence file;
-  check-lesson-disposition holds the fail-closed contract, hermetic via
-  override args.
-- **lesson-pub-harvest** [spec: SPEC-lesson-channels.md] — the outbound
-  channel: consumer-named harvest tags on a lesson lead line route the
-  entry's body to a consumer-configured sink at close triage; this repo
-  wires an essay tag into a gitignored harvest feeding the launch-comms
-  methodology essay.
-- **lesson-context-tag** [spec: SPEC-lesson-channels.md] — the inbound
-  channel: a fixed attend tag on a lesson lead line makes queue-index emit
-  the lead line into every later session of the same iteration, capped;
-  enter-stage scope refuses on a non-empty Lessons section, so the
-  injection mechanically dies at the iteration boundary.
 - **docs-link-convention-gate** [spec: SPEC-docs-link-convention.md] —
   consumer gate over the docs pages: no directory-target relative link
   (name the file), kit-page back-links carry their section anchor; the
@@ -148,5 +133,8 @@
 - manifest-count-shapes
 - comment-count-drift
 - trajectory-closed-row-freeze
+- lesson-disposition-traceability
+- lesson-pub-harvest
+- lesson-context-tag
 
 ## Lessons Learned

@@ -10,12 +10,22 @@ TASK-QUEUE.md `[stage:]` line to `close`, committed together. It reads
 
 ## Session ritual
 
-1. **Process Lessons Learned** — explicit disposition per entry: →rule
+1. **Process Lessons Learned** — explicit disposition per entry, **stamped**
+   one line each into `.workflow/lesson-evidence.txt`
+   (`<iteration> lesson <kind> <ref> — <lead-line prefix>`, the record
+   `check-lesson-disposition` reads at the queue-diff transition): →rule
    (CLAUDE.md for cross-stage, a `.claude/commands/<stage>.md` for
    stage-local — preferred, it loads on demand), →task (name the new queue
-   slug), or →discard (state why). A lesson naming an unfixed gap becomes a
-   queue entry, never evaporates. Lessons that belong to the *private* seam
-   ruling go to BRIEF.local.md (local-only).
+   slug), →harvest (route the entry's body per the table below), or →discard
+   (state why). A lesson naming an unfixed gap becomes a
+   queue entry, never evaporates. A lesson belonging to the *private* seam
+   ruling stamps `discard private-seam (BRIEF.local.md)` and its content goes
+   to BRIEF.local.md (local-only).
+   Harvest routing (`QUEUE_KIT_LESSON_TAGS`, `scripts/queue-config.sh`):
+   - `[essay]` → append the body to `.workflow/essay-harvest.md` (gitignored
+     operator material feeding the `launch-comms` methodology essay; reclaim:
+     merged into the essay, then cleared — the Housekeeping gitignored-artifact
+     rule).
    Lesson-vs-task litmus (also at filing time, any stage): if the deliverable
    and its done-state are nameable now, it is a task — file it in Deferred
    `[needs-spec]` directly, never stage it in Lessons where it waits a stage

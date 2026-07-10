@@ -42,6 +42,7 @@ declare -p LIFECYCLE_CONTRACT_TOKENS &>/dev/null || LIFECYCLE_CONTRACT_TOKENS=("
 
 [[ -v LIFECYCLE_QUEUE_FILE ]] || LIFECYCLE_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 [[ -v LIFECYCLE_STATE_FILE ]] || LIFECYCLE_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
+[[ -v LIFECYCLE_LESSON_EVIDENCE_FILE ]] || LIFECYCLE_LESSON_EVIDENCE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt"
 
 declare -p LIFECYCLE_BOUNDARY_TRUNCATE &>/dev/null || LIFECYCLE_BOUNDARY_TRUNCATE=()
 
@@ -69,6 +70,7 @@ lifecycle_stage_known() {
 _lc_errs=()
 [[ ${#LIFECYCLE_STAGES[@]} -gt 0 ]] || _lc_errs+=("LIFECYCLE_STAGES is empty")
 [[ -n "$LIFECYCLE_SKILLS_DIR" ]] || _lc_errs+=("LIFECYCLE_SKILLS_DIR is empty")
+[[ -n "$LIFECYCLE_LESSON_EVIDENCE_FILE" ]] || _lc_errs+=("LIFECYCLE_LESSON_EVIDENCE_FILE is empty")
 lifecycle_stage_known "$LIFECYCLE_FIRST_STAGE" \
     || _lc_errs+=("LIFECYCLE_FIRST_STAGE '$LIFECYCLE_FIRST_STAGE' is not in LIFECYCLE_STAGES")
 for _lc_k in "${!LIFECYCLE_PREDECESSOR[@]}"; do
