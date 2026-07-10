@@ -72,7 +72,17 @@
   communication, not topology — its sessions share one clone and one
   lifecycle state by design; contributor-level branch/worktree strategy is
   multi-operator-semantics' question, and that rung is upstream of any
-  team-flavored version of this one.
+  team-flavored version of this one. Delegation-parameter note 2026-07-10:
+  the lead owns model/effort for the stage sessions it dispatches (whoever
+  invokes the dispatch selects; stage shape predicts effort, and the lead
+  holds the iteration-wide picture), but sub-agent dispatch inside a stage
+  session stays with that session under the resident delegation protocol
+  and per-dispatch budget guard — the session's context, not the lead's,
+  holds what selection needs. The stamps-authoritative constraint
+  generalizes to policy: a lead's delegation preferences land in the
+  tracked surfaces sessions already read (agent-definition frontmatter,
+  delegation config), never ad-hoc per-session instructions — else the
+  lead becomes a second, ungated source of delegation policy.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
