@@ -5,3 +5,4 @@
 ---
 
 enforcement-sweep scope 92a94cfc 2026-07-10
+enforcement-sweep align e7a8acf9 2026-07-10
