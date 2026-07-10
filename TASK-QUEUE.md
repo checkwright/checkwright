@@ -107,7 +107,11 @@
   constraint 2026-07-10: **filing a queue entry after close must stay
   possible** — the queue is where a post-close finding lands, so a
   queue-only commit must never disturb a published row; whatever the freeze
-  rules for hotfixes, it may not make `TASK-QUEUE.md` append-hostile.
+  rules for hotfixes, it may not make `TASK-QUEUE.md` append-hostile. Measured
+  the same day: the append path already holds — feat/debt harvests only
+  `feat*` and `fix*`/`refactor*` subjects, so a `docs(queue):` filing leaves
+  the row byte-identical. The freeze must *preserve* that property, not
+  establish it; the live hazard is a post-close `feat`/`fix` commit.
 - **site-health-monitor** [needs-spec] — a scheduled probe of the live docs
   site, explicitly *not* a gate: it verifies a deployment, not a tree, so it
   fails on causes no commit produced (DNS, a Pages incident, cert renewal) and
