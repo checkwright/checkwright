@@ -21,7 +21,10 @@ sites and becomes a knob:
   before each dispatch, so the bound surfaces at exactly the decision
   point, and the agent-budget-guard's advisory text relays it on PAUSE.
   The `usage-tests` suite extends to assert the field.
-- **The three prose sites cite the knob** — delegation-kit SPEC rule 3,
+- **The prose sites cite the knob** — delegation-kit SPEC rule 3, the kit's
+  two templates (`templates/agent-execution.md`,
+  `templates/claude-md-agent-execution.md` — the kit-owned sources the
+  consumer copies derive from; unswept they keep shipping the bare literal),
   `CLAUDE.md`'s agent-execution digest, and the `/agent-execution` skill
   replace the bare literal with the knob name (default noted once, in the
   SPEC).
@@ -59,6 +62,10 @@ semantics — is recorded here as the design direction and not built.
   supervision-ceiling paragraphs land beside it.
 - `delegation-kit/SPEC.md` §usage-verdict contract: the verdict-line format
   gains the `width=` field.
+- `delegation-kit/templates/agent-execution.md` and
+  `templates/claude-md-agent-execution.md`: every restatement of the literal
+  (including the loss-bounding rationale line) becomes the knob citation,
+  so a fresh consumer copy inherits the knob, not the number.
 - `CLAUDE.md` §Agent execution and `.claude/commands/agent-execution.md`:
   the literal is replaced by the knob citation — prose sites cite, the SPEC
   owns.
@@ -73,9 +80,9 @@ semantics — is recorded here as the design direction and not built.
       coherent document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls delegation-kit/SPEC-*.md`).
-- [ ] **Removals propagated** — grepped every spec and skill for the bare
-      `≤2-wide` literal; nothing restates the number outside the SPEC's
-      default note.
+- [ ] **Removals propagated** — grepped every spec, skill, and kit template
+      for the bare `≤2-wide` literal; nothing restates the number outside
+      the SPEC's default note.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).

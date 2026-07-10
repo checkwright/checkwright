@@ -41,7 +41,20 @@ dir re-registers by name alone.
   commands), `check-kit-registration` / the kit enum, `check-docs-kit-parity`
   (the docs/index.md row), `check-core-files` (`scripts/core-files.list`),
   the root allowlist, and CI (`.github/workflows/gates.yml` fixture step).
-  The sweep is verified by the battery, not by eyeball.
+  The sweep is verified by the battery, not by eyeball — except the
+  ungoverned sites below.
+- **Ungoverned reference sites** — surfaces outside the spec manifest and
+  the `spec:`-pointer scan that carry retired names, where the battery stays
+  green on a dangle (audited at align): `.claude/commands/scope.md` and
+  `validate.md` (prose §-citations of the SPEC),
+  `.claude/commands/agent-execution.md` (the `spec-config.sh` mention and
+  the fixture-runner line), `lifecycle-kit/templates/skills/release-sweep.md`
+  (the brand name and `SPEC_KIT_DEPRECATION_MARKERS`),
+  `scripts/graph-vocab.sh` (the kit-class vocabulary — a stale pattern
+  misclassifies silently on regeneration rather than erroring), and
+  `scripts/evidence-config.sh` (the fixture-suite path goes red only at the
+  validate stage, not at commit). The removals-propagated grep is the net
+  for these.
 - **Generated projections** — the pre-commit hook, `.workflow/CHECK-GRAPH.html`,
   and `docs/enforcement.md` embed kit paths; all three regenerate after the
   sweep (`gen-pre-commit.sh --write`, `check-graph.sh --emit`,
@@ -56,8 +69,12 @@ dir re-registers by name alone.
 - `canon-kit/README.md`, the repo `README.md` kit map, `CLAUDE.md`'s fixture
   runner line, `CONTRIBUTING.md`: mechanical reference updates.
 - Cross-kit SPEC references (drift-kit, evidence-kit, lifecycle-kit,
-  context-kit, site-kit, queue-kit, gate-sdk, and drift-kit/templates):
-  mechanical reference updates, propagated per merge step 5.
+  context-kit, site-kit, queue-kit, gate-sdk, drift-kit/templates, and
+  lifecycle-kit/templates): mechanical reference updates, propagated per
+  merge step 5.
+- The ungoverned reference sites listed above (`.claude/commands` skills,
+  `scripts/graph-vocab.sh`, `scripts/evidence-config.sh`): mechanical
+  reference updates, held by the removals grep rather than the battery.
 - `docs/posts/` needs no edit: no dated post references the kit (checked at
   scope), so the immutability rule is not exercised.
 
@@ -71,9 +88,11 @@ dir re-registers by name alone.
       coherent document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls canon-kit/SPEC-*.md`).
-- [ ] **Removals propagated** — grepped every spec for names this change
-      retired (`spec-kit`, `SPEC_KIT_`, `spec-config.sh` outside generic-vocab
-      keepers); nothing dangles.
+- [ ] **Removals propagated** — grepped every tracked file for names this
+      change retired (`spec-kit`, `SPEC_KIT_`, `spec-config.sh` outside
+      generic-vocab keepers and immutable surfaces: dated posts, generated
+      trajectory data, fixture bodies where the name is inert content);
+      nothing dangles.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
