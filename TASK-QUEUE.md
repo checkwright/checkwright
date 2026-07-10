@@ -190,9 +190,9 @@
   verified server-side by a party the committing agents cannot touch —
   hosted gate runs as a neutral attestation, cross-repo drift dashboards,
   maintained rulesets. A service, not code: cloning the kits does not clone
-  the neutrality or the ops. Separate private repo, created only when
-  adoption demand shows up — this entry is the public roadmap marker, not a
-  scaffold; natural landing post adoption-track, and multi-operator-semantics
+  the neutrality or the ops. Demand-gated — this entry is the public
+  roadmap marker, not a scaffold; hosting and sequencing decisions are on
+  record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 - **delegation-fan-width** [needs-spec] — the ≤2-wide fan-out bound is a
   subscription-economics number restated as a kit literal in three prose
@@ -217,12 +217,10 @@
   scale with budget. Surfaced 2026-07-10 in build.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
-  first release tag exists: LinkedIn profile update + announcement post;
-  a methodology essay on the writing project's Substack cross-posted to
-  Dev.to and LinkedIn; one well-timed Show HN / Lobsters submission once
-  the demo and docs withstand that traffic; conference CfP targets picked
-  by lead time. In-repo residue only (docs/posts/ entries, the tag);
-  the campaign itself is operator work. Surfaced 2026-07-09.
+  first release tag exists. In-repo residue only (docs/posts/ entries, the
+  tag); the campaign itself — channels, venues, timing — is operator work,
+  planned in the operator's local brief rather than here. Surfaced
+  2026-07-09.
 
 ## Done
 
