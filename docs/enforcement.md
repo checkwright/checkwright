@@ -54,7 +54,7 @@ leaves its section absent.
 | spec-kit | check-spec-embedded-source | precommit |
 | spec-kit | check-spec-fence-balance | precommit |
 | spec-kit | check-md-refs | precommit |
-| (consumer) | check-docs-link-convention | precommit |
+| spec-kit | check-docs-link-convention | precommit |
 | (consumer) | check-docs-cname-parity | precommit |
 | spec-kit | check-docs-cmd | precommit |
 | spec-kit | check-manifest-temporal | precommit |
