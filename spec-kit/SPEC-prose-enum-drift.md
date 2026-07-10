@@ -25,18 +25,25 @@ Member tokens are matched word-bounded, bracketed or bare — the attested
 drift used bare stems. A declared command that fails, or an emitted line
 that does not parse, is fail-closed (exit 2).
 
-Exempt contexts reuse the count gate's family: a subset marker inside the
-window (`e.g.`, `such as`, `among them`), a partitive marker on the match,
+Exempt contexts follow the count gate's family shape — mechanical markers
+first, per-site tag last: a subset marker inside the window (`e.g.`,
+`such as`, `among them` — new to this gate, fixed generic-English mechanism
+like the count gate's partitive markers), a partitive marker on the match,
 and the per-site `prose-enum-exempt: <reason>` on the line or the one above.
 The corrective names both legitimate fixes: cite the owning set by name, or
 complete the enumeration — never trim to a silent subset (trimming is the
 same defect check-kit-enum's help text pre-empts with the glob token).
 
 Shared machinery — the check-manifest-count half of this unit: the
-paragraph-join window and the exempt-site plumbing move from
-check-manifest-count's body into `lib/spec.sh` adapters both gates source.
-One walk, one exemption behavior; check-manifest-count's observable behavior
-is unchanged.
+manifest-prose walk driver (fence tracking, the blank-line paragraph reset,
+the per-site exempt window on the line or the one above) moves from
+check-manifest-count's awk body into a `lib/spec.sh` adapter both
+manifest-prose gates source, parameterized by the per-site marker name; it
+feeds the paragraph-join window that is already a lib adapter (§lib/spec.sh).
+One walk, one exemption behavior for the manifest-prose surface —
+check-comment-tier keeps its caller-owned comment walk (§lib/spec.sh's
+surfaces-disagree ruling stands), and check-manifest-count's observable
+behavior is unchanged.
 
 This repo's consumer config: `scripts/enum-sets.sh` derives the queue-tag
 set from queue-kit's own parsing source plus `QUEUE_KIT_LESSON_TAGS` —
@@ -63,7 +70,8 @@ grammar.
 - §check-manifest-count: the prose-walk paragraph cites the shared
   lib/spec.sh adapters (paragraph-join window, exempt-site helper) instead
   of describing a gate-private walk.
-- §lib/spec.sh: gains the two adapters.
+- §lib/spec.sh: gains the walk adapter and the exempt-site helper beside
+  the paragraph-join window already documented there.
 - Calibration follows the count gate's procedure: tune against this tree,
   disposition every hit (cite the set / complete the list / site-exempt
   with reason). Ships with a good/bad fixture pair;

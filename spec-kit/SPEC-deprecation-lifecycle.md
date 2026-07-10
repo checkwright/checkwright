@@ -11,9 +11,12 @@ consumer config, a consumer's language never a kit literal. Three pieces:
 **1. spec-kit gate — `checks/check-deprecation-task.sh`** (`precommit`):
 every deprecation marker on a governed source resolves to a live
 decommission task — the TODO(task:) analog, sharing
-check-todo-task-liveness's binding grammar and queue-resolution adapters
+check-todo-task-liveness's binding grammar and queue resolution
 (one grammar, two gates: the marker line must carry `task: <slug>` and the
-slug must resolve to a live queue entry, active or deferred). Detector
+slug must resolve to a live queue entry, active or deferred). The live/done
+queue pass is gate-private awk in check-todo-task-liveness today (only its
+section regexes are lib adapters); this unit lifts that pass into a
+`lib/spec.sh` adapter both gates source, unchanged in behavior. Detector
 roster: `SPEC_KIT_DEPRECATION_MARKERS` (one regex per element, default
 empty → clean skip — the graph-vocab pattern; the kit never knows a
 language's marker spelling). A detected marker with no `task:` binding, or a
@@ -47,7 +50,7 @@ check-manifest-count config-path precedent).
   config home). Consumer: the committing operator; each finding names file,
   line, marker, and the unresolved slug — every field read in that message.
 - `SPEC_KIT_DEPRECATION_MARKERS` read at gate startup; the captured slug
-  read at the queue-resolution transition (the shared adapter).
+  read at the queue-resolution transition (the adapter lifted above).
 - Skill template producer: the consumer copies it beside its stage skills
   and invokes it at a release boundary; consumer of the stamps: the release
   reviewer/operator (stated above — no kit reader).
@@ -57,8 +60,9 @@ check-manifest-count config-path precedent).
 ## Existing sections updated
 
 - spec-kit §check-todo-task-liveness: cites the shared binding grammar and
-  resolution adapters now used by two gates.
-- spec-kit §lib/spec.sh: the resolution adapter's second reader.
+  the lifted resolution adapter now used by two gates.
+- spec-kit §lib/spec.sh: gains the queue-resolution adapter with its two
+  readers.
 - lifecycle-kit SPEC §templates: the new skill-template row.
 - drift-kit SPEC §Out of scope + §Layout: the pre-ruling now points at the
   shipped example template.
