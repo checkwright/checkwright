@@ -14,3 +14,4 @@
 | operational-hardening | s a b v c | 6f/0d | 3 · ≤1d | 12s clean | 39 |
 | adoption-track | s a b v c | 6f/1d | 7 · ≤0d | 13s clean | 42 |
 | public-positioning | s · b v c | 2f/4d | 0 | 13s clean | 42 |
+| close-loop-hardening | s a b v c | 10f/0d | 7 · ≤0d | 13s clean | 46 |

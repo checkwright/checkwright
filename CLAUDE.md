@@ -37,6 +37,9 @@ bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                          
 bash guard-kit/bin/run-guard-tests.sh                                                # guard-kit decision table
 ```
 
+The git index is shared with any concurrent session: check `git status` for a
+foreign staged path before `git add`, or stage and commit in one motion.
+
 The repo also runs lifecycle-kit's iteration state machine on itself — one
 iteration per hardening or roadmap unit. `TASK-QUEUE.md` carries the
 `## Iteration: <name>  [stage: <stage>]` header; each stage session invokes

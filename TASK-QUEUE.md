@@ -263,6 +263,17 @@
   list vs restate it across gate-sdk and drift-kit). Carve-outs: merge
   commits, reverts, fixup!/squash! autosquash subjects. Surfaced
   2026-07-10 in build, asking whether the convention was already enforced.
+- **find-glob-steer** [needs-spec] — a guard-kit rule steering listing-only
+  `find` to the Glob tool, the same shape as the existing `sed`-read steer
+  (a better form exists, and it returns paths registered for a later Read).
+  Scope is the design work: fire only when the invocation carries no action
+  predicate (`-exec`, `-execdir`, `-delete`, `-ok`) and is not piped into a
+  consumer — a blanket steer would block the legitimate uses, and "is this
+  a bare listing" is precisely the logic a permission glob cannot express.
+  Ships with decision-table rows for both sides of that line. Evidence: 7
+  fall-throughs in close-loop-hardening, every one a plain listing under a
+  kit directory (`find <dir> -type f`, `find <kit> -name '*.test.sh'`).
+  Surfaced 2026-07-10 at close, tooling-friction triage.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists: LinkedIn profile update + announcement post;
@@ -274,43 +285,4 @@
 
 ## Done
 
-- count-scan-wrap-blindness
-- todo-task-liveness
-- site-health-monitor
-- docs-cname-parity
-- docs-link-convention-gate
-- manifest-count-shapes
-- comment-count-drift
-- trajectory-closed-row-freeze
-- lesson-disposition-traceability
-- lesson-pub-harvest
-- lesson-context-tag
-
 ## Lessons Learned
-
-- **shared-index-atomicity** [attend] — concurrent sessions share one git
-  index: check `git status` for a foreign staged path before any `git
-  add`/`commit`, or stage-and-commit atomically in one motion. This iteration a
-  parallel session's `add -A && commit` swept a build session's staged feature
-  files into a `docs(queue):` commit, misclassifying a feat row that
-  `trajectory-closed-row-freeze` would freeze into the published evidence at
-  close. Recover by splitting the unpushed tip (amend-class, not a rebase:
-  stash → `reset --soft HEAD~1` → two commits); if the tip is already pushed,
-  file the misclassification as evidence on `commit-subject-grammar` instead.
-- **orchestration-trust-framing** [essay] — orchestration multiplies writers
-  but does nothing about trust: every delegation hop is a place where "the
-  agent said it passed" substitutes for verification, and drift compounds per
-  hop — so orchestration without a verification layer parallelizes drift
-  (wrong answers faster, with more confidence). Harness coordination
-  primitives answer *who does what, when*; none answer *how do you know the
-  work is right without reading all of it* — Checkwright is that second
-  answer: gates make done mechanically decidable, stamps make stage claims
-  checkable, gate-tamper handles the adversary, validate-after-agent-commit
-  is an orchestration doctrine wearing a delegation name. Facilitator today;
-  prerequisite specifically for *unattended* orchestration at scale. Honesty
-  boundary for any public use: our own coordination rungs sit in Deferred
-  (scope-session-routing, multi-operator-semantics) and this iteration hit
-  the shared-index limits twice — claim the verification layer, not the
-  orchestration layer. Live exhibit: the 2026-07-10 index collision was
-  caught and correctly resolved *because* the trajectory freeze made the
-  misclassification visible and the gates held through the history split.
