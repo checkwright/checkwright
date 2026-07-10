@@ -163,17 +163,37 @@
   evidence. Decide the disposition vocabulary (rule/task/publish/discard) and
   whether the evidence lives in the commit body or a stamped file. Surfaced
   2026-07-10 auditing whether Lessons still earns its section.
-- **lesson-pub-harvest** [needs-spec] — a configurable publication channel for
-  Lessons: an opt-in tag on a lesson lead line marks it publication-worthy, and
-  the close triage routes tagged entries to a harvest log rather than only to a
-  rule, a task, or a discard. Mechanism only — the tag spelling and the harvest
-  log's path are consumer config (the `check-graph`/`graph-vocab` pattern); the
-  kit ships neither the log nor its content. Attested on a larger private
-  consumer, where most lessons carry such a tag and feed a writing pipeline;
-  this repo has no such channel, though `launch-comms` names a methodology essay
-  as a deliverable, so the lessons that would feed it are today dispositioned to
-  rules and lost as prose. Lands in lifecycle-kit beside the close ritual.
-  Surfaced 2026-07-10.
+- **lesson-pub-harvest** [needs-spec] — a configurable **outbound** channel for
+  Lessons: an opt-in tag on a lesson lead line marks it communication-worthy, and
+  the close triage routes tagged entries to a harvest sink rather than only to a
+  rule, a task, or a discard. The slug says `pub`, but the scope is any
+  communication purpose — a published essay, conference or presentation
+  material, internal knowledge sharing — so the tag vocabulary is plural, not a
+  single `[pub]`. Mechanism only: the tag names, the sink paths, and the
+  per-tag handling instructions are all consumer config (the
+  `check-graph`/`graph-vocab` pattern); the kit ships neither a sink nor its
+  content, and a consumer states how its own tags are dealt with. Attested on a
+  larger private consumer, where most lessons carry such a tag and feed a
+  writing pipeline; this repo has no such channel, though `launch-comms` names a
+  methodology essay as a deliverable, so the lessons that would feed it are
+  today dispositioned to rules and lost as prose. Lands in lifecycle-kit beside
+  the close ritual. Surfaced 2026-07-10.
+- **lesson-context-tag** [needs-spec] — the **inbound** counterpart: a dedicated
+  tag by which the filing session (typically `/build`) marks a lesson as a live
+  point of attention, so `queue-index.sh` injects it into the session context of
+  later sessions *of the same iteration*. Closes the gap that Lessons is today a
+  write-only buffer between the filing session and the close session — the
+  section is absent from `session-context.sh`'s projection, so no following
+  session ever sees an entry it did not write. Load-bearing constraint: the
+  injection must die at the iteration boundary, since a lesson that outlives its
+  close becomes exactly the standing per-session instruction that
+  drift-kit/templates/close-knowledge.md forbids — a permanent token tax paid
+  for one session's observation. The injected surface is always-loaded, so
+  `check-brevity` governs it and a budget belongs in the design. Design tension
+  to rule with `lesson-pub-harvest`: both are one mechanism — a tag vocabulary
+  on the lesson lead line with a configurable sink, inbound here and outbound
+  there — and may want unifying rather than two bespoke tag readers. Surfaced
+  2026-07-10.
 - **docs-cname-parity** [needs-spec] — a hermetic gate making `docs/CNAME` the
   single source of truth for the docs URL: any tracked doc naming a different
   host reds. Offline and decidable, so it fits the gate contract that
