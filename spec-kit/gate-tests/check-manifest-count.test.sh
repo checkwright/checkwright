@@ -5,8 +5,11 @@
 # empty, so only a config that both governs a noun and allowlists a phrase
 # containing it exercises the exemption — which run-gate-tests passes to no
 # fixture. The good/bad pair covers the cardinal+noun shapes (adjacent, wedged,
-# noun-then-range) and the mechanical exemptions (threshold, per, partition,
-# partitive, inline-code, fence, per-site marker); these cases cover the knobs.
+# noun-then-range, wrapped) and the mechanical exemptions (threshold, per,
+# partition, partitive, inline-code, fence, per-site marker); these cases cover
+# the knobs, plus the paragraph-join edges the pair's expect.txt substring
+# cannot pin: which physical line a wrapped span reports at, that the join never
+# double-reports a same-line hit, and that a paragraph break blocks the join.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -59,9 +62,42 @@ fi
 # a non-governed count-noun is never a hit, allowlist or not.
 check_case "ungoverned-noun-clean" 0 "MANIFEST-COUNT: clean"
 
+# The paragraph-join window: a total split across a prose wrap is reported at the
+# span's *first* physical line (the cardinal's), not the line the noun completes
+# it on, and a per-line hit is never double-reported by the join.
+mkdir -p "$SANDBOX/wrap"
+cat >"$SANDBOX/wrap/SPEC.md" <<'EOF'
+# wrap — SPEC
+
+Prose that pins a total across the
+wrap: this suite ships two
+governed gates today.
+EOF
+out="$(cd "$SANDBOX/wrap" && "$GATE" 2>&1)"; rc=$?
+if [[ "$rc" -ne 1 ]]; then
+    echo "  FAIL [wrap-flagged]: want exit 1, got $rc -- $out"; fails=$((fails + 1))
+elif ! grep -qF -- "SPEC.md:4  restated collection total: two" <<<"$out"; then
+    echo "  FAIL [wrap-first-line]: wrapped total not reported at its first physical line:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+elif [[ "$(grep -c 'restated collection total' <<<"$out")" -ne 1 ]]; then
+    echo "  FAIL [wrap-single-report]: the join double-reported a span:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+fi
+
+# A blank line ends the paragraph, so a cardinal and a noun that merely abut
+# across a paragraph break never join into a phantom total.
+cat >"$SANDBOX/wrap/SPEC.md" <<'EOF'
+# wrap — SPEC
+
+The registry holds two
+
+gates own their own totals, per `gates.list`.
+EOF
+check_case "paragraph-break-no-join" 0 "MANIFEST-COUNT: clean"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-manifest-count.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-manifest-count.test.sh: clean (governed-noun trip + allowlist containment + ungoverned-noun clean, 3 cases)"
+echo "check-manifest-count.test.sh: clean (governed-noun trip + allowlist containment + ungoverned-noun clean + wrapped-total first-line report + paragraph-break non-join)"
 exit 0

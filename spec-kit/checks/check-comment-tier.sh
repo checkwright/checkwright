@@ -84,6 +84,10 @@ EXEMPT_RE="$(join_alt comment-tier-exempt:)"
 # blessing its line plus continuations, and POS rescues a block above a construct.
 read -r -d '' CLASSIFY <<'AWK' || true
 function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+function _ct_wrapflush(bf) {
+    if (sk_para_wrapped()) print bf ":" SK_WRAP_FNR ": restated collection total: " SK_WRAP_SPAN
+    sk_para_reset()
+}
 function flush_block(rescue,   i) {
     if (nb == 0) return
     if (rescue && nb >= 1 && bflag[nb]) bflag[nb] = 0
@@ -91,6 +95,13 @@ function flush_block(rescue,   i) {
         if (bflag[i]) print bfile[i] ":" bline[i] ": " btext[i]
         else if (cspan[i] != "") print bfile[i] ":" bline[i] ": restated collection total: " cspan[i]
     }
+    # the count override across a comment wrap: an exempt line ends the join window
+    sk_para_reset()
+    for (i = 1; i <= nb; i++) {
+        if (bexempt[i]) { _ct_wrapflush(bfile[1]); continue }
+        sk_para_add(bline[i], btext[i])
+    }
+    _ct_wrapflush(bfile[1])
     nb = 0; window = 0; xwindow = 0
 }
 function detect_hd(   s, m, ch) {
@@ -113,6 +124,7 @@ function record(bodytext,   blessed, exempt) {
     if (window > 0) window--
     if (xwindow > 0) xwindow--
     bflag[nb] = blessed ? 0 : 1
+    bexempt[nb] = exempt ? 1 : 0
     cspan[nb] = exempt ? "" : sk_count_hit(bodytext)
 }
 function noncomment(   ispos, isblank) {

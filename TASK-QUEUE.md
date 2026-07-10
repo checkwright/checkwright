@@ -14,13 +14,6 @@
 
 ## Technical Debt
 
-- **count-scan-wrap-blindness** —
-  the shared count adapter matches within one physical line, so a prose wrap
-  splitting cardinal from noun evades both restated-total gates: spec-kit's own
-  §lib/spec.sh carried "two comment / gates" across a line break, invisible to
-  check-manifest-count while its adjacent twin on one line reds. Candidate: a
-  paragraph-joined scan window reporting the first physical line of the span.
-
 ## Deferred
 
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
@@ -281,6 +274,7 @@
 
 ## Done
 
+- count-scan-wrap-blindness
 - todo-task-liveness
 - site-health-monitor
 - docs-cname-parity

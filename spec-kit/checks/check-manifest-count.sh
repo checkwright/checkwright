@@ -18,16 +18,24 @@ mapfile -t manifests < <(spec_manifest_files "$ROOT" | sed 's#^\./##' | sort -u)
 
 # spec: spec-kit/SPEC.md §check-manifest-count — prose walk only: fences and per-site markers gate the line, the shared adapter judges it
 read -r -d '' SCAN <<'AWK' || true
-FNR == 1 { in_fence = 0; prev = "" }
+function pflush() {
+    if (sk_para_wrapped()) printf "  %s:%d  restated collection total: %s\n", curfile, SK_WRAP_FNR, SK_WRAP_SPAN
+    sk_para_reset()
+}
+FNR == 1 { pflush(); in_fence = 0; prev = "" }
 {
+    curfile = FILENAME
     raw = $0
-    if (raw ~ /^[[:space:]]*```/) { in_fence = !in_fence; prev = raw; next }
-    if (in_fence) { prev = raw; next }
-    if (raw ~ /manifest-count-exempt:/ || prev ~ /manifest-count-exempt:/) { prev = raw; next }
+    if (raw ~ /^[[:space:]]*```/) { pflush(); in_fence = !in_fence; prev = raw; next }
+    if (in_fence) { pflush(); prev = raw; next }
+    if (raw ~ /manifest-count-exempt:/ || prev ~ /manifest-count-exempt:/) { pflush(); prev = raw; next }
+    if (raw ~ /^[[:space:]]*$/) { pflush(); prev = raw; next }   # a blank line ends the paragraph
     hit = sk_count_hit(raw)
     if (hit != "") printf "  %s:%d  restated collection total: %s\n", FILENAME, FNR, hit
+    sk_para_add(FNR, raw)
     prev = raw
 }
+END { pflush() }
 AWK
 
 AWKSRC="$(spec_count_awk_lib)

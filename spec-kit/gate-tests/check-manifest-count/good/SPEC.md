@@ -9,6 +9,9 @@ five gates per kit.
 
 Partitions classify, they do not count: all but two stages are idempotent.
 
+A bound stays a bound across a prose wrap: a suite needs at least three
+gates, the paragraph-join reading the comparator that precedes the cardinal.
+
 Proportions restate no total on either side, numerator or denominator:
 
 - three of the twelve gates were red last release

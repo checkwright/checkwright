@@ -10,3 +10,6 @@ widget enforces nine generic rules, and three governed stages sequence them.
 
 Naming an ordered collection's endpoints pins it twice over — rules 1-8 rot on
 the next append, as does the battery's gates 1-42.
+
+A prose wrap hides the same pin from a per-line scan: this suite ships two
+governed gates today, its cardinal and noun straddling the line break.

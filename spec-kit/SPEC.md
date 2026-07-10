@@ -264,7 +264,23 @@ adjacent word) and the mechanical exemptions (comparator, `all but`, partitive,
 `per`-phrase, inline code, allowed phrases) live in that fragment alone, so no
 sibling can drift from another in what it considers a total; each supplies its
 own surface walk (fences and per-site markers for the manifest gate, the comment
-classifier for its sibling). The comment
+classifier for its sibling).
+
+`sk_count_hit` judges one physical line, so a total whose cardinal and noun
+straddle a prose wrap evades it — a blind spot both siblings inherited from the
+shared matcher, and one this repo's own §lib/spec.sh prose sat in. The fragment
+therefore also exposes a **paragraph-join window**: a caller feeds a logical
+paragraph's lines in order (`sk_para_reset`, `sk_para_add(fnr, text)`), then
+`sk_para_wrapped()` reports the first total whose span crosses a line boundary
+via `SK_WRAP_FNR` / `SK_WRAP_SPAN`. It reports at the span's *first* physical
+line — where the cardinal sits, and where the operator edits — and returns
+false for a span already on one line, so the caller's per-line scan stays the
+sole reporter of unwrapped totals and no hit is counted twice. A joined span
+carries its prefix with it, so the exemptions hold across the wrap unchanged: a
+comparator before the break still reads as a bound. What ends a paragraph is
+the caller's, since the surfaces disagree — a blank line, fence, or per-site
+marker for the manifest gate; a comment block's end or an exempt line for the
+comment classifier. The comment
 gates read *different* surfaces: `spec_comment_surface` prunes `templates/`
 shell sources, and `spec_comment_surface_with_templates` keeps them.
 `check-spec-pointer` scans the pruned set — a template's `spec:` line is a
@@ -390,7 +406,11 @@ skipped, an inline-code cardinal a meta-reference (so this section may name its
 own examples). Both the grammar and the matcher come from the shared count
 adapter (§lib/spec.sh) — this gate adds only the prose walk (fence skipping, the
 per-site marker), so it and its comment-tier sibling read one vocabulary and
-apply one set of exemptions. The cardinal
+apply one set of exemptions. The walk feeds the adapter's paragraph-join window
+alongside the per-line scan, so a total wrapped across a prose break is caught
+and reported at its first physical line; a blank line, a fence, and an exempt
+site each end the paragraph — an exempted line cannot join its neighbours into
+a total. The cardinal
 grammar is digit sequences and the spelled
 `two`…`twelve`, case-insensitive; `one` is deliberately outside it — singleton and
 cardinality-rule idioms ("one owner per fact", "one iteration per kit") are
@@ -486,7 +506,11 @@ source the manifest gate bans: `# rules 1-8` sat stale in this repo's own guard
 while its ruleset grew past eight, invisible because no gate read comments for
 counts. The fix is deleting the count or citing the owning collection; the sole
 valve is `comment-tier-exempt: <reason>`, whose window suppresses the override
-as it suppresses the tier rule. The weighed alternative — a source-coupled
+as it suppresses the tier rule. The override reads a comment block as a
+paragraph, not a line at a time (the adapter's join window, §lib/spec.sh): a
+directive's own wrapped wording is exactly where a total hides from a per-line
+scan, and an exempt line ends the join rather than laundering its neighbours.
+The weighed alternative — a source-coupled
 numeral scan with an allowlist — is rejected: legitimate numerals abound in
 source (exit codes, indices, field positions) and the false-positive rate would
 exceed the catch. Counts in *code* stay a review concern; counts in *prose*,

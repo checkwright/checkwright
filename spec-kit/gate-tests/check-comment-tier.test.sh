@@ -9,7 +9,9 @@
 # not. Each needs a per-case SPEC_KIT_CONFIG_FILE or scan root, which
 # run-gate-tests passes to neither. The good/bad pair covers the shell classifier
 # (directive run, exempt, heredoc skip) and the count override's mainline; these
-# cover the mechanism a consumer activates by widening the surface.
+# cover the mechanism a consumer activates by widening the surface, plus the
+# paragraph-join wrap the pair's single-substring expect.txt cannot pin —
+# which line a wrapped total reports at, and that the exempt valve reaches it.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -116,9 +118,28 @@ check_case "count-survives-positional-rescue" pos-cfg.sh 1 "restated collection 
 check_case "window-spill-flagged" derived.sh 1 "spills outside the window" \
     "$DIR/gate-tests/check-comment-tier/bad"
 
+# The paragraph-join window over a comment block: a total wrapped across two
+# comment lines is caught (the per-line scan cannot see it) and reported at the
+# cardinal's line; the exempt valve suppresses it across the wrap as on one line.
+cat >"$SANDBOX/wrapped.sh" <<'EOF'
+# spec: some/SPEC.md §w — this window pins two comment
+#   gates across the wrap.
+foo() { echo x; }
+EOF
+cat >"$SANDBOX/wrapx.sh" <<'EOF'
+# comment-tier-exempt: this note pins two comment
+#   gates on purpose, the valve engaged across the wrap.
+noop() { echo x; }
+EOF
+mkcfg "$SANDBOX/wrapped-cfg.sh" 'SPEC_KIT_COMMENT_SURFACE=(wrapped.sh)'
+mkcfg "$SANDBOX/wrapx-cfg.sh"   'SPEC_KIT_COMMENT_SURFACE=(wrapx.sh)'
+
+check_case "count-wrap-flagged" wrapped-cfg.sh 1 "wrapped.sh:1: restated collection total: two comment gates"
+check_case "count-wrap-exempt-valve" wrapx-cfg.sh 0 "COMMENT-TIER: clean"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges, 8 cases)"
+echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap)"
 exit 0

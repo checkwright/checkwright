@@ -267,6 +267,31 @@ function sk_count_hit(text,   scan, low, s) {
     if (s != "") return s
     return _sk_span(low, scan, SK_RRE, 0)
 }
+# the paragraph-join window: sk_count_hit sees one physical line, so a total
+# whose cardinal and noun straddle a prose wrap ("two comment /\ngates") slips
+# both gates. A caller feeds a logical paragraph's lines in order (sk_para_add),
+# then reads back the first total whose span crosses a line boundary, at the
+# span's first physical line (SK_WRAP_FNR/SK_WRAP_SPAN). A same-line span
+# returns 0 here — the caller's per-line scan owns it, so no double report.
+function sk_para_reset() { sk_pn = 0 }
+function sk_para_add(fnr, text) { sk_pn++; sk_pfnr[sk_pn] = fnr; sk_pline[sk_pn] = text }
+function _sk_join(lo, hi,   k, s) {
+    s = ""
+    for (k = lo; k <= hi; k++) s = s (k > lo ? " " : "") sk_pline[k]
+    return s
+}
+function sk_para_wrapped(   k, hit, compK, startK) {
+    SK_WRAP_FNR = 0; SK_WRAP_SPAN = ""
+    if (sk_pn < 2) return 0
+    compK = 0                                       # line where the first span completes
+    for (k = 1; k <= sk_pn; k++) { hit = sk_count_hit(_sk_join(1, k)); if (hit != "") { compK = k; break } }
+    if (compK == 0) return 0
+    startK = 1                                      # largest start whose suffix-join still hits: the span's first line
+    for (k = 2; k <= compK; k++) { if (sk_count_hit(_sk_join(k, compK)) != "") startK = k; else break }
+    if (startK == compK) return 0                   # span sits on one physical line, per-line scan owns it
+    SK_WRAP_FNR = sk_pfnr[startK]; SK_WRAP_SPAN = hit
+    return 1
+}
 AWK
 }
 

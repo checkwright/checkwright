@@ -19,3 +19,7 @@ qux() { echo z; }
 
 # usage: bad.sh --tally   (the ordered set is rules 1-8, pinned at both ends)
 quux() { echo w; }
+
+# spec: some/SPEC.md §wrap — this window pins two comment
+#   gates across the line break, a wrapped total no per-line scan reads.
+corge() { echo v; }

@@ -26,3 +26,7 @@ bar() { echo bye; }
 #   a bound rather than a total; three of the twelve gates below stay partitive,
 #   and the inline-code `six gates` reads as a meta-reference.
 tally() { echo n; }
+
+# spec: some/SPEC.md §wrapbound — a bound survives the join: at most three
+#   gates run per suite, the comparator carrying across the wrap.
+gauge() { echo m; }
