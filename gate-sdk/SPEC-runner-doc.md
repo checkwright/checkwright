@@ -16,14 +16,14 @@ does not need to be resident.
   contributors at the moment they run the battery — a load-triggered
   README read — not every session at start; the registration tripwire
   works from any tracked doc. This dissolves the config-injection
-  question the queue entry flagged: no consumer config file needs to
-  export the knob because the kit default is the desired value, and
-  gate-sdk keeps its no-auto-sourced-config status (its knobs stay pure
-  env, unlike the `<kit>-config.sh` pattern of the content-bearing kits —
-  a deliberate asymmetry: gate-sdk's knobs are layout, not vocabulary).
-  With both defaults on `README.md`, assertion A (registry row) and
-  assertion B (fixture-runner line) read one doc; the assertions stay
-  distinct.
+  question the queue entry flagged: the kit default is the desired value,
+  so no override needs to be emitted anywhere — a stronger answer than
+  wiring the config seam the sibling amendment `SPEC-graph-artifact.md`
+  gives gate-sdk (that seam exists for knobs whose right value is
+  consumer-specific; the runner doc's right value is the same for every
+  consumer). With both defaults on `README.md`, assertion A (registry
+  row) and assertion B (fixture-runner line) read one doc; the assertions
+  stay distinct.
 - **README "This repo, governed" gains the fixture-runner battery**: the
   full-battery command it already carries, plus one
   `bash gate-sdk/bin/run-gate-tests.sh <kit>/gate-tests [<kit>/checks]`
@@ -82,8 +82,9 @@ does not need to be resident.
 - [ ] **Merged with no information lost** — each addition integrated into its
       proper canonical-spec section (not appended); the merged spec reads as one
       coherent document a reader who never saw the amendment can use alone.
-- [ ] **Amendment deleted** — this file removed on merge; none remain for the
-      component (`ls gate-sdk/SPEC-*.md`).
+- [ ] **Amendment deleted** — this file removed on merge
+      (`ls gate-sdk/SPEC-runner-doc.md` finds nothing; the sibling
+      graph-artifact amendment lives its own lifecycle).
 - [ ] **Removals propagated** — grepped every spec for names this change
       retired; nothing dangles.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as

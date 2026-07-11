@@ -33,8 +33,23 @@
   roster to `LIFECYCLE_KIT_`, including the config seam
   (`LIFECYCLE_KIT_CONFIG_FILE` / `lifecycle-config.sh`); compat ruling: hard rename, no shim
   — pre-first-tag renames are compat-free, stated as precedent in the merged SPEC.
+- **check-graph-site-move** [spec: SPEC-graph-artifact.md] — move the coupling-graph
+  artifact to the docs site (never a copy): new `GATE_SDK_GRAPH_ARTIFACT` knob with the
+  workflow-dir default, gate-sdk gains the standard auto-sourced consumer-config seam (this
+  knob its first user), the shipped manifest carries both artifact homes as couples, and the
+  citation sweep repoints this repo's surfaces.
+- **docs-reference-routing** [spec: SPEC-docs-reference.md] — the repo tree is the reference
+  tier: kit docs pages gain anchored GitHub blob links to their SPEC/README under the
+  master-pinned link grammar; check-md-refs gains a self-repo blob-link resolution pass
+  (repo identity derived from the origin remote, anchors resolved under docs-host slugging,
+  no-remote consumers skip).
 
 ## Technical Debt
+
+- **enforcement-map-links** [blocked-by: docs-reference-routing] — emitter edit on the
+  generated enforcement map: the class-roster intro becomes a bulleted list, the kit column
+  links each kit's docs page, and class definitions cite their owner section through the
+  reference-link grammar the blocker lands; regenerate the page in the same unit.
 
 ## Deferred
 
@@ -183,33 +198,6 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
-- **enforcement-map-links** [needs-spec] — the generated enforcement map packs
-  its class roster into one dense intro paragraph and its tables carry no
-  links: an emitter edit turns the roster into a bulleted list and links the
-  kit column to each kit's docs page. Design residue for spec: where a class
-  definition links — its owner section lives in the gate-sdk SPEC, off the
-  served site — kit docs page vs GitHub blob URL (the docs-reference-routing
-  ruling applies). Surfaced 2026-07-11 at scope.
-- **check-graph-site-move** [needs-spec] — publish the coupling-graph artifact
-  on the docs site by moving it out of the workflow dir (ruled 2026-07-11 at
-  scope: move, never copy — a second committed copy would owe its own parity
-  gate; the artifact is pure generated visualization, self-contained HTML, and
-  the site already hosts gated generated projections). Spec must design the
-  artifact-path knob — check-graph's freshness assertion derives the path from
-  `GATE_SDK_WORKFLOW_DIR` today, so the kit default stays put and this repo's
-  config repoints — plus the citation sweep across the always-loaded file, the
-  gate-sdk README, the agent-execution shim, and evidence-kit's smoke. Filed
-  2026-07-11 at scope.
-- **docs-reference-routing** [needs-spec] — how a reader reaches full reference
-  from the deliberately-lite docs site; today kit pages name `SPEC.md` as bare
-  inline code with no link, so the site dead-ends. Ruled 2026-07-11 at scope:
-  point, don't generate — each kit page gains an anchored GitHub link to its
-  SPEC/README (the repo tree is the reference tier; on-site generated SPEC
-  projections stay demand-gated because SPEC-internal relative links would
-  need rewriting at emit, a real emitter, not a copy). Spec rules the link
-  grammar — blob-URL ref pinning (master pre-tag, the tag after), anchor
-  shape — and whether the docs link-shape gate gains a rule holding it.
-  Surfaced 2026-07-11 at scope.
 ## Done
 
 ## Lessons Learned
