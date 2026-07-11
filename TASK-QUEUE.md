@@ -161,6 +161,27 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
+- **trajectory-close-freshness** [needs-spec] — closing an iteration leaves
+  `docs/evidence-data.md` stale, and `check-trajectory-fresh` structurally cannot
+  catch it locally. The extractor emits a closed iteration's row only once the
+  `close` stamp is in committed history; enter-stage.sh commits that stamp, but
+  the enter-close commit is not yet in history during its own pre-commit, so the
+  gate regenerates without the row and passes. The following close commit (clear
+  Done) touches only TASK-QUEUE.md, which the gate's `# graph:` manifest does not
+  couple, so the gate is skipped and the staleness stays invisible until CI runs
+  the full battery unconditionally (attested 2026-07-11). Fix option to rule at
+  spec: fold the projection regeneration into the close skill's Done-clearing
+  commit, which then touches the coupled `docs/evidence-data.md` so the gate runs
+  with the stamp already in history — the check-graph/enforcement regeneration
+  precedent. Design questions: whether the durable home is drift-kit's
+  close-knowledge template (kit-generic — any drift-kit consumer with the
+  extractor+freshness pair hits this) versus a new drift-kit close-stage step,
+  lifecycle-kit's close skill, or this repo's close binding; and whether any
+  local gate can catch it (the self-reference is inherent, so CI's full-battery
+  run may be the only backstop — no new scanner closes it locally). Surfaced
+  2026-07-11 fixing the CI red; the row was regenerated interstitially, so its
+  commit attributes to the next iteration's range (drift-kit/SPEC.md §The
+  published-evidence extractor).
 ## Done
 
 ## Lessons Learned
