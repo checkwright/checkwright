@@ -16,14 +16,19 @@ its context budget.
   - **The budget rule**: a kit's resident ask is at most one pointer line
     on the consumer's always-loaded surface — the load-trigger-residency
     and always-loaded-shape doctrine rules applied to kit shipping. The
-    one sanctioned block-sized ask is doctrine-kit's digest (bounded by
-    its own one-line-per-rule shape and held by `check-brevity`).
+    one sanctioned block-sized ask is doctrine-kit's digest, bounded by
+    its own one-line-per-rule shape (the doctrine's always-loaded-shape
+    rule); its name-lockstep with the doctrine is the sibling
+    doctrine-rule-lockstep amendment's gate.
   - **The roster, by citation**: each kit's resident ask is named by
     citing the kit SPEC section that owns it (delegation-kit's
     pre-authorization sentence + skill pointer: delegation-kit/SPEC.md
     §One template, a resident pointer; doctrine-kit's link + digest:
-    doctrine-kit/SPEC.md; every other kit: none — hooks, skills, gates,
-    and SPECs are load- or event-triggered). The roster is citation-only
+    doctrine-kit/SPEC.md; drift-kit's knowledge-friction capture bullet:
+    drift-kit/SPEC.md §The knowledge-friction loop, which already states
+    the one-bullet cost and its earn-back condition; every other kit:
+    none — hooks, skills, gates, and SPECs are load- or
+    event-triggered). The roster is citation-only
     so it cannot restate and drift; a kit adding a resident ask adds its
     row here, which is the review seam.
   - **The floor-holder ruling**: the meter + committed baseline ship as
@@ -36,8 +41,10 @@ its context budget.
     so a level gate would be a noisy check breeding exemptions — the
     high-false-positive defence the enforcement-first rule sanctions for
     keeping a class as stated manual duty. The mechanical holds that do
-    exist stay: `check-brevity` bounds each digest bullet; the meter
-    delta feeds `kpi-always-loaded`.
+    exist stay: `check-brevity` bounds the one bulleted section its knob
+    designates (single-section by design — context-kit/SPEC.md §The
+    brevity gate; this repo points it at the conventions block, not the
+    digest); the meter delta feeds `kpi-always-loaded`.
 
 ## Producers and consumers
 
