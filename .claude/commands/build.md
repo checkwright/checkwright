@@ -9,7 +9,8 @@ rather than forcing every active task into one changeset; the stage stays in
 `build` until the queue empties. Move a finished task to `## Done` as you go —
 a bare-slug line (`- <slug>`), never the active-section `- **slug** — prose`
 shape (queue-kit/SPEC.md §The queue format); leave the rest for the next
-`/build`. Build per the scope ruling (config via env/config-file, this repo's
+`/build`. A completed task's amendment merges per canon-kit/SPEC.md §Merging
+an amendment (on task completion). Build per the scope ruling (config via env/config-file, this repo's
 layout as defaults), never letting private rule content cross the seam. Every
 new gate is a copy-edit of `gate-sdk/templates/check-skeleton.sh` with a
 `good/`+`bad/` fixture pair; the four contracts (gate-sdk/SPEC.md) are enforced

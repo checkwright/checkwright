@@ -33,7 +33,8 @@ entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
 ## Session ritual
 
 *<audit-fanout: your audit fan-out: sweep the spec corpus for missing fields,
-naming inconsistencies, undocumented contracts, contradictions.>* Resolve every
+naming inconsistencies, undocumented contracts, contradictions; name the
+entry grammar any backfill task filed from a finding is written against.>* Resolve every
 finding in the affected spec or amendment — never ad-hoc, never deferred.
 Commit all spec changes in a single `chore:` commit.
 

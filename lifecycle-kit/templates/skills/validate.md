@@ -21,7 +21,8 @@ empty).
 *<suites: execute your suites. Compilation is not done — a green build is not a
 green test run; gate on the positive success token of your runner, not the
 absence of a failure token. Capture runs to files so the evidence outlives the
-session.>*
+session. Name the baseline-grammar owner any red-triage baseline edit writes
+against.>*
 
 **Triage a red against the queue before excavating it.** On any failure,
 first grep the queue's deferred/lessons sections — a pre-existing red is

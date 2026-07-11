@@ -19,7 +19,9 @@ rule (a better form exists, or logic a glob can't express), or habit change (a
 true one-off); `bash guard-kit/bin/compare-settings-allow.sh` and prune the
 listed local entries, then by judgment prune remaining one-off local entries
 and promote recurring safe patterns to committed `settings.json` globs; clear
-the log (`: > .workflow/prompt-friction.log`). Then knowledge-friction triage
+the log (`: > .workflow/prompt-friction.log`). A task filed by any
+disposition or gap-generalization step is written per queue-kit/SPEC.md
+§The tag algebra. Then knowledge-friction triage
 (drift-kit/templates/close-knowledge.md): walk `.workflow/knowledge-friction.log`
 and remediate each captured re-derivation as a doc-owner edit — give the fact a
 home under the tier contract, or a pointer from where the session looked to the

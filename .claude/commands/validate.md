@@ -21,4 +21,7 @@ diffs the baseline slice, and appends one `verdict=clean` line per suite to
 `.workflow/validate-evidence.txt`; commit that file (evidence-kit/SPEC.md
 §check-evidence-manifest). Gate on the positive success tokens, not the absence
 of failure text; a non-zero exit is a real new failure — fix or file it, never
-edit the baseline to pass.
+edit the baseline to pass. A legitimate baseline edit (a new held-constant red
+with its blocking slug, a recovered row promoted to pass) is written per
+evidence-kit/SPEC.md §Baseline manifest; a finding filed into the queue
+follows queue-kit/SPEC.md §The tag algebra.

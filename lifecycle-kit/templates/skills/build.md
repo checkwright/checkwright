@@ -49,7 +49,8 @@ is durable rather than sitting uncommitted across a long session.
 every component the task touches and merge its amendments into the canonical
 spec on completion; implement exactly what the spec describes — no features
 beyond it; write tests as you go; present a plan for approval before code where
-your process requires it.>*
+your process requires it; name your amendment-merge procedure owner and the
+queue-entry grammar the task-completion move writes against.>*
 
 Build-time question triage — who rules, and where the ruling lives: a
 question *within the amendment's envelope* (calibration, mechanics) is ruled

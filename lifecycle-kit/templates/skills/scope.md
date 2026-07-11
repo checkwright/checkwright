@@ -27,7 +27,10 @@ audit trail, nothing more.
 *<ritual: your scope ritual: index the governing docs before reading them
 whole; update design-ahead projections (diagrams, models) in scope itself
 behind a gate-safe PROPOSED marker so review happens a stage before the code;
-ask clarifying questions about scope before proposing.>*
+ask clarifying questions about scope before proposing; name the grammar owner
+of each governed surface this stage writes — queue-entry tags, amendment
+refs — so a session reads the owner instead of re-deriving the grammar from
+a gate's source.>*
 
 **Triage every task at filing — feature vs debt by the new-names litmus.** A
 task that adds any name to a governed surface (a script, a config knob, a

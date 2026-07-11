@@ -17,4 +17,6 @@ Private rule content never lands here — term lists, vocabularies, glossary
 bodies become optional consumer config, never kit literals; this repo's layout
 stays as the defaults under `<KIT>_<KNOB>` env/config knobs. The amendment
 lifecycle the template's triage step invokes is canon-kit/SPEC.md §The
-amendment lifecycle.
+amendment lifecycle; the queue-entry grammar the promotion step writes
+against is queue-kit/SPEC.md §The tag algebra, and `[spec:]` ref
+resolution is canon-kit/SPEC.md §check-amendment-queue.
