@@ -39,7 +39,7 @@ a real new failure: fix or file it, never edit the baseline to pass.
 
 When filing a finding, place it by kind: nameable deliverable + done-state ⇒
 queue task (Deferred `[needs-spec]`; scope triages feature-vs-debt by the
-new-names litmus, spec-kit/SPEC.md §The amendment lifecycle); an observation
+new-names litmus, canon-kit/SPEC.md §The amendment lifecycle); an observation
 about how the work should be done ⇒ Lessons Learned, dispositioned at close.
 Undone work parked as a lesson evaporates; a process insight parked as a
 task rots.

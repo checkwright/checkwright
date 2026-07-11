@@ -229,7 +229,7 @@ self-reported cross-component trigger so a missed trigger cannot silently
 skip the audit. The signal reads the on-disk amendment tree (cwd-relative,
 gate-sdk prune set applied, and `templates/` paths excluded — a shipped
 `SPEC-amendment.md` skeleton is a copyable stub, not a live amendment, the
-same exclusion spec-kit's finders apply): it fires when amendment files span
+same exclusion canon-kit's finders apply): it fires when amendment files span
 ≥2 component dirs, OR when a single amendment's component set — its own dir ∪
 the contract-surface tokens in its body that resolve to a roster dir — is ≥2.
 The
@@ -320,9 +320,9 @@ Beside the stage skills sits `release-sweep.md` — a **boundary skill**, not a
 stage: it invokes no `enter-stage.sh` and stamps no state, so
 `check-stage-skill-coverage` never reads it (it governs only the configured
 stage set). It is the deprecation disposition walk at a major, forcing every
-marker on the `SPEC_KIT_DEPRECATION_MARKERS` roster to a stamped disposition —
+marker on the `CANON_KIT_DEPRECATION_MARKERS` roster to a stamped disposition —
 decommission, carry-forward, or un-deprecate — the `check-lesson-disposition`
-contract shape at a release boundary. spec-kit's `check-deprecation-task` holds
+contract shape at a release boundary. canon-kit's `check-deprecation-task` holds
 each marker bound to a live task between majors; this sweep forces the standing
 inventory to a decision at the boundary the deprecations were promised against.
 The stamp file is operator evidence riding the release commit — the kit wires no

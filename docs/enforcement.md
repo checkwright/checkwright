@@ -32,6 +32,7 @@ leaves its section absent.
 | gate-sdk | check-kit-enum | precommit |
 | gate-sdk | check-kit-registration | precommit |
 | (consumer) | check-docs-kit-parity | precommit |
+| (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
 | gate-sdk | check-enforcement-fresh | precommit |
 | gate-sdk | check-hook-exec-bit | precommit |
@@ -50,20 +51,20 @@ leaves its section absent.
 | queue-kit | check-task-names | precommit |
 | queue-kit | check-task-conservation | precommit |
 | queue-kit | check-queue-prose-precondition | precommit |
-| spec-kit | check-amendment-queue | precommit |
-| spec-kit | check-spec-embedded-source | precommit |
-| spec-kit | check-spec-fence-balance | precommit |
-| spec-kit | check-md-refs | precommit |
-| spec-kit | check-docs-link-convention | precommit |
+| canon-kit | check-amendment-queue | precommit |
+| canon-kit | check-spec-embedded-source | precommit |
+| canon-kit | check-spec-fence-balance | precommit |
+| canon-kit | check-md-refs | precommit |
+| canon-kit | check-docs-link-convention | precommit |
 | site-kit | check-docs-cname-parity | precommit |
-| spec-kit | check-docs-cmd | precommit |
-| spec-kit | check-manifest-temporal | precommit |
-| spec-kit | check-manifest-count | precommit |
-| spec-kit | check-prose-enum | precommit |
-| spec-kit | check-comment-tier | precommit |
-| spec-kit | check-spec-pointer | precommit |
-| spec-kit | check-todo-task-liveness | precommit |
-| spec-kit | check-deprecation-task | precommit |
+| canon-kit | check-docs-cmd | precommit |
+| canon-kit | check-manifest-temporal | precommit |
+| canon-kit | check-manifest-count | precommit |
+| canon-kit | check-prose-enum | precommit |
+| canon-kit | check-comment-tier | precommit |
+| canon-kit | check-spec-pointer | precommit |
+| canon-kit | check-todo-task-liveness | precommit |
+| canon-kit | check-deprecation-task | precommit |
 | evidence-kit | check-evidence-baseline | precommit |
 | evidence-kit | check-evidence-manifest | precommit |
 | delegation-kit | check-gate-tamper | precommit |
@@ -73,8 +74,8 @@ leaves its section absent.
 | gate-sdk | check-commit-msg | commit-msg |
 | gate-sdk | check-commit-subject | commit-msg |
 | gate-sdk | check-gate-assertions | align-only |
-| spec-kit | check-spec-dod-singleton | align-only |
-| spec-kit | check-spec-derivable-section | align-only |
+| canon-kit | check-spec-dod-singleton | align-only |
+| canon-kit | check-spec-derivable-section | align-only |
 
 ## Advisory KPIs
 

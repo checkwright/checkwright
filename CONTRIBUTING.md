@@ -43,7 +43,7 @@ the exact gate output, and the expected-versus-actual verdict.
 
 The kits are governed by their own conventions before taste. Read the queue and
 spec conventions first — [queue-kit](queue-kit/README.md) and
-[spec-kit](spec-kit/README.md) — and open a
+[canon-kit](canon-kit/README.md) — and open a
 [Discussion](https://github.com/checkwright/checkwright/discussions) before
 building, so the design is agreed before a PR exists.
 

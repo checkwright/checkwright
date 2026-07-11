@@ -9,7 +9,7 @@ tooling-friction triage (guard-kit's close-triage pattern).
 2. **Remediate each entry as a doc-owner edit** — never a standing session-start
    instruction (that converts one re-derivation into a permanent per-session
    tax, exactly what context-kit's brevity machinery rejects). Two shapes:
-   - **Give the fact a home** under your tier contract (spec-kit's star
+   - **Give the fact a home** under your tier contract (canon-kit's star
      topology: one owner per fact) — the SPEC, README, or manifest that already
      owns that surface gains the sentence.
    - **Point from where the session looked to where the owner is** when the fact

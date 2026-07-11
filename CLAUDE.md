@@ -29,7 +29,7 @@ bash gate-sdk/bin/run-gates.sh                                                  
 bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
 bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks           # queue-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests spec-kit/checks             # spec-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks             # canon-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
@@ -72,7 +72,7 @@ Comments are directives, else deleted — a passing `check-comment-tier` is the
 floor, not licence to keep a comment. Blessing a restatement (relocating prose
 behind a `spec:` or `comment-tier-exempt:` tag rather than deleting it) is
 itself the defect; the doctrine and the one-line-binding rule for `spec:` live
-in [spec-kit/SPEC.md](spec-kit/SPEC.md) §check-comment-tier.
+in [canon-kit/SPEC.md](canon-kit/SPEC.md) §check-comment-tier.
 
 ## Single source of truth
 
@@ -157,7 +157,7 @@ validate-after-commit set, gate-driven worklist).
   `CNAME`), repo-root-governed with no owning kit. Living pages (everything
   outside `docs/posts/`) are fully governed prose; dated posts under
   `docs/posts/` are immutable published artifacts — temporal-exempt but still
-  link/command-resolved (`scripts/spec-config.sh`). A page owns orientation and
+  link/command-resolved (`scripts/canon-config.sh`). A page owns orientation and
   sequencing and cites downward: the anti-restatement doctrine applies to docs
   as to comments — never restate an invariant a SPEC or README owns.
   `check-docs-kit-parity` holds every kit's row in `docs/index.md`.

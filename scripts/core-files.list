@@ -34,7 +34,7 @@ scripts/git-hooks/pre-commit
 gate-sdk/SPEC.md
 lifecycle-kit/SPEC.md
 queue-kit/SPEC.md
-spec-kit/SPEC.md
+canon-kit/SPEC.md
 delegation-kit/SPEC.md
 context-kit/SPEC.md
 guard-kit/SPEC.md

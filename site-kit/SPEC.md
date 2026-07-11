@@ -91,6 +91,6 @@ consumer.
 The kit does not resolve DNS, provision certificates, or configure the host
 platform — those are the deployment's concerns, surfaced by the monitor, not
 governed by a gate. It does not gate the *content* of the docs site (links,
-commands, prose): that is spec-kit's charge over the governed doc set. And it
+commands, prose): that is canon-kit's charge over the governed doc set. And it
 holds no opinion on which host a project uses — only that the tree cites one,
 and that the CNAME file names it.

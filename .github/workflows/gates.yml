@@ -26,8 +26,8 @@ jobs:
         run: bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
       - name: queue-kit fixtures
         run: bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks
-      - name: spec-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests spec-kit/checks
+      - name: canon-kit fixtures
+        run: bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks
       - name: delegation-kit fixtures
         run: bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks
       - name: context-kit fixtures

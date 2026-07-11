@@ -53,9 +53,9 @@ sits on its bullet's **lead line** — the only line the parsing tools scan
   unpickable.
 - `[needs-spec]` — design-pending marker. queue-kit parses and displays it;
   the placement semantics (deferred-section-wide enforcement, promotion
-  rules) are spec-kit's amendment lifecycle and land with that kit.
+  rules) are canon-kit's amendment lifecycle and land with that kit.
 - `[spec: <file>]` — spec-ready pointer. Same split: syntax here, amendment
-  semantics in spec-kit.
+  semantics in canon-kit.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
 
@@ -301,9 +301,9 @@ combined-tree copy clears the stage gates too.
 
 <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
 The amendment lifecycle around `[needs-spec]`/`[spec:]` (section-wide
-enforcement, promotion procedure, `check-amendment-queue`) is spec-kit's
+enforcement, promotion procedure, `check-amendment-queue`) is canon-kit's
 scope. Code-comment TODO scanning (`TODO(task:<slug>)` resolution against
-the queue) couples to source-file conventions and is spec-kit's, on the
+the queue) couples to source-file conventions and is canon-kit's, on the
 governed comment surface (`check-todo-task-liveness`). Task-output readers and delegation tooling are delegation-kit's
 scope. A consumer's protocol prose, deferred-subsection taxonomy, and task
 bodies are rule content and never ship.

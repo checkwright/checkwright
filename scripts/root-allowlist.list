@@ -11,7 +11,7 @@ CONTRIBUTING.md
 TASK-QUEUE.md
 .gitignore
 
-# In-flight spec amendments (spec-kit lifecycle — transient root surface)
+# In-flight spec amendments (canon-kit lifecycle — transient root surface)
 SPEC-*.md
 
 # Workflow + gates machinery
@@ -36,7 +36,7 @@ reserve
 gate-sdk
 lifecycle-kit
 queue-kit
-spec-kit
+canon-kit
 guard-kit
 delegation-kit
 context-kit

@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
-# spec: drift-kit/SPEC.md §Out of scope — kpi-deprecated-surface (example template): live deprecation-marker count over the spec-kit roster, trending the between-major backlog
+# spec: drift-kit/SPEC.md §Out of scope — kpi-deprecated-surface (example template): live deprecation-marker count over the canon-kit roster, trending the between-major backlog
 set -uo pipefail
 
-CFG="${SPEC_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/spec-config.sh}"
+CFG="${CANON_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/canon-config.sh}"
 # shellcheck source=/dev/null  # consumer config, path is config
 [[ -f "$CFG" ]] && source "$CFG"
 
-if ! declare -p SPEC_KIT_DEPRECATION_MARKERS &>/dev/null || [[ ${#SPEC_KIT_DEPRECATION_MARKERS[@]} -eq 0 ]]; then
-    [[ "${1:-}" == "--trend" ]] || printf 'lead\tdeprecated surface\tn/a (no SPEC_KIT_DEPRECATION_MARKERS roster)\n'
+if ! declare -p CANON_KIT_DEPRECATION_MARKERS &>/dev/null || [[ ${#CANON_KIT_DEPRECATION_MARKERS[@]} -eq 0 ]]; then
+    [[ "${1:-}" == "--trend" ]] || printf 'lead\tdeprecated surface\tn/a (no CANON_KIT_DEPRECATION_MARKERS roster)\n'
     exit 0
 fi
 
-marker_re="$(printf '%s|' "${SPEC_KIT_DEPRECATION_MARKERS[@]}")"; marker_re="${marker_re%|}"
+marker_re="$(printf '%s|' "${CANON_KIT_DEPRECATION_MARKERS[@]}")"; marker_re="${marker_re%|}"
 
 files=()
 shopt -s nullglob globstar
-for g in "${SPEC_KIT_COMMENT_SURFACE[@]:-**/*.sh}"; do
+for g in "${CANON_KIT_COMMENT_SURFACE[@]:-**/*.sh}"; do
     # shellcheck disable=SC2086  # $g is a surface glob, expansion intended
     for f in $g; do [[ -f "$f" ]] && files+=("$f"); done
 done

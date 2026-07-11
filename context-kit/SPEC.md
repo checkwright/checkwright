@@ -162,7 +162,7 @@ handbooks) are exempt — their cost is paid only when opened; finish with
 
 The lexical share of this narration judgment — a fixed set of `formerly…`-class
 markers in the manifest set — is a blocking gate
-(spec-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic
+(canon-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic
 residue (*is this sentence about the past?*) that no marker set can decide.
 
 ## The memory-off doctrine

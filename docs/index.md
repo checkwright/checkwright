@@ -30,7 +30,7 @@ Read in this order: each kit assumes the machinery of the ones above it.
 - [lifecycle-kit](lifecycle-kit/index.md) — the iteration stage state machine for
   stateless sessions.
 - [queue-kit](queue-kit/index.md) — the git-native, agent-readable task tracker.
-- [spec-kit](spec-kit/index.md) — spec discipline for agent-authored components.
+- [canon-kit](canon-kit/index.md) — spec discipline for agent-authored components.
 - [guard-kit](guard-kit/index.md) — permission-friction tooling for agent sessions.
 - [delegation-kit](delegation-kit/index.md) — safe delegated-agent execution under a
   token budget.

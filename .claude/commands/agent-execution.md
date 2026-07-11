@@ -81,7 +81,7 @@ touches any of these, or serialize:
   artifacts; only regenerate via `gate-sdk/bin/gen-pre-commit.sh --write` +
   `check-graph --emit` in the owning unit, never hand-edit.
 - `scripts/gates.list` and the `scripts/*-config.sh` knob files (e.g.
-  `spec-config.sh` — the comment-tier whitelist lives here).
+  `canon-config.sh` — the comment-tier whitelist lives here).
 - `TASK-QUEUE.md` and `.workflow/WORKFLOW-STATE.txt` — shared iteration state.
 - any `SPEC-*.md` amendment file a unit is mid-merge on.
 
@@ -95,7 +95,7 @@ agent's self-report):
     bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests       gate-sdk/checks
     bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests  lifecycle-kit/checks
     bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests      queue-kit/checks
-    bash gate-sdk/bin/run-gate-tests.sh spec-kit/gate-tests       spec-kit/checks
+    bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests       canon-kit/checks
     bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks
 
 Renames are the trap (relevant to the queued `tag-lead-line-rename`): a gate that

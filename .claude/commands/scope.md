@@ -20,7 +20,7 @@ vocabularies, glossary bodies become optional consumer config, never kit
 literals; this repo's layout stays as the defaults under `<KIT>_<KNOB>`
 env/config knobs.
 
-**Triage every task at filing** (spec-kit/SPEC.md §The amendment lifecycle):
+**Triage every task at filing** (canon-kit/SPEC.md §The amendment lifecycle):
 feature vs debt is the new-names litmus — a task adding any name to a
 governed surface (script, knob, file/dir convention, tag, cross-component
 contract) is a feature: write the SPEC amendment now (scope is the

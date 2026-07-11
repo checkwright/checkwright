@@ -81,7 +81,7 @@ The generic set — each coupled to a kit-governed surface, each degrading to
 - **kpi-amendment-age** — age in days of the oldest amendment on disk
   (`SPEC-*.md`, git add-date; fixture and template paths excluded, matching the
   published-evidence extractor's amendment-latency harvest); the pressure gauge
-  behind spec-kit's short-lived-amendment rule.
+  behind canon-kit's short-lived-amendment rule.
 - **kpi-deferred-age** — age of the oldest `Surfaced <date>` mark
   (queue-kit's ungated convention) in the queue's deferred section:
   premise-rot pressure on design-pending work.
@@ -130,7 +130,7 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
 2. **Triage (close)** — `templates/close-knowledge.md`, spliced into the
    consumer's close skill (the close-triage/close-brevity pattern): walk
    the log; for each entry, the remediation is a **doc-owner edit** — give
-   the fact a home under the consumer's tier contract (spec-kit's star
+   the fact a home under the consumer's tier contract (canon-kit's star
    topology: one owner per fact), or a pointer from where the session
    looked to where the owner is. Never a standing session-start
    instruction: that converts one re-derivation into a permanent
@@ -287,8 +287,8 @@ Toolchain-shaped KPIs are consumer content: orphan-crate and bare-`#[allow]`
 scans (Rust-specific dead-surface detection) and a `TODO(spec-ambiguity)`
 marker count (a marker convention is consumer vocabulary; generalize the
 convention first if it ever ships). A deprecated-surface trend is the same
-shape — it counts markers over the consumer's `SPEC_KIT_DEPRECATION_MARKERS`
-roster (spec-kit's `check-deprecation-task` vocabulary), so it ships as
+shape — it counts markers over the consumer's `CANON_KIT_DEPRECATION_MARKERS`
+roster (canon-kit's `check-deprecation-task` vocabulary), so it ships as
 `templates/kpi-deprecated-surface.sh`, an **example** the consumer registers in
 its `kpis.list` rather than a bundled plugin under `kpis/`: the marker spelling
 is a consumer literal, and the kit stays deprecation-neutral. Registered, it
@@ -298,7 +298,7 @@ plugins' fail-visible discipline). The release-boundary disposition walk over
 the same roster is lifecycle-kit's `release-sweep` skill template. So are product-workflow KPIs: gate
 exemptions (a `scan-exceptions` disposition split) and backlog-aging finding
 counts — both read consumer gates. A narration-marker by-eye count is
-superseded by spec-kit's `check-manifest-temporal`, which gates the same axis
+superseded by canon-kit's `check-manifest-temporal`, which gates the same axis
 instead of trending it. The always-loaded baseline mechanics are context-kit's
 surface; drift-kit ships only the `kpi-always-loaded` plugin that reads its
 meter.

@@ -1,0 +1,395 @@
+# shellcheck shell=bash
+# spec: canon-kit/SPEC.md §lib/spec.sh — sourced config loader + shared section/spec adapters, never gate structure
+
+_sk_cfg="${CANON_KIT_CONFIG_FILE:-}"
+if [[ -n "$_sk_cfg" ]]; then
+    [[ -f "$_sk_cfg" ]] || {
+        echo "canon-kit: CANON_KIT_CONFIG_FILE not found: $_sk_cfg" >&2
+        exit 2
+    }
+    # shellcheck disable=SC1090  # consumer-supplied config, path is config
+    source "$_sk_cfg"
+else
+    _sk_cfg="${GATE_SDK_GATES_DIR:-scripts}/canon-config.sh"
+    if [[ -f "$_sk_cfg" ]]; then
+        # shellcheck disable=SC1090  # consumer-supplied config, path is config
+        source "$_sk_cfg"
+    fi
+fi
+unset _sk_cfg
+
+[[ -v CANON_KIT_SPEC_NAME ]]      || CANON_KIT_SPEC_NAME="SPEC.md"
+[[ -v CANON_KIT_AMENDMENT_GLOB ]] || CANON_KIT_AMENDMENT_GLOB="SPEC-*.md"
+
+[[ -v CANON_KIT_QUEUE_FILE ]] || CANON_KIT_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
+
+declare -p CANON_KIT_DEPRECATION_MARKERS &>/dev/null || CANON_KIT_DEPRECATION_MARKERS=()
+
+declare -p CANON_KIT_FEATURE_SECTIONS &>/dev/null || CANON_KIT_FEATURE_SECTIONS=("New Features")
+declare -p CANON_KIT_ACTIVE_SECTIONS  &>/dev/null || CANON_KIT_ACTIVE_SECTIONS=("New Features" "Technical Debt")
+
+[[ -v CANON_KIT_DEFERRED_SECTION ]] || CANON_KIT_DEFERRED_SECTION="Deferred"
+
+[[ -v CANON_KIT_DOD_HEADING ]] || CANON_KIT_DOD_HEADING="Definition of Done"
+[[ -v CANON_KIT_DOD_MODE ]]    || CANON_KIT_DOD_MODE="exactly-one"
+
+[[ -v CANON_KIT_SCAN_KIT_ROOTS ]] || CANON_KIT_SCAN_KIT_ROOTS=0
+
+declare -p CANON_KIT_BANNED_HEADINGS &>/dev/null \
+    || CANON_KIT_BANNED_HEADINGS=("Directory Structure" "Public API" "Cargo.toml Dependencies")
+[[ -v CANON_KIT_DERIVABLE_DENSITY ]]       || CANON_KIT_DERIVABLE_DENSITY=60
+[[ -v CANON_KIT_DERIVABLE_POINTER_REGEX ]] || CANON_KIT_DERIVABLE_POINTER_REGEX='pub-index|proto-index'
+
+[[ -v CANON_KIT_EMBED_THRESHOLD ]] || CANON_KIT_EMBED_THRESHOLD="0.70"
+[[ -v CANON_KIT_EMBED_MINLINES ]]  || CANON_KIT_EMBED_MINLINES=8
+declare -p CANON_KIT_EMBED_LANGS &>/dev/null || CANON_KIT_EMBED_LANGS=(
+    "rs|rust,rs|*.rs"
+    "toml|toml|*.toml"
+    "sql|sql|*.sql"
+    "sh|bash,sh|*.sh"
+    "yaml|yaml,yml|*.yaml,*.yml"
+    "ts|typescript,ts,tsx|*.ts,*.tsx"
+    "rego|rego|*.rego"
+    "proto|proto,protobuf|*.proto"
+    "dockerfile|dockerfile|Dockerfile"
+)
+declare -p CANON_KIT_EMBED_ILLUSTRATIVE &>/dev/null || CANON_KIT_EMBED_ILLUSTRATIVE=("json")
+[[ -v CANON_KIT_EMBED_WIRE_KIND ]] || CANON_KIT_EMBED_WIRE_KIND="proto"
+
+[[ -v CANON_KIT_GLOSSARY_FILE ]] || CANON_KIT_GLOSSARY_FILE="GLOSSARY.md"
+declare -p CANON_KIT_DUP_SURFACES &>/dev/null || CANON_KIT_DUP_SURFACES=("VISION.md")
+
+declare -p CANON_KIT_MDREF_EXCLUDE &>/dev/null || CANON_KIT_MDREF_EXCLUDE=()
+
+[[ -v CANON_KIT_LINK_ROOT ]] || CANON_KIT_LINK_ROOT="docs"
+
+declare -p CANON_KIT_MANIFEST_FILES &>/dev/null || CANON_KIT_MANIFEST_FILES=()
+declare -p CANON_KIT_TEMPORAL_MARKERS &>/dev/null || CANON_KIT_TEMPORAL_MARKERS=(
+    "previously"
+    "formerly"
+    "renamed from"
+    "no longer"
+    "used to be"
+    "was (retired|removed|renamed|replaced)"
+)
+declare -p CANON_KIT_TEMPORAL_EXEMPT_SECTIONS &>/dev/null || CANON_KIT_TEMPORAL_EXEMPT_SECTIONS=()
+declare -p CANON_KIT_TEMPORAL_EXEMPT_PATHS &>/dev/null || CANON_KIT_TEMPORAL_EXEMPT_PATHS=()
+
+declare -p CANON_KIT_COUNT_COLLECTIONS &>/dev/null || CANON_KIT_COUNT_COLLECTIONS=(
+    "gates"
+    "meta-gates"
+    "checks"
+    "kits"
+    "stages"
+    "rules"
+    "KPIs"
+)
+declare -p CANON_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || CANON_KIT_COUNT_ALLOWED_PHRASES=()
+[[ -v CANON_KIT_COUNT_WEDGE_WORDS ]] || CANON_KIT_COUNT_WEDGE_WORDS=2
+
+[[ -v CANON_KIT_ENUM_SETS_CMD ]] || CANON_KIT_ENUM_SETS_CMD=""
+
+declare -p CANON_KIT_COMMENT_MACHINE &>/dev/null || CANON_KIT_COMMENT_MACHINE=()
+declare -p CANON_KIT_COMMENT_REASON  &>/dev/null || CANON_KIT_COMMENT_REASON=()
+declare -p CANON_KIT_COMMENT_SURFACE &>/dev/null || CANON_KIT_COMMENT_SURFACE=()
+declare -p CANON_KIT_COMMENT_POSITIONAL &>/dev/null || CANON_KIT_COMMENT_POSITIONAL=()
+declare -p CANON_KIT_COMMENT_WHITELIST &>/dev/null || CANON_KIT_COMMENT_WHITELIST=()
+[[ -v CANON_KIT_COMMENT_RUN_CAP ]] || CANON_KIT_COMMENT_RUN_CAP=3
+
+spec_alt() { local IFS='|'; printf '%s' "$*"; }
+
+# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
+SPEC_FEATURE_RE="^## ($(spec_alt "${CANON_KIT_FEATURE_SECTIONS[@]}"))[[:space:]]*$"
+# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
+SPEC_ACTIVE_RE="^## ($(spec_alt "${CANON_KIT_ACTIVE_SECTIONS[@]}"))[[:space:]]*$"
+# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
+SPEC_DEFERRED_RE="^## ${CANON_KIT_DEFERRED_SECTION}[[:space:]]*$"
+# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
+SPEC_SECTION_RE="^## "
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the queue-resolution pass both liveness gates read: one walk emits "<live|done>\t<slug>", live for a bold lead-in bullet in an active/deferred section and done for a bare-slug bullet outside them (the queue-kit format). Each caller builds its own live/done map and fail-closes on the awk status.
+spec_queue_slugs() {  # $1=queue-file
+    awk -v activere="$SPEC_ACTIVE_RE" -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
+        $0 ~ sectre { active = ($0 ~ activere || $0 ~ defre); next }
+        active && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
+            match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
+            printf "live\t%s\n", substr($0, RSTART + 2, RLENGTH - 4); next
+        }
+        !active && $0 ~ /^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$/ {
+            line = $0; sub(/^[[:space:]]*-[[:space:]]+/, "", line); sub(/[[:space:]]*$/, "", line)
+            printf "done\t%s\n", line
+        }
+    ' "$1"
+}
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — finders skip templates/ stubs and vendored kit roots under the scan root (an ancestor kit root never prunes)
+_spec_prune_kit_roots() {
+    if [[ "$CANON_KIT_SCAN_KIT_ROOTS" == "1" ]]; then cat; return 0; fi
+    local root="${1:-.}" root_abs
+    case "$root" in
+        /*)  root_abs="$root" ;;
+        .)   root_abs="$PWD" ;;
+        ./*) root_abs="$PWD/${root#./}" ;;
+        *)   root_abs="$PWD/$root" ;;
+    esac
+    root_abs="${root_abs%/}"
+    local -a roots=()
+    local r rabs f fabs keep
+    while IFS= read -r r; do
+        [[ -n "$r" ]] || continue
+        [[ "$r" == /* ]] && rabs="$r" || rabs="$PWD/$r"
+        rabs="${rabs%/}"
+        [[ "$rabs" == "$root_abs/"* ]] || continue   # only a vendored subtree prunes
+        roots+=("$rabs")
+    done < <(gate_kit_roots)
+    [[ ${#roots[@]} -eq 0 ]] && { cat; return 0; }
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        [[ "$f" == /* ]] && fabs="$f" || fabs="$PWD/${f#./}"
+        keep=1
+        for r in "${roots[@]}"; do
+            [[ "$fabs" == "$r/"* ]] && { keep=0; break; }
+        done
+        [[ "$keep" == "1" ]] && printf '%s\n' "$f"
+    done
+}
+
+spec_canonical_specs() { gate_find "$1" -name "$CANON_KIT_SPEC_NAME" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
+
+spec_amendments() { gate_find "$1" -name "$CANON_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs (kit-root pruned per CANON_KIT_SCAN_KIT_ROOTS) plus README.md at any depth and CLAUDE.md; explicit globs when CANON_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change.
+spec_manifest_files() {
+    local root="${1:-.}" g f
+    if [[ ${#CANON_KIT_MANIFEST_FILES[@]} -gt 0 ]]; then
+        shopt -s nullglob globstar
+        for g in "${CANON_KIT_MANIFEST_FILES[@]}"; do
+            for f in "$root"/$g; do [[ -f "$f" ]] && printf '%s\n' "$f"; done
+        done
+        shopt -u nullglob globstar
+    else
+        spec_canonical_specs "$root"
+        gate_find "$root" -name 'README.md' -type f 2>/dev/null | grep -v '/templates/' || true
+        gate_find "$root" -name 'CLAUDE.md' -type f 2>/dev/null || true
+    fi
+}
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the two governed comment surfaces: the
+#   tier gate scans _with_templates, the pointer gate scans the pruned surface
+#   (templates exempt as placeholders-by-design).
+_spec_comment_surface() {  # $1=root  $2=1 keeps templates/ shell sources, else prunes them
+    local root="${1:-.}" incl="${2:-0}" g f
+    if [[ ${#CANON_KIT_COMMENT_SURFACE[@]} -gt 0 ]]; then
+        shopt -s nullglob globstar
+        for g in "${CANON_KIT_COMMENT_SURFACE[@]}"; do
+            for f in "$root"/$g; do [[ -f "$f" ]] && printf '%s\n' "$f"; done
+        done
+        shopt -u nullglob globstar
+    else
+        if [[ "$incl" == "1" ]]; then
+            gate_find "$root" -name '*.sh' -type f 2>/dev/null | _spec_prune_kit_roots "$root" | sort
+        else
+            gate_find "$root" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
+        fi
+        shopt -s nullglob
+        for f in "$root/${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*.txt; do printf '%s\n' "$f"; done
+        shopt -u nullglob
+    fi
+}
+
+spec_comment_surface() { _spec_comment_surface "$1" 0; }
+
+spec_comment_surface_with_templates() { _spec_comment_surface "$1" 1; }
+
+spec_comment_whitelisted() {  # $1=root-relative path — true when it matches a consumer whitelist glob
+    local rel="$1" g
+    for g in "${CANON_KIT_COMMENT_WHITELIST[@]}"; do
+        # shellcheck disable=SC2053  # intentional glob match: $g is a pattern
+        [[ "$rel" == $g ]] && return 0
+    done
+    return 1
+}
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the count grammar the restated-total gate family shares: one cardinal alternation, one consumer noun vocabulary, two match shapes
+SPEC_COUNT_CARDINAL_RE='([0-9]+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)'
+
+spec_count_noun_alt() {
+    local n out=""
+    for n in "${CANON_KIT_COUNT_COLLECTIONS[@]}"; do
+        [[ -n "$n" ]] || continue
+        out="${out:+$out|}${n,,}"
+    done
+    printf '%s' "$out"
+}
+
+# spec: canon-kit/SPEC.md §check-manifest-count — the wedge groups are optional, so bare adjacency is this shape's zero-wedge case rather than a second branch
+spec_count_quantifier_re() {
+    local i opt=""
+    for ((i = 0; i < CANON_KIT_COUNT_WEDGE_WORDS; i++)); do
+        opt+='([[:space:]]+[[:alnum:]_-]+)?'
+    done
+    printf '%s%s[[:space:]]+(%s)' "$SPEC_COUNT_CARDINAL_RE" "$opt" "$(spec_count_noun_alt)"
+}
+
+spec_count_range_re() {
+    printf '(%s)[[:space:]]+[0-9]+-[0-9]+' "$(spec_count_noun_alt)"
+}
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the awk half of the count adapter: the matcher both restated-total gates prepend, so the boundary rule and the mechanical exemptions have one home. Callers pass SK_QRE, SK_RRE and SK_PHRASES; sk_count_hit returns the offending span, or "".
+spec_count_awk_lib() {
+    cat <<'AWK'
+BEGIN { SK_NP = split(SK_PHRASES, SK_PHRASE, "\n") }
+function _sk_phrase_exempt(low, ms, me,   i, p, lp, start, idx, pp) {
+    for (i = 1; i <= SK_NP; i++) {
+        p = SK_PHRASE[i]; if (p == "") continue
+        lp = length(p); start = 1
+        while (1) {
+            idx = index(substr(low, start), p)
+            if (idx == 0) break
+            pp = start + idx - 1
+            if (ms >= pp && me <= pp + lp - 1) return 1
+            start = pp + 1
+        }
+    }
+    return 0
+}
+function _sk_span(low, scan, re, quantifier,   rest, off, ms, ml, me, bc, ac, ok, m, prefix, suffix) {
+    rest = low; off = 0
+    while (match(rest, re) > 0) {
+        ms = off + RSTART; ml = RLENGTH; me = ms + ml - 1
+        bc = (ms > 1) ? substr(low, ms - 1, 1) : " "
+        ac = (me < length(low)) ? substr(low, me + 1, 1) : " "
+        ok = 1
+        if (bc ~ /[[:alnum:]]/) ok = 0          # match glued to a preceding word or number
+        if (ac ~ /[[:alnum:]-]/) ok = 0         # noun glued to a following word (e.g. gatekeepers)
+        if (ok) {
+            m = substr(low, ms, ml)
+            prefix = substr(low, 1, ms - 1)
+            suffix = substr(low, me + 1)
+            if (_sk_phrase_exempt(low, ms, me)) ok = 0
+            else if (quantifier) {
+                if (prefix ~ /(≥|≤|>|<|at least|at most|up to|more than|fewer than)[[:space:]]*$/) ok = 0
+                else if (prefix ~ /all but[[:space:]]*$/) ok = 0
+                else if (prefix ~ /(^|[^[:alnum:]])of[[:space:]]+(the[[:space:]]+)?$/) ok = 0
+                else if (m ~ /(^|[[:space:]])of([[:space:]]|$)/) ok = 0
+                else if (suffix ~ /^[[:space:]]+per([[:space:]]|$)/) ok = 0
+            }
+        }
+        if (ok) return substr(scan, ms, ml)
+        off = ms; rest = substr(low, ms + 1)
+    }
+    return ""
+}
+function sk_count_hit(text,   scan, low, s) {
+    scan = text
+    gsub(/`[^`]*`/, "", scan)   # a cardinal in inline code is a meta-reference, not a restated total
+    low = tolower(scan)
+    s = _sk_span(low, scan, SK_QRE, 1)
+    if (s != "") return s
+    return _sk_span(low, scan, SK_RRE, 0)
+}
+# the paragraph-join window over the walk driver's accumulator (sk_para_add,
+# sk_pline/_sk_join): sk_count_hit sees one physical line, so a total whose
+# cardinal and noun straddle a prose wrap ("two comment /\ngates") slips both
+# gates. sk_para_wrapped reads back the first total whose span crosses a line
+# boundary, at the span's first physical line (SK_WRAP_FNR/SK_WRAP_SPAN). A
+# same-line span returns 0 here — the per-line scan owns it, so no double report.
+function sk_para_wrapped(   k, hit, compK, startK) {
+    SK_WRAP_FNR = 0; SK_WRAP_SPAN = ""
+    if (sk_pn < 2) return 0
+    compK = 0                                       # line where the first span completes
+    for (k = 1; k <= sk_pn; k++) { hit = sk_count_hit(_sk_join(1, k)); if (hit != "") { compK = k; break } }
+    if (compK == 0) return 0
+    startK = 1                                      # largest start whose suffix-join still hits: the span's first line
+    for (k = 2; k <= compK; k++) { if (sk_count_hit(_sk_join(k, compK)) != "") startK = k; else break }
+    if (startK == compK) return 0                   # span sits on one physical line, per-line scan owns it
+    SK_WRAP_FNR = sk_pfnr[startK]; SK_WRAP_SPAN = hit
+    return 1
+}
+AWK
+}
+
+spec_count_phraselist() {
+    [[ ${#CANON_KIT_COUNT_ALLOWED_PHRASES[@]} -eq 0 ]] && return 0
+    printf '%s\n' "${CANON_KIT_COUNT_ALLOWED_PHRASES[@]}" | tr '[:upper:]' '[:lower:]'
+}
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the paragraph accumulator every manifest-prose gate shares: sk_para_add feeds physical lines, _sk_join reads back a logical window. Both walk drivers (the shared one and check-comment-tier's caller-owned comment walk) fill it; sk_para_wrapped and the enum paragraph read it.
+spec_para_accum_awk() {
+    cat <<'AWK'
+function sk_para_reset() { sk_pn = 0 }
+function sk_para_add(fnr, text) { sk_pn++; sk_pfnr[sk_pn] = fnr; sk_pline[sk_pn] = text }
+function _sk_join(lo, hi,   k, s) {
+    s = ""
+    for (k = lo; k <= hi; k++) s = s (k > lo ? " " : "") sk_pline[k]
+    return s
+}
+AWK
+}
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the manifest-prose walk driver both restated-manifest gates prepend: fence tracking, the blank-line paragraph reset, and the per-site exempt window (the line or the one above; the marker regex arrives in SK_EXEMPT). It calls the caller's sk_on_line(file,fnr,raw) per prose line and sk_on_pflush() at each paragraph boundary, over the shared accumulator (spec_para_accum_awk).
+spec_manifest_walk_awk() {
+    cat <<'AWK'
+function _sk_pflush() { sk_on_pflush(); sk_para_reset() }
+FNR == 1 { _sk_pflush(); sk_fence = 0; sk_prev = "" }
+{
+    sk_curfile = FILENAME
+    sk_raw = $0
+    if (sk_raw ~ /^[[:space:]]*```/) { _sk_pflush(); sk_fence = !sk_fence; sk_prev = sk_raw; next }
+    if (sk_fence) { _sk_pflush(); sk_prev = sk_raw; next }
+    if (sk_raw ~ SK_EXEMPT || sk_prev ~ SK_EXEMPT) { _sk_pflush(); sk_prev = sk_raw; next }
+    if (sk_raw ~ /^[[:space:]]*$/) { _sk_pflush(); sk_prev = sk_raw; next }
+    sk_on_line(sk_curfile, FNR, sk_raw)
+    sk_para_add(FNR, sk_raw)
+    sk_prev = sk_raw
+}
+END { _sk_pflush() }
+AWK
+}
+
+# spec: canon-kit/SPEC.md §check-prose-enum — run the consumer's declared sets command and echo its validated <set-name><TAB><member> lines; a command that fails or a line that does not parse (no tab, empty field, extra tab) returns 2 (fail-closed). Empty CANON_KIT_ENUM_SETS_CMD is the caller's clean-skip signal, handled before this is called.
+spec_enum_sets() {
+    local out st line name member
+    out="$(bash -c "$CANON_KIT_ENUM_SETS_CMD")"; st=$?
+    [[ $st -eq 0 ]] || { echo "spec_enum_sets: CANON_KIT_ENUM_SETS_CMD exited $st" >&2; return 2; }
+    while IFS= read -r line; do
+        [[ -n "$line" ]] || continue
+        [[ "$line" == *$'\t'* ]] || { echo "spec_enum_sets: line has no tab: '$line'" >&2; return 2; }
+        name="${line%%$'\t'*}"; member="${line#*$'\t'}"
+        [[ -n "$name" && -n "$member" ]] || { echo "spec_enum_sets: empty set name or member: '$line'" >&2; return 2; }
+        [[ "$member" == *$'\t'* ]] && { echo "spec_enum_sets: extra tab in line: '$line'" >&2; return 2; }
+        printf '%s\t%s\n' "$name" "$member"
+    done <<< "$out"
+    return 0
+}
+
+_sk_errs=()
+[[ -n "$CANON_KIT_SPEC_NAME" ]]      || _sk_errs+=("CANON_KIT_SPEC_NAME is empty")
+[[ -n "$CANON_KIT_AMENDMENT_GLOB" ]] || _sk_errs+=("CANON_KIT_AMENDMENT_GLOB is empty")
+[[ ${#CANON_KIT_FEATURE_SECTIONS[@]} -gt 0 ]] || _sk_errs+=("CANON_KIT_FEATURE_SECTIONS is empty")
+[[ ${#CANON_KIT_ACTIVE_SECTIONS[@]} -gt 0 ]]  || _sk_errs+=("CANON_KIT_ACTIVE_SECTIONS is empty")
+[[ -n "$CANON_KIT_DEFERRED_SECTION" ]] || _sk_errs+=("CANON_KIT_DEFERRED_SECTION is empty")
+[[ -n "$CANON_KIT_DOD_HEADING" ]]      || _sk_errs+=("CANON_KIT_DOD_HEADING is empty")
+[[ "$CANON_KIT_DOD_MODE" == "exactly-one" || "$CANON_KIT_DOD_MODE" == "at-most-one" ]] \
+    || _sk_errs+=("CANON_KIT_DOD_MODE must be exactly-one|at-most-one (got '$CANON_KIT_DOD_MODE')")
+[[ "$CANON_KIT_SCAN_KIT_ROOTS" == "0" || "$CANON_KIT_SCAN_KIT_ROOTS" == "1" ]] \
+    || _sk_errs+=("CANON_KIT_SCAN_KIT_ROOTS must be 0|1 (got '$CANON_KIT_SCAN_KIT_ROOTS')")
+[[ "$CANON_KIT_DERIVABLE_DENSITY" =~ ^[0-9]+$ && "$CANON_KIT_DERIVABLE_DENSITY" -ge 0 && "$CANON_KIT_DERIVABLE_DENSITY" -le 100 ]] \
+    || _sk_errs+=("CANON_KIT_DERIVABLE_DENSITY must be 0..100 (got '$CANON_KIT_DERIVABLE_DENSITY')")
+[[ "$CANON_KIT_EMBED_THRESHOLD" =~ ^0?\.[0-9]+$|^1(\.0+)?$ ]] \
+    || _sk_errs+=("CANON_KIT_EMBED_THRESHOLD must be a 0..1 fraction (got '$CANON_KIT_EMBED_THRESHOLD')")
+[[ "$CANON_KIT_EMBED_MINLINES" =~ ^[0-9]+$ && "$CANON_KIT_EMBED_MINLINES" -gt 0 ]] \
+    || _sk_errs+=("CANON_KIT_EMBED_MINLINES must be a positive integer (got '$CANON_KIT_EMBED_MINLINES')")
+[[ -n "$CANON_KIT_GLOSSARY_FILE" ]] || _sk_errs+=("CANON_KIT_GLOSSARY_FILE is empty")
+[[ ${#CANON_KIT_TEMPORAL_MARKERS[@]} -gt 0 ]] || _sk_errs+=("CANON_KIT_TEMPORAL_MARKERS is empty")
+[[ ${#CANON_KIT_COUNT_COLLECTIONS[@]} -gt 0 ]] || _sk_errs+=("CANON_KIT_COUNT_COLLECTIONS is empty")
+[[ "$CANON_KIT_COUNT_WEDGE_WORDS" =~ ^[0-9]+$ && "$CANON_KIT_COUNT_WEDGE_WORDS" -gt 0 ]] \
+    || _sk_errs+=("CANON_KIT_COUNT_WEDGE_WORDS must be a positive integer (got '$CANON_KIT_COUNT_WEDGE_WORDS')")
+[[ "$CANON_KIT_COMMENT_RUN_CAP" =~ ^[0-9]+$ && "$CANON_KIT_COMMENT_RUN_CAP" -gt 0 ]] \
+    || _sk_errs+=("CANON_KIT_COMMENT_RUN_CAP must be a positive integer (got '$CANON_KIT_COMMENT_RUN_CAP')")
+if [[ ${#_sk_errs[@]} -gt 0 ]]; then
+    printf 'canon-kit: malformed spec config — the gates cannot run:\n' >&2
+    printf '  %s\n' "${_sk_errs[@]}" >&2
+    exit 2
+fi
+unset _sk_errs

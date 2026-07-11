@@ -132,7 +132,7 @@ shell a consumer copies out) — and `check-comment-tier` governs their comments
 too: a copied-out template's `spec:` line resolves against the vendored kit
 path, so its comments are directives like any source, thinned to the
 `# graph:`/`# spec:` lines and the placeholder scaffolding the consumer fills
-in (spec-kit/SPEC.md §check-comment-tier). Only `check-spec-pointer` skips a
+in (canon-kit/SPEC.md §check-comment-tier). Only `check-spec-pointer` skips a
 template, its `spec:` line being a placeholder unresolvable by design
 (§check-spec-pointer). A template's post-copy `source` paths are legitimate. A
 false positive is silenced inline with `# shellcheck disable=SCxxxx` plus a
@@ -257,7 +257,7 @@ The fixture suites prove each gate in isolation on contrived case dirs, and a
 consumer repo's battery runs under that consumer's own config overrides. Two
 things go untested there: that a *fresh* consumer reaches green by following
 the kit READMEs, and that the **kit defaults** hold on a vendored-kit tree
-under zero config. The DoD-mode defect (`spec-kit-vendored-spec-dod-scope`)
+under zero config. The DoD-mode defect (`canon-kit-vendored-spec-dod-scope`)
 shipped through exactly that gap. `bin/run-consumer-smoke.sh` closes it,
 mechanizing what was a hand-repeated validate-stage prose ritual with no
 committed evidence.
@@ -716,7 +716,7 @@ registry-style — one entry per line, `#` comments and blanks ignored. An absen
 file falls back to the built-in minimal orientation set (`README.md`, `LICENSE`,
 the configured queue file, `CLAUDE.md`, `.gitignore`, plus the `SPEC-*.md`
 amendment glob — a root-component amendment is a legitimate transient root
-surface for any spec-kit consumer, so a gate that reddened every scope stage
+surface for any canon-kit consumer, so a gate that reddened every scope stage
 would only train bypassing). The intentional-new-surface valve is the manifest
 itself: adding a root entry means adding its allowlist line in the same commit,
 a diff-visible edit needing no exemption tag. The `# graph:` couples the

@@ -6,7 +6,7 @@ graph_surface_layer() {
         gate-sdk/*)       echo k_gate_sdk ;;
         lifecycle-kit/*)  echo k_lifecycle ;;
         queue-kit/*)      echo k_queue ;;
-        spec-kit/*)       echo k_spec ;;
+        canon-kit/*)      echo k_canon ;;
         guard-kit/*)      echo k_guard ;;
         delegation-kit/*) echo k_delegation ;;
         context-kit/*)    echo k_context ;;
@@ -19,7 +19,7 @@ GRAPH_LAYERS=(
     "k_gate_sdk:gate-sdk"
     "k_lifecycle:lifecycle-kit"
     "k_queue:queue-kit"
-    "k_spec:spec-kit"
+    "k_canon:canon-kit"
     "k_guard:guard-kit"
     "k_delegation:delegation-kit"
     "k_context:context-kit"
