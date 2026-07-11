@@ -4,11 +4,4 @@
 
 ---
 
-doctrine-kit scope ba26434e 2026-07-11
-doctrine-kit align 94eaead6 2026-07-11
-doctrine-kit build fa705ff9 2026-07-11
-doctrine-kit build 75ef8cf0 2026-07-11
-doctrine-kit build 4c3a03f7 2026-07-11
-doctrine-kit build 367b7afd 2026-07-11
-doctrine-kit validate 8d674a14 2026-07-11
-doctrine-kit close 40579339 2026-07-11
+— scope f9ff4e35 2026-07-11
