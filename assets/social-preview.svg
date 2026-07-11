@@ -4,7 +4,7 @@
        size. Rasterize for upload — GitHub takes PNG/JPG, not SVG:
        rsvg-convert -w 1280 -h 640 assets/social-preview.svg -o /tmp/social.png
        Text is centred by hand (text-anchor=middle); the lockup group is the
-       body of assets/logo/checkwright-lockup.svg with the wordmark fill
+       body of docs/assets/logo/checkwright-lockup.svg with the wordmark fill
        swapped to #E2E8F0 for the dark ground, per that file's own note. -->
   <rect width="1280" height="640" fill="#16202B"/>
   <rect x="0" y="0" width="1280" height="6" fill="#C19A3D"/>
