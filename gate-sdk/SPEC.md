@@ -231,7 +231,16 @@ Every registered gate's header carries a one-line coupling manifest:
   literal. Expansion over-approximates by design — a kit is coupled even where
   the gate's subject is narrower, so an extra trigger runs a green gate while a
   missing one would skip a red — and `check-kit-enum` gates the residual
-  hand-lists derivation cannot reach.
+  hand-lists derivation cannot reach. The corollary is a hard authoring rule:
+  `couples=` must *cover* every path the gate reads at runtime, never a subset.
+  Globs never cross `/` (and `kit:<glob>` expands one level only), so a gate
+  that walks a directory recursively (`find` / `gate_find`) must couple that
+  recursion — a `<dir>/<sub>/*.ext` sibling glob or a wider one — and never
+  lean on the tree holding only the shape the couple enumerates; an
+  under-covering couple silently skips the gate on the very edit it should
+  catch. `check-graph` verifies couples→hook parity, not reads⊆couples, so this
+  coverage is the author's duty (check-shim-restatement's stage-template
+  subdirectory was exactly this bug).
 - `dir=` — `bi` for a coupling bijection (both sides must agree), `one` for a
   one-way audit.
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading

@@ -205,6 +205,21 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **reads-subset-couples-meta-gate** [needs-spec] — a meta-gate asserting a
+  gate's `# graph:` couples *cover* every path it reads, closing the
+  reads⊆couples gap check-graph leaves (it verifies couples→hook parity only).
+  Motivated by check-shim-restatement's recursive-corpus / non-recursive-couple
+  bug (fixed 2026-07-11): the corpus find recursed into templates/skills/ but
+  the couple was templates/*.md, so an edit to a bound stage template skipped
+  the gate. The same latent smell rides check-docs-link-convention and
+  check-graph's own SPEC scan — safe today only because the tree matches their
+  enumerated couple shapes, exactly the fragile assumption that broke here.
+  Design tension: statically deciding what a bash gate reads is undecidable in
+  general, so scope to the tractable heuristic — a find/gate_find recursion
+  under a directory the couples only shallow-match — and rule the
+  false-positive budget against it. The gate-sdk couples authoring rule
+  (gate-sdk/SPEC.md §The `# graph:` manifest) is the prose backstop this
+  mechanizes. Surfaced 2026-07-11.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
