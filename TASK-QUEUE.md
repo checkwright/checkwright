@@ -23,6 +23,22 @@
   SPEC states a `<KIT>_` knob's default value. Calibrate on the low-FP
   triad (knob token + default/value marker + non-owning surface); a bare
   number in prose stays a tripwire, not a gate.
+- **prose-citation-pointer-gate** [needs-spec] — close the §heading-citation
+  gap: today a section reference is verdict-checked only in a structured
+  `spec:`/`contract:` directive (check-spec-pointer) or a markdown-link anchor
+  (check-md-refs); a free-prose citation (`gate-sdk/SPEC.md §The gate model`
+  inline in a sentence) resolves neither its file nor its heading, so a
+  mis-cited heading ships green. Ruled an extension of check-spec-pointer, not
+  a new gate: add a prose-citation mode reusing its `heading_present` helper
+  (the trailing-qualifier tolerance already solved there) over one
+  heading-resolution path. Calibrate the trigger for `<path>.md §<Heading>` in
+  governed prose against the low-FP set the directive scan already dodges —
+  fenced examples, a quoted-but-not-live heading, the `§` symbol in
+  non-citation use (check-spec-pointer already carves the prose-tail `§` out
+  deliberately). Generic mechanism, no seam crossing. Surfaced 2026-07-11
+  dogfooding doctrine-kit: an inline SPEC citation named a heading
+  (`§The four contracts`) the target file never carried, caught only by a
+  hand grep — the enforcement-first stop signal.
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
