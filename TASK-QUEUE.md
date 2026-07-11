@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **ddd-positioning-docs** [spec: SPEC-ddd-positioning.md] — docs/ddd.md positioning page:
-  ubiquitous-language enforcement via check-tree-terms pattern files, comment-tier directives,
-  and the graph-vocab consumer-config pattern; fictional-domain example embedded in the page;
-  kits stay DDD-neutral. Creates the docs/index.md Positioning section.
 - **orchestration-positioning-docs** [spec: SPEC-orchestration-positioning.md] — the sibling
   page docs/orchestration.md: the verification layer under agent orchestration, grounded in
   validate-after-agent-commit, check-gate-tamper, evidence stamps, and the budget guard;
@@ -189,6 +185,7 @@
 
 - reads-subset-couples-meta-gate
 - overhead-metering
+- ddd-positioning-docs
 
 ## Lessons Learned
 

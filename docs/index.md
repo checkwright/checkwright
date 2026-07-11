@@ -47,6 +47,16 @@ Read in this order: each kit assumes the machinery of the ones above it.
 
 The walkthrough and evidence pages join this map when their kits land.
 
+## Positioning
+
+Where Checkwright sits against practices you may already run — one page per
+angle, positioning only, each owning no contract and citing the enforcing kit
+downward.
+
+- [Domain-driven design](ddd.md) — Checkwright as the enforcement layer for a
+  ubiquitous language: banned synonyms, comment and naming directives, and one
+  home per definition.
+
 ## License
 
 Checkwright is Apache-2.0. Adoption is the goal.
