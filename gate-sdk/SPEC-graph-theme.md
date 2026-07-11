@@ -42,10 +42,11 @@ never a kit literal.
   byte-compares fresh — beside the existing pair, which stays the
   themeless case (gate-sdk/SPEC.md §Fixture-pair discipline).
 - **Consumer worklist (this repo).** `scripts/graph-theme.sh` supplies the
-  docs-host parity values: the GitHub-Primer-shaped tokens the Jekyll
-  pages render with (font stack, content width, light+dark color tokens),
-  a site-title header fragment matching those pages, and their footer
-  fragment; then `docs/check-graph.html` is regenerated. The theme values
+  docs-host parity values: the tokens, header fragment, and footer fragment
+  are derived from the site layout the docs-site-chrome unit lands (its
+  amendment owns the chrome contract, including the `checkwright-theme`
+  localStorage key the injected chrome honors — hence that unit builds
+  first); then `docs/check-graph.html` is regenerated. The theme values
   are consumer config by seam discipline — this repo's are public site
   identity, committable in `scripts/`, but the kit default stays
   brand-free.

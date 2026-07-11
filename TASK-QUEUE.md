@@ -37,7 +37,17 @@
   binding names the regeneration step. No new scanner — the self-reference is
   inherent; CI stays the outer backstop.
 
-- **check-graph-theme-parity** [spec: SPEC-graph-theme.md] — a theme-injection seam
+- **docs-site-chrome** [spec: SPEC-docs-site-chrome.md] — the docs site gains its chrome:
+  a custom Primer-based layout (header with logo + wordmark, left nav sidebar derived from
+  front matter, client-side search over a Liquid-emitted index, light/dark/auto selector
+  persisted under the `checkwright-theme` key) and the generated SPEC mirror
+  (`scripts/gen-docs-mirror.sh` + `check-docs-mirror-fresh`) so reference reading stays
+  on-site — rendered-document links go relative to the mirror, blob links narrow to source
+  references (the docs-reference-routing supersession is ruled in the amendment). Logo moves
+  to `docs/assets/logo/`; the nav-parity assertion joins `check-docs-kit-parity`.
+
+- **check-graph-theme-parity** [spec: SPEC-graph-theme.md] [blocked-by: docs-site-chrome] —
+  a theme-injection seam
   in check-graph's emitter (`GATE_SDK_GRAPH_THEME`, the graph-vocab pattern): three
   optional override functions (css/header/footer), kit default byte-identical when
   unset; this repo's `scripts/graph-theme.sh` supplies Primer-shaped tokens + site
@@ -48,6 +58,20 @@
 
 ## Deferred
 
+- **footprint-page** [needs-spec] — publish the kits' measured context footprint as a
+  generated docs page: the always-loaded surfaces and each load-triggered skill/template,
+  line/word counts exact and token counts as a labeled estimate (tokenizers are
+  model-specific — publish the method, never a false-precision number), total plus per-kit
+  split. The adoption-cost evidence a consumer evaluates before vendoring — the
+  token-economics positioning made concrete, and the honest complement to context-kit's
+  consumer-footprint budget rule (context-kit/SPEC.md §The consumer footprint). Derivation
+  discipline: generated + freshness-gated (the evidence-data.md pattern), never
+  hand-maintained counts. Design questions to rule at spec: extractor home (extend
+  context-kit's always-loaded meter, which owns the metric, vs a drift-kit-style
+  extractor beside trajectory.sh); per-kit attribution (a kit's templates and hooks vs
+  consumer bindings and consumer config — only the kit share is the advertised cost);
+  whether the page rides docs/ evidence framing or the install page. Filed 2026-07-11 at
+  scope (operator ask).
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
