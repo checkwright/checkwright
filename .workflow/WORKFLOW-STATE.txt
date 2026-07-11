@@ -12,3 +12,4 @@ self-accounting-and-positioning build 13804fe8 2026-07-11
 self-accounting-and-positioning build 8e0c221d 2026-07-11
 self-accounting-and-positioning build 558fb2af 2026-07-11
 self-accounting-and-positioning validate 6c8c7e68 2026-07-11
+self-accounting-and-positioning close 472b902e 2026-07-11
