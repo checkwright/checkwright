@@ -35,7 +35,11 @@ load-trigger residency rule to the doctrine itself.
    duplication or collapse the surface so the defect class cannot recur, and no
    gate is owed. No duplication with no gate outranks duplication with a gate;
    tolerated duplication is the exception and carries its defence (the amendment
-   template's sanctioned-copy rule is the model).
+   template's sanctioned-copy rule is the model). The caveat that keeps this
+   from reading gate-averse: for a drift-prone surface that must exist, the
+   gate is cheap insurance and is owed — the budget argument never keeps a
+   needed gate out; it keeps removable surfaces from being kept because a gate
+   could watch them.
    *Under agent work:* an unenforced rule is a rule the next session cannot see;
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —
