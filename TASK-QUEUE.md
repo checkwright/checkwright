@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: self-accounting-and-positioning  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,44 +12,31 @@
 
 ## New Features
 
+- **reads-subset-couples-meta-gate** [spec: SPEC-reads-couples.md] — the meta-gate closing the
+  reads⊆couples gap check-graph leaves: every statically resolvable recursive walk in a
+  registered gate must be covered by its expanded couples; skips-and-counts the undecidable
+  remainder. Motivated by check-shim-restatement's recursive-corpus / non-recursive-couple bug
+  (fixed 2026-07-11); the same latent smell rides check-docs-link-convention and check-graph's
+  own SPEC scan.
+- **overhead-metering** [spec: SPEC-overhead-meter.md] — drift-kit's overhead meter: what
+  fraction of a session's volume is governance versus task work, byte-proxy over transcripts,
+  logged per session with a bundled KPI. The commit-first and failures-only economy levers are
+  evaluation targets behind the measurement, not deliverables — the CLAUDE.md battery wording
+  changes with the data, not ahead of it.
+- **ddd-positioning-docs** [spec: SPEC-ddd-positioning.md] — docs/ddd.md positioning page:
+  ubiquitous-language enforcement via check-tree-terms pattern files, comment-tier directives,
+  and the graph-vocab consumer-config pattern; fictional-domain example embedded in the page;
+  kits stay DDD-neutral. Creates the docs/index.md Positioning section.
+- **orchestration-positioning-docs** [spec: SPEC-orchestration-positioning.md] — the sibling
+  page docs/orchestration.md: the verification layer under agent orchestration, grounded in
+  validate-after-agent-commit, check-gate-tamper, evidence stamps, and the budget guard;
+  cites scope-session-routing and multi-operator-semantics as roadmap, claims the trust layer
+  never the orchestration layer.
+
 ## Technical Debt
 
 ## Deferred
 
-- **overhead-metering** [needs-spec] — measure the methodology's own cost so
-  efficiency claims cut both ways: what fraction of a session's token spend
-  is governance (gate-output reading, stage ritual, hook payloads, doc
-  consultation) versus task work, measured over real iterations. First
-  economy levers to evaluate under it, surfaced 2026-07-12 by the operator:
-  commit-first (the generated hook already runs the coupled gates and prints
-  their verdicts, so a separate pre-commit battery run duplicates that
-  output — the token cost is output volume, not script runtime) and a
-  failures-only output mode for run-gates.sh (clean lines carry no decision
-  value at 55-gate scale; the summary line suffices). Related instruction
-  tension to rule: the CLAUDE.md battery block says run before committing —
-  if commit-first wins, that wording changes with the measurement, not ahead
-  of it. Owner candidate: drift-kit (the measurement family).
-- **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
-  config positioning Checkwright for DDD ubiquitous-language enforcement
-  (vocabulary via the check-graph/graph-vocab pattern, comment-tier
-  directives); mechanism kits stay DDD-neutral — the coupling lives in docs
-  and examples only; natural landing slot is alongside drift-kit (kit 7).
-- **orchestration-positioning-docs** [needs-spec] — the sibling positioning
-  page: Checkwright as the verification layer under agent orchestration —
-  coordination primitives answer who/when, the gates+stamps+tamper battery
-  answers whether the work is right without reading all of it; facilitator
-  today, prerequisite for unattended orchestration at scale. Grounded in
-  the mechanisms that already exist (validate-after-agent-commit,
-  check-gate-tamper, evidence stamps, budget guard) and honest about the
-  boundary: the coordination rungs themselves are deferred
-  (scope-session-routing, multi-operator-semantics) — the page claims the
-  trust layer, never the orchestration layer, and cites those rungs as the
-  roadmap rather than hiding them. Angle preserved as prose in the
-  orchestration-trust-framing lesson (essay-tagged for harvest); the docs
-  page and the essay share the argument, not the text. Like ddd-positioning-docs,
-  coupling lives in docs only — no kit gains orchestration vocabulary.
-  Surfaced 2026-07-10, asking whether Checkwright is an orchestration
-  prerequisite.
 - **scope-session-routing** [needs-spec] — iteration-ambiguity routing across
   sessions: a build/align session forwards a question to the still-live scope
   session and relays the reply back; design it atop the harness's native
@@ -172,21 +159,6 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **reads-subset-couples-meta-gate** [needs-spec] — a meta-gate asserting a
-  gate's `# graph:` couples *cover* every path it reads, closing the
-  reads⊆couples gap check-graph leaves (it verifies couples→hook parity only).
-  Motivated by check-shim-restatement's recursive-corpus / non-recursive-couple
-  bug (fixed 2026-07-11): the corpus find recursed into templates/skills/ but
-  the couple was templates/*.md, so an edit to a bound stage template skipped
-  the gate. The same latent smell rides check-docs-link-convention and
-  check-graph's own SPEC scan — safe today only because the tree matches their
-  enumerated couple shapes, exactly the fragile assumption that broke here.
-  Design tension: statically deciding what a bash gate reads is undecidable in
-  general, so scope to the tractable heuristic — a find/gate_find recursion
-  under a directory the couples only shallow-match — and rule the
-  false-positive budget against it. The gate-sdk couples authoring rule
-  (gate-sdk/SPEC.md §The `# graph:` manifest) is the prose backstop this
-  mechanizes. Surfaced 2026-07-11.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
