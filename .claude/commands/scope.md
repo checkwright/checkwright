@@ -1,40 +1,20 @@
-The `scope` (design) stage of a Checkwright iteration (one iteration per
-hardening or roadmap unit). Read `BRIEF.local.md` (local-only brief); decide
-the unit's layout, config surface, and worklist; name the iteration after the
-unit. Exit condition: the design is written down (this session's plan or a
-SPEC draft) and the seam is ruled — what ships as mechanism, what stays
-private rule content, what becomes consumer config.
+Execute the template at lifecycle-kit/templates/skills/scope.md, applying the bindings below.
 
-**First step — reset + stamp evidence.** Run
-`bash lifecycle-kit/bin/enter-stage.sh scope`. `scope` is the iteration
-boundary, so it truncates `.workflow/WORKFLOW-STATE.txt` back to its header
-(git history keeps the prior iteration's stamps), stamps `— scope
-<session-id> <date>`, and sets the TASK-QUEUE.md header to
-`## Iteration: —  [stage: scope]` — the arriving-stage flip, here
-bootstrapping an unnamed iteration. It reads `<session-id>` from
-`bin/session-id.sh` itself (never hand-picked), uses `date +%F`, and refuses
-(writing nothing) if `check-stage-entry` is red.
+## Bindings
 
-Scope rules for this repo: private rule content never lands here — term lists,
-vocabularies, glossary bodies become optional consumer config, never kit
-literals; this repo's layout stays as the defaults under `<KIT>_<KNOB>`
-env/config knobs.
+**exit-condition** — the design is written down (this session's plan or a SPEC
+draft) and the seam is ruled: what ships as mechanism, what stays private rule
+content, what becomes consumer config.
 
-**Triage every task at filing** (canon-kit/SPEC.md §The amendment lifecycle):
-feature vs debt is the new-names litmus — a task adding any name to a
-governed surface (script, knob, file/dir convention, tag, cross-component
-contract) is a feature: write the SPEC amendment now (scope is the
-spec-writing stage) and promote it `[spec:]`; no new names ⇒ debt. A ruling
-longer than a few lines drafted into a queue entry is an amendment hiding
-from `check-amendment-queue` — move it into one.
+**evidence-reset** — nothing to reset by hand here:
+`LIFECYCLE_BOUNDARY_TRUNCATE` (`scripts/lifecycle-stages.sh`) lists
+`.workflow/validate-evidence.txt`, so `enter-stage.sh scope` truncates it —
+together with the lesson-evidence file — in the same stamp commit.
 
-When done, name the iteration (no confirmation needed): replace `—` in the
-header AND in the scope stamp — they ride in one commit. Do **not** flip the
-`[stage:]` line; the arriving stage's skill flips it as its first step.
-
-**Close by recommending the next stage.** Default `build`; recommend `align`
-when one of its triggers fired (see `.claude/commands/align.md`). Trigger 3
-is mechanical: an amendment left on disk whose component span is ≥2 kits
-makes `check-stage-entry` assertion C red a build entry that lacks a
-`<iter> align` stamp or a user-ruled `align-waived` line — so when this
-scope promoted such an amendment, align is not optional, only waivable.
+**ritual** — read `BRIEF.local.md` (local-only brief); decide the unit's
+layout, config surface, and worklist; name the iteration after the unit.
+Private rule content never lands here — term lists, vocabularies, glossary
+bodies become optional consumer config, never kit literals; this repo's layout
+stays as the defaults under `<KIT>_<KNOB>` env/config knobs. The amendment
+lifecycle the template's triage step invokes is canon-kit/SPEC.md §The
+amendment lifecycle.

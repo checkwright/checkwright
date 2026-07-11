@@ -1,8 +1,8 @@
 The `validate` stage of an iteration. Run the full test/verification suites.
-Exit condition: *<your validate exit condition — prefer "zero NEW failures
-against a committed baseline" over bare "all pass", which is unsatisfiable
-while any suite is tracked-red on a deferred blocker; each held-constant red
-line carries the live task slug that blocks it>*.
+Exit condition: *<exit-condition: your validate exit condition — prefer "zero
+NEW failures against a committed baseline" over bare "all pass", which is
+unsatisfiable while any suite is tracked-red on a deferred blocker; each
+held-constant red line carries the live task slug that blocks it>*.
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
 validate`: it appends `<iteration> validate <session-id> <date>` to
@@ -18,9 +18,9 @@ empty).
 
 ## Session ritual
 
-*<Execute your suites. Compilation is not done — a green build is not a green
-test run; gate on the positive success token of your runner, not the absence
-of a failure token. Capture runs to files so the evidence outlives the
+*<suites: execute your suites. Compilation is not done — a green build is not a
+green test run; gate on the positive success token of your runner, not the
+absence of a failure token. Capture runs to files so the evidence outlives the
 session.>*
 
 **Triage a red against the queue before excavating it.** On any failure,

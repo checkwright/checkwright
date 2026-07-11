@@ -53,9 +53,11 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
    ```
 
-3. Copy `templates/skills/*.md` into your agent-skill directory (e.g.
-   `.claude/commands/`) and fill the `<…>` placeholders with your project's
-   ritual.
+3. Adopt `templates/skills/*.md` in your agent-skill directory (e.g.
+   `.claude/commands/`): either copy each in and fill its named slots
+   (`*<slot-name: …>*`) with your project's ritual, or — to track the kit —
+   make each skill a binding shim that references the template (SPEC.md
+   §templates/skills/).
 
 4. Optional — reshape the machine: copy `templates/lifecycle-stages.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,

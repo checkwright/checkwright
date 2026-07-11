@@ -1,8 +1,8 @@
 The `scope` (design) stage of an iteration. Identify tasks, author design
 amendments for the items being promoted, promote them into the active queue,
-suggest the iteration name. Exit condition: *<your scope exit condition — e.g.
-no design-pending tag left in the active queue; your amendment-readiness gate
-green>*.
+suggest the iteration name. Exit condition: *<exit-condition: your scope exit
+condition — e.g. no design-pending tag left in the active queue; your
+amendment-readiness gate green>*.
 
 **First step — reset + stamp evidence.** Run lifecycle-kit's
 `bin/enter-stage.sh scope`. `scope` is the iteration boundary, so the tool
@@ -13,8 +13,10 @@ permanent audit trail; the gates only ever read the current iteration), stamps
 the queue header to `## Iteration: —  [stage: scope]`. It reads `<session-id>`
 from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
 uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
-*<Reset any other per-iteration evidence files your validate stage writes in
-the same commit — the tool touches only the WORKFLOW-STATE file.>* A new
+*<evidence-reset: reset any per-iteration evidence file your validate stage
+writes that the tool does not already truncate — the tool truncates
+WORKFLOW-STATE, the lesson-evidence file, and every `LIFECYCLE_BOUNDARY_TRUNCATE`
+member, in the same commit as this stamp.>* A new
 iteration stays `—` until this skill names it (below); only `scope` resets,
 later stages append. Honest limit: the stamp proves the skill was *invoked*,
 not that the work was done faithfully — it forces deliberate invocation and an
@@ -22,10 +24,10 @@ audit trail, nothing more.
 
 ## Session ritual
 
-*<Your scope ritual: index the governing docs before reading them whole;
-update design-ahead projections (diagrams, models) in scope itself behind a
-gate-safe PROPOSED marker so review happens a stage before the code; ask
-clarifying questions about scope before proposing.>*
+*<ritual: your scope ritual: index the governing docs before reading them
+whole; update design-ahead projections (diagrams, models) in scope itself
+behind a gate-safe PROPOSED marker so review happens a stage before the code;
+ask clarifying questions about scope before proposing.>*
 
 **Triage every task at filing — feature vs debt by the new-names litmus.** A
 task that adds any name to a governed surface (a script, a config knob, a

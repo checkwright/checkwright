@@ -25,7 +25,9 @@ they ride in one commit.
    always-loaded doc for a stage-local procedure), →task (name the new slug),
    →harvest (a lesson carrying a configured harvest tag on its lead line —
    route its *body* to the sink this skill names for that tag, below), or
-   →discard (state why it needs no durable home). Clearing is not
+   →discard (state why it needs no durable home — a lesson that is private
+   rule content discards to the consumer's local-only private brief, if one
+   exists, rather than any tracked surface). Clearing is not
    processing: a lesson naming a concrete *unfixed gap* must become a task,
    not evaporate. When a lesson claims it was "already filed under <slug>",
    verify the target task's **body** actually carries the specific finding
@@ -40,11 +42,13 @@ they ride in one commit.
    it waits a stage and risks →discard; Lessons is for observations about
    how the work should be done, whose durable home (rule vs task vs nothing)
    genuinely needs this stage's call.
-   *<Harvest routing table: each `QUEUE_KIT_LESSON_TAGS` tag → the sink file
-   its body appends to, plus the sink's reclaim path (a gitignored sink needs
-   a named trigger that empties it — the runtime-artifact lifecycle rule).>*
-2. *<Your housekeeping sweeps: deprecation scan, gate-runtime budget check,
-   backlog-aging / premise-rot review, tooling-friction triage.>*
+   *<harvest-routing: harvest routing table: each `QUEUE_KIT_LESSON_TAGS` tag →
+   the sink file its body appends to, plus the sink's reclaim path (a gitignored
+   sink needs a named trigger that empties it — the runtime-artifact lifecycle
+   rule).>*
+2. *<housekeeping: your housekeeping sweeps: deprecation scan, gate-runtime
+   budget check, backlog-aging / premise-rot review, tooling-friction
+   triage.>*
 3. **Clear Done.**
 4. Review top-level docs for staleness (*is it still true?*). Same
    gap-generalization obligation as step 1, per staleness actually found:

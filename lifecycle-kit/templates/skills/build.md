@@ -6,8 +6,8 @@ queue-only flip re-fires the queue/state-coupled gates but **not** your
 spec-consistency battery (it couples the spec corpus, not the queue), so a
 build session can flip in on an unverified align corpus. Close that hop:
 **iff** an `align` stamp for the current iteration exists in
-`.workflow/WORKFLOW-STATE.txt`, run *<your aggregate consistency gate>* and
-refuse to stamp/flip if it is red — fix the drift first (or return to
+`.workflow/WORKFLOW-STATE.txt`, run *<consistency-gate: your aggregate
+consistency gate>* and refuse to stamp/flip if it is red — fix the drift first (or return to
 `align`). Absent an align stamp, align did not run this iteration; build's
 prior stage is scope, whose exit the flip already re-fires — **except** when
 `check-stage-entry` assertion C fires: a cross-component amendment signal with
@@ -45,11 +45,11 @@ is durable rather than sitting uncommitted across a long session.
 
 ## Session ritual
 
-*<Your build ritual: pick the first unblocked task; read the spec for every
-component the task touches and merge its amendments into the canonical spec on
-completion; implement exactly what the spec describes — no features beyond
-it; write tests as you go; present a plan for approval before code where your
-process requires it.>*
+*<ritual: your build ritual: pick the first unblocked task; read the spec for
+every component the task touches and merge its amendments into the canonical
+spec on completion; implement exactly what the spec describes — no features
+beyond it; write tests as you go; present a plan for approval before code where
+your process requires it.>*
 
 Build-time question triage — who rules, and where the ruling lives: a
 question *within the amendment's envelope* (calibration, mechanics) is ruled

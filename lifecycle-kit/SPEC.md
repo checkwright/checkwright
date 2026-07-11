@@ -78,9 +78,10 @@ flip must carry a fresh session — see §check-stage-evidence).
 The kit is vendored beside gate-sdk (conventionally at `lifecycle-kit/`); its
 gates are registered in the consumer's `gates.list` by name and resolve
 through gate-sdk's multi-kit path (consumer gates dir first, then each kit's
-`checks/`). Stage skills are copy-edits of `templates/skills/*.md` into the
-consumer's agent-skill directory; the `<…>` placeholders hold the consumer's
-ritual content.
+`checks/`). Stage skills adopt `templates/skills/*.md` in one of two modes —
+copied into the consumer's agent-skill directory with each named slot
+overwritten, or a thin binding shim that references the template (the grammar
+and the contract both modes satisfy are §templates/skills/).
 
 The stage machine itself is config with this repo's lifecycle as the
 default: copy `templates/lifecycle-stages.sh` into the gates dir as
@@ -271,6 +272,25 @@ does not exist is fail-closed (exit 2). The `# graph:` couples the skills dir at
 `tier=precommit`; the whole-tree `run-gates.sh` battery backstops a stage-set
 edit (`lifecycle-stages.sh`), which is not itself in the coupled surface.
 
+### check-skill-binding
+
+Invariant: every skill under `LIFECYCLE_SKILLS_DIR` (default `.claude/commands`;
+override with the first argument) that carries a binding directive — `Execute
+the template at <path>, applying the bindings below.` — (a) names a template
+file that exists and (b) binds exactly that template's slot set: an unbound slot
+is red, an orphan binding naming no slot is red. A skill with no directive is
+not read, so copy-and-specialize skills and non-stage skills (`/agent-execution`)
+are untouched — the same directive-as-selector mechanism `check-stage-skill-coverage`
+uses on `enter-stage.sh`. Template slots are the `*<slot-name: …>*` opening
+tokens; a shim's bindings are the `**slot-name** —` lead lines under
+`## Bindings`; the directive's template path resolves relative to the current
+directory (the tree root at pre-commit). A skills dir that does not exist is
+fail-closed (exit 2). The `# graph:` couples the skills dir and the templates
+dir at `tier=precommit`, so a slot added to a template or a binding changed in a
+shim fires the gate. The good/bad pair drives the unbound-slot case;
+`gate-tests/check-skill-binding.test.sh` covers the orphan-binding,
+missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
+
 ### check-lesson-disposition
 
 Invariant: every `## Lessons Learned` entry present at HEAD and absent from the
@@ -302,19 +322,40 @@ The `# graph:` couples the queue file and the evidence file at
 
 ### templates/skills/
 
-The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`)
-— copy-edits into the consumer's skill directory, like gate-sdk's
-check-skeleton. Each carries the generic spine (the flip+stamp first step,
-performed by invoking `enter-stage.sh <stage>` and stating in one line what it
-does; scope's truncate-and-bootstrap protocol; align's trigger-gating and waiver
-rule; build's step-0 audit recheck and stamp-per-session/flip-once rule;
-validate's baseline-diff discipline plus the codified-spine + evidence-manifest
-commit step, recorded on a commit later than the entry flip; close's
-disposition-per-lesson rule — rule/task/harvest/discard, each stamped into
-`LIFECYCLE_LESSON_EVIDENCE_FILE` for `check-lesson-disposition`, with the
-harvest route to the consumer's named sink)
-with `<…>` placeholders where the consumer's rule content goes. Structure is
-copied, not imported, so a consumer's skills stay legible and self-contained.
+The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
+the generic stage spine — the flip+stamp first step (performed by invoking
+`enter-stage.sh <stage>` and stating in one line what it does), each stage's
+trigger/ordering rules, and its stage-local doctrine — with **named slots**
+where the consumer's rule content goes. The templates are the owned surface:
+this section states the contract a consumer skill must satisfy and never
+restates what a template carries.
+
+A consumer skill adopts a template in one of two modes; either way the executed
+skill states in one line what the flip+stamp step does and supplies every
+slot's content:
+
+- **Copy-and-specialize** — the template is copied into the consumer's skills
+  dir and each slot overwritten in place. Self-contained and legible, the
+  default for a consumer whose stages diverge from the kit; structure is
+  copied, not imported, so the skill stands alone (gate-sdk's check-skeleton
+  shape).
+- **Consume-by-reference** — the consumer skill is a thin **binding shim** whose
+  body is a single directive line, `Execute the template at <repo-relative
+  path>, applying the bindings below.`, followed by a `## Bindings` section with
+  exactly one entry per template slot. The template stays the executed surface;
+  the shim carries only consumer content, so generic doctrine has one owner and
+  never drifts across a copy. For a consumer that tracks the kit — this repo
+  dogfoods it (`.claude/commands/*.md`).
+
+**Named slots (template grammar).** Each consumer placeholder is a named slot
+`*<slot-name: guidance>*` — `slot-name` matches `[a-z][a-z0-9-]*`, is unique
+within its template, and precedes the `:` and the guidance a copy-editor or
+shim author replaces. A copy-and-specialize consumer overwrites the whole
+`*<…>*` span; a shim binds the slot by name in a `## Bindings` entry
+`**slot-name** — <consumer content>` (multi-line content indents under its lead
+line), and carries nothing else — doctrine restated from the template in a shim
+is the defect the reference mode removes. `check-skill-binding` holds the
+shim↔template slot parity.
 
 Beside the stage skills sits `release-sweep.md` — a **boundary skill**, not a
 stage: it invokes no `enter-stage.sh` and stamps no state, so

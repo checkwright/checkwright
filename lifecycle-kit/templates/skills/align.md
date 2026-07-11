@@ -1,6 +1,7 @@
 The `align` (spec-alignment) stage of an iteration. Cross-spec audit, then
-*<your aggregate consistency gate — e.g. the full gate battery>* as one gate.
-Exit condition: no unresolved conflicts or terminology drift.
+*<consistency-gate: your aggregate consistency gate — e.g. the full gate
+battery>* as one gate. Exit condition: no unresolved conflicts or terminology
+drift.
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
 align`: it appends `<iteration> align <session-id> <date>` to
@@ -31,8 +32,8 @@ entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
 
 ## Session ritual
 
-*<Your audit fan-out: sweep the spec corpus for missing fields, naming
-inconsistencies, undocumented contracts, contradictions.>* Resolve every
+*<audit-fanout: your audit fan-out: sweep the spec corpus for missing fields,
+naming inconsistencies, undocumented contracts, contradictions.>* Resolve every
 finding in the affected spec or amendment — never ad-hoc, never deferred.
 Commit all spec changes in a single `chore:` commit.
 

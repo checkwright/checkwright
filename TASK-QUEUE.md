@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **skill-template-binding** [spec: SPEC-skill-binding.md] — named slots in
-  the stage-skill templates, a binding-shim grammar for
-  consume-by-reference consumers, `check-skill-binding` parity gate; this
-  repo's five stage skills convert to shims after the doctrine back-port.
 - **delegation-fan-width** [spec: SPEC-fan-width.md] — the ≤2-wide fan-out
   literal becomes `DELEGATION_KIT_FAN_WIDTH` (default 2), surfaced as a
   `width=` field on the usage-verdict line; the three prose sites cite the
@@ -235,10 +231,18 @@
   rename-aware carve-out (a gate-file change that is a pure path/pointer sweep
   with no logic delta is not tampering); or bless one-off `--no-verify` as the
   standing rename procedure. Surfaced 2026-07-11 landing the canon-kit rename.
+  Extended 2026-07-11: not rename-specific — landing *any* new gate trips it,
+  because a new `*/checks/*.sh` gate forces the mandatory `docs/enforcement.md`
+  regen (`check-enforcement-fresh`) into the same commit, and docs/ is non-meta;
+  check-skill-binding landed via the same one-off `--no-verify`. The
+  fold-docs/-into-META_PATHS option covers both the rename and the new-gate
+  case; scope the policy against the generated-artifact class, not renames
+  alone.
 
 ## Done
 
 - spec-kit-rename
+- skill-template-binding
 
 ## Lessons Learned
 
