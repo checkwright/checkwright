@@ -4,4 +4,4 @@
 
 ---
 
-— scope 97d131aa 2026-07-11
+footprint-and-parity scope 97d131aa 2026-07-11

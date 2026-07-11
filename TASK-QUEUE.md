@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: footprint-and-parity  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,28 +12,45 @@
 
 ## New Features
 
+- **runner-doc-off-resident** [spec: SPEC-runner-doc.md] — move the fixture-runner
+  registration signal off the always-loaded surface: `GATE_SDK_RUNNER_DOC` defaults to the
+  README, whose "This repo, governed" section gains the battery block CLAUDE.md sheds; the
+  CONTRIBUTING pointer becomes true; hook + graph artifacts regenerate with the manifest edit.
+- **consumer-footprint-budget** [spec: SPEC-consumer-footprint.md] — context-kit/SPEC.md
+  gains §The consumer footprint: the one-pointer-line budget rule, the per-kit resident-ask
+  roster by citation, and the floor-holder ruling (meter + baseline ship in the consumer
+  install; the hold is advisory by design — attribution makes a level gate noisy).
+- **delegation-rules-parity** [spec: SPEC-rules-parity.md] — the template owns the protocol
+  rules (bold lead-ins as stable names); the SPEC drops the numbered roster, keeps rationale
+  and mechanism contracts citing rules by name; new gate check-rule-citation holds forward
+  name-citation liveness with the standard fixture pair.
+- **doctrine-rule-lockstep** [spec: SPEC-doctrine-digest.md] — extend
+  check-doctrine-registration to per-rule bidirectional digest coverage (methodology rule
+  name ↔ digest bold lead-in) with fail-closed digest-section resolution via
+  `DOCTRINE_KIT_DIGEST_SECTION`; gate-economy weighed in the amendment: owed, because
+  re-vendor upgrades stale the digest by construction.
+- **lifecycle-knob-prefix** [spec: SPEC-knob-prefix.md] — rename the bare `LIFECYCLE_` knob
+  roster to `LIFECYCLE_KIT_`, including the config seam
+  (`LIFECYCLE_KIT_CONFIG_FILE` / `lifecycle-config.sh`); compat ruling: hard rename, no shim
+  — pre-first-tag renames are compat-free, stated as precedent in the merged SPEC.
+
 ## Technical Debt
 
 ## Deferred
 
-- **delegation-rules-parity** [needs-spec] — delegation-kit states the protocol twice: the
-  SPEC's numbered rule list and the template's bullets carry the same rules in different
-  prose, with no owner ruling between them. Design lead from the align discussion: tier by
-  why/what — the template owns the rules (the loaded procedure), the SPEC keeps rationale
-  (failure surfaces, calibration, mechanism contracts) and drops the roster, citing rules
-  by stable name; deleting the restatement beats gating its parity, leaving name-citation
-  liveness as the only mechanical need. Surfaced 2026-07-11 at align.
-- **doctrine-rule-lockstep** [needs-spec] — check-doctrine-registration asserts only that the
-  always-loaded file links the doctrine file; nothing holds the one-line-per-rule digest and
-  the doctrine's rule set in lockstep, so a rule added on either side without its counterpart
-  passes. Extend to per-rule bidirectional coverage (the attested handbook-coverage practice:
-  digest line ↔ owner heading, both directions) — but weigh against rule 2's gate-economy
-  clause at spec time: if the digest's coverage risk stays trivial, the gate is not owed.
-  Surfaced 2026-07-11 at align.
-- **lifecycle-knob-prefix** [needs-spec] — lifecycle-kit's knobs ride a bare `LIFECYCLE_`
-  prefix except `LIFECYCLE_KIT_STAGES_FILE`, against the `<KIT>_KIT_` shape every other kit
-  uses; a rename breaks every consumer config, so the unit's spec must rule the
-  compat/deprecation story, not just sweep the names. Surfaced 2026-07-11 at align.
+- **craft-extraction** [needs-spec] — the reusable share of the private consumer's handbook
+  is generic engineering craft this repo never extracted: agent working-style habits
+  (config-edit hygiene, cross-repo governance reads, resolver-gate fork-not-verdict), git
+  operation hygiene (verify HEAD before amend, re-stage after soft reset, fresh `-F` message
+  files), and the dispatch/rename checklists (importer survey, collision check, dispatch
+  brief, sweep verification). Triage ruling 2026-07-11 at scope: this repo's CLAUDE.md has
+  nothing left to move (already pointer-shaped; the provenance seam and kit conventions are
+  kit-author content), so the unit is a copy-first extraction from the consumer handbook —
+  dispatch/rename checklists toward delegation-kit's template surface, working-style and git
+  hygiene toward doctrine-kit's engineering-craft register; design question to rule at spec:
+  whether the habit roster earns full doctrine-rule shape (statement/rationale/enforcement
+  triple) or a lighter kit surface, and per the seam, attested-failure prose generalizes only
+  with product names stripped (identity/key items stay private).
 
 - **scope-session-routing** [needs-spec] — iteration-ambiguity routing across
   sessions: a build/align session forwards a question to the still-live scope
@@ -157,30 +174,6 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **consumer-footprint-budget** [needs-spec] — state and hold the kits' consumer-resident
-  footprint: what checkwright asks a customer's always-loaded surface to carry (today the
-  delegation pre-authorization sentence and the doctrine link; hooks, skills, and SPECs are
-  load- or event-triggered). Rule the owner and whether the always-loaded meter's baseline
-  ships as the consumer's floor-holder — a customer project pursues its own objectives and
-  the tooling must stay near-invisible in its context budget. Surfaced 2026-07-11 at align.
-- **runner-doc-off-resident** [needs-spec] — the always-loaded CLAUDE.md carries the
-  per-kit fixture-runner roster (12 `run-gate-tests.sh <kit>/gate-tests` lines) as pure
-  resident weight, yet the execution list is fully derivable — `gate_fixture_suites`
-  (gate-sdk/lib/gate.sh) derives it from `*/gate-tests` on disk and CI (`gates.yml`) runs
-  that derivation, its own comment naming CLAUDE.md's copy as "no hand-list to drift from".
-  The roster is pinned resident only because it doubles as check-kit-registration's
-  registration tripwire (assertion B greps each `<kit>/gate-tests` line in
-  `GATE_SDK_RUNNER_DOC`, default CLAUDE.md; check-docs-kit-parity inherits the same check).
-  Move the registration signal off the resident surface: repoint `GATE_SDK_RUNNER_DOC` at a
-  load-triggered doc — README's "This repo, governed" section, which CONTRIBUTING.md already
-  *claims* "lists the fixture runners" though it does not (fix that latent falsehood in the
-  same unit). Design tension to rule at spec: check-kit-registration reads the bare env var
-  and nothing sources it today, so the config-injection path (run-gates.sh + the generated
-  pre-commit hook + CI all honoring the override) must be designed, not assumed; and weigh
-  whether the tripwire needs runnable command lines or only registration markers. Done-state:
-  resident surface sheds the roster; both gates green against README; the CONTRIBUTING/README
-  pointer becomes true. Surfaced 2026-07-11 at close, dogfooding the always-loaded-hard-shrink
-  directive.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
