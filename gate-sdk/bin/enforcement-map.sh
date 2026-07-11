@@ -16,6 +16,9 @@ LIST="$GATES_DIR/gates.list"
 : "${CONTEXT_KIT_SETTINGS_FILE:=.claude/settings.json}"
 : "${EVIDENCE_KIT_CONFIG_FILE:=$GATES_DIR/evidence-config.sh}"
 : "${GATE_SDK_ENFORCE_SCAN_DIR:=.}"
+# spec: canon-kit/SPEC.md §check-md-refs — the reference-link ref knob (owned by canon-kit); the page's owner-section citations pin to the same ref check-md-refs' self-repo pass validates, so a link the emitter writes is a link the blocker resolves
+: "${CANON_KIT_DOCS_BLOB_REF:=master}"
+SELF_REPO_PREFIX="$(gate_self_repo_prefix "$CANON_KIT_DOCS_BLOB_REF")"
 
 emit=0
 [[ "${1:-}" == "--emit" ]] && emit=1
@@ -43,6 +46,23 @@ command_path() {
     printf '%s\n' "$1"
 }
 
+# spec: gate-sdk/SPEC.md §enforcement-map — the kit column links each kit's docs page (`<kit>/index.md`, relative to the emitted page under the docs root); the (consumer) group owns no kit page and stays plain text
+kit_cell() {
+    case "$1" in
+        '(consumer)') printf '%s' "$1" ;;
+        *)            printf '[%s](%s/index.md)' "$1" "$1" ;;
+    esac
+}
+
+# spec: gate-sdk/SPEC.md §enforcement-map — cite a class's owner section through the reference-link grammar (canon-kit/SPEC.md §The reference-link grammar): a self-repo blob link when the identity is known and the SPEC is git-tracked, degrading to the bare `<path> §<title>` when a consumer has not vendored that kit or a clone has no origin
+owner_ref() {  # $1=path $2=anchor $3=section-title
+    if [[ -n "$SELF_REPO_PREFIX" ]] && git ls-files --error-unmatch -- "$1" >/dev/null 2>&1; then
+        printf '[`%s` §%s](%s%s#%s)' "$1" "$3" "$SELF_REPO_PREFIX" "$1" "$2"
+    else
+        printf '`%s` §%s' "$1" "$3"
+    fi
+}
+
 mapfile -t CHECK_DIRS < <(gate_check_dirs)
 mapfile -t KIT_ROOTS < <(gate_kit_roots)
 
@@ -57,7 +77,7 @@ gate_rows() {
         tier="$(sed -n 's/^# graph:.*[[:space:]]tier=\([a-z-]*\).*/\1/p' "$src" | head -1)"
         [[ -n "$tier" ]] || tier="?"
         kit="$(attribute_kit "$src")"
-        row="| $kit | $c | $tier |"
+        row="| $(kit_cell "$kit") | $c | $tier |"
         case "$tier" in
             precommit)   pre+=("$row") ;;
             commit-msg)  msg+=("$row") ;;
@@ -85,7 +105,7 @@ kpi_rows() {
             done
         fi
         [[ -n "$src" ]] || src="$GATES_DIR/$name.sh"
-        rows+=("| $(attribute_kit "$src") | $name |")
+        rows+=("| $(kit_cell "$(attribute_kit "$src")") | $name |")
     done < <(gates_list_members "$DRIFT_KIT_KPIS_FILE")
     [[ ${#rows[@]} -eq 0 ]] && return 0
     printf '## Advisory KPIs\n\n'
@@ -106,9 +126,9 @@ hook_rows() {
         [[ -n "$cmd" ]] || continue
         path="$(command_path "$cmd")"
         if [[ "$kind" == guard ]]; then
-            rows+=("| $(attribute_kit "$path") | $path | $matcher |")
+            rows+=("| $(kit_cell "$(attribute_kit "$path")") | $path | $matcher |")
         else
-            rows+=("| $(attribute_kit "$path") | $path |")
+            rows+=("| $(kit_cell "$(attribute_kit "$path")") | $path |")
         fi
     done < <(jq -r "$jqpath" "$CONTEXT_KIT_SETTINGS_FILE" 2>/dev/null)
     [[ ${#rows[@]} -eq 0 ]] && return 0
@@ -139,7 +159,7 @@ suite_rows() {
     for s in "${suites[@]}"; do
         var="EVIDENCE_KIT_RUN_$s"
         cmd="${!var-}"
-        printf '| %s | %s |\n' "$(attribute_kit "$(command_path "$cmd")")" "$s"
+        printf '| %s | %s |\n' "$(kit_cell "$(attribute_kit "$(command_path "$cmd")")")" "$s"
     done
     printf '\n'
 }
@@ -152,13 +172,37 @@ monitor_rows() {
         [[ -n "$line" ]] || continue
         file="${line%%:*}"; rest="${line#*:}"; rest="${rest#*:}"
         surface="$(printf '%s' "$rest" | sed -E 's/^[[:space:]]*#[[:space:]]*enforce:[[:space:]]+class=monitor[[:space:]]+//; s/[[:space:]]+$//')"
-        rows+=("| $(attribute_kit "$file") | $surface |")
+        rows+=("| $(kit_cell "$(attribute_kit "$file")") | $surface |")
     done < <(grep -rHnI "${GATE_GREP_EXCLUDES[@]}" -E '^[[:space:]]*#[[:space:]]*enforce:[[:space:]]+class=monitor[[:space:]]' "$GATE_SDK_ENFORCE_SCAN_DIR" 2>/dev/null | grep -v '/templates/' | sort)
     [[ ${#rows[@]} -eq 0 ]] && return 0
     printf '## Monitors\n\n'
     printf '| kit | surface |\n| --- | --- |\n'
     printf '%s\n' "${rows[@]}"
     printf '\n'
+}
+
+# spec: gate-sdk/SPEC.md §enforcement-map — the enforcement-class taxonomy, ordered hardest to softest; this page owns the prose and each class cites its mechanism owner through the reference-link grammar
+class_roster() {
+    local gate kpi guard warn suite monitor
+    gate="$(owner_ref gate-sdk/SPEC.md enforcement-tiers 'Enforcement tiers')"
+    kpi="$(owner_ref drift-kit/SPEC.md the-kpi-plugin-contract 'The KPI plugin contract')"
+    guard="$(owner_ref guard-kit/SPEC.md the-guard-framework-libguardsh 'The guard framework')"
+    warn="$(owner_ref context-kit/SPEC.md the-session-context-hook-template 'The session-context hook')"
+    suite="$(owner_ref evidence-kit/SPEC.md baseline-manifest 'Baseline manifest')"
+    monitor="$(owner_ref site-kit/SPEC.md the-monitor-boundary 'The monitor boundary')"
+    cat <<CLASSES
+- A **blocking gate** fails the commit (or, at the \`align-only\` tier, the
+  consistency audit) — the pre-commit hook is its local reach, the CI workflow
+  its server-side backstop. Owner: $gate.
+- An **advisory KPI** never blocks; it reports a drift trend into the
+  session-context line. Owner: $kpi.
+- A **guard** intercepts a tool call before it runs. Owner: $guard.
+- A **session warning** surfaces context when a session opens. Owner: $warn.
+- A **validate suite** holds a test baseline that a per-run evidence manifest
+  attests. Owner: $suite.
+- A **monitor** watches deployment truth rather than tree truth, so it reds a
+  scheduled run, never a merge. Owner: $monitor.
+CLASSES
 }
 
 emit_page() {
@@ -169,14 +213,11 @@ _Generated by `bash gate-sdk/bin/enforcement-map.sh --emit`; do not hand-edit �
 `check-enforcement-fresh` byte-compares this page against the emitter._
 
 Every governed surface in this repo is held by one enforcement class, ordered
-here from hardest to softest. A **blocking gate** fails the commit (or, at the
-`align-only` tier, the consistency audit) — the pre-commit hook is its local
-reach, the CI workflow its server-side backstop. An **advisory KPI** never
-blocks; it reports a drift trend into the session-context line. A **guard**
-intercepts a tool call before it runs. A **session warning** surfaces context
-when a session opens. A **validate suite** holds a test baseline that a per-run
-evidence manifest attests. A **monitor** watches deployment truth rather than
-tree truth, so it reds a scheduled run, never a merge.
+here from hardest to softest:
+
+PREAMBLE
+    class_roster
+    cat <<'PREAMBLE'
 
 The rows below derive from the class registries — the gate registry, the KPI
 registry, the harness settings hooks, the evidence-suite config, and the

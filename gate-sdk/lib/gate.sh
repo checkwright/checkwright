@@ -190,3 +190,17 @@ gate_msg_pattern_files() {
 gate_commit_types() {
     printf '%s\n' "${GATE_SDK_COMMIT_TYPES:-feat fix refactor perf docs test build ci chore style}"
 }
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the self-repo blob-link prefix `<identity>/blob/<ref>/`, shared by check-md-refs' resolver and the reference-link producers (the enforcement map) so an emitted link and the pass that validates it derive one identity. Identity comes from `git remote get-url origin`; the git@ and https remote forms normalize to one https identity, so no kit ships a repo name (the provenance seam holds). Empty output ⇒ no origin or an unrecognized remote form, and the caller skips the self-repo pass. The ref is the caller's policy arg, never a literal here.
+gate_self_repo_prefix() {
+    local ref="$1" origin id rest
+    origin="$(git remote get-url origin 2>/dev/null)" || return 0
+    [[ -n "$origin" ]] || return 0
+    id="${origin%.git}"; id="${id%/}"
+    case "$id" in
+        git@*:*)  rest="${id#git@}"; id="https://${rest/:/\/}" ;;
+        https://*|http://*) ;;
+        *) return 0 ;;
+    esac
+    printf '%s/blob/%s/\n' "$id" "$ref"
+}

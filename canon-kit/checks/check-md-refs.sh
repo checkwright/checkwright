@@ -34,18 +34,8 @@ else
     done < <(spec_manifest_files ".")
 fi
 
-# spec: canon-kit/SPEC.md §check-md-refs — the self-repo blob-link prefix, derived from origin (git@ and https forms normalize to one identity); empty ⇒ no origin, the self-repo pass is skipped
-self_repo_prefix=""
-_origin="$(git remote get-url origin 2>/dev/null)" || _origin=""
-if [[ -n "$_origin" ]]; then
-    _id="${_origin%.git}"; _id="${_id%/}"
-    case "$_id" in
-        git@*:*)  _rest="${_id#git@}"; _id="https://${_rest/:/\/}" ;;
-        https://*|http://*) ;;
-        *) _id="" ;;
-    esac
-    [[ -n "$_id" ]] && self_repo_prefix="$_id/blob/$CANON_KIT_DOCS_BLOB_REF/"
-fi
+# spec: canon-kit/SPEC.md §check-md-refs — the self-repo blob-link prefix, derived from origin through the shared gate.sh adapter (git@ and https forms normalize to one identity); CANON_KIT_DOCS_BLOB_REF is the ref policy, empty ⇒ no origin, the self-repo pass is skipped
+self_repo_prefix="$(gate_self_repo_prefix "$CANON_KIT_DOCS_BLOB_REF")"
 
 slugify() {
     local s="${1,,}"

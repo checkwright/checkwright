@@ -14,11 +14,6 @@
 
 ## Technical Debt
 
-- **enforcement-map-links** — emitter edit on the
-  generated enforcement map: the class-roster intro becomes a bulleted list, the kit column
-  links each kit's docs page, and class definitions cite their owner section through the
-  reference-link grammar the blocker lands; regenerate the page in the same unit.
-
 ## Deferred
 
 - **craft-extraction** [needs-spec] — the reusable share of the private consumer's handbook
@@ -168,6 +163,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- enforcement-map-links
 - docs-reference-routing
 - check-graph-site-move
 - lifecycle-knob-prefix

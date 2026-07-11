@@ -911,7 +911,9 @@ same governed doc set (one shared set, no second knob).
 the network is not a gate dependency — with one exception: a link into this
 same repository's GitHub tree, which resolves against the working tree exactly
 as a relative link does. The repo identity is derived at gate runtime from
-`git remote get-url origin`; the `git@host:owner/repo` and
+`git remote get-url origin` through the shared `gate_self_repo_prefix` adapter
+(gate-sdk/SPEC.md §lib/gate.sh), so the resolver here and any reference-link
+*producer* draw one identity; the `git@host:owner/repo` and
 `https://host/owner/repo[.git]` remote forms normalize to one
 `https://host/owner/repo` identity, so the kit ships no repo name (the
 provenance seam holds) and CI's checkout and a local clone alike supply it. A

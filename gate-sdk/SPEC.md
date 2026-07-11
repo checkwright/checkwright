@@ -372,7 +372,14 @@ by `gen-pre-commit` and the `run-gates --for` selector), and `gate_staged_matche
 `--for` selector calls §run-gates). The commit-surface value adapters `gate_msg_pattern_files` and
 `gate_commit_types` also live here — the single home of the banned-pattern set
 and the commit-type roster — each documented at its gate (§check-commit-msg,
-§check-commit-subject). `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
+§check-commit-subject). `gate_self_repo_prefix` is the identity adapter: given a
+ref, it emits the `<identity>/blob/<ref>/` self-repo blob-link prefix, deriving
+the identity from `git remote get-url origin` and normalizing the `git@` and
+`https` remote forms to one https identity (empty when no origin or an
+unrecognized form, so a caller skips the self-repo pass). It ships no repo name
+(the provenance seam holds) and is the single derivation `check-md-refs`' resolver
+(canon-kit/SPEC.md §check-md-refs) and the reference-link producers share, so an
+emitted link and the pass that validates it cannot derive divergent identities. `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
 the couples globs share — resolving absolute roots against the kits' parent and
 passing a relative `GATE_SDK_KIT_DIRS` override through unchanged.
 `gate_fixture_suites` derives the golden-fixture suite set the same way: every
@@ -688,6 +695,18 @@ page — not this SPEC — owns the enforcement-class **taxonomy** prose (what e
 class means and how hard it binds); the emitter's preamble heredoc is its single
 source, and this section documents the emitter contract and cites the page for
 the taxonomy.
+
+The page is a docs-site artifact, so it carries the site's link topology. The
+**taxonomy is a bulleted roster**, each class citing its *mechanism owner* — the
+kit SPEC section that defines the class — through the reference-link grammar
+(canon-kit/SPEC.md §The reference-link grammar): a self-repo blob link built from
+`gate_self_repo_prefix` on the `CANON_KIT_DOCS_BLOB_REF` ref (§lib/gate.sh), so
+the citation pins to the same ref `check-md-refs`' self-repo pass validates. The
+citation degrades to the bare `<path> §<section>` text when the identity is
+unknown (no origin) or the owning kit is unvendored (its SPEC untracked), so a
+gates-only consumer keeps a resolvable page. The **kit column links each kit's
+docs page** (`<kit>/index.md`, relative to the page under the docs root); the
+`(consumer)` group owns no kit page and stays plain text.
 
 ### check-enforcement-fresh
 
