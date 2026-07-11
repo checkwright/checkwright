@@ -322,9 +322,13 @@ fact belongs to stays semantic judgment — a paraphrase below N words passes th
 gate and is still a defect to fix on sight (the same doctrine as
 check-comment-tier's floor). The `# graph:` couples the skills dir, `CLAUDE.md`,
 and the kit template dirs at `tier=precommit`, so editing a shim or a corpus
-surface fires the gate. A red run names the shim, the corpus surface, and the
-shared n-gram, so the fix (delete the restatement, keep a citation) is
-mechanical. The good/bad pair drives the plain restatement/clean split;
+surface fires the gate. Because the corpus find recurses but the `kit:templates/*.md`
+couple does not, the one kit template *sub*directory that holds bound
+templates — `lifecycle-kit/templates/skills/*.md` (the stage-skill templates each
+stage shim binds) — is coupled explicitly beside it; a shim's own template is its
+likeliest collision surface, so it must re-trigger the gate. A red run names the
+shim, the corpus surface, and the shared n-gram, so the fix (delete the
+restatement, keep a citation) is mechanical. The good/bad pair drives the plain restatement/clean split;
 `gate-tests/check-shim-restatement.test.sh` covers the no-directive skip, the
 short-corpus fail-closed, and the below-N paraphrase the one pair cannot.
 

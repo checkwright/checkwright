@@ -121,7 +121,7 @@ if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/skills/*.md' 
     lifecycle-kit/checks/check-skill-binding.sh || hook_fail check-skill-binding
 fi
 
-if staged_matches '.claude/commands/*.md' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md'; then
+if staged_matches '.claude/commands/*.md' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/skills/*.md'; then
     lifecycle-kit/checks/check-shim-restatement.sh || hook_fail check-shim-restatement
 fi
 

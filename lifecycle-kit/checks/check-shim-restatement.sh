@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=.claude/commands/*.md,CLAUDE.md,kit:templates/*.md dir=one valve=none tier=precommit
+# graph: couples=.claude/commands/*.md,CLAUDE.md,kit:templates/*.md,lifecycle-kit/templates/skills/*.md dir=one valve=none tier=precommit
 # spec: lifecycle-kit/SPEC.md §check-shim-restatement — no binding shim shares an >=N-word normalized n-gram with the dedup corpus (CLAUDE.md + every kit's templates)
 #
 # usage: check-shim-restatement.sh [skills-dir] [corpus-file...]
