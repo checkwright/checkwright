@@ -9,7 +9,7 @@ its skill, fail the commit.
 
 Why: a stateless agent session doesn't reliably re-read process prose. So the
 process state lives in two files a gate can read, every stage skill stamps its
-invocation as its first step (the stamp+flip mechanized by
+invocation as its first step (the flip+stamp mechanized by
 `bin/enter-stage.sh <stage>`, so the misformat-prone hand ritual is one
 command), and the *arriving* stage flips the header
 atomically with its stamp — `check-stage-evidence` verifies the current

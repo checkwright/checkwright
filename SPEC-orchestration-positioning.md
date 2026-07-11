@@ -31,9 +31,12 @@ SPEC-ddd-positioning.md.
   prerequisite for unattended orchestration at scale, and nothing on the
   page outruns what is built.
 - Relation to the harvested essay: the page and the essay share the
-  **argument, not the text** (the orchestration-trust-framing lesson's
-  ruling) — the page is written fresh against the mechanisms, never
-  pasted from the essay sink.
+  **argument, not the text** — the ruling carried by the
+  orchestration-trust-framing entry in `.workflow/essay-harvest.md` (the
+  gitignored essay sink the close binding's `[essay]` disposition feeds;
+  local-only operator material, so the build session reads it on the
+  operator's clone) — the page is written fresh against the mechanisms,
+  never pasted from the essay sink.
 - `docs/index.md` — adds the orchestration row to the `## Positioning`
   section SPEC-ddd-positioning.md creates; if this page lands first, it
   creates the section instead (the section is the pair's shared home —

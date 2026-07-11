@@ -62,7 +62,8 @@ procedure.
   two attested shapes (a gate edit co-staged with product code; a new path/glob
   exemption co-staged with the file it excuses) — but it does **not** catch
   semantic weakening inside a legitimate scripts-only commit, so the by-eye diff
-  review remains your duty (delegation-kit/SPEC.md §check-gate-tamper honest limit).
+  review remains your duty (delegation-kit/SPEC.md §Validate after every agent
+  commit — the honest limit).
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
   `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —
   it folds in the reading-age and window-validity checks so a dead-window pct
@@ -76,6 +77,17 @@ procedure.
   window-expensive than its
   subagent-token total suggests, so size waves to leave the next one headroom, or
   accept one wave per window.
+- **Match the dispatched model and effort to the unit's shape.** Delegation
+  levers tokens only when selection follows the work: a read-heavy or mechanical
+  unit (audit, survey, rename/merge sweep) rides a cheaper model class via the
+  dispatch's model parameter or a dedicated agent type; a unit carrying design
+  judgment stays on the supervisor's class. Selection sits with the dispatching
+  session — its context holds what selection needs — and a standing choice lands
+  in a tracked agent-type definition, never per-dispatch habit.
+- **Never revert substantial completed work on your own design judgment** —
+  especially an expensive delegated sweep. Surface the tension and wait for the
+  explicit go-ahead before discarding it: a self-judged revert forfeits the
+  sweep's whole spend and pays it again on the re-run.
 
 ## Shared-file roster
 

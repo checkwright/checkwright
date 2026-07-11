@@ -1,13 +1,13 @@
 The `build` (implementation) stage of an iteration. Implement the queued work
 in queue order. Exit condition: task queue empty for this iteration.
 
-**Step 0 — audit-readiness recheck (before stamping/flipping).** The
+**Step 0 — audit-readiness recheck (before the flip+stamp).** The
 queue-only flip re-fires the queue/state-coupled gates but **not** your
 spec-consistency battery (it couples the spec corpus, not the queue), so a
 build session can flip in on an unverified align corpus. Close that hop:
 **iff** an `align` stamp for the current iteration exists in
 `.workflow/WORKFLOW-STATE.txt`, run *<consistency-gate: your aggregate
-consistency gate>* and refuse to stamp/flip if it is red — fix the drift first (or return to
+consistency gate>* and refuse to flip+stamp if it is red — fix the drift first (or return to
 `align`). Absent an align stamp, align did not run this iteration; build's
 prior stage is scope, whose exit the flip already re-fires — **except** when
 `check-stage-entry` assertion C fires: a cross-component amendment signal with

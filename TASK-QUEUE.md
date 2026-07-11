@@ -35,7 +35,18 @@
 
 ## Technical Debt
 
+- **evidence-config-template** — evidence-kit is the one config-bearing kit shipping no
+  `templates/` config file to copy: its SPEC names `evidence-config.sh` in the gates dir but a
+  vendoring consumer authors it from scratch (this repo's `scripts/evidence-config.sh` is the
+  working shape). Ship the template and the copy-install sentence per the kit config
+  convention. Surfaced 2026-07-11 at align.
+
 ## Deferred
+
+- **lifecycle-knob-prefix** [needs-spec] — lifecycle-kit's knobs ride a bare `LIFECYCLE_`
+  prefix except `LIFECYCLE_KIT_STAGES_FILE`, against the `<KIT>_KIT_` shape every other kit
+  uses; a rename breaks every consumer config, so the unit's spec must rule the
+  compat/deprecation story, not just sweep the names. Surfaced 2026-07-11 at align.
 
 - **scope-session-routing** [needs-spec] — iteration-ambiguity routing across
   sessions: a build/align session forwards a question to the still-live scope
