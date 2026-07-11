@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: craft-and-routing  [stage: scope]
+## Iteration: craft-and-routing  [stage: align]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
