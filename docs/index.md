@@ -41,6 +41,9 @@ Read in this order: each kit assumes the machinery of the ones above it.
   committed per-run evidence manifest.
 - [site-kit](site-kit/index.md) — deployment-truth governance for a repo-served
   docs site: a CNAME-host parity gate and a live-site monitor template.
+- [doctrine-kit](doctrine-kit/index.md) — the experience-packaging rung: the
+  cross-kit delivery doctrine, referenced by link into a consumer's
+  always-loaded agent file.
 
 The walkthrough and evidence pages join this map when their kits land.
 

@@ -34,6 +34,7 @@ bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/che
 bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks             # site-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
 bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
 bash guard-kit/bin/run-guard-tests.sh                                                # guard-kit decision table
 ```
@@ -74,20 +75,20 @@ behind a `spec:` or `comment-tier-exempt:` tag rather than deleting it) is
 itself the defect; the doctrine and the one-line-binding rule for `spec:` live
 in [canon-kit/SPEC.md](canon-kit/SPEC.md) §check-comment-tier.
 
-## Single source of truth
+<!-- doctrine-kit:begin -->
+## Delivery doctrine
 
-- **Content-tiering:** every governed prose surface owns exactly one content
-  tier and *points to* — never restates — a fact another surface owns; a
-  parallel copy is the defect, and the fix is one shape: replace the slab
-  with a pointer to the owner, then a gate forbids it growing back.
-  Quantitative literals (knob defaults, shared constants, derivable rosters)
-  are owned by code or the owning SPEC — prose cites the name, never the
-  value.
-- **Enforcement-first:** on any fix or redundancy finding, name the defect
-  class *and* its enforcing mechanism and land both in the same unit — never
-  offer the gate as a follow-up; a green instance fix is the stop signal to
-  ask what check should have caught it. When the gate cannot land in this
-  unit, the instance fix rides the gate's unit rather than landing bare.
+The cross-kit delivery rules live in [doctrine-kit/DOCTRINE.md](doctrine-kit/DOCTRINE.md) — one tier
+per rule, re-vendor to upgrade:
+
+- **Content-tiering / SSOT** — one content tier per surface; point, never restate.
+- **Enforcement-first** — the fix and the gate that catches it land in one unit.
+- **De-literalization** — prose cites names; code or the owning SPEC owns values.
+- **Always-loaded shape** — one line per rule here; the mechanism behind the pointer.
+- **Load-trigger residency** — resident only when no stage, skill, or tool loads it.
+- **Widest-true-tier placement** — the widest tier true for every reader of it.
+- **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
+<!-- doctrine-kit:end -->
 
 ## Conventions established in gate-sdk (keep every kit consistent)
 

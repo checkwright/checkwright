@@ -13,6 +13,7 @@ check-graph
 check-kit-enum
 check-kit-registration
 check-docs-kit-parity
+check-doctrine-registration
 check-kit-ref-liveness
 check-trajectory-fresh
 check-enforcement-fresh

@@ -32,6 +32,7 @@ leaves its section absent.
 | gate-sdk | check-kit-enum | precommit |
 | gate-sdk | check-kit-registration | precommit |
 | (consumer) | check-docs-kit-parity | precommit |
+| doctrine-kit | check-doctrine-registration | precommit |
 | (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
 | gate-sdk | check-enforcement-fresh | precommit |
@@ -114,6 +115,7 @@ leaves its section absent.
 | gate-sdk | canon_kit |
 | gate-sdk | context_kit |
 | gate-sdk | delegation_kit |
+| gate-sdk | doctrine_kit |
 | gate-sdk | evidence_kit |
 | gate-sdk | lifecycle_kit |
 | gate-sdk | queue_kit |
