@@ -11,11 +11,18 @@
 - One matcher, stated as an invariant: the flag's match semantics are
   *defined* as identical to the generated hook's staged-path matching — both
   read the same `# graph:` manifest fields through the same shared reader
-  (gate-sdk/SPEC.md §check-graph names that single-reader rule), and the
-  glob-match step lives once in `lib/gate.sh` where both the selector and
-  the hook generator consume it. A divergence between what the hook would
-  run for a staged path and what `--for` runs for the same path is a bug
-  against this section.
+  (gate-sdk/SPEC.md §check-graph names that single-reader rule). The
+  glob-match step hoists into `lib/gate.sh` as part of this unit —
+  `gen-pre-commit.sh` carries it only inside the hook body it emits
+  (`staged_matches`), with no lib counterpart — and the generator emits
+  the lib function's body, so the self-contained hook and the selector
+  share one source, held in sync by check-graph's freshness assertion.
+  Two hook behaviors the selector reproduces beyond that matcher: a
+  `trigger='*'` gate is selected for every path, and a `mode=staged`
+  gate — whose hook branch matches by git pathspec, a second mechanism —
+  is selected exactly when that branch would run it. A divergence
+  between what the hook would run for a staged path and what `--for`
+  runs for the same path is a bug against this section.
 - No-match behavior: print an explicit "no registered gate couples to
   \<path\>" note and exit 0 — an ungoverned path is a fact, not a failure;
   the selector is a bin tool, never a registered gate. Its own plumbing

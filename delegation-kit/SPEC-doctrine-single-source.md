@@ -9,7 +9,12 @@
   `*<shared-file-roster: ...>*` and `*<validate-battery: ...>*`, and its
   header's copy-instruction becomes a bind-instruction — the consumer
   creates `.claude/commands/agent-execution.md` as a shim naming this
-  template and binding exactly those two slots. No gate change needed.
+  template and binding exactly those two slots. The gate's verdict logic
+  accepts a template owned by any kit unchanged, but its `# graph:`
+  couples name only the lifecycle skills-template dir — the couples
+  widen to cover this template's path so an edit to it re-triggers the
+  gate at commit (regenerated hook + graph artifact ride the landing
+  commit).
 - `templates/claude-md-agent-execution.md` **retires** (deleted). The
   consumer's CLAUDE.md block shrinks to the residency-earning minimum:
   the consumer's pre-authorization sentence (consumer judgment on what
@@ -29,6 +34,10 @@
   members; battery slot: the full battery plus the touched kit's fixture
   runner); CLAUDE.md §Agent execution shrinks to the pre-authorization
   sentence plus the pointer, deleting every bullet the template owns.
+  `scripts/agent-budget-guard.sh` re-copies from the guard template when
+  its block message gains the pointer — no gate couples the pair, so the
+  re-copy is named here (it also squares the copy's `# spec:` line,
+  which differs from the template's).
 
 ## Producers and consumers
 

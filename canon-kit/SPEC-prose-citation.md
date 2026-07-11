@@ -28,9 +28,9 @@
 ## Producers and consumers
 
 - Producer: `check-spec-pointer`, already registered and hook-coupled;
-  its `# graph:` manifest widens to the manifest file set if the current
-  couples do not already cover it (verified at build; regenerated hook +
-  graph artifact ride the landing commit).
+  its `# graph:` manifest widens to the manifest file set — the couples
+  name shell and workflow-state surfaces only, no markdown (regenerated
+  hook + graph artifact ride the landing commit).
 - Consumer: the committing session — a red run names file:line, the cited
   path, and the missing heading, same shape as the directive pass.
 
