@@ -50,6 +50,21 @@
 
 ## Deferred
 
+- **template-doc-governance** [needs-spec] — kit template markdown escapes the
+  manifest doc gates (link resolution, anti-restatement, command/knob citation):
+  their file set is `CANON_KIT_MANIFEST_FILES`, which carries no `templates/`
+  glob, so `check-kit-ref-liveness`, `check-tree-terms`, and the purpose-built
+  `check-skill-binding`/`check-rule-citation` are a template's only coverage.
+  Intentional for slot-bearing binding templates — unfilled `*<…>*` slots and
+  CONSUMER BINDING headers would false-positive the finished-prose gates — but a
+  slot-free reach-through like `delegation-kit/templates/dispatch-checklists.md`
+  escapes link/restatement governance it would pass cleanly; its sibling links
+  and SPEC citations hold only by authoring care. Design question to rule at
+  scope: a finder discriminator (govern a template iff it has no `*<…>*` slot /
+  CONSUMER BINDING header) vs a stated manual duty (the enforcement-first
+  false-positive carve-out). The exclusion is implicit — `scripts/canon-config.sh`
+  never rules it. Surfaced 2026-07-12 at build, craft-extraction's slot-free
+  template.
 - **footprint-page** [needs-spec] — publish the kits' measured context footprint as a
   generated docs page: the always-loaded surfaces and each load-triggered skill/template,
   line/word counts exact and token counts as a labeled estimate (tokenizers are
