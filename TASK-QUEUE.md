@@ -243,6 +243,18 @@
   CLAUDE.md section that pushed context-kit's smoke violation out of
   check-brevity's scanned section; the spine stayed green and only the explicit
   smoke step caught it.
+- **kfric-capture-tool** [needs-spec] — a dedicated knowledge-friction append
+  helper (`drift-kit/bin/kfric.sh "<fact>" "<surface>"`) so the documented
+  any-session capture stops prompting. Root cause: the capture is a shell
+  redirect append (`printf … >> .workflow/knowledge-friction.log`), and no
+  allowlist glob suppresses it safely — a mid-wildcard `printf * >> log` opens a
+  command-injection hole the bash-guard exists to catch, and echo/printf with a
+  redirect trips the guard's decoration rule regardless. The helper takes the
+  fact as an argument (no redirect), so `bash drift-kit/bin/kfric.sh *` is a
+  safe end-wildcard prefix-glob allowlist entry; it also stamps the `<date>
+  <fact> ← <surface>` grammar so the format stops being hand-typed. Owner:
+  drift-kit (the knowledge-friction loop). Surfaced 2026-07-11 at doctrine-kit
+  close — the printf append prompted 3× this iteration.
 ## Done
 
 - read-command-guard-steer
