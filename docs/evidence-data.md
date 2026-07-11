@@ -17,3 +17,4 @@
 | close-loop-hardening | s a b v c | 10f/0d | 7 · ≤0d | 13s clean | 46 |
 | enforcement-sweep | s a b v c | 10f/1d | 8 · ≤1d | 13s clean | 52 |
 | convention-hardening | s a b v c | 3f/0d | 3 · ≤0d | 13s clean | 54 |
+| doctrine-kit | s a b v c | 4f/2d | 2 · ≤0d | 16s clean | 55 |
