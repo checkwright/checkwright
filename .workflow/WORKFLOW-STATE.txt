@@ -10,3 +10,4 @@ convention-hardening build e9eade68 2026-07-11
 convention-hardening build cae7e499 2026-07-11
 convention-hardening build 286e1c57 2026-07-11
 convention-hardening validate 5bfb211b 2026-07-11
+convention-hardening close 314e605b 2026-07-11
