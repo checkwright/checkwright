@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,kit:*.sh,.workflow/*.txt dir=one valve=none tier=precommit
-# spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: pointer directive on a governed surface resolves: its target file is tracked and a §heading fragment names a heading the file carries
+# graph: couples=*SPEC*.md,*README.md,CLAUDE.md,scripts/*.sh,kit:*.sh,.workflow/*.txt dir=one valve=none tier=precommit
+# spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: directive on a governed source and every free-prose <path>.md §<heading> citation on a governed manifest resolves: the target file is tracked and a §heading fragment names a heading the file carries
 #
 # usage: check-spec-pointer.sh [scan-root]   (default '.')
 set -uo pipefail
@@ -34,24 +34,70 @@ read -r -d '' EXTRACT <<'AWK' || true
 }
 AWK
 
-heading_present() {  # $1=target file  $2=heading fragment -> 0 when a heading matches
-    local file="$1" frag="$2" res st
-    # spec: canon-kit/SPEC.md §check-spec-pointer — heading match tolerates a
-    # trailing "(qualifier)" on either side: match the fragment and each heading
-    # both verbatim and with a trailing "(...)" stripped.
-    res="$(awk -v a="$frag" '
+heading_present() {  # $1=target file  $2=heading fragment  [$3=exact(default)|prefix] -> 0 when a heading matches
+    local file="$1" frag="$2" mode="${3:-exact}" res st
+    # spec: canon-kit/SPEC.md §check-spec-pointer — one resolver, two callers:
+    # the directive pass matches the fragment whole (exact), the prose pass as
+    # a boundary-anchored prefix (prefix); both tolerate a trailing "(qualifier)".
+    res="$(awk -v a="$frag" -v mode="$mode" '
         function strippar(s) { sub(/[[:space:]]*\([^)]*\)[[:space:]]*$/, "", s); return s }
+        function isprefix(text, h,   L, nc) {
+            L = length(h)
+            if (substr(text, 1, L) != h) return 0
+            if (length(text) == L) return 1
+            nc = substr(text, L + 1, 1)
+            return (nc !~ /[[:alnum:]]/)
+        }
         BEGIN { as = strippar(a) }
         /^#{1,6}[[:space:]]/ {
             h = $0; sub(/^#{1,6}[[:space:]]+/, "", h); sub(/[[:space:]]+$/, "", h)
             hs = strippar(h)
-            if (h == a || hs == a || h == as || hs == as) { found = 1 }
+            if (mode == "prefix") {
+                if (isprefix(a, h) || isprefix(a, hs)) found = 1
+            } else if (h == a || hs == a || h == as || hs == as) {
+                found = 1
+            }
         }
         END { print found + 0 }
     ' "$file")"; st=$?
     fail_closed "$st" SPEC-POINTER "awk heading match"
     [[ "$res" == "1" ]]
 }
+
+# spec: canon-kit/SPEC.md §check-spec-pointer — shape-only extraction of prose
+# <path>.md § citations over the blank-line paragraph join; fenced code skipped,
+# resolution and the tracked-file carve-out happen in the shell below.
+read -r -d '' PROSE_EXTRACT <<'AWK' || true
+function flush(   i, joined, mstart, mend, seg, path, post, li, s) {
+    if (np == 0) return
+    joined = ""
+    for (i = 1; i <= np; i++) { lstart[i] = length(joined) + 1; joined = joined (i > 1 ? " " : "") ptext[i] }
+    scanpos = 1
+    while (1) {
+        s = substr(joined, scanpos)
+        if (match(s, /[A-Za-z0-9._\/-]+\.md[[:space:]]*§/) == 0) break
+        mstart = scanpos + RSTART - 1
+        mend = mstart + RLENGTH - 1
+        seg = substr(joined, mstart, RLENGTH)
+        path = seg; sub(/[[:space:]]*§$/, "", path)
+        post = substr(joined, mend + 1)
+        li = 1
+        for (i = 1; i <= np; i++) if (lstart[i] <= mstart) li = i
+        printf "%s\t%d\t%s\t%s\n", cf, pfnr[li], path, post
+        scanpos = mend + 1
+    }
+    np = 0
+}
+FNR == 1 { flush(); fence = 0 }
+{
+    cf = FILENAME
+    if ($0 ~ /^[[:space:]]*```/) { flush(); fence = !fence; next }
+    if (fence) { flush(); next }
+    if ($0 ~ /^[[:space:]]*$/) { flush(); next }
+    np++; pfnr[np] = FNR; ptext[np] = $0
+}
+END { flush() }
+AWK
 
 errors=()
 scanned=0
@@ -97,11 +143,34 @@ while IFS= read -r f; do
     done <<< "$out"
 done < <(spec_comment_surface "$ROOT")
 
+# spec: canon-kit/SPEC.md §check-spec-pointer — the prose-citation pass:
+# heading_present in prefix mode over the manifest set; an untracked cited path
+# is out of scope (path liveness stays with check-md-refs / check-kit-ref-liveness).
+mapfile -t manifest_files < <(spec_manifest_files "$ROOT")
+prose_cites=0
+manifests=0
+if [[ ${#manifest_files[@]} -gt 0 ]]; then
+    manifests=${#manifest_files[@]}
+    prose_out="$(awk "$PROSE_EXTRACT" "${manifest_files[@]}")"; st=$?
+    fail_closed "$st" SPEC-POINTER "awk prose extract"
+    while IFS=$'\t' read -r pfile plineno ppath pfrag; do
+        [[ -n "$ppath" ]] || continue
+        [[ -f "$ROOT/$ppath" ]] || continue
+        git -C "$ROOT" ls-files --error-unmatch -- "$ppath" >/dev/null 2>&1 || continue
+        prose_cites=$((prose_cites + 1))
+        [[ -n "$pfrag" ]] || continue
+        if ! heading_present "$ROOT/$ppath" "$pfrag" prefix; then
+            prel="${pfile#"$ROOT"/}"; prel="${prel#./}"
+            errors+=("$prel:$plineno: §heading not found in $ppath: §${pfrag:0:50}")
+        fi
+    done <<< "$prose_out"
+fi
+
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "SPEC-POINTER: ${#errors[@]} dangling pointer(s):"
     printf '  %s\n' "${errors[@]}"
-    echo "  help: a spec:/contract: pointer binds this site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer. A renamed heading updates every inbound pointer in the same commit."
+    echo "  help: a spec:/contract: directive and a free-prose <path>.md §<heading> citation each bind a site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer. A renamed heading updates every inbound pointer and citation in the same commit."
     exit 1
 fi
-echo "SPEC-POINTER: clean ($pointers pointer(s) across $scanned governed source(s); every target file tracked and named §heading present)"
+echo "SPEC-POINTER: clean ($pointers directive pointer(s) across $scanned governed source(s); $prose_cites prose citation(s) across $manifests manifest file(s); every target file tracked and named §heading present)"
 exit 0

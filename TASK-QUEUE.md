@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **prose-citation-pointer-gate** [spec: canon-kit/SPEC-prose-citation.md] —
-  check-spec-pointer gains a prose-citation pass: a free-prose
-  `<path>.md §<Heading>` on a governed surface must resolve its heading via
-  the existing `heading_present` helper; carve-outs keep the directive
-  pass's false-positive level.
 - **knob-literal-citation-gate** [spec: canon-kit/SPEC-knob-citation.md] —
   `check-knob-citation`: no governed prose surface outside a kit's own SPEC
   states a kit knob's value; derived prefix vocabulary (no term list), the
@@ -228,6 +223,7 @@
   2026-07-09.
 ## Done
 
+- prose-citation-pointer-gate
 - gate-run-for-path
 - stage-shim-dedup
 - delegation-doctrine-single-source

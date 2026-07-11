@@ -661,25 +661,47 @@ sources ride `CANON_KIT_COMMENT_WHITELIST` (its array tagged
 
 ### check-spec-pointer
 
-Invariant: every `spec:` / `contract:` pointer directive on a governed source
-resolves — forward direction only. The directive set is exactly what
-`check-comment-tier` blesses by shape: full-line `spec:` / `contract:` comments
-on the governed sources, plus the `.workflow/*.txt` `# contract:` headers. A
-directive's target grammar is `<path> [§<heading>]`: `<path>` (repo-relative)
-must be a tracked file, and when a `§<heading>` fragment is present the file
-must carry a matching markdown heading; a pointer without `§` resolves
-file-only. Reddens on a missing or untracked target file, on a named heading
-the target lacks, and — fail-closed — on a directive that matched the pointer
-shape but carries no target path.
+Invariant, two passes, forward direction only: every `spec:` / `contract:`
+pointer **directive** on a governed source resolves, and every free-prose
+`<path>.md §<heading>` **citation** on a governed manifest resolves. The
+directive set is exactly what `check-comment-tier` blesses by shape: full-line
+`spec:` / `contract:` comments on the governed sources, plus the
+`.workflow/*.txt` `# contract:` headers. A directive's target grammar is
+`<path> [§<heading>]`: `<path>` (repo-relative) must be a tracked file, and when
+a `§<heading>` fragment is present the file must carry a matching markdown
+heading; a pointer without `§` resolves file-only. Reddens on a missing or
+untracked target file, on a named heading the target lacks, and — fail-closed —
+on a directive that matched the pointer shape but carries no target path.
+
+The prose-citation pass closes the gap where a citation woven into a sentence
+(`context-kit/SPEC.md §The memory-off doctrine`) resolved neither file nor
+heading while the structured directive and the markdown-link anchor were both
+verdict-checked. It scans the manifest set (`spec_manifest_files`, the same
+surface the manifest-narration gate family reads) over a blank-line-delimited
+paragraph join so a heading that wraps a line reassembles, and resolves the
+heading through the one shared `heading_present` helper — one heading-resolution
+path, two callers. Free prose runs on past the heading with no delimiter, so
+the citation pass matches a heading as a boundary-anchored **prefix** of the
+fragment where the directive pass matches it whole. A cited path that is not a
+tracked file is out of this pass's scope — path liveness stays with the gates
+that own it (`check-md-refs`, `check-kit-ref-liveness`); ruling only on headings
+of resolvable files is what holds the false-positive rate at the directive
+pass's level.
 
 `check-comment-tier` owns the directive's *shape*; this gate adds *resolution*
 on top, the binding a `spec:` pointer makes being only as good as its liveness
-— a renamed or deleted heading leaves every inbound pointer dangling, otherwise
-caught only on review. Heading match tolerates a trailing `(qualifier)` on
-either side: a pointer narrowing a section to a labelled point (`§check-graph
-(assertion G)` → the `check-graph` heading) or a heading carrying a locator the
-pointer omits (`§The guard framework` → `## The guard framework
-(lib/guard.sh)`).
+— a renamed or deleted heading leaves every inbound pointer or citation
+dangling, otherwise caught only on review. Heading match tolerates a trailing
+`(qualifier)` on either side: a pointer narrowing a section to a labelled point
+(`§check-graph (assertion G)` → the `check-graph` heading) or a heading carrying
+a locator the pointer omits (`§The guard framework` → `## The guard framework
+(lib/guard.sh)`). Two `§` carve-outs keep the false-positive floor and must not
+be conflated: a directive's em-dash *prose tail* (`spec: <path> §<h> — <gloss>`)
+strips at the ` — ` so a `§` in the gloss is not read as a heading, while a
+free-prose citation *is* a heading marker — the citation pass fires on a
+tracked `.md` path immediately followed by `§`, and a bare `§` with no tracked
+path before it (the deliberate non-citation use) never fires. Fenced code
+blocks are skipped in both passes — a quoted example is not a citation.
 
 Calibration: forward direction only. The reverse — flagging a requirement with
 no inbound pointer as uncovered code — needs a "what counts as a requirement"
