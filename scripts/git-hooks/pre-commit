@@ -195,6 +195,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/
     canon-kit/checks/check-prose-enum.sh || hook_fail check-prose-enum
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
+    canon-kit/checks/check-knob-citation.sh || hook_fail check-knob-citation
+fi
+
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt'; then
     canon-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
 fi

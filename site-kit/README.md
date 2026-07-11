@@ -30,7 +30,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
 
 2. Establish the host source of truth — a CNAME file holding exactly one host
-   line (default `docs/CNAME`; override with `SITE_KIT_CNAME`).
+   line, at the path `SITE_KIT_CNAME` names (site-kit/SPEC.md owns its fallback).
 
 3. Declare your aliases — copy a `site-config.sh` into your gates dir naming
    `SITE_KIT_ALIASES` (every reachable host that is *not* the cited docs host:

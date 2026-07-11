@@ -64,6 +64,7 @@ leaves its section absent.
 | canon-kit | check-manifest-temporal | precommit |
 | canon-kit | check-manifest-count | precommit |
 | canon-kit | check-prose-enum | precommit |
+| canon-kit | check-knob-citation | precommit |
 | canon-kit | check-comment-tier | precommit |
 | canon-kit | check-spec-pointer | precommit |
 | canon-kit | check-todo-task-liveness | precommit |

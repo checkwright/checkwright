@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **knob-literal-citation-gate** [spec: canon-kit/SPEC-knob-citation.md] —
-  `check-knob-citation`: no governed prose surface outside a kit's own SPEC
-  states a kit knob's value; derived prefix vocabulary (no term list), the
-  three-part trigger keeps bare knob names and bare numbers legal.
 - **kfric-capture-tool** [spec: drift-kit/SPEC-kfric-tool.md] — `bin/kfric.sh
   "<fact>" "<surface>"` stamps the capture grammar into the existing
   knowledge-friction log knob with no caller-side redirect, so a prefix-glob
@@ -223,6 +219,7 @@
   2026-07-09.
 ## Done
 
+- knob-literal-citation-gate
 - prose-citation-pointer-gate
 - gate-run-for-path
 - stage-shim-dedup

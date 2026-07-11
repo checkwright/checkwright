@@ -36,8 +36,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
    over-broad registry is safe but noisy.
 
 2. Wire the trend line — point context-kit's session-context hook at the report
-   by setting `CONTEXT_KIT_DRIFT_REPORT=drift-kit/bin/drift-report.sh` (or the
-   `DRIFT_REPORT` default in your hook copy). The hook runs `--trend` and prints
+   by pointing `CONTEXT_KIT_DRIFT_REPORT` at `drift-kit/bin/drift-report.sh` (or
+   the `DRIFT_REPORT` default in your hook copy). The hook runs `--trend` and prints
    one line; absent the variable, the line is silently skipped.
 
 Configuration follows the established kit pattern — override any knob in

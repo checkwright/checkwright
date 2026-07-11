@@ -557,6 +557,69 @@ marked-subset cases; `check-prose-enum.test.sh` covers the config-driven paths
 (the empty-default skip, the fail-closed escapes, bracketed matching, multi-set
 independence, the exempt escapes) the pair cannot reach. `precommit` tier.
 
+### check-knob-citation
+
+Invariant: no kit knob stated *with its value* in governed manifest prose
+outside the owning kit's SPEC. This is the enforcement half of the
+de-literalization rule (doctrine-kit/DOCTRINE.md §Methodology-maintenance
+rules): a knob default copied into a README or a sibling SPEC is a second source
+no gate reads, and it drifts the moment the owner changes. Where the count and
+enum siblings ban a restated *total* and a restated *enumeration*, this bans a
+restated *knob value*.
+
+The knob-token vocabulary is derived, never listed — the provenance seam holds
+(a kit literal carrying a private vocabulary would publish it). Each
+`gate_kit_roots` member yields two SCREAMING_SNAKE prefix forms: the dir name
+uppercased with hyphens mapped to underscores (`gate-sdk` → `GATE_SDK_`,
+`delegation-kit` → `DELEGATION_KIT_`), and for a `-kit`-suffixed dir the
+suffix-dropped short form too (`lifecycle-kit` → `LIFECYCLE_`), so a roster
+carrying the short prefix and its lone long-form knob are both governed. Both
+forms derive mechanically, so adding a kit widens the vocabulary with no edit
+here and the gate ships no term list. A SCREAMING_SNAKE token is a candidate
+only when it starts with a derived prefix; the short form widens the token
+space, and the value-marker leg below is what holds the false-positive rate.
+
+A candidate fires on the value-marker triad, every leg required: a
+derived-prefix token; a same-line value marker; and a surface that is not the
+token's owning SPEC (`<owning-kit>/` joined to `CANON_KIT_SPEC_NAME`). The
+marker is one of two shapes — `=` appended directly to the token
+(`<KIT>_<KNOB>=<value>`), or the word "default" bound within a short window to a
+value literal (a backticked value, a quoted string, or a number). Bare knob
+names stay legal everywhere: prose cites the name and points at the owning
+roster, the fixed instance the gate must never flag; a bare number with no knob
+token in reach never fires — a tripwire left to human judgment, not a gate rule.
+Code and config are out of scope: code owns values, and only the prose manifest
+is scanned.
+
+Two calibrations hold the false-positive rate against this tree, the corpus the
+leg is tuned on. A token named inside a `${…}` shell parameter expansion is a
+name citation — another knob's default *expression*, a fallback source — never a
+value statement of itself, so expansions are blanked before the token scan. And
+the "default" leg binds: the word must be followed within a short window by a
+literal that is not itself a backticked knob name, so a stated default like
+`default \`docs/CNAME\`` fires while a knob cited bare after the verb ("these
+paths default through `<KIT>_<KNOB>`") does not.
+
+The scanned set is the shared `spec_manifest_files` finder and the prose walk is
+the shared `spec_manifest_walk_awk` driver (§lib/spec.sh); this gate supplies the
+`sk_on_line` hook (the per-line triad) and leaves `sk_on_pflush` unused — the
+marker is same-line, so no paragraph join is needed. Fences are skipped, and a
+`knob-citation-exempt: <reason>` on the line or the one above is the per-site
+valve for a genuine local restatement (a wiring example whose value is the
+citing kit's own path). Producer: the generated pre-commit hook / `run-gates.sh`,
+coupled to the manifest set and the kit SPECs; consumer: the committing operator
+via the output contract — file, line, the knob token, and the owning SPEC the
+value belongs in, each read once at the scan transition, no persistent state.
+Fail-closed on the awk status.
+
+Calibration follows the family procedure (§check-manifest-temporal): every hit
+dispositioned — cite the knob by name and point at its SPEC roster (preferred),
+or exempt a genuine local restatement with reason. The good/bad pair covers both
+marker shapes, the short-derived prefix, the `${…}` name citation, the
+default-as-verb non-hit, and the per-site valve; `check-knob-citation.test.sh`
+covers the owning-SPEC exemption (a kit may state its own knob's value in its own
+SPEC but not in its README) the fixture pair cannot reach. `precommit` tier.
+
 ### check-surface-duplication
 
 Invariant: no unvalved bold-lead-in definition of a glossary term on a
