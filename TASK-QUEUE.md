@@ -182,6 +182,29 @@
   2026-07-11 fixing the CI red; the row was regenerated interstitially, so its
   commit attributes to the next iteration's range (drift-kit/SPEC.md §The
   published-evidence extractor).
+- **check-graph-theme-parity** [needs-spec] — `docs/check-graph.html` renders in a
+  bespoke `system-ui` stylesheet (full-bleed header + pannable SVG viewport) that
+  looks foreign next to every other checkwright.dev page, which Jekyll themes with
+  the GitHub Primer default (`container-lg markdown-body`, the GitHub font/color
+  tokens, the site-title header and the "Improve this page" footer).
+  `docs/enforcement.md` inherits that theme for free because it is markdown run
+  through Jekyll's layout; check-graph is raw `.html` served as-is, bypassing the
+  layout — the root cause of the mismatch. Goal: the coupling-graph page reads as
+  the same site. Constraints and design questions to rule at spec: the
+  self-contained-artifact rule (gate-sdk/SPEC.md; no kit output references an asset
+  outside the kit) forbids linking `/assets/css/style.css`, so parity means
+  inlining the theme's visual tokens, not referencing the sheet; the interactive
+  viewport is custom UI beyond `markdown-body`, so a plain-markdown conversion is
+  not viable — the graph keeps its viewport, wrapped in theme-consistent chrome;
+  the theme is consumer-specific (this repo's docs host), not kit-generic, so the
+  gate-sdk emitter must not hardcode it — the fix likely grows a theme-injection
+  seam fed by consumer config (the graph-vocab.sh pattern) owned by site-kit or
+  consumer wiring, never a gate-sdk literal; decide the dark-mode disposition (the
+  artifact ships light+dark per the artifact-design theme-aware principle, Primer
+  defaults light). check-graph asserts the artifact is byte-fresh vs the emitter,
+  so any styling change lands in `gate-sdk/checks/check-graph.sh` and is
+  regenerated, never hand-edited into the HTML. Surfaced 2026-07-11 from a saved
+  copy of the live root page.
 ## Done
 
 ## Lessons Learned
