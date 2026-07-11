@@ -19,3 +19,4 @@
 | convention-hardening | s a b v c | 3f/0d | 3 · ≤0d | 13s clean | 54 |
 | doctrine-kit | s a b v c | 4f/2d | 2 · ≤0d | 16s clean | 55 |
 | doctrine-followthrough | s a b v c | 7f/2d | 6 · ≤0d | 17s clean | 57 |
+| self-accounting-and-positioning | s a b v c | 5f/0d | 4 · ≤0d | 17s clean | 58 |

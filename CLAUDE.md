@@ -132,28 +132,21 @@ the skill on a blocking verdict — so they are not resident here.
   links/commands resolve like any doc. The fixture is the unit of contribution —
   edit the guide, not GitHub UI settings, to change what arrives.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
-  `CNAME`), repo-root-governed with no owning kit. Living pages (everything
-  outside `docs/posts/`) are fully governed prose; dated posts under
-  `docs/posts/` are immutable published artifacts — temporal-exempt but still
-  link/command-resolved (`scripts/canon-config.sh`). A page owns orientation and
-  sequencing and cites downward: the anti-restatement doctrine applies to docs
-  as to comments — never restate an invariant a SPEC or README owns.
-  `check-docs-kit-parity` holds every kit's row in `docs/index.md`.
-- `demo/run-demo.sh` is the runnable adoption walkthrough — it builds a scratch
-  consumer on the gate-sdk consumer-smoke mechanics and narrates the arc
-  (vendor → clean pass → violation blocked → fix → green) on stdout, exiting 0
-  only when every act behaved (the violation act *was* blocked). It writes
-  nothing in-tree and `DEMO_TMP_DIR` is its only knob. Registered as the
+  `CNAME`), repo-root-governed, no owning kit. Living pages are governed prose
+  under the anti-restatement doctrine (cite downward, never restate a SPEC's
+  invariant); dated `docs/posts/` are immutable, temporal-exempt but still
+  link/command-resolved (`scripts/canon-config.sh`). `check-docs-kit-parity`
+  holds every kit's row in `docs/index.md`.
+- `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
+  violation blocked → fix → green), built on the gate-sdk consumer-smoke
+  mechanics; it writes nothing in-tree (`DEMO_TMP_DIR` its only knob) and is the
   evidence-kit `demo` validate suite, so a bit-rotted walkthrough is a red
-  validate, not a stale docs page.
-- **Knowledge-friction capture (any session):** catch yourself re-deriving a
-  fact no doc owns (off an implementation, a gate's source, a commit)? stamp it
-  at that moment with `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"`
-  (prompt-free by design) — deferred capture is no capture; close triages it
-  into doc-owner edits (drift-kit/SPEC.md §The knowledge-friction loop).
-- No per-user memory files for this repo: durable guidance goes in tracked
-  manifests (this file, kit SPECs), or `BRIEF.local.md` for local-only private
-  context. Harness auto-memory is disabled and enforced off — the settings
-  pins hold at commit (`check-settings-pins`), the memory dir and any local
-  override are scanned on the operator's machine (`check-memory-off`); the
-  doctrine is context-kit/SPEC.md §The memory-off doctrine.
+  validate.
+- **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
+  (off an implementation, a gate's source, a commit)? stamp it in the moment
+  with `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"` — deferred capture is
+  no capture; close triages it (drift-kit/SPEC.md §The knowledge-friction loop).
+- No per-user memory files: durable guidance goes in tracked manifests (this
+  file, kit SPECs) or `BRIEF.local.md` (local-only private context). Harness
+  auto-memory is disabled and enforced off (`check-settings-pins`,
+  `check-memory-off`); doctrine: context-kit/SPEC.md §The memory-off doctrine.

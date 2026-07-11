@@ -163,6 +163,24 @@
   load- or event-triggered). Rule the owner and whether the always-loaded meter's baseline
   ships as the consumer's floor-holder — a customer project pursues its own objectives and
   the tooling must stay near-invisible in its context budget. Surfaced 2026-07-11 at align.
+- **runner-doc-off-resident** [needs-spec] — the always-loaded CLAUDE.md carries the
+  per-kit fixture-runner roster (12 `run-gate-tests.sh <kit>/gate-tests` lines) as pure
+  resident weight, yet the execution list is fully derivable — `gate_fixture_suites`
+  (gate-sdk/lib/gate.sh) derives it from `*/gate-tests` on disk and CI (`gates.yml`) runs
+  that derivation, its own comment naming CLAUDE.md's copy as "no hand-list to drift from".
+  The roster is pinned resident only because it doubles as check-kit-registration's
+  registration tripwire (assertion B greps each `<kit>/gate-tests` line in
+  `GATE_SDK_RUNNER_DOC`, default CLAUDE.md; check-docs-kit-parity inherits the same check).
+  Move the registration signal off the resident surface: repoint `GATE_SDK_RUNNER_DOC` at a
+  load-triggered doc — README's "This repo, governed" section, which CONTRIBUTING.md already
+  *claims* "lists the fixture runners" though it does not (fix that latent falsehood in the
+  same unit). Design tension to rule at spec: check-kit-registration reads the bare env var
+  and nothing sources it today, so the config-injection path (run-gates.sh + the generated
+  pre-commit hook + CI all honoring the override) must be designed, not assumed; and weigh
+  whether the tripwire needs runnable command lines or only registration markers. Done-state:
+  resident surface sheds the roster; both gates green against README; the CONTRIBUTING/README
+  pointer becomes true. Surfaced 2026-07-11 at close, dogfooding the always-loaded-hard-shrink
+  directive.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
@@ -171,17 +189,4 @@
   2026-07-09.
 ## Done
 
-- evidence-config-template
-- orchestration-positioning-docs
-- reads-subset-couples-meta-gate
-- overhead-metering
-- ddd-positioning-docs
-
 ## Lessons Learned
-
-- [attend] **always-loaded-hard-shrink** — operator directive at align: this repo is the main
-  demo of checkwright's value and consumers install into their own CLAUDE-governed projects,
-  so the resident surface must be extremely lite; close's brevity pass runs as a hard shrink
-  against the always-loaded meter's over-baseline reading, not a rubber stamp. The expected
-  outcome works both axes: eviction behind load triggers — stage skills, owning SPECs, or a
-  handbook-style on-demand page — and brevity on every block that must remain resident.
