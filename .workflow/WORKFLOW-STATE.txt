@@ -6,3 +6,4 @@
 
 doctrine-kit scope ba26434e 2026-07-11
 doctrine-kit align 94eaead6 2026-07-11
+doctrine-kit build fa705ff9 2026-07-11
