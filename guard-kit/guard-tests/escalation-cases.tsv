@@ -1,0 +1,13 @@
+# guard-kit escalation-guard decision table — <decision><TAB><to><TAB><message>.
+# The advisory fires only on a message to the lead ("main") missing a
+# decision-shape header; a fully shaped block or a non-"main" recipient passes.
+# Columns are tab-separated; # and blank lines are ignored.
+
+# firing — an upward message with no decision shape
+advise	main	please just decide the config header order for me
+
+# non-firing — a fully shaped escalation block
+fallthrough	main	Question: which order? Options: A or B. Recommendation: A. Evidence: check-graph green.
+
+# non-firing — a headerless message to a peer is not an upward escalation
+fallthrough	reviewer	a bare note to a peer session is never an escalation

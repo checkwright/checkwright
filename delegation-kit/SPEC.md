@@ -27,6 +27,13 @@ contracts and only the rationale that earns spec residency (a failure surface,
 a calibration history, a bound that is correctness rather than preference),
 each paragraph citing its rule by name rather than restating it.
 
+**Boundary — this protocol stays fire-and-forget.** An agent here executes a
+bounded brief and its result returns to the supervisor; a paused session that
+holds its working state and *resumes in place* when a question is answered is a
+different interaction model — *resume-in-place orchestration*, lifecycle-kit's
+lead template (lifecycle-kit/SPEC.md §templates/lead.md), which reuses this
+protocol's dispatch safety unchanged rather than replacing it.
+
 The template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide
 otherwise** rule caps an *unlocked* fan-out at read-only work because the git
 index and HEAD are shared for every committing agent regardless of source-file

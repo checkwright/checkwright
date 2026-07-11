@@ -12,15 +12,6 @@
 
 ## New Features
 
-- **scope-session-routing** [spec: SPEC-scope-session-routing.md] — rung 1 of the
-  lead-session design: a lifecycle-kit lead template (not a stage skill) dispatches
-  stage sessions and answers their batched, decision-shaped escalations; sessions
-  resume in place. Stamps stay authoritative — the lead writes no lifecycle state;
-  ruling classes live in tracked agent-definition config; an optional guard-kit
-  SendMessage template is the mechanical floor. Ownership ruled to lifecycle-kit
-  (supersedes the companion-tool hypothesis); topology stays with
-  multi-operator-semantics.
-
 - **trajectory-close-freshness** [spec: SPEC-close-freshness.md] — close the
   close-blindness of the trajectory freshness gate: the extractor SPEC gains the
   close-coupling contract (regenerate the projection in the first commit after the
@@ -158,5 +149,6 @@
 ## Done
 
 - craft-extraction
+- scope-session-routing
 
 ## Lessons Learned

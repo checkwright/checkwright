@@ -73,6 +73,16 @@ it prints, so each stage's provenance is observed, not guessed.
 additionally reads the session id to enforce cross-stage distinctness (a stage
 flip must carry a fresh session — see §check-stage-evidence).
 
+**The optional lead never becomes a second state source.** An iteration may run
+with a live *lead* session (§templates/lead.md) that dispatches its stage
+sessions and answers their escalations so a blocked stage resumes in place
+rather than restarting. The lead writes no state: every flip and stamp
+originates in a stage session through `enter-stage.sh`, exactly as above, so the
+flip+stamp protocol stays the only iteration state and a lead crash costs
+nothing the tracked surfaces do not already hold. The lead is a boundary skill,
+not a stage — it flips nothing and joins no stage set, so the coverage gate
+never reads it (the release-sweep precedent, §templates/lead.md).
+
 ## Layout and configuration
 
 The kit is vendored beside gate-sdk (conventionally at `lifecycle-kit/`); its
@@ -453,3 +463,30 @@ each marker bound to a live task between majors; this sweep forces the standing
 inventory to a decision at the boundary the deprecations were promised against.
 The stamp file is operator evidence riding the release commit — the kit wires no
 gate over it (a consumer may), the same `<…>`-placeholder copy-edit shape.
+
+### templates/lead.md
+
+The **iteration lead** template — an optional live session that dispatches an
+iteration's stage sessions and answers their escalations, closing the
+restart-cost of a stage that would otherwise stop and surface to the user cold
+(§The state machine). Like `release-sweep.md` it is a **boundary skill, not a
+stage**: it invokes no `enter-stage.sh` and joins no stage set, so
+`check-stage-skill-coverage` never reads it. Unlike release-sweep it carries
+named slots, so it adopts the binding-shim grammar (§templates/skills/) — a
+consumer copies-and-specializes it or binds it through a thin shim, and
+`check-skill-binding` holds the slot pairing either way (this repo's
+`.claude/commands/lead.md` shim).
+
+The template owns the orchestration protocol whole: the lead model (dispatch a
+stage session as a background agent whose prompt is that stage's ordinary skill
+invocation), the four-header escalation block (Question / Options /
+Recommendation / Evidence), the split-channel design (routine narration to the
+resume journal, escalations to the message channel), the compact-at-handoff
+economics, and the stamps-authoritative invariant carried from §The state
+machine as the design's load-bearing rule. Dispatch safety is not re-owned — it
+inherits delegation-kit's protocol by citation (delegation-kit/SPEC.md §The
+delegation model: background dispatch, the per-dispatch budget guard, validate
+after any agent commit). Consumer residue stays in named slots — the tracked
+agent-definition carrying the ruling-class roster the dispatch names, and
+whether the consumer wires the optional escalation-shape guard
+(guard-kit/SPEC.md §wakeup-guard) or leaves it inert.

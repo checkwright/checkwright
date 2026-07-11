@@ -301,6 +301,28 @@ reviewed and deleted in the same close-stage triage pass as the friction
 log. Deliberate scheduling stays possible by disabling the hook for a
 session — the block is the default, not a capability removal.
 
+### escalation-guard (template)
+
+`templates/escalation-guard.sh` is the wakeup-guard's sibling — same framework,
+a tool-targeted matcher, a separate opt-in hook — but **advisory, not
+fail-closed**, and the opposite failure posture: an advisory never blocks a
+message, so any inability to inspect the payload passes silently. Registered as
+a `PreToolUse(SendMessage)` hook, it fires only on a message addressed to the
+lead (a background stage session reaches the live lead as `main`) and advises,
+feeding `additionalContext`, when that message lacks any of the decision-shape
+headers **Question / Options / Recommendation / Evidence**. A downward or
+peer-directed message, or one already carrying those headers, passes untouched.
+
+It is the mechanical floor under lifecycle-kit's lead protocol
+(lifecycle-kit/SPEC.md §templates/lead.md): prompts request the escalation
+shape, this guard enforces it. The header grammar is the kit's mechanism; the
+ruling-class roster — what a stage session must escalate at all — stays consumer
+config in the dispatched agent-definition, never here. Opt-in is the consumer's
+settings registration, the same valve as the wakeup-guard; absent it the
+template is inert prose, the intended default (this repo leaves it unwired, as
+it does the wakeup-guard). It sources no config and writes no log — the advisory
+is transient, so nothing accrues for the close-stage triage.
+
 ## The close-stage triage step
 
 `templates/close-triage.md` is the recurring step a consumer splices into
@@ -322,9 +344,11 @@ guard-kit/
   bin/compare-settings-allow.sh
   bin/run-guard-tests.sh    # decision-table runner
   guard-tests/cases.tsv     # expected-decision <TAB> command
+  guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/wakeup-guard.sh
+  templates/escalation-guard.sh
   templates/guard-config.sh
   templates/settings-hooks.json  # the PreToolUse wiring snippet
   templates/close-triage.md
@@ -367,6 +391,13 @@ decision (`block`/`advise`/`allow`/`rewrite`/`fallthrough`) with a command;
 on stdin and asserts the exit code and output class, failing on any
 mismatch. Every generic rule carries at least one firing and one
 non-firing case (the fixture-pair discipline, transplanted).
+
+The same runner drives the escalation-guard from a second table,
+`guard-tests/escalation-cases.tsv` (`<decision> <TAB> <to> <TAB> <message>`),
+feeding a `SendMessage`-shaped payload instead of a command: a firing case (a
+headerless message to `main` → advise) and its non-firing pair (a fully shaped
+block, and a non-`main` recipient → fallthrough) hold the same fixture-pair
+discipline for the advisory.
 
 `smoke/install.sh` copies the templates into the scratch consumer (guard
 and config into the gates dir, hook wiring into `.claude/settings.json`,
