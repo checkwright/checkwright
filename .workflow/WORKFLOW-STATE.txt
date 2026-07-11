@@ -4,15 +4,4 @@
 
 ---
 
-footprint-and-parity scope 97d131aa 2026-07-11
-footprint-and-parity align 600e3271 2026-07-11
-footprint-and-parity build 5c7ad796 2026-07-11
-footprint-and-parity build 7db35dcf 2026-07-11
-footprint-and-parity build 9b8ee22b 2026-07-11
-footprint-and-parity build 5f14c5d0 2026-07-11
-footprint-and-parity build e1944d46 2026-07-11
-footprint-and-parity build 38b38d7c 2026-07-11
-footprint-and-parity build 80a43c2d 2026-07-11
-footprint-and-parity build 5485a3ba 2026-07-11
-footprint-and-parity validate e19ed980 2026-07-11
-footprint-and-parity close c63652da 2026-07-11
+— scope 2ac35d2c 2026-07-11
