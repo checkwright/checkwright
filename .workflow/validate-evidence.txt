@@ -1,1 +1,17 @@
 # contract: evidence-manifest v1
+doctrine-kit gates sha256=377310a3d12d0c1abee18a4b3857cd0cdcc04da5ae85fcdd5861eca39691084e pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit gate_sdk sha256=8305f15cc496e458f6d3cd8aa1a53517db69f1e5ea83b0a3f5f182bfbdd20f2e pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit canon_kit sha256=a5673218f1ea6da2afa1da6f1498f04da2214105f103041c1c4158f359e8a156 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit context_kit sha256=ccc527d5f87226b0de67d84cc9e56417838a2295033aaf6dd1e16d699926131d pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit delegation_kit sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit doctrine_kit sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit evidence_kit sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit lifecycle_kit sha256=a72a655fbdc2336af37022b95846efa73ffc06864ae2241f7ed48d2867d96cc0 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit queue_kit sha256=05c5274b5c3a846edb664ec9ca8b8b45fed95beb3cbffb3eacceb4243869031a pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit site_kit sha256=449c18c74e43482c55acbff93b2549e83311e6942264fc92cc668739026af9c1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit scripts sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit guard_tests sha256=9015ccce751e48d157fbc1106de633cd31567e3ecf2cc5e915338097ed3415c3 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit usage_tests sha256=b4dfde3f66fa559957d685dc4c05fee3d5f17626daaf51b3c8754e96591e0ca1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-11
+doctrine-kit demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-11

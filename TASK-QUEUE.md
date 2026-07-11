@@ -230,6 +230,19 @@
   strictly cheaper than reading gate source to predict a verdict, the
   run-don't-predict equilibrium the oracle-first rule names. Surfaced
   2026-07-11 at doctrine-kit align.
+- **validate-spine-consumer-smoke** [needs-spec] — the codified validate spine
+  (evidence-kit/bin/run-validate.sh over EVIDENCE_KIT_SUITES) omits the
+  consumer-smoke harness, so it reported every suite clean while
+  gate-sdk/bin/run-consumer-smoke.sh was red — the validate binding runs the
+  smoke as a separate step, but the spine's per-suite "clean" reads as total and
+  masks the gap. Design pending: run-consumer-smoke emits a single
+  `CONSUMER-SMOKE: clean` token, not the per-scenario pass/fail lines the
+  evidence parser expects, so enrolling it needs a parser adapter (or a
+  one-scenario synthetic mapping), not a config-list append. Surfaced 2026-07-11
+  dogfooding doctrine-kit validate: a co-vendored kit appended a trailing
+  CLAUDE.md section that pushed context-kit's smoke violation out of
+  check-brevity's scanned section; the spine stayed green and only the explicit
+  smoke step caught it.
 ## Done
 
 - read-command-guard-steer

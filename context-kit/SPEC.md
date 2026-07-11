@@ -319,7 +319,10 @@ integration is exercised only alongside queue-kit), and runs
 `always-loaded.sh --update-baseline` asserting the baseline file appears.
 `smoke/violation.sh` crafts an over-budget pointered bullet in the scratch
 consumer's brevity file and asserts the battery reddens via
-`check-brevity`.
+`check-brevity`. It inserts the bullet inside the budgeted section rather than
+appending at end-of-file: a co-vendored kit may append a trailing section (the
+doctrine-kit installer adds one), and an EOF-appended bullet would land outside
+`check-brevity`'s scanned section and silently disarm the smoke.
 
 ## Out of scope
 
