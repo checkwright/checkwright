@@ -3,8 +3,8 @@
 set -uo pipefail
 
 sessions_dir() {
-    if [[ -n "${LIFECYCLE_SESSIONS_DIR:-}" ]]; then
-        printf '%s\n' "$LIFECYCLE_SESSIONS_DIR"
+    if [[ -n "${LIFECYCLE_KIT_SESSIONS_DIR:-}" ]]; then
+        printf '%s\n' "$LIFECYCLE_KIT_SESSIONS_DIR"
         return 0
     fi
     local home slug
@@ -16,7 +16,7 @@ sessions_dir() {
 dir="$(sessions_dir)"
 [[ -d "$dir" ]] || {
     echo "session-id: sessions dir not found: $dir" >&2
-    echo "  help: set LIFECYCLE_SESSIONS_DIR to the agent transcript directory for this tree." >&2
+    echo "  help: set LIFECYCLE_KIT_SESSIONS_DIR to the agent transcript directory for this tree." >&2
     exit 2
 }
 
@@ -29,7 +29,7 @@ shopt -u nullglob
 
 [[ -n "$newest" ]] || {
     echo "session-id: no transcript (*.jsonl) under $dir" >&2
-    echo "  help: confirm this is the right sessions dir (LIFECYCLE_SESSIONS_DIR)." >&2
+    echo "  help: confirm this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR)." >&2
     exit 2
 }
 

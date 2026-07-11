@@ -150,14 +150,14 @@ Integration is two generic knobs on lifecycle-kit's side of the seam, each
 naming no evidence surface in the kit — the coupling lives entirely in the
 consumer's config and this gate's optional assertions.
 
-`LIFECYCLE_BOUNDARY_TRUNCATE` lists the files `bin/enter-stage.sh` truncates back
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` lists the files `bin/enter-stage.sh` truncates back
 to their `# contract:` header at the iteration boundary, exactly as it already
 resets the state file. A consumer sets it to the evidence manifest, so a new
 iteration starts with a manifest carrying only its contract header — which is
 what makes assertion (B)'s foreign-iteration test able to catch a skipped
 truncation.
 
-`LIFECYCLE_ENTRY_PREFLIGHT` runs this gate as a close-entry pre-flight: a
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT` runs this gate as a close-entry pre-flight: a
 consumer sets `close=…/check-evidence-manifest.sh <manifest>`, and
 `bin/enter-stage.sh` appends the header-flipped temp queue and state file, so
 assertion (A)'s close-entry green-block check fires *before* the flip is
@@ -186,5 +186,5 @@ evidence line proves the green result once the suites have run.
 - **Skip record** — produced by a consumer harness that self-skips a scenario;
   consumed by `diff-baseline.sh`. An absent file means no skips.
 - **Truncation** — produced by `enter-stage.sh` at the scope boundary reading
-  `LIFECYCLE_BOUNDARY_TRUNCATE`; consumed by assertion (B)'s foreign-iteration
+  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`; consumed by assertion (B)'s foreign-iteration
   test, which is what makes skipping it visible.

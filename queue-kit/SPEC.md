@@ -122,7 +122,7 @@ Knobs:
   lead lines `bin/queue-index.sh` emits in its attention block before folding
   the rest into an overflow note.
 
-Cross-kit note: lifecycle-kit's `LIFECYCLE_ACTIVE_SECTIONS` carries the same
+Cross-kit note: lifecycle-kit's `LIFECYCLE_KIT_ACTIVE_SECTIONS` carries the same
 default. The knobs are independent (either kit runs without the other); a
 consumer renaming its active sections sets both.
 

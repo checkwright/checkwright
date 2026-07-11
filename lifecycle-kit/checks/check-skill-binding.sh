@@ -3,7 +3,7 @@
 # spec: lifecycle-kit/SPEC.md §check-skill-binding — every binding-shim skill names an existing template and binds exactly that template's slot set
 #
 # usage: check-skill-binding.sh [skills-dir]
-#   Defaults to LIFECYCLE_SKILLS_DIR (.claude/commands). Template paths in a
+#   Defaults to LIFECYCLE_KIT_SKILLS_DIR (.claude/commands). Template paths in a
 #   binding directive resolve relative to the current directory.
 set -uo pipefail
 
@@ -14,7 +14,7 @@ source "$SDK/lib/gate.sh"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-DIR="${1:-$LIFECYCLE_SKILLS_DIR}"
+DIR="${1:-$LIFECYCLE_KIT_SKILLS_DIR}"
 [[ -d "$DIR" ]] || { echo "check-skill-binding: skills dir not found: $DIR" >&2; exit 2; }
 
 findings=()

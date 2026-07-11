@@ -572,10 +572,10 @@ The knob-token vocabulary is derived, never listed — the provenance seam holds
 `gate_kit_roots` member yields two SCREAMING_SNAKE prefix forms: the dir name
 uppercased with hyphens mapped to underscores (`gate-sdk` → `GATE_SDK_`,
 `delegation-kit` → `DELEGATION_KIT_`), and for a `-kit`-suffixed dir the
-suffix-dropped short form too (`lifecycle-kit` → `LIFECYCLE_`), so a roster
-carrying the short prefix and its lone long-form knob are both governed. Both
-forms derive mechanically, so adding a kit widens the vocabulary with no edit
-here and the gate ships no term list. A SCREAMING_SNAKE token is a candidate
+suffix-dropped short form too (`lifecycle-kit` → `LIFECYCLE_`), so a knob on
+either the long or the short form is governed. Both forms derive mechanically,
+so adding a kit widens the vocabulary with no edit here and the gate ships no
+term list. A SCREAMING_SNAKE token is a candidate
 only when it starts with a derived prefix; the short form widens the token
 space, and the value-marker leg below is what holds the false-positive rate.
 

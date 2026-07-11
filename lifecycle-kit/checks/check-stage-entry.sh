@@ -10,8 +10,8 @@ source "$SDK/lib/gate.sh"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-QUEUE="${1:-$LIFECYCLE_QUEUE_FILE}"
-STATE="${2:-$LIFECYCLE_STATE_FILE}"
+QUEUE="${1:-$LIFECYCLE_KIT_QUEUE_FILE}"
+STATE="${2:-$LIFECYCLE_KIT_STATE_FILE}"
 
 [[ -f "$QUEUE" ]] || { echo "check-stage-entry: file not found: $QUEUE" >&2; exit 2; }
 [[ -f "$STATE" ]] || { echo "check-stage-entry: file not found: $STATE" >&2; exit 2; }
@@ -32,11 +32,11 @@ if [[ -z "$iter" || -z "$stage" ]]; then
 fi
 
 if ! lifecycle_stage_known "$stage"; then
-    echo "STAGE-ENTRY: header stage '$stage' is not a lifecycle stage (${LIFECYCLE_STAGES[*]})"
+    echo "STAGE-ENTRY: header stage '$stage' is not a lifecycle stage (${LIFECYCLE_KIT_STAGES[*]})"
     echo "  help: set [stage:] to one of the configured lifecycle stages"
     exit 1
 fi
-pred="${LIFECYCLE_PREDECESSOR[$stage]:-}"
+pred="${LIFECYCLE_KIT_PREDECESSOR[$stage]:-}"
 
 errors=()
 c_fired=0
@@ -52,9 +52,9 @@ if [[ -n "$pred" ]]; then
 fi
 
 # assertion B: a drain-stage header requires an empty active queue
-if [[ -n "$LIFECYCLE_DRAIN_STAGE" && "$stage" == "$LIFECYCLE_DRAIN_STAGE" ]]; then
+if [[ -n "$LIFECYCLE_KIT_DRAIN_STAGE" && "$stage" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
     secs=""
-    for s in "${LIFECYCLE_ACTIVE_SECTIONS[@]}"; do secs+="${secs:+|}$s"; done
+    for s in "${LIFECYCLE_KIT_ACTIVE_SECTIONS[@]}"; do secs+="${secs:+|}$s"; done
     leftover="$(awk -v secre="^## ($secs)[[:space:]]*$" '
         $0 ~ secre { inq = 1; next }
         /^## /     { inq = 0 }
@@ -65,8 +65,8 @@ if [[ -n "$LIFECYCLE_DRAIN_STAGE" && "$stage" == "$LIFECYCLE_DRAIN_STAGE" ]]; th
 fi
 
 # assertion C: audit-entry with a cross-component amendment signal and no audit stamp demands that stamp or a recorded waiver (lifecycle-kit/SPEC.md §check-stage-entry)
-if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" ]]; then
-    audit_stamp="$(awk -v it="$iter" -v au="$LIFECYCLE_AUDIT_STAGE" '
+if [[ -n "$LIFECYCLE_KIT_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_KIT_AUDIT_ENTRY_STAGE" ]]; then
+    audit_stamp="$(awk -v it="$iter" -v au="$LIFECYCLE_KIT_AUDIT_STAGE" '
         /^---[[:space:]]*$/ { f = 1; next }
         f && NF { if ($1 == it && $2 == au) { print "1"; exit } }
     ' "$STATE")"; st=$?
@@ -78,17 +78,17 @@ if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" 
         while IFS= read -r sf; do
             [[ -n "$sf" ]] || continue
             sf="${sf#./}"; roster["${sf%/*}"]=1
-        done < <(gate_find "." -name "$LIFECYCLE_ROSTER_BASENAME" -type f | grep -v '/templates/' || true)  # reads-couples-exempt: whole-tree audit-signal scan; re-fire is owned by the queue/state couple every stage flip touches
+        done < <(gate_find "." -name "$LIFECYCLE_KIT_ROSTER_BASENAME" -type f | grep -v '/templates/' || true)  # reads-couples-exempt: whole-tree audit-signal scan; re-fire is owned by the queue/state couple every stage flip touches
 
         declare -A amend_dirs=()
         amend_files=()
         while IFS= read -r af; do
             [[ -n "$af" ]] || continue
             af="${af#./}"; amend_dirs["${af%/*}"]=1; amend_files+=("$af")
-        done < <(gate_find "." -name "$LIFECYCLE_AMENDMENT_GLOB" -type f | grep -v '/templates/' || true)  # reads-couples-exempt: whole-tree audit-signal scan; re-fire is owned by the queue/state couple every stage flip touches
+        done < <(gate_find "." -name "$LIFECYCLE_KIT_AMENDMENT_GLOB" -type f | grep -v '/templates/' || true)  # reads-couples-exempt: whole-tree audit-signal scan; re-fire is owned by the queue/state couple every stage flip touches
 
         contract_alt=""
-        for ct in "${LIFECYCLE_CONTRACT_TOKENS[@]}"; do
+        for ct in "${LIFECYCLE_KIT_CONTRACT_TOKENS[@]}"; do
             contract_alt+="${contract_alt:+|}${ct//./\\.}"
         done
 
@@ -101,7 +101,7 @@ if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" 
                 while IFS= read -r tok; do
                     [[ -n "$tok" ]] || continue
                     d="$tok"
-                    for ct in "${LIFECYCLE_CONTRACT_TOKENS[@]}"; do
+                    for ct in "${LIFECYCLE_KIT_CONTRACT_TOKENS[@]}"; do
                         d="${d%/$ct}"; d="${d%/${ct%/}}"
                     done
                     [[ -n "${roster[$d]:-}" ]] && comps["$d"]=1
@@ -116,14 +116,14 @@ if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" 
         fi
 
         if [[ -n "$signal_detail" ]]; then
-            waiver="$(awk -v it="$iter" -v wv="$LIFECYCLE_WAIVER_TOKEN" '
+            waiver="$(awk -v it="$iter" -v wv="$LIFECYCLE_KIT_WAIVER_TOKEN" '
                 /^---[[:space:]]*$/ { f = 1; next }
                 f && NF { if ($1 == it && $2 == wv) { print "1"; exit } }
             ' "$STATE")"; st=$?
             fail_closed "$st" STAGE-ENTRY "awk waiver scan"
             if [[ "$waiver" != "1" ]]; then
                 c_fired=1
-                errors+=("entering '$stage' with a cross-component amendment signal and no '$iter $LIFECYCLE_AUDIT_STAGE' stamp ($signal_detail) — the audit trigger (≥2 components' contracts) was not verified for this iteration")
+                errors+=("entering '$stage' with a cross-component amendment signal and no '$iter $LIFECYCLE_KIT_AUDIT_STAGE' stamp ($signal_detail) — the audit trigger (≥2 components' contracts) was not verified for this iteration")
             fi
         fi
     fi
@@ -133,16 +133,16 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "STAGE-ENTRY: ${#errors[@]} prior-stage readiness issue(s) for header '$iter [stage: $stage]':"
     printf '  %s\n' "${errors[@]}"
     if [[ "$c_fired" == "1" ]]; then
-        echo "  help: a cross-component $LIFECYCLE_AUDIT_ENTRY_STAGE entry must run /$LIFECYCLE_AUDIT_STAGE (stamps '$iter $LIFECYCLE_AUDIT_STAGE <session> <date>'), or — on an explicit user ruling, never self-issued by the entering session — record a deliberate waiver line '$iter $LIFECYCLE_WAIVER_TOKEN <session> <date>' in $STATE"
+        echo "  help: a cross-component $LIFECYCLE_KIT_AUDIT_ENTRY_STAGE entry must run /$LIFECYCLE_KIT_AUDIT_STAGE (stamps '$iter $LIFECYCLE_KIT_AUDIT_STAGE <session> <date>'), or — on an explicit user ruling, never self-issued by the entering session — record a deliberate waiver line '$iter $LIFECYCLE_KIT_WAIVER_TOKEN <session> <date>' in $STATE"
     else
-        echo "  help: a stage flip re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps $STATE) and drain the active queue before flipping to $LIFECYCLE_DRAIN_STAGE"
+        echo "  help: a stage flip re-verifies the prior stage's static exit — invoke the predecessor skill (it stamps $STATE) and drain the active queue before flipping to $LIFECYCLE_KIT_DRAIN_STAGE"
     fi
     exit 1
 fi
 
 if [[ -z "$pred" ]]; then
     detail="'$stage' has no mandatory predecessor"
-elif [[ "$stage" == "$LIFECYCLE_DRAIN_STAGE" ]]; then
+elif [[ "$stage" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
     detail="predecessor '$pred' stamped; active queue empty"
 else
     detail="predecessor '$pred' stamped"

@@ -7,7 +7,8 @@ docs/gate-sdk/index.md
 Live-prefix knobs that resolve to a tracked kit knob:
 CANON_KIT_CONFIG_FILE
 GATE_SDK_ROOT
+LIFECYCLE_KIT_CONFIG_FILE
 
 Out of scope, never flagged — prose compounds and non-brand namespaces:
-a per-kit note, check-kit-registration, the SMOKE_KIT_ROOT harness var,
-and LIFECYCLE_ACTIVE_SECTIONS (a knob off the non-mechanical LIFECYCLE_ prefix).
+a per-kit note, check-kit-registration, and the SMOKE_KIT_ROOT harness var
+(a KIT_ token whose stem names no gate_kit_roots dir).

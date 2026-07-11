@@ -3,7 +3,7 @@
 # spec: lifecycle-kit/SPEC.md §check-shim-restatement — no binding shim shares an >=N-word normalized n-gram with the dedup corpus (CLAUDE.md + every kit's templates)
 #
 # usage: check-shim-restatement.sh [skills-dir] [corpus-file...]
-#   skills-dir defaults to LIFECYCLE_SKILLS_DIR; positional corpus files override
+#   skills-dir defaults to LIFECYCLE_KIT_SKILLS_DIR; positional corpus files override
 #   the computed default (the hermetic-fixture affordance).
 set -uo pipefail
 
@@ -14,18 +14,18 @@ source "$SDK/lib/gate.sh"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-DIR="${1:-$LIFECYCLE_SKILLS_DIR}"
+DIR="${1:-$LIFECYCLE_KIT_SKILLS_DIR}"
 [[ -d "$DIR" ]] || { echo "check-shim-restatement: skills dir not found: $DIR" >&2; exit 2; }
 [[ $# -gt 0 ]] && shift
 
-N="$LIFECYCLE_SHIM_NGRAM"
+N="$LIFECYCLE_KIT_SHIM_NGRAM"
 
 # spec: lifecycle-kit/SPEC.md §check-shim-restatement — corpus resolution order
 corpus=()
 if [[ $# -gt 0 ]]; then
     corpus=("$@")
-elif [[ ${#LIFECYCLE_SHIM_DEDUP_CORPUS[@]} -gt 0 ]]; then
-    corpus=("${LIFECYCLE_SHIM_DEDUP_CORPUS[@]}")
+elif [[ ${#LIFECYCLE_KIT_SHIM_DEDUP_CORPUS[@]} -gt 0 ]]; then
+    corpus=("${LIFECYCLE_KIT_SHIM_DEDUP_CORPUS[@]}")
 else
     [[ -f CLAUDE.md ]] && corpus+=(CLAUDE.md)
     while IFS= read -r root; do

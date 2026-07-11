@@ -36,7 +36,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 2. Give the queue file its header and each evidence file its skeleton — the
    stage-stamp file and the lesson-disposition file
-   (`LIFECYCLE_LESSON_EVIDENCE_FILE`, both boundary-reset to their header):
+   (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header):
 
    ```
    ## Iteration: —  [stage: scope]
@@ -59,7 +59,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    make each skill a binding shim that references the template (SPEC.md
    §templates/skills/).
 
-4. Optional — reshape the machine: copy `templates/lifecycle-stages.sh` into
+4. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,
    section names, or file paths. Defaults are this repo's own lifecycle.
 

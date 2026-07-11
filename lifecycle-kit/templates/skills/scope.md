@@ -15,7 +15,7 @@ from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
 uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
 *<evidence-reset: reset any per-iteration evidence file your validate stage
 writes that the tool does not already truncate — the tool truncates
-WORKFLOW-STATE, the lesson-evidence file, and every `LIFECYCLE_BOUNDARY_TRUNCATE`
+WORKFLOW-STATE, the lesson-evidence file, and every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
 member, in the same commit as this stamp.>* A new
 iteration stays `—` until this skill names it (below); only `scope` resets,
 later stages append. Honest limit: the stamp proves the skill was *invoked*,

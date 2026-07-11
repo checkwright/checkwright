@@ -84,54 +84,61 @@ overwritten, or a thin binding shim that references the template (the grammar
 and the contract both modes satisfy are §templates/skills/).
 
 The stage machine itself is config with this repo's lifecycle as the
-default: copy `templates/lifecycle-stages.sh` into the gates dir as
-`lifecycle-stages.sh` (or point `LIFECYCLE_KIT_STAGES_FILE` elsewhere) and
+default: copy `templates/lifecycle-config.sh` into the gates dir as
+`lifecycle-config.sh` (or point `LIFECYCLE_KIT_CONFIG_FILE` elsewhere) and
 set only what you override — this roster owns every knob and its default;
 the template carries no second copy. The loader validates the machine
 (unknown stages in the map, a waiver token colliding with a stage name, a
 non-integer n-gram width, a malformed preflight entry) and exits 2 on a
 malformed config — a broken machine must not gate anything.
 
-- `LIFECYCLE_STAGES` — the stage roster, in order; default
+Knob-rename compat precedent: before the first release tag a knob rename is
+compat-free — no read-the-old-name shim, no deprecation window — because no
+external consumer can have vendored the kit yet (the first tag is a
+launch-comms prerequisite). From the first tag onward a rename owes the
+queue-bound deprecation mechanism and a tightened-gates/release-note
+declaration (the deprecation-lifecycle and upgrade-path rungs).
+
+- `LIFECYCLE_KIT_STAGES` — the stage roster, in order; default
   `(scope align build validate close)`.
-- `LIFECYCLE_PREDECESSOR` — associative map stage → the predecessor whose
+- `LIFECYCLE_KIT_PREDECESSOR` — associative map stage → the predecessor whose
   stamp `check-stage-entry` requires; default `([align]=scope [build]=scope
   [validate]=build [close]=validate)` (`build` keys to `scope` because the
   audit stage is trigger-gated; §check-stage-entry).
-- `LIFECYCLE_FIRST_STAGE` — the stage whose entry is the iteration boundary
+- `LIFECYCLE_KIT_FIRST_STAGE` — the stage whose entry is the iteration boundary
   (§bin/enter-stage.sh truncation); default `scope`.
-- `LIFECYCLE_DRAIN_STAGE` — the stage whose entry requires the active queue
+- `LIFECYCLE_KIT_DRAIN_STAGE` — the stage whose entry requires the active queue
   sections empty; default `validate`; empty disables the drain assertion.
-- `LIFECYCLE_ACTIVE_SECTIONS` — the queue sections the drain assertion
+- `LIFECYCLE_KIT_ACTIVE_SECTIONS` — the queue sections the drain assertion
   reads; default `("New Features" "Technical Debt")`.
-- `LIFECYCLE_AUDIT_STAGE` — the trigger-gated audit stage assertion C looks
+- `LIFECYCLE_KIT_AUDIT_STAGE` — the trigger-gated audit stage assertion C looks
   for; default `align`; empty disables the audit machinery entirely.
-- `LIFECYCLE_AUDIT_ENTRY_STAGE` — the stage whose entry assertion C blocks
+- `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` — the stage whose entry assertion C blocks
   on a cross-component signal with no audit stamp; default `build` when an
   audit stage is set, else empty.
-- `LIFECYCLE_WAIVER_TOKEN` — the stamp token recording the user's explicit
+- `LIFECYCLE_KIT_WAIVER_TOKEN` — the stamp token recording the user's explicit
   audit waiver; default `<audit-stage>-waived`; must not collide with a
   stage name.
-- `LIFECYCLE_AMENDMENT_GLOB` / `LIFECYCLE_ROSTER_BASENAME` — the amendment
+- `LIFECYCLE_KIT_AMENDMENT_GLOB` / `LIFECYCLE_KIT_ROSTER_BASENAME` — the amendment
   filename shape and the canonical-spec basename assertion C scans
   (template dirs pruned); defaults `SPEC-*.md` / `SPEC.md`.
-- `LIFECYCLE_CONTRACT_TOKENS` — the amendment-body substrings assertion C
+- `LIFECYCLE_KIT_CONTRACT_TOKENS` — the amendment-body substrings assertion C
   reads as a cross-component contract signal; default `("SPEC.md" "proto/")`.
-- `LIFECYCLE_SKILLS_DIR` — the agent-skill directory
+- `LIFECYCLE_KIT_SKILLS_DIR` — the agent-skill directory
   `check-stage-skill-coverage` scans; default `.claude/commands`.
-- `LIFECYCLE_QUEUE_FILE` / `LIFECYCLE_STATE_FILE` — the governed header and
+- `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and
   stamp files, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
   `GATE_SDK_WORKFLOW_DIR`.
-- `LIFECYCLE_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
+- `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
   file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`,
   read by `check-lesson-disposition` and the boundary-reset built-in.
-- `LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset to their header at the
+- `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
   iteration boundary; default empty.
-- `LIFECYCLE_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
+- `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
-- `LIFECYCLE_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
+- `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
   trips at (positive integer; §check-shim-restatement); default `9`.
-- `LIFECYCLE_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default
+- `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default
   empty for the computed `CLAUDE.md`-plus-kit-templates default.
 
 ## Per-component contracts
@@ -152,7 +159,7 @@ Prints the canonical stamp id so a stage skill reads it rather than guessing:
 the first 8 hex of the most recently written transcript under the sessions dir
 (default `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or
 `~/.claude`, and the cwd with every non-alphanumeric char mapped to `-`;
-override `LIFECYCLE_SESSIONS_DIR`). Newest-file selection is the documented
+override `LIFECYCLE_KIT_SESSIONS_DIR`). Newest-file selection is the documented
 single-operator assumption (one live session per project tree); an absent dir
 or transcript exits 2. Not a gate — a `bin/` helper invoked (now internally,
 by `enter-stage.sh`) for the `<session-id>` field; the stage skills reach it
@@ -167,14 +174,14 @@ the id — never an argument, so the no-hand-picking rule rides into the tool.
 `<stage>` must be a configured stage; anything else is a usage error (exit 2).
 An ordinary stage reads the iteration from the header, appends
 `<iteration> <stage> <id> <date>`, and swaps only the header's `[stage:]`
-token; the first stage (`LIFECYCLE_FIRST_STAGE`) performs the
+token; the first stage (`LIFECYCLE_KIT_FIRST_STAGE`) performs the
 iteration-boundary reset instead — truncate the state file to its header,
 stamp under `—`, set the header to the unnamed-iteration form, and reset every
-file in `LIFECYCLE_BOUNDARY_TRUNCATE` to its leading `# contract:` header the
+file in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to its leading `# contract:` header the
 same way (a generic per-iteration reset knob — no consumer surface is named in
 the kit; a downstream kit whose per-iteration file must start each cycle from
 its contract header adds itself here, as evidence-kit's manifest does). The
-kit-owned `LIFECYCLE_LESSON_EVIDENCE_FILE` resets by the same rule as a
+kit-owned `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` resets by the same rule as a
 **built-in member** — the kit owns that surface, so it does not ride the
 consumer knob (git history keeps the retired stamps). The boundary entry also
 **refuses outright when `## Lessons Learned` is non-empty** (exit 1, the
@@ -183,14 +190,14 @@ built-in pre-flight): an untriaged lesson must not cross into the next
 iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
 outlive the iteration that filed it. **Pre-flight,
 not enforcement:** before writing, it runs the built-in `check-stage-entry`
-for the entered stage plus each `LIFECYCLE_ENTRY_PREFLIGHT` command whose
+for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose
 stage key matches — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}`
 plus the real state file, appended as the final two positionals so the
 built-in gate and any configured command read the flip that has not yet been
 written, the commands themselves untouched — and refuses (exit 1, findings
 printed, no writes) when any is red; the refusal is advisory in the same sense
 the gate is at commit time (no `--force`, so the easy path is the compliant
-one). `LIFECYCLE_ENTRY_PREFLIGHT` is a generic per-stage hook — no consumer
+one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook — no consumer
 surface is named in the kit; a downstream kit whose gate is the real
 precondition for a stage wires itself here (as evidence-kit's manifest gate
 does for close entry), turning a would-be pre-commit deadlock into a loud
@@ -198,9 +205,9 @@ refusal at the flip. **Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,
 it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs
-(`LIFECYCLE_QUEUE_FILE`, `LIFECYCLE_STATE_FILE`, `LIFECYCLE_STAGES`,
-`LIFECYCLE_FIRST_STAGE`, `LIFECYCLE_BOUNDARY_TRUNCATE`,
-`LIFECYCLE_LESSON_EVIDENCE_FILE`, and `LIFECYCLE_ENTRY_PREFLIGHT`). Advisory tooling,
+(`LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES`,
+`LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
+`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and `LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
 `smoke/install.sh`.
 
@@ -238,7 +245,7 @@ Honest limit: the stamp proves the stage skill was *invoked*, never that it
 produced its green result — a validate stamp says validate ran, not that the
 suites passed. That gap is closed by evidence-kit, which commits a per-run
 evidence manifest (a suite verdict per line) and, via the optional
-`LIFECYCLE_BOUNDARY_TRUNCATE` integration, couples a `[stage: close]` entry to
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a `[stage: close]` entry to
 the full green block.
 
 ### check-stage-entry
@@ -290,9 +297,9 @@ mechanical residual.
 
 ### check-stage-skill-coverage
 
-Invariant: the configured stage set and the skills dir (`LIFECYCLE_SKILLS_DIR`,
+Invariant: the configured stage set and the skills dir (`LIFECYCLE_KIT_SKILLS_DIR`,
 default `.claude/commands`; override with the first argument) cover each other,
-both directions. Forward: every `LIFECYCLE_STAGES` member has a `<stage>.md`
+both directions. Forward: every `LIFECYCLE_KIT_STAGES` member has a `<stage>.md`
 skill file — a stage with no skill cannot be entered. Reverse: every skill file
 that invokes `enter-stage.sh` names a live stage in the token it passes. The
 `enter-stage.sh` invocation is the mechanical marker separating a stage skill
@@ -301,11 +308,11 @@ invoking a now-unknown stage) reddens without false-flagging a non-stage skill
 like `/agent-execution`, which never invokes `enter-stage.sh`. A skills dir that
 does not exist is fail-closed (exit 2). The `# graph:` couples the skills dir at
 `tier=precommit`; the whole-tree `run-gates.sh` battery backstops a stage-set
-edit (`lifecycle-stages.sh`), which is not itself in the coupled surface.
+edit (`lifecycle-config.sh`), which is not itself in the coupled surface.
 
 ### check-skill-binding
 
-Invariant: every skill under `LIFECYCLE_SKILLS_DIR` (default `.claude/commands`;
+Invariant: every skill under `LIFECYCLE_KIT_SKILLS_DIR` (default `.claude/commands`;
 override with the first argument) that carries a binding directive — `Execute
 the template at <path>, applying the bindings below.` — (a) names a template
 file that exists and (b) binds exactly that template's slot set: an unbound slot
@@ -327,20 +334,20 @@ missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
 
 ### check-shim-restatement
 
-Invariant: no binding shim under `LIFECYCLE_SKILLS_DIR` shares a normalized word
-n-gram of length ≥ `LIFECYCLE_SHIM_NGRAM` with any surface in the dedup corpus
-`LIFECYCLE_SHIM_DEDUP_CORPUS` — the duplication tripwire under the same
+Invariant: no binding shim under `LIFECYCLE_KIT_SKILLS_DIR` shares a normalized word
+n-gram of length ≥ `LIFECYCLE_KIT_SHIM_NGRAM` with any surface in the dedup corpus
+`LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — the duplication tripwire under the same
 directive-as-selector rule `check-skill-binding` uses (a file with no `Execute
 the template …` directive is not a shim and is not read). The corpus defaults to
 the consumer's always-loaded `CLAUDE.md` plus every kit's `templates/**/*.md`
-(kit set from `gate_kit_roots`); an explicit `LIFECYCLE_SHIM_DEDUP_CORPUS` or
+(kit set from `gate_kit_roots`); an explicit `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` or
 positional corpus arguments override it — the latter is the hermetic-fixture
 affordance. Comparison normalizes first — lowercase, punctuation stripped to a
 word boundary, whitespace collapsed — so cosmetic rewording does not evade the
 tripwire; a resolved corpus that yields no n-grams is fail-closed (exit 2), never
 a false clean.
 
-`LIFECYCLE_SHIM_NGRAM` is calibrated to the smallest window with zero false
+`LIFECYCLE_KIT_SHIM_NGRAM` is calibrated to the smallest window with zero false
 positives on the post-rewrite corpus, with a floor of 8 words so a citation line
 (a path plus a §heading) never fires — this repo's default is 9, the width at
 which the 8-word §heading `This repo is governed by its own kits` stops
@@ -363,7 +370,7 @@ short-corpus fail-closed, and the below-N paraphrase the one pair cannot.
 
 Invariant: every `## Lessons Learned` entry present at HEAD and absent from the
 worktree leaves a well-formed disposition stamp in
-`LIFECYCLE_LESSON_EVIDENCE_FILE` — a lesson cannot be cleared without a
+`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — a lesson cannot be cleared without a
 recorded rule/task/harvest/discard call. The evidence home is a stamped file,
 not the commit body, because the battery runs at pre-commit when no commit
 message exists yet, so only a file is mechanically decidable (the

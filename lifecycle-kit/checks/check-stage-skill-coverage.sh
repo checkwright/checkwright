@@ -3,7 +3,7 @@
 # spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the configured stage set and the skills dir cover each other: every stage has a skill, every enter-stage-invoking skill names a live stage
 #
 # usage: check-stage-skill-coverage.sh [skills-dir]
-#   Defaults to LIFECYCLE_SKILLS_DIR (.claude/commands).
+#   Defaults to LIFECYCLE_KIT_SKILLS_DIR (.claude/commands).
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -13,12 +13,12 @@ source "$SDK/lib/gate.sh"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-DIR="${1:-$LIFECYCLE_SKILLS_DIR}"
+DIR="${1:-$LIFECYCLE_KIT_SKILLS_DIR}"
 [[ -d "$DIR" ]] || { echo "check-stage-skill-coverage: skills dir not found: $DIR" >&2; exit 2; }
 
 missing=(); orphan=()
 
-for s in "${LIFECYCLE_STAGES[@]}"; do
+for s in "${LIFECYCLE_KIT_STAGES[@]}"; do
     [[ -f "$DIR/$s.md" ]] || missing+=("$s (expected $DIR/$s.md)")
 done
 
@@ -33,15 +33,15 @@ done
 shopt -u nullglob
 
 if [[ ${#missing[@]} -gt 0 || ${#orphan[@]} -gt 0 ]]; then
-    echo "check-stage-skill-coverage: stage set (${LIFECYCLE_STAGES[*]}) and skills dir $DIR"
+    echo "check-stage-skill-coverage: stage set (${LIFECYCLE_KIT_STAGES[*]}) and skills dir $DIR"
     echo "are out of sync — a stage with no skill cannot be entered; an orphan stage skill"
     echo "is a retired stage's dead entry point:"
     for m in "${missing[@]}"; do echo "  no skill for stage: $m"; done
     for o in "${orphan[@]}"; do echo "  orphan skill:       $o"; done
     echo "  help: add the missing <stage>.md skill, or retire the orphan skill / fix the"
-    echo "        stage name it invokes. The stage set is LIFECYCLE_STAGES (lifecycle-stages.sh)."
+    echo "        stage name it invokes. The stage set is LIFECYCLE_KIT_STAGES (lifecycle-config.sh)."
     exit 1
 fi
 
-echo "STAGE-SKILL-COVERAGE: clean (${#LIFECYCLE_STAGES[@]} stage(s) each have a skill; every enter-stage-invoking skill in $DIR names a live stage)"
+echo "STAGE-SKILL-COVERAGE: clean (${#LIFECYCLE_KIT_STAGES[@]} stage(s) each have a skill; every enter-stage-invoking skill in $DIR names a live stage)"
 exit 0

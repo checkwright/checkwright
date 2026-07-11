@@ -16,7 +16,7 @@ they ride in one commit.
 
 1. **Process Lessons Learned** → durable rules or debt tasks, then clear the
    section. **Give each entry an explicit disposition before clearing, and
-   stamp it** — one line per entry into `LIFECYCLE_LESSON_EVIDENCE_FILE`
+   stamp it** — one line per entry into `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`
    (`<iteration> lesson <kind> <ref> — <lead-line prefix>`), the record
    `check-lesson-disposition` reads when the entry leaves the queue (the
    stamp, not the commit body, is the mechanically-decidable evidence — the

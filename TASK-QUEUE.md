@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **lifecycle-knob-prefix** [spec: SPEC-knob-prefix.md] — rename the bare `LIFECYCLE_` knob
-  roster to `LIFECYCLE_KIT_`, including the config seam
-  (`LIFECYCLE_KIT_CONFIG_FILE` / `lifecycle-config.sh`); compat ruling: hard rename, no shim
-  — pre-first-tag renames are compat-free, stated as precedent in the merged SPEC.
 - **check-graph-site-move** [spec: SPEC-graph-artifact.md] — move the coupling-graph
   artifact to the docs site (never a copy): new `GATE_SDK_GRAPH_ARTIFACT` knob with the
   workflow-dir default, gate-sdk gains the standard auto-sourced consumer-config seam (this
@@ -183,6 +179,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- lifecycle-knob-prefix
 - doctrine-rule-lockstep
 - runner-doc-off-resident
 - consumer-footprint-budget

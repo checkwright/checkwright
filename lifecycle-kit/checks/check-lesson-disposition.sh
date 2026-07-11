@@ -3,7 +3,7 @@
 # spec: lifecycle-kit/SPEC.md §check-lesson-disposition — every Lessons entry present at HEAD and gone from the worktree leaves a well-formed disposition stamp in the evidence file
 #
 # usage: check-lesson-disposition.sh [queue-head] [queue-worktree] [evidence-file]
-#   bare compares git show HEAD:<queue> vs the worktree + LIFECYCLE_LESSON_EVIDENCE_FILE;
+#   bare compares git show HEAD:<queue> vs the worktree + LIFECYCLE_KIT_LESSON_EVIDENCE_FILE;
 #   three explicit file args drive it hermetically (the check-task-conservation precedent).
 set -uo pipefail
 
@@ -23,7 +23,7 @@ if [[ -n "${1:-}" ]]; then
     [[ -f "$WORK_FILE" ]] || { echo "check-lesson-disposition: queue-worktree not found: $WORK_FILE" >&2; exit 2; }
     [[ -f "$EVID_FILE" ]] || { echo "check-lesson-disposition: evidence file not found: $EVID_FILE" >&2; exit 2; }
 else
-    QUEUE="$LIFECYCLE_QUEUE_FILE"
+    QUEUE="$LIFECYCLE_KIT_QUEUE_FILE"
     git rev-parse --git-dir >/dev/null 2>&1 || {
         echo "LESSON-DISPOSITION: clean (no git repository — no HEAD baseline to compare)"; exit 0; }
     ht="$(mktemp)"; cleanup+=("$ht")
@@ -31,7 +31,7 @@ else
         echo "LESSON-DISPOSITION: clean ($QUEUE not at HEAD — no prior lessons to disposition)"; exit 0
     fi
     [[ -f "$QUEUE" ]] || { echo "check-lesson-disposition: worktree queue not found: $QUEUE" >&2; exit 2; }
-    HEAD_FILE="$ht"; WORK_FILE="$QUEUE"; EVID_FILE="$LIFECYCLE_LESSON_EVIDENCE_FILE"
+    HEAD_FILE="$ht"; WORK_FILE="$QUEUE"; EVID_FILE="$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE"
     [[ -f "$EVID_FILE" ]] || { echo "check-lesson-disposition: evidence file not found: $EVID_FILE" >&2; exit 2; }
 fi
 

@@ -65,9 +65,9 @@ prev-iter close ffffffff 2020-01-01
 EOF
 
 es_run() {
-    LIFECYCLE_QUEUE_FILE="$es/TASK-QUEUE.md" \
-    LIFECYCLE_STATE_FILE="$es/.workflow/WORKFLOW-STATE.txt" \
-    LIFECYCLE_SESSIONS_DIR="$es/sessions" \
+    LIFECYCLE_KIT_QUEUE_FILE="$es/TASK-QUEUE.md" \
+    LIFECYCLE_KIT_STATE_FILE="$es/.workflow/WORKFLOW-STATE.txt" \
+    LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
     bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
 }
@@ -94,7 +94,7 @@ if es_run build >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a 
 cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on a refusal" >&2; exit 1; }
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): wrote queue on a refusal" >&2; exit 1; }
 
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_ENTRY_PREFLIGHT: a red entry command refuses the flip (no writes), a green one lets it through
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_ENTRY_PREFLIGHT: a red entry command refuses the flip (no writes), a green one lets it through
 cat > "$esq" <<'EOF'
 # smoke queue
 ## Iteration: pf-iter  [stage: build]
@@ -120,15 +120,15 @@ STUB
 chmod +x "$es/preflight-stub.sh"
 cat > "$es/stages.sh" <<STAGES
 # shellcheck shell=bash
-LIFECYCLE_ENTRY_PREFLIGHT=('validate=$es/preflight-stub.sh')
+LIFECYCLE_KIT_ENTRY_PREFLIGHT=('validate=$es/preflight-stub.sh')
 STAGES
 
 es_pf_run() {
-    LIFECYCLE_QUEUE_FILE="$esq" \
-    LIFECYCLE_STATE_FILE="$ess" \
-    LIFECYCLE_SESSIONS_DIR="$es/sessions" \
+    LIFECYCLE_KIT_QUEUE_FILE="$esq" \
+    LIFECYCLE_KIT_STATE_FILE="$ess" \
+    LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
     GATE_SDK_TMP_DIR="$es/tmp" \
-    LIFECYCLE_KIT_STAGES_FILE="$es/stages.sh" \
+    LIFECYCLE_KIT_CONFIG_FILE="$es/stages.sh" \
     bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
 }
 

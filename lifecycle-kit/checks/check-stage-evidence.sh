@@ -7,8 +7,8 @@ KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-QUEUE="${1:-$LIFECYCLE_QUEUE_FILE}"
-STATE="${2:-$LIFECYCLE_STATE_FILE}"
+QUEUE="${1:-$LIFECYCLE_KIT_QUEUE_FILE}"
+STATE="${2:-$LIFECYCLE_KIT_STATE_FILE}"
 
 hdr="$(lifecycle_header "$QUEUE")"
 if [[ -z "$hdr" ]]; then
@@ -25,8 +25,8 @@ if [[ -z "$iter" || -z "$stage" ]]; then
     exit 1
 fi
 
-if [[ "$iter" == "—" && "$stage" != "$LIFECYCLE_FIRST_STAGE" ]]; then
-    echo "STAGE-EVIDENCE: iteration is still unnamed ('—') at stage '$stage' — /$LIFECYCLE_FIRST_STAGE must name the iteration (header + stamp) before advancing past $LIFECYCLE_FIRST_STAGE"
+if [[ "$iter" == "—" && "$stage" != "$LIFECYCLE_KIT_FIRST_STAGE" ]]; then
+    echo "STAGE-EVIDENCE: iteration is still unnamed ('—') at stage '$stage' — /$LIFECYCLE_KIT_FIRST_STAGE must name the iteration (header + stamp) before advancing past $LIFECYCLE_KIT_FIRST_STAGE"
     echo "  help: set '## Iteration: <name>  [stage: $stage]' and rewrite the matching $STATE stamp's '—' to <name>"
     exit 1
 fi
@@ -46,12 +46,12 @@ while IFS= read -r line; do
     if [[ -z "$f4" || -n "$rest" ]]; then
         errors+=("malformed stamp (want '<iter> <stage> <session-id> <YYYY-MM-DD>'): $line"); continue
     fi
-    if ! lifecycle_stage_known "$f2" && [[ -z "$LIFECYCLE_WAIVER_TOKEN" || "$f2" != "$LIFECYCLE_WAIVER_TOKEN" ]]; then
-        errors+=("bad stage '$f2' (not a lifecycle stage: ${LIFECYCLE_STAGES[*]}${LIFECYCLE_WAIVER_TOKEN:+, or the waiver token $LIFECYCLE_WAIVER_TOKEN}): $line"); continue
+    if ! lifecycle_stage_known "$f2" && [[ -z "$LIFECYCLE_KIT_WAIVER_TOKEN" || "$f2" != "$LIFECYCLE_KIT_WAIVER_TOKEN" ]]; then
+        errors+=("bad stage '$f2' (not a lifecycle stage: ${LIFECYCLE_KIT_STAGES[*]}${LIFECYCLE_KIT_WAIVER_TOKEN:+, or the waiver token $LIFECYCLE_KIT_WAIVER_TOKEN}): $line"); continue
     fi
     [[ "$f4" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { errors+=("bad date '$f4': $line"); continue; }
     [[ "$f1" == "$iter" || ( "$f1" == "—" && "$iter" == "—" ) ]] \
-        || errors+=("stamp iteration '$f1' is neither current ('$iter') nor a legal '—' bootstrap (allowed only while the header is unnamed) — stale; /$LIFECYCLE_FIRST_STAGE truncates at the iteration boundary and renames its bootstrap stamp on naming: $line")
+        || errors+=("stamp iteration '$f1' is neither current ('$iter') nor a legal '—' bootstrap (allowed only while the header is unnamed) — stale; /$LIFECYCLE_KIT_FIRST_STAGE truncates at the iteration boundary and renames its bootstrap stamp on naming: $line")
     [[ "$f1" == "$iter" && "$f2" == "$stage" ]] && found=1
     if [[ "$f1" == "$iter" ]] && lifecycle_stage_known "$f2"; then
         if [[ -n "${stage_of_sid[$f3]:-}" && "${stage_of_sid[$f3]}" != "$f2" ]]; then

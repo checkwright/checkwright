@@ -57,7 +57,7 @@ done < <(ek_data_lines "$MANIFEST")
 if [[ ${#grammar_errs[@]} -gt 0 ]]; then
     echo "EVIDENCE-MANIFEST: ${#grammar_errs[@]} grammar issue(s) in $MANIFEST:"
     printf '  %s\n' "${grammar_errs[@]}"
-    echo "  help: every line is the eight-field '$EVIDENCE_MANIFEST_CONTRACT' shape and carries the current iteration; a foreign line means the iteration-boundary truncation (LIFECYCLE_BOUNDARY_TRUNCATE) did not clear the manifest"
+    echo "  help: every line is the eight-field '$EVIDENCE_MANIFEST_CONTRACT' shape and carries the current iteration; a foreign line means the iteration-boundary truncation (LIFECYCLE_KIT_BOUNDARY_TRUNCATE) did not clear the manifest"
     exit 1
 fi
 

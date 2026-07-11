@@ -49,7 +49,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 4. Record evidence at validate — run `bash evidence-kit/bin/run-validate.sh`; it
    runs each suite, diffs the baseline, and appends one evidence line per suite.
 
-5. Optional lifecycle integration — set `LIFECYCLE_BOUNDARY_TRUNCATE` to the
+5. Optional lifecycle integration — set `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to the
    evidence manifest so a new iteration starts from the contract header, and the
    manifest gate's close-entry and stamp-coupling assertions arm automatically.
 

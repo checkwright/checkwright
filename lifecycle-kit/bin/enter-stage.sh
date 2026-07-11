@@ -6,24 +6,24 @@ KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-usage() { echo "usage: enter-stage.sh <stage>   (stage ∈ ${LIFECYCLE_STAGES[*]})" >&2; }
+usage() { echo "usage: enter-stage.sh <stage>   (stage ∈ ${LIFECYCLE_KIT_STAGES[*]})" >&2; }
 
 stage="${1:-}"
 if [[ -z "$stage" ]]; then usage; exit 2; fi
 if ! lifecycle_stage_known "$stage"; then
-    echo "enter-stage: '$stage' is not a lifecycle stage (${LIFECYCLE_STAGES[*]})" >&2
+    echo "enter-stage: '$stage' is not a lifecycle stage (${LIFECYCLE_KIT_STAGES[*]})" >&2
     usage
     exit 2
 fi
 
-QUEUE="$LIFECYCLE_QUEUE_FILE"
-STATE="$LIFECYCLE_STATE_FILE"
+QUEUE="$LIFECYCLE_KIT_QUEUE_FILE"
+STATE="$LIFECYCLE_KIT_STATE_FILE"
 [[ -f "$QUEUE" ]] || { echo "enter-stage: queue file not found: $QUEUE" >&2; exit 2; }
 [[ -f "$STATE" ]] || { echo "enter-stage: state file not found: $STATE" >&2; exit 2; }
 
 hdr="$(lifecycle_header "$QUEUE")"
 cur_iter="$(lifecycle_header_iter "$hdr")"
-if [[ "$stage" == "$LIFECYCLE_FIRST_STAGE" ]]; then
+if [[ "$stage" == "$LIFECYCLE_KIT_FIRST_STAGE" ]]; then
     first=1
     stamp_iter="—"
 else
@@ -70,12 +70,12 @@ if ! preflight="$(bash "$KIT/checks/check-stage-entry.sh" "$tmpqueue" "$STATE" 2
     exit 1
 fi
 
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_ENTRY_PREFLIGHT: each entry matching the entered stage runs after the built-in pre-flight with the flipped temp queue + state file appended; a non-zero exit refuses the flip, nothing written
-for pf in ${LIFECYCLE_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_ENTRY_PREFLIGHT[@]}"}; do
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_ENTRY_PREFLIGHT: each entry matching the entered stage runs after the built-in pre-flight with the flipped temp queue + state file appended; a non-zero exit refuses the flip, nothing written
+for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]}"}; do
     [[ "${pf%%=*}" == "$stage" ]] || continue
     read -r -a pf_argv <<<"${pf#*=}"
     if ! pf_out="$("${pf_argv[@]}" "$tmpqueue" "$STATE" 2>&1)"; then
-        echo "enter-stage: LIFECYCLE_ENTRY_PREFLIGHT command for '$stage' refuses the flip — nothing written:" >&2
+        echo "enter-stage: LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' refuses the flip — nothing written:" >&2
         printf '%s\n' "$pf_out" >&2
         echo "  help: resolve the finding above, or (to override deliberately) perform the stamp+flip by hand." >&2
         exit 1
@@ -92,7 +92,7 @@ if [[ "$first" == 1 ]]; then
     if [[ -n "$lessons" ]]; then
         echo "enter-stage: iteration-boundary entry to '$stage' refused — ## Lessons Learned is non-empty; the close stage must disposition every lesson before the next iteration begins (nothing written):" >&2
         printf '%s\n' "$lessons" >&2
-        echo "  help: run the close ritual's disposition step (rule/task/harvest/discard, stamping $LIFECYCLE_LESSON_EVIDENCE_FILE), clear the section, then re-run enter-stage $stage." >&2
+        echo "  help: run the close ritual's disposition step (rule/task/harvest/discard, stamping $LIFECYCLE_KIT_LESSON_EVIDENCE_FILE), clear the section, then re-run enter-stage $stage." >&2
         exit 1
     fi
 fi
@@ -100,8 +100,8 @@ fi
 if [[ "$first" == 1 ]]; then
     header_only="$(awk '{ print } /^---[[:space:]]*$/ { exit }' "$STATE")"
     printf '%s\n\n%s\n' "$header_only" "$stamp_line" > "$STATE"
-    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit-owned lesson-evidence file resets as a built-in member (kit owns this surface); LIFECYCLE_BOUNDARY_TRUNCATE stays reserved for files the kit does not own
-    for bt in "$LIFECYCLE_LESSON_EVIDENCE_FILE" ${LIFECYCLE_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_BOUNDARY_TRUNCATE[@]}"}; do
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit-owned lesson-evidence file resets as a built-in member (kit owns this surface); LIFECYCLE_KIT_BOUNDARY_TRUNCATE stays reserved for files the kit does not own
+    for bt in "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" ${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]}"}; do
         [[ -f "$bt" ]] || continue
         bttmp="$tmpdir/boundary-truncate.$$"
         awk 'drop { next } /^#/ || /^[[:space:]]*$/ { print; next } { drop = 1 }' "$bt" > "$bttmp"
