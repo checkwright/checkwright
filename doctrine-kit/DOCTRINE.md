@@ -30,7 +30,12 @@ load-trigger residency rule to the doctrine itself.
    class *and* the mechanism that catches it, and land both in one unit; a green
    instance fix is the stop signal to ask what check should have caught it. When
    the gate cannot land in the same unit, the instance fix rides the gate's unit
-   rather than landing bare.
+   rather than landing bare. The mechanism is bought against a budget — gate
+   count, runtime, maintenance — so the strongest form is structural: remove the
+   duplication or collapse the surface so the defect class cannot recur, and no
+   gate is owed. No duplication with no gate outranks duplication with a gate;
+   tolerated duplication is the exception and carries its defence (the amendment
+   template's sanctioned-copy rule is the model).
    *Under agent work:* an unenforced rule is a rule the next session cannot see;
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —

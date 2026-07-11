@@ -54,7 +54,9 @@
   always-loaded file links the doctrine file; nothing holds the one-line-per-rule digest and
   the doctrine's rule set in lockstep, so a rule added on either side without its counterpart
   passes. Extend to per-rule bidirectional coverage (the attested handbook-coverage practice:
-  digest line ↔ owner heading, both directions). Surfaced 2026-07-11 at align.
+  digest line ↔ owner heading, both directions) — but weigh against rule 2's gate-economy
+  clause at spec time: if the digest's coverage risk stays trivial, the gate is not owed.
+  Surfaced 2026-07-11 at align.
 - **lifecycle-knob-prefix** [needs-spec] — lifecycle-kit's knobs ride a bare `LIFECYCLE_`
   prefix except `LIFECYCLE_KIT_STAGES_FILE`, against the `<KIT>_KIT_` shape every other kit
   uses; a rename breaks every consumer config, so the unit's spec must rule the
@@ -182,6 +184,12 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **consumer-footprint-budget** [needs-spec] — state and hold the kits' consumer-resident
+  footprint: what checkwright asks a customer's always-loaded surface to carry (today the
+  delegation pre-authorization sentence and the doctrine link; hooks, skills, and SPECs are
+  load- or event-triggered). Rule the owner and whether the always-loaded meter's baseline
+  ships as the consumer's floor-holder — a customer project pursues its own objectives and
+  the tooling must stay near-invisible in its context budget. Surfaced 2026-07-11 at align.
 - **launch-comms** [needs-spec] — the promotion arc, sequenced after
   public-positioning lands, the checkwright.dev cutover is live, and a
   first release tag exists. In-repo residue only (docs/posts/ entries, the
@@ -191,3 +199,8 @@
 ## Done
 
 ## Lessons Learned
+
+- [attend] **always-loaded-hard-shrink** — operator directive at align: this repo is the main
+  demo of checkwright's value and consumers install into their own CLAUDE-governed projects,
+  so the resident surface must be extremely lite; close's brevity pass runs as a hard shrink
+  against the always-loaded meter's over-baseline reading, not a rubber stamp.
