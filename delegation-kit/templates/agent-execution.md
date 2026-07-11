@@ -1,10 +1,11 @@
-CONSUMER COPY — copy this into your skills directory as
-`.claude/commands/agent-execution.md` and fill the two marked consumer sections
-(the shared-file roster and the validate battery). The full delegated-`Agent`
+CONSUMER BINDING — create `.claude/commands/agent-execution.md` as a binding
+shim naming this template (a header `Execute the template at <path>, applying
+the bindings below.` then a `## Bindings` section) and bind its two slots — the
+shared-file roster and the validate battery. The full delegated-`Agent`
 execution protocol (any stage, any purpose — an audit, a build sweep, a one-off
-investigation). The load-bearing safety rules are also resident in CLAUDE.md
-§Agent execution so they are never absent from a delegating session (copy
-`claude-md-agent-execution.md` there); this skill is the complete procedure.
+investigation). A resident pointer in CLAUDE.md §Agent execution keeps the
+protocol reachable from a delegating session; this skill is the complete
+procedure.
 
 - **Supervisor owns rulings; agents surface, never guess.** SECURITY and design
   rulings (e.g. a privileged caller set, a naming collision) are decided by the
@@ -76,32 +77,17 @@ investigation). The load-bearing safety rules are also resident in CLAUDE.md
   subagent-token total suggests, so size waves to leave the next one headroom, or
   accept one wave per window.
 
-<!-- ===== consumer section: shared-file roster — edit this ==================
-The files two agents must never edit concurrently (in ADDITION to the git index
-and HEAD, which are always shared for committing agents). List your build's
+## Shared-file roster
+
+*<shared-file-roster: the files two agents must never edit concurrently, in
+addition to the git index and HEAD (always shared for committing agents) — your
 generated-config scripts, shared test-environment fixtures, and any amendment
-file under active edit. Example shape:
+file under active edit.>*
 
-    - deploy/scripts/gen-configs.sh
-    - <your shared integration-test fixture>
-    - the amendment file a unit is editing
-===== end consumer section: shared-file roster =========================== -->
+## Validate battery
 
-<!-- ===== consumer section: validate battery — edit this ====================
-The command set the supervisor re-runs after every agent commit (never the
-agent's self-report). For a gate-sdk consumer this always includes:
-
-    bash gate-sdk/bin/run-gates.sh
-    <the kit fixture runners for the gates this sweep touched>
-
-A toolchain consumer adds its compile/lint/test set here, e.g. for a Cargo
-workspace:
-
-    cargo check --workspace --all-targets
-    cargo clippy --workspace -- -D warnings
-    cargo test  --workspace
-    find <renamed-dirs> -name '*.rs' -size 0    # zero-byte corruption after renames
-
-Renames are the trap: a stale build cache can green a tree with silently
-zero-byted files — sweep for them explicitly.
-===== end consumer section: validate battery ============================= -->
+*<validate-battery: the command set the supervisor re-runs after every agent
+commit, never the agent's self-report — for a gate-sdk consumer the
+`run-gates.sh` battery plus the fixture runner for each kit the sweep touched; a
+toolchain consumer adds its compile/lint/test set, and after any rename sweeps
+explicitly for zero-byte files a stale build cache would green.>*

@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **delegation-doctrine-single-source** [spec: delegation-kit/SPEC-doctrine-single-source.md]
-  — one source for the agent-execution doctrine: the kit
-  template gains the two consumer slots and
-  is bound as a skill shim; the CLAUDE.md digest template retires; the
-  resident block shrinks to pre-authorization plus the `/agent-execution`
-  pointer, with the budget guard naming the protocol at the dispatch seam.
 - **prose-citation-pointer-gate** [spec: canon-kit/SPEC-prose-citation.md] —
   check-spec-pointer gains a prose-citation pass: a free-prose
   `<path>.md §<Heading>` on a governed surface must resolve its heading via
@@ -221,5 +215,6 @@
 
 - gate-run-for-path
 - stage-shim-dedup
+- delegation-doctrine-single-source
 
 ## Lessons Learned

@@ -117,7 +117,7 @@ if staged_matches '.claude/commands/*.md'; then
     lifecycle-kit/checks/check-stage-skill-coverage.sh || hook_fail check-stage-skill-coverage
 fi
 
-if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/skills/*.md'; then
+if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/skills/*.md' 'delegation-kit/templates/agent-execution.md'; then
     lifecycle-kit/checks/check-skill-binding.sh || hook_fail check-skill-binding
 fi
 

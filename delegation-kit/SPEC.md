@@ -91,18 +91,26 @@ consumer). Registration is the opt-in valve: a consumer wanting pure advice
 does not wire the hook. No new persistent state and no new key on the
 `usage.txt` contract — the verdict line is the only interface.
 
-### Two templates, one protocol
+### One template, a resident pointer
 
-`templates/agent-execution.md` is the complete procedure, copied into the
-consumer's skills directory (`.claude/commands/agent-execution.md`) and
-invoked when delegating. `templates/claude-md-agent-execution.md` is the
-compressed resident form for the consumer's CLAUDE.md: skills load on
-invocation, but the safety rules must never be absent from a session that
-*could* delegate, so the load-bearing bullets ride in the always-loaded
-file and point at the skill for the full procedure. Consumer-specific
-material in both templates — the shared-file roster, the validate battery —
-lives in marked consumer sections, the same discipline as guard-kit's
-consumer-rules block.
+`templates/agent-execution.md` is the single source for the protocol — a
+binding-shim *template* in lifecycle-kit's grammar (lifecycle-kit/SPEC.md
+§check-skill-binding). The consumer creates `.claude/commands/agent-execution.md`
+as a shim that names the template and binds its two slots — the shared-file
+roster and the validate battery — the consumer-specialization discipline of
+guard-kit's consumer-rules block, now carried by the slot/binding mechanism the
+lifecycle skills already use. `check-skill-binding` enforces the slot pairing on
+the consumer side.
+
+The consumer's CLAUDE.md carries no digest of the bullets, only a resident
+pointer: the pre-authorization sentence (consumer judgment on what delegation
+needs no ask) and `/agent-execution`. Rationale: a rule is resident only when it
+has no load trigger (the load-trigger-residency doctrine), and every protocol
+bullet triggers at `Agent` dispatch — which already has a mechanical seam, the
+per-dispatch budget guard, whose block message names `/agent-execution`. The
+doctrine lives behind the trigger, not in the always-loaded file. Honest limit:
+the guard enforces budget mechanically, not protocol literacy — a session that
+dispatches without invoking the skill carries only the resident pointer.
 
 ## Resume journal — agent writes, supervisor deletes
 
@@ -326,8 +334,7 @@ delegation-kit/
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
   gate-tests/check-gate-tamper/{good,bad}/
-  templates/agent-execution.md            # full protocol skill
-  templates/claude-md-agent-execution.md  # resident CLAUDE.md section
+  templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
   templates/statusline-usage.sh           # reference usage.txt producer + status bar
   templates/delegation-config.sh          # knob overrides (arrays live here)

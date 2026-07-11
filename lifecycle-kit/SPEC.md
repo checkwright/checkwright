@@ -283,15 +283,18 @@ override with the first argument) that carries a binding directive — `Execute
 the template at <path>, applying the bindings below.` — (a) names a template
 file that exists and (b) binds exactly that template's slot set: an unbound slot
 is red, an orphan binding naming no slot is red. A skill with no directive is
-not read, so copy-and-specialize skills and non-stage skills (`/agent-execution`)
-are untouched — the same directive-as-selector mechanism `check-stage-skill-coverage`
-uses on `enter-stage.sh`. Template slots are the `*<slot-name: …>*` opening
+not read, so a copy-and-specialize skill carrying no such line is untouched —
+the same directive-as-selector mechanism `check-stage-skill-coverage` uses on
+`enter-stage.sh`. A bound skill need not be a stage skill: `/agent-execution`
+binds a delegation-kit template, which the gate accepts unchanged (the resolved
+template path may point at any kit). Template slots are the `*<slot-name: …>*` opening
 tokens; a shim's bindings are the `**slot-name** —` lead lines under
 `## Bindings`; the directive's template path resolves relative to the current
 directory (the tree root at pre-commit). A skills dir that does not exist is
-fail-closed (exit 2). The `# graph:` couples the skills dir and the templates
-dir at `tier=precommit`, so a slot added to a template or a binding changed in a
-shim fires the gate. The good/bad pair drives the unbound-slot case;
+fail-closed (exit 2). The `# graph:` couples the skills dir, the lifecycle
+templates dir, and each out-of-tree bound template (e.g.
+`delegation-kit/templates/agent-execution.md`) at `tier=precommit`, so a slot
+added to a template or a binding changed in a shim fires the gate. The good/bad pair drives the unbound-slot case;
 `gate-tests/check-skill-binding.test.sh` covers the orphan-binding,
 missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
 

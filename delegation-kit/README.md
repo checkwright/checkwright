@@ -30,13 +30,14 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    it in the generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh
    --write`.
 
-2. Copy the protocol templates into place:
-   - `templates/agent-execution.md` → your skills dir as
-     `.claude/commands/agent-execution.md` (the full procedure).
-   - `templates/claude-md-agent-execution.md` → a `### Agent execution` block in
-     your `CLAUDE.md` (the load-bearing rules, always-loaded).
-   - Fill the two marked consumer sections in both: the shared-file roster and
-     the validate battery.
+2. Bind the protocol skill and add its resident pointer:
+   - Create `.claude/commands/agent-execution.md` as a binding shim naming
+     `templates/agent-execution.md` and binding its two slots — the shared-file
+     roster and the validate battery (SPEC §One template, a resident pointer).
+   - Add a `### Agent execution` block to your `CLAUDE.md`: your delegation
+     pre-authorization sentence plus the `/agent-execution` pointer. The
+     protocol loads behind that trigger, so the block stays a pointer, never a
+     digest.
 
 3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — point
    your harness `statusLine` at `templates/statusline-usage.sh` (or copy it), or
