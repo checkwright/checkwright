@@ -14,14 +14,6 @@
 
 ## Technical Debt
 
-- **validate-spine-consumer-smoke** — ruled at scope: the filed
-  parser-adapter premise is stale — the configured evidence parser is
-  `exit-code`, which maps a suite's exit status to one scenario line (the
-  demo suite is the working precedent). Enrollment is a consumer-config
-  append in scripts/evidence-config.sh (a `consumer_smoke` suite running
-  gate-sdk/bin/run-consumer-smoke.sh) plus its baseline scenario line; the
-  validate shim's separate smoke step collapses into the spine citation in
-  the same unit.
 - **session-context-stage-lag** — ruled at scope: union-trigger keying — a
   SessionStart hook reads the queue header before the arriving skill's flip,
   so every stage-conditioned output keys on a stage *set* that includes the
@@ -214,6 +206,7 @@
   2026-07-09.
 ## Done
 
+- validate-spine-consumer-smoke
 - kfric-capture-tool
 - knob-literal-citation-gate
 - prose-citation-pointer-gate

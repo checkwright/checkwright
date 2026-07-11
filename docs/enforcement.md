@@ -128,6 +128,7 @@ leaves its section absent.
 | delegation-kit | budget_guard_tests |
 | delegation-kit | trend_tests |
 | (consumer) | demo |
+| gate-sdk | consumer_smoke |
 
 ## Monitors
 

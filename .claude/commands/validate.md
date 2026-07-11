@@ -6,12 +6,11 @@ Execute the template at lifecycle-kit/templates/skills/validate.md, applying the
 whole-tree.
 
 **suites** — run the full gate battery and every kit's fixture suite as
-CLAUDE.md §This repo is governed by its own kits lists them, then exercise the
-kits as a consumer would: `bash
-gate-sdk/bin/run-consumer-smoke.sh`, gating on its success token
-(gate-sdk/SPEC.md §Consumer smoke). Record the evidence with the codified
-spine: `bash evidence-kit/bin/run-validate.sh` runs each configured suite,
-diffs the baseline slice, and appends one `verdict=clean` line per suite to
+CLAUDE.md §This repo is governed by its own kits lists them. Record the
+evidence with the codified spine: `bash evidence-kit/bin/run-validate.sh` runs
+each configured suite — including the end-to-end consumer smoke exercised as a
+downstream consumer would (gate-sdk/SPEC.md §Consumer smoke) — diffs the
+baseline slice, and appends one `verdict=clean` line per suite to
 `.workflow/validate-evidence.txt`; commit that file (evidence-kit/SPEC.md
 §check-evidence-manifest). Gate on the positive success tokens, not the absence
 of failure text; a non-zero exit is a real new failure — fix or file it, never
