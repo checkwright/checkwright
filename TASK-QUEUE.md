@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: doctrine-followthrough  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,33 +12,58 @@
 
 ## New Features
 
+- **stage-shim-dedup** [spec: lifecycle-kit/SPEC-shim-dedup.md] — the binding
+  shims stop forking kit procedure and restating always-loaded facts (close's
+  housekeeping binds residue and names the two kit templates; build/scope trim
+  to citations); enforcement half in the same unit: `check-shim-restatement`,
+  the shared-n-gram tripwire between a shim and the dedup corpus.
+- **gate-run-for-path** [spec: gate-sdk/SPEC-run-for-path.md] — `run-gates.sh
+  --for <path>`: path-scoped gate selection over the same `# graph:` reader
+  the hook and check-graph share, so selector and hook cannot desync; the
+  oracle-first affordance (edit → run coupled gates → read help).
+- **delegation-doctrine-single-source** [spec: delegation-kit/SPEC-doctrine-single-source.md]
+  — one source for the agent-execution doctrine: the kit
+  template gains the two consumer slots and
+  is bound as a skill shim; the CLAUDE.md digest template retires; the
+  resident block shrinks to pre-authorization plus the `/agent-execution`
+  pointer, with the budget guard naming the protocol at the dispatch seam.
+- **prose-citation-pointer-gate** [spec: canon-kit/SPEC-prose-citation.md] —
+  check-spec-pointer gains a prose-citation pass: a free-prose
+  `<path>.md §<Heading>` on a governed surface must resolve its heading via
+  the existing `heading_present` helper; carve-outs keep the directive
+  pass's false-positive level.
+- **knob-literal-citation-gate** [spec: canon-kit/SPEC-knob-citation.md] —
+  `check-knob-citation`: no governed prose surface outside a kit's own SPEC
+  states a kit knob's value; derived prefix vocabulary (no term list), the
+  three-part trigger keeps bare knob names and bare numbers legal.
+- **kfric-capture-tool** [spec: drift-kit/SPEC-kfric-tool.md] — `bin/kfric.sh
+  "<fact>" "<surface>"` stamps the capture grammar into the existing
+  knowledge-friction log knob with no caller-side redirect, so a prefix-glob
+  allowlist entry makes capture prompt-free.
+
 ## Technical Debt
+
+- **validate-spine-consumer-smoke** — ruled at scope: the filed
+  parser-adapter premise is stale — the configured evidence parser is
+  `exit-code`, which maps a suite's exit status to one scenario line (the
+  demo suite is the working precedent). Enrollment is a consumer-config
+  append in scripts/evidence-config.sh (a `consumer_smoke` suite running
+  gate-sdk/bin/run-consumer-smoke.sh) plus its baseline scenario line; the
+  validate shim's separate smoke step collapses into the spine citation in
+  the same unit.
+- **session-context-stage-lag** — ruled at scope: union-trigger keying — a
+  SessionStart hook reads the queue header before the arriving skill's flip,
+  so every stage-conditioned output keys on a stage *set* that includes the
+  predecessor: the full Deferred board fires on close+scope (which also
+  serves close's backlog review), and each nudge keys on {predecessor, own
+  stage} so first-of-stage and restarted sessions both receive it. The
+  step-1 "only scope acts on Deferred" rationale and an honest-limit
+  sentence about the header lag land in context-kit/SPEC.md §The
+  session-context hook (template); template and this repo's
+  scripts/session-context.sh copy move in one unit.
 
 ## Deferred
 
-- **knob-literal-citation-gate** [needs-spec] — the enforcement half of the
-  align knob-defaults finding: the instance is fixed (CLAUDE.md cites knob
-  names; each kit's SPEC owns its roster and default values) and this gate
-  forbids the slab growing back — no governed surface outside a kit's own
-  SPEC states a `<KIT>_` knob's default value. Calibrate on the low-FP
-  triad (knob token + default/value marker + non-owning surface); a bare
-  number in prose stays a tripwire, not a gate.
-- **prose-citation-pointer-gate** [needs-spec] — close the §heading-citation
-  gap: today a section reference is verdict-checked only in a structured
-  `spec:`/`contract:` directive (check-spec-pointer) or a markdown-link anchor
-  (check-md-refs); a free-prose citation (`gate-sdk/SPEC.md §The gate model`
-  inline in a sentence) resolves neither its file nor its heading, so a
-  mis-cited heading ships green. Ruled an extension of check-spec-pointer, not
-  a new gate: add a prose-citation mode reusing its `heading_present` helper
-  (the trailing-qualifier tolerance already solved there) over one
-  heading-resolution path. Calibrate the trigger for `<path>.md §<Heading>` in
-  governed prose against the low-FP set the directive scan already dodges —
-  fenced examples, a quoted-but-not-live heading, the `§` symbol in
-  non-citation use (check-spec-pointer already carves the prose-tail `§` out
-  deliberately). Generic mechanism, no seam crossing. Surfaced 2026-07-11
-  dogfooding doctrine-kit: an inline SPEC citation named a heading
-  (`§The four contracts`) the target file never carried, caught only by a
-  hand grep — the enforcement-first stop signal.
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
@@ -115,21 +140,6 @@
   enforce). NOTE at sixth ruling: this entry is past the queue-entry
   altitude — its scope session should open by graduating these notes
   into the amendment rather than extending them.
-- **delegation-doctrine-single-source** [needs-spec] — collapse the
-  agent-execution doctrine to one source, the delegation-kit template:
-  CLAUDE.md §Agent execution shrinks to a resident pointer plus at most the
-  pre-authorization sentence, the claude-md-agent-execution.md digest
-  template shrinks with it or retires, and the consumer /agent-execution
-  skill becomes a binding shim over templates/agent-execution.md (the
-  skill-template-binding grammar; check-skill-binding as specced does not
-  restrict which kit owns the named template — sequenced after
-  skill-template-binding lands). Rests on the residency rule from the
-  convention-hardening align review: CLAUDE.md earns a rule's residency
-  only when the rule has no load trigger — anything triggered by a stage,
-  a skill, or a tool call lives in its owned doc behind a pointer, and the
-  Agent budget guard shows dispatch already has a mechanical hook seam.
-  Surfaced 2026-07-11. Superseded note (doctrine-kit scope): the residency
-  rule's owned home is doctrine-kit's DOCTRINE.md, not context-kit's SPEC.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -203,75 +213,6 @@
   tag); the campaign itself — channels, venues, timing — is operator work,
   planned in the operator's local brief rather than here. Surfaced
   2026-07-09.
-- **stage-shim-dedup** [needs-spec] — closure of the doctrine-kit align
-  finding on the stage binding shims: the close shim paraphrases
-  guard-kit/templates/close-triage.md and drift-kit/templates/close-knowledge.md
-  instead of consuming them by reference — a fork of kit-owned procedure, a
-  strict subset when filed but a stranded enhancement the day one lands
-  locally — and the build/scope shims restate always-loaded CLAUDE.md facts
-  (generated-hook regen, public-repo hygiene, the provenance seam,
-  red-gate-never-bypassed) their reader provably has loaded. Fix is
-  pointer-form: the housekeeping binding names the two kit templates and
-  binds only consumer residue; the restatements trim to citations; the
-  build shim's pre-commit battery subset becomes a citation of the CLAUDE.md
-  battery block plus the touched kit's suite. Enforcement half, same unit:
-  a duplication tripwire — a long shared word n-gram between a binding shim
-  and an always-loaded surface or a kit template fails the commit; calibrate
-  the n on the current corpus. Genericity itself stays semantic (no scanner
-  buildable — the n-gram holds the copy shape, judgment holds the tier).
-  Same residency/pointer family as delegation-doctrine-single-source, but
-  sequenced independently of it. Surfaced 2026-07-11 at doctrine-kit align.
-- **gate-run-for-path** [needs-spec] — the affordance half of the doctrine
-  roster's oracle-first rule: expose the generated hook's path→gates
-  selection as an agent-callable entry point (`run-gates.sh --for <path>`
-  or a sibling gate-sdk bin tool), reusing the `# graph:` couples reader
-  gen-pre-commit and check-graph already share, so selector and hook cannot
-  desync. The mid-edit loop becomes edit → run coupled gates → read help —
-  strictly cheaper than reading gate source to predict a verdict, the
-  run-don't-predict equilibrium the oracle-first rule names. Surfaced
-  2026-07-11 at doctrine-kit align.
-- **validate-spine-consumer-smoke** [needs-spec] — the codified validate spine
-  (evidence-kit/bin/run-validate.sh over EVIDENCE_KIT_SUITES) omits the
-  consumer-smoke harness, so it reported every suite clean while
-  gate-sdk/bin/run-consumer-smoke.sh was red — the validate binding runs the
-  smoke as a separate step, but the spine's per-suite "clean" reads as total and
-  masks the gap. Design pending: run-consumer-smoke emits a single
-  `CONSUMER-SMOKE: clean` token, not the per-scenario pass/fail lines the
-  evidence parser expects, so enrolling it needs a parser adapter (or a
-  one-scenario synthetic mapping), not a config-list append. Surfaced 2026-07-11
-  dogfooding doctrine-kit validate: a co-vendored kit appended a trailing
-  CLAUDE.md section that pushed context-kit's smoke violation out of
-  check-brevity's scanned section; the spine stayed green and only the explicit
-  smoke step caught it.
-- **kfric-capture-tool** [needs-spec] — a dedicated knowledge-friction append
-  helper (`drift-kit/bin/kfric.sh "<fact>" "<surface>"`) so the documented
-  any-session capture stops prompting. Root cause: the capture is a shell
-  redirect append (`printf … >> .workflow/knowledge-friction.log`), and no
-  allowlist glob suppresses it safely — a mid-wildcard `printf * >> log` opens a
-  command-injection hole the bash-guard exists to catch, and echo/printf with a
-  redirect trips the guard's decoration rule regardless. The helper takes the
-  fact as an argument (no redirect), so `bash drift-kit/bin/kfric.sh *` is a
-  safe end-wildcard prefix-glob allowlist entry; it also stamps the `<date>
-  <fact> ← <surface>` grammar so the format stops being hand-typed. Owner:
-  drift-kit (the knowledge-friction loop). Surfaced 2026-07-11 at doctrine-kit
-  close — the printf append prompted 3× this iteration.
-- **session-context-stage-lag** [needs-spec] — the session-context hook keys its
-  stage-conditioned output (queue full-board vs tally, and every step-4 nudge) on
-  the queue header, but as a SessionStart hook it reads the header *before* the
-  stage skill's first-step flip — so the value is the *previous* stage. Result:
-  the full Deferred board (intended for the scope session, which promotes off
-  Deferred) lands on the align session instead, scope gets the collapsed tally,
-  and every stage nudge fires one stage late. Design call, not a one-liner: the
-  header can't distinguish a first-of-stage session (reads predecessor) from a
-  restarted same-stage session (reads current), so the fix is a predecessor→
-  current map (brittle on restart) or a union trigger (header ∈ {close, scope} →
-  full board, which also serves close's backlog-aging review). Fix the
-  context-kit/SPEC.md §The session-context hook (template) "only scope acts on
-  Deferred" rationale in the same unit — close reviews and files against Deferred
-  too. Owner: context-kit (the hook template) + this repo's
-  scripts/session-context.sh copy. No clean scanner — the flip-vs-hook ordering
-  is a runtime fact, not a static-scannable one. Surfaced 2026-07-11 at
-  doctrine-kit close, operator-caught.
 ## Done
 
 ## Lessons Learned
