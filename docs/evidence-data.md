@@ -16,3 +16,4 @@
 | public-positioning | s · b v c | 2f/4d | 0 | 13s clean | 42 |
 | close-loop-hardening | s a b v c | 10f/0d | 7 · ≤0d | 13s clean | 46 |
 | enforcement-sweep | s a b v c | 10f/1d | 8 · ≤1d | 13s clean | 52 |
+| convention-hardening | s a b v c | 3f/0d | 3 · ≤0d | 13s clean | 54 |

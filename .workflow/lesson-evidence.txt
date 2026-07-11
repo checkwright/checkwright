@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
-convention-hardening lesson harvest essay — [attend] [essay] golden-practice re-derivation:
