@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **stage-shim-dedup** [spec: lifecycle-kit/SPEC-shim-dedup.md] — the binding
-  shims stop forking kit procedure and restating always-loaded facts (close's
-  housekeeping binds residue and names the two kit templates; build/scope trim
-  to citations); enforcement half in the same unit: `check-shim-restatement`,
-  the shared-n-gram tripwire between a shim and the dedup corpus.
 - **gate-run-for-path** [spec: gate-sdk/SPEC-run-for-path.md] — `run-gates.sh
   --for <path>`: path-scoped gate selection over the same `# graph:` reader
   the hook and check-graph share, so selector and hook cannot desync; the
@@ -227,5 +222,7 @@
   planned in the operator's local brief rather than here. Surfaced
   2026-07-09.
 ## Done
+
+- stage-shim-dedup
 
 ## Lessons Learned

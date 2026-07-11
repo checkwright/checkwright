@@ -28,6 +28,7 @@ check-stage-evidence
 check-stage-entry
 check-stage-skill-coverage
 check-skill-binding
+check-shim-restatement
 check-lesson-disposition
 check-queue-sections
 check-queue-hygiene

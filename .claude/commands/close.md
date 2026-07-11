@@ -12,18 +12,7 @@ queue-kit/bin/lesson-sink.sh <tag>`, which resolves the sink from the local
     `launch-comms` methodology essay; reclaim: merged into the essay, then
     cleared — the runtime-artifact rule).
 
-**housekeeping** — tooling-friction triage (guard-kit/templates/close-triage.md):
-`bash guard-kit/bin/scan-prompts.sh` and resolve each recurring pattern by the
-triage criterion — allowlist (safe & already in the form to reinforce), guard
-rule (a better form exists, or logic a glob can't express), or habit change (a
-true one-off); `bash guard-kit/bin/compare-settings-allow.sh` and prune the
-listed local entries, then by judgment prune remaining one-off local entries
-and promote recurring safe patterns to committed `settings.json` globs; clear
-the log (`: > .workflow/prompt-friction.log`). A task filed by any
-disposition or gap-generalization step is written per queue-kit/SPEC.md
-§The tag algebra. Then knowledge-friction triage
-(drift-kit/templates/close-knowledge.md): walk `.workflow/knowledge-friction.log`
-and remediate each captured re-derivation as a doc-owner edit — give the fact a
-home under the tier contract, or a pointer from where the session looked to the
-owner — never a standing session-start instruction; clear the log
-(`: > .workflow/knowledge-friction.log`).
+**housekeeping** — two triage sweeps, each owned by its kit template and run in
+order: tooling-friction per guard-kit/templates/close-triage.md, then
+knowledge-friction per drift-kit/templates/close-knowledge.md. Any task a sweep
+files follows queue-kit/SPEC.md §The tag algebra.

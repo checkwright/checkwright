@@ -45,6 +45,7 @@ leaves its section absent.
 | lifecycle-kit | check-stage-entry | precommit |
 | lifecycle-kit | check-stage-skill-coverage | precommit |
 | lifecycle-kit | check-skill-binding | precommit |
+| lifecycle-kit | check-shim-restatement | precommit |
 | lifecycle-kit | check-lesson-disposition | precommit |
 | queue-kit | check-queue-sections | precommit |
 | queue-kit | check-queue-hygiene | precommit |

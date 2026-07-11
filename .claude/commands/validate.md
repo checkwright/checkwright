@@ -5,15 +5,9 @@ Execute the template at lifecycle-kit/templates/skills/validate.md, applying the
 **exit-condition** — the full gate battery and every kit's fixture suite green,
 whole-tree.
 
-**suites** — run the battery and the fixture suites:
-
-```bash
-bash gate-sdk/bin/run-gates.sh
-bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
-bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
-```
-
-Also exercise the kits as a consumer would: `bash
+**suites** — run the full gate battery and every kit's fixture suite as
+CLAUDE.md §This repo is governed by its own kits lists them, then exercise the
+kits as a consumer would: `bash
 gate-sdk/bin/run-consumer-smoke.sh`, gating on its success token
 (gate-sdk/SPEC.md §Consumer smoke). Record the evidence with the codified
 spine: `bash evidence-kit/bin/run-validate.sh` runs each configured suite,

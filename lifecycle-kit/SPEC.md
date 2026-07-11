@@ -96,11 +96,15 @@ lesson-disposition stamp file (default
 `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`, read by
 `check-lesson-disposition` and boundary-reset built-in),
 `LIFECYCLE_BOUNDARY_TRUNCATE` — extra files reset
-to their header at the iteration boundary — and `LIFECYCLE_ENTRY_PREFLIGHT` —
+to their header at the iteration boundary — `LIFECYCLE_ENTRY_PREFLIGHT` —
 per-stage entry commands run alongside the built-in pre-flight
-(§bin/enter-stage.sh). Knob semantics
+(§bin/enter-stage.sh) — `LIFECYCLE_SHIM_NGRAM` — the shared-n-gram width
+`check-shim-restatement` trips at (positive integer; §check-shim-restatement)
+— and `LIFECYCLE_SHIM_DEDUP_CORPUS` — that gate's corpus file list, empty for
+the computed `CLAUDE.md`-plus-kit-templates default. Knob semantics
 are documented in the template; the loader validates the machine (unknown
-stages in the map, a waiver token colliding with a stage name) and exits 2 on
+stages in the map, a waiver token colliding with a stage name, a non-integer
+n-gram width) and exits 2 on
 a malformed config — a broken machine must not gate anything.
 
 ## Per-component contracts
@@ -291,6 +295,36 @@ shim fires the gate. The good/bad pair drives the unbound-slot case;
 `gate-tests/check-skill-binding.test.sh` covers the orphan-binding,
 missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
 
+### check-shim-restatement
+
+Invariant: no binding shim under `LIFECYCLE_SKILLS_DIR` shares a normalized word
+n-gram of length ≥ `LIFECYCLE_SHIM_NGRAM` with any surface in the dedup corpus
+`LIFECYCLE_SHIM_DEDUP_CORPUS` — the duplication tripwire under the same
+directive-as-selector rule `check-skill-binding` uses (a file with no `Execute
+the template …` directive is not a shim and is not read). The corpus defaults to
+the consumer's always-loaded `CLAUDE.md` plus every kit's `templates/**/*.md`
+(kit set from `gate_kit_roots`); an explicit `LIFECYCLE_SHIM_DEDUP_CORPUS` or
+positional corpus arguments override it — the latter is the hermetic-fixture
+affordance. Comparison normalizes first — lowercase, punctuation stripped to a
+word boundary, whitespace collapsed — so cosmetic rewording does not evade the
+tripwire; a resolved corpus that yields no n-grams is fail-closed (exit 2), never
+a false clean.
+
+`LIFECYCLE_SHIM_NGRAM` is calibrated to the smallest window with zero false
+positives on the post-rewrite corpus, with a floor of 8 words so a citation line
+(a path plus a §heading) never fires — this repo's default is 9, the width at
+which the 8-word §heading `This repo is governed by its own kits` stops
+tripping. Honest limit: the n-gram holds the *copy shape* only. Which tier a
+fact belongs to stays semantic judgment — a paraphrase below N words passes the
+gate and is still a defect to fix on sight (the same doctrine as
+check-comment-tier's floor). The `# graph:` couples the skills dir, `CLAUDE.md`,
+and the kit template dirs at `tier=precommit`, so editing a shim or a corpus
+surface fires the gate. A red run names the shim, the corpus surface, and the
+shared n-gram, so the fix (delete the restatement, keep a citation) is
+mechanical. The good/bad pair drives the plain restatement/clean split;
+`gate-tests/check-shim-restatement.test.sh` covers the no-directive skip, the
+short-corpus fail-closed, and the below-N paraphrase the one pair cannot.
+
 ### check-lesson-disposition
 
 Invariant: every `## Lessons Learned` entry present at HEAD and absent from the
@@ -356,6 +390,16 @@ shim author replaces. A copy-and-specialize consumer overwrites the whole
 line), and carries nothing else — doctrine restated from the template in a shim
 is the defect the reference mode removes. `check-skill-binding` holds the
 shim↔template slot parity.
+
+**Authoring rule (a binding shim binds residue, cites procedure, restates
+nothing).** A binding a slot supplies carries only what is local to this
+consumer — the residue: which surfaces to sweep, which config knobs, which log
+sinks. Procedure and always-loaded fact that a kit template or the consumer's
+`CLAUDE.md` already owns are named by a citation (a path plus a §heading), never
+copied into the shim: a shim is loaded on every stage invocation, so a
+restatement there is a per-session token tax on a fact with an owner, and it
+drifts the moment the owner changes. `check-shim-restatement` is the tripwire
+for the copy shape; the tier judgment (residue vs owned fact) stays the author's.
 
 Beside the stage skills sits `release-sweep.md` — a **boundary skill**, not a
 stage: it invokes no `enter-stage.sh` and stamps no state, so
