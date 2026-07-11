@@ -1,0 +1,3 @@
+# Hermetic mode: analyze this fixture's sandbox gate (git ls-files anchors to
+# the case dir), never the real gates.list. See gate-sdk/SPEC.md §check-reads-couples.
+sandbox-gate.sh

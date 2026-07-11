@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **reads-subset-couples-meta-gate** [spec: SPEC-reads-couples.md] — the meta-gate closing the
-  reads⊆couples gap check-graph leaves: every statically resolvable recursive walk in a
-  registered gate must be covered by its expanded couples; skips-and-counts the undecidable
-  remainder. Motivated by check-shim-restatement's recursive-corpus / non-recursive-couple bug
-  (fixed 2026-07-11); the same latent smell rides check-docs-link-convention and check-graph's
-  own SPEC scan.
 - **overhead-metering** [spec: SPEC-overhead-meter.md] — drift-kit's overhead meter: what
   fraction of a session's volume is governance versus task work, byte-proxy over transcripts,
   logged per session with a bundled KPI. The commit-first and failures-only economy levers are
@@ -197,6 +191,8 @@
   planned in the operator's local brief rather than here. Surfaced
   2026-07-09.
 ## Done
+
+- reads-subset-couples-meta-gate
 
 ## Lessons Learned
 

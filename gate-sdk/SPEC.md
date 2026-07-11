@@ -238,9 +238,11 @@ Every registered gate's header carries a one-line coupling manifest:
   recursion — a `<dir>/<sub>/*.ext` sibling glob or a wider one — and never
   lean on the tree holding only the shape the couple enumerates; an
   under-covering couple silently skips the gate on the very edit it should
-  catch. `check-graph` verifies couples→hook parity, not reads⊆couples, so this
-  coverage is the author's duty (check-shim-restatement's stage-template
-  subdirectory was exactly this bug).
+  catch. `check-graph` verifies couples→hook parity, not reads⊆couples;
+  `check-reads-couples` (§check-reads-couples) mechanizes the reads⊆couples half
+  for the statically resolvable walks — so the author's duty narrows to the
+  undecidable remainder that gate skips-and-counts (check-shim-restatement's
+  stage-template subdirectory was exactly this bug).
 - `dir=` — `bi` for a coupling bijection (both sides must agree), `one` for a
   one-way audit.
 - `valve=` — `PROPOSED` marks a cycle valve: a coupling where a leading
@@ -567,10 +569,58 @@ disables cycle-valve classification, leaving the no-leading `valve=none` rule),
 and `GRAPH_LAYERS` + `graph_surface_layer()` (the projection's subgraph
 grouping; absent renders one layer). The `--amend-only [dir]` mode runs only
 (G) over a given directory, letting the fixture pair exercise it hermetically.
-Coverage ruling, attested in production use: a `couples ⊇ find-globs` parity
-check — verifying a gate's declared couples cover its real read-set — is *not*
-carried; it would require parsing arbitrary shell, neither cheap nor low-FP,
-and (B) already guarantees editing a coupled surface fires the gate.
+Coverage ruling: a full `couples ⊇ find-globs` parity check over arbitrary
+shell is undecidable — neither cheap nor low-FP — so check-graph does not carry
+it, and (B) already guarantees editing a *coupled* surface fires the gate. The
+statically resolvable slice of that parity is carried by its sibling
+`check-reads-couples` (§check-reads-couples); the undecidable remainder stays
+the author's duty under §The `# graph:` manifest.
+
+### check-reads-couples
+
+Invariant: for every registered gate, every **statically resolvable recursive
+walk** in its source has its tracked read-set covered by the gate's expanded
+`couples=` — the reads⊆couples half `check-graph` leaves to the author
+(§The `# graph:` manifest). This is check-graph's coverage sibling: check-graph
+proves editing a *coupled* surface fires the gate; check-reads-couples proves
+the couples name every surface a resolvable walk *reads*, so no recursion hides
+a surface the couple never listed.
+
+The tractable class is stated as the invariant, because deciding what arbitrary
+bash reads is undecidable and a gate must not over-claim. A **walk** is a
+`gate_find` or `find` at command position; a walk is *resolvable* when its first
+directory argument is one of three shapes — a quoted literal repo-relative path,
+`"$KIT"[/sub]` (the analyzed gate's own kit dir, from the source's
+`checks/`-parent), or `"$REPO_ROOT"[/sub]`. For each resolvable root the gate
+enumerates the **tracked** files under it (`git ls-files`, filtered by a literal
+`-name '<pat>'` primary when one is extractable from the same invocation, else
+unfiltered; `gate_find` walks additionally drop the pruned dirs) and asserts
+every one matches at least one expanded couple under the manifest's own glob
+semantics — segments never cross `/`, so path and glob must share a segment
+count (a shallow one-level couple misses a file one level down, the
+check-shim-restatement bug). A walk whose root does not resolve is **skipped and
+counted** in the clean line: the gate claims only the resolvable class and says
+how much it left undecided. Only tracked files need coverage (couples exist to
+fire the hook on a tracked-path commit; a walk over `.tmp/` or generated state
+has no commit to couple to) and only walks are analyzed — single-file reads and
+`git ls-files` enumeration are out of scope.
+
+Over-demand is absorbed one of two ways, never by weakening the glob semantics
+to pass a near-miss: add the covering sibling glob (the correct fix), or mark
+the deliberate uncoupled walk `# reads-couples-exempt: <reason>` on the walk's
+own line or the line directly above (the `comment-tier-exempt` precedent — local
+to the walk it excuses, auditable in place; a trailing marker excuses only its
+own line). The marker's sole reader is this gate; the skip counter's sole reader
+is the clean-line parenthetical, its honesty label for the undecidable
+remainder. Manifest `tier=precommit trigger=*`: the unconditional trigger is
+load-bearing, not laziness — the invariant breaks two ways, a gate edit that
+changes a walk *or* a new subdirectory grown under a walked root, and no couple
+glob can name a directory that does not exist yet. Its own `couples=` names what
+it reads as content (every `checks/` dir plus `gates.list`); the tracked-file
+enumeration is `git ls-files` metadata, not a content read, so it needs no
+couple. The hermetic fixture affordance: positional gate-source arguments make
+the gate analyze the given source(s) with `git ls-files` anchored to the case
+dir, instead of walking the real `gates.list`.
 
 ### enforcement-map
 

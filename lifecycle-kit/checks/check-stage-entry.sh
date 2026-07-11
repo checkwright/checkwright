@@ -78,14 +78,14 @@ if [[ -n "$LIFECYCLE_AUDIT_STAGE" && "$stage" == "$LIFECYCLE_AUDIT_ENTRY_STAGE" 
         while IFS= read -r sf; do
             [[ -n "$sf" ]] || continue
             sf="${sf#./}"; roster["${sf%/*}"]=1
-        done < <(gate_find "." -name "$LIFECYCLE_ROSTER_BASENAME" -type f | grep -v '/templates/' || true)
+        done < <(gate_find "." -name "$LIFECYCLE_ROSTER_BASENAME" -type f | grep -v '/templates/' || true)  # reads-couples-exempt: whole-tree audit-signal scan; re-fire is owned by the queue/state couple every stage flip touches
 
         declare -A amend_dirs=()
         amend_files=()
         while IFS= read -r af; do
             [[ -n "$af" ]] || continue
             af="${af#./}"; amend_dirs["${af%/*}"]=1; amend_files+=("$af")
-        done < <(gate_find "." -name "$LIFECYCLE_AMENDMENT_GLOB" -type f | grep -v '/templates/' || true)
+        done < <(gate_find "." -name "$LIFECYCLE_AMENDMENT_GLOB" -type f | grep -v '/templates/' || true)  # reads-couples-exempt: whole-tree audit-signal scan; re-fire is owned by the queue/state couple every stage flip touches
 
         contract_alt=""
         for ct in "${LIFECYCLE_CONTRACT_TOKENS[@]}"; do

@@ -61,6 +61,8 @@ if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit
     gate-sdk/checks/check-graph.sh || hook_fail check-graph
 fi
 
+gate-sdk/checks/check-reads-couples.sh || hook_fail check-reads-couples
+
 if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh'; then
     gate-sdk/checks/check-kit-enum.sh || hook_fail check-kit-enum
 fi

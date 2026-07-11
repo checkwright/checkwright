@@ -29,6 +29,7 @@ leaves its section absent.
 | gate-sdk | check-gate-fixture-coverage | precommit |
 | gate-sdk | check-gate-exemption-tasks | precommit |
 | gate-sdk | check-graph | precommit |
+| gate-sdk | check-reads-couples | precommit |
 | gate-sdk | check-kit-enum | precommit |
 | gate-sdk | check-kit-registration | precommit |
 | (consumer) | check-docs-kit-parity | precommit |

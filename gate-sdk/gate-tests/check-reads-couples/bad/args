@@ -1,0 +1,2 @@
+# Hermetic mode: analyze this fixture's sandbox gate. See §check-reads-couples.
+sandbox-gate.sh
