@@ -54,7 +54,7 @@ vendored `gate-sdk/` resolved beside the sourcing script — the root a
 consumer-copied gate sources `lib/gate.sh` from and the anchor kit roots
 relativize against), `GATE_SDK_ROOT_ALLOWLIST` (default
 `<gates-dir>/root-allowlist.list`), `GATE_SDK_REGISTRY_DOC` (default `README.md`)
-and `GATE_SDK_RUNNER_DOC` (default `CLAUDE.md`) for `check-kit-registration`,
+and `GATE_SDK_RUNNER_DOC` (default `README.md`) for `check-kit-registration`,
 `GATE_SDK_MSG_PATTERN_FILES` (default
 `<gates-dir>/msg-patterns.list`; space-separated, each tracked and required —
 fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
@@ -712,7 +712,7 @@ invocation), so a kit whose fixtures never entered the battery is red. A kit
 without `gate-tests/` (guard-kit, drift-kit) owes nothing under B.
 
 Config, the standard kit shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
-is A's doc, `GATE_SDK_RUNNER_DOC` (default `CLAUDE.md`) is B's; both resolve
+is A's doc, `GATE_SDK_RUNNER_DOC` (default `README.md`) is B's; both resolve
 relative to the git toplevel, and an explicit positional argument
 (`[registry-doc [runner-doc]]`) overrides. Fail-closed: a configured doc that
 does not exist is a misconfiguration (exit 2, like `check-kit-enum`'s missing

@@ -22,22 +22,17 @@ one: a kit literal carrying a private vocabulary publishes it.
 ## This repo is governed by its own kits
 
 The gates in [`scripts/gates.list`](scripts/gates.list) run on this tree —
-dogfooding is day-one, not optional. Before committing:
+dogfooding is day-one, not optional. Before committing, run the full battery
+and the touched kit's fixture suite:
 
 ```bash
-bash gate-sdk/bin/run-gates.sh                                                      # full battery
-bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
-bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks           # queue-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks             # canon-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks             # site-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
-bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
-bash guard-kit/bin/run-guard-tests.sh                                                # guard-kit decision table
+bash gate-sdk/bin/run-gates.sh   # full battery
 ```
+
+The per-kit fixture-runner battery — one `run-gate-tests.sh` line per kit, the
+consumer-gate fixtures, the guard-kit decision table — lives in
+[README.md](README.md) §This repo, governed; run the touched kit's suite before
+committing.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.

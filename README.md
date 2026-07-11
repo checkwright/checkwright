@@ -41,8 +41,25 @@ kit is split out only if it earns independent adoption.
 ## This repo, governed
 
 The gates registered in [`scripts/gates.list`](scripts/gates.list) run on this
-tree: `bash gate-sdk/bin/run-gates.sh` for the full battery,
-`bash gate-sdk/bin/install-hooks.sh` to opt this clone into the generated
+tree. Before committing, run the full battery, each kit's fixture suite, and the
+guard-kit decision table:
+
+```bash
+bash gate-sdk/bin/run-gates.sh                                                      # full battery
+bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
+bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks   # lifecycle-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks           # queue-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks           # canon-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks # delegation-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks       # context-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks     # evidence-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks             # site-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks     # doctrine-kit fixtures
+bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
+bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
+```
+
+`bash gate-sdk/bin/install-hooks.sh` opts this clone into the generated
 pre-commit hook. The repo also runs lifecycle-kit's own iteration state
 machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the stage header, one
 iteration per hardening or roadmap unit.

@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **runner-doc-off-resident** [spec: SPEC-runner-doc.md] — move the fixture-runner
-  registration signal off the always-loaded surface: `GATE_SDK_RUNNER_DOC` defaults to the
-  README, whose "This repo, governed" section gains the battery block CLAUDE.md sheds; the
-  CONTRIBUTING pointer becomes true; hook + graph artifacts regenerate with the manifest edit.
 - **consumer-footprint-budget** [spec: SPEC-consumer-footprint.md] — context-kit/SPEC.md
   gains §The consumer footprint: the one-pointer-line budget rule, the per-kit resident-ask
   roster by citation, and the floor-holder ruling (meter + baseline ship in the consumer
@@ -199,5 +195,7 @@
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
 ## Done
+
+- runner-doc-off-resident
 
 ## Lessons Learned

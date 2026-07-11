@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=docs/index.md,CLAUDE.md,kit:gate-tests/* dir=one valve=none tier=precommit
+# graph: couples=docs/index.md,kit:gate-tests/* dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-kit-registration — docs/index.md carries a registry row for every kit root (this consumer re-scopes the kit-registration invariant onto the docs index; wrapper, not mechanism)
 #
 # usage: check-docs-kit-parity.sh [registry-doc]   (default docs/index.md; the
