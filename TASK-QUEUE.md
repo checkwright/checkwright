@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **gate-run-for-path** [spec: gate-sdk/SPEC-run-for-path.md] — `run-gates.sh
-  --for <path>`: path-scoped gate selection over the same `# graph:` reader
-  the hook and check-graph share, so selector and hook cannot desync; the
-  oracle-first affordance (edit → run coupled gates → read help).
 - **delegation-doctrine-single-source** [spec: delegation-kit/SPEC-doctrine-single-source.md]
   — one source for the agent-execution doctrine: the kit
   template gains the two consumer slots and
@@ -223,6 +219,7 @@
   2026-07-09.
 ## Done
 
+- gate-run-for-path
 - stage-shim-dedup
 
 ## Lessons Learned

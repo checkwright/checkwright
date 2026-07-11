@@ -224,7 +224,8 @@ Every registered gate's header carries a one-line coupling manifest:
   (`gate_expand_couples`) expands to `<kit-root>/<glob>` — repo-root-relative —
   for every `gate_kit_roots` member at read time; the same reader feeds
   `gen-pre-commit` (hook emission), `check-graph` (freshness + the HTML
-  projection), so emitter and checker cannot desync on the kit set. A
+  projection), and `run-gates --for` (path-scoped selection §run-gates), so
+  emitter, checker, and selector cannot desync on the kit set. A
   whole-tree gate writes `kit:*.sh` in place of a per-kit hand list; non-kit
   couples (`scripts/*.sh`, `.workflow/*.txt`, `scripts/gates.list`) stay
   literal. Expansion over-approximates by design — a kit is coupled even where
@@ -336,9 +337,12 @@ Owns `fail_closed`, `GATE_PRUNE_DIRS` + the `gate_find` /
 `GATE_GREP_EXCLUDES` / `gate_path_pruned` walk adapters, and the registry
 helpers `gate_sdk_root`, `gate_sdk_gates_dir`, `gates_list_members`,
 `gate_resolve`, `gate_kit_roots`, `gate_kit_roots_rel`, `gate_check_dirs` (the
-multi-kit resolution path other kits' gates ride) and the manifest reader
+multi-kit resolution path other kits' gates ride) and the manifest readers
 `gate_expand_couples` (the `kit:<glob>` couples-token expansion §The `# graph:`
-manifest). The commit-surface value adapters `gate_msg_pattern_files` and
+manifest), `gate_manifest_field` (one field off a gate's `# graph:` line, shared
+by `gen-pre-commit` and the `run-gates --for` selector), and `gate_staged_matches`
+(the path/glob matcher `gen-pre-commit` emits verbatim into the hook and the
+`--for` selector calls §run-gates). The commit-surface value adapters `gate_msg_pattern_files` and
 `gate_commit_types` also live here — the single home of the banned-pattern set
 and the commit-type roster — each documented at its gate (§check-commit-msg,
 §check-commit-subject). `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
@@ -360,6 +364,36 @@ Aggregate runner: executes every `gates.list` member in one shot, timing each
 (`<tmp-dir>/gate-timings.txt`, `<gate> <elapsed-ms>` per line + `TOTAL` —
 uncommitted by design: a measurement, not state). A member that resolves
 nowhere is a failure, not a skip. Exit 0 only when every member passed.
+
+`run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
+agent-callable half of the oracle-first rule: it resolves the registry exactly
+as a bare run, then runs only the members whose *effective trigger* (`trigger=`
+else `couples=`, expanded through `gate_expand_couples`) glob-matches at least
+one given repo-relative path. Registry order and per-gate output are unchanged;
+a bare `run-gates.sh` keeps its behavior. The loop this buys — edit → run
+coupled gates → read the verdict+help — is strictly cheaper than reading gate
+source to predict a verdict; the producer is a mid-edit session or a delegated
+agent's gate-driven worklist, needing no new config (every gate already carries
+the `# graph:` manifest the selection reads).
+
+The match is **one matcher, defined as identical to the generated hook's
+staged-path matching**: the glob step is `gate_staged_matches` in `lib/gate.sh`,
+whose body `gen-pre-commit` emits verbatim as the hook's `staged_matches` (the
+self-contained hook and the selector share one source, held in sync by
+check-graph's freshness assertion §check-graph), and both draw the `# graph:`
+fields through `gate_manifest_field` + `gate_expand_couples` — the single reader
+§The `# graph:` manifest names. Two hook behaviors the selector reproduces
+beyond that matcher: a `trigger=*` gate is selected for every path, and a
+`mode=staged` gate — whose hook branch matches by git pathspec (exact path or
+subtree prefix), a second mechanism — is selected exactly when that branch would
+run it and receives its matching paths as positional args, as the staged branch
+does. A divergence between what the hook would run for a staged path and what
+`--for` runs for the same path is a bug against this contract. When no gate
+couples to a given path the selector prints an explicit `no registered gate
+couples to <path>` note and exits 0 — an ungoverned path is a fact, not a
+failure; the selector is a `bin/` tool, never a registered gate, but its own
+plumbing stays fail-closed (an unreadable registry or unresolvable member exits
+non-zero).
 
 ### run-gate-tests
 

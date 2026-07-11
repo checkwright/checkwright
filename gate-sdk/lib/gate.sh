@@ -136,6 +136,29 @@ gate_expand_couples() {
     printf '%s\n' "${out[*]}"
 }
 
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — read one field from a resolved gate's `# graph:` line; the shared field reader gen-pre-commit and run-gates --for selection draw the manifest through (the couples-token expansion stays gate_expand_couples, the reader check-graph also shares). Emits the value, empty when the field is absent; never fails on a missing field.
+gate_manifest_field() {
+    local src="$1" key="$2" man kv
+    man="$(grep -m1 '^# graph: ' "$src" 2>/dev/null || true)"
+    for kv in ${man#\# graph: }; do
+        [[ "$kv" == "$key="* ]] && { printf '%s' "${kv#"$key"=}"; return 0; }
+    done
+    return 0
+}
+
+# spec: gate-sdk/SPEC.md §run-gates — the path/glob matcher shared by run-gates --for selection and the emitted pre-commit hook: true when a path in the caller's staged_all array matches one of the given globs (bash glob, `*` spans '/'). gen-pre-commit emits this body verbatim into the hook's staged_matches; check-graph's freshness assertion holds the two in sync.
+# shellcheck disable=SC2154  # staged_all is the caller's array: the hook's staged set, the selector's --for paths
+gate_staged_matches() {
+    local f pat
+    for f in "${staged_all[@]}"; do
+        for pat in "$@"; do
+            # shellcheck disable=SC2053
+            [[ "$f" == $pat ]] && return 0
+        done
+    done
+    return 1
+}
+
 # spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Emits one existing readable file path per line; returns 2 when a required tracked file is missing.
 gate_msg_pattern_files() {
     if [[ $# -gt 0 ]]; then

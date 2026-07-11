@@ -48,13 +48,21 @@ read_manual() {
 read_manual
 
 manifest_field() {
-    local gate="$1" key="$2" src man kv
+    local gate="$1" key="$2" src
     src="$(resolve_rel "$gate")" || return 0
-    man="$(grep -m1 '^# graph: ' "$src" 2>/dev/null || true)"
-    for kv in ${man#\# graph: }; do
-        [[ "$kv" == "$key="* ]] && { printf '%s' "${kv#"$key"=}"; return 0; }
-    done
-    return 0
+    gate_manifest_field "$src" "$key"
+}
+
+# spec: gate-sdk/SPEC.md §run-gates — the hook's staged_matches is this lib body emitted verbatim; check-graph freshness holds them in sync
+emit_staged_matcher_body() {
+    local body
+    body="$(awk '
+        $0 == "gate_staged_matches() {" { grab = 1; next }
+        grab && $0 == "}" { exit }
+        grab { print }
+    ' "$SDK/lib/gate.sh")"
+    [[ -n "$body" ]] || { echo "gen-pre-commit: could not extract gate_staged_matches body from lib/gate.sh" >&2; exit 2; }
+    printf '%s\n' "$body"
 }
 
 emit_block() {
@@ -122,14 +130,9 @@ mapfile -t staged_all < <(git diff --cached --name-only --diff-filter=ACMR)
 
 # True if any staged path matches one of the given globs (bash glob: `*` spans '/').
 staged_matches() {
-    local f pat
-    for f in "${staged_all[@]}"; do
-        for pat in "$@"; do
-            # shellcheck disable=SC2053
-            [[ "$f" == $pat ]] && return 0
-        done
-    done
-    return 1
+HEAD
+    emit_staged_matcher_body
+    cat <<'HEAD'
 }
 
 # Uniform failure: the gate already printed its findings + help: line above.
