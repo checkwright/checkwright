@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: craft-and-routing  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,79 +12,42 @@
 
 ## New Features
 
+- **craft-extraction** [spec: SPEC-craft-extraction.md] — copy-first extraction of
+  the generic craft share of the private consumer's handbook: doctrine-kit's
+  engineering-craft register grows six working-style/git-hygiene rules (full
+  statement/rationale/enforcement triple — the shape question is ruled in the
+  amendment), guard-kit's generic ruleset gains the advisory git-rewrite rule, and
+  delegation-kit gains the load-triggered dispatch/rename checklist template.
+  Provenance: generalized only — product names, identity/key items stay private.
+
+- **scope-session-routing** [spec: SPEC-scope-session-routing.md] — rung 1 of the
+  lead-session design: a lifecycle-kit lead template (not a stage skill) dispatches
+  stage sessions and answers their batched, decision-shaped escalations; sessions
+  resume in place. Stamps stay authoritative — the lead writes no lifecycle state;
+  ruling classes live in tracked agent-definition config; an optional guard-kit
+  SendMessage template is the mechanical floor. Ownership ruled to lifecycle-kit
+  (supersedes the companion-tool hypothesis); topology stays with
+  multi-operator-semantics.
+
+- **trajectory-close-freshness** [spec: SPEC-close-freshness.md] — close the
+  close-blindness of the trajectory freshness gate: the extractor SPEC gains the
+  close-coupling contract (regenerate the projection in the first commit after the
+  close stamp lands), this repo's freshness gate widens its `trigger=` to the queue
+  file so the Done-clearing commit runs it with the stamp in history, and the close
+  binding names the regeneration step. No new scanner — the self-reference is
+  inherent; CI stays the outer backstop.
+
+- **check-graph-theme-parity** [spec: SPEC-graph-theme.md] — a theme-injection seam
+  in check-graph's emitter (`GATE_SDK_GRAPH_THEME`, the graph-vocab pattern): three
+  optional override functions (css/header/footer), kit default byte-identical when
+  unset; this repo's `scripts/graph-theme.sh` supplies Primer-shaped tokens + site
+  chrome (light+dark) so `docs/check-graph.html` reads as the same site. Artifact
+  stays generated-only; self-containment and assertion-F href policing unchanged.
+
 ## Technical Debt
 
 ## Deferred
 
-- **craft-extraction** [needs-spec] — the reusable share of the private consumer's handbook
-  is generic engineering craft this repo never extracted: agent working-style habits
-  (config-edit hygiene, cross-repo governance reads, resolver-gate fork-not-verdict), git
-  operation hygiene (verify HEAD before amend, re-stage after soft reset, fresh `-F` message
-  files), and the dispatch/rename checklists (importer survey, collision check, dispatch
-  brief, sweep verification). Triage ruling 2026-07-11 at scope: this repo's CLAUDE.md has
-  nothing left to move (already pointer-shaped; the provenance seam and kit conventions are
-  kit-author content), so the unit is a copy-first extraction from the consumer handbook —
-  dispatch/rename checklists toward delegation-kit's template surface, working-style and git
-  hygiene toward doctrine-kit's engineering-craft register; design question to rule at spec:
-  whether the habit roster earns full doctrine-rule shape (statement/rationale/enforcement
-  triple) or a lighter kit surface, and per the seam, attested-failure prose generalizes only
-  with product names stripped (identity/key items stay private).
-
-- **scope-session-routing** [needs-spec] — iteration-ambiguity routing across
-  sessions: a build/align session forwards a question to the still-live scope
-  session and relays the reply back; design it atop the harness's native
-  agent-to-agent messaging (SendMessage/subagents) rather than bespoke
-  plumbing — the substrate is moving fast and bespoke plumbing would be
-  obsoleted; likely a companion tool or repo, not a kit; triage post kit 7.
-  Extended 2026-07-07: the full ambition is the scope session as the
-  iteration's *lead* — dispatching and supervising the other stage sessions,
-  not only answering their questions; Q&A routing is that design's first
-  rung. Design tension to rule: the lifecycle is built for stateless sessions
-  with evidence stamps as the hand-off, so a live supervisor must leave the
-  stamps authoritative — orchestration convenience must not become a second,
-  ungated source of iteration state. Boundary note 2026-07-10: this rung is
-  communication, not topology — its sessions share one clone and one
-  lifecycle state by design; contributor-level branch/worktree strategy is
-  multi-operator-semantics' question, and that rung is upstream of any
-  team-flavored version of this one. Delegation-parameter note 2026-07-10:
-  the lead owns model/effort for the stage sessions it dispatches (whoever
-  invokes the dispatch selects; stage shape predicts effort, and the lead
-  holds the iteration-wide picture), but sub-agent dispatch inside a stage
-  session stays with that session under the resident delegation protocol
-  and per-dispatch budget guard — the session's context, not the lead's,
-  holds what selection needs. The stamps-authoritative constraint
-  generalizes to policy: a lead's delegation preferences land in the
-  tracked surfaces sessions already read (agent-definition frontmatter,
-  delegation config), never ad-hoc per-session instructions — else the
-  lead becomes a second, ungated source of delegation policy. Interaction
-  model note 2026-07-10: this rung is *orchestration* (a blocked session
-  pauses on its question and resumes in place when the answer arrives —
-  the SendMessage substrate), not *delegation* (fire-and-forget: a
-  delegated agent that hits a question surfaces it, terminates, and is
-  re-dispatched fresh — the resident agent-execution protocol, correct
-  for its bounded read/sweep units). The restart-vs-resume cost asymmetry
-  is this rung's reason to exist: without routing, a stage session
-  blocked on an iteration-ambiguity question forfeits its accumulated
-  working state to a terminate-and-redispatch. Economics note, measured
-  2026-07-10: subscription cache-forgiveness is NOT documented (API-side
-  cache reads are ~0.1x, not free; the window expense of read-heavy
-  sweeps is attested in /agent-execution), and the prompt-cache TTL is
-  ~5 minutes — so a sporadically-questioned lead pays a full context
-  re-warm per cold question. Design accordingly: batch questions rather
-  than forward singly, keep the lead's resident context lean (stamps
-  stay authoritative, so the lead need not hold what tracked surfaces
-  hold), and verify spend via usage-verdict, never assumed forgiveness.
-  Chatter-suppression note 2026-07-10: a background session's narration
-  never reaches the lead — only pushes cross — so verbosity control is
-  channel design: journal for routine findings (pull), SendMessage only
-  for the escalation class (the supervisor-owns ruling list, named in
-  agent-definition config per the policy-as-config ruling), escalations
-  decision-shaped (question/options/recommendation/evidence, budgeted —
-  which is also what makes batching natural), with a guard-kit
-  SendMessage rule as the mechanical floor (prompts request, guards
-  enforce). NOTE at sixth ruling: this entry is past the queue-entry
-  altitude — its scope session should open by graduating these notes
-  into the amendment rather than extending them.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -161,50 +124,6 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
-- **trajectory-close-freshness** [needs-spec] — closing an iteration leaves
-  `docs/evidence-data.md` stale, and `check-trajectory-fresh` structurally cannot
-  catch it locally. The extractor emits a closed iteration's row only once the
-  `close` stamp is in committed history; enter-stage.sh commits that stamp, but
-  the enter-close commit is not yet in history during its own pre-commit, so the
-  gate regenerates without the row and passes. The following close commit (clear
-  Done) touches only TASK-QUEUE.md, which the gate's `# graph:` manifest does not
-  couple, so the gate is skipped and the staleness stays invisible until CI runs
-  the full battery unconditionally (attested 2026-07-11). Fix option to rule at
-  spec: fold the projection regeneration into the close skill's Done-clearing
-  commit, which then touches the coupled `docs/evidence-data.md` so the gate runs
-  with the stamp already in history — the check-graph/enforcement regeneration
-  precedent. Design questions: whether the durable home is drift-kit's
-  close-knowledge template (kit-generic — any drift-kit consumer with the
-  extractor+freshness pair hits this) versus a new drift-kit close-stage step,
-  lifecycle-kit's close skill, or this repo's close binding; and whether any
-  local gate can catch it (the self-reference is inherent, so CI's full-battery
-  run may be the only backstop — no new scanner closes it locally). Surfaced
-  2026-07-11 fixing the CI red; the row was regenerated interstitially, so its
-  commit attributes to the next iteration's range (drift-kit/SPEC.md §The
-  published-evidence extractor).
-- **check-graph-theme-parity** [needs-spec] — `docs/check-graph.html` renders in a
-  bespoke `system-ui` stylesheet (full-bleed header + pannable SVG viewport) that
-  looks foreign next to every other checkwright.dev page, which Jekyll themes with
-  the GitHub Primer default (`container-lg markdown-body`, the GitHub font/color
-  tokens, the site-title header and the "Improve this page" footer).
-  `docs/enforcement.md` inherits that theme for free because it is markdown run
-  through Jekyll's layout; check-graph is raw `.html` served as-is, bypassing the
-  layout — the root cause of the mismatch. Goal: the coupling-graph page reads as
-  the same site. Constraints and design questions to rule at spec: the
-  self-contained-artifact rule (gate-sdk/SPEC.md; no kit output references an asset
-  outside the kit) forbids linking `/assets/css/style.css`, so parity means
-  inlining the theme's visual tokens, not referencing the sheet; the interactive
-  viewport is custom UI beyond `markdown-body`, so a plain-markdown conversion is
-  not viable — the graph keeps its viewport, wrapped in theme-consistent chrome;
-  the theme is consumer-specific (this repo's docs host), not kit-generic, so the
-  gate-sdk emitter must not hardcode it — the fix likely grows a theme-injection
-  seam fed by consumer config (the graph-vocab.sh pattern) owned by site-kit or
-  consumer wiring, never a gate-sdk literal; decide the dark-mode disposition (the
-  artifact ships light+dark per the artifact-design theme-aware principle, Primer
-  defaults light). check-graph asserts the artifact is byte-fresh vs the emitter,
-  so any styling change lands in `gate-sdk/checks/check-graph.sh` and is
-  regenerated, never hand-edited into the HTML. Surfaced 2026-07-11 from a saved
-  copy of the live root page.
 ## Done
 
 ## Lessons Learned
