@@ -193,6 +193,60 @@ guard_rule_find_glob() {
     guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) with no shell prompt. A 'find' carrying an action predicate (-exec/-delete/…) or piped into a consumer is untouched; this fires only on a plain listing. If you genuinely need find, run it yourself with !<command>."
 }
 
+guard_rule_cat_file() {
+    local cmd="$1" s first rest tok operands=0
+    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
+    case "$cmd" in *'`'*) return 0 ;; esac
+    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    grep -qE '(&&|\|\||;|\||&|<|>)' <<<"$s" && return 0
+    s="${s#"${s%%[![:space:]]*}"}"
+    first="${s%%[[:space:]]*}"
+    [[ "$first" == cat ]] || return 0
+    rest="${s#cat}"
+    local -a toks
+    read -ra toks <<<"$rest"
+    for tok in "${toks[@]}"; do
+        case "$tok" in
+            -*) ;;
+            *) operands=$((operands + 1)) ;;
+        esac
+    done
+    [[ "$operands" == 1 ]] || return 0
+    guard_block "don't read a file with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, with no shell prompt. A 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files is untouched — that's composition, not a lone file read. If you genuinely need cat, run it yourself with !<command>."
+}
+
+guard_rule_git_grep() {
+    local cmd="$1" s tok i n positionals=0 want_arg=0 pat_opt=0 working_tree=0
+    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
+    case "$cmd" in *'`'*) return 0 ;; esac
+    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    grep -qE '(&&|\|\||;|\||&|<|>)' <<<"$s" && return 0
+    local -a toks
+    read -ra toks <<<"$s"
+    [[ "${toks[0]:-}" == git && "${toks[1]:-}" == grep ]] || return 0
+    n=${#toks[@]}
+    for ((i = 2; i < n; i++)); do
+        tok="${toks[i]}"
+        if [[ "$want_arg" == 1 ]]; then want_arg=0; continue; fi
+        case "$tok" in
+            --) break ;;
+            --cached | --staged | --no-index | --untracked) return 0 ;;
+            -e | -f) pat_opt=1; want_arg=1 ;;
+            -m | -A | -B | -C | --max-depth | --max-count | --threads | --context | --after-context | --before-context)
+                want_arg=1 ;;
+            -*) ;;
+            *) positionals=$((positionals + 1)) ;;
+        esac
+    done
+    if [[ "$pat_opt" == 1 ]]; then
+        [[ "$positionals" == 0 ]] && working_tree=1
+    else
+        [[ "$positionals" == 1 ]] && working_tree=1
+    fi
+    [[ "$working_tree" == 1 ]] || return 0
+    guard_block "don't search with 'git grep' over the working tree — use the Grep tool: it returns matching lines (files registered for a later Read) with no shell prompt. A 'git grep' naming a revision, searching the index (--cached), or piped into a consumer is untouched — those reach beyond the working tree the Grep tool sees. If you genuinely need git grep, run it yourself with !<command>."
+}
+
 guard_rule_truncate_scratch() {
     local cmd="$1"
     if [[ "$cmd" =~ ^[[:space:]]*:([[:space:]]+[0-9]*\>\>?[[:space:]]*[^[:space:]\&\|\;\<]+)+[[:space:]]*$ ]]; then
@@ -312,6 +366,8 @@ guard_generic_rules() {
     guard_rule_brace_glyph "$cmd"
     guard_rule_sed_file "$cmd"
     guard_rule_find_glob "$cmd"
+    guard_rule_cat_file "$cmd"
+    guard_rule_git_grep "$cmd"
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"

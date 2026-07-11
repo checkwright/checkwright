@@ -19,12 +19,6 @@
   `check-doctrine-registration` holds it present; CLAUDE.md §Single source
   of truth converts to consumer-by-reference; the companion-corpus sweep
   extends the roster — mechanism crosses the seam, rule content never.
-- **read-command-guard-steer** [spec: guard-kit/SPEC-read-steer.md] — three
-  steer rules beside `guard_rule_sed_file`: bare `cat` → Read, print-only
-  `find` → Glob, working-tree `git grep` → Grep; piped/heredoc `cat`,
-  mutating `find`, and history-searching `git grep` pass; fixtures per the
-  decision-table contract.
-
 ## Technical Debt
 
 - **gate-tamper-rename-policy** — ruled at scope: fold `docs/` and `.github/`
@@ -243,5 +237,7 @@
   run-don't-predict equilibrium the oracle-first rule names. Surfaced
   2026-07-11 at doctrine-kit align.
 ## Done
+
+- read-command-guard-steer
 
 ## Lessons Learned

@@ -85,7 +85,7 @@ Primitives a consumer guard composes; each emits the harness's
   the string matches a committed allow pattern, with the harness `:*` prefix
   idiom (`Bash(printf:*)` ≡ any `printf …`) normalized to a trailing `*`. Not a
   hook primitive — a shared helper, one implementation behind
-  compare-settings-allow's redundancy detection and rule 12's silent-grant
+  compare-settings-allow's redundancy detection and rule 14's silent-grant
   guard so the two never drift.
 
 Fail-open is the default posture. The one sanctioned fail-closed shape is a
@@ -161,7 +161,7 @@ load-bearing where noted.
    so `-e`/`-f` consume their argument and the first bare operand is the script
    — a *second* bare operand is the file that fires the rule. **Placed before
    both auto-allow rules:** a consumer that widens `GUARD_KIT_RO_BINS` with
-   `sed` would otherwise have rule 11 silently grant an in-place rewrite.
+   `sed` would otherwise have rule 13 silently grant an in-place rewrite.
 9. **Listing-only `find`** — a bare `find` that only lists is blocked with
    the steer to the harness's Glob tool (the same shape as rule 8's `sed`
    read-steer: a better tool exists, and Glob returns paths registered for a
@@ -170,28 +170,55 @@ load-bearing where noted.
    (`-exec`/`-execdir`/`-ok`/`-okdir`/`-delete`/`-fls`/`-fprint`/`-fprint0`/
    `-fprintf` — find(1) mechanism, a lib literal), and has **no consumer**
    (the `find` is the whole command — no pipe, chain, or redirect). A piped
-   `find` is a legitimate producer (rule 11 may still auto-allow it), an
+   `find` is a legitimate producer (rule 13 may still auto-allow it), an
    action-predicate `find` is an executor, and a redirected `find` has a
    downstream reader — all untouched. **Placed before both auto-allow rules**
    (same reasoning as rule 8): a bare listing meets the steer rather than a
    silent read-only-pipeline grant, since `find` is in the default
    `GUARD_KIT_RO_BINS` roster. A consumer needing different behavior shadows
    the rule in its consumer-rules section.
-10. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
+10. **Bare single-file `cat`** — a `cat` whose whole command is a lone file
+    read is blocked with the steer to the harness's Read tool (rule 8's
+    read-steer shape: Read returns numbered lines registered for a later
+    Edit). Fires on the conjunction no allowlist glob expresses: the command
+    leads with `cat`, has **no consumer** (no pipe, chain, heredoc, redirect,
+    or substitution), and carries **exactly one** non-flag operand — flags are
+    allowed (`cat -n <file>`). Multi-file concatenation, a piped or heredoc'd
+    `cat`, and a redirected `cat` are composition, not a file the Read tool
+    replaces, and pass untouched. **Placed before both auto-allow rules** (same
+    reasoning as rule 8): a bare `cat <file>` meets the steer rather than a
+    silent read-only-pipeline grant, since `cat` is in the default
+    `GUARD_KIT_RO_BINS` roster.
+11. **Working-tree `git grep`** — a `git grep` that searches the working tree
+    is blocked with the steer to the harness's Grep tool (rule 8's read-steer
+    shape: Grep returns matching lines with files registered for a later Read).
+    Fires on the discriminator no allowlist glob expresses: the command leads
+    with `git grep`, names no revision, and does not scope elsewhere — the
+    index (`--cached`/`--staged`), a non-repo search (`--no-index`), or an
+    untracked-file search (`--untracked`). "Names a revision" is read off the
+    positional grammar: the pattern is one positional (or supplied by
+    `-e`/`-f`), so a *further* bare positional before any `--` is a tree-ish
+    the Grep tool cannot reach — `git grep foo` steers while `git grep foo
+    HEAD` passes, and a `-- <path>` limiter keeps the search in the working
+    tree and still steers. A piped `git grep` is a producer and never reaches
+    this rule (the consumer disqualifies it). Conservative by construction: an
+    unrecognized option-with-argument or a glued pattern flag biases toward
+    passing, never a false steer of a history search.
+12. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
     defeats the permission matcher, so it always prompts. Granted silently
     when the command is *only* `:` followed by redirects and every target is
     gitignored (`git check-ignore`): truncating scratch is safe; a tracked
     file must still prompt. The `git` subprocess is gated behind the rare
     `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
     already blocked, so a surviving target is a literal path.
-11. **Auto-allow read-only pipeline** — granted silently when every pipe
+13. **Auto-allow read-only pipeline** — granted silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
     grep/head/cat/find/jq family) and every redirect target is `/dev/null`
     or an fd-dup. Conservative by construction: command/process
     substitution, a leftover quote after stripping, any statement separator,
     a non-`/dev/null` redirect, or a `find` with a write action all refuse
     and fall through.
-12. **Decorated allowlisted command** — the leading command exactly matches a
+14. **Decorated allowlisted command** — the leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
     `2>&1` — which forces a permission prompt no allowlist entry suppresses.
@@ -210,9 +237,9 @@ load-bearing where noted.
     allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
-    the auto-allow rules (10, 11) so a silently granted read-only pipeline never
+    the auto-allow rules (12, 13) so a silently granted read-only pipeline never
     reaches it.
-13. **Fall-through logging** — anything neither blocked nor auto-allowed is
+15. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 ### Consumer rules
@@ -245,7 +272,7 @@ close-stage audit. A committed pattern subsumes a local entry when the
 local string matches it under shell-glob semantics; the harness `:*` prefix
 idiom (`Bash(printf:*)` ≡ any `printf …`) is normalized to a trailing `*`
 so one glob test covers both forms — the match core is `guard_allow_match`
-in `lib/guard.sh`, shared with rule 12. Read-only — reports candidates, never
+in `lib/guard.sh`, shared with rule 14. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
 judgment. `--count` emits the bare count.
@@ -310,7 +337,7 @@ what the consumer left unset. Knobs (this repo's layout as defaults):
 - `GUARD_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
 - `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
-- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 11); default the
+- `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 13); default the
   grep/head/cat/find/jq family.
 - `GUARD_KIT_SCRATCH_DIRS` — gitignored scratch dirs named in the
   rule-3 corrective message; default `(".tmp")`.

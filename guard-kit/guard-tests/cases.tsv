@@ -52,15 +52,31 @@ fallthrough	find src -type f -exec grep -q foo '{}' ';'
 allow	find . -type f | head
 fallthrough	find . -type f > listing.txt
 
-# rule 10 — `: > file` truncation auto-allowed iff every target is gitignored
+# rule 10 — bare single-file cat steered to Read; multi-file, piped, redirected
+#           forms are composition and pass (a lone flagged read still fires)
+block	cat TASK-QUEUE.md
+block	cat -n guard-kit/lib/guard.sh
+allow	cat one.md two.md
+allow	cat notes.md | wc -l
+fallthrough	cat header.md > combined.md
+
+# rule 11 — working-tree git grep steered to Grep (a path-limited `-- <path>`
+#           search is still the working tree); a revision or --cached passes
+block	git grep foo
+block	git grep -i TODO
+block	git grep needle -- src
+fallthrough	git grep foo HEAD
+fallthrough	git grep --cached foo
+
+# rule 12 — `: > file` truncation auto-allowed iff every target is gitignored
 allow	: > scratch.txt
 fallthrough	: > tracked.txt
 
-# rule 11 — read-only pipeline auto-allow; a non-roster segment falls through
+# rule 13 — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
 
-# rule 12 — decorated allowlisted bare lead with an unmatched segment blocked;
+# rule 14 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
 block	git status && rm -rf tmp
 block	git status 2>&1
@@ -69,5 +85,5 @@ fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
 
-# rule 13 — anything else falls through to the friction log
+# rule 15 — anything else falls through to the friction log
 fallthrough	make build
