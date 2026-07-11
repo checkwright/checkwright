@@ -53,6 +53,10 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age pct_7d reset
         echo "  FAIL [$desc]: output missing verdict '-> $verdict': $out"
         fails=$((fails + 1)); continue
     fi
+    if ! grep -qF -- "width=2 " <<<"$out"; then
+        echo "  FAIL [$desc]: verdict line dropped the fan-width field (default 2): $out"
+        fails=$((fails + 1)); continue
+    fi
     if [[ "$axis" != "-" ]]; then
         case "$axis" in
             5h) grep -qF -- "5h window" <<<"$out"     || { echo "  FAIL [$desc]: PAUSE did not name the 5h axis: $out"; fails=$((fails + 1)); continue; } ;;
@@ -75,6 +79,20 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age pct_7d reset
     fi
 done < "$CASES"
 
+# spec: delegation-kit/SPEC.md §usage-verdict — the width field tracks DELEGATION_KIT_FAN_WIDTH, not a literal
+{
+    printf 'five_hour_used_pct=40\n'
+    printf 'five_hour_resets_at=%s\n' "$(( now + 3600 ))"
+    printf 'updated_at=%s\n' "$now"
+} > "$USAGE"
+rm -f "$CRED"
+wout="$( cd "$SANDBOX" && DELEGATION_KIT_FAN_WIDTH=7 bash "$GATE" "$USAGE" "$CRED" 2>&1 )"
+ran=$((ran + 1))
+if ! grep -qF -- "width=7 " <<<"$wout"; then
+    echo "  FAIL [fan-width knob override]: width field did not track DELEGATION_KIT_FAN_WIDTH=7: $wout"
+    fails=$((fails + 1))
+fi
+
 if [[ "$ran" -eq 0 ]]; then
     echo "run-usage-tests: no cases parsed from $CASES" >&2
     exit 2
@@ -83,5 +101,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "run-usage-tests: $fails/$ran case(s) failed"
     exit 1
 fi
-echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes, and the sample-append discipline)"
+echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes, the fan-width field, and the sample-append discipline)"
 exit 0

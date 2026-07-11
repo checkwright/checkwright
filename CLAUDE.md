@@ -120,7 +120,8 @@ validate-after-commit set, gate-driven worklist).
   `.workflow/CHECK-GRAPH.html`, `TASK-QUEUE.md`/`.workflow/WORKFLOW-STATE.txt`,
   the `scripts/*-config.sh` + `gates.list`, an amendment under edit — **and the
   git index/HEAD are shared for every committing agent** (serialize *or*
-  `isolation: worktree`); **≤2-wide otherwise**, read-only fan-outs only.
+  `isolation: worktree`); **≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise**,
+  read-only fan-outs only.
 - **One commit per unit; split** if >4 components, OR mixed
   mechanical+architectural, OR >300 tool calls.
 - **Resume journal in the harness session dir** — never `.tmp/` (the

@@ -13,16 +13,17 @@ investigation). The load-bearing safety rules are also resident in CLAUDE.md
 - **Background + notification, never poll.** Always `run_in_background`; wait for
   the completion notification; do not read the output file. Backgrounding keeps
   the main loop free to redirect.
-- **Serialize on shared files; ≤2-wide otherwise.** Agents that edit a shared
-  file (see the roster below) run one at a time — dispatch, await notification,
-  validate, dispatch the next. Independent units may run ≤2-wide. **The git
-  index and HEAD are shared files for every agent that commits**, independent of
+- **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
+  Agents that edit a shared file (see the roster below) run one at a time —
+  dispatch, await notification, validate, dispatch the next. Independent
+  read-only units may run ≤`DELEGATION_KIT_FAN_WIDTH`-wide. **The git index and
+  HEAD are shared files for every agent that commits**, independent of
   source-file disjointness: two committing agents racing `git add`/`git commit`
   interleave and one sweeps the other's staged files under the wrong message. So
   agents that each commit must be **serialized** *or* run under
-  `isolation: worktree` (own index); reserve unlocked ≤2-wide for **read-only**
-  fan-outs. "No lockfile churn" is a false safety signal — the index is shared
-  regardless.
+  `isolation: worktree` (own index); reserve the unlocked
+  ≤`DELEGATION_KIT_FAN_WIDTH`-wide bound for **read-only** fan-outs. "No lockfile
+  churn" is a false safety signal — the index is shared regardless.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —
@@ -67,10 +68,11 @@ investigation). The load-bearing safety rules are also resident in CLAUDE.md
   can't read stale-high; a PAUSE names its axis — a 5h wall clears in hours, a
   7-day wall in days). If the verdict is PAUSE and the work is large, pause for
   reset. Width is the kill axis: the 5h wall fires mid-flight, and the agents
-  that bank are the ones that *finished* — ≤2-wide bounds the loss to the
-  in-flight pair.
+  that bank are the ones that *finished* — ≤`DELEGATION_KIT_FAN_WIDTH`-wide
+  bounds the loss to the in-flight wave.
   **Project the next wave's burn from the last wave's, not just the current
-  pct** — a read-heavy 2-wide sweep is far more window-expensive than its
+  pct** — a read-heavy `DELEGATION_KIT_FAN_WIDTH`-wide sweep is far more
+  window-expensive than its
   subagent-token total suggests, so size waves to leave the next one headroom, or
   accept one wave per window.
 

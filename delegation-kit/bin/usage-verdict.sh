@@ -15,9 +15,10 @@ PAUSE_PCT_7D="$DELEGATION_KIT_PAUSE_PCT_7D"
 STALE_AGE="$DELEGATION_KIT_STALE_AGE"
 LOGIN_WINDOW="$DELEGATION_KIT_LOGIN_WINDOW"
 HISTORY="$DELEGATION_KIT_USAGE_HISTORY"
+WIDTH="$DELEGATION_KIT_FAN_WIDTH"
 
 if [[ ! -r "$USAGE_FILE" ]]; then
-  echo "usage-verdict: cannot read $USAGE_FILE -> STALE"
+  echo "usage-verdict: cannot read $USAGE_FILE width=${WIDTH} -> STALE"
   exit 2
 fi
 
@@ -38,12 +39,12 @@ while IFS='=' read -r key val; do
 done < "$USAGE_FILE"
 
 if [[ -z "$pct" || -z "$resets_at" || -z "$updated_at" ]]; then
-  echo "usage-verdict: missing key(s) in $USAGE_FILE (pct='$pct' resets_at='$resets_at' updated_at='$updated_at') -> STALE"
+  echo "usage-verdict: missing key(s) in $USAGE_FILE (pct='$pct' resets_at='$resets_at' updated_at='$updated_at') width=${WIDTH} -> STALE"
   exit 2
 fi
 
 if [[ ! "$pct" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-  echo "usage-verdict: non-numeric five_hour_used_pct='$pct' in $USAGE_FILE -> STALE"
+  echo "usage-verdict: non-numeric five_hour_used_pct='$pct' in $USAGE_FILE width=${WIDTH} -> STALE"
   exit 2
 fi
 
@@ -72,13 +73,13 @@ append_sample() {
 
 if (( resets_in <= 0 )); then
   append_sample RESET-OK
-  echo "used=${pct}% age=${age}s resets_in=${resets_in}s -> RESET-OK (window rolled over ${resets_in#-}s ago; pct is from the dead window, re-read for the live value)"
+  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> RESET-OK (window rolled over ${resets_in#-}s ago; pct is from the dead window, re-read for the live value)"
   exit 0
 fi
 
 if (( age > STALE_AGE )); then
   append_sample STALE
-  echo "used=${pct}% age=${age}s resets_in=${resets_in}s -> STALE (reading older than ${STALE_AGE}s; pct may lag reality — re-read or refresh before trusting)"
+  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (reading older than ${STALE_AGE}s; pct may lag reality — re-read or refresh before trusting)"
   exit 2
 fi
 
@@ -97,18 +98,18 @@ if (( pause_5h || pause_7d )); then
   cred_age=$(( now - login_at ))
   if (( login_at > 0 && cred_age >= 0 && cred_age < LOGIN_WINDOW )); then
     append_sample STALE
-    echo "used=${pct}% age=${age}s resets_in=${resets_in}s -> STALE (auth changed ${cred_age}s ago — a /login starts fresh windows the server-fed pct lags; re-read before trusting)"
+    echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (auth changed ${cred_age}s ago — a /login starts fresh windows the server-fed pct lags; re-read before trusting)"
     exit 2
   fi
   append_sample PAUSE
   if (( pause_7d )); then
-    echo "used=${pct}% (7d ${pct_7d}%) age=${age}s resets_in=${resets_in}s -> PAUSE (7-day window; over ${PAUSE_PCT_7D}% of the live weekly window — remediation is days, not hours)"
+    echo "used=${pct}% (7d ${pct_7d}%) age=${age}s resets_in=${resets_in}s width=${WIDTH} -> PAUSE (7-day window; over ${PAUSE_PCT_7D}% of the live weekly window — remediation is days, not hours)"
   else
-    echo "used=${pct}% age=${age}s resets_in=${resets_in}s -> PAUSE (5h window; over ${PAUSE_PCT}% of the live 5h window)"
+    echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> PAUSE (5h window; over ${PAUSE_PCT}% of the live 5h window)"
   fi
   exit 1
 fi
 
 append_sample OK
-echo "used=${pct}% age=${age}s resets_in=${resets_in}s -> OK"
+echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> OK"
 exit 0

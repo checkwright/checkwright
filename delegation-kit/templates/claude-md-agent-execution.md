@@ -14,8 +14,8 @@ mechanics, validate-after-commit command set, gate-driven worklist).
   output file).
 - **Serialize on shared files** (your generated-config script, a shared test
   fixture, an amendment under edit) — **and the git index/HEAD are shared for
-  every committing agent** (serialize *or* `isolation: worktree`); **≤2-wide
-  otherwise**, read-only fan-outs only.
+  every committing agent** (serialize *or* `isolation: worktree`);
+  **≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise**, read-only fan-outs only.
 - **One commit per unit; split** if >4 components, OR mixed
   mechanical+architectural, OR >300 tool calls.
 - **Resume journal in the session dir** (agent writes findings inline + a `DONE`

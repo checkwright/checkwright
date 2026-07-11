@@ -24,6 +24,7 @@ unset _dk_cfg
 [[ -v DELEGATION_KIT_STALE_AGE ]] || DELEGATION_KIT_STALE_AGE=600
 [[ -v DELEGATION_KIT_LOGIN_WINDOW ]] || DELEGATION_KIT_LOGIN_WINDOW=600
 [[ -v DELEGATION_KIT_USAGE_HISTORY ]] || DELEGATION_KIT_USAGE_HISTORY=""
+[[ -v DELEGATION_KIT_FAN_WIDTH ]] || DELEGATION_KIT_FAN_WIDTH=2
 
 declare -p DELEGATION_KIT_GATE_FILES &>/dev/null || DELEGATION_KIT_GATE_FILES=(
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.sh"
@@ -64,6 +65,8 @@ _dk_errs=()
     || _dk_errs+=("DELEGATION_KIT_STALE_AGE must be a non-negative integer (got '$DELEGATION_KIT_STALE_AGE')")
 [[ "$DELEGATION_KIT_LOGIN_WINDOW" =~ ^[0-9]+$ ]] \
     || _dk_errs+=("DELEGATION_KIT_LOGIN_WINDOW must be a non-negative integer (got '$DELEGATION_KIT_LOGIN_WINDOW')")
+[[ "$DELEGATION_KIT_FAN_WIDTH" =~ ^[0-9]+$ && "$DELEGATION_KIT_FAN_WIDTH" -gt 0 ]] \
+    || _dk_errs+=("DELEGATION_KIT_FAN_WIDTH must be a positive integer (got '$DELEGATION_KIT_FAN_WIDTH')")
 [[ ${#DELEGATION_KIT_GATE_FILES[@]} -gt 0 ]] || _dk_errs+=("DELEGATION_KIT_GATE_FILES is empty")
 [[ ${#DELEGATION_KIT_META_PATHS[@]} -gt 0 ]] || _dk_errs+=("DELEGATION_KIT_META_PATHS is empty")
 if [[ ${#_dk_errs[@]} -gt 0 ]]; then

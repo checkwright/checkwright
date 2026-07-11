@@ -29,12 +29,16 @@ protocol's load-bearing rules:
    `run_in_background`, wait for the completion notification, do not read
    the output file mid-flight — backgrounding keeps the supervisor free to
    redirect.
-3. **Serialize on shared files; ≤2-wide otherwise.** Agents editing a
-   shared file run one at a time. **The git index and HEAD are shared files
-   for every agent that commits**, independent of source-file disjointness
-   — committing agents are serialized *or* isolated in their own worktree
-   (`isolation: worktree` — own index); unlocked ≤2-wide is reserved for
-   read-only fan-outs. "No lockfile churn" is a false safety signal.
+3. **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
+   Agents editing a shared file run one at a time. **The git index and HEAD
+   are shared files for every agent that commits**, independent of
+   source-file disjointness — committing agents are serialized *or* isolated
+   in their own worktree (`isolation: worktree` — own index); the unlocked
+   ≤`DELEGATION_KIT_FAN_WIDTH`-wide bound is a **read-only-fan-out ceiling
+   only** — a committing fan-out serializes or takes worktrees regardless,
+   which is correctness and never configurable up. "No lockfile churn" is a
+   false safety signal. (The knob and its derivation: §Layout and
+   configuration.)
 4. **One commit per unit, sized to finish within budget.** A unit that
    investigates long before its first commit is the only thing an interrupt
    can destroy — split it. Split triggers: >4 components, OR mixed
@@ -174,6 +178,18 @@ Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable.
 Fail-closed throughout: missing keys and a non-numeric percentage route to
 STALE, and each threshold compare uses `awk`, not integer-only bash
 arithmetic, so a fractional percentage cannot silently skip PAUSE.
+
+**The `width=<n>` field.** Every emitted verdict line — OK, PAUSE, STALE (the
+fail-closed diagnostics included), RESET-OK — carries a `width=<n>` field
+immediately before the ` -> <verdict>` arrow, read from
+`DELEGATION_KIT_FAN_WIDTH` (§Layout and configuration). It is the knob's
+mechanical reader: the budget check already runs before every dispatch, so the
+read-only fan-out bound surfaces at exactly the wave-sizing decision point, and
+`agent-budget-guard.sh` relays the verdict line verbatim (block on PAUSE, advise
+otherwise) so the width rides into context with the budget verdict. The field is
+a config constant, not derived from the snapshot, so it is present even on an
+unreadable-snapshot STALE. No exit-code or other-field change: existing callers
+that key off the exit code or the `-> <verdict>` arrow are unaffected.
 
 **Two pause axes.** The five-hour window is the always-on axis; the weekly
 (7-day) window is a second axis, armed only when both `seven_day_used_pct`
@@ -339,6 +355,20 @@ layout as defaults):
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
 - `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
   off). This repo sets `.tmp/usage-history.log`, a gitignored measurement.
+- `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`,
+  validated a positive integer by the loader. It bounds read-only fan-outs
+  only: a committing fan-out serializes or takes its own worktree regardless
+  (rule 3), so this knob is never a licence to widen concurrent committers.
+  The default is the loss-bounding invariant — bound the in-flight loss to
+  what the window can absorb when the wall fires mid-flight — at a Pro-class
+  subscription window; a Max-class window absorbs more, and an API-billed
+  operator has no mid-flight window wall at all, so there spend rate and the
+  provider's rate limits replace the rationale. A consumer retunes from the
+  invariant, not the number. **Supervision ceiling:** operator attention over
+  N concurrent reports does not scale with the budget window — a bigger
+  window raises the affordable width, not the reviewable one, so budget is
+  never the sole input to widening. `usage-verdict` surfaces the live value
+  as the `width=` field (§usage-verdict), the knob's mechanical reader.
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
   `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh")` plus the gate-sdk lib and

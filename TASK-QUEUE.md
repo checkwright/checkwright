@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **delegation-fan-width** [spec: SPEC-fan-width.md] — the ≤2-wide fan-out
-  literal becomes `DELEGATION_KIT_FAN_WIDTH` (default 2), surfaced as a
-  `width=` field on the usage-verdict line; the three prose sites cite the
-  knob; mechanical width enforcement ruled out this iteration.
-
 ## Technical Debt
 
 ## Deferred
@@ -243,6 +238,7 @@
 
 - spec-kit-rename
 - skill-template-binding
+- delegation-fan-width
 
 ## Lessons Learned
 
