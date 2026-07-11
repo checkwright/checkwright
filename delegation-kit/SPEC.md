@@ -19,57 +19,25 @@ ship.
 ## The delegation model
 
 One **supervisor** session dispatches `Agent` tasks and owns every ruling;
-agents execute briefs and surface anything the brief does not cover. The
-protocol's load-bearing rules:
+agents execute briefs and surface anything the brief does not cover.
+`templates/agent-execution.md` owns the load-bearing rules — it is the
+procedure a session loads, and each bullet's bold lead-in is the rule's stable
+name (§One template, a resident pointer). This section keeps the mechanism
+contracts and only the rationale that earns spec residency (a failure surface,
+a calibration history, a bound that is correctness rather than preference),
+each paragraph citing its rule by name rather than restating it.
 
-1. **Supervisor owns rulings; agents surface, never guess.** Security and
-   design decisions are handed down in the brief; an agent that hits an
-   uncovered case stops and reports.
-2. **Background + notification, never poll.** Dispatch with
-   `run_in_background`, wait for the completion notification, do not read
-   the output file mid-flight — backgrounding keeps the supervisor free to
-   redirect.
-3. **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
-   Agents editing a shared file run one at a time. **The git index and HEAD
-   are shared files for every agent that commits**, independent of
-   source-file disjointness — committing agents are serialized *or* isolated
-   in their own worktree (`isolation: worktree` — own index); the unlocked
-   ≤`DELEGATION_KIT_FAN_WIDTH`-wide bound is a **read-only-fan-out ceiling
-   only** — a committing fan-out serializes or takes worktrees regardless,
-   which is correctness and never configurable up. "No lockfile churn" is a
-   false safety signal. (The knob and its derivation: §Layout and
-   configuration.)
-4. **One commit per unit, sized to finish within budget.** A unit that
-   investigates long before its first commit is the only thing an interrupt
-   can destroy — split it. Split triggers: >4 components, OR mixed
-   mechanical + architectural work, OR >300 estimated tool calls.
-5. **Gate-driven worklist where one exists.** Drive a sweep from the gate's
-   own output: an interrupt loses only the in-flight unit, and a fresh
-   session re-runs the gate to resume.
-6. **Resume journal** (below) for mutating agents; return-value contract
-   for read-only fan-outs.
-7. **Validate after every agent commit** (below) — the self-report is not
-   evidence.
-8. **Budget-check before *each* dispatch in a fan-out** with
-   `bin/usage-verdict.sh`, not once at the start. Width is the kill axis: the
-   window wall fires mid-flight and the agents that bank are the ones that
-   *finished*. Project the next wave's burn from the last wave's, not from
-   the current percentage alone — a read-heavy wave is far more
-   window-expensive than its token total suggests. The manual run is the
-   planning tool; `agent-budget-guard.sh` is its mechanical enforcement at the
-   dispatch point (below).
-9. **Match the dispatched model and effort to the unit's shape** — cheaper
-   class for read-heavy/mechanical units, the supervisor's class for design
-   judgment; the class ladder derives from the harness's live model roster,
-   never a baked name list (the template carries the operational detail).
-10. **Never revert substantial completed work on your own design judgment** —
-    surface the tension and wait for the explicit go-ahead (the template
-    carries the cost rationale).
+The template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide
+otherwise** rule caps an *unlocked* fan-out at read-only work because the git
+index and HEAD are shared for every committing agent regardless of source-file
+disjointness — so the cap is a correctness bound, never a preference a consumer
+may configure up for committing agents (the knob's derivation: §Layout and
+configuration).
 
-`templates/agent-budget-guard.sh` closes the gap the manual run leaves: the
-budget-check norm relied on the agent *choosing* to run the tool, and a
-memory-quoted percentage acts in its place (a session quoted ~5% while the
-live verdict read 29%). It is a `PreToolUse` hook (matcher `Agent`) the
+`templates/agent-budget-guard.sh` closes the gap the template's
+**Budget-check before *each* dispatch in a fan-out** rule leaves when it relies
+on the agent *choosing* to run the tool: a memory-quoted percentage acts in its
+place (a session quoted ~5% while the live verdict read 29%). It is a `PreToolUse` hook (matcher `Agent`) the
 harness fires on every dispatch once the consumer registers it in settings —
 per-dispatch freshness, not a start-of-session reading a mid-session window
 outlives. It runs `usage-verdict` at the decision point and routes on the exit
@@ -108,6 +76,12 @@ roster and the validate battery — the consumer-specialization discipline of
 guard-kit's consumer-rules block, now carried by the slot/binding mechanism the
 lifecycle skills already use. `check-skill-binding` enforces the slot pairing on
 the consumer side.
+
+A spec reference to one of those rules uses the citation grammar
+`the template's **<name>** rule`, where `<name>` is a bullet's bold lead-in
+verbatim minus its trailing period; `check-rule-citation` resolves every such
+citation in §The delegation model forward into the template, so a lead-in
+rename cannot silently dangle a reference.
 
 The consumer's CLAUDE.md carries no digest of the bullets, only a resident
 pointer: the pre-authorization sentence (consumer judgment on what delegation
@@ -372,7 +346,9 @@ layout as defaults):
 - `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`,
   validated a positive integer by the loader. It bounds read-only fan-outs
   only: a committing fan-out serializes or takes its own worktree regardless
-  (rule 3), so this knob is never a licence to widen concurrent committers.
+  (the template's **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide
+  otherwise** rule), so this knob is never a licence to widen concurrent
+  committers.
   The default is the loss-bounding invariant — bound the in-flight loss to
   what the window can absorb when the wall fires mid-flight — at a Pro-class
   subscription window; a Max-class window absorbs more, and an API-billed
@@ -420,6 +396,11 @@ edit; the context-kit template stays uncoupled from delegation-kit.
 (…)` / findings + `help:` lines / exit 0-1-2) and ships the standard
 `good/`+`bad/` fixture pair driven through `--fixture` by gate-sdk's
 `run-gate-tests.sh`.
+
+`check-rule-citation` speaks the same gate contract and ships the standard
+`good/`+`bad/` fixture pair (a citation resolving to a template lead-in vs one
+naming an absent lead-in), driven by `run-gate-tests.sh` over fixture-local
+spec + template files passed as its two positional arguments.
 
 `usage-verdict` does not fit the gate contract (a three-state verdict, not a
 clean/violation pair), so — like guard-kit's guard-tests — the kit ships
@@ -481,7 +462,8 @@ A consumer's validate battery (its compile/lint/test command set and rename
 corruption sweeps), its shared-file roster, and its width/burn anecdotes tied
 to specific sweeps are rule content, referenced only as marked-section
 examples. A task-output tailer is not shipped: such a tool hardcodes local
-harness paths and exists to violate protocol rule 2 for debugging. The
+harness paths and exists to violate the template's **Background + notification,
+never poll** rule for debugging. The
 `usage.txt` write contract and a reference producer rendering the gauge bars
 and `iteration@stage` readout do ship (the producer's ANSI is self-contained,
 pulling no external asset); a consumer's *particular* statusline styling and

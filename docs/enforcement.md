@@ -73,6 +73,7 @@ leaves its section absent.
 | evidence-kit | check-evidence-baseline | precommit |
 | evidence-kit | check-evidence-manifest | precommit |
 | delegation-kit | check-gate-tamper | precommit |
+| delegation-kit | check-rule-citation | precommit |
 | context-kit | check-brevity | precommit |
 | context-kit | check-settings-pins | precommit |
 | context-kit | check-memory-off | precommit |

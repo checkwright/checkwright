@@ -229,6 +229,10 @@ if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegatio
     delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
 fi
 
+if staged_matches 'delegation-kit/SPEC.md' 'delegation-kit/templates/agent-execution.md'; then
+    delegation-kit/checks/check-rule-citation.sh || hook_fail check-rule-citation
+fi
+
 if staged_matches 'CLAUDE.md'; then
     context-kit/checks/check-brevity.sh || hook_fail check-brevity
 fi

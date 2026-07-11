@@ -58,6 +58,7 @@ check-deprecation-task
 check-evidence-baseline
 check-evidence-manifest
 check-gate-tamper
+check-rule-citation
 check-brevity
 check-settings-pins
 check-memory-off

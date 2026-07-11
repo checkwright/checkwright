@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **delegation-rules-parity** [spec: SPEC-rules-parity.md] — the template owns the protocol
-  rules (bold lead-ins as stable names); the SPEC drops the numbered roster, keeps rationale
-  and mechanism contracts citing rules by name; new gate check-rule-citation holds forward
-  name-citation liveness with the standard fixture pair.
 - **doctrine-rule-lockstep** [spec: SPEC-doctrine-digest.md] — extend
   check-doctrine-registration to per-rule bidirectional digest coverage (methodology rule
   name ↔ digest bold lead-in) with fail-closed digest-section resolution via
@@ -194,5 +190,6 @@
 
 - runner-doc-off-resident
 - consumer-footprint-budget
+- delegation-rules-parity
 
 ## Lessons Learned
