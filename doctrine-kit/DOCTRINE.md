@@ -89,9 +89,25 @@ load-trigger residency rule to the doctrine itself.
    written to be that interface — and the targeted-run resolver reachable through
    the generated hook.
 
+8. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the
+   owner, never mine git history or a prior session's artifacts for how to do
+   what an owned surface already specifies. History answers *what happened*,
+   never *what is correct*; precedent is consulted only where no owner exists,
+   and that consultation is a doc gap to capture, not a habit to keep.
+   *Under agent work:* models train on repos whose docs lag practice, so
+   "imitate the last instance" is a reflex prior — and here it is inverted:
+   the gates hold docs and practice convergent, so mimicking a prior session
+   re-imports as house style exactly the deviation that session was gated on.
+   *Enforced by:* the battery itself, which is what makes the owner doc
+   trustworthy, plus the knowledge-friction loop
+   ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) —
+   a fact with no owner gets one, shrinking the space where history is the
+   only oracle. No scanner sees *how* a session derived a choice; this rule
+   is judgment with a capture mechanism, not a gate.
+
 ## Engineering-craft rules
 
-8. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
+9. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
    that invariant in its *name*; the SPEC's test-requirement section owns which
    invariants a test must cover. A spec-clause *comment* on the test is not a
    substitute — it duplicates what the name should carry and rots silently when
@@ -104,7 +120,7 @@ load-trigger residency rule to the doctrine itself.
    substitute out rather than blessing it, leaving the name as the only place to
    carry the invariant.
 
-9. **Test from the real consumer's runtime.** Verify a contract from the runtime
+10. **Test from the real consumer's runtime.** Verify a contract from the runtime
    of its real consumer, never a more lenient stand-in; a failure at a higher
    test layer with no failing test at the layer below is a coverage gap in the
    lower layer, closed there first.
@@ -116,7 +132,7 @@ load-trigger residency rule to the doctrine itself.
    ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant
    baseline turns a dropped layer into a red validate.
 
-10. **Inspectable-run discipline.** A component a test or an automation spawns
+11. **Inspectable-run discipline.** A component a test or an automation spawns
     must emit a readable log to an inspectable path — never a muted sink; on a
     failure, read that evidence before theorizing. A run you cannot inspect
     barely beats a guess.
@@ -128,7 +144,7 @@ load-trigger residency rule to the doctrine itself.
     move of making a background actor write an inspectable record rather than
     trusting its self-report.
 
-11. **Rename is a full-surface sweep.** A rename sweeps every surface in
+12. **Rename is a full-surface sweep.** A rename sweeps every surface in
     lockstep — prose, fixtures, and docs, not only the compiler-checked
     identifiers; the done-gate is a text-level completeness check, not the
     type-checker, and an in-progress rename is verified by a completeness scan

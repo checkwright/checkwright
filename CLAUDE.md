@@ -89,6 +89,7 @@ an engineering-craft section behind the link:
 - **Load-trigger residency** — resident only when no stage, skill, or tool loads it.
 - **Widest-true-tier placement** — the widest tier true for every reader of it.
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
+- **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
 <!-- doctrine-kit:end -->
 
 ## Conventions established in gate-sdk (keep every kit consistent)
