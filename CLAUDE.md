@@ -48,7 +48,7 @@ protocol — see lifecycle-kit/SPEC.md).
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and run
 `bash gate-sdk/bin/gen-pre-commit.sh --write`, then regenerate the graph
-artifact: `bash gate-sdk/checks/check-graph.sh --emit > .workflow/CHECK-GRAPH.html`
+artifact: `bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`
 (`check-graph` asserts both artifacts are fresh). Per-clone opt-in:
 `bash gate-sdk/bin/install-hooks.sh`.
 

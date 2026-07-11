@@ -28,6 +28,9 @@ override with `GATE_SDK_GATES_DIR`) holding:
 - `gate-tests/` — the consumer's fixture tree (see §run-gate-tests).
 - `git-hooks/` — the generated `pre-commit` (see §gen-pre-commit) and any
   hand-written hooks.
+- `gate-sdk-config.sh` — optional persistent config: a sourced shell file that
+  sets any `GATE_SDK_*` layout knob so the override outlives the shell that set
+  it (see the loader paragraph below).
 - `graph-vocab.sh` — optional rule content for `check-graph` (see there).
 - `core-files.list` — optional manifest for `check-core-files`: the
   repo-relative paths that must stay present and tracked (see there).
@@ -43,7 +46,10 @@ override with `GATE_SDK_GATES_DIR`) holding:
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
-`.workflow`), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
+`.workflow`), `GATE_SDK_GRAPH_ARTIFACT` (default
+`<workflow-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
+read by `check-graph` assertion E — set it to republish the artifact elsewhere,
+e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
 (default `TASK-QUEUE.md`), `GATE_SDK_CORE_FILES_FILE` (default
 `<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default
 `<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
@@ -62,6 +68,16 @@ fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
 fresh clone without the operator's private list still commits). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
+
+`lib/gate.sh` auto-sources the consumer config seam on load, so every gate (all
+source the library) sees the same knob resolution: `GATE_SDK_CONFIG_FILE` when
+set, else `<gates-dir>/gate-sdk-config.sh`, sourced only when the file exists —
+a zero-config consumer is unaffected. Env vars still win (the config file sets a
+default the invoking shell may override), but the file is how an override
+*persists*: an env-only knob dies with the shell that exported it, so a
+consumer that must relocate a layout knob for every session sets it here. The
+one knob the file cannot set is `GATE_SDK_GATES_DIR`, which locates the file
+itself — it stays env-or-default (a config file cannot name its own directory).
 
 ## The gate model
 
@@ -551,8 +567,11 @@ may carry either valve; one with no leading surface must carry `valve=none`;
 (D) hook artifact freshness — the committed pre-commit equals
 `gen-pre-commit.sh --emit`, and (when any gate is `tier=commit-msg`) the
 committed commit-msg hook equals `gen-pre-commit.sh --emit-commit-msg`;
-(E) the committed `CHECK-GRAPH.html` projection
-matches `--emit` output; (F) every emitted asset href resolves under the
+(E) the committed coupling-graph projection at `GATE_SDK_GRAPH_ARTIFACT`
+(default `<workflow-dir>/CHECK-GRAPH.html`)
+matches `--emit` output — the gate's remedy lines print the resolved path, so a
+consumer that republishes the artifact (this repo serves it at
+`docs/check-graph.html`) is always offered its own regenerate command; (F) every emitted asset href resolves under the
 artifact's own directory — a path wrong in both generator and artifact that
 (E) cannot detect; (G) every `# graph:` manifest embedded in a `SPEC-*.md`
 amendment body is well-formed, with each `couples=`/`trigger=` token a
@@ -561,6 +580,14 @@ Unlike (A), an amendment manifest's surfaces are not
 required to be in the vocabulary (the coupled surface may itself be
 design-ahead), and hook parity is not applied — the gate it describes is
 unbuilt; parity re-fires through the normal registry path once it lands.
+
+Dual-couple manifest: the artifact path is a knob, but check-graph's own
+`# graph:` manifest is kit-shipped static text a consumer never edits, so it
+cannot read the knob. It lists **both** artifact homes as couples — the
+workflow-dir default and `docs/check-graph.html` — so the generated hook
+re-fires on whichever a consumer publishes to. For a default consumer the docs
+path is simply an inert trigger pattern that never stages; couples↔trigger
+parity holds because the hook derives from the same manifest.
 
 Rule content is config, not code: `<gates-dir>/graph-vocab.sh` may declare
 `GRAPH_VOCAB` (the legal surface tokens; empty/absent disables the vocabulary

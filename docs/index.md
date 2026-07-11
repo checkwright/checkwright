@@ -18,8 +18,10 @@ an invariant.
    upgrade contract.
 3. [Enforcement map](enforcement.md) — what each kit enforces, and how hard:
    the class of every check surface, emitted from the registries.
-4. The [kit map](#the-kits) below — one page per kit, in reading order.
-5. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the
+4. [Coupling graph](check-graph.html) — which content surfaces each gate binds
+   together, emitted from the per-gate manifests.
+5. The [kit map](#the-kits) below — one page per kit, in reading order.
+6. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the
    launch note.
 
 ## The kits

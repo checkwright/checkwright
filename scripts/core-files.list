@@ -25,10 +25,11 @@ gate-sdk/templates/gates-workflow.yml
 
 # Gate registry + graph rule content + the checked pre-commit/graph projections.
 scripts/gates.list
+scripts/gate-sdk-config.sh
 scripts/graph-vocab.sh
 scripts/identity.conf
 scripts/git-hooks/pre-commit
-.workflow/CHECK-GRAPH.html
+docs/check-graph.html
 
 # One SPEC.md per kit (each kit's canonical contract).
 gate-sdk/SPEC.md

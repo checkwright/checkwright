@@ -1,6 +1,14 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §lib/gate.sh — sourced library: values + adapters, never gate structure
 
+# spec: gate-sdk/SPEC.md §Layout and configuration — auto-source the consumer config seam so a layout knob's override persists past the shell that set it; GATE_SDK_CONFIG_FILE wins, else <gates-dir>/gate-sdk-config.sh (GATE_SDK_GATES_DIR stays env-or-default — a config file cannot name its own directory)
+_gate_sdk_config="${GATE_SDK_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/gate-sdk-config.sh}"
+if [[ -f "$_gate_sdk_config" ]]; then
+    # shellcheck disable=SC1090  # consumer-supplied config, path is a knob
+    source "$_gate_sdk_config"
+fi
+unset _gate_sdk_config
+
 # spec: gate-sdk/SPEC.md §Fail-closed contract — non-zero capture status means the check could not run; exit 2, never a false clean
 fail_closed() {
     if [[ "$1" -ne 0 ]]; then

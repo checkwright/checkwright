@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,docs/check-graph.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
 set -uo pipefail
 
@@ -48,6 +48,7 @@ resolve_member() {
 
 emit_graph() {
     local checks
+    local resolved_artifact="${GATE_SDK_GRAPH_ARTIFACT:-$WORKFLOW_DIR/CHECK-GRAPH.html}"
     mapfile -t checks < <(gates_list_members "$LIST" | sort -u)
     declare -A C_COUPLES C_DIR C_VALVE NODE_SEEN
     local c src man kv couples dir valve s
@@ -115,14 +116,16 @@ emit_graph() {
         fi
     )"
 
-    cat <<'HEAD'
-<!DOCTYPE html>
+    printf '%s\n' '<!DOCTYPE html>'
+    cat <<'COMMENT_HEAD'
 <!--
-  CHECK-GRAPH.html - the check-coupling graph: which content surfaces each
-  gates.list gate binds together.
+  The check-coupling graph: which content surfaces each gates.list gate binds
+  together.
 
   GENERATED, DO NOT EDIT. Source of truth is the per-gate `# graph:` manifests;
-  regenerate with:  bash gate-sdk/checks/check-graph.sh --emit > .workflow/CHECK-GRAPH.html
+COMMENT_HEAD
+    printf '  regenerate with:  bash gate-sdk/checks/check-graph.sh --emit > %s\n' "$resolved_artifact"
+    cat <<'HEAD'
   check-graph (assertion E) fails if this file drifts from them.
 
   Reading it: nodes are surfaces (grouped by layer when the consumer's
@@ -482,8 +485,10 @@ if [[ "$has_msg_gate" -eq 1 ]]; then
     fi
 fi
 
-# assertion E: CHECK-GRAPH.html matches --emit
-ARTIFACT="$WORKFLOW_DIR/CHECK-GRAPH.html"
+# assertion E: the coupling-graph artifact matches --emit; its path is the
+# GATE_SDK_GRAPH_ARTIFACT knob (workflow-dir default), so a consumer that
+# republishes the artifact elsewhere gets its own path in every remedy line
+ARTIFACT="${GATE_SDK_GRAPH_ARTIFACT:-$WORKFLOW_DIR/CHECK-GRAPH.html}"
 ARTIFACT_DIR="$(dirname "$ARTIFACT")"
 emitted="$(emit_graph)"
 if [[ ! -f "$ARTIFACT" ]]; then

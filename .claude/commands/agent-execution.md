@@ -3,7 +3,7 @@ Execute the template at delegation-kit/templates/agent-execution.md, applying th
 ## Bindings
 
 **shared-file-roster** — the generated `scripts/git-hooks/pre-commit` and
-`.workflow/CHECK-GRAPH.html` (regenerate through the owning unit, never
+`docs/check-graph.html` (regenerate through the owning unit, never
 hand-edit); `scripts/gates.list` with the `scripts/*-config.sh` knob files;
 `TASK-QUEUE.md` with `.workflow/WORKFLOW-STATE.txt`; and any `SPEC-*.md`
 amendment a unit is mid-merge on — the git index and HEAD besides, shared by

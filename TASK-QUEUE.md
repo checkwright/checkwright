@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **check-graph-site-move** [spec: SPEC-graph-artifact.md] — move the coupling-graph
-  artifact to the docs site (never a copy): new `GATE_SDK_GRAPH_ARTIFACT` knob with the
-  workflow-dir default, gate-sdk gains the standard auto-sourced consumer-config seam (this
-  knob its first user), the shipped manifest carries both artifact homes as couples, and the
-  citation sweep repoints this repo's surfaces.
 - **docs-reference-routing** [spec: SPEC-docs-reference.md] — the repo tree is the reference
   tier: kit docs pages gain anchored GitHub blob links to their SPEC/README under the
   master-pinned link grammar; check-md-refs gains a self-repo blob-link resolution pass
@@ -179,6 +174,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- check-graph-site-move
 - lifecycle-knob-prefix
 - doctrine-rule-lockstep
 - runner-doc-off-resident
