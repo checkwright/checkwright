@@ -64,6 +64,19 @@
 
 ## Deferred
 
+- **overhead-metering** [needs-spec] — measure the methodology's own cost so
+  efficiency claims cut both ways: what fraction of a session's token spend
+  is governance (gate-output reading, stage ritual, hook payloads, doc
+  consultation) versus task work, measured over real iterations. First
+  economy levers to evaluate under it, surfaced 2026-07-12 by the operator:
+  commit-first (the generated hook already runs the coupled gates and prints
+  their verdicts, so a separate pre-commit battery run duplicates that
+  output — the token cost is output volume, not script runtime) and a
+  failures-only output mode for run-gates.sh (clean lines carry no decision
+  value at 55-gate scale; the summary line suffices). Related instruction
+  tension to rule: the CLAUDE.md battery block says run before committing —
+  if commit-first wins, that wording changes with the measurement, not ahead
+  of it. Owner candidate: drift-kit (the measurement family).
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
