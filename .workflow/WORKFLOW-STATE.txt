@@ -5,3 +5,4 @@
 ---
 
 doctrine-followthrough scope f9ff4e35 2026-07-11
+doctrine-followthrough align 4c21b513 2026-07-11
