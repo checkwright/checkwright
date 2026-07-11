@@ -16,8 +16,9 @@ consumer's tier contract is not canon-kit's to own.
   mechanism itself, and re-vendoring the kit *is* the doctrine upgrade. Each
   rule lands as: the rule statement, why it holds under agent work, and a
   pointer to the enforcing mechanism (the kit gate or skill that holds it).
-  Initial roster, relocated from this repo's CLAUDE.md §Single source of
-  truth plus the residency rule ruled at convention-hardening align:
+  Initial roster — relocated from this repo's CLAUDE.md §Single source of
+  truth, plus the residency rule ruled at convention-hardening align and the
+  placement rule ruled at this scope:
   1. **Content-tiering / SSOT** — one content tier per surface; point, never
      restate; the fix for a parallel copy is a pointer plus a gate that
      forbids the slab growing back.
@@ -31,6 +32,13 @@ consumer's tier contract is not canon-kit's to own.
   5. **Load-trigger residency** — the always-loaded file earns a rule only
      when no stage, skill, or tool-call trigger exists to load it; anything
      triggered lives in its owned doc behind that trigger.
+  6. **Widest-true-tier placement** (surfaced at this iteration's scope,
+     ruling the stage-skill grammar-pointer fix): a fact lands at the widest
+     tier where it holds for every reader of that tier — kit-shipped surface
+     when true for every consumer, consumer-tracked binding or config when
+     it names this repo's choices, the local-only private brief when it
+     cannot be published; a template's binding-slot grammar is the seam
+     marker between the first two.
 - **Roster extension — the corpus sweep (build worklist item).** Sweep the
   private companion consumer's instruction corpus (identity in the
   operator's local brief) for generic practices not yet banked. Candidate
