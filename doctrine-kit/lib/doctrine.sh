@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# spec: doctrine-kit/SPEC.md §lib/doctrine.sh — sourced config loader + the two knob defaults, never gate structure
+# spec: doctrine-kit/SPEC.md §lib/doctrine.sh — sourced config loader + the knob defaults, never gate structure
 
 _dk_cfg="${DOCTRINE_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/doctrine-config.sh}"
 if [[ -f "$_dk_cfg" ]]; then
@@ -16,3 +16,4 @@ unset _dk_cfg _dk_local
 
 : "${DOCTRINE_KIT_AGENT_FILE:=CLAUDE.md}"
 : "${DOCTRINE_KIT_DOCTRINE_FILE:=doctrine-kit/DOCTRINE.md}"
+: "${DOCTRINE_KIT_DIGEST_SECTION:=## Delivery doctrine}"

@@ -14,9 +14,11 @@ reference-not-copy boundary is the mechanism.
 
 The installer — `bin/install-doctrine.sh` — inserts or replaces the reference
 block between fixed markers, idempotently. The gate —
-`check-doctrine-registration` — holds the block present: it asserts the
-always-loaded file carries the markdown link and fails closed when that file is
-missing.
+`check-doctrine-registration` — holds the block honest: it asserts the
+always-loaded file carries the markdown link *and* keeps its methodology-rule
+digest in per-rule lockstep with the doctrine (each rule digested or declared
+trimmed, no digest bullet orphaned), fail-closed when a scanned file or heading
+is missing.
 
 The doctrine ships the rule *statements* only. Each kit's SPEC owns its
 mechanism and knob rosters, cited from the doctrine and never restated — so no
@@ -46,8 +48,11 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
    Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
 
-3. Edit the digest — trim any rule your project does not keep resident. The gate
-   asserts only the link, so the block body is yours to shape.
+3. Edit the digest — to drop a rule your project does not keep resident, declare
+   the trim in place: `<!-- doctrine-digest-trim: <rule name> — <reason> -->`
+   inside the digest section. The gate holds the digest in per-rule lockstep with
+   the doctrine modulo declared trims, so a silent omission stays red; point
+   `DOCTRINE_KIT_DIGEST_SECTION` at your heading if it is not `## Delivery doctrine`.
 
 ## Test
 

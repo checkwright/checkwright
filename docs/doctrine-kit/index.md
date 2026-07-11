@@ -16,10 +16,12 @@ The installer — `install-doctrine.sh` — inserts or replaces that reference b
 between fixed markers, so a re-run is idempotent and a harness-less consumer can
 paste the block by hand.
 
-The gate — `check-doctrine-registration` — holds the block present: it asserts
-the configured agent file carries the markdown link, and fails closed when the
-agent file is missing. What the digest says is the consumer's to edit; the gate
-asserts only the link, so a consumer that rejects a rule trims its own digest.
+The gate — `check-doctrine-registration` — holds the block honest: it asserts
+the configured agent file carries the markdown link *and* keeps its
+methodology-rule digest in per-rule lockstep with the doctrine, fail-closed when
+a scanned file or heading is missing. A rule the consumer does not keep resident
+is dropped by a declared trim marker beside the digest, never a silent deletion —
+so a re-vendor that changes the rule set surfaces at the next commit.
 
 The doctrine ships the rule statements only. Each kit's SPEC owns its mechanism
 and knob rosters, cited from the doctrine and never restated — so no private

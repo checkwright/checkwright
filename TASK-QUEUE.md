@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **doctrine-rule-lockstep** [spec: SPEC-doctrine-digest.md] — extend
-  check-doctrine-registration to per-rule bidirectional digest coverage (methodology rule
-  name ↔ digest bold lead-in) with fail-closed digest-section resolution via
-  `DOCTRINE_KIT_DIGEST_SECTION`; gate-economy weighed in the amendment: owed, because
-  re-vendor upgrades stale the digest by construction.
 - **lifecycle-knob-prefix** [spec: SPEC-knob-prefix.md] — rename the bare `LIFECYCLE_` knob
   roster to `LIFECYCLE_KIT_`, including the config seam
   (`LIFECYCLE_KIT_CONFIG_FILE` / `lifecycle-config.sh`); compat ruling: hard rename, no shim
@@ -188,6 +183,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- doctrine-rule-lockstep
 - runner-doc-off-resident
 - consumer-footprint-budget
 - delegation-rules-parity

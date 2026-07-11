@@ -58,9 +58,13 @@ file. The engineering-craft register is not digested — it is load-triggered an
 reached through the link, so the always-loaded surface carries only what bears
 on every edit. The installer is the single source of the block text, so a manual
 insertion for a harness-less consumer copies what the tool would emit; the README
-documents that manual path. What the digest *says* is the consumer's to trim — a consumer that
-rejects a rule edits its own digest — because the gate asserts only the link,
-never the block body.
+documents that manual path. The installed digest names every methodology rule,
+so a fresh consumer is in per-rule lockstep out of the box (installer and gate
+agree on the `## Delivery doctrine` heading — that agreement is part of
+check-doctrine-registration's contract). Trimming a rule the consumer does not
+keep resident stays legal, but rides a declared-trim marker rather than a silent
+deletion: the gate asserts name-lockstep modulo declared trims (§check-doctrine-registration
+assertion B).
 
 Positional overrides `install-doctrine.sh [agent-file [doctrine-file]]` let a
 smoke or a fixture point both paths at a scratch tree without touching consumer
@@ -68,23 +72,62 @@ config; unset, they fall to the knob defaults.
 
 ## check-doctrine-registration
 
-Invariant: the configured agent file carries a markdown link to the configured
-doctrine file. The gate greps the agent file for a `](<doctrine-file>` link
-token; absent, it is a finding with the install remedy. It asserts link
-*presence* only — that a session loading the agent file is pointed at the
-doctrine — and leaves link-target resolution to the consumer's doc gates
-(canon-kit's `check-md-refs` over the manifest). A missing agent file is
-fail-closed (exit 2): the gate cannot certify a file it cannot read. A grep that
-errors rather than simply not-matching is likewise fail-closed.
+Invariant, in three assertions: the configured agent file (A) carries a markdown
+link to the configured doctrine file and (B, C) holds its methodology-rule digest
+in per-rule lockstep with the doctrine. The digest is the surface the
+always-loaded-shape rule requires, and a re-vendored `DOCTRINE.md` that adds or
+renames a methodology-maintenance rule staling every consumer's digest *by
+construction* — on the exact path the kit advertises as its upgrade story — is
+the drift-prone-surface-that-must-exist case where a gate is owed (the
+enforcement-first weighing). Extending the existing gate rather than adding one
+keeps the gate count flat; the coupling is unchanged (the `# graph:` manifest
+already couples the agent file and the doctrine file).
+
+- **Assertion A (link).** The gate greps the agent file for a
+  `](<doctrine-file>` link token; absent, it is a finding with the install
+  remedy. It asserts link *presence* only — that a session loading the agent
+  file is pointed at the doctrine, not that the link was followed or the
+  doctrine read (the honest limit: a link is not a read) — and leaves
+  link-target resolution to the consumer's doc gates (canon-kit's
+  `check-md-refs` over the manifest).
+- **Assertion B (doctrine → digest).** Every rule name under the doctrine's
+  `## Methodology-maintenance rules` section — the bold text of each numbered
+  rule, trailing period dropped (e.g. `Content-tiering / SSOT`) — appears as a
+  bold digest lead-in (`- **<name>**`) in the agent file's digest section.
+  Engineering-craft rules are exempt: they live behind the link by the
+  doctrine's own two-register design, so the gate scans only the
+  methodology section for the required set. The consumer's right to reject a
+  rule survives as a *declared* trim: a
+  `<!-- doctrine-digest-trim: <rule name> — <reason> -->` line inside the
+  digest section satisfies assertion B for that rule; a silent omission stays
+  red. Declared-not-silent is the reconciliation — the re-vendor moment
+  surfaces every added or renamed rule, and the consumer's decision (adopt the
+  bullet or trim it with cause) is recorded beside the digest it governs.
+- **Assertion C (digest → doctrine).** Every bold bullet lead-in in the digest
+  section matches a methodology-maintenance rule name — a digest line with no
+  owning rule is a rule stated nowhere the doctrine governs.
+
+Section resolution fails closed. The digest section is the agent-file heading
+named by `DOCTRINE_KIT_DIGEST_SECTION` (Layout and configuration); a configured
+heading matching nothing exits 2 — a renamed digest section must not disarm the
+gate into passing an empty set. The doctrine-side heading
+(`Methodology-maintenance rules`) is kit mechanism, not config: the kit ships
+`DOCTRINE.md`, so it owns that name, and its absence is likewise exit 2 (the
+gate cannot certify the digest against an unreadable rule set). A missing agent
+or doctrine file is fail-closed for the same reason, as is a grep or awk that
+errors rather than simply not-matching.
 
 The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
 model): the single `DOCTRINE-REGISTRATION: clean` success line and a `help:`
-remedy on the finding path (output); exit 2 on the unreadable agent file and the
-errored grep (fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/`
-(fixture-pair); and registration in this repo's `gates.list` where its own
-always-loaded file is the scan target (self-lint). Positional form
+remedy on each finding path (output); exit 2 on an unreadable file, an
+unresolved section, or an errored capture (fail-closed); a `good/`+`bad/`
+fixture pair under `gate-tests/` — the pair carries the lockstep-clean and the
+digest-missing-a-rule cases, and a sibling `*.test.sh` drives the extra-line,
+declared-trim, link-absent, and three fail-closed cases the one-pair harness
+cannot hold (fixture-pair); and registration in this repo's `gates.list` where
+its own always-loaded file is the scan target (self-lint). Positional form
 `check-doctrine-registration.sh [agent-file [doctrine-file]]` lets the fixtures
-point at a synthetic agent file.
+point at a synthetic agent and doctrine file.
 
 ## lib/doctrine.sh
 
@@ -107,6 +150,12 @@ elsewhere) overrides any knob; defaults fill what the consumer left unset. Knobs
   gate scans, default `CLAUDE.md`.
 - `DOCTRINE_KIT_DOCTRINE_FILE` — the link target the installer writes and the
   gate asserts, default `doctrine-kit/DOCTRINE.md`.
+- `DOCTRINE_KIT_DIGEST_SECTION` — the agent-file heading whose bullet list the
+  gate reads as the methodology-rule digest (assertions B and C), default
+  `## Delivery doctrine`. The default is `install-doctrine.sh`'s installed block
+  heading, so a zero-config consumer that installed via the tool is green out of
+  the box; a consumer that renamed the heading repoints this knob (a rename that
+  leaves it stale exits 2 rather than passing an empty set).
 - `DOCTRINE_KIT_CONFIG_FILE` — the loader override; when set it is sourced if it
   exists, and a `.local.sh` sibling sources last for private overlay values.
 
@@ -118,10 +167,11 @@ with no config file: `CLAUDE.md` is the always-loaded agent file, and its
 
 Folding the doctrine into canon-kit — ruled out above. Copy-install of the
 doctrine file — a copied doctrine drifts; the reference is the mechanism.
-Per-rule enable/disable knobs — the doctrine is one document, a consumer that
-rejects a rule trims its digest, and the gate asserts only the link, not the
-block body. A standing consultation step in place of packaging — the
-always-loaded anti-pattern this load-triggered kit exists to replace. The kit
-holds no opinion on *which* rules a consumer keeps resident versus behind the
-link; it ships the statements and the wiring, and the consumer's always-loaded
-budget rules the digest.
+Per-rule enable/disable knobs — the doctrine is one document, and a consumer
+that rejects a rule declares a trim marker beside its digest rather than toggling
+a knob. A standing consultation step in place of packaging — the always-loaded
+anti-pattern this load-triggered kit exists to replace. The kit holds no opinion
+on *which* methodology rules a consumer keeps resident versus trims with cause;
+it ships the statements and the wiring, and the consumer's always-loaded budget
+rules the digest — but a trim is declared, not silent, so the gate holds the
+resident set and the doctrine in name-lockstep modulo those declarations.
