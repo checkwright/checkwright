@@ -69,6 +69,34 @@
   `templates/` glob would false-positive, `stage-session.md` the slot-free case
   that would pass clean — the pair the finder-vs-manual-duty ruling decides
   against.
+- **gap-disposition-doctrine** [needs-spec] — a methodology-maintenance rule for
+  the *defer* path: when a session surfaces a gap it will not fix this session,
+  it costs the remedy (works out how it could be solved, not just names it) and
+  either files that analysis or enriches the standing deferred entry — a bare
+  flag-and-skip is the defect. This is the `drift-kit/SPEC.md` knowledge-friction
+  loop one altitude up: that loop captures re-derived *facts with no owner*; this
+  captures *design/coverage gaps* (the template-doc-governance escape is the
+  archetype — mentioned once, it re-pays its own discovery every session). It
+  complements, not duplicates, three existing `doctrine-kit/DOCTRINE.md` rules:
+  Spec-over-precedent already calls a gap "a doc gap to capture"; Enforcement-first
+  names the defect-and-mechanism for a fix being *landed*; neither covers a gap
+  being *deferred*. Design questions to rule at scope: (1) new methodology rule vs
+  an extension of Spec-over-precedent's capture clause / the knowledge-friction
+  loop's convention. (2) Placement ripple if it is a new methodology rule — the
+  methodology rules are numbered ahead of the engineering-craft rules, and at
+  least one craft rule is cited *by number* from code (the git-rewrite guard's
+  advisory in `guard-kit/lib/guard.sh`), so inserting a methodology rule renumbers
+  the craft block and dangles that citation; rule whether to renumber-and-fix, to
+  migrate craft citations to name-based first, or to place the new rule so no
+  renumber is forced. The `CLAUDE.md` doctrine digest is held in per-rule lockstep
+  by `check-doctrine-registration`, so the digest line lands in the same unit. (3)
+  Enforcement: likely a stated manual duty, not a gate — "did the session cost the
+  fix" is not machine-decidable, so the enforcement-first false-positive carve-out
+  applies (Spec-over-precedent's "judgment with a capture mechanism, not a gate"
+  is the precedent). Surfaced 2026-07-12 at build (scope-session-routing), operator
+  ask after the template-doc-governance gap was flagged-and-skipped before being
+  enriched on a follow-up prompt — the rule makes the enrich-on-discovery the
+  default, not the prompted exception.
 - **footprint-page** [needs-spec] — publish the kits' measured context footprint as a
   generated docs page: the always-loaded surfaces and each load-triggered skill/template,
   line/word counts exact and token counts as a labeled estimate (tokenizers are
