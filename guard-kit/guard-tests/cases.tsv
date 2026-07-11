@@ -85,5 +85,14 @@ fallthrough	frobnicate && git status
 fallthrough	git status && ls
 fallthrough	git status && printf done
 
-# rule 15 — anything else falls through to the friction log
+# rule 15 — git history-rewrite advisory: amend / commit -F / soft-reset steered;
+#           a plain commit and a non-soft reset pass
+advise	git commit --amend
+advise	git commit --amend --no-edit
+advise	git commit -F .git/COMMIT_EDITMSG
+advise	git reset --soft HEAD~1
+fallthrough	git commit -m done
+fallthrough	git reset --hard HEAD~1
+
+# rule 16 — anything else falls through to the friction log
 fallthrough	make build

@@ -83,6 +83,20 @@ verbatim minus its trailing period; `check-rule-citation` resolves every such
 citation in §The delegation model forward into the template, so a lead-in
 rename cannot silently dangle a reference.
 
+`templates/dispatch-checklists.md` is a second, load-triggered template the
+protocol template reaches by a single pointer line: `agent-execution.md` names
+it for a deletion, rename, or heavy cross-spec audit dispatch, and it loads only
+then — never resident, and not a binding shim (it binds no slots, so
+`check-skill-binding` does not scan it). It carries the mechanical pre-flight for
+those dispatch shapes — the importer/collision/sweep-verification checks — while
+the protocol proper stays whole in `agent-execution.md`; the pointer-line
+contract is that the protocol template stays complete alone and the checklists
+are a reach-through, so the width, journal, and validate rules live once in the
+protocol template and are cited from the checklists, never restated. This is the
+load-trigger-residency rule applied a rung deeper: even inside a load-triggered
+template, a subset that only a narrower trigger (a deletion or rename dispatch)
+needs sits behind its own pointer.
+
 The consumer's CLAUDE.md carries no digest of the bullets, only a resident
 pointer: the pre-authorization sentence (consumer judgment on what delegation
 needs no ask) and `/agent-execution`. Rationale: a rule is resident only when it
@@ -316,6 +330,7 @@ delegation-kit/
   checks/check-gate-tamper.sh
   gate-tests/check-gate-tamper/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
+  templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
   templates/statusline-usage.sh           # reference usage.txt producer + status bar
   templates/delegation-config.sh          # knob overrides (arrays live here)

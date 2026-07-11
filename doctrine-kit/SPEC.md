@@ -25,7 +25,8 @@ the doctrine rather than restating it.
 The roster carries two registers: methodology-maintenance rules, which govern
 how the methodology's own surfaces stay honest and bear on every surface edit,
 and engineering-craft rules, which govern how the work built under the
-methodology is written and are triggered by test and rename work. The
+methodology is written and are triggered by test, rename, git-rewrite,
+config-edit, and dispatch work. The
 maintenance register forms the installed digest; the craft register lives behind
 the link, load-triggered — the doctrine applying its own load-trigger residency
 rule to itself.

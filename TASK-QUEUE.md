@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **craft-extraction** [spec: SPEC-craft-extraction.md] — copy-first extraction of
-  the generic craft share of the private consumer's handbook: doctrine-kit's
-  engineering-craft register grows six working-style/git-hygiene rules (full
-  statement/rationale/enforcement triple — the shape question is ruled in the
-  amendment), guard-kit's generic ruleset gains the advisory git-rewrite rule, and
-  delegation-kit gains the load-triggered dispatch/rename checklist template.
-  Provenance: generalized only — product names, identity/key items stay private.
-
 - **scope-session-routing** [spec: SPEC-scope-session-routing.md] — rung 1 of the
   lead-session design: a lifecycle-kit lead template (not a stage skill) dispatches
   stage sessions and answers their batched, decision-shaped escalations; sessions
@@ -149,5 +141,7 @@
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
 ## Done
+
+- craft-extraction
 
 ## Lessons Learned

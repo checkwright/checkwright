@@ -7,6 +7,10 @@ investigation). A resident pointer in CLAUDE.md §Agent execution keeps the
 protocol reachable from a delegating session; this skill is the complete
 procedure.
 
+For a **deletion, rename, or heavy cross-spec audit** dispatch, also load the
+mechanical pre-flight in [dispatch-checklists.md](dispatch-checklists.md) — a
+reach-through, not a change to this protocol; every rule below still applies.
+
 - **Supervisor owns rulings; agents surface, never guess.** SECURITY and design
   rulings (e.g. a privileged caller set, a naming collision) are decided by the
   supervisor and handed down; an agent that hits anything its brief doesn't cover

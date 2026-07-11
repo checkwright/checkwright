@@ -11,8 +11,8 @@ The roster is in two registers. **Methodology-maintenance** rules govern how the
 methodology's own surfaces stay honest; they bear on every surface edit and form
 the always-loaded digest a consumer installs. **Engineering-craft** rules govern
 how the work built under the methodology is written; they are load-triggered by
-test and rename work and live behind the link — an application of the
-load-trigger residency rule to the doctrine itself.
+test, rename, git-rewrite, config-edit, and dispatch work and live behind the
+link — an application of the load-trigger residency rule to the doctrine itself.
 
 ## Methodology-maintenance rules
 
@@ -190,3 +190,88 @@ load-trigger residency rule to the doctrine itself.
     out of shipped mechanism (the config-via-env pattern in
     [gate-sdk/SPEC.md](../gate-sdk/SPEC.md)), so the check ships and the
     vocabulary stays with the consumer.
+
+14. **Config edits are merges, not rewrites.** Edit a config or settings file
+    with targeted, string-scoped edits, never a full-file write reconstructed
+    from a partial read — a whole-file write built from part of the file
+    silently drops everything the write did not carry. And validate an
+    apparently broken file with the format's own parser before calling it
+    corrupt: an apparent corruption is usually a parse by the wrong tool, not
+    damaged content.
+    *Under agent work:* an agent reads the top of a settings file, writes the
+    whole file back from that fragment, and the keys it never read vanish with
+    no diff to flag them; or it declares a file corrupt off a wrong-tool parse
+    and "repairs" a file that was already valid.
+    *Enforced by:* a convention, not yet a checkwright gate — the harness's Edit
+    tool is the mechanism (an exact-string replace that fails loudly on a
+    missing or ambiguous match, keeping the write scoped to what was read); no
+    gate asserts a given edit was a merge rather than a rewrite.
+
+15. **Re-verify volatile state before a git history rewrite.** Verify HEAD
+    (`git log --oneline -3`) before an amend or squash; after a `git reset
+    --soft`, re-stage and verify the staged content (`git show :<path>`) before
+    committing — the soft reset keeps the old index snapshot; write any `git
+    commit -F` message file fresh in the same turn (prefer `-m` for a short
+    message — a leftover file lands the wrong message with exit 0); and rewrite
+    the message when amending so it states the combined change.
+    *Under agent work:* the git index and HEAD are mutable state an agent
+    reasons about from a stale in-context snapshot, and a rewrite acts on what
+    the working tree *now* holds, not what the transcript last recorded — so the
+    verification must be a fresh read, never a remembered one.
+    *Enforced by:* guard-kit's advisory guard rule on `git commit --amend`, `git
+    reset --soft`, and `git commit -F`
+    ([guard-kit/SPEC.md](../guard-kit/SPEC.md) §The generic ruleset), which
+    surfaces this checklist at the moment the rewrite is dispatched — advisory
+    because each command is legitimate.
+
+16. **Entering another repo's tree, read its governance first.** A cross-repo
+    edit re-reads that repo's agent file and README and checks its branch
+    freshness every time — a second repo's model drifts independently of this
+    one's, so a remembered version of its rules is a stale premise.
+    *Under agent work:* an agent carries the governing rules of the repo it was
+    last in into the next one, importing the wrong house style; only a fresh
+    read of the entered tree's own governance corrects the prior.
+    *Enforced by:* a convention, not yet a checkwright gate — another repo's
+    tree is outside this tree's gate horizon, so no local check can assert its
+    governance was reread.
+
+17. **Naming: drop the qualifier the context supplies — only when every consumer
+    has that context.** A name that travels into a flat namespace keeps its
+    qualifier; default to the shorter form and reject the vacuous one, but a
+    name that loses the context which disambiguated it must carry the qualifier
+    with it.
+    *Under agent work:* an agent copies a short name out of the scope that gave
+    it meaning into a flat namespace where the qualifier is load-bearing, and
+    the collision surfaces far from the rename; "does every reader still have
+    the context" is the discriminator, not shortness.
+    *Enforced by:* a convention, not yet a checkwright gate — whether a
+    qualifier is redundant *for every consumer* is a judgment a scanner cannot
+    decide; the de-literalization instinct, a name sized to its widest reader,
+    is its written form.
+
+18. **Reuse a co-located consumer's data before designing a new path.** For an
+    embedded or co-located actor, first ask whether it can read a co-located
+    consumer's already-fetched data before minting a new stream, grant, or
+    fetch — a "which path" framing can hide a "no path needed" answer.
+    *Under agent work:* an agent asked "how should X get this data" designs a
+    new channel because the question presupposes one, and never asks whether the
+    data is already in reach; the cheaper reuse stays invisible unless the
+    framing is challenged.
+    *Enforced by:* a convention, not yet a checkwright gate — a data-path choice
+    leaves no artifact a scanner reads; it is design-review judgment, kin to
+    reaching for an existing owner before minting a second source.
+
+19. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
+    gate that finds a silent drop has found either dead config to remove *or*
+    promised-but-unwired config to build — one signature, opposite fixes; only
+    the owning SPEC distinguishes them, so verify intent against the SPEC before
+    sweeping the key away.
+    *Under agent work:* an agent reads a gate finding as an instruction ("remove
+    the flagged key") and deletes config the SPEC promised but the wiring never
+    delivered — turning a build-it signal into a delete-it action; the gate saw
+    the drop, not the intent.
+    *Enforced by:* the name-resolution gates that surface the drop — the
+    couples/reads walkers and reference-liveness sweeps in
+    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — but the fork itself is resolved
+    against the owning SPEC by judgment; the gate reports the dangling key,
+    never which way it should be closed.

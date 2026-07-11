@@ -239,7 +239,19 @@ load-bearing where noted.
     parse error and the rule silently declines and falls through. Placed after
     the auto-allow rules (12, 13) so a silently granted read-only pipeline never
     reaches it.
-15. **Fall-through logging** — anything neither blocked nor auto-allowed is
+15. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
+    or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
+    DOCTRINE.md rule 15's checklist (verify HEAD before amend/squash; re-stage
+    and verify staged content after a soft reset; write any `commit -F` message
+    file fresh this turn). Advisory, not a block: each is a legitimate command,
+    so the rule injects the re-verification context and lets the command
+    proceed. Cited as **DOCTRINE.md rule 15** in full — this ruleset's
+    own rule 15 is unrelated, so a bare "rule 15" here would collide. Placed
+    after the auto-allow rules (12, 13) and the decorated-allowlist rule (14),
+    so it fires only on a bare rewrite command none of those claimed; a
+    decorated form meets rule 14's block first and the advisory fires on the
+    re-issued bare command.
+16. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 ### Consumer rules

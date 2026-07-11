@@ -355,6 +355,17 @@ guard_rule_allowlist_chain() {
     return 0
 }
 
+guard_rule_git_rewrite() {
+    local cmd="$1" s
+    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    if { grep -qE '(^|[[:space:]])git[[:space:]]+commit([[:space:]]|$)' <<<"$s" \
+        && grep -qE '(^|[[:space:]])(-F|--file|--amend)\b' <<<"$s"; } \
+        || { grep -qE '(^|[[:space:]])git[[:space:]]+reset([[:space:]]|$)' <<<"$s" \
+        && grep -qE '(^|[[:space:]])--soft\b' <<<"$s"; }; then
+        guard_advise "re-verify volatile git state before this history rewrite (DOCTRINE.md rule 15): confirm HEAD with 'git log --oneline -3' before an amend or squash; after a 'git reset --soft' re-stage and verify staged content with 'git show :<path>' before committing (the soft reset keeps the old index snapshot); write any 'git commit -F' message file fresh this turn — prefer '-m' for a short message, since a leftover file lands the wrong message with exit 0; and rewrite the message when amending so it states the combined change."
+    fi
+}
+
 guard_generic_rules() {
     local cmd="$1"
     guard_rule_cd_compound "$cmd"
@@ -371,4 +382,5 @@ guard_generic_rules() {
     guard_rule_truncate_scratch "$cmd"
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"
+    guard_rule_git_rewrite "$cmd"
 }
