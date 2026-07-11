@@ -41,6 +41,7 @@ leaves its section absent.
 | [doctrine-kit](doctrine-kit/index.md) | check-doctrine-registration | precommit |
 | (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
+| (consumer) | check-docs-mirror-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-enforcement-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-hook-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |

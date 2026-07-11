@@ -85,6 +85,10 @@ if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workf
     scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
 fi
 
+if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRINE.md' '*/SPEC.md' '*/README.md' 'doctrine-kit/DOCTRINE.md' 'scripts/gen-docs-mirror.sh'; then
+    scripts/check-docs-mirror-fresh.sh || hook_fail check-docs-mirror-fresh
+fi
+
 if staged_matches 'docs/enforcement.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml'; then
     gate-sdk/checks/check-enforcement-fresh.sh || hook_fail check-enforcement-fresh
 fi

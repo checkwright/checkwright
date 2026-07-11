@@ -1,0 +1,1 @@
+stale vs gen-docs-mirror.sh

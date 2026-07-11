@@ -1,0 +1,3 @@
+# Stale case: docs/foo-kit/SPEC.md carries a hand-edit the generator would not
+# emit from the source, so the byte-compare must reject.
+.

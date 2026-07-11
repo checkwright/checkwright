@@ -17,6 +17,7 @@ check-docs-kit-parity
 check-doctrine-registration
 check-kit-ref-liveness
 check-trajectory-fresh
+check-docs-mirror-fresh
 check-enforcement-fresh
 check-hook-exec-bit
 check-commit-msg
