@@ -5,3 +5,4 @@
 ---
 
 footprint-and-parity scope 97d131aa 2026-07-11
+footprint-and-parity align 600e3271 2026-07-11
