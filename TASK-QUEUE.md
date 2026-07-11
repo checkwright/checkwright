@@ -215,6 +215,24 @@
   tag); the campaign itself — channels, venues, timing — is operator work,
   planned in the operator's local brief rather than here. Surfaced
   2026-07-09.
+- **stage-shim-dedup** [needs-spec] — closure of the doctrine-kit align
+  finding on the stage binding shims: the close shim paraphrases
+  guard-kit/templates/close-triage.md and drift-kit/templates/close-knowledge.md
+  instead of consuming them by reference — a fork of kit-owned procedure, a
+  strict subset when filed but a stranded enhancement the day one lands
+  locally — and the build/scope shims restate always-loaded CLAUDE.md facts
+  (generated-hook regen, public-repo hygiene, the provenance seam,
+  red-gate-never-bypassed) their reader provably has loaded. Fix is
+  pointer-form: the housekeeping binding names the two kit templates and
+  binds only consumer residue; the restatements trim to citations; the
+  build shim's pre-commit battery subset becomes a citation of the CLAUDE.md
+  battery block plus the touched kit's suite. Enforcement half, same unit:
+  a duplication tripwire — a long shared word n-gram between a binding shim
+  and an always-loaded surface or a kit template fails the commit; calibrate
+  the n on the current corpus. Genericity itself stays semantic (no scanner
+  buildable — the n-gram holds the copy shape, judgment holds the tier).
+  Same residency/pointer family as delegation-doctrine-single-source, but
+  sequenced independently of it. Surfaced 2026-07-11 at doctrine-kit align.
 ## Done
 
 ## Lessons Learned
