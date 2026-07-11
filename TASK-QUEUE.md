@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: doctrine-kit  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,46 +12,38 @@
 
 ## New Features
 
+- **doctrine-kit** [spec: SPEC-doctrine-kit.md] [blocked-by: fixture-suite-derivation]
+  — the experience-packaging rung: `doctrine-kit/DOCTRINE.md` carries the
+  generic delivery rules (referenced in place, re-vendor is the upgrade),
+  `install-doctrine.sh` inserts the always-loaded reference block,
+  `check-doctrine-registration` holds it present; CLAUDE.md §Single source
+  of truth converts to consumer-by-reference; the companion-corpus sweep
+  extends the roster — mechanism crosses the seam, rule content never.
+- **read-command-guard-steer** [spec: guard-kit/SPEC-read-steer.md] — three
+  steer rules beside `guard_rule_sed_file`: bare `cat` → Read, print-only
+  `find` → Glob, working-tree `git grep` → Grep; piped/heredoc `cat`,
+  mutating `find`, and history-searching `git grep` pass; fixtures per the
+  decision-table contract.
+
 ## Technical Debt
+
+- **gate-tamper-rename-policy** — ruled at scope: fold `docs/` and `.github/`
+  into `DELEGATION_KIT_META_PATHS` in scripts/delegation-config.sh — public
+  docs and CI are governance surfaces in this repo, and the mandatory
+  `docs/enforcement.md` regen was forcing every new-gate commit through a
+  one-off `--no-verify`; covers the rename and new-gate cases alike.
+  Consumer config only — the gate carve-out and standing-`--no-verify`
+  options are rejected; delegation-kit mechanism is untouched.
+- **fixture-suite-derivation** [blocked-by: gate-tamper-rename-policy] —
+  ruled: derive where executable, cite where prose — the CI workflow and
+  scripts/evidence-config.sh loop over the `*/gate-tests` dirs instead of
+  hand-enumerating suites; the agent-execution validate set cites the
+  derivation; the CLAUDE.md battery block stays enumerated
+  (check-kit-registration already holds it per-kit). doctrine-kit lands
+  behind it as the derivation's first exercised pickup.
 
 ## Deferred
 
-- **doctrine-kit** [needs-spec] — the experience-packaging rung, first
-  candidate at next scope: a kit-shipped, customer-deliverable doctrine file
-  carrying the generic battle-tested delivery rules — content-tiering/SSOT
-  (one tier per surface, point-never-restate, a gate forbids the slab
-  growing back), enforcement-first (the fix and its enforcing mechanism land
-  in one unit; a green instance fix is a stop signal), de-literalization
-  (prose cites names, code/SPEC own values), the always-loaded shape
-  (one-line rule per convention, detail behind the pointer) and the
-  load-trigger residency rule (the always-loaded file earns a rule only when
-  no stage/skill/tool-call trigger exists to load it). Install inserts a
-  reference block into the consumer's always-loaded agent file
-  (CLAUDE.md/AGENTS.md); a registration gate holds the reference present
-  (the check-kit-registration shape) and the doctrine file joins the spec
-  manifest so its links resolve. Scope includes the systematic sweep of the
-  private companion consumer's instruction corpus for generic practices not
-  yet banked — mechanism crosses the seam, rule content never does — and
-  converts this repo's CLAUDE.md to consumer-by-reference: the interim
-  §Single source of truth section relocates into the shipped file, CLAUDE.md
-  keeps the reference plus repo-specific bindings. Owning kit ruled at
-  scope. Surfaced 2026-07-11: sessions were re-deriving doctrine the
-  companion project already owns — packaging is what stops the re-derivation.
-  Ruled at convention-hardening close: an interim standing consultation step
-  (convention-shaping stages check the companion corpus before ruling) is
-  declined as the always-loaded anti-pattern — a standing instruction with no
-  load trigger; this rung *is* the load-triggered structural fix, so no interim
-  guard rides ahead of it.
-- **read-command-guard-steer** [needs-spec] — extend the bash-guard read-steer
-  decision table (today `sed`-read only) to the bare working-tree read commands
-  that dominated convention-hardening's prompt friction: `cat <file>` → Read,
-  `find` → Glob, `git grep` → Grep. Same shape as `guard_rule_sed_file`: steer
-  only the bare-read form, not the piped/heredoc `cat`, not a `git grep <ref>`
-  that searches history the Grep tool can't reach. Ships with guard-test
-  fixtures per the decision-table contract. Enforcement-first disposition of the
-  read trio (18 of 38 prompting calls): the form to reinforce is the dedicated
-  tool, so this is a guard rule, never an allowlist entry. Surfaced 2026-07-11
-  at convention-hardening close.
 - **knob-literal-citation-gate** [needs-spec] — the enforcement half of the
   align knob-defaults finding: the instance is fixed (CLAUDE.md cites knob
   names; each kit's SPEC owns its roster and default values) and this gate
@@ -59,14 +51,6 @@
   SPEC states a `<KIT>_` knob's default value. Calibrate on the low-FP
   triad (knob token + default/value marker + non-owning surface); a bare
   number in prose stays a tripwire, not a gate.
-- **fixture-suite-derivation** [needs-spec] — the fixture-suite roster is
-  derivable from disk (`*/gate-tests`) yet hand-enumerated on four surfaces:
-  the CLAUDE.md battery block (the only gated one — check-kit-registration),
-  the CI workflow, evidence-config's validate suites, and the
-  agent-execution validate-after-commit set. Mechanism: derive where the
-  surface is executable (CI and config loop over the dirs), cite where it is
-  prose. The three ungated instances are deliberately not bare-fixed — they
-  ride this unit as its first green case (enforcement-first corollary).
 - **ddd-positioning-docs** [needs-spec] — docs page plus example consumer
   config positioning Checkwright for DDD ubiquitous-language enforcement
   (vocabulary via the check-graph/graph-vocab pattern, comment-tier
@@ -156,8 +140,8 @@
   only when the rule has no load trigger — anything triggered by a stage,
   a skill, or a tool call lives in its owned doc behind a pointer, and the
   Agent budget guard shows dispatch already has a mechanical hook seam.
-  Candidate owned home for that rule: context-kit's SPEC (it owns the
-  always-loaded-budget doctrine). Surfaced 2026-07-11.
+  Surfaced 2026-07-11. Superseded note (doctrine-kit scope): the residency
+  rule's owned home is doctrine-kit's DOCTRINE.md, not context-kit's SPEC.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -231,24 +215,6 @@
   tag); the campaign itself — channels, venues, timing — is operator work,
   planned in the operator's local brief rather than here. Surfaced
   2026-07-09.
-- **gate-tamper-rename-policy** [needs-spec] — check-gate-tamper blocks an
-  atomic cross-cutting kit rename: the sweep updates gate-file (`*/checks/*.sh`)
-  SPEC pointers in the same commit as non-meta surfaces (docs/, .github/, the
-  retired kit-dir rename sources), and no green-preserving split exists, so the
-  canon-kit rename landed via a one-off `--no-verify`. Rule the standing policy
-  — options: fold docs/ + .github/ into DELEGATION_KIT_META_PATHS (public-docs +
-  CI are governance, not product, in this repo); teach check-gate-tamper a
-  rename-aware carve-out (a gate-file change that is a pure path/pointer sweep
-  with no logic delta is not tampering); or bless one-off `--no-verify` as the
-  standing rename procedure. Surfaced 2026-07-11 landing the canon-kit rename.
-  Extended 2026-07-11: not rename-specific — landing *any* new gate trips it,
-  because a new `*/checks/*.sh` gate forces the mandatory `docs/enforcement.md`
-  regen (`check-enforcement-fresh`) into the same commit, and docs/ is non-meta;
-  check-skill-binding landed via the same one-off `--no-verify`. The
-  fold-docs/-into-META_PATHS option covers both the rename and the new-gate
-  case; scope the policy against the generated-artifact class, not renames
-  alone.
-
 ## Done
 
 ## Lessons Learned
