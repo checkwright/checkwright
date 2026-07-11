@@ -257,9 +257,4 @@
   close — the printf append prompted 3× this iteration.
 ## Done
 
-- read-command-guard-steer
-- gate-tamper-rename-policy
-- fixture-suite-derivation
-- doctrine-kit
-
 ## Lessons Learned
