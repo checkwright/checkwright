@@ -255,6 +255,23 @@
   <fact> ← <surface>` grammar so the format stops being hand-typed. Owner:
   drift-kit (the knowledge-friction loop). Surfaced 2026-07-11 at doctrine-kit
   close — the printf append prompted 3× this iteration.
+- **session-context-stage-lag** [needs-spec] — the session-context hook keys its
+  stage-conditioned output (queue full-board vs tally, and every step-4 nudge) on
+  the queue header, but as a SessionStart hook it reads the header *before* the
+  stage skill's first-step flip — so the value is the *previous* stage. Result:
+  the full Deferred board (intended for the scope session, which promotes off
+  Deferred) lands on the align session instead, scope gets the collapsed tally,
+  and every stage nudge fires one stage late. Design call, not a one-liner: the
+  header can't distinguish a first-of-stage session (reads predecessor) from a
+  restarted same-stage session (reads current), so the fix is a predecessor→
+  current map (brittle on restart) or a union trigger (header ∈ {close, scope} →
+  full board, which also serves close's backlog-aging review). Fix the
+  context-kit/SPEC.md §The session-context hook (template) "only scope acts on
+  Deferred" rationale in the same unit — close reviews and files against Deferred
+  too. Owner: context-kit (the hook template) + this repo's
+  scripts/session-context.sh copy. No clean scanner — the flip-vs-hook ordering
+  is a runtime fact, not a static-scannable one. Surfaced 2026-07-11 at
+  doctrine-kit close, operator-caught.
 ## Done
 
 ## Lessons Learned
