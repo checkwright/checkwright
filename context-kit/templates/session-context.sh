@@ -26,7 +26,7 @@ if [[ -f "$QUEUE_FILE" ]]; then
     }' "$QUEUE_FILE" 2>/dev/null)"
 fi
 if [[ -f "$QUEUE_INDEX" ]]; then
-    if [[ "$stage" == scope ]]; then
+    if [[ "$stage" == close || "$stage" == scope ]]; then
         bash "$QUEUE_INDEX" 2>/dev/null || echo "(queue-index unavailable)"
     else
         bash "$QUEUE_INDEX" --collapse-deferred 2>/dev/null || echo "(queue-index unavailable)"
@@ -61,7 +61,7 @@ fi
 
 # spec: context-kit/SPEC.md §The session-context hook — step 4 stage-conditioned nudges; which stages get which nudge is consumer judgment [EDIT ME]
 case "$stage" in
-    align | build)
+    scope | align | build)
         echo "Delegation is the primary token lever and is pre-authorized here: send"
         echo "read-heavy cross-SPEC audits and mechanical rename/merge sweeps to a sub-agent"
         echo "without waiting to be asked — this standing licence satisfies the Agent tool's"

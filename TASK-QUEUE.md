@@ -14,17 +14,6 @@
 
 ## Technical Debt
 
-- **session-context-stage-lag** — ruled at scope: union-trigger keying — a
-  SessionStart hook reads the queue header before the arriving skill's flip,
-  so every stage-conditioned output keys on a stage *set* that includes the
-  predecessor: the full Deferred board fires on close+scope (which also
-  serves close's backlog review), and each nudge keys on {predecessor, own
-  stage} so first-of-stage and restarted sessions both receive it. The
-  step-1 "only scope acts on Deferred" rationale and an honest-limit
-  sentence about the header lag land in context-kit/SPEC.md §The
-  session-context hook (template); template and this repo's
-  scripts/session-context.sh copy move in one unit.
-
 ## Deferred
 
 - **overhead-metering** [needs-spec] — measure the methodology's own cost so
@@ -206,6 +195,7 @@
   2026-07-09.
 ## Done
 
+- session-context-stage-lag
 - validate-spine-consumer-smoke
 - kfric-capture-tool
 - knob-literal-citation-gate

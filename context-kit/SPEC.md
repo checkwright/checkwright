@@ -52,9 +52,12 @@ Every step is guarded and degrades silently — the hook never fails a
 session. Steps, in order:
 
 1. **Queue index** — via queue-kit's `queue-index.sh`, collapsing the
-   Deferred section to a tally except on the scope stage: Deferred is
-   unpickable and only scope (promotion) acts on it, so its full listing
-   every other session is pure recurring cost.
+   Deferred section to a tally except on the close and scope stages.
+   Deferred is unpickable and only scope (promotion) acts on it; the full
+   board additionally serves close's backlog review, and — by the
+   header-lag rule below — firing on close is what hands the full board to
+   the first scope session, which reads `close` at session start. On any
+   other stage the full listing is pure recurring cost.
 2. **Dirty-surface pre-run** — for each component with uncommitted
    changes, pre-run the matching surface index (default: `pub-index` over
    top-level dirs containing `src/`), so a resumed session's editing
@@ -64,8 +67,10 @@ session. Steps, in order:
 3. **Drift line** — one `drift-report --trend` summary line when the
    consumer has a drift report; silently absent otherwise (drift-kit owns
    the report; the seam is this optional line).
-4. **Stage-conditioned nudges** — short reminders keyed on the current
-   stage header (this repo's delegation nudge is the exemplar). Marked
+4. **Stage-conditioned nudges** — short reminders keyed on a stage set
+   read from the header (this repo's delegation nudge is the exemplar).
+   Each keys on {predecessor, own stage} (the header-lag rule below) so a
+   first-of-stage session and a restarted one both receive it. Marked
    consumer section: which stages get which nudge is consumer judgment.
 5. **Memory-off backstop** — one warning line when the harness memory dir
    (`CONTEXT_KIT_MEMORY_DIRS`) holds content, pointing the durable fact at its
@@ -78,6 +83,15 @@ session. Steps, in order:
    same-checkout session's in-flight scratch survives.
 7. **Index-reminder footer** — the "index first" ritual with the
    consumer's actual index commands listed (consumer-edited).
+
+**The header-lag rule.** The hook runs at session start, before the
+arriving skill flips the `[stage:]` header (its first step), so a
+first-of-stage session reads the *predecessor's* stage and no header value
+distinguishes it from a restarted predecessor session. Stage-conditioned
+output therefore keys on a stage *set* spanning {predecessor, own stage} —
+guaranteeing the first-of-stage session is served, at the accepted cost of
+over-firing to the other sessions that share a header value (a restarted
+session of a keyed stage, or the first session of the stage after it).
 
 **Ruled out — lifecycle stamp-id injection.** The hook payload carries the
 harness session id, and its 8-char prefix equals what lifecycle-kit's
