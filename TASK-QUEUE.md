@@ -37,6 +37,21 @@
   keeps the reference plus repo-specific bindings. Owning kit ruled at
   scope. Surfaced 2026-07-11: sessions were re-deriving doctrine the
   companion project already owns — packaging is what stops the re-derivation.
+  Ruled at convention-hardening close: an interim standing consultation step
+  (convention-shaping stages check the companion corpus before ruling) is
+  declined as the always-loaded anti-pattern — a standing instruction with no
+  load trigger; this rung *is* the load-triggered structural fix, so no interim
+  guard rides ahead of it.
+- **read-command-guard-steer** [needs-spec] — extend the bash-guard read-steer
+  decision table (today `sed`-read only) to the bare working-tree read commands
+  that dominated convention-hardening's prompt friction: `cat <file>` → Read,
+  `find` → Glob, `git grep` → Grep. Same shape as `guard_rule_sed_file`: steer
+  only the bare-read form, not the piped/heredoc `cat`, not a `git grep <ref>`
+  that searches history the Grep tool can't reach. Ships with guard-test
+  fixtures per the decision-table contract. Enforcement-first disposition of the
+  read trio (18 of 38 prompting calls): the form to reinforce is the dedicated
+  tool, so this is a guard rule, never an allowlist entry. Surfaced 2026-07-11
+  at convention-hardening close.
 - **knob-literal-citation-gate** [needs-spec] — the enforcement half of the
   align knob-defaults finding: the instance is fixed (CLAUDE.md cites knob
   names; each kit's SPEC owns its roster and default values) and this gate
@@ -236,21 +251,4 @@
 
 ## Done
 
-- spec-kit-rename
-- skill-template-binding
-- delegation-fan-width
-
 ## Lessons Learned
-
-- [attend] [essay] golden-practice re-derivation: the convention-hardening
-  align review re-derived and initially violated doctrine the private
-  companion project already owns (content-tiering, enforcement-first, the
-  one-line-plus-pointer always-loaded shape) — gates were offered as
-  optional follow-ups, restatements were fixed instance-by-instance, and
-  extraction first targeted this repo's CLAUDE.md rather than a shipped
-  surface. The banking premise fails silently when extraction lands
-  repo-local: the experience must land in a customer-deliverable kit
-  surface (→ doctrine-kit) or every consumer, this repo included, re-hits
-  the same rock. Ruling wanted at close: a standing consultation step —
-  convention-shaping stages check the companion corpus inventory before
-  ruling, until doctrine-kit makes the corpus itself the shipped reference.
