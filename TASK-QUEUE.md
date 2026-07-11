@@ -204,5 +204,5 @@
   demo of checkwright's value and consumers install into their own CLAUDE-governed projects,
   so the resident surface must be extremely lite; close's brevity pass runs as a hard shrink
   against the always-loaded meter's over-baseline reading, not a rubber stamp. The expected
-  outcome is eviction behind load triggers — stage skills, owning SPECs, or a handbook-style
-  on-demand page — not rewording in place.
+  outcome works both axes: eviction behind load triggers — stage skills, owning SPECs, or a
+  handbook-style on-demand page — and brevity on every block that must remain resident.

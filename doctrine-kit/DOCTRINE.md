@@ -39,7 +39,10 @@ load-trigger residency rule to the doctrine itself.
    from reading gate-averse: for a drift-prone surface that must exist, the
    gate is cheap insurance and is owed — the budget argument never keeps a
    needed gate out; it keeps removable surfaces from being kept because a gate
-   could watch them.
+   could watch them. The defence that excuses a *missing* gate on such a
+   surface is a high false-positive rate: a noisy check breeds exemptions and
+   erodes the battery's authority, so the class a check cannot decide cleanly
+   stays a stated manual duty rather than a noisy gate.
    *Under agent work:* an unenforced rule is a rule the next session cannot see;
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —
