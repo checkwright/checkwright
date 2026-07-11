@@ -9,8 +9,9 @@ reading on-site. The docs tree is repo-root-governed with no owning kit, so
 this amendment lives at the repo root; kit mechanism is untouched except one
 prose narrowing in canon-kit noted below.
 
-Supersession ruled here: the docs-reference-routing ruling ("point, don't
-generate" — reference reading happens on the github.com tree) narrows. It was
+Supersession ruled here: the reference-link grammar ruling (canon-kit/SPEC.md
+§The reference-link grammar — "point, don't generate": reference reading
+happens on the github.com tree) narrows. It was
 taken when the alternative was a hand-maintained copy; the derivation-first
 rule sanctions a generated, freshness-gated copy, and the navigation dead-end
 is operator-attested. Post-merge: *rendered-document* references (SPEC,
@@ -47,7 +48,9 @@ files the site should not render.
   this layout, including honoring the same localStorage key — so the queue
   entry for check-graph-theme-parity takes `[blocked-by: docs-site-chrome]`.
 - **Logo** — `assets/logo/*` moves to `docs/assets/logo/` (the tree's single
-  served home; nothing tracked references the old path). The header uses the
+  served home; the one tracked reference to the old path — the
+  `assets/social-preview.svg` comment naming its lockup source — is updated
+  in the move). The header uses the
   mark; the mono mark is the dark-scheme variant if the sheet's tokens say
   so.
 - **The SPEC mirror.** `scripts/gen-docs-mirror.sh` emits each kit's
@@ -93,9 +96,9 @@ files the site should not render.
 
 ## Existing sections updated
 
-- canon-kit/SPEC.md §check-md-refs — the reference-link grammar paragraph
-  narrows to source references (rendered documents cite the mirror
-  relatively); the self-repo pass mechanism is unchanged.
+- canon-kit/SPEC.md §The reference-link grammar — the grammar prose narrows
+  to source references (rendered documents cite the mirror relatively);
+  §check-md-refs' self-repo pass mechanism is unchanged.
 - CLAUDE.md §Housekeeping, the docs bullet — gains the mirror's
   one-line regeneration pointer beside the existing generated-projection
   commands.

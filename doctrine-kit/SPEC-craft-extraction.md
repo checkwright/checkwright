@@ -8,7 +8,7 @@ anonymized, and identity/key material and product vocabularies stay in the
 private source. Shape ruling (the question the queue entry deferred): the
 habit roster earns the full doctrine-rule triple. The engineering-craft
 register already *is* the lighter surface — it lives behind the link,
-load-triggered, and is digest-exempt (doctrine-kit/SPEC.md
+load-triggered, and is exempt from the digest scan (doctrine-kit/SPEC.md
 §check-doctrine-registration, assertion B), so new rules stale no consumer
 digest; a second, rationale-free habits file was ruled out because a habit
 stripped of its attested failure reads as style advice, and the *Under agent
@@ -48,8 +48,12 @@ no gate is buildable.
       signature and only the owning SPEC distinguishes them — verify intent
       against the SPEC before sweeping.
 - **guard-kit's generic ruleset gains one advisory rule** (the enforcement
-  half of rule 15): `guard_advise` on `git commit --amend`, `git reset
-  --soft`, and `git commit -F <path>`, steering with rule 15's checklist.
+  half of doctrine rule 15 above): `guard_advise` on `git commit --amend`,
+  `git reset --soft`, and `git commit -F <path>`, steering with that rule's
+  checklist. The merged guard-kit prose cites it as "DOCTRINE.md rule 15" —
+  the ruleset's own rule numbers are an unrelated sequence (its current
+  rule 15 is a different rule), so an unqualified "rule 15" there would
+  collide.
   Generic by the ruleset's own criterion — it encodes git-substrate
   behavior, no toolchain or product vocabulary; advisory posture because all
   three commands are legitimate. Ships with its decision-table row and
@@ -84,8 +88,9 @@ no gate is buildable.
 - New doctrine rules: producer is this DOCTRINE.md edit, delivered by
   re-vendoring (doctrine-kit/SPEC.md §The doctrine deliverable); consumer is
   a session reaching the craft register through the installed link at its
-  load triggers. Digest-exempt, so `check-doctrine-registration` needs no
-  consumer digest edit and no fixture change — asserted at build by a green
+  load triggers. Exempt from the digest scan, so
+  `check-doctrine-registration` needs no consumer digest edit and no
+  fixture change — asserted at build by a green
   battery with CLAUDE.md untouched.
 - Guard rule: producer is the consumer's existing template guard (this
   repo's `scripts/bash-guard.sh`) invoking the new lib rule on

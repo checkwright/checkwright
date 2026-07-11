@@ -62,9 +62,11 @@ branch/worktree strategy is multi-operator-semantics' question.
   channel design, not prompt pleading.
 - **Policy as config.** The ruling-class roster — what must escalate versus
   what the stage session decides alone — lives in the tracked
-  agent-definition frontmatter the dispatch names, never in ad-hoc
-  per-dispatch prose; otherwise the lead becomes a second, ungated source
-  of delegation policy.
+  agent-definition frontmatter the dispatch names (the harness's
+  `.claude/agents/<name>.md` shape; no such definition exists in this tree
+  today, so this unit's consumer worklist lands the definition file), never
+  in ad-hoc per-dispatch prose; otherwise the lead becomes a second,
+  ungated source of delegation policy.
 - **The stamps-authoritative invariant** (the design's load-bearing rule):
   the lead writes no lifecycle state — no WORKFLOW-STATE stamps, no queue
   header flips, no evidence files. Every stamp originates in the stage
@@ -99,9 +101,12 @@ branch/worktree strategy is multi-operator-semantics' question.
 - Answer: produced by the lead's message to the paused session; consumed by
   the resuming stage session, which lands any ruling content in the
   governed surface before acting (the invariant above).
-- Ruling-class roster: produced in the consumer's agent-definition
-  frontmatter; consumed by the stage session (escalate-vs-proceed decision)
-  and by the guard template (its matcher config).
+- Ruling-class roster: produced by this unit landing the consumer's
+  agent-definition frontmatter (this repo: a new tracked `.claude/agents/`
+  definition — the build step that makes this producer reachable, since
+  none exists pre-merge); consumed by the stage session
+  (escalate-vs-proceed decision) and by the guard template (its matcher
+  config).
 - Guard template: produced by opt-in hook registration in consumer
   settings; consumed by the stage session as an advisory. Enabling config
   is the consumer's settings file — absent registration, the template is
