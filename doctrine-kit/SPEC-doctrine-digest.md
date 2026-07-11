@@ -27,7 +27,15 @@ set compare.
     numbered rule, trailing period dropped (e.g. `Content-tiering / SSOT`)
     — appears as a bold digest lead-in (`- **<name>**`) in the agent
     file's digest section. Engineering-craft rules are exempt: they live
-    behind the link by the doctrine's own two-register design.
+    behind the link by the doctrine's own two-register design. The
+    consumer's right to reject a rule (SPEC.md §Out of scope's trim
+    freedom — a contradiction with this assertion until ruled) survives
+    as a *declared* trim: a `<!-- doctrine-digest-trim: <rule name> —
+    <reason> -->` line inside the digest section satisfies assertion B
+    for that rule; a silent omission stays red. Declared-not-silent is
+    the reconciliation: the re-vendor moment surfaces every added or
+    renamed rule, and the consumer's decision — adopt the bullet or trim
+    it with cause — is recorded beside the digest it governs.
   - **Assertion C (digest → doctrine):** every bold bullet lead-in in the
     agent file's digest section matches a methodology-maintenance rule
     name — a digest line with no owning rule is a rule stated nowhere the
@@ -41,7 +49,8 @@ set compare.
   doctrine-side section heading (`Methodology-maintenance rules`) is kit
   mechanism, not config — the kit ships DOCTRINE.md, so it owns that name.
 - **Fixture pair extended**: `bad/` gains a digest-missing-a-rule case and
-  a digest-extra-line case; `good/` carries a matched pair of files.
+  a digest-extra-line case; `good/` carries a matched pair of files plus a
+  declared-trim case (one rule absent, its trim marker present).
 
 ## Producers and consumers
 
@@ -71,6 +80,11 @@ set compare.
   the two assertions and the knob; the "honest limit" prose (link ≠ read)
   stays.
 - doctrine-kit/SPEC.md §Layout and configuration — the knob row.
+- doctrine-kit/SPEC.md §install-doctrine and §Out of scope — the
+  trim-freedom sentences ("the gate asserts only the link, never the block
+  body"; "holds no opinion on *which* rules a consumer keeps resident")
+  are reworded at merge: trimming stays legal but rides the declared-trim
+  marker, and the gate asserts name-lockstep modulo declared trims.
 - doctrine-kit/README.md — only if it states the single-assertion
   behavior.
 - DOCTRINE.md preamble — no change expected; it already names the digest

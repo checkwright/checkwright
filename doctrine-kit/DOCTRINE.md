@@ -56,7 +56,28 @@ load-trigger residency rule to the doctrine itself.
    *Enforced by:* the bare-cardinal gate in
    [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count.
 
-4. **Always-loaded shape.** A rule in the always-loaded agent file is one line —
+4. **Derivation-first.** A fact a tool can derive from the tree is derived at
+   use time, never maintained as its own surface. The ladder: derive; else
+   state once at the owner and point (the Content-tiering / SSOT rule); and a
+   second copy a reader genuinely needs is a generated projection with a
+   freshness gate, never a hand-maintained restatement. Whether what remains
+   earns a gate is the Enforcement-first weighing. A count of a collection is
+   the archetypal derivable fact: the collection is its own counting surface,
+   and a stated total anywhere else is a duplicate counting surface, off by
+   one at the next member.
+   *Under agent work:* a hand-maintained enumeration of a derivable set is a
+   copy of the tree that is stale at the next edit, and an agent trusts the
+   nearer roster over the tree it summarizes; derivation deletes the drift
+   axis rather than gating it.
+   *Enforced by:* the derivation seams and their residual meta-checks — the
+   `kit:` couple expansion with its hand-list gate in
+   [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-kit-enum, the generated
+   projections' byte-compare freshness assertions in
+   [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-graph, and the
+   bare-cardinal gate in [canon-kit/SPEC.md](../canon-kit/SPEC.md)
+   §check-manifest-count.
+
+5. **Always-loaded shape.** A rule in the always-loaded agent file is one line —
    the convention plus a pointer; its mechanism, rosters, and defaults live
    behind the pointer in the owning doc.
    *Under agent work:* the always-loaded file is read in full at every session
@@ -65,7 +86,7 @@ load-trigger residency rule to the doctrine itself.
    *Enforced by:* the brevity budget in
    [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate.
 
-5. **Load-trigger residency.** The always-loaded file earns a rule only when no
+6. **Load-trigger residency.** The always-loaded file earns a rule only when no
    stage, skill, or tool-call trigger exists to load it; anything a trigger can
    pull lives in its owned doc behind that trigger.
    *Under agent work:* always-loaded context is the scarcest budget; a rule that
@@ -76,7 +97,7 @@ load-trigger residency rule to the doctrine itself.
    [guard-kit/SPEC.md](../guard-kit/SPEC.md), which give every triggered rule a home
    that loads on demand.
 
-6. **Widest-true-tier placement.** A fact lands at the widest tier where it holds
+7. **Widest-true-tier placement.** A fact lands at the widest tier where it holds
    for every reader of that tier: kit-shipped surface when true for every
    consumer, a consumer-tracked binding or config when it names this repo's own
    choices, the local-only private brief when it cannot be published. A
@@ -88,7 +109,7 @@ load-trigger residency rule to the doctrine itself.
    [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §check-skill-binding, the seam
    marker between kit-shipped and consumer-tracked tiers.
 
-7. **Oracle-first.** A check's output is its interface: run the gate instead of
+8. **Oracle-first.** A check's output is its interface: run the gate instead of
    emulating it, and treat a red run — including a red commit attempt, where the
    generated hook runs exactly the coupled subset — as the designed feedback
    channel, not an incident. Gate source is opened to fix the gate or write its
@@ -101,7 +122,7 @@ load-trigger residency rule to the doctrine itself.
    written to be that interface — and the targeted-run resolver reachable through
    the generated hook.
 
-8. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the
+9. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the
    owner, never mine git history or a prior session's artifacts for how to do
    what an owned surface already specifies. History answers *what happened*,
    never *what is correct*; precedent is consulted only where no owner exists,
@@ -119,7 +140,7 @@ load-trigger residency rule to the doctrine itself.
 
 ## Engineering-craft rules
 
-9. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
+10. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
    that invariant in its *name*; the SPEC's test-requirement section owns which
    invariants a test must cover. A spec-clause *comment* on the test is not a
    substitute — it duplicates what the name should carry and rots silently when
@@ -132,7 +153,7 @@ load-trigger residency rule to the doctrine itself.
    substitute out rather than blessing it, leaving the name as the only place to
    carry the invariant.
 
-10. **Test from the real consumer's runtime.** Verify a contract from the runtime
+11. **Test from the real consumer's runtime.** Verify a contract from the runtime
    of its real consumer, never a more lenient stand-in; a failure at a higher
    test layer with no failing test at the layer below is a coverage gap in the
    lower layer, closed there first.
@@ -144,7 +165,7 @@ load-trigger residency rule to the doctrine itself.
    ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant
    baseline turns a dropped layer into a red validate.
 
-11. **Inspectable-run discipline.** A component a test or an automation spawns
+12. **Inspectable-run discipline.** A component a test or an automation spawns
     must emit a readable log to an inspectable path — never a muted sink; on a
     failure, read that evidence before theorizing. A run you cannot inspect
     barely beats a guess.
@@ -156,7 +177,7 @@ load-trigger residency rule to the doctrine itself.
     move of making a background actor write an inspectable record rather than
     trusting its self-report.
 
-12. **Rename is a full-surface sweep.** A rename sweeps every surface in
+13. **Rename is a full-surface sweep.** A rename sweeps every surface in
     lockstep — prose, fixtures, and docs, not only the compiler-checked
     identifiers; the done-gate is a text-level completeness check, not the
     type-checker, and an in-progress rename is verified by a completeness scan

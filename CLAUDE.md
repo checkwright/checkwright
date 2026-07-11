@@ -85,6 +85,7 @@ an engineering-craft section behind the link:
 - **Content-tiering / SSOT** — one content tier per surface; point, never restate.
 - **Enforcement-first** — the fix and the gate that catches it land in one unit; removing the duplication outranks gating it.
 - **De-literalization** — prose cites names; code or the owning SPEC owns values.
+- **Derivation-first** — derive the derivable (a roster, a count), never maintain it; a needed copy is generated and freshness-gated.
 - **Always-loaded shape** — one line per rule here; the mechanism behind the pointer.
 - **Load-trigger residency** — resident only when no stage, skill, or tool loads it.
 - **Widest-true-tier placement** — the widest tier true for every reader of it.
