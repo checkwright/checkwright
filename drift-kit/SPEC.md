@@ -131,9 +131,22 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    gitignored per-iteration scratch, the prompt-friction.log pattern):
    `<date> <fact re-derived> ← <surface it was read from>`. One line,
    written at the moment of re-derivation — deferred capture is no capture.
-   The convention costs one always-loaded bullet in the consumer's
-   instructions file; that line is the loop's hook and must earn its
-   recurring cost by the log actually filling.
+   The affordance is `bin/kfric.sh "<fact>" "<surface>"`: it stamps that
+   grammar (date from `date +%F`) into `DRIFT_KIT_KNOWLEDGE_LOG`, creating
+   the log's parent dir if missing, and refuses with a usage message and
+   exit 2 unless both arguments are present and non-empty. It exists so
+   capture is prompt-free — the raw form is a shell redirect
+   (`printf … >> <log>`) that no allowlist glob suppresses safely (a
+   mid-pattern wildcard is the command-injection shape the bash guard
+   catches, and a decorated write trips the guard's decoration rule
+   regardless), whereas the helper takes the fact as an argument with no
+   caller-side redirect, so its invocation is a safe end-wildcard prefix-glob
+   allowlist entry and a permission prompt never turns capture into deferred
+   capture. The raw append stays legal as the fallback — the grammar, not
+   the writer, is the log's contract; both consumers below read lines, not
+   provenance. The convention costs one always-loaded bullet in the
+   consumer's instructions file; that line is the loop's hook and must earn
+   its recurring cost by the log actually filling.
 2. **Triage (close)** — `templates/close-knowledge.md`, spliced into the
    consumer's close skill (the close-triage/close-brevity pattern): walk
    the log; for each entry, the remediation is a **doc-owner edit** — give
@@ -230,6 +243,7 @@ narrative and cites the data file, hand-copying no numbers.
 drift-kit/
   bin/drift-report.sh
   bin/trajectory.sh              # the published-evidence extractor
+  bin/kfric.sh                   # the knowledge-friction capture affordance
   kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
   templates/kpis.list            # example registry (consumer copies + prunes)

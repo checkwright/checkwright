@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **kfric-capture-tool** [spec: drift-kit/SPEC-kfric-tool.md] — `bin/kfric.sh
-  "<fact>" "<surface>"` stamps the capture grammar into the existing
-  knowledge-friction log knob with no caller-side redirect, so a prefix-glob
-  allowlist entry makes capture prompt-free.
-
 ## Technical Debt
 
 - **validate-spine-consumer-smoke** — ruled at scope: the filed
@@ -219,6 +214,7 @@
   2026-07-09.
 ## Done
 
+- kfric-capture-tool
 - knob-literal-citation-gate
 - prose-citation-pointer-gate
 - gate-run-for-path

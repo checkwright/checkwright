@@ -16,6 +16,7 @@
       "Bash(bash drift-kit/bin/drift-report.sh *)",
       "Bash(bash drift-kit/bin/trajectory.sh)",
       "Bash(bash drift-kit/bin/trajectory.sh *)",
+      "Bash(bash drift-kit/bin/kfric.sh *)",
       "Bash(bash drift-kit/kpis/*.sh)",
       "Bash(bash drift-kit/kpis/*.sh *)",
       "Bash(bash scripts/check-*.sh)",

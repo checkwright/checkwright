@@ -147,9 +147,9 @@ the skill on a blocking verdict — so they are not resident here.
   evidence-kit `demo` validate suite, so a bit-rotted walkthrough is a red
   validate, not a stale docs page.
 - **Knowledge-friction capture (any session):** catch yourself re-deriving a
-  fact no doc owns (off an implementation, a gate's source, a commit)? append
-  `<date> <fact> ← <surface>` to `.workflow/knowledge-friction.log` (gitignored
-  scratch) at that moment — deferred capture is no capture; close triages it
+  fact no doc owns (off an implementation, a gate's source, a commit)? stamp it
+  at that moment with `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"`
+  (prompt-free by design) — deferred capture is no capture; close triages it
   into doc-owner edits (drift-kit/SPEC.md §The knowledge-friction loop).
 - No per-user memory files for this repo: durable guidance goes in tracked
   manifests (this file, kit SPECs), or `BRIEF.local.md` for local-only private
