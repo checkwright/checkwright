@@ -55,7 +55,20 @@
   CONSUMER BINDING header) vs a stated manual duty (the enforcement-first
   false-positive carve-out). The exclusion is implicit — `scripts/canon-config.sh`
   never rules it. Surfaced 2026-07-12 at build, craft-extraction's slot-free
-  template.
+  template. Extended 2026-07-12 at build (scope-session-routing): a sibling
+  escaping class, `.claude/agents/*.md` agent-definitions, is neither a template
+  nor a manifest doc yet the most citation-dense surface the routing work added
+  (`stage-session.md` cites `§Session ritual`, `§Delivery doctrine`,
+  `§The state machine`) — widen the design question past `templates/` to any
+  non-manifest governed-prose surface. The narrowed residual after the tree-wide
+  gates: §heading-fragment liveness (`check-spec-pointer`) and command/knob
+  citation (`check-docs-cmd`), which key on the manifest set, are the only axes
+  that actually escape; kit-path liveness and banned-terms already cover these
+  files. The routing unit shipped both discriminator poles as live examples:
+  `lifecycle-kit/templates/lead.md` is the slot-bearing case a blanket
+  `templates/` glob would false-positive, `stage-session.md` the slot-free case
+  that would pass clean — the pair the finder-vs-manual-duty ruling decides
+  against.
 - **footprint-page** [needs-spec] — publish the kits' measured context footprint as a
   generated docs page: the always-loaded surfaces and each load-triggered skill/template,
   line/word counts exact and token counts as a labeled estimate (tokenizers are
