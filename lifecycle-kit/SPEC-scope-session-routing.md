@@ -11,7 +11,21 @@ against the current substrate: the harness natively supports background
 dispatch with resume-in-place messaging, so no bespoke plumbing remains to
 house; what remains is protocol prose and policy config, exactly the
 templates shape lifecycle-kit already owns, and a companion repo would
-rebuild the vendoring/upgrade path the kits have. The interaction-model
+rebuild the vendoring/upgrade path the kits have. A new orchestration-kit
+is likewise ruled out for this rung: a kit earns its root by owning
+mechanism, and rung 1's decomposes entirely into existing charges —
+dispatch safety is delegation-kit's (inherited by citation), the
+escalation-shape guard is guard-kit's (the framework owner; the
+wakeup-guard precedent), and the stamps-authoritative constraint is a rule
+about lifecycle-kit's own state machine that lands in its SPEC wherever
+the template lives — leaving the kit one template plus pointers, a
+directory rather than a remit (contrast doctrine-kit, minted with an
+installer, a gate, and an eviction from canon-kit's out-of-scope). The
+lead is also lifecycle-shaped, not generically orchestration-shaped: it
+dispatches stage sessions, so a consumer without the stage machine has
+nothing for it to dispatch. Reopen trigger, recorded: extraction to its
+own kit is owed when a later rung grows orchestration *mechanism* with a
+non-lifecycle consumer — not when the orchestration prose grows. The interaction-model
 boundary stands: this is *orchestration* (a blocked session pauses on its
 question and resumes in place), not *delegation* (fire-and-forget
 redispatch) — delegation-kit's agent-execution protocol is unchanged and
