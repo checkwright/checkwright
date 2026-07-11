@@ -16,5 +16,5 @@ DELEGATION_KIT_GATE_FILES=(
 # comment-tier-exempt: the kit roots are auto-unioned by delegation.sh (a vendored kit's edits are meta-layer by definition), so only the non-kit prefixes are declared here
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_META_PATHS=(
-    scripts/ .workflow/ .claude/
+    scripts/ .workflow/ .claude/ docs/ .github/
 )

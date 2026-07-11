@@ -21,17 +21,10 @@
   extends the roster — mechanism crosses the seam, rule content never.
 ## Technical Debt
 
-- **gate-tamper-rename-policy** — ruled at scope: fold `docs/` and `.github/`
-  into `DELEGATION_KIT_META_PATHS` in scripts/delegation-config.sh — public
-  docs and CI are governance surfaces in this repo, and the mandatory
-  `docs/enforcement.md` regen was forcing every new-gate commit through a
-  one-off `--no-verify`; covers the rename and new-gate cases alike.
-  Consumer config only — the gate carve-out and standing-`--no-verify`
-  options are rejected; delegation-kit mechanism is untouched.
-- **fixture-suite-derivation** [blocked-by: gate-tamper-rename-policy] —
-  ruled: derive where executable, cite where prose — the CI workflow and
-  scripts/evidence-config.sh loop over the `*/gate-tests` dirs instead of
-  hand-enumerating suites; the agent-execution validate set cites the
+- **fixture-suite-derivation** — ruled: derive where executable, cite where
+  prose — the CI workflow and scripts/evidence-config.sh loop over the
+  `*/gate-tests` dirs instead of hand-enumerating suites; the agent-execution
+  validate set cites the
   derivation; the CLAUDE.md battery block stays enumerated
   (check-kit-registration already holds it per-kit). doctrine-kit lands
   behind it as the derivation's first exercised pickup.
@@ -239,5 +232,6 @@
 ## Done
 
 - read-command-guard-steer
+- gate-tamper-rename-policy
 
 ## Lessons Learned
