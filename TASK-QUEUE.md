@@ -45,10 +45,11 @@
 
 - **delegation-rules-parity** [needs-spec] — delegation-kit states the protocol twice: the
   SPEC's numbered rule list and the template's bullets carry the same rules in different
-  prose, with no owner ruling or parity gate between them. Rule the tiering (template owns
-  the procedure; the SPEC owns the numbered headline roster its own sections cite) and ship
-  the meta-gate asserting headline parity, so the two surfaces cannot drift apart silently.
-  Surfaced 2026-07-11 at align.
+  prose, with no owner ruling between them. Design lead from the align discussion: tier by
+  why/what — the template owns the rules (the loaded procedure), the SPEC keeps rationale
+  (failure surfaces, calibration, mechanism contracts) and drops the roster, citing rules
+  by stable name; deleting the restatement beats gating its parity, leaving name-citation
+  liveness as the only mechanical need. Surfaced 2026-07-11 at align.
 - **doctrine-rule-lockstep** [needs-spec] — check-doctrine-registration asserts only that the
   always-loaded file links the doctrine file; nothing holds the one-line-per-rule digest and
   the doctrine's rule set in lockstep, so a rule added on either side without its counterpart
