@@ -56,6 +56,9 @@ downward.
 - [Domain-driven design](ddd.md) — Checkwright as the enforcement layer for a
   ubiquitous language: banned synonyms, comment and naming directives, and one
   home per definition.
+- [Agent orchestration](orchestration.md) — Checkwright as the verification
+  layer beneath a coordination framework: the gates, budget guard, stage
+  stamps, and evidence manifest that make delegated work checkable.
 
 ## License
 

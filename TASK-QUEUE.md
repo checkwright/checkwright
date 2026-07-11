@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **orchestration-positioning-docs** [spec: SPEC-orchestration-positioning.md] — the sibling
-  page docs/orchestration.md: the verification layer under agent orchestration, grounded in
-  validate-after-agent-commit, check-gate-tamper, evidence stamps, and the budget guard;
-  cites scope-session-routing and multi-operator-semantics as roadmap, claims the trust layer
-  never the orchestration layer.
-
 ## Technical Debt
 
 - **evidence-config-template** — evidence-kit is the one config-bearing kit shipping no
@@ -183,6 +177,7 @@
   2026-07-09.
 ## Done
 
+- orchestration-positioning-docs
 - reads-subset-couples-meta-gate
 - overhead-metering
 - ddd-positioning-docs
