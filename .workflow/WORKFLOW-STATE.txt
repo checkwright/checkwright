@@ -15,3 +15,4 @@ footprint-and-parity build 38b38d7c 2026-07-11
 footprint-and-parity build 80a43c2d 2026-07-11
 footprint-and-parity build 5485a3ba 2026-07-11
 footprint-and-parity validate e19ed980 2026-07-11
+footprint-and-parity close c63652da 2026-07-11
