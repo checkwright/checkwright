@@ -63,6 +63,8 @@ declare -p CANON_KIT_MDREF_EXCLUDE &>/dev/null || CANON_KIT_MDREF_EXCLUDE=()
 
 [[ -v CANON_KIT_LINK_ROOT ]] || CANON_KIT_LINK_ROOT="docs"
 
+[[ -v CANON_KIT_DOCS_BLOB_REF ]] || CANON_KIT_DOCS_BLOB_REF="master"
+
 declare -p CANON_KIT_MANIFEST_FILES &>/dev/null || CANON_KIT_MANIFEST_FILES=()
 declare -p CANON_KIT_TEMPORAL_MARKERS &>/dev/null || CANON_KIT_TEMPORAL_MARKERS=(
     "previously"
@@ -381,6 +383,7 @@ _sk_errs=()
 [[ "$CANON_KIT_EMBED_MINLINES" =~ ^[0-9]+$ && "$CANON_KIT_EMBED_MINLINES" -gt 0 ]] \
     || _sk_errs+=("CANON_KIT_EMBED_MINLINES must be a positive integer (got '$CANON_KIT_EMBED_MINLINES')")
 [[ -n "$CANON_KIT_GLOSSARY_FILE" ]] || _sk_errs+=("CANON_KIT_GLOSSARY_FILE is empty")
+[[ -n "$CANON_KIT_DOCS_BLOB_REF" ]] || _sk_errs+=("CANON_KIT_DOCS_BLOB_REF is empty")
 [[ ${#CANON_KIT_TEMPORAL_MARKERS[@]} -gt 0 ]] || _sk_errs+=("CANON_KIT_TEMPORAL_MARKERS is empty")
 [[ ${#CANON_KIT_COUNT_COLLECTIONS[@]} -gt 0 ]] || _sk_errs+=("CANON_KIT_COUNT_COLLECTIONS is empty")
 [[ "$CANON_KIT_COUNT_WEDGE_WORDS" =~ ^[0-9]+$ && "$CANON_KIT_COUNT_WEDGE_WORDS" -gt 0 ]] \

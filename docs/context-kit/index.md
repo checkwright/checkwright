@@ -10,7 +10,8 @@ a session-start hook that assembles a compact orienting brief, an always-loaded
 meter with a committed baseline, a gate over the density of the densest
 always-loaded section, and a memory-off gate pair that keeps the harness's
 ungoverned per-session memory surface disabled — the doctrine and both gates
-are defined in the kit's `SPEC.md`.
+are defined in the kit's
+[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-memory-off-doctrine).
 
 ## Install
 
@@ -27,7 +28,10 @@ bash context-kit/bin/pub-index.sh <component>/src/   # public API surface
 ## Contracts
 
 The reading-tool contracts and the always-loaded budget are defined in the
-kit's `SPEC.md`, including the consumer footprint it holds — what the kits ask
+kit's
+[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-consumer-footprint),
+including the consumer footprint it holds — what the kits ask
 your always-loaded surface to carry, worth reading before you vendor. Its
-`README.md` lists the mechanism. Back to the
+[`README.md`](https://github.com/checkwright/checkwright/blob/master/context-kit/README.md)
+lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

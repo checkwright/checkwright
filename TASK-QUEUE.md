@@ -12,15 +12,9 @@
 
 ## New Features
 
-- **docs-reference-routing** [spec: SPEC-docs-reference.md] — the repo tree is the reference
-  tier: kit docs pages gain anchored GitHub blob links to their SPEC/README under the
-  master-pinned link grammar; check-md-refs gains a self-repo blob-link resolution pass
-  (repo identity derived from the origin remote, anchors resolved under docs-host slugging,
-  no-remote consumers skip).
-
 ## Technical Debt
 
-- **enforcement-map-links** [blocked-by: docs-reference-routing] — emitter edit on the
+- **enforcement-map-links** — emitter edit on the
   generated enforcement map: the class-roster intro becomes a bulleted list, the kit column
   links each kit's docs page, and class definitions cite their owner section through the
   reference-link grammar the blocker lands; regenerate the page in the same unit.
@@ -174,6 +168,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- docs-reference-routing
 - check-graph-site-move
 - lifecycle-knob-prefix
 - doctrine-rule-lockstep

@@ -907,11 +907,49 @@ exemption. Links are this gate's charge; the sibling `check-docs-cmd` takes the
 invoked commands and env knobs written inside fences and backticks, over the
 same governed doc set (one shared set, no second knob).
 
+**The self-repo blob-link pass.** An absolute link is normally out of scope —
+the network is not a gate dependency — with one exception: a link into this
+same repository's GitHub tree, which resolves against the working tree exactly
+as a relative link does. The repo identity is derived at gate runtime from
+`git remote get-url origin`; the `git@host:owner/repo` and
+`https://host/owner/repo[.git]` remote forms normalize to one
+`https://host/owner/repo` identity, so the kit ships no repo name (the
+provenance seam holds) and CI's checkout and a local clone alike supply it. A
+link whose prefix is `<identity>/blob/<CANON_KIT_DOCS_BLOB_REF>/` (the ref
+default `master`) is a self-repo reference link: its `<path>` must be a
+git-tracked file, and a trailing `#anchor` must slug — under the same GitHub
+heading-slug rules the same-file anchors use — to a heading in that file. A
+repo with no `origin` skips the pass: a self-repo link cannot be identified, so
+it falls through to the external-URL skip. The ref is a knob rather than a
+literal because it is a policy choice, not a derived fact — the site is living
+documentation of the current tree, so a reference link pins to the default
+branch (this repo's `master`), and a tag-pinned reference copy would buy
+staleness, not stability.
+
+### The reference-link grammar
+
+A docs-site page reaches full reference through the repo tree, not an on-site
+projection: the served site is deliberately lite, so a page cites an in-repo
+artifact (a kit's `SPEC.md`, `README.md`, or `DOCTRINE.md`) with an absolute
+GitHub blob link `https://<host>/<owner>/<repo>/blob/<ref>/<path>[#anchor]`,
+anchored when it cites a named section — the downward-citation shape of the
+tiering topology, extended off-site. The link is absolute because the deployed
+site serves `docs/` alone: a relative link into the surrounding tree would 404
+on the site, and the tree is browsable only on the host. Resolution belongs to
+`check-md-refs`' self-repo pass (identity derivation and the ref knob live
+there); `check-docs-link-convention` owns the shape of the relative links that
+stay inside `docs/`. On-site generated SPEC projections stay demand-gated —
+rewriting a SPEC's internal relative links at emit is a real emitter no demand
+has attested.
+
 ### check-docs-link-convention
 
 Invariant: every relative markdown link on a docs-site page obeys the
 downward-citation *shape* — the resolution of those links is `check-md-refs`'
-charge, and this gate owns shape alone. Each rule is scoped to the docs tree
+charge, and this gate owns shape alone. Absolute reference links (the off-site
+blob grammar above) are out of this gate's scope entirely: their resolution is
+`check-md-refs`' self-repo pass, and this gate turns only on the relative links
+that stay inside the tree. Each rule is scoped to the docs tree
 because the "kit page" it turns on (a `<root>/<kit>/index.md`) exists only
 there:
 

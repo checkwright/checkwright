@@ -24,5 +24,8 @@ bash drift-kit/bin/drift-report.sh                   # the full advisory report
 ## Contracts
 
 The KPI registry contract and the knowledge-friction loop are defined in the
-kit's `SPEC.md`; its `README.md` lists the mechanism. Back to the
+kit's
+[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/drift-kit/SPEC.md#the-kpi-plugin-contract);
+its [`README.md`](https://github.com/checkwright/checkwright/blob/master/drift-kit/README.md)
+lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

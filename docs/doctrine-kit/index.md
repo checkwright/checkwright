@@ -43,6 +43,8 @@ bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks
 
 ## Contracts
 
-The rule statements live in the kit's `DOCTRINE.md`; the installer contract, the
-gate invariant, and every knob are defined in its `SPEC.md`. Back to the
-[kit map](../index.md#the-kits).
+The rule statements live in the kit's
+[`DOCTRINE.md`](https://github.com/checkwright/checkwright/blob/master/doctrine-kit/DOCTRINE.md);
+the installer contract, the gate invariant, and every knob are defined in its
+[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/doctrine-kit/SPEC.md#check-doctrine-registration).
+Back to the [kit map](../index.md#the-kits).

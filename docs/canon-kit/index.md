@@ -25,5 +25,7 @@ bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks
 ## Contracts
 
 The spec model — canonical-plus-amendment lifecycle, the tiering topology, and
-the anti-restatement doctrine — is defined in the kit's `SPEC.md`; its
-`README.md` lists the mechanism. Back to the [kit map](../index.md#the-kits).
+the anti-restatement doctrine — is defined in the kit's
+[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/canon-kit/SPEC.md#the-spec-model);
+its [`README.md`](https://github.com/checkwright/checkwright/blob/master/canon-kit/README.md)
+lists the mechanism. Back to the [kit map](../index.md#the-kits).

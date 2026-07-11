@@ -25,5 +25,7 @@ bash delegation-kit/bin/usage-verdict.sh             # one budget verdict: OK / 
 ## Contracts
 
 The supervisor protocol and the tamper-gate contract are defined in the kit's
-`SPEC.md`; its `README.md` lists the mechanism. Back to the
+[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/delegation-kit/SPEC.md#the-delegation-model);
+its [`README.md`](https://github.com/checkwright/checkwright/blob/master/delegation-kit/README.md)
+lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

@@ -34,6 +34,19 @@ else
     done < <(spec_manifest_files ".")
 fi
 
+# spec: canon-kit/SPEC.md §check-md-refs — the self-repo blob-link prefix, derived from origin (git@ and https forms normalize to one identity); empty ⇒ no origin, the self-repo pass is skipped
+self_repo_prefix=""
+_origin="$(git remote get-url origin 2>/dev/null)" || _origin=""
+if [[ -n "$_origin" ]]; then
+    _id="${_origin%.git}"; _id="${_id%/}"
+    case "$_id" in
+        git@*:*)  _rest="${_id#git@}"; _id="https://${_rest/:/\/}" ;;
+        https://*|http://*) ;;
+        *) _id="" ;;
+    esac
+    [[ -n "$_id" ]] && self_repo_prefix="$_id/blob/$CANON_KIT_DOCS_BLOB_REF/"
+fi
+
 slugify() {
     local s="${1,,}"
     printf '%s' "$s" | sed -E 's/[^a-z0-9 _-]//g; s/ +/-/g'
@@ -58,7 +71,7 @@ target_resolves() {  # $1=repo-relative path
     [[ -d "$p" && -n "$(git ls-files -- "$p")" ]]
 }
 
-bad=(); links=0
+bad=(); links=0; selfrepo=0
 for f in "${files[@]}"; do
     [[ -f "$f" ]] || continue
     base="$(dirname "$f")"
@@ -66,6 +79,20 @@ for f in "${files[@]}"; do
         tgt="${raw#*](}"; tgt="${tgt%\)}"
         tgt="${tgt%% *}"                       # drop any "title" suffix
         [[ -n "$tgt" ]] || continue
+        if [[ -n "$self_repo_prefix" && "$tgt" == "$self_repo_prefix"* ]]; then
+            rest="${tgt#"$self_repo_prefix"}"
+            links=$((links + 1)); selfrepo=$((selfrepo + 1))
+            path="${rest%%#*}"; anchor=""
+            [[ "$rest" == *#* ]] && anchor="${rest#*#}"
+            if [[ -z "$path" ]]; then
+                bad+=("$f: self-repo reference link '$tgt' names no path")
+            elif ! target_resolves "$path"; then
+                bad+=("$f: self-repo reference link '$tgt' → $path is not a git-tracked file")
+            elif [[ -n "$anchor" && -f "$path" ]] && ! anchor_ok "$path" "$anchor"; then
+                bad+=("$f: [..]($tgt) — no heading in $path slugs to '$anchor'")
+            fi
+            continue
+        fi
         [[ "$tgt" == *"://"* || "$tgt" == mailto:* ]] && continue
         links=$((links + 1))
         path="${tgt%%#*}"; anchor=""
@@ -94,5 +121,5 @@ if [[ ${#bad[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "MD-REFS: clean (${#files[@]} doc(s), $links internal link(s) all resolve)"
+echo "MD-REFS: clean (${#files[@]} doc(s), $links internal link(s) all resolve; $selfrepo self-repo reference link(s))"
 exit 0
