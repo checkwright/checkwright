@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=docs/evidence-data.md,.workflow/WORKFLOW-STATE.txt,.workflow/validate-evidence.txt,scripts/gates.list dir=one valve=none tier=precommit
+# graph: couples=docs/evidence-data.md,.workflow/WORKFLOW-STATE.txt,.workflow/validate-evidence.txt,scripts/gates.list dir=one valve=none tier=precommit trigger=docs/evidence-data.md,.workflow/WORKFLOW-STATE.txt,.workflow/validate-evidence.txt,scripts/gates.list,TASK-QUEUE.md
 # spec: drift-kit/SPEC.md §The published-evidence extractor — docs/evidence-data.md is the byte-fresh projection of trajectory.sh --emit
 #
 # usage: check-trajectory-fresh.sh [projection-file] [emit-file]

@@ -19,3 +19,9 @@ queue-kit/bin/lesson-sink.sh <tag>`, which resolves the sink from the local
 in order: tooling-friction per guard-kit/templates/close-triage.md, then
 knowledge-friction per drift-kit/templates/close-knowledge.md. Any task a sweep
 files follows queue-kit/SPEC.md §The tag algebra.
+  - **Trajectory projection** — after the template's Clear-Done step lands the
+    `close` stamp in history, regenerate the projection (`bash
+    drift-kit/bin/trajectory.sh --emit > docs/evidence-data.md`) and commit it
+    with the Done clear; the gate is blind at the enter-close commit by
+    construction, and the widened `trigger=` fires it on this commit
+    (drift-kit/SPEC.md §The published-evidence extractor).

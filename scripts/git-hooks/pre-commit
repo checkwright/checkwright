@@ -81,7 +81,7 @@ fi
 
 scripts/check-kit-ref-liveness.sh || hook_fail check-kit-ref-liveness
 
-if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workflow/validate-evidence.txt' 'scripts/gates.list'; then
+if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workflow/validate-evidence.txt' 'scripts/gates.list' 'TASK-QUEUE.md'; then
     scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
 fi
 

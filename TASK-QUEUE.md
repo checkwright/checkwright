@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **trajectory-close-freshness** [spec: SPEC-close-freshness.md] — close the
-  close-blindness of the trajectory freshness gate: the extractor SPEC gains the
-  close-coupling contract (regenerate the projection in the first commit after the
-  close stamp lands), this repo's freshness gate widens its `trigger=` to the queue
-  file so the Done-clearing commit runs it with the stamp in history, and the close
-  binding names the regeneration step. No new scanner — the self-reference is
-  inherent; CI stays the outer backstop.
-
 - **docs-site-chrome** [spec: SPEC-docs-site-chrome.md] — the docs site gains its chrome:
   a custom Primer-based layout (header with logo + wordmark, left nav sidebar derived from
   front matter, client-side search over a Liquid-emitted index, light/dark/auto selector
@@ -191,5 +183,6 @@
 
 - craft-extraction
 - scope-session-routing
+- trajectory-close-freshness
 
 ## Lessons Learned

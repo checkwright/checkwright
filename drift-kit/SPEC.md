@@ -243,6 +243,21 @@ a synthetic emission as a second argument rather than regenerating one.
 `docs/evidence.md` — the framing page, owned by the docs site — carries the
 narrative and cites the data file, hand-copying no numbers.
 
+The freshness gate is blind at the enter-close commit by construction: the
+extractor emits the closing iteration's row only once its `close` stamp is in
+committed history, but during that commit's own pre-commit run the stamp is
+not yet history, so the gate regenerates rowlessly and passes — the honest
+limit of a pre-commit projection whose own close is an input. The consumer
+contract closes the gap: the close ritual regenerates the projection in the
+first commit *after* the close stamp lands — for a queue-clearing close, the
+Done-clearing commit, where the regenerated file and the cleared queue ride
+together. To make that commit fire the gate, the consumer freshness gate's
+manifest names the queue file in `trigger=` (a trigger, not a coupled
+surface — the projection's content derives from the state files, not the
+queue, so `couples=` is unchanged and the couples⊆trigger parity holds); a
+close that skipped the regeneration is then red at that commit. CI's full
+battery stays the outer backstop (gate-sdk/SPEC.md §Enforcement tiers).
+
 ## The overhead meter
 
 `bin/overhead-meter.sh [transcript.jsonl]` measures the methodology's own cost,
