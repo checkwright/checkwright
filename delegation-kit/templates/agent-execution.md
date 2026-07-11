@@ -81,9 +81,12 @@ procedure.
   levers tokens only when selection follows the work: a read-heavy or mechanical
   unit (audit, survey, rename/merge sweep) rides a cheaper model class via the
   dispatch's model parameter or a dedicated agent type; a unit carrying design
-  judgment stays on the supervisor's class. Selection sits with the dispatching
-  session — its context holds what selection needs — and a standing choice lands
-  in a tracked agent-type definition, never per-dispatch habit.
+  judgment stays on the supervisor's class. Derive the class ladder from the
+  harness's **live model roster at dispatch time** — model families churn faster
+  than kit text, so a baked model-name list in any doc is drift by construction.
+  Selection sits with the dispatching session — its context holds what selection
+  needs — and a standing choice lands in a tracked agent-type definition, never
+  per-dispatch habit.
 - **Never revert substantial completed work on your own design judgment** —
   especially an expensive delegated sweep. Surface the tension and wait for the
   explicit go-ahead before discarding it: a self-judged revert forfeits the

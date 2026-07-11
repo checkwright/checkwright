@@ -58,17 +58,13 @@ protocol's load-bearing rules:
    window-expensive than its token total suggests. The manual run is the
    planning tool; `agent-budget-guard.sh` is its mechanical enforcement at the
    dispatch point (below).
-9. **Match the dispatched model and effort to the unit's shape.** Delegation
-   levers tokens only when selection follows the work: a read-heavy or
-   mechanical unit rides a cheaper model class; a unit carrying design
-   judgment stays on the supervisor's class. Selection sits with the
-   dispatching session — its context holds what selection needs — and a
-   standing choice lands in a tracked agent-type definition, never
-   per-dispatch habit.
+9. **Match the dispatched model and effort to the unit's shape** — cheaper
+   class for read-heavy/mechanical units, the supervisor's class for design
+   judgment; the class ladder derives from the harness's live model roster,
+   never a baked name list (the template carries the operational detail).
 10. **Never revert substantial completed work on your own design judgment** —
-    especially an expensive delegated sweep. Surface the tension and wait for
-    the explicit go-ahead: a self-judged revert forfeits the sweep's whole
-    spend and pays it again on the re-run.
+    surface the tension and wait for the explicit go-ahead (the template
+    carries the cost rationale).
 
 `templates/agent-budget-guard.sh` closes the gap the manual run leaves: the
 budget-check norm relied on the agent *choosing* to run the tool, and a

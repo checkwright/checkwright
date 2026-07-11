@@ -43,6 +43,17 @@
 
 ## Deferred
 
+- **delegation-rules-parity** [needs-spec] — delegation-kit states the protocol twice: the
+  SPEC's numbered rule list and the template's bullets carry the same rules in different
+  prose, with no owner ruling or parity gate between them. Rule the tiering (template owns
+  the procedure; the SPEC owns the numbered headline roster its own sections cite) and ship
+  the meta-gate asserting headline parity, so the two surfaces cannot drift apart silently.
+  Surfaced 2026-07-11 at align.
+- **doctrine-rule-lockstep** [needs-spec] — check-doctrine-registration asserts only that the
+  always-loaded file links the doctrine file; nothing holds the one-line-per-rule digest and
+  the doctrine's rule set in lockstep, so a rule added on either side without its counterpart
+  passes. Extend to per-rule bidirectional coverage (the attested handbook-coverage practice:
+  digest line ↔ owner heading, both directions). Surfaced 2026-07-11 at align.
 - **lifecycle-knob-prefix** [needs-spec] — lifecycle-kit's knobs ride a bare `LIFECYCLE_`
   prefix except `LIFECYCLE_KIT_STAGES_FILE`, against the `<KIT>_KIT_` shape every other kit
   uses; a rename breaks every consumer config, so the unit's spec must rule the
