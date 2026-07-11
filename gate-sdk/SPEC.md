@@ -49,7 +49,10 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
-siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT_ALLOWLIST` (default
+siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT` (default: the
+vendored `gate-sdk/` resolved beside the sourcing script — the root a
+consumer-copied gate sources `lib/gate.sh` from and the anchor kit roots
+relativize against), `GATE_SDK_ROOT_ALLOWLIST` (default
 `<gates-dir>/root-allowlist.list`), `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 and `GATE_SDK_RUNNER_DOC` (default `CLAUDE.md`) for `check-kit-registration`,
 `GATE_SDK_MSG_PATTERN_FILES` (default

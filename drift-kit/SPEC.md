@@ -59,6 +59,13 @@ the report degrades that row to its fail-visible read. Two modes:
 - **`--trend`** — at most one compact `<key> <value>` fragment, or nothing
   (a plugin may opt out of the trend line).
 
+The report exports `DRIFT_KIT_KIT_ROOTS` — newline-separated kit roots,
+`gate_kit_roots` when gate-sdk resolves, else the kit's parent — before
+invoking plugins; a plugin needing sibling-kit surfaces reads it rather than
+re-deriving the roster, and falls back to its own derivation when run
+standalone without it. The driver's handoff, not a consumer knob:
+`drift-report.sh` recomputes it every run.
+
 Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch;
 a measurement needing state (a baseline, a log) reads a file some
 *other* mechanism owns and stamps its reading-age caveat when the file is a

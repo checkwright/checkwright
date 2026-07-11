@@ -297,6 +297,11 @@ Config follows the established kit pattern: copy
 `GUARD_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
 what the consumer left unset. Knobs (this repo's layout as defaults):
 
+- `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards
+  source (the test runner points it at the tree under test); default
+  `guard-kit/lib/guard.sh`. Env or the copied guard's head only — it
+  resolves before the config file loads, so `guard-config.sh` cannot set
+  it.
 - `GUARD_KIT_LOG` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/prompt-friction.log`.
 - `GUARD_KIT_WAKEUP_LOG` — default

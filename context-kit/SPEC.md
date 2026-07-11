@@ -266,6 +266,9 @@ what the consumer left unset. Knobs (this repo's layout as defaults):
   the steady-state hook body; default queue-kit's
   `queue-index.sh --collapse-deferred` when resolvable, else empty
   (surfaces only).
+- `CONTEXT_KIT_DRIFT_REPORT` — path to the consumer's drift-report script;
+  the session-context hook runs it with `--trend` for the brief's drift
+  line; default empty (the line is omitted).
 - `CONTEXT_KIT_BASELINE_FILE` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
