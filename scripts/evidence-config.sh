@@ -2,31 +2,18 @@
 # spec: evidence-kit/SPEC.md §Layout and configuration — this repo's evidence-kit consumer config
 # shellcheck disable=SC2034  # every knob below is consumed by evidence-kit/lib/evidence.sh after sourcing
 
-EVIDENCE_KIT_SUITES=(
-    gates
-    gatesdk_fixtures
-    lifecycle_fixtures
-    queue_fixtures
-    spec_fixtures
-    delegation_fixtures
-    context_fixtures
-    evidence_fixtures
-    guard_tests
-    usage_tests
-    budget_guard_tests
-    trend_tests
-    demo
-)
+# spec: gate-sdk/SPEC.md §lib/gate.sh — derive the per-kit fixture suites from the gate-tests dirs on disk (gate_fixture_suites, in scope via evidence-kit → gate-sdk), so a new kit's fixtures enrol with no edit here; the suites below the loop have no gate-tests dir and stay hand-listed.
+EVIDENCE_KIT_SUITES=(gates)
+while IFS=$'\t' read -r _suite _tests _checks; do
+    EVIDENCE_KIT_SUITES+=("$_suite")
+    declare "EVIDENCE_KIT_RUN_$_suite=bash gate-sdk/bin/run-gate-tests.sh $_tests${_checks:+ $_checks}"
+done < <(gate_fixture_suites)
+unset _suite _tests _checks
+EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests demo)
+
 EVIDENCE_KIT_PARSER=exit-code
 
 EVIDENCE_KIT_RUN_gates='bash gate-sdk/bin/run-gates.sh'
-EVIDENCE_KIT_RUN_gatesdk_fixtures='bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks'
-EVIDENCE_KIT_RUN_lifecycle_fixtures='bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks'
-EVIDENCE_KIT_RUN_queue_fixtures='bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks'
-EVIDENCE_KIT_RUN_spec_fixtures='bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks'
-EVIDENCE_KIT_RUN_delegation_fixtures='bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks'
-EVIDENCE_KIT_RUN_context_fixtures='bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks'
-EVIDENCE_KIT_RUN_evidence_fixtures='bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks'
 EVIDENCE_KIT_RUN_guard_tests='bash guard-kit/bin/run-guard-tests.sh'
 EVIDENCE_KIT_RUN_usage_tests='bash delegation-kit/bin/run-usage-tests.sh'
 EVIDENCE_KIT_RUN_budget_guard_tests='bash delegation-kit/bin/run-budget-guard-tests.sh'

@@ -88,6 +88,22 @@ gate_check_dirs() {
     done < <(gate_kit_roots)
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the fixture-suite derivation shared by CI and evidence-kit's validate config: every dir with a gate-tests/ tree (the kit roots plus the gates dir), one tab-separated '<suite> <tests-dir> <checks-dir-or-empty>' row per suite in kit-roots-then-gates-dir order. suite = the dir basename with '-'→'_' (a valid var suffix + scenario name); checks-dir is the sibling checks/ when present, else empty so run-gate-tests falls back to consumer-first resolution. A new kit's gate-tests/ enrols with no hand-list to drift.
+gate_fixture_suites() {
+    local anchor base suite
+    anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"; anchor="${anchor%/*}"
+    { gate_kit_roots_rel; gate_sdk_gates_dir; } | while IFS= read -r base; do
+        base="${base%/}"
+        [[ -d "$anchor/$base/gate-tests" ]] || continue
+        suite="${base##*/}"; suite="${suite//-/_}"
+        if [[ -d "$anchor/$base/checks" ]]; then
+            printf '%s\t%s\t%s\n' "$suite" "$base/gate-tests" "$base/checks"
+        else
+            printf '%s\t%s\t\n' "$suite" "$base/gate-tests"
+        fi
+    done
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — gate_kit_roots as repo-root-relative dirs (the anchor the couples globs share); absolute roots resolve against the kits' parent, relative roots (a GATE_SDK_KIT_DIRS override) pass through
 gate_kit_roots_rel() {
     local anchor root

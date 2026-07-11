@@ -343,7 +343,13 @@ manifest). The commit-surface value adapters `gate_msg_pattern_files` and
 and the commit-type roster — each documented at its gate (§check-commit-msg,
 §check-commit-subject). `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
 the couples globs share — resolving absolute roots against the kits' parent and
-passing a relative `GATE_SDK_KIT_DIRS` override through unchanged. `fail_closed` must be passed *only* a status that genuinely
+passing a relative `GATE_SDK_KIT_DIRS` override through unchanged.
+`gate_fixture_suites` derives the golden-fixture suite set the same way: every
+dir with a `gate-tests/` tree (the kit roots plus the gates dir), one
+tab-separated `<suite> <tests-dir> <checks-dir-or-empty>` row per suite, the
+suite name the dir basename with `-`→`_`. It is the single source both the CI
+workflow (`.github/workflows/gates.yml`) and evidence-kit's validate config
+loop over, so adding a kit enrols its fixtures with no hand-list to drift. `fail_closed` must be passed *only* a status that genuinely
 means the check could not execute (an awk/jq/parser crash) — never `grep`'s
 exit 1, which is the expected "no match"; the caller draws that line at the
 capture site.

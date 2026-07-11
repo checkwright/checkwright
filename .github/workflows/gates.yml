@@ -1,7 +1,9 @@
 # Filled instance of gate-sdk/templates/gates-workflow.yml — this repo's CI
-# backstop. The full battery plus every fixture runner CLAUDE.md's battery list
-# names, checkout + bash only. Scope + neutrality boundary: see the template
-# header and gate-sdk/SPEC.md §Enforcement tiers.
+# backstop. The full battery, then the fixture suites derived from the
+# gate-tests dirs on disk (gate_fixture_suites — no hand-list to drift from
+# CLAUDE.md's battery), then the non-gate-tests runners. Checkout + bash only.
+# Scope + neutrality boundary: see the template header and gate-sdk/SPEC.md
+# §Enforcement tiers.
 name: gates
 
 on:
@@ -20,21 +22,15 @@ jobs:
           fetch-depth: 0
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
-      - name: gate-sdk fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
-      - name: lifecycle-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
-      - name: queue-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks
-      - name: canon-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks
-      - name: delegation-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks
-      - name: context-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh context-kit/gate-tests context-kit/checks
-      - name: evidence-kit fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks
-      - name: consumer-gate fixtures
-        run: bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests
+      - name: fixture suites (derived from */gate-tests)
+        run: |
+          source gate-sdk/lib/gate.sh
+          rc=0
+          while IFS=$'\t' read -r suite tests checks; do
+            echo "== $suite =="
+            # shellcheck disable=SC2086  # empty checks expands to no arg by design
+            bash gate-sdk/bin/run-gate-tests.sh "$tests" $checks || rc=1
+          done < <(gate_fixture_suites)
+          exit $rc
       - name: guard-kit decision table
         run: bash guard-kit/bin/run-guard-tests.sh

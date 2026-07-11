@@ -12,9 +12,11 @@
 # Copied out like every gate-sdk template. Checkout + bash only: no caching, no
 # matrix, no third-party actions, so the surface an agent could tamper with
 # stays minimal and reviewable. To adopt: copy to .github/workflows/gates.yml,
-# set your default-branch name below, fill the fixture-runner placeholder with
-# your battery list, and require this workflow's status check before merge
-# (branch-protection recipe: the install-page docs). A filled example is this
+# set your default-branch name below, add a step per non-gate-tests runner
+# (guard tests, a language test suite) after the derived fixture step, and
+# require this workflow's status check before merge (branch-protection recipe:
+# the install-page docs). The fixture suites need no hand-list — they derive
+# from your gate-tests dirs (gate_fixture_suites). A filled example is this
 # repo's own .github/workflows/gates.yml.
 name: gates
 
@@ -35,11 +37,19 @@ jobs:
           fetch-depth: 0
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
-      # PLACEHOLDER — replace with your consumer battery list: one step per kit
-      # fixture runner and guard-test runner your CLAUDE.md names, e.g.
-      #   - name: gate-sdk fixtures
-      #     run: bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
-      - name: fixture runners
+      # Every dir with a gate-tests/ tree, run against its sibling checks/ — no
+      # hand-list to drift as kits are added or renamed.
+      - name: fixture suites (derived from */gate-tests)
         run: |
-          echo "PLACEHOLDER: replace this step with your fixture/guard-test runners" >&2
-          exit 1
+          source gate-sdk/lib/gate.sh
+          rc=0
+          while IFS=$'\t' read -r suite tests checks; do
+            echo "== $suite =="
+            # shellcheck disable=SC2086  # empty checks expands to no arg by design
+            bash gate-sdk/bin/run-gate-tests.sh "$tests" $checks || rc=1
+          done < <(gate_fixture_suites)
+          exit $rc
+      # PLACEHOLDER — add one step per non-gate-tests runner your CLAUDE.md
+      # names (a guard-test runner, a language test suite), e.g.
+      #   - name: guard-kit decision table
+      #     run: bash guard-kit/bin/run-guard-tests.sh

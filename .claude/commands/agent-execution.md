@@ -90,15 +90,14 @@ touches any of these, or serialize:
 ## Validate battery (this repo)
 
 The command set the supervisor re-runs after every agent commit (never the
-agent's self-report):
+agent's self-report): the full battery, plus the fixture runner for each kit
+the sweep touched. The per-kit runner set is the `*/gate-tests` derivation
+(gate-sdk/lib/gate.sh `gate_fixture_suites` — the same list CI and validate
+loop over), each invoked `run-gate-tests.sh <kit>/gate-tests <kit>/checks`:
 
     bash gate-sdk/bin/run-gates.sh
-    # plus the fixture runner for each kit the sweep touched:
-    bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests       gate-sdk/checks
-    bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests  lifecycle-kit/checks
-    bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests      queue-kit/checks
-    bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests       canon-kit/checks
-    bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks
+    # the touched kit's row from `gate_fixture_suites`, e.g.:
+    bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks
 
 Renames are the trap (relevant to the queued `tag-lead-line-rename`): a gate that
 resolves by name can green a tree while a stale fixture dir or generated artifact

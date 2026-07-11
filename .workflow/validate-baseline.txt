@@ -1,12 +1,14 @@
 # held-constant validate baseline: <suite> <scenario> <status> [<slug>]
 gates gates pass
-gatesdk_fixtures gatesdk_fixtures pass
-lifecycle_fixtures lifecycle_fixtures pass
-queue_fixtures queue_fixtures pass
-spec_fixtures spec_fixtures pass
-delegation_fixtures delegation_fixtures pass
-context_fixtures context_fixtures pass
-evidence_fixtures evidence_fixtures pass
+gate_sdk gate_sdk pass
+canon_kit canon_kit pass
+context_kit context_kit pass
+delegation_kit delegation_kit pass
+evidence_kit evidence_kit pass
+lifecycle_kit lifecycle_kit pass
+queue_kit queue_kit pass
+site_kit site_kit pass
+scripts scripts pass
 guard_tests guard_tests pass
 usage_tests usage_tests pass
 budget_guard_tests budget_guard_tests pass

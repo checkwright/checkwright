@@ -12,7 +12,7 @@
 
 ## New Features
 
-- **doctrine-kit** [spec: SPEC-doctrine-kit.md] [blocked-by: fixture-suite-derivation]
+- **doctrine-kit** [spec: SPEC-doctrine-kit.md]
   — the experience-packaging rung: `doctrine-kit/DOCTRINE.md` carries the
   generic delivery rules (referenced in place, re-vendor is the upgrade),
   `install-doctrine.sh` inserts the always-loaded reference block,
@@ -20,14 +20,6 @@
   of truth converts to consumer-by-reference; the companion-corpus sweep
   extends the roster — mechanism crosses the seam, rule content never.
 ## Technical Debt
-
-- **fixture-suite-derivation** — ruled: derive where executable, cite where
-  prose — the CI workflow and scripts/evidence-config.sh loop over the
-  `*/gate-tests` dirs instead of hand-enumerating suites; the agent-execution
-  validate set cites the
-  derivation; the CLAUDE.md battery block stays enumerated
-  (check-kit-registration already holds it per-kit). doctrine-kit lands
-  behind it as the derivation's first exercised pickup.
 
 ## Deferred
 
@@ -233,5 +225,6 @@
 
 - read-command-guard-steer
 - gate-tamper-rename-policy
+- fixture-suite-derivation
 
 ## Lessons Learned
