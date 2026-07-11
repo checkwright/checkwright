@@ -7,7 +7,14 @@ consumer's always-loaded agent file, never copy-installed — re-vendoring the k
 coding-agent work, and a pointer to the mechanism that enforces it; the
 mechanism and its knob rosters live in the cited kit SPEC, never restated here.
 
-## The rules
+The roster is in two registers. **Methodology-maintenance** rules govern how the
+methodology's own surfaces stay honest; they bear on every surface edit and form
+the always-loaded digest a consumer installs. **Engineering-craft** rules govern
+how the work built under the methodology is written; they are load-triggered by
+test and rename work and live behind the link — an application of the
+load-trigger residency rule to the doctrine itself.
+
+## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** Every governed surface owns exactly one content
    tier and *points to* — never restates — a fact another surface owns. A
@@ -81,3 +88,56 @@ mechanism and its knob rosters live in the cited kit SPEC, never restated here.
    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — the `clean` and `help:` lines are
    written to be that interface — and the targeted-run resolver reachable through
    the generated hook.
+
+## Engineering-craft rules
+
+8. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
+   that invariant in its *name*; the SPEC's test-requirement section owns which
+   invariants a test must cover. A spec-clause *comment* on the test is not a
+   substitute — it duplicates what the name should carry and rots silently when
+   the clause is renamed.
+   *Under agent work:* a test name is the line read at every failure and kept
+   across refactors; an agent scanning a failing suite reads names, not comment
+   pointers, so the invariant must live where the failure surfaces it.
+   *Enforced by:* the test-naming convention, and canon-kit's `check-comment-tier`
+   ([canon-kit/SPEC.md](../canon-kit/SPEC.md)) — which sweeps the comment
+   substitute out rather than blessing it, leaving the name as the only place to
+   carry the invariant.
+
+9. **Test from the real consumer's runtime.** Verify a contract from the runtime
+   of its real consumer, never a more lenient stand-in; a failure at a higher
+   test layer with no failing test at the layer below is a coverage gap in the
+   lower layer, closed there first.
+   *Under agent work:* an agent scripts the contract from whatever client is
+   easiest to drive, and a lenient stand-in passes what the real consumer's
+   stricter stack would reject — a green the production caller does not share.
+   *Enforced by:* a test-layer convention, not yet a checkwright gate: a consumer
+   registers its real-consumer suites in the validate battery
+   ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant
+   baseline turns a dropped layer into a red validate.
+
+10. **Inspectable-run discipline.** A component a test or an automation spawns
+    must emit a readable log to an inspectable path — never a muted sink; on a
+    failure, read that evidence before theorizing. A run you cannot inspect
+    barely beats a guess.
+    *Under agent work:* an agent theorizes confidently from nothing; forcing every
+    spawned component to leave an inspectable artifact converts a guess into a
+    read, and recorded evidence beats a reconstructed hypothesis.
+    *Enforced by:* the convention, kin to delegation-kit's resume-journal
+    discipline ([delegation-kit/SPEC.md](../delegation-kit/SPEC.md)) — the same
+    move of making a background actor write an inspectable record rather than
+    trusting its self-report.
+
+11. **Rename is a full-surface sweep.** A rename sweeps every surface in
+    lockstep — prose, fixtures, and docs, not only the compiler-checked
+    identifiers; the done-gate is a text-level completeness check, not the
+    type-checker, and an in-progress rename is verified by a completeness scan
+    before it is called finished.
+    *Under agent work:* an agent reads a green type-check as "rename done" and
+    leaves the retired term alive in every surface the compiler never sees; only
+    a text-level sweep closes it.
+    *Enforced by:* a text-level completeness check whose term list is *consumer
+    config*, never a kit literal — the same seam that keeps product vocabulary
+    out of shipped mechanism (the config-via-env pattern in
+    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md)), so the check ships and the
+    vocabulary stays with the consumer.

@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **doctrine-kit** [spec: SPEC-doctrine-kit.md]
-  — the experience-packaging rung: `doctrine-kit/DOCTRINE.md` carries the
-  generic delivery rules (referenced in place, re-vendor is the upgrade),
-  `install-doctrine.sh` inserts the always-loaded reference block,
-  `check-doctrine-registration` holds it present; CLAUDE.md §Single source
-  of truth converts to consumer-by-reference; the companion-corpus sweep
-  extends the roster — mechanism crosses the seam, rule content never.
 ## Technical Debt
 
 ## Deferred
@@ -226,5 +219,6 @@
 - read-command-guard-steer
 - gate-tamper-rename-policy
 - fixture-suite-derivation
+- doctrine-kit
 
 ## Lessons Learned

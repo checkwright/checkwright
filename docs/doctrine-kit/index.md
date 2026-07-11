@@ -1,10 +1,11 @@
 # doctrine-kit
 
 The experience-packaging rung. The delivery doctrine the other kits enforce
-piecemeal — content-tiering, enforcement-first, de-literalization, the
-always-loaded shape, load-trigger residency, widest-true-tier placement,
-oracle-first — becomes one customer-deliverable rules file, `DOCTRINE.md`,
-carried into a consumer's project by reference.
+piecemeal becomes one customer-deliverable rules file, `DOCTRINE.md`, carried
+into a consumer's project by reference. It holds two registers:
+methodology-maintenance rules, which keep the methodology's own surfaces honest,
+and engineering-craft rules, which govern how the work built under it is
+written.
 
 The deliverable — `DOCTRINE.md` — is referenced in place, never copy-installed:
 a consumer's always-loaded agent file gains a one-line-per-rule digest and a

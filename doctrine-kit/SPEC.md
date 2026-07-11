@@ -22,6 +22,14 @@ kit SPEC, never restated in the doctrine. The rule *statements* are the
 doctrine's to own — a governed surface elsewhere cites a rule by name and links
 the doctrine rather than restating it.
 
+The roster carries two registers: methodology-maintenance rules, which govern
+how the methodology's own surfaces stay honest and bear on every surface edit,
+and engineering-craft rules, which govern how the work built under the
+methodology is written and are triggered by test and rename work. The
+maintenance register forms the installed digest; the craft register lives behind
+the link, load-triggered — the doctrine applying its own load-trigger residency
+rule to itself.
+
 The file is referenced in place, never copy-installed. A consumer vendors the
 kit and links the vendored path; re-vendoring the kit *is* the doctrine upgrade.
 A copied doctrine drifts the moment the source moves and the copy does not; a
@@ -44,11 +52,13 @@ installer refuses (exit 2) rather than guess the block bounds. The agent file
 must already exist — the installer edits an always-loaded file, it does not mint
 one — so a missing target is exit 2.
 
-The block is the always-loaded shape applied to the doctrine itself: a
-one-line-per-rule digest plus a markdown link to the doctrine file. The
-installer is the single source of the block text, so a manual insertion for a
-harness-less consumer copies what the tool would emit; the README documents that
-manual path. What the digest *says* is the consumer's to trim — a consumer that
+The block is the always-loaded shape applied to the doctrine itself: a one-line
+digest of the methodology-maintenance rules plus a markdown link to the doctrine
+file. The engineering-craft register is not digested — it is load-triggered and
+reached through the link, so the always-loaded surface carries only what bears
+on every edit. The installer is the single source of the block text, so a manual
+insertion for a harness-less consumer copies what the tool would emit; the README
+documents that manual path. What the digest *says* is the consumer's to trim — a consumer that
 rejects a rule edits its own digest — because the gate asserts only the link,
 never the block body.
 

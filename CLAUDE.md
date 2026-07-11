@@ -78,8 +78,9 @@ in [canon-kit/SPEC.md](canon-kit/SPEC.md) §check-comment-tier.
 <!-- doctrine-kit:begin -->
 ## Delivery doctrine
 
-The cross-kit delivery rules live in [doctrine-kit/DOCTRINE.md](doctrine-kit/DOCTRINE.md) — one tier
-per rule, re-vendor to upgrade:
+The cross-kit delivery rules live in [doctrine-kit/DOCTRINE.md](doctrine-kit/DOCTRINE.md) — re-vendor
+to upgrade. The always-loaded maintenance rules, one line each; the doctrine adds
+an engineering-craft section behind the link:
 
 - **Content-tiering / SSOT** — one content tier per surface; point, never restate.
 - **Enforcement-first** — the fix and the gate that catches it land in one unit.

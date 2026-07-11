@@ -20,8 +20,9 @@ block() {
 $BEGIN
 ## Delivery doctrine
 
-The cross-kit delivery rules live in [$DOCTRINE_FILE]($DOCTRINE_FILE) — one tier
-per rule, re-vendor to upgrade:
+The cross-kit delivery rules live in [$DOCTRINE_FILE]($DOCTRINE_FILE) — re-vendor
+to upgrade. The always-loaded maintenance rules, one line each; the doctrine adds
+an engineering-craft section behind the link:
 
 - **Content-tiering / SSOT** — one content tier per surface; point, never restate.
 - **Enforcement-first** — the fix and the gate that catches it land in one unit.
