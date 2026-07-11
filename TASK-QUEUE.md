@@ -233,6 +233,15 @@
   buildable — the n-gram holds the copy shape, judgment holds the tier).
   Same residency/pointer family as delegation-doctrine-single-source, but
   sequenced independently of it. Surfaced 2026-07-11 at doctrine-kit align.
+- **gate-run-for-path** [needs-spec] — the affordance half of the doctrine
+  roster's oracle-first rule: expose the generated hook's path→gates
+  selection as an agent-callable entry point (`run-gates.sh --for <path>`
+  or a sibling gate-sdk bin tool), reusing the `# graph:` couples reader
+  gen-pre-commit and check-graph already share, so selector and hook cannot
+  desync. The mid-edit loop becomes edit → run coupled gates → read help —
+  strictly cheaper than reading gate source to predict a verdict, the
+  run-don't-predict equilibrium the oracle-first rule names. Surfaced
+  2026-07-11 at doctrine-kit align.
 ## Done
 
 ## Lessons Learned

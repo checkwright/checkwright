@@ -39,6 +39,18 @@ consumer's tier contract is not canon-kit's to own.
      it names this repo's choices, the local-only private brief when it
      cannot be published; a template's binding-slot grammar is the seam
      marker between the first two.
+  7. **Oracle-first** (surfaced at this iteration's align, from the
+     verdict-prediction token pattern): a check's output is its interface —
+     run the gate instead of emulating it, and treat a red run, including a
+     red commit attempt (the generated hook runs exactly the coupled
+     subset), as the designed feedback channel rather than an incident;
+     gate source is opened to fix the gate or write its fixtures, never to
+     predict its verdict. A deterministic check costs seconds and zero
+     context; reading its source to anticipate the verdict costs more than
+     running the whole battery and can still be wrong. Mechanism pointers:
+     the gate output contract (gate-sdk/SPEC.md — the `clean`/`help:`
+     lines are written to be the interface) and the targeted-run resolver
+     (queued: gate-run-for-path).
 - **Roster extension — the corpus sweep (build worklist item).** Sweep the
   private companion consumer's instruction corpus (identity in the
   operator's local brief) for generic practices not yet banked. Candidate
