@@ -76,11 +76,22 @@ branch/worktree strategy is multi-operator-semantics' question.
   thread is transport, never a store, so a lead crash or transcript loss
   costs nothing the tracked surfaces do not already hold.
 - **Economics.** The prompt cache's short TTL means a sporadically
-  questioned lead pays a full context re-warm per cold question. Hence:
-  batch escalations (the decision shape makes batching natural), keep the
-  lead's resident context lean (stamps are authoritative, so the lead holds
-  pointers, not state), and verify spend with delegation-kit's usage-verdict
-  rather than assumed forgiveness.
+  questioned lead pays a full context re-warm per cold question (stage
+  sessions outlive the TTL, and escalations arrive on their schedule, so
+  the lead is nearly always cold). Hence: batch escalations (the decision
+  shape makes batching natural), keep the lead's resident context lean —
+  mechanized as **compact-at-handoff**: after the promotion commit lands
+  the amendments and queue entries, and before the first dispatch, the
+  lead compacts its context with an instruction that keeps per-amendment
+  rationale, rejected alternatives, and the ruling-class roster, and drops
+  tool output and file contents (the tree is re-readable, and everything
+  ruled is already in governed surfaces, so the lossy compact has a lead
+  crash's bounded blast radius; stamps are authoritative, so the lead
+  holds pointers, not state) — and verify spend with delegation-kit's
+  usage-verdict rather than assumed forgiveness. Cache-keepalive pinging
+  is ruled out: at batched escalation rates the idle re-warm pings cost
+  more than the cold reads they avoid, burn the shared budget window, and
+  invite idle-turn drift.
 - **Mechanical floor: an optional SendMessage guard template in guard-kit**
   (the guard-kit/SPEC.md §wakeup-guard (template) precedent — same
   framework, tool-targeted matcher, separate opt-in hook). Registered on
