@@ -163,13 +163,4 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
-- enforcement-map-links
-- docs-reference-routing
-- check-graph-site-move
-- lifecycle-knob-prefix
-- doctrine-rule-lockstep
-- runner-doc-off-resident
-- consumer-footprint-budget
-- delegation-rules-parity
-
 ## Lessons Learned
