@@ -17,10 +17,12 @@ its side of the seam (§lifecycle-kit integration).
 
 The kit is vendored beside [gate-sdk](../gate-sdk/) (required); its gates
 register in the consumer's `gates.list` by name and resolve through gate-sdk's
-multi-kit path. Config is a sourced file, `evidence-config.sh` in the gates dir
-(or `EVIDENCE_KIT_CONFIG_FILE` elsewhere); the loader fills every unset knob
-with a default, then validates and exits 2 on a malformed machine (a
-suite name that is not a valid variable suffix) — a broken config gates nothing.
+multi-kit path. Config follows the established kit pattern: copy
+`templates/evidence-config.sh` into the gates dir as `evidence-config.sh` (or
+point `EVIDENCE_KIT_CONFIG_FILE` elsewhere) and override any knob; the loader
+fills every unset knob with a default, then validates and exits 2 on a malformed
+machine (a suite name that is not a valid variable suffix) — a broken config
+gates nothing.
 
 Knobs, this repo's surface names as defaults:
 

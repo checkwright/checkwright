@@ -14,12 +14,6 @@
 
 ## Technical Debt
 
-- **evidence-config-template** — evidence-kit is the one config-bearing kit shipping no
-  `templates/` config file to copy: its SPEC names `evidence-config.sh` in the gates dir but a
-  vendoring consumer authors it from scratch (this repo's `scripts/evidence-config.sh` is the
-  working shape). Ship the template and the copy-install sentence per the kit config
-  convention. Surfaced 2026-07-11 at align.
-
 ## Deferred
 
 - **delegation-rules-parity** [needs-spec] — delegation-kit states the protocol twice: the
@@ -177,6 +171,7 @@
   2026-07-09.
 ## Done
 
+- evidence-config-template
 - orchestration-positioning-docs
 - reads-subset-couples-meta-gate
 - overhead-metering
