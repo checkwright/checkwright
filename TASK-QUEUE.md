@@ -195,13 +195,4 @@
   2026-07-09.
 ## Done
 
-- session-context-stage-lag
-- validate-spine-consumer-smoke
-- kfric-capture-tool
-- knob-literal-citation-gate
-- prose-citation-pointer-gate
-- gate-run-for-path
-- stage-shim-dedup
-- delegation-doctrine-single-source
-
 ## Lessons Learned
