@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **consumer-footprint-budget** [spec: SPEC-consumer-footprint.md] — context-kit/SPEC.md
-  gains §The consumer footprint: the one-pointer-line budget rule, the per-kit resident-ask
-  roster by citation, and the floor-holder ruling (meter + baseline ship in the consumer
-  install; the hold is advisory by design — attribution makes a level gate noisy).
 - **delegation-rules-parity** [spec: SPEC-rules-parity.md] — the template owns the protocol
   rules (bold lead-ins as stable names); the SPEC drops the numbered roster, keeps rationale
   and mechanism contracts citing rules by name; new gate check-rule-citation holds forward
@@ -197,5 +193,6 @@
 ## Done
 
 - runner-doc-off-resident
+- consumer-footprint-budget
 
 ## Lessons Learned

@@ -132,7 +132,10 @@ the measurement.
   `<total-lines> <surface-lines> <baseline-commit>`. Trailing extra
   fields are tolerated and preserved-ignored — a consumer's file may carry
   a fourth (a settings-local count, say, a guard-kit-adjacent KPI owned by
-  its drift report), and the kit reads such a file unchanged.
+  its drift report), and the kit reads such a file unchanged. The baseline is
+  the consumer-side floor-holder for the footprint contract
+  (§The consumer footprint): its delta is what the close-stage brevity pass
+  reacts to.
 
 ## The brevity gate
 
@@ -178,6 +181,54 @@ The lexical share of this narration judgment — a fixed set of `formerly…`-cl
 markers in the manifest set — is a blocking gate
 (canon-kit/SPEC.md §check-manifest-temporal); this pass keeps the semantic
 residue (*is this sentence about the past?*) that no marker set can decide.
+
+## The consumer footprint
+
+A consumer project pursues its own objectives; the tooling must stay
+near-invisible in its context budget. This section states and holds the kits'
+consumer-resident footprint — what checkwright asks a consumer's always-loaded
+surface to carry — owned in one place, with the always-loaded meter's baseline
+as the consumer-side floor-holder. It is prose contract only: no new state,
+event, knob, or gate. Its producer is the kit author at kit-landing time (the
+kit-landing checklist gains no step; the review seam is the roster row); its
+readers are a consumer evaluating adoption cost before vendoring and this
+repo's own close-stage brevity pass, which reads the roster when judging
+whether a new resident line is a kit ask or repo content.
+
+**The budget rule.** A kit's resident ask is at most one pointer line on the
+consumer's always-loaded surface — the load-trigger-residency and
+always-loaded-shape doctrine rules applied to kit shipping. The one sanctioned
+block-sized ask is doctrine-kit's digest, itself bounded by its one-line-per-rule
+shape (the always-loaded-shape rule); its name-lockstep with the doctrine is
+held separately (the doctrine-rule-lockstep unit), because a re-vendor upgrade
+stales the digest by construction.
+
+**The roster, by citation.** Each kit's resident ask is named by citing the kit
+SPEC section that owns it, never by restating it here — so the roster cannot
+drift out of lockstep with what the kit actually ships. A kit adding a resident
+ask adds its row below, which is the review seam:
+
+- **delegation-kit** — the pre-authorization sentence plus skill pointer:
+  delegation-kit/SPEC.md §One template, a resident pointer.
+- **doctrine-kit** — the doctrine link plus the digest block: doctrine-kit/SPEC.md.
+- **drift-kit** — the knowledge-friction capture bullet:
+  drift-kit/SPEC.md §The knowledge-friction loop, which already states the
+  one-bullet cost and its earn-back condition.
+- **every other kit** — none: their hooks, skills, gates, and SPECs are load-
+  or event-triggered, so they cost nothing until opened.
+
+**The floor-holder ruling.** The meter plus its committed baseline
+(§The always-loaded meter) ship as the consumer's floor-holder: the consumer
+install (§Layout and configuration) seeds `always-loaded-baseline.txt`, so
+growth of the resident surface is a visible delta at every close-stage brevity
+pass. The hold is *advisory by design*. A hard total-line gate cannot attribute
+growth — the consumer's own content shares the file and is theirs to grow — so
+a level gate would be a noisy check breeding exemptions, the high-false-positive
+case the enforcement-first rule sanctions for keeping a class as stated manual
+duty rather than a gate. The mechanical holds that do exist stay: `check-brevity`
+bounds the one bulleted section its knob designates (§The brevity gate; this
+repo points it at the conventions block, not the digest), and the meter delta
+feeds `kpi-always-loaded`.
 
 ## The memory-off doctrine
 
@@ -268,6 +319,12 @@ context-kit/
   smoke/install.sh
   smoke/violation.sh
 ```
+
+The install also seeds the committed baseline the footprint contract holds
+(§The consumer footprint): after wiring the hook it runs
+`always-loaded.sh --update-baseline` once to write
+`always-loaded-baseline.txt`, and `smoke/install.sh` asserts that step by
+running the meter and checking the baseline lands.
 
 Config follows the established kit pattern: copy
 `templates/context-config.sh` into the gates dir (or point

@@ -27,5 +27,7 @@ bash context-kit/bin/pub-index.sh <component>/src/   # public API surface
 ## Contracts
 
 The reading-tool contracts and the always-loaded budget are defined in the
-kit's `SPEC.md`; its `README.md` lists the mechanism. Back to the
+kit's `SPEC.md`, including the consumer footprint it holds — what the kits ask
+your always-loaded surface to carry, worth reading before you vendor. Its
+`README.md` lists the mechanism. Back to the
 [kit map](../index.md#the-kits).
