@@ -12,7 +12,10 @@ queue-kit/bin/lesson-sink.sh <tag>`, which resolves the sink from the local
     `launch-comms` methodology essay; reclaim: merged into the essay, then
     cleared — the runtime-artifact rule).
 
-**housekeeping** — two triage sweeps, each owned by its kit template and run in
-order: tooling-friction per guard-kit/templates/close-triage.md, then
+**housekeeping** — measure, then triage. First meter this closing session:
+`bash drift-kit/bin/overhead-meter.sh` logs its governance-vs-task byte proxy
+(drift-kit/SPEC.md §The overhead meter), the per-session producer feeding
+`kpi-overhead`. Then two triage sweeps, each owned by its kit template and run
+in order: tooling-friction per guard-kit/templates/close-triage.md, then
 knowledge-friction per drift-kit/templates/close-knowledge.md. Any task a sweep
 files follows queue-kit/SPEC.md §The tag algebra.

@@ -103,6 +103,12 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   file (`<tmp-dir>/gate-timings.txt`): total, the slowest gates by runtime, and
   the file's reading age — a *measurement*, not live state, so the age
   caveat rides the value.
+- **kpi-overhead** — governance and gate-output share over the overhead
+  meter's log (§The overhead meter): the governance share (`pct` averaged
+  across the recent window of sessions, carrying the session-count and
+  reading-age caveats) and the gate-output share (`gate`/`total` — the axis the
+  deferred economy levers target). `--trend` emits `ovh <pct>%`. Degrades
+  fail-visible to a "run bin/overhead-meter.sh" n/a row when the log is absent.
 
 Lag:
 
@@ -237,6 +243,56 @@ a synthetic emission as a second argument rather than regenerating one.
 `docs/evidence.md` — the framing page, owned by the docs site — carries the
 narrative and cites the data file, hand-copying no numbers.
 
+## The overhead meter
+
+`bin/overhead-meter.sh [transcript.jsonl]` measures the methodology's own cost,
+so efficiency claims cut both ways: what fraction of a session's volume is
+governance (gate output, hook payloads, stage ritual, governed-doc reads)
+versus task work. A bare invocation resolves the newest transcript under
+`DRIFT_KIT_SESSIONS_DIR`; the tool is advisory by construction — exit is always
+0 and it never joins `gates.list`, and a missing transcript is a 0-exit notice,
+not a failure.
+
+The measurement is a **byte-proxy at line granularity**, honesty first. Each
+JSONL transcript line is classified whole by a fixed marker table in the script
+— gate-verdict shapes to `gate`, hook/system-reminder blocks and stage-skill
+loads and governed-doc reads to the rest of governance, everything unmatched to
+task work — and its byte length lands in that category. The markers are
+mechanism (kit names, gate-output shapes), never a private vocabulary, so the
+table crosses no provenance seam. Bytes are not tokens and a line is not a
+message: the only claim this buys is *proportion across sessions of the same
+shape*, and every emitting surface carries that caveat parenthetical. No
+transcript content is written out — the meter emits counts and percentages
+only, and its log lives under the gitignored `DRIFT_KIT_TMP_DIR` (the
+gate-timings precedent), so the private transcript stays private.
+
+One line is appended per measured session to `DRIFT_KIT_OVERHEAD_LOG`, grammar
+`<date> <session8> total=<bytes> gov=<bytes> gate=<bytes> pct=<n>` where `pct`
+is the governance share. `session8` is the dedup key the meter reads on append
+— re-measuring a session replaces its line rather than double-counting it. The
+per-category breakdown beyond `gate=` (hook, stage, governed-doc) stays on the
+meter's stdout at measurement time; a log field with no reader is a field
+removed. Field readers: `kpi-overhead` reads `pct`, `gate`, and `total`
+(§Bundled KPIs), plus `date` for the reading-age caveat and the line count for
+the session-count caveat.
+
+The producer of the log is the consumer's close-stage binding — this repo's
+`.claude/commands/close.md` invokes the meter on the closing session (consumer
+config, not a lifecycle-kit change) — and any session may invoke it ad hoc.
+Both knobs carry working defaults, so the enabling config ships on by default,
+and the sessions-dir default matches the harness layout this repo already reads
+for stage stamps.
+
+The economy levers this meter exists to inform stay *behind* it: **commit-first**
+(the generated hook already runs and prints the coupled gates, so a separate
+pre-battery run duplicates that output) and **failures-only run-gates output**
+(clean lines carry no decision value at battery scale) are evaluation targets,
+not deliverables. Neither lands, and the consumer's always-loaded battery
+wording does not change, until the meter shows gate-output share material over
+several measured sessions — the wording changes *with* the measurement, not
+ahead of it. Their design (a gate-sdk output-mode knob) is a future amendment
+against that data.
+
 ## Layout and configuration
 
 ```
@@ -244,12 +300,14 @@ drift-kit/
   bin/drift-report.sh
   bin/trajectory.sh              # the published-evidence extractor
   bin/kfric.sh                   # the knowledge-friction capture affordance
+  bin/overhead-meter.sh          # the governance-overhead byte-proxy meter
   kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
   templates/kpis.list            # example registry (consumer copies + prunes)
   templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
   templates/close-knowledge.md
   smoke/install.sh
+  smoke/overhead-fixture.jsonl   # synthetic transcript driving the classifier smoke
 ```
 
 Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
@@ -271,6 +329,15 @@ layout as defaults):
   `${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt`.
 - `DRIFT_KIT_TMP_DIR` — plugin scratch root; default
   `${GATE_SDK_TMP_DIR:-.tmp}`.
+- `DRIFT_KIT_SESSIONS_DIR` — the agent transcript directory the overhead
+  meter reads for a bare invocation; default
+  `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/<cwd-slug>`, where `<cwd-slug>`
+  is the working directory with every non-alphanumeric replaced by `-` (the
+  derivation lifecycle-kit's stage stamps already apply; drift-kit re-derives
+  with its own knob rather than importing a sibling kit's bin contract).
+- `DRIFT_KIT_OVERHEAD_LOG` — the overhead meter's append log; default
+  `$DRIFT_KIT_TMP_DIR/overhead-log.txt` (gitignored scratch, so the private
+  transcript's derived counts never enter version control).
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
@@ -300,7 +367,15 @@ emits exactly one line. The trajectory extractor needs committed history the
 throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
 fake-history repo — one closed, range-bounded iteration — and asserts the
 table parses, that iteration's row is emitted, and the in-flight iteration's
-is not. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
+is not. The overhead meter has a fixed classifier, so it *is* fixture-stable:
+`smoke/overhead-fixture.jsonl` carries known category bytes, and
+`smoke/install.sh` drives the meter over it and asserts the log-line grammar,
+that the task line is excluded from governance, that `gate` is a proper subset
+of `gov`, that `pct` is the rounded governance share, and that a re-measure
+replaces the session's line rather than doubling it; kpi-overhead is exercised
+over that log (its two lead rows and the `ovh` trend fragment) and in its
+log-absent degradation. Gate-sdk's `check-shellcheck` lints all kit sources as
+usual.
 
 ## Out of scope
 

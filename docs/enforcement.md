@@ -94,6 +94,7 @@ leaves its section absent.
 | drift-kit | kpi-always-loaded |
 | drift-kit | kpi-settings-local |
 | drift-kit | kpi-gate-runtime |
+| drift-kit | kpi-overhead |
 | drift-kit | kpi-knowledge-friction |
 
 ## Guards

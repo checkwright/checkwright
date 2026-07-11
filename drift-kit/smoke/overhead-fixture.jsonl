@@ -1,0 +1,4 @@
+{"role":"assistant","text":"PASS: check-graph clean (58 gates; manifests well-formed)"}
+{"role":"user","text":"<system-reminder>SessionStart hook payload with the session context block</system-reminder>"}
+{"role":"assistant","text":"reading drift-kit/SPEC.md and CLAUDE.md governed docs before the edit"}
+{"role":"assistant","text":"ordinary task work implementing a feature body with no governance markers at all"}

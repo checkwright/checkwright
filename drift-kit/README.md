@@ -67,7 +67,15 @@ doc owned the fact (drift-kit/SPEC.md §The knowledge-friction loop). It shows
 bash drift-kit/bin/drift-report.sh            # full report: lead/lag rows under the honesty labels
 bash drift-kit/bin/drift-report.sh --trend    # one compact line (fragments joined with ·)
 bash drift-kit/bin/trajectory.sh --emit       # governed-trajectory table (one row per closed iteration)
+bash drift-kit/bin/overhead-meter.sh          # governance-vs-task byte proxy for the newest session transcript
 ```
+
+`bin/overhead-meter.sh` is the overhead meter (drift-kit/SPEC.md §The overhead
+meter): a byte-proxy over a session transcript that reports what fraction of the
+volume was governance versus task work, logging one line per session for
+`kpi-overhead` — the methodology's own cost, measured so efficiency claims cut
+both ways. Advisory and content-free: it emits counts only, never transcript
+text.
 
 `bin/trajectory.sh` is the published-evidence extractor (drift-kit/SPEC.md §The
 published-evidence extractor): a pure function of committed git history that
@@ -80,8 +88,8 @@ dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your
 gates dir and naming it in the registry; shadow a bundled one with a same-named
 file. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers, as lead KPIs, the
 queue split, the gate backlog, amendment/deferred age, prompt friction, the
-always-loaded surface, the local permission overlay, and gate runtime; and one
-lag KPI, `kpi-knowledge-friction`, fed by the loop below.
+always-loaded surface, the local permission overlay, gate runtime, and session
+overhead; and one lag KPI, `kpi-knowledge-friction`, fed by the loop below.
 
 ## Test
 

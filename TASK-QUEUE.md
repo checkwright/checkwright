@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **overhead-metering** [spec: SPEC-overhead-meter.md] — drift-kit's overhead meter: what
-  fraction of a session's volume is governance versus task work, byte-proxy over transcripts,
-  logged per session with a bundled KPI. The commit-first and failures-only economy levers are
-  evaluation targets behind the measurement, not deliverables — the CLAUDE.md battery wording
-  changes with the data, not ahead of it.
 - **ddd-positioning-docs** [spec: SPEC-ddd-positioning.md] — docs/ddd.md positioning page:
   ubiquitous-language enforcement via check-tree-terms pattern files, comment-tier directives,
   and the graph-vocab consumer-config pattern; fictional-domain example embedded in the page;
@@ -193,6 +188,7 @@
 ## Done
 
 - reads-subset-couples-meta-gate
+- overhead-metering
 
 ## Lessons Learned
 

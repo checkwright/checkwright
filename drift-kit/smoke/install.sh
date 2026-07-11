@@ -80,3 +80,50 @@ set -e
 grep -q '^| iteration |' <<<"$traj" || fail "trajectory missing table header"
 [[ "$(grep -c '^| alpha ' <<<"$traj")" -ge 1 ]] || fail "trajectory emitted no closed-iteration row (expected alpha)"
 if grep -q '^| beta ' <<<"$traj"; then fail "trajectory emitted the in-flight (unclosed) beta row"; fi
+
+# spec: drift-kit/SPEC.md §Testing — the synthetic-transcript classifier smoke:
+# known category bytes in (smoke/overhead-fixture.jsonl), known percentages out.
+fixture="$SMOKE_KIT_ROOT/smoke/overhead-fixture.jsonl"
+ovlog="$work/ovh-log.txt"
+meter() { DRIFT_KIT_TMP_DIR="$work" DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$SMOKE_KIT_ROOT/bin/overhead-meter.sh" "$fixture"; }
+
+set +e
+mout="$(meter)"; mrc=$?
+set -e
+[[ "$mrc" -eq 0 ]] || fail "overhead-meter exited $mrc (advisory tool must exit 0)"
+grep -q 'byte-proxy' <<<"$mout" || fail "meter stdout missing the byte-proxy caveat"
+[[ -s "$ovlog" ]] || fail "meter wrote no log line"
+[[ "$(grep -c '' "$ovlog")" -eq 1 ]] || fail "meter log has more than one line for one session"
+
+logln="$(cat "$ovlog")"
+grep -qE '^[0-9-]+ [0-9A-Za-z]+ total=[0-9]+ gov=[0-9]+ gate=[0-9]+ pct=[0-9]+$' <<<"$logln" \
+    || fail "log line does not match the documented grammar: $logln"
+
+tot=$(LC_ALL=C awk '{t+=length($0)} END{print t+0}' "$fixture")
+taskb=$(LC_ALL=C awk '/ordinary task work/{t+=length($0)} END{print t+0}' "$fixture")
+gtotal=$(sed -E 's/.* total=([0-9]+) .*/\1/' <<<"$logln")
+ggov=$(sed -E 's/.* gov=([0-9]+) .*/\1/' <<<"$logln")
+ggate=$(sed -E 's/.* gate=([0-9]+) .*/\1/' <<<"$logln")
+gpct=$(sed -E 's/.* pct=([0-9]+)$/\1/' <<<"$logln")
+[[ "$gtotal" -eq "$tot" ]] || fail "meter total ($gtotal) != fixture bytes ($tot)"
+[[ "$ggov" -eq $(( tot - taskb )) ]] || fail "gov ($ggov) != total-taskline ($(( tot - taskb ))): task line miscounted"
+(( ggate > 0 && ggate < ggov )) || fail "gate ($ggate) is not a positive proper subset of gov ($ggov)"
+[[ "$gpct" -eq $(( (ggov * 100 + gtotal / 2) / gtotal )) ]] || fail "pct ($gpct) != round(100*gov/total)"
+
+meter >/dev/null   # re-measure replaces the session's line, never doubles it
+[[ "$(grep -c '' "$ovlog")" -eq 1 ]] || fail "re-measure double-counted the session (dedup broken)"
+
+set +e
+kout="$(DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh")"; krc=$?
+set -e
+[[ "$krc" -eq 0 ]] || fail "kpi-overhead exited $krc"
+[[ "$(grep -c '^lead' <<<"$kout")" -eq 2 ]] || fail "kpi-overhead did not emit its two lead rows over a live log"
+grep -q 'byte-proxy' <<<"$kout" || fail "kpi-overhead rows missing the byte-proxy caveat"
+ktrend="$(DRIFT_KIT_OVERHEAD_LOG="$ovlog" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh" --trend)"
+grep -qE '^ovh [0-9]+%$' <<<"$ktrend" || fail "kpi-overhead --trend not 'ovh <n>%': $ktrend"
+
+set +e
+kna="$(DRIFT_KIT_OVERHEAD_LOG="$work/no-such-overhead.txt" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh")"; knrc=$?
+set -e
+[[ "$knrc" -eq 0 ]] || fail "kpi-overhead (log absent) exited $knrc"
+grep -q 'n/a' <<<"$kna" || fail "kpi-overhead did not degrade to a visible n/a row without a log"
