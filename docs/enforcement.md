@@ -62,6 +62,7 @@ leaves its section absent.
 | [queue-kit](queue-kit/index.md) | check-task-names | precommit |
 | [queue-kit](queue-kit/index.md) | check-task-conservation | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-prose-precondition | precommit |
+| [queue-kit](queue-kit/index.md) | check-queue-slug-liveness | precommit |
 | [canon-kit](canon-kit/index.md) | check-amendment-queue | precommit |
 | [canon-kit](canon-kit/index.md) | check-spec-embedded-source | precommit |
 | [canon-kit](canon-kit/index.md) | check-spec-fence-balance | precommit |

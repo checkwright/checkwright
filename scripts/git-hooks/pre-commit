@@ -167,6 +167,10 @@ if staged_matches 'TASK-QUEUE.md'; then
     queue-kit/checks/check-queue-prose-precondition.sh || hook_fail check-queue-prose-precondition
 fi
 
+if staged_matches 'TASK-QUEUE.md' 'scripts/*.sh'; then
+    queue-kit/checks/check-queue-slug-liveness.sh || hook_fail check-queue-slug-liveness
+fi
+
 if staged_matches 'TASK-QUEUE.md' 'SPEC-*.md' '*/SPEC-*.md'; then
     canon-kit/checks/check-amendment-queue.sh || hook_fail check-amendment-queue
 fi

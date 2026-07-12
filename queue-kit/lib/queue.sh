@@ -39,6 +39,8 @@ declare -p QUEUE_KIT_REQUIRED_SECTIONS &>/dev/null \
 
 declare -p QUEUE_KIT_PROSE_LEADS &>/dev/null || QUEUE_KIT_PROSE_LEADS=("Protocol:")
 
+declare -p QUEUE_KIT_PROSE_SURFACE_GLOBS &>/dev/null || QUEUE_KIT_PROSE_SURFACE_GLOBS=()
+
 [[ -v QUEUE_KIT_PRECONDITION_REGEX ]] || QUEUE_KIT_PRECONDITION_REGEX='revisit when|once [^.]*(lands|ships|is (done|ready|merged))|gated on|contingent on|waiting on|pending [a-z]|blocked on'
 
 declare -p QUEUE_KIT_LESSON_TAGS &>/dev/null || QUEUE_KIT_LESSON_TAGS=()

@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **docs-queue-slug-liveness** [spec: SPEC-slug-liveness.md] — a slug-shaped bold-code token
-  in a consumer-named prose surface is a queue-membership claim; a new queue-kit gate
-  resolves each against the live slug set, so the site can't call a landed task deferred.
 - **footprint-page** [spec: SPEC-footprint-page.md] — generated, freshness-gated docs page
   publishing each kit's measured context footprint (always-loaded vs load-triggered, exact
   line and word counts, a labeled token estimate); kit-shipped share only.
@@ -146,6 +143,7 @@
 
 ## Done
 
+- docs-queue-slug-liveness
 - template-doc-governance
 - local-env-profile
 - lifecycle-skill-adoption-steering

@@ -29,6 +29,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-task-names
    check-task-conservation
    check-queue-prose-precondition
+   check-queue-slug-liveness
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then

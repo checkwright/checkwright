@@ -36,6 +36,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-task-names
    check-task-conservation
    check-queue-prose-precondition
+   check-queue-slug-liveness
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then

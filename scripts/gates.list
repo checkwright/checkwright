@@ -40,6 +40,7 @@ check-tag-lead-line
 check-task-names
 check-task-conservation
 check-queue-prose-precondition
+check-queue-slug-liveness
 check-amendment-queue
 check-spec-dod-singleton
 check-spec-derivable-section

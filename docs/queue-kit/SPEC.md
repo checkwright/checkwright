@@ -53,6 +53,11 @@ Tags are square-bracket literals with fixed spelling (mechanism, not config
 sits on its bullet's **lead line** — the only line the parsing tools scan
 (enforced by `check-tag-lead-line`).
 
+Outside the queue file, living prose claims a task's queue membership with one
+grammar: a **bold-code token** — `` **`<slug>`** `` whose token matches the
+slug grammar — which `check-queue-slug-liveness` resolves against the live
+slug set on the configured prose surfaces (§check-queue-slug-liveness).
+
 - `[blocked-by: <slug>]` — the entry is unpickable until `<slug>` completes.
   Repeat per blocker. Must resolve to a live task (active or deferred — a
   deferred blocker stands; it is unbuilt); a blocker in the done section is a
@@ -110,6 +115,12 @@ Knobs:
 - `QUEUE_KIT_WRAP_BUDGET` — default `100` (`check-queue-wrap` gate floor).
 - `QUEUE_KIT_PROSE_LEADS` — array of column-0 lead tokens exempt from the
   hygiene gate's no-prose axis, default `("Protocol:")`.
+- `QUEUE_KIT_PROSE_SURFACE_GLOBS` — array of repo-root-relative globs naming
+  the living-prose surfaces `check-queue-slug-liveness` scans, default empty
+  (no surface makes queue claims until the consumer opts one in). Which pages
+  claim queue membership is the consumer's editorial posture — a kit literal
+  would presume a docs layout — so the kit ships none; a bold-code token on a
+  named surface is then a checked membership claim (§check-queue-slug-liveness).
 - `QUEUE_KIT_PRECONDITION_REGEX` — the forward-precondition trigger set for
   `check-queue-prose-precondition`, default = the shipped phrase set.
 - `QUEUE_KIT_REQUIRED_SECTIONS` — array of `##` headings that must each appear
@@ -290,6 +301,26 @@ matching — and scoped to the active sections (the deferred section uses
 "revisit when" as normal vocabulary and is exempt). FP-bearing by
 construction (parsing prose intent); the blocking grade is justified by a
 silent pick attested in production use and the bounded scope.
+
+### check-queue-slug-liveness
+
+Invariant: on every prose surface named by `QUEUE_KIT_PROSE_SURFACE_GLOBS`,
+every slug-shaped bold-code token — `` **`<token>`** `` whose token matches the
+slug grammar (`[a-z0-9][a-z0-9-]*`, so a `--flag` mention falls outside) —
+resolves against the queue's live slug set (`lib/queue.sh`'s `queue_live_slugs`,
+active + deferred). A token naming no live task is a dead membership claim,
+reported by file, line, and slug. The slug set excludes done tasks by
+construction: prose about landed work must drop the bold-code form and cite the
+owning SPEC instead, so a living page can never keep calling a landed task
+queued.
+
+The bold-code token is prose's *only* sanctioned queue-membership claim
+(§The tag algebra) — a grammar narrow enough for a gate to read, so the
+living-page current-state rule stops being a standing duty and becomes a
+checked contract. Default-empty knob: a consumer with no configured surface
+no-ops clean; the surfaces are consumer editorial config, never a kit literal
+(the provenance seam). Resolution direction is one-way (`dir=one`): the queue
+is ground truth, the prose the audited follower.
 
 ### templates/
 
