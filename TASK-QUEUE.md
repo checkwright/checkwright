@@ -139,6 +139,15 @@
   enabled set, Rust demoted from the tool's identity to its shipped default
   extractor, and the session-context nudge line reworded to match. Surfaced
   2026-07-12 as site feedback on context-kit's README.
+- **pages-parser-version-fidelity** [needs-spec] — check-docs-render-fidelity renders through
+  whatever kramdown the box has (the `SITE_KIT_RENDERER` default), not the exact version GitHub
+  Pages ships (kramdown 2.4.0 via the github-pages gem at surfacing). Version skew could
+  false-clean a leakage class Pages still exhibits but a newer kramdown fixed. Disposition to
+  design: state the skew as a render-fidelity honest-limit and document the exact-pin path
+  (`SITE_KIT_RENDERER` → a github-pages-locked bundle), versus auto-resolving the pinned gem —
+  rejected as the default since bundler+fetch breaks the hermetic no-fetch render contract.
+  Surfaced 2026-07-12 building docs-render-fidelity-gate; upstream root cause filed as
+  gettalong/kramdown#843 (both 2.4.0 and 2.5.2 exhibit it, so no divergence on this tree today).
 ## Done
 
 - docs-nav-ia
