@@ -18,3 +18,4 @@ doctrine-and-adoption build 21dfc98f 2026-07-12
 doctrine-and-adoption build 187915f7 2026-07-12
 doctrine-and-adoption build 17e8bcc0 2026-07-12
 doctrine-and-adoption validate 88656891 2026-07-12
+doctrine-and-adoption close 2f87a782 2026-07-12
