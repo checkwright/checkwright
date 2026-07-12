@@ -648,9 +648,9 @@ gate graph. The binding is the value: either side's drift breaks it visibly
 resolves — leaving only the reverse, an uncovered requirement, a review
 concern), which is why it blesses only its own one-line binding, never a
 relocated block — restatement couples nothing, it just forks the why into a
-second copy no gate reads. `comment-tier-exempt:
-<reason>` is the honest directive for a genuinely-local fact below SPEC altitude
-that neither tier owns.
+second copy no gate reads. `comment-tier-exempt: <reason>` is the honest
+directive for a genuinely-local fact below SPEC altitude that neither tier
+owns.
 
 One shape overrides the window: a full-line comment carrying a **restated
 collection total** — the count grammar of §check-manifest-count, over the same

@@ -3,8 +3,10 @@
 A docs site served from the repository (GitHub Pages and equivalents) has two
 truths a gate battery must keep straight: what the *tree* says about the site's
 host, and whether the *live deployment* is actually up. site-kit gates the
-first and ships a template for the second, holding the boundary between them so
-neither leaks into the other.
+tree-side truths — the cited host, and whether each page renders faithfully
+through the platform's own parser — and ships a template for the deployment
+liveness, holding the boundary between gate and monitor so neither leaks into
+the other.
 
 ## The monitor boundary
 
@@ -42,6 +44,13 @@ told to load but cannot find. Knobs:
 - `SITE_KIT_EXEMPT_PATHS` — array of path globs skipped during the scan,
   default `("*/gate-tests/*" "*docs/posts/*")`: fixture trees deliberately cite
   aliases, and dated posts are immutable published artifacts.
+- `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` walks
+  for tracked markdown pages, default `docs`.
+- `SITE_KIT_RENDERER` — array, the stdin→stdout GFM-to-HTML command
+  `check-docs-render-fidelity` renders each page through, default the kramdown
+  CLI invocation with GFM input — `ruby -e '…Kramdown::Document…input: "GFM"…'`,
+  the parser GitHub Pages pins. A consumer whose Pages stack differs points this
+  at its own renderer; an unresolvable one fails the gate closed.
 - `SITE_KIT_CONFIG_FILE` — the loader override; when set it must resolve, else
   the gate exits 2 rather than silently run on defaults.
 
@@ -61,6 +70,51 @@ content only, so an untracked local file is never a source; a `git ls-files`
 error is fail-closed (exit 2). The positional form
 `check-docs-cname-parity.sh [scan-root] [cname-file] [config-file]` lets a
 fixture point all three at a synthetic tree without touching consumer config.
+
+## check-docs-render-fidelity
+
+Invariant: every tracked markdown page under `SITE_KIT_DOCS_DIR`, rendered
+through the pinned Pages parser, leaks no code-fence marker into rendered text
+and promotes no code-fenced line into a heading. GitHub Pages renders through
+kramdown's GFM parser, which diverges from github.com's cmark: consecutive
+fenced blocks inside one list item corrupt the page — the second fence prints
+literally and a `#`-leading skeleton line becomes a heading — so a tree that
+reads green on github.com can ship a garbled Pages site with no gate in the
+path. This gate is the faithful-artifact-verification class mechanized for that
+artifact: it renders the real output and asserts the observed leakage class,
+rather than trusting the source.
+
+The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
+`git ls-files` (every underscore-prefixed directory segment excluded — those are
+Jekyll internals, not published pages), strips Jekyll front matter so it renders
+exactly the body kramdown sees, and asserts two properties per page:
+
+1. **No fence leakage** — the rendered HTML's text content (outside `<pre>` and
+   inline `<code>`) carries no literal backtick fence run. A leaked fence is the
+   signature of a block the parser failed to close, regardless of which
+   construct confused it.
+2. **No heading leakage** — the count of rendered heading elements never exceeds
+   the count of source heading lines the gate's own fence-aware scan (cmark
+   rules: ATX and setext, both skipped inside a fenced or `~`-fenced block)
+   places outside any code context. A surplus rendered heading is a `#` line
+   promoted out of a broken code block.
+
+The renderer is the gate's oracle. Before scanning, the gate probes it on a
+one-line document; an unresolvable or non-producing renderer exits 2 with a help
+line naming the dependency (ruby plus the kramdown-parser-gfm gem, or a
+`SITE_KIT_RENDERER` override) — a gate that cannot run its oracle refuses, never
+a false clean. That dependency joins the *consumer's* toolchain only when the
+consumer registers this gate; it stays outside env-probe's probe-set floor, and
+`docs/install.md`'s Requirements prose states the tier (SPEC-os-support.md owns
+that page's ruling). A consumer with no published docs site simply omits the
+gate by the registry-not-array convention and never installs the dependency.
+
+Honest limit: this is not a full render-diff between the two parsers. It
+mechanizes the observed leakage class — fences and headings — and stays silent
+on divergences that corrupt neither. The positional form
+`check-docs-render-fidelity.sh [docs-dir] [config-file]` lets a fixture point
+the docs dir and renderer at a synthetic tree without touching consumer config.
+`precommit` tier, coupling the docs tree.
 
 ## lib/site.sh
 
@@ -91,6 +145,7 @@ consumer.
 The kit does not resolve DNS, provision certificates, or configure the host
 platform — those are the deployment's concerns, surfaced by the monitor, not
 governed by a gate. It does not gate the *content* of the docs site (links,
-commands, prose): that is canon-kit's charge over the governed doc set. And it
-holds no opinion on which host a project uses — only that the tree cites one,
+commands, prose): that is canon-kit's charge over the governed doc set —
+`check-docs-render-fidelity` gates how a page *renders*, never what it says. And
+it holds no opinion on which host a project uses — only that the tree cites one,
 and that the CNAME file names it.

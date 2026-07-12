@@ -205,6 +205,10 @@ fi
 
 site-kit/checks/check-docs-cname-parity.sh || hook_fail check-docs-cname-parity
 
+if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/posts/*.md'; then
+    site-kit/checks/check-docs-render-fidelity.sh || hook_fail check-docs-render-fidelity
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
     canon-kit/checks/check-docs-cmd.sh || hook_fail check-docs-cmd
 fi

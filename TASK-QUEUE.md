@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **docs-render-fidelity-gate** [spec: SPEC-render-fidelity.md] — site-kit gate rendering every
-  docs page with the pinned Pages parser (kramdown-GFM) and asserting no fence or heading
-  leakage; fail-closed when the renderer is absent.
 - **knob-default-source-coupling** [spec: SPEC-knob-default-coupling.md] — canon-kit gate
   coupling every literal knob fallback in kit source to the default the owning SPEC states,
   sharing check-knob-citation's default-statement grammar.
@@ -148,5 +145,6 @@
 - value-rollup-page
 - harness-layer-positioning
 - os-support-statement
+- docs-render-fidelity-gate
 
 ## Lessons Learned

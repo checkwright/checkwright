@@ -159,8 +159,8 @@ assertions, blocking the two attested tamper shapes:
 
 **Honest limit:** the gate blocks by commit *shape*; it does not catch
 semantic weakening inside a legitimate scripts-only commit — the by-eye
-diff review of agent gate edits remains a supervisor duty. `--fixture
-<dir>` injects `staged-files` / `added-exemptions` lists (fixture-pair test
+diff review of agent gate edits remains a supervisor duty. `--fixture <dir>`
+injects `staged-files` / `added-exemptions` lists (fixture-pair test
 capability); live mode reads `git diff --cached`.
 
 ## usage-verdict

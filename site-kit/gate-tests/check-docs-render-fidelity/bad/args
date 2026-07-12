@@ -1,0 +1,5 @@
+# Point the gate at this fixture's synthetic docs tree. The Install skeleton is
+# the real historical bug shape — consecutive fenced blocks inside one list item,
+# where the second fence prints literally and the '# contract:' line is promoted
+# to a heading under kramdown-GFM. The gate must REJECT.
+tree/docs

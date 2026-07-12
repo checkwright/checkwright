@@ -1,0 +1,4 @@
+# Point the gate at this fixture's synthetic docs tree. The Install skeleton uses
+# indented (4-space) code blocks — the restructure that renders faithfully under
+# kramdown-GFM. The gate must PASS.
+tree/docs
