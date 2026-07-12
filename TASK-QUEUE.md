@@ -321,7 +321,20 @@
   inventory beside the tightened-gates declaration, a release-time sweep,
   not a standing gate; the consumer-facing mechanism (queue-bound
   deprecation, the boundary-sweep skill step, the backlog KPI) is
-  deprecation-lifecycle's.
+  deprecation-lifecycle's. Extended 2026-07-12 (operator ask — does upgrade auto-clean the
+  customer slot fills the new template absorbs): the shim upgrade path splits three ways, and
+  only the third needs design here. (1) slot-set drift — a template that adds, drops, or
+  renames a declared slot reddens the consumer's shim at `check-skill-binding` (it binds the
+  template's exact slot set), so Phase-B names the orphaned or missing slot. (2) verbatim
+  absorption — `check-shim-restatement` couples the stage-skill templates into its dedup corpus
+  and re-fires when the new template lands, so a slot fill the template now covers by a 9-word
+  run reddens automatically, naming the shared phrase. (3) semantic residual — a slot fill the
+  new template now *means* to cover but the consumer worded differently passes both gates (the
+  n-gram holds copy-shape only, the SPEC's stated honest limit) and is un-gateable; it belongs
+  in this rung's phase-B disposition skill as a judgment step (surface the changed slots and
+  shim slot values, judge redundancy) — the ungateable-class-audit-cadence pattern with the
+  upgrade event as the cadence. So the smoke asserts (1) and (2) mechanically; the skill owns
+  (3).
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
