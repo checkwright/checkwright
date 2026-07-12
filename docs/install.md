@@ -35,8 +35,7 @@ your `PATH`, and the note says what breaks without it:
   their inputs with it.
 - `awk` — the gate family's line scanning and field extraction are written in
   awk; most checks cannot run without it.
-- `python3` — context-kit's surface indexers and guard-kit's prompt scanner
-  shell out to it.
+- `python3` — context-kit's surface indexers shell out to it.
 - `shellcheck` — the `check-shellcheck` meta-gate lints every shipped script,
   and a lint finding blocks the commit.
 

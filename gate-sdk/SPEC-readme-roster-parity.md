@@ -10,11 +10,16 @@ kit's shipped `checks/` dir, both directions. This reapplies the
 gate asserts parity over the hand-maintained list rather than an emitter
 generating it.
 
-- **Marker block.** Each kit README wraps its existing register-the-gates
-  fenced block in `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->`
-  markers (the `docs/install.md` `toolchain:begin` shape). Inside the markers,
-  a line's first `check-`-prefixed token is a roster name; everything after it
-  (annotation prose, `#` clauses) the gate never reads.
+- **Marker block.** Each kit README wraps its register-the-gates fenced block
+  in `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers (the
+  `docs/install.md` `toolchain:begin` shape). Inside the markers, a line's
+  first `check-`-prefixed token is a roster name; everything after it
+  (annotation prose, `#` clauses) the gate never reads. Not every README has a
+  parity-shaped block to wrap (align audit, 2026-07-13): gate-sdk's only
+  fenced list is its quick-start subset (7 of 18 shipped checks — pedagogy for
+  a new consumer's first `gates.list`, which stays as-is), so its README gains
+  a separate full roster block; the audit normalized context-kit's prose
+  register list to the fenced shape, so build wraps it like the rest.
 - **Parity assertion, per kit.** The roster name set equals the set of that
   kit's `checks/` script basenames, extension stripped. A shipped gate missing
   from the roster and a roster name with no shipped check are both red, each
@@ -54,8 +59,9 @@ generating it.
   owning section.
 - gate-sdk/SPEC.md §Consumer smoke: the kit-landing checklist's README item
   names the gate-roster markers as the register-block convention.
-- Every kit README that ships checks gains the markers around its existing
-  register block; gate-sdk's own README also gains the new gate's roster row.
+- Every kit README that ships checks gains the markers around its register
+  block; gate-sdk's own README gains the full-roster block (quick-start subset
+  unchanged beside it) including the new gate's roster row.
 
 ## Definition of Done
 

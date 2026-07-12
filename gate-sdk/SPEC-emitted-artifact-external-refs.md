@@ -35,9 +35,12 @@ statements pass unseen, caught by review, not the gate).
 
 - **External references** — producers: `emit_graph` (the mermaid import) and
   the consumer's theme override functions (chrome links). Consumer: the new
-  assertion inside `check-graph`'s existing artifact pass (both artifact
-  homes, the workflow-dir default and the docs republication, exactly as the
-  freshness byte-compare already walks them).
+  assertion inside `check-graph`'s existing artifact pass, scanning the same
+  in-memory emission the asset-href assertion already greps — one artifact
+  home per consumer, the knob-resolved `GATE_SDK_GRAPH_ARTIFACT` path (this
+  repo: `docs/check-graph.html`); the manifest's second listed home is a
+  static trigger couple, not a second walked copy (gate-sdk/SPEC.md
+  §check-graph, the dual-couple manifest paragraph).
 - **`GATE_SDK_GRAPH_EXTERNAL_REFS`** — producer: the consumer's gate config
   (the `<KIT>_<KNOB>` env shape); this repo sets its two chrome prefixes
   beside its other gate-sdk knobs. Reader: `check-graph`'s external-ref

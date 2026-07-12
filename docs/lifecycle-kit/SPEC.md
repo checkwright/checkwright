@@ -236,7 +236,12 @@ the first 8 hex of the most recently written transcript under the sessions dir
 `~/.claude`, and the cwd with every non-alphanumeric char mapped to `-`;
 override `LIFECYCLE_KIT_SESSIONS_DIR`). Newest-file selection is the documented
 single-operator assumption (one live session per project tree); an absent dir
-or transcript exits 2. Not a gate — a `bin/` helper invoked (now internally,
+or transcript exits 2. A lead-dispatched stage session (§templates/lead.md)
+breaks that assumption by design: its transcript lands in a `subagents/`
+subdirectory the top-level glob never sees, so the newest top-level transcript
+is the lead's own and the derived id collides with a prior stage's stamp at
+`check-stage-evidence`. Such a session points `LIFECYCLE_KIT_SESSIONS_DIR` at
+that `subagents/` directory before invoking `enter-stage.sh`. Not a gate — a `bin/` helper invoked (now internally,
 by `enter-stage.sh`) for the `<session-id>` field; the stage skills reach it
 through `enter-stage.sh` rather than calling it directly.
 

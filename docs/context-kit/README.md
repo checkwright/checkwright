@@ -8,7 +8,8 @@ generated: true
 Token-economics-aware context management for stateless agent sessions: an
 index-first reading toolset, a session-start hook that assembles a compact
 brief, a meter that tracks the always-loaded surface against a committed
-baseline, one gate over the densest always-loaded section, a close-stage
+baseline, one gate over the densest always-loaded section, a freshness-gated
+per-kit token-footprint projection, a close-stage
 brevity pass that reacts to the meter's delta, and a memory-off gate pair
 (settings pins plus a local memory-dir scan) that keeps the harness's
 ungoverned auto-memory surface disabled.
@@ -28,14 +29,24 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 hook approximation and the session-context template also expect
 [queue-kit](https://github.com/checkwright/checkwright/tree/master/queue-kit/). Then:
 
-1. Register the gates — add `check-brevity`, `check-settings-pins`, and
-   `check-memory-off` to your `gates.list`. They resolve through gate-sdk's
-   registry path (your gates dir first, then each kit's `checks/`), and their
-   `# graph:` manifests put them in the generated pre-commit hook:
-   `bash gate-sdk/bin/gen-pre-commit.sh --write`. The memory-off gates are
-   inert until you opt in — `check-settings-pins` skips clean with no pins file,
-   so create `settings-pins.conf` (one `<jq path> = <expected JSON>` per line)
-   naming the keys to hold, e.g. the auto-memory-disabling ones.
+1. Register the gates — add to your `gates.list`:
+
+   ```
+   check-brevity
+   check-settings-pins
+   check-memory-off
+   check-footprint-fresh
+   ```
+
+   They resolve through gate-sdk's registry path (your gates dir first, then
+   each kit's `checks/`), and their `# graph:` manifests put them in the
+   generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
+   The memory-off gates are inert until you opt in — `check-settings-pins`
+   skips clean with no pins file, so create `settings-pins.conf` (one
+   `<jq path> = <expected JSON>` per line) naming the keys to hold, e.g. the
+   auto-memory-disabling ones. `check-footprint-fresh` byte-gates a committed
+   `docs/footprint.md` against `bin/footprint.sh --emit`; register it when you
+   publish that projection.
 
 2. Wire the session-start hook — copy `templates/session-context.sh` into your
    gates dir, edit its `[EDIT ME]` sections (layout judgment, not mechanism),
@@ -63,6 +74,7 @@ bash context-kit/bin/md-section.sh <file> <heading> # print one section by headi
 bash context-kit/bin/pub-index.sh [paths…]          # Rust public API surface
 bash context-kit/bin/always-loaded.sh               # standing surface vs baseline (one line)
 bash context-kit/bin/always-loaded.sh --update-baseline   # a close-stage act
+bash context-kit/bin/footprint.sh                   # per-kit token footprint (--emit: the committed page)
 ```
 
 ## Test
