@@ -20,6 +20,15 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      # This repo registers check-docs-render-fidelity, whose oracle renders each
+      # docs page through ruby's kramdown GFM parser (site-kit/SPEC.md
+      # §check-docs-render-fidelity). The runner ships ruby but not the gem, so
+      # provision it into the system ruby the gate's bare `ruby` resolves. Stays
+      # a bash `run:` (no setup-ruby action) to keep the checkout+bash tamper
+      # floor; rides this filled instance, not the generic template, because the
+      # dependency joins the toolchain only for a consumer that registers the gate.
+      - name: render-fidelity gate deps (kramdown GFM parser)
+        run: sudo gem install --no-document kramdown-parser-gfm
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
       - name: fixture suites (derived from */gate-tests)
