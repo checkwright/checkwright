@@ -134,6 +134,16 @@
   exhibit it, no divergence on this tree today). This rung is about version *skew* in general,
   not that bug: the trigger is a future kramdown that fixes some *other* leak class Pages still
   ships, so the gate false-cleans against the newer parser.
+- **render-fidelity-table-leakage** [needs-spec] — extend check-docs-render-fidelity with a
+  third leakage assertion beside fence and heading: a source GFM table (a pipe row followed by a
+  fence-aware `| --- |` delimiter) that produces no rendered `<table>` is leakage — the same
+  source-vs-rendered count parity the heading assertion already uses. Surfaced 2026-07-13:
+  docs/value.md's rollup table rendered as a literal-pipe paragraph because the generated block
+  abutted its `:end` marker with no blank line (kramdown terminates a table only on a blank line),
+  and the fence/heading assertions stayed silent — the gate's stated honest limit (fences and
+  headings only) made concrete. Emitter fixed that instance (gen-value-rollup.sh emits a trailing
+  blank); this rung mechanizes the channel so the next table-break reds instead of shipping.
+
 ## Done
 
 ## Lessons Learned

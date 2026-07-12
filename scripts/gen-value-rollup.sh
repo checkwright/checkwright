@@ -109,6 +109,10 @@ emit_body() {
     printf '%s\n' "$hdr" "$sep"
     printf '%s\n' "${rows[@]}"
     printf '%s\n' "$trow"
+    # comment-tier-exempt: load-bearing blank — kramdown ends a GFM table only on a
+    # blank line, else the :end marker abuts the last row and the block renders as a
+    # literal-pipe paragraph; command substitution strips it so the byte-compare holds.
+    printf '\n'
 }
 
 if [[ "$emit" -eq 1 ]]; then
