@@ -128,11 +128,18 @@ the skill on a blocking verdict — so they are not resident here.
   links/commands resolve like any doc. The fixture is the unit of contribution —
   edit the guide, not GitHub UI settings, to change what arrives.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
-  `CNAME`), repo-root-governed, no owning kit. Living pages are governed prose
-  under the anti-restatement doctrine (cite downward, never restate a SPEC's
-  invariant); dated `docs/posts/` are immutable, temporal-exempt but still
-  link/command-resolved (`scripts/canon-config.sh`). `check-docs-kit-parity`
-  holds every kit's row in `docs/index.md`.
+  `CNAME`), repo-root-governed, no owning kit. Its chrome — the Jekyll layout,
+  nav (Liquid over the `nav_order` front matter), client-side search, and theme
+  selector — lives in `docs/_config.yml`, `docs/_layouts/`, `docs/_includes/`,
+  and `docs/assets/`. Living pages are governed prose under the anti-restatement
+  doctrine (cite downward, never restate a SPEC's invariant); dated `docs/posts/`
+  are immutable, temporal-exempt but still link/command-resolved
+  (`scripts/canon-config.sh`). The on-site SPEC mirror (`docs/<kit>/SPEC.md`,
+  `docs/<kit>/README.md`, `docs/doctrine-kit/DOCTRINE.md`) is generated —
+  regenerate after editing any kit SPEC/README/DOCTRINE:
+  `bash scripts/gen-docs-mirror.sh --write` (`check-docs-mirror-fresh` byte-gates
+  it). `check-docs-kit-parity` holds every kit's row in `docs/index.md` and the
+  nav front-matter block on every `docs/<kit>/index.md`.
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
   violation blocked → fix → green), built on the gate-sdk consumer-smoke
   mechanics; it writes nothing in-tree (`DEMO_TMP_DIR` its only knob) and is the

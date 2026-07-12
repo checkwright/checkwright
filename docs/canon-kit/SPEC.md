@@ -937,19 +937,24 @@ staleness, not stability.
 
 ### The reference-link grammar
 
-A docs-site page reaches full reference through the repo tree, not an on-site
-projection: the served site is deliberately lite, so a page cites an in-repo
-artifact (a kit's `SPEC.md`, `README.md`, or `DOCTRINE.md`) with an absolute
-GitHub blob link `https://<host>/<owner>/<repo>/blob/<ref>/<path>[#anchor]`,
-anchored when it cites a named section — the downward-citation shape of the
-tiering topology, extended off-site. The link is absolute because the deployed
-site serves `docs/` alone: a relative link into the surrounding tree would 404
-on the site, and the tree is browsable only on the host. Resolution belongs to
-`check-md-refs`' self-repo pass (identity derivation and the ref knob live
-there); `check-docs-link-convention` owns the shape of the relative links that
-stay inside `docs/`. On-site generated SPEC projections stay demand-gated —
-rewriting a SPEC's internal relative links at emit is a real emitter no demand
-has attested.
+A docs-site page cites two kinds of in-repo target, and the grammar splits on
+which. A *rendered-document* reference — a kit's `SPEC.md`, `README.md`, or
+`DOCTRINE.md` — cites the on-site mirror of that document *relatively* when the
+site publishes one: a generated, freshness-gated projection under `docs/<kit>/`
+that keeps reference reading on the served site. The mirror preserves the
+documents' cross-citation topology one-to-one, so the relative shape a page
+uses is the same shape the source tree uses. A *source* reference — a script, a
+gate body, config, a directory: files the site does not render — cites the tree
+with an absolute GitHub blob link
+`https://<host>/<owner>/<repo>/blob/<ref>/<path>[#anchor]`, anchored when it
+names a section, because a relative link into the unrendered surrounding tree
+would 404 on a site that serves `docs/` alone. Both are the downward-citation
+shape of the tiering topology, one on-site and one off. Resolution of the blob
+form belongs to `check-md-refs`' self-repo pass (identity derivation and the
+ref knob live there); `check-docs-link-convention` owns the shape of the
+relative links that stay inside `docs/`. The mirror is what a site opts into,
+not a precondition of the grammar: absent a published mirror, rendered-document
+references fall back to the same off-site blob form as source references.
 
 ### check-docs-link-convention
 

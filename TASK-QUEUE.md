@@ -12,16 +12,7 @@
 
 ## New Features
 
-- **docs-site-chrome** [spec: SPEC-docs-site-chrome.md] — the docs site gains its chrome:
-  a custom Primer-based layout (header with logo + wordmark, left nav sidebar derived from
-  front matter, client-side search over a Liquid-emitted index, light/dark/auto selector
-  persisted under the `checkwright-theme` key) and the generated SPEC mirror
-  (`scripts/gen-docs-mirror.sh` + `check-docs-mirror-fresh`) so reference reading stays
-  on-site — rendered-document links go relative to the mirror, blob links narrow to source
-  references (the reference-link-grammar supersession is ruled in the amendment). Logo moves
-  to `docs/assets/logo/`; the nav-parity assertion joins `check-docs-kit-parity`.
-
-- **check-graph-theme-parity** [spec: SPEC-graph-theme.md] [blocked-by: docs-site-chrome] —
+- **check-graph-theme-parity** [spec: SPEC-graph-theme.md] —
   a theme-injection seam
   in check-graph's emitter (`GATE_SDK_GRAPH_THEME`, the graph-vocab pattern): three
   optional override functions (css/header/footer), kit default byte-identical when
@@ -181,6 +172,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- docs-site-chrome
 - craft-extraction
 - scope-session-routing
 - trajectory-close-freshness
