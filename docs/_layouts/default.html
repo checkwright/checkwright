@@ -89,6 +89,16 @@
     .site-content .markdown-body code { background: var(--ck-code-bg); }
     .site-content .markdown-body pre { border: 1px solid var(--ck-border);
       white-space: pre-wrap; overflow-wrap: break-word; }
+    /* Table colors over Primer's: Primer hardcodes light cell/row backgrounds,
+       which collide with the light text the dark theme sets on .markdown-body —
+       light-on-light, unreadable. Remap to theme vars so tables track the palette
+       in both themes. */
+    .site-content .markdown-body table th,
+    .site-content .markdown-body table td { border-color: var(--ck-border); }
+    .site-content .markdown-body table tr { background: var(--ck-bg);
+      border-top-color: var(--ck-border); }
+    .site-content .markdown-body table tr:nth-child(2n) { background: var(--ck-sidebar); }
+    .site-content .markdown-body table th { background: var(--ck-sidebar); }
     /* Rouge token palette over Primer's: light values mirror the theme's shipped
        highlight CSS; the dark set is what makes highlighted code readable on the
        dark backgrounds above. */
