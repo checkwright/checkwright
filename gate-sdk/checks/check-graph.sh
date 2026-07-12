@@ -23,6 +23,12 @@ if [[ -f "$VOCAB_FILE" ]]; then
     source "$VOCAB_FILE"
 fi
 
+THEME_FILE="${GATE_SDK_GRAPH_THEME:-$GATES_DIR/graph-theme.sh}"
+if [[ -f "$THEME_FILE" ]]; then
+    # shellcheck disable=SC1090  # consumer-supplied rule content, path is config
+    source "$THEME_FILE"
+fi
+
 in_set() { local t="$1"; shift; local v; for v in "$@"; do [[ "$t" == "$v" ]] && return 0; done; return 1; }
 
 surface_layer() {
@@ -39,6 +45,45 @@ layer_specs() {
     else
         printf '%s\n' 'surfaces:governed surfaces'
     fi
+}
+
+graph_theme_css_default() {
+    cat <<'CSS'
+    :root { color-scheme: light dark; }
+    body { margin: 0; font: 15px/1.5 system-ui, sans-serif;
+           background: #fff; color: #1a1a1a; }
+    header { padding: 1rem 1.5rem; border-bottom: 1px solid #ddd; }
+    header h1 { margin: 0 0 .35rem; font-size: 1.25rem; }
+    header p { margin: .25rem 0; max-width: 68rem; }
+    .status { font-size: .85rem; opacity: .7; }
+    main { padding: 1rem 1.5rem; }
+    .legend { margin-bottom: .75rem; font-size: .9rem; }
+    .legend .valve { display: inline-block; width: 22px; border-top: 3px solid #d97706; }
+    .viewport { border: 1px solid #ddd; border-radius: 8px; padding: 16px;
+                background: #fafafa; overflow: auto; height: 78vh; cursor: grab; }
+    .viewport.grabbing { cursor: grabbing; }
+    .viewport svg { transform-origin: 0 0; max-width: none; }
+    .hint { margin: .5rem 0 0; font-size: .8rem; opacity: .6; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #16181d; color: #e6e6e6; }
+      header { border-color: #333; }
+      .viewport { border-color: #333; background: #0f1115; }
+    }
+CSS
+}
+
+emit_theme_css() {
+    if declare -F graph_theme_css >/dev/null; then graph_theme_css; else graph_theme_css_default; fi
+}
+
+emit_theme_header() {
+    declare -F graph_theme_header >/dev/null && graph_theme_header
+    return 0
+}
+
+emit_theme_footer() {
+    declare -F graph_theme_footer >/dev/null && graph_theme_footer
+    return 0
 }
 
 mapfile -t RESOLVE_DIRS < <(gate_check_dirs)
@@ -143,29 +188,15 @@ COMMENT_HEAD
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Check-coupling graph</title>
   <style>
-    :root { color-scheme: light dark; }
-    body { margin: 0; font: 15px/1.5 system-ui, sans-serif;
-           background: #fff; color: #1a1a1a; }
-    header { padding: 1rem 1.5rem; border-bottom: 1px solid #ddd; }
-    header h1 { margin: 0 0 .35rem; font-size: 1.25rem; }
-    header p { margin: .25rem 0; max-width: 68rem; }
-    .status { font-size: .85rem; opacity: .7; }
-    main { padding: 1rem 1.5rem; }
-    .legend { margin-bottom: .75rem; font-size: .9rem; }
-    .legend .valve { display: inline-block; width: 22px; border-top: 3px solid #d97706; }
-    .viewport { border: 1px solid #ddd; border-radius: 8px; padding: 16px;
-                background: #fafafa; overflow: auto; height: 78vh; cursor: grab; }
-    .viewport.grabbing { cursor: grabbing; }
-    .viewport svg { transform-origin: 0 0; max-width: none; }
-    .hint { margin: .5rem 0 0; font-size: .8rem; opacity: .6; }
-    @media (prefers-color-scheme: dark) {
-      body { background: #16181d; color: #e6e6e6; }
-      header { border-color: #333; }
-      .viewport { border-color: #333; background: #0f1115; }
-    }
+HEAD
+    emit_theme_css
+    cat <<'HEAD_CHROME'
   </style>
 </head>
 <body>
+HEAD_CHROME
+    emit_theme_header
+    cat <<'HEAD'
   <header>
     <h1>Check-coupling graph</h1>
     <p>Which content surfaces each <code>gates.list</code> gate binds together.
@@ -233,9 +264,12 @@ HEAD
     vp.addEventListener('pointercancel', end);
     vp.addEventListener('dblclick', () => { zoom = 1; applyZoom(); });
   </script>
+TAIL
+    emit_theme_footer
+    cat <<'TAILEND'
 </body>
 </html>
-TAIL
+TAILEND
 }
 
 # spec: gate-sdk/SPEC.md §check-graph (assertion G) — validate `# graph:` manifests in SPEC-*.md amendment bodies

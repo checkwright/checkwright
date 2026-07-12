@@ -32,6 +32,8 @@ override with `GATE_SDK_GATES_DIR`) holding:
   sets any `GATE_SDK_*` layout knob so the override outlives the shell that set
   it (see the loader paragraph below).
 - `graph-vocab.sh` — optional rule content for `check-graph` (see there).
+- `graph-theme.sh` — optional consumer theme for `check-graph`'s emitted
+  artifact (see there).
 - `core-files.list` — optional manifest for `check-core-files`: the
   repo-relative paths that must stay present and tracked (see there).
 - `identity.conf` — optional manifest for `check-identity`: the git identity
@@ -50,7 +52,10 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `<workflow-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
 e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
-(default `TASK-QUEUE.md`), `GATE_SDK_CORE_FILES_FILE` (default
+(default `TASK-QUEUE.md`), `GATE_SDK_GRAPH_THEME` (default
+`<gates-dir>/graph-theme.sh`; the optional consumer theme file `check-graph`
+sources to inline host-site tokens/chrome into the emitted artifact — see
+there), `GATE_SDK_CORE_FILES_FILE` (default
 `<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default
 `<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
@@ -609,6 +614,31 @@ it, and (B) already guarantees editing a *coupled* surface fires the gate. The
 statically resolvable slice of that parity is carried by its sibling
 `check-reads-couples` (§check-reads-couples); the undecidable remainder stays
 the author's duty under §The `# graph:` manifest.
+
+Theme seam (`emit_graph`): the emitted HTML artifact bypasses the consumer's
+site generator, so it renders foreign beside the rest of a docs host unless the
+host theme is inlined — and the theme is consumer-specific, so the emitter must
+not hardcode it. `GATE_SDK_GRAPH_THEME` (default `<gates-dir>/graph-theme.sh`,
+mirroring `GATE_SDK_GRAPH_VOCAB`) names a consumer file sourced when present at
+every emission. It may define override functions, the `graph_surface_layer`
+pattern: `graph_theme_css` emits the `<style>` element's body (replacing the
+kit's default stylesheet), `graph_theme_header` emits a fragment directly after
+`<body>` (site chrome above the kit header), and `graph_theme_footer` emits a
+fragment directly before `</body>`. An absent file or an undefined function
+falls back to the kit default, so a themeless consumer's output stays
+byte-identical. Determinism: assertion E's in-memory emission and the `--emit` a
+consumer redirects into the artifact resolve the same theme path, so the
+byte-compare holds; the artifact stays generated-only, a styling change landing
+in the theme file (or the emitter), never a hand-edit.
+Self-containment is unchanged: injected content is inline, and a theme emitting
+a relative asset href must resolve under the artifact dir or assertion F is red
+— the existing gate already polices the link-the-site-stylesheet shortcut into
+inlining. Dark mode is the theme owner's disposition: the kit default keeps its
+light+dark scheme, and because the emitted mermaid init keys on
+`prefers-color-scheme`, a theme's chrome must honor that query too or it clashes
+with a dark-rendered graph on the same page. This repo's `scripts/graph-theme.sh`
+supplies the docs-host tokens, header, and footer (both schemes), so
+`docs/check-graph.html` reads as the same site.
 
 ### check-reads-couples
 

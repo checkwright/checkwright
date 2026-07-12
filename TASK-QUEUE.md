@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **check-graph-theme-parity** [spec: SPEC-graph-theme.md] —
-  a theme-injection seam
-  in check-graph's emitter (`GATE_SDK_GRAPH_THEME`, the graph-vocab pattern): three
-  optional override functions (css/header/footer), kit default byte-identical when
-  unset; this repo's `scripts/graph-theme.sh` supplies Primer-shaped tokens + site
-  chrome (light+dark) so `docs/check-graph.html` reads as the same site. Artifact
-  stays generated-only; self-containment and assertion-F href policing unchanged.
-
 ## Technical Debt
 
 ## Deferred
@@ -228,6 +220,7 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
+- check-graph-theme-parity
 - docs-site-chrome
 - craft-extraction
 - scope-session-routing
