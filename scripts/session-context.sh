@@ -110,4 +110,11 @@ if [[ -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
         echo "$rules_block"
     fi
 fi
+
+ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"   # context-kit env-probe profile
+if [[ -f "$ENV_PROFILE_FILE" ]]; then
+    echo
+    echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
+    cat "$ENV_PROFILE_FILE" 2>/dev/null || true
+fi
 echo "────────────────────────────────────────────────────────────────────────"

@@ -46,9 +46,15 @@ hook approximation and the session-context template also expect
 3. Set the baseline — `bash context-kit/bin/always-loaded.sh --update-baseline`
    and commit `.workflow/always-loaded-baseline.txt`.
 
-4. Optional — retune: copy `templates/context-config.sh` into your gates dir and
+4. Seed your env profile — `bash context-kit/bin/env-probe.sh` writes a
+   marker-bounded machine profile (OS, package manager, toolchain versions,
+   absent tools) into `ENV.local.md` and seeds a hand-authored gotchas scaffold
+   above the markers. The file is local-only (gitignore it); re-run on demand
+   when the box changes. The session-context hook emits it when present.
+
+5. Optional — retune: copy `templates/context-config.sh` into your gates dir and
    override any knob (surfaces, hook-body command, brevity file/section/budget/
-   pointer pattern). Defaults are this repo's layout. Splice
+   pointer pattern, env-profile file). Defaults are this repo's layout. Splice
    `templates/close-brevity.md` into your close skill.
 
 ## Use

@@ -101,6 +101,13 @@ session. Steps, in order:
    over-firing to an adjacent stage costs only a few lines, and the
    header-lag rule below is about *conditioning*, not about which stage's
    rules to show.
+9. **Env profile** — when the consumer-local profile file
+   (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, its whole body is
+   emitted verbatim so the session adapts its commands to the box it runs on.
+   Silent when the file is absent — the harness's own `Platform:` line is the
+   fallback, and no always-loaded cost is paid where no profile was seeded.
+   The consumer owns the file's brevity (they author the gotchas half), the
+   drift-line precedent.
 
 **The header-lag rule.** The hook runs at session start, before the
 arriving skill flips the `[stage:]` header (its first step), so a
@@ -122,6 +129,39 @@ a downstream kit's hook for ergonomics only — the trust model gains
 nothing, since `check-stage-evidence` already enforces that the stamped id
 is current. A consumer may add a local informational echo; the template
 ships none.
+
+## bin/env-probe
+
+`bin/env-probe.sh` derives a local machine profile so a session adapts to the
+box it runs on — package manager, toolchain versions, absent tools — without
+those machine facts ever landing in the public tree. It writes a
+marker-bounded generated block (`<!-- context-kit:env:begin -->` /
+`:end`, via gate-sdk's shared `inject_marker_block` helper) into the file named
+by `CONTEXT_KIT_ENV_PROFILE_FILE` (default `ENV.local.md`), replacing an
+existing block or appending a fresh one; the block carries its probe date. The
+probed half is derivation-first — never hand-maintained.
+
+**What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager
+(first present of an ordered detection walk over the known managers); the probe
+set's versions — `bash`, `git`, `jq`, `awk`, `python3`, and the kit tools' own
+shared dependency `shellcheck` (the gate battery's linter); and the absent-tools
+list (probe-set members `command -v` cannot resolve).
+
+**The content seam (consumer-local, gitignored).** Hand-authored gotchas — the
+"no `dig`/`host`; use `getent`/DoH" class a probe cannot know — live *outside*
+the markers in the same file and survive every re-probe; when the file is
+absent the probe seeds that scaffold once, then only ever rewrites the block.
+The file is `BRIEF.local.md`-class: local-only, gitignored (this repo's
+`.gitignore` and the CLAUDE.md housekeeping line carry it), so machine facts
+stay private.
+
+**Cadence — cached projection, not per-session probe.** Env changes rarely and
+hook latency is a per-session tax, so the probe runs at install ("seed your env
+profile" is an install step) and on operator demand; the block's probe date is
+the staleness signal. No freshness gate — env truth is not cheaply
+machine-verifiable and the probe is already the derivation (the
+enforcement-first carve-out; the stated install step is the enforcement).
+§The session-context hook's step 9 is the consumer of the file.
 
 ## The always-loaded meter
 
@@ -260,6 +300,13 @@ scoped attention to the lesson channels, private context to the operator's
 local brief. So the kit disables harness memory and enforces it off rather
 than governing its content.
 
+The banned class is *harness-side silent accumulation*, not every local file: an
+explicit, derived, operator-curated local file is config, not memory.
+`ENV.local.md` (§bin/env-probe) sits with `BRIEF.local.md` on the config side of
+that line — its probed half is a re-runnable derivation, its gotchas half is
+hand-curated, and both are gitignored operator surfaces the operator chose to
+keep, never a store the harness wrote to behind the tier contract.
+
 Blast-radius honesty rides the doctrine: the gates hold the tree regardless of
 a polluted session, so a memory that quietly re-accumulated degrades one
 session's judgment, never the committed baselines. This is therefore a
@@ -321,6 +368,7 @@ context-kit/
   bin/md-section.sh
   bin/pub-index.sh
   bin/always-loaded.sh
+  bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the bin tools
   checks/check-brevity.sh
   checks/check-settings-pins.sh  # hermetic: pins hold against the settings file
@@ -342,7 +390,10 @@ The install also seeds the committed baseline the footprint contract holds
 (§The consumer footprint): after wiring the hook it runs
 `always-loaded.sh --update-baseline` once to write
 `always-loaded-baseline.txt`, and `smoke/install.sh` asserts that step by
-running the meter and checking the baseline lands.
+running the meter and checking the baseline lands. Install also seeds the local
+env profile — `env-probe.sh` writes the first `ENV.local.md` block
+(§bin/env-probe); being an operator-local, gitignored surface, no smoke asserts
+it (the stated install step is its enforcement).
 
 Config follows the established kit pattern: copy
 `templates/context-config.sh` into the gates dir (or point
@@ -362,6 +413,9 @@ what the consumer left unset. Knobs (this repo's layout as defaults):
   (doctrine-kit's `stage-rules.sh`); the session-context hook runs it with the
   current stage for the brief's craft-rule block; default empty (the block is
   omitted).
+- `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file
+  `bin/env-probe.sh` writes and the session-context hook's step 9 emits (§bin/
+  env-probe); default `ENV.local.md`.
 - `CONTEXT_KIT_BASELINE_FILE` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.

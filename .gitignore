@@ -6,6 +6,9 @@ Cargo.lock
 BRIEF.local.md
 # private ops runbook — DNS records + GitHub settings desired state, never tracked
 OPS.local.md
+# context-kit env profile — probed machine facts + hand-authored gotchas; local
+# config, not memory (context-kit/SPEC.md §The memory-off doctrine), never tracked
+ENV.local.md
 # private banned-term list for check-commit-msg / check-tree-terms — tracking it
 # would itself be the leak (gate-sdk/SPEC.md §check-commit-msg)
 scripts/msg-patterns.local.list

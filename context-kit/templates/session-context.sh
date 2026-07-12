@@ -110,4 +110,12 @@ if [[ -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
         echo "$rules_block"
     fi
 fi
+
+# spec: context-kit/SPEC.md §The session-context hook — step 9 env profile; consumer-local machine profile emitted verbatim when present (env-profile seam, drift-line precedent)
+ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"
+if [[ -f "$ENV_PROFILE_FILE" ]]; then
+    echo
+    echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
+    cat "$ENV_PROFILE_FILE" 2>/dev/null || true
+fi
 echo "────────────────────────────────────────────────────────────────────────"

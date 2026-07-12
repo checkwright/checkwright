@@ -128,7 +128,9 @@ the skill on a blocking verdict — so they are not resident here.
   committed (checked projections); `BRIEF.local.md` is gitignored (private
   brief); `OPS.local.md` is gitignored (private ops runbook — DNS records
   and the GitHub repo-settings desired state; consult it for domain or
-  repo-settings work).
+  repo-settings work); `ENV.local.md` is gitignored (context-kit's probed
+  machine profile plus hand-authored gotchas — seed it with
+  `bash context-kit/bin/env-probe.sh`; context-kit/SPEC.md §bin/env-probe).
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates are governed repo-meta

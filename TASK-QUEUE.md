@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **local-env-profile** [spec: SPEC-env-profile.md] — kit env probe writing a marker-bounded
-  profile into a gitignored local file (hand-authored gotchas outside the markers), surfaced
-  by the session-context hook; cached projection, stated install step, no gate.
 - **template-doc-governance** [spec: SPEC-template-governance.md] — the manifest finder gains
   a slot-free discriminator over consumer-named candidate globs, so slot-free templates and
   agent definitions join the manifest doc gates; slot-bearing surfaces stay excluded.
@@ -152,6 +149,7 @@
 
 ## Done
 
+- local-env-profile
 - lifecycle-skill-adoption-steering
 - lifecycle-resident-trigger-injector
 - craft-rule-stage-routing
