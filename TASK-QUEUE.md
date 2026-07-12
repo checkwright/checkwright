@@ -157,6 +157,36 @@
   otherwise bash/git/jq/awk/shellcheck toolchain, spent on two text-extraction one-liners. Surfaced
   2026-07-13.
 
+- **docs-nav-restructure** [needs-spec] — the site-nav IA pass. (1) Promote the two off-nav
+  drill-downs (`docs/enforcement.md`, `docs/footprint.md`) into the rendered nav as children of
+  Value: give `docs/value.md` a `nav_id`, add `nav_parent`+`nav_child_order` to both, and drop
+  them from `scripts/docs-offnav.list` — the child mechanism is general, not kits-only
+  (`check-docs-nav-reachable` reaches any page whose `nav_parent` names a top-level `nav_id`;
+  only `kits` uses it today). (2) Decide the comparison-page grouping: Orchestration,
+  Domain-driven design, and Where-Checkwright-sits are all adjacent-discipline contrasts — group
+  all three under a Why-Checkwright parent or leave the cluster flat, never nest two of three.
+  (3) Rule the terse-nav-`title`/descriptive-H1 convention (Orchestration→"Agent orchestration:
+  the verification layer beneath it", Install→"Install and upgrade") — either document it in
+  site-kit/SPEC.md so it reads as intent not drift, or align the two roughest cases. Gate
+  touchpoints: check-docs-nav-reachable, check-docs-kit-parity (its kits child block is separate
+  and must stay intact), check-docs-render-fidelity. Surfaced 2026-07-13 as site feedback.
+- **positioning-harness-emphasis** [needs-spec] — the harness-agnostic story is true but
+  defensively framed: `docs/positioning.md` §The tiered compatibility claim already states Tier
+  one (the gate battery is bare bash — runs under any harness, any CI, or no harness), but it
+  sits as bullet one of a "tiered, not blanket" hedge while the surrounding pages lead
+  Claude-Code-first. Foreground the no-harness-dependency enforcement core on `docs/index.md`
+  and `docs/methodology.md`. Hard constraint (honesty/provenance seam): do not claim tested
+  compatibility with AGENTS.md / `.cursorrules` that does not exist — this is an emphasis pass on
+  the already-true claim; its truthful expansion is harness-adapter-agnostic. Surfaced 2026-07-13.
+- **harness-adapter-agnostic** [needs-spec] — the truthful widening of Tier-two compatibility:
+  today the lifecycle stage skills, the CLAUDE.md load convention, and the settings pins are
+  Claude-Code-native (positioning.md §The tiered compatibility claim names other rules-file
+  conventions an untested adaptation surface, not compatibility). Build the adapter — an
+  AGENTS.md (and kin) load-convention shim plus a settings-pin port — so the multi-harness claim
+  expands because it became true, never by overclaiming. Anti-drift shape to design: parity
+  between the ported load surface and the Claude-Code one. Prerequisite for
+  positioning-harness-emphasis to assert more than Tier one. Surfaced 2026-07-13.
+
 ## Done
 
 ## Lessons Learned
