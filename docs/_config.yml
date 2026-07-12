@@ -2,9 +2,19 @@ title: Checkwright
 description: A coding-agent-assisted delivery methodology, packaged as installable kits.
 theme: jekyll-theme-primer
 
+# GitHub Pages enables these by default; declaring them keeps a local build faithful.
+# relative-links rewrites in-repo .md references to their built .html (so a flipped
+# reference block and the mirror's cross-links resolve on the served site);
+# optional-front-matter renders the front-matter-less pages (dated posts, the
+# generated evidence/enforcement pages) through the chrome.
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+
 # Every page renders through the site chrome; search.json opts back out to layout: null.
 defaults:
   - scope:
       path: ""
     values:
       layout: default
+
