@@ -17,8 +17,15 @@ block between fixed markers, idempotently. The gate —
 `check-doctrine-registration` — holds the block honest: it asserts the
 always-loaded file carries the markdown link *and* keeps its methodology-rule
 digest in per-rule lockstep with the doctrine (each rule digested or declared
-trimmed, no digest bullet orphaned), fail-closed when a scanned file or heading
-is missing.
+trimmed, no digest bullet orphaned), and every engineering-craft rule carries a
+well-formed `*Stages:*` routing trailer, fail-closed when a scanned file or
+heading is missing.
+
+The emitter — `bin/stage-rules.sh <stage>` — reads those trailers and prints the
+craft-rule pointers that bear on a stage, so a session entering it is reminded of
+the rules to follow before the matching action. It is derived, load-triggered
+data: context-kit's session-context hook is its consumer.
+See [SPEC.md](SPEC.md#stage-rules).
 
 The doctrine ships the rule *statements* only. Each kit's SPEC owns its
 mechanism and knob rosters, cited from the doctrine and never restated — so no

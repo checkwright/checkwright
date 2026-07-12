@@ -10,6 +10,7 @@ QUEUE_INDEX="queue-kit/bin/queue-index.sh"       # queue-kit's queue surface
 CTX_BIN="context-kit/bin"                         # context-kit index tools
 QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-drift-kit/bin/drift-report.sh}"  # drift-kit trend line
+STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-doctrine-kit/bin/stage-rules.sh}"  # doctrine-kit craft-rule router
 
 echo "── Session context (context-kit session-context hook) ──────────────────"
 echo
@@ -100,4 +101,13 @@ Before opening source for a task, run the matching surface index first
   • bash $CTX_BIN/md-index.sh <file.md>            — large markdown / SPEC outline
   • bash $CTX_BIN/md-section.sh <file.md> "<head>" — extract one section by heading
 EOF
+
+if [[ -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
+    rules_block="$(bash "$STAGE_RULES" "$stage" 2>/dev/null)" || true
+    if [[ -n "$rules_block" ]]; then
+        echo
+        echo "Craft rules for the $stage stage — follow the doctrine link before the matching action:"
+        echo "$rules_block"
+    fi
+fi
 echo "────────────────────────────────────────────────────────────────────────"

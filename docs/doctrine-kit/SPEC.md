@@ -80,9 +80,10 @@ config; unset, they fall to the knob defaults.
 
 ## check-doctrine-registration
 
-Invariant, in three assertions: the configured agent file (A) carries a markdown
+Invariant, in four assertions: the configured agent file (A) carries a markdown
 link to the configured doctrine file and (B, C) holds its methodology-rule digest
-in per-rule lockstep with the doctrine. The digest is the surface the
+in per-rule lockstep with the doctrine, and the doctrine's craft register (D)
+tags every rule with exactly one stage-routing trailer. The digest is the surface the
 always-loaded-shape rule requires, and a re-vendored `DOCTRINE.md` that adds or
 renames a methodology-maintenance rule staling every consumer's digest *by
 construction* — on the exact path the kit advertises as its upgrade story — is
@@ -114,14 +115,24 @@ already couples the agent file and the doctrine file).
 - **Assertion C (digest → doctrine).** Every bold bullet lead-in in the digest
   section matches a methodology-maintenance rule name — a digest line with no
   owning rule is a rule stated nowhere the doctrine governs.
+- **Assertion D (craft-trailer coverage).** Every numbered rule under the
+  doctrine's `## Engineering-craft rules` section carries exactly one `*Stages:*`
+  trailer matching the tag grammar (§stage-rules). A craft rule with no trailer,
+  or two, or a malformed value is a finding: a re-vendored `DOCTRINE.md` that adds
+  an untagged craft rule reddens here instead of silently dropping out of the
+  stage routing the emitter derives. Stage-name *validity* is deliberately
+  unasserted — doctrine-kit does not depend on lifecycle-kit's stage config, and
+  the emitter's empty-output posture already covers an unknown stage; the gate
+  holds only that the trailer is present and well-formed.
 
 Section resolution fails closed. The digest section is the agent-file heading
 named by `DOCTRINE_KIT_DIGEST_SECTION` (Layout and configuration); a configured
 heading matching nothing exits 2 — a renamed digest section must not disarm the
-gate into passing an empty set. The doctrine-side heading
-(`Methodology-maintenance rules`) is kit mechanism, not config: the kit ships
-`DOCTRINE.md`, so it owns that name, and its absence is likewise exit 2 (the
-gate cannot certify the digest against an unreadable rule set). A missing agent
+gate into passing an empty set. The doctrine-side headings
+(`Methodology-maintenance rules` and `Engineering-craft rules`) are kit
+mechanism, not config: the kit ships `DOCTRINE.md`, so it owns those names, and
+either one's absence is likewise exit 2 (the gate cannot certify the digest or
+the craft trailers against an unreadable rule set). A missing agent
 or doctrine file is fail-closed for the same reason, as is a grep or awk that
 errors rather than simply not-matching.
 
@@ -130,12 +141,47 @@ model): the single `DOCTRINE-REGISTRATION: clean` success line and a `help:`
 remedy on each finding path (output); exit 2 on an unreadable file, an
 unresolved section, or an errored capture (fail-closed); a `good/`+`bad/`
 fixture pair under `gate-tests/` — the pair carries the lockstep-clean and the
-digest-missing-a-rule cases, and a sibling `*.test.sh` drives the extra-line,
-declared-trim, link-absent, and three fail-closed cases the one-pair harness
+digest-missing-a-rule cases (both craft-tagged so assertion D passes there), and
+a sibling `*.test.sh` drives the extra-line, declared-trim, link-absent,
+craft-untagged, craft-malformed, and four fail-closed cases the one-pair harness
 cannot hold (fixture-pair); and registration in this repo's `gates.list` where
 its own always-loaded file is the scan target (self-lint). Positional form
 `check-doctrine-registration.sh [agent-file [doctrine-file]]` lets the fixtures
 point at a synthetic agent and doctrine file.
+
+## stage-rules
+
+The engineering-craft rules are load-triggered — behind the doctrine link, not
+digested (§The doctrine deliverable) — and a *stage* is itself a load trigger.
+`bin/stage-rules.sh <stage>` closes that gap: it derives, for a given stage, the
+craft rules that bear on it and emits one pointer line per hit, so a session
+entering a stage is reminded of the craft rules to follow *before* the matching
+action, without the always-loaded surface carrying the prose.
+
+**The tag grammar (single source: the rule owns its stage).** Each rule under
+`## Engineering-craft rules` in `DOCTRINE.md` carries a machine-parsable trailer
+line, `*Stages:* <stage>[, <stage>…]` — a comma list of lowercase stage tokens
+naming the kit's default stage vocabulary — or `*Stages:* —` for a rule that
+routes to no stage. The mapping lives on the rule, so a re-vendored `DOCTRINE.md`
+carries its own routing and no consumer-side stage↔rule table exists to drift;
+`check-doctrine-registration` assertion D holds every craft rule to exactly one
+well-formed trailer.
+
+**The emitter.** `bin/stage-rules.sh <stage> [doctrine-file]` scans the craft
+section for rules whose `*Stages:*` line names the given stage and prints one
+pointer line each — rule number, name, and the doctrine path — so the reader
+follows the link to the rule body. An unknown stage name yields empty output:
+the tags name the kit-default stages, so a consumer with a renamed stage set
+gets no routing rather than wrong routing (the stated honest limit — a stage
+remap knob is deferred until such a consumer exists). It sources
+`lib/doctrine.sh` for the doctrine path and takes the same positional override
+the gate and installer do; a missing doctrine file is exit 2, an absent craft
+section or a no-match stage is empty output.
+
+**The surfacing seam.** The emitter is derived data with no standing tier of its
+own; context-kit's session-context hook is its named consumer, emitting the
+current stage's pointer block when the emitter is vendored
+(context-kit/SPEC.md §The session-context hook, the drift-line seam precedent).
 
 ## lib/doctrine.sh
 
@@ -178,7 +224,12 @@ doctrine file — a copied doctrine drifts; the reference is the mechanism.
 Per-rule enable/disable knobs — the doctrine is one document, and a consumer
 that rejects a rule declares a trim marker beside its digest rather than toggling
 a knob. A standing consultation step in place of packaging — the always-loaded
-anti-pattern this load-triggered kit exists to replace. The kit holds no opinion
+anti-pattern this load-triggered kit exists to replace. A point-of-use guard
+pushing a craft rule at the triggering action (a Write-seam `guard_advise`) —
+demand-gated and out of scope: guard-kit's seam is Bash-only, the craft-rule
+triggers ride the harness Write/Edit tools the guard never sees, and the
+stage-routed surfacing (§stage-rules) already reaches every stage session, so a
+new Write-seam mechanism carries one tentative consumer and no live demand. The kit holds no opinion
 on *which* methodology rules a consumer keeps resident versus trims with cause;
 it ships the statements and the wiring, and the consumer's always-loaded budget
 rules the digest — but a trim is declared, not silent, so the gate holds the

@@ -11,6 +11,7 @@ QUEUE_INDEX="queue-kit/bin/queue-index.sh"
 CTX_BIN="context-kit/bin"
 QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-}"
+STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-}"
 
 echo "── Session context (context-kit session-context hook) ──────────────────"
 echo
@@ -99,4 +100,14 @@ Before opening source for a task, run the matching surface index first
   • bash $CTX_BIN/md-index.sh <file.md>            — large markdown / SPEC outline
   • bash $CTX_BIN/md-section.sh <file.md> "<head>" — extract one section by heading
 EOF
+
+# spec: context-kit/SPEC.md §The session-context hook — step 8 stage-routed craft-rule pointers; doctrine-kit owns the emitter, the seam is this optional block (drift-line precedent)
+if [[ -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
+    rules_block="$(bash "$STAGE_RULES" "$stage" 2>/dev/null)" || true
+    if [[ -n "$rules_block" ]]; then
+        echo
+        echo "Craft rules for the $stage stage — follow the doctrine link before the matching action:"
+        echo "$rules_block"
+    fi
+fi
 echo "────────────────────────────────────────────────────────────────────────"

@@ -9,3 +9,4 @@
 ## Engineering-craft rules
 
 4. **Rename is a full-surface sweep.** Craft register, behind the link — never digested.
+   *Stages:* build

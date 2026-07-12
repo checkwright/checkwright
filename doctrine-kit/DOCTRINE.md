@@ -213,6 +213,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    ([canon-kit/SPEC.md](../canon-kit/SPEC.md)) — which sweeps the comment
    substitute out rather than blessing it, leaving the name as the only place to
    carry the invariant.
+   *Stages:* build, validate
 
 12. **Test from the real consumer's runtime.** Verify a contract from the runtime
    of its real consumer, never a more lenient stand-in; a failure at a higher
@@ -225,6 +226,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    registers its real-consumer suites in the validate battery
    ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant
    baseline turns a dropped layer into a red validate.
+   *Stages:* build, validate
 
 13. **Inspectable-run discipline.** A component a test or an automation spawns
     must emit a readable log to an inspectable path — never a muted sink; on a
@@ -237,6 +239,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     discipline ([delegation-kit/SPEC.md](../delegation-kit/SPEC.md)) — the same
     move of making a background actor write an inspectable record rather than
     trusting its self-report.
+    *Stages:* build, validate
 
 14. **Rename is a full-surface sweep.** A rename sweeps every surface in
     lockstep — prose, fixtures, and docs, not only the compiler-checked
@@ -251,6 +254,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     out of shipped mechanism (the config-via-env pattern in
     [gate-sdk/SPEC.md](../gate-sdk/SPEC.md)), so the check ships and the
     vocabulary stays with the consumer.
+    *Stages:* build
 
 15. **Config edits are merges, not rewrites.** Edit a config or settings file
     with targeted, string-scoped edits, never a full-file write reconstructed
@@ -267,6 +271,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     tool is the mechanism (an exact-string replace that fails loudly on a
     missing or ambiguous match, keeping the write scoped to what was read); no
     gate asserts a given edit was a merge rather than a rewrite.
+    *Stages:* build
 
 16. **Re-verify volatile state before a git history rewrite.** Verify HEAD
     (`git log --oneline -3`) before an amend or squash; after a `git reset
@@ -284,6 +289,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     ([guard-kit/SPEC.md](../guard-kit/SPEC.md) §The generic ruleset), which
     surfaces this checklist at the moment the rewrite is dispatched — advisory
     because each command is legitimate.
+    *Stages:* build, close
 
 17. **Entering another repo's tree, read its governance first.** A cross-repo
     edit re-reads that repo's agent file and README and checks its branch
@@ -295,6 +301,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     *Enforced by:* a convention, not yet a checkwright gate — another repo's
     tree is outside this tree's gate horizon, so no local check can assert its
     governance was reread.
+    *Stages:* build
 
 18. **Naming: drop the qualifier the context supplies — only when every consumer
     has that context.** A name that travels into a flat namespace keeps its
@@ -309,6 +316,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     qualifier is redundant *for every consumer* is a judgment a scanner cannot
     decide; the de-literalization instinct, a name sized to its widest reader,
     is its written form.
+    *Stages:* scope, build
 
 19. **Reuse a co-located consumer's data before designing a new path.** For an
     embedded or co-located actor, first ask whether it can read a co-located
@@ -321,6 +329,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     *Enforced by:* a convention, not yet a checkwright gate — a data-path choice
     leaves no artifact a scanner reads; it is design-review judgment, kin to
     reaching for an existing owner before minting a second source.
+    *Stages:* scope, build
 
 20. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
     gate that finds a silent drop has found either dead config to remove *or*
@@ -336,3 +345,4 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — but the fork itself is resolved
     against the owning SPEC by judgment; the gate reports the dangling key,
     never which way it should be closed.
+    *Stages:* build

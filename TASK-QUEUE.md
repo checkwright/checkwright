@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **craft-rule-stage-routing** [spec: SPEC-stage-routing.md] — each craft rule owns a
-  *Stages:* trailer; a doctrine emitter derives the stage's rule pointers and the
-  session-context hook surfaces them; the registration gate holds trailer coverage; the
-  point-of-use guards half is deferred (the guard seam is Bash-only).
 - **lifecycle-resident-trigger-injector** [spec: SPEC-resident-trigger.md] — marker-block
   agent-file injector with a config-derived stage roster, a shared gate-sdk inject helper
   (the doctrine injector refactors onto it), and a byte-strict registration gate.
@@ -162,6 +158,7 @@
 
 ## Done
 
+- craft-rule-stage-routing
 - faithful-artifact-verification
 - spec-contract-leaning-sweep
 - gap-disposition-doctrine

@@ -83,6 +83,17 @@ session. Steps, in order:
    same-checkout session's in-flight scratch survives.
 7. **Index-reminder footer** — the "index first" ritual with the
    consumer's actual index commands listed (consumer-edited).
+8. **Stage-routed craft-rule pointers** — when `CONTEXT_KIT_STAGE_RULES`
+   names a present emitter (doctrine-kit's `stage-rules.sh`), the current
+   stage's craft-rule pointer block, so a stage session is reminded of the
+   craft rules bearing on it before the matching action. Silently absent
+   when the emitter is unset or the stage routes no rules (doctrine-kit owns
+   the emitter and its tag grammar; the seam is this optional step, the
+   drift-line precedent). Keyed on the derived stage directly, not a
+   {predecessor, own stage} set: the pointers are advisory reminders, so
+   over-firing to an adjacent stage costs only a few lines, and the
+   header-lag rule below is about *conditioning*, not about which stage's
+   rules to show.
 
 **The header-lag rule.** The hook runs at session start, before the
 arriving skill flips the `[stage:]` header (its first step), so a
@@ -340,6 +351,10 @@ what the consumer left unset. Knobs (this repo's layout as defaults):
 - `CONTEXT_KIT_DRIFT_REPORT` — path to the consumer's drift-report script;
   the session-context hook runs it with `--trend` for the brief's drift
   line; default empty (the line is omitted).
+- `CONTEXT_KIT_STAGE_RULES` — path to a stage→craft-rule pointer emitter
+  (doctrine-kit's `stage-rules.sh`); the session-context hook runs it with the
+  current stage for the brief's craft-rule block; default empty (the block is
+  omitted).
 - `CONTEXT_KIT_BASELINE_FILE` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
