@@ -84,9 +84,11 @@ path. This gate is the faithful-artifact-verification class mechanized for that
 artifact: it renders the real output and asserts the observed leakage class,
 rather than trusting the source. A second instance of the same class: an inline
 code span that wraps across a line break whose continuation begins with a
-block-level or unknown HTML tag, which kramdown emits as a raw-HTML block that
-swallows the rest of the page — the upstream root cause is `gettalong/kramdown#843`,
-and this gate catches it as a leaked fence regardless of the fix's timing.
+block-level or generic XML tag, which kramdown — parsing blocks before spans —
+treats as the start of an HTML block, severing the span so it emits raw HTML
+that swallows the rest of the page (`gettalong/kramdown#843`, closed
+works-as-designed: a documented, permanent divergence, not a pending fix), which
+is exactly why this gate is a standing defense rather than a stopgap.
 
 The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
 `git ls-files` (every underscore-prefixed directory segment excluded — those are

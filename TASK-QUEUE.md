@@ -146,8 +146,11 @@
   design: state the skew as a render-fidelity honest-limit and document the exact-pin path
   (`SITE_KIT_RENDERER` → a github-pages-locked bundle), versus auto-resolving the pinned gem —
   rejected as the default since bundler+fetch breaks the hermetic no-fetch render contract.
-  Surfaced 2026-07-12 building docs-render-fidelity-gate; upstream root cause filed as
-  gettalong/kramdown#843 (both 2.4.0 and 2.5.2 exhibit it, so no divergence on this tree today).
+  Surfaced 2026-07-12 building docs-render-fidelity-gate; the leakage class root cause is
+  gettalong/kramdown#843 — closed works-as-designed, so it is permanent (both 2.4.0 and 2.5.2
+  exhibit it, no divergence on this tree today). This rung is about version *skew* in general,
+  not that bug: the trigger is a future kramdown that fixes some *other* leak class Pages still
+  ships, so the gate false-cleans against the newer parser.
 ## Done
 
 - docs-nav-ia
