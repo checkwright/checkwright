@@ -16,6 +16,38 @@
 
 ## Deferred
 
+- **craft-rule-stage-routing** [needs-spec] — promote the engineering-craft rules
+  (DOCTRINE.md 10–19) into the stage sessions where they apply, instead of the
+  passive behind-link reference tier they are today: a craft rule reaches a session
+  only on a deliberate link-follow or the single point-of-use guard that pushes
+  rule 15 (guard-kit/lib/guard.sh's git-history-rewrite advisory), so the rest
+  (rename-is-a-full-surface-sweep, config-edits-are-merges, spec-invariant test
+  naming, inspectable-run discipline, reuse-co-located-data) reach a build session
+  only if the author reaches for them. The doctrine tension to resolve at scope:
+  this must not re-introduce the resident token tax the Always-loaded shape /
+  Load-trigger residency rules deliberately avoided — the resolution is that a
+  *stage* is itself a load trigger, so stage-scoped surfacing is consistent with
+  Load-trigger residency provided it ships pointers (rule name + link), never the
+  prose, and only the subset relevant to that stage. Mechanism options to rule at
+  scope (cost the remedy): (1) stage-skill citation — each stage skill template
+  names its relevant craft-rule pointers at entry; simplest, but a hand-maintained
+  stage↔rule mapping drifts against a re-vendored DOCTRINE.md. (2) point-of-use
+  guards — extend the rule-15 `guard_advise` pattern to the mechanically-triggerable
+  rules (a rename touching multiple surfaces, a config-file rewrite); lowest tax,
+  content pushed only at the trigger, but covers only rules with a detectable
+  action. (3) a derived stage↔rule mapping — each craft rule declares its own stage
+  relevance (a tag on the rule), and the session-context hook or the stage skill
+  derives and surfaces the relevant subset; derivation-first, single-source (the
+  rule owns its stage tag), generated surfacing. Likely a blend: (3)'s derived
+  mapping for the surfacing plus (2)'s guards for the action-triggerable subset. If
+  a mapping exists, a parity gate holds it against the rule set — the
+  check-doctrine-registration precedent, so a re-vendored DOCTRINE.md that adds a
+  craft rule cannot silently drop out of the routing. Complements
+  ungateable-class-audit-cadence (that plans audits for what a gate cannot decide;
+  this pushes craft guidance to where it applies) and builds on the rule-15
+  point-of-use precedent; the Always-loaded shape rule is the constraint it must
+  respect. Surfaced 2026-07-12 at validate (operator take, after tracing craft-rule
+  residency — only rule 15 has an active push to a stage session).
 - **spec-contract-leaning-sweep** [needs-spec] — lean the `## Per-component
   contracts` subsections of the heavy SPECs (gate-sdk/SPEC.md, canon-kit/SPEC.md)
   that restate the source's function/variable roster and step-by-step algorithm —
