@@ -1,7 +1,7 @@
 ---
 title: canon-kit
-nav_order: 13
-nav_id: canon-kit
+nav_parent: kits
+nav_child_order: 4
 ---
 
 # canon-kit

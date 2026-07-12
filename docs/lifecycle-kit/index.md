@@ -1,7 +1,7 @@
 ---
 title: lifecycle-kit
-nav_order: 11
-nav_id: lifecycle-kit
+nav_parent: kits
+nav_child_order: 2
 ---
 
 # lifecycle-kit

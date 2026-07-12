@@ -1,7 +1,7 @@
 ---
 title: queue-kit
-nav_order: 12
-nav_id: queue-kit
+nav_parent: kits
+nav_child_order: 3
 ---
 
 # queue-kit

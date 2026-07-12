@@ -1,7 +1,7 @@
 ---
 title: delegation-kit
-nav_order: 15
-nav_id: delegation-kit
+nav_parent: kits
+nav_child_order: 6
 ---
 
 # delegation-kit

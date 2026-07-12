@@ -14,6 +14,7 @@ check-reads-couples
 check-kit-enum
 check-kit-registration
 check-docs-kit-parity
+check-docs-nav-reachable
 check-doctrine-registration
 check-lifecycle-registration
 check-kit-ref-liveness

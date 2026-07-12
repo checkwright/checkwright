@@ -1,7 +1,7 @@
 ---
 title: site-kit
-nav_order: 19
-nav_id: site-kit
+nav_parent: kits
+nav_child_order: 10
 ---
 
 # site-kit

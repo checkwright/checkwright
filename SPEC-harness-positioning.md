@@ -10,8 +10,8 @@ and are queue-tagged blocked on it.
 
 - `docs/positioning.md` — a living positioning page, "Where Checkwright
   sits": front matter `title: Where Checkwright sits`, the top-level nav
-  slot from SPEC-docs-nav-ia.md's target layout. Three sections this unit
-  owns:
+  slot `nav_order: 5` (the layout's Where-Checkwright-sits position). Three
+  sections this unit owns:
 
 - **The layer model.** Checkwright is layer-4 content: harness-loaded
   instructions (CLAUDE.md, skills) plus gates that run *outside* the model
@@ -60,7 +60,7 @@ and are queue-tagged blocked on it.
 ## Existing sections updated
 
 - `docs/index.md` — the Positioning section gains one row; nothing else
-  moves (the kit registry's home is SPEC-docs-nav-ia.md's ruling).
+  moves (the kit registry's home is `docs/kits.md`, CLAUDE.md §Housekeeping).
 
 ## Definition of Done
 

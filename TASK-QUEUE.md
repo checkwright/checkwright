@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **docs-nav-ia** [spec: SPEC-docs-nav-ia.md] — Kit Reference nav regroup (flatten fork) plus the
-  nav-reachability/front-matter gate with an off-nav allowlist; owns the target top-level nav
-  layout the sibling docs entries draw their slots from.
 - **value-rollup-page** [spec: SPEC-value-rollup.md] — docs/value.md: hand-framed value page over
   a generated per-kit rollup block (enforcement classes joined to context cost), joining emitter
   plus freshness gate; enforcement and footprint pages become linked drill-down references.
@@ -155,5 +152,7 @@
   extractor, and the session-context nudge line reworded to match. Surfaced
   2026-07-12 as site feedback on context-kit's README.
 ## Done
+
+- docs-nav-ia
 
 ## Lessons Learned

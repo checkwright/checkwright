@@ -1,7 +1,7 @@
 ---
 title: guard-kit
-nav_order: 14
-nav_id: guard-kit
+nav_parent: kits
+nav_child_order: 5
 ---
 
 # guard-kit

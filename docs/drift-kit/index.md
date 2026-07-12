@@ -1,7 +1,7 @@
 ---
 title: drift-kit
-nav_order: 17
-nav_id: drift-kit
+nav_parent: kits
+nav_child_order: 8
 ---
 
 # drift-kit

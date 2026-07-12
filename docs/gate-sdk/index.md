@@ -1,7 +1,7 @@
 ---
 title: gate-sdk
-nav_order: 10
-nav_id: gate-sdk
+nav_parent: kits
+nav_child_order: 1
 ---
 
 # gate-sdk

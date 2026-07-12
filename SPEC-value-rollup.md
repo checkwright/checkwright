@@ -3,13 +3,13 @@
 A docs-site ruling with no owning kit, so this amendment lives at the repo
 root. It consolidates the enforcement map and the footprint into one
 nav-visible "these benefits at this token cost" page and rules the three
-forks the queue entry named. Its nav slot is assigned by
-SPEC-docs-nav-ia.md's target layout.
+forks the queue entry named. Its nav slot is the top-level layout's Value
+position (`nav_order: 7`), realized in the docs pages' front matter.
 
 ## What changes
 
 - `docs/value.md` — the value page: front matter `title: Value`, the
-  top-level nav slot from SPEC-docs-nav-ia.md. Hand-authored framing prose
+  top-level nav slot `nav_order: 7` (the layout's Value position). Hand-authored framing prose
   (the value proposition: what the gates hold, at what context cost) around
   one marker-bounded generated block — the env-probe marker precedent
   (`value-rollup:begin` / `value-rollup:end` HTML comments), because the
@@ -40,8 +40,8 @@ SPEC-docs-nav-ia.md's target layout.
   not collapse into the page. `docs/enforcement.md` and `docs/footprint.md`
   persist as drill-down references linked from `docs/value.md`; the
   footprint page gives up its top-level `nav_order` (title front matter
-  stays), so both are link-reachable under SPEC-docs-nav-ia.md's
-  reachability gate without holding nav slots. No number is duplicated
+  stays), so both are link-reachable under `check-docs-nav-reachable`
+  without holding nav slots. No number is duplicated
   across surfaces by hand: the only figures on the value page are the ones
   its emitter derives.
 

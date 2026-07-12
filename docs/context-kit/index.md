@@ -1,7 +1,7 @@
 ---
 title: context-kit
-nav_order: 16
-nav_id: context-kit
+nav_parent: kits
+nav_child_order: 7
 ---
 
 # context-kit

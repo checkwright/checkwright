@@ -1,7 +1,7 @@
 ---
 title: doctrine-kit
-nav_order: 20
-nav_id: doctrine-kit
+nav_parent: kits
+nav_child_order: 11
 ---
 
 # doctrine-kit

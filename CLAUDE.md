@@ -140,7 +140,7 @@ the skill on a blocking verdict — so they are not resident here.
   edit the guide, not GitHub UI settings, to change what arrives.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome — the Jekyll layout,
-  nav (Liquid over the `nav_order` front matter), client-side search, and theme
+  nav (Liquid over the `nav_order`/`nav_parent` front matter), client-side search, and theme
   selector — lives in `docs/_config.yml`, `docs/_layouts/`, `docs/_includes/`,
   and `docs/assets/`. Living pages are governed prose under the anti-restatement
   doctrine (cite downward, never restate a SPEC's invariant); dated `docs/posts/`
@@ -149,8 +149,12 @@ the skill on a blocking verdict — so they are not resident here.
   `docs/<kit>/README.md`, `docs/doctrine-kit/DOCTRINE.md`) is generated —
   regenerate after editing any kit SPEC/README/DOCTRINE:
   `bash scripts/gen-docs-mirror.sh --write` (`check-docs-mirror-fresh` byte-gates
-  it). `check-docs-kit-parity` holds every kit's row in `docs/index.md` and the
-  nav front-matter block on every `docs/<kit>/index.md`.
+  it). The kit registry lives on `docs/kits.md` (the Kit Reference page);
+  `check-docs-kit-parity` holds every kit's row there and the nav child block
+  (`nav_parent: kits` + `nav_child_order`) on every `docs/<kit>/index.md`.
+  `check-docs-nav-reachable` holds every docs page to a `title:` front-matter
+  block and reachability from the rendered nav (a nav slot or a link walk),
+  with `scripts/docs-offnav.list` the allowlist for pages off-nav by design.
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
   violation blocked → fix → green), built on the gate-sdk consumer-smoke
   mechanics; it writes nothing in-tree (`DEMO_TMP_DIR` its only knob) and is the
