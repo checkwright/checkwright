@@ -72,6 +72,21 @@ lead dispatching its own verified stages. Across operators it still
 coordinates nothing — it verifies, so that whatever does the coordinating can
 be trusted to have coordinated correct work.
 
+## Running an iteration under a lead
+
+The lead is a role a session *becomes*, not a stage it runs. Start the
+iteration with `/scope` in a live session; once its promotion commit lands, that
+same session takes the lead role and dispatches the remaining stages — `/align`,
+`/build`, `/validate`, `/close` — each as a background stage session running its
+skill unchanged. The lead writes no lifecycle state of its own: every flip,
+stamp, and commit stays in the stage session, so the history reads identically
+whether or not a lead drove it. A blocked stage session forwards its question
+and resumes in place rather than restarting cold, and anything outside its
+ruling roster reaches the operator. Running no lead is equally valid — each
+stage is then an ordinary skill invocation that surfaces to the operator
+directly. The start sequence, the escalation shape, and the ruling-class
+boundary are owned by `lifecycle-kit/SPEC.md §templates/lead.md`.
+
 ## Where to go next
 
 - [Why Checkwright](methodology.md) — the delivery-methodology essay behind the
