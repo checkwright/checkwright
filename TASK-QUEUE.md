@@ -136,14 +136,4 @@
   ships, so the gate false-cleans against the newer parser.
 ## Done
 
-- model-effort-guidance
-- competitive-positioning
-- lifecycle-deviation-transitions
-- knob-default-source-coupling
-- docs-nav-ia
-- value-rollup-page
-- harness-layer-positioning
-- os-support-statement
-- docs-render-fidelity-gate
-
 ## Lessons Learned
