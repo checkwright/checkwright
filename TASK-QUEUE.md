@@ -14,11 +14,6 @@
 
 ## Technical Debt
 
-- **model-effort-guidance** — a principle-level section
-  on the positioning page: scope and align are the reasoning-dense stages, build is mechanical,
-  validate and close stay judgment-heavy; effort-tier phrasing, never a stage-to-model-id
-  roster; orthogonal to delegation-kit's token lever.
-
 ## Deferred
 
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
@@ -141,6 +136,7 @@
   ships, so the gate false-cleans against the newer parser.
 ## Done
 
+- model-effort-guidance
 - competitive-positioning
 - lifecycle-deviation-transitions
 - knob-default-source-coupling

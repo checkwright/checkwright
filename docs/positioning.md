@@ -107,6 +107,38 @@ operator, can see it. Checkwright's wager is the opposite: enforcement outside
 the model, state on the tree, so the process that produced any commit is
 auditable from the repository alone.
 
+## Matching effort to the stage
+
+The stages do not make equal demands on the model, and it is worth dialing
+effort to match. Scope and align are the reasoning-dense stages: scope decides
+what a task *is* and where its boundary falls, and align reconciles the spec
+corpus and resolves cross-component amendments — the places where a wrong call
+propagates furthest before any code exists to catch it. Build is the mechanical
+stage: it implements a settled plan against a spec, with the gates there to
+catch a drifting hand. Validate and close stay judgment-heavy in a different
+register — validate weighs whether the evidence actually earns the claim, and
+close triages what was learned against what to defer, calls no gate makes for
+you.
+
+So spend the model's deepest reasoning where a mistake is a *design* mistake
+(scope, align) or a judgment over evidence (validate, close), and let a
+mechanical build run leaner. This is stated as effort tiers on purpose, never as
+a stage-to-model-id roster: a fixed "this model for this stage" table would rot
+the instant a model lineup shifted and would bind the methodology to one
+vendor's ladder — the same maintain-the-derivable and single-vendor traps the
+rest of this page rejects. Which model or effort setting realizes each tier is
+the operator's call under whichever harness they run; the stages only mark where
+the reasoning is dense.
+
+This dial is orthogonal to delegation. The token lever owned by
+`delegation-kit/SPEC.md §The delegation model` decides *where* work runs —
+fanning read-heavy audits and mechanical sweeps out to sub-agents to spare the
+session's context budget — while effort-tiering decides *how hard the model
+thinks* at the stage in hand. They set independently: a build can be both
+low-effort and heavily delegated, an align high-effort and delegated not at all.
+The stage machine these run over is owned by
+`lifecycle-kit/SPEC.md §The state machine`.
+
 ## Where to go next
 
 - [Why Checkwright](methodology.md) — the delivery-methodology essay behind the
