@@ -16,6 +16,28 @@
 
 ## Deferred
 
+- **lifecycle-skill-adoption-steering** [needs-spec] — the stage-skill install step frames
+  binding-shim and copy-and-fill as a coequal either/or (lifecycle-kit/README.md §Install
+  step 3), but the two have opposite drift postures: a shim tracks the kit and is held to a
+  thin reference by `check-skill-binding` + `check-shim-restatement`, while copy-and-fill is
+  consumer-owned prose the anti-drift gates never see and re-vendor never reaches (Phase-B
+  residue). The symmetric framing lets a consumer pick the drift-prone path without being told
+  it is the drift-prone one. Reframe: make the shim the documented default/recommendation in
+  the install step and lifecycle-kit/SPEC, and present copy-and-fill as the sanctioned *fork*
+  with its consequence stated inline (you own this ritual; upgrades don't reach it; the shim
+  gates don't cover it). Do *not* remove copy-and-fill — it is the blessed escape hatch that
+  keeps legitimate divergence visible and contained; removing it drives structural forks into
+  edits of the vendored template (which break Phase-A upgrade determinism with no gate to
+  catch them) or into abandoning the kit, and it is the harness-agnostic floor the bare-bash
+  upgrade smoke also preserves. Design questions to rule at scope: (1) pure doc/framing reword
+  vs a mechanism steer — e.g. the install-time assembler emits shims by default so a copy is
+  an explicit opt-out. (2) diagnostic: a consumer reaching for copy to express *prose*
+  divergence rather than *structural* signals the slot vocabulary is too thin — the fix is
+  richer slots (pulling cases back under shim protection), not more copying; whether to
+  instrument that signal. (3) relationship to lifecycle-resident-trigger-injector and
+  craft-rule-stage-routing — all three are lifecycle-kit adoption-surface refinements that may
+  share one install-ergonomics scope. Surfaced 2026-07-12 (operator ask — whether
+  copy-and-fill should be exposed at all given the shim's drift advantages).
 - **lifecycle-resident-trigger-injector** [needs-spec] — lifecycle-kit ships no agent-file
   injector for the minimal *resident pointer* a consumer needs so their agent knows the stage
   machine exists and when to invoke `/scope`…`/close`: install step 3 adopts the stage skills
