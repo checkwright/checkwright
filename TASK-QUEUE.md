@@ -187,6 +187,21 @@
   between the ported load surface and the Claude-Code one. Prerequisite for
   positioning-harness-emphasis to assert more than Tier one. Surfaced 2026-07-13.
 
+- **scope-lead-handoff** [needs-spec] — extend the scope skill's close-out (currently
+  "recommending the next stage", lifecycle-kit/templates/skills/scope.md) to present the
+  lead-orchestration hand-off at the moment the promotion commit lands: the compact-then-`/lead`
+  branch and the manual-steering alternative (run the stages by hand, consult the compacted scope
+  session on a question). Design rulings owed: (1) SSOT — the start sequence is now stated in
+  docs/orchestration.md §Running an iteration under a lead and owned by lifecycle-kit/SPEC.md
+  §templates/lead.md, so the hand-off must *point* at the branch choice, never restate the steps
+  (content-tiering). (2) Seam — `/lead` is this repo's consumer command and `/compact` is a
+  harness built-in, so the generic template cannot hardcode either; the recommendation is likely
+  a binding slot (the `ritual`/`exit-condition` precedent) a lead-less or harness-less consumer
+  leaves empty, not a template literal. (3) Feature-vs-debt — it adds no new gated name, but it
+  changes a shipped template's close-out contract; if it lands as a new slot, `check-skill-binding`
+  binds the template's slot set, so the repo's scope shim moves with it. Surfaced 2026-07-13 as
+  site feedback on the orchestration how-to.
+
 ## Done
 
 ## Lessons Learned
