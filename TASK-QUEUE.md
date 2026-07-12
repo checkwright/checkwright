@@ -171,6 +171,20 @@
   feature matrix — a maintained comparison table rots on every competitor
   release, the maintain-the-derivable anti-pattern the doctrine bars. Surfaced
   2026-07-12 (operator ask d). Lowest-priority; positioning prose only.
+- **os-support-statement** [needs-spec] — docs/install.md gains a
+  requirements/prerequisites section, absent today: Checkwright is Unix-first
+  (Linux, macOS) and Windows runs via WSL, not natively, because the gate
+  battery and hooks are bash plus a coreutils toolchain (the set context-kit's
+  env-probe detects — bash, git, awk, jq, python3, shellcheck) with no
+  native-Windows shell path. Design tension is derive-vs-restate: env-probe
+  already owns that roster (ENV.local.md's generated block), so a hand-kept
+  prose list drifts — decide a generated requirements fragment or a single-owner
+  list over a restated one, and keep specific min-versions probe-owned, not
+  baked. Shape as a tiered honest claim like harness-layer-positioning's (the
+  bare-bash battery runs under any POSIX bash + coreutils; the Claude-Code-native
+  pieces are the narrower tier), and co-locate the two rungs in one
+  positioning/onboarding pass if scoped together. Surfaced 2026-07-12 (operator
+  ask).
 
 ## Done
 
