@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **harness-layer-positioning** [spec: SPEC-harness-positioning.md] — docs/positioning.md "Where
-  Checkwright sits": the layer model with the issue-75214 worked ceiling, the tiered
-  harness-compatibility claim, and the public memory-off position.
 - **os-support-statement** [spec: SPEC-os-support.md] — docs/install.md Requirements section:
   Unix-first/WSL ruling, annotated toolchain list held to env-probe's probe set by a parity
   gate; min versions stay probe-owned.
@@ -30,12 +27,12 @@
 
 ## Technical Debt
 
-- **competitive-positioning** [blocked-by: harness-layer-positioning] — one design-philosophy
+- **competitive-positioning** — one design-philosophy
   contrast section on the positioning page: gates-as-provenance-seam plus the lifecycle state
   machine vs rules-file / harness-memory approaches; approach categories only, no vendor names,
   never a scored feature matrix (a maintained comparison table is the maintain-the-derivable
   anti-pattern).
-- **model-effort-guidance** [blocked-by: harness-layer-positioning] — a principle-level section
+- **model-effort-guidance** — a principle-level section
   on the positioning page: scope and align are the reasoning-dense stages, build is mechanical,
   validate and close stay judgment-heavy; effort-tier phrasing, never a stage-to-model-id
   roster; orthogonal to delegation-kit's token lever.
@@ -152,5 +149,6 @@
 
 - docs-nav-ia
 - value-rollup-page
+- harness-layer-positioning
 
 ## Lessons Learned

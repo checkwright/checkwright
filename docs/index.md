@@ -42,6 +42,9 @@ Where Checkwright sits against practices you may already run — one page per
 angle, positioning only, each owning no contract and citing the enforcing kit
 downward.
 
+- [Where Checkwright sits](positioning.md) — the layer model: Checkwright as
+  layer-4 content beneath a closed harness prompt, the tiered
+  harness-compatibility claim, and the memory-off position.
 - [Domain-driven design](ddd.md) — Checkwright as the enforcement layer for a
   ubiquitous language: banned synonyms, comment and naming directives, and one
   home per definition.
