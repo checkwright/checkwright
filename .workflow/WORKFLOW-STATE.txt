@@ -4,16 +4,4 @@
 
 ---
 
-docs-ia-and-fidelity scope a7171423 2026-07-12
-docs-ia-and-fidelity align cd59f370 2026-07-12
-docs-ia-and-fidelity build 261cd551 2026-07-12
-docs-ia-and-fidelity build e3c4a27d 2026-07-12
-docs-ia-and-fidelity build 285f9b4a 2026-07-12
-docs-ia-and-fidelity build 07182786 2026-07-12
-docs-ia-and-fidelity build b7219317 2026-07-12
-docs-ia-and-fidelity build 8bec0d8f 2026-07-12
-docs-ia-and-fidelity build c3554482 2026-07-13
-docs-ia-and-fidelity build eba041cd 2026-07-13
-docs-ia-and-fidelity build 165c6ef1 2026-07-13
-docs-ia-and-fidelity validate 571fbc3a 2026-07-13
-docs-ia-and-fidelity close 1f652d32 2026-07-13
+— scope 124d0af6 2026-07-13
