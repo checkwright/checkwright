@@ -36,8 +36,14 @@
   richer slots (pulling cases back under shim protection), not more copying; whether to
   instrument that signal. (3) relationship to lifecycle-resident-trigger-injector and
   craft-rule-stage-routing — all three are lifecycle-kit adoption-surface refinements that may
-  share one install-ergonomics scope. Surfaced 2026-07-12 (operator ask — whether
-  copy-and-fill should be exposed at all given the shim's drift advantages).
+  share one install-ergonomics scope. (4) docs placement — the adoption modes appear only in
+  the generated SPEC/README mirror (docs/lifecycle-kit/README.md step 3,
+  docs/lifecycle-kit/SPEC.md) and are absent from the living front-door pages where a consumer
+  decides how to adopt (docs/install.md and docs/lifecycle-kit/index.md, authored not mirrored,
+  so the reframe does not auto-propagate there); rule whether the shim-default steer surfaces on
+  the living landing/install page or the mirrored README step suffices. Surfaced 2026-07-12
+  (operator ask — whether copy-and-fill should be exposed at all given the shim's drift
+  advantages; (4) added same day after confirming the modes are docs-mirror-only).
 - **lifecycle-resident-trigger-injector** [needs-spec] — lifecycle-kit ships no agent-file
   injector for the minimal *resident pointer* a consumer needs so their agent knows the stage
   machine exists and when to invoke `/scope`…`/close`: install step 3 adopts the stage skills
