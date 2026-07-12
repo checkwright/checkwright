@@ -159,6 +159,15 @@
   expands because it became true, never by overclaiming. Anti-drift shape to design: parity
   between the ported load surface and the Claude-Code one. Prerequisite for
   positioning-harness-emphasis to assert more than Tier one. Surfaced 2026-07-13.
+- **session-id-subagent-aware** [needs-spec] — mechanize the lead-dispatch session-id
+  derivation: a lead-dispatched stage session's transcript nests under the lead session's
+  subagents/ dir, so session-id.sh's top-level newest-transcript glob derives the lead's own
+  id and check-stage-evidence reds on the cross-stage collision. Mechanization candidates,
+  choice design-pending: (1) session-id.sh also globs subagents/*.jsonl; (2) templates/lead.md
+  names LIFECYCLE_KIT_SESSIONS_DIR in its dispatch guidance. The prose remedy already landed
+  (lifecycle-kit/SPEC.md §bin/session-id.sh), and the per-dispatch env override covers this
+  iteration's remaining stages. Surfaced 2026-07-13 at align — the dispatched session's
+  flip+stamp red at check-stage-evidence on the lead's colliding id.
 
 ## Done
 
