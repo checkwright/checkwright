@@ -87,7 +87,11 @@ literally and a `#`-leading skeleton line becomes a heading — so a tree that
 reads green on github.com can ship a garbled Pages site with no gate in the
 path. This gate is the faithful-artifact-verification class mechanized for that
 artifact: it renders the real output and asserts the observed leakage class,
-rather than trusting the source.
+rather than trusting the source. A second instance of the same class: an inline
+code span that wraps across a line break whose continuation begins with a
+block-level or unknown HTML tag, which kramdown emits as a raw-HTML block that
+swallows the rest of the page — the upstream root cause is `gettalong/kramdown#843`,
+and this gate catches it as a leaked fence regardless of the fix's timing.
 
 The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
 `git ls-files` (every underscore-prefixed directory segment excluded — those are
