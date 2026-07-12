@@ -136,6 +136,41 @@
   would presume a consumer's publishing convention this repo sets only as an
   override, and the dual-couple manifest exists for exactly that), so the gate
   pins the existing default rather than a new one.
+- **harness-layer-positioning** [needs-spec] — a docs positioning section
+  ("Where checkwright sits") stating the layer model: checkwright is layer-4
+  content (harness-loaded instructions + gates running outside it) that shapes
+  and audits behavior layers 1-3 produce, subordinate to a closed layer-3
+  harness prompt — issue #75214 (project config can't lift the Task ask-first
+  default) is the worked ceiling, already retained under plugin-marketplace.
+  Folded with the harness-compatibility statement: a tiered honest claim, not
+  blanket compat — the gate battery (gate-sdk, the check-* suite) is bare bash
+  and runs under any harness or CI, while the lifecycle skills, the CLAUDE.md
+  load convention, and the settings-pin hooks are Claude-Code-native and
+  adapter-shaped for AGENTS.md/.cursorrules/Cursor/Codex/OpenCode. Include the
+  public memory-off position (durable guidance in tracked manifests, not
+  per-user harness memory; check-memory-off enforces), generalized across
+  harness memory conventions. Surfaced 2026-07-12 (operator positioning asks
+  a+e); confirmed no harness-compat statement exists in docs today.
+- **lifecycle-deviation-transitions** [needs-spec] — lifecycle-kit/SPEC.md
+  gains a non-linear-transitions section: how to abandon an iteration, split
+  one mid-flight, and reopen after close. Has teeth because check-stage-entry
+  and the flip+stamp protocol block an ad-hoc abandon today, so each escape
+  hatch needs a gate-legal shape (what the header flips to, what stamps, what
+  the evidence/baseline obligation is). Surfaced 2026-07-12 (operator ask c);
+  confirmed absent from lifecycle-kit/SPEC.md and README.md.
+- **model-effort-guidance** [needs-spec] — a principle-level note (not a
+  stage-to-model-id roster, which would violate de-literalization and age with
+  pricing): scope and align are the reasoning-dense stages — spend model/effort
+  budget there; build is the mechanical stage, while validate (regression
+  catch) and close (triage/disposition) stay judgment-heavy. Effort-tier, not
+  product-named; orthogonal to the existing delegation-kit token lever.
+  Surfaced 2026-07-12 (operator ask b). Lowest-priority doc rung.
+- **competitive-positioning** [needs-spec] — a single design-philosophy
+  contrast paragraph in docs (gates-as-provenance-seam + lifecycle state
+  machine vs rules-file / harness-memory approaches), explicitly not a scored
+  feature matrix — a maintained comparison table rots on every competitor
+  release, the maintain-the-derivable anti-pattern the doctrine bars. Surfaced
+  2026-07-12 (operator ask d). Lowest-priority; positioning prose only.
 
 ## Done
 
