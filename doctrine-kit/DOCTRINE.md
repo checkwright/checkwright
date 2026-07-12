@@ -42,7 +42,17 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    could watch them. The defence that excuses a *missing* gate on such a
    surface is a high false-positive rate: a noisy check breeds exemptions and
    erodes the battery's authority, so the class a check cannot decide cleanly
-   stays a stated manual duty rather than a noisy gate.
+   stays a stated manual duty rather than a noisy gate. A stated manual duty
+   carries a *named cadence*, or it is a duty no session performs: the
+   un-gateable class joins a tracked audit roster reviewed on a lifecycle hook,
+   with event-keyed due-ness — a named observable event (a contract edit, a
+   release prep, a template upgrade) beats an iteration counter no surface
+   tracks. The roster is hand-curated, not derived — which classes escape a
+   clean check is a judgment no tool enumerates, so Derivation-first's ladder
+   lands on state-once-at-the-owner — and the roster plus its review step *are*
+   the capture mechanism this carve-out owes, self-applying like the
+   Gap-disposition rule's costed deferral rather than a gate; a duty with no
+   cadence rots exactly like the gap that rule catches.
    *Under agent work:* an unenforced rule is a rule the next session cannot see;
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —

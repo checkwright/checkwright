@@ -19,6 +19,13 @@ queue-kit/bin/lesson-sink.sh <tag>`, which resolves the sink from the local
 in order: tooling-friction per guard-kit/templates/close-triage.md, then
 knowledge-friction per drift-kit/templates/close-knowledge.md. Any task a sweep
 files follows queue-kit/SPEC.md §The tag algebra.
+  - **Audit-roster review** — read `.workflow/audit-roster.txt`; for each
+    un-gateable class, judge which `due:` events fired since its `last:` stamp,
+    then perform or explicitly defer each due audit (a deferral is costed per
+    the Gap-disposition rule, not flagged-and-skipped) and set `last:` to this
+    iteration for every audit performed. This is the cadence the
+    Enforcement-first carve-out owes (doctrine-kit/DOCTRINE.md
+    §Methodology-maintenance rules).
   - **Trajectory projection** — after the template's Clear-Done step lands the
     `close` stamp in history, regenerate the projection (`bash
     drift-kit/bin/trajectory.sh --emit > docs/evidence-data.md`) and commit it

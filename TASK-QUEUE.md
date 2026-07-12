@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **ungateable-class-audit-cadence** [spec: SPEC-audit-cadence.md] — Enforcement-first's
-  carve-out gains the cadence duty: an un-gateable class joins the tracked audit roster,
-  reviewed at close with event-keyed due-ness; stated duty, no gate.
 - **spec-contract-leaning-sweep** [spec: SPEC-identifier-deliteralization.md] —
   De-literalization extends to source identifiers in prose (name the public contract, never
   the internal roster or algorithm); lean the six verified heavy-SPEC sections; seed the
@@ -159,5 +156,6 @@
 ## Done
 
 - gap-disposition-doctrine
+- ungateable-class-audit-cadence
 
 ## Lessons Learned
