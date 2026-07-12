@@ -80,6 +80,34 @@
   ask after the template-doc-governance gap was flagged-and-skipped before being
   enriched on a follow-up prompt — the rule makes the enrich-on-discovery the
   default, not the prompted exception.
+- **faithful-artifact-verification** [needs-spec] — a build/verify discipline for a
+  change whose real output is a *deployed or generated artifact* (a rendered site, a
+  compiled binary, a published package), not just the tracked tree: the gate battery
+  lints the tree and can be all-green over an artifact that is broken, so the artifact
+  itself is exercised before the task is called done. Three sharpenings the
+  docs-site-chrome work paid for: (1) reachable (the build stage's run-the-system
+  guidance) includes *cheap to stand up* — an absent-but-installable runtime is not
+  unreachable; the Jekyll gem was one `bundle install` away, and building the site is
+  what caught a 404 in every kit page (flipped reference links stayed `.md` against
+  `.html` pages) that all 60 gates missed. (2) A local replica must be *faithful to the
+  deployment*, version- and plugin-matched: local Jekyll 4.4 raised SCSS deprecation
+  warnings that do not exist on GitHub Pages' Jekyll 3.10, and its differing plugin
+  defaults are what first hid then exposed the link bug — the `github-pages` gem (the
+  pinned deployment toolchain) is the honest oracle; a newer local one both invents
+  failures and masks real ones. (3) Gate-green is not artifact-correct: name the
+  artifact surface a change carries and verify it, never infer it from a clean tree.
+  Complements Oracle-first (which is about running *gates*, not the end artifact) and
+  the /verify skill (exercise end-to-end). Design questions to rule at scope: (1) home
+  — extend the build stage's run-the-system guidance and/or the Oracle-first rule vs a
+  new methodology rule (the gap-disposition-doctrine placement-ripple applies: a new
+  numbered rule renumbers the craft block a code citation depends on, so prefer
+  extending an existing rule). (2) whether the faithful-replica recipe (pin the
+  deployment toolchain, e.g. a vendored `github-pages` bundle kept out of the tree so
+  it cannot race the real build) belongs in the /verify skill as a bootstrap step. (3)
+  enforcement is a stated duty, not a gate — "did the session exercise the artifact
+  faithfully" is not machine-decidable, so the enforcement-first carve-out applies.
+  Surfaced 2026-07-12 at build (docs-site-chrome), operator ask after a local Jekyll
+  build caught a deployment bug the green gate battery did not.
 - **footprint-page** [needs-spec] — publish the kits' measured context footprint as a
   generated docs page: the always-loaded surfaces and each load-triggered skill/template,
   line/word counts exact and token counts as a labeled estimate (tokenizers are
