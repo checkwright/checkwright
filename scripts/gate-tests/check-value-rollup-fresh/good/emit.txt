@@ -1,0 +1,6 @@
+_Generated block; do not hand-edit._
+
+| kit | Blocking gates | Validate suites | always-loaded | load-triggered |
+| --- | --- | --- | --- | --- |
+| foo-kit | 3 | 1 | ~50t | ~100t |
+| **total** | 3 | 1 | ~50t | ~100t |

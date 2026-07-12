@@ -105,6 +105,10 @@ if staged_matches 'docs/enforcement.md' 'scripts/gates.list' 'scripts/*.sh' 'gat
     gate-sdk/checks/check-enforcement-fresh.sh || hook_fail check-enforcement-fresh
 fi
 
+if staged_matches 'docs/value.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/skills/*.md'; then
+    scripts/check-value-rollup-fresh.sh || hook_fail check-value-rollup-fresh
+fi
+
 if staged_matches 'scripts/git-hooks/*'; then
     gate-sdk/checks/check-hook-exec-bit.sh || hook_fail check-hook-exec-bit
 fi

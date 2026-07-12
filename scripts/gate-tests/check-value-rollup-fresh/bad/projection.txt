@@ -1,0 +1,17 @@
+---
+title: Value
+nav_order: 7
+---
+
+# Value
+
+Framing prose around one generated marker block.
+
+<!-- value-rollup:begin -->
+_Generated block; do not hand-edit._
+
+| kit | Blocking gates | Validate suites | always-loaded | load-triggered |
+| --- | --- | --- | --- | --- |
+| foo-kit | 2 | 1 | ~50t | ~100t |
+| **total** | 2 | 1 | ~50t | ~100t |
+<!-- value-rollup:end -->

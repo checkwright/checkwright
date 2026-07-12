@@ -1,0 +1,1 @@
+is stale vs gen-value-rollup.sh

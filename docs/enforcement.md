@@ -49,6 +49,7 @@ leaves its section absent.
 | [context-kit](context-kit/index.md) | check-footprint-fresh | precommit |
 | (consumer) | check-docs-mirror-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-enforcement-fresh | precommit |
+| (consumer) | check-value-rollup-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-hook-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-root-tiering | precommit |

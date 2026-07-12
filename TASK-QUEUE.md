@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **value-rollup-page** [spec: SPEC-value-rollup.md] — docs/value.md: hand-framed value page over
-  a generated per-kit rollup block (enforcement classes joined to context cost), joining emitter
-  plus freshness gate; enforcement and footprint pages become linked drill-down references.
 - **harness-layer-positioning** [spec: SPEC-harness-positioning.md] — docs/positioning.md "Where
   Checkwright sits": the layer model with the issue-75214 worked ceiling, the tiered
   harness-compatibility claim, and the public memory-off position.
@@ -154,5 +151,6 @@
 ## Done
 
 - docs-nav-ia
+- value-rollup-page
 
 ## Lessons Learned

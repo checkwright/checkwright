@@ -1,6 +1,5 @@
 ---
 title: Footprint
-nav_order: 6
 ---
 
 # Context footprint

@@ -1,0 +1,4 @@
+# Hermetic freshness case: the committed marker block byte-matches the emission.
+# Two args steer the gate off the live emitters onto pre-baked fixture files.
+projection.txt
+emit.txt

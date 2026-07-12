@@ -1,0 +1,4 @@
+# Stale case: the committed block lags the emission (a hand-edited count), so
+# the byte-compare must reject.
+projection.txt
+emit.txt

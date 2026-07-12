@@ -22,6 +22,7 @@ check-trajectory-fresh
 check-footprint-fresh
 check-docs-mirror-fresh
 check-enforcement-fresh
+check-value-rollup-fresh
 check-hook-exec-bit
 check-commit-msg
 check-commit-subject

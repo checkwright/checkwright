@@ -21,8 +21,9 @@ an invariant.
    goes wrong when agents write, and the shape of the remedy.
 2. [Install](install.md) — vendoring the kits into your repo and the
    upgrade contract.
-3. [Enforcement map](enforcement.md) — what each kit enforces, and how hard:
-   the class of every check surface, emitted from the registries.
+3. [Value](value.md) — what each kit enforces set against what it costs your
+   context budget, joined from the registries; drills down to the
+   [enforcement map](enforcement.md) and the [footprint](footprint.md).
 4. [Coupling graph](check-graph.html) — which content surfaces each gate binds
    together, emitted from the per-gate manifests.
 5. The [Kit Reference](kits.md) — one page per kit, in reading order.

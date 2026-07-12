@@ -155,6 +155,12 @@ the skill on a blocking verdict — so they are not resident here.
   `check-docs-nav-reachable` holds every docs page to a `title:` front-matter
   block and reachability from the rendered nav (a nav slot or a link walk),
   with `scripts/docs-offnav.list` the allowlist for pages off-nav by design.
+  `docs/value.md` is hand-framed prose around one generated marker block that
+  joins the enforcement-map's per-kit class counts to the footprint's per-kit
+  token cost — regenerate on any change either emitter reports:
+  `bash scripts/gen-value-rollup.sh` (`check-value-rollup-fresh` byte-gates the
+  block). It holds the nav slot; `docs/enforcement.md` and `docs/footprint.md`
+  persist as its off-nav drill-downs, link-reachable from it.
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
   violation blocked → fix → green), built on the gate-sdk consumer-smoke
   mechanics; it writes nothing in-tree (`DEMO_TMP_DIR` its only knob) and is the
