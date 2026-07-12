@@ -228,6 +228,13 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   definitions, default `(VISION.md)` plus every component spec.
 - `CANON_KIT_MANIFEST_FILES` — array of globs, default empty ⇒ derive the
   manifest set (canonical specs, `README.md` at any depth, `CLAUDE.md`);
+  `CANON_KIT_PROSE_SURFACE_GLOBS` — array of candidate globs, default empty:
+  each matched file joins the manifest set **iff it is slot-free** (no
+  lifecycle-kit binding slot `*<name: …>*`, no `CONSUMER BINDING` header), so
+  slot-free kit-template markdown and agent definitions come under the manifest
+  doc gates while slot-bearing surfaces self-exclude — which surfaces a consumer
+  governs is their config, the discriminator is kit mechanism (§lib/spec.sh).
+  This repo sets `("*/templates/*.md" ".claude/agents/*.md")`.
   `CANON_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by
   `check-manifest-temporal`, default a generic-English list (`previously`,
   `formerly`, `renamed from`, …), matched case-insensitively;
@@ -289,7 +296,14 @@ same shapes:
 - **Finders:** the canonical-spec / amendment finders the spec-scanning gates
   share, and the manifest-set finder the narration-gate family shares —
   canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its
-  members read one identical set. The canonical-spec / amendment finders skip a
+  members read one identical set. The finder then folds in each
+  `CANON_KIT_PROSE_SURFACE_GLOBS` candidate that is **slot-free**: it bears no
+  lifecycle-kit binding slot (`*<name: …>*`, slot-name `[a-z][a-z0-9-]*` — the
+  grammar lifecycle-kit/SPEC.md §templates/skills/ owns) and no
+  `CONSUMER BINDING` header. A slot-bearing candidate is silently excluded — a template still
+  awaiting binding is a placeholder, not finished prose, and its coverage stays
+  the shim/binding gates (§Layout and configuration states the knob). The
+  canonical-spec / amendment finders skip a
   `templates/` skeleton (a copyable stub, not governed content — the same
   rationale as the gate-tests prune) and, unless `CANON_KIT_SCAN_KIT_ROOTS=1`,
   any vendored kit root under the scan root (a dependency's docs; an ancestor

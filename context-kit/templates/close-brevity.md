@@ -13,7 +13,7 @@ baseline is actionable.
    - **Brevity** — *is each block worth its recurring per-session token cost?*
      Dense is fine; redundant or over-explained is not.
 3. **Resolve by rewording or deleting, never by annotating.** Outdated context
-   goes to git history, not to a "formerly…" note — a narration line is new
+   goes to git history, not to a `formerly…` note — a narration line is new
    standing cost that documents the old cost. Two mechanical floors sit under
    this step: `check-brevity` (over-budget bullets that already point to a
    deeper doc) and `check-manifest-temporal` (the lexical share — a fixed set

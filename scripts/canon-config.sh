@@ -42,3 +42,10 @@ CANON_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")
 # comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_ENUM_SETS_CMD="bash scripts/enum-sets.sh"
+
+# comment-tier-exempt: the slot-free kit-template and agent-definition surfaces this repo governs — the finder includes a candidate iff it bears no binding slot, so slot-bearing templates (lead.md, the stage skills, agent-execution.md) self-exclude; the stage-skill shims under .claude/commands/ stay out (they are consumer bindings, governed by check-skill-binding/check-shim-restatement)
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_PROSE_SURFACE_GLOBS=(
+    "*/templates/*.md"
+    ".claude/agents/*.md"
+)

@@ -66,6 +66,7 @@ declare -p CANON_KIT_MDREF_EXCLUDE &>/dev/null || CANON_KIT_MDREF_EXCLUDE=()
 [[ -v CANON_KIT_DOCS_BLOB_REF ]] || CANON_KIT_DOCS_BLOB_REF="master"
 
 declare -p CANON_KIT_MANIFEST_FILES &>/dev/null || CANON_KIT_MANIFEST_FILES=()
+declare -p CANON_KIT_PROSE_SURFACE_GLOBS &>/dev/null || CANON_KIT_PROSE_SURFACE_GLOBS=()
 declare -p CANON_KIT_TEMPORAL_MARKERS &>/dev/null || CANON_KIT_TEMPORAL_MARKERS=(
     "previously"
     "formerly"
@@ -160,7 +161,12 @@ spec_canonical_specs() { gate_find "$1" -name "$CANON_KIT_SPEC_NAME" -type f 2>/
 
 spec_amendments() { gate_find "$1" -name "$CANON_KIT_AMENDMENT_GLOB" -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$1" || true; }
 
-# spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs (kit-root pruned per CANON_KIT_SCAN_KIT_ROOTS) plus README.md at any depth and CLAUDE.md; explicit globs when CANON_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change.
+# spec: canon-kit/SPEC.md §check-spec-pointer — a prose-surface candidate joins the
+#   manifest set iff slot-free: no `*<name: …>*` binding slot (the grammar
+#   lifecycle-kit/SPEC.md §templates/skills/ owns), no `CONSUMER BINDING` header.
+_spec_slot_free() { ! grep -qE '\*<[a-z][a-z0-9-]*:|^CONSUMER BINDING' -- "$1"; }
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs (kit-root pruned per CANON_KIT_SCAN_KIT_ROOTS) plus README.md at any depth and CLAUDE.md; explicit globs when CANON_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change. Slot-free CANON_KIT_PROSE_SURFACE_GLOBS candidates join the set (canon-kit/SPEC.md §check-spec-pointer).
 spec_manifest_files() {
     local root="${1:-.}" g f
     if [[ ${#CANON_KIT_MANIFEST_FILES[@]} -gt 0 ]]; then
@@ -173,6 +179,15 @@ spec_manifest_files() {
         spec_canonical_specs "$root"
         gate_find "$root" -name 'README.md' -type f 2>/dev/null | grep -v '/templates/' || true
         gate_find "$root" -name 'CLAUDE.md' -type f 2>/dev/null || true
+    fi
+    if [[ ${#CANON_KIT_PROSE_SURFACE_GLOBS[@]} -gt 0 ]]; then
+        shopt -s nullglob globstar
+        for g in "${CANON_KIT_PROSE_SURFACE_GLOBS[@]}"; do
+            for f in "$root"/$g; do
+                [[ -f "$f" ]] && _spec_slot_free "$f" && printf '%s\n' "$f"
+            done
+        done
+        shopt -u nullglob globstar
     fi
 }
 

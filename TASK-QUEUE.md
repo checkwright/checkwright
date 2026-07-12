@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **template-doc-governance** [spec: SPEC-template-governance.md] — the manifest finder gains
-  a slot-free discriminator over consumer-named candidate globs, so slot-free templates and
-  agent definitions join the manifest doc gates; slot-bearing surfaces stay excluded.
 - **docs-queue-slug-liveness** [spec: SPEC-slug-liveness.md] — a slug-shaped bold-code token
   in a consumer-named prose surface is a queue-membership claim; a new queue-kit gate
   resolves each against the live slug set, so the site can't call a landed task deferred.
@@ -149,6 +146,7 @@
 
 ## Done
 
+- template-doc-governance
 - local-env-profile
 - lifecycle-skill-adoption-steering
 - lifecycle-resident-trigger-injector

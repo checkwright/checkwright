@@ -1,1 +1,1 @@
-§heading not found
+§heading not found in SPEC-target.md
