@@ -5,3 +5,4 @@
 ---
 
 doctrine-and-adoption scope 9d258e56 2026-07-12
+doctrine-and-adoption align f2f06c73 2026-07-12
