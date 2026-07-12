@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: docs-ia-and-fidelity  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,7 +12,39 @@
 
 ## New Features
 
+- **docs-nav-ia** [spec: SPEC-docs-nav-ia.md] — Kit Reference nav regroup (flatten fork) plus the
+  nav-reachability/front-matter gate with an off-nav allowlist; owns the target top-level nav
+  layout the sibling docs entries draw their slots from.
+- **value-rollup-page** [spec: SPEC-value-rollup.md] — docs/value.md: hand-framed value page over
+  a generated per-kit rollup block (enforcement classes joined to context cost), joining emitter
+  plus freshness gate; enforcement and footprint pages become linked drill-down references.
+- **harness-layer-positioning** [spec: SPEC-harness-positioning.md] — docs/positioning.md "Where
+  Checkwright sits": the layer model with the issue-75214 worked ceiling, the tiered
+  harness-compatibility claim, and the public memory-off position.
+- **os-support-statement** [spec: SPEC-os-support.md] — docs/install.md Requirements section:
+  Unix-first/WSL ruling, annotated toolchain list held to env-probe's probe set by a parity
+  gate; min versions stay probe-owned.
+- **docs-render-fidelity-gate** [spec: SPEC-render-fidelity.md] — site-kit gate rendering every
+  docs page with the pinned Pages parser (kramdown-GFM) and asserting no fence or heading
+  leakage; fail-closed when the renderer is absent.
+- **knob-default-source-coupling** [spec: SPEC-knob-default-coupling.md] — canon-kit gate
+  coupling every literal knob fallback in kit source to the default the owning SPEC states,
+  sharing check-knob-citation's default-statement grammar.
+- **lifecycle-deviation-transitions** [spec: SPEC-deviation-transitions.md] —
+  lifecycle-kit/SPEC.md gains the deviation-transitions section: gate-legal abandon, split, and
+  reopen shapes composed from existing mechanism, no new tooling.
+
 ## Technical Debt
+
+- **competitive-positioning** [blocked-by: harness-layer-positioning] — one design-philosophy
+  contrast section on the positioning page: gates-as-provenance-seam plus the lifecycle state
+  machine vs rules-file / harness-memory approaches; approach categories only, no vendor names,
+  never a scored feature matrix (a maintained comparison table is the maintain-the-derivable
+  anti-pattern).
+- **model-effort-guidance** [blocked-by: harness-layer-positioning] — a principle-level section
+  on the positioning page: scope and align are the reasoning-dense stages, build is mechanical,
+  validate and close stay judgment-heavy; effort-tier phrasing, never a stage-to-model-id
+  roster; orthogonal to delegation-kit's token lever.
 
 ## Deferred
 
@@ -111,113 +143,6 @@
   enabled set, Rust demoted from the tool's identity to its shipped default
   extractor, and the session-context nudge line reworded to match. Surfaced
   2026-07-12 as site feedback on context-kit's README.
-- **docs-render-fidelity-gate** [needs-spec] — GitHub Pages renders through
-  kramdown-GFM, which diverges from github.com's cmark: consecutive fenced
-  blocks inside one list item corrupt the page (the second fence prints
-  literally, a `# contract:` skeleton line becomes a heading), so a
-  source-green tree shipped garbled lifecycle-kit and evidence-kit Install
-  sections — no gate exercises the rendered artifact. Remedy shape: a
-  site-kit gate rendering each docs page with the pinned Pages parser and
-  asserting no fence or heading leakage — the faithful-artifact-verification
-  class, mechanizable for this artifact. Surfaced 2026-07-12 as site
-  feedback; both READMEs restructured to indented code blocks same day, fix
-  verified against a local kramdown-GFM render of every docs page.
-- **knob-default-source-coupling** [needs-spec] — no gate couples a kit knob's
-  default as stated in its owning SPEC to the `:-` fallback in the source that
-  actually supplies it, so they drift silently. `check-knob-citation` only bars a
-  knob value *outside* the owning SPEC; nothing asserts the in-SPEC default equals
-  the source fallback. Surfaced 2026-07-12 verifying `GATE_SDK_GRAPH_ARTIFACT`
-  against `gate-sdk/checks/check-graph.sh` during this iteration's identifier
-  de-literalization work. Remedy shape: a canon-kit gate extracting each
-  `${KNOB:-…}` fallback from kit source and asserting the owning SPEC states the
-  same default — the value class of that sweep's identifier de-literalization,
-  mechanizable where the identifier class was not. The graph-artifact knob's
-  default home was reviewed the same day and kept site-neutral (a docs-site path
-  would presume a consumer's publishing convention this repo sets only as an
-  override, and the dual-couple manifest exists for exactly that), so the gate
-  pins the existing default rather than a new one.
-- **harness-layer-positioning** [needs-spec] — a docs positioning section
-  ("Where checkwright sits") stating the layer model: checkwright is layer-4
-  content (harness-loaded instructions + gates running outside it) that shapes
-  and audits behavior layers 1-3 produce, subordinate to a closed layer-3
-  harness prompt — issue #75214 (project config can't lift the Task ask-first
-  default) is the worked ceiling, already retained under plugin-marketplace.
-  Folded with the harness-compatibility statement: a tiered honest claim, not
-  blanket compat — the gate battery (gate-sdk, the check-* suite) is bare bash
-  and runs under any harness or CI, while the lifecycle skills, the CLAUDE.md
-  load convention, and the settings-pin hooks are Claude-Code-native and
-  adapter-shaped for AGENTS.md/.cursorrules/Cursor/Codex/OpenCode. Include the
-  public memory-off position (durable guidance in tracked manifests, not
-  per-user harness memory; check-memory-off enforces), generalized across
-  harness memory conventions. Surfaced 2026-07-12 (operator positioning asks
-  a+e); confirmed no harness-compat statement exists in docs today.
-- **lifecycle-deviation-transitions** [needs-spec] — lifecycle-kit/SPEC.md
-  gains a non-linear-transitions section: how to abandon an iteration, split
-  one mid-flight, and reopen after close. Has teeth because check-stage-entry
-  and the flip+stamp protocol block an ad-hoc abandon today, so each escape
-  hatch needs a gate-legal shape (what the header flips to, what stamps, what
-  the evidence/baseline obligation is). Surfaced 2026-07-12 (operator ask c);
-  confirmed absent from lifecycle-kit/SPEC.md and README.md.
-- **model-effort-guidance** [needs-spec] — a principle-level note (not a
-  stage-to-model-id roster, which would violate de-literalization and age with
-  pricing): scope and align are the reasoning-dense stages — spend model/effort
-  budget there; build is the mechanical stage, while validate (regression
-  catch) and close (triage/disposition) stay judgment-heavy. Effort-tier, not
-  product-named; orthogonal to the existing delegation-kit token lever.
-  Surfaced 2026-07-12 (operator ask b). Lowest-priority doc rung.
-- **competitive-positioning** [needs-spec] — a single design-philosophy
-  contrast paragraph in docs (gates-as-provenance-seam + lifecycle state
-  machine vs rules-file / harness-memory approaches), explicitly not a scored
-  feature matrix — a maintained comparison table rots on every competitor
-  release, the maintain-the-derivable anti-pattern the doctrine bars. Surfaced
-  2026-07-12 (operator ask d). Lowest-priority; positioning prose only.
-- **os-support-statement** [needs-spec] — docs/install.md gains a
-  requirements/prerequisites section, absent today: Checkwright is Unix-first
-  (Linux, macOS) and Windows runs via WSL, not natively, because the gate
-  battery and hooks are bash plus a coreutils toolchain (the set context-kit's
-  env-probe detects — bash, git, awk, jq, python3, shellcheck) with no
-  native-Windows shell path. Design tension is derive-vs-restate: env-probe
-  already owns that roster (ENV.local.md's generated block), so a hand-kept
-  prose list drifts — decide a generated requirements fragment or a single-owner
-  list over a restated one, and keep specific min-versions probe-owned, not
-  baked. Shape as a tiered honest claim like harness-layer-positioning's (the
-  bare-bash battery runs under any POSIX bash + coreutils; the Claude-Code-native
-  pieces are the narrower tier), and co-locate the two rungs in one
-  positioning/onboarding pass if scoped together. Surfaced 2026-07-12 (operator
-  ask).
-- **value-rollup-page** [needs-spec] — consolidate the enforcement map and the
-  footprint into one nav-visible "these benefits at this token cost" page, led by
-  a generated per-kit rollup that joins the two on the kit axis (kit → gates
-  enforced → always-loaded + load-triggered cost) with a totals row as the value
-  proposition. Absorbs the per-kit-gate-count idea: the gate tally is the benefit
-  column, not a footprint add-on. Three spec forks: (1) benefit metric — count by
-  enforcement class (blocking gate vs advisory KPI vs guard), never one flattened
-  tally that equates a blocker with an advisory; (2) generation — the rollup joins
-  two emitters (enforcement-map.sh, footprint.sh), so it needs a joining emitter
-  plus its own freshness gate, never a hand-stitched page (derivation-first); (3)
-  survival — whether the ~60-row per-gate enforcement detail collapses into the
-  page as a drill-down section or stays a linked reference, with no number
-  duplicated across surfaces. Clusters with the positioning rungs
-  (harness-layer-positioning, competitive-positioning, os-support-statement) as
-  one positioning/onboarding docs pass. Surfaced 2026-07-12 (operator ask).
-- **docs-nav-ia** [needs-spec] — left-nav information architecture, two parts.
-  (a) Grouping: the per-kit entries sit flat at the top level (nav_order in the
-  tens), a long run under the guide pages; group them under one "Kit Reference"
-  parent so the top level stays short. The nav include supports one nesting level
-  only (a nav_id parent with nav_parent children, no grandchildren), so the spec
-  fork is flatten — Kit Reference to the kit index pages, each kit's
-  README/SPEC/DOCTRINE dropping off the nav tree (still reached from the kit index
-  page and client-side search) — versus extending nav.html for a deeper tree;
-  flatten preferred. check-docs-kit-parity gates the nav front-matter block on
-  every docs/<kit>/index.md, so the regroup moves that gate and its expected block
-  in lockstep. (b) Reachability gate: assert every docs page resolves from the nav
-  tree except an explicit off-nav allowlist for embedded data fragments
-  (evidence-data.md is one) — the silent-orphan failure mode already caught
-  enforcement.md (no front matter, unreachable from nav), so Enforcement-first
-  over a one-off nav_order add. Shares the nav surface with value-rollup-page
-  (which folds enforcement + footprint into one entry); scope the two together to
-  avoid churning the nav twice. Surfaced 2026-07-12 (operator ask).
-
 ## Done
 
 ## Lessons Learned
