@@ -80,17 +80,18 @@ lead is equally valid. To drive an iteration under one:
 1. **`/scope` in a live session.** It formalizes the iteration — authoring the
    design amendments, promoting the queue entries — and lands the promotion
    commit.
-2. **`/lead` in that same session**, once the promotion commit lands. The lead
-   role writes no lifecycle state of its own; every flip, stamp, and commit
-   stays in the stage sessions it dispatches, so the history reads identically
-   whether or not a lead drove it. Optionally compact first: a bare `/compact`
-   is safe here, because the lead holds pointers rather than state — everything
-   ruled already lives in a committed surface — so the worst case is a bounded
-   re-read, not lost work.
-3. **The lead dispatches each remaining stage** — `/align`, `/build`,
+2. **`/compact` before the hand-off.** A bare `/compact` is safe here, because
+   the lead holds pointers rather than state — everything ruled already lives in
+   a committed surface — so the worst case is a bounded re-read, not lost work.
+   It pays off: the lead sits cold between escalations and re-warms its context
+   each time it is questioned, so a compacted lead re-warms cheap.
+3. **`/lead` in that same session.** The lead role writes no lifecycle state of
+   its own; every flip, stamp, and commit stays in the stage sessions it
+   dispatches, so the history reads identically whether or not a lead drove it.
+4. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
    unchanged.
-4. **A blocked stage escalates to the lead and resumes in place** rather than
+5. **A blocked stage escalates to the lead and resumes in place** rather than
    restarting cold; anything outside its ruling roster reaches the operator.
 
 Prefer to stay hands-on? Skip the lead and run each stage manually as an
