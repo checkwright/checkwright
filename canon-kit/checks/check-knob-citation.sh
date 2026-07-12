@@ -51,6 +51,8 @@ function _kc_has_prefix(t,   i) {
     for (i = 1; i <= KCN; i++) if (index(t, PFX[i]) == 1) return 1
     return 0
 }
+# spec: canon-kit/SPEC.md §check-knob-citation — the shared default-statement grammar's knob-name predicate (§lib/spec.sh): a backticked token that is a knob name is a name citation, not a value literal
+function sk_is_knobname(t) { return _kc_has_prefix(t) }
 function _kc_token_owner(t, file,   i, matched, self, owner) {
     matched = 0; self = 0; owner = ""
     for (i = 1; i <= KCN; i++) {
@@ -63,33 +65,12 @@ function _kc_token_owner(t, file,   i, matched, self, owner) {
     if (!matched || self) return ""
     return owner
 }
-# spec: canon-kit/SPEC.md §check-knob-citation — the default leg binds: the word "default" must be followed within a short window by a value literal that is not itself a backticked knob name, so "default `docs/CNAME`" fires but a knob cited bare after "default" (a name citation) does not
-function _kc_after_has_literal(after,   content) {
-    if (match(after, /`[^`]+`/) > 0) {
-        content = substr(after, RSTART + 1, RLENGTH - 2)
-        gsub(/^[ \t]+|[ \t]+$/, "", content)
-        if (!_kc_has_prefix(content)) return 1
-    }
-    if (after ~ /"[^"]*"/) return 1
-    if (after ~ /'[^']*'/) return 1
-    if (after ~ /(^|[^A-Za-z0-9_])[0-9]+([^A-Za-z0-9_]|$)/) return 1
-    return 0
-}
-function _kc_default_bound(line,   low, off, ms, me) {
-    low = tolower(line); off = 0
-    while (match(substr(low, off + 1), /(^|[^a-z0-9_])default/) > 0) {
-        ms = off + RSTART; me = ms + RLENGTH - 1
-        if (_kc_after_has_literal(substr(line, me + 1, 24))) return 1
-        off = ms + 1
-    }
-    return 0
-}
 function sk_on_line(file, fnr, raw,   line, tokline, defm, pos, n, s, abs, m, before, tok, eq, owner, firstdef) {
     line = raw
     # spec: canon-kit/SPEC.md §check-knob-citation — a knob named inside a ${...} shell expansion is a name citation (another knob's default expression, a fallback source), never a value statement of itself; blank the expansions before the token scan
     tokline = line
     gsub(/\$\{[^}]*\}/, "  ", tokline)
-    defm = _kc_default_bound(line)
+    defm = sk_default_bound(line)
     firstdef = ""
     pos = 1; n = length(tokline)
     while (pos <= n) {
@@ -119,6 +100,7 @@ AWK
 
 AWKSRC="$(spec_para_accum_awk)
 $(spec_manifest_walk_awk)
+$(spec_default_grammar_awk)
 $HOOKS"
 
 out="$(awk -v KC_PAIRS="$pairs" -v KC_SPEC="$CANON_KIT_SPEC_NAME" -v SK_EXEMPT="knob-citation-exempt:" "$AWKSRC" "${manifests[@]}")"; st=$?

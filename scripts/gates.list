@@ -59,6 +59,7 @@ check-manifest-temporal
 check-manifest-count
 check-prose-enum
 check-knob-citation
+check-knob-default-coupling
 check-comment-tier
 check-spec-pointer
 check-todo-task-liveness

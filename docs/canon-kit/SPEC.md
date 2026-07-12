@@ -332,6 +332,14 @@ same shapes:
   source (§check-comment-tier). Which finder a gate uses is kit contract, not
   consumer config — a consumer wanting the old blanket exemption shadows the
   gate.
+- **The default-statement grammar** both knob gates share, so the rule for
+  what reads as a stated default has one home. `sk_literal_at` recognizes the
+  value literal opening a window (a backticked non-knob string, a quoted string,
+  or a number) and `sk_default_literal` returns the literal the word "default"
+  binds; a caller-supplied `sk_is_knobname` keeps a bare knob name from reading
+  as a value. `check-knob-citation` reads it to reject a restated value in prose;
+  `check-knob-default-coupling` reads it to confirm the SPEC states the source's
+  literal (§check-knob-default-coupling).
 
 ### check-amendment-queue
 
@@ -607,6 +615,65 @@ marker shapes, the short-derived prefix, the `${…}` name citation, the
 default-as-verb non-hit, and the per-site valve; `check-knob-citation.test.sh`
 covers the owning-SPEC exemption (a kit may state its own knob's value in its own
 SPEC but not in its README) the fixture pair cannot reach. `precommit` tier.
+
+This gate polices where a value is *placed* (prose may not restate it); its
+sibling `check-knob-default-coupling` polices whether the value *agrees* between
+the source fallback and the SPEC that owns it. The two share the
+default-statement grammar (§lib/spec.sh) — one reads it to reject a value in
+prose, the other to confirm the SPEC states the source's literal.
+
+### check-knob-default-coupling
+
+Invariant, for every literal kit-knob default in kit executable source: the
+literal (1) agrees across every site that supplies it and (2) equals the default
+the owning kit's SPEC states. Where `check-knob-citation` bars a knob value
+copied into prose *outside* the owning SPEC, this closes the channel that gate
+leaves open — the `:-` fallback (or guarded assignment) in the source that
+actually supplies the default is coupled to the SPEC statement, so the two
+cannot drift silently.
+
+Two default idioms are scanned: a `${PREFIX_KNOB:-value}` fallback expansion, and
+the guarded assignment that is the dominant form in the kits' `lib/*.sh` — a
+`[[ -v PREFIX_KNOB ]] || PREFIX_KNOB=value` scalar or a
+`declare -p PREFIX_KNOB &>/dev/null || PREFIX_KNOB=(…)` array. The knob prefix is
+derived, never listed — one SCREAMING_SNAKE form per `gate_kit_roots` member
+(the dir uppercased, hyphens to underscores), so the gate ships no term list and
+the provenance seam holds; a token is a candidate only when it opens with a
+derived prefix. The scanned surface is the kit source under those roots (the
+roster the meta-gates walk, `templates/` and fixtures pruned); a knob's owning
+SPEC is resolved by its prefix, not the citing file's kit, so a `canon-kit`
+source citing a `GATE_SDK_` knob couples to gate-sdk's SPEC.
+
+Assertion 1 (source self-agreement): every literal site for one knob carries the
+same literal; two disagreeing is drift inside the source before any SPEC is
+read, and it suppresses the knob's assertion-2 check (fix the source first).
+Assertion 2 (SPEC agreement): the owning SPEC states that same literal as the
+knob's default, read through the default-statement grammar `check-knob-citation`
+shares (§lib/spec.sh). A default stated as the same `${…:-tail}` deferral the
+source uses is reduced tail-to-tail before the compare, so a knob inheriting
+another kit's default reads as agreement. A knob whose SPEC carries no default
+statement at all reds — the SPEC owns knob defaults.
+
+The coupling is literal-to-literal, and the calibration draws the boundary of
+what carries a single literal to couple. Skipped-and-counted, never coupled: a
+computed default (any expansion, substitution, or arithmetic in the value), an
+array default (no single literal), an empty fallback (`${X:-}` is the `set -u`
+presence-guard idiom, not a value — the real default lives at the else-branch or
+guarded-assignment site the gate reaches there), and a default the SPEC states
+*descriptively* rather than as a literal (a regex, a phrase set, a bundled list —
+code owns the complex value and the SPEC describes it, the widest-true tier). The
+honest limit: agreement is confirmed by the source literal appearing as the
+SPEC's stated default, so a value the SPEC never pins to a literal cannot be
+coupled — only a literal disagreement or a wholly undocumented default reds.
+
+Producer: the generated pre-commit hook / `run-gates.sh`, coupled to kit source
+and the kit SPECs; consumer: the committing operator via the output contract —
+file, the knob, the source literal, and the owning SPEC, each read once at the
+scan transition, no persistent state. Fail-closed on the awk status. The good/bad
+pair covers self-agreement, the SPEC disagreement, and both idioms;
+`check-knob-default-coupling.test.sh` covers the cross-kit owning SPEC, the
+absent-default red, and the descriptive/array/empty/deferral skips the pair
+cannot reach. `precommit` tier.
 
 ### check-surface-duplication
 

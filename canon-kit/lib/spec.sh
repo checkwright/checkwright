@@ -364,6 +364,37 @@ END { _sk_pflush() }
 AWK
 }
 
+# spec: canon-kit/SPEC.md §lib/spec.sh — the default-statement grammar the knob gates share, one owner so neither gate re-implements it. sk_literal_at(after) returns the value literal opening the window (a backticked non-knob string, a quoted string, or a number), or "". sk_default_literal(line, win) returns the literal the word "default" binds within a forward window of `win` chars, or "". The two bool wrappers (sk_after_has_literal / sk_default_bound at check-knob-citation's 24-char prose window) preserve that gate's leg. The caller supplies sk_is_knobname(token) — check-knob-citation resolves it against its prefix roster, check-knob-default-coupling against its own — so the "a bare knob name after default is a name citation, not a value" rule has one home.
+spec_default_grammar_awk() {
+    cat <<'AWK'
+function sk_literal_at(after,   content) {
+    if (match(after, /`[^`]+`/) > 0) {
+        content = substr(after, RSTART + 1, RLENGTH - 2)
+        gsub(/^[ \t]+|[ \t]+$/, "", content)
+        if (!sk_is_knobname(content)) return content
+    }
+    if (match(after, /"[^"]*"/) > 0 && RLENGTH > 2) return substr(after, RSTART + 1, RLENGTH - 2)
+    if (match(after, /'[^']*'/) > 0 && RLENGTH > 2) return substr(after, RSTART + 1, RLENGTH - 2)
+    if (match(after, /(^|[^A-Za-z0-9_])[0-9]+([^A-Za-z0-9_]|$)/) > 0) {
+        content = substr(after, RSTART, RLENGTH); gsub(/[^0-9]/, "", content); return content
+    }
+    return ""
+}
+function sk_after_has_literal(after) { return (sk_literal_at(after) != "") }
+function sk_default_literal(line, win,   low, off, ms, me, lit) {
+    low = tolower(line); off = 0
+    while (match(substr(low, off + 1), /(^|[^a-z0-9_])default/) > 0) {
+        ms = off + RSTART; me = ms + RLENGTH - 1
+        lit = sk_literal_at(substr(line, me + 1, win))
+        if (lit != "") return lit
+        off = ms + 1
+    }
+    return ""
+}
+function sk_default_bound(line) { return (sk_default_literal(line, 24) != "") }
+AWK
+}
+
 # spec: canon-kit/SPEC.md §check-prose-enum — run the consumer's declared sets command and echo its validated <set-name><TAB><member> lines; a command that fails or a line that does not parse (no tab, empty field, extra tab) returns 2 (fail-closed). Empty CANON_KIT_ENUM_SETS_CMD is the caller's clean-skip signal, handled before this is called.
 spec_enum_sets() {
     local out st line name member

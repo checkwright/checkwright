@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **knob-default-source-coupling** [spec: SPEC-knob-default-coupling.md] — canon-kit gate
-  coupling every literal knob fallback in kit source to the default the owning SPEC states,
-  sharing check-knob-citation's default-statement grammar.
 - **lifecycle-deviation-transitions** [spec: SPEC-deviation-transitions.md] —
   lifecycle-kit/SPEC.md gains the deviation-transitions section: gate-legal abandon, split, and
   reopen shapes composed from existing mechanism, no new tooling.
@@ -153,6 +150,7 @@
   ships, so the gate false-cleans against the newer parser.
 ## Done
 
+- knob-default-source-coupling
 - docs-nav-ia
 - value-rollup-page
 - harness-layer-positioning

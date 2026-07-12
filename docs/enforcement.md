@@ -82,6 +82,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-enum | precommit |
 | [canon-kit](canon-kit/index.md) | check-knob-citation | precommit |
+| [canon-kit](canon-kit/index.md) | check-knob-default-coupling | precommit |
 | [canon-kit](canon-kit/index.md) | check-comment-tier | precommit |
 | [canon-kit](canon-kit/index.md) | check-spec-pointer | precommit |
 | [canon-kit](canon-kit/index.md) | check-todo-task-liveness | precommit |
