@@ -13,3 +13,4 @@ doctrine-and-adoption build 39dddd74 2026-07-12
 doctrine-and-adoption build 1400cb32 2026-07-12
 doctrine-and-adoption build 6f1ac2f5 2026-07-12
 doctrine-and-adoption build 1d32bf4e 2026-07-12
+doctrine-and-adoption build 69c53294 2026-07-12
