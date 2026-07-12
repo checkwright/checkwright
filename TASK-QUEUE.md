@@ -200,6 +200,23 @@
   duplicated across surfaces. Clusters with the positioning rungs
   (harness-layer-positioning, competitive-positioning, os-support-statement) as
   one positioning/onboarding docs pass. Surfaced 2026-07-12 (operator ask).
+- **docs-nav-ia** [needs-spec] — left-nav information architecture, two parts.
+  (a) Grouping: the per-kit entries sit flat at the top level (nav_order in the
+  tens), a long run under the guide pages; group them under one "Kit Reference"
+  parent so the top level stays short. The nav include supports one nesting level
+  only (a nav_id parent with nav_parent children, no grandchildren), so the spec
+  fork is flatten — Kit Reference to the kit index pages, each kit's
+  README/SPEC/DOCTRINE dropping off the nav tree (still reached from the kit index
+  page and client-side search) — versus extending nav.html for a deeper tree;
+  flatten preferred. check-docs-kit-parity gates the nav front-matter block on
+  every docs/<kit>/index.md, so the regroup moves that gate and its expected block
+  in lockstep. (b) Reachability gate: assert every docs page resolves from the nav
+  tree except an explicit off-nav allowlist for embedded data fragments
+  (evidence-data.md is one) — the silent-orphan failure mode already caught
+  enforcement.md (no front matter, unreachable from nav), so Enforcement-first
+  over a one-off nav_order add. Shares the nav surface with value-rollup-page
+  (which folds enforcement + footprint into one entry); scope the two together to
+  avoid churning the nav twice. Surfaced 2026-07-12 (operator ask).
 
 ## Done
 
