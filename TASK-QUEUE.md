@@ -309,10 +309,4 @@
   registry-sourced badge would advertise a dead install path.
 ## Done
 
-- check-graph-theme-parity
-- docs-site-chrome
-- craft-extraction
-- scope-session-routing
-- trajectory-close-freshness
-
 ## Lessons Learned

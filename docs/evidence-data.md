@@ -21,3 +21,4 @@
 | doctrine-followthrough | s a b v c | 7f/2d | 6 · ≤0d | 17s clean | 57 |
 | self-accounting-and-positioning | s a b v c | 5f/0d | 4 · ≤0d | 17s clean | 58 |
 | footprint-and-parity | s a b v c | 10f/0d | 7 · ≤0d | 17s clean | 59 |
+| craft-and-routing | s a b v c | 8f/2d | 5 · ≤1d | 17s clean | 60 |
