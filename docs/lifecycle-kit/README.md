@@ -43,22 +43,20 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 2. Give the queue file its header and each evidence file its skeleton — the
    stage-stamp file and the lesson-disposition file
-   (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header):
+   (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header).
+   The queue header line:
 
-   ```
-   ## Iteration: —  [stage: scope]
-   ```
+       ## Iteration: —  [stage: scope]
 
-   ```
-   # contract: lifecycle-kit/SPEC.md §check-stage-evidence
+   The stage-stamp skeleton:
 
-   ---
+       # contract: lifecycle-kit/SPEC.md §check-stage-evidence
 
-   ```
+       ---
 
-   ```
-   # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
-   ```
+   The lesson-disposition skeleton:
+
+       # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
 
 3. Adopt `templates/skills/*.md` in your agent-skill directory (e.g.
    `.claude/commands/`): either copy each in and fill its named slots

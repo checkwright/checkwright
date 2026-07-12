@@ -56,20 +56,21 @@ at scale, where no human reads each hop. It is not itself an orchestration
 layer, and this page claims none of that ground.
 
 The honesty is structural, not a disclaimer: Checkwright's own coordination
-rungs are still on the roadmap, and here they *are* the roadmap. Two deferred
-tasks name them, in the public queue:
+rungs are named in the open, and their state is checkable.
 
-- **`scope-session-routing`** — session-to-session routing so a blocked stage
-  session can forward a question to the live lead session and resume in place,
-  the first rung toward a scope session that dispatches and supervises the
-  other stages.
-- **`multi-operator-semantics`** — the contributor altitude: merge and conflict
-  behavior for the lifecycle's single-writer state surfaces, the kits'
-  team-readiness rung.
+- **The iteration lead** — landed. A live session that dispatches an
+  iteration's stage sessions as background agents and answers their batched
+  escalations, so a blocked stage forwards its question and resumes in place
+  instead of stopping cold. The orchestration protocol is owned by
+  `lifecycle-kit/SPEC.md §templates/lead.md`.
+- **`multi-operator-semantics`** — deferred, in the public queue: the
+  contributor altitude — merge and conflict behavior for the lifecycle's
+  single-writer state surfaces, the kits' team-readiness rung.
 
-Until those land, Checkwright coordinates nothing on its own. It verifies — so
-that whatever does the coordinating can be trusted to have coordinated correct
-work.
+Within one iteration that is the extent of Checkwright's own coordination: a
+lead dispatching its own verified stages. Across operators it still
+coordinates nothing — it verifies, so that whatever does the coordinating can
+be trusted to have coordinated correct work.
 
 ## Where to go next
 

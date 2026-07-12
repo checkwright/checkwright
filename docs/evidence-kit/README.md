@@ -33,17 +33,14 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
    Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
 
-2. Seed the two surfaces:
+2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 
-   ```
-   # held-constant validate baseline: <suite> <scenario> <status> [<slug>]
-   ```
+       # held-constant validate baseline: <suite> <scenario> <status> [<slug>]
 
-   ```
-   # contract: evidence-manifest v1
-   ```
+   and `.workflow/validate-evidence.txt`:
 
-   at `.workflow/validate-baseline.txt` and `.workflow/validate-evidence.txt`
+       # contract: evidence-manifest v1
+
    (override the paths with `EVIDENCE_KIT_BASELINE_FILE` /
    `EVIDENCE_KIT_MANIFEST_FILE`).
 

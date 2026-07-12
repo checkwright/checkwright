@@ -24,18 +24,24 @@
       --ck-border: #d0d7de; --ck-sidebar: #f6f8fa; --ck-accent: #9a6f16;
       --ck-header-bg: #16202b; --ck-header-fg: #e6edf3; --ck-gold: #c19a3d;
       --ck-link: #0969da; --ck-code-bg: #f6f8fa;
+      --ck-tok-comment: #6a737d; --ck-tok-kw: #d73a49; --ck-tok-str: #032f62;
+      --ck-tok-name: #22863a; --ck-tok-var: #005cc5; --ck-tok-fn: #6f42c1;
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme]) {
         --ck-bg: #0d1117; --ck-fg: #e6edf3; --ck-muted: #8b949e;
         --ck-border: #30363d; --ck-sidebar: #161b22; --ck-accent: #d3a84a;
         --ck-link: #58a6ff; --ck-code-bg: #161b22;
+        --ck-tok-comment: #8b949e; --ck-tok-kw: #ff7b72; --ck-tok-str: #a5d6ff;
+        --ck-tok-name: #7ee787; --ck-tok-var: #79c0ff; --ck-tok-fn: #d2a8ff;
       }
     }
     :root[data-theme="dark"] {
       --ck-bg: #0d1117; --ck-fg: #e6edf3; --ck-muted: #8b949e;
       --ck-border: #30363d; --ck-sidebar: #161b22; --ck-accent: #d3a84a;
       --ck-link: #58a6ff; --ck-code-bg: #161b22;
+      --ck-tok-comment: #8b949e; --ck-tok-kw: #ff7b72; --ck-tok-str: #a5d6ff;
+      --ck-tok-name: #7ee787; --ck-tok-var: #79c0ff; --ck-tok-fn: #d2a8ff;
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--ck-bg); color: var(--ck-fg);
@@ -77,12 +83,42 @@
       padding-left: 0.35rem !important; }
     .nav-children a { font-size: 0.9rem; color: var(--ck-muted); }
     .site-content { flex: 1 1 auto; min-width: 0; padding: 1.5rem 2rem 4rem; }
-    .site-content .markdown-body { background: transparent; color: var(--ck-fg);
-      max-width: 46rem; }
+    .site-content .markdown-body { background: transparent; color: var(--ck-fg); }
     .site-content .markdown-body a { color: var(--ck-link); }
     .site-content .markdown-body pre,
     .site-content .markdown-body code { background: var(--ck-code-bg); }
-    .site-content .markdown-body pre { border: 1px solid var(--ck-border); }
+    .site-content .markdown-body pre { border: 1px solid var(--ck-border);
+      white-space: pre-wrap; overflow-wrap: break-word; }
+    /* Rouge token palette over Primer's: light values mirror the theme's shipped
+       highlight CSS; the dark set is what makes highlighted code readable on the
+       dark backgrounds above. */
+    .site-content .markdown-body .highlight .c, .site-content .markdown-body .highlight .c1,
+    .site-content .markdown-body .highlight .cm, .site-content .markdown-body .highlight .cs,
+    .site-content .markdown-body .highlight .gp { color: var(--ck-tok-comment); }
+    .site-content .markdown-body .highlight .k, .site-content .markdown-body .highlight .kd,
+    .site-content .markdown-body .highlight .kn, .site-content .markdown-body .highlight .kp,
+    .site-content .markdown-body .highlight .kr, .site-content .markdown-body .highlight .kt,
+    .site-content .markdown-body .highlight .ow { color: var(--ck-tok-kw); }
+    .site-content .markdown-body .highlight .s, .site-content .markdown-body .highlight .s1,
+    .site-content .markdown-body .highlight .s2, .site-content .markdown-body .highlight .sb,
+    .site-content .markdown-body .highlight .sc, .site-content .markdown-body .highlight .se,
+    .site-content .markdown-body .highlight .sh, .site-content .markdown-body .highlight .si,
+    .site-content .markdown-body .highlight .sr, .site-content .markdown-body .highlight .sx,
+    .site-content .markdown-body .highlight .ss { color: var(--ck-tok-str); }
+    .site-content .markdown-body .highlight .nt, .site-content .markdown-body .highlight .nc,
+    .site-content .markdown-body .highlight .no, .site-content .markdown-body .highlight .ni,
+    .site-content .markdown-body .highlight .ne { color: var(--ck-tok-name); }
+    .site-content .markdown-body .highlight .nb, .site-content .markdown-body .highlight .nv,
+    .site-content .markdown-body .highlight .vc, .site-content .markdown-body .highlight .vg,
+    .site-content .markdown-body .highlight .vi, .site-content .markdown-body .highlight .bp,
+    .site-content .markdown-body .highlight .m, .site-content .markdown-body .highlight .mf,
+    .site-content .markdown-body .highlight .mh, .site-content .markdown-body .highlight .mi,
+    .site-content .markdown-body .highlight .mo, .site-content .markdown-body .highlight .il
+      { color: var(--ck-tok-var); }
+    .site-content .markdown-body .highlight .nf, .site-content .markdown-body .highlight .nd,
+    .site-content .markdown-body .highlight .nl, .site-content .markdown-body .highlight .nn
+      { color: var(--ck-tok-fn); }
+    .site-content .markdown-body .highlight .err { color: inherit; background: transparent; }
     .site-footer { border-top: 1px solid var(--ck-border); color: var(--ck-muted);
       padding: 1.5rem 2rem; max-width: 1180px; margin: 0 auto; font-size: 0.85rem; }
     .site-footer a { color: var(--ck-muted); }
