@@ -13,7 +13,11 @@ sharpenings the docs-site-chrome work paid for:
    binary, a published package) *names the artifact surface it carries* and
    exercises the artifact before the task is done — never inferred from a
    clean battery. (The motivating instance: a link-extension bug 404'd every
-   kit page of the rendered site while all gates ran green.)
+   kit page of the rendered site while all gates ran green. A second, same
+   week: the Pages parser — kramdown-GFM, which diverges from github.com's
+   renderer — corrupts consecutive fenced blocks inside a list item, so two
+   kit READMEs shipped garbled Install sections under a green battery; the
+   mechanizable half of that class is filed as docs-render-fidelity-gate.)
 2. **Reachable includes cheap-to-stand-up.** An absent-but-installable
    runtime is not unreachable; one install command away counts as reachable
    for the build stage's run-the-system duty.

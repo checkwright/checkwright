@@ -41,6 +41,9 @@
 - **template-doc-governance** [spec: SPEC-template-governance.md] — the manifest finder gains
   a slot-free discriminator over consumer-named candidate globs, so slot-free templates and
   agent definitions join the manifest doc gates; slot-bearing surfaces stay excluded.
+- **docs-queue-slug-liveness** [spec: SPEC-slug-liveness.md] — a slug-shaped bold-code token
+  in a consumer-named prose surface is a queue-membership claim; a new queue-kit gate
+  resolves each against the live slug set, so the site can't call a landed task deferred.
 - **footprint-page** [spec: SPEC-footprint-page.md] — generated, freshness-gated docs page
   publishing each kit's measured context footprint (always-loaded vs load-triggered, exact
   line and word counts, a labeled token estimate); kit-shipped share only.
@@ -138,6 +141,23 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
+- **pub-index-language-plugins** [needs-spec] — context-kit's `pub-index.sh`
+  hardcodes the Rust grammar and file glob; make the extractor pluggable —
+  per-language extractors resolved registry-style, a consumer knob naming the
+  enabled set, Rust demoted from the tool's identity to its shipped default
+  extractor, and the session-context nudge line reworded to match. Surfaced
+  2026-07-12 as site feedback on context-kit's README.
+- **docs-render-fidelity-gate** [needs-spec] — GitHub Pages renders through
+  kramdown-GFM, which diverges from github.com's cmark: consecutive fenced
+  blocks inside one list item corrupt the page (the second fence prints
+  literally, a `# contract:` skeleton line becomes a heading), so a
+  source-green tree shipped garbled lifecycle-kit and evidence-kit Install
+  sections — no gate exercises the rendered artifact. Remedy shape: a
+  site-kit gate rendering each docs page with the pinned Pages parser and
+  asserting no fence or heading leakage — the faithful-artifact-verification
+  class, mechanizable for this artifact. Surfaced 2026-07-12 as site
+  feedback; both READMEs restructured to indented code blocks same day, fix
+  verified against a local kramdown-GFM render of every docs page.
 
 ## Done
 
