@@ -107,7 +107,11 @@ supplies the checklist they invoke and the gate behind the promotion rule.
 1. Read the canonical spec fully, then the amendment.
 2. Integrate — do not append: each addition lands in its proper section,
    and the merged spec reads as one coherent document a reader who never
-   saw the amendment can use alone.
+   saw the amendment can use alone. The merge separates by tier: design
+   rationale relocates into the spec's prose (its permanent home), and any
+   embedded wire-delta becomes a citation to the now-existing contract
+   file — the amendment's exemption is file-scoped, so once step 3 deletes
+   the file `check-spec-embedded-source` re-arms and a kept embed goes red.
 3. Delete the amendment file; verify none remain for the component.
 4. Move the queue entry to `## Done`, dropping its `[spec:]` tag — the
    amendment it referenced is gone, and `check-amendment-queue` requires
@@ -387,9 +391,11 @@ tooling. `align-only` tier.
 
 Invariant: no fenced block in a canonical spec verbatim-copies a tracked
 source file above the overlap threshold — cite the path instead. Overlap
-detection needs no author opt-in; the amendment wire-delta exemption and
-the per-site `spec-embedded-source-exempt: <reason>` marker are the two
-valves.
+detection needs no author opt-in; the two valves are the amendment
+wire-delta exemption — an amendment is a short-lived design-to-code bridge,
+so a not-yet-cite-able wire contract legitimately embeds there until merge
+promotes it to a file the canonical spec cites — and the per-site
+`spec-embedded-source-exempt: <reason>` marker.
 
 Calibration: blocks shorter than `CANON_KIT_EMBED_MINLINES` are ignored;
 languages in `CANON_KIT_EMBED_ILLUSTRATIVE` are skipped by default; the
