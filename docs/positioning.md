@@ -72,6 +72,41 @@ offers rather than tied to one product's feature. The position is stated here;
 the invariant is owned by `context-kit/SPEC.md §The memory-off doctrine` and
 enforced by `check-memory-off`.
 
+## The design-philosophy contrast
+
+Approaches that make a coding agent follow a process tend to cluster into
+recognizable stances, and it is worth naming how Checkwright's design differs
+from each in kind. The contrast is drawn at the level of stance, not feature: a
+scored capability table would be a maintained artifact that rots the moment
+either side changes — the maintain-the-derivable trap the methodology exists to
+reject — so what follows compares design commitments, not checkboxes.
+
+**Against the rules-file stance.** The common approach writes the process down
+as a conventions file the agent is asked to follow at load time. Checkwright
+loads such a file too, but treats it as the *shaping* half only — an instruction
+is a layer-4 request the harness may honor, never the guarantee the worked
+ceiling above shows it cannot be. The enforcing half lives in gates that run
+outside the model. This is where the provenance seam pays off: because the
+mechanism is a gate and the private rule content it polices stays consumer
+config, the mechanism packages and ships as a kit without publishing anyone's
+rules — where a single conventions file fuses process and private content into
+one artifact you can neither share without leaking nor keep without
+re-authoring.
+
+**Against the harness-memory stance.** The other approach lets the agent
+accumulate learned process in per-user memory that carries across sessions.
+Checkwright holds that memory off (the position above) and puts the process in a
+state machine instead: which stage a task sits in, and the evidence advancing
+it, are tracked files that every session and every teammate reads identically
+from the tree. Remembered process forks silently and answers only to the
+operator who taught it; a state machine over the tree answers to the repository.
+The machine is owned by `lifecycle-kit/SPEC.md §The state machine`.
+
+Both other stances put what governs the work where only the model, or only one
+operator, can see it. Checkwright's wager is the opposite: enforcement outside
+the model, state on the tree, so the process that produced any commit is
+auditable from the repository alone.
+
 ## Where to go next
 
 - [Why Checkwright](methodology.md) — the delivery-methodology essay behind the

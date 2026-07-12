@@ -14,11 +14,6 @@
 
 ## Technical Debt
 
-- **competitive-positioning** — one design-philosophy
-  contrast section on the positioning page: gates-as-provenance-seam plus the lifecycle state
-  machine vs rules-file / harness-memory approaches; approach categories only, no vendor names,
-  never a scored feature matrix (a maintained comparison table is the maintain-the-derivable
-  anti-pattern).
 - **model-effort-guidance** — a principle-level section
   on the positioning page: scope and align are the reasoning-dense stages, build is mechanical,
   validate and close stay judgment-heavy; effort-tier phrasing, never a stage-to-model-id
@@ -146,6 +141,7 @@
   ships, so the gate false-cleans against the newer parser.
 ## Done
 
+- competitive-positioning
 - lifecycle-deviation-transitions
 - knob-default-source-coupling
 - docs-nav-ia
