@@ -94,6 +94,34 @@
   consumer bindings and consumer config — only the kit share is the advertised cost);
   whether the page rides docs/ evidence framing or the install page. Filed 2026-07-11 at
   scope (operator ask).
+- **local-env-profile** [needs-spec] — a kit-owned local machine/environment
+  profile so an agent session adapts its guidance to the box it runs on: package
+  manager, toolchain versions, shell, absent tools. Mechanism (generic, kit): a
+  `bin/env-probe.sh` deriving the profile from `uname` / `/etc/os-release` /
+  package-manager + toolchain detection — derivation-first, never hand-maintained.
+  Content (consumer-local, gitignored): the probed profile plus the hand-authored
+  gotchas a probe cannot know (the OPS.local.md "no `dig`/`host`; use `getent`/DoH"
+  class) — `BRIEF.local.md`-class private context, so the machine's facts never
+  land in the public tree. Surfacing: context-kit's session-context hook
+  (context-kit/SPEC.md §The session-context hook template) gains an Environment
+  line, so every session sees it at no resident always-loaded cost. The harness
+  already injects a weak version (`Platform: linux`, an OS-version string); the
+  value-add is a richer, tool-consumable, harness-independent profile a gate or
+  script can read, not just prose in the prompt. Design questions to rule at
+  scope: (1) owning kit — context-kit (owns what a session loads) vs a new
+  concern. (2) live-probe each session (always fresh, hook latency) vs a cached
+  gitignored projection with a freshness nudge (the evidence-data.md pattern) —
+  env changes rarely, so a cached probe may win. (3) reconciliation with
+  context-kit/SPEC.md §The memory-off doctrine: this is derived, explicit local
+  config, not silently auto-accumulated memory, so it is `BRIEF.local.md`-class
+  rather than banned harness memory — the SPEC must draw that line. (4)
+  enforcement is likely a stated install step, not a gate (env truth is not
+  cheaply machine-verifiable and a probe is already the derivation), so the
+  enforcement-first false-positive carve-out applies. (5) install-procedure
+  placement — a "seed your env profile" step in context-kit's install. Surfaced
+  2026-07-12 at build (docs-site-chrome), operator ask — re-derived the Gentoo
+  toolchain (portage/eselect, gem user-install path, no `dig`/`host`) while
+  standing up a local Jekyll build to verify the docs site.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
