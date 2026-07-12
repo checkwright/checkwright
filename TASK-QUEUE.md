@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **os-support-statement** [spec: SPEC-os-support.md] — docs/install.md Requirements section:
-  Unix-first/WSL ruling, annotated toolchain list held to env-probe's probe set by a parity
-  gate; min versions stay probe-owned.
 - **docs-render-fidelity-gate** [spec: SPEC-render-fidelity.md] — site-kit gate rendering every
   docs page with the pinned Pages parser (kramdown-GFM) and asserting no fence or heading
   leakage; fail-closed when the renderer is absent.
@@ -150,5 +147,6 @@
 - docs-nav-ia
 - value-rollup-page
 - harness-layer-positioning
+- os-support-statement
 
 ## Lessons Learned

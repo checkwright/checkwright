@@ -1,0 +1,4 @@
+# Divergence case: PROBE_SET carries `awk` but the marker block never lists it,
+# so the both-directions parity assertion must reject.
+install.md
+probe.sh

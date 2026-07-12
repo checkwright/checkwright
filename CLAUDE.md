@@ -161,6 +161,12 @@ the skill on a blocking verdict — so they are not resident here.
   `bash scripts/gen-value-rollup.sh` (`check-value-rollup-fresh` byte-gates the
   block). It holds the nav slot; `docs/enforcement.md` and `docs/footprint.md`
   persist as its off-nav drill-downs, link-reachable from it.
+  `docs/install.md`'s Requirements section holds the toolchain list to
+  env-probe's probe set: `check-install-toolchain` asserts name-set parity
+  between its `<!-- toolchain:begin -->` bullets and
+  `context-kit/bin/env-probe.sh`'s `PROBE_SET` array both directions (names
+  derivable, purpose clauses hand prose), so a probe-set edit reds the docs
+  list without an emitter handshake.
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
   violation blocked → fix → green), built on the gate-sdk consumer-smoke
   mechanics; it writes nothing in-tree (`DEMO_TMP_DIR` its only knob) and is the

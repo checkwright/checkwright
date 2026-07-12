@@ -15,6 +15,43 @@ Before you vendor, the [footprint page](footprint.md) measures what each kit
 adds to a consumer's context budget — the always-loaded and load-triggered cost
 per kit, so the adoption decision weighs a number rather than a guess.
 
+## Requirements
+
+Checkwright is **Unix-first**: Linux and macOS are the supported platforms.
+Windows is supported through WSL, not natively — the gate battery and the git
+hooks are Bash over a coreutils toolchain, and no native-Windows shell path
+exists.
+
+The battery leans on a small command-line toolchain; each tool below must be on
+your `PATH`, and the note says what breaks without it:
+
+<!-- toolchain:begin -->
+
+- `bash` — every gate and both generated git hooks are Bash scripts; nothing in
+  the battery runs without it.
+- `git` — the gates read tracked files and the hooks fire at commit time; the
+  model is git-native end to end.
+- `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
+  their inputs with it.
+- `awk` — the gate family's line scanning and field extraction are written in
+  awk; most checks cannot run without it.
+- `python3` — context-kit's surface indexers and guard-kit's prompt scanner
+  shell out to it.
+- `shellcheck` — the `check-shellcheck` meta-gate lints every shipped script,
+  and a lint finding blocks the commit.
+
+<!-- toolchain:end -->
+
+No minimum versions are pinned here: the toolchain moves with your platform, and
+a version floor baked into this page would rot. To see exactly what your machine
+carries, seed a local profile with context-kit's env-probe —
+`bash context-kit/bin/env-probe.sh` writes an `ENV.local.md` you keep untracked.
+
+Publishing a docs site is an optional wider tier. A consumer that registers
+site-kit's render-fidelity gate — which re-renders every page through the
+GitHub Pages parser — additionally needs Ruby with the `kramdown-parser-gfm`
+gem. A consumer that publishes no docs site never installs it.
+
 ## Vendoring the kits
 
 Each kit is a self-contained top-level directory. To adopt one, copy it into

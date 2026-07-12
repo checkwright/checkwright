@@ -1,0 +1,4 @@
+# Parity case: the marker-block tool names equal the fixture PROBE_SET exactly.
+# Two args steer the gate onto hermetic fixture copies of each surface.
+install.md
+probe.sh

@@ -76,6 +76,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-docs-link-convention | precommit |
 | [site-kit](site-kit/index.md) | check-docs-cname-parity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
+| (consumer) | check-install-toolchain | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-enum | precommit |

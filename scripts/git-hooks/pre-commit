@@ -209,6 +209,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/
     canon-kit/checks/check-docs-cmd.sh || hook_fail check-docs-cmd
 fi
 
+if staged_matches 'docs/install.md' 'context-kit/bin/env-probe.sh'; then
+    scripts/check-install-toolchain.sh || hook_fail check-install-toolchain
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     canon-kit/checks/check-manifest-temporal.sh || hook_fail check-manifest-temporal
 fi
