@@ -138,9 +138,31 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    only oracle. No scanner sees *how* a session derived a choice; this rule
    is judgment with a capture mechanism, not a gate.
 
+10. **Gap disposition.** A gap a session surfaces but will not close this
+   session — a coverage hole, a design defect, an escaping class — is *costed*,
+   not merely flagged: the session works out how the gap could be closed and
+   lands that analysis where the next session finds it, as a new queue entry or
+   an enrichment of the standing deferred entry that owns it. A bare
+   flag-and-skip is the defect. This is the knowledge-friction loop one altitude
+   up — that loop captures re-derived *facts* with no owner; this rule captures
+   the *design and coverage gaps* a session leaves behind. It fills the space
+   between two neighbours: Spec-over-precedent captures a doc gap met during
+   precedent consultation, Enforcement-first governs a fix being *landed*, and
+   neither governs a gap being *deferred*.
+   *Under agent work:* a fresh context window cannot see a gap the prior session
+   only reasoned about; an unwritten deferral is one the next session
+   re-discovers from scratch, and the costed remedy is the only carrier of the
+   analysis across the reset.
+   *Enforced by:* judgment with a capture mechanism, not a gate — whether a
+   session costed the remedy is not machine-decidable (the Enforcement-first
+   false-positive carve-out, on Spec-over-precedent's model). It rides the
+   queue's Deferred section for design gaps and the knowledge-friction log
+   ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) for
+   fact gaps.
+
 ## Engineering-craft rules
 
-10. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
+11. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
    that invariant in its *name*; the SPEC's test-requirement section owns which
    invariants a test must cover. A spec-clause *comment* on the test is not a
    substitute — it duplicates what the name should carry and rots silently when
@@ -153,7 +175,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    substitute out rather than blessing it, leaving the name as the only place to
    carry the invariant.
 
-11. **Test from the real consumer's runtime.** Verify a contract from the runtime
+12. **Test from the real consumer's runtime.** Verify a contract from the runtime
    of its real consumer, never a more lenient stand-in; a failure at a higher
    test layer with no failing test at the layer below is a coverage gap in the
    lower layer, closed there first.
@@ -165,7 +187,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    ([evidence-kit/SPEC.md](../evidence-kit/SPEC.md)), where a held-constant
    baseline turns a dropped layer into a red validate.
 
-12. **Inspectable-run discipline.** A component a test or an automation spawns
+13. **Inspectable-run discipline.** A component a test or an automation spawns
     must emit a readable log to an inspectable path — never a muted sink; on a
     failure, read that evidence before theorizing. A run you cannot inspect
     barely beats a guess.
@@ -177,7 +199,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     move of making a background actor write an inspectable record rather than
     trusting its self-report.
 
-13. **Rename is a full-surface sweep.** A rename sweeps every surface in
+14. **Rename is a full-surface sweep.** A rename sweeps every surface in
     lockstep — prose, fixtures, and docs, not only the compiler-checked
     identifiers; the done-gate is a text-level completeness check, not the
     type-checker, and an in-progress rename is verified by a completeness scan
@@ -191,7 +213,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     [gate-sdk/SPEC.md](../gate-sdk/SPEC.md)), so the check ships and the
     vocabulary stays with the consumer.
 
-14. **Config edits are merges, not rewrites.** Edit a config or settings file
+15. **Config edits are merges, not rewrites.** Edit a config or settings file
     with targeted, string-scoped edits, never a full-file write reconstructed
     from a partial read — a whole-file write built from part of the file
     silently drops everything the write did not carry. And validate an
@@ -207,7 +229,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     missing or ambiguous match, keeping the write scoped to what was read); no
     gate asserts a given edit was a merge rather than a rewrite.
 
-15. **Re-verify volatile state before a git history rewrite.** Verify HEAD
+16. **Re-verify volatile state before a git history rewrite.** Verify HEAD
     (`git log --oneline -3`) before an amend or squash; after a `git reset
     --soft`, re-stage and verify the staged content (`git show :<path>`) before
     committing — the soft reset keeps the old index snapshot; write any `git
@@ -224,7 +246,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     surfaces this checklist at the moment the rewrite is dispatched — advisory
     because each command is legitimate.
 
-16. **Entering another repo's tree, read its governance first.** A cross-repo
+17. **Entering another repo's tree, read its governance first.** A cross-repo
     edit re-reads that repo's agent file and README and checks its branch
     freshness every time — a second repo's model drifts independently of this
     one's, so a remembered version of its rules is a stale premise.
@@ -235,7 +257,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     tree is outside this tree's gate horizon, so no local check can assert its
     governance was reread.
 
-17. **Naming: drop the qualifier the context supplies — only when every consumer
+18. **Naming: drop the qualifier the context supplies — only when every consumer
     has that context.** A name that travels into a flat namespace keeps its
     qualifier; default to the shorter form and reject the vacuous one, but a
     name that loses the context which disambiguated it must carry the qualifier
@@ -249,7 +271,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     decide; the de-literalization instinct, a name sized to its widest reader,
     is its written form.
 
-18. **Reuse a co-located consumer's data before designing a new path.** For an
+19. **Reuse a co-located consumer's data before designing a new path.** For an
     embedded or co-located actor, first ask whether it can read a co-located
     consumer's already-fetched data before minting a new stream, grant, or
     fetch — a "which path" framing can hide a "no path needed" answer.
@@ -261,7 +283,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     leaves no artifact a scanner reads; it is design-review judgment, kin to
     reaching for an existing owner before minting a second source.
 
-19. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
+20. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
     gate that finds a silent drop has found either dead config to remove *or*
     promised-but-unwired config to build — one signature, opposite fixes; only
     the owning SPEC distinguishes them, so verify intent against the SPEC before

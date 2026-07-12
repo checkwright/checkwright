@@ -362,7 +362,7 @@ guard_rule_git_rewrite() {
         && grep -qE '(^|[[:space:]])(-F|--file|--amend)\b' <<<"$s"; } \
         || { grep -qE '(^|[[:space:]])git[[:space:]]+reset([[:space:]]|$)' <<<"$s" \
         && grep -qE '(^|[[:space:]])--soft\b' <<<"$s"; }; then
-        guard_advise "re-verify volatile git state before this history rewrite (DOCTRINE.md rule 15): confirm HEAD with 'git log --oneline -3' before an amend or squash; after a 'git reset --soft' re-stage and verify staged content with 'git show :<path>' before committing (the soft reset keeps the old index snapshot); write any 'git commit -F' message file fresh this turn — prefer '-m' for a short message, since a leftover file lands the wrong message with exit 0; and rewrite the message when amending so it states the combined change."
+        guard_advise "re-verify volatile git state before this history rewrite (DOCTRINE.md: Re-verify volatile state before a git history rewrite): confirm HEAD with 'git log --oneline -3' before an amend or squash; after a 'git reset --soft' re-stage and verify staged content with 'git show :<path>' before committing (the soft reset keeps the old index snapshot); write any 'git commit -F' message file fresh this turn — prefer '-m' for a short message, since a leftover file lands the wrong message with exit 0; and rewrite the message when amending so it states the combined change."
     fi
 }
 

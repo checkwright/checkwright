@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **gap-disposition-doctrine** [spec: SPEC-gap-disposition.md] — methodology rule 10, Gap
-  disposition: a gap surfaced-and-deferred is filed with its costed remedy, never
-  flagged-and-skipped; craft rules renumber 11–20, by-number citations migrate to name-based.
 - **ungateable-class-audit-cadence** [spec: SPEC-audit-cadence.md] — Enforcement-first's
   carve-out gains the cadence duty: an un-gateable class joins the tracked audit roster,
   reviewed at close with event-keyed due-ness; stated duty, no gate.
@@ -160,5 +157,7 @@
   verified against a local kramdown-GFM render of every docs page.
 
 ## Done
+
+- gap-disposition-doctrine
 
 ## Lessons Learned

@@ -25,7 +25,7 @@ to upgrade. The always-loaded maintenance rules, one line each; the doctrine add
 an engineering-craft section behind the link:
 
 - **Content-tiering / SSOT** — one content tier per surface; point, never restate.
-- **Enforcement-first** — the fix and the gate that catches it land in one unit.
+- **Enforcement-first** — the fix and the gate that catches it land in one unit; removing the duplication outranks gating it.
 - **De-literalization** — prose cites names; code or the owning SPEC owns values.
 - **Derivation-first** — derive the derivable (a roster, a count), never maintain it; a needed copy is generated and freshness-gated.
 - **Always-loaded shape** — one line per rule here; the mechanism behind the pointer.
@@ -33,6 +33,7 @@ an engineering-craft section behind the link:
 - **Widest-true-tier placement** — the widest tier true for every reader of it.
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
+- **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
 $END
 EOF
 }

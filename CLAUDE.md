@@ -86,6 +86,7 @@ an engineering-craft section behind the link:
 - **Widest-true-tier placement** — the widest tier true for every reader of it.
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
+- **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
 <!-- doctrine-kit:end -->
 
 ## Conventions established in gate-sdk (keep every kit consistent)
