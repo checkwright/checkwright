@@ -74,18 +74,30 @@ be trusted to have coordinated correct work.
 
 ## Running an iteration under a lead
 
-The lead is a role a session *becomes*, not a stage it runs. Start the
-iteration with `/scope` in a live session; once its promotion commit lands, that
-same session takes the lead role and dispatches the remaining stages — `/align`,
-`/build`, `/validate`, `/close` — each as a background stage session running its
-skill unchanged. The lead writes no lifecycle state of its own: every flip,
-stamp, and commit stays in the stage session, so the history reads identically
-whether or not a lead drove it. A blocked stage session forwards its question
-and resumes in place rather than restarting cold, and anything outside its
-ruling roster reaches the operator. Running no lead is equally valid — each
-stage is then an ordinary skill invocation that surfaces to the operator
-directly. The start sequence, the escalation shape, and the ruling-class
-boundary are owned by `lifecycle-kit/SPEC.md §templates/lead.md`.
+The lead is a role a session *becomes*, not a stage it runs — and running no
+lead is equally valid. To drive an iteration under one:
+
+1. **`/scope` in a live session.** It formalizes the iteration — authoring the
+   design amendments, promoting the queue entries — and lands the promotion
+   commit.
+2. **`/lead` in that same session**, once the promotion commit lands. The lead
+   role writes no lifecycle state of its own; every flip, stamp, and commit
+   stays in the stage sessions it dispatches, so the history reads identically
+   whether or not a lead drove it. Optionally compact first: a bare `/compact`
+   is safe here, because the lead holds pointers rather than state — everything
+   ruled already lives in a committed surface — so the worst case is a bounded
+   re-read, not lost work.
+3. **The lead dispatches each remaining stage** — `/align`, `/build`,
+   `/validate`, `/close` — as a background stage session that runs its skill
+   unchanged.
+4. **A blocked stage escalates to the lead and resumes in place** rather than
+   restarting cold; anything outside its ruling roster reaches the operator.
+
+Prefer to stay hands-on? Skip the lead and run each stage manually as an
+ordinary skill invocation, consulting the — optionally compacted — scope session
+when a stage raises a question. The compaction instruction, the escalation
+shape, and the ruling-class boundary are owned by `lifecycle-kit/SPEC.md
+§templates/lead.md`.
 
 ## Where to go next
 
