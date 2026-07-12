@@ -23,6 +23,14 @@ your repo root and wire it in:
 4. Opt each clone into the generated pre-commit hook with
    `bash gate-sdk/bin/install-hooks.sh`.
 
+Where a kit ships adoptable skills, take each as a binding shim by default — a
+one-line directive that references the vendored template, so a re-vendor reaches
+it and its gates hold the shim thin. Copying the template and filling its slots
+is the sanctioned fork: kept for legitimate structural divergence, but you then
+own its prose and an upgrade won't reach it. The shipping kit's SPEC owns the
+shim↔template contract — see lifecycle-kit's
+[stage-skill modes](lifecycle-kit/SPEC.md#templatesskills).
+
 Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
 runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
 

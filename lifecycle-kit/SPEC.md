@@ -479,18 +479,32 @@ A consumer skill adopts a template in one of two modes; either way the executed
 skill states in one line what the flip+stamp step does and supplies every
 slot's content:
 
-- **Copy-and-specialize** — the template is copied into the consumer's skills
-  dir and each slot overwritten in place. Self-contained and legible, the
-  default for a consumer whose stages diverge from the kit; structure is
-  copied, not imported, so the skill stands alone (gate-sdk's check-skeleton
-  shape).
-- **Consume-by-reference** — the consumer skill is a thin **binding shim** whose
-  body is a single directive line, `Execute the template at <repo-relative
-  path>, applying the bindings below.`, followed by a `## Bindings` section with
-  exactly one entry per template slot. The template stays the executed surface;
-  the shim carries only consumer content, so generic doctrine has one owner and
-  never drifts across a copy. For a consumer that tracks the kit — this repo
-  dogfoods it (`.claude/commands/*.md`).
+- **Consume-by-reference (the default)** — the consumer skill is a thin
+  **binding shim** whose body is a single directive line, `Execute the template
+  at <repo-relative path>, applying the bindings below.`, followed by a
+  `## Bindings` section with exactly one entry per template slot. The template
+  stays the executed surface; the shim carries only consumer content, so generic
+  doctrine has one owner and never drifts across a copy. This is the documented
+  default because it tracks the kit: a re-vendor reaches the template, and
+  `check-skill-binding` + `check-shim-restatement` hold the shim to a thin
+  reference. This repo dogfoods it (`.claude/commands/*.md`).
+- **Copy-and-specialize (the sanctioned fork)** — the template is copied into
+  the consumer's skills dir and each slot overwritten in place; self-contained
+  and legible, structure copied not imported, so the skill stands alone
+  (gate-sdk's check-skeleton shape). It is a fork with its consequence owned:
+  you own the ritual prose, an upgrade's re-vendor does not reach it, and the
+  shim gates do not cover it. It is kept deliberately — the blessed escape hatch
+  that keeps legitimate structural divergence (different stages, a reshaped
+  machine) visible and contained, and the harness-agnostic floor the bare-bash
+  upgrade smoke assumes; removing it would drive forks into edits of the
+  vendored template, which break Phase-A upgrade determinism with no gate to
+  catch them.
+
+A consumer reaching for the fork to express *prose* divergence rather than
+structural divergence signals the slot vocabulary is too thin; the fix is
+richer slots pulling those cases back under shim protection, not more copying.
+No gate or telemetry watches for it — which mode a consumer picks is their tree,
+not this one.
 
 **Named slots (template grammar).** Each consumer placeholder is a named slot
 `*<slot-name: guidance>*` — `slot-name` matches `[a-z][a-z0-9-]*`, is unique

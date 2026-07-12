@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **lifecycle-skill-adoption-steering** [spec: SPEC-adoption-steering.md] — the binding shim
-  becomes the documented default; copy-and-fill stays as the sanctioned fork with its drift
-  consequence stated inline; the steer also lands on the living install page.
 - **local-env-profile** [spec: SPEC-env-profile.md] — kit env probe writing a marker-bounded
   profile into a gitignored local file (hand-authored gotchas outside the markers), surfaced
   by the session-context hook; cached projection, stated install step, no gate.
@@ -155,6 +152,7 @@
 
 ## Done
 
+- lifecycle-skill-adoption-steering
 - lifecycle-resident-trigger-injector
 - craft-rule-stage-routing
 - faithful-artifact-verification
