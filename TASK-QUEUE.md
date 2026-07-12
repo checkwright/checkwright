@@ -143,6 +143,19 @@
   and the fence/heading assertions stayed silent — the gate's stated honest limit (fences and
   headings only) made concrete. Emitter fixed that instance (gen-value-rollup.sh emits a trailing
   blank); this rung mechanizes the channel so the next table-break reds instead of shipping.
+- **drop-python-dependency** [needs-spec] — port the two embedded `EXTRACT` programs (the only
+  python3 use in tracked code) from python3 to awk, then drop python3 from env-probe's `PROBE_SET`
+  and docs/install.md's Requirements — check-install-toolchain gates that name-set parity, so both
+  move in one commit. The embed sites are inline `python3 -c "$EXTRACT"` in `context-kit/bin/
+  md-index.sh` (markdown heading + first-summary extractor: link/emphasis stripping, first-sentence
+  -vs-120-char truncation, fence-awareness) and `pub-index.sh` (Rust `pub`-item match then sort by
+  kind,name). Oracle: `run-index-tests.sh` byte-diffs both tools against committed goldens, so the
+  awk ports are correct iff the goldens still match. Decide POSIX-awk vs GNU-awk: the box runs GNU
+  awk but the kits ship generic, so prefer POSIX constructs (no `match(...,arr)`/`gensub`) unless
+  a gawk floor is declared. Intersects pub-index-language-plugins — the awk extractor becomes that
+  task's Rust default extractor, no fold-in needed. Motivation: python3 is the heaviest item in an
+  otherwise bash/git/jq/awk/shellcheck toolchain, spent on two text-extraction one-liners. Surfaced
+  2026-07-13.
 
 ## Done
 
