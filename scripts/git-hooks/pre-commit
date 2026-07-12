@@ -89,6 +89,10 @@ if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workf
     scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
 fi
 
+if staged_matches 'docs/footprint.md' 'CLAUDE.md' 'gate-sdk/templates' 'canon-kit/templates' 'context-kit/templates' 'delegation-kit/templates' 'doctrine-kit/templates' 'drift-kit/templates' 'evidence-kit/templates' 'guard-kit/templates' 'lifecycle-kit/templates' 'queue-kit/templates' 'site-kit/templates'; then
+    context-kit/checks/check-footprint-fresh.sh || hook_fail check-footprint-fresh
+fi
+
 if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRINE.md' '*/SPEC.md' '*/README.md' 'doctrine-kit/DOCTRINE.md' 'scripts/gen-docs-mirror.sh'; then
     scripts/check-docs-mirror-fresh.sh || hook_fail check-docs-mirror-fresh
 fi

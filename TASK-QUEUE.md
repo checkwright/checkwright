@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **footprint-page** [spec: SPEC-footprint-page.md] — generated, freshness-gated docs page
-  publishing each kit's measured context footprint (always-loaded vs load-triggered, exact
-  line and word counts, a labeled token estimate); kit-shipped share only.
-
 ## Technical Debt
 
 ## Deferred
@@ -143,6 +139,7 @@
 
 ## Done
 
+- footprint-page
 - docs-queue-slug-liveness
 - template-doc-governance
 - local-env-profile

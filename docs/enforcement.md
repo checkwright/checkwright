@@ -42,6 +42,7 @@ leaves its section absent.
 | [lifecycle-kit](lifecycle-kit/index.md) | check-lifecycle-registration | precommit |
 | (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
+| [context-kit](context-kit/index.md) | check-footprint-fresh | precommit |
 | (consumer) | check-docs-mirror-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-enforcement-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-hook-exec-bit | precommit |

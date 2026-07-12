@@ -1,0 +1,12 @@
+---
+title: Footprint
+nav_order: 6
+---
+
+# Context footprint
+
+| kit | always-loaded | load-triggered |
+| --- | --- | --- |
+| foo-kit | 5l · 35w · ~75t | — |
+| bar-kit | — | 40l · 300w · ~500t |
+| **total** | 5l · 35w · ~75t | 40l · 300w · ~500t |

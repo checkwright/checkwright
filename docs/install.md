@@ -11,6 +11,10 @@ and the audit story wants the governance layer inside the reviewed tree — so
 the package registries hold the name only, never a dependency channel. There is
 nothing to `npm install` or `cargo add`.
 
+Before you vendor, the [footprint page](footprint.md) measures what each kit
+adds to a consumer's context budget — the always-loaded and load-triggered cost
+per kit, so the adoption decision weighs a number rather than a guess.
+
 ## Vendoring the kits
 
 Each kit is a self-contained top-level directory. To adopt one, copy it into

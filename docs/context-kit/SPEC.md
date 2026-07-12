@@ -195,6 +195,50 @@ the measurement.
   (§The consumer footprint): its delta is what the close-stage brevity pass
   reacts to.
 
+## bin/footprint
+
+`bin/footprint.sh` publishes the kits' measured context footprint — the
+adoption-cost evidence a consumer weighs before vendoring, the concrete form of
+the token-economics positioning. Where the meter reads one consumer's live
+always-loaded total, this reads the tracked kit surfaces and attributes the cost
+per kit, split by when it lands.
+
+The measured set is the kit roster, **derived not maintained**: the top-level
+directories carrying a `SPEC.md`. No knob names the set — a new kit joins the
+page by existing.
+
+Each kit is measured in the always-loaded and load-triggered tiers:
+
+- **Always-loaded** — the block a kit generates between its own
+  `begin`/`end` markers in the configured surface files
+  (`CONTEXT_KIT_SURFACES`), the agent-file text the kit injects into every
+  session's context. This reuses the always-loaded meter's surface set; most
+  kits inject nothing and score zero here.
+- **Load-triggered** — the skill and template markdown the kit ships under its
+  `templates/` tree, pulled into context only when its trigger fires. Gate-test
+  fixtures sit outside `templates/`, so they never enter the count.
+
+**Numbers ruling.** Line and word counts are exact. The token column is a
+*labeled estimate* — a bytes/4 heuristic, carried with a leading `~` and stated
+inline as model-tokenizer-dependent, never a false-precision figure.
+
+**Attribution ruling: kit share only.** A kit's advertised cost is what the kit
+ships. Consumer bindings (the skill shims pointing at a vendored template),
+consumer config, the on-demand SPEC/README pages, this repo's own `CLAUDE.md`
+residue, and the session hook's dynamic body (consumer state, not fixed kit
+text) are all excluded, and the page states the exclusion so the number is
+honest. The exclusion is also a determinism requirement: the freshness gate
+byte-compares the emission, so every measured surface must be a static tracked
+file — a live hook run, being state-dependent, could never be byte-gated.
+
+**Emission.** Bare invocation prints a human header plus the per-kit table;
+`--emit` prints the committed `docs/footprint.md` page whole (front matter,
+method and exclusion prose, then the table with a totals row) — the `--emit`
+symmetry the sibling emitters (`always-loaded.sh`, drift-kit's `trajectory.sh`)
+share. Advisory by construction: exit is always zero and the script never joins
+`gates.list`; the freshness gate (§check-footprint-fresh) is what blocks a stale
+page.
+
 ## The brevity gate
 
 `checks/check-brevity.sh` — a section-agnostic name: the governed section
@@ -288,6 +332,10 @@ bounds the one bulleted section its knob designates (§The brevity gate; this
 repo points it at the conventions block, not the digest), and the meter delta
 feeds `kpi-always-loaded`.
 
+The measured counterpart to this budget doctrine is the published footprint page
+(§bin/footprint): this section owns the budget rule, the page owns the measured
+per-kit numbers, and the two never restate each other.
+
 ## The memory-off doctrine
 
 Harness memory — the per-session store the harness offers to persist facts
@@ -360,6 +408,26 @@ is clean, and the clean line states the fail-open caveat — an absent dir
 proves nothing about another clone. It fails closed only when it cannot read
 what is present to check: a local settings file with no `jq`.
 
+## check-footprint-fresh
+
+`checks/check-footprint-fresh.sh` (hermetic, `precommit`) byte-compares the
+committed `docs/footprint.md` against `footprint.sh --emit`, the
+`check-docs-mirror-fresh`/`check-trajectory-fresh` posture: a generated,
+freshness-gated projection is Derivation-first's sanctioned copy, so the
+maintainer re-runs the emitter after any change to a measured surface and a
+stale page reddens the battery. Its `# graph:` manifest couples the measured
+surfaces — the configured agent file and each kit's `templates/` tree — so an
+edit to what the page counts re-fires the gate.
+
+Bare, it runs the live emitter; a two-argument form
+(`check-footprint-fresh.sh <projection> <emit>`) compares two pre-baked files,
+the hermetic mode the `good/`+`bad/` fixture pair drives. Fail-closed (exit 2)
+on a missing projection or emit source; the stale byte-compare is the exit-1
+violation. The page's generated numbers ride the `docs/evidence-data.md`
+precedent past the prose gates on content, not a named valve — the figures live
+in table cells the count gate does not read as prose, and the method prose names
+no bare collection total.
+
 ## Layout and configuration
 
 ```
@@ -368,14 +436,17 @@ context-kit/
   bin/md-section.sh
   bin/pub-index.sh
   bin/always-loaded.sh
+  bin/footprint.sh               # per-kit two-tier footprint; --emit is docs/footprint.md
   bin/env-probe.sh               # derives the marker-bounded local env profile
   bin/run-index-tests.sh         # expected-output runner for the bin tools
   checks/check-brevity.sh
   checks/check-settings-pins.sh  # hermetic: pins hold against the settings file
   checks/check-memory-off.sh     # local-environment: memory dir + local overrides
+  checks/check-footprint-fresh.sh # hermetic: docs/footprint.md byte-fresh vs the emitter
   gate-tests/check-brevity/{good,bad}/
   gate-tests/check-settings-pins/{good,bad}/
   gate-tests/check-memory-off/{good,bad}/
+  gate-tests/check-footprint-fresh/{good,bad}/
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
@@ -448,8 +519,12 @@ instead: `index-tests/` holds a small fixture corpus (Markdown with nested
 headings, fences, and link-bearing first sentences; Rust with the pub-item
 kinds; a baseline file) beside expected outputs, and
 `bin/run-index-tests.sh` runs each tool over the corpus and asserts exact
-output, failing on any diff. `check-brevity`, `check-settings-pins`, and
-`check-memory-off` are gates and carry the standard fixture pair. Both
+output, failing on any diff. `footprint.sh` is advisory the same way, but its
+projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
+`docs/footprint.md` against `--emit`. `check-brevity`, `check-settings-pins`,
+`check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
+fixture pair; the footprint pair drives the hermetic two-argument mode
+(`<projection> <emit>`), the `check-trajectory-fresh` precedent. Both
 memory-off gates take a `--fixture <dir>` injection (the check-identity
 precedent): the settings-pins pair reads `<dir>/settings.json` against
 `<dir>/settings-pins.conf`; the memory-off pair scans `<dir>/memory` for
