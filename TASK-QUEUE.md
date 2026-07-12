@@ -16,6 +16,63 @@
 
 ## Deferred
 
+- **spec-contract-leaning-sweep** [needs-spec] — lean the `## Per-component
+  contracts` subsections of the heavy SPECs (gate-sdk/SPEC.md, canon-kit/SPEC.md)
+  that restate the source's function/variable roster and step-by-step algorithm —
+  the mechanical WHAT the code owns — keeping the invariant, the design rationale,
+  and the public-API contract citations while cutting the exhaustive
+  internal-identifier inventories and branch-condition narration, pointing to the
+  source as owner (the de-literalization move the kit already makes for knob
+  values). Verified leaks: gate-sdk/SPEC.md §lib/gate.sh (a function inventory down
+  to internal helpers `gate_expand_couples` / `gate_manifest_field` /
+  `gate_staged_matches`), canon-kit/SPEC.md §lib/spec.sh (internal awk identifiers
+  `SPEC_COUNT_CARDINAL_RE` / `spec_count_awk_lib` / `sk_count_hit` plus walk
+  narration), lifecycle-kit/SPEC.md §bin/enter-stage.sh (write-sequence steps + the
+  knob roster the script reads), gate-sdk/SPEC.md §check-graph (letter-labeled
+  assertion conditions mirroring the check's branches), canon-kit/SPEC.md
+  §check-comment-tier (the directive-token set) and §check-manifest-count (the
+  cardinal grammar + exemption regex). Why un-gated: every existing
+  anti-restatement gate targets a *literal* — check-manifest-count (values/counts),
+  check-knob-citation (knob values), check-spec-embedded-source (verbatim copy),
+  check-spec-derivable-section (code dumps under banned headings); a prose
+  function-inventory is none of those and escapes — the delta between the codified
+  de-literalization-of-values rule and the broader WHY-to-SPEC / WHAT-to-code
+  aspiration. Design question to rule at scope: extend the de-literalization duty
+  to *source identifiers in prose* (name the public contract, never the internal
+  roster/algorithm) as a stated authoring rule — no gate, per the Enforcement-first
+  high-false-positive carve-out (a SPEC legitimately names public function names as
+  contracts, so "prose names a source identifier" cannot be decided cleanly). Scope
+  bounded to the two heavy SPECs' lib/* and check-* subsections, not tree-wide;
+  this sweep is the first instance the ungateable-class-audit-cadence rule below
+  would schedule. Surfaced 2026-07-12 at validate (operator ask, audit of the
+  WHY/WHAT SPEC split).
+- **ungateable-class-audit-cadence** [needs-spec] — a methodology-maintenance rule
+  for the class a gate cannot watch: Enforcement-first's false-positive carve-out
+  sends an unformalizable / high-FP defect class to "a stated manual duty", but a
+  duty with no cadence is a duty no session performs — it rots exactly like the
+  deferred gap the gap-disposition-doctrine rule catches. Propose: when a class is
+  un-gateable, plan a *recurring audit* (a named periodic sweep on a lifecycle hook
+  — a close-stage roster review, or an every-N-iterations counter) rather than
+  leaving the duty cadence-less, so the mechanically-undecidable residual still
+  gets a review channel. Relationship to existing rules: extends Enforcement-first's
+  carve-out (adds cadence to "stated manual duty"); complements
+  gap-disposition-doctrine (that rule costs the remedy when a gap is *deferred*;
+  this schedules the un-gateable one no gate can ever close); complements
+  Oracle-first (the gate is the mechanically decidable, the audit is its residual).
+  Design questions to rule at scope: (1) new numbered methodology rule vs an
+  extension of Enforcement-first's carve-out clause — the gap-disposition-doctrine
+  placement ripple applies (a new numbered rule renumbers the engineering-craft
+  block a by-number code citation in guard-kit/lib/guard.sh depends on; prefer
+  extending the clause, or migrate that citation to name-based first). (2) the
+  CLAUDE.md doctrine digest is held in per-rule lockstep by
+  check-doctrine-registration, so a new rule lands its digest bullet in the same
+  unit. (3) where the cadence lives — a close-stage skill step, an iteration
+  counter, or a standalone audit skill — and whether the audit roster is a tracked
+  derived artifact (un-gateable classes + last-audit stamp, the evidence-data.md
+  pattern) so "which audits are due" is derived, not remembered. (4) the rule's own
+  enforcement is a stated duty (audit cadence is not machine-decidable) — the
+  carve-out is self-applying. Surfaced 2026-07-12 at validate (operator ask, after
+  the spec-contract-leaning-sweep gap proved un-gateable).
 - **template-doc-governance** [needs-spec] — kit template markdown escapes the
   manifest doc gates (link resolution, anti-restatement, command/knob citation):
   their file set is `CANON_KIT_MANIFEST_FILES`, which carries no `templates/`
