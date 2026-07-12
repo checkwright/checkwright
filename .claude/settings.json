@@ -21,6 +21,8 @@
       "Bash(bash drift-kit/kpis/*.sh *)",
       "Bash(bash scripts/check-*.sh)",
       "Bash(bash scripts/check-*.sh *)",
+      "Bash(bash scripts/gen-docs-mirror.sh)",
+      "Bash(bash scripts/gen-docs-mirror.sh *)",
       "Bash(bash gate-sdk/bin/gen-pre-commit.sh --write)",
       "Bash(bash gate-sdk/bin/enforcement-map.sh)",
       "Bash(bash gate-sdk/bin/enforcement-map.sh *)",
