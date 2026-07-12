@@ -1,0 +1,20 @@
+<nav class="nav-tree" aria-label="Documentation">
+  {%- assign navpages = site.pages | where_exp: "p", "p.nav_order" | sort: "nav_order" -%}
+  <ul>
+    {%- for p in navpages -%}
+    <li class="{% if p.url == page.url %}current{% endif %}">
+      <a href="{{ p.url | relative_url }}">{{ p.title | default: p.name }}</a>
+      {%- if p.nav_id -%}
+        {%- assign kids = site.pages | where: "nav_parent", p.nav_id | sort: "nav_child_order" -%}
+        {%- if kids != empty -%}
+        <ul class="nav-children">
+          {%- for k in kids -%}
+          <li class="{% if k.url == page.url %}current{% endif %}"><a href="{{ k.url | relative_url }}">{{ k.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+        {%- endif -%}
+      {%- endif -%}
+    </li>
+    {%- endfor -%}
+  </ul>
+</nav>

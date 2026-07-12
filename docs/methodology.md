@@ -1,3 +1,8 @@
+---
+title: Why Checkwright
+nav_order: 2
+---
+
 # Why Checkwright
 
 ## The problem: discipline that does not hold

@@ -1,3 +1,9 @@
+---
+title: queue-kit
+nav_order: 12
+nav_id: queue-kit
+---
+
 # queue-kit
 
 A git-native, agent-readable task tracker. The queue is a single Markdown file
@@ -25,6 +31,6 @@ bash gate-sdk/bin/run-gate-tests.sh queue-kit/gate-tests queue-kit/checks
 ## Contracts
 
 The queue format and the tag algebra are defined in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/queue-kit/SPEC.md#the-queue-format);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/queue-kit/README.md)
+[`SPEC.md`](SPEC.md#the-queue-format);
+its [`README.md`](README.md#queue-kit)
 lists the mechanism. Back to the [kit map](../index.md#the-kits).

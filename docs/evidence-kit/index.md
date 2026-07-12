@@ -1,3 +1,9 @@
+---
+title: evidence-kit
+nav_order: 18
+nav_id: evidence-kit
+---
+
 # evidence-kit
 
 A held-constant test baseline and a committed per-run evidence manifest for the
@@ -25,7 +31,7 @@ bash gate-sdk/bin/run-gate-tests.sh evidence-kit/gate-tests evidence-kit/checks
 
 The baseline grammar and the versioned manifest contract are defined in the
 kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/evidence-kit/SPEC.md#per-component-contracts);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/evidence-kit/README.md)
+[`SPEC.md`](SPEC.md#per-component-contracts);
+its [`README.md`](README.md#evidence-kit)
 lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

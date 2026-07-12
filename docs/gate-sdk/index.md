@@ -1,3 +1,9 @@
+---
+title: gate-sdk
+nav_order: 10
+nav_id: gate-sdk
+---
+
 # gate-sdk
 
 A self-testing lint framework for the prose, spec, and config surfaces
@@ -29,8 +35,8 @@ bash gate-sdk/bin/install-hooks.sh                   # opt this clone into the h
 
 The gate contracts — the output, fail-closed, fixture-pair, and self-lint
 disciplines every gate keeps — are defined in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#the-gate-model);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/gate-sdk/README.md)
+[`SPEC.md`](SPEC.md#the-gate-model);
+its [`README.md`](README.md#gate-sdk)
 lists the mechanism. Both ship inside the vendored `gate-sdk/`
 directory. Back to the [kit map](../index.md#the-kits) or the
 [install guide](../install.md).

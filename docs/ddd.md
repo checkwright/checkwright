@@ -1,3 +1,8 @@
+---
+title: Domain-driven design
+nav_order: 4
+---
+
 # Domain-driven design: enforcing the ubiquitous language
 
 Domain-driven design asks a team to speak one **ubiquitous language** — a

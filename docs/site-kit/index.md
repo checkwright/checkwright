@@ -1,3 +1,9 @@
+---
+title: site-kit
+nav_order: 19
+nav_id: site-kit
+---
+
 # site-kit
 
 Deployment-truth governance for a docs site served from the repository itself
@@ -32,7 +38,7 @@ bash gate-sdk/bin/run-gate-tests.sh site-kit/gate-tests site-kit/checks
 
 The gate invariant, the monitor boundary, and every knob are defined in the
 kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/site-kit/SPEC.md#check-docs-cname-parity);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/site-kit/README.md)
+[`SPEC.md`](SPEC.md#check-docs-cname-parity);
+its [`README.md`](README.md#site-kit)
 lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

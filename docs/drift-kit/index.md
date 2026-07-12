@@ -1,3 +1,9 @@
+---
+title: drift-kit
+nav_order: 17
+nav_id: drift-kit
+---
+
 # drift-kit
 
 Advisory drift reporting for stateless sessions. Not every consistency axis is
@@ -25,7 +31,7 @@ bash drift-kit/bin/drift-report.sh                   # the full advisory report
 
 The KPI registry contract and the knowledge-friction loop are defined in the
 kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/drift-kit/SPEC.md#the-kpi-plugin-contract);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/drift-kit/README.md)
+[`SPEC.md`](SPEC.md#the-kpi-plugin-contract);
+its [`README.md`](README.md#drift-kit)
 lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

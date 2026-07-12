@@ -1,3 +1,9 @@
+---
+title: delegation-kit
+nav_order: 15
+nav_id: delegation-kit
+---
+
 # delegation-kit
 
 Safe delegated-agent execution for budget-bounded sessions. Delegating work to
@@ -25,7 +31,7 @@ bash delegation-kit/bin/usage-verdict.sh             # one budget verdict: OK / 
 ## Contracts
 
 The supervisor protocol and the tamper-gate contract are defined in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/delegation-kit/SPEC.md#the-delegation-model);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/delegation-kit/README.md)
+[`SPEC.md`](SPEC.md#the-delegation-model);
+its [`README.md`](README.md#delegation-kit)
 lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

@@ -1,3 +1,8 @@
+---
+title: Orchestration
+nav_order: 3
+---
+
 # Agent orchestration: the verification layer beneath it
 
 Agent orchestration frameworks answer *who works on what, and when*. They fan a

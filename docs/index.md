@@ -1,3 +1,8 @@
+---
+title: Home
+nav_order: 1
+---
+
 # Checkwright
 
 Checkwright is a coding-agent-assisted delivery methodology, packaged as

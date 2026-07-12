@@ -71,7 +71,7 @@ if staged_matches 'README.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' '
     gate-sdk/checks/check-kit-registration.sh || hook_fail check-kit-registration
 fi
 
-if staged_matches 'docs/index.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*'; then
+if staged_matches 'docs/index.md' 'docs/*/index.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*'; then
     scripts/check-docs-kit-parity.sh || hook_fail check-docs-kit-parity
 fi
 

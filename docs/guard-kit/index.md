@@ -1,3 +1,9 @@
+---
+title: guard-kit
+nav_order: 14
+nav_id: guard-kit
+---
+
 # guard-kit
 
 Permission-friction tooling for agent sessions. An agent that stops to ask
@@ -25,7 +31,7 @@ bash guard-kit/bin/run-guard-tests.sh                # exercise the decision tab
 ## Contracts
 
 The guard decision model and the friction-triage step are defined in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/guard-kit/SPEC.md#the-guard-framework-libguardsh);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/guard-kit/README.md)
+[`SPEC.md`](SPEC.md#the-guard-framework-libguardsh);
+its [`README.md`](README.md#guard-kit)
 lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

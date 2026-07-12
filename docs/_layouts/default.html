@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {%- assign is_home = false -%}
+  {%- if page.url == "/" or page.url == "/index.html" -%}{%- assign is_home = true -%}{%- endif -%}
+  <title>{% if page.title and is_home == false %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="icon" href="{{ '/assets/logo/checkwright-mark.svg' | relative_url }}" type="image/svg+xml">
+  <script>
+    // Resolve the persisted theme before first paint so the chrome never flashes.
+    (function () {
+      try {
+        var t = localStorage.getItem('checkwright-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --ck-bg: #ffffff; --ck-fg: #1f2328; --ck-muted: #656d76;
+      --ck-border: #d0d7de; --ck-sidebar: #f6f8fa; --ck-accent: #9a6f16;
+      --ck-header-bg: #16202b; --ck-header-fg: #e6edf3; --ck-gold: #c19a3d;
+      --ck-link: #0969da; --ck-code-bg: #f6f8fa;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --ck-bg: #0d1117; --ck-fg: #e6edf3; --ck-muted: #8b949e;
+        --ck-border: #30363d; --ck-sidebar: #161b22; --ck-accent: #d3a84a;
+        --ck-link: #58a6ff; --ck-code-bg: #161b22;
+      }
+    }
+    :root[data-theme="dark"] {
+      --ck-bg: #0d1117; --ck-fg: #e6edf3; --ck-muted: #8b949e;
+      --ck-border: #30363d; --ck-sidebar: #161b22; --ck-accent: #d3a84a;
+      --ck-link: #58a6ff; --ck-code-bg: #161b22;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ck-bg); color: var(--ck-fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.5; }
+    a { color: var(--ck-link); }
+    .site-header { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 1.25rem;
+      background: var(--ck-header-bg); color: var(--ck-header-fg);
+      border-top: 4px solid var(--ck-gold); position: sticky; top: 0; z-index: 20; }
+    .site-header .brand { display: flex; align-items: center; gap: 0.6rem;
+      color: var(--ck-header-fg); text-decoration: none; font-weight: 600; font-size: 1.15rem; }
+    .site-header .brand img { width: 30px; height: 30px; display: block; }
+    .site-header .spacer { flex: 1; }
+    .theme-select { display: inline-flex; border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px; overflow: hidden; }
+    .theme-select button { background: transparent; color: var(--ck-header-fg);
+      border: 0; padding: 0.25rem 0.6rem; font-size: 0.8rem; cursor: pointer; }
+    .theme-select button[aria-pressed="true"] { background: var(--ck-gold); color: #16202b; }
+    .site-body { display: flex; align-items: flex-start; max-width: 1180px; margin: 0 auto; }
+    .site-nav { flex: 0 0 260px; padding: 1.25rem 1rem; border-right: 1px solid var(--ck-border);
+      position: sticky; top: 52px; align-self: flex-start; max-height: calc(100vh - 52px);
+      overflow-y: auto; background: var(--ck-sidebar); }
+    .site-search input { width: 100%; padding: 0.4rem 0.6rem; border: 1px solid var(--ck-border);
+      border-radius: 6px; background: var(--ck-bg); color: var(--ck-fg); }
+    .search-results { list-style: none; margin: 0.4rem 0 0; padding: 0; }
+    .search-results li { margin: 0; }
+    .search-results a { display: block; padding: 0.3rem 0.4rem; border-radius: 5px;
+      text-decoration: none; font-size: 0.9rem; }
+    .search-results a:hover { background: var(--ck-border); }
+    .search-results .hit-crumb { color: var(--ck-muted); font-size: 0.75rem; }
+    .nav-tree { margin-top: 1rem; }
+    .nav-tree ul { list-style: none; margin: 0; padding: 0; }
+    .nav-tree > ul > li { margin: 0.15rem 0; }
+    .nav-tree a { display: block; padding: 0.2rem 0.4rem; border-radius: 5px;
+      text-decoration: none; color: var(--ck-fg); }
+    .nav-tree a:hover { background: var(--ck-border); }
+    .nav-tree li.current > a { color: var(--ck-accent); font-weight: 600; }
+    .nav-children { margin-left: 0.75rem !important; border-left: 1px solid var(--ck-border);
+      padding-left: 0.35rem !important; }
+    .nav-children a { font-size: 0.9rem; color: var(--ck-muted); }
+    .site-content { flex: 1 1 auto; min-width: 0; padding: 1.5rem 2rem 4rem; }
+    .site-content .markdown-body { background: transparent; color: var(--ck-fg);
+      max-width: 46rem; }
+    .site-content .markdown-body a { color: var(--ck-link); }
+    .site-content .markdown-body pre,
+    .site-content .markdown-body code { background: var(--ck-code-bg); }
+    .site-content .markdown-body pre { border: 1px solid var(--ck-border); }
+    .site-footer { border-top: 1px solid var(--ck-border); color: var(--ck-muted);
+      padding: 1.5rem 2rem; max-width: 1180px; margin: 0 auto; font-size: 0.85rem; }
+    .site-footer a { color: var(--ck-muted); }
+    @media (max-width: 800px) {
+      .site-body { display: block; }
+      .site-nav { position: static; max-height: none; width: auto; border-right: 0;
+        border-bottom: 1px solid var(--ck-border); }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      <img src="{{ '/assets/logo/checkwright-mark.svg' | relative_url }}" alt="">
+      <span>{{ site.title }}</span>
+    </a>
+    <span class="spacer"></span>
+    <div class="theme-select" role="group" aria-label="Color theme">
+      <button type="button" data-theme-choice="light">Light</button>
+      <button type="button" data-theme-choice="dark">Dark</button>
+      <button type="button" data-theme-choice="auto">Auto</button>
+    </div>
+  </header>
+
+  <div class="site-body">
+    <aside class="site-nav">
+      <div class="site-search">
+        <input type="search" id="site-search" placeholder="Search docs…" autocomplete="off" aria-label="Search documentation">
+        <ul class="search-results" id="search-results"></ul>
+      </div>
+      {% include nav.html %}
+    </aside>
+    <main class="site-content">
+      <article class="markdown-body">
+        {{ content }}
+      </article>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    Checkwright — governed by the same kits it ships.
+    <a href="https://github.com/checkwright/checkwright">Source on GitHub</a>.
+  </footer>
+
+  <script>
+    // Theme selector: persist the explicit choice under checkwright-theme; 'auto'
+    // clears the override and defers to prefers-color-scheme.
+    (function () {
+      var root = document.documentElement;
+      var buttons = document.querySelectorAll('.theme-select button');
+      function current() {
+        try { return localStorage.getItem('checkwright-theme') || 'auto'; } catch (e) { return 'auto'; }
+      }
+      function reflect() {
+        var c = current();
+        buttons.forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-theme-choice') === c ? 'true' : 'false');
+        });
+      }
+      buttons.forEach(function (b) {
+        b.addEventListener('click', function () {
+          var choice = b.getAttribute('data-theme-choice');
+          try {
+            if (choice === 'auto') { localStorage.removeItem('checkwright-theme'); }
+            else { localStorage.setItem('checkwright-theme', choice); }
+          } catch (e) {}
+          if (choice === 'auto') root.removeAttribute('data-theme');
+          else root.setAttribute('data-theme', choice);
+          reflect();
+        });
+      });
+      reflect();
+    })();
+  </script>
+  <script>window.CK_SEARCH_URL = {{ '/search.json' | relative_url | jsonify }};</script>
+  <script src="{{ '/assets/search.js' | relative_url }}"></script>
+</body>
+</html>

@@ -1,3 +1,9 @@
+---
+title: context-kit
+nav_order: 16
+nav_id: context-kit
+---
+
 # context-kit
 
 Token-economics-aware context management. Everything a stateless session reads
@@ -11,7 +17,7 @@ meter with a committed baseline, a gate over the density of the densest
 always-loaded section, and a memory-off gate pair that keeps the harness's
 ungoverned per-session memory surface disabled — the doctrine and both gates
 are defined in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-memory-off-doctrine).
+[`SPEC.md`](SPEC.md#the-memory-off-doctrine).
 
 ## Install
 
@@ -29,9 +35,9 @@ bash context-kit/bin/pub-index.sh <component>/src/   # public API surface
 
 The reading-tool contracts and the always-loaded budget are defined in the
 kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-consumer-footprint),
+[`SPEC.md`](SPEC.md#the-consumer-footprint),
 including the consumer footprint it holds — what the kits ask
 your always-loaded surface to carry, worth reading before you vendor. Its
-[`README.md`](https://github.com/checkwright/checkwright/blob/master/context-kit/README.md)
+[`README.md`](README.md#context-kit)
 lists the mechanism. Back to the
 [kit map](../index.md#the-kits).

@@ -1,3 +1,9 @@
+---
+title: doctrine-kit
+nav_order: 20
+nav_id: doctrine-kit
+---
+
 # doctrine-kit
 
 The experience-packaging rung. The delivery doctrine the other kits enforce
@@ -44,7 +50,7 @@ bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks
 ## Contracts
 
 The rule statements live in the kit's
-[`DOCTRINE.md`](https://github.com/checkwright/checkwright/blob/master/doctrine-kit/DOCTRINE.md);
+[`DOCTRINE.md`](DOCTRINE.md);
 the installer contract, the gate invariant, and every knob are defined in its
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/doctrine-kit/SPEC.md#check-doctrine-registration).
+[`SPEC.md`](SPEC.md#check-doctrine-registration).
 Back to the [kit map](../index.md#the-kits).

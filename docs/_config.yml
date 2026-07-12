@@ -1,0 +1,10 @@
+title: Checkwright
+description: A coding-agent-assisted delivery methodology, packaged as installable kits.
+theme: jekyll-theme-primer
+
+# Every page renders through the site chrome; search.json opts back out to layout: null.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

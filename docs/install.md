@@ -1,3 +1,8 @@
+---
+title: Install
+nav_order: 5
+---
+
 # Install and upgrade
 
 Checkwright is distributed git-native and vendored-committed: you copy the kit

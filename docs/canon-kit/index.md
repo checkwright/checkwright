@@ -1,3 +1,9 @@
+---
+title: canon-kit
+nav_order: 13
+nav_id: canon-kit
+---
+
 # canon-kit
 
 Spec discipline for agent-authored components. When agents write both the code
@@ -26,6 +32,6 @@ bash gate-sdk/bin/run-gate-tests.sh canon-kit/gate-tests canon-kit/checks
 
 The spec model — canonical-plus-amendment lifecycle, the tiering topology, and
 the anti-restatement doctrine — is defined in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/canon-kit/SPEC.md#the-spec-model);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/canon-kit/README.md)
+[`SPEC.md`](SPEC.md#the-spec-model);
+its [`README.md`](README.md#canon-kit)
 lists the mechanism. Back to the [kit map](../index.md#the-kits).

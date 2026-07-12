@@ -1,3 +1,9 @@
+---
+title: lifecycle-kit
+nav_order: 11
+nav_id: lifecycle-kit
+---
+
 # lifecycle-kit
 
 An iteration stage state machine built for stateless agent sessions. Where a
@@ -27,6 +33,6 @@ bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/check
 
 The state-machine contract — the stamp grammar, the flip-and-stamp protocol,
 and the gates that enforce it — lives in the kit's
-[`SPEC.md`](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/SPEC.md#the-state-machine);
-its [`README.md`](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/README.md)
+[`SPEC.md`](SPEC.md#the-state-machine);
+its [`README.md`](README.md#lifecycle-kit)
 lists the mechanism. Back to the [kit map](../index.md#the-kits).
