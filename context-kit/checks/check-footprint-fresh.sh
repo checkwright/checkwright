@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=docs/footprint.md,CLAUDE.md,kit:templates dir=one valve=none tier=precommit trigger=docs/footprint.md,CLAUDE.md,kit:templates
+# graph: couples=docs/footprint.md,CLAUDE.md,kit:templates/*.md,lifecycle-kit/templates/skills/*.md dir=one valve=none tier=precommit trigger=docs/footprint.md,CLAUDE.md,kit:templates/*.md,lifecycle-kit/templates/skills/*.md
 # spec: context-kit/SPEC.md §check-footprint-fresh — docs/footprint.md is the byte-fresh projection of footprint.sh --emit
 #
 # usage: check-footprint-fresh.sh [projection-file] [emit-file]
