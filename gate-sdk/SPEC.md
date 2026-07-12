@@ -344,6 +344,14 @@ checklist; a kit root lacking `smoke/` is an environment error (exit 2).
   is rightly absent only where no battery-reddening violation is craftable —
   a kit that registers no gates has nothing to redden.
 
+**CI tool provisioning.** A gate whose oracle shells out beyond the
+checkout+bash baseline (a renderer, a language runtime) is provisioned in the CI
+backstop (`gates.yml`), not just locally — a green pre-commit on a dev box that
+carries the tool is not a green CI, and the divergence surfaces only after push.
+The provisioning step rides the consumer's filled workflow instance, never the
+generic template (§templates/gates-workflow.yml), since the dependency joins the
+toolchain only for a consumer that registers the gate.
+
 **Starter-template conformance.** A kit that ships a starter template (in
 `templates/`) ships it battery-clean: the template must pass the **full
 battery** — every vendored kit's gates — when copied verbatim into a
