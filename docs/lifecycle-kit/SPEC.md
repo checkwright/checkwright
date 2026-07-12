@@ -35,6 +35,10 @@ Two governed surfaces:
   <iteration> <stage> <session-id> <YYYY-MM-DD>
   ```
 
+The default motion is the linear stage walk; the gate-legal shapes for leaving
+it — abandon, split, reopen — are specified in §Deviation transitions, not
+improvised.
+
 ### The flip+stamp protocol
 
 The **arriving** stage's skill flips the `[stage:]` line to its own stage as
@@ -87,6 +91,55 @@ flip+stamp protocol stays the only iteration state and a lead crash costs
 nothing the tracked surfaces do not already hold. The lead is a boundary skill,
 not a stage — it flips nothing and joins no stage set, so the coverage gate
 never reads it (the release-sweep precedent, §templates/lead.md).
+
+### Deviation transitions
+
+The stages walk `scope → align → build → validate → close` in order by
+default; the gate-legal shapes for leaving that walk are specified here, not
+improvised. Each composes mechanism the kit already owns — `enter-stage.sh`'s
+boundary reset, canon-kit's amendment pairing, queue-kit's tag algebra — so
+**no new tooling, state, stamp grammar, or tag is introduced**, and a
+harness-less consumer keeps every shape. `check-stage-entry` and the flip+stamp
+protocol bar an ad-hoc abandon, which is why each hatch is spelled against the
+existing gates.
+
+**The demote ritual** is the shared step the other shapes compose. To take a
+promoted entry out of a live iteration: move it back to the deferred queue
+section restoring its design-pending tag, and delete its amendment file in the
+same commit. Git history preserves the design — a later scope re-promotes by
+resurrecting the file from history rather than re-deriving it. The enforcement
+is already on the books: canon-kit's `check-amendment-queue` reds the commit on
+a deferred entry that still carries a spec ref, or an orphaned amendment left on
+disk. If the validate baseline carries a scenario keyed to the demoted entry,
+that scenario is re-scoped or removed in the same commit — a coverage-honesty
+obligation, not a gate one (`check-evidence-baseline`'s slug-liveness passes
+regardless, since a demoted entry stays a live queue task).
+
+**Abandon** ends an iteration without a close. Disposition every active entry
+explicitly — demote it (ritual above) or carry it (it stays active with its
+amendment and the next iteration adopts it); sink or delete every Lessons entry
+under the existing disposition rules (the first-stage entry refuses a non-empty
+Lessons section, so this is already forced). Then the next `enter-stage.sh
+scope` *is* the abandon: scope has no mandatory predecessor, so the flip is
+gate-legal from any stage, and the boundary reset drops the dead iteration's
+stamps exactly as it drops a closed one's (git history is the permanent audit
+trail — the existing boundary doctrine, not a new rule). The abandon commit's
+subject names the abandoned iteration; no stamp grammar changes.
+
+**Split mid-flight** narrows a live iteration. The iteration name never changes
+once set — every stamp already written carries it, and a rename-in-place is
+barred because it would orphan those stamps against `check-stage-evidence`'s
+header/stamp agreement. So splitting is demotion: demote the split-out subset
+via the ritual and drive the remaining queue through the remaining stages; the
+subset re-promotes at a later scope under its own iteration.
+
+**Reopen after close** is barred as an in-place edit. Stamps are append-only
+within an iteration and scope is the only reset, so there is no gate-legal way
+to continue a closed iteration's evidence file — and no history rewrite is
+sanctioned to fake one (doctrine-kit rule 16 territory). The sanctioned shape
+is a successor iteration: a post-close defect files as a debt entry and the
+follow-up iteration proceeds normally; the closed iteration's record stays
+immutable.
 
 ## Layout and configuration
 

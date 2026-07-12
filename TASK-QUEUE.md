@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **lifecycle-deviation-transitions** [spec: SPEC-deviation-transitions.md] —
-  lifecycle-kit/SPEC.md gains the deviation-transitions section: gate-legal abandon, split, and
-  reopen shapes composed from existing mechanism, no new tooling.
-
 ## Technical Debt
 
 - **competitive-positioning** — one design-philosophy
@@ -150,6 +146,7 @@
   ships, so the gate false-cleans against the newer parser.
 ## Done
 
+- lifecycle-deviation-transitions
 - knob-default-source-coupling
 - docs-nav-ia
 - value-rollup-page

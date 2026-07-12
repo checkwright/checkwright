@@ -23,6 +23,10 @@ predecessor stamp, the drained queue at validate entry, and the
 cross-component audit trigger at build entry. See [SPEC.md](SPEC.md) for the
 full contracts.
 
+The linear stage walk is the default; the gate-legal ways to leave it —
+abandon, split, reopen — compose existing mechanism with no new tooling
+([SPEC.md](SPEC.md) §Deviation transitions).
+
 ## Install
 
 Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree/master/gate-sdk/) (required), then:
