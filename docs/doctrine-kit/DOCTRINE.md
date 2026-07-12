@@ -68,10 +68,28 @@ link — an application of the load-trigger residency rule to the doctrine itsel
 3. **De-literalization.** Prose cites names; code or the owning SPEC owns values.
    Knob defaults, shared constants, and derivable rosters are stated once at
    their owner, and prose names the knob or the roster rather than its value.
+   The duty widens past values to *source identifiers*: prose names the public
+   contract — the knob, the command, the entry point another surface calls —
+   never the source's internal identifier roster or its step-by-step algorithm.
+   A SPEC subsection that inventories internal helpers or narrates branch
+   conditions is the same defect as a copied knob value: a second source of a
+   fact the code owns, stale at the next refactor. The WHY, the invariant, and
+   the public contract stay SPEC prose; the WHAT and the how live in the source
+   behind a pointer. The judgment line: an identifier stays in prose iff a
+   consumer outside the file must type or configure it, and goes behind a
+   pointer iff only the source's own maintainer meets it.
    *Under agent work:* a literal copied into prose is a second source of a
-   number, and an agent that trusts the nearer copy ships the stale one.
-   *Enforced by:* the bare-cardinal gate in
-   [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count.
+   number, and an agent that trusts the nearer copy ships the stale one; an
+   internal-helper inventory rots the same way, read as ground truth after the
+   refactor that renamed it.
+   *Enforced by:* for values, the bare-cardinal gate in
+   [canon-kit/SPEC.md](../canon-kit/SPEC.md) §check-manifest-count; the
+   source-identifier class cannot be gated cleanly — a SPEC legitimately names
+   public functions as contracts, so the Enforcement-first false-positive
+   carve-out applies — and it rides that carve-out's cadence as the
+   `internal-identifier-restatement` seed member of the close-stage audit
+   roster (`.workflow/audit-roster.txt`), a stated authoring duty due on
+   heavy-SPEC contract edits and at release prep.
 
 4. **Derivation-first.** A fact a tool can derive from the tree is derived at
    use time, never maintained as its own surface. The ladder: derive; else

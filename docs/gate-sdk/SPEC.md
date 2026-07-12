@@ -377,37 +377,32 @@ CI entry point (wiring CI is out of scope here).
 ### lib/gate.sh
 
 The family's single sourced library — values + adapters, never gate structure.
-Owns `fail_closed`, `GATE_PRUNE_DIRS` + the `gate_find` /
-`GATE_GREP_EXCLUDES` / `gate_path_pruned` walk adapters, and the registry
-helpers `gate_sdk_root`, `gate_sdk_gates_dir`, `gates_list_members`,
-`gate_resolve`, `gate_kit_roots`, `gate_kit_roots_rel`, `gate_check_dirs` (the
-multi-kit resolution path other kits' gates ride) and the manifest readers
-`gate_expand_couples` (the `kit:<glob>` couples-token expansion §The `# graph:`
-manifest), `gate_manifest_field` (one field off a gate's `# graph:` line, shared
-by `gen-pre-commit` and the `run-gates --for` selector), and `gate_staged_matches`
-(the path/glob matcher `gen-pre-commit` emits verbatim into the hook and the
-`--for` selector calls §run-gates). The commit-surface value adapters `gate_msg_pattern_files` and
-`gate_commit_types` also live here — the single home of the banned-pattern set
-and the commit-type roster — each documented at its gate (§check-commit-msg,
-§check-commit-subject). `gate_self_repo_prefix` is the identity adapter: given a
-ref, it emits the `<identity>/blob/<ref>/` self-repo blob-link prefix, deriving
-the identity from `git remote get-url origin` and normalizing the `git@` and
-`https` remote forms to one https identity (empty when no origin or an
-unrecognized form, so a caller skips the self-repo pass). It ships no repo name
-(the provenance seam holds) and is the single derivation `check-md-refs`' resolver
-(canon-kit/SPEC.md §check-md-refs) and the reference-link producers share, so an
-emitted link and the pass that validates it cannot derive divergent identities. `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor
-the couples globs share — resolving absolute roots against the kits' parent and
-passing a relative `GATE_SDK_KIT_DIRS` override through unchanged.
-`gate_fixture_suites` derives the golden-fixture suite set the same way: every
-dir with a `gate-tests/` tree (the kit roots plus the gates dir), one
-tab-separated `<suite> <tests-dir> <checks-dir-or-empty>` row per suite, the
-suite name the dir basename with `-`→`_`. It is the single source both the CI
-workflow (`.github/workflows/gates.yml`) and evidence-kit's validate config
-loop over, so adding a kit enrols its fixtures with no hand-list to drift. `fail_closed` must be passed *only* a status that genuinely
-means the check could not execute (an awk/jq/parser crash) — never `grep`'s
-exit 1, which is the expected "no match"; the caller draws that line at the
-capture site.
+It gives a gate author the fail-closed guard `fail_closed`, the walk adapters
+(`gate_find` / `GATE_GREP_EXCLUDES` / `gate_path_pruned` over `GATE_PRUNE_DIRS`),
+the registry helpers that resolve a check consumer-first across kit dirs
+(`gate_resolve`, `gate_kit_roots` / `gate_kit_roots_rel`, `gate_check_dirs` —
+the multi-kit resolution path other kits' gates ride), and the `# graph:`
+manifest readers (`gate_expand_couples` and its siblings §The `# graph:`
+manifest). How each derives its result lives in the source; the invariants a
+reader needs outlive the refactor that renames a helper:
+
+- The commit-surface value adapters (`gate_msg_pattern_files`,
+  `gate_commit_types`) are the single home of the banned-pattern set and the
+  commit-type roster, each documented at its gate (§check-commit-msg,
+  §check-commit-subject).
+- `gate_self_repo_prefix` is the single identity derivation `check-md-refs`'
+  resolver (canon-kit/SPEC.md §check-md-refs) and the reference-link producers
+  share, so an emitted link and the pass that validates it cannot derive
+  divergent identities; it ships no repo name — the provenance seam holds.
+- `gate_fixture_suites` is the single source both the CI workflow
+  (`.github/workflows/gates.yml`) and evidence-kit's validate config loop over,
+  so adding a kit enrols its fixtures with no hand-list to drift.
+- `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor the
+  couples globs share.
+
+`fail_closed` must be passed *only* a status that genuinely means the check
+could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is
+the expected "no match"; the caller draws that line at the capture site.
 
 ### run-gates
 
@@ -575,35 +570,28 @@ local and self-evident via their adjacent comment.
 ### check-graph
 
 Invariant: the `# graph:` manifest on every `gates.list` member is well-formed
-and consistent, and the pre-commit hook is the faithful generated projection
-of the manifests. Seven assertions: (A) every member carries a well-formed
-`# graph:` line — the four required keys (`couples`/`dir`/`valve`/`tier`) plus
-the optional `mode`/`trigger`/`gen` — with surfaces in the declared vocabulary
-when one exists; a `kit:<glob>` couples/trigger token is expanded
-(`gate_expand_couples`) before the vocabulary and parity checks, so both run on
-the same surfaces the hook and the HTML projection carry; (B) couples⊆trigger
-parity — each `couples=` surface is covered by the gate's `trigger=` globs
-(trigger defaulting to couples), so editing a coupled surface always fires the
-gate; (C) cycle-valve consistency —
-a `dir=bi` gate spanning a declared-leading and a declared-lagging surface
-must carry `valve=PROPOSED`; one with a leading surface but no lagging surface
-may carry either valve; one with no leading surface must carry `valve=none`;
-(D) hook artifact freshness — the committed pre-commit equals
-`gen-pre-commit.sh --emit`, and (when any gate is `tier=commit-msg`) the
-committed commit-msg hook equals `gen-pre-commit.sh --emit-commit-msg`;
-(E) the committed coupling-graph projection at `GATE_SDK_GRAPH_ARTIFACT`
-(default `<workflow-dir>/CHECK-GRAPH.html`)
-matches `--emit` output — the gate's remedy lines print the resolved path, so a
-consumer that republishes the artifact (this repo serves it at
-`docs/check-graph.html`) is always offered its own regenerate command; (F) every emitted asset href resolves under the
-artifact's own directory — a path wrong in both generator and artifact that
-(E) cannot detect; (G) every `# graph:` manifest embedded in a `SPEC-*.md`
-amendment body is well-formed, with each `couples=`/`trigger=` token a
-syntactically valid glob (the `kit:<glob>` form validates on its glob part).
-Unlike (A), an amendment manifest's surfaces are not
-required to be in the vocabulary (the coupled surface may itself be
-design-ahead), and hook parity is not applied — the gate it describes is
-unbuilt; parity re-fires through the normal registry path once it lands.
+and consistent, and the pre-commit hook is the faithful generated projection of
+the manifests. The manifest grammar a gate author writes against: four required
+keys (`couples`/`dir`/`valve`/`tier`) plus the optional `mode`/`trigger`/`gen`,
+each `couples=`/`trigger=` token a syntactically valid glob (or a `kit:<glob>`
+couples/trigger form that expands before the vocabulary and parity checks), and
+surfaces drawn from the declared vocabulary when one exists. The `valve=` value
+follows the cycle rule: a `dir=bi` gate spanning a declared-leading and a
+declared-lagging surface carries `valve=PROPOSED`; a leading-only gate may carry
+either; a gate with no leading surface carries `valve=none`. From that grammar
+the check derives its guarantees — each `couples=` surface is covered by the
+gate's `trigger=` globs (trigger defaulting to couples), so editing a coupled
+surface always fires the gate; and the committed pre-commit hook, the commit-msg
+hook (when any gate is `tier=commit-msg`), and the coupling-graph projection at
+`GATE_SDK_GRAPH_ARTIFACT` (default `<workflow-dir>/CHECK-GRAPH.html`) each equal
+their generator's `--emit` output, down to every emitted asset href resolving
+under the artifact's own directory. The remedy lines print the resolved artifact
+path, so a consumer that republishes it (this repo serves `docs/check-graph.html`)
+is always offered its own regenerate command; how each guarantee is asserted
+lives in the check. A `# graph:` manifest embedded in a `SPEC-*.md` amendment
+body is held to the glob grammar but not to the vocabulary or hook-parity — the
+gate it describes is unbuilt, so its coupled surface may itself be design-ahead;
+parity re-fires through the normal registry path once the gate lands.
 
 Dual-couple manifest: the artifact path is a knob, but check-graph's own
 `# graph:` manifest is kit-shipped static text a consumer never edits, so it
@@ -622,7 +610,8 @@ grouping; absent renders one layer). The `--amend-only [dir]` mode runs only
 (G) over a given directory, letting the fixture pair exercise it hermetically.
 Coverage ruling: a full `couples ⊇ find-globs` parity check over arbitrary
 shell is undecidable — neither cheap nor low-FP — so check-graph does not carry
-it, and (B) already guarantees editing a *coupled* surface fires the gate. The
+it, and the couples⊆trigger guarantee already ensures editing a *coupled*
+surface fires the gate. The
 statically resolvable slice of that parity is carried by its sibling
 `check-reads-couples` (§check-reads-couples); the undecidable remainder stays
 the author's duty under §The `# graph:` manifest.
@@ -638,14 +627,14 @@ kit's default stylesheet), `graph_theme_header` emits a fragment directly after
 `<body>` (site chrome above the kit header), and `graph_theme_footer` emits a
 fragment directly before `</body>`. An absent file or an undefined function
 falls back to the kit default, so a themeless consumer's output stays
-byte-identical. Determinism: assertion E's in-memory emission and the `--emit` a
+byte-identical. Determinism: the freshness assertion's in-memory emission and the `--emit` a
 consumer redirects into the artifact resolve the same theme path, so the
 byte-compare holds; the artifact stays generated-only, a styling change landing
 in the theme file (or the emitter), never a hand-edit.
 Self-containment is unchanged: injected content is inline, and a theme emitting
-a relative asset href must resolve under the artifact dir or assertion F is red
-— the existing gate already polices the link-the-site-stylesheet shortcut into
-inlining. Dark mode is the theme owner's disposition: the kit default keeps its
+a relative asset href must resolve under the artifact dir or the asset-href
+assertion is red — the existing gate already polices the link-the-site-stylesheet
+shortcut into inlining. Dark mode is the theme owner's disposition: the kit default keeps its
 light+dark scheme, and because the emitted mermaid init keys on
 `prefers-color-scheme`, a theme's chrome must honor that query too or it clashes
 with a dark-rendered graph on the same page. This repo's `scripts/graph-theme.sh`

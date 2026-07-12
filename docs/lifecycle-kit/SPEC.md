@@ -189,15 +189,14 @@ appends the invocation stamp and flips the `[stage:]` field in one invocation
 (honoring the flip+stamp-ride-together protocol), reading `session-id.sh` for
 the id — never an argument, so the no-hand-picking rule rides into the tool.
 `<stage>` must be a configured stage; anything else is a usage error (exit 2).
-An ordinary stage reads the iteration from the header, appends
-`<iteration> <stage> <id> <date>`, and swaps only the header's `[stage:]`
-token; the first stage (`LIFECYCLE_KIT_FIRST_STAGE`) performs the
-iteration-boundary reset instead — truncate the state file to its header,
-stamp under `—`, set the header to the unnamed-iteration form, and reset every
-file in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to its leading `# contract:` header the
-same way (a generic per-iteration reset knob — no consumer surface is named in
+An ordinary stage stamps the iteration under the entered stage and swaps only
+the header's `[stage:]` token; the first stage (`LIFECYCLE_KIT_FIRST_STAGE`)
+performs the iteration-boundary reset instead — truncating the state file and
+every file in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` back to its contract header and
+restarting the header at the unnamed-iteration form. `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
+is a generic per-iteration reset knob — no consumer surface is named in
 the kit; a downstream kit whose per-iteration file must start each cycle from
-its contract header adds itself here, as evidence-kit's manifest does). The
+its contract header adds itself here, as evidence-kit's manifest does. The
 kit-owned `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` resets by the same rule as a
 **built-in member** — the kit owns that surface, so it does not ride the
 consumer knob (git history keeps the retired stamps). The boundary entry also
@@ -208,15 +207,13 @@ iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
 outlive the iteration that filed it. **Pre-flight,
 not enforcement:** before writing, it runs the built-in `check-stage-entry`
 for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose
-stage key matches — a header-flipped temp queue under `${GATE_SDK_TMP_DIR}`
-plus the real state file, appended as the final two positionals so the
-built-in gate and any configured command read the flip that has not yet been
-written, the commands themselves untouched — and refuses (exit 1, findings
-printed, no writes) when any is red; the refusal is advisory in the same sense
-the gate is at commit time (no `--force`, so the easy path is the compliant
-one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook — no consumer
-surface is named in the kit; a downstream kit whose gate is the real
-precondition for a stage wires itself here (as evidence-kit's manifest gate
+stage key matches, each reading the not-yet-written flip off a header-flipped
+temp queue under `${GATE_SDK_TMP_DIR}` beside the real state file, and refuses
+(exit 1, findings printed, no writes) when any is red; the refusal is advisory
+in the same sense the gate is at commit time (no `--force`, so the easy path is
+the compliant one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
+— no consumer surface is named in the kit; a downstream kit whose gate is the
+real precondition for a stage wires itself here (as evidence-kit's manifest gate
 does for close entry), turning a would-be pre-commit deadlock into a loud
 refusal at the flip. **Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,

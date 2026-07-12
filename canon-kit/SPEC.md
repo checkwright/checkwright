@@ -274,78 +274,45 @@ consumer renaming its sections sets both. Valve and marker spellings <!-- prose-
 
 ### lib/spec.sh
 
-The sourced config loader plus shared adapters: section-regex builders for
-the queue-facing gates (queue-kit's rule — both sides of a section boundary
-must parse identically) plus the queue-resolution pass `spec_queue_slugs` built
-on them — one queue walk emitting a live slug for a bold lead-in bullet in an
-active or deferred section and a done slug for a bare-slug bullet outside them,
-so `check-todo-task-liveness` and `check-deprecation-task` resolve a
-`task: <slug>` binding through one grammar (each caller builds its own live/done
-map and fail-closes on the awk status), the canonical-spec/amendment finders the
-spec-scanning gates share, the manifest-set finder (`spec_manifest_files`) the
-narration-gate family shares — canonical specs plus `README.md`/`CLAUDE.md`,
-amendments excluded — so its members read one identical set, and the governed
-comment-surface adapters (`spec_comment_whitelisted` plus two finders that
-`check-comment-tier` and `check-spec-pointer` scan through), and the
-count adapter that the restated-total gates share, so a consumer's
-`CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate matches
-the same shapes (§check-manifest-count). The adapter has two halves: the shell
-regex builders (`SPEC_COUNT_CARDINAL_RE` plus `spec_count_noun_alt`,
-`spec_count_quantifier_re`, `spec_count_range_re`, and the lowercased
-`spec_count_phraselist`), and `spec_count_awk_lib` — an awk source fragment a
-gate prepends to its own program, exposing `sk_count_hit(text)`, which returns
-the offending span or the empty string. The boundary rule (no match glued to an
-adjacent word) and the mechanical exemptions (comparator, `all but`, partitive,
-`per`-phrase, inline code, allowed phrases) live in that fragment alone, so no
-sibling can drift from another in what it considers a total; each supplies its
-own surface walk (fences and per-site markers for the manifest gate, the comment
-classifier for its sibling).
+The sourced config loader plus shared adapters — values and adapters only,
+never gate structure. It centralizes the surfaces and vocabularies the
+spec-scanning gates share, so a rule enters once and every sibling matches the
+same shapes:
 
-`sk_count_hit` judges one physical line, so a total whose cardinal and noun
-straddle a prose wrap evades it — a blind spot both siblings inherited from the
-shared matcher, and one this repo's own §lib/spec.sh prose sat in. Two further
-awk adapters close it and factor the walk the manifest-prose gates share.
-`spec_para_accum_awk` is the **paragraph accumulator**: a caller feeds a logical
-paragraph's lines in order (`sk_para_reset`, `sk_para_add(fnr, text)`), and
-`_sk_join` reads a window back. On it the count fragment builds
-`sk_para_wrapped()`, which reports the first total whose span crosses a line
-boundary via `SK_WRAP_FNR` / `SK_WRAP_SPAN`, at the span's *first* physical line
-— where the cardinal sits, and where the operator edits — and returns false for
-a span already on one line, so the caller's per-line scan stays the sole
-reporter of unwrapped totals and no hit is counted twice. A joined span carries
-its prefix with it, so the exemptions hold across the wrap unchanged: a
-comparator before the break still reads as a bound.
-
-`spec_manifest_walk_awk` is the **manifest-prose walk driver** both
-restated-manifest gates (check-manifest-count, check-prose-enum) prepend: it
-tracks fences, resets the paragraph on a blank line, and skips a per-site exempt
-window (the line or the one above; the marker regex arrives in `SK_EXEMPT`),
-calling the caller's `sk_on_line(file, fnr, raw)` on each prose line and
-`sk_on_pflush()` at each boundary, over the shared accumulator. One walk, one
-exemption behavior for the manifest-prose surface — the count gate's
-`sk_on_line` reports the per-line total and its `sk_on_pflush` runs the wrap
-detector; the enum gate reads the whole flushed paragraph. `check-comment-tier`
-keeps its **caller-owned comment walk**, driving the same accumulator by hand
-because its surface disagrees — a comment block's end or an exempt line ends its
-paragraph, not a blank line or fence. The enum gate's declared sets arrive
-through `spec_enum_sets`, which runs the consumer's `CANON_KIT_ENUM_SETS_CMD` and
-echoes its validated `<set>`⇥`<member>` lines, fail-closing (exit 2) on a
-command error or an unparsable line (§check-prose-enum). The comment
-gates read *different* surfaces: `spec_comment_surface` prunes `templates/`
-shell sources, and `spec_comment_surface_with_templates` keeps them.
-`check-spec-pointer` scans the pruned set — a template's `spec:` line is a
-placeholder unresolvable by design (§check-spec-pointer). `check-comment-tier`
-scans the with-templates set — a copied-out template's `spec:` pointer resolves
-against the vendored kit path (kit SPECs travel with the vendor-whole install),
-so its comments are governed like any source (§check-comment-tier). Which
-finder a gate uses is kit contract, not consumer config — a consumer wanting
-the old blanket exemption shadows the gate. The canonical-spec/amendment
-finders skip a `templates/` skeleton (a copyable stub, not governed content —
-the same rationale as the gate-tests prune) and, unless
-`CANON_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under
-the scan root (a dependency's docs; an ancestor kit root — the case when a
-kit's own gate fixture dir is the scan root — never prunes). Values and
-adapters only, never gate structure.
+- **Section grammar and queue resolution:** the section-regex builders the
+  queue-facing gates use (queue-kit's rule — both sides of a section boundary
+  must parse identically), and the one queue walk that emits a live slug for a
+  bold lead-in bullet in an active or deferred section and a done slug for a
+  bare-slug bullet outside them — the single grammar `check-todo-task-liveness`
+  and `check-deprecation-task` resolve a `task: <slug>` binding through (each
+  caller builds its own live/done map and fail-closes on the walk status).
+- **Finders:** the canonical-spec / amendment finders the spec-scanning gates
+  share, and the manifest-set finder the narration-gate family shares —
+  canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its
+  members read one identical set. The canonical-spec / amendment finders skip a
+  `templates/` skeleton (a copyable stub, not governed content — the same
+  rationale as the gate-tests prune) and, unless `CANON_KIT_SCAN_KIT_ROOTS=1`,
+  any vendored kit root under the scan root (a dependency's docs; an ancestor
+  kit root — the case when a kit's own fixture dir is the scan root — never
+  prunes).
+- **The count adapter** the restated-total gates share, so a consumer's
+  `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
+  matches the same total shapes — including a total whose cardinal and noun
+  straddle a prose wrap, reported at the cardinal's physical line. The boundary
+  rule and the mechanical exemptions live in one shared fragment, so no sibling
+  drifts from another in what it counts as a total (§check-manifest-count).
+- **The enum sets** arrive through the consumer's `CANON_KIT_ENUM_SETS_CMD`,
+  validated and fail-closing (exit 2) on a command error or an unparsable line
+  (§check-prose-enum).
+- **The comment-surface adapters:** the comment gates read *different* surfaces.
+  `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
+  line is an unresolvable-by-design placeholder (§check-spec-pointer);
+  `check-comment-tier` scans the with-templates surface — a copied-out
+  template's `spec:` pointer resolves against the vendored kit path (kit SPECs
+  travel with the vendor-whole install), so its comments are governed like any
+  source (§check-comment-tier). Which finder a gate uses is kit contract, not
+  consumer config — a consumer wanting the old blanket exemption shadows the
+  gate.
 
 ### check-amendment-queue
 
@@ -452,14 +419,12 @@ entity mapping; a lexical tripwire eliminates the copy. The motivating find: thi
 repo landed one gate and left the same total in four disagreeing copies (across
 two READMEs and a SPEC), caught only by close-stage review.
 
-The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh) —
+The scanned set is the shared manifest-set finder (§lib/spec.sh) —
 canonical specs, `README.md`, `CLAUDE.md`; amendments excluded, fenced blocks
 skipped, an inline-code cardinal a meta-reference (so this section may name its
 own examples). Both the grammar and the matcher come from the shared count
-adapter, and the prose walk itself is the shared `spec_manifest_walk_awk`
-driver (§lib/spec.sh) — this gate supplies only two hooks: `sk_on_line` runs
-the matcher per line, `sk_on_pflush` runs the paragraph-join window over the
-accumulator. So it, its `check-prose-enum` sibling, and its comment-tier cousin
+adapter, and the prose walk is the shared manifest-prose driver (§lib/spec.sh),
+so this gate, its `check-prose-enum` sibling, and its comment-tier cousin
 read one vocabulary and one exemption behavior, and a total wrapped across a
 prose break is caught and reported at its first physical line; a blank line, a
 fence, and a `manifest-count-exempt:` site each end the paragraph — an exempted
@@ -472,24 +437,22 @@ invariants, not totals. Collection nouns are `CANON_KIT_COUNT_COLLECTIONS`
 `kits`, `stages`, `rules`, `KPIs`) — the one place consumer vocabulary enters,
 and it enters as config.
 
-Two match shapes carry the cardinal to the noun. The *quantifier* shape allows
-up to `CANON_KIT_COUNT_WEDGE_WORDS` (default `2`) modifiers wedged between them,
-so `nine generic rules` pins a total as surely as the adjacent `six gates` —
-adjacency is the zero-wedge case of one regex, not a branch of its own. The
-*noun-then-range* shape (`rules 1-8`, `gates 1-42`) pins both endpoints of an
-ordered collection and rots on every append. Five exempt contexts, mechanical
-first: a threshold/comparator
-on the same line (`≥ ≤ > <`, `at least` / `at most` / `up to` / `more than` /
-`fewer than`, or a following `per`-phrase) — a bound is a rule, not a total; the
-partition idiom `all but <cardinal>`; a partitive marker (`of`, `out of`) on
-either side of the match — in `three of the twelve gates` neither cardinal is a
-restated total, so a wedge containing the marker and the denominator it
-introduces are both exempt, and the markers are fixed generic-English mechanism
-rather than config; `CANON_KIT_COUNT_ALLOWED_PHRASES`, an
-exact-phrase allowlist for fixed named sets a doc legitimately enumerates (default
-empty — fixed-set naming is consumer judgment, config not mechanism, and the
-valve only bites on a phrase whose noun the consumer governs);
-and the per-site `manifest-count-exempt: <reason>` on the line or the one above.
+Two match shapes carry the cardinal to the noun: the *quantifier* shape, which
+allows up to `CANON_KIT_COUNT_WEDGE_WORDS` (default `2`) modifiers wedged between
+cardinal and noun (so `nine generic rules` pins a total as surely as the
+adjacent `six gates`, adjacency being the zero-wedge case), and the
+*noun-then-range* shape (`rules 1-8`), which pins both endpoints of an ordered
+collection and rots on every append. The exempt contexts an author writes into:
+a threshold or comparator on the same line (a bound is a rule, not a total); the
+`all but <cardinal>` partition idiom; a partitive marker (`of`, `out of`) on
+either side of the match (in `three of the twelve gates` neither cardinal is a
+restated total); `CANON_KIT_COUNT_ALLOWED_PHRASES`, an exact-phrase allowlist for
+fixed named sets a doc legitimately enumerates (default empty — fixed-set naming
+is consumer judgment, config not mechanism, biting only on a phrase whose noun
+the consumer governs); and the per-site `manifest-count-exempt: <reason>` marker
+on the line or the one above. The exact operator and phrase tokens each context
+recognizes are the check's own regex, generic-English mechanism rather than
+config.
 Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the
 committing operator via the output contract; each hit read at the single scan
 transition (file, line, matched span in the message), no persistent state.
@@ -680,10 +643,9 @@ source the manifest gate bans: `# rules 1-8` sat stale in this repo's own guard
 while its ruleset grew past eight, invisible because no gate read comments for
 counts. The fix is deleting the count or citing the owning collection; the sole
 valve is `comment-tier-exempt: <reason>`, whose window suppresses the override
-as it suppresses the tier rule. The override reads a comment block as a
-paragraph, not a line at a time (the adapter's join window, §lib/spec.sh): a
-directive's own wrapped wording is exactly where a total hides from a per-line
-scan, and an exempt line ends the join rather than laundering its neighbours.
+as it suppresses the tier rule. The override still catches a total hidden in a
+directive's own wrapped wording — the wrap is exactly where one would escape a
+line-at-a-time scan — and an exempt line cannot launder its neighbours into one.
 The weighed alternative — a source-coupled
 numeral scan with an allowlist — is rejected: legitimate numerals abound in
 source (exit codes, indices, field positions) and the false-positive rate would
@@ -713,7 +675,7 @@ a directive may still say `at most three checks per run` or name a
 (`#`) — `templates/` stubs included: a copied-out template's `spec:` line
 resolves against the vendored kit path (kit SPECs travel with the
 vendor-whole install), so its comments are directives like any source and
-this gate governs them (`spec_comment_surface_with_templates`), where
+this gate governs them, where
 `check-spec-pointer` exempts them as placeholders-by-design — with the
 `.workflow/*.txt` state files blessing only `contract:`/`see`;
 slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships

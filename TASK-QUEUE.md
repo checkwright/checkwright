@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **spec-contract-leaning-sweep** [spec: SPEC-identifier-deliteralization.md] —
-  De-literalization extends to source identifiers in prose (name the public contract, never
-  the internal roster or algorithm); lean the six verified heavy-SPEC sections; seed the
-  audit roster's first member.
 - **faithful-artifact-verification** [spec: SPEC-artifact-verification.md] — Oracle-first
   gains the artifact clause: name and exercise the artifact surface a change carries, on a
   deployment-faithful replica; the build template's run-the-system step carries the duty.
@@ -152,9 +148,24 @@
   class, mechanizable for this artifact. Surfaced 2026-07-12 as site
   feedback; both READMEs restructured to indented code blocks same day, fix
   verified against a local kramdown-GFM render of every docs page.
+- **knob-default-source-coupling** [needs-spec] — no gate couples a kit knob's
+  default as stated in its owning SPEC to the `:-` fallback in the source that
+  actually supplies it, so they drift silently. `check-knob-citation` only bars a
+  knob value *outside* the owning SPEC; nothing asserts the in-SPEC default equals
+  the source fallback. Surfaced 2026-07-12 verifying `GATE_SDK_GRAPH_ARTIFACT`
+  against `gate-sdk/checks/check-graph.sh` during this iteration's identifier
+  de-literalization work. Remedy shape: a canon-kit gate extracting each
+  `${KNOB:-…}` fallback from kit source and asserting the owning SPEC states the
+  same default — the value class of that sweep's identifier de-literalization,
+  mechanizable where the identifier class was not. The graph-artifact knob's
+  default home was reviewed the same day and kept site-neutral (a docs-site path
+  would presume a consumer's publishing convention this repo sets only as an
+  override, and the dual-couple manifest exists for exactly that), so the gate
+  pins the existing default rather than a new one.
 
 ## Done
 
+- spec-contract-leaning-sweep
 - gap-disposition-doctrine
 - ungateable-class-audit-cadence
 
