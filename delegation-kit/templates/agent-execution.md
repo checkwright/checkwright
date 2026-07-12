@@ -88,7 +88,11 @@ reach-through, not a change to this protocol; every rule below still applies.
   judgment stays on the supervisor's class. Derive the class ladder from the
   harness's **live model roster at dispatch time** — model families churn faster
   than kit text, so a baked model-name list in any doc is drift by construction.
-  Selection sits with the dispatching session — its context holds what selection
+  Agent-**type** selection derives the same way — from the dispatch-time
+  agent-roster descriptions, not a baked list: an audit or survey rides the type
+  whose description commits to review work, never one that disclaims it (an
+  excerpt-locator serves pure search, not audit). Selection sits with the
+  dispatching session — its context holds what selection
   needs — and a standing choice lands in a tracked agent-type definition, never
   per-dispatch habit.
 - **Never revert substantial completed work on your own design judgment** —

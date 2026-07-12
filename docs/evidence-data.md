@@ -22,3 +22,4 @@
 | self-accounting-and-positioning | s a b v c | 5f/0d | 4 · ≤0d | 17s clean | 58 |
 | footprint-and-parity | s a b v c | 10f/0d | 7 · ≤0d | 17s clean | 59 |
 | craft-and-routing | s a b v c | 8f/2d | 5 · ≤1d | 17s clean | 60 |
+| doctrine-and-adoption | s a b v c | 10f/1d | 11 · ≤0d | 17s clean | 63 |

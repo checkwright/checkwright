@@ -174,16 +174,4 @@
 
 ## Done
 
-- footprint-page
-- docs-queue-slug-liveness
-- template-doc-governance
-- local-env-profile
-- lifecycle-skill-adoption-steering
-- lifecycle-resident-trigger-injector
-- craft-rule-stage-routing
-- faithful-artifact-verification
-- spec-contract-leaning-sweep
-- gap-disposition-doctrine
-- ungateable-class-audit-cadence
-
 ## Lessons Learned
