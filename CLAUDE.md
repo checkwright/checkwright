@@ -37,13 +37,20 @@ committing.
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
 
-The repo also runs lifecycle-kit's iteration state machine on itself — one
-iteration per hardening or roadmap unit. `TASK-QUEUE.md` carries the
-`## Iteration: <name>  [stage: <stage>]` header; each stage session invokes
-the matching `.claude/commands/<stage>.md` skill, which stamps
-`.workflow/WORKFLOW-STATE.txt` and flips the header as its first step
-(`check-stage-evidence` / `check-stage-entry` enforce the flip+stamp
-protocol — see lifecycle-kit/SPEC.md).
+Beyond the gate battery, the repo runs its own iteration lifecycle — one
+iteration per hardening or roadmap unit, the queue and stage roster below. Each
+stage session stamps `.workflow/WORKFLOW-STATE.txt` and flips the queue header's
+`[stage:]` field as its first step (`check-stage-evidence` / `check-stage-entry`
+enforce the flip+stamp protocol; `check-lifecycle-registration` holds the block
+below in lockstep with the machine).
+
+<!-- lifecycle-kit:begin -->
+The repo runs lifecycle-kit's iteration state machine on `TASK-QUEUE.md` — one
+stage session per stage, each invoking its skill:
+`/scope` `/align` `/build` `/validate` `/close`.
+The state machine, its flip+stamp protocol, and the per-stage contracts:
+[lifecycle-kit/SPEC.md](lifecycle-kit/SPEC.md).
+<!-- lifecycle-kit:end -->
 
 The pre-commit hook is **generated** — never hand-edit
 `scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and run

@@ -136,6 +136,10 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   reads as a cross-component contract signal; default `("SPEC.md" "proto/")`.
 - `LIFECYCLE_KIT_SKILLS_DIR` — the agent-skill directory
   `check-stage-skill-coverage` scans; default `.claude/commands`.
+- `LIFECYCLE_KIT_AGENT_FILE` — the always-loaded agent file
+  `bin/install-lifecycle.sh` writes the registration block into and
+  `check-lifecycle-registration` reads it back from; default `CLAUDE.md`
+  (the `DOCTRINE_KIT_AGENT_FILE` sibling).
 - `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and
   stamp files, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
   `GATE_SDK_WORKFLOW_DIR`.
@@ -160,7 +164,10 @@ unset (an explicitly empty value disables a knob where the contract says so),
 then validation. Also owns the shared header adapters
 (`lifecycle_header`, `lifecycle_header_iter`, `lifecycle_header_stage`,
 `lifecycle_stage_known`) — both gates must parse the header identically, and
-a shared adapter removes that drift axis. Values and adapters only, never
+a shared adapter removes that drift axis — and `lifecycle_registration_block`,
+which renders the resident registration block (§bin/install-lifecycle.sh) from the
+live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
+derive one text and cannot drift. Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
 
 ### bin/session-id.sh
@@ -217,6 +224,62 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and `LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
 `smoke/install.sh`.
+
+### bin/install-lifecycle.sh
+
+`bin/install-lifecycle.sh [agent-file]` writes the resident registration block
+into the always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
+`CLAUDE.md`; the positional override points a smoke or fixture at a scratch
+tree without touching consumer config), idempotently. The block is bounded by
+fixed marker lines (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end -->`);
+a run replaces the content between the markers when present and appends the
+block when absent, so re-running never duplicates. A begin marker without its
+end is a malformed target (exit 2, rather than guess the bounds); the agent
+file must already exist — the installer edits an always-loaded file, it does
+not mint one — so a missing target is exit 2. The marker insert/replace itself
+is not the installer's code: it rides gate-sdk's shared `lib/inject.sh`
+helper (`inject_marker_block`), the one copy `install-doctrine.sh` also uses,
+so no second replace path exists to drift.
+
+The block is pointer-only, its roster derived: `lib/stages.sh`'s
+`lifecycle_registration_block` renders the one line that the repo runs the
+state machine on `LIFECYCLE_KIT_QUEUE_FILE`, the stage roster as skill
+invocations (`/<stage>` for each `LIFECYCLE_KIT_STAGES` member), and the
+markdown link to the kit SPEC — never stage prose, and never a hand-listed
+roster, so a consumer's reshaped stage set flows into the block by
+construction. The installer and `check-lifecycle-registration` share that one
+renderer, so the emitted block and the block the gate certifies cannot
+diverge. Advisory tooling, not a gate: no fixture pair is owed; it is
+exercised end-to-end in `smoke/install.sh`.
+
+### check-lifecycle-registration
+
+Invariant: the configured agent file (`LIFECYCLE_KIT_AGENT_FILE`) carries a
+lifecycle-kit marker block whose inner content byte-matches the block
+regenerated from the live stage machine (`lifecycle_registration_block`). The
+block is derived from the machine, and a reshaped machine — a renamed or
+reordered stage, a relocated queue file — or a hand-edit stales it *by
+construction*, on the exact path the kit advertises (reshape the config,
+re-run the installer): the drift-prone-generated-surface case where a gate is
+owed (the enforcement-first weighing). The freshness posture is
+`check-doctrine-registration`'s, byte-strict like `check-docs-mirror-fresh`.
+
+A missing block is a finding with the install remedy; a block present but out
+of lockstep is a finding printing the diff and the regenerate remedy (both
+exit 1). Resolution fails closed: a missing agent file, a begin marker without
+its end, or an errored awk capture is exit 2 — a half-written or unreadable
+target must not pass as clean. The gate satisfies the four gate-sdk contracts
+(gate-sdk/SPEC.md §The gate model): the single `LIFECYCLE-REGISTRATION: clean`
+line and a `help:` remedy on each finding path (output); exit 2 on an
+unreadable target (fail-closed); a `good/`+`bad/` fixture pair under
+`gate-tests/` (byte-lockstep-clean and stale-block) plus a sibling `*.test.sh`
+for the block-absent, unpaired-marker, and agent-missing cases the one-pair
+harness cannot hold (fixture-pair); and registration in this repo's
+`gates.list` where its own always-loaded file is the scan target (self-lint).
+Positional form `check-lifecycle-registration.sh [agent-file]` points the
+fixtures at a synthetic agent file. Its `# graph:` manifest couples the agent
+file and `lib/stages.sh` — the config that feeds the block — so an edit to
+either re-fires the gate.
 
 ### check-stage-evidence
 

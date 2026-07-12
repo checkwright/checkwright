@@ -40,6 +40,8 @@ declare -p LIFECYCLE_KIT_CONTRACT_TOKENS &>/dev/null || LIFECYCLE_KIT_CONTRACT_T
 
 [[ -v LIFECYCLE_KIT_SKILLS_DIR ]] || LIFECYCLE_KIT_SKILLS_DIR=".claude/commands"
 
+[[ -v LIFECYCLE_KIT_AGENT_FILE ]] || LIFECYCLE_KIT_AGENT_FILE="CLAUDE.md"
+
 [[ -v LIFECYCLE_KIT_SHIM_NGRAM ]] || LIFECYCLE_KIT_SHIM_NGRAM=9
 declare -p LIFECYCLE_KIT_SHIM_DEDUP_CORPUS &>/dev/null || LIFECYCLE_KIT_SHIM_DEDUP_CORPUS=()
 
@@ -68,6 +70,22 @@ lifecycle_stage_known() {
         [[ "$1" == "$s" ]] && return 0
     done
     return 1
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the resident registration block from the live config so the installer and check-lifecycle-registration derive one text; the roster is the stage set as skill invocations, never hand-listed
+lifecycle_registration_block() {
+    local roster="" s
+    for s in "${LIFECYCLE_KIT_STAGES[@]}"; do
+        roster+="\`/$s\` "
+    done
+    roster="${roster% }"
+    cat <<EOF
+The repo runs lifecycle-kit's iteration state machine on \`$LIFECYCLE_KIT_QUEUE_FILE\` — one
+stage session per stage, each invoking its skill:
+$roster.
+The state machine, its flip+stamp protocol, and the per-stage contracts:
+[lifecycle-kit/SPEC.md](lifecycle-kit/SPEC.md).
+EOF
 }
 
 _lc_errs=()

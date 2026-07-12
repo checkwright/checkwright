@@ -397,6 +397,24 @@ reader needs outlive the refactor that renames a helper:
 could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is
 the expected "no match"; the caller draws that line at the capture site.
 
+### lib/inject.sh
+
+The marker-bounded insert/replace every kit's agent-file injector shares —
+one function, `inject_marker_block <file> <begin> <end>`, taking the inner
+block content on stdin. It writes `<begin>` + the piped content + `<end>` into
+the target: replacing the span between an existing marker pair (inclusive) in
+place, or appending a fresh block when the markers are absent, so a re-run
+never duplicates. A begin marker without its end is a malformed target — it
+refuses (exit 2) rather than guess the bounds; a missing target file is exit
+2. On success it echoes the action taken (`appended`|`replaced`) for the
+caller to report. Block-content *generation* stays with the caller (the
+lifecycle roster, the doctrine digest) — this helper owns only the placement
+mechanism, so a second injector adds no second copy of the awk replace logic:
+`doctrine-kit/bin/install-doctrine.sh` and
+`lifecycle-kit/bin/install-lifecycle.sh` both ride it. A sourced library, not
+a gate: exercised end-to-end wherever an installer that rides it runs
+(doctrine-kit and lifecycle-kit `smoke/install.sh`).
+
 ### run-gates
 
 Aggregate runner: executes every `gates.list` member in one shot, timing each

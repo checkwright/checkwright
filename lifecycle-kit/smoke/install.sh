@@ -142,4 +142,25 @@ es_pf_run validate >/dev/null || { echo "smoke(enter-stage): green preflight sho
 grep -q "^## Iteration: pf-iter  \[stage: validate\]\$" "$esq" || { echo "smoke(enter-stage): green preflight did not flip to validate" >&2; exit 1; }
 grep -q "^pf-iter validate aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): green preflight did not stamp" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — exercise the injector + check-lifecycle-registration end-to-end under .tmp (advisory tool, no fixture pair)
+il="$es/agent"; mkdir -p "$il"
+cat > "$il/CLAUDE.md" <<'EOF'
+# Scratch agent file
+
+Resident context the consumer keeps.
+EOF
+il_run() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" "$@"; }
+il_gate() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SMOKE_KIT_ROOT/checks/check-lifecycle-registration.sh" "$@"; }
+
+il_run >/dev/null
+grep -q "<!-- lifecycle-kit:begin -->" "$il/CLAUDE.md" || { echo "smoke(install-lifecycle): block not injected" >&2; exit 1; }
+il_gate >/dev/null || { echo "smoke(install-lifecycle): a freshly installed block should pass the parity gate" >&2; exit 1; }
+
+cp "$il/CLAUDE.md" "$il/before"
+il_run >/dev/null
+cmp -s "$il/before" "$il/CLAUDE.md" || { echo "smoke(install-lifecycle): re-run was not idempotent" >&2; exit 1; }
+
+sed -i 's#`/close`##' "$il/CLAUDE.md"
+if il_gate >/dev/null 2>&1; then echo "smoke(install-lifecycle): a staled block should redden the parity gate" >&2; exit 1; fi
+
 rm -rf "$es"

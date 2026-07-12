@@ -39,6 +39,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-kit-registration | precommit |
 | (consumer) | check-docs-kit-parity | precommit |
 | [doctrine-kit](doctrine-kit/index.md) | check-doctrine-registration | precommit |
+| [lifecycle-kit](lifecycle-kit/index.md) | check-lifecycle-registration | precommit |
 | (consumer) | check-kit-ref-liveness | precommit |
 | (consumer) | check-trajectory-fresh | precommit |
 | (consumer) | check-docs-mirror-fresh | precommit |

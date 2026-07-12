@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **lifecycle-resident-trigger-injector** [spec: SPEC-resident-trigger.md] — marker-block
-  agent-file injector with a config-derived stage roster, a shared gate-sdk inject helper
-  (the doctrine injector refactors onto it), and a byte-strict registration gate.
 - **lifecycle-skill-adoption-steering** [spec: SPEC-adoption-steering.md] — the binding shim
   becomes the documented default; copy-and-fill stays as the sanctioned fork with its drift
   consequence stated inline; the steer also lands on the living install page.
@@ -158,6 +155,7 @@
 
 ## Done
 
+- lifecycle-resident-trigger-injector
 - craft-rule-stage-routing
 - faithful-artifact-verification
 - spec-contract-leaning-sweep

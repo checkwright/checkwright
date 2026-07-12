@@ -51,7 +51,10 @@ they are not, so re-running never duplicates and a marker set left in place is
 updated where it sits. A begin marker without its end is a malformed target: the
 installer refuses (exit 2) rather than guess the block bounds. The agent file
 must already exist — the installer edits an always-loaded file, it does not mint
-one — so a missing target is exit 2.
+one — so a missing target is exit 2. The marker insert/replace itself is not
+this installer's code: it rides gate-sdk's shared `lib/inject.sh` helper
+(`inject_marker_block`), the single copy `lifecycle-kit`'s injector also uses;
+`install-doctrine.sh` supplies only the block content (the digest) on stdin.
 
 The block is the always-loaded shape applied to the doctrine itself: a one-line
 digest of the methodology-maintenance rules plus a markdown link to the doctrine

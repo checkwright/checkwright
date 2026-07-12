@@ -15,6 +15,7 @@ check-kit-enum
 check-kit-registration
 check-docs-kit-parity
 check-doctrine-registration
+check-lifecycle-registration
 check-kit-ref-liveness
 check-trajectory-fresh
 check-docs-mirror-fresh

@@ -3,8 +3,11 @@
 set -euo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../lib/doctrine.sh
 source "$KIT/lib/doctrine.sh"
+# shellcheck source=../../gate-sdk/lib/inject.sh
+source "$SDK/lib/inject.sh"
 
 AGENT_FILE="${1:-$DOCTRINE_KIT_AGENT_FILE}"
 DOCTRINE_FILE="${2:-$DOCTRINE_KIT_DOCTRINE_FILE}"
@@ -17,7 +20,6 @@ END="<!-- doctrine-kit:end -->"
 # spec: doctrine-kit/SPEC.md §install-doctrine — the block is the always-loaded shape applied to the doctrine itself: a one-line-per-rule digest plus the markdown link to the doctrine file
 block() {
     cat <<EOF
-$BEGIN
 ## Delivery doctrine
 
 The cross-kit delivery rules live in [$DOCTRINE_FILE]($DOCTRINE_FILE) — re-vendor
@@ -34,30 +36,8 @@ an engineering-craft section behind the link:
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
 - **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
-$END
 EOF
 }
 
-tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
-
-if grep -qF -- "$BEGIN" "$AGENT_FILE"; then
-    grep -qF -- "$END" "$AGENT_FILE" \
-        || { echo "install-doctrine: begin marker present but end marker missing in $AGENT_FILE — refusing to guess the block bounds" >&2; exit 2; }
-    block > "$tmp.block"
-    awk -v b="$BEGIN" -v e="$END" -v blockfile="$tmp.block" '
-        $0 == b { skip = 1; while ((getline line < blockfile) > 0) print line; close(blockfile); next }
-        $0 == e { skip = 0; next }
-        !skip { print }
-    ' "$AGENT_FILE" > "$tmp"
-    rm -f "$tmp.block"
-    action="replaced"
-else
-    cp "$AGENT_FILE" "$tmp"
-    printf '\n' >> "$tmp"
-    block >> "$tmp"
-    action="appended"
-fi
-
-cp "$tmp" "$AGENT_FILE"
+action="$(block | inject_marker_block "$AGENT_FILE" "$BEGIN" "$END")" || exit $?
 echo "install-doctrine: $action the doctrine reference block in $AGENT_FILE (link → $DOCTRINE_FILE)"

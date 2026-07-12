@@ -79,6 +79,10 @@ if staged_matches 'CLAUDE.md' 'doctrine-kit/DOCTRINE.md'; then
     doctrine-kit/checks/check-doctrine-registration.sh || hook_fail check-doctrine-registration
 fi
 
+if staged_matches 'CLAUDE.md' 'lifecycle-kit/lib/stages.sh'; then
+    lifecycle-kit/checks/check-lifecycle-registration.sh || hook_fail check-lifecycle-registration
+fi
+
 scripts/check-kit-ref-liveness.sh || hook_fail check-kit-ref-liveness
 
 if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workflow/validate-evidence.txt' 'scripts/gates.list' 'TASK-QUEUE.md'; then

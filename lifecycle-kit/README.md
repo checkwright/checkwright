@@ -28,6 +28,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-stage-evidence
    check-stage-entry
    check-lesson-disposition
+   check-lifecycle-registration
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then
@@ -57,7 +58,15 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    make each skill a binding shim that references the template (SPEC.md
    §templates/skills/).
 
-4. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
+4. Point your always-loaded agent file at the machine — run
+   `bash lifecycle-kit/bin/install-lifecycle.sh`. It writes a marker-bounded
+   registration block (the state machine, the stage roster as skill
+   invocations, the SPEC link) into `LIFECYCLE_KIT_AGENT_FILE` (default
+   `CLAUDE.md`), the roster derived from your config so a reshape (step 5)
+   flows in on a re-run. `check-lifecycle-registration` (step 1) holds the
+   block in lockstep.
+
+5. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,
    section names, or file paths. Defaults are this repo's own lifecycle.
 
