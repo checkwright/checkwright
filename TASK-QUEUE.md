@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **faithful-artifact-verification** [spec: SPEC-artifact-verification.md] — Oracle-first
-  gains the artifact clause: name and exercise the artifact surface a change carries, on a
-  deployment-faithful replica; the build template's run-the-system step carries the duty.
 - **craft-rule-stage-routing** [spec: SPEC-stage-routing.md] — each craft rule owns a
   *Stages:* trailer; a doctrine emitter derives the stage's rule pointers and the
   session-context hook surfaces them; the registration gate holds trailer coverage; the
@@ -165,6 +162,7 @@
 
 ## Done
 
+- faithful-artifact-verification
 - spec-contract-leaning-sweep
 - gap-disposition-doctrine
 - ungateable-class-audit-cadence

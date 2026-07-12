@@ -141,10 +141,21 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    emulating it, and treat a red run — including a red commit attempt, where the
    generated hook runs exactly the coupled subset — as the designed feedback
    channel, not an incident. Gate source is opened to fix the gate or write its
-   fixtures, never to predict its verdict.
+   fixtures, never to predict its verdict. The battery is an oracle but not the
+   only one: a change whose real output is a deployed or generated artifact — a
+   rendered site, a compiled binary, a published package — is *tree-correct*
+   when the battery is green but not yet *artifact-correct*, so it names the
+   artifact surface it carries and exercises that artifact before the task is
+   done, never inferring artifact behaviour from a clean battery. Reachable
+   includes cheap-to-stand-up: an absent-but-installable runtime is one install
+   command away, not unreachable, so it is exercised too.
    *Under agent work:* a deterministic check costs seconds and zero context;
    reading its source to anticipate the verdict costs more than running the whole
-   battery and can still be wrong.
+   battery and can still be wrong. The replica that exercises an artifact is
+   honest only when deployment-faithful — toolchain version- and plugin-matched
+   to the pinned deployment; a newer local toolchain invents failures the
+   deployment never shows and masks real ones it would, making it a second wrong
+   oracle rather than a check.
    *Enforced by:* the gate output contract in
    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — the `clean` and `help:` lines are
    written to be that interface — and the targeted-run resolver reachable through

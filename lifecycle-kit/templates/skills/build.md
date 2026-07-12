@@ -62,4 +62,8 @@ causal gap* is not a TODO: stop, resolve it this session, update the spec.
 
 **Run the system; don't reason about it** — when a running system is
 reachable, reproduce first, read second. Recorded evidence rots: a static
-trace in a task body is a dated hypothesis to re-verify, not a premise.
+trace in a task body is a dated hypothesis to re-verify, not a premise. A
+change carrying an artifact surface — a change whose real output is a deployed
+or generated artifact — names that surface and exercises the artifact
+deployment-faithfully before the stage exits; a green battery is tree-correct,
+not artifact-correct (Oracle-first).
