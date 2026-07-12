@@ -185,6 +185,21 @@
   pieces are the narrower tier), and co-locate the two rungs in one
   positioning/onboarding pass if scoped together. Surfaced 2026-07-12 (operator
   ask).
+- **value-rollup-page** [needs-spec] — consolidate the enforcement map and the
+  footprint into one nav-visible "these benefits at this token cost" page, led by
+  a generated per-kit rollup that joins the two on the kit axis (kit → gates
+  enforced → always-loaded + load-triggered cost) with a totals row as the value
+  proposition. Absorbs the per-kit-gate-count idea: the gate tally is the benefit
+  column, not a footprint add-on. Three spec forks: (1) benefit metric — count by
+  enforcement class (blocking gate vs advisory KPI vs guard), never one flattened
+  tally that equates a blocker with an advisory; (2) generation — the rollup joins
+  two emitters (enforcement-map.sh, footprint.sh), so it needs a joining emitter
+  plus its own freshness gate, never a hand-stitched page (derivation-first); (3)
+  survival — whether the ~60-row per-gate enforcement detail collapses into the
+  page as a drill-down section or stays a linked reference, with no number
+  duplicated across surfaces. Clusters with the positioning rungs
+  (harness-layer-positioning, competitive-positioning, os-support-statement) as
+  one positioning/onboarding docs pass. Surfaced 2026-07-12 (operator ask).
 
 ## Done
 
