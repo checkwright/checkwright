@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: parity-fidelity-handoff  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,7 +12,39 @@
 
 ## New Features
 
+- **readme-roster-parity** [spec: SPEC-readme-roster-parity.md] — gate-sdk meta-gate
+  check-readme-roster: name-set parity between each kit README's gate-roster marker block and
+  the kit's shipped checks/ dir, both directions; the markers land on every kit README that
+  ships checks.
+- **emitted-artifact-external-refs** [spec: SPEC-emitted-artifact-external-refs.md] —
+  check-graph gains an external-ref assertion over emitted HTML: href/src values and ESM
+  imports prefix-match the kit-seeded mermaid entry plus the GATE_SDK_GRAPH_EXTERNAL_REFS
+  allowlist.
+- **render-fidelity-table-leakage** [spec: SPEC-render-fidelity-table-leakage.md] — third
+  check-docs-render-fidelity assertion: a rendered-table deficit against fence-aware source GFM
+  table starts reds; the bad fixture reproduces the value-page incident shape.
+- **scope-lead-handoff** [spec: SPEC-scope-lead-handoff.md] — the scope template close-out
+  gains the handoff slot; this repo's shim binds the compact-then-/lead vs manual-steering
+  choice by citation to docs/orchestration.md.
+
 ## Technical Debt
+
+- **drop-python-dependency** — port the md-index.sh and pub-index.sh EXTRACT embeds to POSIX
+  awk (no gawk-only constructs — ruled at scope 2026-07-13); oracle: run-index-tests.sh goldens
+  stay byte-identical; drop python3 from env-probe's PROBE_SET and docs/install.md's toolchain
+  bullets in the same commit (check-install-toolchain holds the parity).
+- **pages-parser-version-fidelity** — ruled at scope 2026-07-13: state the kramdown version
+  skew as a check-docs-render-fidelity honest limit and document the exact-pin recipe
+  (SITE_KIT_RENDERER pointed at a github-pages-locked bundle); auto-resolving the pinned gem
+  rejected — it breaks the hermetic no-fetch render contract. SPEC prose only, no new names.
+- **docs-nav-restructure** — ruled at scope 2026-07-13: (1) enforcement.md and footprint.md
+  become nav children of Value — nav_id on value.md, nav_parent+nav_child_order on both (the
+  filed offnav-allowlist premise was stale: neither page is listed there; they pass by link
+  walk today); (2) orchestration, ddd, and positioning nest as children of methodology.md,
+  which gains a nav_id — Why Checkwright becomes the contrast cluster's parent and the
+  top-level nav_order renumbers; (3) the terse-nav-title/descriptive-H1 convention is ruled
+  intent, documented as one line in CLAUDE.md §Housekeeping's docs bullet. Gate touchpoints
+  unchanged: check-docs-kit-parity's kits child block stays intact.
 
 ## Deferred
 
@@ -105,71 +137,12 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
-- **readme-roster-parity** [needs-spec] — name-set parity between each kit README's
-  register-the-gates block and the kit's shipped `checks/` dir — the check-install-toolchain
-  fork ruling reapplied (names derivable, per-gate annotation clauses hand prose, so a gate
-  holds the derivable half rather than generating the list). Surfaced 2026-07-12 at align:
-  canon-kit's README listed 9 of 17 shipped gates, lifecycle-kit 4 of 7, delegation-kit 1 of 2
-  — hand-fixed that session; this rung mechanizes the channel.
-- **emitted-artifact-external-refs** [needs-spec] — mechanize the self-contained-artifacts
-  convention's external-reference half: check-graph's asset-href assertion polices relative
-  `href`/`src` only, so an absolute URL or a JS module import in kit-emitted HTML passes
-  unseen; extend to an external-ref allowlist whose only seeded entry is the sanctioned
-  pinned mermaid import (gate-sdk/SPEC.md §check-graph). Surfaced 2026-07-12 at align.
 - **pub-index-language-plugins** [needs-spec] — context-kit's `pub-index.sh`
   hardcodes the Rust grammar and file glob; make the extractor pluggable —
   per-language extractors resolved registry-style, a consumer knob naming the
   enabled set, Rust demoted from the tool's identity to its shipped default
   extractor, and the session-context nudge line reworded to match. Surfaced
   2026-07-12 as site feedback on context-kit's README.
-- **pages-parser-version-fidelity** [needs-spec] — check-docs-render-fidelity renders through
-  whatever kramdown the box has (the `SITE_KIT_RENDERER` default), not the exact version GitHub
-  Pages ships (kramdown 2.4.0 via the github-pages gem at surfacing). Version skew could
-  false-clean a leakage class Pages still exhibits but a newer kramdown fixed. Disposition to
-  design: state the skew as a render-fidelity honest-limit and document the exact-pin path
-  (`SITE_KIT_RENDERER` → a github-pages-locked bundle), versus auto-resolving the pinned gem —
-  rejected as the default since bundler+fetch breaks the hermetic no-fetch render contract.
-  Surfaced 2026-07-12 building docs-render-fidelity-gate; the leakage class root cause is
-  gettalong/kramdown#843 — closed works-as-designed, so it is permanent (both 2.4.0 and 2.5.2
-  exhibit it, no divergence on this tree today). This rung is about version *skew* in general,
-  not that bug: the trigger is a future kramdown that fixes some *other* leak class Pages still
-  ships, so the gate false-cleans against the newer parser.
-- **render-fidelity-table-leakage** [needs-spec] — extend check-docs-render-fidelity with a
-  third leakage assertion beside fence and heading: a source GFM table (a pipe row followed by a
-  fence-aware `| --- |` delimiter) that produces no rendered `<table>` is leakage — the same
-  source-vs-rendered count parity the heading assertion already uses. Surfaced 2026-07-13:
-  docs/value.md's rollup table rendered as a literal-pipe paragraph because the generated block
-  abutted its `:end` marker with no blank line (kramdown terminates a table only on a blank line),
-  and the fence/heading assertions stayed silent — the gate's stated honest limit (fences and
-  headings only) made concrete. Emitter fixed that instance (gen-value-rollup.sh emits a trailing
-  blank); this rung mechanizes the channel so the next table-break reds instead of shipping.
-- **drop-python-dependency** [needs-spec] — port the two embedded `EXTRACT` programs (the only
-  python3 use in tracked code) from python3 to awk, then drop python3 from env-probe's `PROBE_SET`
-  and docs/install.md's Requirements — check-install-toolchain gates that name-set parity, so both
-  move in one commit. The embed sites are inline `python3 -c "$EXTRACT"` in `context-kit/bin/
-  md-index.sh` (markdown heading + first-summary extractor: link/emphasis stripping, first-sentence
-  -vs-120-char truncation, fence-awareness) and `pub-index.sh` (Rust `pub`-item match then sort by
-  kind,name). Oracle: `run-index-tests.sh` byte-diffs both tools against committed goldens, so the
-  awk ports are correct iff the goldens still match. Decide POSIX-awk vs GNU-awk: the box runs GNU
-  awk but the kits ship generic, so prefer POSIX constructs (no `match(...,arr)`/`gensub`) unless
-  a gawk floor is declared. Intersects pub-index-language-plugins — the awk extractor becomes that
-  task's Rust default extractor, no fold-in needed. Motivation: python3 is the heaviest item in an
-  otherwise bash/git/jq/awk/shellcheck toolchain, spent on two text-extraction one-liners. Surfaced
-  2026-07-13.
-
-- **docs-nav-restructure** [needs-spec] — the site-nav IA pass. (1) Promote the two off-nav
-  drill-downs (`docs/enforcement.md`, `docs/footprint.md`) into the rendered nav as children of
-  Value: give `docs/value.md` a `nav_id`, add `nav_parent`+`nav_child_order` to both, and drop
-  them from `scripts/docs-offnav.list` — the child mechanism is general, not kits-only
-  (`check-docs-nav-reachable` reaches any page whose `nav_parent` names a top-level `nav_id`;
-  only `kits` uses it today). (2) Decide the comparison-page grouping: Orchestration,
-  Domain-driven design, and Where-Checkwright-sits are all adjacent-discipline contrasts — group
-  all three under a Why-Checkwright parent or leave the cluster flat, never nest two of three.
-  (3) Rule the terse-nav-`title`/descriptive-H1 convention (Orchestration→"Agent orchestration:
-  the verification layer beneath it", Install→"Install and upgrade") — either document it in
-  site-kit/SPEC.md so it reads as intent not drift, or align the two roughest cases. Gate
-  touchpoints: check-docs-nav-reachable, check-docs-kit-parity (its kits child block is separate
-  and must stay intact), check-docs-render-fidelity. Surfaced 2026-07-13 as site feedback.
 - **positioning-harness-emphasis** [needs-spec] — the harness-agnostic story is true but
   defensively framed: `docs/positioning.md` §The tiered compatibility claim already states Tier
   one (the gate battery is bare bash — runs under any harness, any CI, or no harness), but it
@@ -186,21 +159,6 @@
   expands because it became true, never by overclaiming. Anti-drift shape to design: parity
   between the ported load surface and the Claude-Code one. Prerequisite for
   positioning-harness-emphasis to assert more than Tier one. Surfaced 2026-07-13.
-
-- **scope-lead-handoff** [needs-spec] — extend the scope skill's close-out (currently
-  "recommending the next stage", lifecycle-kit/templates/skills/scope.md) to present the
-  lead-orchestration hand-off at the moment the promotion commit lands: the compact-then-`/lead`
-  branch and the manual-steering alternative (run the stages by hand, consult the compacted scope
-  session on a question). Design rulings owed: (1) SSOT — the start sequence is now stated in
-  docs/orchestration.md §Running an iteration under a lead and owned by lifecycle-kit/SPEC.md
-  §templates/lead.md, so the hand-off must *point* at the branch choice, never restate the steps
-  (content-tiering). (2) Seam — `/lead` is this repo's consumer command and `/compact` is a
-  harness built-in, so the generic template cannot hardcode either; the recommendation is likely
-  a binding slot (the `ritual`/`exit-condition` precedent) a lead-less or harness-less consumer
-  leaves empty, not a template literal. (3) Feature-vs-debt — it adds no new gated name, but it
-  changes a shipped template's close-out contract; if it lands as a new slot, `check-skill-binding`
-  binds the template's slot set, so the repo's scope shim moves with it. Surfaced 2026-07-13 as
-  site feedback on the orchestration how-to.
 
 ## Done
 

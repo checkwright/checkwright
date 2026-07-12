@@ -4,4 +4,4 @@
 
 ---
 
-— scope 124d0af6 2026-07-13
+parity-fidelity-handoff scope 124d0af6 2026-07-13
