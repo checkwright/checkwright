@@ -342,7 +342,9 @@ delegation-kit/
   usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
+  checks/check-rule-citation.sh
   gate-tests/check-gate-tamper/{good,bad}/
+  gate-tests/check-rule-citation/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard

@@ -21,11 +21,17 @@ This is the one renumber event of the iteration — the sibling doctrine
 amendments (audit-cadence, artifact-verification, identifier-deliteralization)
 extend existing rules precisely so no second renumber lands. Before the
 renumber, every by-number craft-rule citation migrates to a name-based one:
-the known instance is guard-kit's history-rewrite advisory in
-`guard-kit/lib/guard.sh` ("DOCTRINE.md rule 15" → cite the rule by its name,
-"Re-verify volatile state before a git history rewrite"), and the build
-session sweeps the tree for any other `rule 1[0-9]` citation before
-renumbering (Rename is a full-surface sweep).
+the known instances are the history-rewrite advisory's three "DOCTRINE.md
+rule 15" citations — one in `guard-kit/lib/guard.sh`, two in the advisory's
+own entry in guard-kit/SPEC.md §The generic ruleset (the checklist reference
+and the collision note, which must be reworded rather than renumbered) → cite
+the rule by its name, "Re-verify volatile state before a git history rewrite"
+— and the build session sweeps the tree for any other `DOCTRINE.md rule
+1[0-9]` citation before renumbering (Rename is a full-surface sweep). The
+sweep matches the doc-qualified form only: guard-kit numbers its own ruleset
+1–16 independently, and its internal by-number citations ("rules 12, 13",
+"rule 14") are that ruleset's, never DOCTRINE.md's — an unqualified
+`rule 1[0-9]` sweep would mis-touch them.
 
 **Enforcement ruling.** Stated manual duty, no gate — "did the session cost
 the remedy" is not machine-decidable (the Enforcement-first false-positive
@@ -56,6 +62,9 @@ knowledge-friction log (fact gaps).
   CLAUDE.md regenerated (brevity budget re-checked by its gate).
 - `guard-kit/lib/guard.sh` — the rule-15 advisory's citation migrates to
   name-based, renumber-immune form.
+- `guard-kit/SPEC.md` §The generic ruleset — the advisory entry's two
+  "DOCTRINE.md rule 15" citations migrate likewise (`docs/guard-kit/SPEC.md`
+  follows via the mirror regen).
 - `doctrine-kit/SPEC.md` — the rule-count/roster prose, where it exists, is
   re-derived, never hand-bumped.
 

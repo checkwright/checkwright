@@ -41,7 +41,10 @@ drift-line seam precedent; the consumer owns the file's brevity since they
 author the gotchas). No always-loaded cost — the harness's weak
 `Platform:` line stays the fallback where no profile exists; the value-add
 is a richer, tool-consumable, harness-independent profile a script can also
-read.
+read. Sibling-slot note: `doctrine-kit/SPEC-stage-routing.md` adds its own
+optional step to the same numbered hook list this iteration; the two are
+order-independent — each appends after the list's tail at its own merge
+time, and whichever merges second appends again, renumbering nothing.
 
 **Memory-off reconciliation.** context-kit/SPEC.md §The memory-off doctrine
 gains the distinction line this feature forces: an *explicit, derived,

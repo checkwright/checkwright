@@ -77,7 +77,12 @@ and `GATE_SDK_RUNNER_DOC` (default `README.md`) for `check-kit-registration`,
 `<gates-dir>/msg-patterns.list`; space-separated, each tracked and required —
 fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
 `<gates-dir>/msg-patterns.local.list`; gitignored, skipped when absent so a
-fresh clone without the operator's private list still commits). Paths are
+fresh clone without the operator's private list still commits),
+`GATE_SDK_COMMIT_TYPES` (default
+`feat fix refactor perf docs test build ci chore style`; the shared
+commit-type roster — see §check-commit-subject), and
+`GATE_SDK_ENFORCE_SCAN_DIR` (default `.`; the enforcement map's
+monitor-marker scan root — see §enforcement-map). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 

@@ -30,11 +30,15 @@ byte-gated by new `check-footprint-fresh` (context-kit/checks/; the
 `# graph:` manifest coupling the measured surfaces; skeleton-contract
 fixture pair ships with it. Where the generated numbers would trip the
 prose gates (bare cardinals, temporal phrasing), the page follows the
-`docs/evidence-data.md` valve precedent — a generated, freshness-gated
-projection is Derivation-first's sanctioned copy.
+`docs/evidence-data.md` precedent — a generated, freshness-gated projection
+is Derivation-first's sanctioned copy. That precedent passes on content, not
+via a named valve (verified: no path valve in `scripts/canon-config.sh`); if
+this page's numbers do trip a prose gate, the valve is authored then, as
+consumer config.
 
 **Placement ruling: evidence framing.** The page rides the docs site's
-evidence family (beside the trajectory page), with nav front matter, and
+evidence family (beside the trajectory projection `docs/evidence-data.md`),
+with nav front matter, and
 `docs/install.md` links it where vendoring cost is weighed. It complements —
 never restates — §The consumer footprint's budget rule: the SPEC owns the
 budget doctrine, the page owns the measured numbers.

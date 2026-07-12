@@ -29,7 +29,11 @@ optional step (the drift-line seam precedent): the hook already derives the
 current stage from the queue header; if the doctrine emitter is present it
 emits the stage's pointer block. This repo's `scripts/session-context.sh`
 copy adopts the step (dogfood). Per-session cost: a few pointer lines, only
-on stages that have routed rules.
+on stages that have routed rules. Sibling-slot note:
+`context-kit/SPEC-env-profile.md` adds its own optional step to the same
+numbered hook list this iteration; the two are order-independent — each
+appends after the list's tail at its own merge time, and whichever merges
+second appends again, renumbering nothing.
 
 **Parity gate.** `check-doctrine-registration` extends: every craft rule
 carries exactly one `*Stages:*` trailer matching the grammar (comma list of
