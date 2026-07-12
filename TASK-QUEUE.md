@@ -16,6 +16,33 @@
 
 ## Deferred
 
+- **lifecycle-resident-trigger-injector** [needs-spec] — lifecycle-kit ships no agent-file
+  injector for the minimal *resident pointer* a consumer needs so their agent knows the stage
+  machine exists and when to invoke `/scope`…`/close`: install step 3 adopts the stage skills
+  into `.claude/commands/` (shim or copy) but never touches `CLAUDE.md`/`AGENTS.md`, so the
+  load-trigger for those skills has no resident breadcrumb — the consumer hand-authors it (as
+  this repo's `CLAUDE.md` §"governed by its own kits" does) or the skills sit undiscovered.
+  Mirror doctrine-kit's `bin/install-doctrine.sh`: a marker-bounded block (a
+  `lifecycle-kit:begin`/`:end` HTML-comment marker pair, the doctrine-kit precedent),
+  idempotently (re)written by a `bin/install-lifecycle.sh`, parametrized on the agent file
+  (`LIFECYCLE_KIT_AGENT_FILE`
+  default `CLAUDE.md`, overridable to `AGENTS.md` — the `DOCTRINE_KIT_AGENT_FILE` precedent),
+  carrying *pointer-only* content (the stage roster + one line that the repo runs the
+  iteration machine — never the stage prose, per Load-trigger residency). Anti-drift: a parity
+  gate on the block (the `check-doctrine-registration` precedent) so an edited or stale
+  resident pointer reddens rather than silently diverging — the same guarantee the shim gates
+  (`check-skill-binding`/`check-shim-restatement`) give the copied skills. Design questions to
+  rule at scope: (1) generated marker block vs a paste-in README snippet (the injector is the
+  doctrine-kit-proven path, and a parity gate needs a generated target). (2) the resident
+  content is bounded to a pointer + stage roster *derived* from the configured stage set
+  (`lifecycle-config.sh`) so a reshaped machine's pointer stays in lockstep — never a
+  hand-listed roster. (3) relationship to craft-rule-stage-routing (which surfaces
+  stage-relevant craft rules into stage sessions) and to the doctrine injector: whether a
+  single install-time agent-file assembler owns every kit-injected resident block rather than
+  each kit editing the file independently. Surfaced 2026-07-12 (operator ask, after auditing
+  which kits seed the consumer's always-loaded surface — only doctrine-kit injects into the
+  agent file; context-kit uses the session-start hook; lifecycle-kit leaves the resident
+  trigger to hand-authoring).
 - **craft-rule-stage-routing** [needs-spec] — promote the engineering-craft rules
   (DOCTRINE.md 10–19) into the stage sessions where they apply, instead of the
   passive behind-link reference tier they are today: a craft rule reaches a session
