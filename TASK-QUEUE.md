@@ -137,6 +137,17 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
+- **readme-roster-parity** [needs-spec] — name-set parity between each kit README's
+  register-the-gates block and the kit's shipped `checks/` dir — the check-install-toolchain
+  fork ruling reapplied (names derivable, per-gate annotation clauses hand prose, so a gate
+  holds the derivable half rather than generating the list). Surfaced 2026-07-12 at align:
+  canon-kit's README listed 9 of 17 shipped gates, lifecycle-kit 4 of 7, delegation-kit 1 of 2
+  — hand-fixed that session; this rung mechanizes the channel.
+- **emitted-artifact-external-refs** [needs-spec] — mechanize the self-contained-artifacts
+  convention's external-reference half: check-graph's asset-href assertion polices relative
+  `href`/`src` only, so an absolute URL or a JS module import in kit-emitted HTML passes
+  unseen; extend to an external-ref allowlist whose only seeded entry is the sanctioned
+  pinned mermaid import (gate-sdk/SPEC.md §check-graph). Surfaced 2026-07-12 at align.
 - **pub-index-language-plugins** [needs-spec] — context-kit's `pub-index.sh`
   hardcodes the Rust grammar and file glob; make the extractor pluggable —
   per-language extractors resolved registry-style, a consumer knob naming the

@@ -20,14 +20,15 @@ a gate quietly weakened to make its commit pass. The protocol closes all three;
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
-1. Register the gate — add to your `gates.list`:
+1. Register the gates — add to your `gates.list`:
 
    ```
    check-gate-tamper
+   check-rule-citation   # holds SPEC §The delegation model's rule citations to the template
    ```
 
-   It resolves through gate-sdk's registry path and its `# graph:` manifest puts
-   it in the generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh
+   They resolve through gate-sdk's registry path and their `# graph:` manifests
+   put them in the generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh
    --write`.
 
 2. Bind the protocol skill and add its resident pointer:

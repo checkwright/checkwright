@@ -9,21 +9,28 @@ in the source that actually supplies it, so the two drift silently
 ## What changes
 
 - `canon-kit/checks/check-knob-default-coupling.sh` — invariant, for every
-  kit-knob fallback expansion in kit executable source (a `${PREFIX_NAME:-value}`
-  form whose prefix resolves to a vendored kit dir by the established
-  naming convention — the dir name uppercased, hyphens to underscores):
+  kit-knob default site in kit executable source — both idioms: a
+  `${PREFIX_NAME:-value}` fallback expansion, and the guarded assignment
+  (`[[ -v PREFIX_NAME ]] || PREFIX_NAME=value` /
+  `declare -p PREFIX_NAME &>/dev/null || PREFIX_NAME=(...)`) that is the
+  dominant default form in the kits' `lib/*.sh` — whose prefix resolves to a
+  vendored kit dir by the established naming convention (the dir name
+  uppercased, hyphens to underscores):
   1. **Source self-agreement** — every fallback site for one knob carries
      the same literal; two sites disagreeing is drift inside the source
      before any SPEC is consulted.
   2. **SPEC agreement** — the owning kit's canonical spec states that same
      default for the knob, in the default-statement grammar
-     `check-knob-citation` already parses (the `lib/spec.sh` adapters are
-     shared, not re-implemented); an empty-string fallback pairs with a
-     stated empty default.
-- Calibration: non-literal fallbacks — any expansion, substitution, or
-  arithmetic inside the fallback — are computed defaults with no single
-  literal to couple; they are skipped-and-counted in the clean line, the
-  reads-couples idiom. A knob whose owning SPEC states no default at all
+     `check-knob-citation` already parses. That grammar lives inline in
+     check-knob-citation's own awk today (`_kc_default_bound` /
+     `_kc_after_has_literal`), so this unit first extracts it into
+     `canon-kit/lib/spec.sh` and re-points check-knob-citation at the shared
+     copy — one grammar owner, never a re-implementation. An empty-string
+     fallback pairs with a stated empty default.
+- Calibration: non-literal defaults — any expansion, substitution, or
+  arithmetic inside the fallback or the guarded assignment's value — are
+  computed defaults with no single literal to couple; they are
+  skipped-and-counted in the clean line, the reads-couples idiom. A knob whose owning SPEC states no default at all
   reds under assertion 2: the SPEC owns knob rosters and default values
   (the config-via-env convention), so a stated-nowhere default is the
   defect, not a valve.

@@ -645,7 +645,14 @@ in the theme file (or the emitter), never a hand-edit.
 Self-containment is unchanged: injected content is inline, and a theme emitting
 a relative asset href must resolve under the artifact dir or the asset-href
 assertion is red — the existing gate already polices the link-the-site-stylesheet
-shortcut into inlining. Dark mode is the theme owner's disposition: the kit default keeps its
+shortcut into inlining. One external reference is sanctioned: `emit_graph`'s
+pinned-major mermaid ESM import from the jsdelivr CDN — the diagram renderer is
+client-side, and inlining it would vendor a megabyte-scale library into a
+byte-compared artifact. It is the *only* sanctioned external reference in
+kit-emitted HTML, and it marks the asset-href assertion's honest limit: the
+assertion polices relative `href`/`src` values only (absolute `://` URLs and JS
+`import` statements pass unseen), so any new external reference is caught by
+review, not the gate. Dark mode is the theme owner's disposition: the kit default keeps its
 light+dark scheme, and because the emitted mermaid init keys on
 `prefers-color-scheme`, a theme's chrome must honor that query too or it clashes
 with a dark-rendered graph on the same page. This repo's `scripts/graph-theme.sh`

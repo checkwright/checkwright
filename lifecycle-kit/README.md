@@ -29,6 +29,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-stage-entry
    check-lesson-disposition
    check-lifecycle-registration
+   check-stage-skill-coverage   # skill-shim trio: needs the skills dir (step 3)
+   check-skill-binding
+   check-shim-restatement
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then

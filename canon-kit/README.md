@@ -33,6 +33,14 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
    check-spec-pointer           # resolves spec:/contract: pointer targets
    check-todo-task-liveness     # resolves TODO(task:) slugs against the queue
    check-docs-cmd               # invoked paths + kit knobs in docs resolve
+   check-knob-citation          # knob values stated only in the owning SPEC
+   check-manifest-count         # no bare cardinal over a governed collection
+   check-manifest-temporal      # no temporal narration in manifest prose
+   check-prose-enum             # partial enumeration of a governed set
+   check-md-refs                # internal markdown links resolve
+   check-spec-fence-balance     # even fence counts, parsers never desync
+   check-docs-link-convention   # needs a docs site (cite-downward links)
+   check-deprecation-task       # needs a deprecation-marker vocabulary
    ```
 
    They resolve through gate-sdk's registry path (your gates dir first, then

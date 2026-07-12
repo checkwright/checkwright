@@ -108,7 +108,8 @@ live in the owning SPEC section — cited, never restated.
   this repo's layout as the defaults; each kit's SPEC owns its knob roster
   and default values.
 - **Self-contained artifacts:** emitted HTML inlines its CSS; no kit output may
-  reference an asset outside the kit.
+  reference an asset outside the kit — the one sanctioned exception and its
+  honest limit: gate-sdk/SPEC.md §check-graph.
 - **Kit-landing checklist:** README + SPEC.md, fixtures for every shipped
   gate, `smoke/`, and registration in this repo's `gates.list` where
   applicable — gate-sdk/SPEC.md §Consumer smoke owns the checklist.

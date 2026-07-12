@@ -16,7 +16,7 @@ nav tree rather than the include growing a deeper walker.
 - `docs/kits.md` — the Kit Reference landing page, created by this unit:
   front matter `title: Kit Reference`, `nav_id: kits`, and the top-level
   `nav_order` slot from the target layout below. Its body takes over the kit
-  registry table from `docs/index.md` (which keeps a one-line pointer to it —
+  registry list from `docs/index.md` (which keeps a one-line pointer to it —
   content-tiering: the registry lives on one surface). The registry-doc
   argument of `scripts/check-docs-kit-parity.sh` re-points at `docs/kits.md`
   so the wrapped kit-registration invariant (gate-sdk/SPEC.md
@@ -88,7 +88,7 @@ page passes assertion 1 without hand-editing a generated artifact;
 
 - CLAUDE.md §Housekeeping — the sentence naming `check-docs-kit-parity`'s
   expected nav block updates to the new block shape and registry page.
-- `docs/index.md` — kit table replaced by a pointer to `docs/kits.md`.
+- `docs/index.md` — kit registry list replaced by a pointer to `docs/kits.md`.
 - `scripts/check-docs-kit-parity.sh` header prose — registry doc becomes
   `docs/kits.md`.
 
