@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **session-id-child-flag** [spec: SPEC-session-id-verify.md] — verify
-  `CLAUDE_CODE_CHILD_SESSION` instead of trusting it: the harness now sets
-  the flag in top-level sessions too, so every stage entry dead-ends in the
-  narrowed subagents scan and needs the `LIFECYCLE_KIT_SESSION_ID` escape by
-  hand. Empty narrowed scan + a top-level transcript for the env uuid marks
-  the flag spurious → fall back to `CLAUDE_CODE_SESSION_ID`; SPEC sentence
-  flip, help-text rewrite, spurious-flag smoke case. Surfaced 2026-07-14;
-  interim mitigation (exit-2 help names the escape) landed at
-  docs-coupling-graph-link close.
-
 ## Technical Debt
 
 ## Deferred
@@ -117,5 +107,7 @@
   registry-sourced badge would advertise a dead install path.
 
 ## Done
+
+- session-id-child-flag
 
 ## Lessons Learned

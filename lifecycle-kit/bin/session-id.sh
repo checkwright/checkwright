@@ -55,12 +55,18 @@ shopt -u nullglob
 
 [[ -n "$newest" ]] || {
     if [[ -n "${CLAUDE_CODE_CHILD_SESSION:-}" && -n "${CLAUDE_CODE_SESSION_ID:-}" ]]; then
-        echo "session-id: no subagent transcript under $dir/${CLAUDE_CODE_SESSION_ID}/subagents" >&2
-        echo "  help: CLAUDE_CODE_CHILD_SESSION is set but no child transcript exists — a top-level session carrying the flag takes the designed escape: LIFECYCLE_KIT_SESSION_ID=<this session's uuid> (lifecycle-kit/SPEC.md §bin/session-id.sh)." >&2
+        # spec: lifecycle-kit/SPEC.md §bin/session-id.sh — empty narrowed scan + a top-level
+        # transcript for the env uuid marks the flag spurious: the uuid names a live top-level
+        # session, not a lead, so fall back to it rather than exiting 2.
+        if [[ -e "$dir/${CLAUDE_CODE_SESSION_ID}.jsonl" ]]; then
+            normalize "$CLAUDE_CODE_SESSION_ID"
+            exit 0
+        fi
+        echo "session-id: no subagent transcript under $dir/${CLAUDE_CODE_SESSION_ID}/subagents and no top-level $dir/${CLAUDE_CODE_SESSION_ID}.jsonl" >&2
     else
         echo "session-id: no transcript (*.jsonl) under $dir" >&2
-        echo "  help: confirm this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR)." >&2
     fi
+    echo "  help: confirm this is the right sessions dir (LIFECYCLE_KIT_SESSIONS_DIR)." >&2
     exit 2
 }
 

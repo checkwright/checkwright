@@ -237,9 +237,10 @@ the first 8 characters:
 2. `CLAUDE_CODE_SESSION_ID` — the shipped default source, harness-specific by
    nature: this harness exports the current session's transcript uuid into every
    Bash environment, identifying the session directly rather than inferring it
-   from file mtimes. Skipped when `CLAUDE_CODE_CHILD_SESSION` is set, where a
-   lead-dispatched stage session (§templates/lead.md) sees the *lead's* uuid
-   here, not its own.
+   from file mtimes. Taken directly here only when `CLAUDE_CODE_CHILD_SESSION`
+   is unset; when the flag is set a lead-dispatched stage session
+   (§templates/lead.md) may see the *lead's* uuid here, so source 3 verifies
+   the flag before trusting it and can route back to this uuid.
 3. The newest transcript under the sessions dir (default
    `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or `~/.claude`,
    and the cwd with every non-alphanumeric char mapped to `-`; override
@@ -251,11 +252,21 @@ the first 8 characters:
    lead's uuid) narrows this scan to `<dir>/<lead-uuid>/subagents/*.jsonl`
    alone, excluding the lead's own top-level transcript — concurrently written,
    and able to out-mtime the dispatched session's — from the candidate set. The
-   flag is trusted, never verified: a *top-level* session that carries
-   `CLAUDE_CODE_CHILD_SESSION` anyway is sent down this narrowed scan, finds no
-   subagent transcript, and exits 2 — source 1 is the designed escape (set
-   `LIFECYCLE_KIT_SESSION_ID` to the session's own id). An
-   absent dir or transcript exits 2.
+   flag is verified, not trusted, because this harness sets it in top-level
+   sessions too: a non-empty narrowed scan is a genuine child (newest subagent
+   transcript wins); an empty scan with `<dir>/<lead-uuid>.jsonl` present marks
+   the flag spurious — a genuine child's transcript lives under `subagents/`
+   while it runs, so an empty scan plus a top-level transcript for the env uuid
+   means the uuid names a live top-level session, and the derivation falls back
+   to `CLAUDE_CODE_SESSION_ID` (source 2's answer). An empty scan with no such
+   top-level transcript exits 2 — only a wrong sessions dir or a broken layout
+   still reaches it. Two races are accepted: a genuine child stamping before
+   its transcript's first write would fall back to the lead's uuid (theoretical
+   — a child's transcript has its first writes by the time it can run a tool
+   call), and a spurious-flagged session that dispatched subagents earlier in
+   the same session stamps the newest subagent's id (a provenance smudge, not a
+   correctness break, unchanged from the prior trusting behavior). An absent dir
+   or transcript exits 2.
 
 Not a gate — a `bin/` helper invoked (now internally, by `enter-stage.sh`) for
 the `<session-id>` field; the stage skills reach it through `enter-stage.sh`

@@ -184,6 +184,12 @@ touch -d '2025-01-01T00:00:00' "$sid/tree/$lead.jsonl"                    # lead
 o="$(sid_run CLAUDE_CODE_CHILD_SESSION=1 CLAUDE_CODE_SESSION_ID=$lead LIFECYCLE_KIT_SESSIONS_DIR=$sid/tree)"
 [[ "$o" == "aaaabbbb" ]] || { echo "smoke(session-id): dispatched child did not narrow to subagents (got '$o')" >&2; exit 1; }
 
+spur="ccccdddd-1111-2222-3333-444455556666"                             # spurious flag: empty subagents/ + top-level transcript → fall back to env uuid
+mkdir -p "$sid/spur/$spur/subagents"                                     # subagents/ dir exists but empty
+: > "$sid/spur/$spur.jsonl"
+o="$(sid_run CLAUDE_CODE_CHILD_SESSION=1 CLAUDE_CODE_SESSION_ID=$spur LIFECYCLE_KIT_SESSIONS_DIR=$sid/spur)"
+[[ "$o" == "ccccdddd" ]] || { echo "smoke(session-id): spurious flag did not fall back to top-level uuid (got '$o')" >&2; exit 1; }
+
 mkdir -p "$sid/tree2/somelead/subagents"                                 # source 3 widened glob, no env id vars
 : > "$sid/tree2/somelead/subagents/agent-9999888877776666.jsonl"
 o="$(sid_run LIFECYCLE_KIT_SESSIONS_DIR=$sid/tree2)"
