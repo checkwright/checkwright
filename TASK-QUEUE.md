@@ -14,17 +14,6 @@
 
 ## Technical Debt
 
-- **docs-coupling-graph-link** — surface `docs/check-graph.html` from the Value
-  cluster: a link in `docs/value.md`'s hand prose (outside the rollup marker
-  block) presenting the coupling graph as the third generated projection beside
-  the enforcement map and footprint. Ruled at scope 2026-07-14:
-  `docs/enforcement.md` is out as the carrier — it is emitter-generated, and
-  teaching the kit emitter a consumer artifact path is disproportionate to a
-  see-also; a nav slot stays ruled out (raw HTML; the nav is
-  front-matter-driven, `.md`-only). Debt by the new-names litmus: the artifact
-  is already generated, freshness-gated, and core-files-pinned — the link adds
-  no new name, knob, or contract. Surfaced 2026-07-14 (operator ask).
-
 ## Deferred
 
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
@@ -118,5 +107,7 @@
   registry-sourced badge would advertise a dead install path.
 
 ## Done
+
+- docs-coupling-graph-link
 
 ## Lessons Learned
