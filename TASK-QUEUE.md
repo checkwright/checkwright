@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: session-id-child-flag  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,16 @@
 ---
 
 ## New Features
+
+- **session-id-child-flag** [spec: SPEC-session-id-verify.md] — verify
+  `CLAUDE_CODE_CHILD_SESSION` instead of trusting it: the harness now sets
+  the flag in top-level sessions too, so every stage entry dead-ends in the
+  narrowed subagents scan and needs the `LIFECYCLE_KIT_SESSION_ID` escape by
+  hand. Empty narrowed scan + a top-level transcript for the env uuid marks
+  the flag spurious → fall back to `CLAUDE_CODE_SESSION_ID`; SPEC sentence
+  flip, help-text rewrite, spurious-flag smoke case. Surfaced 2026-07-14;
+  interim mitigation (exit-2 help names the escape) landed at
+  docs-coupling-graph-link close.
 
 ## Technical Debt
 
@@ -105,24 +115,6 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
-
-- **session-id-child-flag** [needs-spec] — session-id.sh trusts
-  `CLAUDE_CODE_CHILD_SESSION` unverified (lifecycle-kit/SPEC.md
-  §bin/session-id.sh states the contract), but the harness now sets the flag
-  in top-level sessions too (observed across three sessions, 2026-07-14), so
-  every stage entry dead-ends in the narrowed subagents scan and needs the
-  `LIFECYCLE_KIT_SESSION_ID` escape by hand — standing per-stage friction,
-  and the env-prefix form breaks the Bash allowlist match so it re-prompts
-  each time. Design call to make: verify the flag instead of trusting it —
-  when the narrowed scan is empty and `<dir>/<session-uuid>.jsonl` exists
-  top-level, fall back to `CLAUDE_CODE_SESSION_ID` (a genuine child's
-  transcript lives under `subagents/` while it runs, so an empty scan marks
-  the flag spurious; the residual race is a child stamping before its
-  transcript's first write). Lands with the SPEC sentence flip
-  ("trusted, never verified"), a smoke case for the spurious-flag path, and
-  removes the standing escape. Interim mitigation landed at
-  docs-coupling-graph-link close: the exit-2 help text now names the escape.
-  Surfaced 2026-07-14.
 
 ## Done
 
