@@ -61,7 +61,7 @@
       border: 0; padding: 0.25rem 0.6rem; font-size: 0.8rem; cursor: pointer; }
     .theme-select button[aria-pressed="true"] { background: var(--ck-gold); color: #16202b; }
     .site-body { display: flex; align-items: flex-start; max-width: 1180px; margin: 0 auto; }
-    .site-nav { flex: 0 0 260px; padding: 1.25rem 1rem; border-right: 1px solid var(--ck-border);
+    .site-nav { flex: 0 0 280px; padding: 1.25rem 1rem; border-right: 1px solid var(--ck-border);
       position: sticky; top: 52px; align-self: flex-start; max-height: calc(100vh - 52px);
       overflow-y: auto; background: var(--ck-sidebar); }
     .site-search input { width: 100%; padding: 0.4rem 0.6rem; border: 1px solid var(--ck-border);
@@ -82,7 +82,8 @@
     .nav-children { margin-left: 0.75rem !important; border-left: 1px solid var(--ck-border);
       padding-left: 0.35rem !important; }
     .nav-children a { font-size: 0.9rem; color: var(--ck-muted); }
-    .nav-children li.has-suffix { display: flex; align-items: baseline; gap: 0.15rem; }
+    .nav-children li.has-suffix { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem; }
+    .nav-children li.has-suffix > a { white-space: nowrap; }
     .nav-suffix { font-size: 0.72rem; color: var(--ck-muted); white-space: nowrap; }
     .nav-suffix a { display: inline; padding: 0 0.1rem; font-size: inherit; }
     .nav-suffix a.current { color: var(--ck-accent); font-weight: 600; }
