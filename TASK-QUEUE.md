@@ -136,6 +136,21 @@
   (lifecycle-kit/SPEC.md §bin/session-id.sh), and the per-dispatch env override covers this
   iteration's remaining stages. Surfaced 2026-07-13 at align — the dispatched session's
   flip+stamp red at check-stage-evidence on the lead's colliding id.
+- **dispatch-policy-residency** [needs-spec] — the lead's dispatch prompts restate standing
+  policy per dispatch (journal mechanics, the sessions-dir override, shared-index reminders),
+  which templates/lead.md rules belongs in tracked config, never ad-hoc per-dispatch prose.
+  Move the standing content into the stage-session agent definition so a dispatch prompt
+  carries only stage-specific context; then audit the first orchestrated iteration's
+  dispatched-session transcripts for further re-derivation classes worth the same residency
+  treatment. Surfaced 2026-07-13 running the first lead-orchestrated iteration.
+- **usage-snapshot-poller** [needs-spec] — delegation-kit's usage snapshot is produced by the
+  statusline hook, so it refreshes only on the lead session's own message flow: a 6.7h
+  delegated build ran with zero snapshot updates (trend-log evidence, 2026-07-13), leaving the
+  budget gauge blind exactly when delegation keeps the lead static. Design an alternate
+  producer per delegation-kit/SPEC.md §The usage.txt contract (the producer is pluggable by
+  design): a timer-driven poller reading the account usage source and atomically rewriting the
+  snapshot independent of message flow; credentials handling and usage-source stability are the
+  open design questions. Surfaced 2026-07-13.
 
 ## Done
 
