@@ -108,6 +108,4 @@
 
 ## Done
 
-- session-id-child-flag
-
 ## Lessons Learned
