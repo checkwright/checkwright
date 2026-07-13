@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **scope-lead-handoff** [spec: SPEC-scope-lead-handoff.md] — the scope template close-out
-  gains the handoff slot; this repo's shim binds the compact-then-/lead vs manual-steering
-  choice by citation to docs/orchestration.md.
-
 ## Technical Debt
 
 - **drop-python-dependency** — port the md-index.sh and pub-index.sh EXTRACT embeds to POSIX
@@ -163,5 +159,6 @@
 - readme-roster-parity
 - emitted-artifact-external-refs
 - render-fidelity-table-leakage
+- scope-lead-handoff
 
 ## Lessons Learned

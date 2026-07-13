@@ -66,3 +66,11 @@ cross-component trigger is mechanical — an amendment on disk spanning ≥2
 component dirs makes `check-stage-entry` assertion C demand the audit stamp
 (or a user-ruled waiver) at build entry — so a scope that promoted such an
 amendment should say so rather than let build discover it.
+
+With the promotion commit landed, the iteration named, and the next stage
+recommended, present the consumer's **hand-off** — how this consumer carries a
+closed scope into the remaining stages: *<handoff: the consumer's start-sequence
+choice at this boundary — driving the rest under a lead versus steering the
+stages by hand, or a plain "no lead — run the stages by hand" line for a
+lead-less or harness-less consumer; point at the consumer's documented
+start sequence by citation, never restating its steps here>*.
