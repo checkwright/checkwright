@@ -114,11 +114,4 @@
 
 ## Done
 
-- footprint-drop-word-measure
-- positioning-harness-emphasis
-- pub-index-language-extractors
-- harness-adapter-agnostic
-- pub-index-language-plugins
-- pub-index-rust-default-framing
-
 ## Lessons Learned
