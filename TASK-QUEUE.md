@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **usage-snapshot-poller** [spec: SPEC-usage-poller.md] — a timer-driven second reference
-  producer for the usage snapshot: fail-soft polling, endpoint knob as test seam and stability
-  valve, last-writer-wins coexistence with the statusline producer. Surfaced 2026-07-13.
 - **lead-compact-cadence** [spec: SPEC-lead-compact-cadence.md] — the lead suggests operator
   compacts at stage-acceptance boundaries that pay per the cold-wakes-times-residue calibration
   rule; keep-instruction unchanged from the handoff compact. Surfaced 2026-07-13.
@@ -152,5 +149,6 @@
 - session-id-subagent-aware
 - dispatch-policy-residency
 - battery-quiet-mode
+- usage-snapshot-poller
 
 ## Lessons Learned

@@ -48,9 +48,11 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
      digest.
 
 3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — point
-   your harness `statusLine` at `templates/statusline-usage.sh` (or copy it), or
+   your harness `statusLine` at `templates/statusline-usage.sh` (or copy it),
+   wire `templates/usage-poller.sh` under a timer so the snapshot stays fresh
+   while a supervising session sits static, or
    have any producer honour the snapshot contract (SPEC §The usage.txt contract).
-   The reference producer also renders a status bar (context + both rate windows +
+   The statusline producer also renders a status bar (context + both rate windows +
    iteration@stage); the three mandatory snapshot lines are the floor, and
    supplying the optional weekly keys arms the second (7-day) pause axis.
 

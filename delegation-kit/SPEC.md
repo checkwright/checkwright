@@ -250,7 +250,9 @@ no subscription percentage applies). Optional keys are omitted when their
 source has no value, never written empty; keys the verdict does not read
 pass through unchanged.
 
-`templates/statusline-usage.sh` is the reference producer: a statusline hook
+The kit ships two reference producers — one push, one poll — and any producer
+honoring the contract works beside them. `templates/statusline-usage.sh` is
+the push producer: a statusline hook
 that parses the harness's rate-limit JSON and atomically writes the
 snapshot (`tmp` + `mv`) to `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt`.
 It also produces the weekly pair from the payload and `account` / `tier`
@@ -263,9 +265,42 @@ Beyond the snapshot write it renders a status bar — model/effort, a context
 gauge, the 5h and 7d windows with reset countdowns, and the `iteration@stage`
 readout parsed from the queue header — self-contained ANSI, no external asset
 (§Out of scope). The snapshot write is the contract; the bar is
-reference UX a consumer may restyle or discard. Any producer honoring the
-contract works — the source is pluggable (`DELEGATION_KIT_USAGE_FILE`), so no
-single-operator `CLAUDE_CONFIG_DIR` assumption is baked in. Because the
+reference UX a consumer may restyle or discard. The source is pluggable
+(`DELEGATION_KIT_USAGE_FILE`), so no
+single-operator `CLAUDE_CONFIG_DIR` assumption is baked in.
+
+`templates/usage-poller.sh` is the poll producer, closing the push producer's
+blind spot: the statusline fires on the supervising session's own message
+flow, so a lead that delegates stops producing exactly when it goes static —
+a delegated build can run for hours with every per-dispatch budget verdict
+reading a stale file. The poller is one poll cycle per invocation: read the
+harness OAuth token from the credentials file the kit already knows
+(`DELEGATION_KIT_CRED_FILE`; the token goes into the request header and
+nowhere else — never logged, never echoed, never written to the snapshot),
+query the account usage source, map the payload onto the contract (the three
+mandatory lines plus whichever optional keys the source exposes; **no new
+key**), and atomically rewrite the snapshot (`tmp` + `mv`, the same
+discipline). No daemon, no loop: scheduling belongs to the consumer's timer —
+a cron line such as `*/5 * * * * bash scripts/usage-poller.sh` or a systemd
+timer — and without that timer entry the producer is dead; the timer entry is
+the enabling config. The usage endpoint is harness-account plumbing, not a
+published contract, so the poller is **fail-soft**: a missing/unreadable
+credentials file, a fetch failure, or an unparseable payload exits non-zero
+with a `help:` line *without touching the snapshot* — a stale snapshot is
+already the detected condition downstream (`usage-verdict`'s `updated_at`
+staleness check turns it into a STALE verdict, never a silent green), and the
+non-zero exit lands in the invoking timer's logging, deliberately nowhere
+else. The endpoint URL is the `DELEGATION_KIT_USAGE_ENDPOINT` knob — both the
+test seam (the smoke points it at a local `file://` stub) and the valve when
+the source moves.
+
+Both producers write the whole snapshot atomically from the same account
+source; last-writer-wins is correct because the freshest write is the truest
+and `updated_at` arbitrates downstream. Nothing serializes them and nothing
+needs to. The trend log is unaffected: `usage-verdict` stays the single
+append author (§usage-verdict); the poller writes the snapshot only.
+
+Because the
 statusline fires far more often than the per-session /
 per-dispatch verdict calls, a consumer wanting a denser trend history can drive
 sampling from the render path — `usage-verdict` stays the single append author
@@ -341,7 +376,8 @@ delegation-kit/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
-  templates/statusline-usage.sh           # reference usage.txt producer + status bar
+  templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar
+  templates/usage-poller.sh               # poll usage.txt producer (timer-driven, fail-soft)
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh
   smoke/violation.sh
@@ -360,6 +396,10 @@ layout as defaults):
   overrides (test injection).
 - `DELEGATION_KIT_CRED_FILE` — default the usage file's sibling
   `.credentials.json`; positional `$2` overrides.
+- `DELEGATION_KIT_USAGE_ENDPOINT` — the poll producer's usage source; default
+  `https://api.anthropic.com/api/oauth/usage`. The test seam (a `file://` stub)
+  and the stability valve when the unpublished source moves (§The usage.txt
+  contract).
 - `DELEGATION_KIT_PAUSE_PCT` — default `80`.
 - `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default the
   `DELEGATION_KIT_PAUSE_PCT` value (one conservatism policy unless split).
@@ -474,7 +514,11 @@ output so a memory-quoted percentage cannot be the acting source.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot
-through `usage-verdict` asserting a verdict — self-verifying install.
+through `usage-verdict` asserting a verdict — self-verifying install. It also
+drives the poll producer through its `file://` stub seam: the happy path
+writes a contract-valid snapshot (asserted by driving it through
+`usage-verdict`), and a fetch failure exits non-zero leaving a pre-seeded
+snapshot byte-identical — the fail-soft contract, exercised end to end.
 `smoke/violation.sh` stages a gate edit co-staged with a product file in
 the scratch consumer and asserts the battery reds (assertion A) — the
 violation is craftable, so the file is mandatory
