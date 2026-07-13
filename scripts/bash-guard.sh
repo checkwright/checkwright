@@ -10,7 +10,14 @@ source "$GUARD_KIT_LIB" 2>/dev/null || exit 0
 
 cmd="$(guard_read_command)" || exit 0
 
-# spec: guard-kit/SPEC.md §Consumer rules — project block/steer/allow rules go here, before the generic ruleset (this repo adds none)
+# spec: guard-kit/SPEC.md §Consumer rules — project block/steer/allow rules go here, before the generic ruleset
+# spec: CLAUDE.md §This repo is governed by its own kits — a hook bypass is a one-off with cause, so it must stay visible: the allowlisted 'git commit -m *' glob would otherwise auto-allow a trailing bypass flag; quoted spans are stripped first so a commit message merely naming the flag passes
+cmd_unquoted="$(printf '%s' "$cmd" | sed "s/'[^']*'//g;"' s/"[^"]*"//g')"
+case " $cmd_unquoted " in
+    *" git commit "*"--no-verify"*|*" git commit -n "*)
+        guard_block "a hook bypass (--no-verify/-n) is a one-off with cause, never auto-allowed — fix the red gate instead, or run the bypass yourself with !<command> so the cause is on record."
+        ;;
+esac
 guard_generic_rules "$cmd"
 guard_log_fallthrough "$cmd"
 exit 0
