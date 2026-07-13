@@ -78,8 +78,9 @@ consequences:
 - **Batch escalations.** The decision shape makes batching natural — a stage
   session collects its open questions and sends them in one turn.
 - **Compact at handoff.** After the promotion commit lands the amendments and
-  queue entries, and before the first dispatch, compact the lead's context with
-  an instruction that **keeps** per-amendment rationale, rejected alternatives,
+  queue entries, and before the first dispatch, `/compact` the lead's context
+  with an instruction that **keeps** per-amendment rationale, rejected
+  alternatives,
   and the ruling-class roster, and **drops** tool output and file contents. The
   tree is re-readable and everything ruled already lives in a governed surface,
   so the lossy compact has a lead crash's bounded blast radius; the lead holds

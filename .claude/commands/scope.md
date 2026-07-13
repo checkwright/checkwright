@@ -21,7 +21,7 @@ against is queue-kit/SPEC.md §The tag algebra, and `[spec:]` ref
 resolution is canon-kit/SPEC.md §check-amendment-queue.
 
 **handoff** — lay out the two branches per docs/orchestration.md §Running an
-iteration under a lead: compact this session then `/lead` to drive the rest, or
+iteration under a lead: `/compact` this session then `/lead` to drive the rest, or
 skip the lead and steer each stage by hand, consulting the compacted scope
 session when a stage asks. That page is the sequence's single source (owned by
 lifecycle-kit/SPEC.md §templates/lead.md) — send the reader there, do not
