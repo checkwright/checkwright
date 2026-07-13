@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **session-id-subagent-aware** [spec: SPEC-session-id-subagent.md] — mechanize the lead-dispatch
-  session-id derivation: env-first source order with `agent-` prefix normalization and a widened
-  subagents/ glob fallback; retires the per-dispatch sessions-dir override remedy from prose.
-  Surfaced 2026-07-13 at align.
 - **dispatch-policy-residency** [spec: SPEC-dispatch-policy.md] — standing dispatch policy moves
   into the tracked stage-session agent definition; templates/lead.md codifies dispatch
   granularity (batch by shared kit/SPEC surface, split on model tier or a split trigger); plus a
@@ -160,5 +156,7 @@
   column-scanning alone does not buy the width. Surfaced 2026-07-13.
 
 ## Done
+
+- session-id-subagent-aware
 
 ## Lessons Learned

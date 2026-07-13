@@ -74,10 +74,10 @@ names the iteration. Later stages only append.
 **Honest limit:** a stamp proves the stage skill was *invoked*, not that its
 work was done faithfully — strictly better than skip-and-no-trace, but not
 proof of done. The `<session-id>` field is **read, not hand-picked**:
-`bin/session-id.sh` prints the canonical id — the first 8 hex of the newest
-agent-session transcript under the sessions dir, which rotates per session
-(including across a context clear) — and the stage skills stamp exactly what
-it prints, so each stage's provenance is observed, not guessed.
+`bin/session-id.sh` prints the canonical id by a fixed derivation order
+(§bin/session-id.sh), which rotates per session (including across a context
+clear), and the stage skills stamp exactly what it prints, so each stage's
+provenance is observed, not guessed.
 `check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it
 additionally reads the session id to enforce cross-stage distinctness (a stage
 flip must carry a fresh session — see §check-stage-evidence).
@@ -201,6 +201,8 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
 - `LIFECYCLE_KIT_QUEUE_FILE` / `LIFECYCLE_KIT_STATE_FILE` — the governed header and
   stamp files, defaulting through gate-sdk's `GATE_SDK_QUEUE_FILE` /
   `GATE_SDK_WORKFLOW_DIR`.
+- `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1
+  of the derivation order (§bin/session-id.sh); default unset.
 - `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
   file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`,
   read by `check-lesson-disposition` and the boundary-reset built-in.
@@ -230,20 +232,35 @@ gate structure (gate-sdk's `lib/gate.sh` rule).
 
 ### bin/session-id.sh
 
-Prints the canonical stamp id so a stage skill reads it rather than guessing:
-the first 8 hex of the most recently written transcript under the sessions dir
-(default `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or
-`~/.claude`, and the cwd with every non-alphanumeric char mapped to `-`;
-override `LIFECYCLE_KIT_SESSIONS_DIR`). Newest-file selection is the documented
-single-operator assumption (one live session per project tree); an absent dir
-or transcript exits 2. A lead-dispatched stage session (§templates/lead.md)
-breaks that assumption by design: its transcript lands in a `subagents/`
-subdirectory the top-level glob never sees, so the newest top-level transcript
-is the lead's own and the derived id collides with a prior stage's stamp at
-`check-stage-evidence`. Such a session points `LIFECYCLE_KIT_SESSIONS_DIR` at
-that `subagents/` directory before invoking `enter-stage.sh`. Not a gate — a `bin/` helper invoked (now internally,
-by `enter-stage.sh`) for the `<session-id>` field; the stage skills reach it
-through `enter-stage.sh` rather than calling it directly.
+Prints the canonical stamp id so a stage skill reads it rather than guessing.
+The id derives by a fixed source order, first hit wins, every source ending in
+the same normalization — strip a leading `agent-` token if present, then take
+the first 8 characters:
+
+1. `LIFECYCLE_KIT_SESSION_ID` — a harness-neutral consumer override: a consumer
+   whose harness exposes a session identity by any means wires it here.
+2. `CLAUDE_CODE_SESSION_ID` — the shipped default source, harness-specific by
+   nature: this harness exports the current session's transcript uuid into every
+   Bash environment, identifying the session directly rather than inferring it
+   from file mtimes. Skipped when `CLAUDE_CODE_CHILD_SESSION` is set, where a
+   lead-dispatched stage session (§templates/lead.md) sees the *lead's* uuid
+   here, not its own.
+3. The newest transcript under the sessions dir (default
+   `<config-home>/projects/<cwd-slug>` — `$CLAUDE_CONFIG_DIR` or `~/.claude`,
+   and the cwd with every non-alphanumeric char mapped to `-`; override
+   `LIFECYCLE_KIT_SESSIONS_DIR`), the top-level glob widened with
+   `<dir>/*/subagents/*.jsonl` so a dispatched session with neither env var
+   still resolves without a per-dispatch override. Newest-file selection is the
+   documented single-operator assumption (one live session per project tree). A
+   dispatched child (source 2 skipped, `CLAUDE_CODE_SESSION_ID` carrying the
+   lead's uuid) narrows this scan to `<dir>/<lead-uuid>/subagents/*.jsonl`
+   alone, excluding the lead's own top-level transcript — concurrently written,
+   and able to out-mtime the dispatched session's — from the candidate set. An
+   absent dir or transcript exits 2.
+
+Not a gate — a `bin/` helper invoked (now internally, by `enter-stage.sh`) for
+the `<session-id>` field; the stage skills reach it through `enter-stage.sh`
+rather than calling it directly.
 
 ### bin/enter-stage.sh
 

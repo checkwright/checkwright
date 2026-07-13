@@ -65,6 +65,7 @@ prev-iter close ffffffff 2020-01-01
 EOF
 
 es_run() {
+    env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
     LIFECYCLE_KIT_QUEUE_FILE="$es/TASK-QUEUE.md" \
     LIFECYCLE_KIT_STATE_FILE="$es/.workflow/WORKFLOW-STATE.txt" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
@@ -124,6 +125,7 @@ LIFECYCLE_KIT_ENTRY_PREFLIGHT=('validate=$es/preflight-stub.sh')
 STAGES
 
 es_pf_run() {
+    env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
     LIFECYCLE_KIT_QUEUE_FILE="$esq" \
     LIFECYCLE_KIT_STATE_FILE="$ess" \
     LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
@@ -162,5 +164,29 @@ cmp -s "$il/before" "$il/CLAUDE.md" || { echo "smoke(install-lifecycle): re-run 
 
 sed -i 's#`/close`##' "$il/CLAUDE.md"
 if il_gate >/dev/null 2>&1; then echo "smoke(install-lifecycle): a staled block should redden the parity gate" >&2; exit 1; fi
+
+# spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order: env-first, agent- strip, widened + child-narrowed subagents scan (advisory tool, no fixture pair)
+SID="$SMOKE_KIT_ROOT/bin/session-id.sh"
+sid="$es/sid"; mkdir -p "$sid"
+sid_run() { env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID -u LIFECYCLE_KIT_SESSIONS_DIR "$@" bash "$SID"; }
+
+o="$(sid_run LIFECYCLE_KIT_SESSION_ID=agent-deadbeefcafe0000)"           # source 1, agent- strip
+[[ "$o" == "deadbeef" ]] || { echo "smoke(session-id): override did not strip agent- (got '$o')" >&2; exit 1; }
+o="$(sid_run CLAUDE_CODE_SESSION_ID=abcdef0123456789)"                    # source 2 (CHILD unset)
+[[ "$o" == "abcdef01" ]] || { echo "smoke(session-id): harness session id not used (got '$o')" >&2; exit 1; }
+
+lead="11112222-3333-4444-5555-666677778888"                              # source 2 skipped when CHILD set → narrowed scan
+mkdir -p "$sid/tree/$lead/subagents"
+: > "$sid/tree/$lead/subagents/agent-aaaabbbbccccdddd.jsonl"
+: > "$sid/tree/$lead.jsonl"
+touch -d '2020-01-01T00:00:00' "$sid/tree/$lead/subagents/agent-aaaabbbbccccdddd.jsonl"
+touch -d '2025-01-01T00:00:00' "$sid/tree/$lead.jsonl"                    # lead top-level newer, yet excluded
+o="$(sid_run CLAUDE_CODE_CHILD_SESSION=1 CLAUDE_CODE_SESSION_ID=$lead LIFECYCLE_KIT_SESSIONS_DIR=$sid/tree)"
+[[ "$o" == "aaaabbbb" ]] || { echo "smoke(session-id): dispatched child did not narrow to subagents (got '$o')" >&2; exit 1; }
+
+mkdir -p "$sid/tree2/somelead/subagents"                                 # source 3 widened glob, no env id vars
+: > "$sid/tree2/somelead/subagents/agent-9999888877776666.jsonl"
+o="$(sid_run LIFECYCLE_KIT_SESSIONS_DIR=$sid/tree2)"
+[[ "$o" == "99998888" ]] || { echo "smoke(session-id): widened subagents glob did not resolve (got '$o')" >&2; exit 1; }
 
 rm -rf "$es"

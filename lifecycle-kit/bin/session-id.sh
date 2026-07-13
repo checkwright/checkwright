@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the per-stage stamp id, read from the newest transcript (not hand-picked)
+# spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the per-stage stamp id via the env-first derivation order (not hand-picked)
 set -uo pipefail
 
 sessions_dir() {
@@ -13,6 +13,21 @@ sessions_dir() {
     printf '%s/projects/%s\n' "$home" "$slug"
 }
 
+normalize() {                  # strip a leading agent- token, then take the first 8 chars
+    local id="${1#agent-}"
+    printf '%s\n' "${id:0:8}"
+}
+
+if [[ -n "${LIFECYCLE_KIT_SESSION_ID:-}" ]]; then
+    normalize "$LIFECYCLE_KIT_SESSION_ID"
+    exit 0
+fi
+
+if [[ -z "${CLAUDE_CODE_CHILD_SESSION:-}" && -n "${CLAUDE_CODE_SESSION_ID:-}" ]]; then
+    normalize "$CLAUDE_CODE_SESSION_ID"
+    exit 0
+fi
+
 dir="$(sessions_dir)"
 [[ -d "$dir" ]] || {
     echo "session-id: sessions dir not found: $dir" >&2
@@ -21,10 +36,21 @@ dir="$(sessions_dir)"
 }
 
 newest=""
+pick() {                       # advance $newest across a (possibly empty) glob
+    local f
+    for f in "$@"; do
+        [[ -e "$f" ]] || continue
+        [[ -z "$newest" || "$f" -nt "$newest" ]] && newest="$f"
+    done
+}
+
 shopt -s nullglob
-for f in "$dir"/*.jsonl; do
-    [[ -z "$newest" || "$f" -nt "$newest" ]] && newest="$f"
-done
+if [[ -n "${CLAUDE_CODE_CHILD_SESSION:-}" && -n "${CLAUDE_CODE_SESSION_ID:-}" ]]; then
+    pick "$dir/${CLAUDE_CODE_SESSION_ID}/subagents"/*.jsonl   # the lead's own subagents/ dir alone
+else
+    pick "$dir"/*.jsonl
+    pick "$dir"/*/subagents/*.jsonl
+fi
 shopt -u nullglob
 
 [[ -n "$newest" ]] || {
@@ -33,6 +59,6 @@ shopt -u nullglob
     exit 2
 }
 
-base="${newest##*/}"       # <uuid>.jsonl
-base="${base%.jsonl}"      # <uuid>
-printf '%s\n' "${base:0:8}"
+base="${newest##*/}"       # <uuid>.jsonl or agent-<hex>.jsonl
+base="${base%.jsonl}"
+normalize "$base"
