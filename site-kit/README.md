@@ -31,10 +31,12 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 1. Register the gates — add to your `gates.list`:
 
+   <!-- gate-roster:begin -->
    ```
    check-docs-cname-parity
    check-docs-render-fidelity
    ```
+   <!-- gate-roster:end -->
 
    Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
    `check-docs-render-fidelity` needs ruby plus the kramdown-parser-gfm gem (the

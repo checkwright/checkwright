@@ -75,6 +75,35 @@ Write your first gate by copying `gate-sdk/templates/check-skeleton.sh` to
 `scripts/gates.list`, and shipping a `scripts/gate-tests/check-<area>/{good,bad}/`
 fixture pair. The meta-gates will hold you to the rest.
 
+## Gates
+
+The [Quick start](#quick-start) registers the subset a new consumer begins with;
+gate-sdk ships the full meta-gate roster below, each contract in [SPEC.md](SPEC.md):
+
+<!-- gate-roster:begin -->
+```
+check-shellcheck
+check-gate-output
+check-gate-fail-closed
+check-gate-fixture-coverage
+check-gate-assertions
+check-gate-exemption-tasks
+check-graph
+check-reads-couples
+check-enforcement-fresh
+check-kit-enum
+check-kit-registration
+check-readme-roster
+check-core-files
+check-identity
+check-hook-exec-bit
+check-root-tiering
+check-commit-msg
+check-commit-subject
+check-tree-terms
+```
+<!-- gate-roster:end -->
+
 ## Requirements
 
 bash 4+, git, GNU coreutils/findutils, GNU awk (`check-gate-assertions`),

@@ -23,6 +23,7 @@ reads the tag syntax [queue-kit](../queue-kit/) defines.
 1. Register the gates — add to your `gates.list`, **each where its surface
    exists**:
 
+   <!-- gate-roster:begin -->
    ```
    check-amendment-queue        # needs a task queue
    check-spec-dod-singleton     # needs canonical specs

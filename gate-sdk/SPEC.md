@@ -324,7 +324,11 @@ prints its path (the temp-dir write's named reclaim path).
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
-checklist; a kit root lacking `smoke/` is an environment error (exit 2).
+checklist; a kit root lacking `smoke/` is an environment error (exit 2). The
+README item of that checklist carries the register-the-gates block in
+`<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
+name-set parity with the kit's shipped `checks/` by `check-readme-roster`
+(§check-readme-roster) — a kit that ships checks registers them.
 
 - `smoke/install.sh` (required) — run with cwd = scratch-consumer root and env
   `SMOKE_KIT_ROOT` = the vendored copy of the installing kit. The executable
@@ -824,6 +828,43 @@ consumer keeping no prose registry opts out by not registering the gate in its
 `gates.list`; there is no empty-knob valve. This gate retires close's manual
 "does the kit table still reflect the kit set?" staleness check, narrowing that
 step to the un-gated remainder (row descriptions, per-kit READMEs).
+
+### check-readme-roster
+
+Invariant: every kit README's register-the-gates block holds name-set parity
+with the kit's shipped `checks/` basenames, both directions. This is the
+`check-install-toolchain` fork applied a second time: the roster names are
+derivable (the `checks/` script basenames, extension stripped), the per-gate
+annotation clauses beside them are hand prose, so a gate asserts parity over a
+hand-maintained list rather than an emitter generating it — the list stays a
+human-read register, the gate holds it honest.
+
+Marker vocabulary: each kit README wraps its register block in
+`<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers (the
+`docs/install.md` `toolchain:begin` shape). Inside the markers, a line's first
+`check-`-prefixed token is a roster name; everything after it — annotation
+prose, `#` clauses — the gate never reads. Calibration: marker lines may carry
+leading indentation, because a README nests the fenced block inside an install
+list item; the roster scan trims surrounding whitespace before matching the
+marker and the names.
+
+Two assertions, per kit, over the roster set versus the `checks/` basename set:
+(A) every shipped check appears in the README roster — a gate shipped but never
+registered is red; (B) every roster name resolves to a shipped check — a roster
+name naming no `checks/` script is red. Each finding names the kit and the
+name.
+
+Sweep: kit roots come from `gate_kit_roots` (the `GATE_SDK_KIT_DIRS` knob —
+§Layout and configuration), the `check-kit-enum` / `check-kit-registration`
+sweep shape. A kit root without a `checks/` dir is skipped-and-counted; a kit
+root with `checks/` but no marker block in its README is red — the kit-landing
+checklist (§Consumer smoke) has a kit that ships checks registering them.
+Config reuses `GATE_SDK_KIT_DIRS`; no new knob. Positional form
+`check-readme-roster.sh [root]` resolves relative kit roots against a fixture
+tree (the case dir's `gate-sdk-config.sh` names the fixture kits), the sibling
+meta-gates' hermetic-fixture shape; bare, it sweeps against the git toplevel.
+Fail-closed: a non-repo cwd with no root argument, an empty roster, or an
+unreadable README marker scan is exit 2, never a false clean.
 
 ### check-core-files
 

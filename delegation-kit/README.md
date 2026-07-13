@@ -22,10 +22,12 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 1. Register the gates — add to your `gates.list`:
 
+   <!-- gate-roster:begin -->
    ```
    check-gate-tamper
    check-rule-citation   # holds SPEC §The delegation model's rule citations to the template
    ```
+   <!-- gate-roster:end -->
 
    They resolve through gate-sdk's registry path and their `# graph:` manifests
    put them in the generated pre-commit hook: `bash gate-sdk/bin/gen-pre-commit.sh

@@ -71,6 +71,10 @@ if staged_matches 'README.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' '
     gate-sdk/checks/check-kit-registration.sh || hook_fail check-kit-registration
 fi
 
+if staged_matches 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README.md' 'delegation-kit/README.md' 'doctrine-kit/README.md' 'drift-kit/README.md' 'evidence-kit/README.md' 'guard-kit/README.md' 'lifecycle-kit/README.md' 'queue-kit/README.md' 'site-kit/README.md' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*'; then
+    gate-sdk/checks/check-readme-roster.sh || hook_fail check-readme-roster
+fi
+
 if staged_matches 'docs/kits.md' 'docs/*/index.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*'; then
     scripts/check-docs-kit-parity.sh || hook_fail check-docs-kit-parity
 fi

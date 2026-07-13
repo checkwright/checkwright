@@ -26,12 +26,14 @@ hook approximation and the session-context template also expect
 
 1. Register the gates — add to your `gates.list`:
 
+   <!-- gate-roster:begin -->
    ```
    check-brevity
    check-settings-pins
    check-memory-off
    check-footprint-fresh
    ```
+   <!-- gate-roster:end -->
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the

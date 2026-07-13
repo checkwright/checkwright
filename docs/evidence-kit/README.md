@@ -24,10 +24,12 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 1. Register the gates — add to your `gates.list`:
 
+   <!-- gate-roster:begin -->
    ```
    check-evidence-baseline
    check-evidence-manifest
    ```
+   <!-- gate-roster:end -->
 
    Regenerate the hook + graph artifacts: `bash gate-sdk/bin/gen-pre-commit.sh --write`.
 

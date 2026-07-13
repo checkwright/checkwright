@@ -26,6 +26,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 1. Register the gates — add to your `gates.list`:
 
+   <!-- gate-roster:begin -->
    ```
    check-queue-hygiene
    check-queue-sections
@@ -36,6 +37,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-queue-prose-precondition
    check-queue-slug-liveness
    ```
+   <!-- gate-roster:end -->
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the

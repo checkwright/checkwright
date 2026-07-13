@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **readme-roster-parity** [spec: SPEC-readme-roster-parity.md] — gate-sdk meta-gate
-  check-readme-roster: name-set parity between each kit README's gate-roster marker block and
-  the kit's shipped checks/ dir, both directions; the markers land on every kit README that
-  ships checks.
 - **emitted-artifact-external-refs** [spec: SPEC-emitted-artifact-external-refs.md] —
   check-graph gains an external-ref assertion over emitted HTML: href/src values and ESM
   imports prefix-match the kit-seeded mermaid entry plus the GATE_SDK_GRAPH_EXTERNAL_REFS
@@ -170,5 +166,7 @@
   flip+stamp red at check-stage-evidence on the lead's colliding id.
 
 ## Done
+
+- readme-roster-parity
 
 ## Lessons Learned

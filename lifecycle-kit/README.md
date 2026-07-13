@@ -28,6 +28,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 1. Register the gates — add to your `gates.list`:
 
+   <!-- gate-roster:begin -->
    ```
    check-stage-evidence
    check-stage-entry
@@ -37,6 +38,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-skill-binding
    check-shim-restatement
    ```
+   <!-- gate-roster:end -->
 
    They resolve through gate-sdk's registry path (your gates dir first, then
    each kit's `checks/`), and their `# graph:` manifests put them in the
