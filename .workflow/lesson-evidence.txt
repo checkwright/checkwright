@@ -2,4 +2,3 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
-parity-fidelity-handoff lesson discard accept check-docs-nav-reachable (front-matter reachability) as sufficient; residual un-gateable offline: the gate reimplements the include parent/child logic rather than executing docs/_includes/nav.html (gate-vs-include divergence) plus remote-render parity, both behind the offline gate contract per site-kit/SPEC.md check-docs-render-fidelity parser-version precedent — Validate coverage limit

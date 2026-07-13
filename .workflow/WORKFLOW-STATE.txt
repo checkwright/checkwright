@@ -4,8 +4,4 @@
 
 ---
 
-parity-fidelity-handoff scope 124d0af6 2026-07-13
-parity-fidelity-handoff align agent-a4 2026-07-13
-parity-fidelity-handoff build agent-a9 2026-07-13
-parity-fidelity-handoff validate agent-a0 2026-07-13
-parity-fidelity-handoff close agent-a3 2026-07-13
+— scope e8dbfb77 2026-07-13
