@@ -97,7 +97,7 @@ fi
 cat <<EOF
 Before opening source for a task, run the matching surface index first
 (index, then read the one you need):
-  • bash $CTX_BIN/pub-index.sh <component>/src/    — Rust public API surface
+  • bash $CTX_BIN/pub-index.sh <component>/src/    — public API surface (per-language extractors; ships rust, ts)
   • bash $CTX_BIN/md-index.sh <file.md>            — large markdown / SPEC outline
   • bash $CTX_BIN/md-section.sh <file.md> "<head>" — extract one section by heading
 EOF

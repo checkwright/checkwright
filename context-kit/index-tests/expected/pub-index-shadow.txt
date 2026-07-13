@@ -1,0 +1,2 @@
+corpus/sample.rs  (1)
+  shadow   ok :1

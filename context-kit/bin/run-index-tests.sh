@@ -46,9 +46,25 @@ check() {
 check md-index   "$EXPECTED/md-index.txt"   bash "$BIN/md-index.sh"   "$CORPUS/sample.md"
 check md-section "$EXPECTED/md-section.txt" bash "$BIN/md-section.sh" "$CORPUS/sample.md" "Code First"
 check pub-index  "$EXPECTED/pub-index.txt"  bash "$BIN/pub-index.sh"  "$CORPUS/sample.rs"
+check pub-index-ts "$EXPECTED/pub-index-ts.txt" bash "$BIN/pub-index.sh" "$CORPUS/sample.ts"
+
+# spec: context-kit/SPEC.md §Testing — a consumer extractor shadows the kit's shipped one (CONTEXT_KIT_PUB_LANG_DIR resolved first); the scratch rust.sh emits a marker so the kit grammar's absence is visible
+shadowdir="$(mktemp -d)"
+cat > "$shadowdir/rust.sh" <<'EOS'
+# shellcheck shell=bash disable=SC2034
+PUB_LANG_GLOBS=("*.rs")
+pub_lang_extract() { printf 'shadow ok 1\n'; }
+EOS
+shadowcfg="$(mktemp)"
+{
+    echo "CONTEXT_KIT_PUB_LANG_DIR=\"$shadowdir\""
+    echo 'CONTEXT_KIT_PUB_LANGS=("rust")'
+} > "$shadowcfg"
+check pub-index-shadow "$EXPECTED/pub-index-shadow.txt" \
+    env "CONTEXT_KIT_CONFIG_FILE=$shadowcfg" bash "$BIN/pub-index.sh" "$CORPUS/sample.rs"
 
 cfg="$(mktemp)"
-trap 'rm -f "$cfg"' EXIT
+trap 'rm -f "$cfg" "$shadowcfg"; rm -rf "$shadowdir"' EXIT
 {
     echo "CONTEXT_KIT_SURFACES=(\"$CORPUS/surface.md\")"
     echo "CONTEXT_KIT_HOOK_CMD=\"cat $CORPUS/hook-sample.txt\""

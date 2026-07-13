@@ -1,0 +1,12 @@
+corpus/sample.ts  (11)
+  class    Gamma :5
+  const    theta :22
+  default  main :28
+  enum     Eta :18
+  enum     Zeta :13
+  function alpha :1
+  function beta :3
+  interface Delta :7
+  let      iota :24
+  type     Epsilon :11
+  var      kappa :26

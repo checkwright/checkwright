@@ -153,6 +153,7 @@ leaves its section absent.
 | (consumer) | demo |
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
 | [context-kit](context-kit/index.md) | agents_md_smoke |
+| [context-kit](context-kit/index.md) | index_tests |
 
 ## Monitors
 

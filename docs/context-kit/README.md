@@ -73,7 +73,7 @@ hook approximation and the session-context template also expect
 ```bash
 bash context-kit/bin/md-index.sh [paths…]           # markdown heading index + first sentences
 bash context-kit/bin/md-section.sh <file> <heading> # print one section by heading
-bash context-kit/bin/pub-index.sh [paths…]          # Rust public API surface
+bash context-kit/bin/pub-index.sh [paths…]          # public API surface (per-language extractors; ships rust, ts)
 bash context-kit/bin/always-loaded.sh               # standing surface vs baseline (one line)
 bash context-kit/bin/always-loaded.sh --update-baseline   # a close-stage act
 bash context-kit/bin/footprint.sh                   # per-kit token footprint (--emit: the committed page)

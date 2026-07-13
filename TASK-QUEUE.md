@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **pub-index-language-extractors** [spec: context-kit/SPEC-pub-index-languages.md] — pub-index
-  becomes a dispatcher over per-language extractors (consumer-first resolution, gates.list
-  precedent), shipping rust + ts; absorbs the framing rewording. Upgraded from debt at scope
-  2026-07-13: the second adopter's tree carries a TypeScript surface its vendored copy cannot
-  index, so the standing single-extractor ruling's demand gate has fired (record in the
-  amendment; consumer identity in the operator's local brief).
-
 ## Technical Debt
 
 - **positioning-harness-emphasis** — foreground the
@@ -125,6 +118,7 @@
 
 ## Done
 
+- pub-index-language-extractors
 - harness-adapter-agnostic
 - pub-index-language-plugins
 - pub-index-rust-default-framing

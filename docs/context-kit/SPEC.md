@@ -39,14 +39,38 @@ three are advisory `bin/` tools; none joins `gates.list`.
   pastes directly); headings inside fenced code blocks are not mistaken
   for structure. The companion: find the heading in the index, extract
   just that body.
-- **`pub-index.sh [paths…]`** — compact public API surface for Rust
-  sources: every `pub`/`pub(crate)`/`pub(super)` item with kind, name, and
-  line, sorted by kind then name. The one language-specific tool in the
-  kit, and deliberately so: it ships as the Rust extractor, not a
-  pluggable framework — a consumer in another language writes its own
-  `<lang>-index` and names it in the hook template's marked section and
-  index-reminder footer. A speculative plugin interface for extractors
-  nobody has written yet would be scaffolding, not mechanism.
+- **`pub-index.sh [paths…]`** — compact public API surface: every public
+  item with kind, name, and line, sorted by kind then name, in a per-file
+  block headed by a count. It is a **dispatcher over per-language
+  extractors**: the dispatcher owns traversal (the prune set is `.git`,
+  `target`, `node_modules`, `dist`, `build`), the kind-then-name sort, and
+  the `  %-8s %s :%s` formatting; each extractor is a sourced bash file
+  defining exactly two names — a `PUB_LANG_GLOBS` array (the find globs, e.g.
+  `*.rs`) and a `pub_lang_extract <file>` function emitting unsorted
+  `kind name lineno` rows. Two names, both read every run; no other
+  extractor-file surface is contract.
+
+  Extractors resolve registry-style (the `gates.list` consumer-first
+  precedent): a shipped extractor lives at `lib/pub-lang/<lang>.sh`, and a
+  consumer extractor of the same basename under `CONTEXT_KIT_PUB_LANG_DIR`
+  (default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`) shadows it. The enabled
+  set is `CONTEXT_KIT_PUB_LANGS`, whose default is every shipped extractor,
+  derived from the `lib/pub-lang/` roster at run time — never maintained as a
+  list (derivation-first). Both knobs are read through the consumer config
+  seam (`context-config.sh`), which the tool sources like the meter and the
+  footprint do.
+
+  Two extractors ship: `rust.sh` (every `pub`/`pub(crate)`/`pub(super)` item —
+  the grep-grade grammar the tool has always carried) and `ts.sh`
+  (TypeScript: `export`-declared `function`/`class`/`interface`/`type`/`enum`/
+  `const`/`let`/`var`, `const enum`, and `export default`, over `*.ts` and
+  `*.tsx` with `.d.ts` included as public surface by construction). Both are
+  grep-grade: re-exports (`export { x } from`) and multi-line declarations are
+  stated honest limits, not parsed. The dispatcher shipped when demand named
+  it — a second adopter's tree carries a TypeScript surface its Rust-only copy
+  could not index — not before: an unrequested plugin framework would have
+  been scaffolding, and AST/tree-sitter parsing is above the tool's grep-grade
+  portability altitude (bare bash + coreutils, Tier one).
 
 ## The session-context hook (template)
 
@@ -432,7 +456,9 @@ no bare collection total.
 context-kit/
   bin/md-index.sh
   bin/md-section.sh
-  bin/pub-index.sh
+  bin/pub-index.sh               # dispatcher over the per-language extractors
+  lib/pub-lang/rust.sh           # shipped extractor: Rust public items
+  lib/pub-lang/ts.sh             # shipped extractor: TypeScript export surface
   bin/always-loaded.sh
   bin/footprint.sh               # per-kit two-tier footprint; --emit is docs/footprint.md
   bin/env-probe.sh               # derives the marker-bounded local env profile
@@ -478,6 +504,12 @@ what the consumer left unset. Knobs (this repo's layout as defaults):
   `smoke/agents-md.sh` adapter smoke exercises exactly that: an `AGENTS.md`
   scratch consumer whose battery is green and whose meter and footprint measure
   `AGENTS.md`.
+- `CONTEXT_KIT_PUB_LANGS` — array naming the `pub-index` extractors to
+  enable; default every shipped extractor, derived from the `lib/pub-lang/`
+  roster at run time (never a maintained list).
+- `CONTEXT_KIT_PUB_LANG_DIR` — the consumer extractor dir searched before the
+  kit's `lib/pub-lang/` (a same-basename file shadows the shipped one);
+  default `${GATE_SDK_GATES_DIR:-scripts}/pub-lang`.
 - `CONTEXT_KIT_HOOK_CMD` — command whose output line count approximates
   the steady-state hook body; default queue-kit's
   `queue-index.sh --collapse-deferred` when resolvable, else empty
@@ -522,9 +554,18 @@ The three index tools and the meter are advisory and speak plain text, so
 the gate contracts do not fit; the kit ships an expected-output runner
 instead: `index-tests/` holds a small fixture corpus (Markdown with nested
 headings, fences, and link-bearing first sentences; Rust with the pub-item
-kinds; a baseline file) beside expected outputs, and
+kinds; TypeScript with every kind the `ts.sh` grammar claims — including
+`const enum` and `export default` — beside re-export and non-export lines it
+must skip; a baseline file) beside expected outputs, and
 `bin/run-index-tests.sh` runs each tool over the corpus and asserts exact
-output, failing on any diff. `footprint.sh` is advisory the same way, but its
+output, failing on any diff. The Rust golden is the no-regression assertion
+for the extractor-dispatcher refactor: it stays byte-identical across it. A
+consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
+whose `rust.sh` emits a marker row, exercising the consumer-first resolution
+order (the shadow's output, not the shipped grammar's, is what the golden
+records). The runner registers as its own evidence-kit validate suite
+(`index_tests`, the `demo` precedent): the golden the refactor leans on now
+has an automated validate-stage consumer. `footprint.sh` is advisory the same way, but its
 projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds
 `docs/footprint.md` against `--emit`. `check-brevity`, `check-settings-pins`,
 `check-memory-off`, and `check-footprint-fresh` are gates and carry the standard
