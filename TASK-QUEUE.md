@@ -139,11 +139,4 @@
 
 ## Done
 
-- session-id-subagent-aware
-- dispatch-policy-residency
-- battery-quiet-mode
-- usage-snapshot-poller
-- lead-compact-cadence
-- docs-nav-kit-page-suffixes
-
 ## Lessons Learned

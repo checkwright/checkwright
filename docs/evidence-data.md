@@ -25,3 +25,4 @@
 | doctrine-and-adoption | s a b v c | 10f/1d | 11 · ≤0d | 17s clean | 63 |
 | docs-ia-and-fidelity | s a b v c | 9f/2d | 7 · ≤1d | 17s clean | 68 |
 | parity-fidelity-handoff | s a b v c | 4f/2d | 4 · ≤0d | 17s clean | 69 |
+| orchestration-residue | s a b v c | 6f/0d | 6 · ≤0d | 17s clean | 69 |
