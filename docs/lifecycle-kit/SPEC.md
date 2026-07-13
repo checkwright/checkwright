@@ -636,11 +636,14 @@ stage session as a background agent whose prompt is that stage's ordinary skill
 invocation), the four-header escalation block (Question / Options /
 Recommendation / Evidence), the split-channel design (routine narration to the
 resume journal, escalations to the message channel), the compact-at-handoff
-economics, and the stamps-authoritative invariant carried from §The state
-machine as the design's load-bearing rule. Dispatch safety is not re-owned — it
-inherits delegation-kit's protocol by citation (delegation-kit/SPEC.md §The
-delegation model: background dispatch, the per-dispatch budget guard, validate
-after any agent commit). Consumer residue stays in named slots — the tracked
-agent-definition carrying the ruling-class roster the dispatch names, and
-whether the consumer wires the optional escalation-shape guard
+economics with the dispatch-granularity rule (batch units sharing a kit or SPEC
+surface, split on a model-tier change or a delegation-kit split trigger), and
+the stamps-authoritative invariant carried from §The state machine as the
+design's load-bearing rule. Dispatch safety is not re-owned — it inherits
+delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation
+model: background dispatch, the per-dispatch budget guard, validate after any
+agent commit). Consumer residue stays in named slots — the tracked
+agent-definition carrying the standing dispatch policy the dispatch names (the
+ruling-class roster and everything else true of every dispatch, not improvised
+per prompt), and whether the consumer wires the optional escalation-shape guard
 (guard-kit/SPEC.md §wakeup-guard) or leaves it inert.

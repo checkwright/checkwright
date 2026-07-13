@@ -49,10 +49,18 @@ be quiet.
 
 ## Policy is config, not prose
 
-The ruling-class roster — what a stage session must escalate versus what it
-decides alone — lives in the tracked agent-definition the dispatch names, never
-in ad-hoc per-dispatch instructions, so there is one gated source of the policy
-rather than a second one improvised per dispatch.
+All *standing* dispatch policy — everything true of every dispatch, not the
+ruling-class roster alone — lives in the tracked agent-definition the dispatch
+names, never in ad-hoc per-dispatch instructions, so there is one gated source
+of the policy rather than a second one improvised per dispatch. Journal
+mechanics, environment wiring, the shared-index caution, the escalation shape,
+and the escalate-versus-decide roster are all standing; a dispatch prompt
+carries only what varies per dispatch — the stage skill to invoke, the batch's
+task slugs, and pointers specific to that batch. The tell that content is
+misplaced: the same sentence appearing in two dispatch prompts. The
+agent-definition points at its owning docs rather than restating them
+(content-tiering) — it cites delegation-kit's resume-journal mechanics, say,
+never transcribes them.
 
 *<ruling-config: the tracked agent-definition the lead dispatches and the roster
 it carries — its path, the subagent type the dispatch names, and where the
@@ -75,6 +83,14 @@ context re-warm on each cold question: stage sessions outlive the TTL and
 escalations arrive on their schedule, so the lead is nearly always cold. Two
 consequences:
 
+- **Batch dispatches by shared surface.** Both naive granularities are ruled
+  out: whole-queue-in-one rides past every split trigger the delegation protocol
+  names, and one-dispatch-per-task pays context setup times N while buying no
+  parallelism (committing agents serialize on the shared git index regardless).
+  Batch units that share a kit or SPEC surface into one dispatch, where derived
+  context is actually common; split where the model tier changes or a
+  delegation-kit split trigger fires — per-batch model tiering is the dominant
+  window lever, not token counts.
 - **Batch escalations.** The decision shape makes batching natural — a stage
   session collects its open questions and sends them in one turn.
 - **Compact at handoff.** After the promotion commit lands the amendments and

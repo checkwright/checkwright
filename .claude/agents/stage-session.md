@@ -45,3 +45,18 @@ findings go to your resume journal (the pull channel), never to the message
 channel. When the lead answers, land any ruling content in the governed surface
 it belongs to (the amendment, the queue entry) before you act — the message
 thread is transport, never a store.
+
+## Standing dispatch policy
+
+Everything true of every dispatch lives here, not in the dispatch prompt — which
+carries only what varies: the stage skill to invoke, the batch's task slugs, and
+batch-specific pointers such as the journal path.
+
+- **Resume journal.** Narration and findings go to the resume journal, not the
+  message channel; the mechanics (the agent writes, the lead deletes) are
+  delegation-kit's:
+  delegation-kit/SPEC.md §Resume journal — agent writes, supervisor deletes.
+  The dispatch names the journal path.
+- **Shared git index.** A concurrent session may share the index; follow the
+  shared-index discipline in CLAUDE.md §This repo is governed by its own kits,
+  not a copy here.

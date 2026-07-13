@@ -12,11 +12,6 @@
 
 ## New Features
 
-- **dispatch-policy-residency** [spec: SPEC-dispatch-policy.md] — standing dispatch policy moves
-  into the tracked stage-session agent definition; templates/lead.md codifies dispatch
-  granularity (batch by shared kit/SPEC surface, split on model tier or a split trigger); plus a
-  one-time audit of the first orchestrated iteration's dispatched transcripts. Surfaced
-  2026-07-13.
 - **battery-quiet-mode** [spec: SPEC-battery-quiet.md] — quiet-green default for run-gates.sh and
   the generated hooks (GATE_SDK_VERBOSE the opt-in), red output verbatim always; doctrine craft
   rule "quiet green, loud red"; demo stays verbose by design. Surfaced 2026-07-13.
@@ -158,5 +153,6 @@
 ## Done
 
 - session-id-subagent-aware
+- dispatch-policy-residency
 
 ## Lessons Learned
