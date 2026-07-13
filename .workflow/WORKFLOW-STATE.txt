@@ -7,3 +7,4 @@
 harness-adapter scope 12a34d6c 2026-07-13
 harness-adapter align a8f8ab13 2026-07-13
 harness-adapter build a188be7a 2026-07-14
+harness-adapter validate ac252329 2026-07-14
