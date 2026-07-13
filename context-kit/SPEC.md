@@ -39,7 +39,8 @@ three are advisory `bin/` tools; none joins `gates.list`.
   block headed by a count. It is a **dispatcher over per-language
   extractors**: the dispatcher owns traversal (the prune set is `.git`,
   `target`, `node_modules`, `dist`, `build`), the kind-then-name sort, and
-  the `  %-8s %s :%s` formatting; each extractor is a sourced bash file
+  the row formatting (the index-tests goldens assert the exact shape); each
+  extractor is a sourced bash file
   defining exactly two names — a `PUB_LANG_GLOBS` array (the find globs, e.g.
   `*.rs`) and a `pub_lang_extract <file>` function emitting unsorted
   `kind name lineno` rows. Two names, both read every run; no other

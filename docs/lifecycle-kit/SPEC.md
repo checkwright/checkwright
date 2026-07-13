@@ -255,7 +255,11 @@ the first 8 characters:
    dispatched child (source 2 skipped, `CLAUDE_CODE_SESSION_ID` carrying the
    lead's uuid) narrows this scan to `<dir>/<lead-uuid>/subagents/*.jsonl`
    alone, excluding the lead's own top-level transcript — concurrently written,
-   and able to out-mtime the dispatched session's — from the candidate set. An
+   and able to out-mtime the dispatched session's — from the candidate set. The
+   flag is trusted, never verified: a *top-level* session that carries
+   `CLAUDE_CODE_CHILD_SESSION` anyway is sent down this narrowed scan, finds no
+   subagent transcript, and exits 2 — source 1 is the designed escape (set
+   `LIFECYCLE_KIT_SESSION_ID` to the session's own id). An
    absent dir or transcript exits 2.
 
 Not a gate — a `bin/` helper invoked (now internally, by `enter-stage.sh`) for
