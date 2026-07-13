@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: orchestration-residue  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,28 @@
 ---
 
 ## New Features
+
+- **session-id-subagent-aware** [spec: SPEC-session-id-subagent.md] — mechanize the lead-dispatch
+  session-id derivation: env-first source order with `agent-` prefix normalization and a widened
+  subagents/ glob fallback; retires the per-dispatch sessions-dir override remedy from prose.
+  Surfaced 2026-07-13 at align.
+- **dispatch-policy-residency** [spec: SPEC-dispatch-policy.md] — standing dispatch policy moves
+  into the tracked stage-session agent definition; templates/lead.md codifies dispatch
+  granularity (batch by shared kit/SPEC surface, split on model tier or a split trigger); plus a
+  one-time audit of the first orchestrated iteration's dispatched transcripts. Surfaced
+  2026-07-13.
+- **battery-quiet-mode** [spec: SPEC-battery-quiet.md] — quiet-green default for run-gates.sh and
+  the generated hooks (GATE_SDK_VERBOSE the opt-in), red output verbatim always; doctrine craft
+  rule "quiet green, loud red"; demo stays verbose by design. Surfaced 2026-07-13.
+- **usage-snapshot-poller** [spec: SPEC-usage-poller.md] — a timer-driven second reference
+  producer for the usage snapshot: fail-soft polling, endpoint knob as test seam and stability
+  valve, last-writer-wins coexistence with the statusline producer. Surfaced 2026-07-13.
+- **lead-compact-cadence** [spec: SPEC-lead-compact-cadence.md] — the lead suggests operator
+  compacts at stage-acceptance boundaries that pay per the cold-wakes-times-residue calibration
+  rule; keep-instruction unchanged from the handoff compact. Surfaced 2026-07-13.
+- **docs-nav-kit-page-suffixes** [spec: SPEC-docs-nav-suffixes.md] — derived readme/spec sibling
+  suffix links on each kit's nav child with current-class extension; the nav-reachable gate
+  learns the same sibling rule, paying down the gate-vs-include residual. Surfaced 2026-07-13.
 
 ## Technical Debt
 
@@ -127,66 +149,6 @@
   expands because it became true, never by overclaiming. Anti-drift shape to design: parity
   between the ported load surface and the Claude-Code one. Prerequisite for
   positioning-harness-emphasis to assert more than Tier one. Surfaced 2026-07-13.
-- **session-id-subagent-aware** [needs-spec] — mechanize the lead-dispatch session-id
-  derivation: a lead-dispatched stage session's transcript nests under the lead session's
-  subagents/ dir, so session-id.sh's top-level newest-transcript glob derives the lead's own
-  id and check-stage-evidence reds on the cross-stage collision. Mechanization candidates,
-  choice design-pending: (1) session-id.sh also globs subagents/*.jsonl; (2) templates/lead.md
-  names LIFECYCLE_KIT_SESSIONS_DIR in its dispatch guidance. The prose remedy already landed
-  (lifecycle-kit/SPEC.md §bin/session-id.sh), and the per-dispatch env override covers this
-  iteration's remaining stages. Surfaced 2026-07-13 at align — the dispatched session's
-  flip+stamp red at check-stage-evidence on the lead's colliding id.
-- **dispatch-policy-residency** [needs-spec] — the lead's dispatch prompts restate standing
-  policy per dispatch (journal mechanics, the sessions-dir override, shared-index reminders),
-  which templates/lead.md rules belongs in tracked config, never ad-hoc per-dispatch prose.
-  Move the standing content into the stage-session agent definition so a dispatch prompt
-  carries only stage-specific context; then audit the first orchestrated iteration's
-  dispatched-session transcripts for further re-derivation classes worth the same residency
-  treatment. Surfaced 2026-07-13 running the first lead-orchestrated iteration. Extended
-  2026-07-13 (operator ask — one build dispatch vs one per task): the same design owns the
-  dispatch-granularity ruling. Both defaults rejected: whole-queue-in-one rode past every split
-  trigger the delegation protocol names, and one-per-task pays context setup times N while
-  buying no parallelism (committing agents serialize on the shared index regardless). The shape
-  to codify: batch units that share a kit/SPEC surface into one dispatch so derived context is
-  reused where it is actually common, and split where the model tier changes or a split trigger
-  fires — per-batch model tiering is the dominant window lever, not token counts.
-- **usage-snapshot-poller** [needs-spec] — delegation-kit's usage snapshot is produced by the
-  statusline hook, so it refreshes only on the lead session's own message flow: a 6.7h
-  delegated build ran with zero snapshot updates (trend-log evidence, 2026-07-13), leaving the
-  budget gauge blind exactly when delegation keeps the lead static. Design an alternate
-  producer per delegation-kit/SPEC.md §The usage.txt contract (the producer is pluggable by
-  design): a timer-driven poller reading the account usage source and atomically rewriting the
-  snapshot independent of message flow; credentials handling and usage-source stability are the
-  open design questions. Surfaced 2026-07-13.
-- **battery-quiet-mode** [needs-spec] — run-gates.sh prints every gate's full success banner, so
-  any session re-running the battery accretes the whole PASS roll in context and a supervising
-  lead re-reads it on each later cold wake — the dominant residue class observed in the first
-  lead-orchestrated iteration. Make quiet the default: a green run prints the summary line only
-  (carrying the executed-gate count, so a roster collapse stays visible), a failing gate's
-  output prints verbatim always — the red path is the feedback channel and never quiets — and
-  the full green banner roll moves behind an opt-in verbose flag/knob. The green banners' counts
-  are the vacuous-pass tripwire ("0 files scanned" on a pass), an on-demand reading verbose
-  serves. Design questions: flag vs GATE_SDK_<KNOB> env shape; the default flip is a
-  consumer-facing behavior change for a vendored kit — it joins the spec checklist. The unit
-  also formalizes the principle as a doctrine-kit craft rule — quiet green, loud red: success is
-  one summary line carrying its scope counts, failure output is verbatim and never quiets —
-  landing together with its second mechanization, a quiet-green generated pre-commit hook
-  (every commit accretes the full clean roll today); demo/run-demo.sh stays verbose by design,
-  its display being the payload. The aggregate rule is craft-class, prompted not gated ("prints
-  too much on success" is not mechanically decidable); leaf enforcement is already
-  check-gate-output, and the new rule joins check-doctrine-registration's gated roster with its
-  *Stages:* trailer. Surfaced 2026-07-13.
-- **lead-compact-cadence** [needs-spec] — templates/lead.md's economics section names one compact
-  point (at handoff, before the first dispatch); extend the protocol so the lead also *suggests*
-  a compact to the operator at stage-acceptance boundaries — after a stage session's work is
-  validated and its rulings landed, before the next dispatch — since compaction is
-  operator-invoked and the lead can only recommend. Calibration to state: a compact pays when
-  remaining cold wakes times compressible residue exceed one context read, which makes the
-  early acceptances (the audit and build stages) the paying boundaries and the late ones not
-  worth it; the keep-instruction is the handoff one unchanged (keep per-amendment rationale and
-  the ruling roster, drop tool output). Evidence from the first orchestrated iteration: roughly
-  70k tokens of validation residue accreted by build acceptance were re-read on every later
-  cold wake. Surfaced 2026-07-13.
 - **footprint-drop-word-measure** [needs-spec] — the footprint table's compound cell carries
   three measures (`53l · 408w · ~669t`); the token figure is the budget unit but a labeled
   bytes/4 estimate, and exact lines are the repo's native editing currency — words are neither,
@@ -196,16 +158,6 @@
   the token figure; re-check its awk survives the narrower cell. Ruled against splitting the
   cell into per-measure columns: the analyzing party is a script that already extracts, and
   column-scanning alone does not buy the width. Surfaced 2026-07-13.
-- **docs-nav-kit-page-suffixes** [needs-spec] — the nav renders one child level, so each kit's
-  SPEC/README mirror pages sit two hops from anywhere (kit index → Contracts links); suffix each
-  kit's nav child with compact sibling links (`queue-kit [readme|spec]`) so the ground-truth
-  pages are one click from every page without a second nav level. Derived, never annotated:
-  Liquid discovers the sibling pages from the child's URL (the mirrors' front matter already
-  marks them), so no per-kit maintenance lands. The `current` class must extend to a suffix link
-  when its page is open (today a SPEC page highlights nothing). Named cost: nav.html features
-  widen the check-docs-nav-reachable gate-vs-include divergence (the close-stamped residual) —
-  suffix links are additive reachability so the gate stays green, but the spec step should weigh
-  paying that residual down in the same unit. Surfaced 2026-07-13.
 
 ## Done
 
