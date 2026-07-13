@@ -92,17 +92,17 @@ emit_block() {
     quoted="${quoted# }"
 
     if [[ "$trigger" == '*' ]]; then
-        printf '%s\n' "$relpath || hook_fail $gate"
+        printf '%s\n' "run_gate $gate $relpath"
     elif [[ "$mode" == staged ]]; then
         printf 'mapfile -t _staged < <(git diff --cached --name-only --diff-filter=ACMR -- %s)\n' "$quoted"
         printf '%s\n' "_targets=()"
         printf '%s\n' 'for _f in "${_staged[@]}"; do [[ -f "$_f" ]] && _targets+=("$_f"); done'
         printf '%s\n' 'if [[ ${#_targets[@]} -gt 0 ]]; then'
-        printf '    %s "${_targets[@]}" || hook_fail %s\n' "$relpath" "$gate"
+        printf '    run_gate %s %s "${_targets[@]}"\n' "$gate" "$relpath"
         printf '%s\n' 'fi'
     else
         printf 'if staged_matches %s; then\n' "$quoted"
-        printf '    %s || hook_fail %s\n' "$relpath" "$gate"
+        printf '    run_gate %s %s\n' "$gate" "$relpath"
         printf '%s\n' 'fi'
     fi
 }
@@ -135,12 +135,30 @@ HEAD
     cat <<'HEAD'
 }
 
-# Uniform failure: the gate already printed its findings + help: line above.
+# Uniform failure: the captured output was already reprinted above.
 hook_fail() {
     echo ""
     echo "pre-commit: $1 failed (see above)."
     echo "  Bypass once (use sparingly): git commit --no-verify"
     exit 1
+}
+
+GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
+_ran=0
+# Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
+run_gate() {
+    local name="$1"; shift
+    local out ok=1
+    out="$("$@" 2>&1)" || ok=0
+    _ran=$((_ran + 1))
+    if (( ! ok )); then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        hook_fail "$name"
+    fi
+    if [[ -n "$GATE_SDK_VERBOSE" ]]; then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        printf '  PASS: %s\n' "$name"
+    fi
 }
 HEAD
 
@@ -154,7 +172,11 @@ HEAD
         emit_block "$c"
     done
 
-    printf '\nexit 0\n'
+    cat <<'TAIL'
+
+printf 'pre-commit: %d gate(s) passed.\n' "$_ran"
+exit 0
+TAIL
 }
 
 # spec: gate-sdk/SPEC.md §gen-pre-commit — the commit-msg surface: every tier=commit-msg gate becomes one unconditional invocation passing the hook's $1 (message path)
@@ -186,12 +208,30 @@ set -euo pipefail
 
 msg_file="${1:?commit-msg: git did not pass the message-file path}"
 
-# Uniform failure: the gate already printed its findings + help: line above.
+# Uniform failure: the captured output was already reprinted above.
 hook_fail() {
     echo ""
     echo "commit-msg: $1 failed (see above)."
     echo "  Bypass once (use sparingly): git commit --no-verify"
     exit 1
+}
+
+GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
+_ran=0
+# Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
+run_gate() {
+    local name="$1"; shift
+    local out ok=1
+    out="$("$@" 2>&1)" || ok=0
+    _ran=$((_ran + 1))
+    if (( ! ok )); then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        hook_fail "$name"
+    fi
+    if [[ -n "$GATE_SDK_VERBOSE" ]]; then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        printf '  PASS: %s\n' "$name"
+    fi
 }
 HEAD
 
@@ -199,10 +239,14 @@ HEAD
     while IFS= read -r c; do
         [[ -n "$c" ]] || continue
         relpath="$(resolve_rel "$c")" || relpath="$GATES_DIR/$c.sh"
-        printf '\n%s "$msg_file" || hook_fail %s\n' "$relpath" "$c"
+        printf '\nrun_gate %s %s "$msg_file"\n' "$c" "$relpath"
     done < <(commit_msg_gates)
 
-    printf '\nexit 0\n'
+    cat <<'TAIL'
+
+printf 'commit-msg: %d gate(s) passed.\n' "$_ran"
+exit 0
+TAIL
 }
 
 case "${1:-}" in

@@ -29,7 +29,7 @@ staged_matches() {
     return 1
 }
 
-# Uniform failure: the gate already printed its findings + help: line above.
+# Uniform failure: the captured output was already reprinted above.
 hook_fail() {
     echo ""
     echo "pre-commit: $1 failed (see above)."
@@ -37,250 +37,269 @@ hook_fail() {
     exit 1
 }
 
+GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
+_ran=0
+# Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
+run_gate() {
+    local name="$1"; shift
+    local out ok=1
+    out="$("$@" 2>&1)" || ok=0
+    _ran=$((_ran + 1))
+    if (( ! ok )); then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        hook_fail "$name"
+    fi
+    if [[ -n "$GATE_SDK_VERBOSE" ]]; then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        printf '  PASS: %s\n' "$name"
+    fi
+}
+
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    gate-sdk/checks/check-shellcheck.sh || hook_fail check-shellcheck
+    run_gate check-shellcheck gate-sdk/checks/check-shellcheck.sh
 fi
 
 if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    gate-sdk/checks/check-gate-output.sh || hook_fail check-gate-output
+    run_gate check-gate-output gate-sdk/checks/check-gate-output.sh
 fi
 
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    gate-sdk/checks/check-gate-fail-closed.sh || hook_fail check-gate-fail-closed
+    run_gate check-gate-fail-closed gate-sdk/checks/check-gate-fail-closed.sh
 fi
 
 if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'scripts/gate-tests/*' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    gate-sdk/checks/check-gate-fixture-coverage.sh || hook_fail check-gate-fixture-coverage
+    run_gate check-gate-fixture-coverage gate-sdk/checks/check-gate-fixture-coverage.sh
 fi
 
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'TASK-QUEUE.md'; then
-    gate-sdk/checks/check-gate-exemption-tasks.sh || hook_fail check-gate-exemption-tasks
+    run_gate check-gate-exemption-tasks gate-sdk/checks/check-gate-exemption-tasks.sh
 fi
 
 if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'docs/check-graph.html' 'SPEC-*.md' '*/SPEC-*.md'; then
-    gate-sdk/checks/check-graph.sh || hook_fail check-graph
+    run_gate check-graph gate-sdk/checks/check-graph.sh
 fi
 
-gate-sdk/checks/check-reads-couples.sh || hook_fail check-reads-couples
+run_gate check-reads-couples gate-sdk/checks/check-reads-couples.sh
 
 if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh'; then
-    gate-sdk/checks/check-kit-enum.sh || hook_fail check-kit-enum
+    run_gate check-kit-enum gate-sdk/checks/check-kit-enum.sh
 fi
 
 if staged_matches 'README.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*'; then
-    gate-sdk/checks/check-kit-registration.sh || hook_fail check-kit-registration
+    run_gate check-kit-registration gate-sdk/checks/check-kit-registration.sh
 fi
 
 if staged_matches 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README.md' 'delegation-kit/README.md' 'doctrine-kit/README.md' 'drift-kit/README.md' 'evidence-kit/README.md' 'guard-kit/README.md' 'lifecycle-kit/README.md' 'queue-kit/README.md' 'site-kit/README.md' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*'; then
-    gate-sdk/checks/check-readme-roster.sh || hook_fail check-readme-roster
+    run_gate check-readme-roster gate-sdk/checks/check-readme-roster.sh
 fi
 
 if staged_matches 'docs/kits.md' 'docs/*/index.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*'; then
-    scripts/check-docs-kit-parity.sh || hook_fail check-docs-kit-parity
+    run_gate check-docs-kit-parity scripts/check-docs-kit-parity.sh
 fi
 
 if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRINE.md' 'docs/posts/*.md' 'scripts/docs-offnav.list'; then
-    scripts/check-docs-nav-reachable.sh || hook_fail check-docs-nav-reachable
+    run_gate check-docs-nav-reachable scripts/check-docs-nav-reachable.sh
 fi
 
 if staged_matches 'CLAUDE.md' 'doctrine-kit/DOCTRINE.md'; then
-    doctrine-kit/checks/check-doctrine-registration.sh || hook_fail check-doctrine-registration
+    run_gate check-doctrine-registration doctrine-kit/checks/check-doctrine-registration.sh
 fi
 
 if staged_matches 'CLAUDE.md' 'lifecycle-kit/lib/stages.sh'; then
-    lifecycle-kit/checks/check-lifecycle-registration.sh || hook_fail check-lifecycle-registration
+    run_gate check-lifecycle-registration lifecycle-kit/checks/check-lifecycle-registration.sh
 fi
 
-scripts/check-kit-ref-liveness.sh || hook_fail check-kit-ref-liveness
+run_gate check-kit-ref-liveness scripts/check-kit-ref-liveness.sh
 
 if staged_matches 'docs/evidence-data.md' '.workflow/WORKFLOW-STATE.txt' '.workflow/validate-evidence.txt' 'scripts/gates.list' 'TASK-QUEUE.md'; then
-    scripts/check-trajectory-fresh.sh || hook_fail check-trajectory-fresh
+    run_gate check-trajectory-fresh scripts/check-trajectory-fresh.sh
 fi
 
 if staged_matches 'docs/footprint.md' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/skills/*.md'; then
-    context-kit/checks/check-footprint-fresh.sh || hook_fail check-footprint-fresh
+    run_gate check-footprint-fresh context-kit/checks/check-footprint-fresh.sh
 fi
 
 if staged_matches 'docs/*/SPEC.md' 'docs/*/README.md' 'docs/doctrine-kit/DOCTRINE.md' '*/SPEC.md' '*/README.md' 'doctrine-kit/DOCTRINE.md' 'scripts/gen-docs-mirror.sh'; then
-    scripts/check-docs-mirror-fresh.sh || hook_fail check-docs-mirror-fresh
+    run_gate check-docs-mirror-fresh scripts/check-docs-mirror-fresh.sh
 fi
 
 if staged_matches 'docs/enforcement.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml'; then
-    gate-sdk/checks/check-enforcement-fresh.sh || hook_fail check-enforcement-fresh
+    run_gate check-enforcement-fresh gate-sdk/checks/check-enforcement-fresh.sh
 fi
 
 if staged_matches 'docs/value.md' 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/kpis.list' '.claude/settings.json' '.github/workflows/*.yml' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/skills/*.md'; then
-    scripts/check-value-rollup-fresh.sh || hook_fail check-value-rollup-fresh
+    run_gate check-value-rollup-fresh scripts/check-value-rollup-fresh.sh
 fi
 
 if staged_matches 'scripts/git-hooks/*'; then
-    gate-sdk/checks/check-hook-exec-bit.sh || hook_fail check-hook-exec-bit
+    run_gate check-hook-exec-bit gate-sdk/checks/check-hook-exec-bit.sh
 fi
 
-gate-sdk/checks/check-tree-terms.sh || hook_fail check-tree-terms
+run_gate check-tree-terms gate-sdk/checks/check-tree-terms.sh
 
 if staged_matches 'scripts/root-allowlist.list'; then
-    gate-sdk/checks/check-root-tiering.sh || hook_fail check-root-tiering
+    run_gate check-root-tiering gate-sdk/checks/check-root-tiering.sh
 fi
 
 if staged_matches 'scripts/core-files.list'; then
-    gate-sdk/checks/check-core-files.sh || hook_fail check-core-files
+    run_gate check-core-files gate-sdk/checks/check-core-files.sh
 fi
 
 if staged_matches 'scripts/identity.conf'; then
-    gate-sdk/checks/check-identity.sh || hook_fail check-identity
+    run_gate check-identity gate-sdk/checks/check-identity.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
-    lifecycle-kit/checks/check-stage-evidence.sh || hook_fail check-stage-evidence
+    run_gate check-stage-evidence lifecycle-kit/checks/check-stage-evidence.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
-    lifecycle-kit/checks/check-stage-entry.sh || hook_fail check-stage-entry
+    run_gate check-stage-entry lifecycle-kit/checks/check-stage-entry.sh
 fi
 
 if staged_matches '.claude/commands/*.md'; then
-    lifecycle-kit/checks/check-stage-skill-coverage.sh || hook_fail check-stage-skill-coverage
+    run_gate check-stage-skill-coverage lifecycle-kit/checks/check-stage-skill-coverage.sh
 fi
 
 if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/skills/*.md' 'lifecycle-kit/templates/lead.md' 'delegation-kit/templates/agent-execution.md'; then
-    lifecycle-kit/checks/check-skill-binding.sh || hook_fail check-skill-binding
+    run_gate check-skill-binding lifecycle-kit/checks/check-skill-binding.sh
 fi
 
 if staged_matches '.claude/commands/*.md' 'CLAUDE.md' 'gate-sdk/templates/*.md' 'canon-kit/templates/*.md' 'context-kit/templates/*.md' 'delegation-kit/templates/*.md' 'doctrine-kit/templates/*.md' 'drift-kit/templates/*.md' 'evidence-kit/templates/*.md' 'guard-kit/templates/*.md' 'lifecycle-kit/templates/*.md' 'queue-kit/templates/*.md' 'site-kit/templates/*.md' 'lifecycle-kit/templates/skills/*.md'; then
-    lifecycle-kit/checks/check-shim-restatement.sh || hook_fail check-shim-restatement
+    run_gate check-shim-restatement lifecycle-kit/checks/check-shim-restatement.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md' '.workflow/lesson-evidence.txt'; then
-    lifecycle-kit/checks/check-lesson-disposition.sh || hook_fail check-lesson-disposition
+    run_gate check-lesson-disposition lifecycle-kit/checks/check-lesson-disposition.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-queue-sections.sh || hook_fail check-queue-sections
+    run_gate check-queue-sections queue-kit/checks/check-queue-sections.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-queue-hygiene.sh || hook_fail check-queue-hygiene
+    run_gate check-queue-hygiene queue-kit/checks/check-queue-hygiene.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-queue-wrap.sh || hook_fail check-queue-wrap
+    run_gate check-queue-wrap queue-kit/checks/check-queue-wrap.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-tag-lead-line.sh || hook_fail check-tag-lead-line
+    run_gate check-tag-lead-line queue-kit/checks/check-tag-lead-line.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-task-names.sh || hook_fail check-task-names
+    run_gate check-task-names queue-kit/checks/check-task-names.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-task-conservation.sh || hook_fail check-task-conservation
+    run_gate check-task-conservation queue-kit/checks/check-task-conservation.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    queue-kit/checks/check-queue-prose-precondition.sh || hook_fail check-queue-prose-precondition
+    run_gate check-queue-prose-precondition queue-kit/checks/check-queue-prose-precondition.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md' 'scripts/*.sh'; then
-    queue-kit/checks/check-queue-slug-liveness.sh || hook_fail check-queue-slug-liveness
+    run_gate check-queue-slug-liveness queue-kit/checks/check-queue-slug-liveness.sh
 fi
 
 if staged_matches 'TASK-QUEUE.md' 'SPEC-*.md' '*/SPEC-*.md'; then
-    canon-kit/checks/check-amendment-queue.sh || hook_fail check-amendment-queue
+    run_gate check-amendment-queue canon-kit/checks/check-amendment-queue.sh
 fi
 
 if staged_matches '*SPEC*.md' '*.rs' '*.toml' '*.sql' '*.rego' '*.ts' '*.tsx' '*.yaml' '*.yml' '*.proto' '*.sh' 'Dockerfile'; then
-    canon-kit/checks/check-spec-embedded-source.sh || hook_fail check-spec-embedded-source
+    run_gate check-spec-embedded-source canon-kit/checks/check-spec-embedded-source.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'TASK-QUEUE.md'; then
-    canon-kit/checks/check-spec-fence-balance.sh || hook_fail check-spec-fence-balance
+    run_gate check-spec-fence-balance canon-kit/checks/check-spec-fence-balance.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
-    canon-kit/checks/check-md-refs.sh || hook_fail check-md-refs
+    run_gate check-md-refs canon-kit/checks/check-md-refs.sh
 fi
 
 if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/posts/*.md'; then
-    canon-kit/checks/check-docs-link-convention.sh || hook_fail check-docs-link-convention
+    run_gate check-docs-link-convention canon-kit/checks/check-docs-link-convention.sh
 fi
 
-site-kit/checks/check-docs-cname-parity.sh || hook_fail check-docs-cname-parity
+run_gate check-docs-cname-parity site-kit/checks/check-docs-cname-parity.sh
 
 if staged_matches 'docs/*.md' 'docs/*/index.md' 'docs/posts/*.md'; then
-    site-kit/checks/check-docs-render-fidelity.sh || hook_fail check-docs-render-fidelity
+    run_gate check-docs-render-fidelity site-kit/checks/check-docs-render-fidelity.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    canon-kit/checks/check-docs-cmd.sh || hook_fail check-docs-cmd
+    run_gate check-docs-cmd canon-kit/checks/check-docs-cmd.sh
 fi
 
 if staged_matches 'docs/install.md' 'context-kit/bin/env-probe.sh'; then
-    scripts/check-install-toolchain.sh || hook_fail check-install-toolchain
+    run_gate check-install-toolchain scripts/check-install-toolchain.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
-    canon-kit/checks/check-manifest-temporal.sh || hook_fail check-manifest-temporal
+    run_gate check-manifest-temporal canon-kit/checks/check-manifest-temporal.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
-    canon-kit/checks/check-manifest-count.sh || hook_fail check-manifest-count
+    run_gate check-manifest-count canon-kit/checks/check-manifest-count.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    canon-kit/checks/check-prose-enum.sh || hook_fail check-prose-enum
+    run_gate check-prose-enum canon-kit/checks/check-prose-enum.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
-    canon-kit/checks/check-knob-citation.sh || hook_fail check-knob-citation
+    run_gate check-knob-citation canon-kit/checks/check-knob-citation.sh
 fi
 
 if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md'; then
-    canon-kit/checks/check-knob-default-coupling.sh || hook_fail check-knob-default-coupling
+    run_gate check-knob-default-coupling canon-kit/checks/check-knob-default-coupling.sh
 fi
 
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt'; then
-    canon-kit/checks/check-comment-tier.sh || hook_fail check-comment-tier
+    run_gate check-comment-tier canon-kit/checks/check-comment-tier.sh
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt'; then
-    canon-kit/checks/check-spec-pointer.sh || hook_fail check-spec-pointer
+    run_gate check-spec-pointer canon-kit/checks/check-spec-pointer.sh
 fi
 
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
-    canon-kit/checks/check-todo-task-liveness.sh || hook_fail check-todo-task-liveness
+    run_gate check-todo-task-liveness canon-kit/checks/check-todo-task-liveness.sh
 fi
 
 if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt' 'TASK-QUEUE.md'; then
-    canon-kit/checks/check-deprecation-task.sh || hook_fail check-deprecation-task
+    run_gate check-deprecation-task canon-kit/checks/check-deprecation-task.sh
 fi
 
 if staged_matches '.workflow/validate-baseline.txt' 'TASK-QUEUE.md'; then
-    evidence-kit/checks/check-evidence-baseline.sh || hook_fail check-evidence-baseline
+    run_gate check-evidence-baseline evidence-kit/checks/check-evidence-baseline.sh
 fi
 
 if staged_matches '.workflow/validate-evidence.txt' 'TASK-QUEUE.md' '.workflow/WORKFLOW-STATE.txt'; then
-    evidence-kit/checks/check-evidence-manifest.sh || hook_fail check-evidence-manifest
+    run_gate check-evidence-manifest evidence-kit/checks/check-evidence-manifest.sh
 fi
 
 if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    delegation-kit/checks/check-gate-tamper.sh || hook_fail check-gate-tamper
+    run_gate check-gate-tamper delegation-kit/checks/check-gate-tamper.sh
 fi
 
 if staged_matches 'delegation-kit/SPEC.md' 'delegation-kit/templates/agent-execution.md'; then
-    delegation-kit/checks/check-rule-citation.sh || hook_fail check-rule-citation
+    run_gate check-rule-citation delegation-kit/checks/check-rule-citation.sh
 fi
 
 if staged_matches 'CLAUDE.md'; then
-    context-kit/checks/check-brevity.sh || hook_fail check-brevity
+    run_gate check-brevity context-kit/checks/check-brevity.sh
 fi
 
 if staged_matches '.claude/settings.json' 'scripts/settings-pins.conf'; then
-    context-kit/checks/check-settings-pins.sh || hook_fail check-settings-pins
+    run_gate check-settings-pins context-kit/checks/check-settings-pins.sh
 fi
 
-context-kit/checks/check-memory-off.sh || hook_fail check-memory-off
+run_gate check-memory-off context-kit/checks/check-memory-off.sh
 
+printf 'pre-commit: %d gate(s) passed.\n' "$_ran"
 exit 0

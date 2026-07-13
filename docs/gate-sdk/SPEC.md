@@ -56,8 +56,10 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `.workflow`), `GATE_SDK_GRAPH_ARTIFACT` (default
 `<workflow-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
-e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_FILE`
-(default `TASK-QUEUE.md`), `GATE_SDK_GRAPH_THEME` (default
+e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
+(default unset = quiet green; any non-empty value restores the full per-gate
+banner roll on `run-gates.sh` and the generated hooks — see §run-gates),
+`GATE_SDK_QUEUE_FILE` (default `TASK-QUEUE.md`), `GATE_SDK_GRAPH_THEME` (default
 `<gates-dir>/graph-theme.sh`; the optional consumer theme file `check-graph`
 sources to inline host-site tokens/chrome into the emitted artifact — see
 there), `GATE_SDK_GRAPH_EXTERNAL_REFS` (default empty; space-separated URL
@@ -442,6 +444,20 @@ Aggregate runner: executes every `gates.list` member in one shot, timing each
 uncommitted by design: a measurement, not state). A member that resolves
 nowhere is a failure, not a skip. Exit 0 only when every member passed.
 
+The output contract is **quiet green, loud red**. A passing gate prints
+nothing: its captured output is discarded and the run ends with the summary
+line alone, whose executed-gate count (`All N gates passed.`) is the
+roster-collapse tripwire — a battery that silently shrank shows a smaller N. A
+failing or erroring member prints its `===== <name> =====` banner and its
+captured output verbatim, always — the red path is the feedback channel and
+never quiets. `GATE_SDK_VERBOSE` (any non-empty value) restores the full banner
+roll, the on-demand reading for the vacuous-pass tripwire (a "0 files scanned"
+clean line is visible only in the gate's own banner). Env over flag by the kit
+convention: one mechanism serves the interactive run, the generated hooks, and
+any CI wrapper without an argv contract change. Gates themselves are untouched —
+each still prints its single clean line per the output contract (§Output
+contract); the runner captures it.
+
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
 agent-callable half of the oracle-first rule: it resolves the registry exactly
 as a bare run, then runs only the members whose *effective trigger* (`trigger=`
@@ -510,7 +526,13 @@ pre-commit hook to stdout and `--emit-commit-msg` the commit-msg hook
 and `commit-msg` only when a `tier=commit-msg` gate is registered. Adding a
 gate to either hook is manifest-only — there is no second hand-wiring step to
 drift. The emission is deterministic (no timestamps) so the committed hooks are
-byte-stable. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
+byte-stable. Both emitted hooks carry the quiet-green wrapper in their
+generated header (§run-gates owns the contract): each gate invocation's output
+is captured and reprinted only when that invocation fails (then the uniform
+failure report as before) or when `GATE_SDK_VERBOSE` is set, and a fully green
+hook run prints one summary line carrying its executed-invocation count. The
+wrapper lives in the emitter's heredoc, so the freshness assertion carries any
+change into the committed hooks. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
 (via `gate_expand_couples`), so adding a kit later reddens `check-graph`
 (committed hook ≠ `--emit`) until regeneration — the freshness gate keeps the
 static hooks honest across a kit-set change.

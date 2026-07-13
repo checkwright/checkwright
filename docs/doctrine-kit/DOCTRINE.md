@@ -351,3 +351,17 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     against the owning SPEC by judgment; the gate reports the dangling key,
     never which way it should be closed.
     *Stages:* build
+
+21. **Quiet green, loud red.** A batch runner's success is one summary line
+    carrying its scope counts (the count doubling as the roster-collapse
+    tripwire); failure output is verbatim and never quiets. Per-item success
+    banners are an opt-in reading, not the default — the red path is the
+    feedback channel, the green path is a receipt.
+    *Under agent work:* every green re-run accretes the full banner roll in the
+    session's context, and a supervising session re-reads it on each cold wake —
+    success residue crowds out the signal the run exists to carry.
+    *Enforced by:* judgment at review — "prints too much on success" is not
+    mechanically decidable; the leaf mechanisms are gate-sdk's per-gate output
+    contract and the quiet-default run surfaces
+    ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates).
+    *Stages:* build

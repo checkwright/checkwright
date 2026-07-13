@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **battery-quiet-mode** [spec: SPEC-battery-quiet.md] — quiet-green default for run-gates.sh and
-  the generated hooks (GATE_SDK_VERBOSE the opt-in), red output verbatim always; doctrine craft
-  rule "quiet green, loud red"; demo stays verbose by design. Surfaced 2026-07-13.
 - **usage-snapshot-poller** [spec: SPEC-usage-poller.md] — a timer-driven second reference
   producer for the usage snapshot: fail-soft polling, endpoint knob as test seam and stability
   valve, last-writer-wins coexistence with the statusline producer. Surfaced 2026-07-13.
@@ -154,5 +151,6 @@
 
 - session-id-subagent-aware
 - dispatch-policy-residency
+- battery-quiet-mode
 
 ## Lessons Learned

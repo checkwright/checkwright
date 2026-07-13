@@ -13,7 +13,7 @@ set -euo pipefail
 
 msg_file="${1:?commit-msg: git did not pass the message-file path}"
 
-# Uniform failure: the gate already printed its findings + help: line above.
+# Uniform failure: the captured output was already reprinted above.
 hook_fail() {
     echo ""
     echo "commit-msg: $1 failed (see above)."
@@ -21,8 +21,27 @@ hook_fail() {
     exit 1
 }
 
-gate-sdk/checks/check-commit-msg.sh "$msg_file" || hook_fail check-commit-msg
+GATE_SDK_VERBOSE="${GATE_SDK_VERBOSE:-}"
+_ran=0
+# Capture a gate's output; reprint it only on failure, or with GATE_SDK_VERBOSE.
+run_gate() {
+    local name="$1"; shift
+    local out ok=1
+    out="$("$@" 2>&1)" || ok=0
+    _ran=$((_ran + 1))
+    if (( ! ok )); then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        hook_fail "$name"
+    fi
+    if [[ -n "$GATE_SDK_VERBOSE" ]]; then
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        printf '  PASS: %s\n' "$name"
+    fi
+}
 
-gate-sdk/checks/check-commit-subject.sh "$msg_file" || hook_fail check-commit-subject
+run_gate check-commit-msg gate-sdk/checks/check-commit-msg.sh "$msg_file"
 
+run_gate check-commit-subject gate-sdk/checks/check-commit-subject.sh "$msg_file"
+
+printf 'commit-msg: %d gate(s) passed.\n' "$_ran"
 exit 0

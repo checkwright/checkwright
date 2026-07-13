@@ -30,9 +30,10 @@ mk_gate g_staged '# graph: couples=beta dir=one valve=none tier=precommit mode=s
 { echo g_star; echo g_glob; echo g_staged; } > "$scratch/gates.list"
 
 # Isolate the runner onto the scratch registry: no kit roots, tmp off-tree.
+# Verbose: selection is observed through each stub gate's echoed banner output.
 run_for() {
     GATE_SDK_GATES_DIR="$scratch" GATE_SDK_KIT_DIRS="$scratch" \
-        GATE_SDK_TMP_DIR="$scratch/.tmp" bash "$RUN" --for "$@" 2>&1
+        GATE_SDK_TMP_DIR="$scratch/.tmp" GATE_SDK_VERBOSE=1 bash "$RUN" --for "$@" 2>&1
 }
 
 fails=0

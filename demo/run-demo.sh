@@ -21,7 +21,7 @@ banner() {
 say() { printf '  %s\n' "$*"; }
 fail() { printf '\nDEMO: FAIL — %s\n' "$*"; exit 1; }
 
-run_battery() { ( cd "$SCRATCH" && bash gate-sdk/bin/run-gates.sh ) 2>&1; }
+run_battery() { ( cd "$SCRATCH" && GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh ) 2>&1; }   # verbose by design: the roll is the demo's payload
 
 roots=()
 while IFS= read -r r; do roots+=("$r"); done < <(gate_kit_roots)

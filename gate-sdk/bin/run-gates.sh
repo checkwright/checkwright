@@ -106,26 +106,31 @@ failed=()
 TIMINGS="${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt"
 mkdir -p "$(dirname "$TIMINGS")" && : > "$TIMINGS"
 total_ms=0
+VERBOSE="${GATE_SDK_VERBOSE:-}"
 for i in "${!RUN_MEMBERS[@]}"; do
     c="${RUN_MEMBERS[$i]}"
     args=()
     if [[ ${#FOR_PATHS[@]} -gt 0 && -n "${RUN_ARGSTR[$i]}" ]]; then
         mapfile -t args <<<"${RUN_ARGSTR[$i]}"
     fi
-    printf '\n===== %s =====\n' "$c"
     start_ns=$(date +%s%N)
+    out=""; ok=1
     if gate_path="$(gate_resolve "$c" "${RESOLVE_DIRS[@]}")"; then
-        if "$gate_path" "${args[@]}"; then
-            printf '  PASS: %s\n' "$c"
+        if out="$("$gate_path" "${args[@]}" 2>&1)"; then
+            tail="  PASS: $c"
         else
-            rc=$?
-            printf '  FAIL: %s (exit %d)\n' "$c" "$rc"
-            failed+=("$c")
+            rc=$?; ok=0; tail="  FAIL: $c (exit $rc)"; failed+=("$c")
         fi
     else
-        printf '  FAIL: %s (listed in %s but resolves in none of: %s)\n' \
-            "$c" "$LIST" "${RESOLVE_DIRS[*]}"
+        ok=0
+        out="$c listed in $LIST but resolves in none of: ${RESOLVE_DIRS[*]}"
+        tail="  FAIL: $c (unresolved)"
         failed+=("$c")
+    fi
+    if (( ! ok )) || [[ -n "$VERBOSE" ]]; then
+        printf '\n===== %s =====\n' "$c"
+        [[ -n "$out" ]] && printf '%s\n' "$out"
+        printf '%s\n' "$tail"
     fi
     elapsed_ms=$(( ($(date +%s%N) - start_ns) / 1000000 ))
     printf '%s %d\n' "$c" "$elapsed_ms" >> "$TIMINGS"
