@@ -159,14 +159,16 @@
   snapshot independent of message flow; credentials handling and usage-source stability are the
   open design questions. Surfaced 2026-07-13.
 - **battery-quiet-mode** [needs-spec] — run-gates.sh prints every gate's full success banner, so
-  a supervising session re-running the battery as its validate-after-commit step accretes the
-  whole PASS roll in context and re-reads it on each later cold wake — the dominant residue
-  class observed in the first lead-orchestrated iteration. Add a quiet mode (a flag or knob)
-  emitting only failures and the summary line; full output stays the default so the committing
-  session's feedback channel is unchanged, and oracle-first is preserved — the supervisor still
-  runs the gate itself, it just reads less of a green run. Design questions: flag vs
-  GATE_SDK_<KNOB> env shape, and whether per-gate FAIL output stays verbatim (it must — the red
-  path is the feedback channel and never quiets). Surfaced 2026-07-13.
+  any session re-running the battery accretes the whole PASS roll in context and a supervising
+  lead re-reads it on each later cold wake — the dominant residue class observed in the first
+  lead-orchestrated iteration. Make quiet the default: a green run prints the summary line only
+  (carrying the executed-gate count, so a roster collapse stays visible), a failing gate's
+  output prints verbatim always — the red path is the feedback channel and never quiets — and
+  the full green banner roll moves behind an opt-in verbose flag/knob. The green banners' counts
+  are the vacuous-pass tripwire ("0 files scanned" on a pass), an on-demand reading verbose
+  serves. Design questions: flag vs GATE_SDK_<KNOB> env shape; the default flip is a
+  consumer-facing behavior change for a vendored kit, and demo/run-demo.sh displays a clean
+  pass — both join the spec checklist. Surfaced 2026-07-13.
 - **lead-compact-cadence** [needs-spec] — templates/lead.md's economics section names one compact
   point (at handoff, before the first dispatch); extend the protocol so the lead also *suggests*
   a compact to the operator at stage-acceptance boundaries — after a stage session's work is
