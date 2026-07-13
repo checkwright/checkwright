@@ -167,8 +167,15 @@
   the full green banner roll moves behind an opt-in verbose flag/knob. The green banners' counts
   are the vacuous-pass tripwire ("0 files scanned" on a pass), an on-demand reading verbose
   serves. Design questions: flag vs GATE_SDK_<KNOB> env shape; the default flip is a
-  consumer-facing behavior change for a vendored kit, and demo/run-demo.sh displays a clean
-  pass — both join the spec checklist. Surfaced 2026-07-13.
+  consumer-facing behavior change for a vendored kit — it joins the spec checklist. The unit
+  also formalizes the principle as a doctrine-kit craft rule — quiet green, loud red: success is
+  one summary line carrying its scope counts, failure output is verbatim and never quiets —
+  landing together with its second mechanization, a quiet-green generated pre-commit hook
+  (every commit accretes the full clean roll today); demo/run-demo.sh stays verbose by design,
+  its display being the payload. The aggregate rule is craft-class, prompted not gated ("prints
+  too much on success" is not mechanically decidable); leaf enforcement is already
+  check-gate-output, and the new rule joins check-doctrine-registration's gated roster with its
+  *Stages:* trailer. Surfaced 2026-07-13.
 - **lead-compact-cadence** [needs-spec] — templates/lead.md's economics section names one compact
   point (at handoff, before the first dispatch); extend the protocol so the lead also *suggests*
   a compact to the operator at stage-acceptance boundaries — after a stage session's work is
