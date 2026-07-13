@@ -94,6 +94,9 @@ lead is equally valid. To drive an iteration under one:
    unchanged.
 5. **A blocked stage escalates to the lead and resumes in place** rather than
    restarting cold; anything outside its ruling roster reaches the operator.
+6. **At an acceptance boundary that pays, the lead suggests another compact** —
+   same instruction as the hand-off one, operator-invoked; the calibration rule
+   is the template's.
 
 Prefer to stay hands-on? Skip the lead and run each stage manually as an
 ordinary skill invocation, consulting the — optionally compacted — scope session

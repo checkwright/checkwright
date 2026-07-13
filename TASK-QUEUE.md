@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **lead-compact-cadence** [spec: SPEC-lead-compact-cadence.md] — the lead suggests operator
-  compacts at stage-acceptance boundaries that pay per the cold-wakes-times-residue calibration
-  rule; keep-instruction unchanged from the handoff compact. Surfaced 2026-07-13.
 - **docs-nav-kit-page-suffixes** [spec: SPEC-docs-nav-suffixes.md] — derived readme/spec sibling
   suffix links on each kit's nav child with current-class extension; the nav-reachable gate
   learns the same sibling rule, paying down the gate-vs-include residual. Surfaced 2026-07-13.
@@ -150,5 +147,6 @@
 - dispatch-policy-residency
 - battery-quiet-mode
 - usage-snapshot-poller
+- lead-compact-cadence
 
 ## Lessons Learned

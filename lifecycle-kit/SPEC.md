@@ -630,8 +630,10 @@ The template owns the orchestration protocol whole: the lead model (dispatch a
 stage session as a background agent whose prompt is that stage's ordinary skill
 invocation), the four-header escalation block (Question / Options /
 Recommendation / Evidence), the split-channel design (routine narration to the
-resume journal, escalations to the message channel), the compact-at-handoff
-economics with the dispatch-granularity rule (batch units sharing a kit or SPEC
+resume journal, escalations to the message channel), the compact economics —
+the handoff compact plus operator-suggested compacts at the acceptance
+boundaries that pay under the cold-wakes-times-compressible-residue rule —
+with the dispatch-granularity rule (batch units sharing a kit or SPEC
 surface, split on a model-tier change or a delegation-kit split trigger), and
 the stamps-authoritative invariant carried from §The state machine as the
 design's load-bearing rule. Dispatch safety is not re-owned — it inherits

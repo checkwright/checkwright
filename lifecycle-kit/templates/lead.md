@@ -76,7 +76,7 @@ surface it belongs to (the amendment, the queue entry), *before* the session
 acts on it. The message thread is transport, never a store — so a lead crash or
 a lost transcript costs nothing the tracked surfaces do not already hold.
 
-## Economics — batch, and compact at handoff
+## Economics — batch, and compact where it pays
 
 The prompt cache's short TTL means a sporadically questioned lead pays a full
 context re-warm on each cold question: stage sessions outlive the TTL and
@@ -102,6 +102,18 @@ consequences:
   so the lossy compact has a lead crash's bounded blast radius; the lead holds
   pointers, not state. Verify the spend afterward with delegation-kit's
   usage-verdict rather than assuming forgiveness.
+- **Suggest a compact at the paying acceptance boundaries.** After a stage
+  session's work is accepted — its commits validated, its rulings landed in
+  governed surfaces — and before the next dispatch, the lead *suggests* a
+  compact to the operator. Compaction is operator-invoked; the lead can only
+  recommend (the honest limit), so the suggestion is one line in the lead's
+  acceptance message, never a new mechanism. Suggest where it pays, not
+  blanket: a compact pays when the remaining cold wakes times the compressible
+  residue exceed one context re-read — the early acceptance boundaries, with
+  the most residue accreted and the most wakes still ahead, pay, while the
+  late ones do not warrant the operator interruption. This is the rule, not a
+  stage roster; a consumer derives its own paying boundaries from its stage
+  set. The keep-instruction is the handoff bullet's, unchanged.
 
 Cache-keepalive pinging is ruled out: at batched escalation rates the idle
 re-warm pings cost more than the cold reads they avoid, burn the shared budget
