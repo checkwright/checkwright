@@ -14,10 +14,6 @@
 
 ## Technical Debt
 
-- **pages-parser-version-fidelity** — ruled at scope 2026-07-13: state the kramdown version
-  skew as a check-docs-render-fidelity honest limit and document the exact-pin recipe
-  (SITE_KIT_RENDERER pointed at a github-pages-locked bundle); auto-resolving the pinned gem
-  rejected — it breaks the hermetic no-fetch render contract. SPEC prose only, no new names.
 - **docs-nav-restructure** — ruled at scope 2026-07-13: (1) enforcement.md and footprint.md
   become nav children of Value — nav_id on value.md, nav_parent+nav_child_order on both (the
   filed offnav-allowlist premise was stale: neither page is listed there; they pass by link
@@ -157,5 +153,6 @@
 - render-fidelity-table-leakage
 - scope-lead-handoff
 - drop-python-dependency
+- pages-parser-version-fidelity
 
 ## Lessons Learned

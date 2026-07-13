@@ -143,6 +143,21 @@ The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
 lets a fixture point the docs dir and renderer at a synthetic tree without
 touching consumer config. `precommit` tier, coupling the docs tree.
 
+Parser-version fidelity (a second honest limit). The oracle is faithful to the
+*parser* GitHub Pages uses (kramdown with GFM input), not necessarily to the
+exact kramdown *version* Pages pins: a locally-installed kramdown that differs
+in patch or minor version from the Pages-locked one can render a construct
+differently, so a green local run is not a categorical proof for a divergence
+introduced between the two versions. The exact-pin recipe closes that gap for a
+consumer that needs it: point `SITE_KIT_RENDERER` at a version-locked bundle —
+a `bundle exec ruby …Kramdown…` invocation whose `Gemfile.lock` pins kramdown
+(and `kramdown-parser-gfm`) to the versions the `github-pages` gem resolves — so
+the oracle and the deploy render byte-for-byte the same parser build. The kit
+does not auto-resolve that pin: fetching the Pages-locked gemset at gate time
+would break the hermetic no-network render contract the oracle depends on (a
+gate must run offline and deterministically), so the pin stays a consumer's
+deliberate `SITE_KIT_RENDERER` override, not kit-run machinery.
+
 ## lib/site.sh
 
 The sourced config loader: it loads `SITE_KIT_CONFIG_FILE` (or the gates-dir
