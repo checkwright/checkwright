@@ -167,6 +167,17 @@
   runs the gate itself, it just reads less of a green run. Design questions: flag vs
   GATE_SDK_<KNOB> env shape, and whether per-gate FAIL output stays verbatim (it must — the red
   path is the feedback channel and never quiets). Surfaced 2026-07-13.
+- **lead-compact-cadence** [needs-spec] — templates/lead.md's economics section names one compact
+  point (at handoff, before the first dispatch); extend the protocol so the lead also *suggests*
+  a compact to the operator at stage-acceptance boundaries — after a stage session's work is
+  validated and its rulings landed, before the next dispatch — since compaction is
+  operator-invoked and the lead can only recommend. Calibration to state: a compact pays when
+  remaining cold wakes times compressible residue exceed one context read, which makes the
+  early acceptances (the audit and build stages) the paying boundaries and the late ones not
+  worth it; the keep-instruction is the handoff one unchanged (keep per-amendment rationale and
+  the ruling roster, drop tool output). Evidence from the first orchestrated iteration: roughly
+  70k tokens of validation residue accreted by build acceptance were re-read on every later
+  cold wake. Surfaced 2026-07-13.
 
 ## Done
 
