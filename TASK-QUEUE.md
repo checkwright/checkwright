@@ -14,13 +14,13 @@
 
 ## Technical Debt
 
-- **docs-coupling-graph-link** — surface `docs/check-graph.html` from the Value
+## Deferred
+
+- **docs-coupling-graph-link** [needs-spec] — surface `docs/check-graph.html` from the Value
   cluster: a link in `docs/value.md` (and/or `docs/enforcement.md`) prose
   presenting the coupling graph as the third generated projection beside the
   enforcement map and footprint; a nav slot is ruled out (generated chrome-less
   HTML; the nav is front-matter-driven). Surfaced 2026-07-14 (operator ask).
-
-## Deferred
 
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
