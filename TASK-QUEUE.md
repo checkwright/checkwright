@@ -139,19 +139,4 @@
 
 ## Done
 
-- readme-roster-parity
-- emitted-artifact-external-refs
-- render-fidelity-table-leakage
-- scope-lead-handoff
-- drop-python-dependency
-- pages-parser-version-fidelity
-- docs-nav-restructure
-
 ## Lessons Learned
-
-- Validate coverage limit — the docs-nav-restructure was asserted only by
-  `check-docs-nav-reachable` (front-matter reachability) plus a front-matter
-  hand-trace; no local Jekyll renders the actual Pages nav HTML on this box
-  (the site builds remotely), so the local validate suite does not assert
-  rendered-nav fidelity. Close to triage: accept the structural gate as
-  sufficient, or file a remote/rendered nav-parity check.
