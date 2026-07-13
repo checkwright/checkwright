@@ -79,8 +79,9 @@ fixture point all three at a synthetic tree without touching consumer config.
 ## check-docs-render-fidelity
 
 Invariant: every tracked markdown page under `SITE_KIT_DOCS_DIR`, rendered
-through the pinned Pages parser, leaks no code-fence marker into rendered text
-and promotes no code-fenced line into a heading. GitHub Pages renders through
+through the pinned Pages parser, leaks no code-fence marker into rendered text,
+promotes no code-fenced line into a heading, and renders no fewer tables than
+its source GFM table starts. GitHub Pages renders through
 kramdown's GFM parser, which diverges from github.com's cmark: consecutive
 fenced blocks inside one list item corrupt the page — the second fence prints
 literally and a `#`-leading skeleton line becomes a heading — so a tree that
@@ -98,7 +99,7 @@ is exactly why this gate is a standing defense rather than a stopgap.
 The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
 `git ls-files` (every underscore-prefixed directory segment excluded — those are
 Jekyll internals, not published pages), strips Jekyll front matter so it renders
-exactly the body kramdown sees, and asserts two properties per page:
+exactly the body kramdown sees, and asserts three properties per page:
 
 1. **No fence leakage** — the rendered HTML's text content (outside `<pre>` and
    inline `<code>`) carries no literal backtick fence run. A leaked fence is the
@@ -109,6 +110,16 @@ exactly the body kramdown sees, and asserts two properties per page:
    rules: ATX and setext, both skipped inside a fenced or `~`-fenced block)
    places outside any code context. A surplus rendered heading is a `#` line
    promoted out of a broken code block.
+3. **No table leakage** — the count of rendered `<table>` elements is never
+   *less than* the count of source GFM table starts the same fence-aware scan
+   places outside code. A table start is a pipe-carrying row immediately
+   followed by a delimiter row (dashes, colons, pipes — the `| --- |` shape).
+   The direction is one-sided: rendered may *exceed* source (a raw-HTML
+   `<table>` in source is legitimate and renders without a GFM start); only a
+   deficit reds. A deficit is a source table that shipped as literal-pipe
+   paragraph text — kramdown terminates a table only on a blank line, so a
+   table whose last row abuts a following non-blank line collapses into a
+   paragraph.
 
 The renderer is the gate's oracle. Before scanning, the gate probes it on a
 one-line document; an unresolvable or non-producing renderer exits 2 with a help
@@ -121,11 +132,21 @@ that page's ruling). A consumer with no published docs site simply omits the
 gate by the registry-not-array convention and never installs the dependency.
 
 Honest limit: this is not a full render-diff between the two parsers. It
-mechanizes the observed leakage class — fences and headings — and stays silent
-on divergences that corrupt neither. The positional form
-`check-docs-render-fidelity.sh [docs-dir] [config-file]` lets a fixture point
-the docs dir and renderer at a synthetic tree without touching consumer config.
-`precommit` tier, coupling the docs tree.
+mechanizes the observed leakage class — fences, headings, and tables — and stays
+silent on divergences that corrupt none of the three. The table count can be
+masked by an offsetting raw-HTML `<table>` on the same page: one collapsed GFM
+table plus one HTML table balances the counts. The table detector is
+deliberately conservative (delimiter-row anchored), so a table kramdown accepts
+but the scan does not count can only *under*-count source starts — which
+false-cleans, never false-reds. The observed table incident (2026-07-13): the
+value page's generated rollup table abutted its `:end` marker and shipped as a
+literal-pipe paragraph with the gate silent; the emitter fix (a trailing blank
+line) landed then, and this assertion mechanizes the channel. The good/bad
+fixture pair stays the fence/heading case; the table assertion carries its own
+hermetic unit test (a collapsed table reds table-only, a trailing blank clears).
+The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
+lets a fixture point the docs dir and renderer at a synthetic tree without
+touching consumer config. `precommit` tier, coupling the docs tree.
 
 ## lib/site.sh
 

@@ -12,9 +12,6 @@
 
 ## New Features
 
-- **render-fidelity-table-leakage** [spec: SPEC-render-fidelity-table-leakage.md] — third
-  check-docs-render-fidelity assertion: a rendered-table deficit against fence-aware source GFM
-  table starts reds; the bad fixture reproduces the value-page incident shape.
 - **scope-lead-handoff** [spec: SPEC-scope-lead-handoff.md] — the scope template close-out
   gains the handoff slot; this repo's shim binds the compact-then-/lead vs manual-steering
   choice by citation to docs/orchestration.md.
@@ -165,5 +162,6 @@
 
 - readme-roster-parity
 - emitted-artifact-external-refs
+- render-fidelity-table-leakage
 
 ## Lessons Learned
