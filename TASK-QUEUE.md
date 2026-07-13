@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **harness-adapter-agnostic** [spec: context-kit/SPEC-harness-adapter.md] — widen the Tier-two
-  compatibility claim truthfully: agent-file knob convergence (the scope sweep found exactly two
-  surviving `CLAUDE.md` literals in kit runtime code), an AGENTS.md consumer smoke that makes
-  "tested" true, the docs/install.md adapter recipe with its honest limits, and the
-  positioning-claim re-split. Design, sweep results, and ruled-out alternatives live in the
-  amendment. Surfaced 2026-07-13.
 - **pub-index-language-extractors** [spec: context-kit/SPEC-pub-index-languages.md] — pub-index
   becomes a dispatcher over per-language extractors (consumer-first resolution, gates.list
   precedent), shipping rust + ts; absorbs the framing rewording. Upgraded from debt at scope
@@ -27,7 +21,7 @@
 
 ## Technical Debt
 
-- **positioning-harness-emphasis** [blocked-by: harness-adapter-agnostic] — foreground the
+- **positioning-harness-emphasis** — foreground the
   no-harness-dependency enforcement core on `docs/index.md` and `docs/methodology.md`; assert
   the Tier-two widening only as far as the blocker's smoke makes it true, never beyond what
   docs/positioning.md §The tiered compatibility claim then states. Surfaced 2026-07-13.
@@ -131,6 +125,7 @@
 
 ## Done
 
+- harness-adapter-agnostic
 - pub-index-language-plugins
 - pub-index-rust-default-framing
 

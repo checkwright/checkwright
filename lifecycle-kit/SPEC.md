@@ -484,7 +484,8 @@ n-gram of length ≥ `LIFECYCLE_KIT_SHIM_NGRAM` with any surface in the dedup co
 `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — the duplication tripwire under the same
 directive-as-selector rule `check-skill-binding` uses (a file with no `Execute
 the template …` directive is not a shim and is not read). The corpus defaults to
-the consumer's always-loaded `CLAUDE.md` plus every kit's `templates/**/*.md`
+the consumer's always-loaded agent file (`LIFECYCLE_KIT_AGENT_FILE`, default
+`CLAUDE.md`) plus every kit's `templates/**/*.md`
 (kit set from `gate_kit_roots`); an explicit `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` or
 positional corpus arguments override it — the latter is the hermetic-fixture
 affordance. Comparison normalizes first — lowercase, punctuation stripped to a

@@ -22,7 +22,7 @@ if [[ -f "$ALLOWFILE" ]]; then
     mapfile -t allow < <(gates_list_members "$ALLOWFILE")
     src="$ALLOWFILE"
 else
-    allow=(README.md LICENSE "${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}" CLAUDE.md .gitignore 'SPEC-*.md')
+    allow=(README.md LICENSE "${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}" "${GATE_SDK_AGENT_FILE:-CLAUDE.md}" .gitignore 'SPEC-*.md')
     src="built-in minimal orientation set"
 fi
 

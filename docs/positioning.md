@@ -49,16 +49,27 @@ broad claim that would not survive contact:
   toolchain. No gate reads a harness surface, so the battery runs under any
   harness, under any CI, or under no harness at all. This is the layer that
   does the enforcing, and it has no harness dependency to compromise.
-- **Tier two — Claude-Code-native, adapter-shaped elsewhere.** The lifecycle
-  stage skills, the CLAUDE.md load convention, and the settings pins are built
-  for Claude Code. For other rules-file conventions — AGENTS.md, `.cursorrules`,
-  and kin — they are an adaptation surface, not tested compatibility: the load
-  triggers and the settings mechanism would have to be ported. The page names
-  this as work to do, and claims no compatibility that does not exist today.
+- **Tier two — configurable at the core, Claude-Code-native at the edges.**
+  What was once lumped as one adapter-shaped surface now splits in two. The
+  always-loaded agent-file convention is **configuration, not a port**: no kit
+  mechanism resolves that file by literal — each reads its kit's knob, defaulting
+  to `CLAUDE.md` — so a consumer whose harness reads `AGENTS.md` (or any other
+  always-loaded agent file) runs every kit mechanism by setting existing knobs.
+  This is *tested*, not asserted: a shipped smoke stands up an `AGENTS.md`
+  consumer, sets the agent-file knobs, and runs the full battery green
+  (context-kit's `smoke/agents-md.sh`); the adapter recipe with its honest limits
+  is in [the install guide](install.md). What stays genuinely Claude-Code-native
+  is the residue with no cross-harness target: the stage-skill auto-load bindings
+  (the `.claude/` shims that point a `/build` at its template — one binding, not
+  the mechanism, which is plain markdown run by path) and the settings pins, the
+  session-hook wiring, and memory-off enforcement (no standard cross-harness
+  settings surface exists to port them to).
 
 The division is deliberate. The part that must be portable — enforcement — is;
-the part that is convention rides whichever harness convention you already run,
-once adapted.
+the always-loaded convention rides whichever agent file your harness already
+reads, by configuration; only the harness-native bindings and settings residue
+are adapter work, and the page names exactly that residue rather than a broad
+claim that would not survive contact.
 
 ## The memory-off position
 

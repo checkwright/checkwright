@@ -27,7 +27,7 @@ if [[ $# -gt 0 ]]; then
 elif [[ ${#LIFECYCLE_KIT_SHIM_DEDUP_CORPUS[@]} -gt 0 ]]; then
     corpus=("${LIFECYCLE_KIT_SHIM_DEDUP_CORPUS[@]}")
 else
-    [[ -f CLAUDE.md ]] && corpus+=(CLAUDE.md)
+    [[ -f "$LIFECYCLE_KIT_AGENT_FILE" ]] && corpus+=("$LIFECYCLE_KIT_AGENT_FILE")
     while IFS= read -r root; do
         tdir="${root%/}/templates"
         [[ -d "$tdir" ]] || continue

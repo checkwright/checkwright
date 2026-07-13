@@ -54,7 +54,10 @@ read by `check-graph` assertion E — set it to republish the artifact elsewhere
 e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
 (default unset = quiet green; any non-empty value restores the full per-gate
 banner roll on `run-gates.sh` and the generated hooks — see §run-gates),
-`GATE_SDK_QUEUE_FILE` (default `TASK-QUEUE.md`), `GATE_SDK_GRAPH_THEME` (default
+`GATE_SDK_QUEUE_FILE` (default `TASK-QUEUE.md`), `GATE_SDK_AGENT_FILE` (default
+`CLAUDE.md`; the always-loaded agent file a consumer's harness reads — set it to
+`AGENTS.md` under an agent-file harness, and `check-root-tiering`'s built-in
+allowlist accepts that file at root), `GATE_SDK_GRAPH_THEME` (default
 `<gates-dir>/graph-theme.sh`; the optional consumer theme file `check-graph`
 sources to inline host-site tokens/chrome into the emitted artifact — see
 there), `GATE_SDK_GRAPH_EXTERNAL_REFS` (default empty; space-separated URL
@@ -326,6 +329,18 @@ restore. Exit codes follow the gate convention (0 all hold, 1 an assertion
 failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
 (<n> kits installed, <m> violations fired)`. `--keep` retains the temp dir and
 prints its path (the temp-dir write's named reclaim path).
+
+The scratch-consumer build itself — temp dir, seed commit, vendor-by-copy, the
+`smoke/install.sh` loop, the installed-baseline commit — is factored into
+`lib/consumer-smoke.sh` (`csmoke_vendor_and_install`, which sets `SCRATCH` and
+`CSMOKE_INSTALLED`), so a second harness that needs the same green baseline
+before it diverges shares the mechanics rather than copying them. The caller
+owns its cleanup trap and every assertion after the baseline commit.
+context-kit's `smoke/agents-md.sh` is that second caller: it builds the same
+baseline, then converts the consumer to a nondefault agent file (`AGENTS.md`)
+and asserts the agent-file knobs carry it — an assertion `run-consumer-smoke.sh`
+cannot make, since it fixes the kit defaults under zero config
+(context-kit/SPEC.md §Testing).
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
@@ -994,7 +1009,9 @@ The allowlist is optional consumer config (the `graph-vocab.sh` pattern): the
 path knob is `GATE_SDK_ROOT_ALLOWLIST` (default `<gates-dir>/root-allowlist.list`),
 registry-style — one entry per line, `#` comments and blanks ignored. An absent
 file falls back to the built-in minimal orientation set (`README.md`, `LICENSE`,
-the configured queue file, `CLAUDE.md`, `.gitignore`, plus the `SPEC-*.md`
+the configured queue file, the configured agent file (`GATE_SDK_AGENT_FILE`,
+default `CLAUDE.md` — the always-loaded agent file a consumer's harness reads,
+`AGENTS.md` under an agent-file harness), `.gitignore`, plus the `SPEC-*.md`
 amendment glob — a root-component amendment is a legitimate transient root
 surface for any canon-kit consumer, so a gate that reddened every scope stage
 would only train bypassing). The intentional-new-surface valve is the manifest

@@ -453,6 +453,7 @@ context-kit/
   templates/close-brevity.md
   smoke/install.sh
   smoke/violation.sh
+  smoke/agents-md.sh             # the AGENTS.md adapter smoke (its own validate suite)
 ```
 
 The install also seeds the committed baseline the footprint contract holds
@@ -470,7 +471,13 @@ Config follows the established kit pattern: copy
 what the consumer left unset. Knobs (this repo's layout as defaults):
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
-  `("CLAUDE.md")`.
+  `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer
+  whose harness reads `AGENTS.md` (or any other always-loaded agent file) sets
+  this to that file and the meter, the footprint, and `check-brevity` all follow
+  — no kit mechanism resolves the agent file by literal. The
+  `smoke/agents-md.sh` adapter smoke exercises exactly that: an `AGENTS.md`
+  scratch consumer whose battery is green and whose meter and footprint measure
+  `AGENTS.md`.
 - `CONTEXT_KIT_HOOK_CMD` — command whose output line count approximates
   the steady-state hook body; default queue-kit's
   `queue-index.sh --collapse-deferred` when resolvable, else empty
@@ -543,6 +550,20 @@ consumer's brevity file and asserts the battery reddens via
 appending at end-of-file: a co-vendored kit may append a trailing section (the
 doctrine-kit installer adds one), and an EOF-appended bullet would land outside
 `check-brevity`'s scanned section and silently disarm the smoke.
+
+`smoke/agents-md.sh` is the agent-file adapter smoke — the exercise behind the
+Tier-two compatibility claim (docs/positioning.md §The tiered compatibility
+claim). It vendors a scratch consumer through the shared consumer-smoke
+mechanics (gate-sdk/SPEC.md §Consumer smoke), converts its agent file from
+`CLAUDE.md` to `AGENTS.md`, sets the agent-file knobs in the consumer's config
+seams (`GATE_SDK_AGENT_FILE`, `LIFECYCLE_KIT_AGENT_FILE`, `DOCTRINE_KIT_AGENT_FILE`,
+`CANON_KIT_MANIFEST_FILES`, `CONTEXT_KIT_SURFACES`, `CONTEXT_KIT_BREVITY_FILE`),
+then asserts the battery is green, `always-loaded.sh` and `footprint.sh` measure
+the `AGENTS.md` surface, and `check-root-tiering`'s built-in allowlist accepts
+`AGENTS.md` at root while rejecting a stray second agent file. It is a standalone
+harness — not driven by `run-consumer-smoke.sh`, which asserts the kit defaults
+under zero config — and registers as its own evidence-kit validate suite
+(`agents_md_smoke`, the `demo` precedent).
 
 ## Out of scope
 

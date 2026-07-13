@@ -73,6 +73,51 @@ shim↔template contract — see lifecycle-kit's
 Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
 runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
 
+## Running under an AGENTS.md harness
+
+Checkwright defaults to `CLAUDE.md` as the always-loaded agent file, but no kit
+mechanism resolves that file by literal — each reads its kit's knob. A consumer
+whose harness reads `AGENTS.md` (or any other always-loaded agent file) runs
+every kit mechanism by pointing those knobs at that file. This path is not just
+asserted: context-kit ships `smoke/agents-md.sh`, which stands up an `AGENTS.md`
+consumer, sets the knobs below, and runs the full battery green (see
+[the tiered compatibility claim](positioning.md#the-tiered-compatibility-claim)).
+
+Set the agent-file knobs in your kit config seams, each to your agent file:
+
+- `GATE_SDK_AGENT_FILE` — the root-tiering allowlist's agent-file entry
+  (gate-sdk).
+- `LIFECYCLE_KIT_AGENT_FILE` — the lifecycle registration + shim-restatement
+  corpus (lifecycle-kit).
+- `DOCTRINE_KIT_AGENT_FILE` — the always-loaded doctrine block's host
+  (doctrine-kit).
+- `CONTEXT_KIT_SURFACES` and `CONTEXT_KIT_BREVITY_FILE` — the measured
+  always-loaded surface and the brevity target (context-kit).
+- `CANON_KIT_MANIFEST_FILES` — the prose manifest that must govern the agent
+  file (canon-kit).
+
+The kit-injected always-loaded blocks (each kit's `<!-- kit:begin -->` /
+`<!-- kit:end -->` markers) land in whichever file `CONTEXT_KIT_SURFACES` names,
+so they inject into your agent file, not `CLAUDE.md`. The stage skills need no
+Claude shim grammar: the skill templates are plain markdown executed by path
+(`lifecycle-kit/templates/skills/*.md`), and the `.claude/` shims are one binding
+of that mechanism, not the mechanism itself — an `AGENTS.md` harness runs a stage
+by invoking its template directly.
+
+Two honest limits:
+
+- **Settings stay Claude-Code-native.** The settings pins, the session-context
+  hook wiring, and memory-off enforcement remain Claude Code's — no standard
+  cross-harness settings surface exists to port them to. This is the residue
+  [the compatibility claim](positioning.md#the-tiered-compatibility-claim) names
+  as harness-native.
+- **Generated trigger lists carry default literals.** The generated pre-commit
+  hook's per-gate trigger lists come from the gates' `# graph:` manifests, which
+  carry the default `CLAUDE.md` literal. A nondefault agent file means adjusting
+  the affected `# graph:` trigger lines and regenerating the hook, or relying on
+  full-battery runs (`bash gate-sdk/bin/run-gates.sh`), which read the knobs and
+  are agent-file-agnostic.
+
 ## Versioning
 
 The repository carries one semver line, applied as git tags, with the kits

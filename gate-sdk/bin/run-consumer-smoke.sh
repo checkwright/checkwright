@@ -5,6 +5,8 @@ set -uo pipefail
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
+# shellcheck source=../lib/consumer-smoke.sh
+source "$SDK/lib/consumer-smoke.sh"
 
 KEEP=0
 kit_args=()
@@ -41,8 +43,9 @@ for r in "${roots[@]}"; do
     }
 done
 
-SCRATCH="$(mktemp -d "${TMPDIR:-/tmp}/consumer-smoke.XXXXXX")"
+SCRATCH=""
 cleanup() {
+    [[ -n "$SCRATCH" ]] || return 0
     if [[ "$KEEP" == "1" ]]; then
         echo "CONSUMER-SMOKE: --keep, scratch retained at $SCRATCH"
     else
@@ -51,29 +54,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
-git -C "$SCRATCH" init -q
-printf '.tmp/\n' > "$SCRATCH/.gitignore"
-git -C "$SCRATCH" add -A
-git -C "$SCRATCH" -c user.email=smoke@example.invalid -c user.name=smoke \
-    commit -q --allow-empty -m "seed"
-
-for r in "${roots[@]}"; do
-    cp -R "$r" "$SCRATCH/$(basename "$r")"
-done
-
-installed=0
-for r in "${roots[@]}"; do
-    kit="$(basename "$r")"
-    if ! ( cd "$SCRATCH" && SMOKE_KIT_ROOT="$SCRATCH/$kit" bash "$SCRATCH/$kit/smoke/install.sh" ); then
-        echo "run-consumer-smoke: $kit/smoke/install.sh failed (a broken installer is an environment failure)" >&2
-        exit 2
-    fi
-    installed=$((installed + 1))
-done
-
-git -C "$SCRATCH" add -A
-git -C "$SCRATCH" -c user.email=smoke@example.invalid -c user.name=smoke \
-    commit -q --no-verify -m "installed baseline"
+csmoke_vendor_and_install "${roots[@]}" || exit 2
+installed="$CSMOKE_INSTALLED"
 
 run_battery() { ( cd "$SCRATCH" && bash gate-sdk/bin/run-gates.sh ) 2>&1; }
 
