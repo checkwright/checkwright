@@ -18,6 +18,12 @@
   "tested" true, the docs/install.md adapter recipe with its honest limits, and the
   positioning-claim re-split. Design, sweep results, and ruled-out alternatives live in the
   amendment. Surfaced 2026-07-13.
+- **pub-index-language-extractors** [spec: context-kit/SPEC-pub-index-languages.md] — pub-index
+  becomes a dispatcher over per-language extractors (consumer-first resolution, gates.list
+  precedent), shipping rust + ts; absorbs the framing rewording. Upgraded from debt at scope
+  2026-07-13: the second adopter's tree carries a TypeScript surface its vendored copy cannot
+  index, so the standing single-extractor ruling's demand gate has fired (record in the
+  amendment; consumer identity in the operator's local brief).
 
 ## Technical Debt
 
@@ -25,13 +31,6 @@
   no-harness-dependency enforcement core on `docs/index.md` and `docs/methodology.md`; assert
   the Tier-two widening only as far as the blocker's smoke makes it true, never beyond what
   docs/positioning.md §The tiered compatibility claim then states. Surfaced 2026-07-13.
-- **pub-index-rust-default-framing** — demote Rust from `pub-index.sh`'s identity to its shipped
-  default extractor on the naming surfaces: context-kit README's tool line and the
-  session-context nudge line (kit template and this repo's copy), each pointing at the existing
-  write-your-own `<lang>-index` extension point. The pluggable-registry ask stays declined per
-  the standing ruling (context-kit/SPEC.md §Index-first reading) — no second-language consumer
-  exists; framing converges, no framework lands. Converged 2026-07-13 at scope from
-  pub-index-language-plugins (site feedback 2026-07-12).
 - **footprint-drop-word-measure** — drop the word measure from `context-kit/bin/footprint.sh`'s
   compound cell (`53l · ~669t`): the `cell()` emitter, the emitted page's "exact counts" prose,
   and the bare-mode header line adjust together; regenerate docs/footprint.md and the value
@@ -133,5 +132,6 @@
 ## Done
 
 - pub-index-language-plugins
+- pub-index-rust-default-framing
 
 ## Lessons Learned
