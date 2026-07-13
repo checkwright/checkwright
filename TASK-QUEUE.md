@@ -178,6 +178,25 @@
   the ruling roster, drop tool output). Evidence from the first orchestrated iteration: roughly
   70k tokens of validation residue accreted by build acceptance were re-read on every later
   cold wake. Surfaced 2026-07-13.
+- **footprint-drop-word-measure** [needs-spec] — the footprint table's compound cell carries
+  three measures (`53l · 408w · ~669t`); the token figure is the budget unit but a labeled
+  bytes/4 estimate, and exact lines are the repo's native editing currency — words are neither,
+  so drop the word measure from `context-kit/bin/footprint.sh`'s cell (emitter, prose in the
+  emitted page body, and the "exact counts" framing all adjust together). Machine extraction is
+  unaffected either way — `scripts/gen-value-rollup.sh` parses the compound cell and reads only
+  the token figure; re-check its awk survives the narrower cell. Ruled against splitting the
+  cell into per-measure columns: the analyzing party is a script that already extracts, and
+  column-scanning alone does not buy the width. Surfaced 2026-07-13.
+- **docs-nav-kit-page-suffixes** [needs-spec] — the nav renders one child level, so each kit's
+  SPEC/README mirror pages sit two hops from anywhere (kit index → Contracts links); suffix each
+  kit's nav child with compact sibling links (`queue-kit [readme|spec]`) so the ground-truth
+  pages are one click from every page without a second nav level. Derived, never annotated:
+  Liquid discovers the sibling pages from the child's URL (the mirrors' front matter already
+  marks them), so no per-kit maintenance lands. The `current` class must extend to a suffix link
+  when its page is open (today a SPEC page highlights nothing). Named cost: nav.html features
+  widen the check-docs-nav-reachable gate-vs-include divergence (the close-stamped residual) —
+  suffix links are additive reachability so the gate stays green, but the spec step should weigh
+  paying that residual down in the same unit. Surfaced 2026-07-13.
 
 ## Done
 
