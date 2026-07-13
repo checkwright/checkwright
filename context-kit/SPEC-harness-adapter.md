@@ -37,8 +37,12 @@ consumer-smoke mechanics) whose agent file is `AGENTS.md` and whose config
 sets the knobs above plus `CONTEXT_KIT_SURFACES=("AGENTS.md")`, then asserts:
 the battery passes, `bin/always-loaded.sh` and `bin/footprint.sh` measure the
 `AGENTS.md` surface, and `check-root-tiering` accepts it at root while
-rejecting a stray second agent file. Registered per the kit-landing checklist
-(gate-sdk/SPEC.md §Consumer smoke) and joining the README battery roster.
+rejecting a stray second agent file. Shipped per the kit-landing checklist
+(gate-sdk/SPEC.md §Consumer smoke), but registered as its own hand-listed
+evidence-kit validate suite in `scripts/evidence-config.sh` (the `demo`
+precedent) — `run-consumer-smoke.sh` cannot drive it, since that harness
+asserts the kit defaults under zero consumer config and this smoke exists to
+set nondefault knobs.
 
 **3. The adapter recipe — a docs/install.md section.** "Running under an
 AGENTS.md harness": the knob set, where the kit-injected blocks land, how the
@@ -72,9 +76,10 @@ no standard target; harness plugin packaging — the plugin-marketplace rung's.
   one reader.
 - **`LIFECYCLE_KIT_AGENT_FILE`** (existing) — gains a second reader:
   `check-shim-restatement`'s corpus probe, read where the corpus is built.
-- **The smoke** — producer: the validate battery invocation (README §This
-  repo, governed roster); consumer: the validate stage's evidence run, plus
-  the positioning claim that cites it.
+- **The smoke** — producer: its `EVIDENCE_KIT_SUITES` entry in
+  `scripts/evidence-config.sh` (evidence-kit/SPEC.md §Layout and
+  configuration); consumer: the validate stage's evidence run, plus the
+  positioning claim that cites it.
 - **The recipe section** — producer: docs/install.md; consumer: an adopting
   operator on a non-Claude harness; its commands and links resolve under the
   same canon config as every docs page.
@@ -93,7 +98,10 @@ no standard target; harness plugin packaging — the plugin-marketplace rung's.
 - context-kit/SPEC.md — the smoke joins the kit's test-surface prose; the
   `CONTEXT_KIT_SURFACES` entry states the agent-file-name-agnostic contract
   and cites the smoke.
-- README §This repo, governed — the new smoke joins the battery roster.
+- scripts/evidence-config.sh — the smoke's hand-listed validate-suite entry
+  (align finding: the README §This repo, governed block lists fixture runners
+  and the guard table only; validate suites register in evidence config, the
+  `demo`/`consumer_smoke` precedent).
 - docs/install.md — the new recipe section; docs mirror regenerated for the
   touched kit SPECs (`scripts/gen-docs-mirror.sh --write`).
 

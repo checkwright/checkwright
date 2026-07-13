@@ -57,6 +57,11 @@ superseded write-your-own paragraph.
 exercising every kind the TS grammar claims; the runner gains the case
 beside the Rust one. A consumer-shadowing case (a scratch
 `CONTEXT_KIT_PUB_LANG_DIR` overriding `rust.sh`) exercises resolution order.
+`bin/run-index-tests.sh` itself registers as a hand-listed evidence-kit
+validate suite in `scripts/evidence-config.sh` (`index_tests`, the `demo`
+precedent) — the align audit found it registered in no validate suite, so
+the golden this refactor leans on as its no-regression assertion had no
+automated consumer (runner verified green at align, pre-refactor).
 
 **Ruled out:** AST/tree-sitter parsing — grep-grade extraction is the tool's
 altitude and its portability guarantee (bare bash + coreutils, Tier one);
@@ -91,6 +96,8 @@ tool output.
 - context-kit/README.md — the tool line (change 4).
 - context-kit/templates/session-context.sh + this repo's
   `scripts/session-context.sh` — the nudge line (change 4).
+- scripts/evidence-config.sh — the runner's validate-suite entry
+  (`index_tests`; change 5).
 - Docs mirror regenerated for the touched SPEC/README
   (`scripts/gen-docs-mirror.sh --write`).
 
