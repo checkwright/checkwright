@@ -1,1 +1,20 @@
 # contract: evidence-manifest v1
+session-id-child-flag gates sha256=af602de401fa2586de0d2ee15f27caac8827083be73d2e143de891f58775dcdd pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag gate_sdk sha256=757b865d594ef15ed585f2a374884424fd0d65784cfdd17f54979099b7379738 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag canon_kit sha256=3b4f627186b5c83c3d57c67777cb011d312901b5705f8eaf51c806bc5ee37264 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag evidence_kit sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag lifecycle_kit sha256=2f199647c9fe374545f553d487397708ac7aba71e72a03a0db203430f1b19508 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag queue_kit sha256=0f7d5111c384795d745d6d3573644ffa1122590521907a3175bc1a9ac383d92d pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag site_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag scripts sha256=4051096bbca0fd3ce2555f4a53096f2eb5e431e561d6e7f1241c82eecff7ce89 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag guard_tests sha256=7c96fb61e85aea1e59f04e2e44a773ad6654014667624a872c3353ce427b1c38 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag usage_tests sha256=b4dfde3f66fa559957d685dc4c05fee3d5f17626daaf51b3c8754e96591e0ca1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
+session-id-child-flag index_tests sha256=71d410e2b32adb3cbdfa575b3c3cbd89d1eada95158c123e4ee517a439e789d2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-14
