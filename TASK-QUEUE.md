@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **emitted-artifact-external-refs** [spec: SPEC-emitted-artifact-external-refs.md] —
-  check-graph gains an external-ref assertion over emitted HTML: href/src values and ESM
-  imports prefix-match the kit-seeded mermaid entry plus the GATE_SDK_GRAPH_EXTERNAL_REFS
-  allowlist.
 - **render-fidelity-table-leakage** [spec: SPEC-render-fidelity-table-leakage.md] — third
   check-docs-render-fidelity assertion: a rendered-table deficit against fence-aware source GFM
   table starts reds; the bad fixture reproduces the value-page incident shape.
@@ -168,5 +164,6 @@
 ## Done
 
 - readme-roster-parity
+- emitted-artifact-external-refs
 
 ## Lessons Learned

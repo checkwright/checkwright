@@ -60,7 +60,10 @@ e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_QUEUE_F
 (default `TASK-QUEUE.md`), `GATE_SDK_GRAPH_THEME` (default
 `<gates-dir>/graph-theme.sh`; the optional consumer theme file `check-graph`
 sources to inline host-site tokens/chrome into the emitted artifact — see
-there), `GATE_SDK_CORE_FILES_FILE` (default
+there), `GATE_SDK_GRAPH_EXTERNAL_REFS` (default empty; space-separated URL
+prefixes the `check-graph` external-ref assertion sanctions beyond the
+kit-seeded mermaid import — a consumer whose theme chrome links absolute URLs
+lists their prefixes here — see §check-graph), `GATE_SDK_CORE_FILES_FILE` (default
 `<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default
 `<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
 `target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
@@ -662,14 +665,23 @@ in the theme file (or the emitter), never a hand-edit.
 Self-containment is unchanged: injected content is inline, and a theme emitting
 a relative asset href must resolve under the artifact dir or the asset-href
 assertion is red — the existing gate already polices the link-the-site-stylesheet
-shortcut into inlining. One external reference is sanctioned: `emit_graph`'s
-pinned-major mermaid ESM import from the jsdelivr CDN — the diagram renderer is
-client-side, and inlining it would vendor a megabyte-scale library into a
-byte-compared artifact. It is the *only* sanctioned external reference in
-kit-emitted HTML, and it marks the asset-href assertion's honest limit: the
-assertion polices relative `href`/`src` values only (absolute `://` URLs and JS
-`import` statements pass unseen), so any new external reference is caught by
-review, not the gate. Dark mode is the theme owner's disposition: the kit default keeps its
+shortcut into inlining. Its complement is the **external-ref assertion**, over
+the same in-memory emission: every absolute (`://`-carrying) `href`/`src`
+attribute value and every ESM `import` specifier must prefix-match the allowed
+set, or the gate reds naming the URL. The set is seeded with `emit_graph`'s own
+pinned-major mermaid ESM import from the jsdelivr CDN — the one sanctioned
+external reference the kit itself emits (the diagram renderer is client-side, and
+inlining a megabyte-scale library into a byte-compared artifact is the worse
+trade), always allowed so a consumer cannot lock the kit's emission out. A
+consumer's chrome may need more — this repo's theme links its docs host and its
+source repo — so `GATE_SDK_GRAPH_EXTERNAL_REFS` (space-separated URL prefixes,
+default empty) adds consumer-sanctioned prefixes: rule content the kit must not
+hardcode, the `graph-vocab` seam. The assertion runs whole-tree and hermetically
+via `--refs-only` (the fixture's `check-graph-refs.test.sh` drives it, as
+`--amend-only` drives assertion G). Honest limit, now narrowed: the scan covers
+`href`/`src` values and import specifiers only — CSS `url()` and an inline-script
+`fetch()` still pass unseen (review-caught), and `xmlns=` namespace values are
+neither `href` nor `src` and are out of scope. Dark mode is the theme owner's disposition: the kit default keeps its
 light+dark scheme, and because the emitted mermaid init keys on
 `prefers-color-scheme`, a theme's chrome must honor that query too or it clashes
 with a dark-rendered graph on the same page. This repo's `scripts/graph-theme.sh`

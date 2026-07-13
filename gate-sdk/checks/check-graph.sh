@@ -272,6 +272,35 @@ TAIL
 TAILEND
 }
 
+# spec: gate-sdk/SPEC.md §check-graph — the external-ref allowlist: the pinned-major
+# mermaid ESM import emit_graph itself emits (kit-seeded, always allowed) plus the
+# consumer-sanctioned GATE_SDK_GRAPH_EXTERNAL_REFS prefixes (graph-vocab seam)
+GRAPH_MERMAID_SEED="https://cdn.jsdelivr.net/npm/mermaid@11"
+read -ra GRAPH_EXTERNAL_REFS <<<"${GATE_SDK_GRAPH_EXTERNAL_REFS:-}"
+ext_ref_allowed() {
+    local ref="$1" p
+    [[ "$ref" == "$GRAPH_MERMAID_SEED"* ]] && return 0
+    for p in "${GRAPH_EXTERNAL_REFS[@]+"${GRAPH_EXTERNAL_REFS[@]}"}"; do
+        [[ -n "$p" && "$ref" == "$p"* ]] && return 0
+    done
+    return 1
+}
+
+# spec: gate-sdk/SPEC.md §check-graph — echo each disallowed external reference in the emitted HTML: an absolute href/src value or ESM import specifier matching no allowed prefix
+disallowed_external_refs() {
+    local emitted="$1" ref
+    while IFS= read -r ref; do
+        [[ -n "$ref" ]] || continue
+        ext_ref_allowed "$ref" || printf '%s\n' "$ref"
+    done < <(
+        {
+            grep -oE '(href|src)="[^"]+"' <<<"$emitted" | sed -E 's/^(href|src)="//; s/"$//' | grep '://'
+            grep -oE "import[[:space:]][^;]*from[[:space:]]*'[^']+'|import[[:space:]]*'[^']+'" <<<"$emitted" \
+                | grep -oE "'[^']+'" | tr -d "'"
+        } | sort -u
+    )
+}
+
 # spec: gate-sdk/SPEC.md §check-graph (assertion G) — validate `# graph:` manifests in SPEC-*.md amendment bodies
 valid_glob_token() {
     local t="$1"
@@ -392,6 +421,22 @@ if [[ "${1:-}" == "--amend-only" ]]; then
         exit 1
     fi
     echo "CHECK-GRAPH: clean (amendment-body '# graph:' manifests well-formed)"
+    exit 0
+fi
+
+if [[ "${1:-}" == "--refs-only" ]]; then
+    ref_errors=()
+    emitted="$(emit_graph)"
+    while IFS= read -r ref; do
+        ref_errors+=("EXTERNAL-REF: emitted artifact references '$ref', neither the seeded mermaid import nor a GATE_SDK_GRAPH_EXTERNAL_REFS prefix; add its prefix to the knob or drop the reference")
+    done < <(disallowed_external_refs "$emitted")
+    if [[ ${#ref_errors[@]} -gt 0 ]]; then
+        echo "CHECK-GRAPH: ${#ref_errors[@]} external-ref violation(s):"
+        printf '  %s\n' "${ref_errors[@]}"
+        echo "  help: an emitted external reference must prefix-match the seeded mermaid import or a GATE_SDK_GRAPH_EXTERNAL_REFS prefix"
+        exit 1
+    fi
+    echo "CHECK-GRAPH: clean (emitted external refs allowlisted)"
     exit 0
 fi
 
@@ -538,6 +583,12 @@ while IFS= read -r href; do
         errors+=("ASSET-HREF: emitted asset '$href' does not resolve to a file under $ARTIFACT_DIR/ (artifact-relative); fix the href in emit_graph")
 done < <(grep -oE '(href|src)="[^"]+"' <<<"$emitted" | sed -E 's/^(href|src)="//; s/"$//' | grep -v '://')
 
+# assertion H: every emitted external reference prefix-matches the seeded
+# mermaid import or a GATE_SDK_GRAPH_EXTERNAL_REFS prefix (§check-graph)
+while IFS= read -r ref; do
+    errors+=("EXTERNAL-REF: emitted artifact references '$ref', neither the seeded mermaid import nor a GATE_SDK_GRAPH_EXTERNAL_REFS prefix; add its prefix to the knob or drop the reference")
+done < <(disallowed_external_refs "$emitted")
+
 # assertion G: every `# graph:` manifest in a SPEC-*.md amendment body is well-formed
 g_errors=()
 amendment_findings "."
@@ -549,5 +600,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "  help: fix the '# graph:' manifest / gates.list-membership / hook-trigger mismatch (or the malformed amendment-body manifest), then regenerate the hook and graph artifacts"
     exit 1
 fi
-echo "CHECK-GRAPH: clean (${#CHECKS[@]} gates; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, and amendment-body manifests valid)"
+echo "CHECK-GRAPH: clean (${#CHECKS[@]} gates; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, external refs allowlisted, and amendment-body manifests valid)"
 exit 0
