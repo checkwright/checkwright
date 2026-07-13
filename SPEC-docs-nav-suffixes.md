@@ -21,8 +21,10 @@ page without a second nav level.
   page, its suffix link carries the `current` class and the owning child
   `<li>` carries it too — today a SPEC page highlights nothing, so the
   reader loses their nav position exactly on the ground-truth pages.
-- **Styling.** A `nav-suffix` class in the site stylesheet
-  (`docs/assets/`), visually subordinate (smaller, muted, bracketed) so the
+- **Styling.** A `nav-suffix` class in the site's inline style block
+  (`docs/_layouts/default.html` — the site has no separate stylesheet;
+  `docs/assets/` holds only the logo and search script), visually
+  subordinate (smaller, muted, bracketed) so the
   child label stays the scannable unit — the nav-label terseness rule
   (CLAUDE.md §Housekeeping) is unaffected.
 - **The gate residual is paid down in the same unit.**
@@ -54,8 +56,8 @@ page without a second nav level.
   pair gains a generated-sibling case both directions (reachable via
   sibling-index; orphaned generated page with no nav-reachable sibling index
   stays red).
-- No new front-matter keys, no new knobs, no new files beyond CSS lines in
-  an existing stylesheet.
+- No new front-matter keys, no new knobs, no new files — the CSS lines join
+  the layout's existing inline style block.
 
 ## Existing sections updated
 

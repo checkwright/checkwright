@@ -38,12 +38,15 @@ The per-dispatch `LIFECYCLE_KIT_SESSIONS_DIR` override remedy is retired from
 prose (the knob itself stays — it is the sessions-dir layout knob, not a
 collision remedy).
 
-**Build-time probe (contingency named ahead):** verify with one dispatched
-probe agent that `CLAUDE_CODE_SESSION_ID` inside a subagent carries the
-subagent's *own* identity, not the lead's (the environment also carries
-`CLAUDE_CODE_CHILD_SESSION`, so the harness distinguishes the cases). If it
-carries the lead's, source 2 is skipped when `CLAUDE_CODE_CHILD_SESSION` is
-set and the widened glob (source 3) carries dispatched sessions alone.
+**Probe resolved (align, 2026-07-13):** a dispatched stage session observed
+`CLAUDE_CODE_SESSION_ID` carrying the *lead's* uuid with
+`CLAUDE_CODE_CHILD_SESSION=1` set — the contingency branch holds. So source 2
+is **skipped when `CLAUDE_CODE_CHILD_SESSION` is set** and the widened glob
+(source 3) carries dispatched sessions alone; no further build-time probe is
+needed. In that case the lead uuid source 2 rejected still narrows source 3:
+scan `<dir>/<that-uuid>/subagents/*.jsonl` alone, excluding the lead's own
+top-level transcript — which is concurrently written and can out-mtime the
+dispatched session's — from the newest-wins candidate set.
 
 ## Producers and consumers
 
