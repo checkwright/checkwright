@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: first-release  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,17 @@
 ---
 
 ## New Features
+
+- **launch-comms** [spec: SPEC-launch-comms.md] — the first release cut
+  (v0.1.0) and the repeatable procedure behind it: RELEASING.md runbook,
+  the release-sweep binding, the release-note post, tag + GitHub Release,
+  README version badge. In-repo residue only; the campaign is operator
+  work in the operator's local brief.
+- **upgrade-path** [spec: SPEC-upgrade-path.md] [blocked-by: launch-comms] —
+  the upgrade smoke (gate-sdk, registered as the `upgrade` validate suite)
+  proving the two-phase upgrade contract against the newest tag, plus the
+  phase-B disposition skill template (lifecycle-kit). The thin installer
+  CLI is ruled out demand-gated in the amendment.
 
 ## Technical Debt
 
@@ -35,42 +46,6 @@
   FlowBench as prior art. Surfaced 2026-07-08 inside adoption-track; split
   out 2026-07-09 — the self-referential route (drift-trajectory) ships
   first and this rung upgrades the claim only if demand attests it.
-- **upgrade-path** [needs-spec] — the upgrade demo/tooling rung: an upgrade
-  smoke that vendors tag N into a scratch consumer, re-vendors N+1 over it,
-  and asserts phase-A determinism (nothing changes outside kit dirs plus
-  generated artifacts) and that the battery's red set matches the release
-  note's tightened-gates declaration; optionally a thin installer CLI
-  wrapping the git-native vendor copy (registries stay namespace
-  reservations, never a dependency channel). The two-phase upgrade
-  contract landed with docs-site (docs/install.md §The upgrade contract); this
-  rung is buildable once a second tag exists. Surfaced 2026-07-09. Noted at
-  public-positioning scope: no tag exists at all yet — the first release tag
-  (a launch-comms prerequisite) is what starts this rung's clock. Ruled
-  2026-07-10 at close-loop-hardening scope: the phase-B disposition ritual
-  (read the tightened-gates declaration, disposition each new red as
-  fix-the-tree vs exempt-with-cause, never weaken the gate) ships as a kit
-  skill template beside the smoke — the smoke stays bare bash so a
-  harness-less consumer keeps the upgrade path, the skill narrates it
-  (lifecycle-kit's templates/skills precedent); harness packaging stays
-  with plugin-marketplace. Extended 2026-07-10: this repo's own
-  release-prep decommission sweep rides this rung — a deprecated-surface
-  inventory beside the tightened-gates declaration, a release-time sweep,
-  not a standing gate; the consumer-facing mechanism (queue-bound
-  deprecation, the boundary-sweep skill step, the backlog KPI) is
-  deprecation-lifecycle's. Extended 2026-07-12 (operator ask — does upgrade auto-clean the
-  customer slot fills the new template absorbs): the shim upgrade path splits three ways, and
-  only the third needs design here. (1) slot-set drift — a template that adds, drops, or
-  renames a declared slot reddens the consumer's shim at `check-skill-binding` (it binds the
-  template's exact slot set), so Phase-B names the orphaned or missing slot. (2) verbatim
-  absorption — `check-shim-restatement` couples the stage-skill templates into its dedup corpus
-  and re-fires when the new template lands, so a slot fill the template now covers by a 9-word
-  run reddens automatically, naming the shared phrase. (3) semantic residual — a slot fill the
-  new template now *means* to cover but the consumer worded differently passes both gates (the
-  n-gram holds copy-shape only, the SPEC's stated honest limit) and is un-gateable; it belongs
-  in this rung's phase-B disposition skill as a judgment step (surface the changed slots and
-  shim slot values, judge redundancy) — the ungateable-class-audit-cadence pattern with the
-  upgrade event as the cadence. So the smoke asserts (1) and (2) mechanically; the skill owns
-  (3).
 - **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
   assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
   the per-iteration scratch logs (prompt-friction, knowledge-friction), and
@@ -96,16 +71,6 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **launch-comms** [needs-spec] — the promotion arc, sequenced after
-  public-positioning lands, the checkwright.dev cutover is live, and a
-  first release tag exists. In-repo residue only (docs/posts/ entries, the
-  tag); the campaign itself — channels, venues, timing — is operator work,
-  planned in the operator's local brief rather than here. Surfaced
-  2026-07-09. First-tag residue noted 2026-07-11 at scope: the README gains a
-  release-version badge sourced from the GitHub tag, never from the registry
-  placeholders — `reserve/` is a namespace reservation, not a channel, and a
-  registry-sourced badge would advertise a dead install path.
-
 ## Done
 
 ## Lessons Learned
