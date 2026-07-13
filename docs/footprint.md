@@ -23,7 +23,7 @@ Each kit's footprint splits by when its cost lands in a session:
   into context only when its trigger fires. Measured over the markdown the kit
   ships under its templates directory.
 
-Line and word counts are exact. The token column is a labeled estimate — a
+Line counts are exact. The token column is a labeled estimate — a
 bytes-over-four heuristic, marked with a leading `~` because the true count is
 model-tokenizer-dependent; read it as an order of magnitude, never a precise
 figure.
@@ -41,15 +41,15 @@ host repository's residue.
 
 | kit | always-loaded | load-triggered |
 | --- | --- | --- |
-| canon-kit | — | 53l · 408w · ~669t |
-| context-kit | — | 30l · 288w · ~493t |
-| delegation-kit | — | 176l · 1711w · ~2844t |
-| doctrine-kit | 16l · 185w · ~310t | — |
-| drift-kit | — | 23l · 200w · ~352t |
+| canon-kit | — | 53l · ~669t |
+| context-kit | — | 30l · ~493t |
+| delegation-kit | — | 176l · ~2844t |
+| doctrine-kit | 16l · ~310t | — |
+| drift-kit | — | 23l · ~352t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
-| guard-kit | — | 31l · 276w · ~486t |
-| lifecycle-kit | 5l · 35w · ~75t | 483l · 4384w · ~7326t |
-| queue-kit | — | 43l · 223w · ~381t |
+| guard-kit | — | 31l · ~486t |
+| lifecycle-kit | 5l · ~75t | 483l · ~7326t |
+| queue-kit | — | 43l · ~381t |
 | site-kit | — | — |
-| **total** | 21l · 220w · ~385t | 839l · 7490w · ~12554t |
+| **total** | 21l · ~385t | 839l · ~12554t |

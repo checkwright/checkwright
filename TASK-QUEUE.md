@@ -14,12 +14,6 @@
 
 ## Technical Debt
 
-- **footprint-drop-word-measure** — drop the word measure from `context-kit/bin/footprint.sh`'s
-  compound cell (`53l · ~669t`): the `cell()` emitter, the emitted page's "exact counts" prose,
-  and the bare-mode header line adjust together; regenerate docs/footprint.md and the value
-  rollup. Verified at scope: `scripts/gen-value-rollup.sh`'s `tok()` extracts only the `~<n>t`
-  token, so the narrower cell parses unchanged. Surfaced 2026-07-13.
-
 ## Deferred
 
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
@@ -114,6 +108,7 @@
 
 ## Done
 
+- footprint-drop-word-measure
 - positioning-harness-emphasis
 - pub-index-language-extractors
 - harness-adapter-agnostic

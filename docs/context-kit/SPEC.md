@@ -240,7 +240,7 @@ Each kit is measured in the always-loaded and load-triggered tiers:
   `templates/` tree, pulled into context only when its trigger fires. Gate-test
   fixtures sit outside `templates/`, so they never enter the count.
 
-**Numbers ruling.** Line and word counts are exact. The token column is a
+**Numbers ruling.** Line counts are exact. The token column is a
 *labeled estimate* — a bytes/4 heuristic, carried with a leading `~` and stated
 inline as model-tokenizer-dependent, never a false-precision figure.
 
