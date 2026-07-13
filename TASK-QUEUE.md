@@ -106,8 +106,24 @@
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
 
-## Done
+- **session-id-child-flag** [needs-spec] — session-id.sh trusts
+  `CLAUDE_CODE_CHILD_SESSION` unverified (lifecycle-kit/SPEC.md
+  §bin/session-id.sh states the contract), but the harness now sets the flag
+  in top-level sessions too (observed across three sessions, 2026-07-14), so
+  every stage entry dead-ends in the narrowed subagents scan and needs the
+  `LIFECYCLE_KIT_SESSION_ID` escape by hand — standing per-stage friction,
+  and the env-prefix form breaks the Bash allowlist match so it re-prompts
+  each time. Design call to make: verify the flag instead of trusting it —
+  when the narrowed scan is empty and `<dir>/<session-uuid>.jsonl` exists
+  top-level, fall back to `CLAUDE_CODE_SESSION_ID` (a genuine child's
+  transcript lives under `subagents/` while it runs, so an empty scan marks
+  the flag spurious; the residual race is a child stamping before its
+  transcript's first write). Lands with the SPEC sentence flip
+  ("trusted, never verified"), a smoke case for the spurious-flag path, and
+  removes the standing escape. Interim mitigation landed at
+  docs-coupling-graph-link close: the exit-2 help text now names the escape.
+  Surfaced 2026-07-14.
 
-- docs-coupling-graph-link
+## Done
 
 ## Lessons Learned

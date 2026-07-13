@@ -27,3 +27,4 @@
 | parity-fidelity-handoff | s a b v c | 4f/2d | 4 · ≤0d | 17s clean | 69 |
 | orchestration-residue | s a b v c | 6f/0d | 6 · ≤0d | 17s clean | 69 |
 | harness-adapter | s a b v c | 2f/3d | 2 · ≤1d | 19s clean | 69 |
+| docs-coupling-graph-link | s · b v c | 0f/0d | 0 | 19s clean | 69 |
