@@ -14,15 +14,6 @@
 
 ## Technical Debt
 
-- **docs-nav-restructure** — ruled at scope 2026-07-13: (1) enforcement.md and footprint.md
-  become nav children of Value — nav_id on value.md, nav_parent+nav_child_order on both (the
-  filed offnav-allowlist premise was stale: neither page is listed there; they pass by link
-  walk today); (2) orchestration, ddd, and positioning nest as children of methodology.md,
-  which gains a nav_id — Why Checkwright becomes the contrast cluster's parent and the
-  top-level nav_order renumbers; (3) the terse-nav-title/descriptive-H1 convention is ruled
-  intent, documented as one line in CLAUDE.md §Housekeeping's docs bullet. Gate touchpoints
-  unchanged: check-docs-kit-parity's kits child block stays intact.
-
 ## Deferred
 
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
@@ -154,5 +145,6 @@
 - scope-lead-handoff
 - drop-python-dependency
 - pages-parser-version-fidelity
+- docs-nav-restructure
 
 ## Lessons Learned

@@ -209,6 +209,8 @@ emit_page() {
     cat <<'PREAMBLE'
 ---
 title: Enforcement map
+nav_parent: value
+nav_child_order: 1
 ---
 # Enforcement map
 

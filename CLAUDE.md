@@ -140,9 +140,12 @@ the skill on a blocking verdict — so they are not resident here.
   edit the guide, not GitHub UI settings, to change what arrives.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome — the Jekyll layout,
-  nav (Liquid over the `nav_order`/`nav_parent` front matter), client-side search, and theme
+  nav (Liquid over the `nav_order`/`nav_parent` front matter, a page's `nav_id`
+  parenting its `nav_child_order`-sorted children), client-side search, and theme
   selector — lives in `docs/_config.yml`, `docs/_layouts/`, `docs/_includes/`,
-  and `docs/assets/`. Living pages are governed prose under the anti-restatement
+  and `docs/assets/`. A page's `title:` is its terse nav label; its opening H1
+  carries the descriptive full form (nav stays scannable, the page reads whole).
+  Living pages are governed prose under the anti-restatement
   doctrine (cite downward, never restate a SPEC's invariant); dated `docs/posts/`
   are immutable, temporal-exempt but still link/command-resolved
   (`scripts/canon-config.sh`). The on-site SPEC mirror (`docs/<kit>/SPEC.md`,

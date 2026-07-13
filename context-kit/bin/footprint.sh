@@ -92,6 +92,8 @@ fi
 cat <<'EOF'
 ---
 title: Footprint
+nav_parent: value
+nav_child_order: 2
 ---
 
 # Context footprint

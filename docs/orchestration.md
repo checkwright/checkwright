@@ -1,6 +1,7 @@
 ---
 title: Orchestration
-nav_order: 3
+nav_parent: methodology
+nav_child_order: 1
 ---
 
 # Agent orchestration: the verification layer beneath it

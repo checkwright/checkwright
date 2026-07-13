@@ -1,6 +1,7 @@
 ---
 title: Where Checkwright sits
-nav_order: 5
+nav_parent: methodology
+nav_child_order: 3
 ---
 
 # Where Checkwright sits

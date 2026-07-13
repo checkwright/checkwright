@@ -1,6 +1,7 @@
 ---
 title: Domain-driven design
-nav_order: 4
+nav_parent: methodology
+nav_child_order: 2
 ---
 
 # Domain-driven design: enforcing the ubiquitous language

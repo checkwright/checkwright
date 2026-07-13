@@ -1,6 +1,7 @@
 ---
 title: Value
-nav_order: 7
+nav_id: value
+nav_order: 4
 ---
 
 # Value
