@@ -9,7 +9,15 @@
         {%- if kids != empty -%}
         <ul class="nav-children">
           {%- for k in kids -%}
-          <li class="{% if k.url == page.url %}current{% endif %}"><a href="{{ k.url | relative_url }}">{{ k.title }}</a></li>
+          {%- assign sufs = site.pages | where: "dir", k.dir | where_exp: "s", "s.generated" | sort: "title" -%}
+          {%- assign kid_current = false -%}
+          {%- if k.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}
+          {%- for s in sufs -%}{%- if s.url == page.url -%}{%- assign kid_current = true -%}{%- endif -%}{%- endfor -%}
+          <li class="{% if kid_current %}current{% endif %}{% if sufs != empty %} has-suffix{% endif %}"><a href="{{ k.url | relative_url }}">{{ k.title }}</a>
+            {%- if sufs != empty -%}
+            <span class="nav-suffix">[{% for s in sufs %}<a href="{{ s.url | relative_url }}" class="{% if s.url == page.url %}current{% endif %}">{{ s.title | downcase }}</a>{% unless forloop.last %}|{% endunless %}{% endfor %}]</span>
+            {%- endif -%}
+          </li>
           {%- endfor -%}
         </ul>
         {%- endif -%}

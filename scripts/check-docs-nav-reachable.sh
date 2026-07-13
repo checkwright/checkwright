@@ -26,25 +26,26 @@ if [[ -f "$ALLOWLIST" ]]; then
     done < "$ALLOWLIST"
 fi
 
-# spec: CLAUDE.md §Housekeeping — front-matter facts per page: does it open with a
-# block carrying title:, does it hold a top-level nav_order slot, and its nav_id /
-# nav_parent (the include's one-level parent/child keys). Resolution is in the shell.
+# spec: CLAUDE.md §Housekeeping — front-matter facts per page: the title: block,
+# the top-level nav_order slot, nav_id / nav_parent (the include's parent/child keys),
+# and the generated: mirror marker (suffix-link discovery). Resolution is in the shell.
 read -r -d '' FM_EXTRACT <<'AWK' || true
-NR==1 { if ($0 != "---") { print "0 0 - -"; exit } fm=1; next }
+NR==1 { if ($0 != "---") { print "0 0 - - 0"; exit } fm=1; next }
 fm && $0 == "---" { fm=0 }
 fm && /^title:[[:space:]]*[^[:space:]]/ { t=1 }
 fm && /^nav_order:[[:space:]]*[0-9]/ { o=1 }
 fm && /^nav_id:[[:space:]]*[^[:space:]]/ { id=$2 }
 fm && /^nav_parent:[[:space:]]*[^[:space:]]/ { par=$2 }
-END { print t+0, o+0, (id=="" ? "-" : id), (par=="" ? "-" : par) }
+fm && /^generated:[[:space:]]*true/ { g=1 }
+END { print t+0, o+0, (id=="" ? "-" : id), (par=="" ? "-" : par), g+0 }
 AWK
 
-declare -A TITLE=() ORDER=() PARENT=() INSCOPE=() TOPNAVID=()
+declare -A TITLE=() ORDER=() PARENT=() GEN=() INSCOPE=() TOPNAVID=()
 for p in "${pages[@]}"; do
     fm="$(awk "$FM_EXTRACT" "$p")"; st=$?
     fail_closed "$st" DOCS-NAV-REACHABLE "awk front-matter ($p)"
-    read -r t o id par <<< "$fm"
-    TITLE[$p]="$t"; ORDER[$p]="$o"; PARENT[$p]="$par"; INSCOPE[$p]=1
+    read -r t o id par g <<< "$fm"
+    TITLE[$p]="$t"; ORDER[$p]="$o"; PARENT[$p]="$par"; GEN[$p]="$g"; INSCOPE[$p]=1
     [[ "$o" == "1" && "$id" != "-" ]] && TOPNAVID[$id]=1
 done
 
@@ -76,6 +77,15 @@ while [[ ${#queue[@]} -gt 0 ]]; do
         [[ -n "$tgt" && -n "${INSCOPE[$tgt]:-}" && -z "${REACH[$tgt]:-}" ]] || continue
         REACH[$tgt]=1; queue+=("$tgt")
     done < <(links_of "$cur")
+    # spec: CLAUDE.md §Housekeeping — the include's suffix-link rule, modeled: a generated
+    # mirror page is reachable iff its directory-sibling index.md is nav-reachable
+    if [[ "${cur##*/}" == index.md ]]; then
+        curdir="${cur%/*}"
+        for sib in "${pages[@]}"; do
+            [[ "${sib%/*}" == "$curdir" && "${GEN[$sib]}" == "1" && -z "${REACH[$sib]:-}" ]] || continue
+            REACH[$sib]=1; queue+=("$sib")
+        done
+    fi
 done
 
 bad=()
@@ -93,5 +103,5 @@ if [[ ${#bad[@]} -gt 0 ]]; then
     echo "        page. A page off-nav by design (an embedded fragment) goes in $ALLOWLIST."
     exit 1
 fi
-echo "DOCS-NAV-REACHABLE: clean (${#pages[@]} docs page(s) under $ROOT; each carries a title block and sits in the rendered nav or its link walk, or is allowlisted off-nav)"
+echo "DOCS-NAV-REACHABLE: clean (${#pages[@]} docs page(s) under $ROOT; each carries a title block and sits in the rendered nav — a nav slot, its link walk, or the generated-sibling suffix rule — or is allowlisted off-nav)"
 exit 0

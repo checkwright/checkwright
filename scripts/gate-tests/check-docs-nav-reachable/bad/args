@@ -1,5 +1,7 @@
 # Point the gate at this fixture's synthetic docs tree and its (empty) allowlist.
 # orphan.md carries a title but holds no nav slot, is linked from no nav page,
-# and is not allowlisted — the fell-out-of-the-nav drift. The gate REJECTS.
+# and is not allowlisted — the fell-out-of-the-nav drift; lost/SPEC.md is a
+# generated mirror with no nav-reachable sibling index.md, so the sibling rule
+# must not rescue it. The gate REJECTS.
 docs
 docs-offnav.list

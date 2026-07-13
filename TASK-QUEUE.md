@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **docs-nav-kit-page-suffixes** [spec: SPEC-docs-nav-suffixes.md] — derived readme/spec sibling
-  suffix links on each kit's nav child with current-class extension; the nav-reachable gate
-  learns the same sibling rule, paying down the gate-vs-include residual. Surfaced 2026-07-13.
-
 ## Technical Debt
 
 ## Deferred
@@ -148,5 +144,6 @@
 - battery-quiet-mode
 - usage-snapshot-poller
 - lead-compact-cadence
+- docs-nav-kit-page-suffixes
 
 ## Lessons Learned
