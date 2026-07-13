@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: harness-adapter  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,7 +12,31 @@
 
 ## New Features
 
+- **harness-adapter-agnostic** [spec: context-kit/SPEC-harness-adapter.md] — widen the Tier-two
+  compatibility claim truthfully: agent-file knob convergence (the scope sweep found exactly two
+  surviving `CLAUDE.md` literals in kit runtime code), an AGENTS.md consumer smoke that makes
+  "tested" true, the docs/install.md adapter recipe with its honest limits, and the
+  positioning-claim re-split. Design, sweep results, and ruled-out alternatives live in the
+  amendment. Surfaced 2026-07-13.
+
 ## Technical Debt
+
+- **positioning-harness-emphasis** [blocked-by: harness-adapter-agnostic] — foreground the
+  no-harness-dependency enforcement core on `docs/index.md` and `docs/methodology.md`; assert
+  the Tier-two widening only as far as the blocker's smoke makes it true, never beyond what
+  docs/positioning.md §The tiered compatibility claim then states. Surfaced 2026-07-13.
+- **pub-index-rust-default-framing** — demote Rust from `pub-index.sh`'s identity to its shipped
+  default extractor on the naming surfaces: context-kit README's tool line and the
+  session-context nudge line (kit template and this repo's copy), each pointing at the existing
+  write-your-own `<lang>-index` extension point. The pluggable-registry ask stays declined per
+  the standing ruling (context-kit/SPEC.md §Index-first reading) — no second-language consumer
+  exists; framing converges, no framework lands. Converged 2026-07-13 at scope from
+  pub-index-language-plugins (site feedback 2026-07-12).
+- **footprint-drop-word-measure** — drop the word measure from `context-kit/bin/footprint.sh`'s
+  compound cell (`53l · ~669t`): the `cell()` emitter, the emitted page's "exact counts" prose,
+  and the bare-mode header line adjust together; regenerate docs/footprint.md and the value
+  rollup. Verified at scope: `scripts/gen-value-rollup.sh`'s `tok()` extracts only the `~<n>t`
+  token, so the narrower cell parses unchanged. Surfaced 2026-07-13.
 
 ## Deferred
 
@@ -105,38 +129,9 @@
   release-version badge sourced from the GitHub tag, never from the registry
   placeholders — `reserve/` is a namespace reservation, not a channel, and a
   registry-sourced badge would advertise a dead install path.
-- **pub-index-language-plugins** [needs-spec] — context-kit's `pub-index.sh`
-  hardcodes the Rust grammar and file glob; make the extractor pluggable —
-  per-language extractors resolved registry-style, a consumer knob naming the
-  enabled set, Rust demoted from the tool's identity to its shipped default
-  extractor, and the session-context nudge line reworded to match. Surfaced
-  2026-07-12 as site feedback on context-kit's README.
-- **positioning-harness-emphasis** [needs-spec] — the harness-agnostic story is true but
-  defensively framed: `docs/positioning.md` §The tiered compatibility claim already states Tier
-  one (the gate battery is bare bash — runs under any harness, any CI, or no harness), but it
-  sits as bullet one of a "tiered, not blanket" hedge while the surrounding pages lead
-  Claude-Code-first. Foreground the no-harness-dependency enforcement core on `docs/index.md`
-  and `docs/methodology.md`. Hard constraint (honesty/provenance seam): do not claim tested
-  compatibility with AGENTS.md / `.cursorrules` that does not exist — this is an emphasis pass on
-  the already-true claim; its truthful expansion is harness-adapter-agnostic. Surfaced 2026-07-13.
-- **harness-adapter-agnostic** [needs-spec] — the truthful widening of Tier-two compatibility:
-  today the lifecycle stage skills, the CLAUDE.md load convention, and the settings pins are
-  Claude-Code-native (positioning.md §The tiered compatibility claim names other rules-file
-  conventions an untested adaptation surface, not compatibility). Build the adapter — an
-  AGENTS.md (and kin) load-convention shim plus a settings-pin port — so the multi-harness claim
-  expands because it became true, never by overclaiming. Anti-drift shape to design: parity
-  between the ported load surface and the Claude-Code one. Prerequisite for
-  positioning-harness-emphasis to assert more than Tier one. Surfaced 2026-07-13.
-- **footprint-drop-word-measure** [needs-spec] — the footprint table's compound cell carries
-  three measures (`53l · 408w · ~669t`); the token figure is the budget unit but a labeled
-  bytes/4 estimate, and exact lines are the repo's native editing currency — words are neither,
-  so drop the word measure from `context-kit/bin/footprint.sh`'s cell (emitter, prose in the
-  emitted page body, and the "exact counts" framing all adjust together). Machine extraction is
-  unaffected either way — `scripts/gen-value-rollup.sh` parses the compound cell and reads only
-  the token figure; re-check its awk survives the narrower cell. Ruled against splitting the
-  cell into per-measure columns: the analyzing party is a script that already extracts, and
-  column-scanning alone does not buy the width. Surfaced 2026-07-13.
 
 ## Done
+
+- pub-index-language-plugins
 
 ## Lessons Learned

@@ -4,4 +4,4 @@
 
 ---
 
-— scope 12a34d6c 2026-07-13
+harness-adapter scope 12a34d6c 2026-07-13
