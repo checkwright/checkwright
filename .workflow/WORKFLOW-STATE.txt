@@ -7,3 +7,4 @@
 docs-coupling-graph-link scope 5290ff77 2026-07-14
 docs-coupling-graph-link build 9580f538 2026-07-14
 docs-coupling-graph-link validate 63cdd19d 2026-07-14
+docs-coupling-graph-link close 436c91cc 2026-07-14
