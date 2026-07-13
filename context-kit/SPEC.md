@@ -136,7 +136,7 @@ probed half is derivation-first — never hand-maintained.
 
 **What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager
 (first present of an ordered detection walk over the known managers); the probe
-set's versions — `bash`, `git`, `jq`, `awk`, `python3`, and the kit tools' own
+set's versions — `bash`, `git`, `jq`, `awk`, and the kit tools' own
 shared dependency `shellcheck` (the gate battery's linter); and the absent-tools
 list (probe-set members `command -v` cannot resolve).
 

@@ -14,10 +14,6 @@
 
 ## Technical Debt
 
-- **drop-python-dependency** — port the md-index.sh and pub-index.sh EXTRACT embeds to POSIX
-  awk (no gawk-only constructs — ruled at scope 2026-07-13); oracle: run-index-tests.sh goldens
-  stay byte-identical; drop python3 from env-probe's PROBE_SET and docs/install.md's toolchain
-  bullets in the same commit (check-install-toolchain holds the parity).
 - **pages-parser-version-fidelity** — ruled at scope 2026-07-13: state the kramdown version
   skew as a check-docs-render-fidelity honest limit and document the exact-pin recipe
   (SITE_KIT_RENDERER pointed at a github-pages-locked bundle); auto-resolving the pinned gem
@@ -160,5 +156,6 @@
 - emitted-artifact-external-refs
 - render-fidelity-table-leakage
 - scope-lead-handoff
+- drop-python-dependency
 
 ## Lessons Learned

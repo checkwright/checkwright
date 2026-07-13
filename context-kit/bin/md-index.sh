@@ -12,60 +12,54 @@ if [[ ${#TARGETS[@]} -eq 0 ]]; then
 fi
 
 EXTRACT='
-import sys, re
-
-lines = sys.stdin.read().splitlines()
-total = len(lines)
-i = 0
-results = []
-
-while i < total:
-    line = lines[i]
-    m = re.match(r"^(#{1,6})\s+(.*)", line)
-    if m:
-        level = len(m.group(1))
-        heading = m.group(2).strip()
-        lineno = i + 1
-
+function strip_links(s,   out, span, txt) {
+    out = ""
+    while (match(s, /\[[^]]+\]\([^)]+\)/)) {
+        span = substr(s, RSTART, RLENGTH)
+        txt = span; sub(/^\[/, "", txt); sub(/\].*$/, "", txt)
+        out = out substr(s, 1, RSTART - 1) txt
+        s = substr(s, RSTART + RLENGTH)
+    }
+    return out s
+}
+{ lines[NR] = $0 }
+END {
+    for (i = 1; i <= NR; i++) {
+        line = lines[i]
+        if (! match(line, /^#{1,6}[ \t]+/)) continue
+        level = 0
+        while (substr(line, level + 1, 1) == "#") level++
+        heading = substr(line, RLENGTH + 1)
+        gsub(/^[ \t]+|[ \t]+$/, "", heading)
         first = ""
-        j = i + 1
-        in_fence = False
-        while j < total:
-            l = lines[j].strip()
-            if l.startswith("```") or l.startswith("~~~"):
-                in_fence = not in_fence
-                j += 1
-                continue
-            if in_fence:
-                j += 1
-                continue
-            if re.match(r"^#{1,6}\s", l) or l.startswith("---"):
+        infence = 0
+        for (j = i + 1; j <= NR; j++) {
+            l = lines[j]
+            gsub(/^[ \t]+|[ \t]+$/, "", l)
+            if (l ~ /^```/ || l ~ /^~~~/) { infence = ! infence; continue }
+            if (infence) continue
+            if (l ~ /^#{1,6}[ \t]/ || l ~ /^---/) break
+            if (l != "") {
+                text = strip_links(l)
+                gsub(/[*_`]/, "", text)
+                if (match(text, /[.!?]/)) first = substr(text, 1, RSTART)
+                else first = substr(text, 1, 120)
+                gsub(/^[ \t]+|[ \t]+$/, "", first)
                 break
-            if l:
-                text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", l)
-                text = re.sub(r"[*_`]", "", text)
-                m2 = re.search(r"[.!?]", text)
-                first = text[:m2.end()].strip() if m2 else text[:120].strip()
-                break
-            j += 1
-
-        results.append((lineno, level, heading, first))
-    i += 1
-
-for lineno, level, heading, first in results:
-    indent = "  " * (level - 1)
-    prefix = "#" * level
-    loc = f":{lineno}"
-    if first:
-        print(f"{indent}{prefix} {heading}{loc}  — {first}")
-    else:
-        print(f"{indent}{prefix} {heading}{loc}")
+            }
+        }
+        indent = ""; for (k = 1; k < level; k++) indent = indent "  "
+        prefix = ""; for (k = 1; k <= level; k++) prefix = prefix "#"
+        if (first != "") print indent prefix " " heading ":" i "  — " first
+        else print indent prefix " " heading ":" i
+    }
+}
 '
 
 FOUND=0
 
 while IFS= read -r -d '' file; do
-    output=$(python3 -c "$EXTRACT" < "$file" 2>/dev/null || true)
+    output=$(awk "$EXTRACT" < "$file" 2>/dev/null || true)
 
     if [[ -n "$output" ]]; then
         rel="${file#"$REPO_ROOT"/}"

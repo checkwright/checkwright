@@ -22,7 +22,7 @@ BEGIN="<!-- context-kit:env:begin -->"
 END="<!-- context-kit:env:end -->"
 
 # spec: context-kit/SPEC.md §bin/env-probe — the probe set: the session's own floor plus the kit tools' shared dependency (shellcheck, the gate battery's linter)
-PROBE_SET=(bash git jq awk python3 shellcheck)
+PROBE_SET=(bash git jq awk shellcheck)
 # spec: context-kit/SPEC.md §bin/env-probe — package-manager detection walk; first present wins, ordered widest-family first
 PM_CANDIDATES=(apt-get dnf yum pacman emerge zypper apk brew nix-env)
 

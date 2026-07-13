@@ -12,27 +12,32 @@ if [[ ${#TARGETS[@]} -eq 0 ]]; then
 fi
 
 EXTRACT='
-import sys, re
-pat = re.compile(
-    r"^(\d+):[ \t]*pub(?:\([^)]*\))?[ \t]+(?:async[ \t]+)?"
-    r"(fn|struct|enum|trait|type|const|static|mod)[ \t]+([A-Za-z_]\w*)"
-)
-items = []
-for line in sys.stdin:
-    m = pat.match(line)
-    if m:
-        lineno, kind, name = m.group(1), m.group(2), m.group(3)
-        items.append((kind, name, int(lineno)))
-for kind, name, lineno in sorted(items, key=lambda x: (x[0], x[1])):
-    print(f"  {kind:<8} {name} :{lineno}")
+{
+    line = $0
+    if (! match(line, /^[0-9]+:/)) next
+    lineno = substr(line, 1, RLENGTH - 1)
+    rest = substr(line, RLENGTH + 1)
+    sub(/^[ \t]*/, "", rest)
+    if (rest !~ /^pub([ \t]|\()/) next
+    sub(/^pub(\([^)]*\))?[ \t]+/, "", rest)
+    sub(/^async[ \t]+/, "", rest)
+    if (! match(rest, /^(fn|struct|enum|trait|type|const|static|mod)[ \t]+/)) next
+    kw = substr(rest, 1, RLENGTH); sub(/[ \t]+$/, "", kw)
+    rest = substr(rest, RLENGTH + 1)
+    if (! match(rest, /^[A-Za-z_][A-Za-z0-9_]*/)) next
+    name = substr(rest, 1, RLENGTH)
+    print kw " " name " " lineno
+}
 '
+
+FORMAT='{ printf "  %-8s %s :%s\n", $1, $2, $3 }'
 
 FOUND=0
 
 while IFS= read -r -d '' file; do
     items=$(grep -n -E \
         '^\s*(pub|pub\([^)]*\))\s+(async\s+)?(fn|struct|enum|trait|type|const|static|mod)\s+[A-Za-z_]' \
-        "$file" 2>/dev/null | python3 -c "$EXTRACT" || true)
+        "$file" 2>/dev/null | awk "$EXTRACT" | LC_ALL=C sort -k1,1 -k2,2 | awk "$FORMAT" || true)
 
     if [[ -n "$items" ]]; then
         rel="${file#"$REPO_ROOT"/}"
