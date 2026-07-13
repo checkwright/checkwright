@@ -11,6 +11,12 @@ stateless agent sessions do the writing: every cheap, mechanically-decidable
 consistency axis becomes a gate that blocks the commit, so the human (or agent)
 residue is the irreducibly semantic judgment alone.
 
+The enforcement core carries no harness dependency: the gate battery is bare
+bash, so it runs under any coding-agent harness, any CI, or none. Only the
+always-loaded convention adapts — it rides whichever agent file your harness
+reads, by configuration rather than a port, per the
+[tiered compatibility claim](positioning.md#the-tiered-compatibility-claim).
+
 These pages orient and sequence. They own no contracts — each contract lives in
 the kit that enforces it, and a page here cites downward rather than restating
 an invariant.

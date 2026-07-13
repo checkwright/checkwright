@@ -40,6 +40,20 @@ A gate earns its place only when it is cheap, rarely wrong, and guards a real
 failure mode. A gate that cries wolf trains its readers to bypass it, so a false
 positive is treated as a defect in the gate, not a cost of doing business.
 
+## The enforcement core carries no harness dependency
+
+The part that does the blocking — the gate battery — is bare bash over a
+coreutils toolchain. No gate reads a harness surface, so the enforcement core
+runs under any coding-agent harness, under any CI, or under no harness at all:
+there is no harness dependency in the layer that must be trustworthy. The
+shaping layer — the always-loaded convention the agent reads each session —
+rides whichever agent file your harness already loads (`CLAUDE.md`, `AGENTS.md`,
+or another) by configuration rather than a port, and that path is exercised by a
+shipped smoke, not merely asserted. Only the harness-native skill bindings and
+settings residue are adapter work. The honest, tiered split — what is portable,
+what is configurable, and what stays harness-native — is drawn on
+[Where Checkwright sits](positioning.md#the-tiered-compatibility-claim).
+
 ## Why kits
 
 Checkwright is not a monolith. It is a set of kits, each owning one axis of the
