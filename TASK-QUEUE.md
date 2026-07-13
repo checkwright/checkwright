@@ -142,7 +142,14 @@
   Move the standing content into the stage-session agent definition so a dispatch prompt
   carries only stage-specific context; then audit the first orchestrated iteration's
   dispatched-session transcripts for further re-derivation classes worth the same residency
-  treatment. Surfaced 2026-07-13 running the first lead-orchestrated iteration.
+  treatment. Surfaced 2026-07-13 running the first lead-orchestrated iteration. Extended
+  2026-07-13 (operator ask — one build dispatch vs one per task): the same design owns the
+  dispatch-granularity ruling. Both defaults rejected: whole-queue-in-one rode past every split
+  trigger the delegation protocol names, and one-per-task pays context setup times N while
+  buying no parallelism (committing agents serialize on the shared index regardless). The shape
+  to codify: batch units that share a kit/SPEC surface into one dispatch so derived context is
+  reused where it is actually common, and split where the model tier changes or a split trigger
+  fires — per-batch model tiering is the dominant window lever, not token counts.
 - **usage-snapshot-poller** [needs-spec] — delegation-kit's usage snapshot is produced by the
   statusline hook, so it refreshes only on the lead session's own message flow: a 6.7h
   delegated build ran with zero snapshot updates (trend-log evidence, 2026-07-13), leaving the
