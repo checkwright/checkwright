@@ -4,4 +4,4 @@
 
 ---
 
-— scope 5290ff77 2026-07-14
+docs-coupling-graph-link scope 5290ff77 2026-07-14

@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: docs-coupling-graph-link  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -14,13 +14,18 @@
 
 ## Technical Debt
 
-## Deferred
+- **docs-coupling-graph-link** — surface `docs/check-graph.html` from the Value
+  cluster: a link in `docs/value.md`'s hand prose (outside the rollup marker
+  block) presenting the coupling graph as the third generated projection beside
+  the enforcement map and footprint. Ruled at scope 2026-07-14:
+  `docs/enforcement.md` is out as the carrier — it is emitter-generated, and
+  teaching the kit emitter a consumer artifact path is disproportionate to a
+  see-also; a nav slot stays ruled out (raw HTML; the nav is
+  front-matter-driven, `.md`-only). Debt by the new-names litmus: the artifact
+  is already generated, freshness-gated, and core-files-pinned — the link adds
+  no new name, knob, or contract. Surfaced 2026-07-14 (operator ask).
 
-- **docs-coupling-graph-link** [needs-spec] — surface `docs/check-graph.html` from the Value
-  cluster: a link in `docs/value.md` (and/or `docs/enforcement.md`) prose
-  presenting the coupling graph as the third generated projection beside the
-  enforcement map and footprint; a nav slot is ruled out (generated chrome-less
-  HTML; the nav is front-matter-driven). Surfaced 2026-07-14 (operator ask).
+## Deferred
 
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
