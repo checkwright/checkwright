@@ -25,6 +25,7 @@ check-docs-mirror-fresh
 check-enforcement-fresh
 check-value-rollup-fresh
 check-hook-exec-bit
+check-exec-bit
 check-commit-msg
 check-commit-subject
 check-tree-terms

@@ -135,6 +135,10 @@ if staged_matches 'scripts/git-hooks/*'; then
     run_gate check-hook-exec-bit gate-sdk/checks/check-hook-exec-bit.sh
 fi
 
+if staged_matches 'gate-sdk/checks/*.sh' 'canon-kit/checks/*.sh' 'context-kit/checks/*.sh' 'delegation-kit/checks/*.sh' 'doctrine-kit/checks/*.sh' 'drift-kit/checks/*.sh' 'evidence-kit/checks/*.sh' 'guard-kit/checks/*.sh' 'lifecycle-kit/checks/*.sh' 'queue-kit/checks/*.sh' 'site-kit/checks/*.sh' 'gate-sdk/kpis/*.sh' 'canon-kit/kpis/*.sh' 'context-kit/kpis/*.sh' 'delegation-kit/kpis/*.sh' 'doctrine-kit/kpis/*.sh' 'drift-kit/kpis/*.sh' 'evidence-kit/kpis/*.sh' 'guard-kit/kpis/*.sh' 'lifecycle-kit/kpis/*.sh' 'queue-kit/kpis/*.sh' 'site-kit/kpis/*.sh' 'gate-sdk/bin/*.sh' 'canon-kit/bin/*.sh' 'context-kit/bin/*.sh' 'delegation-kit/bin/*.sh' 'doctrine-kit/bin/*.sh' 'drift-kit/bin/*.sh' 'evidence-kit/bin/*.sh' 'guard-kit/bin/*.sh' 'lifecycle-kit/bin/*.sh' 'queue-kit/bin/*.sh' 'site-kit/bin/*.sh' 'scripts/check-*.sh' 'scripts/kpi-*.sh'; then
+    run_gate check-exec-bit gate-sdk/checks/check-exec-bit.sh
+fi
+
 run_gate check-tree-terms gate-sdk/checks/check-tree-terms.sh
 
 if staged_matches 'scripts/root-allowlist.list'; then

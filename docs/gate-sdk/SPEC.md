@@ -86,7 +86,12 @@ fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
 fresh clone without the operator's private list still commits),
 `GATE_SDK_COMMIT_TYPES` (default
 `feat fix refactor perf docs test build ci chore style`; the shared
-commit-type roster — see §check-commit-subject), and
+commit-type roster — see §check-commit-subject), `GATE_SDK_EXEC_GLOBS`
+(default `*/checks/*.sh */kpis/*.sh */bin/*.sh` plus the computed
+`<gates-dir>/check-*.sh` and `<gates-dir>/kpi-*.sh`; the path globs whose
+tracked `*.sh` members `check-exec-bit` holds to index mode `100755` — see
+there), `GATE_SDK_EXEC_PRUNE` (default `gate-tests fixtures templates smoke`;
+the path segments whose subtrees `check-exec-bit` exempts — see there), and
 `GATE_SDK_ENFORCE_SCAN_DIR` (default `.`; the enforcement map's
 monitor-marker scan root — see §enforcement-map). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
@@ -1053,6 +1058,47 @@ non-repo cwd is fail-closed (exit 2); a hooks dir with no tracked files, or an
 absent hooks dir, is clean (nothing committed to skip). The `# graph:` couples
 the hooks dir at `tier=precommit`, and the whole-tree `run-gates.sh` battery is
 the backstop for a mode-only change no `ACMR` content filter would surface.
+
+### check-exec-bit
+
+Invariant: every tracked `*.sh` path matching an exec-glob carries git *index*
+mode `100755`. The class is by-path-invoked kit scripts — gate-sdk's runner
+(`run-gates.sh`), drift-kit's collator (`drift-report.sh`), and lifecycle-kit's
+entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
+is by-convention path-invocable — so a script committed `100644` degrades
+silently in a fresh clone: a KPI plugin to `n/a (plugin failed)`, a
+runner-invoked preflight to a skipped check. The index is the checked surface
+because it is the mode a clone receives, and a `Write`-tool-authored script
+acquires `100644` there regardless of worktree state; one `git ls-files -s`
+reads it, sidestepping the worktree bit.
+
+The subject class is two knobs (both join §Layout and configuration's roster).
+`GATE_SDK_EXEC_GLOBS` is the space-separated glob set (globs match with `*`
+spanning `/`); its default `*/checks/*.sh */kpis/*.sh */bin/*.sh` plus the
+computed `<gates-dir>/check-*.sh` and `<gates-dir>/kpi-*.sh` covers the per-kit
+exec dirs and the consumer gates dir (consumer gates and KPI plugins resolve
+from the gates dir first, so they are by-path targets too).
+`GATE_SDK_EXEC_PRUNE` (default `gate-tests fixtures templates smoke`) exempts
+subtrees by path segment: fixture trees deliberately carry glob-matching paths,
+and `templates/` members are copied content sourced at their destination, never
+invoked in place. `lib/` needs no prune — sourced libraries match no default
+glob.
+
+Sibling, not overlap, with `check-hook-exec-bit`: that gate asserts the same
+index-mode invariant over the hooks dir, a disjoint target class (hook files
+are not `*.sh`, and no default glob reaches the hooks dir), so both gates
+stand. The honest limit is shared: the gate reads the index, so a mode broken
+only in an uncommitted worktree file is invisible until staged, and the
+whole-tree `run-gates.sh` battery is the backstop for a mode-only change no
+`ACMR` content filter would surface. A non-repo cwd is fail-closed (exit 2).
+
+Argument mode (fixture capability): `check-exec-bit.sh [ls-files-dump]` lints a
+canned `git ls-files -s` dump instead of running `git ls-files -s` from the
+repo root, so a fixture is hermetic against the host repo's index (the
+check-merge-attrs precedent). The `good/`+`bad/` pair runs on the argument
+path; the bespoke `gate-tests/check-exec-bit.test.sh` builds a temp git repo
+and re-stages a KPI at `100644` then `100755`, exercising the live
+`git ls-files` path. Tier `precommit`.
 
 ### check-root-tiering
 

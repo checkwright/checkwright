@@ -1,0 +1,7 @@
+100755 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	alpha-kit/checks/check-alpha.sh
+100755 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	alpha-kit/kpis/kpi-alpha.sh
+100755 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	alpha-kit/bin/tool.sh
+100755 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	scripts/check-consumer.sh
+100644 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	alpha-kit/lib/helper.sh
+100644 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	alpha-kit/gate-tests/check-x/bad/beta-kit/checks/check-beta.sh
+100644 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0	README.md

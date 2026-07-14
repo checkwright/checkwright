@@ -97,6 +97,7 @@ check-readme-roster
 check-core-files
 check-identity
 check-hook-exec-bit
+check-exec-bit
 check-root-tiering
 check-commit-msg
 check-commit-subject

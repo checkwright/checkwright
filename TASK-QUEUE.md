@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **check-plugin-exec-bit** [spec: SPEC-exec-bit.md] — a gate-sdk meta-gate
-  (`check-exec-bit`) asserting index mode `100755` for by-path-invoked kit
-  scripts, so a `100644` KPI plugin no longer degrades silently to
-  `n/a (plugin failed)` (the kpi-overhead instance, 2026-07-11 → 2026-07-14).
-  Scope ruled generalized past KPIs — glob classes over checks/, kpis/, bin/
-  and the consumer gates dir; the four live `100644` bin scripts get `chmod +x`
-  in the same unit. Surfaced 2026-07-14 in multi-operator-semantics close.
 - **metric-dir-split** [spec: SPEC-metric-dir.md] — split the append-only
   measurement trends out of disposable scratch: gitignored `.metric/` (new
   `DRIFT_KIT_METRIC_DIR` knob) holds `overhead-log.txt` +
@@ -102,5 +95,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- check-plugin-exec-bit
 
 ## Lessons Learned
