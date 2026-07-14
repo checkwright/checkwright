@@ -137,7 +137,10 @@ the skill on a blocking verdict — so they are not resident here.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates are governed repo-meta
   (tracked, core-files-pinned); `CONTRIBUTING.md` joins the spec manifest so its
   links/commands resolve like any doc. The fixture is the unit of contribution —
-  edit the guide, not GitHub UI settings, to change what arrives.
+  edit the guide, not GitHub UI settings, to change what arrives. `RELEASING.md`
+  is governed repo-meta likewise (tracked, core-files-pinned, in the spec
+  manifest); the release runbook itself is the load-triggered tier, resident
+  only at a release.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome — the Jekyll layout,
   nav (Liquid over the `nav_order`/`nav_parent` front matter, a page's `nav_id`

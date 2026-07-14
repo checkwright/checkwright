@@ -1,6 +1,7 @@
 # Checkwright
 
 [![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml)
+[![release](https://img.shields.io/github/v/tag/checkwright/checkwright?label=release)](https://github.com/checkwright/checkwright/releases)
 
 A coding-agent-assisted delivery methodology as installable kits: machine-gated
 documentation/spec consistency, an evidence-stamped iteration lifecycle

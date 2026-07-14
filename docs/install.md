@@ -138,10 +138,20 @@ graph projection).
 the release note supplies the intent behind the move. Reconcile the red set and
 you are current.
 
-Release notes are dated posts. Each carries a tightened-gates section and a
-renamed-knobs section — the consumer-owned residue Phase A cannot touch
-(gates you have shadowed, templates you have copied out, knob renames in your
-own config) is that note's checklist.
+Release notes are dated posts under `docs/posts/`. Each carries a
+`release: vX.Y.Z` key in its front matter — the key that resolves a version to
+its note — and two sections under fixed names:
+
+- **Tightened gates** — one bullet per gate that landed new or got stricter, the
+  gate name the bullet's lead token. A mechanical consumer reads these lead
+  tokens as the release's allowed-red set: the gates a clean upgrade may turn
+  red, each named here with the intent behind the move.
+- **Renamed knobs** — one bullet per rename, `old → new`.
+
+"None" is a valid body for either section and must be stated, not omitted — a
+release that tightens nothing says so. This consumer-owned residue Phase A
+cannot touch (gates you have shadowed, templates you have copied out, knob
+renames in your own config) is that note's checklist.
 
 ## Branch protection
 

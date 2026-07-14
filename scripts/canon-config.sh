@@ -20,12 +20,13 @@ CANON_KIT_COMMENT_WHITELIST=(
     ".workflow/validate-evidence.txt"
 )
 
-# comment-tier-exempt: the docs/ site joins the governed manifest set by explicit wiring — this knob replaces the default set, so it enumerates the prior default (CLAUDE.md, README.md at any depth, kit SPEC.md/README.md — single-level globs skip the gate-tests/ fixtures the finder pruned) plus the docs/ living pages, the dated posts, the root contribution surface (CONTRIBUTING.md), and the doctrine deliverable (doctrine-kit/DOCTRINE.md) so its links and commands resolve under the doc gates
+# comment-tier-exempt: the docs/ site joins the governed manifest set by explicit wiring — this knob replaces the default set, so it enumerates the prior default (CLAUDE.md, README.md at any depth, kit SPEC.md/README.md — single-level globs skip the gate-tests/ fixtures the finder pruned) plus the docs/ living pages, the dated posts, the root contribution and release surfaces (CONTRIBUTING.md, RELEASING.md), and the doctrine deliverable (doctrine-kit/DOCTRINE.md) so its links and commands resolve under the doc gates
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_MANIFEST_FILES=(
     "CLAUDE.md"
     "README.md"
     "CONTRIBUTING.md"
+    "RELEASING.md"
     "*/SPEC.md"
     "*/README.md"
     "reserve/*/README.md"
