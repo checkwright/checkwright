@@ -16,6 +16,20 @@
 
 ## Deferred
 
+- **hermetic-kit-test-config** [needs-spec] — kit unit/bespoke tests that run
+  in-tree inherit the consumer's config: kit libs source `<kit>-config.sh`
+  from cwd, so a consumer knob leaks into what should be a kit-defaults test
+  run. Attested instance: check-stage-evidence's bespoke test greened its
+  strict-boundary cases under this repo's freshly-set `iteration` posture
+  until `LIFECYCLE_KIT_CONFIG_FILE` was pinned to an empty file (fixed for
+  that one test in 689cd9c). Unit shape: sweep every kit's bespoke
+  `gate-tests/*.test.sh` for the exposure and pin each; gate shape: a
+  meta-gate asserting a bespoke test pins its kit's `_CONFIG_FILE` knob (or
+  otherwise proves hermeticity against consumer config). Deferral cost: low
+  today — lifecycle-kit is the only kit with a test-relevant knob set in this
+  repo's config — but the class re-arms silently the next time any consumer
+  knob lands here, and the failure mode is a unit test that greens wrongly.
+  Surfaced 2026-07-14 during operational-hygiene build acceptance.
 - **orchestration-headline** [needs-spec] — promote the orchestration story
   to headline positioning: docs/index.md gives orchestration one link-list
   bullet, docs/orchestration.md §What is built reads as a status changelog,
@@ -35,7 +49,10 @@
   class over the trailer block, sibling to check-commit-msg's pattern-file
   mechanism, kept in the gitignored-local pattern list so the public repo ships
   no session-shaped literal (the provenance seam). Surfaced 2026-07-14 during
-  multi-operator-semantics acceptance.
+  multi-operator-semantics acceptance. Promotion signal: two live attested
+  instances during operational-hygiene's build (2026-07-14) — harness-injected
+  session trailers rode into local commits and were caught and rewritten only
+  by manual scan before landing; the manual guard is demonstrably load-bearing.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -64,10 +81,5 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
-
-- check-plugin-exec-bit
-- metric-dir-split
-- release-bump-criteria
-- session-boundary-knob
 
 ## Lessons Learned
