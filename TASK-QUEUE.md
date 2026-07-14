@@ -26,12 +26,6 @@
   citing lifecycle-kit/SPEC.md §Multi-operator semantics downward, and the
   status-changelog section rewritten present-tense. Surfaced 2026-07-14 by
   the operator reviewing the public site.
-- **hermetic-kit-test-config** [spec: SPEC-hermetic-kit-test-config.md] —
-  bespoke `gate-tests/*.test.sh` runs inherit the consumer's cwd-relative
-  kit config and can green wrongly (attested: 689cd9c). A shared
-  test-hermetic bootstrap pins every kit's `_CONFIG_FILE` to an empty file;
-  sweep all 30 tests onto it; meta-gate `check-test-hermetic` enforces the
-  pairing. Surfaced 2026-07-14 during operational-hygiene build acceptance.
 
 ## Technical Debt
 
@@ -84,5 +78,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- hermetic-kit-test-config
 
 ## Lessons Learned

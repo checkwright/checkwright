@@ -1,0 +1,1 @@
+neither source lib/test-hermetic.sh nor

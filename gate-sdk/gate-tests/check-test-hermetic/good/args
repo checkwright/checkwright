@@ -1,0 +1,3 @@
+# Scan this case dir: one test sources the bootstrap, one carries the
+# hermetic-exempt marker — both compliant, so the gate is clean.
+.

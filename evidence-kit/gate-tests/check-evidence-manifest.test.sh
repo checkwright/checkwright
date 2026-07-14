@@ -7,6 +7,7 @@
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
 GATE="$DIR/checks/check-evidence-manifest.sh"
@@ -24,7 +25,7 @@ case_run() {
     printf '%s\n' "$hdr" >"$d/queue.md"
     printf '%b' "$state" >"$d/state.txt"
     [[ -n "$suites" ]] && printf 'EVIDENCE_KIT_SUITES=(%s)\n' "$suites" >"$d/scripts/evidence-config.sh"
-    out="$( cd "$d" && GATE_SDK_GATES_DIR=scripts "$GATE" man.txt queue.md state.txt 2>&1 )"; rc=$?
+    out="$( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" man.txt queue.md state.txt 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL: $name expected exit $want, got $rc: $out"; fails=$((fails + 1)); return
     fi

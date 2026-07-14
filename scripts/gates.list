@@ -9,6 +9,7 @@ check-gate-fail-closed
 check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
+check-test-hermetic
 check-graph
 check-reads-couples
 check-kit-enum

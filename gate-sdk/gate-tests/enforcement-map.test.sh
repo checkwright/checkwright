@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §enforcement-map — degraded-registry coverage the hermetic fixtures cannot reach: each optional registry absent drops exactly its own section, and the gate registry (gate-sdk's core) always remains
 set -uo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$ROOT" || exit 2
@@ -14,7 +15,11 @@ fails=0
 assert_has()    { grep -qF -- "$2" <<<"$3" || { echo "FAIL [$1]: expected present: $2"; fails=$((fails + 1)); }; }
 assert_absent() { grep -qF -- "$2" <<<"$3" && { echo "FAIL [$1]: expected absent: $2"; fails=$((fails + 1)); }; return 0; }
 
-base="$(bash "$EMIT" --emit)"
+# The baseline asserts every real registry projects its section. Evidence
+# routes through EVIDENCE_KIT_CONFIG_FILE, which the hermetic bootstrap pins to
+# an empty file; drop that pin here so the emitter resolves this repo's real
+# evidence-config.sh (the other registries already read their real defaults).
+base="$(env -u EVIDENCE_KIT_CONFIG_FILE bash "$EMIT" --emit)"
 for section in "## Blocking gates" "## Advisory KPIs" "## Guards" "## Session warnings" "## Validate suites" "## Monitors"; do
     assert_has baseline "$section" "$base"
 done

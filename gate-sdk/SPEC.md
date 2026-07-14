@@ -355,7 +355,10 @@ checklist; a kit root lacking `smoke/` is an environment error (exit 2). The
 README item of that checklist carries the register-the-gates block in
 `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
 name-set parity with the kit's shipped `checks/` by `check-readme-roster`
-(§check-readme-roster) — a kit that ships checks registers them.
+(§check-readme-roster) — a kit that ships checks registers them. A new kit's
+bespoke `gate-tests/*.test.sh` sources `lib/test-hermetic.sh`
+(§lib/test-hermetic.sh) — one clause of the same checklist, `check-test-hermetic`
+enforcing it.
 
 - `smoke/install.sh` (required) — run with cwd = scratch-consumer root and env
   `SMOKE_KIT_ROOT` = the vendored copy of the installing kit. The executable
@@ -454,6 +457,26 @@ mechanism, so a second injector adds no second copy of the awk replace logic:
 a gate: exercised end-to-end wherever an installer that rides it runs
 (doctrine-kit and lifecycle-kit `smoke/install.sh`).
 
+### lib/test-hermetic.sh
+
+The bespoke-test hermeticity bootstrap, sourced as the first act of every
+`gate-tests/*.test.sh` (§run-gate-tests, enforced by §check-test-hermetic). It
+derives the kit roster from its own location — the `gate-sdk` and `*-kit`
+subdirectories of gate-sdk's parent, a name-glob that needs no config to
+bootstrap and reaches the kits whose loader lives in `bin/` (context-kit,
+drift-kit) as well as the `lib/` loaders — and for each exports
+`<KIT>_CONFIG_FILE` (name uppercased, `-`→`_`) pointing at one shared empty file
+at `${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.sh`, created idempotently with `: >`:
+fixed path, always empty, so no trap (a test's own `trap … EXIT` stays
+unclobbered) and no growth. The shared *existing* empty file serves both loader
+shapes — the strict shape fails closed (exit 2) on a set-but-missing
+`<KIT>_CONFIG_FILE`, the `${VAR:-default}`-expansion shape skips a missing file
+silently, and an existing empty file is a no-op source for both. Knob-free by
+design: a config-pinning tool cannot itself be configured by the surface it
+pins. A test that must exercise real config overrides after the source (a later
+assignment, or an `env -u <KIT>_CONFIG_FILE` prefix so the loader falls back to
+its cwd-relative default) — ordering wins, no opt-in flag needed.
+
 ### run-gates
 
 Aggregate runner: executes every `gates.list` member in one shot, timing each
@@ -514,9 +537,20 @@ the consumer gates dir, then each vendored kit's `checks/`) with the args in the
 `good/expect.txt` exists, print its substring); `bad/` must exit 1 and print
 `bad/expect.txt`'s substring — a rejection substring is required, so the *right*
 finding fired. Exit 2 from a gate marks the fixture malformed (harness error,
-distinct from logic failure). `<tests-dir>/*.test.sh` unit tests run after the
-pairs; each must exit 0. The runner is a test layer parallel to the gates,
-never a `gates.list` member.
+distinct from logic failure). Fixture-pair hermeticity is the `cd` into the case
+dir: a gate resolving its `<KIT>_CONFIG_FILE` under the cwd finds only the case's
+own files (and a fixture may ship its own cwd-relative config deliberately).
+`<tests-dir>/*.test.sh` unit tests run after the pairs; each must exit 0 — and
+each runs with the **invoker's** cwd (repo root in this repo's battery), so
+absent a pin a gate it drives silently inherits this repo's consumer config. The
+hermeticity contract is therefore explicit: every bespoke test sources
+`lib/test-hermetic.sh` (§lib/test-hermetic.sh) as its first act — pinning every
+kit's `<KIT>_CONFIG_FILE` to one shared empty file so the gate runs on kit
+defaults, not the consumer's posture — with `check-test-hermetic`
+(§check-test-hermetic) enforcing the pairing. A case that deliberately exercises
+config overrides *after* the source (a later assignment, or an `env -u
+<KIT>_CONFIG_FILE` / per-invocation prefix) by ordering. The runner is a test
+layer parallel to the gates, never a `gates.list` member.
 
 ### run-consumer-smoke
 
@@ -677,6 +711,22 @@ side without the other, but not adding an assertion while forgetting *both*
 its marker and the contract. A first paragraph that embeds the literal pattern
 in example prose self-matches — the failure is loud (a false positive forcing
 a reword), never a silent miss, so it is accepted. Requires GNU awk.
+
+### check-test-hermetic
+
+Invariant: every bespoke `gate-tests/*.test.sh` under the configured kit dirs
+either sources `lib/test-hermetic.sh` or carries a `# hermetic-exempt: <reason>`
+marker line. The exposure it closes: `run-gate-tests` runs fixture pairs `cd`'d
+into a case dir (hermetic by construction) but runs the bespoke unit tests with
+the invoker's cwd, so a gate a unit test drives silently inherits the consumer's
+`<KIT>_CONFIG_FILE` resolution — a test can green under the consumer's posture
+rather than kit defaults (attested: 689cd9c). The bootstrap is the fix (one
+shared pin, not one per test §lib/test-hermetic.sh); the marker is the valve for
+a test that establishes hermeticity otherwise (constructing its own cwd). With
+no argument the gate scans each `gate_kit_roots` kit's `gate-tests/`; a
+positional arg scans the named dir(s), the mode the fixture pair drives. Tier
+`precommit`; the `# graph:` couples `kit:gate-tests/*.test.sh` (`dir=one`, a
+one-way audit over the test trees).
 
 ### check-gate-exemption-tasks
 

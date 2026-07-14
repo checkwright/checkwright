@@ -5,6 +5,7 @@
 # gate's git-pathspec exact-or-subtree match with its matching paths passed as
 # args) plus the trigger='*'/plain-glob cases. Run by run-gate-tests.sh.
 set -uo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 RUN="$ROOT/gate-sdk/bin/run-gates.sh"

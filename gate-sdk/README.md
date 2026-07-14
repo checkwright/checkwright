@@ -87,6 +87,7 @@ check-gate-output
 check-gate-fail-closed
 check-gate-fixture-coverage
 check-gate-assertions
+check-test-hermetic
 check-gate-exemption-tasks
 check-graph
 check-reads-couples

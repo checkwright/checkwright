@@ -1,0 +1,3 @@
+# Scan this case dir: its lone test neither sources the bootstrap nor is
+# exempt, so the gate rejects it.
+.

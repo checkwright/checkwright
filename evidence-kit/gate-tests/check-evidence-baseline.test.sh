@@ -6,6 +6,7 @@
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # evidence-kit/
 GATE="$DIR/checks/check-evidence-baseline.sh"
@@ -54,7 +55,7 @@ _perm_cfg() {
     printf 'EVIDENCE_KIT_PERMANENT_SLUGS=(forever)\n' >"$d/scripts/evidence-config.sh"
     printf '# fixture\nu a ignore forever\n' >"$d/base.txt"
     printf '## New Features\n- **unrelated** — x\n' >"$d/queue.md"
-    ( cd "$d" && GATE_SDK_GATES_DIR=scripts "$GATE" base.txt queue.md 2>&1 )
+    ( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" base.txt queue.md 2>&1 )
 }
 if ! out="$(_perm_cfg)" || ! grep -qF "clean" <<<"$out"; then
     echo "  FAIL: permanent-marker not accepted: $out"; fails=$((fails + 1))
@@ -67,7 +68,7 @@ _cov_cfg() {
     printf 'declare -A EVIDENCE_KIT_SCENARIO_GLOBS=([sx]="scen/*.txt")\n' >"$d/scripts/evidence-config.sh"
     : >"$d/scen/a.txt"; : >"$d/scen/b.txt"
     printf '# fixture\nsx a.txt pass\n' >"$d/base.txt"
-    ( cd "$d" && GATE_SDK_GATES_DIR=scripts "$GATE" base.txt 2>&1 )
+    ( cd "$d" && env -u EVIDENCE_KIT_CONFIG_FILE GATE_SDK_GATES_DIR=scripts "$GATE" base.txt 2>&1 )
 }
 if out="$(_cov_cfg)"; then
     echo "  FAIL: coverage gap (extra on-disk scenario) did not redden: $out"; fails=$((fails + 1))
