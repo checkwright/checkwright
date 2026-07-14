@@ -2,16 +2,20 @@
 
 ## What changes
 
-**The exposure (verified this scope).** Every kit lib resolves its consumer
-config as `<KIT>_CONFIG_FILE` env-wins, else `${GATE_SDK_GATES_DIR:-scripts}/
-<kit>-config.sh` **cwd-relative**. `run-gate-tests.sh` runs fixture pairs with
+**The exposure (verified this scope; counts re-verified at align).** Every
+kit lib resolves its consumer config as `<KIT>_CONFIG_FILE` env-wins, else its
+per-kit config basename under `${GATE_SDK_GATES_DIR:-scripts}/`
+**cwd-relative** (`lifecycle-config.sh`, `gate-sdk-config.sh`, … — each kit's
+SPEC owns the name). `run-gate-tests.sh` runs fixture pairs with
 `cd` into the case dir (hermetic by construction — and some fixtures ship
 their own cwd-relative config deliberately), but runs bespoke unit tests
 (`gate-tests/*.test.sh`) with the invoker's cwd — repo root in this repo's
 battery — so every gate invoked inside a unit test silently inherits this
 repo's consumer config. Attested instance: 689cd9c (check-stage-evidence's
 strict-boundary cases greened under the consumer's `iteration` posture).
-17 of 30 bespoke tests carry no pin today.
+15 of 30 bespoke tests carry no pin of any form today; the pins that exist
+are ad hoc — a `_CONFIG_FILE` export, a `GATE_SDK_GATES_DIR` redirect, or a
+top-level `cd` — and each covers only the surface it names.
 
 **Fix: one shared bootstrap, not thirty pins.** New lib
 `gate-sdk/lib/test-hermetic.sh`, sourced as the first act of every bespoke
@@ -25,14 +29,17 @@ strict-boundary cases greened under the consumer's `iteration` posture).
   pointing at one shared empty file, created idempotently at
   `${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.sh` with `: >` — no trap needed
   (a test's own `trap … EXIT` must not be clobbered), no growth (fixed path,
-  always empty), and the file exists because kit libs fail-closed (exit 2)
-  on a set-but-missing `_CONFIG_FILE`.
+  always empty), and the file exists because the strict loader shape
+  (lifecycle-kit's: six of the eleven) fails closed (exit 2) on a
+  set-but-missing `_CONFIG_FILE`; the `${VAR:-default}`-shape loaders
+  (gate-sdk's: the other five) skip a missing file silently per their own
+  SPECs, so the shared existing file gives both shapes the same no-op source.
 - A test that deliberately exercises config behavior overrides *after*
   sourcing — a later assignment or a per-invocation env prefix (the
   check-prose-enum style) wins by ordering. No opt-in flag needed.
 
-Ruled against the two alternatives: **per-test literal pins** (the queue
-entry's shape) pin only the test's own kit, but a gate sources several kits'
+Ruled against the two alternatives: **per-test literal pins** (the original
+filing's shape; the queue entry now carries this ruling) pin only the test's own kit, but a gate sources several kits'
 libs — gate-sdk's, doctrine-kit's, and guard-kit's cwd defaults would stay
 live — and thirty copies of pin boilerplate is maintained duplication;
 **runner-level pinning** would cover only runner-mediated runs, leaving a
@@ -40,7 +47,7 @@ directly-invoked `bash <kit>/gate-tests/x.test.sh` (the dev loop where a
 wrong green misleads a build session) exposed, and offers nothing a gate can
 enforce.
 
-**Sweep.** Every existing bespoke test (30 files across 9 kits) gains the
+**Sweep.** Every existing bespoke test (30 files across 8 kits) gains the
 source line; 689cd9c's ad-hoc `LIFECYCLE_KIT_CONFIG_FILE` pin is replaced by
 it (dedup). Per-case config overrides inside tests are kept — they now
 override a hermetic baseline instead of a leaky one.
