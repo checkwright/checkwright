@@ -626,8 +626,11 @@ decommission, carry-forward, or un-deprecate — the `check-lesson-disposition`
 contract shape at a release boundary. canon-kit's `check-deprecation-task` holds
 each marker bound to a live task between majors; this sweep forces the standing
 inventory to a decision at the boundary the deprecations were promised against.
-The stamp file is operator evidence riding the release commit — the kit wires no
-gate over it (a consumer may), the same `<…>`-placeholder copy-edit shape.
+It carries **named slots** (`inventory-command`, `evidence-gate`), so like the
+stage skills it adopts the binding-shim grammar (§templates/skills/) and
+`check-skill-binding` holds the slot pairing; the stamp file is operator
+evidence riding the release commit — the kit wires no gate over it (a consumer
+may, through `evidence-gate`).
 
 ### templates/lead.md
 
@@ -636,7 +639,7 @@ iteration's stage sessions and answers their escalations, closing the
 restart-cost of a stage that would otherwise stop and surface to the user cold
 (§The state machine). Like `release-sweep.md` it is a **boundary skill, not a
 stage**: it invokes no `enter-stage.sh` and joins no stage set, so
-`check-stage-skill-coverage` never reads it. Unlike release-sweep it carries
+`check-stage-skill-coverage` never reads it. Like release-sweep it carries
 named slots, so it adopts the binding-shim grammar (§templates/skills/) — a
 consumer copies-and-specializes it or binds it through a thin shim, and
 `check-skill-binding` holds the slot pairing either way (this repo's
