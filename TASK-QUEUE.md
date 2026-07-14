@@ -62,7 +62,4 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
 
-- launch-comms
-- upgrade-path
-
 ## Lessons Learned
