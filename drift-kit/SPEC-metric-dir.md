@@ -61,7 +61,9 @@ cannot: writer and reader computing *defaults* independently.
   nothing persistent lives there; a stale resume journal from a closed
   iteration is dead by definition).
 - `scripts/bash-guard.sh`'s `git clean -x/-X` guard message names `.metric/`
-  (the trend logs are now the irreplaceable loss, ahead of resume journals).
+  (the trend logs are now the irreplaceable loss, ahead of resume journals);
+  the guard's `spec:` tag cites CLAUDE.md §Housekeeping and its text rides
+  the same edit.
 
 `DRIFT_KIT_TIMINGS_FILE` (gate timings) **stays** in `DRIFT_KIT_TMP_DIR` —
 regenerated every `run-gates`, a wipe is harmless.
@@ -85,11 +87,16 @@ regenerated every `run-gates`, a wipe is harmless.
 
 - drift-kit/SPEC.md §Layout and configuration — `DRIFT_KIT_METRIC_DIR`
   joins the roster; `DRIFT_KIT_OVERHEAD_LOG`'s stated default changes.
-- drift-kit/SPEC.md §The report skeleton — the export-contract sentence now
-  states the scalar-namespace export.
+- drift-kit/SPEC.md §The KPI plugin contract — the export prose (today only
+  the `DRIFT_KIT_KIT_ROOTS` handoff sentence; the plugins-read-exported-env
+  rule is implicit) gains the scalar-namespace export statement.
+  §The report skeleton carries no export sentence and needs none.
 - drift-kit/SPEC.md §The overhead meter — log-home prose follows the new
   default.
 - drift-kit/README.md — config example mentions the metric dir.
+- delegation-kit/SPEC.md §Layout and configuration — the
+  `DELEGATION_KIT_USAGE_HISTORY` bullet's "This repo sets
+  `.tmp/usage-history.log`" example follows the move to `.metric/`.
 - CLAUDE.md §Housekeeping (consumer prose, above).
 - Docs-mirror regeneration rides the SPEC edits.
 

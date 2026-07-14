@@ -18,7 +18,11 @@ and `guard-kit/bin/scan-prompts.sh` are all tracked `100644` today; their
 **Invariant:** every tracked `*.sh` path matching an exec-glob carries mode
 `100755` in the git index. The index, not the worktree, is asserted — the
 mode that ships in a clone is the index mode, and a `Write`-tool-authored
-script acquires `100644` there regardless of worktree state.
+script acquires `100644` there regardless of worktree state. Sibling, not
+overlap: `check-hook-exec-bit` already asserts this same index-mode invariant
+over the hooks dir — a disjoint target class (hook files are not `*.sh`, and
+no default glob reaches the hooks dir), so both gates stand; the new SPEC
+section cross-cites it.
 
 **Knobs** (join gate-sdk/SPEC.md §Layout and configuration's roster,
 `<KIT>_<KNOB>` shape):
