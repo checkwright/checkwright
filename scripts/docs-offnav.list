@@ -1,7 +1,10 @@
 # Off-nav docs pages — exempt from check-docs-nav-reachable's front-matter floor
 # and reachability walk. One repo-relative path per line; '#' comments.
 # A page belongs here only when it is off-nav by design: an embedded data
-# fragment no link targets, or an immutable dated post rendered front-matter-less
-# through jekyll-optional-front-matter (docs/_config.yml).
+# fragment no link targets, or an immutable dated post — whether rendered
+# front-matter-less through jekyll-optional-front-matter (docs/_config.yml) or
+# carrying its own front matter (a release note's `release:` key) — whose inbound
+# link is external (the GitHub Release), not a nav slot.
 docs/evidence-data.md
 docs/posts/2026-07-09-announcing-checkwright.md
+docs/posts/2026-07-14-checkwright-v0-1-0.md

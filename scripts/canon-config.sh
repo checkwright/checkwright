@@ -13,11 +13,12 @@ CANON_KIT_SCAN_KIT_ROOTS=1
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_TEMPORAL_EXEMPT_SECTIONS=("Out of scope")
 
-# comment-tier-exempt: evidence-kit's baseline + manifest are data files whose leading '#' line is a wire-format contract header, not a source-comment directive or spec pointer — check-evidence-baseline/manifest own their grammar
+# comment-tier-exempt: these .workflow data files carry a leading '#' wire-format/format-doc header, not a source-comment directive or spec pointer — the evidence baseline+manifest (check-evidence-baseline/manifest own their grammar) and the release-sweep evidence (operator disposition log, RELEASING.md step 1; no gate reads it)
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_COMMENT_WHITELIST=(
     ".workflow/validate-baseline.txt"
     ".workflow/validate-evidence.txt"
+    ".workflow/release-sweep-evidence.txt"
 )
 
 # comment-tier-exempt: the docs/ site joins the governed manifest set by explicit wiring — this knob replaces the default set, so it enumerates the prior default (CLAUDE.md, README.md at any depth, kit SPEC.md/README.md — single-level globs skip the gate-tests/ fixtures the finder pruned) plus the docs/ living pages, the dated posts, the root contribution and release surfaces (CONTRIBUTING.md, RELEASING.md), and the doctrine deliverable (doctrine-kit/DOCTRINE.md) so its links and commands resolve under the doc gates
