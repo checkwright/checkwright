@@ -5,3 +5,4 @@
 ---
 
 multi-operator-semantics scope 1b544fc1 2026-07-14
+multi-operator-semantics align a252becf 2026-07-14
