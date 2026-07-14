@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: multi-operator-semantics  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,13 @@
 ---
 
 ## New Features
+
+- **multi-operator-semantics** [spec: SPEC-multi-operator-semantics.md] — the
+  contributor altitude: merge and conflict semantics for the lifecycle's
+  single-writer state surfaces. Branch-per-iteration topology; the
+  iteration-scoped merge class derived from the boundary-truncate set
+  (`.gitattributes` + per-clone driver + a parity gate); the serialized
+  close-merge protocol. Surfaced 2026-07-07; the kits' team-readiness rung.
 
 ## Technical Debt
 
@@ -35,23 +42,6 @@
   FlowBench as prior art. Surfaced 2026-07-08 inside adoption-track; split
   out 2026-07-09 — the self-referential route (drift-trajectory) ships
   first and this rung upgrades the claim only if demand attests it.
-- **multi-operator-semantics** [needs-spec] — the lifecycle's state surfaces
-  assume one operator: WORKFLOW-STATE stamps, the TASK-QUEUE stage header,
-  the per-iteration scratch logs (prompt-friction, knowledge-friction), and
-  the committed baselines all carry single-writer semantics. Define merge and
-  conflict behavior — concurrent stage sessions, branch-per-iteration vs
-  shared master, who may flip the header — before any team pilot; the kits'
-  team-readiness rung. Surfaced 2026-07-07. Boundary note 2026-07-10, the
-  three-altitude split: sub-agents within one session are already ruled
-  (agent-execution's serialize-or-worktree rules, reusable prior art here
-  since a contributor's worktree looks the same to git as an agent's);
-  sessions within one iteration are scope-session-routing; this rung owns
-  the contributor altitude alone — the only one where branch/worktree
-  topology is a design decision, because the state surfaces are
-  single-writer. Fork contributors are out of scope: an outside PR never
-  flips the header or stamps state, it only has to pass the battery in CI
-  (the branch-protection/ruleset story), so multi-operator means a second
-  operator of the methodology, not a drive-by contributor.
 - **hosted-attestation-service** [needs-spec] — the team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
   hosted gate runs as a neutral attestation, cross-repo drift dashboards,
