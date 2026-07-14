@@ -117,9 +117,15 @@ dispatches without invoking the skill carries only the resident pointer.
 ## Resume journal — agent writes, supervisor deletes
 
 A mutating agent `Write`s a running progress journal (findings triaged,
-edits applied, what remains) to the harness session directory (never a
-system temp dir — a restart wipes it), updating as it goes; on success it
-appends a `DONE` marker. Each finding lands in the journal *inline as it is
+edits applied, what remains) to a repo-local gitignored scratch directory
+in the main checkout — never a temporary worktree (a worktree-isolated
+agent's own tree is deleted with the worktree, taking the journal) nor a
+system temp dir (a restart wipes tmpfs). The supervisor names that path
+**absolute into the main checkout** in the dispatch prompt, so a
+worktree-isolated agent writes to the surviving checkout, not its doomed
+tree. Repo-dir-local scratch is reboot-survivable, cheap to clean, and
+predictable across coding agents. The agent updates the journal as it
+goes; on success it appends a `DONE` marker. Each finding lands in the journal *inline as it is
 confirmed* — never "see final output": the agent's return message dies with
 the session, so a pointer-only journal makes `DONE` lie about
 recoverability. Agents have no `rm`; the supervisor deletes the journal at
@@ -127,7 +133,7 @@ the post-commit validation checkpoint. A journal present *without* `DONE`
 means that unit was interrupted — resume from it.
 
 **Caveat — the sandbox may block the journal write.** Background agents
-have been observed unable to `Write` to the session dir, silently falling
+have been observed unable to `Write` to the granted path, silently falling
 back to returning findings in the final message — which defeats the journal
 exactly when it matters (a long, interruptible run). So: for a read-only
 fan-out the return value *is* the contract — no journal; for mutating

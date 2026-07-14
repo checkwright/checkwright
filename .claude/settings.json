@@ -68,6 +68,7 @@
       "Bash(bash evidence-kit/bin/run-validate.sh *)",
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(: > .workflow/knowledge-friction.log)",
+      "Bash(rm .tmp/*)",
       "Bash(git add *)",
       "Bash(git commit -m *)",
       "Bash(git commit -q -m *)",

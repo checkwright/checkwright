@@ -38,9 +38,14 @@ reach-through, not a change to this protocol; every rule below still applies.
   output, so an interrupt loses only the in-flight uncommitted unit and a fresh
   session re-runs the gate to resume.
 - **Resume journal — agent writes, supervisor deletes.** The agent `Write`s a
-  running progress journal (findings triaged, edits applied, what remains) to the
-  harness session directory (never a system temp dir — a restart wipes it),
-  updating it as it goes; on success it appends a `DONE` marker. Each finding is
+  running progress journal (findings triaged, edits applied, what remains) to a
+  repo-local gitignored scratch dir in the main checkout — `.tmp/` here — never a
+  temporary worktree (deleted with the worktree) nor a system temp dir (a restart
+  wipes it); name the path **absolute into the main checkout** in the dispatch
+  prompt so a worktree-isolated agent writes to the surviving tree, not its doomed
+  one. Repo-dir-local scratch is reboot-survivable, cheap to clean, and predictable
+  across coding agents. The agent updates it as it goes; on success it appends a
+  `DONE` marker. Each finding is
   written into the journal *inline as it is confirmed* — never "see final
   output": the agent's return message dies with the session, so a pointer-only
   journal makes `DONE` lie about recoverability. **Agents have no `rm`, so the
@@ -48,7 +53,7 @@ reach-through, not a change to this protocol; every rule below still applies.
   journal still present *without* a `DONE` marker means that unit was
   interrupted — resume from it. **Caveat — a background agent's sandbox may block
   the journal write.** `run_in_background` agents have been observed unable to
-  `Write` to the session dir and silently falling back to returning findings in
+  `Write` to the granted path and silently falling back to returning findings in
   their final message — which makes the journal mechanic non-functional exactly
   when it matters (a long, interruptible run). So: for a **read-only fan-out**
   (audit, survey), the return value *is* the contract — don't rely on a journal.
