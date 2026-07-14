@@ -53,9 +53,10 @@ while IFS= read -r line; do
     [[ "$f1" == "$iter" || ( "$f1" == "—" && "$iter" == "—" ) ]] \
         || errors+=("stamp iteration '$f1' is neither current ('$iter') nor a legal '—' bootstrap (allowed only while the header is unnamed) — stale; /$LIFECYCLE_KIT_FIRST_STAGE truncates at the iteration boundary and renames its bootstrap stamp on naming: $line")
     [[ "$f1" == "$iter" && "$f2" == "$stage" ]] && found=1
-    if [[ "$f1" == "$iter" ]] && lifecycle_stage_known "$f2"; then
+    # spec: lifecycle-kit/SPEC.md §check-stage-evidence — the distinctness map runs only at the 'stage' posture; 'iteration' skips this check alone, attribution still rides the stamps
+    if [[ "$LIFECYCLE_KIT_SESSION_BOUNDARY" == stage && "$f1" == "$iter" ]] && lifecycle_stage_known "$f2"; then
         if [[ -n "${stage_of_sid[$f3]:-}" && "${stage_of_sid[$f3]}" != "$f2" ]]; then
-            errors+=("session id '$f3' is shared by stages '${stage_of_sid[$f3]}' and '$f2' of '$iter' — a stage flip is a context boundary and needs a fresh session (same-stage re-entries may share or rotate freely; waiver stamps are exempt): $line")
+            errors+=("session id '$f3' is shared by stages '${stage_of_sid[$f3]}' and '$f2' of '$iter' — a stage flip is a context boundary and needs a fresh session (same-stage re-entries may share or rotate freely; waiver stamps are exempt; the 'iteration' posture of LIFECYCLE_KIT_SESSION_BOUNDARY relaxes this check): $line")
         else
             stage_of_sid["$f3"]="$f2"
         fi
@@ -70,5 +71,9 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "  help: run /\$stage in this session (it stamps $STATE as its first step), or append the '<iter> <stage> <session> <date>' stamp"
     exit 1
 fi
-echo "STAGE-EVIDENCE: clean ('$iter' / '$stage' stamped; all stamps well-formed, current, and stage-distinct in session id)"
+if [[ "$LIFECYCLE_KIT_SESSION_BOUNDARY" == stage ]]; then
+    echo "STAGE-EVIDENCE: clean ('$iter' / '$stage' stamped; all stamps well-formed, current, and stage-distinct in session id)"
+else
+    echo "STAGE-EVIDENCE: clean ('$iter' / '$stage' stamped; all stamps well-formed and current; cross-stage distinctness relaxed by the 'iteration' session boundary)"
+fi
 exit 0

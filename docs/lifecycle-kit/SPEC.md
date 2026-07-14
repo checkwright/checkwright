@@ -87,8 +87,10 @@ proof of done. The `<session-id>` field is **read, not hand-picked**:
 clear), and the stage skills stamp exactly what it prints, so each stage's
 provenance is observed, not guessed.
 `check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it
-additionally reads the session id to enforce cross-stage distinctness (a stage
-flip must carry a fresh session — see §check-stage-evidence).
+additionally reads the session id to enforce cross-stage distinctness under
+the default `stage` posture (a stage flip must carry a fresh session; the
+`iteration` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` relaxes exactly this —
+see §check-stage-evidence).
 
 **The optional lead never becomes a second state source.** An iteration may run
 with a live *lead* session (§templates/lead.md) that dispatches its stage
@@ -222,6 +224,15 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   `GATE_SDK_WORKFLOW_DIR`.
 - `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1
   of the derivation order (§bin/session-id.sh); default unset.
+- `LIFECYCLE_KIT_SESSION_BOUNDARY` — `stage` or `iteration`; default `stage`.
+  The consumer's session-boundary posture: at `stage`, distinct stages of
+  one iteration may not share a session id (§check-stage-evidence); at
+  `iteration`, that cross-stage distinctness check alone is skipped —
+  attribution still rides the stamps, and every other assertion holds. The
+  loader validates the value alongside its machine checks and exits 2 on
+  anything else. `enter-stage.sh` does not read it — stamping is
+  posture-independent; `templates/lead.md` consumes it as the inline-run
+  posture prose.
 - `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
   file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`,
   read by `check-lesson-disposition` and the boundary-reset built-in.
@@ -509,12 +520,17 @@ stage), date `YYYY-MM-DD`; every data line's iteration must be the current
 one, stale lines from a prior iteration are rejected; and the `—`
 unnamed-iteration sentinel may appear only while the header itself is unnamed.
 It also reads the `<session-id>` field (which it once ignored) for one
-cross-stage invariant: within the current iteration, two *different* stages
-may not share one session id — a stage flip is a context boundary and demands
-a fresh session, so a duplicate (e.g. build == validate) is a self-reported
-skip and fails. Same-stage re-entries (a multi-session build) may share or
-rotate ids freely, and waiver-token stamps are exempt (never a stage, so never
-in the map).
+cross-stage invariant, active at the default `stage` posture of
+`LIFECYCLE_KIT_SESSION_BOUNDARY` (§Layout and configuration): within the
+current iteration, two *different* stages may not share one session id — a
+stage flip is a context boundary and demands a fresh session, so a duplicate
+(e.g. build == validate) is a self-reported skip and fails. Same-stage
+re-entries (a multi-session build) may share or rotate ids freely, and
+waiver-token stamps are exempt (never a stage, so never in the map). At the
+`iteration` posture the gate skips only this distinctness map; stamp grammar,
+staleness, sentinel scoping, and the current-stage coverage stamp hold
+identically, and a reused session id remains on the audit trail — it just
+stops failing the gate.
 
 Calibration: the `—` sentinel is the bootstrap name for a new iteration
 before the first stage names it. Any stage past the first carrying `—` in the
@@ -825,8 +841,10 @@ consumer copies-and-specializes it or binds it through a thin shim, and
 
 The template owns the orchestration protocol whole: the lead model (dispatch a
 stage session as a background agent whose prompt is that stage's ordinary skill
-invocation), the four-header escalation block (Question / Options /
-Recommendation / Evidence), the split-channel design (routine narration to the
+invocation, with the inline-run posture sentence reading
+`LIFECYCLE_KIT_SESSION_BOUNDARY` — inline stage runs banned under `stage`,
+the sanctioned blocked-dispatch fallback under `iteration`), the four-header
+escalation block (Question / Options / Recommendation / Evidence), the split-channel design (routine narration to the
 resume journal, escalations to the message channel), the compact economics —
 the handoff compact plus operator-suggested compacts at the acceptance
 boundaries that pay under the cold-wakes-times-compressible-residue rule —

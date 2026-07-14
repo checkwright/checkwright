@@ -23,6 +23,16 @@ with notification, honor the per-dispatch budget guard, and validate after any
 agent commit. Load `/agent-execution` for the protocol and follow it there — it
 is not restated here.
 
+Whether the lead may ever run a stage *inline* is the consumer's
+session-boundary posture (`LIFECYCLE_KIT_SESSION_BOUNDARY`,
+lifecycle-kit/SPEC.md §Layout and configuration). Under the strict posture
+(`stage`) the lead may never run a stage inline for an iteration it already
+stamped — its session id is spent, and an inline run would be exactly the
+self-reported skip `check-stage-evidence` exists to catch. Under the relaxed
+posture (`iteration`) an inline stage run is the sanctioned fallback when
+dispatch is blocked (e.g. the budget guard), the stamp recording the shared id
+honestly.
+
 ## The escalation protocol
 
 A stage session that hits a question inside its ruling classes ends its turn

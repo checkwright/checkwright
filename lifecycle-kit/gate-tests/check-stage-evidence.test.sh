@@ -79,9 +79,26 @@ case_run "same-stage-multi-session" \
     'demo-iteration scope s1 2026-06-12\ndemo-iteration build s2 2026-06-13\ndemo-iteration build s3 2026-06-14\n' \
     0 "clean"
 
+# H — case F's shared-id input greens under the 'iteration' posture: the knob
+#     skips only the cross-stage distinctness map (attribution still stamps).
+printf '%s\n' '## Iteration: demo-iteration  [stage: build]' >"$tmp/TASK-QUEUE.md"
+printf 'header prose\n---\ndemo-iteration scope s1 2026-06-12\ndemo-iteration build s1 2026-06-13\n' >"$tmp/WORKFLOW-STATE.txt"
+out="$(LIFECYCLE_KIT_SESSION_BOUNDARY=iteration "$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
+if [[ "$rc" -ne 0 ]] || ! grep -qF "clean" <<<"$out"; then
+    echo "  FAIL: shared-session-iteration-posture expected clean exit 0, got $rc: $out"; fails=$((fails + 1))
+fi
+
+# I — a bad posture value must exit 2 (the loader's fail-closed machine check).
+printf '%s\n' '## Iteration: demo-iteration  [stage: build]' >"$tmp/TASK-QUEUE.md"
+printf 'header prose\n---\ndemo-iteration build s1 2026-06-13\n' >"$tmp/WORKFLOW-STATE.txt"
+out="$(LIFECYCLE_KIT_SESSION_BOUNDARY=bogus "$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
+if [[ "$rc" -ne 2 ]] || ! grep -qF "neither 'stage' nor 'iteration'" <<<"$out"; then
+    echo "  FAIL: bogus-posture expected exit 2 with the loader finding, got $rc: $out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-evidence.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages rejected; bootstrap + named later stage + waiver token + multi-session build accepted)"
+echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages + bogus posture rejected; bootstrap + named later stage + waiver token + multi-session build + iteration-posture shared id accepted)"
 exit 0

@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **session-boundary-knob** [spec: SPEC-session-boundary.md] — the
-  fresh-session-per-stage rule becomes consumer posture:
-  `LIFECYCLE_KIT_SESSION_BOUNDARY=stage|iteration` (default `stage`, today's
-  behavior); at `iteration`, check-stage-evidence skips only the cross-stage
-  shared-session-id check (attribution still rides the stamps). lead.md gains
-  the inline-run posture sentence. This repo's own posture is decided when
-  the unit lands (operator leans `iteration`; cost on record in the
-  amendment). Surfaced 2026-07-14 when check-stage-evidence correctly bounced
-  the lead's inline close.
-
 ## Technical Debt
 
 ## Deferred
@@ -78,5 +68,6 @@
 - check-plugin-exec-bit
 - metric-dir-split
 - release-bump-criteria
+- session-boundary-knob
 
 ## Lessons Learned
