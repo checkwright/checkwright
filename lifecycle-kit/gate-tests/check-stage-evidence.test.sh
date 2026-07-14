@@ -16,6 +16,12 @@ fails=0
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
+# Pin the config to an empty file: the cases assert kit defaults + per-case env
+# overrides, and a consumer repo's lifecycle-config.sh sourced from cwd would
+# clobber both (a posture set there overrode cases F and I when run in-tree).
+: >"$tmp/empty-config.sh"
+export LIFECYCLE_KIT_CONFIG_FILE="$tmp/empty-config.sh"
+
 # case <name> <header-line> <stamp-lines> <want-exit> <expect-substring>
 case_run() {
     local name="$1" hdr="$2" stamp="$3" want="$4" expect="$5" out rc
