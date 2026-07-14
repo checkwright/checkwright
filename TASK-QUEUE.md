@@ -54,6 +54,17 @@
 
 ## Deferred
 
+- **orchestration-headline** [needs-spec] — promote the orchestration story
+  to headline positioning: docs/index.md gives orchestration one link-list
+  bullet, docs/orchestration.md §What is built reads as a status changelog,
+  and the multi-operator scenario (branch-per-iteration, the merge-driver
+  set, close-merge serialization) has no site walkthrough — it lives one
+  dense sentence deep, citing lifecycle-kit/SPEC.md §Multi-operator
+  semantics. Unit shape: index/hero framing, a scenario walkthrough citing
+  the SPEC downward, de-changelog the built-vs-roadmap section.
+  Verification-under-delegation is the differentiator adjacent tools lack,
+  and multi-operator semantics is shipped mechanism, not roadmap. Surfaced
+  2026-07-14 by the operator reviewing the public site.
 - **commit-msg-session-trailer-screen** [needs-spec] — screen commit messages
   against harness-injected trailers that reference an internal session: a
   default session-reference trailer can ride into a commit body unnoticed and
