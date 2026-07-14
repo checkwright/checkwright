@@ -37,6 +37,15 @@
 
 ## Deferred
 
+- **releases-nav-children** [needs-spec] — surface each release note as a
+  second-level nav child of the Releases page. Ruled derivation-first: the
+  nav include gains a generic derived-children branch — the parent's front
+  matter names a key (e.g. `nav_children_key: release`) and the children
+  derive from the same `release:` query the page body already runs, newest
+  first — never per-note `nav_parent` stamps (dated posts are immutable, and
+  the releases page itself refuses a maintained index). Verify with the
+  local Jekyll render. Surfaced 2026-07-14 by the operator reviewing the
+  public site.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
