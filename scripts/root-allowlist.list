@@ -11,6 +11,7 @@ CONTRIBUTING.md
 RELEASING.md
 TASK-QUEUE.md
 .gitignore
+.gitattributes
 
 # In-flight spec amendments (canon-kit lifecycle — transient root surface)
 SPEC-*.md
