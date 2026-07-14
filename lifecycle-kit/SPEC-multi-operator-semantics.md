@@ -127,8 +127,10 @@ branch-protection/ruleset story rides **`hosted-attestation-service`**.
   existing knobs).
 - docs/orchestration.md §What is built, and what is roadmap — the
   multi-operator bullet flips from deferred to landed, citing the SPEC
-  section; the queue entry's three-altitude boundary note relocates into
-  the SPEC section (a design ruling leaves the queue).
+  section; the three-altitude boundary note — already relocated out of the
+  queue entry into this amendment's opening paragraph at scope's promotion —
+  reaches the SPEC section by the merge itself (a design ruling leaves the
+  queue).
 - queue-kit/SPEC.md is *not* edited: the queue file's merge behavior is
   ruled here because the header line is lifecycle-kit's governed surface;
   queue-kit's body grammar is untouched. drift-kit/SPEC.md is *not*
