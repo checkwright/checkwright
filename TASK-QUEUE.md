@@ -12,12 +12,7 @@
 
 ## New Features
 
-- **launch-comms** [spec: SPEC-launch-comms.md] — the first release cut
-  (v0.1.0) and the repeatable procedure behind it: RELEASING.md runbook,
-  the release-sweep binding, the release-note post, tag + GitHub Release,
-  README version badge. In-repo residue only; the campaign is operator
-  work in the operator's local brief.
-- **upgrade-path** [spec: SPEC-upgrade-path.md] [blocked-by: launch-comms] —
+- **upgrade-path** [spec: SPEC-upgrade-path.md] —
   the upgrade smoke (gate-sdk, registered as the `upgrade` validate suite)
   proving the two-phase upgrade contract against the newest tag, plus the
   phase-B disposition skill template (lifecycle-kit). The thin installer
@@ -72,5 +67,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- launch-comms
 
 ## Lessons Learned
