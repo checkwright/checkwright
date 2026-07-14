@@ -35,7 +35,10 @@
   semantics). Ruling: the bump floor derives from the release note's two
   sections — both "None" → patch, either non-empty → minor, a decommission →
   major, pre-1.0 breaking rides minors — landing in §Versioning with a
-  `check-release-bump` floor gate in scripts/. Surfaced 2026-07-14 reviewing
+  `check-release-bump` floor gate in scripts/. Also ruled in: a
+  `docs/releases.md` nav-slotted index deriving at render time (Liquid over
+  the `release:` front-matter key) so releases are discoverable on-site with
+  no second post and no new runbook step. Surfaced 2026-07-14 reviewing
   RELEASING.md against the v0.1.0 release.
 - **session-boundary-knob** [spec: SPEC-session-boundary.md] — the
   fresh-session-per-stage rule becomes consumer posture:

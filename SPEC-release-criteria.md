@@ -43,12 +43,34 @@ notes — consumers never do, so this is consumer-gate altitude, no kit
 change), with the standard fixture pair under `scripts/gate-tests/`,
 registered in `gates.list`, tier `precommit`.
 
+**The releases index — discoverability without a second post.** Release
+notes are invisible on the site today (off-nav by design, GitHub Release
+the only inbound), so release cadence — the cheapest liveness signal a
+young project has — never reaches a site visitor. Ruled: a `docs/releases.md`
+page holding a nav slot, whose body is a Liquid loop over site pages
+carrying the `release:` front-matter key (dated post paths sort
+chronologically; render newest first). The index therefore **derives at
+render time from the notes themselves** — no generated artifact, no
+freshness gate, and RELEASING.md step 2 gains no step: a note joins the
+index by carrying the key it already carries. The note stays the single
+home; no per-release announcement post exists (an announcement essay
+remains reserved for releases with a story, and is operator comms, not
+runbook mechanics). The posts stay in `scripts/docs-offnav.list` —
+`check-docs-nav-reachable`'s walk reads sources, not rendered Liquid — with
+the allowlist's comment updated to name the render-time index as an inbound
+beside the GitHub Release.
+
 ## Producers and consumers
 
 - **The criteria prose** — producer: this amendment, merged into
   docs/install.md §Versioning; consumers: the operator cutting a tag
   (RELEASING.md step 3 reads §Versioning by its existing citation) and any
   consumer reading the versioning model.
+- **An index row** — producer: the release-note author, via the `release:`
+  front-matter key RELEASING.md step 2 already requires (no new field);
+  consumers: Jekyll's render of `docs/releases.md` (the Liquid loop) and
+  the site visitor reading it. The nav slot's reader is the existing nav
+  chrome (Liquid over `nav_order` front matter).
 - **The gate** — producer: the pre-commit hook and `run-gates.sh` via the
   `gates.list` registration; consumer: the committing session authoring a
   release note. Reads only existing surfaces (`docs/posts/` front matter
@@ -59,7 +81,13 @@ registered in `gates.list`, tier `precommit`.
 
 - docs/install.md §Versioning — gains the criteria block.
 - RELEASING.md — step 3 gains the half-line "choose the bump by
-  §Versioning's criteria" (a citation, not a restatement).
+  §Versioning's criteria" (a citation, not a restatement); step 2's
+  "off-nav by design, its inbound link the GitHub Release" sentence gains
+  the releases index as the second, render-time inbound.
+- `scripts/docs-offnav.list` — the header comment's description of a dated
+  post's inbound links adds the releases index.
+- CLAUDE.md §Housekeeping's docs-chrome prose is untouched — the index page
+  is an ordinary nav-slotted page under the existing front-matter grammar.
 - Regeneration ride-alongs on landing: pre-commit hook + graph artifact
   (new gate manifest), enforcement map + value rollup (new `tier=`
   registration). docs/install.md is a live docs page, not a mirrored kit
