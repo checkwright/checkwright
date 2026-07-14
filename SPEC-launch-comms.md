@@ -1,7 +1,11 @@
 # SPEC amendment: launch-comms
 
 Governance/release ruling with no owning kit — repo-root placement per
-canon-kit/templates/SPEC-amendment.md. The unit is the first release cut
+canon-kit/templates/SPEC-amendment.md. Cross-component per the 2026-07-14
+align ruling: the unit also touches lifecycle-kit (the release-sweep
+template's named-slot conversion, below) and this repo's
+`.claude/commands/`; this iteration's align stamp covers the audit trigger.
+The unit is the first release cut
 (`v0.1.0`) and the repeatable release procedure behind it. In-repo residue
 only: the campaign itself — channels, venues, timing — is operator work,
 planned in the operator's local brief, never in tracked files.
@@ -10,7 +14,9 @@ planned in the operator's local brief, never in tracked files.
 
 - **`RELEASING.md`** (repo root, new) — the release runbook, governed
   repo-meta like `CONTRIBUTING.md` (tracked, joins the spec manifest so its
-  links and commands resolve). The ordered procedure every release follows:
+  links and commands resolve, and joins the `scripts/core-files.list` pin —
+  the full treatment "like CONTRIBUTING.md" implies). The ordered procedure
+  every release follows:
   1. Run the release-sweep skill (the deprecation disposition walk;
      binding below) — every marker dispositioned before the tag.
   2. Author the release-note post (shape below).
@@ -20,12 +26,20 @@ planned in the operator's local brief, never in tracked files.
      a pointer to it.
   5. Verify the README version badge resolves the new tag.
 - **`.claude/commands/release-sweep.md`** (new) — this repo's binding of
-  lifecycle-kit's `templates/skills/release-sweep.md`. Bindings: the
-  inventory command is the `CANON_KIT_DEPRECATION_MARKERS` roster scan
-  (the same resolution `kpi-deprecated-surface` uses); the evidence path is
-  `.workflow/release-sweep-evidence.txt` (committed, appended one
-  disposition block per release); no gate over the stamp file — demand-gated,
-  wire one only if a release ever ships with the sweep skipped.
+  lifecycle-kit's `templates/skills/release-sweep.md`. Prerequisite this
+  unit owns (the 2026-07-14 align ruling): the template's two `*<…>*`
+  prose placeholders convert to named slots — `inventory-command` (the
+  step-1 inventory) and `evidence-gate` (the step-4 evidence path, gate
+  decision, and reclaim trigger) — adopting the binding-shim grammar
+  `check-skill-binding` holds, and lifecycle-kit/SPEC.md drops its two
+  copy-edit clauses (§templates/skills' release-sweep paragraph;
+  §templates/lead.md's "Unlike release-sweep" contrast). Bindings:
+  `inventory-command` — the `CANON_KIT_DEPRECATION_MARKERS` roster scan
+  (the same resolution `kpi-deprecated-surface` uses); `evidence-gate` —
+  the evidence path is `.workflow/release-sweep-evidence.txt` (committed,
+  appended one disposition block per release); no gate over the stamp
+  file — demand-gated, wire one only if a release ever ships with the
+  sweep skipped.
 - **Release-note post shape** — a release's note is a dated `docs/posts/`
   entry (immutable, temporal-exempt, link/command-resolved like every post)
   carrying front-matter key `release: vX.Y.Z` and the two sections
@@ -36,7 +50,12 @@ planned in the operator's local brief, never in tracked files.
   is **owned by docs/install.md §The upgrade contract** — this unit extends
   that section with the front-matter key and bullet grammar; this amendment
   only names the producer. For `v0.1.0` both sections are "none — first
-  release; the shipped battery is the baseline".
+  release; the shipped battery is the baseline". Nav disposition (the
+  2026-07-14 align completion): each release post joins
+  `scripts/docs-offnav.list` — off-nav by design like every dated post, its
+  inbound link the GitHub Release — and, since a post carrying a `release:`
+  front-matter block is no longer front-matter-less, that list's
+  header-comment rationale widens to cover dated posts with front matter.
 - **README version badge** (per the 2026-07-11 scope ruling, relocated here
   from the queue entry): a release-version badge beside the existing gates
   badge, sourced from the GitHub tag
@@ -81,6 +100,15 @@ planned in the operator's local brief, never in tracked files.
 - **CLAUDE.md §Housekeeping** — `RELEASING.md` joins the governed repo-meta
   line beside `CONTRIBUTING.md` (one clause; the runbook itself is the
   load-triggered tier).
+- **lifecycle-kit/SPEC.md** — the §templates/skills release-sweep paragraph
+  swaps its copy-edit clause for the named-slot binding grammar, and
+  §templates/lead.md drops the "Unlike release-sweep it carries named
+  slots" contrast (both now slotted); the F1 align ruling above.
+- **scripts/core-files.list** — `RELEASING.md` gains a pin line (the
+  repo-meta block beside `CONTRIBUTING.md`).
+- **scripts/docs-offnav.list** — each release post gains a line; the header
+  comment's "rendered front-matter-less" rationale widens to cover dated
+  posts carrying front matter.
 - The queue's deferred entry body (badge ruling, prerequisite chain) is
   absorbed here; the trimmed active entry carries only the residue list.
 
