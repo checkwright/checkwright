@@ -138,6 +138,13 @@ graph projection).
 the release note supplies the intent behind the move. Reconcile the red set and
 you are current.
 
+Two shipped tools carry this contract. [The upgrade smoke](gate-sdk/SPEC.md#upgrade-smoke)
+is its executable proof — it drives both phases against a scratch consumer,
+asserting the phase-A sync is deterministic and the red set stays within the
+target note's declaration. [The upgrade skill](lifecycle-kit/SPEC.md#templatesskills)
+is the phase-B disposition ritual a consumer runs to register the note's newly
+declared gates and disposition each red.
+
 Release notes are dated posts under `docs/posts/`. Each carries a
 `release: vX.Y.Z` key in its front matter — the key that resolves a version to
 its note — and two sections under fixed names:

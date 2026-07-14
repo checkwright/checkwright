@@ -152,6 +152,7 @@ leaves its section absent.
 | [delegation-kit](delegation-kit/index.md) | trend_tests |
 | (consumer) | demo |
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
+| [gate-sdk](gate-sdk/index.md) | upgrade |
 | [context-kit](context-kit/index.md) | agents_md_smoke |
 | [context-kit](context-kit/index.md) | index_tests |
 

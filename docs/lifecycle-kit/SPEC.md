@@ -637,6 +637,27 @@ stage skills it adopts the binding-shim grammar (§templates/skills/) and
 evidence riding the release commit — the kit wires no gate over it (a consumer
 may, through `evidence-gate`).
 
+Beside it sits `upgrade.md` — another **boundary skill**, not a stage: it
+invokes no `enter-stage.sh` and stamps no state, so `check-stage-skill-coverage`
+never reads it. It is the phase-B disposition walk a consumer runs when moving
+their vendored kits from one release to the next — the judgment half of the
+two-phase upgrade contract whose deterministic half (the wholesale kit-sync) and
+whose executable proof both live in gate-sdk (gate-sdk/SPEC.md §upgrade-smoke),
+against the release-note grammar docs/install.md §The upgrade contract owns. Its
+ritual registers the target note's newly-declared gates (a new gate's only
+delivery channel to an upgrading consumer — the phase-A sync never re-runs the
+installer), dispositions each red gate (fix-the-tree or exempt-with-cause, never
+a weakened gate), and closes on the semantic-residual audit: the upgrade is the
+cadence at which a consumer judges the ungateable third of a template-slot change
+— the shim fill that clears both `check-skill-binding` (slot-set drift) and
+`check-shim-restatement` (verbatim copy) yet duplicates what the new slot now
+means to own. It carries named slots (`gates-list`, `disposition-evidence`), so
+like the stage skills it adopts the binding-shim grammar (§templates/skills/) and
+`check-skill-binding` holds the slot pairing when a consumer binds it. This repo
+binds no command for it — the repo is the kit source, never a vendored consumer,
+so it never upgrades itself; the template ships for consumers and the upgrade
+smoke exercises the mechanics it narrates.
+
 ### templates/lead.md
 
 The **iteration lead** template — an optional live session that dispatches an

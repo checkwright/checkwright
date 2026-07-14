@@ -345,7 +345,9 @@ context-kit's `smoke/agents-md.sh` is that second caller: it builds the same
 baseline, then converts the consumer to a nondefault agent file (`AGENTS.md`)
 and asserts the agent-file knobs carry it — an assertion `run-consumer-smoke.sh`
 cannot make, since it fixes the kit defaults under zero config
-(context-kit/SPEC.md §Testing).
+(context-kit/SPEC.md §Testing). `bin/upgrade-smoke.sh` is the third caller: it
+builds the same FROM baseline, then diverges into the two-phase upgrade proof
+(§upgrade-smoke).
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
@@ -524,6 +526,59 @@ full battery is green under zero config, then fires each `smoke/violation.sh`
 and asserts the battery reddens at the named gate before restoring. A `bin/`
 tool, never a `gates.list` member — it is pre-commit-unfit by runtime budget
 and is the proof that the kit defaults hold on a vendored-kit tree.
+
+### upgrade-smoke
+
+The two-phase upgrade proof, `bin/upgrade-smoke.sh` — the third caller of
+`csmoke_vendor_and_install` (§Consumer smoke), reusing the same green baseline
+before it diverges. Where run-consumer-smoke proves a *single* release's
+defaults hold, this proves the *transition* between two: it vendors every kit at
+a **FROM** ref into a scratch consumer, installs and asserts the baseline is
+green (a red FROM baseline is a broken tag — exit 2, not an upgrade finding),
+then replaces the vendored kit directories wholesale at a **TO** ref and
+regenerates the generated artifacts — the contract's consumer phase-A steps
+(docs/install.md §The upgrade contract). It asserts **determinism** (the scratch
+consumer's `git status` shows changes only under the kit roots and the two
+regenerated artifacts — the pre-commit hook and the graph) and then, over the
+phase-B battery, that the **red set is a subset of TO's tightened-gates
+declaration** — the `docs/posts/` note whose front-matter `release:` names TO's
+version, parsed for the bullet lead tokens docs/install.md owns. A new N+1 gate
+is *not* in this consumer's `gates.list` (the phase-A sync never re-runs the
+installer, so it does not run in phase B); the smoke asserts the declaration's
+sufficiency for the gates that *do* run, and the upgrade skill
+(lifecycle-kit/SPEC.md §templates/skills/) is the executor that registers the
+new ones. When TO is unreleased — the `HEAD` default resolving no version — no
+note names it and the red set must be empty: every run is then the standing
+pre-release assertion that the working tree upgrades cleanly from the last tag. A
+red gate absent from the declaration, or a missing/unparseable note while reds
+exist, is a fail (exit 1); usage/environment failure is exit 2 (the gate exit
+convention). A `bin/` tool, not a gate — no `good/`+`bad/` fixture pair is owed;
+the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
+evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
+scratch (accepted as validate-stage cost, never pre-commit).
+
+Knobs — config-via-env in the `<KIT>_<KNOB>` shape, defaults this repo's layout,
+each read exactly once at the resolve step:
+
+- `GATE_SDK_UPGRADE_REPO` — the kit-source git repository (default: the
+  enclosing repo's toplevel). A consumer points it at their checkwright clone;
+  the smoke never touches the network.
+- `GATE_SDK_UPGRADE_FROM` — the FROM ref (default: the source repo's newest
+  `v*` tag; none resolvable is exit 2, not a skip).
+- `GATE_SDK_UPGRADE_TO` — the TO ref (default: `HEAD`).
+- Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees and
+  the consumer are `mktemp`-created under it and trap-removed.
+
+Producers and consumers: the smoke's verdict (exit code + assertion output) is
+produced by the `upgrade` suite each validate stage, or by a consumer invoking
+the script pre-upgrade; it is consumed by the validate session's evidence file
+(this repo) or the operator's go/no-go on a consumer tree. The
+`GATE_SDK_UPGRADE_*` knobs are produced by the invoking environment (defaults
+emitted by the script itself, so the zero-config run works here) and read only
+at the resolve step. The tightened-gates declaration is produced by the release
+session (RELEASING.md) and consumed here (the allowed-red-set parse) and by the
+upgrade skill (the consumer checklist); its grammar owner is docs/install.md
+§The upgrade contract.
 
 ### gen-pre-commit
 

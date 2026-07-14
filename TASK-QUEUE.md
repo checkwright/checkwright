@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **upgrade-path** [spec: SPEC-upgrade-path.md] —
-  the upgrade smoke (gate-sdk, registered as the `upgrade` validate suite)
-  proving the two-phase upgrade contract against the newest tag, plus the
-  phase-B disposition skill template (lifecycle-kit). The thin installer
-  CLI is ruled out demand-gated in the amendment.
-
 ## Technical Debt
 
 ## Deferred
@@ -69,5 +63,6 @@
 ## Done
 
 - launch-comms
+- upgrade-path
 
 ## Lessons Learned
