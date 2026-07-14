@@ -11,6 +11,13 @@ stateless agent sessions do the writing: every cheap, mechanically-decidable
 consistency axis becomes a gate that blocks the commit, so the human (or agent)
 residue is the irreducibly semantic judgment alone.
 
+The differentiator is **verification under delegation**: Checkwright makes
+*done* mechanically decidable, so delegated agent work can be trusted without
+reading all of it. That is the prerequisite for scaling agent
+[orchestration](orchestration.md) past the point where a human reads every hop —
+coordination is only worth parallelizing once each coordinated result is
+checkable.
+
 The enforcement core carries no harness dependency: the gate battery is bare
 bash, so it runs under any coding-agent harness, any CI, or none. Only the
 always-loaded convention adapts — it rides whichever agent file your harness

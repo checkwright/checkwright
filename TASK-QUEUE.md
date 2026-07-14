@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **orchestration-headline** [spec: SPEC-orchestration-headline.md] — promote
-  the orchestration story to headline positioning: index-hero differentiator
-  framing, a multi-operator walkthrough section on docs/orchestration.md
-  citing lifecycle-kit/SPEC.md §Multi-operator semantics downward, and the
-  status-changelog section rewritten present-tense. Surfaced 2026-07-14 by
-  the operator reviewing the public site.
-
 ## Technical Debt
 
 ## Deferred
@@ -73,5 +66,6 @@
 
 - hermetic-kit-test-config
 - commit-msg-session-trailer-screen
+- orchestration-headline
 
 ## Lessons Learned

@@ -49,32 +49,31 @@ downward so the invariant stays in one place.
 Together these make the delegation boundary trustworthy: work crosses it with
 a checkable receipt, not a promise.
 
-## What is built, and what is roadmap
+## Checkwright's own coordination
 
-Checkwright is the verification layer **today** — a facilitator for
-orchestration, and specifically the prerequisite for *unattended* orchestration
-at scale, where no human reads each hop. It is not itself an orchestration
-layer, and this page claims none of that ground.
+Checkwright is a verification layer, not an orchestration layer — the
+prerequisite for *unattended* orchestration at scale, where no human reads each
+hop, and this page claims none of the coordination ground itself. What it does
+carry is a small, checkable amount of its *own* coordination, named in the open:
 
-The honesty is structural, not a disclaimer: Checkwright's own coordination
-rungs are named in the open, and their state is checkable.
+- **The iteration lead** — a live session that dispatches an iteration's stage
+  sessions as background agents and answers their batched escalations, so a
+  blocked stage forwards its question and resumes in place instead of stopping
+  cold. The protocol is owned by `lifecycle-kit/SPEC.md §templates/lead.md`.
+- **Multi-operator semantics** — the contributor altitude: merge and conflict
+  behavior for the lifecycle's single-writer state surfaces. An iteration owns
+  one branch, the iteration-scoped surfaces resolve to the arriving branch at a
+  merge (a derived `merge=iteration-scoped` driver set plus a parity gate), and
+  a close-merge serializes boundaries on the integration branch. Owned by
+  `lifecycle-kit/SPEC.md §Multi-operator semantics`.
 
-- **The iteration lead** — landed. A live session that dispatches an
-  iteration's stage sessions as background agents and answers their batched
-  escalations, so a blocked stage forwards its question and resumes in place
-  instead of stopping cold. The orchestration protocol is owned by
-  `lifecycle-kit/SPEC.md §templates/lead.md`.
-- **Multi-operator semantics** — landed. The contributor altitude — merge and
-  conflict behavior for the lifecycle's single-writer state surfaces: an
-  iteration owns one branch, the iteration-scoped surfaces resolve to the
-  arriving branch at a merge (a derived `merge=iteration-scoped` driver set plus
-  a parity gate), and the close-merge serializes boundaries on the integration
-  branch. Owned by `lifecycle-kit/SPEC.md §Multi-operator semantics`.
-
-Within one iteration that is the extent of Checkwright's own coordination: a
-lead dispatching its own verified stages. Across operators it still
-coordinates nothing — it verifies, so that whatever does the coordinating can
-be trusted to have coordinated correct work.
+Within one iteration that is the extent of it: a lead dispatching its own
+verified stages. Across operators Checkwright still coordinates nothing — it
+verifies, so that whatever does the coordinating can be trusted to have
+coordinated correct work. Where the coordination layer goes next is the roadmap,
+and the roadmap is not narrated here: the queue's Deferred section is that
+surface, checkable in the tree rather than restated on a page that would age the
+moment it was written.
 
 ## Running an iteration under a lead
 
@@ -106,6 +105,48 @@ ordinary skill invocation, consulting the — optionally compacted — scope ses
 when a stage raises a question. The compaction instruction, the escalation
 shape, and the ruling-class boundary are owned by `lifecycle-kit/SPEC.md
 §templates/lead.md`.
+
+## Two operators, one governed tree
+
+A lead drives one iteration. When a second operator wants to work the same repo
+at the same time, the coordination is git topology, not a new mechanism — every
+rule below is owned by `lifecycle-kit/SPEC.md §Multi-operator semantics`, and
+this walkthrough only tells the story.
+
+Picture two iterations live at once — say *surface-trust* and *docs-polish*.
+
+1. **Each iteration owns one branch.** The first operator's iteration lives on
+   its home branch; the second operator cuts a branch at their own `/scope`
+   entry. The integration branch is just the degenerate single-operator home,
+   which is why a solo repo's own dogfooding needs none of this. Every flip and
+   stamp an iteration makes lands on its own branch — the state surfaces stay
+   single-writer even while two operators move.
+2. **Each branch stamps its own state.** `surface-trust`'s stage sessions flip
+   its header and append its evidence on its branch; `docs-polish` does the same
+   on its. Neither reads the other's state, so there is no shared file to race
+   on — operator attribution rides the git author on each flip commit, no new
+   stamp grammar required.
+3. **At a merge, the iteration-scoped surfaces resolve to the arriving side.**
+   When one branch merges into another, the header line, the evidence file, and
+   the other boundary-truncated surfaces take the checked-out iteration's
+   version wholesale — the other side's copy is per-iteration scratch the
+   boundary doctrine already declares dead (git history keeps the audit trail).
+   The set is *derived* from what the iteration boundary already truncates, and
+   mechanized as a `merge=iteration-scoped` driver plus a parity gate, so it
+   never drifts from a hand-maintained list. Shared backlog and lessons in the
+   queue body merge like any prose; only its one header line is resolved by
+   hand — and a wrong resolution reddens at the next commit, because the stage
+   evidence gate demands header↔stamp agreement.
+4. **Closes serialize at the integration branch.** Each operator closes on their
+   own iteration branch, reconciling by merging the integration branch in, where
+   the driver resolves the state surfaces to their arriving iteration; the
+   close-merges land one after another on the integration branch. No lock, no
+   lease — the serialization is the merge order git already imposes.
+
+The through-line: concurrency is isolation git already provides, and
+verification is unchanged on every branch. Whatever an operator's branch merges,
+it merged a tree that passed the battery — so two operators parallelize
+*checked* work, never drift.
 
 ## Where to go next
 
