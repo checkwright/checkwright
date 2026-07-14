@@ -4,4 +4,4 @@
 
 ---
 
-— scope 24bb5686 2026-07-14
+operational-hygiene scope 24bb5686 2026-07-14
