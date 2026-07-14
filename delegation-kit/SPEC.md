@@ -401,8 +401,10 @@ layout as defaults):
   and the stability valve when the unpublished source moves (§The usage.txt
   contract).
 - `DELEGATION_KIT_PAUSE_PCT` — default `80`.
-- `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default the
-  `DELEGATION_KIT_PAUSE_PCT` value (one conservatism policy unless split).
+- `DELEGATION_KIT_PAUSE_PCT_7D` — weekly-axis pause threshold; default `95`,
+  deliberately looser than the 5h axis: a weekly PAUSE is remediated in days,
+  not hours, so pausing at the 5h conservatism would strand a fifth of the
+  week's budget — only the true red zone stops delegation on this axis.
 - `DELEGATION_KIT_STALE_AGE` — default `600` (seconds).
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
 - `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
