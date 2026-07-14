@@ -4,8 +4,4 @@
 
 ---
 
-operational-hygiene scope 24bb5686 2026-07-14
-operational-hygiene align af07d103 2026-07-14
-operational-hygiene build a7098380 2026-07-14
-operational-hygiene validate a561b77f 2026-07-14
-operational-hygiene close a5b2c309 2026-07-14
+— scope 86ebf020 2026-07-14
