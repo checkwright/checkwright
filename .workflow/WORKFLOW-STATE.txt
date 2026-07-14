@@ -5,3 +5,4 @@
 ---
 
 operational-hygiene scope 24bb5686 2026-07-14
+operational-hygiene align af07d103 2026-07-14
