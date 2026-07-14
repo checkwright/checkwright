@@ -247,6 +247,10 @@ if staged_matches 'docs/install.md' 'context-kit/bin/env-probe.sh'; then
     run_gate check-install-toolchain scripts/check-install-toolchain.sh
 fi
 
+if staged_matches 'docs/posts/*.md' 'docs/install.md'; then
+    run_gate check-release-bump scripts/check-release-bump.sh
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     run_gate check-manifest-temporal canon-kit/checks/check-manifest-temporal.sh
 fi

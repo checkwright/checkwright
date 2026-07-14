@@ -58,6 +58,7 @@ check-docs-cname-parity
 check-docs-render-fidelity
 check-docs-cmd
 check-install-toolchain
+check-release-bump
 check-manifest-temporal
 check-manifest-count
 check-prose-enum

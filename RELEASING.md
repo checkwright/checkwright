@@ -26,11 +26,15 @@ links and commands resolve under the doc gates.
    (front-matter key, section names, bullet lead tokens) is owned by
    [docs/install.md](docs/install.md) §The upgrade contract; "none" is a valid
    section body and is stated, never omitted. Add the post's path to
-   `scripts/docs-offnav.list` — off-nav by design, its inbound link the GitHub
-   Release. Launch-adjacent copy uses the reserved phrasing, "the verification
-   layer under agent orchestration".
+   `scripts/docs-offnav.list` — off-nav by design, its inbound links the GitHub
+   Release and the render-time [releases index](docs/releases.md), which the
+   note joins by its `release:` key with no further step. Launch-adjacent copy
+   uses the reserved phrasing, "the verification layer under agent
+   orchestration".
 
-3. **Tag the release commit.** Tag `vX.Y.Z` on the release commit and push it —
+3. **Tag the release commit.** Choose the bump by
+   [docs/install.md](docs/install.md) §Versioning's criteria (the derivable
+   floor is gated by `check-release-bump`). Tag `vX.Y.Z` on the release commit and push it —
    `git tag -a vX.Y.Z` on the commit, then push the tag to the origin. Push
    mechanics for a keyless agent sandbox live in the operator's local ops
    runbook, outside the tree.

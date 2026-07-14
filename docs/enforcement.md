@@ -83,6 +83,7 @@ leaves its section absent.
 | [site-kit](site-kit/index.md) | check-docs-render-fidelity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | (consumer) | check-install-toolchain | precommit |
+| (consumer) | check-release-bump | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-enum | precommit |

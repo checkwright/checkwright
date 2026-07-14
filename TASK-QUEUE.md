@@ -12,17 +12,6 @@
 
 ## New Features
 
-- **release-bump-criteria** [spec: SPEC-release-criteria.md] — no doc states
-  what earns a major, minor, or patch (docs/install.md §Versioning has the
-  line, not the criteria; only the deprecation machinery implies major
-  semantics). Ruling: the bump floor derives from the release note's two
-  sections — both "None" → patch, either non-empty → minor, a decommission →
-  major, pre-1.0 breaking rides minors — landing in §Versioning with a
-  `check-release-bump` floor gate in scripts/. Also ruled in: a
-  `docs/releases.md` nav-slotted index deriving at render time (Liquid over
-  the `release:` front-matter key) so releases are discoverable on-site with
-  no second post and no new runbook step. Surfaced 2026-07-14 reviewing
-  RELEASING.md against the v0.1.0 release.
 - **session-boundary-knob** [spec: SPEC-session-boundary.md] — the
   fresh-session-per-stage rule becomes consumer posture:
   `LIFECYCLE_KIT_SESSION_BOUNDARY=stage|iteration` (default `stage`, today's
@@ -88,5 +77,6 @@
 
 - check-plugin-exec-bit
 - metric-dir-split
+- release-bump-criteria
 
 ## Lessons Learned

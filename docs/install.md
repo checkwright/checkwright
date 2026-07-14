@@ -124,6 +124,30 @@ The repository carries one semver line, applied as git tags, with the kits
 moving in lockstep: a kit earns its own version only if it is ever split out
 for independent adoption. The first tag rides the launch announcement.
 
+What earns each bump derives from the release note itself — its two fixed
+sections (§The upgrade contract below) already declare everything phase B must
+reconcile, so the floor is read off the note rather than maintained beside it:
+
+- **Patch** — both note sections are "None": a phase-A-only sync, fixes and
+  docs that tighten nothing a consumer must reconcile.
+- **Minor** — either section is non-empty: the release carries phase-B work —
+  a new or stricter gate, or a knob rename riding its deprecation path.
+- **Major** — a decommission: a release that *removes* a deprecated surface
+  (a release-sweep disposition executed as decommission), or any change the
+  two-phase upgrade contract cannot reconcile from the note alone. Majors are
+  where the deprecation promises come due — the release-sweep constraint that
+  no marker rides into the next major undispositioned binds here.
+- **Pre-1.0 qualifier** — while the line is 0.x, breaking changes may ride
+  minors (the semver 0.x convention), each still declared in the note;
+  `v1.0.0` is the first stability promise and is cut deliberately, never
+  earned mechanically.
+
+The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
+orders the release notes by version and reds a patch-only bump whose note
+declares tightened gates or renamed knobs. The major criteria stay judgment —
+a decommission is a semantic fact no section grammar carries — so the gate
+holds only the floor.
+
 ## The upgrade contract
 
 An upgrade runs in two phases.

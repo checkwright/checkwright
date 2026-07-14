@@ -3,8 +3,10 @@
 # A page belongs here only when it is off-nav by design: an embedded data
 # fragment no link targets, or an immutable dated post — whether rendered
 # front-matter-less through jekyll-optional-front-matter (docs/_config.yml) or
-# carrying its own front matter (a release note's `release:` key) — whose inbound
-# link is external (the GitHub Release), not a nav slot.
+# carrying its own front matter (a release note's `release:` key) — whose
+# inbound links are the GitHub Release and the render-time releases index
+# (docs/releases.md's Liquid loop over the `release:` key), not a nav slot:
+# the walk reads sources, not rendered Liquid, so the posts stay listed here.
 docs/evidence-data.md
 docs/posts/2026-07-09-announcing-checkwright.md
 docs/posts/2026-07-14-checkwright-v0-1-0.md
