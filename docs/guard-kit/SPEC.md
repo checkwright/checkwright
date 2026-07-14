@@ -271,7 +271,12 @@ ruleset. Two ordering disciplines, attested in production use and kept as
 guidance: a command about to be *blocked* must never first trigger a
 side-effecting rule (place blocks before any reclaim/cleanup rule), and a
 steering rule must precede the broader rule that would catch the same
-command less precisely.
+command less precisely. A third, on the match surface: a substring rule
+sees the entire tool input, heredoc bodies included, so prose that merely
+*names* a guarded command — a `git commit -F -` message describing one —
+false-blocks. Match against a quote-stripped copy of the command (quoted
+spans may then name anything), and keep longer prose out of the match
+surface via a quoted `-m` span or a `-F <file>` the hook never reads.
 
 ## scan-prompts
 
