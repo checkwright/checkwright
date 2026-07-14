@@ -30,3 +30,4 @@
 | docs-coupling-graph-link | s · b v c | 0f/0d | 0 | 19s clean | 69 |
 | session-id-child-flag | s · b v c | 2f/0d | 1 · ≤0d | 19s clean | 69 |
 | first-release | s a b v c | 5f/0d | 2 · ≤0d | 20s clean | 69 |
+| multi-operator-semantics | s a b v c | 2f/0d | 1 · ≤0d | 20s clean | 70 |
