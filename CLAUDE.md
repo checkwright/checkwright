@@ -125,7 +125,11 @@ the skill on a blocking verdict — so they are not resident here.
 
 ## Housekeeping
 
-- `.tmp/` is gitignored (measurements, e.g. gate timings); `.workflow/` is
+- `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
+  journals), wiped at the scope boundary; `.metric/` is gitignored persistent
+  account-bearing measurement trends (overhead + usage logs) — **never
+  committed** (samples carry account UUIDs and session refs; the provenance
+  seam makes the gitignore load-bearing); `.workflow/` is
   committed (checked projections); `BRIEF.local.md` is gitignored (private
   brief); `OPS.local.md` is gitignored (private ops runbook — DNS records
   and the GitHub repo-settings desired state; consult it for domain or

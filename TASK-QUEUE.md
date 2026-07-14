@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **metric-dir-split** [spec: SPEC-metric-dir.md] — split the append-only
-  measurement trends out of disposable scratch: gitignored `.metric/` (new
-  `DRIFT_KIT_METRIC_DIR` knob) holds `overhead-log.txt` +
-  `usage-history.log`; `.tmp/` becomes purely disposable, wiped at the scope
-  boundary. Fixes the attested writer/reader divergence (drift-report's fixed
-  export list omits `DRIFT_KIT_OVERHEAD_LOG`) by exporting the scalar
-  `DRIFT_KIT_*` namespace, with a smoke assertion as the class oracle.
-  **Never commit `.metric/`** — trend samples carry account UUIDs and
-  session refs (the provenance seam makes the gitignore load-bearing).
-  Surfaced 2026-07-14 in multi-operator-semantics close.
 - **release-bump-criteria** [spec: SPEC-release-criteria.md] — no doc states
   what earns a major, minor, or patch (docs/install.md §Versioning has the
   line, not the criteria; only the deprecation machinery implies major
@@ -97,5 +87,6 @@
 ## Done
 
 - check-plugin-exec-bit
+- metric-dir-split
 
 ## Lessons Learned

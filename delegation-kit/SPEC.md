@@ -414,7 +414,9 @@ layout as defaults):
 - `DELEGATION_KIT_STALE_AGE` — default `600` (seconds).
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
 - `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
-  off). This repo sets `.tmp/usage-history.log`, a gitignored measurement.
+  off). This repo sets `.metric/usage-history.log`, a gitignored persistent
+  measurement trend (drift-kit/SPEC.md §Layout and configuration owns the
+  metric-dir retention contract).
 - `DELEGATION_KIT_FAN_WIDTH` — read-only-fan-out width bound; default `2`,
   validated a positive integer by the loader. It bounds read-only fan-outs
   only: a committing fan-out serializes or takes its own worktree regardless

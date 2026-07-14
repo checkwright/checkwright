@@ -16,7 +16,8 @@ fi
 unset _ds_cfg
 
 : "${DRIFT_KIT_TMP_DIR:=${GATE_SDK_TMP_DIR:-.tmp}}"
-: "${DRIFT_KIT_OVERHEAD_LOG:=$DRIFT_KIT_TMP_DIR/overhead-log.txt}"
+: "${DRIFT_KIT_METRIC_DIR:=.metric}"
+: "${DRIFT_KIT_OVERHEAD_LOG:=$DRIFT_KIT_METRIC_DIR/overhead-log.txt}"
 
 sessions_dir() {
     if [[ -n "${DRIFT_KIT_SESSIONS_DIR:-}" ]]; then

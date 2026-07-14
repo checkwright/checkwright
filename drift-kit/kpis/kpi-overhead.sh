@@ -2,8 +2,8 @@
 # spec: drift-kit/SPEC.md §Bundled KPIs — kpi-overhead: governance + gate-output share over the overhead meter's log
 set -uo pipefail
 
-: "${DRIFT_KIT_TMP_DIR:=${GATE_SDK_TMP_DIR:-.tmp}}"
-LOG="${DRIFT_KIT_OVERHEAD_LOG:-$DRIFT_KIT_TMP_DIR/overhead-log.txt}"
+: "${DRIFT_KIT_METRIC_DIR:=.metric}"
+LOG="${DRIFT_KIT_OVERHEAD_LOG:-$DRIFT_KIT_METRIC_DIR/overhead-log.txt}"
 WINDOW=10   # sessions averaged: recent enough to track the trend, wide enough to damp per-session noise
 
 na() { [[ "${1:-}" == "--trend" ]] && exit 0; printf 'lead\toverhead\tn/a (%s)\n' "$2"; exit 0; }

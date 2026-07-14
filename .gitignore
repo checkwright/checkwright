@@ -2,6 +2,10 @@ target/
 node_modules/
 Cargo.lock
 .tmp/
+# persistent account-bearing measurement trends (drift-kit/SPEC.md §Layout and
+# configuration, DRIFT_KIT_METRIC_DIR) — samples carry account UUIDs and session
+# refs, so committing the dir would itself be the leak; never tracked
+.metric/
 # private brief — local companion context (identity, seam, roadmap), never tracked
 BRIEF.local.md
 # private ops runbook — DNS records + GitHub settings desired state, never tracked

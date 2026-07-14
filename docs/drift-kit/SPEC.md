@@ -64,12 +64,19 @@ the report degrades that row to its fail-visible read. Two modes:
 - **`--trend`** — at most one compact `<key> <value>` fragment, or nothing
   (a plugin may opt out of the trend line).
 
-The report exports `DRIFT_KIT_KIT_ROOTS` — newline-separated kit roots,
-`gate_kit_roots` when gate-sdk resolves, else the kit's parent — before
-invoking plugins; a plugin needing sibling-kit surfaces reads it rather than
-re-deriving the roster, and falls back to its own derivation when run
-standalone without it. The driver's handoff, not a consumer knob:
-`drift-report.sh` recomputes it every run.
+Plugins read **exported env only** — a plain assignment in the consumer
+config reaches the collator's shell but never a child plugin. The collator
+closes that gap structurally: before invoking plugins, `drift-report.sh`
+exports every scalar `DRIFT_KIT_*` variable (`compgen` over the namespace;
+arrays skipped — bash cannot export them, and array knobs like
+`DRIFT_KIT_KPI_DIRS` are consumed inside the collator itself), so a config
+override reaches writer and reader alike with no fixed export list to drift
+out of parity. It also exports `DRIFT_KIT_KIT_ROOTS` — newline-separated kit
+roots, `gate_kit_roots` when gate-sdk resolves, else the kit's parent; a
+plugin needing sibling-kit surfaces reads it rather than re-deriving the
+roster, and falls back to its own derivation when run standalone without it.
+The driver's handoff, not a consumer knob: `drift-report.sh` recomputes it
+every run.
 
 Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch;
 a measurement needing state (a baseline, a log) reads a file some
@@ -283,8 +290,9 @@ table crosses no provenance seam. Bytes are not tokens and a line is not a
 message: the only claim this buys is *proportion across sessions of the same
 shape*, and every emitting surface carries that caveat parenthetical. No
 transcript content is written out — the meter emits counts and percentages
-only, and its log lives under the gitignored `DRIFT_KIT_TMP_DIR` (the
-gate-timings precedent), so the private transcript stays private.
+only, and its log lives under the gitignored `DRIFT_KIT_METRIC_DIR` (the
+persistent measurement home — an append-only trend must survive the scratch
+wipes `DRIFT_KIT_TMP_DIR` invites), so the private transcript stays private.
 
 One line is appended per measured session to `DRIFT_KIT_OVERHEAD_LOG`, grammar
 `<date> <session8> total=<bytes> gov=<bytes> gate=<bytes> pct=<n>` where `pct`
@@ -348,7 +356,15 @@ layout as defaults):
 - `DRIFT_KIT_TIMINGS_FILE` — default
   `${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt`.
 - `DRIFT_KIT_TMP_DIR` — plugin scratch root; default
-  `${GATE_SDK_TMP_DIR:-.tmp}`.
+  `${GATE_SDK_TMP_DIR:-.tmp}`. Members are regenerated on every run, so a
+  scratch wipe is harmless.
+- `DRIFT_KIT_METRIC_DIR` — the persistent measurement home, distinct from
+  `DRIFT_KIT_TMP_DIR` by retention contract: metric-dir members are
+  append-only trend logs that survive scratch wipes. Default `.metric`. The
+  dir must be gitignored and never committed — trend samples carry account
+  identifiers and per-session refs, so committing it publishes them (the
+  retention/privacy contract is kit-generic; a consumer's provenance seam
+  makes the gitignore load-bearing).
 - `DRIFT_KIT_SESSIONS_DIR` — the agent transcript directory the overhead
   meter reads for a bare invocation; default
   `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/<cwd-slug>`, where `<cwd-slug>`
@@ -356,8 +372,12 @@ layout as defaults):
   derivation lifecycle-kit's stage stamps already apply; drift-kit re-derives
   with its own knob rather than importing a sibling kit's bin contract).
 - `DRIFT_KIT_OVERHEAD_LOG` — the overhead meter's append log; default
-  `$DRIFT_KIT_TMP_DIR/overhead-log.txt` (gitignored scratch, so the private
-  transcript's derived counts never enter version control).
+  `$DRIFT_KIT_METRIC_DIR/overhead-log.txt` (gitignored, so the private
+  transcript's derived counts never enter version control; the meter
+  `mkdir -p`s the log's dirname). All three resolvers — the meter,
+  `kpi-overhead`, and the collator's namespace export — compute this same
+  default, and the smoke's writer/reader assertion holds them together
+  (§Testing).
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
@@ -394,7 +414,11 @@ that the task line is excluded from governance, that `gate` is a proper subset
 of `gov`, that `pct` is the rounded governance share, and that a re-measure
 replaces the session's line rather than doubling it; kpi-overhead is exercised
 over that log (its two lead rows and the `ovh` trend fragment) and in its
-log-absent degradation. Gate-sdk's `check-shellcheck` lints all kit sources as
+log-absent degradation. The writer/reader-divergence assertion runs meter and
+KPI under one `DRIFT_KIT_METRIC_DIR` override with no explicit
+`DRIFT_KIT_OVERHEAD_LOG` and asserts the reader finds the log the writer
+wrote — the surviving divergence surface the namespace export cannot guard:
+writer and reader computing *defaults* independently. Gate-sdk's `check-shellcheck` lints all kit sources as
 usual.
 
 ## Out of scope

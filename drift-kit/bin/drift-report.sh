@@ -28,12 +28,17 @@ unset _ds_cfg
 : "${DRIFT_KIT_KNOWLEDGE_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/knowledge-friction.log}"
 : "${DRIFT_KIT_TIMINGS_FILE:=${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt}"
 : "${DRIFT_KIT_TMP_DIR:=${GATE_SDK_TMP_DIR:-.tmp}}"
+: "${DRIFT_KIT_METRIC_DIR:=.metric}"
 : "${DRIFT_KIT_DONE_SECTION:=Done}"
 : "${DRIFT_KIT_DEFERRED_SECTION:=Deferred}"
 declare -p DRIFT_KIT_KPI_DIRS >/dev/null 2>&1 || DRIFT_KIT_KPI_DIRS=("${GATE_SDK_GATES_DIR:-scripts}")
 
-export DRIFT_KIT_KPIS_FILE DRIFT_KIT_QUEUE_FILE DRIFT_KIT_KNOWLEDGE_LOG \
-    DRIFT_KIT_TIMINGS_FILE DRIFT_KIT_TMP_DIR DRIFT_KIT_DONE_SECTION DRIFT_KIT_DEFERRED_SECTION
+# spec: drift-kit/SPEC.md §The KPI plugin contract — export every scalar DRIFT_KIT_* (arrays skipped: unexportable, collator-internal), so a config override reaches plugins with no fixed list to drift
+for _dv in $(compgen -v DRIFT_KIT_); do
+    [[ "$(declare -p "$_dv" 2>/dev/null)" == "declare -a"* ]] && continue
+    export "${_dv?}"
+done
+unset _dv
 
 if declare -f gate_kit_roots >/dev/null 2>&1; then
     DRIFT_KIT_KIT_ROOTS="$(gate_kit_roots)"

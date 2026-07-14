@@ -3,7 +3,7 @@
 
 # spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; usage-trend.sh reports the evolution
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
-DELEGATION_KIT_USAGE_HISTORY=".tmp/usage-history.log"
+DELEGATION_KIT_USAGE_HISTORY=".metric/usage-history.log"
 
 # comment-tier-exempt: `*` spans '/' in a bash [[ == ]] glob, so */checks/*.sh reaches every kit's gates
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing

@@ -42,7 +42,10 @@ Vendor the kit beside [gate-sdk](../gate-sdk/), then:
 
 Configuration follows the established kit pattern — override any knob in
 `drift-config.sh` (registry path, extra KPI dirs, the queue/log/timings surfaces,
-the Done/Deferred section headings); defaults are this repo's layout.
+the metric dir holding the persistent trend logs, the Done/Deferred section
+headings); defaults are this repo's layout. Keep the metric dir
+(`DRIFT_KIT_METRIC_DIR`; drift-kit/SPEC.md §Layout and configuration owns the
+default) gitignored — its trend samples carry account and session identifiers.
 
 ### The knowledge-friction loop (optional)
 

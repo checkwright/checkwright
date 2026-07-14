@@ -127,3 +127,17 @@ kna="$(DRIFT_KIT_OVERHEAD_LOG="$work/no-such-overhead.txt" bash "$SMOKE_KIT_ROOT
 set -e
 [[ "$knrc" -eq 0 ]] || fail "kpi-overhead (log absent) exited $knrc"
 grep -q 'n/a' <<<"$kna" || fail "kpi-overhead did not degrade to a visible n/a row without a log"
+
+# spec: drift-kit/SPEC.md §Testing — the writer/reader-divergence assertion: under one
+# DRIFT_KIT_METRIC_DIR override (no explicit OVERHEAD_LOG), writer and reader must
+# compute the same default log path, or a default drift splits them silently.
+mdir="$work/metric"
+DRIFT_KIT_METRIC_DIR="$mdir" bash "$SMOKE_KIT_ROOT/bin/overhead-meter.sh" "$fixture" >/dev/null \
+    || fail "overhead-meter failed under a DRIFT_KIT_METRIC_DIR-only override"
+[[ -s "$mdir/overhead-log.txt" ]] || fail "writer did not resolve DRIFT_KIT_METRIC_DIR into its default log path"
+set +e
+kmd="$(DRIFT_KIT_METRIC_DIR="$mdir" bash "$SMOKE_KIT_ROOT/kpis/kpi-overhead.sh")"; kmrc=$?
+set -e
+[[ "$kmrc" -eq 0 ]] || fail "kpi-overhead exited $kmrc under the shared DRIFT_KIT_METRIC_DIR override"
+if grep -q 'n/a' <<<"$kmd"; then fail "writer/reader default divergence: reader missed the log the writer wrote under one DRIFT_KIT_METRIC_DIR override"; fi
+[[ "$(grep -c '^lead' <<<"$kmd")" -eq 2 ]] || fail "kpi-overhead did not read the metric-dir log the meter wrote"

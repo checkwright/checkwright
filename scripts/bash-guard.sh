@@ -18,9 +18,9 @@ case " $cmd_unquoted " in
         guard_block "a hook bypass (--no-verify/-n) is a one-off with cause, never auto-allowed — fix the red gate instead, or run the bypass yourself with !<command> so the cause is on record."
         ;;
 esac
-# spec: CLAUDE.md §Housekeeping — .tmp/ is gitignored scratch holding crash-recovery resume journals; git clean -x/-X wipes it, so steer to the !<command> escape rather than let the destructive form auto-run
+# spec: CLAUDE.md §Housekeeping — .metric/ is gitignored persistent measurement trends and .tmp/ crash-recovery scratch; git clean -x/-X wipes both, so steer to the !<command> escape rather than let the destructive form auto-run
 if [[ " $cmd_unquoted " == *" git clean "* && " $cmd_unquoted " =~ [[:space:]]-[A-Za-z]*[xX] ]]; then
-    guard_block "git clean -x/-X wipes gitignored scratch — including crash-recovery resume journals under .tmp/. If you mean to discard them, run it yourself with !<command> so the intent is on record."
+    guard_block "git clean -x/-X wipes gitignored state — the irreplaceable measurement trends under .metric/ and crash-recovery resume journals under .tmp/. If you mean to discard them, run it yourself with !<command> so the intent is on record."
 fi
 guard_generic_rules "$cmd"
 guard_log_fallthrough "$cmd"
