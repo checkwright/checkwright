@@ -37,6 +37,16 @@
 
 ## Deferred
 
+- **strict-config-loader-shape** [needs-spec] — the eleven kit config
+  loaders split into two shapes: six fail closed (exit 2) on a set-but-missing
+  `<KIT>_CONFIG_FILE`, five (`${VAR:-default}` expansion) skip it silently —
+  an operator typo in the env var silently runs kit defaults, the same
+  silent-wrong-config class the hermetic bootstrap kills inside tests.
+  Unify the five lenient loaders on the strict shape; the unset-default
+  path stays skip-if-absent for zero-config consumers. Each shape is
+  documented in its own SPEC today (divergence, not undocumented drift), so
+  the SPEC lines move with the code. Surfaced 2026-07-14 by surface-trust's
+  align audit.
 - **releases-nav-children** [needs-spec] — surface each release note as a
   second-level nav child of the Releases page. Ruled derivation-first: the
   nav include gains a generic derived-children branch — the parent's front
