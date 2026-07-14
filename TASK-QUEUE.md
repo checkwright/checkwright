@@ -29,6 +29,14 @@
   **Never commit `.metric/`** — trend samples carry account UUIDs and
   session refs (the provenance seam makes the gitignore load-bearing).
   Surfaced 2026-07-14 in multi-operator-semantics close.
+- **release-bump-criteria** [spec: SPEC-release-criteria.md] — no doc states
+  what earns a major, minor, or patch (docs/install.md §Versioning has the
+  line, not the criteria; only the deprecation machinery implies major
+  semantics). Ruling: the bump floor derives from the release note's two
+  sections — both "None" → patch, either non-empty → minor, a decommission →
+  major, pre-1.0 breaking rides minors — landing in §Versioning with a
+  `check-release-bump` floor gate in scripts/. Surfaced 2026-07-14 reviewing
+  RELEASING.md against the v0.1.0 release.
 - **session-boundary-knob** [spec: SPEC-session-boundary.md] — the
   fresh-session-per-stage rule becomes consumer posture:
   `LIFECYCLE_KIT_SESSION_BOUNDARY=stage|iteration` (default `stage`, today's
