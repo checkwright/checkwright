@@ -1192,7 +1192,14 @@ fresh clone without the operator's private list still commits). Each file is
 `grep -E` one-pattern-per-line, `#` comments and blanks ignored; the kit ships
 `templates/msg-patterns.list` with the generic defaults (absolute home paths,
 the Claude Code promo URL — the marketing link that ends a generated PR body,
-never the `Co-Authored-By` trailer). A no-argument run (the whole-tree battery)
+never the `Co-Authored-By` trailer — and the session-reference class: the
+session-share URL host and a trailer-shaped `Key: ` line carrying a full UUID,
+the shape of a harness-injected session-id trailer. Both are generic mechanism —
+a public host and a shape, no private term — so they ship tracked, not local. The
+UUID half is anchored to a trailer-shaped line so the shared pattern set (also
+read by check-tree-terms §check-tree-terms) matches an injected footer, never the
+synthetic session UUIDs the tracked `smoke/` trees legitimately carry). A
+no-argument run (the whole-tree battery)
 is a clean skip: the message is not a tracked surface and the history-scan
 backstop is deferred to the hosted-attestation rung. A missing message-file
 argument-with-value, or a missing required tracked pattern file, is fail-closed

@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **commit-msg-session-trailer-screen** [spec: SPEC-commit-msg-session-trailer-screen.md]
-  — screen commit messages against harness-injected session-reference
-  trailers before they publish a private reference into public history. The
-  class ships as tracked generic patterns (a scope-stage seam correction of
-  the local-only filing; the amendment owns the ruling and the shared-source
-  anchoring constraint). Surfaced 2026-07-14 during multi-operator-semantics
-  acceptance; promotion signal: two live attested instances during
-  operational-hygiene's build, caught only by manual scan.
 - **orchestration-headline** [spec: SPEC-orchestration-headline.md] — promote
   the orchestration story to headline positioning: index-hero differentiator
   framing, a multi-operator walkthrough section on docs/orchestration.md
@@ -80,5 +72,6 @@
 ## Done
 
 - hermetic-kit-test-config
+- commit-msg-session-trailer-screen
 
 ## Lessons Learned

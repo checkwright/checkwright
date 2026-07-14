@@ -10,3 +10,12 @@
 # The Claude Code promo URL — the marketing link that ends a generated PR body.
 # The Co-Authored-By trailer is a footer convention, not a leak: do not ban it.
 claude\.com/claude-code
+
+# Session-reference class — a harness-injected trailer referencing an internal
+# session, before it lands in public history. The session-share URL host (public
+# software's public domain, so a shape not a private term); and a trailer-shaped
+# 'Key: ' line carrying a full UUID — the session-id trailer shape whatever key
+# the harness uses. The UUID half is trailer-anchored so it matches an injected
+# footer, never the synthetic session UUIDs check-tree-terms scans in smoke/.
+claude\.ai/
+^[A-Za-z][A-Za-z-]*: .*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}

@@ -1,3 +1,5 @@
-fix: correct the path resolver
+feat(widget): tighten the resize path
 
-Reproduced against a checkout under /home/alice/work before the fix landed.
+Adjust the debounce so a fast drag coalesces into one layout pass.
+
+Session-Id: 3f2504e0-4f89-41d3-9a0c-0305e82c3301
