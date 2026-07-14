@@ -1,0 +1,4 @@
+# lifecycle-kit:merge:begin
+.workflow/WORKFLOW-STATE.txt merge=iteration-scoped
+.workflow/lesson-evidence.txt merge=iteration-scoped
+# lifecycle-kit:merge:end

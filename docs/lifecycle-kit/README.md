@@ -42,6 +42,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-stage-skill-coverage   # skill-shim trio: needs the skills dir (step 3)
    check-skill-binding
    check-shim-restatement
+   check-merge-attrs            # multi-operator: needs the .gitattributes step (step 4)
    ```
    <!-- gate-roster:end -->
 
@@ -81,7 +82,13 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    invocations, the SPEC link) into `LIFECYCLE_KIT_AGENT_FILE` (default
    `CLAUDE.md`), the roster derived from your config so a reshape (step 5)
    flows in on a re-run. `check-lifecycle-registration` (step 1) holds the
-   block in lockstep.
+   block in lockstep. The same run also writes the iteration-scoped
+   `merge=iteration-scoped` attribute block into `.gitattributes` (the
+   per-iteration state surfaces resolve to the arriving branch at a merge —
+   SPEC.md §Multi-operator semantics) and registers the keep-ours driver in
+   your clone's git config (per-clone, the `install-hooks.sh` opt-in class).
+   `check-merge-attrs` (step 1) holds the attribute block in parity with the
+   derived supersede set.
 
 5. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,

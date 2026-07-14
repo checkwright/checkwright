@@ -173,6 +173,10 @@ if staged_matches 'TASK-QUEUE.md' '.workflow/lesson-evidence.txt'; then
     run_gate check-lesson-disposition lifecycle-kit/checks/check-lesson-disposition.sh
 fi
 
+if staged_matches '.gitattributes' 'lifecycle-kit/lib/stages.sh'; then
+    run_gate check-merge-attrs lifecycle-kit/checks/check-merge-attrs.sh
+fi
+
 if staged_matches 'TASK-QUEUE.md'; then
     run_gate check-queue-sections queue-kit/checks/check-queue-sections.sh
 fi

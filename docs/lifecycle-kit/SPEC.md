@@ -35,6 +35,14 @@ Two governed surfaces:
   <iteration> <stage> <session-id> <YYYY-MM-DD>
   ```
 
+Both surfaces are **single-writer and branch-scoped**: an iteration owns exactly
+one branch (its home branch) and every flip and stamp lands there, so
+concurrency between operators is git branch topology, not a multi-writer state
+file. The integration branch is the degenerate single-operator home; a second
+concurrent operator cuts a branch at their scope entry. The merge semantics that
+make this safe — the iteration-scoped surfaces resolve to the arriving branch at
+a merge — are §Multi-operator semantics.
+
 The default motion is the linear stage walk; the gate-legal shapes for leaving
 it — abandon, split, reopen — are specified in §Deviation transitions, not
 improvised.
@@ -141,6 +149,17 @@ is a successor iteration: a post-close defect files as a debt entry and the
 follow-up iteration proceeds normally; the closed iteration's record stays
 immutable.
 
+**The close-merge** is the concurrent-close shape, and like the others it
+composes existing mechanism (the merge-supersede rule of §Multi-operator
+semantics, not new tooling). Iteration boundaries serialize on the integration
+branch: the closing operator reconciles *on their iteration branch* — merges the
+integration branch in, where the `merge=iteration-scoped` driver resolves the
+iteration-scoped surfaces to their own (arriving) side and humans resolve the
+content conflicts — re-runs the full battery green, then lands
+fast-forward-only on the integration branch. The integration branch never hosts
+a conflict resolution, so "arriving iteration" is always well-defined (ours on
+the iteration branch) and every merged tree passed the battery post-reconcile.
+
 ## Layout and configuration
 
 The kit is vendored beside gate-sdk (conventionally at `lifecycle-kit/`); its
@@ -215,6 +234,86 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
 - `LIFECYCLE_KIT_SHIM_DEDUP_CORPUS` — that gate's corpus file list; default
   empty for the computed `CLAUDE.md`-plus-kit-templates default.
 
+`.gitattributes` (repo root) is a consumer surface the kit writes but adds **no
+knob** for: the `merge=iteration-scoped` supersede set derives from the existing
+boundary-truncate knobs (`LIFECYCLE_KIT_STATE_FILE`,
+`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
+member), so a reshaped truncate set flows into the attribute block by
+construction — §Multi-operator semantics, §bin/install-lifecycle.sh.
+
+## Multi-operator semantics
+
+The contributor altitude of the coordination map: a second operator running
+their own concurrent iteration on the same repo. The two narrower altitudes are
+ruled elsewhere and stay untouched — sub-agents within one session
+(delegation-kit's serialize-or-worktree rules) and sessions within one iteration
+(§templates/lead.md: one live iteration, stages serialized through the flip+stamp
+protocol). Fork contributors are out of scope: an outside PR never flips the
+header or stamps state — it only passes the battery in CI.
+
+**The topology ruling — state surfaces stay single-writer; concurrency is git
+topology.** The header line, the evidence file, and every boundary-truncated
+surface are *iteration-scoped*: an iteration owns exactly one branch (its home
+branch), and every flip and stamp lands there. One live iteration per branch —
+the second concurrent operator cuts a branch at their scope entry; the
+integration branch is the degenerate single-operator home, which is why a
+single-operator repo's own dogfood changes nothing. Branch naming is prose
+guidance (name the branch after the iteration), not mechanism — no knob, no
+gate. Ruled out, each because it composes worse than git already does: per-operator
+state files or stamp-attribution fields (multi-writer surfaces and a new stamp
+grammar — operator attribution already rides the git author on every flip
+commit); a lock or lease on the integration branch (state the kit refuses to
+own, where git already provides the isolation).
+
+**The merge-supersede rule.** At any branch merge, the iteration-scoped surfaces
+resolve wholesale to the *arriving* (checked-out) iteration's version — the other
+side's content is per-iteration scratch the boundary doctrine already declares
+dead (git history is the permanent audit trail). The supersede set is **derived,
+never maintained**: it is exactly what `bin/enter-stage.sh` truncates at the
+iteration boundary — `LIFECYCLE_KIT_STATE_FILE`,
+`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
+members — rendered by `lifecycle_supersede_set` (§lib/stages.sh). The queue file
+is deliberately *not* in the set: its body (backlog sections, lessons) is shared
+content that merges like any prose, and only its header line is iteration-scoped
+— resolved by hand to the arriving iteration, with a wrong resolution going red
+at the next commit because `check-stage-evidence` requires header↔stamp
+agreement and the state file already took the arriving side by driver.
+Held-constant baselines and append-across-iterations evidence keep normal merge
+semantics: their conflicts are real disagreements. A consumer with a *tracked*
+shared append log points it at git's built-in `union` driver themselves —
+sanctioned shape, no kit mechanism. (Gitignored per-checkout scratch — friction
+logs — never merges and needs no rule.)
+
+**`.gitattributes` — the rule mechanized.** Each supersede-set path carries
+`merge=iteration-scoped`; the driver definition (`git config
+merge.iteration-scoped.driver true` — keep ours) is per-clone config installed by
+`bin/install-lifecycle.sh` beside its registration block (the `install-hooks.sh`
+opt-in class). Honest limit: on a clone without the driver installed the
+attribute is inert and the file conflicts normally — the rule above then governs
+the hand resolution, so the uninstalled path degrades to judgment, never to
+silence. Writer/asserter split: the installer emits the attribute block
+(marker-bounded, `lib/inject.sh`), `check-merge-attrs` verifies it — the
+`gen-pre-commit.sh` ↔ `check-graph` precedent.
+
+**Who may flip, at this altitude.** Unchanged: the arriving stage session flips,
+and only on its own iteration's home branch. A session never flips a branch whose
+iteration it is not driving; cross-iteration discoveries (a lesson, a deferred
+filing) land on the discoverer's own branch and reconcile at merge.
+
+**Causal-completeness core: no new state surface.** The design adds no stamp
+grammar, no queue tag, no evidence file. Every existing producer/consumer pair
+(`enter-stage.sh`, the stage gates, the drift report) keeps working per-branch
+unmodified. The two added surfaces each have a named reader at a named
+transition: the `merge=iteration-scoped` lines are read by git's merge machinery
+at a merge and by `check-merge-attrs` at pre-commit; the `merge.iteration-scoped`
+driver config is read by git's merge machinery when an attributed path needs a
+three-way merge (not readable by a pre-commit gate — per-clone state, its absence
+the recorded honest limit above). The close-merge protocol (§Deviation
+transitions) is produced by the closing operator's close session and consumed by
+the integration branch's battery — the reconcile commit re-fires every
+queue/state-coupled gate, which is what makes the header hand-resolution
+enforceable.
+
 ## Per-component contracts
 
 ### lib/stages.sh
@@ -227,7 +326,14 @@ then validation. Also owns the shared header adapters
 a shared adapter removes that drift axis — and `lifecycle_registration_block`,
 which renders the resident registration block (§bin/install-lifecycle.sh) from the
 live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
-derive one text and cannot drift. Values and adapters only, never
+derive one text and cannot drift. Two more renderers follow the same
+writer/asserter shape for the merge-attribute surface: `lifecycle_supersede_set`
+prints the derived iteration-scoped supersede set (the state file, the kit-owned
+lesson-evidence file, and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member — exactly
+what `bin/enter-stage.sh` truncates at the boundary), and
+`lifecycle_merge_attrs_block` renders it as the `<path> merge=iteration-scoped`
+lines, so `bin/install-lifecycle.sh` (writer) and `check-merge-attrs` (asserter)
+read one set (§Multi-operator semantics). Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
 
 ### bin/session-id.sh
@@ -344,8 +450,22 @@ markdown link to the kit SPEC — never stage prose, and never a hand-listed
 roster, so a consumer's reshaped stage set flows into the block by
 construction. The installer and `check-lifecycle-registration` share that one
 renderer, so the emitted block and the block the gate certifies cannot
-diverge. Advisory tooling, not a gate: no fixture pair is owed; it is
-exercised end-to-end in `smoke/install.sh`.
+diverge.
+
+The same run performs two further steps for the multi-operator merge surface
+(§Multi-operator semantics). **The merge-attribute step** injects a
+marker-bounded block (`# lifecycle-kit:merge:begin` … `# lifecycle-kit:merge:end`,
+`inject_marker_block` again) into `.gitattributes` (repo root) rendered from
+`lifecycle_merge_attrs_block`, so a reshaped supersede set flows into the
+attribute lines by construction and `check-merge-attrs` certifies the same
+rendering. Unlike the agent file, the installer legitimately **mints
+`.gitattributes` when absent** (it is not an always-loaded file the consumer
+authored). **The driver-config step** registers the keep-ours driver — `git
+config merge.iteration-scoped.driver true` — per-clone (the `install-hooks.sh`
+opt-in class); a non-repo cwd degrades to a printed skip, never a hard failure,
+leaving the `.gitattributes` attribute inert until a clone installs the driver.
+Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
+end-to-end in `smoke/install.sh`.
 
 ### check-lifecycle-registration
 
@@ -560,6 +680,38 @@ precedent); `gate-tests/check-lesson-disposition.test.sh` covers the malformed
 grammar, still-present-not-removed, and prefix-join cases the one pair cannot.
 The `# graph:` couples the queue file and the evidence file at
 `tier=precommit`.
+
+### check-merge-attrs
+
+Invariant: bidirectional set-parity between the derived iteration-scoped
+supersede set (`lifecycle_supersede_set`, §lib/stages.sh) and the paths carrying
+`merge=iteration-scoped` in the consumer's `.gitattributes` (default
+`.gitattributes`; override with the first argument). The forward direction — a
+supersede-set path with no `merge=iteration-scoped` line — catches an
+unmechanized rule (a merge would silently take the wrong side on that surface).
+The reverse direction is the safety edge: a `merge=iteration-scoped` attribute on
+a path *outside* the derived set silently discards merge content on a real
+surface, so a smuggled line is red, not config. The gate scans every
+`merge=iteration-scoped` line in the file — inside the installer's marker block
+or not — so the reverse edge holds against a hand-added line anywhere. A missing
+`.gitattributes` reports every derived surface as unmechanized (exit 1, the
+install remedy); an unreadable one, or an empty derived set (a lifecycle always
+owns at least its state + lesson-evidence files), is fail-closed (exit 2).
+
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model):
+the single `MERGE-ATTRS: clean` line and a `help:` remedy on the finding path
+(output); exit 2 on an unreadable target or an empty derived set (fail-closed); a
+`good/`+`bad/` fixture pair under `gate-tests/` — the good case the default
+state+lesson attribution, the bad case a smuggled reverse-edge line — plus
+`gate-tests/check-merge-attrs.test.sh` for the forward-missing and missing-file
+findings and a real two-branch merge in a sandbox repo that asserts the keep-ours
+driver resolves an attributed surface to the arriving side (fixture-pair); and
+registration in this repo's `gates.list` where its own `.gitattributes` is the
+scan target (self-lint). Its `# graph:` couples `.gitattributes` and
+`lib/stages.sh` (the config the supersede set derives from) at `tier=precommit`;
+a reshaped `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` in the consumer config is backstopped
+by the whole-tree `run-gates.sh` battery (the `check-stage-skill-coverage`
+precedent).
 
 ### templates/skills/
 

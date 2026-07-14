@@ -64,9 +64,12 @@ rungs are named in the open, and their state is checkable.
   escalations, so a blocked stage forwards its question and resumes in place
   instead of stopping cold. The orchestration protocol is owned by
   `lifecycle-kit/SPEC.md §templates/lead.md`.
-- **`multi-operator-semantics`** — deferred, in the public queue: the
-  contributor altitude — merge and conflict behavior for the lifecycle's
-  single-writer state surfaces, the kits' team-readiness rung.
+- **Multi-operator semantics** — landed. The contributor altitude — merge and
+  conflict behavior for the lifecycle's single-writer state surfaces: an
+  iteration owns one branch, the iteration-scoped surfaces resolve to the
+  arriving branch at a merge (a derived `merge=iteration-scoped` driver set plus
+  a parity gate), and the close-merge serializes boundaries on the integration
+  branch. Owned by `lifecycle-kit/SPEC.md §Multi-operator semantics`.
 
 Within one iteration that is the extent of Checkwright's own coordination: a
 lead dispatching its own verified stages. Across operators it still

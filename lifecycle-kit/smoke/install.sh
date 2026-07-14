@@ -165,6 +165,25 @@ cmp -s "$il/before" "$il/CLAUDE.md" || { echo "smoke(install-lifecycle): re-run 
 sed -i 's#`/close`##' "$il/CLAUDE.md"
 if il_gate >/dev/null 2>&1; then echo "smoke(install-lifecycle): a staled block should redden the parity gate" >&2; exit 1; fi
 
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — exercise the merge-attribute + driver-config steps and check-merge-attrs end-to-end in a scratch git repo (advisory tool, no fixture pair)
+ma="$es/merge-attrs"; mkdir -p "$ma"
+git -C "$ma" init -q
+printf '# Scratch agent file\n' > "$ma/CLAUDE.md"
+( cd "$ma" && bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null )
+grep -q "^# lifecycle-kit:merge:begin\$" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): merge-attribute block not injected into .gitattributes" >&2; exit 1; }
+grep -q "^\.workflow/WORKFLOW-STATE.txt merge=iteration-scoped\$" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): state-file merge attribute missing" >&2; exit 1; }
+[[ "$(git -C "$ma" config --get merge.iteration-scoped.driver)" == "true" ]] || { echo "smoke(install-lifecycle): keep-ours driver not registered in git config" >&2; exit 1; }
+( cd "$ma" && bash "$SMOKE_KIT_ROOT/checks/check-merge-attrs.sh" >/dev/null ) || { echo "smoke(install-lifecycle): a freshly installed .gitattributes should pass the parity gate" >&2; exit 1; }
+
+cp "$ma/.gitattributes" "$ma/before"
+( cd "$ma" && bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null )
+cmp -s "$ma/before" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): merge-attribute re-run was not idempotent" >&2; exit 1; }
+
+printf 'README.md merge=iteration-scoped\n' >> "$ma/.gitattributes"   # smuggled reverse-edge line
+if ( cd "$ma" && bash "$SMOKE_KIT_ROOT/checks/check-merge-attrs.sh" >/dev/null 2>&1 ); then
+    echo "smoke(install-lifecycle): a smuggled out-of-set merge attribute should redden the parity gate" >&2; exit 1
+fi
+
 # spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order: env-first, agent- strip, widened + child-narrowed subagents scan (advisory tool, no fixture pair)
 SID="$SMOKE_KIT_ROOT/bin/session-id.sh"
 sid="$es/sid"; mkdir -p "$sid"

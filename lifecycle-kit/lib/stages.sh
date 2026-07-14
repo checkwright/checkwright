@@ -72,6 +72,23 @@ lifecycle_stage_known() {
     return 1
 }
 
+# spec: lifecycle-kit/SPEC.md §Multi-operator semantics — the iteration-scoped supersede set: exactly the surfaces enter-stage.sh truncates at the iteration boundary (the state file, the kit-owned lesson-evidence file, and every LIFECYCLE_KIT_BOUNDARY_TRUNCATE member). Derived here so the installer's .gitattributes block and check-merge-attrs's parity check read one set and cannot drift.
+lifecycle_supersede_set() {
+    printf '%s\n' "$LIFECYCLE_KIT_STATE_FILE" "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE"
+    local m
+    for m in ${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]}"}; do
+        printf '%s\n' "$m"
+    done
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the .gitattributes merge-driver lines the installer injects (one `<path> merge=iteration-scoped` per supersede member); the installer emits this, check-merge-attrs verifies it — the same writer/asserter split as lifecycle_registration_block.
+lifecycle_merge_attrs_block() {
+    local p
+    while IFS= read -r p; do
+        printf '%s merge=iteration-scoped\n' "$p"
+    done < <(lifecycle_supersede_set)
+}
+
 # spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the resident registration block from the live config so the installer and check-lifecycle-registration derive one text; the roster is the stage set as skill invocations, never hand-listed
 lifecycle_registration_block() {
     local roster="" s

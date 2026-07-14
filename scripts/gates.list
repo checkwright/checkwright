@@ -37,6 +37,7 @@ check-stage-skill-coverage
 check-skill-binding
 check-shim-restatement
 check-lesson-disposition
+check-merge-attrs
 check-queue-sections
 check-queue-hygiene
 check-queue-wrap
