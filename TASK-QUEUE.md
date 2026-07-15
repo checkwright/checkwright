@@ -58,9 +58,4 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
 
-- contribution-intake-triage
-- releases-nav-children
-- scratchpad-path-guard
-- strict-config-loader-shape
-
 ## Lessons Learned

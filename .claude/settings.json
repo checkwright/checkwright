@@ -76,6 +76,8 @@
       "Bash(git commit -m *)",
       "Bash(git commit -q -m *)",
       "Bash(git rm -q *)",
+      "Bash(gh run list *)",
+      "Bash(gh run watch *)",
       "Bash(ls *)",
       "Bash(grep *)",
       "Bash(command -v *)",

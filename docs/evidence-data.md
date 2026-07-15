@@ -33,3 +33,4 @@
 | multi-operator-semantics | s a b v c | 2f/0d | 1 · ≤0d | 20s clean | 70 |
 | operational-hygiene | s a b v c | 8f/1d | 4 · ≤0d | 20s clean | 72 |
 | surface-trust | s a b v c | 2f/0d | 3 · ≤1d | 20s clean | 73 |
+| edge-discipline | s a b v c | 4f/1d | 2 · ≤0d | 20s clean | 73 |
