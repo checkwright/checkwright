@@ -7,3 +7,4 @@
 surface-trust scope 86ebf020 2026-07-14
 surface-trust align a9311daa 2026-07-14
 surface-trust build acd3aa92 2026-07-14
+surface-trust validate acb668c3 2026-07-15
