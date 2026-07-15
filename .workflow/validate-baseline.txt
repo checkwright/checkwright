@@ -4,6 +4,7 @@ gate_sdk gate_sdk pass
 canon_kit canon_kit pass
 context_kit context_kit pass
 delegation_kit delegation_kit pass
+doctrine_kit doctrine_kit pass
 evidence_kit evidence_kit pass
 lifecycle_kit lifecycle_kit pass
 queue_kit queue_kit pass
@@ -15,3 +16,6 @@ budget_guard_tests budget_guard_tests pass
 trend_tests trend_tests pass
 demo demo pass
 consumer_smoke consumer_smoke pass
+upgrade upgrade pass
+agents_md_smoke agents_md_smoke pass
+index_tests index_tests pass
