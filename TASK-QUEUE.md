@@ -76,8 +76,4 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
 
-- hermetic-kit-test-config
-- commit-msg-session-trailer-screen
-- orchestration-headline
-
 ## Lessons Learned
