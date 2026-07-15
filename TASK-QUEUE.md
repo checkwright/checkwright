@@ -14,22 +14,21 @@
 
 ## Technical Debt
 
-- **enforcement-map-strict-config** — `gate-sdk/bin/enforcement-map.sh` reads
-  `EVIDENCE_KIT_CONFIG_FILE` with the retired lenient pattern (a `:=` default
-  expansion followed by a skip-if-absent file test), so a set-but-missing path
-  silently skips the KPI join — the silent-wrong-config class the
-  strict-config-loader-shape unit eliminated from the five kit loaders, left
-  here because the emitter is a cross-kit reader outside that unit's envelope.
-  Converge it on the strict distinction: set-but-missing exits 2; unset with
-  the default absent still skips, preserving the zero-config consumer path.
-  `check-enforcement-fresh`'s byte-compare does not backstop this: a regen
-  under a typo'd `EVIDENCE_KIT_CONFIG_FILE` emits a wrong map that then
-  byte-matches itself on the next check — the freshness gate launders the
-  wrong config rather than catching it. Surfaced 2026-07-15 by
-  edge-discipline's build session.
-
 ## Deferred
 
+- **enforcement-map-strict-config** [needs-spec] — `gate-sdk/bin/enforcement-map.sh`
+  reads `EVIDENCE_KIT_CONFIG_FILE` with the retired lenient pattern (a `:=`
+  default expansion followed by a skip-if-absent file test), so a
+  set-but-missing path silently skips the KPI join — the silent-wrong-config
+  class the strict-config-loader-shape unit eliminated from the five kit
+  loaders, left here because the emitter is a cross-kit reader outside that
+  unit's envelope. Converge it on the strict distinction: set-but-missing
+  exits 2; unset with the default absent still skips, preserving the
+  zero-config consumer path. `check-enforcement-fresh`'s byte-compare does not
+  backstop this: a regen under a typo'd `EVIDENCE_KIT_CONFIG_FILE` emits a
+  wrong map that then byte-matches itself on the next check — the freshness
+  gate launders the wrong config rather than catching it. Surfaced 2026-07-15
+  by edge-discipline's build session.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
