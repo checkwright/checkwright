@@ -16,6 +16,25 @@
 
 ## Deferred
 
+- **contribution-intake-triage** [needs-spec] — the public repo makes GitHub
+  issues and PRs an intake surface with no owned process. Rulings captured at
+  filing: intake, never a second queue — this file stays the sole owner of
+  work state, and scope's ritual gains the triage sweep as the single
+  promotion point (each open issue is promoted into queue grammar citing its
+  issue number, or closed with cause — no linked-and-skipped middle state,
+  per gap disposition). PR absorption is a distinct lane the spec must
+  formalize alongside — a PR is reviewed work under CONTRIBUTING.md's
+  fixture-is-the-unit rule, not a task; its ritual slot (mandatory vs
+  optional scope step) and its queue coupling (review findings become
+  entries) are the open design. No parity gate: pre-commit stays offline, so
+  the enforcement point is the ritual checklist / session-context report,
+  never the commit path. Budget protection is in-scope for the unit: a triage
+  cap (top-N sweep per boundary, analysis delegated under the usage verdict,
+  the overflow deferred to the next boundary) so a flood of intake cannot
+  burn the token window on its own analysis. The seam rule rides the
+  governed issue/PR templates: reports describe generic mechanism, never a
+  consumer's private vocabulary. Surfaced 2026-07-15 by the operator
+  planning public-repo intake.
 - **scratchpad-path-guard** [needs-spec] — the harness steers every session
   toward its per-session scratchpad under `/tmp/claude-…` while this repo's
   ruling is repo-local `.tmp/` (CLAUDE.md §Housekeeping) — a memory-dependent
