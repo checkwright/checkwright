@@ -69,7 +69,10 @@
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(: > .workflow/knowledge-friction.log)",
       "Bash(rm .tmp/*)",
+      "Bash(rm -f .tmp/*)",
+      "Bash(rm -rf .tmp/*)",
       "Bash(git add *)",
+      "Bash(git grep *)",
       "Bash(git commit -m *)",
       "Bash(git commit -q -m *)",
       "Bash(git rm -q *)",
@@ -80,6 +83,7 @@
       "Bash(chmod +x *)",
       "Bash(mkdir -p *)",
       "Bash(echo *)",
+      "Bash(printf *)",
       "Bash(wc *)",
       "Bash(head *)",
       "Bash(tail *)"
