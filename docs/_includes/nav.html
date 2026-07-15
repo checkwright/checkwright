@@ -22,6 +22,16 @@
         </ul>
         {%- endif -%}
       {%- endif -%}
+      {%- if p.nav_children_key -%}
+        {%- assign ckids = site.pages | where_exp: "c", "c[p.nav_children_key]" | sort: "path" | reverse -%}
+        {%- if ckids != empty -%}
+        <ul class="nav-children">
+          {%- for c in ckids -%}
+          <li class="{% if c.url == page.url %}current{% endif %}"><a href="{{ c.url | relative_url }}">{{ c[p.nav_children_key] }}</a></li>
+          {%- endfor -%}
+        </ul>
+        {%- endif -%}
+      {%- endif -%}
     </li>
     {%- endfor -%}
   </ul>

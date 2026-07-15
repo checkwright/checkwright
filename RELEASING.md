@@ -25,12 +25,13 @@ links and commands resolve under the doc gates.
    names — tightened gates and renamed knobs. The parseable grammar
    (front-matter key, section names, bullet lead tokens) is owned by
    [docs/install.md](docs/install.md) §The upgrade contract; "none" is a valid
-   section body and is stated, never omitted. Add the post's path to
-   `scripts/docs-offnav.list` — off-nav by design, its inbound links the GitHub
-   Release and the render-time [releases index](docs/releases.md), which the
-   note joins by its `release:` key with no further step. Launch-adjacent copy
-   uses the reserved phrasing, "the verification layer under agent
-   orchestration".
+   section body and is stated, never omitted. The note joins the nav by its
+   `release:` key with no further step — the [Releases page](docs/releases.md)
+   names that key in `nav_children_key`, so the note renders as a derived nav
+   child (and the render-time releases index lists it likewise); no
+   `scripts/docs-offnav.list` entry, no allowlist growth per release.
+   Launch-adjacent copy uses the reserved phrasing, "the verification layer
+   under agent orchestration".
 
 3. **Tag the release commit.** Choose the bump by
    [docs/install.md](docs/install.md) §Versioning's criteria (the derivable

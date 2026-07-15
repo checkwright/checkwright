@@ -1,6 +1,7 @@
 ---
 title: Releases
 nav_order: 6
+nav_children_key: release
 ---
 
 # Release notes

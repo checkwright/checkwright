@@ -1,7 +1,9 @@
 # Point the gate at this fixture's synthetic docs tree and its own allowlist.
 # The tree exercises every pass path: a top-level nav page, a nav child resolving
 # to its parent, a title-only page reached by a link walk, a generated mirror
-# reached only through its nav-child sibling index (the suffix-link rule), and an
-# off-nav fragment (no front matter, unlinked) rescued by the allowlist. The gate PASSES.
+# reached only through its nav-child sibling index (the suffix-link rule), a
+# titleless note (notes/v1.md) reached only through the derived-children rule (the
+# Releases page names `release`, whose value labels it), and an off-nav fragment
+# (no front matter, unlinked) rescued by the allowlist. The gate PASSES.
 docs
 docs-offnav.list

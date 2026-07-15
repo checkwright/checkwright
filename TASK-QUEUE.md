@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **releases-nav-children** [spec: SPEC-releases-nav-children.md] — surface
-  each release note as a derived nav child of the Releases page
-  (`nav_children_key` grammar, nav-include branch, gate-model extension,
-  allowlist and runbook shrink). The amendment carries the rulings; verify
-  with the local Jekyll render. Surfaced 2026-07-14 by the operator
-  reviewing the public site.
-
 ## Technical Debt
 
 - **scratchpad-path-guard** — the harness steers every session
@@ -82,5 +75,6 @@
 ## Done
 
 - contribution-intake-triage
+- releases-nav-children
 
 ## Lessons Learned
