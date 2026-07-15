@@ -4,8 +4,4 @@
 
 ---
 
-enforcement-map-strict-config scope 83099c61 2026-07-15
-enforcement-map-strict-config align a2b8138e 2026-07-15
-enforcement-map-strict-config build a6b4239c 2026-07-15
-enforcement-map-strict-config validate ae605855 2026-07-15
-enforcement-map-strict-config close a77d3ad8 2026-07-15
+— scope a2eda0bc 2026-07-16
