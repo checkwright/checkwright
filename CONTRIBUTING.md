@@ -24,6 +24,10 @@ reproduction — no prose repro steps, no maintainer setup. File a gate-defect
 issue only when you cannot craft the fixture, and it must still name the gate,
 the exact gate output, and the expected-versus-actual verdict.
 
+A filed issue is swept at an iteration boundary and given exactly one
+disposition — promoted into the work queue or closed with cause. It is never
+left linked-but-unqueued: the queue is the only place work waits.
+
 ## Pull requests
 
 - **Battery-green in CI.** Run it locally first: `bash gate-sdk/bin/run-gates.sh`
@@ -38,6 +42,10 @@ the exact gate output, and the expected-versus-actual verdict.
   `Signed-off-by:` line); it certifies the
   [Developer Certificate of Origin](https://developercertificate.org/). There is
   no CLA and no bot — the sign-off is checked in review.
+- **Every PR gets one disposition at a boundary.** A swept PR is merged
+  (battery-green and in-convention), closed with cause, or reviewed with
+  findings — where the findings that warrant design or follow-on work become
+  queued entries. A PR is never left reviewed-but-actionless.
 
 ## Larger changes
 
@@ -50,8 +58,10 @@ building, so the design is agreed before a PR exists.
 ## Support
 
 Community support is best-effort: there is no response SLA, and stale-thread
-automation may close inactive issues and PRs. A clean fixture pair is the
-surest path to a merge — it asks the least of a reviewer.
+automation may close inactive issues and PRs. Triage runs at iteration
+boundaries rather than continuously — an issue or PR waits at most one iteration
+for its disposition, so there is no need to ping between boundaries. A clean
+fixture pair is the surest path to a merge — it asks the least of a reviewer.
 
 Paid support, consultancy, and training are available — write to
 <hello@checkwright.dev>.

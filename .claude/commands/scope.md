@@ -14,7 +14,8 @@ together with the lesson-evidence file — in the same stamp commit. Wipe
 §Housekeeping — persistent trends live in `.metric/`), and a resume journal
 from a closed iteration is dead by definition.
 
-**ritual** — read `BRIEF.local.md` (local-only brief); decide the unit's
+**ritual** — read `BRIEF.local.md` (local-only brief); run the GitHub
+boundary sweep (below); decide the unit's
 layout, config surface, and worklist; name the iteration after the unit. Hold
 the provenance seam per CLAUDE.md §The provenance seam (never cross it) and
 config-via-env per CLAUDE.md §Conventions established in gate-sdk. The amendment
@@ -22,6 +23,28 @@ lifecycle the template's triage step invokes is canon-kit/SPEC.md §The
 amendment lifecycle; the queue-entry grammar the promotion step writes
 against is queue-kit/SPEC.md §The tag algebra, and `[spec:]` ref
 resolution is canon-kit/SPEC.md §check-amendment-queue.
+
+**The GitHub boundary sweep** — after the brief read, before promotion triage,
+sweep the public repo's intake. `TASK-QUEUE.md` stays the sole owner of work
+state; nothing lives triaged-but-unqueued anywhere else. Cap: the top five
+items per lane per boundary — a per-item analysis heavier than a read is
+delegated under the usage verdict (CLAUDE.md §Agent execution). Overflow beyond
+five stays on the tracker for the next boundary (the tracker's own open-item
+list is the carry — no shadow copy). The `gh` calls run only inside this
+interactive sweep; no pre-commit or session-context hook makes a network call.
+
+- **Issues** — `gh issue list --state open`; take the top five, oldest first.
+  Each gets exactly one disposition: *promoted* — a queue entry in this file's
+  grammar, its body citing the issue on the existing provenance sentence
+  (`Surfaced <date> by GitHub issue #N` — no new tag, queue-kit/SPEC.md §The
+  tag algebra untouched) — or *closed with cause*, a comment naming the reason.
+  No linked-and-skipped middle state (gap disposition).
+- **PRs** — `gh pr list --state open`; take the top five. A PR is reviewed work
+  under CONTRIBUTING.md's fixture-is-the-unit rule, never a task. Each gets one
+  of three dispositions: *merged* (battery-green, in-convention), *closed with
+  cause*, or *reviewed with findings* — the findings warranting design or
+  follow-on work become queue entries citing `PR #N`, posted as the review. The
+  third is a disposition, not a skip: the PR carries an actionable review after.
 
 **handoff** — lay out the two branches per docs/orchestration.md §Running an
 iteration under a lead: `/compact` this session then `/lead` to drive the rest, or

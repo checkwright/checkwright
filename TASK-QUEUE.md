@@ -12,12 +12,6 @@
 
 ## New Features
 
-- **contribution-intake-triage** [spec: SPEC-contribution-intake-triage.md] —
-  own the public repo's GitHub issue/PR intake: the boundary sweep in scope's
-  ritual (top-five per lane, promote-or-close, PR dispositions), the
-  CONTRIBUTING.md contract, the seam caution on the governed templates. The
-  amendment carries the rulings. Surfaced 2026-07-15 by the operator
-  planning public-repo intake.
 - **releases-nav-children** [spec: SPEC-releases-nav-children.md] — surface
   each release note as a derived nav child of the Releases page
   (`nav_children_key` grammar, nav-include branch, gate-model extension,
@@ -86,5 +80,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- contribution-intake-triage
 
 ## Lessons Learned

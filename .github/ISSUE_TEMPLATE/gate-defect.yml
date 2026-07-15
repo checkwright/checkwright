@@ -6,6 +6,8 @@ body:
     attributes:
       value: |
         A gate defect you can reproduce with a fixture belongs in a pull request, not here — add the `good/`/`bad/` case and let CI verify it (see CONTRIBUTING.md). Open this issue only when you cannot craft the fixture. Questions and proposals go to Discussions.
+
+        Keep your report and any fixture to generic mechanism — never paste your own private rule content (term lists, coupling vocabularies, product constants). A gate reproduces on structure, not on your vocabulary.
   - type: input
     id: gate
     attributes:
