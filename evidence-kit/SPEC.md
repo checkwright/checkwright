@@ -74,6 +74,10 @@ to a live queue task (the queue-file knob) or a configured permanent marker.
 Tooling never writes it — a promotion (a held-constant red recovering to pass)
 is a human commit, which is what keeps the baseline honest.
 
+A scenario absent from the baseline fails closed: the diff treats its failure
+as a new failure, so a missing `pass` row loses no enforcement — its cost is
+classification (a regression reads as a new scenario), not a silent green.
+
 ### Evidence manifest
 
 Committed, append-per-run. The file header is a `# contract: evidence-manifest v1`
