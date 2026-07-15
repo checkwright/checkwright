@@ -14,18 +14,6 @@
 
 ## Technical Debt
 
-- **scratchpad-path-guard** — the harness steers every session
-  toward its per-session scratchpad under `/tmp/claude-…` while this repo's
-  ruling is repo-local `.tmp/` (CLAUDE.md §Housekeeping) — a memory-dependent
-  rule, re-leaked in practice (a dead poller script found in the scratchpad).
-  No pre-commit gate can see the violation (the file never enters the tree);
-  the enforcement point is the consumer bash-guard: block Bash commands
-  referencing the harness-scratchpad path prefix, steering to `.tmp/`. Match
-  the prefix only — kit mechanism legitimately uses `TMPDIR` (the hermetic
-  bootstrap's shared empty file). Known limit, accepted at filing: direct
-  Write/Edit tool calls are not hooked; a `Write|Edit` PreToolUse matcher is
-  the follow-on if leakage persists. Surfaced 2026-07-14 by the operator
-  reviewing the lead session's scratch hygiene.
 - **strict-config-loader-shape** — the eleven kit config
   loaders split into two shapes: six fail closed (exit 2) on a set-but-missing
   `<KIT>_CONFIG_FILE`, five (`${VAR:-default}` expansion) skip it silently —
@@ -76,5 +64,6 @@
 
 - contribution-intake-triage
 - releases-nav-children
+- scratchpad-path-guard
 
 ## Lessons Learned

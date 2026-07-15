@@ -18,6 +18,12 @@ case " $cmd_unquoted " in
         guard_block "a hook bypass (--no-verify/-n) is a one-off with cause, never auto-allowed — fix the red gate instead, or run the bypass yourself with !<command> so the cause is on record."
         ;;
 esac
+# spec: CLAUDE.md §Housekeeping — .tmp/ is this repo's disposable scratch; the harness's
+# per-session /tmp scratchpad leaks session work outside it, so the path prefix is blocked.
+# Prefix-only match: kit mechanism legitimately uses TMPDIR (the hermetic bootstrap).
+if [[ "$cmd_unquoted" == *"/tmp/claude-"* ]]; then
+    guard_block "the harness per-session scratchpad (/tmp/claude-...) is not this repo's scratch home — use repo-local .tmp/ instead (CLAUDE.md §Housekeeping): it survives crashes in-tree and is wiped at the scope boundary. If you genuinely need the harness path, run it yourself with !<command>."
+fi
 # spec: CLAUDE.md §Housekeeping — .metric/ is gitignored persistent measurement trends and .tmp/ crash-recovery scratch; git clean -x/-X wipes both, so steer to the !<command> escape rather than let the destructive form auto-run
 if [[ " $cmd_unquoted " == *" git clean "* && " $cmd_unquoted " =~ [[:space:]]-[A-Za-z]*[xX] ]]; then
     guard_block "git clean -x/-X wipes gitignored state — the irreplaceable measurement trends under .metric/ and crash-recovery resume journals under .tmp/. If you mean to discard them, run it yourself with !<command> so the intent is on record."
