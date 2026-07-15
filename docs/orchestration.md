@@ -78,33 +78,38 @@ moment it was written.
 ## Running an iteration under a lead
 
 The lead is a role a session *becomes*, not a stage it runs — and running no
-lead is equally valid. To drive an iteration under one:
+lead is equally valid. The recommended shape is the **split posture**: the
+lead rides a cheap routing tier and only the judgment-heavy work pays premium
+prices. To drive an iteration under it:
 
-1. **`/scope` in a live session.** It formalizes the iteration — authoring the
-   design amendments, promoting the queue entries — and lands the promotion
-   commit.
-2. **`/compact` before the hand-off.** A bare `/compact` is safe here, because
-   the lead holds pointers rather than state — everything ruled already lives in
-   a committed surface — so the worst case is a bounded re-read, not lost work.
-   It pays off: the lead sits cold between escalations and re-warms its context
-   each time it is questioned, so a compacted lead re-warms cheap.
-3. **`/lead` in that same session.** The lead role writes no lifecycle state of
-   its own; every flip, stamp, and commit stays in the stage sessions it
-   dispatches, so the history reads identically whether or not a lead drove it.
-4. **The lead dispatches each remaining stage** — `/align`, `/build`,
+1. **`/lead` in a fresh session on the routing tier.** The lead role writes no
+   lifecycle state of its own; every flip, stamp, and commit stays in the stage
+   sessions it dispatches, so the history reads identically whether or not a
+   lead drove it.
+2. **The lead dispatches `/scope` as a background stage session on the
+   judgment tier.** Scope formalizes the iteration — authoring the design
+   amendments, promoting the queue entries — lands the promotion commit, and
+   its agent stays resumable afterward as the iteration's **intent oracle**.
+3. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
-   unchanged.
-5. **A blocked stage escalates to the lead and resumes in place** rather than
-   restarting cold; anything outside its ruling roster reaches the operator.
-6. **At an acceptance boundary that pays, the lead suggests another compact** —
-   same instruction as the hand-off one, operator-invoked; the calibration rule
-   is the template's.
+   unchanged, on the tier the stage-session agent definition pins.
+4. **A blocked stage escalates to the lead and resumes in place** rather than
+   restarting cold. The lead rules machinery questions itself; a question
+   about the iteration's *intent* it forwards — with the working-state excerpt
+   the question turns on — to the scope oracle and relays the answer back.
+   Anything outside the ruling roster reaches the operator.
+5. **If the oracle cannot be resumed,** the lead answers from the governed
+   surfaces the rulings already live in — the amendments, the queue entries —
+   and hands anything not derivable there to the operator.
 
-Prefer to stay hands-on? Skip the lead and run each stage manually as an
-ordinary skill invocation, consulting the — optionally compacted — scope session
-when a stage raises a question. The compaction instruction, the escalation
-shape, and the ruling-class boundary are owned by `lifecycle-kit/SPEC.md
-§templates/lead.md`.
+The earlier **unified posture** — `/scope` in a live session, `/compact`, then
+`/lead` in that same session — remains valid and simpler when tiering is not a
+concern; its trade-off is that every orchestration turn re-reads scope's
+context at scope's prices. Prefer to stay hands-on? Skip the lead and run each
+stage manually as an ordinary skill invocation, consulting the scope session
+when a stage raises a question. The posture definitions, the compaction
+instruction, the escalation shape, and the ruling-class boundary are owned by
+`lifecycle-kit/SPEC.md §templates/lead.md`.
 
 ## Two operators, one governed tree
 

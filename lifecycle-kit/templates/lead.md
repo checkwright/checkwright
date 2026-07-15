@@ -11,12 +11,25 @@ rule and resume it, instead of at a cold restart.
 
 ## The lead model
 
-A scope session may stay live as the iteration's lead once its promotion commit
-lands. It dispatches a stage session as a **background agent** whose prompt is
-that stage's ordinary skill invocation (`/build`, `/validate`, …); the stage
-session executes its stage skill unchanged. Every lifecycle-state write — the
-flip+stamp, commits, evidence — happens **in the stage session**, never in the
-lead.
+The lead takes one of two postures; which one — and the model tier each
+session rides — is standing dispatch policy (the ruling-config slot below):
+
+- **Unified** — the scope session stays live as the iteration's lead once its
+  promotion commit lands. One session holds both scope's judgment and the
+  dispatch loop, so every orchestration turn rides whatever tier scope ran on.
+- **Split** — a session on a cheaper routing tier takes the lead role first
+  and dispatches scope itself as a stage session on the judgment tier, keeping
+  that agent resumable afterward as the iteration's **intent oracle**. The
+  lead's own turns are routing work — dispatch, result ingestion, budget
+  verdicts — and stop paying judgment-tier prices. The oracle must be a fresh
+  dispatch, never a fork: a fork inherits the dispatcher's model, which is
+  exactly the tier split this posture exists to make.
+
+Under either posture the lead dispatches a stage session as a **background
+agent** whose prompt is that stage's ordinary skill invocation (`/build`,
+`/validate`, …); the stage session executes its stage skill unchanged. Every
+lifecycle-state write — the flip+stamp, commits, evidence — happens **in the
+stage session**, never in the lead.
 
 Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background
 with notification, honor the per-dispatch budget guard, and validate after any
@@ -48,6 +61,18 @@ read by the lead at its answer transition:
 The lead answers by messaging the paused session, which resumes in place with
 its working state intact. That resume — not a cold restart — is the cost
 asymmetry the lead exists to close.
+
+Under the split posture the lead **routes** an escalation before answering it.
+A question the iteration's machinery already governs — which fixture, which
+surface, ordering, a helper's shape — the lead rules itself. A question about
+the iteration's *intent* — a scope boundary, an amendment's envelope, a seam
+ruling — is forwarded to the intent oracle and the oracle's answer relayed
+back. A forwarded question carries the excerpt of current working state it
+turns on: the oracle holds the iteration's intent, not the build's unfolding,
+so the lead supplies what the question needs read. When the oracle cannot be
+resumed, the lead answers from the governed surfaces the rulings already live
+in — the amendments, the queue entries — and a question not derivable there
+goes to the operator, never substituted by the lead's own judgment.
 
 ## Channel design
 
@@ -103,7 +128,17 @@ consequences:
   window lever, not token counts.
 - **Batch escalations.** The decision shape makes batching natural — a stage
   session collects its open questions and sends them in one turn.
-- **Compact at handoff.** After the promotion commit lands the amendments and
+- **Split the lead where the tail dominates.** Most of a lead's turns are
+  tail — dispatch, result ingestion, budget verdicts — and under the unified
+  posture each one re-reads a cache carrying scope's whole working context at
+  judgment-tier prices. The split posture moves that recurring cost to the
+  routing tier and concentrates judgment-tier spend where it pays: scope
+  itself, plus one oracle turn per forwarded intent question — a cold context
+  re-warm at worst, bounded and per-question instead of per-turn. Assume the
+  oracle is cold: escalations arrive on the stages' schedule, so the TTL
+  arithmetic that leaves a lead nearly always cold (above) applies to the
+  oracle unchanged.
+- **Compact at handoff (unified posture).** After the promotion commit lands the amendments and
   queue entries, and before the first dispatch, `/compact` the lead's context
   with an instruction that **keeps** per-amendment rationale, rejected
   alternatives,

@@ -46,9 +46,12 @@ interactive sweep; no pre-commit or session-context hook makes a network call.
   follow-on work become queue entries citing `PR #N`, posted as the review. The
   third is a disposition, not a skip: the PR carries an actionable review after.
 
-**handoff** — lay out the two branches per docs/orchestration.md §Running an
-iteration under a lead: `/compact` this session then `/lead` to drive the rest, or
-skip the lead and steer each stage by hand, consulting the compacted scope
-session when a stage asks. That page is the sequence's single source (owned by
+**handoff** — lay out the branches per docs/orchestration.md §Running an
+iteration under a lead. Dispatched by a live split-posture lead, there is no
+handoff: finish the stage, report back, and stay resumable — the lead will
+route intent questions here for the rest of the iteration. Run by hand, the
+choices are the unified shape (`/compact` this session, then `/lead` in it) or
+no lead at all, the operator consulting this session when a stage asks. That
+page is the sequence's single source (owned by
 lifecycle-kit/SPEC.md §templates/lead.md) — send the reader there, do not
 transcribe its steps.

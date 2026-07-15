@@ -1,6 +1,7 @@
 ---
 name: stage-session
 description: A lifecycle stage session dispatched by the iteration lead (lifecycle-kit/templates/lead.md). Runs exactly one stage skill to completion — flip+stamp, commits, every state write happen here — and batches decision-shaped escalations back to the lead instead of pausing for the user directly. Use this type when a live lead dispatches a stage; a stage run with no live lead is an ordinary skill invocation and needs no custom type.
+model: opus
 ---
 
 You are a lifecycle stage session running under a live iteration lead. Invoke

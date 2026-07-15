@@ -839,14 +839,23 @@ consumer copies-and-specializes it or binds it through a thin shim, and
 `check-skill-binding` holds the slot pairing either way (this repo's
 `.claude/commands/lead.md` shim).
 
-The template owns the orchestration protocol whole: the lead model (dispatch a
+The template owns the orchestration protocol whole: the two lead postures
+(**unified** — the scope session stays live as the lead, one session holding
+judgment and dispatch on one model tier; **split** — a routing-tier lead
+dispatches scope as a stage session on the judgment tier and keeps it
+resumable as the iteration's *intent oracle*, ruling machinery questions
+itself, forwarding intent questions to the oracle with the working-state
+excerpt each turns on, and falling back to the governed surfaces — then the
+operator — when the oracle is gone; posture and tier assignment are standing
+dispatch policy in the ruling-config slot), the lead model (dispatch a
 stage session as a background agent whose prompt is that stage's ordinary skill
 invocation, with the inline-run posture sentence reading
 `LIFECYCLE_KIT_SESSION_BOUNDARY` — inline stage runs banned under `stage`,
 the sanctioned blocked-dispatch fallback under `iteration`), the four-header
 escalation block (Question / Options / Recommendation / Evidence), the split-channel design (routine narration to the
 resume journal, escalations to the message channel), the compact economics —
-the handoff compact plus operator-suggested compacts at the acceptance
+the split-where-the-tail-dominates rule, the unified posture's handoff compact,
+and operator-suggested compacts at the acceptance
 boundaries that pay under the cold-wakes-times-compressible-residue rule —
 with the dispatch-granularity rule (batch units sharing a kit or SPEC
 surface, split on a model-tier change or a delegation-kit split trigger), and
