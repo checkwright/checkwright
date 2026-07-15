@@ -35,6 +35,13 @@
   FlowBench as prior art. Surfaced 2026-07-08 inside adoption-track; split
   out 2026-07-09 — the self-referential route (drift-trajectory) ships
   first and this rung upgrades the claim only if demand attests it.
+  Includes the experiment's measurement half: a **stage-burn meter** landing
+  in drift-kit's bin/ on the overhead-meter pattern (sessions-dir resolution,
+  config via env, advisory exit-0) — per-stage, per-model token burn read off
+  harness transcripts and price-weighted, replacing the local-only prototype
+  scripts parked in `.metric/`. Nearer use: verifying the split-lead posture's
+  savings (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15
+  by the per-stage budget analysis that motivated that posture.
 - **hosted-attestation-service** [needs-spec] — the team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
   hosted gate runs as a neutral attestation, cross-repo drift dashboards,
