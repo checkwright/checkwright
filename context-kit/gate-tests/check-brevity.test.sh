@@ -43,6 +43,10 @@ cat >"$SANDBOX/cfg.sh" <<'EOF'
 CONTEXT_KIT_BREVITY_SECTION="## Conventions we since renamed"
 EOF
 
+# The stock-default cases pin an existing empty config (the strict loader
+# exits 2 on a set-but-missing path, and /dev/null is not a regular file).
+: >"$SANDBOX/noop-cfg.sh"
+
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=file  $5..=env assignments
     local label="$1" want="$2" sub="$3" file="$4"; shift 4
     local out rc
@@ -60,7 +64,7 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=file  $5..=env ass
 # renamed it, and the over-budget bullet below it goes unseen. Before the fix
 # this exited 0 reporting "0 bullets" — a disarmed gate reading as a clean tree.
 check_case "renamed-section-fails-closed" 2 "no heading matches" renamed.md \
-    CONTEXT_KIT_CONFIG_FILE=/dev/null
+    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/noop-cfg.sh"
 
 # Symmetrically, a consumer config naming a heading the governed file lacks is
 # the same broken machine, reached through the config seam rather than the default.
@@ -70,7 +74,7 @@ check_case "config-names-absent-heading" 2 "no heading matches" empty.md \
 # Resolution is what fails closed, not emptiness: a section that exists and
 # holds no bullets is a clean tree, and the help line stays out of the way.
 check_case "matched-but-bulletless-clean" 0 "BREVITY: clean (0 bullets" empty.md \
-    CONTEXT_KIT_CONFIG_FILE=/dev/null
+    CONTEXT_KIT_CONFIG_FILE="$SANDBOX/noop-cfg.sh"
 
 # The renamed file is clean once the knob is repointed at the live heading —
 # and the bullet it was hiding is now seen, so the knob really did resolve.

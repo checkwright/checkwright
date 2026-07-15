@@ -25,7 +25,8 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=settings.local.jso
     rm -f "$SANDBOX/settings.local.json"
     [[ -n "$body" ]] && printf '%s\n' "$body" >"$SANDBOX/settings.local.json"
     local out rc
-    out="$(CONTEXT_KIT_CONFIG_FILE=/dev/null "$GATE" --fixture "$SANDBOX" 2>&1)"; rc=$?
+    # config isolation is test-hermetic's export (the shared existing empty file)
+    out="$("$GATE" --fixture "$SANDBOX" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi

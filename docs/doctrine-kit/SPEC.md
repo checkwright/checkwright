@@ -211,8 +211,9 @@ elsewhere) overrides any knob; defaults fill what the consumer left unset. Knobs
   heading, so a zero-config consumer that installed via the tool is green out of
   the box; a consumer that renamed the heading repoints this knob (a rename that
   leaves it stale exits 2 rather than passing an empty set).
-- `DOCTRINE_KIT_CONFIG_FILE` — the loader override; when set it is sourced if it
-  exists, and a `.local.sh` sibling sources last for private overlay values.
+- `DOCTRINE_KIT_CONFIG_FILE` — the loader override; when set it must resolve,
+  else the loader exits 2 rather than silently run on defaults. A `.local.sh`
+  sibling of the resolved config sources last for private overlay values.
 
 The defaults are this repo's own layout, so this repo runs the kit on itself
 with no config file: `CLAUDE.md` is the always-loaded agent file, and its

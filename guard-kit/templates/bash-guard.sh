@@ -5,8 +5,9 @@ set -uo pipefail
 # shellcheck disable=SC2034  # consumed by the sourced lib/guard.sh (guard_block et al.)
 GUARD_NAME="bash-guard"
 GUARD_KIT_LIB="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
-# shellcheck source=/dev/null  # vendored lib path is resolved at runtime; fail-open if absent
-source "$GUARD_KIT_LIB" 2>/dev/null || exit 0
+[[ -f "$GUARD_KIT_LIB" ]] || exit 0
+# shellcheck source=/dev/null  # vendored lib path is resolved at runtime; fail-open above if absent, but the lib's own exit 2 (set-but-missing config) must stay loud
+source "$GUARD_KIT_LIB"
 
 cmd="$(guard_read_command)" || exit 0
 

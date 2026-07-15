@@ -6,10 +6,20 @@ set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
-_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/context-config.sh}"
-if [[ -f "$_ck_cfg" ]]; then
+_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-}"
+if [[ -n "$_ck_cfg" ]]; then
+    [[ -f "$_ck_cfg" ]] || {
+        echo "context-kit: CONTEXT_KIT_CONFIG_FILE not found: $_ck_cfg" >&2
+        exit 2
+    }
     # shellcheck source=/dev/null  # consumer config path is resolved at runtime
     source "$_ck_cfg"
+else
+    _ck_cfg="${GATE_SDK_GATES_DIR:-scripts}/context-config.sh"
+    if [[ -f "$_ck_cfg" ]]; then
+        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
+        source "$_ck_cfg"
+    fi
 fi
 unset _ck_cfg
 

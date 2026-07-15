@@ -1,10 +1,20 @@
 # shellcheck shell=bash
 # spec: doctrine-kit/SPEC.md §lib/doctrine.sh — sourced config loader + the knob defaults, never gate structure
 
-_dk_cfg="${DOCTRINE_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/doctrine-config.sh}"
-if [[ -f "$_dk_cfg" ]]; then
+_dk_cfg="${DOCTRINE_KIT_CONFIG_FILE:-}"
+if [[ -n "$_dk_cfg" ]]; then
+    [[ -f "$_dk_cfg" ]] || {
+        echo "doctrine-kit: DOCTRINE_KIT_CONFIG_FILE not found: $_dk_cfg" >&2
+        exit 2
+    }
     # shellcheck disable=SC1090  # consumer-supplied config, path is config
     source "$_dk_cfg"
+else
+    _dk_cfg="${GATE_SDK_GATES_DIR:-scripts}/doctrine-config.sh"
+    if [[ -f "$_dk_cfg" ]]; then
+        # shellcheck disable=SC1090  # consumer-supplied config, path is config
+        source "$_dk_cfg"
+    fi
 fi
 # spec: doctrine-kit/SPEC.md §lib/doctrine.sh — the local overlay: a gitignored <config>.local.sh beside the tracked config sources last
 _dk_local="${_dk_cfg%.sh}.local.sh"

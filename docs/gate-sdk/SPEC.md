@@ -99,8 +99,10 @@ before resolving them.
 
 `lib/gate.sh` auto-sources the consumer config seam on load, so every gate (all
 source the library) sees the same knob resolution: `GATE_SDK_CONFIG_FILE` when
-set, else `<gates-dir>/gate-sdk-config.sh`, sourced only when the file exists —
-a zero-config consumer is unaffected. Env vars still win (the config file sets a
+set — and a set-but-missing path exits 2 rather than silently running on
+defaults (an operator typo must not pass as clean) — else
+`<gates-dir>/gate-sdk-config.sh`, sourced only when the file exists — a
+zero-config consumer is unaffected. Env vars still win (the config file sets a
 default the invoking shell may override), but the file is how an override
 *persists*: an env-only knob dies with the shell that exported it, so a
 consumer that must relocate a layout knob for every session sets it here. The
@@ -473,10 +475,9 @@ drift-kit) as well as the `lib/` loaders — and for each exports
 `<KIT>_CONFIG_FILE` (name uppercased, `-`→`_`) pointing at one shared empty file
 at `${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.sh`, created idempotently with `: >`:
 fixed path, always empty, so no trap (a test's own `trap … EXIT` stays
-unclobbered) and no growth. The shared *existing* empty file serves both loader
-shapes — the strict shape fails closed (exit 2) on a set-but-missing
-`<KIT>_CONFIG_FILE`, the `${VAR:-default}`-expansion shape skips a missing file
-silently, and an existing empty file is a no-op source for both. Knob-free by
+unclobbered) and no growth. Every kit loader shares one strict shape — fail
+closed (exit 2) on a set-but-missing `<KIT>_CONFIG_FILE` — and the shared
+*existing* empty file is a no-op source for it. Knob-free by
 design: a config-pinning tool cannot itself be configured by the surface it
 pins. A test that must exercise real config overrides after the source (a later
 assignment, or an `env -u <KIT>_CONFIG_FILE` prefix so the loader falls back to

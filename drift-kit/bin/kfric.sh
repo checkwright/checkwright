@@ -8,10 +8,20 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 1
 
 # spec: drift-kit/SPEC.md §Layout and configuration
-_ds_cfg="${DRIFT_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/drift-config.sh}"
-if [[ -f "$_ds_cfg" ]]; then
+_ds_cfg="${DRIFT_KIT_CONFIG_FILE:-}"
+if [[ -n "$_ds_cfg" ]]; then
+    [[ -f "$_ds_cfg" ]] || {
+        echo "drift-kit: DRIFT_KIT_CONFIG_FILE not found: $_ds_cfg" >&2
+        exit 2
+    }
     # shellcheck source=/dev/null  # consumer config path is resolved at runtime
     source "$_ds_cfg"
+else
+    _ds_cfg="${GATE_SDK_GATES_DIR:-scripts}/drift-config.sh"
+    if [[ -f "$_ds_cfg" ]]; then
+        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
+        source "$_ds_cfg"
+    fi
 fi
 unset _ds_cfg
 

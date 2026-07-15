@@ -338,8 +338,9 @@ Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
 
 Config follows the established kit pattern: copy `templates/drift-config.sh`
 into the gates dir (or point `DRIFT_KIT_CONFIG_FILE` elsewhere) and override
-any knob; defaults fill what the consumer left unset. Knobs (this repo's
-layout as defaults):
+any knob; defaults fill what the consumer left unset, and a set-but-missing
+`DRIFT_KIT_CONFIG_FILE` exits 2 rather than silently running on defaults.
+Knobs (this repo's layout as defaults):
 
 - `DRIFT_KIT_KPIS_FILE` — the registry; default
   `${GATE_SDK_GATES_DIR:-scripts}/kpis.list`.

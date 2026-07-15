@@ -371,7 +371,13 @@ guard-kit/
 Config follows the established kit pattern: copy
 `templates/guard-config.sh` into the gates dir (or point
 `GUARD_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset. Knobs (this repo's layout as defaults):
+what the consumer left unset, and a set-but-missing `GUARD_KIT_CONFIG_FILE`
+exits 2 rather than silently running on defaults. In a hook that sources the
+lib, that exit 2 surfaces as a hook block carrying the not-found message —
+loud on the first guarded command, the intended fail-closed (the guards
+gate the lib source on file existence only, so the message is never
+swallowed; a lib that is not vendored at all stays fail-open). Knobs (this
+repo's layout as defaults):
 
 - `GUARD_KIT_LIB` — the vendored `lib/guard.sh` path the copied guards
   source (the test runner points it at the tree under test); default

@@ -1,10 +1,21 @@
 # shellcheck shell=bash
 # spec: guard-kit/SPEC.md §The guard framework — hook primitives + generic ruleset; no project rule content
 
-_frik_cfg="${GUARD_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/guard-config.sh}"
-if [[ -f "$_frik_cfg" ]]; then
+# spec: guard-kit/SPEC.md §Layout and configuration — a set-but-missing GUARD_KIT_CONFIG_FILE exits 2, surfacing as a hook block with this message on the first guarded command
+_frik_cfg="${GUARD_KIT_CONFIG_FILE:-}"
+if [[ -n "$_frik_cfg" ]]; then
+    [[ -f "$_frik_cfg" ]] || {
+        echo "guard-kit: GUARD_KIT_CONFIG_FILE not found: $_frik_cfg" >&2
+        exit 2
+    }
     # shellcheck source=/dev/null  # consumer config path is resolved at runtime
     source "$_frik_cfg"
+else
+    _frik_cfg="${GATE_SDK_GATES_DIR:-scripts}/guard-config.sh"
+    if [[ -f "$_frik_cfg" ]]; then
+        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
+        source "$_frik_cfg"
+    fi
 fi
 unset _frik_cfg
 

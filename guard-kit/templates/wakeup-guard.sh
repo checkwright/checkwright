@@ -5,8 +5,8 @@ set -uo pipefail
 # shellcheck disable=SC2034  # consumed by the sourced lib/guard.sh (guard_block et al.)
 GUARD_NAME="wakeup-guard"
 GUARD_KIT_LIB="${GUARD_KIT_LIB:-guard-kit/lib/guard.sh}"
-# shellcheck source=/dev/null  # sourced only for the log-path knob; deny stands even if absent
-source "$GUARD_KIT_LIB" 2>/dev/null || true
+# shellcheck source=/dev/null  # sourced only for the log-path knob; deny stands even if absent, but the lib's own exit 2 (set-but-missing config) must stay loud
+if [[ -f "$GUARD_KIT_LIB" ]]; then source "$GUARD_KIT_LIB"; fi
 : "${GUARD_KIT_WAKEUP_LOG:=.workflow/wakeup-attempts.log}"
 
 input="$(cat 2>/dev/null || true)"

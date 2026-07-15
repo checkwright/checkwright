@@ -14,22 +14,6 @@
 
 ## Technical Debt
 
-- **strict-config-loader-shape** — the eleven kit config
-  loaders split into two shapes: six fail closed (exit 2) on a set-but-missing
-  `<KIT>_CONFIG_FILE`, five (`${VAR:-default}` expansion) skip it silently —
-  an operator typo in the env var silently runs kit defaults, the same
-  silent-wrong-config class the hermetic bootstrap kills inside tests.
-  Unify the five lenient loaders on the strict shape (doctrine-kit, gate-sdk,
-  guard-kit, plus context-kit's and drift-kit's per-file loader copies —
-  context-kit's live in `checks/` as well as `bin/`); the
-  unset-default path stays skip-if-absent for zero-config consumers.
-  gate-sdk/SPEC.md §lib/test-hermetic's both-shapes sentence is a further
-  read site: it moves with the unification (one shape remains). In the
-  guard lib the strict exit 2 surfaces as a hook block with the message —
-  loud on the first guarded command, which is the intended fail-closed. Each
-  shape is documented in its own SPEC today (divergence, not undocumented
-  drift), so the SPEC lines move with the code. Surfaced 2026-07-14 by
-  surface-trust's align audit.
 
 ## Deferred
 
@@ -65,5 +49,6 @@
 - contribution-intake-triage
 - releases-nav-children
 - scratchpad-path-guard
+- strict-config-loader-shape
 
 ## Lessons Learned

@@ -495,7 +495,9 @@ it (the stated install step is its enforcement).
 Config follows the established kit pattern: copy
 `templates/context-config.sh` into the gates dir (or point
 `CONTEXT_KIT_CONFIG_FILE` elsewhere) and override any knob; defaults fill
-what the consumer left unset. Knobs (this repo's layout as defaults):
+what the consumer left unset, and a set-but-missing `CONTEXT_KIT_CONFIG_FILE`
+exits 2 rather than silently running on defaults. Knobs (this repo's layout
+as defaults):
 
 - `CONTEXT_KIT_SURFACES` — array of always-loaded files; default
   `("CLAUDE.md")`. The measured surface is agent-file-name-agnostic: a consumer

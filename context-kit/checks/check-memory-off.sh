@@ -12,10 +12,20 @@ SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-${GATE_SDK_GATES_DIR:-scripts}/context-config.sh}"
-if [[ -f "$_ck_cfg" ]]; then
+_ck_cfg="${CONTEXT_KIT_CONFIG_FILE:-}"
+if [[ -n "$_ck_cfg" ]]; then
+    [[ -f "$_ck_cfg" ]] || {
+        echo "context-kit: CONTEXT_KIT_CONFIG_FILE not found: $_ck_cfg" >&2
+        exit 2
+    }
     # shellcheck source=/dev/null  # consumer config path is resolved at runtime
     source "$_ck_cfg"
+else
+    _ck_cfg="${GATE_SDK_GATES_DIR:-scripts}/context-config.sh"
+    if [[ -f "$_ck_cfg" ]]; then
+        # shellcheck source=/dev/null  # consumer config path is resolved at runtime
+        source "$_ck_cfg"
+    fi
 fi
 unset _ck_cfg
 
