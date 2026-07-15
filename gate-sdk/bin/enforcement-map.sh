@@ -2,20 +2,43 @@
 # spec: gate-sdk/SPEC.md §enforcement-map — the kit→surface→class map emitted from the class registries; the emitted page owns the enforcement-class taxonomy
 # usage: enforcement-map.sh [--emit]
 #   bare: an advisory header plus the page; --emit: the page only, for the committed docs/enforcement.md projection.
-#   advisory by construction: exit is always 0, never joins gates.list; the freshness gate (check-enforcement-fresh) blocks a stale emission.
+#   advisory by construction: never joins gates.list; a healthy run exits 0 whatever registries are absent, a set-but-missing registry knob exits 2 fail-closed before any stdout; the freshness gate (check-enforcement-fresh) blocks a stale emission.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
-# spec: gate-sdk/SPEC.md §enforcement-map — every registry defaults to this repo's layout and reads through the owning kit's knob, so a consumer relocates each surface without touching the emitter
+# spec: gate-sdk/SPEC.md §enforcement-map — every registry defaults to this repo's layout and reads through the owning kit's knob, so a consumer relocates each surface without touching the emitter; the := expansion erases set-ness, so each knob's explicit value is captured first (adopted-but-broken refuses where not-adopted degrades)
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"
+set_kpis="${DRIFT_KIT_KPIS_FILE:-}"
+set_settings="${CONTEXT_KIT_SETTINGS_FILE:-}"
+set_evidence="${EVIDENCE_KIT_CONFIG_FILE:-}"
+set_scan="${GATE_SDK_ENFORCE_SCAN_DIR:-}"
 : "${DRIFT_KIT_KPIS_FILE:=$GATES_DIR/kpis.list}"
 : "${CONTEXT_KIT_SETTINGS_FILE:=.claude/settings.json}"
 : "${EVIDENCE_KIT_CONFIG_FILE:=$GATES_DIR/evidence-config.sh}"
 : "${GATE_SDK_ENFORCE_SCAN_DIR:=.}"
+
+# spec: gate-sdk/SPEC.md §enforcement-map — check-before-emit: every explicitly set registry knob is verified before the first stdout byte in both modes, stderr naming the knob and exit 2 on a missing path (for the settings knob, also a set file jq refuses to parse; jq absence is a toolchain gap and keeps degrading), so a misconfigured --emit regen leaves an empty projection and a nonzero exit, never a plausible partial page
+preflight_knobs() {
+    local bad=0
+    [[ -n "$set_kpis" && ! -f "$DRIFT_KIT_KPIS_FILE" ]] &&
+        { echo "enforcement-map: DRIFT_KIT_KPIS_FILE not found: $DRIFT_KIT_KPIS_FILE" >&2; bad=1; }
+    [[ -n "$set_evidence" && ! -f "$EVIDENCE_KIT_CONFIG_FILE" ]] &&
+        { echo "enforcement-map: EVIDENCE_KIT_CONFIG_FILE not found: $EVIDENCE_KIT_CONFIG_FILE" >&2; bad=1; }
+    [[ -n "$set_scan" && ! -d "$GATE_SDK_ENFORCE_SCAN_DIR" ]] &&
+        { echo "enforcement-map: GATE_SDK_ENFORCE_SCAN_DIR not found: $GATE_SDK_ENFORCE_SCAN_DIR" >&2; bad=1; }
+    if [[ -n "$set_settings" ]]; then
+        if [[ ! -f "$CONTEXT_KIT_SETTINGS_FILE" ]]; then
+            echo "enforcement-map: CONTEXT_KIT_SETTINGS_FILE not found: $CONTEXT_KIT_SETTINGS_FILE" >&2; bad=1
+        elif command -v jq >/dev/null 2>&1 && ! jq -e . "$CONTEXT_KIT_SETTINGS_FILE" >/dev/null 2>&1; then
+            echo "enforcement-map: CONTEXT_KIT_SETTINGS_FILE unparseable: $CONTEXT_KIT_SETTINGS_FILE" >&2; bad=1
+        fi
+    fi
+    return "$bad"
+}
 # spec: canon-kit/SPEC.md §check-md-refs — the reference-link ref knob (owned by canon-kit); the page's owner-section citations pin to the same ref check-md-refs' self-repo pass validates, so a link the emitter writes is a link the blocker resolves
 : "${CANON_KIT_DOCS_BLOB_REF:=master}"
 SELF_REPO_PREFIX="$(gate_self_repo_prefix "$CANON_KIT_DOCS_BLOB_REF")"
@@ -238,6 +261,8 @@ PREAMBLE
     suite_rows
     monitor_rows
 }
+
+preflight_knobs || exit 2
 
 if [[ "$emit" -eq 0 ]]; then
     echo "=== Enforcement map (advisory — regenerate the committed page with --emit) ==="

@@ -888,9 +888,14 @@ dir, instead of walking the real `gates.list`.
 every check surface — kit, governed surface, enforcement class — derived from
 the class registries so it cannot drift from what actually runs. It is
 check-graph's sibling in shape (an emitter whose output a freshness gate
-byte-compares), advisory by construction: exit is always 0 and it never joins
-`gates.list`. Bare it prints a human header before the page; `--emit` prints the
-page alone, for the committed projection.
+byte-compares), advisory by construction: it never joins `gates.list`, and a
+*healthy* run exits 0 whatever registries are absent — while a misconfigured run
+(a set-but-missing registry knob) exits 2, fail-closed. Every knob check runs
+before the first stdout byte in both modes, so a misconfigured
+`--emit > docs/enforcement.md` regen leaves an empty projection and a nonzero
+exit, never a plausible partial page that byte-matches itself on the next
+freshness check. Bare it prints a human header before the page; `--emit` prints
+the page alone, for the committed projection.
 
 Each enforcement class reads one registry, every registry defaulting to this
 repo's layout through the owning kit's knob: **blocking gates** from
@@ -915,8 +920,18 @@ grammar is the reusable name a future uncovered class adopts rather than growing
 a bespoke registry.
 
 Cross-registry reads are a reporting surface (the drift-report precedent), and
-the emitter degrades per class: a registry a consumer has not adopted leaves its
-section absent, so a gates-only consumer still gets its gate map. The emitted
+the emitter distinguishes two absences per class, converging on the strict
+set-but-missing rule the kit config loaders share (§lib/test-hermetic.sh): a
+registry *not adopted* — its knob unset with the default path absent — degrades,
+leaving its section absent, so a gates-only consumer still gets its gate map; a
+registry *adopted but broken* — its knob explicitly set to a missing path —
+refuses (exit 2, a stderr line naming the knob). The settings knob additionally
+checks parseability when set: set and `jq`-unparseable refuses likewise (a typo
+inside an explicitly adopted file is the same laundering vector as a typo in its
+path), while the default-path file unparseable keeps degrading — a stray
+`.claude/` must not break a zero-config consumer — and `jq` *absence* keeps
+degrading in both modes, a toolchain gap owned by the install requirements /
+env-probe parity, not a config typo. The emitted
 page — not this SPEC — owns the enforcement-class **taxonomy** prose (what each
 class means and how hard it binds); the emitter's preamble heredoc is its single
 source, and this section documents the emitter contract and cites the page for

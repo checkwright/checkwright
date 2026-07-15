@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **enforcement-map-strict-config** [spec: SPEC-enforcement-map-strict-config.md] —
-  converge `gate-sdk/bin/enforcement-map.sh`'s registry-knob reads on the
-  strict set-but-missing distinction (exit 2) the kit config loaders already
-  share, keeping the unset-with-default-absent degrade; the amendment carries
-  the envelope, ordering, and exit-contract rulings. Surfaced 2026-07-15 by
-  edge-discipline's build session.
-
 ## Technical Debt
 
 ## Deferred
@@ -51,5 +44,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- enforcement-map-strict-config
 
 ## Lessons Learned
