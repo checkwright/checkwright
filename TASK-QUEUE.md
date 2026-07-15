@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: enforcement-map-strict-config  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,23 +12,17 @@
 
 ## New Features
 
+- **enforcement-map-strict-config** [spec: SPEC-enforcement-map-strict-config.md] —
+  converge `gate-sdk/bin/enforcement-map.sh`'s registry-knob reads on the
+  strict set-but-missing distinction (exit 2) the kit config loaders already
+  share, keeping the unset-with-default-absent degrade; the amendment carries
+  the envelope, ordering, and exit-contract rulings. Surfaced 2026-07-15 by
+  edge-discipline's build session.
+
 ## Technical Debt
 
 ## Deferred
 
-- **enforcement-map-strict-config** [needs-spec] — `gate-sdk/bin/enforcement-map.sh`
-  reads `EVIDENCE_KIT_CONFIG_FILE` with the retired lenient pattern (a `:=`
-  default expansion followed by a skip-if-absent file test), so a
-  set-but-missing path silently skips the KPI join — the silent-wrong-config
-  class the strict-config-loader-shape unit eliminated from the five kit
-  loaders, left here because the emitter is a cross-kit reader outside that
-  unit's envelope. Converge it on the strict distinction: set-but-missing
-  exits 2; unset with the default absent still skips, preserving the
-  zero-config consumer path. `check-enforcement-fresh`'s byte-compare does not
-  backstop this: a regen under a typo'd `EVIDENCE_KIT_CONFIG_FILE` emits a
-  wrong map that then byte-matches itself on the next check — the freshness
-  gate launders the wrong config rather than catching it. Surfaced 2026-07-15
-  by edge-discipline's build session.
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
