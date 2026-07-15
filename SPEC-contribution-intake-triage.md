@@ -65,7 +65,8 @@ extraction into a kit is demand-gated on a second consumer asking for it.
 
 ## Existing sections updated
 
-- `CONTRIBUTING.md` §Report a gate defect and §Pull requests gain the
+- `CONTRIBUTING.md` §Report a gate defect as a failing fixture pair and
+  §Pull requests gain the
   disposition contract (what happens to a filed issue / opened PR, and
   when); §Support gains the cadence sentence. The merge keeps
   CONTRIBUTING.md's content-tier: contributor-facing expectation, not

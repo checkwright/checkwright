@@ -28,9 +28,11 @@ sentence), `docs/_includes/nav.html`, `docs/releases.md`,
   (it now holds a nav slot); the header comment's release-note rationale is
   rewritten — release notes are on-nav by derivation now. The front-matter-less
   announcement post (no `release:` key) stays allowlisted.
-- **Release runbook step removed.** RELEASING.md's phase-B step "add the note
-  to docs-offnav.list" is deleted: a note joins the nav by its `release:` key
-  with no further step — one less maintained list.
+- **Release runbook step removed.** RELEASING.md's note-authoring step (§The
+  procedure step 2) loses its "Add the post's path to `scripts/docs-offnav.list`"
+  sentence: a note joins the nav by its `release:` key with no further step —
+  the allowlist stops growing per release (it stays for the pages off-nav by
+  design, e.g. the front-matter-less announcement post).
 - **Verification is the local render.** Liquid's dynamic-key lookup
   (`p[key]` under `where_exp`, or a fallback for-loop filter if `where_exp`
   refuses a variable key) is confirmed against the local Jekyll render
@@ -58,7 +60,7 @@ sentence), `docs/_includes/nav.html`, `docs/releases.md`,
   — the gate's `# spec:` lines cite that sentence, so model and prose move
   together.
 - `scripts/docs-offnav.list` header comment (above).
-- RELEASING.md phase-B checklist (above).
+- RELEASING.md §The procedure step 2, the note-authoring step (above).
 
 ## Definition of Done
 

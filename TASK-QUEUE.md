@@ -45,8 +45,11 @@
   an operator typo in the env var silently runs kit defaults, the same
   silent-wrong-config class the hermetic bootstrap kills inside tests.
   Unify the five lenient loaders on the strict shape (doctrine-kit, gate-sdk,
-  guard-kit, plus context-kit's and drift-kit's per-bin loader copies); the
-  unset-default path stays skip-if-absent for zero-config consumers. In the
+  guard-kit, plus context-kit's and drift-kit's per-file loader copies —
+  context-kit's live in `checks/` as well as `bin/`); the
+  unset-default path stays skip-if-absent for zero-config consumers.
+  gate-sdk/SPEC.md §lib/test-hermetic's both-shapes sentence is a further
+  read site: it moves with the unification (one shape remains). In the
   guard lib the strict exit 2 surfaces as a hook block with the message —
   loud on the first guarded command, which is the intended fail-closed. Each
   shape is documented in its own SPEC today (divergence, not undocumented
