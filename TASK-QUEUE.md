@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: edge-discipline  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,30 +12,22 @@
 
 ## New Features
 
+- **contribution-intake-triage** [spec: SPEC-contribution-intake-triage.md] —
+  own the public repo's GitHub issue/PR intake: the boundary sweep in scope's
+  ritual (top-five per lane, promote-or-close, PR dispositions), the
+  CONTRIBUTING.md contract, the seam caution on the governed templates. The
+  amendment carries the rulings. Surfaced 2026-07-15 by the operator
+  planning public-repo intake.
+- **releases-nav-children** [spec: SPEC-releases-nav-children.md] — surface
+  each release note as a derived nav child of the Releases page
+  (`nav_children_key` grammar, nav-include branch, gate-model extension,
+  allowlist and runbook shrink). The amendment carries the rulings; verify
+  with the local Jekyll render. Surfaced 2026-07-14 by the operator
+  reviewing the public site.
+
 ## Technical Debt
 
-## Deferred
-
-- **contribution-intake-triage** [needs-spec] — the public repo makes GitHub
-  issues and PRs an intake surface with no owned process. Rulings captured at
-  filing: intake, never a second queue — this file stays the sole owner of
-  work state, and scope's ritual gains the triage sweep as the single
-  promotion point (each open issue is promoted into queue grammar citing its
-  issue number, or closed with cause — no linked-and-skipped middle state,
-  per gap disposition). PR absorption is a distinct lane the spec must
-  formalize alongside — a PR is reviewed work under CONTRIBUTING.md's
-  fixture-is-the-unit rule, not a task; its ritual slot (mandatory vs
-  optional scope step) and its queue coupling (review findings become
-  entries) are the open design. No parity gate: pre-commit stays offline, so
-  the enforcement point is the ritual checklist / session-context report,
-  never the commit path. Budget protection is in-scope for the unit: a triage
-  cap (top-N sweep per boundary, analysis delegated under the usage verdict,
-  the overflow deferred to the next boundary) so a flood of intake cannot
-  burn the token window on its own analysis. The seam rule rides the
-  governed issue/PR templates: reports describe generic mechanism, never a
-  consumer's private vocabulary. Surfaced 2026-07-15 by the operator
-  planning public-repo intake.
-- **scratchpad-path-guard** [needs-spec] — the harness steers every session
+- **scratchpad-path-guard** — the harness steers every session
   toward its per-session scratchpad under `/tmp/claude-…` while this repo's
   ruling is repo-local `.tmp/` (CLAUDE.md §Housekeeping) — a memory-dependent
   rule, re-leaked in practice (a dead poller script found in the scratchpad).
@@ -47,25 +39,22 @@
   Write/Edit tool calls are not hooked; a `Write|Edit` PreToolUse matcher is
   the follow-on if leakage persists. Surfaced 2026-07-14 by the operator
   reviewing the lead session's scratch hygiene.
-- **strict-config-loader-shape** [needs-spec] — the eleven kit config
+- **strict-config-loader-shape** — the eleven kit config
   loaders split into two shapes: six fail closed (exit 2) on a set-but-missing
   `<KIT>_CONFIG_FILE`, five (`${VAR:-default}` expansion) skip it silently —
   an operator typo in the env var silently runs kit defaults, the same
   silent-wrong-config class the hermetic bootstrap kills inside tests.
-  Unify the five lenient loaders on the strict shape; the unset-default
-  path stays skip-if-absent for zero-config consumers. Each shape is
-  documented in its own SPEC today (divergence, not undocumented drift), so
-  the SPEC lines move with the code. Surfaced 2026-07-14 by surface-trust's
-  align audit.
-- **releases-nav-children** [needs-spec] — surface each release note as a
-  second-level nav child of the Releases page. Ruled derivation-first: the
-  nav include gains a generic derived-children branch — the parent's front
-  matter names a key (e.g. `nav_children_key: release`) and the children
-  derive from the same `release:` query the page body already runs, newest
-  first — never per-note `nav_parent` stamps (dated posts are immutable, and
-  the releases page itself refuses a maintained index). Verify with the
-  local Jekyll render. Surfaced 2026-07-14 by the operator reviewing the
-  public site.
+  Unify the five lenient loaders on the strict shape (doctrine-kit, gate-sdk,
+  guard-kit, plus context-kit's and drift-kit's per-bin loader copies); the
+  unset-default path stays skip-if-absent for zero-config consumers. In the
+  guard lib the strict exit 2 surfaces as a hook block with the message —
+  loud on the first guarded command, which is the intended fail-closed. Each
+  shape is documented in its own SPEC today (divergence, not undocumented
+  drift), so the SPEC lines move with the code. Surfaced 2026-07-14 by
+  surface-trust's align audit.
+
+## Deferred
+
 - **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
