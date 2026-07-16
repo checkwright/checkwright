@@ -4,4 +4,4 @@
 
 ---
 
-— scope a3c15919 2026-07-16
+config-seam-hardening scope a3c15919 2026-07-16

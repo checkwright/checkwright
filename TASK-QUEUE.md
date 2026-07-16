@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: config-seam-hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,40 +12,33 @@
 
 ## New Features
 
+- **demand-driven-usage-refresh** [spec: SPEC-demand-driven-usage-refresh.md] — demand-driven
+  refresh replaces timer polling as the usage-snapshot freshness mechanism: a
+  `DELEGATION_KIT_REFRESH_CMD` knob (with a min-age short-circuit) that usage-verdict runs
+  before reading the snapshot; `usage.txt` survives as last-known-good cache. Bundled by the
+  same operator ruling: the login-reroute hoist ahead of the pause comparison and the
+  at-threshold boundary fix. Design and rulings live in the amendment. Surfaced 2026-07-16
+  by the live lead dispatches of the lifecycle-machinery iteration.
+- **per-gate-validate-baseline** [spec: SPEC-per-gate-validate-baseline.md] — per-gate
+  granularity for the validate baseline's gates suite: an `EVIDENCE_KIT_PARSER_<suite>`
+  per-suite parser override plus a consumer parser mapping the verbose run-gates log to
+  per-gate scenario lines and per-gate baseline rows; in-envelope debt — ek_diff converges
+  on the SPEC's fail-closed claim for observed failures absent from the baseline. The
+  entry's "no kit change expected" premise re-verified false; correction on record in the
+  amendment. Surfaced 2026-07-16 as drain-stage-active-residue's third cost in close's
+  knowledge-friction triage; deferred 2026-07-16 by lead ruling at lifecycle-machinery
+  scope, holding the bundle to one iteration.
+- **prose-tell-abbr-append** [spec: SPEC-prose-tell-abbr-append.md] — union semantics for
+  the prose-tell vocabulary arrays: `_EXTRA` append knobs for
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW` and `CANON_KIT_PROSE_TELL_PHRASES`, dissolving this
+  repo's copied 12-token bundled prefix (enforcement-first: candidate (a) union over
+  candidate (b) freshness gate — ruling in the amendment). Surfaced 2026-07-16 dogfooding
+  check-prose-tells' abbreviation valve during launch-readiness.
+
 ## Technical Debt
 
 ## Deferred
 
-- **prose-tell-abbr-append** [needs-spec] — `CANON_KIT_PROSE_TELL_ABBR_ALLOW`
-  (and the sibling `CANON_KIT_PROSE_TELL_PHRASES`) are replace-not-append: a
-  consumer adding one token must copy the kit's entire bundled universal set
-  verbatim into its config, because assigning the array overwrites the default
-  rather than unioning with it. This repo's `scripts/canon-config.sh` already
-  carries the full 12-token kit default reproduced solely to append four local
-  tokens — a literal duplication that silently staleness-diverges if the kit's
-  bundled set ever changes, since no gate couples the copied prefix to the kit
-  default. Fix candidates: (a) union semantics — the kit seeds the default and
-  the consumer array *extends* it (an append/`_EXTRA` convention, or lib merges
-  default+consumer); (b) a freshness gate coupling any consumer copy of the
-  bundled prefix to the kit default so divergence reds. Gap generalization: the
-  missing check class is consumer-config-restates-kit-default (a value the kit
-  owns, copied into consumer config with no coupling gate) — (a) removes the
-  duplication outright (enforcement-first: eliminate over gate), (b) gates it if
-  a copy must remain. Generic mechanism only: the token vocabulary stays
-  consumer config either way (the provenance seam). Surfaced 2026-07-16
-  dogfooding check-prose-tells' abbreviation valve during launch-readiness.
-- **per-gate-validate-baseline** [needs-spec] — per-gate granularity for the validate
-  baseline's gates suite. Cost carried while deferred: the exit-code parser holds the whole
-  battery as one scenario, so any future suite-level held-red baseline row masks a fresh
-  intra-suite regression until this lands (a per-gate baseline would catch the new red).
-  The standing driver — the drain-entry override holding the gates suite constant-red for
-  a whole validate stage — is removed by drain-stage-active-residue's assertion-B model.
-  Implementation path on record so a later scope does not re-derive it: consumer-side
-  only — an EVIDENCE_KIT_PARSER consumer command mapping the run-gates log to per-gate
-  scenario lines plus per-gate baseline rows (evidence-kit/SPEC.md §Layout and
-  configuration); no kit change expected. Surfaced 2026-07-16 as drain-stage-active-residue's
-  third cost in close's knowledge-friction triage; deferred 2026-07-16 by lead ruling at
-  lifecycle-machinery scope, holding the bundle to one iteration.
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
@@ -110,25 +103,6 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **demand-driven-usage-refresh** [needs-spec] — demand-driven refresh
-  replaces timer polling as the usage-snapshot freshness mechanism: a
-  `DELEGATION_KIT_REFRESH_CMD` knob (empty default) that `usage-verdict` runs
-  before reading the snapshot, so the budget guard and any verdict call poll
-  at decision time; `usage.txt` survives as last-known-good cache,
-  source-agnostic seam, and test seam — never deleted (operator ruling
-  2026-07-16). First live poll proved the gap: the statusline snapshot said
-  2-5% while the endpoint said 28% (a delegated build burning while the
-  supervising session idled). Bundled by the same ruling, the login-reroute
-  hoist (technical debt): `usage.txt` lags an account-switching `/login` by
-  about a minute — the producer stamps the new account id while pct/resets_at
-  still carry the dead login's window, so the reading is a fresh-looking
-  chimera — and the reroute check living only inside the PAUSE branch lets a
-  lagging pct at-or-under the threshold print OK; hoist it ahead of the
-  threshold comparison. Boundary case on record: pct exactly equal to
-  `DELEGATION_KIT_PAUSE_PCT` misses the strict `>` comparison. Interim
-  discipline until this lands: run `templates/usage-poller.sh` then
-  `usage-verdict.sh` before each dispatch. Surfaced 2026-07-16 by the live
-  lead dispatches of the lifecycle-machinery iteration.
 ## Done
 
 ## Lessons Learned
