@@ -2,4 +2,3 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
-lifecycle-machinery lesson rule queue-kit/SPEC.md §The tag algebra — **drain-exempt-reason-width**
