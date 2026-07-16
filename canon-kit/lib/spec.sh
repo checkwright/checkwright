@@ -99,6 +99,24 @@ declare -p CANON_KIT_COMMENT_POSITIONAL &>/dev/null || CANON_KIT_COMMENT_POSITIO
 declare -p CANON_KIT_COMMENT_WHITELIST &>/dev/null || CANON_KIT_COMMENT_WHITELIST=()
 [[ -v CANON_KIT_COMMENT_RUN_CAP ]] || CANON_KIT_COMMENT_RUN_CAP=3
 
+declare -p CANON_KIT_PROSE_TELL_GLOBS &>/dev/null || CANON_KIT_PROSE_TELL_GLOBS=()
+[[ -v CANON_KIT_PROSE_TELL_EMDASH_MAX ]]       || CANON_KIT_PROSE_TELL_EMDASH_MAX=2
+[[ -v CANON_KIT_PROSE_TELL_CONTRAST_MAX ]]     || CANON_KIT_PROSE_TELL_CONTRAST_MAX=1
+[[ -v CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES ]] || CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES=4
+[[ -v CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN ]]    || CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN="0.25"
+[[ -v CANON_KIT_PROSE_TELL_TRICOLON_MAX ]]     || CANON_KIT_PROSE_TELL_TRICOLON_MAX=2
+declare -p CANON_KIT_PROSE_TELL_PHRASES &>/dev/null || CANON_KIT_PROSE_TELL_PHRASES=(
+    "It's worth noting"
+    "It is worth noting"
+    "It's important to note"
+    "That said"
+    "Needless to say"
+    "It goes without saying"
+)
+declare -p CANON_KIT_PROSE_TELL_ABBR_ALLOW &>/dev/null || CANON_KIT_PROSE_TELL_ABBR_ALLOW=(
+    "API" "CLI" "URL" "HTML" "CSS" "JSON" "YAML" "CI" "SDK" "SSO" "DNS" "HTTPS"
+)
+
 spec_alt() { local IFS='|'; printf '%s' "$*"; }
 
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib

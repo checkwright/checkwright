@@ -47,6 +47,7 @@ reads the tag syntax [queue-kit](https://github.com/checkwright/checkwright/tree
    check-md-refs                # internal markdown links resolve
    check-spec-fence-balance     # even fence counts, parsers never desync
    check-docs-link-convention   # needs a docs site (cite-downward links)
+   check-prose-tells            # needs prose surfaces (mechanical AI-prose tells)
    check-deprecation-task       # needs a deprecation-marker vocabulary
    ```
 

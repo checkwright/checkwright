@@ -267,6 +267,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/
     run_gate check-prose-enum canon-kit/checks/check-prose-enum.sh
 fi
 
+if staged_matches 'docs/*.md'; then
+    run_gate check-prose-tells canon-kit/checks/check-prose-tells.sh
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     run_gate check-knob-citation canon-kit/checks/check-knob-citation.sh
 fi

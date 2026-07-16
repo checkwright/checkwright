@@ -14,7 +14,10 @@ probabilistic; the non-mechanical read stays human (this iteration: a one-time
 validate pass).
 
 Assertions, each mechanical and threshold-gated (a paragraph is a blank-line
-delimited block; a section is a `##`-headed span):
+delimited block and a section is a `##`-headed span, except that each markdown
+list item (`-`/`*`/`+`/`N.`) is its own unit for every paragraph and section
+assertion — a definition list carrying one em-dash per item is well-formed
+markdown, not flowing prose, so its items are never lumped into one block):
 
 - **A. Em-dash density** — a paragraph carrying more than
   `CANON_KIT_PROSE_TELL_EMDASH_MAX` (default `2`) em-dashes.

@@ -270,6 +270,26 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   with a per-entry `# until: <drain-task>`. `CANON_KIT_COMMENT_RUN_CAP` —
   positive integer, default 3: total physical comment lines a directive
   blesses (its own line plus continuations, blank `#` lines counted).
+- `CANON_KIT_PROSE_TELL_GLOBS` — array of repo-root-relative globs, default
+  empty ⇒ nothing scanned, a clean pass: the reader-facing prose surfaces
+  `check-prose-tells` reads. Which surfaces carry authored prose is the
+  consumer's editorial posture, and per the provenance seam it never lands as a
+  kit literal. The threshold knobs, each read by `check-prose-tells` alone:
+  `CANON_KIT_PROSE_TELL_EMDASH_MAX` — em-dashes a paragraph may carry, default
+  `2`; `CANON_KIT_PROSE_TELL_CONTRAST_MAX` — "not X, it's Y" contrast turns a
+  section may carry, default `1`; `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` —
+  sentences a paragraph needs before its rhythm is judged, default `4`;
+  `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` — the word-count coefficient-of-variation
+  floor beneath which a paragraph reads as metronomic, default `0.25`;
+  `CANON_KIT_PROSE_TELL_TRICOLON_MAX` — "A, B, and C" triples a section may
+  carry, default `2`. `CANON_KIT_PROSE_TELL_PHRASES` — array of throat-clearing
+  phrases matched case-insensitively, default a bundled generic-English set
+  (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
+  array of abbreviations exempt from the undefined-abbreviation tell, default a
+  bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends either
+  array with its own vocabulary (the `CANON_KIT_TEMPORAL_MARKERS` precedent —
+  generic English is kit-shippable, a consumer's own vocabulary never becomes a
+  kit literal).
 
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
@@ -1069,6 +1089,62 @@ fixture runner invokes from a case directory. Not a git repository, or a
 `git grep` that errors, is fail-closed (exit 2). The `# graph:` manifest couples
 the doc set to `scripts/*.sh` and every kit's shell sources (`kit:*.sh`), so a
 script rename or a knob retirement re-fires the gate over the docs.
+
+### check-prose-tells
+
+The mechanical subset of the AI-prose tells — the machine-detectable patterns
+that mark agent-authored reader-facing prose — over the consumer-configured
+markdown surfaces (`CANON_KIT_PROSE_TELL_GLOBS`; empty ⇒ nothing scanned, the
+correct unconfigured-consumer no-op). Judgment-dependent tells (voice, argument
+shape, hedging) are out of scope permanently: the gate never grows heuristics
+that would make it probabilistic; that read stays human.
+
+It runs six mechanical assertions over each surface, every one threshold-gated:
+em-dash density (A), throat-clearing phrases (B), contrast cadence (C),
+undefined abbreviations (D), sentence-rhythm variance (E), and tricolon density
+(F). A paragraph is a blank-line-delimited block and a section is a `##`-headed
+span, except that each markdown list item (`-`/`*`/`+`/`N.`) is its own unit for
+every paragraph and section assertion — a definition list carrying one em-dash
+per item is well-formed markdown, not flowing prose, so its items are never
+lumped into one block (the same structural holdout the non-prose surfaces below
+earn). Because the tells measure authored prose, three non-prose surfaces are
+held out before any assertion runs: inline `` `code` `` spans, markdown table
+rows, and generated `<!-- name:begin -->`…`<!-- name:end -->` regions (each
+byte-gated elsewhere — a prose gate that forced edits to generated content
+would contradict its generation, the same reasoning that keeps `docs/posts/`
+out of the opt-in). Fenced code the shared walk driver already drops.
+
+- **A. Em-dash density** — a paragraph carrying more than
+  `CANON_KIT_PROSE_TELL_EMDASH_MAX` em-dashes.
+- **B. Throat-clearing phrases** — a case-insensitive match of any
+  `CANON_KIT_PROSE_TELL_PHRASES` member.
+- **C. Contrast cadence** — the "not X — it's Y" shape (a `not …` clause
+  resolved across an em-dash or `, but` into `it's`/`it is`) more than
+  `CANON_KIT_PROSE_TELL_CONTRAST_MAX` times in a section.
+- **D. Undefined abbreviations** — an all-caps token of length ≥ 3 the file
+  never expands (no parenthesized expansion at any occurrence) and absent from
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW`.
+- **E. Sentence-rhythm variance** — a paragraph of at least
+  `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` sentences whose sentence
+  word-count coefficient of variation falls below
+  `CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN` (metronomic cadence).
+- **F. Tricolon density** — more than `CANON_KIT_PROSE_TELL_TRICOLON_MAX`
+  `A, B, and C` constructions in a section.
+
+Exact detection regexes are implementation, owned by the gate source; the
+`good/`+`bad/` fixture pair is the executable statement of each boundary
+(`bad/` trips every assertion, `good/` passes all and demonstrates the valve).
+Thresholds are the `CANON_KIT_PROSE_TELL_*` knobs (§Layout and configuration).
+
+**Valve** — an HTML comment `<!-- prose-tell-exempt: <reason> -->` on the
+flagged line or directly above it suppresses the tell at that site; it rides the
+shared exempt-window (§lib/spec.sh — the line or the one above), and the reason
+is mandatory (the `comment-tier-exempt:` convention — a deliberate stylistic
+keep carries its cause in-line, a reasonless valve is red). The gate is a
+producer of nothing but a verdict: the committing session reads the red and
+either fixes the prose or lands a reasoned valve (oracle-first), the fixture
+pair feeds `run-gate-tests.sh`, and every `CANON_KIT_PROSE_TELL_*` field is read
+by `check-prose-tells` at scan time and no other component.
 
 ### templates/
 
