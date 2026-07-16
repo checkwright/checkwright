@@ -58,6 +58,22 @@
 
 ## Deferred
 
+- **drain-stage-active-residue** [needs-spec] — check-stage-entry assertion B
+  (drain-entry queue-empty) has no model for active-section entries that
+  legitimately persist into validate. The drain model assumes the active queue
+  empties before validate, yet two active items can both legitimately remain: a
+  validate-spanning feature — launch-readiness-gate, the first to hit this,
+  whose build half ships and whose validate half is the four readiness checks,
+  so Done is false and Deferred is wrong while it is being validated — and a
+  designed-debt item that cannot move to the Deferred section without a false
+  needs-spec tag (env-probe-auto-refresh, per check-amendment-queue rule (b),
+  which requires every Deferred entry to carry needs-spec, and which the item's
+  designed-debt nature makes false; it is correctly in Technical Debt). Both
+  legitimately block the drain assertion, so entering validate needs the
+  enter-stage.sh by-hand override — the gate's own designed escape for a case
+  assertion B admits it cannot model. Fix candidates: per-iteration
+  active-section scoping, a spanning/standing-residue exemption tag, or a valve
+  on assertion B. Surfaced 2026-07-16 entering validate for launch-readiness.
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
