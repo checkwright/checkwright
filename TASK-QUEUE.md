@@ -12,8 +12,6 @@
 
 ## New Features
 
-## Technical Debt
-
 - **env-probe-auto-refresh** [spec: SPEC-env-probe-refresh.md] — automate the
   env-profile refresh: the session-context hook re-probes once per session (at
   its step-9 profile emit) in place of the install-plus-on-demand cadence, and
@@ -28,6 +26,8 @@
   change-detection semantics, DoD) is on record in
   context-kit/SPEC-env-probe-refresh.md. Surfaced 2026-07-16 by the operator
   questioning the install+on-demand cadence and a probe-runtime measurement.
+
+## Technical Debt
 
 ## Deferred
 
@@ -57,22 +57,20 @@
   whose build half ships and whose validate half is the four readiness checks,
   so Done is false and Deferred is wrong while it is being validated — and a
   designed-debt item that cannot move to the Deferred section without a false
-  needs-spec tag (env-probe-auto-refresh, per check-amendment-queue rule (b),
-  which requires every Deferred entry to carry needs-spec, and which the item's
-  designed-debt nature makes false; it is correctly in Technical Debt). Both
-  legitimately block the drain assertion, so entering validate needs the
-  enter-stage.sh by-hand override — the gate's own designed escape for a case
-  assertion B admits it cannot model. The gap's cost is threefold: (1) it blocks
-  validate entry without the by-hand override; (2) the override then leaves the
-  full battery red for the stage's duration (the validate-baseline holds the
-  suite constant-red); and (3) that suite-level baseline granularity masks any
-  *new* intra-battery gate regression introduced during validate — a per-gate
-  baseline would catch a fresh red, the whole-suite one cannot. Fix candidates:
-  per-iteration active-section scoping, a spanning/standing-residue exemption
-  tag, or a valve on assertion B (cost 3 additionally wants per-gate baseline
-  granularity so an intra-validate regression is not masked). Surfaced
-  2026-07-16 entering validate for launch-readiness; the third cost surfaced in
-  close's knowledge-friction triage.
+  needs-spec tag. Both legitimately block the drain assertion, so entering
+  validate needs the enter-stage.sh by-hand override — the gate's own designed
+  escape for a case assertion B admits it cannot model. The gap's cost is
+  threefold: (1) it blocks validate entry without the by-hand override; (2) the
+  override then leaves the full battery red for the stage's duration (the
+  validate-baseline holds the suite constant-red); and (3) that suite-level
+  baseline granularity masks any *new* intra-battery gate regression introduced
+  during validate — a per-gate baseline would catch a fresh red, the whole-suite
+  one cannot. Fix candidates: per-iteration active-section scoping, a
+  spanning/standing-residue exemption tag, or a valve on assertion B (cost 3
+  additionally wants per-gate baseline granularity so an intra-validate
+  regression is not masked). Surfaced 2026-07-16 entering validate for
+  launch-readiness; the third cost surfaced in close's knowledge-friction
+  triage.
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
