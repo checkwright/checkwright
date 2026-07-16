@@ -10,7 +10,8 @@
 
 ## Technical Debt
 
-- **tidy-logs** — collapse the duplicated log lines.
+- **tidy-logs** [drain-exempt: validate-half pending] — collapse the duplicated log lines.
+  a continuation mentioning [drain-exempt: whatever] is tolerated (lead carries the class).
 
 ## Deferred
 

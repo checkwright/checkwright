@@ -524,6 +524,7 @@ omitted. This is the enumeration sibling of check-manifest-count's restated
 totals and the prose analog of check-kit-enum's hand-list doctrine: the count
 gate catches a bare cardinal over a growing collection, but a row that
 *enumerates instead of counting* drifts just as silently when the set grows.
+<!-- prose-enum-exempt: historical attested-drift citation — names the set as it stood when the drift occurred, deliberately not tracking growth -->
 The attested drift: a README row's `blocked-by/needs-spec/spec` tag algebra went
 incomplete when a sibling tag landed — same restatement, different surface form,
 no scanner. Engagement mirrors check-kit-enum — two members are a list, a lone

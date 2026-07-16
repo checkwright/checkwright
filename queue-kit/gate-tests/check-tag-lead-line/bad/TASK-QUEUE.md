@@ -7,6 +7,8 @@
 - **alpha-feature** — build the alpha surface.
   it is really [blocked-by: beta-feature] until beta ships.
 - **beta-feature** — the prerequisite groundwork.
+- **gamma-feature** — a drain-spanning surface whose exemption reflowed
+  off the lead line: [drain-exempt: validate-half pending] no reader sees it.
 
 ## Technical Debt
 

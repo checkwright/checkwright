@@ -1,1 +1,1 @@
-on a continuation line
+[drain-exempt] on a continuation line

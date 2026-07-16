@@ -66,6 +66,12 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   rules) are canon-kit's amendment lifecycle and land with that kit.
 - `[spec: <file>]` — spec-ready pointer. Same split: syntax here, amendment
   semantics in canon-kit.
+- `[drain-exempt: <reason>]` — drain-stage residue marker: the entry
+  legitimately stays active into the drain stage (a drain-spanning feature
+  whose remaining half *is* drain-stage work). Same split: syntax here;
+  placement semantics — the drain-entry exemption, the non-empty-reason
+  grammar, the successor-entry backstop — are lifecycle-kit's
+  `check-stage-entry` assertion B.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
 
@@ -163,7 +169,10 @@ fail-open, not an error.
 
 Compact surface of the queue for task selection — the iteration header line
 if present, then every top-level active entry as a one-line title plus tags,
-ready (`•`) vs blocked (`✗`) marked from the `[blocked-by:]` tag alone.
+ready (`•`) vs blocked (`✗`) marked from the `[blocked-by:]` tag alone. Tags
+are stripped from the one-line title; `[blocked-by:]` and
+`[drain-exempt: <reason>]` are re-echoed after it — the two tags a picking
+session acts on without opening the entry body.
 `--extent <slug>` prints the inclusive line range of one entry's body (parent
 slug → whole subtree; boundary = next sibling-or-shallower bullet, heading,
 `---`, or EOF, including the trailing blank so a range deletion leaves no
@@ -240,14 +249,15 @@ fenced-code blocks, and lines over budget solely due to one unbreakable token
 
 Invariant: every **lead-line-scoped** tag sits on its bullet's lead line — the
 only line *its* readers scan; such a tag pushed to a continuation line by a
-reflow silently unblocks a task, masks a needs-spec state, or drops a lesson out
-of the attention block. Membership tracks reader semantics, not §The tag
+reflow silently unblocks a task, masks a needs-spec state, voids a drain
+exemption, or drops a lesson out of the attention block. Membership tracks reader semantics, not §The tag
 algebra: a tag is governed here when its readers scan lead lines alone, so the
 set is narrower than the algebra's and `[precondition-ok:]` is deliberately
 outside it — `check-queue-prose-precondition` honors that tag anywhere in the
 entry, leaving it no lead-line requirement to enforce. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
-`[spec:]` / `[needs-spec]` in the task sections (active + deferred), plus
+`[spec:]` / `[needs-spec]` / `[drain-exempt:]` in the task sections
+(active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
 section — the section `queue-index.sh` now reads, which retires the old "parsed
 by no reader" exemption for it. Couples

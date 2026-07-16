@@ -67,6 +67,28 @@ out="$(QUEUE_KIT_ATTEND_CAP=2 bash "$IDX" --collapse-deferred "$SANDBOX/TASK-QUE
 want "collapse-block" "$out" "Attention (Lessons [attend], this iteration):"
 want "collapse-l1"    "$out" "first attention point"
 
+# [drain-exempt: <reason>] re-echoed on the active line (tags otherwise stripped).
+cat >"$SANDBOX/drain.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo  [stage: validate]
+
+## New Features
+
+- **feat-b** [drain-exempt: validate-half pending] — spanning feature.
+
+## Technical Debt
+
+## Deferred
+
+## Done
+
+## Lessons Learned
+EOF
+out="$(bash "$IDX" "$SANDBOX/drain.md")"
+want "drain-echo"  "$out" "[drain-exempt: validate-half pending]"
+want "drain-ready" "$out" "• feat-b"
+
 # no [attend] entries -> no attention block.
 cat >"$SANDBOX/none.md" <<'EOF'
 # TASK-QUEUE.md
@@ -92,5 +114,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "queue-index.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-index.test.sh: clean (attend block: cap+overflow, default cap, --collapse-deferred, empty, 12 checks)"
+echo "queue-index.test.sh: clean (attend block: cap+overflow, default cap, --collapse-deferred, empty; drain-exempt echo; 14 checks)"
 exit 0

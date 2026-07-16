@@ -60,6 +60,12 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
         if (length(t) > 64) t = substr(t, 1, 63) "…"
         return t
     }
+    function drainex(line,   d) {
+        if (!match(line, /\[drain-exempt:[[:space:]]*[^]]+\]/)) return ""
+        d = substr(line, RSTART, RLENGTH)
+        sub(/\[drain-exempt:[[:space:]]*/, "", d); sub(/\][[:space:]]*$/, "", d)
+        return d
+    }
     function blockers(line,   s, r, b) {
         s = line; r = ""
         while (match(s, /\[blocked-by:[[:space:]]*[a-z0-9][a-z0-9-]*/)) {
@@ -82,9 +88,10 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
 
     sec == "active" && /^-[[:space:]]/ && match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/) {
         sl = substr($0, RSTART + 2, RLENGTH - 4)
-        bl = blockers($0)
+        bl = blockers($0); de = drainex($0)
         na++; amark[na] = (bl == "" ? "•" : "✗"); aslug[na] = sl
-        atitle[na] = title($0) (bl == "" ? "" : "   [blocked-by: " bl "]")
+        atitle[na] = title($0) (bl == "" ? "" : "   [blocked-by: " bl "]") \
+                              (de == "" ? "" : "   [drain-exempt: " de "]")
         next
     }
     sec == "deferred" && /^###[[:space:]]/ {

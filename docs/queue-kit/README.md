@@ -8,8 +8,8 @@ generated: true
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
 square-bracket tags (`[blocked-by:]`, `[needs-spec]`, `[spec:]`,
-`[precondition-ok:]`, plus the Lessons Learned channel's `[attend]` and the
-consumer-named harvest tags) are the state machine. Gates hold the grammar a coding agent selects work by, and a
+`[drain-exempt:]`, `[precondition-ok:]`, plus the Lessons Learned channel's
+`[attend]` and the consumer-named harvest tags) are the state machine. Gates hold the grammar a coding agent selects work by, and a
 `queue-index.sh` tool renders the compact selection surface.
 
 Why: an agent picks work by *parsing*, not reading — so everything selection

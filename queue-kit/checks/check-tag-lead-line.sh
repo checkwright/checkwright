@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
-# spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag (blocked-by/spec/needs-spec in the task sections, attend + configured lesson tags in Lessons) sits on its bullet's lead line, the only line the tag readers scan
+# spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag (blocked-by/spec/needs-spec/drain-exempt in the task sections, attend + configured lesson tags in Lessons) sits on its bullet's lead line, the only line the tag readers scan
 #
 # usage: check-tag-lead-line.sh [queue-file]
 #   Defaults to the configured queue file (QUEUE_KIT_QUEUE_FILE).
@@ -26,6 +26,7 @@ out="$(awk -v taskre="$QUEUE_TASK_RE" -v lessonsre="$QUEUE_LESSONS_RE" \
         if (line ~ /\[spec:/)        arr["spec"]       = 1
         if (line ~ /\[needs-spec\]/) arr["needs-spec"] = 1
         if (line ~ /\[attend\]/)     arr["attend"]     = 1
+        if (line ~ /\[drain-exempt:/) arr["drain-exempt"] = 1
         for (i = 1; i <= nlt; i++)
             if (index(line, "[" lt[i] "]")) arr[lt[i]] = 1
     }
