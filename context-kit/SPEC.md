@@ -120,12 +120,16 @@ session. Steps, in order:
    header-lag rule below is about *conditioning*, not about which stage's
    rules to show.
 9. **Env profile** — when the consumer-local profile file
-   (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, its whole body is
-   emitted verbatim so the session adapts its commands to the box it runs on.
-   Silent when the file is absent — the harness's own `Platform:` line is the
-   fallback, and no always-loaded cost is paid where no profile was seeded.
-   The consumer owns the file's brevity (they author the gotchas half), the
-   drift-line precedent.
+   (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, the step first runs
+   `bin/env-probe.sh` to re-probe it (output suppressed so no status line
+   reaches the brief), then emits its whole body verbatim so the session adapts
+   its commands to the box as it is now. The re-probe sits inside the same
+   file-present guard, so producer and consumer co-locate here and the probe
+   never auto-seeds a profile the operator did not opt into. Silent when the
+   file is absent — the harness's own `Platform:` line is the fallback, no
+   re-probe fires, and no always-loaded cost is paid where no profile was
+   seeded. The consumer owns the file's brevity (they author the gotchas half),
+   the drift-line precedent.
 
 **The header-lag rule.** The hook runs at session start, before the
 arriving skill flips the `[stage:]` header (its first step), so a
@@ -156,8 +160,10 @@ those machine facts ever landing in the public tree. It writes a
 marker-bounded generated block (`<!-- context-kit:env:begin -->` /
 `:end`, via gate-sdk's shared `inject_marker_block` helper) into the file named
 by `CONTEXT_KIT_ENV_PROFILE_FILE` (default `ENV.local.md`), replacing an
-existing block or appending a fresh one; the block carries its probe date. The
-probed half is derivation-first — never hand-maintained.
+existing block or appending a fresh one — but only when the probed content
+actually changed (Cadence, below), so the block's probe date marks the last
+real change, not the last run. The probed half is derivation-first — never
+hand-maintained.
 
 **What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager
 (first present of an ordered detection walk over the known managers); the probe
@@ -169,17 +175,26 @@ list (probe-set members `command -v` cannot resolve).
 "no `dig`/`host`; use `getent`/DoH" class a probe cannot know — live *outside*
 the markers in the same file and survive every re-probe; when the file is
 absent the probe seeds that scaffold once, then only ever rewrites the block.
+The per-session re-probe (Cadence, below) does not trigger that seeding: it
+runs only against a file that already exists, so seeding stays a
+first-run/on-demand action.
 The file is `BRIEF.local.md`-class: local-only, gitignored (this repo's
 `.gitignore` and the CLAUDE.md housekeeping line carry it), so machine facts
 stay private.
 
-**Cadence — cached projection, not per-session probe.** Env changes rarely and
-hook latency is a per-session tax, so the probe runs at install ("seed your env
-profile" is an install step) and on operator demand; the block's probe date is
-the staleness signal. No freshness gate — env truth is not cheaply
-machine-verifiable and the probe is already the derivation (the
-enforcement-first carve-out; the stated install step is the enforcement).
-§The session-context hook's step 9 is the consumer of the file.
+**Cadence — per-session auto-refresh.** The session-context hook re-probes
+once per session, at its step-9 profile emit (§The session-context hook), so a
+session always adapts to the box as it is now — the install step seeds the
+profile once, and every session thereafter refreshes it. Change-detection keeps
+this cheap and the date honest: the probe rewrites the block only when the
+probed content differs from what is on disk (the `Probed` date line excluded
+from the comparison), so an unchanged box writes nothing and the date marks the
+last real change, not the last run. Still no freshness gate — env truth is not
+cheaply machine-verifiable and the probe is already the derivation (the
+enforcement-first carve-out; the per-session re-probe is now the enforcement,
+replacing the install-step-only cadence). The hook re-probes only when the
+profile file already exists, so a never-seeded consumer pays no cost and seeds
+nothing unbidden.
 
 ## The always-loaded meter
 

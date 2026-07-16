@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **env-probe-auto-refresh** [spec: SPEC-env-probe-refresh.md] — automate the
-  env-profile refresh: the session-context hook re-probes once per session (at
-  its step-9 profile emit) in place of the install-plus-on-demand cadence, and
-  `bin/env-probe.sh` gains change-detection so the block and its `Probed` date
-  rewrite only on an actual content change — the date stays a real last-changed
-  signal and an unchanged box writes nothing. Single-component (context-kit):
-  both the producer (env-probe) and the step-9 consumer are context-kit's own,
-  so no cross-kit coupling. The hook re-probes only when the profile file
-  already exists, so the silent-when-absent / no-cost-where-unseeded contract
-  holds.
-  Full design (producers/consumers, the Cadence-paragraph rewrite,
-  change-detection semantics, DoD) is on record in
-  context-kit/SPEC-env-probe-refresh.md. Surfaced 2026-07-16 by the operator
-  questioning the install+on-demand cadence and a probe-runtime measurement.
-
 ## Technical Debt
 
 ## Deferred
@@ -184,5 +169,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- env-probe-auto-refresh
 
 ## Lessons Learned

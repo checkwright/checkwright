@@ -87,14 +87,25 @@ this box; resolve names with `getent hosts` or a DoH `curl`.
 SEED
 fi
 
-action="$(
-    {
-        printf '_Probed %s by context-kit env-probe — do not hand-edit inside the markers._\n\n' "$(date +%F)"
-        printf -- '- **OS:** %s\n' "$os_line"
-        printf -- '- **Package manager:** %s\n' "$pm"
-        printf -- '- **Toolchain:**\n%s' "$tool_lines"
-        printf -- '- **Absent:** %s\n' "$absent_line"
-    } | inject_marker_block "$CONTEXT_KIT_ENV_PROFILE_FILE" "$BEGIN" "$END"
-)" || { echo "env-probe: failed to write profile block" >&2; exit 2; }
+new_body="$(
+    printf '_Probed %s by context-kit env-probe — do not hand-edit inside the markers._\n\n' "$(date +%F)"
+    printf -- '- **OS:** %s\n' "$os_line"
+    printf -- '- **Package manager:** %s\n' "$pm"
+    printf -- '- **Toolchain:**\n%s' "$tool_lines"
+    printf -- '- **Absent:** %s\n' "$absent_line"
+)"
+
+# spec: context-kit/SPEC.md §bin/env-probe — change-detection: rewrite the block only when the probed content differs from disk, comparing every line but the derived `Probed <date>` line, so an unchanged box writes nothing and the date stays a last-changed signal
+new_cmp="$(printf '%s\n' "$new_body" | grep -v '^_Probed ')"
+if grep -qF -- "$BEGIN" "$CONTEXT_KIT_ENV_PROFILE_FILE" 2>/dev/null; then
+    old_cmp="$(awk -v b="$BEGIN" -v e="$END" '$0==b{i=1;next} $0==e{i=0;next} i' "$CONTEXT_KIT_ENV_PROFILE_FILE" | grep -v '^_Probed ')"
+    if [[ "$new_cmp" == "$old_cmp" ]]; then
+        echo "env-probe: env profile block unchanged in $CONTEXT_KIT_ENV_PROFILE_FILE (Probed date preserved)"
+        exit 0
+    fi
+fi
+
+action="$(printf '%s\n' "$new_body" | inject_marker_block "$CONTEXT_KIT_ENV_PROFILE_FILE" "$BEGIN" "$END")" \
+    || { echo "env-probe: failed to write profile block" >&2; exit 2; }
 
 echo "env-probe: $action the env profile block in $CONTEXT_KIT_ENV_PROFILE_FILE"

@@ -111,9 +111,11 @@ if [[ -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
     fi
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — step 9 env profile; consumer-local machine profile emitted verbatim when present (env-profile seam, drift-line precedent)
+# spec: context-kit/SPEC.md §The session-context hook — step 9 env profile; consumer-local machine profile re-probed then emitted verbatim when present (env-profile seam, drift-line precedent)
 ENV_PROFILE_FILE="${CONTEXT_KIT_ENV_PROFILE_FILE:-ENV.local.md}"
 if [[ -f "$ENV_PROFILE_FILE" ]]; then
+    # spec: context-kit/SPEC.md §The session-context hook — per-session auto-refresh: re-probe inside the file-present guard (never auto-seeds), output suppressed; retarget the probe path to your layout [EDIT ME]
+    [[ -f "$CTX_BIN/env-probe.sh" ]] && bash "$CTX_BIN/env-probe.sh" >/dev/null 2>&1 || true
     echo
     echo "Local env profile ($ENV_PROFILE_FILE) — adapt commands to this box:"
     cat "$ENV_PROFILE_FILE" 2>/dev/null || true
