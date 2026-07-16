@@ -19,8 +19,9 @@
   executor-facing steps for a lead; `LIFECYCLE_KIT_SESSION_BOUNDARY` untouched — role rides
   the marker, ruled. Design, rationale, and rejected alternatives live in the amendment.
   Surfaced 2026-07-16 in a /lead design session.
-- **drain-stage-active-residue** [spec: SPEC-drain-stage-active-residue.md] — model
-  legitimate drain-stage residue in check-stage-entry assertion B: a drain-exempt reason
+- **drain-stage-active-residue** [spec: SPEC-drain-stage-active-residue.md] [drain-exempt: baseline]
+  — model legitimate drain-stage residue in check-stage-entry assertion B: a
+  drain-exempt reason
   tag skipped at drain entry, with a no-exemption backstop at the drain successor's entry;
   coupled check-amendment-queue clause — a spec-ready entry belongs in the feature section;
   case 2 ruled a mis-filing, not a gate gap; the held-red gates baseline row promotes to
