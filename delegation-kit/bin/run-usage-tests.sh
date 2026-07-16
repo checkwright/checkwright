@@ -11,6 +11,11 @@ CASES="${1:-$KIT/usage-tests/cases.tsv}"
 [[ -x "$GATE" ]]  || { echo "run-usage-tests: missing or non-executable $GATE" >&2; exit 2; }
 [[ -f "$CASES" ]] || { echo "run-usage-tests: cases file not found: $CASES" >&2; exit 2; }
 
+# spec: delegation-kit/SPEC.md §Testing — the table encodes the kit defaults, so strip ambient DELEGATION_KIT_* at every gate invocation; the poison export proves the strip each run (a leak fails the table loudly)
+export DELEGATION_KIT_PAUSE_PCT=0
+DK_UNSET=()
+while IFS= read -r name; do DK_UNSET+=(-u "$name"); done < <(env | grep -o '^DELEGATION_KIT_[A-Za-z0-9_]*')
+
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 USAGE="$SANDBOX/usage.txt"
@@ -42,7 +47,7 @@ while IFS=$'\t' read -r verdict want pct age_off reset_off cred_age pct_7d reset
     fi
 
     rm -f "$HIST"
-    out="$( cd "$SANDBOX" && DELEGATION_KIT_USAGE_HISTORY="$HIST" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
+    out="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" DELEGATION_KIT_USAGE_HISTORY="$HIST" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
     ran=$((ran + 1))
 
     if [[ "$rc" -ne "$want" ]]; then
@@ -86,7 +91,7 @@ done < "$CASES"
     printf 'updated_at=%s\n' "$now"
 } > "$USAGE"
 rm -f "$CRED"
-wout="$( cd "$SANDBOX" && DELEGATION_KIT_FAN_WIDTH=7 bash "$GATE" "$USAGE" "$CRED" 2>&1 )"
+wout="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" DELEGATION_KIT_FAN_WIDTH=7 bash "$GATE" "$USAGE" "$CRED" 2>&1 )"
 ran=$((ran + 1))
 if ! grep -qF -- "width=7 " <<<"$wout"; then
     echo "  FAIL [fan-width knob override]: width field did not track DELEGATION_KIT_FAN_WIDTH=7: $wout"

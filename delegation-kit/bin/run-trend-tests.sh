@@ -11,6 +11,11 @@ HIST="${1:-$KIT/usage-tests/trend-history.log}"
 [[ -x "$TREND" ]] || { echo "run-trend-tests: missing or non-executable $TREND" >&2; exit 2; }
 [[ -f "$HIST" ]]  || { echo "run-trend-tests: history fixture not found: $HIST" >&2; exit 2; }
 
+# spec: delegation-kit/SPEC.md §Testing — strip ambient DELEGATION_KIT_* at every reporter invocation; the poison export proves the strip each run (a leak turns the unset-knob case green)
+export DELEGATION_KIT_USAGE_HISTORY="$HIST"
+DK_UNSET=()
+while IFS= read -r name; do DK_UNSET+=(-u "$name"); done < <(env | grep -o '^DELEGATION_KIT_[A-Za-z0-9_]*')
+
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -25,7 +30,7 @@ assert_count() {  # <label> <pattern> <want> <<< haystack
 }
 
 # spec: delegation-kit/SPEC.md §Testing — hermetic sandbox run, fixture as the positional arg
-out="$( cd "$SANDBOX" && bash "$TREND" "$HIST" )"; rc=$?
+out="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" bash "$TREND" "$HIST" )"; rc=$?
 [[ "$rc" -eq 0 ]] || { echo "  FAIL [exit]: want 0, got $rc"; fails=$((fails + 1)); }
 
 assert_has   "per-account grouping: acctA heads its own block" "account acctA" <<<"$out"
@@ -45,9 +50,9 @@ assert_has   "weekly headroom on the report" "weekly headroom:" <<<"$out"
 
 assert_has   "PAUSE onset annotated where the pause first landed" "first PAUSE onset at epoch 33600" <<<"$out"
 
-( cd "$SANDBOX" && bash "$TREND" ) >/dev/null 2>&1 && { echo "  FAIL [unset knob]: want exit 2"; fails=$((fails + 1)); }
+( cd "$SANDBOX" && env "${DK_UNSET[@]}" bash "$TREND" ) >/dev/null 2>&1 && { echo "  FAIL [unset knob]: want exit 2"; fails=$((fails + 1)); }
 rc=$?; [[ "$rc" -eq 2 ]] || { echo "  FAIL [unset knob]: want exit 2, got $rc"; fails=$((fails + 1)); }
-( cd "$SANDBOX" && bash "$TREND" "$SANDBOX/nope.log" ) >/dev/null 2>&1 && { echo "  FAIL [missing history]: want exit 2"; fails=$((fails + 1)); }
+( cd "$SANDBOX" && env "${DK_UNSET[@]}" bash "$TREND" "$SANDBOX/nope.log" ) >/dev/null 2>&1 && { echo "  FAIL [missing history]: want exit 2"; fails=$((fails + 1)); }
 rc=$?; [[ "$rc" -eq 2 ]] || { echo "  FAIL [missing history]: want exit 2, got $rc"; fails=$((fails + 1)); }
 
 if [[ "$fails" -gt 0 ]]; then

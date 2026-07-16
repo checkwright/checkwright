@@ -15,6 +15,11 @@ for f in "$GUARD" "$LIB" "$VERDICT" "$CASES"; do
 done
 command -v jq >/dev/null 2>&1 || { echo "run-budget-guard-tests: jq not found on PATH" >&2; exit 2; }
 
+# spec: delegation-kit/SPEC.md §Testing — the table encodes the kit defaults, so strip ambient DELEGATION_KIT_* at every guard invocation; the poison export proves the strip each run (a leak turns every advise case into block)
+export DELEGATION_KIT_PAUSE_PCT=0
+DK_UNSET=()
+while IFS= read -r name; do DK_UNSET+=(-u "$name"); done < <(env | grep -o '^DELEGATION_KIT_[A-Za-z0-9_]*')
+
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 USAGE="$SANDBOX/usage.txt"
@@ -52,7 +57,7 @@ while IFS=$'\t' read -r want pct age_off reset_off cred_age desc; do
     fi
 
     out="$( cd "$SANDBOX" && printf '%s' "$JSON" \
-        | GUARD_KIT_LIB="$LIB" DELEGATION_KIT_VERDICT_BIN="$VERDICT" \
+        | env "${DK_UNSET[@]}" GUARD_KIT_LIB="$LIB" DELEGATION_KIT_VERDICT_BIN="$VERDICT" \
           DELEGATION_KIT_USAGE_FILE="$USAGE" DELEGATION_KIT_CRED_FILE="$CRED" \
           bash "$GUARD" 2>"$ERR" )"
     rc=$?

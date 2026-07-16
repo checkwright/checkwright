@@ -490,7 +490,12 @@ knobs (percentage, snapshot age offset, reset offset, credential age);
 file (timestamps must be computed relative to *now* — static fixtures
 would age into permanent STALE) and asserts verdict and exit code. Each
 case runs in a throwaway sandbox with no consumer config on the lookup
-path, so the gate exercises its own defaults hermetic to the host repo;
+path **and** with ambient `DELEGATION_KIT_*` exports stripped at each gate
+invocation, so the gate exercises its own defaults hermetic to the host
+repo — the decision table encodes those defaults, and a host override (a
+raised pause threshold, say) must not reshape it. The trend and
+budget-guard runners below share the strip, each runner under a deliberate
+poison export that fails its own table loudly if the strip ever breaks;
 `cases.tsv` columns are `verdict exit pct age_off reset_off cred_age pct_7d
 reset7d_off append axis desc` (the offsets seconds from *now*; `pct_7d` `-`
 omits the weekly keys, `append` is the expected sample-line count, `axis`
