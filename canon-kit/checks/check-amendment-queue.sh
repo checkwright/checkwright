@@ -20,10 +20,11 @@ ROOT="${2:-.}"
 
 errors=""
 
-# (a) feature-section entries missing [spec:], and any [needs-spec] in the
+# (a) feature-section entries missing [spec:], any [needs-spec] in the
 #     active sections (entries, sub-bullets, or prose — a mention masks a
-#     missing tag); (b) deferred entries missing [needs-spec], and a deferred
-#     entry already carrying [spec:] (promote it). One awk pass over the queue.
+#     missing tag), and a [spec:]-tagged entry misfiled in an active
+#     non-feature section; (b) deferred entries missing [needs-spec], and a
+#     deferred entry already carrying [spec:] (promote it). One awk pass.
 qout="$(awk -v featre="$SPEC_FEATURE_RE" -v activere="$SPEC_ACTIVE_RE" \
             -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
     $0 ~ sectre {
@@ -39,6 +40,8 @@ qout="$(awk -v featre="$SPEC_FEATURE_RE" -v activere="$SPEC_ACTIVE_RE" \
                 printf "active-needs-spec\t%d\t%s\n", FNR, $0
             else if (sec == "feature" && $0 !~ /\[spec:/)
                 printf "missing-spec\t%d\t%s\n", FNR, $0
+            else if (sec == "active" && $0 ~ /\[spec:/)
+                printf "misfiled-ready\t%d\t%s\n", FNR, $0
         } else if ($0 ~ /\[needs-spec\]/) {
             printf "prose-needs-spec\t%d\t%s\n", FNR, $0
         }
@@ -54,7 +57,7 @@ qout="$(awk -v featre="$SPEC_FEATURE_RE" -v activere="$SPEC_ACTIVE_RE" \
 ' "$QUEUE")"; st=$?
 fail_closed "$st" check-amendment-queue awk
 
-missing=(); an=(); pn=(); dopen=(); dready=()
+missing=(); an=(); pn=(); dopen=(); dready=(); mready=()
 while IFS=$'\t' read -r class ln text; do
     [[ -n "$class" ]] || continue
     case "$class" in
@@ -63,6 +66,7 @@ while IFS=$'\t' read -r class ln text; do
         prose-needs-spec)  pn+=("$QUEUE:$ln: $text") ;;
         deferred-open)     dopen+=("$QUEUE:$ln: $text") ;;
         deferred-ready)    dready+=("$QUEUE:$ln: $text") ;;
+        misfiled-ready)    mready+=("$QUEUE:$ln: $text") ;;
     esac
 done <<< "$qout"
 
@@ -71,6 +75,7 @@ done <<< "$qout"
 (( ${#pn[@]} ))      && errors+="[needs-spec] tag in active-queue prose ($CANON_KIT_DEFERRED_SECTION-only tag; say \"needs design\" in prose):"$'\n'"$(printf '  %s\n' "${pn[@]}")"$'\n'
 (( ${#dopen[@]} ))   && errors+="$CANON_KIT_DEFERRED_SECTION entries without [needs-spec] (all deferred work is design-pending):"$'\n'"$(printf '  %s\n' "${dopen[@]}")"$'\n'
 (( ${#dready[@]} ))  && errors+="$CANON_KIT_DEFERRED_SECTION entries already carrying [spec:] (promote to a feature section):"$'\n'"$(printf '  %s\n' "${dready[@]}")"$'\n'
+(( ${#mready[@]} ))  && errors+="[spec:]-tagged entries misfiled in an active non-feature section (a spec-ready entry belongs in a feature section):"$'\n'"$(printf '  %s\n' "${mready[@]}")"$'\n'
 
 # (c) bidirectional pairing on disk: every [spec:] ref resolves to a file, and
 #     every amendment on disk is referenced by a [spec:] entry (by basename). A

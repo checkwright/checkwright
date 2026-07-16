@@ -359,8 +359,10 @@ same shapes:
 ### check-amendment-queue
 
 Invariant: the bidirectional rule holds — (a) no feature-section entry
-without `[spec:]` and no `[needs-spec]` anywhere in the active sections
-(entries or prose; a prose mention masks the tag's absence); (b) every
+without `[spec:]`, no `[needs-spec]` anywhere in the active sections
+(entries or prose; a prose mention masks the tag's absence), and no
+`[spec:]`-tagged entry in an active non-feature section (a spec-ready
+entry is misfiled there — it belongs in a feature section); (b) every
 deferred entry carries `[needs-spec]`, and a deferred entry already
 carrying `[spec:]` must be promoted; (c) every amendment on disk pairs
 with a `[spec:]` queue entry and every `[spec:]` ref resolves to a file.

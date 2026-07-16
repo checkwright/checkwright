@@ -6,6 +6,8 @@
 
 ## Technical Debt
 
+- **tidy-logs** [spec: SPEC-tidy.md] — spec-ready but misfiled outside the feature section.
+
 ## Deferred
 
 - **later-thing** — a design-pending idea with no design ruling yet.
