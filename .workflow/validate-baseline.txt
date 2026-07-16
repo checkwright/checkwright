@@ -1,5 +1,5 @@
 # held-constant validate baseline: <suite> <scenario> <status> [<slug>]
-gates gates pass
+gates gates fail drain-stage-active-residue
 gate_sdk gate_sdk pass
 canon_kit canon_kit pass
 context_kit context_kit pass

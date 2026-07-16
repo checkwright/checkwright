@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+launch-readiness gates sha256=0ebf23033fc575b81e2bb8bda953a09b1c662bb2db3308d934998e0c30765fe1 pass=0 fail=1 ignore=0 verdict=clean 2026-07-16
+launch-readiness gate_sdk sha256=49aedef2c95f338de95a7ff54ef51ed9deae9baf39e93d24f6c4c2ed960073e9 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness canon_kit sha256=d0c0e1b2b9f099ba2152cce6123319b0a62b245f97a69ec9addff36255d756d7 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness evidence_kit sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness lifecycle_kit sha256=ffd7a1e902cbae04cacb68889ebe621172d592e7e4888bdacf2288b0b2c93f93 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness queue_kit sha256=0f7d5111c384795d745d6d3573644ffa1122590521907a3175bc1a9ac383d92d pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness site_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness scripts sha256=5290d60ae6c7cea1b25dfd3cd7526956ee9110a24b82012d2b03540192ac7d4e pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness guard_tests sha256=7c96fb61e85aea1e59f04e2e44a773ad6654014667624a872c3353ce427b1c38 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness usage_tests sha256=aab874b225e226f15563ea6142f0571ab7e5f24e4247105148d1a2e045b85a00 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness upgrade sha256=8b25356f6613951ba6f72319fcaf8d92ec92725a627e7ca69aefdde7419f402b pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
+launch-readiness index_tests sha256=71d410e2b32adb3cbdfa575b3c3cbd89d1eada95158c123e4ee517a439e789d2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
