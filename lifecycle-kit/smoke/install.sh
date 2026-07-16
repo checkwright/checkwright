@@ -144,6 +144,22 @@ es_pf_run validate >/dev/null || { echo "smoke(enter-stage): green preflight sho
 grep -q "^## Iteration: pf-iter  \[stage: validate\]\$" "$esq" || { echo "smoke(enter-stage): green preflight did not flip to validate" >&2; exit 1; }
 grep -q "^pf-iter validate aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): green preflight did not stamp" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --simulate: would-no-op, would-pass, would-refuse; read-only and prefix-marked in all three
+cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
+out="$(es_pf_run --simulate validate 2>&1)" || { echo "smoke(enter-stage): --simulate of a stamped stage should exit 0" >&2; exit 1; }
+grep -q "idempotent no-op" <<<"$out" || { echo "smoke(enter-stage): --simulate did not report the would-be no-op: $out" >&2; exit 1; }
+out="$(es_pf_run --simulate close 2>&1)" || { echo "smoke(enter-stage): --simulate of a clean entry should exit 0" >&2; exit 1; }
+grep -q "would proceed" <<<"$out" || { echo "smoke(enter-stage): --simulate did not report would-proceed: $out" >&2; exit 1; }
+if out="$(es_pf_run --simulate build 2>&1)"; then
+    echo "smoke(enter-stage): --simulate of an unstamped predecessor should exit 1" >&2; exit 1
+fi
+grep -q "would refuse" <<<"$out" || { echo "smoke(enter-stage): --simulate did not relay the refusal: $out" >&2; exit 1; }
+if grep -qv "^enter-stage (simulate): " <<<"$out"; then
+    echo "smoke(enter-stage): --simulate emitted an unprefixed line: $out" >&2; exit 1
+fi
+cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): --simulate wrote state" >&2; exit 1; }
+cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): --simulate wrote queue" >&2; exit 1; }
+
 # spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — exercise the injector + check-lifecycle-registration end-to-end under .tmp (advisory tool, no fixture pair)
 il="$es/agent"; mkdir -p "$il"
 cat > "$il/CLAUDE.md" <<'EOF'

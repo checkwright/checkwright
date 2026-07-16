@@ -9,6 +9,23 @@ an ordinary skill invocation that stops and surfaces to the user. The lead only
 changes where a stage session's escalations land: at a live lead that can
 rule and resume it, instead of at a cold restart.
 
+**First step — record the session role.** Write `lead <id>` — `<id>` from
+`bash lifecycle-kit/bin/session-id.sh` — to the session-role marker
+(`CONTEXT_KIT_SESSION_ROLE_FILE`, default
+`${GATE_SDK_TMP_DIR:-.tmp}/session-role`):
+
+```bash
+mkdir -p "${GATE_SDK_TMP_DIR:-.tmp}" && \
+  echo "lead $(bash lifecycle-kit/bin/session-id.sh)" \
+  > "${CONTEXT_KIT_SESSION_ROLE_FILE:-${GATE_SDK_TMP_DIR:-.tmp}/session-role}"
+```
+
+The session-context hook reads it on each re-fire and suppresses its
+executor-facing steps for this session only — the id match scopes the signal,
+so no other session inherits it and a stale marker self-invalidates
+(context-kit/SPEC.md §The session-context hook owns the grammar and limits).
+Skipping the step costs nothing but the suppression.
+
 ## The lead model
 
 The lead takes one of two postures; which one — and the model tier each
@@ -35,6 +52,13 @@ Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background
 with notification, honor the per-dispatch budget guard, and validate after any
 agent commit. Load `/agent-execution` for the protocol and follow it there — it
 is not restated here.
+
+The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE
+or the git log to decide whether a dispatch may proceed re-derives what the
+machinery already rules on. It dispatches and trusts `enter-stage.sh`'s
+fail-closed refusal (relayed in the stage session's report), or gates an
+expensive dispatch cheaply first with `enter-stage.sh --simulate <stage>`
+(lifecycle-kit/SPEC.md §bin/enter-stage.sh) — oracle-first made concrete.
 
 Whether the lead may ever run a stage *inline* is the consumer's
 session-boundary posture (`LIFECYCLE_KIT_SESSION_BOUNDARY`,
@@ -105,10 +129,16 @@ ruling classes are stated.>*
 
 The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue
 header flips, no evidence files. Every stamp originates in the stage session via
-`enter-stage.sh` (lifecycle-kit/SPEC.md §The state machine). An answer that
+`enter-stage.sh` (lifecycle-kit/SPEC.md §The state machine). Lead-does-stamping
+is ruled out, not merely omitted: it breaks this invariant, and under the
+`stage` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` a lead stamp is exactly the
+self-reported skip `check-stage-evidence` exists to catch. An answer that
 amounts to a design ruling is landed **by the stage session**, in the governed
 surface it belongs to (the amendment, the queue entry), *before* the session
-acts on it. The message thread is transport, never a store — so a lead crash or
+acts on it — and a ruling whose acting session is **not imminent** is filed to
+a durable governed surface (a queue entry, an amendment) in the moment it is
+made, because "the stage session lands it" holds only when that session
+exists. The message thread is transport, never a store — so a lead crash or
 a lost transcript costs nothing the tracked surfaces do not already hold.
 
 ## Economics — batch, and compact where it pays

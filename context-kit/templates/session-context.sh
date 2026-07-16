@@ -60,16 +60,30 @@ if [[ -n "$DRIFT_REPORT" && -f "$DRIFT_REPORT" ]]; then
     fi
 fi
 
-# spec: context-kit/SPEC.md §The session-context hook — step 4 stage-conditioned nudges; which stages get which nudge is consumer judgment [EDIT ME]
-case "$stage" in
-    scope | align | build)
-        echo "Delegation is the primary token lever and is pre-authorized here: send"
-        echo "read-heavy cross-SPEC audits and mechanical rename/merge sweeps to a sub-agent"
-        echo "without waiting to be asked — this standing licence satisfies the Agent tool's"
-        echo "ask-first default (see your delegation protocol)."
-        echo
-        ;;
-esac
+# spec: context-kit/SPEC.md §The session-context hook — session-role signal: lead iff the marker's id matches this fire's payload session id (the payload, never CLAUDE_CODE_SESSION_ID — a subagent inherits its parent's); guarded, signal absent = byte-identical output
+role=""
+ROLE_FILE="${CONTEXT_KIT_SESSION_ROLE_FILE:-${GATE_SDK_TMP_DIR:-.tmp}/session-role}"
+if [[ -f "$ROLE_FILE" && ! -t 0 ]]; then
+    payload="$(cat 2>/dev/null)" || true
+    hook_sid="$(grep -oE '"session_id"[[:space:]]*:[[:space:]]*"[^"]*"' <<<"${payload:-}" 2>/dev/null | head -1 | sed -E 's/.*"([^"]*)"$/\1/')" || true
+    read -r m_role m_sid _ < "$ROLE_FILE" 2>/dev/null || true
+    if [[ "${m_role:-}" == "lead" && -n "${m_sid:-}" && "${hook_sid:0:8}" == "${m_sid:-}" ]]; then
+        role=lead
+    fi
+fi
+
+# spec: context-kit/SPEC.md §The session-context hook — step 4 stage-conditioned nudges; which stages get which nudge is consumer judgment [EDIT ME]; suppressed for a lead (executor-facing)
+if [[ "$role" != lead ]]; then
+    case "$stage" in
+        scope | align | build)
+            echo "Delegation is the primary token lever and is pre-authorized here: send"
+            echo "read-heavy cross-SPEC audits and mechanical rename/merge sweeps to a sub-agent"
+            echo "without waiting to be asked — this standing licence satisfies the Agent tool's"
+            echo "ask-first default (see your delegation protocol)."
+            echo
+            ;;
+    esac
+fi
 
 # spec: context-kit/SPEC.md §The session-context hook — step 5 memory-off backstop; check-memory-off fires at commit, this surfaces pollution between commits
 MEM_DIRS="${CONTEXT_KIT_MEMORY_DIRS:-$HOME/.claude/projects/$(printf '%s' "$REPO_ROOT" | tr '/.' '-')/memory}"
@@ -101,8 +115,8 @@ Before opening source for a task, run the matching surface index first
   • bash $CTX_BIN/md-section.sh <file.md> "<head>" — extract one section by heading
 EOF
 
-# spec: context-kit/SPEC.md §The session-context hook — step 8 stage-routed craft-rule pointers; doctrine-kit owns the emitter, the seam is this optional block (drift-line precedent)
-if [[ -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
+# spec: context-kit/SPEC.md §The session-context hook — step 8 stage-routed craft-rule pointers; doctrine-kit owns the emitter, the seam is this optional block (drift-line precedent); suppressed for a lead (executor-facing)
+if [[ "$role" != lead && -n "$stage" && -n "$STAGE_RULES" && -f "$STAGE_RULES" ]]; then
     rules_block="$(bash "$STAGE_RULES" "$stage" 2>/dev/null)" || true
     if [[ -n "$rules_block" ]]; then
         echo

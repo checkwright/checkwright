@@ -6,7 +6,12 @@ KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
 
-usage() { echo "usage: enter-stage.sh <stage>   (stage ∈ ${LIFECYCLE_KIT_STAGES[*]})" >&2; }
+usage() { echo "usage: enter-stage.sh [--simulate] <stage>   (stage ∈ ${LIFECYCLE_KIT_STAGES[*]})" >&2; }
+
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --simulate: read-only preflight, every line prefixed 'enter-stage (simulate):' so a transcript can never read as a stamp
+sim=0
+if [[ "${1:-}" == "--simulate" ]]; then sim=1; shift; fi
+sim_relay() { local l; while IFS= read -r l; do echo "enter-stage (simulate): $l"; done <<<"$1"; }
 
 stage="${1:-}"
 if [[ -z "$stage" ]]; then usage; exit 2; fi
@@ -41,6 +46,10 @@ stamp_line="$stamp_iter $stage $id $today"
 last="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { last = $0 } END { print last }' "$STATE")"
 read -r f_iter f_stage f_id _ <<<"$last"
 if [[ "$f_iter" == "$stamp_iter" && "$f_stage" == "$stage" && "$f_id" == "$id" ]]; then
+    if [[ "$sim" == 1 ]]; then
+        echo "enter-stage (simulate): '$stamp_line' is already the last stamp in $STATE — the real entry would be an idempotent no-op."
+        exit 0
+    fi
     echo "enter-stage: '$stamp_line' already stamped in $STATE — idempotent no-op, nothing written."
     exit 0
 fi
@@ -64,6 +73,11 @@ else
 fi
 
 if ! preflight="$(bash "$KIT/checks/check-stage-entry.sh" "$tmpqueue" "$STATE" 2>&1)"; then
+    if [[ "$sim" == 1 ]]; then
+        echo "enter-stage (simulate): check-stage-entry would refuse the flip to '$stage':" >&2
+        sim_relay "$preflight" >&2
+        exit 1
+    fi
     echo "enter-stage: check-stage-entry refuses the flip to '$stage' — nothing written:" >&2
     printf '%s\n' "$preflight" >&2
     echo "  help: resolve the finding above, or (to override deliberately) perform the stamp+flip by hand." >&2
@@ -75,6 +89,11 @@ for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]
     [[ "${pf%%=*}" == "$stage" ]] || continue
     read -r -a pf_argv <<<"${pf#*=}"
     if ! pf_out="$("${pf_argv[@]}" "$tmpqueue" "$STATE" 2>&1)"; then
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate): LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' would refuse the flip:" >&2
+            sim_relay "$pf_out" >&2
+            exit 1
+        fi
         echo "enter-stage: LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' refuses the flip — nothing written:" >&2
         printf '%s\n' "$pf_out" >&2
         echo "  help: resolve the finding above, or (to override deliberately) perform the stamp+flip by hand." >&2
@@ -90,11 +109,21 @@ if [[ "$first" == 1 ]]; then
         inl && /^-[[:space:]]/ { print }
     ' "$QUEUE")"
     if [[ -n "$lessons" ]]; then
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — ## Lessons Learned is non-empty:" >&2
+            sim_relay "$lessons" >&2
+            exit 1
+        fi
         echo "enter-stage: iteration-boundary entry to '$stage' refused — ## Lessons Learned is non-empty; the close stage must disposition every lesson before the next iteration begins (nothing written):" >&2
         printf '%s\n' "$lessons" >&2
         echo "  help: run the close ritual's disposition step (rule/task/harvest/discard, stamping $LIFECYCLE_KIT_LESSON_EVIDENCE_FILE), clear the section, then re-run enter-stage $stage." >&2
         exit 1
     fi
+fi
+
+if [[ "$sim" == 1 ]]; then
+    echo "enter-stage (simulate): entry to '$stage' would proceed — no stamp, no flip, nothing written."
+    exit 0
 fi
 
 if [[ "$first" == 1 ]]; then

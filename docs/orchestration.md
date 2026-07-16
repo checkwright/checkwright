@@ -85,7 +85,10 @@ prices. To drive an iteration under it:
 1. **`/lead` in a fresh session on the routing tier.** The lead role writes no
    lifecycle state of its own; every flip, stamp, and commit stays in the stage
    sessions it dispatches, so the history reads identically whether or not a
-   lead drove it.
+   lead drove it. Its first step records the session-role marker the
+   session-context hook reads, so lead sessions stop drawing executor-facing
+   craft rules ([the lead template](../lifecycle-kit/templates/lead.md) carries
+   the step).
 2. **The lead dispatches `/scope` as a background stage session on the
    judgment tier.** Scope formalizes the iteration — authoring the design
    amendments, promoting the queue entries — and lands the promotion commit. Its

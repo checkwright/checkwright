@@ -222,6 +222,9 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
 - `LIFECYCLE_KIT_SESSION_ID` — the harness-neutral stamp-id override, source 1
   of the derivation order (§bin/session-id.sh); default unset.
 - `LIFECYCLE_KIT_SESSION_BOUNDARY` — `stage` or `iteration`; default `stage`.
+  The knob lives on the session-span/evidence axis only (ruled; no role
+  values): manual-versus-lead is the driver/role axis and rides context-kit's
+  session-role signal, never this knob.
   The consumer's session-boundary posture: at `stage`, distinct stages of
   one iteration may not share a session id (§check-stage-evidence); at
   `iteration`, that cross-stage distinctness check alone is skipped —
@@ -424,7 +427,19 @@ the compliant one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
 — no consumer surface is named in the kit; a downstream kit whose gate is the
 real precondition for a stage wires itself here (as evidence-kit's manifest gate
 does for close entry), turning a would-be pre-commit deadlock into a loud
-refusal at the flip. **Idempotent:** if the
+refusal at the flip. **`--simulate <stage>` — the read-only preflight mode:**
+it runs everything a real entry runs up to the write — config load and stage
+validation, header parse, session-id derivation, the idempotence probe (a
+would-be no-op is reported as such and exits 0), the temp flipped-queue
+build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
+entry, and the iteration-boundary Lessons check — then stops: no stamp, no
+header flip, no boundary truncation, the temp queue removed. Every output
+line is prefixed `enter-stage (simulate):` so a transcript can never read as
+a stamp. Exit 0 = the real entry would proceed (or no-op); exit 1 = it would
+refuse, with the refusing check's output relayed line-by-line; exit 2 =
+usage/config error, as a real entry. Not a gate — exercised in `smoke/`
+beside the existing enter-stage coverage (would-pass, would-refuse,
+would-no-op, nothing written). **Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,
 it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs
@@ -875,7 +890,14 @@ boundaries that pay under the cold-wakes-times-compressible-residue rule —
 with the dispatch-granularity rule (batch units sharing a kit or SPEC
 surface, split on a model-tier change or a delegation-kit split trigger), and
 the stamps-authoritative invariant carried from §The state machine as the
-design's load-bearing rule. Dispatch safety is not re-owned — it inherits
+design's load-bearing rule — with its two corollaries: the lead never
+hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it
+dispatches and trusts `enter-stage.sh`'s fail-closed refusal, or gates an
+expensive dispatch with `--simulate`, §bin/enter-stage.sh), and a ruling
+whose acting session is not imminent is filed to a durable governed surface
+in the moment it is made. The template also carries the lead's first step —
+writing the session-role marker context-kit's hook reads
+(context-kit/SPEC.md §The session-context hook). Dispatch safety is not re-owned — it inherits
 delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation
 model: background dispatch, the per-dispatch budget guard, validate after any
 agent commit). Consumer residue stays in named slots — the tracked

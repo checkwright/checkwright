@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **lead-seam-redesign** [spec: SPEC-lead-seam-redesign.md] — redraw the lead↔machinery
-  stage-transition seam: a read-only `enter-stage.sh --simulate` preflight; the lead
-  no-hand-derivation and ruling-durability rulings (lead-does-stamping stays ruled out); a
-  session-id-scoped session-role marker the session-context hook reads, suppressing its
-  executor-facing steps for a lead; `LIFECYCLE_KIT_SESSION_BOUNDARY` untouched — role rides
-  the marker, ruled. Design, rationale, and rejected alternatives live in the amendment.
-  Surfaced 2026-07-16 in a /lead design session.
 - **drain-stage-active-residue** [spec: SPEC-drain-stage-active-residue.md] [drain-exempt: baseline]
   — model legitimate drain-stage residue in check-stage-entry assertion B: a
   drain-exempt reason
@@ -128,5 +121,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- lead-seam-redesign
 
 ## Lessons Learned

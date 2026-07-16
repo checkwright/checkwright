@@ -97,6 +97,8 @@ session. Steps, in order:
    Each keys on {predecessor, own stage} (the header-lag rule below) so a
    first-of-stage session and a restarted one both receive it. Marked
    consumer section: which stages get which nudge is consumer judgment.
+   Suppressed when the session-role signal (below) marks the session `lead`
+   — the nudges are executor-facing.
 5. **Memory-off backstop** — one warning line when the harness memory dir
    (`CONTEXT_KIT_MEMORY_DIRS`) holds content, pointing the durable fact at its
    tracked home (§The memory-off doctrine). `check-memory-off` fires only at
@@ -118,7 +120,8 @@ session. Steps, in order:
    {predecessor, own stage} set: the pointers are advisory reminders, so
    over-firing to an adjacent stage costs only a few lines, and the
    header-lag rule below is about *conditioning*, not about which stage's
-   rules to show.
+   rules to show. Suppressed when the session-role signal marks the
+   session `lead` — the craft rules are executor-facing.
 9. **Env profile** — when the consumer-local profile file
    (`CONTEXT_KIT_ENV_PROFILE_FILE`, §bin/env-probe) exists, the step first runs
    `bin/env-probe.sh` to re-probe it (output suppressed so no status line
@@ -139,6 +142,44 @@ output therefore keys on a stage *set* spanning {predecessor, own stage} —
 guaranteeing the first-of-stage session is served, at the accepted cost of
 over-firing to the other sessions that share a header value (a restarted
 session of a keyed stage, or the first session of the stage after it).
+
+**The session-role signal.** The hook keys every stage-conditioned injection
+off the queue header's `[stage:]`, which says nothing about whether the
+*reading* session is a lead, a stage session, or a manual run — so without a
+role signal a lead draws executor-facing craft rules at every hook fire
+(startup, plus each compact/resume re-fire, the recurring cost). The signal
+is a marker file, **session-id-scoped**: `/lead`'s first step writes one line
+`lead <id>` — `<id>` being `session-id.sh`'s value — to
+`CONTEXT_KIT_SESSION_ROLE_FILE` (gitignored scratch, default
+`${GATE_SDK_TMP_DIR:-.tmp}/session-role`). The hook treats the session as
+`lead` only when the marker's id equals the 8-char prefix of **its own
+payload's session id** — read from the hook payload, never from
+`CLAUDE_CODE_SESSION_ID`, because a subagent is handed its *parent's* id in
+that variable (the named assumption: were the harness ever to fire
+`SessionStart` in subagents, an env-var read would match every stage session
+to its lead's marker and invert the suppression onto exactly its intended
+audience; revisit if subagent hook-fire lands). So a concurrent or later
+top-level session never bleeds, and a stale marker self-invalidates when the
+id rotates. Top-level scoping is sufficient because both producer and
+consumer are top-level by construction — `SessionStart` does not fire for
+Task-spawned subagents, so the only sessions the hook fires in are leads and
+manual runs, and the identity match discriminates exactly those. When the
+signal marks the session `lead`, steps 4 and 8 are suppressed; everything
+else emits unchanged. Signal absent ⇒ byte-identical to the signal-free
+hook; the read is guarded like every step — the hook never fails a session.
+Accepted limits (not defects): the initial startup fire precedes `/lead` by
+construction, a bounded one-per-lead-session cost against the
+per-compact/resume recurrence that is the actual waste; the marker ages out
+with the day-horizon scratch sweep (step 6), degrading to absent-signal
+behavior; and the producer inherits `session-id.sh`'s
+`CLAUDE_CODE_SESSION_ID` dependency — unset, the newest-transcript fallback
+in a lead with live subagents returns an `agent-` prefix the payload can
+never match, and the signal silently no-ops to absent-signal behavior (the
+failure costs a suppression, never a correctness property). Rejected
+alternatives, recorded so they are not re-derived: a launch-env var (a
+perpetual operator ritual whose forgotten export degrades silently with no
+signal it happened) and both-producers-with-precedence (two producers plus a
+precedence rule to spec and gate, for a gap one hook fire wide).
 
 **Ruled out — lifecycle stamp-id injection.** The hook payload carries the
 harness session id, and **in a top-level session** its 8-char prefix equals
@@ -541,6 +582,9 @@ as defaults):
 - `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file
   `bin/env-probe.sh` writes and the session-context hook's step 9 emits (§bin/
   env-probe); default `ENV.local.md`.
+- `CONTEXT_KIT_SESSION_ROLE_FILE` — the session-role marker `/lead` writes and
+  the session-context hook's identity match reads (§The session-context hook);
+  default `${GATE_SDK_TMP_DIR:-.tmp}/session-role` (gitignored scratch).
 - `CONTEXT_KIT_BASELINE_FILE` — default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/always-loaded-baseline.txt`.
 - `CONTEXT_KIT_BREVITY_FILE` — default `CLAUDE.md`.
