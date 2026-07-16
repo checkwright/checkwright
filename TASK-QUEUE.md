@@ -68,9 +68,57 @@
   one cannot. Fix candidates: per-iteration active-section scoping, a
   spanning/standing-residue exemption tag, or a valve on assertion B (cost 3
   additionally wants per-gate baseline granularity so an intra-validate
-  regression is not masked). Surfaced 2026-07-16 entering validate for
-  launch-readiness; the third cost surfaced in close's knowledge-friction
-  triage.
+  regression is not masked).
+  Reframe on record (operator ruling, same /lead session as lead-seam-redesign):
+  Feature-versus-Debt triage is scope work — a task surfaced mid-iteration files
+  as Deferred [needs-spec] and a later scope promotes it to New Features
+  (spec-ready) or Technical Debt, never plugged straight into Debt late in an
+  iteration. Under that rule case 2's designed-debt item was partly a mis-filing
+  (the env-probe example that seeded it should have been Deferred [needs-spec]
+  then scope-promoted, as it since was), not purely a gate-model gap, so this
+  iteration must re-decide whether case 2 remains a real assertion-B gap. Coupled
+  gate (enforcement-first, land fix and gate together): a check-amendment-queue
+  rule that a spec-ready entry (one carrying a spec tag) belongs in New Features.
+  Surfaced
+  2026-07-16 entering validate for launch-readiness; the third cost surfaced in
+  close's knowledge-friction triage.
+- **lead-seam-redesign** [needs-spec] — the iteration lead's stage-transition
+  seam over-reads prior-stage completeness by hand instead of trusting the
+  machinery. Four coupled parts, surfaced in a /lead design session and none in
+  a governed surface before this entry: (1) an enter-stage.sh `--simulate`
+  (read-only preflight) — the script already separates its preflight
+  (check-stage-entry + LIFECYCLE_KIT_ENTRY_PREFLIGHT + the lessons check, run
+  against a temp flipped queue) from its write, so a flag that runs the preflight
+  and skips the write hands the lead the exact gate the dispatched stage will
+  run, read-only, in place of re-deriving completeness from WORKFLOW-STATE and
+  git log (oracle-first made concrete). (2) A lead-template ruling: the lead
+  stops hand-deriving prior-stage completeness — it dispatches and trusts
+  enter-stage's fail-closed refusal plus the agent's report, or runs `--simulate`
+  to gate a dispatch cheaply; lead-does-stamping is ruled out (it breaks the
+  "Stamps are authoritative" invariant and check-stage-evidence under the strict
+  LIFECYCLE_KIT_SESSION_BOUNDARY, where a lead stamp is the self-reported skip
+  that gate catches). (3) A session-context role signal:
+  scripts/session-context.sh and context-kit/templates/session-context.sh key
+  every injection off the queue's `[stage:]` field with no signal for whether the
+  session is a lead, a stage agent, or a manual run, so a lead dispatching build
+  draws "craft rules for the build stage" written for the executor and a
+  split-posture lead that no longer authors amendments still draws
+  amendment-authoring craft — fix is a session-role signal the hook reads (set by
+  /lead, unset for manual or stage). (4) Operator-authorized rename or revalue of
+  LIFECYCLE_KIT_SESSION_BOUNDARY to separate manual from /lead modes; lean on
+  record — the boundary is honestly the session-span and evidence axis (one
+  stamp, one session id; values could read per-stage/per-iteration) while
+  manual-versus-lead is the driver/role axis, the same signal as part (3), so add
+  a role signal rather than overload the boundary knob. Also on record: the
+  lead-durability gap this session exposed — the lead template's "a ruling lands
+  in the stage session that acts on it" assumes an imminent session and has no
+  model for a ruling whose acting session is iterations away, so such rulings
+  must be filed to a durable surface in the moment, not held in-session (this
+  entry is that filing). Bundled at scope with drain-stage-active-residue as one
+  lifecycle-machinery iteration, split if the envelope grows. Surfaces:
+  lifecycle-kit (bin/enter-stage.sh, checks/check-stage-entry.sh, SPEC.md,
+  templates/lead.md), context-kit (the session-context hook), delegation-kit
+  (lead economics), CLAUDE.md. Surfaced 2026-07-16 in a /lead design session.
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
