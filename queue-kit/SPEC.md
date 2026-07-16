@@ -233,14 +233,19 @@ fenced-code blocks, and lines over budget solely due to one unbreakable token
 
 ### check-tag-lead-line
 
-Invariant: every governed tag sits on its bullet's lead line — the only line
-the tag-reading tools scan; a tag pushed to a continuation line by a reflow
-silently unblocks a task, masks a needs-spec state, or drops a lesson out of
-the attention block. The governed set and scanned surface both widen with the
-lesson channels: `[blocked-by:]` / `[spec:]` / `[needs-spec]` in the task
-sections (active + deferred), plus `[attend]` and every `QUEUE_KIT_LESSON_TAGS`
-name in the `## Lessons Learned` section — the section `queue-index.sh` now
-reads, which retires the old "parsed by no reader" exemption for it. Couples
+Invariant: every **lead-line-scoped** tag sits on its bullet's lead line — the
+only line *its* readers scan; such a tag pushed to a continuation line by a
+reflow silently unblocks a task, masks a needs-spec state, or drops a lesson out
+of the attention block. Membership tracks reader semantics, not §The tag
+algebra: a tag is governed here when its readers scan lead lines alone, so the
+set is narrower than the algebra's and `[precondition-ok:]` is deliberately
+outside it — `check-queue-prose-precondition` honors that tag anywhere in the
+entry, leaving it no lead-line requirement to enforce. The governed set and
+scanned surface both widen with the lesson channels: `[blocked-by:]` /
+`[spec:]` / `[needs-spec]` in the task sections (active + deferred), plus
+`[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
+section — the section `queue-index.sh` now reads, which retires the old "parsed
+by no reader" exemption for it. Couples
 the width-only wrap gate to the tag-parsing tools over the same surface: gate
 the coupling, not just each side.
 

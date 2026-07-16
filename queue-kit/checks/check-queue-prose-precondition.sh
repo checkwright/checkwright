@@ -55,7 +55,7 @@ if [[ -n "$out" ]]; then
     done <<< "$out"
     echo "  help: tag the real blocker '[blocked-by: <slug>]', or move the entry to the"
     echo "        Deferred section, or rephrase past-tense if the precondition is already"
-    echo "        met, or opt out with '[precondition-ok: <reason>]' on the lead line."
+    echo "        met, or opt out with '[precondition-ok: <reason>]' anywhere in the entry."
     exit 1
 fi
 

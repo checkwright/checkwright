@@ -49,13 +49,16 @@
    *roster* to join. `check-tag-lead-line`'s `classes()` hard-codes four literal
    awk arms (`blocked-by`, `spec`, `needs-spec`, `attend`); only *lesson* tags
    are configurable (`QUEUE_KIT_LESSON_TAGS`). `[drain-exempt:]` lands as a
-   fifth hard-coded arm. The audit also found the drift this shape invites is
-   already live — `[precondition-ok:]` is a governed task tag in §The tag
-   algebra that `classes()` never matches, so the gate does not enforce it, and
-   §check-tag-lead-line's "every governed tag" invariant is false as written.
-   That pre-existing drift is **not** this amendment's merge to carry; its
-   disposition (a SPEC-set↔`classes()` parity gate, which reds today on
-   `precondition-ok`) is filed separately on the lead's ruling.
+   fifth hard-coded arm, and belongs there because its reader is genuinely
+   lead-line-scoped: assertion B scans `^- ` lines only.
+
+   Membership in `classes()` tracks **reader semantics, not the tag algebra** —
+   a tag earns an arm when its reader scans lead lines alone. `[precondition-ok:]`
+   is the contrast that fixes the rule: it is a governed task tag with no arm,
+   correctly, because its only reader is reflow-tolerant by construction —
+   `check-queue-prose-precondition.sh` sets `hasblock=1` from both the lead-line
+   branch (:36) and the continuation branch (:42), so the tag is honored
+   wherever a reflow puts it and has no lead-line requirement to enforce.
    `check-stage-entry` assertion B skips an active entry whose lead line
    carries the tag with a non-empty reason (empty reason = malformed,
    still red). **Backstop:** at entry to the drain stage's successor
