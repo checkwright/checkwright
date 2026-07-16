@@ -6,3 +6,4 @@
 
 config-seam-hardening scope a3c15919 2026-07-16
 config-seam-hardening align acaefcd8 2026-07-16
+config-seam-hardening build a7e374b2 2026-07-16
