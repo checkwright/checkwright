@@ -11,7 +11,7 @@ lifecycle-machinery queue_kit sha256=0f7d5111c384795d745d6d3573644ffa11225905219
 lifecycle-machinery site_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
 lifecycle-machinery scripts sha256=5290d60ae6c7cea1b25dfd3cd7526956ee9110a24b82012d2b03540192ac7d4e pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
 lifecycle-machinery guard_tests sha256=7c96fb61e85aea1e59f04e2e44a773ad6654014667624a872c3353ce427b1c38 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
-lifecycle-machinery usage_tests sha256=20fcfc28d1570bbb1a02a7015e470a5a6efb228f83eb73a6481645de44e8c51f pass=0 fail=1 ignore=0 verdict=new-failures 2026-07-16
+lifecycle-machinery usage_tests sha256=aab874b225e226f15563ea6142f0571ab7e5f24e4247105148d1a2e045b85a00 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
 lifecycle-machinery budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
 lifecycle-machinery trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
 lifecycle-machinery demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-16
