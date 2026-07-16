@@ -2,3 +2,4 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
+launch-readiness lesson harvest essay — first validate-spanning feature: the lifecycle drain model has no spanning representation; the enter-stage override carried the iteration but should be designed out (fix tracked by drain-stage-active-residue; narrative harvested to the launch-comms essay staging)

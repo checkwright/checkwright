@@ -35,3 +35,4 @@
 | surface-trust | s a b v c | 2f/0d | 3 · ≤1d | 20s clean | 73 |
 | edge-discipline | s a b v c | 4f/1d | 2 · ≤0d | 20s clean | 73 |
 | enforcement-map-strict-config | s a b v c | 2f/0d | 1 · ≤0d | 20s clean | 73 |
+| launch-readiness | s a b v c | 4f/0d | 0 | 20s 1✗ | 74 |
