@@ -33,6 +33,29 @@
 
 ## Technical Debt
 
+- **env-probe-auto-refresh** — automate the env-profile refresh
+  instead of the install-time + on-demand cadence. The current design
+  (context-kit/SPEC.md §bin/env-probe, "cached projection, not per-session
+  probe") rests on "env changes rarely" plus a per-session latency tax; both
+  are weak — on a rolling-release environment the toolchain versions change
+  daily-plus (a `python3` probe-set drop was caught stale on one refresh) and
+  the probe measures in tens of ms, so the latency objection does not hold.
+  Design on record: call env-probe from the **session-context hook** (once per
+  session — the meaningful granularity; NOT the statusline, which re-renders
+  many times per session for a box that does not change mid-session; NOT
+  enter-stage.sh, which under-covers non-lifecycle sessions and couples
+  lifecycle-kit → context-kit). Optional refinement: give env-probe
+  **change-detection** so the block and its `Probed` date rewrite only on an
+  actual content change (keeps the date a real last-changed signal, avoids
+  per-session file churn). Surfaces: context-kit/SPEC.md §bin/env-probe (rewrite
+  the cadence / no-freshness-gate paragraph — the session-context hook is
+  already its step-9 consumer, so producer and consumer co-locate),
+  scripts/session-context.sh + context-kit/templates/session-context.sh (the
+  call), possibly context-kit/bin/env-probe.sh (change-detection); the docs
+  mirror regenerates after the SPEC edit and check-install-toolchain parity is
+  unaffected (probe set unchanged). Surfaced 2026-07-16 by the operator
+  questioning the install+on-demand cadence and a probe-runtime measurement.
+
 ## Deferred
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
