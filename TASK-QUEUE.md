@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **demand-driven-usage-refresh** [spec: SPEC-demand-driven-usage-refresh.md] — demand-driven
-  refresh replaces timer polling as the usage-snapshot freshness mechanism: a
-  `DELEGATION_KIT_REFRESH_CMD` knob (with a min-age short-circuit) that usage-verdict runs
-  before reading the snapshot; `usage.txt` survives as last-known-good cache. Bundled by the
-  same operator ruling: the login-reroute hoist ahead of the pause comparison and the
-  at-threshold boundary fix. Design and rulings live in the amendment. Surfaced 2026-07-16
-  by the live lead dispatches of the lifecycle-machinery iteration.
 - **per-gate-validate-baseline** [spec: SPEC-per-gate-validate-baseline.md] — per-gate
   granularity for the validate baseline's gates suite: an `EVIDENCE_KIT_PARSER_<suite>`
   per-suite parser override plus a consumer parser mapping the verbose run-gates log to
@@ -104,5 +97,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- demand-driven-usage-refresh
 
 ## Lessons Learned

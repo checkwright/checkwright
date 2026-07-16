@@ -98,6 +98,77 @@ if ! grep -qF -- "width=7 " <<<"$wout"; then
     fails=$((fails + 1))
 fi
 
+# spec: delegation-kit/SPEC.md §usage-verdict — demand-driven refresh: armed/fail-soft/short-circuit, each proved through a stub REFRESH_CMD (a real poll would need the network)
+STUB="$SANDBOX/refresh-stub.sh"
+STAMP="$SANDBOX/refresh-ran"
+
+seed_snapshot() {
+    {
+        printf 'five_hour_used_pct=%s\n' "$1"
+        printf 'five_hour_resets_at=%s\n' "$(( now + 3600 ))"
+        printf 'updated_at=%s\n' "$(( now - $2 ))"
+    } > "$USAGE"
+}
+
+rm -f "$CRED"
+
+cat > "$STUB" <<STUBEOF
+#!/usr/bin/env bash
+touch "$STAMP"
+{
+    printf 'five_hour_used_pct=95\n'
+    printf 'five_hour_resets_at=$(( now + 3600 ))\n'
+    printf 'updated_at=$now\n'
+} > "$USAGE.tmp" && mv "$USAGE.tmp" "$USAGE"
+STUBEOF
+
+seed_snapshot 40 1200
+rm -f "$STAMP"
+rout="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" DELEGATION_KIT_REFRESH_CMD="bash $STUB" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"
+ran=$((ran + 1))
+if [[ ! -f "$STAMP" ]]; then
+    echo "  FAIL [refresh-armed-stale]: a stale snapshot did not invoke DELEGATION_KIT_REFRESH_CMD"
+    fails=$((fails + 1))
+elif ! grep -qF -- "used=95%" <<<"$rout"; then
+    echo "  FAIL [refresh-armed-stale]: verdict read the cached pct, not the refreshed one: $rout"
+    fails=$((fails + 1))
+fi
+
+cat > "$STUB" <<'STUBEOF'
+#!/usr/bin/env bash
+echo "usage-poller: fetch failed" >&2
+exit 1
+STUBEOF
+
+seed_snapshot 40 1200
+before="$(cat "$USAGE")"
+fout="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" DELEGATION_KIT_REFRESH_CMD="bash $STUB" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; frc=$?
+ran=$((ran + 1))
+if [[ "$(cat "$USAGE")" != "$before" ]]; then
+    echo "  FAIL [refresh-fail-soft]: a failed refresh mutated the snapshot"
+    fails=$((fails + 1))
+elif [[ "$frc" -ne 2 ]] || ! grep -qF -- "-> STALE" <<<"$fout"; then
+    echo "  FAIL [refresh-fail-soft]: want the cached snapshot judged STALE by the existing staleness machinery, got exit $frc -- $fout"
+    fails=$((fails + 1))
+elif grep -qF -- "fetch failed" <<<"$fout"; then
+    echo "  FAIL [refresh-fail-soft]: refresh diagnostics leaked into the verdict output (callers relay this line verbatim): $fout"
+    fails=$((fails + 1))
+fi
+
+cat > "$STUB" <<STUBEOF
+#!/usr/bin/env bash
+touch "$STAMP"
+STUBEOF
+
+seed_snapshot 40 0
+rm -f "$STAMP"
+sout="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" DELEGATION_KIT_REFRESH_CMD="bash $STUB" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"
+ran=$((ran + 1))
+if [[ -f "$STAMP" ]]; then
+    echo "  FAIL [refresh-skip-fresh]: a snapshot under REFRESH_MIN_AGE (default 60s) still invoked the refresh — the render path would hammer the source: $sout"
+    fails=$((fails + 1))
+fi
+
 if [[ "$ran" -eq 0 ]]; then
     echo "run-usage-tests: no cases parsed from $CASES" >&2
     exit 2
@@ -106,5 +177,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "run-usage-tests: $fails/$ran case(s) failed"
     exit 1
 fi
-echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes, the fan-width field, and the sample-append discipline)"
+echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes and their at-or-over boundaries, the hoisted login reroute, the fan-width field, the demand-driven refresh (armed/fail-soft/short-circuit), and the sample-append discipline)"
 exit 0

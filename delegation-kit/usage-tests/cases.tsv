@@ -14,20 +14,25 @@ OK	0	28.999	0	3600	-	-	0	1	-	fractional under threshold (non-firing PAUSE)
 OK	0	40	0	3600	-	30	500000	1	-	weekly present but comfortable — neither axis fires
 OK	0	40	0	3600	-	90	500000	1	-	weekly between the split thresholds (80..95) — the looser weekly default does not fire
 OK	0	40	0	3600	-	99	-100	1	-	dead weekly window does not pause (a high 7d pct from a rolled window)
+OK	0	79.999	0	3600	-	-	0	1	-	just under the 5h threshold — the at-or-over boundary's non-firing side
+OK	0	40	0	3600	-	94.999	500000	1	-	just under the weekly threshold — the at-or-over boundary's non-firing side
 
-# PAUSE (5h) — over threshold, fresh, live window, no recent login
+# PAUSE (5h) — at or over threshold, fresh, live window, no recent login
 PAUSE	1	95	0	3600	-	-	0	1	5h	integer over the 5h threshold
 PAUSE	1	82.5	0	3600	-	-	0	1	5h	fractional over 5h (the float-compare regression)
 PAUSE	1	80.9	0	3600	-	-	0	1	5h	fractional just over the 5h boundary (int truncation would miss)
+PAUSE	1	80	0	3600	-	-	0	1	5h	exactly at the 5h threshold pauses (at-or-over: the boundary reading is judged at the limit)
 PAUSE	1	95	0	3600	99999	-	0	1	5h	over 5h with an old login (no lag reroute)
 
 # PAUSE (7-day) — the weekly axis fires while 5h sits comfortable, and dominates when both fire
 PAUSE	1	40	0	3600	-	96	500000	1	7d	weekly over while 5h comfortable -> PAUSE names the 7-day axis
 PAUSE	1	95	0	3600	-	97	500000	1	7d	both axes over -> the costlier weekly axis is named
+PAUSE	1	40	0	3600	-	95	500000	1	7d	exactly at the weekly threshold pauses (at-or-over boundary)
 
-# STALE — post-login lag, stale reading, and non-numeric fail-closed
+# STALE — post-login lag (hoisted: unconditional within LOGIN_WINDOW), stale reading, non-numeric fail-closed
 STALE	2	95	0	3600	60	-	0	1	-	over 5h but a fresh login -> STALE (server-fed pct lags), still a parsed sample
-STALE	2	40	0	3600	60	96	500000	1	-	a login reroutes a weekly PAUSE too (a switch swaps both windows)
+STALE	2	40	0	3600	60	96	500000	1	-	a fresh login reroutes the weekly axis too (a switch swaps both windows)
+STALE	2	40	0	3600	60	-	0	1	-	under threshold with a fresh login -> STALE: the reroute precedes the axes, so a lagging pct cannot print a fresh-looking OK
 STALE	2	40	1200	3600	-	-	0	1	-	reading older than STALE_AGE — parsed, so it still logs
 STALE	2	abc	0	3600	-	-	0	0	-	non-numeric pct fails closed and appends nothing (not a parsed sample)
 

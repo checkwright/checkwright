@@ -44,8 +44,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
 3. Wire a `usage.txt` producer so `usage-verdict` has a snapshot to read — point
    your harness `statusLine` at `templates/statusline-usage.sh` (or copy it),
-   wire `templates/usage-poller.sh` under a timer so the snapshot stays fresh
-   while a supervising session sits static, or
+   point `DELEGATION_KIT_REFRESH_CMD` at `templates/usage-poller.sh` so every
+   verdict call refreshes the snapshot on demand (or wire the same poller under
+   a timer), keeping it fresh while a supervising session sits static, or
    have any producer honour the snapshot contract (SPEC §The usage.txt contract).
    The statusline producer also renders a status bar (context + both rate windows +
    iteration@stage); the three mandatory snapshot lines are the floor, and

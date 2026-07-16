@@ -201,16 +201,53 @@ three failure modes a raw percentage reading leaves open:
 3. **Post-login lag** — a fresh login starts a new window but the
    server-fed percentage lags it, and the file-write age check cannot see
    that. The gate reads the auth event from the credentials file's mtime
-   (`LOGIN_WINDOW`); a would-be PAUSE with a that-recent login routes to
-   STALE (re-read) instead of a wrongful pause. Self-limiting: once the
+   (`LOGIN_WINDOW`); *every* parsed verdict within that window routes to
+   STALE (re-read), not only a would-be PAUSE — the reroute precedes the
+   axis compares. Confining it to the PAUSE branch would print OK for a
+   lagging percentage at or under the threshold: a fresh-looking chimera,
+   since the producer stamps the new account id while the percentage and
+   `resets_at` still carry the dead login's window. Self-limiting: once the
    mtime ages out, a genuine near-limit percentage re-reads back to PAUSE.
-   An account switch swaps both windows, so the reroute applies whichever
-   axis would have fired.
+   An account switch swaps both windows, so no axis escapes the reroute.
+   The budget guard treats STALE as advise, never block, so the unconditional
+   reroute creates no dispatch blackout.
+
+Check order: parse → RESET-OK → age-STALE → login-STALE → pause axes → OK.
 
 Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable.
 Fail-closed throughout: missing keys and a non-numeric percentage route to
-STALE, and each threshold compare uses `awk`, not integer-only bash
-arithmetic, so a fractional percentage cannot silently skip PAUSE.
+STALE; each threshold compare uses `awk`, not integer-only bash
+arithmetic, so a fractional percentage cannot silently skip PAUSE; and both
+pause compares are **at-or-over** (`>=`), so a reading exactly at
+`PAUSE_PCT` / `PAUSE_PCT_7D` pauses — the boundary reading is judged at the
+limit, not under it.
+
+**Demand-driven refresh.** The decision point triggers the poll: when
+`DELEGATION_KIT_REFRESH_CMD` is non-empty, `usage-verdict` runs it before
+reading the snapshot, so the budget guard and any verdict caller read live
+data instead of whatever the last statusline render left behind. This closes
+the push producer's blind spot at the point of use — a lead that delegates
+stops rendering exactly when it goes static, and the first live poll proved
+the gap: the snapshot said 2-5% while the endpoint said 28%. Empty (the
+default) keeps the read-only behavior, so an unconfigured consumer's push and
+timer producers are unchanged.
+
+The refresh is **short-circuited** by `DELEGATION_KIT_REFRESH_MIN_AGE`: the
+command runs only when the snapshot is missing, unreadable, or its
+`updated_at` age is at least that value. The statusline calls `usage-verdict`
+on every render for trend sampling; without the floor a configured refresh
+would hammer the source on the render path. At dispatch-decision time a
+stale-enough snapshot still polls.
+
+It is **fail-soft**: a non-zero refresh exit leaves the snapshot untouched and
+the verdict proceeds on the cached file — the staleness machinery above judges
+its trust, turning a dead producer into a STALE verdict rather than a silent
+green. Refresh diagnostics are suppressed rather than mixed into the verdict
+output, which callers relay verbatim; the snapshot's age is the signal.
+`usage.txt` survives as last-known-good cache, source-agnostic seam, and test
+seam. A refresh inside `LOGIN_WINDOW` rewrites `updated_at` while the
+server-fed percentage may still lag the login by about a minute — the hoisted
+reroute correctly keeps those readings STALE for the window's duration.
 
 **The `width=<n>` field.** Every emitted verdict line — OK, PAUSE, STALE (the
 fail-closed diagnostics included), RESET-OK — carries a `width=<n>` field
@@ -303,10 +340,14 @@ nowhere else — never logged, never echoed, never written to the snapshot),
 query the account usage source, map the payload onto the contract (the three
 mandatory lines plus whichever optional keys the source exposes; **no new
 key**), and atomically rewrite the snapshot (`tmp` + `mv`, the same
-discipline). No daemon, no loop: scheduling belongs to the consumer's timer —
-a cron line such as `*/5 * * * * bash scripts/usage-poller.sh` or a systemd
-timer — and without that timer entry the producer is dead; the timer entry is
-the enabling config. The usage endpoint is harness-account plumbing, not a
+discipline). No daemon, no loop: scheduling belongs to the consumer, and two
+modes are sanctioned. **Demand-driven** (§usage-verdict): point
+`DELEGATION_KIT_REFRESH_CMD` at the poller and the same one-cycle producer runs
+at verdict time, which puts the freshest reading exactly at the decision point.
+**Timer-driven**: a cron line such as `*/5 * * * * bash usage-poller.sh` or a
+systemd timer, for consumers wanting continuous trend density independent of
+verdict calls. Either entry is the enabling config; with neither, the producer
+is dead. The usage endpoint is harness-account plumbing, not a
 published contract, so the poller is **fail-soft**: a missing/unreadable
 credentials file, a fetch failure, or an unparseable payload exits non-zero
 with a `help:` line *without touching the snapshot* — a stale snapshot is
@@ -430,6 +471,16 @@ layout as defaults):
   week's budget — only the true red zone stops delegation on this axis.
 - `DELEGATION_KIT_STALE_AGE` — default `600` (seconds).
 - `DELEGATION_KIT_LOGIN_WINDOW` — default `600` (seconds).
+- `DELEGATION_KIT_REFRESH_CMD` — the command `usage-verdict` runs before
+  reading the snapshot (§usage-verdict); default empty, which keeps the
+  read-only behavior. This repo points it at the poll producer, run in place
+  from its template path.
+- `DELEGATION_KIT_REFRESH_MIN_AGE` — the refresh short-circuit (§usage-verdict);
+  default `60` (seconds), validated a non-negative integer by the loader. The
+  floor is set by the render path, not the dispatch path: the statusline calls
+  the verdict on every render, so the default bounds source traffic to roughly
+  one poll a minute while leaving any dispatch-time reading fresh enough to act
+  on.
 - `DELEGATION_KIT_USAGE_HISTORY` — sample-log path; default empty (sampling
   off). This repo sets `.metric/usage-history.log`, a gitignored persistent
   measurement trend (drift-kit/SPEC.md §Layout and configuration owns the
@@ -515,9 +566,23 @@ asserts which window a PAUSE names). Every verdict branch and both pause axes
 carry a firing and a non-firing case — the fixture-pair discipline,
 transplanted — covering a weekly PAUSE while 5h is comfortable, the axis
 named in the output, absent keys disarming the weekly axis, a dead weekly
-window not pausing, and the sample-append discipline (a parsed snapshot
+window not pausing, each axis's at-or-over boundary (a reading exactly at the
+threshold pauses; just under does not), the hoisted login reroute (an
+under-threshold percentage with a fresh login is STALE, not OK — the defect
+the hoist closes), and the sample-append discipline (a parsed snapshot
 appends one line whatever the verdict; a non-numeric snapshot appends none;
 `pct_7d` present-vs-omitted in the passed-through line).
+
+The demand-driven refresh needs a command seam the table's columns do not
+carry, so it is asserted beside the table through a stub `REFRESH_CMD` (a real
+poll would need the network): **armed** — a stale snapshot invokes the command
+and the verdict reads the values the refresh wrote, not the cached ones;
+**fail-soft** — a non-zero stub leaves the snapshot byte-identical, the verdict
+proceeds and the cached reading is judged STALE by the existing staleness
+machinery, and no refresh diagnostic leaks into the relayed verdict line;
+**short-circuit** — a snapshot under `REFRESH_MIN_AGE` never invokes the
+command. Armed and short-circuit are the firing/non-firing pair over the same
+stub, so the absence proves the floor rather than a broken stub.
 
 `usage-trend` is likewise not a gate (it renders no clean/violation
 verdict), so it ships an assertion runner, `bin/run-trend-tests.sh`, over a

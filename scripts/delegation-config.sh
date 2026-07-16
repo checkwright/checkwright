@@ -5,6 +5,10 @@
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_USAGE_HISTORY=".metric/usage-history.log"
 
+# comment-tier-exempt: the poller runs in place — this repo keeps no scripts/ copy and the template carries no local edit, so a copy would only drift (statusline-usage.sh is the in-place precedent)
+# shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
+DELEGATION_KIT_REFRESH_CMD="bash delegation-kit/templates/usage-poller.sh"
+
 # comment-tier-exempt: `*` spans '/' in a bash [[ == ]] glob, so */checks/*.sh reaches every kit's gates
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_GATE_FILES=(
