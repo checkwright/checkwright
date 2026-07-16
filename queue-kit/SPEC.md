@@ -66,7 +66,9 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   whose remaining half *is* drain-stage work). Same split: syntax here;
   placement semantics — the drain-entry exemption, the non-empty-reason
   grammar, the successor-entry backstop — are lifecycle-kit's
-  `check-stage-entry` assertion B.
+  `check-stage-entry` assertion B. The Done move takes the tag with it
+  (done entries drop their lifecycle tags; every reader scans live task
+  sections only).
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
 

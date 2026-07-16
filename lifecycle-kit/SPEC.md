@@ -196,7 +196,12 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   not be terminal: at least one `LIFECYCLE_KIT_PREDECESSOR` entry names it, or
   config load fails (the drain-exempt backstop; §check-stage-entry).
 - `LIFECYCLE_KIT_ACTIVE_SECTIONS` — the queue sections the drain assertion
-  reads; default `("New Features" "Technical Debt")`.
+  reads; default `("New Features" "Technical Debt")`. Independent of
+  canon-kit's `CANON_KIT_ACTIVE_SECTIONS` (read by `check-amendment-queue`'s
+  misfiled-spec-ready clause) though their defaults coincide — a consumer
+  retargeting one alone splits the drain assertion's view from
+  `check-amendment-queue`'s, with no gate to notice. A known, accepted
+  coupling: kit independence outranks unifying the knob.
 - `LIFECYCLE_KIT_AUDIT_STAGE` — the trigger-gated audit stage assertion C looks
   for; default `align`; empty disables the audit machinery entirely.
 - `LIFECYCLE_KIT_AUDIT_ENTRY_STAGE` — the stage whose entry assertion C blocks

@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **drain-stage-active-residue** [spec: SPEC-drain-stage-active-residue.md] [drain-exempt: baseline]
-  — model legitimate drain-stage residue in check-stage-entry assertion B: a
-  drain-exempt reason
-  tag skipped at drain entry, with a no-exemption backstop at the drain successor's entry;
-  coupled check-amendment-queue clause — a spec-ready entry belongs in the feature section;
-  case 2 ruled a mis-filing, not a gate gap; the held-red gates baseline row promotes to
-  pass at validate. Design and rulings live in the amendment. Surfaced 2026-07-16 entering
-  validate for launch-readiness; the third cost surfaced in close's knowledge-friction
-  triage.
-
 ## Technical Debt
 
 ## Deferred
@@ -123,6 +113,7 @@
 ## Done
 
 - lead-seam-redesign
+- drain-stage-active-residue
 
 ## Lessons Learned
 
