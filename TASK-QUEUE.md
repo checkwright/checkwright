@@ -131,7 +131,4 @@
   lead dispatches of the lifecycle-machinery iteration.
 ## Done
 
-- lead-seam-redesign
-- drain-stage-active-residue
-
 ## Lessons Learned
