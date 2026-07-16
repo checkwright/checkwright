@@ -18,9 +18,9 @@ per kit, so the adoption decision weighs a number rather than a guess.
 ## Requirements
 
 Checkwright is **Unix-first**: Linux and macOS are the supported platforms.
-Windows is supported through WSL, not natively — the gate battery and the git
-hooks are Bash over a coreutils toolchain, and no native-Windows shell path
-exists.
+Windows is supported through WSL (Windows Subsystem for Linux), not natively —
+the gate battery and the git hooks are Bash over a coreutils toolchain, and no
+native-Windows shell path exists.
 
 The battery leans on a small command-line toolchain; each tool below must be on
 your `PATH`, and the note says what breaks without it:

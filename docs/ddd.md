@@ -48,7 +48,8 @@ enforces it, cited downward so the invariant stays in one place.
 
 ## An example
 
-Take a fictional cargo-shipping domain — the classic DDD teaching example — in
+Take a fictional cargo-shipping domain — the classic domain-driven design
+teaching example — in
 which `cargo` is the canonical aggregate and `parcel` and `shipment` are
 synonyms the team has agreed to retire. The consumer writes a pattern file
 naming the retired words as extended-regex lines:

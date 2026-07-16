@@ -25,7 +25,7 @@ problem: nobody is signalled.
 ## The remedy: mechanize the decidable, isolate the semantic
 
 Checkwright's premise is a division of labour. Some consistency questions are
-mechanically decidable and cheap to check — does this link resolve, does this
+mechanically decidable and cheap to check: does this link resolve, does this
 command exist, does every kit have a registry row, was this stage actually
 entered. Those belong to a machine. What remains is the irreducibly semantic
 judgment — is this the right design, does this prose actually explain the thing
@@ -42,11 +42,11 @@ positive is treated as a defect in the gate, not a cost of doing business.
 
 ## The enforcement core carries no harness dependency
 
-The part that does the blocking — the gate battery — is bare bash over a
+The part that does the blocking (the gate battery) is bare bash over a
 coreutils toolchain. No gate reads a harness surface, so the enforcement core
 runs under any coding-agent harness, under any CI, or under no harness at all:
 there is no harness dependency in the layer that must be trustworthy. The
-shaping layer — the always-loaded convention the agent reads each session —
+shaping layer (the always-loaded convention the agent reads each session)
 rides whichever agent file your harness already loads (`CLAUDE.md`, `AGENTS.md`,
 or another) by configuration rather than a port, and that path is exercised by a
 shipped smoke, not merely asserted. Only the harness-native skill bindings and

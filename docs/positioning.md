@@ -52,8 +52,8 @@ broad claim that would not survive contact:
 - **Tier two — configurable at the core, Claude-Code-native at the edges.**
   What was once lumped as one adapter-shaped surface now splits in two. The
   always-loaded agent-file convention is **configuration, not a port**: no kit
-  mechanism resolves that file by literal — each reads its kit's knob, defaulting
-  to `CLAUDE.md` — so a consumer whose harness reads `AGENTS.md` (or any other
+  mechanism resolves that file by literal; each reads its kit's knob, defaulting
+  to `CLAUDE.md`, so a consumer whose harness reads `AGENTS.md` (or any other
   always-loaded agent file) runs every kit mechanism by setting existing knobs.
   This is *tested*, not asserted: a shipped smoke stands up an `AGENTS.md`
   consumer, sets the agent-file knobs, and runs the full battery green
@@ -67,7 +67,7 @@ broad claim that would not survive contact:
 
 The division is deliberate. The part that must be portable — enforcement — is;
 the always-loaded convention rides whichever agent file your harness already
-reads, by configuration; only the harness-native bindings and settings residue
+reads (by configuration); only the harness-native bindings and settings residue
 are adapter work, and the page names exactly that residue rather than a broad
 claim that would not survive contact.
 

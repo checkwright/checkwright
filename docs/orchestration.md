@@ -15,7 +15,7 @@ verification layer parallelizes drift: wrong answers faster, with more
 confidence.
 
 Checkwright is that second answer. It makes *done* mechanically decidable, so a
-supervisor — human or agent — can trust a completed unit of work without
+supervisor (human or agent) can trust a completed unit of work without
 reading all of it. That is the prerequisite the orchestration story quietly
 assumes: coordination is only worth scaling once each coordinated result is
 checkable. Checkwright therefore sits **beneath** an orchestrator, not beside
@@ -88,8 +88,8 @@ prices. To drive an iteration under it:
    lead drove it.
 2. **The lead dispatches `/scope` as a background stage session on the
    judgment tier.** Scope formalizes the iteration — authoring the design
-   amendments, promoting the queue entries — lands the promotion commit, and
-   its agent stays resumable afterward as the iteration's **intent oracle**.
+   amendments, promoting the queue entries — and lands the promotion commit. Its
+   agent stays resumable afterward as the iteration's **intent oracle**.
 3. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
    unchanged, on the tier the stage-session agent definition pins.

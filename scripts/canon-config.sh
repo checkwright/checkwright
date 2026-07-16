@@ -51,3 +51,14 @@ CANON_KIT_PROSE_SURFACE_GLOBS=(
     "*/templates/*.md"
     ".claude/agents/*.md"
 )
+
+# comment-tier-exempt: this repo's reader-facing prose surfaces for check-prose-tells — the hand-authored top-level docs living pages only; the single-level docs/*.md glob deliberately excludes the generated kit mirror (docs/<kit>/) and the immutable dated posts (docs/posts/), since a prose gate forcing edits to generated or immutable pages contradicts them; consumer editorial scope, never a kit literal (the provenance seam)
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_PROSE_TELL_GLOBS=(docs/*.md)
+
+# comment-tier-exempt: extends the kit's bundled universal abbreviation set (restated here because a consumer array replaces the default rather than appending) with this repo's own standard tokens — SPEC, KPI, README, CNAME — that read as jargon-free to its audience and so are exempt from the undefined-abbreviation tell; consumer vocabulary, never a kit literal (the provenance seam)
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_PROSE_TELL_ABBR_ALLOW=(
+    "API" "CLI" "URL" "HTML" "CSS" "JSON" "YAML" "CI" "SDK" "SSO" "DNS" "HTTPS"
+    "SPEC" "KPI" "README" "CNAME"
+)
