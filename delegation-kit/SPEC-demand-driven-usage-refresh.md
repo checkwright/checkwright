@@ -55,6 +55,14 @@ keeps those readings STALE for the window's duration.
   which is the deployed enabling config (not test-only). Consumed by
   `usage-verdict` at verdict time — the single reader. The kit default stays
   empty: an unconfigured consumer keeps the push/timer producers unchanged.
+  The template runs **in place**: this repo has no `scripts/usage-poller.sh`
+  copy and the poller carries no local edit, so a copy would only drift
+  (`statusline-usage.sh` is the in-place precedent in `.claude/settings.json`;
+  `agent-budget-guard.sh` is copied because its block message is consumer
+  prose). §The usage.txt contract's scheduling example names
+  `scripts/usage-poller.sh` — the same paragraph this amendment rewrites, so
+  the rewrite presents the copy as one option rather than the shape, and the
+  in-place config below contradicts nothing. Surfaced by the align audit.
 - **`DELEGATION_KIT_REFRESH_MIN_AGE`** — produced by consumer config or the
   default; read by `usage-verdict` alone (the short-circuit compare).
 - **The refreshed snapshot** — produced by the refresh command through the

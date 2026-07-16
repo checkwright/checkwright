@@ -16,6 +16,14 @@ a sibling gate is legitimately held red.
    `bin/diff-baseline.sh` — inherit it. The name mirrors the
    `EVIDENCE_KIT_RUN_<suite>` convention.
 
+   The resolution is a named helper (`ek_parser_for <suite>`), not private to
+   `ek_parse`: `run-validate`'s produced-no-result diagnostic
+   (`run-validate.sh:53`) interpolates `$EVIDENCE_KIT_PARSER` today, so once a
+   suite carries an override the message names the global while the override
+   produced the empty result — misreporting exactly the guard this amendment
+   leans on (consumer-side, below). The diagnostic names the effective parser.
+   Surfaced by the align audit at the read site.
+
 2. **`ek_diff` fail-closed convergence** (debt, in-envelope precondition) — an
    observed non-pass scenario with no baseline row is a new failure.
    §Baseline manifest already asserts this ("A scenario absent from the

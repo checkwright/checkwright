@@ -59,6 +59,12 @@ consumer config; the kit ships only the generic-English bundled sets.
 - **§Layout and configuration** — the "A consumer extends either array with
   its own vocabulary" sentence becomes the `_EXTRA` mechanics: extension via
   the `_EXTRA` knobs, replacement of the base array as the narrowing valve.
+  That sentence's parenthetical cites `CANON_KIT_TEMPORAL_MARKERS` as *the
+  extension precedent* (SPEC.md:290); once this pair alone gains `_EXTRA`, the
+  cited array is the one without it, so the rewrite keeps the parenthetical's
+  live half — the provenance-seam point (generic English is kit-shippable, a
+  consumer's own vocabulary never becomes a kit literal) — and drops the
+  precedent framing. Surfaced by the align audit.
 - **§check-prose-tells** — assertions B and D read the merged sets; the knob
   roster sentence names the pair.
 
