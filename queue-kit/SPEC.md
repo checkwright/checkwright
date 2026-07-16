@@ -68,7 +68,11 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   grammar, the successor-entry backstop — are lifecycle-kit's
   `check-stage-entry` assertion B. The Done move takes the tag with it
   (done entries drop their lifecycle tags; every reader scans live task
-  sections only).
+  sections only). The lead-line reason is a terse marker, not the audit
+  trail: `check-tag-lead-line` pins the tag to the lead line while
+  `check-queue-wrap` caps its width, so a long slug can squeeze the reason
+  to a few columns — keep it a keyword and carry the full exemption
+  rationale in the entry body.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
 

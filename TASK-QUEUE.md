@@ -116,10 +116,3 @@
 - drain-stage-active-residue
 
 ## Lessons Learned
-
-- **drain-exempt-reason-width** — dogfooding the drain-exempt tag on this
-  iteration's own entry: a long slug plus its spec-pointer tag leaves roughly
-  eight columns for the reason inside the 100-column wrap budget, thinning
-  the audit trail the reason field exists to carry. Close triages whether
-  the fix belongs to the tag algebra (a shorter tag), the wrap gate (a
-  lead-line valve), or nowhere (accepted cost).

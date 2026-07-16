@@ -37,3 +37,4 @@
 | enforcement-map-strict-config | s a b v c | 2f/0d | 1 · ≤0d | 20s clean | 73 |
 | launch-readiness | s a b v c | 4f/0d | 0 | 20s 1✗ | 74 |
 | env-probe-refresh | s · b v c | 1f/0d | 2 · ≤0d | 20s clean | 74 |
+| lifecycle-machinery | s a b v c | 6f/2d | 2 · ≤0d | 21s 1✗ | 74 |
