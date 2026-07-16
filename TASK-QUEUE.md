@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: env-probe-refresh  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -14,27 +14,19 @@
 
 ## Technical Debt
 
-- **env-probe-auto-refresh** — automate the env-profile refresh
-  instead of the install-time + on-demand cadence. The current design
-  (context-kit/SPEC.md §bin/env-probe, "cached projection, not per-session
-  probe") rests on "env changes rarely" plus a per-session latency tax; both
-  are weak — on a rolling-release environment the toolchain versions change
-  daily-plus (a `python3` probe-set drop was caught stale on one refresh) and
-  the probe measures in tens of ms, so the latency objection does not hold.
-  Design on record: call env-probe from the **session-context hook** (once per
-  session — the meaningful granularity; NOT the statusline, which re-renders
-  many times per session for a box that does not change mid-session; NOT
-  enter-stage.sh, which under-covers non-lifecycle sessions and couples
-  lifecycle-kit → context-kit). Optional refinement: give env-probe
-  **change-detection** so the block and its `Probed` date rewrite only on an
-  actual content change (keeps the date a real last-changed signal, avoids
-  per-session file churn). Surfaces: context-kit/SPEC.md §bin/env-probe (rewrite
-  the cadence / no-freshness-gate paragraph — the session-context hook is
-  already its step-9 consumer, so producer and consumer co-locate),
-  scripts/session-context.sh + context-kit/templates/session-context.sh (the
-  call), possibly context-kit/bin/env-probe.sh (change-detection); the docs
-  mirror regenerates after the SPEC edit and check-install-toolchain parity is
-  unaffected (probe set unchanged). Surfaced 2026-07-16 by the operator
+- **env-probe-auto-refresh** [spec: SPEC-env-probe-refresh.md] — automate the
+  env-profile refresh: the session-context hook re-probes once per session (at
+  its step-9 profile emit) in place of the install-plus-on-demand cadence, and
+  `bin/env-probe.sh` gains change-detection so the block and its `Probed` date
+  rewrite only on an actual content change — the date stays a real last-changed
+  signal and an unchanged box writes nothing. Single-component (context-kit):
+  both the producer (env-probe) and the step-9 consumer are context-kit's own,
+  so no cross-kit coupling. The hook re-probes only when the profile file
+  already exists, so the silent-when-absent / no-cost-where-unseeded contract
+  holds.
+  Full design (producers/consumers, the Cadence-paragraph rewrite,
+  change-detection semantics, DoD) is on record in
+  context-kit/SPEC-env-probe-refresh.md. Surfaced 2026-07-16 by the operator
   questioning the install+on-demand cadence and a probe-runtime measurement.
 
 ## Deferred

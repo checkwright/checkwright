@@ -4,4 +4,4 @@
 
 ---
 
-— scope a51656f0 2026-07-16
+env-probe-refresh scope a51656f0 2026-07-16
