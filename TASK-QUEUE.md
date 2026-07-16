@@ -170,6 +170,4 @@
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
 
-- env-probe-auto-refresh
-
 ## Lessons Learned
