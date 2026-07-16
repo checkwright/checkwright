@@ -51,18 +51,42 @@ prior-stage completeness by hand:
    (`CONTEXT_KIT_SESSION_ROLE_FILE`, default
    `${GATE_SDK_TMP_DIR:-.tmp}/session-role`); the hook — which receives
    the harness session id on stdin, whose 8-char prefix equals what
-   `session-id.sh` computes (the attested parity in context-kit/SPEC.md
-   §The session-context hook, "Ruled out — lifecycle stamp-id injection") —
-   treats the session as `lead` only when the marker's id matches its own,
-   so a concurrent or later session never bleeds and a stale marker
-   self-invalidates when the id rotates.
+   `session-id.sh` computes **in a top-level session** (the parity attested,
+   and scoped, in context-kit/SPEC.md §The session-context hook, "Ruled out —
+   lifecycle stamp-id injection") — treats the session as `lead` only when the
+   marker's id matches its own, so a concurrent or later **top-level** session
+   never bleeds and a stale marker self-invalidates when the id rotates.
 
-   **Known, accepted limit (not a defect):** the initial startup fire
+   **Why top-level scoping is sufficient (audited, align/lifecycle-machinery).**
+   Both producer and consumer are top-level by construction: /lead runs in the
+   top-level session, and `SessionStart` does not fire for Task-spawned
+   subagents — the brief reaches a top-level transcript as a hook attachment and
+   reaches a stage session not at all. So the only sessions the hook fires in
+   are leads and manual runs, and the identity match discriminates exactly
+   those. The bleed it prevents is a *manual run in the same tree while a lead
+   marker sits in scratch*, not a lead versus its own stage sessions.
+
+   **Named assumption (the match's soundness rests on it):** a stage session
+   shares its lead's `CLAUDE_CODE_SESSION_ID`, so were the harness ever to fire
+   `SessionStart` in subagents, every stage session would match the marker and
+   read as `lead` — inverting the suppression onto exactly its intended
+   audience. Build wires the read against the hook's own payload, never against
+   the env var, and this assumption is revisited if subagent hook-fire lands.
+
+   **Known, accepted limits (not defects):** the initial startup fire
    precedes /lead by construction, so it renders as today — a bounded,
    one-per-lead-session cost, against the per-compact/resume recurrence
    that is the actual waste. The marker also ages out with the hook's
    day-horizon scratch sweep; a lead session older than a day degrades to
-   absent-signal behavior, the same posture as before this change.
+   absent-signal behavior, the same posture as before this change. Finally the
+   producer inherits `session-id.sh`'s `CLAUDE_CODE_SESSION_ID` dependency:
+   unset, that script falls through to a newest-transcript scan that in a lead
+   with live subagents returns an `agent-` prefix the hook's payload can never
+   match, and the signal silently no-ops to today's behavior. This is the same
+   degradation shape the launch-env-var alternative was rejected for, in a
+   strictly better reliability class — harness-set, not operator-remembered —
+   and it is recorded rather than guarded: the failure costs a suppression, not
+   a correctness property.
 
    Rejected alternatives (recorded so build does not re-litigate): a
    launch-env var — costs an operator ritual per lead launch in
@@ -121,7 +145,11 @@ prior-stage completeness by hand:
 - context-kit/SPEC.md §The session-context hook — the role-signal
   conditioning on steps 4 and 8, the marker grammar, and the accepted
   startup-fire limit; §Layout and configuration gains
-  `CONTEXT_KIT_SESSION_ROLE_FILE`.
+  `CONTEXT_KIT_SESSION_ROLE_FILE`. Its "Ruled out — lifecycle stamp-id
+  injection" parity attestation is **narrowed to the top-level case** (landed
+  at align: the unqualified claim is false for a subagent, which is handed its
+  parent's `CLAUDE_CODE_SESSION_ID` while `session-id.sh` derives its own
+  transcript id).
 - context-kit/templates/session-context.sh and scripts/session-context.sh
   (consumer copy) — the guarded role read.
 - docs/orchestration.md §Running an iteration under a lead — one line on

@@ -29,13 +29,33 @@
    already exists); canon-kit/SPEC.md §check-amendment-queue invariant
    updated; a bad-fixture case added.
 
+   **Knob coupling (noted at align).** This clause reads canon-kit's
+   `CANON_KIT_ACTIVE_SECTIONS`, while part 3's assertion B reads
+   lifecycle-kit's own `LIFECYCLE_KIT_ACTIVE_SECTIONS` — two independent knobs
+   whose defaults coincide (`("New Features" "Technical Debt")`). The two halves
+   of this amendment compose only while they agree; a consumer retargeting one
+   alone splits them with no gate to notice. Recorded as a known coupling, not
+   unified here (kit independence is deliberate and outranks the convenience).
+
 3. **Case-1 model — the `[drain-exempt: <reason>]` tag.** A
    validate-spanning feature (its build half shipped; its validate half
    *is* validate work — launch-readiness-gate the attested first case)
    legitimately persists in the active queue into the drain stage. New
    queue tag, split per the `[needs-spec]`/`[spec:]` precedent: syntax in
-   queue-kit (§The tag algebra bullet; `check-tag-lead-line`'s governed-tag
-   roster; `queue-index.sh` display), placement semantics in lifecycle-kit.
+   queue-kit (§The tag algebra bullet; `check-tag-lead-line`; `queue-index.sh`
+   display), placement semantics in lifecycle-kit.
+
+   **Correction (align, verified at the read site):** there is no governed-tag
+   *roster* to join. `check-tag-lead-line`'s `classes()` hard-codes four literal
+   awk arms (`blocked-by`, `spec`, `needs-spec`, `attend`); only *lesson* tags
+   are configurable (`QUEUE_KIT_LESSON_TAGS`). `[drain-exempt:]` lands as a
+   fifth hard-coded arm. The audit also found the drift this shape invites is
+   already live — `[precondition-ok:]` is a governed task tag in §The tag
+   algebra that `classes()` never matches, so the gate does not enforce it, and
+   §check-tag-lead-line's "every governed tag" invariant is false as written.
+   That pre-existing drift is **not** this amendment's merge to carry; its
+   disposition (a SPEC-set↔`classes()` parity gate, which reds today on
+   `precondition-ok`) is filed separately on the lead's ruling.
    `check-stage-entry` assertion B skips an active entry whose lead line
    carries the tag with a non-empty reason (empty reason = malformed,
    still red). **Backstop:** at entry to the drain stage's successor
@@ -45,6 +65,22 @@
    nothing may remain active, tagged or not. The drain contract becomes:
    untagged entries drain by drain-stage entry; tagged entries drain by
    successor entry.
+
+   **Successor resolution (specified at align — the map is not injective).**
+   `LIFECYCLE_KIT_PREDECESSOR` is many-to-one and the default roster already
+   proves it: `align` and `build` both name `scope`. So "the stage whose
+   predecessor is the drain stage" is a one-to-many query and needs a rule:
+   - **Multiple matches** — every matching stage is a backstop entry; the
+     no-exemption assertion runs at each. A tagged entry must therefore drain
+     by whichever successor is entered first, which is the bound the backstop
+     exists to impose.
+   - **Zero matches** (a roster whose drain stage is terminal) — **fail-closed**:
+     the exemption is refused outright, because a `[drain-exempt:]` with no
+     reachable backstop is a permanent exemption, and a silently-never-running
+     backstop is the one failure this design cannot absorb. Consistent with the
+     gate framework's `fail_closed` posture.
+   `lib/stages.sh`'s roster validator (which today checks only that the map's
+   keys and values are known stages) gains the corresponding assertion.
 
 4. **Costs 2 and 3 discharge.** With case 1 modeled, entering validate with
    legitimate residue needs no by-hand override, so the full battery no

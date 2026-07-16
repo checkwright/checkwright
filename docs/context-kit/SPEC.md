@@ -146,9 +146,13 @@ over-firing to the other sessions that share a header value (a restarted
 session of a keyed stage, or the first session of the stage after it).
 
 **Ruled out — lifecycle stamp-id injection.** The hook payload carries the
-harness session id, and its 8-char prefix equals what lifecycle-kit's
-`session-id.sh` computes, so the hook *could* inject the canonical stamp
-id with no shell-out. It does not: lifecycle-kit owns its id derivation
+harness session id, and **in a top-level session** its 8-char prefix equals
+what lifecycle-kit's `session-id.sh` computes, so the hook *could* inject the
+canonical stamp id with no shell-out. The parity is top-level-only and holds
+only while the harness sets `CLAUDE_CODE_SESSION_ID`: a subagent is handed its
+*parent's* id in that variable, while `session-id.sh` deliberately derives the
+subagent's own transcript id instead (its `CLAUDE_CODE_CHILD_SESSION` branch),
+so the two quantities diverge there by design. The hook does not inject: lifecycle-kit owns its id derivation
 end-to-end (the stage-entry ritual derives it via `session-id.sh`,
 whatever invokes that script), and having the stage skills
 read a context-kit-injected value would wire an upstream kit's protocol to
