@@ -25,7 +25,7 @@ a sibling gate is legitimately held red.
    Surfaced by the align audit at the read site.
 
 2. **`ek_diff` fail-closed convergence** (debt, in-envelope precondition) — an
-   observed non-pass scenario with no baseline row is a new failure.
+   observed `fail` scenario with no baseline row is a new failure.
    §Baseline manifest already asserts this ("A scenario absent from the
    baseline fails closed: the diff treats its failure as a new failure");
    re-verified this session, today's `ek_diff` walks baseline rows only and
@@ -35,6 +35,20 @@ a sibling gate is legitimately held red.
    gate would slip through a clean verdict. Code converges on the existing
    SPEC sentence; the only spec delta is citing the branch in
    §bin/diff-baseline.sh.
+
+   The settled triple for a scenario absent from the baseline — observed
+   `fail` is a new failure; observed `pass` is the SPEC's stated
+   classification cost, no red; observed `ignore` is **silent**, an ignored
+   test being a non-verdict with no spec sentence to converge on. The rule is
+   `fail`, not non-pass: the governing sentence says *failure*, and widening to
+   non-pass would red a libtest consumer's new `#[ignore]` test under a
+   debt-convergence banner — a fail-closed appetite for absent `ignore` files
+   as a separate argued change carrying a real §Baseline manifest delta, never
+   as this amendment's rider. The skip demotion stays a baseline-row concern
+   and does not reach absent scenarios: a skip-demoted observed `pass` absent
+   from the baseline falls under the classification-cost rule. Intent-oracle
+   ruling at align, on the align audit's finding that the amendment's original
+   "non-pass" wording overran the sentence it converges on.
 
 3. **Consumer side (this repo)** —
    - `scripts/parse-gates-log.sh` (new consumer script): maps the verbose
@@ -103,6 +117,12 @@ with an override uses it while a sibling suite keeps the global parser);
 `ek_diff` observed-fail-absent-from-baseline returns a new-failure; the
 consumer parser fixture — a verbose log maps to per-gate lines, an
 early-crash log (no tails) maps to no output.
+
+The ruled edge carries its own test: `ek_diff` observed-**ignore**-absent-from-baseline
+stays silent (rc=0, no line). The triple's narrow side is the half a later
+session widens by accident — "non-pass" is the intuitive misreading, and it
+was this amendment's own first wording — so it is pinned by a test rather
+than by prose alone.
 
 ## Definition of Done
 
