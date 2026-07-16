@@ -110,6 +110,25 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **demand-driven-usage-refresh** [needs-spec] — demand-driven refresh
+  replaces timer polling as the usage-snapshot freshness mechanism: a
+  `DELEGATION_KIT_REFRESH_CMD` knob (empty default) that `usage-verdict` runs
+  before reading the snapshot, so the budget guard and any verdict call poll
+  at decision time; `usage.txt` survives as last-known-good cache,
+  source-agnostic seam, and test seam — never deleted (operator ruling
+  2026-07-16). First live poll proved the gap: the statusline snapshot said
+  2-5% while the endpoint said 28% (a delegated build burning while the
+  supervising session idled). Bundled by the same ruling, the login-reroute
+  hoist (technical debt): `usage.txt` lags an account-switching `/login` by
+  about a minute — the producer stamps the new account id while pct/resets_at
+  still carry the dead login's window, so the reading is a fresh-looking
+  chimera — and the reroute check living only inside the PAUSE branch lets a
+  lagging pct at-or-under the threshold print OK; hoist it ahead of the
+  threshold comparison. Boundary case on record: pct exactly equal to
+  `DELEGATION_KIT_PAUSE_PCT` misses the strict `>` comparison. Interim
+  discipline until this lands: run `templates/usage-poller.sh` then
+  `usage-verdict.sh` before each dispatch. Surfaced 2026-07-16 by the live
+  lead dispatches of the lifecycle-machinery iteration.
 ## Done
 
 - lead-seam-redesign

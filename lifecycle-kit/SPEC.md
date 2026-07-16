@@ -374,7 +374,14 @@ the first 8 characters:
    `LIFECYCLE_KIT_SESSIONS_DIR`), the top-level glob widened with
    `<dir>/*/subagents/*.jsonl` so a dispatched session with neither env var
    still resolves without a per-dispatch override. Newest-file selection is the
-   documented single-operator assumption (one live session per project tree). A
+   documented single-operator assumption (one live session per project tree) —
+   and the widened glob makes it bite *within* one session too: a top-level
+   session that reaches this source (its Bash environment lacking the source-2
+   uuid) right after one of its subagents finishes picks that subagent's
+   transcript when it out-mtimes the session's own, so a lead deriving its own
+   id here (the session-role marker, §templates/lead.md) can name the wrong
+   session and misfire the suppression — a lead in that position verifies the
+   printed id against its own transcript before writing the marker. A
    dispatched child (source 2 skipped, `CLAUDE_CODE_SESSION_ID` carrying the
    lead's uuid) narrows this scan to `<dir>/<lead-uuid>/subagents/*.jsonl`
    alone, excluding the lead's own top-level transcript — concurrently written,

@@ -73,6 +73,18 @@ consumer). Registration is the opt-in valve: a consumer wanting pure advice
 does not wire the hook. No new persistent state and no new key on the
 `usage.txt` contract — the verdict line is the only interface.
 
+A knob-raise ruling has one working transport in this harness: the settings
+env block (`.claude/settings.local.json`), which hooks re-read per fire — the
+raised `DELEGATION_KIT_PAUSE_PCT` reaches the guard on the next dispatch with
+no restart, and deleting the entry afterwards restores the default just as
+immediately. A Bash-tool inline `export` never reaches the hook (the hook
+process does not inherit the tool's shell), so it is not an override path.
+Propagation is asymmetric within a live session: the hook re-reads the file
+per fire, but the Bash tool environment retains an injected value after the
+entry is deleted until the session restarts — an in-session `usage-verdict`
+run and a hook fire can judge against different thresholds in that window, so
+the hook's verdict line, not an in-session re-run, is the acting reading.
+
 ### One template, a resident pointer
 
 `templates/agent-execution.md` is the single source for the protocol — a
