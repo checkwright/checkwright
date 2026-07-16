@@ -8,3 +8,4 @@ lifecycle-machinery scope a5656d74 2026-07-16
 lifecycle-machinery align a4dc95fd 2026-07-16
 lifecycle-machinery build ac74d6e2 2026-07-16
 lifecycle-machinery validate a42795bd 2026-07-16
+lifecycle-machinery close a6706a19 2026-07-16
