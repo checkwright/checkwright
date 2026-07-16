@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **launch-readiness-gate** [spec: canon-kit/SPEC-prose-tells.md] — the
-  readiness bar a surge-channel (Lobsters / Show-HN-class) submission must
-  clear. Build ships the durable half: `check-prose-tells`, canon-kit's
-  mechanical AI-prose-tell gate over consumer-configured docs surfaces (the
-  amendment owns the tell set, knobs, and valve). Validate runs the four
-  readiness checks: (1) cold clone of the *public* repo, `demo/run-demo.sh`
-  exits 0 with the full vendor → blocked → fix → green arc (the dev-tree pass
-  is already attested; the cold public clone is the delta this asserts);
-  (2) reader-facing link crawl of the rendered checkwright.dev site — dead
-  internal/external links and half-finished pages, the path site-kit's
-  render/deployment gates do not cover; (3) the prose gate green on this
-  repo's configured docs set, plus a one-time human read for the
-  non-mechanical tells; (4) install-path dry-run — docs/install.md followed
-  verbatim as a new adopter, vendoring recipe and AGENTS.md adapter notes
-  confirmed as written. Exit criterion: all four checks clean ⇒ a
-  surge-channel submission is unblocked (the upstream criterion's "all three
-  clean" reconciled to the four checks it lists). Surfaced 2026-07-16 by the
-  operator's launch triage.
-
 ## Technical Debt
 
 - **env-probe-auto-refresh** — automate the env-profile refresh
@@ -165,5 +146,7 @@
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
 ## Done
+
+- launch-readiness-gate
 
 ## Lessons Learned
