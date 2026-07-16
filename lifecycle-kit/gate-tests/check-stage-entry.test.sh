@@ -3,10 +3,12 @@
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
 # pair (run-gate-tests.sh) covers assertion A (prerequisite-stamp ordering: a
 # [stage: close] header with no validate stamp); the harness admits only one
-# bad/ dir, so assertion B drives a [stage: validate] header with a non-empty
-# ## New Features (exit 1), and assertion C drives four cross-component
-# build-entry scenarios (2-dir amendments ±waiver, single-amendment cross-
-# component body, single-component amendment).
+# bad/ dir, so assertion B drives untagged residue at drain entry (exit 1),
+# [drain-exempt:] residue at drain entry (exit 0, reason echoed), an
+# empty-reason tag (exit 1), and tagged residue at the drain successor's
+# entry (exit 1 — the no-exemption backstop); assertion C drives four
+# cross-component build-entry scenarios (2-dir amendments ±waiver,
+# single-amendment cross-component body, single-component amendment).
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -53,7 +55,17 @@ elif ! grep -qF 'active queue is non-empty' <<<"$out"; then
     fails=$((fails + 1))
 fi
 
-# --- assertion C: a cross-component build entry demands an align (or waiver) stamp ---
+# --- assertion B, drain-exempt model: tag skips at drain entry, never at successor entry ---
+
+state_through_build() {  # writes a scope+build stamp file into $1/.workflow
+    mkdir -p "$1/.workflow"
+    cat >"$1/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01
+demo-iteration build bbbbbbbb 2026-06-02
+EOF
+}
 
 check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring
     local out rc
@@ -66,6 +78,79 @@ check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring
         fails=$((fails + 1))
     fi
 }
+
+# B2 (good): tagged residue at drain entry — skipped, reason echoed in the clean detail.
+b2="$SANDBOX/b2"
+mkdir -p "$b2"
+cat >"$b2/TASK-QUEUE.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo-iteration  [stage: validate]
+
+---
+
+## New Features
+
+- **spanning-feature** [drain-exempt: validate-half is validate work] — build half shipped
+
+## Technical Debt
+
+## Done
+EOF
+state_through_build "$b2"
+check_case "B2 tagged-residue-drain-entry" "$b2" 0 "validate-half is validate work"
+
+# B3 (bad): an empty reason is malformed — the exemption does not hold.
+b3="$SANDBOX/b3"
+mkdir -p "$b3"
+cat >"$b3/TASK-QUEUE.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo-iteration  [stage: validate]
+
+---
+
+## New Features
+
+- **spanning-feature** [drain-exempt: ] — no reason recorded
+
+## Technical Debt
+
+## Done
+EOF
+state_through_build "$b3"
+check_case "B3 empty-reason-malformed" "$b3" 1 "empty reason is malformed"
+
+# B4 (bad): tagged residue at the drain successor's entry — the backstop runs
+# with no exemption; nothing may remain active past the drain stage.
+b4="$SANDBOX/b4"
+mkdir -p "$b4"
+cat >"$b4/TASK-QUEUE.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo-iteration  [stage: close]
+
+---
+
+## New Features
+
+- **spanning-feature** [drain-exempt: validate-half is validate work] — never drained
+
+## Technical Debt
+
+## Done
+EOF
+mkdir -p "$b4/.workflow"
+cat >"$b4/.workflow/WORKFLOW-STATE.txt" <<'EOF'
+---
+
+demo-iteration scope aaaaaaaa 2026-06-01
+demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration validate dddddddd 2026-06-03
+EOF
+check_case "B4 tagged-residue-successor-entry" "$b4" 1 "[drain-exempt:] included"
+
+# --- assertion C: a cross-component build entry demands an align (or waiver) stamp ---
 
 build_queue() {  # writes a [stage: build] TASK-QUEUE.md into $1
     mkdir -p "$1"
@@ -159,5 +244,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + assertion C cross-component align/waiver + templates-stub exclusion, 5 cases)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + assertion C cross-component align/waiver + templates-stub exclusion, 9 cases)"
 exit 0

@@ -51,17 +51,54 @@ if [[ -n "$pred" ]]; then
     [[ "$found" == "1" ]] || errors+=("entering '$stage' but no '$iter $pred' stamp in $STATE — the mandatory predecessor stage was never invoked (run /$pred, or correct the [stage:] flip)")
 fi
 
-# assertion B: a drain-stage header requires an empty active queue
-if [[ -n "$LIFECYCLE_KIT_DRAIN_STAGE" && "$stage" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
+# assertion B: drain-entry queue-empty — [drain-exempt:] exempts at drain entry only; the drain successor's entry backstops with no exemption
+b_mode=""
+if [[ -n "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
+    if [[ "$stage" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
+        b_mode=drain
+    else
+        for s in "${!LIFECYCLE_KIT_PREDECESSOR[@]}"; do
+            [[ "$s" == "$stage" && "${LIFECYCLE_KIT_PREDECESSOR[$s]}" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]] && b_mode=successor
+        done
+    fi
+fi
+exempt_detail=""
+if [[ -n "$b_mode" ]]; then
     secs=""
     for s in "${LIFECYCLE_KIT_ACTIVE_SECTIONS[@]}"; do secs+="${secs:+|}$s"; done
-    leftover="$(awk -v secre="^## ($secs)[[:space:]]*$" '
+    scan="$(awk -v secre="^## ($secs)[[:space:]]*$" -v exempt="$([[ "$b_mode" == drain ]] && echo 1 || echo 0)" '
         $0 ~ secre { inq = 1; next }
         /^## /     { inq = 0 }
-        inq && /^- / { printf "    %d: %s\n", FNR, $0 }
+        !inq || $0 !~ /^- / { next }
+        {
+            if (match($0, /\[drain-exempt:[[:space:]]*[^]]*\]/)) {
+                r = substr($0, RSTART, RLENGTH)
+                sub(/^\[drain-exempt:[[:space:]]*/, "", r); sub(/\]$/, "", r)
+                gsub(/[[:space:]]+$/, "", r)
+                if (r == "")     printf "M\t%d\t%s\n", FNR, $0
+                else if (exempt) printf "E\t%d\t%s\n", FNR, r
+                else             printf "L\t%d\t%s\n", FNR, $0
+            } else printf "L\t%d\t%s\n", FNR, $0
+        }
     ' "$QUEUE")"; st=$?
     fail_closed "$st" STAGE-ENTRY "awk active-queue scan"
-    [[ -z "$leftover" ]] || errors+=("entering '$stage' but the active queue is non-empty (the prior stage is not drained):"$'\n'"$leftover")
+    leftover=""; malformed=""; n_exempt=0
+    while IFS=$'\t' read -r kind ln text; do
+        [[ -n "$kind" ]] || continue
+        case "$kind" in
+            L) leftover+=$'\n'"    $ln: $text" ;;
+            M) malformed+=$'\n'"    $ln: $text" ;;
+            E) n_exempt=$((n_exempt + 1)); exempt_detail+="${exempt_detail:+; }$ln: $text" ;;
+        esac
+    done <<< "$scan"
+    if [[ -n "$leftover" ]]; then
+        if [[ "$b_mode" == drain ]]; then
+            errors+=("entering '$stage' but the active queue is non-empty (the prior stage is not drained):$leftover")
+        else
+            errors+=("entering '$stage' (the drain successor) but the active queue is non-empty — nothing may remain active past '$LIFECYCLE_KIT_DRAIN_STAGE', [drain-exempt:] included:$leftover")
+        fi
+    fi
+    [[ -z "$malformed" ]] || errors+=("[drain-exempt:] with an empty reason is malformed (the reason is the audit trail):$malformed")
 fi
 
 # assertion C: audit-entry with a cross-component amendment signal and no audit stamp demands that stamp or a recorded waiver (lifecycle-kit/SPEC.md §check-stage-entry)
@@ -142,8 +179,11 @@ fi
 
 if [[ -z "$pred" ]]; then
     detail="'$stage' has no mandatory predecessor"
-elif [[ "$stage" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
-    detail="predecessor '$pred' stamped; active queue empty"
+elif [[ "$b_mode" == drain ]]; then
+    detail="predecessor '$pred' stamped; active queue drained"
+    [[ -z "$exempt_detail" ]] || detail+=" (drain-exempt residue — $exempt_detail)"
+elif [[ "$b_mode" == successor ]]; then
+    detail="predecessor '$pred' stamped; active queue empty (drain-successor backstop, no exemption)"
 else
     detail="predecessor '$pred' stamped"
 fi

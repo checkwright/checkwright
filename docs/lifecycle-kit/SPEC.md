@@ -197,7 +197,9 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
 - `LIFECYCLE_KIT_FIRST_STAGE` — the stage whose entry is the iteration boundary
   (§bin/enter-stage.sh truncation); default `scope`.
 - `LIFECYCLE_KIT_DRAIN_STAGE` — the stage whose entry requires the active queue
-  sections empty; default `validate`; empty disables the drain assertion.
+  sections empty; default `validate`; empty disables the drain assertion. Must
+  not be terminal: at least one `LIFECYCLE_KIT_PREDECESSOR` entry names it, or
+  config load fails (the drain-exempt backstop; §check-stage-entry).
 - `LIFECYCLE_KIT_ACTIVE_SECTIONS` — the queue sections the drain assertion
   reads; default `("New Features" "Technical Debt")`.
 - `LIFECYCLE_KIT_AUDIT_STAGE` — the trigger-gated audit stage assertion C looks
@@ -561,7 +563,23 @@ stamp for X's configured mandatory predecessor, which closes the "flipped
 straight to the last stage with no prior stamp" hole its sibling — asserting
 only the *current* stage's stamp — cannot see; (B) drain-entry queue-empty —
 a drain-stage header requires the configured active queue sections to carry
-no top-level `- ` entry, catching entry-on-incomplete-build; and (C)
+no top-level `- ` entry, catching entry-on-incomplete-build, with one modeled
+residue class: an entry whose **lead line** carries `[drain-exempt: <reason>]`
+(syntax: queue-kit/SPEC.md §The tag algebra) is skipped at drain-stage entry —
+a drain-spanning feature whose remaining half *is* drain-stage work. The
+reason must be non-empty (empty is malformed, red); it is echoed in the
+refusal/clean detail, the audit trail its semantic reader. The **backstop**:
+at entry to every drain *successor* — each stage whose
+`LIFECYCLE_KIT_PREDECESSOR` value is the drain stage; the map is many-to-one,
+so every match backstops and a tagged entry drains by whichever successor is
+entered first — assertion B runs with **no** exemption: nothing may remain
+active, tagged or not. So untagged entries drain by drain-stage entry, tagged
+entries by successor entry. A roster whose drain stage is terminal (zero
+successors) is refused fail-closed at config load (§lib/stages.sh's
+validator): an exemption with no reachable backstop would be permanent.
+Ruled-but-unpromoted work is never exempt residue — it files as Deferred
+`[needs-spec]` for a later scope's promotion (deferred-filing is the model
+for designed-but-unscheduled work); and (C)
 audit-trigger — an audit-entry-stage header carrying a cross-component
 amendment signal but no `<iter> <audit-stage>` stamp demands either that
 stamp or an explicit recorded waiver line, mechanizing the audit stage's
@@ -588,10 +606,12 @@ component surfaces" — it can over-demand (the cheap waiver valve absorbs
 that) and can under-detect a purely semantic cross-component impact; it
 converts a silent skip into a stamp, a recorded waiver, or a narrow
 false-negative, strictly better than self-report. The good/bad pair covers
-assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over five
-sandbox scenarios (two-dir amendments ±waiver, a single-amendment
-cross-component body, a single-component amendment, and a `templates/` stub
-that must not fabricate a second component). Suite *runs* and other
+assertion A; `gate-tests/check-stage-entry.test.sh` covers B and C over nine
+sandbox scenarios (untagged residue red, tagged residue at drain entry green,
+empty-reason tag red, tagged residue at successor entry red; two-dir
+amendments ±waiver, a single-amendment cross-component body, a
+single-component amendment, and a `templates/` stub that must not fabricate a
+second component). Suite *runs* and other
 non-static exits are not re-runnable as pre-commit gates and stay
 human-judged at the stage approval; the prerequisite-stamp floor is their
 mechanical residual.

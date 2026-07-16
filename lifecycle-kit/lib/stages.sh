@@ -125,6 +125,15 @@ for _lc_k in "${!LIFECYCLE_KIT_PREDECESSOR[@]}"; do
 done
 [[ -z "$LIFECYCLE_KIT_DRAIN_STAGE" ]] || lifecycle_stage_known "$LIFECYCLE_KIT_DRAIN_STAGE" \
     || _lc_errs+=("LIFECYCLE_KIT_DRAIN_STAGE '$LIFECYCLE_KIT_DRAIN_STAGE' is not in LIFECYCLE_KIT_STAGES")
+if [[ -n "$LIFECYCLE_KIT_DRAIN_STAGE" ]]; then
+    _lc_succ=0
+    for _lc_k in "${!LIFECYCLE_KIT_PREDECESSOR[@]}"; do
+        [[ "${LIFECYCLE_KIT_PREDECESSOR[$_lc_k]}" == "$LIFECYCLE_KIT_DRAIN_STAGE" ]] && _lc_succ=1
+    done
+    # spec: lifecycle-kit/SPEC.md §check-stage-entry — a terminal drain stage is fail-closed config: a [drain-exempt:] tag with no reachable successor backstop would be a permanent exemption
+    [[ "$_lc_succ" == 1 ]] \
+        || _lc_errs+=("LIFECYCLE_KIT_DRAIN_STAGE '$LIFECYCLE_KIT_DRAIN_STAGE' is terminal (no LIFECYCLE_KIT_PREDECESSOR entry names it) — the drain-exempt backstop would never run")
+fi
 [[ -z "$LIFECYCLE_KIT_AUDIT_STAGE" ]] || lifecycle_stage_known "$LIFECYCLE_KIT_AUDIT_STAGE" \
     || _lc_errs+=("LIFECYCLE_KIT_AUDIT_STAGE '$LIFECYCLE_KIT_AUDIT_STAGE' is not in LIFECYCLE_KIT_STAGES")
 [[ -z "$LIFECYCLE_KIT_AUDIT_ENTRY_STAGE" ]] || lifecycle_stage_known "$LIFECYCLE_KIT_AUDIT_ENTRY_STAGE" \
@@ -144,4 +153,4 @@ if [[ ${#_lc_errs[@]} -gt 0 ]]; then
     printf '  %s\n' "${_lc_errs[@]}" >&2
     exit 2
 fi
-unset _lc_errs _lc_k _lc_pf
+unset _lc_errs _lc_k _lc_pf _lc_succ
