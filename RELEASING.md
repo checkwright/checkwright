@@ -51,8 +51,11 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 
 4. **Tag the iteration's final commit.** Tag `vX.Y.Z` on the iteration's final
    commit and push it — `git tag -a vX.Y.Z` on the commit, then push the tag to
-   the origin. Push mechanics for a keyless agent sandbox live in the operator's
-   local ops runbook, outside the tree. Stamp `<iteration> release vX.Y.Z —
+   the origin. The closing session runs steps 4-6 itself when it holds the
+   credentials (the default — an authenticated `gh` login carrying `repo` scope
+   and a working `git push`, confirmed with `gh auth status`); only a genuinely
+   keyless sandbox defers these to the operator, whose push mechanics live in
+   the local ops runbook, outside the tree. Stamp `<iteration> release vX.Y.Z —
    <basis>` into the disposition evidence.
 
 5. **Create the GitHub Release.** Its body points at the post's
