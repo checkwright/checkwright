@@ -196,7 +196,7 @@ three failure modes a raw percentage reading leaves open:
 3. **Post-login lag** — a fresh login starts a new window but the
    server-fed percentage lags it, and the file-write age check cannot see
    that. The gate reads the auth event from the credentials file's mtime
-   (`LOGIN_WINDOW`); *every* parsed verdict within that window routes to
+   (`DELEGATION_KIT_LOGIN_WINDOW`); *every* parsed verdict within that window routes to
    STALE (re-read), not only a would-be PAUSE — the reroute precedes the
    axis compares. Confining it to the PAUSE branch would print OK for a
    lagging percentage at or under the threshold: a fresh-looking chimera,
@@ -214,7 +214,8 @@ Fail-closed throughout: missing keys and a non-numeric percentage route to
 STALE; each threshold compare uses `awk`, not integer-only bash
 arithmetic, so a fractional percentage cannot silently skip PAUSE; and both
 pause compares are **at-or-over** (`>=`), so a reading exactly at
-`PAUSE_PCT` / `PAUSE_PCT_7D` pauses — the boundary reading is judged at the
+`DELEGATION_KIT_PAUSE_PCT` / `DELEGATION_KIT_PAUSE_PCT_7D` pauses — the
+boundary reading is judged at the
 limit, not under it.
 
 **Demand-driven refresh.** The decision point triggers the poll: when
@@ -240,7 +241,7 @@ its trust, turning a dead producer into a STALE verdict rather than a silent
 green. Refresh diagnostics are suppressed rather than mixed into the verdict
 output, which callers relay verbatim; the snapshot's age is the signal.
 `usage.txt` survives as last-known-good cache, source-agnostic seam, and test
-seam. A refresh inside `LOGIN_WINDOW` rewrites `updated_at` while the
+seam. A refresh inside the `DELEGATION_KIT_LOGIN_WINDOW` rewrites `updated_at` while the
 server-fed percentage may still lag the login by about a minute — the hoisted
 reroute correctly keeps those readings STALE for the window's duration.
 
@@ -264,7 +265,8 @@ while the 5h window sits comfortable, and a weekly PAUSE costs days, not
 hours, so it must gate delegation planning, not merely appear in a log —
 delegation is the discretionary spend, the first thing to stop near the
 weekly ceiling so the remaining week stays with the supervisor. The axes
-are judged independently against `PAUSE_PCT` and `PAUSE_PCT_7D`; either
+are judged independently against `DELEGATION_KIT_PAUSE_PCT` and
+`DELEGATION_KIT_PAUSE_PCT_7D`; either
 firing is a PAUSE (exit 1), and the message names the axis that fired
 (`PAUSE (7-day window)` vs `PAUSE (5h window)`, the weekly named when both
 fire) because the operator's remediation differs by days. No caller
@@ -410,7 +412,7 @@ decreases.
    rate, token deltas when token keys ride, tier, sample count, and
    suspect-sample count (a high suspect ratio means the producer is
    unreliable and no number from that segment is trusted). The weekly axis
-   additionally reports headroom against `PAUSE_PCT_7D` at the current rate —
+   additionally reports headroom against `DELEGATION_KIT_PAUSE_PCT_7D` at the current rate —
    the planning number for how much delegation the week still affords — and,
    when `account` is present, segments group under an account heading so a
    rotating operator reads one weekly trajectory per account rather than an
@@ -569,13 +571,14 @@ appends one line whatever the verdict; a non-numeric snapshot appends none;
 `pct_7d` present-vs-omitted in the passed-through line).
 
 The demand-driven refresh needs a command seam the table's columns do not
-carry, so it is asserted beside the table through a stub `REFRESH_CMD` (a real
+carry, so it is asserted beside the table through a stub
+`DELEGATION_KIT_REFRESH_CMD` (a real
 poll would need the network): **armed** — a stale snapshot invokes the command
 and the verdict reads the values the refresh wrote, not the cached ones;
 **fail-soft** — a non-zero stub leaves the snapshot byte-identical, the verdict
 proceeds and the cached reading is judged STALE by the existing staleness
 machinery, and no refresh diagnostic leaks into the relayed verdict line;
-**short-circuit** — a snapshot under `REFRESH_MIN_AGE` never invokes the
+**short-circuit** — a snapshot under `DELEGATION_KIT_REFRESH_MIN_AGE` never invokes the
 command. Armed and short-circuit are the firing/non-firing pair over the same
 stub, so the absence proves the floor rather than a broken stub.
 
