@@ -9,3 +9,7 @@ The result is not slow — it's correct. The design is not clever, but it's plai
 The gate runs fast. The gate blocks bugs. The gate reports sins. The gate exits clean.
 
 We ship the alpha, the beta, and the gamma. We test the north, the south, and the east. We log the red, the green, and the blue.
+
+## Second section
+
+Suffice it to say the consumer's own throat-clearing phrase trips the same assertion the bundled set does, because the gate reads the union of both.

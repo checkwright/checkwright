@@ -12,13 +12,6 @@
 
 ## New Features
 
-- **prose-tell-abbr-append** [spec: SPEC-prose-tell-abbr-append.md] — union semantics for
-  the prose-tell vocabulary arrays: `_EXTRA` append knobs for
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW` and `CANON_KIT_PROSE_TELL_PHRASES`, dissolving this
-  repo's copied 12-token bundled prefix (enforcement-first: candidate (a) union over
-  candidate (b) freshness gate — ruling in the amendment). Surfaced 2026-07-16 dogfooding
-  check-prose-tells' abbreviation valve during launch-readiness.
-
 ## Technical Debt
 
 ## Deferred
@@ -91,5 +84,6 @@
 
 - demand-driven-usage-refresh
 - per-gate-validate-baseline
+- prose-tell-abbr-append
 
 ## Lessons Learned

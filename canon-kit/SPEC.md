@@ -287,9 +287,16 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
   array of abbreviations exempt from the undefined-abbreviation tell, default a
   bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends either
-  array with its own vocabulary (the `CANON_KIT_TEMPORAL_MARKERS` precedent —
-  generic English is kit-shippable, a consumer's own vocabulary never becomes a
-  kit literal).
+  array with its own vocabulary through the matching `_EXTRA` knob —
+  `CANON_KIT_PROSE_TELL_PHRASES_EXTRA` and
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA`, both default empty — which the lib
+  unions onto the base after the base defaults resolve: the effective set is
+  base plus extra. Extension therefore costs one token, never a restatement of
+  the bundled default that would silently diverge from it. Assigning a base
+  array keeps its replace semantics, and that is the narrowing valve: a consumer
+  wanting a bundled member *gone* replaces the base array. Generic English is
+  kit-shippable; a consumer's own vocabulary never becomes a kit literal (the
+  provenance seam).
 
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
@@ -1120,13 +1127,15 @@ out of the opt-in). Fenced code the shared walk driver already drops.
 - **A. Em-dash density** — a paragraph carrying more than
   `CANON_KIT_PROSE_TELL_EMDASH_MAX` em-dashes.
 - **B. Throat-clearing phrases** — a case-insensitive match of any
-  `CANON_KIT_PROSE_TELL_PHRASES` member.
+  `CANON_KIT_PROSE_TELL_PHRASES` member, the base array merged with
+  `CANON_KIT_PROSE_TELL_PHRASES_EXTRA` (§Layout and configuration).
 - **C. Contrast cadence** — the "not X — it's Y" shape (a `not …` clause
   resolved across an em-dash or `, but` into `it's`/`it is`) more than
   `CANON_KIT_PROSE_TELL_CONTRAST_MAX` times in a section.
 - **D. Undefined abbreviations** — an all-caps token of length ≥ 3 the file
   never expands (no parenthesized expansion at any occurrence) and absent from
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW`.
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW` merged with
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA` (§Layout and configuration).
 - **E. Sentence-rhythm variance** — a paragraph of at least
   `CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES` sentences whose sentence
   word-count coefficient of variation falls below

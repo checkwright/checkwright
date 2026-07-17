@@ -117,6 +117,12 @@ declare -p CANON_KIT_PROSE_TELL_ABBR_ALLOW &>/dev/null || CANON_KIT_PROSE_TELL_A
     "API" "CLI" "URL" "HTML" "CSS" "JSON" "YAML" "CI" "SDK" "SSO" "DNS" "HTTPS"
 )
 
+# spec: canon-kit/SPEC.md §Layout and configuration — the _EXTRA arrays union onto the base sets after the base defaults resolve, so a consumer adding a token need not restate the bundled default; replacing a base array stays the narrowing valve
+declare -p CANON_KIT_PROSE_TELL_PHRASES_EXTRA &>/dev/null || CANON_KIT_PROSE_TELL_PHRASES_EXTRA=()
+declare -p CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA &>/dev/null || CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA=()
+CANON_KIT_PROSE_TELL_PHRASES+=(${CANON_KIT_PROSE_TELL_PHRASES_EXTRA[@]+"${CANON_KIT_PROSE_TELL_PHRASES_EXTRA[@]}"})
+CANON_KIT_PROSE_TELL_ABBR_ALLOW+=(${CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[@]+"${CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA[@]}"})
+
 spec_alt() { local IFS='|'; printf '%s' "$*"; }
 
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib

@@ -6,7 +6,7 @@ The tool checks prose. Each surface is scanned once and a clean run says so on a
 
 This paragraph is deliberately varied in its cadence. Some sentences stay short. Others stretch on for a good while and carry several clauses before they finally arrive at a natural stop the reader can feel. A couple sit in between.
 
-The API is the single abbreviation on this page and it rides the shipped allow-list so no undefined-abbreviation tell fires here.
+The API rides the shipped allow-list and ZFS rides the consumer's own extra list, so neither trips the undefined-abbreviation tell and the union of the two sets is what the gate reads.
 
 ## Reference
 
