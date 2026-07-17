@@ -319,9 +319,4 @@
 
 ## Done
 
-- release-major-criteria-pre-1-0-tension
-- lead-task-selection-seam
-- release-in-iteration-lifecycle
-- claude-md-housekeeping-residency
-
 ## Lessons Learned
