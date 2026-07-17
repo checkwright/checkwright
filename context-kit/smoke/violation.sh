@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: context-kit/SPEC.md §Testing — consumer-smoke violation: over-budget pointered bullet reddens check-brevity
 set -euo pipefail
+: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 
 echo "check-brevity"
 

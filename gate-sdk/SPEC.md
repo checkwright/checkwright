@@ -353,7 +353,14 @@ builds the same FROM baseline, then diverges into the two-phase upgrade proof
 
 **The `smoke/` per-kit contract.** Every vendored kit ships a `smoke/`
 directory — shipping it joins fixtures + README + SPEC in the kit-landing
-checklist; a kit root lacking `smoke/` is an environment error (exit 2). The
+checklist; a kit root lacking `smoke/` is an environment error (exit 2). Every
+`smoke/` script that mutates the invoking tree — `install.sh` and
+`violation.sh` both do — opens with the entry-point guard
+`: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"` before its first mutating
+command, so a bare invocation (outside the harness that exports
+`SMOKE_KIT_ROOT`) refuses instead of writing into the caller's repo;
+`check-smoke-entry-guard` (§check-smoke-entry-guard) holds the guard's presence
+across the roster. The
 README item of that checklist carries the register-the-gates block in
 `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
 name-set parity with the kit's shipped `checks/` by `check-readme-roster`
@@ -370,7 +377,8 @@ enforcing it.
   is already installed (it runs first), nothing else. A non-zero exit aborts the
   harness with exit 2 (a broken installer is an environment failure, not a gate
   finding).
-- `smoke/violation.sh` (optional) — same cwd/env contract; mutates the scratch
+- `smoke/violation.sh` (optional) — same cwd/env contract and entry-point guard
+  (above); mutates the scratch
   tree to introduce exactly one violation the harness restore (`git reset --hard`
   + `git clean`) reverses (edit a tracked file, add an untracked one, or stage a
   shape), and prints the expected gate name as its first stdout line (the
@@ -1040,6 +1048,34 @@ tree (the case dir's `gate-sdk-config.sh` names the fixture kits), the sibling
 meta-gates' hermetic-fixture shape; bare, it sweeps against the git toplevel.
 Fail-closed: a non-repo cwd with no root argument, an empty roster, or an
 unreadable README marker scan is exit 2, never a false clean.
+
+### check-smoke-entry-guard
+
+Invariant: for every kit root in the roster, every `smoke/install.sh` and
+`smoke/violation.sh` present contains the entry-point guard expansion
+`${SMOKE_KIT_ROOT:?` (§Consumer smoke's contract clause) — a mutating smoke
+script run bare, outside the harness that exports `SMOKE_KIT_ROOT`, must abort
+rather than write into the caller's repo. A missing guard is a finding naming
+the file (the fix worklist). `install.sh`'s shipped guard is the precedent this
+gate promotes from convention to contract; `violation.sh` joins it.
+
+Honest limit: the gate asserts the guard's **presence**, not its **position** —
+a guard placed below a mutating line still passes, so ordering (the guard
+before the first mutation) is review's, not the gate's. Presence is the
+mechanically decidable half; position would need a mutation model the gate does
+not carry.
+
+Sweep: kit roots come from `gate_kit_roots` (the `GATE_SDK_KIT_DIRS` knob —
+§Layout and configuration), the sibling roster meta-gates' shape; a kit root
+without a `smoke/` dir is skipped, and `violation.sh` is checked only where it
+exists (it is optional — §Consumer smoke). Config reuses `GATE_SDK_KIT_DIRS`;
+no new knob. Positional form `check-smoke-entry-guard.sh [root]` resolves
+relative kit roots against a fixture tree (the case dir's `gate-sdk-config.sh`
+names the fixture kits); bare, it sweeps against the git toplevel. Fail-closed:
+a non-repo cwd with no root argument, an empty roster, or an unreadable smoke
+script is exit 2, never a false clean. The `# graph:` couples the mutating
+smoke scripts (`kit:smoke/install.sh,kit:smoke/violation.sh`, `dir=one`,
+`tier=precommit`), so editing one re-fires the gate.
 
 ### check-core-files
 

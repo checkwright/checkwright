@@ -1,0 +1,1 @@
+alpha-kit/smoke/violation.sh: no

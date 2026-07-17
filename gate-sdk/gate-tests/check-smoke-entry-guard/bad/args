@@ -1,0 +1,4 @@
+# Same synthetic-tree steer as good/. alpha-kit's violation.sh mutates the tree
+# but omits the ${SMOKE_KIT_ROOT:?} entry-point guard — the fail-open shape the
+# gate names. install.sh carries the guard, so only violation.sh is a finding.
+.

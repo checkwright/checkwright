@@ -1,0 +1,6 @@
+# Anchor the sweep at this case dir: gate-sdk-config.sh (auto-sourced at cwd)
+# names the synthetic kits via GATE_SDK_KIT_DIRS; their relative roots resolve
+# against the positional root. alpha-kit ships both mutating smoke scripts,
+# each carrying the guard; beta-kit ships install.sh only (no violation.sh —
+# the optional-file skip path).
+.

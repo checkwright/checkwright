@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: delegation-kit/SPEC.md §Testing — consumer-smoke violation: co-staged gate edit + product file reddens check-gate-tamper (assertion A)
 set -euo pipefail
+: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 
 echo "check-gate-tamper"
 

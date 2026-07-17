@@ -97,6 +97,10 @@ if staged_matches 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README
     run_gate check-readme-roster gate-sdk/checks/check-readme-roster.sh
 fi
 
+if staged_matches 'gate-sdk/smoke/install.sh' 'canon-kit/smoke/install.sh' 'context-kit/smoke/install.sh' 'delegation-kit/smoke/install.sh' 'doctrine-kit/smoke/install.sh' 'drift-kit/smoke/install.sh' 'evidence-kit/smoke/install.sh' 'guard-kit/smoke/install.sh' 'lifecycle-kit/smoke/install.sh' 'queue-kit/smoke/install.sh' 'site-kit/smoke/install.sh' 'gate-sdk/smoke/violation.sh' 'canon-kit/smoke/violation.sh' 'context-kit/smoke/violation.sh' 'delegation-kit/smoke/violation.sh' 'doctrine-kit/smoke/violation.sh' 'drift-kit/smoke/violation.sh' 'evidence-kit/smoke/violation.sh' 'guard-kit/smoke/violation.sh' 'lifecycle-kit/smoke/violation.sh' 'queue-kit/smoke/violation.sh' 'site-kit/smoke/violation.sh'; then
+    run_gate check-smoke-entry-guard gate-sdk/checks/check-smoke-entry-guard.sh
+fi
+
 if staged_matches 'docs/kits.md' 'docs/*/index.md' 'gate-sdk/gate-tests/*' 'canon-kit/gate-tests/*' 'context-kit/gate-tests/*' 'delegation-kit/gate-tests/*' 'doctrine-kit/gate-tests/*' 'drift-kit/gate-tests/*' 'evidence-kit/gate-tests/*' 'guard-kit/gate-tests/*' 'lifecycle-kit/gate-tests/*' 'queue-kit/gate-tests/*' 'site-kit/gate-tests/*'; then
     run_gate check-docs-kit-parity scripts/check-docs-kit-parity.sh
 fi

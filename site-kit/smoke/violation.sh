@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §Consumer smoke — site-kit consumer-smoke violation: configures an alias, then cites it in a ://URL, reddening check-docs-cname-parity
 set -euo pipefail
+: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 
 echo "check-docs-cname-parity"
 

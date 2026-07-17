@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §Consumer smoke — doctrine-kit consumer-smoke violation: strips the reference block from the agent file, reddening check-doctrine-registration
 set -euo pipefail
+: "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 
 echo "check-doctrine-registration"
 

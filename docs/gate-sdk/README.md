@@ -100,6 +100,7 @@ check-enforcement-fresh
 check-kit-enum
 check-kit-registration
 check-readme-roster
+check-smoke-entry-guard
 check-core-files
 check-identity
 check-hook-exec-bit

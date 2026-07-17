@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **smoke-violation-fail-open** [spec: SPEC-smoke-entry-guard.md] — the nine
-  consumer-smoke `violation.sh` scripts fail open (run bare, they mutate the
-  invoking repo); land `install.sh`'s `SMOKE_KIT_ROOT` guard in each, promote
-  the guard to a §Consumer smoke contract clause, and ship the
-  `check-smoke-entry-guard` meta-gate holding it across the roster. Design,
-  causal map, and honest limits: the amendment. Surfaced 2026-07-16 dogfooding
-  a bare `violation.sh` invocation during config-seam-hardening build.
-
 ## Technical Debt
 
 - **budget-guard-override-point-of-use-residency** — point-of-use residency
@@ -321,5 +313,7 @@
   (kfric plus one operator-raised refinement).
 
 ## Done
+
+- smoke-violation-fail-open
 
 ## Lessons Learned

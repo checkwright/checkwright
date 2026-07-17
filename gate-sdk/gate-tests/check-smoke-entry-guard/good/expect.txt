@@ -1,0 +1,1 @@
+SMOKE-ENTRY-GUARD: clean
