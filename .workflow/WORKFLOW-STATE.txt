@@ -4,4 +4,4 @@
 
 ---
 
-— scope a6618fcd 2026-07-17
+fail-open-hardening scope a6618fcd 2026-07-17

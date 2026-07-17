@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: fail-open-hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,7 +12,41 @@
 
 ## New Features
 
+- **smoke-violation-fail-open** [spec: SPEC-smoke-entry-guard.md] — the nine
+  consumer-smoke `violation.sh` scripts fail open (run bare, they mutate the
+  invoking repo); land `install.sh`'s `SMOKE_KIT_ROOT` guard in each, promote
+  the guard to a §Consumer smoke contract clause, and ship the
+  `check-smoke-entry-guard` meta-gate holding it across the roster. Design,
+  causal map, and honest limits: the amendment. Surfaced 2026-07-16 dogfooding
+  a bare `violation.sh` invocation during config-seam-hardening build.
+
 ## Technical Debt
+
+- **budget-guard-override-point-of-use-residency** — point-of-use residency
+  for the budget guard's block-vs-advise semantics (owner:
+  delegation-kit/SPEC.md §usage-verdict — only PAUSE blocks; override rides
+  the `.claude/settings.local.json` env block). Ruled fix, per the filing:
+  (a) extend the guard corrective — the kit template
+  `delegation-kit/templates/agent-budget-guard.sh` and this repo's consumer
+  copy `scripts/agent-budget-guard.sh` — to name the settings.local.json
+  transport and cover the STALE case (advisory, no override needed); (b) add
+  a one-line block-vs-advise + override-transport pointer at the lead's
+  budget-guard mention (lifecycle-kit/templates/lead.md), citing the SPEC
+  section, never restating it. Surfaced 2026-07-17 in the
+  release-in-lifecycle lead session.
+
+- **session-role-marker-boundary-survival** — the scope boundary wipe deletes
+  a live lead's session-role marker: `.claude/commands/scope.md`'s
+  evidence-reset binding says wipe `.tmp/`'s files, and the marker defaults to
+  `.tmp/session-role` (context-kit/SPEC.md §The session-context hook), so a
+  lead outliving the iteration boundary silently loses suppression until it
+  rewrites the marker. Ruled fix: narrow the binding's wipe to spare the
+  marker file, and add an accepted-limits sentence to the SPEC section — the
+  marker's lifetime is the lead session's, not the iteration's, so consumer
+  boundary rituals must not delete it. No new names; the id-scoped marker
+  already self-invalidates across sessions (a literal iteration column was
+  ruled out — no reader). Surfaced 2026-07-17 by this scope's own boundary
+  wipe deleting the dispatching lead's marker.
 
 ## Deferred
 
@@ -80,37 +114,6 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **smoke-violation-fail-open** [needs-spec] — the consumer-smoke
-  `violation.sh` scripts fail **open**: run outside their entry point they
-  mutate the invoking repo. The asymmetry is at the read sites —
-  `smoke/install.sh` opens with `: "${SMOKE_KIT_ROOT:?run via
-  run-consumer-smoke.sh}"` and refuses; `smoke/violation.sh` carries no guard
-  and proceeds. Blast radius is the whole roster: nine kits ship an unguarded
-  violation script — gate-sdk, lifecycle-kit, queue-kit, evidence-kit,
-  delegation-kit, context-kit, doctrine-kit, site-kit, canon-kit — and
-  delegation-kit's goes further, `git add`-ing into the index a concurrent
-  session shares. Observed, not theorized: a bare invocation wrote
-  `scripts/check-smoke-gate.sh` and `product/app.txt` into the real tree and
-  staged both; the pre-commit foreign-path check caught it and nothing reached
-  a commit.
-  **Cost while deferred:** every bare `violation.sh` invocation stays a live
-  contamination hazard whose only backstop fires *after* the mutation, and the
-  class stays ungated — a new kit inherits the gap silently.
-  The missing check class is **smoke-script-fails-open**: a kit script that
-  mutates the invoking repo when run outside its entry point. Ruled shape (b),
-  on record: the guard **plus** a gate-sdk §Consumer smoke contract sentence
-  and a meta-gate asserting it across the roster, the way the fixture-pair and
-  fail-closed contracts already are — `install.sh`'s guard is the shipped
-  precedent. Enforcement-first: the fix and the gate that catches it land in
-  one unit, and a contract sentence plus a meta-gate is what removes the
-  duplication of the guard's claim across nine hand-copied sites. Guarding the
-  nine alone was rejected — it leaves the class ungated, so kit #10 ships
-  unguarded; flagging without filing was rejected under the gap-disposition
-  doctrine, and this entry is that filing. Seam: the guard and the contract are
-  kit mechanism; nothing consumer-specific belongs in either. Surfaced
-  2026-07-16 dogfooding a bare `violation.sh` invocation during
-  config-seam-hardening build.
-
 - **spec-internal-identifier-prefix-drift** [needs-spec] — SPEC prose naming a
   script's **internal** variable spelling where the public knob is the contract
   name. Found by the config-seam-hardening close audit of the
@@ -316,39 +319,6 @@
   is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
-
-- **budget-guard-override-point-of-use-residency** [needs-spec] — the budget
-  guard's block-vs-advise semantics and the deliberate-override transport are
-  documented only in the *owner* SPEC (delegation-kit/SPEC.md §usage-verdict:
-  only PAUSE blocks, STALE/RESET-OK advise; override via the
-  `.claude/settings.local.json` env block, which hooks re-read per fire) — the
-  correct owner, but not projected to the surfaces a lead or operator reads at
-  the point of failure. Two point-of-use gaps: the guard's own corrective
-  message (`scripts/agent-budget-guard.sh`, PAUSE branch) names the knob to
-  raise but not the settings.local.json transport, and covers only PAUSE — a
-  lead seeing a STALE line gets no note that STALE is advisory and needs no
-  override; and the lead instructions (lifecycle-kit/templates/lead.md,
-  delegation-kit/templates/agent-execution.md) say only "honor the per-dispatch
-  budget guard", carrying neither the block-vs-advise distinction nor the
-  transport.
-  **Cost while deferred:** a lead hitting a blocked or STALE dispatch reaches
-  for the error message (incomplete) and its own instructions (silent), and
-  re-derives the semantics from a vague "fail-closed" prior — exactly the
-  misread that imposed an unnecessary wait/override this session before the
-  owner SPEC corrected it.
-  **Recommendation:** (a) extend the guard corrective to name the
-  settings.local.json transport and cover the STALE case; (b) add a one-line
-  block-vs-advise + override-transport pointer to the lead's budget-guard
-  mention (widest-true-tier: the lead template, pointing at the SPEC section,
-  not restating it). Enforcement-first / load-trigger residency: the override
-  instruction should be resident at the failure point, not only in a SPEC read
-  at implementation time.
-  **Seam:** the corrective message is consumer copy of
-  delegation-kit/templates/agent-budget-guard.sh (fix the kit template if the
-  message is kit-owned); the SPEC owner is unchanged. On this iteration's
-  "enhance lead instructions" theme, surfaced too late to ride it. Surfaced
-  2026-07-17 in the release-in-lifecycle lead session (operator asked why
-  documented override guidance was not applied).
 
 ## Done
 
