@@ -41,3 +41,4 @@
 | config-seam-hardening | s a b v c | 4f/0d | 3 · ≤1d | 20s clean | 74 |
 | release-in-lifecycle | s a b v c | 4f/1d | 3 · ≤0d | 20s clean | 74 |
 | fail-open-hardening | s · b v c | 2f/1d | 1 · ≤0d | 20s clean | 75 |
+| concurrency-hardening | s a b v c | 3f/0d | 3 · ≤0d | 20s clean | 75 |

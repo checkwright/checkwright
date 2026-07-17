@@ -215,8 +215,4 @@
 
 ## Done
 
-- mid-iteration-gap-channel-seam
-- intra-stage-batch-supervision
-- upgrade-note-nongate-change-slot
-
 ## Lessons Learned
