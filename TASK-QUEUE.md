@@ -179,6 +179,42 @@
   both sides of the seam and must keep the kit half generic. Surfaced 2026-07-17
   authoring the `v0.2.0` note.
 
+- **mid-iteration-gap-channel-seam** [needs-spec] — should mid-iteration
+  gap-filing be routed off `TASK-QUEUE.md`, with only `/scope` (open) and
+  `/close` (dispose) writing the queue, and if so through what channel? Surfaced
+  live in the release-in-lifecycle lead session: with a build stage-session
+  holding the shared git index, every mid-iteration queue write races it, so the
+  lead filed gaps via kfric as a workaround — which raised whether that should be
+  doctrine, and whether it serves the multi-operator goal.
+  **Two separable decisions — do not conflate:** (1) *Restrict queue writes to
+  scope/close.* Precondition: the `[stage:]` cursor lives in the queue header and
+  is flipped at **every** stage entry, so "only scope/close touch the queue" is
+  unreachable until the fast-mutating cursor is **extracted out of the queue
+  body** (into `.workflow/WORKFLOW-STATE.txt`, where the stamp already lives, or a
+  dedicated cursor file). That slow-backlog vs fast-cursor split is what actually
+  reduces multi-operator queue contention, and is worth doing independent of the
+  channel choice. (2) *Choice of diversion channel.* kfric is the **wrong**
+  channel for a multi-operator goal: `.metric/` is gitignored + account-bearing
+  (the provenance seam), a **per-clone local buffer** that fragments the backlog
+  across operators until close triages and pushes. Multi-operator wants a
+  **committed** append-only channel — a per-session gap file close drains, or a
+  conflict-free queue "inbox" region. Keep kfric as the **narrow
+  knowledge-friction sensor** it is (`kfric N` means "facts with no home");
+  overloading it as the general backlog inbox dilutes that signal — the lead did
+  exactly this dilution under index pressure this session, evidence of the
+  pressure, not that kfric is the right permanent home.
+  **Multi-operator finding:** kfric-as-primary does **not** enforce or help
+  multi-operator — it slightly harms it (local fragmentation). What enables
+  concurrent operators is decision (1) plus a committed channel from (2); the two
+  are independent, pick each on its own merits.
+  **Recommendation:** (a) extract the stage cursor from the queue body; (b) if
+  diverting mid-iteration filing, use a committed channel, not kfric; (c) preserve
+  kfric's narrow friction-sensor role. Surfaces: lifecycle-kit/SPEC.md (state
+  machine / queue-ownership — the `[stage:]` cursor location), drift-kit/SPEC.md
+  §The knowledge-friction loop (kfric contract and scope), delegation-kit
+  shared-file-roster (`TASK-QUEUE.md` contention). Surfaced 2026-07-17 in the
+  release-in-lifecycle lead session under live shared-index pressure.
+
 ## Done
 
 - lead-task-selection-seam
