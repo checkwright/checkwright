@@ -134,13 +134,18 @@ reconcile, so the floor is read off the note rather than maintained beside it:
   a new or stricter gate, or a knob rename riding its deprecation path.
 - **Major** — a decommission: a release that *removes* a deprecated surface
   (a release-sweep disposition executed as decommission), or any change the
-  two-phase upgrade contract cannot reconcile from the note alone. Majors are
-  where the deprecation promises come due — the release-sweep constraint that
-  no marker rides into the next major undispositioned binds here.
-- **Pre-1.0 qualifier** — while the line is 0.x, breaking changes may ride
-  minors (the semver 0.x convention), each still declared in the note;
-  `v1.0.0` is the first stability promise and is cut deliberately, never
-  earned mechanically.
+  two-phase upgrade contract cannot reconcile from the note alone. This
+  criterion is absolute: a decommission earns a major even while the line is
+  0.x, outranking the pre-1.0 qualifier below rather than riding a minor.
+  Majors are where the deprecation promises come due — the release-sweep
+  constraint that no marker rides into the next major undispositioned binds
+  here.
+- **Pre-1.0 qualifier** — while the line is 0.x, breaking changes *other than
+  decommissions* may ride minors (the semver 0.x convention), each still
+  declared in the note; a decommission still earns a major (above), and that
+  is what keeps release-sweep's no-marker-rides-past-the-major constraint
+  anchored while 0.x. `v1.0.0` is the first stability promise and is cut
+  deliberately, never earned mechanically.
 
 The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
 orders the release notes by version and reds a patch-only bump whose note

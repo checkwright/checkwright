@@ -14,14 +14,6 @@
 
 ## Technical Debt
 
-- **release-major-criteria-pre-1-0-tension** — order docs/install.md
-  §Versioning's Major bullet and Pre-1.0 qualifier explicitly, per the operator
-  ruling at release-in-lifecycle scope (2026-07-17): the Major criterion is
-  absolute — a decommission earns a major even pre-1.0 — and the qualifier
-  scopes to breaking changes *other than* decommissions riding minors. Keeps
-  release-sweep's no-marker-rides-past-the-major constraint anchored while 0.x.
-  Doc-ordering fix, no new names. Surfaced 2026-07-17 deriving the v0.2.0 bump.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
@@ -217,6 +209,7 @@
 
 ## Done
 
+- release-major-criteria-pre-1-0-tension
 - lead-task-selection-seam
 - release-in-iteration-lifecycle
 - claude-md-housekeeping-residency
