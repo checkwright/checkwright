@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-fail-open-hardening release v0.4.0 — minor: check-smoke-entry-guard landed new (non-empty Tightened gates), no knob renames — docs/install.md §Versioning
-

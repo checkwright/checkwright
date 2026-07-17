@@ -4,7 +4,4 @@
 
 ---
 
-fail-open-hardening scope a6618fcd 2026-07-17
-fail-open-hardening build a535f745 2026-07-17
-fail-open-hardening validate a3d85c04 2026-07-17
-fail-open-hardening close a4886cde 2026-07-17
+— scope ad23aa32 2026-07-17
