@@ -7,3 +7,4 @@
 concurrency-hardening scope ad23aa32 2026-07-17
 concurrency-hardening align a70536b6 2026-07-17
 concurrency-hardening build a4ebc9d1 2026-07-17
+concurrency-hardening validate a2f51b28 2026-07-17
