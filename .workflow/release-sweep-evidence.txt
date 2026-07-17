@@ -6,3 +6,12 @@
 ## v0.1.0 — 2026-07-14
 none — no CANON_KIT_DEPRECATION_MARKERS roster configured; the deprecation
 inventory is empty, nothing to disposition.
+
+## v0.2.0 — 2026-07-17
+none — no CANON_KIT_DEPRECATION_MARKERS roster configured; the deprecation
+inventory is empty, nothing to disposition. Inventory command
+(bash drift-kit/templates/kpi-deprecated-surface.sh) reports the n/a
+no-roster line; check-deprecation-task reports clean for the same reason.
+No decommission this release: no kit, gate, or knob was removed between
+v0.1.0 and v0.2.0 (11 kits both refs; the check roster grew 71 -> 76 with
+none dropped; zero knobs removed). The bump stays minor on that basis.
