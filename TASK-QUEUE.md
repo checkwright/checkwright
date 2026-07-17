@@ -317,6 +317,39 @@
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
 
+- **budget-guard-override-point-of-use-residency** [needs-spec] — the budget
+  guard's block-vs-advise semantics and the deliberate-override transport are
+  documented only in the *owner* SPEC (delegation-kit/SPEC.md §usage-verdict:
+  only PAUSE blocks, STALE/RESET-OK advise; override via the
+  `.claude/settings.local.json` env block, which hooks re-read per fire) — the
+  correct owner, but not projected to the surfaces a lead or operator reads at
+  the point of failure. Two point-of-use gaps: the guard's own corrective
+  message (`scripts/agent-budget-guard.sh`, PAUSE branch) names the knob to
+  raise but not the settings.local.json transport, and covers only PAUSE — a
+  lead seeing a STALE line gets no note that STALE is advisory and needs no
+  override; and the lead instructions (lifecycle-kit/templates/lead.md,
+  delegation-kit/templates/agent-execution.md) say only "honor the per-dispatch
+  budget guard", carrying neither the block-vs-advise distinction nor the
+  transport.
+  **Cost while deferred:** a lead hitting a blocked or STALE dispatch reaches
+  for the error message (incomplete) and its own instructions (silent), and
+  re-derives the semantics from a vague "fail-closed" prior — exactly the
+  misread that imposed an unnecessary wait/override this session before the
+  owner SPEC corrected it.
+  **Recommendation:** (a) extend the guard corrective to name the
+  settings.local.json transport and cover the STALE case; (b) add a one-line
+  block-vs-advise + override-transport pointer to the lead's budget-guard
+  mention (widest-true-tier: the lead template, pointing at the SPEC section,
+  not restating it). Enforcement-first / load-trigger residency: the override
+  instruction should be resident at the failure point, not only in a SPEC read
+  at implementation time.
+  **Seam:** the corrective message is consumer copy of
+  delegation-kit/templates/agent-budget-guard.sh (fix the kit template if the
+  message is kit-owned); the SPEC owner is unchanged. On this iteration's
+  "enhance lead instructions" theme, surfaced too late to ride it. Surfaced
+  2026-07-17 in the release-in-lifecycle lead session (operator asked why
+  documented override guidance was not applied).
+
 ## Done
 
 ## Lessons Learned
