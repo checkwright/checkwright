@@ -238,6 +238,70 @@
   them together. Surfaced 2026-07-17 by operator review of the lead's own
   dispatch behavior.
 
+- **release-major-criteria-pre-1-0-tension** [needs-spec] — `docs/install.md`
+  §Versioning contradicts itself for a pre-1.0 decommission. The **Major**
+  criterion earns a major for "a decommission: a release that *removes* a
+  deprecated surface"; the **Pre-1.0 qualifier** two bullets below says that
+  "while the line is 0.x, breaking changes may ride minors (the semver 0.x
+  convention), each still declared in the note". A decommission *is* a breaking
+  change, so the qualifier arguably licenses riding it on a minor — the exact
+  release the Major criterion reserves for it. Nothing on the page orders the
+  two, so the first pre-1.0 decommission is decided by whichever bullet the
+  reader reaches first.
+  **Cost while deferred:** none binding today and that is precisely the risk —
+  `v0.2.0`'s release-sweep came back empty, so the tension stayed latent and was
+  found only because the sweep was read carefully rather than run. It binds
+  silently on the first release that decommissions anything while still 0.x, at
+  the moment a version number is being chosen under release pressure, and
+  `check-release-bump` cannot catch it: the gate holds only the derivable floor
+  (it reds a patch whose note declares tightened gates or renamed knobs) and the
+  page itself states the major criteria "stay judgment".
+  **The design question** (unanswered): does the pre-1.0 qualifier scope to
+  breaking changes *other than* decommissions, leaving the Major criterion
+  absolute — or does 0.x genuinely suspend the major-on-decommission rule, in
+  which case a decommission's declaration in the note is the whole protection
+  and the release-sweep constraint ("no marker rides into the next major
+  undispositioned") needs re-reading, since pre-1.0 there may be no next major
+  to bind on. Whichever way it resolves, the page must order the two bullets
+  explicitly rather than leave the precedence to reading order. Seam: the
+  versioning model is this repo's own doc, not kit mechanism — no kit ships it.
+  Surfaced 2026-07-17 deriving the `v0.2.0` bump.
+
+- **upgrade-note-nongate-change-slot** [needs-spec] — the release note's grammar
+  has no slot for a behavior change that is not a battery gate, so the two most
+  consequential changes in `v0.2.0` could not be declared where a mechanical
+  reader looks. `docs/install.md` §The upgrade contract fixes two sections:
+  **Tightened gates** ("one bullet per gate that landed new or got stricter, the
+  gate name the bullet's lead token" — read mechanically as the release's
+  allowed-red set) and **Renamed knobs**. Neither can express: (a) the
+  config-seam fail-closed convergence, where `gate-sdk/lib/gate.sh` is sourced by
+  every gate so a set-but-missing `<KIT>_CONFIG_FILE` reds the whole battery at
+  once — no single gate name to lead a bullet with, and enumerating the roster
+  would be a lie about what moved; or (b) `ek_diff`'s fail-closed convergence,
+  which reds `bin/run-validate.sh` — not a battery gate, so it has no place in a
+  set defined as the battery's allowed reds. Both went to the note's Upgrading
+  prose, which is the honest call under the grammar (over-declaring is safe for
+  the upgrade smoke but pollutes the contract) and is why this is a grammar gap
+  rather than an authoring defect.
+  **Cost while deferred:** a consumer reading the two sections mechanically —
+  which the contract invites, since the lead tokens are specified as machine-read
+  — misses every non-gate change, and `gate-sdk/bin/upgrade-smoke.sh` cannot
+  assert containment for them because its assertion is defined over the battery's
+  red set. The prose carrying them is unenforced: no gate holds it, so the next
+  release's non-gate change lands in prose or nowhere by the author's judgment
+  alone. The class is not rare — `v0.2.0` produced two in one release.
+  **The design question** (unanswered): a third fixed section (a "Behavior
+  changes" body with its own lead-token grammar and a `None` default, parseable
+  the way the first two are), versus widening the allowed-red set's definition
+  past the battery to any shipped runner, versus ruling the prose sufficient and
+  saying so on the page so the silence is a decision rather than an omission. If
+  a third section, it needs a reader before it is worth a grammar: a field with
+  no named reader should not exist, and today upgrade-smoke is the only
+  mechanical reader in sight. Seam: the note grammar is this repo's doc; the
+  upgrade smoke that reads it is gate-sdk mechanism, so a grammar change lands on
+  both sides of the seam and must keep the kit half generic. Surfaced 2026-07-17
+  authoring the `v0.2.0` note.
+
 ## Done
 
 ## Lessons Learned
