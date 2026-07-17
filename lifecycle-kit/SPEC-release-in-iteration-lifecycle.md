@@ -123,9 +123,13 @@ in one unit).** A new config knob:
 - lifecycle-kit/SPEC.md §bin/enter-stage.sh and §Layout and configuration —
   the require-check contract and the knob row.
 - lifecycle-kit/SPEC.md §check-stage-entry / gate-tests — the new refusal is
-  enter-stage's (tool-side), mirroring the lessons refusal; extend
-  enter-stage's test coverage with the require-check scenarios (present,
-  missing, unnamed iteration, missing file fail-closed).
+  enter-stage's (tool-side), mirroring the lessons refusal; cover the
+  require-check scenarios (present, missing, unnamed iteration, missing file
+  fail-closed). Align note (2026-07-17): enter-stage.sh's boundary refusals
+  (lessons, truncation) have **no dedicated unit test** today — only
+  `smoke/install.sh` exercises the tool end-to-end — so this is a new
+  `enter-stage` test harness (or an extension of the smoke), not an edit to an
+  existing one.
 - RELEASING.md — the reorder above (this repo's doc; the note grammar and
   §Versioning criteria stay owned by docs/install.md, cited never restated).
 - CLAUDE.md §Housekeeping's RELEASING.md sentence — "resident only at a

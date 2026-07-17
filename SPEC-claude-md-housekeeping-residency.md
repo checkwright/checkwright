@@ -94,11 +94,26 @@ disposition rather than growing this unit.
 - The spec manifest needs no edit: `CANON_KIT_MANIFEST_FILES` already
   carries the `docs/*.md` glob (verified), so the new doc's links and
   commands resolve under the doc gates from its first commit.
-- No other surface restates §Housekeeping's content (grep verified): the
-  only external references are citations by section name — e.g.
-  `.claude/commands/scope.md`'s evidence-reset binding cites "CLAUDE.md
-  §Housekeeping" for the `.tmp/`/`.metric/` split — and the section keeps
-  its name and those facts, so the citations survive the rewrite unedited.
+- External references to §Housekeeping split by whether the cited *fact*
+  stays or moves (align audit, 2026-07-17 — the scope grep scanned `.md`
+  surfaces but missed the `spec:` pointers in gate/script source):
+  - **Citations by section name whose fact stays** survive unedited — e.g.
+    `.claude/commands/scope.md`'s evidence-reset binding cites "CLAUDE.md
+    §Housekeeping" for the `.tmp/`/`.metric/` split; the section keeps its
+    name and that fact.
+  - **`spec:` pointers restating a fact that moves whole to
+    `docs/site-architecture.md` must repoint** — `check-spec-pointer`
+    validates only that the named §heading *exists*, not that it still owns
+    the restated fact, so a stale owner stays green (silent drift). Two hard
+    cases, each repointed to `docs/site-architecture.md §<heading>` in the
+    same commit that moves the sub-bullet: `scripts/check-value-rollup-fresh.sh`
+    (its em-dash tail restates the value-rollup projection) and
+    `scripts/check-install-toolchain.sh` (restates the toolchain↔`PROBE_SET`
+    parity). Build therefore authors `site-architecture.md` with named
+    headings the two pointers can resolve to. The softer §Housekeeping
+    citations (`demo/run-demo.sh`, `scripts/bash-guard.sh`) point at facts
+    that stay in the compressed section or already carry a kit owner — build
+    repoints or keeps each by where its fact lands.
 
 ## Definition of Done
 
