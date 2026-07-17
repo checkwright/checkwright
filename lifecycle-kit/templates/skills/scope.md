@@ -41,6 +41,13 @@ carry and needs no amendment. The tell for misfiling: a design ruling
 longer than a few lines drafted into a queue entry is an amendment inlined
 where no gate can see it — move it into one.
 
+**A standing directive is a theme, not a unit list.** A directive received from
+a lead or operator at iteration open bounds this survey — it names the theme,
+never the units. The intake sweep and the premise re-verification run regardless,
+and the proposed unit set is escalated for ruling before promotion: to the lead
+under the split posture, to the user directly under none — the stage's ordinary
+stop. The destination changes; the proposal step does not.
+
 Before declaring an amendment ready, verify causal completeness — every new
 state, event, or interface the amendment introduces names its **producer**
 (what code path or trigger creates it — and that the producer's enabling

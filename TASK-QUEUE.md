@@ -24,15 +24,6 @@
   config-seam-hardening close, 2026-07-17, prompted by the unreleased-backlog
   gap (141 unreleased commits post-v0.1.0; the v0.2.0 cut fixed the backlog,
   this entry is the methodology change).
-- **lead-task-selection-seam** [spec: SPEC-lead-task-selection-seam.md] — the
-  lead template gains the opening-an-iteration contract: the lead never selects
-  the unit set — it relays the operator's standing directive (a theme, never a
-  slug list) verbatim in the scope dispatch, scope surveys and re-verifies
-  premises, and the proposed set returns as an ordinary escalation the lead
-  routes. Counterpart paragraph in the scope template; no new slot, shims
-  untouched. Surfaced 2026-07-17 by operator review of the first split-posture
-  lead's own dispatch behavior (a pre-selected menu pre-empting scope's
-  selection contract).
 - **claude-md-housekeeping-residency** [spec: SPEC-claude-md-housekeeping-residency.md] —
   CLAUDE.md §Housekeeping (72 of 200 always-loaded lines, the only section
   carrying mechanism inline) sheds its mechanism to a new load-triggered
@@ -211,5 +202,7 @@
   authoring the `v0.2.0` note.
 
 ## Done
+
+- lead-task-selection-seam
 
 ## Lessons Learned

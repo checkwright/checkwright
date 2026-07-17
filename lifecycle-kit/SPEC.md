@@ -893,7 +893,12 @@ dispatch policy in the ruling-config slot), the lead model (dispatch a
 stage session as a background agent whose prompt is that stage's ordinary skill
 invocation, with the inline-run posture sentence reading
 `LIFECYCLE_KIT_SESSION_BOUNDARY` — inline stage runs banned under `stage`,
-the sanctioned blocked-dispatch fallback under `iteration`), the four-header
+the sanctioned blocked-dispatch fallback under `iteration`), the
+opening-an-iteration contract (the lead never selects the unit set — it relays
+the operator's standing directive, a theme bounding scope's survey and never a
+slug list, verbatim in the scope dispatch, and routes scope's proposed set back
+as an ordinary escalation; selection is scope's contract, and a lead-authored
+menu pre-empts the premise re-verification), the four-header
 escalation block (Question / Options / Recommendation / Evidence), the split-channel design (routine narration to the
 resume journal, escalations to the message channel), the compact economics —
 the split-where-the-tail-dominates rule, the unified posture's handoff compact,

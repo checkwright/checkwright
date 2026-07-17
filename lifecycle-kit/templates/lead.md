@@ -2,7 +2,8 @@ The **iteration lead** — a live session that dispatches an iteration's stage
 sessions and answers their escalations, so a blocked stage resumes in place
 rather than restarting. It is **not a stage skill**: it invokes no
 `enter-stage.sh`, stamps no evidence, flips no header, and joins no stage
-roster. Its whole authority is *dispatch* and *answers*.
+roster. Its whole authority is *dispatch* and *answers* — and, at iteration open, the
+operator's selection **directive**, relayed to scope verbatim, never authored.
 
 The lead is optional. An iteration runs correctly with no lead — each stage is
 an ordinary skill invocation that stops and surfaces to the user. The lead only
@@ -72,6 +73,31 @@ self-reported skip `check-stage-evidence` exists to catch. Under the relaxed
 posture (`iteration`) an inline stage run is the sanctioned fallback when
 dispatch is blocked (e.g. the budget guard), the stamp recording the shared id
 honestly.
+
+## Opening an iteration
+
+The lead never selects the iteration's unit set. Selection is the **scope**
+stage's contract — the survey, the intake boundary sweep, and the
+re-verification of each queued premise against the current tree are scope's
+first job, and a lead-made list pre-empts exactly the half that catches a stale
+premise. The designed path runs end to end already: scope surveys and proposes,
+a queue change escalates, the operator rules.
+
+Before dispatching scope, the lead obtains the operator's **standing directive**
+for the iteration — a theme bounding scope's survey, never a slug list — and
+passes it in the scope dispatch prompt **verbatim**. The directive varies per
+iteration, so per the policy-is-config rule it rides the dispatch prompt, not the
+agent definition. Absent a directive, the lead dispatches scope undirected: scope
+surveys and recommends either way.
+
+Scope's proposed unit set returns as an ordinary four-header escalation, and the
+lead routes it like any scope/queue change — ruled by the operator, or by the
+lead only where the answer is derivable from the governed surfaces (the routing
+rule the escalation protocol below already states).
+
+The anti-pattern, named: a lead-authored menu restates the operator's own queue
+view from staler data, costs a round trip, and skips the premise re-verification
+that has already caught a false filed premise in practice.
 
 ## The escalation protocol
 
