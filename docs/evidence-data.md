@@ -40,3 +40,4 @@
 | lifecycle-machinery | s a b v c | 6f/2d | 2 · ≤0d | 21s 1✗ | 74 |
 | config-seam-hardening | s a b v c | 4f/0d | 3 · ≤1d | 20s clean | 74 |
 | release-in-lifecycle | s a b v c | 4f/1d | 3 · ≤0d | 20s clean | 74 |
+| fail-open-hardening | s · b v c | 2f/1d | 1 · ≤0d | 20s clean | 75 |

@@ -288,8 +288,4 @@
 
 ## Done
 
-- smoke-violation-fail-open
-- budget-guard-override-point-of-use-residency
-- session-role-marker-boundary-survival
-
 ## Lessons Learned
