@@ -130,66 +130,29 @@ the skill on a blocking verdict — so they are not resident here.
 
 - `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
   journals), wiped at the scope boundary; `.metric/` is gitignored persistent
-  measurement trends (overhead + usage logs) — **never committed**;
-  account-bearing, per drift-kit/SPEC.md §Layout and configuration;
-  `.workflow/` is
-  committed (checked projections); `BRIEF.local.md` is gitignored (private
-  brief); `OPS.local.md` is gitignored (private ops runbook — DNS records
-  and the GitHub repo-settings desired state; consult it for domain or
-  repo-settings work); `ENV.local.md` is gitignored (context-kit's probed
-  machine profile plus hand-authored gotchas — seed it with
-  `bash context-kit/bin/env-probe.sh`; context-kit/SPEC.md §bin/env-probe).
+  measurement trends (overhead + usage logs) — **never committed**,
+  account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/` is
+  committed (checked projections). `BRIEF.local.md` (private brief),
+  `OPS.local.md` (private ops runbook — DNS records + GitHub repo-settings
+  desired state; consult it for domain or repo-settings work), and `ENV.local.md`
+  (context-kit's probed machine profile plus hand-authored gotchas — seed with
+  `bash context-kit/bin/env-probe.sh`, context-kit/SPEC.md §bin/env-probe) are
+  gitignored, local-only.
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
-- `CONTRIBUTING.md` + the `.github/` issue/PR templates are governed repo-meta
-  (tracked, core-files-pinned); `CONTRIBUTING.md` joins the spec manifest so its
-  links/commands resolve like any doc. The fixture is the unit of contribution —
-  edit the guide, not GitHub UI settings, to change what arrives. `RELEASING.md`
-  is governed repo-meta likewise (tracked, core-files-pinned, in the spec
-  manifest); the release runbook itself is the load-triggered tier, resident
-  only at close's release step.
+- `CONTRIBUTING.md` + the `.github/` issue/PR templates and `RELEASING.md` are
+  governed repo-meta (tracked, core-files-pinned, in the spec manifest so their
+  links/commands resolve like any doc); the fixture is the unit of contribution —
+  edit the guide, not GitHub UI settings. The release runbook is the
+  load-triggered tier, resident only at close's release step.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
-  `CNAME`), repo-root-governed, no owning kit. Its chrome — the Jekyll layout,
-  nav (Liquid over the `nav_order`/`nav_parent` front matter, a page's `nav_id`
-  parenting its `nav_child_order`-sorted children, each child carrying derived
-  suffix links to its `generated:`-marked directory siblings; a nav page naming
-  a `nav_children_key` instead derives its children from the site pages carrying
-  that key, path-descending, each labeled by the key's value — the release notes
-  under the Releases page), client-side
-  search, and theme
-  selector — lives in `docs/_config.yml`, `docs/_layouts/`, `docs/_includes/`,
-  and `docs/assets/`. A page's `title:` is its terse nav label; its opening H1
-  carries the descriptive full form (nav stays scannable, the page reads whole).
-  Living pages are governed prose under the anti-restatement
-  doctrine (cite downward, never restate a SPEC's invariant); dated `docs/posts/`
-  are immutable, temporal-exempt but still link/command-resolved
-  (`scripts/canon-config.sh`). The on-site SPEC mirror (`docs/<kit>/SPEC.md`,
-  `docs/<kit>/README.md`, `docs/doctrine-kit/DOCTRINE.md`) is generated —
-  regenerate after editing any kit SPEC/README/DOCTRINE:
-  `bash scripts/gen-docs-mirror.sh --write` (`check-docs-mirror-fresh` byte-gates
-  it). The kit registry lives on `docs/kits.md` (the Kit Reference page);
-  `check-docs-kit-parity` holds every kit's row there and the nav child block
-  (`nav_parent: kits` + `nav_child_order`) on every `docs/<kit>/index.md`.
-  `check-docs-nav-reachable` holds every docs page to a `title:` front-matter
-  block and reachability from the rendered nav (a nav slot or a link walk),
-  with `scripts/docs-offnav.list` the allowlist for pages off-nav by design.
-  `docs/value.md` is hand-framed prose around one generated marker block that
-  joins the enforcement-map's per-kit class counts to the footprint's per-kit
-  token cost — regenerate on any change either emitter reports:
-  `bash scripts/gen-value-rollup.sh` (`check-value-rollup-fresh` byte-gates the
-  block). It holds the nav slot; `docs/enforcement.md` and `docs/footprint.md`
-  persist as its off-nav drill-downs, link-reachable from it.
-  `docs/install.md`'s Requirements section holds the toolchain list to
-  env-probe's probe set: `check-install-toolchain` asserts name-set parity
-  between its `<!-- toolchain:begin -->` bullets and
-  `context-kit/bin/env-probe.sh`'s `PROBE_SET` array both directions (names
-  derivable, purpose clauses hand prose), so a probe-set edit reds the docs
-  list without an emitter handshake.
+  `CNAME`), repo-root-governed, no owning kit. Its chrome, page-authoring rules,
+  generated projections + regen commands, and docs gate roster live in the
+  load-triggered [docs/site-architecture.md](docs/site-architecture.md).
 - `demo/run-demo.sh` is the runnable adoption walkthrough (vendor → clean pass →
-  violation blocked → fix → green), built on the gate-sdk consumer-smoke
-  mechanics; it writes nothing in-tree (`DEMO_TMP_DIR` its only knob) and is the
-  evidence-kit `demo` validate suite, so a bit-rotted walkthrough is a red
-  validate.
+  violation blocked → fix → green), the evidence-kit `demo` validate suite on the
+  gate-sdk consumer-smoke mechanics (`DEMO_TMP_DIR` its only knob, writing nothing
+  in-tree), so a bit-rotted walkthrough is a red validate.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
   (off an implementation, a gate's source, a commit)? stamp it in the moment
   with `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"` — deferred capture is

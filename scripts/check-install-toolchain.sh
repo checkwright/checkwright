@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/install.md,context-kit/bin/env-probe.sh dir=bi valve=none tier=precommit
-# spec: CLAUDE.md §Housekeeping — docs/install.md's Requirements toolchain list holds name-set parity with context-kit/bin/env-probe.sh's PROBE_SET array, both directions
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — docs/install.md's Requirements toolchain list holds name-set parity with context-kit/bin/env-probe.sh's PROBE_SET array, both directions
 #
 # usage: check-install-toolchain.sh [install-md] [probe-script]
 #   bare: parity between docs/install.md's toolchain marker block and env-probe's PROBE_SET.

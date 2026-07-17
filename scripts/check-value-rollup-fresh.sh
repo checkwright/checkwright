@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/value.md,scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/kpis.list,.claude/settings.json,.github/workflows/*.yml,CLAUDE.md,kit:templates/*.md,lifecycle-kit/templates/skills/*.md dir=one valve=none tier=precommit
-# spec: CLAUDE.md §Housekeeping — the value-rollup block in docs/value.md is the byte-fresh projection of gen-value-rollup.sh --emit
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the value-rollup block in docs/value.md is the byte-fresh projection of gen-value-rollup.sh --emit
 #
 # usage: check-value-rollup-fresh.sh [projection-file] [emit-file]
 #   bare: compare the value-rollup block in docs/value.md against `gen-value-rollup.sh --emit`.

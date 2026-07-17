@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: CLAUDE.md §Housekeeping — the value-rollup block in docs/value.md joins the enforcement-map's per-kit class counts to the footprint's per-kit token cost; a consumer docs ruling, not kit mechanism, so the join axis and column choice live here, never in a kit
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the value-rollup block in docs/value.md joins the enforcement-map's per-kit class counts to the footprint's per-kit token cost; a consumer docs ruling, not kit mechanism, so the join axis and column choice live here, never in a kit
 # usage: gen-value-rollup.sh [--emit]
 #   bare: rewrite the value-rollup marker block in docs/value.md in place (the env-probe marker precedent).
 #   --emit: print the block body (the joined table) to stdout, the surface check-value-rollup-fresh byte-compares.
@@ -21,13 +21,13 @@ FOOTPRINT_EMITTER="context-kit/bin/footprint.sh"
 emit=0
 [[ "${1:-}" == "--emit" ]] && emit=1
 
-# spec: CLAUDE.md §Housekeeping — the join reads the two emitters live (never the committed detail pages), so a stale committed page cannot poison the rollup; each page carries its own freshness gate
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the join reads the two emitters live (never the committed detail pages), so a stale committed page cannot poison the rollup; each page carries its own freshness gate
 enf="$(bash "$ENFORCEMENT_EMITTER" --emit)"; est=$?
 [[ "$est" -eq 0 ]] || { echo "gen-value-rollup: enforcement-map emitter failed (exit $est)" >&2; exit 2; }
 foot="$(bash "$FOOTPRINT_EMITTER" --emit)"; fst=$?
 [[ "$fst" -eq 0 ]] || { echo "gen-value-rollup: footprint emitter failed (exit $fst)" >&2; exit 2; }
 
-# spec: CLAUDE.md §Housekeeping — the class taxonomy and its hardest-to-softest order are owned by the enforcement page; derive the columns from its `##` section headings rather than restating the class set here
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the class taxonomy and its hardest-to-softest order are owned by the enforcement page; derive the columns from its `##` section headings rather than restating the class set here
 declare -A CNT
 declare -A KITSEEN
 CLASSES=()
@@ -49,7 +49,7 @@ done < <(awk '
     }
 ' <<<"$enf")
 
-# spec: CLAUDE.md §Housekeeping — the cost columns are the footprint's per-kit token figure; the `**total**` row carries the pre-summed token totals, so the rollup's totals row reuses them rather than re-summing token strings
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the cost columns are the footprint's per-kit token figure; the `**total**` row carries the pre-summed token totals, so the rollup's totals row reuses them rather than re-summing token strings
 declare -A FAL FTR
 FKITS=()
 TOT_AL="—"; TOT_TR="—"
@@ -71,7 +71,7 @@ done < <(awk '
     }
 ' <<<"$foot")
 
-# spec: CLAUDE.md §Housekeeping — kit axis: the footprint kit roster first (its order), then any enforcement-only label (a surface under no kit groups as `(consumer)`), sorted
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — kit axis: the footprint kit roster first (its order), then any enforcement-only label (a surface under no kit groups as `(consumer)`), sorted
 AXIS=("${FKITS[@]+"${FKITS[@]}"}")
 extra=()
 for k in "${!KITSEEN[@]}"; do

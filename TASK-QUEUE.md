@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **claude-md-housekeeping-residency** [spec: SPEC-claude-md-housekeeping-residency.md] —
-  CLAUDE.md §Housekeeping (72 of 200 always-loaded lines, the only section
-  carrying mechanism inline) sheds its mechanism to a new load-triggered
-  `docs/site-architecture.md` (off-nav by design; the no-owning-kit ruling
-  stands per operator ruling in the amendment), the docs bullet collapsing to a
-  pointer and the whole section swept to one-line-plus-pointer shape;
-  regen-command residency is oracle-safe (each freshness gate's red names its
-  regen command — verified). Surfaced 2026-07-17 by the config-seam-hardening
-  close brevity pass.
-
 ## Technical Debt
 
 - **release-major-criteria-pre-1-0-tension** — order docs/install.md
@@ -193,5 +183,6 @@
 
 - lead-task-selection-seam
 - release-in-iteration-lifecycle
+- claude-md-housekeeping-residency
 
 ## Lessons Learned

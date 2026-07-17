@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/*/SPEC.md,docs/*/README.md,docs/doctrine-kit/DOCTRINE.md,docs/posts/*.md,scripts/docs-offnav.list dir=one valve=none tier=precommit
-# spec: CLAUDE.md §Housekeeping — every tracked docs page carries a title front-matter block and is reachable from the rendered nav (a nav slot, or a relative-link walk seeded from the nav set), or is listed in the off-nav allowlist
+# spec: docs/site-architecture.md §Site chrome and the nav contract — every tracked docs page carries a title front-matter block and is reachable from the rendered nav (a nav slot, or a relative-link walk seeded from the nav set), or is listed in the off-nav allowlist
 #
 # usage: check-docs-nav-reachable.sh [docs-root] [allowlist]
 #   defaults: docs, scripts/docs-offnav.list — the optional args point the
@@ -26,7 +26,7 @@ if [[ -f "$ALLOWLIST" ]]; then
     done < "$ALLOWLIST"
 fi
 
-# spec: CLAUDE.md §Housekeeping — front-matter facts per page: title:, the nav_order
+# spec: docs/site-architecture.md §Site chrome and the nav contract — front-matter facts per page: title:, the nav_order
 # slot, nav_id / nav_parent, the generated: mirror marker, and nav_children_key (the
 # derived-children key a nav page names). Resolution is in the shell.
 read -r -d '' FM_EXTRACT <<'AWK' || true
@@ -48,12 +48,12 @@ for p in "${pages[@]}"; do
     read -r t o id par g ck <<< "$fm"
     TITLE[$p]="$t"; ORDER[$p]="$o"; PARENT[$p]="$par"; GEN[$p]="$g"; INSCOPE[$p]=1
     [[ "$o" == "1" && "$id" != "-" ]] && TOPNAVID[$id]=1
-    # spec: CLAUDE.md §Housekeeping — only a top-level nav page (nav_order slot) names
+    # spec: docs/site-architecture.md §Site chrome and the nav contract — only a top-level nav page (nav_order slot) names
     # a derived-children key, matching the include's navpages-only iteration.
     [[ "$o" == "1" && "$ck" != "-" ]] && NAMEDKEY[$ck]=1
 done
 
-# spec: CLAUDE.md §Housekeeping — the include's derived-children rule, modeled: a page
+# spec: docs/site-architecture.md §Site chrome and the nav contract — the include's derived-children rule, modeled: a page
 # whose front matter carries a key a nav page names in nav_children_key holds a nav slot
 # (reachable) and takes the key value as its label, satisfying the title floor titleless.
 declare -A DERIVED=()
@@ -100,7 +100,7 @@ while [[ ${#queue[@]} -gt 0 ]]; do
         [[ -n "$tgt" && -n "${INSCOPE[$tgt]:-}" && -z "${REACH[$tgt]:-}" ]] || continue
         REACH[$tgt]=1; queue+=("$tgt")
     done < <(links_of "$cur")
-    # spec: CLAUDE.md §Housekeeping — the include's suffix-link rule, modeled: a generated
+    # spec: docs/site-architecture.md §Site chrome and the nav contract — the include's suffix-link rule, modeled: a generated
     # mirror page is reachable iff its directory-sibling index.md is nav-reachable
     if [[ "${cur##*/}" == index.md ]]; then
         curdir="${cur%/*}"

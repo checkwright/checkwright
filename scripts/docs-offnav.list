@@ -8,4 +8,5 @@
 # `release:` key, and the Releases page names it in nav_children_key, so each
 # note holds a derived nav slot (labeled by its key value) that the gate models.
 docs/evidence-data.md
+docs/site-architecture.md
 docs/posts/2026-07-09-announcing-checkwright.md
