@@ -4,4 +4,5 @@
 .workflow/lesson-evidence.txt merge=iteration-scoped
 .workflow/validate-evidence.txt merge=iteration-scoped
 .workflow/release-disposition.txt merge=iteration-scoped
+.workflow/gap-inbox.md merge=union
 # lifecycle-kit:merge:end
