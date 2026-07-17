@@ -254,7 +254,22 @@ load-bearing where noted.
     so it fires only on a bare rewrite command none of those claimed; a
     decorated form meets rule 14's block first and the advisory fires on the
     re-issued bare command.
-16. **Fall-through logging** — anything neither blocked nor auto-allowed is
+16. **Bare `rm` of a tracked path** — an `rm` statement naming a git-tracked
+    file (`git ls-files --error-unmatch`) is **blocked** with the steer to
+    `git rm -q <path>`, which deletes and stages that one deletion in a single
+    motion. The deletion is the point: a bare `rm` leaves it unstaged, so it
+    lands only via a later `git add -A` — the form the shared-index discipline
+    warns against, since it sweeps a concurrent session's foreign path into the
+    commit. Block, not advise, on rule 14's reasoning: no consumer allowlist is
+    presumed to grant `rm`, so the rule fires on a command that would prompt
+    anyway and converts the prompt into a durable steer. Fires per statement
+    (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as
+    the bare one. Conservative by construction: expansions and backticks decline
+    outright (rule 6 already blocks them), option words are skipped, and a
+    tracked *directory* under `rm -r` does not match `--error-unmatch` — each
+    biases toward passing rather than a false steer. An untracked or gitignored
+    target never matches, so scratch deletion is untouched.
+17. **Fall-through logging** — anything neither blocked nor auto-allowed is
     appended to the friction log. Always last; never affects the decision.
 
 ### Consumer rules

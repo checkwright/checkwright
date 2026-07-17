@@ -377,6 +377,25 @@ guard_rule_git_rewrite() {
     fi
 }
 
+guard_rule_rm_tracked() {
+    local raw="$1" s
+    grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
+    case "$raw" in *'`'*) return 0 ;; esac
+    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$raw")"
+    local seg lead arg
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        lead="${seg%%[[:space:]]*}"
+        [[ "$lead" == "rm" ]] || continue
+        for arg in ${seg#rm}; do
+            case "$arg" in -* | '') continue ;; esac
+            if git ls-files --error-unmatch -- "$arg" >/dev/null 2>&1; then
+                guard_block "don't delete the git-tracked path '$arg' with a bare 'rm' — use 'git rm -q $arg': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An 'rm' of an untracked or gitignored path is untouched. If you genuinely need rm, run it yourself with !<command>."
+            fi
+        done
+    done < <(sed -E 's/(\&\&|\|\||;|\|)/\n/g' <<<"$s")
+}
+
 guard_generic_rules() {
     local cmd="$1"
     guard_rule_cd_compound "$cmd"
@@ -394,4 +413,5 @@ guard_generic_rules() {
     guard_rule_ro_pipeline "$cmd"
     guard_rule_allowlist_chain "$cmd"
     guard_rule_git_rewrite "$cmd"
+    guard_rule_rm_tracked "$cmd"
 }

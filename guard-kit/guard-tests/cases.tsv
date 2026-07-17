@@ -94,5 +94,14 @@ advise	git reset --soft HEAD~1
 fallthrough	git commit -m done
 fallthrough	git reset --hard HEAD~1
 
-# rule 16 — anything else falls through to the friction log
+# rule 16 — bare rm of a tracked path steers to 'git rm -q'; untracked,
+#           gitignored, and the already-correct git rm form pass
+block	rm tracked.md
+block	rm -f tracked.md
+block	rm tracked.md; ls
+fallthrough	rm scratch.txt
+fallthrough	rm untracked-nowhere.md
+fallthrough	git rm -q tracked.md
+
+# rule 17 — anything else falls through to the friction log
 fallthrough	make build
