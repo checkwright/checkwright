@@ -207,6 +207,45 @@
   shared-file-roster (`TASK-QUEUE.md` contention). Surfaced 2026-07-17 in the
   release-in-lifecycle lead session under live shared-index pressure.
 
+- **heterogeneous-agent-delegation** [needs-spec] — cross-vendor stage dispatch:
+  a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
+  (Codex, etc.), extending the homogeneous multi-agent / multi-operator model to a
+  heterogeneous fleet. Cashes the public "no IDE/model/harness lock-in"
+  positioning claim, and is the purest expression of the thesis — governance
+  enforced at the git/gate boundary, not by trusting the author. It splits along a
+  **two-substrate line**. *Already agent-neutral:* the verification substrate (git
+  + the gate battery + the bash flip/stamp state machine) does not care who
+  authored the diff — a foreign agent's commit is gated identically; and the
+  concurrent-agent coordination primitive is the shared git-index/HEAD
+  serialization, vendor-neutral already. *Homogeneous today — the real work,
+  worst-first:* (1) the **escalation resume model** is the gating sub-problem —
+  the lead's whole value is resuming a paused stage in place instead of
+  cold-restarting; a foreign agent cannot be `SendMessage`-resumed, so a foreign
+  stage either runs fully autonomously (no mid-stage escalation) or escalates
+  through a committed/polled channel with cold restarts, forfeiting the lead's
+  cost asymmetry — the part that is not plumbing. (2) **dispatch transport** —
+  today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs
+  a transport-neutral handoff (committed worklist, issue, spawned process). (3)
+  **budget oracle** — `usage-verdict.sh` is Anthropic-OAuth-specific; a
+  heterogeneous fleet has N vendor-keyed oracles (the same seam as this session's
+  credential-swap / token-usage tasks). (4) **stage-contract expression** —
+  `/build` is a Claude Code skill (markdown + tool bindings); the lifecycle
+  machinery is already neutral bash but the skill prose is not, so the contract
+  needs an agent-agnostic form.
+  **Seam ruling (on record):** generic mechanism only — the dispatch transport,
+  budget oracle, and escalation channel become consumer-config seams (harness-native
+  one adapter, foreign-agent another). A kit literal naming a vendor crosses the
+  provenance seam and is ruled out, same pattern as `prose-profile`. **Economic
+  why:** extends the existing per-batch model-tiering lever (the split-lead
+  posture's whole point) across vendors — route each stage to whichever vendor's
+  model wins. **Prerequisite cluster:** interacts with `hosted-attestation-service`
+  (its neutral-party angle; multi-operator-semantics its named prerequisite),
+  `plugin-marketplace` (the harness-absorption hedge), and this session's
+  credential-swap budget-oracle tasks. **Demand-gated:** promote when a concrete
+  cross-vendor dispatch need attests; until then this is the roadmap marker.
+  Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
+  on external-agent delegation).
+
 ## Done
 
 - release-major-criteria-pre-1-0-tension
