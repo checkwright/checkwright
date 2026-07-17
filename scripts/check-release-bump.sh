@@ -35,7 +35,7 @@ prev="$(tail -n2 <<<"$sorted" | head -n1)"
 newest_v="${newest%%$'\t'*}"; newest_f="${newest#*$'\t'}"
 prev_v="${prev%%$'\t'*}"
 
-# spec: docs/install.md §The upgrade contract — both fixed sections must be present; non-empty = at least one bullet
+# spec: docs/install.md §The upgrade contract — all three fixed sections must be present; non-empty = at least one bullet
 section_bullets() {  # $1=file  $2=section name; emits the bullet count, status 1 when the section is absent
     awk -v sec="$2" '
         /^## / { insec = (substr($0, 4) == sec); if (insec) found = 1; next }
@@ -47,16 +47,19 @@ tg="$(section_bullets "$newest_f" "Tightened gates")" \
     || { echo "check-release-bump: newest note $newest_f has no 'Tightened gates' section — the floor cannot be derived (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
 rk="$(section_bullets "$newest_f" "Renamed knobs")" \
     || { echo "check-release-bump: newest note $newest_f has no 'Renamed knobs' section — the floor cannot be derived (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
+bc="$(section_bullets "$newest_f" "Behavior changes")" \
+    || { echo "check-release-bump: newest note $newest_f has no 'Behavior changes' section — the floor cannot be derived (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
 
 IFS=. read -r nmaj nmin _ <<<"$newest_v"
 IFS=. read -r pmaj pmin _ <<<"$prev_v"
 patch_only=0
 [[ "$nmaj" == "$pmaj" && "$nmin" == "$pmin" ]] && patch_only=1
 
-if [[ "$patch_only" -eq 1 && ( "$tg" -gt 0 || "$rk" -gt 0 ) ]]; then
+if [[ "$patch_only" -eq 1 && ( "$tg" -gt 0 || "$rk" -gt 0 || "$bc" -gt 0 ) ]]; then
     echo "check-release-bump: v$newest_v is a patch-only bump over v$prev_v, but its note declares phase-B work (docs/install.md §Versioning — the floor is minor):"
     [[ "$tg" -gt 0 ]] && echo "  $newest_f: $tg tightened-gate bullet(s)"
     [[ "$rk" -gt 0 ]] && echo "  $newest_f: $rk renamed-knob bullet(s)"
+    [[ "$bc" -gt 0 ]] && echo "  $newest_f: $bc behavior-change bullet(s)"
     echo "  help: bump the minor instead (re-key the note's 'release:' and re-tag the plan), or move the declared work out of this release's note."
     exit 1
 fi

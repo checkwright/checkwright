@@ -22,11 +22,11 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 <one-line basis>`.
 
 1. **Author the release-note post — in-iteration.** Add a dated `docs/posts/`
-   entry carrying a `release: vX.Y.Z` front-matter key and the two sections the
-   upgrade contract names — tightened gates and renamed knobs. The parseable
-   grammar (front-matter key, section names, bullet lead tokens) is owned by
-   [docs/install.md](docs/install.md) §The upgrade contract; "none" is a valid
-   section body and is stated, never omitted. The note joins the nav by its
+   entry carrying a `release: vX.Y.Z` front-matter key and the three sections the
+   upgrade contract names — tightened gates, renamed knobs, and behavior changes.
+   The parseable grammar (front-matter key, section names, bullet lead tokens) is
+   owned by [docs/install.md](docs/install.md) §The upgrade contract; "none" is a
+   valid section body and is stated, never omitted. The note joins the nav by its
    `release:` key with no further step — the [Releases page](docs/releases.md)
    names that key in `nav_children_key`, so the note renders as a derived nav
    child (and the render-time releases index lists it likewise); no
@@ -36,7 +36,7 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 
 2. **Derive the bump off the note.** Choose the bump by
    [docs/install.md](docs/install.md) §Versioning's criteria (the derivable floor
-   is gated by `check-release-bump`), read off the note's two sections. An
+   is gated by `check-release-bump`), read off the note's three sections. An
    iteration meeting no bump criterion earns **none**: stamp `<iteration> release
    none — <basis>` into the disposition evidence and stop — no tag, no GitHub
    Release. A patch stays available on operator judgment for an urgent fix.

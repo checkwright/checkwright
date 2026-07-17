@@ -31,6 +31,18 @@ release's one allowed red.
 
 None — nothing was renamed or removed.
 
+## Behavior changes
+
+Two changes this release moves no gate — they land here, the fixed section for
+what shifts outside the battery, and neither asks anything of a clean tree.
+
+- **lifecycle-kit lead template** — the budget-guard block-vs-advise override
+  note moved to its point of use in the lead template (documentation residency,
+  nothing to reconcile).
+- **scope boundary scratch wipe** — now spares a live lead's `.tmp/session-role`
+  marker, so a lead outliving an iteration boundary keeps its role suppression
+  (context-kit's session-context signal — a fix, no knob or schema change).
+
 ## Upgrading
 
 Sync the vendored kit directories wholesale at `v0.4.0` and regenerate the
@@ -46,15 +58,9 @@ script of yours that lacks the `${SMOKE_KIT_ROOT:?…}` guard. The fix is the
 guard line the note names, placed before the script's first mutating command —
 the same one-line refusal the shipped scripts now carry.
 
-Two changes this release moves no gate and lands here by design: the
-budget-guard block-vs-advise override note moved to its point of use in
-lifecycle-kit's lead template (documentation residency, nothing to reconcile),
-and scope's boundary scratch wipe now spares a live lead's `.tmp/session-role`
-marker so a lead outliving an iteration boundary keeps its role suppression
-(context-kit's session-context signal — a fix, no knob or schema change).
-
-Both fixed sections above are the mechanical allowed-red set: the gates a clean
-upgrade may turn red. If a gate reds that this note does not name, the upgrade
+The Tightened gates section is the mechanical allowed-red set: the gates a clean
+upgrade may turn red. The behavior changes above are declared for reading, not a
+mechanical scan. If a gate reds that this note does not name, the upgrade
 smoke was supposed to catch it first —
 [open an issue](https://github.com/checkwright/checkwright/issues), because that
 is a defect in the release rather than work for you.

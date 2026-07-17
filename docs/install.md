@@ -124,14 +124,16 @@ The repository carries one semver line, applied as git tags, with the kits
 moving in lockstep: a kit earns its own version only if it is ever split out
 for independent adoption. The first tag rides the launch announcement.
 
-What earns each bump derives from the release note itself — its two fixed
+What earns each bump derives from the release note itself — its three fixed
 sections (§The upgrade contract below) already declare everything phase B must
 reconcile, so the floor is read off the note rather than maintained beside it:
 
-- **Patch** — both note sections are "None": a phase-A-only sync, fixes and
+- **Patch** — all three note sections are "None": a phase-A-only sync, fixes and
   docs that tighten nothing a consumer must reconcile.
-- **Minor** — either section is non-empty: the release carries phase-B work —
-  a new or stricter gate, or a knob rename riding its deprecation path.
+- **Minor** — any section is non-empty: the release carries phase-B work —
+  a new or stricter gate, a knob rename riding its deprecation path, or a
+  behavior change a consumer's tree may depend on (blind-upgrade-safe is exactly
+  what such a change breaks, the same reasoning that floors the other two).
 - **Major** — a decommission: a release that *removes* a deprecated surface
   (a release-sweep disposition executed as decommission), or any change the
   two-phase upgrade contract cannot reconcile from the note alone. This
@@ -149,7 +151,8 @@ reconcile, so the floor is read off the note rather than maintained beside it:
 
 The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
 orders the release notes by version and reds a patch-only bump whose note
-declares tightened gates or renamed knobs. The major criteria stay judgment —
+declares tightened gates, renamed knobs, or behavior changes (and fails closed
+if any of the three fixed sections is absent). The major criteria stay judgment —
 a decommission is a semantic fact no section grammar carries — so the gate
 holds only the floor.
 
@@ -176,18 +179,34 @@ declared gates and disposition each red.
 
 Release notes are dated posts under `docs/posts/`. Each carries a
 `release: vX.Y.Z` key in its front matter — the key that resolves a version to
-its note — and two sections under fixed names:
+its note — and three sections under fixed names:
 
 - **Tightened gates** — one bullet per gate that landed new or got stricter, the
   gate name the bullet's lead token. A mechanical consumer reads these lead
   tokens as the release's allowed-red set: the gates a clean upgrade may turn
   red, each named here with the intent behind the move.
 - **Renamed knobs** — one bullet per rename, `old → new`.
+- **Behavior changes** — one bullet per shipped change that alters what the kits
+  *do* without landing or tightening a battery gate: a fail-closed convergence
+  in a shared library, a runner's semantics, a skill or template behavior, a
+  default's effect. The bullet's lead token is the changed surface's name (the
+  script, knob, template, or file), bolded like the other sections' lead tokens;
+  the rest states what moved and what, if anything, the consumer reconciles.
 
-"None" is a valid body for either section and must be stated, not omitted — a
-release that tightens nothing says so. This consumer-owned residue Phase A
+"None" is a valid body for any of the three sections and must be stated, not
+omitted — a release that tightens nothing, renames nothing, and changes no
+out-of-gate behavior says so on each. This consumer-owned residue Phase A
 cannot touch (gates you have shadowed, templates you have copied out, knob
-renames in your own config) is that note's checklist.
+renames in your own config, behavior your tree depends on) is that note's
+checklist.
+
+Honest limit on the third section: **Behavior-changes bullets are declared for
+the human upgrader, not smoke-asserted.** A non-gate change cannot red the
+battery, so the upgrade smoke's containment assertion (defined over battery
+reds) does not read this section — it fixes where such changes are stated and
+`check-release-bump` fixes that they are stated, but neither makes them
+executable. Tightened-gates bullets stay the mechanical allowed-red set;
+behavior-changes bullets are reconciled by reading.
 
 ## Branch protection
 

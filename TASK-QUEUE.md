@@ -12,15 +12,6 @@
 
 ## New Features
 
-- **upgrade-note-nongate-change-slot** [spec: SPEC-behavior-changes-slot.md] —
-  add the release note's third fixed section, **Behavior changes** (stated
-  `None` default), for shipped changes no battery gate expresses;
-  `check-release-bump` is the mechanical reader (presence + the minor bump
-  floor), existing notes backfilled, allowed-red stays battery-defined with
-  the honest limit stated. Demand: the class recurred — two such changes in
-  `v0.2.0`, two more in `v0.4.0`. Design and ruled-out alternatives: the
-  amendment. Surfaced 2026-07-17 authoring the `v0.2.0` note.
-
 ## Technical Debt
 
 ## Deferred
@@ -226,5 +217,6 @@
 
 - mid-iteration-gap-channel-seam
 - intra-stage-batch-supervision
+- upgrade-note-nongate-change-slot
 
 ## Lessons Learned

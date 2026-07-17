@@ -62,48 +62,49 @@ None — nothing was renamed and no knob was removed. This release adds knobs
 `CANON_KIT_PROSE_TELL_*` set), and each defaults to the prior behaviour. There
 is nothing to re-point.
 
+## Behavior changes
+
+Four changes alter what the kits do without moving a battery gate. None
+announces itself as a red on a clean tree, so reconcile them by reading.
+
+- **`<KIT>_CONFIG_FILE` seams fail closed.** A `<KIT>_CONFIG_FILE` knob that is
+  *set* to a path that does not exist now exits 2 and names the knob. At
+  `v0.1.0`, gate-sdk, context-kit, doctrine-kit, drift-kit, and guard-kit
+  silently fell back to the default `scripts/<kit>-config.sh`, so a typo'd or
+  stale path ran the battery against default configuration and passed; the
+  remaining kits already refused, and this release converges those five on that
+  shape. An unset knob still resolves the default path, and a missing default is
+  still no error, so an unconfigured consumer sees nothing change. This is not a
+  tightened-gate bullet because it is not one gate: `gate-sdk/lib/gate.sh` is
+  sourced by every gate, so a broken `GATE_SDK_CONFIG_FILE` reds all of them at
+  once rather than naming a migration, and `gate-sdk/bin/enforcement-map.sh`
+  refuses the same way, verifying every explicitly set registry knob before its
+  first stdout byte. Check your seams before you sync — the failure is loud and
+  names the knob to fix.
+- **`bin/run-validate.sh` fails closed on an unbaselined failure.** evidence-kit's
+  per-scenario diff — shared by `bin/run-validate.sh` and `bin/diff-baseline.sh`
+  — now classifies an observed `fail` with no baseline row as a new failure. It
+  previously scored only against the baseline's own rows, so a scenario that
+  failed while absent from the manifest passed silently, precisely the hole a
+  baseline exists to close. If your baseline is incomplete, a previously green
+  validate goes red and names the scenario: the gap surfacing, not a regression.
+  An absent `pass` is the stated classification cost and an absent `ignore` is a
+  non-verdict; neither is a red.
+- **guard-kit ruleset** gains a rule steering a bare `rm` of a tracked path to
+  `git rm`, so a command that previously passed the bash guard now blocks with
+  that suggestion.
+- **`bin/usage-verdict.sh`** (delegation-kit) compares its pause thresholds
+  at-or-over rather than strictly over, so a window sitting exactly on a
+  threshold now pauses where it previously proceeded.
+
 ## Upgrading
 
 Run the two phases the [install guide](../install.md) §The upgrade contract
 owns: sync the vendored kit directories wholesale at `v0.2.0`, regenerate the
 pre-commit hook and the graph projection, then run the full battery and
-disposition the red set against the bullets above.
-
-Two behaviour changes land outside the battery's red set. Neither will announce
-itself as a red gate on a clean tree, so reconcile them by reading.
-
-**Config seams fail closed.** A `<KIT>_CONFIG_FILE` knob that is *set* to a path
-that does not exist now exits 2 and names the knob. At `v0.1.0`, gate-sdk,
-context-kit, doctrine-kit, drift-kit, and guard-kit silently fell back to the
-default `scripts/<kit>-config.sh` in that case, so a typo'd or stale path ran
-the battery against default configuration and passed; the remaining kits already
-refused, and this release converges those five on that shape. An unset
-knob still resolves the default path, and a missing default is still no error,
-so an unconfigured consumer sees nothing change. This is not a bullet above
-because it is not one gate: `gate-sdk/lib/gate.sh` is sourced by every gate, so
-a broken `GATE_SDK_CONFIG_FILE` reds all of them at once rather than naming a
-migration. Check your seams before you sync — the failure is loud, and the
-message names the knob to fix. `gate-sdk/bin/enforcement-map.sh` refuses the
-same way, verifying every explicitly set registry knob before its first stdout
-byte, so a misconfigured `--emit` leaves an empty projection and a nonzero exit
-instead of a plausible partial page.
-
-**`run-validate` fails closed on an unbaselined failure.** evidence-kit's
-per-scenario diff — shared by `bin/run-validate.sh` and `bin/diff-baseline.sh` —
-now classifies an observed `fail` with no baseline row as a new failure. It
-previously scored only against the baseline's own rows, so a scenario that
-failed while absent from the manifest passed silently, which is precisely the
-hole a baseline exists to close. If your baseline is incomplete, a previously
-green validate goes red and names the scenario: that is the gap surfacing, not a
-regression. An absent `pass` is the stated classification cost and an absent
-`ignore` is a non-verdict; neither is a red.
-
-Two smaller notes, neither asking anything of you. For guard-kit consumers: the
-ruleset gains a rule steering a bare `rm` of a tracked path to `git rm`, so a
-command that previously passed the bash guard now blocks with that suggestion.
-For delegation-kit consumers: `bin/usage-verdict.sh` compares its pause
-thresholds at-or-over rather than strictly over, so a window sitting exactly on
-a threshold now pauses where it previously proceeded.
+disposition the red set against the tightened-gates bullets above. The
+behavior-changes section holds what shifted outside the battery — reconcile
+those by reading, they will not surface as reds on a clean tree.
 
 If a gate reds that this note does not name, the upgrade smoke was supposed to
 catch it first — [open an issue](https://github.com/checkwright/checkwright/issues),
