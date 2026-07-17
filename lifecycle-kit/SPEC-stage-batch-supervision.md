@@ -43,12 +43,12 @@ The doctrine clause the template lacks:
   split posture exists to remove. Read-only fan-outs inside a stage stay
   sanctioned (the delegation nudge; CLAUDE.md §Agent execution).
 - Sequencing residue the lead owns: sibling batch sessions of one stage run
-  under one flip-free stamp regime (see the companion
-  `SPEC-mid-iteration-gap-channel.md` — under it, re-entry is a pure stamp
-  append; if this amendment merges first, the statement holds under the
-  current flip+stamp too, where a same-stage flip rewrites the field to its
-  current value). The lead serializes batches that share a surface and may
-  parallelize batches that do not, subject to the shared-index discipline.
+  under whatever stamp regime is live. Under the current flip+stamp, a
+  same-stage re-entry's flip rewrites the `[stage:]` field to its current
+  value; if the deferred stage-cursor-extraction unit later retires the flip,
+  re-entry becomes a pure stamp append. Either way the statement holds. The
+  lead serializes batches that share a surface and may parallelize batches that
+  do not, subject to the shared-index discipline.
 
 ## Producers and consumers
 
