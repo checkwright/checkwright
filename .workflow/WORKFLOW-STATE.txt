@@ -5,3 +5,4 @@
 ---
 
 fail-open-hardening scope a6618fcd 2026-07-17
+fail-open-hardening build a535f745 2026-07-17
