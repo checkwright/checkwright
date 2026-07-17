@@ -121,6 +121,22 @@ if [[ "$first" == 1 ]]; then
     fi
 fi
 
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the iteration-boundary entry refuses while the gap inbox holds bullets: a mid-iteration gap must be dispositioned by close's drain before the next iteration begins (the same refusal contract as the Lessons check), so no gap outlives its iteration untriaged.
+if [[ "$first" == 1 && -f "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]]; then
+    gaps="$(awk '/^-[[:space:]]/ { print }' "$LIFECYCLE_KIT_GAP_INBOX_FILE")"
+    if [[ -n "$gaps" ]]; then
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds untriaged gap bullets:" >&2
+            sim_relay "$gaps" >&2
+            exit 1
+        fi
+        echo "enter-stage: iteration-boundary entry to '$stage' refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds untriaged gap bullets; the close stage must drain every gap before the next iteration begins (nothing written):" >&2
+        printf '%s\n' "$gaps" >&2
+        echo "  help: run the close ritual's gap-drain step (disposition each bullet — promote to a deferred [needs-spec] entry, fix inline, or discard with cause in the commit message — then truncate the inbox to its header), then re-run enter-stage $stage." >&2
+        exit 1
+    fi
+fi
+
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_BOUNDARY_REQUIRE: at the iteration boundary each member must carry a data line whose first token is the closing iteration's name, else the entry refuses (fail-closed on a missing file); a never-named (—) closing iteration has nothing to disposition and skips the check. Runs after the Lessons refusal and before the boundary truncation, the same refusal contract.
 if [[ "$first" == 1 && "$cur_iter" != "—" ]]; then
     for br in ${LIFECYCLE_KIT_BOUNDARY_REQUIRE[@]+"${LIFECYCLE_KIT_BOUNDARY_REQUIRE[@]}"}; do

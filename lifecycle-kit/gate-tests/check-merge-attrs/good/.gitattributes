@@ -1,4 +1,5 @@
 # lifecycle-kit:merge:begin
 .workflow/WORKFLOW-STATE.txt merge=iteration-scoped
 .workflow/lesson-evidence.txt merge=iteration-scoped
+.workflow/gap-inbox.md merge=union
 # lifecycle-kit:merge:end

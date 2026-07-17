@@ -12,17 +12,6 @@
 
 ## New Features
 
-- **mid-iteration-gap-channel-seam** [spec: SPEC-mid-iteration-gap-channel.md]
-  — give mid-iteration gap filing a committed append-only channel
-  (`.workflow/gap-inbox.md` + `bin/file-gap.sh`, drained at close, refused
-  non-empty at the iteration boundary) — kfric stays the narrow
-  knowledge-friction sensor (its log is `.workflow/knowledge-friction.log`,
-  gitignored per-clone, which is exactly why it is the wrong backlog channel).
-  The coupled stage-cursor extraction was demoted to the deferred
-  stage-cursor-extraction unit during the concurrency-hardening align audit (a
-  missed cross-kit `[stage:]` readership premise). Design, causal map, and the
-  queue-write doctrine: the amendment. Surfaced 2026-07-17 in the
-  release-in-lifecycle lead session under live shared-index pressure.
 - **intra-stage-batch-supervision** [spec: SPEC-stage-batch-supervision.md] —
   state same-stage re-entry in the SPEC (verified at promotion: enter-stage
   idempotence keys on the full iter/stage/session triple, assertion A on the
@@ -242,5 +231,7 @@
   2026-07-17.
 
 ## Done
+
+- mid-iteration-gap-channel-seam
 
 ## Lessons Learned

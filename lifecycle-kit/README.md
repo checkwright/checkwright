@@ -77,13 +77,15 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    invocations, the SPEC link) into `LIFECYCLE_KIT_AGENT_FILE` (default
    `CLAUDE.md`), the roster derived from your config so a reshape (step 5)
    flows in on a re-run. `check-lifecycle-registration` (step 1) holds the
-   block in lockstep. The same run also writes the iteration-scoped
-   `merge=iteration-scoped` attribute block into `.gitattributes` (the
-   per-iteration state surfaces resolve to the arriving branch at a merge —
-   SPEC.md §Multi-operator semantics) and registers the keep-ours driver in
-   your clone's git config (per-clone, the `install-hooks.sh` opt-in class).
-   `check-merge-attrs` (step 1) holds the attribute block in parity with the
-   derived supersede set.
+   block in lockstep. The same run also writes the merge-attribute block into
+   `.gitattributes` — a `merge=iteration-scoped` line per per-iteration state
+   surface (these resolve to the arriving branch at a merge — SPEC.md
+   §Multi-operator semantics) and a `merge=union` line for the committed gap
+   inbox (its append-only bullets must survive a concurrent merge — SPEC.md §The
+   committed gap inbox) — and registers the keep-ours driver in your clone's git
+   config (per-clone, the `install-hooks.sh` opt-in class; the git-native union
+   driver needs no such step). `check-merge-attrs` (step 1) holds the block in
+   parity with the derived supersede and union sets.
 
 5. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,

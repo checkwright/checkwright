@@ -1,0 +1,1 @@
+# contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one `- <YYYY-MM-DD> — <gap>` bullet per gap below (filed via lifecycle-kit/bin/file-gap.sh).

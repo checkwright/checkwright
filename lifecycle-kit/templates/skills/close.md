@@ -46,19 +46,31 @@ they ride in one commit.
    the sink file its body appends to, plus the sink's reclaim path (a gitignored
    sink needs a named trigger that empties it — the runtime-artifact lifecycle
    rule).>*
-2. *<housekeeping: your housekeeping sweeps: deprecation scan, gate-runtime
+2. **Drain the gap inbox** (`LIFECYCLE_KIT_GAP_INBOX_FILE`,
+   §The committed gap inbox) → disposition every `- <date> — <gap>` bullet,
+   then **truncate the inbox to its `# contract:` header**. The disposition set
+   is →promote (file a deferred `[needs-spec]` queue entry for the gap),
+   →fix (resolve it inline this session), or →discard (state why in the close
+   commit message — the bullet's own prose is the disposition body). The date
+   feeds the staleness read (an aged bullet is a signal, not a free pass).
+   Draining is not deleting: a bullet naming a concrete unfixed gap must become a
+   task or a fix, not evaporate — the same clearing-is-not-processing rule as
+   Lessons. The next iteration's scope entry refuses a non-empty inbox
+   (§bin/enter-stage.sh), so an undrained gap blocks the boundary rather than
+   crossing it silently.
+3. *<housekeeping: your housekeeping sweeps: deprecation scan, gate-runtime
    budget check, backlog-aging / premise-rot review, tooling-friction
    triage.>*
-3. **Clear Done.**
-4. Review top-level docs for staleness (*is it still true?*). Same
+4. **Clear Done.**
+5. Review top-level docs for staleness (*is it still true?*). Same
    gap-generalization obligation as step 1, per staleness actually found:
    name the check class that should have caught it, and file the missing
    check as a deferred task or state in one line why no scanner is
    buildable — a silent fix forfeits the check.
-5. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
+6. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path.
-6. **Release disposition** — run after the surface-mutating steps above and
+7. **Release disposition** — run after the surface-mutating steps above and
    **before** the brevity pass (the disposition note is itself such a write).
    Every close dispositions the iteration at the release boundary: read the
    consumer's release policy (the `release-policy` slot below) and either
@@ -76,12 +88,12 @@ they ride in one commit.
    citation, the disposition-evidence path, and any boundary-only sub-procedures
    (e.g. a major-only deprecation sweep); or a plain "no release process — every
    iteration stamps none" line for a consumer without one.>*
-7. **Brevity pass on the always-loaded surfaces** — run this **last**, after
+8. **Brevity pass on the always-loaded surfaces** — run this **last**, after
    every surface-mutating step above. Scope by principle, not a fixed list:
    every surface injected into each agent session. Staleness asks *is it
    still true?*; brevity asks *is each block worth its standing per-session
    token cost?* — reword/delete over annotating; outdated context goes to git
    history. On-demand files (specs, this skill) are exempt — their cost is
    paid only when opened.
-8. **Optionally merge** — an iteration can close without merging if validate
+9. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.

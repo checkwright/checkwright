@@ -289,4 +289,48 @@ write_br_fixture —                                                       # (d)
 printf '# contract\n' > "$brd"
 br_run scope >/dev/null || { echo "smoke(enter-stage): boundary-require should skip a never-named closing iteration" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the iteration-boundary entry refuses while the gap inbox holds bullets (the Lessons-refusal contract); an empty (header-only) inbox passes
+gp="$es/gap-inbox"; mkdir -p "$gp/.workflow"
+gpq="$gp/TASK-QUEUE.md"; gps="$gp/.workflow/WORKFLOW-STATE.txt"; gpi="$gp/.workflow/gap-inbox.md"
+cat > "$gpq" <<EOF
+# smoke queue
+## Iteration: gap-iter  [stage: close]
+
+---
+
+## New Features
+## Technical Debt
+## Deferred
+## Done
+## Lessons Learned
+EOF
+cat > "$gps" <<EOF
+# contract
+
+---
+
+gap-iter close aabbccdd $d
+EOF
+cat > "$gp/stages.sh" <<STAGES
+# shellcheck shell=bash
+LIFECYCLE_KIT_GAP_INBOX_FILE=$gpi
+STAGES
+gp_run() {
+    env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
+    LIFECYCLE_KIT_QUEUE_FILE="$gpq" \
+    LIFECYCLE_KIT_STATE_FILE="$gps" \
+    LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
+    GATE_SDK_TMP_DIR="$es/tmp" \
+    LIFECYCLE_KIT_CONFIG_FILE="$gp/stages.sh" \
+    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+}
+printf '# contract: gap inbox\n- 2026-07-17 — an untriaged gap bullet\n' > "$gpi"   # (a) non-empty inbox → refuse, nothing written
+cp "$gpq" "$gp/q.before"; cp "$gps" "$gp/s.before"
+if gp_run scope >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a boundary entry while the gap inbox holds bullets" >&2; exit 1; fi
+cmp -s "$gp/s.before" "$gps" || { echo "smoke(enter-stage): wrote state on a gap-inbox refusal" >&2; exit 1; }
+cmp -s "$gp/q.before" "$gpq" || { echo "smoke(enter-stage): wrote queue on a gap-inbox refusal" >&2; exit 1; }
+printf '# contract: gap inbox\n' > "$gpi"                                            # (b) header-only inbox → boundary entry proceeds
+gp_run scope >/dev/null || { echo "smoke(enter-stage): a header-only gap inbox should not refuse a boundary entry" >&2; exit 1; }
+grep -q "^## Iteration: —  \[stage: scope\]\$" "$gpq" || { echo "smoke(enter-stage): gap-inbox pass did not reset the header" >&2; exit 1; }
+
 rm -rf "$es"

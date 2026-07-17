@@ -241,6 +241,11 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
 - `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` — the kit-owned lesson-disposition stamp
   file; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt`,
   read by `check-lesson-disposition` and the boundary-reset built-in.
+- `LIFECYCLE_KIT_GAP_INBOX_FILE` — the committed append-only gap inbox
+  (§The committed gap inbox); default
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by `bin/file-gap.sh`,
+  its `merge=union` attribute verified by `check-merge-attrs`, drained by the
+  close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
 - `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
   iteration boundary; default empty.
 - `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
@@ -299,10 +304,13 @@ content that merges like any prose, and only its header line is iteration-scoped
 at the next commit because `check-stage-evidence` requires header↔stamp
 agreement and the state file already took the arriving side by driver.
 Held-constant baselines and append-across-iterations evidence keep normal merge
-semantics: their conflicts are real disagreements. A consumer with a *tracked*
-shared append log points it at git's built-in `union` driver themselves —
-sanctioned shape, no kit mechanism. (Gitignored per-checkout scratch — friction
-logs — never merges and needs no rule.)
+semantics: their conflicts are real disagreements. The kit owns exactly one
+`union`-driver surface — the committed gap inbox (§The committed gap inbox),
+whose append-only bullets must survive a concurrent merge rather than supersede
+— rendered into the attribute block beside the supersede set and verified by the
+same gate; a consumer with its own *tracked* shared append log points it at git's
+built-in `union` driver the same way — sanctioned shape, git-native. (Gitignored
+per-checkout scratch — friction logs — never merges and needs no rule.)
 
 **`.gitattributes` — the rule mechanized.** Each supersede-set path carries
 `merge=iteration-scoped`; the driver definition (`git config
@@ -334,6 +342,53 @@ the integration branch's battery — the reconcile commit re-fires every
 queue/state-coupled gate, which is what makes the header hand-resolution
 enforceable.
 
+## The committed gap inbox
+
+Mid-iteration work-state writes race the stage session holding the shared git
+index: a gap surfaced mid-stage has no committed place to land except the queue
+file that stage session is already contending on. So mid-iteration gap *filing*
+gets a committed, append-only channel of its own — distinct from the
+knowledge-friction log, which stays the narrow sensor for a fact re-derived
+because no doc owns it (drift-kit/SPEC.md §The knowledge-friction loop): a
+*work-shaped* finding (a gap, a task, a defect) is backlog, not knowledge
+friction, and routes here.
+
+**The surface.** `.workflow/gap-inbox.md` (knob `LIFECYCLE_KIT_GAP_INBOX_FILE`,
+§Layout and configuration) is a committed, append-only capture buffer. Grammar:
+a `# contract:` prose header, then one `- <YYYY-MM-DD> — <gap prose>` bullet per
+gap. Committed, not gitignored — a per-clone buffer fragments the backlog across
+operators, the finding that rules the gitignored friction log out as the channel.
+
+**The affordance.** `bin/file-gap.sh "<gap prose>"` (the `bin/kfric.sh` pattern:
+repo-root cd, config-via-env, exit 2 on an empty argument) appends one dated
+bullet, seeding the contract header when the inbox does not yet exist. It is
+advisory tooling, not a gate — no fixture pair is owed; the raw append (a bullet
+line into the inbox) stays a legal fallback, the grammar being the surface's
+contract, not the writer.
+
+**Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone
+driver registration), not the keep-ours `merge=iteration-scoped` the
+boundary-truncated surfaces carry: an iteration-scoped surface is per-iteration
+scratch superseded at the boundary, but a gap filed on either side of a
+concurrent merge must survive. The installer emits the line and
+`check-merge-attrs` verifies it (§bin/install-lifecycle.sh, §check-merge-attrs).
+
+**The boundary refusal.** `bin/enter-stage.sh`'s first-stage (iteration-boundary)
+entry refuses while the inbox holds bullets (exit 1, the untriaged bullets
+printed, nothing written — the same refusal contract as the non-empty Lessons
+section), so no gap outlives its iteration untriaged (the gap-disposition rule:
+costed and filed, never flagged-and-skipped).
+
+**Producers and consumers.** Producer: any mid-iteration session (lead or stage)
+via `bin/file-gap.sh` — the knob default makes the channel live everywhere the
+kit is vendored. Consumers: the close skill's drain step (§templates/skills/)
+dispositions every bullet — promoted to a deferred `[needs-spec]` queue entry,
+fixed inline that session, or discarded with cause in the close commit message —
+then truncates the inbox to its header; the boundary refusal reads emptiness at
+the next scope entry as the backstop. Each bullet's two fields have named
+readers: the date feeds close's staleness judgment, the prose is the disposition
+body.
+
 ## Per-component contracts
 
 ### lib/stages.sh
@@ -346,12 +401,14 @@ then validation. Also owns the shared header adapters
 a shared adapter removes that drift axis — and `lifecycle_registration_block`,
 which renders the resident registration block (§bin/install-lifecycle.sh) from the
 live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
-derive one text and cannot drift. Two more renderers follow the same
+derive one text and cannot drift. Three more renderers follow the same
 writer/asserter shape for the merge-attribute surface: `lifecycle_supersede_set`
 prints the derived iteration-scoped supersede set (the state file, the kit-owned
 lesson-evidence file, and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member — exactly
-what `bin/enter-stage.sh` truncates at the boundary), and
-`lifecycle_merge_attrs_block` renders it as the `<path> merge=iteration-scoped`
+what `bin/enter-stage.sh` truncates at the boundary); `lifecycle_union_set`
+prints the derived union-merge set (the gap inbox — §The committed gap inbox);
+and `lifecycle_merge_attrs_block` renders the supersede set as
+`<path> merge=iteration-scoped` lines and the union set as `<path> merge=union`
 lines, so `bin/install-lifecycle.sh` (writer) and `check-merge-attrs` (asserter)
 read one set (§Multi-operator semantics). Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
@@ -432,7 +489,10 @@ consumer knob (git history keeps the retired stamps). The boundary entry also
 untriaged entries printed, nothing written — the same refusal contract as the
 built-in pre-flight): an untriaged lesson must not cross into the next
 iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
-outlive the iteration that filed it. The boundary entry additionally **refuses
+outlive the iteration that filed it. It **likewise refuses while the gap inbox
+(`LIFECYCLE_KIT_GAP_INBOX_FILE`) holds bullets** — the same refusal contract, so
+a mid-iteration gap the close skill did not drain (§The committed gap inbox)
+cannot cross the boundary untriaged; an absent inbox has no bullets and passes. The boundary entry additionally **refuses
 when a `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member lacks a disposition line for the
 closing iteration** (exit 1, nothing written, the same refusal contract): each
 member must carry a data line whose first token is the closing iteration's name,
@@ -509,14 +569,17 @@ The same run performs two further steps for the multi-operator merge surface
 (§Multi-operator semantics). **The merge-attribute step** injects a
 marker-bounded block (`# lifecycle-kit:merge:begin` … `# lifecycle-kit:merge:end`,
 `inject_marker_block` again) into `.gitattributes` (repo root) rendered from
-`lifecycle_merge_attrs_block`, so a reshaped supersede set flows into the
-attribute lines by construction and `check-merge-attrs` certifies the same
-rendering. Unlike the agent file, the installer legitimately **mints
+`lifecycle_merge_attrs_block` — one `merge=iteration-scoped` line per supersede
+member (keep-ours) and one `merge=union` line per union member (the gap inbox,
+git-native) — so a reshaped supersede or union set flows into the attribute lines
+by construction and `check-merge-attrs` certifies the same rendering. Unlike the agent file, the installer legitimately **mints
 `.gitattributes` when absent** (it is not an always-loaded file the consumer
 authored). **The driver-config step** registers the keep-ours driver — `git
 config merge.iteration-scoped.driver true` — per-clone (the `install-hooks.sh`
 opt-in class); a non-repo cwd degrades to a printed skip, never a hard failure,
 leaving the `.gitattributes` attribute inert until a clone installs the driver.
+The union attribute needs no such step — `merge=union` is git-native, so its
+line is live the moment `.gitattributes` carries it.
 Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
 end-to-end in `smoke/install.sh`.
 
@@ -759,29 +822,40 @@ The `# graph:` couples the queue file and the evidence file at
 
 ### check-merge-attrs
 
-Invariant: bidirectional set-parity between the derived iteration-scoped
-supersede set (`lifecycle_supersede_set`, §lib/stages.sh) and the paths carrying
-`merge=iteration-scoped` in the consumer's `.gitattributes` (default
-`.gitattributes`; override with the first argument). The forward direction — a
+Invariant, over two derived sets: bidirectional set-parity between the derived
+iteration-scoped supersede set (`lifecycle_supersede_set`, §lib/stages.sh) and
+the paths carrying `merge=iteration-scoped` in the consumer's `.gitattributes`
+(default `.gitattributes`; override with the first argument), plus **forward-only**
+parity between the derived union set (`lifecycle_union_set` — the gap inbox) and
+the paths carrying `merge=union`. The iteration-scoped forward direction — a
 supersede-set path with no `merge=iteration-scoped` line — catches an
 unmechanized rule (a merge would silently take the wrong side on that surface).
-The reverse direction is the safety edge: a `merge=iteration-scoped` attribute on
+Its reverse direction is the safety edge: a `merge=iteration-scoped` attribute on
 a path *outside* the derived set silently discards merge content on a real
 surface, so a smuggled line is red, not config. The gate scans every
 `merge=iteration-scoped` line in the file — inside the installer's marker block
-or not — so the reverse edge holds against a hand-added line anywhere. A missing
+or not — so the reverse edge holds against a hand-added line anywhere. The union
+set is **forward-only by design** — a union member with no `merge=union` line is
+red (a filed gap would be silently dropped at a concurrent merge), but a
+`merge=union` line *outside* the derived set is **not** flagged: `merge=union` is
+a git-native driver a consumer's own tracked append log legitimately carries
+(§Multi-operator semantics), so there is no smuggling to catch. A missing
 `.gitattributes` reports every derived surface as unmechanized (exit 1, the
-install remedy); an unreadable one, or an empty derived set (a lifecycle always
-owns at least its state + lesson-evidence files), is fail-closed (exit 2).
+install remedy); an unreadable one, an empty supersede set (a lifecycle always
+owns at least its state + lesson-evidence files), or an empty union set (it
+always owns at least its gap inbox), is fail-closed (exit 2).
 
 The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model):
 the single `MERGE-ATTRS: clean` line and a `help:` remedy on the finding path
 (output); exit 2 on an unreadable target or an empty derived set (fail-closed); a
 `good/`+`bad/` fixture pair under `gate-tests/` — the good case the default
-state+lesson attribution, the bad case a smuggled reverse-edge line — plus
-`gate-tests/check-merge-attrs.test.sh` for the forward-missing and missing-file
-findings and a real two-branch merge in a sandbox repo that asserts the keep-ours
-driver resolves an attributed surface to the arriving side (fixture-pair); and
+state+lesson attribution plus the gap-inbox union line, the bad case a smuggled
+reverse-edge line — plus `gate-tests/check-merge-attrs.test.sh` for the
+iteration-scoped forward-missing and missing-file findings, the union
+forward-missing finding, the union no-reverse-edge case (a `merge=union` line
+outside the derived set stays clean), and a real two-branch merge in a sandbox
+repo that asserts the keep-ours driver resolves an attributed surface to the
+arriving side (fixture-pair); and
 registration in this repo's `gates.list` where its own `.gitattributes` is the
 scan target (self-lint). Its `# graph:` couples `.gitattributes` and
 `lib/stages.sh` (the config the supersede set derives from) at `tier=precommit`;

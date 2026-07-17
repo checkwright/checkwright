@@ -50,6 +50,7 @@ declare -p LIFECYCLE_KIT_SHIM_DEDUP_CORPUS &>/dev/null || LIFECYCLE_KIT_SHIM_DED
 [[ -v LIFECYCLE_KIT_QUEUE_FILE ]] || LIFECYCLE_KIT_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 [[ -v LIFECYCLE_KIT_STATE_FILE ]] || LIFECYCLE_KIT_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
 [[ -v LIFECYCLE_KIT_LESSON_EVIDENCE_FILE ]] || LIFECYCLE_KIT_LESSON_EVIDENCE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt"
+[[ -v LIFECYCLE_KIT_GAP_INBOX_FILE ]] || LIFECYCLE_KIT_GAP_INBOX_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md"
 
 declare -p LIFECYCLE_KIT_BOUNDARY_TRUNCATE &>/dev/null || LIFECYCLE_KIT_BOUNDARY_TRUNCATE=()
 
@@ -85,12 +86,20 @@ lifecycle_supersede_set() {
     done
 }
 
-# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the .gitattributes merge-driver lines the installer injects (one `<path> merge=iteration-scoped` per supersede member); the installer emits this, check-merge-attrs verifies it — the same writer/asserter split as lifecycle_registration_block.
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the union-merge set: append-only surfaces where a bullet filed on either side of a concurrent merge must survive (the gap inbox), git-native `merge=union` so no per-clone driver registration. Distinct from the keep-ours iteration-scoped supersede set above.
+lifecycle_union_set() {
+    printf '%s\n' "$LIFECYCLE_KIT_GAP_INBOX_FILE"
+}
+
+# spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the .gitattributes merge-driver lines the installer injects: one `<path> merge=iteration-scoped` per supersede member (keep-ours) then one `<path> merge=union` per union member (git-native). The installer emits this, check-merge-attrs verifies it — the same writer/asserter split as lifecycle_registration_block.
 lifecycle_merge_attrs_block() {
     local p
     while IFS= read -r p; do
         printf '%s merge=iteration-scoped\n' "$p"
     done < <(lifecycle_supersede_set)
+    while IFS= read -r p; do
+        printf '%s merge=union\n' "$p"
+    done < <(lifecycle_union_set)
 }
 
 # spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — render the resident registration block from the live config so the installer and check-lifecycle-registration derive one text; the roster is the stage set as skill invocations, never hand-listed
@@ -113,6 +122,7 @@ _lc_errs=()
 [[ ${#LIFECYCLE_KIT_STAGES[@]} -gt 0 ]] || _lc_errs+=("LIFECYCLE_KIT_STAGES is empty")
 [[ -n "$LIFECYCLE_KIT_SKILLS_DIR" ]] || _lc_errs+=("LIFECYCLE_KIT_SKILLS_DIR is empty")
 [[ -n "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_LESSON_EVIDENCE_FILE is empty")
+[[ -n "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_GAP_INBOX_FILE is empty")
 [[ "$LIFECYCLE_KIT_SHIM_NGRAM" =~ ^[1-9][0-9]*$ ]] \
     || _lc_errs+=("LIFECYCLE_KIT_SHIM_NGRAM '$LIFECYCLE_KIT_SHIM_NGRAM' is not a positive integer")
 [[ "$LIFECYCLE_KIT_SESSION_BOUNDARY" == stage || "$LIFECYCLE_KIT_SESSION_BOUNDARY" == iteration ]] \

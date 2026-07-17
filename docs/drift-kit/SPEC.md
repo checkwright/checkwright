@@ -164,7 +164,12 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    the writer, is the log's contract; both consumers below read lines, not
    provenance. The convention costs one always-loaded bullet in the
    consumer's instructions file; that line is the loop's hook and must earn
-   its recurring cost by the log actually filling.
+   its recurring cost by the log actually filling. **Seam:** kfric is the
+   narrow sensor for a *re-derived fact* only — a *work-shaped* mid-iteration
+   finding (a gap, a task, a defect) is not knowledge friction and routes to
+   the consumer's committed gap channel instead
+   (lifecycle-kit/SPEC.md §The committed gap inbox); overloading this log as a
+   backlog inbox dilutes the `kpi-knowledge-friction` signal it exists to carry.
 2. **Triage (close)** — `templates/close-knowledge.md`, spliced into the
    consumer's close skill (the close-triage/close-brevity pattern): walk
    the log; for each entry, the remediation is a **doc-owner edit** — give

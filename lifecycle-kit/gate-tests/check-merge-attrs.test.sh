@@ -3,9 +3,11 @@
 # good/bad harness cannot hold. The good/bad fixture pair (run-gate-tests.sh)
 # covers the reverse-direction safety edge (a merge=iteration-scoped attribute
 # on a path outside the derived set); this file covers the forward direction (a
-# derived surface with no attribute), the missing-file case, and the end-to-end
-# proof that the keep-ours driver resolves an attributed surface to the arriving
-# (checked-out) side across a real two-branch merge.
+# derived surface with no attribute), the missing-file case, the union set's
+# forward-missing (a union surface with no merge=union line) and its deliberate
+# absence of a reverse edge (a merge=union line outside the derived set is legit
+# consumer usage), and the end-to-end proof that the keep-ours driver resolves an
+# attributed surface to the arriving (checked-out) side across a real two-branch merge.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -43,6 +45,28 @@ check_case "forward-missing-lesson" "$fwd" 1 "no merge=iteration-scoped attribut
 none="$SANDBOX/none"
 mkdir -p "$none"
 check_case "missing-gitattributes" "$none" 1 "the merge-supersede rule is unmechanized"
+
+# --- forward direction, union set: the iteration-scoped lines are complete but the
+#     gap inbox carries no merge=union line (a filed gap would be silently dropped) ---
+uf="$SANDBOX/union-forward"
+mkdir -p "$uf"
+cat >"$uf/.gitattributes" <<'EOF'
+.workflow/WORKFLOW-STATE.txt merge=iteration-scoped
+.workflow/lesson-evidence.txt merge=iteration-scoped
+EOF
+check_case "union-forward-missing" "$uf" 1 "no merge=union attribute"
+
+# --- a merge=union line on a path outside the derived union set is NOT flagged:
+#     the git-native union driver is legitimate consumer usage (no reverse edge) ---
+uok="$SANDBOX/union-extra-ok"
+mkdir -p "$uok"
+cat >"$uok/.gitattributes" <<'EOF'
+.workflow/WORKFLOW-STATE.txt merge=iteration-scoped
+.workflow/lesson-evidence.txt merge=iteration-scoped
+.workflow/gap-inbox.md merge=union
+CHANGELOG.md merge=union
+EOF
+check_case "union-reverse-legit" "$uok" 0 "MERGE-ATTRS: clean"
 
 # --- the keep-ours driver resolves an attributed surface to the arriving side ---
 # A real two-branch merge in a sandbox git repo: the driver definition is `true`
@@ -85,5 +109,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-merge-attrs.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-merge-attrs.test.sh: clean (forward-missing + missing-file findings + real two-branch keep-ours driver resolution, 3 cases)"
+echo "check-merge-attrs.test.sh: clean (forward-missing + missing-file findings + union forward-missing + union reverse-legit + real two-branch keep-ours driver resolution, 5 cases)"
 exit 0
