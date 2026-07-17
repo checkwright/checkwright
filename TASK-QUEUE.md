@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: release-in-lifecycle  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -12,7 +12,46 @@
 
 ## New Features
 
+- **release-in-iteration-lifecycle** [spec: SPEC-release-in-iteration-lifecycle.md] —
+  releasing joins the iteration lifecycle: the close template gains a
+  release-disposition step + `release-policy` slot (every close executes the
+  consumer's release procedure or stamps an explicit `none`), enforced by a new
+  `LIFECYCLE_KIT_BOUNDARY_REQUIRE` boundary require-check in `enter-stage.sh`
+  (default empty); this repo binds the slot to RELEASING.md's reordered
+  per-iteration procedure with `.workflow/release-disposition.txt` as evidence.
+  Operator rulings in the amendment: tag per qualifying iteration; both-None
+  tags nothing and stamps `none`. Surfaced by operator directive during
+  config-seam-hardening close, 2026-07-17, prompted by the unreleased-backlog
+  gap (141 unreleased commits post-v0.1.0; the v0.2.0 cut fixed the backlog,
+  this entry is the methodology change).
+- **lead-task-selection-seam** [spec: SPEC-lead-task-selection-seam.md] — the
+  lead template gains the opening-an-iteration contract: the lead never selects
+  the unit set — it relays the operator's standing directive (a theme, never a
+  slug list) verbatim in the scope dispatch, scope surveys and re-verifies
+  premises, and the proposed set returns as an ordinary escalation the lead
+  routes. Counterpart paragraph in the scope template; no new slot, shims
+  untouched. Surfaced 2026-07-17 by operator review of the first split-posture
+  lead's own dispatch behavior (a pre-selected menu pre-empting scope's
+  selection contract).
+- **claude-md-housekeeping-residency** [spec: SPEC-claude-md-housekeeping-residency.md] —
+  CLAUDE.md §Housekeeping (72 of 200 always-loaded lines, the only section
+  carrying mechanism inline) sheds its mechanism to a new load-triggered
+  `docs/site-architecture.md` (off-nav by design; the no-owning-kit ruling
+  stands per operator ruling in the amendment), the docs bullet collapsing to a
+  pointer and the whole section swept to one-line-plus-pointer shape;
+  regen-command residency is oracle-safe (each freshness gate's red names its
+  regen command — verified). Surfaced 2026-07-17 by the config-seam-hardening
+  close brevity pass.
+
 ## Technical Debt
+
+- **release-major-criteria-pre-1-0-tension** — order docs/install.md
+  §Versioning's Major bullet and Pre-1.0 qualifier explicitly, per the operator
+  ruling at release-in-lifecycle scope (2026-07-17): the Major criterion is
+  absolute — a decommission earns a major even pre-1.0 — and the qualifier
+  scopes to breaking changes *other than* decommissions riding minors. Keeps
+  release-sweep's no-marker-rides-past-the-major constraint anchored while 0.x.
+  Doc-ordering fix, no new names. Surfaced 2026-07-17 deriving the v0.2.0 bump.
 
 ## Deferred
 
@@ -111,41 +150,6 @@
   2026-07-16 dogfooding a bare `violation.sh` invocation during
   config-seam-hardening build.
 
-- **release-in-iteration-lifecycle** [needs-spec] — releasing is deliberately
-  *outside* the iteration lifecycle today: the five stages tag nothing,
-  `RELEASING.md` is a separate runbook, and CLAUDE.md holds it load-triggered
-  ("resident only at a release"). So an iteration landing phase-B work with no
-  version bump is the machinery working as designed, not an oversight. The
-  operator's directive is to change that design: **release should be
-  incorporated into the iteration methodology — each iteration meeting the
-  criteria should bump the version accordingly.**
-  **Observed cost of today's shape:** `v0.1.0` was tagged 2026-07-14; 141
-  commits have landed since, roughly 38 feat/fix, including many new-or-stricter
-  gates. `docs/posts/` holds exactly two entries (the announcement and the
-  v0.1.0 note). Every one of those iterations met the minor criteria in
-  `docs/install.md` §Versioning and none bumped — the drift is **systemic, not
-  an oversight**, because nothing in the lifecycle asks.
-  **Why it bites specifically:** the upgrade contract's phase B
-  (docs/install.md §The upgrade contract) makes the red set a consumer's
-  migration worklist and the release note the source of intent behind it. With
-  no note, a consumer syncing past v0.1.0 gets reds with no declaration — the
-  contract's second half is unhonorable until a note exists. That is a promise
-  already published, not a nice-to-have.
-  **Open design questions** (this entry carries the question, not a design):
-  does close own the bump, or does a new stage? The criteria are *derived from
-  the release note* (§Versioning reads the bump off the note's two sections), so
-  an iteration-time bump needs the note authored in-iteration — which reorders
-  RELEASING.md's steps 1–3 and touches release-sweep's release-boundary
-  contract. Does every qualifying iteration tag, or does it accrue a pending
-  bump that the release boundary consumes? What happens when an iteration's note
-  sections are both "None"?
-  **Seam:** lifecycle-kit is a shipped kit — the mechanism ships generic, this
-  repo's release policy stays consumer config.
-  A **`v0.2.0` release is being cut immediately** for the existing backlog,
-  separately from this entry: that is the backlog fix, this entry is the
-  forward-looking methodology change. Provenance: operator directive during
-  config-seam-hardening close, 2026-07-17, prompted by the unreleased-backlog
-  gap.
 - **spec-internal-identifier-prefix-drift** [needs-spec] — SPEC prose naming a
   script's **internal** variable spelling where the public knob is the contract
   name. Found by the config-seam-hardening close audit of the
@@ -170,102 +174,6 @@
   low-false-positive gate is the open work, and if it is not, the honest outcome
   is to record that here and leave the class to the audit cadence. Seam: the gate
   is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
-
-- **claude-md-housekeeping-residency** [needs-spec] — CLAUDE.md §Housekeeping is
-  72 of the file's 200 lines — 36% of the always-loaded surface every session
-  pays for — and it is the only section carrying **mechanism inline** rather than
-  one line plus a pointer. Its `docs/` bullet is the bulk: Jekyll layout, the nav
-  Liquid contract and its front-matter keys (`nav_order`, `nav_parent`, `nav_id`,
-  `nav_child_order`, `nav_children_key`), the mirror/rollup regen commands, and
-  the four docs gates. Every line of it is load-triggered by principle — only a
-  session touching `docs/` needs any of it — so it fails
-  **Load-trigger residency**, while the same file's §Conventions and §Delivery
-  doctrine already model the shape it should take.
-  **Cost while deferred:** the standing per-session tax is paid by every session
-  regardless of whether it opens `docs/`, and §Housekeeping is where new
-  mechanism keeps landing (the +13-line always-loaded growth this iteration
-  window), so the share grows without a forcing function.
-  **Why it needs spec, not just an edit:** the block has nowhere to point. This
-  same file declares `docs/` "repo-root-governed, no owning kit", so the
-  de-residency move needs an owner decided first — a `docs/`-local architecture
-  doc, a widened site-kit (which would overturn the no-owning-kit ruling on
-  record), or a split where the gate roster stays and the chrome leaves. Naming
-  that owner is the design question. Related but distinct from the
-  `always-loaded` KPI, which measures the surface and does not judge residency.
-  Surfaced 2026-07-17 by the config-seam-hardening close brevity pass.
-
-- **lead-task-selection-seam** [needs-spec] — the lead template leaves *who
-  selects an iteration's units* unstated, and the gap fills itself the wrong
-  way: a lead reading "its whole authority is dispatch and answers" still has to
-  open an iteration somehow, so it pre-selects and hands scope a finished list.
-  Observed 2026-07-16 on this repo's first split-posture lead, which presented
-  the operator a menu of deferred slugs and dispatched `/scope` with the three
-  chosen. Both halves are wrong against the specs already on record:
-  `lifecycle-kit/templates/skills/scope.md` opens "**Identify tasks**, author
-  design amendments for the items being promoted..." — selection is scope's
-  first job, and a pre-made list pre-empts it — while the ruling-class roster
-  routes "adding, dropping, splitting, deferring, or re-prioritizing a task" to
-  the lead as an *escalation*, i.e. scope proposes, the lead surfaces, the
-  operator rules. The designed path already exists; the lead template just never
-  says to walk it.
-  **Cost while deferred:** the selection is made by the least-informed party
-  from the stalest data. The operator sees `TASK-QUEUE.md`; scope additionally
-  sweeps the GitHub issue/PR boundary and — the sharper half — re-verifies each
-  entry's premise against the current tree, which scope.md already mandates ("a
-  premise inherited from a queued task is a dated hypothesis"). Both bit on the
-  observing iteration: `per-gate-validate-baseline`'s filed premise
-  ("consumer-side only, no kit change expected") was re-verified **false** at
-  scope, so the operator had selected against a description of the task that was
-  not true. A lead-authored menu also adds no information the operator lacks —
-  it restates their own queue view — while costing a round trip.
-  **Why it needs spec, not just a lead that behaves:** the fix is a contract
-  slot, not a habit, or the next lead re-improvises the same shortcut. Open
-  questions the design must settle: does the lead ask the operator for a
-  standing directive first and dispatch a recommending scope only absent one (a
-  directive makes the survey waste — the operator's release ruling this session
-  is the example), or does scope always survey? Does the recommendation become a
-  scope.md contract slot, a lead-template line, or both? What does scope
-  recommend *from* — the queue and the issue boundary are named, but the gap
-  that prompted this entry (an unreleased backlog) sat in neither. Note the
-  machinery already permits the flow: `enter-stage.sh scope` stamps under the
-  unnamed-iteration sentinel and the header stays `—` until scope names it at
-  promotion, so a survey-then-escalate costs no mis-stamp and no wasted entry —
-  verified against this iteration's own commits.
-  **Seam:** lifecycle-kit ships generic mechanism; which posture a consumer runs
-  and who its operator is stay consumer config. Related to
-  `release-in-iteration-lifecycle` — both are the same class (the lead template
-  is silent where a lead must act, so leads improvise), and a spec pass may want
-  them together. Surfaced 2026-07-17 by operator review of the lead's own
-  dispatch behavior.
-
-- **release-major-criteria-pre-1-0-tension** [needs-spec] — `docs/install.md`
-  §Versioning contradicts itself for a pre-1.0 decommission. The **Major**
-  criterion earns a major for "a decommission: a release that *removes* a
-  deprecated surface"; the **Pre-1.0 qualifier** two bullets below says that
-  "while the line is 0.x, breaking changes may ride minors (the semver 0.x
-  convention), each still declared in the note". A decommission *is* a breaking
-  change, so the qualifier arguably licenses riding it on a minor — the exact
-  release the Major criterion reserves for it. Nothing on the page orders the
-  two, so the first pre-1.0 decommission is decided by whichever bullet the
-  reader reaches first.
-  **Cost while deferred:** none binding today and that is precisely the risk —
-  `v0.2.0`'s release-sweep came back empty, so the tension stayed latent and was
-  found only because the sweep was read carefully rather than run. It binds
-  silently on the first release that decommissions anything while still 0.x, at
-  the moment a version number is being chosen under release pressure, and
-  `check-release-bump` cannot catch it: the gate holds only the derivable floor
-  (it reds a patch whose note declares tightened gates or renamed knobs) and the
-  page itself states the major criteria "stay judgment".
-  **The design question** (unanswered): does the pre-1.0 qualifier scope to
-  breaking changes *other than* decommissions, leaving the Major criterion
-  absolute — or does 0.x genuinely suspend the major-on-decommission rule, in
-  which case a decommission's declaration in the note is the whole protection
-  and the release-sweep constraint ("no marker rides into the next major
-  undispositioned") needs re-reading, since pre-1.0 there may be no next major
-  to bind on. Whichever way it resolves, the page must order the two bullets
-  explicitly rather than leave the precedence to reading order. Seam: the
-  versioning model is this repo's own doc, not kit mechanism — no kit ships it.
-  Surfaced 2026-07-17 deriving the `v0.2.0` bump.
 
 - **upgrade-note-nongate-change-slot** [needs-spec] — the release note's grammar
   has no slot for a behavior change that is not a battery gate, so the two most

@@ -4,4 +4,4 @@
 
 ---
 
-— scope a1f92412 2026-07-17
+release-in-lifecycle scope a1f92412 2026-07-17
