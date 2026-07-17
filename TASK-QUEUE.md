@@ -194,6 +194,50 @@
   `always-loaded` KPI, which measures the surface and does not judge residency.
   Surfaced 2026-07-17 by the config-seam-hardening close brevity pass.
 
+- **lead-task-selection-seam** [needs-spec] — the lead template leaves *who
+  selects an iteration's units* unstated, and the gap fills itself the wrong
+  way: a lead reading "its whole authority is dispatch and answers" still has to
+  open an iteration somehow, so it pre-selects and hands scope a finished list.
+  Observed 2026-07-16 on this repo's first split-posture lead, which presented
+  the operator a menu of deferred slugs and dispatched `/scope` with the three
+  chosen. Both halves are wrong against the specs already on record:
+  `lifecycle-kit/templates/skills/scope.md` opens "**Identify tasks**, author
+  design amendments for the items being promoted..." — selection is scope's
+  first job, and a pre-made list pre-empts it — while the ruling-class roster
+  routes "adding, dropping, splitting, deferring, or re-prioritizing a task" to
+  the lead as an *escalation*, i.e. scope proposes, the lead surfaces, the
+  operator rules. The designed path already exists; the lead template just never
+  says to walk it.
+  **Cost while deferred:** the selection is made by the least-informed party
+  from the stalest data. The operator sees `TASK-QUEUE.md`; scope additionally
+  sweeps the GitHub issue/PR boundary and — the sharper half — re-verifies each
+  entry's premise against the current tree, which scope.md already mandates ("a
+  premise inherited from a queued task is a dated hypothesis"). Both bit on the
+  observing iteration: `per-gate-validate-baseline`'s filed premise
+  ("consumer-side only, no kit change expected") was re-verified **false** at
+  scope, so the operator had selected against a description of the task that was
+  not true. A lead-authored menu also adds no information the operator lacks —
+  it restates their own queue view — while costing a round trip.
+  **Why it needs spec, not just a lead that behaves:** the fix is a contract
+  slot, not a habit, or the next lead re-improvises the same shortcut. Open
+  questions the design must settle: does the lead ask the operator for a
+  standing directive first and dispatch a recommending scope only absent one (a
+  directive makes the survey waste — the operator's release ruling this session
+  is the example), or does scope always survey? Does the recommendation become a
+  scope.md contract slot, a lead-template line, or both? What does scope
+  recommend *from* — the queue and the issue boundary are named, but the gap
+  that prompted this entry (an unreleased backlog) sat in neither. Note the
+  machinery already permits the flow: `enter-stage.sh scope` stamps under the
+  unnamed-iteration sentinel and the header stays `—` until scope names it at
+  promotion, so a survey-then-escalate costs no mis-stamp and no wasted entry —
+  verified against this iteration's own commits.
+  **Seam:** lifecycle-kit ships generic mechanism; which posture a consumer runs
+  and who its operator is stay consumer config. Related to
+  `release-in-iteration-lifecycle` — both are the same class (the lead template
+  is silent where a lead must act, so leads improvise), and a spec pass may want
+  them together. Surfaced 2026-07-17 by operator review of the lead's own
+  dispatch behavior.
+
 ## Done
 
 ## Lessons Learned
