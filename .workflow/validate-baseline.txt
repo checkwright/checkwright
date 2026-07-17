@@ -11,6 +11,7 @@ gates check-reads-couples pass
 gates check-kit-enum pass
 gates check-kit-registration pass
 gates check-readme-roster pass
+gates check-smoke-entry-guard pass
 gates check-docs-kit-parity pass
 gates check-docs-nav-reachable pass
 gates check-doctrine-registration pass

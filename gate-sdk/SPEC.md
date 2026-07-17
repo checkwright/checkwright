@@ -364,7 +364,10 @@ across the roster. The
 README item of that checklist carries the register-the-gates block in
 `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
 name-set parity with the kit's shipped `checks/` by `check-readme-roster`
-(§check-readme-roster) — a kit that ships checks registers them. A new kit's
+(§check-readme-roster) — a kit that ships checks registers them. A new gate MAY
+also gain a `pass` row in the held-constant validate baseline —
+evidence-kit/SPEC.md §Baseline manifest tolerates its absence (a classification
+cost only, zero enforcement loss). A new kit's
 bespoke `gate-tests/*.test.sh` sources `lib/test-hermetic.sh`
 (§lib/test-hermetic.sh) — one clause of the same checklist, `check-test-hermetic`
 enforcing it.

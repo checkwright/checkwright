@@ -54,7 +54,11 @@ state, event, or interface the amendment introduces names its **producer**
 config is actually emitted everywhere it must be), its **consumer** (what
 receives it, by what mechanism), updates any **existing integration prose**
 describing the prior flow, and gives every new field a **named reader** (a
-field with no named reader should be removed). A premise inherited from a
+field with no named reader should be removed). Survey those readers across the
+**whole component set**, never a hand-picked subset, and never silence a
+probe's stderr — a `2>/dev/null` on a path grep reads a bad path as "no
+reader", manufacturing the false negative that hides a cross-component reader.
+A premise inherited from a
 queued task ("clean/mechanical", "already filed", "dead code") is a dated
 hypothesis — re-verify it against the current tree before building on it.
 
