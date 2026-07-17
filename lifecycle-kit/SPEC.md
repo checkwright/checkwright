@@ -87,6 +87,20 @@ the default `stage` posture (a stage flip must carry a fresh session; the
 `iteration` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` relaxes exactly this —
 see §check-stage-evidence).
 
+**Same-stage re-entry (N sibling sessions per stage).** Entering the
+currently-stamped stage from a *new* session is legal and appends a fresh
+stamp: `enter-stage.sh`'s idempotence guard keys on the full
+`(iteration, stage, session-id)` triple, so only the *same* session re-entering
+is a no-op, and `check-stage-entry` assertion A keys on the *predecessor* stamp,
+which the stage's first entry satisfied for every sibling. So N sessions may
+enter one stage — a multi-session build, or a lead's intra-stage batch split
+(§templates/lead.md) — serialized by the shared index/HEAD like any concurrent
+sessions; each leaves its own stamp, so per-batch provenance rides the existing
+stamp grammar with no new field. The flip stays once-per-stage: after the first
+entry the `[stage:]` line already reads the current stage, so a sibling's
+`enter-stage.sh` rewrites it to the same value (a no-op flip) and only its stamp
+lands.
+
 **The optional lead never becomes a second state source.** An iteration may run
 with a live *lead* session (§templates/lead.md) that dispatches its stage
 sessions and answers their escalations so a blocked stage resumes in place
@@ -629,9 +643,13 @@ cross-stage invariant, active at the default `stage` posture of
 `LIFECYCLE_KIT_SESSION_BOUNDARY` (§Layout and configuration): within the
 current iteration, two *different* stages may not share one session id — a
 stage flip is a context boundary and demands a fresh session, so a duplicate
-(e.g. build == validate) is a self-reported skip and fails. Same-stage
-re-entries (a multi-session build) may share or rotate ids freely, and
-waiver-token stamps are exempt (never a stage, so never in the map). At the
+(e.g. build == validate) is a self-reported skip and fails. The rule constrains
+*cross-stage* sharing only: **same-stage re-entries are in-contract** — a
+multi-session build, or a lead's N sibling batch sessions of one stage
+(§The state machine), may share or rotate ids freely, a sanctioned pattern
+rather than merely unpunished. This owner-doc statement is the home of the rule
+the gate's own distinctness message echoes. Waiver-token stamps are exempt
+(never a stage, so never in the map). At the
 `iteration` posture the gate skips only this distinctness map; stamp grammar,
 staleness, sentinel scoping, and the current-stage coverage stamp hold
 identically, and a reused session id remains on the audit trail — it just
@@ -1013,7 +1031,11 @@ the split-where-the-tail-dominates rule, the unified posture's handoff compact,
 and operator-suggested compacts at the acceptance
 boundaries that pay under the cold-wakes-times-compressible-residue rule —
 with the dispatch-granularity rule (batch units sharing a kit or SPEC
-surface, split on a model-tier change or a delegation-kit split trigger), and
+surface, split on a model-tier change or a delegation-kit split trigger) and
+the lead-owns-batching clause (an intra-stage batch split is N sibling stage
+sessions the lead dispatches and validates — each a same-stage re-entry,
+§The state machine — and a stage session never dispatches a sibling stage
+session), and
 the stamps-authoritative invariant carried from §The state machine as the
 design's load-bearing rule — with its two corollaries: the lead never
 hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it

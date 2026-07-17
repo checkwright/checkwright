@@ -95,7 +95,11 @@ prices. To drive an iteration under it:
    agent stays resumable afterward as the iteration's **intent oracle**.
 3. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
-   unchanged, on the tier the stage-session agent definition pins.
+   unchanged, on the tier the stage-session agent definition pins. A stage whose
+   work splits into batches is N sibling stage sessions the lead dispatches and
+   validates (each a same-stage re-entry), never a stage session sub-dispatching
+   its own siblings (`lifecycle-kit/SPEC.md §templates/lead.md`, the
+   lead-owns-batching clause).
 4. **A blocked stage escalates to the lead and resumes in place** rather than
    restarting cold. The lead rules machinery questions itself; a question
    about the iteration's *intent* it forwards — with the working-state excerpt

@@ -187,6 +187,20 @@ consequences:
   context is actually common; split where the model tier changes or a
   delegation-kit split trigger fires — per-batch model tiering is the dominant
   window lever, not token counts.
+- **An intra-stage batch split is the lead's to own.** When a stage's work
+  splits into batches, those batches are **N sibling stage sessions the lead
+  dispatches and validates** — each entering through `enter-stage.sh` as a
+  same-stage re-entry (lifecycle-kit/SPEC.md §The state machine: N sessions may
+  enter one stage, the flip a no-op after the first, each leaving its own
+  stamp). A stage session **never dispatches a sibling stage session**: a stage
+  that sub-dispatches its own batches nests a second supervisor at the lead's
+  tier, hidden from its budget and context accounting — the redundancy the split
+  posture exists to remove, and the clause is a dispatched stage's authority to
+  refuse. Read-only fan-outs inside a stage stay sanctioned (the delegation
+  nudge; CLAUDE.md §Agent execution). The batching *criteria* are the
+  shared-surface rule above, unchanged; this adds only the owner — the lead
+  serializes sibling batches that share a surface and may parallelize those that
+  do not, subject to the shared-index discipline.
 - **Batch escalations.** The decision shape makes batching natural — a stage
   session collects its open questions and sends them in one turn.
 - **Split the lead where the tail dominates.** Most of a lead's turns are

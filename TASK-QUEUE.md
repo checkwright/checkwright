@@ -12,14 +12,6 @@
 
 ## New Features
 
-- **intra-stage-batch-supervision** [spec: SPEC-stage-batch-supervision.md] —
-  state same-stage re-entry in the SPEC (verified at promotion: enter-stage
-  idempotence keys on the full iter/stage/session triple, assertion A on the
-  predecessor stamp, so N sibling sessions may enter one stage) and land the
-  lead-owns-batching clause in lead.md §Economics: an intra-stage batch split
-  is N sibling stage sessions the lead dispatches and validates, never a
-  stage session sub-dispatching its own siblings. Design and rationale: the
-  amendment. Surfaced 2026-07-17 in the release-in-lifecycle session (kfric).
 - **upgrade-note-nongate-change-slot** [spec: SPEC-behavior-changes-slot.md] —
   add the release note's third fixed section, **Behavior changes** (stated
   `None` default), for shipped changes no battery gate expresses;
@@ -233,5 +225,6 @@
 ## Done
 
 - mid-iteration-gap-channel-seam
+- intra-stage-batch-supervision
 
 ## Lessons Learned
