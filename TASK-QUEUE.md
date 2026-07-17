@@ -111,10 +111,89 @@
   2026-07-16 dogfooding a bare `violation.sh` invocation during
   config-seam-hardening build.
 
-## Done
+- **release-in-iteration-lifecycle** [needs-spec] — releasing is deliberately
+  *outside* the iteration lifecycle today: the five stages tag nothing,
+  `RELEASING.md` is a separate runbook, and CLAUDE.md holds it load-triggered
+  ("resident only at a release"). So an iteration landing phase-B work with no
+  version bump is the machinery working as designed, not an oversight. The
+  operator's directive is to change that design: **release should be
+  incorporated into the iteration methodology — each iteration meeting the
+  criteria should bump the version accordingly.**
+  **Observed cost of today's shape:** `v0.1.0` was tagged 2026-07-14; 141
+  commits have landed since, roughly 38 feat/fix, including many new-or-stricter
+  gates. `docs/posts/` holds exactly two entries (the announcement and the
+  v0.1.0 note). Every one of those iterations met the minor criteria in
+  `docs/install.md` §Versioning and none bumped — the drift is **systemic, not
+  an oversight**, because nothing in the lifecycle asks.
+  **Why it bites specifically:** the upgrade contract's phase B
+  (docs/install.md §The upgrade contract) makes the red set a consumer's
+  migration worklist and the release note the source of intent behind it. With
+  no note, a consumer syncing past v0.1.0 gets reds with no declaration — the
+  contract's second half is unhonorable until a note exists. That is a promise
+  already published, not a nice-to-have.
+  **Open design questions** (this entry carries the question, not a design):
+  does close own the bump, or does a new stage? The criteria are *derived from
+  the release note* (§Versioning reads the bump off the note's two sections), so
+  an iteration-time bump needs the note authored in-iteration — which reorders
+  RELEASING.md's steps 1–3 and touches release-sweep's release-boundary
+  contract. Does every qualifying iteration tag, or does it accrue a pending
+  bump that the release boundary consumes? What happens when an iteration's note
+  sections are both "None"?
+  **Seam:** lifecycle-kit is a shipped kit — the mechanism ships generic, this
+  repo's release policy stays consumer config.
+  A **`v0.2.0` release is being cut immediately** for the existing backlog,
+  separately from this entry: that is the backlog fix, this entry is the
+  forward-looking methodology change. Provenance: operator directive during
+  config-seam-hardening close, 2026-07-17, prompted by the unreleased-backlog
+  gap.
+- **spec-internal-identifier-prefix-drift** [needs-spec] — SPEC prose naming a
+  script's **internal** variable spelling where the public knob is the contract
+  name. Found by the config-seam-hardening close audit of the
+  `internal-identifier-restatement` roster class, and fixed there: seven sites
+  in delegation-kit/SPEC.md named `PAUSE_PCT`, `PAUSE_PCT_7D`, `LOGIN_WINDOW`,
+  `REFRESH_CMD`, `REFRESH_MIN_AGE` — each of which exists in
+  `bin/usage-verdict.sh` only as a local assigned straight from its
+  `DELEGATION_KIT_`-prefixed env knob. The same doc's §Layout roster names the
+  prefixed spelling correctly, so the drift was prose-vs-roster *within one
+  file*.
+  **Cost while deferred:** the fix is a rename away from rotting — renaming the
+  local in the script silently falsifies the prose, and only the roster class's
+  audit cadence catches it, at iteration granularity.
+  The parent class is on the audit roster precisely because it is **un-gateable**
+  (public contract names are legitimate citations). This entry is the narrower
+  sub-class that does look gateable: a backtick-quoted `^[A-Z][A-Z0-9_]*$` token
+  in a kit SPEC that appears in that kit's source *only* as a local assigned from
+  a `<KIT>_`-prefixed env var must be cited by its prefixed spelling. The
+  prefixed counterpart's existence is what bounds the false-positive surface — an
+  internal constant with no public counterpart never fires. Needs spec because
+  that boundary is the whole design: proving it is tight enough for a
+  low-false-positive gate is the open work, and if it is not, the honest outcome
+  is to record that here and leave the class to the audit cadence. Seam: the gate
+  is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
 
-- demand-driven-usage-refresh
-- per-gate-validate-baseline
-- prose-tell-abbr-append
+- **claude-md-housekeeping-residency** [needs-spec] — CLAUDE.md §Housekeeping is
+  72 of the file's 200 lines — 36% of the always-loaded surface every session
+  pays for — and it is the only section carrying **mechanism inline** rather than
+  one line plus a pointer. Its `docs/` bullet is the bulk: Jekyll layout, the nav
+  Liquid contract and its front-matter keys (`nav_order`, `nav_parent`, `nav_id`,
+  `nav_child_order`, `nav_children_key`), the mirror/rollup regen commands, and
+  the four docs gates. Every line of it is load-triggered by principle — only a
+  session touching `docs/` needs any of it — so it fails
+  **Load-trigger residency**, while the same file's §Conventions and §Delivery
+  doctrine already model the shape it should take.
+  **Cost while deferred:** the standing per-session tax is paid by every session
+  regardless of whether it opens `docs/`, and §Housekeeping is where new
+  mechanism keeps landing (the +13-line always-loaded growth this iteration
+  window), so the share grows without a forcing function.
+  **Why it needs spec, not just an edit:** the block has nowhere to point. This
+  same file declares `docs/` "repo-root-governed, no owning kit", so the
+  de-residency move needs an owner decided first — a `docs/`-local architecture
+  doc, a widened site-kit (which would overturn the no-owning-kit ruling on
+  record), or a split where the gate roster stays and the chrome leaves. Naming
+  that owner is the design question. Related but distinct from the
+  `always-loaded` KPI, which measures the surface and does not judge residency.
+  Surfaced 2026-07-17 by the config-seam-hardening close brevity pass.
+
+## Done
 
 ## Lessons Learned

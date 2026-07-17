@@ -38,3 +38,4 @@
 | launch-readiness | s a b v c | 4f/0d | 0 | 20s 1✗ | 74 |
 | env-probe-refresh | s · b v c | 1f/0d | 2 · ≤0d | 20s clean | 74 |
 | lifecycle-machinery | s a b v c | 6f/2d | 2 · ≤0d | 21s 1✗ | 74 |
+| config-seam-hardening | s a b v c | 4f/0d | 3 · ≤1d | 20s clean | 74 |
