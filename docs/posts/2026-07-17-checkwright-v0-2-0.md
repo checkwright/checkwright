@@ -98,9 +98,12 @@ green validate goes red and names the scenario: that is the gap surfacing, not a
 regression. An absent `pass` is the stated classification cost and an absent
 `ignore` is a non-verdict; neither is a red.
 
-One smaller note for guard-kit consumers: the ruleset gains a rule steering a
-bare `rm` of a tracked path to `git rm`, so a command that previously passed the
-bash guard now blocks with that suggestion.
+Two smaller notes, neither asking anything of you. For guard-kit consumers: the
+ruleset gains a rule steering a bare `rm` of a tracked path to `git rm`, so a
+command that previously passed the bash guard now blocks with that suggestion.
+For delegation-kit consumers: `bin/usage-verdict.sh` compares its pause
+thresholds at-or-over rather than strictly over, so a window sitting exactly on
+a threshold now pauses where it previously proceeded.
 
 If a gate reds that this note does not name, the upgrade smoke was supposed to
 catch it first — [open an issue](https://github.com/checkwright/checkwright/issues),
