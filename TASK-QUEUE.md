@@ -80,6 +80,37 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+- **smoke-violation-fail-open** [needs-spec] — the consumer-smoke
+  `violation.sh` scripts fail **open**: run outside their entry point they
+  mutate the invoking repo. The asymmetry is at the read sites —
+  `smoke/install.sh` opens with `: "${SMOKE_KIT_ROOT:?run via
+  run-consumer-smoke.sh}"` and refuses; `smoke/violation.sh` carries no guard
+  and proceeds. Blast radius is the whole roster: nine kits ship an unguarded
+  violation script — gate-sdk, lifecycle-kit, queue-kit, evidence-kit,
+  delegation-kit, context-kit, doctrine-kit, site-kit, canon-kit — and
+  delegation-kit's goes further, `git add`-ing into the index a concurrent
+  session shares. Observed, not theorized: a bare invocation wrote
+  `scripts/check-smoke-gate.sh` and `product/app.txt` into the real tree and
+  staged both; the pre-commit foreign-path check caught it and nothing reached
+  a commit.
+  **Cost while deferred:** every bare `violation.sh` invocation stays a live
+  contamination hazard whose only backstop fires *after* the mutation, and the
+  class stays ungated — a new kit inherits the gap silently.
+  The missing check class is **smoke-script-fails-open**: a kit script that
+  mutates the invoking repo when run outside its entry point. Ruled shape (b),
+  on record: the guard **plus** a gate-sdk §Consumer smoke contract sentence
+  and a meta-gate asserting it across the roster, the way the fixture-pair and
+  fail-closed contracts already are — `install.sh`'s guard is the shipped
+  precedent. Enforcement-first: the fix and the gate that catches it land in
+  one unit, and a contract sentence plus a meta-gate is what removes the
+  duplication of the guard's claim across nine hand-copied sites. Guarding the
+  nine alone was rejected — it leaves the class ungated, so kit #10 ships
+  unguarded; flagging without filing was rejected under the gap-disposition
+  doctrine, and this entry is that filing. Seam: the guard and the contract are
+  kit mechanism; nothing consumer-specific belongs in either. Surfaced
+  2026-07-16 dogfooding a bare `violation.sh` invocation during
+  config-seam-hardening build.
+
 ## Done
 
 - demand-driven-usage-refresh
