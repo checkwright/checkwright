@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-release-in-lifecycle release v0.3.0 — minor: close gains a required release-disposition step and opt-in LIFECYCLE_KIT_BOUNDARY_REQUIRE enforcement plus the lead/scope opening-an-iteration contract — consumer must reconcile, no decommission
