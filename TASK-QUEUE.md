@@ -246,6 +246,77 @@
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
 
+- **intra-stage-batch-supervision** [needs-spec] — who supervises a stage that
+  splits into multiple batches, and whether the machinery permits it. Two
+  coupled halves surfaced this session.
+  **(1) The doctrine.** lifecycle-kit/templates/lead.md §Economics says "batch
+  dispatches by shared surface" but never states who supervises *intra-stage*
+  batching. A multi-batch stage (e.g. build's enforcement cluster plus a
+  mechanical docs cluster) should be N sibling stage-sessions the **lead**
+  dispatches and validates, not one stage-session that sub-dispatches — the
+  latter nests a redundant second supervisor at the same tier, hidden from the
+  lead's budget/context accounting. Proposed default: **lead-owns-batching**;
+  reserve stage sub-dispatch for the read-only fan-outs a stage genuinely needs
+  (the delegation nudge already sanctions those).
+  **(2) The enabling precondition — verify oracle-first.** enter-stage.sh
+  same-stage re-entry semantics are undocumented: when the lead dispatches a
+  second /build session into an already-`[stage: build]` header, is the flip a
+  stamp-refresh (which *licenses* lead multi-session stage dispatch) or a
+  refusal? The SPEC must state which, and the answer must be verified against
+  `check-stage-entry` / enter-stage.sh before the doctrine relies on it — a
+  refusal would make lead-owns-batching unreachable without a machinery change.
+  **Cost while deferred:** the batching posture stays unstated, so a stage under
+  budget pressure improvises (this session's lead felt exactly this pull), and
+  the re-entry behavior is trusted by assumption rather than by oracle.
+  Surfaces: lifecycle-kit/templates/lead.md §Economics, lifecycle-kit/SPEC.md
+  §The state machine (re-entry semantics), the delegation-kit stage-vs-lead
+  dispatch boundary. Surfaced 2026-07-17 in the release-in-lifecycle session
+  (kfric).
+
+- **background-credential-swap-support** [needs-spec] — first-class support for
+  swapping the Anthropic OAuth credential out from under in-flight agents (to
+  spread burn across accounts), which the budget oracle does not model today.
+  Four components, worst-first; all delegation-kit SPEC+code, all demand-gated
+  (no one swaps in background yet — this is the roadmap marker).
+  **(a) Detection.** usage-verdict's auth-change reroute fires only on
+  CRED_FILE mtime, so an out-of-band / env-var / path token swap that does not
+  rewrite that file bypasses it — the verdict trusts the prior account's
+  snapshot and the poller re-fetches the stale file's token. Broaden the reroute
+  to also fire when the live account identity (oauthAccount.accountUuid /
+  subscriptionType) differs from the snapshot's `account=` / `tier=`, forcing a
+  re-poll on any swap.
+  **(b) Evidence.** the `.metric/` trend samples already carry `account=` /
+  `tier=`, but the wave-over-wave burn projection reads the tail
+  **unpartitioned**, so a swap reads as a spurious used% drop that corrupts the
+  projection and masks aggregate load. Segment usage analysis by `account=` and
+  mark the swap boundary in the trend log so the evidence is per-account-honest.
+  **(c) Safety.** the budget guard's premise is one account = one rate window
+  per wave; background rotation moves the wall in-flight agents bill against and
+  lets rotation collectively exceed what any single account's 5h/7-day PAUSE
+  would allow while each account stays individually under threshold. Add a
+  cross-account aggregate view so supported swapping cannot silently blow past
+  the true combined ceiling.
+  **(d) Signal-quality refinement (advisory, not a bug).** the post-login
+  reroute (`DELEGATION_KIT_LOGIN_WINDOW`) is correctly advisory-only — STALE
+  never blocks (delegation-kit/SPEC.md §The staleness contract, lines 62-64 and
+  207-208), so this is signal quality, not a dispatch-blocking defect. Two
+  points: the window default is 600s while the SPEC's own stated server-lag is
+  "about a minute" (SPEC line 245), a ~10x margin worth tightening; and it is a
+  **blanket** time-window where an **account-keyed** check is sharper — trust
+  `usage.txt` when its `account=` matches the current credential's account AND
+  `updated_at > login_at`, with a short (~90s) settling floor for the server
+  lag. That restores the true reading in ~1 min instead of 10 and stops 10 min
+  of STALE samples polluting the trend log (`.metric/usage-history.log`) — which
+  directly sharpens (b).
+  **Cost while deferred:** any background swap today silently corrupts the burn
+  projection and can breach the combined budget ceiling with every account
+  reading individually safe; and the login window over-STALEs by ~10x.
+  **Seam:** all four are generic delegation-kit mechanism — the account-id is
+  already on the `usage.txt` contract; nothing consumer-specific is added. This
+  is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
+  cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
+  (kfric plus one operator-raised refinement).
+
 ## Done
 
 - release-major-criteria-pre-1-0-tension
