@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: concurrency-hardening  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,34 @@
 ---
 
 ## New Features
+
+- **mid-iteration-gap-channel-seam** [spec: SPEC-mid-iteration-gap-channel.md]
+  — extract the fast-mutating `[stage:]` cursor out of the queue header (the
+  evidence file's last stamp becomes the cursor's single source; the flip
+  dies), and give mid-iteration gap filing a committed append-only channel
+  (`.workflow/gap-inbox.md` + `bin/file-gap.sh`, drained at close, refused
+  non-empty at the iteration boundary) — kfric stays the narrow
+  knowledge-friction sensor (its log is `.workflow/knowledge-friction.log`,
+  gitignored per-clone, which is exactly why it is the wrong backlog channel).
+  Design, causal map, and the queue-write doctrine: the amendment. Surfaced
+  2026-07-17 in the release-in-lifecycle lead session under live shared-index
+  pressure.
+- **intra-stage-batch-supervision** [spec: SPEC-stage-batch-supervision.md] —
+  state same-stage re-entry in the SPEC (verified at promotion: enter-stage
+  idempotence keys on the full iter/stage/session triple, assertion A on the
+  predecessor stamp, so N sibling sessions may enter one stage) and land the
+  lead-owns-batching clause in lead.md §Economics: an intra-stage batch split
+  is N sibling stage sessions the lead dispatches and validates, never a
+  stage session sub-dispatching its own siblings. Design and rationale: the
+  amendment. Surfaced 2026-07-17 in the release-in-lifecycle session (kfric).
+- **upgrade-note-nongate-change-slot** [spec: SPEC-behavior-changes-slot.md] —
+  add the release note's third fixed section, **Behavior changes** (stated
+  `None` default), for shipped changes no battery gate expresses;
+  `check-release-bump` is the mechanical reader (presence + the minor bump
+  floor), existing notes backfilled, allowed-red stays battery-defined with
+  the honest limit stated. Demand: the class recurred — two such changes in
+  `v0.2.0`, two more in `v0.4.0`. Design and ruled-out alternatives: the
+  amendment. Surfaced 2026-07-17 authoring the `v0.2.0` note.
 
 ## Technical Debt
 
@@ -105,77 +133,6 @@
   is to record that here and leave the class to the audit cadence. Seam: the gate
   is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
 
-- **upgrade-note-nongate-change-slot** [needs-spec] — the release note's grammar
-  has no slot for a behavior change that is not a battery gate, so the two most
-  consequential changes in `v0.2.0` could not be declared where a mechanical
-  reader looks. `docs/install.md` §The upgrade contract fixes two sections:
-  **Tightened gates** ("one bullet per gate that landed new or got stricter, the
-  gate name the bullet's lead token" — read mechanically as the release's
-  allowed-red set) and **Renamed knobs**. Neither can express: (a) the
-  config-seam fail-closed convergence, where `gate-sdk/lib/gate.sh` is sourced by
-  every gate so a set-but-missing `<KIT>_CONFIG_FILE` reds the whole battery at
-  once — no single gate name to lead a bullet with, and enumerating the roster
-  would be a lie about what moved; or (b) `ek_diff`'s fail-closed convergence,
-  which reds `bin/run-validate.sh` — not a battery gate, so it has no place in a
-  set defined as the battery's allowed reds. Both went to the note's Upgrading
-  prose, which is the honest call under the grammar (over-declaring is safe for
-  the upgrade smoke but pollutes the contract) and is why this is a grammar gap
-  rather than an authoring defect.
-  **Cost while deferred:** a consumer reading the two sections mechanically —
-  which the contract invites, since the lead tokens are specified as machine-read
-  — misses every non-gate change, and `gate-sdk/bin/upgrade-smoke.sh` cannot
-  assert containment for them because its assertion is defined over the battery's
-  red set. The prose carrying them is unenforced: no gate holds it, so the next
-  release's non-gate change lands in prose or nowhere by the author's judgment
-  alone. The class is not rare — `v0.2.0` produced two in one release.
-  **The design question** (unanswered): a third fixed section (a "Behavior
-  changes" body with its own lead-token grammar and a `None` default, parseable
-  the way the first two are), versus widening the allowed-red set's definition
-  past the battery to any shipped runner, versus ruling the prose sufficient and
-  saying so on the page so the silence is a decision rather than an omission. If
-  a third section, it needs a reader before it is worth a grammar: a field with
-  no named reader should not exist, and today upgrade-smoke is the only
-  mechanical reader in sight. Seam: the note grammar is this repo's doc; the
-  upgrade smoke that reads it is gate-sdk mechanism, so a grammar change lands on
-  both sides of the seam and must keep the kit half generic. Surfaced 2026-07-17
-  authoring the `v0.2.0` note.
-
-- **mid-iteration-gap-channel-seam** [needs-spec] — should mid-iteration
-  gap-filing be routed off `TASK-QUEUE.md`, with only `/scope` (open) and
-  `/close` (dispose) writing the queue, and if so through what channel? Surfaced
-  live in the release-in-lifecycle lead session: with a build stage-session
-  holding the shared git index, every mid-iteration queue write races it, so the
-  lead filed gaps via kfric as a workaround — which raised whether that should be
-  doctrine, and whether it serves the multi-operator goal.
-  **Two separable decisions — do not conflate:** (1) *Restrict queue writes to
-  scope/close.* Precondition: the `[stage:]` cursor lives in the queue header and
-  is flipped at **every** stage entry, so "only scope/close touch the queue" is
-  unreachable until the fast-mutating cursor is **extracted out of the queue
-  body** (into `.workflow/WORKFLOW-STATE.txt`, where the stamp already lives, or a
-  dedicated cursor file). That slow-backlog vs fast-cursor split is what actually
-  reduces multi-operator queue contention, and is worth doing independent of the
-  channel choice. (2) *Choice of diversion channel.* kfric is the **wrong**
-  channel for a multi-operator goal: `.metric/` is gitignored + account-bearing
-  (the provenance seam), a **per-clone local buffer** that fragments the backlog
-  across operators until close triages and pushes. Multi-operator wants a
-  **committed** append-only channel — a per-session gap file close drains, or a
-  conflict-free queue "inbox" region. Keep kfric as the **narrow
-  knowledge-friction sensor** it is (`kfric N` means "facts with no home");
-  overloading it as the general backlog inbox dilutes that signal — the lead did
-  exactly this dilution under index pressure this session, evidence of the
-  pressure, not that kfric is the right permanent home.
-  **Multi-operator finding:** kfric-as-primary does **not** enforce or help
-  multi-operator — it slightly harms it (local fragmentation). What enables
-  concurrent operators is decision (1) plus a committed channel from (2); the two
-  are independent, pick each on its own merits.
-  **Recommendation:** (a) extract the stage cursor from the queue body; (b) if
-  diverting mid-iteration filing, use a committed channel, not kfric; (c) preserve
-  kfric's narrow friction-sensor role. Surfaces: lifecycle-kit/SPEC.md (state
-  machine / queue-ownership — the `[stage:]` cursor location), drift-kit/SPEC.md
-  §The knowledge-friction loop (kfric contract and scope), delegation-kit
-  shared-file-roster (`TASK-QUEUE.md` contention). Surfaced 2026-07-17 in the
-  release-in-lifecycle lead session under live shared-index pressure.
-
 - **heterogeneous-agent-delegation** [needs-spec] — cross-vendor stage dispatch:
   a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
   (Codex, etc.), extending the homogeneous multi-agent / multi-operator model to a
@@ -214,33 +171,6 @@
   cross-vendor dispatch need attests; until then this is the roadmap marker.
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
-
-- **intra-stage-batch-supervision** [needs-spec] — who supervises a stage that
-  splits into multiple batches, and whether the machinery permits it. Two
-  coupled halves surfaced this session.
-  **(1) The doctrine.** lifecycle-kit/templates/lead.md §Economics says "batch
-  dispatches by shared surface" but never states who supervises *intra-stage*
-  batching. A multi-batch stage (e.g. build's enforcement cluster plus a
-  mechanical docs cluster) should be N sibling stage-sessions the **lead**
-  dispatches and validates, not one stage-session that sub-dispatches — the
-  latter nests a redundant second supervisor at the same tier, hidden from the
-  lead's budget/context accounting. Proposed default: **lead-owns-batching**;
-  reserve stage sub-dispatch for the read-only fan-outs a stage genuinely needs
-  (the delegation nudge already sanctions those).
-  **(2) The enabling precondition — verify oracle-first.** enter-stage.sh
-  same-stage re-entry semantics are undocumented: when the lead dispatches a
-  second /build session into an already-`[stage: build]` header, is the flip a
-  stamp-refresh (which *licenses* lead multi-session stage dispatch) or a
-  refusal? The SPEC must state which, and the answer must be verified against
-  `check-stage-entry` / enter-stage.sh before the doctrine relies on it — a
-  refusal would make lead-owns-batching unreachable without a machinery change.
-  **Cost while deferred:** the batching posture stays unstated, so a stage under
-  budget pressure improvises (this session's lead felt exactly this pull), and
-  the re-entry behavior is trusted by assumption rather than by oracle.
-  Surfaces: lifecycle-kit/templates/lead.md §Economics, lifecycle-kit/SPEC.md
-  §The state machine (re-entry semantics), the delegation-kit stage-vs-lead
-  dispatch boundary. Surfaced 2026-07-17 in the release-in-lifecycle session
-  (kfric).
 
 - **background-credential-swap-support** [needs-spec] — first-class support for
   swapping the Anthropic OAuth credential out from under in-flight agents (to
