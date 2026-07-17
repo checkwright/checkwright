@@ -31,6 +31,16 @@ Knobs, this repo's surface names as defaults:
   under `EVIDENCE_KIT_TMP_DIR`, default gate-sdk's `.tmp`).
 - `EVIDENCE_KIT_PARSER` — a parser adapter name or a consumer command mapping a
   captured log to `<scenario> <pass|fail|ignore>` lines; default `exit-code`.
+- `EVIDENCE_KIT_PARSER_<suite>` — a per-suite parser override with the same
+  value grammar; default unset, an unset suite falling through to the global
+  knob. The name mirrors the `EVIDENCE_KIT_RUN_<suite>` convention. Suite
+  granularity is a floor, not a ceiling: a suite whose runner reports per-case
+  results carries a parser that says so, while its siblings keep the global
+  adapter. This repo dogfoods it on the `gates` suite —
+  `scripts/parse-gates-log.sh` maps the verbose `run-gates` log to one scenario
+  per registered gate, so an existing gate turning red diffs as a new failure
+  even while a sibling gate is legitimately held red; the whole-battery
+  `exit-code` scenario could not tell those apart.
 - `EVIDENCE_KIT_SCENARIO_GLOBS` — optional per-suite globs; configuring one
   arms the manifest↔disk set-equality assertion for that suite.
 - `EVIDENCE_KIT_BASELINE_FILE` (default `.workflow/validate-baseline.txt`),
@@ -62,8 +72,29 @@ gate-sdk vendored beside it.
 The parser adapters map a captured log — and, for `exit-code`, the suite's exit
 status — to `<scenario> <pass|fail|ignore>` lines: `libtest` reads per-test
 result lines (a Rust `cargo test` suite), `exit-code` emits one scenario per
-suite keyed off the suite command's exit (the adapter this repo dogfoods). Any
-other value is a consumer command run on the log.
+suite keyed off the suite command's exit. Any other value is a consumer command
+run on the log.
+
+Which adapter a suite gets is resolved by `ek_parser_for <suite>`
+(`EVIDENCE_KIT_PARSER_<suite>`, else the global `EVIDENCE_KIT_PARSER`), and the
+dispatch lives inside `ek_parse` — so both spine callers, `run-validate` and
+`diff-baseline`, inherit per-suite parsing with no edit of their own. The
+resolution is a named helper rather than private to `ek_parse` because
+`run-validate`'s produced-no-result diagnostic must name the *effective* parser:
+naming the global while an override produced the empty result would misreport
+exactly the guard the per-gate baseline leans on.
+
+A consumer parser command receives the log path alone — no suite name, no exit
+status. That is deliberate: passing suite+status to every consumer command would
+add fields most parsers never read (a field with no reader is removed), and a
+consumer needing exit-code semantics for a suite simply leaves that suite on the
+global adapter.
+
+Neither adapter is a gate, so the library's branches are covered by
+`gate-tests/evidence-lib.test.sh`: the per-suite dispatch with its global
+fall-through, and `ek_diff`'s absent-from-baseline triple. The triple's `ignore`
+edge carries a test of its own — the narrow side is the half a later session
+widens by accident, so it is pinned by an assertion rather than by prose alone.
 
 ### Baseline manifest
 
@@ -77,6 +108,16 @@ is a human commit, which is what keeps the baseline honest.
 A scenario absent from the baseline fails closed: the diff treats its failure
 as a new failure, so a missing `pass` row loses no enforcement — its cost is
 classification (a regression reads as a new scenario), not a silent green.
+
+The rule keys on `fail`, never on non-pass. For a scenario with no baseline row,
+observed `fail` is a new failure; observed `pass` is the classification cost
+above, no red; observed `ignore` is **silent** — an ignored test is a non-verdict,
+with no assertion here to converge on. Widening to non-pass would redden a
+libtest consumer's newly-added `#[ignore]` test: a fail-closed appetite for
+absent `ignore` is a separate argued change with its own delta to this section,
+never a rider. The skip demotion (§bin/diff-baseline.sh) stays a baseline-row
+concern and does not reach absent scenarios — a skip-demoted observed `pass`
+absent from the baseline falls under the classification-cost rule.
 
 ### Evidence manifest
 
@@ -112,7 +153,9 @@ not an empty diff. Its own exit is non-zero when any suite records
 The situational runtime diff, not a precommit gate: it takes captured logs as
 arguments, parses each, and diffs against the baseline slice per-scenario. A
 baseline `pass` scenario red-or-absent is a new failure; a baseline `fail` or
-`ignore` scenario running green is an unpromoted recovery; the split is
+`ignore` scenario running green is an unpromoted recovery; an observed `fail`
+with no baseline row at all is a new failure (§Baseline manifest's fail-closed
+rule, which keys on `fail` alone). The split is
 per-scenario, so a regression and a recovery cannot net to zero. It reads the
 skip side-channel (`EVIDENCE_KIT_SKIP_FILE`, truncated per run) to demote a
 self-skipped scenario from pass first, so a self-skip cannot masquerade as a
@@ -189,6 +232,14 @@ evidence line proves the green result once the suites have run.
   `check-evidence-baseline` (grammar, liveness, coverage).
 - **Skip record** — produced by a consumer harness that self-skips a scenario;
   consumed by `diff-baseline.sh`. An absent file means no skips.
+- **Per-suite parser override** — produced by consumer config
+  (`EVIDENCE_KIT_PARSER_<suite>`); read by `ek_parser_for`, and so by the
+  `ek_parse` dispatch and `run-validate`'s effective-parser diagnostic, reaching
+  both spine tools.
+- **Scenario line** — produced by the resolved parser from the captured log;
+  consumed by `ek_diff` (the per-scenario diff) and by the evidence line's
+  `pass=`/`fail=`/`ignore=` counts. Per-gate granularity changes the line's
+  population, not its shape, so those readers are unchanged.
 - **Truncation** — produced by `enter-stage.sh` at the scope boundary reading
   `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`; consumed by assertion (B)'s foreign-iteration
   test, which is what makes skipping it visible.

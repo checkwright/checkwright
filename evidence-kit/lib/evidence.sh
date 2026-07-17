@@ -77,9 +77,16 @@ ek_run_key() {
     printf '%s\n' "$EVIDENCE_KIT_RUN_ID"
 }
 
+# spec: evidence-kit/SPEC.md §Layout and configuration — the per-suite parser override resolves ahead of the global knob; a named helper because run-validate's diagnostic names the effective parser, not the global
+ek_parser_for() {
+    local var="EVIDENCE_KIT_PARSER_$1"
+    printf '%s\n' "${!var:-$EVIDENCE_KIT_PARSER}"
+}
+
 # spec: evidence-kit/SPEC.md §lib/evidence.sh — parser adapters map a captured log (+ the suite's exit status) to '<scenario> <pass|fail|ignore>' lines; two ship built-in, any other value is a consumer command run on the log
 ek_parse() {
-    local parser="$1" suite="$2" log="$3" status="$4"
+    local suite="$1" log="$2" status="$3" parser
+    parser="$(ek_parser_for "$suite")"
     case "$parser" in
         exit-code)
             if [[ "$status" -eq 0 ]]; then printf '%s pass\n' "$suite"; else printf '%s fail\n' "$suite"; fi
@@ -105,10 +112,10 @@ ek_data_lines() {
     grep -Ev '^[[:space:]]*(#|$)' "$1" 2>/dev/null || true
 }
 
-# spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — the per-scenario diff shared by run-validate (verdict) and diff-baseline (findings): a baseline 'pass' scenario red-or-absent is a new-failure; a baseline 'fail'/'ignore' scenario observed green is an unpromoted recovery; a self-skipped scenario is demoted from pass first. Prints 'new-failure <suite> <scenario>' / 'recovery <suite> <scenario>' lines; returns 1 iff a new-failure fired.
+# spec: evidence-kit/SPEC.md §bin/diff-baseline.sh — the per-scenario diff shared by run-validate (verdict) and diff-baseline (findings): a baseline 'pass' scenario red-or-absent is a new-failure; a baseline 'fail'/'ignore' scenario observed green is an unpromoted recovery; an observed 'fail' with no baseline row is a new-failure (§Baseline manifest's fail-closed rule); a self-skipped scenario is demoted from pass first. Prints 'new-failure <suite> <scenario>' / 'recovery <suite> <scenario>' lines; returns 1 iff a new-failure fired.
 ek_diff() {
     local baseline="$1" suite="$2" observed="$3" skipfile="${4:-}"
-    declare -A obs=() skip=()
+    declare -A obs=() skip=() seen=()
     local sc st f1 f2 bsuite bscen bstat cur
     while read -r sc st _; do
         [[ -n "$sc" ]] && obs["$sc"]="$st"
@@ -121,6 +128,7 @@ ek_diff() {
     local rc=0
     while read -r bsuite bscen bstat _; do
         [[ "$bsuite" == "$suite" ]] || continue
+        seen["$bscen"]=1
         cur="${obs[$bscen]:-absent}"
         [[ -n "${skip[$bscen]:-}" && "$cur" == "pass" ]] && cur="skip"
         if [[ "$bstat" == "pass" ]]; then
@@ -132,6 +140,17 @@ ek_diff() {
             [[ "$cur" == "pass" ]] && printf 'recovery %s %s\n' "$suite" "$bscen"
         fi
     done < <(ek_data_lines "$baseline")
+
+    # spec: evidence-kit/SPEC.md §Baseline manifest — an observed failure absent from the baseline is a new failure; the rule is 'fail', never non-pass: an absent 'pass' is the stated classification cost and an absent 'ignore' is a non-verdict, neither a red
+    while read -r sc st _; do
+        [[ -n "$sc" ]] || continue
+        [[ -n "${seen[$sc]:-}" ]] && continue
+        seen["$sc"]=1
+        if [[ "$st" == "fail" ]]; then
+            printf 'new-failure %s %s\n' "$suite" "$sc"
+            rc=1
+        fi
+    done < "$observed"
     return "$rc"
 }
 

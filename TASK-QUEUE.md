@@ -12,15 +12,6 @@
 
 ## New Features
 
-- **per-gate-validate-baseline** [spec: SPEC-per-gate-validate-baseline.md] — per-gate
-  granularity for the validate baseline's gates suite: an `EVIDENCE_KIT_PARSER_<suite>`
-  per-suite parser override plus a consumer parser mapping the verbose run-gates log to
-  per-gate scenario lines and per-gate baseline rows; in-envelope debt — ek_diff converges
-  on the SPEC's fail-closed claim for observed failures absent from the baseline. The
-  entry's "no kit change expected" premise re-verified false; correction on record in the
-  amendment. Surfaced 2026-07-16 as drain-stage-active-residue's third cost in close's
-  knowledge-friction triage; deferred 2026-07-16 by lead ruling at lifecycle-machinery
-  scope, holding the bundle to one iteration.
 - **prose-tell-abbr-append** [spec: SPEC-prose-tell-abbr-append.md] — union semantics for
   the prose-tell vocabulary arrays: `_EXTRA` append knobs for
   `CANON_KIT_PROSE_TELL_ABBR_ALLOW` and `CANON_KIT_PROSE_TELL_PHRASES`, dissolving this
@@ -99,5 +90,6 @@
 ## Done
 
 - demand-driven-usage-refresh
+- per-gate-validate-baseline
 
 ## Lessons Learned

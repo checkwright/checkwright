@@ -48,9 +48,9 @@ for suite in "${EVIDENCE_KIT_SUITES[@]}"; do
     [[ "$status" -ne 0 ]] && echo "run-validate: suite '$suite' exited $status (log: $log)" >&2
 
     parsed="$EVIDENCE_KIT_TMP_DIR/validate-$suite.parsed"
-    ek_parse "$EVIDENCE_KIT_PARSER" "$suite" "$log" "$status" >"$parsed"
+    ek_parse "$suite" "$log" "$status" >"$parsed"
     if [[ ! -s "$parsed" ]]; then
-        echo "run-validate: parser '$EVIDENCE_KIT_PARSER' produced no result for suite '$suite' (log: $log) — a run failure, not an empty diff" >&2
+        echo "run-validate: parser '$(ek_parser_for "$suite")' produced no result for suite '$suite' (log: $log) — a run failure, not an empty diff" >&2
         exit 1
     fi
 

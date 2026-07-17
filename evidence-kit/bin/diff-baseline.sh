@@ -18,7 +18,7 @@ while [[ $# -gt 0 ]]; do
     suite="$1"; log="$2"; shift 2
     [[ -f "$log" ]] || { echo "diff-baseline: log not found: $log" >&2; exit 2; }
     parsed="$EVIDENCE_KIT_TMP_DIR/diff-$suite.parsed"
-    ek_parse "$EVIDENCE_KIT_PARSER" "$suite" "$log" 0 >"$parsed"
+    ek_parse "$suite" "$log" 0 >"$parsed"
     out="$(ek_diff "$EVIDENCE_KIT_BASELINE_FILE" "$suite" "$parsed" "$EVIDENCE_KIT_SKIP_FILE")" || rc=1
     if [[ -n "$out" ]]; then
         printf '%s\n' "$out"

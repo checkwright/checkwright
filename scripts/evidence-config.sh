@@ -13,7 +13,9 @@ EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests dem
 
 EVIDENCE_KIT_PARSER=exit-code
 
-EVIDENCE_KIT_RUN_gates='bash gate-sdk/bin/run-gates.sh'
+# spec: evidence-kit/SPEC.md §Layout and configuration — per-gate scenarios for the gates suite; the verbose run is what emits the per-gate tails the parser reads
+EVIDENCE_KIT_PARSER_gates='bash scripts/parse-gates-log.sh'
+EVIDENCE_KIT_RUN_gates='env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh'
 EVIDENCE_KIT_RUN_guard_tests='bash guard-kit/bin/run-guard-tests.sh'
 EVIDENCE_KIT_RUN_usage_tests='bash delegation-kit/bin/run-usage-tests.sh'
 EVIDENCE_KIT_RUN_budget_guard_tests='bash delegation-kit/bin/run-budget-guard-tests.sh'
