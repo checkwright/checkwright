@@ -14,19 +14,6 @@
 
 ## Technical Debt
 
-- **budget-guard-override-point-of-use-residency** — point-of-use residency
-  for the budget guard's block-vs-advise semantics (owner:
-  delegation-kit/SPEC.md §usage-verdict — only PAUSE blocks; override rides
-  the `.claude/settings.local.json` env block). Ruled fix, per the filing:
-  (a) extend the guard corrective — the kit template
-  `delegation-kit/templates/agent-budget-guard.sh` and this repo's consumer
-  copy `scripts/agent-budget-guard.sh` — to name the settings.local.json
-  transport and cover the STALE case (advisory, no override needed); (b) add
-  a one-line block-vs-advise + override-transport pointer at the lead's
-  budget-guard mention (lifecycle-kit/templates/lead.md), citing the SPEC
-  section, never restating it. Surfaced 2026-07-17 in the
-  release-in-lifecycle lead session.
-
 - **session-role-marker-boundary-survival** — the scope boundary wipe deletes
   a live lead's session-role marker: `.claude/commands/scope.md`'s
   evidence-reset binding says wipe `.tmp/`'s files, and the marker defaults to
@@ -315,5 +302,6 @@
 ## Done
 
 - smoke-violation-fail-open
+- budget-guard-override-point-of-use-residency
 
 ## Lessons Learned

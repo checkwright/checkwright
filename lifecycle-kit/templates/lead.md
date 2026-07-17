@@ -54,8 +54,10 @@ stage session**, never in the lead.
 
 Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background
 with notification, honor the per-dispatch budget guard, and validate after any
-agent commit. Load `/agent-execution` for the protocol and follow it there — it
-is not restated here.
+agent commit. The guard blocks only on PAUSE (STALE and OK advise); a deliberate
+override rides the `.claude/settings.local.json` env block — delegation-kit/SPEC.md
+§The delegation model. Load `/agent-execution` for the protocol and follow it
+there — it is not restated here.
 
 The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE
 or the git log to decide whether a dispatch may proceed re-derives what the
