@@ -10,9 +10,13 @@ content, what becomes consumer config.
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` (`scripts/lifecycle-config.sh`) lists
 `.workflow/validate-evidence.txt`, so `enter-stage.sh scope` truncates it —
 together with the lesson-evidence file — in the same stamp commit. Wipe
-`.tmp/`'s files at this boundary: it is purely disposable scratch (CLAUDE.md
-§Housekeeping — persistent trends live in `.metric/`), and a resume journal
-from a closed iteration is dead by definition.
+`.tmp/`'s files at this boundary — **except** the session-role marker
+(`.tmp/session-role`), which a live dispatching lead's session-context hook
+still reads: its lifetime is the lead session's, not the iteration's
+(context-kit/SPEC.md §The session-context hook), so deleting it here would
+silently drop the lead's role suppression mid-session. The rest is purely
+disposable scratch (CLAUDE.md §Housekeeping — persistent trends live in
+`.metric/`), and a resume journal from a closed iteration is dead by definition.
 
 **ritual** — read `BRIEF.local.md` (local-only brief); run the GitHub
 boundary sweep (below); decide the unit's

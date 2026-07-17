@@ -14,19 +14,6 @@
 
 ## Technical Debt
 
-- **session-role-marker-boundary-survival** — the scope boundary wipe deletes
-  a live lead's session-role marker: `.claude/commands/scope.md`'s
-  evidence-reset binding says wipe `.tmp/`'s files, and the marker defaults to
-  `.tmp/session-role` (context-kit/SPEC.md §The session-context hook), so a
-  lead outliving the iteration boundary silently loses suppression until it
-  rewrites the marker. Ruled fix: narrow the binding's wipe to spare the
-  marker file, and add an accepted-limits sentence to the SPEC section — the
-  marker's lifetime is the lead session's, not the iteration's, so consumer
-  boundary rituals must not delete it. No new names; the id-scoped marker
-  already self-invalidates across sessions (a literal iteration column was
-  ruled out — no reader). Surfaced 2026-07-17 by this scope's own boundary
-  wipe deleting the dispatching lead's marker.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
@@ -303,5 +290,6 @@
 
 - smoke-violation-fail-open
 - budget-guard-override-point-of-use-residency
+- session-role-marker-boundary-survival
 
 ## Lessons Learned

@@ -176,7 +176,11 @@ Accepted limits (not defects): the initial startup fire precedes `/lead` by
 construction, a bounded one-per-lead-session cost against the
 per-compact/resume recurrence that is the actual waste; the marker ages out
 with the day-horizon scratch sweep (step 6), degrading to absent-signal
-behavior; and the producer inherits `session-id.sh`'s
+behavior; the marker's lifetime is the **lead session's, not the iteration's**,
+so a consumer boundary ritual that wipes gitignored scratch (a scope
+evidence-reset, say) must spare the marker file — a lead outliving an iteration
+boundary otherwise reverts silently to absent-signal behavior until it rewrites
+it; and the producer inherits `session-id.sh`'s
 `CLAUDE_CODE_SESSION_ID` dependency — unset, the newest-transcript fallback
 in a lead with live subagents returns an `agent-` prefix the payload can
 never match, and the signal silently no-ops to absent-signal behavior (the
