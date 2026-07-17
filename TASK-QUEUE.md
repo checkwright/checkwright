@@ -12,18 +12,6 @@
 
 ## New Features
 
-- **release-in-iteration-lifecycle** [spec: SPEC-release-in-iteration-lifecycle.md] —
-  releasing joins the iteration lifecycle: the close template gains a
-  release-disposition step + `release-policy` slot (every close executes the
-  consumer's release procedure or stamps an explicit `none`), enforced by a new
-  `LIFECYCLE_KIT_BOUNDARY_REQUIRE` boundary require-check in `enter-stage.sh`
-  (default empty); this repo binds the slot to RELEASING.md's reordered
-  per-iteration procedure with `.workflow/release-disposition.txt` as evidence.
-  Operator rulings in the amendment: tag per qualifying iteration; both-None
-  tags nothing and stamps `none`. Surfaced by operator directive during
-  config-seam-hardening close, 2026-07-17, prompted by the unreleased-backlog
-  gap (141 unreleased commits post-v0.1.0; the v0.2.0 cut fixed the backlog,
-  this entry is the methodology change).
 - **claude-md-housekeeping-residency** [spec: SPEC-claude-md-housekeeping-residency.md] —
   CLAUDE.md §Housekeeping (72 of 200 always-loaded lines, the only section
   carrying mechanism inline) sheds its mechanism to a new load-triggered
@@ -204,5 +192,6 @@
 ## Done
 
 - lead-task-selection-seam
+- release-in-iteration-lifecycle
 
 ## Lessons Learned

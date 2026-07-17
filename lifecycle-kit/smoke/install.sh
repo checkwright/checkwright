@@ -230,4 +230,63 @@ mkdir -p "$sid/tree2/somelead/subagents"                                 # sourc
 o="$(sid_run LIFECYCLE_KIT_SESSIONS_DIR=$sid/tree2)"
 [[ "$o" == "99998888" ]] || { echo "smoke(session-id): widened subagents glob did not resolve (got '$o')" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_BOUNDARY_REQUIRE: at the iteration boundary each member must carry a line naming the closing iteration, else refuse (fail-closed on a missing file); a never-named (—) closing iteration skips the check
+br="$es/boundary-require"; mkdir -p "$br/.workflow"
+brq="$br/TASK-QUEUE.md"; brs="$br/.workflow/WORKFLOW-STATE.txt"; brd="$br/.workflow/release-disposition.txt"
+write_br_fixture() {   # $1 = header (and stamp) iteration name
+    cat > "$brq" <<EOF
+# smoke queue
+## Iteration: $1  [stage: close]
+
+---
+
+## New Features
+## Technical Debt
+## Deferred
+## Done
+EOF
+    cat > "$brs" <<EOF
+# contract
+
+---
+
+$1 close aabbccdd $d
+EOF
+}
+cat > "$br/stages.sh" <<STAGES
+# shellcheck shell=bash
+LIFECYCLE_KIT_BOUNDARY_REQUIRE=($brd)
+STAGES
+br_run() {
+    env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_CODE_CHILD_SESSION -u LIFECYCLE_KIT_SESSION_ID \
+    LIFECYCLE_KIT_QUEUE_FILE="$brq" \
+    LIFECYCLE_KIT_STATE_FILE="$brs" \
+    LIFECYCLE_KIT_SESSIONS_DIR="$es/sessions" \
+    GATE_SDK_TMP_DIR="$es/tmp" \
+    LIFECYCLE_KIT_CONFIG_FILE="$br/stages.sh" \
+    bash "$SMOKE_KIT_ROOT/bin/enter-stage.sh" "$@"
+}
+
+write_br_fixture closing-iter                                            # (a) member missing the closing-iteration line → refuse
+printf '# contract\n' > "$brd"
+cp "$brq" "$br/q.before"; cp "$brs" "$br/s.before"
+if br_run scope >/dev/null 2>&1; then echo "smoke(enter-stage): boundary-require should refuse a member missing the closing-iteration line" >&2; exit 1; fi
+cmp -s "$br/s.before" "$brs" || { echo "smoke(enter-stage): wrote state on a boundary-require refusal" >&2; exit 1; }
+cmp -s "$br/q.before" "$brq" || { echo "smoke(enter-stage): wrote queue on a boundary-require refusal" >&2; exit 1; }
+
+write_br_fixture closing-iter                                            # (b) member absent from disk → fail-closed refusal
+rm -f "$brd"
+cp "$brs" "$br/s.before"
+if br_run scope >/dev/null 2>&1; then echo "smoke(enter-stage): boundary-require should fail closed on an absent member" >&2; exit 1; fi
+cmp -s "$br/s.before" "$brs" || { echo "smoke(enter-stage): wrote state on a fail-closed boundary-require refusal" >&2; exit 1; }
+
+write_br_fixture closing-iter                                            # (c) member names the closing iteration → boundary entry proceeds
+printf '# contract\n\nclosing-iter release none — smoke basis\n' > "$brd"
+br_run scope >/dev/null || { echo "smoke(enter-stage): boundary-require should pass when the member names the closing iteration" >&2; exit 1; }
+grep -q "^## Iteration: —  \[stage: scope\]\$" "$brq" || { echo "smoke(enter-stage): boundary-require pass did not reset the header" >&2; exit 1; }
+
+write_br_fixture —                                                       # (d) never-named (—) closing iteration skips the check even with no line
+printf '# contract\n' > "$brd"
+br_run scope >/dev/null || { echo "smoke(enter-stage): boundary-require should skip a never-named closing iteration" >&2; exit 1; }
+
 rm -rf "$es"

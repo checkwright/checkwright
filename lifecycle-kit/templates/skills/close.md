@@ -58,12 +58,30 @@ they ride in one commit.
 5. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
    trigger: a write-path needs a paired reclaim-path.
-6. **Brevity pass on the always-loaded surfaces** — run this **last**, after
+6. **Release disposition** — run after the surface-mutating steps above and
+   **before** the brevity pass (the disposition note is itself such a write).
+   Every close dispositions the iteration at the release boundary: read the
+   consumer's release policy (the `release-policy` slot below) and either
+   execute its release procedure or stamp an explicit no-release line. Silence
+   is not a disposition — a close that says nothing about release is incomplete.
+   Stamp one line into the consumer-named disposition-evidence file:
+   `<iteration> release <version|none> — <one-line basis>` (the
+   `check-lesson-disposition` contract shape at the release boundary, the same
+   lineage release-sweep's stamp follows) — `<version>` is the tag applied,
+   `none` states the both-None (or consumer-equivalent) outcome. Ordering: a tag
+   names a commit, so the tag-and-host-release half of the procedure runs *after*
+   the iteration's final commit lands; the note-authoring and stamp halves ride
+   the close commits themselves.
+   *<release-policy: the consumer's release procedure and criteria source by
+   citation, the disposition-evidence path, and any boundary-only sub-procedures
+   (e.g. a major-only deprecation sweep); or a plain "no release process — every
+   iteration stamps none" line for a consumer without one.>*
+7. **Brevity pass on the always-loaded surfaces** — run this **last**, after
    every surface-mutating step above. Scope by principle, not a fixed list:
    every surface injected into each agent session. Staleness asks *is it
    still true?*; brevity asks *is each block worth its standing per-session
    token cost?* — reword/delete over annotating; outdated context goes to git
    history. On-demand files (specs, this skill) are exempt — their cost is
    paid only when opened.
-7. **Optionally merge** — an iteration can close without merging if validate
+8. **Optionally merge** — an iteration can close without merging if validate
    is incomplete or a follow-up iteration is planned.

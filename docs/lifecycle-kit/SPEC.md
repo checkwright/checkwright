@@ -248,6 +248,10 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   read by `check-lesson-disposition` and the boundary-reset built-in.
 - `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
   iteration boundary; default empty.
+- `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
+  must carry a data line naming the closing iteration before the iteration
+  boundary may be crossed (§bin/enter-stage.sh); a missing member is a
+  fail-closed refusal; default empty (an unconfigured consumer sees no change).
 - `LIFECYCLE_KIT_ENTRY_PREFLIGHT` — per-stage `<stage>=<command>` entries run
   alongside the built-in pre-flight (§bin/enter-stage.sh); default empty.
 - `LIFECYCLE_KIT_SHIM_NGRAM` — the shared-n-gram width `check-shim-restatement`
@@ -433,7 +437,18 @@ consumer knob (git history keeps the retired stamps). The boundary entry also
 untriaged entries printed, nothing written — the same refusal contract as the
 built-in pre-flight): an untriaged lesson must not cross into the next
 iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
-outlive the iteration that filed it. **Pre-flight,
+outlive the iteration that filed it. The boundary entry additionally **refuses
+when a `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member lacks a disposition line for the
+closing iteration** (exit 1, nothing written, the same refusal contract): each
+member must carry a data line whose first token is the closing iteration's name,
+so a consumer wiring its release-disposition evidence here makes the close-stage
+disposition a mechanical boundary precondition rather than a decorative stamp.
+Fail-closed: a member that does not exist on disk is a refusal naming the path. A
+never-named (`—`) closing iteration has nothing to disposition and skips the
+check. `--simulate` relays the would-be refusal the way it does for lessons. The
+require-check runs after the Lessons refusal and before the boundary truncation,
+so a member that is also a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` file is verified by
+the same boundary that then consumes it. **Pre-flight,
 not enforcement:** before writing, it runs the built-in `check-stage-entry`
 for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose
 stage key matches, each reading the not-yet-written flip off a header-flipped
@@ -462,9 +477,12 @@ it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 (`LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES`,
 `LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and `LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
+`LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
-`smoke/install.sh`.
+`smoke/install.sh` — including the boundary require-check scenarios (a member
+naming the closing iteration passes; a member missing the line, a member absent
+from disk, and a never-named closing iteration each take their branch).
 
 ### bin/install-lifecycle.sh
 
@@ -837,10 +855,26 @@ restatement there is a per-session token tax on a fact with an owner, and it
 drifts the moment the owner changes. `check-shim-restatement` is the tripwire
 for the copy shape; the tier judgment (residue vs owned fact) stays the author's.
 
+The `close` template carries a **release-disposition step**: every close
+dispositions the iteration at the release boundary — reading the consumer's
+`release-policy` slot and either executing its release procedure or stamping an
+explicit no-release line into the consumer-named disposition-evidence file
+(`<iteration> release <version|none> — <basis>`, the `check-lesson-disposition`
+contract shape at the release boundary). The step runs after the surface-mutating
+close steps and before the brevity pass, since the note is itself such a write;
+silence is not a disposition. The `release-policy` slot carries the consumer's
+procedure and criteria by citation, the disposition-evidence path, and any
+boundary-only sub-procedure such as a major-only deprecation sweep; a consumer
+with no release process binds a plain `none`-every-iteration line. The
+disposition line's mechanical reader is `enter-stage.sh`'s boundary require-check
+(§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the
+file into that knob.
+
 Beside the stage skills sits `release-sweep.md` — a **boundary skill**, not a
 stage: it invokes no `enter-stage.sh` and stamps no state, so
 `check-stage-skill-coverage` never reads it (it governs only the configured
-stage set). It is the deprecation disposition walk at a major, forcing every
+stage set). It is the deprecation disposition walk at a major — invoked from
+close's release-disposition step when the derived bump is a major — forcing every
 marker on the `CANON_KIT_DEPRECATION_MARKERS` roster to a stamped disposition —
 decommission, carry-forward, or un-deprecate — the `check-lesson-disposition`
 contract shape at a release boundary. canon-kit's `check-deprecation-task` holds

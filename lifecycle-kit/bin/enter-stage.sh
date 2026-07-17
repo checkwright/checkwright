@@ -121,6 +121,30 @@ if [[ "$first" == 1 ]]; then
     fi
 fi
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_BOUNDARY_REQUIRE: at the iteration boundary each member must carry a data line whose first token is the closing iteration's name, else the entry refuses (fail-closed on a missing file); a never-named (—) closing iteration has nothing to disposition and skips the check. Runs after the Lessons refusal and before the boundary truncation, the same refusal contract.
+if [[ "$first" == 1 && "$cur_iter" != "—" ]]; then
+    for br in ${LIFECYCLE_KIT_BOUNDARY_REQUIRE[@]+"${LIFECYCLE_KIT_BOUNDARY_REQUIRE[@]}"}; do
+        req_msg=""
+        if [[ ! -f "$br" ]]; then
+            req_msg="required boundary-disposition file not found: $br"
+        elif ! awk -v it="$cur_iter" '
+            /^#/ || /^[[:space:]]*$/ { next }
+            $1 == it { found = 1 }
+            END { exit found ? 0 : 1 }
+        ' "$br"; then
+            req_msg="no disposition line naming the closing iteration '$cur_iter' in $br"
+        fi
+        [[ -z "$req_msg" ]] && continue
+        if [[ "$sim" == 1 ]]; then
+            echo "enter-stage (simulate): iteration-boundary entry to '$stage' would be refused — $req_msg" >&2
+            exit 1
+        fi
+        echo "enter-stage: iteration-boundary entry to '$stage' refused — $req_msg (nothing written)." >&2
+        echo "  help: the close stage must disposition the iteration at the release boundary, stamping a '<iteration> release <version|none> — <basis>' line into $br before the next iteration begins." >&2
+        exit 1
+    done
+fi
+
 if [[ "$sim" == 1 ]]; then
     echo "enter-stage (simulate): entry to '$stage' would proceed — no stamp, no flip, nothing written."
     exit 0
