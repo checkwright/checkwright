@@ -233,6 +233,4 @@
 
 ## Done
 
-- stage-cursor-extraction
-
 ## Lessons Learned
