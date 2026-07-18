@@ -4,4 +4,4 @@
 
 ---
 
-— scope af819467 2026-07-18
+stage-cursor-extraction scope af819467 2026-07-18

@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: stage-cursor-extraction  [stage: scope]
 
   The lifecycle-kit gates read the header above and
   `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
@@ -11,6 +11,18 @@
 ---
 
 ## New Features
+
+- **stage-cursor-extraction** [spec: SPEC-stage-cursor-extraction.md] —
+  extract the fast-mutating `[stage:]` cursor out of the queue header: the
+  evidence file's last stamp becomes the cursor's single source and the
+  header flip dies. Envelope: the four-reader migration (evidence-kit,
+  context-kit, delegation-kit, queue-kit) to self-contained last-stamp
+  derivations, with the evidence-kit-reader-first ordering constraint as a
+  binding envelope term (a retired field silently voids
+  check-evidence-manifest assertions A/C). Design, causal map, ordering, and
+  the sweep roster: the amendment. Demoted from mid-iteration-gap-channel-seam
+  during the concurrency-hardening align audit (operator ruling, Option C);
+  re-promoted by operator unit-set ruling. Surfaced 2026-07-17.
 
 ## Technical Debt
 
@@ -187,31 +199,6 @@
   is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
-
-- **stage-cursor-extraction** [needs-spec] — extract the fast-mutating
-  `[stage:]` cursor out of the queue header: the evidence file's last
-  `.workflow/WORKFLOW-STATE.txt` stamp becomes the cursor's single source and
-  the header flip dies (the header narrows to `## Iteration: <name>`). The
-  change looks lifecycle-internal but is not — the `[stage:]` field is a
-  cross-kit interface, so the envelope is a four-reader migration to
-  self-contained "last WORKFLOW-STATE stamp" derivations: evidence-kit
-  (`ek_queue_stage` feeding check-evidence-manifest, crossing the documented
-  no-lifecycle-dependency seam at `evidence-kit/lib/evidence.sh`), context-kit
-  (the session-context hook's stage routing — the kit template plus this repo's
-  `scripts/session-context.sh` copy), delegation-kit (`statusline-usage.sh`
-  stage display), and queue-kit (SPEC prose plus `templates/TASK-QUEUE.md`
-  grammar narrowing). Ordering constraint (silent-gate-disarm): the extraction
-  must not land ahead of the evidence-kit reader fix — a retired field makes
-  `ek_queue_stage` read empty, silently voiding `check-evidence-manifest`
-  assertions A (`stage==close`) and C (`stage!=validate`) with no red, so the
-  gate disarms without signalling. needs-spec because the seam design — a
-  self-contained last-stamp reader per kit versus a lifecycle-kit dependency,
-  and how each kit derives the stage after the field is gone — is the open
-  work. Demoted from the mid-iteration-gap-channel-seam unit during the
-  concurrency-hardening align audit when the cross-kit readership proved a
-  missed scope premise (operator ruling, Option C); the extraction design is
-  preserved in that amendment's git history for re-promotion. Surfaced
-  2026-07-17.
 
 ## Done
 
