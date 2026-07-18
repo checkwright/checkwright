@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
+stage-cursor-extraction release v0.6.0 — behavior release: stage cursor extracted to the state file's last stamp across four kits, the flip retired, [stage:] retired from the header grammar with residual-field healing; no gate tightened, so minor per docs/install.md §Versioning (any non-empty note section earns a minor; not a decommission — no deprecated surface removed — and the pre-1.0 qualifier keeps a direct behavior change on a minor).
