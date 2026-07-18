@@ -117,6 +117,46 @@
   is to record that here and leave the class to the audit cadence. Seam: the gate
   is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
 
+- **stage-lag-disambiguation** [needs-spec] [blocked-by: stage-cursor-extraction] —
+  narrow the session-context hook's accepted over-firing by distinguishing a
+  first-of-stage session from a restarted predecessor session, using the session
+  id the stage-cursor migration puts in the state file's last stamp.
+  **The rule was never wrong, only wrongly argued.** context-kit's header-lag
+  rule (context-kit/SPEC.md:137-144) survives the stage-cursor migration on its
+  *lag* ground: the hook fires at session start, before the arriving skill's
+  first step writes the cursor, so a first-of-stage session still reads the
+  predecessor's value. What the migration retires is the rule's stated
+  **justification** — "no header value distinguishes [a first-of-stage session]
+  from a restarted predecessor session" — and the over-firing cost it accepts
+  on that basis. The header carried one value; the state file's last stamp
+  carries `<iter> <stage> <session-id> <date>`, so the id distinguishes exactly
+  the two cases the rule says are indistinguishable: ids match = restarted
+  session of the stamped stage, ids differ = new session whose stage has not
+  stamped yet. Found by the stage-cursor-extraction align audit; deliberately
+  left out of that amendment's envelope (a behavior widening coupled to a
+  mechanical migration muddies what its fixture proves).
+  **Cost — larger than the comparison it looks like.** The session id *is*
+  reachable from the hook payload, so the premise holds: the session-role
+  signal already reads it (`scripts/session-context.sh:72-73`, spec at
+  context-kit/SPEC.md:146-164), and the stamp's 8-char id already matches the
+  `${hook_sid:0:8}` comparison shape that code uses. But that read sits inside
+  the `[[ -f "$ROLE_FILE" && ! -t 0 ]]` guard (:71), and **stdin is consumable
+  exactly once** — so the payload read must be hoisted to the unconditional
+  path before a stage derivation can use it. The hoist is the real work, and it
+  lands on a hook whose contract is "never fails a session" and "signal absent =
+  byte-identical output": a read that today happens only for lead-marked
+  sessions would happen every fire. Note the audience inversion that makes the
+  hoist unavoidable rather than incidental — the sessions this entry serves are
+  stage sessions, which carry *no* role marker, i.e. precisely the case the
+  current guard skips. Scope: the hoist plus its no-payload/`-t 0` fallbacks,
+  the comparison, and a fixture pair proving both the first-of-stage and
+  restarted-predecessor cases; both kit template and consumer copy.
+  **Cost while deferred:** low and non-rotting — the over-firing is the
+  documented accepted cost, not a defect, and the rule stays correct on its lag
+  ground. The blocker self-clears: the tag is stale once
+  `stage-cursor-extraction` reaches Done, and removing it is what makes this
+  pickable.
+
 - **heterogeneous-agent-delegation** [needs-spec] — cross-vendor stage dispatch:
   a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
   (Codex, etc.), extending the homogeneous multi-agent / multi-operator model to a

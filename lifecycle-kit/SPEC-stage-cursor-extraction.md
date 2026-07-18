@@ -212,14 +212,12 @@ by the operator the same day.
     at the state file. The rule's substance is untouched; the marker-file
     mechanism and its session-id scoping are independent of the cursor source.
 
-  **Deferred (filed, not silently dropped):** the last stamp's session id
-  makes the header-lag rule's over-firing cost avoidable — the hook could
-  compare its own payload session id against the last stamp's and distinguish
-  "restarted session of the stamped stage" (ids match) from "new session whose
-  stage has not stamped yet" (ids differ), serving the first-of-stage session
-  without over-firing to the others. This widens the hook's asserted behavior
-  and is out of this amendment's four-reader-migration envelope. It is
-  recorded here as the design memory; promoting it needs its own unit.
+  **Deferred, filed:** narrowing the rule's accepted over-firing by using the
+  last stamp's session id widens the hook's asserted behavior and is out of
+  this amendment's envelope. Filed as the deferred entry
+  **`stage-lag-disambiguation`**, blocked on this iteration, which
+  owns the design memory and its cost — this amendment is deleted at merge and
+  cannot carry it.
 - delegation-kit/SPEC.md — statusline stage-source sentence.
 - queue-kit/SPEC.md + templates/TASK-QUEUE.md — header grammar narrowing.
 - drift-kit/bin/drift-report.sh — name-axis awk keeps working unchanged (the
