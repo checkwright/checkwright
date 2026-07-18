@@ -166,7 +166,10 @@ that variable (the named assumption: were the harness ever to fire
 to its lead's marker and invert the suppression onto exactly its intended
 audience; revisit if subagent hook-fire lands). So a concurrent or later
 top-level session never bleeds, and a stale marker self-invalidates when the
-id rotates. Top-level scoping is sufficient because both producer and
+id rotates. The payload arrives on the hook's stdin, consumable exactly once,
+so the single read here is its sole consumer — a later payload-derived signal
+(a stage derivation, say) must hoist that one read ahead of this guard, never
+add a second. Top-level scoping is sufficient because both producer and
 consumer are top-level by construction — `SessionStart` does not fire for
 Task-spawned subagents, so the only sessions the hook fires in are leads and
 manual runs, and the identity match discriminates exactly those. When the
