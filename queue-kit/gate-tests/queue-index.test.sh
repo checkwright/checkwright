@@ -21,7 +21,7 @@ fails=0
 cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo  [stage: build]
+## Iteration: demo
 
 ## New Features
 
@@ -71,7 +71,7 @@ want "collapse-l1"    "$out" "first attention point"
 cat >"$SANDBOX/drain.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo  [stage: validate]
+## Iteration: demo
 
 ## New Features
 
@@ -93,7 +93,7 @@ want "drain-ready" "$out" "• feat-b"
 cat >"$SANDBOX/none.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo  [stage: build]
+## Iteration: demo
 
 ## New Features
 

@@ -18,7 +18,7 @@ if [[ ! -f TASK-QUEUE.md ]]; then
     cat > TASK-QUEUE.md <<'EOF'
 # TASK-QUEUE.md — smoke consumer work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: —
 
 ---
 

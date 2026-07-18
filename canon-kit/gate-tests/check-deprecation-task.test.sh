@@ -23,7 +23,7 @@ fails=0
 cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md — sandbox
 
-## Iteration: fixture  [stage: build]
+## Iteration: fixture
 
 ---
 

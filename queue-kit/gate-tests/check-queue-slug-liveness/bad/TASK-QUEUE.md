@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — fixture
 
-## Iteration: fixture  [stage: build]
+## Iteration: fixture
 
 ## New Features
 

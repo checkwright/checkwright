@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — fixture
 
-## Iteration: demo  [stage: build]
+## Iteration: demo
 
 ---
 

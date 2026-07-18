@@ -230,7 +230,7 @@ scanner: `check-amendment-queue`, `check-task-names`, `check-task-conservation`,
 and the session-context index all locate work by `## <section>` boundaries and
 silently find *nothing* — passing open — when a heading is dropped or
 misspelled. A trailing `:` on a required entry marks a dynamic-suffix heading
-(the iteration header, which carries its iteration name and `[stage:]`) and is
+(the iteration header, whose suffix is its iteration name) and is
 prefix-matched; every other entry is matched exactly. A grep error (not a
 no-match) is fail-closed (exit 2). The `# graph:` couples the queue file at
 `tier=precommit`.

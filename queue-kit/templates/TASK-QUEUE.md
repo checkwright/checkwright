@@ -1,8 +1,8 @@
 # TASK-QUEUE.md — <project> work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: —
 
-  The lifecycle stage header (lifecycle-kit): the composed-tree shape a
+  The lifecycle iteration header (lifecycle-kit): the composed-tree shape a
   Checkwright consumer ships. A queue-only adopter with no lifecycle-kit
   deletes this line and the `---` below; both are inert to the queue gates.
 

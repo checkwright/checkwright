@@ -1,1 +1,1 @@
-## Iteration: demo-iter  [stage: build]
+## Iteration: demo-iter

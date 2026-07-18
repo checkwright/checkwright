@@ -1,6 +1,6 @@
 # TASK-QUEUE.md
 
-## Iteration: demo-iter  [stage: close]
+## Iteration: demo-iter
 
 ## Lessons Learned
 

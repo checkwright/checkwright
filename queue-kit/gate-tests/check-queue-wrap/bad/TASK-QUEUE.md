@@ -1,6 +1,6 @@
 # TASK-QUEUE.md
 
-## Iteration: demo  [stage: build]
+## Iteration: demo
 
 ## New Features
 

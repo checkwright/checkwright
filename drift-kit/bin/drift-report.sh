@@ -84,8 +84,8 @@ registry_members() {
 iteration_start() {
     local state="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt" iter
     [[ -f "$DRIFT_KIT_QUEUE_FILE" ]] || return 0
-    iter="$(awk '/^## Iteration:/ { for (i=3;i<=NF;i++){ if ($i=="[stage:") break; printf "%s%s",(i>3?" ":""),$i } exit }' \
-        "$DRIFT_KIT_QUEUE_FILE" 2>/dev/null)"
+    iter="$(grep -m1 '^## Iteration:' "$DRIFT_KIT_QUEUE_FILE" 2>/dev/null \
+        | sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//')"
     [[ -n "$iter" ]] || return 0
     git log --format='%h' -S"$iter scope " -- "$state" 2>/dev/null | tail -1
 }
