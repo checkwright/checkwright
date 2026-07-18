@@ -5,3 +5,4 @@
 ---
 
 stage-economics-report scope af0add5a 2026-07-18
+stage-economics-report align ac84d6a3 2026-07-18
