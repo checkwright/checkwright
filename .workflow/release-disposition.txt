@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-concurrency-hardening release v0.5.0 — minor floor: Tightened gates (check-merge-attrs gains gap-inbox union parity) and Behavior changes (committed gap channel, same-stage re-entry) both non-empty; Renamed knobs none
-
