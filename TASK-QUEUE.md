@@ -1,28 +1,16 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: stage-cursor-extraction  [stage: build]
+## Iteration: stage-cursor-extraction
 
-  The lifecycle-kit gates read the header above and
-  `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine);
-  queue-kit formalizes the queue format itself and gates this file. One
-  iteration per hardening or roadmap unit; [README.md](README.md) maps the
-  kits.
+  The lifecycle-kit gates read this header's iteration name and the stage
+  cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
+  (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue
+  format itself and gates this file. One iteration per hardening or roadmap
+  unit; [README.md](README.md) maps the kits.
 
 ---
 
 ## New Features
-
-- **stage-cursor-extraction** [spec: SPEC-stage-cursor-extraction.md] —
-  extract the fast-mutating `[stage:]` cursor out of the queue header: the
-  evidence file's last stamp becomes the cursor's single source and the
-  header flip dies. Envelope: the four-reader migration (evidence-kit,
-  context-kit, delegation-kit, queue-kit) to self-contained last-stamp
-  derivations, with the evidence-kit-reader-first ordering constraint as a
-  binding envelope term (a retired field silently voids
-  check-evidence-manifest assertions A/C). Design, causal map, ordering, and
-  the sweep roster: the amendment. Demoted from mid-iteration-gap-channel-seam
-  during the concurrency-hardening align audit (operator ruling, Option C);
-  re-promoted by operator unit-set ruling. Surfaced 2026-07-17.
 
 ## Technical Debt
 
@@ -117,17 +105,18 @@
   is to record that here and leave the class to the audit cadence. Seam: the gate
   is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
 
-- **stage-lag-disambiguation** [needs-spec] [blocked-by: stage-cursor-extraction] —
+- **stage-lag-disambiguation** [needs-spec] —
   narrow the session-context hook's accepted over-firing by distinguishing a
   first-of-stage session from a restarted predecessor session, using the session
   id the stage-cursor migration puts in the state file's last stamp.
-  **The rule was never wrong, only wrongly argued.** context-kit's header-lag
-  rule (context-kit/SPEC.md:137-144) survives the stage-cursor migration on its
-  *lag* ground: the hook fires at session start, before the arriving skill's
+  **The rule was never wrong, only wrongly argued.** context-kit's cursor-lag
+  rule (context-kit/SPEC.md §The session-context hook) already survived the
+  stage-cursor migration on its *lag* ground: the hook fires at session start,
+  before the arriving skill's
   first step writes the cursor, so a first-of-stage session still reads the
-  predecessor's value. What the migration retires is the rule's stated
+  predecessor's value. What the migration retired is the rule's former stated
   **justification** — "no header value distinguishes [a first-of-stage session]
-  from a restarted predecessor session" — and the over-firing cost it accepts
+  from a restarted predecessor session" — and the over-firing cost it accepted
   on that basis. The header carried one value; the state file's last stamp
   carries `<iter> <stage> <session-id> <date>`, so the id distinguishes exactly
   the two cases the rule says are indistinguishable: ids match = restarted
@@ -137,12 +126,15 @@
   mechanical migration muddies what its fixture proves).
   **Cost — larger than the comparison it looks like.** The session id *is*
   reachable from the hook payload, so the premise holds: the session-role
-  signal already reads it (`scripts/session-context.sh:72-73`, spec at
-  context-kit/SPEC.md:146-164), and the stamp's 8-char id already matches the
+  signal already reads it (`scripts/session-context.sh`, spec at
+  context-kit/SPEC.md §The session-context hook), and the stamp's 8-char id
+  already matches the
   `${hook_sid:0:8}` comparison shape that code uses. But that read sits inside
-  the `[[ -f "$ROLE_FILE" && ! -t 0 ]]` guard (:71), and **stdin is consumable
+  the `[[ -f "$ROLE_FILE" && ! -t 0 ]]` guard, and **stdin is consumable
   exactly once** — so the payload read must be hoisted to the unconditional
-  path before a stage derivation can use it. The hoist is the real work, and it
+  path before a stage derivation can use it. (The stage-cursor migration added
+  a *named-file* cursor read ahead of that guard, deliberately consuming no
+  stdin, so it left this hoist untouched.) The hoist is the real work, and it
   lands on a hook whose contract is "never fails a session" and "signal absent =
   byte-identical output": a read that today happens only for lead-marked
   sessions would happen every fire. Note the audience inversion that makes the
@@ -153,9 +145,8 @@
   restarted-predecessor cases; both kit template and consumer copy.
   **Cost while deferred:** low and non-rotting — the over-firing is the
   documented accepted cost, not a defect, and the rule stays correct on its lag
-  ground. The blocker self-clears: the tag is stale once
-  `stage-cursor-extraction` reaches Done, and removing it is what makes this
-  pickable.
+  ground. Unblocked: `stage-cursor-extraction` has reached Done, so this entry
+  is pickable.
 
 - **heterogeneous-agent-delegation** [needs-spec] — cross-vendor stage dispatch:
   a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
@@ -241,5 +232,7 @@
   (kfric plus one operator-raised refinement).
 
 ## Done
+
+- stage-cursor-extraction
 
 ## Lessons Learned

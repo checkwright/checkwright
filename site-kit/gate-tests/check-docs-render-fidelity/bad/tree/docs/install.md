@@ -13,7 +13,7 @@ Vendor the kit, then:
    (`LESSON_EVIDENCE_FILE`, both boundary-reset to their header):
 
    ```
-   ## Iteration: —  [stage: scope]
+   ## Iteration: —
    ```
 
    ```

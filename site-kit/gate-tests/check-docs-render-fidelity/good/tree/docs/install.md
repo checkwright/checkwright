@@ -13,7 +13,7 @@ Vendor the kit, then:
    (`LESSON_EVIDENCE_FILE`, both boundary-reset to their header).
    The queue header line:
 
-       ## Iteration: —  [stage: scope]
+       ## Iteration: —
 
    The stage-stamp skeleton:
 
