@@ -7,3 +7,4 @@
 stage-cursor-extraction scope af819467 2026-07-18
 stage-cursor-extraction align a2311dd8 2026-07-18
 stage-cursor-extraction build a254c831 2026-07-18
+stage-cursor-extraction validate aa65b153 2026-07-18
