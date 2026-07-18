@@ -58,13 +58,15 @@ ek_queue_iteration() {
     sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//' <<<"$hdr"
 }
 
-ek_queue_stage() {
-    local q="${1:-$EVIDENCE_KIT_QUEUE_FILE}"
-    [[ -f "$q" ]] || return 1
-    local hdr
-    hdr="$(grep -m1 '^## Iteration:' "$q" 2>/dev/null)" || return 1
-    [[ "$hdr" == *'[stage:'* ]] || return 1
-    sed -E 's/.*\[stage:[[:space:]]*//; s/[[:space:]]*\].*$//' <<<"$hdr"
+# spec: evidence-kit/SPEC.md §lib/evidence.sh — the lifecycle cursor is the state file's last data line; a self-contained reader so the kit needs no lifecycle-kit dependency, non-zero on both no-cursor shapes (absent file, no data line)
+ek_state_stage() {
+    local s="${1:-$EVIDENCE_KIT_STATE_FILE}" last stage
+    [[ -f "$s" ]] || return 1
+    last="$(awk '/^---[[:space:]]*$/{f=1; next} f && NF {l=$0} END{print l}' "$s")"
+    [[ -n "$last" ]] || return 1
+    stage="$(awk '{print $2}' <<<"$last")"
+    [[ -n "$stage" ]] || return 1
+    printf '%s\n' "$stage"
 }
 
 ek_run_key() {

@@ -63,9 +63,13 @@ Knobs, this repo's surface names as defaults:
 The sourced config loader: consumer config first, kit defaults fill what it
 left unset, then validation. It also owns the shared adapters — `ek_parse` (the
 parser dispatch), `ek_diff` (the per-scenario baseline diff, §bin/diff-baseline.sh),
-`ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_queue_stage`
-/ `ek_run_key` header readers that let the kit read a lifecycle header without a
-lifecycle-kit dependency. Values and adapters only, never tool structure. It
+`ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_run_key`
+header readers plus the `ek_state_stage` cursor reader that let the kit read
+lifecycle state without a lifecycle-kit dependency. The two axes come from two
+surfaces: the queue header names the iteration, the state file's **last data
+line** is the stage cursor. `ek_state_stage` returns non-zero on both no-cursor
+shapes — an absent state file, and a file truncated to its preamble with no data
+line yet — so a caller's `|| true` yields an empty stage for either. Values and adapters only, never tool structure. It
 sources gate-sdk's `lib/gate.sh` for `fail_closed`, so evidence-kit requires
 gate-sdk vendored beside it.
 
@@ -178,15 +182,19 @@ liveness and coverage branches beyond the one good/bad pair are covered by
 
 Invariant: the evidence manifest is well-formed and, where lifecycle drives the
 tree, coupled to the stage machine. It owns three assertions, (A) close-entry —
-a `[stage: close]` header requires the full green block, a `verdict=clean` line
+a `close` cursor requires the full green block, a `verdict=clean` line
 for every configured suite dated on/after the iteration's earliest validate
 stamp; (B) grammar — every line the eight-field manifest shape with the current
 iteration (a foreign iteration line means the boundary truncation was skipped);
 and (C) stamp-coupling — a validate stamp demands at least one evidence line,
-re-armed only once the header has advanced past `[stage: validate]`, since the
-entry flip legitimately precedes the suites. Grammar (B) red suppresses A and C.
-The state file's absence means no lifecycle integration and disarms A and C
-entirely, so a consumer running no lifecycle keeps only the grammar floor.
+re-armed only once the cursor has advanced past `validate`, since the
+entry stamp legitimately precedes the suites. Grammar (B) red suppresses A and C.
+An empty cursor disarms A and C entirely, so a consumer running no lifecycle
+keeps only the grammar floor. Both no-cursor shapes disarm at the *declared*
+early-out rather than by an empty stage falling through two live assertions: a
+silent fall-through would read as a green gate in exactly the window where the
+gate has nothing to say, which is the failure mode the cursor migration was
+ordered to avoid.
 Argument mode `$1 $2 $3` (manifest, queue, state) makes it fixture-capable; the
 close-entry and stamp-coupling assertions are covered by
 `gate-tests/check-evidence-manifest.test.sh`.

@@ -26,7 +26,7 @@ fi
 
 iter=""; stage=""
 iter="$(ek_queue_iteration "$QUEUE" 2>/dev/null || true)"
-stage="$(ek_queue_stage "$QUEUE" 2>/dev/null || true)"
+stage="$(ek_state_stage "$STATE" 2>/dev/null || true)"
 
 # assertion B: every manifest line carries the version header, the eight-field shape, and the current iteration
 grammar_errs=()
@@ -61,7 +61,8 @@ if [[ ${#grammar_errs[@]} -gt 0 ]]; then
     exit 1
 fi
 
-if [[ -z "$iter" || ! -f "$STATE" ]]; then
+# spec: evidence-kit/SPEC.md §check-evidence-manifest — an empty cursor disarms A and C here, at the declared early-out, rather than letting an empty stage slip past two live assertions; the no-cursor window (state file truncated to its preamble at the iteration boundary) is reachable in normal operation
+if [[ -z "$iter" || ! -f "$STATE" || -z "$stage" ]]; then
     echo "EVIDENCE-MANIFEST: clean (grammar holds in $MANIFEST; no lifecycle state — close-entry/stamp-coupling disarmed)"
     exit 0
 fi
@@ -76,12 +77,12 @@ done < <(awk '/^---[[:space:]]*$/{f=1; next} f && NF {print}' "$STATE")
 
 errors=()
 
-# assertion C: a validate stamp demands ≥1 evidence line, re-armed only once the header has advanced past validate (the entry flip precedes the suites)
+# assertion C: a validate stamp demands ≥1 evidence line, re-armed only once the cursor has advanced past validate (the entry stamp precedes the suites)
 if [[ "$have_validate" -eq 1 && "$stage" != "validate" && "$have_line_for_iter" -eq 0 ]]; then
     errors+=("iteration '$iter' has a validate stamp but no evidence line — validate ran and recorded nothing (run evidence-kit/bin/run-validate.sh)")
 fi
 
-# assertion A: a close-entry header requires the full green block — every configured suite a clean line dated on/after the earliest validate stamp
+# assertion A: a close-entry cursor requires the full green block — every configured suite a clean line dated on/after the earliest validate stamp
 if [[ "$stage" == "close" ]]; then
     for suite in ${EVIDENCE_KIT_SUITES[@]+"${EVIDENCE_KIT_SUITES[@]}"}; do
         d="${clean_suite_date[$suite]:-}"
@@ -99,5 +100,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "  help: record a run-validate evidence line per suite before flipping to close; the entry stamp proves invocation, the evidence line proves the green result"
     exit 1
 fi
-echo "EVIDENCE-MANIFEST: clean (grammar + close-entry/stamp-coupling hold for '$iter' [stage: ${stage:-?}] in $MANIFEST)"
+echo "EVIDENCE-MANIFEST: clean (grammar + close-entry/stamp-coupling hold for '$iter' at stage '$stage' in $MANIFEST)"
 exit 0
