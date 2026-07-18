@@ -38,6 +38,30 @@
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
+- **stage-economics-report** [needs-spec] — extract the per-stage, per-model,
+  price-weighted cost attribution now prototyped in the untracked `.metric/`
+  Python scripts into a tracked, seam-clean drift-kit tool
+  (`bin/stage-economics.sh`, bash+awk on the overhead-meter pattern:
+  sessions-dir resolution, config via env, advisory exit-0, writes under
+  `DRIFT_KIT_METRIC_DIR`, no account IDs in output). It joins WORKFLOW-STATE
+  stamps → transcripts → a model price table to answer the one question no
+  built-in surface answers: real spend by lifecycle stage × model × iteration
+  (the built-in overhead-meter measures governance-vs-task *bytes*, and
+  delegation-kit's usage-trend the *window* pct — neither prices the stage).
+  The price table is consumer config (the graph-vocab pattern — per-token
+  prices are public, but the model roster a consumer runs is theirs), never a
+  kit literal that would publish it. Ships with an `/economics` skill run at
+  close that chains overhead-meter → stage-economics → usage-trend into one
+  post-iteration narrative — the regular-cadence, customer-facing capability.
+  The scope→Opus flip it exists to verify already landed in
+  `.claude/commands/lead.md`; this iteration builds the tool that confirms the
+  saving close-over-close. Motivating dig (2026-07-18): cache-read of accumulated
+  context is the dominant burn across every stage — build 73% of session cost
+  and climbing 37M→86M cr-tokens/session — not model choice; the tool exists
+  to keep that lever visible close-over-close. Supersedes the stage-burn-meter
+  measurement half of benchmark-ab-experiment (below), which consumes this
+  tool rather than rebuilding it. Surfaced 2026-07-18 by the budget-token
+  usage analysis run on the `.metric/` prototype scripts.
 - **benchmark-ab-experiment** [needs-spec] — the controlled differential
   experiment: same model, same dependent-task series, two arms (ungoverned
   loop vs Checkwright-governed), drift *accumulation across the series* as
@@ -50,13 +74,12 @@
   FlowBench as prior art. Surfaced 2026-07-08 inside adoption-track; split
   out 2026-07-09 — the self-referential route (drift-trajectory) ships
   first and this rung upgrades the claim only if demand attests it.
-  Includes the experiment's measurement half: a **stage-burn meter** landing
-  in drift-kit's bin/ on the overhead-meter pattern (sessions-dir resolution,
-  config via env, advisory exit-0) — per-stage, per-model token burn read off
-  harness transcripts and price-weighted, replacing the local-only prototype
-  scripts parked in `.metric/`. Nearer use: verifying the split-lead posture's
-  savings (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15
-  by the per-stage budget analysis that motivated that posture.
+  The experiment's measurement half — per-stage, per-model, price-weighted
+  token burn off harness transcripts — is the stage-economics-report tool
+  filed above; this rung consumes it rather than rebuilding it. Nearer use of
+  that tool: verifying the split-lead posture's savings
+  (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
+  per-stage budget analysis that motivated that posture.
 - **prose-profile** [needs-spec] — the non-code universality rung: a third
   consumer shaped as a prose/documentation repo (no build, no test suite)
   stress-tests whether the kits govern non-code work. Core dilution is ruled
