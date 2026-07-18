@@ -155,7 +155,7 @@
   positioning claim, and is the purest expression of the thesis — governance
   enforced at the git/gate boundary, not by trusting the author. It splits along a
   **two-substrate line**. *Already agent-neutral:* the verification substrate (git
-  + the gate battery + the bash flip/stamp state machine) does not care who
+  + the gate battery + the bash stamp state machine) does not care who
   authored the diff — a foreign agent's commit is gated identically; and the
   concurrent-agent coordination primitive is the shared git-index/HEAD
   serialization, vendor-neutral already. *Homogeneous today — the real work,

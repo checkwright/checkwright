@@ -8,13 +8,13 @@ nav_child_order: 2
 
 An iteration stage state machine built for stateless agent sessions. Where a
 human developer carries the state of a task in their head across a day,
-successive agent sessions do not — so lifecycle-kit externalizes it: a stage
-header and an evidence-stamp file record which stage a unit of work is in and
-prove each stage was actually entered.
+successive agent sessions do not — so lifecycle-kit externalizes it: an
+evidence-stamp file records which stage a unit of work is in — its last stamp
+is the cursor — and proves each stage was actually entered.
 
-Each stage is a skill a session invokes; the stage flip and its stamp ride
-together in one commit, and gates make skipping a stage fail the commit. The
-stages themselves are configuration, not code.
+Each stage is a skill a session invokes; entering a stage stamps that file in
+one commit, and gates make skipping a stage fail the commit. The stages
+themselves are configuration, not code.
 
 ## Install
 
@@ -25,13 +25,13 @@ external configuration you point the kit at.
 ## Quick start
 
 ```bash
-bash lifecycle-kit/bin/enter-stage.sh <stage>        # stamp + flip, committed together
+bash lifecycle-kit/bin/enter-stage.sh <stage>        # stamp the stage entry, committed
 bash gate-sdk/bin/run-gate-tests.sh lifecycle-kit/gate-tests lifecycle-kit/checks
 ```
 
 ## Contracts
 
-The state-machine contract — the stamp grammar, the flip-and-stamp protocol,
+The state-machine contract — the stamp grammar, the stamp protocol,
 and the gates that enforce it — lives in the kit's
 [`SPEC.md`](SPEC.md#the-state-machine);
 its [`README.md`](README.md#lifecycle-kit)

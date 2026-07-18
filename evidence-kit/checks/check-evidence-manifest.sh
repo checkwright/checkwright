@@ -97,7 +97,7 @@ fi
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "EVIDENCE-MANIFEST: ${#errors[@]} issue(s) coupling $MANIFEST to $STATE:"
     printf '  %s\n' "${errors[@]}"
-    echo "  help: record a run-validate evidence line per suite before flipping to close; the entry stamp proves invocation, the evidence line proves the green result"
+    echo "  help: record a run-validate evidence line per suite before the close entry is stamped; the entry stamp proves invocation, the evidence line proves the green result"
     exit 1
 fi
 echo "EVIDENCE-MANIFEST: clean (grammar + close-entry/stamp-coupling hold for '$iter' at stage '$stage' in $MANIFEST)"

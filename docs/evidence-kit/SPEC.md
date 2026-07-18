@@ -219,17 +219,18 @@ truncation.
 
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT` runs this gate as a close-entry pre-flight: a
 consumer sets `close=…/check-evidence-manifest.sh <manifest>`, and
-`bin/enter-stage.sh` appends the header-flipped temp queue and state file, so
-assertion (A)'s close-entry green-block check fires *before* the flip is
-written — the missing evidence becomes a refusal at the flip (pointing at
+`bin/enter-stage.sh` runs it against the candidate temp state file (the
+prospective close stamp appended) and the live queue, so assertion (A)'s
+close-entry green-block check fires *before* the stamp is
+written — the missing evidence becomes a refusal at the entry (pointing at
 run-validate) instead of a self-referential deadlock at pre-commit, where the
 `gates` suite that would produce the evidence re-runs this same red gate
-against the already-flipped header. Belt-and-braces behind the validate
+against the already-stamped cursor. Belt-and-braces behind the validate
 skill's run-validate wiring, not a replacement for it; for a consumer that
 wires it, assertion (A)'s enforcement point moves one step earlier, from
-commit to flip.
+commit to entry.
 
-The validate stage records evidence on a commit later than the entry flip
+The validate stage records evidence on a commit later than the entry stamp
 (assertion C's re-arm scoping): the stamp proves invocation at entry, the
 evidence line proves the green result once the suites have run.
 
