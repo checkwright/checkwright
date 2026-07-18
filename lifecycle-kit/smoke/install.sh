@@ -15,7 +15,7 @@ if [[ ! -f TASK-QUEUE.md ]]; then
     cat > TASK-QUEUE.md <<'EOF'
 # TASK-QUEUE.md — smoke consumer work queue
 
-## Iteration: —  [stage: scope]
+## Iteration: —
 
 ---
 
@@ -47,7 +47,7 @@ rm -rf "$es"; mkdir -p "$es/.workflow" "$es/sessions" "$es/tmp"
 : > "$es/sessions/aabbccdd-0000-0000-0000-000000000000.jsonl"
 cat > "$es/TASK-QUEUE.md" <<'EOF'
 # smoke queue
-## Iteration: prev-iter  [stage: close]
+## Iteration: prev-iter
 
 ---
 
@@ -75,14 +75,18 @@ es_run() {
 esq="$es/TASK-QUEUE.md"; ess="$es/.workflow/WORKFLOW-STATE.txt"; d="$(date +%F)"
 
 es_run scope >/dev/null
-grep -q "^## Iteration: —  \[stage: scope\]\$" "$esq" || { echo "smoke(enter-stage): scope header wrong" >&2; exit 1; }
+grep -q "^## Iteration: —\$" "$esq" || { echo "smoke(enter-stage): scope header wrong" >&2; exit 1; }
 grep -q "^— scope aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): scope stamp missing" >&2; exit 1; }
 if grep -q 'prev-iter' "$ess"; then echo "smoke(enter-stage): state not truncated on reset" >&2; exit 1; fi
 
+# spec: lifecycle-kit/SPEC.md §The stamp protocol — a non-boundary entry writes the evidence file ONLY: the cursor advances by the appended stamp and the queue is byte-identical afterwards
+cp "$esq" "$es/q.before"
 es_run align >/dev/null
-grep -q "^## Iteration: —  \[stage: align\]\$" "$esq" || { echo "smoke(enter-stage): align header wrong" >&2; exit 1; }
+cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): a non-boundary entry wrote the queue" >&2; exit 1; }
 grep -q "^— align aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): align stamp missing" >&2; exit 1; }
 grep -q "^— scope aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): scope stamp lost on append" >&2; exit 1; }
+[[ "$(awk '/^---[[:space:]]*$/{f=1;next} f && NF {l=$2} END{print l}' "$ess")" == align ]] \
+    || { echo "smoke(enter-stage): cursor did not advance to align" >&2; exit 1; }
 
 es_run align >/dev/null
 if [[ "$(grep -c "^— align aabbccdd " "$ess")" -ne 1 ]]; then
@@ -95,10 +99,10 @@ if es_run build >/dev/null 2>&1; then echo "smoke(enter-stage): should refuse a 
 cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on a refusal" >&2; exit 1; }
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): wrote queue on a refusal" >&2; exit 1; }
 
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_ENTRY_PREFLIGHT: a red entry command refuses the flip (no writes), a green one lets it through
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_ENTRY_PREFLIGHT: a red entry command refuses the entry (no writes), a green one lets it through
 cat > "$esq" <<'EOF'
 # smoke queue
-## Iteration: pf-iter  [stage: build]
+## Iteration: pf-iter
 
 ---
 
@@ -135,13 +139,14 @@ es_pf_run() {
 }
 
 cp "$esq" "$es/q.before"; cp "$ess" "$es/s.before"
-if es_pf_run validate >/dev/null 2>&1; then echo "smoke(enter-stage): red preflight should refuse the flip" >&2; exit 1; fi
+if es_pf_run validate >/dev/null 2>&1; then echo "smoke(enter-stage): red preflight should refuse the entry" >&2; exit 1; fi
 cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): wrote state on a preflight refusal" >&2; exit 1; }
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): wrote queue on a preflight refusal" >&2; exit 1; }
 
 touch "$es/preflight-ok"
-es_pf_run validate >/dev/null || { echo "smoke(enter-stage): green preflight should let the flip through" >&2; exit 1; }
-grep -q "^## Iteration: pf-iter  \[stage: validate\]\$" "$esq" || { echo "smoke(enter-stage): green preflight did not flip to validate" >&2; exit 1; }
+es_pf_run validate >/dev/null || { echo "smoke(enter-stage): green preflight should let the entry through" >&2; exit 1; }
+[[ "$(awk '/^---[[:space:]]*$/{f=1;next} f && NF {l=$2} END{print l}' "$ess")" == validate ]] \
+    || { echo "smoke(enter-stage): green preflight did not advance the cursor to validate" >&2; exit 1; }
 grep -q "^pf-iter validate aabbccdd $d\$" "$ess" || { echo "smoke(enter-stage): green preflight did not stamp" >&2; exit 1; }
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --simulate: would-no-op, would-pass, would-refuse; read-only and prefix-marked in all three
@@ -236,7 +241,7 @@ brq="$br/TASK-QUEUE.md"; brs="$br/.workflow/WORKFLOW-STATE.txt"; brd="$br/.workf
 write_br_fixture() {   # $1 = header (and stamp) iteration name
     cat > "$brq" <<EOF
 # smoke queue
-## Iteration: $1  [stage: close]
+## Iteration: $1
 
 ---
 
@@ -283,7 +288,7 @@ cmp -s "$br/s.before" "$brs" || { echo "smoke(enter-stage): wrote state on a fai
 write_br_fixture closing-iter                                            # (c) member names the closing iteration → boundary entry proceeds
 printf '# contract\n\nclosing-iter release none — smoke basis\n' > "$brd"
 br_run scope >/dev/null || { echo "smoke(enter-stage): boundary-require should pass when the member names the closing iteration" >&2; exit 1; }
-grep -q "^## Iteration: —  \[stage: scope\]\$" "$brq" || { echo "smoke(enter-stage): boundary-require pass did not reset the header" >&2; exit 1; }
+grep -q "^## Iteration: —\$" "$brq" || { echo "smoke(enter-stage): boundary-require pass did not reset the header" >&2; exit 1; }
 
 write_br_fixture —                                                       # (d) never-named (—) closing iteration skips the check even with no line
 printf '# contract\n' > "$brd"
@@ -294,7 +299,7 @@ gp="$es/gap-inbox"; mkdir -p "$gp/.workflow"
 gpq="$gp/TASK-QUEUE.md"; gps="$gp/.workflow/WORKFLOW-STATE.txt"; gpi="$gp/.workflow/gap-inbox.md"
 cat > "$gpq" <<EOF
 # smoke queue
-## Iteration: gap-iter  [stage: close]
+## Iteration: gap-iter
 
 ---
 
@@ -331,6 +336,6 @@ cmp -s "$gp/s.before" "$gps" || { echo "smoke(enter-stage): wrote state on a gap
 cmp -s "$gp/q.before" "$gpq" || { echo "smoke(enter-stage): wrote queue on a gap-inbox refusal" >&2; exit 1; }
 printf '# contract: gap inbox\n' > "$gpi"                                            # (b) header-only inbox → boundary entry proceeds
 gp_run scope >/dev/null || { echo "smoke(enter-stage): a header-only gap inbox should not refuse a boundary entry" >&2; exit 1; }
-grep -q "^## Iteration: —  \[stage: scope\]\$" "$gpq" || { echo "smoke(enter-stage): gap-inbox pass did not reset the header" >&2; exit 1; }
+grep -q "^## Iteration: —\$" "$gpq" || { echo "smoke(enter-stage): gap-inbox pass did not reset the header" >&2; exit 1; }
 
 rm -rf "$es"

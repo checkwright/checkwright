@@ -1,17 +1,17 @@
 The `build` (implementation) stage of an iteration. Implement the queued work
 in queue order. Exit condition: task queue empty for this iteration.
 
-**Step 0 — audit-readiness recheck (before the flip+stamp).** The
-queue-only flip re-fires the queue/state-coupled gates but **not** your
-spec-consistency battery (it couples the spec corpus, not the queue), so a
-build session can flip in on an unverified align corpus. Close that hop:
+**Step 0 — audit-readiness recheck (before the stamp).** The
+entry stamp re-fires the state-coupled gates but **not** your
+spec-consistency battery (it couples the spec corpus, not the evidence file), so a
+build session can enter on an unverified align corpus. Close that hop:
 **iff** an `align` stamp for the current iteration exists in
 `.workflow/WORKFLOW-STATE.txt`, run *<consistency-gate: your aggregate
-consistency gate>* and refuse to flip+stamp if it is red — fix the drift first (or return to
+consistency gate>* and refuse to stamp if it is red — fix the drift first (or return to
 `align`). Absent an align stamp, align did not run this iteration; build's
-prior stage is scope, whose exit the flip already re-fires — **except** when
+prior stage is scope, whose exit the entry already re-fires — **except** when
 `check-stage-entry` assertion C fires: a cross-component amendment signal with
-no align stamp blocks the flip until the iteration carries either an align
+no align stamp blocks the entry until the iteration carries either an align
 stamp or an explicit `<iter> align-waived <session> <date>` waiver line,
 written **only on the user's explicit ruling** — never self-issued by this
 entering session.
@@ -19,12 +19,12 @@ entering session.
 **First step — stamp evidence.** Run lifecycle-kit's
 `bin/enter-stage.sh build`: it appends `<iteration> build <session-id> <date>`
 to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
-stamp proves invocation, not faithful execution) and flips the queue header's
-`[stage:]` line to `build`, reading `<session-id>` from `bin/session-id.sh`
+stamp proves invocation, not faithful execution), reading `<session-id>` from
+`bin/session-id.sh`
 (the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. Commit the flip together with
-this stamp — the arriving-stage flip; the line and its stamp must match, so
-they ride in one commit (the departing session left the line untouched).
+(writing nothing) if `check-stage-entry` is red. That stamp *is* the
+transition — the last stamp is the stage cursor, so nothing flips and no queue
+write is involved. Commit the stamp on its own.
 
 Build runs one fresh session per task: a fresh session rehydrates the
 governing docs + queue state at full fidelity from disk, where an in-session
@@ -35,11 +35,10 @@ a fallback before a commit, never as the routine per-task reset.
 **Every session still stamps** — re-run `bin/enter-stage.sh build` each
 session: it appends a fresh `<iter> build <session-id> <date>` line with this
 session's id, so WORKFLOW-STATE keeps the per-session audit trail
-(`check-stage-evidence` tolerates multiple `build` stamps; it needs only one
-matching the header). The **`[stage:]` flip** is once-per-stage, and the tool
-handles that: on a same-stage re-entry the line is already `build`, so the
-flip is a no-op and only the stamp lands (a re-run within one session that
-already stamped is reported as an idempotent no-op). Prefer committing the new
+(`check-stage-evidence` tolerates multiple `build` stamps). A sibling stamp
+naming `build` leaves the cursor where it already is, so there is no
+once-per-stage write to coordinate — only a re-run within one session that
+already stamped is reported as an idempotent no-op. Prefer committing the new
 stamp standalone when the task will land as several commits, so the evidence
 is durable rather than sitting uncommitted across a long session.
 

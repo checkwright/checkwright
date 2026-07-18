@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the deterministic flip+stamp half of a stage transition, mechanized (judgment stays in the skill)
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the deterministic stamp half of a stage transition, mechanized (judgment stays in the skill)
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -57,46 +57,50 @@ fi
 tmpdir="${GATE_SDK_TMP_DIR:-.tmp}"
 mkdir -p "$tmpdir"
 tmpqueue="$tmpdir/enter-stage.queue.$$"
-trap 'rm -f "$tmpqueue"' EXIT
+tmpstate="$tmpdir/enter-stage.state.$$"
+trap 'rm -f "$tmpqueue" "$tmpstate"' EXIT
 truncated=()
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the pre-flight hand-off: the cursor is the last stamp, so the temp file carrying the candidate transition is the STATE file, not the queue. The boundary reset additionally renames the header (dropping any residual pre-upgrade [stage:] field), so the first stage passes a temp queue too; every later entry passes the live queue untouched — stage motion no longer writes it.
 if [[ "$first" == 1 ]]; then
-    awk -v nh="## Iteration: —  [stage: $stage]" '
-        !d && /^## Iteration:/ { print nh; d = 1; next }
+    awk '
+        !d && /^## Iteration:/ { print "## Iteration: —"; d = 1; next }
         { print }
     ' "$QUEUE" > "$tmpqueue"
+    header_only="$(awk '{ print } /^---[[:space:]]*$/ { exit }' "$STATE")"
+    printf '%s\n\n%s\n' "$header_only" "$stamp_line" > "$tmpstate"
+    pre_queue="$tmpqueue"
 else
-    awk -v st="$stage" '
-        !d && /^## Iteration:/ { sub(/\[stage:[^]]*\]/, "[stage: " st "]"); d = 1 }
-        { print }
-    ' "$QUEUE" > "$tmpqueue"
+    cp "$STATE" "$tmpstate"
+    printf '%s\n' "$stamp_line" >> "$tmpstate"
+    pre_queue="$QUEUE"
 fi
 
-if ! preflight="$(bash "$KIT/checks/check-stage-entry.sh" "$tmpqueue" "$STATE" 2>&1)"; then
+if ! preflight="$(bash "$KIT/checks/check-stage-entry.sh" "$pre_queue" "$tmpstate" 2>&1)"; then
     if [[ "$sim" == 1 ]]; then
-        echo "enter-stage (simulate): check-stage-entry would refuse the flip to '$stage':" >&2
+        echo "enter-stage (simulate): check-stage-entry would refuse the entry to '$stage':" >&2
         sim_relay "$preflight" >&2
         exit 1
     fi
-    echo "enter-stage: check-stage-entry refuses the flip to '$stage' — nothing written:" >&2
+    echo "enter-stage: check-stage-entry refuses the entry to '$stage' — nothing written:" >&2
     printf '%s\n' "$preflight" >&2
-    echo "  help: resolve the finding above, or (to override deliberately) perform the stamp+flip by hand." >&2
+    echo "  help: resolve the finding above, or (to override deliberately) perform the stamp by hand." >&2
     exit 1
 fi
 
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_ENTRY_PREFLIGHT: each entry matching the entered stage runs after the built-in pre-flight with the flipped temp queue + state file appended; a non-zero exit refuses the flip, nothing written
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — LIFECYCLE_KIT_ENTRY_PREFLIGHT: each entry matching the entered stage runs after the built-in pre-flight with the same '<queue> <state>' argv the built-in gets — the candidate-carrying temp file is the state file, the queue passes through live; a non-zero exit refuses the entry, nothing written
 for pf in ${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]+"${LIFECYCLE_KIT_ENTRY_PREFLIGHT[@]}"}; do
     [[ "${pf%%=*}" == "$stage" ]] || continue
     read -r -a pf_argv <<<"${pf#*=}"
-    if ! pf_out="$("${pf_argv[@]}" "$tmpqueue" "$STATE" 2>&1)"; then
+    if ! pf_out="$("${pf_argv[@]}" "$pre_queue" "$tmpstate" 2>&1)"; then
         if [[ "$sim" == 1 ]]; then
-            echo "enter-stage (simulate): LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' would refuse the flip:" >&2
+            echo "enter-stage (simulate): LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' would refuse the entry:" >&2
             sim_relay "$pf_out" >&2
             exit 1
         fi
-        echo "enter-stage: LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' refuses the flip — nothing written:" >&2
+        echo "enter-stage: LIFECYCLE_KIT_ENTRY_PREFLIGHT command for '$stage' refuses the entry — nothing written:" >&2
         printf '%s\n' "$pf_out" >&2
-        echo "  help: resolve the finding above, or (to override deliberately) perform the stamp+flip by hand." >&2
+        echo "  help: resolve the finding above, or (to override deliberately) perform the stamp by hand." >&2
         exit 1
     fi
 done
@@ -162,13 +166,12 @@ if [[ "$first" == 1 && "$cur_iter" != "—" ]]; then
 fi
 
 if [[ "$sim" == 1 ]]; then
-    echo "enter-stage (simulate): entry to '$stage' would proceed — no stamp, no flip, nothing written."
+    echo "enter-stage (simulate): entry to '$stage' would proceed — no stamp, nothing written."
     exit 0
 fi
 
 if [[ "$first" == 1 ]]; then
-    header_only="$(awk '{ print } /^---[[:space:]]*$/ { exit }' "$STATE")"
-    printf '%s\n\n%s\n' "$header_only" "$stamp_line" > "$STATE"
+    mv "$tmpstate" "$STATE"
     # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit-owned lesson-evidence file resets as a built-in member (kit owns this surface); LIFECYCLE_KIT_BOUNDARY_TRUNCATE stays reserved for files the kit does not own
     for bt in "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" ${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]}"}; do
         [[ -f "$bt" ]] || continue
@@ -177,18 +180,21 @@ if [[ "$first" == 1 ]]; then
         mv "$bttmp" "$bt"
         truncated+=("$bt")
     done
+    mv "$tmpqueue" "$QUEUE"
 else
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the live stamp is an append, never a rewrite of the pre-flight temp copy: a concurrent session's stamp landing between the copy and the write would be lost by a whole-file move
     printf '%s\n' "$stamp_line" >> "$STATE"
 fi
-mv "$tmpqueue" "$QUEUE"
 trap - EXIT
+rm -f "$tmpqueue" "$tmpstate"
 
 if [[ "$first" == 1 ]]; then
-    echo "enter-stage: iteration-boundary reset — stamped '$stamp_line'; header set to '## Iteration: —  [stage: $stage]'."
+    echo "enter-stage: iteration-boundary reset — stamped '$stamp_line'; header set to '## Iteration: —'."
+    echo "  next: commit $QUEUE and $STATE together (the boundary reset writes both), hook enabled."
 else
-    echo "enter-stage: stamped '$stamp_line'; header flipped to [stage: $stage]."
+    echo "enter-stage: stamped '$stamp_line'; the cursor is now '$stage' (no queue write — stage motion never touches it)."
+    echo "  next: commit $STATE, hook enabled."
 fi
-echo "  next: commit $QUEUE and $STATE together (the flip+stamp ride in one commit), hook enabled."
 if [[ ${#truncated[@]} -gt 0 ]]; then
     echo "  note: boundary-truncated to the '# contract:' header: ${truncated[*]} — commit alongside the reset."
 fi

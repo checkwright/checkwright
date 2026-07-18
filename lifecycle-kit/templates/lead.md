@@ -1,7 +1,7 @@
 The **iteration lead** — a live session that dispatches an iteration's stage
 sessions and answers their escalations, so a blocked stage resumes in place
 rather than restarting. It is **not a stage skill**: it invokes no
-`enter-stage.sh`, stamps no evidence, flips no header, and joins no stage
+`enter-stage.sh`, stamps no evidence, moves no cursor, and joins no stage
 roster. Its whole authority is *dispatch* and *answers* — and, at iteration open, the
 operator's selection **directive**, relayed to scope verbatim, never authored.
 
@@ -49,7 +49,7 @@ session rides — is standing dispatch policy (the ruling-config slot below):
 Under either posture the lead dispatches a stage session as a **background
 agent** whose prompt is that stage's ordinary skill invocation (`/build`,
 `/validate`, …); the stage session executes its stage skill unchanged. Every
-lifecycle-state write — the flip+stamp, commits, evidence — happens **in the
+lifecycle-state write — the entry stamp, commits, evidence — happens **in the
 stage session**, never in the lead.
 
 Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background
@@ -159,7 +159,7 @@ ruling classes are stated.>*
 ## Stamps are authoritative (the load-bearing invariant)
 
 The lead writes **no** lifecycle state — no WORKFLOW-STATE stamps, no queue
-header flips, no evidence files. Every stamp originates in the stage session via
+writes, no evidence files. Every stamp originates in the stage session via
 `enter-stage.sh` (lifecycle-kit/SPEC.md §The state machine). Lead-does-stamping
 is ruled out, not merely omitted: it breaks this invariant, and under the
 `stage` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` a lead stamp is exactly the
@@ -191,8 +191,7 @@ consequences:
   splits into batches, those batches are **N sibling stage sessions the lead
   dispatches and validates** — each entering through `enter-stage.sh` as a
   same-stage re-entry (lifecycle-kit/SPEC.md §The state machine: N sessions may
-  enter one stage, the flip a no-op after the first, each leaving its own
-  stamp). A stage session **never dispatches a sibling stage session**: a stage
+  enter one stage, each leaving its own stamp and the cursor staying put). A stage session **never dispatches a sibling stage session**: a stage
   that sub-dispatches its own batches nests a second supervisor at the lead's
   tier, hidden from its budget and context accounting — the redundancy the split
   posture exists to remove, and the clause is a dispatched stage's authority to

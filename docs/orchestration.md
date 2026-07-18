@@ -83,7 +83,7 @@ lead rides a cheap routing tier and only the judgment-heavy work pays premium
 prices. To drive an iteration under it:
 
 1. **`/lead` in a fresh session on the routing tier.** The lead role writes no
-   lifecycle state of its own; every flip, stamp, and commit stays in the stage
+   lifecycle state of its own; every stamp and commit stays in the stage
    sessions it dispatches, so the history reads identically whether or not a
    lead drove it. Its first step records the session-role marker the
    session-context hook reads, so lead sessions stop drawing executor-facing
@@ -130,13 +130,13 @@ Picture two iterations live at once — say *surface-trust* and *docs-polish*.
 1. **Each iteration owns one branch.** The first operator's iteration lives on
    its home branch; the second operator cuts a branch at their own `/scope`
    entry. The integration branch is just the degenerate single-operator home,
-   which is why a solo repo's own dogfooding needs none of this. Every flip and
+   which is why a solo repo's own dogfooding needs none of this. Every
    stamp an iteration makes lands on its own branch — the state surfaces stay
    single-writer even while two operators move.
-2. **Each branch stamps its own state.** `surface-trust`'s stage sessions flip
-   its header and append its evidence on its branch; `docs-polish` does the same
+2. **Each branch stamps its own state.** `surface-trust`'s stage sessions append
+   its evidence on its branch; `docs-polish` does the same
    on its. Neither reads the other's state, so there is no shared file to race
-   on — operator attribution rides the git author on each flip commit, no new
+   on — operator attribution rides the git author on each stamp commit, no new
    stamp grammar required.
 3. **At a merge, the iteration-scoped surfaces resolve to the arriving side.**
    When one branch merges into another, the header line, the evidence file, and

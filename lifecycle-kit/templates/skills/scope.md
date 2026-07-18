@@ -10,7 +10,7 @@ amendment-readiness gate green>*.
 to its header (dropping the prior iteration's stamps — git history is the
 permanent audit trail; the gates only ever read the current iteration), stamps
 `— scope <session-id> <date>` under the unnamed-iteration sentinel, and sets
-the queue header to `## Iteration: —  [stage: scope]`. It reads `<session-id>`
+the queue header to `## Iteration: —`. It reads `<session-id>`
 from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
 uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
 *<evidence-reset: reset any per-iteration evidence file your validate stage
@@ -65,10 +65,10 @@ hypothesis — re-verify it against the current tree before building on it.
 When done, **set the iteration name without waiting for confirmation** and
 inform the user: replace the `—` placeholder in the queue header AND update
 the WORKFLOW-STATE scope stamp to match (`check-stage-evidence` requires
-header and stamp to agree, so they ride in one commit). This sets only the
-*name*. **Do not flip the `[stage:]` line here** — the *arriving* stage's
-skill flips it to its own stage as that skill's first step, committed
-atomically with its WORKFLOW-STATE stamp. Invoking the next skill is the
+every stamp's iteration to match the header's, so they ride in one commit).
+The header carries the *name axis alone* — there is no stage field to set, and
+no stage field to advance. The *arriving* stage's skill moves the cursor by
+stamping, as that skill's first step. Invoking the next skill is the
 stage-advance approval (the name itself needs none).
 
 Close by **recommending the next stage**: the trigger-gated audit stage when

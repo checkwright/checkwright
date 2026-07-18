@@ -7,13 +7,14 @@ held-constant red line carries the live task slug that blocks it>*.
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
 validate`: it appends `<iteration> validate <session-id> <date>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
-proves invocation, not faithful execution) and flips the queue header's
-`[stage:]` line to `validate`, reading `<session-id>` from `bin/session-id.sh`
-(the newest transcript — never hand-picked), using `date +%F`. Commit the flip
-together with this stamp — the arriving-stage flip; the line and its stamp
-must match, so they ride in one commit. The tool refuses (writing nothing) if
+proves invocation, not faithful execution), reading `<session-id>` from
+`bin/session-id.sh`
+(the newest transcript — never hand-picked), using `date +%F`. That stamp *is*
+the transition — the last stamp is the stage cursor, so nothing flips and no
+queue write is involved. Commit the stamp on its own. The tool refuses (writing
+nothing) if
 `check-stage-entry` is red — which for `validate` additionally requires the
-active queue drained before this flip (build is not done until the queue is
+active queue drained before this entry (build is not done until the queue is
 empty).
 
 ## Session ritual
@@ -39,7 +40,7 @@ task rots.
 **Record the evidence.** Append one line per suite to your per-iteration
 evidence manifest (suite, log digest, verdict, date) and commit it at validate
 completion — the evidence does not exist at the entry stamp, so it rides a
-later commit, not the entry flip. An iteration with a validate stamp but no
+later commit, not the entry stamp. An iteration with a validate stamp but no
 evidence line is the recorded-nothing gap the manifest closes. If your kit
 provides a codified validate spine — a `run-validate` tool that runs each
 suite, diffs the held-constant baseline, and appends the evidence line —

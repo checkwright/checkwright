@@ -2,7 +2,7 @@
 # Behavioral test of checks/check-stage-entry.sh assertions B and C — the
 # scenarios the one-pair good/bad harness cannot hold. The good/bad fixture
 # pair (run-gate-tests.sh) covers assertion A (prerequisite-stamp ordering: a
-# [stage: close] header with no validate stamp); the harness admits only one
+# close cursor with no validate stamp); the harness admits only one
 # bad/ dir, so assertion B drives untagged residue at drain entry (exit 1),
 # [drain-exempt:] residue at drain entry (exit 0, reason echoed), an
 # empty-reason tag (exit 1), and tagged residue at the drain successor's
@@ -25,7 +25,7 @@ fails=0
 cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo-iteration  [stage: validate]
+## Iteration: demo-iteration
 
 ---
 
@@ -43,6 +43,7 @@ cat >"$SANDBOX/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 
 demo-iteration scope aaaaaaaa 2026-06-01
 demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration validate cccccccc 2026-06-03
 EOF
 
 out="$(cd "$SANDBOX" && "$GATE" 2>&1)"; rc=$?
@@ -57,13 +58,14 @@ fi
 
 # --- assertion B, drain-exempt model: tag skips at drain entry, never at successor entry ---
 
-state_through_build() {  # writes a scope+build stamp file into $1/.workflow
+state_through_validate() {  # stamps scope..validate into $1/.workflow — the last stamp IS the entered stage
     mkdir -p "$1/.workflow"
     cat >"$1/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 ---
 
 demo-iteration scope aaaaaaaa 2026-06-01
 demo-iteration build bbbbbbbb 2026-06-02
+demo-iteration validate cccccccc 2026-06-03
 EOF
 }
 
@@ -85,7 +87,7 @@ mkdir -p "$b2"
 cat >"$b2/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo-iteration  [stage: validate]
+## Iteration: demo-iteration
 
 ---
 
@@ -97,7 +99,7 @@ cat >"$b2/TASK-QUEUE.md" <<'EOF'
 
 ## Done
 EOF
-state_through_build "$b2"
+state_through_validate "$b2"
 check_case "B2 tagged-residue-drain-entry" "$b2" 0 "validate-half is validate work"
 
 # B3 (bad): an empty reason is malformed — the exemption does not hold.
@@ -106,7 +108,7 @@ mkdir -p "$b3"
 cat >"$b3/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo-iteration  [stage: validate]
+## Iteration: demo-iteration
 
 ---
 
@@ -118,7 +120,7 @@ cat >"$b3/TASK-QUEUE.md" <<'EOF'
 
 ## Done
 EOF
-state_through_build "$b3"
+state_through_validate "$b3"
 check_case "B3 empty-reason-malformed" "$b3" 1 "empty reason is malformed"
 
 # B4 (bad): tagged residue at the drain successor's entry — the backstop runs
@@ -128,7 +130,7 @@ mkdir -p "$b4"
 cat >"$b4/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo-iteration  [stage: close]
+## Iteration: demo-iteration
 
 ---
 
@@ -147,17 +149,18 @@ cat >"$b4/.workflow/WORKFLOW-STATE.txt" <<'EOF'
 demo-iteration scope aaaaaaaa 2026-06-01
 demo-iteration build bbbbbbbb 2026-06-02
 demo-iteration validate dddddddd 2026-06-03
+demo-iteration close eeeeeeee 2026-06-04
 EOF
 check_case "B4 tagged-residue-successor-entry" "$b4" 1 "[drain-exempt:] included"
 
 # --- assertion C: a cross-component build entry demands an align (or waiver) stamp ---
 
-build_queue() {  # writes a [stage: build] TASK-QUEUE.md into $1
+build_queue() {  # writes the name-axis-only TASK-QUEUE.md the build-entry cases share into $1
     mkdir -p "$1"
     cat >"$1/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 
-## Iteration: demo-iteration  [stage: build]
+## Iteration: demo-iteration
 
 ---
 

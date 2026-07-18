@@ -5,12 +5,12 @@ lessons promoted first).
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
 close`: it appends `<iteration> close <session-id> <date>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
-proves invocation, not faithful execution) and flips the queue header's
-`[stage:]` line to `close`, reading `<session-id>` from `bin/session-id.sh`
+proves invocation, not faithful execution), reading `<session-id>` from
+`bin/session-id.sh`
 (the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. Commit the flip together with
-this stamp — the arriving-stage flip; the line and its stamp must match, so
-they ride in one commit.
+(writing nothing) if `check-stage-entry` is red. That stamp *is* the
+transition — the last stamp is the stage cursor, so nothing flips and no queue
+write is involved. Commit the stamp on its own.
 
 ## Session ritual
 

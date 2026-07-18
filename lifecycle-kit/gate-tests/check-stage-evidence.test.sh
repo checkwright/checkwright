@@ -34,25 +34,25 @@ case_run() {
 # A — an unnamed iteration past the first stage must FAIL (without the header
 #     guard a '—' header matched a '— validate' stamp and passed clean).
 case_run "unnamed-past-first-stage" \
-    '## Iteration: —  [stage: validate]' \
+    '## Iteration: —' \
     '— validate s1 2026-06-12\n' \
     1 "still unnamed ('—') at stage 'validate'"
 
 # B — a named header with a leftover '—' bootstrap stamp is stale and must FAIL.
 case_run "stale-bootstrap-under-named" \
-    '## Iteration: demo-iteration  [stage: scope]' \
+    '## Iteration: demo-iteration' \
     '— scope s1 2026-06-12\n' \
     1 "legal '—' bootstrap"
 
 # C — the legitimate pre-naming first-stage bootstrap is CLEAN.
 case_run "unnamed-first-stage-bootstrap" \
-    '## Iteration: —  [stage: scope]' \
+    '## Iteration: —' \
     '— scope s1 2026-06-12\n' \
     0 "clean"
 
 # D — a properly named iteration with a matching stamp at a later stage is CLEAN.
 case_run "named-at-validate" \
-    '## Iteration: demo-iteration  [stage: validate]' \
+    '## Iteration: demo-iteration' \
     'demo-iteration scope s1 2026-06-12\ndemo-iteration validate s2 2026-06-12\n' \
     0 "clean"
 
@@ -62,27 +62,37 @@ case_run "named-at-validate" \
 #     It also shares its id with build here — a waiver stamp is exempt from the
 #     stage-distinctness pass, so that reuse does not fire.
 case_run "waiver-token-accepted" \
-    '## Iteration: demo-iteration  [stage: build]' \
+    '## Iteration: demo-iteration' \
     'demo-iteration scope s1 2026-06-12\ndemo-iteration align-waived s3 2026-06-12\ndemo-iteration build s3 2026-06-12\n' \
     0 "clean"
 
 # F — two distinct stages sharing one session id must FAIL: a stage flip is a
 #     context boundary, so scope and build cannot both be session s1.
 case_run "shared-session-across-stages" \
-    '## Iteration: demo-iteration  [stage: build]' \
+    '## Iteration: demo-iteration' \
     'demo-iteration scope s1 2026-06-12\ndemo-iteration build s1 2026-06-13\n' \
     1 "is shared by stages"
 
 # G — a multi-session build (same stage, two different ids) is CLEAN: same-stage
 #     re-entries may rotate the id freely.
 case_run "same-stage-multi-session" \
-    '## Iteration: demo-iteration  [stage: build]' \
+    '## Iteration: demo-iteration' \
     'demo-iteration scope s1 2026-06-12\ndemo-iteration build s2 2026-06-13\ndemo-iteration build s3 2026-06-14\n' \
     0 "clean"
 
+# G2 — a state file present but carrying no stamp (the no-cursor window) must
+#      FAIL. Once the stage axis moved off the header this is the shape that
+#      would otherwise go vacuous: with no stamps there is nothing for the
+#      grammar or staleness passes to reject, so an unstamped file would read
+#      as clean — exactly what this gate exists to catch.
+case_run "no-cursor-unstamped-state" \
+    '## Iteration: demo-iteration' \
+    '' \
+    1 "carries no stamp"
+
 # H — case F's shared-id input greens under the 'iteration' posture: the knob
 #     skips only the cross-stage distinctness map (attribution still stamps).
-printf '%s\n' '## Iteration: demo-iteration  [stage: build]' >"$tmp/TASK-QUEUE.md"
+printf '%s\n' '## Iteration: demo-iteration' >"$tmp/TASK-QUEUE.md"
 printf 'header prose\n---\ndemo-iteration scope s1 2026-06-12\ndemo-iteration build s1 2026-06-13\n' >"$tmp/WORKFLOW-STATE.txt"
 out="$(LIFECYCLE_KIT_SESSION_BOUNDARY=iteration "$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
 if [[ "$rc" -ne 0 ]] || ! grep -qF "clean" <<<"$out"; then
@@ -90,7 +100,7 @@ if [[ "$rc" -ne 0 ]] || ! grep -qF "clean" <<<"$out"; then
 fi
 
 # I — a bad posture value must exit 2 (the loader's fail-closed machine check).
-printf '%s\n' '## Iteration: demo-iteration  [stage: build]' >"$tmp/TASK-QUEUE.md"
+printf '%s\n' '## Iteration: demo-iteration' >"$tmp/TASK-QUEUE.md"
 printf 'header prose\n---\ndemo-iteration build s1 2026-06-13\n' >"$tmp/WORKFLOW-STATE.txt"
 out="$(LIFECYCLE_KIT_SESSION_BOUNDARY=bogus "$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
 if [[ "$rc" -ne 2 ]] || ! grep -qF "neither 'stage' nor 'iteration'" <<<"$out"; then
@@ -101,5 +111,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-evidence.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages + bogus posture rejected; bootstrap + named later stage + waiver token + multi-session build + iteration-posture shared id accepted)"
+echo "check-stage-evidence.test: ok (unnamed past first stage + stale bootstrap + shared-session-across-stages + unstamped no-cursor state + bogus posture rejected; bootstrap + named later stage + waiver token + multi-session build + iteration-posture shared id accepted)"
 exit 0

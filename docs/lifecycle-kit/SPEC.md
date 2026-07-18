@@ -19,13 +19,14 @@ resolve through its registry).
 
 ## The state machine
 
-Two governed surfaces:
+Two governed surfaces, carrying **one axis each**:
 
 - **The header line**, at the top of the consumer's queue file (default
-  `TASK-QUEUE.md`):
+  `TASK-QUEUE.md`), carrying the *slow* axis — the iteration name, and nothing
+  else:
 
   ```
-  ## Iteration: <name>  [stage: <stage>]
+  ## Iteration: <name>
   ```
 
 - **The evidence file** (default `.workflow/WORKFLOW-STATE.txt`): free prose,
@@ -35,8 +36,20 @@ Two governed surfaces:
   <iteration> <stage> <session-id> <YYYY-MM-DD>
   ```
 
+  It carries the *fast* axis too: **the last data line's `<stage>` token is the
+  cursor** — the single source for "which stage is this iteration in".
+
+The header once carried a `[stage:]` field as well. It was a second copy of a
+derivable fact — every stage entry already stamps its `<stage>` — bought at one
+queue write per stage entry, and kept in sync only by an assertion that existed
+for no other purpose. Deriving the cursor from the stamps retires the copy, the
+write, and the assertion together (derivation-first). A consumer upgrading
+mid-iteration needs no migration step: every header reader strips an optional
+trailing bracketed field, so a residual `[stage:]` is inert and the next
+iteration-boundary reset rewrites the header without it.
+
 Both surfaces are **single-writer and branch-scoped**: an iteration owns exactly
-one branch (its home branch) and every flip and stamp lands there, so
+one branch (its home branch) and every stamp lands there, so
 concurrency between operators is git branch topology, not a multi-writer state
 file. The integration branch is the degenerate single-operator home; a second
 concurrent operator cuts a branch at their scope entry. The merge semantics that
@@ -47,30 +60,50 @@ The default motion is the linear stage walk; the gate-legal shapes for leaving
 it — abandon, split, reopen — are specified in §Deviation transitions, not
 improvised.
 
-### The flip+stamp protocol
+### The stamp protocol
 
-The **arriving** stage's skill flips the `[stage:]` line to its own stage as
-its first step, committed atomically with its evidence stamp — the departing
-session never flips it, leaving no uncommitted stage line across the session
-boundary. The flip commit stages the queue file + the evidence file, so every
-queue/state-coupled gate re-fires on it: the prior stage's machine-expressible
-exit is re-verified *at the flip* (`check-stage-evidence`), and
-`check-stage-entry` extends that one hop back. A self-asserted "stage
+The **arriving** stage's skill *stamps* the evidence file as its first step —
+and that stamp is the whole transition, because the last stamp is the cursor.
+Nothing flips. The departing session writes nothing, so no uncommitted stage
+line crosses the session boundary. The entry commit stages the evidence file,
+so every state-coupled gate re-fires on it: the prior stage's
+machine-expressible exit is re-verified *at the entry* (`check-stage-evidence`),
+and `check-stage-entry` extends that one hop back. A self-asserted "stage
 complete" marker would prove a claim, not completion — the kit deliberately
 has none.
 
+**What the entry re-fires, and what it does not.** The entry commit stages the
+evidence file alone, so the gates coupled to it — `check-stage-entry`,
+`check-stage-evidence`, `check-evidence-manifest`, `check-trajectory-fresh`,
+and any gate globbing the workflow dir — re-fire at every entry exactly as
+before. Queue-only-coupled gates do not: the queue is not written at an entry,
+so their re-run would be a no-op on unchanged input, and each of
+them couples some *other* input that fires it on the change it actually gates.
+What is genuinely given up is the incidental *periodic sweep* — the guarantee
+that those gates ran at least once per stage regardless of what changed, which
+could catch drift introduced out of band (a `--no-verify` commit, an edit
+outside every coupled glob). The full battery at the validate stage is the
+surviving sweep and the stronger one: it runs every gate, not the
+queue-coupled subset. The per-entry queue re-fire was a side effect of the flip,
+never the designed sweep — an accepted, costed loss.
+
+Mid-iteration the queue file is written only for real **work-state**
+transitions: promotion and naming (the first stage), the Done move riding each
+amendment-merge commit, and the closing dispositions. Stage motion never
+touches it.
+
 The **deterministic half** of that first step — read the iteration from the
-header, read the id from `session-id.sh`, append the stamp, flip the
-`[stage:]` field — is mechanized by `bin/enter-stage.sh <stage>`, the same
+header, read the id from `session-id.sh`, append the stamp — is mechanized by
+`bin/enter-stage.sh <stage>`, the same
 writer/asserter split as `gen-pre-commit.sh` ↔ `check-graph`: the skill
 invokes it, **judgment stays in the skill** (what the stage means, its exit
 condition, when to enter it at all), and the stage gates stay the independent
 verifier. The tool takes no `--force` flag, so the compliant path is the easy
-one — an operator who intends to override runs the flip+stamp by hand, exactly
-as before the tool existed. Committing the flip+stamp remains the skill's
+one — an operator who intends to override writes the stamp by hand, exactly
+as before the tool existed. Committing the stamp remains the skill's
 business — **never with `--no-verify`**: `enter-stage.sh` refuses to write
 while `check-stage-entry` is red, so the hook a bypass skips is exactly the
-battery that would confirm the stamp just written. A stage flip is never the
+battery that would confirm the stamp just written. A stage entry is never the
 one-off-with-cause that a bypass is reserved for.
 
 The first stage is the iteration boundary: `enter-stage.sh` *truncates* the
@@ -78,6 +111,19 @@ evidence file back to its header (git history is the permanent audit trail;
 the gates only read the current iteration) and stamps under the
 unnamed-iteration sentinel `—`, rewritten to the real name when the stage
 names the iteration. Later stages only append.
+
+**The no-cursor window.** Because the cursor is the last stamp, it has an empty
+state the header never had — and one of its two shapes is reachable in normal
+operation. The boundary truncation leaves the evidence file holding its prose
+preamble and `---` with **no data line**, and the cursor is empty until the
+boundary stamp lands milliseconds later; the second shape is an absent file
+entirely (an unvendored or pre-upgrade consumer). Every reader of the cursor —
+inside this kit and in every consuming kit that derives it — **states its own
+behavior for that window** rather than inheriting whatever its parser happens
+to emit. The shared derivation `lifecycle_current_stage` reports it as empty
+with a *success* status, because "no cursor" is a legitimate state and not an
+error; what it means is the caller's ruling, and each caller's is recorded in
+its own section.
 
 **Honest limit:** a stamp proves the stage skill was *invoked*, not that its
 work was done faithfully — strictly better than skip-and-no-trace, but not
@@ -88,7 +134,7 @@ clear), and the stage skills stamp exactly what it prints, so each stage's
 provenance is observed, not guessed.
 `check-stage-evidence`'s invocation floor keys on `<iteration> <stage>`; it
 additionally reads the session id to enforce cross-stage distinctness under
-the default `stage` posture (a stage flip must carry a fresh session; the
+the default `stage` posture (a stage entry must carry a fresh session; the
 `iteration` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` relaxes exactly this —
 see §check-stage-evidence).
 
@@ -101,19 +147,18 @@ which the stage's first entry satisfied for every sibling. So N sessions may
 enter one stage — a multi-session build, or a lead's intra-stage batch split
 (§templates/lead.md) — serialized by the shared index/HEAD like any concurrent
 sessions; each leaves its own stamp, so per-batch provenance rides the existing
-stamp grammar with no new field. The flip stays once-per-stage: after the first
-entry the `[stage:]` line already reads the current stage, so a sibling's
-`enter-stage.sh` rewrites it to the same value (a no-op flip) and only its stamp
-lands.
+stamp grammar with no new field. A sibling's entry simply appends another stamp
+naming the same stage, which leaves the cursor where it already was — there is
+no once-per-stage write left to make idempotent.
 
 **The optional lead never becomes a second state source.** An iteration may run
 with a live *lead* session (§templates/lead.md) that dispatches its stage
 sessions and answers their escalations so a blocked stage resumes in place
-rather than restarting. The lead writes no state: every flip and stamp
+rather than restarting. The lead writes no state: every stamp
 originates in a stage session through `enter-stage.sh`, exactly as above, so the
-flip+stamp protocol stays the only iteration state and a lead crash costs
+stamp protocol stays the only iteration state and a lead crash costs
 nothing the tracked surfaces do not already hold. The lead is a boundary skill,
-not a stage — it flips nothing and joins no stage set, so the coverage gate
+not a stage — it stamps nothing and joins no stage set, so the coverage gate
 never reads it (the release-sweep precedent, §templates/lead.md).
 
 ### Deviation transitions
@@ -123,7 +168,7 @@ default; the gate-legal shapes for leaving that walk are specified here, not
 improvised. Each composes mechanism the kit already owns — `enter-stage.sh`'s
 boundary reset, canon-kit's amendment pairing, queue-kit's tag algebra — so
 **no new tooling, state, stamp grammar, or tag is introduced**, and a
-harness-less consumer keeps every shape. `check-stage-entry` and the flip+stamp
+harness-less consumer keeps every shape. `check-stage-entry` and the stamp
 protocol bar an ad-hoc abandon, which is why each hatch is spelled against the
 existing gates.
 
@@ -144,7 +189,7 @@ explicitly — demote it (ritual above) or carry it (it stays active with its
 amendment and the next iteration adopts it); sink or delete every Lessons entry
 under the existing disposition rules (the first-stage entry refuses a non-empty
 Lessons section, so this is already forced). Then the next `enter-stage.sh
-scope` *is* the abandon: scope has no mandatory predecessor, so the flip is
+scope` *is* the abandon: scope has no mandatory predecessor, so the entry is
 gate-legal from any stage, and the boundary reset drops the dead iteration's
 stamps exactly as it drops a closed one's (git history is the permanent audit
 trail — the existing boundary doctrine, not a new rule). The abandon commit's
@@ -153,7 +198,8 @@ subject names the abandoned iteration; no stamp grammar changes.
 **Split mid-flight** narrows a live iteration. The iteration name never changes
 once set — every stamp already written carries it, and a rename-in-place is
 barred because it would orphan those stamps against `check-stage-evidence`'s
-header/stamp agreement. So splitting is demotion: demote the split-out subset
+name-axis agreement — its staleness assertion reds every stamp whose iteration
+is not the header's. So splitting is demotion: demote the split-out subset
 via the ritual and drive the remaining queue through the remaining stages; the
 subset re-promotes at a later scope under its own iteration.
 
@@ -291,21 +337,21 @@ The contributor altitude of the coordination map: a second operator running
 their own concurrent iteration on the same repo. The two narrower altitudes are
 ruled elsewhere and stay untouched — sub-agents within one session
 (delegation-kit's serialize-or-worktree rules) and sessions within one iteration
-(§templates/lead.md: one live iteration, stages serialized through the flip+stamp
-protocol). Fork contributors are out of scope: an outside PR never flips the
-header or stamps state — it only passes the battery in CI.
+(§templates/lead.md: one live iteration, stages serialized through the stamp
+protocol). Fork contributors are out of scope: an outside PR never stamps
+state — it only passes the battery in CI.
 
 **The topology ruling — state surfaces stay single-writer; concurrency is git
 topology.** The header line, the evidence file, and every boundary-truncated
 surface are *iteration-scoped*: an iteration owns exactly one branch (its home
-branch), and every flip and stamp lands there. One live iteration per branch —
+branch), and every stamp lands there. One live iteration per branch —
 the second concurrent operator cuts a branch at their scope entry; the
 integration branch is the degenerate single-operator home, which is why a
 single-operator repo's own dogfood changes nothing. Branch naming is prose
 guidance (name the branch after the iteration), not mechanism — no knob, no
 gate. Ruled out, each because it composes worse than git already does: per-operator
 state files or stamp-attribution fields (multi-writer surfaces and a new stamp
-grammar — operator attribution already rides the git author on every flip
+grammar — operator attribution already rides the git author on every stamp
 commit); a lock or lease on the integration branch (state the kit refuses to
 own, where git already provides the isolation).
 
@@ -320,8 +366,12 @@ members — rendered by `lifecycle_supersede_set` (§lib/stages.sh). The queue f
 is deliberately *not* in the set: its body (backlog sections, lessons) is shared
 content that merges like any prose, and only its header line is iteration-scoped
 — resolved by hand to the arriving iteration, with a wrong resolution going red
-at the next commit because `check-stage-evidence` requires header↔stamp
-agreement and the state file already took the arriving side by driver.
+at the next commit because `check-stage-evidence` requires the header's name to
+agree with every stamp's, and the state file already took the arriving side by
+driver. Contention on the queue is lower than it reads: since the cursor left
+the header, **stage motion writes no queue at all**, so the file changes only on
+real work-state transitions (promotion and naming, a Done move, the closing
+dispositions) rather than once per stage entry per operator.
 Held-constant baselines and append-across-iterations evidence keep normal merge
 semantics: their conflicts are real disagreements. The kit owns exactly one
 `union`-driver surface — the committed gap inbox (§The committed gap inbox),
@@ -342,8 +392,9 @@ silence. Writer/asserter split: the installer emits the attribute block
 (marker-bounded, `lib/inject.sh`), `check-merge-attrs` verifies it — the
 `gen-pre-commit.sh` ↔ `check-graph` precedent.
 
-**Who may flip, at this altitude.** Unchanged: the arriving stage session flips,
-and only on its own iteration's home branch. A session never flips a branch whose
+**Who may stamp, at this altitude.** Unchanged: the arriving stage session
+stamps,
+and only on its own iteration's home branch. A session never stamps a branch whose
 iteration it is not driving; cross-iteration discoveries (a lesson, a deferred
 filing) land on the discoverer's own branch and reconcile at merge.
 
@@ -414,10 +465,26 @@ body.
 
 The sourced config loader: consumer config first, defaults fill what it left
 unset (an explicitly empty value disables a knob where the contract says so),
-then validation. Also owns the shared header adapters
-(`lifecycle_header`, `lifecycle_header_iter`, `lifecycle_header_stage`,
-`lifecycle_stage_known`) — both gates must parse the header identically, and
-a shared adapter removes that drift axis — and `lifecycle_registration_block`,
+then validation. Also owns the shared state adapters
+(`lifecycle_header`, `lifecycle_header_iter`, `lifecycle_current_stage`,
+`lifecycle_stage_known`) — both gates must read the two axes identically, and
+a shared adapter removes that drift axis.
+
+`lifecycle_current_stage <state-file>` is the **cursor derivation**: the last
+data line's `<stage>` token, the read `bin/enter-stage.sh` already performed
+inline, hoisted so every lifecycle reader shares one definition of "current
+stage". It prints empty and returns *success* for both no-cursor shapes (§The
+state machine) — an absent file and a file with no data line — because "no
+cursor" is a legitimate state rather than a parse failure; its two callers
+each rule on what it means for them (§check-stage-entry, §check-stage-evidence).
+`lifecycle_header_iter` keeps stripping an optional trailing bracketed field:
+that strip is now **residual-field healing**, letting a pre-upgrade header
+still carrying `[stage:]` read as the bare iteration name. The cross-kit
+readers deliberately do *not* call this helper — each derives the cursor
+itself from a path it already configures, so no consumer kit gains a
+lifecycle-kit dependency.
+
+The loader also owns `lifecycle_registration_block`,
 which renders the resident registration block (§bin/install-lifecycle.sh) from the
 live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
 derive one text and cannot drift. Three more renderers follow the same
@@ -489,15 +556,19 @@ rather than calling it directly.
 ### bin/enter-stage.sh
 
 The deterministic writer for a stage transition: `enter-stage.sh <stage>`
-appends the invocation stamp and flips the `[stage:]` field in one invocation
-(honoring the flip+stamp-ride-together protocol), reading `session-id.sh` for
+appends the invocation stamp, reading `session-id.sh` for
 the id — never an argument, so the no-hand-picking rule rides into the tool.
 `<stage>` must be a configured stage; anything else is a usage error (exit 2).
-An ordinary stage stamps the iteration under the entered stage and swaps only
-the header's `[stage:]` token; the first stage (`LIFECYCLE_KIT_FIRST_STAGE`)
+An ordinary stage **writes the evidence file only** — the appended stamp *is*
+the transition, since the last stamp is the cursor, so the queue file is not
+touched and need not be committed. The first stage
+(`LIFECYCLE_KIT_FIRST_STAGE`)
 performs the iteration-boundary reset instead — truncating the state file and
 every file in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` back to its contract header and
-restarting the header at the unnamed-iteration form. `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
+restarting the header at the unnamed-iteration form. That header rewrite is
+also where a residual pre-upgrade `[stage:]` field is dropped, so a consumer
+that vendored the cursor extraction mid-iteration heals at its next boundary
+without a migration step. `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
 is a generic per-iteration reset knob — no consumer surface is named in
 the kit; a downstream kit whose per-iteration file must start each cycle from
 its contract header adds itself here, as evidence-kit's manifest does. The
@@ -525,21 +596,25 @@ so a member that is also a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` file is verified by
 the same boundary that then consumes it. **Pre-flight,
 not enforcement:** before writing, it runs the built-in `check-stage-entry`
 for the entered stage plus each `LIFECYCLE_KIT_ENTRY_PREFLIGHT` command whose
-stage key matches, each reading the not-yet-written flip off a header-flipped
-temp queue under `${GATE_SDK_TMP_DIR}` beside the real state file, and refuses
-(exit 1, findings printed, no writes) when any is red; the refusal is advisory
+stage key matches, and refuses
+(exit 1, findings printed, no writes) when any is red. The hand-off keeps the
+same `<queue> <state>` argv it always had, but **the temp file swapped sides**:
+because the cursor is the last stamp, the candidate transition now lives in a
+temp *state* file under `${GATE_SDK_TMP_DIR}` carrying the not-yet-written
+stamp, while the live queue passes through untouched (the boundary reset, which
+does rewrite the header, passes a temp queue as well). The refusal is advisory
 in the same sense the gate is at commit time (no `--force`, so the easy path is
 the compliant one). `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is a generic per-stage hook
 — no consumer surface is named in the kit; a downstream kit whose gate is the
 real precondition for a stage wires itself here (as evidence-kit's manifest gate
 does for close entry), turning a would-be pre-commit deadlock into a loud
-refusal at the flip. **`--simulate <stage>` — the read-only preflight mode:**
+refusal at the entry. **`--simulate <stage>` — the read-only preflight mode:**
 it runs everything a real entry runs up to the write — config load and stage
 validation, header parse, session-id derivation, the idempotence probe (a
-would-be no-op is reported as such and exits 0), the temp flipped-queue
-build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
+would-be no-op is reported as such and exits 0), the candidate-stamp temp
+state build, `check-stage-entry`, every matching `LIFECYCLE_KIT_ENTRY_PREFLIGHT`
 entry, and the iteration-boundary Lessons check — then stops: no stamp, no
-header flip, no boundary truncation, the temp queue removed. Every output
+boundary truncation, the temp files removed. Every output
 line is prefixed `enter-stage (simulate):` so a transcript can never read as
 a stamp. Exit 0 = the real entry would proceed (or no-op); exit 1 = it would
 refuse, with the refusing check's output relayed line-by-line; exit 2 =
@@ -633,11 +708,26 @@ either re-fires the gate.
 
 ### check-stage-evidence
 
-Invariant: the current iteration's stage has a matching skill-invocation
-stamp in the evidence file. Each stage skill appends a stamp as its first
-step; the gate asserts the header's current `<name> [stage: <stage>]` pair is
-covered — so advancing the stage header without running the skill fails
-closed. The stamp file is additionally kept provably bounded: every data line
+Invariant: the evidence file's stamps are well-formed and every one of them
+belongs to the header's iteration. Each stage skill appends a stamp as its
+first step, and since the last stamp *is* the current stage, "the current
+stage has a matching stamp" holds by construction — so the gate does not
+assert it, because a tautology is not an invariant. What it asserts is the
+**name-axis agreement** between the two surfaces, carried by the staleness
+assertion: every data line's iteration must be the header's. That assertion is
+what forces the first stage to rewrite its `—` bootstrap stamp once it names
+the iteration, and it is the sole remaining enforcer of header↔stamp
+agreement, not a bystander to it.
+
+The gate's one no-cursor ruling: a state file that exists but carries **no
+stamp** is a red, with the same shape as the missing-file message. The
+window is legitimate *inside* `enter-stage.sh`'s boundary reset, which stamps
+in the same motion; by commit time an unstamped file means no stage was ever
+invoked, which is precisely what this gate exists to reject — and with the
+stage axis off the header, nothing else would have caught it (an empty file
+gives the grammar and staleness passes nothing to reject).
+
+The stamp file is additionally kept provably bounded: every data line
 must be grammatically well-formed — exactly four fields, stage ∈ the
 configured stage set plus the waiver token (a stamp token but never a header
 stage), date `YYYY-MM-DD`; every data line's iteration must be the current
@@ -647,7 +737,7 @@ It also reads the `<session-id>` field (which it once ignored) for one
 cross-stage invariant, active at the default `stage` posture of
 `LIFECYCLE_KIT_SESSION_BOUNDARY` (§Layout and configuration): within the
 current iteration, two *different* stages may not share one session id — a
-stage flip is a context boundary and demands a fresh session, so a duplicate
+stage entry is a context boundary and demands a fresh session, so a duplicate
 (e.g. build == validate) is a self-reported skip and fails. The rule constrains
 *cross-stage* sharing only: **same-stage re-entries are in-contract** — a
 multi-session build, or a lead's N sibling batch sessions of one stage
@@ -656,13 +746,15 @@ rather than merely unpunished. This owner-doc statement is the home of the rule
 the gate's own distinctness message echoes. Waiver-token stamps are exempt
 (never a stage, so never in the map). At the
 `iteration` posture the gate skips only this distinctness map; stamp grammar,
-staleness, sentinel scoping, and the current-stage coverage stamp hold
+staleness, and sentinel scoping hold
 identically, and a reused session id remains on the audit trail — it just
 stops failing the gate.
 
 Calibration: the `—` sentinel is the bootstrap name for a new iteration
 before the first stage names it. Any stage past the first carrying `—` in the
-header is rejected (the header-name guard); admitting `—` at every stage — an
+header is rejected (the unnamed-iteration guard, which reads the name axis from
+the header and the stage axis from the cursor — it works only because the two
+axes stay independently sourced); admitting `—` at every stage — an
 attested bug — would let an unnamed iteration reach the final stage
 undetected, so the allowance is stage-scoped, not global. The data section
 begins after the first `---` separator; prose above it is not validated
@@ -674,7 +766,7 @@ Honest limit: the stamp proves the stage skill was *invoked*, never that it
 produced its green result — a validate stamp says validate ran, not that the
 suites passed. That gap is closed by evidence-kit, which commits a per-run
 evidence manifest (a suite verdict per line) and, via the optional
-`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a `[stage: close]` entry to
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a close entry to
 the full green block.
 
 ### check-stage-entry
@@ -682,13 +774,19 @@ the full green block.
 Invariant: the stage being *entered* re-verifies its prior stage's static
 exit, extending the invocation-stamp floor `check-stage-evidence` provides
 for the current stage one hop back (a shared surface, a distinct invariant:
-*current-stage invoked + file grammar* there, *prior-stage invoked +
-entered-stage static exit* here). It owns three assertions, (A)
-prerequisite-stamp ordering — for header `[stage: X]` the file carries a
-stamp for X's configured mandatory predecessor, which closes the "flipped
-straight to the last stage with no prior stamp" hole its sibling — asserting
-only the *current* stage's stamp — cannot see; (B) drain-entry queue-empty —
-a drain-stage header requires the configured active queue sections to carry
+*stamp grammar + name-axis agreement* there, *prior-stage invoked +
+entered-stage static exit* here). It reads the entered stage from the **cursor**
+— the state file's last stamp — and the iteration from the header. An empty
+cursor is unreachable by construction here and stays a hard parse error rather
+than a disarm: `enter-stage.sh` hands the gate a temp state file that always
+carries the candidate stamp, and at commit time the entry commit stages that
+same stamp. It owns three assertions, (A)
+prerequisite-stamp ordering — for an entered stage X the file carries a
+stamp for X's configured mandatory predecessor, which closes the "jumped
+straight to the last stage with no prior stamp" hole its sibling — which no
+longer asserts any stage coverage at all — cannot see; (B) drain-entry
+queue-empty —
+a drain-stage entry requires the configured active queue sections to carry
 no top-level `- ` entry, catching entry-on-incomplete-build, with one modeled
 residue class: an entry whose **lead line** carries `[drain-exempt: <reason>]`
 (syntax: queue-kit/SPEC.md §The tag algebra) is skipped at drain-stage entry —
@@ -889,7 +987,7 @@ precedent).
 ### templates/skills/
 
 The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
-the generic stage spine — the flip+stamp first step (performed by invoking
+the generic stage spine — the stamp first step (performed by invoking
 `enter-stage.sh <stage>` and stating in one line what it does), each stage's
 trigger/ordering rules, and its stage-local doctrine — with **named slots**
 where the consumer's rule content goes. The templates are the owned surface:
@@ -897,7 +995,7 @@ this section states the contract a consumer skill must satisfy and never
 restates what a template carries.
 
 A consumer skill adopts a template in one of two modes; either way the executed
-skill states in one line what the flip+stamp step does and supplies every
+skill states in one line what the stamp step does and supplies every
 slot's content:
 
 - **Consume-by-reference (the default)** — the consumer skill is a thin

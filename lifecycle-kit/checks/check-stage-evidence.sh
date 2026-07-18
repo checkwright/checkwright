@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
-# spec: lifecycle-kit/SPEC.md §check-stage-evidence — the header's current stage carries a matching skill-invocation stamp; stamp grammar + staleness
+# spec: lifecycle-kit/SPEC.md §check-stage-evidence — stamp grammar + name-axis agreement (staleness) between the header and every stamp; cross-stage session-id distinctness
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -13,32 +13,37 @@ STATE="${2:-$LIFECYCLE_KIT_STATE_FILE}"
 hdr="$(lifecycle_header "$QUEUE")"
 if [[ -z "$hdr" ]]; then
     echo "STAGE-EVIDENCE: no '## Iteration:' header in $QUEUE"
-    echo "  help: add '## Iteration: <name>  [stage: <stage>]' to $QUEUE"
+    echo "  help: add '## Iteration: <name>' to $QUEUE"
     exit 1
 fi
 
 iter="$(lifecycle_header_iter "$hdr")"
-stage="$(lifecycle_header_stage "$hdr")"
-if [[ -z "$iter" || -z "$stage" ]]; then
-    echo "STAGE-EVIDENCE: could not parse iteration/stage from: $hdr"
-    echo "  help: header must read '## Iteration: <name>  [stage: <stage>]'"
+if [[ -z "$iter" ]]; then
+    echo "STAGE-EVIDENCE: could not parse the iteration from: $hdr"
+    echo "  help: header must read '## Iteration: <name>'"
     exit 1
 fi
 
-if [[ "$iter" == "—" && "$stage" != "$LIFECYCLE_KIT_FIRST_STAGE" ]]; then
-    echo "STAGE-EVIDENCE: iteration is still unnamed ('—') at stage '$stage' — /$LIFECYCLE_KIT_FIRST_STAGE must name the iteration (header + stamp) before advancing past $LIFECYCLE_KIT_FIRST_STAGE"
-    echo "  help: set '## Iteration: <name>  [stage: $stage]' and rewrite the matching $STATE stamp's '—' to <name>"
-    exit 1
-fi
-
+# spec: lifecycle-kit/SPEC.md §check-stage-evidence — the cursor is read before the unnamed-iteration guard because that guard consumes both axes; a state file present but carrying no stamp is this gate's no-cursor fallback and reds with the missing-file message's sibling — an unstamped file is exactly the condition this gate exists to reject, so it must not go vacuous once the stage axis moved off the header.
 [[ -f "$STATE" ]] || {
     echo "STAGE-EVIDENCE: $STATE is missing"
     echo "  help: create it — prose header, a '---' separator, then one '<iter> <stage> <session-id> <YYYY-MM-DD>' stamp per stage-skill invocation"
     exit 1
 }
+stage="$(lifecycle_current_stage "$STATE")"
+if [[ -z "$stage" ]]; then
+    echo "STAGE-EVIDENCE: $STATE carries no stamp — there is no current stage to attest"
+    echo "  help: run the stage skill (it stamps as its first step), or append the '<iter> <stage> <session-id> <YYYY-MM-DD>' stamp below the '---' separator"
+    exit 1
+fi
+
+if [[ "$iter" == "—" && "$stage" != "$LIFECYCLE_KIT_FIRST_STAGE" ]]; then
+    echo "STAGE-EVIDENCE: iteration is still unnamed ('—') at stage '$stage' — /$LIFECYCLE_KIT_FIRST_STAGE must name the iteration (header + stamp) before advancing past $LIFECYCLE_KIT_FIRST_STAGE"
+    echo "  help: set '## Iteration: <name>' and rewrite the matching $STATE stamp's '—' to <name>"
+    exit 1
+fi
 
 errors=()
-found=0
 # spec: lifecycle-kit/SPEC.md §check-stage-evidence — cross-stage session-id distinctness (a stage flip is a context boundary)
 declare -A stage_of_sid=()
 while IFS= read -r line; do
@@ -52,7 +57,6 @@ while IFS= read -r line; do
     [[ "$f4" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { errors+=("bad date '$f4': $line"); continue; }
     [[ "$f1" == "$iter" || ( "$f1" == "—" && "$iter" == "—" ) ]] \
         || errors+=("stamp iteration '$f1' is neither current ('$iter') nor a legal '—' bootstrap (allowed only while the header is unnamed) — stale; /$LIFECYCLE_KIT_FIRST_STAGE truncates at the iteration boundary and renames its bootstrap stamp on naming: $line")
-    [[ "$f1" == "$iter" && "$f2" == "$stage" ]] && found=1
     # spec: lifecycle-kit/SPEC.md §check-stage-evidence — the distinctness map runs only at the 'stage' posture; 'iteration' skips this check alone, attribution still rides the stamps
     if [[ "$LIFECYCLE_KIT_SESSION_BOUNDARY" == stage && "$f1" == "$iter" ]] && lifecycle_stage_known "$f2"; then
         if [[ -n "${stage_of_sid[$f3]:-}" && "${stage_of_sid[$f3]}" != "$f2" ]]; then
@@ -62,8 +66,6 @@ while IFS= read -r line; do
         fi
     fi
 done < <(awk '/^---[[:space:]]*$/{f=1; next} f && NF {print}' "$STATE")
-
-[[ "$found" -eq 1 ]] || errors+=("no stamp for the current '$iter $stage' — run /$stage in this session (it stamps as its first step), or append the stamp, before advancing/committing the stage line")
 
 if [[ ${#errors[@]} -gt 0 ]]; then
     echo "STAGE-EVIDENCE: ${#errors[@]} issue(s) in $STATE:"

@@ -6,12 +6,12 @@ drift.
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh
 align`: it appends `<iteration> align <session-id> <date>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
-proves invocation, not faithful execution) and flips the queue header's
-`[stage:]` line to `align`, reading `<session-id>` from `bin/session-id.sh`
+proves invocation, not faithful execution), reading `<session-id>` from
+`bin/session-id.sh`
 (the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. Commit the flip together with
-this stamp — the arriving-stage flip; the line and its stamp must match, so
-they ride in one commit.
+(writing nothing) if `check-stage-entry` is red. That stamp *is* the
+transition — the last stamp is the stage cursor, so nothing flips and no queue
+write is involved. Commit the stamp on its own.
 
 ## Trigger (align is trigger-gated)
 
@@ -20,11 +20,11 @@ implementation task; (2) a multi-component spec ambiguity surfaces during
 build; (3) this iteration's `scope` authored an amendment changing ≥2
 components' contracts. None firing → `scope` advances directly to `build`
 (align skipped; the advance still needs user approval per the stage-line
-rule). The arriving stage flips its own `[stage:]` line as its first step
+rule). The arriving stage stamps its own entry as its first step
 (above).
 
 Trigger 3 is mechanized at build entry: `check-stage-entry` assertion C blocks
-the build flip when the on-disk amendments carry a cross-component signal and
+the build entry when the on-disk amendments carry a cross-component signal and
 no `<iter> align` stamp exists. To skip the audit anyway, the user must
 explicitly rule it unwarranted and a `<iter> align-waived <session> <date>`
 line is recorded in `.workflow/WORKFLOW-STATE.txt` — never self-issued by the

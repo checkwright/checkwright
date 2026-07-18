@@ -62,11 +62,18 @@ lifecycle_header() {
     grep -m1 '^## Iteration:' "$1" 2>/dev/null || true
 }
 
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the trailing-bracket strip survives the cursor extraction as residual-field healing: a pre-upgrade header still carrying [stage:] yields the bare name, so a consumer upgrades mid-iteration without a red
 lifecycle_header_iter() {
     sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//' <<<"$1"
 }
-lifecycle_header_stage() {
-    sed -E 's/.*\[stage:[[:space:]]*//; s/[[:space:]]*\].*$//' <<<"$1"
+
+# spec: lifecycle-kit/SPEC.md §lib/stages.sh — the cursor: the state file's last data line's stage token, the one derivation every lifecycle reader shares. Empty with status 0 for both no-cursor shapes (absent file, no data line yet) — "no cursor" is a legitimate state, not an error, and each caller decides what it means.
+lifecycle_current_stage() {
+    local s="${1:-$LIFECYCLE_KIT_STATE_FILE}" last
+    [[ -f "$s" ]] || return 0
+    last="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $0 } END { print l }' "$s")"
+    [[ -n "$last" ]] || return 0
+    awk '{ print $2 }' <<<"$last"
 }
 
 lifecycle_stage_known() {
@@ -113,7 +120,7 @@ lifecycle_registration_block() {
 The repo runs lifecycle-kit's iteration state machine on \`$LIFECYCLE_KIT_QUEUE_FILE\` — one
 stage session per stage, each invoking its skill:
 $roster.
-The state machine, its flip+stamp protocol, and the per-stage contracts:
+The state machine, its stamp protocol, and the per-stage contracts:
 [lifecycle-kit/SPEC.md](lifecycle-kit/SPEC.md).
 EOF
 }

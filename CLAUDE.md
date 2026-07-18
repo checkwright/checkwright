@@ -42,16 +42,17 @@ workflow to green (`gh run watch`) before calling the push done.
 
 Beyond the gate battery, the repo runs its own iteration lifecycle — one
 iteration per hardening or roadmap unit, the queue and stage roster below. Each
-stage session stamps `.workflow/WORKFLOW-STATE.txt` and flips the queue header's
-`[stage:]` field as its first step (`check-stage-evidence` / `check-stage-entry`
-enforce the flip+stamp protocol; `check-lifecycle-registration` holds the block
+stage session stamps `.workflow/WORKFLOW-STATE.txt` as its first step, and that
+file's last stamp *is* the current stage — the cursor has one source, and stage
+motion never writes the queue (`check-stage-evidence` / `check-stage-entry`
+enforce the stamp protocol; `check-lifecycle-registration` holds the block
 below in lockstep with the machine).
 
 <!-- lifecycle-kit:begin -->
 The repo runs lifecycle-kit's iteration state machine on `TASK-QUEUE.md` — one
 stage session per stage, each invoking its skill:
 `/scope` `/align` `/build` `/validate` `/close`.
-The state machine, its flip+stamp protocol, and the per-stage contracts:
+The state machine, its stamp protocol, and the per-stage contracts:
 [lifecycle-kit/SPEC.md](lifecycle-kit/SPEC.md).
 <!-- lifecycle-kit:end -->
 

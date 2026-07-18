@@ -1,1 +1,1 @@
-no stamp for the current 'demo-iteration build'
+is neither current ('demo-iteration')

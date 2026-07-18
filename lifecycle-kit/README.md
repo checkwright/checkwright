@@ -1,19 +1,21 @@
 # lifecycle-kit
 
 The iteration stage state machine for coding-agent-assisted delivery: a
-`## Iteration: <name>  [stage: <stage>]` header line in the task queue, an
-evidence file of `<iteration> <stage> <session-id> <date>` stamps, stage
+`## Iteration: <name>` header line in the task queue naming the iteration, an
+evidence file of `<iteration> <stage> <session-id> <date>` stamps whose **last
+stamp is the current stage**, stage
 skills (scope/align/build/validate/close by default — stages are config), and
-gates that make skipping a stage, or flipping a header without running
+gates that make skipping a stage, or claiming one without running
 its skill, fail the commit.
 
 Why: a stateless agent session doesn't reliably re-read process prose. So the
-process state lives in two files a gate can read, every stage skill stamps its
-invocation as its first step (the flip+stamp mechanized by
+process state lives in two files a gate can read, and every stage skill stamps
+its invocation as its first step (mechanized by
 `bin/enter-stage.sh <stage>`, so the misformat-prone hand ritual is one
-command), and the *arriving* stage flips the header
-atomically with its stamp — `check-stage-evidence` verifies the current
-stage's stamp and the stamp file's grammar, `check-stage-entry` verifies the
+command). That stamp *is* the stage transition — there is no second copy of
+the cursor to keep in sync, and stage motion writes no queue at all.
+`check-stage-evidence` verifies the stamp file's grammar and that every stamp
+belongs to the header's iteration; `check-stage-entry` verifies the
 predecessor stamp, the drained queue at validate entry, and the
 cross-component audit trigger at build entry. See [SPEC.md](SPEC.md) for the
 full contracts.
@@ -50,7 +52,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    (`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, both boundary-reset to their header).
    The queue header line:
 
-       ## Iteration: —  [stage: scope]
+       ## Iteration: —
 
    The stage-stamp skeleton:
 
