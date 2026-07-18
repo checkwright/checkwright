@@ -319,8 +319,14 @@ It ships no `tokens_in` / `tokens_out` producer: this harness's payload
 carries no cumulative token count, so under the dead-producer rule the keys
 stay defined here for third-party producers but no dead producer is shipped.
 Beyond the snapshot write it renders a status bar — model/effort, a context
-gauge, the 5h and 7d windows with reset countdowns, and the `iteration@stage`
-readout parsed from the queue header — self-contained ANSI, no external asset
+gauge, the 5h and 7d windows with reset countdowns, and an `iteration@stage`
+readout whose two halves come from two surfaces: the iteration from the queue
+header, the stage from the lifecycle evidence file's **last data line**. Both
+are repo-root-relative reads in the template's existing hardcode style — a
+consumer-owned template adds no knob. With no cursor to read (no evidence file,
+or one truncated to its preamble at an iteration boundary) the readout degrades
+to the iteration alone rather than printing a dangling separator or a partial
+parse — self-contained ANSI, no external asset
 (§Out of scope). The snapshot write is the contract; the bar is
 reference UX a consumer may restyle or discard. The source is pluggable
 (`DELEGATION_KIT_USAGE_FILE`), so no

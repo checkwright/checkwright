@@ -47,7 +47,10 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ -n "$ROOT" ] && [ -f "$ROOT/TASK-QUEUE.md" ]; then
   HEADER=$(grep -m1 '^## Iteration:' "$ROOT/TASK-QUEUE.md")
   ITER=$(printf '%s' "$HEADER" | sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//')
-  STAGE=$(printf '%s' "$HEADER" | sed -E 's/^.*\[stage:[[:space:]]*//; s/[[:space:]]*\].*$//')
+fi
+# spec: delegation-kit/SPEC.md §The statusline template — the stage is the state file's last data line, so an absent file or one with no data line leaves STAGE empty and the render drops the @stage suffix rather than printing a partial parse
+if [ -n "$ROOT" ] && [ -f "$ROOT/.workflow/WORKFLOW-STATE.txt" ]; then
+  STAGE=$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$ROOT/.workflow/WORKFLOW-STATE.txt")
 fi
 
 USAGE_FILE="${DELEGATION_KIT_USAGE_FILE:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt}"
@@ -72,5 +75,5 @@ TIER=""; ACCOUNT=""
 SB="[${MODEL:-?}${EFFORT:+-$EFFORT}]·ctx $(_gauge "$CTX")"
 SB="$SB·5h $(_gauge "${FIVE_H:-0}")"; [ -n "$FIVE_H_RESETS" ] && SB="$SB $(_remaining "$FIVE_H_RESETS")"
 [ -n "$SEVEN_D" ] && { SB="$SB·7d $(_gauge "$SEVEN_D")"; [ -n "$SEVEN_D_RESETS" ] && SB="$SB $(_remaining "$SEVEN_D_RESETS")"; }
-[ -n "$ITER" ] && SB="$SB·⟳ ${ITER}@${STAGE}"
+[ -n "$ITER" ] && SB="$SB·⟳ ${ITER}${STAGE:+@$STAGE}"
 printf '%s\n' "$SB"
