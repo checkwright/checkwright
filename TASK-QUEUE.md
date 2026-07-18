@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: stage-economics-report
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -11,6 +11,24 @@
 ---
 
 ## New Features
+
+- **stage-economics-report** [spec: SPEC-stage-economics.md] — a tracked
+  drift-kit tool `bin/stage-economics.sh` pricing lifecycle spend by stage ×
+  model × iteration (WORKFLOW-STATE stamps ⋈ transcripts ⋈ a consumer-config
+  price table), plus the `/economics` close-cadence skill chaining
+  overhead-meter → stage-economics → usage-trend into one post-iteration
+  narrative. Answers the one question no built-in surface prices — real spend by
+  lifecycle stage × model × iteration — and keeps the cache-read burn lever
+  visible close-over-close (the dig that motivated it: cache-read of accumulated
+  context is the dominant burn, not model choice). Design, causal completeness,
+  and the provenance seam (the price table is consumer config, never a kit
+  literal roster) are in the amendment. Cross-component read-only: the tool
+  consumes lifecycle-kit's stamp contract and delegation-kit's usage surface
+  without changing either, so build entry's assertion C will demand the audit
+  stamp or a recorded waiver. Supersedes benchmark-ab-experiment's
+  stage-burn-meter measurement half (that rung consumes this tool rather than
+  rebuilding it). Surfaced 2026-07-18 by the budget-token usage analysis run on
+  the `.metric/` prototype scripts.
 
 ## Technical Debt
 
@@ -38,30 +56,6 @@
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
-- **stage-economics-report** [needs-spec] — extract the per-stage, per-model,
-  price-weighted cost attribution now prototyped in the untracked `.metric/`
-  Python scripts into a tracked, seam-clean drift-kit tool
-  (`bin/stage-economics.sh`, bash+awk on the overhead-meter pattern:
-  sessions-dir resolution, config via env, advisory exit-0, writes under
-  `DRIFT_KIT_METRIC_DIR`, no account IDs in output). It joins WORKFLOW-STATE
-  stamps → transcripts → a model price table to answer the one question no
-  built-in surface answers: real spend by lifecycle stage × model × iteration
-  (the built-in overhead-meter measures governance-vs-task *bytes*, and
-  delegation-kit's usage-trend the *window* pct — neither prices the stage).
-  The price table is consumer config (the graph-vocab pattern — per-token
-  prices are public, but the model roster a consumer runs is theirs), never a
-  kit literal that would publish it. Ships with an `/economics` skill run at
-  close that chains overhead-meter → stage-economics → usage-trend into one
-  post-iteration narrative — the regular-cadence, customer-facing capability.
-  The scope→Opus flip it exists to verify already landed in
-  `.claude/commands/lead.md`; this iteration builds the tool that confirms the
-  saving close-over-close. Motivating dig (2026-07-18): cache-read of accumulated
-  context is the dominant burn across every stage — build 73% of session cost
-  and climbing 37M→86M cr-tokens/session — not model choice; the tool exists
-  to keep that lever visible close-over-close. Supersedes the stage-burn-meter
-  measurement half of benchmark-ab-experiment (below), which consumes this
-  tool rather than rebuilding it. Surfaced 2026-07-18 by the budget-token
-  usage analysis run on the `.metric/` prototype scripts.
 - **benchmark-ab-experiment** [needs-spec] — the controlled differential
   experiment: same model, same dependent-task series, two arms (ungoverned
   loop vs Checkwright-governed), drift *accumulation across the series* as
