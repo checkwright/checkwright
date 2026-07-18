@@ -31,15 +31,22 @@ priced cost, never the account the tokens billed to.
 **The join.** Three inputs, joined on the session:
 
 1. **Stamps** — the WORKFLOW-STATE data lines, one per stage-skill invocation,
-   grammar `<iteration> <stage> <session8> <date>` (owned by
+   grammar `<iteration> <stage> <session-id> <date>` (owned by
    lifecycle-kit/SPEC.md §The state machine; this tool is a read-only consumer of
-   that contract, it changes nothing there). The stamp supplies the
-   iteration↔stage↔session8 mapping. Read from `DRIFT_KIT_STATE_FILE` (new knob
-   below), defaulting to the same state-file path the trajectory extractor
-   already reads (§Layout).
+   that contract, it changes nothing there). The `<session-id>` field is not a raw
+   transcript id: it is lifecycle's `session-id.sh` *normalization* of one — a
+   leading `agent-` stripped, then the first 8 chars (lifecycle-kit/SPEC.md
+   §bin/session-id.sh) — so this repo's stamps carry an 8-char value, `session8`
+   below. The stamp supplies the iteration↔stage↔session8 mapping. Read from
+   `DRIFT_KIT_STATE_FILE` (new knob below), defaulting to the same state-file path
+   the trajectory extractor already reads (§Layout).
 2. **Transcripts** — under `DRIFT_KIT_SESSIONS_DIR` (the knob the overhead meter
-   already resolves). Each stamp's `session8` selects the transcript whose id
-   shares that 8-char prefix; the tool sums that session's assistant-turn usage
+   already resolves). A stamp's `session8` selects a transcript by applying that
+   **same normalization** to each candidate basename and matching — not by a raw
+   filename prefix: this repo's stage sessions are subagent transcripts named
+   `agent-<hex>.jsonl` whose stamp is `<hex>` truncated to 8 chars, so a raw
+   prefix match against the `agent-` prefix would select nothing. The tool sums
+   the matched session's assistant-turn usage
    into four token categories — `input`, `output`, `cache_read`,
    `cache_creation` — per model id seen on those turns. Because this repo runs
    one session per stage (lifecycle-kit/SPEC.md §The state machine,
@@ -85,8 +92,8 @@ removed.
 
 `/economics` is the customer-facing post-iteration narrative: run at close, it
 chains `bin/overhead-meter.sh` → `bin/stage-economics.sh` →
-delegation-kit's usage-trend (delegation-kit/SPEC.md §The staleness contract owns
-the usage surface; the skill is a read-only caller) into one report answering
+delegation-kit's usage-trend (delegation-kit/SPEC.md §Trend reporter owns
+`bin/usage-trend.sh`; the skill is a read-only caller) into one report answering
 "what did this iteration cost, where, and was the model posture worth it". It
 ships as a drift-kit skill template `templates/economics.md`, materialized in this
 repo as the consumer copy `.claude/commands/economics.md` — the same
