@@ -327,8 +327,32 @@
   lead-dispatched stage and a cleanly-completed one are indistinguishable by the
   marker the SPEC says distinguishes them.
 
-## Done
+- **stage-economics-smoke-jq-arm-dormant** [needs-spec] — drift-kit's smoke
+  asserts the jq-absent degradation of `bin/stage-economics.sh`, but the
+  assertion never executes. `drift-kit/smoke/install.sh:171` branches on the
+  **host's** jq (`command -v jq`), so the degradation arm at `:189` — "without
+  jq must emit its degradation notice" — is reached only on a jq-less machine.
+  Neither this machine nor CI is one (the gates workflow image carries jq), so
+  the arm is **dormant on every runner that actually runs it**: a correct
+  assertion that no run has ever evaluated. **This is a testability gap, not a
+  defect** — the stage-economics-report validate verified the degradation by
+  hand (jq masked → exit 0, `jq not found` notice, 0 rows logged), so the
+  behavior is known-good; what is missing is the *automation* of that check.
+  Fix direction: exercise the arm unconditionally rather than conditionally —
+  a second tool run under a PATH sandbox with jq masked, asserted alongside the
+  jq-present run, so both arms evaluate on every host. **Scope: drift-kit's
+  smoke only.** Deliberately not generalized to a smoke-authoring rule — one
+  instance is not evidence for a general rule, and gate-sdk's own jq consumers
+  do not assert their degradation at all, so a blanket rule would manufacture
+  work against a pattern nobody has shown to be wrong.
+  **Cost while deferred:** low and non-rotting. The asserted behavior was
+  hand-verified at ship, and the arm cannot *false-green* anything — it is
+  skipped, not passed. The real cost is narrow: a future regression in the
+  jq-absent path (say a reordering that emits the notice after an unguarded
+  `jq` call) lands unnoticed, because the only mechanism watching that path
+  never runs. Bounded by the degradation path being small and rarely touched.
+  Filed 2026-07-18 by lead ruling at the stage-economics-report close.
 
-- stage-economics-report
+## Done
 
 ## Lessons Learned

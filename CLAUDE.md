@@ -131,7 +131,7 @@ the skill on a blocking verdict — so they are not resident here.
 
 - `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
   journals), wiped at the scope boundary; `.metric/` is gitignored persistent
-  measurement trends (overhead + usage logs) — **never committed**,
+  measurement trends — **never committed**,
   account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/` is
   committed (checked projections). `BRIEF.local.md` (private brief),
   `OPS.local.md` (private ops runbook — DNS records + GitHub repo-settings

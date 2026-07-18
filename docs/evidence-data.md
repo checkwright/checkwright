@@ -43,3 +43,4 @@
 | fail-open-hardening | s · b v c | 2f/1d | 1 · ≤0d | 20s clean | 75 |
 | concurrency-hardening | s a b v c | 3f/0d | 3 · ≤0d | 20s clean | 75 |
 | stage-cursor-extraction | s a b v c | 6f/0d | 1 · ≤0d | 20s clean | 75 |
+| stage-economics-report | s a b v c | 1f/0d | 1 · ≤0d | 20s clean | 75 |

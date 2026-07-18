@@ -364,7 +364,12 @@ priced cost, never the account the tokens billed to.
    **same normalization** to each candidate basename and matching — not by a raw
    filename prefix: this repo's stage sessions are subagent transcripts named
    `agent-<hex>.jsonl` whose stamp is `<hex>` truncated to 8 chars, so a raw
-   prefix match against the `agent-` prefix would select nothing. The tool sums
+   prefix match against the `agent-` prefix would select nothing. Candidates are
+   two-tiered, because a subagent transcript is not a sibling of its lead's: a
+   lead session sits directly under the sessions dir, while the sessions it
+   dispatches sit two levels deep under `<lead-session-id>/subagents/`. The scan
+   globs both tiers, so a stage session dispatched by a live lead is found on the
+   nested tier and a stage run without one on the flat tier. The tool sums
    the matched session's assistant-turn usage into four token categories —
    `input`, `output`, `cache_read`, `cache_creation` — per model id seen on those
    turns. A streaming transcript repeats a message id across lines (input/cache
