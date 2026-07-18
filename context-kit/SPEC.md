@@ -77,10 +77,15 @@ Every step is guarded and degrades silently — the hook never fails a
 session. Steps, in order:
 
 1. **Queue index** — via queue-kit's `queue-index.sh`, collapsing the
-   Deferred section to a tally except on the close and scope stages.
+   Deferred section to a tally except on the close and scope stages. The stage
+   it routes on comes from the cursor — `CONTEXT_KIT_STATE_FILE`'s last data
+   line — with an empty cursor (no such file, or one truncated to its preamble
+   at an iteration boundary) taking the collapsed branch every non-close,
+   non-scope stage already takes, so the no-cursor window needs no branch of
+   its own and can never fail the session.
    Deferred is unpickable and only scope (promotion) acts on it; the full
    board additionally serves close's backlog review, and — by the
-   header-lag rule below — firing on close is what hands the full board to
+   cursor-lag rule below — firing on close is what hands the full board to
    the first scope session, which reads `close` at session start. On any
    other stage the full listing is pure recurring cost.
 2. **Dirty-surface pre-run** — for each component with uncommitted
@@ -94,7 +99,7 @@ session. Steps, in order:
    the report; the seam is this optional line).
 4. **Stage-conditioned nudges** — short reminders keyed on a stage set
    read from the header (this repo's delegation nudge is the exemplar).
-   Each keys on {predecessor, own stage} (the header-lag rule below) so a
+   Each keys on {predecessor, own stage} (the cursor-lag rule below) so a
    first-of-stage session and a restarted one both receive it. Marked
    consumer section: which stages get which nudge is consumer judgment.
    Suppressed when the session-role signal (below) marks the session `lead`
@@ -119,7 +124,7 @@ session. Steps, in order:
    drift-line precedent). Keyed on the derived stage directly, not a
    {predecessor, own stage} set: the pointers are advisory reminders, so
    over-firing to an adjacent stage costs only a few lines, and the
-   header-lag rule below is about *conditioning*, not about which stage's
+   cursor-lag rule below is about *conditioning*, not about which stage's
    rules to show. Suppressed when the session-role signal marks the
    session `lead` — the craft rules are executor-facing.
 9. **Env profile** — when the consumer-local profile file
@@ -134,17 +139,18 @@ session. Steps, in order:
    seeded. The consumer owns the file's brevity (they author the gotchas half),
    the drift-line precedent.
 
-**The header-lag rule.** The hook runs at session start, before the
-arriving skill flips the `[stage:]` header (its first step), so a
-first-of-stage session reads the *predecessor's* stage and no header value
-distinguishes it from a restarted predecessor session. Stage-conditioned
+**The cursor-lag rule.** The hook runs at session start, before the
+arriving skill stamps its entry (its first step) — and that stamp is what
+moves the cursor. So a first-of-stage session reads the *predecessor's* stage.
+The lag is structural and survives any change of cursor source: the hook reads
+a value written after it fires. Stage-conditioned
 output therefore keys on a stage *set* spanning {predecessor, own stage} —
 guaranteeing the first-of-stage session is served, at the accepted cost of
-over-firing to the other sessions that share a header value (a restarted
+over-firing to the other sessions that share a cursor value (a restarted
 session of a keyed stage, or the first session of the stage after it).
 
 **The session-role signal.** The hook keys every stage-conditioned injection
-off the queue header's `[stage:]`, which says nothing about whether the
+off the lifecycle stage cursor, which says nothing about whether the
 *reading* session is a lead, a stage session, or a manual run — so without a
 role signal a lead draws executor-facing craft rules at every hook fire
 (startup, plus each compact/resume re-fire, the recurring cost). The signal
@@ -583,6 +589,11 @@ as defaults):
   (doctrine-kit's `stage-rules.sh`); the session-context hook runs it with the
   current stage for the brief's craft-rule block; default empty (the block is
   omitted).
+- `CONTEXT_KIT_STATE_FILE` — the lifecycle evidence file whose **last data
+  line** carries the stage cursor the hook routes on (§The session-context
+  hook); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`. Read
+  as a named file, never through stdin — the session-role signal consumes stdin
+  exactly once, and a second reader there would starve it.
 - `CONTEXT_KIT_ENV_PROFILE_FILE` — the consumer-local env profile file
   `bin/env-probe.sh` writes and the session-context hook's step 9 emits (§bin/
   env-probe); default `ENV.local.md`.

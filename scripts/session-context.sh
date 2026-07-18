@@ -8,21 +8,17 @@ cd "$REPO_ROOT" 2>/dev/null || exit 0
 
 QUEUE_INDEX="queue-kit/bin/queue-index.sh"       # queue-kit's queue surface
 CTX_BIN="context-kit/bin"                         # context-kit index tools
-QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-drift-kit/bin/drift-report.sh}"  # drift-kit trend line
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-doctrine-kit/bin/stage-rules.sh}"  # doctrine-kit craft-rule router
+STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"  # lifecycle stage cursor
 
 echo "── Session context (context-kit session-context hook) ──────────────────"
 echo
 
+# spec: context-kit/SPEC.md §The session-context hook — the stage cursor is the state file's last data line; read from a named file, never stdin, which the session-role signal below consumes exactly once. An absent file or one with no data line yields empty, which falls to the existing non-close/non-scope branch.
 stage=""
-if [[ -f "$QUEUE_FILE" ]]; then
-    stage="$(awk '/^## Iteration:/ {
-        if (match($0, /\[stage: *[a-z]+ *\]/)) {
-            s = substr($0, RSTART, RLENGTH); gsub(/\[stage: *| *\]/, "", s)
-            print s; exit
-        }
-    }' "$QUEUE_FILE" 2>/dev/null)"
+if [[ -f "$STATE_FILE" ]]; then
+    stage="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$STATE_FILE" 2>/dev/null)"
 fi
 if [[ -f "$QUEUE_INDEX" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then

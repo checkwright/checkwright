@@ -9,22 +9,18 @@ cd "$REPO_ROOT" 2>/dev/null || exit 0
 # spec: context-kit/SPEC.md §The session-context hook — consumer layout: vendored kit tools + governed queue file, retarget to yours [EDIT ME]
 QUEUE_INDEX="queue-kit/bin/queue-index.sh"
 CTX_BIN="context-kit/bin"
-QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 DRIFT_REPORT="${CONTEXT_KIT_DRIFT_REPORT:-}"
 STAGE_RULES="${CONTEXT_KIT_STAGE_RULES:-}"
+STATE_FILE="${CONTEXT_KIT_STATE_FILE:-${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"
 
 echo "── Session context (context-kit session-context hook) ──────────────────"
 echo
 
 # spec: context-kit/SPEC.md §The session-context hook — step 1 queue index
+# spec: context-kit/SPEC.md §The session-context hook — the stage cursor is the state file's last data line; read from a named file, never stdin, which the session-role signal below consumes exactly once. An absent file or one with no data line yields empty, which falls to the branch every non-close, non-scope stage already takes.
 stage=""
-if [[ -f "$QUEUE_FILE" ]]; then
-    stage="$(awk '/^## Iteration:/ {
-        if (match($0, /\[stage: *[a-z]+ *\]/)) {
-            s = substr($0, RSTART, RLENGTH); gsub(/\[stage: *| *\]/, "", s)
-            print s; exit
-        }
-    }' "$QUEUE_FILE" 2>/dev/null)"
+if [[ -f "$STATE_FILE" ]]; then
+    stage="$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$STATE_FILE" 2>/dev/null)"
 fi
 if [[ -f "$QUEUE_INDEX" ]]; then
     if [[ "$stage" == close || "$stage" == scope ]]; then
