@@ -302,6 +302,13 @@
   Behavior changes by author judgment (reconciled by reading, not silently
   dropped), so the residue is stated; the cost is a checklist axis that is
   sharper in principle than in the current section set.
+  **Observed 2026-07-18 (stage-economics-report close):** the first live instance
+  of the wider distinction this entry circles. A purely additive consumer-facing
+  feature (drift-kit's new stage-economics tool plus its `/economics` command)
+  produced an all-None note and therefore no release-line visibility at all —
+  correct under the contract (the note is a residue-reconciliation checklist, not
+  a changelog), but the cost is now observed rather than theoretical: a feature a
+  reader would call user-facing is invisible on the release line by design.
 
 - **resume-journal-done-marker-compliance** [needs-spec] — stage-session agents
   complete without appending the spec-mandated resume-journal `DONE` marker
