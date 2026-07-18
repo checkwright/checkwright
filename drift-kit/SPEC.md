@@ -321,6 +321,108 @@ several measured sessions — the wording changes *with* the measurement, not
 ahead of it. Their design (a gate-sdk output-mode knob) is a future amendment
 against that data.
 
+Sibling meter: §The stage-economics meter prices the token draw this byte-proxy
+does not — they share the `DRIFT_KIT_METRIC_DIR` retention contract and the
+advisory exit-0 posture.
+
+## The stage-economics meter
+
+`bin/stage-economics.sh` answers the one question no built-in surface prices:
+**real spend by lifecycle stage × model × iteration**. The overhead meter
+measures governance-versus-task *bytes* and delegation-kit's usage-trend the
+rate-window *percentage*; neither converts a stage's token draw into money. This
+tool does, so the operator can see close-over-close whether the posture that
+rides every stage on Opus (the current all-stages-Opus posture recorded in the
+lead command's ruling-config binding, not a scope-only choice) earns its cost.
+
+It is advisory by the same contract as the overhead meter (§The overhead meter):
+exit is always 0, it never joins `gates.list`, and a missing input is a 0-exit
+notice, not a failure. It writes only under `DRIFT_KIT_METRIC_DIR` (the
+gitignored, account-bearing persistent home) and **emits no account
+identifiers** — the trend log carries stage, model, iteration, token counts, and
+priced cost, never the account the tokens billed to.
+
+**The join.** Three inputs, joined on the session:
+
+1. **Stamps** — the WORKFLOW-STATE data lines, one per stage-skill invocation,
+   grammar `<iteration> <stage> <session-id> <date>` (owned by
+   lifecycle-kit/SPEC.md §The state machine; this tool is a read-only consumer of
+   that contract, it changes nothing there). The `<session-id>` field is not a raw
+   transcript id: it is lifecycle's `session-id.sh` *normalization* of one — a
+   leading `agent-` stripped, then the first 8 chars (lifecycle-kit/SPEC.md
+   §bin/session-id.sh) — so this repo's stamps carry an 8-char value, `session8`
+   below. The stamp supplies the iteration↔stage↔session8 mapping. Read from
+   `DRIFT_KIT_STATE_FILE` (§Layout and configuration), defaulting to the same
+   state-file path the trajectory extractor already reads.
+2. **Transcripts** — under `DRIFT_KIT_SESSIONS_DIR` (the knob the overhead meter
+   already resolves). A stamp's `session8` selects a transcript by applying that
+   **same normalization** to each candidate basename and matching — not by a raw
+   filename prefix: this repo's stage sessions are subagent transcripts named
+   `agent-<hex>.jsonl` whose stamp is `<hex>` truncated to 8 chars, so a raw
+   prefix match against the `agent-` prefix would select nothing. The tool sums
+   the matched session's assistant-turn usage into four token categories —
+   `input`, `output`, `cache_read`, `cache_creation` — per model id seen on those
+   turns. A streaming transcript repeats a message id across lines (input/cache
+   constant, output growing), so the sum keeps the last usage per message id
+   before aggregating — summing raw lines would multi-count. Because this repo runs
+   one session per stage under `LIFECYCLE_KIT_SESSION_BOUNDARY` (lifecycle-kit/SPEC.md
+   §The state machine; its roster owns the setting), a session maps to exactly one
+   stage, so per-session usage *is* per-stage usage. Under an iteration-boundary
+   consumer a session may span stages; the tool attributes such a session to the
+   stage its stamp names and says so in the emitted caveat — the honest limit,
+   parallel to the overhead meter's byte-proxy caveat. Parsing the transcript
+   needs `jq`; its absence degrades to a token-less notice rather than a failure.
+3. **Price table** — a consumer-supplied data file mapping model id → per-token
+   price for each of the four categories. This is **consumer config, never a kit
+   literal** (the provenance seam, the `check-graph`/`graph-vocab` pattern): the
+   per-token prices are public facts, but the *roster of models a consumer runs*
+   is theirs, and a kit literal enumerating it would publish that roster. The kit
+   ships `templates/price-table.tsv` with placeholder rows and the column schema;
+   the consumer copies it and fills their roster. Resolved from
+   `DRIFT_KIT_PRICE_TABLE` (§Layout and configuration).
+
+**Degradation.** A price table that is absent, or that has no row for a model the
+transcripts name, degrades that model's cost cell to `n/a` and the tool emits the
+token counts alone — the same degradation contract the trajectory extractor
+applies to an unreadable surface (§Bundled KPIs / §Layout and configuration). Cost
+is additive over priced cells only; an `n/a` cell never poisons the total
+silently — the output carries an "incomplete pricing" caveat when any contributing
+cell degraded.
+
+**The trend log.** One line is appended per `(iteration, stage, model)` triple to
+`DRIFT_KIT_STAGE_ECONOMICS_LOG`, grammar:
+
+```
+<date> <iteration> <stage> <model> in=<tok> out=<tok> cr=<tok> cw=<tok> cost=<usd|n/a>
+```
+
+`cr` is cache-read and `cw` is cache-creation. `cr` is the headline field: the
+motivating dig showed cache-read of accumulated context — not model choice — is
+the dominant burn (build ~73% of session cost, climbing 37M→86M cr-tokens per
+session), so the field exists to keep that lever visible close-over-close. The
+dedup key read on append is the `<iteration> <stage> <model>` triple —
+re-measuring a triple replaces its line rather than double-counting, exactly as
+the overhead meter dedups on `session8`. Any per-model sub-breakdown beyond these
+fields stays on stdout at measurement time; a log field with no reader is a field
+removed. Field readers: the `/economics` narrative reads `cost` and the four token
+fields (`cr` headline); the operator reads `cost` close-over-close; the deferred
+`benchmark-ab-experiment` rung's measurement half consumes this log rather than
+rebuilding it; `date` carries the reading-age caveat.
+
+## The `/economics` skill
+
+`/economics` is the customer-facing post-iteration narrative: run at close, it
+chains `bin/overhead-meter.sh` → `bin/stage-economics.sh` → delegation-kit's
+usage-trend (delegation-kit/SPEC.md §Trend reporter owns `bin/usage-trend.sh`; the
+skill is a read-only caller) into one report answering "what did this iteration
+cost, where, and was the model posture worth it". It ships as a drift-kit skill
+template `templates/economics.md`, materialized in the consumer as the copy
+`.claude/commands/economics.md` — the template↔consumer-copy split the guard/hook
+skills use, its one bound slot the consumer's model posture. It is not a lifecycle
+stage (it moves no cursor, stamps nothing) and so is outside
+`check-stage-skill-coverage`'s stage roster; it is a reporting ritual the close
+skill may invoke, never a gate.
+
 ## Layout and configuration
 
 ```
@@ -329,11 +431,14 @@ drift-kit/
   bin/trajectory.sh              # the published-evidence extractor
   bin/kfric.sh                   # the knowledge-friction capture affordance
   bin/overhead-meter.sh          # the governance-overhead byte-proxy meter
+  bin/stage-economics.sh         # the stage × model × iteration spend pricer
   kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
   templates/kpis.list            # example registry (consumer copies + prunes)
   templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
   templates/close-knowledge.md
+  templates/price-table.tsv      # placeholder + schema for the stage-economics price table (consumer fills the roster)
+  templates/economics.md         # the /economics close-cadence skill template
   smoke/install.sh
   smoke/overhead-fixture.jsonl   # synthetic transcript driving the classifier smoke
 ```
@@ -390,6 +495,18 @@ Knobs (this repo's layout as defaults):
 - `DRIFT_KIT_GATES_FILE` — the registry whose member count the trajectory
   extractor reads at each close commit (gate-roster growth); default
   `${GATE_SDK_GATES_DIR:-scripts}/gates.list`.
+- `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default
+  `$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt` (gitignored; the meter
+  `mkdir -p`s the dirname).
+- `DRIFT_KIT_PRICE_TABLE` — the consumer-owned model→price roster the
+  stage-economics meter prices through; default
+  `${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv` (beside `graph-vocab.sh`, the
+  consumer-config precedent). Absent, cost degrades to `n/a` and tokens still report.
+- `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path the stage-economics join reads
+  for stamps; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
+  same default the trajectory extractor's surface list computes — drift-kit
+  re-derives with its own knob rather than importing a sibling kit's bin contract,
+  the established `DRIFT_KIT_SESSIONS_DIR` precedent).
 
 Per-KPI couplings (which meter, which log, which scan flag) are the
 plugins' own headers, not knobs — a consumer retargeting one edits its copy
@@ -419,7 +536,15 @@ log-absent degradation. The writer/reader-divergence assertion runs meter and
 KPI under one `DRIFT_KIT_METRIC_DIR` override with no explicit
 `DRIFT_KIT_OVERHEAD_LOG` and asserts the reader finds the log the writer
 wrote — the surviving divergence surface the namespace export cannot guard:
-writer and reader computing *defaults* independently. Gate-sdk's `check-shellcheck` lints all kit sources as
+writer and reader computing *defaults* independently. The stage-economics meter
+is likewise fixture-driven: `smoke/install.sh` drives the join over a synthetic
+fixture set — a small WORKFLOW-STATE stamp file, a synthetic transcript carrying
+usage records for the stamped `session8`, and a placeholder price table — and
+asserts the emitted trend line's fields (the `<iteration> <stage> <model>`
+grouping and the `in`/`out`/`cr`/`cw`/`cost` values), that a re-measure replaces
+the triple's line rather than doubling it, and the `n/a` cost cell plus the
+incomplete-pricing caveat when the priced model has no row (the price-table-absent
+degradation). Gate-sdk's `check-shellcheck` lints all kit sources as
 usual.
 
 ## Out of scope

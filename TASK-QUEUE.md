@@ -12,24 +12,6 @@
 
 ## New Features
 
-- **stage-economics-report** [spec: SPEC-stage-economics.md] — a tracked
-  drift-kit tool `bin/stage-economics.sh` pricing lifecycle spend by stage ×
-  model × iteration (WORKFLOW-STATE stamps ⋈ transcripts ⋈ a consumer-config
-  price table), plus the `/economics` close-cadence skill chaining
-  overhead-meter → stage-economics → usage-trend into one post-iteration
-  narrative. Answers the one question no built-in surface prices — real spend by
-  lifecycle stage × model × iteration — and keeps the cache-read burn lever
-  visible close-over-close (the dig that motivated it: cache-read of accumulated
-  context is the dominant burn, not model choice). Design, causal completeness,
-  and the provenance seam (the price table is consumer config, never a kit
-  literal roster) are in the amendment. Cross-component read-only: the tool
-  consumes lifecycle-kit's stamp contract and delegation-kit's usage surface
-  without changing either, so build entry's assertion C will demand the audit
-  stamp or a recorded waiver. Supersedes benchmark-ab-experiment's
-  stage-burn-meter measurement half (that rung consumes this tool rather than
-  rebuilding it). Surfaced 2026-07-18 by the budget-token usage analysis run on
-  the `.metric/` prototype scripts.
-
 ## Technical Debt
 
 ## Deferred
@@ -346,5 +328,7 @@
   marker the SPEC says distinguishes them.
 
 ## Done
+
+- stage-economics-report
 
 ## Lessons Learned

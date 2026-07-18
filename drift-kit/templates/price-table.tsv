@@ -1,0 +1,13 @@
+# price-table.tsv — consumer config for bin/stage-economics.sh (drift-kit/SPEC.md §The stage-economics meter).
+# Copy this beside your gates dir (default scripts/price-table.tsv, DRIFT_KIT_PRICE_TABLE) and
+# replace the placeholder rows with YOUR model roster. The per-token prices are public facts, but
+# the roster of models you run is yours — a kit literal enumerating it would publish it (the
+# provenance seam / graph-vocab pattern), so this template ships the schema and placeholders only.
+#
+# Tab-separated. One row per model id (the id as it appears in the transcript's message.model).
+# Columns are USD per single token (a $/MTok price ÷ 1,000,000). A model with no row here
+# degrades its cost cell to n/a — token counts still report; pricing is advisory, never required.
+#
+# model	input	output	cache_read	cache_creation
+example-model-large	0.000015	0.000075	0.0000015	0.00001875
+example-model-small	0.0000008	0.000004	0.00000008	0.000001

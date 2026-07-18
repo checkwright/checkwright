@@ -141,3 +141,50 @@ set -e
 [[ "$kmrc" -eq 0 ]] || fail "kpi-overhead exited $kmrc under the shared DRIFT_KIT_METRIC_DIR override"
 if grep -q 'n/a' <<<"$kmd"; then fail "writer/reader default divergence: reader missed the log the writer wrote under one DRIFT_KIT_METRIC_DIR override"; fi
 [[ "$(grep -c '^lead' <<<"$kmd")" -eq 2 ]] || fail "kpi-overhead did not read the metric-dir log the meter wrote"
+
+# spec: drift-kit/SPEC.md §Testing — the stage-economics join over a synthetic fixture set:
+# a WORKFLOW-STATE stamp file, a transcript whose basename normalizes to the stamped
+# session8, and a placeholder price table. Known tokens in, known trend line out.
+sedir="$work/sessions"; mkdir -p "$sedir"
+cat > "$sedir/agent-sess1234deadbeef.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"m1","model":"test-model","usage":{"input_tokens":10,"output_tokens":5,"cache_read_input_tokens":100,"cache_creation_input_tokens":20}}}
+{"type":"assistant","message":{"id":"m1","model":"test-model","usage":{"input_tokens":10,"output_tokens":8,"cache_read_input_tokens":100,"cache_creation_input_tokens":20}}}
+{"type":"assistant","message":{"id":"m2","model":"test-model","usage":{"input_tokens":4,"output_tokens":3,"cache_read_input_tokens":50,"cache_creation_input_tokens":10}}}
+EOF
+printf 'smoke build sess1234 2025-01-01\n' > "$work/se-state.txt"
+printf 'model\tinput\toutput\tcache_read\tcache_creation\ntest-model\t1\t2\t3\t4\n' > "$work/se-prices.tsv"
+selog="$work/se-log.txt"
+
+econ() {   # $1 = price-table path (a missing path exercises the degradation)
+    DRIFT_KIT_STATE_FILE="$work/se-state.txt" \
+    DRIFT_KIT_SESSIONS_DIR="$sedir" \
+    DRIFT_KIT_PRICE_TABLE="$1" \
+    DRIFT_KIT_STAGE_ECONOMICS_LOG="$selog" \
+    bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh"
+}
+
+set +e
+eout="$(econ "$work/se-prices.tsv" 2>&1)"; erc=$?
+set -e
+[[ "$erc" -eq 0 ]] || fail "stage-economics exited $erc (advisory tool must exit 0)"
+
+if command -v jq >/dev/null 2>&1; then
+    [[ -s "$selog" ]] || fail "stage-economics wrote no trend line"
+    [[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "stage-economics log has more than one line for one (iteration,stage,model) triple"
+    seln="$(cat "$selog")"
+    grep -qE '^[0-9-]+ smoke build test-model in=14 out=11 cr=150 cw=30 cost=606\.[0-9]+$' <<<"$seln" \
+        || fail "trend line does not match the documented grammar/values: $seln"
+
+    econ "$work/se-prices.tsv" >/dev/null   # re-measure replaces the triple's line, never doubles it
+    [[ "$(grep -c '' "$selog")" -eq 1 ]] || fail "re-measure double-counted the triple (dedup broken)"
+
+    : > "$selog"
+    set +e
+    dout="$(econ "$work/no-such-price-table.tsv")"; drc=$?
+    set -e
+    [[ "$drc" -eq 0 ]] || fail "stage-economics (price table absent) exited $drc"
+    grep -q 'cost=n/a' "$selog" || fail "absent price table did not degrade the cost cell to n/a"
+    grep -q 'incomplete' <<<"$dout" || fail "degraded run did not carry the incomplete-pricing caveat"
+else
+    grep -q 'jq not found' <<<"$eout" || fail "stage-economics without jq must emit its degradation notice"
+fi

@@ -76,6 +76,7 @@ bash drift-kit/bin/drift-report.sh            # full report: lead/lag rows under
 bash drift-kit/bin/drift-report.sh --trend    # one compact line (fragments joined with ·)
 bash drift-kit/bin/trajectory.sh --emit       # governed-trajectory table (one row per closed iteration)
 bash drift-kit/bin/overhead-meter.sh          # governance-vs-task byte proxy for the newest session transcript
+bash drift-kit/bin/stage-economics.sh         # real spend by stage × model × iteration (stamps ⋈ transcripts ⋈ price table)
 ```
 
 `bin/overhead-meter.sh` is the overhead meter (drift-kit/SPEC.md §The overhead
@@ -90,6 +91,18 @@ published-evidence extractor): a pure function of committed git history that
 emits one row per closed iteration — stages run, commit shape, amendment
 latency, validate attestations, gate-roster growth — for a consumer to pin
 behind a freshness gate.
+
+`bin/stage-economics.sh` is the stage-economics meter (drift-kit/SPEC.md §The
+stage-economics meter): it prices real spend by lifecycle stage × model ×
+iteration by joining WORKFLOW-STATE stamps to their session transcripts to a
+consumer-supplied price table, keeping the cache-read burn lever visible
+close-over-close. Copy `templates/price-table.tsv` beside your gates dir and fill
+your model roster (the roster is consumer config, never a kit literal — the
+provenance seam); absent it, cost degrades to `n/a` and tokens still report. The
+`/economics` skill (`templates/economics.md`, materialized as
+`.claude/commands/economics.md`) chains overhead-meter → stage-economics →
+delegation-kit's usage-trend into one post-iteration cost narrative — a reporting
+ritual the close skill may invoke, not a lifecycle stage and not a gate.
 
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your
