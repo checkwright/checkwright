@@ -12,23 +12,6 @@
 
 ## New Features
 
-- **economics-budget-pct-decouple** [spec: SPEC-economics-budget-pct-decouple.md] —
-  drop delegation-kit's `usage-trend` (the subscription **budget-%** rate-window
-  footprint) as the third cost surface of the `/economics` narrative, so the cost
-  chain narrows to `overhead-meter → stage-economics` and `stage-economics`
-  becomes the sole cost-attribution surface. Budget-% is account-wide — confounded
-  by overlapping sessions and a second operator on one account — so it is the
-  wrong instrument for per-iteration cost attribution, sitting confounded beside
-  `stage-economics`'s clean per-transcript token pricing. Removal of a *role*, not
-  a tool: `usage-verdict`, `agent-budget-guard`, and `usage-trend` itself all
-  stand (budget-% stays correct for the pre-dispatch shared-account throttle and
-  weekly-headroom planning). Edit surface: `drift-kit/templates/economics.md`
-  (drop step 3, reword the intro cardinal), `drift-kit/SPEC.md` §The `/economics`
-  skill (two-tool chain, drop the usage-trend caller clause), `drift-kit/README.md`
-  (one-liner), and the regenerated `docs/drift-kit/{README,SPEC}.md` mirror
-  (`gen-docs-mirror.sh --write`; `check-docs-mirror-fresh` byte-gates). Scope ruled
-  with the operator 2026-07-19: economics-only. Single-component (drift-kit).
-
 - **resume-journal-done-marker-compliance** [spec: SPEC-resume-journal-done-marker-compliance.md] —
   rescope the resume-journal recovery contract so the `DONE`-absence clause stops
   false-reading a completed run as interrupted (agents routinely finish without
@@ -461,5 +444,7 @@
   `trajectory-stage-roster-hardcode` close, filed by lead-dispatch instruction.
 
 ## Done
+
+- economics-budget-pct-decouple
 
 ## Lessons Learned

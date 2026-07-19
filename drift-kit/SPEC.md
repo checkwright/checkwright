@@ -426,10 +426,17 @@ rebuilding it; `date` carries the reading-age caveat.
 ## The `/economics` skill
 
 `/economics` is the customer-facing post-iteration narrative: run at close, it
-chains `bin/overhead-meter.sh` → `bin/stage-economics.sh` → delegation-kit's
-usage-trend (delegation-kit/SPEC.md §Trend reporter owns `bin/usage-trend.sh`; the
-skill is a read-only caller) into one report answering "what did this iteration
-cost, where, and was the model posture worth it". It ships as a drift-kit skill
+chains `bin/overhead-meter.sh` → `bin/stage-economics.sh` into one report
+answering "what did this iteration cost, where, and was the model posture worth
+it". `stage-economics` is the sole cost-attribution surface — it prices
+per-transcript, per-stage, per-model token draw (the token SSOT), while
+`overhead-meter` contributes the governance share, not a cost figure. The
+narrative deliberately excludes delegation-kit's usage-trend budget-%: that
+rate-window footprint is account-wide — confounded by overlapping sessions and
+by a second operator on the same account — so it is the wrong instrument for
+per-iteration cost attribution, and carrying it beside the per-transcript token
+SSOT put a confounded advisory number next to a clean one a reader could
+over-trust as this iteration's cost. It ships as a drift-kit skill
 template `templates/economics.md`, materialized in the consumer as the copy
 `.claude/commands/economics.md` — the template↔consumer-copy split the guard/hook
 skills use, its one bound slot the consumer's model posture. It is not a lifecycle

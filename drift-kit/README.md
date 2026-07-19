@@ -95,9 +95,9 @@ close-over-close. Copy `templates/price-table.tsv` beside your gates dir and fil
 your model roster (the roster is consumer config, never a kit literal — the
 provenance seam); absent it, cost degrades to `n/a` and tokens still report. The
 `/economics` skill (`templates/economics.md`, materialized as
-`.claude/commands/economics.md`) chains overhead-meter → stage-economics →
-delegation-kit's usage-trend into one post-iteration cost narrative — a reporting
-ritual the close skill may invoke, not a lifecycle stage and not a gate.
+`.claude/commands/economics.md`) chains overhead-meter → stage-economics into
+one post-iteration cost narrative — a reporting ritual the close skill may
+invoke, not a lifecycle stage and not a gate.
 
 A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your

@@ -7,7 +7,7 @@ not a lifecycle stage: it moves no cursor and stamps nothing (drift-kit/SPEC.md
 
 Run it at close (the close skill may invoke it) or ad hoc. It answers, for the
 iteration just run: what did it cost, where did the cost land, and was the model
-posture worth it. Chain the three reporting tools in order, then read their
+posture worth it. Chain the two reporting tools in order, then read their
 output into one narrative — do not paste the raw tool dumps:
 
 1. **Governance overhead** — `bash drift-kit/bin/overhead-meter.sh` on the
@@ -19,10 +19,8 @@ output into one narrative — do not paste the raw tool dumps:
    accumulated-context cache-read, not model choice, is the dominant draw, so lead
    the cost story with it. A missing price table degrades cost to `n/a` and the
    tokens still report.
-3. **Usage trend** — `bash delegation-kit/bin/usage-trend.sh` (delegation-kit/SPEC.md
-   §Trend reporter): the rate-window footprint across the recent samples.
 
-Compose the narrative from those three surfaces:
+Compose the narrative from those two surfaces:
 
 - **Cost by stage.** From the stage-economics rows, name the priciest stages and
   their token shape; call out `cr` explicitly as the lever, since it dominates.
