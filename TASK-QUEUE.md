@@ -462,8 +462,38 @@
   under-reports it in the economics evidence until this lands. Surfaced 2026-07-19
   by the `stage-posture-split-tuning` align audit verifying the amendment wires
   cleanly against the current tree.
-## Done
+  **Prioritized-for-next-scope (2026-07-19, lead ruling at the
+  `stage-posture-split-tuning` close):** the six-stage roster is now **LIVE**, so
+  the premise above is no longer latent — `trajectory.sh`'s hardcoded 5-stage
+  roster (`:52` case arm, `:68` git-log grep, `:162` render loop) now silently
+  drops every `spec` stamp on this repo's own trajectory. This directly **blocks
+  the promotion-reflection loop** (`spec-split-promotion-review` depends on it for
+  any recorded `spec`-stage data), so next iteration's scope should evaluate it as
+  a **near-term unit**, not leave it indefinitely deferred. Still needs its own
+  amendment/`spec` unit — the seam design (read the configured roster vs a literal
+  list) is unchanged and un-started; this annotation raises priority, it does not
+  un-defer the entry into an active envelope. The lead is carrying this as a
+  directed theme into next scope.
 
-- stage-posture-split-tuning
+- **spec-split-promotion-review** [needs-spec] — after the six-stage roster has
+  run **≥N iterations with `spec`-stage economics actually recorded on the
+  trajectory**, re-run the `/economics` read; if the split shows the projected
+  cache/context win, **promote the `spec` stage to the kit default** via a new
+  amendment (else keep it consumer-config or revert). The `stage-posture-split`
+  amendment shipped the stage as optional, demand-gated consumer config
+  precisely so this promotion is an evidence-gated follow-up rather than a
+  default flip on projection alone.
+  **Precondition — hard dependency on `trajectory-stage-roster-hardcode`:** until
+  that lands, `drift-kit/bin/trajectory.sh` silently drops every `spec` stamp
+  (hardcoded 5-stage roster), so **no `spec`-stage economics data is recorded on
+  the trajectory at all** — the re-run this task prescribes has nothing to read.
+  This task cannot start before that fix.
+  **Cost while deferred:** one queue line; the backlog-aging review re-raises it
+  every iteration until the data exists to run it. Filed 2026-07-19 by lead
+  ruling at the `stage-posture-split-tuning` close — the split shipped on
+  projected economics, and this is the loop that confirms or retires that
+  projection with recorded data.
+
+## Done
 
 ## Lessons Learned
