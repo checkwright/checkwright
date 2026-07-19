@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+tooling-signal-honesty gates sha256=cedb514dab6a60718674c399a6b218a8b9f1df7bce00cd6ab2920876006aee87 pass=75 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty gate_sdk sha256=dd0eda66b26b3bd3c18cc292b3ea0fee2e1fb6eaf96b9c8b450e1bf19c89f262 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty canon_kit sha256=d0c0e1b2b9f099ba2152cce6123319b0a62b245f97a69ec9addff36255d756d7 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty lifecycle_kit sha256=ffd7a1e902cbae04cacb68889ebe621172d592e7e4888bdacf2288b0b2c93f93 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty queue_kit sha256=0f7d5111c384795d745d6d3573644ffa1122590521907a3175bc1a9ac383d92d pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty site_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty scripts sha256=fe2ed0bfc0475ebe387ff499ba20bb4d3932c068a3248f11890841d7fb69c94b pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty guard_tests sha256=d4bf2cb95ff71dec4ba250f72ab892bfaa46cf9677013909169b8e13119d4ca3 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty usage_tests sha256=577d29baebe4ddb4a1b4ec2573546b7acc9ee34f62f55c8dd35c7c24e85a186a pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty upgrade sha256=0c01c82a63528514fe797824404c88b6e4ad0420e5a0fdc48a99b0b89f250154 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
+tooling-signal-honesty index_tests sha256=71d410e2b32adb3cbdfa575b3c3cbd89d1eada95158c123e4ee517a439e789d2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-19
