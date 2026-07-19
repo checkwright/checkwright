@@ -2,3 +2,5 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
+stage-posture-split-tuning release v0.8.0 — Behavior changes non-empty: lifecycle-kit ships a new optional trigger-gated `spec` amendment-authoring stage template; non-breaking, kit default roster unchanged, no gate tightened and no knob renamed.
+
