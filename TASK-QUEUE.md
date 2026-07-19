@@ -12,6 +12,28 @@
 
 ## New Features
 
+- **usage-verdict-stale-steer-contradiction** [spec: delegation-kit/SPEC-verdict-consequence.md]
+  — one STALE verdict carries two contradictory steers, and which one a session
+  reads depends on the path it read the verdict through: `usage-verdict`'s own
+  STALE line states the epistemic status and omits the decision consequence,
+  while the budget guard's advisory states the consequence. A session that reads
+  the direct-run line infers "do not trust the number" into "do not dispatch",
+  and the corrective is structurally unreachable — the guard fires *on* dispatch,
+  the act a hesitating session has not yet performed. Attested first-party and
+  reported as a repeat across sessions. The amendment rules the open (a)/(b)
+  question in favour of (a), structurally: one string, one producer, the guard's
+  restating arm deleted rather than synchronized.
+
+- **smoke-exit-code-assertion-honesty** [spec: gate-sdk/SPEC-assertion-strength.md]
+  — `delegation-kit/smoke/install.sh` guards a `usage-verdict` call with a bare
+  `if`, accepting PAUSE and STALE alike under a message asserting specifically
+  that the call did not PAUSE, so a STALE regression passes the smoke silently.
+  Per enforcement-first the fix ships with the scanner for its class — an
+  assertion weaker than its own failure message. The amendment places the gate in
+  gate-sdk beside `check-test-hermetic` (generic testing discipline, widest true
+  tier) while the fix stays delegation-kit's; it derives the verdict vocabulary
+  from the callee's declared `# exit:` header so no term list ships in gate code.
+
 ## Technical Debt
 
 ## Deferred
@@ -312,28 +334,6 @@
   operator-authorized hermeticity fix rather than of its precedent-doctrine
   envelope.
 
-- **smoke-exit-code-assertion-honesty** [needs-spec] — `delegation-kit/smoke/install.sh:21`
-  asserts less than its message claims. The `if` guard fails only on exit 0, so
-  it accepts PAUSE (exit 1) and STALE (exit 2) alike, while the error text says
-  "usage-verdict did not PAUSE on a live 95% reading". Exit semantics confirmed
-  in `delegation-kit/bin/usage-verdict.sh` (0 OK/RESET-OK, 1 PAUSE, 2
-  STALE-or-unreadable). Pre-existing and unchanged by the hermeticity fix: the
-  cred pin landed there makes a STALE far less likely but does not make the
-  assertion honest, so a future STALE regression would still pass this smoke
-  silently.
-  **Design question (why deferred, not fixed at close):** the fix itself is a
-  one-line condition change plus a smoke re-run, well under an hour — but the
-  class is not one script. An assertion whose guard is weaker than its message
-  is a gateable shape, and filing it as a build unit lets the fix and the
-  scanner that catches the class land together per Enforcement-first, rather
-  than landing a silent one-line correction in a close stage after validate has
-  already signed the tree.
-  **Cost while deferred:** low — one smoke assertion is weaker than it reads,
-  in a kit whose other assertions are honest; the risk is a masked STALE
-  regression, not a false green today. Surfaced 2026-07-19 by the validate
-  re-entry on `derivation-by-precedent`, the same
-  operator-authorized-hermeticity-fix thread as `hermetic-bin-roster-config`.
-
 - **release-body-url-form** [needs-spec] — *residue only: the two cheap
   deliverables are done (see below); what remains is the monitor-shaped half,
   promotable only together with `rendered-site-link-monitor`.* The `v0.6.0`
@@ -471,53 +471,6 @@
   scratch — a missed verification costs a late-caught regression, never lost work.
   Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
   plain-(b) ruling named.
-
-- **usage-verdict-stale-steer-contradiction** [needs-spec] — one STALE verdict
-  carries two contradictory steers, and which one a session reads depends on the
-  path it read the verdict through.
-  *Direct run* — `delegation-kit/bin/usage-verdict.sh:98` prints `STALE (reading
-  older than <n>s; pct may lag reality — re-read or refresh before trusting)`.
-  *Hook path* — `scripts/agent-budget-guard.sh:17` (and its kit template) feeds
-  back `advisory only: STALE is budget-unknown, never blocks and needs no
-  override (only PAUSE does)`.
-  **The drift is inside one file, not just across the two readers.**
-  delegation-kit/SPEC.md:62 (§The delegation model) states "STALE never blocks —
-  budget-unknown is decision-relevant, but a consumer with no snapshot producer
-  must route to advice, not out of delegation"; delegation-kit/SPEC.md:200
-  (§usage-verdict) states "STALE (exit 2): re-read before trusting." Same file,
-  two sections, opposite operational readings — the same prose-vs-prose shape as
-  the `STALE_AGE` citation drift found in this same file by the
-  `tooling-signal-honesty` close audit.
-  **Demand evidence — first-party, this iteration.** The close session read the
-  direct-run string mid-iteration, treated STALE as a reason not to dispatch, and
-  built a polling loop to wait it out: precisely the behavior the direct string
-  steers toward and the hook string would have stopped cold. **The corrective is
-  structurally unreachable when it is needed** — the hook fires *on* dispatch,
-  i.e. exactly the act a session hesitating on STALE has not yet performed. The
-  operator reports this as a repeat across sessions, not a one-off, so the
-  recurrence is attested rather than projected.
-  **Design question (why design-pending, not a one-line string fix):** which string
-  is wrong is genuinely open. Either (a) carry the never-blocks clause into
-  `usage-verdict`'s own STALE line so both readers get one answer — cheap, but it
-  presumes the two readers want the same sentence; or (b) rule that "re-read
-  before trusting" is correct for a *human* reader and wrong only for a
-  *dispatching agent*, in which case the split is intentional and the real defect
-  is that nothing marks which reader each string addresses — a reader-tagging
-  convention across the verdict surfaces, which is a design pass, not an edit.
-  Resolving (a) vs (b) also settles whether SPEC:62 and SPEC:200 should converge
-  or be explicitly reader-scoped.
-  **Adjacent precedent, on record:** this is the same shape as the
-  memory-quoted-percentage failure the guard already exists to close
-  (delegation-kit/SPEC.md §The delegation model) — a session acting on a reading
-  whose *authority* it misjudged, rather than on a wrong number. That the guard's
-  own advisory text is the corrective here, and is unreachable at the moment of
-  hesitation, is the sharpest form of the argument.
-  **Cost while deferred:** recurring and self-concealing. Each occurrence burns
-  wall-clock on an unnecessary wait (a polling loop, a deferred dispatch) and
-  leaves no artifact — a session that waits out a STALE reading logs nothing to
-  distinguish it from one that never hit it, so the frequency is unmeasurable
-  from the tree and the cost is systematically under-read. Filed 2026-07-19 by
-  lead ruling at the `tooling-signal-honesty` close, off first-party evidence.
 
 ## Done
 
