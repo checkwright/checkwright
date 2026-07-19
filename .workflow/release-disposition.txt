@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-derivation-by-precedent release v0.7.0 — Tightened gates is non-empty (check-test-hermetic gains assertion B), which floors the bump to minor per docs/install.md §Versioning; no decommission, so not a major.
