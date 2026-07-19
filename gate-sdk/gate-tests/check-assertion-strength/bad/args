@@ -1,0 +1,3 @@
+# Scan this case dir's smoke tree: its lone guard is truthiness-only while its
+# message names PAUSE, which the callee's header binds to exit 1 alone.
+smoke

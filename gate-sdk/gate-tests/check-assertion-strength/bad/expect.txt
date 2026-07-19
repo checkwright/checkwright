@@ -1,0 +1,1 @@
+message names PAUSE (exit 1 of verdict.sh) but the guard compares no status to 1

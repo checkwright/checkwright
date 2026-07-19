@@ -79,6 +79,10 @@ if staged_matches 'gate-sdk/gate-tests/*.test.sh' 'canon-kit/gate-tests/*.test.s
     run_gate check-test-hermetic gate-sdk/checks/check-test-hermetic.sh
 fi
 
+if staged_matches 'gate-sdk/smoke/*.sh' 'canon-kit/smoke/*.sh' 'context-kit/smoke/*.sh' 'delegation-kit/smoke/*.sh' 'doctrine-kit/smoke/*.sh' 'drift-kit/smoke/*.sh' 'evidence-kit/smoke/*.sh' 'guard-kit/smoke/*.sh' 'lifecycle-kit/smoke/*.sh' 'queue-kit/smoke/*.sh' 'site-kit/smoke/*.sh' 'gate-sdk/gate-tests/*.test.sh' 'canon-kit/gate-tests/*.test.sh' 'context-kit/gate-tests/*.test.sh' 'delegation-kit/gate-tests/*.test.sh' 'doctrine-kit/gate-tests/*.test.sh' 'drift-kit/gate-tests/*.test.sh' 'evidence-kit/gate-tests/*.test.sh' 'guard-kit/gate-tests/*.test.sh' 'lifecycle-kit/gate-tests/*.test.sh' 'queue-kit/gate-tests/*.test.sh' 'site-kit/gate-tests/*.test.sh' 'gate-sdk/bin/*.sh' 'canon-kit/bin/*.sh' 'context-kit/bin/*.sh' 'delegation-kit/bin/*.sh' 'doctrine-kit/bin/*.sh' 'drift-kit/bin/*.sh' 'evidence-kit/bin/*.sh' 'guard-kit/bin/*.sh' 'lifecycle-kit/bin/*.sh' 'queue-kit/bin/*.sh' 'site-kit/bin/*.sh'; then
+    run_gate check-assertion-strength gate-sdk/checks/check-assertion-strength.sh
+fi
+
 if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'docs/check-graph.html' 'SPEC-*.md' '*/SPEC-*.md'; then
     run_gate check-graph gate-sdk/checks/check-graph.sh
 fi

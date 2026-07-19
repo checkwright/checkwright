@@ -12,16 +12,6 @@
 
 ## New Features
 
-- **smoke-exit-code-assertion-honesty** [spec: gate-sdk/SPEC-assertion-strength.md]
-  — `delegation-kit/smoke/install.sh` guards a `usage-verdict` call with a bare
-  `if`, accepting PAUSE and STALE alike under a message asserting specifically
-  that the call did not PAUSE, so a STALE regression passes the smoke silently.
-  Per enforcement-first the fix ships with the scanner for its class — an
-  assertion weaker than its own failure message. The amendment places the gate in
-  gate-sdk beside `check-test-hermetic` (generic testing discipline, widest true
-  tier) while the fix stays delegation-kit's; it derives the verdict vocabulary
-  from the callee's declared `# exit:` header so no term list ships in gate code.
-
 ## Technical Debt
 
 ## Deferred
@@ -463,5 +453,6 @@
 ## Done
 
 - usage-verdict-stale-steer-contradiction
+- smoke-exit-code-assertion-honesty
 
 ## Lessons Learned

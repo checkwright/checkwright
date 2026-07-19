@@ -18,8 +18,9 @@ now="$(date +%s)"
     printf 'updated_at=%s\n' "$now"
 } > "$snap"
 # spec: delegation-kit/SPEC.md §usage-verdict — hermetic cred pin: point CRED_FILE at an absent path so login_at=0 skips the login-window reroute; the ambient ~/.claude cred (or a fresh stub, mtime ~now) falls inside LOGIN_WINDOW and would reroute this call to STALE, making the smoke flaky by wall-clock
-if DELEGATION_KIT_CRED_FILE="$snap.nocred" bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$snap" >/dev/null 2>&1; then
-    echo "delegation-kit/smoke: usage-verdict did not PAUSE on a live 95% reading" >&2
+DELEGATION_KIT_CRED_FILE="$snap.nocred" bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$snap" >/dev/null 2>&1 && vrc=0 || vrc=$?
+if [[ "$vrc" -ne 1 ]]; then
+    echo "delegation-kit/smoke: usage-verdict on a live 95% reading: want exit 1 (PAUSE), got $vrc" >&2
     rm -f "$snap"; exit 1
 fi
 rm -f "$snap"

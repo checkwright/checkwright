@@ -229,7 +229,12 @@ three failure modes a raw percentage reading leaves open:
 
 Check order: parse → RESET-OK → age-STALE → login-STALE → pause axes → OK.
 
-Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable.
+Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. The
+bin's header declares that mapping, and the declaration is **machine-read** by
+`check-assertion-strength` (gate-sdk/SPEC.md), which derives the verdict
+vocabulary from it rather than carrying a literal — so the header is a surface
+with a consumer, not loose documentation, and rewording it reshapes what that
+gate can discriminate.
 Fail-closed throughout: missing keys and a non-numeric percentage route to
 STALE; each threshold compare uses `awk`, not integer-only bash
 arithmetic, so a fractional percentage cannot silently skip PAUSE; and both
@@ -654,7 +659,12 @@ output so a memory-quoted percentage cannot be the acting source.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot
-through `usage-verdict` asserting a verdict — self-verifying install. It also
+through `usage-verdict` asserting a verdict — self-verifying install. That
+assertion is **code-specific**: the 95% guard captures the exit status and
+compares it to the PAUSE code, reporting the status it observed rather than
+claiming an outcome it did not establish, so a STALE regression cannot pass
+under a "did not PAUSE" message (gate-sdk/SPEC.md
+§check-assertion-strength, the gate for the class). It also
 drives the poll producer through its `file://` stub seam: the happy path
 writes a contract-valid snapshot (asserted by driving it through
 `usage-verdict`), and a fetch failure exits non-zero leaving a pre-seeded

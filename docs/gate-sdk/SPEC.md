@@ -764,6 +764,80 @@ mode the fixture pair drives); `--smoke [dir...]` scans the named smoke dir(s)
 `kit:smoke/install.sh`, and `kit:smoke/violation.sh` (`dir=one`, a one-way audit
 over the test and smoke trees).
 
+### check-assertion-strength
+
+Invariant: **an assertion is at least as strong as its own failure message.** In
+a smoke or gate-test script, a guard that discriminates only zero from non-zero
+must not carry a failure message naming a verdict token that the invoked
+script's declared exit contract binds to one specific non-zero exit code.
+
+The exposure is not a false green today but a **masked regression**: the
+attested case is delegation-kit's smoke guarding a `usage-verdict` call with a
+bare `if`, which accepts PAUSE (1) and STALE (2) alike under a message asserting
+specifically that the call "did not PAUSE". A STALE regression then reports
+itself under the wrong name — worse than an honest silence, because it sends the
+reader to the wrong place.
+
+**The declared exit contract.** A script may declare its exit codes in its
+header comment block. Both live declarations sit inside a wider `# usage:` block
+and are written `#   exit: …` with leading whitespace, so the parser keys on
+`^#[[:space:]]*exit:`, not a bare `# exit:` prefix. The grammar: each uppercase
+token binds to the nearest preceding integer on the line, yielding a token→code
+map. Tokens admit internal hyphens, so `RESET-OK` reads as one token rather than
+two. A token bound to more than one code, or to code 0, is **not discriminable
+and is skipped** — that rule is load-bearing, not housekeeping: a truthiness
+guard discriminates code 0 exactly, so a message naming a code-0 token claims no
+more than the guard established, and the rule is what keeps the gate off the
+honest `did not verdict OK` neighbour sitting a few lines from its own fixture.
+
+This is the same seam move `check-test-hermetic` makes with the own-kit-bin
+convention: the verdict vocabulary (`PAUSE`, `STALE`, and any other kit's
+tokens) is derived from the callee's own declaration and **never appears as a
+literal in gate code**. A gate shipping a vocabulary would publish it; a gate
+deriving one cannot.
+
+**Reach is opt-in and the gate never widens it.** A callee declaring no `# exit:`
+header is simply out of reach — the gate demands the header of no one, so the
+unit imposes no new obligation on every script in the tree. Stated honestly, the
+day-one reach is thin: of the two live declarations, `usage-trend.sh` names its
+codes in prose with no uppercase token and so yields an empty map, leaving
+`usage-verdict.sh`'s `PAUSE`→1 and `STALE`→2 as the whole live vocabulary
+(`OK` and `RESET-OK` bind to 0 and are skipped). One declaring script, two usable
+tokens; the success line reports the call count so the reach stays visible rather
+than implied.
+
+**Detection.** For each guard invoking a declaring script through the own-kit-bin
+convention (`bin/<name>.sh` resolved against the scanned dir's kit root) whose
+discrimination is truthiness only — the call sits in an `if` or chains into
+`||`/`&&` — the gate reads the guard body's failure text within a bounded window,
+truncated at the next such call so guards cannot excuse each other, and reds when
+that text names a discriminable token while the guard compares no status to that
+token's code.
+
+**Valve.** A `# assertion-strength-exempt: <reason>` marker, for a guard that
+establishes the outcome by other means. It is an **inline per-site directive**,
+sited on the guard it excuses — its own line, its immediately preceding comment
+block, or its body — and its discipline is the adjacent `<reason>`, exactly as
+`# fail-closed-exempt:` and the `# hermetic-exempt:` valve it is modelled on.
+It is deliberately **not** queue-linked: §check-gate-exemption-tasks scopes
+itself to `# exception-list:`-tagged arrays and rules this class out as local and
+self-evident via its adjacent comment.
+
+**Honest limit.** The gate reads guard shape, not semantics. An assertion
+weakened without a token-naming message is out of reach, as is any callee
+declaring no exit contract; a message naming a token bound to several codes is
+skipped rather than guessed. What it catches is precisely the attested shape — a
+message more specific than the guard behind it. Like its siblings, a false
+positive is loud (a forced reword or an explicit exemption), never a silent miss.
+
+With no argument the gate scans each `gate_kit_roots` kit's `smoke/` and
+`gate-tests/`; positional args scan the named dir(s), the mode the fixture pair
+drives. Tier `precommit`, matching its sibling; the `# graph:` couples
+`kit:smoke/*.sh`, `kit:gate-tests/*.test.sh`, and `kit:bin/*.sh` (`dir=one`, a
+one-way audit — an edit to a scanned script *or* to a declaring header re-fires
+it). Configuration adds **no new knob**: the scan roots come from the existing
+kit-roots derivation, as `check-test-hermetic`'s do.
+
 ### check-gate-exemption-tasks
 
 Invariant: every element of an `# exception-list:`-tagged array in a

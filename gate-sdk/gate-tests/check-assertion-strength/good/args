@@ -1,0 +1,3 @@
+# Scan this case dir's smoke tree: the PAUSE-naming guard captures and compares
+# the status, and the OK-naming guard is honest because OK binds to code 0.
+smoke

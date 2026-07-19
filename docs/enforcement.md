@@ -39,6 +39,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-gate-fixture-coverage | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-exemption-tasks | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-test-hermetic | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-assertion-strength | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-graph | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-reads-couples | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-kit-enum | precommit |
