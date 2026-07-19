@@ -75,7 +75,7 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*
     run_gate check-gate-exemption-tasks gate-sdk/checks/check-gate-exemption-tasks.sh
 fi
 
-if staged_matches 'gate-sdk/gate-tests/*.test.sh' 'canon-kit/gate-tests/*.test.sh' 'context-kit/gate-tests/*.test.sh' 'delegation-kit/gate-tests/*.test.sh' 'doctrine-kit/gate-tests/*.test.sh' 'drift-kit/gate-tests/*.test.sh' 'evidence-kit/gate-tests/*.test.sh' 'guard-kit/gate-tests/*.test.sh' 'lifecycle-kit/gate-tests/*.test.sh' 'queue-kit/gate-tests/*.test.sh' 'site-kit/gate-tests/*.test.sh'; then
+if staged_matches 'gate-sdk/gate-tests/*.test.sh' 'canon-kit/gate-tests/*.test.sh' 'context-kit/gate-tests/*.test.sh' 'delegation-kit/gate-tests/*.test.sh' 'doctrine-kit/gate-tests/*.test.sh' 'drift-kit/gate-tests/*.test.sh' 'evidence-kit/gate-tests/*.test.sh' 'guard-kit/gate-tests/*.test.sh' 'lifecycle-kit/gate-tests/*.test.sh' 'queue-kit/gate-tests/*.test.sh' 'site-kit/gate-tests/*.test.sh' 'gate-sdk/smoke/install.sh' 'canon-kit/smoke/install.sh' 'context-kit/smoke/install.sh' 'delegation-kit/smoke/install.sh' 'doctrine-kit/smoke/install.sh' 'drift-kit/smoke/install.sh' 'evidence-kit/smoke/install.sh' 'guard-kit/smoke/install.sh' 'lifecycle-kit/smoke/install.sh' 'queue-kit/smoke/install.sh' 'site-kit/smoke/install.sh' 'gate-sdk/smoke/violation.sh' 'canon-kit/smoke/violation.sh' 'context-kit/smoke/violation.sh' 'delegation-kit/smoke/violation.sh' 'doctrine-kit/smoke/violation.sh' 'drift-kit/smoke/violation.sh' 'evidence-kit/smoke/violation.sh' 'guard-kit/smoke/violation.sh' 'lifecycle-kit/smoke/violation.sh' 'queue-kit/smoke/violation.sh' 'site-kit/smoke/violation.sh'; then
     run_gate check-test-hermetic gate-sdk/checks/check-test-hermetic.sh
 fi
 

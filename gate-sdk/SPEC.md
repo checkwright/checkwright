@@ -726,19 +726,38 @@ a reword), never a silent miss, so it is accepted. Requires GNU awk.
 
 ### check-test-hermetic
 
-Invariant: every bespoke `gate-tests/*.test.sh` under the configured kit dirs
-either sources `lib/test-hermetic.sh` or carries a `# hermetic-exempt: <reason>`
-marker line. The exposure it closes: `run-gate-tests` runs fixture pairs `cd`'d
-into a case dir (hermetic by construction) but runs the bespoke unit tests with
-the invoker's cwd, so a gate a unit test drives silently inherits the consumer's
+Two assertions guard a run against ambient state: (A) every bespoke
+`gate-tests/*.test.sh` under the configured kit dirs either sources
+`lib/test-hermetic.sh` or carries a `# hermetic-exempt: <reason>` marker line;
+and (B) a credential-managing smoke script — one that assigns a `*_CRED_FILE` —
+pins every own-kit bin call to a `*_CRED_FILE` path on the invocation line, or
+carries the same `# hermetic-exempt:` valve.
+
+Assertion A's exposure: `run-gate-tests` runs fixture pairs `cd`'d into a case
+dir (hermetic by construction) but runs the bespoke unit tests with the
+invoker's cwd, so a gate a unit test drives silently inherits the consumer's
 `<KIT>_CONFIG_FILE` resolution — a test can green under the consumer's posture
 rather than kit defaults (attested: 689cd9c). The bootstrap is the fix (one
 shared pin, not one per test §lib/test-hermetic.sh); the marker is the valve for
-a test that establishes hermeticity otherwise (constructing its own cwd). With
-no argument the gate scans each `gate_kit_roots` kit's `gate-tests/`; a
-positional arg scans the named dir(s), the mode the fixture pair drives. Tier
-`precommit`; the `# graph:` couples `kit:gate-tests/*.test.sh` (`dir=one`, a
-one-way audit over the test trees).
+a test that establishes hermeticity otherwise (constructing its own cwd).
+
+Assertion B's exposure: a smoke script drives its kit's bins under the real
+`$HOME`, so a bin that resolves its credential file from the ambient `~/.claude`
+(the `<KIT>_CRED_FILE` default) reads live login state — a call whose verdict
+then turns on the wall-clock age of the operator's credential, non-deterministic
+by construction (the delegation-kit `usage-verdict` login-window reroute is the
+attested case). The fix pins the cred at an absent path, so no ambient auth
+event leaks in; the trigger is the script's own `*_CRED_FILE` assignment (a
+smoke script that manages no credentials is never held to the rule), and the
+scan keys on the `$SMOKE_KIT_ROOT/bin/` own-kit-bin convention, so no kit's
+credential-consuming bin roster is spelled out in gate code.
+
+With no argument the gate runs both — each `gate_kit_roots` kit's `gate-tests/`
+(A) and `smoke/` (B); a positional arg scans the named gate-tests dir(s) (A, the
+mode the fixture pair drives); `--smoke [dir...]` scans the named smoke dir(s)
+(B). Tier `precommit`; the `# graph:` couples `kit:gate-tests/*.test.sh`,
+`kit:smoke/install.sh`, and `kit:smoke/violation.sh` (`dir=one`, a one-way audit
+over the test and smoke trees).
 
 ### check-gate-exemption-tasks
 
