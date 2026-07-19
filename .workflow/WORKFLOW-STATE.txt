@@ -9,3 +9,4 @@ trajectory-stage-roster-hardcode spec af12f77d 2026-07-19
 trajectory-stage-roster-hardcode align-waived cbc94da8 2026-07-19
 trajectory-stage-roster-hardcode build a29cb2ad 2026-07-19
 trajectory-stage-roster-hardcode validate a84669ce 2026-07-19
+trajectory-stage-roster-hardcode close a981ea80 2026-07-19
