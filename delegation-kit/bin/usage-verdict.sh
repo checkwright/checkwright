@@ -34,7 +34,7 @@ if [[ -n "$REFRESH_CMD" ]]; then
 fi
 
 if [[ ! -r "$USAGE_FILE" ]]; then
-  echo "usage-verdict: cannot read $USAGE_FILE width=${WIDTH} -> STALE"
+  echo "usage-verdict: cannot read $USAGE_FILE width=${WIDTH} -> STALE (never blocks delegation — re-read or refresh before trusting the number)"
   exit 2
 fi
 
@@ -55,12 +55,12 @@ while IFS='=' read -r key val; do
 done < "$USAGE_FILE"
 
 if [[ -z "$pct" || -z "$resets_at" || -z "$updated_at" ]]; then
-  echo "usage-verdict: missing key(s) in $USAGE_FILE (pct='$pct' resets_at='$resets_at' updated_at='$updated_at') width=${WIDTH} -> STALE"
+  echo "usage-verdict: missing key(s) in $USAGE_FILE (pct='$pct' resets_at='$resets_at' updated_at='$updated_at') width=${WIDTH} -> STALE (never blocks delegation — re-read or refresh before trusting the number)"
   exit 2
 fi
 
 if [[ ! "$pct" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-  echo "usage-verdict: non-numeric five_hour_used_pct='$pct' in $USAGE_FILE width=${WIDTH} -> STALE"
+  echo "usage-verdict: non-numeric five_hour_used_pct='$pct' in $USAGE_FILE width=${WIDTH} -> STALE (never blocks delegation — re-read or refresh before trusting the number)"
   exit 2
 fi
 
@@ -95,7 +95,7 @@ fi
 
 if (( age > STALE_AGE )); then
   append_sample STALE
-  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (reading older than ${STALE_AGE}s; pct may lag reality — re-read or refresh before trusting)"
+  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (reading older than ${STALE_AGE}s; pct may lag reality; never blocks delegation — re-read or refresh before trusting the number)"
   exit 2
 fi
 
@@ -103,7 +103,7 @@ fi
 cred_age=$(( now - login_at ))
 if (( login_at > 0 && cred_age >= 0 && cred_age < LOGIN_WINDOW )); then
   append_sample STALE
-  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (auth changed ${cred_age}s ago — a /login starts fresh windows the server-fed pct lags; re-read before trusting)"
+  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (auth changed ${cred_age}s ago; a /login starts fresh windows the server-fed pct lags; never blocks delegation — re-read or refresh before trusting the number)"
   exit 2
 fi
 

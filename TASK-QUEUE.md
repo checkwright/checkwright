@@ -12,18 +12,6 @@
 
 ## New Features
 
-- **usage-verdict-stale-steer-contradiction** [spec: delegation-kit/SPEC-verdict-consequence.md]
-  — one STALE verdict carries two contradictory steers, and which one a session
-  reads depends on the path it read the verdict through: `usage-verdict`'s own
-  STALE line states the epistemic status and omits the decision consequence,
-  while the budget guard's advisory states the consequence. A session that reads
-  the direct-run line infers "do not trust the number" into "do not dispatch",
-  and the corrective is structurally unreachable — the guard fires *on* dispatch,
-  the act a hesitating session has not yet performed. Attested first-party and
-  reported as a repeat across sessions. The amendment rules the open (a)/(b)
-  question in favour of (a), structurally: one string, one producer, the guard's
-  restating arm deleted rather than synchronized.
-
 - **smoke-exit-code-assertion-honesty** [spec: gate-sdk/SPEC-assertion-strength.md]
   — `delegation-kit/smoke/install.sh` guards a `usage-verdict` call with a bare
   `if`, accepting PAUSE and STALE alike under a message asserting specifically
@@ -473,5 +461,7 @@
   plain-(b) ruling named.
 
 ## Done
+
+- usage-verdict-stale-steer-contradiction
 
 ## Lessons Learned

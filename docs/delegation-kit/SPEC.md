@@ -64,9 +64,12 @@ code:
 - **STALE / unreadable (2)** and **OK / RESET-OK (0)** → `guard_advise`,
   feeding the verdict line back as `additionalContext` so the live reading
   rides in context at every dispatch and a memory-quoted percentage can never
-  be the acting source. STALE never blocks — budget-unknown is
-  decision-relevant, but a consumer with no snapshot producer must route to
-  advice, not out of delegation.
+  be the acting source. The advise arm relays that line and adds nothing: the
+  verdict string carries its own decision consequence (§usage-verdict), so
+  restating it on the arm would be one fact in two places. Routing STALE to
+  advice rather than out of delegation is what keeps a consumer with no
+  snapshot producer working — budget-unknown is decision-relevant, never
+  disqualifying.
 
 The harness is the producer (it fires the hook once the settings registration
 is set); the consumers are the dispatching agent, which reads the verdict line
@@ -203,7 +206,8 @@ Emits a trustworthy budget verdict from a usage snapshot file, closing the
 three failure modes a raw percentage reading leaves open:
 
 1. **Stale reading** — `now - updated_at` beyond `DELEGATION_KIT_STALE_AGE` → STALE
-   (exit 2): re-read before trusting.
+   (exit 2): budget-unknown, never blocking delegation — re-read or refresh
+   before trusting the number.
 2. **Dead window** — `resets_at <= now` → RESET-OK (exit 0): the percentage
    is from the dead window and must not be read as a pause signal. The
    weekly axis carries the same rule per-axis (`seven_day_resets_at <= now`
@@ -261,6 +265,21 @@ seam. A refresh inside the `DELEGATION_KIT_LOGIN_WINDOW` rewrites `updated_at` w
 server-fed percentage may still lag the login by about a minute — the hoisted
 reroute correctly keeps those readings STALE for the window's duration.
 
+**The verdict-string contract.** Every line `usage-verdict` emits carries three
+parts: the **reading** (the measured fields), the **epistemic status** of that
+reading (how far to trust the number), and its **decision consequence** for
+delegation (what the reading gates). A verdict string stating a status without
+its consequence is incomplete by contract — the reader completes it by
+inference, and the inference is unconstrained: a session reading a bare STALE
+infers "do not trust the number" into "do not dispatch". That read is wrong
+(STALE never blocks) and is structurally uncorrectable downstream, because the
+budget guard fires *on* dispatch, the act a hesitating session has not yet
+performed. STALE's status half is site-specific — each emission site names why
+it is stale — while its consequence half is uniform, because the consequence is
+uniform: STALE is budget-unknown at every site and never blocks delegation. The
+consequence clause appends *after* the ` -> <verdict>` arrow, leaving it
+disjoint from the `width=<n>` invariant below.
+
 **The `width=<n>` field.** Every emitted verdict line — OK, PAUSE, STALE (the
 fail-closed diagnostics included), RESET-OK — carries a `width=<n>` field
 immediately before the ` -> <verdict>` arrow, read from
@@ -268,7 +287,11 @@ immediately before the ` -> <verdict>` arrow, read from
 mechanical reader: the budget check already runs before every dispatch, so the
 read-only fan-out bound surfaces at exactly the wave-sizing decision point, and
 `agent-budget-guard.sh` relays the verdict line verbatim (block on PAUSE, advise
-otherwise) so the width rides into context with the budget verdict. The field is
+otherwise) so the width rides into context with the budget verdict. *Verbatim*
+governs the verdict line's own text, not the surrounding frame: the guard
+prefixes the relayed line and the PAUSE arm appends its corrective, but no arm
+restates the payload's content — there is exactly one advise arm and it adds
+nothing. The field is
 a config constant, not derived from the snapshot, so it is present even on an
 unreadable-snapshot STALE. No exit-code or other-field change: existing callers
 that key off the exit code or the `-> <verdict>` arrow are unaffected.
