@@ -31,8 +31,31 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    names that key in `nav_children_key`, so the note renders as a derived nav
    child (and the render-time releases index lists it likewise); no
    `scripts/docs-offnav.list` entry, no allowlist growth per release.
-   Launch-adjacent copy uses the reserved phrasing, "the verification layer
-   under agent orchestration".
+
+   **Author the note's fixed chrome from this skeleton, never by copying a prior
+   post** — this runbook is the chrome's single source (the verbatim text below
+   was lifted once from the current posts to seed it, not copied per release):
+
+   - **Opener (fixed, verbatim)** — the reserved framing, then a per-release
+     summary slot: *"Checkwright is the verification layer under agent
+     orchestration, and this release {one- or two-sentence summary}."*
+   - **The three variable sections** — Tightened gates, Renamed knobs, and
+     Behavior changes, authored to [docs/install.md](docs/install.md) §The
+     upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under
+     Renamed knobs); that pointer owns their grammar, this skeleton does not
+     restate it.
+   - **Upgrading — sync/regen slot** — {the wholesale kit sync at `vX.Y.Z`, the
+     generated artifacts to regenerate, then the full battery}.
+   - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed
+     reds.**" when Tightened gates is empty, or "**The allowed red[s].**" naming
+     each red and the regen or step that clears it. The set itself — the
+     Tightened-gates lead tokens — is owned by [docs/install.md](docs/install.md)
+     §The upgrade contract's allowed-red-set grammar; cite it, never restate it.
+   - **Closing tail (fixed, verbatim)** — "The behavior changes above are
+     declared for reading, not a mechanical scan. If a gate reds that this note
+     does not name, the upgrade smoke was supposed to catch it first —
+     [open an issue](https://github.com/checkwright/checkwright/issues), because
+     that is a defect in the release rather than work for you."
 
 2. **Derive the bump off the note.** Choose the bump by
    [docs/install.md](docs/install.md) §Versioning's criteria (the derivable floor

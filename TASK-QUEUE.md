@@ -12,22 +12,6 @@
 
 ## New Features
 
-- **release-note-chrome-ownership** [spec: SPEC-release-note-chrome-ownership.md] —
-  give the release note's fixed chrome (the reserved opener sentence + the closing
-  "Upgrading" paragraph) one owning surface: inline it into RELEASING.md step 1 as
-  the single source with an "author from this skeleton, never copy a prior post"
-  instruction, so the chrome stops propagating by precedent. The freshness-gated
-  skeleton alternative is ruled out (disproportionate against immutable dated
-  posts); rationale preserved in the amendment.
-
-- **release-note-section-taxonomy** [spec: SPEC-release-note-section-taxonomy.md] —
-  reconcile the note's three sections to docs/install.md §The upgrade contract's
-  four residue classes: express a knob removal as `old → ∅` under Renamed knobs
-  (same residue class, floors to minor via the existing bullet count, no gate
-  change) and state the four-classes → three-sections mapping (copied-out-template
-  residue stays behavior-folded into Behavior changes). No new section, no
-  check-release-bump change; the two ruled edges are in the amendment.
-
 ## Technical Debt
 
 ## Deferred
@@ -351,5 +335,7 @@
 ## Done
 
 - kfric-trigger-prior-artifact-consultation
+- release-note-chrome-ownership
+- release-note-section-taxonomy
 
 ## Lessons Learned

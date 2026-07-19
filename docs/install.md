@@ -185,7 +185,8 @@ its note — and three sections under fixed names:
   gate name the bullet's lead token. A mechanical consumer reads these lead
   tokens as the release's allowed-red set: the gates a clean upgrade may turn
   red, each named here with the intent behind the move.
-- **Renamed knobs** — one bullet per rename, `old → new`.
+- **Renamed knobs** — one bullet per rename, `old → new`; a knob *removal* is
+  the same residue class (own-config orphaned) and is expressed `old → ∅`.
 - **Behavior changes** — one bullet per shipped change that alters what the kits
   *do* without landing or tightening a battery gate: a fail-closed convergence
   in a shared library, a runner's semantics, a skill or template behavior, a
@@ -199,6 +200,14 @@ out-of-gate behavior says so on each. This consumer-owned residue Phase A
 cannot touch (gates you have shadowed, templates you have copied out, knob
 renames in your own config, behavior your tree depends on) is that note's
 checklist.
+
+Those four residue classes map onto the three sections by design: **shadowed
+gates** → Tightened gates; **own-config knob renames and removals** → Renamed
+knobs; **copied-out templates and depended-on behavior** → Behavior changes. The
+copied-out-template class earns no section of its own because a template you have
+copied out that then changed *is* depended-on behavior diverging from your copy —
+it is behavior-folded, not dropped. Four classes, three sections, by that
+folding.
 
 Honest limit on the third section: **Behavior-changes bullets are declared for
 the human upgrader, not smoke-asserted.** A non-gate change cannot red the
