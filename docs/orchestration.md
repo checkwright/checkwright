@@ -90,22 +90,31 @@ prices. To drive an iteration under it:
    craft rules ([the lead template](../lifecycle-kit/templates/lead.md) carries
    the step).
 2. **The lead dispatches `/scope` as a background stage session on the
-   judgment tier.** Scope formalizes the iteration — authoring the design
-   amendments, promoting the queue entries — and lands the promotion commit. Its
-   agent stays resumable afterward as the iteration's **intent oracle**.
-3. **The lead dispatches each remaining stage** — `/align`, `/build`,
+   judgment tier.** Scope bounds the iteration — surveying the tree and the
+   deferred queue, proposing the unit set, naming the iteration, and promoting
+   the debt units — and lands the promotion commit. Its agent stays resumable
+   afterward as the iteration's **intent oracle**.
+3. **When the iteration promotes a feature, the lead dispatches `/spec`** — the
+   trigger-gated **amendment-authoring** stage — as a background stage session on
+   the judgment tier. It authors the promoted features' design amendments and
+   pairs each into the queue (fresh session, so the exploratory context does not
+   ride every authoring turn). A debt-only iteration skips it.
+4. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
-   unchanged, on the tier the stage-session agent definition pins. A stage whose
+   unchanged, on the tier the ruling-config pins per stage: `validate`'s
+   mechanical oracle-running rides a cheaper tier, the judgment-heavy stages the
+   premium one (the tier-differentiation rule,
+   [the lead template](../lifecycle-kit/templates/lead.md) §Economics). A stage whose
    work splits into batches is N sibling stage sessions the lead dispatches and
    validates (each a same-stage re-entry), never a stage session sub-dispatching
    its own siblings (`lifecycle-kit/SPEC.md §templates/lead.md`, the
    lead-owns-batching clause).
-4. **A blocked stage escalates to the lead and resumes in place** rather than
+5. **A blocked stage escalates to the lead and resumes in place** rather than
    restarting cold. The lead rules machinery questions itself; a question
    about the iteration's *intent* it forwards — with the working-state excerpt
    the question turns on — to the scope oracle and relays the answer back.
    Anything outside the ruling roster reaches the operator.
-5. **If the oracle cannot be resumed,** the lead answers from the governed
+6. **If the oracle cannot be resumed,** the lead answers from the governed
    surfaces the rulings already live in — the amendments, the queue entries —
    and hands anything not derivable there to the operator.
 

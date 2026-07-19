@@ -23,9 +23,9 @@ delegation-kit/SPEC.md §One template, a resident pointer.
 ## Before a rename dispatch
 
 - **Target-collision check.** Grep the target namespace for the new name before
-  the rename amendment is declared build-ready — a scope-stage step, not a
-  build-time discovery. A collision found at scope reshapes the amendment; found
-  at build it strands a half-done sweep.
+  the rename amendment is declared build-ready — an authoring-stage step, not a
+  build-time discovery. A collision found while authoring reshapes the amendment;
+  found at build it strands a half-done sweep.
 - **Mention-versus-use brief.** A rename dispatch brief names where the old token
   is legitimately *mentioned* — a historical `Old→New` migration arrow, a
   changelog line, a deprecation record — separately from where it is *used*. A

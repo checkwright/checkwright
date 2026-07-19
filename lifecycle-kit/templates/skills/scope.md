@@ -1,6 +1,8 @@
-The `scope` (design) stage of an iteration. Identify tasks, author design
-amendments for the items being promoted, promote them into the active queue,
-suggest the iteration name. Exit condition: *<exit-condition: your scope exit
+The `scope` stage of an iteration — the exploratory half of design. Identify and
+bound the iteration's units, promote them into the active queue, and suggest the
+iteration name; author the promoted features' design amendments here **unless
+the roster splits out a dedicated authoring stage** (below), which then owns
+them. Exit condition: *<exit-condition: your scope exit
 condition — e.g. no design-pending tag left in the active queue; your
 amendment-readiness gate green>*.
 
@@ -35,7 +37,8 @@ a gate's source.>*
 **Triage every task at filing — feature vs debt by the new-names litmus.** A
 task that adds any name to a governed surface (a script, a config knob, a
 file or directory convention, a tag, a contract another component must
-honor) is a feature: author its design amendment in this stage, however
+honor) is a feature: its design amendment is authored — in this stage unless
+the roster splits authoring into a dedicated stage (below), however
 small the diff looks. Debt converges behavior on names the specs already
 carry and needs no amendment. The tell for misfiling: a design ruling
 longer than a few lines drafted into a queue entry is an amendment inlined
@@ -48,19 +51,21 @@ and the proposed unit set is escalated for ruling before promotion: to the lead
 under the split posture, to the user directly under none — the stage's ordinary
 stop. The destination changes; the proposal step does not.
 
-Before declaring an amendment ready, verify causal completeness — every new
-state, event, or interface the amendment introduces names its **producer**
-(what code path or trigger creates it — and that the producer's enabling
-config is actually emitted everywhere it must be), its **consumer** (what
-receives it, by what mechanism), updates any **existing integration prose**
-describing the prior flow, and gives every new field a **named reader** (a
-field with no named reader should be removed). Survey those readers across the
-**whole component set**, never a hand-picked subset, and never silence a
-probe's stderr — a `2>/dev/null` on a path grep reads a bad path as "no
-reader", manufacturing the false negative that hides a cross-component reader.
-A premise inherited from a
-queued task ("clean/mechanical", "already filed", "dead code") is a dated
-hypothesis — re-verify it against the current tree before building on it.
+**Authoring the promoted features' amendments is scope's — unless the roster
+splits out a dedicated authoring stage.** Where it does, that stage authors the
+amendment(s) and pairs the feature entries into the queue, and scope keeps only
+the exploratory half: survey, propose, name, and debt promotion — ending at the
+boundary so the survey context drops before authoring begins (that drop is the
+split's whole economics). Either way the detailed authoring how-to — causal
+completeness (every new field's producer, consumer, and named reader, surveyed
+across the whole component set) and the bidirectional queue pairing — is
+single-sourced in the authoring stage's template
+(`lifecycle-kit/templates/skills/spec.md`); a default-roster scope that authors
+follows it here.
+
+A premise inherited from a queued task ("clean/mechanical", "already filed",
+"dead code") is a dated hypothesis — re-verify it against the current tree
+before building on it, whether or not this stage goes on to author.
 
 When done, **set the iteration name without waiting for confirmation** and
 inform the user: replace the `—` placeholder in the queue header AND update
@@ -71,12 +76,14 @@ no stage field to advance. The *arriving* stage's skill moves the cursor by
 stamping, as that skill's first step. Invoking the next skill is the
 stage-advance approval (the name itself needs none).
 
-Close by **recommending the next stage**: the trigger-gated audit stage when
-one of its triggers fired this session, otherwise the build stage. The
+Close by **recommending the next stage**: where the roster splits out a
+dedicated authoring stage and this iteration promoted a feature, that stage
+(it authors the promoted amendments); otherwise the trigger-gated audit stage
+when one of its triggers fired this session, else the build stage. The
 cross-component trigger is mechanical — an amendment on disk spanning ≥2
 component dirs makes `check-stage-entry` assertion C demand the audit stamp
-(or a user-ruled waiver) at build entry — so a scope that promoted such an
-amendment should say so rather than let build discover it.
+(or a user-ruled waiver) at the next stage's entry — so whichever stage
+promoted such an amendment should say so rather than let the entry discover it.
 
 With the promotion commit landed, the iteration named, and the next stage
 recommended, present the consumer's **hand-off** — how this consumer carries a

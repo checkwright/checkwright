@@ -12,10 +12,6 @@
 
 ## New Features
 
-- **stage-posture-split-tuning** [spec: SPEC-stage-posture-split.md] — split
-  amendment-authoring into its own trigger-gated lifecycle stage (scope bounds,
-  spec authors, align verifies) and downgrade validate's dispatch tier.
-
 ## Technical Debt
 
 ## Deferred
@@ -467,5 +463,7 @@
   by the `stage-posture-split-tuning` align audit verifying the amendment wires
   cleanly against the current tree.
 ## Done
+
+- stage-posture-split-tuning
 
 ## Lessons Learned

@@ -70,7 +70,7 @@ while IFS=$'\t' read -r class ln text; do
     esac
 done <<< "$qout"
 
-(( ${#missing[@]} )) && errors+="feature-section entries without [spec:] (spec-writing is scope-stage — write the amendment, then promote):"$'\n'"$(printf '  %s\n' "${missing[@]}")"$'\n'
+(( ${#missing[@]} )) && errors+="feature-section entries without [spec:] (spec-writing is an authoring-stage activity — write the amendment, then promote):"$'\n'"$(printf '  %s\n' "${missing[@]}")"$'\n'
 (( ${#an[@]} ))      && errors+="[needs-spec] tag in an active-queue entry (move it to $CANON_KIT_DEFERRED_SECTION):"$'\n'"$(printf '  %s\n' "${an[@]}")"$'\n'
 (( ${#pn[@]} ))      && errors+="[needs-spec] tag in active-queue prose ($CANON_KIT_DEFERRED_SECTION-only tag; say \"needs design\" in prose):"$'\n'"$(printf '  %s\n' "${pn[@]}")"$'\n'
 (( ${#dopen[@]} ))   && errors+="$CANON_KIT_DEFERRED_SECTION entries without [needs-spec] (all deferred work is design-pending):"$'\n'"$(printf '  %s\n' "${dopen[@]}")"$'\n'

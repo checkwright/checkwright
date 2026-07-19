@@ -820,11 +820,24 @@ an explicit user ruling — never self-issued by the entering session; it
 satisfies only assertion C (assertion A's predecessor scan matches the audit
 stage exactly, so a waiver is never read as an audit *stamp*).
 
-Calibration: the predecessor map deliberately omits the trigger-gated audit
-stage as anyone's predecessor — demanding an audit stamp before every build
-would false-fire on an iteration that legitimately skipped it; the
-build→align re-check when align *did* run is the build skill's step-0
-procedural precondition, not this gate. Assertion C's honest limit: it
+Calibration: the predecessor map deliberately omits a **trigger-gated stage**
+as anyone's mandatory predecessor — the audit stage, and equally a trigger-gated
+*authoring* stage where a roster splits one out (§templates/skills/) — because
+demanding its stamp before a successor would false-fire on an iteration that
+legitimately skipped it (an amendment-free iteration runs no audit; a debt-only
+one runs no authoring stage); the build→align re-check when align *did* run is
+the build skill's step-0 procedural precondition, not this gate. A trigger-gated
+authoring stage takes **no assertion-C sibling**, a mechanized trigger considered
+and deferred: its trigger is procedural (the prior stage's next-stage
+recommendation) and already backstopped by canon-kit's bidirectional
+amendment-pairing rule — a feature entry carries a `[spec:]` ref only when the
+amendment exists on disk, so a skipped authoring stage cannot ship a feature
+without its amendment. The disanalogy with assertion C is decisive: C mechanizes
+because the *audit* it gates is otherwise-unverifiable judgment, whereas an
+authoring stage's *output* — the amendment — is otherwise-verified by that
+bidirectional rule, so a process assertion there would only duplicate the
+on-disk-amendment signal or smear canon-kit's feature-section grammar into this
+gate. Assertion C's honest limit: it
 approximates "changes ≥2 components' *contracts*" with "touches or names ≥2
 component surfaces" — it can over-demand (the cheap waiver valve absorbs
 that) and can under-detect a purely semantic cross-component impact; it
@@ -993,6 +1006,25 @@ trigger/ordering rules, and its stage-local doctrine — with **named slots**
 where the consumer's rule content goes. The templates are the owned surface:
 this section states the contract a consumer skill must satisfy and never
 restates what a template carries.
+
+Alongside the default-roster templates the kit ships **`spec.md`**, an optional
+**amendment-authoring** stage template — the generative half of design, split
+out from `scope` on a roster that carries a dedicated authoring stage (the
+ontology: scope bounds the units, the authoring stage authors the amendments,
+the audit stage independently verifies them). It is a full stage (it invokes
+`enter-stage.sh` and stamps), **trigger-gated exactly like the audit stage**: it
+runs only when an iteration promotes a feature to author, it **appends** rather
+than resets (only the first stage resets the evidence file), and it takes `scope`
+as its predecessor without being named any stage's mandatory predecessor
+(§check-stage-entry's trigger-gated-stage calibration). The kit **default roster
+does not bind it** — the split is demand-gated and non-breaking; a consumer
+activates it through `LIFECYCLE_KIT_STAGES` / `LIFECYCLE_KIT_PREDECESSOR`
+(§Layout and configuration). This is the supported roster shape for a
+trigger-gated authoring stage, the same class as the trigger-gated audit stage.
+The generic authoring how-to `spec.md` single-sources — causal completeness and
+canon-kit's bidirectional queue pairing — is the content `scope`'s conditional
+authoring step points at, so a default-roster `scope` that still authors reads it
+there.
 
 A consumer skill adopts a template in one of two modes; either way the executed
 skill states in one line what the stamp step does and supplies every

@@ -17,8 +17,10 @@ write is involved. Commit the stamp on its own.
 
 Run `align` only when one fires: (1) phase start, before the first
 implementation task; (2) a multi-component spec ambiguity surfaces during
-build; (3) this iteration's `scope` authored an amendment changing ≥2
-components' contracts. None firing → `scope` advances directly to `build`
+build; (3) this iteration's **authoring stage** (scope by default, or the
+dedicated authoring stage where the roster splits one out) authored an amendment
+changing ≥2 components' contracts. None firing → the prior stage advances
+directly to `build`
 (align skipped; the advance still needs user approval per the stage-line
 rule). The arriving stage stamps its own entry as its first step
 (above).

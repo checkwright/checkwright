@@ -1262,7 +1262,7 @@ the configured queue file, the configured agent file (`GATE_SDK_AGENT_FILE`,
 default `CLAUDE.md` — the always-loaded agent file a consumer's harness reads,
 `AGENTS.md` under an agent-file harness), `.gitignore`, plus the `SPEC-*.md`
 amendment glob — a root-component amendment is a legitimate transient root
-surface for any canon-kit consumer, so a gate that reddened every scope stage
+surface for any canon-kit consumer, so a gate that reddened every authoring stage
 would only train bypassing). The intentional-new-surface valve is the manifest
 itself: adding a root entry means adding its allowlist line in the same commit,
 a diff-visible edit needing no exemption tag. The `# graph:` couples the

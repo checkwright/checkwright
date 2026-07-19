@@ -4,9 +4,9 @@ One canonical spec per component, deltas as short-lived amendment files, and
 a star topology across the prose surfaces: every fact has exactly one owning
 surface, and every other surface cites it — never restates it. The problem
 the kit solves: when coding agents author the specs, design rationale gets
-re-derived under build pressure unless it is captured at scope, and a
+re-derived under build pressure unless it is captured up front, and a
 parallel copy of any gated fact is an un-gateable second source that drifts
-silently. The remedy is a lifecycle (amendments are written at scope,
+silently. The remedy is a lifecycle (amendments authored up front,
 merged and deleted at build) and gates over the copy-shaped failure modes.
 
 The kit carries the lifecycle, the checklists, and its gates; a consumer's
@@ -48,7 +48,11 @@ spec.
 
 ## The amendment lifecycle
 
-Spec-writing is a scope-stage activity — build sessions never author specs.
+Spec-writing is an **authoring-stage** activity, not a build activity — build
+sessions never author specs. The feature/debt litmus runs at filing in the
+scoping stage's triage; the amendment is *authored* in whichever stage the
+roster designates for it (scope by default, or a dedicated authoring stage where
+the roster splits one out).
 A feature task is therefore in exactly one of two states, marked with the
 queue tags whose syntax queue-kit defines:
 

@@ -6,3 +6,6 @@ LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)
 LIFECYCLE_KIT_ENTRY_PREFLIGHT=('close=evidence-kit/checks/check-evidence-manifest.sh .workflow/validate-evidence.txt')
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's session-boundary posture: 'iteration' sanctions the lead's inline fallback; cost accepted that the dogfood evidence stops demonstrating the strict posture
 LIFECYCLE_KIT_SESSION_BOUNDARY=iteration
+# spec: lifecycle-kit/SPEC.md §check-stage-entry — this repo splits amendment authoring into a dedicated trigger-gated `spec` stage (scope bounds, spec authors, align verifies); the roster and its `[spec]=scope` predecessor edge are set together — a roster member absent from the predecessor map fails config-load validation. Only `scope` (LIFECYCLE_KIT_FIRST_STAGE) resets the evidence file; `spec` appends. `spec` is omitted as any stage's mandatory predecessor (same calibration as the trigger-gated audit stage), so align/build/validate/close edges are unchanged.
+LIFECYCLE_KIT_STAGES=(scope spec align build validate close)
+declare -A LIFECYCLE_KIT_PREDECESSOR=([spec]=scope [align]=scope [build]=scope [validate]=build [close]=validate)

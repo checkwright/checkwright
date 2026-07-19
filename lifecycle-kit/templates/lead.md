@@ -187,6 +187,17 @@ consequences:
   context is actually common; split where the model tier changes or a
   delegation-kit split trigger fires — per-batch model tiering is the dominant
   window lever, not token counts.
+- **Tier each stage to its work class.** A stage whose work is *mechanical
+  oracle-running* — running a fixed verification battery and reporting its
+  verdict, low generative judgment — is **tier-downgradeable**: a cheaper model
+  serves it, and the dispatcher pins the cheaper tier with a `model` override on
+  that stage's dispatch. A stage whose work is *generative or verificational
+  judgment* — bounding a unit set, authoring an amendment, cross-spec audit,
+  implementation — is **not**: the judgment is exactly what the tier buys, and
+  downgrading it trades a large correctness risk for a small window saving. Which
+  stages fall on each side is the consumer's binding (the ruling-config slot), the
+  work-class test is this rule; re-judge every assignment when the harness model
+  roster churns.
 - **An intra-stage batch split is the lead's to own.** When a stage's work
   splits into batches, those batches are **N sibling stage sessions the lead
   dispatches and validates** — each entering through `enter-stage.sh` as a

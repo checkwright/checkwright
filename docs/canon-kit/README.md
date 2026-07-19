@@ -12,9 +12,9 @@ surfaces — every fact has exactly one owning surface, and every other surface
 modes; the irreducibly semantic judgment stays a review tripwire, not a gate.
 
 Why: when a coding agent authors the specs, design rationale gets re-derived
-under build pressure unless it is captured at scope, and a parallel copy of any
+under build pressure unless it is captured up front, and a parallel copy of any
 gated fact is an un-gateable second source that drifts silently. The remedy is a
-lifecycle (amendments written at scope, merged and deleted at build) plus gates
+lifecycle (amendments authored up front, merged and deleted at build) plus gates
 over the mechanically-decidable copy failures — a doubled Definition-of-Done, a
 banned-heading code dump, a fenced block that verbatim-copies a source file, a
 glossary definition restated on another surface, a feature task with no
@@ -73,7 +73,7 @@ reads the tag syntax [queue-kit](https://github.com/checkwright/checkwright/tree
 The lifecycle is prose discipline the gates enforce; there is no runtime tool.
 Author a spec so it (1) owns semantics, (2) names every contract and couples it
 to code by a gate, and (3) never copies a structural definition — reference the
-code instead. Write amendments at scope; merge and delete them at build.
+code instead. Author amendments up front; merge and delete them at build.
 
 ## Test
 
