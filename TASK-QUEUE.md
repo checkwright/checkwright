@@ -29,6 +29,24 @@
   (`gen-docs-mirror.sh --write`; `check-docs-mirror-fresh` byte-gates). Scope ruled
   with the operator 2026-07-19: economics-only. Single-component (drift-kit).
 
+- **resume-journal-done-marker-compliance** [spec: SPEC-resume-journal-done-marker-compliance.md] —
+  rescope the resume-journal recovery contract so the `DONE`-absence clause stops
+  false-reading a completed run as interrupted (agents routinely finish without
+  appending `DONE`). The corrected contract keys the recovery signal on whether
+  the **supervisor consumed the agent's return** (delegation-kit's own
+  supervisor/agent vocabulary, not lifecycle terms): return consumed + the
+  supervisor's post-commit verification *is* the recovery contract (`DONE`
+  redundant), and the "no-`DONE` = interrupted" reading scopes to the **cold
+  journal read** where the return was not consumed (background/crash/timeout).
+  Rescoping-only — operator ruled plain (b): does **not** enforce the marker and
+  does **not** mechanize the manual verification into a gate (that follow-up is
+  filed at close if the manual step is judged worth retiring). Edit surface:
+  `delegation-kit/SPEC.md` §Resume journal (the `DONE`-absence clause),
+  `delegation-kit/templates/agent-execution.md` (the operational restatement), and
+  the regenerated `docs/delegation-kit/SPEC.md` mirror
+  (`gen-docs-mirror.sh --write`; `check-docs-mirror-fresh` byte-gates).
+  Single-component (delegation-kit).
+
 ## Technical Debt
 
 ## Deferred
@@ -246,37 +264,6 @@
   is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
-
-- **resume-journal-done-marker-compliance** [needs-spec] — stage-session agents
-  complete without appending the spec-mandated resume-journal `DONE` marker
-  (2 of 3 on stage-economics-report: align, validate; then 2 of 2 on
-  derivation-by-precedent: build, validate — 4 of 5 across two iterations, a
-  pattern rather than a fluke, and the recurrence is what lifts this from
-  anecdote to a standing false invariant), so the
-  delegation-kit/SPEC.md §Resume journal invariant "a journal present without
-  `DONE` = interrupted, resume from it" **false-reads a completed run as
-  interrupted**. Found 2026-07-18 checking the journals during the operator's
-  journal-lifecycle question; the on-going close session did not capture it
-  (its kfric triage drained only the session-context stdin entry), so promoted
-  here per the operator's standing directive. Fix options: (a) tighten
-  `.claude/agents/stage-session.md` to make the `DONE` append non-skippable
-  (the marker is the recovery contract, enforce it); (b) a spec ruling that
-  **under a live lead** the return-message plus the lead's post-commit oracle-
-  verification *is* the recovery contract, making `DONE` redundant for
-  lead-dispatched agents — and scope the SPEC's "present-without-DONE =
-  interrupted" clause to lead-less runs. **Note the channel seam** (the same one
-  drift-kit/SPEC.md §The knowledge-friction loop draws): this is a *work-shaped*
-  finding and by that seam belonged in the gap inbox, not the kfric log where it
-  was first stamped — same Deferred destination, and the mis-stamp is itself a
-  data point for `kfric-trigger-prior-artifact-consultation`'s seam-clarity.
-  **Cost while deferred:** low but real, and now recurring — recovery cannot
-  trust journal presence alone while the invariant is silently false; a
-  genuinely interrupted lead-dispatched stage and a cleanly-completed one are
-  indistinguishable by the marker the SPEC says distinguishes them. Each
-  omission costs a supervisor either a re-run of finished work or the deletion
-  of an interrupted unit's only recovery record; both iterations so far were
-  rescued by the lead verifying completeness out of band, which is precisely
-  the manual step the marker exists to retire.
 
 - **stage-economics-smoke-jq-arm-dormant** [needs-spec] — drift-kit's smoke
   asserts the jq-absent degradation of `bin/stage-economics.sh`, but the
