@@ -92,6 +92,17 @@
   **Cost while deferred:** the fix is a rename away from rotting — renaming the
   local in the script silently falsifies the prose, and only the roster class's
   audit cadence catches it, at iteration granularity.
+  **The manual fix is demonstrably incomplete — an eighth site surfaced
+  2026-07-19.** The `tooling-signal-honesty` close audit swept the class
+  mechanically and found `DELEGATION_KIT_STALE_AGE` cited as bare `STALE_AGE` at
+  delegation-kit/SPEC.md:200, a survivor the config-seam-hardening pass missed
+  while correctly fixing seven neighbours in the same file (the §Layout roster two
+  hundred lines below had the prefixed spelling right the whole time). Fixed at
+  that close. This is the demand evidence the entry was waiting on: a hand sweep
+  of one file missed one instance in eight, so the audit cadence is catching
+  what review does not — and a ~20-line scan expressed the whole class, which is
+  itself evidence the low-false-positive boundary is tighter than feared (one hit,
+  zero false positives, across every kit SPEC in the tree).
   The parent class is on the audit roster precisely because it is **un-gateable**
   (public contract names are legitimate citations). This entry is the narrower
   sub-class that does look gateable: a backtick-quoted `^[A-Z][A-Z0-9_]*$` token
@@ -425,9 +436,42 @@
   store (CLAUDE.md §How to escalate). Surfaced 2026-07-19 by the
   `trajectory-stage-roster-hardcode` close, filed by lead-dispatch instruction.
 
-## Done
+- **supervisor-verification-attestation** [needs-spec] — the resume-journal
+  recovery contract now rests on an **unattested** supervisor duty. The
+  `resume-journal-done-marker-compliance` amendment (this iteration) rescoped the
+  DONE-absence clause so that on the ordinary path "the supervisor consumed the
+  agent's return and ran its post-commit verification (§Validate after every agent
+  commit)" *is* the recovery contract, making the `DONE` marker redundant. That
+  promotion is correct — DONE was false-reading completed runs as interrupted —
+  but it moves the load onto a step nothing checks: no mechanism records that the
+  supervisor actually ran the verification before deleting the journal, so a
+  skipped verification is indistinguishable from a performed one.
+  **Deliberately out of the amendment's envelope:** the operator ruled plain (b),
+  which excluded marker enforcement and gate mechanization by name — the amendment
+  fixes the *reading* of the contract, and mechanizing the *check* is separate
+  work, filed rather than smuggled in.
+  **Design question (why [needs-spec], not a build unit):** the verification
+  happens **after** the commit it verifies, so the pre-commit battery cannot reach
+  it — a gate is the wrong shape on ordering grounds alone, the same
+  wrong-shape finding as `rendered-site-link-monitor`'s. The open design is what
+  an attestation would even be: a supervisor-written stamp (another
+  self-asserted-completion marker, which lifecycle-kit/SPEC.md §The stamp protocol
+  rules out as proving a claim rather than completion), a next-dispatch preflight
+  that refuses until the prior batch's verification is on record, or an honest
+  ruling that the duty stays unmechanized and the SPEC's existing
+  **Honest limit** paragraph is widened to say so. Note `check-gate-tamper`
+  already mechanizes one slice (agent gate-edit *shape*) and its own text concedes
+  the by-eye review remains a supervisor duty — so the precedent in-kit is a
+  partial floor plus a stated limit, not full mechanization.
+  **Cost while deferred:** low today, structurally rising. Under a single
+  attentive supervisor the verification does happen (this iteration's every batch
+  was verified); the exposure grows with dispatch volume and with the split-lead
+  posture, where the lead accepting a stage session's return is exactly the
+  unattested step. Bounded by the delete being idempotent and the journal being
+  scratch — a missed verification costs a late-caught regression, never lost work.
+  Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
+  plain-(b) ruling named.
 
-- economics-budget-pct-decouple
-- resume-journal-done-marker-compliance
+## Done
 
 ## Lessons Learned

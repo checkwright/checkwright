@@ -197,7 +197,7 @@ capability); live mode reads `git diff --cached`.
 Emits a trustworthy budget verdict from a usage snapshot file, closing the
 three failure modes a raw percentage reading leaves open:
 
-1. **Stale reading** — `now - updated_at` beyond `STALE_AGE` → STALE
+1. **Stale reading** — `now - updated_at` beyond `DELEGATION_KIT_STALE_AGE` → STALE
    (exit 2): re-read before trusting.
 2. **Dead window** — `resets_at <= now` → RESET-OK (exit 0): the percentage
    is from the dead window and must not be read as a pause signal. The

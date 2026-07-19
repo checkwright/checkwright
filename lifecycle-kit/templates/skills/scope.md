@@ -1,5 +1,6 @@
 The `scope` stage of an iteration — the exploratory half of design. Identify and
-bound the iteration's units, promote them into the active queue, and suggest the
+bound the iteration's units, promote them into the active queue — debt always,
+features only where scope also authors (below) — and suggest the
 iteration name; author the promoted features' design amendments here **unless
 the roster splits out a dedicated authoring stage** (below), which then owns
 them. Exit condition: *<exit-condition: your scope exit
@@ -56,7 +57,11 @@ splits out a dedicated authoring stage.** Where it does, that stage authors the
 amendment(s) and pairs the feature entries into the queue, and scope keeps only
 the exploratory half: survey, propose, name, and debt promotion — ending at the
 boundary so the survey context drops before authoring begins (that drop is the
-split's whole economics). Either way the detailed authoring how-to — causal
+split's whole economics). Feature promotion is not a separable step that could
+fall to either stage: writing the amendment *is* promoting the entry
+(canon-kit/SPEC.md §The amendment lifecycle, the bidirectional rule), so the
+stage that authors is necessarily the stage that promotes. Either way the
+detailed authoring how-to — causal
 completeness (every new field's producer, consumer, and named reader, surveyed
 across the whole component set) and the bidirectional queue pairing — is
 single-sourced in the authoring stage's template
@@ -85,7 +90,8 @@ component dirs makes `check-stage-entry` assertion C demand the audit stamp
 (or a user-ruled waiver) at the next stage's entry — so whichever stage
 promoted such an amendment should say so rather than let the entry discover it.
 
-With the promotion commit landed, the iteration named, and the next stage
+With this stage's promotion commit landed (debt, plus the features only where
+scope authored them), the iteration named, and the next stage
 recommended, present the consumer's **hand-off** — how this consumer carries a
 closed scope into the remaining stages: *<handoff: the consumer's start-sequence
 choice at this boundary — driving the rest under a lead versus steering the

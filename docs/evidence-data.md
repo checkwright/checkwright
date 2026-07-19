@@ -47,3 +47,4 @@
 | derivation-by-precedent | sc · a b v c | 1f/1d | 3 · ≤0d | 20s clean | 75 |
 | stage-posture-split-tuning | sc · a b v c | 2f/1d | 1 · ≤0d | 20s clean | 75 |
 | trajectory-stage-roster-hardcode | sc sp · b v c | 1f/0d | 1 · ≤0d | 20s clean | 75 |
+| tooling-signal-honesty | sc sp · b v c | 2f/0d | 2 · ≤0d | 20s clean | 75 |
