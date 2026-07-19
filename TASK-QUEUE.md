@@ -440,6 +440,32 @@
   render cap): the one-line render fix landed, but the paired render-cap gate —
   exactly the low-FP gate enforcement-first says to land in the same unit — was
   added only on explicit request.
+
+- **trajectory-stage-roster-hardcode** [needs-spec] — `drift-kit/bin/trajectory.sh`
+  hardcodes the 5-stage roster in three sites and silently drops any stamp outside
+  it: `:52` the case arm `scope|align|build|validate|close) ;; *) continue` (a
+  `spec` stamp falls through and is discarded), `:68` the `git log` grep pre-filter
+  `^\+[a-z0-9-]+ (scope|align|build|validate|close) ` (filters `spec` stamps out
+  before the loop), and `:162` `render_stages`'s five-fixed-slot loop (no slot is
+  ever rendered for `spec`). Post-activation of the stage-posture split this repo's
+  roster is six stages, so the trajectory/economics evidence renders a 5-slot row
+  with the `spec` stage invisible — and it is the `/economics` read that motivated
+  the split, so the tool that measures the win under-reports the very stage the win
+  added.
+  **Design question (why deferred, not folded into the split's build — align ruling
+  with lead 2026-07-19, Option B):** the fix is to read the *configured* roster
+  rather than a literal list, but drift-kit today couples to lifecycle only through
+  the `WORKFLOW-STATE` stamp file; having it read `LIFECYCLE_KIT_STAGES` is a new
+  cross-kit config dependency whose seam shape (source lifecycle's `lib/stages.sh`?
+  a fall-open default when absent? render width when the roster count varies?) is
+  the open design work, not a mechanical substitution. Generalizing it is its own
+  unit and would bloat the split's activation scope.
+  **Cost while deferred:** low and non-rotting for correctness (trajectory is a
+  gitignored `.metric/` emission, not a pre-commit gate, so nothing false-greens),
+  but observability-degrading — every post-activation iteration that runs `spec`
+  under-reports it in the economics evidence until this lands. Surfaced 2026-07-19
+  by the `stage-posture-split-tuning` align audit verifying the amendment wires
+  cleanly against the current tree.
 ## Done
 
 ## Lessons Learned
