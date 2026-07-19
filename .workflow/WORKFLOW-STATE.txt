@@ -7,3 +7,4 @@
 verdict-reader-honesty scope a0c0156f 2026-07-19
 verdict-reader-honesty spec a77fd0d4 2026-07-19
 verdict-reader-honesty align a709cf2c 2026-07-19
+verdict-reader-honesty build a2f78bcb 2026-07-20
