@@ -882,7 +882,7 @@ graph LR
   n79 -->|"check-value-rollup-fresh"| n194
   n79 -->|"check-value-rollup-fresh"| n156
 `;
-    mermaid.initialize({ startOnLoad: false });
+    mermaid.initialize({ startOnLoad: false, maxEdges: 100000 });
     const { svg } = await mermaid.render('graph', graph);
     const vp = document.getElementById('diagram');
     vp.innerHTML = svg;

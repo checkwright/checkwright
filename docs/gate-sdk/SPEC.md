@@ -866,6 +866,25 @@ with a dark-rendered graph on the same page. This repo's `scripts/graph-theme.sh
 supplies the docs-host tokens, header, and footer (both schemes), so
 `docs/check-graph.html` reads as the same site.
 
+Render cap (`GATE_SDK_GRAPH_MAX_EDGES`, default `100000`): Mermaid refuses to
+render a flowchart whose edge count *exceeds* `maxEdges` (its own default is
+`500`), painting an error graphic in place of the diagram — so a graph that
+outgrows the cap is a published page that never draws, invisible to the
+byte-compare freshness assertion because the HTML is still well-formed. The
+emitter writes the knob's value into the page's `mermaid.initialize` call, and
+the **render-cap assertion** re-derives the cap and the edge count from the same
+in-memory emission and reds when `edges > cap`. Modelling Mermaid's boundary
+exactly (`edges == cap` renders; `edges > cap` throws) keeps the gate honest
+against the renderer rather than a guessed margin. The default is effectively
+unlimited for a trusted, manifest-bounded graph; the knob exists so a consumer
+whose graph legitimately dwarfs it, or who wants the guard to bite sooner, sets
+its own ceiling — the emitted page and the assertion always read the one value,
+so they cannot disagree. A missing `maxEdges` in the emission falls back to
+Mermaid's own `500` default, catching a regression that drops the init key
+entirely. The assertion runs whole-tree and hermetically via `--cap-only` (the
+fixture's `check-graph-cap.test.sh` drives it, as `--refs-only` drives assertion
+H).
+
 ### check-reads-couples
 
 Invariant: for every registered gate, every **statically resolvable recursive

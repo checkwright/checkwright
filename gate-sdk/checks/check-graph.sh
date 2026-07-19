@@ -23,6 +23,8 @@ if [[ -f "$VOCAB_FILE" ]]; then
     source "$VOCAB_FILE"
 fi
 
+MAX_EDGES="${GATE_SDK_GRAPH_MAX_EDGES:-100000}"
+
 THEME_FILE="${GATE_SDK_GRAPH_THEME:-$GATES_DIR/graph-theme.sh}"
 if [[ -f "$THEME_FILE" ]]; then
     # shellcheck disable=SC1090  # consumer-supplied rule content, path is config
@@ -225,9 +227,8 @@ HEAD_CHROME
     const graph = `%%{init:{'theme':'${dark ? 'dark' : 'base'}','themeVariables':{'fontSize':'13px'}}}%%
 HEAD
     printf '%s\n' "$graph_text"
+    printf '`;\n    mermaid.initialize({ startOnLoad: false, maxEdges: %s });\n' "$MAX_EDGES"
     cat <<'TAIL'
-`;
-    mermaid.initialize({ startOnLoad: false });
     const { svg } = await mermaid.render('graph', graph);
     const vp = document.getElementById('diagram');
     vp.innerHTML = svg;
@@ -299,6 +300,15 @@ disallowed_external_refs() {
                 | grep -oE "'[^']+'" | tr -d "'"
         } | sort -u
     )
+}
+
+# spec: gate-sdk/SPEC.md §check-graph — count the emitted mermaid edges (an arrow bearing a gate label)
+graph_edge_count() { grep -cE '(<-->|-->)\|"' <<<"$1"; }
+
+# spec: gate-sdk/SPEC.md §check-graph — the render cap the emitted page declares, or Mermaid's built-in default when the init call names none
+graph_render_cap() {
+    local cap; cap="$(grep -oE 'maxEdges:[[:space:]]*[0-9]+' <<<"$1" | grep -oE '[0-9]+' | head -1)"
+    printf '%s\n' "${cap:-500}"
 }
 
 # spec: gate-sdk/SPEC.md §check-graph (assertion G) — validate `# graph:` manifests in SPEC-*.md amendment bodies
@@ -437,6 +447,17 @@ if [[ "${1:-}" == "--refs-only" ]]; then
         exit 1
     fi
     echo "CHECK-GRAPH: clean (emitted external refs allowlisted)"
+    exit 0
+fi
+
+if [[ "${1:-}" == "--cap-only" ]]; then
+    emitted="$(emit_graph)"; edge_n="$(graph_edge_count "$emitted")"; cap="$(graph_render_cap "$emitted")"
+    if [[ "$edge_n" -gt "$cap" ]]; then
+        echo "CHECK-GRAPH: 1 render-cap violation(s):"
+        echo "  RENDER-CAP: emitted graph has $edge_n edges but the page declares maxEdges=$cap; Mermaid refuses a flowchart with more edges than the cap and paints an error graphic — raise GATE_SDK_GRAPH_MAX_EDGES above $edge_n"
+        exit 1
+    fi
+    echo "CHECK-GRAPH: clean (emitted graph within the render cap: $edge_n edges <= maxEdges=$cap)"
     exit 0
 fi
 
@@ -589,6 +610,13 @@ while IFS= read -r ref; do
     errors+=("EXTERNAL-REF: emitted artifact references '$ref', neither the seeded mermaid import nor a GATE_SDK_GRAPH_EXTERNAL_REFS prefix; add its prefix to the knob or drop the reference")
 done < <(disallowed_external_refs "$emitted")
 
+# assertion I: the emitted edge count fits the render cap the page declares —
+# Mermaid paints an error graphic past maxEdges, invisible to the byte-compare
+# freshness check (§check-graph)
+edge_n="$(graph_edge_count "$emitted")"; cap="$(graph_render_cap "$emitted")"
+[[ "$edge_n" -gt "$cap" ]] && \
+    errors+=("RENDER-CAP: emitted graph has $edge_n edges but the page declares maxEdges=$cap; Mermaid would paint an error graphic instead of the diagram — raise GATE_SDK_GRAPH_MAX_EDGES above $edge_n")
+
 # assertion G: every `# graph:` manifest in a SPEC-*.md amendment body is well-formed
 g_errors=()
 amendment_findings "."
@@ -600,5 +628,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "  help: fix the '# graph:' manifest / gates.list-membership / hook-trigger mismatch (or the malformed amendment-body manifest), then regenerate the hook and graph artifacts"
     exit 1
 fi
-echo "CHECK-GRAPH: clean (${#CHECKS[@]} gates; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, external refs allowlisted, and amendment-body manifests valid)"
+echo "CHECK-GRAPH: clean (${#CHECKS[@]} gates; manifests well-formed, couples<->trigger parity, cycle valves, the generated pre-commit hook + CHECK-GRAPH.html artifacts fresh, emitted asset hrefs resolve, external refs allowlisted, edge count within the render cap, and amendment-body manifests valid)"
 exit 0
