@@ -420,6 +420,22 @@
   recurring per-release chance of repeating it until the runbook pins the form.
   Surfaced 2026-07-19 by the close-stage release step for `derivation-by-precedent`,
   verifying that the URL its own release body advertises actually resolves.
+- **enforcement-first-behavioral-regressions** [needs-spec] — the always-loaded
+  enforcement-first rule ("the fix and the gate that catches it land in one unit;
+  removing the duplication outranks gating it") anchors its second clause — and
+  every neighbouring doctrine example (content-tiering, de-literalization) — in
+  the SSOT/duplication domain, so it under-cues the incident→gate reflex for a
+  *behavioral* regression that has nothing to do with duplicated content. Design
+  shape: tighten the always-loaded line (or the doctrine-kit section behind it) to
+  name the generalize-to-class-then-gate reflex for runtime/behavioral defects,
+  not only duplication — a `doctrine-kit/DOCTRINE.md` change, re-vendored to
+  upgrade, so it sits outside an incident-fix commit's envelope. **Cost while
+  deferred:** each behavioral bug fixed in a maintenance turn risks shipping
+  without its paired low-FP gate until a reviewer prompts. Surfaced 2026-07-19 by
+  the check-graph `maxEdges` fix (the coupling graph outgrew Mermaid's 500-edge
+  render cap): the one-line render fix landed, but the paired render-cap gate —
+  exactly the low-FP gate enforcement-first says to land in the same unit — was
+  added only on explicit request.
 
 ## Done
 
