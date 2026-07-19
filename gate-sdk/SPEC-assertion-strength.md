@@ -41,12 +41,15 @@ the invoked script's **declared exit contract** binds to one specific non-zero
 exit code.
 
 **The declared exit contract.** A script may already declare its exit codes in
-its header comment block — a line of the form `# exit: <code> <TOKEN> …`, in
-which uppercase tokens follow the code they belong to. This amendment makes
-that existing header **machine-read** and gives it a grammar: each uppercase
-token binds to the nearest preceding integer on the line, yielding a token→code
-map. A token bound to more than one code, or to code 0, is not discriminable
-and is skipped.
+its header comment block — a comment line whose first word is `exit:`, followed
+by codes with the uppercase tokens they name. Both live declarations sit inside
+a wider `# usage:`-style block and are written `#   exit: …` with leading
+whitespace, so the parser keys on `^#[[:space:]]*exit:`, not a bare `# exit:`
+prefix. This amendment makes that existing header **machine-read** and gives it
+a grammar: each uppercase token binds to the nearest preceding integer on the
+line, yielding a token→code map. Tokens admit internal hyphens, so `RESET-OK`
+reads as one token rather than two. A token bound to more than one code, or to
+code 0, is not discriminable and is skipped.
 
 This is the seam move, and it is the same one `check-test-hermetic` makes: that
 gate keys on the own-kit-bin convention *so that no kit's credential-consuming
@@ -86,8 +89,15 @@ and compares it to the PAUSE code, and its failure message reports the status it
 actually observed rather than asserting an outcome it did not establish. The
 script runs under `set -e`, so the capture uses the status-preserving idiom
 rather than a bare call. Its sibling guards in the same file are already honest
-— they assert non-zero under messages that claim only non-zero — and are
-unchanged. The fixed guard and the current one are the gate's fixture pair.
+and are unchanged — but for a sharper reason than "they name no token". The
+poller-snapshot guard *does* name one: its message reads `did not verdict OK`.
+It is honest because `OK` binds to code 0, and a truthiness guard discriminates
+code 0 exactly — the message claims no more than the guard established. That is
+the whole work the grammar's skip-code-0 rule does, and it is what keeps the
+gate off an honest neighbour four lines from its own fixture. The remaining
+guards in the file invoke `templates/usage-poller.sh`, outside the own-kit-bin
+convention and declaring no exit contract, so they are out of reach twice over.
+The fixed guard and the current one are the gate's fixture pair.
 
 ## Producers and consumers
 
@@ -95,7 +105,14 @@ unchanged. The fixed guard and the current one are the gate's fixture pair.
 author's declaration, already live in the tree on `delegation-kit/bin/usage-verdict.sh`
 and `delegation-kit/bin/usage-trend.sh` — real declarations under no test-only
 config, so the gate has a live producer on day one rather than a fixture-only
-one. Consumer: `check-assertion-strength`'s parser, at the guard-scan
+one. Stated honestly, though, the *effective* day-one reach is narrower than
+that count suggests: `usage-trend.sh`'s declaration names its codes in prose
+and carries no uppercase token at all, so it yields an empty token→code map and
+contributes nothing to discrimination. The whole live vocabulary is
+`usage-verdict.sh`'s `PAUSE`→1 and `STALE`→2 (`OK` and `RESET-OK` bind to 0 and
+are skipped as indiscriminable). One declaring script, two usable tokens — thin
+by construction, and the amendment claims no more. An iteration about verdict
+honesty does not get to overstate its own gate's reach. Consumer: `check-assertion-strength`'s parser, at the guard-scan
 transition. Named reader per field: the **code** is read to compare against the
 guard's explicit status comparison; the **token** is read to match against the
 failure message text. There is no third field, and neither field is populated
@@ -107,10 +124,17 @@ which the pre-commit generator reads to emit the hook. Consumer:
 enforcement map reads its tier.
 
 **The exemption marker.** Producer: a script author writing it with cause.
-Consumer: the gate's own scan, which skips a guard carrying it — and
-`check-gate-exemption-tasks`, which already holds gate exemptions to a filed
-task, so a new valve inherits that discipline rather than opening an ungoverned
-escape.
+Consumer: the gate's own scan, which skips a guard carrying it — and that is
+the *only* consumer. `check-gate-exemption-tasks` does **not** reach it, and
+this is deliberate rather than a gap: §check-gate-exemption-tasks scopes itself
+to `# exception-list:`-tagged arrays inside `check-*.sh` gates and rules inline
+per-site directives (`# fail-closed-exempt:`, `# no-fixture:`) out on the
+grounds that they are local and self-evident via their adjacent comment.
+`# assertion-strength-exempt:` joins that inline class — as does the
+`# hermetic-exempt:` valve it is modelled on, which no exemption-task gate
+holds today either. Its discipline is the adjacent `<reason>`, sited on the
+guard it excuses; the queue-linked discipline belongs to the array class and is
+not inherited here.
 
 **The fixed smoke guard.** Producer: `run-consumer-smoke.sh` driving
 `delegation-kit/smoke/install.sh`. Consumer: the smoke runner's own pass/fail,

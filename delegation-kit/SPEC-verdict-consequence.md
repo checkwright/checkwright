@@ -58,6 +58,13 @@ The status half stays site-specific (each site already names *why* it is
 stale); the consequence half is uniform, because the consequence *is* uniform —
 STALE is budget-unknown at every site.
 
+The clause appends to the tail, *after* the ` -> STALE` arrow. This is what
+keeps it compatible with the `width=<n>` invariant §usage-verdict already
+asserts — that every emitted verdict line carries `width=<n>` immediately
+*before* the arrow. Nothing lands between the width field and the arrow, so the
+two contracts occupy disjoint halves of the line and neither constrains the
+other.
+
 **3. The guard's advisory tail is deleted, not synchronized.** Once the verdict
 line carries its own consequence, the `2)` case arm in
 `delegation-kit/templates/agent-budget-guard.sh` (and this repo's consumer copy
@@ -67,13 +74,27 @@ verdict line and adds nothing. The arm's "needs no override" clause dies with
 it: it is implied by "never blocks", and the override instruction that matters
 already lives on the PAUSE arm, which is the only arm that blocks.
 
+**The two guard copies are not byte-identical today, and must not be made so.**
+They differ on line 2 — each carries its own `# spec:` header, the template's
+naming the settings-registration matcher the consumer copy has no need to
+restate. That divergence is deliberate and predates this unit. Build edits the
+two case blocks by hand in both files and leaves line 2 alone; "sync the
+copies" is the wrong instruction, "apply the same body edit twice" is the right
+one. No gate holds them together, so the hand-edit is the only mechanism.
+
 This is the enforcement-first ruling. Two strings that must agree is a drift
 class needing a gate; **one string with one producer is not a drift class at
 all** — removing the duplication outranks gating it (CLAUDE.md §Delivery
 doctrine). No new gate ships for this unit; the duplication it would have
 policed ceases to exist. `delegation-kit/SPEC.md` already asserts the guard
-"relays the verdict line verbatim" — after this change that sentence is
-literally true rather than approximately true, and it is the surviving contract.
+"relays the verdict line verbatim" (§usage-verdict, inside the `width=<n>`
+paragraph — the sentence is embedded there, not free-standing, which is where
+build will find it). Precisely: what the change makes true is that the guard no
+longer *restates the payload's content*. Both advise arms still prefix the
+relayed line with `budget verdict (agent-budget-guard):`, and the PAUSE arm
+still appends its corrective — "verbatim" governs the verdict line's own text,
+never a claim that the guard emits it unadorned. It is the surviving contract,
+and it survives unweakened.
 
 **4. The two SPEC sections converge on one owner.** §usage-verdict owns the
 verdict-string contract, including the consequence clause. §The delegation
