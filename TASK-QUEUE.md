@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: stage-posture-split-tuning
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -11,6 +11,10 @@
 ---
 
 ## New Features
+
+- **stage-posture-split-tuning** [spec: SPEC-stage-posture-split.md] — split
+  amendment-authoring into its own trigger-gated lifecycle stage (scope bounds,
+  spec authors, align verifies) and downgrade validate's dispatch tier.
 
 ## Technical Debt
 
@@ -436,43 +440,6 @@
   render cap): the one-line render fix landed, but the paired render-cap gate —
   exactly the low-FP gate enforcement-first says to land in the same unit — was
   added only on explicit request.
-- **stage-posture-split-tuning** [needs-spec] — the `/economics` read on
-  `derivation-by-precedent` found cache-read is ~95% of iteration token burn
-  (cr 94.8% of 31.2M tokens; output 1.1%), so the cost levers are per-stage
-  model class and capping context accumulation — not template trimming, which
-  is load-triggered and already terse. Two moves the SPEC must rule:
-  (a) **validate → lower tier.** validate's rows are mechanical oracle-running
-  (out=7,764 on cr=759k for one session) — run the battery, report — with low
-  generative judgment. A cheaper class likely serves; the lead ruling-config
-  pins every stage to Opus (lifecycle-kit/templates/lead.md §Economics). align
-  is explicitly *out of scope* for downgrade: its low output (35k) is
-  cross-spec *verification* that prevents build struggles, not glue — the
-  judgment justifies the tier.
-  (b) **scope amendment-authoring split.** scope's cr (5.3M) is driven by
-  causal-completeness amendment authoring after a whole-corpus sweep; the seam
-  is the pre-promotion ruling ("the proposed unit set is escalated for ruling
-  before promotion"), splitting the exploratory half from the generative half
-  so the sweep context stops being re-read. Leading design direction: give the
-  amendment-authoring half its *own lifecycle stage* rather than a second scope
-  session. scope carries the unconditional iteration-boundary reset, so a second
-  `enter-stage.sh scope` would re-truncate WORKFLOW-STATE; a dedicated stage
-  stamps and appends like align/build/validate/close, leaving the reset uniquely
-  scope's and untouched. It also sharpens the ontology (scope = bound the units;
-  new stage = author the amendments; align = independently verify them) and is
-  naturally trigger-gated like align — skipped for a debt-only iteration with no
-  amendment. Blast radius is wide but shallow: every roster mirror (the CLAUDE.md
-  stage block, lead dispatch, enforcement map, docs), all held in lockstep by
-  `check-lifecycle-registration`. Alternative considered and not preferred:
-  teach enter-stage.sh to reset only on the unnamed boundary and append on
-  re-entry — narrower blast radius (one tool) but adds a conditional to the reset
-  (lifecycle-kit/SPEC.md §check-stage-entry / §bin/enter-stage.sh). A roster
-  change, its own iteration — not a tuning tweak. build-session splitting, by
-  contrast, is already directed and needs no spec change.
-  **Cost while deferred:** every iteration pays the top class on validate's
-  mechanical pass and re-reads scope's full sweep context through the
-  amendment-authoring turns. **Surfaced** 2026-07-19 by `/economics` on
-  `derivation-by-precedent`.
-
 ## Done
 
 ## Lessons Learned
