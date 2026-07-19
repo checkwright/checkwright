@@ -12,15 +12,6 @@
 
 ## New Features
 
-- **kfric-trigger-prior-artifact-consultation** [spec: SPEC-kfric-trigger-prior-artifact.md]
-  — broaden the knowledge-friction capture cue (drift-kit/SPEC.md §The
-  knowledge-friction loop step 1, and the always-loaded CLAUDE.md kfric bullet) to
-  name prior-artifact / sibling-deliverable consultation as a stampable non-owning
-  surface, so derivation-by-precedent self-reports instead of staying invisible to
-  every content gate. The methodology-level generalization of the two release-note
-  units below. Cue-broadening envelope and the reinforced channel seam (work-shaped
-  "should be owned/generated" → gap inbox, not kfric) are ruled in the amendment.
-
 - **release-note-chrome-ownership** [spec: SPEC-release-note-chrome-ownership.md] —
   give the release note's fixed chrome (the reserved opener sentence + the closing
   "Upgrading" paragraph) one owning surface: inline it into RELEASING.md step 1 as
@@ -358,5 +349,7 @@
   direction.
 
 ## Done
+
+- kfric-trigger-prior-artifact-consultation
 
 ## Lessons Learned

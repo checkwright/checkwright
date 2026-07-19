@@ -14,7 +14,8 @@ tooling-friction triage (guard-kit's close-triage pattern).
      owns that surface gains the sentence.
    - **Point from where the session looked to where the owner is** when the fact
      is already owned but was read off the wrong surface (an implementation, a
-     gate's source, a commit message).
+     gate's source, a commit message, or a prior/sibling deliverable consulted
+     to shape a new one).
 3. **Clear the log** — its named reclaim path:
    `: > .workflow/knowledge-friction.log`.
 

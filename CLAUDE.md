@@ -155,8 +155,9 @@ the skill on a blocking verdict — so they are not resident here.
   gate-sdk consumer-smoke mechanics (`DEMO_TMP_DIR` its only knob, writing nothing
   in-tree), so a bit-rotted walkthrough is a red validate.
 - **Knowledge-friction capture (any session):** re-deriving a fact no doc owns
-  (off an implementation, a gate's source, a commit)? stamp it in the moment
-  with `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"` — deferred capture is
+  (off an implementation, a gate's source, a commit, or a prior/sibling
+  deliverable)? stamp it in the moment with
+  `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"` — deferred capture is
   no capture; close triages it (drift-kit/SPEC.md §The knowledge-friction loop).
 - No per-user memory files: durable guidance goes in tracked manifests (this
   file, kit SPECs) or `BRIEF.local.md` (local-only private context). Harness

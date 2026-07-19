@@ -134,7 +134,8 @@ plugin.
 guard-kit's friction loop catches *permission* friction — its log is fed by
 a hook that fires on every command. Knowledge friction has no hook: a
 session re-derives a fact no doc owns (reads it off an implementation, a
-gate's source, a commit message), gets the right answer, and moves on —
+gate's source, a commit message, or a prior/sibling deliverable it consults
+to shape a new one), gets the right answer, and moves on —
 nothing prompts, nothing logs, and the next session re-pays the same
 derivation. The loop mirrors guard-kit's, with capture moved to convention:
 
@@ -165,6 +166,12 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    the consumer's committed gap channel instead
    (lifecycle-kit/SPEC.md §The committed gap inbox); overloading this log as a
    backlog inbox dilutes the `kpi-knowledge-friction` signal it exists to carry.
+   The prior/sibling-deliverable cue does not relax that seam: consulting a
+   prior artifact to shape the next, the conclusion "this artifact's chrome
+   *should be owned or generated* rather than copied" is work-shaped and routes
+   to the gap inbox; what kfric captures is the narrower *fact re-derived* — the
+   specific value or structure reconstructed from the prior artifact because no
+   doc owns it.
 2. **Triage (close)** — `templates/close-knowledge.md`, spliced into the
    consumer's close skill (the close-triage/close-brevity pattern): walk
    the log; for each entry, the remediation is a **doc-owner edit** — give
