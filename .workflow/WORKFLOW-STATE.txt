@@ -4,4 +4,4 @@
 
 ---
 
-— scope ac6fc2a4 2026-07-19
+trajectory-stage-roster-hardcode scope ac6fc2a4 2026-07-19
