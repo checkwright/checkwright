@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **trajectory-stage-roster-hardcode** [spec: SPEC-trajectory-stage-roster-config.md] —
-  `drift-kit/bin/trajectory.sh` renders the governed-trajectory table off a
-  hardcoded five-stage roster at four sites (`:52` case arm, `:68` git-log grep
-  pre-filter, `:162` `render_stages` loop, `:180` column-header literal),
-  silently dropping every stamp outside it — so this repo's live six-stage
-  roster's `spec` stamps render invisible in the economics evidence, the tool
-  under-reporting the very stage the stage-posture split added. The amendment has
-  the extractor read the *configured* roster via a new `DRIFT_KIT_STAGES` knob
-  (fall-open five-stage default keeps standalone/un-upgraded consumers
-  byte-identical; this repo derives the knob from `LIFECYCLE_KIT_STAGES`, the sole
-  roster owner), with a shortest-unique-prefix abbreviator resolving the
-  scope/spec label collision. Single-component (drift-kit only; consumer config is
-  not a kit component). Unblocks `spec-split-promotion-review`, which needs
-  recorded `spec`-stage trajectory data to run.
-
 ## Technical Debt
 
 ## Deferred
@@ -472,5 +457,7 @@
   projection with recorded data.
 
 ## Done
+
+- trajectory-stage-roster-hardcode
 
 ## Lessons Learned

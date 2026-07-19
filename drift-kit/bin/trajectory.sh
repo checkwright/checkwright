@@ -32,6 +32,34 @@ _wf="${GATE_SDK_WORKFLOW_DIR:-.workflow}"
 unset _wf
 read -r STATE_FILE EVIDENCE_FILE _ <<<"$DRIFT_KIT_TRAJECTORY_SURFACES"
 
+# spec: drift-kit/SPEC.md §Layout and configuration — DRIFT_KIT_STAGES is the ordered stage roster the trajectory table renders; unset falls open to the historical five so standalone/un-upgraded emission stays byte-identical (drift re-derives with its own knob, never sourcing lifecycle — the DRIFT_KIT_STATE_FILE precedent)
+declare -p DRIFT_KIT_STAGES &>/dev/null || DRIFT_KIT_STAGES=(scope align build validate close)
+
+# spec: drift-kit/SPEC.md §The published-evidence extractor — each stage's slot label is its shortest prefix unique among the roster; header legend and cells read this one map so they cannot drift, and a non-colliding roster reduces every label to its single letter (five-stage default byte-identical)
+declare -A STAGE_ABBR
+for _s in "${DRIFT_KIT_STAGES[@]}"; do
+    _len=1
+    while (( _len < ${#_s} )); do
+        _pfx="${_s:0:_len}"
+        _collide=0
+        for _o in "${DRIFT_KIT_STAGES[@]}"; do
+            [[ "$_o" == "$_s" ]] && continue
+            [[ "${_o:0:_len}" == "$_pfx" ]] && { _collide=1; break; }
+        done
+        (( _collide )) || break
+        _len=$(( _len + 1 ))
+    done
+    STAGE_ABBR[$_s]="${_s:0:_len}"
+done
+_stage_legend=""
+for _s in "${DRIFT_KIT_STAGES[@]}"; do
+    _stage_legend="$_stage_legend${_stage_legend:+ }${STAGE_ABBR[$_s]}"
+done
+unset _s _o _len _pfx _collide
+
+# spec: drift-kit/SPEC.md §The published-evidence extractor — the case-arm membership test and the git-log grep pre-filter build one alternation from the roster, so the two roster reads cannot diverge
+_stage_alt="$(IFS='|'; printf '%s' "${DRIFT_KIT_STAGES[*]}")"
+
 emit=0
 [[ "${1:-}" == "--emit" ]] && emit=1
 
@@ -48,8 +76,8 @@ if git cat-file -e "HEAD:$STATE_FILE" 2>/dev/null; then
             +*)
                 stamp="${line#+}"
                 read -r it st _ <<<"$stamp"
-                case "$st" in
-                    scope|align|build|validate|close) ;;
+                case " ${DRIFT_KIT_STAGES[*]} " in
+                    *" $st "*) ;;
                     *) continue ;;
                 esac
                 if [[ -z "${START_COMMIT[$it]:-}" ]]; then
@@ -65,7 +93,7 @@ if git cat-file -e "HEAD:$STATE_FILE" 2>/dev/null; then
                 ;;
         esac
     done < <(git log --reverse --format='COMMIT %H' -p -U0 -- "$STATE_FILE" 2>/dev/null \
-                 | grep -E '^COMMIT |^\+[a-z0-9-]+ (scope|align|build|validate|close) ')
+                 | grep -E "^COMMIT |^\+[a-z0-9-]+ ($_stage_alt) ")
 fi
 
 # spec: drift-kit/SPEC.md §The published-evidence extractor — every range-scoped column freezes at (close(N-1), close(N)]; no column reads HEAD, so the emission is a pure function of closed history
@@ -156,12 +184,12 @@ for it in "${!CLOSE_COMMIT[@]}"; do
         || GATE_COUNT[$it]="n/a"
 done
 
-render_stages() {   # five fixed slots (scope align build validate close); absent shown '·'
-    local seen=" $1 " out=""
-    local s
-    for s in scope align build validate close; do
+# spec: drift-kit/SPEC.md §The published-evidence extractor — one slot per configured stage in roster order, present as its roster-unique abbreviation or absent as '·'
+render_stages() {
+    local seen=" $1 " out="" s
+    for s in "${DRIFT_KIT_STAGES[@]}"; do
         case "$seen" in
-            *" $s "*) out="$out${out:+ }${s:0:1}" ;;
+            *" $s "*) out="$out${out:+ }${STAGE_ABBR[$s]}" ;;
             *)        out="$out${out:+ }·" ;;
         esac
     done
@@ -177,7 +205,7 @@ if [[ "$emit" -eq 0 ]]; then
     echo
 fi
 
-echo "| iteration | stages (s a b v c) | commits (feat/debt) | amendments (merged · max lag) | validate (suites) | gates.list |"
+echo "| iteration | stages ($_stage_legend) | commits (feat/debt) | amendments (merged · max lag) | validate (suites) | gates.list |"
 echo "| --- | --- | --- | --- | --- | --- |"
 
 if [[ "$state_missing" -eq 1 ]]; then

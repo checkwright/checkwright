@@ -222,7 +222,9 @@ it harvests:
 
 - **iteration + stages run** — the stamp lines from `WORKFLOW-STATE.txt`'s git
   history (the file truncates at each scope boundary; history keeps every
-  stamp), rendered as fixed stage slots so a skipped stage reads as a gap.
+  stamp), rendered as one slot per configured stage (`DRIFT_KIT_STAGES`, roster
+  order), each labelled by its shortest roster-unique prefix, so a skipped or
+  non-roster stage reads as a gap.
 - **validate attestations** — the evidence-manifest lines
   (`validate-evidence.txt` history): the per-iteration suite roll-up and any
   non-clean verdict. This is the primary satisfiable-drift surface — a
@@ -512,6 +514,15 @@ Knobs (this repo's layout as defaults):
 - `DRIFT_KIT_GATES_FILE` — the registry whose member count the trajectory
   extractor reads at each close commit (gate-roster growth); default
   `${GATE_SDK_GATES_DIR:-scripts}/gates.list`.
+- `DRIFT_KIT_STAGES` — the ordered stage roster the trajectory extractor
+  renders (one slot per stage, labelled by its shortest roster-unique prefix);
+  default `(scope align build validate close)`, which reduces to the frozen
+  single-letter header. A consumer running a wider roster derives this from its
+  sole roster owner — this repo's `scripts/drift-config.sh` sources
+  `scripts/lifecycle-config.sh` and copies `LIFECYCLE_KIT_STAGES`, the SSOT
+  activation — rather than re-listing. Third instance of drift-kit re-deriving a
+  cross-kit fact with its own knob rather than importing a sibling kit's bin
+  contract (alongside `DRIFT_KIT_SESSIONS_DIR` and `DRIFT_KIT_STATE_FILE`).
 - `DRIFT_KIT_STAGE_ECONOMICS_LOG` — the stage-economics append trend log; default
   `$DRIFT_KIT_METRIC_DIR/stage-economics-log.txt` (gitignored; the meter
   `mkdir -p`s the dirname).
