@@ -4,9 +4,4 @@
 
 ---
 
-tooling-signal-honesty scope aa26eaeb 2026-07-19
-tooling-signal-honesty spec a1669e3f 2026-07-19
-tooling-signal-honesty align-waived a5bde933 2026-07-19
-tooling-signal-honesty build a5bde933 2026-07-19
-tooling-signal-honesty validate a87eaec8 2026-07-19
-tooling-signal-honesty close ac8f8440 2026-07-19
+— scope a0c0156f 2026-07-19

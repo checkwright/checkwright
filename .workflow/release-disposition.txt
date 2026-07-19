@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-tooling-signal-honesty release v0.9.0 — minor: Behavior changes non-empty (the /economics cost chain drops usage-trend; the resume-journal DONE-absence clause rescopes to the cold-read arm); no gate tightened, no knob renamed, no decommission
-
