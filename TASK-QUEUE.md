@@ -12,6 +12,23 @@
 
 ## New Features
 
+- **economics-budget-pct-decouple** [spec: SPEC-economics-budget-pct-decouple.md] —
+  drop delegation-kit's `usage-trend` (the subscription **budget-%** rate-window
+  footprint) as the third cost surface of the `/economics` narrative, so the cost
+  chain narrows to `overhead-meter → stage-economics` and `stage-economics`
+  becomes the sole cost-attribution surface. Budget-% is account-wide — confounded
+  by overlapping sessions and a second operator on one account — so it is the
+  wrong instrument for per-iteration cost attribution, sitting confounded beside
+  `stage-economics`'s clean per-transcript token pricing. Removal of a *role*, not
+  a tool: `usage-verdict`, `agent-budget-guard`, and `usage-trend` itself all
+  stand (budget-% stays correct for the pre-dispatch shared-account throttle and
+  weekly-headroom planning). Edit surface: `drift-kit/templates/economics.md`
+  (drop step 3, reword the intro cardinal), `drift-kit/SPEC.md` §The `/economics`
+  skill (two-tool chain, drop the usage-trend caller clause), `drift-kit/README.md`
+  (one-liner), and the regenerated `docs/drift-kit/{README,SPEC}.md` mirror
+  (`gen-docs-mirror.sh --write`; `check-docs-mirror-fresh` byte-gates). Scope ruled
+  with the operator 2026-07-19: economics-only. Single-component (drift-kit).
+
 ## Technical Debt
 
 ## Deferred
@@ -286,35 +303,6 @@
   `jq` call) lands unnoticed, because the only mechanism watching that path
   never runs. Bounded by the degradation path being small and rarely touched.
   Filed 2026-07-18 by lead ruling at the stage-economics-report close.
-
-- **economics-budget-pct-decouple** [needs-spec] — drift-kit's `/economics`
-  narrative chains three cost surfaces, the third being delegation-kit's
-  `usage-trend` (`drift-kit/templates/economics.md` step 3) — the subscription
-  **budget-%** rate-window footprint. Budget-% is account-wide: it is confounded
-  by overlapping sessions and by a second operator on the same account, so it is
-  the wrong instrument for **per-iteration cost attribution**. `stage-economics`
-  already prices per-transcript, per-stage, per-model token draw (the token SSOT,
-  immune to that confound), so the narrative carries a confounded advisory number
-  beside a clean one. **Scope ruled with operator 2026-07-19: economics-only** —
-  drop `usage-trend` from the `/economics` chain; `stage-economics` becomes the
-  sole cost surface. **Keep every delegation-kit budget surface**:
-  `usage-verdict`, `agent-budget-guard`, and `usage-trend` itself all stand — the
-  budget-% is *correct* for its real job, the pre-dispatch safety throttle
-  against a shared-account cap, where cross-session / cross-operator overlap is
-  the feature not the bug (usage-trend also still serves delegation planning —
-  weekly headroom). Only its role as an economics *cost* surface is removed.
-  **Edit surface:** `drift-kit/templates/economics.md` (drop step 3 + its
-  narrative bullet; chain becomes overhead-meter → stage-economics),
-  `drift-kit/SPEC.md` §The `/economics` skill (two-tool chain, drop the
-  usage-trend caller clause), `drift-kit/README.md` (reword the one-liner), and
-  the regenerated `docs/drift-kit/README.md` projection
-  (`check-docs-render-fidelity` gates its freshness); then the gate battery plus
-  drift-kit fixtures.
-  **Cost while deferred:** low, non-rotting — no data corruption (stage-economics
-  is already the headline and is unaffected); the cost is a confounded budget-%
-  line a reader could over-trust as this iteration's cost. Surfaced 2026-07-19 by
-  the operator question on whether `/economics` measures cost purely from session
-  transcripts.
 
 - **new-initiative-filing-default** [needs-spec] — no always-loaded surface
   states the rule that a **new initiative raised mid-session** (an operator
