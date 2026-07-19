@@ -12,6 +12,21 @@
 
 ## New Features
 
+- **trajectory-stage-roster-hardcode** [spec: SPEC-trajectory-stage-roster-config.md] —
+  `drift-kit/bin/trajectory.sh` renders the governed-trajectory table off a
+  hardcoded five-stage roster at four sites (`:52` case arm, `:68` git-log grep
+  pre-filter, `:162` `render_stages` loop, `:180` column-header literal),
+  silently dropping every stamp outside it — so this repo's live six-stage
+  roster's `spec` stamps render invisible in the economics evidence, the tool
+  under-reporting the very stage the stage-posture split added. The amendment has
+  the extractor read the *configured* roster via a new `DRIFT_KIT_STAGES` knob
+  (fall-open five-stage default keeps standalone/un-upgraded consumers
+  byte-identical; this repo derives the knob from `LIFECYCLE_KIT_STAGES`, the sole
+  roster owner), with a shortest-unique-prefix abbreviator resolving the
+  scope/spec label collision. Single-component (drift-kit only; consumer config is
+  not a kit component). Unblocks `spec-split-promotion-review`, which needs
+  recorded `spec`-stage trajectory data to run.
+
 ## Technical Debt
 
 ## Deferred
@@ -436,44 +451,6 @@
   render cap): the one-line render fix landed, but the paired render-cap gate —
   exactly the low-FP gate enforcement-first says to land in the same unit — was
   added only on explicit request.
-
-- **trajectory-stage-roster-hardcode** [needs-spec] — `drift-kit/bin/trajectory.sh`
-  hardcodes the 5-stage roster in three sites and silently drops any stamp outside
-  it: `:52` the case arm `scope|align|build|validate|close) ;; *) continue` (a
-  `spec` stamp falls through and is discarded), `:68` the `git log` grep pre-filter
-  `^\+[a-z0-9-]+ (scope|align|build|validate|close) ` (filters `spec` stamps out
-  before the loop), and `:162` `render_stages`'s five-fixed-slot loop (no slot is
-  ever rendered for `spec`). Post-activation of the stage-posture split this repo's
-  roster is six stages, so the trajectory/economics evidence renders a 5-slot row
-  with the `spec` stage invisible — and it is the `/economics` read that motivated
-  the split, so the tool that measures the win under-reports the very stage the win
-  added.
-  **Design question (why deferred, not folded into the split's build — align ruling
-  with lead 2026-07-19, Option B):** the fix is to read the *configured* roster
-  rather than a literal list, but drift-kit today couples to lifecycle only through
-  the `WORKFLOW-STATE` stamp file; having it read `LIFECYCLE_KIT_STAGES` is a new
-  cross-kit config dependency whose seam shape (source lifecycle's `lib/stages.sh`?
-  a fall-open default when absent? render width when the roster count varies?) is
-  the open design work, not a mechanical substitution. Generalizing it is its own
-  unit and would bloat the split's activation scope.
-  **Cost while deferred:** low and non-rotting for correctness (trajectory is a
-  gitignored `.metric/` emission, not a pre-commit gate, so nothing false-greens),
-  but observability-degrading — every post-activation iteration that runs `spec`
-  under-reports it in the economics evidence until this lands. Surfaced 2026-07-19
-  by the `stage-posture-split-tuning` align audit verifying the amendment wires
-  cleanly against the current tree.
-  **Prioritized-for-next-scope (2026-07-19, lead ruling at the
-  `stage-posture-split-tuning` close):** the six-stage roster is now **LIVE**, so
-  the premise above is no longer latent — `trajectory.sh`'s hardcoded 5-stage
-  roster (`:52` case arm, `:68` git-log grep, `:162` render loop) now silently
-  drops every `spec` stamp on this repo's own trajectory. This directly **blocks
-  the promotion-reflection loop** (`spec-split-promotion-review` depends on it for
-  any recorded `spec`-stage data), so next iteration's scope should evaluate it as
-  a **near-term unit**, not leave it indefinitely deferred. Still needs its own
-  amendment/`spec` unit — the seam design (read the configured roster vs a literal
-  list) is unchanged and un-started; this annotation raises priority, it does not
-  un-defer the entry into an active envelope. The lead is carrying this as a
-  directed theme into next scope.
 
 - **spec-split-promotion-review** [needs-spec] — after the six-stage roster has
   run **≥N iterations with `spec`-stage economics actually recorded on the
