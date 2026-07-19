@@ -83,7 +83,12 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 
 5. **Create the GitHub Release.** Its body points at the post's
    `https://checkwright.dev/` URL — the post is the note's single home, the
-   Release a pointer to it, never a second copy of the note.
+   Release a pointer to it, never a second copy of the note. Write the post URL
+   **without a trailing slash** (`…/posts/<slug>`, not `…/posts/<slug>/`): the
+   site serves the bare form and 404s the slashed one. Open the link once the
+   Release is published — the body lives on the host, out of the battery's
+   reach, so this verification is the only thing standing between a typo and a
+   dead link in a permanent artifact.
 
 6. **Verify the version badge.** Confirm the README release-version badge
    resolves the new tag. It is sourced from the GitHub tag list, so each release

@@ -383,7 +383,10 @@
   re-entry on `derivation-by-precedent`, the same
   operator-authorized-hermeticity-fix thread as `hermetic-bin-roster-config`.
 
-- **release-body-url-form** [needs-spec] — the `v0.6.0` GitHub Release body links
+- **release-body-url-form** [needs-spec] — *residue only: the two cheap
+  deliverables are done (see below); what remains is the monitor-shaped half,
+  promotable only together with `rendered-site-link-monitor`.* The `v0.6.0`
+  GitHub Release body linked
   `https://checkwright.dev/posts/2026-07-18-checkwright-v0-6-0/` **with a trailing
   slash, which 404s** — the site serves posts without one. Confirmed 2026-07-19:
   the no-slash form returns 200, and `v0.4.0`/`v0.5.0` both use the correct form,
@@ -391,13 +394,19 @@
   long-standing convention error. `v0.7.0` hit the same trap while being cut and
   was corrected before this entry was filed, which is the evidence that the trap
   is live rather than historical.
-  **Two deliverables:** (a) repair the `v0.6.0` body — a one-line `gh release
-  edit`, deliberately *not* done while closing `derivation-by-precedent` because
-  editing a previously published release is outside that iteration's envelope and
-  the envelope had already been widened once by ruling; (b) pin the URL form in
-  RELEASING.md step 5, which today says only that the body "points at the post's
-  `https://checkwright.dev/` URL" and never states the no-slash form — the
-  ambiguity is what both slips came through.
+  **Two deliverables — both DONE 2026-07-19, operator-authorized out of stage**
+  (the entry's own "pinning the form in the runbook is the cheap half and stands
+  alone" is the authority for landing them without a scoped iteration):
+  (a) the `v0.6.0` body is repaired — a one-line `gh release edit`, deliberately
+  *not* done while closing `derivation-by-precedent` because editing a previously
+  published release is outside that iteration's envelope and the envelope had
+  already been widened once by ruling; re-verified 200 after the edit, and the
+  note's prose is byte-identical apart from the URL. `v0.4.0`/`v0.5.0` re-checked
+  and already correct, so no other published body carries the trap.
+  (b) RELEASING.md step 5 now pins the no-slash form and makes opening the link a
+  named verification; it previously said only that the body "points at the post's
+  `https://checkwright.dev/` URL", and that ambiguity is what both slips came
+  through.
   **Gap generalization — why no gate.** A release body lives on the host, not in
   the tree, so the battery cannot reach it; and the link is an external URL whose
   liveness reds on causes no commit produced, which site-kit/SPEC.md §The monitor
