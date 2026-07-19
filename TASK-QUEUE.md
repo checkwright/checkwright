@@ -472,6 +472,53 @@
   Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
   plain-(b) ruling named.
 
+- **usage-verdict-stale-steer-contradiction** [needs-spec] — one STALE verdict
+  carries two contradictory steers, and which one a session reads depends on the
+  path it read the verdict through.
+  *Direct run* — `delegation-kit/bin/usage-verdict.sh:98` prints `STALE (reading
+  older than <n>s; pct may lag reality — re-read or refresh before trusting)`.
+  *Hook path* — `scripts/agent-budget-guard.sh:17` (and its kit template) feeds
+  back `advisory only: STALE is budget-unknown, never blocks and needs no
+  override (only PAUSE does)`.
+  **The drift is inside one file, not just across the two readers.**
+  delegation-kit/SPEC.md:62 (§The delegation model) states "STALE never blocks —
+  budget-unknown is decision-relevant, but a consumer with no snapshot producer
+  must route to advice, not out of delegation"; delegation-kit/SPEC.md:200
+  (§usage-verdict) states "STALE (exit 2): re-read before trusting." Same file,
+  two sections, opposite operational readings — the same prose-vs-prose shape as
+  the `STALE_AGE` citation drift found in this same file by the
+  `tooling-signal-honesty` close audit.
+  **Demand evidence — first-party, this iteration.** The close session read the
+  direct-run string mid-iteration, treated STALE as a reason not to dispatch, and
+  built a polling loop to wait it out: precisely the behavior the direct string
+  steers toward and the hook string would have stopped cold. **The corrective is
+  structurally unreachable when it is needed** — the hook fires *on* dispatch,
+  i.e. exactly the act a session hesitating on STALE has not yet performed. The
+  operator reports this as a repeat across sessions, not a one-off, so the
+  recurrence is attested rather than projected.
+  **Design question (why design-pending, not a one-line string fix):** which string
+  is wrong is genuinely open. Either (a) carry the never-blocks clause into
+  `usage-verdict`'s own STALE line so both readers get one answer — cheap, but it
+  presumes the two readers want the same sentence; or (b) rule that "re-read
+  before trusting" is correct for a *human* reader and wrong only for a
+  *dispatching agent*, in which case the split is intentional and the real defect
+  is that nothing marks which reader each string addresses — a reader-tagging
+  convention across the verdict surfaces, which is a design pass, not an edit.
+  Resolving (a) vs (b) also settles whether SPEC:62 and SPEC:200 should converge
+  or be explicitly reader-scoped.
+  **Adjacent precedent, on record:** this is the same shape as the
+  memory-quoted-percentage failure the guard already exists to close
+  (delegation-kit/SPEC.md §The delegation model) — a session acting on a reading
+  whose *authority* it misjudged, rather than on a wrong number. That the guard's
+  own advisory text is the corrective here, and is unreachable at the moment of
+  hesitation, is the sharpest form of the argument.
+  **Cost while deferred:** recurring and self-concealing. Each occurrence burns
+  wall-clock on an unnecessary wait (a polling loop, a deferred dispatch) and
+  leaves no artifact — a session that waits out a STALE reading logs nothing to
+  distinguish it from one that never hit it, so the frequency is unmeasurable
+  from the tree and the cost is systematically under-read. Filed 2026-07-19 by
+  lead ruling at the `tooling-signal-honesty` close, off first-party evidence.
+
 ## Done
 
 ## Lessons Learned
