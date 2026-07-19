@@ -45,11 +45,16 @@ backlog items.
   recognized trigger *case* to that recognition, no new code path. The
   affordance stays `bin/kfric.sh "<fact>" "<surface>"` (unchanged), and the raw
   append stays the legal fallback.
-- **Consumer** — unchanged. The close-stage triage walks the log line by line
-  and gives each re-derived fact a doc owner (or a pointer); the
+- **Consumer** — behavior unchanged. The close-stage triage walks the log line
+  by line and gives each re-derived fact a doc owner (or a pointer); the
   `kpi-knowledge-friction` KPI trends the per-iteration line count. Neither
   reads provenance, so a line captured under the new cue is triaged and
-  aggregated identically to any other.
+  aggregated identically to any other. The close-triage template
+  (`templates/close-knowledge.md`) carries an illustrative "read off the wrong
+  surface" roster parallel to the capture roster; its triage behavior does not
+  change, but that illustrative roster widens in lockstep so no summary of the
+  non-owning-surface set stays narrower than the SPEC roster (see Existing
+  sections updated).
 - **No new field, file, knob, or tag.** The log line's shape is unchanged, so
   there is nothing whose reader must be newly named — the existing triage and
   KPI are the readers, already named above.
@@ -64,6 +69,13 @@ backlog items.
   parenthetical ("off an implementation, a gate's source, or a commit") to
   include a prior/sibling deliverable, so the always-loaded cue matches the
   broadened SPEC roster. Keep it one line (always-loaded shape).
+- **drift-kit/templates/close-knowledge.md — the triage "read off the wrong
+  surface" example** — widen its parallel roster ("an implementation, a gate's
+  source, a commit message") to include a prior/sibling deliverable, so this
+  second restatement of the non-owning-surface set does not stay narrower than
+  the broadened SPEC roster. Prose-only; the triage step's behavior is
+  unchanged (align audit finding — the "only summary" claim undercounted this
+  site).
 
 No wire contract, no fenced source — nothing to embed.
 
@@ -78,7 +90,10 @@ No wire contract, no fenced source — nothing to embed.
       the CLAUDE.md bullet widens in place; both read as one coherent surface.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for
       drift-kit (`ls drift-kit/SPEC-*.md`).
-- [ ] **Removals propagated** — nothing retired; confirm no other surface
-      restates the narrower roster (the CLAUDE.md bullet is the only summary).
+- [ ] **Removals propagated** — nothing retired; the roster is summarized in
+      two other surfaces — the CLAUDE.md kfric bullet and the
+      `close-knowledge.md` triage example — and both widen in lockstep so
+      neither stays narrower than the SPEC roster (align audit finding; the
+      original "CLAUDE.md is the only summary" undercounted the second site).
 - [ ] **Gaps filed** — any cross-component gap found during the work filed as a
       debt task, resolved in-session if it is a build-time causal gap.
