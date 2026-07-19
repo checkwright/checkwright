@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-trajectory-stage-roster-hardcode release none — drift-kit-internal, fall-open byte-identical for un-upgraded consumers; sole new surface an opt-in DRIFT_KIT_STAGES knob (addition, not rename/removal); no gate landed/tightened; all three upgrade-contract sections None
