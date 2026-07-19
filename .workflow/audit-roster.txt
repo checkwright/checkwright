@@ -2,4 +2,4 @@
 # audit-roster v1 — one line per un-gateable class; the close-stage review (.claude/commands/close.md) reads, judges due-ness, and stamps last:
 # <class-slug> — <audit scope: what to sweep> — due: <event(s)> — last: <iteration | never>
 
-internal-identifier-restatement — prose restating a source's internal identifier roster or algorithm, un-gateable because public contract names are legitimate citations — due: any heavy-SPEC per-component-contract edit; release prep — last: stage-posture-split-tuning
+internal-identifier-restatement — prose restating a source's internal identifier roster or algorithm, un-gateable because public contract names are legitimate citations — due: any heavy-SPEC per-component-contract edit; release prep — last: trajectory-stage-roster-hardcode

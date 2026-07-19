@@ -456,8 +456,35 @@
   projected economics, and this is the loop that confirms or retires that
   projection with recorded data.
 
-## Done
+- **split-posture-waiver-writer** [needs-spec] — in the split-lead posture the
+  lead issues stage rulings (e.g. an align waiver) but commits no lifecycle
+  state by design (the lead stamps nothing; only stage sessions write), so a
+  lead-issued **waiver stamp** has no clean writer. This iteration's
+  `trajectory-stage-roster-hardcode align-waived cbc94da8 2026-07-19` line was
+  carried into the *build* session's entry commit (`6b22f38`) as a piggyback,
+  because no stage owns the waiver and the lead cannot commit it. The protocol
+  worked here only because the build session was told to carry it; nothing in
+  the stage skills or lifecycle SPEC prescribes *which* stage commit a pending
+  waiver rides, nor guarantees the carry happens at all.
+  **Design question (why deferred, not fixed inline):** the fix is a protocol
+  ruling on the seam, not a code tweak — options include (a) codify in the
+  next-stage skill/entry contract that a stage session carries any pending
+  lead-issued waiver into its entry commit (formalize the piggyback that
+  happened), (b) a lead-invokable waiver-writer that appends the stamp without
+  the lead becoming a lifecycle-state writer (tension with the split posture's
+  "lead writes none" invariant), or (c) route the waiver through the same
+  committed-worklist channel the dispatch uses. Choosing among these is a
+  split-posture-vs-state-machine seam ruling that belongs in
+  lifecycle-kit's SPEC / the lead template, so it earns a scope pass.
+  **Cost while deferred:** low and non-rotting — the waiver *did* land correctly
+  here and `check-stage-evidence` accepts the line, so the machine is not
+  broken. The cost is recurrence risk: every future split-posture waiver
+  re-litigates which stage commit carries it, and a stage session that stamps
+  its entry without carrying a pending waiver would leave the waiver
+  uncommitted — living only in the message channel, which is transport, never a
+  store (CLAUDE.md §How to escalate). Surfaced 2026-07-19 by the
+  `trajectory-stage-roster-hardcode` close, filed by lead-dispatch instruction.
 
-- trajectory-stage-roster-hardcode
+## Done
 
 ## Lessons Learned
