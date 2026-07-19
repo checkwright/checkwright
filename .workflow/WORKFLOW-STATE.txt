@@ -4,4 +4,4 @@
 
 ---
 
-— scope aa26eaeb 2026-07-19
+tooling-signal-honesty scope aa26eaeb 2026-07-19
