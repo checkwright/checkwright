@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
-stage-economics-report release none — additive advisory tool; no gate registered, no knob renamed, no existing behavior moved, so all three note sections are None
-
