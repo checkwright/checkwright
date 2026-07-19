@@ -44,3 +44,4 @@
 | concurrency-hardening | s a b v c | 3f/0d | 3 · ≤0d | 20s clean | 75 |
 | stage-cursor-extraction | s a b v c | 6f/0d | 1 · ≤0d | 20s clean | 75 |
 | stage-economics-report | s a b v c | 1f/0d | 1 · ≤0d | 20s clean | 75 |
+| derivation-by-precedent | s a b v c | 1f/1d | 3 · ≤0d | 20s clean | 75 |

@@ -232,7 +232,10 @@
 
 - **resume-journal-done-marker-compliance** [needs-spec] — stage-session agents
   complete without appending the spec-mandated resume-journal `DONE` marker
-  (2 of 3 this iteration: align, validate), so the
+  (2 of 3 on stage-economics-report: align, validate; then 2 of 2 on
+  derivation-by-precedent: build, validate — 4 of 5 across two iterations, a
+  pattern rather than a fluke, and the recurrence is what lifts this from
+  anecdote to a standing false invariant), so the
   delegation-kit/SPEC.md §Resume journal invariant "a journal present without
   `DONE` = interrupted, resume from it" **false-reads a completed run as
   interrupted**. Found 2026-07-18 checking the journals during the operator's
@@ -249,10 +252,14 @@
   finding and by that seam belonged in the gap inbox, not the kfric log where it
   was first stamped — same Deferred destination, and the mis-stamp is itself a
   data point for `kfric-trigger-prior-artifact-consultation`'s seam-clarity.
-  **Cost while deferred:** low but real — recovery cannot trust journal presence
-  alone while the invariant is silently false; a genuinely interrupted
-  lead-dispatched stage and a cleanly-completed one are indistinguishable by the
-  marker the SPEC says distinguishes them.
+  **Cost while deferred:** low but real, and now recurring — recovery cannot
+  trust journal presence alone while the invariant is silently false; a
+  genuinely interrupted lead-dispatched stage and a cleanly-completed one are
+  indistinguishable by the marker the SPEC says distinguishes them. Each
+  omission costs a supervisor either a re-run of finished work or the deletion
+  of an interrupted unit's only recovery record; both iterations so far were
+  rescued by the lead verifying completeness out of band, which is precisely
+  the manual step the marker exists to retire.
 
 - **stage-economics-smoke-jq-arm-dormant** [needs-spec] — drift-kit's smoke
   asserts the jq-absent degradation of `bin/stage-economics.sh`, but the
@@ -332,10 +339,50 @@
   Surfaced 2026-07-19 alongside `economics-budget-pct-decouple` at the operator's
   direction.
 
-## Done
+- **hermetic-bin-roster-config** [needs-spec] — `check-test-hermetic` assertion
+  B catches *partial* credential pinning but not *absent* pinning. B arms only
+  when the smoke script itself contains a `*_CRED_FILE=` assignment, so a smoke
+  script that calls a credential-consuming own-kit bin and pins nothing at all
+  is never flagged. The narrow trigger was deliberate and correct — an
+  unconditional every-own-bin-call-must-pin rule false-positives across the
+  credential-free kits — so the hole is a known limit of the trigger, not a bug
+  in it.
+  **Design question (why deferred, not a build fix):** closing it needs a
+  per-kit roster of credential-consuming bins, and that roster is exactly the
+  content the provenance seam keeps out of a kit — it is optional consumer
+  config (the `check-graph` / `scripts/graph-vocab.sh` pattern), never a
+  gate-sdk literal. So the deliverable is a config seam and its fall-open
+  default, an align-shaped design pass rather than an assertion tweak.
+  **Cost while deferred:** low and bounded — the gate still catches the partial
+  case that actually regressed here; the uncovered case is a kit shipping a
+  credential-consuming smoke with no pin at all, which no kit does today.
+  Cost to close: roughly one iteration. Surfaced 2026-07-19 by the validate
+  re-entry on `derivation-by-precedent`, downstream of that iteration's
+  operator-authorized hermeticity fix rather than of its precedent-doctrine
+  envelope.
 
-- kfric-trigger-prior-artifact-consultation
-- release-note-chrome-ownership
-- release-note-section-taxonomy
+- **smoke-exit-code-assertion-honesty** [needs-spec] — `delegation-kit/smoke/install.sh:21`
+  asserts less than its message claims. The `if` guard fails only on exit 0, so
+  it accepts PAUSE (exit 1) and STALE (exit 2) alike, while the error text says
+  "usage-verdict did not PAUSE on a live 95% reading". Exit semantics confirmed
+  in `delegation-kit/bin/usage-verdict.sh` (0 OK/RESET-OK, 1 PAUSE, 2
+  STALE-or-unreadable). Pre-existing and unchanged by the hermeticity fix: the
+  cred pin landed there makes a STALE far less likely but does not make the
+  assertion honest, so a future STALE regression would still pass this smoke
+  silently.
+  **Design question (why deferred, not fixed at close):** the fix itself is a
+  one-line condition change plus a smoke re-run, well under an hour — but the
+  class is not one script. An assertion whose guard is weaker than its message
+  is a gateable shape, and filing it as a build unit lets the fix and the
+  scanner that catches the class land together per Enforcement-first, rather
+  than landing a silent one-line correction in a close stage after validate has
+  already signed the tree.
+  **Cost while deferred:** low — one smoke assertion is weaker than it reads,
+  in a kit whose other assertions are honest; the risk is a masked STALE
+  regression, not a false green today. Surfaced 2026-07-19 by the validate
+  re-entry on `derivation-by-precedent`, the same
+  operator-authorized-hermeticity-fix thread as `hermetic-bin-roster-config`.
+
+## Done
 
 ## Lessons Learned

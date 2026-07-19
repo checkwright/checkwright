@@ -86,6 +86,17 @@ reach-through, not a change to this protocol; every rule below still applies.
   window-expensive than its
   subagent-token total suggests, so size waves to leave the next one headroom, or
   accept one wave per window.
+  **Do not read live budget off the statusline while parked on a dispatch.**
+  Observed: the harness statusline does not refresh while the main session waits
+  on a background agent's completion notification, so its displayed budget
+  freezes for the length of the dispatch — the longer the unit, the staler the
+  number. Poll `usage-verdict.sh` externally when you need a live reading
+  mid-dispatch (`watch -n 30 bash delegation-kit/bin/usage-verdict.sh`); this is
+  the one sanctioned poll and it does not weaken the never-poll rule above,
+  which governs waiting for *completion*. Enforcement is unaffected either way:
+  the per-dispatch budget check reads a fresh verdict at dispatch time, so a
+  pause/proceed decision is never made off the frozen display — only passive
+  display is stale.
 - **Match the dispatched model and effort to the unit's shape.** Delegation
   levers tokens only when selection follows the work: a read-heavy or mechanical
   unit (audit, survey, rename/merge sweep) rides a cheaper model class via the
