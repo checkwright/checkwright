@@ -12,24 +12,6 @@
 
 ## New Features
 
-- **resume-journal-done-marker-compliance** [spec: SPEC-resume-journal-done-marker-compliance.md] —
-  rescope the resume-journal recovery contract so the `DONE`-absence clause stops
-  false-reading a completed run as interrupted (agents routinely finish without
-  appending `DONE`). The corrected contract keys the recovery signal on whether
-  the **supervisor consumed the agent's return** (delegation-kit's own
-  supervisor/agent vocabulary, not lifecycle terms): return consumed + the
-  supervisor's post-commit verification *is* the recovery contract (`DONE`
-  redundant), and the "no-`DONE` = interrupted" reading scopes to the **cold
-  journal read** where the return was not consumed (background/crash/timeout).
-  Rescoping-only — operator ruled plain (b): does **not** enforce the marker and
-  does **not** mechanize the manual verification into a gate (that follow-up is
-  filed at close if the manual step is judged worth retiring). Edit surface:
-  `delegation-kit/SPEC.md` §Resume journal (the `DONE`-absence clause),
-  `delegation-kit/templates/agent-execution.md` (the operational restatement), and
-  the regenerated `docs/delegation-kit/SPEC.md` mirror
-  (`gen-docs-mirror.sh --write`; `check-docs-mirror-fresh` byte-gates).
-  Single-component (delegation-kit).
-
 ## Technical Debt
 
 ## Deferred
@@ -446,5 +428,6 @@
 ## Done
 
 - economics-budget-pct-decouple
+- resume-journal-done-marker-compliance
 
 ## Lessons Learned

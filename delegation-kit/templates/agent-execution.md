@@ -50,8 +50,12 @@ reach-through, not a change to this protocol; every rule below still applies.
   output": the agent's return message dies with the session, so a pointer-only
   journal makes `DONE` lie about recoverability. **Agents have no `rm`, so the
   supervisor deletes the journal at the post-commit validation checkpoint.** A
-  journal still present *without* a `DONE` marker means that unit was
-  interrupted — resume from it. **Caveat — a background agent's sandbox may block
+  journal *without* a `DONE` marker signals interruption only in a **cold read**
+  — the supervisor found a journal but never consumed the agent's return (its
+  session died before returning); there, no `DONE` = interrupted, resume from
+  it. On the ordinary path the supervisor consumed the return and ran its
+  post-commit verification, which *is* the completion attest, so the missing
+  marker is redundant, not a signal of interruption. **Caveat — a background agent's sandbox may block
   the journal write.** `run_in_background` agents have been observed unable to
   `Write` to the granted path and silently falling back to returning findings in
   their final message — which makes the journal mechanic non-functional exactly

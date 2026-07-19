@@ -146,8 +146,19 @@ goes; on success it appends a `DONE` marker. Each finding lands in the journal *
 confirmed* — never "see final output": the agent's return message dies with
 the session, so a pointer-only journal makes `DONE` lie about
 recoverability. Agents have no `rm`; the supervisor deletes the journal at
-the post-commit validation checkpoint. A journal present *without* `DONE`
-means that unit was interrupted — resume from it.
+the post-commit validation checkpoint. Whether a journal *without* `DONE`
+signals interruption turns on whether the supervisor consumed the agent's
+return. On the ordinary completion path the supervisor received the return and
+ran its post-commit verification (§Validate after every agent commit); that
+return plus the verification *is* the recovery contract, attesting completion
+directly, so the `DONE` marker is redundant and a journal without it does
+**not** imply interruption. Only in a **cold read** — the supervisor finds a
+journal but never consumed a return, the agent's session having died before
+returning (a background sandbox died, a crash, a timeout) — is the marker the
+sole signal, and there the original reading holds: no `DONE` = interrupted,
+resume from it. The inline-findings rule above is exactly that cold arm's
+insurance — with no surviving return, a pointer-only journal would make a
+would-be `DONE` lie about recoverability.
 
 **Caveat — the sandbox may block the journal write.** Background agents
 have been observed unable to `Write` to the granted path, silently falling
