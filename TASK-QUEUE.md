@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: derivation-by-precedent
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -11,6 +11,31 @@
 ---
 
 ## New Features
+
+- **kfric-trigger-prior-artifact-consultation** [spec: SPEC-kfric-trigger-prior-artifact.md]
+  — broaden the knowledge-friction capture cue (drift-kit/SPEC.md §The
+  knowledge-friction loop step 1, and the always-loaded CLAUDE.md kfric bullet) to
+  name prior-artifact / sibling-deliverable consultation as a stampable non-owning
+  surface, so derivation-by-precedent self-reports instead of staying invisible to
+  every content gate. The methodology-level generalization of the two release-note
+  units below. Cue-broadening envelope and the reinforced channel seam (work-shaped
+  "should be owned/generated" → gap inbox, not kfric) are ruled in the amendment.
+
+- **release-note-chrome-ownership** [spec: SPEC-release-note-chrome-ownership.md] —
+  give the release note's fixed chrome (the reserved opener sentence + the closing
+  "Upgrading" paragraph) one owning surface: inline it into RELEASING.md step 1 as
+  the single source with an "author from this skeleton, never copy a prior post"
+  instruction, so the chrome stops propagating by precedent. The freshness-gated
+  skeleton alternative is ruled out (disproportionate against immutable dated
+  posts); rationale preserved in the amendment.
+
+- **release-note-section-taxonomy** [spec: SPEC-release-note-section-taxonomy.md] —
+  reconcile the note's three sections to docs/install.md §The upgrade contract's
+  four residue classes: express a knob removal as `old → ∅` under Renamed knobs
+  (same residue class, floors to minor via the existing bullet count, no gate
+  change) and state the four-classes → three-sections mapping (copied-out-template
+  residue stays behavior-folded into Behavior changes). No new section, no
+  check-release-bump change; the two ruled edges are in the amendment.
 
 ## Technical Debt
 
@@ -229,86 +254,6 @@
   is the budget-oracle prerequisite cluster heterogeneous-agent-delegation
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
-
-- **release-note-chrome-ownership** [needs-spec] — the release note's fixed
-  chrome — the opening reserved-phrasing sentence and the whole closing
-  "Upgrading" paragraph (the "mechanical allowed-red set" / "open an issue …
-  a defect in the release rather than work for you" boilerplate) — has **no
-  owning surface**. RELEASING.md step 1 owns only the three *variable* sections
-  (grammar in docs/install.md §The upgrade contract, floor-gated by
-  `check-release-bump`) and names the reserved opener phrase, but hands the
-  author no skeleton for the fixed chrome. So each note's chrome propagates by
-  **copying the previous post** — the derivation-by-precedent the
-  de-literalization / derivation-first doctrine rules out, and it passes every
-  content gate byte-identically to a derived note (a correctness gate cannot see
-  the derivation path). Found 2026-07-18 when the operator eyeballed the v0.6.0
-  note and named the smell; the always-loaded lead validation (battery + git
-  log/status) verifies the artifact, never how it was derived, so nothing caught
-  it. Fix options: (a) a spec-owned note skeleton (a `docs/posts/` template with
-  slot markers for the three sections, named by RELEASING.md step 1 and
-  freshness-gated so the boilerplate cannot drift — the derivation-first move
-  that turns an ungated maintained-copy into a gated generated one); (b) inline
-  the canonical closing paragraph into RELEASING.md as the single source plus an
-  explicit "author from grammar + skeleton, never copy a prior post."
-  **Cost while deferred:** low, non-rotting — notes are dated immutable
-  artifacts and the load-bearing *structure* is already gated; the cost is the
-  per-release imitation and its doctrine-smell, one more copied note each
-  release until owned.
-
-- **kfric-trigger-prior-artifact-consultation** [needs-spec] — the knowledge-
-  friction trigger roster (drift-kit/SPEC.md §The knowledge-friction loop) cues
-  capture on "an implementation, a gate's source, a commit message" — a
-  *non-owning surface* — but does **not** name **consulting a prior/sibling
-  deliverable to derive a new one** (reading the last release note to author the
-  next; copying a prior SPEC's structure). That is the same doctrine failure as
-  re-deriving off an implementation, but the roster's examples do not cue it, so
-  precedent-imitation self-reports nowhere and stays invisible to every content
-  gate. This is the methodology-level generalization of
-  `release-note-chrome-ownership`: that entry owns one artifact's chrome; this
-  entry makes precedent-imitation *recognizable* everywhere. Fix: broaden the
-  §The knowledge-friction loop capture roster (and the always-loaded CLAUDE.md
-  kfric bullet if its wording narrows the cue) to name prior-artifact / sibling-
-  deliverable consultation as a stampable non-owning surface. **Watch the seam:**
-  the loop's §Seam already routes *work-shaped* findings to the gap inbox, not
-  kfric — a "this artifact should be owned/generated" conclusion is work-shaped
-  and belongs in the gap inbox; kfric stays the sensor for the *fact* re-derived.
-  The broadening is a cue for the fact-channel, not a licence to overload it.
-  Found 2026-07-18 alongside the chrome finding. **Cost while deferred:** the
-  highest-leverage of this cluster while unfixed — derivation-by-precedent
-  remains structurally invisible across all authored artifacts, caught only by a
-  human eye, the exact failure mode the methodology exists to remove.
-
-- **release-note-section-taxonomy** [needs-spec] — the three release-note
-  sections (Tightened gates / Renamed knobs / Behavior changes) are the
-  *consumer's reconciliation checklist for residue wholesale-sync + battery
-  cannot mechanically surface* (docs/install.md §The upgrade contract names four
-  residue classes: shadowed gates, copied-out templates, own-config knob
-  renames, depended-on behavior). Under that lens the current narrowness is
-  mostly principled — "Tightened gates" (not "gate changes") is correct because
-  only new/stricter gates can red a clean tree; a relaxed/removed gate reds
-  nobody and is off the allowed-red worklist by design — but two real edges are
-  under-covered: **(1) knob *removal* / orphaned config.** `old → ∅` silently
-  orphans consumer config exactly as a rename does, but is not a rename and may
-  red no gate — no clean section home. **(2) four residue classes, three
-  sections.** "templates you have copied out" is a *named* residue class with no
-  dedicated section, folded implicitly into Behavior changes — the section set
-  is imperfectly aligned to its own stated model. Scope: review the section
-  taxonomy against §The upgrade contract's four residue classes; decide whether
-  knob-removal earns explicit treatment (a Renamed knobs `old → ∅` form, or a
-  Removed knobs line) and whether copied-out-template residue earns a home or is
-  deliberately behavior-folded — then reconcile the grammar owner and
-  `check-release-bump`. Surfaced 2026-07-18 in the operator's v0.6.0 note review.
-  **Cost while deferred:** low and non-rotting — a knob removal today lands under
-  Behavior changes by author judgment (reconciled by reading, not silently
-  dropped), so the residue is stated; the cost is a checklist axis that is
-  sharper in principle than in the current section set.
-  **Observed 2026-07-18 (stage-economics-report close):** the first live instance
-  of the wider distinction this entry circles. A purely additive consumer-facing
-  feature (drift-kit's new stage-economics tool plus its `/economics` command)
-  produced an all-None note and therefore no release-line visibility at all —
-  correct under the contract (the note is a residue-reconciliation checklist, not
-  a changelog), but the cost is now observed rather than theoretical: a feature a
-  reader would call user-facing is invisible on the release line by design.
 
 - **resume-journal-done-marker-compliance** [needs-spec] — stage-session agents
   complete without appending the spec-mandated resume-journal `DONE` marker
