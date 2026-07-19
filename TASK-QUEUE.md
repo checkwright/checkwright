@@ -383,6 +383,35 @@
   re-entry on `derivation-by-precedent`, the same
   operator-authorized-hermeticity-fix thread as `hermetic-bin-roster-config`.
 
+- **release-body-url-form** [needs-spec] — the `v0.6.0` GitHub Release body links
+  `https://checkwright.dev/posts/2026-07-18-checkwright-v0-6-0/` **with a trailing
+  slash, which 404s** — the site serves posts without one. Confirmed 2026-07-19:
+  the no-slash form returns 200, and `v0.4.0`/`v0.5.0` both use the correct form,
+  so this is a one-off regression in the most recent release rather than a
+  long-standing convention error. `v0.7.0` hit the same trap while being cut and
+  was corrected before this entry was filed, which is the evidence that the trap
+  is live rather than historical.
+  **Two deliverables:** (a) repair the `v0.6.0` body — a one-line `gh release
+  edit`, deliberately *not* done while closing `derivation-by-precedent` because
+  editing a previously published release is outside that iteration's envelope and
+  the envelope had already been widened once by ruling; (b) pin the URL form in
+  RELEASING.md step 5, which today says only that the body "points at the post's
+  `https://checkwright.dev/` URL" and never states the no-slash form — the
+  ambiguity is what both slips came through.
+  **Gap generalization — why no gate.** A release body lives on the host, not in
+  the tree, so the battery cannot reach it; and the link is an external URL whose
+  liveness reds on causes no commit produced, which site-kit/SPEC.md §The monitor
+  boundary already rules out of gate shape on the low-false-positive contract. So
+  the durable form is **monitor-shaped, not gate-shaped** — the same disposition
+  and the same reasoning as `rendered-site-link-monitor`, over a different surface
+  (links *in release bodies pointing at* the site, versus links *on* the rendered
+  site). Promote the two together if either earns automation; pinning the form in
+  the runbook is the cheap half and stands alone.
+  **Cost while deferred:** one dead link in one published release body, plus a
+  recurring per-release chance of repeating it until the runbook pins the form.
+  Surfaced 2026-07-19 by the close-stage release step for `derivation-by-precedent`,
+  verifying that the URL its own release body advertises actually resolves.
+
 ## Done
 
 ## Lessons Learned
