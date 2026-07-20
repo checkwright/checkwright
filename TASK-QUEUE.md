@@ -151,6 +151,57 @@
   Debt: latent policy with no owner doc.
   Filed 2026-07-20 by lead while ruling on the active-section question.
 
+- **close-triage-surface-roster** [needs-spec] — close's inbound triage
+  surfaces are enumerated only as prose in a template placeholder
+  (`lifecycle-kit/templates/skills/close.md`, the housekeeping step: deprecation
+  scan, gate-runtime budget check, backlog-aging review, tooling-friction
+  triage). Nothing derives that list and nothing notices a surface close never
+  read. Today they are `gap-inbox.md`, `knowledge-friction.log`,
+  `prompt-friction.log`, the queue's Lessons section, and `essay-harvest.md` —
+  and **only the gap inbox has a structural forcing function**, the
+  `enter-stage` boundary refusal. The other four depend on close remembering
+  them, so adding a sixth inbox is the dangerous act: it fails silently and
+  forever. Direction: derive the roster (derivation-first — a roster is never
+  maintained by hand), and give each surface either a forcing function or an
+  explicit advisory-only marking, so "close did not read this" is a
+  distinguishable state rather than an invisible one.
+  **Cost while deferred:** unbounded and undetectable — a surface silently
+  skipped leaves no trace anywhere in the tree.
+  Debt: converges existing mechanism onto a derived roster, adds no capability.
+  Filed 2026-07-20 by lead, from a review of the workflow-directory surfaces.
+
+- **workflow-file-format-convention** [needs-spec] — `.workflow/` carries three
+  extensions with no stated rule for choosing one, and the apparent convention
+  does not survive inspection. The tidy reading — `.txt` for gate-read line
+  records, `.md` for prose, `.log` for tool-appended events — breaks on
+  `gap-inbox.md` versus `knowledge-friction.log`: both are appended by a `bin/`
+  affordance one dated record at a time, differing in drain semantics and merge
+  attributes, neither of which the extension tracks. So the extension encodes
+  nothing reliable, and a new file's extension is a coin flip.
+  **Second defect, concrete:** `prompt-friction.log` carries no `# contract:`
+  header, alone among the ten non-empty files, so nothing names its owner,
+  grammar, or reclaim path. Direction: state the rule in the owning SPEC keyed
+  on a real property (gated-vs-advisory, or drained-vs-accumulating), rename to
+  match, and gate the contract-header requirement — the header is already
+  universal in practice, which makes it cheap to enforce and cheap to lose.
+  Debt: a naming convention with no owner doc plus one missing header.
+  Filed 2026-07-20 by lead, same workflow-directory review.
+
+- **friction-log-merge** [needs-spec] — `knowledge-friction.log` and
+  `prompt-friction.log` are the same surface twice: each is appended by a
+  capture affordance one line per event, each is triaged at the same close step,
+  each is metered as an advisory KPI rather than gated, and they differ only in
+  which *kind* of friction they record — which a type field carries. Merging
+  them behind one log with a type column halves close's inbox count and gives
+  the two frictions a single trend line, which is also the more honest read:
+  they compete for the same triage attention and are currently ranked against
+  each other by nothing.
+  **Sequencing:** land after `close-triage-surface-roster`, which will show
+  whether the merge actually reduces what close must remember or merely moves
+  it. Merging first risks optimising a count that the roster work reframes.
+  Debt: consolidates two shipped surfaces, adds no capability.
+  Filed 2026-07-20 by lead; ranked third of the workflow-directory findings.
+
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
