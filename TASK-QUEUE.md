@@ -530,6 +530,52 @@
   as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
   lead instruction.
 
+- **release-disposition-deferred-value** [needs-spec] — the release-disposition
+  grammar is `<iteration> release <version|none> — <basis>`, and **neither value
+  expresses "qualified but deferred"**: a release the criteria plainly earn,
+  which an operator ruling holds back. `verdict-reader-honesty` hit exactly that
+  and stamped `none` with the criteria spelled out in the basis prose — an
+  overload the grammar does not define, landed by operator ruling with the
+  caveat on record.
+  **What the overload actually costs — three things, worst first.**
+  (1) *The earned criteria are carried by memory alone.* This iteration's
+  Tightened-gates and Behavior-changes entries still floor the **next**
+  qualifying release to minor, and nothing mechanically carries them there.
+  `scripts/check-release-bump.sh` couples `docs/posts/*.md` and
+  `docs/install.md` only — it **never reads
+  `.workflow/release-disposition.txt`** — so a later release note that omits the
+  deferred criteria reds nothing, and the gate that exists to hold the bump
+  floor cannot see the floor it should be holding.
+  (2) *The evidence file loses a distinction it used to carry.* Before this,
+  `none` meant "nothing to release"; it now also means "release earned, held
+  back". Any reader or future derivation over the file must parse basis prose to
+  tell the two apart, which is exactly the de-literalization the repo otherwise
+  refuses.
+  (3) *Recurrence re-litigates the call.* The next collision re-derives the
+  three options and the grammar question from scratch, as this close did.
+  **Design question (why [needs-spec], not a one-line grammar edit).** The token
+  is the easy half — `deferred:vX.Y.Z`, or `deferred` with the criteria as
+  structured fields. The real design is the **carry-forward mechanism**, and it
+  splits across the provenance seam: the disposition *grammar* is generic
+  lifecycle-kit mechanism (lifecycle-kit/SPEC.md §bin/enter-stage.sh owns the
+  line shape), while the *bump criteria* to be carried are this consumer's
+  release policy (docs/install.md §Versioning, RELEASING.md). So the shape is a
+  kit-side third value plus a consumer-side rule that the next qualifying note
+  inherits any outstanding deferred criteria — with `check-release-bump` widened
+  to read the disposition file so the inheritance is gated rather than
+  remembered. Whether that widening stays low-false-positive is the open work;
+  if it does not, the honest outcome is a defined token with the carry-forward
+  left explicitly manual, recorded as such.
+  **Cost while deferred:** moderate, and it has a live carrier — this
+  iteration's unconsumed minor criteria. Until this lands, the next qualifying
+  release depends on someone reading a basis line in a boundary-truncated
+  evidence file; the truncation is the sharp edge, since the disposition file is
+  in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` and the carrying line does not survive
+  many boundaries. Cost to close: under one iteration for the token and the
+  SPEC/RELEASING wording, roughly one with the gate widening. Filed 2026-07-20
+  by the `verdict-reader-honesty` close, by operator ruling — attested by a real
+  collision rather than anticipated.
+
 ## Done
 
 ## Lessons Learned

@@ -2,3 +2,5 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none> — <one-line basis>
 
+verdict-reader-honesty release none — deferred by operator ruling, not unearned: the minor criteria ARE met (Tightened gates: check-assertion-strength landed new and registered; Behavior changes: the STALE verdict string gained its decision consequence, and agent-budget-guard.sh lost its `2)` arm in both copies), Renamed knobs None, no decommission. The operator ruled this iteration's unit set rather than a release, so nothing outward-facing left the machine — no tag, no GitHub Release. These criteria are unconsumed and must be carried into the next qualifying release's note, whose bump they still floor to minor. `none` is overloaded here beyond the grammar's <version|none>; the durable third value is filed as release-disposition-deferred-value.
+
