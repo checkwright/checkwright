@@ -36,6 +36,7 @@ an engineering-craft section behind the link:
 - **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
 - **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
 - **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
+- **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope.
 EOF
 }
 

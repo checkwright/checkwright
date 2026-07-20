@@ -199,9 +199,33 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) for
    fact gaps.
 
+11. **Scope-gated intake.** Delivery work enters only through the scope gate. A
+   new initiative raised mid-session — an operator or lead feature request, a
+   design idea, a "while we're here" — is *filed* as a costed Deferred entry by
+   default, never *started*: it becomes active work only by passing through scope
+   as an iteration's chosen unit. The default is file, not act, because starting
+   unscoped work skips the survey, the economic composition test, and the
+   feature/debt triage scope exists to run. This is Gap disposition's
+   intake-side sibling, guarding the *opposite* failure: that rule catches a gap
+   flagged and skipped (under-action on something found), this one catches a want
+   acted on before it is scoped (over-action on something raised). The rule
+   licenses no self-exemption — editing a governance surface is itself delivery
+   work, so codifying or amending this doctrine is done as a scoped unit, not the
+   very out-of-band edit it forbids.
+   *Under agent work:* an eager context reads a raised want as an instruction to
+   act *now* and will start building it in-session, bypassing scope entirely; the
+   default-to-file reflex is the one a fresh window least reliably supplies, so it
+   is stated rather than assumed.
+   *Enforced by:* judgment with a capture mechanism, not a gate — whether a raised
+   want should have been filed rather than started is not machine-decidable (the
+   Enforcement-first false-positive carve-out, on Gap disposition's model). The
+   intake it names is scope's — the survey that bounds an iteration's units
+   ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The state machine) — and the
+   filed form rides the queue's Deferred section.
+
 ## Engineering-craft rules
 
-11. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
+12. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
    that invariant in its *name*; the SPEC's test-requirement section owns which
    invariants a test must cover. A spec-clause *comment* on the test is not a
    substitute — it duplicates what the name should carry and rots silently when
@@ -215,7 +239,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    carry the invariant.
    *Stages:* build, validate
 
-12. **Test from the real consumer's runtime.** Verify a contract from the runtime
+13. **Test from the real consumer's runtime.** Verify a contract from the runtime
    of its real consumer, never a more lenient stand-in; a failure at a higher
    test layer with no failing test at the layer below is a coverage gap in the
    lower layer, closed there first.
@@ -228,7 +252,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    baseline turns a dropped layer into a red validate.
    *Stages:* build, validate
 
-13. **Inspectable-run discipline.** A component a test or an automation spawns
+14. **Inspectable-run discipline.** A component a test or an automation spawns
     must emit a readable log to an inspectable path — never a muted sink; on a
     failure, read that evidence before theorizing. A run you cannot inspect
     barely beats a guess.
@@ -241,7 +265,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     trusting its self-report.
     *Stages:* build, validate
 
-14. **Rename is a full-surface sweep.** A rename sweeps every surface in
+15. **Rename is a full-surface sweep.** A rename sweeps every surface in
     lockstep — prose, fixtures, and docs, not only the compiler-checked
     identifiers; the done-gate is a text-level completeness check, not the
     type-checker, and an in-progress rename is verified by a completeness scan
@@ -256,7 +280,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     vocabulary stays with the consumer.
     *Stages:* build
 
-15. **Config edits are merges, not rewrites.** Edit a config or settings file
+16. **Config edits are merges, not rewrites.** Edit a config or settings file
     with targeted, string-scoped edits, never a full-file write reconstructed
     from a partial read — a whole-file write built from part of the file
     silently drops everything the write did not carry. And validate an
@@ -273,7 +297,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     gate asserts a given edit was a merge rather than a rewrite.
     *Stages:* build
 
-16. **Re-verify volatile state before a git history rewrite.** Verify HEAD
+17. **Re-verify volatile state before a git history rewrite.** Verify HEAD
     (`git log --oneline -3`) before an amend or squash; after a `git reset
     --soft`, re-stage and verify the staged content (`git show :<path>`) before
     committing — the soft reset keeps the old index snapshot; write any `git
@@ -291,7 +315,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     because each command is legitimate.
     *Stages:* build, close
 
-17. **Entering another repo's tree, read its governance first.** A cross-repo
+18. **Entering another repo's tree, read its governance first.** A cross-repo
     edit re-reads that repo's agent file and README and checks its branch
     freshness every time — a second repo's model drifts independently of this
     one's, so a remembered version of its rules is a stale premise.
@@ -303,7 +327,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     governance was reread.
     *Stages:* build
 
-18. **Naming: drop the qualifier the context supplies — only when every consumer
+19. **Naming: drop the qualifier the context supplies — only when every consumer
     has that context.** A name that travels into a flat namespace keeps its
     qualifier; default to the shorter form and reject the vacuous one, but a
     name that loses the context which disambiguated it must carry the qualifier
@@ -318,7 +342,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     is its written form.
     *Stages:* scope, build
 
-19. **Reuse a co-located consumer's data before designing a new path.** For an
+20. **Reuse a co-located consumer's data before designing a new path.** For an
     embedded or co-located actor, first ask whether it can read a co-located
     consumer's already-fetched data before minting a new stream, grant, or
     fetch — a "which path" framing can hide a "no path needed" answer.
@@ -331,7 +355,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     reaching for an existing owner before minting a second source.
     *Stages:* scope, build
 
-20. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
+21. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
     gate that finds a silent drop has found either dead config to remove *or*
     promised-but-unwired config to build — one signature, opposite fixes; only
     the owning SPEC distinguishes them, so verify intent against the SPEC before
@@ -347,7 +371,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     never which way it should be closed.
     *Stages:* build
 
-21. **Quiet green, loud red.** A batch runner's success is one summary line
+22. **Quiet green, loud red.** A batch runner's success is one summary line
     carrying its scope counts (the count doubling as the roster-collapse
     tripwire); failure output is verbatim and never quiets. Per-item success
     banners are an opt-in reading, not the default — the red path is the
