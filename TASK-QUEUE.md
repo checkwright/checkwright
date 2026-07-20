@@ -81,6 +81,62 @@
   accounting, adds no governed name. Filed 2026-07-20 by lead economics review
   during the `render-fidelity-leak-coverage` close.
 
+- **close-capture-filing-destination** [needs-spec] — `close.md` names a filing
+  destination only for the gap-inbox drain (step 2, "file a deferred entry").
+  Its step-3 housekeeping sweeps and any dispatch-supplied findings name none,
+  so a close session capturing findings has no stated home and the first
+  correcting signal is a red `check-stage-entry`. Add one filing-destination
+  rule covering every capture close makes — the active sections are scope's to
+  populate, close's own filings go to `Deferred` — sited where both `close.md`
+  and a lead authoring a dispatch will read it.
+  **Observed twice:** a close session mis-filed into the active sections off a
+  dispatch that said "capture as debt", and the lead later stranded two bullets
+  in the gap inbox after close had already drained it (below).
+  Debt: the rule is already enforced; only its statement is missing.
+  Filed 2026-07-20 by lead, drained from the gap inbox after the close stage.
+
+- **enter-stage-simulate-writes** [needs-spec] — `enter-stage.sh --simulate`
+  honours the flag on its *refusal* paths but not on its success path: a
+  simulated iteration-boundary entry performed the real reset — truncated and
+  stamped `.workflow/WORKFLOW-STATE.txt`, rewrote the queue's `## Iteration:`
+  header, and boundary-truncated `lesson-evidence.txt`, `validate-evidence.txt`
+  and `release-disposition.txt`. Reproduced live: the refusal printed the
+  `(simulate)` marker and wrote nothing; the success run printed `stamped` and
+  wrote everything. A dry-run flag that is load-bearing on one branch and inert
+  on the other is worse than no flag — it is trusted exactly where it fails.
+  Fix: gate every write behind the flag, and add a fixture asserting the tree is
+  byte-identical after a simulated successful entry. Consider printing the
+  `(simulate)` marker unconditionally so an honoured flag is visible in output.
+  **Cost while deferred:** any caller probing whether a boundary is clear mutates
+  the boundary it is probing; recovery needs an out-of-band `git checkout`, and
+  on an unclean tree the damage is not separable.
+  Debt: a dry-run contract violation in shipped mechanism.
+  Filed 2026-07-20 by lead after triggering it while probing the gap-inbox block.
+
+- **gap-inbox-post-close-window** [needs-spec] — the gap inbox is drained by
+  `close` and refuses the next iteration-boundary `scope` entry while non-empty
+  (`enter-stage.sh`), which assumes every bullet is filed *during* an iteration.
+  A bullet filed after that iteration's close has no drainer left in the state
+  machine: the next `scope` is refused and only an out-of-band edit clears it.
+  Either `file-gap.sh` should refuse (or warn) when the current stamp is already
+  `close`, or `enter-stage` should distinguish a stranded bullet from an
+  untriaged one. Reproduced live: `enter-stage.sh scope --simulate` refused on
+  two post-close filings.
+  Debt: a real boundary hazard in shipped mechanism, not a new capability.
+  Filed 2026-07-20 by lead, drained from the gap inbox.
+
+- **queue-selection-order-implicit** [needs-spec] — `queue-kit/SPEC.md`
+  documents section order as selection order, so the default section sequence
+  silently makes `New Features` outrank `Technical Debt` in what scope picks
+  first. Unlike the spec-tag requirement that `CANON_KIT_FEATURE_SECTIONS`
+  places on `New Features` alone, which is principled and argued, this ordering
+  policy is embedded in section sequence with no stated argument anywhere.
+  Either state the argument or make selection order explicit rather than
+  positional. Surfaced while ruling on whether the two active sections should
+  collapse into one — they should not, but this rides along on their sequence.
+  Debt: latent policy with no owner doc.
+  Filed 2026-07-20 by lead while ruling on the active-section question.
+
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
