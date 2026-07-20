@@ -79,32 +79,56 @@ fixture point all three at a synthetic tree without touching consumer config.
 ## check-docs-render-fidelity
 
 Invariant: every tracked markdown page under `SITE_KIT_DOCS_DIR`, rendered
-through the pinned Pages parser, leaks no code-fence marker into rendered text,
-promotes no code-fenced line into a heading, and renders no fewer tables than
-its source GFM table starts. GitHub Pages renders through
-kramdown's GFM parser, which diverges from github.com's cmark: consecutive
-fenced blocks inside one list item corrupt the page — the second fence prints
-literally and a `#`-leading skeleton line becomes a heading — so a tree that
-reads green on github.com can ship a garbled Pages site with no gate in the
-path. This gate is the faithful-artifact-verification class mechanized for that
-artifact: it renders the real output and asserts the observed leakage class,
-rather than trusting the source. A second instance of the same class: an inline
-code span that wraps across a line break whose continuation begins with a
-block-level or generic XML tag, which kramdown — parsing blocks before spans —
-treats as the start of an HTML block, severing the span so it emits raw HTML
-that swallows the rest of the page (`gettalong/kramdown#843`, closed
-works-as-designed: a documented, permanent divergence, not a pending fix), which
-is exactly why this gate is a standing defense rather than a stopgap.
+through the pinned Pages parser, leaks no code-span corruption symptom into
+rendered text — neither a literal backtick nor a raw non-HTML-element tag
+surviving outside a code context — promotes no code-fenced line into a heading,
+and renders no fewer tables than its source GFM table starts. GitHub Pages
+renders through kramdown's GFM parser, which diverges from github.com's cmark:
+consecutive fenced blocks inside one list item corrupt the page — the second
+fence prints literally and a `#`-leading skeleton line becomes a heading — so a
+tree that reads green on github.com can ship a garbled Pages site with no gate in
+the path. This gate is the faithful-artifact-verification class mechanized for
+that artifact: it renders the real output and asserts the observed leakage class,
+rather than trusting the source.
+
+The leakage class has more than one root cause, and the assertion keys on the
+**shared symptom** rather than on any single cause — one low-false-positive
+assertion covering every shape that leaves the same signature. The causes
+observed on this tree: (1) a code span that wraps across a line break whose
+continuation begins with a block-level or generic XML tag; (2) a single-line code
+span whose embedded angle-bracket token (a placeholder such as `<verdict>` or
+`<n>`) is consumed as a raw HTML span before the span can close, no line break
+involved; (3) a code span nesting escaped backticks alongside such a token. All
+three are the same kramdown behavior — parsing blocks before spans, it treats the
+angle-bracket token as the start of an HTML block, severing the span so it emits
+raw HTML that swallows the rest of the page (`gettalong/kramdown#843`, closed
+works-as-designed: a documented, permanent divergence, not a pending fix). A
+severed span never forms the closing fence run, so it leaves not a multi-backtick
+marker but a **single** stray backtick and a **raw placeholder tag** in the
+rendered text — which is exactly the symptom the assertion keys on, so the gate is
+a standing defense against the whole class rather than a stopgap against one
+backtick-fence shape of it.
 
 The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
 `git ls-files` (every underscore-prefixed directory segment excluded — those are
 Jekyll internals, not published pages), strips Jekyll front matter so it renders
 exactly the body kramdown sees, and asserts three properties per page:
 
-1. **No fence leakage** — the rendered HTML's text content (outside `<pre>` and
-   inline `<code>`) carries no literal backtick fence run. A leaked fence is the
-   signature of a block the parser failed to close, regardless of which
-   construct confused it.
+1. **No span-corruption leakage** — the rendered HTML's text content, taken
+   after the `<pre>` blocks and inline `<code>` spans are removed (a legitimate
+   backtick renders inside `<code>` and a legitimate embedded tag renders as
+   escaped entities inside it, so both are excluded before the check), carries
+   neither of two symptoms: (a) **any literal backtick** — a single stray one,
+   not only a `` `{3,} `` fence run — and (b) **any raw tag whose element name is
+   not a known HTML element**, matched by name so an attribute-bearing legitimate
+   tag (`<a href…>`) is excluded and a placeholder token (`<verdict>`, `<n>`,
+   `<KIT>`) is not. Either symptom is the signature of a code span or fenced block
+   the parser failed to form, regardless of which construct confused it: a
+   backtick that never paired, or a placeholder tag kramdown passed through as a
+   raw HTML block. The two are complementary — a swallowed page region whose own
+   inline code re-leaks as literal backticks trips (a), while a swallowed
+   backtick-free region (pure prose or headings) trips only (b) — so neither
+   alone covers the class and the assertion keys on both.
 2. **No heading leakage** — the count of rendered heading elements never exceeds
    the count of source heading lines the gate's own fence-aware scan (cmark
    rules: ATX and setext, both skipped inside a fenced or `~`-fenced block)
@@ -131,9 +155,39 @@ consumer registers this gate; it stays outside env-probe's probe-set floor, and
 that page's ruling). A consumer with no published docs site simply omits the
 gate by the registry-not-array convention and never installs the dependency.
 
+The false-positive floor is the assertion's hard boundary, deliberately set. The
+backtick symptom rests on a property of well-formed markdown: every backtick
+belongs to a code span, which renders inside `<code>` and is excluded from the
+scanned text, so a backtick surviving into paragraph, heading, or list text is a
+code span that failed to form — not legitimate prose. Its one residual
+legitimate case is documenting the backtick *character* itself; the faithful way
+to do that is a doubled-backtick code span, which renders the character inside
+`<code>` — excluded from the scan — so the honest form does not trip the gate and
+only the fragile bare-backtick form would. The raw-tag symptom rests on
+the HTML-element allowlist: kramdown passes an unrecognized `<name>` through
+verbatim as raw HTML, while a `<name>` whose element is in the HTML standard is
+legitimate markup — so a tag matched by element name against that set is
+excluded, and only a token outside it (a placeholder kramdown mistook for an HTML
+block) reds. Its residual legitimate case is a page that deliberately embeds a
+*non-standard* element (a custom element or web component); a placeholder meant
+as literal prose is instead written as a code span (`` `<verdict>` `` renders
+`<code>&lt;verdict&gt;</code>`) and never surfaces as a raw tag. Both floors hold
+empirically: across the tracked corpus each symptom fires on exactly the
+corrupted pages and no clean page. The element set is generic mechanism — the
+HTML standard's element list is universal render truth, not consumer rule
+content — so it is a kit built-in, not a config seam; a consumer that
+legitimately ships non-standard elements in a docs page is the narrow accepted
+false positive, and if that demand ever attests, an optional allowlist-extension
+knob is the config-via-env answer, deferred until then rather than built against
+a case no page presents.
+
 Honest limit: this is not a full render-diff between the two parsers. It
-mechanizes the observed leakage class — fences, headings, and tables — and stays
-silent on divergences that corrupt none of the three. The table count can be
+mechanizes the observed leakage class — the code-span corruption symptom (a
+surviving backtick or raw placeholder tag), headings, and tables — and stays
+silent on divergences that corrupt none of the three. The first assertion keys
+on the shared symptom rather than a multi-backtick fence run, so it implements
+the severed-span defense (`gettalong/kramdown#843`) the section describes — prose
+and assertion cover the same class. The table count can be
 masked by an offsetting raw-HTML `<table>` on the same page: one collapsed GFM
 table plus one HTML table balances the counts. The table detector is
 deliberately conservative (delimiter-row anchored), so a table kramdown accepts
@@ -142,8 +196,11 @@ false-cleans, never false-reds. The observed table incident (2026-07-13): the
 value page's generated rollup table abutted its `:end` marker and shipped as a
 literal-pipe paragraph with the gate silent; the emitter fix (a trailing blank
 line) landed then, and this assertion mechanizes the channel. The good/bad
-fixture pair stays the fence/heading case; the table assertion carries its own
-hermetic unit test (a collapsed table reds table-only, a trailing blank clears).
+fixture pair exercises the span-corruption symptom (a bad page whose severed span
+leaks a stray backtick and a raw placeholder tag, a good page whose faithful code
+spans render clean) alongside the fence/heading case; the table assertion carries
+its own hermetic unit test (a collapsed table reds table-only, a trailing blank
+clears).
 The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
 lets a fixture point the docs dir and renderer at a synthetic tree without
 touching consumer config. `precommit` tier, coupling the docs tree.

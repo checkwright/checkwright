@@ -587,6 +587,71 @@
   iteration's open already paid. Filed 2026-07-20 by lead instruction at this
   iteration's `scope`, during the render-fidelity bundling ruling.
 
+- **gate-spec-claim-assertion-parity** [needs-spec] — the generalization the
+  `render-fidelity-inline-span-leak` entry flagged as a deliberately-unsettled
+  `/spec` question, ruled here: a gate whose **SPEC prose names a failure class
+  its assertions do not implement**. This iteration's defect is the instance —
+  `check-docs-render-fidelity`'s section described the severed-span defense
+  (`gettalong/kramdown#843`) while its assertion matched only a multi-backtick
+  fence run, so the prose claimed a defense the code omitted.
+  **Ruling — the general class is a human-audit class, not gateable.** The two
+  in-kit precedents that look adjacent both key on a **structured token**:
+  `check-assertion-strength` reads callee `# exit:` codes and
+  `check-gate-assertion-strength` reads the runtime **failure message** string.
+  A SPEC's claimed-defense is unstructured natural-language prose with no such
+  token, so correlating prose intent to code behaviour is the by-eye
+  faithful-artifact residue `check-gate-tamper` and `check-assertion-strength`
+  already concede as a stated limit plus partial floor — not a deterministic,
+  low-false-positive assertion. No gate is built for the general class.
+  **Why `[needs-spec]` and not closed:** a *narrower structured sub-class* could
+  be gateable via a **claimed-defense annotation** convention — an author tags a
+  claimed failure class with a machine-readable marker and a gate correlates the
+  marker to a present assertion. That is a genuine new-gate initiative, filed
+  here per `new-initiative-filing-default` (a broader new-gate build is filed,
+  never smuggled into this iteration's lean single-unit envelope), demand-gated.
+  The open design is whether the annotation buys reach or ceremony — the same
+  reach-vs-ceremony question as `assertion-strength-exit-header-reach`; the
+  honest outcome may be to record the general class as a permanent human-audit
+  limit in `gate-sdk/SPEC.md` near `check-assertion-strength` and build nothing,
+  a widest-true-tier placement call in its own right (gate-sdk honest limit vs a
+  meta-gate doctrine line).
+  **Cost while deferred:** low and non-rotting — this iteration's instance is
+  fixed and the general class stays a review tripwire; the recurrence cost is
+  that a future gate can overclaim in prose versus its assertions and only human
+  audit catches it. Debt/analysis, adds no governed name unless the annotation
+  convention is built. Filed 2026-07-20 by the `render-fidelity-leak-coverage`
+  spec, settling the flagged `/spec` question.
+
+- **build-stage-tier-economics** [needs-spec] — measure whether the `build`
+  stage downgrades from Opus to Sonnet net-positive rather than flipping on
+  intuition; a ruling-config tier re-judgment (`.claude/agents/stage-session.md`
+  / the lead template's ruling-config, which invites re-judging every tier).
+  Grounding: `drift-kit/bin/stage-economics.sh` shows build is the largest token
+  consumer of any stage (~100–175k output, 5–25M cache-read per run, versus
+  close/validate ~7–49k output), so it is the highest-value tier to test — a
+  bigger lever than the validate→Sonnet move already adopted.
+  **Two design blockers:** (1) the decision metric is uninstrumented — the tool
+  reports `cost=n/a` because `scripts/price-table.tsv` is absent (whether that
+  file is intentionally a local/gitignored artifact or simply not yet created is
+  itself part of the design question), so no price-weighted comparison is
+  possible today; obtaining/placing a price table is the prerequisite. (2) the
+  metric must be **net delivered-work cost** — price-weighted tokens + rework
+  round-trips + the supervisor's by-eye gate-diff burden + escalation load
+  shifted onto the Opus lead — not single-pass token price; a cheaper builder
+  that fails the battery or emits a subtly-wrong gate the supervisor must catch
+  can invert the saving.
+  **Design direction:** a deliberate A/B on representative *low-judgment* builds
+  (convergence on an already-authored contract), holding the unit class
+  comparable; high-judgment builds that write gate assertions or touch the
+  provenance seam likely stay Opus regardless, so the honest outcome may be a
+  per-build-class tier rule, not a blanket flip. Sibling to
+  `spec-split-promotion-review` (evidence-gated tier promotion) and
+  `benchmark-ab-experiment` (which holds model constant and varies governance —
+  this holds stage constant and varies model). Debt/analysis: settles a
+  ruling-config tier by data, adds no governed name. Filed 2026-07-20 by lead
+  ruling during the `render-fidelity-leak-coverage` spec, from an operator
+  question.
+
 ## Done
 
 ## Lessons Learned
