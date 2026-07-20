@@ -23,6 +23,16 @@ survive is the *earned bump level*; a bare token drops it and the next release
 re-derives which floor it inherits, which is the recurrence cost this unit was
 filed on.
 
+**How the producer derives `<version>`.** The field is the version the criteria
+*would have shipped as* had the release not been held: the bump the note's three
+upgrade-contract sections floor, applied over the newest already-released note.
+It is the version that was earned and withheld, never the next version the
+project happens to reach. For this repo's live carrier, `verdict-reader-honesty`
+met minor criteria over a newest release of `v0.9.0`, so its line stamps
+`deferred:v0.10.0`. Stating the rule here is what keeps the field mechanically
+derivable rather than an operator's guess — without it the discharge comparison
+has no defined scale.
+
 **Why the criteria stay in prose and are not structured fields.** The three
 upgrade-contract sections (Tightened gates / Renamed knobs / Behavior changes)
 are the release note's, and docs/install.md §The upgrade contract owns them. A
@@ -38,17 +48,30 @@ second state to drift. This is what keeps the widened gate low-false-positive: a
 deferral cannot linger past the release that consumes it, and a deferral that
 genuinely has not been consumed *should* keep firing, which is the point.
 
-**The carry-forward reader must read committed history, not the live file.**
-This is the load-bearing finding, and it was verified rather than assumed:
-`.workflow/release-disposition.txt` is a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
-member, and it is **already header-only** — the `verdict-reader-honesty` line
-carrying this repo's unconsumed minor criteria survives only in commit
-`6c53737`. A reader of the live file therefore sees nothing and would gate
-nothing. Any consumer-side gate over this line derives the disposition set from
-the file's committed history, the same technique
-`drift-kit/SPEC-stage-economics-durability.md` adopts for the stamp surface and
-`drift-kit/bin/trajectory.sh` already ships. Truncation-immunity is a property of
-the *reader*, and every reader of a truncated evidence file needs it.
+**The carry-forward reader reads the union of committed history and the live
+file.** This is the load-bearing finding, and it was verified rather than
+assumed: `.workflow/release-disposition.txt` is a
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member, and it is **already header-only** —
+the `verdict-reader-honesty` line carrying this repo's unconsumed minor criteria
+survives only in commit `6c53737`. A reader of the live file alone therefore
+sees nothing and would gate nothing.
+
+Any consumer-side gate over this line derives its disposition set the same way
+`drift-kit/SPEC-stage-economics-durability.md` derives the stamp set and
+`drift-kit/bin/trajectory.sh` already ships: **history ∪ live — not
+replacement, not fallback.** The two amendments share one technique under one
+vocabulary, deliberately; a reader who has understood either has understood
+both. History-only is the *replacement* arm the stamp amendment rules out, and
+it fails harder here than there: `check-release-bump` is `tier=precommit`, so
+the run that matters most is the pre-commit of the very close commit that
+writes the `deferred:` line — at that instant the line is live and not yet
+committed, and a history-only reader is blind to precisely the disposition it
+was widened to enforce. The live arm covers that uncommitted tail; the history
+arm covers everything truncation has taken. Union costs nothing, because a line
+present in both arms is the same line and dedups on the iteration name.
+
+Truncation-immunity is a property of the *reader*, and every reader of a
+truncated evidence file needs it.
 
 **The kit wires no gate.** Consistent with the release-sweep stamp file
 (§The release-disposition step), the disposition file is operator evidence riding
@@ -71,6 +94,17 @@ path, becoming:
 Landing that regenerates the pre-commit hook and the graph artifact per
 CLAUDE.md. `dir=one` is unchanged and correct: the note derives its floor from
 the disposition record, never the reverse.
+
+**The deferred floor derives before the two-note early return.** The gate today
+exits clean when fewer than two notes carry a `release:` key
+(`scripts/check-release-bump.sh:26-29`), because its existing floor is a
+*comparison against a predecessor note*. The deferred floor has no such
+dependency — it is carried by the disposition record, not by a predecessor — so
+a single-note tree with an outstanding deferral must still red. The derivation
+therefore runs ahead of that return, not inside the two-note arm. This repo has
+nine keyed notes so the arm is unreachable here today; it is specified because a
+fresh consumer adopting the kit meets it on note one, which is exactly when a
+carried deferral is easiest to lose.
 
 ## Producers and consumers
 

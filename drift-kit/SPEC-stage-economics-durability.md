@@ -33,6 +33,12 @@ alternative loses:
   almost always truncated, so the fallback arm would never fire on the path that
   needs it.
 
+**History ∪ live** is the shared name for this technique, not this amendment's
+local coinage: `lifecycle-kit/SPEC-release-disposition-deferred.md` adopts the
+identical reader over the release-disposition file in the same iteration, with
+the same ruling and the same rejected alternatives. Truncation-immunity is a
+property of the reader, and both truncated evidence files need the same one.
+
 The union costs nothing structurally, because the existing `seen_triples` dedup
 (`:132-133`) already collapses a stamp seen twice on the
 `iteration/stage/session8` key. History is a superset of the live file except
@@ -132,10 +138,19 @@ other bundled KPIs read neither this meter nor its log.
 - **§Layout and configuration, `DRIFT_KIT_STATE_FILE`.** "the WORKFLOW-STATE path
   the stage-economics join reads for stamps" becomes the path whose history and
   live content the join reads. Default unchanged.
-- **§Testing.** The smoke already builds a hermetic fake-history repo for the
-  trajectory extractor. Add the economics assertion to it: a stamp present only
-  in history — truncated out of the live file — still prices, which is the whole
-  claim of this amendment in one assertion.
+- **§Testing.** The assertion is: a stamp present only in history — truncated
+  out of the live file — still prices, which is the whole claim of this
+  amendment in one line. **The harness it needs does not exist and must be
+  built.** The align audit checked: `drift-kit/smoke/` holds only `install.sh`
+  and `overhead-fixture.jsonl`, nothing in drift-kit constructs a git history,
+  and `git init` appears in exactly one file in the whole tree
+  (`site-kit/gate-tests/check-docs-render-fidelity-table.test.sh`) — so there is
+  no hermetic fake-history repo for the trajectory extractor to extend. Build
+  creates it: a temp repo, a state file committed with a stamp, the stamp then
+  truncated out of the live file, and the meter run against the pair. This is
+  the amendment's load-bearing test — the Definition of Done's recovered-loss
+  criterion rides on it — and its cost is named here rather than discovered mid
+  build.
 
 ## Seam
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: context-kit/SPEC.md §The session-context hook — consumer-copy SessionStart hook (bash-guard pattern); assembles the session brief, every step guarded, never fails a session
+# spec: context-kit/SPEC.md §The session-context hook (template) — consumer-copy SessionStart hook (bash-guard pattern); assembles the session brief, every step guarded, never fails a session
 
 set -uo pipefail
 
