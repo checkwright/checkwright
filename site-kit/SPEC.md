@@ -117,7 +117,16 @@ exactly the body kramdown sees, and asserts three properties per page:
    not only a `` `{3,} `` fence run — and (b) **any raw tag whose element name is
    not a known HTML element**, matched by name so an attribute-bearing legitimate
    tag (`<a href…>`) is excluded and a placeholder token (`<verdict>`, `<n>`,
-   `<KIT>`) is not. Either symptom is the signature of a code span or fenced block
+   `<KIT>`) is not. Content inside an `<svg>` or `<math>` subtree is exempt from
+   (b), tracked by open/close depth: those two roots open foreign content whose
+   vocabularies (`<circle>`, `<mi>`) are not HTML element names, so scanning them
+   by the HTML set would red a page for legitimate inline markup. The exemption is
+   scoped to the subtree rather than granted to the names, so a bare `<path>` or
+   `<use>` outside any `<svg>` still reds as the placeholder token it is. Keep
+   such a subtree on one source line: kramdown severs a foreign root split across
+   a line break, emitting its tail as escaped text, and that is a real render
+   divergence the gate is right to red.
+   Either symptom is the signature of a code span or fenced block
    the parser failed to form, regardless of which construct confused it: a
    backtick that never paired, or a placeholder tag kramdown passed through as a
    raw HTML block. The two are complementary — a swallowed page region whose own

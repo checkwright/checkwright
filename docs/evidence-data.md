@@ -50,3 +50,4 @@
 | tooling-signal-honesty | sc sp · b v c | 2f/0d | 2 · ≤0d | 20s clean | 75 |
 | verdict-reader-honesty | sc sp a b v c | 3f/0d | 2 · ≤1d | 20s clean | 76 |
 | carry-forward-durability | sc sp a b v c | 4f/0d | 3 · ≤0d | 20s clean | 77 |
+| render-fidelity-leak-coverage | sc sp · b v c | 1f/0d | 0 | 20s clean | 77 |

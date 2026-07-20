@@ -52,9 +52,9 @@ strip_fm='NR==1 && $0=="---" { fm=1; next } fm==1 && $0=="---" { fm=0; next } fm
 
 rendered_scan='
 BEGIN {
-    inpre=0; leak=0; h=0; tbl=0
+    inpre=0; leak=0; h=0; tbl=0; fgn=0
     # spec: site-kit/SPEC.md §check-docs-render-fidelity — the known-HTML-element set is a kit built-in, not a config seam
-    split("a abbr address area article aside audio b base bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul var video wbr", A, " ")
+    split("a abbr address area article aside audio b base bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script search section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul var video wbr", A, " ")
     for (i in A) HTMLEL[A[i]]=1
 }
 {
@@ -70,8 +70,16 @@ BEGIN {
     w=s
     while (match(w, /<\/?[A-Za-z][A-Za-z0-9]*[^>]*>/)) {
         nm=substr(w, RSTART, RLENGTH); w=substr(w, RSTART+RLENGTH)
+        closing=(nm ~ /^<\//); selfclose=(nm ~ /\/>[ \t]*$/)
         sub(/^<\/?/, "", nm); sub(/[^A-Za-z0-9].*/, "", nm)
-        if (!(tolower(nm) in HTMLEL)) leak=1
+        nm=tolower(nm)
+        # spec: site-kit/SPEC.md §check-docs-render-fidelity — foreign-content subtree, tracked by depth so an unknown name inside it is legitimate SVG/MathML vocabulary rather than a leaked placeholder
+        if (nm == "svg" || nm == "math") {
+            if (closing) { if (fgn > 0) fgn-- } else if (!selfclose) fgn++
+            continue
+        }
+        if (fgn > 0) continue
+        if (!(nm in HTMLEL)) leak=1
     }
     # spec: site-kit/SPEC.md §check-docs-render-fidelity — symptom (a), any literal backtick, not only a fence run
     gsub(/<[^>]*>/, "", s)
