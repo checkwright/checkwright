@@ -84,8 +84,10 @@ never the designed sweep — an accepted, costed loss.
 
 Mid-iteration the queue file is written only for real **work-state**
 transitions: promotion and naming (the first stage), the Done move riding each
-amendment-merge commit, and the closing dispositions. Stage motion never
-touches it.
+unit's **completing** commit — a build-bound unit's at `build` (a feature's is
+its amendment-merge commit), a **no-build debt ruling's at its `spec` authoring
+commit**, since build never runs for it and the drain stage refuses a non-empty
+active queue — and the closing dispositions. Stage motion never touches it.
 
 The **deterministic half** of that first step — read the iteration from the
 header, read the id from `session-id.sh`, append the stamp — is mechanized by

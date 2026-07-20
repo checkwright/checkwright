@@ -14,70 +14,6 @@
 
 ## Technical Debt
 
-- **stage-routing-for-debt-with-design-rulings** — the lifecycle
-  contract does not document how a **debt** unit that carries genuine design
-  rulings (not mere behavior-convergence) routes its design: through a `/spec`
-  pass, or settled at `/scope`. `/spec` is nominally trigger-gated to feature
-  units, yet this iteration ran `/spec` for a debt unit by lead ruling and it
-  worked cleanly — the false-positive floor was real design work that scope
-  would have carried badly.
-  **Design question:** a lifecycle-contract clarification —
-  name the routing rule and place it at the widest true tier
-  (`lifecycle-kit/templates/skills/scope.md` / `spec.md`, or lifecycle-kit's
-  SPEC), the same shape as `scope-iteration-cost-bundling-test` and
-  `new-initiative-filing-default`. Debt, adds no governed name.
-  **Cost while deferred:** low but recurring — each debt unit carrying design
-  re-litigates its routing by lead ruling, as this iteration did.
-  Filed 2026-07-20 by lead ruling at this iteration's build, from a spec-stage
-  process observation. Promoted 2026-07-20 into `lifecycle-rule-placement`
-  (operator ruling); land first — it settles the routing the other three ride on.
-
-- **new-initiative-filing-default** — no always-loaded surface
-  states the rule that a **new initiative raised mid-session** (an operator
-  feature request, a design idea) is **filed as a Deferred queue entry by
-  default, not started** — it enters delivery only by passing through `/scope` as
-  the active iteration's unit. The rule is *implicit* in the iteration model and
-  partially covered for one case: doctrine-kit's **Gap disposition** bullet ("a
-  gap you defer is costed and filed") and close's gap→promote step cover a *gap
-  found while working*, and scope's "a standing directive is a theme, not a unit
-  list" bounds the scope survey — but none states the general default for an
-  operator-raised initiative. This session is the evidence: the assistant first
-  offered to *run* the `economics-budget-pct-decouple` decouple as a live
-  iteration rather than file it, and the operator had to redirect.
-  **Design question:** placement is a
-  widest-true-tier ruling — CLAUDE.md's iteration-lifecycle section, doctrine-kit's
-  Gap-disposition bullet (widen its wording), or lifecycle-kit's SPEC — and
-  codifying "don't start work out of band" by an *out-of-band edit to an
-  always-loaded governance surface* is self-contradictory, so it earns the
-  deliberate scope pass it prescribes.
-  **Cost while deferred:** low but recurring — each session re-litigates whether
-  an operator ask is filed or started, the ambiguity this session already paid.
-  Surfaced 2026-07-19 alongside `economics-budget-pct-decouple` at the operator's
-  direction. Promoted 2026-07-20 into `lifecycle-rule-placement` (operator ruling).
-
-- **scope-iteration-cost-bundling-test** — the `scope` stage
-  contract does not carry the **economic composition test**: weigh whether a
-  single sub-threshold unit justifies a whole iteration, and either bundle
-  related-surface deferred entries or argue the unit is significant enough to
-  stand alone. `scope.md` today covers feature-vs-debt triage, theme-not-unit-list,
-  and premise re-verification, but has no line making that iteration-cost weighing
-  a scope duty — which is why it had to be relayed by hand at this iteration's
-  open. The lead template's economics section
-  (`lifecycle-kit/templates/lead.md` §Economics) already carries the underlying
-  cost principle, so the deliverable **single-sources it by citation** — a scope
-  contract line pointing at that section, never restating the economics — placed
-  at the widest tier true for all lifecycle-kit consumers.
-  Debt, not feature: it converges `scope.md` onto a principle a sibling template
-  already owns and adds no governed name. The design work is the placement
-  ruling only (the scope-skill template line vs a lifecycle-kit SPEC section — a
-  widest-true-tier call, the same shape as `new-initiative-filing-default`), not
-  the principle, which lead.md §Economics settles.
-  **Cost while deferred:** low but recurring — each undirected scope re-litigates
-  by hand whether a lone small unit earns an iteration, the ambiguity this
-  iteration's open already paid. Filed 2026-07-20 by lead instruction at this
-  iteration's `scope`, during the render-fidelity bundling ruling. Promoted
-  2026-07-20 into `lifecycle-rule-placement` (operator ruling) — the very test
-  this scope applied by hand.
 
 ## Deferred
 
@@ -824,5 +760,8 @@
 
 - enter-stage-simulate-writes
 - close-capture-filing-destination
+- stage-routing-for-debt-with-design-rulings
+- new-initiative-filing-default
+- scope-iteration-cost-bundling-test
 
 ## Lessons Learned

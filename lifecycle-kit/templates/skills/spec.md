@@ -79,3 +79,12 @@ contracts is one — `check-stage-entry` will demand the audit stamp at the next
 stage's entry), otherwise the build stage. A `spec` that authored a
 cross-component amendment should say so rather than let the downstream entry
 discover it.
+
+**A no-build debt ruling has no build half** — its authoring *is* the whole
+delivery (the ruling landed in the governed surface; there is no code to
+implement). So this stage performs that unit's **task-completion Done move** —
+the queue write build would otherwise make — in the same authoring commit, and
+recommends **`validate`**, skipping build. Leaving the unit active strands it:
+build never runs to move it, and the drain stage refuses entry on a non-empty
+active queue (`check-stage-entry` assertion B). A pass mixing build-bound units
+with no-build rulings moves only the latter and recommends build for the rest.
