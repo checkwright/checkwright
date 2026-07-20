@@ -4,4 +4,4 @@
 
 ---
 
-— scope ac37f3eb 2026-07-20
+render-fidelity-leak-coverage scope ac37f3eb 2026-07-20

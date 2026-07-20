@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: render-fidelity-leak-coverage
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,58 +14,64 @@
 
 ## Technical Debt
 
+- **render-fidelity-inline-span-leak** — `check-docs-render-fidelity`
+  **claims a defense its assertions do not implement**, and four flagship public
+  SPEC pages render 24–62% of their body as raw text today while the gate reports
+  clean. Promoted from Deferred to active debt 2026-07-20 by operator ruling; the
+  v0.10.0 release is held partly on these corrupted pages
+  (`.workflow/release-disposition.txt`), so clearing this both repairs the public
+  docs and unblocks the release note.
+  **One Enforcement-first unit** (the fix and the gate that catches it land
+  together): widen the leak assertion so any backtick — or raw `<word>` tag —
+  surviving into rendered non-code text reds the gate, with the false-positive
+  floor designed deliberately (that floor is the open design work — needs design
+  before build — not the diagnosis, which the SPEC already settles);
+  land the fixture pair; and rewrap the offending source spans in the four kit
+  SPECs so the mirrors regenerate clean.
+  **Symptom (the assertion target):** kramdown parses blocks before spans, so a
+  code span whose content escapes into a raw `<word>` HTML tag makes the parser
+  swallow the rest of the paragraph/page as raw HTML — headings render as literal
+  `##`, emphasis as literal `**`, GFM tables never parse. The current assertion 1
+  matches only a **3+-backtick** run (`` `{3,} ``); every leak here survives as a
+  *single* backtick and/or a raw tag, so the gate is blind to all of them. A
+  downstream GFM table is the only thing that incidentally reds the gate (the
+  table-count assertion), which is why the prior build "fixed" a redded table by
+  converting it to a list — removing the one visible symptom and leaving the
+  corruption in place.
+  **Scope re-verification 2026-07-20 (this promotion) — the prior close's
+  root-cause diagnosis is CONFIRMED corrupt-and-clean but too NARROW.** Reproduced
+  against the pinned parser (kramdown 2.5.2 + kramdown-parser-gfm 1.1.0); blast
+  radius re-measured on the live mirrors: `docs/gate-sdk/SPEC.md` ~62% / 1106
+  leaked backticks, `docs/delegation-kit/SPEC.md` ~58%, `docs/canon-kit/SPEC.md`
+  ~47%, `docs/lifecycle-kit/SPEC.md` ~24% / 230 backticks; gate clean on all 57
+  pages. But the leaks are **at least three distinct sub-shapes**, not one: (1)
+  *severed span* — `gate-sdk/SPEC.md:566` and `lifecycle-kit/SPEC.md:935-936`,
+  a single-backtick span split across a newline whose continuation begins with a
+  `<word>` token (the close's stated class); (2) *single-line embedded tag* —
+  `delegation-kit/SPEC.md:280`, code spans `` ` -> <verdict>` `` / `` `width=<n>` ``
+  that fail to form because `<verdict>`/`<n>` are consumed as raw HTML spans, no
+  newline involved; (3) *escaped-backtick nested span* — `canon-kit/SPEC.md:625`,
+  `` `default \`docs/CNAME\`` `` combined with `` `<KIT>_<KNOB>` ``. So a fix
+  keyed to "severed span" (the close's framing) would miss delegation and canon
+  entirely — which **confirms the entry's own alternative**: the assertion must
+  key on the shared *symptom* (a surviving backtick / raw `<word>` tag in rendered
+  text), not on any single root cause. This is the FP-floor design's real burden:
+  one low-false-positive assertion covering ≥3 root causes.
+  Gap generalization (a `/spec` question, deliberately unsettled): the class that
+  should have caught this is a **gate-claims-vs-assertions** audit — a gate whose
+  SPEC names a failure class it does not assert. `check-gate-assertion-strength`
+  (commit `1461b96`) is the nearest instance but reads the *failure message*, not
+  SPEC prose; whether it extends to prose claims or is inherently a human-audit
+  class is spec work, not settled here.
+  **Seam ruling (this promotion):** all generic site-kit mechanism — the render
+  fidelity assertion is universal markdown-render truth, the `<word>`/`<KIT>`
+  tokens in the offending spans are generic prose placeholders, not private rule
+  content, and nothing new becomes consumer config. Clean seam; this is why it is
+  debt, not a feature (it converges the gate onto a defense its SPEC already
+  claims, adding no governed name).
+
 ## Deferred
 
-- **render-fidelity-inline-span-leak** [needs-spec] — `check-docs-render-fidelity`
-  **claims a defense its assertions do not implement.** Its SPEC section names
-  the span-severing class explicitly — an inline code span wrapping across a
-  line break whose continuation begins with a generic XML tag, which kramdown
-  (parsing blocks before spans) reads as an unclosed HTML block that swallows
-  the rest of the page (`gettalong/kramdown#843`, closed works-as-designed) —
-  and cites it as "exactly why this gate is a standing defense rather than a
-  stopgap". No assertion detects it. Assertion 1 matches only a **3+-backtick**
-  run in rendered text (`` `{3,} ``), while the severed span leaks a *single*
-  backtick; neither honest-limit paragraph discloses the gap. So the documented
-  mechanism, the gate's stated purpose, and its implemented coverage are three
-  different things — a spec-vs-implementation divergence, not a missing idea.
-  Measured symptom: every downstream block stops being markdown — headings
-  render as literal `##` text, emphasis as literal `**`, and GFM tables never
-  parse at all. That last effect is what
-  redded the gate on a well-formed table in `gate-sdk/SPEC.md` during this
-  iteration's build — the table was the *victim*, the split code span ~400
-  lines upstream (`gate-sdk/SPEC.md:566`) was the cause, and the gate's own
-  `help:` text ("an indented 4-space code block avoids the consecutive-fence
-  and unclosed-fence leakage class") misdirects, because no fence is involved.
-  Build's fix was to convert the table to a bulleted list, which removes the
-  symptom and leaves the document corruption in place.
-  **Measured blast radius** (full-document render, cutting only at blank lines
-  so no truncation artifact inflates it): four mirrored kit SPEC pages are
-  currently degraded on the public site — `docs/gate-sdk/SPEC.md` (breaks
-  line 570 of 1536, ~63% of the page), `docs/delegation-kit/SPEC.md` (~59%),
-  `docs/canon-kit/SPEC.md` (~47%), `docs/lifecycle-kit/SPEC.md` (~23%);
-  1106 and 230 leaked backticks on the first and last respectively. The gate
-  reports **clean** on all four.
-  Deliverable is one Enforcement-first unit: widen the leak assertion to any
-  backtick surviving into rendered text (and/or raw-markdown survival — a
-  literal `##`/`**` in rendered text) with the false-positive floor designed
-  deliberately, land the fixture pair, and rewrap the offending source spans in
-  the four kit SPECs so the mirrors regenerate clean. `[needs-spec]` is for the
-  assertion's floor, not the diagnosis, which the SPEC already settles.
-  Gap generalization: the check class that should have caught this is a
-  **gate-claims-vs-assertions** audit — a gate whose SPEC names a failure class
-  it does not assert. `check-gate-assertion-strength` (commit `1461b96`, "gate
-  assertions weaker than their own failure message") is the nearest existing
-  instance and reads the *failure message*, not SPEC prose; whether it extends
-  to prose claims or this is inherently a human-audit class is part of this
-  entry's spec work, deliberately not settled here.
-  **Cost while deferred:** high and reader-facing, unlike the other rungs here —
-  the repo's four flagship spec pages render most of their body as raw text to
-  every public reader today, and the tree is silent about it. The secondary cost
-  is recurrence: a SPEC author who writes a correct table gets an unexplained
-  red pointing at their table, and the cheapest escape is build's workaround.
-  Filed 2026-07-20 by the `carry-forward-durability` close, from the
-  knowledge-friction sweep; mechanism corrected and blast radius measured in
-  that sweep rather than taken from the friction note.
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
@@ -558,6 +564,28 @@
   The cost is that each reader re-derives the adoption-vs-inherent distinction,
   as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
   lead instruction.
+
+- **scope-iteration-cost-bundling-test** [needs-spec] — the `scope` stage
+  contract does not carry the **economic composition test**: weigh whether a
+  single sub-threshold unit justifies a whole iteration, and either bundle
+  related-surface deferred entries or argue the unit is significant enough to
+  stand alone. `scope.md` today covers feature-vs-debt triage, theme-not-unit-list,
+  and premise re-verification, but has no line making that iteration-cost weighing
+  a scope duty — which is why it had to be relayed by hand at this iteration's
+  open. The lead template's economics section
+  (`lifecycle-kit/templates/lead.md` §Economics) already carries the underlying
+  cost principle, so the deliverable **single-sources it by citation** — a scope
+  contract line pointing at that section, never restating the economics — placed
+  at the widest tier true for all lifecycle-kit consumers.
+  Debt, not feature: it converges `scope.md` onto a principle a sibling template
+  already owns and adds no governed name. `[needs-spec]` is for the placement
+  ruling only (the scope-skill template line vs a lifecycle-kit SPEC section — a
+  widest-true-tier call, the same shape as `new-initiative-filing-default`), not
+  the principle, which lead.md §Economics settles.
+  **Cost while deferred:** low but recurring — each undirected scope re-litigates
+  by hand whether a lone small unit earns an iteration, the ambiguity this
+  iteration's open already paid. Filed 2026-07-20 by lead instruction at this
+  iteration's `scope`, during the render-fidelity bundling ruling.
 
 ## Done
 
