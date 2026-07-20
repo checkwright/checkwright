@@ -5,3 +5,4 @@
 ---
 
 carry-forward-durability scope a70a075e 2026-07-20
+carry-forward-durability spec a2701e1d 2026-07-20
