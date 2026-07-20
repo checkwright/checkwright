@@ -44,6 +44,12 @@ Commit all spec changes in a single `chore:` commit.
 and the align audit is its first test.** Authoring a producer silently asserts
 the consumer's read side already matches — it rarely does. Verify every
 cross-component literal *at the read site*: grep the consumer's actual match
-arms, don't trust the amendment's prose. When scope authored a new gate, the
+arms, don't trust the amendment's prose. A **negative** existence claim ("no
+such harness/helper/gate exists yet") is the audit's weakest evidence shape: a
+literal-string grep proves only that the spellings you guessed are absent, and
+the thing you are about to build often already exists under a spelling you did
+not anticipate. Before asserting absence, search the *concept* two ways — the
+symbol under its plausible spellings **and** the directory that would own it —
+or write the claim bounded ("no match for X") rather than absolute. When scope authored a new gate, the
 audit is that gate's first real run — the drift it surfaces is a backfill
 worklist to land before build, not a reason the gate is wrong.

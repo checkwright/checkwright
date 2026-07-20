@@ -40,6 +40,15 @@ link/command-resolved (`scripts/canon-config.sh`). A page off-nav by design join
 `scripts/docs-offnav.list` — an embedded data fragment no link targets, or
 maintainer governance like this page reached only by citation.
 
+Markdown constructs that render correctly on github.com but corrupt under the
+Pages parser are **not** listed here: site-kit/SPEC.md §check-docs-render-fidelity
+owns that roster (the consecutive-fence, promoted-heading, collapsed-table, and
+severed-inline-span classes) together with the gate that catches them and its
+honest limits. Reach for it — not this page — when a well-formed construct
+renders wrong or reds that gate: the cause is routinely far upstream of the
+symptom in the same file, so the block the gate names is often the victim
+rather than the offender.
+
 ## Generated projections and their freshness gates
 
 Several docs surfaces are generated and byte-gated for freshness; each gate's red

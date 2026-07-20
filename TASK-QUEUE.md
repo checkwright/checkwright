@@ -16,6 +16,56 @@
 
 ## Deferred
 
+- **render-fidelity-inline-span-leak** [needs-spec] — `check-docs-render-fidelity`
+  **claims a defense its assertions do not implement.** Its SPEC section names
+  the span-severing class explicitly — an inline code span wrapping across a
+  line break whose continuation begins with a generic XML tag, which kramdown
+  (parsing blocks before spans) reads as an unclosed HTML block that swallows
+  the rest of the page (`gettalong/kramdown#843`, closed works-as-designed) —
+  and cites it as "exactly why this gate is a standing defense rather than a
+  stopgap". No assertion detects it. Assertion 1 matches only a **3+-backtick**
+  run in rendered text (`` `{3,} ``), while the severed span leaks a *single*
+  backtick; neither honest-limit paragraph discloses the gap. So the documented
+  mechanism, the gate's stated purpose, and its implemented coverage are three
+  different things — a spec-vs-implementation divergence, not a missing idea.
+  Measured symptom: every downstream block stops being markdown — headings
+  render as literal `##` text, emphasis as literal `**`, and GFM tables never
+  parse at all. That last effect is what
+  redded the gate on a well-formed table in `gate-sdk/SPEC.md` during this
+  iteration's build — the table was the *victim*, the split code span ~400
+  lines upstream (`gate-sdk/SPEC.md:566`) was the cause, and the gate's own
+  `help:` text ("an indented 4-space code block avoids the consecutive-fence
+  and unclosed-fence leakage class") misdirects, because no fence is involved.
+  Build's fix was to convert the table to a bulleted list, which removes the
+  symptom and leaves the document corruption in place.
+  **Measured blast radius** (full-document render, cutting only at blank lines
+  so no truncation artifact inflates it): four mirrored kit SPEC pages are
+  currently degraded on the public site — `docs/gate-sdk/SPEC.md` (breaks
+  line 570 of 1536, ~63% of the page), `docs/delegation-kit/SPEC.md` (~59%),
+  `docs/canon-kit/SPEC.md` (~47%), `docs/lifecycle-kit/SPEC.md` (~23%);
+  1106 and 230 leaked backticks on the first and last respectively. The gate
+  reports **clean** on all four.
+  Deliverable is one Enforcement-first unit: widen the leak assertion to any
+  backtick surviving into rendered text (and/or raw-markdown survival — a
+  literal `##`/`**` in rendered text) with the false-positive floor designed
+  deliberately, land the fixture pair, and rewrap the offending source spans in
+  the four kit SPECs so the mirrors regenerate clean. `[needs-spec]` is for the
+  assertion's floor, not the diagnosis, which the SPEC already settles.
+  Gap generalization: the check class that should have caught this is a
+  **gate-claims-vs-assertions** audit — a gate whose SPEC names a failure class
+  it does not assert. `check-gate-assertion-strength` (commit `1461b96`, "gate
+  assertions weaker than their own failure message") is the nearest existing
+  instance and reads the *failure message*, not SPEC prose; whether it extends
+  to prose claims or this is inherently a human-audit class is part of this
+  entry's spec work, deliberately not settled here.
+  **Cost while deferred:** high and reader-facing, unlike the other rungs here —
+  the repo's four flagship spec pages render most of their body as raw text to
+  every public reader today, and the tree is silent about it. The secondary cost
+  is recurrence: a SPEC author who writes a correct table gets an unexplained
+  red pointing at their table, and the cheapest escape is build's workaround.
+  Filed 2026-07-20 by the `carry-forward-durability` close, from the
+  knowledge-friction sweep; mechanism corrected and blast radius measured in
+  that sweep rather than taken from the friction note.
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
@@ -510,9 +560,5 @@
   lead instruction.
 
 ## Done
-
-- stage-economics-truncation-durability
-- release-disposition-deferred-value
-- template-consumer-copy-parity
 
 ## Lessons Learned
