@@ -799,10 +799,4 @@
 
 ## Done
 
-- enter-stage-simulate-writes
-- close-capture-filing-destination
-- stage-routing-debt-to-build-spec-features-only
-- new-initiative-filing-default
-- scope-iteration-cost-bundling-test
-
 ## Lessons Learned

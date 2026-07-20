@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+lifecycle-rule-placement release none — instruction-only correction, no consumer surface changed, no release

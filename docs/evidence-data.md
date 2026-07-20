@@ -51,3 +51,4 @@
 | verdict-reader-honesty | sc sp a b v c | 3f/0d | 2 · ≤1d | 20s clean | 76 |
 | carry-forward-durability | sc sp a b v c | 4f/0d | 3 · ≤0d | 20s clean | 77 |
 | render-fidelity-leak-coverage | sc sp · b v c | 1f/0d | 0 | 20s clean | 77 |
+| lifecycle-rule-placement | sc sp · b v c | 0f/2d | 0 | 40s 1✗ | 77 |
