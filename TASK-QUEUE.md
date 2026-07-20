@@ -118,10 +118,24 @@
   (`enter-stage.sh`), which assumes every bullet is filed *during* an iteration.
   A bullet filed after that iteration's close has no drainer left in the state
   machine: the next `scope` is refused and only an out-of-band edit clears it.
-  Either `file-gap.sh` should refuse (or warn) when the current stamp is already
-  `close`, or `enter-stage` should distinguish a stranded bullet from an
-  untriaged one. Reproduced live: `enter-stage.sh scope --simulate` refused on
-  two post-close filings.
+  Reproduced live: `enter-stage.sh scope --simulate` refused on two post-close
+  filings.
+  **Not a gate** (lead ruling, open to spec): `close` legitimately writes the
+  inbox when it drains, so the rule cannot be "block changes" without separating
+  close-truncating from anyone-appending; `file-gap.sh` appends without
+  committing, so a gate reds at whatever commit next carries the file, blaming
+  an actor who did not file the bullet; and refusing capture does not dissolve a
+  real finding — it pushes it back into session context, the deferred-capture
+  antipattern the inbox exists to prevent. A close that files something it
+  genuinely cannot disposition in-session would red on a correct action.
+  **Preferred arm:** warn at the point of capture — `file-gap.sh` knows the
+  current stamp, so it can tell the filer, while they can still act, that the
+  bullet will block the next `scope` unless drained or promoted directly.
+  **Second half:** `enter-stage`'s refusal text says only that "the close stage
+  must drain every gap", which once close has finished describes a stage that is
+  not coming back; it should name the promote-directly recovery. The existing
+  refusal *did* detect this correctly — what failed was the message's
+  actionability, which is why a second detector is the wrong fix.
   Debt: a real boundary hazard in shipped mechanism, not a new capability.
   Filed 2026-07-20 by lead, drained from the gap inbox.
 
