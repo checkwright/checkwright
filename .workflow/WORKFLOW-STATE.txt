@@ -4,8 +4,4 @@
 
 ---
 
-render-fidelity-leak-coverage scope ac37f3eb 2026-07-20
-render-fidelity-leak-coverage spec ac62492d 2026-07-20
-render-fidelity-leak-coverage build a8ad5cab 2026-07-20
-render-fidelity-leak-coverage validate a0967e5e 2026-07-20
-render-fidelity-leak-coverage close a7c5ca34 2026-07-20
+— scope aa4bebed 2026-07-20
