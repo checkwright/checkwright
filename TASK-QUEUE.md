@@ -491,11 +491,30 @@
   default, an align-shaped design pass rather than an assertion tweak.
   **Cost while deferred:** low and bounded — the gate still catches the partial
   case that actually regressed here; the uncovered case is a kit shipping a
-  credential-consuming smoke with no pin at all, which no kit does today.
+  credential-consuming smoke with no pin at all — reproduced 2026-07-21 (was:
+  "no kit does today" as of 2026-07-19).
   Cost to close: roughly one iteration. Surfaced 2026-07-19 by the validate
   re-entry on `derivation-by-precedent`, downstream of that iteration's
   operator-authorized hermeticity fix rather than of its precedent-doctrine
   envelope.
+  **Reproduced 2026-07-21** by the `lifecycle-rule-placement` validate
+  re-entry: `delegation-kit/smoke/install.sh` pins `DELEGATION_KIT_CRED_FILE`
+  for its live 95%-reading `usage-verdict.sh` assertion but never pins
+  `DELEGATION_KIT_PAUSE_PCT`/`_7D`, so it inherits whatever the ambient
+  session env carries. That session's env happened to carry
+  `DELEGATION_KIT_PAUSE_PCT=100` / `_7D=100` (an operator override for an
+  unrelated stale pre-login budget reading, later reverted in config but
+  already exported into the live process — reverting the file cannot unexport
+  it from inherited child env), which pushed the 95% reading's expected PAUSE
+  (exit 1) to OK (exit 0) — turning demo, consumer_smoke, upgrade, and
+  agents_md_smoke red, since all four share that installer. Controlled by
+  re-running with both vars unset (no code change): all four suites passed,
+  confirming the ambient-env leak, not a code regression, was the cause. The
+  one-line fix: `smoke/install.sh` should `export DELEGATION_KIT_PAUSE_PCT`/
+  `_7D` around its 95%-reading assertion the same way
+  `delegation-kit/bin/run-usage-tests.sh` already pins
+  `DELEGATION_KIT_PAUSE_PCT=0` around its own. Still build-routed tech-debt —
+  not fixed at this validate re-entry.
 
 - **release-body-url-form** [needs-spec] — *residue only: the two cheap
   deliverables are done (see below); what remains is the monitor-shaped half,
