@@ -12,6 +12,48 @@
 
 ## New Features
 
+- **stage-economics-truncation-durability** [spec: drift-kit/SPEC-stage-economics-durability.md]
+  — `bin/stage-economics.sh` reads the lifecycle stamps from the **live** state
+  file only, which `/scope` truncates every iteration boundary, so three
+  consecutive iterations' spec-stage economics are already unrecoverable. The
+  sibling meter `bin/trajectory.sh` reconstructs the identical stamps from
+  committed history and is truncation-immune by construction. The amendment rules
+  all three open questions: the history read **unions** with the live read rather
+  than replacing it (replacement blinds the meter to a stamped-but-uncommitted
+  stage) or falling back to it (the fallback arm would never fire on the path that
+  needs it); the reconstruction is **unbounded with no knob**, on the trajectory
+  precedent and because transcript retention already self-bounds it via the
+  existing unmatched-stamp path; and the append-log **needs no new idempotence** —
+  `log_line` already dedups on the `<iteration> <stage> <model>` triple and the
+  SPEC already specifies that key, so the question dissolves against the
+  implementation. Also unblocks `spec-split-promotion-review`.
+
+- **release-disposition-deferred-value** [spec: lifecycle-kit/SPEC-release-disposition-deferred.md]
+  — the disposition grammar's `<version|none>` cannot express "qualified but
+  deferred", so `verdict-reader-honesty` overloaded `none` and this repo's
+  unconsumed minor criteria are carried by memory alone. The amendment adds
+  `deferred:<version>` (the version, not a bare token, because the earned bump
+  level is the thing that must survive) and derives outstanding-vs-discharged from
+  the disposition record itself rather than tracking a second state. Its
+  load-bearing finding: the disposition file is a boundary-truncate member and is
+  **already header-only** — the carrying line survives only in commit `6c53737` —
+  so the widened `check-release-bump` must read committed history, the same
+  technique unit 1 adopts. Seam split: the grammar is kit mechanism, the bump
+  criteria stay consumer policy.
+
+- **template-consumer-copy-parity** [spec: gate-sdk/SPEC-template-consumer-copy-parity.md]
+  — no mechanism keeps a kit template and its vendored consumer copy in parity;
+  the `agent-budget-guard.sh` pair was hand-edited on both sides with nothing
+  verifying the edits matched. Byte parity is ruled out on measurement (11/11
+  pairs diverge, and for the eight `*-config.sh` pairs divergence *is* the
+  contract). The amendment's finding is that containment in **either** direction
+  is insufficient — the copies legitimately add content — so the gate asserts over
+  the declared contract surface (same resolved `spec:` target; the template's
+  functions and exit arms present in the copy) and makes the rotting direction
+  decidable with a required `# copy-divergence: <reason>` marker. The honest
+  fallback if assertion C proves noisy is recorded now: ship A+B and state the
+  limit, the `check-gate-tamper` precedent.
+
 ## Technical Debt
 
 ## Deferred
@@ -477,38 +519,6 @@
   Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
   plain-(b) ruling named.
 
-- **template-consumer-copy-parity** [needs-spec] — no mechanism keeps a
-  consumer copy of a kit template in step with the template it was vendored
-  from. `scripts/agent-budget-guard.sh` and
-  `delegation-kit/templates/agent-budget-guard.sh` were both hand-edited this
-  iteration (the `2)` arm removed from each) with nothing verifying the two
-  edits matched; they now differ deliberately on line 2 alone (the `spec:`
-  line, which names the consumer copy as such).
-  **Why byte-sync is ruled out — measured, not assumed.** A close sweep of all
-  eleven `*/templates/*.sh` ↔ `scripts/*.sh` pairs found **eleven of eleven
-  diverge**, and for the eight `*-config.sh` pairs divergence *is* the contract
-  — a template config is a starting point the consumer customizes, so equality
-  would be the defect. The executable pairs diverge too and largely on purpose:
-  `session-context.sh` (41 lines), `bash-guard.sh` (22, this repo's own
-  steering rules), `agent-budget-guard.sh` (2).
-  **Design question (why [needs-spec], not a build unit):** the deliverable is
-  a check that separates *intended* divergence from drift, over the executable
-  copies only. Candidate shape: structural parity rather than byte parity — the
-  copy carries every `spec:`-tagged contract line, function, and exit arm the
-  template declares, differing only in the lines a declared exemption names.
-  Whether that is expressible at low false-positive cost is the open work; if
-  it is not, the honest outcome is a ruling here that hand-editing both copies
-  is the sanctioned shape, recorded so the next close does not re-derive it.
-  Seam: generic mechanism — the template↔copy pairing is already derivable from
-  the layout, and no kit-specific content enters.
-  **Cost while deferred:** moderate and rotting in one direction. A hand edit
-  landing in the consumer copy but not the template ships a stale template, and
-  the template is what adopters vendor — so the defect is invisible in this
-  tree and visible only downstream, which is the worst detection asymmetry the
-  repo has. Bounded today by the executable copies being three and rarely
-  touched. Cost to close: roughly one iteration. Filed 2026-07-20 by the
-  `verdict-reader-honesty` close, by lead instruction.
-
 - **assertion-strength-exit-header-reach** [needs-spec] —
   `check-assertion-strength` is armed by callee `# exit:` headers, and **two
   scripts in the tree declare one** (`delegation-kit/bin/usage-verdict.sh`,
@@ -540,90 +550,6 @@
   The cost is that each reader re-derives the adoption-vs-inherent distinction,
   as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
   lead instruction.
-
-- **release-disposition-deferred-value** [needs-spec] — the release-disposition
-  grammar is `<iteration> release <version|none> — <basis>`, and **neither value
-  expresses "qualified but deferred"**: a release the criteria plainly earn,
-  which an operator ruling holds back. `verdict-reader-honesty` hit exactly that
-  and stamped `none` with the criteria spelled out in the basis prose — an
-  overload the grammar does not define, landed by operator ruling with the
-  caveat on record.
-  **What the overload actually costs — three things, worst first.**
-  (1) *The earned criteria are carried by memory alone.* This iteration's
-  Tightened-gates and Behavior-changes entries still floor the **next**
-  qualifying release to minor, and nothing mechanically carries them there.
-  `scripts/check-release-bump.sh` couples `docs/posts/*.md` and
-  `docs/install.md` only — it **never reads
-  `.workflow/release-disposition.txt`** — so a later release note that omits the
-  deferred criteria reds nothing, and the gate that exists to hold the bump
-  floor cannot see the floor it should be holding.
-  (2) *The evidence file loses a distinction it used to carry.* Before this,
-  `none` meant "nothing to release"; it now also means "release earned, held
-  back". Any reader or future derivation over the file must parse basis prose to
-  tell the two apart, which is exactly the de-literalization the repo otherwise
-  refuses.
-  (3) *Recurrence re-litigates the call.* The next collision re-derives the
-  three options and the grammar question from scratch, as this close did.
-  **Design question (why [needs-spec], not a one-line grammar edit).** The token
-  is the easy half — `deferred:vX.Y.Z`, or `deferred` with the criteria as
-  structured fields. The real design is the **carry-forward mechanism**, and it
-  splits across the provenance seam: the disposition *grammar* is generic
-  lifecycle-kit mechanism (lifecycle-kit/SPEC.md §bin/enter-stage.sh owns the
-  line shape), while the *bump criteria* to be carried are this consumer's
-  release policy (docs/install.md §Versioning, RELEASING.md). So the shape is a
-  kit-side third value plus a consumer-side rule that the next qualifying note
-  inherits any outstanding deferred criteria — with `check-release-bump` widened
-  to read the disposition file so the inheritance is gated rather than
-  remembered. Whether that widening stays low-false-positive is the open work;
-  if it does not, the honest outcome is a defined token with the carry-forward
-  left explicitly manual, recorded as such.
-  **Cost while deferred:** moderate, and it has a live carrier — this
-  iteration's unconsumed minor criteria. Until this lands, the next qualifying
-  release depends on someone reading a basis line in a boundary-truncated
-  evidence file; the truncation is the sharp edge, since the disposition file is
-  in `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` and the carrying line does not survive
-  many boundaries. Cost to close: under one iteration for the token and the
-  SPEC/RELEASING wording, roughly one with the gate widening. Filed 2026-07-20
-  by the `verdict-reader-honesty` close, by operator ruling — attested by a real
-  collision rather than anticipated.
-
-- **stage-economics-truncation-durability** [needs-spec] — `bin/stage-economics.sh`
-  reads the lifecycle stamps from the **live** state file only
-  (`DRIFT_KIT_STATE_FILE`, set at `drift-kit/bin/stage-economics.sh:31`, consumed
-  at `:158`), and `/scope` truncates that file at every iteration boundary. So an
-  iteration's stage economics are capturable only inside the window between its
-  close and the next scope, and nothing enforces the capture: the meter's only
-  caller is the `/economics` ritual, which drift-kit/templates/economics.md:4-6
-  defines as "a post-iteration reporting ritual ... outside the stage roster and
-  never a gate". Miss the window and the data is gone.
-  **Attested by loss, not anticipated.** The trajectory table carries `sp` stamps
-  for `trajectory-stage-roster-hardcode`, `tooling-signal-honesty`, and
-  `verdict-reader-honesty`, while `.metric/stage-economics-log.txt` holds **zero
-  `spec` rows** — its last entry is `derivation-by-precedent` (2026-07-19),
-  predating the split. Three consecutive iterations' spec-stage economics are
-  unrecoverable by the meter, and the third's stamps were destroyed by the
-  boundary reset of the very scope session that found this.
-  **The fix has in-kit precedent over the same surface.** The sibling meter
-  `bin/trajectory.sh` reconstructs the identical stamps from committed history
-  (`git log -p -- "$STATE_FILE"` at `:95`, `:152`) and is truncation-immune by
-  construction — which is why it can render `sp` for iterations the economics log
-  cannot price. Two drift-kit meters over one stamp surface, opposite durability,
-  and the durable technique already shipped in the same kit.
-  **Design question (why [needs-spec], not a build fix):** drift-kit/SPEC.md §The
-  stage-economics meter states the meter's input contract, so changing what it
-  reads changes asserted behavior a reader relies on. Open work: whether the
-  history read replaces the live read or falls back to it; how far back to
-  reconstruct and whether that bound needs a knob; and whether the append-log
-  gains idempotence, since a history-reading meter can re-derive rows it already
-  logged — a live-file meter never could. Seam: generic mechanism throughout, the
-  state path is already each consumer's config.
-  **Cost while deferred:** moderate and actively rotting — every iteration
-  boundary destroys another iteration's economics unless someone remembers the
-  ritual in the window, and the loss is silent (the meter reports on what it
-  finds, never that a stage went missing). It also **blocks
-  `spec-split-promotion-review`**, whose whole precondition is recorded
-  spec-stage economics. Surfaced 2026-07-20 by the undirected scope survey, from
-  the contradiction between the trajectory table and the economics log.
 
 ## Done
 
