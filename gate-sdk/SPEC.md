@@ -178,7 +178,10 @@ path, so its comments are directives like any source, thinned to the
 `# graph:`/`# spec:` lines and the placeholder scaffolding the consumer fills
 in (canon-kit/SPEC.md §check-comment-tier). Only `check-spec-pointer` skips a
 template, its `spec:` line being a placeholder unresolvable by design
-(§check-spec-pointer). A template's post-copy `source` paths are legitimate. A
+(§check-spec-pointer) — so the template↔copy relationship itself is governed
+separately, by §check-template-copy-parity, whose assertion A is the only
+mechanism that resolves a template's target at all. A template's post-copy
+`source` paths are legitimate. A
 false positive is silenced inline with `# shellcheck disable=SCxxxx` plus a
 justifying comment, never a blanket `.shellcheckrc`.
 
@@ -1415,6 +1418,87 @@ list is caught by keeping it gitignored, not by this gate. A non-repo cwd, or a
 missing required tracked pattern file, is fail-closed (exit 2). When the pattern
 set is empty the tree is unchecked (clean) — the fail-closed obligation is on a
 missing file, not an empty one.
+
+### check-template-copy-parity
+
+Invariant: a kit template and its vendored consumer copy agree on their
+**declared contract surface**. No mechanism kept the two in step before this
+gate — `scripts/agent-budget-guard.sh` and its template were both hand-edited
+with nothing verifying the edits matched.
+
+**Scope derives from layout, never a roster.** The pairing is
+`<kit>/templates/<name>.sh` ↔ `<gates-dir>/<name>.sh` (scan root the optional
+first argument, default the git toplevel). Two exclusions, both derivable:
+`*-config.sh` is out of scope by name suffix — a config template is a starting
+point the consumer customizes, so equality would be the defect — and a template
+with **no** same-named file under the gates dir is silently skipped, not failed.
+An unpaired template was never vendored out and has no copy to be in parity
+with; running a template in place (this repo wires two from the template path
+itself) is a legitimate adoption mode, so failing closed there would red a tree
+for six files that are working as designed.
+
+**Byte parity is ruled out, on measurement**, and so is containment in either
+direction. Every executable pair diverges deliberately: the consumer copies add
+this repo's own steering content. *copy ⊆ template* is therefore false on
+purpose; *template ⊆ copy* catches only the reverse of the direction that rots.
+Both alternatives are recorded here so no later pass re-derives them.
+
+**The declared surface** is four classes of *declaration*, namespaced so a
+collision across classes cannot mask one:
+
+- `func:` — function declarations, both `name()` and `function name` spellings.
+- `case:` — each `case`-arm's **exit token**: the first command word of the arm
+  body.
+- `lib:` — command-position calls to `_`-bearing identifiers the file does not
+  itself declare (the sourced-lib API).
+- `knob:` — uppercase `_`-bearing names read via the defaulted-env idiom
+  `${NAME:-…}` / `${NAME:=…}`.
+
+The `case:` class reads the arm's **action, never its pattern**, and that is a
+seam requirement rather than a convenience: a consumer's arm patterns are its own
+rule vocabulary, which a kit gate must never read (CLAUDE.md §The provenance
+seam). The gate asserts that a consumer's divergent rule lines are *declared*,
+never what they say. `func:` is inert on every pair in this tree (thin hook
+scripts source a kit lib and delegate, declaring no functions); the surface's
+whole bite comes from the other three classes, which are non-empty on every file.
+
+**The three assertions.**
+
+- **A — same resolved `spec:` target.** Both copies' first `spec:` line resolves
+  to the same `<file> §<section>`, compared on the target with trailing prose
+  stripped: a pair may gloss one target two ways deliberately, and comparing
+  whole lines would red a sanctioned divergence. A inherits a second property —
+  `check-spec-pointer` skips templates by design (§Self-lint), so a template's
+  target has never been resolved by anything, and A is the only mechanism that
+  surfaces a dangling template pointer.
+- **B — the template's declared surface is present in the copy.** Catches a
+  template-side change never propagated *and* a copy-side **removal**. B is the
+  only arm that sees a removal, which is why it is not droppable: the
+  `session-context` pair is a mutual rewrite, not a pure addition.
+- **C — the copy declares what it adds.** A surface token in the copy but not the
+  template is drift unless a `# copy-divergence: <reason>` line in that copy
+  **names** the token. Naming, not blanket per-file coverage: a blanket marker
+  would let C fire once and never again.
+
+**The `# copy-divergence: <reason>` marker** is source, like the `# graph:` and
+`# spec:` headers it sits beside — hand-authored by whoever adds something the
+template does not declare, read by assertion C, and a directive rather than a
+restatement under `check-comment-tier` (it changes gate behavior). The reason is
+required and non-empty, the `[drain-exempt:]` precedent where the reason *is* the
+audit trail.
+
+**Why this is the low-false-positive shape:** the gate reads declarations, not
+prose or logic, so a consumer rewording a message, reordering rules, or adding
+steering text triggers nothing. It fires only when a declared contract element
+appears on one side unexplained.
+
+`dir=bi` — parity is symmetric, either side going stale is the defect, which is
+precisely what B and C split between them. The fixture pair **synthesizes** the
+one-sided edit rather than capturing one: the tree's own attesting divergence is
+already repaired, so `good/` proves green-on-a-sanctioned-`spec:`-prose-difference
+(alongside an unpaired template and a divergent `*-config.sh` pair, proving both
+scope exclusions) and `bad/` proves all three assertions red on a hand-edited
+copy. Tier `precommit`.
 
 ### templates/check-skeleton.sh
 

@@ -79,3 +79,4 @@ check-rule-citation
 check-brevity
 check-settings-pins
 check-memory-off
+check-template-copy-parity

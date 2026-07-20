@@ -104,6 +104,7 @@ leaves its section absent.
 | [context-kit](context-kit/index.md) | check-brevity | precommit |
 | [context-kit](context-kit/index.md) | check-settings-pins | precommit |
 | [context-kit](context-kit/index.md) | check-memory-off | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-template-copy-parity | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-commit-msg | commit-msg |
 | [gate-sdk](gate-sdk/index.md) | check-commit-subject | commit-msg |
 | [gate-sdk](gate-sdk/index.md) | check-gate-assertions | align-only |

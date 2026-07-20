@@ -1,0 +1,9 @@
+# The attesting defect, synthesized — the tree's own agent-budget-guard pair is
+# already repaired, so a one-sided edit is constructed here rather than captured.
+# The copy was hand-edited and the template was not, tripping all three assertions:
+#   A — the copy's `spec:` line now resolves to a different section.
+#   B — the copy dropped `guard_advise`, which the template still declares. This
+#       is the direction that only B can see: a REMOVAL, not an addition.
+#   C — the copy added `guard_log_fallthrough` and the DELEGATION_KIT_PAUSE_PCT
+#       knob with no `# copy-divergence:` marker naming either.
+.

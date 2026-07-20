@@ -110,6 +110,7 @@ check-root-tiering
 check-commit-msg
 check-commit-subject
 check-tree-terms
+check-template-copy-parity
 ```
 <!-- gate-roster:end -->
 

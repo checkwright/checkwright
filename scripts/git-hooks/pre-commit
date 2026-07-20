@@ -329,5 +329,9 @@ fi
 
 run_gate check-memory-off context-kit/checks/check-memory-off.sh
 
+if staged_matches '*/templates/*.sh' 'scripts/*.sh'; then
+    run_gate check-template-copy-parity gate-sdk/checks/check-template-copy-parity.sh
+fi
+
 printf 'pre-commit: %d gate(s) passed.\n' "$_ran"
 exit 0

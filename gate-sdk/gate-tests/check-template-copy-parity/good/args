@@ -1,0 +1,8 @@
+# Root is the fixture dir: one synthesized template<->copy pair whose line-2
+# `spec:` lines gloss the SAME resolved target with different trailing prose —
+# the sanctioned divergence assertion A is designed to tolerate. The declared
+# surface (case-arm exit tokens, lib calls, knob names) is identical, so B and C
+# are both silent. This is the live agent-budget-guard pair's shape, synthesized:
+# the tree's own pair is already repaired, so green-on-sanctioned is proven here
+# rather than captured.
+.
