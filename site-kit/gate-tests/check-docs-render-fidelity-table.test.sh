@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Direct unit test of check-docs-render-fidelity's table-leakage assertion — the
-# good/bad pair stays the fence/heading case (the real historical Install bug),
-# so the table assertion needs its own case: a GFM table whose last row abuts a
+# good/bad pair carries the fence/heading case (the real historical Install bug)
+# and the severed-span case, so the table assertion needs its own case: a GFM
+# table whose last row abuts a
 # non-blank marker line (the value-page rollup incident, 2026-07-13) collapses to
 # literal-pipe paragraph text and reds ONLY the table assertion (green on fence
 # and heading, proving the new assertion carries the class the two missed); the

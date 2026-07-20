@@ -933,8 +933,8 @@ recorded rule/task/harvest/discard call. The evidence home is a stamped file,
 not the commit body, because the battery runs at pre-commit when no commit
 message exists yet, so only a file is mechanically decidable (the
 `check-stage-evidence` fail-closed precedent). Each data line is
-`<iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard
-<reason>> — <lead-line prefix>`; the ` — ` separates the disposition from the
+``<iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>``;
+the `` — `` separates the disposition from the
 lead-line prefix that joins it to the removed entry (a stored prefix matches a
 removed entry when it is a leading substring of that entry's normalized lead
 line). Both grammar (each line well-formed, a known disposition kind) and

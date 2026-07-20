@@ -26,3 +26,10 @@ Vendor the kit, then:
        # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
 
 3. Adopt the skills in your agent-skill directory.
+
+## Verdict line
+
+The consequence clause appends after the `` -> <verdict> `` arrow, leaving it
+disjoint from the width invariant below. The doubled-backtick span is the
+faithful form: the placeholder renders as escaped entities inside a code
+element, so neither a stray backtick nor a raw tag reaches the scanned text.

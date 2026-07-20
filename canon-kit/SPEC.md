@@ -622,7 +622,7 @@ name citation — another knob's default *expression*, a fallback source — nev
 value statement of itself, so expansions are blanked before the token scan. And
 the "default" leg binds: the word must be followed within a short window by a
 literal that is not itself a backticked knob name, so a stated default like
-`default \`docs/CNAME\`` fires while a knob cited bare after the verb ("these
+``default `docs/CNAME` `` fires while a knob cited bare after the verb ("these
 paths default through `<KIT>_<KNOB>`") does not.
 
 The scanned set is the shared `spec_manifest_files` finder and the prose walk is
@@ -843,7 +843,7 @@ dangling, otherwise caught only on review. Heading match tolerates a trailing
 a locator the pointer omits (`§The guard framework` → `## The guard framework
 (lib/guard.sh)`). Two `§` carve-outs keep the false-positive floor and must not
 be conflated: a directive's em-dash *prose tail* (`spec: <path> §<h> — <gloss>`)
-strips at the ` — ` so a `§` in the gloss is not read as a heading, while a
+strips at the `` — `` so a `§` in the gloss is not read as a heading, while a
 free-prose citation *is* a heading marker — the citation pass fires on a
 tracked `.md` path immediately followed by `§`, and a bare `§` with no tracked
 path before it (the deliberate non-citation use) never fires. Fenced code
@@ -1078,9 +1078,9 @@ would be caught. Two assertions:
   templates/x.sh scripts/x.sh` install *destination*, which the consumer
   creates and this repo need not track — is never a finding. That is the
   deliberate calibration: the invariant's failure mode is a broken invocation,
-  and scoping to the two named forms (a bare `<dir>/…/<name>.sh` and the `bash
-  <path>` form) drops the hypothetical-install-target class by construction,
-  with no whole-file exemption.
+  and scoping to the two named forms (a bare `<dir>/…/<name>.sh` and the
+  `bash <path>` form) drops the hypothetical-install-target class by
+  construction, with no whole-file exemption.
 - **(B) env knobs.** Any backticked or fenced ALL-CAPS name carrying a kit
   prefix (the roster is each `gate_kit_roots` member's basename uppercased,
   hyphens to underscores, trailing `_`: `gate-sdk` → `GATE_SDK_`) must occur in

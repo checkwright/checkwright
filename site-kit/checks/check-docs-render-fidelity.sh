@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit
-# spec: site-kit/SPEC.md §check-docs-render-fidelity — every tracked docs markdown page, rendered through the pinned Pages parser, leaks no fence marker into text, promotes no code-fenced heading, and renders no fewer tables than its source GFM table starts; a missing renderer fails closed
+# spec: site-kit/SPEC.md §check-docs-render-fidelity — every tracked docs markdown page, rendered through the pinned Pages parser, leaks no code-span corruption symptom (a stray backtick or a raw non-HTML-element tag) into text, promotes no code-fenced heading, and renders no fewer tables than its source GFM table starts; a missing renderer fails closed
 #
 # usage: check-docs-render-fidelity.sh [docs-dir] [config-file]
 #   defaults SITE_KIT_DOCS_DIR; config-file overrides SITE_KIT_CONFIG_FILE so a
@@ -51,7 +51,12 @@ fi
 strip_fm='NR==1 && $0=="---" { fm=1; next } fm==1 && $0=="---" { fm=0; next } fm==1 { next } { print }'
 
 rendered_scan='
-BEGIN { inpre=0; leak=0; h=0; tbl=0 }
+BEGIN {
+    inpre=0; leak=0; h=0; tbl=0
+    # spec: site-kit/SPEC.md §check-docs-render-fidelity — the known-HTML-element set is a kit built-in, not a config seam
+    split("a abbr address area article aside audio b base bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul var video wbr", A, " ")
+    for (i in A) HTMLEL[A[i]]=1
+}
 {
     t=$0
     while (match(t, /<h[1-6][ >]/)) { h++; t=substr(t, RSTART+RLENGTH) }
@@ -61,8 +66,16 @@ BEGIN { inpre=0; leak=0; h=0; tbl=0 }
     if ($0 ~ /<pre/) { inpre=1; next }
     s=$0
     gsub(/<code[^>]*>[^<]*<\/code>/, "", s)
+    # spec: site-kit/SPEC.md §check-docs-render-fidelity — symptom (b), scanned before the tag-strip below so the placeholder tag is still present
+    w=s
+    while (match(w, /<\/?[A-Za-z][A-Za-z0-9]*[^>]*>/)) {
+        nm=substr(w, RSTART, RLENGTH); w=substr(w, RSTART+RLENGTH)
+        sub(/^<\/?/, "", nm); sub(/[^A-Za-z0-9].*/, "", nm)
+        if (!(tolower(nm) in HTMLEL)) leak=1
+    }
+    # spec: site-kit/SPEC.md §check-docs-render-fidelity — symptom (a), any literal backtick, not only a fence run
     gsub(/<[^>]*>/, "", s)
-    if (s ~ /`{3,}/) leak=1
+    if (s ~ /`/) leak=1
 }
 END { print leak+0, h+0, tbl+0 }'
 
@@ -128,7 +141,7 @@ for page in "${pages[@]}"; do
     stbl="$(printf '%s\n' "$body" | awk "$source_tables")"; tst=$?
     fail_closed "$tst" DOCS-RENDER-FIDELITY source-table-scan
 
-    [[ "$leak" -eq 1 ]] && findings+=("$page: a fence marker (backtick run) leaked into rendered text — a fenced block failed to parse")
+    [[ "$leak" -eq 1 ]] && findings+=("$page: a code-span corruption symptom (a stray backtick, or a raw non-HTML-element tag) leaked into rendered text — a code span or fenced block failed to parse")
     [[ "$rcount" -gt "$scount" ]] && findings+=("$page: $rcount rendered heading(s) exceed $scount source heading(s) outside code — a code-fenced '#' line was promoted")
     [[ "$rtbl" -lt "$stbl" ]] && findings+=("$page: $rtbl rendered table(s) fall short of $stbl source GFM table start(s) — a table collapsed into literal-pipe paragraph text (a row abutting a non-blank line)")
 done
@@ -137,8 +150,10 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "check-docs-render-fidelity: rendered docs page(s) diverge from source under the pinned Pages parser:"
     printf '  %s\n' "${findings[@]}"
     echo "  help: restructure the offending block so kramdown's GFM parser renders it faithfully — an"
-    echo "        indented (4-space) code block avoids the consecutive-fence and unclosed-fence leakage class."
+    echo "        indented (4-space) code block avoids the consecutive-fence and unclosed-fence leakage"
+    echo "        class; a doubled-backtick code span kept on one line (never split across a newline"
+    echo "        before a <word> token) avoids the severed-span class."
     exit 1
 fi
-echo "DOCS-RENDER-FIDELITY: clean (${#pages[@]} tracked markdown page(s) under $DOCS render with no fence, heading, or table leakage)"
+echo "DOCS-RENDER-FIDELITY: clean (${#pages[@]} tracked markdown page(s) under $DOCS render with no span-corruption, heading, or table leakage)"
 exit 0

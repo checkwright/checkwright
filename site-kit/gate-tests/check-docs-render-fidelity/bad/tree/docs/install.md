@@ -28,3 +28,11 @@ Vendor the kit, then:
    ```
 
 3. Adopt the skills in your agent-skill directory.
+
+## Verdict line
+
+The consequence clause appends after the ` -> <verdict>` arrow, leaving it
+disjoint from the width invariant below. A single-backtick span whose content
+carries an angle-bracket placeholder is severed by kramdown's block-before-span
+parse: the span never closes, so the page leaks a stray backtick *and* a raw
+`<verdict>` tag into rendered text — both symptoms of assertion 1.

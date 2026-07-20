@@ -14,62 +14,6 @@
 
 ## Technical Debt
 
-- **render-fidelity-inline-span-leak** — `check-docs-render-fidelity`
-  **claims a defense its assertions do not implement**, and four flagship public
-  SPEC pages render 24–62% of their body as raw text today while the gate reports
-  clean. Promoted from Deferred to active debt 2026-07-20 by operator ruling; the
-  v0.10.0 release is held partly on these corrupted pages
-  (`.workflow/release-disposition.txt`), so clearing this both repairs the public
-  docs and unblocks the release note.
-  **One Enforcement-first unit** (the fix and the gate that catches it land
-  together): widen the leak assertion so any backtick — or raw `<word>` tag —
-  surviving into rendered non-code text reds the gate, with the false-positive
-  floor designed deliberately (that floor is the open design work — needs design
-  before build — not the diagnosis, which the SPEC already settles);
-  land the fixture pair; and rewrap the offending source spans in the four kit
-  SPECs so the mirrors regenerate clean.
-  **Symptom (the assertion target):** kramdown parses blocks before spans, so a
-  code span whose content escapes into a raw `<word>` HTML tag makes the parser
-  swallow the rest of the paragraph/page as raw HTML — headings render as literal
-  `##`, emphasis as literal `**`, GFM tables never parse. The current assertion 1
-  matches only a **3+-backtick** run (`` `{3,} ``); every leak here survives as a
-  *single* backtick and/or a raw tag, so the gate is blind to all of them. A
-  downstream GFM table is the only thing that incidentally reds the gate (the
-  table-count assertion), which is why the prior build "fixed" a redded table by
-  converting it to a list — removing the one visible symptom and leaving the
-  corruption in place.
-  **Scope re-verification 2026-07-20 (this promotion) — the prior close's
-  root-cause diagnosis is CONFIRMED corrupt-and-clean but too NARROW.** Reproduced
-  against the pinned parser (kramdown 2.5.2 + kramdown-parser-gfm 1.1.0); blast
-  radius re-measured on the live mirrors: `docs/gate-sdk/SPEC.md` ~62% / 1106
-  leaked backticks, `docs/delegation-kit/SPEC.md` ~58%, `docs/canon-kit/SPEC.md`
-  ~47%, `docs/lifecycle-kit/SPEC.md` ~24% / 230 backticks; gate clean on all 57
-  pages. But the leaks are **at least three distinct sub-shapes**, not one: (1)
-  *severed span* — `gate-sdk/SPEC.md:566` and `lifecycle-kit/SPEC.md:935-936`,
-  a single-backtick span split across a newline whose continuation begins with a
-  `<word>` token (the close's stated class); (2) *single-line embedded tag* —
-  `delegation-kit/SPEC.md:280`, code spans `` ` -> <verdict>` `` / `` `width=<n>` ``
-  that fail to form because `<verdict>`/`<n>` are consumed as raw HTML spans, no
-  newline involved; (3) *escaped-backtick nested span* — `canon-kit/SPEC.md:625`,
-  `` `default \`docs/CNAME\`` `` combined with `` `<KIT>_<KNOB>` ``. So a fix
-  keyed to "severed span" (the close's framing) would miss delegation and canon
-  entirely — which **confirms the entry's own alternative**: the assertion must
-  key on the shared *symptom* (a surviving backtick / raw `<word>` tag in rendered
-  text), not on any single root cause. This is the FP-floor design's real burden:
-  one low-false-positive assertion covering ≥3 root causes.
-  Gap generalization (a `/spec` question, deliberately unsettled): the class that
-  should have caught this is a **gate-claims-vs-assertions** audit — a gate whose
-  SPEC names a failure class it does not assert. `check-gate-assertion-strength`
-  (commit `1461b96`) is the nearest instance but reads the *failure message*, not
-  SPEC prose; whether it extends to prose claims or is inherently a human-audit
-  class is spec work, not settled here.
-  **Seam ruling (this promotion):** all generic site-kit mechanism — the render
-  fidelity assertion is universal markdown-render truth, the `<word>`/`<KIT>`
-  tokens in the offending spans are generic prose placeholders, not private rule
-  content, and nothing new becomes consumer config. Clean seam; this is why it is
-  debt, not a feature (it converges the gate onto a defense its SPEC already
-  claims, adding no governed name).
-
 ## Deferred
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
@@ -622,6 +566,23 @@
   convention is built. Filed 2026-07-20 by the `render-fidelity-leak-coverage`
   spec, settling the flagged `/spec` question.
 
+- **stage-routing-for-debt-with-design-rulings** [needs-spec] — the lifecycle
+  contract does not document how a **debt** unit that carries genuine design
+  rulings (not mere behavior-convergence) routes its design: through a `/spec`
+  pass, or settled at `/scope`. `/spec` is nominally trigger-gated to feature
+  units, yet this iteration ran `/spec` for a debt unit by lead ruling and it
+  worked cleanly — the false-positive floor was real design work that scope
+  would have carried badly.
+  **Design question (why [needs-spec]):** a lifecycle-contract clarification —
+  name the routing rule and place it at the widest true tier
+  (`lifecycle-kit/templates/skills/scope.md` / `spec.md`, or lifecycle-kit's
+  SPEC), the same shape as `scope-iteration-cost-bundling-test` and
+  `new-initiative-filing-default`. Debt, adds no governed name.
+  **Cost while deferred:** low but recurring — each debt unit carrying design
+  re-litigates its routing by lead ruling, as this iteration did.
+  Filed 2026-07-20 by lead ruling at this iteration's build, from a spec-stage
+  process observation.
+
 - **build-stage-tier-economics** [needs-spec] — measure whether the `build`
   stage downgrades from Opus to Sonnet net-positive rather than flipping on
   intuition; a ruling-config tier re-judgment (`.claude/agents/stage-session.md`
@@ -653,5 +614,7 @@
   question.
 
 ## Done
+
+- render-fidelity-inline-span-leak
 
 ## Lessons Learned

@@ -198,9 +198,13 @@ literal-pipe paragraph with the gate silent; the emitter fix (a trailing blank
 line) landed then, and this assertion mechanizes the channel. The good/bad
 fixture pair exercises the span-corruption symptom (a bad page whose severed span
 leaks a stray backtick and a raw placeholder tag, a good page whose faithful code
-spans render clean) alongside the fence/heading case; the table assertion carries
-its own hermetic unit test (a collapsed table reds table-only, a trailing blank
-clears).
+spans render clean) alongside the fence/heading case. Because that bad page would
+red on its fence run alone, the span assertion also carries its own hermetic unit
+test isolating it — a page with no fence, no surplus heading and no table, whose
+only defect is the severed span, reds span-only and clears in the
+doubled-backtick form — so a widening that reds nothing new cannot pass. The
+table assertion likewise carries its own unit test (a collapsed table reds
+table-only, a trailing blank clears).
 The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
 lets a fixture point the docs dir and renderer at a synthetic tree without
 touching consumer config. `precommit` tier, coupling the docs tree.

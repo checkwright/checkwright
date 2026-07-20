@@ -568,9 +568,9 @@ hermeticity contract is therefore explicit: every bespoke test sources
 kit's `<KIT>_CONFIG_FILE` to one shared empty file so the gate runs on kit
 defaults, not the consumer's posture — with `check-test-hermetic`
 (§check-test-hermetic) enforcing the pairing. A case that deliberately exercises
-config overrides *after* the source (a later assignment, or an `env -u
-<KIT>_CONFIG_FILE` / per-invocation prefix) by ordering. The runner is a test
-layer parallel to the gates, never a `gates.list` member.
+config overrides *after* the source (a later assignment, or an
+`env -u <KIT>_CONFIG_FILE` / per-invocation prefix) by ordering. The runner is a
+test layer parallel to the gates, never a `gates.list` member.
 
 ### run-consumer-smoke
 

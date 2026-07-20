@@ -1,5 +1,8 @@
-# Point the gate at this fixture's synthetic docs tree. The Install skeleton is
-# the real historical bug shape — consecutive fenced blocks inside one list item,
-# where the second fence prints literally and the '# contract:' line is promoted
-# to a heading under kramdown-GFM. The gate must REJECT.
+# Point the gate at this fixture's synthetic docs tree. Two real bug shapes ride
+# this page. (1) The Install skeleton: consecutive fenced blocks inside one list
+# item, where the second fence prints literally and the '# contract:' line is
+# promoted to a heading under kramdown-GFM. (2) The Verdict-line section: a
+# single-backtick span carrying an angle-bracket placeholder, severed by
+# kramdown's block-before-span parse so it leaks BOTH assertion-1 symptoms — a
+# stray backtick and a raw non-HTML-element tag. The gate must REJECT.
 tree/docs

@@ -1,4 +1,6 @@
-# Point the gate at this fixture's synthetic docs tree. The Install skeleton uses
-# indented (4-space) code blocks — the restructure that renders faithfully under
-# kramdown-GFM. The gate must PASS.
+# Point the gate at this fixture's synthetic docs tree — the faithful
+# counterpart of every shape the bad page corrupts. The Install skeleton uses
+# indented (4-space) code blocks; the Verdict-line section uses a
+# doubled-backtick span kept on one line, so the placeholder renders as escaped
+# entities inside a code element. The gate must PASS.
 tree/docs

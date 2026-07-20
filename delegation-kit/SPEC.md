@@ -277,12 +277,12 @@ budget guard fires *on* dispatch, the act a hesitating session has not yet
 performed. STALE's status half is site-specific — each emission site names why
 it is stale — while its consequence half is uniform, because the consequence is
 uniform: STALE is budget-unknown at every site and never blocks delegation. The
-consequence clause appends *after* the ` -> <verdict>` arrow, leaving it
+consequence clause appends *after* the `` -> <verdict> `` arrow, leaving it
 disjoint from the `width=<n>` invariant below.
 
 **The `width=<n>` field.** Every emitted verdict line — OK, PAUSE, STALE (the
 fail-closed diagnostics included), RESET-OK — carries a `width=<n>` field
-immediately before the ` -> <verdict>` arrow, read from
+immediately before the `` -> <verdict> `` arrow, read from
 `DELEGATION_KIT_FAN_WIDTH` (§Layout and configuration). It is the knob's
 mechanical reader: the budget check already runs before every dispatch, so the
 read-only fan-out bound surfaces at exactly the wave-sizing decision point, and
