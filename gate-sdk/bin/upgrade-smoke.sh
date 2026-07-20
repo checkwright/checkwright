@@ -83,6 +83,10 @@ for r in "${fromroots[@]}"; do kitname_seen["$(basename "$r")"]=1; done
     || { echo "upgrade-smoke: phase A gen-pre-commit failed at TO ($TO)" >&2; exit 2; }
 ( cd "$CONS" && bash gate-sdk/checks/check-graph.sh --emit > .workflow/CHECK-GRAPH.html ) \
     || { echo "upgrade-smoke: phase A check-graph --emit failed at TO ($TO)" >&2; exit 2; }
+if [[ -f "$CONS/doctrine-kit/bin/install-doctrine.sh" ]]; then
+    ( cd "$CONS" && bash doctrine-kit/bin/install-doctrine.sh >/dev/null ) \
+        || { echo "upgrade-smoke: phase A install-doctrine failed at TO ($TO)" >&2; exit 2; }
+fi
 
 # spec: gate-sdk/SPEC.md §upgrade-smoke — determinism: git status shows changes only under kit roots and the two regenerated artifacts; anything else means phase A edited a consumer file (the wholesale-sync invariant broke)
 git -C "$CONS" add -A
@@ -90,7 +94,7 @@ stray=()
 while IFS= read -r p; do
     [[ -n "$p" ]] || continue
     case "$p" in
-        scripts/git-hooks/pre-commit|.workflow/CHECK-GRAPH.html) continue ;;
+        scripts/git-hooks/pre-commit|.workflow/CHECK-GRAPH.html|CLAUDE.md) continue ;;
     esac
     top="${p%%/*}"
     [[ -n "${kitname_seen[$top]:-}" ]] || stray+=("$p")
