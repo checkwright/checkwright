@@ -1,4 +1,6 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written:
-#   <iteration> release <version|none> — <one-line basis>
+#   <iteration> release <version|none|deferred:<version>> — <one-line basis>
+
+verdict-reader-honesty release deferred:v0.10.0 — minor criteria met and held back by operator ruling, not unearned (Tightened gates: check-assertion-strength landed new and registered; Behavior changes: the STALE verdict string gained its decision consequence, and agent-budget-guard.sh lost its `2)` arm in both copies; Renamed knobs: none; no decommission). The operator ruled this iteration's unit set rather than a release, so nothing outward-facing left the machine — no tag, no GitHub Release. v0.10.0 is the bump these criteria floor over the newest released note (v0.9.0); they stay unconsumed and must be carried into the next qualifying release's note. Re-stamped from commit 6c53737, where the boundary truncation had left them surviving only in history.
 

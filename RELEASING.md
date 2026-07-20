@@ -63,6 +63,14 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    iteration meeting no bump criterion earns **none**: stamp `<iteration> release
    none — <basis>` into the disposition evidence and stop — no tag, no GitHub
    Release. A patch stays available on operator judgment for an urgent fix.
+   An iteration that **meets** a bump criterion but whose release the operator
+   holds back is neither of those: stamp `<iteration> release deferred:vX.Y.Z —
+   <basis>` — the version the criteria would have shipped as, derived over the
+   newest already-released note — and stop, again with no tag and no Release. The
+   deferral stays outstanding until a later line releases at or above it, and the
+   outstanding criteria are carried into the next qualifying note's three
+   sections; `check-release-bump` floors that note against it. Never overload
+   `none` for this — `none` means nothing was earned.
    Otherwise continue with the derived `vX.Y.Z`.
 
 3. **Major only: sweep the deprecation markers.** When the bump is a major, run

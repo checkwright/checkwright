@@ -583,6 +583,10 @@ closing iteration** (exit 1, nothing written, the same refusal contract): each
 member must carry a data line whose first token is the closing iteration's name,
 so a consumer wiring its release-disposition evidence here makes the close-stage
 disposition a mechanical boundary precondition rather than a decorative stamp.
+The check is **value-agnostic by construction** — it tests the first token only
+and never parses the value field — so a disposition grammar gaining a value (as
+it did with `deferred:<version>`, §templates/skills/) needs no
+widening here; recorded so a future value addition does not re-derive it.
 Fail-closed: a member that does not exist on disk is a refusal naming the path. A
 never-named (`—`) closing iteration has nothing to disposition and skips the
 check. `--simulate` relays the would-be refusal the way it does for lessons. The
@@ -1076,8 +1080,52 @@ The `close` template carries a **release-disposition step**: every close
 dispositions the iteration at the release boundary — reading the consumer's
 `release-policy` slot and either executing its release procedure or stamping an
 explicit no-release line into the consumer-named disposition-evidence file
-(`<iteration> release <version|none> — <basis>`, the `check-lesson-disposition`
-contract shape at the release boundary). The step runs after the surface-mutating
+(`<iteration> release <version|none|deferred:<version>> — <basis>`, the
+`check-lesson-disposition` contract shape at the release boundary).
+
+The third value carries a release the criteria **earn** but an operator ruling
+holds back, which `none` ("nothing to release") cannot express — a reader forced
+to tell the two apart by parsing basis prose has no mechanical signal at all. It
+is `deferred:<version>` and not a bare `deferred` because the thing that must
+survive is the *earned bump level*; a bare token drops it and the next release
+re-derives which floor it inherits. The producer derives `<version>` as the
+version the criteria *would have shipped as* had the release not been held: the
+bump the note's upgrade-contract sections floor, applied over the newest
+already-released note — never the next version the project happens to reach.
+Stating that rule is what keeps the field mechanically derivable rather than an
+operator's guess, since without a defined scale the discharge comparison has
+none. The criteria themselves stay in the basis prose and are not structured
+fields: the release note's upgrade-contract sections already own them, and a
+structured list here would be a second copy of that surface — the line carries
+the *level*, the note owns the *criteria*.
+
+**Outstanding-deferral is derived, never tracked.** A `deferred:<version>` line
+is **outstanding** until a later line dispositions a release at or above
+`<version>`; that later line **discharges** it. Nothing records discharge
+separately — the release actually happening *is* the discharge, so there is no
+second state to drift. This is what keeps a consumer's gate over the value
+low-false-positive: a deferral cannot linger past the release that consumes it,
+and one that genuinely has not been consumed *should* keep firing.
+
+A consumer deriving that outstanding set reads the disposition file as
+**history ∪ live** — not replacement, not fallback — the same reader
+drift-kit/SPEC.md §The stage-economics meter applies to the stage stamps and
+`drift-kit/bin/trajectory.sh` already ships. The file is typically a `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member,
+so a carrying line survives only in committed history and a live-only reader sees
+nothing; conversely a history-only reader is blind at exactly the moment that
+matters most for a precommit gate — the pre-commit of the very close commit
+writing the `deferred:` line, when that line is live and not yet committed.
+The live arm covers the uncommitted tail, the history arm covers everything
+truncation has taken, and the union costs nothing because a line in both arms is
+the same line. Truncation-immunity is a property of the *reader*, and every
+reader of a truncated evidence file needs it.
+
+**The kit wires no gate over the value**, consistent with the release-sweep stamp
+file: the disposition file is operator evidence riding the release commit, the
+kit defines the value and the outstanding/discharged derivation, and a consumer
+may gate it. That split is the provenance seam — the *grammar* is generic
+lifecycle mechanism, the *bump criteria* being carried are consumer release
+policy, so the kit ships no list of criteria. The step runs after the surface-mutating
 close steps and before the brevity pass, since the note is itself such a write;
 silence is not a disposition. The `release-policy` slot carries the consumer's
 procedure and criteria by citation, the disposition-evidence path, and any

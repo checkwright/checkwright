@@ -12,19 +12,6 @@
 
 ## New Features
 
-- **release-disposition-deferred-value** [spec: lifecycle-kit/SPEC-release-disposition-deferred.md]
-  — the disposition grammar's `<version|none>` cannot express "qualified but
-  deferred", so `verdict-reader-honesty` overloaded `none` and this repo's
-  unconsumed minor criteria are carried by memory alone. The amendment adds
-  `deferred:<version>` (the version, not a bare token, because the earned bump
-  level is the thing that must survive) and derives outstanding-vs-discharged from
-  the disposition record itself rather than tracking a second state. Its
-  load-bearing finding: the disposition file is a boundary-truncate member and is
-  **already header-only** — the carrying line survives only in commit `6c53737` —
-  so the widened `check-release-bump` must read committed history, the same
-  technique unit 1 adopts. Seam split: the grammar is kit mechanism, the bump
-  criteria stay consumer policy.
-
 - **template-consumer-copy-parity** [spec: gate-sdk/SPEC-template-consumer-copy-parity.md]
   — no mechanism keeps a kit template and its vendored consumer copy in parity;
   the `agent-budget-guard.sh` pair was hand-edited on both sides with nothing
@@ -538,5 +525,6 @@
 ## Done
 
 - stage-economics-truncation-durability
+- release-disposition-deferred-value
 
 ## Lessons Learned

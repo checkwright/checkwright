@@ -90,9 +90,53 @@ write_note "$d" "0.1.0" "None." "None."
 write_note "$d" "0.1.1" "None." "None."
 check_case "all-none-patch-clean" "$tmp/allnone" 0 "RELEASE-BUMP: clean"
 
+# $1=label $2=root $3=disposition-body $4=want-rc $5=want-substring
+check_deferral() {
+    local out rc
+    printf '%s' "$3" > "$2/disposition.txt"
+    out="$(cd "$2" && "$GATE" posts disposition.txt 2>&1)"; rc=$?
+    if [[ "$rc" -ne "$4" ]]; then
+        echo "  FAIL [$1]: want exit $4, got $rc -- $out"; fails=$((fails + 1)); return
+    fi
+    if [[ -n "$5" ]] && ! grep -qF -- "$5" <<<"$out"; then
+        echo "  FAIL [$1]: exit $rc OK but output lacks '$5': $out"; fails=$((fails + 1))
+    fi
+}
+
+# E — an outstanding deferral floors an otherwise floor-neutral patch bump to minor.
+e="$tmp/deferred"
+write_note "$e/posts" "0.1.0" "None." "None."
+write_note "$e/posts" "0.1.1" "None." "None."
+check_deferral "outstanding-deferral-patch-red" "$e" \
+    'alpha release deferred:v0.2.0 — held back
+' 1 "outstanding deferred release (v0.2.0)"
+
+# F — a later line releasing at or above the deferred version discharges it: clean.
+check_deferral "discharged-deferral-patch-clean" "$e" \
+    'alpha release deferred:v0.2.0 — held back
+beta release v0.2.0 — shipped
+' 0 "RELEASE-BUMP: clean"
+
+# G — an outstanding deferral is no red on a minor bump, which already clears its floor.
+g="$tmp/deferred-minor"
+write_note "$g/posts" "0.1.0" "None." "None."
+write_note "$g/posts" "0.2.0" "None." "None."
+check_deferral "outstanding-deferral-minor-clean" "$g" \
+    'alpha release deferred:v0.2.0 — held back
+' 0 "inheriting outstanding deferral v0.2.0"
+
+# H — the deferred floor derives ahead of the two-note early return, so a single-note
+# tree carrying an outstanding deferral reds rather than exiting clean for lack of a
+# predecessor — the case a fresh consumer meets on note one.
+h="$tmp/deferred-single"
+write_note "$h/posts" "0.1.0" "None." "None."
+check_deferral "single-note-deferral-red" "$h" \
+    'alpha release deferred:v0.2.0 — held back
+' 1 "single-note tree cannot ride it out"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-bump.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean, 4 cases)"
+echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, and passes a minor)"
 exit 0

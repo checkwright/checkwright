@@ -149,6 +149,15 @@ reconcile, so the floor is read off the note rather than maintained beside it:
   anchored while 0.x. `v1.0.0` is the first stability promise and is cut
   deliberately, never earned mechanically.
 
+The floor has a **second input**: a note also inherits the floor of any
+outstanding deferred release. When an iteration's criteria were met but the
+release was held back, its disposition line records the earned version as
+`deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/skills/), and
+those criteria stay unconsumed until a release at or above that version ships.
+The next qualifying note carries them in its three sections and may not fall
+below that version — so a note's floor is the higher of what its own sections
+derive and what an outstanding deferral carries. `check-release-bump` reads both.
+
 The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
 orders the release notes by version and reds a patch-only bump whose note
 declares tightened gates, renamed knobs, or behavior changes (and fails closed
