@@ -12,19 +12,6 @@
 
 ## New Features
 
-- **template-consumer-copy-parity** [spec: gate-sdk/SPEC-template-consumer-copy-parity.md]
-  — no mechanism keeps a kit template and its vendored consumer copy in parity;
-  the `agent-budget-guard.sh` pair was hand-edited on both sides with nothing
-  verifying the edits matched. Byte parity is ruled out on measurement (11/11
-  pairs diverge, and for the eight `*-config.sh` pairs divergence *is* the
-  contract). The amendment's finding is that containment in **either** direction
-  is insufficient — the copies legitimately add content — so the gate asserts over
-  the declared contract surface (same resolved `spec:` target; the template's
-  functions and exit arms present in the copy) and makes the rotting direction
-  decidable with a required `# copy-divergence: <reason>` marker. The honest
-  fallback if assertion C proves noisy is recorded now: ship A+B and state the
-  limit, the `check-gate-tamper` precedent.
-
 ## Technical Debt
 
 ## Deferred
@@ -526,5 +513,6 @@
 
 - stage-economics-truncation-durability
 - release-disposition-deferred-value
+- template-consumer-copy-parity
 
 ## Lessons Learned
