@@ -84,10 +84,8 @@ never the designed sweep — an accepted, costed loss.
 
 Mid-iteration the queue file is written only for real **work-state**
 transitions: promotion and naming (the first stage), the Done move riding each
-unit's **completing** commit — a build-bound unit's at `build` (a feature's is
-its amendment-merge commit), a **no-build debt ruling's at its `spec` authoring
-commit**, since build never runs for it and the drain stage refuses a non-empty
-active queue — and the closing dispositions. Stage motion never touches it.
+amendment-merge commit, and the closing dispositions. Stage motion never
+touches it.
 
 The **deterministic half** of that first step — read the iteration from the
 header, read the id from `session-id.sh`, append the stamp — is mechanized by
@@ -825,20 +823,15 @@ Calibration: the predecessor map deliberately omits a **trigger-gated stage**
 as anyone's mandatory predecessor — the audit stage, and equally a trigger-gated
 *authoring* stage where a roster splits one out (§templates/skills/) — because
 demanding its stamp before a successor would false-fire on an iteration that
-legitimately skipped it (an amendment-free iteration runs no audit; an iteration
-with no unit to author — no feature and no debt ruling — runs no authoring stage,
-§templates/skills/); the build→align re-check when align *did* run is
+legitimately skipped it (an amendment-free iteration runs no audit; a debt-only
+one runs no authoring stage); the build→align re-check when align *did* run is
 the build skill's step-0 procedural precondition, not this gate. A trigger-gated
 authoring stage takes **no assertion-C sibling**, a mechanized trigger considered
 and deferred: its trigger is procedural (the prior stage's next-stage
 recommendation) and already backstopped by canon-kit's bidirectional
 amendment-pairing rule — a feature entry carries a `[spec:]` ref only when the
 amendment exists on disk, so a skipped authoring stage cannot ship a feature
-without its amendment. (A **debt ruling** routed here carries no amendment to
-backstop it — §templates/skills/; that case stays procedural-only by the same
-deliberate non-mechanization, its correctness resting on the converged surface's
-own gates rather than the pairing rule.) The disanalogy with assertion C is
-decisive: C mechanizes
+without its amendment. The disanalogy with assertion C is decisive: C mechanizes
 because the *audit* it gates is otherwise-unverifiable judgment, whereas an
 authoring stage's *output* — the amendment — is otherwise-verified by that
 bidirectional rule, so a process assertion there would only duplicate the
@@ -1019,27 +1012,10 @@ out from `scope` on a roster that carries a dedicated authoring stage (the
 ontology: scope bounds the units, the authoring stage authors the amendments,
 the audit stage independently verifies them). It is a full stage (it invokes
 `enter-stage.sh` and stamps), **trigger-gated exactly like the audit stage**: it
-runs only when an iteration promotes a unit that carries **authoring** — genuine
-design reasoned and recorded before build — it **appends** rather
+runs only when an iteration promotes a feature to author, it **appends** rather
 than resets (only the first stage resets the evidence file), and it takes `scope`
 as its predecessor without being named any stage's mandatory predecessor
-(§check-stage-entry's trigger-gated-stage calibration).
-
-The trigger is **not** the feature/debt litmus. Two unit shapes carry authoring:
-every **feature** (its amendment *is* the authoring), and a **debt unit whose
-design is a ruling** — a placement, seam, or among-alternatives decision rather
-than a mechanical convergence on a name the spec already carries. A debt ruling
-drafted longer than a few lines into a queue-entry body is design work inlined
-where no gate can see it (canon-kit/SPEC.md §The amendment lifecycle); routing it
-here gives it the authoring stage instead. The two shapes differ in **where the
-authoring lands**: a feature's is a `SPEC-<feature>.md` amendment paired by
-`[spec:]` under canon-kit's bidirectional rule, whereas a debt ruling's lands
-**directly in the governed surface it converges** — the canonical spec section or
-skill template — with no amendment file and no `[spec:]` tag, since the pairing
-gate reds a `[spec:]` outside a feature section (canon-kit/SPEC.md
-§check-amendment-queue). The debt case is therefore **un-backstopped** by that
-gate: its correctness rests on scope's routing and the converged surface's own
-gates, the procedural-only footing the audit stage also runs on. The kit **default roster
+(§check-stage-entry's trigger-gated-stage calibration). The kit **default roster
 does not bind it** — the split is demand-gated and non-breaking; a consumer
 activates it through `LIFECYCLE_KIT_STAGES` / `LIFECYCLE_KIT_PREDECESSOR`
 (§Layout and configuration). This is the supported roster shape for a

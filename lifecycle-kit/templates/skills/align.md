@@ -9,7 +9,10 @@ align`: it appends `<iteration> align <session-id> <date>` to
 proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`
 (the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. That stamp *is* the
+(writing nothing) if `check-stage-entry` is red. On a refusal, **do not force
+the entry** — escalate to the lead (where one exists and this is not a standalone
+session) and stop; a refused entry is a gate verdict to resolve at its source,
+never to override. That stamp *is* the
 transition — the last stamp is the stage cursor, so nothing flips and no queue
 write is involved. Commit the stamp on its own.
 

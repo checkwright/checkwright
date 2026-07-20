@@ -756,11 +756,33 @@
   ruling during the `render-fidelity-leak-coverage` spec, from an operator
   question.
 
+- **upgrade-smoke-phase-a-regen-derivation** [needs-spec] —
+  `gate-sdk/bin/upgrade-smoke.sh` phase A swaps in the tip-of-tree kits then
+  regenerates a **hardcoded roster** of generated artifacts — pre-commit,
+  check-graph, and (as of `cd5dd59`) install-doctrine's digest — plus a **literal
+  `CLAUDE.md`** in the determinism whitelist. Both are hand-maintained copies of a
+  fact the vendored kits already own: which artifacts each kit's installer
+  regenerates. A kit that adds or renames a generated artifact (as doctrine-kit
+  just did, reddening `check-doctrine-registration` in phase B until `cd5dd59`
+  patched the roster) silently falls out of phase A until someone hand-edits the
+  roster — the maintain-a-derivable antipattern derivation-first rules out.
+  **Design direction:** derive the regen set from the vendored kits' own installers
+  (each kit owns its generated-artifact targets), so phase A re-runs whatever the
+  vendored kits install rather than a literal list, and the determinism whitelist
+  follows from those targets rather than naming `CLAUDE.md` by hand. This is the
+  interim flagged in `cd5dd59`'s message.
+  Debt: converges an existing smoke onto a derived roster; adds no governed name.
+  **Cost while deferred:** low but rot-prone — each new or renamed generated
+  artifact in any vendorable kit re-opens the same phase-A staleness, caught only
+  when a downstream phase-B gate reds and someone re-derives the cause (as
+  `cd5dd59` did). Cost to close: roughly one iteration. Filed 2026-07-21 by build
+  during `lifecycle-rule-placement`'s model correction.
+
 ## Done
 
 - enter-stage-simulate-writes
 - close-capture-filing-destination
-- stage-routing-for-debt-with-design-rulings
+- stage-routing-debt-to-build-spec-features-only
 - new-initiative-filing-default
 - scope-iteration-cost-bundling-test
 

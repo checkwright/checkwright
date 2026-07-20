@@ -1,6 +1,13 @@
 The `build` (implementation) stage of an iteration. Implement the queued work
 in queue order. Exit condition: task queue empty for this iteration.
 
+Build is **mandatory every iteration** and processes **both feature and debt
+units**: it merges a promoted feature's amendment into the canonical spec and
+makes a debt unit's direct edits (a debt unit skips the authoring stage
+entirely), and it **owns the task-completion Done move** for either kind. The
+authoring stage authors amendments only — it makes no direct spec/code edit and
+moves nothing to Done.
+
 **Step 0 — audit-readiness recheck (before the stamp).** The
 entry stamp re-fires the state-coupled gates but **not** your
 spec-consistency battery (it couples the spec corpus, not the evidence file), so a
@@ -22,7 +29,10 @@ to `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the
 stamp proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh`
 (the newest transcript — never hand-picked), using `date +%F`, and refusing
-(writing nothing) if `check-stage-entry` is red. That stamp *is* the
+(writing nothing) if `check-stage-entry` is red. On a refusal, **do not force
+the entry** — escalate to the lead (where one exists and this is not a standalone
+session) and stop; a refused entry is a gate verdict to resolve at its source,
+never to override. That stamp *is* the
 transition — the last stamp is the stage cursor, so nothing flips and no queue
 write is involved. Commit the stamp on its own.
 

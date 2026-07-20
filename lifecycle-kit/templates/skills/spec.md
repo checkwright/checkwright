@@ -9,34 +9,25 @@ amendment on disk, and each amendment's causal-completeness check is green>*.
 
 ## Trigger (spec is trigger-gated)
 
-Run `spec` when this iteration promotes ≥1 unit that carries **authoring** —
-genuine design reasoned and recorded before build. Two shapes qualify: a
-**feature** (its amendment is the authoring), and a **debt unit whose design is a
-ruling** — a placement, seam, or among-alternatives decision, not a mechanical
-convergence on a name the spec already carries. An iteration with neither — every
-unit a mechanical debt convergence — skips `spec` entirely (scope advances to the
-next stage), exactly as the audit stage is skipped when no cross-component
-amendment exists. The trigger is **not** the feature/debt litmus, and it is
-**procedural** — scope's next-stage recommendation.
-
-The two shapes differ in **where the authoring lands**, and only the feature
-shape is gate-backstopped. A feature entry carries a `[spec: <ref>]` only once
-this stage has authored the amendment file, and the bidirectional rule reds any
-`[spec:]` ref resolving to no file, so a skipped `spec` cannot ship a feature
-without its amendment (the same procedural-plus-one-gated-backstop shape as the
-audit stage's own trigger). A **debt ruling** authors **directly into the
-governed surface it converges** — the canonical spec section or skill template —
-with **no amendment file and no `[spec:]` tag**, because the pairing gate reds a
-`[spec:]` outside a feature section (canon-kit/SPEC.md §check-amendment-queue); it
-is un-backstopped by that gate, its correctness resting on scope's routing and
-the converged surface's own gates.
+Run `spec` only when this iteration promotes ≥1 **feature** unit — an amendment
+to author. A **debt-only** iteration skips `spec` entirely (scope advances to
+the next stage), exactly as the audit stage is skipped when no cross-component
+amendment exists. The trigger is **procedural** — scope's next-stage
+recommendation — and backstopped by the existing amendment-pairing gate: a
+feature entry carries a `[spec: <ref>]` only once this stage has authored the
+file, and the bidirectional rule reds any `[spec:]` ref resolving to no file, so
+a skipped `spec` cannot ship a feature without its amendment (the same
+procedural-plus-one-gated-backstop shape as the audit stage's own trigger).
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh spec`:
 it appends `<iteration> spec <session-id> <date>` to
 `.workflow/WORKFLOW-STATE.txt` (required by `check-stage-evidence`; the stamp
 proves invocation, not faithful execution), reading `<session-id>` from
 `bin/session-id.sh` (the newest transcript — never hand-picked), using
-`date +%F`, and refusing (writing nothing) if `check-stage-entry` is red. `spec`
+`date +%F`, and refusing (writing nothing) if `check-stage-entry` is red. On a
+refusal, **do not force the entry** — escalate to the lead (where one exists and
+this is not a standalone session) and stop; a refused entry is a gate verdict to
+resolve at its source, never to override. `spec`
 is **not** the iteration boundary, so it **appends** — only the first stage
 resets the evidence file. That stamp *is* the transition — the last stamp is the
 stage cursor, so nothing flips and no queue write is involved. Commit the stamp
@@ -79,12 +70,3 @@ contracts is one — `check-stage-entry` will demand the audit stamp at the next
 stage's entry), otherwise the build stage. A `spec` that authored a
 cross-component amendment should say so rather than let the downstream entry
 discover it.
-
-**A no-build debt ruling has no build half** — its authoring *is* the whole
-delivery (the ruling landed in the governed surface; there is no code to
-implement). So this stage performs that unit's **task-completion Done move** —
-the queue write build would otherwise make — in the same authoring commit, and
-recommends **`validate`**, skipping build. Leaving the unit active strands it:
-build never runs to move it, and the drain stage refuses entry on a non-empty
-active queue (`check-stage-entry` assertion B). A pass mixing build-bound units
-with no-build rulings moves only the latter and recommends build for the rest.

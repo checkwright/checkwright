@@ -15,7 +15,9 @@ queue write is involved. Commit the stamp on its own. The tool refuses (writing
 nothing) if
 `check-stage-entry` is red — which for `validate` additionally requires the
 active queue drained before this entry (build is not done until the queue is
-empty).
+empty). On a refusal, **do not force the entry** — escalate to the lead (where
+one exists and this is not a standalone session) and stop; a refused entry is a
+gate verdict to resolve at its source, never to override.
 
 ## Session ritual
 

@@ -16,6 +16,9 @@ permanent audit trail; the gates only ever read the current iteration), stamps
 the queue header to `## Iteration: —`. It reads `<session-id>`
 from `bin/session-id.sh` itself (the newest transcript — never hand-picked),
 uses `date +%F`, and refuses (writing nothing) if `check-stage-entry` is red.
+On a refusal, **do not force the entry** — escalate to the lead (where one
+exists and this is not a standalone session) and stop; a refused entry is a gate
+verdict to resolve at its source, never to override.
 *<evidence-reset: reset any per-iteration evidence file your validate stage
 writes that the tool does not already truncate — the tool truncates
 WORKFLOW-STATE, the lesson-evidence file, and every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
@@ -91,13 +94,8 @@ stamping, as that skill's first step. Invoking the next skill is the
 stage-advance approval (the name itself needs none).
 
 Close by **recommending the next stage**: where the roster splits out a
-dedicated authoring stage and this iteration promoted a unit that needs
-authoring, that stage — every **feature** (it authors the promoted amendments),
-and a **debt unit whose design is a ruling** rather than a mechanical convergence
-(a placement, seam, or among-alternatives decision; the authoring stage lands it
-directly in the converged governed surface — the canonical spec section or skill
-template — with no amendment and no `[spec:]` tag, lifecycle-kit/SPEC.md
-§templates/skills/). Otherwise the trigger-gated audit stage
+dedicated authoring stage and this iteration promoted a feature, that stage
+(it authors the promoted amendments); otherwise the trigger-gated audit stage
 when one of its triggers fired this session, else the build stage. The
 cross-component trigger is mechanical — an amendment on disk spanning ≥2
 component dirs makes `check-stage-entry` assertion C demand the audit stamp
