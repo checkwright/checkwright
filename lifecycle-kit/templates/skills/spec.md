@@ -9,15 +9,27 @@ amendment on disk, and each amendment's causal-completeness check is green>*.
 
 ## Trigger (spec is trigger-gated)
 
-Run `spec` only when this iteration promotes ≥1 **feature** unit — an amendment
-to author. A **debt-only** iteration skips `spec` entirely (scope advances to
-the next stage), exactly as the audit stage is skipped when no cross-component
-amendment exists. The trigger is **procedural** — scope's next-stage
-recommendation — and backstopped by the existing amendment-pairing gate: a
-feature entry carries a `[spec: <ref>]` only once this stage has authored the
-file, and the bidirectional rule reds any `[spec:]` ref resolving to no file, so
-a skipped `spec` cannot ship a feature without its amendment (the same
-procedural-plus-one-gated-backstop shape as the audit stage's own trigger).
+Run `spec` when this iteration promotes ≥1 unit that carries **authoring** —
+genuine design reasoned and recorded before build. Two shapes qualify: a
+**feature** (its amendment is the authoring), and a **debt unit whose design is a
+ruling** — a placement, seam, or among-alternatives decision, not a mechanical
+convergence on a name the spec already carries. An iteration with neither — every
+unit a mechanical debt convergence — skips `spec` entirely (scope advances to the
+next stage), exactly as the audit stage is skipped when no cross-component
+amendment exists. The trigger is **not** the feature/debt litmus, and it is
+**procedural** — scope's next-stage recommendation.
+
+The two shapes differ in **where the authoring lands**, and only the feature
+shape is gate-backstopped. A feature entry carries a `[spec: <ref>]` only once
+this stage has authored the amendment file, and the bidirectional rule reds any
+`[spec:]` ref resolving to no file, so a skipped `spec` cannot ship a feature
+without its amendment (the same procedural-plus-one-gated-backstop shape as the
+audit stage's own trigger). A **debt ruling** authors **directly into the
+governed surface it converges** — the canonical spec section or skill template —
+with **no amendment file and no `[spec:]` tag**, because the pairing gate reds a
+`[spec:]` outside a feature section (canon-kit/SPEC.md §check-amendment-queue); it
+is un-backstopped by that gate, its correctness resting on scope's routing and
+the converged surface's own gates.
 
 **First step — stamp evidence.** Run lifecycle-kit's `bin/enter-stage.sh spec`:
 it appends `<iteration> spec <session-id> <date>` to

@@ -82,8 +82,13 @@ stamping, as that skill's first step. Invoking the next skill is the
 stage-advance approval (the name itself needs none).
 
 Close by **recommending the next stage**: where the roster splits out a
-dedicated authoring stage and this iteration promoted a feature, that stage
-(it authors the promoted amendments); otherwise the trigger-gated audit stage
+dedicated authoring stage and this iteration promoted a unit that needs
+authoring, that stage — every **feature** (it authors the promoted amendments),
+and a **debt unit whose design is a ruling** rather than a mechanical convergence
+(a placement, seam, or among-alternatives decision; the authoring stage lands it
+directly in the converged governed surface — the canonical spec section or skill
+template — with no amendment and no `[spec:]` tag, lifecycle-kit/SPEC.md
+§templates/skills/). Otherwise the trigger-gated audit stage
 when one of its triggers fired this session, else the build stage. The
 cross-component trigger is mechanical — an amendment on disk spanning ≥2
 component dirs makes `check-stage-entry` assertion C demand the audit stamp
