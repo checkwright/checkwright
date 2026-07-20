@@ -12,22 +12,6 @@
 
 ## New Features
 
-- **stage-economics-truncation-durability** [spec: drift-kit/SPEC-stage-economics-durability.md]
-  — `bin/stage-economics.sh` reads the lifecycle stamps from the **live** state
-  file only, which `/scope` truncates every iteration boundary, so three
-  consecutive iterations' spec-stage economics are already unrecoverable. The
-  sibling meter `bin/trajectory.sh` reconstructs the identical stamps from
-  committed history and is truncation-immune by construction. The amendment rules
-  all three open questions: the history read **unions** with the live read rather
-  than replacing it (replacement blinds the meter to a stamped-but-uncommitted
-  stage) or falling back to it (the fallback arm would never fire on the path that
-  needs it); the reconstruction is **unbounded with no knob**, on the trajectory
-  precedent and because transcript retention already self-bounds it via the
-  existing unmatched-stamp path; and the append-log **needs no new idempotence** —
-  `log_line` already dedups on the `<iteration> <stage> <model>` triple and the
-  SPEC already specifies that key, so the question dissolves against the
-  implementation. Also unblocks `spec-split-promotion-review`.
-
 - **release-disposition-deferred-value** [spec: lifecycle-kit/SPEC-release-disposition-deferred.md]
   — the disposition grammar's `<version|none>` cannot express "qualified but
   deferred", so `verdict-reader-honesty` overloaded `none` and this repo's
@@ -552,5 +536,7 @@
   lead instruction.
 
 ## Done
+
+- stage-economics-truncation-durability
 
 ## Lessons Learned

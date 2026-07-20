@@ -362,7 +362,24 @@ priced cost, never the account the tokens billed to.
    §bin/session-id.sh) — so this repo's stamps carry an 8-char value, `session8`
    below. The stamp supplies the iteration↔stage↔session8 mapping. Read from
    `DRIFT_KIT_STATE_FILE` (§Layout and configuration), defaulting to the same
-   state-file path the trajectory extractor already reads.
+   state-file path the trajectory extractor already reads — and read as
+   **history ∪ live**: that path's *committed history* (added lines in its diff
+   across history, the technique §The published-evidence extractor already uses)
+   unioned with its *current content*, so a `/scope` boundary truncation of the
+   live file destroys no economics. Union rather than replacement because
+   replacement blinds the meter to a stage that has stamped but not yet committed
+   — precisely the in-flight stage whose economics are being read — and rather
+   than fallback because the live file is almost always present and almost always
+   truncated, so a fallback arm would never fire on the path that needs it. The
+   union costs nothing: the `iteration/stage/session8` dedup already collapses a
+   stamp seen in both arms. The reconstruction is **unbounded and carries no depth
+   knob**: the trajectory extractor sets the in-kit precedent, and the effective
+   bound is already self-enforcing from the transcript side — a stamp whose
+   session has aged out of `DRIFT_KIT_SESSIONS_DIR` takes the unmatched path below
+   and costs one skipped row. A depth knob would be a second bound with no reader.
+   Because unbounded history would turn a per-stamp skip notice into unbounded
+   output, unmatched stamps are **counted into one summary line** rather than
+   listed; the skipped rows were never logged and still are not.
 2. **Transcripts** — under `DRIFT_KIT_SESSIONS_DIR` (the knob the overhead meter
    already resolves). A stamp's `session8` selects a transcript by applying that
    **same normalization** to each candidate basename and matching — not by a raw
@@ -395,8 +412,11 @@ priced cost, never the account the tokens billed to.
    the consumer copies it and fills their roster. Resolved from
    `DRIFT_KIT_PRICE_TABLE` (§Layout and configuration).
 
-**Degradation.** A price table that is absent, or that has no row for a model the
-transcripts name, degrades that model's cost cell to `n/a` and the tool emits the
+**Degradation.** An absent live state file is a notice and the run continues to
+the history arm — committed history can carry stamps for a file absent from the
+working tree — and the 0-exit "nothing to read" notice fires only when *both*
+sources yield no stamps. A price table that is absent, or that has no row for a
+model the transcripts name, degrades that model's cost cell to `n/a` and the tool emits the
 token counts alone — the same degradation contract the trajectory extractor
 applies to an unreadable surface (§Bundled KPIs / §Layout and configuration). Cost
 is additive over priced cells only; an `n/a` cell never poisons the total
@@ -416,12 +436,21 @@ the dominant burn (build ~73% of session cost, climbing 37M→86M cr-tokens per
 session), so the field exists to keep that lever visible close-over-close. The
 dedup key read on append is the `<iteration> <stage> <model>` triple —
 re-measuring a triple replaces its line rather than double-counting, exactly as
-the overhead meter dedups on `session8`. Any per-model sub-breakdown beyond these
+the overhead meter dedups on `session8`. That key is also what makes the
+history ∪ live read safe with no added mechanism: a history arm re-derives rows
+already logged, and re-derivation replaces a triple's line rather than
+double-counting it. Any per-model sub-breakdown beyond these
 fields stays on stdout at measurement time; a log field with no reader is a field
 removed. Field readers: the `/economics` narrative reads `cost` and the four token
 fields (`cr` headline); the operator reads `cost` close-over-close; the deferred
 `benchmark-ab-experiment` rung's measurement half consumes this log rather than
-rebuilding it; `date` carries the reading-age caveat.
+rebuilding it; `date` carries the reading-age caveat. `date` is the
+**measurement** date, not the stage's — and under the history read the two can be
+far apart, because re-deriving an old iteration restamps its row to the day it
+was re-measured. The reading-age caveat stays correct (it ages the reading, which
+is what it says), but the field may not be read as "when this stage ran": the
+stage's own date is in the stamp, and the trajectory extractor is the surface
+that renders it.
 
 ## The `/economics` skill
 
@@ -532,8 +561,9 @@ Knobs (this repo's layout as defaults):
   stage-economics meter prices through; default
   `${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv` (beside `graph-vocab.sh`, the
   consumer-config precedent). Absent, cost degrades to `n/a` and tokens still report.
-- `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path the stage-economics join reads
-  for stamps; default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
+- `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path whose *committed history and
+  live content* the stage-economics join reads for stamps (§The stage-economics
+  meter, history ∪ live); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
   same default the trajectory extractor's surface list computes — drift-kit
   re-derives with its own knob rather than importing a sibling kit's bin contract,
   the established `DRIFT_KIT_SESSIONS_DIR` precedent).
@@ -574,8 +604,14 @@ asserts the emitted trend line's fields (the `<iteration> <stage> <model>`
 grouping and the `in`/`out`/`cr`/`cw`/`cost` values), that a re-measure replaces
 the triple's line rather than doubling it, and the `n/a` cost cell plus the
 incomplete-pricing caveat when the priced model has no row (the price-table-absent
-degradation). Gate-sdk's `check-shellcheck` lints all kit sources as
-usual.
+degradation). Its **history ∪ live** read is proved against the same hermetic
+fake-history repo the trajectory extractor uses, which already carries the
+truncation shape: that repo's live WORKFLOW-STATE was overwritten with the
+in-flight iteration's stamp, so the closed iteration's stamps survive only in
+committed history. One run asserts both arms — the history-only stamp prices
+(replacement would lose it) and the live-only stamp prices (a history-only read
+would lose the uncommitted tail). Gate-sdk's `check-shellcheck` lints all kit
+sources as usual.
 
 ## Out of scope
 

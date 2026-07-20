@@ -101,11 +101,18 @@ price_cell() {                 # $1=model $2=in $3=out $4=cr $5=cw -> USD cost, 
         'BEGIN { printf "%.4f", i*pi + o*po + cr*pcr + cw*pcw }'
 }
 
-[[ -f "$DRIFT_KIT_STATE_FILE" ]] || {
-    echo "stage-economics: no state file to read: $DRIFT_KIT_STATE_FILE" >&2
-    echo "  help: set DRIFT_KIT_STATE_FILE to the WORKFLOW-STATE path carrying the stage stamps." >&2
-    exit 0
+# spec: drift-kit/SPEC.md §The stage-economics meter — history ∪ live, the same reader
+# bin/trajectory.sh already ships: the boundary truncation of the live file destroys no
+# economics, and the live arm keeps a stamped-but-uncommitted stage visible.
+collect_stamps() {
+    git log --reverse --format='%H' -p -U0 -- "$DRIFT_KIT_STATE_FILE" 2>/dev/null \
+        | sed -n -E 's/^\+([a-z0-9][a-z0-9-]* [a-z][a-z0-9-]* [A-Za-z0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2}.*)$/\1/p'
+    [[ -f "$DRIFT_KIT_STATE_FILE" ]] && cat "$DRIFT_KIT_STATE_FILE"
+    return 0
 }
+
+[[ -f "$DRIFT_KIT_STATE_FILE" ]] || \
+    echo "stage-economics: no live state file ($DRIFT_KIT_STATE_FILE) — reading committed history alone" >&2
 
 today="$(date +%F)"
 mkdir -p "$(dirname "$DRIFT_KIT_STAGE_ECONOMICS_LOG")" 2>/dev/null || true
@@ -126,15 +133,20 @@ printf 'stage-economics: %s\n' "$today"
 seen_triples=""
 rows=0
 incomplete=0
+stamps=0
+unmatched=0
 while read -r iter stage session8 _date _rest; do
     [[ -z "$iter" || "$iter" == \#* || "$iter" == "---" ]] && continue
     [[ -n "$stage" && -n "$session8" ]] || continue
     case " $seen_triples " in *" $iter/$stage/$session8 "*) continue ;; esac   # a re-stamp of one session is one stage
     seen_triples="$seen_triples $iter/$stage/$session8"
+    stamps=$((stamps + 1))
 
     transcript="$(find_transcript "$session8")"
+    # spec: drift-kit/SPEC.md §The stage-economics meter — unbounded history makes a
+    # per-stamp skip notice unbounded output, so unmatched stamps are counted, not listed.
     if [[ -z "$transcript" ]]; then
-        printf '  %s %s %s: no transcript matched (skipped)\n' "$iter" "$stage" "$session8"
+        unmatched=$((unmatched + 1))
         continue
     fi
 
@@ -155,7 +167,16 @@ while read -r iter stage session8 _date _rest; do
             "$today $iter $stage $model in=$in out=$out cr=$cr cw=$cw cost=$cost"
         rows=$((rows + 1))
     done <<< "$usage"
-done < "$DRIFT_KIT_STATE_FILE"
+done < <(collect_stamps)
+
+if [[ "$stamps" -eq 0 ]]; then
+    echo "stage-economics: no stamps in either source (committed history or $DRIFT_KIT_STATE_FILE) — nothing to read" >&2
+    echo "  help: set DRIFT_KIT_STATE_FILE to the WORKFLOW-STATE path carrying the stage stamps." >&2
+    exit 0
+fi
+
+[[ "$unmatched" -eq 0 ]] || \
+    printf '  %d stamp(s) had no matching transcript (skipped — session transcripts age out of the sessions dir)\n' "$unmatched"
 
 if [[ "$incomplete" -eq 1 ]]; then
     printf '  total pricing incomplete — one or more model cost cells degraded to n/a (unpriced model or absent table)\n'

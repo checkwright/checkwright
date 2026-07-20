@@ -188,3 +188,29 @@ if command -v jq >/dev/null 2>&1; then
 else
     grep -q 'jq not found' <<<"$eout" || fail "stage-economics without jq must emit its degradation notice"
 fi
+
+# spec: drift-kit/SPEC.md §Testing — history ∪ live over the trajectory extractor's
+# fake-history repo, whose live state file already carries only beta's stamp.
+if command -v jq >/dev/null 2>&1; then
+    hdir="$work/hist-sessions"; mkdir -p "$hdir"
+    for sid in s2 s4; do
+        cat > "$hdir/$sid.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"m1","model":"test-model","usage":{"input_tokens":1,"output_tokens":1,"cache_read_input_tokens":1,"cache_creation_input_tokens":1}}}
+EOF
+    done
+    hlog="$work/hist-log.txt"
+    set +e
+    hout="$( cd "$trepo" && DRIFT_KIT_STATE_FILE=".workflow/WORKFLOW-STATE.txt" \
+        DRIFT_KIT_SESSIONS_DIR="$hdir" \
+        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+        DRIFT_KIT_STAGE_ECONOMICS_LOG="$hlog" \
+        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1 )"; hrc=$?
+    set -e
+    [[ "$hrc" -eq 0 ]] || fail "stage-economics over fake history exited $hrc (advisory tool must exit 0)"
+    grep -q '^alpha build s2 ' "$trepo/.workflow/WORKFLOW-STATE.txt" \
+        && fail "fake-history premise broken: alpha's stamp is still in the live state file"
+    grep -q ' alpha build test-model ' "$hlog" \
+        || fail "a stamp surviving only in committed history did not price (truncation immunity lost)"
+    grep -q ' beta scope test-model ' "$hlog" \
+        || fail "the live file's stamp did not price (the union dropped its live arm)"
+fi
