@@ -79,14 +79,28 @@ and makes the rotting direction decidable with an explicit exemption channel.
   property: it surfaces a dangling template pointer that the pointer gate cannot
   see. The session-context arm is determinate — the real heading is
   `## The session-context hook (template)` (context-kit/SPEC.md:71), so the
-  *template* carries the wrong target and is corrected to match its copy. The
-  bash-guard arm is not determinate and is escalated rather than guessed:
-  `guard-kit/SPEC.md` has no `§Consumer rules` section at all, so both sides are
-  wrong and the correct target does not yet exist.
+  *template* carries the wrong target and is corrected to match its copy —
+  landed in the align audit.
 
-  This backfill is three files (two templates, one copy) and is **additional to**
-  the two marker files costed below; the amendment as authored costed only the
-  markers.
+  **The bash-guard arm was escalated rather than guessed, and is ruled: the
+  missing section is authored.** `guard-kit/SPEC.md` had no `§Consumer rules`
+  heading, while *three of the pair's four* `spec:` lines cite one
+  (`guard-kit/templates/bash-guard.sh:2,14` and `scripts/bash-guard.sh:14`) —
+  the pointer was dangling, not merely mismatched, and independently of this
+  gate. A descriptive `## Consumer rules` section is added to guard-kit/SPEC.md
+  documenting placement that the mechanism already has (project rules compose
+  `lib/guard.sh` primitives and run before the generic ruleset); it asserts no
+  new behavior and adds no knob. The rejected alternative is recorded because
+  its failure mode generalizes: re-pointing both sides at the nearest existing
+  heading would author a knowingly-imprecise pointer to make the gate pass,
+  which is corrupting a gate's input to buy its green — the shape
+  `check-gate-tamper` exists to block, arriving by a different door. A gate whose
+  green is bought by degrading the surface it reads is worse than one that reds.
+  Build's remaining backfill is one line: `scripts/bash-guard.sh:2` gains the
+  `§Consumer rules` section its sibling lines already name.
+
+  This backfill is **additional to** the two marker files costed below; the
+  amendment as authored costed only the markers.
 - **B — the template's declared surface is present in the copy.** Every function
   name and every `case`-arm exit token the template declares appears in the copy.
   This catches a template-side change never propagated.
@@ -117,13 +131,27 @@ C on noise, while the measured weakness is B on vacuity. Note also that
 `session-context` **removes** 20 template lines rather than only adding: that is
 B's direction, the one arm currently unable to see it.
 
-This is a change to what the gate asserts, so it is escalated rather than
-settled here. The audit's recommendation is to widen the declared surface from
-{function names, `case`-arm exit tokens} to additionally include **sourced-lib
-API calls** (`guard_block`, `guard_advise`, `guard_read_command`) and the
-`<KIT>_*` knob names each side reads. Both are declarations rather than content,
-so the seam below is untouched, and the table shows both are non-empty on every
-pair — 4/7 and 3/3 lib calls where `case` arms give 0/1.
+**Ruled: the declared surface widens.** B and C read
+
+> function names, `case`-arm exit tokens, **sourced-lib API calls**
+> (`guard_block`, `guard_advise`, `guard_read_command` and siblings), and the
+> **`<KIT>_*` knob names** each side reads.
+
+B as authored asserts nothing on five of the six files, and a gate that cannot
+red is the defect this repo's meta-gates exist to prevent — shipping it under a
+stated limit would buy a green battery row and no coverage. The widening is
+non-empty on every pair (4/7 and 3/3 lib calls where `case` arms give 0/1), and
+it holds the provenance seam, which is what makes it a calibration and not a
+seam question: the gate reads *which* lib calls and knob names each side
+declares, never what this repo's 19 divergent `bash-guard` rule lines say. Had
+it needed the rule content, the answer would have been to narrow scope instead.
+
+**B is the arm that sees a removal, and the removal case is live.** The
+amendment originally described the divergence as the copies *adding* content.
+Measurement says otherwise: `session-context.sh` is 21 added / 20 **removed** — a
+mutual rewrite in which the copy drops template-declared content. C cannot see
+that direction; only B can. So B's inertness was not a thin-coverage
+inconvenience, it was blindness to a direction already present in the tree.
 
 **The divergence marker.** The consumer copy carries
 `# copy-divergence: <reason>` lines naming what it adds beyond the template and
@@ -136,11 +164,20 @@ it.
 **Why this is the low-false-positive shape.** The gate reads *declarations*, not
 prose or logic, so a consumer rewording a message, reordering rules, or adding
 steering text triggers nothing. It fires only when a declared contract element
-appears on one side unexplained. Should build find assertion C's false-positive
-rate unacceptable in practice, the honest fallback — stated now so it is a
-ruling and not a retreat — is to ship A and B and record C's direction as an
-unmechanized limit in §check-template-copy-parity, the `check-gate-tamper`
-precedent of a partial floor plus a stated limit.
+appears on one side unexplained.
+
+**The fallbacks, stated now so each is a ruling and not a retreat.** Two risks
+are live and they are independent, so neither fallback replaces the other:
+
+- *If the widened B proves noisy* — narrow to the **lib-call clause alone**,
+  dropping the `<KIT>_*` knob-name clause first. Knob names drift more
+  legitimately than lib calls do: a consumer may read a knob the template never
+  needed without any contract having changed, whereas a lib call appearing on
+  one side is a genuine interface difference. Dropping B entirely is the last
+  resort, not the first, because B is the only arm that sees a removal.
+- *If assertion C proves noisy* — ship A and B and record C's direction as an
+  unmechanized limit in §check-template-copy-parity, the `check-gate-tamper`
+  precedent of a partial floor plus a stated limit.
 
 **Gate contracts.** The gate copies `templates/check-skeleton.sh` and ships a
 `good/`+`bad/` fixture pair, satisfying the four contracts (output, fail-closed,

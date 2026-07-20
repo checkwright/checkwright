@@ -102,6 +102,20 @@ composing these primitives into a `PreToolUse(Agent)` hook that blocks on a
 PAUSE budget verdict and advises otherwise (delegation-kit/SPEC.md §The
 delegation model) — cite-only; no guard-kit mechanism moves for it.
 
+## Consumer rules
+
+A consumer's project-specific block/steer/allow rules live in its copy of
+`templates/bash-guard.sh`, composed from the `lib/guard.sh` primitives above and
+placed **before** the generic ruleset — the template marks the position. Order
+is the whole reason the seam sits here: a project rule that fires must fire
+ahead of the generic rule it refines, or the generic verdict wins and the
+project rule is dead code.
+
+This is a placement contract, not a mechanism: guard-kit ships no consumer rule
+and names none. What a project blocks or steers is its own toolchain knowledge
+and stays in its copy, which is why the copy legitimately diverges from the
+template here and why no rule content crosses into the kit.
+
 ## The generic ruleset
 
 Rules that encode **harness behavior**, not any project's toolchain —
