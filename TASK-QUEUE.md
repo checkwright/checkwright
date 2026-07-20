@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: carry-forward-durability
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -395,6 +395,17 @@
   (hardcoded 5-stage roster), so **no `spec`-stage economics data is recorded on
   the trajectory at all** — the re-run this task prescribes has nothing to read.
   This task cannot start before that fix.
+  **Premise corrected 2026-07-20 by the undirected scope survey — the named
+  dependency has landed and this entry is still blocked, by a different one.**
+  `trajectory-stage-roster-hardcode` reached Done, and the trajectory table now
+  renders `sp` for three iterations — so this entry reads as unblocked and
+  pickable. It is not. The trajectory and the *economics* are two surfaces, and
+  only the first recovered: `.metric/stage-economics-log.txt` holds **zero `spec`
+  rows**, because `bin/stage-economics.sh` reads the boundary-truncated live state
+  file rather than committed history. The precondition this entry actually needs
+  is *recorded spec-stage economics*, and that is blocked on
+  **`stage-economics-truncation-durability`** — the real blocker, named here so no
+  future scope re-derives it or promotes a review with nothing to read.
   **Cost while deferred:** one queue line; the backlog-aging review re-raises it
   every iteration until the data exists to run it. Filed 2026-07-19 by lead
   ruling at the `stage-posture-split-tuning` close — the split shipped on
@@ -575,6 +586,44 @@
   SPEC/RELEASING wording, roughly one with the gate widening. Filed 2026-07-20
   by the `verdict-reader-honesty` close, by operator ruling — attested by a real
   collision rather than anticipated.
+
+- **stage-economics-truncation-durability** [needs-spec] — `bin/stage-economics.sh`
+  reads the lifecycle stamps from the **live** state file only
+  (`DRIFT_KIT_STATE_FILE`, set at `drift-kit/bin/stage-economics.sh:31`, consumed
+  at `:158`), and `/scope` truncates that file at every iteration boundary. So an
+  iteration's stage economics are capturable only inside the window between its
+  close and the next scope, and nothing enforces the capture: the meter's only
+  caller is the `/economics` ritual, which drift-kit/templates/economics.md:4-6
+  defines as "a post-iteration reporting ritual ... outside the stage roster and
+  never a gate". Miss the window and the data is gone.
+  **Attested by loss, not anticipated.** The trajectory table carries `sp` stamps
+  for `trajectory-stage-roster-hardcode`, `tooling-signal-honesty`, and
+  `verdict-reader-honesty`, while `.metric/stage-economics-log.txt` holds **zero
+  `spec` rows** — its last entry is `derivation-by-precedent` (2026-07-19),
+  predating the split. Three consecutive iterations' spec-stage economics are
+  unrecoverable by the meter, and the third's stamps were destroyed by the
+  boundary reset of the very scope session that found this.
+  **The fix has in-kit precedent over the same surface.** The sibling meter
+  `bin/trajectory.sh` reconstructs the identical stamps from committed history
+  (`git log -p -- "$STATE_FILE"` at `:95`, `:152`) and is truncation-immune by
+  construction — which is why it can render `sp` for iterations the economics log
+  cannot price. Two drift-kit meters over one stamp surface, opposite durability,
+  and the durable technique already shipped in the same kit.
+  **Design question (why [needs-spec], not a build fix):** drift-kit/SPEC.md §The
+  stage-economics meter states the meter's input contract, so changing what it
+  reads changes asserted behavior a reader relies on. Open work: whether the
+  history read replaces the live read or falls back to it; how far back to
+  reconstruct and whether that bound needs a knob; and whether the append-log
+  gains idempotence, since a history-reading meter can re-derive rows it already
+  logged — a live-file meter never could. Seam: generic mechanism throughout, the
+  state path is already each consumer's config.
+  **Cost while deferred:** moderate and actively rotting — every iteration
+  boundary destroys another iteration's economics unless someone remembers the
+  ritual in the window, and the loss is silent (the meter reports on what it
+  finds, never that a stage went missing). It also **blocks
+  `spec-split-promotion-review`**, whose whole precondition is recorded
+  spec-stage economics. Surfaced 2026-07-20 by the undirected scope survey, from
+  the contradiction between the trajectory table and the economics log.
 
 ## Done
 
