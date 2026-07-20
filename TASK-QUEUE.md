@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: lifecycle-rule-placement
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,7 +14,124 @@
 
 ## Technical Debt
 
+- **stage-routing-for-debt-with-design-rulings** — the lifecycle
+  contract does not document how a **debt** unit that carries genuine design
+  rulings (not mere behavior-convergence) routes its design: through a `/spec`
+  pass, or settled at `/scope`. `/spec` is nominally trigger-gated to feature
+  units, yet this iteration ran `/spec` for a debt unit by lead ruling and it
+  worked cleanly — the false-positive floor was real design work that scope
+  would have carried badly.
+  **Design question:** a lifecycle-contract clarification —
+  name the routing rule and place it at the widest true tier
+  (`lifecycle-kit/templates/skills/scope.md` / `spec.md`, or lifecycle-kit's
+  SPEC), the same shape as `scope-iteration-cost-bundling-test` and
+  `new-initiative-filing-default`. Debt, adds no governed name.
+  **Cost while deferred:** low but recurring — each debt unit carrying design
+  re-litigates its routing by lead ruling, as this iteration did.
+  Filed 2026-07-20 by lead ruling at this iteration's build, from a spec-stage
+  process observation. Promoted 2026-07-20 into `lifecycle-rule-placement`
+  (operator ruling); land first — it settles the routing the other three ride on.
+
+- **new-initiative-filing-default** — no always-loaded surface
+  states the rule that a **new initiative raised mid-session** (an operator
+  feature request, a design idea) is **filed as a Deferred queue entry by
+  default, not started** — it enters delivery only by passing through `/scope` as
+  the active iteration's unit. The rule is *implicit* in the iteration model and
+  partially covered for one case: doctrine-kit's **Gap disposition** bullet ("a
+  gap you defer is costed and filed") and close's gap→promote step cover a *gap
+  found while working*, and scope's "a standing directive is a theme, not a unit
+  list" bounds the scope survey — but none states the general default for an
+  operator-raised initiative. This session is the evidence: the assistant first
+  offered to *run* the `economics-budget-pct-decouple` decouple as a live
+  iteration rather than file it, and the operator had to redirect.
+  **Design question:** placement is a
+  widest-true-tier ruling — CLAUDE.md's iteration-lifecycle section, doctrine-kit's
+  Gap-disposition bullet (widen its wording), or lifecycle-kit's SPEC — and
+  codifying "don't start work out of band" by an *out-of-band edit to an
+  always-loaded governance surface* is self-contradictory, so it earns the
+  deliberate scope pass it prescribes.
+  **Cost while deferred:** low but recurring — each session re-litigates whether
+  an operator ask is filed or started, the ambiguity this session already paid.
+  Surfaced 2026-07-19 alongside `economics-budget-pct-decouple` at the operator's
+  direction. Promoted 2026-07-20 into `lifecycle-rule-placement` (operator ruling).
+
+- **scope-iteration-cost-bundling-test** — the `scope` stage
+  contract does not carry the **economic composition test**: weigh whether a
+  single sub-threshold unit justifies a whole iteration, and either bundle
+  related-surface deferred entries or argue the unit is significant enough to
+  stand alone. `scope.md` today covers feature-vs-debt triage, theme-not-unit-list,
+  and premise re-verification, but has no line making that iteration-cost weighing
+  a scope duty — which is why it had to be relayed by hand at this iteration's
+  open. The lead template's economics section
+  (`lifecycle-kit/templates/lead.md` §Economics) already carries the underlying
+  cost principle, so the deliverable **single-sources it by citation** — a scope
+  contract line pointing at that section, never restating the economics — placed
+  at the widest tier true for all lifecycle-kit consumers.
+  Debt, not feature: it converges `scope.md` onto a principle a sibling template
+  already owns and adds no governed name. The design work is the placement
+  ruling only (the scope-skill template line vs a lifecycle-kit SPEC section — a
+  widest-true-tier call, the same shape as `new-initiative-filing-default`), not
+  the principle, which lead.md §Economics settles.
+  **Cost while deferred:** low but recurring — each undirected scope re-litigates
+  by hand whether a lone small unit earns an iteration, the ambiguity this
+  iteration's open already paid. Filed 2026-07-20 by lead instruction at this
+  iteration's `scope`, during the render-fidelity bundling ruling. Promoted
+  2026-07-20 into `lifecycle-rule-placement` (operator ruling) — the very test
+  this scope applied by hand.
+
+- **close-capture-filing-destination** — `close.md` names a filing
+  destination only for the gap-inbox drain (step 2, "file a deferred entry").
+  Its step-3 housekeeping sweeps and any dispatch-supplied findings name none,
+  so a close session capturing findings has no stated home and the first
+  correcting signal is a red `check-stage-entry`. Add one filing-destination
+  rule covering every capture close makes — the active sections are scope's to
+  populate, close's own filings go to `Deferred` — sited where both `close.md`
+  and a lead authoring a dispatch will read it.
+  **Observed twice:** a close session mis-filed into the active sections off a
+  dispatch that said "capture as debt", and the lead later stranded two bullets
+  in the gap inbox after close had already drained it (below).
+  Debt: the rule is already enforced; only its statement is missing.
+  Filed 2026-07-20 by lead, drained from the gap inbox after the close stage.
+  Promoted 2026-07-20 into `lifecycle-rule-placement` (operator ruling).
+
 ## Deferred
+
+- **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
+  fixture asserting `enter-stage.sh --simulate <stage>` leaves the tree
+  byte-identical after a *successful* (non-refused) boundary entry. The guard
+  now present at `lifecycle-kit/bin/enter-stage.sh:168-171` (the `sim` exit ahead
+  of every write) has no test pinning it, so a future refactor could silently
+  re-introduce the success-path write. This is the second half of the now-closed
+  enter-stage-simulate-writes entry (Done): the behavioral fix is verified
+  present, and only its regression guard is missing. Consider also asserting the
+  `(simulate)` marker prints on the success path so an honoured flag stays visible.
+  Debt: adds a fixture to shipped mechanism, no governed name.
+  **Cost while deferred:** low and non-rotting — the fix is present; the exposure
+  is a future un-caught regression on a rarely-touched dry-run path.
+  Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
+
+- **stage-economics-truncation-durability** [needs-spec] —
+  `spec-split-promotion-review` names this as its real blocker (in its own
+  premise-correction) but no entry existed, so that dependency resolved to
+  nothing; filing it makes the dependency real and pickable.
+  **Premise to confirm FIRST — the entry's first open question.** The blocker as
+  filed assumes `drift-kit/bin/stage-economics.sh` reads *only* the
+  boundary-truncated live `WORKFLOW-STATE.txt`, losing every `spec`-stage row at
+  each iteration reset. The tree partly contradicts that: `stage-economics.sh:108`
+  already unions committed history via `git log -p -U0` on the state file (the
+  arm whose comment says it "keeps a stamped-but-uncommitted stage visible"). So
+  whether `spec`-stage economics rows are genuinely unrecoverable from
+  `.metric/stage-economics-log.txt` is itself **unverified** — the spec pass must
+  establish that before prescribing any fix, and "the meter is already durable and
+  the missing rows have another cause" is a legitimate outcome that would retire
+  this entry and unblock `spec-split-promotion-review` directly.
+  Only if the loss is confirmed does a durability fix (read committed history for
+  the truncated rows, or persist them before truncation) follow.
+  Debt/analysis: converges the meter's read onto durable history; adds no governed
+  name. **Cost while deferred:** `spec-split-promotion-review` stays blocked on an
+  unconfirmed premise, and the backlog-aging review re-raises it each iteration.
+  Filed 2026-07-20 by scope (operator ruling), from the undirected survey's
+  premise re-verification.
 
 - **price-table-age-kpi** [needs-spec] — an advisory drift-kit KPI reading the
   `priced-as-of:` date in `scripts/price-table.tsv`, so a stale price table
@@ -80,38 +197,6 @@
   even have a known sign. Debt/analysis: converges an existing meter onto honest
   accounting, adds no governed name. Filed 2026-07-20 by lead economics review
   during the `render-fidelity-leak-coverage` close.
-
-- **close-capture-filing-destination** [needs-spec] — `close.md` names a filing
-  destination only for the gap-inbox drain (step 2, "file a deferred entry").
-  Its step-3 housekeeping sweeps and any dispatch-supplied findings name none,
-  so a close session capturing findings has no stated home and the first
-  correcting signal is a red `check-stage-entry`. Add one filing-destination
-  rule covering every capture close makes — the active sections are scope's to
-  populate, close's own filings go to `Deferred` — sited where both `close.md`
-  and a lead authoring a dispatch will read it.
-  **Observed twice:** a close session mis-filed into the active sections off a
-  dispatch that said "capture as debt", and the lead later stranded two bullets
-  in the gap inbox after close had already drained it (below).
-  Debt: the rule is already enforced; only its statement is missing.
-  Filed 2026-07-20 by lead, drained from the gap inbox after the close stage.
-
-- **enter-stage-simulate-writes** [needs-spec] — `enter-stage.sh --simulate`
-  honours the flag on its *refusal* paths but not on its success path: a
-  simulated iteration-boundary entry performed the real reset — truncated and
-  stamped `.workflow/WORKFLOW-STATE.txt`, rewrote the queue's `## Iteration:`
-  header, and boundary-truncated `lesson-evidence.txt`, `validate-evidence.txt`
-  and `release-disposition.txt`. Reproduced live: the refusal printed the
-  `(simulate)` marker and wrote nothing; the success run printed `stamped` and
-  wrote everything. A dry-run flag that is load-bearing on one branch and inert
-  on the other is worse than no flag — it is trusted exactly where it fails.
-  Fix: gate every write behind the flag, and add a fixture asserting the tree is
-  byte-identical after a simulated successful entry. Consider printing the
-  `(simulate)` marker unconditionally so an honoured flag is visible in output.
-  **Cost while deferred:** any caller probing whether a boundary is clear mutates
-  the boundary it is probing; recovery needs an out-of-band `git checkout`, and
-  on an unclean tree the damage is not separable.
-  Debt: a dry-run contract violation in shipped mechanism.
-  Filed 2026-07-20 by lead after triggering it while probing the gap-inbox block.
 
 - **gap-inbox-post-close-window** [needs-spec] — the gap inbox is drained by
   `close` and refuses the next iteration-boundary `scope` entry while non-empty
@@ -469,29 +554,6 @@
   never runs. Bounded by the degradation path being small and rarely touched.
   Filed 2026-07-18 by lead ruling at the stage-economics-report close.
 
-- **new-initiative-filing-default** [needs-spec] — no always-loaded surface
-  states the rule that a **new initiative raised mid-session** (an operator
-  feature request, a design idea) is **filed as a Deferred queue entry by
-  default, not started** — it enters delivery only by passing through `/scope` as
-  the active iteration's unit. The rule is *implicit* in the iteration model and
-  partially covered for one case: doctrine-kit's **Gap disposition** bullet ("a
-  gap you defer is costed and filed") and close's gap→promote step cover a *gap
-  found while working*, and scope's "a standing directive is a theme, not a unit
-  list" bounds the scope survey — but none states the general default for an
-  operator-raised initiative. This session is the evidence: the assistant first
-  offered to *run* the `economics-budget-pct-decouple` decouple as a live
-  iteration rather than file it, and the operator had to redirect.
-  **Design question (why deferred, not an inline one-liner):** placement is a
-  widest-true-tier ruling — CLAUDE.md's iteration-lifecycle section, doctrine-kit's
-  Gap-disposition bullet (widen its wording), or lifecycle-kit's SPEC — and
-  codifying "don't start work out of band" by an *out-of-band edit to an
-  always-loaded governance surface* is self-contradictory, so it earns the
-  deliberate scope pass it prescribes.
-  **Cost while deferred:** low but recurring — each session re-litigates whether
-  an operator ask is filed or started, the ambiguity this session already paid.
-  Surfaced 2026-07-19 alongside `economics-budget-pct-decouple` at the operator's
-  direction.
-
 - **hermetic-bin-roster-config** [needs-spec] — `check-test-hermetic` assertion
   B catches *partial* credential pinning but not *absent* pinning. B arms only
   when the smoke script itself contains a `*_CRED_FILE=` assignment, so a smoke
@@ -695,28 +757,6 @@
   as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
   lead instruction.
 
-- **scope-iteration-cost-bundling-test** [needs-spec] — the `scope` stage
-  contract does not carry the **economic composition test**: weigh whether a
-  single sub-threshold unit justifies a whole iteration, and either bundle
-  related-surface deferred entries or argue the unit is significant enough to
-  stand alone. `scope.md` today covers feature-vs-debt triage, theme-not-unit-list,
-  and premise re-verification, but has no line making that iteration-cost weighing
-  a scope duty — which is why it had to be relayed by hand at this iteration's
-  open. The lead template's economics section
-  (`lifecycle-kit/templates/lead.md` §Economics) already carries the underlying
-  cost principle, so the deliverable **single-sources it by citation** — a scope
-  contract line pointing at that section, never restating the economics — placed
-  at the widest tier true for all lifecycle-kit consumers.
-  Debt, not feature: it converges `scope.md` onto a principle a sibling template
-  already owns and adds no governed name. `[needs-spec]` is for the placement
-  ruling only (the scope-skill template line vs a lifecycle-kit SPEC section — a
-  widest-true-tier call, the same shape as `new-initiative-filing-default`), not
-  the principle, which lead.md §Economics settles.
-  **Cost while deferred:** low but recurring — each undirected scope re-litigates
-  by hand whether a lone small unit earns an iteration, the ambiguity this
-  iteration's open already paid. Filed 2026-07-20 by lead instruction at this
-  iteration's `scope`, during the render-fidelity bundling ruling.
-
 - **gate-spec-claim-assertion-parity** [needs-spec] — the generalization the
   `render-fidelity-inline-span-leak` entry flagged as a deliberately-unsettled
   `/spec` question, ruled here: a gate whose **SPEC prose names a failure class
@@ -751,23 +791,6 @@
   audit catches it. Debt/analysis, adds no governed name unless the annotation
   convention is built. Filed 2026-07-20 by the `render-fidelity-leak-coverage`
   spec, settling the flagged `/spec` question.
-
-- **stage-routing-for-debt-with-design-rulings** [needs-spec] — the lifecycle
-  contract does not document how a **debt** unit that carries genuine design
-  rulings (not mere behavior-convergence) routes its design: through a `/spec`
-  pass, or settled at `/scope`. `/spec` is nominally trigger-gated to feature
-  units, yet this iteration ran `/spec` for a debt unit by lead ruling and it
-  worked cleanly — the false-positive floor was real design work that scope
-  would have carried badly.
-  **Design question (why [needs-spec]):** a lifecycle-contract clarification —
-  name the routing rule and place it at the widest true tier
-  (`lifecycle-kit/templates/skills/scope.md` / `spec.md`, or lifecycle-kit's
-  SPEC), the same shape as `scope-iteration-cost-bundling-test` and
-  `new-initiative-filing-default`. Debt, adds no governed name.
-  **Cost while deferred:** low but recurring — each debt unit carrying design
-  re-litigates its routing by lead ruling, as this iteration did.
-  Filed 2026-07-20 by lead ruling at this iteration's build, from a spec-stage
-  process observation.
 
 - **build-stage-tier-economics** [needs-spec] — measure whether the `build`
   stage downgrades from Opus to Sonnet net-positive rather than flipping on
@@ -813,5 +836,7 @@
   question.
 
 ## Done
+
+- enter-stage-simulate-writes
 
 ## Lessons Learned

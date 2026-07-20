@@ -4,4 +4,4 @@
 
 ---
 
-— scope aa4bebed 2026-07-20
+lifecycle-rule-placement scope aa4bebed 2026-07-20
