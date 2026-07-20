@@ -48,3 +48,4 @@
 | stage-posture-split-tuning | sc · a b v c | 2f/1d | 1 · ≤0d | 20s clean | 75 |
 | trajectory-stage-roster-hardcode | sc sp · b v c | 1f/0d | 1 · ≤0d | 20s clean | 75 |
 | tooling-signal-honesty | sc sp · b v c | 2f/0d | 2 · ≤0d | 20s clean | 75 |
+| verdict-reader-honesty | sc sp a b v c | 3f/0d | 2 · ≤1d | 20s clean | 76 |

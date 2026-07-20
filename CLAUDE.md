@@ -67,7 +67,9 @@ The enforcement map is a generated projection likewise — after a class-registr
 change (a gate's `tier=`, `kpis.list`, the settings hooks, a `# enforce:`
 marker), regenerate it:
 `bash gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`
-(`check-enforcement-fresh` byte-compares it).
+(`check-enforcement-fresh` byte-compares it). These two are the
+repo-governance projections only — the docs-site set and its regen commands
+are a separate roster, owned by docs/site-architecture.md.
 
 New gates copy `gate-sdk/templates/check-skeleton.sh` and ship with a
 `good/`+`bad/` fixture pair; the four contracts (output, fail-closed,

@@ -114,6 +114,22 @@
   low-false-positive gate is the open work, and if it is not, the honest outcome
   is to record that here and leave the class to the audit cadence. Seam: the gate
   is generic mechanism; the `<KIT>_` prefix is already each consumer's config.
+  **Premise updated 2026-07-20 by the `verdict-reader-honesty` close audit — two
+  corrections, both of which the next scope would otherwise re-derive.**
+  (1) *The class is currently clean.* The eighth site was fixed at this
+  iteration's scope, and a fresh mechanical sweep of every kit SPEC found zero
+  genuine hits. A gate built for this class today would land **greenfield** — it
+  proves the boundary rather than fixing a backlog, so the demand argument now
+  rests entirely on recurrence, not on outstanding drift.
+  (2) *The false-positive bound above is looser than stated.* The sweep produced
+  one hit — `GRAPH_VOCAB` at gate-sdk/SPEC.md:883 — which is **correct prose**:
+  it names the array a consumer declares inside `<gates-dir>/graph-vocab.sh`,
+  a public contract in its own right, while `GATE_SDK_GRAPH_VOCAB` is the
+  *separate* knob naming that file's path. So a `<KIT>_`-prefixed counterpart
+  can exist and denote a **different contract**, which the "prefixed counterpart
+  bounds the false positives" claim does not anticipate. The gate must therefore
+  also establish that the bare token and the prefixed one denote the *same*
+  contract — the discriminator the design pass actually owes.
 
 - **stage-lag-disambiguation** [needs-spec] —
   narrow the session-context hook's accepted over-firing by distinguishing a
@@ -450,9 +466,70 @@
   Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
   plain-(b) ruling named.
 
-## Done
+- **template-consumer-copy-parity** [needs-spec] — no mechanism keeps a
+  consumer copy of a kit template in step with the template it was vendored
+  from. `scripts/agent-budget-guard.sh` and
+  `delegation-kit/templates/agent-budget-guard.sh` were both hand-edited this
+  iteration (the `2)` arm removed from each) with nothing verifying the two
+  edits matched; they now differ deliberately on line 2 alone (the `spec:`
+  line, which names the consumer copy as such).
+  **Why byte-sync is ruled out — measured, not assumed.** A close sweep of all
+  eleven `*/templates/*.sh` ↔ `scripts/*.sh` pairs found **eleven of eleven
+  diverge**, and for the eight `*-config.sh` pairs divergence *is* the contract
+  — a template config is a starting point the consumer customizes, so equality
+  would be the defect. The executable pairs diverge too and largely on purpose:
+  `session-context.sh` (41 lines), `bash-guard.sh` (22, this repo's own
+  steering rules), `agent-budget-guard.sh` (2).
+  **Design question (why [needs-spec], not a build unit):** the deliverable is
+  a check that separates *intended* divergence from drift, over the executable
+  copies only. Candidate shape: structural parity rather than byte parity — the
+  copy carries every `spec:`-tagged contract line, function, and exit arm the
+  template declares, differing only in the lines a declared exemption names.
+  Whether that is expressible at low false-positive cost is the open work; if
+  it is not, the honest outcome is a ruling here that hand-editing both copies
+  is the sanctioned shape, recorded so the next close does not re-derive it.
+  Seam: generic mechanism — the template↔copy pairing is already derivable from
+  the layout, and no kit-specific content enters.
+  **Cost while deferred:** moderate and rotting in one direction. A hand edit
+  landing in the consumer copy but not the template ships a stale template, and
+  the template is what adopters vendor — so the defect is invisible in this
+  tree and visible only downstream, which is the worst detection asymmetry the
+  repo has. Bounded today by the executable copies being three and rarely
+  touched. Cost to close: roughly one iteration. Filed 2026-07-20 by the
+  `verdict-reader-honesty` close, by lead instruction.
 
-- usage-verdict-stale-steer-contradiction
-- smoke-exit-code-assertion-honesty
+- **assertion-strength-exit-header-reach** [needs-spec] —
+  `check-assertion-strength` is armed by callee `# exit:` headers, and **two
+  scripts in the tree declare one** (`delegation-kit/bin/usage-verdict.sh`,
+  `delegation-kit/bin/usage-trend.sh`; the other two hits are the gate's own
+  fixtures). Of those, `usage-trend.sh` declares its codes in prose with no
+  uppercase token, so it yields an **empty** token→code map — leaving
+  `usage-verdict.sh`'s `PAUSE`→1 / `STALE`→2 as the gate's entire live
+  vocabulary, over 2 call sites out of 54 scanned scripts. Recorded as an
+  honest limit in gate-sdk/SPEC.md §check-assertion-strength.
+  **What the close sweep changes about the premise.** The limit reads as though
+  the reach were inherently narrow; it is narrow **by adoption**. A count of the
+  bin roster found **29 of 64 scripts exit with a code >1**, i.e. carry a
+  three-valued contract a header could declare. That is a materially larger
+  candidate surface than "one script" suggests.
+  **Design question (why [needs-spec], and why the value is the open part):**
+  the mechanism is trivial — add `# exit:` headers across the bin roster. The
+  unresolved question is whether it buys reach or ceremony. The gate fires only
+  when a guard's *failure message names a verdict token*, and for most of the 29
+  the code >1 arm is a generic error exit (usage error, unreadable input) rather
+  than a named verdict a caller relays, as `usage-verdict.sh`'s is. Headers
+  declaring `2 USAGE` / `2 UNREADABLE` would arm the gate against a smoke guard
+  claiming "fails on unreadable input" while checking only truthiness — a
+  plausible real defect class, but one nobody has shown to have occurred. So the
+  design pass must establish the value before prescribing the convention;
+  concluding "not worth it" and widening the SPEC's honest limit to say *why* is
+  a legitimate outcome of this entry.
+  **Cost while deferred:** low and non-rotting — the gate is correct and clean
+  over what it reaches, and the SPEC states the limit rather than overclaiming.
+  The cost is that each reader re-derives the adoption-vs-inherent distinction,
+  as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
+  lead instruction.
+
+## Done
 
 ## Lessons Learned
