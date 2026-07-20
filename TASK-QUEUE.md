@@ -16,6 +16,71 @@
 
 ## Deferred
 
+- **price-table-age-kpi** [needs-spec] — an advisory drift-kit KPI reading the
+  `priced-as-of:` date in `scripts/price-table.tsv`, so a stale price table
+  surfaces as a trend signal instead of silently mispricing every economics read.
+  **Why not a gate:** prices are a dated literal with no machine-readable feed,
+  so a freshness *check* would have to fetch externally — which reds on causes no
+  commit produced and breaks hermeticity, the shape
+  `site-kit/SPEC.md §The monitor boundary` already rules out. An age KPI needs no
+  network: it reads a date in-tree and reports, never blocking. Follow the
+  established `kpi-deferred-age` / `defer 13d` age-KPI idiom, registering the name
+  in `scripts/kpis.list`.
+  **Concrete urgency:** the table records a known cliff — Sonnet 5 introductory
+  pricing ends 2026-08-31, and on 2026-09-01 the Opus:Sonnet ratio moves from
+  2.5x to ~1.67x. Every tier judgment made against the pre-cliff ratio needs
+  re-reading after that date, and nothing in-tree would announce it.
+  Feature: adds a governed KPI name to the registry. Filed 2026-07-20 by lead
+  economics review during the `render-fidelity-leak-coverage` close.
+
+- **guard-read-compound-carveout** [needs-spec] — tighten `guard_rule_cat_read` /
+  `guard_rule_find_glob` so an all-reads compound does not slip their
+  composition carve-out. Both rules deliberately exempt a `cat`/`find` that
+  pipes, redirects, or feeds a consumer — correct, that is real composition. But
+  a compound whose every segment is a bare read (`cat A; echo ===; cat B`) is not
+  composition; it is two file reads batched through the shell to save a
+  round-trip, which is exactly what the Read/Glob steer exists to prevent, and it
+  currently falls through to a permission prompt. Observed 6x `cat` + 4x `find`
+  in one iteration's friction log. Fix: treat a `;`-separated compound as
+  steerable when every segment is itself a bare read, leaving genuine
+  pipe/redirect composition untouched; ships with the good/bad fixture pair.
+  Debt: refines an existing guard rule, adds no governed name. Filed 2026-07-20
+  by tooling-friction triage during the `render-fidelity-leak-coverage` close.
+
+- **stage-economics-attribution-honesty** [needs-spec] — converge
+  `drift-kit/bin/stage-economics.sh` onto per-stage attribution that can carry a
+  decision. The meter prices correctly; what it *attributes* is not trustworthy,
+  in three independent ways, all verified against the tool this session.
+  **(a) Over-count — one session, two stamps, counted in full twice.** The dedup
+  key is `<iteration>/<stage>/<session>`, so two stage stamps from one session
+  are two distinct keys, and each resolves the same transcript and sums its
+  *entire* usage. Live evidence: `tooling-signal-honesty align-waived` and
+  `tooling-signal-honesty build` (one session) print byte-identical rows, as do
+  the early `lifecycle-kit scope`/`build` pair — the same figure billed to two
+  stages. The trailing note ("attributed to its stamp's stage", singular) states
+  the intended model; the key does not implement it. Direction: attribute one
+  session's usage once, split or assigned, never duplicated.
+  **(b) Under-count — unstamped continuation sessions are invisible.** The stamp
+  is the stage's *first* step, and enumeration is stamp-driven, so a stage that
+  continues in a new session (a credential swap mid-stage, or any resume) leaves
+  that session unstamped, matching no stamp and never sought. The `unmatched`
+  counter reports the inverse case (a stamp with no transcript) and is
+  structurally blind to this one. `close` is the most exposed stage: it runs last,
+  after build has drained the rate window — exactly when a swap happens. Sibling
+  to `background-credential-swap-support` **(b)**, which is the same swap event
+  corrupting a *different* surface (delegation-kit's `.metric/` usage-trend
+  projection reading its tail unpartitioned); fix them coherently, not twice.
+  **(c) The lead's burn belongs to no stage.** Under the split-lead posture the
+  lead's dispatch, verification, and battery runs carry no stamp and appear in no
+  row, so every per-stage total understates the iteration's true cost by the whole
+  supervision line item. Direction: decide whether supervision is its own row or
+  is apportioned — either is honest, silence is not.
+  **Cost while deferred:** any tier decision read off these figures compares
+  noisy numbers; (a) and (c) push in opposite directions, so the error does not
+  even have a known sign. Debt/analysis: converges an existing meter onto honest
+  accounting, adds no governed name. Filed 2026-07-20 by lead economics review
+  during the `render-fidelity-leak-coverage` close.
+
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
@@ -587,15 +652,28 @@
   stage downgrades from Opus to Sonnet net-positive rather than flipping on
   intuition; a ruling-config tier re-judgment (`.claude/agents/stage-session.md`
   / the lead template's ruling-config, which invites re-judging every tier).
-  Grounding: `drift-kit/bin/stage-economics.sh` shows build is the largest token
-  consumer of any stage (~100–175k output, 5–25M cache-read per run, versus
-  close/validate ~7–49k output), so it is the highest-value tier to test — a
-  bigger lever than the validate→Sonnet move already adopted.
-  **Two design blockers:** (1) the decision metric is uninstrumented — the tool
-  reports `cost=n/a` because `scripts/price-table.tsv` is absent (whether that
-  file is intentionally a local/gitignored artifact or simply not yet created is
-  itself part of the design question), so no price-weighted comparison is
-  possible today; obtaining/placing a price table is the prerequisite. (2) the
+  Grounding, **corrected** against priced rows (the earlier token-only reading
+  below predates both the price table and the split-lead posture, and overstated
+  build's lead): under the current split-lead posture the priced spread is build
+  $2.59–10.96, close $5.83–7.81, validate-on-Sonnet $0.54–1.44. Two readings
+  follow, and neither matches the original grounding. **Close is comparable to
+  build, not an order of magnitude below it** — so close is a tier candidate in
+  its own right, arguably ahead of build, and the premise that build is the
+  single highest-value lever no longer holds. And the already-adopted
+  validate→Sonnet downgrade **demonstrably works**: validate is the cheapest
+  stage by a wide margin with no observed quality cost, which is the affirmative
+  precedent this A/B is testing for build. Treat every figure here as provisional
+  until the prerequisite below lands — they carry the same attribution defects.
+  The superseded token-only reading: build ~100–175k output, 5–25M cache-read per
+  run versus close/validate ~7–49k output.
+  **Two design blockers:** (1) ~~the decision metric is uninstrumented~~ —
+  **resolved**: a price table now exists and the meter prices instead of
+  reporting `cost=n/a`. It is replaced by a sharper blocker: the figures are
+  priced but **mis-attributed**, so `stage-economics-attribution-honesty` is
+  now this task's hard prerequisite. Running the A/B on today's rows would
+  compare two noisy numbers — one session bearing two stamps is billed to both
+  stages in full, unstamped continuation sessions vanish, and the lead's own
+  supervision burn lands in no row at all. Sequence that task first. (2) the
   metric must be **net delivered-work cost** — price-weighted tokens + rework
   round-trips + the supervisor's by-eye gate-diff burden + escalation load
   shifted onto the Opus lead — not single-pass token price; a cheaper builder
@@ -614,7 +692,5 @@
   question.
 
 ## Done
-
-- render-fidelity-inline-span-leak
 
 ## Lessons Learned
