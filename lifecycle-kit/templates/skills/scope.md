@@ -52,6 +52,15 @@ and the proposed unit set is escalated for ruling before promotion: to the lead
 under the split posture, to the user directly under none — the stage's ordinary
 stop. The destination changes; the proposal step does not.
 
+**Weigh the iteration's cost before opening it — the economic composition test.**
+A lone sub-threshold unit may not justify a whole iteration's fixed cost: either
+bundle related-surface deferred entries into the iteration, or argue the unit is
+significant enough to stand alone. The cost principle — amortize a fixed setup
+cost across a shared-surface batch — is the lead's, owned by
+lifecycle-kit/templates/lead.md §Economics and applied there to dispatch
+batching; scope applies the same principle one axis over, to iteration
+composition. Cite it and weigh it here; do not re-derive the economics.
+
 **Authoring the promoted features' amendments is scope's — unless the roster
 splits out a dedicated authoring stage.** Where it does, that stage authors the
 amendment(s) and pairs the feature entries into the queue, and scope keeps only
