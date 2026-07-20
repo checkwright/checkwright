@@ -14,6 +14,16 @@ write is involved. Commit the stamp on its own.
 
 ## Session ritual
 
+**Where close's own captures file.** Close never writes the active queue
+sections — promoting a unit into them is scope's. Every finding close itself
+captures files instead as a Deferred `[needs-spec]` entry for a later scope to
+promote: a lesson turned task, a drained gap, a housekeeping or triage finding,
+or a dispatch's "capture as debt". The active sections must be empty at the
+drain boundary, so a finding mis-filed into one is caught only later as a red
+`check-stage-entry` at the next iteration's entry; filing to Deferred keeps the
+boundary clean (lifecycle-kit/SPEC.md §check-stage-entry owns the deferred-filing
+model for ruled-but-unpromoted work).
+
 1. **Process Lessons Learned** → durable rules or debt tasks, then clear the
    section. **Give each entry an explicit disposition before clearing, and
    stamp it** — one line per entry into `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`

@@ -79,21 +79,6 @@
   2026-07-20 into `lifecycle-rule-placement` (operator ruling) — the very test
   this scope applied by hand.
 
-- **close-capture-filing-destination** — `close.md` names a filing
-  destination only for the gap-inbox drain (step 2, "file a deferred entry").
-  Its step-3 housekeeping sweeps and any dispatch-supplied findings name none,
-  so a close session capturing findings has no stated home and the first
-  correcting signal is a red `check-stage-entry`. Add one filing-destination
-  rule covering every capture close makes — the active sections are scope's to
-  populate, close's own filings go to `Deferred` — sited where both `close.md`
-  and a lead authoring a dispatch will read it.
-  **Observed twice:** a close session mis-filed into the active sections off a
-  dispatch that said "capture as debt", and the lead later stranded two bullets
-  in the gap inbox after close had already drained it (below).
-  Debt: the rule is already enforced; only its statement is missing.
-  Filed 2026-07-20 by lead, drained from the gap inbox after the close stage.
-  Promoted 2026-07-20 into `lifecycle-rule-placement` (operator ruling).
-
 ## Deferred
 
 - **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
@@ -838,5 +823,6 @@
 ## Done
 
 - enter-stage-simulate-writes
+- close-capture-filing-destination
 
 ## Lessons Learned
