@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+render-fidelity-leak-coverage gates sha256=24fe95ab2b1004c5c4c81362e771b7c2ceb8366e19e22f567ac1b95f38175cb9 pass=77 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage gate_sdk sha256=2bfac74f7a03771af1c8da28805518467131fb09fb1c8812f130b55fad0d67e8 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage canon_kit sha256=d0c0e1b2b9f099ba2152cce6123319b0a62b245f97a69ec9addff36255d756d7 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage lifecycle_kit sha256=ffd7a1e902cbae04cacb68889ebe621172d592e7e4888bdacf2288b0b2c93f93 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage queue_kit sha256=0f7d5111c384795d745d6d3573644ffa1122590521907a3175bc1a9ac383d92d pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage site_kit sha256=55d65e50c2d04c15a7af0821270dccb9929f2853d511f1dcbc5b48e654117eed pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage scripts sha256=fe2ed0bfc0475ebe387ff499ba20bb4d3932c068a3248f11890841d7fb69c94b pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage guard_tests sha256=d4bf2cb95ff71dec4ba250f72ab892bfaa46cf9677013909169b8e13119d4ca3 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage usage_tests sha256=577d29baebe4ddb4a1b4ec2573546b7acc9ee34f62f55c8dd35c7c24e85a186a pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage budget_guard_tests sha256=9ec974d542c9b1cdc30c02c41e8acebb62bb06e02f0544547d688ed774404bb2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage upgrade sha256=39cd18c88ecab1fda2701e3c7319c8afac199167db5fd67bb816f96399812d13 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
+render-fidelity-leak-coverage index_tests sha256=71d410e2b32adb3cbdfa575b3c3cbd89d1eada95158c123e4ee517a439e789d2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-20
