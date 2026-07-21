@@ -12,6 +12,26 @@
 
 ## New Features
 
+- **price-table-age-kpi** [spec: SPEC-price-table-age-kpi.md] — an advisory
+  drift-kit KPI (`kpi-price-table-age`) reading the `priced-as-of:` date in the
+  consumer price table, so a stale table surfaces as a trend signal instead of
+  silently mispricing every economics read. **Time-boxed:** the table records a
+  known cliff — Sonnet 5 introductory pricing ends 2026-08-31, and on 2026-09-01
+  the Opus:Sonnet ratio moves from 2.5x to ~1.67x, so every tier judgment made
+  against the pre-cliff ratio needs re-reading after that date and nothing
+  in-tree would announce it. Landing the KPI before that cliff is the point.
+  The amendment carries the design: why an age KPI and not a gate (hermeticity —
+  no external fetch), the `priced-as-of:` header contract, the seam ruling
+  (kit-generic mechanism, consumer-owned table), and — per the lead's promotion
+  ruling — **Delta B, the `supervision` reserved stage value** that
+  `stage-economics-attribution-honesty` defect (c) needs, ruled here rather than
+  in a second amendment. Feature: adds a governed KPI name to the registry and a
+  governed value to the economics trend log's stage column. **Ordering:** Delta B
+  lands after or with that entry's defect (a) — a supervision row on top of a
+  double-counting join is a fourth wrong number. Filed 2026-07-20 by lead
+  economics review during the `render-fidelity-leak-coverage` close. Promoted
+  2026-07-21 into `stage-economics-honesty` by `/spec` (amendment authored).
+
 ## Technical Debt
 
 - **stage-economics-truncation-durability** — *re-framed at promotion from a
@@ -74,7 +94,11 @@
   if (c) lands "supervision is its own row", that row kind is a new name on a
   governed surface and belongs inside this iteration's `/spec` amendment
   envelope alongside `price-table-age-kpi` (lead ruling at promotion) rather
-  than in a separate unit.
+  than in a separate unit. **Ruled 2026-07-21 by `/spec`: supervision is its own
+  row.** The name, its knob, the derive-the-lead-from-the-transcript-path
+  producer, and the attribution invariant are Delta B of
+  `drift-kit/SPEC-price-table-age-kpi.md` — that amendment is the owner; this
+  entry carries (a) and (b) only, and (a) lands before or with Delta B.
   **Cost while deferred:** any tier decision read off these figures compares
   noisy numbers; (a) and (c) push in opposite directions, so the error does not
   even have a known sign. Debt/analysis: converges an existing meter onto honest
@@ -123,22 +147,6 @@
   is a future un-caught regression on a rarely-touched dry-run path.
   Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
 
-- **price-table-age-kpi** [needs-spec] — an advisory drift-kit KPI reading the
-  `priced-as-of:` date in `scripts/price-table.tsv`, so a stale price table
-  surfaces as a trend signal instead of silently mispricing every economics read.
-  **Why not a gate:** prices are a dated literal with no machine-readable feed,
-  so a freshness *check* would have to fetch externally — which reds on causes no
-  commit produced and breaks hermeticity, the shape
-  `site-kit/SPEC.md §The monitor boundary` already rules out. An age KPI needs no
-  network: it reads a date in-tree and reports, never blocking. Follow the
-  established `kpi-deferred-age` / `defer 13d` age-KPI idiom, registering the name
-  in `scripts/kpis.list`.
-  **Concrete urgency:** the table records a known cliff — Sonnet 5 introductory
-  pricing ends 2026-08-31, and on 2026-09-01 the Opus:Sonnet ratio moves from
-  2.5x to ~1.67x. Every tier judgment made against the pre-cliff ratio needs
-  re-reading after that date, and nothing in-tree would announce it.
-  Feature: adds a governed KPI name to the registry. Filed 2026-07-20 by lead
-  economics review during the `render-fidelity-leak-coverage` close.
 
 - **guard-read-compound-carveout** [needs-spec] — tighten `guard_rule_cat_read` /
   `guard_rule_find_glob` so an all-reads compound does not slip their
