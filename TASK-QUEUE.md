@@ -55,33 +55,6 @@
 
 ## Technical Debt
 
-- **stage-economics-truncation-durability** — *re-framed at promotion from a
-  durability fix to a **verify-and-retire**: the scope survey confirmed the
-  premise is false.* The entry was filed assuming
-  `drift-kit/bin/stage-economics.sh` reads only the boundary-truncated live
-  `WORKFLOW-STATE.txt`, losing every `spec`-stage row at each iteration reset,
-  and it named that loss as `spec-split-promotion-review`'s real blocker.
-  **The loss does not occur.** `.metric/stage-economics-log.txt` holds five
-  `spec` rows — `trajectory-stage-roster-hardcode`, `tooling-signal-honesty`,
-  `verdict-reader-honesty`, `carry-forward-durability`,
-  `render-fidelity-leak-coverage` — every one of them stamped 2026-07-20, i.e.
-  written by a single run that recovered five *past* iterations' spec stamps
-  after their boundary truncations had already happened. That is the
-  `git log -p -U0` history union at `stage-economics.sh:108` working as
-  designed. The entry pre-authorized this outcome by name ("the meter is
-  already durable and the missing rows have another cause is a legitimate
-  outcome that would retire this entry").
-  **Remaining work is confirmation and retirement, not repair:** pin the
-  durability with a fixture or an explicit SPEC statement so the next reader
-  does not re-derive it a third time, record the finding, and retire the entry.
-  Retirement carries a second obligation — **`spec-split-promotion-review`'s
-  named blocker dissolves**, so that entry's premise is updated in the same
-  motion rather than left stale in Deferred (done at this promotion; re-confirm
-  at close). Debt: converges a doc claim onto verified behavior, adds no
-  governed name. Filed 2026-07-20 by scope (operator ruling). Promoted
-  2026-07-21 into `stage-economics-honesty` (operator ruling); land first — it
-  is the cheapest member and it settles what the other two are measured against.
-
 - **stage-economics-attribution-honesty** — converge
   `drift-kit/bin/stage-economics.sh` onto per-stage attribution that can carry a
   decision. The meter prices correctly; what it *attributes* is not trustworthy,
@@ -929,5 +902,7 @@
   during `lifecycle-rule-placement`'s model correction.
 
 ## Done
+
+- stage-economics-truncation-durability
 
 ## Lessons Learned

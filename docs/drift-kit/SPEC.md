@@ -385,6 +385,17 @@ priced cost, never the account the tokens billed to.
    Because unbounded history would turn a per-stamp skip notice into unbounded
    output, unmatched stamps are **counted into one summary line** rather than
    listed; the skipped rows were never logged and still are not.
+   **Diagnosing a stage absent from the trend log** — the union makes truncation
+   a *non-cause*, and saying so here is the point: a stage whose stamps were
+   truncated out of the live file still prices off history, so a missing
+   `(iteration, stage)` row means that stamp resolved no transcript (aged out of
+   `DRIFT_KIT_SESSIONS_DIR`, counted in the unmatched summary) or that the
+   transcript carried no assistant-turn usage — both reported at measurement
+   time — and never that the boundary truncation lost it. The standing
+   misdiagnosis runs the other way: the union backfills a truncated stage only
+   on the first run that reads far enough back, so a log sampled before that run
+   shows the stage missing and reads as permanent loss. It is not; re-run the
+   meter before concluding the history arm is lossy.
 2. **Transcripts** — under `DRIFT_KIT_SESSIONS_DIR` (the knob the overhead meter
    already resolves). A stamp's `session8` selects a transcript by applying that
    **same normalization** to each candidate basename and matching — not by a raw
