@@ -18,7 +18,8 @@ now="$(date +%s)"
     printf 'updated_at=%s\n' "$now"
 } > "$snap"
 # spec: delegation-kit/SPEC.md §usage-verdict — hermetic cred pin: point CRED_FILE at an absent path so login_at=0 skips the login-window reroute; the ambient ~/.claude cred (or a fresh stub, mtime ~now) falls inside LOGIN_WINDOW and would reroute this call to STALE, making the smoke flaky by wall-clock
-DELEGATION_KIT_CRED_FILE="$snap.nocred" bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$snap" >/dev/null 2>&1 && vrc=0 || vrc=$?
+# spec: delegation-kit/SPEC.md §usage-verdict — hermetic threshold pin, same shape as bin/run-usage-tests.sh's own PAUSE_PCT export: an ambient DELEGATION_KIT_PAUSE_PCT/_7D override (e.g. an operator's stale-budget widening left exported in the live process) would push this 95% reading's expected PAUSE past the caller's threshold, inverting exit 1 to exit 0
+DELEGATION_KIT_CRED_FILE="$snap.nocred" DELEGATION_KIT_PAUSE_PCT=80 DELEGATION_KIT_PAUSE_PCT_7D=95 bash "$SMOKE_KIT_ROOT/bin/usage-verdict.sh" "$snap" >/dev/null 2>&1 && vrc=0 || vrc=$?
 if [[ "$vrc" -ne 1 ]]; then
     echo "delegation-kit/smoke: usage-verdict on a live 95% reading: want exit 1 (PAUSE), got $vrc" >&2
     rm -f "$snap"; exit 1

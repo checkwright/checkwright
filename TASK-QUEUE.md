@@ -55,30 +55,6 @@
 
 ## Technical Debt
 
-- **delegation-smoke-threshold-pin** — `delegation-kit/smoke/install.sh` pins
-  `DELEGATION_KIT_CRED_FILE` around its live 95%-reading `usage-verdict.sh`
-  assertion (`install.sh:21`) but pins **no threshold**, so the assertion
-  inherits whatever `DELEGATION_KIT_PAUSE_PCT`/`_7D` the ambient session env
-  carries. With an inherited `PAUSE_PCT=100` the expected `exit 1` (PAUSE)
-  becomes `exit 0` (OK) and the assertion inverts.
-  **Reproduced twice, with real cost.** The `lifecycle-rule-placement` validate
-  re-entry (2026-07-21) turned demo, consumer_smoke, upgrade, and agents_md_smoke
-  red on exactly this leak — an operator override exported into the live process
-  for an unrelated stale budget reading, which reverting the config file could
-  not unexport from inherited child env. Re-running with both vars unset, no code
-  change, passed all four. Re-verified by inspection at this scope.
-  **The fix is one line, already patterned in-kit:** export
-  `DELEGATION_KIT_PAUSE_PCT`/`_7D` around the 95%-reading assertion, copying the
-  pin that the kit's own `bin/run-usage-tests.sh` puts around its equivalent
-  threshold-sensitive check.
-  **Scope boundary (lead ruling):** this unit is the pin only. It does **not**
-  carry the credential-consuming-bin roster design pass — that stays in Deferred
-  as `hermetic-bin-roster-config`, whose remaining scope is the config seam
-  alone. Debt: converges a smoke onto hermetic env, adds no governed name.
-  Split out and promoted 2026-07-21 into `stage-economics-honesty` (operator
-  ruling) from `hermetic-bin-roster-config`, whose entry named this one-liner
-  as separable.
-
 ## Deferred
 
 - **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
@@ -859,5 +835,6 @@
 
 - stage-economics-truncation-durability
 - stage-economics-attribution-honesty
+- delegation-smoke-threshold-pin
 
 ## Lessons Learned
