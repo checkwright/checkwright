@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: stage-economics-honesty
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,6 +14,98 @@
 
 ## Technical Debt
 
+- **stage-economics-truncation-durability** — *re-framed at promotion from a
+  durability fix to a **verify-and-retire**: the scope survey confirmed the
+  premise is false.* The entry was filed assuming
+  `drift-kit/bin/stage-economics.sh` reads only the boundary-truncated live
+  `WORKFLOW-STATE.txt`, losing every `spec`-stage row at each iteration reset,
+  and it named that loss as `spec-split-promotion-review`'s real blocker.
+  **The loss does not occur.** `.metric/stage-economics-log.txt` holds five
+  `spec` rows — `trajectory-stage-roster-hardcode`, `tooling-signal-honesty`,
+  `verdict-reader-honesty`, `carry-forward-durability`,
+  `render-fidelity-leak-coverage` — every one of them stamped 2026-07-20, i.e.
+  written by a single run that recovered five *past* iterations' spec stamps
+  after their boundary truncations had already happened. That is the
+  `git log -p -U0` history union at `stage-economics.sh:108` working as
+  designed. The entry pre-authorized this outcome by name ("the meter is
+  already durable and the missing rows have another cause is a legitimate
+  outcome that would retire this entry").
+  **Remaining work is confirmation and retirement, not repair:** pin the
+  durability with a fixture or an explicit SPEC statement so the next reader
+  does not re-derive it a third time, record the finding, and retire the entry.
+  Retirement carries a second obligation — **`spec-split-promotion-review`'s
+  named blocker dissolves**, so that entry's premise is updated in the same
+  motion rather than left stale in Deferred (done at this promotion; re-confirm
+  at close). Debt: converges a doc claim onto verified behavior, adds no
+  governed name. Filed 2026-07-20 by scope (operator ruling). Promoted
+  2026-07-21 into `stage-economics-honesty` (operator ruling); land first — it
+  is the cheapest member and it settles what the other two are measured against.
+
+- **stage-economics-attribution-honesty** — converge
+  `drift-kit/bin/stage-economics.sh` onto per-stage attribution that can carry a
+  decision. The meter prices correctly; what it *attributes* is not trustworthy,
+  in three independent ways.
+  **(a) Over-count — one session, two stamps, counted in full twice.** The dedup
+  key is `<iteration>/<stage>/<session>`, so two stage stamps from one session
+  are two distinct keys, and each resolves the same transcript and sums its
+  *entire* usage. Live evidence, re-verified 2026-07-21 at the head of
+  `.metric/stage-economics-log.txt`: the `lifecycle-kit scope` and
+  `lifecycle-kit build` rows are byte-identical at `cost=25.8245` — one
+  session's burn billed to two stages in full; the
+  `tooling-signal-honesty align-waived`/`build` pair is the same shape. The
+  trailing note ("attributed to its stamp's stage", singular) states the
+  intended model; the key does not implement it. Direction: attribute one
+  session's usage once, split or assigned, never duplicated.
+  **(b) Under-count — unstamped continuation sessions are invisible.** The stamp
+  is the stage's *first* step, and enumeration is stamp-driven, so a stage that
+  continues in a new session (a credential swap mid-stage, or any resume) leaves
+  that session unstamped, matching no stamp and never sought. The `unmatched`
+  counter reports the inverse case (a stamp with no transcript) and is
+  structurally blind to this one. `close` is the most exposed stage: it runs last,
+  after build has drained the rate window — exactly when a swap happens. Sibling
+  to `background-credential-swap-support` **(b)**, which is the same swap event
+  corrupting a *different* surface (delegation-kit's `.metric/` usage-trend
+  projection reading its tail unpartitioned); fix them coherently, not twice.
+  **(c) The lead's burn belongs to no stage.** Under the split-lead posture the
+  lead's dispatch, verification, and battery runs carry no stamp and appear in no
+  row, so every per-stage total understates the iteration's true cost by the whole
+  supervision line item. Direction: decide whether supervision is its own row or
+  is apportioned — either is honest, silence is not. **Note the amendment seam:**
+  if (c) lands "supervision is its own row", that row kind is a new name on a
+  governed surface and belongs inside this iteration's `/spec` amendment
+  envelope alongside `price-table-age-kpi` (lead ruling at promotion) rather
+  than in a separate unit.
+  **Cost while deferred:** any tier decision read off these figures compares
+  noisy numbers; (a) and (c) push in opposite directions, so the error does not
+  even have a known sign. Debt/analysis: converges an existing meter onto honest
+  accounting, adds no governed name. Filed 2026-07-20 by lead economics review
+  during the `render-fidelity-leak-coverage` close. Promoted 2026-07-21 into
+  `stage-economics-honesty` (operator ruling); the iteration's substantive unit,
+  and the hard prerequisite two Deferred entries name.
+
+- **delegation-smoke-threshold-pin** — `delegation-kit/smoke/install.sh` pins
+  `DELEGATION_KIT_CRED_FILE` around its live 95%-reading `usage-verdict.sh`
+  assertion (`install.sh:21`) but pins **no threshold**, so the assertion
+  inherits whatever `DELEGATION_KIT_PAUSE_PCT`/`_7D` the ambient session env
+  carries. With an inherited `PAUSE_PCT=100` the expected `exit 1` (PAUSE)
+  becomes `exit 0` (OK) and the assertion inverts.
+  **Reproduced twice, with real cost.** The `lifecycle-rule-placement` validate
+  re-entry (2026-07-21) turned demo, consumer_smoke, upgrade, and agents_md_smoke
+  red on exactly this leak — an operator override exported into the live process
+  for an unrelated stale budget reading, which reverting the config file could
+  not unexport from inherited child env. Re-running with both vars unset, no code
+  change, passed all four. Re-verified by inspection at this scope.
+  **The fix is one line, already patterned in-kit:** export
+  `DELEGATION_KIT_PAUSE_PCT`/`_7D` around the 95%-reading assertion, copying the
+  pin that the kit's own `bin/run-usage-tests.sh` puts around its equivalent
+  threshold-sensitive check.
+  **Scope boundary (lead ruling):** this unit is the pin only. It does **not**
+  carry the credential-consuming-bin roster design pass — that stays in Deferred
+  as `hermetic-bin-roster-config`, whose remaining scope is the config seam
+  alone. Debt: converges a smoke onto hermetic env, adds no governed name.
+  Split out and promoted 2026-07-21 into `stage-economics-honesty` (operator
+  ruling) from `hermetic-bin-roster-config`, whose entry named this one-liner
+  as separable.
 
 ## Deferred
 
@@ -30,29 +122,6 @@
   **Cost while deferred:** low and non-rotting — the fix is present; the exposure
   is a future un-caught regression on a rarely-touched dry-run path.
   Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
-
-- **stage-economics-truncation-durability** [needs-spec] —
-  `spec-split-promotion-review` names this as its real blocker (in its own
-  premise-correction) but no entry existed, so that dependency resolved to
-  nothing; filing it makes the dependency real and pickable.
-  **Premise to confirm FIRST — the entry's first open question.** The blocker as
-  filed assumes `drift-kit/bin/stage-economics.sh` reads *only* the
-  boundary-truncated live `WORKFLOW-STATE.txt`, losing every `spec`-stage row at
-  each iteration reset. The tree partly contradicts that: `stage-economics.sh:108`
-  already unions committed history via `git log -p -U0` on the state file (the
-  arm whose comment says it "keeps a stamped-but-uncommitted stage visible"). So
-  whether `spec`-stage economics rows are genuinely unrecoverable from
-  `.metric/stage-economics-log.txt` is itself **unverified** — the spec pass must
-  establish that before prescribing any fix, and "the meter is already durable and
-  the missing rows have another cause" is a legitimate outcome that would retire
-  this entry and unblock `spec-split-promotion-review` directly.
-  Only if the loss is confirmed does a durability fix (read committed history for
-  the truncated rows, or persist them before truncation) follow.
-  Debt/analysis: converges the meter's read onto durable history; adds no governed
-  name. **Cost while deferred:** `spec-split-promotion-review` stays blocked on an
-  unconfirmed premise, and the backlog-aging review re-raises it each iteration.
-  Filed 2026-07-20 by scope (operator ruling), from the undirected survey's
-  premise re-verification.
 
 - **price-table-age-kpi** [needs-spec] — an advisory drift-kit KPI reading the
   `priced-as-of:` date in `scripts/price-table.tsv`, so a stale price table
@@ -84,40 +153,6 @@
   pipe/redirect composition untouched; ships with the good/bad fixture pair.
   Debt: refines an existing guard rule, adds no governed name. Filed 2026-07-20
   by tooling-friction triage during the `render-fidelity-leak-coverage` close.
-
-- **stage-economics-attribution-honesty** [needs-spec] — converge
-  `drift-kit/bin/stage-economics.sh` onto per-stage attribution that can carry a
-  decision. The meter prices correctly; what it *attributes* is not trustworthy,
-  in three independent ways, all verified against the tool this session.
-  **(a) Over-count — one session, two stamps, counted in full twice.** The dedup
-  key is `<iteration>/<stage>/<session>`, so two stage stamps from one session
-  are two distinct keys, and each resolves the same transcript and sums its
-  *entire* usage. Live evidence: `tooling-signal-honesty align-waived` and
-  `tooling-signal-honesty build` (one session) print byte-identical rows, as do
-  the early `lifecycle-kit scope`/`build` pair — the same figure billed to two
-  stages. The trailing note ("attributed to its stamp's stage", singular) states
-  the intended model; the key does not implement it. Direction: attribute one
-  session's usage once, split or assigned, never duplicated.
-  **(b) Under-count — unstamped continuation sessions are invisible.** The stamp
-  is the stage's *first* step, and enumeration is stamp-driven, so a stage that
-  continues in a new session (a credential swap mid-stage, or any resume) leaves
-  that session unstamped, matching no stamp and never sought. The `unmatched`
-  counter reports the inverse case (a stamp with no transcript) and is
-  structurally blind to this one. `close` is the most exposed stage: it runs last,
-  after build has drained the rate window — exactly when a swap happens. Sibling
-  to `background-credential-swap-support` **(b)**, which is the same swap event
-  corrupting a *different* surface (delegation-kit's `.metric/` usage-trend
-  projection reading its tail unpartitioned); fix them coherently, not twice.
-  **(c) The lead's burn belongs to no stage.** Under the split-lead posture the
-  lead's dispatch, verification, and battery runs carry no stamp and appear in no
-  row, so every per-stage total understates the iteration's true cost by the whole
-  supervision line item. Direction: decide whether supervision is its own row or
-  is apportioned — either is honest, silence is not.
-  **Cost while deferred:** any tier decision read off these figures compares
-  noisy numbers; (a) and (c) push in opposite directions, so the error does not
-  even have a known sign. Debt/analysis: converges an existing meter onto honest
-  accounting, adds no governed name. Filed 2026-07-20 by lead economics review
-  during the `render-fidelity-leak-coverage` close.
 
 - **gap-inbox-post-close-window** [needs-spec] — the gap inbox is drained by
   `close` and refuses the next iteration-boundary `scope` entry while non-empty
@@ -187,11 +222,58 @@
   **Second defect, concrete:** `prompt-friction.log` carries no `# contract:`
   header, alone among the ten non-empty files, so nothing names its owner,
   grammar, or reclaim path. Direction: state the rule in the owning SPEC keyed
-  on a real property (gated-vs-advisory, or drained-vs-accumulating), rename to
-  match, and gate the contract-header requirement — the header is already
-  universal in practice, which makes it cheap to enforce and cheap to lose.
-  Debt: a naming convention with no owner doc plus one missing header.
+  on a real property, rename to match, and gate the contract-header requirement.
+  **Discriminator corrected 2026-07-21 by the scope survey — the axis this entry
+  proposed is not the one the tree uses.** The proposal was to key the rule on
+  gated-vs-advisory or drained-vs-accumulating. Neither is what actually
+  partitions the directory: **tracked-vs-gitignored** does, cleanly and with no
+  exceptions. `knowledge-friction.log`, `prompt-friction.log`, and
+  `essay-harvest.md` are gitignored (`.gitignore:25,27,30`); the other nine
+  `.workflow/` files are tracked. That split is exactly the advisory-local-capture
+  versus checked-projection distinction the entry was reaching for, and it is
+  already machine-readable via `git check-ignore`, so a gate keyed on it needs no
+  new marker — which also makes the header requirement cheap to express as
+  "every tracked `.workflow/` file carries a `# contract:` header".
+  **The header defect is wider than filed:** `prompt-friction.log` still carries
+  none (its first line is captured shell text), and `knowledge-friction.log` now
+  sits at 0 bytes with none either — two instances, both on the gitignored side,
+  which is itself a signal that the untracked files are the ones no gate reaches.
+  Decide whether the header requirement follows tracking or covers all ten.
+  Debt: a naming convention with no owner doc plus missing headers.
   Filed 2026-07-20 by lead, same workflow-directory review.
+
+- **workflow-dir-tracking-claim** [needs-spec] — CLAUDE.md §Housekeeping states
+  that "`.workflow/` is committed (checked projections)", and three of that
+  directory's twelve files are gitignored: `knowledge-friction.log`,
+  `prompt-friction.log`, `essay-harvest.md` (`.gitignore:25,27,30`). The claim is
+  false as written, and it is false on an **always-loaded surface** — every
+  session reads it, so the wrong model is the default model until someone checks
+  `git ls-files`.
+  **Why this is more than a wording fix.** The sentence sits in a one-line-per-rule
+  always-loaded tier where each line is supposed to be true for every reader
+  (widest-true-tier placement). Correcting it means deciding what the rule
+  actually is — the honest reading is two-tier: `.workflow/` holds *tracked
+  checked projections* (gated, committed, `# contract:`-headed) alongside
+  *gitignored local capture* (advisory, drained, session-local). That is a real
+  distinction worth stating rather than a typo worth patching, and it is the same
+  axis `workflow-file-format-convention` needs — related, but separately pickable,
+  and deliberately not folded into that entry (lead ruling 2026-07-21): this one
+  is a doc-accuracy fix on an always-loaded surface, that one is a naming
+  convention in a kit SPEC.
+  **Open gate question:** a doc claim about tracking status is machine-checkable
+  — `git check-ignore` over the directory versus what the prose asserts — so this
+  may be a genuine low-false-positive gate rather than a one-time correction. But
+  the gate's shape depends on how the corrected prose is phrased (a gate can only
+  check a claim stated in a form it can parse), so phrasing and gateability are
+  one design question, not two. Concluding "correct the prose, build no gate" is a
+  legitimate outcome if the claim resists a parseable form.
+  **Cost while deferred:** low per-session but paid by every session — an
+  always-loaded falsehood is the highest-leverage kind of doc drift, and it
+  actively misleads on exactly the surfaces the lifecycle machinery writes.
+  Bounded: nothing breaks, no gate reds; the cost is wrong beliefs, not failures.
+  Debt: converges an always-loaded claim onto verified tracking state; adds no
+  governed name unless the gate lands. Filed 2026-07-21 by scope (operator
+  ruling), from the undirected survey's `.workflow/` premise re-verification.
 
 - **friction-log-merge** [needs-spec] — `knowledge-friction.log` and
   `prompt-friction.log` are the same surface twice: each is appended by a
@@ -489,6 +571,13 @@
   config (the `check-graph` / `scripts/graph-vocab.sh` pattern), never a
   gate-sdk literal. So the deliverable is a config seam and its fall-open
   default, an align-shaped design pass rather than an assertion tweak.
+  **Remaining scope is the roster design only — the one-line leak was split out
+  and fixed separately.** The concrete `delegation-kit/smoke/install.sh`
+  threshold leak this entry recorded is now its own promoted debt unit,
+  `delegation-smoke-threshold-pin` (2026-07-21, operator ruling): it needed no
+  config seam, only the export the sibling test script already uses. What stays
+  here is the part that genuinely earns a design pass — the per-kit roster of
+  credential-consuming bins and its fall-open default. Do not re-file the pin.
   **Cost while deferred:** low and bounded — the gate still catches the partial
   case that actually regressed here; the uncovered case is a kit shipping a
   credential-consuming smoke with no pin at all — reproduced 2026-07-21 (was:
@@ -594,6 +683,19 @@
   is *recorded spec-stage economics*, and that is blocked on
   **`stage-economics-truncation-durability`** — the real blocker, named here so no
   future scope re-derives it or promotes a review with nothing to read.
+  **Premise corrected again 2026-07-21 by the scope survey — that blocker has
+  dissolved and this entry is now genuinely pickable.** The "zero `spec` rows"
+  reading above was taken before the meter's history union had been exercised;
+  `.metric/stage-economics-log.txt` in fact holds five `spec` rows covering five
+  distinct iterations, all recovered *after* their boundary truncations. So the
+  data this entry prescribes reading **exists**, and the named blocker is being
+  retired inside `stage-economics-honesty` rather than repaired. Two carry-overs
+  before the re-run is worth anything: (1) wait for that iteration to land, since
+  the figures this review reads are exactly the ones
+  `stage-economics-attribution-honesty` is correcting — re-running against
+  mis-attributed rows would settle a tier question on noise; (2) the `≥N
+  iterations` threshold this entry leaves unset still needs a value, and five
+  recorded iterations is the number now on the table.
   **Cost while deferred:** one queue line; the backlog-aging review re-raises it
   every iteration until the data exists to run it. Filed 2026-07-19 by lead
   ruling at the `stage-posture-split-tuning` close — the split shipped on
