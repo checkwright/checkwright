@@ -1,9 +1,12 @@
 # SPEC amendment: price-table-age-kpi
 
 <!-- Owning component: drift-kit (owns the KPI plugin contract, the bundled set,
-     and the stage-economics meter). Single-component: nothing here changes
-     lifecycle-kit's state machine, its stamp grammar, or any other kit's
-     contract — the meter stays a read-only consumer of the stamp line.
+     and the stage-economics meter). One contract owner, audited at align:
+     nothing here changes lifecycle-kit's state machine, its stamp grammar, or
+     any other kit's contract — the meter stays a read-only consumer of the
+     stamp line. Other kits are reached as *gate constraints* and *projection
+     obligations*, not as contracts this amendment may change; both rosters are
+     in §Cross-component reach (align-verified).
      Pairs with the queue entry tagged [spec: SPEC-price-table-age-kpi.md].
 
      Two deltas, one envelope. Delta A is the named feature. Delta B is the
@@ -48,7 +51,13 @@ built to flag.
 - **The surface it reads** — the price table already resolved by
   `DRIFT_KIT_PRICE_TABLE` (§Layout and configuration). No new knob: the plugin
   reads the same consumer-config path the meter prices through, so the table has
-  one owner and one address.
+  one owner and one address. **The default expression travels with it**: that
+  knob's default (`${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv`) is stated
+  only inside `bin/stage-economics.sh`, and plugins read *exported env only*
+  (§The KPI plugin contract) — a consumer who sets nothing exports nothing, so
+  the plugin restates the identical default, the `kpi-overhead` /
+  `DRIFT_KIT_METRIC_DIR` precedent. The smoke's writer/reader-divergence
+  assertion is the shape that keeps the two copies honest.
 - **The dating contract** — two fields on the same consumer-owned header block,
   each read as the first line of that file matching
   `^#[[:space:]]*<field>:[[:space:]]*(\d{4}-\d{2}-\d{2})`, trailing prose on the
@@ -200,10 +209,12 @@ that a degraded or absent measurement is visible, never silently folded
   the operator reading close-over-close; the deferred `benchmark-ab-experiment`
   rung's measurement half, which consumes this log and inherits the row.
 - **Reader survey of the widened column, run whole-tree so the next reader need
-  not re-run it.** The economics log has **exactly one parsing reader**:
-  `bin/stage-economics.sh` itself (its own dedup grep). The log path appears
-  nowhere else in the tree but that script, the two SPEC copies of its knob
-  entry, and queue prose — no gate reads it (it lives under the gitignored
+  not re-run it** (re-run and corrected at align — the earlier survey undercounted
+  by one). The log has **one parsing reader in production code**,
+  `bin/stage-economics.sh` itself (its own dedup grep), and **one asserting
+  reader in the harness**, `drift-kit/smoke/install.sh`, which counts the log's
+  lines. The path appears nowhere else but those two, the two SPEC copies of its
+  knob entry, and queue prose — no *gate* reads it (it lives under the gitignored
   `DRIFT_KIT_METRIC_DIR`), and the `/economics` narrative reads it as prose, not
   by parsing the stage column. **`bin/trajectory.sh` does not parse this column
   at all** — the reader worth checking, since `trajectory-stage-roster-hardcode`
@@ -211,6 +222,14 @@ that a degraded or absent measurement is visible, never silently folded
   own `DRIFT_KIT_STAGES` roster, never this log. So a non-stage value in the
   column has **bounded blast radius** and cannot silently fall out of a roster
   the way the trajectory's stamps did.
+- **What the smoke reader costs this delta.** `smoke/install.sh` asserts the
+  stage-economics log holds **exactly one line** for one `(iteration, stage,
+  model)` triple, both on first measure and after a re-measure. Those assertions
+  survive only because every transcript in the existing fixture set sits on the
+  **flat** tier, so no supervision row is derivable from it. The nested-tier
+  fixture therefore gets **its own sessions dir, state file, and log**; adding it
+  to the existing fixture set would emit a second row into the log those two
+  assertions count and red the smoke.
 - **No new field.** Delta B deliberately adds no log field: the four token
   fields, `cost`, and `date` carry the supervision row exactly as they carry a
   stage row, and their readers are already named in §The stage-economics meter.
@@ -254,7 +273,10 @@ generated projection of the first three.
   independently, and — the inversion this delta exists for — an expiry row
   reading EXPIRED on a fixture whose `priced-as-of:` is recent and whose
   `prices-valid-through:` has passed; (ii) a nested-tier fixture transcript (a synthetic
-  `<lead>/subagents/<agent>.jsonl` beside a `<lead>.jsonl`) and assertions that
+  `<lead>/subagents/<agent>.jsonl` beside a `<lead>.jsonl`) **in its own sessions
+  dir, state file, and log** — the existing stage-economics fixture set is
+  flat-tier and its log is asserted to hold exactly one line, so the supervision
+  fixture must not share it — and assertions that
   exactly one supervision row is emitted for the iteration, that the label is
   the knob's value, and that a stamp naming the label suppresses the row with a
   notice.
@@ -270,20 +292,32 @@ generated projection of the first three.
   keeping the post-cliff per-token numbers**, citing the header for the date
   instead. Not optional and not cosmetic: without it the cliff date is
   maintained in two places the day it is mechanized, and the block's numbers have
-  no other owner, so the block is edited, never deleted.
+  no other owner, so the block is edited, never deleted. **Two date literals, not
+  one**: the block spells the same fact twice — `KNOWN CLIFF — 2026-09-01` in its
+  heading and "in effect through 2026-08-31" in its first sentence. Both go; the
+  header owns the date and the prose says "past the `prices-valid-through:`
+  date". Dropping only the one the amendment named would leave the duplication
+  the delta exists to remove.
 - **`drift-kit/templates/kpis.list`** — registers `kpi-price-table-age` in the
   Lead block.
 - **`drift-kit/templates/economics.md`** — the composed narrative gains the
   supervision line item beside the per-stage cost bullets, naming it as burn no
   stage stamp carries.
 - **`scripts/kpis.list`** — this repo's registry, Lead block.
-- **Generated projections, regenerated in the same unit:**
-  `docs/drift-kit/SPEC.md` and `docs/drift-kit/README.md`
-  (`bash scripts/gen-docs-mirror.sh --write`, `check-docs-mirror-fresh`
-  byte-gates them) and `docs/enforcement.md`
-  (`bash gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`,
-  `check-enforcement-fresh` byte-compares it) — a `kpis.list` change is a
-  class-registry change.
+- **Generated projections, regenerated in the same unit** — four, not two; the
+  last two were found at align by following `kpis.list`'s readers rather than the
+  amendment's own list, and each is byte-gated, so a miss is a red pre-commit:
+  - `docs/drift-kit/SPEC.md` and `docs/drift-kit/README.md`
+    (`bash scripts/gen-docs-mirror.sh --write`, `check-docs-mirror-fresh`).
+  - `docs/enforcement.md`
+    (`bash gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`,
+    `check-enforcement-fresh`) — a `kpis.list` change is a class-registry change.
+  - `docs/footprint.md` (`check-footprint-fresh`, context-kit's) — drift-kit's
+    load-triggered token cost moves because `drift-kit/SPEC.md` grows.
+  - `docs/value.md`'s value-rollup block (`bash scripts/gen-value-rollup.sh`,
+    `check-value-rollup-fresh`) — it joins the enforcement map's per-kit class
+    counts to the footprint's token cost, so this unit moves it on **both** axes:
+    drift-kit's Advisory-KPI count goes 10 → 11 and its token column grows.
 
 **Reviewed and deliberately unchanged** — `lifecycle-kit/SPEC.md` §The state
 machine: no new stamp, no cursor motion, no roster member. `bin/trajectory.sh`
@@ -292,6 +326,51 @@ column (surveyed above), so the widened column reaches it not at all.
 `bin/stage-economics.sh`'s pricing arithmetic is untouched by Delta A — the KPI
 reads the table's header, never its rows, so an expired table still prices,
 loudly rather than silently.
+
+## Cross-component reach (align-verified)
+
+`check-stage-entry` assertion C fired on this amendment, naming four components
+(`drift-kit lifecycle-kit site-kit docs/drift-kit`). The align audit resolved
+each; the detector was **both over- and under-inclusive**, so this section is the
+audited answer and supersedes any reference count.
+
+- **drift-kit — the one contract owner.** Every contract this amendment changes
+  is drift-kit's. No other kit's contract changes.
+- **`docs/drift-kit` — not a component.** It holds a `SPEC.md`, which is what the
+  detector's roster keys on, but it is a generated mirror of `drift-kit/`
+  (`scripts/gen-docs-mirror.sh`), owning nothing. It is a regeneration
+  obligation, listed above.
+- **lifecycle-kit — the state-machine mention is a true negative, verified
+  empirically.** Delta B's producer derives the supervisor from the transcript
+  path, and the live layout was checked rather than assumed: this repo's sessions
+  dir carries `<lead-uuid>/subagents/agent-<id>.jsonl` beside a flat
+  `<lead-uuid>.jsonl`, so both tiers the derivation needs exist and the lead's own
+  transcript is resolvable from the nested path's own directory component. No
+  stamp, no cursor motion, no roster member — §The state machine stands.
+  **But lifecycle-kit does hold one live gate over this unit**, which the
+  reference count did not surface: `check-skill-binding` resolves whatever
+  template a `.claude/commands/*.md` shim names and asserts the shim binds that
+  template's exact slot set. `.claude/commands/economics.md` names
+  `drift-kit/templates/economics.md` (today: one slot, `posture`; one binding).
+  Delta B's edit to that template is prose within the existing slot — **it adds
+  no `*<slot: …>*` and removes none**, or the shim gains the matching binding in
+  the same commit.
+- **site-kit — the cited section is a citation, and verified accurate.**
+  §The monitor boundary does rule out exactly the network-fetching freshness
+  gate Delta A declines to build. **The live reach is a different gate**:
+  `check-docs-render-fidelity` covers every tracked docs page, `docs/drift-kit/SPEC.md`
+  included, and this delta's prose is unusually dense in angle-bracket
+  placeholders (`<N>`, `<date>`, `<TAB>`, `<agent>.jsonl`) — precisely the
+  raw-non-HTML-element-tag symptom that gate reds on. Rendered through the pinned
+  kramdown/GFM parser at align, every such token **escapes clean so long as it
+  stays inside a code span**; that is the drafting rule for the merged sections,
+  and it is the existing SPEC idiom already.
+- **Reached but *not* flagged by the detector** — the repo-root and gate-sdk /
+  context-kit projections above. The signal keys on `<component>/<contract-file>`
+  references in the amendment's prose, so a surface this unit changes only
+  *derivatively* (a rollup that counts `kpis.list` entries) is invisible to it.
+  Following the registry's readers, not the prose's citations, is what found
+  them.
 
 ## Definition of Done
 
@@ -316,6 +395,13 @@ loudly rather than silently.
       economics log's stage column is roster-closed.
 - [ ] **Ordering honored** — `stage-economics-attribution-honesty` (a) lands
       before or with Delta B.
+- [ ] **All four projections regenerated in the unit** — docs mirror,
+      `docs/enforcement.md`, `docs/footprint.md`, and `docs/value.md`'s rollup
+      block; each is byte-gated, so the full battery is the oracle, not this list.
+- [ ] **Cross-component constraints honored** — `check-skill-binding` stays green
+      (the `economics.md` edit adds no slot, or the shim binds it), and every
+      angle-bracket placeholder in the merged SPEC prose sits inside a code span
+      so `check-docs-render-fidelity` stays green on the mirror.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
