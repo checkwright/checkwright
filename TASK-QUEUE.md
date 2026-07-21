@@ -20,6 +20,27 @@
   the Opus:Sonnet ratio moves from 2.5x to ~1.67x, so every tier judgment made
   against the pre-cliff ratio needs re-reading after that date and nothing
   in-tree would announce it. Landing the KPI before that cliff is the point.
+  **Intent ruled 2026-07-21 by scope (this iteration's intent oracle), on a
+  question `/spec` escalated: the envelope covers expiry, not age alone.** The
+  entry's asserted mechanism is a `priced-as-of:` age read, but its stated point
+  is the cliff — and age does not serve expiry, it *inverts* at it. A table
+  re-transcribed on 2026-08-30 reads "1d — fresh" on the morning of 2026-09-01,
+  when it is least trustworthy; the age signal is quietest exactly when the cliff
+  bites. So an age-only KPI does not merely announce the cliff indirectly, it
+  reads reassuringly at the moment the entry exists to flag. The entry's own gap
+  statement — the cliff is the thing "nothing in-tree would announce" — is also
+  literally unmet by age-only: the cliff *is* in-tree, as an unparsed prose block
+  in `scripts/price-table.tsv`, and age-only leaves it unparsed.
+  **Inside this promoted scope, not a new unit:** the optional
+  `prices-valid-through: <YYYY-MM-DD>` header is a second field on the same
+  consumer-owned header block, read by the same KPI, producing no second KPI
+  name and no new reader. **Bounded so it does not creep:** the KPI stays
+  advisory and never gates; the header stays optional with an `n/a` lead row when
+  absent; and this ruling authorizes no third field. **One SSOT consequence to
+  land with it:** once the header carries the date, the table's prose cliff block
+  must cite it rather than restate it — the block keeps the post-cliff *numbers*
+  (transcription help with no other home) and drops the duplicated date, else the
+  cliff date is maintained in two places the day it is mechanized.
   The amendment carries the design: why an age KPI and not a gate (hermeticity —
   no external fetch), the `priced-as-of:` header contract, the seam ruling
   (kit-generic mechanism, consumer-owned table), and — per the lead's promotion
