@@ -55,52 +55,6 @@
 
 ## Technical Debt
 
-- **stage-economics-attribution-honesty** — converge
-  `drift-kit/bin/stage-economics.sh` onto per-stage attribution that can carry a
-  decision. The meter prices correctly; what it *attributes* is not trustworthy,
-  in three independent ways.
-  **(a) Over-count — one session, two stamps, counted in full twice.** The dedup
-  key is `<iteration>/<stage>/<session>`, so two stage stamps from one session
-  are two distinct keys, and each resolves the same transcript and sums its
-  *entire* usage. Live evidence, re-verified 2026-07-21 at the head of
-  `.metric/stage-economics-log.txt`: the `lifecycle-kit scope` and
-  `lifecycle-kit build` rows are byte-identical at `cost=25.8245` — one
-  session's burn billed to two stages in full; the
-  `tooling-signal-honesty align-waived`/`build` pair is the same shape. The
-  trailing note ("attributed to its stamp's stage", singular) states the
-  intended model; the key does not implement it. Direction: attribute one
-  session's usage once, split or assigned, never duplicated.
-  **(b) Under-count — unstamped continuation sessions are invisible.** The stamp
-  is the stage's *first* step, and enumeration is stamp-driven, so a stage that
-  continues in a new session (a credential swap mid-stage, or any resume) leaves
-  that session unstamped, matching no stamp and never sought. The `unmatched`
-  counter reports the inverse case (a stamp with no transcript) and is
-  structurally blind to this one. `close` is the most exposed stage: it runs last,
-  after build has drained the rate window — exactly when a swap happens. Sibling
-  to `background-credential-swap-support` **(b)**, which is the same swap event
-  corrupting a *different* surface (delegation-kit's `.metric/` usage-trend
-  projection reading its tail unpartitioned); fix them coherently, not twice.
-  **(c) The lead's burn belongs to no stage.** Under the split-lead posture the
-  lead's dispatch, verification, and battery runs carry no stamp and appear in no
-  row, so every per-stage total understates the iteration's true cost by the whole
-  supervision line item. Direction: decide whether supervision is its own row or
-  is apportioned — either is honest, silence is not. **Note the amendment seam:**
-  if (c) lands "supervision is its own row", that row kind is a new name on a
-  governed surface and belongs inside this iteration's `/spec` amendment
-  envelope alongside `price-table-age-kpi` (lead ruling at promotion) rather
-  than in a separate unit. **Ruled 2026-07-21 by `/spec`: supervision is its own
-  row.** The name, its knob, the derive-the-lead-from-the-transcript-path
-  producer, and the attribution invariant are Delta B of
-  `drift-kit/SPEC-price-table-age-kpi.md` — that amendment is the owner; this
-  entry carries (a) and (b) only, and (a) lands before or with Delta B.
-  **Cost while deferred:** any tier decision read off these figures compares
-  noisy numbers; (a) and (c) push in opposite directions, so the error does not
-  even have a known sign. Debt/analysis: converges an existing meter onto honest
-  accounting, adds no governed name. Filed 2026-07-20 by lead economics review
-  during the `render-fidelity-leak-coverage` close. Promoted 2026-07-21 into
-  `stage-economics-honesty` (operator ruling); the iteration's substantive unit,
-  and the hard prerequisite two Deferred entries name.
-
 - **delegation-smoke-threshold-pin** — `delegation-kit/smoke/install.sh` pins
   `DELEGATION_KIT_CRED_FILE` around its live 95%-reading `usage-verdict.sh`
   assertion (`install.sh:21`) but pins **no threshold**, so the assertion
@@ -904,5 +858,6 @@
 ## Done
 
 - stage-economics-truncation-durability
+- stage-economics-attribution-honesty
 
 ## Lessons Learned

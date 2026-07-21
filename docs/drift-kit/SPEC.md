@@ -415,9 +415,23 @@ priced cost, never the account the tokens billed to.
    one session per stage under `LIFECYCLE_KIT_SESSION_BOUNDARY` (lifecycle-kit/SPEC.md
    §The state machine; its roster owns the setting), a session maps to exactly one
    stage, so per-session usage *is* per-stage usage. Under an iteration-boundary
-   consumer a session may span stages; the tool attributes such a session to the
-   stage its stamp names and says so in the emitted caveat — the honest limit,
-   parallel to the overhead meter's byte-proxy caveat. Parsing the transcript
+   consumer a session may span stages, and then it bears **several stamps**. The
+   join therefore keys on the **session, not the stamp**: a session's usage is
+   summed once and attributed to the `(iteration, stage)` of its **last** stamp,
+   and every stamp it yielded takes no row at all, named in a caveat listing the
+   yielded pairs. Keying on the stamp is the over-count defect this rule exists to
+   forbid — it makes two stamps two keys, resolves the same transcript twice, and
+   bills one session's whole burn to both stages in full, so a per-stage figure
+   read off it compares one number against a copy of itself. *Assignment, not a
+   split*: apportioning a spanning session across its stages would need an
+   allocation key — relative effort per stage — that nothing in the join measures,
+   and a fabricated key folded into figures a tier decision is read off is worse
+   than a stated one, the same rule that decides supervision below (the reserved
+   `supervision` value, under The trend log). Last rather than first because the
+   stamp is a stage's *first* step, so
+   everything after the final stamp is that stage's; the honest limit is that the
+   yielded stages under-report, which is why the caveat names them and makes the
+   residue countable rather than invisible. Parsing the transcript
    needs `jq`; its absence degrades to a token-less notice rather than a failure.
 3. **Price table** — a consumer-supplied data file mapping model id → per-token
    price for each of the four categories. This is **consumer config, never a kit
@@ -438,6 +452,19 @@ applies to an unreadable surface (§Bundled KPIs / §Layout and configuration). 
 is additive over priced cells only; an `n/a` cell never poisons the total
 silently — the output carries an "incomplete pricing" caveat when any contributing
 cell degraded.
+
+**The under-count bound.** The unmatched counter reports the *stamp with no
+transcript* and is structurally blind to its inverse — the **transcript with no
+stamp**. A stage that continues in a new session (a credential swap mid-stage,
+any resume) leaves that session unstamped, so it matches no stamp and is never
+sought; its burn is invisible rather than wrong. The meter therefore counts the
+transcripts under `DRIFT_KIT_SESSIONS_DIR` that no row claimed and reports the
+count. It is an **upper bound, never an attribution**: a transcript carries no
+iteration and no stage, so nothing in the join could place it, and most
+unstamped transcripts are ordinary non-lifecycle sessions. Sizing the blind spot
+is the whole of what drift-kit can do alone — attributing a continuation would
+need the *stamp* side to record it, which is lifecycle-kit's contract and no
+part of this meter's read-only consumption of it.
 
 **The trend log.** One line is appended per `(iteration, stage, model)` triple to
 `DRIFT_KIT_STAGE_ECONOMICS_LOG`, grammar:
@@ -467,6 +494,76 @@ was re-measured. The reading-age caveat stays correct (it ages the reading, whic
 is what it says), but the field may not be read as "when this stage ran": the
 stage's own date is in the stamp, and the trajectory extractor is the surface
 that renders it.
+
+**The reserved `supervision` value — the lead's burn is its own row.** Under a
+split-lead posture the lead session dispatches, verifies, and runs batteries
+while carrying **no stamp**, so it appears in no row and every per-stage total
+understates the iteration's true cost by the whole supervision line item. The
+meter emits it as a distinct row instead, labelled by
+`DRIFT_KIT_SUPERVISION_LABEL` (§Layout and configuration). *A row rather than an
+apportionment across stages*: spreading the lead's burn over stages would need
+an allocation key with no basis in anything measured — the lead's burn is not
+proportional to any stage's tokens — and would fold a fabricated number into
+figures a tier decision is read off, where a distinct row is a visible line item
+the operator can accept, discount, or ignore. The meter's contract is that a
+degraded or absent measurement is visible, never silently folded (§The report
+skeleton); the same rule decides this.
+
+- **The column's widened meaning.** `<stage>` reads **stage *or* cost-bearing
+  role**, not stage alone. A supervision row is a role that carries cost and no
+  stamp — never a lifecycle stage that dropped out of the roster. The column's
+  members were roster-closed until this value existed, and a reader who assumes
+  they still are would misdiagnose the row as roster drift.
+- **The producer — derivation from the transcript path, not from a stamp.** The
+  two-tier scan above already resolves a dispatched stage session at
+  `<sessions-dir>/<lead-session-id>/subagents/<agent>.jsonl` while a lead sits
+  directly under the sessions dir. So for every stamp whose transcript resolved
+  on the **nested** tier, that path's `<lead-session-id>` component names the
+  supervisor and the stamp supplies the iteration. The meter collects
+  `(lead-session, iteration)` → dispatch count, resolves each lead's own
+  transcript on the flat tier, and sums its assistant-turn usage per model with
+  the same last-usage-per-message-id reader — no second parser. **No lifecycle
+  change**: the lead still stamps nothing and moves no cursor; the supervising
+  session is *derived*, which is what keeps this a read-only consumption of
+  lifecycle-kit/SPEC.md §The state machine.
+- **The attribution invariant.** A transcript's usage is attributed to exactly
+  one `(iteration, stage)` pair — the rule the session-keyed join above enforces
+  for stage rows, and the reason a lead whose own transcript already carried a
+  stage row yields no supervision row. In the ordinary case a lead supervises one
+  iteration and its whole usage lands on that iteration's supervision row —
+  exact, no key. A lead spanning two or more iterations **apportions in
+  proportion to the number of stamped stage sessions it dispatched per
+  iteration**, integer-split with the remainder to the iteration holding the most
+  dispatches (ties broken by iteration name, so the split is deterministic and
+  the parts re-sum to the whole). The run's caveat names that key: a disclosed
+  key is honest and a silent one is not.
+- **Collision rule.** If any stamp the run reads names a stage equal to the
+  label, the meter emits a visible notice naming `DRIFT_KIT_SUPERVISION_LABEL`
+  and emits **no** supervision rows that run. It is checkable from data the meter
+  already reads — its own stamps — so this adds no roster dependency and no
+  second bound to drift.
+- **Degradation.** A run with no nested-tier match (a stage run without a live
+  lead) emits no supervision row and no notice: zero supervision burn is the
+  honest reading, not a missing measurement. A lead transcript aged out of the
+  sessions dir takes the existing unmatched-summary path.
+- **No new field.** The four token fields, `cost`, and `date` carry a supervision
+  row exactly as they carry a stage row, and the dedup key, the
+  replace-on-re-measure behavior, and every existing reader work unchanged —
+  `supervision` is a value in an existing column, not a new field. The
+  apportionment key and the collision notice are **stdout caveats at measurement
+  time**, not log fields; a log field with no reader is a field removed, and
+  neither has one. The row's own named reader is the `/economics` narrative's
+  supervision line item (§The `/economics` skill).
+- **Blast radius of the widened column.** The log has one parsing reader in
+  production code — this meter's own dedup grep — and one asserting reader in the
+  harness, `smoke/install.sh`, which counts log lines. No *gate* reads it (it
+  lives under the gitignored `DRIFT_KIT_METRIC_DIR`), and the `/economics`
+  narrative reads it as prose rather than parsing the stage column.
+  **`bin/trajectory.sh` does not parse this column at all** — the reader worth
+  naming, since it is the surface a hardcoded stage roster once broke; it reads
+  stamps and its own `DRIFT_KIT_STAGES` roster, never this log. So a non-stage
+  value in the column cannot silently fall out of a roster the way the
+  trajectory's stamps did.
 
 ## The `/economics` skill
 
@@ -577,6 +674,13 @@ Knobs (this repo's layout as defaults):
   stage-economics meter prices through; default
   `${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv` (beside `graph-vocab.sh`, the
   consumer-config precedent). Absent, cost degrades to `n/a` and tokens still report.
+- `DRIFT_KIT_SUPERVISION_LABEL` — the reserved value the stage-economics meter
+  writes into the trend log's `<stage>` column for a lead's own burn
+  (§The stage-economics meter, the reserved `supervision` value); default
+  `supervision`. A consumer whose
+  lifecycle roster already carries that word renames it here; a stamp naming the
+  label collides and suppresses the rows for that run rather than blending two
+  meanings into one column value.
 - `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path whose *committed history and
   live content* the stage-economics join reads for stamps (§The stage-economics
   meter, history ∪ live); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
@@ -626,8 +730,20 @@ truncation shape: that repo's live WORKFLOW-STATE was overwritten with the
 in-flight iteration's stamp, so the closed iteration's stamps survive only in
 committed history. One run asserts both arms — the history-only stamp prices
 (replacement would lose it) and the live-only stamp prices (a history-only read
-would lose the uncommitted tail). Gate-sdk's `check-shellcheck` lints all kit
-sources as usual.
+would lose the uncommitted tail). Two further stage-economics fixtures each get
+**their own sessions dir, state file, and log**, because the flat fixture set's
+log is asserted to hold exactly one line and a second row there would red that
+assertion rather than the behavior under test. (i) A *two-stamp* fixture — one
+session stamped into a further stage — asserts the log holds exactly one line, that
+the row names the **last** stamp's stage, and that the yielded stamp is named in
+the collapsed caveat; a transcript matching no stamp sits in the same dir and
+asserts the unstamped-transcript bound reports it. (ii) A *nested-tier* fixture —
+a synthetic `<lead>/subagents/<agent>.jsonl` beside a flat `<lead>.jsonl` —
+asserts exactly one supervision row is emitted for the iteration carrying the
+lead transcript's own usage, that the dispatched session keeps its own stage row,
+that the row's label is `DRIFT_KIT_SUPERVISION_LABEL`'s value rather than a
+literal, and that a stamp naming the label suppresses the row with the collision
+notice. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
 
 ## Out of scope
 

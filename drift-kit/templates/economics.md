@@ -24,6 +24,13 @@ Compose the narrative from those two surfaces:
 
 - **Cost by stage.** From the stage-economics rows, name the priciest stages and
   their token shape; call out `cr` explicitly as the lever, since it dominates.
+- **Supervision.** Under a split-lead posture the lead's dispatch, verification,
+  and battery burn carries no stage stamp, so it lands in its own row rather than
+  inside any stage's total (drift-kit/SPEC.md §The stage-economics meter, the reserved
+  `supervision` value). Report it as a named line item beside the per-stage
+  bullets — never folded into them — and say plainly that per-stage figures
+  exclude it. If the run's caveat named an apportionment key (one lead spanning
+  several iterations), repeat the key so the reader can discount the row.
 - **Overhead share.** From the overhead meter, state what fraction of the
   closing session was governance versus task work — the methodology's own cost.
 - **Posture verdict.** Weigh *<posture: the model posture this iteration ran —

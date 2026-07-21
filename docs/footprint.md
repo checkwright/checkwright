@@ -45,11 +45,11 @@ host repository's residue.
 | context-kit | — | 30l · ~493t |
 | delegation-kit | — | 196l · ~3224t |
 | doctrine-kit | 17l · ~347t | — |
-| drift-kit | — | 62l · ~982t |
+| drift-kit | — | 69l · ~1123t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
 | guard-kit | — | 31l · ~486t |
 | lifecycle-kit | 5l · ~76t | 828l · ~12959t |
 | queue-kit | — | 43l · ~378t |
 | site-kit | — | — |
-| **total** | 22l · ~423t | 1243l · ~19194t |
+| **total** | 22l · ~423t | 1250l · ~19334t |

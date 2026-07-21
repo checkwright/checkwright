@@ -97,6 +97,15 @@ built to flag.
 
 ### Delta B — `supervision`, a reserved stage value in the economics trend log
 
+> **MERGED 2026-07-22** into `drift-kit/SPEC.md` (§The stage-economics meter,
+> §The trend log, §Layout and configuration, §Testing),
+> `drift-kit/bin/stage-economics.sh`, `drift-kit/templates/economics.md`, and the
+> smoke's nested-tier fixture, landing with
+> `stage-economics-attribution-honesty` (a) and (b) as the ordering constraint
+> below requires. **Delta B is done — do not merge it a second time.** This file
+> survives only because Delta A is not yet built; it is deleted when
+> `price-table-age-kpi` completes, per the DoD below.
+
 Under the split-lead posture the lead session's dispatch, verification, and
 battery burn carries **no stamp**, appears in no row, and so every per-stage
 total understates the iteration's true cost by the whole supervision line item.

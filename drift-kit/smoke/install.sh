@@ -214,3 +214,75 @@ EOF
     grep -q ' beta scope test-model ' "$hlog" \
         || fail "the live file's stamp did not price (the union dropped its live arm)"
 fi
+
+# spec: drift-kit/SPEC.md §The stage-economics meter — the attribution invariant over its own fixture
+# set: one session bearing two stamps bills once (its last), and a transcript matching no stamp is
+# counted as the under-count bound. Its own sessions dir, state file, and log — the flat fixture set's
+# log is asserted to hold exactly one line, so a second row there would red that assertion, not this one.
+if command -v jq >/dev/null 2>&1; then
+    dbldir="$work/dbl-sessions"; mkdir -p "$dbldir"
+    cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/agent-sess1234deadbeef.jsonl"
+    cp "$sedir/agent-sess1234deadbeef.jsonl" "$dbldir/orphan9876.jsonl"
+    printf 'smoke scope sess1234 2025-01-01\nsmoke build sess1234 2025-01-01\n' > "$work/dbl-state.txt"
+    dbllog="$work/dbl-log.txt"
+    set +e
+    dblout="$( DRIFT_KIT_STATE_FILE="$work/dbl-state.txt" \
+        DRIFT_KIT_SESSIONS_DIR="$dbldir" \
+        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+        DRIFT_KIT_STAGE_ECONOMICS_LOG="$dbllog" \
+        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1 )"; dblrc=$?
+    set -e
+    [[ "$dblrc" -eq 0 ]] || fail "stage-economics over the two-stamp fixture exited $dblrc"
+    [[ "$(grep -c '' "$dbllog")" -eq 1 ]] \
+        || fail "one session with two stamps billed more than one row (the over-count defect is back)"
+    grep -q ' smoke build test-model ' "$dbllog" \
+        || fail "the two-stamp session was not attributed to its last stamp"
+    grep -q 'yielded (no row): smoke scope' <<<"$dblout" \
+        || fail "the collapsed stamp was not named in the caveat (a silent collapse is not an honest one)"
+    grep -q '1 transcript(s) in the sessions dir match no stamp' <<<"$dblout" \
+        || fail "the unstamped-transcript bound did not report the orphan transcript"
+
+# spec: drift-kit/SPEC.md §The stage-economics meter — the supervision row, derived from the nested transcript
+# tier: a dispatched stage session sits under <lead>/subagents/ while its lead sits flat beside it,
+# so the lead is named by the path and needs no stamp. Its own dir/state/log, same reason as above.
+    supdir="$work/sup-sessions"; mkdir -p "$supdir/lead0001dead/subagents"
+    cp "$sedir/agent-sess1234deadbeef.jsonl" "$supdir/lead0001dead/subagents/agent-supa1234feed.jsonl"
+    cat > "$supdir/lead0001dead.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"L1","model":"test-model","usage":{"input_tokens":2,"output_tokens":3,"cache_read_input_tokens":4,"cache_creation_input_tokens":5}}}
+EOF
+    printf 'supiter build supa1234 2025-01-01\n' > "$work/sup-state.txt"
+    suplog="$work/sup-log.txt"
+    sup() {   # $1 = supervision label
+        DRIFT_KIT_STATE_FILE="$work/sup-state.txt" \
+        DRIFT_KIT_SESSIONS_DIR="$supdir" \
+        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+        DRIFT_KIT_STAGE_ECONOMICS_LOG="$suplog" \
+        DRIFT_KIT_SUPERVISION_LABEL="$1" \
+        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1
+    }
+    set +e
+    supout="$(sup supervision)"; suprc=$?
+    set -e
+    [[ "$suprc" -eq 0 ]] || fail "stage-economics over the nested-tier fixture exited $suprc"
+    [[ "$(grep -c ' supiter supervision test-model ' "$suplog")" -eq 1 ]] \
+        || fail "the nested-tier fixture did not yield exactly one supervision row: $supout"
+    grep -qE ' supiter supervision test-model in=2 out=3 cr=4 cw=5 cost=40\.[0-9]+$' "$suplog" \
+        || fail "the supervision row does not carry the lead transcript's own usage"
+    grep -q ' supiter build test-model ' "$suplog" \
+        || fail "the dispatched stage session lost its own row to the supervision derivation"
+
+    : > "$suplog"
+    sup lead-burn >/dev/null
+    grep -q ' supiter lead-burn test-model ' "$suplog" \
+        || fail "DRIFT_KIT_SUPERVISION_LABEL did not name the row (the label is not a literal)"
+
+    : > "$suplog"
+    printf 'supiter build supa1234 2025-01-01\nsupiter supervision nolead12 2025-01-01\n' > "$work/sup-state.txt"
+    set +e
+    colout="$(sup supervision)"
+    set -e
+    grep -q 'colliding with DRIFT_KIT_SUPERVISION_LABEL' <<<"$colout" \
+        || fail "a stamp naming the label did not raise the collision notice"
+    [[ "$(grep -c ' supiter supervision ' "$suplog")" -eq 0 ]] \
+        || fail "the collision did not suppress the supervision row"
+fi
