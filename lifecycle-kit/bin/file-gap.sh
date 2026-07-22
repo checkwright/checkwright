@@ -29,3 +29,15 @@ mkdir -p "$(dirname "$INBOX")" 2>/dev/null || true
 line="- $(date +%F) — $1"
 printf '%s\n' "$line" >> "$INBOX"
 printf 'file-gap: %s\n' "$line"
+
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — warn at the point of
+#   capture, while the filer can still act: after the iteration's last stage
+#   stamps there is no drainer left in the machine.
+_fg_stage="$(lifecycle_current_stage)"
+if [[ "$_fg_stage" == "${LIFECYCLE_KIT_STAGES[-1]}" ]]; then
+    printf 'file-gap: WARNING — the cursor is at %s, the last stage of the iteration. Disposition this bullet before the iteration ends: once that stage has finished, none is left to drain it, and the next %s entry refuses until an entering session promotes it directly.\n' \
+        "$_fg_stage" "$LIFECYCLE_KIT_FIRST_STAGE" >&2
+else
+    printf 'file-gap: this bullet blocks the next %s entry until close drains it.\n' \
+        "$LIFECYCLE_KIT_FIRST_STAGE" >&2
+fi

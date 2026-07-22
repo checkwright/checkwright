@@ -440,6 +440,16 @@ advisory tooling, not a gate — no fixture pair is owed; the raw append (a bull
 line into the inbox) stays a legal fallback, the grammar being the surface's
 contract, not the writer.
 
+It also **warns at the point of capture**, reading the cursor
+(`lifecycle_current_stage`) to say which consequence the filer is buying: an
+ordinary filing is told the bullet blocks the next first-stage entry until the
+drain, and a filing made while the cursor sits at the **last configured stage**
+is told that once that stage finishes, none is left to drain it. The warning
+goes to stderr so the stamped bullet stays the tool's stdout contract. It is a
+warning and not a refusal deliberately: refusing capture does not dissolve a
+real finding, it pushes it back into session context — the deferred-capture
+antipattern this inbox exists to prevent.
+
 **Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone
 driver registration), not the keep-ours `merge=iteration-scoped` the
 boundary-truncated surfaces carry: an iteration-scoped surface is per-iteration
@@ -451,7 +461,20 @@ concurrent merge must survive. The installer emits the line and
 entry refuses while the inbox holds bullets (exit 1, the untriaged bullets
 printed, nothing written — the same refusal contract as the non-empty Lessons
 section), so no gap outlives its iteration untriaged (the gap-disposition rule:
-costed and filed, never flagged-and-skipped). That refusal is the inbox's
+costed and filed, never flagged-and-skipped).
+
+The refusal names **two** recoveries, because the drain and the filing window do
+not coincide. A bullet filed *during* the iteration is drained by the closing
+stage, and the refusal points there. A bullet filed *after* that stage has run
+has no drainer left in the machine — the detection is still right, and what
+would fail is a message describing a stage that is not coming back — so the
+refusal also tells the entering session to disposition the bullets itself:
+promote each directly to the deferred queue (or fix it), truncate the inbox,
+commit, re-run. Deleting a bullet without a disposition is not a drain. No
+second detector is added for the post-close window: the existing refusal already
+detects it, and what was missing was the message's actionability.
+
+That refusal is the inbox's
 forcing function, so the inbox declares itself on the close-surface roster
 (§The close-surface roster) here, where the forcing function is documented:
 

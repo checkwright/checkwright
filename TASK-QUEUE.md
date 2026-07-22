@@ -14,40 +14,6 @@
 
 ## Technical Debt
 
-- **gap-inbox-post-close-window** — the gap inbox is drained by
-  `close` and refuses the next iteration-boundary `scope` entry while non-empty
-  (`enter-stage.sh`), which assumes every bullet is filed *during* an iteration.
-  A bullet filed after that iteration's close has no drainer left in the state
-  machine: the next `scope` is refused and only an out-of-band edit clears it.
-  Reproduced live: `enter-stage.sh scope --simulate` refused on two post-close
-  filings.
-  **Not a gate** (lead ruling): `close` legitimately writes the
-  inbox when it drains, so the rule cannot be "block changes" without separating
-  close-truncating from anyone-appending; `file-gap.sh` appends without
-  committing, so a gate reds at whatever commit next carries the file, blaming
-  an actor who did not file the bullet; and refusing capture does not dissolve a
-  real finding — it pushes it back into session context, the deferred-capture
-  antipattern the inbox exists to prevent. A close that files something it
-  genuinely cannot disposition in-session would red on a correct action.
-  **Preferred arm:** warn at the point of capture — `file-gap.sh` knows the
-  current stamp, so it can tell the filer, while they can still act, that the
-  bullet will block the next `scope` unless drained or promoted directly.
-  **Second half:** `enter-stage`'s refusal text says only that "the close stage
-  must drain every gap", which once close has finished describes a stage that is
-  not coming back; it should name the promote-directly recovery. The existing
-  refusal *did* detect this correctly — what failed was the message's
-  actionability, which is why a second detector is the wrong fix.
-  Debt: a real boundary hazard in shipped mechanism, not a new capability.
-  **Promoted 2026-07-22 by scope** into `workflow-surface-tiering` (operator
-  ruling). Routed as debt, not to the authoring stage: both halves converge
-  shipped mechanism onto its own stated contract — a warning line in
-  `file-gap.sh` and an actionable refusal message in `enter-stage.sh` — and
-  neither arm adds a name to a governed surface. The "open to spec" phrasing
-  the entry carried while deferred is dropped: the lead's not-a-gate ruling and
-  the named preferred arm are the design, and no arm remains that would need an
-  amendment.
-  Filed 2026-07-20 by lead, drained from the gap inbox.
-
 ## Deferred
 
 - **boundary-scratch-wipe-unowned** [needs-spec] — the iteration-boundary `.tmp/`
@@ -1044,5 +1010,6 @@
 - workflow-file-format-convention
 - close-triage-surface-roster
 - workflow-dir-tracking-claim
+- gap-inbox-post-close-window
 
 ## Lessons Learned
