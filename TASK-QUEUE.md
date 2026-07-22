@@ -1006,10 +1006,4 @@
 
 ## Done
 
-- friction-log-merge
-- workflow-file-format-convention
-- close-triage-surface-roster
-- workflow-dir-tracking-claim
-- gap-inbox-post-close-window
-
 ## Lessons Learned

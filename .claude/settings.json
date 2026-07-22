@@ -36,6 +36,7 @@
       "Bash(bash lifecycle-kit/bin/session-id.sh)",
       "Bash(bash lifecycle-kit/bin/enter-stage.sh *)",
       "Bash(bash lifecycle-kit/bin/file-gap.sh *)",
+      "Bash(bash lifecycle-kit/bin/close-surfaces.sh)",
       "Bash(bash lifecycle-kit/checks/check-stage-evidence.sh)",
       "Bash(bash lifecycle-kit/checks/check-stage-entry.sh)",
       "Bash(bash context-kit/bin/md-index.sh *)",

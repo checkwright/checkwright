@@ -2,3 +2,5 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+workflow-surface-tiering release v0.13.0 — three new gates (check-workflow-tiering, check-close-surfaces, check-tracking-claim), Tightened gates non-empty = minor over v0.12.0
+
