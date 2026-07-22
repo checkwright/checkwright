@@ -831,6 +831,113 @@
   `cd5dd59` did). Cost to close: roughly one iteration. Filed 2026-07-21 by build
   during `lifecycle-rule-placement`'s model correction.
 
+- **usage-verdict-login-reroute-fails-open** [needs-spec] — *the most severe of
+  the four `usage-verdict.sh` findings filed 2026-07-22; fix this one first.*
+  The login-window reroute in `delegation-kit/bin/usage-verdict.sh` runs
+  **before** the two pause-axis compares and returns exit 2 unconditionally, so
+  during the window a genuinely over-threshold reading prints STALE instead of
+  PAUSE. Its own `spec:` comment justifies that ordering solely by the lagging-
+  **low** case — "the reroute precedes the axis compares: within the window
+  every parsed verdict is STALE, so a lagging under-threshold pct cannot print a
+  fresh-looking OK" — an argument that covers only one direction. In the other
+  direction the ordering is a safety inversion: the script's own STALE text says
+  STALE "never blocks delegation", and the delegation protocol agrees, so a
+  reading that should have refused an expensive dispatch instead waves it
+  through. The usage header's claim `exit: 2 STALE or unreadable (fail-closed)`
+  is therefore false on the blocking axis — exit 2 is fail-closed on *trusting
+  the number* and fail-**open** on *refusing work*, and the header conflates the
+  two.
+  **Sketch of the remedy (asymmetric, not a reordering):** the reroute may
+  suppress an OK, never a PAUSE. Evaluate the pause axes first and let the
+  reroute downgrade only the non-blocking outcome — an over-threshold reading
+  inside the login window still exits 1, while an under-threshold one still
+  exits 2 rather than printing a fresh-looking OK. That keeps the comment's
+  stated argument intact and closes the direction it never addressed. The header
+  line needs correcting in the same unit, since it is the thing a reader trusts.
+  Debt: corrects the verdict semantics of shipped mechanism; adds no governed
+  name. Ships with gate-test fixtures pinning both directions inside the window.
+  **Cost while deferred:** high — the guard exists to refuse a dispatch at the
+  budget wall, and this is precisely the failure mode that lets one launch and
+  get killed mid-flight, paying the full cost for no result.
+  Filed 2026-07-22 by lead, auditing the reroute's ordering after a live
+  `usage-verdict.sh` misfire.
+
+- **usage-verdict-login-mtime-conflation** [needs-spec] — `usage-verdict.sh`
+  derives `login_at` from `stat -c %Y` on `DELEGATION_KIT_CRED_FILE`, and the
+  login-window reroute treats any recent mtime as an auth change ("auth changed
+  Ns ago; a /login starts fresh windows the server-fed pct lags"). A credential
+  file's mtime cannot distinguish an actual `/login` from a routine OAuth token
+  rotation, which rewrites the same file. Every rotation therefore mints a fake
+  auth event and blinds the verdict for `DELEGATION_KIT_LOGIN_WINDOW` seconds
+  (600 by default), and rotations cluster around long-session resume and window
+  boundaries — exactly the moments a verdict is being asked for.
+  **Reproduced live 2026-07-22** (`.metric/usage-history.log`, gitignored — cite,
+  never stage): consecutive samples `pct=86.0 resets_at=1784683800 verdict=PAUSE
+  login_at=1784665951` then `pct=0 resets_at=1784722800 verdict=STALE
+  login_at=1784705002`. No `/login` occurred; the mtime moved because the token
+  rotated. `pct=0` was true — the window had rolled — and the verdict was STALE
+  anyway.
+  Debt: replaces a proxy signal in shipped mechanism with a sound one; adds no
+  governed name. Likely specced together with
+  `usage-verdict-roll-witness-unused`, which is the principled form of the fix.
+  **Cost while deferred:** moderate and recurring — a 600s blind spot at every
+  session resume, each one an operator budget judgement made with no oracle.
+  Filed 2026-07-22 by lead, tracing the misfire's fake auth event to cred-file
+  mtime.
+
+- **usage-verdict-roll-witness-unused** [needs-spec] — the login-window reroute
+  tests cred mtime alone, though `usage-verdict.sh` already holds enough state to
+  refute its own premise. The reroute's premise is that a low pct inside the
+  window is a *lagging* reading; but when the 5h window has demonstrably rolled,
+  a low pct is the expected reading, not a suspect one. Two witnesses of a roll
+  are already in hand at that point: the snapshot's `resets_at` differs from the
+  newest `DELEGATION_KIT_USAGE_HISTORY` sample's, and `updated_at` is past the
+  *old* `resets_at`. Neither is consulted — the history log is written by
+  `append_sample` and never read back by the verdict path.
+  **Witnessed in the same 2026-07-22 misfire:** `resets_at` moved 1784683800 →
+  1784722800 and `updated_at=1784705007` sat 21207s past the old boundary, so
+  both witnesses fired while the verdict still rerouted to STALE on mtime alone.
+  Debt: uses state the script already carries; adds no governed name. Note the
+  read-back is a new coupling — the verdict path currently only appends to the
+  history log, and making it a *reader* of that log needs the absent/unset and
+  malformed-tail cases specced, not just the happy path.
+  **Cost while deferred:** low standing alone — it is the principled remedy for
+  `usage-verdict-login-mtime-conflation` and the two will likely be specced as
+  one unit.
+  Filed 2026-07-22 by lead, on noticing the snapshot already refuted the
+  reroute's premise.
+
+- **delegation-smoke-history-pollution** [needs-spec] — `delegation-kit/smoke/`
+  `install.sh` pins `DELEGATION_KIT_CRED_FILE` and both PAUSE thresholds around
+  its `usage-verdict.sh` assertions but never neutralizes
+  `DELEGATION_KIT_USAGE_HISTORY`, so every smoke verdict call appends a synthetic
+  sample wherever the ambient config points sampling.
+  **What is actually verified (2026-07-22), and what the harness hides:** three
+  synthetic samples sit in this repo's live trend log right now — one snapshot's
+  `updated_at`, `pct=95`, `login_at=0`, verdicts PAUSE/PAUSE/OK — interleaved
+  among real operator readings and indistinguishable from them by shape. But a
+  controlled `run-consumer-smoke.sh delegation-kit` appends **nothing**: this
+  repo configures `DELEGATION_KIT_USAGE_HISTORY` as a *relative* path and the
+  harness runs `smoke/install.sh` with cwd = the scratch consumer root, so the
+  appends land in the scratch tree and die with it. The hermeticity is therefore
+  accidental, not designed, and it evaporates two ordinary ways: a consumer that
+  configures an absolute history path, or any invocation whose cwd is the real
+  tree (which is how the three existing lines got there).
+  **Same class as `delegation-smoke-threshold-pin` (Done, this iteration), and
+  that is the point.** That unit pinned the two knobs that were biting and left
+  the third, so the instance-pin pattern has now missed once by construction.
+  Enforcement-first says the remedy is one hermetic env prelude covering the
+  whole smoke file — every `DELEGATION_KIT_*` knob the file depends on
+  neutralized in one place — not a third instance-pin. See also the roster half
+  of the credential-pin entry above, which is the gate-side of the same problem;
+  this entry is the concrete file, that one is the detector.
+  Debt: hermeticity of an existing smoke; adds no governed name.
+  **Cost while deferred:** low but compounding — the trend log is the input to
+  any future budget-trend work, and it is being quietly seeded with readings that
+  never happened.
+  Filed 2026-07-22 by lead; verified by build against the live log and a
+  controlled scratch run.
+
 ## Done
 
 - stage-economics-truncation-durability
