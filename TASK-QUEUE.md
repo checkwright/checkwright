@@ -12,6 +12,39 @@
 
 ## New Features
 
+- **workflow-dir-tracking-claim** [spec: canon-kit/SPEC-tracking-claim.md] —
+  CLAUDE.md §Housekeeping asserts `.workflow/` is committed while three of its
+  twelve members are gitignored, on an always-loaded surface every session
+  reads. Corrects the claim to a two-tier rule and takes the open gate arm: a
+  tracking claim is machine-checkable against `git check-ignore`, so the
+  correction lands with the gate that keeps it true. Design, ruled-out
+  alternatives, and the gate's honest limit: the amendment.
+  Lands **after** `workflow-file-format-convention` — the corrected sentence
+  cites the surface contract that unit creates.
+  Promoted 2026-07-22 by spec, which authored the amendment and took the gate
+  arm scope left open.
+
+- **workflow-file-format-convention** [spec: gate-sdk/SPEC-workflow-file-convention.md]
+  — `.workflow/` has no stated surface contract: three extensions with no rule
+  for choosing one, and a header requirement nothing gates. Gives the directory
+  a two-tier membership rule, a ruled header form on the tracked tier, an
+  extension rule keyed on writer and reader, and one gate for the mechanizable
+  half. A fix with a real backlog: two tracked headers are rewritten and one
+  consumer whitelist shrinks.
+  Promoted 2026-07-22 by spec, which authored the amendment and ruled the
+  prefix-versus-any-header question scope flagged.
+
+- **close-triage-surface-roster** [spec: lifecycle-kit/SPEC-close-surface-roster.md]
+  — close's inbound triage surfaces are enumerated only as prose, so a surface
+  close never reads leaves no trace anywhere. Replaces the enumeration with a
+  derived roster carrying a per-surface forced/advisory mode, plus the closure
+  that reports an undeclared capture surface instead of inheriting the hole.
+  **Cross-component by design** (lifecycle-kit, queue-kit, guard-kit,
+  drift-kit, doctrine-kit): `check-stage-entry` assertion C is armed, and an
+  **audit stamp** is the expected disposition at the next stage's entry —
+  anticipated, not a waiver.
+  Promoted 2026-07-22 by spec, which authored the amendment.
+
 ## Technical Debt
 
 - **gap-inbox-post-close-window** — the gap inbox is drained by
@@ -268,139 +301,6 @@
   Debt: latent policy with no owner doc.
   Filed 2026-07-20 by lead while ruling on the active-section question.
 
-- **close-triage-surface-roster** [needs-spec] — close's inbound triage
-  surfaces are enumerated only as prose in a template placeholder
-  (`lifecycle-kit/templates/skills/close.md`, the housekeeping step: deprecation
-  scan, gate-runtime budget check, backlog-aging review, tooling-friction
-  triage). Nothing derives that list and nothing notices a surface close never
-  read. Today they are `gap-inbox.md`, `knowledge-friction.log`,
-  `prompt-friction.log`, the queue's Lessons section, and `essay-harvest.md` —
-  and **only the gap inbox has a structural forcing function**, the
-  `enter-stage` boundary refusal. The other four depend on close remembering
-  them, so adding a sixth inbox is the dangerous act: it fails silently and
-  forever. Direction: derive the roster (derivation-first — a roster is never
-  maintained by hand), and give each surface either a forcing function or an
-  explicit advisory-only marking, so "close did not read this" is a
-  distinguishable state rather than an invisible one.
-  **Cost while deferred:** unbounded and undetectable — a surface silently
-  skipped leaves no trace anywhere in the tree.
-  Debt: converges existing mechanism onto a derived roster, adds no capability.
-  Filed 2026-07-20 by lead, from a review of the workflow-directory surfaces.
-  **Premise re-verified 2026-07-22 by the scope survey — holds.** The four
-  triage sweeps are still enumerated only as prose in the placeholder binding at
-  `lifecycle-kit/templates/skills/close.md:75-76`, and the gap inbox is still
-  the only one with a forcing function (`close.md:62-71` plus the `enter-stage`
-  boundary refusal). No SPEC in the tree owns the roster.
-  **Reclassified feature, not debt:** the "adds no capability" line above
-  predates the direction the entry itself now prescribes. A *derived* roster
-  plus a per-surface advisory-vs-forced marking adds names to a governed surface
-  — the marker, and the derivation's output contract — so this needs an
-  amendment however small the diff. Routed to the authoring stage on that basis.
-  **Known cross-component cost, accepted by operator ruling 2026-07-22 (not a
-  reason to trim):** the amendment will span ≥2 component dirs — lifecycle-kit
-  (close's roster, `enter-stage`'s refusal) and at least one kit owning a
-  capture affordance — which arms `check-stage-entry` assertion C and makes the
-  **audit stamp** the expected disposition at the following stage's entry. An
-  audit stamp is anticipated here, not a ruled waiver: the span is genuine
-  cross-component design rather than a mechanical migration, which is the case
-  the audit stage exists for. Recorded so that entry meets a documented
-  obligation instead of a surprise.
-  Promoted into `workflow-surface-tiering` 2026-07-22 (operator ruling).
-
-- **workflow-file-format-convention** [needs-spec] — `.workflow/` carries three
-  extensions with no stated rule for choosing one, and the apparent convention
-  does not survive inspection. The tidy reading — `.txt` for gate-read line
-  records, `.md` for prose, `.log` for tool-appended events — breaks on
-  `gap-inbox.md` versus `knowledge-friction.log`: both are appended by a `bin/`
-  affordance one dated record at a time, differing in drain semantics and merge
-  attributes, neither of which the extension tracks. So the extension encodes
-  nothing reliable, and a new file's extension is a coin flip.
-  **Second defect, concrete:** `prompt-friction.log` carries no `# contract:`
-  header, alone among the ten non-empty files, so nothing names its owner,
-  grammar, or reclaim path. Direction: state the rule in the owning SPEC keyed
-  on a real property, rename to match, and gate the contract-header requirement.
-  **Discriminator corrected 2026-07-21 by the scope survey — the axis this entry
-  proposed is not the one the tree uses.** The proposal was to key the rule on
-  gated-vs-advisory or drained-vs-accumulating. Neither is what actually
-  partitions the directory: **tracked-vs-gitignored** does, cleanly and with no
-  exceptions. `knowledge-friction.log`, `prompt-friction.log`, and
-  `essay-harvest.md` are gitignored (`.gitignore:25,27,30`); the other nine
-  `.workflow/` files are tracked. That split is exactly the advisory-local-capture
-  versus checked-projection distinction the entry was reaching for, and it is
-  already machine-readable via `git check-ignore`, so a gate keyed on it needs no
-  new marker — which also makes the header requirement cheap to express as
-  "every tracked `.workflow/` file carries a `# contract:` header".
-  **The header defect is wider than filed:** `prompt-friction.log` still carries
-  none (its first line is captured shell text), and `knowledge-friction.log` now
-  sits at 0 bytes with none either — two instances, both on the gitignored side,
-  which is itself a signal that the untracked files are the ones no gate reaches.
-  Decide whether the header requirement follows tracking or covers all ten.
-  **Premise corrected 2026-07-22 by the scope survey — the defect is on the
-  tracked side too, which changes what the unit is.** The claim above that
-  `prompt-friction.log` lacks a header "alone among the ten non-empty files" is
-  false, and so is the implication that the gitignored side holds every
-  instance. `.workflow/` now holds 12 files, 9 tracked; of those 9, **two carry
-  a descriptive `#` header but no `# contract:` line** —
-  `release-sweep-evidence.txt` (`# Release-sweep evidence — one disposition
-  block per release (RELEASING.md step 1).`) and `validate-baseline.txt`
-  (`# held-constant validate baseline: <suite> <scenario> <status> [<slug>]`).
-  Both are real headers doing real work; what they are not is the
-  `# contract: <owner> §<section>` form the other seven carry, so neither names
-  an owning SPEC section.
-  **Consequence for the design pass:** the cheap formulation this entry reached
-  for — "every tracked `.workflow/` file carries a `# contract:` header" — is
-  **false for 2 of 9 today**, so the unit lands as a fix with a real backlog,
-  not as a greenfield gate proving a boundary. Do not design against the
-  greenfield premise. The two survivors are also the discriminating cases: a
-  gate keyed on the literal `# contract:` prefix reds on both, so the design
-  must rule whether the requirement is the *prefix* (rename both headers) or
-  merely *some* header (which the tracked side already satisfies and which
-  gates nothing).
-  Debt: a naming convention with no owner doc plus missing headers.
-  Filed 2026-07-20 by lead, same workflow-directory review.
-
-- **workflow-dir-tracking-claim** [needs-spec] — CLAUDE.md §Housekeeping states
-  that "`.workflow/` is committed (checked projections)", and three of that
-  directory's twelve files are gitignored: `knowledge-friction.log`,
-  `prompt-friction.log`, `essay-harvest.md` (`.gitignore:25,27,30`). The claim is
-  false as written, and it is false on an **always-loaded surface** — every
-  session reads it, so the wrong model is the default model until someone checks
-  `git ls-files`.
-  **Why this is more than a wording fix.** The sentence sits in a one-line-per-rule
-  always-loaded tier where each line is supposed to be true for every reader
-  (widest-true-tier placement). Correcting it means deciding what the rule
-  actually is — the honest reading is two-tier: `.workflow/` holds *tracked
-  checked projections* (gated, committed, `# contract:`-headed) alongside
-  *gitignored local capture* (advisory, drained, session-local). That is a real
-  distinction worth stating rather than a typo worth patching, and it is the same
-  axis `workflow-file-format-convention` needs — related, but separately pickable,
-  and deliberately not folded into that entry (lead ruling 2026-07-21): this one
-  is a doc-accuracy fix on an always-loaded surface, that one is a naming
-  convention in a kit SPEC.
-  **Open gate question:** a doc claim about tracking status is machine-checkable
-  — `git check-ignore` over the directory versus what the prose asserts — so this
-  may be a genuine low-false-positive gate rather than a one-time correction. But
-  the gate's shape depends on how the corrected prose is phrased (a gate can only
-  check a claim stated in a form it can parse), so phrasing and gateability are
-  one design question, not two. Concluding "correct the prose, build no gate" is a
-  legitimate outcome if the claim resists a parseable form.
-  **Cost while deferred:** low per-session but paid by every session — an
-  always-loaded falsehood is the highest-leverage kind of doc drift, and it
-  actively misleads on exactly the surfaces the lifecycle machinery writes.
-  Bounded: nothing breaks, no gate reds; the cost is wrong beliefs, not failures.
-  Debt: converges an always-loaded claim onto verified tracking state; adds no
-  governed name unless the gate lands. Filed 2026-07-21 by scope (operator
-  ruling), from the undirected survey's `.workflow/` premise re-verification.
-  **Premise re-verified 2026-07-22 by the scope survey — holds verbatim.**
-  `.workflow/` holds 12 files; exactly 3 are gitignored (`essay-harvest.md`,
-  `knowledge-friction.log`, `prompt-friction.log`, still `.gitignore:25,27,30`)
-  and 9 are tracked. CLAUDE.md:137 still carries the false claim unchanged.
-  Routed to the authoring stage rather than promoted as debt, because the open
-  gate arm is live: a gate is a name on a governed surface, so if the design
-  pass builds one this is a feature, and the arm cannot be foreclosed at scope.
-  Promoted 2026-07-22 into `workflow-surface-tiering` by operator ruling, as
-  that iteration's always-loaded-correction unit.
-
 - **friction-log-merge** [needs-spec] — `knowledge-friction.log` and
   `prompt-friction.log` are the same surface twice: each is appended by a
   capture affordance one line per event, each is triaged at the same close step,
@@ -429,6 +329,14 @@
   **Premise note 2026-07-22:** `knowledge-friction.log` currently sits at 0
   bytes and carries no header at all, so the merge's migration half is cheap on
   that side — there is no accumulated content to carry across.
+  **Held at spec 2026-07-22 pending a disposition ruling.** The design pass ran
+  the merge against the two logs' actual producers, consumers, owners, and
+  reclaim moments and found it ruled out on four independent grounds; the
+  argument is recorded in `lifecycle-kit/SPEC-close-surface-roster.md` §Ruled
+  out, whose roster answers the complaint the merge was a proxy for. No
+  amendment is authored for this slug, so it stays here rather than being
+  promoted on a ruling spec does not own — retiring a promoted unit is a queue
+  disposition, not an authoring call.
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
