@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: workflow-surface-tiering
+## Iteration: permission-posture-reconciliation
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -12,7 +12,52 @@
 
 ## New Features
 
+- **boundary-scratch-wipe-unowned** [spec: SPEC-boundary-scratch-preserve.md] —
+  mechanize the iteration-boundary scratch wipe every scope session performs by
+  hand (an unavoidable per-iteration permission prompt on a `find … -delete`
+  compound the allowlist cannot express). New `LIFECYCLE_KIT_BOUNDARY_PRESERVE`
+  array (default empty) lets `enter-stage.sh`'s boundary path wipe the scratch dir
+  (`GATE_SDK_TMP_DIR`) while keeping named members; this consumer sets
+  `(session-role)` in `scripts/lifecycle-config.sh` to preserve context-kit's
+  lead-session marker. Ruling and causal completeness in the amendment — option
+  (a), a preserve knob on the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` pattern, over
+  option (b)'s cross-seam marker relocation. Cross-component (lifecycle mechanism
+  + context-kit marker citation): arms the audit trigger.
+
+- **scratch-execution-prompt-friction** [spec: SPEC-scratch-run.md] —
+  close the self-inflicted loop where the guard steers scratch writes into
+  `.tmp/` yet executing them prompts forever. New `guard-kit/bin/scratch-run.sh`
+  echoes a scratch script's contents then executes it (fail-closed outside the
+  scratch dir), so a fixed allowlistable path kills the prompt while the run stays
+  self-documenting on the evidence trail. Consumer adds
+  `Bash(bash guard-kit/bin/scratch-run.sh *)` to committed settings. Ruling and
+  causal completeness in the amendment — arm (c), a named runner, over arm (a)'s
+  opaque bare allowlist and arm (b)'s inlining.
+
 ## Technical Debt
+
+- **guard-read-compound-carveout** — tighten `guard_rule_cat_read` /
+  `guard_rule_find_glob` (`guard-kit/lib/guard.sh`) so a `;`-separated compound
+  whose every segment is a bare read (`cat A; echo ===; cat B`) is steered to the
+  Read/Glob tool like a lone read, instead of falling through to a permission
+  prompt. Genuine pipe/redirect/heredoc composition stays untouched — the rule
+  fires only when every segment is itself a bare read; ships with the good/bad
+  fixture pair. Ruled here (scope): a compound-all-reads is not composition but
+  batched reads, exactly what the steer prevents; recurred twice, no
+  counter-evidence. Shares the compound-matching sub-problem with
+  `scan-prompts-local-overlay-blind`.
+
+- **scan-prompts-local-overlay-blind** — `bin/scan-prompts.sh` filters the
+  friction log against `GUARD_KIT_SETTINGS` (committed allowlist) only, so a
+  command granted solely by `GUARD_KIT_SETTINGS_LOCAL` is reported as prompting
+  though it did not. Ruled here (scope, arm (c)): read both settings files; the
+  headline count excludes overlay-covered commands (making the prompt count true),
+  and overlay-covered survivors go to a separate, visibly-advisory section that
+  preserves the promote-or-prune worklist. Fix `allowed()` to match the harness's
+  compound-splitting first (a whole-string glob matches a compound the harness
+  would split and refuse) — the same compound-matching sub-problem as
+  `guard-read-compound-carveout`. Adds no governed name (`GUARD_KIT_SETTINGS_LOCAL`
+  already exists).
 
 ## Deferred
 
@@ -50,75 +95,6 @@
   remote-oracle red on this iteration's release commit (the gate shipped
   presence-based and failed its first CI run).
 
-- **boundary-scratch-wipe-unowned** [needs-spec] — the iteration-boundary `.tmp/`
-  wipe is prescribed as **consumer binding prose** (the `/scope` skill's
-  evidence-reset binding) and performed by hand, so every scope session emits an
-  ad-hoc destructive shell command. The recurring shape, verbatim:
-  `find .tmp -mindepth 1 -not -name session-role -delete && ls -a .tmp/`
-  Cadence: once per iteration, on every scope session, permanently. It prompts
-  every time and cannot stop prompting — the `&&` makes it a compound no prefix
-  entry matches, and `find … -delete` is not allowlisted at all. The allowlisted
-  `rm .tmp/*` globs cannot express "preserve `session-role`", which is exactly
-  why the hand-written form reaches for `find`.
-  **Widening the allowlist is the wrong fix** — it grants a broad destructive
-  shape to buy one convenience. The operation has no per-invocation variance, so
-  it belongs behind kit mechanism the allowlist matches bare and undecorated,
-  which kills the prompt at its source and leaves the allowlist no wider.
-  **The home already exists — no new script.** `bin/enter-stage.sh` is already
-  the boundary actor: it resolves the scratch dir at `:57`
-  (`GATE_SDK_TMP_DIR:-.tmp`), already writes there, already truncates the
-  boundary-reset file set at `:176-181`, and already reports what it truncated at
-  `:199`. The wipe is the same boundary operation over a different surface.
-  **Why this is a feature, not a one-line debt fix — the reason it is filed
-  rather than folded in.** The wipe must *preserve* `.tmp/session-role`, and that
-  marker is **context-kit's** surface (its session-context hook reads it; its
-  lifetime is the lead session's, not the iteration's), not lifecycle-kit's.
-  Expressing the exception needs a preserve-list knob — presumably
-  `LIFECYCLE_KIT_BOUNDARY_PRESERVE`, following the established
-  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` array pattern. That is a **new name on a
-  governed surface**, so the new-names litmus makes it a feature requiring an
-  amendment however small the diff looks. Two consequences follow: the amendment
-  spans ≥2 component dirs (lifecycle-kit mechanism, context-kit's marker as the
-  reason for the exception), which arms `check-stage-entry` assertion C and
-  demands an audit stamp at the next stage's entry; and moving the wipe from
-  binding prose into kit mechanism is a provenance-seam call in its own right —
-  what is mechanism versus what stays consumer config.
-  **Open design question:** whether the preserve list is the right shape at all.
-  The alternative is that the kit wipes nothing and instead *names* the scratch
-  surface it owns, leaving cross-kit markers somewhere the boundary never
-  touches — which would dissolve the exception rather than configure it, and may
-  be the better answer.
-  Debt/feature: adds a governed name; needs an amendment. Not implemented.
-  **Cost while deferred:** low, non-rotting, but permanent and paid by the
-  **operator** rather than the agent — one unavoidable interruption per
-  iteration, on a command whose destructive shape is exactly the kind a reviewer
-  should not be trained to wave through. Bounded: nothing breaks, no gate reds.
-  Surfaced 2026-07-22 by the operator during the `budget-oracle-honesty` scope,
-  naming the exact recurring command; filed by scope at lead instruction after
-  verifying the placement claim against `enter-stage.sh`.
-  **Evidence added 2026-07-22 by the `workflow-surface-tiering` scope — the
-  command drifts between sessions, so the shape recorded above is one observed
-  instance, not the canonical form.** That session performed the same prescribed
-  wipe as:
-  `find .tmp -maxdepth 1 -type f ! -name session-role -delete`
-  — compare the shape recorded verbatim near the top of this entry, which no
-  session has now reproduced. Three independent divergences for one prescribed
-  operation — the traversal
-  bound (`-maxdepth 1` vs `-mindepth 1`), a type filter present in one and
-  absent in the other (`-type f`), and the negation spelling (`!` vs `-not`) —
-  plus the trailing listing dropped. The first two are not cosmetic: the
-  observed form deletes only regular files at the top level, while the recorded
-  form descends and removes directories too, so the two commands do not even
-  agree on what the wipe removes.
-  **Why this sharpens the entry's own argument rather than qualifying it:** the
-  central claim is that the operation has no per-invocation variance and so
-  belongs behind mechanism. That holds — what varies is not the operation but
-  the *command*, because binding prose specifies an outcome and each session
-  re-authors the shell for it from scratch. A destructive command whose exact
-  effect is re-derived per session is a stronger case for mechanism than a
-  stable one would be, since the recurring cost is not only the prompt but a
-  fresh chance to get the deletion boundary wrong.
-
 - **done-slug-commit-naming-gate** [needs-spec] — `kpi-task-split` reads a Done
   slug's feature/debt class off the commit its message names, via
   `git log -1 --grep=<slug>`. Nothing requires a landing commit to name its
@@ -153,73 +129,6 @@
   the gate lands. Filed 2026-07-22 by close, from this iteration's own
   unclassified split.
 
-- **scan-prompts-local-overlay-blind** [needs-spec] — `bin/scan-prompts.sh`
-  filters the friction log against `GUARD_KIT_SETTINGS` (the committed
-  allowlist) only. `GUARD_KIT_SETTINGS_LOCAL` exists in `lib/guard.sh` and
-  `compare-settings-allow.sh` reads it, but the ranker never does — so a command
-  granted solely by the local overlay is reported as a prompting call although it
-  did not prompt. Concretely this iteration: `gh issue list --state open`,
-  `gh pr list --state open`, and the bare `gh release create` are all covered by
-  `.claude/settings.local.json` globs and all three appear in the ranked
-  survivors, so **at least 4 of the 23 reported calls never prompted anyone**
-  (a fourth, an exact-string local entry, is counted below). With 90 local
-  entries live here the inflation is structural, not incidental.
-  **The claim was the defect, and it is already corrected** — guard-kit/SPEC.md
-  §scan-prompts said "so only commands that actually prompted remain", which is
-  false for any consumer with an overlay; it now states the honest limit and the
-  design reason the overlay is excluded (a locally-granted command is exactly the
-  triage candidate close must see, to promote or prune). What is *not* settled,
-  and is this entry, is the mechanism.
-  **Open design:** three arms, genuinely undecided. (a) Keep committed-only
-  filtering and rename the output/KPI so nothing claims to count prompts —
-  cheapest, but leaves `kpi-prompt-friction` a mixed quantity. (b) Read both
-  files and report two numbers — prompted versus committed-uncovered — which is
-  the honest shape but doubles the KPI's surface and its fixtures. (c) Read both
-  and rank the overlay-covered survivors in a separate, visibly-advisory section,
-  which preserves the promote-or-prune worklist while making the prompt count
-  true. Note (b)/(c) inherit a second inaccuracy the committed path already has:
-  `allowed()` glob-matches the whole command string, so `git *` matches a
-  compound the harness would split and refuse — a wider filter is *more* wrong on
-  compounds, not less, and any arm that reads more settings must settle the
-  compound semantics first.
-  **Cost while deferred:** low and non-rotting now that the SPEC states the
-  limit; the residue is that the friction trend line the lead steers by is an
-  upper bound of unknown slack, so a real regression and an overlay artifact read
-  identically. Debt: converges an advisory tool onto its own contract; adds no
-  governed name. Filed 2026-07-22 by close, from this iteration's tooling-friction
-  triage.
-
-- **scratch-execution-prompt-friction** [needs-spec] — this repo's `bash-guard`
-  actively steers every scratch write into repo-local `.tmp/` (CLAUDE.md
-  §Housekeeping; the harness scratchpad is refused by name), and nothing
-  allowlists *executing* what lands there — so `bash .tmp/<probe>.sh` prompts on
-  every run, forever. Measured this iteration: 4 calls on one build probe, plus 3
-  more in the close session's audit sweep, on a shape the repo's own guard
-  mandates. The loop is self-inflicted: the guard creates the directory
-  convention, and the permission posture penalizes it.
-  **Widening the allowlist is not obviously the fix, which is why this is
-  `[needs-spec]`.** `Bash(bash .tmp/*.sh)` auto-approves running an
-  agent-authored script whose *contents* no one reviewed — it converts a visible
-  command into an opaque one, which is the opposite of what the prompt exists to
-  do. The competing arms: (a) allowlist it and accept that scratch execution is
-  agent-trusted, arguing the agent could inline the same code anyway; (b) steer
-  to inlining, which works for short probes and fails for genuine multi-line
-  sweeps (this close's audit sweep is one — loops and arrays, not inlineable);
-  (c) give the boundary a named, gated scratch-runner so the *shape* is
-  allowlistable while the content stays visible in the log. Arm (b) is already
-  known-insufficient from this session's own experience, which is the evidence
-  the entry rests on.
-  **Deliberately not folded into `boundary-scratch-wipe-unowned`** — that entry
-  is about *wiping* `.tmp/` at the boundary and needs a preserve-list knob; this
-  is about *executing* from it and needs a trust ruling. Same directory, unrelated
-  questions.
-  **Cost while deferred:** low per-call, paid by the operator, and rising with
-  build-probe volume — every reproduction harness costs interruptions
-  proportional to how many times it is re-run, which penalizes exactly the
-  iterative probing that finds real defects. Bounded: nothing breaks.
-  Debt/policy: a permission-posture ruling; adds no governed name unless arm (c)
-  ships. Filed 2026-07-22 by close, from this iteration's tooling-friction triage.
-
 - **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
   fixture asserting `enter-stage.sh --simulate <stage>` leaves the tree
   byte-identical after a *successful* (non-refused) boundary entry. The guard
@@ -234,27 +143,6 @@
   is a future un-caught regression on a rarely-touched dry-run path.
   Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
 
-
-- **guard-read-compound-carveout** [needs-spec] — tighten `guard_rule_cat_read` /
-  `guard_rule_find_glob` so an all-reads compound does not slip their
-  composition carve-out. Both rules deliberately exempt a `cat`/`find` that
-  pipes, redirects, or feeds a consumer — correct, that is real composition. But
-  a compound whose every segment is a bare read (`cat A; echo ===; cat B`) is not
-  composition; it is two file reads batched through the shell to save a
-  round-trip, which is exactly what the Read/Glob steer exists to prevent, and it
-  currently falls through to a permission prompt. Observed 6x `cat` + 4x `find`
-  in one iteration's friction log. Fix: treat a `;`-separated compound as
-  steerable when every segment is itself a bare read, leaving genuine
-  pipe/redirect composition untouched; ships with the good/bad fixture pair.
-  **Recurred 2026-07-22** (`budget-oracle-honesty` close triage): 3x `cat` + 2x
-  `find`, plus two `;`-joined all-`git`-read compounds. Three of the five were
-  emitted by the close session itself while reading four small config files —
-  the strongest form of the argument, since a session executing the triage that
-  owns this entry still reached for the batched read. One `find` is the separate
-  `boundary-scratch-wipe-unowned` wipe and is not this class. Two iterations of
-  recurrence now, with no counter-evidence.
-  Debt: refines an existing guard rule, adds no governed name. Filed 2026-07-20
-  by tooling-friction triage during the `render-fidelity-leak-coverage` close.
 
 - **queue-selection-order-implicit** [needs-spec] — `queue-kit/SPEC.md`
   documents section order as selection order, so the default section sequence
