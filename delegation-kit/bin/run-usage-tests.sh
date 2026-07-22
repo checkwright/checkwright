@@ -169,6 +169,51 @@ if [[ -f "$STAMP" ]]; then
     fails=$((fails + 1))
 fi
 
+# spec: delegation-kit/SPEC.md §usage-verdict — the roll witnesses need a pre-seeded history tail the table's columns cannot express, so they are asserted beside it: both witnesses disarm the login reroute, either alone does not, and an unusable tail falls open to it
+roll_case() {
+    local desc="$1" tail_line="$2" want_rc="$3" want_verdict="$4"
+    {
+        printf 'five_hour_used_pct=3\n'
+        printf 'five_hour_resets_at=%s\n' "$(( now + 18000 ))"
+        printf 'updated_at=%s\n' "$now"
+    } > "$USAGE"
+    : > "$CRED"
+    touch -d "@$(( now - 60 ))" "$CRED"
+    rm -f "$HIST"
+    [[ -n "$tail_line" ]] && printf '%s\n' "$tail_line" > "$HIST"
+    local out rc
+    out="$( cd "$SANDBOX" && env "${DK_UNSET[@]}" DELEGATION_KIT_USAGE_HISTORY="$HIST" bash "$GATE" "$USAGE" "$CRED" 2>&1 )"; rc=$?
+    ran=$((ran + 1))
+    if [[ "$rc" -ne "$want_rc" ]] || ! grep -qF -- "-> $want_verdict" <<<"$out"; then
+        echo "  FAIL [$desc]: want exit $want_rc and '-> $want_verdict', got exit $rc -- $out"
+        fails=$((fails + 1))
+    fi
+}
+
+prev_boundary_crossed=$(( now - 3600 ))
+
+roll_case "roll-witnesses-disarm-reroute" \
+    "updated_at=$(( now - 7200 )) pct=86.0 resets_at=${prev_boundary_crossed} verdict=PAUSE login_at=0" \
+    0 OK
+roll_case "roll-witness-boundary-unmoved" \
+    "updated_at=$(( now - 60 )) pct=86.0 resets_at=$(( now + 18000 )) verdict=PAUSE login_at=0" \
+    2 STALE
+roll_case "roll-witness-uncrossed-boundary" \
+    "updated_at=$(( now - 60 )) pct=86.0 resets_at=$(( now + 900 )) verdict=PAUSE login_at=0" \
+    2 STALE
+roll_case "roll-witness-malformed-tail" \
+    "updated_at=$(( now - 7200 )) pct=86.0 resets_at=notanepoch verdict=PAUSE login_at=0" \
+    2 STALE
+roll_case "roll-witness-absent-history" "" 2 STALE
+
+# spec: delegation-kit/SPEC.md §usage-verdict — the witness reads the *previous* sample, never the one this run appends: a first-ever sample cannot disarm its own reroute
+rm -f "$HIST"
+roll_case "roll-witness-not-self-witnessing" "" 2 STALE
+[[ "$(grep -c '' "$HIST" 2>/dev/null || echo 0)" -eq 1 ]] || {
+    echo "  FAIL [roll-witness-not-self-witnessing]: the run did not leave exactly its own sample behind"
+    fails=$((fails + 1))
+}
+
 if [[ "$ran" -eq 0 ]]; then
     echo "run-usage-tests: no cases parsed from $CASES" >&2
     exit 2
@@ -177,5 +222,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "run-usage-tests: $fails/$ran case(s) failed"
     exit 1
 fi
-echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes and their at-or-over boundaries, the login reroute in both directions (it suppresses an OK, never a PAUSE), the fan-width field, the demand-driven refresh (armed/fail-soft/short-circuit), and the sample-append discipline)"
+echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes and their at-or-over boundaries, the login reroute in both directions (it suppresses an OK, never a PAUSE), the fan-width field, the roll witnesses that disarm it, the demand-driven refresh (armed/fail-soft/short-circuit), and the sample-append discipline)"
 exit 0

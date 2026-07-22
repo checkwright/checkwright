@@ -235,7 +235,41 @@ three failure modes a raw percentage reading leaves open:
    An account switch swaps both windows, so neither axis escapes the
    suppression when the outcome is a would-be OK.
 
-Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK.
+   **The mtime is a proxy, and the roll witnesses refute it.** A credentials
+   file's mtime cannot distinguish an actual login from a routine OAuth token
+   rotation, which rewrites the same file — so every rotation mints a fake
+   auth event and blinds the verdict for the window's duration, and rotations
+   cluster around long-session resume, exactly when a verdict is being asked
+   for. The reroute's *premise* is that a low percentage inside the window is
+   a **lagging** reading; when the five-hour window has demonstrably rolled,
+   a low percentage is the **expected** reading and the premise is false. Two
+   witnesses of a roll are already in hand at that point, and the verdict
+   consults both — conjunctively, since either alone is ambiguous:
+
+   - the snapshot's `five_hour_resets_at` differs from the newest
+     `DELEGATION_KIT_USAGE_HISTORY` sample's `resets_at` (the boundary moved);
+   - the snapshot's `updated_at` is past that **previous** boundary (time
+     actually crossed it, rather than the boundary being restamped by an
+     account switch).
+
+   Both firing disarms the reroute and the reading verdicts on its own merits.
+   This makes the verdict path a **reader** of the trend log it already
+   appends to; the read is taken before this run's own append, so the witness
+   is the previous reading and never this one. It falls open to the
+   unrefuted reroute whenever the log cannot answer — knob unset, file absent
+   or unreadable, or a tail carrying no numeric `resets_at` — which is the
+   pre-existing behavior, so an unconfigured consumer is unchanged. The
+   residual limit is honest and named: a rotation with **no** roll still
+   blinds the window, because no witness in hand contradicts it; closing that
+   needs an account-keyed check against the credential's own identity, not a
+   sharper time window.
+
+Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK. The
+RESET-OK branch is the same decision one step earlier and is ordering
+precedent for the witnesses: the file already accepts that a demonstrated roll
+outranks the reroute. It covers only a snapshot from an already-dead window;
+the witnesses cover a window that rolled *between* samples, where the
+re-polled snapshot carries a live `resets_at`.
 
 Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. Exit
 2 is fail-closed on *trusting the number* and deliberately fail-open on
@@ -339,7 +373,12 @@ harness-reported values verbatim; write-time smoothing or correction is
 forbidden (a later corrective push is evidence about the earlier sample, and
 only the reader has both). A STALE exit from an unreadable or unparseable
 snapshot appends nothing — a sample the gate would not trust is not history.
-`usage-trend` (§Trend reporter) reads the log.
+`usage-trend` (§Trend reporter) reads the log, and so does `usage-verdict`
+itself: the newest sample's `resets_at` is one of the two roll witnesses
+(§usage-verdict). That read is the log's only in-verdict consumer and is
+strictly fall-open, so the log stays an advisory trend surface rather than
+becoming a correctness dependency — a consumer with sampling off gets the
+same verdicts it always did.
 
 ### The usage.txt contract
 
@@ -647,6 +686,18 @@ machinery, and no refresh diagnostic leaks into the relayed verdict line;
 **short-circuit** — a snapshot under `DELEGATION_KIT_REFRESH_MIN_AGE` never invokes the
 command. Armed and short-circuit are the firing/non-firing pair over the same
 stub, so the absence proves the floor rather than a broken stub.
+
+The **roll witnesses** need a pre-seeded history tail the table's columns do
+not carry, so they are asserted beside it too, over one fixed shape — a low
+percentage with a credentials mtime inside the login window, which without a
+witness is STALE. Both witnesses present verdicts OK; each of the four ways
+the log can fail to answer holds the STALE — the boundary unmoved, the
+previous boundary uncrossed, a tail with a non-numeric `resets_at`, and no
+history at all. The two single-witness cases are the discriminating pair: they
+prove the conjunction is load-bearing rather than either witness carrying it
+alone. A sixth case asserts the read is not self-witnessing — a run with an
+empty log still STALEs and leaves exactly its own sample behind, so the
+witness can only ever be a previous reading.
 
 `usage-trend` is likewise not a gate (it renders no clean/violation
 verdict), so it ships an assertion runner, `bin/run-trend-tests.sh`, over a

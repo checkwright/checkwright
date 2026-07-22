@@ -74,6 +74,16 @@ if [[ -r "$CRED_FILE" ]]; then
   login_at=$(stat -c %Y "$CRED_FILE" 2>/dev/null || echo 0)
 fi
 
+# spec: delegation-kit/SPEC.md §usage-verdict — the roll witnesses: read the newest sample's boundary before any append of this run's own, so the reroute is judged against the previous reading, never against itself
+prev_resets_at=""
+if [[ -n "$HISTORY" && -r "$HISTORY" ]]; then
+  prev_resets_at="$(tail -n 1 "$HISTORY" 2>/dev/null | awk '{ for (i = 1; i <= NF; i++) if ($i ~ /^resets_at=/) { sub(/^resets_at=/, "", $i); print $i; exit } }' || true)"
+fi
+rolled=0
+if [[ "$prev_resets_at" =~ ^[0-9]+$ ]] && (( resets_at != prev_resets_at && updated_at > prev_resets_at )); then
+  rolled=1
+fi
+
 # spec: delegation-kit/SPEC.md §The usage.txt contract — the sample line is the trend log's wire contract: raw values verbatim, optional keys omitted (never empty) when their source is absent
 append_sample() {
   local verdict="$1" line
@@ -121,8 +131,9 @@ if (( pause_5h || pause_7d )); then
 fi
 
 # spec: delegation-kit/SPEC.md §usage-verdict — the reroute follows the axis compares and may suppress only the non-blocking outcome: a lagging under-threshold pct still cannot print a fresh-looking OK, while an over-threshold reading inside the window still blocks
+# spec: delegation-kit/SPEC.md §usage-verdict — and a demonstrated roll refutes the reroute's lagging-reading premise, so the witnesses disarm it: a low pct after the window turned over is the expected reading, not a suspect one
 cred_age=$(( now - login_at ))
-if (( login_at > 0 && cred_age >= 0 && cred_age < LOGIN_WINDOW )); then
+if (( login_at > 0 && cred_age >= 0 && cred_age < LOGIN_WINDOW && ! rolled )); then
   append_sample STALE
   echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (auth changed ${cred_age}s ago; a /login starts fresh windows the server-fed pct lags; never blocks delegation — re-read or refresh before trusting the number)"
   exit 2

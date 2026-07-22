@@ -14,60 +14,6 @@
 
 ## Technical Debt
 
-- **usage-verdict-login-mtime-conflation** — `usage-verdict.sh` derives
-  `login_at` from `stat -c %Y` on `DELEGATION_KIT_CRED_FILE`, and the
-  login-window reroute treats any recent mtime as an auth change ("auth changed
-  Ns ago; a /login starts fresh windows the server-fed pct lags"). A credential
-  file's mtime cannot distinguish an actual `/login` from a routine OAuth token
-  rotation, which rewrites the same file. Every rotation therefore mints a fake
-  auth event and blinds the verdict for `DELEGATION_KIT_LOGIN_WINDOW` seconds
-  (600 by default), and rotations cluster around long-session resume and window
-  boundaries — exactly the moments a verdict is being asked for.
-  **Reproduced live 2026-07-22** (`.metric/usage-history.log`, gitignored — cite,
-  never stage): consecutive samples `pct=86.0 resets_at=1784683800 verdict=PAUSE
-  login_at=1784665951` then `pct=0 resets_at=1784722800 verdict=STALE
-  login_at=1784705002`. No `/login` occurred; the mtime moved because the token
-  rotated. `pct=0` was true — the window had rolled — and the verdict was STALE
-  anyway.
-  Debt: replaces a proxy signal in shipped mechanism with a sound one; adds no
-  governed name. **Spec together with `usage-verdict-roll-witness-unused`**,
-  which is the principled form of the fix — not a separate feature.
-  **Premise re-verified 2026-07-22 by the scope survey:** the `stat -c %Y` read
-  is at `usage-verdict.sh:74`, feeding the reroute at `:104`. Filed 2026-07-22
-  by lead; promoted 2026-07-22 by scope (operator ruling), ranked second — it is
-  the *cause* of the observed misfire, but its damage is confined to signal
-  quality, which is why the fail-open unit ranks ahead of it.
-
-- **usage-verdict-roll-witness-unused** — the login-window reroute tests cred
-  mtime alone, though `usage-verdict.sh` already holds enough state to refute its
-  own premise. The reroute's premise is that a low pct inside the window is a
-  *lagging* reading; but when the 5h window has demonstrably rolled, a low pct is
-  the expected reading, not a suspect one. Two witnesses of a roll are already in
-  hand at that point: the snapshot's `resets_at` differs from the newest
-  `DELEGATION_KIT_USAGE_HISTORY` sample's, and `updated_at` is past the *old*
-  `resets_at`. Neither is consulted — the history log is written by
-  `append_sample` and never read back by the verdict path.
-  **Witnessed in the same 2026-07-22 misfire:** `resets_at` moved 1784683800 →
-  1784722800 and `updated_at=1784705007` sat 21207s past the old boundary, so
-  both witnesses fired while the verdict still rerouted to STALE on mtime alone.
-  Debt: uses state the script already carries; adds no governed name. Note the
-  read-back is a new coupling — the verdict path currently only appends to the
-  history log, and making it a *reader* of that log needs the absent/unset and
-  malformed-tail cases specced, not just the happy path.
-  **A third witness already ships, and it is ordering precedent.**
-  `usage-verdict.sh:90-94` exits RESET-OK when `resets_at - now <= 0`, i.e. when
-  the snapshot is itself from a dead window — and that branch is ordered
-  **before** the reroute at `:104`. It does not cover this entry's case (a window
-  that rolled *between* samples, where the re-polled snapshot carries a fresh
-  `resets_at`), so it is not a duplicate. Its value is precedent: the file
-  already accepts that a demonstrated roll outranks the login-window reroute, so
-  placing the two history-derived witnesses ahead of the reroute extends an
-  existing decision rather than inverting one.
-  **Premise re-verified 2026-07-22 by the scope survey:** `append_sample` writes
-  the history at `:87` and nothing in the file reads it back; the RESET-OK branch
-  at `:90-94` is confirmed ahead of the reroute. Filed 2026-07-22 by lead;
-  promoted 2026-07-22 by scope (operator ruling), ranked third.
-
 - **delegation-smoke-history-pollution** — `delegation-kit/smoke/install.sh` pins
   `DELEGATION_KIT_CRED_FILE` and both PAUSE thresholds around its
   `usage-verdict.sh` assertions but never neutralizes
@@ -1063,5 +1009,7 @@
 ## Done
 
 - usage-verdict-login-reroute-fails-open
+- usage-verdict-login-mtime-conflation
+- usage-verdict-roll-witness-unused
 
 ## Lessons Learned
