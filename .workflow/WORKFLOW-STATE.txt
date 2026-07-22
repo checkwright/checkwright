@@ -7,3 +7,4 @@
 budget-oracle-honesty scope a0479a81 2026-07-22
 budget-oracle-honesty build a57f61a6 2026-07-22
 budget-oracle-honesty validate a752ae26 2026-07-22
+budget-oracle-honesty close ae6b49e3 2026-07-22
