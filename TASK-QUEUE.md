@@ -301,43 +301,6 @@
   Debt: latent policy with no owner doc.
   Filed 2026-07-20 by lead while ruling on the active-section question.
 
-- **friction-log-merge** [needs-spec] — `knowledge-friction.log` and
-  `prompt-friction.log` are the same surface twice: each is appended by a
-  capture affordance one line per event, each is triaged at the same close step,
-  each is metered as an advisory KPI rather than gated, and they differ only in
-  which *kind* of friction they record — which a type field carries. Merging
-  them behind one log with a type column halves close's inbox count and gives
-  the two frictions a single trend line, which is also the more honest read:
-  they compete for the same triage attention and are currently ranked against
-  each other by nothing.
-  **Sequencing:** land after `close-triage-surface-roster`, which will show
-  whether the merge actually reduces what close must remember or merely moves
-  it. Merging first risks optimising a count that the roster work reframes.
-  Debt: consolidates two shipped surfaces, adds no capability.
-  Filed 2026-07-20 by lead; ranked third of the workflow-directory findings.
-  **Promoted into `workflow-surface-tiering` 2026-07-22 (operator ruling), in
-  the same iteration as its named predecessor.** The sequencing note above is
-  the reason it rides along rather than waiting: the merge is gated on what
-  `close-triage-surface-roster` reveals, and holding it one more iteration pays
-  a second iteration's fixed cost to learn something this one already produces.
-  Order within the iteration is unchanged — the roster lands first and its
-  answer decides whether the merge ships at all. Retiring the merge on that
-  evidence is a legitimate outcome of this unit, not a failure of it.
-  **Routed to the authoring stage:** merging the two logs behind one surface
-  with a type column names a new file and a new field on a governed surface, so
-  the new-names litmus makes it a feature despite the "adds no capability" line.
-  **Premise note 2026-07-22:** `knowledge-friction.log` currently sits at 0
-  bytes and carries no header at all, so the merge's migration half is cheap on
-  that side — there is no accumulated content to carry across.
-  **Held at spec 2026-07-22 pending a disposition ruling.** The design pass ran
-  the merge against the two logs' actual producers, consumers, owners, and
-  reclaim moments and found it ruled out on four independent grounds; the
-  argument is recorded in `lifecycle-kit/SPEC-close-surface-roster.md` §Ruled
-  out, whose roster answers the complaint the merge was a proxy for. No
-  amendment is authored for this slug, so it stays here rather than being
-  promoted on a ruling spec does not own — retiring a promoted unit is a queue
-  disposition, not an authoring call.
-
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
@@ -1109,5 +1072,7 @@
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
 ## Done
+
+- friction-log-merge
 
 ## Lessons Learned
