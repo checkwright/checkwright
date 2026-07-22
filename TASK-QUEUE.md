@@ -134,6 +134,53 @@
 
 ## Deferred
 
+- **boundary-scratch-wipe-unowned** [needs-spec] — the iteration-boundary `.tmp/`
+  wipe is prescribed as **consumer binding prose** (the `/scope` skill's
+  evidence-reset binding) and performed by hand, so every scope session emits an
+  ad-hoc destructive shell command. The recurring shape, verbatim:
+  `find .tmp -mindepth 1 -not -name session-role -delete && ls -a .tmp/`
+  Cadence: once per iteration, on every scope session, permanently. It prompts
+  every time and cannot stop prompting — the `&&` makes it a compound no prefix
+  entry matches, and `find … -delete` is not allowlisted at all. The allowlisted
+  `rm .tmp/*` globs cannot express "preserve `session-role`", which is exactly
+  why the hand-written form reaches for `find`.
+  **Widening the allowlist is the wrong fix** — it grants a broad destructive
+  shape to buy one convenience. The operation has no per-invocation variance, so
+  it belongs behind kit mechanism the allowlist matches bare and undecorated,
+  which kills the prompt at its source and leaves the allowlist no wider.
+  **The home already exists — no new script.** `bin/enter-stage.sh` is already
+  the boundary actor: it resolves the scratch dir at `:57`
+  (`GATE_SDK_TMP_DIR:-.tmp`), already writes there, already truncates the
+  boundary-reset file set at `:176-181`, and already reports what it truncated at
+  `:199`. The wipe is the same boundary operation over a different surface.
+  **Why this is a feature, not a one-line debt fix — the reason it is filed
+  rather than folded in.** The wipe must *preserve* `.tmp/session-role`, and that
+  marker is **context-kit's** surface (its session-context hook reads it; its
+  lifetime is the lead session's, not the iteration's), not lifecycle-kit's.
+  Expressing the exception needs a preserve-list knob — presumably
+  `LIFECYCLE_KIT_BOUNDARY_PRESERVE`, following the established
+  `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` array pattern. That is a **new name on a
+  governed surface**, so the new-names litmus makes it a feature requiring an
+  amendment however small the diff looks. Two consequences follow: the amendment
+  spans ≥2 component dirs (lifecycle-kit mechanism, context-kit's marker as the
+  reason for the exception), which arms `check-stage-entry` assertion C and
+  demands an audit stamp at the next stage's entry; and moving the wipe from
+  binding prose into kit mechanism is a provenance-seam call in its own right —
+  what is mechanism versus what stays consumer config.
+  **Open design question:** whether the preserve list is the right shape at all.
+  The alternative is that the kit wipes nothing and instead *names* the scratch
+  surface it owns, leaving cross-kit markers somewhere the boundary never
+  touches — which would dissolve the exception rather than configure it, and may
+  be the better answer.
+  Debt/feature: adds a governed name; needs an amendment. Not implemented.
+  **Cost while deferred:** low, non-rotting, but permanent and paid by the
+  **operator** rather than the agent — one unavoidable interruption per
+  iteration, on a command whose destructive shape is exactly the kind a reviewer
+  should not be trained to wave through. Bounded: nothing breaks, no gate reds.
+  Surfaced 2026-07-22 by the operator during the `budget-oracle-honesty` scope,
+  naming the exact recurring command; filed by scope at lead instruction after
+  verifying the placement claim against `enter-stage.sh`.
+
 - **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
   fixture asserting `enter-stage.sh --simulate <stage>` leaves the tree
   byte-identical after a *successful* (non-refused) boundary entry. The guard
