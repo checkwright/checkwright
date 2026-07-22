@@ -78,7 +78,12 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    the release boundary, its contract lifecycle-kit/SPEC.md §templates/skills/.
    Every marker on the roster earns a stamped disposition in
    `.workflow/release-sweep-evidence.txt` before the tag; an empty roster is a
-   stated "none". No marker rides into the next major undispositioned.
+   stated "none". No marker rides into the next major undispositioned. That file
+   is a tracked checked projection of the workflow directory
+   (gate-sdk/SPEC.md §The workflow directory), so its first line is the
+   `# contract: RELEASING.md §The procedure — …` header carrying the block
+   grammar; a disposition block opens with a bare `<release> — <date>` line
+   below it, never a `#` one.
 
 4. **Tag the iteration's final commit.** Tag `vX.Y.Z` on the iteration's final
    commit and push it — `git tag -a vX.Y.Z` on the commit, then push the tag to

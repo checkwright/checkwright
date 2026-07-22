@@ -1,4 +1,4 @@
-# held-constant validate baseline: <suite> <scenario> <status> [<slug>]
+# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug>]
 gates check-shellcheck pass
 gates check-gate-output pass
 gates check-gate-fail-closed pass

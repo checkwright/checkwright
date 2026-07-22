@@ -157,6 +157,10 @@ if staged_matches 'scripts/root-allowlist.list'; then
     run_gate check-root-tiering gate-sdk/checks/check-root-tiering.sh
 fi
 
+if staged_matches '.workflow/*' '.gitignore'; then
+    run_gate check-workflow-tiering gate-sdk/checks/check-workflow-tiering.sh
+fi
+
 if staged_matches 'scripts/core-files.list'; then
     run_gate check-core-files gate-sdk/checks/check-core-files.sh
 fi
@@ -287,11 +291,11 @@ if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegatio
     run_gate check-knob-default-coupling canon-kit/checks/check-knob-default-coupling.sh
 fi
 
-if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*'; then
     run_gate check-comment-tier canon-kit/checks/check-comment-tier.sh
 fi
 
-if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*.txt'; then
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' '.workflow/*'; then
     run_gate check-spec-pointer canon-kit/checks/check-spec-pointer.sh
 fi
 

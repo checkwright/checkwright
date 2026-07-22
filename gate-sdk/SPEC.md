@@ -48,7 +48,8 @@ override with `GATE_SDK_GATES_DIR`) holding:
 Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
-`.workflow`), `GATE_SDK_GRAPH_ARTIFACT` (default
+`.workflow`; the directory's two-tier membership rule, header form, and
+extension rule are §The workflow directory), `GATE_SDK_GRAPH_ARTIFACT` (default
 `<workflow-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
 e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
@@ -103,6 +104,75 @@ default the invoking shell may override), but the file is how an override
 consumer that must relocate a layout knob for every session sets it here. The
 one knob the file cannot set is `GATE_SDK_GATES_DIR`, which locates the file
 itself — it stays env-or-default (a config file cannot name its own directory).
+
+## The workflow directory
+
+`GATE_SDK_WORKFLOW_DIR` (default `.workflow`) is where every kit writes its
+committed projections and its local capture. gate-sdk owns the knob, so it owns
+the directory's contract; the kits that write into it own their individual
+files.
+
+**Two tiers, partitioned by tracking.** Every member is either a **checked
+projection** (tracked, committed, gate-read) or **local capture** (gitignored,
+advisory, drained by a named reclaim path). A member that is neither tracked nor
+ignored is the drift state `check-workflow-tiering` refuses: an uncommitted file
+no reviewer sees and no `.gitignore` line accounts for.
+
+**The header requirement follows tracking, and it must.** Local capture's
+reclaim path is whole-file truncation (`: > <file>`, the shape every capture
+log's close-stage step uses), which erases a header on every drain. A header
+requirement on that tier would fight the tier's own reclaim mechanism — either
+the header is re-seeded on every clear, adding a writer to a surface whose whole
+point is that any appender may write it, or it decays to a rule violated by
+correct operation. So: **checked projections carry the header; local capture
+carries none.** That asymmetry is the substantive content of the
+tracked-vs-gitignored axis, not a convenience.
+
+**The header form.** A checked projection's first line is `# contract: `
+followed by one of two ruled payloads:
+
+- **Pointer form** — `<owner-path> §<section>`, optionally followed by an
+  em-dash tail (` — ` then a line grammar or a gloss). The path is a tracked
+  file and the section resolves;
+  `check-spec-pointer` already owns that resolution, and the em-dash tail is
+  already stripped before heading matching, so a grammar line may ride the same
+  header as its pointer. This is the default form.
+- **Version-marker form** — `<format-name> v<N>` (`^[a-z0-9-]+ v[0-9]+$`), used
+  only where a gate parses the header itself as a wire-format version. The
+  owning SPEC states that it does — evidence-kit/SPEC.md §Evidence manifest is
+  the one such statement in this tree.
+
+Requiring *some* header would gate nothing — the tracked side already satisfies
+it — so the requirement is the **prefix with a ruled payload**. Both payload
+forms are machine-recognizable, which is what keeps the rule a rule rather than
+a description.
+
+**The extension rule keys on writer and reader, not on tier.** These are two
+independent axes, and conflating them is why the convention resisted statement:
+the directory holds tracked `.md` beside gitignored `.md`, so no extension
+tracks tracking.
+
+- `.txt` — a **record file with a stated line grammar** that a gate or `bin/`
+  affordance parses field-wise.
+- `.md` — a **prose surface a human reads and dispositions**, machine-read only
+  for emptiness or for a bullet count.
+- `.log` — an **append-only capture stream** written by tooling at the moment of
+  an event, triaged in bulk and cleared wholesale; no per-line grammar contract,
+  which is exactly why nothing parses it field-wise.
+
+A new file's extension is therefore determined, not chosen: ask which of the
+three describes its writer and its reader. The extension rule is deliberately
+**not** gated — deciding whether a file is a record, a prose surface, or a
+capture stream is the judgment the rule exists to guide, and mechanizing it
+would mean inferring a writer's intent from a file's bytes. Under the
+enforcement-first carve-out it takes the other disposition available to an
+un-gateable class: a cadenced review entry on the consumer's audit roster, due
+at each workflow-directory addition.
+
+The tracked tier is also the surface canon-kit's comment gates read — the
+governed comment/pointer surface admits a workflow member iff it is tracked,
+whatever its extension, and blesses only `contract:`/`see` there
+(canon-kit/SPEC.md §check-comment-tier).
 
 ## The gate model
 
@@ -1340,6 +1410,26 @@ itself: adding a root entry means adding its allowlist line in the same commit,
 a diff-visible edit needing no exemption tag. The `# graph:` couples the
 manifest at `tier=precommit`; the whole-tree `run-gates.sh` battery is the
 backstop for a pure-addition commit outside the trigger's staged view.
+
+### check-workflow-tiering
+
+Two assertions, over `GATE_SDK_WORKFLOW_DIR`: (A) **partition totality** — every
+member is tracked or ignored, never neither; (B) **header presence and form** —
+every tracked member's first line is `# contract: ` with a payload matching the
+pointer form or the version-marker form. Both are §The workflow directory's
+rules; this section is the mechanism, that one the argument.
+
+It deliberately does **not** re-resolve the pointer's path and heading:
+`check-spec-pointer` already does, and a second resolver is the parallel copy
+canon-kit's own tiering rule bans. The division is presence-and-shape here,
+resolution there — the same split `check-comment-tier` and `check-spec-pointer`
+already hold between them.
+
+No new knob: `GATE_SDK_WORKFLOW_DIR` is the whole configuration surface.
+Fail-closed (exit 2) on a non-repo scan root, on a workflow directory the knob
+names but the tree lacks, and on an unreadable member. A directory member is
+partition-checked and header-exempt — a header belongs to a file. Tier
+`precommit`; the `# graph:` manifest couples the workflow dir and `.gitignore`.
 
 ### check-commit-msg
 

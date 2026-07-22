@@ -35,7 +35,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 2. Seed the two surfaces — `.workflow/validate-baseline.txt`:
 
-       # held-constant validate baseline: <suite> <scenario> <status> [<slug>]
+       # contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug>]
 
    and `.workflow/validate-evidence.txt`:
 

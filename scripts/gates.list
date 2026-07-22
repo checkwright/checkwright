@@ -33,6 +33,7 @@ check-commit-msg
 check-commit-subject
 check-tree-terms
 check-root-tiering
+check-workflow-tiering
 check-core-files
 check-identity
 check-stage-evidence

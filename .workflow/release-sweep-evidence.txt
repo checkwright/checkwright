@@ -1,13 +1,10 @@
-# Release-sweep evidence — one disposition block per release (RELEASING.md step 1).
-# Each marker on the CANON_KIT_DEPRECATION_MARKERS roster earns a stamped line:
-#   <release> deprecation <disposition> <task-slug> — <marker lead prefix>
-# Operator evidence riding the release commit; no gate reads it (demand-gated).
+# contract: RELEASING.md §The procedure — release-sweep evidence for the runbook's major-only deprecation sweep, one disposition block per release, each opening with a bare `<release> — <date>` line; every marker on the CANON_KIT_DEPRECATION_MARKERS roster earns a stamped `<release> deprecation <disposition> <task-slug> — <marker lead prefix>` line. Operator evidence riding the release commit; no gate reads it (demand-gated).
 
-## v0.1.0 — 2026-07-14
+v0.1.0 — 2026-07-14
 none — no CANON_KIT_DEPRECATION_MARKERS roster configured; the deprecation
 inventory is empty, nothing to disposition.
 
-## v0.2.0 — 2026-07-17
+v0.2.0 — 2026-07-17
 none — no CANON_KIT_DEPRECATION_MARKERS roster configured; the deprecation
 inventory is empty, nothing to disposition. Inventory command
 (bash drift-kit/templates/kpi-deprecated-surface.sh) reports the n/a

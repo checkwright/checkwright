@@ -24,16 +24,6 @@
   Promoted 2026-07-22 by spec, which authored the amendment and took the gate
   arm scope left open.
 
-- **workflow-file-format-convention** [spec: gate-sdk/SPEC-workflow-file-convention.md]
-  — `.workflow/` has no stated surface contract: three extensions with no rule
-  for choosing one, and a header requirement nothing gates. Gives the directory
-  a two-tier membership rule, a ruled header form on the tracked tier, an
-  extension rule keyed on writer and reader, and one gate for the mechanizable
-  half. A fix with a real backlog: two tracked headers are rewritten and one
-  consumer whitelist shrinks.
-  Promoted 2026-07-22 by spec, which authored the amendment and ruled the
-  prefix-versus-any-header question scope flagged.
-
 - **close-triage-surface-roster** [spec: lifecycle-kit/SPEC-close-surface-roster.md]
   — close's inbound triage surfaces are enumerated only as prose, so a surface
   close never reads leaves no trace anywhere. Replaces the enumeration with a
@@ -1074,5 +1064,6 @@
 ## Done
 
 - friction-log-merge
+- workflow-file-format-convention
 
 ## Lessons Learned

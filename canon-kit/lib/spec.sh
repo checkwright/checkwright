@@ -232,8 +232,15 @@ _spec_comment_surface() {  # $1=root  $2=1 keeps templates/ shell sources, else 
         else
             gate_find "$root" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
         fi
+        # spec: canon-kit/SPEC.md §check-spec-pointer — the workflow directory's
+        #   tracked tier, whatever the extension: the capture tier is gitignored
+        #   and carries no header (gate-sdk/SPEC.md §The workflow directory).
         shopt -s nullglob
-        for f in "$root/${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*.txt; do printf '%s\n' "$f"; done
+        for f in "$root/${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*; do
+            [[ -f "$f" ]] || continue
+            git -C "$root" ls-files --error-unmatch -- "${f#"$root"/}" >/dev/null 2>&1 || continue
+            printf '%s\n' "$f"
+        done
         shopt -u nullglob
     fi
 }

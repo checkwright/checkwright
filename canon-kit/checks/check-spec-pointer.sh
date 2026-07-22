@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=*SPEC*.md,*README.md,CLAUDE.md,scripts/*.sh,kit:*.sh,.workflow/*.txt dir=one valve=none tier=precommit
+# graph: couples=*SPEC*.md,*README.md,CLAUDE.md,scripts/*.sh,kit:*.sh,.workflow/* dir=one valve=none tier=precommit
 # spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: directive on a governed source and every free-prose <path>.md §<heading> citation on a governed manifest resolves: the target file is tracked and a §heading fragment names a heading the file carries
 #
 # usage: check-spec-pointer.sh [scan-root]   (default '.')

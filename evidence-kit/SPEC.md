@@ -102,7 +102,12 @@ widens by accident, so it is pinned by an assertion rather than by prose alone.
 
 ### Baseline manifest
 
-Held-constant, edited by human commit only: one line per known scenario,
+Held-constant, edited by human commit only. It is a tracked checked projection
+of the workflow directory, so its first line is the pointer-form header
+`# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate
+baseline: <suite> <scenario> <status> [<slug>]` (the form ruled by
+gate-sdk/SPEC.md §The workflow directory, whose em-dash tail carries the line
+grammar). Below it, one line per known scenario,
 `<suite> <scenario> <status> [<slug>]`. A blocking `<slug>` is required exactly
 when status is `fail` or `ignore` and forbidden when `pass`; each slug resolves
 to a live queue task (the queue-file knob) or a configured permanent marker.
@@ -135,12 +140,14 @@ stays uncommitted under the tmp dir; its digest pins which run produced the
 counts. The iteration key scopes the line so the boundary-truncate knob can
 clear the manifest at the start of the next iteration.
 
-The header is a wire-format version marker, not a doc pointer; `check-evidence-manifest`
-owns it (asserts the first line is `# contract: <version>`). A consumer that
-also runs canon-kit's `check-spec-pointer` / `check-comment-tier` over its
-workflow dir whitelists the baseline and manifest there (they are data files,
-`CANON_KIT_COMMENT_WHITELIST`), so the `contract:` header is read as the wire
-marker it is rather than a dangling spec pointer.
+The header is a wire-format version marker, not a doc pointer —
+gate-sdk/SPEC.md §The workflow directory rules that as one of the two payload
+forms a checked projection may carry, and this section is the statement that
+form requires. `check-evidence-manifest` owns it (asserts the first line is
+`# contract: <version>`). A consumer that also runs canon-kit's
+`check-spec-pointer` over its workflow dir whitelists **this** file there
+(`CANON_KIT_COMMENT_WHITELIST`), since a version marker resolves as no path; the
+baseline is pointer-form and needs no whitelist entry.
 
 ### bin/run-validate.sh
 

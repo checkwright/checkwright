@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/*.sh,kit:*.sh,.workflow/*.txt dir=one valve=none tier=precommit
+# graph: couples=scripts/*.sh,kit:*.sh,.workflow/* dir=one valve=none tier=precommit
 # spec: canon-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt, or justifies a positional construct
 #
 # usage: check-comment-tier.sh [scan-root]
@@ -186,7 +186,8 @@ scanned=0
 for f in "${SURFACE[@]}"; do
     rel="${f#"$ROOT"/}"; rel="${rel#./}"
     spec_comment_whitelisted "$rel" && continue
-    case "$f" in
+    case "$rel" in
+        "${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*) style="hash"; bless="$TXT_BLESS"; pos="" ;;
         *.sh|*.bash)              style="hash";  bless="$SHELL_BLESS"; pos="$POS_RE" ;;
         *.txt)                    style="hash";  bless="$TXT_BLESS";   pos="" ;;
         *.rs|*.ts|*.tsx|*.js|*.go|*.c|*.h|*.rego) style="slash"; bless="$SHELL_BLESS"; pos="$POS_RE" ;;

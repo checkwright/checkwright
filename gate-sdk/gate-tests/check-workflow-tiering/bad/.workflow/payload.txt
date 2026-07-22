@@ -1,0 +1,1 @@
+# contract: not a pointer and not a version marker

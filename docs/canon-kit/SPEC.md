@@ -797,7 +797,10 @@ resolves against the vendored kit path (kit SPECs travel with the
 vendor-whole install), so its comments are directives like any source and
 this gate governs them, where
 `check-spec-pointer` exempts them as placeholders-by-design — with the
-`.workflow/*.txt` state files blessing only `contract:`/`see`;
+workflow directory's **tracked** members blessing only `contract:`/`see`,
+whatever their extension (the capture tier is gitignored and headerless, so
+tracking is the filter, not the suffix — gate-sdk/SPEC.md §The workflow
+directory);
 slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships
 as mechanism and activates when a consumer widens `CANON_KIT_COMMENT_SURFACE`
 to a language that needs it. Positional rescue is language-agnostic — its
@@ -816,8 +819,10 @@ Invariant, two passes, forward direction only: every `spec:` / `contract:`
 pointer **directive** on a governed source resolves, and every free-prose
 `<path>.md §<heading>` **citation** on a governed manifest resolves. The
 directive set is exactly what `check-comment-tier` blesses by shape: full-line
-`spec:` / `contract:` comments on the governed sources, plus the
-`.workflow/*.txt` `# contract:` headers. A directive's target grammar is
+`spec:` / `contract:` comments on the governed sources, plus the `# contract:`
+headers on the workflow directory's **tracked** members (gate-sdk/SPEC.md §The
+workflow directory owns that tier; a version-marker payload resolves as no path
+and rides `CANON_KIT_COMMENT_WHITELIST`). A directive's target grammar is
 `<path> [§<heading>]`: `<path>` (repo-relative) must be a tracked file, and when
 a `§<heading>` fragment is present the file must carry a matching markdown
 heading; a pointer without `§` resolves file-only. Reddens on a missing or

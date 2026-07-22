@@ -13,7 +13,7 @@ EOF
 
 mkdir -p .workflow
 [[ -f .workflow/validate-baseline.txt ]] \
-    || printf '# held-constant validate baseline: <suite> <scenario> <status> [<slug>]\n' > .workflow/validate-baseline.txt
+    || printf '# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug>]\n' > .workflow/validate-baseline.txt
 [[ -f .workflow/validate-evidence.txt ]] \
     || printf '# contract: evidence-manifest v1\n' > .workflow/validate-evidence.txt
 

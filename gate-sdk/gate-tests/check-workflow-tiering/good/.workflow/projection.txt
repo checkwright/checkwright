@@ -1,0 +1,1 @@
+# contract: gate-sdk/SPEC.md §The workflow directory — the pointer payload form, with its grammar riding the em-dash tail
