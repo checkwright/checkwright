@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: workflow-surface-tiering
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,40 @@
 ## New Features
 
 ## Technical Debt
+
+- **gap-inbox-post-close-window** — the gap inbox is drained by
+  `close` and refuses the next iteration-boundary `scope` entry while non-empty
+  (`enter-stage.sh`), which assumes every bullet is filed *during* an iteration.
+  A bullet filed after that iteration's close has no drainer left in the state
+  machine: the next `scope` is refused and only an out-of-band edit clears it.
+  Reproduced live: `enter-stage.sh scope --simulate` refused on two post-close
+  filings.
+  **Not a gate** (lead ruling): `close` legitimately writes the
+  inbox when it drains, so the rule cannot be "block changes" without separating
+  close-truncating from anyone-appending; `file-gap.sh` appends without
+  committing, so a gate reds at whatever commit next carries the file, blaming
+  an actor who did not file the bullet; and refusing capture does not dissolve a
+  real finding — it pushes it back into session context, the deferred-capture
+  antipattern the inbox exists to prevent. A close that files something it
+  genuinely cannot disposition in-session would red on a correct action.
+  **Preferred arm:** warn at the point of capture — `file-gap.sh` knows the
+  current stamp, so it can tell the filer, while they can still act, that the
+  bullet will block the next `scope` unless drained or promoted directly.
+  **Second half:** `enter-stage`'s refusal text says only that "the close stage
+  must drain every gap", which once close has finished describes a stage that is
+  not coming back; it should name the promote-directly recovery. The existing
+  refusal *did* detect this correctly — what failed was the message's
+  actionability, which is why a second detector is the wrong fix.
+  Debt: a real boundary hazard in shipped mechanism, not a new capability.
+  **Promoted 2026-07-22 by scope** into `workflow-surface-tiering` (operator
+  ruling). Routed as debt, not to the authoring stage: both halves converge
+  shipped mechanism onto its own stated contract — a warning line in
+  `file-gap.sh` and an actionable refusal message in `enter-stage.sh` — and
+  neither arm adds a name to a governed surface. The "open to spec" phrasing
+  the entry carried while deferred is dropped: the lead's not-a-gate ruling and
+  the named preferred arm are the design, and no arm remains that would need an
+  amendment.
+  Filed 2026-07-20 by lead, drained from the gap inbox.
 
 ## Deferred
 
@@ -62,6 +96,28 @@
   Surfaced 2026-07-22 by the operator during the `budget-oracle-honesty` scope,
   naming the exact recurring command; filed by scope at lead instruction after
   verifying the placement claim against `enter-stage.sh`.
+  **Evidence added 2026-07-22 by the `workflow-surface-tiering` scope — the
+  command drifts between sessions, so the shape recorded above is one observed
+  instance, not the canonical form.** That session performed the same prescribed
+  wipe as:
+  `find .tmp -maxdepth 1 -type f ! -name session-role -delete`
+  — compare the shape recorded verbatim near the top of this entry, which no
+  session has now reproduced. Three independent divergences for one prescribed
+  operation — the traversal
+  bound (`-maxdepth 1` vs `-mindepth 1`), a type filter present in one and
+  absent in the other (`-type f`), and the negation spelling (`!` vs `-not`) —
+  plus the trailing listing dropped. The first two are not cosmetic: the
+  observed form deletes only regular files at the top level, while the recorded
+  form descends and removes directories too, so the two commands do not even
+  agree on what the wipe removes.
+  **Why this sharpens the entry's own argument rather than qualifying it:** the
+  central claim is that the operation has no per-invocation variance and so
+  belongs behind mechanism. That holds — what varies is not the operation but
+  the *command*, because binding prose specifies an outcome and each session
+  re-authors the shell for it from scratch. A destructive command whose exact
+  effect is re-derived per session is a stronger case for mechanism than a
+  stable one would be, since the recurring cost is not only the prompt but a
+  fresh chance to get the deletion boundary wrong.
 
 - **done-slug-commit-naming-gate** [needs-spec] — `kpi-task-split` reads a Done
   slug's feature/debt class off the commit its message names, via
@@ -200,32 +256,6 @@
   Debt: refines an existing guard rule, adds no governed name. Filed 2026-07-20
   by tooling-friction triage during the `render-fidelity-leak-coverage` close.
 
-- **gap-inbox-post-close-window** [needs-spec] — the gap inbox is drained by
-  `close` and refuses the next iteration-boundary `scope` entry while non-empty
-  (`enter-stage.sh`), which assumes every bullet is filed *during* an iteration.
-  A bullet filed after that iteration's close has no drainer left in the state
-  machine: the next `scope` is refused and only an out-of-band edit clears it.
-  Reproduced live: `enter-stage.sh scope --simulate` refused on two post-close
-  filings.
-  **Not a gate** (lead ruling, open to spec): `close` legitimately writes the
-  inbox when it drains, so the rule cannot be "block changes" without separating
-  close-truncating from anyone-appending; `file-gap.sh` appends without
-  committing, so a gate reds at whatever commit next carries the file, blaming
-  an actor who did not file the bullet; and refusing capture does not dissolve a
-  real finding — it pushes it back into session context, the deferred-capture
-  antipattern the inbox exists to prevent. A close that files something it
-  genuinely cannot disposition in-session would red on a correct action.
-  **Preferred arm:** warn at the point of capture — `file-gap.sh` knows the
-  current stamp, so it can tell the filer, while they can still act, that the
-  bullet will block the next `scope` unless drained or promoted directly.
-  **Second half:** `enter-stage`'s refusal text says only that "the close stage
-  must drain every gap", which once close has finished describes a stage that is
-  not coming back; it should name the promote-directly recovery. The existing
-  refusal *did* detect this correctly — what failed was the message's
-  actionability, which is why a second detector is the wrong fix.
-  Debt: a real boundary hazard in shipped mechanism, not a new capability.
-  Filed 2026-07-20 by lead, drained from the gap inbox.
-
 - **queue-selection-order-implicit** [needs-spec] — `queue-kit/SPEC.md`
   documents section order as selection order, so the default section sequence
   silently makes `New Features` outrank `Technical Debt` in what scope picks
@@ -256,6 +286,26 @@
   skipped leaves no trace anywhere in the tree.
   Debt: converges existing mechanism onto a derived roster, adds no capability.
   Filed 2026-07-20 by lead, from a review of the workflow-directory surfaces.
+  **Premise re-verified 2026-07-22 by the scope survey — holds.** The four
+  triage sweeps are still enumerated only as prose in the placeholder binding at
+  `lifecycle-kit/templates/skills/close.md:75-76`, and the gap inbox is still
+  the only one with a forcing function (`close.md:62-71` plus the `enter-stage`
+  boundary refusal). No SPEC in the tree owns the roster.
+  **Reclassified feature, not debt:** the "adds no capability" line above
+  predates the direction the entry itself now prescribes. A *derived* roster
+  plus a per-surface advisory-vs-forced marking adds names to a governed surface
+  — the marker, and the derivation's output contract — so this needs an
+  amendment however small the diff. Routed to the authoring stage on that basis.
+  **Known cross-component cost, accepted by operator ruling 2026-07-22 (not a
+  reason to trim):** the amendment will span ≥2 component dirs — lifecycle-kit
+  (close's roster, `enter-stage`'s refusal) and at least one kit owning a
+  capture affordance — which arms `check-stage-entry` assertion C and makes the
+  **audit stamp** the expected disposition at the following stage's entry. An
+  audit stamp is anticipated here, not a ruled waiver: the span is genuine
+  cross-component design rather than a mechanical migration, which is the case
+  the audit stage exists for. Recorded so that entry meets a documented
+  obligation instead of a surprise.
+  Promoted into `workflow-surface-tiering` 2026-07-22 (operator ruling).
 
 - **workflow-file-format-convention** [needs-spec] — `.workflow/` carries three
   extensions with no stated rule for choosing one, and the apparent convention
@@ -285,6 +335,27 @@
   sits at 0 bytes with none either — two instances, both on the gitignored side,
   which is itself a signal that the untracked files are the ones no gate reaches.
   Decide whether the header requirement follows tracking or covers all ten.
+  **Premise corrected 2026-07-22 by the scope survey — the defect is on the
+  tracked side too, which changes what the unit is.** The claim above that
+  `prompt-friction.log` lacks a header "alone among the ten non-empty files" is
+  false, and so is the implication that the gitignored side holds every
+  instance. `.workflow/` now holds 12 files, 9 tracked; of those 9, **two carry
+  a descriptive `#` header but no `# contract:` line** —
+  `release-sweep-evidence.txt` (`# Release-sweep evidence — one disposition
+  block per release (RELEASING.md step 1).`) and `validate-baseline.txt`
+  (`# held-constant validate baseline: <suite> <scenario> <status> [<slug>]`).
+  Both are real headers doing real work; what they are not is the
+  `# contract: <owner> §<section>` form the other seven carry, so neither names
+  an owning SPEC section.
+  **Consequence for the design pass:** the cheap formulation this entry reached
+  for — "every tracked `.workflow/` file carries a `# contract:` header" — is
+  **false for 2 of 9 today**, so the unit lands as a fix with a real backlog,
+  not as a greenfield gate proving a boundary. Do not design against the
+  greenfield premise. The two survivors are also the discriminating cases: a
+  gate keyed on the literal `# contract:` prefix reds on both, so the design
+  must rule whether the requirement is the *prefix* (rename both headers) or
+  merely *some* header (which the tracked side already satisfies and which
+  gates nothing).
   Debt: a naming convention with no owner doc plus missing headers.
   Filed 2026-07-20 by lead, same workflow-directory review.
 
@@ -320,6 +391,15 @@
   Debt: converges an always-loaded claim onto verified tracking state; adds no
   governed name unless the gate lands. Filed 2026-07-21 by scope (operator
   ruling), from the undirected survey's `.workflow/` premise re-verification.
+  **Premise re-verified 2026-07-22 by the scope survey — holds verbatim.**
+  `.workflow/` holds 12 files; exactly 3 are gitignored (`essay-harvest.md`,
+  `knowledge-friction.log`, `prompt-friction.log`, still `.gitignore:25,27,30`)
+  and 9 are tracked. CLAUDE.md:137 still carries the false claim unchanged.
+  Routed to the authoring stage rather than promoted as debt, because the open
+  gate arm is live: a gate is a name on a governed surface, so if the design
+  pass builds one this is a feature, and the arm cannot be foreclosed at scope.
+  Promoted 2026-07-22 into `workflow-surface-tiering` by operator ruling, as
+  that iteration's always-loaded-correction unit.
 
 - **friction-log-merge** [needs-spec] — `knowledge-friction.log` and
   `prompt-friction.log` are the same surface twice: each is appended by a
@@ -335,6 +415,20 @@
   it. Merging first risks optimising a count that the roster work reframes.
   Debt: consolidates two shipped surfaces, adds no capability.
   Filed 2026-07-20 by lead; ranked third of the workflow-directory findings.
+  **Promoted into `workflow-surface-tiering` 2026-07-22 (operator ruling), in
+  the same iteration as its named predecessor.** The sequencing note above is
+  the reason it rides along rather than waiting: the merge is gated on what
+  `close-triage-surface-roster` reveals, and holding it one more iteration pays
+  a second iteration's fixed cost to learn something this one already produces.
+  Order within the iteration is unchanged — the roster lands first and its
+  answer decides whether the merge ships at all. Retiring the merge on that
+  evidence is a legitimate outcome of this unit, not a failure of it.
+  **Routed to the authoring stage:** merging the two logs behind one surface
+  with a type column names a new file and a new field on a governed surface, so
+  the new-names litmus makes it a feature despite the "adds no capability" line.
+  **Premise note 2026-07-22:** `knowledge-friction.log` currently sits at 0
+  bytes and carries no header at all, so the merge's migration half is cheap on
+  that side — there is no accumulated content to carry across.
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
@@ -1045,6 +1139,30 @@
   against a distribution, not a point, which both strengthens the eventual A/B
   and sharpens the caveat below: a single Sonnet run must be read against that
   spread, and a spread that wide may swallow the effect entirely.
+  **Window declined again 2026-07-22 for `workflow-surface-tiering` (operator
+  ruling at that iteration's scope), on the same grounds as the first
+  declination — the quality read this entry owes still does not exist, and a
+  cost-only A/B on the tier that makes rulings returns a number that cannot be
+  interpreted. Second consecutive declination; that iteration's Opus supervision
+  cost lands as another baseline row.**
+  **Premise sharpened at that scope — the spread argument cuts harder than this
+  entry states, and it re-ranks the entry's own open work.** Re-counted:
+  `.metric/stage-economics-log.txt` now holds **24 `supervision` rows**, the
+  priced Opus ones still running $3.2016 to $19.1464 — a **6x** spread. Read
+  against that, a single Sonnet lead session is not merely underpowered at the
+  margin; it is uninterpretable in principle, because any plausible tier effect
+  sits well inside the existing variance. So the experiment as filed would
+  return an unusable number **even if the quality read existed**. The
+  consequence is a re-ordering this entry does not currently carry: it reads as
+  though the quality read were the sole blocker and the cost read were ready,
+  when in fact **both legs are blocked**. The cost leg needs either many
+  repeated runs (n≫1, at one lead session per iteration) or a
+  variance-controlled comparison that normalizes for iteration size — the
+  obvious candidate being cost per unit delivered rather than cost per
+  iteration. Design that normalization *before* the quality read: an
+  uninterpretable cost axis makes the quality axis moot, and the reverse does
+  not hold. Landed here so the next scope reads the corrected case rather than
+  re-deriving it from the log.
   **A measurement caveat on the baseline itself:** supervision is the only row
   still growing while close runs, so any figure quoted for it is a snapshot. The
   lead's own mid-close read was $6.4552 (17.6% of $36.72); this close's read is
