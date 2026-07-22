@@ -1,1 +1,21 @@
 # contract: evidence-manifest v1
+budget-oracle-honesty gates sha256=c0a1fca12009ae93186907dd1083535fdb84b8e05cb404592ec9318854ba1ddc pass=77 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty gate_sdk sha256=2bfac74f7a03771af1c8da28805518467131fb09fb1c8812f130b55fad0d67e8 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty canon_kit sha256=d0c0e1b2b9f099ba2152cce6123319b0a62b245f97a69ec9addff36255d756d7 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty lifecycle_kit sha256=ffd7a1e902cbae04cacb68889ebe621172d592e7e4888bdacf2288b0b2c93f93 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty queue_kit sha256=0f7d5111c384795d745d6d3573644ffa1122590521907a3175bc1a9ac383d92d pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty site_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty scripts sha256=fe2ed0bfc0475ebe387ff499ba20bb4d3932c068a3248f11890841d7fb69c94b pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty guard_tests sha256=d4bf2cb95ff71dec4ba250f72ab892bfaa46cf9677013909169b8e13119d4ca3 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty upgrade sha256=3cde531305236c71c10973eba5d25501c5457ec4b6c71bea766ef88676d8e42f pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
+budget-oracle-honesty index_tests sha256=71d410e2b32adb3cbdfa575b3c3cbd89d1eada95158c123e4ee517a439e789d2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-22
