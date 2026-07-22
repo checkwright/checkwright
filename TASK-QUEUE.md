@@ -14,38 +14,6 @@
 
 ## Technical Debt
 
-- **usage-verdict-login-reroute-fails-open** — *pick first; the only unit of the
-  four whose failure direction costs money.* The login-window reroute in
-  `delegation-kit/bin/usage-verdict.sh` runs **before** the two pause-axis
-  compares and returns exit 2 unconditionally, so during the window a genuinely
-  over-threshold reading prints STALE instead of PAUSE. Its own `spec:` comment
-  justifies that ordering solely by the lagging-**low** case — "the reroute
-  precedes the axis compares: within the window every parsed verdict is STALE,
-  so a lagging under-threshold pct cannot print a fresh-looking OK" — an argument
-  covering one direction only. In the other direction the ordering is a safety
-  inversion: the script's own STALE text says STALE "never blocks delegation",
-  and the delegation protocol agrees, so a reading that should have refused an
-  expensive dispatch instead waves it through. The usage header's claim
-  `exit: 2 STALE or unreadable (fail-closed)` is therefore false on the blocking
-  axis — exit 2 is fail-closed on *trusting the number* and fail-**open** on
-  *refusing work*, and the header conflates the two.
-  **Remedy sketch (asymmetric, not a reordering):** the reroute may suppress an
-  OK, never a PAUSE. Evaluate the pause axes first and let the reroute downgrade
-  only the non-blocking outcome — an over-threshold reading inside the login
-  window still exits 1, while an under-threshold one still exits 2 rather than
-  printing a fresh-looking OK. That keeps the comment's stated argument intact
-  and closes the direction it never addressed. The header line needs correcting
-  in the same unit, since it is the thing a reader trusts.
-  Debt: corrects the verdict semantics of shipped mechanism; adds no governed
-  name. Ships with gate-test fixtures pinning both directions inside the window.
-  **Premise re-verified 2026-07-22 by the scope survey, against the source:**
-  the reroute at `usage-verdict.sh:104-108` does precede the pause compares at
-  `:111-129` and does `exit 2` unconditionally; the `# exit:` header at `:4` does
-  read "2 STALE or unreadable (fail-closed)"; every STALE message in the file
-  says "never blocks delegation". All three facts hold and the contradiction is
-  on the file's own face. Filed 2026-07-22 by lead; promoted 2026-07-22 by scope
-  (operator ruling), ranked first of four.
-
 - **usage-verdict-login-mtime-conflation** — `usage-verdict.sh` derives
   `login_at` from `stat -c %Y` on `DELEGATION_KIT_CRED_FILE`, and the
   login-window reroute treats any recent mtime as an auth change ("auth changed
@@ -1093,5 +1061,7 @@
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
 ## Done
+
+- usage-verdict-login-reroute-fails-open
 
 ## Lessons Learned

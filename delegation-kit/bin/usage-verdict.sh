@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # spec: delegation-kit/SPEC.md §usage-verdict — trustworthy budget verdict from usage.txt
 # usage: usage-verdict.sh [usage-file [credentials-file]]   ($1/$2 override paths for test injection)
-#   exit: 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable (fail-closed)
+#   exit: 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable (budget unknown, never blocks)
 set -euo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -99,14 +99,6 @@ if (( age > STALE_AGE )); then
   exit 2
 fi
 
-# spec: delegation-kit/SPEC.md §usage-verdict — the reroute precedes the axis compares: within the window every parsed verdict is STALE, so a lagging under-threshold pct cannot print a fresh-looking OK
-cred_age=$(( now - login_at ))
-if (( login_at > 0 && cred_age >= 0 && cred_age < LOGIN_WINDOW )); then
-  append_sample STALE
-  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (auth changed ${cred_age}s ago; a /login starts fresh windows the server-fed pct lags; never blocks delegation — re-read or refresh before trusting the number)"
-  exit 2
-fi
-
 # spec: delegation-kit/SPEC.md §usage-verdict — two pause axes judged independently; the weekly axis arms only when both seven_day keys are present and its window is live
 pause_5h=0
 awk -v p="$pct" -v t="$PAUSE_PCT" 'BEGIN { exit !(p >= t) }' && pause_5h=1
@@ -126,6 +118,14 @@ if (( pause_5h || pause_7d )); then
     echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> PAUSE (5h window; at or over ${PAUSE_PCT}% of the live 5h window)"
   fi
   exit 1
+fi
+
+# spec: delegation-kit/SPEC.md §usage-verdict — the reroute follows the axis compares and may suppress only the non-blocking outcome: a lagging under-threshold pct still cannot print a fresh-looking OK, while an over-threshold reading inside the window still blocks
+cred_age=$(( now - login_at ))
+if (( login_at > 0 && cred_age >= 0 && cred_age < LOGIN_WINDOW )); then
+  append_sample STALE
+  echo "used=${pct}% age=${age}s resets_in=${resets_in}s width=${WIDTH} -> STALE (auth changed ${cred_age}s ago; a /login starts fresh windows the server-fed pct lags; never blocks delegation — re-read or refresh before trusting the number)"
+  exit 2
 fi
 
 append_sample OK

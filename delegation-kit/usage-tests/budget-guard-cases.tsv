@@ -10,6 +10,7 @@ advise	40	0	3600	-	OK under threshold -> advise (verdict rides in context)
 
 # block — PAUSE: over threshold, fresh, live window (the one sanctioned deny)
 block	95	0	3600	-	PAUSE over threshold -> block
+block	95	0	3600	60	PAUSE over threshold with a fresh login -> still block: the login reroute may suppress an OK, never a PAUSE
 
 # advise — budget unknown is decision-relevant but must never wedge delegation
 advise	40	1200	3600	-	stale reading -> advise, never block

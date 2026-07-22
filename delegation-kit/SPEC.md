@@ -211,21 +211,34 @@ three failure modes a raw percentage reading leaves open:
 3. **Post-login lag** — a fresh login starts a new window but the
    server-fed percentage lags it, and the file-write age check cannot see
    that. The gate reads the auth event from the credentials file's mtime
-   (`DELEGATION_KIT_LOGIN_WINDOW`); *every* parsed verdict within that window routes to
-   STALE (re-read), not only a would-be PAUSE — the reroute precedes the
-   axis compares. Confining it to the PAUSE branch would print OK for a
-   lagging percentage at or under the threshold: a fresh-looking chimera,
-   since the producer stamps the new account id while the percentage and
-   `resets_at` still carry the dead login's window. Self-limiting: once the
-   mtime ages out, a genuine near-limit percentage re-reads back to PAUSE.
-   An account switch swaps both windows, so no axis escapes the reroute.
-   The budget guard treats STALE as advise, never block, so the unconditional
-   reroute creates no dispatch blackout.
+   (`DELEGATION_KIT_LOGIN_WINDOW`) and, within that window, routes a
+   would-be OK to STALE (re-read). Letting the lag print OK would emit a
+   fresh-looking chimera, since the producer stamps the new account id while
+   the percentage and `resets_at` still carry the dead login's window.
+   Self-limiting: once the mtime ages out, the reroute stops firing.
 
-Check order: parse → RESET-OK → age-STALE → login-STALE → pause axes → OK.
+   **The reroute is asymmetric — it may suppress an OK, never a PAUSE.** It
+   therefore follows the axis compares rather than preceding them. The two
+   directions of a lagging reading have opposite costs: a lagging *low*
+   percentage printing OK invites a dispatch the budget may not afford, which
+   is what the reroute exists to prevent; a lagging *high* percentage
+   suppressed into STALE waves that dispatch through, because STALE is
+   advisory and never blocks (§The staleness contract). An unconditional
+   reroute closes the first and opens the second, so it must fire on the
+   non-blocking outcome only: inside the window an at-or-over reading still
+   exits 1 on whichever axis fired, and an under-threshold one still exits 2.
+   An account switch swaps both windows, so neither axis escapes the
+   suppression when the outcome is a would-be OK.
 
-Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. The
-bin's header declares that mapping, and the declaration is **machine-read** by
+Check order: parse → RESET-OK → age-STALE → pause axes → login-STALE → OK.
+
+Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. Exit
+2 is fail-closed on *trusting the number* and deliberately fail-open on
+*refusing work* — budget-unknown never blocks delegation — so it is never the
+code a reading that should refuse an expensive dispatch may land on. The bin's
+`# exit:` header declares that mapping, stating exit 2's consequence rather
+than labelling it a bare "fail-closed" (which named only the trust axis and
+read as a claim about the blocking one). That declaration is **machine-read** by
 `check-assertion-strength` (gate-sdk/SPEC.md), which derives the verdict
 vocabulary from it rather than carrying a literal — so the header is a surface
 with a consumer, not loose documentation, and rewording it reshapes what that
@@ -262,8 +275,9 @@ green. Refresh diagnostics are suppressed rather than mixed into the verdict
 output, which callers relay verbatim; the snapshot's age is the signal.
 `usage.txt` survives as last-known-good cache, source-agnostic seam, and test
 seam. A refresh inside the `DELEGATION_KIT_LOGIN_WINDOW` rewrites `updated_at` while the
-server-fed percentage may still lag the login by about a minute — the hoisted
-reroute correctly keeps those readings STALE for the window's duration.
+server-fed percentage may still lag the login by about a minute — the reroute
+correctly keeps those readings STALE for the window's duration, save the
+at-or-over ones it is forbidden to suppress.
 
 **The verdict-string contract.** Every line `usage-verdict` emits carries three
 parts: the **reading** (the measured fields), the **epistemic status** of that
@@ -609,9 +623,11 @@ carry a firing and a non-firing case — the fixture-pair discipline,
 transplanted — covering a weekly PAUSE while 5h is comfortable, the axis
 named in the output, absent keys disarming the weekly axis, a dead weekly
 window not pausing, each axis's at-or-over boundary (a reading exactly at the
-threshold pauses; just under does not), the hoisted login reroute (an
-under-threshold percentage with a fresh login is STALE, not OK — the defect
-the hoist closes), and the sample-append discipline (a parsed snapshot
+threshold pauses; just under does not), both directions of the login reroute
+(an under-threshold percentage with a fresh login is STALE, not OK; an
+at-or-over one on either axis is still PAUSE, not STALE — the asymmetry is
+what keeps the reroute from waving an unaffordable dispatch through), and the
+sample-append discipline (a parsed snapshot
 appends one line whatever the verdict; a non-numeric snapshot appends none;
 `pct_7d` present-vs-omitted in the passed-through line).
 

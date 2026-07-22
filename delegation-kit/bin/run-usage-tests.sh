@@ -177,5 +177,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "run-usage-tests: $fails/$ran case(s) failed"
     exit 1
 fi
-echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes and their at-or-over boundaries, the hoisted login reroute, the fan-width field, the demand-driven refresh (armed/fail-soft/short-circuit), and the sample-append discipline)"
+echo "run-usage-tests: ok ($ran cases across the OK/PAUSE/STALE/RESET-OK verdict table, both pause axes and their at-or-over boundaries, the login reroute in both directions (it suppresses an OK, never a PAUSE), the fan-width field, the demand-driven refresh (armed/fail-soft/short-circuit), and the sample-append discipline)"
 exit 0
