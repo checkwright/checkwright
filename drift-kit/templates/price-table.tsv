@@ -4,6 +4,14 @@
 # the roster of models you run is yours — a kit literal enumerating it would publish it (the
 # provenance seam / graph-vocab pattern), so this template ships the schema and placeholders only.
 #
+# priced-as-of: 2000-01-01 — replace with the date you last transcribed these numbers.
+# prices-valid-through: 2000-01-01 — optional; the last date every row is still true.
+# Drop this line if no row is time-boxed. Where one is (introductory pricing, a
+# scheduled change), this header owns that date and the prose below cites it rather
+# than restating it. Both headers are read by kpi-price-table-age (drift-kit/SPEC.md
+# §Bundled KPIs): age alone cannot see a cliff, since a freshly retyped table reads
+# freshest on the morning its prices stop being true.
+#
 # Tab-separated. One row per model id (the id as it appears in the transcript's message.model).
 # Columns are USD per single token (a $/MTok price ÷ 1,000,000). A model with no row here
 # degrades its cost cell to n/a — token counts still report; pricing is advisory, never required.

@@ -121,6 +121,38 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   reading-age caveats) and the gate-output share (`gate`/`total` — the axis the
   deferred economy levers target). `--trend` emits `ovh <pct>%`. Degrades
   fail-visible to a "run bin/overhead-meter.sh" n/a row when the log is absent.
+- **kpi-price-table-age** — two rows off the consumer price table
+  (`DRIFT_KIT_PRICE_TABLE`, §The stage-economics meter input 3): the age in days
+  of its `priced-as-of:` header, and the time to — or past — its optional
+  `prices-valid-through:` header. **Both, because at the moment that matters they
+  point opposite ways.** Age measures when someone last *typed* the numbers;
+  expiry is when the numbers *stop being true*, and nothing makes the first
+  predict the second. The failure is an inversion rather than a correlation gap:
+  a table retyped the day before a known introductory-pricing row lapses reads
+  `priced 1d ago` — freshest exactly when it is least trustworthy. An age-only
+  KPI would read reassuringly at the one moment it was built to flag, which is
+  why the expiry row exists. Full mode emits
+  `priced <N>d ago (as-of <date>)` and either
+  `expires in <N>d (through <date>)` or
+  `EXPIRED <N>d ago — re-verify (through <date>)`; `--trend` emits `price <N>d`
+  and nothing when the age is `n/a`. The expiry row volunteers no second
+  fragment — the trend line takes at most one per plugin (§The KPI plugin
+  contract) and staleness is the one already specified. Age counts from the
+  wall clock (the `kpi-deferred-age` idiom); expiry counts whole calendar days
+  against the through-date, which is a calendar claim: `expires in 0d` on the
+  last valid day, `EXPIRED 1d ago` the next. Degrades per row and fail-visible:
+  `n/a (no priced-as-of: header)`, `n/a (unparseable priced-as-of date)`, and
+  for the expiry row `n/a (no prices-valid-through: header)` /
+  `n/a (unparseable prices-valid-through date)`. With **no table at all** it
+  emits the single `n/a (no price table)` age row and no expiry row — a table
+  that is not there has no expiry to report, and one row per absent surface is
+  the report's row-count shape. Advisory like every KPI: it never joins
+  `gates.list`. A freshness *gate* is ruled out by construction — prices are a
+  dated literal with no machine-readable feed, so checking them would mean
+  fetching externally, which reds on causes no commit produced and breaks
+  hermeticity (site-kit/SPEC.md §The monitor boundary). Reading a date in-tree
+  needs no network. The mechanism is kit-generic; no model id, price, or roster
+  enters the kit (§The stage-economics meter, the provenance seam).
 
 Lag:
 
@@ -441,6 +473,18 @@ priced cost, never the account the tokens billed to.
    ships `templates/price-table.tsv` with placeholder rows and the column schema;
    the consumer copies it and fills their roster. Resolved from
    `DRIFT_KIT_PRICE_TABLE` (§Layout and configuration).
+   **Two dating headers, on the same consumer-owned header block.** Each is read
+   as the first line of the file matching
+   `^#[[:space:]]*<field>:[[:space:]]*<YYYY-MM-DD>`, trailing prose on the same
+   line ignored: `priced-as-of:` (when the numbers were last transcribed) and
+   `prices-valid-through:` (the last date every row is still true, **optional**).
+   Their reader is `kpi-price-table-age` (§Bundled KPIs), not this meter — the
+   KPI reads the table's header and never its rows, so an expired table still
+   prices, loudly rather than silently, and the meter's arithmetic is untouched
+   by either header. Where a row is time-boxed, `prices-valid-through:` **owns**
+   that date and the file's own prose cites the header rather than restating it;
+   a second copy of a date the day it becomes machine-read is the duplication
+   the header exists to remove (de-literalization).
 
 **Degradation.** An absent live state file is a notice and the run continues to
 the history arm — committed history can carry stamps for a file absent from the
@@ -743,7 +787,18 @@ asserts exactly one supervision row is emitted for the iteration carrying the
 lead transcript's own usage, that the dispatched session keeps its own stage row,
 that the row's label is `DRIFT_KIT_SUPERVISION_LABEL`'s value rather than a
 literal, and that a stamp naming the label suppresses the row with the collision
-notice. Gate-sdk's `check-shellcheck` lints all kit sources as usual.
+notice. `kpi-price-table-age` is fixture-stable in the same way — it reads two
+dates out of a file the fixture writes — so `smoke/install.sh` drives it over
+purpose-built tables and asserts the age row, the `price <N>d` trend fragment,
+each header's absence degrading its own row independently, and — **the
+inversion the KPI exists for** — that a table whose `priced-as-of:` is *today*
+and whose `prices-valid-through:` has passed reads a fresh age row and an
+`EXPIRED` expiry row in the same breath. A fixture that pins only the age row
+has not tested the feature: the age row is reassuring in exactly that case,
+which is the defect. The no-table degradation is asserted to emit its single
+`n/a (no price table)` row, and the report-wide one-row-per-registered-KPI
+assertion covers that shape from the other side. Gate-sdk's `check-shellcheck`
+lints all kit sources as usual.
 
 ## Out of scope
 

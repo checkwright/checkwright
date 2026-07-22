@@ -13,6 +13,7 @@ kpi-always-loaded
 kpi-settings-local
 kpi-gate-runtime
 kpi-overhead
+kpi-price-table-age
 
 # Lag — weighted low; undercounts by construction. kpi-knowledge-friction reads
 # drift-kit's knowledge-friction loop (its capture convention + close triage);

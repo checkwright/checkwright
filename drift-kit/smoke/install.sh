@@ -142,6 +142,66 @@ set -e
 if grep -q 'n/a' <<<"$kmd"; then fail "writer/reader default divergence: reader missed the log the writer wrote under one DRIFT_KIT_METRIC_DIR override"; fi
 [[ "$(grep -c '^lead' <<<"$kmd")" -eq 2 ]] || fail "kpi-overhead did not read the metric-dir log the meter wrote"
 
+# spec: drift-kit/SPEC.md §Testing — kpi-price-table-age over purpose-built tables: the
+# dated-header reads, each row's independent degradation, and the inversion the KPI
+# exists for (fresh age, expired prices, in one report).
+ptkpi() { DRIFT_KIT_PRICE_TABLE="$1" bash "$SMOKE_KIT_ROOT/kpis/kpi-price-table-age.sh" "${2:-}"; }
+
+pt_both="$work/pt-both.tsv"
+cat > "$pt_both" <<EOF
+# priced-as-of: $(date -d '3 days ago' +%F) — trailing prose the reader must ignore
+# prices-valid-through: $(date -d '10 days' +%F)
+# model	input	output	cache_read	cache_creation
+test-model	0.000001	0.000002	0.0000001	0.000002
+EOF
+set +e
+ptout="$(ptkpi "$pt_both")"; ptrc=$?
+set -e
+[[ "$ptrc" -eq 0 ]] || fail "kpi-price-table-age exited $ptrc (advisory plugins always exit 0)"
+[[ "$(grep -c '^lead' <<<"$ptout")" -eq 2 ]] || fail "kpi-price-table-age did not emit its two lead rows over a fully dated table"
+grep -q 'priced 3d ago (as-of' <<<"$ptout" || fail "age row did not read the priced-as-of: header: $ptout"
+grep -q 'expires in 10d (through' <<<"$ptout" || fail "expiry row did not read the prices-valid-through: header: $ptout"
+pttrend="$(ptkpi "$pt_both" --trend)"
+[[ "$pttrend" == 'price 3d' ]] || fail "kpi-price-table-age --trend not 'price 3d': $pttrend"
+
+pt_inv="$work/pt-inverted.tsv"
+cat > "$pt_inv" <<EOF
+# priced-as-of: $(date +%F)
+# prices-valid-through: $(date -d 'yesterday' +%F)
+# model	input	output	cache_read	cache_creation
+test-model	0.000001	0.000002	0.0000001	0.000002
+EOF
+ptinv="$(ptkpi "$pt_inv")"
+grep -q 'priced 0d ago' <<<"$ptinv" || fail "inversion fixture: age row should read fresh (0d), got: $ptinv"
+grep -q 'EXPIRED 1d ago — re-verify (through' <<<"$ptinv" \
+    || fail "inversion fixture: a lapsed prices-valid-through: must read EXPIRED even beside a fresh age row: $ptinv"
+[[ "$(ptkpi "$pt_inv" --trend)" == 'price 0d' ]] \
+    || fail "inversion fixture: the trend fragment tracks age only, and must still emit"
+
+pt_noexp="$work/pt-noexpiry.tsv"
+printf '# priced-as-of: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' "$(date -d '1 day ago' +%F)" > "$pt_noexp"
+ptne="$(ptkpi "$pt_noexp")"
+grep -q 'priced 1d ago' <<<"$ptne" || fail "age row must still report when the optional expiry header is absent: $ptne"
+grep -q 'n/a (no prices-valid-through: header)' <<<"$ptne" \
+    || fail "absent optional expiry header must degrade its own row visibly, not the age row: $ptne"
+
+pt_noage="$work/pt-noage.tsv"
+printf '# prices-valid-through: %s\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' "$(date -d '5 days' +%F)" > "$pt_noage"
+ptna="$(ptkpi "$pt_noage")"
+grep -q 'n/a (no priced-as-of: header)' <<<"$ptna" || fail "absent priced-as-of: must degrade the age row visibly: $ptna"
+grep -q 'expires in 5d' <<<"$ptna" || fail "the expiry row degrades independently of the age row: $ptna"
+[[ -z "$(ptkpi "$pt_noage" --trend)" ]] || fail "--trend must emit nothing when the age value is n/a"
+
+pt_bad="$work/pt-bad.tsv"
+printf '# priced-as-of: not-a-date\n# prices-valid-through: 2026-13-45\ntest-model\t0.000001\t0.000002\t0.0000001\t0.000002\n' > "$pt_bad"
+ptbad="$(ptkpi "$pt_bad")"
+grep -q 'n/a (unparseable priced-as-of date)' <<<"$ptbad" || fail "malformed priced-as-of must read as unparseable, not as absent: $ptbad"
+grep -q 'n/a (unparseable prices-valid-through date)' <<<"$ptbad" || fail "malformed prices-valid-through must read as unparseable, not as absent: $ptbad"
+
+ptmiss="$(ptkpi "$work/no-such-price-table.tsv")"
+[[ "$(grep -c '^lead' <<<"$ptmiss")" -eq 1 ]] || fail "with no table the KPI emits one row, not an expiry row for a table that is not there: $ptmiss"
+grep -q 'n/a (no price table)' <<<"$ptmiss" || fail "absent price table must degrade fail-visibly: $ptmiss"
+
 # spec: drift-kit/SPEC.md §Testing — the stage-economics join over a synthetic fixture set:
 # a WORKFLOW-STATE stamp file, a transcript whose basename normalizes to the stamped
 # session8, and a placeholder price table. Known tokens in, known trend line out.

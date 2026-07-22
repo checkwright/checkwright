@@ -124,6 +124,7 @@ leaves its section absent.
 | [drift-kit](drift-kit/index.md) | kpi-settings-local |
 | [drift-kit](drift-kit/index.md) | kpi-gate-runtime |
 | [drift-kit](drift-kit/index.md) | kpi-overhead |
+| [drift-kit](drift-kit/index.md) | kpi-price-table-age |
 | [drift-kit](drift-kit/index.md) | kpi-knowledge-friction |
 
 ## Guards

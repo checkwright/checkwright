@@ -4,8 +4,13 @@
 #
 # priced-as-of: 2026-07-20 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
-# so this file goes stale silently; re-verify against the published table when the
-# staleness advisory raises it.
+# so nothing but this date says when it was last checked; re-verify against the
+# published table when kpi-price-table-age raises it.
+#
+# prices-valid-through: 2026-08-31 — the last date every row below is still true.
+# Both headers are read by kpi-price-table-age (drift-kit/SPEC.md §Bundled KPIs):
+# age alone cannot see a cliff, since a freshly retyped table reads freshest on the
+# morning its prices stop being true.
 #
 # cache_creation encodes the 1-HOUR cache-write price (2x base input). Sessions here
 # run a 1h prompt-cache TTL; the 5-minute write (1.25x base input) applies only when
@@ -13,8 +18,8 @@
 # Cache reads dominate the totals by one to two orders of magnitude, so the convention
 # moves the result far less than the cache_read column does.
 #
-# KNOWN CLIFF — 2026-09-01: the Sonnet 5 row is INTRODUCTORY pricing, in effect through
-# 2026-08-31. On 2026-09-01 it becomes 3 / 15 / 0.30 / 6 per MTok, i.e.
+# KNOWN CLIFF: the Sonnet 5 row is INTRODUCTORY pricing. Past the prices-valid-through:
+# date above it becomes 3 / 15 / 0.30 / 6 per MTok, i.e.
 # input 0.000003, output 0.000015, cache_read 0.0000003, cache_creation 0.000006.
 # That moves the Opus:Sonnet ratio from 2.5x to ~1.67x on every column — any tier
 # comparison run after that date against these numbers overstates the saving.
