@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-budget-oracle-honesty release v0.12.0 — minor: Behavior changes non-empty (the login reroute no longer suppresses a PAUSE, the verdict now reads the trend log, the smoke strips the DELEGATION_KIT_ namespace); tightened gates and renamed knobs both None
-
