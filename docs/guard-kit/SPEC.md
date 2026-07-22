@@ -33,7 +33,8 @@ conventions without depending on its registry.
    appended to the friction log. An *approved* prompt is invisible to the
    agent, so this log is the only record.
 2. **Close time** — `bin/scan-prompts.sh` filters the log against the
-   committed allowlist and ranks what actually prompted, grouped by command
+   committed allowlist and ranks what survives (§scan-prompts states the
+   local-overlay upper bound), grouped by command
    pattern. Each recurring pattern is resolved by the **triage criterion**
    (below); `bin/compare-settings-allow.sh` lists the local-overlay entries
    a committed glob already grants (the deterministic prune set). Then the
@@ -311,8 +312,15 @@ surface via a quoted `-m` span or a `-F <file>` the hook never reads.
 
 Advisory: surfaces recurring permission-prompt sources from the friction
 log, filtering against the committed allowlist and the harness's built-in
-read-only git/docker auto-allows, so only commands that actually prompted
-remain. Grouped and ranked by pattern (leading binary, plus subcommand for
+read-only git/docker auto-allows, so what remains is what the *committed*
+allowlist does not cover. **Honest limit — the survivors are an upper bound
+on prompting, not a measurement of it.** `GUARD_KIT_SETTINGS_LOCAL` is not
+read here, by design: a command granted only by the local overlay did not
+prompt, yet is exactly the triage candidate the close step must see, to
+promote or prune. So a consumer carrying a local overlay reads survivors
+(and the `--count` token behind `kpi-prompt-friction`) as inflated by
+however much that overlay grants. Grouped and ranked by pattern (leading
+binary, plus subcommand for
 the common multi-command binaries). Triaged at close by the criterion
 above. `--count` emits a compact `<patterns>/<occurrences>` token for a
 drift-KPI consumer; an explicit file argument overrides the log path (test

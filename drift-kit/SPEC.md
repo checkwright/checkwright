@@ -88,6 +88,11 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   the queue file and git. gate-sdk's check-commit-subject is the parse
   guarantee this classification assumes — every subject carries a roster
   type, so a mistyped prefix is a blocked commit, not a miscounted row.
+  A slug reaches its subject through `git log -1 --grep=<slug>`, so the
+  classification rests on the landing commit's *message naming the slug*;
+  a Done slug no commit message mentions counts as unclassified however
+  correctly that commit is typed, and a later `chore` commit naming the slug
+  wins the lookup over an earlier `fix` that did not.
 - **kpi-gate-backlog** — proposed-but-absent gates: `check-*`/`scan-*`
   names appearing anywhere in the queue with no file in any gate-resolution
   dir, over the live gate count. A name with a file on disk is built and

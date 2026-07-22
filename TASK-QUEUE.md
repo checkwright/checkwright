@@ -63,6 +63,107 @@
   naming the exact recurring command; filed by scope at lead instruction after
   verifying the placement claim against `enter-stage.sh`.
 
+- **done-slug-commit-naming-gate** [needs-spec] — `kpi-task-split` reads a Done
+  slug's feature/debt class off the commit its message names, via
+  `git log -1 --grep=<slug>`. Nothing requires a landing commit to name its
+  slug, so a correctly-typed `fix` commit that omits it leaves the row
+  **unclassified** and the KPI reports `0f/0d`. Reproduced this iteration on all
+  four units: `1dac2f9`, `9c5aeb2`, `a740a7b` are each typed `fix(delegation)`
+  and each moves its slug(s) into Done **in the same commit**, yet none names a
+  slug in its message — so the newest matching commit for every one of the four
+  is the `chore(scope)` opener, and the split read `0f / 0d of 4 done (4
+  unclassified)` for an iteration that was unambiguously four debt units.
+  **Gap generalization — this class is gateable, and precisely.** The commit-msg
+  hook holds both inputs the rule needs: a commit whose diff **adds a slug line
+  to the queue's Done section** must name that slug in its message. Both halves
+  are mechanical, the trigger is narrow (only Done-moving commits arm it), and
+  there is no judgment in the match — the low-false-positive contract looks
+  satisfiable without a new vocabulary. The queue-section parse already exists in
+  `kpi-task-split`'s awk and in queue-kit's gates.
+  **Open design (why `[needs-spec]`, not a build unit):** whether the rule binds
+  the *moving* commit or merely requires *some* commit in the range to name the
+  slug — a build may legitimately land the fix in one commit and move the queue
+  line in another, and the strict form would then red on a correct sequence. That
+  choice decides the gate's shape and its false-positive surface, and it is a
+  queue-kit-vs-gate-sdk placement call besides (queue-format knowledge versus
+  commit-message mechanism).
+  **Cost while deferred:** low per-iteration but silently compounding — the
+  headline lead KPI reads `n/a`-shaped noise whenever the convention lapses, and
+  the lapse is invisible until close reads the report. `trajectory.sh` is
+  unaffected (it splits range commits by subject and recorded this iteration's
+  debt correctly), so the published evidence stays honest; what degrades is the
+  live dashboard the lead steers by. Bounded: nothing breaks, no gate reds.
+  Debt: converges a KPI onto a stated convention; adds no governed name unless
+  the gate lands. Filed 2026-07-22 by close, from this iteration's own
+  unclassified split.
+
+- **scan-prompts-local-overlay-blind** [needs-spec] — `bin/scan-prompts.sh`
+  filters the friction log against `GUARD_KIT_SETTINGS` (the committed
+  allowlist) only. `GUARD_KIT_SETTINGS_LOCAL` exists in `lib/guard.sh` and
+  `compare-settings-allow.sh` reads it, but the ranker never does — so a command
+  granted solely by the local overlay is reported as a prompting call although it
+  did not prompt. Concretely this iteration: `gh issue list --state open`,
+  `gh pr list --state open`, and the bare `gh release create` are all covered by
+  `.claude/settings.local.json` globs and all three appear in the ranked
+  survivors, so **at least 4 of the 23 reported calls never prompted anyone**
+  (a fourth, an exact-string local entry, is counted below). With 90 local
+  entries live here the inflation is structural, not incidental.
+  **The claim was the defect, and it is already corrected** — guard-kit/SPEC.md
+  §scan-prompts said "so only commands that actually prompted remain", which is
+  false for any consumer with an overlay; it now states the honest limit and the
+  design reason the overlay is excluded (a locally-granted command is exactly the
+  triage candidate close must see, to promote or prune). What is *not* settled,
+  and is this entry, is the mechanism.
+  **Open design:** three arms, genuinely undecided. (a) Keep committed-only
+  filtering and rename the output/KPI so nothing claims to count prompts —
+  cheapest, but leaves `kpi-prompt-friction` a mixed quantity. (b) Read both
+  files and report two numbers — prompted versus committed-uncovered — which is
+  the honest shape but doubles the KPI's surface and its fixtures. (c) Read both
+  and rank the overlay-covered survivors in a separate, visibly-advisory section,
+  which preserves the promote-or-prune worklist while making the prompt count
+  true. Note (b)/(c) inherit a second inaccuracy the committed path already has:
+  `allowed()` glob-matches the whole command string, so `git *` matches a
+  compound the harness would split and refuse — a wider filter is *more* wrong on
+  compounds, not less, and any arm that reads more settings must settle the
+  compound semantics first.
+  **Cost while deferred:** low and non-rotting now that the SPEC states the
+  limit; the residue is that the friction trend line the lead steers by is an
+  upper bound of unknown slack, so a real regression and an overlay artifact read
+  identically. Debt: converges an advisory tool onto its own contract; adds no
+  governed name. Filed 2026-07-22 by close, from this iteration's tooling-friction
+  triage.
+
+- **scratch-execution-prompt-friction** [needs-spec] — this repo's `bash-guard`
+  actively steers every scratch write into repo-local `.tmp/` (CLAUDE.md
+  §Housekeeping; the harness scratchpad is refused by name), and nothing
+  allowlists *executing* what lands there — so `bash .tmp/<probe>.sh` prompts on
+  every run, forever. Measured this iteration: 4 calls on one build probe, plus 3
+  more in the close session's audit sweep, on a shape the repo's own guard
+  mandates. The loop is self-inflicted: the guard creates the directory
+  convention, and the permission posture penalizes it.
+  **Widening the allowlist is not obviously the fix, which is why this is
+  `[needs-spec]`.** `Bash(bash .tmp/*.sh)` auto-approves running an
+  agent-authored script whose *contents* no one reviewed — it converts a visible
+  command into an opaque one, which is the opposite of what the prompt exists to
+  do. The competing arms: (a) allowlist it and accept that scratch execution is
+  agent-trusted, arguing the agent could inline the same code anyway; (b) steer
+  to inlining, which works for short probes and fails for genuine multi-line
+  sweeps (this close's audit sweep is one — loops and arrays, not inlineable);
+  (c) give the boundary a named, gated scratch-runner so the *shape* is
+  allowlistable while the content stays visible in the log. Arm (b) is already
+  known-insufficient from this session's own experience, which is the evidence
+  the entry rests on.
+  **Deliberately not folded into `boundary-scratch-wipe-unowned`** — that entry
+  is about *wiping* `.tmp/` at the boundary and needs a preserve-list knob; this
+  is about *executing* from it and needs a trust ruling. Same directory, unrelated
+  questions.
+  **Cost while deferred:** low per-call, paid by the operator, and rising with
+  build-probe volume — every reproduction harness costs interruptions
+  proportional to how many times it is re-run, which penalizes exactly the
+  iterative probing that finds real defects. Bounded: nothing breaks.
+  Debt/policy: a permission-posture ruling; adds no governed name unless arm (c)
+  ships. Filed 2026-07-22 by close, from this iteration's tooling-friction triage.
+
 - **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
   fixture asserting `enter-stage.sh --simulate <stage>` leaves the tree
   byte-identical after a *successful* (non-refused) boundary entry. The guard
@@ -89,6 +190,13 @@
   in one iteration's friction log. Fix: treat a `;`-separated compound as
   steerable when every segment is itself a bare read, leaving genuine
   pipe/redirect composition untouched; ships with the good/bad fixture pair.
+  **Recurred 2026-07-22** (`budget-oracle-honesty` close triage): 3x `cat` + 2x
+  `find`, plus two `;`-joined all-`git`-read compounds. Three of the five were
+  emitted by the close session itself while reading four small config files —
+  the strongest form of the argument, since a session executing the triage that
+  owns this entry still reached for the batched read. One `find` is the separate
+  `boundary-scratch-wipe-unowned` wipe and is not this class. Two iterations of
+  recurrence now, with no counter-evidence.
   Debt: refines an existing guard rule, adds no governed name. Filed 2026-07-20
   by tooling-friction triage during the `render-fidelity-leak-coverage` close.
 
@@ -975,10 +1083,5 @@
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
 ## Done
-
-- usage-verdict-login-reroute-fails-open
-- usage-verdict-login-mtime-conflation
-- usage-verdict-roll-witness-unused
-- delegation-smoke-history-pollution
 
 ## Lessons Learned
