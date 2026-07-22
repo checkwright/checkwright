@@ -74,6 +74,7 @@
       "Bash(bash queue-kit/bin/lesson-sink.sh *)",
       "Bash(bash evidence-kit/bin/run-validate.sh)",
       "Bash(bash evidence-kit/bin/run-validate.sh *)",
+      "Bash(bash demo/run-demo.sh)",
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(: > .workflow/knowledge-friction.log)",
       "Bash(rm .tmp/*)",

@@ -52,3 +52,4 @@
 | carry-forward-durability | sc sp a b v c | 4f/0d | 3 · ≤0d | 20s clean | 77 |
 | render-fidelity-leak-coverage | sc sp · b v c | 1f/0d | 0 | 20s clean | 77 |
 | lifecycle-rule-placement | sc sp · b v c | 0f/2d | 0 | 40s 1✗ | 77 |
+| stage-economics-honesty | sc sp a b v c | 1f/2d | 1 · ≤1d | 20s clean | 77 |

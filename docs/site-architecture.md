@@ -75,6 +75,15 @@ recoverable:
   here, never in a kit. `docs/value.md` holds the nav slot; `docs/enforcement.md`
   and `docs/footprint.md` persist as its off-nav drill-downs, link-reachable from
   it.
+- **The KPI-roster fan-out** — a `scripts/kpis.list` edit is the widest single
+  trigger on this page: adding or removing one KPI moves **four** byte-gated
+  surfaces, not the one or two an amendment naturally names — the on-site SPEC
+  mirror (the owning kit's SPEC documents the KPI), `docs/enforcement.md` (the
+  KPI joins the class registry), `docs/footprint.md` (the KPI script is a new
+  file with a token cost), and `docs/value.md`'s rollup block (its per-kit
+  Advisory count is derived from the enforcement map). Each of the four gates
+  names its own regen command on a red, so recovery is mechanical once the
+  fan-out is known — knowing it in advance is the part nothing else states.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
   section holds the toolchain list to env-probe's probe set:
   `check-install-toolchain` asserts name-set parity between its

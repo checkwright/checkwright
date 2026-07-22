@@ -820,6 +820,18 @@
   get killed mid-flight, paying the full cost for no result.
   Filed 2026-07-22 by lead, auditing the reroute's ordering after a live
   `usage-verdict.sh` misfire.
+  **Close triage 2026-07-22 — verified against the source, not endorsed on the
+  filing's word, and ranked first of the four for the next scope.** The reroute
+  at `usage-verdict.sh:104-108` does precede the pause compares at `:111-129` and
+  does `exit 2` unconditionally; the `# exit:` header at `:4` does read "2 STALE
+  or unreadable (fail-closed)"; and every STALE message in the file says "never
+  blocks delegation". So the three facts the entry rests on all hold, and the
+  contradiction is on the file's own face — the header promises fail-closed while
+  the branch it describes is the one path that can wave through an
+  over-threshold reading. Ranking basis: it is the only one of the four whose
+  failure direction *costs* something (a dispatch launched at the budget wall and
+  killed mid-flight, paying full cost for no result); the other three degrade
+  signal quality without ever unblocking work.
 
 - **usage-verdict-login-mtime-conflation** [needs-spec] — `usage-verdict.sh`
   derives `login_at` from `stat -c %Y` on `DELEGATION_KIT_CRED_FILE`, and the
@@ -843,6 +855,14 @@
   session resume, each one an operator budget judgement made with no oracle.
   Filed 2026-07-22 by lead, tracing the misfire's fake auth event to cred-file
   mtime.
+  **Close triage 2026-07-22 — ranked second of the four.** It is the *cause* of
+  the observed misfire and so reads as the headline, but its damage is confined
+  to signal quality: a fake auth event can only push a verdict toward STALE,
+  which never blocks. `usage-verdict-login-reroute-fails-open` is what converts
+  that same blind spot into an unblocked dispatch, which is why it ranks ahead
+  despite being the less visible defect. Specify this one with
+  `usage-verdict-roll-witness-unused` as both entries say — the roll witnesses
+  are the principled replacement for the mtime proxy, not a separate feature.
 
 - **usage-verdict-roll-witness-unused** [needs-spec] — the login-window reroute
   tests cred mtime alone, though `usage-verdict.sh` already holds enough state to
@@ -865,6 +885,17 @@
   one unit.
   Filed 2026-07-22 by lead, on noticing the snapshot already refuted the
   reroute's premise.
+  **Close triage 2026-07-22 — a third witness already ships, and it is
+  precedent.** `usage-verdict.sh:90-94` exits RESET-OK when `resets_at - now <=
+  0`, i.e. when the snapshot is itself from a dead window — and that branch is
+  ordered **before** the reroute at `:104`. It does not cover this entry's case
+  (a window that rolled *between* samples, where the re-polled snapshot carries a
+  fresh `resets_at`), so it is not a duplicate. Its value to the spec pass is
+  ordering precedent: the file already accepts that a demonstrated roll outranks
+  the login-window reroute, so placing the two history-derived witnesses ahead of
+  the reroute extends an existing decision rather than inverting one. Ranked
+  third of the four; specify with `usage-verdict-login-mtime-conflation` as the
+  entry says.
 
 - **delegation-smoke-history-pollution** [needs-spec] — `delegation-kit/smoke/`
   `install.sh` pins `DELEGATION_KIT_CRED_FILE` and both PAUSE thresholds around
@@ -896,12 +927,134 @@
   never happened.
   Filed 2026-07-22 by lead; verified by build against the live log and a
   controlled scratch run.
+  **Close triage 2026-07-22 — ranked fourth of the four, and deliberately not
+  promoted.** Its own evidence is what deranks it: the controlled harness run
+  appends nothing, so the exposure needs an out-of-harness invocation or an
+  absolute-path consumer to bite. That makes it the slowest-compounding of the
+  four. It is also the only one of the four that is not a `usage-verdict.sh`
+  semantics fix, so folding it into their spec pass would widen that unit's
+  surface for no shared design. Pick it with the roster half of
+  `hermetic-bin-roster-config`, which is its detector.
+
+- **stage-tiering-unit-is-the-batch** [needs-spec] — the lead binding tiers
+  models by **stage** (`lifecycle-kit/templates/lead.md` §Economics, "Tier each
+  stage to its work class"), but work class varies **within** a stage. This
+  iteration is the proof: `build` ran three batches, and batch 2a (a one-line
+  hermeticity pin) and batch 2b (a new KPI plugin plus four queue filings) sat in
+  the same `build` stage with opposite work classes. Stage is the wrong tiering
+  unit; the **batch** is the right one — and the lead already owns the batch
+  split, since the neighbouring bullet in that same section says to "split where
+  the model tier changes", which presupposes a per-batch tier the per-stage rule
+  never provides.
+  **This is a reconciliation, not a new policy.**
+  `delegation-kit/templates/agent-execution.md` already mandates selection at the
+  unit level: "Match the dispatched model and effort to the unit's shape";
+  selection "sits with the dispatching session"; the class ladder derives "from
+  the harness's **live model roster at dispatch time**"; and "a standing choice
+  lands in a tracked agent-type definition, never per-dispatch habit". The lead
+  binding sits *under* that doctrine, so its per-stage tiering is a **coarsening
+  that contradicts the finer rule already in force**. That framing also indicts
+  this iteration's own success: the Sonnet dispatch for 2a was the right answer
+  reached by the wrong route — per-dispatch habit, the anti-pattern the doctrine
+  names by name. The deliverable is convergence of the lead binding onto the rule
+  it already inherits, not the invention of a tiering policy.
+  **The substantive design content — `/spec` emits a work-class label per delta,
+  never a model recommendation.** A model name written into an amendment is drift
+  by construction against a churning roster (the doctrine's own reason for
+  deriving the ladder at dispatch time), and a spec-time model *recommendation*
+  attaches to a batch that does not exist yet, because the lead cuts batches at
+  build. A work-class label — **mechanical** vs **design-bearing** — is durable,
+  roster-independent, and is genuinely information spec holds that the lead does
+  not: spec knows what each delta demands, the lead knows only what the queue
+  entry says. The lead then maps class → live model at dispatch time, which keeps
+  the roster dependency where the doctrine already puts it. This iteration's own
+  amendment is the worked example: Delta B and the hermeticity rider were
+  mechanical; Delta A was not.
+  **Evidence, stated honestly — n=1, confounded, and smaller than it looks.**
+  Batch 2a cost $1.4131 on Sonnet against build 1's $9.3255 on Opus, but that gap
+  is **not** $7.9 of tier saving: cost here is dominated by cache reads (2a
+  2,797,771; build 1 9,541,533), so most of the spread is unit size, not tier.
+  Repricing 2a's *own* token volume at Opus rates gives a $3.5329 counterfactual,
+  so the tier itself saved **$2.1198** on that unit — with quality holding, since
+  2a caught an error in the lead's own dispatch brief and mutation-tested its own
+  fix. One unit, one iteration, no control: this is a plausibility argument for
+  the mechanism, not a measured effect size.
+  **A second honesty caveat the price table forces.** `scripts/price-table.tsv`
+  carries a KNOWN CLIFF: the Sonnet row is introductory pricing, and past its
+  `prices-valid-through: 2026-08-31` the Opus:Sonnet ratio falls from 2.5x to
+  ~1.67x on every column. Repricing 2a post-cliff gives a $1.41 saving rather than
+  $2.12 — a third of the benefit evaporates on a calendar date, with no code
+  change. Any tier ruling this entry reaches must be re-read against the table's
+  headers rather than against these figures, which is precisely what
+  `kpi-price-table-age` (shipped this iteration) exists to raise.
+  **Why the figures are usable at all:** this is the first iteration whose meter
+  output is trustworthy, because it is the iteration that fixed the meter's
+  attribution (`stage-economics-attribution-honesty`, Done). Every prior
+  per-stage figure in the queue predates that fix and should not be compared
+  against these.
+  Debt/analysis: reconciles a consumer binding to the doctrine above it and adds
+  a label to `/spec`'s output contract; adds no governed name.
+  **Cost while deferred:** low per iteration, structurally compounding — each
+  build stage either pays the Opus premium on mechanical batches or reaches the
+  cheaper tier by habit, and habit is the failure mode the doctrine already
+  forbids. Sibling to `build-stage-tier-economics`, which asks whether *the build
+  stage* downgrades; this entry argues that question is malformed because the
+  stage is not the unit.
+  Filed 2026-07-22 by close, from a lead-side economics review of this
+  iteration's own priced rows.
+
+- **supervision-overhead-unmeasured** [needs-spec] — the `supervision` row is
+  now the iteration's third-largest line and has never been examined. Re-derived
+  at this close: supervision **$6.9870 of a $37.26 iteration total, 18.8%** —
+  larger than every stage but build 1 ($9.3255), and larger than scope ($5.3941),
+  spec ($5.2158), and align ($3.2266) individually. It went unexamined because
+  until Delta B landed *this iteration* it was **not a distinct row at all** —
+  the lead's burn was attributed nowhere. Note the scale comparison that makes
+  this the priority: `stage-tiering-unit-is-the-batch` (above) fights over ~$2 of
+  build-tier spread; this line is more than three times that.
+  **First experiment, to run as recorded here:** run the **next** iteration's
+  lead session on Sonnet and measure it against this iteration's Opus baseline of
+  $6.9870. The `supervision` row makes that a clean A/B, which is exactly what
+  Delta B was built to enable. It could not be tried mid-iteration — a session
+  cannot re-tier itself — so the binding change necessarily applies to a future
+  lead session, and the baseline above is the number it is measured against.
+  **A measurement caveat on the baseline itself:** supervision is the only row
+  still growing while close runs, so any figure quoted for it is a snapshot. The
+  lead's own mid-close read was $6.4552 (17.6% of $36.72); this close's read is
+  $6.9870. The A/B must therefore compare rows read at the *same* lifecycle
+  point, not two convenience snapshots.
+  **The risk this experiment carries, which is a different class from
+  validate's.** Supervision is where **rulings** happen. This iteration's
+  highest-judgment act was a supervision-axis ruling — the intent oracle's
+  finding that age *inverts* at a cliff, which redirected the whole
+  `price-table-age-kpi` unit and is the reason it shipped an expiry header rather
+  than an age-only KPI. Downgrading the tier that makes rulings is not the
+  already-vindicated validate downgrade, whose rows are mechanical
+  oracle-running; the failure mode is not a bigger bill but a **bad ruling that
+  costs a rebuild**, which the cost row would score as a *saving*. So the
+  experiment needs a **quality read alongside the cost read**, and the design
+  question this entry owes is what that read is — a rebuild count, an escalation
+  correctness sample, or an honest ruling that the axis is unmeasurable at n=1.
+  **What cannot be harvested by delegation.** Supervision splits internally the
+  same way `build` did — mechanical routing/verification versus genuine rulings —
+  so the batch-tiering answer looks transferable. It is not: the verification
+  half is **not delegable away from the supervising session**, because the
+  supervisor re-running the battery and diffing every agent commit *is* the
+  protocol (`delegation-kit/templates/agent-execution.md`, "Validate after every
+  agent commit"). A supervision split can therefore be tiered but not delegated,
+  which narrows the available levers to the tier question this experiment tests.
+  **Why the figures are usable at all:** same provenance as the entry above —
+  this is the first iteration whose meter output is trustworthy, being the
+  iteration that fixed the meter's attribution, and the `supervision` row exists
+  at all only because of that fix.
+  Debt/analysis: measures an unexamined cost line and may re-tier a lead binding;
+  adds no governed name.
+  **Cost while deferred:** the largest unexamined line in the iteration budget,
+  paid every iteration, with no evidence either way about whether it is bought or
+  wasted. Bounded and non-rotting — nothing breaks, and the row now accumulates
+  per-iteration baselines whether or not the experiment runs.
+  Filed 2026-07-22 by close, from the same lead-side economics review.
 
 ## Done
-
-- stage-economics-truncation-durability
-- stage-economics-attribution-honesty
-- delegation-smoke-threshold-pin
-- price-table-age-kpi
 
 ## Lessons Learned
