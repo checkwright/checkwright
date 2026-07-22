@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-stage-economics-honesty release v0.11.0 — Behavior changes non-empty (meter attribution, supervision row, new advisory KPI, price-table header); minor per docs/install.md §Versioning, no outstanding deferral
