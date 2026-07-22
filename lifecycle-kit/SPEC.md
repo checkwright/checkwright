@@ -306,6 +306,15 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by `bin/file-gap.sh`,
   its `merge=union` attribute verified by `check-merge-attrs`, drained by the
   close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
+- `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` — the consumer's `close-surface:`
+  declaration surfaces beyond the resolved kit roots (§The close-surface
+  roster); default `*/SPEC.md`. It deliberately does **not** default to
+  `CANON_KIT_MANIFEST_FILES`: reading another kit's knob would make lifecycle-kit
+  depend on canon-kit's configuration for a value the consumer already owns, and
+  the one cross-kit knob read in the tree today is precedent, not a ruling. The
+  declaration vocabulary is kit-owned and carries no consumer content; the roster
+  is derived, never a kit literal — a kit shipping the *names* of a consumer's
+  inbound surfaces would publish that consumer's private workflow.
 - `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
   iteration boundary; default empty.
 - `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
@@ -442,7 +451,11 @@ concurrent merge must survive. The installer emits the line and
 entry refuses while the inbox holds bullets (exit 1, the untriaged bullets
 printed, nothing written — the same refusal contract as the non-empty Lessons
 section), so no gap outlives its iteration untriaged (the gap-disposition rule:
-costed and filed, never flagged-and-skipped).
+costed and filed, never flagged-and-skipped). That refusal is the inbox's
+forcing function, so the inbox declares itself on the close-surface roster
+(§The close-surface roster) here, where the forcing function is documented:
+
+close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-stage.sh
 
 **Producers and consumers.** Producer: any mid-iteration session (lead or stage)
 via `bin/file-gap.sh` — the knob default makes the channel live everywhere the
@@ -453,6 +466,94 @@ then truncates the inbox to its header; the boundary refusal reads emptiness at
 the next scope entry as the backstop. Each bullet's two fields have named
 readers: the date feeds close's staleness judgment, the prose is the disposition
 body.
+
+## The close-surface roster
+
+Close reads a set of **inbound triage surfaces** — capture logs, harvest sinks,
+the gap inbox, the queue's Lessons section. Enumerated only as prose, that set
+has no closure: a surface close never reads leaves no trace anywhere, and a
+sixth inbox added without being named costs nothing at the moment of the mistake
+and everything afterwards. The roster replaces the enumeration with a
+derivation, and gives each surface a mode so a skip is a *visible* judgment
+rather than an invisible omission.
+
+**The declaration.** A surface declares itself in the section that already owns
+it — one full-line directive, the same shape and altitude as canon-kit's `spec:`
+and `contract:` directives (the derivation skips fenced blocks, so the grammar
+is quotable where it is specified — `check-spec-pointer`'s carve-out, for the
+same reason):
+
+```
+close-surface: <path> <mode> [reclaim=<command>]
+```
+
+- `<path>` — repo-relative, or a `<file>#<section>` locator when the surface is
+  a section of a larger file; the fragment is the heading in anchor form (spaces
+  as `-`), since `<path>` is the line's first whitespace-delimited token.
+- `<mode>` — exactly one of:
+  - `forced=<owner-path> §<section>` — a structural forcing function exists and
+    the citation names it. The gap inbox's is the iteration-boundary entry
+    refusal; the Lessons section's is that refusal's sibling assertion.
+  - `advisory` — no forcing function. Close reads it by procedure, and a skip is
+    **sanctioned and visible** rather than undetected. An advisory surface is not
+    a lesser surface; it is one whose skip is a judgment someone may audit.
+- `reclaim=<command>` — required when `<path>` is a capture-tier (gitignored)
+  member, naming the drain that empties it. It runs to end of line, so it is
+  written last. The runtime-artifact lifecycle rule already demands a paired
+  reclaim path for every write path; this is where that pairing becomes
+  machine-readable.
+
+Declaration lives with the owner, never in a central list: a central list is a
+second source that drifts from the surface it names, and the one-owner rule puts
+the fact where the surface is defined.
+
+A `forced=` declaration belongs on a **manifest surface**, and that is
+load-bearing rather than incidental — it is what gives the citation its
+resolver. `check-spec-pointer`'s prose-citation pass sweeps the manifest set for
+a free-prose `<path>.md §<heading>` citation and resolves it in prefix mode; a
+`forced=` citation *is* that shape, so it resolves today with no new code. The
+restriction binds `forced=` only, not the directive as such: an `advisory`
+declaration carries no citation and so needs no resolver, which is what lets a
+consumer-owned capture surface declare itself in the binding that owns it
+(a stage-skill binding is not a manifest surface). The honest limit follows from
+the same seam — a `forced=` declaration authored outside the manifest set would
+carry an unresolved citation, and no gate here catches that, because the
+resolver is canon-kit's and lifecycle-kit does not depend on canon-kit.
+
+**The derivation** is `bin/close-surfaces.sh`, never a maintained registry. Two
+sources, unioned: every `close-surface:` declaration across the resolved kit
+roots and the consumer's configured declaration surfaces; and every **gitignored
+member of the workflow directory** — capture-tier by definition (gate-sdk/SPEC.md
+§The workflow directory), therefore close-inbound by definition. The second
+source is the closure that makes the roster fail loudly: a capture surface added
+with no declaration appears as `(undeclared)` rather than not appearing at all.
+The roster reports the hole instead of inheriting it, which is the whole
+difference between a derived roster and a maintained one.
+
+**Ruled out: shrinking the roster by merging the two capture logs.** The obvious
+way to make close's inbox count smaller is to merge the two friction capture logs
+behind one file with a type column. It is ruled out, on this roster's own
+evidence:
+
+- The logs are owned by **different kits**, and the dependency runs one way only
+  — the drift-kit KPI already reaches into guard-kit through the shared kit-root
+  resolution, so guard-kit cannot depend back without a cycle. A merged log has
+  no legal owner short of the base gate framework, which is not a friction sink.
+- Their producers are not the same kind of act: one is a **harness hook
+  fallthrough** writing raw command text at the moment of a prompt, undated and
+  ungrammared; the other is a **deliberate structured capture**. A type column
+  would not unify them, it would document that they were never one stream.
+- Their consumers are disjoint — allowlist-filtering and pattern-ranking on one
+  side, doc-owner remediation on the other. Every consumer would filter by type
+  first, re-deriving the two logs at read time, which is the tell that the merge
+  moves the split rather than removing it.
+- Their reclaim moments are independent whole-file truncations. Sharing one file
+  makes each sweep's drain erase the other type's untriaged lines.
+
+The complaint the merge reached for is real — the two frictions compete for one
+triage attention and were ranked against each other by nothing — and the roster
+answers it directly: both appear on one derived roster, with modes, which is what
+"ranked against each other" needs. Merging the files was the proxy, not the thing.
 
 ## Per-component contracts
 
@@ -675,6 +776,66 @@ The union attribute needs no such step — `merge=union` is git-native, so its
 line is live the moment `.gitattributes` carries it.
 Advisory tooling, not a gate: no fixture pair is owed; every step is exercised
 end-to-end in `smoke/install.sh`.
+
+### bin/close-surfaces.sh
+
+Prints the derived close-surface roster (§The close-surface roster), one row per
+surface, tab-separated `<path>	<mode>	<reclaim>	<owner>`, sorted by path. A
+field with nothing declared is `-`; an owner-less row is a capture surface source
+2 found with no declaration, whose mode reads `(undeclared)`. The mode is echoed
+verbatim — a malformed one is passed through for `check-close-surfaces` to rule
+on, so the derivation never silently repairs what the gate exists to catch.
+
+The declaration surfaces are the resolved kit roots' `LIFECYCLE_KIT_ROSTER_BASENAME`
+files plus every `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` match (gate-sdk's kit-root
+resolution, consumer-first with kit shadowing — the order every kit registry
+already uses); duplicates collapse. Follows the affordance contract:
+repo-root `cd`, config-via-env, exit 2 on a non-repo cwd, an unreadable
+declaration surface, or a `git check-ignore` that could not decide. Advisory
+tooling, no fixture pair owed — the gate below is what blocks.
+
+### check-close-surfaces
+
+Three assertions, over the derived roster: (A) **no undeclared surface** — every
+capture-tier workflow-dir member carries a declaration; (B) **every declaration
+carries a mode**, and a `forced=` mode's citation is *well-formed* — a
+repo-relative `<path>.md` followed by `§<section>`; (C) **every capture-tier
+declaration names a reclaim command**.
+
+Assertion B is shape-only, and resolution is somebody else's job already:
+`check-spec-pointer`'s prose pass resolves a `forced=` citation on any manifest
+surface (§The close-surface roster). Taking the presence-and-shape half here is
+not a preference — `heading_present` is defined *inside*
+`canon-kit/checks/check-spec-pointer.sh`, not exported from a library, so there
+is no resolver a second gate could call. Reaching it would mean either copying
+the resolver, which canon-kit's own tiering rule bans, or making lifecycle-kit
+depend on canon-kit — the same ownership-cycle argument that rules out the log
+merge. The honest arrangement is a pair of gates independently reading one
+surface, each asserting what it owns.
+
+The gate reads the roster by running the affordance, so a roster it could not
+derive is fail-closed (exit 2), as is an unreadable declaration surface. An
+optional scan-root argument (passed through to the affordance) is the fixture
+capability: `git check-ignore` never reports a *tracked* path, and a fixture file
+must be tracked to survive a clone, so a case dir cannot hold a capture-tier
+member. The `good/`+`bad/` pair therefore covers assertion B on a consumer-set
+`LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS`, and the bespoke
+`gate-tests/check-close-surfaces.test.sh` builds sandbox repos with a real
+`.gitignore` for assertions A and C — the `check-exec-bit` precedent. Tier
+`precommit`; the `# graph:` manifest couples the workflow dir and the
+declaration surfaces.
+
+Calibration and honest limit: the gate asserts the roster is **complete and
+moded**, never that close actually *read* a surface. Reading is a session act
+with no mechanical residue short of a per-surface disposition stamp, which is the
+heavier design this deliberately does not take: the marking converts an invisible
+omission into a sanctioned one, and a stamp would convert it into a gated one at
+the cost of a stamp-per-surface-per-iteration ritual. The lighter disposition
+comes first because an advisory surface's skip is often correct, and gating a
+correct action is the failure mode the gap-inbox refusal already demonstrated.
+The un-gateable half rides the Enforcement-first carve-out's cadence — a class on
+the consumer's close-stage audit roster (doctrine-kit/DOCTRINE.md
+§Methodology-maintenance rules).
 
 ### check-lifecycle-registration
 

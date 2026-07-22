@@ -45,6 +45,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-skill-binding
    check-shim-restatement
    check-merge-attrs            # multi-operator: needs the .gitattributes step (step 4)
+   check-close-surfaces
    ```
    <!-- gate-roster:end -->
 

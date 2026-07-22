@@ -385,6 +385,13 @@ entries and promote recurring safe patterns to the committed settings as
 globs; clear the friction log. Goal: the local set stays small and every
 durable pattern lives in the committed, reviewable allowlist.
 
+The friction log is a capture-tier surface with no forcing function — nothing
+refuses a close that skips it — so it declares itself advisory on the
+close-surface roster (lifecycle-kit/SPEC.md §The close-surface roster), naming
+the clear above as its reclaim path:
+
+close-surface: .workflow/prompt-friction.log advisory reclaim=: > .workflow/prompt-friction.log
+
 ## Layout and configuration
 
 ```

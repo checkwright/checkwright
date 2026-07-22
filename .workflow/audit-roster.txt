@@ -3,3 +3,5 @@
 # <class-slug> — <audit scope: what to sweep> — due: <event(s)> — last: <iteration | never>
 
 internal-identifier-restatement — prose restating a source's internal identifier roster or algorithm, un-gateable because public contract names are legitimate citations — due: any heavy-SPEC per-component-contract edit; release prep — last: budget-oracle-honesty
+workflow-surface-extension — a workflow-dir member whose extension misreads its writer and reader (record vs prose surface vs capture stream, gate-sdk/SPEC.md §The workflow directory), un-gateable because it would mean inferring a writer's intent from a file's bytes — due: any workflow-directory addition — last: never
+close-surface-actually-read — whether close read each roster surface rather than merely having it declared and moded (lifecycle-kit/SPEC.md §check-close-surfaces), un-gateable because reading is a session act with no mechanical residue short of a per-surface disposition stamp — due: every close — last: never

@@ -222,7 +222,12 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    looked to where the owner is. Never a standing session-start
    instruction: that converts one re-derivation into a permanent
    per-session tax, exactly what context-kit's brevity machinery rejects.
-   Then clear the log — its named reclaim path.
+   Then clear the log — its named reclaim path. Nothing refuses a close that
+   skips the walk, so the log declares itself advisory on the close-surface
+   roster (lifecycle-kit/SPEC.md §The close-surface roster) with that clear as
+   its reclaim command:
+
+   close-surface: .workflow/knowledge-friction.log advisory reclaim=: > .workflow/knowledge-friction.log
 3. **Aggregate (drift)** — `kpi-knowledge-friction` trends the per-iteration
    count; it falls as the tier contract's holes fill. Detection is the
    loop; elimination is a tiering edit.

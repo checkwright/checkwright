@@ -197,6 +197,10 @@ if staged_matches '.gitattributes' 'lifecycle-kit/lib/stages.sh'; then
     run_gate check-merge-attrs lifecycle-kit/checks/check-merge-attrs.sh
 fi
 
+if staged_matches '.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' '.claude/commands/*.md' '.gitignore'; then
+    run_gate check-close-surfaces lifecycle-kit/checks/check-close-surfaces.sh
+fi
+
 if staged_matches 'TASK-QUEUE.md'; then
     run_gate check-queue-sections queue-kit/checks/check-queue-sections.sh
 fi

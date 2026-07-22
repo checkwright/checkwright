@@ -71,9 +71,16 @@ model for ruled-but-unpromoted work).
    Lessons. The next iteration's scope entry refuses a non-empty inbox
    (§bin/enter-stage.sh), so an undrained gap blocks the boundary rather than
    crossing it silently.
-3. *<housekeeping: your housekeeping sweeps: deprecation scan, gate-runtime
-   budget check, backlog-aging / premise-rot review, tooling-friction
-   triage.>*
+3. **Sweep the inbound triage surfaces** — run `bin/close-surfaces.sh` and
+   disposition every row (§The close-surface roster). The roster is derived, not
+   enumerated here or in the binding below: a `forced=` row has a structural
+   forcing function and cannot be skipped silently; an `advisory` row may be
+   skipped, but the skip is a judgment to state, not an omission to leave
+   invisible. An `(undeclared)` row is a capture surface nobody declared — file
+   the missing declaration rather than reading past it.
+   *<housekeeping: your housekeeping sweeps beyond the roster: deprecation scan,
+   gate-runtime budget check, backlog-aging / premise-rot review, and the
+   per-surface triage procedures the roster's rows route to.>*
 4. **Clear Done.**
 5. Review top-level docs for staleness (*is it still true?*). Same
    gap-generalization obligation as step 1, per staleness actually found:
@@ -82,7 +89,10 @@ model for ruled-but-unpromoted work).
    buildable — a silent fix forfeits the check.
 6. **Runtime-artifact lifecycle check** — any gitignored/runtime artifact
    introduced this iteration (log, cache, scratch dir) has a named cleanup
-   trigger: a write-path needs a paired reclaim-path.
+   trigger: a write-path needs a paired reclaim-path. For a workflow-directory
+   artifact the roster already answers it: the `reclaim=` field is that named
+   trigger, and `check-close-surfaces` blocks a capture-tier declaration without
+   one. What stays a judgment here is the artifact *outside* that directory.
 7. **Release disposition** — run after the surface-mutating steps above and
    **before** the brevity pass (the disposition note is itself such a write).
    Every close dispositions the iteration at the release boundary: read the

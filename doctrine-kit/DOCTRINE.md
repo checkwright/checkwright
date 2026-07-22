@@ -46,8 +46,8 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    carries a *named cadence*, or it is a duty no session performs: the
    un-gateable class joins a tracked audit roster reviewed on a lifecycle hook,
    with event-keyed due-ness — a named observable event (a contract edit, a
-   release prep, a template upgrade) beats an iteration counter no surface
-   tracks. The roster is hand-curated, not derived — which classes escape a
+   release prep, a template upgrade, a new member on a governed surface) beats
+   an iteration counter no surface tracks. The roster is hand-curated, not derived — which classes escape a
    clean check is a judgment no tool enumerates, so Derivation-first's ladder
    lands on state-once-at-the-owner — and the roster plus its review step *are*
    the capture mechanism this carve-out owes, self-applying like the

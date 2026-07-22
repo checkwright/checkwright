@@ -9,16 +9,20 @@ queue-kit/bin/lesson-sink.sh <tag>`, which resolves the sink from the local
 `.workflow/<tag>-harvest.md` staging append.
   - `[essay]` — no sink command is configured here, so the body stages to
     `.workflow/essay-harvest.md` (gitignored operator material feeding the
-    `launch-comms` methodology essay; reclaim: merged into the essay, then
-    cleared — the runtime-artifact rule).
+    `launch-comms` methodology essay; merged into the essay, then cleared). This
+    binding owns that sink, so its close-surface declaration lands here:
+
+    close-surface: .workflow/essay-harvest.md advisory reclaim=: > .workflow/essay-harvest.md
 
 **housekeeping** — measure, then triage. First meter this closing session:
 `bash drift-kit/bin/overhead-meter.sh` logs its governance-vs-task byte proxy
 (drift-kit/SPEC.md §The overhead meter), the per-session producer feeding
-`kpi-overhead`. Then two triage sweeps, each owned by its kit template and run
-in order: tooling-friction per guard-kit/templates/close-triage.md, then
-knowledge-friction per drift-kit/templates/close-knowledge.md. Any task a sweep
-files follows queue-kit/SPEC.md §The tag algebra.
+`kpi-overhead`. The roster step above already names which surfaces to read; what
+this binding adds is the procedure each row routes to — the prompt-friction row
+to guard-kit/templates/close-triage.md, the knowledge-friction row to
+drift-kit/templates/close-knowledge.md, the essay-harvest row to the essay merge
+named under `harvest-routing`. Any task a sweep files follows
+queue-kit/SPEC.md §The tag algebra.
   - **Audit-roster review** — read `.workflow/audit-roster.txt`; for each
     un-gateable class, judge which `due:` events fired since its `last:` stamp,
     then perform or explicitly defer each due audit (a deferral is costed per

@@ -24,17 +24,6 @@
   Promoted 2026-07-22 by spec, which authored the amendment and took the gate
   arm scope left open.
 
-- **close-triage-surface-roster** [spec: lifecycle-kit/SPEC-close-surface-roster.md]
-  — close's inbound triage surfaces are enumerated only as prose, so a surface
-  close never reads leaves no trace anywhere. Replaces the enumeration with a
-  derived roster carrying a per-surface forced/advisory mode, plus the closure
-  that reports an undeclared capture surface instead of inheriting the hole.
-  **Cross-component by design** (lifecycle-kit, queue-kit, guard-kit,
-  drift-kit, doctrine-kit): `check-stage-entry` assertion C is armed, and an
-  **audit stamp** is the expected disposition at the next stage's entry —
-  anticipated, not a waiver.
-  Promoted 2026-07-22 by spec, which authored the amendment.
-
 ## Technical Debt
 
 - **gap-inbox-post-close-window** — the gap inbox is drained by
@@ -1065,5 +1054,6 @@
 
 - friction-log-merge
 - workflow-file-format-convention
+- close-triage-surface-roster
 
 ## Lessons Learned

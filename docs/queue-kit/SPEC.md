@@ -83,7 +83,12 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
 
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`
-plus `check-tag-lead-line` read that section's lead lines too:
+plus `check-tag-lead-line` read that section's lead lines too. That section is
+one of close's inbound triage surfaces, and its forcing function is the sibling
+of the gap inbox's — the first-stage entry refuses while it holds entries — so it
+declares itself on the close-surface roster here:
+
+close-surface: TASK-QUEUE.md#Lessons-Learned forced=lifecycle-kit/SPEC.md §bin/enter-stage.sh
 
 - `[attend]` — fixed spelling, kit mechanism (the inbound channel): the filing
   session marks a lesson as a live attention point for later sessions *of the
