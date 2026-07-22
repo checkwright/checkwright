@@ -721,7 +721,28 @@ output so a memory-quoted percentage cannot be the acting source.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot
-through `usage-verdict` asserting a verdict — self-verifying install. That
+through `usage-verdict` asserting a verdict — self-verifying install. It opens
+with **one hermetic env prelude covering the whole file**: it strips the whole
+`DELEGATION_KIT_*` namespace and then sets the knobs with no per-call home —
+sampling off, and both pause thresholds at the defaults the 95% reading is
+judged against. A prelude rather than per-instance pins because
+instance-pinning has already missed
+once by construction: a pass that pinned the two knobs then biting left the
+third, and the survivor was the one whose failure is **silent** — an
+unpinned history path makes every smoke verdict append a synthetic sample
+into whatever trend log the ambient config names, indistinguishable in shape
+from a real operator reading. That this repo's runs happened not to pollute
+was accidental, not designed: the harness runs the file with cwd = the
+scratch consumer root and the configured history path is *relative*, so the
+appends died with the scratch tree — hermeticity that evaporates the moment a
+consumer configures an absolute path or the file is invoked from a real tree.
+Stripping the whole namespace is the shape that cannot miss a third knob.
+The credentials pin stays **at each invocation** rather than moving into the
+prelude, because gate-sdk/SPEC.md §check-test-hermetic reads it there — a
+line-local pin is evidence a reader and a gate can both see without tracing
+file-level state — and the poller's own snapshot, credentials and endpoint
+paths stay inline too, being genuine per-call arguments the prelude has no
+business pre-empting. That
 assertion is **code-specific**: the 95% guard captures the exit status and
 compares it to the PAUSE code, reporting the status it observed rather than
 claiming an outcome it did not establish, so a STALE regression cannot pass

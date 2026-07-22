@@ -14,38 +14,6 @@
 
 ## Technical Debt
 
-- **delegation-smoke-history-pollution** — `delegation-kit/smoke/install.sh` pins
-  `DELEGATION_KIT_CRED_FILE` and both PAUSE thresholds around its
-  `usage-verdict.sh` assertions but never neutralizes
-  `DELEGATION_KIT_USAGE_HISTORY`, so every smoke verdict call appends a synthetic
-  sample wherever the ambient config points sampling.
-  **What is verified, and what the harness hides:** three synthetic samples sit
-  in this repo's live trend log right now — one snapshot's `updated_at`,
-  `pct=95`, `login_at=0`, verdicts PAUSE/PAUSE/OK — interleaved among real
-  operator readings and indistinguishable from them by shape. But a controlled
-  `run-consumer-smoke.sh delegation-kit` appends **nothing**: this repo
-  configures `DELEGATION_KIT_USAGE_HISTORY` as a *relative* path and the harness
-  runs `smoke/install.sh` with cwd = the scratch consumer root, so the appends
-  land in the scratch tree and die with it. The hermeticity is therefore
-  accidental, not designed, and it evaporates two ordinary ways: a consumer that
-  configures an absolute history path, or any invocation whose cwd is the real
-  tree (which is how the three existing lines got there).
-  **Same class as `delegation-smoke-threshold-pin` (Done), and that is the
-  point.** That unit pinned the two knobs that were biting and left the third, so
-  the instance-pin pattern has now missed once by construction. Enforcement-first
-  says the remedy is one hermetic env prelude covering the whole smoke file —
-  every `DELEGATION_KIT_*` knob the file depends on neutralized in one place —
-  not a third instance-pin. See also the roster half of `hermetic-bin-roster-config`
-  (deferred), which is the gate-side detector of the same problem; this entry is
-  the concrete file.
-  Debt: hermeticity of an existing smoke; adds no governed name.
-  **Premise re-verified 2026-07-22 by the scope survey:** the smoke pins
-  CRED_FILE/PAUSE_PCT/_7D at `:22`, `:37-40` and `:45` across three
-  `usage-verdict.sh` call sites, and `DELEGATION_KIT_USAGE_HISTORY` appears
-  nowhere in the file. Filed 2026-07-22 by lead; promoted 2026-07-22 by scope
-  (operator ruling), ranked fourth — the slowest-compounding of the four, taken
-  in because it shares the kit and the spec pass's env-hermeticity thinking.
-
 ## Deferred
 
 - **boundary-scratch-wipe-unowned** [needs-spec] — the iteration-boundary `.tmp/`
@@ -1011,5 +979,6 @@
 - usage-verdict-login-reroute-fails-open
 - usage-verdict-login-mtime-conflation
 - usage-verdict-roll-witness-unused
+- delegation-smoke-history-pollution
 
 ## Lessons Learned
