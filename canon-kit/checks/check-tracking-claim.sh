@@ -100,16 +100,18 @@ while IFS=$'\t' read -r file lineno path pred; do
 
     tracked="$(git -C "$ROOT" ls-files -- "$path")"; gst=$?
     [[ "$gst" -eq 0 ]] || { echo "check-tracking-claim: git ls-files failed for '$path'" >&2; exit 2; }
-    ignored="$(git -C "$ROOT" ls-files --others --ignored --exclude-standard -- "$path")"; gst=$?
-    [[ "$gst" -eq 0 ]] || { echo "check-tracking-claim: git ls-files --ignored failed for '$path'" >&2; exit 2; }
+    ntracked=0; [[ -n "$tracked" ]] && ntracked=1
 
-    if [[ -z "$tracked" && -z "$ignored" && ! -e "$ROOT/$path" ]]; then
-        errors+=("$rel:$lineno: '$path is $pred' — the path is in neither the index nor the working tree, so the claim is unverifiable")
+    # spec: canon-kit/SPEC.md §check-tracking-claim — the ignored side is
+    #   rule-based (check-ignore --no-index), not presence-based, so it resolves
+    #   in a fresh checkout; that section owns why --no-index is load-bearing.
+    nignored=0
+    git -C "$ROOT" check-ignore -q --no-index -- "$path" && nignored=1
+
+    if [[ "$ntracked" == 0 && "$nignored" == 0 && ! -e "$ROOT/$path" ]]; then
+        errors+=("$rel:$lineno: '$path is $pred' — the path is in neither the index nor the ignore rules nor the working tree, so the claim is unverifiable")
         continue
     fi
-    ntracked=0; [[ -n "$tracked" ]] && ntracked=1
-    nignored=0; [[ -n "$ignored" ]] && nignored=1
-    [[ "$nignored" == 0 ]] && git -C "$ROOT" check-ignore -q -- "$path" && nignored=1
 
     case "$pred" in
         committed|tracked)

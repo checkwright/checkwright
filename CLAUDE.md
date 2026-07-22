@@ -134,8 +134,8 @@ the skill on a blocking verdict — so they are not resident here.
 - `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
   journals), wiped at the scope boundary; `.metric/` is gitignored persistent
   measurement trends — **never committed**,
-  account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/` is
-  two-tier — tracked checked projections beside gitignored local capture
+  account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/`
+  holds two tiers — tracked checked projections beside gitignored local capture
   (gate-sdk/SPEC.md §The workflow directory). `BRIEF.local.md` (private brief),
   `OPS.local.md` (private ops runbook — DNS records + GitHub repo-settings
   desired state; consult it for domain or repo-settings work), and `ENV.local.md`

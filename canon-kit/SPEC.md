@@ -977,15 +977,24 @@ asserting a directory is committed while part of it is gitignored — is invisib
 to every other gate the kit ships: `check-md-refs` resolves paths,
 `check-spec-pointer` resolves headings, and neither reads what the sentence
 *claims* about the path. Resolution: a path naming a directory expands to its
-members (`git ls-files` for the tracked side, the `--others --ignored` listing
-plus `git check-ignore` on the path itself for the ignored side); a path naming
-a file is its own single member. The mixed predicate is what lets an
-honestly-mixed directory have a true sentence at all — without it, the
-always-loaded tier could only be given a false one.
+members (`git ls-files` for the tracked side, `git check-ignore --no-index` on
+the path for the ignored side); a path naming a file is its own single member.
+The ignored side is read from the rules, not the working tree, so a gitignored
+runtime path with no file in a fresh checkout still resolves — a presence read
+(`ls-files --others --ignored`, which lists only files that exist) made the same
+claim verify locally and red in CI. `--no-index` is load-bearing for the mixed
+predicate: plain `check-ignore` refuses to report a directory that has a tracked
+member as ignored, and a two-tier directory always has one. The mixed predicate
+is what lets an honestly-mixed directory have a true sentence at all — without
+it, the always-loaded tier could only be given a false one. Its rule-based proof
+reaches only a directory the rules match whole (a `dir/` pattern) that also
+carries a tracked member; a directory whose ignored members are matched by file
+patterns, the directory itself matching no rule, has no rule-based two-tier proof
+and stays a prose description (the `runtime-dir-two-tier-detector` debt).
 
 Reddens on a predicate whose verification fails, and — fail-closed — on a bound
-path that exists in neither the index nor the working tree, since an
-unresolvable path makes the claim unverifiable rather than true.
+path that exists in neither the index, the ignore rules, nor the working tree,
+since an unresolvable path makes the claim unverifiable rather than true.
 
 Surface: the manifest set (`spec_manifest_files`, the same surface the
 manifest-narration gate family reads). **No new knob**: the predicate vocabulary
@@ -1007,9 +1016,13 @@ unbinds it (`` `core-files.list` `` *manifest exists in the worktree and* is
 tracked is correctly not a claim). That is deliberate under-detection, and it is
 what buys the false-positive floor: the fixture pair covers both directions.
 
-The gate landed green over this repo — three claims, all true once the
-`.workflow/` sentence was corrected, and no backfill. That is the expected
-shape: it is a regression gate for a defect that already shipped on the
+The gate landed green over this repo — two claims (`.tmp/` and `.metric/`, both
+gitignored), each verified rule-based against the ignore rules; a third
+directory, `.workflow/`, is described in prose citing gate-sdk/SPEC.md §The
+workflow directory rather than as a bound claim, because its ignored members are
+file-pattern-matched and the directory itself matches no rule, so no rule-based
+two-tier proof exists for it (the `runtime-dir-two-tier-detector` debt). No
+backfill. That is the expected shape: it is a regression gate for a defect that already shipped on the
 always-loaded tier, not a discovery tool, and §When a gate earns its place in
 gate-sdk/SPEC.md governs that class. No per-site valve is taken: a claim that
 cannot be made true is a claim that must be reworded, and a valve would restore

@@ -16,6 +16,40 @@
 
 ## Deferred
 
+- **runtime-dir-two-tier-detector** [needs-spec] — `check-tracking-claim`'s
+  `is two-tier` predicate is rule-provable only for a directory the ignore rules
+  match *whole* (a `dir/` pattern) that also carries a force-added tracked member:
+  `git check-ignore --no-index <dir>` matches the whole-dir rule, and `git
+  ls-files <dir>` finds the tracked member. A directory whose ignored members are
+  matched by **file patterns** — the directory itself matching no rule, e.g.
+  `.workflow/` under `.workflow/*.log` + specific-file ignores — has no rule-based
+  two-tier proof: `check-ignore --no-index .workflow/` is a no-match, so the gate
+  reads it as one-tier and the claim reds. The gate fix (this iteration) moved the
+  ignored side from a presence read (`ls-files --others --ignored`, which listed
+  only files that exist and so made `.workflow/`'s claim verify locally but red in
+  a fileless CI checkout) to the rule-based `check-ignore --no-index`; that fix is
+  correct and deterministic, but it cannot prove the file-pattern two-tier shape,
+  so `.workflow/`'s two-tier fact was **unbound from the gate** in CLAUDE.md and is
+  now carried as prose citing gate-sdk/SPEC.md §The workflow directory.
+  **Deliverable:** a rules-based detector that proves two-tier for the
+  file-pattern shape and re-binds `.workflow/ is two-tier` — probing candidate
+  member paths under the directory via `check-ignore --no-index` (which resolves
+  on non-existent paths), or reading the ignore patterns that target inside the
+  directory. **Why `[needs-spec]`:** enumerating "would-be-ignored members" of a
+  directory without the files present is the open design — a probe-path approach
+  needs a principled candidate set, and a pattern-reading approach re-implements a
+  slice of gitignore matching (negations, nested `.gitignore`, precedence), whose
+  false-positive floor is the whole question. The honest outcome may be that the
+  file-pattern two-tier shape stays a prose-only description and the predicate's
+  reach is documented as bounded to whole-dir patterns.
+  **Cost while deferred:** low and non-rotting — the gate is correct and
+  deterministic over what it reaches (whole-dir gitignored, force-added two-tier),
+  `.tmp/`/`.metric/` stay gated, and `.workflow/`'s two-tier fact is stated
+  accurately in prose; the residue is one true directory-tiering fact the battery
+  cannot mechanically hold. Filed 2026-07-22 by close, operator-blessed, from the
+  remote-oracle red on this iteration's release commit (the gate shipped
+  presence-based and failed its first CI run).
+
 - **boundary-scratch-wipe-unowned** [needs-spec] — the iteration-boundary `.tmp/`
   wipe is prescribed as **consumer binding prose** (the `/scope` skill's
   evidence-reset binding) and performed by hand, so every scope session emits an
