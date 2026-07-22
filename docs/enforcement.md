@@ -91,6 +91,7 @@ leaves its section absent.
 | (consumer) | check-release-bump | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
+| [canon-kit](canon-kit/index.md) | check-tracking-claim | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-enum | precommit |
 | [canon-kit](canon-kit/index.md) | check-prose-tells | precommit |
 | [canon-kit](canon-kit/index.md) | check-knob-citation | precommit |

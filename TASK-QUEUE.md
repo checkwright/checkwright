@@ -12,18 +12,6 @@
 
 ## New Features
 
-- **workflow-dir-tracking-claim** [spec: canon-kit/SPEC-tracking-claim.md] —
-  CLAUDE.md §Housekeeping asserts `.workflow/` is committed while three of its
-  twelve members are gitignored, on an always-loaded surface every session
-  reads. Corrects the claim to a two-tier rule and takes the open gate arm: a
-  tracking claim is machine-checkable against `git check-ignore`, so the
-  correction lands with the gate that keeps it true. Design, ruled-out
-  alternatives, and the gate's honest limit: the amendment.
-  Lands **after** `workflow-file-format-convention` — the corrected sentence
-  cites the surface contract that unit creates.
-  Promoted 2026-07-22 by spec, which authored the amendment and took the gate
-  arm scope left open.
-
 ## Technical Debt
 
 - **gap-inbox-post-close-window** — the gap inbox is drained by
@@ -1055,5 +1043,6 @@
 - friction-log-merge
 - workflow-file-format-convention
 - close-triage-surface-roster
+- workflow-dir-tracking-claim
 
 ## Lessons Learned

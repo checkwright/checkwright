@@ -279,6 +279,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
     run_gate check-manifest-count canon-kit/checks/check-manifest-count.sh
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then
+    run_gate check-tracking-claim canon-kit/checks/check-tracking-claim.sh
+fi
+
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
     run_gate check-prose-enum canon-kit/checks/check-prose-enum.sh
 fi

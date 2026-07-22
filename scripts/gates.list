@@ -66,6 +66,7 @@ check-install-toolchain
 check-release-bump
 check-manifest-temporal
 check-manifest-count
+check-tracking-claim
 check-prose-enum
 check-prose-tells
 check-knob-citation

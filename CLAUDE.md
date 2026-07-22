@@ -135,7 +135,8 @@ the skill on a blocking verdict — so they are not resident here.
   journals), wiped at the scope boundary; `.metric/` is gitignored persistent
   measurement trends — **never committed**,
   account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/` is
-  committed (checked projections). `BRIEF.local.md` (private brief),
+  two-tier — tracked checked projections beside gitignored local capture
+  (gate-sdk/SPEC.md §The workflow directory). `BRIEF.local.md` (private brief),
   `OPS.local.md` (private ops runbook — DNS records + GitHub repo-settings
   desired state; consult it for domain or repo-settings work), and `ENV.local.md`
   (context-kit's probed machine profile plus hand-authored gotchas — seed with

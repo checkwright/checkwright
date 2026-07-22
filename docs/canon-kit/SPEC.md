@@ -152,7 +152,9 @@ own instance); the kit's rules are the topology itself:
   instead (`check-manifest-count` bans a bare cardinal quantifying a
   governed collection in a manifest — the collection is the count's owner).
   A literal stays verbatim only when load-bearing, and then only
-  gate-coupled.
+  gate-coupled. A path's **version-control tracking status** is code-owned in
+  the same sense a count is — git owns it — so prose states the rule and
+  `check-tracking-claim` verifies it, rather than prose transcribing membership.
 - **Comments cite, never restate.** The code surface is a tier too: a
   full-line comment on a governed source is a machine or reason directive,
   rides the contiguous run a directive opens, or is exempt — design
@@ -962,6 +964,62 @@ The release-boundary disposition walk over the standing marker inventory
 lifecycle-kit's `release-sweep` skill template, and the between-major backlog
 trend over the same roster is drift-kit's `kpi-deprecated-surface` example
 (lifecycle-kit SPEC §templates, drift-kit SPEC §Out of scope). `precommit` tier.
+
+### check-tracking-claim
+
+Invariant: every **tracking claim** on a governed manifest surface agrees with
+git. A tracking claim is a fixed-vocabulary predicate bound to the backticked
+repo-relative path token it follows:
+
+| Predicate | Holds when |
+| --- | --- |
+| `is committed`, `is tracked` | the path has tracked members and no ignored ones |
+| `is gitignored`, `is local-only` | the path has ignored members and no tracked ones |
+| `is two-tier` | both classes are non-empty — the path holds tracked and ignored members |
+
+It exists because the defect class it catches — an always-loaded surface
+asserting a directory is committed while part of it is gitignored — is invisible
+to every other gate the kit ships: `check-md-refs` resolves paths,
+`check-spec-pointer` resolves headings, and neither reads what the sentence
+*claims* about the path. Resolution: a path naming a directory expands to its
+members (`git ls-files` for the tracked side, the `--others --ignored` listing
+plus `git check-ignore` on the path itself for the ignored side); a path naming
+a file is its own single member. The mixed predicate is what lets an
+honestly-mixed directory have a true sentence at all — without it, the
+always-loaded tier could only be given a false one.
+
+Reddens on a predicate whose verification fails, and — fail-closed — on a bound
+path that exists in neither the index nor the working tree, since an
+unresolvable path makes the claim unverifiable rather than true.
+
+Surface: the manifest set (`spec_manifest_files`, the same surface the
+manifest-narration gate family reads). **No new knob**: the predicate vocabulary
+is kit-owned generic English, and which surfaces are governed is a knob that
+already exists. Fenced code blocks are skipped, matching `check-spec-pointer` —
+a quoted example is not a claim — and a predicate inside an inline code span is
+a meta-reference, not an assertion (`check-manifest-count`'s carve-out, same
+reason), which is what lets this section name its own vocabulary.
+
+Calibration, stated as the gate's honest limit: **forward direction only, fixed
+vocabulary only, adjacency only.** The gate fires on the listed predicates and
+rules on nothing else; a claim phrased any other way ("the workflow directory
+ships in the repo") is out of scope and stays a review concern — the same
+forward-only bar `check-spec-pointer` holds, and for the same reason: widening to
+"any sentence asserting tracking" needs a notion of assertion that cannot hold
+the false-positive floor. **Adjacency is the binding**: only whitespace may sit
+between the path's closing backtick and the predicate, so a clause in between
+unbinds it (`` `core-files.list` `` *manifest exists in the worktree and* is
+tracked is correctly not a claim). That is deliberate under-detection, and it is
+what buys the false-positive floor: the fixture pair covers both directions.
+
+The gate landed green over this repo — three claims, all true once the
+`.workflow/` sentence was corrected, and no backfill. That is the expected
+shape: it is a regression gate for a defect that already shipped on the
+always-loaded tier, not a discovery tool, and §When a gate earns its place in
+gate-sdk/SPEC.md governs that class. No per-site valve is taken: a claim that
+cannot be made true is a claim that must be reworded, and a valve would restore
+exactly the unverified-prose state the gate exists to end. Tier `precommit`; the
+`# graph:` manifest couples the manifest set and `.gitignore`.
 
 ### check-spec-fence-balance
 
