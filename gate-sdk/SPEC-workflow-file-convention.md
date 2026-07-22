@@ -98,11 +98,20 @@ the em-dash tail so nothing is lost:
 - `release-sweep-evidence.txt` — owner is the consumer's release runbook step
   that writes it.
 - `validate-baseline.txt` — owner is evidence-kit's held-constant baseline
-  contract (`EVIDENCE_KIT_BASELINE_FILE`). The seed literal in
-  **evidence-kit/smoke/install.sh** writes this header and moves with it, as
-  does the fixture literal in **evidence-kit/smoke/violation.sh**'s sibling
-  setup — the smoke is the shipped example of the convention and must
-  demonstrate it.
+  contract (`EVIDENCE_KIT_BASELINE_FILE`). Two literal sites move with it, both
+  verified at the write site: the seed in **evidence-kit/smoke/install.sh**
+  (the smoke is the shipped example of the convention and must demonstrate it)
+  and the documented seed snippet in **evidence-kit/README.md**, whose
+  docs-site projection regenerates rather than being edited. The smoke's
+  nested-fixture baseline and **evidence-kit/smoke/violation.sh** are *not*
+  sites: the former writes its own throwaway header inside a temp consumer, and
+  the latter appends a data line and no header at all.
+
+The rewrite is parse-safe, checked rather than assumed: `ek_data_lines`
+(evidence-kit/lib/evidence.sh) drops every line whose first non-blank character
+is `#`, so `check-evidence-baseline` reads the same rows before and after. That
+verification is the point — the whole reason `validate-evidence.txt` is exempt
+below is that a header change there *would* have been parsed.
 
 A third member, `validate-evidence.txt`, carries `# contract: evidence-manifest
 v1` — the prefix, but a wire-format version marker that `check-evidence-manifest`
@@ -162,7 +171,11 @@ chosen — a marker would be a second source for a fact git already owns.
   every **tracked** workflow-dir member, so a tracked `.md` projection's header
   (`gap-inbox.md`) is resolved like its `.txt` siblings instead of falling
   outside the directive set on extension alone. The tracked qualifier is what
-  keeps capture logs out.
+  keeps capture logs out. The change lands at **one** site —
+  `_spec_comment_surface` in `canon-kit/lib/spec.sh`, where the `*.txt` glob is
+  literal — which both gates read; the two SPEC sections document it, they do
+  not each own a copy. Widening admits exactly one new member here
+  (`gap-inbox.md`), whose header is already pointer-form and resolves.
 - **The consumer's canon config** — `CANON_KIT_COMMENT_WHITELIST` drops
   `release-sweep-evidence.txt` and `validate-baseline.txt` once their headers are
   pointer-form, retaining only the version-marker file. The whitelist's stated

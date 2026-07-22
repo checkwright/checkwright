@@ -15,9 +15,9 @@ everything afterwards.
 
 ### New directive: `close-surface:`
 
-A surface declares itself in the SPEC section (or kit template) that already
-owns it — one full-line directive, the same shape and altitude as the `spec:`
-and `contract:` directives canon-kit governs:
+A surface declares itself in the SPEC section that already owns it — one
+full-line directive, the same shape and altitude as the `spec:` and `contract:`
+directives canon-kit governs:
 
 ```
 close-surface: <path> <mode> [reclaim=<command>]
@@ -41,6 +41,11 @@ close-surface: <path> <mode> [reclaim=<command>]
 Declaration lives with the owner, never in a central list: a central list is a
 second source that drifts from the surface it names, and the one-owner rule puts
 the fact where the surface is defined.
+
+**Declarations live on manifest surfaces, and that is load-bearing** rather than
+incidental — it is what gives a `forced=` citation its resolver (assertion B
+below). A declaration on a non-manifest surface (a kit template) would carry an
+unresolved citation, so the directive is not available there.
 
 ### New affordance: `lifecycle-kit/bin/close-surfaces.sh`
 
@@ -70,10 +75,26 @@ the gate below is what blocks.
 
 Invariant, over the derived roster: (A) **no undeclared surface** — every
 capture-tier workflow-dir member carries a declaration; (B) **every declaration
-carries a mode**, and a `forced=` mode's citation resolves (path and `§section`,
-through the shared heading resolver `check-spec-pointer` already owns — one
-resolution path, not a second copy); (C) **every capture-tier declaration names
-a reclaim command**.
+carries a mode**, and a `forced=` mode's citation is *well-formed* — a
+repo-relative `<path>.md` followed by `§<section>`; (C) **every capture-tier
+declaration names a reclaim command**.
+
+**Assertion B is shape-only, and resolution is somebody else's job already.**
+`check-spec-pointer`'s prose-citation pass sweeps every manifest surface for a
+free-prose `<path>.md §<heading>` citation and resolves it in prefix mode
+(`canon-kit/checks/check-spec-pointer.sh`, the pass below the directive pass),
+skipping fenced blocks. A `forced=` citation on a manifest surface *is* that
+shape, so it is resolved today with no new code — which is why the directive is
+restricted to manifest surfaces above.
+
+This is the same presence-and-shape / resolution division the sibling
+`workflow-file-format-convention` amendment takes, and taking it here is not a
+preference: `heading_present` is defined **inside** `check-spec-pointer.sh`, not
+exported from a library, so there is no resolver a second gate could call.
+Reaching it would mean either copying the resolver — which the tiering rule bans
+— or making lifecycle-kit depend on canon-kit, the same ownership-cycle argument
+that rules out the log merge in §Ruled out below. The honest arrangement is two
+gates independently reading one surface, each asserting what it owns.
 
 Fail-closed on an unreadable declaration surface and on a roster the affordance
 could not derive. Tier `precommit`. `# graph:` manifest couples the gate to the
@@ -90,7 +111,12 @@ and gating a correct action is the failure mode the gap-inbox refusal already
 demonstrated.
 
 **Knob.** One: `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` — the consumer's declaration
-surfaces beyond the kit roots (default: the consumer's spec manifest set). The
+surfaces beyond the kit roots. Its default is a lifecycle-kit-owned glob literal
+(`*/SPEC.md`), and the consumer widens it to its own manifest set in
+`scripts/lifecycle-config.sh`. It deliberately does **not** default to
+`CANON_KIT_MANIFEST_FILES`: reading another kit's knob would make lifecycle-kit
+depend on canon-kit's configuration for a value the consumer already owns, and
+the one cross-kit knob read in the tree today is precedent, not a ruling. The
 declaration vocabulary itself is kit-owned and carries no consumer content; the
 roster is derived, never a kit literal — a kit shipping the *names* of a
 consumer's inbound surfaces would publish that consumer's private workflow.
@@ -149,8 +175,10 @@ for that, not the thing itself.
   capture-tier closure check (source 2 against source 1).
 - `<mode>` — read by close to decide whether a skip needs a stated reason
   (`advisory`) or is impossible (`forced`); read by the gate at assertion B.
-- `forced=`'s citation — read by the gate at assertion B's resolution; read by a
-  close session verifying the forcing function still exists before trusting it.
+- `forced=`'s citation — read by the gate at assertion B as a shape; read by
+  `check-spec-pointer`'s prose pass, which resolves its path and `§section`;
+  read by a close session verifying the forcing function still exists before
+  trusting it.
 - `reclaim=` — read by close's **runtime-artifact lifecycle step**, which today
   asks the same question in prose and has no roster to ask it against; read by
   the gate at assertion C.
@@ -175,9 +203,9 @@ those are not drained.
   declaration lands here (`forced=`, citing the boundary refusal it already
   describes), so the section that documents the forcing function is the section
   that declares it.
-- **queue-kit/SPEC.md** — the Lessons section declares itself `forced=`, citing
-  the same boundary refusal (its drain-entry assertion is the sibling of the
-  inbox's).
+- **queue-kit/SPEC.md** — the Lessons section declares itself `forced=` citing
+  `lifecycle-kit/SPEC.md §bin/enter-stage.sh`, which owns the sibling refusal
+  (both refusals are implemented there, one per surface).
 - **guard-kit/SPEC.md** and **drift-kit/SPEC.md** — each capture log declares
   itself `advisory` with its `reclaim=` truncation, in the section that already
   names that reclaim path.

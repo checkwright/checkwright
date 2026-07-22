@@ -53,6 +53,20 @@ assertion that cannot hold the false-positive floor. The binding is the
 construction ("`A`, `B`, and `C` are gitignored") is verified for `C` alone;
 that is deliberate under-detection, not a bug, and the fixture pair covers it.
 
+**First run over this repo, before the gate exists** — the align audit ran the
+vocabulary across the manifest set by hand, since a new gate's first honest test
+is the drift it finds. Result: **no backfill**. Three sites bind a predicate to a
+backticked path — the two `.tmp/` and `.metric/` claims in this repo's
+always-loaded tier, both verified true, and the `.workflow/` claim this unit
+corrects. Three near-misses (a kit SPEC's "their log is gitignored", a README's
+"the file is local-only", a gate's prose about tracked targets) carry a predicate
+with no backticked path immediately preceding it and are correctly *not* claims;
+they are the false-positive floor the binding rule buys, observed rather than
+predicted. A gate that lands green is the expected shape here — this one is a
+regression gate for a defect that already shipped on the always-loaded tier, not
+a discovery tool, and gate-sdk/SPEC.md §When a gate earns its place governs that
+class.
+
 ### The consumer-side correction this gate makes checkable
 
 The claim that motivated the gate is this repo's always-loaded
