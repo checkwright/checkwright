@@ -348,8 +348,15 @@
   model wins. **Prerequisite cluster:** interacts with `hosted-attestation-service`
   (its neutral-party angle; multi-operator-semantics its named prerequisite),
   `plugin-marketplace` (the harness-absorption hedge), and this session's
-  credential-swap budget-oracle tasks. **Demand-gated:** promote when a concrete
-  cross-vendor dispatch need attests; until then this is the roadmap marker.
+  credential-swap budget-oracle tasks. **Demand-gated — first attestation on
+  record (2026-07-23):** the operator holds a Codex subscription and wants
+  read-heavy delegation routed there for token-budget headroom — exactly the
+  per-batch vendor-routing lever named above. First slice at promotion: not
+  full stage dispatch but a codex-cli executor for the already-pre-authorized
+  read-heavy audit / mechanical-sweep class (dispatch transport: a spawned
+  `codex exec` process; the escalation-resume sub-problem (1) is moot for
+  autonomous read-only work, so it stays unblocked-on). Promotion-eligible at
+  the next scope session.
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
 
@@ -925,6 +932,102 @@
   wasted. Bounded and non-rotting — nothing breaks, and the row now accumulates
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
+
+- **launch-activation-cli** [needs-spec] — the five-minute activation path: an
+  installer CLI on the reserved npm name (`npx checkwright init` / `doctor` /
+  `update` / `diff` / `uninstall`, `--dry-run`) that vendors pinned kit source
+  into the consumer repo and commits a lock/manifest recording profile, kit
+  versions, and generated files — distribution convenience without giving up
+  auditable, committed vendoring. At most three progressive profiles
+  (starter / delegation / full) so the first experience is not all eleven
+  kits at once; `doctor` probes the bash/GNU/jq/ShellCheck floors before any
+  partial install. Acceptance shape: a clean Linux repo reaches first green
+  in under five minutes with one command and no manual copying; re-init is
+  idempotent; uninstall removes only manifest-recorded files; consumer smoke
+  covers install/update/uninstall per profile. Sequencing: owns the
+  install-ownership contract that `plugin-marketplace` must package against —
+  a marketplace package without an ownership/upgrade manifest is a second
+  install model. Promotion revisits the thin-installer demand-gating ruling
+  (gate-sdk/SPEC.md §upgrade-smoke): the external review names
+  time-to-first-value the top adoption weakness — a second attestation
+  beside the anticipated second consumer.
+  **Cost while deferred:** every prospective adopter pays the manual
+  vendor-and-wire path, the largest single drop-off risk at announcement;
+  non-rotting otherwise. Surfaced 2026-07-23 in an external
+  product/positioning review (operator-commissioned; artifact local-only).
+
+- **front-door-outcome-rewrite** [needs-spec] — rewrite the README/docs first
+  screen around one job: a literal category line (verification for
+  coding-agent delivery), the outcome (spec drift, skipped stages, and
+  unsupported done claims become failing checks before merge), the target
+  user, one command, one before/after example — the eleven-kit table and
+  architecture prose move below the quick start, `demo/run-demo.sh` gets
+  linked from README and the docs home (today the working demo is linked
+  from neither), and the repo gains likely discovery topics. External-review
+  finding: the front door describes architecture before outcome, inviting
+  mis-categorization as a heavyweight methodology; the complement-not-compete
+  stance (keep your spec workflow; add Checkwright where a claim must be
+  mechanically proven) moves near the top. Consumes RELEASING.md's reserved
+  launch-copy phrasing rather than forking it.
+  **Cost while deferred:** the current first screen filters out exactly the
+  reader the launch targets; zero until announcement, then compounding.
+  Surfaced 2026-07-23 in the same external review.
+
+- **supply-chain-trust-baseline** [needs-spec] — close the gap between the
+  governance promise and the repo's own supply-chain posture: root
+  `SECURITY.md` (private reporting route, threat boundaries) plus
+  conduct/maintainer docs; pin GitHub Actions to commit SHAs (both workflows
+  reference the mutable `actions/checkout@v5` tag); version-pin the
+  CI-installed kramdown GFM gem or stop calling it the "pinned Pages parser"
+  (site-kit/SPEC.md §render-fidelity says pinned; gates.yml installs
+  latest) — a truth-drift instance of the exact class the kits gate, so
+  enforcement-first applies: a workflow-lint gate asserting SHA-pinned
+  action refs lands with the fix; checksummed release assets once cadence
+  stabilizes; document what the vendored hooks execute and how to
+  review/disable them.
+  **Cost while deferred:** the trust bar for "run this repo's shell in your
+  hooks and CI" is unmet at announcement time, and the pinned-claim drift
+  rots silently. Surfaced 2026-07-23 in the same external review.
+
+- **platform-support-contract** [needs-spec] — make portability a tested
+  contract instead of a layered explanation: a support matrix (Linux /
+  macOS / Windows-WSL, exact tool floors) with a CI install-smoke leg per
+  supported platform or an explicit experimental label; resolve the standing
+  contradiction — docs/install.md declares no minimum versions are pinned
+  while gate-sdk/README.md requires bash 4+ and GNU userland, neither of
+  which stock macOS ships; the first support table distinguishes engine
+  portability from full harness experience. The `doctor` probe belongs to
+  `launch-activation-cli`; this entry owns the matrix and the CI legs.
+  **Cost while deferred:** the install.md / gate-sdk floor contradiction is
+  live public doc drift today; the rest costs nothing until macOS/WSL
+  adopters exist, then becomes the dominant support load.
+  Surfaced 2026-07-23 in the same external review (its portability finding).
+
+- **preview-release-cadence** [needs-spec] — reset release signaling for a
+  pre-1.0 audience: declare a preview/alpha channel, batch internal
+  iterations into a slower external cadence (weekly-class) so consumers stop
+  reading thirteen-releases-in-nine-days as churn, publish
+  checksum-verifiable release assets instead of bare tag pointers, and keep
+  a 30-second human changelog beside the migration detail. Separates
+  internal iteration completion from public version publication — a
+  RELEASING.md policy change more than a mechanism.
+  **Cost while deferred:** zero pre-announcement; at announcement the
+  release history itself signals instability to exactly the risk-averse
+  teams the trust story targets.
+  Surfaced 2026-07-23 in the same external review (its release-signaling
+  finding).
+
+- **public-roadmap-projection** [needs-spec] — a generated Now/Next/Later
+  `ROADMAP.md` projection off this queue (derivation-first: curated horizon
+  markers on entries, a projection script, a freshness gate — never a
+  hand-maintained copy), three-to-five items per horizon, labeled
+  adoption / reliability / ecosystem / commercial; plus low-friction issue
+  forms for install failures, doc problems, and adoption reports beside the
+  fixture-first gate-defect template — the current funnel routes exactly
+  the pre-launch usability signal away from issues.
+  **Cost while deferred:** outsiders cannot read direction from a
+  30-entry deferred section, and pre-launch usability feedback has no
+  low-friction inlet. Surfaced 2026-07-23 in the same external review.
 
 ## Done
 
