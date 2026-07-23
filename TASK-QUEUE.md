@@ -348,15 +348,18 @@
   model wins. **Prerequisite cluster:** interacts with `hosted-attestation-service`
   (its neutral-party angle; multi-operator-semantics its named prerequisite),
   `plugin-marketplace` (the harness-absorption hedge), and this session's
-  credential-swap budget-oracle tasks. **Demand-gated — first attestation on
-  record (2026-07-23):** the operator holds a Codex subscription and wants
-  read-heavy delegation routed there for token-budget headroom — exactly the
-  per-batch vendor-routing lever named above. First slice at promotion: not
-  full stage dispatch but a codex-cli executor for the already-pre-authorized
-  read-heavy audit / mechanical-sweep class (dispatch transport: a spawned
-  `codex exec` process; the escalation-resume sub-problem (1) is moot for
-  autonomous read-only work, so it stays unblocked-on). Promotion-eligible at
-  the next scope session.
+  credential-swap budget-oracle tasks. **Demand-gated — demand attested
+  (2026-07-23):** the operator holds working foreign-vendor subscriptions
+  (Codex; Gemini Enterprise via the Antigravity CLI) and wants read-heavy
+  delegation routed to them for token-budget headroom — exactly the
+  per-batch vendor-routing lever named above, and with three vendors live
+  the N-keyed budget-oracle seam (3) is no longer hypothetical. First slice
+  at promotion: not full stage dispatch but a foreign-CLI executor for the
+  already-pre-authorized read-heavy audit / mechanical-sweep class (dispatch
+  transport: a spawned non-interactive CLI process — `codex exec`-shaped,
+  one adapter per vendor as consumer config; the escalation-resume
+  sub-problem (1) is moot for autonomous read-only work, so it stays
+  unblocked-on). Promotion-eligible at the next scope session.
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
 
