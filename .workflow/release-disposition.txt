@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+permission-posture-reconciliation release deferred:v0.14.0 — hardening pass landed consumer-facing mechanism on shipped kit surfaces (guard-kit compound-read batching + scratch-run, lifecycle boundary-scratch-wipe); minor bump defensible but release/push held for operator decision, no note authored this close.

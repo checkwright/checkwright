@@ -1033,11 +1033,38 @@
   Filed 2026-07-24 by spec, operator-ruled, from this iteration's own
   scope/spec conflation.
 
-## Done
+- **exit-echo-decoration-guard-vs-habit** [needs-spec] — stage-session (sonnet)
+  agents decorate an otherwise-allowlisted command with a trailing `; echo
+  EXIT:$?` (or a leading `echo EXIT:$?;`) to read an exit status the harness
+  **already reports**. The `$?` is a shell *expansion*, and bash-guard's own
+  banner states no allowlist entry can suppress an expansion — so the triage
+  criterion (guard-kit/SPEC.md §The triage criterion) **cannot** resolve this to
+  (a) allowlist. It resolves to either a **guard rewrite/steer** that recognises
+  the benign decoration and steers to the bare form, or a **habit-change** note
+  for stage-sessions to drop it. Both are guard-kit design decisions.
+  Reproduced this iteration: 7 fall-throughs in `.workflow/prompt-friction.log`
+  containing `EXIT:` (validate-stage, operator-reported), the residue
+  `scan-prompts.sh` folds into its `echo` pattern rank.
+  **Open design (why `[needs-spec]`):** a steer must strip a benign trailing/leading
+  `echo <literal>$?` around an allowlisted command *without* widening the very
+  expansion-suppression hole the banner warns against — a general "strip trailing
+  echo" rule has a safety surface that is the whole question, so the choice
+  between a narrowly-shaped steer and a documented habit-change (no new mechanism)
+  is the design, plus the steer-vs-note call itself. **Sibling in the same
+  decision surface:** the broader compound exploratory-read fall-throughs
+  (`grep`/`ls`/`git status`/`find` chained with `;`, the dominant `scan-prompts`
+  ranks this iteration) share one root — stage-sessions decorate/chain benign
+  commands — and this iteration already landed the `cat`/`find` compound
+  read-steers and per-segment matching; widening the steer set to the other
+  read verbs is the same guard-rewrite-vs-habit call, so scope should weigh them
+  together.
+  **Cost while deferred:** low and non-rotting — pure recurring prompt friction,
+  no gate reds, no correctness impact; the harness surfaces exit status already,
+  so every decorated call re-hits one avoidable prompt and nothing downstream
+  degrades. Bounded. Debt: a guard steer adds no governed name; a habit-change
+  note adds none either. Filed 2026-07-25 by close, operator-reported, from this
+  iteration's validate-stage permission friction.
 
-- boundary-scratch-wipe-unowned
-- scratch-execution-prompt-friction
-- scan-prompts-local-overlay-blind
-- guard-read-compound-carveout
+## Done
 
 ## Lessons Learned
