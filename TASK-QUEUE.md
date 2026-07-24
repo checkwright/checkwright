@@ -280,17 +280,25 @@
   authored the diff — a foreign agent's commit is gated identically; and the
   concurrent-agent coordination primitive is the shared git-index/HEAD
   serialization, vendor-neutral already. *Homogeneous today — the real work,
-  worst-first:* (1) the **escalation resume model** is the gating sub-problem —
-  the lead's whole value is resuming a paused stage in place instead of
-  cold-restarting; a foreign agent cannot be `SendMessage`-resumed, so a foreign
-  stage either runs fully autonomously (no mid-stage escalation) or escalates
-  through a committed/polled channel with cold restarts, forfeiting the lead's
-  cost asymmetry — the part that is not plumbing. (2) **dispatch transport** —
-  today the harness `Agent`/`SendMessage`/task-notification; a foreign agent needs
-  a transport-neutral handoff (committed worklist, issue, spawned process). (3)
-  **budget oracle** — `usage-verdict.sh` is Anthropic-OAuth-specific; a
-  heterogeneous fleet has N vendor-keyed oracles (the same seam as this session's
-  credential-swap / token-usage tasks). (4) **stage-contract expression** —
+  worst-first:* (1) the **escalation resume model** — the lead's whole value is
+  resuming a paused stage in place instead of cold-restarting. **Re-ranked by
+  the 2026-07-25 amendment below:** the founding premise ("a foreign agent
+  cannot be resumed headless, so escalation means cold restarts") is stale —
+  headless warm-resume exists per vendor, so (1) collapses into (2) as a
+  property of the chosen transport, plumbing after all. (2) **dispatch
+  transport** — today the harness `Agent`/`SendMessage`/task-notification; a
+  foreign agent needs a transport-neutral handoff (committed worklist, issue,
+  spawned process). The adapter contract is "open / prompt /
+  permission-request / resume" spoken over each vendor's structured machine
+  plane, never its TUI: a screen-scrape relay (tmux send-keys/capture-pane)
+  is adapter-of-last-resort for a vendor shipping no machine interface at
+  all — it yields rendered frames instead of turn events, answers dialogs by
+  heuristic, and bets on the vendor's least-stable surface. (3) **budget
+  oracle** — `usage-verdict.sh` is Anthropic-OAuth-specific; a heterogeneous
+  fleet has N vendor-keyed oracles (the same seam as this session's
+  credential-swap / token-usage tasks); the vendors' JSONL event streams
+  carry token-usage events — raw oracle material the TUI path would have to
+  scrape from a status bar. (4) **stage-contract expression** —
   `/build` is a Claude Code skill (markdown + tool bindings); the lifecycle
   machinery is already neutral bash but the skill prose is not, so the contract
   needs an agent-agnostic form.
@@ -315,6 +323,20 @@
   one adapter per vendor as consumer config; the escalation-resume
   sub-problem (1) is moot for autonomous read-only work, so it stays
   unblocked-on). Promotion-eligible at the next scope session.
+  **Design-memory amendment (2026-07-25, verified against the installed
+  CLIs):** the operator probed the interactive-TUI-relay alternative (drive
+  vendor TUIs under tmux, relay via send-keys/capture-pane) for session
+  resume and token efficiency. Ruling: those benefits live in the vendor's
+  session store, not the TUI — the APIs are stateless, and both modes replay
+  the same on-disk transcript against the same server-side prompt cache, so
+  interactive-vs-headless is a rendering choice, not a state choice. Verified
+  locally: Codex ships `codex exec resume <session-id> "<prompt>"` (headless
+  warm-resume by id, `--json` JSONL turn events) plus `mcp-server` (stdio)
+  and an experimental `app-server`; Claude Code pairs `-p --resume` with
+  bidirectional stream-json. Gemini CLI speaks ACP (unverified — not
+  installed here). First slice unchanged; escalation-with-warm-resume lands
+  as a cheap second increment (`exec resume`) on the same adapter, not a new
+  architecture.
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
 
