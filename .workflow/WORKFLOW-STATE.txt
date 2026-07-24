@@ -7,3 +7,4 @@
 permission-posture-reconciliation scope a3356f05 2026-07-22
 permission-posture-reconciliation spec a6988847 2026-07-24
 permission-posture-reconciliation align ae23a636 2026-07-24
+permission-posture-reconciliation build ad852768 2026-07-24
