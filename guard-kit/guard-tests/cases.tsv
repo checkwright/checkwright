@@ -43,19 +43,29 @@ block	sed -i 's/a/b/' notes.md
 fallthrough	sed -E 's/a/b/'
 fallthrough	grep foo file | sed -e s/a/b/
 
-# rule 9 — listing-only find steered to Glob; action-predicate / piped /
-#          redirected forms untouched
+# rule 9 — listing-only find steered to Glob, alone or as a ';'-batch of listings
+#          (a literal banner between them is fine); action-predicate / piped /
+#          redirected / mixed forms untouched
 block	find lib -type f
 block	find lib -name '*.sh'
+block	find lib -type f; find lib -type d
+block	find lib -type f; echo ===; find lib -type d
+fallthrough	find lib -type f; find lib -delete
 fallthrough	find . -name '*.tmp' -delete
 fallthrough	find src -type f -exec grep -q foo '{}' ';'
 allow	find . -type f | head
 fallthrough	find . -type f > listing.txt
 
-# rule 10 — bare single-file cat steered to Read; multi-file, piped, redirected
-#           forms are composition and pass (a lone flagged read still fires)
+# rule 10 — bare single-file cat steered to Read, alone or as a ';'-batch of reads
+#           (a literal echo/printf banner between reads is fine); multi-file, piped,
+#           redirected, &&-chained, mixed, and banner-only forms are composition and pass
 block	cat TASK-QUEUE.md
 block	cat -n guard-kit/lib/guard.sh
+block	cat a.md; cat b.md
+block	cat a.md; echo ===; cat b.md
+fallthrough	cat a.md; find lib -type f
+fallthrough	cat a.md && cat b.md
+fallthrough	echo a; echo b
 allow	cat one.md two.md
 allow	cat notes.md | wc -l
 fallthrough	cat header.md > combined.md

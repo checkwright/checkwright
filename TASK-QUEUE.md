@@ -14,20 +14,6 @@
 
 ## Technical Debt
 
-- **guard-read-compound-carveout** — tighten `guard_rule_cat_read` /
-  `guard_rule_find_glob` (`guard-kit/lib/guard.sh`) so a `;`-separated compound
-  whose every segment is a bare read (`cat A; echo ===; cat B`) is steered to the
-  Read/Glob tool like a lone read, instead of falling through to a permission
-  prompt. Genuine pipe/redirect/heredoc composition stays untouched — the rule
-  fires only when every segment is itself a bare read; ships with the good/bad
-  fixture pair. Ruled here (scope): a compound-all-reads is not composition but
-  batched reads, exactly what the steer prevents; recurred twice, no
-  counter-evidence. Shares the compound-matching sub-problem with
-  `scan-prompts-local-overlay-blind`. Recurred again in this iteration's align
-  session: a two-range `sed` read of one file was steered to Read, costing two
-  round-trips where the steer's own advice is a single batched read — first-hand,
-  since the session paying it is the one recording it.
-
 ## Deferred
 
 - **runtime-dir-two-tier-detector** [needs-spec] — `check-tracking-claim`'s
@@ -1052,5 +1038,6 @@
 - boundary-scratch-wipe-unowned
 - scratch-execution-prompt-friction
 - scan-prompts-local-overlay-blind
+- guard-read-compound-carveout
 
 ## Lessons Learned

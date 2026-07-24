@@ -189,27 +189,39 @@ load-bearing where noted.
 9. **Listing-only `find`** — a bare `find` that only lists is blocked with
    the steer to the harness's Glob tool (the same shape as rule 8's `sed`
    read-steer: a better tool exists, and Glob returns paths registered for a
-   later Read). Fires on the conjunction no allowlist glob can express: the
-   segment leads with `find`, carries **no action predicate**
+   later Read). Fires on the conjunction no allowlist glob can express: every
+   segment leads with `find` and carries **no action predicate**
    (`-exec`/`-execdir`/`-ok`/`-okdir`/`-delete`/`-fls`/`-fprint`/`-fprint0`/
-   `-fprintf` — find(1) mechanism, a lib literal), and has **no consumer**
-   (the `find` is the whole command — no pipe, chain, or redirect). A piped
-   `find` is a legitimate producer (rule 13 may still auto-allow it), an
-   action-predicate `find` is an executor, and a redirected `find` has a
-   downstream reader — all untouched. **Placed before both auto-allow rules**
-   (same reasoning as rule 8): a bare listing meets the steer rather than a
-   silent read-only-pipeline grant, since `find` is in the default
+   `-fprintf` — find(1) mechanism, a lib literal), with **no composition** — no
+   pipe, `&&`/`||` chain, background, or redirect. A lone listing fires, and so
+   does a **`;`-sequence of listings**: a `;`-compound is not composition but a
+   batch of independent listings, exactly what the Glob steer collapses into one
+   call. A literal `echo`/`printf` banner segment between them is the natural
+   separator of such a batch and is tolerated; at least one segment must be a
+   listing. A piped `find` is a legitimate producer (rule 13 may still
+   auto-allow it), an action-predicate `find` is an executor, a redirected
+   `find` has a downstream reader, and a **mixed** compound (a segment that is
+   neither a listing nor a banner) all pass untouched. **Placed before both
+   auto-allow rules** (same reasoning as rule 8): a bare listing meets the steer
+   rather than a silent read-only-pipeline grant, since `find` is in the default
    `GUARD_KIT_RO_BINS` roster. A consumer needing different behavior shadows
    the rule in its consumer-rules section.
-10. **Bare single-file `cat`** — a `cat` whose whole command is a lone file
-    read is blocked with the steer to the harness's Read tool (rule 8's
-    read-steer shape: Read returns numbered lines registered for a later
-    Edit). Fires on the conjunction no allowlist glob expresses: the command
-    leads with `cat`, has **no consumer** (no pipe, chain, heredoc, redirect,
-    or substitution), and carries **exactly one** non-flag operand — flags are
-    allowed (`cat -n <file>`). Multi-file concatenation, a piped or heredoc'd
-    `cat`, and a redirected `cat` are composition, not a file the Read tool
-    replaces, and pass untouched. **Placed before both auto-allow rules** (same
+10. **Bare single-file `cat`** — a `cat` read is blocked with the steer to the
+    harness's Read tool (rule 8's read-steer shape: Read returns numbered lines
+    registered for a later Edit). Fires on the conjunction no allowlist glob
+    expresses: every segment leads with `cat` and carries **exactly one**
+    non-flag operand (flags are allowed, `cat -n <file>`), with **no
+    composition** — no pipe, heredoc, redirect, substitution, `&&`/`||` chain,
+    or background. A lone `cat <file>` fires, and so does a **`;`-batch of
+    reads** (`cat a; cat b`): a `;`-compound of single-file reads is a batch,
+    not composition, and collapses into successive Read calls — the ergonomic
+    case the steer exists for. A literal `echo`/`printf` banner segment between
+    reads is the natural separator of such a batch and is tolerated: it is
+    redundant once the batch moves to the Read tool, which shows each filename
+    itself. At least one segment must be a read. Multi-file concatenation, a
+    piped or heredoc'd `cat`, a redirected `cat`, an `&&`-chain, and a **mixed**
+    or banner-only compound are composition (or carry no read the Read tool
+    replaces) and pass untouched. **Placed before both auto-allow rules** (same
     reasoning as rule 8): a bare `cat <file>` meets the steer rather than a
     silent read-only-pipeline grant, since `cat` is in the default
     `GUARD_KIT_RO_BINS` roster.

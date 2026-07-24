@@ -195,40 +195,66 @@ guard_rule_sed_file() {
     done < <(guard_split_compound "$s")
 }
 
-guard_rule_find_glob() {
-    local cmd="$1" s first
-    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
-    case "$cmd" in *'`'*) return 0 ;; esac
-    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
-    grep -qE '(&&|\|\||;|\||&)' <<<"$s" && return 0
-    case "$s" in *'>'*) return 0 ;; esac
-    first="${s#"${s%%[![:space:]]*}"}"
-    first="${first%%[[:space:]]*}"
-    [[ "$first" == find ]] || return 0
-    grep -qE '\-(execdir|exec|okdir|ok|delete|fls|fprintf|fprint0|fprint)\b' <<<"$s" && return 0
-    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) with no shell prompt. A 'find' carrying an action predicate (-exec/-delete/…) or piped into a consumer is untouched; this fires only on a plain listing. If you genuinely need find, run it yourself with !<command>."
+# spec: guard-kit/SPEC.md §The generic ruleset — a literal echo/printf banner segment: the natural separator of a batched read (no expansion survives here — rule 6 ran first, the caller bailed on substitution/backtick)
+_guard_is_banner() {
+    local seg="${1#"${1%%[![:space:]]*}"}"
+    case "${seg%%[[:space:]]*}" in echo | printf) return 0 ;; *) return 1 ;; esac
 }
 
-guard_rule_cat_file() {
-    local cmd="$1" s first rest tok operands=0
-    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
-    case "$cmd" in *'`'*) return 0 ;; esac
-    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
-    grep -qE '(&&|\|\||;|\||&|<|>)' <<<"$s" && return 0
-    s="${s#"${s%%[![:space:]]*}"}"
-    first="${s%%[[:space:]]*}"
-    [[ "$first" == cat ]] || return 0
-    rest="${s#cat}"
+# spec: guard-kit/SPEC.md §The generic ruleset — one segment is a lone single-file cat read: leads with cat, exactly one non-flag operand
+_guard_is_cat_read() {
+    local seg="${1#"${1%%[![:space:]]*}"}" rest tok operands=0
+    [[ "${seg%%[[:space:]]*}" == cat ]] || return 1
+    rest="${seg#cat}"
     local -a toks
     read -ra toks <<<"$rest"
     for tok in "${toks[@]}"; do
-        case "$tok" in
-            -*) ;;
-            *) operands=$((operands + 1)) ;;
-        esac
+        case "$tok" in -*) ;; *) operands=$((operands + 1)) ;; esac
     done
-    [[ "$operands" == 1 ]] || return 0
-    guard_block "don't read a file with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, with no shell prompt. A 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files is untouched — that's composition, not a lone file read. If you genuinely need cat, run it yourself with !<command>."
+    [[ "$operands" == 1 ]]
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — one segment is a bare find listing: leads with find, carries no action predicate
+_guard_is_find_listing() {
+    local seg="${1#"${1%%[![:space:]]*}"}"
+    [[ "${seg%%[[:space:]]*}" == find ]] || return 1
+    grep -qE '\-(execdir|exec|okdir|ok|delete|fls|fprintf|fprint0|fprint)\b' <<<"$seg" && return 1
+    return 0
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — a ';'-compound skeleton is a batched read when every segment is a bare read (the passed predicate) or a literal banner, and at least one is a read; the caller has already bailed on every non-';' separator, so guard_split_compound sees only ';' sequencing
+_guard_is_read_batch() {
+    local s="$1" pred="$2" seg reads=0
+    while IFS= read -r seg; do
+        seg="${seg#"${seg%%[![:space:]]*}"}"
+        [[ -z "$seg" ]] && continue
+        if "$pred" "$seg"; then
+            reads=$((reads + 1))
+        elif ! _guard_is_banner "$seg"; then
+            return 1
+        fi
+    done < <(guard_split_compound "$s")
+    [[ "$reads" -ge 1 ]]
+}
+
+guard_rule_find_glob() {
+    local cmd="$1" s
+    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
+    case "$cmd" in *'`'*) return 0 ;; esac
+    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
+    _guard_is_read_batch "$s" _guard_is_find_listing || return 0
+    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) with no shell prompt. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>."
+}
+
+guard_rule_cat_file() {
+    local cmd="$1" s
+    grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
+    case "$cmd" in *'`'*) return 0 ;; esac
+    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
+    _guard_is_read_batch "$s" _guard_is_cat_read || return 0
+    guard_block "don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, with no shell prompt. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>."
 }
 
 guard_rule_git_grep() {
