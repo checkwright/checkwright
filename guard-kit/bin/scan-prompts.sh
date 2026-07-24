@@ -8,6 +8,7 @@ source "$BIN/../lib/guard.sh"
 
 LOG="$GUARD_KIT_LOG"
 SETTINGS="$GUARD_KIT_SETTINGS"
+SETTINGS_LOCAL="$GUARD_KIT_SETTINGS_LOCAL"
 
 COUNT=0
 case "${1:-}" in
@@ -22,9 +23,13 @@ if [[ ! -s "$LOG" ]]; then
     exit 0
 fi
 
-mapfile -t ALLOW < <(jq -r '.permissions.allow[]?
-    | select(startswith("Bash("))
-    | sub("^Bash\\(";"") | sub("\\)$";"")' "$SETTINGS" 2>/dev/null || true)
+read_allow() {
+    jq -r '.permissions.allow[]?
+        | select(startswith("Bash("))
+        | sub("^Bash\\(";"") | sub("\\)$";"")' "$1" 2>/dev/null || true
+}
+mapfile -t ALLOW       < <(read_allow "$SETTINGS")
+mapfile -t ALLOW_LOCAL < <(read_allow "$SETTINGS_LOCAL")
 
 GIT_RO=" status log diff show blame branch tag remote ls-files ls-remote rev-parse describe shortlog cat-file for-each-ref worktree reflog "
 DOCKER_RO=" ps images logs inspect version "
@@ -37,9 +42,12 @@ strip_prefix() {
     printf '%s' "$c"
 }
 
-allowed() {
-    local c t1 t2 rest p glob
-    c="$(strip_prefix "$1")"
+# spec: guard-kit/SPEC.md §scan-prompts — one segment granted by the committed allowlist, a harness read-only git/docker built-in, or (set=local) the uncommitted overlay
+seg_allowed() {
+    local seg="$1" set="$2" c t1 t2 rest p glob
+    c="$(strip_prefix "$seg")"
+    c="${c#"${c%%[![:space:]]*}"}"; c="${c%"${c##*[![:space:]]}"}"
+    [[ -z "$c" ]] && return 0
     t1="${c%%[[:space:]]*}"
     rest="${c#"$t1"}"; rest="${rest#"${rest%%[![:space:]]*}"}"
     t2="${rest%%[[:space:]]*}"
@@ -51,7 +59,26 @@ allowed() {
         # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
         [[ "$c" == $glob ]] && return 0
     done
+    if [[ "$set" == local ]]; then
+        for p in "${ALLOW_LOCAL[@]}"; do
+            [[ -z "$p" ]] && continue
+            glob="${p//:\*/\*}"
+            # shellcheck disable=SC2053  # intentional glob match: $glob is a pattern, not a literal
+            [[ "$c" == $glob ]] && return 0
+        done
+    fi
     return 1
+}
+
+# spec: guard-kit/SPEC.md §scan-prompts — granted only if EVERY segment is; a whole-string glob spanning a compound the harness would split and refuse must not read as allowed
+allowed() {
+    local set="$1" cmd="$2" skel seg
+    skel="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    while IFS= read -r seg; do
+        [[ -z "${seg// }" ]] && continue
+        seg_allowed "$seg" "$set" || return 1
+    done < <(guard_split_compound "$skel")
+    return 0
 }
 
 pattern_of() {
@@ -67,18 +94,29 @@ pattern_of() {
     esac
 }
 
-declare -A counts
+declare -A counts local_counts
 total=0
+local_total=0
+distinct=0
+local_distinct=0
+# comment-tier-exempt: ${#assoc[@]} on a still-empty associative array trips set -u on some bash, so distinct/local_distinct are counted incrementally on first sight of a key
 while IFS= read -r line; do
     [[ -z "$line" ]] && continue
-    allowed "$line" && continue
     key="$(pattern_of "$line")"
     [[ -z "$key" ]] && continue
-    counts["$key"]=$((${counts["$key"]:-0} + 1))
-    total=$((total + 1))
+    if allowed committed "$line"; then
+        continue                                   # committed allowlist covers it: reinforced, no worklist entry
+    elif allowed local "$line"; then
+        [[ -z "${local_counts[$key]:-}" ]] && local_distinct=$((local_distinct + 1))
+        local_counts["$key"]=$((${local_counts["$key"]:-0} + 1))   # granted only by the uncommitted overlay: did not prompt, but promote-or-prune
+        local_total=$((local_total + 1))
+    else
+        [[ -z "${counts[$key]:-}" ]] && distinct=$((distinct + 1))
+        counts["$key"]=$((${counts["$key"]:-0} + 1))               # nothing grants it: a true prompt
+        total=$((total + 1))
+    fi
 done < "$LOG"
 
-distinct=${#counts[@]}
 logged="$(wc -l < "$LOG" 2>/dev/null | tr -d ' ')"
 
 if [[ "$COUNT" -eq 1 ]]; then
@@ -86,8 +124,29 @@ if [[ "$COUNT" -eq 1 ]]; then
     exit 0
 fi
 
+rank_section() {
+    local -n src="$1"
+    local key
+    for key in "${!src[@]}"; do
+        printf '%s\t%s\n' "${src[$key]}" "$key"
+    done | sort -rn | while IFS=$'\t' read -r n key; do
+        printf '%5dx  %s\n' "$n" "$key"
+    done
+}
+
+overlay_section() {
+    [[ "$local_distinct" -eq 0 ]] && return 0
+    echo
+    echo "--- Overlay-covered (advisory — did NOT prompt; granted only by the uncommitted"
+    echo "    local overlay $SETTINGS_LOCAL). Promote the recurring-safe patterns to the"
+    echo "    committed allowlist or prune the one-offs (guard-kit/SPEC.md §The triage criterion): ---"
+    echo "$local_total call(s) across $local_distinct pattern(s)."
+    rank_section local_counts
+}
+
 if [[ "$distinct" -eq 0 ]]; then
     echo "PROMPT-FRICTION: clean ($logged fall-through(s) logged, all allowlisted / auto-allowed)"
+    overlay_section
     exit 0
 fi
 
@@ -95,15 +154,13 @@ echo "=== Prompt friction (advisory — triage at close, not a gate) ==="
 echo "$total prompting call(s) across $distinct pattern(s), from $logged logged fall-through(s)."
 echo "log: $LOG"
 echo
-for key in "${!counts[@]}"; do
-    printf '%s\t%s\n' "${counts[$key]}" "$key"
-done | sort -rn | while IFS=$'\t' read -r n key; do
-    printf '%5dx  %s\n' "$n" "$key"
-done
+rank_section counts
 echo
 echo "Triage each by the criterion (guard-kit/SPEC.md §The triage criterion):"
 echo "  (a) allowlist entry — safe & already in the form to reinforce,"
 echo "  (b) guard rule — a better form exists (steer), or logic a glob can't express,"
 echo "  (c) habit change — a true one-off."
+overlay_section
+echo
 echo "Then clear the log:  : > $LOG"
 exit 0

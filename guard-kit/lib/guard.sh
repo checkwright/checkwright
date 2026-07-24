@@ -71,6 +71,11 @@ guard_allow_match() {
     [[ "$s" == $glob ]]
 }
 
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/14/16, the read-compound carve-out, scan-prompts), fed a quote-stripped skeleton so the harness's per-segment boundary set never drifts
+guard_split_compound() {
+    sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
+}
+
 # spec: guard-kit/SPEC.md §The generic ruleset — the guard_rule_* run below; order is load-bearing
 guard_rule_cd_compound() {
     local cmd="$1"
@@ -187,7 +192,7 @@ guard_rule_sed_file() {
         case "$seg" in
             sed | sed[[:space:]]*) _guard_sed_segment "$seg" ;;
         esac
-    done < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$s")
+    done < <(guard_split_compound "$s")
 }
 
 guard_rule_find_glob() {
@@ -331,7 +336,7 @@ guard_rule_allowlist_chain() {
     skel="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
 
     local -a segs
-    mapfile -t segs < <(sed -E 's/\|\||&&|;|\|/\n/g' <<<"$skel")
+    mapfile -t segs < <(guard_split_compound "$skel")
 
     local lead="${segs[0]}"
     lead="${lead#"${lead%%[![:space:]]*}"}"; lead="${lead%"${lead##*[![:space:]]}"}"
@@ -393,7 +398,7 @@ guard_rule_rm_tracked() {
                 guard_block "don't delete the git-tracked path '$arg' with a bare 'rm' — use 'git rm -q $arg': it removes the file and stages exactly that deletion in one motion, so no later 'git add -A' is needed to pick it up (which risks staging a concurrent session's foreign path). An 'rm' of an untracked or gitignored path is untouched. If you genuinely need rm, run it yourself with !<command>."
             fi
         done
-    done < <(sed -E 's/(\&\&|\|\||;|\|)/\n/g' <<<"$s")
+    done < <(guard_split_compound "$s")
 }
 
 guard_generic_rules() {

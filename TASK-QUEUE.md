@@ -28,18 +28,6 @@
   round-trips where the steer's own advice is a single batched read — first-hand,
   since the session paying it is the one recording it.
 
-- **scan-prompts-local-overlay-blind** — `bin/scan-prompts.sh` filters the
-  friction log against `GUARD_KIT_SETTINGS` (committed allowlist) only, so a
-  command granted solely by `GUARD_KIT_SETTINGS_LOCAL` is reported as prompting
-  though it did not. Ruled here (scope, arm (c)): read both settings files; the
-  headline count excludes overlay-covered commands (making the prompt count true),
-  and overlay-covered survivors go to a separate, visibly-advisory section that
-  preserves the promote-or-prune worklist. Fix `allowed()` to match the harness's
-  compound-splitting first (a whole-string glob matches a compound the harness
-  would split and refuse) — the same compound-matching sub-problem as
-  `guard-read-compound-carveout`. Adds no governed name (`GUARD_KIT_SETTINGS_LOCAL`
-  already exists).
-
 ## Deferred
 
 - **runtime-dir-two-tier-detector** [needs-spec] — `check-tracking-claim`'s
@@ -1063,5 +1051,6 @@
 
 - boundary-scratch-wipe-unowned
 - scratch-execution-prompt-friction
+- scan-prompts-local-overlay-blind
 
 ## Lessons Learned

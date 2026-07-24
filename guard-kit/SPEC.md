@@ -88,6 +88,15 @@ Primitives a consumer guard composes; each emits the harness's
   hook primitive — a shared helper, one implementation behind
   compare-settings-allow's redundancy detection and rule 14's silent-grant
   guard so the two never drift.
+- `guard_split_compound <skeleton>` — the compound splitter: emits one segment
+  per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
+  `|`). Also not a hook primitive — the single implementation every consumer
+  that reasons *per segment* shares (rules 8/14/16, the read-compound carve-out
+  of rules 9/10, and scan-prompts' `allowed()`), so the harness's per-segment
+  matching surface is modelled in exactly one place and cannot drift between
+  them. Fed a quote-stripped skeleton (`'…'`/`"…"` regions already neutralized
+  by the caller, as every rule does), so a separator inside a quoted argument is
+  never mistaken for a statement break.
 
 Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
@@ -357,20 +366,33 @@ path is that consumer's settings, never a kit literal.
 ## scan-prompts
 
 Advisory: surfaces recurring permission-prompt sources from the friction
-log, filtering against the committed allowlist and the harness's built-in
-read-only git/docker auto-allows, so what remains is what the *committed*
-allowlist does not cover. **Honest limit — the survivors are an upper bound
-on prompting, not a measurement of it.** `GUARD_KIT_SETTINGS_LOCAL` is not
-read here, by design: a command granted only by the local overlay did not
-prompt, yet is exactly the triage candidate the close step must see, to
-promote or prune. So a consumer carrying a local overlay reads survivors
-(and the `--count` token behind `kpi-prompt-friction`) as inflated by
-however much that overlay grants. Grouped and ranked by pattern (leading
-binary, plus subcommand for
-the common multi-command binaries). Triaged at close by the criterion
-above. `--count` emits a compact `<patterns>/<occurrences>` token for a
-drift-KPI consumer; an explicit file argument overrides the log path (test
-capability).
+log, filtering against **both** settings files (`GUARD_KIT_SETTINGS` and
+`GUARD_KIT_SETTINGS_LOCAL`) and the harness's built-in read-only git/docker
+auto-allows. Matching is **per compound segment**, the same surface the
+harness matches on (§The guard framework, `guard_split_compound`): a logged
+command is granted only when *every* segment is, so a whole-string glob that
+spans a compound the harness would split and refuse — `Bash(git status:*)`
+against `git status && rm -rf x` — does not read as allowed and is counted as
+prompting.
+
+The friction log's fall-throughs split three ways:
+- **Committed-covered** — every segment matches the committed allowlist or a
+  harness built-in. Silently granted, reinforced; off every list.
+- **Prompting** — some segment nothing grants. The headline `<n> prompting
+  call(s)`, grouped and ranked by pattern (leading binary, plus subcommand for
+  the common multi-command binaries), triaged at close by the criterion above.
+- **Overlay-covered** — granted, but at least one segment relies on the
+  uncommitted `GUARD_KIT_SETTINGS_LOCAL` overlay. It *did not prompt*, so it is
+  excluded from the headline (the count is a true prompt count, not an upper
+  bound), yet it is exactly the promote-or-prune candidate the close step must
+  see — so it is ranked in a **separate, visibly-advisory section** below the
+  headline, never mixed into it.
+
+`--count` emits the compact `<patterns>/<occurrences>` prompting token for a
+drift-KPI consumer (overlay-covered excluded, so the KPI reads true); an
+explicit file argument overrides the log path (test capability). Its behavior
+— the three-way split, the per-segment matching, the true count — is pinned by
+`gate-tests/scan-prompts.test.sh`.
 
 ## compare-settings-allow
 
