@@ -38,7 +38,14 @@ removes a tracked file at the boundary and dirties the tree at the moment the
 scope session commits the reset. (The exemption is *not* about the directory
 surviving: `bin/enter-stage.sh:58` already `mkdir -p`s the scratch dir, and the
 wipe removes members, not the dir. Recorded with that reason instead, a later
-reader would retire the exemption as redundant.) context-kit's session sweep over
+reader would retire the exemption as redundant.) **Align audit — the exemption is
+generic-consumer mechanism, not a fact about this tree.** This repo gitignores the
+scratch dir wholesale (`.gitignore:4`) and keeps no `.gitkeep` in it (the only
+tracked one is a context-kit fixture under a different directory), so the
+tracked-file hazard is the one a consumer that *does* commit its scratch dir's
+scaffolding faces. Checking the "tracked scaffolding" phrase against this checkout
+finds nothing and would invite retiring the invariant — the same retire-it failure
+the parenthetical above guards against, reached by the other road. context-kit's session sweep over
 this identical directory already exempts `.gitkeep` by name, so the two sweeps
 agree on what is not scratch; match its form — a basename test (`! -name
 .gitkeep`) applied at every depth the wipe reaches, consistent with `PRESERVE`
@@ -117,7 +124,12 @@ existing config pattern, touches one kit, and leaves the working marker alone.
     `lib/stages.sh` (the loader that already defaults the other boundary knobs); a
     fall-open empty default when the consumer sets nothing. The scratch dir is
     read from `GATE_SDK_TMP_DIR` (`:57`, already resolved for the temp files) — no
-    new dir knob.
+    new dir knob. *Align audit — delete mechanics:* mirror context-kit's form
+    (`-mindepth 1`, `-depth`, stderr suppressed). `-depth` so a directory is
+    removed after its contents; the suppression because a `PRESERVE` basename kept
+    *inside* a doomed subdirectory makes that subdirectory's own delete fail. That
+    failure is noise, never an abort — `bin/enter-stage.sh` runs `set -uo pipefail`
+    with **no `-e`**, verified at `:3`.
   - *Consumer:* the delete itself (the boundary actor is its own consumer — this
     is a filesystem side effect, not a message), and the **boundary report**
     (`:199-201`), which gains a `note:` line naming the wiped members, mirroring

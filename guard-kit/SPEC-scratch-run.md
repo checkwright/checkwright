@@ -84,12 +84,33 @@ sweeps (loops, arrays), which is exactly the case that recurs.
   assertions. The bespoke-unit-test lane is gate-sdk's:
   `<tests-dir>/*.test.sh` run after the fixture pairs by
   `gate-sdk/bin/run-gate-tests.sh` (gate-sdk/SPEC.md §run-gate-tests), which needs
-  no fixture pair present. Two obligations ride along, both mechanical:
+  no fixture pair present.
+  **Align audit — that last clause is false, and it blocks this unit.**
+  `gate-sdk/bin/run-gate-tests.sh` exits 2 (`no gate fixture dirs under <dir>`)
+  when the tests-dir holds no `<gate>/` subdirectory; the `*.test.sh` lane runs
+  *after* that check and is never reached. A `guard-kit/gate-tests/` holding only
+  `scratch-run.test.sh` therefore reds the battery line this amendment obliges,
+  and the test never runs. Verified empirically, and by survey: every kit that
+  ships `*.test.sh` today also ships fixture pairs, so guard-kit — gateless, with
+  no fixture pair to give — would be the first to take this path.
+  §run-gate-tests states only that unit tests "run after the pairs"; it never
+  licenses a pair-less dir. **The remedy is escalated to the iteration lead**
+  (teaching the runner to accept a unit-test-only tests-dir touches gate-sdk, a
+  third component); build must not start this unit until that ruling lands.
+  Two obligations ride along, both mechanical:
   the test sources `gate-sdk/lib/test-hermetic.sh` as its first act or carries a
   `# hermetic-exempt:` marker (`check-test-hermetic`, gate-sdk/SPEC.md
   §check-test-hermetic); and guard-kit's first `gate-tests/` dir obliges a
   `run-gate-tests.sh guard-kit/gate-tests` line in the fixture-runner battery
   (`check-kit-registration` reds a kit shipping gate-tests with no battery line).
+  *Align audit — both verified at the read site, and both do fire.*
+  `check-test-hermetic`'s assertion A enumerates `<kit-root>/gate-tests/*.test.sh`
+  from `gate_kit_roots`, and guard-kit is a kit root despite shipping no `checks/`
+  (the discovery rule keys on `checks/` *or* `smoke/` — guard-kit/SPEC.md §Testing),
+  so the bootstrap-or-marker obligation reaches this test. `check-kit-registration`'s
+  assertion B tests the dir with `git ls-files`, not the filesystem, so it stays
+  silent until the test is staged and then reds in the pre-commit hook — the
+  battery line belongs in the same commit as the test, never a follow-up.
 - **Consumer surface (this repo, not kit):** `.claude/settings.json` gains
   `Bash(bash guard-kit/bin/scratch-run.sh *)`. Lands at build; named here for
   causal completeness. (`compare-settings-allow.sh` / `scan-prompts.sh` read that
