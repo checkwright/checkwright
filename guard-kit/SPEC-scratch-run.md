@@ -13,6 +13,13 @@ name. Nothing allowlists *executing* what lands there, so `bash .tmp/<probe>.sh`
 prompts on every run, forever — a loop the repo's own guard creates and its
 permission posture penalizes. The friction is real and recurring (measured
 multi-times per iteration on build probes and audit sweeps).
+**First-hand, from this iteration's align session:** auditing whether any kit
+ships a bespoke test without a fixture pair needed one `for`-loop over
+`*/gate-tests` with a command substitution per kit — a genuine multi-line sweep,
+the arm-(b)-defeating case. The guard refused it for carrying expansions, and the
+runner this unit specifies did not yet exist to take it, so the audit was re-cut
+into weaker single-purpose commands. The tool's absence taxed the very session
+auditing the tool.
 
 New tool **`guard-kit/bin/scratch-run.sh <script> [args…]`** — a content-agnostic
 scratch runner that, given a path inside the scratch dir:
@@ -84,19 +91,18 @@ sweeps (loops, arrays), which is exactly the case that recurs.
   assertions. The bespoke-unit-test lane is gate-sdk's:
   `<tests-dir>/*.test.sh` run after the fixture pairs by
   `gate-sdk/bin/run-gate-tests.sh` (gate-sdk/SPEC.md §run-gate-tests), which needs
-  no fixture pair present.
-  **Align audit — that last clause is false, and it blocks this unit.**
-  `gate-sdk/bin/run-gate-tests.sh` exits 2 (`no gate fixture dirs under <dir>`)
-  when the tests-dir holds no `<gate>/` subdirectory; the `*.test.sh` lane runs
-  *after* that check and is never reached. A `guard-kit/gate-tests/` holding only
-  `scratch-run.test.sh` therefore reds the battery line this amendment obliges,
-  and the test never runs. Verified empirically, and by survey: every kit that
-  ships `*.test.sh` today also ships fixture pairs, so guard-kit — gateless, with
-  no fixture pair to give — would be the first to take this path.
-  §run-gate-tests states only that unit tests "run after the pairs"; it never
-  licenses a pair-less dir. **The remedy is escalated to the iteration lead**
-  (teaching the runner to accept a unit-test-only tests-dir touches gate-sdk, a
-  third component); build must not start this unit until that ruling lands.
+  no fixture pair present **once gate-sdk/SPEC-unit-only-tests-dir.md lands**.
+  *Align audit — that qualifier is load-bearing and was missing.* As written
+  today the runner exits 2 (`no gate fixture dirs under <dir>`) on a tests dir
+  with no `<gate>/` subdirectory, before the `*.test.sh` lane it would reach, so a
+  `guard-kit/gate-tests/` holding only `scratch-run.test.sh` would red the battery
+  line this amendment obliges and the test would never run. The original clause
+  was an inference from §run-gate-tests' "unit tests run after the pairs", which
+  states an ordering and never licensed a pair-less dir. Operator-authorized
+  remedy: the runner exits 2 only when the dir holds *neither* pairs *nor* unit
+  tests — specified in the paired gate-sdk amendment, which this unit now carries
+  alongside this one. Sequencing for build: the runner change lands before or with
+  the test, never after.
   Two obligations ride along, both mechanical:
   the test sources `gate-sdk/lib/test-hermetic.sh` as its first act or carries a
   `# hermetic-exempt:` marker (`check-test-hermetic`, gate-sdk/SPEC.md

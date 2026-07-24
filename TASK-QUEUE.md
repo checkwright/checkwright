@@ -24,7 +24,8 @@
   option (b)'s cross-seam marker relocation. Cross-component (lifecycle mechanism
   + context-kit marker citation): arms the audit trigger.
 
-- **scratch-execution-prompt-friction** [spec: SPEC-scratch-run.md] —
+- **scratch-execution-prompt-friction** [spec: SPEC-scratch-run.md]
+  [spec: SPEC-unit-only-tests-dir.md] —
   close the self-inflicted loop where the guard steers scratch writes into
   `.tmp/` yet executing them prompts forever. New `guard-kit/bin/scratch-run.sh`
   echoes a scratch script's contents then executes it (fail-closed outside the
@@ -32,7 +33,11 @@
   self-documenting on the evidence trail. Consumer adds
   `Bash(bash guard-kit/bin/scratch-run.sh *)` to committed settings. Ruling and
   causal completeness in the amendment — arm (c), a named runner, over arm (a)'s
-  opaque bare allowlist and arm (b)'s inlining.
+  opaque bare allowlist and arm (b)'s inlining. Cross-component (guard-kit
+  mechanism + gate-sdk runner + this repo's settings and battery registration):
+  align found the runner rejects a tests dir carrying only bespoke tests, so the
+  test home this unit needs does not exist until gate-sdk's guard is widened;
+  operator authorized that growth, and the second amendment specifies it.
 
 ## Technical Debt
 
@@ -45,7 +50,10 @@
   fixture pair. Ruled here (scope): a compound-all-reads is not composition but
   batched reads, exactly what the steer prevents; recurred twice, no
   counter-evidence. Shares the compound-matching sub-problem with
-  `scan-prompts-local-overlay-blind`.
+  `scan-prompts-local-overlay-blind`. Recurred again in this iteration's align
+  session: a two-range `sed` read of one file was steered to Read, costing two
+  round-trips where the steer's own advice is a single batched read — first-hand,
+  since the session paying it is the one recording it.
 
 - **scan-prompts-local-overlay-blind** — `bin/scan-prompts.sh` filters the
   friction log against `GUARD_KIT_SETTINGS` (committed allowlist) only, so a
