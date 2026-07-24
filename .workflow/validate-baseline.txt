@@ -80,6 +80,7 @@ context_kit context_kit pass
 delegation_kit delegation_kit pass
 doctrine_kit doctrine_kit pass
 evidence_kit evidence_kit pass
+guard_kit guard_kit pass
 lifecycle_kit lifecycle_kit pass
 queue_kit queue_kit pass
 site_kit site_kit pass
