@@ -1087,6 +1087,30 @@
   note adds none either. Filed 2026-07-25 by close, operator-reported, from this
   iteration's validate-stage permission friction.
 
+- **evidence-journal-hash-chain** [needs-spec] — tamper-evidence for the
+  evidence trail itself, kit-side and infrastructure-free: each evidence
+  record (a stage stamp, a gate-run evidence line) carries the hash of its
+  predecessor, making the journal an append-only chain whose retroactive
+  edits — a rewritten verdict, a silently dropped red run — break the chain
+  and are detectable by a standalone offline verifier, no service involved.
+  This is the first cryptographic rung under **hosted-attestation-service**
+  and useful alone before it: a chained journal is exactly the record a
+  neutral party later countersigns or logs, and today's integrity story
+  (git history plus content hashes) proves nothing about omission.
+  **Open design (why `[needs-spec]`):** which surfaces chain (the
+  WORKFLOW-STATE stamp stream spans tracked projections and gitignored
+  local capture; gate evidence is per-iteration), the chain's scope and
+  reset boundary (per-iteration vs continuous), where the genesis hash
+  anchors, and the record envelope — a DSSE/in-toto-compatible statement
+  shape would make the chained record double as the attestation wire
+  format, a contract decision that outlives the journal and should be
+  taken deliberately, not defaulted.
+  **Cost while deferred:** zero mechanism rots and nothing regresses — the
+  gap is a missing guarantee, not drift, and it only bites when a third
+  party is asked to trust the record, which is the hosted rung's
+  precondition anyway. Bounded. Surfaced 2026-07-25 in the operator's
+  attestation-direction review.
+
 ## Done
 
 ## Lessons Learned
