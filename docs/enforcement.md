@@ -154,6 +154,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | delegation_kit |
 | [gate-sdk](gate-sdk/index.md) | doctrine_kit |
 | [gate-sdk](gate-sdk/index.md) | evidence_kit |
+| [gate-sdk](gate-sdk/index.md) | guard_kit |
 | [gate-sdk](gate-sdk/index.md) | lifecycle_kit |
 | [gate-sdk](gate-sdk/index.md) | queue_kit |
 | [gate-sdk](gate-sdk/index.md) | site_kit |

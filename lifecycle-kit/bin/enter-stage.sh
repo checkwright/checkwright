@@ -60,6 +60,7 @@ tmpqueue="$tmpdir/enter-stage.queue.$$"
 tmpstate="$tmpdir/enter-stage.state.$$"
 trap 'rm -f "$tmpqueue" "$tmpstate"' EXIT
 truncated=()
+wiped=()
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the pre-flight hand-off: the cursor is the last stamp, so the temp file carrying the candidate transition is the STATE file, not the queue. The boundary reset additionally renames the header (dropping any residual pre-upgrade [stage:] field), so the first stage passes a temp queue too; every later entry passes the live queue untouched — stage motion no longer writes it.
 if [[ "$first" == 1 ]]; then
@@ -189,6 +190,16 @@ fi
 trap - EXIT
 rm -f "$tmpqueue" "$tmpstate"
 
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the boundary scratch wipe, distinct from the truncate above (that rewrites a tracked file to its header; this deletes untracked scratch outright). Runs last so this run's own enter-stage.*.$$ temporaries are already gone and never candidates. '.gitkeep' is the kit invariant LIFECYCLE_KIT_BOUNDARY_PRESERVE cannot unset — a consumer that tracks its scratch dir's scaffolding must not have it deleted at the moment the boundary reset is committed.
+if [[ "$first" == 1 && -d "$tmpdir" ]]; then
+    wipe_args=(-mindepth 1 -depth ! -name .gitkeep)
+    for bp in ${LIFECYCLE_KIT_BOUNDARY_PRESERVE[@]+"${LIFECYCLE_KIT_BOUNDARY_PRESERVE[@]}"}; do
+        wipe_args+=(! -name "$bp")
+    done
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — stderr is suppressed because a preserved basename inside a doomed subdirectory makes that subdirectory's own delete fail; the failure is noise, never an abort
+    mapfile -t wiped < <(find "$tmpdir" "${wipe_args[@]}" -print -delete 2>/dev/null)
+fi
+
 if [[ "$first" == 1 ]]; then
     echo "enter-stage: iteration-boundary reset — stamped '$stamp_line'; header set to '## Iteration: —'."
     echo "  next: commit $QUEUE and $STATE together (the boundary reset writes both), hook enabled."
@@ -198,4 +209,7 @@ else
 fi
 if [[ ${#truncated[@]} -gt 0 ]]; then
     echo "  note: boundary-truncated to the '# contract:' header: ${truncated[*]} — commit alongside the reset."
+fi
+if [[ ${#wiped[@]} -gt 0 ]]; then
+    echo "  note: boundary-wiped from $tmpdir: ${wiped[*]}"
 fi

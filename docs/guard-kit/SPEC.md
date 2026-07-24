@@ -308,6 +308,57 @@ false-blocks. Match against a quote-stripped copy of the command (quoted
 spans may then name anything), and keep longer prose out of the match
 surface via a quoted `-m` span or a `-F <file>` the hook never reads.
 
+## scratch-run
+
+`bin/scratch-run.sh <script> [args…]` closes a loop the steering rules
+themselves open. The generic ruleset pushes probes and multi-line sweeps
+into the consumer's gitignored scratch dir (`GATE_SDK_TMP_DIR`) and refuses
+the harness scratchpad by name — yet nothing allowlists *executing* what
+lands there, so every run of a steered-to script prompts, forever. The
+runner is the fixed, allowlistable path that ends it: given a target inside
+the scratch dir it **echoes the script's contents to stdout** (a header
+naming the path, then the body), then **executes it**, passing stdout,
+stderr and the child's exit code through and forwarding `[args…]` verbatim
+without interpreting them.
+
+The echo is the point, not a convenience. A bare scratch-glob allowlist
+would auto-approve executing any script at that path with its contents
+visible only in an earlier write call — turning a visible command into a
+silent *and* opaque one, the opposite of what the prompt was buying.
+Echo-at-execution makes the silent run **self-documenting**: the executed
+lines land in the transcript at the moment they run, which is the evidence
+surface a supervisor's post-commit review reads. Steering the agent to
+inline the script instead is known-insufficient — it serves a short probe
+and not the genuine multi-line sweeps (loops, arrays, command
+substitution) that are exactly the recurring case.
+
+**What the allowlist entry buys, and what it costs.** The consumer's entry
+names this fixed path with a wildcard tail, and a guard only ever inspects
+the **outer command string** — so an allowlisted invocation of the runner
+carries no expansion and no decoration, passes, and the script's
+*contents* are never guard-inspected at all. State that plainly rather than
+as a convenience: the generic rules that would refuse an expansion-bearing
+one-liner do not reach the same code once it sits inside a scratch file.
+The echoed body is the **compensating control**, and it relocates review
+rather than removing it — from *before* execution, where the permission
+prompt put it, to *after*, in the transcript a supervisor reads. That is
+the actual posture of the entry, and a consumer unwilling to move review
+downstream should simply not add it: the tool still runs without it, and
+still prompts.
+
+**Fail-closed on reach.** A target resolving outside the scratch dir is
+refused before any echo or execution, so the tool cannot become a general
+"run this arbitrary path without a prompt" bypass: its reach is exactly the
+scratch surface the guard already steers into. The test reads the
+*resolved* path, never the spelling, so a traversal out of the dir refuses
+like any other outsider. Refusal, an absent target, and a missing argument
+are each exit 2 — which the passthrough makes ambiguous by construction,
+since a child exiting 2 is indistinguishable by code alone; the echo is the
+discriminator, as a refusal prints no body. Content-agnostic generic
+mechanism: the scratch dir comes from gate-sdk's existing `GATE_SDK_TMP_DIR`
+and no kit knob is added, while the consumer's allowlist entry for the fixed
+path is that consumer's settings, never a kit literal.
+
 ## scan-prompts
 
 Advisory: surfaces recurring permission-prompt sources from the friction
@@ -399,9 +450,11 @@ guard-kit/
   lib/guard.sh              # primitives + generic ruleset functions
   bin/scan-prompts.sh
   bin/compare-settings-allow.sh
+  bin/scratch-run.sh        # echo-then-exec runner for scratch scripts
   bin/run-guard-tests.sh    # decision-table runner
   guard-tests/cases.tsv     # expected-decision <TAB> command
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message
+  gate-tests/scratch-run.test.sh    # bespoke unit test, run by gate-sdk's runner
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/wakeup-guard.sh
@@ -469,6 +522,23 @@ the installed guard, asserting a block — the install is self-verifying.
 There is no `smoke/violation.sh`: the kit registers no gates, so no
 battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
 makes that file conditional on exactly this).
+
+A shipped `bin/` tool that is not a hook takes neither lane. `bin/scratch-run.sh`
+(§scratch-run) is tested by a bespoke unit test at
+`gate-tests/scratch-run.test.sh`, asserting echo-then-exec on an in-scratch
+target, pass-through of args and exit code, and the fail-closed refusal of an
+out-of-scratch one. It is **not** a `guard-tests/` row: that table's grammar is a
+decision paired with a command, which cannot express any of the three. It is not
+a gate either, so no `good/`+`bad/` fixture pair is owed — but shipped mechanism
+owes a test, and the bespoke-unit-test lane is gate-sdk's
+`<tests-dir>/*.test.sh` (gate-sdk/SPEC.md §run-gate-tests), which admits a tests
+dir carrying unit tests and no fixture pair. Homing it there is what puts it
+under `check-test-hermetic`, whose assertion A enumerates
+`<kit-root>/gate-tests/*.test.sh` — the enforcement a kit-local runner would
+forfeit. A kit's first `gate-tests/` directory also obliges a fixture-runner
+line in the consumer's battery, which `check-kit-registration` reads from
+`git ls-files`: the line belongs in the same commit as the test, never a
+follow-up.
 
 A gateless kit shapes gate-sdk's discovery rule: `gate_kit_roots` recognizes a
 sibling kit by its `checks/` *or* `smoke/` directory. Keying on `checks/`

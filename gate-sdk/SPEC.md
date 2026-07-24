@@ -634,7 +634,21 @@ kit's `<KIT>_CONFIG_FILE` to one shared empty file so the gate runs on kit
 defaults, not the consumer's posture — with `check-test-hermetic`
 (§check-test-hermetic) enforcing the pairing. A case that deliberately exercises
 config overrides *after* the source (a later assignment, or an
-`env -u <KIT>_CONFIG_FILE` / per-invocation prefix) by ordering. The runner is a
+`env -u <KIT>_CONFIG_FILE` / per-invocation prefix) by ordering. A tests dir may
+hold fixture pairs, bespoke unit tests, or **both**, and the runner exits 2 only
+when it holds **neither** — the emptiness case, where the invocation named
+nothing to test at all. So a **gateless** kit ships bespoke tests with no fixture
+pair to give: it registers no gate to build a pair *around*, yet its `lib/` and
+`bin/` still need testing, and the discovery rule already recognizes that kind of
+kit (`gate_kit_roots` keys on `checks/` **or** `smoke/` — §lib/gate.sh). A
+unit-test-only dir prints `0 pairs` beside its unit count, so the shape reads as
+deliberate rather than silent. This widens what a *tests dir* may contain, never
+what a *gate* may omit: a registered gate still owes its `good/`+`bad/` pair
+(§check-fixture-pair). Rehoming such a test in the owning kit's own runner is
+ruled out — `check-test-hermetic`'s assertion A enumerates
+`<kit-root>/gate-tests/*.test.sh` only, so a test outside that directory silently
+escapes the bootstrap-or-marker obligation that is the whole reason this lane
+lives here. The runner is a
 test layer parallel to the gates, never a `gates.list` member.
 
 ### run-consumer-smoke

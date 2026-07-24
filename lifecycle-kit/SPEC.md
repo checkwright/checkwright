@@ -317,6 +317,14 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   inbound surfaces would publish that consumer's private workflow.
 - `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
   iteration boundary; default empty.
+- `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — keep-list of scratch-dir **basenames** the
+  iteration-boundary wipe spares (§bin/enter-stage.sh); default empty, so an
+  unset-knob consumer gets a clean wipe of an already-disposable surface.
+  Boundary-only, and paired with the scratch dir it reads (`GATE_SDK_TMP_DIR`)
+  rather than adding a directory knob of its own. **The tier split matters:** the
+  `.gitkeep` exemption is a kit invariant this knob cannot unset, and `PRESERVE`
+  is the consumer keep-list layered on top — a reader who takes the knob for the
+  wipe's only keep rule would reintroduce the tracked-file deletion.
 - `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
   must carry a data line naming the closing iteration before the iteration
   boundary may be crossed (§bin/enter-stage.sh); a missing member is a
@@ -693,7 +701,51 @@ the kit; a downstream kit whose per-iteration file must start each cycle from
 its contract header adds itself here, as evidence-kit's manifest does. The
 kit-owned `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` resets by the same rule as a
 **built-in member** — the kit owns that surface, so it does not ride the
-consumer knob (git history keeps the retired stamps). The boundary entry also
+consumer knob (git history keeps the retired stamps).
+
+The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`),
+deleting every member whose basename is neither `.gitkeep` nor a
+`LIFECYCLE_KIT_BOUNDARY_PRESERVE` entry — at any depth the wipe reaches — and
+naming the wiped set in its report the way it already names the truncated set.
+Truncate and wipe share the boundary trigger and the report line and **nothing
+else**: truncate rewrites a *tracked* file down to its `# contract:` header, so
+the file survives with an empty body; the wipe *deletes* untracked scratch
+members outright. `PRESERVE` is therefore a keep-list for the delete and never a
+truncate target. The wipe runs last — after the truncate loop and after
+enter-stage removes its own temp files — so those temporaries are never
+candidates, and it is **boundary-only**: an ordinary stage entry appends and
+touches no scratch. It is unconditional over the directory because scratch is
+disposable *by definition*; a consumer's persistent measurement trends live
+outside it by retention contract. A delete that fails because a preserved
+basename sits inside an otherwise-doomed subdirectory is noise, never an abort.
+
+`.gitkeep` is a **kit invariant, not configuration** — the consumer cannot unset
+it. The kit must not delete a file the consumer tracks: doing so removes a
+tracked file at the boundary and dirties the tree at the very moment the
+first-stage session commits the reset. The exemption is *not* about the directory
+surviving (the tool `mkdir -p`s the scratch dir, and the wipe removes members,
+not the dir); it is recorded with its real reason so a later reader does not
+retire it as redundant, and it is generic-consumer mechanism rather than a fact
+about any one checkout — a consumer that gitignores its scratch dir wholesale
+never exercises it. Shipping the exemption as `PRESERVE`'s *default* is **ruled
+out**: a defaulted bash array is replaced, not merged, when a consumer assigns
+it, so protection would decrease as configuration increases and any consumer
+setting `PRESERVE` for its own reasons would silently lose the exemption. A
+git-aware "spare any tracked file" rule is **ruled out** too — it makes
+filesystem behavior git-dependent for one case, and it would spare any tracked
+file parked in scratch, re-opening the accumulation the wipe exists to close.
+
+The scratch dir has a **second reclaimer, and the two do not overlap.**
+context-kit's session-context hook sweeps the same directory at *every* session
+start, age-guarded precisely so a concurrent same-checkout session's in-flight
+scratch survives (context-kit/SPEC.md §The session-context hook). The boundary
+wipe is deliberately **not** age-guarded: it fires once, at the iteration
+transition, where the only scratch a consumer means to carry across is by
+definition named in `PRESERVE` — an age guard there would leave the previous
+iteration's fresh residue behind, which is the whole thing being reclaimed. Two
+triggers, two postures, one directory; neither mechanism reads the other.
+
+The boundary entry also
 **refuses outright when `## Lessons Learned` is non-empty** (exit 1, the
 untriaged entries printed, nothing written — the same refusal contract as the
 built-in pre-flight): an untriaged lesson must not cross into the next
@@ -749,6 +801,7 @@ it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 (`LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES`,
 `LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
+`LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
 `LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in

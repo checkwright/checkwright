@@ -12,33 +12,6 @@
 
 ## New Features
 
-- **boundary-scratch-wipe-unowned** [spec: SPEC-boundary-scratch-preserve.md] —
-  mechanize the iteration-boundary scratch wipe every scope session performs by
-  hand (an unavoidable per-iteration permission prompt on a `find … -delete`
-  compound the allowlist cannot express). New `LIFECYCLE_KIT_BOUNDARY_PRESERVE`
-  array (default empty) lets `enter-stage.sh`'s boundary path wipe the scratch dir
-  (`GATE_SDK_TMP_DIR`) while keeping named members; this consumer sets
-  `(session-role)` in `scripts/lifecycle-config.sh` to preserve context-kit's
-  lead-session marker. Ruling and causal completeness in the amendment — option
-  (a), a preserve knob on the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` pattern, over
-  option (b)'s cross-seam marker relocation. Cross-component (lifecycle mechanism
-  + context-kit marker citation): arms the audit trigger.
-
-- **scratch-execution-prompt-friction** [spec: SPEC-scratch-run.md]
-  [spec: SPEC-unit-only-tests-dir.md] —
-  close the self-inflicted loop where the guard steers scratch writes into
-  `.tmp/` yet executing them prompts forever. New `guard-kit/bin/scratch-run.sh`
-  echoes a scratch script's contents then executes it (fail-closed outside the
-  scratch dir), so a fixed allowlistable path kills the prompt while the run stays
-  self-documenting on the evidence trail. Consumer adds
-  `Bash(bash guard-kit/bin/scratch-run.sh *)` to committed settings. Ruling and
-  causal completeness in the amendment — arm (c), a named runner, over arm (a)'s
-  opaque bare allowlist and arm (b)'s inlining. Cross-component (guard-kit
-  mechanism + gate-sdk runner + this repo's settings and battery registration):
-  align found the runner rejects a tests dir carrying only bespoke tests, so the
-  test home this unit needs does not exist until gate-sdk's guard is widened;
-  operator authorized that growth, and the second amendment specifies it.
-
 ## Technical Debt
 
 - **guard-read-compound-carveout** — tighten `guard_rule_cat_read` /
@@ -1087,5 +1060,8 @@
   scope/spec conflation.
 
 ## Done
+
+- boundary-scratch-wipe-unowned
+- scratch-execution-prompt-friction
 
 ## Lessons Learned

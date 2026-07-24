@@ -132,7 +132,9 @@ the skill on a blocking verdict — so they are not resident here.
 ## Housekeeping
 
 - `.tmp/` is gitignored, purely disposable scratch (gate timings, resume
-  journals), wiped at the scope boundary; `.metric/` is gitignored persistent
+  journals), wiped at the scope boundary by `enter-stage.sh`'s boundary reset —
+  mechanized, not by hand; the keep-list is in `scripts/lifecycle-config.sh`
+  (lifecycle-kit/SPEC.md §bin/enter-stage.sh); `.metric/` is gitignored persistent
   measurement trends — **never committed**,
   account-bearing (drift-kit/SPEC.md §Layout and configuration); `.workflow/`
   holds two tiers — tracked checked projections beside gitignored local capture

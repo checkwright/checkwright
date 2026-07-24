@@ -55,6 +55,7 @@
       "Bash(bash guard-kit/bin/scan-prompts.sh *)",
       "Bash(bash guard-kit/bin/compare-settings-allow.sh)",
       "Bash(bash guard-kit/bin/run-guard-tests.sh)",
+      "Bash(bash guard-kit/bin/scratch-run.sh *)",
       "Bash(bash */checks/check-*.sh)",
       "Bash(bash */checks/check-*.sh *)",
       "Bash(bash */bin/run-*-tests.sh)",

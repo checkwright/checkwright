@@ -3,6 +3,8 @@
 # shellcheck disable=SC2034  # consumed by lifecycle-kit/lib/stages.sh after sourcing
 LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/release-disposition.txt)
 LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)
+# spec: context-kit/SPEC.md §The session-context hook — the one scratch member this repo carries across the boundary: the marker the hook reads to suppress the delegation nudge for a lead session, whose lifetime is that live session's, not the iteration's
+LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)
 LIFECYCLE_KIT_ENTRY_PREFLIGHT=('close=evidence-kit/checks/check-evidence-manifest.sh .workflow/validate-evidence.txt')
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's session-boundary posture: 'iteration' sanctions the lead's inline fallback; cost accepted that the dogfood evidence stops demonstrating the strict posture
 LIFECYCLE_KIT_SESSION_BOUNDARY=iteration

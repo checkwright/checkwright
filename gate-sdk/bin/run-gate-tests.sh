@@ -68,13 +68,14 @@ run_case() {
 
 shopt -s nullglob
 gate_dirs=("$TESTS_DIR"/*/)
+unit_tests=("$TESTS_DIR"/*.test.sh)
 shopt -u nullglob
-if [[ ${#gate_dirs[@]} -eq 0 ]]; then
-    echo "run-gate-tests: no gate fixture dirs under $TESTS_DIR" >&2
+if [[ ${#gate_dirs[@]} -eq 0 && ${#unit_tests[@]} -eq 0 ]]; then
+    echo "run-gate-tests: no gate fixture dirs and no *.test.sh under $TESTS_DIR" >&2
     exit 2
 fi
 
-for d in "${gate_dirs[@]}"; do
+for d in "${gate_dirs[@]+"${gate_dirs[@]}"}"; do
     gate="$(basename "$d")"
     good="$d/good"
     bad="$d/bad"
@@ -103,10 +104,7 @@ done
 
 unit=0
 unit_fail=0
-shopt -s nullglob
-unit_tests=("$TESTS_DIR"/*.test.sh)
-shopt -u nullglob
-for t in "${unit_tests[@]}"; do
+for t in "${unit_tests[@]+"${unit_tests[@]}"}"; do
     unit=$((unit + 1))
     if out="$(bash "$t" 2>&1)"; then
         :
