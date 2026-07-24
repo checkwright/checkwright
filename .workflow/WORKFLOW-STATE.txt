@@ -10,3 +10,4 @@ permission-posture-reconciliation align ae23a636 2026-07-24
 permission-posture-reconciliation build ad852768 2026-07-24
 permission-posture-reconciliation build ac484096 2026-07-24
 permission-posture-reconciliation validate a1cce87a 2026-07-24
+permission-posture-reconciliation close aed6e238 2026-07-25
