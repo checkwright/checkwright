@@ -34,6 +34,23 @@ empty body); the wipe *deletes* untracked scratch members outright. They share
 the boundary trigger and the report line, nothing else — `PRESERVE` is a keep-list
 for the delete operation, never a truncate target.
 
+**The scratch dir already has a reclaimer; this is the second, and they do not
+overlap.** context-kit's session-context hook sweeps the same
+`${GATE_SDK_TMP_DIR:-.tmp}` at **every session start**, age-guarded (`-mmin
++1440`) precisely so a concurrent same-checkout session's in-flight scratch
+survives (context-kit/SPEC.md §The session-context hook, step 6). The boundary
+wipe is deliberately **not** age-guarded: it fires once, at the iteration
+transition, where the only scratch a consumer means to carry across is by
+definition named in `PRESERVE` — an age guard there would leave the previous
+iteration's fresh residue behind, which is the whole thing being reclaimed. Two
+triggers, two postures, one directory; neither mechanism reads the other and no
+context-kit surface changes. The other cross-component scratch residents are
+already consistent with a wipe: drift-kit's `DRIFT_KIT_TMP_DIR` members are
+"regenerated on every run, so a scratch wipe is harmless" (drift-kit/SPEC.md
+§Layout and configuration), its persistent trends live in `DRIFT_KIT_METRIC_DIR`
+by retention contract, and the knowledge-friction log is a `.workflow/` member,
+not scratch.
+
 **Seam.** The wipe mechanism and the empty-default knob are generic
 lifecycle-kit mechanism. The one value this consumer sets — `session-role` — is
 **consumer config**, landing in `scripts/lifecycle-config.sh` beside the existing

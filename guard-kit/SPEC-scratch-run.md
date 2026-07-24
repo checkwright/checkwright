@@ -73,11 +73,23 @@ sweeps (loops, arrays), which is exactly the case that recurs.
   runner: guard-kit steers writes into scratch, and this tool closes the loop by
   making scratch *execution* allowlistable-yet-visible. State the fail-closed
   in-scratch-dir contract and the echo-then-exec evidence property.
-- **guard-kit landing checklist** — the tool ships with a test under
-  `guard-kit/guard-tests/` (the kit's suite dir): assert echo-then-exec on an
-  in-scratch target, pass-through of exit code and args, and fail-closed refusal
-  of an out-of-scratch target. (A bin/tool, not a gate — no good/bad gate-fixture
-  pair, but shipped mechanism needs a test.)
+- **guard-kit landing checklist** — the tool ships with a test asserting
+  echo-then-exec on an in-scratch target, pass-through of exit code and args, and
+  fail-closed refusal of an out-of-scratch target. (A bin/tool, not a gate — no
+  good/bad gate-fixture pair, but shipped mechanism needs a test.) Its home is a
+  new `guard-kit/gate-tests/scratch-run.test.sh`, **not** `guard-kit/guard-tests/`:
+  the latter is the hook decision table (`cases.tsv`, expected-decision `<TAB>`
+  command, fed through the template guard as hook JSON by `bin/run-guard-tests.sh`
+  — guard-kit/SPEC.md §Testing), whose row grammar cannot express any of the three
+  assertions. The bespoke-unit-test lane is gate-sdk's:
+  `<tests-dir>/*.test.sh` run after the fixture pairs by
+  `gate-sdk/bin/run-gate-tests.sh` (gate-sdk/SPEC.md §run-gate-tests), which needs
+  no fixture pair present. Two obligations ride along, both mechanical:
+  the test sources `gate-sdk/lib/test-hermetic.sh` as its first act or carries a
+  `# hermetic-exempt:` marker (`check-test-hermetic`, gate-sdk/SPEC.md
+  §check-test-hermetic); and guard-kit's first `gate-tests/` dir obliges a
+  `run-gate-tests.sh guard-kit/gate-tests` line in the fixture-runner battery
+  (`check-kit-registration` reds a kit shipping gate-tests with no battery line).
 - **Consumer surface (this repo, not kit):** `.claude/settings.json` gains
   `Bash(bash guard-kit/bin/scratch-run.sh *)`. Lands at build; named here for
   causal completeness. (`compare-settings-allow.sh` / `scan-prompts.sh` read that

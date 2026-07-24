@@ -1032,6 +1032,52 @@
   30-entry deferred section, and pre-launch usability feedback has no
   low-friction inlet. Surfaced 2026-07-23 in the same external review.
 
+- **scope-amendment-authoring-gate** [needs-spec] — on a roster carrying a
+  dedicated authoring stage, nothing stops the **scope** stage from doing
+  `spec`'s job: `4e10265` authored both of this iteration's amendment files and
+  landed both amendment-ref promotions in one `chore(scope)` commit, and every gate
+  stayed green — `check-amendment-queue`'s bidirectional rule is satisfied by a
+  paired amendment *whenever* it was written, and the stamp protocol only checks
+  that a stage's predecessor stamped, never that a stage's **output** was produced
+  under its own cursor. The stage evidence then records an authoring stage that
+  authored nothing, which is exactly the auditability the state machine exists to
+  provide.
+  **Gap generalization — the inputs are already at the hook.** The pre-commit
+  hook can read the stage cursor (last stamp in `.workflow/WORKFLOW-STATE.txt`)
+  and the staged diff; the roster and its predecessor map are in
+  `LIFECYCLE_KIT_STAGES` / `LIFECYCLE_KIT_PREDECESSOR`. Narrow rule: when the
+  roster contains `spec` and the cursor is `scope`, a staged diff that **adds** an
+  amendment file (`<kit>/SPEC-*.md`) or **adds** an amendment-ref tag (canon-kit's
+  spec-ref form) to a queue entry is the violation. Trigger is narrow, both
+  halves are mechanical, and the match carries no judgment.
+  **Open design (why `[needs-spec]`, not a build unit):** three choices decide the
+  gate's shape. (1) **Scope** — the narrow scope/spec rule, or its general form: a
+  stage-scoped write-surface table where each stage declares the surfaces it may
+  write and a commit under stage X touching stage Y's surface reds. The general
+  form is worth far more and is a much larger design (every stage's surface set
+  must be enumerable and correct, and stages legitimately share surfaces). (2)
+  **Placement** — lifecycle-kit owns the cursor and the roster; canon-kit owns
+  amendment files and the bidirectional rule. The rule needs both, so ownership is
+  a real seam call, not a coin flip. (3) **Deliberate-early valve** — an operator
+  may sanction early authoring (this iteration's amendments were kept, not
+  reverted), so the gate needs a legible override, and a bypass-by-`--no-verify`
+  is not one.
+  Known false-positive surface to specify against: close's merge step **deletes**
+  amendment files and drops their refs under a `close` cursor (deletions and
+  removals must not arm the rule), and a debt-only iteration skips `spec`
+  entirely, so scope authoring nothing is the normal case there.
+  **Cost:** a real check plus a `good/`+`bad/` fixture pair, its `# graph:`
+  manifest, the regenerated pre-commit hook and graph artifact, and a
+  `gates.list` row — a full gate landing, not a one-liner; the general form
+  multiplies that by the write-surface table it would have to enumerate and keep
+  true. Feature by the litmus: it adds a governed name.
+  **Cost while deferred:** low per occurrence, and the failure is silent — the
+  amendments produced this way were sound, so nothing is wrong downstream; what
+  degrades is the stage evidence's truthfulness, and it degrades invisibly
+  (a green battery is not evidence against it). Recurred once so far.
+  Filed 2026-07-24 by spec, operator-ruled, from this iteration's own
+  scope/spec conflation.
+
 ## Done
 
 ## Lessons Learned
