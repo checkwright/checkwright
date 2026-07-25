@@ -6,3 +6,4 @@
 
 supply-chain-trust-baseline scope afeddccf 2026-07-25
 supply-chain-trust-baseline spec a97b4db9 2026-07-25
+supply-chain-trust-baseline align abd83ebd 2026-07-25
