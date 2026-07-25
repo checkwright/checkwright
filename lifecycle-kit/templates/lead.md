@@ -187,17 +187,26 @@ consequences:
   context is actually common; split where the model tier changes or a
   delegation-kit split trigger fires — per-batch model tiering is the dominant
   window lever, not token counts.
-- **Tier each stage to its work class.** A stage whose work is *mechanical
-  oracle-running* — running a fixed verification battery and reporting its
-  verdict, low generative judgment — is **tier-downgradeable**: a cheaper model
-  serves it, and the dispatcher pins the cheaper tier with a `model` override on
-  that stage's dispatch. A stage whose work is *generative or verificational
-  judgment* — bounding a unit set, authoring an amendment, cross-spec audit,
-  implementation — is **not**: the judgment is exactly what the tier buys, and
-  downgrading it trades a large correctness risk for a small window saving. Which
-  stages fall on each side is the consumer's binding (the ruling-config slot), the
-  work-class test is this rule; re-judge every assignment when the harness model
-  roster churns.
+- **Tier each batch to its work class.** The lead reads the **work-class**
+  labels of the deltas in a batch — via the `[spec:]` amendments the batch's
+  entries point at, where `/spec` emits one `{mechanical | design-bearing}` tag
+  per delta — and tiers the batch by their aggregate. A batch whose deltas are
+  **all mechanical** (oracle-running: a fixed verification battery, a
+  rename/merge sweep, a mechanical pin — low generative judgment) is
+  **tier-downgradeable**: a cheaper model serves it, and the dispatcher pins the
+  cheaper tier with a `model` override on that batch's dispatch. A batch carrying
+  **any design-bearing** delta (generative or verificational judgment — bounding
+  a unit set, authoring an amendment, cross-spec audit, non-obvious
+  implementation) **stays on the judgment tier**: the judgment is exactly what
+  the tier buys, and downgrading it trades a large correctness risk for a small
+  window saving. Class → live model is mapped at dispatch time, where the roster
+  dependency already belongs (agent-execution.md, same bullet). There is no
+  standing per-stage classification to bind: the batch's labels decide at
+  dispatch time, so a stage-uniform class (validate, uniformly mechanical) is a
+  **collapsed default**, not a bound roster — while a stage whose batches diverge
+  (build — a one-line hermeticity pin beside a new KPI plugin) tiers each batch
+  from its deltas' labels, which a per-stage rule could not express. Re-judge
+  every assignment when the harness model roster churns.
 - **An intra-stage batch split is the lead's to own.** When a stage's work
   splits into batches, those batches are **N sibling stage sessions the lead
   dispatches and validates** — each entering through `enter-stage.sh` as a

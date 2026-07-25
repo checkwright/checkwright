@@ -57,6 +57,25 @@ never a hand-picked subset, and never silence a probe's stderr — a `2>/dev/nul
 on a path grep reads a bad path as "no reader", manufacturing the false negative
 that hides a cross-component reader.
 
+**Label every delta with its work class.** In the amendment's §What changes,
+every delta carries a **work-class** tag — either **mechanical** or
+**design-bearing**. A delta is **mechanical** when executing it demands only
+oracle-running — running a fixed verification battery, a rename/merge sweep, a
+mechanical pin — with low generative judgment. It is **design-bearing** when
+executing it demands generative or verificational judgment — authoring a
+contract, a cross-spec audit, a non-obvious implementation. The label records
+what the delta *demands*, never a model name: a baked model name is drift by
+construction against a churning roster, and a spec-time model *recommendation*
+would attach to a batch the lead has not cut yet (the lead cuts batches at
+build). The two values apply delegation-kit's unit-shape distinction
+(`templates/agent-execution.md`, "Match the dispatched model and effort to the
+unit's shape" — a read-heavy or mechanical unit rides a cheaper model class; a
+unit carrying design judgment stays on the supervisor's class) at authoring
+time. This is judgment `spec` holds and the lead does not: `spec` knows what
+each delta demands, the lead knows only what the queue entry says. The label's
+one reader is the lead's per-batch tier decision (`lead.md` §Economics), which
+reads the labels of a batch's deltas at batch-cut time.
+
 **Writing the amendment *is* promoting the deferred entry.** Land the
 `[spec: <ref>]` ref on the feature entry and the amendment file itself in **one
 commit**, satisfying canon-kit's bidirectional rule — without the pairing,

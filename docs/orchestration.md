@@ -101,9 +101,10 @@ prices. To drive an iteration under it:
    ride every authoring turn). A debt-only iteration skips it.
 4. **The lead dispatches each remaining stage** — `/align`, `/build`,
    `/validate`, `/close` — as a background stage session that runs its skill
-   unchanged, on the tier the ruling-config pins per stage: `validate`'s
-   mechanical oracle-running rides a cheaper tier, the judgment-heavy stages the
-   premium one (the tier-differentiation rule,
+   unchanged, on the tier the ruling-config pins: `validate`'s uniformly
+   mechanical oracle-running rides a cheaper tier, while `build` is tiered **per
+   batch** from its deltas' work-class labels, its judgment-heavy work staying
+   on the premium tier (the per-batch tier-differentiation rule,
    [the lead template](../lifecycle-kit/templates/lead.md) §Economics). A stage whose
    work splits into batches is N sibling stage sessions the lead dispatches and
    validates (each a same-stage re-entry), never a stage session sub-dispatching

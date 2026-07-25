@@ -12,36 +12,6 @@
 
 ## New Features
 
-- **stage-tiering-unit-is-the-batch** [spec: SPEC-per-batch-tiering.md] —
-  reconciles the lead binding's model-tiering unit from the **stage** to the
-  **batch**, and adds the per-delta **work-class** label (`mechanical` vs
-  `design-bearing`) that `/spec` emits and the lead consumes at batch-cut.
-  Resolves the live self-contradiction in
-  `lifecycle-kit/templates/lead.md` §Economics — the "per-batch model tiering …
-  dominant window lever" bullet against the "Tier each stage to its work class"
-  bullet just below it — by converging on the unit-level doctrine the lead
-  already inherits (`delegation-kit/templates/agent-execution.md`, "Match the
-  dispatched model and effort to the unit's shape", cited not changed).
-  Single-component (lifecycle-kit): `/spec` output contract + `lead.md`
-  §Economics. The design, causal completeness, and the consumer-shim integration
-  live in the amendment.
-  **Evidence, honest and time-bound (kept here, not in the to-be-deleted
-  amendment nor in permanent `lead.md`):** n=1 and confounded — batch 2a's
-  Sonnet-vs-Opus gap is dominated by unit size (cache reads), and the tier itself
-  saved **$2.1198** on that unit ($1.41 post-cliff), quality holding.
-  `scripts/price-table.tsv` carries a KNOWN CLIFF
-  (`prices-valid-through: 2026-08-31`, Opus:Sonnet 2.5x → ~1.67x), so any
-  downstream tier ruling re-reads the table headers, not these figures
-  (`kpi-price-table-age` raises it). The figures are usable only because
-  `stage-economics-attribution-honesty` (Done) fixed the meter this iteration;
-  earlier per-stage figures predate the fix.
-  **Cost if not built:** low per iteration, structurally compounding — each build
-  stage either pays the Opus premium on mechanical batches or reaches the cheaper
-  tier by habit, the failure mode the doctrine forbids. Sibling to
-  `build-stage-tier-economics`, which asks whether *the build stage* downgrades —
-  malformed, since the stage is not the unit.
-  Filed 2026-07-22 by close; promoted 2026-07-25 by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -1155,5 +1125,7 @@
   scope-stage decision.
 
 ## Done
+
+- stage-tiering-unit-is-the-batch
 
 ## Lessons Learned
