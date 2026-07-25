@@ -2,7 +2,3 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
-supply-chain-trust-baseline lesson rule lifecycle-kit/templates/skills/align.md — Amendment precision, twice in one document: an enumerated count the amendment's own prose contradicts
-supply-chain-trust-baseline lesson task amendment-update-target-coverage — Amendment precision, twice in one document: an update target no delta letter claims
-supply-chain-trust-baseline lesson rule .claude/agents/stage-session.md — Standing dispatch policy in the wrong tier: the sibling-dispatch clause lived only in lead.md
-supply-chain-trust-baseline lesson discard not a defect — Validate stalled twice on an approval prompt awaiting an away operator, not agent or tier misbehavior
