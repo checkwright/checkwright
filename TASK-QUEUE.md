@@ -12,6 +12,112 @@
 
 ## New Features
 
+- **launch-activation-cli** [spec: SPEC-activation-installer.md] — the
+  five-minute activation path: an installer CLI on the reserved npm name
+  (`npx checkwright init` / `doctor` / `update` / `diff` / `uninstall`,
+  `--dry-run`) that vendors pinned kit source into the consumer repo and
+  commits a lock/manifest recording profile, kit versions, and generated
+  files — distribution convenience without giving up auditable, committed
+  vendoring. At most three progressive profiles (starter / delegation / full)
+  so the first experience is not all eleven kits at once; `doctor` probes the
+  bash/GNU/jq/ShellCheck floors before any partial install. Acceptance shape:
+  a clean Linux repo reaches first green in under five minutes with one
+  command and no manual copying; re-init is idempotent; uninstall removes only
+  manifest-recorded files; consumer smoke covers install/update/uninstall per
+  profile. Sequencing: owns the install-ownership contract that
+  `plugin-marketplace` must package against — a marketplace package without an
+  ownership/upgrade manifest is a second install model. Promotion revisits the
+  thin-installer demand-gating ruling (gate-sdk/SPEC.md §upgrade-smoke): the
+  external review names time-to-first-value the top adoption weakness — a
+  second attestation beside the anticipated second consumer.
+  **Promoted into the `activation-path` unit set 2026-07-26 by the undirected
+  scope survey (operator ruling), with three conditions ruled in. `/spec` pairs
+  this entry; all three belong in the amendment's envelope, not in build-time
+  judgment.**
+  **(1) Phasing is authorized and must be stated in the envelope.** `init` +
+  `doctor` land first; `update` / `diff` / `uninstall` land second. The envelope
+  says so explicitly so build is not left to discover the overrun. This is the
+  largest entry in the queue and the phasing is what makes it iteration-shaped.
+  **(2) The registry doctrine survives; its prose is rewritten as an explicit
+  envelope item.** `docs/install.md:11-12` publishes a ruling — "the package
+  registries hold the name only, never a dependency channel. There is nothing to
+  `npm install` or `cargo add`." A published installer reopens it. Operator
+  ruling: an `npx checkwright init` that vendors pinned source and commits it is
+  **not** a dependency channel — nothing resolves at build time and the kits
+  still land as committed, auditable source, which is the property the doctrine
+  protects. So the doctrine stands and install.md is rewritten to distinguish a
+  one-shot vendoring installer from a resolved dependency. Because that is
+  user-facing published semantics, it lands **in the amendment** as a named
+  envelope item, never as incidental build-time wording.
+  **(3) Two verified cost facts, carried so `/spec` does not re-derive them.**
+  *The publish is real work with its own supply-chain surface:*
+  `reserve/npm/package.json` is a bare name reservation — `"version": "0.0.1"`,
+  `"files": ["README.md"]`, and **no `bin` field** — so there is no installer
+  package today, and standing one up adds a distribution channel the
+  just-landed `supply-chain-trust-baseline` does not cover (provenance, a
+  pinned publish workflow). *`doctor` is smaller than this entry implies:*
+  `context-kit/bin/env-probe.sh` already walks `PROBE_SET` and already probes
+  versions (`probe_version()`, lines 39-47); it lacks only a floor to compare
+  against and a verdict to emit. The floor axis itself is
+  `platform-support-contract`'s deliverable in this same unit set, so `doctor`
+  consumes it rather than defining it.
+  **Paired 2026-07-26 by `/spec`; the amendment carries the rulings.** Phasing,
+  the rewritten doctrine and its two gated properties, the bash-not-JS
+  implementation call, the `reserve/npm/` retirement, the six-field manifest
+  with a phase-1 reader each, the profile subset chain, and the declined
+  payload gate all live in `SPEC-activation-installer.md` — read it before
+  cutting a batch. The registry publish is **ruled out of this iteration** by
+  the lead: build lands the package and the provenance workflow and proves the
+  path against a packed tarball; the live publish is the operator's to
+  authorize at a release under RELEASING.md.
+  **Cost while deferred:** every prospective adopter pays the manual
+  vendor-and-wire path, the largest single drop-off risk at announcement;
+  non-rotting otherwise. Surfaced 2026-07-23 in an external
+  product/positioning review (operator-commissioned; artifact local-only).
+
+- **platform-support-contract** [spec: SPEC-toolchain-floor.md] — make
+  portability a tested contract instead of a layered explanation: a support
+  matrix (Linux / macOS / Windows-WSL, exact tool floors) with a CI
+  install-smoke leg per supported platform or an explicit experimental label;
+  resolve the standing contradiction — docs/install.md declares no minimum
+  versions are pinned while gate-sdk/README.md requires bash 4+ and GNU
+  userland, neither of which stock macOS ships; the first support table
+  distinguishes engine portability from full harness experience. The `doctor`
+  probe belongs to `launch-activation-cli`; this entry owns the matrix and the
+  CI legs.
+  **Scoped down to the floor half 2026-07-26 by the `activation-path` scope
+  survey (operator ruling).** This entry is now the **floor contract only** and
+  is a member of the `activation-path` unit set, to be paired by `/spec`. The
+  CI per-platform install-smoke legs are deferred back as their own costed
+  entry, `platform-support-ci-matrix` — no macOS/WSL adopter exists yet to
+  justify the runner spend. Do not rebuild the legs here.
+  **The floor surface already exists and is already gated — this is one missing
+  axis, not a new roster.** `scripts/check-install-toolchain.sh` holds
+  bidirectional name-set parity between `docs/install.md`'s Requirements
+  toolchain block (delimited by its `toolchain:begin`/`toolchain:end`
+  markers) and
+  `context-kit/bin/env-probe.sh`'s `PROBE_SET=(bash git jq awk shellcheck)`.
+  That roster carries **names only**: there is no version-floor axis anywhere in
+  it. So "exact tool floors" is an axis added to a roster the battery already
+  holds in parity, and the natural deliverable shape is that axis plus the
+  parity assertion extended to cover it — not a second roster beside the first.
+  Verified this session.
+  **Paired 2026-07-26 by `/spec`; the amendment carries the rulings.**
+  `SPEC-toolchain-floor.md` moves the roster to a sourceable owner
+  (`context-kit/lib/toolfloor.sh`, forced by `doctor`'s cross-unit read), makes
+  the floor per-member and justified rather than universal, and adds one roster
+  member (`sort`, for the GNU coreutils dependency `sort -V` / `date -d` /
+  `stat -c` force and nothing probes today). The lead-paragraph clause above
+  claiming this entry owns the CI legs is superseded by the scope-down note and
+  is left in place only as the pre-scope text.
+  **Cost while deferred:** the install.md / gate-sdk floor contradiction is
+  live public doc drift today — re-verified 2026-07-26: `docs/install.md:43`
+  states "No minimum versions are pinned here" while `gate-sdk/README.md:116`
+  requires "bash 4+, git, GNU coreutils/findutils, GNU awk", on a page whose
+  line 20 declares macOS a supported platform though stock macOS ships bash 3.2
+  and BSD userland.
+  Surfaced 2026-07-23 in the same external review (its portability finding).
+
 ## Technical Debt
 
 ## Deferred
@@ -846,60 +952,6 @@
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
-- **launch-activation-cli** [needs-spec] — the five-minute activation path: an
-  installer CLI on the reserved npm name (`npx checkwright init` / `doctor` /
-  `update` / `diff` / `uninstall`, `--dry-run`) that vendors pinned kit source
-  into the consumer repo and commits a lock/manifest recording profile, kit
-  versions, and generated files — distribution convenience without giving up
-  auditable, committed vendoring. At most three progressive profiles
-  (starter / delegation / full) so the first experience is not all eleven
-  kits at once; `doctor` probes the bash/GNU/jq/ShellCheck floors before any
-  partial install. Acceptance shape: a clean Linux repo reaches first green
-  in under five minutes with one command and no manual copying; re-init is
-  idempotent; uninstall removes only manifest-recorded files; consumer smoke
-  covers install/update/uninstall per profile. Sequencing: owns the
-  install-ownership contract that `plugin-marketplace` must package against —
-  a marketplace package without an ownership/upgrade manifest is a second
-  install model. Promotion revisits the thin-installer demand-gating ruling
-  (gate-sdk/SPEC.md §upgrade-smoke): the external review names
-  time-to-first-value the top adoption weakness — a second attestation
-  beside the anticipated second consumer.
-  **Promoted into the `activation-path` unit set 2026-07-26 by the undirected
-  scope survey (operator ruling), with three conditions ruled in. `/spec` pairs
-  this entry; all three belong in the amendment's envelope, not in build-time
-  judgment.**
-  **(1) Phasing is authorized and must be stated in the envelope.** `init` +
-  `doctor` land first; `update` / `diff` / `uninstall` land second. The envelope
-  says so explicitly so build is not left to discover the overrun. This is the
-  largest entry in the queue and the phasing is what makes it iteration-shaped.
-  **(2) The registry doctrine survives; its prose is rewritten as an explicit
-  envelope item.** `docs/install.md:11-12` publishes a ruling — "the package
-  registries hold the name only, never a dependency channel. There is nothing to
-  `npm install` or `cargo add`." A published installer reopens it. Operator
-  ruling: an `npx checkwright init` that vendors pinned source and commits it is
-  **not** a dependency channel — nothing resolves at build time and the kits
-  still land as committed, auditable source, which is the property the doctrine
-  protects. So the doctrine stands and install.md is rewritten to distinguish a
-  one-shot vendoring installer from a resolved dependency. Because that is
-  user-facing published semantics, it lands **in the amendment** as a named
-  envelope item, never as incidental build-time wording.
-  **(3) Two verified cost facts, carried so `/spec` does not re-derive them.**
-  *The publish is real work with its own supply-chain surface:*
-  `reserve/npm/package.json` is a bare name reservation — `"version": "0.0.1"`,
-  `"files": ["README.md"]`, and **no `bin` field** — so there is no installer
-  package today, and standing one up adds a distribution channel the
-  just-landed `supply-chain-trust-baseline` does not cover (provenance, a
-  pinned publish workflow). *`doctor` is smaller than this entry implies:*
-  `context-kit/bin/env-probe.sh` already walks `PROBE_SET` and already probes
-  versions (`probe_version()`, lines 39-47); it lacks only a floor to compare
-  against and a verdict to emit. The floor axis itself is
-  `platform-support-contract`'s deliverable in this same unit set, so `doctor`
-  consumes it rather than defining it.
-  **Cost while deferred:** every prospective adopter pays the manual
-  vendor-and-wire path, the largest single drop-off risk at announcement;
-  non-rotting otherwise. Surfaced 2026-07-23 in an external
-  product/positioning review (operator-commissioned; artifact local-only).
-
 - **front-door-outcome-rewrite** [needs-spec] — rewrite the README/docs first
   screen around one job: a literal category line (verification for
   coding-agent delivery), the outcome (spec drift, skipped stages, and
@@ -933,40 +985,6 @@
   **Cost while deferred:** the current first screen filters out exactly the
   reader the launch targets; zero until announcement, then compounding.
   Surfaced 2026-07-23 in the same external review.
-
-- **platform-support-contract** [needs-spec] — make portability a tested
-  contract instead of a layered explanation: a support matrix (Linux /
-  macOS / Windows-WSL, exact tool floors) with a CI install-smoke leg per
-  supported platform or an explicit experimental label; resolve the standing
-  contradiction — docs/install.md declares no minimum versions are pinned
-  while gate-sdk/README.md requires bash 4+ and GNU userland, neither of
-  which stock macOS ships; the first support table distinguishes engine
-  portability from full harness experience. The `doctor` probe belongs to
-  `launch-activation-cli`; this entry owns the matrix and the CI legs.
-  **Scoped down to the floor half 2026-07-26 by the `activation-path` scope
-  survey (operator ruling).** This entry is now the **floor contract only** and
-  is a member of the `activation-path` unit set, to be paired by `/spec`. The
-  CI per-platform install-smoke legs are deferred back as their own costed
-  entry, `platform-support-ci-matrix` — no macOS/WSL adopter exists yet to
-  justify the runner spend. Do not rebuild the legs here.
-  **The floor surface already exists and is already gated — this is one missing
-  axis, not a new roster.** `scripts/check-install-toolchain.sh` holds
-  bidirectional name-set parity between `docs/install.md`'s Requirements
-  toolchain block (delimited by its `toolchain:begin`/`toolchain:end`
-  markers) and
-  `context-kit/bin/env-probe.sh`'s `PROBE_SET=(bash git jq awk shellcheck)`.
-  That roster carries **names only**: there is no version-floor axis anywhere in
-  it. So "exact tool floors" is an axis added to a roster the battery already
-  holds in parity, and the natural deliverable shape is that axis plus the
-  parity assertion extended to cover it — not a second roster beside the first.
-  Verified this session.
-  **Cost while deferred:** the install.md / gate-sdk floor contradiction is
-  live public doc drift today — re-verified 2026-07-26: `docs/install.md:43`
-  states "No minimum versions are pinned here" while `gate-sdk/README.md:116`
-  requires "bash 4+, git, GNU coreutils/findutils, GNU awk", on a page whose
-  line 20 declares macOS a supported platform though stock macOS ships bash 3.2
-  and BSD userland.
-  Surfaced 2026-07-23 in the same external review (its portability finding).
 
 - **preview-release-cadence** [needs-spec] — reset release signaling for a
   pre-1.0 audience: declare a preview/alpha channel, batch internal
