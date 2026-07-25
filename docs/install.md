@@ -73,6 +73,43 @@ shim↔template contract — see lifecycle-kit's
 Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
 runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
 
+## Reviewing the pre-commit hook before you install it
+
+Step 4 above points a clone's git hooks at bash from this tree, which is worth
+deciding with the files open. The account below aims at completeness over
+reassurance.
+
+**What the hook is.** A generated file. `gate-sdk/bin/gen-pre-commit.sh` emits
+it from the per-gate `# graph:` manifests, so the hook carries the *triggered
+subset* of your registered battery: each gate fires under the path globs its
+own manifest declares, and the gates outside that subset run only in the full
+battery. The emitted hook is tracked, so the diff you review is what will run,
+and `check-graph` holds it byte-fresh against its emitter — a hand-edited hook
+that has drifted from the manifests reddens rather than diverging quietly.
+
+**What installing it changes in your clone.** `gate-sdk/bin/install-hooks.sh`
+has three effects, and an audit of what the script touches wants all three:
+
+- `core.hooksPath` is repointed at the kit's hooks directory. That config write
+  is what makes the generated hook fire at commit time.
+- `blame.ignoreRevsFile` is set to `.git-blame-ignore-revs`, but only when the
+  repo carries that file; a repo without one is left untouched.
+- `check-identity` runs once at opt-in, so a wrong-identity or wrong-remote
+  mapping surfaces before your first commit. The gate's exit status becomes the
+  installer's, so a failing identity check is visible to whatever ran it.
+
+**How to review before running.** The hook and every gate it invokes are
+tracked bash under the vendored kit directories and your own gates directory.
+Nothing is fetched at install time or at run time, so a vendoring or upgrade
+diff shows the whole of what you are agreeing to execute.
+
+**How to disable it.** Per commit, `git commit --no-verify` skips the hook. Per
+clone, `git config --unset core.hooksPath` removes it. Both are supported
+positions and neither is an escape:
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md#enforcement-tiers) rules the local hook a
+latency optimization whose guarantee lives in the CI tier, so skipping it costs
+an earlier signal and nothing beyond that, provided the outer tier exists.
+
 ## Running under an AGENTS.md harness
 
 Checkwright defaults to `CLAUDE.md` as the always-loaded agent file, but no kit
