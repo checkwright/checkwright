@@ -450,8 +450,12 @@ ruling-class roster — what a stage session must escalate at all — stays cons
 config in the dispatched agent-definition, never here. Opt-in is the consumer's
 settings registration, the same valve as the wakeup-guard; absent it the
 template is inert prose, the intended default (this repo leaves it unwired, as
-it does the wakeup-guard). It sources no config and writes no log — the advisory
-is transient, so nothing accrues for the close-stage triage.
+it does the wakeup-guard). That stated default is the *only* enforcement of the
+wiring: no gate observes it — `check-settings-pins` and `check-memory-off` stay
+green whether the hook is wired or not — so a session decides whether to wire an
+optional guard by reading this section, never by predicting a gate's verdict or
+reading the guard's own source to infer one. It sources no config and writes no
+log — the advisory is transient, so nothing accrues for the close-stage triage.
 
 ## The close-stage triage step
 

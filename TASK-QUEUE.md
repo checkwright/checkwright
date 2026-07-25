@@ -1124,8 +1124,72 @@
   observation that `[needs-spec]` implies a feature while deferred triage is a
   scope-stage decision.
 
-## Done
+- **md-section-near-miss-match** [needs-spec] — `context-kit/bin/md-section.sh`
+  silently returns empty (exit 0, no output) on a near-miss heading query instead
+  of matching or failing loudly. This session it was queried with `wakeup-guard`
+  and `The knowledge-friction loop` while the actual headings were
+  `wakeup-guard (template)` and a differently-worded line, and the tool matched
+  only on exact/leading text — reproduced twice. The silent-empty result
+  mis-signals "no such section" and pushes the caller to read the gate/mechanism
+  **source** as a fallback, which is the source-prediction anti-pattern
+  (oracle-first / the knowledge-friction lesson this iteration gave a doc home in
+  guard-kit/SPEC.md §escalation-guard). **Design direction:** prefix/substring
+  heading match, or fail loudly with a `did you mean <closest heading>`
+  suggestion, never exit 0 empty. **Optional adjunct:** an advisory guard nudging
+  a non-gate-authoring session that Reads a check's `.sh` toward the SPEC + running
+  the gate (advisory-only, the honest ceiling for a judgment boundary).
+  **Why `[needs-spec]`:** the match-relaxation has a real false-positive surface —
+  a prefix/substring match can silently resolve to the *wrong* section, so
+  choosing among prefix-only, substring, and fail-loud-with-suggestion is the open
+  design, and the advisory-guard adjunct is a second guard-kit-vs-context-kit
+  placement question. Not a close-stage inline fix: changing a shared tool's match
+  semantics wants a fixture pair and belongs in a scoped unit, not a drive-by.
+  **Cost while deferred:** low and non-rotting — the tool is correct on an exact
+  query; the exposure is a caller silently mis-reading a near-miss as "absent" and
+  source-reading as fallback, the exact loop the doctrine names. Filed 2026-07-25
+  by close, drained from the committed gap inbox (`c5c595c`).
 
-- stage-tiering-unit-is-the-batch
+- **validate-verb-collision-and-check-routing** [needs-spec] — two coupled
+  defects with one root: the delegation discipline verb collides with the
+  `/validate` stage noun, and that collision misroutes the lead's
+  post-delegation check onto the evidence producer.
+  **(1) Verb collision.** The lifecycle stage `/validate` (runs `run-validate`,
+  the broad checksuite) shares its term with the delegation discipline "validate
+  after every agent commit" (the lead re-runs the gate battery to verify a
+  sub-agent's self-report). The verb is performed right *before* the stage, so
+  completing the lead-side verify reads as completing the stage — this iteration a
+  lead conflated them and nearly skipped the `/validate` stage, jumping build to
+  close. **Cheapest true fix:** rename the delegation discipline **verb**
+  (validate → verify or re-check) in `delegation-kit/templates/agent-execution.md`
+  and the lead binding, leaving the load-bearing stage name (`/validate`,
+  `run-validate`, the state machine, gates, docs) untouched. Renaming the stage is
+  rejected as invasive for a confusion the verb rename fully resolves.
+  **(2) Check-routing gap the collision causes.** The post-delegation-check
+  binding (`validate-battery`: re-run `run-gates` + the touched kit's
+  `run-gate-tests`) carves out no case for when the *delegated stage is `/validate`
+  itself*. There the naive "re-run the battery to check it" is **wrong**:
+  `/validate` is the evidence producer, so re-running `run-validate` mutates or
+  duplicates the committed execution evidence rather than verifying it. The correct
+  lead-side check for the validate stage is to **read** its committed evidence
+  manifest (`.workflow/validate-evidence.txt`), never to re-run. This session a
+  lead acting on the vague default moved to re-run `run-validate` to "verify" the
+  validate stage twice; the operator caught both. The binding must distinguish
+  **work-producing stages** (spec, build → re-run the battery, safe and
+  idempotent) from the **evidence-producing stage** (`/validate` → read the
+  committed manifest, never re-run). The two defects travel together because the
+  verb rename is what stops the check discipline mis-attaching to the evidence
+  producer.
+  **Why `[needs-spec]`:** a prose rename plus a binding-semantics change across
+  `delegation-kit`'s dispatch template and the lead binding, with a
+  grep-propagation pass — a shipped-kit surface change that wants a scoped unit,
+  not a close drive-by; and the work-vs-evidence carve-out is a delegation-kit SPEC
+  ruling, not a wording tweak. **Cost while deferred:** low but recurrent — every
+  delegated `/validate` re-litigates whether the lead re-runs or reads, risking
+  corrupted execution evidence, and the verb keeps inviting the skip-the-stage
+  conflation. Filed 2026-07-25 by close, draining the committed gap inbox
+  (`0eec298`) merged with the lead's post-dispatch third triage item (the
+  check-routing half).
+
+## Done
 
 ## Lessons Learned
