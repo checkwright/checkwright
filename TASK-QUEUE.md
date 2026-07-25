@@ -12,6 +12,36 @@
 
 ## New Features
 
+- **stage-tiering-unit-is-the-batch** [spec: SPEC-per-batch-tiering.md] —
+  reconciles the lead binding's model-tiering unit from the **stage** to the
+  **batch**, and adds the per-delta **work-class** label (`mechanical` vs
+  `design-bearing`) that `/spec` emits and the lead consumes at batch-cut.
+  Resolves the live self-contradiction in
+  `lifecycle-kit/templates/lead.md` §Economics — the "per-batch model tiering …
+  dominant window lever" bullet against the "Tier each stage to its work class"
+  bullet just below it — by converging on the unit-level doctrine the lead
+  already inherits (`delegation-kit/templates/agent-execution.md`, "Match the
+  dispatched model and effort to the unit's shape", cited not changed).
+  Single-component (lifecycle-kit): `/spec` output contract + `lead.md`
+  §Economics. The design, causal completeness, and the consumer-shim integration
+  live in the amendment.
+  **Evidence, honest and time-bound (kept here, not in the to-be-deleted
+  amendment nor in permanent `lead.md`):** n=1 and confounded — batch 2a's
+  Sonnet-vs-Opus gap is dominated by unit size (cache reads), and the tier itself
+  saved **$2.1198** on that unit ($1.41 post-cliff), quality holding.
+  `scripts/price-table.tsv` carries a KNOWN CLIFF
+  (`prices-valid-through: 2026-08-31`, Opus:Sonnet 2.5x → ~1.67x), so any
+  downstream tier ruling re-reads the table headers, not these figures
+  (`kpi-price-table-age` raises it). The figures are usable only because
+  `stage-economics-attribution-honesty` (Done) fixed the meter this iteration;
+  earlier per-stage figures predate the fix.
+  **Cost if not built:** low per iteration, structurally compounding — each build
+  stage either pays the Opus premium on mechanical batches or reaches the cheaper
+  tier by habit, the failure mode the doctrine forbids. Sibling to
+  `build-stage-tier-economics`, which asks whether *the build stage* downgrades —
+  malformed, since the stage is not the unit.
+  Filed 2026-07-22 by close; promoted 2026-07-25 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -751,73 +781,6 @@
   when a downstream phase-B gate reds and someone re-derives the cause (as
   `cd5dd59` did). Cost to close: roughly one iteration. Filed 2026-07-21 by build
   during `lifecycle-rule-placement`'s model correction.
-
-- **stage-tiering-unit-is-the-batch** [needs-spec] — the lead binding tiers
-  models by **stage** (`lifecycle-kit/templates/lead.md` §Economics, "Tier each
-  stage to its work class"), but work class varies **within** a stage. This
-  iteration is the proof: `build` ran three batches, and batch 2a (a one-line
-  hermeticity pin) and batch 2b (a new KPI plugin plus four queue filings) sat in
-  the same `build` stage with opposite work classes. Stage is the wrong tiering
-  unit; the **batch** is the right one — and the lead already owns the batch
-  split, since the neighbouring bullet in that same section says to "split where
-  the model tier changes", which presupposes a per-batch tier the per-stage rule
-  never provides.
-  **This is a reconciliation, not a new policy.**
-  `delegation-kit/templates/agent-execution.md` already mandates selection at the
-  unit level: "Match the dispatched model and effort to the unit's shape";
-  selection "sits with the dispatching session"; the class ladder derives "from
-  the harness's **live model roster at dispatch time**"; and "a standing choice
-  lands in a tracked agent-type definition, never per-dispatch habit". The lead
-  binding sits *under* that doctrine, so its per-stage tiering is a **coarsening
-  that contradicts the finer rule already in force**. That framing also indicts
-  this iteration's own success: the Sonnet dispatch for 2a was the right answer
-  reached by the wrong route — per-dispatch habit, the anti-pattern the doctrine
-  names by name. The deliverable is convergence of the lead binding onto the rule
-  it already inherits, not the invention of a tiering policy.
-  **The substantive design content — `/spec` emits a work-class label per delta,
-  never a model recommendation.** A model name written into an amendment is drift
-  by construction against a churning roster (the doctrine's own reason for
-  deriving the ladder at dispatch time), and a spec-time model *recommendation*
-  attaches to a batch that does not exist yet, because the lead cuts batches at
-  build. A work-class label — **mechanical** vs **design-bearing** — is durable,
-  roster-independent, and is genuinely information spec holds that the lead does
-  not: spec knows what each delta demands, the lead knows only what the queue
-  entry says. The lead then maps class → live model at dispatch time, which keeps
-  the roster dependency where the doctrine already puts it. This iteration's own
-  amendment is the worked example: Delta B and the hermeticity rider were
-  mechanical; Delta A was not.
-  **Evidence, stated honestly — n=1, confounded, and smaller than it looks.**
-  Batch 2a cost $1.4131 on Sonnet against build 1's $9.3255 on Opus, but that gap
-  is **not** $7.9 of tier saving: cost here is dominated by cache reads (2a
-  2,797,771; build 1 9,541,533), so most of the spread is unit size, not tier.
-  Repricing 2a's *own* token volume at Opus rates gives a $3.5329 counterfactual,
-  so the tier itself saved **$2.1198** on that unit — with quality holding, since
-  2a caught an error in the lead's own dispatch brief and mutation-tested its own
-  fix. One unit, one iteration, no control: this is a plausibility argument for
-  the mechanism, not a measured effect size.
-  **A second honesty caveat the price table forces.** `scripts/price-table.tsv`
-  carries a KNOWN CLIFF: the Sonnet row is introductory pricing, and past its
-  `prices-valid-through: 2026-08-31` the Opus:Sonnet ratio falls from 2.5x to
-  ~1.67x on every column. Repricing 2a post-cliff gives a $1.41 saving rather than
-  $2.12 — a third of the benefit evaporates on a calendar date, with no code
-  change. Any tier ruling this entry reaches must be re-read against the table's
-  headers rather than against these figures, which is precisely what
-  `kpi-price-table-age` (shipped this iteration) exists to raise.
-  **Why the figures are usable at all:** this is the first iteration whose meter
-  output is trustworthy, because it is the iteration that fixed the meter's
-  attribution (`stage-economics-attribution-honesty`, Done). Every prior
-  per-stage figure in the queue predates that fix and should not be compared
-  against these.
-  Debt/analysis: reconciles a consumer binding to the doctrine above it and adds
-  a label to `/spec`'s output contract; adds no governed name.
-  **Cost while deferred:** low per iteration, structurally compounding — each
-  build stage either pays the Opus premium on mechanical batches or reaches the
-  cheaper tier by habit, and habit is the failure mode the doctrine already
-  forbids. Sibling to `build-stage-tier-economics`, which asks whether *the build
-  stage* downgrades; this entry argues that question is malformed because the
-  stage is not the unit.
-  Filed 2026-07-22 by close, from a lead-side economics review of this
-  iteration's own priced rows.
 
 - **supervision-overhead-unmeasured** [needs-spec] — the `supervision` row is
   now the iteration's third-largest line and has never been examined. Re-derived
