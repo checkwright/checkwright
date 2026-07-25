@@ -1223,6 +1223,46 @@
   (`0eec298`) merged with the lead's post-dispatch third triage item (the
   check-routing half).
 
+- **core-files-kit-coverage-derived** [needs-spec] — `scripts/core-files.list`
+  carries a block headed "One SPEC.md per kit (each kit's canonical contract)"
+  that lists **9 of the 11** kit SPECs: `site-kit/SPEC.md` and
+  `doctrine-kit/SPEC.md` are absent, as is `doctrine-kit/DOCTRINE.md` (which
+  `CANON_KIT_MANIFEST_FILES` does carry). The block is a hand-maintained roster
+  of a **derivable** set — `gate_kit_roots` × `SPEC.md` — which is the
+  maintain-a-derivable antipattern derivation-first rules out; and
+  `check-core-files` asserts only that *listed* paths exist, never that the
+  derivable set is covered, so the omission is invisible to a green battery.
+  **Deliverable — the derived coverage assertion, not the three-line backfill.**
+  Backfilling the two missing names re-arms the identical drift for kit twelve:
+  that is the defect, not the fix. Two in-kit precedents give the shape, both
+  bidirectional parity over a derived set — `check-readme-roster` (each kit
+  README's roster block ↔ that kit's `checks/` basenames) and `check-kit-enum`
+  (a `couples=` set naming two or more kit roots must name every root carrying
+  the suffix). This entry is the same move over the core-file manifest: every
+  `gate_kit_roots` member's canonical SPEC is pinned by derivation, not by a
+  line someone remembered to add.
+  **Why `[needs-spec]`:** the derived set's boundary is the open design, not the
+  assertion. Kit SPECs are uniform, but `doctrine-kit/DOCTRINE.md` is a per-kit
+  *deliverable* with no counterpart in the other ten, and the same manifest pins
+  surfaces no derivation reaches (workflow instances, generated projections, the
+  validate baseline). The rule must therefore state which slice it owns and
+  leave the remainder an honest hand list, or it over-reaches into a roster that
+  is legitimately hand-held. Placement is a second call: a new assertion inside
+  `check-core-files` versus a sibling gate.
+  **Cost while deferred — the derivation-first defect is confirmed, the safety
+  hole is not.** Confirmed: the block's stated per-kit invariant is false today
+  and degrades silently as kits land. Unconfirmed: whether an unpinned kit SPEC
+  is genuinely deletable without a red anywhere. `scripts/gen-docs-mirror.sh
+  --list` derives all eleven kits' SPEC and README plus DOCTRINE.md, so a
+  deleted kit SPEC would plausibly surface through `check-docs-mirror-fresh` or
+  `check-docs-kit-parity` — not destructively verified here, so whoever picks
+  this up should establish the real exposure before costing the gate against it.
+  Debt: converges an existing manifest onto a derived roster; adds no governed
+  name unless the assertion lands.
+  Filed 2026-07-25 by align, from the `supply-chain-trust-baseline` cross-spec
+  audit — the amendment's A3 edits this same file, so the gap is adjacent to its
+  envelope without being inside it. Lead ruling, scope-gated intake.
+
 ## Done
 
 ## Lessons Learned
