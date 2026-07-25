@@ -1358,6 +1358,4 @@
 
 ## Done
 
-- supply-chain-trust-baseline
-
 ## Lessons Learned
