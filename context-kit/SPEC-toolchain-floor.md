@@ -143,12 +143,16 @@ present job — what breaks without the tool — and gains, for a constrained
 member, the construct that forces the constraint, so a reader who asks "why 4.0"
 gets the answer on the page rather than in a commit message.
 
-**B3. The gate's `# graph:` manifest and the fixture pair. {mechanical}** The
-manifest's `couples=` moves from `context-kit/bin/env-probe.sh` to the library
-(and keeps `docs/install.md`), so the hook fires on an edit to the roster's real
-owner. The good/bad fixture pair gains a floor-mismatch case: today's pair can
-only express a name mismatch, and a widened invariant with an unwidened bad
-fixture is the trivially-passing shape gate-sdk/SPEC.md §The gate model bars.
+**B3. The gate's `# graph:` manifest. {mechanical}** The manifest's `couples=`
+moves from `context-kit/bin/env-probe.sh` to the library (and keeps
+`docs/install.md`), so the hook fires on an edit to the roster's real owner.
+
+**B3a. The fixture pair covers the widened invariant. {design-bearing}** The
+good/bad pair gains a floor-mismatch case: today's pair can only express a name
+mismatch, and a widened invariant with an unwidened bad fixture is the
+trivially-passing shape gate-sdk/SPEC.md §The gate model bars. Authoring a bad
+fixture that fails for the new reason and only the new reason is generative
+work, which is why it is split from `B3`'s manifest edit rather than riding it.
 
 **B4. The regen tail. {mechanical}** A `# graph:` manifest edit and a SPEC edit
 move the fixed set of generated projections, each naming its regen command on a
