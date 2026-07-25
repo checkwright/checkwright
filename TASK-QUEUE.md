@@ -1147,6 +1147,50 @@
   request, from a session tracing why only lifecycle-kit carries a
   `templates/skills/` subdirectory.
 
+- **needs-spec-tag-rename** [needs-spec] — the design-pending tag's *name*
+  asserts a falsehood over part of the set it governs. `spec` is feature-bound
+  everywhere in the system: `spec:` pairs with an authored amendment, the
+  `/spec` stage authors amendments, and `check-amendment-queue` makes `spec:`
+  **feature-only** ("a `spec:`-tagged entry in an active non-feature section
+  … is misfiled there — it belongs in a feature section"). But `[needs-spec]`
+  is mandatory on **every** Deferred entry, and Deferred is triaged into
+  feature-vs-debt only at scope — debt always promotes, features only where
+  scope authors. A deferred **debt** item promotes with its `[needs-spec]`
+  **deleted, never converted to `spec:`** (debt carries neither tag in the
+  active queue), so for the debt fraction the token names a spec that will
+  never exist. The tag's own owner doc already defines it correctly as a
+  "**design-pending marker**" (queue-kit/SPEC.md:59) — section-wide and
+  honest; it is the *token* `needs-spec` that leaks the feature implication the
+  definition does not carry. A name that contradicts its own definition, on the
+  naming-doctrine tree.
+  **Deliverable:** rename the pending-pole token to a design-state-honest
+  spelling — candidate `[design-pending]` (doc-aligned, verbatim from
+  queue-kit/SPEC.md:59); alternatives `[triage-pending]` / `[unscoped]` if
+  "design" still over-implies for debt (the one fact true of every deferred
+  entry is that scope has not triaged it). The `spec:` ready-pole stays — it
+  is correctly feature-bound. Breaking the `[needs-spec]`/`spec:` lexical
+  pairing is **intended**: the pending→`spec:` path is not guaranteed (debt
+  exits the pool with no tag), so the tokens must not imply it is. Touches
+  queue-kit (`check-tag-lead-line`, README, `TASK-QUEUE.md` template),
+  canon-kit (`check-amendment-queue` + SPEC), lifecycle-kit (close's gap-drain,
+  `enter-stage.sh` help text), the fixtures, docs, and a migration of every
+  existing Deferred entry. **Not a decommission:** the pending↔ready
+  cross-check is load-bearing (forbidden-in-active catches a stale tag on a
+  botched promotion; `spec:`-in-Deferred forces promotion) — rename preserves
+  every guard clause verbatim, only the token string changes. **Why
+  `[needs-spec]`:** the exact replacement token is the open call, and whether to
+  narrow the tag's *meaning* to match a renamed token or keep it section-wide
+  under a truer name is the design the spec settles.
+  **Cost while deferred:** low and non-rotting, rising toward launch — the
+  grammar is internally consistent and gated; the residue is one token whose
+  name every reader must mentally correct for the debt fraction, and a breaking
+  rename that is near-free today (no external adopter) but prices in with the
+  first one. Best landed before launch, or folded into the same major as
+  `templates-stages-taxonomy-realignment` (both are pre-adoption grammar
+  breaks). Filed 2026-07-25 by operator request, from the same session, on the
+  observation that `[needs-spec]` implies a feature while deferred triage is a
+  scope-stage decision.
+
 ## Done
 
 ## Lessons Learned
