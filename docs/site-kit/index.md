@@ -20,7 +20,7 @@ never a kit literal: a kit that shipped a project's host names would publish
 them.
 
 The render gate — `check-docs-render-fidelity` — re-renders every tracked docs
-page through the pinned Pages parser and asserts the observed leakage classes
+page through the Pages parser and asserts the observed leakage classes
 never reach the published artifact: it verifies the real rendered output
 rather than trusting that a page reading green on github.com ships intact.
 The class list and the gate's honest limit live in the kit's
@@ -36,7 +36,7 @@ waiting to happen.
 
 Vendor the `site-kit/` directory into your repo, register `check-docs-cname-parity`
 (and, if a Pages-style stack renders your site, `check-docs-render-fidelity` —
-it needs the pinned parser on the machine) in `gates.list`, name your host in
+it needs the parser on the machine) in `gates.list`, name your host in
 the CNAME file, and declare your aliases in the kit's external config.
 
 ## Quick start

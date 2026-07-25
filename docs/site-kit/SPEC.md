@@ -79,7 +79,7 @@ fixture point all three at a synthetic tree without touching consumer config.
 ## check-docs-render-fidelity
 
 Invariant: every tracked markdown page under `SITE_KIT_DOCS_DIR`, rendered
-through the pinned Pages parser, leaks no code-span corruption symptom into
+through the Pages parser, leaks no code-span corruption symptom into
 rendered text — neither a literal backtick nor a raw non-HTML-element tag
 surviving outside a code context — promotes no code-fenced line into a heading,
 and renders no fewer tables than its source GFM table starts. GitHub Pages

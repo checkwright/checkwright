@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit
-# spec: site-kit/SPEC.md §check-docs-render-fidelity — every tracked docs markdown page, rendered through the pinned Pages parser, leaks no code-span corruption symptom (a stray backtick or a raw non-HTML-element tag) into text, promotes no code-fenced heading, and renders no fewer tables than its source GFM table starts; a missing renderer fails closed
+# spec: site-kit/SPEC.md §check-docs-render-fidelity — every tracked docs markdown page, rendered through the Pages parser, leaks no code-span corruption symptom (a stray backtick or a raw non-HTML-element tag) into text, promotes no code-fenced heading, and renders no fewer tables than its source GFM table starts; a missing renderer fails closed
 #
 # usage: check-docs-render-fidelity.sh [docs-dir] [config-file]
 #   defaults SITE_KIT_DOCS_DIR; config-file overrides SITE_KIT_CONFIG_FILE so a
@@ -26,7 +26,7 @@ git rev-parse --git-dir >/dev/null 2>&1 || {
 probe="$(printf '# probe\n' | "${SITE_KIT_RENDERER[@]}" 2>/dev/null)"; pst=$?
 if [[ "$pst" -ne 0 || -z "$probe" ]]; then
     echo "check-docs-render-fidelity: renderer '${SITE_KIT_RENDERER[*]}' could not run (exit $pst)" >&2
-    echo "  help: install the pinned Pages parser — ruby plus the kramdown-parser-gfm gem — or point" >&2
+    echo "  help: install the Pages parser — ruby plus the kramdown-parser-gfm gem — or point" >&2
     echo "        SITE_KIT_RENDERER at a stdin->stdout GFM-to-HTML command" >&2
     exit 2
 fi
@@ -155,7 +155,7 @@ for page in "${pages[@]}"; do
 done
 
 if [[ ${#findings[@]} -gt 0 ]]; then
-    echo "check-docs-render-fidelity: rendered docs page(s) diverge from source under the pinned Pages parser:"
+    echo "check-docs-render-fidelity: rendered docs page(s) diverge from source under the Pages parser:"
     printf '  %s\n' "${findings[@]}"
     echo "  help: restructure the offending block so kramdown's GFM parser renders it faithfully — an"
     echo "        indented (4-space) code block avoids the consecutive-fence and unclosed-fence leakage"
