@@ -12,6 +12,31 @@
 
 ## New Features
 
+- **supply-chain-trust-baseline** [spec: SPEC-supply-chain-trust-baseline.md] —
+  close the gap between the governance promise and the repo's own supply-chain
+  posture: a root `SECURITY.md` (private reporting route, threat boundaries)
+  plus a conduct doc, both registered as governed repo-meta; SHA-pin every
+  mutable `uses:` ref — including the one in `gate-sdk/templates/gates-workflow.yml`,
+  the copy-out every consumer vendors — with the paired `check-action-pinning`
+  gate landing alongside, per enforcement-first; strike the bare "pinned Pages
+  parser" phrase wherever it contradicts the honest limit site-kit's own SPEC
+  states; and document what the vendored hooks execute and how to review or
+  disable them. The design, the seam ruling, causal completeness, and the
+  per-delta work-class labels live in the amendment.
+  **Spans two component dirs (`gate-sdk`, `site-kit`) plus root governance**, so
+  `check-stage-entry` assertion C will demand the align stamp at build's entry —
+  expected, not a surprise.
+  **Two rulings inherited settled from scope, not re-derived here.** The kramdown
+  half resolves by **de-claiming, not pinning** — the CI gem stays unversioned,
+  because the pin is one site-kit deliberately declines to own. Checksummed
+  release assets are **carved out** to `preview-release-cadence`, the entry that
+  owns the release rhythm a checksum convention has to match; costed there under
+  that entry, not dropped, and nothing here waits on it.
+  **Cost if not built:** the trust bar for "run this repo's shell in your hooks
+  and CI" is unmet at announcement time, against an audience whose top-two
+  objection this already is; the pinned-claim drift rots silently meanwhile.
+  Surfaced 2026-07-23 in the external review; promoted 2026-07-25 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -895,61 +920,6 @@
   **Cost while deferred:** the current first screen filters out exactly the
   reader the launch targets; zero until announcement, then compounding.
   Surfaced 2026-07-23 in the same external review.
-
-- **supply-chain-trust-baseline** [needs-spec] — close the gap between the
-  governance promise and the repo's own supply-chain posture: root
-  `SECURITY.md` (private reporting route, threat boundaries) plus
-  conduct/maintainer docs; pin GitHub Actions to commit SHAs (both workflows
-  reference the mutable `actions/checkout@v5` tag); version-pin the
-  CI-installed kramdown GFM gem or stop calling it the "pinned Pages parser"
-  (site-kit/SPEC.md §render-fidelity says pinned; gates.yml installs
-  latest) — a truth-drift instance of the exact class the kits gate, so
-  enforcement-first applies: a workflow-lint gate asserting SHA-pinned
-  action refs lands with the fix; checksummed release assets once cadence
-  stabilizes; document what the vendored hooks execute and how to
-  review/disable them.
-  **Premises re-verified 2026-07-25 by the undirected scope survey — every one
-  holds, and one is sharper than filed.** No `SECURITY.md` exists at root,
-  `.github/`, or `docs/`, and no security/disclosure route appears anywhere in
-  `CONTRIBUTING.md`, `docs/install.md`, or `README.md`; no `CODE_OF_CONDUCT.md`.
-  The tree's only two `uses:` lines are both mutable —
-  `.github/workflows/gates.yml:20` and `.github/workflows/site-health.yml:33`,
-  each `actions/checkout@v5`. `.github/workflows/gates.yml:31` is an unpinned
-  `gem install --no-document kramdown-parser-gfm`. Hook review/disable is
-  undocumented: `docs/install.md:63` names `install-hooks.sh` and nothing more.
-  **The kramdown half is narrower than this entry states, and its resolution is
-  ruled — de-claim, do not pin.** site-kit/SPEC.md:216-229 **already carries the
-  accurate honest limit** ("not necessarily … the exact kramdown *version* Pages
-  pins … the pin stays a consumer's deliberate `SITE_KIT_RENDERER` override, not
-  kit-run machinery"), so this is not a section-wide overclaim: it is the bare
-  phrase *"the pinned Pages parser"* at site-kit/SPEC.md:77 and in README's
-  site-kit table row contradicting that same file two hundred lines below —
-  prose-vs-limit drift **within one file**, the shape
-  `spec-internal-identifier-prefix-drift` names. Operator ruling 2026-07-25:
-  **strike both phrases** so each reads consistently with the stated limit; do
-  **not** version-pin the CI gem, which would buy a pin the kit deliberately
-  declines to own. Settled here so the authoring stage inherits the choice
-  rather than re-deriving it.
-  **Envelope carve-out (operator-approved 2026-07-25): checksummed release
-  assets are out of this unit.** This entry's own wording gates them on "once
-  cadence stabilizes", and cadence is `preview-release-cadence`'s, still
-  deferred — so shipping assets here would pin a checksum convention to a
-  release rhythm that entry may change. Cost of the deferral: the trust-bar gap
-  it closes stays open until `preview-release-cadence` promotes, and it is that
-  entry's to carry, not a dropped deliverable. Everything else stands: the
-  disclosure/conduct docs, the SHA pinning with its paired workflow-lint gate,
-  the de-claim above, and the hook-review documentation.
-  **Flag for the authoring stage — two things scope deliberately did not
-  settle.** (1) The workflow-lint gate's **placement is a genuine seam call**:
-  SHA-pinned `uses:` refs are generic mechanism (gate-sdk) but GitHub Actions is
-  not universal to every consumer, so a consumer gate in `scripts/checks` is the
-  live alternative; the provenance seam is not at issue either way (no private
-  content), the reach question is. (2) If the amendment spans ≥2 component
-  dirs, `check-stage-entry` assertion C demands an align stamp at the next
-  stage's entry — expect it rather than discovering it.
-  **Cost while deferred:** the trust bar for "run this repo's shell in your
-  hooks and CI" is unmet at announcement time, and the pinned-claim drift
-  rots silently. Surfaced 2026-07-23 in the same external review.
 
 - **platform-support-contract** [needs-spec] — make portability a tested
   contract instead of a layered explanation: a support matrix (Linux /
