@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+per-batch-tiering release deferred:v0.14.0 — minor earned on Behavior-changes: /spec output contract gains a per-delta work-class label and lead.md §Economics tiers per-batch (shipped lifecycle-kit template behavior a consumer's copy diverges from); tag + GitHub Release reserved to the lead's master push, not shipped this session
