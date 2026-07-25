@@ -12,31 +12,6 @@
 
 ## New Features
 
-- **supply-chain-trust-baseline** [spec: SPEC-supply-chain-trust-baseline.md] —
-  close the gap between the governance promise and the repo's own supply-chain
-  posture: a root `SECURITY.md` (private reporting route, threat boundaries)
-  plus a conduct doc, both registered as governed repo-meta; SHA-pin every
-  mutable `uses:` ref — including the one in `gate-sdk/templates/gates-workflow.yml`,
-  the copy-out every consumer vendors — with the paired `check-action-pinning`
-  gate landing alongside, per enforcement-first; strike the bare "pinned Pages
-  parser" phrase wherever it contradicts the honest limit site-kit's own SPEC
-  states; and document what the vendored hooks execute and how to review or
-  disable them. The design, the seam ruling, causal completeness, and the
-  per-delta work-class labels live in the amendment.
-  **Spans two component dirs (`gate-sdk`, `site-kit`) plus root governance**, so
-  `check-stage-entry` assertion C will demand the align stamp at build's entry —
-  expected, not a surprise.
-  **Two rulings inherited settled from scope, not re-derived here.** The kramdown
-  half resolves by **de-claiming, not pinning** — the CI gem stays unversioned,
-  because the pin is one site-kit deliberately declines to own. Checksummed
-  release assets are **carved out** to `preview-release-cadence`, the entry that
-  owns the release rhythm a checksum convention has to match; costed there under
-  that entry, not dropped, and nothing here waits on it.
-  **Cost if not built:** the trust bar for "run this repo's shell in your hooks
-  and CI" is unmet at announcement time, against an audience whose top-two
-  objection this already is; the pinned-claim drift rots silently meanwhile.
-  Surfaced 2026-07-23 in the external review; promoted 2026-07-25 by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -1264,5 +1239,7 @@
   envelope without being inside it. Lead ruling, scope-gated intake.
 
 ## Done
+
+- supply-chain-trust-baseline
 
 ## Lessons Learned
