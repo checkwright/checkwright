@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-per-batch-tiering release v0.14.0 — minor on Behavior-changes: /spec output contract (spec.md) gains a per-delta work-class label and lead.md §Economics tiers per-batch (shipped lifecycle-kit templates a consumer's copy diverges from); note authored at docs/posts/2026-07-25-checkwright-v0-14-0.md; tag + GitHub Release are the operator's on their master push

@@ -4,8 +4,4 @@
 
 ---
 
-per-batch-tiering scope a00d26bd 2026-07-25
-per-batch-tiering spec a1c52ddc 2026-07-25
-per-batch-tiering build a2060e2d 2026-07-25
-per-batch-tiering validate a3203c7b 2026-07-25
-per-batch-tiering close a1c9aacf 2026-07-25
+— scope afeddccf 2026-07-25
