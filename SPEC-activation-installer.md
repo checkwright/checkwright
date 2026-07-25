@@ -3,8 +3,9 @@
 A root-level amendment: it stands up a new top-level surface that no kit owns
 (`installer/`), rewrites a published governance ruling (the registry doctrine),
 and reaches context-kit (the floor roster its `doctor` consumes), gate-sdk
-(the kit-roots deriver its pack step reads), `docs/`, `.github/workflows/`, and
-the three registries that make a root surface governed.
+(the kit-roots deriver its pack step reads, and the lint scope its own scripts
+fall outside of), `docs/`, `.github/workflows/`, and the registries that make a
+root surface governed.
 
 It is the activation path: a clean Linux repo reaching first green with one
 command, without giving up the property the whole distribution model rests on —
@@ -78,11 +79,15 @@ not collapse the two halves into one claim.
 the implementation. The `bin` entry is a bash script with a
 `#!/usr/bin/env bash` shebang. Three reasons converge. The supported platform set
 is Unix-first and the floor contract already requires bash on `PATH`, so bash
-adds no dependency the adopter does not already have. `check-shellcheck` lints
-every shipped script, so a bash installer is covered by the linter the repo
-already runs, where a JavaScript one would ship an ungated language. And the
-codebase's single-language property is load-bearing for the audit story — a
-reader reviewing what they are about to run reads one language, not two.
+adds no dependency the adopter does not already have. A bash installer is
+lintable by the linter the repo already runs, where a JavaScript one would ship a
+language no gate in the tree reads — **lintable, not already linted**:
+`check-shellcheck`'s scan set is the gates dir plus each *kit root's* `lib/`,
+`bin/`, `checks/`, and `templates/`, and the layout rule below rules `installer/`
+out of the kit roots, so the coverage is owed rather than inherited and `F3` owes
+it. And the codebase's single-language property is load-bearing for the audit
+story — a reader reviewing what they are about to run reads one language, not
+two.
 
 *Node is not added to the floor roster.* `npx` needs Node, but the battery does
 not, and adding `node` to `PROBE_SET` would make the floor contract assert a
@@ -93,16 +98,48 @@ all. The install page says which requirement belongs to which path.
 *Layout.* `installer/package.json` (the real package — name, version, `bin`,
 `files`), `installer/bin/checkwright.sh` (the verb dispatcher),
 `installer/lib/` (the verbs), `installer/profiles.list` (the profile roster,
-`B7`), `installer/README.md`, `installer/smoke/` (`B6`).
+`B7`), `installer/README.md`, and `B6`'s smoke tree.
+
+*`installer/` must not present as a kit root, and that constrains two names.*
+`gate_kit_roots` enumerates a repo-root directory as a kit iff it carries
+`checks/` **or** `smoke/` (gate-sdk/SPEC.md §lib/gate.sh) — that predicate, not
+a registry, is what makes a directory a kit. So `B6`'s smoke tree is **not**
+named `installer/smoke/` and the installer ships no `installer/checks/`; the
+smoke tree takes any other name (`installer/consumer-smoke/` reads plainly).
+This is not tidiness. Were `installer/` to enumerate as a kit root:
+`gate-sdk/bin/run-consumer-smoke.sh` exits 2 on any kit root lacking
+`smoke/install.sh`, and the installer's smoke is a different contract entirely;
+`check-kit-registration` would demand a kit-registry row in README.md, which
+`D2` deliberately does not add; `check-smoke-entry-guard` would demand the
+`${SMOKE_KIT_ROOT:?}` guard of a file named `install.sh` — the likeliest name
+for an *installer's* smoke; every `kit:<glob>` coupling token would expand into
+`installer/`; and the payload set below, being `gate_kit_roots_rel`, would
+include `installer/` itself, so the pack step would pack its own output. Every
+repo-root directory carrying `smoke/` or `checks/` today is a kit, and `demo/`
+carries neither — which is exactly why the demo precedent `B6` follows works.
 
 *The payload is assembled, never duplicated.* The kit directories are not copied
-into `installer/` in the tree. A pack step assembles them into a gitignored
-`installer/payload/` from the repo's own kit roots — the set gate-sdk's
-`gate_kit_roots_rel` derives (gate-sdk/SPEC.md §lib/gate.sh) — and `npm pack`
-runs from there. A checked-in second copy of every kit would be the
-parallel-copy defect at its largest scale in this repo; deriving the payload is
-the derivation-first rule applied to a distribution artifact. The pack step also
-stamps the version and the commit (`C3`, `B5`).
+into `installer/` in the tree. A pack step assembles them from the repo's own
+kit roots — the set gate-sdk's `gate_kit_roots_rel` derives (gate-sdk/SPEC.md
+§lib/gate.sh) — and `npm pack` runs over the assembly. A checked-in second copy
+of every kit would be the parallel-copy defect at its largest scale in this
+repo; deriving the payload is the derivation-first rule applied to a
+distribution artifact. The pack step also stamps the version and the commit
+(`C3`, `B5`).
+
+*The assembly is staged out-of-tree, on a `*_TMP_DIR`-class knob.* The pack step
+copies `installer/`'s own files and the derived payload into a scratch
+directory and packs there; **no `payload/` ever exists inside the worktree**.
+Gitignoring an in-tree assembly would not have been enough, because the gates
+that sweep the whole tree walk the filesystem rather than the index:
+`GATE_PRUNE_DIRS` prunes `target`, `.git`, `node_modules`, `.tmp`, and
+`gate-tests` and nothing else, so an in-tree payload would put a second copy of
+every kit's `SPEC.md` in front of canon-kit's canonical-spec finder, a second
+copy of every in-flight `SPEC-*.md` in front of the amendment finder and
+`check-stage-entry`'s whole-tree scans, and a second copy of every workflow in
+front of `check-action-pinning` — a red battery for the duration of a pack. Out
+of tree, the pack step inherits `demo/run-demo.sh`'s writes-nothing-in-tree
+property, which is the same precedent `B6` follows for the smoke.
 
 **B2. `reserve/npm/` retires into `installer/`. {mechanical}** Two
 `package.json` files claiming the npm name `checkwright` is the two-sources
@@ -157,6 +194,12 @@ why `platform-support-contract`'s amendment makes the roster a sourceable librar
 rather than leaving it inside an executing script, and why these two units are one
 unit set. `doctor` defines no floor of its own; it renders the verdict the
 roster's predicate returns.
+
+*The ordering that follows is a constraint on build's plan, not a preference.*
+`context-kit/lib/toolfloor.sh` must exist before `doctor` is written, because
+`doctor` sources it out of the payload rather than reimplementing it — so the
+floor unit's library batch lands **before** this unit's `doctor` batch, and a
+plan that interleaves them has `doctor` sourcing a file no batch has produced.
 
 **B5. `checkwright.lock` — the install-ownership manifest. {design-bearing}** A
 tracked JSON file at the consumer root, written by `init` and parsed with `jq` —
@@ -293,15 +336,24 @@ half (`B2`). One new line names `installer/` as the published activation surface
 and its pack-time-assembly rule, with the mechanism behind the pointer — the
 always-loaded shape: one line per rule, the detail in the surface that owns it.
 
-**D4. Registration in the three registries that make a root surface governed.
-{mechanical}** `installer` joins `scripts/root-allowlist.list` (an unallowlisted
-root entry reds `check-root-tiering`); the installer's entry points join
-`scripts/core-files.list` (silent deletion goes red); and `installer/README.md`
-joins `CANON_KIT_MANIFEST_FILES` in `scripts/canon-config.sh` so its links and
-commands resolve under the doc gates like any other governed page. The same
-three-registry pattern `supply-chain-trust-baseline` established for a new
-governed root surface, and the reserve comment in the allowlist is updated for
-`B2`.
+**D4. Registration in the registries that make a root surface governed.
+{mechanical}** Two edits, not the three the
+`supply-chain-trust-baseline` pattern suggests, because align verified the
+third is already covered. `installer` joins `scripts/root-allowlist.list` (an
+unallowlisted root entry reds `check-root-tiering`), and the installer's entry
+points join `scripts/core-files.list` (silent deletion goes red). The reserve
+comment in the allowlist is updated for `B2`.
+
+**No `scripts/canon-config.sh` edit is owed.** `CANON_KIT_MANIFEST_FILES`
+already carries `*/README.md`, and canon-kit expands its manifest globs as plain
+single-level globs from the repo root, so `installer/README.md` joins the
+governed manifest set the moment the file exists — its links and commands
+resolve under the doc gates with no registration. (`reserve/*/README.md` is
+listed separately only because it is one level deeper, and `reserve/crates/`
+keeps that glob populated after `B2`.) Adding a literal `installer/README.md`
+row would be a maintained copy of a derivation — the defect this repo's
+de-literalization rule names. Recorded so build does not add the row on reflex
+and so a reader does not read its absence as an oversight.
 
 **D5. `RELEASING.md` gains the publish step. {mechanical}** Per `C2` and `C3`:
 where in the release sequence the publish runs, that it runs from the workflow
@@ -356,7 +408,28 @@ nothing extra and runs in the tier that can afford it. Recorded so build does no
 re-derive the question, and so a later reader does not read the absence as an
 oversight.
 
-**F3. The regen tail. {mechanical}** A new gate and a new root surface move the
+**F3. The installer's scripts are brought under `check-shellcheck`.
+{design-bearing}** `B1`'s language ruling rests on the installer being linted,
+and `B1`'s own layout rule keeps `installer/` out of the kit roots, so nothing
+lints it by default — the gap this delta closes, and the reason `B1` states the
+claim as owed rather than inherited. The indicated mechanism is a lint-scope knob
+on gate-sdk (the scan set gains consumer-named directories on top of the gates
+dir and the kit roots), set for `installer/bin` and `installer/lib` in this
+repo's `scripts/gate-sdk-config.sh` — the config seam's existing job. A knob
+carries the usual tail: the roster entry and default in gate-sdk/SPEC.md
+§Layout and configuration, and the invariant in §check-shellcheck restated to
+name the added set, both of which `check-knob-citation` and
+`check-knob-default-coupling` read.
+
+Two constraints on executing it. The knob **adds to** the default scan set and
+never replaces it, so a consumer that sets nothing keeps today's coverage
+exactly. And `demo/run-demo.sh` sits in the same blind spot today — it is a
+shipped script under no kit root — so it joins the same knob value; it is
+already clean at `-S warning`, verified, so the widening costs nothing and
+leaving it out would mean landing the mechanism that fixes a gap beside the gap.
+
+**F4. The regen tail. {mechanical}** A new gate, a new root surface, and a new
+kit knob move the
 fixed set of generated projections, each naming its regen command on a red: the
 pre-commit hook (`gen-pre-commit.sh --write`), the graph artifact
 (`check-graph.sh --emit > docs/check-graph.html`), the enforcement map
@@ -405,14 +478,16 @@ cost. Executing this is running commands until the battery is green.
   `scripts/gates.list`, which is what makes the runner resolve it — a gate file
   no registry names runs nowhere. *Consumers*: the full battery, the generated
   pre-commit hook through its `# graph:` manifest, and the CI backstop. The
-  manifest has the further reader `F3` names: the graph artifact and the
+  manifest has the further reader `F4` names: the graph artifact and the
   enforcement map both project from it.
 
-- **The three registry rows (`D4`).** *Producers*: the three list/config files.
-  *Consumers*, one gate each: `check-root-tiering` reads the root allowlist,
-  `check-core-files` reads the core-files list, and canon-kit's doc gates read
-  the manifest globs. A root surface added to none of the three reds the first
-  and is ungoverned by the other two.
+- **The registry rows (`D4`).** *Producers*: the two list files.
+  *Consumers*, one gate each: `check-root-tiering` reads the root allowlist and
+  `check-core-files` reads the core-files list. A root surface in neither reds
+  the first and is silently deletable past the second. Canon-kit's doc gates are
+  a third consumer with **no producer to add** — they read
+  `CANON_KIT_MANIFEST_FILES`, whose `*/README.md` glob already resolves
+  `installer/README.md`, so the edge exists by derivation rather than by a row.
 
 ## Existing sections updated
 
@@ -431,23 +506,33 @@ cost. Executing this is running commands until the battery is green.
   line does not currently admit exists, which is why this is stated here rather
   than left for build to discover mid-batch. The second edit is `D3`'s new
   `installer/` line.
-- **gate-sdk/README.md** — no roster row: `check-installer-no-deps` is a consumer
-  gate in `scripts/`, not a gate-sdk gate, so the kit's roster block (held
-  bidirectionally by `check-readme-roster` against `gate-sdk/checks/`) must
-  **not** gain a row. Named here because the reflex from the last new-gate unit
-  is to add one.
+- **gate-sdk/README.md §Gate roster** — `F1`, as a **no** edit:
+  `check-installer-no-deps` is a consumer gate in `scripts/`, not a gate-sdk
+  gate, so the kit's roster block (held bidirectionally by
+  `check-readme-roster` against `gate-sdk/checks/`) must **not** gain a row.
+  Named here because the reflex from the last new-gate unit is to add one.
 - **README.md §This repo, governed** — the per-kit fixture-runner battery roster
-  gains the new consumer-gate fixture pair and the new validate suite, since that
+  gains `F1`'s consumer-gate fixture pair and `B6`'s validate suite, since that
   section owns the roster a session runs before committing.
+- **gate-sdk/SPEC.md §Layout and configuration and §check-shellcheck** — `F3`:
+  the knob's roster entry and default, and the lint invariant restated to name
+  the consumer-added directories. The only gate-sdk contract either amendment
+  changes, which is why it is stated here rather than left to a batch.
 - **context-kit/SPEC.md §bin/env-probe** — no edit from this amendment; the
-  sourceable-library change is `platform-support-contract`'s and is cited here as
-  a dependency, not restated.
-- **scripts/root-allowlist.list, scripts/core-files.list,
-  scripts/canon-config.sh** — `D4`.
-- **The local ops runbook** — its repo-settings desired state gains the publish
-  workflow's required secret and permissions, so the desired-state table and the
-  live repo agree. Local-only file, no tracked diff, and leaving it stale
-  re-litigates the setting at the next ops pass.
+  sourceable-library change is `platform-support-contract`'s and is cited by
+  `B4` as a dependency, not restated.
+- **scripts/root-allowlist.list, scripts/core-files.list** — `D4`.
+  `scripts/canon-config.sh` is **not** in this list: `D4` records why no edit is
+  owed there.
+- **scripts/gates.list** — `F1`'s registration row. A gate file no registry
+  names runs nowhere, so this is the delta that makes the gate real rather than
+  a tail on it.
+- **scripts/gate-sdk-config.sh** — `F3`'s knob value for `installer/bin`,
+  `installer/lib`, and `demo`.
+- **The local ops runbook** — `C1`: its repo-settings desired state gains the
+  publish workflow's required secret and permissions, so the desired-state table
+  and the live repo agree. Local-only file, no tracked diff, and leaving it
+  stale re-litigates the setting at the next ops pass.
 
 ## Definition of Done
 

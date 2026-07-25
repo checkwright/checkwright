@@ -70,6 +70,18 @@
   the lead: build lands the package and the provenance workflow and proves the
   path against a packed tarball; the live publish is the operator's to
   authorize at a release under RELEASING.md.
+  **Audited 2026-07-26 by `/align`, which found three wiring defects against the
+  current tree — read the amendment's `B1` before cutting a batch.** A smoke
+  tree at `installer/smoke/` would have made `installer/` enumerate as a *kit
+  root* (that directory name is the predicate), breaking
+  `run-consumer-smoke.sh` closed and pulling the installer into the payload it
+  packs; an in-tree `payload/` would have put a second copy of every kit in
+  front of the whole-tree spec and workflow sweeps, gitignore being no defence
+  against a filesystem walk; and the canon-config registration the entry planned
+  is already covered by an existing glob. A fourth finding added a delta: the
+  installer's scripts fall outside `check-shellcheck`'s scan set once
+  `installer/` is not a kit root, so the lint coverage the bash-over-JS ruling
+  assumed is now owed explicitly (`F3`).
   **Cost while deferred:** every prospective adopter pays the manual
   vendor-and-wire path, the largest single drop-off risk at announcement;
   non-rotting otherwise. Surfaced 2026-07-23 in an external
@@ -83,8 +95,9 @@
   versions are pinned while gate-sdk/README.md requires bash 4+ and GNU
   userland, neither of which stock macOS ships; the first support table
   distinguishes engine portability from full harness experience. The `doctor`
-  probe belongs to `launch-activation-cli`; this entry owns the matrix and the
-  CI legs.
+  probe belongs to `launch-activation-cli`; the CI legs belong to
+  `platform-support-ci-matrix` (scoped out below); this entry owns the floor
+  contract.
   **Scoped down to the floor half 2026-07-26 by the `activation-path` scope
   survey (operator ruling).** This entry is now the **floor contract only** and
   is a member of the `activation-path` unit set, to be paired by `/spec`. The
@@ -106,10 +119,15 @@
   `SPEC-toolchain-floor.md` moves the roster to a sourceable owner
   (`context-kit/lib/toolfloor.sh`, forced by `doctor`'s cross-unit read), makes
   the floor per-member and justified rather than universal, and adds one roster
-  member (`sort`, for the GNU coreutils dependency `sort -V` / `date -d` /
-  `stat -c` force and nothing probes today). The lead-paragraph clause above
-  claiming this entry owns the CI legs is superseded by the scope-down note and
-  is left in place only as the pre-scope text.
+  member (`sort`, for the GNU coreutils dependency `realpath --relative-to` /
+  `sort -V` / `date -d` / `stat -c` force and nothing probes today).
+  **Audited 2026-07-26 by `/align`**, which added the `realpath --relative-to`
+  citation (in `gate-sdk/lib/gate.sh`, the library every gate sources — the
+  strongest of the four), closed the `gate-sdk/README.md` findutils question
+  against the tree (unbacked; the claim is dropped, no roster member owed), and
+  fixed two amendment defects: an update target naming no owning delta, and a
+  page-rendering grammar whose worked example would have redded the parity gate
+  the same delta widens.
   **Cost while deferred:** the install.md / gate-sdk floor contradiction is
   live public doc drift today — re-verified 2026-07-26: `docs/install.md:43`
   states "No minimum versions are pinned here" while `gate-sdk/README.md:116`

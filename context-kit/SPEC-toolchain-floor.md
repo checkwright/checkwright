@@ -44,10 +44,14 @@ installer's own payload copy, before any consumer file exists. A sourceable
 owner serves that reader; a script does not.
 
 **A2. The floor token grammar. {design-bearing}** A roster element becomes
-`<name>[:<min-version>[:<impl-token>]]`. Both trailing fields are optional and
-a bare name keeps today's meaning exactly — "must be present, no version
-constraint" — so the axis is *per-member*, not a number demanded of every
-member.
+`<name>[:<min-version>[:<impl-token>]]`. A bare name keeps today's meaning
+exactly — "must be present, no version constraint" — so the axis is
+*per-member*, not a number demanded of every member. The fields are positional,
+so a member constrained by implementation alone carries an **empty** min-version
+field and reads `<name>::<impl-token>` — `awk::GNU`, `sort::coreutils` below. An
+empty field means "unconstrained on that axis", which is the same thing an
+omitted trailing field means; the parser must accept both spellings and treat
+`awk`, `awk:`, and `awk::` as one unconstrained member.
 
 That optionality is the design. `docs/install.md` today refuses floors with a
 real argument: "a version floor baked into this page would rot." The refusal is
@@ -66,8 +70,8 @@ so the constraint is checked against the binary actually on `PATH` rather than
 against a package name nobody can probe.
 
 **A3. The roster's initial content, each floor citing its forcing construct.
-{design-bearing}** Verified by tree-wide grep this session; build re-verifies
-before pinning and pins nothing it cannot cite.
+{design-bearing}** Verified by tree-wide grep at authoring and re-verified at
+align; build pins nothing it cannot cite.
 
 - `bash:4.0` — three independent bash-4.0 constructs: `declare -A` (gate-sdk,
   guard-kit, delegation-kit, evidence-kit checks), `mapfile` (widespread across
@@ -80,10 +84,15 @@ before pinning and pins nothing it cannot cite.
   sentence in the SPEC is the token's citation target and stays where it is; it
   is not a duplicate to strike.
 - `sort::coreutils` — a **new roster member**, and the only one. GNU coreutils
-  is forced three ways and probed nowhere today: `sort -V`
-  (`scripts/check-release-bump.sh`), `date -d` (drift-kit's KPIs and
-  `bin/trajectory.sh`, a delegation-kit template), and `stat -c`
-  (`delegation-kit/bin/usage-verdict.sh`). None is BSD-portable. One member per
+  is forced four ways and probed nowhere today: `realpath --relative-to`
+  (`gate-sdk/lib/gate.sh`'s `gate_kit_roots_rel` and `bin/gen-pre-commit.sh`,
+  and the `-m` form in canon-kit's link/command resolvers and two consumer
+  gates), `sort -V` (`scripts/check-release-bump.sh`), `date -d` (drift-kit's
+  KPIs and `bin/trajectory.sh`, a delegation-kit template), and `stat -c`
+  (`delegation-kit/bin/usage-verdict.sh`). None is BSD-portable, and the first
+  is the strongest of the four: `--relative-to` and `-m` are GNU-only flags, and
+  they sit in the library every gate sources, so a box without GNU coreutils
+  cannot run the battery at all rather than failing one gate. One member per
   package family, the representative being the binary carrying a forcing
   construct — `sort`, which is also the predicate's own comparison tool (A4).
   This is a member added to the existing roster, not a second roster: the whole
@@ -138,7 +147,17 @@ what it lints.
 **B2. The install-page bullet grammar. {design-bearing}** Each bullet in the
 `toolchain:begin`/`toolchain:end` block renders its constraint in a
 parenthetical the gate parses: `` - `bash` (≥ 4.0) — … ``, `` - `awk` (GNU) — … ``,
-`` - `git` — … `` for an unconstrained member. The prose after the dash keeps its
+`` - `git` — … `` for an unconstrained member.
+
+**The parenthetical carries the roster token verbatim**, and that is what makes
+`B1`'s widened parity checkable rather than a mapping table: a version
+constraint renders `(≥ <min-version>)` and an implementation constraint renders
+`(<impl-token>)` with no translation. So `sort::coreutils` renders
+`` - `sort` (coreutils) — … `` and **not** `(GNU)` — the reflex the `awk` example
+invites, and a red on the gate this delta widens. A member constrained on both
+axes renders both, comma-joined (`(≥ 4.0, GNU)`); no member carries both today.
+
+The prose after the dash keeps its
 present job — what breaks without the tool — and gains, for a constrained
 member, the construct that forces the constraint, so a reader who asks "why 4.0"
 gets the answer on the page rather than in a commit message.
@@ -198,12 +217,18 @@ requirement is stated truthfully; the claim that it is *tested* per platform is
 {mechanical}** The line "bash 4+, git, GNU coreutils/findutils, GNU awk
 (`check-gate-assertions`), ShellCheck (`check-shellcheck`)" is a parallel copy of
 a roster that now has one owner and a gate — the one-owner-per-fact rule. It
-becomes a pointer to the install page's Requirements block. The `findutils`
-clause does not survive the move regardless: no GNU-only find predicate was found
-this session (`gate-sdk/lib/gate.sh`'s `gate_find` is a POSIX
-`-prune -o … -print` form, and no `-printf` appears in the tree), so it is an
-unbacked claim — build re-verifies and, on the same finding, the claim is dropped
-rather than rostered. Dropping an unbacked requirement is the same de-claim
+becomes a pointer to the install page's Requirements block.
+
+The `findutils` clause does not survive the move regardless, and the
+verification is closed rather than passed on: **align re-verified it and the
+claim is unbacked**, so build drops it and does not re-derive the question.
+`gate-sdk/lib/gate.sh`'s `gate_find` is a POSIX `-name` / `-prune` / `-o` /
+`-print` form; no `-printf`, `-regextype`, `-newermt`, or `-execdir` appears
+anywhere in the tree. The only non-POSIX find predicates are `-mindepth`,
+`-mmin`, `-depth`, and `-delete` (the two session-context scripts' scratch sweep
+and `lifecycle-kit/bin/enter-stage.sh`'s boundary reset), and every one of those
+is BSD-portable — so nothing in the battery forces GNU findutils and no roster
+member is owed for it. Dropping an unbacked requirement is the same de-claim
 discipline `supply-chain-trust-baseline` applied to the pinned-parser phrase.
 
 ## Producers and consumers
@@ -257,9 +282,10 @@ No new message or event is introduced. One new state — a per-tool floor verdic
 
 ## Existing sections updated
 
-- **context-kit/SPEC.md §bin/env-probe** — "What it probes" gains the floor axis,
-  the token grammar, and the verdict set; the probe set's enumeration moves to
-  citing `lib/toolfloor.sh` as its owner rather than restating the names. The
+- **context-kit/SPEC.md §bin/env-probe** — `A2`'s token grammar and `A4`'s
+  verdict set join "What it probes", `A5`'s rendered block replaces the
+  version-only description, and `A1` moves the probe set's enumeration to citing
+  `lib/toolfloor.sh` as its owner rather than restating the names. The
   content-seam and cadence paragraphs are unchanged and stay where they are.
 - **context-kit/SPEC.md §Layout and configuration** — the layout listing gains
   `lib/toolfloor.sh`; the knob roster is untouched, because this delta adds no
