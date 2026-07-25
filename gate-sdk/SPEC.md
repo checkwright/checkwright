@@ -1445,6 +1445,45 @@ names but the tree lacks, and on an unreadable member. A directory member is
 partition-checked and header-exempt — a header belongs to a file. Tier
 `precommit`; the `# graph:` manifest couples the workflow dir and `.gitignore`.
 
+### check-action-pinning
+
+Invariant: every `uses:` ref in a scanned YAML file is immutable — a full 40-hex
+commit SHA, or a repo-local `./` path to an in-repo composite action, which the
+checkout already pins. A tag or branch ref (`@v5`, `@main`) reds: whoever owns
+the tag can repoint it, so the code a run executes stops being the code that was
+reviewed. The ref is the first whitespace-delimited token after a key-position
+`uses:`, so a trailing `# v1.2.3` comment falls away and a commented-out step —
+the copy-paste seed a template ships — is read like a live one.
+
+Not `check-workflow-*`. This tree already spends "workflow" on §The workflow
+directory (and `GATE_SDK_WORKFLOW_DIR`), so a second `check-workflow-*` gate,
+over `.github/workflows/` instead, would collide on the reader's only
+disambiguator.
+
+The scan set is **derived, not rostered**: a `gate_find` walk for `*.yml` /
+`*.yaml` from the scan root (the optional positional argument, default `.`, the
+`check-root-tiering` form). Not a `git ls-files` enumeration — a tracked-files
+filter would put the fixture pair's synthetic tree out of reach, since it is
+untracked by construction. The walk covers `.github/workflows/` and the shipped
+copy-outs (`templates/gates-workflow.yml`, site-kit's `templates/site-health.yml`)
+with no roster to drift, and the shared prune set keeps it out of `gate-tests/`,
+so the `bad/` fixture cannot red the whole-tree run. **No new knob** — the scan
+set is derived and the prune set is the shared one (§Shared cross-gate values). A
+tree holding no YAML exits clean on a zero count, the counted inertness that makes
+this kit mechanism rather than a consumer gate: a consumer running no GitHub
+Actions pays nothing for it.
+
+What it deliberately does not assert is the trailing version comment. The comment
+is not required, and where one is present the gate does not check that it names
+the tag the SHA resolves to — that needs a network call, which breaks the
+hermetic-gate contract, and demanding an unverifiable comment would be exactly
+the trivially-true proxy §When a gate earns its place bars. The comment stays a
+convention for review. The currency limit the pin does *not* buy is
+§templates/gates-workflow.yml's.
+
+Tier `precommit`; the `# graph:` couples the scanned YAML surfaces, `dir=one` —
+a one-way audit.
+
 ### check-commit-msg
 
 Invariant: the prospective commit message (the `commit-msg` hook's `$1`) matches
@@ -1623,7 +1662,17 @@ step one is `run-gates.sh` (the full battery); step two is a fail-closed
 placeholder the consumer replaces with its own fixture/guard-test runners (an
 unfilled copy reddens CI, the fill-me signal). Checkout + bash only — no
 caching, no matrix, no third-party actions — so the workflow surface an agent
-could tamper with stays minimal and reviewable. This repo's own
+could tamper with stays minimal and reviewable. The one action that survives that
+rule is pinned to a full commit SHA with the tag kept as a trailing comment, and
+§check-action-pinning holds it there: ruling *which* actions may appear leaves
+open *which code* a named tag resolves to, and a tag its owner can repoint is the
+same tamper axis one hop further out.
+
+The pin buys immutability, not currency — and the two are easy to confuse. No
+update bot refreshes a pinned SHA (this repo deliberately runs none), so a pin
+stays exactly as old as the day it was written; refreshing one is a manual act at
+release time. A pinned ref is therefore not a maintained ref, and a consumer who
+reads it as one has the wrong picture of what the pin is worth. This repo's own
 `.github/workflows/gates.yml` is the filled example; both files register in
 `core-files.list` so their silent deletion is red, and the instance needs no
 freshness gate — a workflow invoking a retired script reddens in CI on its next

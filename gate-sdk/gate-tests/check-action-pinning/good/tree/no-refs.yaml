@@ -1,0 +1,8 @@
+name: no action refs at all
+on:
+  schedule:
+    - cron: '17 6 * * *'
+jobs:
+  probe:
+    steps:
+      - run: echo "bash only, nothing uses: an action here"

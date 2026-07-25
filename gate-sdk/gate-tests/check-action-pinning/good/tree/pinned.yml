@@ -1,0 +1,10 @@
+name: pinned
+jobs:
+  build:
+    steps:
+      - uses: owner/action@0123456789abcdef0123456789abcdef01234567 # v1.2.3
+      - uses: "owner/action@89abcdef0123456789abcdef0123456789abcdef"
+      - uses: owner/action/sub@abcdef0123456789abcdef0123456789abcdef01 # v2
+      - uses: ./.github/actions/local
+      # Boundary: prose naming uses: mid-sentence is not a key position and is
+      # not a ref — a scanner keying on the bare token would red on this line.

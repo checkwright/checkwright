@@ -1,0 +1,5 @@
+name: a clean sibling — the report must name only the mutable file
+jobs:
+  build:
+    steps:
+      - uses: owner/action@0123456789abcdef0123456789abcdef01234567 # v1.2.3

@@ -108,6 +108,7 @@ check-hook-exec-bit
 check-exec-bit
 check-root-tiering
 check-workflow-tiering
+check-action-pinning
 check-commit-msg
 check-commit-subject
 check-tree-terms

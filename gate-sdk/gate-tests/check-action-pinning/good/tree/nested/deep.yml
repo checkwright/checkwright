@@ -1,0 +1,5 @@
+name: reached by the recursive walk, not a top-level listing
+jobs:
+  build:
+    steps:
+      - uses: owner/action@fedcba9876543210fedcba9876543210fedcba98 # v3.0.0

@@ -1,0 +1,11 @@
+name: mutable
+jobs:
+  build:
+    steps:
+      - uses: owner/action@v5
+      - uses: owner/action@main
+      # Boundary: a 39-hex ref is one short of a SHA and must not pass as one.
+      - uses: owner/action@0123456789abcdef0123456789abcdef0123456
+      # Boundary: a commented-out step is the copy-paste seed a consumer fills
+      # in, so its ref is scanned like any other.
+      # - uses: owner/action@v1
