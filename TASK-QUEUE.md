@@ -1179,24 +1179,53 @@
   `/validate` is the evidence producer, so re-running `run-validate` mutates or
   duplicates the committed execution evidence rather than verifying it. The correct
   lead-side check for the validate stage is to **read** its committed evidence
-  manifest (`.workflow/validate-evidence.txt`), never to re-run. This session a
-  lead acting on the vague default moved to re-run `run-validate` to "verify" the
-  validate stage twice; the operator caught both. The binding must distinguish
-  **work-producing stages** (spec, build → re-run the battery, safe and
-  idempotent) from the **evidence-producing stage** (`/validate` → read the
+  manifest (`.workflow/validate-evidence.txt`), never to re-run. The binding must
+  distinguish **work-producing stages** (spec, build → re-run the battery, safe
+  and idempotent) from the **evidence-producing stage** (`/validate` → read the
   committed manifest, never re-run). The two defects travel together because the
   verb rename is what stops the check discipline mis-attaching to the evidence
   producer.
+  **Recorded instances, both caught by the operator and by nothing else.**
+  *First (filing iteration):* a lead acting on the vague default moved to re-run
+  `run-validate` to "verify" the validate stage, twice. *Second
+  (`supply-chain-trust-baseline`):* a lead ran the full `run-gates` battery after
+  the validate stage's commit, as its standing "verify independently after every
+  agent commit" discipline — precisely the case this part names as wrong.
+  **What the second instance sharpens.** The two re-runs are not equally harmful,
+  and the binding must say which is which. `run-gates` writes nothing under
+  `.workflow` (see `evidence-row-upsert-order`, whose premise was corrected on
+  exactly this point), so re-running it is inert on the evidence and merely
+  wasted work; `run-validate` is the sole writer, so re-running *it* is the one
+  that mutates committed execution evidence. The reason a lead reaches for
+  `run-gates` here is that it is the generic post-delegation check and carries no
+  carve-out — the routing defect is real for both, the corruption risk only for
+  the second. Part (2)'s wording should split them rather than attributing the
+  mutation to any re-run.
+  **Disposition after recurrence — unchanged, cost raised, insufficiency named.**
+  The recurrence does not make a different fix correct: the verb rename plus the
+  work-vs-evidence carve-out is still the cheapest true fix, and nothing in the
+  second instance argues for renaming the stage. What it does establish is that
+  the prose fix is **not sufficient on its own** — it removes the ambiguity but
+  installs no oracle, and a lead reaching for the generic check still gets no red.
+  Gap generalization, per the close ritual: the check class that would catch this
+  is a gate over a lead's *tool invocations*, and no scanner is buildable — a
+  lead's choice of command leaves no tracked artifact for the battery to read.
+  The nearest buildable proxy is the liveness sentinel filed under
+  `validate-producer-liveness-unobservable`, which covers only the concurrent
+  case, not a sequential re-run. So the unit ships the prose fix knowing
+  detection stays human, and that limit belongs in the binding it lands.
   **Why `[needs-spec]`:** a prose rename plus a binding-semantics change across
   `delegation-kit`'s dispatch template and the lead binding, with a
   grep-propagation pass — a shipped-kit surface change that wants a scoped unit,
   not a close drive-by; and the work-vs-evidence carve-out is a delegation-kit SPEC
-  ruling, not a wording tweak. **Cost while deferred:** low but recurrent — every
-  delegated `/validate` re-litigates whether the lead re-runs or reads, risking
-  corrupted execution evidence, and the verb keeps inviting the skip-the-stage
-  conflation. Filed 2026-07-25 by close, draining the committed gap inbox
-  (`0eec298`) merged with the lead's post-dispatch third triage item (the
-  check-routing half).
+  ruling, not a wording tweak. **Cost while deferred:** raised from "low but
+  recurrent" — it has now fired in two consecutive iterations, each time detected
+  only by an operator catch, so the in-band cost is unbounded until someone
+  happens to look: every delegated `/validate` re-litigates whether the lead
+  re-runs or reads, and the verb keeps inviting the skip-the-stage conflation.
+  Filed 2026-07-25 by close, draining the committed gap inbox (`0eec298`) merged
+  with the lead's post-dispatch third triage item (the check-routing half);
+  second instance added the same day by close.
 
 - **core-files-kit-coverage-derived** [needs-spec] — `scripts/core-files.list`
   carries a block headed "One SPEC.md per kit (each kit's canonical contract)"
@@ -1330,31 +1359,182 @@
   Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
   inbox (two bullets merged at triage, costed once).
 
-- **evidence-row-upsert-order** [needs-spec] — `run-gates.sh` rewrites its
-  `gates` row in `.workflow/validate-evidence.txt` on **every** battery run, not
-  only during validate, and the rewrite is a delete-then-append rather than an
-  in-place update. The row's content is unchanged (same sha256, same counts,
-  same date), so no evidence is corrupted; what the run produces is a
-  reordering, and therefore a dirty tree.
-  **Why it costs anything:** the battery is the repo's standing oracle, so any
-  session told to verify before committing dirties a committed stage record as a
-  side effect of verifying. This close hit it twice — once at entry, on a tree
-  the lead had just reported clean after its own verification run, and once
-  mid-session. Each hit costs a session the same diff read and the same judgment
-  (churn or evidence?), and the wrong call in either direction is cheap to make:
-  committing noise into a stage record, or discarding a row that mattered.
-  **Deliverable:** an order-stable upsert, so a re-run of an unchanged suite
+- **evidence-row-upsert-order** [needs-spec] — `evidence-kit/bin/run-validate.sh`
+  upserts each suite's row in `.workflow/validate-evidence.txt` as a
+  delete-then-append: `awk` filters the `(iteration, suite)` line out into a
+  temp, the new line is appended, the temp is `mv`'d over the manifest. So a
+  re-run **relocates** the row to the end rather than updating it in place. The
+  content is unchanged (same sha256, same counts, same date), so no evidence is
+  corrupted; what a re-run produces is a reordering.
+  **Correction to this entry's original premise, 2026-07-25.** It was filed
+  claiming any battery run — not just validate's — rewrites the `gates` row.
+  That is false. `gate-sdk/bin/run-gates.sh` contains no `.workflow` reference
+  at all and writes nothing there; `run-validate.sh` is the sole writer.
+  Re-verified by running the bare battery on a clean tree: 81/81 green, `git
+  status` unchanged. The clause claiming this cost a close entry a false
+  clean-tree report falls with the premise — the battery was never the writer,
+  so a lead's post-delegation battery run never dirtied the manifest.
+  **What actually caused the churn.** The validate session's `run-validate` was
+  still executing in the background when close was dispatched, and its writes
+  raced the close commits. Fingerprint in the committed manifests: `gates` is
+  first in `EVIDENCE_KIT_SUITES` (`scripts/evidence-config.sh`) and first in the
+  prior iteration's manifest at `7692335`, but **last** in this iteration's at
+  `ae70eae`, both carrying all 21 suites clean. One relocated row with no
+  content change is a second pass that had upserted only its first suite — a
+  live producer, not a property of the battery. The concurrency itself is filed
+  separately as `validate-producer-liveness-unobservable`; this entry keeps only
+  the ordering defect.
+  **Why the ordering is still worth fixing on its own merits.** A relocating
+  upsert makes the manifest's line order non-deterministic, so a repeated or
+  concurrent write surfaces as a diff with no content behind it, and every
+  session reading that diff pays the same churn-or-evidence judgment — cheap to
+  get wrong either way: committing noise into a stage record, or discarding a
+  row that mattered. Under a stable order the race above would have been
+  invisible in the tree; it is the ordering that turned a benign re-run into a
+  session-visible defect.
+  **Deliverable:** an order-stable upsert, so re-running an unchanged suite
   leaves the file byte-identical.
-  **Why `[needs-spec]`:** the open question is whether a non-validate battery
-  run should write the file at all. Order-stable upsert fixes the symptom and
-  keeps the writer's current reach; scoping the write to the validate stage is
-  the narrower claim and asks what the row means when a close-stage run produces
-  it. Those settle differently, and evidence-kit/SPEC.md owns the manifest
-  contract that decides which is right.
-  **Cost while deferred:** low per hit, once or twice per session that runs the
-  battery. No gate catches it because nothing is wrong with the file's content.
-  Debt: converges a writer onto a stable ordering; adds no governed name.
-  Filed 2026-07-25 by close, from the session's own tree-state handling.
+  **Why `[needs-spec]`:** the writer's `# spec:` line declares the current
+  semantics deliberately — "a re-run supersedes this iteration's prior line for
+  the suite, then appends" — so recency order may be the intended contract
+  rather than an accident, and an in-place update changes it. Whether the
+  manifest's line order is contractual (and if so, which order) is
+  evidence-kit/SPEC.md §Evidence manifest's ruling, not a patch to the script.
+  **Cost while deferred:** low per hit, and rarer than first filed — it needs a
+  repeated or concurrent run-validate, not any battery run. No gate catches it
+  because nothing is wrong with the file's content. Debt: converges a writer
+  onto a stable ordering; adds no governed name.
+  Filed 2026-07-25 by close; premise corrected the same day by close after
+  re-deriving the writer set.
+
+- **local-overlay-git-blanket-grant** [needs-spec] — the local permission overlay
+  carries `Bash(git *)`, a single glob granting **every** git subcommand without a
+  prompt. The destructive ones ride it: `git reset --hard`, `git clean -fd`, `git
+  push --force`, `git rm -r`. `bash-guard`'s project rules cover only two narrow
+  cases (`git commit --no-verify`, `git clean -x/-X`), so everything else in that
+  set is auto-allowed by the blanket rather than by a judgment about it.
+  **Why it survived this long.** `compare-settings-allow.sh` reports it
+  non-redundant and therefore never flags it — correctly, since the committed set
+  holds no glob that covers it. The tool answers "is this entry redundant?", and
+  the question this entry needs is "is this entry *too broad?*", which nothing
+  asks. That is the gap, not the entry itself.
+  **Deliverable:** replace the blanket with the write-side verbs the workflow
+  actually uses (`git checkout <path>`, `git push origin master`, `git tag -a`,
+  `git add`, `git commit`, `git stash`), leaving destructive git to prompt. The
+  read-only verbs no longer need it — `git status|log|show|diff|rev-parse|
+  ls-remote|tag -l|check-ignore` were promoted to the committed allowlist this
+  close, which is what makes the narrowing affordable.
+  **Why `[needs-spec]`:** the general question is whether guard-kit should ship a
+  *breadth* criterion beside its redundancy one — a check that reds a local glob
+  whose match set includes a known-destructive command — and if so, where the
+  destructive set is owned without becoming a maintained roster. That is a
+  guard-kit/SPEC.md ruling; narrowing this one overlay is the instance, not the
+  fix.
+  **Cost while deferred:** an unprompted destructive git command is a
+  low-probability, high-cost event, and the overlay is local-only so the exposure
+  is one machine rather than every consumer. Debt: narrows a local grant and adds
+  one gate class; adds no governed name to a shipped surface.
+  **Why close did not just narrow it here:** the triage step's mandate is
+  promote-and-prune, and re-shaping a grant model mid-release — with a tag and a
+  push still to run in this same session — is bad sequencing regardless of
+  authority. The promotion and the dead-entry prune landed; this is the costed
+  remainder.
+  Filed 2026-07-25 by close, from the tooling-friction triage.
+
+- **validate-producer-liveness-unobservable** [needs-spec] — a stage session can
+  report its stage done while its own oracle is still executing, and nothing in
+  the lifecycle can see it. This iteration the validate session's `run-validate`
+  was still running in the background when the lead dispatched close; its writes
+  landed on `.workflow/validate-evidence.txt` underneath the close session's
+  commits (the churn recorded under `evidence-row-upsert-order`).
+  **What did not catch it, and why.** The lead's post-dispatch check is `git
+  status` / `git log`, both blind to a live process. The close-entry preflight
+  (`LIFECYCLE_KIT_ENTRY_PREFLIGHT`, `scripts/lifecycle-config.sh`) is blind for a
+  different reason: it reads a file at an instant, and the file can change a
+  second later. Neither is a coverage hole; both are liveness holes.
+  **What the preflight already asserts — recorded so this entry is not filed on
+  a false premise, as its sibling above was.** `check-evidence-manifest` is not
+  grammar-only. Assertion A, armed at a `close` cursor, walks
+  `EVIDENCE_KIT_SUITES` and errors on any configured suite with no clean line for
+  the iteration and on any clean line predating the earliest validate stamp — so
+  suite-roster completeness *is* asserted, and already derived from the
+  configured roster rather than a maintained list. A truncated manifest reds at
+  the close entry today. Nor is a torn read reachable: `run-validate` builds each
+  revision in a temp file and `mv`s it over the manifest, so a row is relocated,
+  never briefly absent. The gap is liveness alone.
+  **Deliverable:** a liveness sentinel — `run-validate` claims a lock under
+  `EVIDENCE_KIT_TMP_DIR` for the duration of a run and releases it on exit; the
+  close-entry preflight reds on a held lock, so a stage entry cannot be stamped
+  while the prior stage's producer is still writing.
+  **Why `[needs-spec]`:** it adds a runtime artifact needing a named reclaim path
+  (the runtime-artifact lifecycle rule), a stale-lock policy for a crashed run,
+  and a knob; and evidence-kit/SPEC.md owns the writer contract while
+  lifecycle-kit owns the preflight, so which kit holds the lock is a
+  cross-kit ruling, not an implementation choice.
+  **Cost while deferred:** silent at the moment it happens and paid entirely by
+  the next session, which fights a file changing underneath it and cannot
+  distinguish churn from evidence. Rare — it needs a backgrounded producer — but
+  it cost this iteration three restores once dispatch overlapped, and the only
+  detector was the operator. Debt: one runtime artifact plus one preflight
+  assertion; adds no governed name to a shipped surface.
+  Filed 2026-07-25 by close, from the operator's observation of the live
+  `run-validate` and the row-relocation fingerprint at `ae70eae`.
+
+- **lead-dispatch-requires-completion-notification** [needs-spec] — the lead has
+  no stated precondition for dispatching stage N+1, and the one it improvised is
+  wrong: artifact state. This iteration the lead verified that validate's commit
+  had landed with complete evidence, the tree was clean, the battery green, and
+  `enter-stage.sh --simulate close` cleared — then dispatched close on that basis,
+  into a still-running `run-validate`. Every one of those checks passed while the
+  producer was mid-write, because `run-validate` commits its evidence and keeps
+  going: **the terminal commit existing is fully compatible with the process still
+  executing.** The lead dispatched on the *absence* of a completion notification
+  rather than its arrival.
+  **The generalizable trap, worth the entry on its own.** The operator mentioned
+  having "approved it only now upon return," referring to a permission prompt the
+  validate session had stalled on. The lead read that as the stall resolving and
+  therefore the stage being finished. It means the opposite: an approval prompt
+  gates a command **starting**, so that message was positive evidence the battery
+  had just *begun*. Any signal about a prompt being answered is a start signal,
+  never a completion one.
+  **Deliverable:** a dispatch precondition in
+  `lifecycle-kit/templates/lead.md` — stage N+1 is dispatched on stage N's agent
+  **completion notification**, never on the presence of its commit or any
+  tree-state check, because artifact state cannot distinguish "finished" from
+  "still writing." It belongs beside the existing post-delegation verify
+  discipline, which specifies what to check *after* a stage and is silent on how
+  the lead knows the stage is over.
+  **Assertability — checked, not assumed.** The precondition is **prose-only**.
+  The notification is harness session state with no tracked artifact, so no
+  battery gate can read it; the precedent is the sibling-dispatch clause, prose in
+  the same template for the same reason. But the *negative* is assertable, and
+  that is the pairing that matters: "did the lead get a notification?" is
+  unreadable, while "is the producer still running?" is exactly what the lock
+  sentinel under `validate-producer-liveness-unobservable` reads. The two are one
+  unit — prose rule on the dispatch side, oracle on the artifact side.
+  **Disposition of the incident as a set, which differs from the lead's read.**
+  The lead proposed this rule as the actual fix with the others as symptoms it
+  prevents. Half right. It is the proximate cause and the cheapest fix, so it goes
+  first. It is not sufficient alone, and this queue already carries the reason:
+  `validate-verb-collision-and-check-routing` established this same iteration that
+  a prose fix with no oracle recurs and is caught only by an operator. Shipping
+  this rule without the sentinel repeats that pattern knowingly. Also retracted
+  here: the incident was briefly read as `check-evidence-manifest` being
+  grammar-only. It is not — see the assertion-A note under
+  `validate-producer-liveness-unobservable`. Three real findings, not four:
+  the dispatch decision (this entry), the observability gap (the sentinel), and
+  the artifact churn (`evidence-row-upsert-order`), which is worth fixing on its
+  own merits and is not merely a symptom.
+  **Why `[needs-spec]`:** it adds a precondition to a shipped template's dispatch
+  contract and states a limit (prose-only, human-enforced) that
+  lifecycle-kit/SPEC.md should own explicitly rather than leave implied.
+  **Cost while deferred:** every multi-stage iteration with a live lead can
+  re-run this race, and the cost lands on the next stage session, which fights a
+  file changing underneath it. Debt: one template rule plus one SPEC limit; adds
+  no governed name.
+  Filed 2026-07-25 by close, from the lead's own account of the dispatch
+  decision; the operator ruled stage sequencing the lead's accountability, which
+  is why this is a lead rule rather than a stage-session or gate concern.
 
 ## Done
 
