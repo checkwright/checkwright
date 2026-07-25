@@ -146,10 +146,13 @@ the skill on a blocking verdict — so they are not resident here.
   gitignored, local-only.
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
-- `CONTRIBUTING.md` + the `.github/` issue/PR templates and `RELEASING.md` are
+- `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
+  `SECURITY.md`, and `RELEASING.md` are
   governed repo-meta (tracked, core-files-pinned, in the spec manifest so their
   links/commands resolve like any doc); the fixture is the unit of contribution —
-  edit the guide, not GitHub UI settings. The release runbook is the
+  edit the guide, not GitHub UI settings. `SECURITY.md` owns the vendored-bash
+  threat boundary and cites gate-sdk/SPEC.md §Enforcement tiers for the CI
+  limit rather than restating it. The release runbook is the
   load-triggered tier, resident only at close's release step.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome, page-authoring rules,

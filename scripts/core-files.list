@@ -12,6 +12,10 @@ CLAUDE.md
 
 # Public contribution surface: guide + GitHub-rendered issue/PR templates.
 CONTRIBUTING.md
+# Conduct surface: GitHub renders it from this root basename.
+CODE_OF_CONDUCT.md
+# Disclosure route: the Security tab renders it from this root basename.
+SECURITY.md
 # Release runbook: governed repo-meta, the repeatable release procedure.
 RELEASING.md
 .github/ISSUE_TEMPLATE/gate-defect.yml
