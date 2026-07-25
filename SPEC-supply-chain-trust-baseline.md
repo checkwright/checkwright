@@ -3,7 +3,7 @@
 A root-level amendment: the ruling is repo governance (a disclosure route, a
 conduct surface, the CI action-ref form) with no single owning component, and it
 reaches two kits — `gate-sdk` gains a gate and a pinned template, `site-kit`
-loses an overclaiming phrase.
+gains a pinned template and loses an overclaiming phrase.
 
 ## What changes
 
@@ -58,11 +58,23 @@ at the next ops pass.
 
 **B1. Pin every mutable `uses:` ref. {mechanical}** Each `uses:` ref in the
 tree resolves to a full 40-hex commit SHA, with the human-readable tag kept as
-a trailing comment. Three sites, and the third is the one that matters: the two
-instances under `.github/workflows/`, **and** `gate-sdk/templates/gates-workflow.yml`
-— the copy-out every consumer vendors. Pinning the instances while the template
-ships mutable would fix this repo and leave the drift source intact for
-everyone downstream.
+a trailing comment. Four sites, and the last two are the ones that matter: the
+two instances under `.github/workflows/`, **and** both shipped copy-outs —
+`gate-sdk/templates/gates-workflow.yml` and `site-kit/templates/site-health.yml`.
+Pinning the instances while a template ships mutable would fix this repo and
+leave the drift source intact for everyone downstream, and the two templates are
+the same class: site-kit/SPEC.md §templates/site-health.yml rules its template
+"copied verbatim into a consumer's `.github/workflows/`" and installed verbatim
+as governed surface by the kit's `smoke/install.sh`. `B2`'s scan set is derived,
+not rostered, so the gate reaches `site-kit/templates/site-health.yml` whether or
+not this delta names it — a three-site pin would have the new gate red on a file
+this same unit ships.
+
+No site-kit/SPEC.md edit follows. The pin is a literal the template carries; the
+rule that governs it and the refresh limit that bounds it are gate-sdk-owned
+(§check-action-pinning and `B4`'s addition to §templates/gates-workflow.yml).
+Restating either in site-kit's template section would fork a rule that already
+has one owner.
 
 **B2. `check-action-pinning` — a new gate-sdk gate. {design-bearing}**
 
@@ -93,8 +105,11 @@ full 40-hex commit SHA, or a repo-local ref (a `./`-prefixed path to an in-repo
 composite action, which git already pins by checkout). A tag or branch ref
 (`@v5`, `@main`) reds.
 
-*Scan set, derived not rostered.* A whole-tree walk over tracked `*.yml` /
-`*.yaml` via `gate_find`, which prunes `gate-tests` through the shared
+*Scan set, derived not rostered.* A whole-tree walk over `*.yml` / `*.yaml` via
+`gate_find` — a `find` walk from the scan root, not a `git ls-files`
+enumeration, because the fixture pair's synthetic tree is untracked by
+construction and a tracked-files filter would make it unreachable. `gate_find`
+prunes `gate-tests` through the shared
 `GATE_SDK_PRUNE_DIRS` — so the `bad/` fixture cannot red the whole-tree run,
 and both `.github/workflows/` and the shipped template are covered with no
 roster to drift. **This gate introduces no new knob**: the scan set is derived
@@ -140,17 +155,41 @@ Stating this is what keeps `B1` from becoming its own overclaim.
 a pin the same kit explicitly declines to own: site-kit/SPEC.md
 §check-docs-render-fidelity's parser-version limit says the exact-version pin
 "stays a consumer's deliberate `SITE_KIT_RENDERER` override, not kit-run
-machinery". Four sites carry the contradicting phrase — `site-kit/SPEC.md`'s
-invariant sentence, `README.md`'s site-kit table row, and two in
-`docs/site-kit/index.md`, one of which sits a few lines from the link to the
-very limit it contradicts. All four are struck to name the parser without
-claiming it is pinned. `docs/site-kit/SPEC.md` is the generated mirror and
-follows from `B3`'s regen, never a hand edit.
+machinery". **Seven hand-edited occurrences across four files**, plus one
+generated and one immutable:
 
-Scope ruled two sites; the two `docs/site-kit/index.md` occurrences are the
-same phrase and the same contradiction, and striking half would ship the
-inconsistency on the public site. No pin is added anywhere: the CI gem install
-stays unversioned, deliberately.
+- `site-kit/SPEC.md`'s §check-docs-render-fidelity invariant sentence.
+- `README.md`'s site-kit table row.
+- Two in `docs/site-kit/index.md` — one sits a few lines from the link to the
+  very limit it contradicts, the other is the install step's parenthetical.
+- **Three in `site-kit/checks/check-docs-render-fidelity.sh`**: its `spec:`
+  gloss, which is a verbatim copy of the invariant sentence being edited — a
+  stale gloss forks the why the one-line binding exists to prevent
+  (canon-kit/SPEC.md §check-comment-tier), and `check-spec-pointer` gates only
+  the forward direction, so nothing would catch it; and two runtime output
+  strings, the help text and the divergence report. The help text is the
+  sharpest instance in the tree: it says "install the pinned Pages parser —
+  ruby plus the kramdown-parser-gfm gem" while that gem install is deliberately
+  unversioned. The gate makes the overclaim in its own voice, so leaving it
+  while striking the docs would ship the contradiction where a reader hits it
+  under failure.
+
+`docs/site-kit/SPEC.md` is the generated mirror and follows from `B3`'s regen,
+never a hand edit. The `bad/` fixture's `expect.txt` matches a substring that
+does not include the phrase, so the output edits need no fixture change.
+
+One occurrence is **not** struck: `docs/posts/2026-07-20-checkwright-v0-10-0.md`
+carries it in the v0.10.0 release note. Dated posts are immutable published
+artifacts (docs/site-architecture.md §Page-authoring rules; the ruling is
+mechanized as `CANON_KIT_TEMPORAL_EXEMPT_PATHS`), and a release note records what
+was claimed at that release. Rewriting it would be the larger defect. The strike
+is bounded to living surfaces.
+
+Scope ruled two sites; the count grew twice on evidence — the two
+`docs/site-kit/index.md` occurrences are the same phrase and the same
+contradiction, and striking half would ship the inconsistency on the public site;
+the gate's own three are the same claim in the surface that implements it. No pin
+is added anywhere: the CI gem install stays unversioned, deliberately.
 
 ### D. What the vendored hooks execute
 
@@ -234,6 +273,10 @@ governed documents, and a pinned literal form. The causal chains that exist:
 - **site-kit/SPEC.md** — `C1`'s strike in the §check-docs-render-fidelity
   invariant sentence. The parser-version limit two hundred lines below is
   already correct and is not touched; this edit makes the opening agree with it.
+  §templates/site-health.yml is **not** touched — `B1` rules why.
+- **site-kit/checks/check-docs-render-fidelity.sh** — `C1`'s three strikes: the
+  `spec:` gloss tracking the SPEC sentence above, and the two output strings.
+- **site-kit/templates/site-health.yml** — `B1`'s fourth pinned ref.
 - **gate-sdk/README.md** — the roster row for the new gate.
 - **README.md** — `C1`'s strike in the site-kit table row.
 - **docs/install.md** — `D1`'s hook-review section, placed after the vendoring
@@ -256,8 +299,10 @@ governed documents, and a pinned literal form. The causal chains that exist:
 - [ ] **Amendment deleted** — this file removed on merge; none remain
       (`ls SPEC-*.md`).
 - [ ] **Removals propagated** — grepped every spec for names this change
-      retired; nothing dangles. Specifically: no bare "pinned Pages parser"
-      survives anywhere, mirror included.
+      retired; nothing dangles. Specifically: no bare "pinned Pages parser" (or
+      "pinned parser") survives on any living surface — the generated mirror and
+      the gate's own source and output included. The sole surviving occurrence is
+      the immutable v0.10.0 release note, ruled out of scope in `C1`.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
