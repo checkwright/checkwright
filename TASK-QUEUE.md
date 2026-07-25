@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: activation-path
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -864,6 +864,37 @@
   (gate-sdk/SPEC.md §upgrade-smoke): the external review names
   time-to-first-value the top adoption weakness — a second attestation
   beside the anticipated second consumer.
+  **Promoted into the `activation-path` unit set 2026-07-26 by the undirected
+  scope survey (operator ruling), with three conditions ruled in. `/spec` pairs
+  this entry; all three belong in the amendment's envelope, not in build-time
+  judgment.**
+  **(1) Phasing is authorized and must be stated in the envelope.** `init` +
+  `doctor` land first; `update` / `diff` / `uninstall` land second. The envelope
+  says so explicitly so build is not left to discover the overrun. This is the
+  largest entry in the queue and the phasing is what makes it iteration-shaped.
+  **(2) The registry doctrine survives; its prose is rewritten as an explicit
+  envelope item.** `docs/install.md:11-12` publishes a ruling — "the package
+  registries hold the name only, never a dependency channel. There is nothing to
+  `npm install` or `cargo add`." A published installer reopens it. Operator
+  ruling: an `npx checkwright init` that vendors pinned source and commits it is
+  **not** a dependency channel — nothing resolves at build time and the kits
+  still land as committed, auditable source, which is the property the doctrine
+  protects. So the doctrine stands and install.md is rewritten to distinguish a
+  one-shot vendoring installer from a resolved dependency. Because that is
+  user-facing published semantics, it lands **in the amendment** as a named
+  envelope item, never as incidental build-time wording.
+  **(3) Two verified cost facts, carried so `/spec` does not re-derive them.**
+  *The publish is real work with its own supply-chain surface:*
+  `reserve/npm/package.json` is a bare name reservation — `"version": "0.0.1"`,
+  `"files": ["README.md"]`, and **no `bin` field** — so there is no installer
+  package today, and standing one up adds a distribution channel the
+  just-landed `supply-chain-trust-baseline` does not cover (provenance, a
+  pinned publish workflow). *`doctor` is smaller than this entry implies:*
+  `context-kit/bin/env-probe.sh` already walks `PROBE_SET` and already probes
+  versions (`probe_version()`, lines 39-47); it lacks only a floor to compare
+  against and a verdict to emit. The floor axis itself is
+  `platform-support-contract`'s deliverable in this same unit set, so `doctor`
+  consumes it rather than defining it.
   **Cost while deferred:** every prospective adopter pays the manual
   vendor-and-wire path, the largest single drop-off risk at announcement;
   non-rotting otherwise. Surfaced 2026-07-23 in an external
@@ -886,12 +917,19 @@
   sub-deliverable is already done, the other is confirmed live.** "The repo
   gains likely discovery topics" is stale: four topics are already set
   (`agent-governance`, `code-quality`, `git-hooks`, `linting`), so the residue
-  is topic *quality* — none names agents, LLMs, spec-driven development, or a
-  harness — not their absence. The demo-invisibility half stands and is
+  is topic *quality*, not their absence. The demo-invisibility half stands and is
   confirmed: `run-demo`/`demo/` appears **zero times** in both `README.md` and
   `docs/index.md`, so the working walkthrough is linked from neither front
   door. The first screen's shape is confirmed too — badges, prose premise, then
   the eleven-kit table at README.md:24, architecture before outcome.
+  **Correction to that correction, 2026-07-26 by the undirected scope survey —
+  the topic residue is three axes, not four.** The note above originally read
+  "none names agents, LLMs, spec-driven development, or a harness".
+  `agent-governance` **does** name agents, so the true residue is the absence of
+  an LLM, a spec-driven-development, and a harness topic. Re-verified against
+  the live repo metadata this session: the topic set is unchanged from
+  2026-07-25, and the demo-invisibility half still reads zero in both front
+  doors.
   **Cost while deferred:** the current first screen filters out exactly the
   reader the launch targets; zero until announcement, then compounding.
   Surfaced 2026-07-23 in the same external review.
@@ -905,9 +943,29 @@
   which stock macOS ships; the first support table distinguishes engine
   portability from full harness experience. The `doctor` probe belongs to
   `launch-activation-cli`; this entry owns the matrix and the CI legs.
+  **Scoped down to the floor half 2026-07-26 by the `activation-path` scope
+  survey (operator ruling).** This entry is now the **floor contract only** and
+  is a member of the `activation-path` unit set, to be paired by `/spec`. The
+  CI per-platform install-smoke legs are deferred back as their own costed
+  entry, `platform-support-ci-matrix` — no macOS/WSL adopter exists yet to
+  justify the runner spend. Do not rebuild the legs here.
+  **The floor surface already exists and is already gated — this is one missing
+  axis, not a new roster.** `scripts/check-install-toolchain.sh` holds
+  bidirectional name-set parity between `docs/install.md`'s Requirements
+  toolchain block (delimited by its `toolchain:begin`/`toolchain:end`
+  markers) and
+  `context-kit/bin/env-probe.sh`'s `PROBE_SET=(bash git jq awk shellcheck)`.
+  That roster carries **names only**: there is no version-floor axis anywhere in
+  it. So "exact tool floors" is an axis added to a roster the battery already
+  holds in parity, and the natural deliverable shape is that axis plus the
+  parity assertion extended to cover it — not a second roster beside the first.
+  Verified this session.
   **Cost while deferred:** the install.md / gate-sdk floor contradiction is
-  live public doc drift today; the rest costs nothing until macOS/WSL
-  adopters exist, then becomes the dominant support load.
+  live public doc drift today — re-verified 2026-07-26: `docs/install.md:43`
+  states "No minimum versions are pinned here" while `gate-sdk/README.md:116`
+  requires "bash 4+, git, GNU coreutils/findutils, GNU awk", on a page whose
+  line 20 declares macOS a supported platform though stock macOS ships bash 3.2
+  and BSD userland.
   Surfaced 2026-07-23 in the same external review (its portability finding).
 
 - **preview-release-cadence** [needs-spec] — reset release signaling for a
@@ -918,13 +976,14 @@
   a 30-second human changelog beside the migration detail. Separates
   internal iteration completion from public version publication — a
   RELEASING.md policy change more than a mechanism.
-  **Premise corrected 2026-07-25 by the undirected scope survey — the count is
-  larger than filed and the rhythm held.** This entry says
-  "thirteen-releases-in-nine-days"; the tree now carries **14 tags in 12 days**,
-  `v0.1.0` (2026-07-14) through `v0.14.0` (2026-07-25). The finding is not a
-  one-off burst that has since settled — the cadence continued at roughly a
-  release a day across the whole window, which strengthens rather than dates
-  the signaling argument.
+  **Premise corrected 2026-07-25 by the undirected scope survey, re-counted
+  2026-07-26 — the count is larger than filed and the rhythm held.** This entry
+  says "thirteen-releases-in-nine-days"; the tree now carries **15 tags in 12
+  days**, `v0.1.0` (2026-07-14) through `v0.15.0` (2026-07-25). The finding is
+  not a one-off burst that has since settled — the cadence continued at roughly
+  a release a day across the whole window, and the count has risen at every
+  re-read (13 → 14 → 15), which strengthens rather than dates the signaling
+  argument.
   **Now also carries `supply-chain-trust-baseline`'s carved-out deliverable:
   checksum-verifiable release assets.** That entry gated them on "once cadence
   stabilizes" and its promoted iteration carved them out on exactly that
@@ -1535,6 +1594,38 @@
   Filed 2026-07-25 by close, from the lead's own account of the dispatch
   decision; the operator ruled stage sequencing the lead's accountability, which
   is why this is a lead rule rather than a stage-session or gate concern.
+
+- **platform-support-ci-matrix** [needs-spec] — the per-platform half carved out
+  of `platform-support-contract` when that entry was scoped down to the floor
+  contract for the `activation-path` iteration: a CI install-smoke leg per
+  supported platform (Linux / macOS / Windows-WSL), or an explicit experimental
+  label where no leg exists. The floor contract states *what* the toolchain
+  floors are; this entry is the mechanism that proves a platform actually meets
+  them, and the support matrix's per-platform rows are only as honest as the
+  legs behind them.
+  **Why deferred rather than built alongside the floors:** the repo runs two
+  workflows (`.github/workflows/gates.yml`, `site-health.yml`), neither a
+  matrix, so this is new runner spend on macOS and WSL images — and **no macOS
+  or WSL adopter exists** to attest the spend. Demand-gated on exactly that,
+  like the other adoption rungs.
+  **The un-defer trigger, carried so the reason is not re-derived:** the
+  contradiction that motivates the legs is live and verified 2026-07-26 —
+  `docs/install.md:20` declares macOS a supported platform, while
+  `gate-sdk/README.md:116` requires bash 4+ and GNU coreutils/findutils/awk,
+  and **stock macOS ships bash 3.2 and BSD userland**. The floor contract can
+  only *state* that gap; nothing proves whether the battery actually runs on a
+  stock macOS box until a leg runs there. So this entry un-defers on the first
+  of: a macOS or WSL adopter appearing, or the support matrix wanting to promote
+  a platform from experimental to supported.
+  **Cost while deferred:** the support matrix's non-Linux rows rest on
+  reasoning rather than on a green run, so a macOS claim is unfalsified in both
+  directions; zero until a non-Linux adopter exists, then it becomes the
+  dominant support load, which is the same shape the parent entry recorded.
+  Bounded and non-rotting — the floor contract lands the falsifiable half.
+  Debt: CI configuration over an already-stated contract; adds no governed name
+  unless a platform label becomes a gated surface.
+  Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set
+  escalation, split from `platform-support-contract`.
 
 ## Done
 
