@@ -8,7 +8,9 @@ private context that must never be committed); consult it before roadmap/seam
 work. The kit map lives in [README.md](README.md).
 
 This repo is public: no local paths, private repo/project names, accounts, or
-internal session/commit references in tracked files or commit messages.
+internal session/commit references in tracked files or commit messages —
+including the harness's default `Claude-Session:` trailer, which
+`check-commit-msg` reds on.
 
 ## The provenance seam (never cross it)
 

@@ -61,3 +61,9 @@ batch-specific pointers such as the journal path.
 - **Shared git index.** A concurrent session may share the index; follow the
   shared-index discipline in CLAUDE.md §This repo is governed by its own kits,
   not a copy here.
+- **No sibling dispatch.** You never dispatch a sibling stage session; an
+  intra-stage batch split is the lead's to own, and that clause is your
+  authority to refuse one:
+  lifecycle-kit/templates/lead.md §Economics — batch, and compact where it pays.
+  Read-only fan-outs inside your own stage stay sanctioned
+  (CLAUDE.md §Agent execution).

@@ -29,7 +29,9 @@
 ## Existing sections updated
 
 <!-- Any canonical-spec section describing the prior flow that this change
-     touches — updated here, in the amendment, not left to drift. -->
+     touches — updated here, in the amendment, not left to drift. Each entry
+     names the delta that owns it; an update target no delta claims reaches
+     build as an orphan a batch adopts on its own authority. -->
 
 <!-- The one sanctioned copy exemption: an amendment may embed a wire-contract
      delta (e.g. a fenced proto block) until merge, because it is the design

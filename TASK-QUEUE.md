@@ -1238,6 +1238,124 @@
   audit — the amendment's A3 edits this same file, so the gap is adjacent to its
   envelope without being inside it. Lead ruling, scope-gated intake.
 
+- **amendment-update-target-coverage** [needs-spec] — an entry under an
+  amendment's `## Existing sections updated` heading can name no owning delta,
+  and nothing catches it. `supply-chain-trust-baseline` shipped two such entries
+  of eight: the CLAUDE.md §Housekeeping enumeration and the gate-sdk/README.md
+  roster row. Both were adopted correctly by a build batch reading intent, so
+  nothing shipped wrong. The exposure is that an unclaimed target is
+  indistinguishable from one a batch may skip, leaving the batch to decide on
+  its own authority which it is.
+  **Deliverable — a canon-kit gate asserting every entry under that heading
+  cites a delta the same amendment defines.** The authoring-side rule landed at
+  this close (canon-kit/templates/SPEC-amendment.md) and align now carries the
+  manual verification (lifecycle-kit/templates/skills/align.md); this entry is
+  the assertion those two currently stand in for.
+  **Why `[needs-spec]`:** the delta-letter grammar is convention, not contract.
+  `**A1.` through `**D1.` is how amendments have happened to number their
+  deltas; no surface pins it, and a gate cannot match a grammar the template
+  never specifies. The design call is whether canon-kit fixes that numbering
+  (and reds a non-conforming amendment) or weakens the assertion to "cites some
+  bold token defined above" — a proxy thin enough to fail gate-sdk/SPEC.md
+  §When a gate earns its place.
+  **Cost while deferred:** bounded. The failure mode is an edit adopted by
+  judgment rather than one dropped, and the align duty now names it.
+  Debt: one gate over an existing governed structure; adds no governed name.
+  Filed 2026-07-25 by close, from the `supply-chain-trust-baseline` lesson
+  triage.
+
+- **gap-inbox-commit-ownership** [needs-spec] — the gap inbox has an unowned
+  commit seam and an under-advertised entry point, both hit this iteration by a
+  lead filing a bullet mid-iteration. Two halves, one unit.
+  **(1) Who commits a lead-filed bullet is unspecified.** lifecycle-kit/SPEC.md
+  §The committed gap inbox calls the channel committed and names any
+  mid-iteration session, lead or stage, a producer; lifecycle-kit/templates/lead.md
+  holds that every lifecycle-state write happens in a stage session, and the
+  lead has no stage session of its own to carry the bullet. `bin/file-gap.sh`
+  warns about the cursor consequence and says nothing about the commit
+  obligation, so the producer derives whether to commit alone, ride a concurrent
+  stage session's commit, or wait for a clean checkpoint.
+  **(2) The always-loaded tier advertises only the narrower channel.** CLAUDE.md
+  §Housekeeping names `kfric.sh` as the any-session capture affordance and never
+  mentions `file-gap.sh`, so the work-shaped channel is visible only after
+  loading lifecycle-kit/SPEC.md. That channel carries the harder consequence: a
+  bullet blocks the next scope entry. The asymmetry is standing pressure toward
+  the kfric overload drift-kit/SPEC.md §The knowledge-friction loop warns
+  against.
+  **Deliverable:** the SPEC names the commit owner, `file-gap.sh` says so at the
+  point of capture, and one always-loaded line pairs the two channels by their
+  seam.
+  **Why `[needs-spec]`:** the ownership rule is the open call, not the wording.
+  "The producer commits it alone" is one candidate and it collides with the
+  shared-index discipline whenever a stage session holds a dirty index; the
+  alternative defers the bullet to the next clean checkpoint and widens the
+  window in which a filed gap is uncommitted.
+  **Cost while deferred:** low, and it recurs per lead-filed bullet.
+  Debt: docs plus one stderr string; adds no governed name.
+  Filed 2026-07-25 by close, from the `supply-chain-trust-baseline` gap-inbox
+  drain (both halves one unit, as the bullet filed them).
+
+- **security-advisory-lane** [needs-spec] — `SECURITY.md` (shipped this
+  iteration) directs reporters to GitHub private vulnerability reporting, and
+  nothing on our side is named as the reader. Advisories are a surface distinct
+  from issues and PRs, returned by neither `gh issue list` nor `gh pr list`.
+  The scope skill's GitHub boundary sweep (.claude/commands/scope.md §The GitHub
+  boundary sweep) has exactly two lanes, Issues and PRs, while asserting nothing
+  lives triaged-but-unqueued anywhere else — so the assertion is now false for
+  the one lane whose items are the most time-critical.
+  SPEC-supply-chain-trust-baseline.md §causal chains named the route's producer
+  and called the external reporter its consumer, but the reporter is the sender.
+  **Honest limit:** advisories are not unread. GitHub notifies maintainers, so
+  this is an unswept lane rather than a black hole, which is what kept it out of
+  the in-flight unit.
+  **Why `[needs-spec]` — the lane owes three decisions, and copying the Issues
+  lane settles none of them.**
+  *Disposition grammar under a public queue:* advisories are private and
+  TASK-QUEUE.md is public, so a promoted entry citing an unfixed vulnerability
+  publishes it. The lane needs its own dispositions (fix under embargo,
+  advisory-only, decline with cause) and a rule for what a public entry may say
+  before the advisory is published.
+  *Response latency:* scope runs at iteration boundaries, so a sweep-lane duty
+  makes acknowledgement latency equal to the time until the next scope entry.
+  That is systematic disposition, not speed.
+  *Whether scope-gated intake gains an exception:* what delivers a fast critical
+  response is an interrupt, a rule that a critical advisory preempts the running
+  iteration. CLAUDE.md §Delivery doctrine has no severity carve-out, and a
+  security interrupt is the one case that plausibly earns one.
+  **Cost while deferred:** until the interrupt path exists, `SECURITY.md`'s
+  current windows must not be tightened. Promising a response the machinery
+  cannot deliver is the overclaim shape this iteration existed to remove, one
+  level up from the gate overclaim it did remove.
+  Debt: small-to-medium; the constraint is the design, not the code.
+  Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
+  inbox (two bullets merged at triage, costed once).
+
+- **evidence-row-upsert-order** [needs-spec] — `run-gates.sh` rewrites its
+  `gates` row in `.workflow/validate-evidence.txt` on **every** battery run, not
+  only during validate, and the rewrite is a delete-then-append rather than an
+  in-place update. The row's content is unchanged (same sha256, same counts,
+  same date), so no evidence is corrupted; what the run produces is a
+  reordering, and therefore a dirty tree.
+  **Why it costs anything:** the battery is the repo's standing oracle, so any
+  session told to verify before committing dirties a committed stage record as a
+  side effect of verifying. This close hit it twice — once at entry, on a tree
+  the lead had just reported clean after its own verification run, and once
+  mid-session. Each hit costs a session the same diff read and the same judgment
+  (churn or evidence?), and the wrong call in either direction is cheap to make:
+  committing noise into a stage record, or discarding a row that mattered.
+  **Deliverable:** an order-stable upsert, so a re-run of an unchanged suite
+  leaves the file byte-identical.
+  **Why `[needs-spec]`:** the open question is whether a non-validate battery
+  run should write the file at all. Order-stable upsert fixes the symptom and
+  keeps the writer's current reach; scoping the write to the validate stage is
+  the narrower claim and asks what the row means when a close-stage run produces
+  it. Those settle differently, and evidence-kit/SPEC.md owns the manifest
+  contract that decides which is right.
+  **Cost while deferred:** low per hit, once or twice per session that runs the
+  battery. No gate catches it because nothing is wrong with the file's content.
+  Debt: converges a writer onto a stable ordering; adds no governed name.
+  Filed 2026-07-25 by close, from the session's own tree-state handling.
+
 ## Done
 
 - supply-chain-trust-baseline

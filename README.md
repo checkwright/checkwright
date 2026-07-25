@@ -62,12 +62,13 @@ bash guard-kit/bin/run-guard-tests.sh                                           
 ```
 
 `bash gate-sdk/bin/install-hooks.sh` opts this clone into the generated
-pre-commit hook. The repo also runs lifecycle-kit's own iteration state
+pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state
 machine — [`TASK-QUEUE.md`](TASK-QUEUE.md) carries the iteration header, one
 iteration per hardening or roadmap unit.
 
 Contributing: the fixture is the unit of contribution — see
-[`CONTRIBUTING.md`](CONTRIBUTING.md).
+[`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+Reporting a vulnerability: [`SECURITY.md`](SECURITY.md), never a public issue.
 
 ## License
 

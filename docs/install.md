@@ -87,6 +87,12 @@ battery. The emitted hook is tracked, so the diff you review is what will run,
 and `check-graph` holds it byte-fresh against its emitter — a hand-edited hook
 that has drifted from the manifests reddens rather than diverging quietly.
 
+The same emitter writes a second tracked hook, `commit-msg`, from the gates
+registered at that tier, and `check-graph` holds it fresh by the same
+byte-comparison. Installing points your clone at the hooks directory, so both
+hooks are what you are reviewing; everything this section says of the
+pre-commit hook holds of the commit-msg one.
+
 **What installing it changes in your clone.** `gate-sdk/bin/install-hooks.sh`
 has three effects, and an audit of what the script touches wants all three:
 
@@ -242,7 +248,11 @@ its note — and three sections under fixed names:
 
 "None" is a valid body for any of the three sections and must be stated, not
 omitted — a release that tightens nothing, renames nothing, and changes no
-out-of-gate behavior says so on each. This consumer-owned residue Phase A
+out-of-gate behavior says so on each. Its form is a bare "None."; add a
+trailing clause only where it rules out a near-miss the reader would otherwise
+mis-classify (an advisory KPI that never joins the gate registry, knobs added
+but not renamed). A clause that only restates the heading's own negation is a
+restatement to delete. This consumer-owned residue Phase A
 cannot touch (gates you have shadowed, templates you have copied out, knob
 renames in your own config, behavior your tree depends on) is that note's
 checklist.

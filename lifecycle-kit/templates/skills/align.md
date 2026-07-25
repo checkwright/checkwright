@@ -43,6 +43,13 @@ entry grammar any backfill task filed from a finding is written against.>* Resol
 finding in the affected spec or amendment — never ad-hoc, never deferred.
 Commit all spec changes in a single `chore:` commit.
 
+**Audit the amendment against itself before auditing it against the tree.** Two
+defects are visible on the amendment alone and both survive a green battery. An
+author-stated count ("three things and no fourth") is an assertion about the
+deliverable, so check it against what the deltas actually mandate rather than
+against the sentence it heads. And every `## Existing sections updated` entry
+must name the delta that owns it (canon-kit/templates/SPEC-amendment.md).
+
 **Every amendment's "wires cleanly against the current tree" is a hypothesis,
 and the align audit is its first test.** Authoring a producer silently asserts
 the consumer's read side already matches — it rarely does. Verify every

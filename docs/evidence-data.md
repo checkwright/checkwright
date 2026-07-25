@@ -57,3 +57,4 @@
 | workflow-surface-tiering | sc sp a b v c | 3f/1d | 3 · ≤0d | 20s clean | 80 |
 | permission-posture-reconciliation | sc sp a b v c | 1f/3d | 3 · ≤2d | 21s clean | 80 |
 | per-batch-tiering | sc sp · b v c | 2f/0d | 1 · ≤0d | 21s clean | 80 |
+| supply-chain-trust-baseline | sc sp a b v c | 2f/0d | 1 · ≤0d | 21s clean | 81 |
