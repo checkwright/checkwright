@@ -6,3 +6,4 @@
 
 per-batch-tiering scope a00d26bd 2026-07-25
 per-batch-tiering spec a1c52ddc 2026-07-25
+per-batch-tiering build a2060e2d 2026-07-25
