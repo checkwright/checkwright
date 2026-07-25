@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+supply-chain-trust-baseline release deferred:v0.15.0 — minor earned on Tightened gates (check-action-pinning, new) plus Behavior changes (gates-workflow.yml and site-health.yml templates now ship SHA-pinned refs; check-docs-render-fidelity output text de-claimed); held because the pin is API-verified only (actions/checkout v5.1.0 -> fbc6f399 reconfirmed off the tags API this session) and has never been executed by CI, the deployment-faithful check being the gates workflow green on the next master push, which is unauthorized this session; no note authored, criteria carry to the next qualifying note
