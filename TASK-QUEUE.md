@@ -1111,6 +1111,42 @@
   precondition anyway. Bounded. Surfaced 2026-07-25 in the operator's
   attestation-direction review.
 
+- **templates-stages-taxonomy-realignment** [needs-spec] — the tree scatters a class the
+  SPEC names as one. `lead.md`, `release-sweep.md`, and `upgrade.md` are each
+  classified **"boundary skill, not a stage"** (lifecycle-kit/SPEC.md:1375,
+  :1391, :1417; lead cites "the release-sweep precedent" at :157), yet the
+  layout puts two of them (`release-sweep`, `upgrade`) inside
+  `templates/skills/` beside the stages and the third (`lead`) alone at
+  `templates/` root. The realignment: move `release-sweep.md` + `upgrade.md`
+  up to `templates/` root beside `lead.md` (the boundary-skill class), and
+  rename `templates/skills/` → `templates/stages/` so the directory becomes
+  precisely the stage-class templates (`scope`, `spec`, `align`, `build`,
+  `validate`, `close`). Result: two pure adoption globs (root = boundary
+  skills, `stages/` = stages) mirroring the SPEC's own stage/boundary axis,
+  in place of today's mixed `skills/` bag plus a lone root file.
+  **Why deferred, not done:** the payoff is purely cosmetic and the cost is a
+  breaking rename of a **consumer-facing adoption path**. No correctness or
+  gate value — `check-stage-skill-coverage` reads the configured roster
+  (`LIFECYCLE_KIT_STAGES`), not the directory, and the roster can't be derived
+  from `stages/` anyway (`spec.md` sits in the dir but is out of the default
+  roster, and the roster is ordered and consumer-configurable), so there is no
+  derivation-first win hiding here. The path is published surface: the binding
+  shims hardcode it (`.claude/commands/*.md` → "Execute the template at
+  `lifecycle-kit/templates/skills/<stage>.md`"), ~15 SPEC `§templates/skills/`
+  refs point at it (including the binding-shim grammar section the boundary
+  skills themselves cite), README's adoption line names it, and any vendored
+  consumer adopted `templates/skills/`. Renaming it is a breaking change under
+  the kit's own upgrade contract — it needs a deprecation marker and a release
+  note, exactly the machinery `upgrade.md` narrates.
+  **Cost while deferred:** zero — nothing rots, no gate gaps, no drift; the
+  residue is one layout that groups by a different axis than the SPEC's stated
+  one, with the SPEC prose carrying the true taxonomy correctly meanwhile. The
+  disposition to hold: land it folded into the **next major that already
+  breaks the adoption path** for another reason, so the break amortizes rather
+  than standing as its own breaking release. Filed 2026-07-25 by operator
+  request, from a session tracing why only lifecycle-kit carries a
+  `templates/skills/` subdirectory.
+
 ## Done
 
 ## Lessons Learned
