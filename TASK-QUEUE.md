@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: supply-chain-trust-baseline
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -882,6 +882,16 @@
   stance (keep your spec workflow; add Checkwright where a claim must be
   mechanically proven) moves near the top. Consumes RELEASING.md's reserved
   launch-copy phrasing rather than forking it.
+  **Premise corrected 2026-07-25 by the undirected scope survey — one
+  sub-deliverable is already done, the other is confirmed live.** "The repo
+  gains likely discovery topics" is stale: four topics are already set
+  (`agent-governance`, `code-quality`, `git-hooks`, `linting`), so the residue
+  is topic *quality* — none names agents, LLMs, spec-driven development, or a
+  harness — not their absence. The demo-invisibility half stands and is
+  confirmed: `run-demo`/`demo/` appears **zero times** in both `README.md` and
+  `docs/index.md`, so the working walkthrough is linked from neither front
+  door. The first screen's shape is confirmed too — badges, prose premise, then
+  the eleven-kit table at README.md:24, architecture before outcome.
   **Cost while deferred:** the current first screen filters out exactly the
   reader the launch targets; zero until announcement, then compounding.
   Surfaced 2026-07-23 in the same external review.
@@ -898,6 +908,45 @@
   action refs lands with the fix; checksummed release assets once cadence
   stabilizes; document what the vendored hooks execute and how to
   review/disable them.
+  **Premises re-verified 2026-07-25 by the undirected scope survey — every one
+  holds, and one is sharper than filed.** No `SECURITY.md` exists at root,
+  `.github/`, or `docs/`, and no security/disclosure route appears anywhere in
+  `CONTRIBUTING.md`, `docs/install.md`, or `README.md`; no `CODE_OF_CONDUCT.md`.
+  The tree's only two `uses:` lines are both mutable —
+  `.github/workflows/gates.yml:20` and `.github/workflows/site-health.yml:33`,
+  each `actions/checkout@v5`. `.github/workflows/gates.yml:31` is an unpinned
+  `gem install --no-document kramdown-parser-gfm`. Hook review/disable is
+  undocumented: `docs/install.md:63` names `install-hooks.sh` and nothing more.
+  **The kramdown half is narrower than this entry states, and its resolution is
+  ruled — de-claim, do not pin.** site-kit/SPEC.md:216-229 **already carries the
+  accurate honest limit** ("not necessarily … the exact kramdown *version* Pages
+  pins … the pin stays a consumer's deliberate `SITE_KIT_RENDERER` override, not
+  kit-run machinery"), so this is not a section-wide overclaim: it is the bare
+  phrase *"the pinned Pages parser"* at site-kit/SPEC.md:77 and in README's
+  site-kit table row contradicting that same file two hundred lines below —
+  prose-vs-limit drift **within one file**, the shape
+  `spec-internal-identifier-prefix-drift` names. Operator ruling 2026-07-25:
+  **strike both phrases** so each reads consistently with the stated limit; do
+  **not** version-pin the CI gem, which would buy a pin the kit deliberately
+  declines to own. Settled here so the authoring stage inherits the choice
+  rather than re-deriving it.
+  **Envelope carve-out (operator-approved 2026-07-25): checksummed release
+  assets are out of this unit.** This entry's own wording gates them on "once
+  cadence stabilizes", and cadence is `preview-release-cadence`'s, still
+  deferred — so shipping assets here would pin a checksum convention to a
+  release rhythm that entry may change. Cost of the deferral: the trust-bar gap
+  it closes stays open until `preview-release-cadence` promotes, and it is that
+  entry's to carry, not a dropped deliverable. Everything else stands: the
+  disclosure/conduct docs, the SHA pinning with its paired workflow-lint gate,
+  the de-claim above, and the hook-review documentation.
+  **Flag for the authoring stage — two things scope deliberately did not
+  settle.** (1) The workflow-lint gate's **placement is a genuine seam call**:
+  SHA-pinned `uses:` refs are generic mechanism (gate-sdk) but GitHub Actions is
+  not universal to every consumer, so a consumer gate in `scripts/checks` is the
+  live alternative; the provenance seam is not at issue either way (no private
+  content), the reach question is. (2) If the amendment spans ≥2 component
+  dirs, `check-stage-entry` assertion C demands an align stamp at the next
+  stage's entry — expect it rather than discovering it.
   **Cost while deferred:** the trust bar for "run this repo's shell in your
   hooks and CI" is unmet at announcement time, and the pinned-claim drift
   rots silently. Surfaced 2026-07-23 in the same external review.
@@ -924,9 +973,23 @@
   a 30-second human changelog beside the migration detail. Separates
   internal iteration completion from public version publication — a
   RELEASING.md policy change more than a mechanism.
+  **Premise corrected 2026-07-25 by the undirected scope survey — the count is
+  larger than filed and the rhythm held.** This entry says
+  "thirteen-releases-in-nine-days"; the tree now carries **14 tags in 12 days**,
+  `v0.1.0` (2026-07-14) through `v0.14.0` (2026-07-25). The finding is not a
+  one-off burst that has since settled — the cadence continued at roughly a
+  release a day across the whole window, which strengthens rather than dates
+  the signaling argument.
+  **Now also carries `supply-chain-trust-baseline`'s carved-out deliverable:
+  checksum-verifiable release assets.** That entry gated them on "once cadence
+  stabilizes" and its promoted iteration carved them out on exactly that
+  ground (2026-07-25, operator-approved), so the convention lands here, with
+  the cadence it depends on, rather than being pinned to a rhythm this entry
+  may change.
   **Cost while deferred:** zero pre-announcement; at announcement the
   release history itself signals instability to exactly the risk-averse
-  teams the trust story targets.
+  teams the trust story targets — and the checksummed-asset gap inherited
+  above stays open for the same window.
   Surfaced 2026-07-23 in the same external review (its release-signaling
   finding).
 
