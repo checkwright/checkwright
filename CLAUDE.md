@@ -9,8 +9,7 @@ work. The kit map lives in [README.md](README.md).
 
 This repo is public: no local paths, private repo/project names, accounts, or
 internal session/commit references in tracked files or commit messages —
-including the harness's default `Claude-Session:` trailer, which
-`check-commit-msg` reds on.
+including the harness's default `Claude-Session:` commit trailer.
 
 ## The provenance seam (never cross it)
 
@@ -149,13 +148,11 @@ the skill on a blocking verdict — so they are not resident here.
 - `reserve/` holds the crates.io/npm name-reservation placeholders — do not
   develop in it.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
-  `SECURITY.md`, and `RELEASING.md` are
-  governed repo-meta (tracked, core-files-pinned, in the spec manifest so their
-  links/commands resolve like any doc); the fixture is the unit of contribution —
-  edit the guide, not GitHub UI settings. `SECURITY.md` owns the vendored-bash
-  threat boundary and cites gate-sdk/SPEC.md §Enforcement tiers for the CI
-  limit rather than restating it. The release runbook is the
-  load-triggered tier, resident only at close's release step.
+  `SECURITY.md`, and `RELEASING.md` are governed repo-meta (tracked,
+  core-files-pinned, in the spec manifest so their links/commands resolve like
+  any doc); the fixture is the unit of contribution — edit the guide, not GitHub
+  UI settings. The release runbook is the load-triggered tier, resident only at
+  close's release step.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome, page-authoring rules,
   generated projections + regen commands, and docs gate roster live in the
