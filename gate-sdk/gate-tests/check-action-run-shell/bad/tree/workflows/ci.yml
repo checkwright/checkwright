@@ -1,0 +1,15 @@
+name: reject-case
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint_me:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a block whose shell has a real finding
+        run: |
+          cd /some/dir
+          echo "an unchecked cd leaves the rest of the block running elsewhere"

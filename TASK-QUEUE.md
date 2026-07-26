@@ -12,30 +12,6 @@
 
 ## New Features
 
-- **workflow-run-block-lint** [spec: SPEC-action-run-shell.md] — no oracle lints
-  workflow shell at all: `check-shellcheck`'s target list is each kit's
-  `lib/`/`bin/`/`checks/`/`templates/` plus the consumer gates dir, so
-  `.github/workflows/*.yml` is unreached by construction. The `v0.16.0` publish
-  failure is the class's evidence — a careful by-eye review of that exact line
-  passed it, and the defect reached a released tag. Eight literal `run:` blocks
-  are in scope at the audit-stage count; two earlier counts were low because
-  each stopped at a surface — five reached `.github/workflows/` only, six added
-  `gate-sdk/templates/gates-workflow.yml` but not `site-kit/templates/site-health.yml`.
-  **Two kits ship a workflow template carrying `run:` shell**, which is why the
-  gate is kit mechanism rather than a consumer gate: no consumer gate covers
-  another kit's copy-out for a downstream vendor. **The scan set is narrowed to
-  the gate's subject** (operator ruling, 2026-07-26, at audit): a walked YAML
-  enters extraction only with a top-level `jobs:` or `runs:` key, everything else
-  skipped-and-counted — kit placement must not export a gate that lints another
-  CI dialect's `run:` as shell in a consumer's tree.
-  **The YAML-extraction question is ruled** (operator, 2026-07-26): an awk
-  extractor with a stated fidelity limit, no parser, `PROBE_SET` unchanged.
-  Design, the measured limit, and the fixtures that pin it:
-  [gate-sdk/SPEC-action-run-shell.md](gate-sdk/SPEC-action-run-shell.md).
-  **Do not read this as the `v0.16.0` fix** — that line is clean at
-  `-S warning`; `publish-spec-gate` catches it and this closes the class around
-  it. Promoted 2026-07-26 by spec; filed 2026-07-26 by scope.
-
 ## Technical Debt
 
 ## Deferred
@@ -1887,5 +1863,6 @@
 - publish-spec-disambiguation
 - publish-spec-gate
 - release-tarball-delivery-channel
+- workflow-run-block-lint
 
 ## Lessons Learned

@@ -104,6 +104,7 @@ check-exec-bit
 check-root-tiering
 check-workflow-tiering
 check-action-pinning
+check-action-run-shell
 check-commit-msg
 check-commit-subject
 check-tree-terms

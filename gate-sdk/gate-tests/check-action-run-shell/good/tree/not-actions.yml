@@ -1,0 +1,16 @@
+# A YAML with no top-level `jobs:` or `runs:` key — outside the gate's subject.
+# It carries the very construct the extractor refuses loudly inside that subject,
+# so it must be neither reddened nor linted, only skipped and counted. An author
+# who restores whole-tree reach turns this fixture red at exit 2, which is what
+# holds the reach ruling by oracle rather than by prose a refactor can drop.
+version: 2
+
+workflows:
+  build:
+    steps:
+      - run: >
+          echo this is a folded scalar
+          in a foreign CI schema
+      - run: |
+          echo a literal block the extractor would handle correctly
+          echo but declines to claim

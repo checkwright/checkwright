@@ -768,6 +768,12 @@ named in `GATE_SDK_LINT_EXTRA_DIRS` passes ShellCheck at `-S warning` (the
 self-lint contract). A missing `shellcheck` binary is exit 2 — a gate that
 cannot run is not clean.
 
+That derivation is also the answer to "does anything lint my workflows?", and on
+its own the answer is no: `.github/workflows/*.yml` sits under no kit root and
+under no gates dir, so it is unreached here by construction. §check-action-run-shell
+is the sibling that reaches it, extracting the shell out of `run:` block scalars
+and linting each at this gate's severity.
+
 The knob **appends to** that derived set and never replaces it, so a consumer
 that sets nothing keeps the shipped coverage exactly and a consumer that sets it
 can only widen. It exists because the kit-root predicate (§lib/gate.sh) is what
@@ -1515,6 +1521,146 @@ convention for review. The currency limit the pin does *not* buy is
 
 Tier `precommit`; the `# graph:` couples the scanned YAML surfaces, `dir=one` —
 a one-way audit.
+
+### check-action-run-shell
+
+Invariant: every GitHub Actions `run:` **literal block scalar** in a scanned YAML
+file is ShellCheck-clean at `-S warning` under the dialect the step actually
+runs. It closes the class §check-shellcheck's target derivation leaves open — a
+workflow's `run:` body is shell that nothing lints, shellchecks, or executes
+outside a push or a tag.
+
+Kit mechanism rather than a consumer gate, and the deciding fact is that kits
+ship workflow templates carrying `run:` shell — §templates/gates-workflow.yml and
+site-kit's `templates/site-health.yml`, the copy-outs consumers vendor. A
+consumer gate could reach both in one tree while leaving them unlinted for every
+downstream vendor, the same fix-the-instance shape §check-action-pinning
+rejected; that the second template belongs to a *different kit* is what makes the
+argument decisive, since no consumer gate and no site-kit-local gate covers both.
+Named `action-`, not `check-workflow-*`, for §check-action-pinning's reason: this
+tree already spends "workflow" on §The workflow directory.
+
+**Scan set — derived, then narrowed to the subject.** Stage one is a `gate_find`
+walk for `*.yml` / `*.yaml` from the scan root (the optional positional argument,
+default `.`), pruned by the shared set, so `gate-tests/` is out and the `bad/`
+fixture cannot red the whole-tree run. Stage two is the **Actions-shape
+predicate**: a walked file enters the subject only if it carries a top-level
+`jobs:` key (a workflow) or a top-level `runs:` key (a composite action).
+Everything else is **skipped and counted**. The predicate governs *extraction as
+well as refusal* — a file it skips is neither linted nor refused.
+
+Whole-tree reach is the wrong boundary here even though §check-action-pinning
+takes it. `uses:` with a 40-hex ref is self-limiting grammar; `run:` is an
+ordinary word serving as a YAML key in more than one CI schema, so whole-tree
+reach would lint foreign-schema text as shell — a stream of silent false
+positives, strictly worse than a loud refusal and squarely what §When a gate
+earns its place forbids. Two further reasons the narrowing is right rather than
+merely safe: a gate whose name and reach disagree teaches every later reader the
+wrong boundary; and gate-sdk has no standing to impose the literal-form
+conformance rule below on a consumer's non-Actions YAML, where it ships no
+template and owns no contract.
+
+The `# graph:` manifest couples the **walked** surface rather than the matching
+one — a file that *gains* a top-level `jobs:` key must retrigger the gate, and a
+manifest naming only today's workflows would miss exactly that. The block tally
+is a measurement, never a contract: this section carries the derivation so a
+later commit adding a step cannot falsify it.
+
+**The extractor** is one awk pass per file, keyed on block-scalar indentation,
+and stays inline in the check script rather than moving to `lib/` — a helper
+earns its place at a second consumer and there is none. Its rules, each of which
+a prototype proved necessary by failing without it:
+
+- **The key column is the column of the key token, never the list dash.** A
+  `- run: |` item's dash sits left of the key; taking the dash's column as the
+  body's indentation floor makes every sibling key of that step (`env:`, `name:`)
+  satisfy "more indented than the block header" and be swallowed into the shell
+  body, dedented by the body's indent, so `env:` arrives as `v:`. That is not a
+  missed block but a false-positive engine, and it is the single most important
+  line in the extractor.
+- **The body is every following line more indented than the key column**, blank
+  lines included, dedented by the first body line's indentation, ending at the
+  first non-blank line at or left of the key column.
+- **No block header is recognised while inside a block**, so a body containing a
+  heredoc whose text is literally `run: |` stays shell instead of being
+  double-extracted.
+- **A comment line is never a header** — the commented example a shipped template
+  carries is not a step.
+
+**GitHub expressions.** `${{ … }}` is not shell syntax; left raw it is a parse
+error. It is replaced per line by `${GHEXPR}`, a braced parameter expansion,
+which presents to ShellCheck as the opaque runtime value a GitHub expression
+actually is. A bare word does not work and the difference is measured, not
+stylistic: a literal constant drags ShellCheck's constant-expression analysis
+into firing on correct code, manufacturing SC2050 inside `[ … ]` and SC2194
+inside `case`. The braced form causes no finding in any tested position.
+
+**Dialect — resolved, never assumed.** Linting a block under the wrong dialect
+manufactures false positives, so the step's effective shell comes from its
+`shell:` sibling key, which may sit either side of the `run:` block:
+
+| `shell:` | resolution |
+| --- | --- |
+| absent | `-s bash` — GitHub's documented default for a `run:` step on every hosted runner |
+| `bash` (with or without arguments) | `-s bash` |
+| `sh` / `dash` / `ksh` | the matching ShellCheck dialect — linting a POSIX body as bash hides the portability findings that dialect exists to surface |
+| anything else (`pwsh`, `python`, a custom `{0}` template) | the block is **skipped and counted** — the body is not shell, so there is no shell to lint |
+
+**Severity is `-S warning`**, the gate family's level, so one threshold governs
+all ShellCheck lint in the tree. A future author lowering it inherits false
+positives this gate creates rather than finds: **SC1091** ("not following: … was
+not specified as input") fires on any block that sources a library, because an
+extracted fragment has no resolvable source root. It sits at `info`, below the
+threshold, so it does not bite today — recorded so that decision is made
+knowingly.
+
+**The fidelity limit.** What the extractor **refuses loudly** can never become a
+false negative; what is **out of reach** is a stated cost; what is **out of
+subject** is a boundary the kit declines to cross. The distinctions carry the
+remedies, so they are kept apart.
+
+*Refused — exit 2, naming the construct.* Each is detectable, so the gate stops
+rather than guessing, and every refusal fires **only inside the Actions-shape
+subject**: a folded block scalar (`run: >`, `run: >-`), because reassembling
+folded lines needs YAML's folding rules and mis-folding manufactures findings;
+an explicit block-scalar indentation indicator (`run: |2`), which can contradict
+the indent derived from the first body line; a YAML anchor or alias as the `run:`
+value, since no anchor resolution is attempted; and an unbalanced `${{` on a body
+line. Refusing the folded form makes the literal form a conformance requirement
+for a multi-line `run:` body *in an Actions-shaped file* — governance where
+gate-sdk ships the template and owns the contract. The chomping indicators `|-`
+and `|+` are ordinary spellings, handled and extracted with the body bytes
+intact; silently skipping those would be the worst hole of the set, since an
+author reaches for `|-` by habit.
+
+*Out of subject.* **Other CI dialects that also spell a shell step `run:`.**
+CircleCI's `.circleci/config.yml` is the concrete case — `- run: |` there is
+genuinely shell and the extractor would handle it correctly. It is skipped
+anyway, because gate-sdk ships no CircleCI template and owns no contract over
+that file. This is a **decision, not an inability**, and the distinction matters
+to whoever revisits it: widening the predicate is a governance question about
+what the kit claims, never an engineering question about what the extractor can
+parse.
+
+*Out of ability.* **Single-line plain-scalar `run:` values** are not linted: a
+plain scalar's text is governed by YAML's plain-scalar rules — a space-preceded
+`#` opens a *YAML* comment, not a shell one — so recovering the shell honestly
+means parsing the scalar, which is the dependency this gate declines. They are
+counted in the output so the cost is visible on every run, and the class that
+produces incidents is multi-line blocks. **Following a `uses:` call into another
+repository** is beyond any tree-local gate; a called workflow's own blocks are
+linted in the file that defines them, which carries its own top-level `jobs:`
+key. **GitHub-expression injection** is a non-goal rather than an oversight: the
+substitution above turns an interpolation into an opaque expansion, so the gate
+cannot see the injection hazard of an unquoted `${{ }}` — a textual substitution
+happening before the shell ever runs, and a different and worse class belonging
+to a dedicated workflow-security linter.
+
+Tier `precommit`; **no new knob** — the scan set is derived, the prune set is the
+shared one, and the severity is the family's literal. A missing `shellcheck`
+binary is exit 2, as §check-shellcheck models. A tree holding no YAML exits clean
+on a zero count, the counted inertness that makes this kit mechanism: a consumer
+running no GitHub Actions pays nothing for it.
 
 ### check-commit-msg
 

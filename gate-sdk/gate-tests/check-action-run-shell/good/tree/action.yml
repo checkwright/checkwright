@@ -1,0 +1,14 @@
+# The predicate's `runs:` arm. The tree this kit ships into carries no composite
+# action, so this fixture is the only place that arm is ever executed — drop the
+# arm and this file stops being extracted, which the block count catches.
+name: a composite action
+description: exercises the runs: arm of the Actions-shape predicate
+
+runs:
+  using: composite
+  steps:
+    - name: a composite step's literal block
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "composite actions are Actions-shaped too"

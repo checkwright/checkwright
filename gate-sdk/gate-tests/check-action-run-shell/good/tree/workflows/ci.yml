@@ -1,0 +1,106 @@
+name: accept-cases
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  literal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a plain literal block
+        run: |
+          set -euo pipefail
+          echo "clean at -S warning"
+
+      # A chomping indicator is an ordinary spelling an author reaches for by
+      # habit; silently dropping these blocks would be the worst hole of the set.
+      - name: a chomped literal block
+        run: |-
+          set -euo pipefail
+          printf '%s\n' "chomped"
+
+      - name: a keep-chomped literal block
+        run: |+
+          set -euo pipefail
+          printf '%s\n' "kept"
+
+  dash_inline:
+    runs-on: ubuntu-latest
+    steps:
+      # The extractor's single most important rule: the block's indentation floor
+      # is the column of the `run` token, not of the list dash. Taking the dash's
+      # column makes the sibling keys below satisfy "more indented than the block
+      # header" and swallows them into the shell body, dedented by the body's
+      # indent — `env:` arriving as `v:`. The apostrophe in the name below is
+      # load-bearing: swallowed and truncated it leaves an unterminated string, so
+      # the regression is a ShellCheck parse error rather than a silent pass.
+      - run: |
+          set -euo pipefail
+          echo "body-line"
+        env:
+          FOO: bar
+        name: the step's sibling keys follow its dash-inline block
+
+  heredoc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a body whose text contains a block header
+        run: |
+          set -euo pipefail
+          cat > /dev/null <<'YAML'
+          steps:
+            - run: |
+                this is data, not a step
+          YAML
+          echo "still one block"
+
+      # A commented-out example is not a step.
+      #     run: bash some-script.sh
+      - name: after a commented run: line
+        run: |
+          echo "unaffected by the comment above"
+
+  expressions:
+    runs-on: ubuntu-latest
+    steps:
+      # Substituting a bare word for the expression manufactures SC2050 in the
+      # test below and SC2194 in the case; the braced expansion presents as the
+      # opaque runtime value a GitHub expression actually is.
+      - name: GitHub expressions in discriminating positions
+        run: |
+          set -euo pipefail
+          echo "${{ github.ref_name }}"
+          if [ "${{ inputs.flag }}" = "yes" ]; then
+            echo "flagged"
+          fi
+          case "${{ github.event_name }}" in
+            push) echo "push" ;;
+            *)    echo "other" ;;
+          esac
+
+  dialects:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a POSIX body linted as sh
+        shell: sh
+        run: |
+          set -eu
+          printf '%s\n' "posix clean"
+
+      - name: a body that is not shell at all
+        shell: pwsh
+        run: |
+          Write-Output "skipped and counted, never linted as shell"
+
+      - name: the shell key may follow its own run block
+        run: |
+          set -eu
+          printf '%s\n' "resolved from a sibling key below"
+        shell: sh
+
+  plain_scalar:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "a single-line plain scalar is skipped and counted"

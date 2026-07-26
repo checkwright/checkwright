@@ -1,0 +1,3 @@
+# Reject case: a run: block carrying a genuine -S warning ShellCheck finding —
+# workflow shell nothing else in the battery reaches.
+tree

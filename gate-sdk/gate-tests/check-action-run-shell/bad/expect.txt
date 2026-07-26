@@ -1,0 +1,1 @@
+tree/workflows/ci.yml:14:1: warning: Use 'cd ... || exit' or 'cd ... || return' in case cd fails. [SC2164]
