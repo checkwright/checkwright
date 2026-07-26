@@ -60,8 +60,8 @@ consumer gate under `scripts/` could reach both in *this* tree while leaving the
 unlinted for everyone downstream, which is the same "fix the instance, ship the
 drift source" shape `check-action-pinning` rejected. That the second template
 belongs to a *different kit* is what makes the argument decisive rather than
-convenient: no consumer gate and no site-kit-local gate covers both, and a
-whole-tree kit gate covers them without a roster. Second, a `run:` block is shell in
+convenient: no consumer gate and no site-kit-local gate covers both, while a
+gate-sdk gate scanning by shape (`B2`) covers them with no roster to drift. Second, a `run:` block is shell in
 anybody's workflow — unlike an `npm publish` spec, which is this repo's product
 knowledge and stays a consumer gate (`SPEC-publish-spec-gate.md` §A). Third, the
 "GitHub Actions is not universal" objection is a *reach* question, and gate-sdk
@@ -81,24 +81,58 @@ established for this surface.
 scalar** in a scanned YAML file is ShellCheck-clean at `-S warning` under the
 dialect the step actually runs.
 
-**B2. Scan set, derived not rostered. {mechanical}** A whole-tree walk over
-tracked `*.yml` / `*.yaml` via `gate_find`, which prunes `gate-tests` through
-the shared `GATE_SDK_PRUNE_DIRS` — so the `bad/` fixture cannot red the
-whole-tree run, and both `.github/workflows/` and the shipped template are
-covered with no roster to drift. Exactly `check-action-pinning`'s scan set, and
-the same positional `[scan-root]` argument reaches a synthetic tree.
+**B2. Scan set — derived, then narrowed to the gate's subject.
+{design-bearing}** Two stages, and the second is a ruling rather than a
+mechanism.
 
-Measured on the current tree at the audit stage: **eight** literal block
-scalars. `.github/workflows/` carries five (`gates.yml` 1, `publish.yml` 2,
-`site-health.yml` 2); the vendored copy-out templates carry three
-(`gate-sdk/templates/gates-workflow.yml` 1, `site-kit/templates/site-health.yml`
-2). Two earlier counts were low and each for the same reason — the queue entry's
-five surveyed `.github/workflows/` only, and the authoring count of six reached
+*Stage one, the walk.* A whole-tree walk over `*.yml` / `*.yaml` via
+`gate_find`, which prunes through the shared `GATE_SDK_PRUNE_DIRS` — `gate-tests`
+among them, so the `bad/` fixture cannot red the whole-tree run. The same
+positional `[scan-root]` argument reaches a synthetic tree.
+
+*Stage two, the Actions-shape predicate.* A walked file enters the gate's subject
+only if it carries a **top-level `jobs:` key** (a workflow) or a **top-level
+`runs:` key** (a composite action). Everything else is **skipped and counted**,
+the same visible-cost mechanic §C2 uses for plain scalars. The predicate governs
+**extraction as well as refusal** — a non-matching file is neither linted nor
+refused.
+
+Whole-tree reach was the authoring draft, borrowed from `check-action-pinning`,
+and it does not survive the audit. `uses:` with a 40-hex ref is self-limiting
+grammar; `run:` is an ordinary word serving as a YAML key in more than one CI
+schema. Under whole-tree reach the gate would *lint* a `run: |` block found in a
+foreign schema as though it were shell, which is a stream of silent false
+positives against text that is not shell — strictly worse than the loud
+`C1` refusal, and squarely what gate-sdk/SPEC.md §When a gate earns its place
+forbids. Two further reasons the narrowing is right rather than merely safe: the
+gate's own name asserts its subject, and a gate whose name and reach disagree
+teaches every later reader the wrong boundary; and gate-sdk has no standing to
+impose `C1`'s literal-form conformance rule on a consumer's non-Actions YAML —
+inside a workflow the kit ships the template and owns the contract, outside one
+it would be reddening a file the kit never claimed, whose likeliest remedy is
+deleting the gate and losing the whole class.
+
+*Re-derived at the audit stage against the live prune set, not against a bare
+grep.* The walk yields **eight** files; the predicate admits **five** — the three
+under `.github/workflows/` plus both vendored copy-out templates
+(`gate-sdk/templates/gates-workflow.yml`, `site-kit/templates/site-health.yml`) —
+and skips three (`.github/ISSUE_TEMPLATE/config.yml`,
+`.github/ISSUE_TEMPLATE/gate-defect.yml`, `docs/_config.yml`). Those five carry
+**eight** literal block scalars: `gates.yml` 1, `publish.yml` 2, `site-health.yml`
+2, `gates-workflow.yml` 1, `site-kit/templates/site-health.yml` 2. **The
+predicate loses no block and no plain scalar** — every one sits in a matching
+file, verified by running the extractor over the skipped set and getting nothing.
+
+Two earlier counts were low, each for the same reason: the queue entry's five
+surveyed `.github/workflows/` only, and the authoring count of six reached
 gate-sdk's template but not site-kit's. **The number is measurement, never
-contract**: the sibling `release-tarball-delivery-channel` unit adds a ninth
-block to `publish.yml` this same iteration, so gate-sdk/SPEC.md carries the
-derivation (`gate_find` over tracked YAML, prune set shared) and never a count
-that a later commit falsifies.
+contract** — the sibling `release-tarball-delivery-channel` unit adds a ninth
+block to `publish.yml` this same iteration — so gate-sdk/SPEC.md carries the
+derivation and the predicate, never a count a later commit falsifies.
+
+The `# graph:` manifest (`B8`) couples the **walked** surface rather than the
+matching one: a file that *gains* a top-level `jobs:` key must retrigger the
+gate, and a manifest naming only today's workflows would miss exactly that.
 
 **B3. The extractor. {design-bearing}** One awk pass per file, keyed on
 block-scalar indentation. Four rules, each of which a prototype proved necessary
@@ -191,17 +225,22 @@ the shared one, and the severity is the family's literal.
 
 ### C. The fidelity limit
 
-This is the section the ruling asks for. Two classes, and the distinction is the
-whole point: what the extractor **refuses loudly** can never become a false
-negative, while what is **out of reach** is a stated cost.
+This is the section the ruling asks for. Three classes, and the distinctions are
+the whole point: what the extractor **refuses loudly** can never become a false
+negative, what is **out of reach** is a stated cost, and what is **out of
+subject** is a boundary the kit declines to cross.
 
 **C1. Refused loudly — exit 2, naming the construct. {design-bearing}** Each of
-these is detectable, so the gate stops rather than guessing:
+these is detectable, so the gate stops rather than guessing. **Every refusal here
+fires only inside `B2`'s subject** — a construct in a file the Actions-shape
+predicate skipped is not refused, because the gate never read it as shell:
 
 - **A folded block scalar** (`run: >`, `run: >-`). Reassembling folded lines
   needs YAML's folding rules, and mis-folding manufactures findings. Refusing it
   also makes the literal form a conformance requirement: a multi-line `run:`
-  body in a scanned file must be `|`, so it is linted.
+  body **in an Actions-shaped file** must be `|`, so it is linted. That
+  requirement is governance where gate-sdk ships the template and owns the
+  contract, which is exactly the reach `B2` confines it to.
 - **An explicit block-scalar indentation indicator** (`run: |2`). The extractor
   derives the body indent from the first body line; an explicit indicator can
   contradict it.
@@ -209,24 +248,45 @@ these is detectable, so the gate stops rather than guessing:
   resolution is attempted.
 - **An unbalanced `${{` on a body line**, per `B4`.
 
-Measured with the prototype: `>` and `|2` were each detected and refused; `|-`
-and `|+` (chomping indicators, ordinary spellings) are handled and extracted
-normally — silently skipping those would have been the worst hole of the set,
-since an author reaches for `|-` by habit.
+Measured with the prototype, and re-measured across the whole set at the audit
+stage: `>`, `>-`, `|2`, and `*alias` were each detected and refused; `|-` and
+`|+` (chomping indicators, ordinary spellings) are handled and extracted
+normally, body bytes intact — silently skipping those would have been the worst
+hole of the set, since an author reaches for `|-` by habit.
 
-**C2. Out of reach — stated cost. {design-bearing}**
+**C2. Out of reach, and out of subject — stated cost. {design-bearing}** Two
+different things, kept apart because the remedies differ: an **ability** limit is
+something the extractor cannot do, while a **subject** limit is something the
+gate declines to claim.
+
+*Out of subject (`B2`'s predicate).* **Other CI dialects that also spell a shell
+step `run:`.** CircleCI's `.circleci/config.yml` is the concrete case —
+`- run: |` there is genuinely shell, and the extractor would handle it correctly.
+It is skipped anyway, because gate-sdk ships no CircleCI template and owns no
+contract over that file; linting it would be an unrelated vendored gate reddening
+a consumer's battery over a surface the kit never claimed. This is a **decision,
+not an inability**, and the distinction matters to whoever revisits it: widening
+the predicate is a governance question about what the kit claims, never an
+engineering question about what the extractor can parse. A consumer-configurable
+predicate is the honest generalization and is filed rather than built here.
+
+*Out of ability.* The genuine limits:
 
 - **Single-line plain-scalar `run:` values** (`run: bash gate-sdk/bin/run-gates.sh`).
   Not linted. A plain scalar's text is governed by YAML's plain-scalar rules —
   a space-preceded `#` opens a *YAML* comment, not a shell one — so recovering
   the shell honestly means parsing the scalar, which is the dependency the
-  ruling declined. Measured: **four** such lines in the tree
-  (`gates.yml` 31/33/45, the template's 39), each a single command with no
-  control flow. The class that produced the incident is multi-line blocks. The
-  gate counts these in its output as skipped so the cost is visible on every run.
-- **Composite actions and reusable workflows.** A composite `action.yml`'s
-  `runs.steps[].run` and a called workflow's blocks are outside the scan set as
-  drawn; the tree carries none today.
+  ruling declined. Re-derived at the audit stage over `B2`'s admitted set:
+  **four** such lines (`gates.yml` 31/33/45, `gates-workflow.yml` 39), each a
+  single command with no control flow, and none of them lost to the predicate.
+  The class that produced the incident is multi-line blocks. The gate counts
+  these in its output as skipped so the cost is visible on every run.
+- **Reusable workflows.** A called workflow's blocks are linted in the file that
+  *defines* them, since that file carries its own top-level `jobs:` key and so
+  satisfies `B2`; what is out of reach is following a `uses:` call into another
+  repository, which no tree-local gate can do. Composite actions are **not** in
+  this class — `B2`'s `runs:` arm admits an `action.yml`, and `D1`'s fixture is
+  where that arm is exercised, the tree carrying none today.
 - **GitHub-expression injection.** `B4`'s substitution turns an interpolation
   into an opaque expansion, so the gate cannot see the injection hazard of an
   unquoted `${{ }}` — a textual substitution that happens before the shell ever
@@ -257,6 +317,16 @@ a body carrying `${{ … }}` in both bare and `[ … ]` positions, which reds un
 the `B4` bare-word substitution and passes under `${GHEXPR}`; a `shell: sh` step
 whose body is POSIX-clean; and a `shell: pwsh` step, asserted **skipped and
 counted** rather than linted.
+
+It also carries the fixture that makes `B2`'s reach ruling durable rather than a
+comment: **a non-Actions YAML — no top-level `jobs:` or `runs:` key — carrying a
+`run: >` block**, the very construct `C1` refuses. It must be neither reddened
+nor linted, only skipped and counted. A later author who restores whole-tree
+reach turns `good/` red at exit 2, so the boundary is held by the oracle rather
+than by prose that a refactor can quietly drop. A second file exercising the
+predicate's **`runs:` arm** (a composite action whose `runs.steps[].run` block
+lints clean) keeps that arm real rather than decorative: the tree carries no
+composite action today, so the fixture is the only place it is ever executed.
 
 **D2. `bad/` carries a genuine finding and each refusal. {design-bearing}** A
 block with a real `-S warning` ShellCheck finding, plus one file per `C1`
@@ -324,12 +394,15 @@ one registry row, one README roster row, and one fixture pair.
 ## Existing sections updated
 
 - **gate-sdk/SPEC.md** — a `### check-action-run-shell` section under the
-  per-component contracts, carrying `B1`'s invariant, `B2`'s derived scan set,
-  `B5`'s dialect table, `B6`'s severity and the SC1091 extraction artifact, and
-  §C's fidelity limit in both classes. The limit belongs in the canonical spec,
-  not only here: this amendment is deleted at merge and the boundary must outlive
-  it. It carries `B2`'s **derivation and not `B2`'s count** — the block tally is
-  a measurement this iteration's own sibling unit changes.
+  per-component contracts, carrying `B1`'s invariant, `B2`'s derived scan set
+  **and its Actions-shape predicate**, `B5`'s dialect table, `B6`'s severity and
+  the SC1091 extraction artifact, and §C's limit in all three classes — refused,
+  out of reach, and out of subject. The boundary belongs in the canonical spec,
+  not only here: this amendment is deleted at merge and it must outlive it, and
+  the out-of-subject class in particular is the one a later reader is most
+  likely to mistake for an oversight and "fix". It carries `B2`'s **derivation
+  and not `B2`'s count** — the block tally is a measurement this iteration's own
+  sibling unit changes.
 - **gate-sdk/SPEC.md §check-shellcheck** — owned by `B8`: one sentence naming
   its sibling, so the reader who asks "does anything lint my workflows?" is
   answered at the section whose target list makes the answer *no*. Today that
@@ -360,6 +433,14 @@ one registry row, one README roster row, and one fixture pair.
 - [ ] **The fidelity limit is pinned by the oracle, not only by prose** — every
       §C1 refusal has a `bad/` fixture asserting exit 2 and the construct name,
       and every §C2 out-of-reach class is named in gate-sdk/SPEC.md.
+- [ ] **The reach ruling is pinned by the oracle** — `good/` carries a
+      non-Actions YAML with a `run: >` block, and restoring whole-tree reach reds
+      it at exit 2. Verified by making that reversion before shipping. The
+      predicate's `runs:` arm has a `good/` fixture that fails if the arm is
+      dropped.
+- [ ] **The predicate loses no block** — the extractor run over the files §B2's
+      predicate skips yields nothing, re-derived against the tree rather than
+      inherited from this amendment.
 - [ ] **The extractor's own trap is pinned** — `good/` carries the `- run: |`
       dash-inline block with sibling keys, and reverting the key-column rule to
       the dash's column reds it. Verified by making that reversion before shipping.

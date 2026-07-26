@@ -36,7 +36,11 @@
   `gate-sdk/templates/gates-workflow.yml` but not `site-kit/templates/site-health.yml`.
   **Two kits ship a workflow template carrying `run:` shell**, which is why the
   gate is kit mechanism rather than a consumer gate: no consumer gate covers
-  another kit's copy-out for a downstream vendor.
+  another kit's copy-out for a downstream vendor. **The scan set is narrowed to
+  the gate's subject** (operator ruling, 2026-07-26, at audit): a walked YAML
+  enters extraction only with a top-level `jobs:` or `runs:` key, everything else
+  skipped-and-counted — kit placement must not export a gate that lints another
+  CI dialect's `run:` as shell in a consumer's tree.
   **The YAML-extraction question is ruled** (operator, 2026-07-26): an awk
   extractor with a stated fidelity limit, no parser, `PROBE_SET` unchanged.
   Design, the measured limit, and the fixtures that pin it:
