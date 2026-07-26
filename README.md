@@ -20,6 +20,15 @@ governs itself with its own kits, day one.
 Docs live at <https://checkwright.dev> — the same pages served in-repo
 under [`docs/`](docs/index.md).
 
+## Quick start
+
+```bash
+npx checkwright init
+```
+
+Vendors a kit profile into a clean git repo and commits it. See
+[docs/install.md](docs/install.md) for profiles and requirements.
+
 ## Kits
 
 | Kit | What it is |
