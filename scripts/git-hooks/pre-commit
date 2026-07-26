@@ -271,6 +271,10 @@ if staged_matches 'docs/install.md' 'context-kit/lib/toolfloor.sh'; then
     run_gate check-install-toolchain scripts/check-install-toolchain.sh
 fi
 
+if staged_matches 'installer/package.json'; then
+    run_gate check-installer-no-deps scripts/check-installer-no-deps.sh
+fi
+
 if staged_matches 'docs/posts/*.md' 'docs/install.md' '.workflow/release-disposition.txt'; then
     run_gate check-release-bump scripts/check-release-bump.sh
 fi

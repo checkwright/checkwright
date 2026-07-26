@@ -1,0 +1,6 @@
+# Reject case, both shapes at once. The `dependencies` map is empty on purpose:
+# presence is the finding, because an empty map is a declared channel with
+# nothing in it yet, and the next edit fills it. The `postinstall` hook is the
+# run-on-install code path — the second thing the rewritten registry doctrine
+# claims this package does not have.
+package.json

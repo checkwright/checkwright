@@ -1,0 +1,1 @@
+install-time lifecycle script declared: scripts.postinstall

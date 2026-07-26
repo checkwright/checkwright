@@ -1,0 +1,5 @@
+# Accept case: a package that ships a bin and a payload and nothing resolvable.
+# A `scripts` block is present but carries only `test` — the gate rejects the
+# three install-time lifecycle names, never the presence of scripts, so a package
+# with an ordinary test script must still pass.
+package.json
