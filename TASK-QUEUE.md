@@ -1654,6 +1654,40 @@
   `platform-support-contract` floor batch, from a probe of `check-gate-tamper`'s
   resolved runtime config.
 
+- **lint-scope-hook-trigger** [needs-spec] — `GATE_SDK_LINT_EXTRA_DIRS` widens
+  what `check-shellcheck` scans but cannot widen when the generated hook fires
+  it. The hook's trigger is expanded from the gate's `# graph:` couples
+  (`scripts/*.sh,kit:*.sh`), and `kit:` resolves to kit roots — a set no
+  consumer knob joins — so a directory only the knob names is linted by the
+  full battery and by CI, never at commit time. gate-sdk/SPEC.md
+  §check-shellcheck now states this limit; this entry owns the fix.
+  **Deliverable:** a consumer-expandable `lint:` token beside the existing
+  `kit:` token in `gate_expand_couples`, expanded at hook-generation time from
+  `GATE_SDK_LINT_EXTRA_DIRS`, so a consumer's added lint directories reach the
+  generated hook without any kit literal naming them — the same shape the
+  `check-graph` / `graph-vocab.sh` pattern already uses to keep consumer
+  vocabulary out of kit source.
+  **Why deferred rather than taken with the knob:** it changes gate-sdk/SPEC.md
+  §The `# graph:` manifest — a gate-sdk contract the `activation-installer`
+  amendment's §Existing sections updated does not list, so it sits outside that
+  envelope. Scope-gated intake, not a batch side errand.
+  **Two cheaper-looking options are already dead; do not re-derive them.**
+  Widening the gate's `couples=` with entries like `kit:lib/*.sh` is a no-op:
+  the hook matches with a pattern comparison in which `*` spans `/`, so
+  `<kit>/*.sh` already reaches every subdirectory of every kit — measured, and
+  the reason the kit half of the originally-reported gap turned out not to
+  exist. Setting `trigger=*` works but costs the full gate on every commit:
+  `check-shellcheck` runs about five seconds, the second-slowest gate in the
+  battery behind `check-docs-render-fidelity`.
+  **Cost while deferred:** consumer-named lint directories — this repo's
+  installer scripts and its runnable walkthrough — are covered one tier later
+  than every other script in the tree. CI catches a lint regression there; the
+  commit does not, so the feedback arrives after the push rather than before
+  it. Non-rotting and bounded to directories the consumer chose to add.
+  Filed 2026-07-26 by build, on the lead's ruling during the `activation-path`
+  doctor + manifest batch, after measuring both the glob behavior and the
+  gate's runtime.
+
 ## Done
 
 - platform-support-contract
