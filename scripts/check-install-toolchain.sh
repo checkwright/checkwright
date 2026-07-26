@@ -2,8 +2,8 @@
 # graph: couples=docs/install.md,context-kit/bin/env-probe.sh dir=bi valve=none tier=precommit
 # spec: docs/site-architecture.md §Generated projections and their freshness gates — docs/install.md's Requirements toolchain list holds name-set parity with context-kit/bin/env-probe.sh's PROBE_SET array, both directions
 #
-# usage: check-install-toolchain.sh [install-md] [probe-script]
-#   bare: parity between docs/install.md's toolchain marker block and env-probe's PROBE_SET.
+# usage: check-install-toolchain.sh [install-md] [roster-file]
+#   bare: parity between docs/install.md's toolchain marker block and the PROBE_SET roster.
 #   two args: steer onto hermetic fixture copies of each surface.
 set -uo pipefail
 
@@ -12,7 +12,12 @@ SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
 source "$SDK/lib/gate.sh"
 
 INSTALL_MD="${1:-docs/install.md}"
-PROBE="${2:-context-kit/bin/env-probe.sh}"
+PROBE="${2:-}"
+if [[ -z "$PROBE" ]]; then
+    # comment-tier-exempt: transitional — the roster is moving from the probe script to the sourceable library, so resolve by existence and keep the pre-move location working for a tree that predates it. The triple-parity rewrite drops the fallback; it is not a permanent two-owner resolution order.
+    PROBE=context-kit/lib/toolfloor.sh
+    [[ -f "$PROBE" ]] || PROBE=context-kit/bin/env-probe.sh
+fi
 BEGIN="<!-- toolchain:begin -->"
 END="<!-- toolchain:end -->"
 
@@ -35,7 +40,10 @@ probe_inner="${probe_inner%%)*}"
 read -r -a probe_arr <<<"$probe_inner"
 [[ ${#probe_arr[@]} -gt 0 ]] || { echo "check-install-toolchain: PROBE_SET array is empty in $PROBE" >&2; exit 2; }
 
-probe_sorted="$(printf '%s\n' "${probe_arr[@]}" | sort -u)"; st=$?
+# comment-tier-exempt: transitional — a roster element may carry `:<min-version>[:<impl-token>]` fields this gate does not yet assert; compare the name alone so the present invariant holds unchanged over the widened grammar. The triple-parity rewrite asserts the whole element and drops this strip.
+probe_names=()
+for _e in "${probe_arr[@]}"; do probe_names+=("${_e%%:*}"); done
+probe_sorted="$(printf '%s\n' "${probe_names[@]}" | sort -u)"; st=$?
 fail_closed "$st" INSTALL-TOOLCHAIN sort
 listed_sorted="$(printf '%s\n' "$listed" | sort -u)"; st=$?
 fail_closed "$st" INSTALL-TOOLCHAIN sort
@@ -48,7 +56,7 @@ if [[ -n "$missing" || -n "$extra" ]]; then
     while IFS= read -r t; do [[ -n "$t" ]] && echo "  probed but not listed: $t"; done <<<"$missing"
     while IFS= read -r t; do [[ -n "$t" ]] && echo "  listed but not probed: $t"; done <<<"$extra"
     echo "  help: keep docs/install.md's toolchain bullets in name-set parity with"
-    echo "        context-kit/bin/env-probe.sh's PROBE_SET array (the single owner) — add"
+    echo "        $PROBE's PROBE_SET array (the single owner) — add"
     echo "        the missing tool's bullet or drop the stale one."
     exit 1
 fi
