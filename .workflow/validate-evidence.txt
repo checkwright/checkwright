@@ -1,5 +1,6 @@
 # contract: evidence-manifest v1
-activation-path gates sha256=76317281a69f9f532eda893dea8144521c26d1d672768c65e512130f5b143fbb pass=82 fail=0 ignore=0 verdict=clean 2026-07-26
+activation-path installer_smoke sha256=4cbc6a6c96553597aa8cb0026c323c3d76b2bce43c9f778648840a82a0c7cef6 pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
+activation-path gates sha256=02950ab921c3b46994bf745c0a12fa1dc412a9bd42a40b77800a5fb0795e464f pass=82 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path gate_sdk sha256=f1ccf0faf092f7ef6aed01cb298fc06e2b5a0744d5a271216a26189746f69660 pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path canon_kit sha256=e815dbf777988899ed0181b821468cc42a47415c1f61c698bff5122b5d50a0f2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
@@ -16,7 +17,6 @@ activation-path usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd750
 activation-path budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path demo sha256=154be4f890e743622cade9e8efece61ff3d61817ced96a2df778b2f4599587ee pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
-activation-path installer_smoke sha256=5e7a16410bb07ce5147d57a31f46d4219732ef0b85b004cefb9870d5f9ab8cf5 pass=0 fail=1 ignore=0 verdict=clean 2026-07-26
 activation-path consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path upgrade sha256=ad35fda247df43b082d08e31a18358bd7fd1e4229a6cde0d7eb627911134445b pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
 activation-path agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-26
