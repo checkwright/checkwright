@@ -17,10 +17,20 @@ per kit, so the adoption decision weighs a number rather than a guess.
 
 ## Requirements
 
-Checkwright is **Unix-first**: Linux and macOS are the supported platforms.
-Windows is supported through WSL (Windows Subsystem for Linux), not natively —
-the gate battery and the git hooks are Bash over a coreutils toolchain, and no
-native-Windows shell path exists.
+Checkwright is **Unix-first**, and specifically **GNU-first**: the engine is
+portable to any Unix that presents a GNU userland on `PATH`, which Linux
+distributions do out of the box. Windows runs it through WSL (Windows Subsystem
+for Linux), not natively — the gate battery and the git hooks are Bash scripts
+and no native-Windows shell path exists.
+
+macOS runs it too, but as an adopter action rather than something the stock
+system delivers. Stock macOS ships bash 3.2 over a BSD userland whose `sort`,
+`date`, and `stat` reject the flags the gates pass. Install GNU bash together
+with coreutils and gawk, then put them ahead of `/usr/bin` on `PATH`. That last
+clause is the honest limit: the requirements below assert what `PATH` actually
+resolves, so a Mac carrying Homebrew coreutils that is not `PATH`-ordered
+reports below contract — correctly, since BSD `sort` is what the gates would
+invoke.
 
 The battery leans on a small command-line toolchain; each tool below must be on
 your `PATH`, and the note says what breaks without it:
@@ -38,19 +48,32 @@ your `PATH`, and the note says what breaks without it:
 - `awk` (GNU) — the gate family's line scanning and field extraction are written
   in awk; most checks cannot run without it. GNU awk specifically: the 3-argument
   `match()` in `check-gate-assertions` is a gawk extension.
-- `sort` (coreutils) — GNU coreutils is what the battery's file plumbing assumes,
-  and `sort` is the member that carries it: `realpath --relative-to` in the gate
-  library every check sources, plus `sort -V`, `date -d`, and `stat -c` in the
-  release, drift, and usage tooling. None of those flags is BSD-portable.
+- `sort` (coreutils) — the battery's file plumbing assumes GNU coreutils, and
+  `sort` is the member standing for that family. The binding construct is
+  `realpath --relative-to` in the gate library every check sources; the release,
+  drift and usage tooling reach for `sort -V`, `date -d` and `stat -c` besides.
+  No BSD equivalent carries those flags.
 - `shellcheck` — the `check-shellcheck` meta-gate lints every shipped script,
   and a lint finding blocks the commit.
 
 <!-- toolchain:end -->
 
-No minimum versions are pinned here: the toolchain moves with your platform, and
-a version floor baked into this page would rot. To see exactly what your machine
-carries, seed a local profile with context-kit's env-probe —
-`bash context-kit/bin/env-probe.sh` writes an `ENV.local.md` you keep untracked.
+A member is pinned only where a construct the battery actually runs forces the
+pin, and each pinned member names that construct above. A floor nobody's code
+forces is an aspiration, and an aspiration is what rots; the rule is what keeps
+this list honest, not a promise to revisit it.
+
+Nor are the bullets maintained beside the code. The roster lives in
+`context-kit/lib/toolfloor.sh`; this block renders it, and
+`check-install-toolchain` holds the two in whole-element parity — floor and
+implementation token included — so the page cannot drift from what the gates
+require.
+
+To see where your machine stands against it, seed a local profile with
+context-kit's env-probe — `bash context-kit/bin/env-probe.sh` writes an
+`ENV.local.md` you keep untracked. It reports each tool's version *and* its
+verdict against the contract, so the profile answers whether this box qualifies,
+not only what it carries.
 
 Publishing a docs site is an optional wider tier. A consumer that registers
 site-kit's render-fidelity gate — which re-renders every page through the
