@@ -12,6 +12,51 @@
 
 ## New Features
 
+- **publish-spec-gate** [spec: SPEC-publish-spec-gate.md] — the enforcement half
+  of `publish-spec-disambiguation`: a consumer gate under `scripts/` asserting
+  that every `npm publish` spec in `.github/workflows/*.yml` is unambiguous, and
+  landing in the same commit as the fix (enforcement-first, CLAUDE.md §Delivery
+  doctrine). Predicate, the `publish`-alone reach ruling, the no-extraction scan
+  set, and the fixture contract:
+  [SPEC-publish-spec-gate.md](SPEC-publish-spec-gate.md).
+  **The one thing no reader may re-derive:** the trigger is the *leading
+  character*, not the slash — `.tmp/pubrepro/dist/x.tgz` carries three slashes
+  and publishes fine, so "contains no slash" and "starts with `./`" are both
+  wrong, and the `good/` fixture is built to red on either simplification.
+  Promoted 2026-07-26 by spec; filed 2026-07-26 by scope.
+
+- **workflow-run-block-lint** [spec: SPEC-action-run-shell.md] — no oracle lints
+  workflow shell at all: `check-shellcheck`'s target list is each kit's
+  `lib/`/`bin/`/`checks/`/`templates/` plus the consumer gates dir, so
+  `.github/workflows/*.yml` is unreached by construction. The `v0.16.0` publish
+  failure is the class's evidence — a careful by-eye review of that exact line
+  passed it, and the defect reached a released tag. Six literal `run:` blocks are
+  in scope; the earlier count of five surveyed `.github/workflows/` only and
+  missed `gate-sdk/templates/gates-workflow.yml`, the copy-out every consumer
+  vendors and the reason the gate is kit mechanism rather than a consumer gate.
+  **The YAML-extraction question is ruled** (operator, 2026-07-26): an awk
+  extractor with a stated fidelity limit, no parser, `PROBE_SET` unchanged.
+  Design, the measured limit, and the fixtures that pin it:
+  [gate-sdk/SPEC-action-run-shell.md](gate-sdk/SPEC-action-run-shell.md).
+  **Do not read this as the `v0.16.0` fix** — that line is clean at
+  `-S warning`; `publish-spec-gate` catches it and this closes the class around
+  it. Promoted 2026-07-26 by spec; filed 2026-07-26 by scope.
+
+- **release-tarball-delivery-channel** [spec: SPEC-release-tarball-delivery-channel.md]
+  — add a GitHub Release tarball as the **primary** delivery channel, npm/npx
+  retained as **secondary**. An operator ruling: nothing in the gate battery
+  needs Node, so requiring it solely to deliver a bash payload asks the adopter
+  for a dependency the contract does not assert. Cheap by construction —
+  `.github/workflows/publish.yml`'s `pack` job already assembles and stamps one
+  tarball and uploads it as the run's artifact, so this is a sibling job that
+  `needs: pack`. Shape, the checksum's honest limit, the runbook and install-page
+  edits, and the Node-masked smoke arm:
+  [SPEC-release-tarball-delivery-channel.md](SPEC-release-tarball-delivery-channel.md).
+  **Cross-component:** the amendment changes `installer/`, `docs/`,
+  `.github/workflows/`, and `RELEASING.md`, so the audit stage fires this
+  iteration. Promoted 2026-07-26 by spec; filed 2026-07-26 on the operator's
+  ruling during the `activation-path` publish batch.
+
 ## Technical Debt
 
 - **publish-spec-disambiguation** — `v0.16.0`'s tag fired `publish.yml`; `pack`
@@ -63,64 +108,6 @@
   Filed 2026-07-26 by scope from the `v0.16.0` publish-run failure.
 
 ## Deferred
-
-- **publish-spec-gate** [needs-spec] — enforcement-first (CLAUDE.md §Delivery
-  doctrine) puts the fix and the gate that catches it in one unit, so
-  `publish-spec-disambiguation` ships with a consumer gate under `scripts/`
-  asserting that every `npm publish` spec in `.github/workflows/*.yml` is
-  unambiguous. **Feature, not debt, by the new-names litmus** (canon-kit/SPEC.md
-  §The amendment lifecycle): it adds a gate script name, a `scripts/gates.list`
-  row, and a `gate-tests/` fixture pair — new names on governed surfaces, "however
-  small the diff". Hence `[needs-spec]`, and hence the spec stage authors the
-  amendment and promotes this entry.
-  **Predicate, ruled at scope because the reproduction settles it:** the spec must
-  *start with* `/` or `./` — **not** "contains no slash", which the `.tmp/…` row
-  in `publish-spec-disambiguation` disproves and which would red the safe
-  `./dist/x.tgz` form. The `good/` fixture must therefore contain a
-  **slash-bearing safe spelling**, so that a future author who "simplifies" the
-  predicate to slash-detection turns the good fixture red — the fixture doing
-  real work rather than merely passing.
-  **Open for the amendment:** how the spec is extracted from YAML without a
-  parser, and whether the gate reaches `npm publish` alone or every path-taking
-  npm verb. Filed 2026-07-26 by scope.
-
-- **workflow-run-block-lint** [needs-spec] — **no oracle executes or lints
-  workflow shell at all.** `check-shellcheck` builds its target list as
-  `targets+=("$d"/*.sh)` over kit `lib/`/`bin/`/`checks/`/`templates/` and the
-  consumer gates dir (re-verified against the current tree this session), so
-  `.github/workflows/*.yml` is unreached by construction — the `run:` blocks are
-  shell that nothing lints, shellchecks, or executes outside a tag push. The
-  `v0.16.0` publish failure is this class's evidence: a careful by-eye review of
-  that exact line passed it, and the defect reached a released tag.
-  `publish-spec-gate` above catches **one** hazard shape; the class is the
-  unlinted blocks themselves. Present exposure: 5 `run: |` blocks across
-  `gates.yml` (1), `publish.yml` (2), `site-health.yml` (2).
-  **Deliverable:** extract each `run:` block and lint it under shellcheck at the
-  gate family's `-S warning`.
-  **Open question — an operator ruling, not a coding decision. `/spec` surfaces
-  it, `/spec` does not settle it.** Extracting `run:` blocks from YAML honestly
-  may require a real YAML parser rather than regex over the file. That is a
-  supply-chain decision in a repo whose whole thesis is dependency-light gates
-  (CLAUDE.md §This repo is governed by its own kits; the `PROBE_SET` floor
-  deliberately carries no language runtime), and it is exactly the class of
-  ruling this queue records rather than re-argues. The honest options are: take
-  the dependency and say so in the requirements contract; accept a regex
-  extractor with a stated fidelity limit and a fixture proving where it gives
-  up; or narrow the gate to a hazard-pattern check that needs no extraction at
-  all — which is `publish-spec-gate`'s scope, and would leave this entry with
-  nothing of its own.
-  **Two further sub-problems, coding-level and `/spec`'s to settle:** (1)
-  `${{ … }}` GitHub expressions are not shell syntax and will misparse — they
-  need placeholder substitution whose token must not itself alter the parse.
-  (2) The effective shell varies (`shell:` key, bash vs sh default, composite
-  actions), and linting a block under the wrong dialect manufactures false
-  positives.
-  **Cost while deferred:** moderate and slowly rotting — every new `run:` block
-  widens unlinted surface, and the failure mode is a defect that reaches a tag
-  push, where the feedback loop is a failed release rather than a red pre-commit.
-  Explicitly **not** mitigated by review attention: a reviewer reading correctly
-  is not a substitute for an oracle, which is precisely what this incident
-  demonstrated. Filed 2026-07-26 by scope.
 
 - **runtime-dir-two-tier-detector** [needs-spec] — `check-tracking-claim`'s
   `is two-tier` predicate is rule-provable only for a directory the ignore rules
@@ -1750,55 +1737,6 @@
   Filed 2026-07-26 by build, on the lead's ruling during the `activation-path`
   doctor + manifest batch, after measuring both the glob behavior and the
   gate's runtime.
-
-- **release-tarball-delivery-channel** [needs-spec] — add a GitHub Release
-  tarball as the **primary** delivery channel; npm/npx is retained as
-  **secondary**, not removed. An operator ruling, recorded rather than
-  re-argued.
-  **Why:** nothing in the gate battery needs Node — `PROBE_SET` does not carry
-  it and the floor roster deliberately keeps it off — so requiring Node solely
-  to deliver a bash payload asks the adopter for a dependency the contract does
-  not assert.
-  **Explicitly rejected, recorded so it is not re-proposed:** `curl -fsSL … |
-  sh`. [docs/install.md](docs/install.md) argues that what governs your tree is
-  committed, auditable source you read before you run it; piping an unreviewed
-  remote script into a shell is the counter-pattern, and shipping it would have
-  the page contradicting its own first command.
-  **Shape:** publish the same `scripts/pack-installer.sh` assembly as a release
-  asset with a published checksum, and document a two-step download → verify →
-  run. One assembly path, not a second.
-  **Why npm is kept:** immutable versioned artifacts, registry integrity
-  hashes, `npm pack` pre-inspection, and `--provenance` sigstore attestation —
-  none of them free on a self-hosted script.
-  **Costed deliverable:** a release-asset + checksum job beside the npm job in
-  `.github/workflows/publish.yml`, cheap by construction because that workflow's
-  `pack` job already uploads the stamped assembly as the run's artifact and
-  every channel is a sibling job consuming it; a download arm in
-  `installer/consumer-smoke/run-smoke.sh`; the quick-start reordering in
-  [docs/install.md](docs/install.md); and a `RELEASING.md` asset step.
-  **The taxonomy — two transports over one install model.** npm and this
-  tarball are not two install models. They share `init`, they share
-  `checkwright.lock`, and they produce the same vendored result; only the fetch
-  differs, which is exactly why both can be sibling jobs over the one `pack`
-  assembly. `plugin-marketplace` is the channel that does **not** share that
-  assembly — different unit of delivery, different subject — so the sibling-job
-  cheapness costed above generalizes to this pair and stops there. Do not
-  extend it to that rung; its entry carries the matching negative result.
-  **Why it was deferred, and why that reason is now discharged:** it modifies the
-  `activation-installer` amendment's landed design-bearing delivery ruling (§B1)
-  and widens its phase-1 envelope (§A1), so lifecycle-kit/SPEC.md
-  §check-stage-entry filed it as Deferred `[needs-spec]` awaiting a later scope's
-  promotion. That scope has run: the `release-path-hardening` survey bounded this
-  entry into the iteration's unit set, on the economics that the sibling-job work
-  lands in the same `publish.yml` the `publish-spec-disambiguation` fix already
-  opens. It stays `[needs-spec]` — the amendment update is real and the split
-  roster gives it to `/spec`, which authors it and promotes this entry.
-  **Cost while it stays deferred:** the install page ships one iteration naming
-  `npx` as its quick start, so the first announcement's front door needs Node.
-  Non-rotting, and bounded by the added-job structure the publish workflow
-  already carries.
-  Filed 2026-07-26 on the operator's ruling during the `activation-path`
-  publish batch.
 
 - **installer-lifecycle-verbs** [needs-spec] — the installer's second phase:
   `update`, `diff`, and `uninstall`, the verbs that manage an install after
