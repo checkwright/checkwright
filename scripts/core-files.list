@@ -32,7 +32,7 @@ gate-sdk/templates/gates-workflow.yml
 # The installer package's publish channel (RELEASING.md §The procedure step 5).
 .github/workflows/publish.yml
 
-# The installer's own entry points (SPEC-activation-installer.md §B1).
+# The installer's own entry points (CLAUDE.md §Housekeeping).
 installer/package.json
 installer/bin/checkwright.sh
 

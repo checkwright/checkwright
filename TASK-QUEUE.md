@@ -12,81 +12,6 @@
 
 ## New Features
 
-- **launch-activation-cli** [spec: SPEC-activation-installer.md] — the
-  five-minute activation path: an installer CLI on the reserved npm name
-  (`npx checkwright init` / `doctor` / `update` / `diff` / `uninstall`,
-  `--dry-run`) that vendors pinned kit source into the consumer repo and
-  commits a lock/manifest recording profile, kit versions, and generated
-  files — distribution convenience without giving up auditable, committed
-  vendoring. At most three progressive profiles (starter / delegation / full)
-  so the first experience is not all eleven kits at once; `doctor` probes the
-  bash/GNU/jq/ShellCheck floors before any partial install. Acceptance shape:
-  a clean Linux repo reaches first green in under five minutes with one
-  command and no manual copying; re-init is idempotent; uninstall removes only
-  manifest-recorded files; consumer smoke covers install/update/uninstall per
-  profile. Sequencing: owns the install-ownership contract that
-  `plugin-marketplace` must package against — a marketplace package without an
-  ownership/upgrade manifest is a second install model. Promotion revisits the
-  thin-installer demand-gating ruling (gate-sdk/SPEC.md §upgrade-smoke): the
-  external review names time-to-first-value the top adoption weakness — a
-  second attestation beside the anticipated second consumer.
-  **Promoted into the `activation-path` unit set 2026-07-26 by the undirected
-  scope survey (operator ruling), with three conditions ruled in. `/spec` pairs
-  this entry; all three belong in the amendment's envelope, not in build-time
-  judgment.**
-  **(1) Phasing is authorized and must be stated in the envelope.** `init` +
-  `doctor` land first; `update` / `diff` / `uninstall` land second. The envelope
-  says so explicitly so build is not left to discover the overrun. This is the
-  largest entry in the queue and the phasing is what makes it iteration-shaped.
-  **(2) The registry doctrine survives; its prose is rewritten as an explicit
-  envelope item.** `docs/install.md:11-12` publishes a ruling — "the package
-  registries hold the name only, never a dependency channel. There is nothing to
-  `npm install` or `cargo add`." A published installer reopens it. Operator
-  ruling: an `npx checkwright init` that vendors pinned source and commits it is
-  **not** a dependency channel — nothing resolves at build time and the kits
-  still land as committed, auditable source, which is the property the doctrine
-  protects. So the doctrine stands and install.md is rewritten to distinguish a
-  one-shot vendoring installer from a resolved dependency. Because that is
-  user-facing published semantics, it lands **in the amendment** as a named
-  envelope item, never as incidental build-time wording.
-  **(3) Two verified cost facts, carried so `/spec` does not re-derive them.**
-  *The publish is real work with its own supply-chain surface:*
-  `reserve/npm/package.json` is a bare name reservation — `"version": "0.0.1"`,
-  `"files": ["README.md"]`, and **no `bin` field** — so there is no installer
-  package today, and standing one up adds a distribution channel the
-  just-landed `supply-chain-trust-baseline` does not cover (provenance, a
-  pinned publish workflow). *`doctor` is smaller than this entry implies:*
-  `context-kit/bin/env-probe.sh` already walks `PROBE_SET` and already probes
-  versions (`probe_version()`, lines 39-47); it lacks only a floor to compare
-  against and a verdict to emit. The floor axis itself is
-  `platform-support-contract`'s deliverable in this same unit set, so `doctor`
-  consumes it rather than defining it.
-  **Paired 2026-07-26 by `/spec`; the amendment carries the rulings.** Phasing,
-  the rewritten doctrine and its two gated properties, the bash-not-JS
-  implementation call, the `reserve/npm/` retirement, the six-field manifest
-  with a phase-1 reader each, the profile subset chain, and the declined
-  payload gate all live in `SPEC-activation-installer.md` — read it before
-  cutting a batch. The registry publish is **ruled out of this iteration** by
-  the lead: build lands the package and the provenance workflow and proves the
-  path against a packed tarball; the live publish is the operator's to
-  authorize at a release under RELEASING.md.
-  **Audited 2026-07-26 by `/align`, which found three wiring defects against the
-  current tree — read the amendment's `B1` before cutting a batch.** A smoke
-  tree at `installer/smoke/` would have made `installer/` enumerate as a *kit
-  root* (that directory name is the predicate), breaking
-  `run-consumer-smoke.sh` closed and pulling the installer into the payload it
-  packs; an in-tree `payload/` would have put a second copy of every kit in
-  front of the whole-tree spec and workflow sweeps, gitignore being no defence
-  against a filesystem walk; and the canon-config registration the entry planned
-  is already covered by an existing glob. A fourth finding added a delta: the
-  installer's scripts fall outside `check-shellcheck`'s scan set once
-  `installer/` is not a kit root, so the lint coverage the bash-over-JS ruling
-  assumed is now owed explicitly (`F3`).
-  **Cost while deferred:** every prospective adopter pays the manual
-  vendor-and-wire path, the largest single drop-off risk at announcement;
-  non-rotting otherwise. Surfaced 2026-07-23 in an external
-  product/positioning review (operator-commissioned; artifact local-only).
-
 ## Technical Debt
 
 ## Deferred
@@ -205,6 +130,13 @@
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
   plugin substrate moves fast (the scope-session-routing ruling applies).
+  **The install-ownership contract this must package against already exists:**
+  `checkwright.lock`, written by the installer's `init` and specified at
+  installer/README.md §The manifest — its schema owner is
+  `installer/lib/common/lock.sh`. A marketplace package that installs kits
+  without writing that manifest would be a second install model with no upgrade
+  or uninstall story, which is the sequencing risk this entry has always
+  flagged; the named contract replaces the re-derivation it used to imply.
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
@@ -1727,5 +1659,6 @@
 ## Done
 
 - platform-support-contract
+- launch-activation-cli
 
 ## Lessons Learned

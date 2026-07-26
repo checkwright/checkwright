@@ -218,6 +218,19 @@ Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
 worktree. It needs a clean worktree, because the pack step refuses to stamp a
 commit the payload does not match.
 
+*Why the payload has no gate of its own.* The obvious sibling check would assert
+that the packed payload matches the repository's kit roots. It is deliberately
+not a gate: the payload exists only at pack time, so the gate would have to run
+`npm pack` at commit time — putting a network-capable toolchain in the
+pre-commit path and breaking the hermeticity every other gate keeps. The
+property is covered here instead, in the tier that can afford it: the pack step
+derives the payload from the same kit-root set the battery itself resolves, and
+the smoke then runs `doctor` from the payload for *every* profile, so a payload
+missing the kit `doctor` sources its toolchain roster from fails the smallest
+profile rather than passing unnoticed. The honest residue is that no assertion
+compares the two sets element by element — a kit dropped from the payload that
+nothing in the smoke's path reads would not be caught here.
+
 ## Docs
 
 <https://checkwright.dev> and <https://github.com/checkwright/checkwright>.
