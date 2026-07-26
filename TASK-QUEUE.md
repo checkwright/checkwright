@@ -137,6 +137,8 @@
   without writing that manifest would be a second install model with no upgrade
   or uninstall story, which is the sequencing risk this entry has always
   flagged; the named contract replaces the re-derivation it used to imply.
+  The upgrade/uninstall story itself is `installer-lifecycle-verbs` below —
+  sequence against it rather than duplicating it.
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
@@ -1655,6 +1657,48 @@
   already carries.
   Filed 2026-07-26 on the operator's ruling during the `activation-path`
   publish batch.
+
+- **installer-lifecycle-verbs** [needs-spec] — the installer's second phase:
+  `update`, `diff`, and `uninstall`, the verbs that manage an install after
+  `init` has made one. Phase 1 (`init`, `doctor`, `--dry-run`, the manifest, the
+  profiles, the packaging, and the consumer smoke) shipped in `activation-path`;
+  this phase was ruled a separate build unit at promotion and is filed here on
+  the lead's ruling at that iteration's merge, so it survives the amendment that
+  governed it.
+  **The manifest is already the contract, and that is what makes this additive.**
+  All six `checkwright.lock` fields — `schema`, `version`, `commit`, `profile`,
+  `kits`, `files` — carry a phase-1 reader today (installer/README.md §The
+  manifest), and **no field exists whose only reader arrives in this phase**. A
+  seventh field proposed for `update`'s benefit alone was deferred with it. So
+  these verbs are second readers of a schema that already exists rather than a
+  schema revision, and a `/spec` pass should not re-derive that off
+  `installer/lib/common/lock.sh`.
+  **Acceptance shape:** `uninstall` removes only manifest-recorded files —
+  never a file the adopter wrote, which is exactly what the per-file hash the
+  manifest already records is for; `diff` reports drift between the recorded
+  hashes and the tree; and `installer/consumer-smoke/run-smoke.sh` covers
+  install → update → uninstall per profile, extending the suite it already runs
+  rather than standing up a second one. Every mutating verb carries `--dry-run`,
+  the rule installer/README.md already states.
+  **Couples to `plugin-marketplace`, in both directions.** That entry must
+  package against `checkwright.lock` as its install-ownership contract, and the
+  sequencing risk it flags is a second install model with **no upgrade or
+  uninstall story**. This entry is that story. A marketplace design that lands
+  first would either wait on these verbs or duplicate them.
+  **Cost while deferred — this is the honest one, and the retired entry never
+  stated it because phase 2 was in scope there.** A consumer who has vendored
+  has **no supported path to move versions or to back out**. `init`'s re-run
+  refuses a payload older than the recorded install as a silent downgrade, and
+  `--force` is the only affordance that rewrites anything — an override that
+  overwrites what `init` would otherwise protect, not an upgrade path. So today
+  the answer to "how do I move to the next release" is to re-run `init` and
+  trust `--force`, and the answer to "how do I remove this" is to delete files
+  by hand against the manifest. Non-rotting, and bounded by the manifest being
+  correct and complete meanwhile — the data an upgrade needs is being recorded
+  from day one, which is why deferring costs capability rather than fidelity.
+  Filed 2026-07-26 by build on the lead's ruling at the `activation-installer`
+  merge, from scope the amendment governed and its deletion would otherwise
+  have dropped.
 
 ## Done
 
