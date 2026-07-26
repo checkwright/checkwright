@@ -127,6 +127,19 @@ repo; deriving the payload is the derivation-first rule applied to a
 distribution artifact. The pack step also stamps the version and the commit
 (`C3`, `B5`).
 
+*Built, with these calibrations ruled in-session.* The pack step is
+`scripts/pack-installer.sh`, not a member of `installer/`: the layout above
+enumerates what the package *ships*, and a maintainer tool that packs the
+repository belongs beside this repo's other generators. Its scratch knob is
+`INSTALLER_PACK_TMP_DIR`. It refuses a dirty worktree rather than stamping a
+commit the payload does not match — the stamp is the whole of what makes a
+vendored tree resolvable to an upstream state, so a stamp that describes no tree
+is worse than none. Both stamps land in the packed `package.json` — `.version`
+from the tag, `.checkwright.commit` from `HEAD` — so one file carries them, one
+`jq` write sets them, and `init` reads them from the package it is running out
+of. The committed `files` roster carries only entries with something behind them
+(`bin/`, `lib/`, `payload/`, `README.md`); `profiles.list` joins it with `B7`.
+
 *The assembly is staged out-of-tree, on a `*_TMP_DIR`-class knob.* The pack step
 copies `installer/`'s own files and the derived payload into a scratch
 directory and packs there; **no `payload/` ever exists inside the worktree**.
@@ -335,6 +348,10 @@ category line, outcome framing, or table placement.
 half (`B2`). One new line names `installer/` as the published activation surface
 and its pack-time-assembly rule, with the mechanism behind the pointer — the
 always-loaded shape: one line per rule, the detail in the surface that owns it.
+**Both edits are landed**, each forced by the delta it rode with rather than
+deferred to this one: `B2` falsifies the `reserve/` line the moment it deletes
+the npm half, and the installer's scripts need a live `spec:` owner the moment
+they exist.
 
 **D4. Registration in the registries that make a root surface governed.
 {mechanical}** Two edits, not the three the
@@ -342,7 +359,10 @@ always-loaded shape: one line per rule, the detail in the surface that owns it.
 third is already covered. `installer` joins `scripts/root-allowlist.list` (an
 unallowlisted root entry reds `check-root-tiering`), and the installer's entry
 points join `scripts/core-files.list` (silent deletion goes red). The reserve
-comment in the allowlist is updated for `B2`.
+comment in the allowlist is updated for `B2`. The allowlist half is **landed**
+with the surface it admits — an unallowlisted root reds `check-root-tiering`, so
+it is not deferrable — and the core-files half stays here, `F1` covering the
+package file meanwhile by refusing to run without it.
 
 **No `scripts/canon-config.sh` edit is owed.** `CANON_KIT_MANIFEST_FILES`
 already carries `*/README.md`, and canon-kit expands its manifest globs as plain
@@ -427,6 +447,14 @@ exactly. And `demo/run-demo.sh` sits in the same blind spot today — it is a
 shipped script under no kit root — so it joins the same knob value; it is
 already clean at `-S warning`, verified, so the widening costs nothing and
 leaving it out would mean landing the mechanism that fixes a gap beside the gap.
+
+*Built as `GATE_SDK_LINT_EXTRA_DIRS`, with one gap left open.* The gate's scan
+widened, but its `# graph:` couples did not: a kit gate's static glob list
+cannot name a directory a consumer knob supplies, so an `installer/bin` edit is
+linted by the full battery and by CI, not by the generated hook's trigger. The
+same under-coverage predates this delta on the kit subdirectories the gate has
+always read, and closing either half is a change to §The `# graph:` manifest —
+outside this amendment's envelope, and filed rather than taken.
 
 **F4. The regen tail. {mechanical}** A new gate, a new root surface, and a new
 kit knob move the
