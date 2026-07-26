@@ -118,8 +118,10 @@ check-template-copy-parity
 
 ## Requirements
 
-bash 4+, git, GNU coreutils/findutils, GNU awk (`check-gate-assertions`),
-[ShellCheck](https://www.shellcheck.net/) (`check-shellcheck`).
+The toolchain contract lives in `docs/install.md` §Requirements: the roster,
+each pinned floor, and the construct that forces it. `check-install-toolchain`
+holds that page to `context-kit/lib/toolfloor.sh`, the roster's owner, so the
+requirement has one statement and no copy.
 
 ## License
 

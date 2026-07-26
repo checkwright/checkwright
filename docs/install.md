@@ -53,8 +53,9 @@ your `PATH`, and the note says what breaks without it:
   `realpath --relative-to` in the gate library every check sources; the release,
   drift and usage tooling reach for `sort -V`, `date -d` and `stat -c` besides.
   No BSD equivalent carries those flags.
-- `shellcheck` — the `check-shellcheck` meta-gate lints every shipped script,
-  and a lint finding blocks the commit.
+- `shellcheck` — the `check-shellcheck` meta-gate runs
+  [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
+  lint finding blocks the commit.
 
 <!-- toolchain:end -->
 
