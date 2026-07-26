@@ -44,6 +44,71 @@ battery does assert, with its version floors, is on the install page.
   the source tree, so no second copy of any kit is checked in.
 - `profiles.list` — the profile rosters (below).
 
+## init
+
+`checkwright init` vendors the selected profile's kit source out of this
+package's own payload into your repository and commits it. One command, and
+what governs your tree afterwards is committed source you can read.
+
+Three preconditions, and all three **refuse** rather than warn — a partial
+install is the outcome none of them may produce, so every one is checked before
+a single file is written:
+
+- **You are inside a git work tree.** The vendored source is meant to be
+  committed; that is what makes it auditable rather than merely present.
+- **The worktree is clean.** `init` makes one commit, and a dirty tree would
+  fold your work into it, leaving a reviewer's diff wider than what was
+  actually vendored. `--no-commit` is the valve: it writes and stages the
+  files and leaves the commit to you, so an operator who wants to compose the
+  change themselves has taken that guarantee on deliberately.
+- **`doctor` passes.** A below-contract toolchain blocks *before* any partial
+  install, rather than halfway through one — which is why `doctor` ships in the
+  same phase as `init` rather than as a later convenience.
+
+It writes the selected profile's kit directories, a `gates.list` seeded with
+each kit's starting gates, the config seam files those kits need, and the
+manifest. Then it makes **one commit** naming the profile and the version, and
+prints the two commands that finish the setup — `gate-sdk/bin/install-hooks.sh`
+to opt this clone into the generated hook, and `gate-sdk/bin/run-gates.sh` to
+run the battery.
+
+**Re-running is idempotent and non-destructive.** A second `init` reads each
+recorded hash from the manifest: a file whose hash still matches is `init`'s to
+rewrite, and one that has changed since is **yours** — it is reported and left
+alone, never overwritten, unless you pass `--force`. A re-run that finds
+nothing to change says so and exits clean; an unchanged tree is the success
+case, not an error. A payload older than the recorded install is refused as a
+silent downgrade.
+
+`--dry-run` prints the file plan and the manifest that would be written, writes
+nothing, and exits 0. Every mutating verb has one.
+
+## What init seeds
+
+Beyond the kit directories themselves, `init` writes the least that makes the
+battery green on the tree it just made.
+
+The **config seam is derived, never listed**: a kit's consumer config is
+whatever `templates/*-config.sh` it ships, and the destination is always your
+gates directory under the file's own name. A kit that grows a config template
+is picked up with no edit here.
+
+The **starting gate roster** is the subset a fresh consumer begins with, not
+the kit's full roster — the same distinction gate-sdk's own README draws. A
+gate whose subject you have not authored yet has nothing to read: canon-kit's
+duplication gate wants a glossary, site-kit's wants a docs host, and
+lifecycle-kit's two want a stage attestation only a stage session can write. On
+a tree that has done nothing wrong those would red on day one, so they are
+registered when the surface exists rather than at install. Each kit's README
+names the full roster to grow into.
+
+*The honest limit.* That per-kit starting roster is knowledge this installer
+holds, and each kit's `smoke/install.sh` holds a second encoding of the same
+fact for its own scratch consumer. The consumer smoke catches the drift that
+matters — a roster naming a gate that fails to resolve reds it — but not a
+kit that adds a zero-config gate this roster never learns about. Collapsing the
+two into one per-kit source is filed as queued work, not papered over here.
+
 ## doctor
 
 `checkwright doctor` tells you whether this machine meets the toolchain the
