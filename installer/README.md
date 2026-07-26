@@ -78,7 +78,10 @@ rewrite, and one that has changed since is **yours** — it is reported and left
 alone, never overwritten, unless you pass `--force`. A re-run that finds
 nothing to change says so and exits clean; an unchanged tree is the success
 case, not an error. A payload older than the recorded install is refused as a
-silent downgrade.
+silent downgrade — `--force` covers that refusal too, which is what makes a
+rollback a thing you asked for rather than a thing that happened to you.
+`--force` means the same thing in both places: overwrite what `init` would
+otherwise protect.
 
 `--dry-run` prints the file plan and the manifest that would be written, writes
 nothing, and exits 0. Every mutating verb has one.

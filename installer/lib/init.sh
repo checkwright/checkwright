@@ -65,8 +65,8 @@ if [[ -f "$LOCK" ]]; then
     lock_schema_ok "$LOCK" || die "$CHECKWRIGHT_LOCK_FILE carries a schema this build does not know" \
         "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for."
     PRIOR_VERSION="$(lock_field "$LOCK" version)"
-    # spec: installer/README.md §The manifest — the version field's re-run reader: a payload older than the recorded install is a silent downgrade, so it refuses rather than rolling the tree backwards
-    if [[ -n "$PRIOR_VERSION" && "$PRIOR_VERSION" != "$VERSION" ]]; then
+    # spec: installer/README.md §The manifest — the version field's re-run reader: a payload older than the recorded install is a silent downgrade, so it refuses rather than rolling the tree backwards, and --force is the one thing that makes the rollback deliberate rather than silent
+    if (( ! FORCE )) && [[ -n "$PRIOR_VERSION" && "$PRIOR_VERSION" != "$VERSION" ]]; then
         older="$(printf '%s\n%s\n' "$PRIOR_VERSION" "$VERSION" | sort -V | head -n1)"
         if [[ "$older" == "$VERSION" ]]; then
             die "this package is $VERSION but $CHECKWRIGHT_LOCK_FILE records $PRIOR_VERSION — refusing a silent downgrade" \
