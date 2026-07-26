@@ -166,6 +166,7 @@ leaves its section absent.
 | [delegation-kit](delegation-kit/index.md) | budget_guard_tests |
 | [delegation-kit](delegation-kit/index.md) | trend_tests |
 | (consumer) | demo |
+| (consumer) | installer_smoke |
 | [gate-sdk](gate-sdk/index.md) | consumer_smoke |
 | [gate-sdk](gate-sdk/index.md) | upgrade |
 | [context-kit](context-kit/index.md) | agents_md_smoke |

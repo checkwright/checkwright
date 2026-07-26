@@ -192,6 +192,29 @@ contract asserts, its object hash is content-addressed and stable, so the
 manifest's integrity story stays inside the toolchain that contract already
 covers.
 
+## The consumer smoke
+
+`consumer-smoke/run-smoke.sh` is the acceptor for everything above, and it is
+registered as a validate suite so a bit-rotted activation path is a red
+validate rather than a discovery at announcement.
+
+It packs the package, installs it **from the resulting tarball with
+`--offline`**, and drives a scratch consumer once per profile: `init`, then the
+battery must be green, then the manifest must agree with the tree it describes
+file by file, then a re-run must leave the tree object identical, then `doctor`
+must exit 0 and name the installed profile. It also asserts the profile
+invariant against the installed payload — every named kit resolves, the
+containment chain holds, and there are at most three profiles.
+
+The offline tarball install is the load-bearing one. It is what turns "this is
+a one-shot vendoring installer, not a dependency channel" from a claim into an
+assertion: a package that installs and runs with no registry access after the
+fetch is not resolving anything on your behalf.
+
+Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
+worktree. It needs a clean worktree, because the pack step refuses to stamp a
+commit the payload does not match.
+
 ## Docs
 
 <https://checkwright.dev> and <https://github.com/checkwright/checkwright>.

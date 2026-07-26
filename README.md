@@ -59,6 +59,7 @@ bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks 
 bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
 bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                            # guard-kit bin unit tests
 bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
+bash installer/consumer-smoke/run-smoke.sh                                          # the activation path, per profile
 ```
 
 `bash gate-sdk/bin/install-hooks.sh` opts this clone into the generated

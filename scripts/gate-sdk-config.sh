@@ -11,4 +11,4 @@ GATE_SDK_GRAPH_EXTERNAL_REFS="https://checkwright.dev https://github.com/checkwr
 
 # spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships bash under no kit root: the installer's dispatcher, its verbs, the modules those verbs share, and the runnable adoption walkthrough; name them so the lint that governs every other script in the tree governs these too. Each directory is named on its own because the gate globs *.sh per named directory and does not descend
 # shellcheck disable=SC2034  # read by gate-sdk/checks/check-shellcheck.sh after sourcing
-GATE_SDK_LINT_EXTRA_DIRS="installer/bin installer/lib installer/lib/common demo"
+GATE_SDK_LINT_EXTRA_DIRS="installer/bin installer/lib installer/lib/common installer/consumer-smoke demo"
