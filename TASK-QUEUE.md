@@ -1688,6 +1688,42 @@
   doctor + manifest batch, after measuring both the glob behavior and the
   gate's runtime.
 
+- **release-tarball-delivery-channel** [needs-spec] — add a GitHub Release
+  tarball as the **primary** delivery channel; npm/npx is retained as
+  **secondary**, not removed. An operator ruling, recorded rather than
+  re-argued.
+  **Why:** nothing in the gate battery needs Node — `PROBE_SET` does not carry
+  it and the floor roster deliberately keeps it off — so requiring Node solely
+  to deliver a bash payload asks the adopter for a dependency the contract does
+  not assert.
+  **Explicitly rejected, recorded so it is not re-proposed:** `curl -fsSL … |
+  sh`. [docs/install.md](docs/install.md) argues that what governs your tree is
+  committed, auditable source you read before you run it; piping an unreviewed
+  remote script into a shell is the counter-pattern, and shipping it would have
+  the page contradicting its own first command.
+  **Shape:** publish the same `scripts/pack-installer.sh` assembly as a release
+  asset with a published checksum, and document a two-step download → verify →
+  run. One assembly path, not a second.
+  **Why npm is kept:** immutable versioned artifacts, registry integrity
+  hashes, `npm pack` pre-inspection, and `--provenance` sigstore attestation —
+  none of them free on a self-hosted script.
+  **Costed deliverable:** a release-asset + checksum job beside the npm job in
+  `.github/workflows/publish.yml`, cheap by construction because that workflow's
+  `pack` job already uploads the stamped assembly as the run's artifact and
+  every channel is a sibling job consuming it; a download arm in
+  `installer/consumer-smoke/run-smoke.sh`; the quick-start reordering in
+  [docs/install.md](docs/install.md); and a `RELEASING.md` asset step.
+  **Why deferred rather than taken now:** it modifies the `activation-installer`
+  amendment's landed design-bearing delivery ruling (§B1) and widens its phase-1
+  envelope (§A1). lifecycle-kit/SPEC.md §check-stage-entry — ruled-but-unpromoted
+  work files as Deferred `[needs-spec]` for a later scope's promotion.
+  **Cost while deferred:** the install page ships one iteration naming `npx` as
+  its quick start, so the first announcement's front door needs Node.
+  Non-rotting, and bounded by the added-job structure the publish workflow
+  already carries.
+  Filed 2026-07-26 on the operator's ruling during the `activation-path`
+  publish batch.
+
 ## Done
 
 - platform-support-contract
