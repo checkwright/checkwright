@@ -36,9 +36,42 @@ battery does assert, with its version floors, is on the install page.
 
 - `bin/checkwright.sh` — the verb dispatcher, and the package's `bin` entry.
 - `lib/` — one file per verb; the dispatcher's roster is this directory.
+- `lib/common/` — modules the verbs share. The dispatcher's roster is the
+  `*.sh` files directly under `lib/`, and that glob does not descend, so a
+  shared module cannot be advertised as a verb.
 - `payload/` — the vendored kit source, assembled at pack time from the
   repository's own kit roots. It exists in the published tarball only, never in
   the source tree, so no second copy of any kit is checked in.
+
+## The manifest
+
+`init` writes `checkwright.lock` at the root of the repository it vendors into,
+and that file is tracked like everything else it writes. It is JSON, read with
+`jq`, and it is the install-ownership record: what was installed, from which
+upstream state, and which files this installer owns. `lib/common/lock.sh` is
+its schema owner — the wire key, the accessors, and the hash rule live there,
+so the verb that writes the manifest and the verbs that read it cannot drift
+apart.
+
+The wire key is versioned (`checkwright-lock v1`, in `CHECKWRIGHT_LOCK_SCHEMA`)
+and a build that meets a key it does not know refuses rather than guessing at
+the shape behind it.
+
+| Field | Holds | Read by |
+| --- | --- | --- |
+| `schema` | the versioned wire key | every verb, as its first act — an unknown key is a refusal |
+| `version` | the release the payload was cut at | `doctor` reports it; a re-run of `init` compares it against the payload's and refuses a silent downgrade |
+| `commit` | the 40-hex commit the payload was assembled from | `doctor` prints it — it is what lets a reviewer resolve the vendored tree to an exact upstream state |
+| `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
+| `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
+| `files` | each written path with its content hash | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten |
+
+A recorded hash is `git hash-object`, never `sha256sum`. Not a portability
+detail worth burying: macOS ships `shasum` rather than `sha256sum`, and the
+answer is not a new tool requirement — git is already something the toolchain
+contract asserts, its object hash is content-addressed and stable, so the
+manifest's integrity story stays inside the toolchain that contract already
+covers.
 
 ## Docs
 
