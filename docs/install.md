@@ -5,11 +5,34 @@ nav_order: 3
 
 # Install and upgrade
 
-Checkwright is distributed git-native and vendored-committed: you copy the kit
-directories into your repository and commit them. The gates read tracked files,
-and the audit story wants the governance layer inside the reviewed tree — so
-the package registries hold the name only, never a dependency channel. There is
-nothing to `npm install` or `cargo add`.
+Checkwright is distributed git-native and vendored-committed: the kit
+directories live in your repository as committed source. The gates read tracked
+files, and the audit story wants the governance layer inside the reviewed tree.
+
+The two registries stand in different relations to that, and the distinction is
+worth drawing rather than blurring:
+
+- **crates.io holds the name only, never a dependency channel.** There is
+  nothing to `cargo add`.
+- **npm carries a real package, and it is an installer rather than a
+  dependency.** `npx checkwright init` copies pinned kit source out of its own
+  payload into your tree and commits it.
+
+An installer is not a dependency channel, and the difference is mechanical
+rather than a matter of framing. Nothing resolves at *your* build time. The
+payload ships inside the published tarball, so nothing is fetched after the
+package itself. And nothing the installer writes is a resolvable reference —
+no `dependencies` entry, no lockfile pointing at a registry, no submodule, no
+install-time lifecycle script. Uninstall the package afterwards and the tree it
+vendored keeps working, needing nothing from a registry ever again.
+
+That is what a one-shot vendoring means, and it is why the doctrine survives the
+installer rather than being repealed by it: what governs your tree is still
+committed, auditable source you read before you run it. Both properties are
+asserted rather than claimed — the consumer smoke installs from a packed
+tarball with no registry access and runs the whole path from it, and
+`check-installer-no-deps` reds the package the moment it declares a dependency
+field or an install-time script.
 
 Before you vendor, the [footprint page](footprint.md) measures what each kit
 adds to a consumer's context budget — the always-loaded and load-triggered cost
@@ -76,12 +99,57 @@ context-kit's env-probe — `bash context-kit/bin/env-probe.sh` writes an
 verdict against the contract, so the profile answers whether this box qualifies,
 not only what it carries.
 
+One requirement belongs to a path rather than to the battery: the installer
+below needs Node, for `npx`. Nothing in the gate battery uses Node, and the
+manual vendoring path needs none of it — so a consumer who would rather not
+add Node to the picture vendors by hand and loses nothing but the convenience.
+
 Publishing a docs site is an optional wider tier. A consumer that registers
 site-kit's render-fidelity gate — which re-renders every page through the
 GitHub Pages parser — additionally needs Ruby with the `kramdown-parser-gfm`
 gem. A consumer that publishes no docs site never installs it.
 
+## Quick start
+
+From a clean git repository:
+
+```bash
+npx checkwright init                      # or: --profile delegation | --profile full
+bash gate-sdk/bin/install-hooks.sh        # opt this clone into the generated hook
+bash gate-sdk/bin/run-gates.sh            # the battery, green on what was just vendored
+```
+
+`init` vendors the selected profile's kit directories and writes a `gates.list`
+seeded with each kit's starting gates, alongside the config seam those kits
+need. Then it makes **one commit** naming the profile and the version.
+
+Its three preconditions all refuse rather than warn. You must be inside a git
+work tree. The worktree must be clean, with `--no-commit` as the valve for an
+operator who wants to stage the vendoring themselves. And the toolchain must
+meet the contract — which `checkwright doctor` decides *before* any partial
+install, rather than halfway through one.
+
+You pick how much to meet first. `starter` is the framework — the gate SDK on
+its own. `delegation` adds the kits whose subject is the agent session itself.
+`full` is everything. The progression is a containment chain, so moving up only
+ever adds.
+
+Re-running is idempotent and non-destructive: it reads the per-file hash
+recorded in `checkwright.lock`, rewrites what still matches, and **reports
+rather than overwrites** anything you have changed since, unless you pass
+`--force`. `--dry-run` prints the file plan and the manifest and writes nothing.
+
+`checkwright.lock` is the install-ownership record — what was installed, from
+which upstream commit, and which files the installer owns. That commit field is
+what lets a reviewer resolve the tree in front of them to an exact upstream
+state, which is the difference between vendored source that is merely committed
+and vendored source that is auditable.
+
 ## Vendoring the kits
+
+The installer above does this on your behalf; the manual path stays supported
+and is worth reading whether or not you take it. It is the audit story — the
+account of what lands in your tree — and it is the path that needs no Node.
 
 Each kit is a self-contained top-level directory. To adopt one, copy it into
 your repo root and wire it in:
