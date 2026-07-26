@@ -1700,6 +1700,50 @@
   merge, from scope the amendment governed and its deletion would otherwise
   have dropped.
 
+- **installer-smoke-manifest-write-collision** [needs-spec] — `installer_smoke`
+  (new this iteration in `EVIDENCE_KIT_SUITES`) sits 18th of 22 suites in
+  `scripts/evidence-config.sh`'s roster, behind `gates` and every kit fixture
+  suite, `guard_tests`, `usage_tests`, `budget_guard_tests`, `trend_tests`, and
+  `demo`. `evidence-kit/bin/run-validate.sh` upserts each suite's row into the
+  tracked `.workflow/validate-evidence.txt` manifest as it goes, so by the time
+  `installer_smoke`'s turn arrives 17 prior suites have already dirtied that
+  tracked file. `installer/consumer-smoke/run-smoke.sh` (and the
+  `scripts/pack-installer.sh` it drives) both hard-refuse a dirty `git status
+  --porcelain`, so a full `bash evidence-kit/bin/run-validate.sh` run
+  deterministically reds `installer_smoke` on every invocation — not a race,
+  a guaranteed collision between the roster's order and the spine's own
+  write mechanism.
+  **Confirmed this session.** The full-battery run for `activation-path
+  validate` logged `installer_smoke -> new-failures`, log reading "the
+  worktree is dirty". Stashing `.workflow/validate-evidence.txt`'s in-flight
+  diff and re-running `installer/consumer-smoke/run-smoke.sh` alone on the
+  now-clean tree passed all three profiles (starter/delegation/full) cleanly
+  — matching the lead's independently reported clean run. The suite itself
+  is sound; the codified spine's own write order is what breaks it.
+  **Deliverable:** a fix that lets a clean-tree-requiring suite coexist with
+  the spine's incremental manifest write. Candidates: reorder
+  `installer_smoke` (and any future clean-tree suite) first in
+  `EVIDENCE_KIT_SUITES`, or have `run-validate.sh` batch its manifest writes
+  to scratch and fold them into the tracked file only after every suite has
+  run, rather than upserting the tracked file suite-by-suite.
+  **Why `[needs-spec]`:** the two candidates trade off differently.
+  Reordering is a one-line config change but re-breaks silently the moment a
+  second clean-tree-requiring suite lands anywhere but first. Deferring the
+  write to end-of-run changes the writer contract `evidence-row-upsert-order`
+  already covers ("a re-run supersedes this iteration's prior line for the
+  suite, then appends") — an `evidence-kit/SPEC.md` ruling, not a script
+  patch, and the two entries likely converge on one fix.
+  **Cost while deferred:** high hit-rate, low latent risk. Every full
+  `bash evidence-kit/bin/run-validate.sh` run reds this one suite until
+  fixed, but the suite is proven sound in isolation, so no real installer
+  regression is masked; a session must know to re-run it standalone (or
+  trust an isolated confirmation, as this one did) rather than read the
+  full-battery red as a defect in the installer itself. Held constant against
+  this slug in `.workflow/validate-baseline.txt` so future runs classify it
+  correctly rather than as new.
+  Filed 2026-07-26 by validate (`activation-path`), from the full evidence
+  battery run.
+
 ## Done
 
 - platform-support-contract

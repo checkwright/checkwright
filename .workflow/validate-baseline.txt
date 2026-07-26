@@ -94,3 +94,4 @@ consumer_smoke consumer_smoke pass
 upgrade upgrade pass
 agents_md_smoke agents_md_smoke pass
 index_tests index_tests pass
+installer_smoke installer_smoke fail installer-smoke-manifest-write-collision
