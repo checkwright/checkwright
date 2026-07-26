@@ -229,10 +229,75 @@ real change, not the last run. The probed half is derivation-first — never
 hand-maintained.
 
 **What it probes.** OS/distro (`uname`, `/etc/os-release`); the package manager
-(first present of an ordered detection walk over the known managers); the probe
-set's versions — `bash`, `git`, `jq`, `awk`, and the kit tools' own
-shared dependency `shellcheck` (the gate battery's linter); and the absent-tools
-list (probe-set members `command -v` cannot resolve).
+(first present of an ordered detection walk over the known managers); each
+roster member's version and its floor verdict (below); the absent-tools list
+(roster members `command -v` cannot resolve); and the below-contract list. The
+roster itself is owned by `lib/toolfloor.sh` and never restated here.
+
+**The roster and its floor axis (`lib/toolfloor.sh`).** The roster lives in a
+sourceable library rather than in the script, because `env-probe.sh` does its
+work on execution: a second reader cannot obtain the roster by running it, which
+is why the parity gate greps the array out of a file instead of sourcing it, and
+why a reader that runs before any consumer file exists — an installer's `doctor`
+reading its own payload copy — needs an owner it can source. The library defines
+the array `PROBE_SET` and the predicate below and executes nothing else. It
+carries no knob, deliberately: the roster is the kit's own dependency set, and a
+consumer who could override it could only make the contract lie.
+
+A roster element reads `<name>[:<min-version>[:<impl-token>]]`. A bare name keeps
+the original meaning — must be present, no version constraint — so the floor axis
+is **per-member** rather than a number demanded of every member. The fields are
+positional, so a member constrained by implementation alone carries an empty
+min-version field (`awk::GNU`), and an empty field means what an omitted trailing
+field means: `awk`, `awk:`, and `awk::` are one unconstrained member. **A member
+gains a floor only where a construct the battery actually runs forces one**, and
+the forcing construct is recorded with it — a floor nobody's code forces is not
+pinned, which is what stops a version number from rotting into an aspiration
+(de-literalization applied to a version: the value is owned where the constraint
+is provable).
+
+The constrained members and what forces each:
+
+- `bash:4.0` — three independent bash-4.0 constructs: `declare -A` (gate-sdk,
+  guard-kit, delegation-kit, evidence-kit checks), `mapfile` (widespread across
+  the kits), and the `${x,,}` case expansion (canon-kit's `lib/spec.sh` and
+  checks, a delegation-kit template).
+- `awk::GNU` — no version floor, one implementation constraint: the 3-arg
+  `match()` in `check-gate-assertions`, whose dependency gate-sdk/SPEC.md
+  §check-gate-assertions already owns.
+Every other member is a bare name — no construct in the battery forces a version
+on it (the `jq` usage is 1.5-era throughout), so none is pinned.
+
+An implementation token is matched as a **substring of the tool's own version
+banner** — gawk prints `GNU Awk`, GNU sort prints `sort (GNU coreutils)` — so the
+constraint is checked against the binary actually on `PATH` rather than against a
+package name nothing can probe. Its honest limit is the same one: the roster
+asserts what `PATH` resolves at probe time, so an installed-but-not-`PATH`-ordered
+GNU userland probes as below contract, correctly, since that is what the gates
+will invoke.
+
+**The floor predicate.** `tool_floor_check <element> <banner>` returns one verdict
+from a closed set — `ok`, `absent` (an empty banner), `below <found> <floor>`,
+`wrong-impl <found>`, `uncomparable`. Numeric comparison is `sort -V`.
+`<found>` is the banner's first dotted-version token for `below` and its
+first word — the implementation's own name — for `wrong-impl`. `uncomparable` is
+the fail-closed arm: a banner the predicate cannot parse, or a `sort` without
+`-V`, is reported unverified and never silently as `ok` — the posture
+gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is
+not one.
+
+**The rendered verdict.** Each toolchain bullet carries the probed banner and,
+for a constrained member, the constraint and its verdict — `` (floor 4.0, ok) ``,
+`` (requires GNU — below contract) ``, `` (floor 4.0 — unverified) ``; an
+unconstrained member carries no parenthetical. A `**Below contract:**` line joins
+the existing `**Absent:**` line, reading `none` when clean and otherwise naming
+each failing member through the verdict's own fields: `below` and `wrong-impl`
+are distinguished because the remedies differ — upgrade versus install a
+different implementation — and `uncomparable` is listed as explicitly unverified
+rather than folded into the clean state. Both version probes read from
+`/dev/null`: `-V` prints a version banner for most tools but is an ordinary flag
+for some — GNU sort's version-*sort* — so a tool that rejects `--version` would
+otherwise fall through to a `-V` that reads inherited stdin and hangs the probe.
 
 **The content seam (consumer-local, gitignored).** Hand-authored gotchas — the
 "no `dig`/`host`; use `getent`/DoH" class a probe cannot know — live *outside*
@@ -531,6 +596,7 @@ context-kit/
   bin/md-index.sh
   bin/md-section.sh
   bin/pub-index.sh               # dispatcher over the per-language extractors
+  lib/toolfloor.sh               # sourceable owner: the probe roster + the floor predicate
   lib/pub-lang/rust.sh           # shipped extractor: Rust public items
   lib/pub-lang/ts.sh             # shipped extractor: TypeScript export surface
   bin/always-loaded.sh
@@ -647,7 +713,12 @@ for the extractor-dispatcher refactor: it stays byte-identical across it. A
 consumer-shadowing case points `CONTEXT_KIT_PUB_LANG_DIR` at a scratch dir
 whose `rust.sh` emits a marker row, exercising the consumer-first resolution
 order (the shadow's output, not the shipped grammar's, is what the golden
-records). The runner registers as its own evidence-kit validate suite
+records). The floor predicate rides the same runner rather than a fixture pair —
+it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
+`lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
+verdict set, the three spellings of an unconstrained member, and the
+`uncomparable` fail-closed arm are asserted against a golden rather than assumed.
+The runner registers as its own evidence-kit validate suite
 (`index_tests`, the `demo` precedent): the golden the refactor leans on now
 has an automated validate-stage consumer. `footprint.sh` is advisory the same way, but its
 projection is gated rather than runner-tested: `check-footprint-fresh` byte-holds

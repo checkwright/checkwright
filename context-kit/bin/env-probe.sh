@@ -31,16 +31,18 @@ unset _ck_cfg
 BEGIN="<!-- context-kit:env:begin -->"
 END="<!-- context-kit:env:end -->"
 
-# spec: context-kit/SPEC.md §bin/env-probe — the probe set: the session's own floor plus the kit tools' shared dependency (shellcheck, the gate battery's linter)
-PROBE_SET=(bash git jq awk shellcheck)
+# shellcheck source=../lib/toolfloor.sh
+source "$KIT/lib/toolfloor.sh"
+
 # spec: context-kit/SPEC.md §bin/env-probe — package-manager detection walk; first present wins, ordered widest-family first
 PM_CANDIDATES=(apt-get dnf yum pacman emerge zypper apk brew nix-env)
 
 probe_version() {
     local tool="$1" raw="" out=""
     command -v "$tool" >/dev/null 2>&1 || return 1
-    raw="$("$tool" --version 2>/dev/null)"
-    [[ -n "$raw" ]] || raw="$("$tool" -V 2>/dev/null)"
+    # spec: context-kit/SPEC.md §bin/env-probe — both version probes read from /dev/null: `-V` prints a banner for most tools but is an ordinary flag for some (GNU sort's version-sort), so a tool rejecting `--version` would otherwise fall through to a `-V` that reads inherited stdin and hangs the probe
+    raw="$("$tool" --version 2>/dev/null </dev/null)"
+    [[ -n "$raw" ]] || raw="$("$tool" -V 2>/dev/null </dev/null)"
     # spec: context-kit/SPEC.md §bin/env-probe — prefer the first line bearing an N.N version token (shellcheck buries it past a banner), else the first line, else the resolved path
     out="$(printf '%s\n' "$raw" | grep -m1 -E '[0-9]+\.[0-9]+')"
     [[ -n "$out" ]] || out="$(printf '%s\n' "$raw" | head -1)"
@@ -63,17 +65,47 @@ for _pm in "${PM_CANDIDATES[@]}"; do
     fi
 done
 
+# spec: context-kit/SPEC.md §bin/env-probe — renders the constrained member's parenthetical; an unconstrained member carries none, so the roster's optional axis stays optional on the page too
+render_floor() {   # $1 = roster element, $2 = verdict -> the trailing parenthetical, empty when the member is unconstrained
+    local desc=""
+    tool_floor_parse "$1"
+    [[ -n "$TOOL_FLOOR_MIN" ]] && desc="floor $TOOL_FLOOR_MIN"
+    if [[ -n "$TOOL_FLOOR_IMPL" ]]; then
+        [[ -n "$desc" ]] && desc+=", "
+        desc+="requires $TOOL_FLOOR_IMPL"
+    fi
+    [[ -n "$desc" ]] || return 0
+    case "$2" in
+        ok)           printf ' (%s, ok)' "$desc" ;;
+        uncomparable) printf ' (%s — unverified)' "$desc" ;;
+        *)            printf ' (%s — below contract)' "$desc" ;;
+    esac
+}
+
 tool_lines=""
 absent=()
-for _t in "${PROBE_SET[@]}"; do
-    if ver="$(probe_version "$_t")"; then
-        tool_lines+="  - \`$_t\` — $ver"$'\n'
-    else
-        absent+=("$_t")
-    fi
+below=()
+for _e in "${PROBE_SET[@]}"; do
+    tool_floor_parse "$_e"
+    _t="$TOOL_FLOOR_NAME"
+    ver="$(probe_version "$_t")" || ver=""
+    verdict="$(tool_floor_check "$_e" "$ver")"
+    read -r _kind _found _floor <<<"$verdict"
+    case "$_kind" in
+        absent) absent+=("$_t"); continue ;;
+        below) below+=("\`$_t\` (found $_found, floor $_floor)") ;;
+        wrong-impl) below+=("\`$_t\` (found $_found, requires $TOOL_FLOOR_IMPL)") ;;
+        uncomparable) below+=("\`$_t\` (unverified against floor $TOOL_FLOOR_MIN)") ;;
+    esac
+    tool_lines+="  - \`$_t\` — $ver$(render_floor "$_e" "$verdict")"$'\n'
 done
 absent_line="none"
 [[ ${#absent[@]} -gt 0 ]] && absent_line="$(printf '`%s` ' "${absent[@]}")"
+below_line="none"
+if [[ ${#below[@]} -gt 0 ]]; then
+    below_line="$(printf '%s; ' "${below[@]}")"
+    below_line="${below_line%; }"
+fi
 
 if [[ ! -f "$CONTEXT_KIT_ENV_PROFILE_FILE" ]]; then
     # spec: context-kit/SPEC.md §bin/env-probe — seed the gotchas scaffold once (outside the markers); every re-probe replaces only the block
@@ -93,6 +125,7 @@ new_body="$(
     printf -- '- **Package manager:** %s\n' "$pm"
     printf -- '- **Toolchain:**\n%s' "$tool_lines"
     printf -- '- **Absent:** %s\n' "$absent_line"
+    printf -- '- **Below contract:** %s\n' "$below_line"
 )"
 
 # spec: context-kit/SPEC.md §bin/env-probe — change-detection: rewrite the block only when the probed content differs from disk, comparing every line but the derived `Probed <date>` line, so an unchanged box writes nothing and the date stays a last-changed signal
