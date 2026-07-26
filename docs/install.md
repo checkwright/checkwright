@@ -27,14 +27,21 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` — every gate and both generated git hooks are Bash scripts; nothing in
-  the battery runs without it.
+- `bash` (≥ 4.0) — every gate and both generated git hooks are Bash scripts;
+  nothing in the battery runs without it. Three constructs force the floor:
+  associative arrays, `mapfile`, and the lowercasing case expansion, spread
+  across the gate libraries, the checks, and canon-kit's prose tooling.
 - `git` — the gates read tracked files and the hooks fire at commit time; the
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse
   their inputs with it.
-- `awk` — the gate family's line scanning and field extraction are written in
-  awk; most checks cannot run without it.
+- `awk` (GNU) — the gate family's line scanning and field extraction are written
+  in awk; most checks cannot run without it. GNU awk specifically: the 3-argument
+  `match()` in `check-gate-assertions` is a gawk extension.
+- `sort` (coreutils) — GNU coreutils is what the battery's file plumbing assumes,
+  and `sort` is the member that carries it: `realpath --relative-to` in the gate
+  library every check sources, plus `sort -V`, `date -d`, and `stat -c` in the
+  release, drift, and usage tooling. None of those flags is BSD-portable.
 - `shellcheck` — the `check-shellcheck` meta-gate lints every shipped script,
   and a lint finding blocks the commit.
 

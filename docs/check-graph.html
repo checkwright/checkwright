@@ -237,12 +237,12 @@ graph LR
     n50["context-kit/README.md"]
     n51["context-kit/SPEC.md"]
     n52["context-kit/bin/*.sh"]
-    n53["context-kit/bin/env-probe.sh"]
-    n54["context-kit/checks/*"]
-    n55["context-kit/checks/*.sh"]
-    n56["context-kit/gate-tests/*"]
-    n57["context-kit/gate-tests/*.test.sh"]
-    n58["context-kit/kpis/*.sh"]
+    n53["context-kit/checks/*"]
+    n54["context-kit/checks/*.sh"]
+    n55["context-kit/gate-tests/*"]
+    n56["context-kit/gate-tests/*.test.sh"]
+    n57["context-kit/kpis/*.sh"]
+    n58["context-kit/lib/toolfloor.sh"]
     n59["context-kit/smoke/*.sh"]
     n60["context-kit/smoke/install.sh"]
     n61["context-kit/smoke/violation.sh"]
@@ -415,7 +415,7 @@ graph LR
   n152 -->|"check-assertion-strength"| n229
   n152 -->|"check-assertion-strength"| n149
   n152 -->|"check-assertion-strength"| n41
-  n152 -->|"check-assertion-strength"| n57
+  n152 -->|"check-assertion-strength"| n56
   n152 -->|"check-assertion-strength"| n72
   n152 -->|"check-assertion-strength"| n104
   n152 -->|"check-assertion-strength"| n119
@@ -495,7 +495,7 @@ graph LR
   n93 -->|"check-docs-kit-parity"| n84
   n93 -->|"check-docs-kit-parity"| n148
   n93 -->|"check-docs-kit-parity"| n40
-  n93 -->|"check-docs-kit-parity"| n56
+  n93 -->|"check-docs-kit-parity"| n55
   n93 -->|"check-docs-kit-parity"| n71
   n93 -->|"check-docs-kit-parity"| n103
   n93 -->|"check-docs-kit-parity"| n118
@@ -560,7 +560,7 @@ graph LR
   n28 -->|"check-evidence-manifest"| n33
   n28 -->|"check-evidence-manifest"| n24
   n147 -->|"check-exec-bit"| n39
-  n147 -->|"check-exec-bit"| n55
+  n147 -->|"check-exec-bit"| n54
   n147 -->|"check-exec-bit"| n70
   n147 -->|"check-exec-bit"| n102
   n147 -->|"check-exec-bit"| n117
@@ -571,7 +571,7 @@ graph LR
   n147 -->|"check-exec-bit"| n225
   n147 -->|"check-exec-bit"| n150
   n147 -->|"check-exec-bit"| n42
-  n147 -->|"check-exec-bit"| n58
+  n147 -->|"check-exec-bit"| n57
   n147 -->|"check-exec-bit"| n73
   n147 -->|"check-exec-bit"| n105
   n147 -->|"check-exec-bit"| n120
@@ -705,10 +705,10 @@ graph LR
   n211 -->|"check-graph"| n10
   n212 -->|"check-hook-exec-bit"| n212
   n214 -->|"check-identity"| n214
-  n92 <-->|"check-install-toolchain"| n53
+  n92 <-->|"check-install-toolchain"| n58
   n211 -->|"check-kit-enum"| n147
   n211 -->|"check-kit-enum"| n39
-  n211 -->|"check-kit-enum"| n55
+  n211 -->|"check-kit-enum"| n54
   n211 -->|"check-kit-enum"| n70
   n211 -->|"check-kit-enum"| n102
   n211 -->|"check-kit-enum"| n117
@@ -729,7 +729,7 @@ graph LR
   n143 -->|"check-kit-ref-liveness"| n221
   n31 -->|"check-kit-registration"| n148
   n31 -->|"check-kit-registration"| n40
-  n31 -->|"check-kit-registration"| n56
+  n31 -->|"check-kit-registration"| n55
   n31 -->|"check-kit-registration"| n71
   n31 -->|"check-kit-registration"| n103
   n31 -->|"check-kit-registration"| n118
@@ -803,7 +803,7 @@ graph LR
   n143 <-->|"check-readme-roster"| n221
   n143 <-->|"check-readme-roster"| n146
   n143 <-->|"check-readme-roster"| n38
-  n143 <-->|"check-readme-roster"| n54
+  n143 <-->|"check-readme-roster"| n53
   n143 <-->|"check-readme-roster"| n69
   n143 <-->|"check-readme-roster"| n101
   n143 <-->|"check-readme-roster"| n116
@@ -813,7 +813,7 @@ graph LR
   n143 <-->|"check-readme-roster"| n195
   n143 <-->|"check-readme-roster"| n224
   n147 -->|"check-reads-couples"| n39
-  n147 -->|"check-reads-couples"| n55
+  n147 -->|"check-reads-couples"| n54
   n147 -->|"check-reads-couples"| n70
   n147 -->|"check-reads-couples"| n102
   n147 -->|"check-reads-couples"| n117
@@ -916,7 +916,7 @@ graph LR
   n33 -->|"check-task-names"| n33
   n11 <-->|"check-template-copy-parity"| n206
   n149 -->|"check-test-hermetic"| n41
-  n149 -->|"check-test-hermetic"| n57
+  n149 -->|"check-test-hermetic"| n56
   n149 -->|"check-test-hermetic"| n72
   n149 -->|"check-test-hermetic"| n104
   n149 -->|"check-test-hermetic"| n119

@@ -85,8 +85,14 @@ recoverable:
   names its own regen command on a red, so recovery is mechanical once the
   fan-out is known — knowing it in advance is the part nothing else states.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
-  section holds the toolchain list to env-probe's probe set:
-  `check-install-toolchain` asserts name-set parity between its
-  `<!-- toolchain:begin -->` bullets and `context-kit/bin/env-probe.sh`'s
-  `PROBE_SET` array both directions (names derivable, purpose clauses hand prose),
-  so a probe-set edit reds the docs list without an emitter handshake.
+  section holds the toolchain list to the probe roster:
+  `check-install-toolchain` asserts whole-element parity between its
+  `<!-- toolchain:begin -->` bullets and `context-kit/lib/toolfloor.sh`'s
+  `PROBE_SET` array both directions — name, version floor, and implementation
+  token, since each bullet's parenthetical renders its roster element verbatim
+  (`` - `bash` (≥ 4.0) — … ``, `` - `awk` (GNU) — … ``, both axes comma-joined,
+  no parenthetical for an unconstrained member). Elements are derivable, purpose
+  clauses hand prose, so a roster edit reds the docs list without an emitter
+  handshake. The gate greps the roster and never sources it: a fixture path is
+  untrusted input, so the reader that lints the array must not be made to execute
+  the file it reads.

@@ -267,7 +267,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'scripts/*.sh' 'gate-sdk/
     run_gate check-docs-cmd canon-kit/checks/check-docs-cmd.sh
 fi
 
-if staged_matches 'docs/install.md' 'context-kit/bin/env-probe.sh'; then
+if staged_matches 'docs/install.md' 'context-kit/lib/toolfloor.sh'; then
     run_gate check-install-toolchain scripts/check-install-toolchain.sh
 fi
 

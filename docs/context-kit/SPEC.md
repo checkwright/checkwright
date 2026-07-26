@@ -265,6 +265,16 @@ The constrained members and what forces each:
 - `awk::GNU` — no version floor, one implementation constraint: the 3-arg
   `match()` in `check-gate-assertions`, whose dependency gate-sdk/SPEC.md
   §check-gate-assertions already owns.
+- `sort::coreutils` — no version floor, one implementation constraint, and one
+  member standing for a whole package family: GNU coreutils is forced by
+  `realpath --relative-to` and its `-m` form (gate-sdk's shared gate library and
+  hook emitter, canon-kit's link and command resolvers), `sort -V`
+  (`check-release-bump`), `date -d` (drift-kit's KPIs and trajectory), and
+  `stat -c` (delegation-kit's usage verdict). None is BSD-portable, and the
+  first sits in the library every gate sources — so a box without it cannot run
+  the battery at all rather than failing one gate. The representative member is
+  the binary carrying a forcing construct, which is also the floor predicate's
+  own comparison tool.
 Every other member is a bare name — no construct in the battery forces a version
 on it (the `jq` usage is 1.5-era throughout), so none is pinned.
 

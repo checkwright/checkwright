@@ -1,4 +1,6 @@
-# Parity case: the marker-block tool names equal the fixture PROBE_SET exactly.
+# Parity case: every bullet's parenthetical renders its roster element verbatim —
+# a bare name, a floor, an implementation token, and both axes comma-joined. The
+# roster's `jq:` proves an empty trailing field parses as the unconstrained `jq`.
 # Two args steer the gate onto hermetic fixture copies of each surface.
 install.md
 probe.sh

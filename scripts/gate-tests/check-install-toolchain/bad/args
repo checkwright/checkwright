@@ -1,4 +1,6 @@
-# Divergence case: PROBE_SET carries `awk` but the marker block never lists it,
-# so the both-directions parity assertion must reject.
+# Floor-divergence case: the name sets agree exactly, so the pre-widening
+# name-set assertion passes this fixture — the page states `bash` unconstrained
+# while the roster pins `bash:4.0`, which is the drift class the whole-element
+# assertion exists to catch and the only reason this case rejects.
 install.md
 probe.sh

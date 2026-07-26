@@ -3,7 +3,7 @@
 
 # spec: context-kit/SPEC.md §bin/env-probe — the roster, `<name>[:<min-version>[:<impl-token>]]`; a member gains a floor only where a construct the battery runs forces one, and the SPEC records that construct beside the token
 # shellcheck disable=SC2034  # read by whoever sources this file (bin/env-probe.sh), never here
-PROBE_SET=(bash:4.0 git jq awk::GNU shellcheck)
+PROBE_SET=(bash:4.0 git jq awk::GNU sort::coreutils shellcheck)
 
 # spec: context-kit/SPEC.md §bin/env-probe — positional fields, an empty field meaning unconstrained on that axis exactly as an omitted trailing one does, so `awk`, `awk:` and `awk::` parse to one member
 tool_floor_parse() {   # $1 = roster element -> TOOL_FLOOR_NAME / _MIN / _IMPL
