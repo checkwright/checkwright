@@ -145,8 +145,8 @@ the skill on a blocking verdict — so they are not resident here.
   (context-kit's probed machine profile plus hand-authored gotchas — seed with
   `bash context-kit/bin/env-probe.sh`, context-kit/SPEC.md §bin/env-probe) are
   gitignored, local-only.
-- `reserve/` holds the crates.io/npm name-reservation placeholders — do not
-  develop in it.
+- `reserve/` holds the crates.io name-reservation placeholder — do not develop
+  in it (the npm name is the `installer/` package below).
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
   `SECURITY.md`, and `RELEASING.md` are governed repo-meta (tracked,
   core-files-pinned, in the spec manifest so their links/commands resolve like

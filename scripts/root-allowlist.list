@@ -36,7 +36,7 @@ demo
 # Published activation surface (the npm package; not a kit — it carries no checks/ or smoke/)
 installer
 
-# Name-reservation placeholders (not developed in)
+# crates.io name-reservation placeholder (not developed in; the npm name is installer/)
 reserve
 
 # The kits (this is a kit monorepo — each kit is a top-level root)

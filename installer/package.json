@@ -1,0 +1,23 @@
+{
+  "name": "checkwright",
+  "version": "0.0.0",
+  "description": "Vendors pinned Checkwright kit source into your repository and commits it — a coding-agent-assisted delivery methodology (gate SDK, evidence-stamped lifecycle, agent context economics).",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/checkwright/checkwright.git"
+  },
+  "homepage": "https://checkwright.dev",
+  "bin": {
+    "checkwright": "bin/checkwright.sh"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "payload/",
+    "README.md"
+  ],
+  "checkwright": {
+    "commit": ""
+  }
+}
