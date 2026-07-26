@@ -12,19 +12,6 @@
 
 ## New Features
 
-- **publish-spec-gate** [spec: SPEC-publish-spec-gate.md] — the enforcement half
-  of `publish-spec-disambiguation`: a consumer gate under `scripts/` asserting
-  that every `npm publish` spec in `.github/workflows/*.yml` is unambiguous, and
-  landing in the same commit as the fix (enforcement-first, CLAUDE.md §Delivery
-  doctrine). Predicate, the `publish`-alone reach ruling, the no-extraction scan
-  set, and the fixture contract:
-  [SPEC-publish-spec-gate.md](SPEC-publish-spec-gate.md).
-  **The one thing no reader may re-derive:** the trigger is the *leading
-  character*, not the slash — `.tmp/pubrepro/dist/x.tgz` carries three slashes
-  and publishes fine, so "contains no slash" and "starts with `./`" are both
-  wrong, and the `good/` fixture is built to red on either simplification.
-  Promoted 2026-07-26 by spec; filed 2026-07-26 by scope.
-
 - **workflow-run-block-lint** [spec: SPEC-action-run-shell.md] — no oracle lints
   workflow shell at all: `check-shellcheck`'s target list is each kit's
   `lib/`/`bin/`/`checks/`/`templates/` plus the consumer gates dir, so
@@ -65,54 +52,6 @@
   ruling during the `activation-path` publish batch.
 
 ## Technical Debt
-
-- **publish-spec-disambiguation** — `v0.16.0`'s tag fired `publish.yml`; `pack`
-  assembled and version-verified the tarball correctly, then the `npm` job died
-  at **exit 128** before contacting the registry. `publish.yml`'s publish step
-  passes `"$(ls dist/*.tgz)"`, which expands to `dist/checkwright-0.16.0.tgz` —
-  and npm resolved that as the GitHub shorthand `owner/repo`, shelling out to
-  `git ls-remote ssh://git@github.com/dist/checkwright-0.16.0.tgz.git`. Nothing
-  published; the registry still serves only the `0.0.1` reservation placeholder
-  (`npm view checkwright versions` → `["0.0.1"]`, re-verified this session).
-  **The trigger is the leading character, not the slash.** Reproduced twice
-  independently against a real packed tarball with `npm publish --dry-run`:
-  `dist/x.tgz` exits 128, while `./dist/x.tgz`, an absolute path, **and**
-  `.tmp/pubrepro/dist/x.tgz` (three slashes, leading dot) all exit 0. npm reads a
-  spec as a path when it starts with `.` or `/`, and as `owner/repo` otherwise —
-  so a bare filename also works, which is why this survived review.
-  **Deliverable — the operator saw and approved this shape; build implements it,
-  it is not re-derived:** replace the command substitution with a glob into an
-  array, refuse any count but one, and publish a `$PWD`-prefixed spec —
-
-  ```bash
-  tarballs=(dist/*.tgz)
-  if [ "${#tarballs[@]}" -ne 1 ]; then
-    echo "expected exactly one tarball, got ${#tarballs[@]}" >&2
-    exit 1
-  fi
-  # An npm spec containing a slash is read as a GitHub
-  # owner/repo shorthand unless it is unambiguously a path.
-  npm publish --provenance --access public "$PWD/${tarballs[0]}"
-  ```
-
-  The arity assertion is the shape `scripts/pack-installer.sh` already uses at
-  its own tarball step, and the comment is load-bearing: a future editor who
-  shortens the spec back to `dist/*.tgz` reintroduces this exact failure, and
-  the reason is not guessable from the code.
-  **Also in this unit — a public claim that is false, and one that stays false.**
-  `README.md:26` and `docs/install.md:117` say `npx checkwright init`; those
-  self-correct the moment this publish lands, since the unpinned spec resolves to
-  `latest`, and need no edit. But
-  `docs/posts/2026-07-26-checkwright-v0-16-0.md:87` says
-  `npx checkwright@0.16.0 init` — **permanently** false, because `0.16.0` will
-  never reach the registry. Operator-ruled: keep the shipped note's body intact
-  and add a **dated erratum**, placed *above* the install command rather than at
-  the foot, so a reader meets it before copying the broken line.
-  **Do not touch `publish.yml`'s job split or its `uses:` pins.** The split is
-  load-bearing per that file's own header — `pack` assembles and stamps once,
-  every channel is a sibling job that `needs: pack` — and all three action SHAs
-  are pinned and verified against upstream tags.
-  Filed 2026-07-26 by scope from the `v0.16.0` publish-run failure.
 
 ## Deferred
 
@@ -1959,5 +1898,8 @@
   `installer/lib/common/recipe.sh`; both converge here.
 
 ## Done
+
+- publish-spec-disambiguation
+- publish-spec-gate
 
 ## Lessons Learned

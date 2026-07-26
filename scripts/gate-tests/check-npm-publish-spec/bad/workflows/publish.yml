@@ -1,0 +1,21 @@
+name: publish-reject-cases
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: the shipped defect, verbatim
+        run: |
+          npm publish --provenance --access public "$(ls dist/*.tgz)"
+
+  bare-filename:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a bare filename resolves on runtime state, not on the literal
+        run: |
+          npm publish --access public checkwright-0.16.0.tgz

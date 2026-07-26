@@ -1,0 +1,3 @@
+# Reject case: the v0.16.0 line as released — a command substitution the gate
+# cannot evaluate, so the literal does not decide how npm resolves it.
+workflows

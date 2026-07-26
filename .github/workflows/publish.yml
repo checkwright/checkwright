@@ -90,4 +90,12 @@ jobs:
           # npm expands the variable when it reads the file, so the token itself
           # never lands on disk.
           printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > ~/.npmrc
-          npm publish --provenance --access public "$(ls dist/*.tgz)"
+
+          tarballs=(dist/*.tgz)
+          if [ "${#tarballs[@]}" -ne 1 ]; then
+            echo "expected exactly one tarball, got ${#tarballs[@]}" >&2
+            exit 1
+          fi
+          # An npm spec containing a slash is read as a GitHub
+          # owner/repo shorthand unless it is unambiguously a path.
+          npm publish --provenance --access public "$PWD/${tarballs[0]}"

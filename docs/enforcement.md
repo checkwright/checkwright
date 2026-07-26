@@ -91,6 +91,7 @@ leaves its section absent.
 | (consumer) | check-install-toolchain | precommit |
 | (consumer) | check-installer-no-deps | precommit |
 | (consumer) | check-release-bump | precommit |
+| (consumer) | check-npm-publish-spec | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-count | precommit |
 | [canon-kit](canon-kit/index.md) | check-tracking-claim | precommit |

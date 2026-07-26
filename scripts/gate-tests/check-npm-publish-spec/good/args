@@ -1,0 +1,3 @@
+# Accept case: every safe spelling npm resolves as a path, including the three
+# that a "contains no slash" or a "starts with ./" predicate would wrongly red.
+workflows

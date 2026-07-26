@@ -1,0 +1,1 @@
+NPM-PUBLISH-SPEC: clean (12 npm publish invocation(s) across 1 YAML file(s) under workflows, every positional spec unambiguous by its literal)

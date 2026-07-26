@@ -105,7 +105,8 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    fixed and the tag re-pushed, never worked around by publishing locally. The
    job's credential and approval are repository configuration rather than tree
    state, so a first run on an unconfigured repository fails loudly on the
-   missing token rather than publishing unattested.
+   missing token rather than publishing unattested. What the job may pass npm as
+   a package spec is §The publish spec below, held by `check-npm-publish-spec`.
 
 6. **Create the GitHub Release.** Its body points at the post's
    `https://checkwright.dev/` URL — the post is the note's single home, the
@@ -119,3 +120,54 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 7. **Verify the version badge.** Confirm the README release-version badge
    resolves the new tag. It is sourced from the GitHub tag list, so each release
    updates it with no edit — this step is a verification, not a write.
+
+## The publish spec
+
+The positional argument of an `npm publish` in a workflow must be unambiguously
+a path **by its own literal text**. `check-npm-publish-spec` holds this over
+`.github/workflows/`; the rule is npm's, and it is stated here because a spec
+that reads correctly to a human is the shape that already reached a released
+tag.
+
+npm resolves a positional package spec as a **path** when it begins with `.` or
+`/`, and as the GitHub shorthand **`owner/repo`** otherwise. The trigger is the
+leading character, **not the slash** — `dist/x.tgz` sends npm to
+`git ls-remote`, while `./dist/x.tgz`, an absolute path, and
+`.tmp/pubrepro/dist/x.tgz` (three slashes, leading dot) are all read as paths.
+So neither "contains no slash" nor "starts with `./`" is the rule, and a gate
+narrowed to either would red a spec that works — including the `$PWD`-prefixed
+form the workflow now carries.
+
+A spec is unambiguous when, with **one layer of surrounding shell quoting
+removed** (every real spec on this surface is quoted, so the strip comes first
+or the gate reads `"` as the leading character):
+
+- its first character is `.` or `/`; or
+- it begins with a bare (`$PWD/`) or braced (`${PWD}/`) expansion of a
+  proven-absolute root, immediately followed by `/`. The roster is exactly
+  `PWD`, `GITHUB_WORKSPACE`, and `RUNNER_TEMP`, each absolute by a written
+  contract — POSIX gives `PWD` as *an absolute pathname of the current working
+  directory*, and the Actions default-environment-variable table documents the
+  other two as runner-absolute. `HOME` is deliberately **not** on it: POSIX
+  gives it as *a pathname* of the user's home directory with no absoluteness
+  guarantee, and the Actions contract does not carry it at all. Re-proposing a
+  root takes a contract citation, never a runner observation.
+
+Everything else is refused, and two refusals look safe enough to name. A **bare
+filename** publishes today only because a file of that name happens to sit in
+the runner's cwd — a runtime property the literal does not express, which is why
+the gate's message states the ambiguity and never predicts a failure. A
+**command substitution** cannot be evaluated by any reader of the text, and is
+the exact shape that shipped in `v0.16.0`; assign it to a variable and publish
+through a prefixed expansion, which is what the `npm` job does.
+
+The rule reaches `npm publish` alone. Its positional argument is by definition a
+local package, so every one of them is path-intended; every other npm verb takes
+registry specs as its ordinary case (`npm install lodash` is a correct bare
+token), and applying this rule to them would red correct lines. Two reach limits
+are deliberate: the check is line-local, so an `npm publish` continued across a
+backslash is **refused loudly** rather than judged from a fragment; and shell
+scripts under the tree are out of reach, because a `.sh` file's spec is
+typically a variable whose absoluteness the text cannot prove — the workflow
+surface is where the spec is written as a literal, which is what makes it
+gateable there and nowhere else.

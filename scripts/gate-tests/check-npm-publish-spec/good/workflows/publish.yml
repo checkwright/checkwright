@@ -1,0 +1,78 @@
+name: publish-accept-cases
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+jobs:
+  bare-relative:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a leading dot with one slash
+        run: |
+          npm publish --provenance --access public ./dist/x.tgz
+
+  quoted-relative:
+    runs-on: ubuntu-latest
+    steps:
+      # The same spec double-quoted. A predicate reading the raw token sees `"`
+      # as the first character and reds this row — and since every real spec on
+      # this surface is quoted, that failure mode would be the ordinary case.
+      - name: the same spec, double-quoted
+        run: |
+          npm publish --provenance --access public "./dist/x.tgz"
+
+  three-slashes:
+    runs-on: ubuntu-latest
+    steps:
+      # Three slashes and a leading dot, verified to exit 0 against a real packed
+      # tarball. This one row disproves both wrong predicates at once: it is not
+      # slash-free, and it does not start with `./`.
+      - name: a deep relative path
+        run: |
+          npm publish --provenance --access public .tmp/pubrepro/dist/x.tgz
+
+  single-quoted:
+    runs-on: ubuntu-latest
+    steps:
+      - name: single quoting is stripped too
+        run: |
+          npm publish --provenance --access public './dist/x.tgz'
+
+  absolute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: an absolute literal
+        run: |
+          npm publish --provenance --access public /tmp/dist/x.tgz
+
+  proven-roots:
+    runs-on: ubuntu-latest
+    steps:
+      # The prescribed form: the quoting clause and the proven-absolute-root arm
+      # together, which is the composite the live workflow carries.
+      - name: the three proven-absolute roots, bare and braced
+        run: |
+          npm publish --provenance --access public "$PWD/${tarballs[0]}"
+          npm publish --access public ${PWD}/dist/x.tgz
+          npm publish --access public "$GITHUB_WORKSPACE/dist/x.tgz"
+          npm publish --access public "${GITHUB_WORKSPACE}/dist/x.tgz"
+          npm publish --access public "$RUNNER_TEMP/dist/x.tgz"
+          npm publish --access public "${RUNNER_TEMP}/dist/x.tgz"
+
+  no-positional:
+    runs-on: ubuntu-latest
+    steps:
+      # The arity-zero arm: `public` is the value of --access, not a spec.
+      - name: publish the cwd
+        run: |
+          npm publish --provenance --access public
+
+  commented:
+    runs-on: ubuntu-latest
+    steps:
+      - name: a commented-out example is not an invocation
+        run: |
+          # npm publish --provenance --access public dist/x.tgz
+          echo "nothing published here"

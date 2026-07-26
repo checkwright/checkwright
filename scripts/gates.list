@@ -66,6 +66,7 @@ check-docs-cmd
 check-install-toolchain
 check-installer-no-deps
 check-release-bump
+check-npm-publish-spec
 check-manifest-temporal
 check-manifest-count
 check-tracking-claim
