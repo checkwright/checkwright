@@ -8,3 +8,7 @@ GATE_SDK_GRAPH_ARTIFACT="docs/check-graph.html"
 # spec: gate-sdk/SPEC.md §check-graph — this repo's graph-theme chrome links the docs host and the source repo; sanction those prefixes for the external-ref assertion
 # shellcheck disable=SC2034  # read by gate-sdk/checks/check-graph.sh after sourcing
 GATE_SDK_GRAPH_EXTERNAL_REFS="https://checkwright.dev https://github.com/checkwright"
+
+# spec: gate-sdk/SPEC.md §check-shellcheck — this repo ships bash under no kit root: the installer's dispatcher and verbs, and the runnable adoption walkthrough; name them so the lint that governs every other script in the tree governs these too
+# shellcheck disable=SC2034  # read by gate-sdk/checks/check-shellcheck.sh after sourcing
+GATE_SDK_LINT_EXTRA_DIRS="installer/bin installer/lib demo"

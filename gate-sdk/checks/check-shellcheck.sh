@@ -4,6 +4,7 @@
 #
 # usage: check-shellcheck.sh [dir...]
 #   default dirs: consumer gates dir + each kit's lib/, bin/, checks/, templates/
+#                 + GATE_SDK_LINT_EXTRA_DIRS
 
 set -uo pipefail
 
@@ -18,6 +19,8 @@ else
     while IFS= read -r k; do
         DIRS+=("$k/lib" "$k/bin" "$k/checks" "$k/templates")
     done < <(gate_kit_roots)
+    # spec: gate-sdk/SPEC.md §check-shellcheck — the consumer-added set is appended to the derived default, never substituted for it: a consumer naming a shipped script that sits under no kit root can only widen coverage
+    for d in ${GATE_SDK_LINT_EXTRA_DIRS:-}; do DIRS+=("$d"); done
 fi
 
 if ! command -v shellcheck >/dev/null 2>&1; then

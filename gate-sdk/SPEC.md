@@ -87,9 +87,11 @@ commit-type roster — see §check-commit-subject), `GATE_SDK_EXEC_GLOBS`
 `<gates-dir>/check-*.sh` and `<gates-dir>/kpi-*.sh`; the path globs whose
 tracked `*.sh` members `check-exec-bit` holds to index mode `100755` — see
 there), `GATE_SDK_EXEC_PRUNE` (default `gate-tests fixtures templates smoke`;
-the path segments whose subtrees `check-exec-bit` exempts — see there), and
-`GATE_SDK_ENFORCE_SCAN_DIR` (default `.`; the enforcement map's
-monitor-marker scan root — see §enforcement-map). Paths are
+the path segments whose subtrees `check-exec-bit` exempts — see there), `GATE_SDK_ENFORCE_SCAN_DIR` (default `.`; the enforcement map's
+monitor-marker scan root — see §enforcement-map), and
+`GATE_SDK_LINT_EXTRA_DIRS` (default empty; space-separated directories whose
+direct `*.sh` members join `check-shellcheck`'s derived scan set — the seam for
+a shipped script that sits under no kit root — see §check-shellcheck). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
@@ -755,10 +757,19 @@ gate's exit status surfaces through this script's.
 
 ### check-shellcheck
 
-Invariant: every `*.sh` directly under the consumer gates dir and each
-vendored kit's `lib/`, `bin/`, `checks/`, and `templates/` passes ShellCheck at
-`-S warning` (the self-lint contract). A missing `shellcheck` binary is exit 2
-— a gate that cannot run is not clean.
+Invariant: every `*.sh` directly under the consumer gates dir, each
+vendored kit's `lib/`, `bin/`, `checks/`, and `templates/`, and each directory
+named in `GATE_SDK_LINT_EXTRA_DIRS` passes ShellCheck at `-S warning` (the
+self-lint contract). A missing `shellcheck` binary is exit 2 — a gate that
+cannot run is not clean.
+
+The knob **appends to** that derived set and never replaces it, so a consumer
+that sets nothing keeps the shipped coverage exactly and a consumer that sets it
+can only widen. It exists because the kit-root predicate (§lib/gate.sh) is what
+puts a directory in scope, so a shipped script under no kit root — a consumer's
+own tooling, a runnable walkthrough, an installer — is lintable but not linted
+until its directory is named. Positional arguments remain a full scope override
+(the hermetic fixture affordance), not an addition.
 
 ### check-gate-output
 
