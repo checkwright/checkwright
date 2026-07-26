@@ -77,6 +77,8 @@
       "Bash(bash evidence-kit/bin/run-validate.sh)",
       "Bash(bash evidence-kit/bin/run-validate.sh *)",
       "Bash(bash demo/run-demo.sh)",
+      "Bash(bash installer/consumer-smoke/run-smoke.sh)",
+      "Bash(bash installer/consumer-smoke/run-smoke.sh *)",
       "Bash(: > .workflow/prompt-friction.log)",
       "Bash(: > .workflow/knowledge-friction.log)",
       "Bash(rm .tmp/*)",

@@ -599,7 +599,14 @@ layout as defaults):
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
   `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh")` plus the gate-sdk lib and
-  runners (this repo's consumer config widens it to `*/checks/*.sh`).
+  runners. A consumer declaration **replaces** this default outright rather
+  than extending it — the loader guards it with `declare -p … ||`, so the
+  default is the no-declaration fallback, not a base to append to. A consumer
+  adding kit-shipped globs must therefore restate any default glob it still
+  wants covered (this repo's config names `*/checks/*.sh` **and**
+  `scripts/check-*.sh`, because it has gates in both places). Contrast
+  `DELEGATION_KIT_META_PATHS` below, whose kit-root union *is* additive — the
+  two knobs do not behave alike.
 - `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
   assertion A; default `("${GATE_SDK_GATES_DIR:-scripts}/"
   "${GATE_SDK_WORKFLOW_DIR:-.workflow}/" ".claude/")`; root-level `*.md` is

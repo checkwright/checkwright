@@ -9,10 +9,11 @@ DELEGATION_KIT_USAGE_HISTORY=".metric/usage-history.log"
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_REFRESH_CMD="bash delegation-kit/templates/usage-poller.sh"
 
-# comment-tier-exempt: `*` spans '/' in a bash [[ == ]] glob, so */checks/*.sh reaches every kit's gates
+# comment-tier-exempt: `*` spans '/' in a bash [[ == ]] glob, so */checks/*.sh reaches every kit's gates; this array REPLACES the kit default (delegation.sh guards it with `declare -p ... ||`), so the default's scripts/check-*.sh glob is restated here rather than inherited — the repo's consumer-resident gates would otherwise fall outside tamper coverage
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_GATE_FILES=(
     "*/checks/*.sh"
+    "scripts/check-*.sh"
     "gate-sdk/lib/gate.sh"
     "gate-sdk/bin/run-gate-tests.sh"
 )

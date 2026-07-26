@@ -58,3 +58,4 @@
 | permission-posture-reconciliation | sc sp a b v c | 1f/3d | 3 · ≤2d | 21s clean | 80 |
 | per-batch-tiering | sc sp · b v c | 2f/0d | 1 · ≤0d | 21s clean | 80 |
 | supply-chain-trust-baseline | sc sp a b v c | 2f/0d | 1 · ≤0d | 21s clean | 81 |
+| activation-path | sc sp a b v c | 13f/6d | 2 · ≤0d | 24s 1✗ | 82 |

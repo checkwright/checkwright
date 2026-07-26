@@ -139,6 +139,29 @@
   flagged; the named contract replaces the re-derivation it used to imply.
   The upgrade/uninstall story itself is `installer-lifecycle-verbs` below —
   sequence against it rather than duplicating it.
+  **Negative result — the tarball channel's economics do not transfer here.**
+  `release-tarball-delivery-channel` is cheap for a structural reason that is
+  absent from this rung: `.github/workflows/publish.yml`'s `pack` job already
+  assembles and stamps one tarball and uploads it as the run's artifact, so a
+  new channel is a sibling job that `needs: pack` and consumes that artifact.
+  A marketplace package cannot consume it. Its unit of delivery is the
+  harness's own plugin manifest format, not a packed npm assembly, and its
+  subject is the stage skills and guards rather than the eleven-kit tree — so
+  it shares neither the assembly nor the artifact. Recorded because the reflex
+  at promotion will be to cost this by analogy from the tarball's sibling-job
+  cheapness and arrive at the wrong number.
+  **Open question a promoting scope answers first — deliberately undecided
+  here.** Whether the marketplace package vendors kits at all, or merely
+  registers the skills and delegates all vendoring to the installer's `init`.
+  Under the second answer it stops being a distribution channel and becomes a
+  **discovery surface**, and `checkwright.lock` ceases to be a contract it must
+  *honour* and becomes one it must not *violate* — the materially cheaper
+  answer, and the one that dissolves most of the sequencing risk above. It is
+  not settled here because it is downstream of this entry's standing ruling
+  that the plugin substrate moves fast and the design must be made against the
+  live manifest format at promotion; deciding it now would be deciding it
+  against a format that will have moved. Recorded 2026-07-26 by close
+  (`activation-path`).
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
@@ -1647,6 +1670,14 @@
   every channel is a sibling job consuming it; a download arm in
   `installer/consumer-smoke/run-smoke.sh`; the quick-start reordering in
   [docs/install.md](docs/install.md); and a `RELEASING.md` asset step.
+  **The taxonomy — two transports over one install model.** npm and this
+  tarball are not two install models. They share `init`, they share
+  `checkwright.lock`, and they produce the same vendored result; only the fetch
+  differs, which is exactly why both can be sibling jobs over the one `pack`
+  assembly. `plugin-marketplace` is the channel that does **not** share that
+  assembly — different unit of delivery, different subject — so the sibling-job
+  cheapness costed above generalizes to this pair and stops there. Do not
+  extend it to that rung; its entry carries the matching negative result.
   **Why deferred rather than taken now:** it modifies the `activation-installer`
   amendment's landed design-bearing delivery ruling (§B1) and widens its phase-1
   envelope (§A1). lifecycle-kit/SPEC.md §check-stage-entry — ruled-but-unpromoted
@@ -1685,17 +1716,34 @@
   sequencing risk it flags is a second install model with **no upgrade or
   uninstall story**. This entry is that story. A marketplace design that lands
   first would either wait on these verbs or duplicate them.
-  **Cost while deferred — this is the honest one, and the retired entry never
-  stated it because phase 2 was in scope there.** A consumer who has vendored
-  has **no supported path to move versions or to back out**. `init`'s re-run
-  refuses a payload older than the recorded install as a silent downgrade, and
-  `--force` is the only affordance that rewrites anything — an override that
-  overwrites what `init` would otherwise protect, not an upgrade path. So today
-  the answer to "how do I move to the next release" is to re-run `init` and
-  trust `--force`, and the answer to "how do I remove this" is to delete files
-  by hand against the manifest. Non-rotting, and bounded by the manifest being
-  correct and complete meanwhile — the data an upgrade needs is being recorded
-  from day one, which is why deferring costs capability rather than fidelity.
+  **Cost while deferred — corrected 2026-07-26 against `installer/lib/init.sh`;
+  the prior text overstated it, claiming no upgrade path at all.** Verified
+  against the source, the deferred cost is three narrower things:
+  1. **`uninstall` is the one real capability gap.** Backing out means deleting
+     files by hand against the manifest. Mechanical, since `files` records every
+     path with its hash — but manual, with no verb.
+  2. **Discoverability, not capability, on upgrade.** Upgrade *is* supported
+     today and is spelled `npx checkwright@<newer> init`. `init.sh`'s re-run
+     refusal gates on a version difference, but `sort -V` narrows it to the
+     downgrade direction only (it dies solely when the *package* is the older
+     of the two); an upgrade falls straight through, the profile is re-read from
+     the lock, and `claim()` rewrites only files whose hashes still match the
+     manifest while reporting and preserving anything the adopter edited. So
+     `--force` is not the upgrade path and never needed to be. What it costs to
+     have no `update` verb is that nobody guesses `init` for an upgrade.
+  3. **The cross-version upgrade is implemented but not smoke-covered.**
+     `installer/consumer-smoke/run-smoke.sh` packs one `$VERSION` and asserts
+     the same-version re-run leaves the tree unchanged — idempotence, not a
+     version bump. The falls-through-and-re-applies path therefore has no
+     automated exercise; the first adopter moving off v0.16.0 runs it first.
+     Closing this is cheap and does not need the verbs: pack twice at two
+     stamped versions and assert the bump re-applies while preserving a
+     deliberately-edited file.
+  `--dry-run` already covers most of what a deferred `diff` would add: it
+  prints the file plan and the manifest that would be written. Non-rotting, and
+  bounded by the manifest being correct and complete meanwhile — the data an
+  upgrade needs is recorded from day one, which is why deferring costs
+  capability rather than fidelity.
   Filed 2026-07-26 by build on the lead's ruling at the `activation-installer`
   merge, from scope the amendment governed and its deletion would otherwise
   have dropped.
@@ -1773,9 +1821,87 @@
   Filed 2026-07-26 by validate (`activation-path`), from the full evidence
   battery run.
 
-## Done
+- **installer-upgrade-smoke-arm** [needs-spec] — `installer/consumer-smoke/run-smoke.sh`
+  packs a single `$VERSION` and asserts the same-version re-run leaves the tree
+  unchanged (idempotence). The **cross-version** upgrade path — `init.sh`'s
+  version check falling through in the upgrade direction, the profile re-read
+  from the lock, `claim()` re-applying while preserving adopter-edited files —
+  therefore ships in v0.16.0 with no automated exercise. It is implemented and
+  was read against the source, not run.
+  **Deliverable:** pack twice at two stamped versions in the scratch consumer;
+  assert the bump re-applies the recorded profile, leaves a deliberately-edited
+  file untouched, reports it as changed, and updates the lock's `version`.
+  Extends the suite that already exists rather than adding one.
+  **Scope note:** it asserts behavior installer/README.md §init and §The
+  manifest already specify — no contract question, just uncovered ground, so a
+  spec pass should be short.
+  **Cost while deferred:** the first adopter to move off v0.16.0 is the first
+  execution of that path. Carved out of `installer-lifecycle-verbs` because it
+  needs none of the verbs and is much cheaper than they are.
+  Filed 2026-07-26 by close (`activation-path`), correcting a false
+  no-upgrade-path premise against `installer/lib/init.sh`.
 
-- platform-support-contract
-- launch-activation-cli
+- **gate-file-coverage-closure** [needs-spec] — the missing check class behind a
+  hole this close fixed inline: nothing asserts that every gate script in the
+  tree is matched by some `DELEGATION_KIT_GATE_FILES` glob, so a gate can sit
+  outside `check-gate-tamper`'s assertion-A coverage silently. It did: this
+  repo's consumer config declares the array, which **replaces** the kit default
+  rather than extending it (`delegation.sh` guards it with `declare -p … ||`),
+  and the declaration named only `*/checks/*.sh` — leaving all nine
+  `scripts/check-*.sh` consumer-resident gates uncovered. Close restated the
+  default's glob in `scripts/delegation-config.sh` and corrected
+  delegation-kit/SPEC.md §Layout and configuration, which had described the
+  knob as *widening* the default — the inverse of the mechanism.
+  **The gate:** enumerate gate scripts (the `gates.list` registry resolved to
+  files), and red any whose path no `DELEGATION_KIT_GATE_FILES` glob matches.
+  Cheap and mechanically decidable — the coverage set and the glob set are both
+  already in hand at gate time. Needs a `gate-sdk` fixture pair and a home
+  (delegation-kit, since it reads that kit's knob).
+  **Why `[needs-spec]`:** it makes coverage-completeness a delegation-kit
+  contract, which is a SPEC assertion, not just a new script.
+  **Cost while deferred:** the config is correct today but unheld — the next
+  consumer-resident gate, or the next kit-glob edit, can reopen the identical
+  hole with nothing to catch it. Exactly the replace-vs-extend footgun the SPEC
+  now documents but does not enforce.
+  Filed 2026-07-26 by close (`activation-path`), generalizing the
+  knowledge-friction captures that surfaced the replace-vs-extend semantics.
+
+- **kit-owned-install-recipe** [needs-spec] — a kit's **zero-config gate
+  subset** (the gates it can register in a fresh consumer with no
+  adopter-authored surface) is encoded twice, and no surface owns it: once in
+  each kit's `smoke/install.sh` for its scratch consumer, and once in
+  `installer/lib/common/recipe.sh`'s per-kit case arm for a real adopter.
+  Verified on the tree at filing: 11 kits ship `smoke/install.sh`, 9 carry a
+  `checks/` roster, and `recipe.sh` restates those rosters as literal gate-name
+  lists. The installer's copy was not derived from any spec — it was produced
+  by reading eleven smoke installs and probing a scratch battery, because
+  naive registration of every `checks/check-*.sh` reds 29 of 74 gates.
+  **The exposure, stated precisely.** The consumer smoke catches a roster that
+  names a gate which fails to *resolve*. It cannot catch the live direction of
+  drift: a kit that **adds** a zero-config gate the installer never learns
+  about. That gate then ships to adopters unregistered and silent, and nothing
+  reds.
+  **Costed fix (carried from the gap bullet, unchanged).** Push a
+  `bin/install-<kit>.sh` down into each kit as the product form of its README
+  §Install; have `smoke/install.sh` delegate to it and the installer's `init`
+  call it; add a gate asserting every kit root ships one. Roughly nine new
+  scripts, eleven smoke rewrites, a `gate-sdk/SPEC.md` contract section, and a
+  gate with a fixture pair. This is the De-literalization and Derivation-first
+  fix in one: the roster stops being prose-and-literal in two places and
+  becomes a thing each kit owns and the installer calls.
+  **Why `[needs-spec]`:** it adds a kit-root structural predicate (every kit
+  ships an install entry point), which is a `gate-sdk/SPEC.md` contract change
+  across all eleven kits, not a script patch.
+  **Cost while deferred:** the two rosters drift open-loop — every kit that
+  gains a zero-config gate widens the gap silently, and the installer's copy is
+  re-derivable only by repeating the eleven-smoke read and the scratch probe
+  that produced it.
+  Filed 2026-07-26 by close (`activation-path`), draining the gap inbox; the
+  gap was ruled outside the `activation-installer` amendment's envelope as
+  cross-component across all eleven kits. The same finding was independently
+  captured as a knowledge-friction re-derivation against
+  `installer/lib/common/recipe.sh`; both converge here.
+
+## Done
 
 ## Lessons Learned
