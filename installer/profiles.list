@@ -29,6 +29,13 @@ starter	gate-sdk
 # evidence a stage must produce before it can close, the protocol it follows
 # when it spawns a sub-session, the context budget it runs inside, the
 # permission surface it acts through, and the delivery doctrine it follows.
+#
+# The honest consequence of the starting-subset rule, stated where the roster is
+# read rather than only on the install page: lifecycle-kit registers **no gate**
+# at install, because its gates read a stage attestation only a stage session can
+# write. So an adopter who picks this profile *for* lifecycle governance gets the
+# stage machinery vendored and nothing enforcing it until their first stage
+# stamp arms those gates. Vendored is not yet enforced.
 delegation	gate-sdk
 delegation	lifecycle-kit
 delegation	queue-kit
