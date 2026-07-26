@@ -4,4 +4,4 @@
 
 ---
 
-publish-spec-fix scope a2bd10df 2026-07-26
+release-path-hardening scope ae91cd5e 2026-07-26

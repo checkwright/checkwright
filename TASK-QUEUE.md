@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: publish-spec-fix
+## Iteration: release-path-hardening
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -21,29 +21,46 @@
   and npm resolved that as the GitHub shorthand `owner/repo`, shelling out to
   `git ls-remote ssh://git@github.com/dist/checkwright-0.16.0.tgz.git`. Nothing
   published; the registry still serves only the `0.0.1` reservation placeholder
-  (`npm view checkwright versions` → `["0.0.1"]`, verified this session).
-  **The trigger is the leading character, not the slash.** Reproduced against a
-  real packed tarball with `npm publish --dry-run`: `dist/x.tgz` exits 128,
-  while `./dist/x.tgz`, an absolute path, **and** `.tmp/pubrepro/dist/x.tgz`
-  (three slashes, leading dot) all exit 0. npm reads a spec as a path when it
-  starts with `.` or `/`, and as `owner/repo` otherwise — so a bare filename
-  also works, which is why this survived review.
-  **Deliverable:** publish via a `$PWD`-prefixed spec, asserting the glob
-  matched exactly one file rather than trusting it (the shape
-  `scripts/pack-installer.sh` already uses at its own tarball step), carrying a
-  comment stating why the path prefix is load-bearing — a future editor who
-  shortens it back to `dist/*.tgz` reintroduces this exact failure, and the
-  reason is not guessable from the code. Ships with the erratum + install-command
-  correction below.
+  (`npm view checkwright versions` → `["0.0.1"]`, re-verified this session).
+  **The trigger is the leading character, not the slash.** Reproduced twice
+  independently against a real packed tarball with `npm publish --dry-run`:
+  `dist/x.tgz` exits 128, while `./dist/x.tgz`, an absolute path, **and**
+  `.tmp/pubrepro/dist/x.tgz` (three slashes, leading dot) all exit 0. npm reads a
+  spec as a path when it starts with `.` or `/`, and as `owner/repo` otherwise —
+  so a bare filename also works, which is why this survived review.
+  **Deliverable — the operator saw and approved this shape; build implements it,
+  it is not re-derived:** replace the command substitution with a glob into an
+  array, refuse any count but one, and publish a `$PWD`-prefixed spec —
+
+  ```bash
+  tarballs=(dist/*.tgz)
+  if [ "${#tarballs[@]}" -ne 1 ]; then
+    echo "expected exactly one tarball, got ${#tarballs[@]}" >&2
+    exit 1
+  fi
+  # An npm spec containing a slash is read as a GitHub
+  # owner/repo shorthand unless it is unambiguously a path.
+  npm publish --provenance --access public "$PWD/${tarballs[0]}"
+  ```
+
+  The arity assertion is the shape `scripts/pack-installer.sh` already uses at
+  its own tarball step, and the comment is load-bearing: a future editor who
+  shortens the spec back to `dist/*.tgz` reintroduces this exact failure, and
+  the reason is not guessable from the code.
   **Also in this unit — a public claim that is false, and one that stays false.**
   `README.md:26` and `docs/install.md:117` say `npx checkwright init`; those
   self-correct the moment this publish lands, since the unpinned spec resolves to
-  `latest`. But `docs/posts/2026-07-26-checkwright-v0-16-0.md:87` says
+  `latest`, and need no edit. But
+  `docs/posts/2026-07-26-checkwright-v0-16-0.md:87` says
   `npx checkwright@0.16.0 init` — **permanently** false, because `0.16.0` will
   never reach the registry. Operator-ruled: keep the shipped note's body intact
-  and add an erratum, placed *above* the install command rather than at the foot,
-  so a reader meets it before copying the broken line. Filed 2026-07-26 by scope
-  from the `v0.16.0` publish-run failure.
+  and add a **dated erratum**, placed *above* the install command rather than at
+  the foot, so a reader meets it before copying the broken line.
+  **Do not touch `publish.yml`'s job split or its `uses:` pins.** The split is
+  load-bearing per that file's own header — `pack` assembles and stamps once,
+  every channel is a sibling job that `needs: pack` — and all three action SHAs
+  are pinned and verified against upstream tags.
+  Filed 2026-07-26 by scope from the `v0.16.0` publish-run failure.
 
 ## Deferred
 
@@ -58,10 +75,11 @@
   amendment and promotes this entry.
   **Predicate, ruled at scope because the reproduction settles it:** the spec must
   *start with* `/` or `./` — **not** "contains no slash", which the `.tmp/…` row
-  above disproves and which would red the safe `./dist/x.tgz` form. The `good/`
-  fixture must therefore contain a slash-bearing safe spelling, so that a future
-  author who "simplifies" the predicate to slash-detection turns the good fixture
-  red — the fixture doing real work rather than merely passing.
+  in `publish-spec-disambiguation` disproves and which would red the safe
+  `./dist/x.tgz` form. The `good/` fixture must therefore contain a
+  **slash-bearing safe spelling**, so that a future author who "simplifies" the
+  predicate to slash-detection turns the good fixture red — the fixture doing
+  real work rather than merely passing.
   **Open for the amendment:** how the spec is extracted from YAML without a
   parser, and whether the gate reaches `npm publish` alone or every path-taking
   npm verb. Filed 2026-07-26 by scope.
@@ -69,24 +87,34 @@
 - **workflow-run-block-lint** [needs-spec] — **no oracle executes or lints
   workflow shell at all.** `check-shellcheck` builds its target list as
   `targets+=("$d"/*.sh)` over kit `lib/`/`bin/`/`checks/`/`templates/` and the
-  consumer gates dir (verified against the current tree this session), so
+  consumer gates dir (re-verified against the current tree this session), so
   `.github/workflows/*.yml` is unreached by construction — the `run:` blocks are
   shell that nothing lints, shellchecks, or executes outside a tag push. The
   `v0.16.0` publish failure is this class's evidence: a careful by-eye review of
-  that exact line passed it, and the defect reached a released tag. `publish-spec-gate`
-  above catches **one** hazard shape; the class is the unlinted blocks themselves.
-  Present exposure: 5 `run: |` blocks across `gates.yml`, `publish.yml`,
-  `site-health.yml`.
+  that exact line passed it, and the defect reached a released tag.
+  `publish-spec-gate` above catches **one** hazard shape; the class is the
+  unlinted blocks themselves. Present exposure: 5 `run: |` blocks across
+  `gates.yml` (1), `publish.yml` (2), `site-health.yml` (2).
   **Deliverable:** extract each `run:` block and lint it under shellcheck at the
   gate family's `-S warning`.
-  **Why `[needs-spec]`:** extraction is the real work, and three sub-problems are
-  open. (1) `${{ … }}` GitHub expressions are not shell syntax and will misparse —
-  they need placeholder substitution whose token must not itself alter the parse.
+  **Open question — an operator ruling, not a coding decision. `/spec` surfaces
+  it, `/spec` does not settle it.** Extracting `run:` blocks from YAML honestly
+  may require a real YAML parser rather than regex over the file. That is a
+  supply-chain decision in a repo whose whole thesis is dependency-light gates
+  (CLAUDE.md §This repo is governed by its own kits; the `PROBE_SET` floor
+  deliberately carries no language runtime), and it is exactly the class of
+  ruling this queue records rather than re-argues. The honest options are: take
+  the dependency and say so in the requirements contract; accept a regex
+  extractor with a stated fidelity limit and a fixture proving where it gives
+  up; or narrow the gate to a hazard-pattern check that needs no extraction at
+  all — which is `publish-spec-gate`'s scope, and would leave this entry with
+  nothing of its own.
+  **Two further sub-problems, coding-level and `/spec`'s to settle:** (1)
+  `${{ … }}` GitHub expressions are not shell syntax and will misparse — they
+  need placeholder substitution whose token must not itself alter the parse.
   (2) The effective shell varies (`shell:` key, bash vs sh default, composite
   actions), and linting a block under the wrong dialect manufactures false
-  positives. (3) Block extraction from YAML without a parser dependency is the
-  same class of problem the kit refuses elsewhere — a real YAML dependency may be
-  the honest answer, which is a supply-chain ruling, not a coding one.
+  positives.
   **Cost while deferred:** moderate and slowly rotting — every new `run:` block
   widens unlinted surface, and the failure mode is a defect that reaches a tag
   push, where the feedback loop is a failed release rather than a red pre-commit.
@@ -1756,12 +1784,17 @@
   assembly — different unit of delivery, different subject — so the sibling-job
   cheapness costed above generalizes to this pair and stops there. Do not
   extend it to that rung; its entry carries the matching negative result.
-  **Why deferred rather than taken now:** it modifies the `activation-installer`
-  amendment's landed design-bearing delivery ruling (§B1) and widens its phase-1
-  envelope (§A1). lifecycle-kit/SPEC.md §check-stage-entry — ruled-but-unpromoted
-  work files as Deferred `[needs-spec]` for a later scope's promotion.
-  **Cost while deferred:** the install page ships one iteration naming `npx` as
-  its quick start, so the first announcement's front door needs Node.
+  **Why it was deferred, and why that reason is now discharged:** it modifies the
+  `activation-installer` amendment's landed design-bearing delivery ruling (§B1)
+  and widens its phase-1 envelope (§A1), so lifecycle-kit/SPEC.md
+  §check-stage-entry filed it as Deferred `[needs-spec]` awaiting a later scope's
+  promotion. That scope has run: the `release-path-hardening` survey bounded this
+  entry into the iteration's unit set, on the economics that the sibling-job work
+  lands in the same `publish.yml` the `publish-spec-disambiguation` fix already
+  opens. It stays `[needs-spec]` — the amendment update is real and the split
+  roster gives it to `/spec`, which authors it and promotes this entry.
+  **Cost while it stays deferred:** the install page ships one iteration naming
+  `npx` as its quick start, so the first announcement's front door needs Node.
   Non-rotting, and bounded by the added-job structure the publish workflow
   already carries.
   Filed 2026-07-26 on the operator's ruling during the `activation-path`
