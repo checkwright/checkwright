@@ -42,6 +42,30 @@ battery does assert, with its version floors, is on the install page.
 - `payload/` — the vendored kit source, assembled at pack time from the
   repository's own kit roots. It exists in the published tarball only, never in
   the source tree, so no second copy of any kit is checked in.
+- `profiles.list` — the profile rosters (below).
+
+## Profiles
+
+You pick how much of the methodology to meet first. The progression is
+`starter`, then `delegation`, then `full`, and it is a containment chain rather
+than three unrelated menus: moving up a profile only ever adds, so nothing you
+already vendored is taken away or rearranged underneath you.
+
+- **`starter`** is the framework — the gate SDK on its own. You get a battery,
+  a generated pre-commit hook, and gates that already red on real defects in
+  your own tree without any configuration outside your gates directory.
+- **`delegation`** adds every kit whose subject is the agent session itself:
+  the stage machine a session runs, the queue it selects work from, the
+  evidence a stage produces before it can close, the protocol it follows when
+  it spawns, the context budget it runs inside, the permission surface it acts
+  through, and the delivery doctrine it follows.
+- **`full`** is everything in the payload.
+
+`starter` and `delegation` are rosters in `profiles.list`, because neither
+follows from the tree — each is a judgment about what an adopter should meet
+first, and the file records the criterion behind each membership beside it.
+`full` is derived instead: it is every kit root the payload carries, resolved
+at run time, never a list to maintain.
 
 ## The manifest
 

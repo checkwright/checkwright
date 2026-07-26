@@ -1,0 +1,46 @@
+# Progressive install profiles — installer/README.md §Profiles. One
+# `<profile><TAB><kit>` membership per line; `#` comments and blanks ignored.
+#
+# `full` has no rows here on purpose: it is every kit root in the payload,
+# derived at run time. A hand-maintained "all the kits" roster is drift the day
+# a kit lands.
+#
+# The rows below are the two rosters that are not derivable, each a judgment
+# recorded with the criterion that produced it. The invariant over all three —
+# starter is contained in delegation is contained in full, every named kit
+# resolves in the payload, and no fourth profile — is asserted by the consumer
+# smoke, which runs `init` per profile against a packed tarball.
+
+# starter — the smallest set that reaches a green battery with a working
+# generated hook and at least one gate that reds on a real consumer defect
+# needing no configuration outside the gates directory. gate-sdk is forced in:
+# without it there is no runner, no hook generator, and no registry for a gate
+# name to resolve against. It also already satisfies the last clause several
+# times over, through gates that read the adopter's own tree rather than the
+# vendored source — a tracked script missing its exec bit, a mutable action ref
+# in their workflows, a malformed commit subject, a broken shell script under
+# their gates directory. So any second kit would make the set larger than the
+# criterion asks for, and the first experience is the framework, not a reading
+# list.
+starter	gate-sdk
+
+# delegation — starter plus every kit whose subject is the agent session
+# itself: the stage machine a session runs, the queue it selects work from, the
+# evidence a stage must produce before it can close, the protocol it follows
+# when it spawns a sub-session, the context budget it runs inside, the
+# permission surface it acts through, and the delivery doctrine it follows.
+delegation	gate-sdk
+delegation	lifecycle-kit
+delegation	queue-kit
+delegation	evidence-kit
+delegation	delegation-kit
+delegation	context-kit
+delegation	guard-kit
+delegation	doctrine-kit
+
+# What `full` adds on top of delegation is the set whose subject is something
+# other than a session: canon-kit governs authored documents, drift-kit reports
+# trends advisorily and registers no gates, site-kit governs a deployed docs
+# site. canon-kit is the one that reads oddly at a glance and is deliberate —
+# its subject is spec discipline over what a session produces, not how the
+# session runs.
