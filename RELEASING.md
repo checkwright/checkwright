@@ -87,14 +87,27 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 
 4. **Tag the iteration's final commit.** Tag `vX.Y.Z` on the iteration's final
    commit and push it — `git tag -a vX.Y.Z` on the commit, then push the tag to
-   the origin. The closing session runs steps 4-6 itself when it holds the
+   the origin. The closing session runs steps 4-7 itself when it holds the
    credentials (the default — an authenticated `gh` login carrying `repo` scope
    and a working `git push`, confirmed with `gh auth status`); only a genuinely
    keyless sandbox defers these to the operator, whose push mechanics live in
    the local ops runbook, outside the tree. Stamp `<iteration> release vX.Y.Z —
    <basis>` into the disposition evidence.
 
-5. **Create the GitHub Release.** Its body points at the post's
+5. **Watch the publish workflow.** Pushing the tag is what publishes the
+   installer package: `.github/workflows/publish.yml` fires on the tag alone,
+   assembles the package with `scripts/pack-installer.sh`, and runs
+   `npm publish --provenance` from the runner. Nothing is published by hand, and
+   **there is no version to edit** — the pack script stamps the version from the
+   tag being packed and the job refuses a tarball whose stamp disagrees with it
+   (docs/install.md §Versioning owns the one-semver-line rule this derives from).
+   Watch the run to green (`gh run watch`) before continuing; a red publish is
+   fixed and the tag re-pushed, never worked around by publishing locally. The
+   job's credential and approval are repository configuration rather than tree
+   state, so a first run on an unconfigured repository fails loudly on the
+   missing token rather than publishing unattested.
+
+6. **Create the GitHub Release.** Its body points at the post's
    `https://checkwright.dev/` URL — the post is the note's single home, the
    Release a pointer to it, never a second copy of the note. Write the post URL
    **without a trailing slash** (`…/posts/<slug>`, not `…/posts/<slug>/`): the
@@ -103,6 +116,6 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    reach, so this verification is the only thing standing between a typo and a
    dead link in a permanent artifact.
 
-6. **Verify the version badge.** Confirm the README release-version badge
+7. **Verify the version badge.** Confirm the README release-version badge
    resolves the new tag. It is sourced from the GitHub tag list, so each release
    updates it with no edit — this step is a verification, not a write.

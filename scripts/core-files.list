@@ -29,6 +29,9 @@ gate-sdk/templates/gates-workflow.yml
 # Live-site monitoring (not a gate): the scheduled deployment probe.
 .github/workflows/site-health.yml
 
+# The installer package's publish channel (RELEASING.md §The procedure step 5).
+.github/workflows/publish.yml
+
 # Gate registry + graph rule content + the checked pre-commit/graph projections.
 scripts/gates.list
 scripts/gate-sdk-config.sh

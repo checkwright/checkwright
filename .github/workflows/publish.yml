@@ -1,0 +1,93 @@
+# The installer package's publish channel. A version tag is the only trigger and
+# the only version input, so nothing publishes from a laptop and no file carries a
+# version to edit — the first publish rides an operator-authorized release under
+# RELEASING.md §The procedure.
+#
+# The job split is load-bearing, not tidiness: `pack` assembles and stamps the
+# tarball once and uploads it as the run's artifact, and every delivery channel is
+# a sibling job that `needs: pack` and consumes that one artifact. Add a channel as
+# a job; never weld a second publish into an existing one, which would give two
+# channels two assemblies to disagree about.
+#
+# Every `uses:` ref is a full 40-hex SHA — check-action-pinning walks this file.
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+# Read-only by default; each job widens only what it needs.
+permissions: {}
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: assemble the package from the tagged tree
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+
+          # The pack step refuses a dirty worktree, so its scratch and its output
+          # both live outside the checkout.
+          out="$RUNNER_TEMP/dist"
+          mkdir -p "$out"
+          INSTALLER_PACK_TMP_DIR="$RUNNER_TEMP" \
+            bash scripts/pack-installer.sh --version "$version" --out "$out"
+
+          # The tag is the whole of the version derivation, so prove the packed
+          # artifact carries it rather than trusting that the stamp ran.
+          tarball="$(ls "$out"/*.tgz)"
+          packed="$(tar -xzOf "$tarball" package/package.json | jq -r '.version')"
+          if [ "$packed" != "$version" ]; then
+            echo "packed version '$packed' is not the tag's '$version'" >&2
+            exit 1
+          fi
+          echo "packed $(basename "$tarball") at version $packed"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: installer-package
+          path: ${{ runner.temp }}/dist/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  npm:
+    needs: pack
+    runs-on: ubuntu-latest
+    # The environment is where the operator attaches approval to the publish;
+    # its name and required secret are desired state in the ops runbook.
+    environment: npm-publish
+    permissions:
+      contents: read
+      # npm mints its provenance attestation through GitHub's OIDC issuer; without
+      # this the publish still lands but carries no attestation, which is the whole
+      # of what this channel adds over a hand-uploaded tarball.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-package
+          path: dist
+
+      - name: publish to npm with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "NPM_TOKEN is unset on this repository — the publish credential is" >&2
+            echo "repository configuration, carried as desired state in the ops runbook." >&2
+            exit 1
+          fi
+          # npm expands the variable when it reads the file, so the token itself
+          # never lands on disk.
+          printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}\n' > ~/.npmrc
+          npm publish --provenance --access public "$(ls dist/*.tgz)"
