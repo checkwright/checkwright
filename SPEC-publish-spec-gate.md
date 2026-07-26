@@ -51,22 +51,52 @@ So the predicate is **not** "contains no slash", and it is **not** "starts with
 under gate-sdk/SPEC.md §When a gate earns its place, and the second one reds the
 very `$PWD`-prefixed form the paired debt entry prescribes.
 
+The predicate applies to the token **with one layer of surrounding shell quoting
+removed** — `"…"` or `'…'`. This is not a detail: every real spec on this
+surface is quoted, including the shipped defect (`"$(ls dist/*.tgz)"`) and the
+prescribed fix (`"$PWD/${tarballs[0]}"`). A predicate that reads the raw token
+sees `"` as the first character and reds `"./dist/x.tgz"`, a safe form — the
+common case, not a corner. Strip first, then decide.
+
 A positional spec is **unambiguous** when one of these holds:
 
 1. its first character is `.` or `/` — npm's own path rule, verbatim; or
 2. it begins with an expansion of a **proven-absolute root** immediately
-   followed by `/` — the roster is `PWD`, `HOME`, `GITHUB_WORKSPACE`,
-   `RUNNER_TEMP`, in bare (`$PWD/`) or braced (`${PWD}/`) form. Each is
-   guaranteed absolute by POSIX or by the GitHub Actions runner contract, so
-   accepting them is a proof and not a concession.
+   followed by `/`, in bare (`$PWD/`) or braced (`${PWD}/`) form. The roster is
+   exactly three: `PWD`, `GITHUB_WORKSPACE`, `RUNNER_TEMP`.
+
+   Each of the three is absolute **by a written contract**, which is what
+   entitles arm 2 to call itself a proof: POSIX gives `PWD` as "an absolute
+   pathname of the current working directory", and the GitHub Actions
+   default-environment-variable table documents `GITHUB_WORKSPACE` and
+   `RUNNER_TEMP` as runner-absolute paths. **`HOME` was proposed for this roster
+   and is excluded on the evidence**: POSIX defines it as "a pathname of the
+   user's home directory" with no absoluteness guarantee, and it is not in the
+   Actions default-variable contract at all — so it is absolute in practice and
+   unproven on paper. Admitting it would apply a looser evidentiary standard
+   than the bare-filename ruling two paragraphs below rejects, inside the same
+   section. It also has no use site on this surface. Re-proposing it needs a
+   contract citation, not a runner observation.
 
 Everything else reds, and the two cases worth naming because they look safe are:
 
 - **A bare filename** (`x.tgz`, no slash). It happens to work today, which is
   why the defect survived review — but only because a file of that name exists
   in the runner's cwd at that moment. npm's resolution there depends on a
-  runtime property no gate can see, so the line is lucky rather than correct and
-  reddening it is not a false positive. The fix is two characters.
+  runtime property no gate can see, so the line is lucky rather than correct.
+
+  Reddening a *working* line is the one place this gate brushes the
+  low-false-positive contract in gate-sdk/SPEC.md §When a gate earns its place,
+  so the reasoning is recorded rather than assumed. It clears the bar on three
+  counts: the gate's invariant is **unambiguity**, not breakage, and the bare
+  filename genuinely is ambiguous, so the red is a true statement about the
+  property being checked; unambiguity is a real drift axis rather than the
+  trivially-true proxy that section bars; and the false-positive *friction* the
+  section weighs is two characters, with a fix that is always available and
+  always correct. What would break the contract is a **failure message that
+  overclaims** — text asserting the line will fail is false today, and the
+  maintainer who tests it and finds it working learns to distrust the gate.
+  `A5` binds the message accordingly.
 - **Any command substitution** (`"$(ls dist/*.tgz)"`). The gate cannot evaluate
   it, and this is the exact shape that shipped in `v0.16.0`.
 
@@ -123,6 +153,12 @@ model. The gate takes a positional scan-root argument, the form
 reaches a synthetic tree. A tree with no `npm publish` line exits clean with a
 zero count.
 
+**The failure text states the ambiguity, never a predicted failure** (`A1`). It
+names the spec, says its resolution depends on runtime state rather than on the
+literal, and gives the unambiguous form — because for the bare-filename arm a
+"this will fail" message is factually wrong, and a gate that is wrong in its own
+message is the false positive `A1` argues the red is not.
+
 ### B. The fixture pair, which must do real work
 
 **B1. `good/` carries a slash-bearing safe spelling. {design-bearing}** This is
@@ -130,12 +166,18 @@ the fixture's whole point and the reason `A1` is spelled out above. The `good/`
 tree contains, at minimum:
 
 - `./dist/x.tgz` — safe, slash-bearing, and the form a "no slash" predicate reds;
+- `"./dist/x.tgz"` — the **same spec double-quoted**, which is what pins `A1`'s
+  quote-stripping clause. A predicate that reads the raw token sees `"` and reds
+  this row, and since every real spec on this surface is quoted, that failure
+  mode would ship as the gate's ordinary behaviour rather than as an edge case;
 - `.tmp/pubrepro/dist/x.tgz` — **three slashes and a leading `.`**, verified to
   exit 0. This one row disproves *both* wrong predicates at once: it is not
   slash-free, and it does not start with `./`. A future author who "simplifies"
   the predicate to either shape turns the good fixture red;
 - `"$PWD/${tarballs[0]}"` — the prescribed form from the paired debt entry, so
-  the gate that guards the fix cannot red the fix;
+  the gate that guards the fix cannot red the fix. It exercises the quoting
+  clause and arm 2 together, which is the exact composite the live workflow will
+  carry;
 - `npm publish --provenance --access public` with no positional — the arity-zero
   arm that proves `A4` does not mistake `public` for a spec.
 
@@ -234,6 +276,9 @@ session from editing a claim that is about to become true.
       safe spellings from `B1` are present, and narrowing the predicate to
       slash-detection or to a `./` prefix reds `good/`. Verified by running the
       suite against a deliberately-narrowed predicate before shipping the real one.
+- [ ] **The quoting clause is pinned by the fixture** — `good/` carries a
+      double-quoted safe spec, and dropping `A1`'s quote-stripping step reds it.
+      Verified by making that removal before shipping.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).

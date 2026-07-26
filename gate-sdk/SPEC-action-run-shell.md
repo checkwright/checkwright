@@ -53,11 +53,15 @@ the ShellCheck findings are observations, not projections.
 
 **A1. gate-sdk mechanism, not a consumer gate. {design-bearing}** It ships in
 `gate-sdk/checks/`. The reasoning is `check-action-pinning`'s, continued, and it
-turns on one fact: **`gate-sdk/templates/gates-workflow.yml` carries a `run: |`
-block of its own** — the copy-out every consumer vendors. A consumer gate under
-`scripts/` could reach that file in *this* tree while leaving it unlinted for
-everyone downstream, which is the same "fix the instance, ship the drift source"
-shape `check-action-pinning` rejected. Second, a `run:` block is shell in
+turns on one fact: **two kits ship a workflow template carrying `run:` shell** —
+`gate-sdk/templates/gates-workflow.yml` (one block) and
+`site-kit/templates/site-health.yml` (two), the copy-outs consumers vendor. A
+consumer gate under `scripts/` could reach both in *this* tree while leaving them
+unlinted for everyone downstream, which is the same "fix the instance, ship the
+drift source" shape `check-action-pinning` rejected. That the second template
+belongs to a *different kit* is what makes the argument decisive rather than
+convenient: no consumer gate and no site-kit-local gate covers both, and a
+whole-tree kit gate covers them without a roster. Second, a `run:` block is shell in
 anybody's workflow — unlike an `npm publish` spec, which is this repo's product
 knowledge and stays a consumer gate (`SPEC-publish-spec-gate.md` §A). Third, the
 "GitHub Actions is not universal" objection is a *reach* question, and gate-sdk
@@ -84,11 +88,17 @@ whole-tree run, and both `.github/workflows/` and the shipped template are
 covered with no roster to drift. Exactly `check-action-pinning`'s scan set, and
 the same positional `[scan-root]` argument reaches a synthetic tree.
 
-Measured on the current tree: **six** literal block scalars —
-`gates.yml` (1), `publish.yml` (2), `site-health.yml` (2), and
-`gate-sdk/templates/gates-workflow.yml` (1). The queue entry counted five; it
-surveyed `.github/workflows/` only and did not reach the shipped template, which
-`A1` makes the load-bearing one.
+Measured on the current tree at the audit stage: **eight** literal block
+scalars. `.github/workflows/` carries five (`gates.yml` 1, `publish.yml` 2,
+`site-health.yml` 2); the vendored copy-out templates carry three
+(`gate-sdk/templates/gates-workflow.yml` 1, `site-kit/templates/site-health.yml`
+2). Two earlier counts were low and each for the same reason — the queue entry's
+five surveyed `.github/workflows/` only, and the authoring count of six reached
+gate-sdk's template but not site-kit's. **The number is measurement, never
+contract**: the sibling `release-tarball-delivery-channel` unit adds a ninth
+block to `publish.yml` this same iteration, so gate-sdk/SPEC.md carries the
+derivation (`gate_find` over tracked YAML, prune set shared) and never a count
+that a later commit falsifies.
 
 **B3. The extractor. {design-bearing}** One awk pass per file, keyed on
 block-scalar indentation. Four rules, each of which a prototype proved necessary
@@ -152,15 +162,17 @@ step's effective shell from its `shell:` sibling key rather than assuming one:
 family's level, matching `check-shellcheck`, so one threshold governs all
 ShellCheck lint in the tree.
 
-Measured: all six in-tree blocks are **clean at `-S warning` today**, so the
-gate lands greenfield — it proves the boundary rather than clearing a backlog.
-At `-S style` four findings appear, and one of them is an artifact of extraction
-rather than a property of the code: **SC1091** ("not following: … was not
-specified as input") fires on the two blocks that `source gate-sdk/lib/gate.sh`,
-because an extracted fragment has no resolvable source root. It sits at `info`,
-below the threshold, so it does not bite — but a future author lowering the
-threshold inherits a false positive the gate created. Recorded so that decision
-is made knowingly.
+Measured: all **eight** in-tree blocks (`B2`) are **clean at `-S warning`
+today**, so the gate lands greenfield — it proves the boundary rather than
+clearing a backlog. At `-S style` five findings appear, and **two** of them are
+an artifact of extraction rather than a property of the code: **SC1091** ("not
+following: … was not specified as input") fires on each of the two blocks that
+`source gate-sdk/lib/gate.sh`, because an extracted fragment has no resolvable
+source root. Both sit at `info`, below the threshold, so they do not bite — but
+a future author lowering the threshold inherits false positives the gate
+created. The remaining three are SC2016, a property of the workflows' own
+single-quoted `printf` formats rather than of extraction. Recorded so that
+decision is made knowingly.
 
 **B7. The extractor stays inline. {mechanical}** It lives in the check script,
 not in `gate-sdk/lib/`. A `lib/` helper earns its place at a second consumer and
@@ -225,8 +237,11 @@ since an author reaches for `|-` by habit.
   why no in-tree `run:` body contains a `${{ }}` at all.
 - **What this gate would not have caught.** Measured, and stated plainly because
   the entry sits beside the incident that motivated it: the `v0.16.0`
-  `"$(ls dist/*.tgz)"` line is **clean at `-S warning`**. `check-npm-publish-spec`
-  is the gate that catches that defect; this one closes the *class* of unlinted
+  `"$(ls dist/*.tgz)"` line is **clean at `-S warning`** — and, re-measured at
+  the audit stage, clean at `-S style` too, so lowering `B6`'s threshold would
+  not recover it either. The defect is npm's spec-resolution grammar, which
+  ShellCheck has no theory of at any severity. `check-npm-publish-spec` is the
+  gate that catches that defect; this one closes the *class* of unlinted
   blocks around it. Neither subsumes the other, and reading this gate as the
   incident's fix would be a false comfort.
 
@@ -313,12 +328,13 @@ one registry row, one README roster row, and one fixture pair.
   `B5`'s dialect table, `B6`'s severity and the SC1091 extraction artifact, and
   §C's fidelity limit in both classes. The limit belongs in the canonical spec,
   not only here: this amendment is deleted at merge and the boundary must outlive
-  it.
-- **gate-sdk/SPEC.md §check-shellcheck** — one sentence naming its sibling, so
-  the reader who asks "does anything lint my workflows?" is answered at the
-  section whose target list makes the answer *no*. Today that section states the
-  target derivation and stops.
-- **gate-sdk/README.md** — the roster row for the new gate.
+  it. It carries `B2`'s **derivation and not `B2`'s count** — the block tally is
+  a measurement this iteration's own sibling unit changes.
+- **gate-sdk/SPEC.md §check-shellcheck** — owned by `B8`: one sentence naming
+  its sibling, so the reader who asks "does anything lint my workflows?" is
+  answered at the section whose target list makes the answer *no*. Today that
+  section states the target derivation and stops.
+- **gate-sdk/README.md** — the roster row for the new gate, per `B8`.
 - **`.github/workflows/publish.yml`** — no edit is owed by *this* unit, but its
   two blocks come under lint; the `release-tarball-delivery-channel` unit adds a
   third block in the same iteration and it must land clean under this gate.

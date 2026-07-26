@@ -146,7 +146,7 @@ the body points at the post's `https://checkwright.dev/` URL, **without a
 trailing slash**, and opening the link once is a named verification, because the
 body lives on the host and out of the battery's reach.
 
-**C2. `docs/install.md`. {design-bearing}** Three edits, and the second is the
+**C2. `docs/install.md`. {design-bearing}** Four edits, and the second is the
 one that carries the design.
 
 - **§Quick start is reordered**: the tarball flow first, as four commands
@@ -166,6 +166,14 @@ one that carries the design.
   payload is downloadable as a Release asset, which strengthens rather than
   weakens the doctrine — a downloaded, checksummed, extracted tarball you read
   before running is the *most* auditable form of the same one-shot vendoring.
+- **§Vendoring the kits' claim to be the Node-free path is corrected.** It says
+  of manual vendoring "it is the path that needs no Node" — true when there was
+  one installer path and false the moment there are two. The audit found this
+  surface; the three edits above do not reach it, and the DoD's
+  no-unqualified-Node-claim item is not satisfied without it. The section keeps
+  its real subject: manual vendoring stays the **audit story**, the account of
+  what lands in your tree. It simply stops claiming the Node-free property as
+  its own, since the tarball path now has it too.
 
 **C3. `installer/README.md`. {mechanical}** §Requirements carries the landed §B1
 corollary in its narrow form ("The installer path needs Node, for `npx`") and is
@@ -186,6 +194,16 @@ only do that by not using Node:
   the smoke instead of passing silently on a machine that happens to have Node;
 - assert the same post-conditions the npm arm asserts — green battery, manifest
   agrees with the tree, idempotent re-run, `doctor` clean.
+
+**Scope: one profile, not the per-profile loop.** The npm arm drives `init` once
+per profile because what it proves — the payload resolves and every profile's
+kit set is present — is profile-dependent. What *this* arm proves is
+transport-independent: the same payload reached the tree without Node. Re-running
+it per profile would re-assert the npm arm's property at triple the smoke's cost
+and prove the Node-free claim no harder. It runs against **`full`**, the profile
+whose payload is largest and whose `doctor` sources the widest toolchain roster,
+so a Node dependency latent in any kit's path is reachable. Stated here because
+it is a cost decision, and an unstated one gets re-made at build.
 
 The masking is the whole value of the arm. Without it the two arms differ only
 in how the bytes arrived, and the claim the channel exists to make would be
@@ -239,6 +257,16 @@ move them.
   `PATH`: that is the point at which "needs no Node" stops being a sentence and
   becomes an assertion.
 
+  **Verified at the audit stage rather than assumed**, because "the payload
+  already works without Node" is the hypothesis this whole unit rests on:
+  `installer/bin/checkwright.sh` takes its package root from `BASH_SOURCE`
+  through the symlink chain, not from any npm-supplied variable, and no
+  `npm_*`, `node`, or `npx` reference exists anywhere under `installer/bin/` or
+  `installer/lib/`. `installer/package.json`'s `files` array carries `bin/`, so
+  the entry point is inside the packed tarball. `C4`'s arm therefore lands as an
+  assertion of a property the tree already has — not as a discovery that the
+  entry point needs reworking first.
+
 - **No new manifest field.** `checkwright.lock`'s six fields are written by
   `init`, which is transport-agnostic; the channel is upstream of it. This is the
   landed §A1 binding rule discharged by construction — there is no field whose
@@ -255,13 +283,17 @@ move them.
   the three `uses:` SHA pins are untouched.
 - **`RELEASING.md` §The procedure** — steps 5 and 6 per `C1`.
 - **`docs/install.md`** — the opening two-registry distinction, §Requirements'
-  path-requirement paragraph, and §Quick start, per `C2`.
+  path-requirement paragraph, §Quick start, and §Vendoring the kits' Node-free
+  claim, per `C2`.
 - **`installer/README.md` §Requirements** — per `C3`; §Implementation unchanged.
 - **`installer/consumer-smoke/run-smoke.sh`** — the download arm, `C4`. It is the
   evidence-kit `installer_smoke` validate suite, so the arm is re-run at every
   validate stage rather than only at release.
-- **`installer/README.md` §The consumer smoke** — the arm roster this section
-  describes gains the download arm, so the prose and the script agree.
+- **`installer/README.md` §The consumer smoke** — owned by `C4`: the arm roster
+  this section describes gains the download arm, so the prose and the script
+  agree. Its "the offline tarball install is the load-bearing one" paragraph
+  gains the second load-bearing arm rather than being displaced by it — the two
+  assert different properties (no registry resolution; no Node).
 - **`docs/footprint.md`, `docs/value.md`** — generated projections, regenerated
   through their owning commands per `D1`.
 - **This repo's release note for the shipping version** — a Behavior-changes

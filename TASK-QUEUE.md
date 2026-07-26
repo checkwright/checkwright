@@ -30,10 +30,13 @@
   `lib/`/`bin/`/`checks/`/`templates/` plus the consumer gates dir, so
   `.github/workflows/*.yml` is unreached by construction. The `v0.16.0` publish
   failure is the class's evidence — a careful by-eye review of that exact line
-  passed it, and the defect reached a released tag. Six literal `run:` blocks are
-  in scope; the earlier count of five surveyed `.github/workflows/` only and
-  missed `gate-sdk/templates/gates-workflow.yml`, the copy-out every consumer
-  vendors and the reason the gate is kit mechanism rather than a consumer gate.
+  passed it, and the defect reached a released tag. Eight literal `run:` blocks
+  are in scope at the audit-stage count; two earlier counts were low because
+  each stopped at a surface — five reached `.github/workflows/` only, six added
+  `gate-sdk/templates/gates-workflow.yml` but not `site-kit/templates/site-health.yml`.
+  **Two kits ship a workflow template carrying `run:` shell**, which is why the
+  gate is kit mechanism rather than a consumer gate: no consumer gate covers
+  another kit's copy-out for a downstream vendor.
   **The YAML-extraction question is ruled** (operator, 2026-07-26): an awk
   extractor with a stated fidelity limit, no parser, `PROBE_SET` unchanged.
   Design, the measured limit, and the fixtures that pin it:
