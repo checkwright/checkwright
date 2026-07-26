@@ -87,55 +87,6 @@
   non-rotting otherwise. Surfaced 2026-07-23 in an external
   product/positioning review (operator-commissioned; artifact local-only).
 
-- **platform-support-contract** [spec: SPEC-toolchain-floor.md] — make
-  portability a tested contract instead of a layered explanation: a support
-  matrix (Linux / macOS / Windows-WSL, exact tool floors) with a CI
-  install-smoke leg per supported platform or an explicit experimental label;
-  resolve the standing contradiction — docs/install.md declares no minimum
-  versions are pinned while gate-sdk/README.md requires bash 4+ and GNU
-  userland, neither of which stock macOS ships; the first support table
-  distinguishes engine portability from full harness experience. The `doctor`
-  probe belongs to `launch-activation-cli`; the CI legs belong to
-  `platform-support-ci-matrix` (scoped out below); this entry owns the floor
-  contract.
-  **Scoped down to the floor half 2026-07-26 by the `activation-path` scope
-  survey (operator ruling).** This entry is now the **floor contract only** and
-  is a member of the `activation-path` unit set, to be paired by `/spec`. The
-  CI per-platform install-smoke legs are deferred back as their own costed
-  entry, `platform-support-ci-matrix` — no macOS/WSL adopter exists yet to
-  justify the runner spend. Do not rebuild the legs here.
-  **The floor surface already exists and is already gated — this is one missing
-  axis, not a new roster.** `scripts/check-install-toolchain.sh` holds
-  bidirectional name-set parity between `docs/install.md`'s Requirements
-  toolchain block (delimited by its `toolchain:begin`/`toolchain:end`
-  markers) and
-  `context-kit/bin/env-probe.sh`'s `PROBE_SET=(bash git jq awk shellcheck)`.
-  That roster carries **names only**: there is no version-floor axis anywhere in
-  it. So "exact tool floors" is an axis added to a roster the battery already
-  holds in parity, and the natural deliverable shape is that axis plus the
-  parity assertion extended to cover it — not a second roster beside the first.
-  Verified this session.
-  **Paired 2026-07-26 by `/spec`; the amendment carries the rulings.**
-  `SPEC-toolchain-floor.md` moves the roster to a sourceable owner
-  (`context-kit/lib/toolfloor.sh`, forced by `doctor`'s cross-unit read), makes
-  the floor per-member and justified rather than universal, and adds one roster
-  member (`sort`, for the GNU coreutils dependency `realpath --relative-to` /
-  `sort -V` / `date -d` / `stat -c` force and nothing probes today).
-  **Audited 2026-07-26 by `/align`**, which added the `realpath --relative-to`
-  citation (in `gate-sdk/lib/gate.sh`, the library every gate sources — the
-  strongest of the four), closed the `gate-sdk/README.md` findutils question
-  against the tree (unbacked; the claim is dropped, no roster member owed), and
-  fixed two amendment defects: an update target naming no owning delta, and a
-  page-rendering grammar whose worked example would have redded the parity gate
-  the same delta widens.
-  **Cost while deferred:** the install.md / gate-sdk floor contradiction is
-  live public doc drift today — re-verified 2026-07-26: `docs/install.md:43`
-  states "No minimum versions are pinned here" while `gate-sdk/README.md:116`
-  requires "bash 4+, git, GNU coreutils/findutils, GNU awk", on a page whose
-  line 20 declares macOS a supported platform though stock macOS ships bash 3.2
-  and BSD userland.
-  Surfaced 2026-07-23 in the same external review (its portability finding).
-
 ## Technical Debt
 
 ## Deferred
@@ -1644,13 +1595,15 @@
   matrix, so this is new runner spend on macOS and WSL images — and **no macOS
   or WSL adopter exists** to attest the spend. Demand-gated on exactly that,
   like the other adoption rungs.
-  **The un-defer trigger, carried so the reason is not re-derived:** the
-  contradiction that motivates the legs is live and verified 2026-07-26 —
-  `docs/install.md:20` declares macOS a supported platform, while
-  `gate-sdk/README.md:116` requires bash 4+ and GNU coreutils/findutils/awk,
-  and **stock macOS ships bash 3.2 and BSD userland**. The floor contract can
-  only *state* that gap; nothing proves whether the battery actually runs on a
-  stock macOS box until a leg runs there. So this entry un-defers on the first
+  **The un-defer trigger, carried so the reason is not re-derived:** the gap
+  that motivates the legs is now *stated* rather than contradicted —
+  `platform-support-contract` landed the floor contract, so `docs/install.md`
+  §Requirements says outright that stock macOS ships bash 3.2 and a BSD
+  userland and that a GNU toolchain is an adopter action there. That statement
+  is the whole of what the floor contract can do; nothing proves whether the
+  battery actually runs on a Mac so prepared until a leg runs there, and the
+  page's macOS support claim rests on reasoning until one does. So this entry
+  un-defers on the first
   of: a macOS or WSL adopter appearing, or the support matrix wanting to promote
   a platform from experimental to supported.
   **Cost while deferred:** the support matrix's non-Linux rows rest on
@@ -1663,6 +1616,46 @@
   Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set
   escalation, split from `platform-support-contract`.
 
+- **gate-tamper-consumer-gate-coverage** [needs-spec] — this repo's gates
+  are outside `check-gate-tamper` entirely, and the override that did it looks
+  like an oversight rather than a decision. `delegation-kit/lib/delegation.sh`
+  defaults `DELEGATION_KIT_GATE_FILES` to `<gates-dir>/check-*.sh` plus the
+  runner and library under that dir, and the declaration is
+  `declare -p … || <default>` — a consumer array **replaces** it rather than
+  extending it. `scripts/delegation-config.sh` declares
+  `("*/checks/*.sh" "gate-sdk/lib/gate.sh" "gate-sdk/bin/run-gate-tests.sh")`,
+  which reaches every kit-shipped gate and drops `scripts/check-*.sh`, the very
+  case the default existed for. The globs were almost certainly meant to be
+  additive: the comment above them explains the `*/checks/*.sh` reach and says
+  nothing about giving anything up.
+  **Deliverable:** restore the dropped glob —
+  `("*/checks/*.sh" "scripts/check-*.sh" "gate-sdk/lib/gate.sh" "gate-sdk/bin/run-gate-tests.sh")`
+  — with a fixture arm proving that a `scripts/` gate edit co-staged with
+  product code is blocked, which no existing arm covers. Check the same
+  replace-not-extend hazard on `DELEGATION_KIT_META_PATHS` while there; that one
+  re-declares every default it overrides, so it is correct today by hand rather
+  than by mechanism. One doc correction rides along: delegation-kit/SPEC.md's
+  knob roster says this repo's config *widens* `GATE_FILES` — what a reader
+  would assume, and the opposite of what the mechanism does. The SPEC should
+  state the replace-not-extend semantics where it states the default.
+  **Why deferred rather than fixed in the batch that found it:** the cost is not
+  the one-line array. Widening coverage may red-line commit shapes this repo's
+  own history relies on — a consumer gate landing beside the product change it
+  gates is exactly the shape the assertion rejects — so the fix needs a survey
+  of recent gate-touching commits before it lands, and a survey is not a
+  build-batch side errand. Scope-gated intake.
+  **Cost while deferred:** the assertion this repo advertises does not hold
+  where it matters most. An agent can co-stage a weakening of
+  `scripts/check-install-toolchain.sh` — or any consumer gate — with the product
+  change that gate would have caught, and the tamper gate stays silent; the
+  kit's own default covers precisely that case. Non-rotting, but the exposure is
+  permanent until the glob returns.
+  Filed 2026-07-26 by build, on the lead's ruling during the
+  `platform-support-contract` floor batch, from a probe of `check-gate-tamper`'s
+  resolved runtime config.
+
 ## Done
+
+- platform-support-contract
 
 ## Lessons Learned
