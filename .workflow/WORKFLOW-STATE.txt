@@ -9,3 +9,4 @@ release-path-hardening spec aeb7a028 2026-07-26
 release-path-hardening align ae96ba4e 2026-07-26
 release-path-hardening build a3486d68 2026-07-26
 release-path-hardening validate ad56fa5f 2026-07-26
+release-path-hardening close ae4efc48 2026-07-26
