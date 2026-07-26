@@ -1720,27 +1720,56 @@
   now-clean tree passed all three profiles (starter/delegation/full) cleanly
   — matching the lead's independently reported clean run. The suite itself
   is sound; the codified spine's own write order is what breaks it.
-  **Deliverable:** a fix that lets a clean-tree-requiring suite coexist with
-  the spine's incremental manifest write. Candidates: reorder
-  `installer_smoke` (and any future clean-tree suite) first in
-  `EVIDENCE_KIT_SUITES`, or have `run-validate.sh` batch its manifest writes
-  to scratch and fold them into the tracked file only after every suite has
-  run, rather than upserting the tracked file suite-by-suite.
-  **Why `[needs-spec]`:** the two candidates trade off differently.
-  Reordering is a one-line config change but re-breaks silently the moment a
-  second clean-tree-requiring suite lands anywhere but first. Deferring the
-  write to end-of-run changes the writer contract `evidence-row-upsert-order`
-  already covers ("a re-run supersedes this iteration's prior line for the
-  suite, then appends") — an `evidence-kit/SPEC.md` ruling, not a script
-  patch, and the two entries likely converge on one fix.
-  **Cost while deferred:** high hit-rate, low latent risk. Every full
-  `bash evidence-kit/bin/run-validate.sh` run reds this one suite until
-  fixed, but the suite is proven sound in isolation, so no real installer
-  regression is masked; a session must know to re-run it standalone (or
-  trust an isolated confirmation, as this one did) rather than read the
-  full-battery red as a defect in the installer itself. Held constant against
-  this slug in `.workflow/validate-baseline.txt` so future runs classify it
-  correctly rather than as new.
+  **Interim mitigation landed this session:** `installer_smoke` was reordered
+  strictly first in `EVIDENCE_KIT_SUITES` (ahead of `gates`), with a
+  load-bearing comment in `scripts/evidence-config.sh` explaining why the
+  position matters. Verified before landing: grepped every configured
+  suite's run command for a `git status`/porcelain precondition —
+  `installer_smoke` (via `scripts/pack-installer.sh`) is the *only* one that
+  requires this repo's own tree be clean; this session's own prior run is
+  corroborating evidence, since the other 21 suites passed on a
+  progressively dirtied tree. Also confirmed no gate, evidence-kit contract,
+  or parser assumption pins `gates` (or anything else) to roster position 1
+  — it was only `scripts/evidence-config.sh`'s own hand-chosen first entry.
+  A **baseline hold was tried and reverted the same session.** Holding
+  `installer_smoke installer_smoke fail <slug>` constant in
+  `.workflow/validate-baseline.txt` was the first disposition attempted; it
+  was wrong and has been dropped. `installer_smoke` carries no
+  `EVIDENCE_KIT_PARSER_installer_smoke`, so it falls to the default
+  `exit-code` parser, whose entire parsed result is one row. Any nonzero
+  exit — a dirty tree, a broken profile, a pack failure, a genuine `init`
+  regression — produces the identical row, and a held-constant baseline
+  entry classifies all of them `clean` alike. The hold did not preserve a
+  known red; it blinded the suite to every other failure mode. That is why
+  holding it constant is not a viable disposition on its own, and why the
+  reorder — imperfect as an interim step — is the mitigation that landed
+  instead: it lets the suite's real result stand rather than papering over
+  it.
+  **Deliverable — the durable fix, not yet built.** The reorder is
+  positional and fragile: it re-breaks silently the moment a second
+  clean-tree-requiring suite lands anywhere but first, and nothing asserts
+  the ordering, so the failure mode is silent regression, not a red. The
+  durable fix is one of: (a) have `run-validate.sh` batch its manifest
+  writes to scratch and fold them into the tracked file only after every
+  suite has run, removing the write-order dependency entirely, or (b) an
+  assertion (a gate, or a `run-validate.sh` precondition) that reds when a
+  clean-tree-requiring suite is not first — a scanner for "requires a clean
+  tree" would need each suite to declare that need rather than inferring it
+  from grepping its script, which is itself an open design question.
+  **Why `[needs-spec]`:** candidate (a) changes the writer contract
+  `evidence-row-upsert-order` already covers ("a re-run supersedes this
+  iteration's prior line for the suite, then appends") — an
+  `evidence-kit/SPEC.md` ruling, not a script patch, and the two entries
+  likely converge on one fix. Candidate (b) needs a declaration mechanism
+  this repo doesn't have yet (no suite currently states its own
+  preconditions in a machine-readable way).
+  **Cost while deferred — corrected.** The reorder closes the deterministic
+  every-run red. What remains open is the silent-regression exposure: a
+  second clean-tree-requiring suite landing anywhere but first would
+  reintroduce the identical collision with no gate to catch it, discoverable
+  only by a session noticing the red and re-deriving this same diagnosis.
+  Debt: converges `run-validate.sh`'s writer onto an order-independent
+  mechanism, or adds a declared-precondition gate; no governed name yet.
   Filed 2026-07-26 by validate (`activation-path`), from the full evidence
   battery run.
 

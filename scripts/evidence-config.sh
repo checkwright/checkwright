@@ -2,14 +2,17 @@
 # spec: evidence-kit/SPEC.md §Layout and configuration — this repo's evidence-kit consumer config
 # shellcheck disable=SC2034  # every knob below is consumed by evidence-kit/lib/evidence.sh after sourcing
 
+# TODO(task: installer-smoke-manifest-write-collision) installer_smoke must stay
+# position 1 (ahead of gates) — interim mitigation for its clean-tree
+# requirement colliding with run-validate's incremental manifest write.
+EVIDENCE_KIT_SUITES=(installer_smoke gates)
 # spec: gate-sdk/SPEC.md §lib/gate.sh — derive the per-kit fixture suites from the gate-tests dirs on disk (gate_fixture_suites, in scope via evidence-kit → gate-sdk), so a new kit's fixtures enrol with no edit here; the suites below the loop have no gate-tests dir and stay hand-listed.
-EVIDENCE_KIT_SUITES=(gates)
 while IFS=$'\t' read -r _suite _tests _checks; do
     EVIDENCE_KIT_SUITES+=("$_suite")
     declare "EVIDENCE_KIT_RUN_$_suite=bash gate-sdk/bin/run-gate-tests.sh $_tests${_checks:+ $_checks}"
 done < <(gate_fixture_suites)
 unset _suite _tests _checks
-EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests demo installer_smoke consumer_smoke upgrade agents_md_smoke index_tests)
+EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests demo consumer_smoke upgrade agents_md_smoke index_tests)
 
 EVIDENCE_KIT_PARSER=exit-code
 
