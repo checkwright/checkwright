@@ -186,6 +186,23 @@ for kit in "${KITS[@]}"; do
     )
 done
 
+# spec: installer/README.md §What init seeds — a guarded seed is written once and kept thereafter, so a re-run must re-claim it: dropping it from the manifest would disown a file init created, and an uninstall that reads this roster would then leave it behind
+under_kit() {   # $1 = repo-relative path -> 0 iff it lies inside one of this profile's kit directories
+    local k
+    for k in "${KITS[@]}"; do [[ "$1" == "$k/"* ]] && return 0; done
+    return 1
+}
+if [[ -n "$PRIOR_FILES" ]]; then
+    while IFS=$'\t' read -r p h; do
+        [[ -n "$p" ]] || continue
+        under_kit "$p" && continue
+        printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$p" && continue
+        [[ -f "$ROOT/$p" ]] || continue
+        [[ "$(lock_hash "$ROOT/$p")" == "$h" ]] || continue
+        record "$p"
+    done <<<"$PRIOR_FILES"
+fi
+
 # spec: installer/README.md §init — the generated projections are produced by the vendored tools themselves, never restated by the installer: the hook generator and the graph emitter are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes
 GENERATED=("$GATES_DIR/git-hooks/pre-commit" ".workflow/CHECK-GRAPH.html")
 if (( ! DRY )); then
