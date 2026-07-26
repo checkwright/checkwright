@@ -36,21 +36,6 @@
   `-S warning`; `publish-spec-gate` catches it and this closes the class around
   it. Promoted 2026-07-26 by spec; filed 2026-07-26 by scope.
 
-- **release-tarball-delivery-channel** [spec: SPEC-release-tarball-delivery-channel.md]
-  — add a GitHub Release tarball as the **primary** delivery channel, npm/npx
-  retained as **secondary**. An operator ruling: nothing in the gate battery
-  needs Node, so requiring it solely to deliver a bash payload asks the adopter
-  for a dependency the contract does not assert. Cheap by construction —
-  `.github/workflows/publish.yml`'s `pack` job already assembles and stamps one
-  tarball and uploads it as the run's artifact, so this is a sibling job that
-  `needs: pack`. Shape, the checksum's honest limit, the runbook and install-page
-  edits, and the Node-masked smoke arm:
-  [SPEC-release-tarball-delivery-channel.md](SPEC-release-tarball-delivery-channel.md).
-  **Cross-component:** the amendment changes `installer/`, `docs/`,
-  `.github/workflows/`, and `RELEASING.md`, so the audit stage fires this
-  iteration. Promoted 2026-07-26 by spec; filed 2026-07-26 on the operator's
-  ruling during the `activation-path` publish batch.
-
 ## Technical Debt
 
 ## Deferred
@@ -1901,5 +1886,6 @@
 
 - publish-spec-disambiguation
 - publish-spec-gate
+- release-tarball-delivery-channel
 
 ## Lessons Learned

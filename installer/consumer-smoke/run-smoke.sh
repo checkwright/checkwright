@@ -16,7 +16,7 @@ say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
-for tool in npm node jq git; do
+for tool in npm node jq git tar sha256sum; do
     command -v "$tool" >/dev/null 2>&1 || blocked "$tool not found on PATH — the smoke cannot run."
 done
 [[ -z "$(git -C "$REPO" status --porcelain)" ]] \
@@ -91,15 +91,15 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     printf '%s' "$c"
 }
 
-for profile in "${PROFILES[@]}"; do
-    printf '%s\n' "$profile"
-    C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
+# spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
+assert_install() {   # $1 = profile, $2 = scratch consumer dir
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked path want got
 
-    out="$( cd "$C" && "$CW" init --profile "$profile" 2>&1 )" \
+    out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
     say "init: $(grep -m1 '^INIT:' <<<"$out")"
 
-    out="$( cd "$C" && bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
+    out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
     if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
         printf '%s\n' "$out"
         fail "the battery is not green on the $profile consumer init just made"
@@ -131,18 +131,60 @@ for profile in "${PROFILES[@]}"; do
 
     # spec: installer/README.md §init — idempotence is a property of the tree, so the assertion is on the tree object and not on what the re-run printed
     before="$(git -C "$C" rev-parse 'HEAD^{tree}')"
-    out="$( cd "$C" && "$CW" init 2>&1 )" \
+    out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "$profile: the idempotent re-run of init failed"; }
     after="$(git -C "$C" rev-parse 'HEAD^{tree}')"
     [[ "$before" == "$after" ]] || fail "$profile: re-running init changed the tree — the install is not idempotent"
     [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "$profile: the re-run left the worktree dirty"
     say "re-run: tree unchanged"
 
-    out="$( cd "$C" && "$CW" doctor 2>&1 )"; rc=$?
+    out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
     [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$profile: doctor exited $rc inside the installed consumer"; }
     grep -q "^  profile      $profile\$" <<<"$out" || fail "$profile: doctor did not report the installed profile"
     say "doctor: clean, reports the installed profile"
+}
+
+ENTRY=("$CW")
+RUN_PATH="$PATH"
+for profile in "${PROFILES[@]}"; do
+    printf '%s\n' "$profile"
+    C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
+    assert_install "$profile" "$C"
 done
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball, no registry access)\n' "${#PROFILES[@]}"
+# spec: installer/README.md §The consumer smoke — the download transport, asserted rather than documented: verify the digest, extract with tar rather than npm, and drive the same post-conditions with node/npm masked, so a latent Node dependency reds here instead of passing on a host that happens to carry Node
+printf 'download arm (%s, node/npm masked)\n' "$PROFILE_DERIVED"
+DL="$SCRATCH/download"
+mkdir -p "$DL"
+cp "$TARBALL" "$DL/"
+DL_NAME="$(basename "$TARBALL")"
+( cd "$DL" && sha256sum "$DL_NAME" > "$DL_NAME.sha256" && sha256sum -c --status "$DL_NAME.sha256" ) \
+    || fail "the packed tarball does not verify against its own sha256 digest — the checksum step the install page documents would not work"
+( cd "$DL" && tar -xzf "$DL_NAME" ) || fail "tar could not extract the packed tarball"
+DL_ENTRY="$DL/package/bin/checkwright.sh"
+[[ -f "$DL_ENTRY" ]] || fail "the extracted tarball carries no package/bin/checkwright.sh — the Node-free entry point is not in the payload"
+say "verified $DL_NAME against its digest and extracted package/ with tar"
+
+# spec: installer/README.md §The consumer smoke — the mask is the whole value of this arm: a shim that reds and names itself turns a latent Node reach into a loud failure rather than a silent pass, and shims are what keeps the mask portable — dropping every PATH entry that carries node would take /usr/bin with it on the hosts where node lives there
+MASK="$SCRATCH/mask"
+mkdir -p "$MASK"
+for masked in node npm npx; do
+    printf '#!/usr/bin/env bash\necho "download arm: %s was reached — the tarball path is not Node-free" >&2\nexit 127\n' \
+        "$masked" > "$MASK/$masked"
+    chmod +x "$MASK/$masked"
+done
+
+ENTRY=(bash "$DL_ENTRY")
+RUN_PATH="$MASK:$PATH"
+# spec: installer/README.md §The consumer smoke — the mask is proved rather than assumed: an arm whose PATH silently failed to shadow the real interpreter would assert nothing while passing
+for masked in node npm npx; do
+    resolved="$( PATH="$RUN_PATH" bash -c "command -v $masked" 2>/dev/null )"
+    [[ "$resolved" == "$MASK/$masked" ]] \
+        || fail "the mask did not take: $masked resolves to '${resolved:-nothing}', not the shim at $MASK/$masked"
+done
+say "mask: node, npm and npx resolve to failing shims"
+C="$(consumer "download")" || fail "could not build a scratch consumer for the download arm"
+assert_install "$PROFILE_DERIVED" "$C"
+
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked)\n' "${#PROFILES[@]}"
 exit 0

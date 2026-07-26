@@ -94,21 +94,26 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    the local ops runbook, outside the tree. Stamp `<iteration> release vX.Y.Z —
    <basis>` into the disposition evidence.
 
-5. **Watch the publish workflow.** Pushing the tag is what publishes the
-   installer package: `.github/workflows/publish.yml` fires on the tag alone,
-   assembles the package with `scripts/pack-installer.sh`, and runs
-   `npm publish --provenance` from the runner. Nothing is published by hand, and
+5. **Watch the publish workflow — both channels.** Pushing the tag is what
+   publishes the installer package: `.github/workflows/publish.yml` fires on the
+   tag alone and assembles the package once with `scripts/pack-installer.sh`.
+   Two sibling jobs then consume that one artifact — `release` attaches the
+   tarball and its `.sha256` to the GitHub Release (the primary channel), and
+   `npm` runs `npm publish --provenance` from the runner (the secondary one,
+   held behind its approval environment). Nothing is published by hand, and
    **there is no version to edit** — the pack script stamps the version from the
    tag being packed and the job refuses a tarball whose stamp disagrees with it
    (docs/install.md §Versioning owns the one-semver-line rule this derives from).
-   Watch the run to green (`gh run watch`) before continuing; a red publish is
-   fixed and the tag re-pushed, never worked around by publishing locally. The
+   Watch **both** jobs to green (`gh run watch`) before continuing; a red publish
+   is fixed and the tag re-pushed, never worked around by publishing locally. The
    job's credential and approval are repository configuration rather than tree
    state, so a first run on an unconfigured repository fails loudly on the
    missing token rather than publishing unattested. What the job may pass npm as
    a package spec is §The publish spec below, held by `check-npm-publish-spec`.
 
-6. **Create the GitHub Release.** Its body points at the post's
+6. **Fill in the GitHub Release body.** Step 5's `release` job already created
+   the Release and attached its assets, so this step writes the body rather than
+   the Release. That body points at the post's
    `https://checkwright.dev/` URL — the post is the note's single home, the
    Release a pointer to it, never a second copy of the note. Write the post URL
    **without a trailing slash** (`…/posts/<slug>`, not `…/posts/<slug>/`): the

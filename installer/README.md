@@ -27,10 +27,14 @@ other script in the repository governs these too.
 
 ## Requirements
 
-The installer path needs Node, for `npx`. That requirement belongs to this
-delivery path alone — the gate battery it vendors does not use Node, and the
-manual vendoring path documented on the site needs none. The toolchain the
-battery does assert, with its version floors, is on the install page.
+This package reaches a tree over two transports, and each carries its own
+requirement. Fetched from npm it needs Node, for `npx`. Fetched as the tarball
+attached to a GitHub Release it needs none — `curl`, `tar`, and `sha256sum`,
+then `bash package/bin/checkwright.sh init`. Both requirements belong to a
+delivery path alone: the gate battery this vendors does not use Node, no
+delivery-path tool joins the toolchain roster, and the manual vendoring path
+documented on the site needs neither. The toolchain the battery does assert,
+with its version floors, is on the install page.
 
 ## Layout
 
@@ -209,10 +213,33 @@ must exit 0 and name the installed profile. It also asserts the profile
 invariant against the installed payload — every named kit resolves, the
 containment chain holds, and there are at most three profiles.
 
-The offline tarball install is the load-bearing one. It is what turns "this is
-a one-shot vendoring installer, not a dependency channel" from a claim into an
-assertion: a package that installs and runs with no registry access after the
-fetch is not resolving anything on your behalf.
+A second arm drives the **download transport**: it verifies the packed tarball
+against a digest the smoke computes, extracts it with `tar` rather than npm,
+and runs the same `init` and the same post-conditions with `npm` and `node`
+**masked off `PATH`**. It runs against `full` alone rather than per profile —
+what the per-profile loop proves (the payload resolves and each profile's kit
+set is present) is profile-dependent, while what this arm proves (the same
+payload reached the tree without Node) is transport-independent, and `full` is
+the largest payload with the widest `doctor` toolchain read. The smoke's
+preflight still requires `npm` and `node`, because packing needs them; the
+masking is around this arm's `init` only.
+
+Two arms, two load-bearing properties, neither displacing the other. The
+offline tarball install is what turns "this is a one-shot vendoring installer,
+not a dependency channel" from a claim into an assertion: a package that
+installs and runs with no registry access after the fetch is not resolving
+anything on your behalf. The masked-`PATH` arm is what turns "the Release
+tarball needs no Node" from a sentence into an assertion — without the masking
+the two arms would differ only in how the bytes arrived, and a latent Node
+dependency would pass silently on any machine that happens to have Node.
+
+The mask is itself asserted rather than assumed: before the arm runs, each
+masked name must resolve to the shim, so a `PATH` that quietly failed to shadow
+the real interpreter reds instead of passing. Shims rather than deletion,
+because dropping every `PATH` entry carrying `node` would take `/usr/bin` with
+it wherever Node is installed there. The residue is that a payload merely
+*probing* for a Node binary still finds a name; one that *runs* it fails loudly
+and says which name it reached.
 
 Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
 worktree. It needs a clean worktree, because the pack step refuses to stamp a

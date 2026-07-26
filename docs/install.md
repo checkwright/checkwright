@@ -17,6 +17,20 @@ worth drawing rather than blurring:
 - **npm carries a real package, and it is an installer rather than a
   dependency.** `npx checkwright init` copies pinned kit source out of its own
   payload into your tree and commits it.
+- **The same payload downloads straight off the GitHub Release**, as a tarball
+  and its `.sha256`, attached to every tagged release. This strengthens the
+  doctrine rather than weakening it: a downloaded, checksummed, extracted
+  tarball you read before running it is the most auditable form of the same
+  one-shot vendoring.
+
+The last two are two transports over one install model, not two products. Both
+reach the same `init`, write the same `checkwright.lock`, and leave the same
+vendored result; only the fetch differs. The tarball is the primary path because
+it removes a runtime dependency. npm is retained because it is the path that
+carries a build attestation — `npm publish --provenance` has the release runner
+sign a statement of what built the package, which a self-hosted asset cannot
+offer. Neither dominates, so both properties are named rather than one being
+called better.
 
 An installer is not a dependency channel, and the difference is mechanical
 rather than a matter of framing. Nothing resolves at *your* build time. The
@@ -99,10 +113,16 @@ context-kit's env-probe — `bash context-kit/bin/env-probe.sh` writes an
 verdict against the contract, so the profile answers whether this box qualifies,
 not only what it carries.
 
-One requirement belongs to a path rather than to the battery: the installer
-below needs Node, for `npx`. Nothing in the gate battery uses Node, and the
-manual vendoring path needs none of it — so a consumer who would rather not
-add Node to the picture vendors by hand and loses nothing but the convenience.
+Some requirements belong to an **install path** rather than to the battery, and
+no delivery-path tool joins the roster above. That roster asserts what the
+*battery* requires; how the payload reached your machine is not that, so the
+three paths carry their requirements here in prose instead. The **Release
+tarball** wants `curl` (or `wget`) plus `tar` and `sha256sum` — a GNU userland
+already has them, `sha256sum` being a coreutils member the roster asserts
+anyway. The **`npx` installer** wants Node. **Manual vendoring** wants nothing
+beyond the roster. Nothing in the gate battery uses Node on any of the three, so
+a consumer who would rather not add it takes either of the other two paths and
+loses nothing.
 
 Publishing a docs site is an optional wider tier. A consumer that registers
 site-kit's render-fidelity gate — which re-renders every page through the
@@ -111,13 +131,48 @@ gem. A consumer that publishes no docs site never installs it.
 
 ## Quick start
 
-From a clean git repository:
+From a clean git repository. Pick a version off the
+[releases](https://github.com/checkwright/checkwright/releases) page and
+substitute it for `X.Y.Z`. Four steps — download, then verify, then extract,
+then run — any of which you may stop after:
 
 ```bash
-npx checkwright init                      # or: --profile delegation | --profile full
-bash gate-sdk/bin/install-hooks.sh        # opt this clone into the generated hook
-bash gate-sdk/bin/run-gates.sh            # the battery, green on what was just vendored
+cw="$(mktemp -d)"   # unpack outside the repository — see the note below
+curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz" \
+  https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz
+curl -fsSL -o "$cw/checkwright-X.Y.Z.tgz.sha256" \
+  https://github.com/checkwright/checkwright/releases/download/vX.Y.Z/checkwright-X.Y.Z.tgz.sha256
+( cd "$cw" && sha256sum -c checkwright-X.Y.Z.tgz.sha256 && tar -xzf checkwright-X.Y.Z.tgz )
+
+bash "$cw/package/bin/checkwright.sh" init  # from your repository root
+bash gate-sdk/bin/install-hooks.sh          # opt this clone into the generated hook
+bash gate-sdk/bin/run-gates.sh              # the battery, green on what was just vendored
 ```
+
+Unpack outside the repository rather than inside it. `init` refuses a worktree
+that is not clean, and an extracted `package/` sitting in your root is untracked
+content that makes it exactly that — so a tarball unpacked in place blocks the
+install it was downloaded for.
+
+Four commands rather than one piped into a shell is deliberate. A
+`curl … | sh` one-liner would have this page contradicting its own opening
+claim: what governs your tree is meant to be source you read before you run it,
+and an unreviewed remote script fed straight to a shell is that claim's
+counter-pattern.
+
+The checksum is worth understanding for what it does not cover. It travels from
+the same origin over the same encrypted session as the tarball, so verifying it
+catches a corrupted or truncated download. It is not evidence that the release
+host was uncompromised; the property carrying that is a build attestation, which
+is what the npm channel's `--provenance` mints and this channel does not.
+
+The `package/` prefix is `npm pack`'s doing, and it is named here rather than
+left to be discovered. npm builds the asset on the release runner; consuming it
+needs no Node.
+
+If Node is already on your machine the same install is one command —
+`npx checkwright init`, then the two `gate-sdk` lines above. Same payload, same
+`init`, same `checkwright.lock`; only the fetch differs.
 
 `init` vendors the selected profile's kit directories and writes a `gates.list`
 seeded with each kit's starting gates, alongside the config seam those kits
@@ -147,9 +202,10 @@ and vendored source that is auditable.
 
 ## Vendoring the kits
 
-The installer above does this on your behalf; the manual path stays supported
-and is worth reading whether or not you take it. It is the audit story — the
-account of what lands in your tree — and it is the path that needs no Node.
+The installers above do this on your behalf; the manual path stays supported and
+is worth reading whether or not you take it. It is the audit story — the account
+of what lands in your tree, and the reason nothing above has to be taken on
+trust.
 
 Each kit is a self-contained top-level directory. To adopt one, copy it into
 your repo root and wire it in:

@@ -99,3 +99,47 @@ jobs:
           # An npm spec containing a slash is read as a GitHub
           # owner/repo shorthand unless it is unambiguously a path.
           npm publish --provenance --access public "$PWD/${tarballs[0]}"
+
+  release:
+    needs: pack
+    runs-on: ubuntu-latest
+    # The primary delivery channel: the same bytes the npm job publishes, reachable
+    # with no Node on the adopter's machine. It carries no `environment:` gate —
+    # attaching assets to this repository's own Release is neither irreversible nor
+    # external, and gating it would hold the primary channel behind the secondary
+    # channel's approval. Its capability story is docs/install.md §Requirements.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-package
+          path: dist
+
+      - name: attach the tarball and its checksum to the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          tarballs=(dist/*.tgz)
+          if [ "${#tarballs[@]}" -ne 1 ]; then
+            echo "expected exactly one tarball, got ${#tarballs[@]}" >&2
+            exit 1
+          fi
+          name="$(basename "${tarballs[0]}")"
+
+          # The digest is written beside the asset with a bare filename inside it, so
+          # `sha256sum -c` works wherever a reader puts the two files. What it proves
+          # is bounded and stated on the install page: same origin, same TLS session,
+          # so it catches corruption and truncation, never a compromised host.
+          ( cd dist && sha256sum "$name" > "$name.sha256" )
+
+          # Create the Release if the tag has none yet, so the assets are on it from
+          # the moment it exists; the operator fills in the body afterwards
+          # (RELEASING.md §The procedure step 6).
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --notes ""
+          fi
+          gh release upload "$TAG" "dist/$name" "dist/$name.sha256" --clobber
+          echo "attached $name and $name.sha256 to $TAG"
