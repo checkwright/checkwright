@@ -776,6 +776,22 @@ own tooling, a runnable walkthrough, an installer — is lintable but not linted
 until its directory is named. Positional arguments remain a full scope override
 (the hermetic fixture affordance), not an addition.
 
+**The knob widens what the gate scans, not when the hook fires it.** The
+generated hook's trigger comes from this gate's `# graph:` couples
+(`scripts/*.sh,kit:*.sh`), and `kit:` expands to kit roots — a set a consumer
+knob has no way to join. The kit family itself is fully covered and never was
+the gap: the hook matches with `[[ "$f" == $pat ]]`, where `*` spans `/`, so
+`<kit>/*.sh` already matches every script in every subdirectory of that kit.
+What is genuinely uncovered is a directory the knob adds and nothing else
+names: an edit there is linted by the full battery and by CI, but not by the
+hook at commit time, so the finding arrives one tier later than for every other
+script in the tree. Closing it is not a matter of widening the glob — the
+trigger derives from a manifest a *kit* ships, and a kit manifest that named
+consumer paths would carry consumer content across the provenance seam, which
+is the thing kit literals are forbidden to do. The honest fix is a
+consumer-expandable token in §The `# graph:` manifest, and that is a contract
+change tracked on the queue rather than an adjustment available here.
+
 ### check-gate-output
 
 Invariant: every `gates.list` member's source contains both a `: clean`
