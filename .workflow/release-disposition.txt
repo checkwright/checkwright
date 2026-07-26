@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+activation-path release v0.16.0 — minor: the note declares behavior changes (the installer activation surface, context-kit toolfloor extraction and probe stdin fix, a new gate-sdk lint knob, a corrected delegation-kit GATE_FILES contract); no kit-shipped gate tightened, so the allowed-red set is empty
