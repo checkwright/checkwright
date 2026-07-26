@@ -33,6 +33,9 @@ docs
 # Runnable adoption walkthrough (registered as the evidence-kit demo suite)
 demo
 
+# Published activation surface (the npm package; not a kit — it carries no checks/ or smoke/)
+installer
+
 # Name-reservation placeholders (not developed in)
 reserve
 

@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# spec: CLAUDE.md §Housekeeping — assemble the installer package out of tree and npm-pack it there; the payload is derived from the repo's own kit roots at pack time, so no second copy of any kit is ever checked in or written inside the worktree
+#
+# usage: pack-installer.sh [--version <semver>] [--out <dir>]
+#   --version  the version to stamp (default: the newest reachable git tag)
+#   --out      where the tarball lands (default: INSTALLER_PACK_TMP_DIR)
+set -uo pipefail
+
+SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
+# shellcheck source=../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+    echo "pack-installer: not inside a git work tree — the payload's commit stamp has no source." >&2
+    exit 2
+}
+cd "$ROOT" || exit 2
+
+VERSION=""
+OUT=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --version) VERSION="${2:-}"; shift 2 ;;
+        --out) OUT="${2:-}"; shift 2 ;;
+        *) echo "pack-installer: unknown argument: $1" >&2; exit 2 ;;
+    esac
+done
+
+for tool in npm jq git; do
+    command -v "$tool" >/dev/null 2>&1 || {
+        echo "pack-installer: $tool not found on PATH — the pack step cannot run." >&2
+        exit 2
+    }
+done
+
+[[ -f installer/package.json ]] || {
+    echo "pack-installer: installer/package.json not found — there is no package to pack." >&2
+    exit 2
+}
+
+# spec: CLAUDE.md §Housekeeping — a dirty tree would stamp a commit that does not describe the payload, and that stamp is the whole of what makes a vendored tree resolvable to an upstream state
+if [[ -n "$(git status --porcelain)" ]]; then
+    echo "pack-installer: the worktree is dirty — refusing to stamp a commit the payload does not match." >&2
+    echo "  help: commit or stash first; the stamp is what makes the vendoring auditable." >&2
+    exit 2
+fi
+
+COMMIT="$(git rev-parse HEAD)"
+[[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]] || {
+    echo "pack-installer: could not resolve HEAD to a 40-hex commit." >&2
+    exit 2
+}
+
+if [[ -z "$VERSION" ]]; then
+    VERSION="$(git describe --tags --abbrev=0 2>/dev/null)" || VERSION=""
+    VERSION="${VERSION#v}"
+fi
+[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]] || {
+    echo "pack-installer: no usable version — pass --version, or tag the commit being packed." >&2
+    echo "  help: the version comes from the tag, never from an edit to installer/package.json." >&2
+    exit 2
+}
+
+BASE="${INSTALLER_PACK_TMP_DIR:-${TMPDIR:-/tmp}}"
+[[ -d "$BASE" ]] || { echo "pack-installer: scratch base not a directory: $BASE" >&2; exit 2; }
+ASM="$(mktemp -d "$BASE/checkwright-pack.XXXXXX")" || exit 2
+cleanup() { rm -rf "$ASM"; }
+trap cleanup EXIT
+OUT="${OUT:-$BASE}"
+[[ -d "$OUT" ]] || { echo "pack-installer: output directory not found: $OUT" >&2; exit 2; }
+
+cp -R installer/. "$ASM/" || exit 2
+
+# spec: CLAUDE.md §Housekeeping — the payload's kit set is gate_kit_roots_rel, the same derivation the battery runs on, so the shipped set cannot drift from the governed one
+mkdir -p "$ASM/payload" || exit 2
+packed=0
+while IFS= read -r kit; do
+    kit="${kit%/}"
+    [[ -n "$kit" && -d "$kit" ]] || continue
+    cp -R "$kit" "$ASM/payload/${kit##*/}" || exit 2
+    packed=$((packed + 1))
+done < <(gate_kit_roots_rel)
+[[ "$packed" -gt 0 ]] || { echo "pack-installer: no kit roots enumerated — the payload would be empty." >&2; exit 2; }
+
+stamped="$(jq --arg v "$VERSION" --arg c "$COMMIT" \
+    '.version = $v | .checkwright.commit = $c' "$ASM/package.json")" || {
+    echo "pack-installer: could not stamp installer/package.json." >&2
+    exit 2
+}
+printf '%s\n' "$stamped" > "$ASM/package.json" || exit 2
+
+( cd "$ASM" && npm pack ) >/dev/null || {
+    echo "pack-installer: npm pack failed in $ASM." >&2
+    exit 2
+}
+
+shopt -s nullglob
+tarballs=("$ASM"/*.tgz)
+shopt -u nullglob
+[[ ${#tarballs[@]} -eq 1 ]] || {
+    echo "pack-installer: expected exactly one tarball in $ASM, found ${#tarballs[@]}." >&2
+    exit 2
+}
+mv "${tarballs[0]}" "$OUT/" || exit 2
+
+echo "PACK: ${OUT%/}/${tarballs[0]##*/} (version $VERSION, commit ${COMMIT:0:12}, $packed kit(s) in payload)"
+exit 0
