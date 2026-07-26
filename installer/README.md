@@ -44,6 +44,36 @@ battery does assert, with its version floors, is on the install page.
   the source tree, so no second copy of any kit is checked in.
 - `profiles.list` — the profile rosters (below).
 
+## doctor
+
+`checkwright doctor` tells you whether this machine meets the toolchain the
+gate battery needs, and it says so in its **exit status** rather than only in
+its output: `0` meets the contract, `1` is below it. That is what lets a CI
+step or `init`'s own precondition check gate on the answer without parsing a
+report — and it is why a below-contract machine is caught before any partial
+install rather than halfway through one.
+
+It has two behaviors, selected by where you run it rather than by a flag. Run
+anywhere, it reports the toolchain verdict. Run inside a repository that has
+been vendored into, it additionally reads `checkwright.lock` and reports the
+installed release, the upstream commit it came from, the profile, and the kit
+set.
+
+`doctor` defines no floor of its own. It sources the toolchain roster out of
+its own `payload/` and renders whatever verdict that roster's predicate
+returns, so the contract keeps one owner and this stays a display of it. The
+payload copy is the one it reads, never a copy in the tree it is inspecting:
+at `init` time nothing has been vendored there yet, so a tree copy would not
+exist at the moment the answer is needed.
+
+`doctor` writes nothing, so it has no `--dry-run`. Every verb that does write
+has one.
+
+A third exit status, `2`, means the question could not be answered rather than
+that the answer was bad: the package carries no payload, or the manifest
+carries a schema key this build does not know. A build refuses an unfamiliar
+manifest rather than guessing at the shape behind it.
+
 ## Profiles
 
 You pick how much of the methodology to meet first. The progression is
