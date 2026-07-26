@@ -5,7 +5,14 @@
 #   checkwright --help    list the verbs this package carries
 set -uo pipefail
 
-INSTALLER="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# spec: installer/README.md §Layout — resolve the symlink chain before taking the package root: npm installs the bin entry as a link in node_modules/.bin, so the unresolved path's parent is node_modules and every verb and the payload would be looked for in the wrong tree
+SELF="${BASH_SOURCE[0]}"
+while [[ -L "$SELF" ]]; do
+    LINK_DIR="$(cd "$(dirname "$SELF")" && pwd)"
+    SELF="$(readlink "$SELF")"
+    [[ "$SELF" == /* ]] || SELF="$LINK_DIR/$SELF"
+done
+INSTALLER="$(cd "$(dirname "$SELF")/.." && pwd)"
 
 # spec: CLAUDE.md §Housekeeping — the verb roster is lib/ itself, never a list beside it: a verb is advertised because its implementation is present, so the help text cannot promise a verb the package does not carry
 verbs() {
