@@ -22,12 +22,13 @@ under [`docs/`](docs/index.md).
 
 ## Quick start
 
-```bash
-npx checkwright init
-```
-
-Vendors a kit profile into a clean git repo and commits it. See
-[docs/install.md](docs/install.md) for profiles and requirements.
+Vendors a kit profile into a clean git repo and commits it. The primary path is
+the **release tarball** — download it and its `.sha256` off the
+[releases](https://github.com/checkwright/checkwright/releases) page, verify,
+extract, run `init` — which needs nothing beyond a GNU userland; `npx
+checkwright init` is the same vendoring over npm, for a consumer who already has
+Node. Both recipes, with profiles and requirements:
+[docs/install.md](docs/install.md) §Quick start.
 
 ## Kits
 

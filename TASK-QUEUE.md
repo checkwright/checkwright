@@ -1858,11 +1858,172 @@
   captured as a knowledge-friction re-derivation against
   `installer/lib/common/recipe.sh`; both converge here.
 
-## Done
+- **operator-authored-unit-set** [needs-spec] — lifecycle-kit/SPEC.md's
+  standing-scope-directive clause models exactly one shape: a **lead-authored**
+  menu, "a theme bounding scope's survey and never a slug list". This iteration
+  ran the other shape — an **operator-authored slug list** naming all four units
+  before scope opened. That is legitimate in substance (the operator owns what
+  the project builds) but unmodeled in the contract, and the clause's own stated
+  hazard — a pre-authored menu pre-empting scope's premise re-verification — is
+  precisely the hazard the operator case carries, with nothing written to
+  address it.
+  **Deliverable:** model the operator-authored unit set explicitly in the
+  standing-scope-directive clause, and restate the premise-re-verification
+  obligation as **scope's own regardless of who authored the list** — the
+  re-verification is not a check on the author's authority, it is scope's
+  contract with the tree.
+  **Why `[needs-spec]`:** it amends a lifecycle-kit SPEC clause that governs
+  stage-entry semantics for every consumer, and the honest form may be a
+  generalization (any pre-authored unit set, author-agnostic) rather than a
+  second enumerated case — that choice is the design.
+  **Cost while deferred:** low but recurring — every operator-directed iteration
+  runs a shape the contract does not describe, and scope's re-verification rests
+  on convention rather than on a written obligation. Nothing reds; the residue is
+  a governing clause narrower than the practice it governs.
+  Filed 2026-07-26 by close (`release-path-hardening`), draining the gap inbox;
+  surfaced by that iteration's scope and routed to spec by the lead for filing,
+  deliberately not fixed in-iteration.
 
-- publish-spec-disambiguation
-- publish-spec-gate
-- release-tarball-delivery-channel
-- workflow-run-block-lint
+- **tarball-build-attestation** [needs-spec] — `release-tarball-delivery-channel`
+  ships the Release tarball beside a `.sha256`, and that checksum proves
+  **transfer integrity only**: checksum and tarball share one origin and one TLS
+  session, so a consumer who fetches both from a compromised release fetches a
+  matched pair. The **build-provenance** property — this artifact was built by
+  this workflow from this commit — stays exclusive to the npm channel, which has
+  `--provenance`. The tarball is now the primary channel, so the stronger
+  property lives on the secondary one.
+  **Deliverable:** a signed build attestation on the tarball channel —
+  `actions/attest-build-provenance` at publish time, verified by
+  `gh attestation verify` at install time — plus the install-path documentation
+  that makes verification a step a Node-free adopter can actually run.
+  **Why `[needs-spec]`:** it adds a fourth pinned `uses:` ref to `publish.yml`
+  (a supply-chain-surface change the supply-chain-trust-baseline contract
+  governs), and the install-side half is an open question: an attestation nobody
+  verifies buys nothing, but `gh attestation verify` reintroduces a toolchain
+  dependency on the channel whose whole premise is needing none.
+  **Cost while deferred:** bounded and non-rotting — the checksum is honest about
+  what it proves and the docs claim no more. The residue is a primary channel
+  with a weaker integrity story than the secondary one, which inverts as adoption
+  moves to the tarball. Costed at roughly one small unit.
+  Filed 2026-07-26 by close (`release-path-hardening`) off the gap inbox's
+  tarball-checksum bullet; ruled outside the shipping unit's envelope at align.
+
+- **spec-measured-count-gate** [needs-spec] — a **measured count authored into a
+  canonical SPEC section goes stale with no oracle**. Reproduced twice in one
+  iteration: the align audit found `gate-sdk/SPEC-action-run-shell.md` B2's block
+  count wrong twice over (five, then six; the tree carried eight) and, worse,
+  slated for `gate-sdk/SPEC.md` — where this same iteration's sibling unit
+  falsifies it on the next commit. It was corrected by hand (the canonical
+  section now carries the **derivation**, never the count), which is exactly the
+  shape CLAUDE.md's Enforcement-first rule bars: the fix landed without the gate
+  that catches the next one.
+  **Gap generalization — the check class that should have caught it.** Neither
+  existing gate covers it: `check-prose-enum` reads governed-set membership, not
+  numerals; `check-spec-derivable-section` reads fenced-dump density. The
+  candidate is narrow — a **bare cardinal qualifying a derived roster** in a SPEC
+  section whose subject is a `gate_find`-derived set — and it is filed here
+  rather than left as prose, per the Gap-disposition rule.
+  **Why `[needs-spec]`:** the false-positive surface *is* the design. "Bare
+  cardinal near a roster noun" over-matches legitimate prose (a contract that
+  genuinely fixes a count — "the four contracts", "both halves"), so the gate
+  needs a principled trigger, and the honest outcome may be an opt-in
+  `measured:`-style marker the author applies rather than a scanner that infers
+  intent.
+  **Cost while deferred:** compounding and silent — this recurs at **every
+  amendment that measures the tree**, the failure mode is a canonical doc
+  asserting a false number, and detection is by hand at align if at all.
+  Filed 2026-07-26 by close (`release-path-hardening`), draining the
+  stale-measured-count bullet; costed at roughly one small unit.
+
+- **action-run-shell-scan-predicate** [needs-spec] —
+  `check-action-run-shell`'s scan predicate is a **kit literal with no consumer
+  seam**. The align ruling narrowed extraction to files carrying a top-level
+  `jobs:` or `runs:` key, which is right for what gate-sdk claims, but it leaves
+  a consumer whose shell genuinely lives in another CI dialect with no way to opt
+  that surface in — CircleCI's `- run:` is the concrete case, and the extractor
+  handles it correctly, so the reach is a policy choice, not a capability limit.
+  **Deliverable:** a consumer-configurable scan predicate on the gate-sdk
+  config-via-env pattern, defaulting to the Actions shape so **no consumer
+  inherits a wider reach by accident**. The shape is the
+  `check-graph` / `scripts/graph-vocab.sh` optional-consumer-config pattern the
+  provenance seam already prescribes, so the precedent exists.
+  **Why `[needs-spec]`:** it adds a knob to a gate that has none, and
+  `gate-sdk/SPEC.md`'s no-new-knob claim for this gate would need re-deriving —
+  a contract edit, not a script patch.
+  **Cost while deferred:** low — the gate is correct and complete over what it
+  claims, and the narrowing is documented. The residue is a consumer with
+  non-Actions CI shell getting no coverage and no opt-in, which surfaces only
+  when such a consumer adopts. Costed at roughly one small unit.
+  Filed 2026-07-26 by close (`release-path-hardening`) from the scan-predicate
+  bullet; deliberately out of that unit's envelope at align.
+
+- **scratch-execution-allowlist-bar** [needs-spec] — the prompt-friction triage
+  keeps surfacing one dominant class that must **never** be allowlisted, and
+  nothing records why. This close's scan ranked `bash .tmp/<script>.sh` first by
+  a wide margin (24 calls across 13 one-off script names, against 7 for the next
+  pattern), and it will rank first at every close: writing a throwaway probe into
+  `.tmp/` and running it is the repo's *sanctioned* scratch form — `bash-guard`
+  actively steers sessions toward it, and `.claude/settings.json` already grants
+  `rm .tmp/*`.
+  **Why the obvious triage answer is wrong.** By guard-kit's criterion the
+  pattern looks like a textbook allowlist candidate (safe, static, glob-matched,
+  and already the form to reinforce). It is not. `.tmp/` content is by
+  construction **agent-authored**, so the permission prompt on `bash .tmp/*.sh`
+  is the single point at which a human sees agent-written code before it
+  executes. Granting it would convert "every dangerous command prompts" into
+  "write it to scratch and it does not" — a general bypass of every other guard
+  in the settings, earned by one line.
+  **Deliverable (enforcement-first, and this class is gateable):** a guard-kit
+  assertion that reds a **committed** allowlist entry granting bare execution
+  (`bash`, `sh`, `source`, `.`) of a path under an agent-writable scratch
+  directory, plus the one-line rule in guard-kit/SPEC.md §The triage criterion
+  that the gate enforces. Both halves land together, per Enforcement-first.
+  **Why `[needs-spec]`:** the scratch-directory set is the design. `.tmp/` is
+  this repo's binding, not a kit literal, so the gate needs the consumer seam the
+  provenance seam prescribes (the `check-graph` / `graph-vocab.sh` pattern) — and
+  the honest predicate may be wider than scratch (any agent-writable path,
+  including a gitignored generated directory), which changes both the knob and
+  the false-positive surface.
+  **Cost while deferred:** low per close, but it is pure re-derivation — every
+  close re-reaches the same conclusion from scratch about the same top-ranked
+  pattern, and a close that reasons less carefully files the grant instead. The
+  standing bar is currently held by nothing but each session's judgment.
+  Filed 2026-07-26 by close (`release-path-hardening`), from its own
+  prompt-friction triage; the local overlay carried no redundant entries to
+  prune this iteration.
+
+- **primary-install-path-claim** [needs-spec] — the gap generalization behind a
+  staleness this close fixed inline: **no surface owns which install path is
+  primary**, so two documents drifted apart with nothing to catch it. README.md's
+  Quick start still led with `npx checkwright init` — the command `v0.16.0`
+  announced and which never worked, npm serving only the `0.0.1` reservation
+  placeholder — while `docs/install.md`, rewritten this same iteration, states
+  the tarball is primary "because it removes a runtime dependency". The repo's
+  most-read surface contradicted its own install page and advertised a broken
+  command, through a release and into the next one.
+  **Gap generalization, honestly split.** The general form — *does this
+  documented install command actually resolve against the live registry?* —
+  needs network egress at gate time and is out of a hermetic battery's reach;
+  that half is not buildable and should not be attempted. The narrow form is
+  buildable but has no subject yet: a gate can hold two surfaces to one
+  **primary-path claim** only once some surface *owns* that claim as a governed
+  value, which none does today.
+  **Deliverable:** give the primary-path claim an owner (docs/install.md
+  §Quick start, as the page the release note and README both already cite), then
+  a consistency gate asserting no other prose surface leads with a different
+  install transport — canon-kit's star topology applied to a user-facing claim
+  rather than an internal one.
+  **Why `[needs-spec]`:** "leads with a different transport" is the undecided
+  predicate. Naming npm as a *secondary* path is correct and must stay green, so
+  the gate has to distinguish leading from mentioning, and doing that by position
+  or by heading is the design question.
+  **Cost while deferred:** demonstrated, not hypothetical — it has now drifted at
+  two consecutive releases, and the failure mode is the worst-placed one a
+  project has: the front door telling a first-time reader to run something that
+  does not work.
+  Filed 2026-07-26 by close (`release-path-hardening`), from its own top-level
+  doc-staleness review.
+
+## Done
 
 ## Lessons Learned

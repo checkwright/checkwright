@@ -125,8 +125,9 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "than on its own literal text — npm reads a positional spec as a path when it begins with '.'"
     echo "or '/', and as the GitHub 'owner/repo' shorthand otherwise:"
     printf '  %s\n' "${findings[@]}"
+    roots_help=$(printf '$%s/, ' "${ABS_ROOTS[@]}")
     echo "  help: make the literal decide it — prefix the spec with './' or '/', or with a bare or braced"
-    echo "        expansion of a proven-absolute root (\$PWD/, \$GITHUB_WORKSPACE/, \$RUNNER_TEMP/)."
+    echo "        expansion of a proven-absolute root (${roots_help%, })."
     echo "        A command substitution or a glob is assigned to a variable first, then published"
     echo "        through such a prefix."
     exit 1
