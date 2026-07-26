@@ -4,16 +4,4 @@
 
 ---
 
-activation-path scope a1a512c6 2026-07-26
-activation-path spec a2cdfd76 2026-07-26
-activation-path align ab7d71f5 2026-07-26
-activation-path build a1fa1165 2026-07-26
-activation-path build a353df02 2026-07-26
-activation-path build a120252e 2026-07-26
-activation-path build a2b42d83 2026-07-26
-activation-path build acfa7a93 2026-07-26
-activation-path build a304caab 2026-07-26
-activation-path build a2bdb0b6 2026-07-26
-activation-path build a055b1cf 2026-07-26
-activation-path validate a9d5960b 2026-07-26
-activation-path close a69f9a22 2026-07-26
+publish-spec-fix scope a2bd10df 2026-07-26
