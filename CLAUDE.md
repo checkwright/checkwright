@@ -161,8 +161,9 @@ the skill on a blocking verdict — so they are not resident here.
   violation blocked → fix → green), the evidence-kit `demo` validate suite on the
   gate-sdk consumer-smoke mechanics (`DEMO_TMP_DIR` its only knob, writing nothing
   in-tree), so a bit-rotted walkthrough is a red validate.
-- `installer/` is the published activation surface (the npm package, bash
-  inside), repo-root-governed, no owning kit; its layout is
+- `installer/` is the published activation surface (bash inside, shipped over
+  two transports from one payload — the Release tarball and the npm package),
+  repo-root-governed, no owning kit; its layout is
   installer/README.md. It must never carry `checks/` or `smoke/` — that
   predicate is what makes a root directory a kit. Its payload is never
   committed: `scripts/pack-installer.sh` assembles it out of tree from this

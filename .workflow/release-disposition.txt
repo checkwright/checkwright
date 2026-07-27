@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+release-path-hardening release v0.17.0 — minor: the note declares a new kit-shipped gate (check-action-run-shell, gate-sdk) under Tightened gates, which floors the bump above a patch; the release tarball channel ships alongside it as the first Node-free install path
