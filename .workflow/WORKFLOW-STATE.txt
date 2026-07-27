@@ -5,3 +5,4 @@
 ---
 
 front-door-readiness scope a33379ed 2026-07-27
+front-door-readiness spec a11ba2ad 2026-07-27
