@@ -2126,6 +2126,42 @@
   Filed 2026-07-28 by operator request, from a session assessing the shell
   substrate's structural limits against a native-binary port.
 
+- **deferred-queue-carry-cost** [needs-spec] — the deferred section has grown
+  to 56 entries and ~2,000 lines (~36 lines per entry), the arithmetic of an
+  intake asymmetry the doctrine itself creates: gap disposition plus
+  scope-gated intake make filing mandatory and cheap while the only exit is
+  building the entry — demand-gated promotion exists, but no symmetric
+  eviction. 21 entries self-describe their deferred cost as low and
+  non-rotting — decision records carried as work items — and the tally the
+  session banner steers by counts them identically with actionable debt.
+  **Deliverable:** one carry-reduction unit: (a) an icebox tier for entries
+  with low, non-rotting cost and no live promotion trigger — one line each,
+  the full narrative left to the filing commit (derivation-first) — with
+  demand-gated eviction symmetric to promotion (close triages entries past a
+  defer-age threshold; an icebox entry re-filed on real recurrence is the
+  mechanism working, not churn); (b) a queue-kit gate capping deferred-entry
+  line count so the compression sticks (enforcement-first); (c) a
+  filed-minus-closed net-delta KPI beside the existing defer-age drift
+  metric; (d) the one-time triage sweep that seeds the icebox and cheaply
+  *rules* on the `[needs-spec]` entries whose own text already admits a
+  wontfix outcome (close as a one-line boundary note in the owning SPEC).
+  **Why `[needs-spec]`:** the icebox's placement is the open design — a new
+  queue section versus a separate file decides how check-task-conservation,
+  check-queue-sections, and the slug-liveness grammar treat an iceboxed slug,
+  and whether eviction is a conserved move or a sanctioned disappearance; the
+  entry-size floor and the eviction age threshold are policy values needing
+  an owner doc.
+  **Cost while deferred:** compounding with every filing — the queue is read
+  by every scope session and curated by every close, and the intake rate
+  (27 entries filed 07-25/26 alone) currently outruns closure with no
+  counter-pressure; the filing threshold does not scale with queue size.
+  Bounded: nothing reds; the cost is carry weight and a steering tally that
+  overstates actionable debt. Debt-shaped at triage: converges the queue onto
+  existing doctrine; the new governed names are the icebox tier, its gate,
+  and the KPI.
+  Filed 2026-07-28 by operator request, from a session assessing whether the
+  queue's 30-to-56 deferred growth is healthy.
+
 ## Done
 
 ## Lessons Learned
