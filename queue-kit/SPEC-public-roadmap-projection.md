@@ -65,11 +65,13 @@ malformed config: `lib/queue.sh` exits 2, per the loader's existing
 broken-grammar contract. A half-configured vocabulary would silently accept
 every track value.
 
-This repo's `scripts/queue-config.sh` sets all four —
-`QUEUE_KIT_HORIZONS=(now next later)`,
+This repo's `scripts/queue-config.sh` sets the three that have no usable
+default — `QUEUE_KIT_HORIZONS=(now next later)`,
 `QUEUE_KIT_TRACKS=(adoption reliability ecosystem commercial)`,
 `QUEUE_KIT_ROADMAP_FILE=ROADMAP.md` — so the tag's enabling config is live in a
-real configuration, not test-only.
+real configuration, not test-only. `QUEUE_KIT_ROADMAP_MARKER` stays on its kit
+default and is deliberately absent from the consumer config: a consumer line
+restating a kit default is the de-literalization defect, not a completeness win.
 
 ### 3. `queue-kit/bin/roadmap.sh` — *design-bearing*
 
@@ -132,6 +134,15 @@ Ships with a `good/`+`bad/` fixture pair per gate-sdk's fixture-pair contract
 and a `# graph:` manifest coupling the gate to the queue file, the config, and
 the projection page.
 
+The fixture pair needs an interface, and the cited models already carry it:
+both `check-footprint-fresh` and `check-value-rollup-fresh` take
+`[projection-file] [emit-file]`, and their fixtures are a pre-baked
+`projection.txt` + `emit.txt` behind an `args` file. Assertion A takes the same
+two-arg form for the same reason — a freshness gate offering only its bare form
+has no fixture that does not read the live queue, so the pair's verdict would
+turn on tree state outside the fixture directory. Verified at align against
+`context-kit/gate-tests/check-footprint-fresh/`.
+
 ### 5. `check-tag-lead-line` gains the tag — *mechanical*
 
 One `arr["roadmap"] = 1` row on `/\[roadmap:/` in the gate's `classes()`
@@ -143,10 +154,27 @@ every other tag. The gate's `# spec:` header line gains the tag name.
 `scripts/enum-sets.sh` derives this repo's `queue-task-tag` set by grepping the
 `arr["<tag>"]` rows out of `check-tag-lead-line.sh`. So delta 5 grows the set,
 and `check-prose-enum` then reds every manifest paragraph hand-listing two or
-more task tags without the new member. The known site is `README.md`'s queue-kit
-table row, which enumerates the algebra
-(`blocked-by/needs-spec/spec/drain-exempt/precondition-ok`). Sweep for others
-rather than assuming that row is the only one — the gate names them.
+more task tags without the new member.
+
+**The propagation and its blast radius were both verified at align**, by running
+the real gate against a simulated post-delta-5 set rather than reading the two
+scripts and inferring. The mechanism holds — `arr["roadmap"]` matches the
+emitter's ERE, and the derived set grows from four members to five. The sweep
+the align audit was asked to run returns **four** red sites, not the one this
+delta originally named:
+
+- `README.md`'s queue-kit table row, which enumerates the algebra
+  (`blocked-by/needs-spec/spec/drain-exempt/precondition-ok`).
+- `queue-kit/README.md`'s opening tag-algebra sentence — a **separate** update
+  target from the gate/tool roster row deltas 3 and 4 own, on a different block
+  of the same file.
+- `queue-kit/SPEC.md` §check-tag-lead-line's governed-set list, already owned by
+  delta 5.
+- `docs/queue-kit/index.md`, the generated mirror of `queue-kit/README.md` —
+  carried by delta 13's `gen-docs-mirror.sh --write`, never hand-edited.
+
+Two hand edits, then, not one; the third rides delta 5 and the fourth rides the
+regen.
 
 ### 7. `ROADMAP.md` framing prose — *design-bearing*
 
@@ -209,7 +237,13 @@ Discussions. With three inlets open, it names them and says which goes where.
 
 ### 12. Front-door links — *mechanical*
 
-`README.md` and `docs/index.md` link the roadmap. **Sequencing note:** the
+`README.md` and `docs/index.md` link the roadmap. `README.md` links it
+relatively; `docs/index.md` takes the self-repo blob grammar the generated docs
+pages already use for a repo source, because the site is served from `docs/` as
+its root and a relative `../ROADMAP.md` resolves on disk — leaving `check-md-refs`
+green — while 404ing for the reader who follows it. Verified at align: the docs
+home currently links nothing outside `docs/`, so this is its first such link.
+**Sequencing note:** the
 `front-door-outcome-rewrite` debt unit promoted this same iteration rewrites
 both first screens; land that unit's rewrite first and add these links into the
 rewritten prose, rather than adding links a rewrite then relocates.
@@ -295,8 +329,10 @@ does not ship.
   stating the ungated count band and why.
 - **queue-kit/SPEC.md §check-tag-lead-line** — the governed-tag list in its
   invariant statement. Owned by delta 5.
-- **queue-kit/README.md** — the gate/tool roster row, held by
-  `check-readme-roster`. Owned by deltas 3 and 4.
+- **queue-kit/README.md** — two separate blocks: the gate/tool roster row, held
+  by `check-readme-roster` (owned by deltas 3 and 4), and the opening
+  tag-algebra sentence, which `check-prose-enum` reds once the set grows (owned
+  by delta 6). Added at align, which found the second uncovered.
 - **README.md** — the queue-kit table row's tag enumeration (delta 6) and the
   roadmap link (delta 12).
 - **CLAUDE.md §Housekeeping** — one line placing `ROADMAP.md` as a generated

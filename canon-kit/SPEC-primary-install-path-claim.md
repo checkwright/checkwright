@@ -24,6 +24,16 @@ currently-consistent claim rather than repairing one, and its value is entirely
 recurrence: the claim drifted at two consecutive releases with nothing watching
 it, and the surface it drifted on is the first thing a new reader runs.
 
+**Both halves confirmed at align**, by walking every section the configured
+regex selects rather than trusting the two cited lines. No section in the
+scanned set leads with a non-primary transport, so the gate arrives green. And
+the recurrence path is *in scope*, which is the half that makes the greenfield
+verdict worth having: the drift that actually happened was `README.md` §Quick
+start leading with `npx checkwright init`, and `## Quick start` is a
+`##`-or-deeper section matching the configured regex. A gate that arrives green
+on a path it could not have caught would be recurrence value in name only; this
+one covers the path that fired.
+
 ## Seam ruling
 
 Kit mechanism: the `install-primary:` declaration's spelling and grammar, the
@@ -117,6 +127,19 @@ If one line matches two transport patterns, the section passes when any matching
 id is the primary — a sentence naming both transports is not leading with the
 secondary one.
 
+**The third honest limit, which the section scope buys and the SPEC must
+state.** The prose tier of the declared claim — the sentence at
+`docs/install.md`:28-29 — sits in that same H1 preamble, ~104 lines above the
+`## Quick start` heading delta 1 puts the marker under. So the one sentence the
+marker is the machine tier *of* is itself outside assertion B's reach: rewriting
+the preamble to call npm primary while leaving the marker on `tarball` stays
+green. This is the price of the scoping, not an argument against it — the
+alternative whole-file rule reds the owner page on correct prose today. The
+binding delta 1 describes is therefore documentary, held by this SPEC section
+and by a reader, not by the gate; saying so is what keeps a future reader from
+over-trusting a green run. The recurrence path that actually fired is unaffected
+(it was `README.md` §Quick start, in scope).
+
 Ships with a `good/`+`bad/` fixture pair and a `# graph:` manifest coupling the
 gate to the doc set, `scripts/*.sh`, and the consumer config, so a transport
 rename re-fires it over the docs.
@@ -186,9 +209,10 @@ guess.
   delta 2.
 - **canon-kit/SPEC.md §Per-component contracts** — a new `check-install-claim`
   section carrying both assertions, the leading-vs-mentioning ruling, the
-  section-scope calibration and the preamble evidence behind it, and the two
-  honest limits (no registry reachability; pattern quality is the consumer's).
-  Owned by deltas 3 and 4.
+  section-scope calibration and the preamble evidence behind it, and the three
+  honest limits (no registry reachability; pattern quality is the consumer's;
+  the claim's own prose tier sits in the unscanned preamble). Owned by deltas 3
+  and 4.
 - **canon-kit/SPEC.md §Content tiering — the star topology** — one sentence
   placing this gate as the star topology's first user-facing application, so a
   reader of that section finds the mechanism that now enforces it beyond
