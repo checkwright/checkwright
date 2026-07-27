@@ -49,6 +49,14 @@ declare -p QUEUE_KIT_LESSON_SINKS &>/dev/null || declare -A QUEUE_KIT_LESSON_SIN
 
 [[ -v QUEUE_KIT_ATTEND_CAP ]] || QUEUE_KIT_ATTEND_CAP=3
 
+declare -p QUEUE_KIT_HORIZONS &>/dev/null || QUEUE_KIT_HORIZONS=()
+
+declare -p QUEUE_KIT_TRACKS &>/dev/null || QUEUE_KIT_TRACKS=()
+
+[[ -v QUEUE_KIT_ROADMAP_FILE ]] || QUEUE_KIT_ROADMAP_FILE=""
+
+[[ -v QUEUE_KIT_ROADMAP_MARKER ]] || QUEUE_KIT_ROADMAP_MARKER="roadmap"
+
 queue_alt() { local IFS='|'; printf '%s' "$*"; }
 
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
@@ -89,6 +97,43 @@ queue_done_slugs() {
     ' "$1"
 }
 
+# spec: queue-kit/SPEC.md §bin/roadmap.sh — the one lead-line [roadmap:] parse, shared by the emitter and check-roadmap-fresh so the two never disagree on what an entry claims. One TSV line per tagged live entry, in queue order: <tag-count> <raw-field> <slug> <summary>. The summary is the lead line's text with every tag stripped, cut at the first sentence boundary; entry bodies are never read.
+queue_roadmap_entries() {
+    awk -v taskre="$QUEUE_TASK_RE" -v sectre="$QUEUE_SECTION_RE" '
+        function summary(line,   t) {
+            t = line
+            sub(/^[[:space:]]*-[[:space:]]+/, "", t)
+            sub(/^\*\*[a-z0-9][a-z0-9-]*\*\*/, "", t)
+            gsub(/\[[^]]*\]/, "", t)
+            sub(/^[[:space:]]*(—|--)[[:space:]]*/, "", t)
+            gsub(/[[:space:]]+/, " ", t)
+            sub(/^ /, "", t); sub(/ $/, "", t)
+            if (match(t, /\.( |$)/)) t = substr(t, 1, RSTART)
+            return t
+        }
+        function tagcount(line,   s, n) {
+            s = line; n = 0
+            while (match(s, /\[roadmap:/)) { n++; s = substr(s, RSTART + RLENGTH) }
+            return n
+        }
+        function field(line,   f) {
+            if (!match(line, /\[roadmap:[^]]*\]/)) return ""
+            f = substr(line, RSTART, RLENGTH)
+            sub(/^\[roadmap:[[:space:]]*/, "", f); sub(/[[:space:]]*\]$/, "", f)
+            return f
+        }
+        function slugof(line) {
+            if (!match(line, /\*\*[a-z0-9][a-z0-9-]*\*\*/)) return ""
+            return substr(line, RSTART + 2, RLENGTH - 4)
+        }
+        $0 ~ taskre { inq = 1; next }
+        $0 ~ sectre { inq = 0 }
+        inq && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ && /\[roadmap:/ {
+            printf "%d\t%s\t%s\t%s\n", tagcount($0), field($0), slugof($0), summary($0)
+        }
+    ' "$1"
+}
+
 _qk_errs=()
 [[ ${#QUEUE_KIT_ACTIVE_SECTIONS[@]} -gt 0 ]] || _qk_errs+=("QUEUE_KIT_ACTIVE_SECTIONS is empty")
 [[ -n "$QUEUE_KIT_DEFERRED_SECTION" ]] || _qk_errs+=("QUEUE_KIT_DEFERRED_SECTION is empty")
@@ -99,6 +144,14 @@ _qk_errs=()
     || _qk_errs+=("QUEUE_KIT_ATTEND_CAP must be a positive integer (got '$QUEUE_KIT_ATTEND_CAP')")
 [[ -n "$QUEUE_KIT_PRECONDITION_REGEX" ]] || _qk_errs+=("QUEUE_KIT_PRECONDITION_REGEX is empty")
 [[ ${#QUEUE_KIT_REQUIRED_SECTIONS[@]} -gt 0 ]] || _qk_errs+=("QUEUE_KIT_REQUIRED_SECTIONS is empty")
+[[ -n "$QUEUE_KIT_ROADMAP_MARKER" ]] || _qk_errs+=("QUEUE_KIT_ROADMAP_MARKER is empty")
+# spec: queue-kit/SPEC.md §Layout and configuration — the roadmap vocabulary is all-or-nothing: one array set while the other is empty would accept every value of the unconfigured field, so a half-configured pair is malformed config, not a lenient default
+if [[ ${#QUEUE_KIT_HORIZONS[@]} -gt 0 && ${#QUEUE_KIT_TRACKS[@]} -eq 0 ]]; then
+    _qk_errs+=("QUEUE_KIT_HORIZONS is set but QUEUE_KIT_TRACKS is empty — the roadmap vocabulary is configured as a pair")
+fi
+if [[ ${#QUEUE_KIT_TRACKS[@]} -gt 0 && ${#QUEUE_KIT_HORIZONS[@]} -eq 0 ]]; then
+    _qk_errs+=("QUEUE_KIT_TRACKS is set but QUEUE_KIT_HORIZONS is empty — the roadmap vocabulary is configured as a pair")
+fi
 if [[ ${#_qk_errs[@]} -gt 0 ]]; then
     printf 'queue-kit: malformed queue config — the gates cannot run:\n' >&2
     printf '  %s\n' "${_qk_errs[@]}" >&2

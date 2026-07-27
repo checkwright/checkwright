@@ -1,0 +1,5 @@
+# Hermetic freshness case: the committed marker block byte-matches the emission,
+# and both [roadmap:] tags name a configured horizon and track.
+# Two args steer assertion A off the live emitter onto pre-baked fixture files.
+projection.txt
+emit.txt

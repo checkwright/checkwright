@@ -6,6 +6,8 @@
 
 # Iteration state machine + governance charter.
 TASK-QUEUE.md
+# Public direction: the generated projection of the queue's curated [roadmap:] tags.
+ROADMAP.md
 .workflow/WORKFLOW-STATE.txt
 README.md
 CLAUDE.md

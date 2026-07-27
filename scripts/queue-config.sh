@@ -4,3 +4,10 @@
 QUEUE_KIT_LESSON_TAGS=(essay)
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
 QUEUE_KIT_PROSE_SURFACE_GLOBS=("docs/*.md" "*.local.md")
+# comment-tier-exempt: the roadmap posture is this repo's editorial vocabulary, never a kit literal — horizons in emitted section order, tracks as the per-item label; QUEUE_KIT_ROADMAP_MARKER keeps its kit default and is deliberately absent
+# shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
+QUEUE_KIT_HORIZONS=(now next later)
+# shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
+QUEUE_KIT_TRACKS=(adoption reliability ecosystem commercial)
+# shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
+QUEUE_KIT_ROADMAP_FILE=ROADMAP.md

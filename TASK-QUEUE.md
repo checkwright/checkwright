@@ -14,7 +14,7 @@
 
 - **public-roadmap-projection** [spec: SPEC-public-roadmap-projection.md] — a
   generated Now/Next/Later `ROADMAP.md` projected off this queue: a curated
-  `[roadmap: <horizon>/<track>]` tag, an emitter, and a freshness gate — never
+  `roadmap:` horizon/track tag, an emitter, and a freshness gate — never
   a hand-maintained copy; plus low-friction issue forms for install failures,
   doc problems, and adoption reports beside the fixture-first gate-defect
   template, since the current funnel routes exactly the pre-launch usability

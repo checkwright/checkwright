@@ -1,0 +1,5 @@
+# Stale case: the queue gained an item and retitled another, so the committed
+# marker block lags the emission and the byte-compare must reject. Every tag is
+# valid, so the rejection is assertion A's and not assertion B's.
+projection.txt
+emit.txt

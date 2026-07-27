@@ -8,9 +8,11 @@ generated: true
 A git-native, agent-readable task tracker: one Markdown file where `##`
 sections are queues, bold kebab-case slugs are the task handles, and
 square-bracket tags (`[blocked-by:]`, `[needs-spec]`, `[spec:]`,
-`[drain-exempt:]`, `[precondition-ok:]`, plus the Lessons Learned channel's
-`[attend]` and the consumer-named harvest tags) are the state machine. Gates hold the grammar a coding agent selects work by, and a
-`queue-index.sh` tool renders the compact selection surface.
+`[drain-exempt:]`, `[roadmap:]`, `[precondition-ok:]`, plus the Lessons Learned
+channel's `[attend]` and the consumer-named harvest tags) are the state machine.
+Gates hold the grammar a coding agent selects work by, a
+`queue-index.sh` tool renders the compact selection surface, and a `roadmap.sh`
+tool projects the entries curated with `[roadmap:]` onto a generated public page.
 
 Why: an agent picks work by *parsing*, not reading — so everything selection
 trusts (section position, slugs, tags) must be grammar a gate can enforce, and
@@ -36,6 +38,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-task-conservation
    check-queue-prose-precondition
    check-queue-slug-liveness
+   check-roadmap-fresh
    ```
    <!-- gate-roster:end -->
 
@@ -58,7 +61,13 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 bash queue-kit/bin/queue-index.sh                     # header + active (• ready / ✗ blocked) + deferred
 bash queue-kit/bin/queue-index.sh --collapse-deferred # deferred as a per-### tally
 bash queue-kit/bin/queue-index.sh --extent <slug>     # inclusive line range of one entry's subtree
+bash queue-kit/bin/roadmap.sh --emit                  # the public roadmap block, to stdout
+bash queue-kit/bin/roadmap.sh --write                 # splice it into the configured projection page
 ```
+
+The roadmap projection is opt-in: it emits nothing until you set the horizon and
+track vocabularies and a projection page in your config (step 3 above), so an
+unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 
 ## Test
 

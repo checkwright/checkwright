@@ -241,6 +241,10 @@ if staged_matches 'TASK-QUEUE.md' 'scripts/*.sh'; then
     run_gate check-queue-slug-liveness queue-kit/checks/check-queue-slug-liveness.sh
 fi
 
+if staged_matches 'TASK-QUEUE.md' 'ROADMAP.md' 'scripts/queue-config.sh'; then
+    run_gate check-roadmap-fresh queue-kit/checks/check-roadmap-fresh.sh
+fi
+
 if staged_matches 'TASK-QUEUE.md' 'SPEC-*.md' '*/SPEC-*.md'; then
     run_gate check-amendment-queue canon-kit/checks/check-amendment-queue.sh
 fi

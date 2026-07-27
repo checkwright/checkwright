@@ -80,6 +80,21 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   rationale in the entry body.
 - `[precondition-ok: <reason>]` — per-entry opt-out valve for
   `check-queue-prose-precondition`.
+- `[roadmap: <horizon>/<track>]` — public-projection marker: the entry is
+  curated onto the generated roadmap page (§bin/roadmap.sh), under `<horizon>`
+  and labelled `<track>`. The tag's spelling is fixed mechanism; its two field
+  *values* are drawn from the consumer-configured `QUEUE_KIT_HORIZONS` and
+  `QUEUE_KIT_TRACKS` arrays — the same fixed-spelling/configured-values split
+  `[spec:]` already carries, and for the same reason: a kit literal spelling one
+  project's horizons would ship its roadmap posture as everyone's. One tag with
+  two slash-joined fields rather than two tags, because the fields are never
+  independently meaningful — a track with no horizon has no slot on the page and
+  a horizon with no track has no label in it, so splitting the pair would invent
+  two governed names where the domain has one. An entry carries at most one
+  `[roadmap:]` tag; an untagged entry is simply not projected, the normal case.
+  Placement is unconstrained by section — an active entry and a deferred entry
+  may both be projected, because the projection is about public direction, not
+  selection order. Field validity is `check-roadmap-fresh`'s assertion B.
 
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`
@@ -154,6 +169,25 @@ Knobs:
 - `QUEUE_KIT_ATTEND_CAP` — positive integer, default `3`; the maximum `[attend]`
   lead lines `bin/queue-index.sh` emits in its attention block before folding
   the rest into an overflow note.
+- `QUEUE_KIT_HORIZONS` — ordered array of horizon names for the `[roadmap:]`
+  tag's first field, default empty. The order is the projection's emitted
+  section order.
+- `QUEUE_KIT_TRACKS` — array of track labels for the tag's second field,
+  default empty.
+- `QUEUE_KIT_ROADMAP_FILE` — repo-relative path of the projection page, default
+  empty: no page, and `check-roadmap-fresh` skips clean.
+- `QUEUE_KIT_ROADMAP_MARKER` — the marker-block token, default `roadmap`,
+  delimiting the generated span as `<!-- roadmap:begin -->` /
+  `<!-- roadmap:end -->`. One knob with two readers — the `--write` splice and
+  the gate's block locator — which must agree, so it resolves through this
+  loader rather than being re-defaulted in each.
+
+The roadmap vocabulary is configured as a **pair**: `QUEUE_KIT_HORIZONS` or
+`QUEUE_KIT_TRACKS` set while the other is empty is malformed config and
+`lib/queue.sh` exits 2, per the loader's broken-grammar contract. A
+half-configured vocabulary would silently accept every value of the
+unconfigured field. Both empty is the unconfigured default — a consumer that
+publishes no roadmap gets a clean skip rather than a kit-shaped one.
 
 Cross-kit note: lifecycle-kit's `LIFECYCLE_KIT_ACTIVE_SECTIONS` carries the same
 default. The knobs are independent (either kit runs without the other); a
@@ -168,6 +202,19 @@ the gates pass to awk (both sides of every section boundary must parse
 identically — a shared adapter removes that drift axis), and the slug/tag
 extraction helpers. Values and adapters only, never gate structure
 (gate-sdk's `lib/gate.sh` rule).
+
+The loader validates what it loads: an empty or non-numeric knob is a
+broken grammar, and the roadmap vocabulary is validated as a pair (§Layout and
+configuration) rather than per-array, because the failure the check exists to
+stop is one array set alone. Validation failures are collected and reported
+together, then exit 2.
+
+`queue_roadmap_entries <queue-file>` is the single `[roadmap:]` parse, shared by
+`bin/roadmap.sh` and `check-roadmap-fresh` so the emitter and the gate can never
+disagree about what an entry claims — the same one-adapter rule the section
+regexes follow. It walks the live task sections in queue order and prints one
+tab-separated line per tagged entry: the entry's `[roadmap:]` tag count, the raw
+field text, the slug, and the projected summary.
 
 The loader sources the consumer config, then a `<config>.local.sh` overlay
 beside it when present — last write wins. This is the tracked-name /
@@ -199,6 +246,68 @@ capped at `QUEUE_KIT_ATTEND_CAP` (default 3) with overflow noted as
 always-loaded through the session-context hook that embeds this output, so the
 cap is its token budget. This is the inbound lesson channel reaching every
 later session of the iteration with zero consumer-hook edits.
+
+### bin/roadmap.sh
+
+The public-roadmap emitter: a tool, not a gate (no `# graph:` manifest),
+following `bin/queue-index.sh`. `--emit` prints the generated block to stdout;
+`--write` splices it between the markers in `QUEUE_KIT_ROADMAP_FILE` through
+gate-sdk's `inject_marker_block`, leaving every byte outside them untouched. It
+reads the live task sections only — active plus deferred, never the done section,
+because a shipped item is history, not direction.
+
+The emit grammar is a contract on both sides: `check-roadmap-fresh` byte-compares
+it and a reader consumes it as the page's body.
+
+- One `### <horizon>` heading per configured horizon, in configured order, each
+  emitted even when the queue puts nothing there — an empty horizon is
+  information, and a section that vanishes when it empties reads as a page that
+  forgot it. An empty horizon carries a one-line placeholder instead of bullets.
+- Under each, one bullet per tagged entry, in queue order:
+  ``- **`<slug>`** *(<track>)* — <summary>``.
+- The summary is the entry's **lead-line** text with every tag stripped, cut at
+  the first sentence boundary. Entry bodies are never projected: they carry
+  internal design rationale and cost accounting, which is precisely the content a
+  public page must not inherit. The lead line is therefore the whole budget a
+  projected item gets, and writing one that reads as a public one-liner is the
+  curating maintainer's job, not the emitter's — the emitter truncates, it does
+  not summarize.
+
+Ordering inside a horizon is queue order, not a rank; the page states so in its
+framing rather than implying a priority the queue does not carry. The
+three-to-five items per horizon band is editorial posture, stated in the page's
+framing prose, and deliberately **not gated**: a horizon legitimately holding two
+items is a true state of the queue, and reddening a commit over it would buy a
+curation opinion at the cost of the low-false-positive contract every gate here
+is held to.
+
+### check-roadmap-fresh
+
+Invariant, in two assertions over `QUEUE_KIT_ROADMAP_FILE`:
+
+- **(A) Freshness.** The committed marker block byte-matches
+  `bin/roadmap.sh --emit`, on the `check-footprint-fresh` /
+  `check-value-rollup-fresh` model — diff the emission against the block and name
+  the regen command in the red output. A missing file, missing markers, or an
+  unbalanced marker pair is fail-closed (exit 2): an absent projection under a
+  configured path is a broken install, not a clean skip.
+- **(B) Tag-field validity.** Every `[roadmap:]` tag in the live task sections
+  parses as `<horizon>/<track>` with both fields members of their configured
+  arrays. An unknown horizon or track, a missing slash, or a second `[roadmap:]`
+  tag on one entry is a violation naming the entry and the offending field.
+
+Assertion B lives here rather than in `check-tag-lead-line` because this is the
+gate that already loads the horizon and track vocabularies; putting it in the
+lead-line gate would make a placement gate load a value roster it has no other
+use for. `check-tag-lead-line` still governs the tag on its *placement* axis.
+
+Calibration: `QUEUE_KIT_ROADMAP_FILE` empty is a clean skip for both assertions
+— the correct no-op for a consumer that publishes no roadmap, matching
+`check-queue-slug-liveness`'s empty-globs behavior. The two-argument form
+(`[projection-file] [emit-file]`) steers assertion A off the live emitter onto
+pre-baked fixture files, the interface both cited models carry: a freshness gate
+offering only its bare form has no fixture that does not read the live queue, so
+the pair's verdict would turn on tree state outside the fixture directory.
 
 ### bin/lesson-sink.sh
 
@@ -267,8 +376,8 @@ set is narrower than the algebra's and `[precondition-ok:]` is deliberately
 outside it — `check-queue-prose-precondition` honors that tag anywhere in the
 entry, leaving it no lead-line requirement to enforce. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
-`[spec:]` / `[needs-spec]` / `[drain-exempt:]` in the task sections
-(active + deferred), plus
+`[spec:]` / `[needs-spec]` / `[drain-exempt:]` / `[roadmap:]` in the task
+sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
 section — the section `queue-index.sh` now reads, which retires the old "parsed
 by no reader" exemption for it. Couples
