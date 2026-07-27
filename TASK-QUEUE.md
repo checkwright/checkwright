@@ -2150,7 +2150,24 @@
   check-queue-sections, and the slug-liveness grammar treat an iceboxed slug,
   and whether eviction is a conserved move or a sanctioned disappearance; the
   entry-size floor and the eviction age threshold are policy values needing
-  an owner doc.
+  an owner doc. A second open design rides the size cap: where filing-time
+  design capital lives once the entry cannot carry it. Ruled at filing: the
+  entry keeps the open questions (canon-kit's own few-line budget — its
+  misfiling tell already names a long entry an amendment inlined where
+  check-amendment-queue cannot see it); the filing commit body keeps the
+  narrative and cost analysis, recoverable at authoring via
+  `git log --grep=<slug>`, so nothing is discarded, only made non-resident;
+  the owning SPEC keeps durable one-line facts; no ungoverned detail-file
+  convention. Undecided, and the deciding lens is token economics: whether a
+  governed `draft:` tag state between design-pending and spec-ready — a live
+  pre-amendment file a deferred entry may point at — buys authoring a better
+  starting point than the commit body does (pre-derived thinking reused, even
+  slightly rotted, versus re-derived), against its anchoring risk on a moved
+  codebase and the pairing/orphan gate semantics it needs — a new lifecycle
+  state, not a tag reuse, since check-amendment-queue rules that a deferred
+  entry carrying a `spec:` ref must be promoted. Decide at spec on triage
+  evidence: entries whose discarded derivation would be genuinely expensive
+  to re-derive.
   **Cost while deferred:** compounding with every filing — the queue is read
   by every scope session and curated by every close, and the intake rate
   (27 entries filed 07-25/26 alone) currently outruns closure with no
