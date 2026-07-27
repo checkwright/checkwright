@@ -273,6 +273,13 @@ it and a reader consumes it as the page's body.
   curating maintainer's job, not the emitter's — the emitter truncates, it does
   not summarize.
 
+The block ends on a blank line. That blank is load-bearing rather than cosmetic:
+the Pages parser closes a list only on one, so without it the `:end` marker abuts
+the last bullet and renders *inside* that list item. Command substitution strips
+the trailing newline on both sides of the freshness compare, so the byte-compare
+is unaffected — the same arrangement `gen-value-rollup.sh` uses to keep a table
+from swallowing its marker.
+
 Honest limit — the lead line is a shared budget, and `[roadmap:]` competes for it
 with every other tag the entry carries. Against `check-queue-wrap`'s floor a
 `[spec: <file>]` tag is far wider than `[needs-spec]`, so an entry carrying a

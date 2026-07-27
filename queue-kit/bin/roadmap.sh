@@ -51,6 +51,10 @@ emit_body() {
         done <<< "$entries"
         [[ "$n" -gt 0 ]] || printf '%s\n' "_Nothing is queued under this horizon._"
     done
+    # comment-tier-exempt: load-bearing blank — kramdown ends a list only on a blank
+    # line, else the :end marker abuts the last bullet and is absorbed into that <li>;
+    # command substitution strips it on both sides, so the byte-compare still holds.
+    printf '\n'
 }
 
 if [[ "$mode" == emit ]]; then

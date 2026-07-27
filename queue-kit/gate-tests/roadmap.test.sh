@@ -108,6 +108,16 @@ out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
 want "empty-heading"     "$out" "### someday"
 want "empty-placeholder" "$out" "_Nothing is queued under this horizon._"
 
+# The written block ends on a blank line before the :end marker — without it the
+# Pages parser leaves the list open and renders the marker inside the last <li>.
+printf 'framing\n\n<!-- roadmap:begin -->\n<!-- roadmap:end -->\n' >"$SANDBOX/ROADMAP.md"
+( cd "$SANDBOX" && bash "$EMIT" --write >/dev/null )
+if ! grep -B1 -F -- '<!-- roadmap:end -->' "$SANDBOX/ROADMAP.md" | head -1 | grep -qx ''; then
+    echo "  FAIL [write-trailing-blank]: no blank line before the :end marker:"
+    printf '    %s\n' "$(cat "$SANDBOX/ROADMAP.md")"
+    fails=$((fails + 1))
+fi
+
 # --write leaves every byte outside the markers untouched.
 printf 'KEEP-ABOVE\n\n<!-- roadmap:begin -->\nstale\n<!-- roadmap:end -->\n\nKEEP-BELOW\n' >"$SANDBOX/ROADMAP.md"
 ( cd "$SANDBOX" && bash "$EMIT" --write >/dev/null )
@@ -137,5 +147,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "roadmap.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "roadmap.test.sh: clean (assertion B: valid, unknown horizon/track, unparseable field, duplicate tag, untagged; emit grammar: done excluded, body excluded, empty-horizon placeholder; --write splice bounds; empty-page skip; half-configured vocabulary; 26 checks)"
+echo "roadmap.test.sh: clean (assertion B: valid, unknown horizon/track, unparseable field, duplicate tag, untagged; emit grammar: done excluded, body excluded, empty-horizon placeholder; --write splice bounds + trailing blank; empty-page skip; half-configured vocabulary; 27 checks)"
 exit 0
