@@ -2167,7 +2167,11 @@
   state, not a tag reuse, since check-amendment-queue rules that a deferred
   entry carrying a `spec:` ref must be promoted. Decide at spec on triage
   evidence: entries whose discarded derivation would be genuinely expensive
-  to re-derive.
+  to re-derive. The size-cap gate's spec also mints the owner section for
+  the entry-body field roster — the fields every entry carries (deliverable,
+  open design, cost while deferred, filed-by) are today precedent-only,
+  derived by imitating neighboring entries (kfric-stamped 2026-07-28), and
+  the gate must enumerate them anyway.
   **Cost while deferred:** compounding with every filing — the queue is read
   by every scope session and curated by every close, and the intake rate
   (27 entries filed 07-25/26 alone) currently outruns closure with no
