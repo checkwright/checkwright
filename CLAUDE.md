@@ -178,6 +178,13 @@ the skill on a blocking verdict — so they are not resident here.
   deliverable)? stamp it in the moment with
   `bash drift-kit/bin/kfric.sh "<fact>" "<surface>"` — deferred capture is
   no capture; close triages it (drift-kit/SPEC.md §The knowledge-friction loop).
+- **Gap capture (any mid-iteration session):** a work-shaped finding — a gap,
+  a task, a defect — routes to the committed gap inbox with
+  `bash lifecycle-kit/bin/file-gap.sh "<gap>"`, never a mid-iteration queue
+  edit contending on a stage session's surface; close drains it
+  (lifecycle-kit/SPEC.md §The committed gap inbox). The sanctioned exception:
+  an operator-directed filing may land in the queue directly, staged and
+  committed in one motion under the shared-index rule above.
 - No per-user memory files: durable guidance goes in tracked manifests (this
   file, kit SPECs) or `BRIEF.local.md` (local-only private context). Harness
   auto-memory is disabled and enforced off (`check-settings-pins`,
