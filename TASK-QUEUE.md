@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: front-door-readiness
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,45 @@
 ## New Features
 
 ## Technical Debt
+
+- **front-door-outcome-rewrite** — rewrite the README/docs first screen around
+  one job: a literal category line (verification for coding-agent delivery), the
+  outcome (spec drift, skipped stages, and unsupported done claims become
+  failing checks before merge), the target user, one command, one before/after
+  example. `demo/run-demo.sh` gets linked from README and the docs home, and the
+  repo's discovery topics gain the axes they lack. External-review finding: the
+  front door describes architecture before outcome, inviting mis-categorization
+  as a heavyweight methodology; the complement-not-compete stance (keep your
+  spec workflow; add Checkwright where a claim must be mechanically proven)
+  moves near the top. Consumes RELEASING.md's reserved launch-copy phrasing and
+  docs/positioning.md's positioning vocabulary rather than forking either.
+  **Classified debt 2026-07-27 by scope, operator-ruled — nothing had decided
+  the class before.** The entry carried no clause justifying the Deferred
+  section's design tag, which every entry there wears by construction, so the
+  tag was a blanket default rather than a ruling. By canon-kit/SPEC.md §The
+  amendment lifecycle's new-names litmus this adds **no name to a governed
+  surface**: it
+  converges prose onto vocabulary RELEASING.md and docs/positioning.md already
+  own, and neither the demo link nor the repo topics introduce a governed name.
+  Debt, and it needs no amendment.
+  **Premise re-verified 2026-07-27 by scope — supersedes the 2026-07-25 and
+  2026-07-26 correction notes, which are folded in here.** Two sub-deliverables
+  are **already done** and are dropped from the deliverable above: the kit table
+  and architecture prose already sit below the quick start, and the quick start
+  already leads with the release tarball (the `npx checkwright init` lead was
+  corrected inline by `release-path-hardening`'s close). The 2026-07-25 note's
+  citation "the eleven-kit table at README.md:24" **no longer resolves** — the
+  quick-start heading is at that altitude now and the table sits below it — so
+  that note is retired rather than carried. What stands, confirmed against the
+  live tree and repo metadata this session: `run-demo`/`demo/` appears **zero
+  times** in both `README.md` and `docs/index.md`, so the working walkthrough is
+  linked from neither front door; the topic set is exactly `agent-governance`,
+  `code-quality`, `git-hooks`, `linting`, leaving three residual axes (an LLM, a
+  spec-driven-development, and a harness topic — `agent-governance` already
+  names agents); and neither front door carries a category line, an outcome
+  sentence, or a before/after example.
+  Promoted 2026-07-27 by scope (`front-door-readiness`), operator-ruled;
+  surfaced 2026-07-23 by the commissioned external review.
 
 ## Deferred
 
@@ -878,40 +917,6 @@
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
-- **front-door-outcome-rewrite** [needs-spec] — rewrite the README/docs first
-  screen around one job: a literal category line (verification for
-  coding-agent delivery), the outcome (spec drift, skipped stages, and
-  unsupported done claims become failing checks before merge), the target
-  user, one command, one before/after example — the eleven-kit table and
-  architecture prose move below the quick start, `demo/run-demo.sh` gets
-  linked from README and the docs home (today the working demo is linked
-  from neither), and the repo gains likely discovery topics. External-review
-  finding: the front door describes architecture before outcome, inviting
-  mis-categorization as a heavyweight methodology; the complement-not-compete
-  stance (keep your spec workflow; add Checkwright where a claim must be
-  mechanically proven) moves near the top. Consumes RELEASING.md's reserved
-  launch-copy phrasing rather than forking it.
-  **Premise corrected 2026-07-25 by the undirected scope survey — one
-  sub-deliverable is already done, the other is confirmed live.** "The repo
-  gains likely discovery topics" is stale: four topics are already set
-  (`agent-governance`, `code-quality`, `git-hooks`, `linting`), so the residue
-  is topic *quality*, not their absence. The demo-invisibility half stands and is
-  confirmed: `run-demo`/`demo/` appears **zero times** in both `README.md` and
-  `docs/index.md`, so the working walkthrough is linked from neither front
-  door. The first screen's shape is confirmed too — badges, prose premise, then
-  the eleven-kit table at README.md:24, architecture before outcome.
-  **Correction to that correction, 2026-07-26 by the undirected scope survey —
-  the topic residue is three axes, not four.** The note above originally read
-  "none names agents, LLMs, spec-driven development, or a harness".
-  `agent-governance` **does** name agents, so the true residue is the absence of
-  an LLM, a spec-driven-development, and a harness topic. Re-verified against
-  the live repo metadata this session: the topic set is unchanged from
-  2026-07-25, and the demo-invisibility half still reads zero in both front
-  doors.
-  **Cost while deferred:** the current first screen filters out exactly the
-  reader the launch targets; zero until announcement, then compounding.
-  Surfaced 2026-07-23 in the same external review.
-
 - **preview-release-cadence** [needs-spec] — reset release signaling for a
   pre-1.0 audience: declare a preview/alpha channel, batch internal
   iterations into a slower external cadence (weekly-class) so consumers stop
@@ -921,23 +926,30 @@
   internal iteration completion from public version publication — a
   RELEASING.md policy change more than a mechanism.
   **Premise corrected 2026-07-25 by the undirected scope survey, re-counted
-  2026-07-26 — the count is larger than filed and the rhythm held.** This entry
-  says "thirteen-releases-in-nine-days"; the tree now carries **15 tags in 12
-  days**, `v0.1.0` (2026-07-14) through `v0.15.0` (2026-07-25). The finding is
-  not a one-off burst that has since settled — the cadence continued at roughly
-  a release a day across the whole window, and the count has risen at every
-  re-read (13 → 14 → 15), which strengthens rather than dates the signaling
-  argument.
-  **Now also carries `supply-chain-trust-baseline`'s carved-out deliverable:
-  checksum-verifiable release assets.** That entry gated them on "once cadence
-  stabilizes" and its promoted iteration carved them out on exactly that
-  ground (2026-07-25, operator-approved), so the convention lands here, with
-  the cadence it depends on, rather than being pinned to a rhythm this entry
-  may change.
+  2026-07-26 and again 2026-07-27 — the count is larger than filed and the
+  rhythm held.** This entry says "thirteen-releases-in-nine-days"; the tree now
+  carries **17 tags in 14 days**, `v0.1.0` (2026-07-14) through `v0.17.0`
+  (2026-07-27). The finding is not a one-off burst that has since settled — the
+  cadence continued at roughly a release a day across the whole window, and the
+  count has risen at every re-read (13 → 14 → 15 → 17), which strengthens rather
+  than dates the signaling argument.
+  **The inherited checksum-verifiable-asset deliverable is SATISFIED — corrected
+  2026-07-27 by scope.** This entry absorbed `supply-chain-trust-baseline`'s
+  carved-out "publish checksum-verifiable release assets instead of bare tag
+  pointers" (2026-07-25, operator-approved) on the ground that the convention
+  should land with the cadence it depends on. `release-tarball-delivery-channel`
+  shipped it independently: `v0.17.0` is the first release carrying assets —
+  `checkwright-0.17.0.tgz` beside its `.sha256` — where `v0.16.0` carried none.
+  The deliverable is struck; what this entry still owns is the **signaling** half
+  alone (a declared preview channel, a slower external cadence batching internal
+  iterations, and a 30-second human changelog beside the migration detail). The
+  residual integrity question — that a checksum sharing one origin with its
+  tarball proves transfer integrity only — is `tarball-build-attestation`'s, not
+  this entry's.
   **Cost while deferred:** zero pre-announcement; at announcement the
   release history itself signals instability to exactly the risk-averse
-  teams the trust story targets — and the checksummed-asset gap inherited
-  above stays open for the same window.
+  teams the trust story targets. The inherited checksummed-asset gap no longer
+  contributes — it is closed, per the correction above.
   Surfaced 2026-07-23 in the same external review (its release-signaling
   finding).
 
