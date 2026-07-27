@@ -12,6 +12,38 @@
 
 ## New Features
 
+- **public-roadmap-projection** [spec: SPEC-public-roadmap-projection.md] — a
+  generated Now/Next/Later `ROADMAP.md` projected off this queue: a curated
+  `[roadmap: <horizon>/<track>]` tag, an emitter, and a freshness gate — never
+  a hand-maintained copy; plus low-friction issue forms for install failures,
+  doc problems, and adoption reports beside the fixture-first gate-defect
+  template, since the current funnel routes exactly the pre-launch usability
+  signal away from issues. The horizon and track vocabularies are consumer
+  config, not kit literals. Design, seam ruling, and the per-delta work
+  classes: queue-kit/SPEC-public-roadmap-projection.md.
+  **Cost while deferred:** outsiders cannot read direction from a 30-entry
+  deferred section, and pre-launch usability feedback has no low-friction
+  inlet. Surfaced 2026-07-23 in the commissioned external review; promoted by
+  spec 2026-07-27 (`front-door-readiness`).
+
+- **primary-install-path-claim** [spec: SPEC-primary-install-path-claim.md] —
+  **no surface owns which install path is primary**, so two documents drifted
+  apart with nothing to catch it: README.md's Quick start led with `npx
+  checkwright init` — the command `v0.16.0` announced and which never worked,
+  npm serving only the `0.0.1` reservation placeholder — while docs/install.md
+  states the tarball is primary. The repo's most-read surface contradicted its
+  own install page and advertised a broken command, through a release and into
+  the next one. **Deliverable:** an `install-primary:` declaration owning the
+  claim in docs/install.md §Quick start, plus a consistency gate holding every
+  governed surface's install section to it. The registry-reachability half is
+  ruled out of hermetic reach and the leading-vs-mentioning predicate is
+  settled, both in canon-kit/SPEC-primary-install-path-claim.md.
+  **Cost while deferred:** demonstrated, not hypothetical — it drifted at two
+  consecutive releases, and the failure mode is the worst-placed one a project
+  has: the front door telling a first-time reader to run something that does
+  not work. Filed 2026-07-26 by close (`release-path-hardening`); promoted
+  2026-07-27 by spec (`front-door-readiness`).
+
 ## Technical Debt
 
 - **front-door-outcome-rewrite** — rewrite the README/docs first screen around
@@ -952,18 +984,6 @@
   contributes — it is closed, per the correction above.
   Surfaced 2026-07-23 in the same external review (its release-signaling
   finding).
-
-- **public-roadmap-projection** [needs-spec] — a generated Now/Next/Later
-  `ROADMAP.md` projection off this queue (derivation-first: curated horizon
-  markers on entries, a projection script, a freshness gate — never a
-  hand-maintained copy), three-to-five items per horizon, labeled
-  adoption / reliability / ecosystem / commercial; plus low-friction issue
-  forms for install failures, doc problems, and adoption reports beside the
-  fixture-first gate-defect template — the current funnel routes exactly
-  the pre-launch usability signal away from issues.
-  **Cost while deferred:** outsiders cannot read direction from a
-  30-entry deferred section, and pre-launch usability feedback has no
-  low-friction inlet. Surfaced 2026-07-23 in the same external review.
 
 - **scope-amendment-authoring-gate** [needs-spec] — on a roster carrying a
   dedicated authoring stage, nothing stops the **scope** stage from doing
@@ -2003,38 +2023,6 @@
   Filed 2026-07-26 by close (`release-path-hardening`), from its own
   prompt-friction triage; the local overlay carried no redundant entries to
   prune this iteration.
-
-- **primary-install-path-claim** [needs-spec] — the gap generalization behind a
-  staleness this close fixed inline: **no surface owns which install path is
-  primary**, so two documents drifted apart with nothing to catch it. README.md's
-  Quick start still led with `npx checkwright init` — the command `v0.16.0`
-  announced and which never worked, npm serving only the `0.0.1` reservation
-  placeholder — while `docs/install.md`, rewritten this same iteration, states
-  the tarball is primary "because it removes a runtime dependency". The repo's
-  most-read surface contradicted its own install page and advertised a broken
-  command, through a release and into the next one.
-  **Gap generalization, honestly split.** The general form — *does this
-  documented install command actually resolve against the live registry?* —
-  needs network egress at gate time and is out of a hermetic battery's reach;
-  that half is not buildable and should not be attempted. The narrow form is
-  buildable but has no subject yet: a gate can hold two surfaces to one
-  **primary-path claim** only once some surface *owns* that claim as a governed
-  value, which none does today.
-  **Deliverable:** give the primary-path claim an owner (docs/install.md
-  §Quick start, as the page the release note and README both already cite), then
-  a consistency gate asserting no other prose surface leads with a different
-  install transport — canon-kit's star topology applied to a user-facing claim
-  rather than an internal one.
-  **Why `[needs-spec]`:** "leads with a different transport" is the undecided
-  predicate. Naming npm as a *secondary* path is correct and must stay green, so
-  the gate has to distinguish leading from mentioning, and doing that by position
-  or by heading is the design question.
-  **Cost while deferred:** demonstrated, not hypothetical — it has now drifted at
-  two consecutive releases, and the failure mode is the worst-placed one a
-  project has: the front door telling a first-time reader to run something that
-  does not work.
-  Filed 2026-07-26 by close (`release-path-hardening`), from its own top-level
-  doc-staleness review.
 
 - **action-gh-repo-context** [needs-spec] — a workflow job that invokes `gh`
   while carrying **neither a checkout nor a repo-context env** cannot resolve a
