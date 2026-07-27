@@ -46,8 +46,9 @@
 
 ## Technical Debt
 
-- **front-door-outcome-rewrite** — rewrite the README/docs first screen around
-  one job: a literal category line (verification for coding-agent delivery), the
+- **front-door-outcome-rewrite** [roadmap: now/adoption] — rewrite the front door around one job.
+  Both first screens (README and the docs home) get a literal category line
+  (verification for coding-agent delivery), the
   outcome (spec drift, skipped stages, and unsupported done claims become
   failing checks before merge), the target user, one command, one before/after
   example. `demo/run-demo.sh` gets linked from README and the docs home, and the
@@ -197,7 +198,8 @@
   launch crawl (launch-readiness-gate validate) shows recurrence worth
   automating. Surfaced 2026-07-16 in the launch triage that scoped
   launch-readiness-gate.
-- **plugin-marketplace** [needs-spec] — harness plugin/marketplace packaging
+- **plugin-marketplace** [needs-spec] [roadmap: later/ecosystem] — harness plugin packaging.
+  Harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
   plugin substrate moves fast (the scope-session-routing ruling applies).
@@ -236,7 +238,8 @@
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
-- **benchmark-ab-experiment** [needs-spec] — the controlled differential
+- **benchmark-ab-experiment** [needs-spec] [roadmap: later/adoption] — a controlled A/B experiment.
+  The controlled differential
   experiment: same model, same dependent-task series, two arms (ungoverned
   loop vs Checkwright-governed), drift *accumulation across the series* as
   the metric — a governance layer's effect, not a model leaderboard number.
@@ -254,7 +257,8 @@
   that tool: verifying the split-lead posture's savings
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
-- **prose-profile** [needs-spec] — the non-code universality rung: a third
+- **prose-profile** [needs-spec] [roadmap: later/ecosystem] — a profile for non-code repos.
+  The non-code universality rung: a third
   consumer shaped as a prose/documentation repo (no build, no test suite)
   stress-tests whether the kits govern non-code work. Core dilution is ruled
   out on record — if pursued, this is an adapter/profile delivered as
@@ -269,7 +273,8 @@
   launch-readiness-gate build) is the first concretely prose-shaped kit
   mechanism and the natural profile seed. Surfaced 2026-07-16 in the same
   launch triage that scoped launch-readiness-gate.
-- **hosted-attestation-service** [needs-spec] — the team/paid rung: gates
+- **hosted-attestation-service** [needs-spec] [roadmap: later/commercial] — a neutral attestation.
+  The team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
   hosted gate runs as a neutral attestation, cross-repo drift dashboards,
   maintained rulesets. A service, not code: cloning the kits does not clone
@@ -372,7 +377,8 @@
   ground. Unblocked: `stage-cursor-extraction` has reached Done, so this entry
   is pickable.
 
-- **heterogeneous-agent-delegation** [needs-spec] — cross-vendor stage dispatch:
+- **heterogeneous-agent-delegation** [needs-spec] [roadmap: later/ecosystem] — cross-vendor stages.
+  Cross-vendor stage dispatch:
   a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
   (Codex, etc.), extending the homogeneous multi-agent / multi-operator model to a
   heterogeneous fleet. Cashes the public "no IDE/model/harness lock-in"
@@ -949,7 +955,8 @@
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
-- **preview-release-cadence** [needs-spec] — reset release signaling for a
+- **preview-release-cadence** [needs-spec] [roadmap: next/adoption] — a declared preview channel.
+  Reset release signaling for a
   pre-1.0 audience: declare a preview/alpha channel, batch internal
   iterations into a slower external cadence (weekly-class) so consumers stop
   reading thirteen-releases-in-nine-days as churn, publish
@@ -1571,7 +1578,8 @@
   decision; the operator ruled stage sequencing the lead's accountability, which
   is why this is a lead rule rather than a stage-session or gate concern.
 
-- **platform-support-ci-matrix** [needs-spec] — the per-platform half carved out
+- **platform-support-ci-matrix** [needs-spec] [roadmap: next/reliability] — a CI leg per platform.
+  The per-platform half carved out
   of `platform-support-contract` when that entry was scoped down to the floor
   contract for the `activation-path` iteration: a CI install-smoke leg per
   supported platform (Linux / macOS / Windows-WSL), or an explicit experimental
@@ -1677,7 +1685,8 @@
   doctor + manifest batch, after measuring both the glob behavior and the
   gate's runtime.
 
-- **installer-lifecycle-verbs** [needs-spec] — the installer's second phase:
+- **installer-lifecycle-verbs** [needs-spec] [roadmap: next/adoption] — update, diff, uninstall.
+  The installer's second phase:
   `update`, `diff`, and `uninstall`, the verbs that manage an install after
   `init` has made one. Phase 1 (`init`, `doctor`, `--dry-run`, the manifest, the
   profiles, the packaging, and the consumer smoke) shipped in `activation-path`;

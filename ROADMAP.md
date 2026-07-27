@@ -48,13 +48,19 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-_Nothing is queued under this horizon._
+- **`front-door-outcome-rewrite`** *(adoption)* — rewrite the front door around one job.
 
 ### next
 
-_Nothing is queued under this horizon._
+- **`preview-release-cadence`** *(adoption)* — a declared preview channel.
+- **`platform-support-ci-matrix`** *(reliability)* — a CI leg per platform.
+- **`installer-lifecycle-verbs`** *(adoption)* — update, diff, uninstall.
 
 ### later
 
-_Nothing is queued under this horizon._
+- **`plugin-marketplace`** *(ecosystem)* — harness plugin packaging.
+- **`benchmark-ab-experiment`** *(adoption)* — a controlled A/B experiment.
+- **`prose-profile`** *(ecosystem)* — a profile for non-code repos.
+- **`hosted-attestation-service`** *(commercial)* — a neutral attestation.
+- **`heterogeneous-agent-delegation`** *(ecosystem)* — cross-vendor stages.
 <!-- roadmap:end -->

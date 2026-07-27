@@ -268,6 +268,15 @@ it and a reader consumes it as the page's body.
   curating maintainer's job, not the emitter's — the emitter truncates, it does
   not summarize.
 
+Honest limit — the lead line is a shared budget, and `[roadmap:]` competes for it
+with every other tag the entry carries. Against `check-queue-wrap`'s floor a
+`[spec: <file>]` tag is far wider than `[needs-spec]`, so an entry carrying a
+spec pointer and a long slug can have **no** columns left for a summary, and is
+simply not projectable until that pointer drops at the amendment's merge. That is
+a true state of the queue rather than a defect to gate around: the wrap floor
+exists so a runaway never reflows to column 0, and widening it to make room for a
+public page would trade a parse guarantee for a presentation one.
+
 Ordering inside a horizon is queue order, not a rank; the page states so in its
 framing rather than implying a priority the queue does not carry. The
 three-to-five items per horizon band is editorial posture, stated in the page's
