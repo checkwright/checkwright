@@ -170,11 +170,19 @@ delta originally named:
   of the same file.
 - `queue-kit/SPEC.md` §check-tag-lead-line's governed-set list, already owned by
   delta 5.
-- `docs/queue-kit/index.md`, the generated mirror of `queue-kit/README.md` —
-  carried by delta 13's `gen-docs-mirror.sh --write`, never hand-edited.
+- `docs/queue-kit/index.md`, the docs-site kit page.
 
-Two hand edits, then, not one; the third rides delta 5 and the fourth rides the
-regen.
+Three hand edits, then, not one; the fourth rides delta 5.
+
+**Correction, made at build against the generator rather than inferred.** The
+fourth site was filed as "the generated mirror of `queue-kit/README.md`, carried
+by delta 13's `gen-docs-mirror.sh --write`, never hand-edited". It is not
+generated: `scripts/gen-docs-mirror.sh`'s `sources()` emits
+`docs/<kit>/SPEC.md` and `docs/<kit>/README.md` only, so the mirror of the kit
+README is `docs/queue-kit/README.md`. `docs/queue-kit/index.md` is a
+hand-authored docs-site page (nav front matter, no `generated:` key) and takes a
+hand edit like the other two. The count of four red sites was right; the
+disposition of the fourth was wrong.
 
 ### 7. `ROADMAP.md` framing prose — *design-bearing*
 
