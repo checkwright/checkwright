@@ -2071,6 +2071,61 @@
   landing a consumer-reachable gate after validate has passed is the failure mode
   this iteration exists to fix.
 
+- **native-gate-binary-port** [needs-spec] — replace the gate substrate:
+  port the battery off bash-plus-GNU-userland onto a single native compiled
+  binary (Rust the lead candidate), because every structural pain the current
+  stack carries is substrate-bound, not fixable in place. The inventory today:
+  76 check scripts, ~14.3k lines of shell across `*/checks`, `*/bin`, and
+  `scripts/`, 85 registry entries. The pains, each already live: the platform
+  reality is Linux-only — stock macOS ships bash 3.2 and a BSD userland
+  (docs/install.md §Requirements states it outright) and Windows is WSL-only
+  (`platform-support-ci-matrix` carries that half); the
+  bash/git/jq/awk/sort/shellcheck assortment has independent release
+  lifecycles, with cross-version workarounds already in tree; battery
+  wall-time has grown from tens of seconds toward minutes on some batteries,
+  most of it process-spawn cost rather than work; shellcheck is a linter, not
+  a compiler, and bash offers no type system under 14k lines; and check
+  source in the consumer's tree feeds the source-prediction anti-pattern —
+  agents reading gate scripts to predict verdicts instead of running the
+  oracle, a recurring token sink the delegation rules fight behaviorally
+  rather than structurally.
+  **Deliverable:** one multi-call binary (busybox-style, one subcommand per
+  check), with `gates.list` resolution dispatching per-entry to binary
+  subcommand or script so the port lands cohort by cohort, slowest and
+  meta-gates first; each ported gate's `good/`+`bad/` fixture pair is the
+  mechanical parity oracle before its script retires; consumer-authored gates
+  keep the shell escape hatch, so registry-plus-shadowing semantics survive
+  verbatim; per-platform release artifacts (Linux, macOS, native Windows)
+  with published checksums and publicly buildable source; git the sole
+  runtime dependency (shelled out, not embedded). Expected wins: the battery
+  in the sub-second class, native macOS/Windows with no GNU-toolchain floor,
+  the cross-utility version matrix gone, a real unit-test harness under the
+  fixtures, and vendored binaries giving an agent nothing to read.
+  **Why `[needs-spec]`:** the consumer-extensibility model is the design that
+  decides everything else — script escape hatch as first-class vs a
+  declarative check DSL vs native plugins — plus language choice (Rust vs
+  Go), the dogfood question (this repo must run built artifacts or the
+  opacity win is consumer-only, and the Rust source sits readable in-tree
+  regardless), the trust inversion (an auditable script becoming an opaque
+  binary in a pre-commit hook demands reproducible builds and checksums —
+  opacity to agents is opacity to human adopters too), and the
+  cross-compile/release pipeline including how `pack-installer` ships
+  per-platform payloads. A multi-iteration track: cost the design spike
+  separately from the port, since the spike decides whether the port is a
+  cohort per iteration or worse.
+  **Cost while deferred:** compounding on three axes — every new gate adds
+  shell to the eventual port, battery duration grows with the roster and is
+  a per-commit tax already, and the source-prediction token waste recurs per
+  session. Bounded in kind: nothing breaks; the current substrate is correct
+  on Linux and fully gated. Interacts with `platform-support-ci-matrix`
+  (native binaries change what a platform leg must prove — the binary runs,
+  not that a GNU floor is met) and with the front-door requirements story
+  (one static binary is a stronger install claim than the utility list).
+  Feature-shaped at triage: it adds governed names — the binary, its
+  subcommand surface, the dispatch knob — on top of new mechanism.
+  Filed 2026-07-28 by operator request, from a session assessing the shell
+  substrate's structural limits against a native-binary port.
+
 ## Done
 
 ## Lessons Learned
