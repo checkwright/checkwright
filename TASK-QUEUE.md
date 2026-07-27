@@ -2024,6 +2024,44 @@
   Filed 2026-07-26 by close (`release-path-hardening`), from its own top-level
   doc-staleness review.
 
+- **action-gh-repo-context** [needs-spec] — a workflow job that invokes `gh`
+  while carrying **neither a checkout nor a repo-context env** cannot resolve a
+  target repository, and nothing catches it until a tag fires. This is not
+  hypothetical: it took down `v0.17.0`'s `release` job on its first live run.
+  `.github/workflows/publish.yml`'s release job downloads the packed artifact and
+  deliberately checks out nothing (the job needs no source, and its own header
+  argues that design), but set only `GH_TOKEN` and `TAG` — so `gh` fell back to
+  resolving the repo from a git remote that was not there and died in 7s on
+  `failed to run git: fatal: not a git repository`, before its first API call.
+  No Release was created and no assets were attached.
+  **Gap generalization — the class is real and ShellCheck is structurally blind
+  to it.** `check-action-run-shell`, which this same iteration shipped, lints
+  exactly this block and passes it: the shell is valid, the variables are quoted,
+  the control flow is sound. The defect is **semantic** — an assumption about the
+  runner's filesystem that no syntactic linter can hold. So the gate that exists
+  is not the gate this needed, and that distinction is the entry's whole point.
+  **Deliverable:** an assertion that a job whose `run:` blocks invoke `gh` either
+  contains a checkout step, sets `GH_REPO` (job- or step-level), or passes
+  `--repo` on every `gh` invocation. All three inputs are readable from the
+  workflow text, and the trigger is narrow — only jobs that actually call `gh`
+  arm it.
+  **Why `[needs-spec]`:** placement and reach are undecided. It reads the same
+  Actions-shape surface as `check-action-run-shell` and so probably belongs in
+  gate-sdk, but that makes it consumer-reachable — which means a fixture pair, a
+  SPEC section, `gates.list` registration, three regenerated projections, and a
+  Tightened-gates bullet in the next note. The `--repo`-on-every-call arm is also
+  the fiddly one: proving *every* invocation carries it is a per-line read, and a
+  job mixing prefixed and unprefixed calls is the false-negative to design out.
+  **Cost while deferred:** the concrete instance is fixed (the release job now
+  sets `GH_REPO`, bound by a comment to the no-checkout design), so what stays
+  open is the class — any future `gh`-using job repeats it, and the failure mode
+  is the worst-timed one available: green everywhere, red only at the tag, on the
+  release path itself. Costed at roughly one small unit.
+  Filed 2026-07-27 by close (`release-path-hardening`), from the v0.17.0 release
+  job's first live failure; ruled a unit rather than a close-step patch, since
+  landing a consumer-reachable gate after validate has passed is the failure mode
+  this iteration exists to fix.
+
 ## Done
 
 ## Lessons Learned

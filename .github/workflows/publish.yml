@@ -119,6 +119,10 @@ jobs:
       - name: attach the tarball and its checksum to the Release
         env:
           GH_TOKEN: ${{ github.token }}
+          # This job checks out nothing, so gh has no git remote to resolve a
+          # target repository from. Keep GH_REPO whenever the no-checkout design
+          # above holds — without it every gh call below dies before its request.
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
