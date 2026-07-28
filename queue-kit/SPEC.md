@@ -26,6 +26,13 @@ as `##` sections over column-0 bullets:
   selection; `###` subsections are presentation, not semantics. An entry's
   prose may carry a `Surfaced <date>` mark — an ungated convention recording
   when the premise was filed; drift-kit's deferred-age KPI is its reader.
+  A deferred body is free prose, but four **ungated** bold-lead-in fields
+  recur and are worth reaching for, each answering a question a later scope
+  asks: `Deliverable` (what landing looks like), `Why <the design-pending
+  tag>` (what the open design actually is), `Cost while deferred` (the
+  Gap-disposition rule's costing — the most-used of the four), and a
+  closing `Filed <date> by <stage>` provenance line. None is required and no
+  gate reads them; an entry uses the ones that carry weight for it.
 - **The done section** (default `Done`) — one line per completed task, the
   bare slug only; prose about what happened lives in git history.
 - Any other section (an iteration header, a lessons section) is outside the
