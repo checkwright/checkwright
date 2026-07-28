@@ -3,22 +3,59 @@
 [![gates](https://github.com/checkwright/checkwright/actions/workflows/gates.yml/badge.svg)](https://github.com/checkwright/checkwright/actions/workflows/gates.yml)
 [![release](https://img.shields.io/github/v/tag/checkwright/checkwright?label=release)](https://github.com/checkwright/checkwright/releases)
 
-A coding-agent-assisted delivery methodology as installable kits: machine-gated
-documentation/spec consistency, an evidence-stamped iteration lifecycle
-designed for stateless agent sessions, and token-economics-aware context
-management. A *wright* is a craftsman — shipwright, playwright; this is the
-craft of checks.
+**Verification for coding-agent delivery.** Checkwright is the verification
+layer under agent orchestration: spec drift, skipped stages, and unsupported
+*done* claims become failing checks before a merge, instead of review findings
+after one. It ships as installable kits — bare-bash gates plus an
+evidence-stamped iteration lifecycle designed for stateless agent sessions.
 
-The premise: when coding agents do the writing, discipline does not hold —
-conventions live in prose no stateless session reliably re-reads, and drift is
-silent. The remedy is mechanization: every cheap, low-false-positive,
-mechanically-decidable consistency axis is enforced by a gate that blocks the
-commit, and the human (or agent) residue is held to the irreducibly semantic
-judgment alone. Checkwright packages that machinery — and this repository
-governs itself with its own kits, day one.
+**For the maintainer of a repository coding agents write most of**, who has to
+answer at merge time whether the work is actually done, and cannot answer it by
+reading every diff.
 
-Docs live at <https://checkwright.dev> — the same pages served in-repo
-under [`docs/`](docs/index.md).
+**It complements the workflow you already run.** Keep your spec process, your
+prompts, your harness. Add Checkwright where a claim has to be mechanically
+proven rather than asserted: the instructions shape, the gates enforce. Why that
+split is the whole design: [Where Checkwright sits](docs/positioning.md).
+
+One command runs the entire arc against a throwaway consumer repo, installing
+nothing and touching no tree but its own:
+
+```bash
+bash demo/run-demo.sh
+```
+
+It vendors the kits into a fresh git repo, passes the battery clean, introduces
+a defect and shows the gate that blocks it, then drops the defect and goes green
+again. The script is [`demo/run-demo.sh`](demo/run-demo.sh), and it runs on every
+validate stage, so the walkthrough cannot rot.
+
+## What that buys you
+
+**Before.** A session finishes a task and marks it done; the evidence is the
+session's own say-so. A page keeps citing a spec section that a rename moved out
+from under it. Both commits go in green, and the next stateless session reads
+both as ground truth.
+
+**After.** Neither commit lands:
+
+```text
+===== check-md-refs =====
+check-md-refs: dangling reference in the governed doc set
+  docs/guide.md:71 -> SPEC.md §Retry budget — no such section
+FAIL: check-md-refs
+===== check-stage-evidence =====
+check-stage-evidence: a task reached Done with no validate stamp this iteration
+FAIL: check-stage-evidence
+```
+
+Nothing there is a review opinion: each finding is cheap, mechanically decidable,
+and low-false-positive by construction, which is what lets it block a commit
+rather than open a thread. The semantic residue — is this design right, does the
+evidence earn the claim — stays with the human or the agent, undiluted.
+
+Docs live at <https://checkwright.dev> — the same pages served in-repo under
+[`docs/`](docs/index.md).
 
 ## Quick start
 
@@ -29,6 +66,17 @@ extract, run `init` — which needs nothing beyond a GNU userland; `npx
 checkwright init` is the same vendoring over npm, for a consumer who already has
 Node. Both recipes, with profiles and requirements:
 [docs/install.md](docs/install.md) §Quick start.
+
+## The premise
+
+When coding agents do the writing, discipline does not hold: conventions live in
+prose no stateless session reliably re-reads, and drift is silent. The remedy is
+mechanization — every cheap, low-false-positive, mechanically-decidable
+consistency axis is enforced by a gate that blocks the commit, and the human (or
+agent) residue is held to the irreducibly semantic judgment alone. Checkwright
+packages that machinery, and this repository governs itself with its own kits,
+day one. A *wright* is a craftsman — shipwright, playwright; this is the craft
+of checks.
 
 ## Kits
 

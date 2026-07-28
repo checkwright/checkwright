@@ -48,47 +48,6 @@
 
 ## Technical Debt
 
-- **front-door-outcome-rewrite** [roadmap: now/adoption] — rewrite the front door around one job.
-  roadmap-summary: A first screen that leads with the outcome instead of the architecture.
-  Both first screens (README and the docs home) get a literal category line
-  (verification for coding-agent delivery), the
-  outcome (spec drift, skipped stages, and unsupported done claims become
-  failing checks before merge), the target user, one command, one before/after
-  example. `demo/run-demo.sh` gets linked from README and the docs home, and the
-  repo's discovery topics gain the axes they lack. External-review finding: the
-  front door describes architecture before outcome, inviting mis-categorization
-  as a heavyweight methodology; the complement-not-compete stance (keep your
-  spec workflow; add Checkwright where a claim must be mechanically proven)
-  moves near the top. Consumes RELEASING.md's reserved launch-copy phrasing and
-  docs/positioning.md's positioning vocabulary rather than forking either.
-  **Classified debt 2026-07-27 by scope, operator-ruled — nothing had decided
-  the class before.** The entry carried no clause justifying the Deferred
-  section's design tag, which every entry there wears by construction, so the
-  tag was a blanket default rather than a ruling. By canon-kit/SPEC.md §The
-  amendment lifecycle's new-names litmus this adds **no name to a governed
-  surface**: it
-  converges prose onto vocabulary RELEASING.md and docs/positioning.md already
-  own, and neither the demo link nor the repo topics introduce a governed name.
-  Debt, and it needs no amendment.
-  **Premise re-verified 2026-07-27 by scope — supersedes the 2026-07-25 and
-  2026-07-26 correction notes, which are folded in here.** Two sub-deliverables
-  are **already done** and are dropped from the deliverable above: the kit table
-  and architecture prose already sit below the quick start, and the quick start
-  already leads with the release tarball (the `npx checkwright init` lead was
-  corrected inline by `release-path-hardening`'s close). The 2026-07-25 note's
-  citation "the eleven-kit table at README.md:24" **no longer resolves** — the
-  quick-start heading is at that altitude now and the table sits below it — so
-  that note is retired rather than carried. What stands, confirmed against the
-  live tree and repo metadata this session: `run-demo`/`demo/` appears **zero
-  times** in both `README.md` and `docs/index.md`, so the working walkthrough is
-  linked from neither front door; the topic set is exactly `agent-governance`,
-  `code-quality`, `git-hooks`, `linting`, leaving three residual axes (an LLM, a
-  spec-driven-development, and a harness topic — `agent-governance` already
-  names agents); and neither front door carries a category line, an outcome
-  sentence, or a before/after example.
-  Promoted 2026-07-27 by scope (`front-door-readiness`), operator-ruled;
-  surfaced 2026-07-23 by the commissioned external review.
-
 ## Deferred
 
 - **runtime-dir-two-tier-detector** [needs-spec] — `check-tracking-claim`'s
@@ -2196,5 +2155,7 @@
   queue's 30-to-56 deferred growth is healthy.
 
 ## Done
+
+- front-door-outcome-rewrite
 
 ## Lessons Learned

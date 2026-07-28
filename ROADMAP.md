@@ -50,7 +50,6 @@ everything else to
 
 - **`public-roadmap-projection`** *(adoption)* — This page, generated from the work queue so it cannot go stale.
 - **`primary-install-path-claim`** *(adoption)* — One documented install path, with a gate holding every page to it.
-- **`front-door-outcome-rewrite`** *(adoption)* — A first screen that leads with the outcome instead of the architecture.
 
 ### next
 

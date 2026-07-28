@@ -5,23 +5,64 @@ nav_order: 1
 
 # Checkwright
 
-Checkwright is a coding-agent-assisted delivery methodology, packaged as
-installable kits. It mechanizes the discipline that prose alone cannot hold when
-stateless agent sessions do the writing: every cheap, mechanically-decidable
-consistency axis becomes a gate that blocks the commit, so the human (or agent)
-residue is the irreducibly semantic judgment alone.
+**Verification for coding-agent delivery.** Checkwright is the verification
+layer under agent orchestration: spec drift, skipped stages, and unsupported
+*done* claims become failing checks before a merge, instead of review findings
+after one.
 
-The differentiator is **verification under delegation**: Checkwright makes
-*done* mechanically decidable, so delegated agent work can be trusted without
-reading all of it. That is the prerequisite for scaling agent
-[orchestration](orchestration.md) past the point where a human reads every hop —
-coordination is only worth parallelizing once each coordinated result is
-checkable.
+It is for the maintainer of a repository coding agents write most of, who has to
+answer at merge time whether the work is actually done and cannot answer it by
+reading every diff.
 
-The enforcement core carries no harness dependency: the gate battery is bare
+**It complements the workflow you already run.** Keep your spec process, your
+prompts, your harness. Add Checkwright where a claim has to be mechanically
+proven rather than asserted: the instructions shape, the gates enforce. Why that
+split is the whole design is the layer model on
+[Where Checkwright sits](positioning.md).
+
+One command runs the entire arc against a throwaway consumer repo, installing
+nothing:
+
+```bash
+bash demo/run-demo.sh
+```
+
+It vendors the kits into a fresh git repo, passes the battery clean, introduces
+a defect and shows the gate that blocks it, then drops the defect and goes green
+again.
+
+## What that buys you
+
+**Before.** A session finishes a task and marks it done; the evidence is the
+session's own say-so. A page keeps citing a spec section that a rename moved out
+from under it. Both commits go in green, and the next stateless session reads
+both as ground truth.
+
+**After.** Neither commit lands:
+
+```text
+===== check-md-refs =====
+check-md-refs: dangling reference in the governed doc set
+  docs/guide.md:71 -> SPEC.md §Retry budget — no such section
+FAIL: check-md-refs
+===== check-stage-evidence =====
+check-stage-evidence: a task reached Done with no validate stamp this iteration
+FAIL: check-stage-evidence
+```
+
+Nothing there is a review opinion. Each finding is cheap and mechanically
+decidable, which is what earns it the right to block a commit rather than open a
+thread; the semantic residue stays with the human or the agent, undiluted.
+
+That is what **verification under delegation** means, and it is the prerequisite
+for scaling agent [orchestration](orchestration.md) past the point where a human
+reads every hop: coordination is only worth parallelizing once each coordinated
+result is checkable.
+
+The enforcement core carries no harness dependency. The gate battery is bare
 bash, so it runs under any coding-agent harness, any CI, or none. Only the
-always-loaded convention adapts — it rides whichever agent file your harness
-reads, by configuration rather than a port, per the
+always-loaded convention adapts, riding whichever agent file your harness reads
+by configuration rather than a port, per the
 [tiered compatibility claim](positioning.md#the-tiered-compatibility-claim).
 
 These pages orient and sequence. They own no contracts — each contract lives in
