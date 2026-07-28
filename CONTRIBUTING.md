@@ -4,7 +4,31 @@ Checkwright is a monorepo of gate kits that a coding agent and its supervisor
 run against their own delivery work. Its contribution surface is built for the
 failure mode of that era — a repo drowning in low-triage-value issues and PRs.
 The defense is mechanical: **the fixture is the unit of contribution.** A report
-a gate can verify costs near-zero to triage; anything else routes to
+a gate can verify costs near-zero to triage; everything else routes through the
+inlets below.
+
+## Where to file what
+
+The issue forms are the whole issue surface — blank issues are off, and each
+form asks for what a maintainer needs to act without a round trip. Open one from
+the [issue chooser](https://github.com/checkwright/checkwright/issues/new/choose):
+
+- **Gate defect** — a gate misses a violation or flags a valid tree. The
+  fixture pair goes as a pull request instead, on the terms the next section
+  sets.
+- **Install failure** — a vendoring install refuses or breaks on a machine
+  `checkwright doctor` reports clean. Run the doctor first: a below-contract
+  toolchain is the likeliest cause and carries its own fix.
+- **Documentation problem** — a page is wrong, incomplete, or unfollowable. A
+  correction you can write is a pull request; the form is for the case where the
+  text that should be there is what you came to learn.
+- **Adoption report** — what happened after you vendored it into a real
+  repository, including the gates you kept and the ones you unregistered. A
+  removal is the sharpest signal this project receives, and there is no other
+  inlet shaped for it.
+
+Anything that wants a conversation before it wants a disposition — usage
+questions, design proposals, anything open-ended — goes to
 [Discussions](https://github.com/checkwright/checkwright/discussions), where
 volume is harmless.
 

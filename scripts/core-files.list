@@ -21,6 +21,9 @@ SECURITY.md
 # Release runbook: governed repo-meta, the repeatable release procedure.
 RELEASING.md
 .github/ISSUE_TEMPLATE/gate-defect.yml
+.github/ISSUE_TEMPLATE/install-failure.yml
+.github/ISSUE_TEMPLATE/doc-problem.yml
+.github/ISSUE_TEMPLATE/adoption-report.yml
 .github/ISSUE_TEMPLATE/config.yml
 .github/pull_request_template.md
 

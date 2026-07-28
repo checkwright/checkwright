@@ -1,0 +1,66 @@
+name: Install failure
+description: A vendoring install did not complete — name the transport, the platform, and the step that failed.
+labels: ["install-failure"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Run `checkwright doctor` before filing. It reports every toolchain member's version and its verdict against the contract, and an unmet requirement is the likeliest cause of a refused install — if it reports below contract, installing or upgrading what it names is the fix.
+
+        This form is for an install that fails on a machine the doctor passes. A gate that fires wrongly once the install succeeded is a gate defect, not an install failure. Questions and proposals go to Discussions.
+
+        Keep your report to generic mechanism — never paste your own private rule content (term lists, coupling vocabularies, product constants). An install reproduces on a platform and a transport, not on your vocabulary.
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Transport
+      description: How the payload reached your machine.
+      options:
+        - npx checkwright init (npm)
+        - Release tarball (curl, sha256sum, tar)
+        - Manual vendoring
+    validations:
+      required: true
+  - type: dropdown
+    id: step
+    attributes:
+      label: Failing step
+      description: The first command that did not do what the install page says it does.
+      options:
+        - checkwright doctor
+        - checkwright init
+        - bash gate-sdk/bin/install-hooks.sh
+        - bash gate-sdk/bin/run-gates.sh (the first battery)
+        - Another step — name it in the output below
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Checkwright version
+      description: The release or npm version you installed. If init got far enough to write checkwright.lock, its version field.
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and userland
+      description: Operating system, and which userland is ahead on PATH — e.g. Ubuntu 24.04, macOS 15 with Homebrew coreutils first, WSL2 Debian 12.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Verbatim output of the failing command
+      description: The command you ran and everything it printed, unedited.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: checkwright doctor output
+      description: Paste it even when a later step is the one that failed — the toolchain verdict is what separates an unmet requirement from a defect.
+      render: shell
+    validations:
+      required: true

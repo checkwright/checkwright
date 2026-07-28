@@ -1,0 +1,45 @@
+name: Documentation problem
+description: A page is wrong, incomplete, or unfollowable — name the page and quote the passage.
+labels: ["doc-problem"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A correction you can write is a pull request, not an issue. The docs are tracked files under the same battery as everything else (see CONTRIBUTING.md), so the fix is verified the moment CI runs over it.
+
+        Open this issue when the page is wrong in a way you cannot fix yourself — typically because the behavior it should describe is the thing you came here to learn. Questions and proposals go to Discussions.
+
+        Keep your report to generic mechanism — never paste your own private rule content (term lists, coupling vocabularies, product constants). A documentation defect reproduces on the page, not on your vocabulary.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The URL on checkwright.dev, or the repo-relative path — e.g. docs/install.md.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong with it
+      description: What a maintainer has to change to close this.
+      options:
+        - Wrong — it contradicts what the tree does
+        - Incomplete — a step or fact you needed is absent
+        - Unclear — accurate, but you could not act on it
+        - Broken — a link or command that does not resolve
+    validations:
+      required: true
+  - type: textarea
+    id: passage
+    attributes:
+      label: The passage
+      description: The sentence, command, or link exactly as the page carries it, so it can be located. For an absent fact, the passage you expected to carry it.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What you did, and what happened instead
+      description: What the page led you to expect and what the tree actually did. For an incomplete or unclear passage, what you needed it to answer.
+    validations:
+      required: true

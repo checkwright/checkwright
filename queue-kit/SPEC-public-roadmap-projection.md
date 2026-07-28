@@ -238,6 +238,23 @@ than a message.
 `config.yml` needs no change: `blank_issues_enabled: false` and the Discussions
 contact link are already the routing this completes.
 
+**Two mechanics settled at build, inside this envelope.** The three forms join
+`scripts/core-files.list` beside `gate-defect.yml` and `config.yml`: CLAUDE.md
+§Housekeeping makes the `.github/` issue templates core-files-pinned governed
+repo-meta, so a silently deleted form reddens like every other repo-meta surface.
+They do **not** join `CANON_KIT_MANIFEST_FILES`, whose members are markdown — a
+`.yml` form has no links or commands for the doc gates to resolve.
+
+**One prerequisite this delta cannot satisfy from the tree.** Each form declares
+a `labels:` key, and the Producers and consumers section names GitHub-at-issue-creation
+as its reader. GitHub applies only labels that already exist in the repository,
+and the repo carries the GitHub default set plus `site-health` — so no form's
+`labels:` key has a live reader, `gate-defect.yml`'s included. Creating the
+labels is a repo-settings act with a desired-state row in the private ops
+runbook, not a tree edit; it is escalated rather than assumed, and the forms
+carry their form-named labels so that the settings act is the only remaining
+step.
+
 ### 11. `CONTRIBUTING.md` routing prose — *mechanical*
 
 The guide currently routes everything that is not a reproducible gate defect to

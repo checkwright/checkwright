@@ -1,0 +1,54 @@
+name: Adoption report
+description: You vendored Checkwright into a real repository — report where it paid and where it cost you.
+labels: ["adoption-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The most useful report here is a negative one: the point where the governance cost more than it saved, or the gate you unregistered. A refused install goes to the install-failure form and a gate that fires wrongly to the gate-defect one — this form is for what happened after the install worked.
+
+        Open-ended conversation belongs in Discussions. This form exists so a structured report gets a disposition at an iteration boundary instead of scrolling away.
+
+        Keep your report to generic mechanism — never paste your own private rule content (term lists, coupling vocabularies, product constants). Describe the shape of what you govern, never the vocabulary you govern it with.
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Profile installed
+      options:
+        - starter
+        - delegation
+        - full
+    validations:
+      required: true
+  - type: dropdown
+    id: standing
+    attributes:
+      label: Where it stands
+      description: The single fact that decides how the rest of this report is read.
+      options:
+        - Still running the battery
+        - Vendored, then stopped running it
+        - Evaluated and did not adopt
+    validations:
+      required: true
+  - type: input
+    id: shape
+    attributes:
+      label: Repository shape
+      description: Enough to read your report against — language, rough size, solo or team, and the coding-agent harness you run, if any.
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: Where it cost you
+      description: The first place you stalled, re-read something twice, or worked around a gate. Name the step, not the feeling.
+    validations:
+      required: true
+  - type: textarea
+    id: gates
+    attributes:
+      label: Gates you kept, and gates you dropped
+      description: Which ones earned their place, and which you unregistered or would. A removal is the sharpest signal this project receives.
+    validations:
+      required: true
