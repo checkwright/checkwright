@@ -4,4 +4,4 @@
 
 ---
 
-— scope a33e23f6 2026-07-29
+pre-adoption-grammar-break scope a33e23f6 2026-07-29

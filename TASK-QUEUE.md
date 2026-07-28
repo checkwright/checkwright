@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: pre-adoption-grammar-break
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,56 @@
 ## New Features
 
 ## Technical Debt
+
+- **queue-index-title-tag-residue** — `bin/queue-index.sh` renders every tagged
+  entry as `slug —  — prose` in the selection surface, a doubled separator.
+  `title()` strips the slug with an optional trailing em-dash in one regex
+  (`^\*\*slug\*\*[[:space:]]*(—[[:space:]]*)?`), but when a tag sits between the
+  slug and the dash that alternative cannot match; the later `gsub` then removes
+  the tag and leaves the orphaned dash behind. Pre-existing, not introduced by
+  the roadmap work. A second facet, same cause: an entry whose lead line is
+  fully consumed by a long spec-pointer tag has no prose after the tag, so
+  its title renders empty.
+  **Re-reproduced 2026-07-29 at scope on the live queue** — the doubled dash on
+  every one of **61** deferred entries (57 when filed; the defect is unchanged,
+  the base grew), and the same four fully empty titles
+  (`stage-lag-disambiguation`, `assertion-strength-exit-header-reach`,
+  `upgrade-smoke-phase-a-regen-derivation`, `action-run-shell-scan-predicate`).
+  **Deliverable:** strip tags *before* the slug-and-dash substitution so the
+  dash is adjacent when the regex runs, plus a title-rendering case in
+  `queue-kit/gate-tests/queue-index.test.sh`, which today covers the attend
+  block and the drain-exempt echo but asserts nothing about titles.
+  **Open judgment (why it is not a pure fix):** the empty-title facet wants a
+  fallback to the entry's first body line, which is a separate call — the index
+  is an internal surface where body prose is fine, but a fallback that pulls a
+  mid-sentence fragment could read worse than nothing. Debt, not a feature: it
+  converges `queue-index.sh` on the rendering its own tests already imply,
+  minting no name on any governed surface.
+  **Sequenced first in this section deliberately** — every other unit in
+  `pre-adoption-grammar-break` rewrites the Deferred section, and this is the
+  surface a session reads to pick that work.
+  Filed 2026-07-28 at build in front-door-readiness, while measuring what a
+  lead-line roadmap tag costs the selection surface; re-verified at close;
+  promoted 2026-07-29 at scope.
+
+- **queue-selection-order-implicit** — `queue-kit/SPEC.md`
+  documents section order as selection order, so the default section sequence
+  silently makes `New Features` outrank `Technical Debt` in what scope picks
+  first. Unlike the spec-tag requirement that `CANON_KIT_FEATURE_SECTIONS`
+  places on `New Features` alone, which is principled and argued, this ordering
+  policy is embedded in section sequence with no stated argument anywhere.
+  Either state the argument or make selection order explicit rather than
+  positional. Surfaced while ruling on whether the two active sections should
+  collapse into one — they should not, but this rides along on their sequence.
+  Debt: latent policy with no owner doc.
+  **Rides `pre-adoption-grammar-break` as the rider, ruled 2026-07-29 at scope.**
+  Same owner doc as the iteration's size-cap and icebox work, so the argument
+  lands in a section the sibling amendments are already opening. If the
+  resolution mints an explicit ordering declaration rather than stating the
+  argument in prose, that is a governed name and the unit is misfiled here —
+  escalate rather than minting it from the debt lane.
+  Filed 2026-07-20 by lead while ruling on the active-section question;
+  promoted 2026-07-29 at scope as this iteration's rider.
 
 ## Deferred
 
@@ -98,18 +148,6 @@
   is a future un-caught regression on a rarely-touched dry-run path.
   Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
 
-
-- **queue-selection-order-implicit** [needs-spec] — `queue-kit/SPEC.md`
-  documents section order as selection order, so the default section sequence
-  silently makes `New Features` outrank `Technical Debt` in what scope picks
-  first. Unlike the spec-tag requirement that `CANON_KIT_FEATURE_SECTIONS`
-  places on `New Features` alone, which is principled and argued, this ordering
-  policy is embedded in section sequence with no stated argument anywhere.
-  Either state the argument or make selection order explicit rather than
-  positional. Surfaced while ruling on whether the two active sections should
-  collapse into one — they should not, but this rides along on their sequence.
-  Debt: latent policy with no owner doc.
-  Filed 2026-07-20 by lead while ruling on the active-section question.
 
 - **rendered-site-link-monitor** [needs-spec] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
@@ -1060,7 +1098,22 @@
   one, with the SPEC prose carrying the true taxonomy correctly meanwhile. The
   disposition to hold: land it folded into the **next major that already
   breaks the adoption path** for another reason, so the break amortizes rather
-  than standing as its own breaking release. Filed 2026-07-25 by operator
+  than standing as its own breaking release.
+  **That trigger has fired — ruled by the operator 2026-07-29 at scope.** This
+  entry rides `pre-adoption-grammar-break` beside `needs-spec-tag-rename`, which
+  breaks the adoption path on the queue-grammar axis and which this entry's
+  sibling text already nominated by slug as the shared major. The deciding weight
+  was **launch timing, not the cosmetic payoff**: the design-partner preview is
+  the next roadmap rung, and a taxonomy break landing *after* it makes those
+  teams re-bind twice. Weighed and outranked: the churn objection — the rename
+  crosses ~15 `§templates/skills/` SPEC refs, the `.claude/commands/*.md` binding
+  shims, and README, on a different surface than the queue-grammar break — which
+  argues for two clean majors and loses to the one-re-bind timing point.
+  **Filing class, triaged at scope: feature.** `templates/stages/` is a new
+  directory convention on a published adoption path, and the litmus names a file
+  or directory convention explicitly; it needs an amendment and the deprecation
+  marker plus release note this entry already describes.
+  Filed 2026-07-25 by operator
   request, from a session tracing why only lifecycle-kit carries a
   `templates/skills/` subdirectory.
 
@@ -1104,7 +1157,22 @@
   rename that is near-free today (no external adopter) but prices in with the
   first one. Best landed before launch, or folded into the same major as
   `templates-stages-taxonomy-realignment` (both are pre-adoption grammar
-  breaks). Filed 2026-07-25 by operator request, from the same session, on the
+  breaks).
+  **Both halves of that disposition were taken, ruled 2026-07-29 at scope.** This
+  entry is the spine of `pre-adoption-grammar-break`: it lands before launch, and
+  `templates-stages-taxonomy-realignment` folds into the same major on the
+  operator's launch-timing ruling recorded there. It adds no capability, so the
+  standing pre-launch prioritization bar never reached it and it runs under no
+  exception — only the sibling `deferred-queue-carry-cost` does.
+  **Sequencing constraint carried to `spec`:** the token migration rewrites every
+  Deferred entry, and so does `deferred-queue-carry-cost`'s part (d) triage
+  sweep. They are paired into one iteration precisely so the queue is rewritten
+  once; authoring the two amendments independently of that ordering would
+  re-introduce the double rewrite the pairing exists to avoid. Re-measured
+  2026-07-29 at scope: `[needs-spec]` now appears **98×** in `TASK-QUEUE.md`
+  across 61 Deferred entries, and queue-kit/SPEC.md:66 still carries the
+  "design-pending marker" definition this entry quotes.
+  Filed 2026-07-25 by operator request, from the same session, on the
   observation that `[needs-spec]` implies a feature while deferred triage is a
   scope-stage decision.
 
@@ -2119,6 +2187,27 @@
   overstates actionable debt. Debt-shaped at triage: converges the queue onto
   existing doctrine; the new governed names are the icebox tier, its gate,
   and the KPI.
+  **Runs under an explicit operator exception, ruled 2026-07-29 at scope.** This
+  unit is the one member of the `pre-adoption-grammar-break` set that *adds
+  capability* — an icebox tier, a size-cap gate, a KPI — so it is the one member
+  the standing pre-launch prioritization bar defers, and it clears none of that
+  bar's tests on a strict reading. The operator granted the exception on the
+  compounding-carry evidence, not on a reframe: the bar reaches this entry and
+  was overridden. The sibling units in the set add no capability, so the bar
+  never reached them and none of them runs under an exception — do not read one
+  onto them. **Constraint carried to `spec`:** the capability half cannot be
+  cheaply severed. Part (d), the one-time triage sweep, is the real carry relief
+  and is not itself an enhancement, but enforcement-first binds the part (b)
+  size-cap gate to it in one unit — a sweep that skips the machinery is
+  doctrine-blocked, not a cheaper option to be re-proposed at authoring.
+  **Premise re-verified 2026-07-29 at scope, and worse on every axis than
+  filed.** Deferred is now **61 entries / 2218 lines** (~36 per entry), against
+  the 56 this entry states and the 30 before that. Of the 49 entries carrying a
+  `Cost while deferred` field, **28** open it with low/zero/bounded/cosmetic
+  against **3** compounding — the decision-records-as-work-items fraction this
+  entry counted at 21. **12 entries carry no cost field at all**, and
+  `Deliverable` is present on 19 of 61 (this entry states 16 of 57 — the
+  proportion held while the base grew).
   Filed 2026-07-28 by operator request, from a session assessing whether the
   queue's 30-to-56 deferred growth is healthy.
 
@@ -2188,31 +2277,6 @@
   front-door-readiness after rendering every root manifest page through both
   parsers.
 
-- **queue-index-title-tag-residue** [needs-spec] — `bin/queue-index.sh` renders every tagged
-  entry as `slug —  — prose` in the selection surface, a doubled separator.
-  `title()` strips the slug with an optional trailing em-dash in one regex
-  (`^\*\*slug\*\*[[:space:]]*(—[[:space:]]*)?`), but when a tag sits between the
-  slug and the dash that alternative cannot match; the later `gsub` then removes
-  the tag and leaves the orphaned dash behind. Pre-existing, not introduced by
-  the roadmap work. A second facet, same cause: an entry whose lead line is
-  fully consumed by a long spec-pointer tag has no prose after the tag, so
-  its title renders empty. Reproduced on the live queue at close — the doubled
-  dash on every one of 57 deferred entries, and four with fully empty titles
-  (`stage-lag-disambiguation`, `assertion-strength-exit-header-reach`,
-  `upgrade-smoke-phase-a-regen-derivation`, `action-run-shell-scan-predicate`).
-  **Deliverable:** strip tags *before* the slug-and-dash substitution so the
-  dash is adjacent when the regex runs, plus a title-rendering case in
-  `queue-kit/gate-tests/queue-index.test.sh`, which today covers the attend
-  block and the drain-exempt echo but asserts nothing about titles.
-  **Open judgment (why it is not a pure fix):** the empty-title facet wants a
-  fallback to the entry's first body line, which is a separate call — the index
-  is an internal surface where body prose is fine, but a fallback that pulls a
-  mid-sentence fragment could read worse than nothing.
-  **Cost while deferred:** cosmetic, but on the surface an agent parses to pick
-  work, and the empty-title facet degrades exactly the entries a picking
-  session should read first.
-  Filed 2026-07-28 at build in front-door-readiness, while measuring what a
-  lead-line roadmap tag costs the selection surface; re-verified at close.
 
 - **capture-affordance-help-flag** [needs-spec] — `lifecycle-kit/bin/file-gap.sh` takes
   exactly one free-text argument, so `--help` satisfies its arity check and is
