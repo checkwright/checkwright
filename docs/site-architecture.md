@@ -49,6 +49,20 @@ renders wrong or reds that gate: the cause is routinely far upstream of the
 symptom in the same file, so the block the gate names is often the victim
 rather than the offender.
 
+**Which parser serves which file** is what scopes that roster, and it is the
+first thing to establish before calling a rendering a defect. The Jekyll source
+is `docs/`, so the Pages parser (kramdown plus `kramdown-parser-gfm`) serves
+`docs/` pages and nothing else. Every root manifest page (`README.md`,
+`ROADMAP.md`, `CONTRIBUTING.md`, `RELEASING.md`, `CODE_OF_CONDUCT.md`,
+`SECURITY.md`) sits outside that source and is not mirrored, since the mirror's
+source set is kit SPEC/README/DOCTRINE, below. None of them has a site URL. A
+docs page reaching one links it through the self-repo blob grammar, into
+GitHub's **repository view**, which is CommonMark-based (`cmark-gfm`) and
+markedly more forgiving; it joins a code span across a newline, which is the
+severed-span class's whole premise. So a kramdown-only symptom found in a root
+page is **not** a defect, because no reader of that page is served by kramdown.
+Render a page through the parser that actually serves it before filing.
+
 ## Generated projections and their freshness gates
 
 Several docs surfaces are generated and byte-gated for freshness; each gate's red
