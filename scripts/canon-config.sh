@@ -60,5 +60,5 @@ CANON_KIT_PROSE_TELL_GLOBS=(docs/*.md)
 # comment-tier-exempt: tokens this repo's audience reads as jargon-free and so exempt from the undefined-abbreviation tell — this repo's own standard names alongside industry terms nobody expands on an install page; consumer vocabulary, never a kit literal (the provenance seam)
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA=(
-    "SPEC" "KPI" "README" "CNAME" "CLAUDE" "DOCTRINE" "GNU" "BSD"
+    "SPEC" "KPI" "README" "CNAME" "CLAUDE" "DOCTRINE" "ROADMAP" "GNU" "BSD"
 )

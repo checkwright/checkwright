@@ -54,8 +54,10 @@ and low-false-positive by construction, which is what lets it block a commit
 rather than open a thread. The semantic residue — is this design right, does the
 evidence earn the claim — stays with the human or the agent, undiluted.
 
-Docs live at <https://checkwright.dev> — the same pages served in-repo under
-[`docs/`](docs/index.md).
+Where the project is heading, and what moves an item: [`ROADMAP.md`](ROADMAP.md),
+generated from the queue entries a maintainer marked for the page and
+freshness-gated on every commit. Docs live at <https://checkwright.dev> — the
+same pages served in-repo under [`docs/`](docs/index.md).
 
 ## Quick start
 

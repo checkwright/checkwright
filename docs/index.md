@@ -81,7 +81,10 @@ an invariant.
 4. [Coupling graph](check-graph.html) — which content surfaces each gate binds
    together, emitted from the per-gate manifests.
 5. The [Kit Reference](kits.md) — one page per kit, in reading order.
-6. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the
+6. [Roadmap](https://github.com/checkwright/checkwright/blob/master/ROADMAP.md) —
+   where the project is heading and what moves an item, generated from the queue
+   entries a maintainer marked for the page and freshness-gated on every commit.
+7. [Announcing Checkwright](posts/2026-07-09-announcing-checkwright.md) — the
    launch note.
 
 ## The kits
