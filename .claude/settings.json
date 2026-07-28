@@ -74,6 +74,8 @@
       "Bash(bash queue-kit/bin/queue-index.sh)",
       "Bash(bash queue-kit/bin/queue-index.sh *)",
       "Bash(bash queue-kit/bin/lesson-sink.sh *)",
+      "Bash(bash queue-kit/bin/roadmap.sh)",
+      "Bash(bash queue-kit/bin/roadmap.sh *)",
       "Bash(bash evidence-kit/bin/run-validate.sh)",
       "Bash(bash evidence-kit/bin/run-validate.sh *)",
       "Bash(bash demo/run-demo.sh)",

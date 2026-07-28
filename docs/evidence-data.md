@@ -60,3 +60,4 @@
 | supply-chain-trust-baseline | sc sp a b v c | 2f/0d | 1 · ≤0d | 21s clean | 81 |
 | activation-path | sc sp a b v c | 13f/6d | 2 · ≤0d | 24s 1✗ | 82 |
 | release-path-hardening | sc sp a b v c | 4f/0d | 3 · ≤0d | 22s clean | 84 |
+| front-door-readiness | sc sp a b v c | 6f/2d | 2 · ≤1d | 22s clean | 86 |

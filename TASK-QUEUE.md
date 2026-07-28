@@ -2105,10 +2105,12 @@
   entry carrying a `spec:` ref must be promoted. Decide at spec on triage
   evidence: entries whose discarded derivation would be genuinely expensive
   to re-derive. The size-cap gate's spec also mints the owner section for
-  the entry-body field roster — the fields every entry carries (deliverable,
-  open design, cost while deferred, filed-by) are today precedent-only,
-  derived by imitating neighboring entries (kfric-stamped 2026-07-28), and
-  the gate must enumerate them anyway.
+  the entry-body field roster. Narrowed 2026-07-28 at close: the roster was
+  precedent-only (kfric-stamped, derived by imitating neighbors), and close
+  gave it an owner in queue-kit/SPEC.md §The queue format as an explicitly
+  **ungated** convention. What is left for the gate's spec is only whether any
+  field becomes *required* — a stronger claim the prose deliberately does not
+  make, since 16 of 57 entries carry a Deliverable field today.
   **Cost while deferred:** compounding with every filing — the queue is read
   by every scope session and curated by every close, and the intake rate
   (27 entries filed 07-25/26 alone) currently outruns closure with no
@@ -2120,10 +2122,118 @@
   Filed 2026-07-28 by operator request, from a session assessing whether the
   queue's 30-to-56 deferred growth is healthy.
 
-## Done
+- **docs-root-link-grammar** [needs-spec] — a hand-authored `docs/` page that
+  links a path *outside* `docs/` with a bare relative link resolves on disk but
+  404s on the rendered site, which is served from `docs/` as its root.
+  `check-md-refs` resolves the target on disk and stays green, so nothing
+  catches it; `jekyll-relative-links` cannot rewrite it either, because the
+  target is outside the Jekyll source and so has no built URL to rewrite to.
+  Verified live at close: `docs/orchestration.md` lines 90 and 108 both link
+  `../lifecycle-kit/templates/lead.md`, two reader-facing broken links standing
+  today. The generated mirror already emits the self-repo blob grammar for
+  exactly this reason (`scripts/gen-docs-mirror.sh` rewrites source and
+  directory links), and `docs/index.md` reaches `ROADMAP.md` that way by hand —
+  so the correct form is established and only the hand-authored path is
+  unguarded.
+  **Deliverable:** a gate asserting that a link from a `docs/` page to a target
+  outside `docs/` uses the blob form, plus — under enforcement-first, in the
+  same unit — the sweep of the existing violations.
+  **Why `[needs-spec]`:** the boundary predicate needs care. Relative links
+  *within* `docs/` are correct and must stay silent; the mirror's own pages are
+  generated and already conform; and the rule must not fire on anchors or
+  absolute URLs. Whether this is a new gate or an assertion inside
+  `check-md-refs` (which already resolves every link and knows the target path)
+  is the open call — folding it in reuses the traversal, but gives a
+  disk-resolution gate a site-topology opinion.
+  **Cost while deferred:** two reader-facing broken links stand on the rendered
+  site, and every hand-authored docs page added meanwhile can add another
+  silently. Not covered by `rendered-site-link-monitor`, whose scope is
+  external-URL rot and which rules a hermetic gate out on false-positive
+  grounds — this class is intra-repo and decidable from the tree alone, so that
+  ruling does not transfer.
+  Filed 2026-07-27 at align in front-door-readiness, while verifying the
+  roadmap amendment's docs-home link; re-verified at close.
 
-- front-door-outcome-rewrite
-- public-roadmap-projection
-- primary-install-path-claim
+- **root-page-render-coverage** [needs-spec] — *re-based at close; read the
+  negative finding before reopening.* No gate renders a governed markdown
+  surface at the repo root: `check-docs-render-fidelity` enumerates tracked
+  pages under `docs/` only. This was filed twice this iteration as a live
+  defect — a `:end` marker absorbed into a list item in `ROADMAP.md`, and a
+  code span severed across lines 21-22 of `RELEASING.md` — and **both filings
+  were wrong**. Close rendered each case through both parsers: the Pages parser
+  (kramdown) corrupts them, but no reader of a root page is served by kramdown.
+  The Jekyll source is `docs/`, the mirror's source set is kit
+  SPEC/README/DOCTRINE only, so no root page has a site URL; readers reach them
+  through GitHub's repository view, which is CommonMark (`cmark-gfm`) and
+  renders both cases correctly — the severed span joins into one `<code>` and
+  the following heading promotes normally. The renderer-to-surface mapping now
+  has an owner (docs/site-architecture.md §Page-authoring rules), which is the
+  actual fix for what went wrong here.
+  **Deliverable, if anything:** fidelity coverage for the one root page a
+  *machine* writes — `ROADMAP.md` — keyed on the renderer that serves it.
+  **Why `[needs-spec]`:** the honest outcome may well be *build nothing*, and a
+  scope opening this should be willing to close it unbuilt. The repo's
+  toolchain has ruby/kramdown but no CommonMark renderer, so this means a new
+  gate dependency; the hand-authored root pages need no coverage at all (a
+  human sees the rendering on github.com); and the emitter's output shape is
+  narrow — headings, bullets, a placeholder line — with author-written
+  single-sentence summaries as the only free text. Zero CommonMark-real defects
+  have been demonstrated, against two kramdown-only false alarms.
+  **Cost while deferred:** low, and now correctly understood as low. The
+  residue is that a queue summary containing an unbalanced fence or a stray
+  pipe could reach `ROADMAP.md` unrendered-checked. The compounding cost — two
+  sessions mis-attributing a root page to the Pages parser — is already paid
+  off by the site-architecture edit.
+  Filed 2026-07-28 at build, re-filed at validate, re-based at close in
+  front-door-readiness after rendering every root manifest page through both
+  parsers.
+
+- **queue-index-title-tag-residue** [needs-spec] — `bin/queue-index.sh` renders every tagged
+  entry as `slug —  — prose` in the selection surface, a doubled separator.
+  `title()` strips the slug with an optional trailing em-dash in one regex
+  (`^\*\*slug\*\*[[:space:]]*(—[[:space:]]*)?`), but when a tag sits between the
+  slug and the dash that alternative cannot match; the later `gsub` then removes
+  the tag and leaves the orphaned dash behind. Pre-existing, not introduced by
+  the roadmap work. A second facet, same cause: an entry whose lead line is
+  fully consumed by a long spec-pointer tag has no prose after the tag, so
+  its title renders empty. Reproduced on the live queue at close — the doubled
+  dash on every one of 57 deferred entries, and four with fully empty titles
+  (`stage-lag-disambiguation`, `assertion-strength-exit-header-reach`,
+  `upgrade-smoke-phase-a-regen-derivation`, `action-run-shell-scan-predicate`).
+  **Deliverable:** strip tags *before* the slug-and-dash substitution so the
+  dash is adjacent when the regex runs, plus a title-rendering case in
+  `queue-kit/gate-tests/queue-index.test.sh`, which today covers the attend
+  block and the drain-exempt echo but asserts nothing about titles.
+  **Open judgment (why it is not a pure fix):** the empty-title facet wants a
+  fallback to the entry's first body line, which is a separate call — the index
+  is an internal surface where body prose is fine, but a fallback that pulls a
+  mid-sentence fragment could read worse than nothing.
+  **Cost while deferred:** cosmetic, but on the surface an agent parses to pick
+  work, and the empty-title facet degrades exactly the entries a picking
+  session should read first.
+  Filed 2026-07-28 at build in front-door-readiness, while measuring what a
+  lead-line roadmap tag costs the selection surface; re-verified at close.
+
+- **capture-affordance-help-flag** [needs-spec] — `lifecycle-kit/bin/file-gap.sh` takes
+  exactly one free-text argument, so `--help` satisfies its arity check and is
+  **filed as a gap**. Not hypothetical: a session ran
+  `bash lifecycle-kit/bin/file-gap.sh --help` this iteration and the resulting
+  `- <date> — --help` bullet sat in the committed inbox until close drained it.
+  The blast radius is larger than a typo because the inbox is boundary-blocking
+  — a spurious bullet refuses the next scope entry. The script already has a
+  `usage()` it only reaches on misuse, so the fix is a `-h|--help` case.
+  Sibling `drift-kit/bin/kfric.sh` is safe only by accident (it takes two args,
+  so `--help` alone fails arity); 3 of 17 kit `bin/` scripts handle `--help`
+  today, so the class is worth a sweep rather than a one-line patch.
+  **Deliverable:** `-h|--help` handling on the single-free-text-argument
+  capture affordances, and a decision on whether the convention becomes a
+  gate-sdk/kit authoring rule for `bin/` tools generally.
+  **Cost while deferred:** low but recurring and self-concealing — the failure
+  writes a committed record that looks like a filing, and the next scope entry
+  is the thing that trips over it.
+  Filed 2026-07-28 at close in front-door-readiness, from the prompt-friction
+  log's own evidence of the invocation.
+
+## Done
 
 ## Lessons Learned
