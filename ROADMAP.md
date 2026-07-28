@@ -48,7 +48,6 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-- **`public-roadmap-projection`** *(adoption)* — This page, generated from the work queue so it cannot go stale.
 - **`primary-install-path-claim`** *(adoption)* — One documented install path, with a gate holding every page to it.
 
 ### next

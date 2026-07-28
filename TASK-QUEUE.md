@@ -12,21 +12,6 @@
 
 ## New Features
 
-- **public-roadmap-projection** [spec: SPEC-public-roadmap-projection.md] [roadmap: now/adoption]
-  roadmap-summary: This page, generated from the work queue so it cannot go stale.
-  A generated Now/Next/Later `ROADMAP.md` projected off this queue: a curated
-  `roadmap:` horizon/track tag, an emitter, and a freshness gate — never
-  a hand-maintained copy; plus low-friction issue forms for install failures,
-  doc problems, and adoption reports beside the fixture-first gate-defect
-  template, since the current funnel routes exactly the pre-launch usability
-  signal away from issues. The horizon and track vocabularies are consumer
-  config, not kit literals. Design, seam ruling, and the per-delta work
-  classes: queue-kit/SPEC-public-roadmap-projection.md.
-  **Cost while deferred:** outsiders cannot read direction from a 30-entry
-  deferred section, and pre-launch usability feedback has no low-friction
-  inlet. Surfaced 2026-07-23 in the commissioned external review; promoted by
-  spec 2026-07-27 (`front-door-readiness`).
-
 - **primary-install-path-claim** [spec: SPEC-primary-install-path-claim.md] [roadmap: now/adoption]
   roadmap-summary: One documented install path, with a gate holding every page to it.
   **no surface owns which install path is primary**, so two documents drifted
@@ -2157,5 +2142,6 @@
 ## Done
 
 - front-door-outcome-rewrite
+- public-roadmap-projection
 
 ## Lessons Learned
