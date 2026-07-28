@@ -1,1 +1,23 @@
 # contract: evidence-manifest v1
+front-door-readiness installer_smoke sha256=62033d809e1ab036a47a011602e220434966bbbf9cd689b47d6f3d9b0edbef0b pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness gates sha256=2184e349fbbe0fbaf74b9b5591defa41f578ec3fc4f4382cac448b53d6e7e618 pass=86 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness gate_sdk sha256=73c6291f69ddd7aceb4ae99cbbf9f179e23b5b911c2461447597d9fac574bc30 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness canon_kit sha256=53f86c08f6cdef04eb8e8e2d3c3f46a93432f64a0c404fbfe741af65bab97f1b pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness guard_kit sha256=641f55e2064f186cb2340df8c91a22bbcff22fe376bd1527c388e9162c9262f4 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness lifecycle_kit sha256=5f9077e6d8df174b6193fe6ba78a8ab96cf810bbf46392f4a0185b40726803d1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness queue_kit sha256=fe2ed0bfc0475ebe387ff499ba20bb4d3932c068a3248f11890841d7fb69c94b pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness site_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness scripts sha256=9ceea1fcc2c4360991a31d3b3b4d04707cb674b3194724c7612f94089836520e pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness demo sha256=cb887ef2598a7aca31fe60c38bdecc564969c920123dc9407de4a073a862d86a pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness upgrade sha256=f4f60212704c05db9671c7b703ddcba9469f1d9ec39d99e6968dbeaa394722cf pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
+front-door-readiness index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-07-28
