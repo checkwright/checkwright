@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-front-door-readiness release deferred:v0.18.0 — minor earned on two new gates (check-roadmap-fresh, check-install-claim) plus the roadmap tag algebra, so not none; held unreleased because the tag must name a pushed commit and master stands 28 ahead of origin with the push, and the remote-oracle watch it gates, reserved to the operator.
-

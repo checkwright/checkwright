@@ -4,9 +4,4 @@
 
 ---
 
-front-door-readiness scope a33379ed 2026-07-27
-front-door-readiness spec a11ba2ad 2026-07-27
-front-door-readiness align ab54dfce 2026-07-27
-front-door-readiness build a1dd6510 2026-07-27
-front-door-readiness validate a8fadf3f 2026-07-28
-front-door-readiness close aba5596e 2026-07-28
+— scope a33e23f6 2026-07-29
