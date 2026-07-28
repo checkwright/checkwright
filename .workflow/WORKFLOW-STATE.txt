@@ -5,3 +5,4 @@
 ---
 
 pre-adoption-grammar-break scope a33e23f6 2026-07-29
+pre-adoption-grammar-break spec ad1dbe5c 2026-07-29
