@@ -90,11 +90,11 @@ consume:
   emitted even when empty (an empty horizon is information: nothing is queued
   there).
 - Under each, one bullet per tagged entry, in queue order:
-  ``- **`<slug>`** *(<track>)* — <lead-line summary>``.
-- The summary is the entry's lead-line text with every tag stripped, truncated
-  at the first sentence boundary. Entry bodies are never projected: they carry
-  internal design rationale and cost accounting, which is precisely the content
-  a public page must not inherit.
+  ``- **`<slug>`** *(<track>)* — <summary>``.
+- The summary is the entry's `roadmap-summary:` declaration, verbatim
+  (delta 14). *Superseded:* this clause read "the entry's lead-line text with
+  every tag stripped, truncated at the first sentence boundary"; delta 14
+  records why that rule was replaced and what replaced it.
 
 Ordering inside a horizon is queue order, not a rank — the page states so in its
 framing rather than implying a priority the queue does not carry.
@@ -276,6 +276,87 @@ docs-site projections, and a generated file at the repo root is CLAUDE.md
 §Housekeeping's tier. One line there, pointing at queue-kit/SPEC.md
 §check-roadmap-fresh for the mechanism.
 
+### 14. The `roadmap-summary:` declaration — *design-bearing, envelope amendment*
+
+**Operator ruling, 2026-07-28, widening the envelope delta 3 set.** The
+lead-line-only summary rule shipped and was measured against the real queue: it
+yields 20-35 character fragments, and an entry carrying a `[spec: <file>]`
+pointer reaches 77 columns before any prose, so both active `New Features`
+entries could not carry the tag at all and `now` shipped one item. The rule needs
+replacing. The **replacement was ruled, and the rejected alternative matters more
+than the accepted one.**
+
+*Rejected:* widening the projection to the entry's first sentence while excluding
+the rationale and cost blocks. That is a **blocklist, and a blocklist fails
+open** — a cost note or a premise correction authored as an ordinary opening
+sentence projects to a public page anyway. It contradicts this amendment's own
+premise that entry bodies carry exactly what a public page must not inherit, and
+while it is harmless for a repo whose queue is already public, the kit ships to
+consumers whose queue is private and whose roadmap is not. The seam here is a
+**privacy boundary before it is a design one**, and a mechanism whose failure
+mode is "publishes internal prose" is the wrong default to ship.
+
+*Accepted:* the projection may read beyond the lead line, but **only text the
+author explicitly marked projectable** — a whitelist. Unmarked prose never
+projects, so the failure mode is a thin page, never a leak.
+
+**The mechanism.** A `roadmap-summary: <text>` **declaration line**, indented
+inside the entry body like any continuation line, carrying the one sentence the
+public page prints. The emitter reads that text verbatim; there is no sentence
+heuristic left anywhere in the projection, because the author already decided
+where the summary ends.
+
+It is a **declaration, not a tag**, and the distinction is load-bearing rather
+than cosmetic. Every member of the tag algebra is bracketed and lead-line-scoped,
+and `check-tag-lead-line` exists to keep it that way; a bracketed marker living
+on a continuation line by design would contradict the one rule that gate teaches.
+So this takes the bare `<token>: <value>` shape the tree already uses for a
+declaration a scanner reads off a line of its own — the `close-surface:`
+declaration in queue-kit/SPEC.md §The tag algebra is the precedent, and
+`QUEUE_KIT_PROSE_LEADS`' `Protocol:` token is the same shape at column 0.
+`roadmap-summary:` also cannot collide with the `[roadmap:` tag scan, which keys
+on the bracket.
+
+Fixed spelling, kit mechanism: the seam ruling above puts the tag's spelling and
+grammar on the kit side, and this declaration is the same class of thing. No new
+consumer config.
+
+**Why one line, not a marked block.** An indented declaration line has the whole
+wrap budget behind it — about 81 columns after the indent and the token, roughly
+triple what the lead line could ever spare, and comfortably a full sentence. A
+multi-line form would need a block-end rule (deeper indent, a blank line, a
+closing token), and every candidate either invites a reflow to silently truncate
+the summary or adds a second grammar for the wrap gate to police. One line needs
+no end rule at all. The cost is honest and bounded: an author who wants two
+sentences on the public page cannot have them, which is the right constraint for
+a bullet on a scannable roadmap.
+
+**The wrap budget still applies**, unchanged — `check-queue-wrap` reads every
+line in the file, and a declaration line is a line. This does not widen the
+budget for anyone; it moves the summary off the one line that was already full.
+
+**Delta 4 gains assertion C**, in both directions, because a whitelist with no
+parity check degrades silently in the direction that matters:
+
+- A `[roadmap:]`-tagged entry carrying **no** `roadmap-summary:` declaration, or
+  more than one, is a violation naming the entry. Without this, a curated entry
+  would project as a bullet with an empty summary — the thin-page failure mode
+  reaching a reader instead of the author.
+- A `roadmap-summary:` declaration on an entry whose lead line carries **no**
+  `[roadmap:]` tag is a violation too: a dead marking is how a dropped or
+  reflowed tag looks from the page's side, and the tag is what decides
+  projection.
+
+Both halves are mechanical over the shared parse, so the low-false-positive
+contract holds. The parse itself stays single-sourced — `queue_roadmap_entries`
+grows the declaration count and text, so the emitter and the gate still cannot
+disagree about what an entry claims.
+
+**Delta 9's curation is re-run under this grammar**: each curated entry gains a
+declaration authored for a public reader rather than inherited from internal
+prose, and the two `[spec:]`-tagged active features become projectable — their
+lead line now needs room for the tag alone, not for the tag plus a summary.
+
 ## Producers and consumers
 
 **The `[roadmap: <horizon>/<track>]` tag.**
@@ -303,6 +384,22 @@ a reader of the rendered `ROADMAP.md` consumes it as the page's body.
 structure; each bullet's slug, track, and summary are read by the human reader.
 Nothing is emitted that no reader consumes — the deliberate omission is the
 entry body, which has no public reader and is therefore not projected.
+
+**The `roadmap-summary: <text>` declaration** (delta 14).
+*Producer:* the same scope or close session that writes the `[roadmap:]` tag
+authors the declaration in the entry body, in the same edit — assertion C makes
+the pair mandatory, so the tag cannot land without it.
+*Consumers:* (a) `bin/roadmap.sh`, through `lib/queue.sh`'s shared
+`queue_roadmap_entries` parse, at the emit walk, where the text becomes the
+bullet's summary verbatim; (b) `check-roadmap-fresh` assertion C, which reads the
+declaration *count* per entry and pairs it against the tag's presence in both
+directions; (c) a reader of the rendered page, for whom this text is the only
+prose the entry contributes.
+*Field readers:* `<text>` is read by `roadmap.sh` at the emit walk and by the
+human reader of the page; its presence-and-count is read by assertion C. The
+declaration has no other reader by construction, and that is the point — it is
+the whole of what the entry publishes, so nothing else in the body needs a
+publication decision.
 
 **The four config knobs.**
 *Producer:* the consumer's `queue-config.sh`, sourced by `lib/queue.sh`'s
@@ -334,7 +431,13 @@ does not ship.
   vocabulary arrays. Owned by delta 2.
 - **queue-kit/SPEC.md §Per-component contracts** — two new sections,
   `bin/roadmap.sh` (delta 3) and `check-roadmap-fresh` (delta 4), the second
-  stating the ungated count band and why.
+  stating the ungated count band and why. Both are amended by delta 14: the emit
+  grammar's summary rule and the gate's assertion C.
+- **queue-kit/SPEC.md §The tag algebra** — a second target: the
+  `roadmap-summary:` declaration beside the `close-surface:` precedent, stated as
+  a declaration rather than a tag. Owned by delta 14.
+- **queue-kit/SPEC.md §lib/queue.sh** — a second target: `queue_roadmap_entries`
+  grows the declaration count and text. Owned by delta 14.
 - **queue-kit/SPEC.md §check-tag-lead-line** — the governed-tag list in its
   invariant statement. Owned by delta 5.
 - **queue-kit/README.md** — two separate blocks: the gate/tool roster row, held
