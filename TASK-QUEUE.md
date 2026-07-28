@@ -1355,6 +1355,13 @@
   bullet blocks the next scope entry. The asymmetry is standing pressure toward
   the kfric overload drift-kit/SPEC.md §The knowledge-friction loop warns
   against.
+  **Half (2) is STALE — observed 2026-07-29 at scope, deliberately not re-costed
+  there.** CLAUDE.md §Housekeeping now carries the `file-gap.sh` pointer beside
+  the `kfric.sh` one, so the advertising asymmetry this half describes is
+  already closed. Left standing for close to triage with the rest of its drain,
+  since this entry sits in no active unit and a half-stale premise is close's
+  call, not a scope-stage rewrite. Only half (1) — who commits a lead-filed
+  bullet — is known open; re-verify before promoting either half.
   **Deliverable:** the SPEC names the commit owner, `file-gap.sh` says so at the
   point of capture, and one always-loaded line pairs the two channels by their
   seam.
