@@ -12,6 +12,51 @@
 
 ## New Features
 
+- **deferred-queue-carry-cost** [spec: SPEC-queue-carry-cost.md] — the deferred
+  section carries 59 entries / 2,241 lines, the arithmetic of an intake
+  asymmetry the doctrine itself creates: gap disposition plus scope-gated intake
+  make filing mandatory and cheap while the only exit is building the entry —
+  demand-gated promotion exists, but no symmetric eviction. 27 entries
+  self-describe their deferred cost as low and non-rotting — decision records
+  carried as work items — and the tally the session banner steers by counts them
+  identically with actionable debt.
+  **Deliverable:** one carry-reduction unit, designed in
+  queue-kit/SPEC-queue-carry-cost.md — an `Icebox` tier joined to the live task
+  sections (so eviction is a conserved move), a `check-queue-entry-budget` gate
+  bounding a deferred entry above (size) and below (a required cost field), a
+  two-row `kpi-queue-net-delta`, and the one-time triage sweep that seeds the
+  icebox and rules the admitted-wontfix entries into their owning SPECs. The
+  amendment settles every design call this filing left open: icebox placement,
+  the iceboxed entry's tag state, the cap and age values, whether any entry-body
+  field becomes required, and the `draft:` state — ruled out on triage evidence,
+  with the reasoning recorded so it is not re-proposed.
+  **Cost while deferred:** compounding with every filing — the queue is read by
+  every scope session and curated by every close, and the intake rate outruns
+  closure with no counter-pressure; the filing threshold does not scale with
+  queue size. Bounded: nothing reds; the cost is carry weight and a steering
+  tally that overstates actionable debt.
+  **Feature at the litmus, corrected 2026-07-29 at spec** — it mints governed
+  names (the icebox tier, its gate, three config knobs, the KPI), so it belongs
+  in this section; the "debt-shaped at triage" reading this entry carried at
+  filing was wrong on the new-names test.
+  **Runs under an explicit operator exception, ruled 2026-07-29 at scope.** This
+  unit is the one member of the `pre-adoption-grammar-break` set that *adds
+  capability*, so it is the one member the standing pre-launch prioritization bar
+  defers, and it clears none of that bar's tests on a strict reading. The
+  operator granted the exception on the compounding-carry evidence, not on a
+  reframe: the bar reaches this entry and was overridden. The sibling units in
+  the set add no capability, so the bar never reached them and none of them runs
+  under an exception — do not read one onto them. Enforcement-first binds the
+  size-cap gate to the triage sweep in one unit; a sweep-only variant is
+  doctrine-blocked, not a cheaper option to be re-proposed.
+  **Sequencing:** the sibling `needs-spec-tag-rename` rewrites every deferred
+  entry and so does this unit's triage sweep — the two are paired into one
+  iteration precisely so the queue is rewritten once.
+  Filed 2026-07-28 by operator request, from a session assessing whether the
+  queue's 30-to-56 deferred growth is healthy; amendment authored 2026-07-29 at
+  spec, which is where the filing's full premise analysis and re-measurements
+  now live.
+
 ## Technical Debt
 
 - **queue-index-title-tag-residue** — `bin/queue-index.sh` renders every tagged
@@ -2137,86 +2182,6 @@
   subcommand surface, the dispatch knob — on top of new mechanism.
   Filed 2026-07-28 by operator request, from a session assessing the shell
   substrate's structural limits against a native-binary port.
-
-- **deferred-queue-carry-cost** [needs-spec] — the deferred section has grown
-  to 56 entries and ~2,000 lines (~36 lines per entry), the arithmetic of an
-  intake asymmetry the doctrine itself creates: gap disposition plus
-  scope-gated intake make filing mandatory and cheap while the only exit is
-  building the entry — demand-gated promotion exists, but no symmetric
-  eviction. 21 entries self-describe their deferred cost as low and
-  non-rotting — decision records carried as work items — and the tally the
-  session banner steers by counts them identically with actionable debt.
-  **Deliverable:** one carry-reduction unit: (a) an icebox tier for entries
-  with low, non-rotting cost and no live promotion trigger — one line each,
-  the full narrative left to the filing commit (derivation-first) — with
-  demand-gated eviction symmetric to promotion (close triages entries past a
-  defer-age threshold; an icebox entry re-filed on real recurrence is the
-  mechanism working, not churn); (b) a queue-kit gate capping deferred-entry
-  line count so the compression sticks (enforcement-first); (c) a
-  filed-minus-closed net-delta KPI beside the existing defer-age drift
-  metric; (d) the one-time triage sweep that seeds the icebox and cheaply
-  *rules* on the `[needs-spec]` entries whose own text already admits a
-  wontfix outcome (close as a one-line boundary note in the owning SPEC).
-  **Why `[needs-spec]`:** the icebox's placement is the open design — a new
-  queue section versus a separate file decides how check-task-conservation,
-  check-queue-sections, and the slug-liveness grammar treat an iceboxed slug,
-  and whether eviction is a conserved move or a sanctioned disappearance; the
-  entry-size floor and the eviction age threshold are policy values needing
-  an owner doc. A second open design rides the size cap: where filing-time
-  design capital lives once the entry cannot carry it. Ruled at filing: the
-  entry keeps the open questions (canon-kit's own few-line budget — its
-  misfiling tell already names a long entry an amendment inlined where
-  check-amendment-queue cannot see it); the filing commit body keeps the
-  narrative and cost analysis, recoverable at authoring via
-  `git log --grep=<slug>`, so nothing is discarded, only made non-resident;
-  the owning SPEC keeps durable one-line facts; no ungoverned detail-file
-  convention. Undecided, and the deciding lens is token economics: whether a
-  governed `draft:` tag state between design-pending and spec-ready — a live
-  pre-amendment file a deferred entry may point at — buys authoring a better
-  starting point than the commit body does (pre-derived thinking reused, even
-  slightly rotted, versus re-derived), against its anchoring risk on a moved
-  codebase and the pairing/orphan gate semantics it needs — a new lifecycle
-  state, not a tag reuse, since check-amendment-queue rules that a deferred
-  entry carrying a `spec:` ref must be promoted. Decide at spec on triage
-  evidence: entries whose discarded derivation would be genuinely expensive
-  to re-derive. The size-cap gate's spec also mints the owner section for
-  the entry-body field roster. Narrowed 2026-07-28 at close: the roster was
-  precedent-only (kfric-stamped, derived by imitating neighbors), and close
-  gave it an owner in queue-kit/SPEC.md §The queue format as an explicitly
-  **ungated** convention. What is left for the gate's spec is only whether any
-  field becomes *required* — a stronger claim the prose deliberately does not
-  make, since 16 of 57 entries carry a Deliverable field today.
-  **Cost while deferred:** compounding with every filing — the queue is read
-  by every scope session and curated by every close, and the intake rate
-  (27 entries filed 07-25/26 alone) currently outruns closure with no
-  counter-pressure; the filing threshold does not scale with queue size.
-  Bounded: nothing reds; the cost is carry weight and a steering tally that
-  overstates actionable debt. Debt-shaped at triage: converges the queue onto
-  existing doctrine; the new governed names are the icebox tier, its gate,
-  and the KPI.
-  **Runs under an explicit operator exception, ruled 2026-07-29 at scope.** This
-  unit is the one member of the `pre-adoption-grammar-break` set that *adds
-  capability* — an icebox tier, a size-cap gate, a KPI — so it is the one member
-  the standing pre-launch prioritization bar defers, and it clears none of that
-  bar's tests on a strict reading. The operator granted the exception on the
-  compounding-carry evidence, not on a reframe: the bar reaches this entry and
-  was overridden. The sibling units in the set add no capability, so the bar
-  never reached them and none of them runs under an exception — do not read one
-  onto them. **Constraint carried to `spec`:** the capability half cannot be
-  cheaply severed. Part (d), the one-time triage sweep, is the real carry relief
-  and is not itself an enhancement, but enforcement-first binds the part (b)
-  size-cap gate to it in one unit — a sweep that skips the machinery is
-  doctrine-blocked, not a cheaper option to be re-proposed at authoring.
-  **Premise re-verified 2026-07-29 at scope, and worse on every axis than
-  filed.** Deferred is now **61 entries / 2218 lines** (~36 per entry), against
-  the 56 this entry states and the 30 before that. Of the 49 entries carrying a
-  `Cost while deferred` field, **28** open it with low/zero/bounded/cosmetic
-  against **3** compounding — the decision-records-as-work-items fraction this
-  entry counted at 21. **12 entries carry no cost field at all**, and
-  `Deliverable` is present on 19 of 61 (this entry states 16 of 57 — the
-  proportion held while the base grew).
-  Filed 2026-07-28 by operator request, from a session assessing whether the
-  queue's 30-to-56 deferred growth is healthy.
 
 - **docs-root-link-grammar** [needs-spec] — a hand-authored `docs/` page that
   links a path *outside* `docs/` with a bare relative link resolves on disk but
