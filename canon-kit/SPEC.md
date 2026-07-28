@@ -147,7 +147,11 @@ own instance); the kit's rules are the topology itself:
   instead (`check-manifest-count` bans a bare cardinal quantifying a
   governed collection in a manifest — the collection is the count's owner).
   A literal stays verbatim only when load-bearing, and then only
-  gate-coupled. A path's **version-control tracking status** is code-owned in
+  gate-coupled. A **user-facing** claim takes the same treatment when a reader
+  acts on it: `check-install-claim` gives the primary-install-path claim one
+  declared owner and holds every governed install section to it, so the topology
+  reaches beyond the internal facts the rules above are stated over.
+  A path's **version-control tracking status** is code-owned in
   the same sense a count is — git owns it — so prose states the rule and
   `check-tracking-claim` verifies it, rather than prose transcribing membership.
 - **Comments cite, never restate.** The code surface is a tier too: a
@@ -262,6 +266,18 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   default empty ⇒ clean skip (no declared sets). This repo sets
   `bash scripts/enum-sets.sh`, which derives the queue tag sets from
   queue-kit's own parser rather than restating them.
+- `CANON_KIT_INSTALL_TRANSPORTS_CMD` — a consumer command emitting the install
+  transports `check-install-claim` holds, one `<transport-id>`⇥`<ERE>` line per
+  transport, default empty ⇒ clean skip. `CANON_KIT_INSTALL_SECTION_RE` — an ERE
+  matched against `##`-or-deeper heading text to select the sections that gate
+  scans, default empty ⇒ clean skip; either knob left empty skips the whole gate,
+  since neither assertion has a vocabulary to judge against without the other.
+  `CANON_KIT_INSTALL_CLAIM_EXCLUDE` — array of globs dropped from that gate's
+  scanned set on top of `CANON_KIT_MDREF_EXCLUDE`, default empty. A transport
+  vocabulary is one project's distribution model, so no spelling of it ships as a
+  kit literal (the provenance seam). This repo sets
+  `bash scripts/install-transports.sh`, `^(Quick start|Install)`, and
+  `("docs/posts/*")`.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
@@ -351,6 +367,13 @@ same shapes:
 - **The enum sets** arrive through the consumer's `CANON_KIT_ENUM_SETS_CMD`,
   validated and fail-closing (exit 2) on a command error or an unparsable line
   (§check-prose-enum).
+- **The install transports** arrive the same way, through
+  `CANON_KIT_INSTALL_TRANSPORTS_CMD`, and `spec_install_transports` carries the
+  same fail-closed contract its enum-set sibling does — a command error, an
+  unparsable line, an id that is not slug-shaped, or a repeated id is exit 2. The
+  duplicate check is what a bare emit grammar cannot express and the gate needs:
+  two lines claiming one id would give a transport two patterns and make its
+  match order arbitrary (§check-install-claim).
 - **The comment-surface adapters:** the comment gates read *different* surfaces.
   `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
   line is an unresolvable-by-design placeholder (§check-spec-pointer);
@@ -1179,6 +1202,92 @@ fixture runner invokes from a case directory. Not a git repository, or a
 `git grep` that errors, is fail-closed (exit 2). The `# graph:` manifest couples
 the doc set to `scripts/*.sh` and every kit's shell sources (`kit:*.sh`), so a
 script rename or a knob retirement re-fires the gate over the docs.
+
+### check-install-claim
+
+Invariant: exactly one governed doc declares which install transport is primary,
+and no scanned install section leads with a different one. This is the star
+topology's first *user-facing* application — the same one-owner-per-fact rule the
+kit applies to internal facts, aimed at a claim a first-time reader acts on.
+
+**What it does not attempt.** Whether a documented install command resolves
+against a live registry needs network egress at gate time and is out of a
+hermetic battery's reach. It is not built, and this paragraph says so rather than
+leaving a reader to over-read a green run: the command that drove this gate's
+filing was syntactically fine, and only a registry could have contradicted it.
+What is decidable from the tree alone is the consistency half — two surfaces
+cannot name different primary transports — and that is the whole of what runs.
+
+The claim's machine-readable owner is a full-line
+`<!-- install-primary: <transport-id> -->` HTML comment. A marker rather than a
+visible sentence, because the reader-facing form of this claim already exists as
+prose and must stay prose; the marker is the tier beside it, not a replacement.
+The transport vocabulary is consumer config — one `<transport-id>`⇥`<ERE>` line
+per transport through `CANON_KIT_INSTALL_TRANSPORTS_CMD`, loaded by
+`spec_install_transports` (§lib/spec.sh) — because a kit literal spelling a
+transport publishes one project's distribution model as a kit fact.
+
+The scanned set is `check-md-refs`' governed doc set (the manifest set minus
+`CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_INSTALL_CLAIM_EXCLUDE`. Two
+assertions:
+
+- **(A) Singleton owner.** Exactly one declaration exists across the scanned set.
+  Zero is the defect the gate was built for — nothing owns the claim, so two
+  pages can drift apart with nothing watching — and two owners is that same
+  defect wearing a different shape. An id outside the configured vocabulary is
+  fail-closed (exit 2) rather than a violation: the gate then holds no primary to
+  compare a section against, so it must not run rather than pass.
+- **(B) Leading transport.** Within each scanned document, for every
+  `##`-or-deeper section whose heading text matches
+  `CANON_KIT_INSTALL_SECTION_RE`, the **earliest** line matching any transport
+  pattern must match the declared primary. Later matches are never flagged, and a
+  section matching no transport pattern is silent. One line matching two patterns
+  passes when either id is the primary — a sentence naming both transports is not
+  leading with the secondary one. Fenced content is scanned, because a recipe is
+  exactly where a transport shows, but a fenced line is never read as a heading;
+  the declaration line is skipped, since a claim is not evidence for itself.
+
+Assertion B is the answer to the leading-versus-mentioning question: naming a
+secondary transport is correct prose and must stay green, so the rule is
+positional. **The scope in which "leading" is well-defined is the install
+section, not the file**, and that calibration was verified rather than assumed —
+this repo's own install page names its npm path in the H1 preamble about 120
+lines above the tarball recipe, so a whole-file first-match rule would red the
+owner page on correct prose.
+
+Three honest limits, each stated because a reader would otherwise over-trust a
+green run. Registry reachability is the first, above. **Pattern quality is the
+second, and it is the consumer's own drift to own:** the gate is only as sharp as
+the emitted EREs, and a loosely-written pattern wins matches by accident — the
+kit contract asks for the emit grammar, exactly as `check-prose-enum` says of a
+hand-listed set. **The third is bought by the section scope:** the prose tier of
+the declared claim may itself sit outside any scanned section, as this repo's
+does, in which case rewriting that prose to name a different transport while
+leaving the declaration alone stays green. That binding is documentary — held by
+this section and by a reader, not by the gate. It is the price of the scoping
+rather than an argument against it, since the alternative whole-file rule reds
+the owner page today, and the recurrence path that actually fired is unaffected:
+the drift was a `## Quick start` section leading with the wrong transport, which
+is in scope.
+
+Producer: the maintainer editing the section that owns the claim, plus the
+consumer's transport command; both are live tracked configuration in this repo,
+not fixture-only. Consumer: the committing operator via the output contract —
+assertion B's report names the section, the offending line, and *which* transport
+it led with, because "wrong transport" alone would leave the reader grepping. The
+declaration carries exactly one field and both assertions read it; each emitted
+line's id is read at the membership check and in the report, its ERE at the
+per-line match.
+
+The gate lands greenfield: the drift that filed it was fixed inline at the close
+that filed it, so this pins a currently-consistent claim and its value is
+recurrence. That claim drifted at two consecutive releases with nothing watching
+it, on the surface a first-time reader runs first. The good/bad pair covers the
+recurrence path itself — a quick-start section leading with the secondary
+transport — beside a silent no-transport section, a heading the regex does not
+select, and a published note the path valve keeps out of the scanned set. The
+`# graph:` manifest couples the gate to the doc set and `scripts/*.sh`, so a
+transport rename re-fires it over the docs. `precommit` tier.
 
 ### check-prose-tells
 

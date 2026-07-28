@@ -42,6 +42,14 @@ CANON_KIT_MANIFEST_FILES=(
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")
 
+# comment-tier-exempt: this repo's install transports and the sections they are held over — the vocabulary is consumer config because a kit literal spelling a transport would publish one project's distribution model; the section regex is anchored so a heading merely mentioning a script name (### install-hooks) never selects, and the posts valve keeps a published release note immutable the same way CANON_KIT_TEMPORAL_EXEMPT_PATHS already does
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_INSTALL_TRANSPORTS_CMD="bash scripts/install-transports.sh"
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_INSTALL_SECTION_RE='^(Quick start|Install)'
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_INSTALL_CLAIM_EXCLUDE=("docs/posts/*")
+
 # comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_ENUM_SETS_CMD="bash scripts/enum-sets.sh"

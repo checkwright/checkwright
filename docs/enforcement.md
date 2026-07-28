@@ -91,6 +91,7 @@ leaves its section absent.
 | [site-kit](site-kit/index.md) | check-docs-render-fidelity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | (consumer) | check-install-toolchain | precommit |
+| [canon-kit](canon-kit/index.md) | check-install-claim | precommit |
 | (consumer) | check-installer-no-deps | precommit |
 | (consumer) | check-release-bump | precommit |
 | (consumer) | check-npm-publish-spec | precommit |

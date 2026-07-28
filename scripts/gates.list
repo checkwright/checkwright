@@ -66,6 +66,7 @@ check-docs-cname-parity
 check-docs-render-fidelity
 check-docs-cmd
 check-install-toolchain
+check-install-claim
 check-installer-no-deps
 check-release-bump
 check-npm-publish-spec

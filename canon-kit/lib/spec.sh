@@ -92,6 +92,10 @@ declare -p CANON_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || CANON_KIT_COUNT_ALLOWE
 
 [[ -v CANON_KIT_ENUM_SETS_CMD ]] || CANON_KIT_ENUM_SETS_CMD=""
 
+[[ -v CANON_KIT_INSTALL_TRANSPORTS_CMD ]] || CANON_KIT_INSTALL_TRANSPORTS_CMD=""
+[[ -v CANON_KIT_INSTALL_SECTION_RE ]]     || CANON_KIT_INSTALL_SECTION_RE=""
+declare -p CANON_KIT_INSTALL_CLAIM_EXCLUDE &>/dev/null || CANON_KIT_INSTALL_CLAIM_EXCLUDE=()
+
 declare -p CANON_KIT_COMMENT_MACHINE &>/dev/null || CANON_KIT_COMMENT_MACHINE=()
 declare -p CANON_KIT_COMMENT_REASON  &>/dev/null || CANON_KIT_COMMENT_REASON=()
 declare -p CANON_KIT_COMMENT_SURFACE &>/dev/null || CANON_KIT_COMMENT_SURFACE=()
@@ -438,6 +442,25 @@ spec_enum_sets() {
         [[ -n "$name" && -n "$member" ]] || { echo "spec_enum_sets: empty set name or member: '$line'" >&2; return 2; }
         [[ "$member" == *$'\t'* ]] && { echo "spec_enum_sets: extra tab in line: '$line'" >&2; return 2; }
         printf '%s\t%s\n' "$name" "$member"
+    done <<< "$out"
+    return 0
+}
+
+# spec: canon-kit/SPEC.md §check-install-claim — run the consumer's transport command and echo its validated <transport-id><TAB><ERE> lines; a command that fails, a line that does not parse, or a duplicate id returns 2 (fail-closed), the same contract spec_enum_sets carries. Empty CANON_KIT_INSTALL_TRANSPORTS_CMD is the caller's clean-skip signal, handled before this is called.
+spec_install_transports() {
+    local out st line id ere seen=""
+    out="$(bash -c "$CANON_KIT_INSTALL_TRANSPORTS_CMD")"; st=$?
+    [[ $st -eq 0 ]] || { echo "spec_install_transports: CANON_KIT_INSTALL_TRANSPORTS_CMD exited $st" >&2; return 2; }
+    while IFS= read -r line; do
+        [[ -n "$line" ]] || continue
+        [[ "$line" == *$'\t'* ]] || { echo "spec_install_transports: line has no tab: '$line'" >&2; return 2; }
+        id="${line%%$'\t'*}"; ere="${line#*$'\t'}"
+        [[ -n "$id" && -n "$ere" ]] || { echo "spec_install_transports: empty id or pattern: '$line'" >&2; return 2; }
+        [[ "$ere" == *$'\t'* ]] && { echo "spec_install_transports: extra tab in line: '$line'" >&2; return 2; }
+        [[ "$id" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo "spec_install_transports: id is not slug-shaped: '$id'" >&2; return 2; }
+        [[ " $seen " == *" $id "* ]] && { echo "spec_install_transports: duplicate transport id: '$id'" >&2; return 2; }
+        seen="$seen $id"
+        printf '%s\t%s\n' "$id" "$ere"
     done <<< "$out"
     return 0
 }

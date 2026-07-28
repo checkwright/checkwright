@@ -26,7 +26,11 @@ worth drawing rather than blurring:
 The last two are two transports over one install model, not two products. Both
 reach the same `init`, write the same `checkwright.lock`, and leave the same
 vendored result; only the fetch differs. The tarball is the primary path because
-it removes a runtime dependency. npm is retained because it is the path that
+it removes a runtime dependency. That sentence is the reader-facing tier of a
+declared claim: its machine-readable tier is the `install-primary:` declaration
+under §Quick start, and
+[canon-kit/SPEC.md](canon-kit/SPEC.md#check-install-claim) owns what binds the
+two. npm is retained because it is the path that
 carries a build attestation — `npm publish --provenance` has the release runner
 sign a statement of what built the package, which a self-hosted asset cannot
 offer. Neither dominates, so both properties are named rather than one being
@@ -130,6 +134,8 @@ GitHub Pages parser — additionally needs Ruby with the `kramdown-parser-gfm`
 gem. A consumer that publishes no docs site never installs it.
 
 ## Quick start
+
+<!-- install-primary: tarball -->
 
 From a clean git repository. Pick a version off the
 [releases](https://github.com/checkwright/checkwright/releases) page and

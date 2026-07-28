@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **primary-install-path-claim** [spec: SPEC-primary-install-path-claim.md] [roadmap: now/adoption]
-  roadmap-summary: One documented install path, with a gate holding every page to it.
-  **no surface owns which install path is primary**, so two documents drifted
-  apart with nothing to catch it: README.md's Quick start led with `npx
-  checkwright init` — the command `v0.16.0` announced and which never worked,
-  npm serving only the `0.0.1` reservation placeholder — while docs/install.md
-  states the tarball is primary. The repo's most-read surface contradicted its
-  own install page and advertised a broken command, through a release and into
-  the next one. **Deliverable:** an `install-primary:` declaration owning the
-  claim in docs/install.md §Quick start, plus a consistency gate holding every
-  governed surface's install section to it. The registry-reachability half is
-  ruled out of hermetic reach and the leading-vs-mentioning predicate is
-  settled, both in canon-kit/SPEC-primary-install-path-claim.md.
-  **Cost while deferred:** demonstrated, not hypothetical — it drifted at two
-  consecutive releases, and the failure mode is the worst-placed one a project
-  has: the front door telling a first-time reader to run something that does
-  not work. Filed 2026-07-26 by close (`release-path-hardening`); promoted
-  2026-07-27 by spec (`front-door-readiness`).
-
 ## Technical Debt
 
 ## Deferred
@@ -2143,5 +2124,6 @@
 
 - front-door-outcome-rewrite
 - public-roadmap-projection
+- primary-install-path-claim
 
 ## Lessons Learned

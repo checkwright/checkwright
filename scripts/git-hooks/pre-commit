@@ -279,6 +279,10 @@ if staged_matches 'docs/install.md' 'context-kit/lib/toolfloor.sh'; then
     run_gate check-install-toolchain scripts/check-install-toolchain.sh
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'docs/*.md' 'scripts/*.sh'; then
+    run_gate check-install-claim canon-kit/checks/check-install-claim.sh
+fi
+
 if staged_matches 'installer/package.json'; then
     run_gate check-installer-no-deps scripts/check-installer-no-deps.sh
 fi

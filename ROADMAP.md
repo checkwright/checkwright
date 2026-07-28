@@ -48,7 +48,7 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-- **`primary-install-path-claim`** *(adoption)* — One documented install path, with a gate holding every page to it.
+_Nothing is queued under this horizon._
 
 ### next
 
