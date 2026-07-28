@@ -97,20 +97,9 @@ queue_done_slugs() {
     ' "$1"
 }
 
-# spec: queue-kit/SPEC.md §bin/roadmap.sh — the one lead-line [roadmap:] parse, shared by the emitter and check-roadmap-fresh so the two never disagree on what an entry claims. One TSV line per tagged live entry, in queue order: <tag-count> <raw-field> <slug> <summary>. The summary is the lead line's text with every tag stripped, cut at the first sentence boundary; entry bodies are never read.
+# spec: queue-kit/SPEC.md §bin/roadmap.sh — the one [roadmap:] + roadmap-summary: parse, shared by the emitter and check-roadmap-fresh so the two never disagree on what an entry claims. One TSV line per live entry carrying either, in queue order: <tag-count> <raw-field> <slug> <declaration-count> <summary>. The summary is the entry's roadmap-summary: declaration verbatim — a whitelist, so unmarked body prose never reaches the page.
 queue_roadmap_entries() {
     awk -v taskre="$QUEUE_TASK_RE" -v sectre="$QUEUE_SECTION_RE" '
-        function summary(line,   t) {
-            t = line
-            sub(/^[[:space:]]*-[[:space:]]+/, "", t)
-            sub(/^\*\*[a-z0-9][a-z0-9-]*\*\*/, "", t)
-            gsub(/\[[^]]*\]/, "", t)
-            sub(/^[[:space:]]*(—|--)[[:space:]]*/, "", t)
-            gsub(/[[:space:]]+/, " ", t)
-            sub(/^ /, "", t); sub(/ $/, "", t)
-            if (match(t, /\.( |$)/)) t = substr(t, 1, RSTART)
-            return t
-        }
         function tagcount(line,   s, n) {
             s = line; n = 0
             while (match(s, /\[roadmap:/)) { n++; s = substr(s, RSTART + RLENGTH) }
@@ -126,11 +115,34 @@ queue_roadmap_entries() {
             if (!match(line, /\*\*[a-z0-9][a-z0-9-]*\*\*/)) return ""
             return substr(line, RSTART + 2, RLENGTH - 4)
         }
-        $0 ~ taskre { inq = 1; next }
-        $0 ~ sectre { inq = 0 }
-        inq && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ && /\[roadmap:/ {
-            printf "%d\t%s\t%s\t%s\n", tagcount($0), field($0), slugof($0), summary($0)
+        function declared(line,   t) {
+            t = line
+            sub(/^[[:space:]]*roadmap-summary:[[:space:]]*/, "", t)
+            gsub(/[[:space:]]+/, " ", t)
+            sub(/^ /, "", t); sub(/ $/, "", t)
+            return t
         }
+        # spec: queue-kit/SPEC.md §lib/queue.sh — the field column of an untagged entry prints as "-", never empty: tab counts as IFS whitespace, so a reader splitting on it coalesces an empty column and silently shifts every field after it
+        function flush(   f) {
+            f = (fieldv == "" ? "-" : fieldv)
+            if (slug != "" && (ntags > 0 || nsum > 0))
+                printf "%d\t%s\t%s\t%d\t%s\n", ntags, f, slug, nsum, sumtext
+            slug = ""; ntags = 0; nsum = 0; fieldv = ""; sumtext = ""
+        }
+        $0 ~ taskre { flush(); inq = 1; next }
+        $0 ~ sectre { flush(); inq = 0; next }
+        !inq { next }
+        /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
+            flush()
+            slug = slugof($0); ntags = tagcount($0); fieldv = field($0)
+            next
+        }
+        # spec: queue-kit/SPEC.md §The tag algebra — the declaration is body-scoped by design, so it is read off a continuation line and counted per entry
+        slug != "" && /^[[:space:]]+roadmap-summary:/ {
+            nsum++
+            if (nsum == 1) sumtext = declared($0)
+        }
+        END { flush() }
     ' "$1"
 }
 

@@ -91,6 +91,26 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   may both be projected, because the projection is about public direction, not
   selection order. Field validity is `check-roadmap-fresh`'s assertion B.
 
+A tagged entry also carries a **`roadmap-summary: <text>` declaration** — one
+indented line in the entry body holding the single sentence the public page
+prints. It is a declaration, not a tag, and the difference is the point: a tag is
+bracketed and lead-line-scoped because its readers scan lead lines alone, while
+this is read off a line of its own, the shape the `close-surface:` declaration
+above already uses (and `QUEUE_KIT_PROSE_LEADS`' `Protocol:` token at column 0).
+Spelling is fixed mechanism; `check-tag-lead-line` does not govern it, and it
+cannot collide with the `[roadmap:` scan, which keys on the bracket.
+
+The declaration is a **whitelist, and that is a privacy boundary before it is a
+design one**. Only text an author explicitly marked is ever projected, so the
+mechanism's failure mode is a thin page rather than published internal prose —
+the direction a consumer whose queue is private and whose roadmap is not can
+afford to fail in. The emitter reads the text verbatim, so no sentence heuristic
+decides what a public page inherits. One line, not a block: an indented
+declaration has roughly 81 columns behind it under the default wrap budget —
+comfortably a sentence, and needing no block-end rule a reflow could silently
+truncate. `check-roadmap-fresh`'s assertion C makes the tag and the declaration
+mandatory for each other in both directions.
+
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`
 plus `check-tag-lead-line` read that section's lead lines too. That section is
@@ -204,12 +224,19 @@ configuration) rather than per-array, because the failure the check exists to
 stop is one array set alone. Validation failures are collected and reported
 together, then exit 2.
 
-`queue_roadmap_entries <queue-file>` is the single `[roadmap:]` parse, shared by
-`bin/roadmap.sh` and `check-roadmap-fresh` so the emitter and the gate can never
-disagree about what an entry claims — the same one-adapter rule the section
-regexes follow. It walks the live task sections in queue order and prints one
-tab-separated line per tagged entry: the entry's `[roadmap:]` tag count, the raw
-field text, the slug, and the projected summary.
+`queue_roadmap_entries <queue-file>` is the single `[roadmap:]` and
+`roadmap-summary:` parse, shared by `bin/roadmap.sh` and `check-roadmap-fresh` so
+the emitter and the gate can never disagree about what an entry claims — the same
+one-adapter rule the section regexes follow. It walks the live task sections in
+queue order and prints one tab-separated line per entry carrying **either**
+marking: the entry's `[roadmap:]` tag count, the raw field text, the slug, the
+`roadmap-summary:` declaration count, and the declaration's text. Emitting on
+either marking rather than on the tag alone is what lets assertion C see a dead
+declaration — an entry the tag has fallen off is exactly the case a
+tag-triggered walk cannot report. An untagged entry's field column prints as `-`
+rather than empty, because a tab counts as IFS whitespace: a reader splitting on
+it coalesces an empty column and silently shifts every field after it, so a
+fixed-arity line must never carry one.
 
 The loader sources the consumer config, then a `<config>.local.sh` overlay
 beside it when present — last write wins. This is the tracked-name /
@@ -260,13 +287,13 @@ it and a reader consumes it as the page's body.
   forgot it. An empty horizon carries a one-line placeholder instead of bullets.
 - Under each, one bullet per tagged entry, in queue order:
   ``- **`<slug>`** *(<track>)* — <summary>``.
-- The summary is the entry's **lead-line** text with every tag stripped, cut at
-  the first sentence boundary. Entry bodies are never projected: they carry
-  internal design rationale and cost accounting, which is precisely the content a
-  public page must not inherit. The lead line is therefore the whole budget a
-  projected item gets, and writing one that reads as a public one-liner is the
-  curating maintainer's job, not the emitter's — the emitter truncates, it does
-  not summarize.
+- The summary is the entry's `roadmap-summary:` declaration (§The tag algebra),
+  printed verbatim. Nothing else in the entry is projected — not the lead line,
+  not the body, which carries internal design rationale and cost accounting,
+  precisely the content a public page must not inherit. The emitter neither
+  summarizes nor truncates: an author decided what the page says, and an entry
+  without a single non-empty declaration contributes no bullet at all, so
+  unmarked prose cannot reach the page even with the gate bypassed.
 
 The block ends on a blank line. That blank is load-bearing rather than cosmetic:
 the Pages parser closes a list only on one, so without it the `:end` marker abuts
@@ -277,12 +304,15 @@ from swallowing its marker.
 
 Honest limit — the lead line is a shared budget, and `[roadmap:]` competes for it
 with every other tag the entry carries. Against `check-queue-wrap`'s floor a
-`[spec: <file>]` tag is far wider than `[needs-spec]`, so an entry carrying a
-spec pointer and a long slug can have **no** columns left for a summary, and is
-simply not projectable until that pointer drops at the amendment's merge. That is
-a true state of the queue rather than a defect to gate around: the wrap floor
-exists so a runaway never reflows to column 0, and widening it to make room for a
-public page would trade a parse guarantee for a presentation one.
+`[spec: <file>]` tag is far wider than `[needs-spec]`, so an entry carrying a spec
+pointer and a long slug may have room for the `[roadmap:]` tag but none for prose
+after it. That costs nothing now the summary lives on its own declaration line:
+the lead line needs room for the tag alone. It does bound the tag itself — a
+sufficiently long slug plus spec pointer leaves no room even for that, and such an
+entry is unprojectable until the pointer drops at the amendment's merge. A true
+state of the queue rather than a defect to gate around: the wrap floor exists so a
+runaway never reflows to column 0, and widening it to make room for a public page
+would trade a parse guarantee for a presentation one.
 
 Ordering inside a horizon is queue order, not a rank; the page states so in its
 framing rather than implying a priority the queue does not carry. The
@@ -306,11 +336,20 @@ Invariant, in two assertions over `QUEUE_KIT_ROADMAP_FILE`:
   parses as `<horizon>/<track>` with both fields members of their configured
   arrays. An unknown horizon or track, a missing slash, or a second `[roadmap:]`
   tag on one entry is a violation naming the entry and the offending field.
+- **(C) Marking parity**, in both directions. A `[roadmap:]`-tagged entry carries
+  exactly one `roadmap-summary:` declaration — none, or two, is a violation,
+  because a curated entry with no marked text would otherwise reach a reader as a
+  bullet with no prose. And a declaration on an entry whose lead line carries no
+  `[roadmap:]` tag is a violation too: a dead marking is what a dropped or
+  reflowed tag looks like from the page's side, and the tag is what decides
+  projection.
 
-Assertion B lives here rather than in `check-tag-lead-line` because this is the
-gate that already loads the horizon and track vocabularies; putting it in the
-lead-line gate would make a placement gate load a value roster it has no other
-use for. `check-tag-lead-line` still governs the tag on its *placement* axis.
+Assertions B and C live here rather than in `check-tag-lead-line` because this is
+the gate that already loads the horizon and track vocabularies and the shared
+`[roadmap:]` parse; putting them in the lead-line gate would make a placement gate
+load a value roster and a body-scoped declaration it has no other use for.
+`check-tag-lead-line` still governs the tag on its *placement* axis, and governs
+the declaration not at all — it is body-scoped by design.
 
 Calibration: `QUEUE_KIT_ROADMAP_FILE` empty is a clean skip for both assertions
 — the correct no-op for a consumer that publishes no roadmap, matching

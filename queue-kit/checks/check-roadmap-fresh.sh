@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh dir=one valve=none tier=precommit trigger=TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh
-# spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon and track, and the projection page's marker block is the byte-fresh emission of bin/roadmap.sh
+# spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon and track and pairs with exactly one roadmap-summary: declaration, and the projection page's marker block is the byte-fresh emission of bin/roadmap.sh
 #
 # usage: check-roadmap-fresh.sh [projection-file] [emit-file]
 #   bare: compare the marker block in QUEUE_KIT_ROADMAP_FILE against `roadmap.sh --emit`.
@@ -31,9 +31,19 @@ horizons=" ${QUEUE_KIT_HORIZONS[*]+"${QUEUE_KIT_HORIZONS[*]}"} "
 tracks=" ${QUEUE_KIT_TRACKS[*]+"${QUEUE_KIT_TRACKS[*]}"} "
 bad=()
 tagged=0
-while IFS=$'\t' read -r ntags fieldv slug _summary; do
+while IFS=$'\t' read -r ntags fieldv slug nsum _summary; do
     [[ -n "$slug" ]] || continue
+
+    # spec: queue-kit/SPEC.md §check-roadmap-fresh — assertion C, both directions: the tag decides projection and the declaration is the only prose that may be projected, so neither is meaningful without the other
+    if [[ "$ntags" -eq 0 ]]; then
+        bad+=("$slug: carries a roadmap-summary: declaration but no [roadmap:] tag; a dead marking is what a dropped or reflowed tag looks like from the page's side")
+        continue
+    fi
     tagged=$((tagged + 1))
+    # spec: queue-kit/SPEC.md §check-roadmap-fresh — the declaration count and the tag's fields are independent, so both are reported in one run rather than costing the author a second round trip
+    [[ "$nsum" -eq 1 ]] \
+        || bad+=("$slug: is [roadmap:]-tagged but carries $nsum roadmap-summary: declaration(s); exactly one is required")
+
     if [[ "$ntags" -ne 1 ]]; then
         bad+=("$slug: carries $ntags [roadmap:] tags; an entry takes at most one")
         continue
@@ -48,11 +58,14 @@ while IFS=$'\t' read -r ntags fieldv slug _summary; do
 done < <(queue_roadmap_entries "$QUEUE_KIT_QUEUE_FILE")
 
 if [[ ${#bad[@]} -gt 0 ]]; then
-    echo "check-roadmap-fresh: invalid [roadmap:] tag field(s) in $QUEUE_KIT_QUEUE_FILE"
-    echo "(an unconfigured value drops the entry off the page with nothing else to notice):"
+    echo "check-roadmap-fresh: invalid roadmap curation in $QUEUE_KIT_QUEUE_FILE"
+    echo "(an unconfigured value or an unpaired marking drops the entry off the page"
+    echo "with nothing else to notice):"
     for b in "${bad[@]}"; do echo "  $b"; done
-    echo "  help: spell the tag [roadmap: <horizon>/<track>], both values drawn from"
-    echo "        QUEUE_KIT_HORIZONS / QUEUE_KIT_TRACKS (queue-kit/SPEC.md §Layout and configuration)."
+    echo "  help: an entry joins the page with a [roadmap: <horizon>/<track>] tag on its lead"
+    echo "        line, both values drawn from QUEUE_KIT_HORIZONS / QUEUE_KIT_TRACKS, plus"
+    echo "        exactly one indented 'roadmap-summary: <text>' declaration in its body —"
+    echo "        the only prose the public page prints (queue-kit/SPEC.md §bin/roadmap.sh)."
     exit 1
 fi
 

@@ -48,20 +48,23 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-- **`front-door-outcome-rewrite`** *(adoption)* — rewrite the front door around one job.
+- **`public-roadmap-projection`** *(adoption)* — This page, generated from the work queue so it cannot go stale.
+- **`primary-install-path-claim`** *(adoption)* — One documented install path, with a gate holding every page to it.
+- **`front-door-outcome-rewrite`** *(adoption)* — A first screen that leads with the outcome instead of the architecture.
 
 ### next
 
-- **`preview-release-cadence`** *(adoption)* — a declared preview channel.
-- **`platform-support-ci-matrix`** *(reliability)* — a CI leg per platform.
-- **`installer-lifecycle-verbs`** *(adoption)* — update, diff, uninstall.
+- **`preview-release-cadence`** *(adoption)* — A declared preview channel and a slower, calmer release cadence.
+- **`platform-support-ci-matrix`** *(reliability)* — A CI install-smoke leg per supported platform, or an honest label.
+- **`installer-lifecycle-verbs`** *(adoption)* — update, diff and uninstall, so an install can be managed after init.
+- **`native-gate-binary-port`** *(reliability)* — The gate battery as one native binary: no GNU userland, sub-second runs.
 
 ### later
 
-- **`plugin-marketplace`** *(ecosystem)* — harness plugin packaging.
-- **`benchmark-ab-experiment`** *(adoption)* — a controlled A/B experiment.
-- **`prose-profile`** *(ecosystem)* — a profile for non-code repos.
-- **`hosted-attestation-service`** *(commercial)* — a neutral attestation.
-- **`heterogeneous-agent-delegation`** *(ecosystem)* — cross-vendor stages.
+- **`plugin-marketplace`** *(ecosystem)* — The stage skills and guards installable as a harness plugin.
+- **`benchmark-ab-experiment`** *(adoption)* — A controlled experiment measuring drift with and without governance.
+- **`prose-profile`** *(ecosystem)* — A profile for documentation repos, where there is no build to gate.
+- **`hosted-attestation-service`** *(commercial)* — Gate runs verified by a neutral party no committing agent can touch.
+- **`heterogeneous-agent-delegation`** *(ecosystem)* — Dispatch a stage to any vendor's coding agent, gated identically.
 
 <!-- roadmap:end -->

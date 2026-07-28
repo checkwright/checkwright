@@ -33,12 +33,14 @@ code() {   # $1=label $2=actual $3=expected
     [[ "$2" == "$3" ]] || { echo "  FAIL [$1]: expected exit $3, got $2"; fails=$((fails + 1)); }
 }
 
-queue() {  # $1=the entry lead line(s) — writes a minimal well-formed queue
+queue() {  # $1=the entry lead line, $2=optional body line(s) — writes a minimal well-formed queue
     { printf '## Iteration: demo\n\n## New Features\n\n'
       printf '%s\n' "$1"
+      [[ $# -ge 2 ]] && printf '%s\n' "$2"
       printf '\n## Technical Debt\n\n## Deferred\n\n## Done\n\n## Lessons Learned\n'
     } >"$SANDBOX/TASK-QUEUE.md"
 }
+decl='  roadmap-summary: A sentence an author marked for the public page.'
 
 # The projection page is kept fresh throughout, so every verdict below is
 # assertion B's and never assertion A's.
@@ -49,61 +51,105 @@ refresh() {
 
 run_gate() { ( cd "$SANDBOX" && bash "$GATE" 2>&1 ); }
 
-# Every field valid -> clean.
-queue '- **ok-thing** [roadmap: soon/alpha] — a valid entry.'
+# Every field valid, one declaration -> clean.
+queue '- **ok-thing** [roadmap: soon/alpha] — a valid entry.' "$decl"
 refresh
 out="$(run_gate)"; code "valid-exit" "$?" 0
 want "valid" "$out" "ROADMAP-FRESH: clean"
 
 # Unknown horizon -> named, with the offending value.
-queue '- **bad-horizon** [roadmap: eventually/alpha] — an unconfigured horizon.'
+queue '- **bad-horizon** [roadmap: eventually/alpha] — an unconfigured horizon.' "$decl"
 refresh
 out="$(run_gate)"; code "horizon-exit" "$?" 1
 want "horizon-slug"  "$out" "bad-horizon"
 want "horizon-value" "$out" "unknown horizon 'eventually'"
 
 # Unknown track -> named, with the offending value.
-queue '- **bad-track** [roadmap: soon/gamma] — an unconfigured track.'
+queue '- **bad-track** [roadmap: soon/gamma] — an unconfigured track.' "$decl"
 refresh
 out="$(run_gate)"; code "track-exit" "$?" 1
 want "track-value" "$out" "unknown track 'gamma'"
 
 # Missing slash -> a parse failure, not a membership failure.
-queue '- **no-slash** [roadmap: soon] — one field where two are required.'
+queue '- **no-slash** [roadmap: soon] — one field where two are required.' "$decl"
 refresh
 out="$(run_gate)"; code "slash-exit" "$?" 1
 want "slash" "$out" "does not parse as <horizon>/<track>"
 
 # A second [roadmap:] tag on one entry -> rejected.
-queue '- **two-tags** [roadmap: soon/alpha] [roadmap: someday/beta] — two tags.'
+queue '- **two-tags** [roadmap: soon/alpha] [roadmap: someday/beta] — two tags.' "$decl"
 refresh
 out="$(run_gate)"; code "twotags-exit" "$?" 1
 want "twotags" "$out" "carries 2 [roadmap:] tags"
 
-# An untagged entry is simply not projected — the normal case, not a violation.
+# An untagged, unmarked entry is simply not projected — the normal case.
 queue '- **plain-thing** — no tag at all.'
 refresh
 out="$(run_gate)"; code "untagged-exit" "$?" 0
 want "untagged" "$out" "ROADMAP-FRESH: clean"
 
-# Emit grammar: the done section is history, never direction.
+# Assertion C — a tagged entry with no declaration reds rather than projecting a
+# bullet with no prose.
+queue '- **no-decl** [roadmap: soon/alpha] — tagged, but nothing marked.'
+refresh
+out="$(run_gate)"; code "nodecl-exit" "$?" 1
+want "nodecl" "$out" "carries 0 roadmap-summary: declaration(s)"
+
+# Assertion C — two declarations are ambiguous, so they red too.
+queue '- **two-decl** [roadmap: soon/alpha] — tagged twice over.' "$decl
+$decl"
+refresh
+out="$(run_gate)"; code "twodecl-exit" "$?" 1
+want "twodecl" "$out" "carries 2 roadmap-summary: declaration(s)"
+
+# Assertion C, the other direction — a declaration with no tag is a dead marking,
+# which is what a dropped or reflowed tag looks like from the page's side.
+queue '- **dead-marking** — the tag fell off this lead line.' "$decl"
+refresh
+out="$(run_gate)"; code "dead-exit" "$?" 1
+want "dead-slug" "$out" "dead-marking"
+want "dead"      "$out" "no [roadmap:] tag"
+
+# The declaration count and the tag fields are independent, so one run reports
+# both rather than costing the author a second round trip.
+queue '- **both-wrong** [roadmap: eventually/alpha] — bad horizon and no mark.'
+refresh
+out="$(run_gate)"; code "both-exit" "$?" 1
+want "both-decl"    "$out" "carries 0 roadmap-summary: declaration(s)"
+want "both-horizon" "$out" "unknown horizon 'eventually'"
+
+# Emit grammar. The whitelist is the load-bearing property: only the declaration
+# is projected, so the lead-line prose, the surrounding body, and the cost block
+# all stay off the page. The done section is history, never direction.
 { printf '## Iteration: demo\n\n## New Features\n\n'
-  printf -- '- **live-thing** [roadmap: soon/alpha] — a live entry. A second sentence.\n'
-  printf '  A body line that is never projected.\n'
+  printf -- '- **live-thing** [roadmap: soon/alpha] — LEADPROSE, an internal one-liner.\n'
+  printf '  BODYPROSE that no reader should ever see.\n'
+  printf '  roadmap-summary: The public sentence, and only this.\n'
+  printf '  **Cost while deferred:** COSTPROSE, the accounting a public page must not inherit.\n'
   printf '\n## Technical Debt\n\n## Deferred\n\n'
-  printf -- '- **deferred-thing** [roadmap: someday/beta] — a deferred entry.\n'
+  printf -- '- **deferred-thing** [roadmap: someday/beta] — internal framing.\n'
+  printf '  roadmap-summary: A deferred rung, said publicly.\n'
   printf '\n## Done\n\n- shipped-thing\n\n## Lessons Learned\n'
 } >"$SANDBOX/TASK-QUEUE.md"
 out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
-want   "emit-live"     "$out" '- **`live-thing`** *(alpha)* — a live entry.'
-absent "emit-sentence" "$out" "A second sentence"
-absent "emit-body"     "$out" "never projected"
-want   "emit-deferred" "$out" '- **`deferred-thing`** *(beta)* — a deferred entry.'
-absent "emit-done"     "$out" "shipped-thing"
-want   "emit-heading"  "$out" "### soon"
+want   "emit-declared"  "$out" '- **`live-thing`** *(alpha)* — The public sentence, and only this.'
+absent "emit-leadprose" "$out" "LEADPROSE"
+absent "emit-bodyprose" "$out" "BODYPROSE"
+absent "emit-costprose" "$out" "COSTPROSE"
+want   "emit-deferred"  "$out" '- **`deferred-thing`** *(beta)* — A deferred rung, said publicly.'
+absent "emit-done"      "$out" "shipped-thing"
+want   "emit-heading"   "$out" "### soon"
+
+# The whitelist holds even with the gate bypassed: a tagged entry whose
+# declaration is missing contributes no bullet at all rather than a naked one.
+queue '- **unmarked** [roadmap: soon/alpha] — LEADPROSE only, nothing marked.' '  BODYPROSE here too.'
+out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
+absent "bypass-slug"      "$out" "unmarked"
+absent "bypass-leadprose" "$out" "LEADPROSE"
+absent "bypass-bodyprose" "$out" "BODYPROSE"
 
 # An empty horizon still gets its heading, carrying the placeholder.
-queue '- **only-soon** [roadmap: soon/alpha] — the only entry.'
+queue '- **only-soon** [roadmap: soon/alpha] — the only entry.' "$decl"
 out="$( cd "$SANDBOX" && bash "$EMIT" --emit )"
 want "empty-heading"     "$out" "### someday"
 want "empty-placeholder" "$out" "_Nothing is queued under this horizon._"
@@ -147,5 +193,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "roadmap.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "roadmap.test.sh: clean (assertion B: valid, unknown horizon/track, unparseable field, duplicate tag, untagged; emit grammar: done excluded, body excluded, empty-horizon placeholder; --write splice bounds + trailing blank; empty-page skip; half-configured vocabulary; 27 checks)"
+echo "roadmap.test.sh: clean (assertion B: valid, unknown horizon/track, unparseable field, duplicate tag, untagged; assertion C: missing/duplicate declaration, dead marking, independent findings reported together; emit whitelist: lead/body/cost prose excluded, done excluded, unmarked entry contributes nothing, empty-horizon placeholder; --write splice bounds + trailing blank; empty-page skip; half-configured vocabulary; 41 checks)"
 exit 0

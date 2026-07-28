@@ -1,8 +1,8 @@
 ### soon
 
-- **`first-thing`** *(alpha)* — the nearest thing, retitled.
-- **`second-thing`** *(beta)* — curated after the last generation.
+- **`first-thing`** *(alpha)* — The nearest thing, re-said since the page was generated.
+- **`second-thing`** *(beta)* — An item curated after the page was last generated.
 
 ### someday
 
-- **`third-thing`** *(beta)* — a demand-gated rung.
+- **`third-thing`** *(beta)* — A rung promoted when a consumer's demand attests it.

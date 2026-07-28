@@ -34,18 +34,20 @@ entries="$(queue_roadmap_entries "$FILE")"; st=$?
 
 # spec: queue-kit/SPEC.md §bin/roadmap.sh — every configured horizon gets its heading whether or not the queue fills it: an empty horizon is information, and a section that vanishes when it empties reads as a page that forgot it
 emit_body() {
-    local first=1 h n ntags fieldv slug summary track
+    local first=1 h n ntags fieldv slug nsum summary track
     for h in "${QUEUE_KIT_HORIZONS[@]}"; do
         [[ "$first" -eq 1 ]] || printf '\n'
         first=0
         printf '### %s\n\n' "$h"
         n=0
-        while IFS=$'\t' read -r ntags fieldv slug summary; do
+        while IFS=$'\t' read -r ntags fieldv slug nsum summary; do
             [[ -n "$slug" ]] || continue
             [[ "$ntags" == 1 ]] || continue
             [[ "$fieldv" == "$h/"* ]] || continue
             track="${fieldv#*/}"
             [[ -n "$track" && "$track" != */* ]] || continue
+            # spec: queue-kit/SPEC.md §bin/roadmap.sh — the whitelist: an entry with no single declaration contributes no prose, so unmarked body text can never reach the page even when the gate is bypassed
+            [[ "$nsum" == 1 && -n "$summary" ]] || continue
             printf -- '- **`%s`** *(%s)* — %s\n' "$slug" "$track" "$summary"
             n=$((n + 1))
         done <<< "$entries"

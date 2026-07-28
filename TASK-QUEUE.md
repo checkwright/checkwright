@@ -12,8 +12,9 @@
 
 ## New Features
 
-- **public-roadmap-projection** [spec: SPEC-public-roadmap-projection.md] — a
-  generated Now/Next/Later `ROADMAP.md` projected off this queue: a curated
+- **public-roadmap-projection** [spec: SPEC-public-roadmap-projection.md] [roadmap: now/adoption]
+  roadmap-summary: This page, generated from the work queue so it cannot go stale.
+  A generated Now/Next/Later `ROADMAP.md` projected off this queue: a curated
   `roadmap:` horizon/track tag, an emitter, and a freshness gate — never
   a hand-maintained copy; plus low-friction issue forms for install failures,
   doc problems, and adoption reports beside the fixture-first gate-defect
@@ -26,7 +27,8 @@
   inlet. Surfaced 2026-07-23 in the commissioned external review; promoted by
   spec 2026-07-27 (`front-door-readiness`).
 
-- **primary-install-path-claim** [spec: SPEC-primary-install-path-claim.md] —
+- **primary-install-path-claim** [spec: SPEC-primary-install-path-claim.md] [roadmap: now/adoption]
+  roadmap-summary: One documented install path, with a gate holding every page to it.
   **no surface owns which install path is primary**, so two documents drifted
   apart with nothing to catch it: README.md's Quick start led with `npx
   checkwright init` — the command `v0.16.0` announced and which never worked,
@@ -47,6 +49,7 @@
 ## Technical Debt
 
 - **front-door-outcome-rewrite** [roadmap: now/adoption] — rewrite the front door around one job.
+  roadmap-summary: A first screen that leads with the outcome instead of the architecture.
   Both first screens (README and the docs home) get a literal category line
   (verification for coding-agent delivery), the
   outcome (spec drift, skipped stages, and unsupported done claims become
@@ -199,6 +202,7 @@
   automating. Surfaced 2026-07-16 in the launch triage that scoped
   launch-readiness-gate.
 - **plugin-marketplace** [needs-spec] [roadmap: later/ecosystem] — harness plugin packaging.
+  roadmap-summary: The stage skills and guards installable as a harness plugin.
   Harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
   surface parity. Design against the live manifest format at promotion — the
@@ -239,6 +243,7 @@
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
 - **benchmark-ab-experiment** [needs-spec] [roadmap: later/adoption] — a controlled A/B experiment.
+  roadmap-summary: A controlled experiment measuring drift with and without governance.
   The controlled differential
   experiment: same model, same dependent-task series, two arms (ungoverned
   loop vs Checkwright-governed), drift *accumulation across the series* as
@@ -258,6 +263,7 @@
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
 - **prose-profile** [needs-spec] [roadmap: later/ecosystem] — a profile for non-code repos.
+  roadmap-summary: A profile for documentation repos, where there is no build to gate.
   The non-code universality rung: a third
   consumer shaped as a prose/documentation repo (no build, no test suite)
   stress-tests whether the kits govern non-code work. Core dilution is ruled
@@ -274,6 +280,7 @@
   mechanism and the natural profile seed. Surfaced 2026-07-16 in the same
   launch triage that scoped launch-readiness-gate.
 - **hosted-attestation-service** [needs-spec] [roadmap: later/commercial] — a neutral attestation.
+  roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.
   The team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
   hosted gate runs as a neutral attestation, cross-repo drift dashboards,
@@ -378,6 +385,7 @@
   is pickable.
 
 - **heterogeneous-agent-delegation** [needs-spec] [roadmap: later/ecosystem] — cross-vendor stages.
+  roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.
   Cross-vendor stage dispatch:
   a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
   (Codex, etc.), extending the homogeneous multi-agent / multi-operator model to a
@@ -956,6 +964,7 @@
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
 - **preview-release-cadence** [needs-spec] [roadmap: next/adoption] — a declared preview channel.
+  roadmap-summary: A declared preview channel and a slower, calmer release cadence.
   Reset release signaling for a
   pre-1.0 audience: declare a preview/alpha channel, batch internal
   iterations into a slower external cadence (weekly-class) so consumers stop
@@ -1579,6 +1588,7 @@
   is why this is a lead rule rather than a stage-session or gate concern.
 
 - **platform-support-ci-matrix** [needs-spec] [roadmap: next/reliability] — a CI leg per platform.
+  roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   The per-platform half carved out
   of `platform-support-contract` when that entry was scoped down to the floor
   contract for the `activation-path` iteration: a CI install-smoke leg per
@@ -1686,6 +1696,7 @@
   gate's runtime.
 
 - **installer-lifecycle-verbs** [needs-spec] [roadmap: next/adoption] — update, diff, uninstall.
+  roadmap-summary: update, diff and uninstall, so an install can be managed after init.
   The installer's second phase:
   `update`, `diff`, and `uninstall`, the verbs that manage an install after
   `init` has made one. Phase 1 (`init`, `doctor`, `--dry-run`, the manifest, the
@@ -2071,8 +2082,9 @@
   landing a consumer-reachable gate after validate has passed is the failure mode
   this iteration exists to fix.
 
-- **native-gate-binary-port** [needs-spec] — replace the gate substrate:
-  port the battery off bash-plus-GNU-userland onto a single native compiled
+- **native-gate-binary-port** [needs-spec] [roadmap: next/reliability] — replace the gate substrate.
+  roadmap-summary: The gate battery as one native binary: no GNU userland, sub-second runs.
+  Port the battery off bash-plus-GNU-userland onto a single native compiled
   binary (Rust the lead candidate), because every structural pain the current
   stack carries is substrate-bound, not fixable in place. The inventory today:
   76 check scripts, ~14.3k lines of shell across `*/checks`, `*/bin`, and

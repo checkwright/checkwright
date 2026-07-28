@@ -1,7 +1,7 @@
 ### soon
 
-- **`first-thing`** *(alpha)* — the nearest thing.
+- **`first-thing`** *(alpha)* — The nearest thing, said the way a public reader wants it.
 
 ### someday
 
-- **`third-thing`** *(beta)* — a demand-gated rung.
+- **`third-thing`** *(beta)* — A rung promoted when a consumer's demand attests it.
