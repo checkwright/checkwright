@@ -1827,6 +1827,53 @@
   above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
   were both verified against source before filing.
 
+- **vacuous-assertion-count-discipline** [design-pending] — an assertion that
+  passes without asserting now has three attested instances in this tree and no
+  craft rule names it. In all three the tell was a **count**, never an exit code:
+  the run was green and the set it ranged over was empty.
+  **The three, all from `release-assertion-honesty`, all inside the fix for this
+  very class** — which is the evidence that it recurs, not the irony: (i) a
+  `None` predicate that silently matched nothing once it moved from `grep -E` to
+  awk, because `\b` is a word boundary in ERE and a backspace in awk's regex
+  (verified at this close: `awk '/\bNone\b/'` matches nothing on a literal
+  `None` that `grep -cE '\bNone\b'` counts 1); (ii) a helper arm that would have
+  shipped with no fixture to exercise it; (iii) a verification probe that
+  mutated a gate the consumer never registers, so it reported a 0-wide red set
+  against a non-empty declaration and read as a pass.
+  **Where the concept already lives, partially.** `gate-sdk/SPEC.md` §run-gates
+  names the *vacuous-pass tripwire* — a gate's clean line carries its scanned
+  count, and `GATE_SDK_VERBOSE` is the reading that surfaces it — and
+  `doctrine-kit/DOCTRINE.md` rule 22 carries the runner half. What is unnamed is
+  the rule for a verification the *session itself* writes: a probe, a mutation,
+  a predicate under edit. The tripwire exists for the battery and nowhere else.
+  **Deliverable:** a craft rule in `doctrine-kit/DOCTRINE.md` §Engineering-craft
+  rules — a verification whose subject is a set reports that set's size, because
+  an exit code cannot distinguish "asserted and held" from "asserted nothing";
+  and a mutation probe is valid only against a target the assertion actually
+  ranges over. Filed rather than landed at close deliberately: rule 11 licenses
+  no self-exemption, so amending this doctrine is a scoped unit.
+  **Gap generalization, per instance.** (i) is fixture-shaped — the missing
+  coverage is a good/bad pair over the `None` body, which the existing
+  fixture-pair contract already requires, so this is enforcement that went
+  unexercised rather than enforcement that is absent. (ii) is per-arm fixture
+  coverage, already carried as the iceboxed
+  `stage-economics-smoke-jq-arm-dormant`; a branch-coverage assertion over a
+  check's fixture corpus is its buildable form. (iii) is **not** gateable:
+  whether a session's mutation probe targeted something its assertion ranges
+  over is a property of a session act that leaves no residue in the tree.
+  **Why `[design-pending]`:** whether this ships as one craft rule, or as a rule
+  plus the branch-coverage gate (ii) wants, is the open call — and a rule whose
+  *Enforced by* line reads "judgment" must state the two-of-three split above
+  honestly rather than promise a scanner.
+  **Cost while deferred:** low and non-rotting in the tree; charged instead
+  against every future assertion-shaped unit, where the failure mode is a green
+  that means nothing and is indistinguishable from a green that means something.
+  Debt: one doctrine rule, optionally one gate; adds no governed name unless the
+  gate lands.
+  Filed 2026-07-31 at close from the lead's dispatch, weighed as evidence and
+  ruled **task**-shaped rather than lesson-shaped: the deliverable and its
+  done-state are both nameable now, which is the litmus.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -1860,9 +1907,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- release-note-lead-token-grammar
-- action-gh-repo-context
-- upgrade-smoke-note-resolution
 
 ## Lessons Learned
