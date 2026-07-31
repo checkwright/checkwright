@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Behavioral test of bin/queue-index.sh's attention block — the [attend] Lessons
-# lead lines it appends (both default and --collapse-deferred output), capped at
+# Behavioral test of bin/queue-index.sh's rendering: the one-line title of a
+# tagged entry (active and deferred), and the attention block of [attend] Lessons
+# lead lines (both default and --collapse-deferred output), capped at
 # QUEUE_KIT_ATTEND_CAP with an overflow note. queue-index is a tool, not a gate,
 # so it has no good/bad pair; this drives it directly. Config is isolated via
-# QUEUE_KIT_CONFIG_FILE=/dev/null so the repo's queue-config.sh does not leak in.
+# QUEUE_KIT_CONFIG_FILE so the repo's queue-config.sh does not leak in.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -17,6 +18,7 @@ trap 'rm -rf "$SANDBOX"' EXIT
 export QUEUE_KIT_CONFIG_FILE="$SANDBOX/empty-config.sh"
 
 fails=0
+checks=0
 
 cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
@@ -42,9 +44,11 @@ cat >"$SANDBOX/TASK-QUEUE.md" <<'EOF'
 EOF
 
 want() {   # $1=label $2=output $3=substring-that-must-be-present
+    checks=$((checks + 1))
     grep -qF -- "$3" <<<"$2" || { echo "  FAIL [$1]: output lacks '$3':"; printf '    %s\n' "$2"; fails=$((fails + 1)); }
 }
 absent() { # $1=label $2=output $3=substring-that-must-be-absent
+    checks=$((checks + 1))
     grep -qF -- "$3" <<<"$2" && { echo "  FAIL [$1]: output should not contain '$3':"; printf '    %s\n' "$2"; fails=$((fails + 1)); } || true
 }
 
@@ -110,9 +114,46 @@ EOF
 out="$(bash "$IDX" "$SANDBOX/none.md")"
 absent "none-block" "$out" "Attention (Lessons"
 
+# Title rendering: tags come off without leaving the separator they sat next to.
+# A tag between the slug and the em-dash used to survive the slug-and-dash strip
+# and render `slug —  — prose`; a lead line that is all tag has no title at all
+# and renders as the bare slug rather than a dangling separator.
+cat >"$SANDBOX/titles.md" <<'EOF'
+# TASK-QUEUE.md
+
+## Iteration: demo
+
+## New Features
+
+- **feat-tagged** [design-pending] — a tagged active entry.
+- **feat-two-tags** [design-pending] [roadmap: later/thing] — two tags here.
+- **feat-alltag** [design-pending]
+- **feat-exempt** [drain-exempt: half pending] — exempt and titled.
+
+## Technical Debt
+
+## Deferred
+
+- **def-tagged** [design-pending] — a tagged deferred entry.
+- **def-alltag** [spec: some-kit/SPEC.md §A Long Pointer Section]
+
+## Done
+
+## Lessons Learned
+EOF
+out="$(bash "$IDX" "$SANDBOX/titles.md")"
+want   "title-one-tag"     "$out" "• feat-tagged — a tagged active entry."
+want   "title-two-tags"    "$out" "• feat-two-tags — two tags here."
+want   "title-exempt"      "$out" "• feat-exempt — exempt and titled.   [drain-exempt: half pending]"
+want   "title-deferred"    "$out" "def-tagged — a tagged deferred entry."
+want   "title-empty"       "$out" "• feat-alltag"
+absent "title-empty-sep"   "$out" "feat-alltag —"
+want   "title-empty-def"   "$out" "def-alltag"
+absent "title-empty-defsep" "$out" "def-alltag —"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "queue-index.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "queue-index.test.sh: clean (attend block: cap+overflow, default cap, --collapse-deferred, empty; drain-exempt echo; 14 checks)"
+echo "queue-index.test.sh: clean (titles: tag residue, multi-tag, drain-exempt echo, empty title; attend block: cap+overflow, default cap, --collapse-deferred, empty; $checks checks)"
 exit 0

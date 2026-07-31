@@ -395,7 +395,9 @@ fail-open, not an error.
 Compact surface of the queue for task selection — the iteration header line
 if present, then every top-level active entry as a one-line title plus tags,
 ready (`•`) vs blocked (`✗`) marked from the `[blocked-by:]` tag alone. Tags
-are stripped from the one-line title; `[blocked-by:]` and
+are stripped from the one-line title leaving no residue of the separator they
+sat beside, so an entry whose lead line is nothing but tags has no title and
+renders as the bare slug rather than a dangling `—`; `[blocked-by:]` and
 `[drain-exempt: <reason>]` are re-echoed after it — the two tags a picking
 session acts on without opening the entry body.
 `--extent <slug>` prints the inclusive line range of one entry's body (parent

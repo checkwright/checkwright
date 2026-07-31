@@ -94,15 +94,17 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
     -v lessonsre="$QUEUE_LESSONS_RE" -v cap="$QUEUE_KIT_ATTEND_CAP" \
     -v sectre="$QUEUE_SECTION_RE" -v collapse="$collapse" \
     -v iceboxre="$QUEUE_ICEBOX_RE" -v iceboxname="$QUEUE_KIT_ICEBOX_SECTION" '
+    # spec: queue-kit/SPEC.md §bin/queue-index.sh — tags come off before the slug-and-dash strip so the dash is adjacent when that regex runs, and a title left empty renders as the bare slug rather than an orphaned separator
     function title(line,   t) {
         t = line
         sub(/^[[:space:]]*-[[:space:]]+/, "", t)
-        sub(/^\*\*[a-z0-9][a-z0-9-]*\*\*[[:space:]]*(—[[:space:]]*)?/, "", t)
         gsub(/\[[^]]*\]/, "", t)
-        sub(/[[:space:]]+$/, "", t)
+        sub(/^\*\*[a-z0-9][a-z0-9-]*\*\*[[:space:]]*(—[[:space:]]*)?/, "", t)
+        sub(/^[[:space:]]+/, "", t); sub(/[[:space:]]+$/, "", t)
         if (length(t) > 64) t = substr(t, 1, 63) "…"
         return t
     }
+    function joined(sl, t) { return (t == "" ? sl : sl " — " t) }
     function drainex(line,   d) {
         if (!match(line, /\[drain-exempt:[[:space:]]*[^]]+\]/)) return ""
         d = substr(line, RSTART, RLENGTH)
@@ -136,8 +138,9 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
     sec == "active" && /^-[[:space:]]/ && match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/) {
         sl = substr($0, RSTART + 2, RLENGTH - 4)
         bl = blockers($0); de = drainex($0)
-        na++; amark[na] = (bl == "" ? "•" : "✗"); aslug[na] = sl
-        atitle[na] = title($0) (bl == "" ? "" : "   [blocked-by: " bl "]") \
+        na++; amark[na] = (bl == "" ? "•" : "✗")
+        atitle[na] = joined(sl, title($0)) \
+                              (bl == "" ? "" : "   [blocked-by: " bl "]") \
                               (de == "" ? "" : "   [drain-exempt: " de "]")
         next
     }
@@ -149,14 +152,14 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
         key = (cur == "" ? "(top)" : cur)
         if (!(key in seen)) { seen[key] = 1; dord[++nd] = key }
         cnt[key]++
-        dn++; dsub[dn] = key; dtitle[dn] = sl " — " title($0)
+        dn++; dsub[dn] = key; dtitle[dn] = joined(sl, title($0))
         next
     }
 
     END {
         print "Active (pick the first •):"
         if (na == 0) print "  (none — active queue empty)"
-        for (i = 1; i <= na; i++) printf "  %s %s — %s\n", amark[i], aslug[i], atitle[i]
+        for (i = 1; i <= na; i++) printf "  %s %s\n", amark[i], atitle[i]
         print ""
         if (collapse == 1) {
             print "Deferred (tally):"

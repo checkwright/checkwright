@@ -14,37 +14,6 @@
 
 ## Technical Debt
 
-- **queue-index-title-tag-residue** — `bin/queue-index.sh` renders every tagged
-  entry as `slug —  — prose` in the selection surface, a doubled separator.
-  `title()` strips the slug with an optional trailing em-dash in one regex
-  (`^\*\*slug\*\*[[:space:]]*(—[[:space:]]*)?`), but when a tag sits between the
-  slug and the dash that alternative cannot match; the later `gsub` then removes
-  the tag and leaves the orphaned dash behind. Pre-existing, not introduced by
-  the roadmap work. A second facet, same cause: an entry whose lead line is
-  fully consumed by a long spec-pointer tag has no prose after the tag, so
-  its title renders empty.
-  **Re-reproduced 2026-07-29 at scope on the live queue** — the doubled dash on
-  every one of **61** deferred entries (57 when filed; the defect is unchanged,
-  the base grew), and the same four fully empty titles
-  (`stage-lag-disambiguation`, `assertion-strength-exit-header-reach`,
-  `upgrade-smoke-phase-a-regen-derivation`, `action-run-shell-scan-predicate`).
-  **Deliverable:** strip tags *before* the slug-and-dash substitution so the
-  dash is adjacent when the regex runs, plus a title-rendering case in
-  `queue-kit/gate-tests/queue-index.test.sh`, which today covers the attend
-  block and the drain-exempt echo but asserts nothing about titles.
-  **Open judgment (why it is not a pure fix):** the empty-title facet wants a
-  fallback to the entry's first body line, which is a separate call — the index
-  is an internal surface where body prose is fine, but a fallback that pulls a
-  mid-sentence fragment could read worse than nothing. Debt, not a feature: it
-  converges `queue-index.sh` on the rendering its own tests already imply,
-  minting no name on any governed surface.
-  **Sequenced first in this section deliberately** — every other unit in
-  `pre-adoption-grammar-break` rewrites the Deferred section, and this is the
-  surface a session reads to pick that work.
-  Filed 2026-07-28 at build in front-door-readiness, while measuring what a
-  lead-line roadmap tag costs the selection surface; re-verified at close;
-  promoted 2026-07-29 at scope.
-
 - **queue-selection-order-implicit** — `queue-kit/SPEC.md`
   documents section order as selection order, so the default section sequence
   silently makes `New Features` outrank `Technical Debt` in what scope picks
@@ -1272,5 +1241,6 @@
 - needs-spec-tag-rename
 - deferred-queue-carry-cost
 - templates-stages-taxonomy-realignment
+- queue-index-title-tag-residue
 
 ## Lessons Learned
