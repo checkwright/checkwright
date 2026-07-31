@@ -21,8 +21,8 @@
   feature-shaped: the fix revises the contract rather than converging the script
   onto it.
   **Deliverable:** a `.workflow/` declaration surface build appends to as it
-  tightens and close composes the note from, read by the smoke's untagged arm, so
-  an untagged `TO` proves containment rather than emptiness. The missing piece is
+  tightens or lands a gate, and close composes the note from, read by the smoke's
+  untagged arm, so an untagged `TO` proves containment rather than emptiness. The missing piece is
   a **producer**, not a resolution rule — every rule the filing floated is a no-op
   because at validate no artifact on disk names the gate just tightened. Deltas,
   causal completeness, and the ruled-out alternatives:
