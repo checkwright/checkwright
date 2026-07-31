@@ -69,6 +69,21 @@ widening asserted behavior, user-facing semantics) stops and surfaces to the
 user — never pick a "conservative alternative" silently. A *cross-component
 causal gap* is not a TODO: stop, resolve it this session, update the spec.
 
+**Declare a gate you land or tighten, in the unit that lands it.** A unit that
+lands a new gate or makes an existing one stricter appends that gate's bare name
+to the tightened-gates declaration surface,
+`<workflow-dir>/tightened-gates.txt` (gate-sdk/SPEC.md §upgrade-smoke), in the
+same commit. Build is the only stage that knows what it tightened at the moment
+it tightens it, so the declaration is written from knowledge rather than
+reconstructed later from a red — and an assertion that discovers its own
+allowed-red set from the gate it was supposed to check is its own trigger. The
+surface accumulates across the iterations batched into one release; the release
+step composes the note's Tightened-gates section from it and drains it at the
+tag, so nothing here loads the release runbook. Only gates a consumer's vendored
+tree can actually run are declared: a gate living solely in your own gates
+directory never reaches a vendored tree and is not part of any release's
+allowed-red set.
+
 **Run the system; don't reason about it** — when a running system is
 reachable, reproduce first, read second. Recorded evidence rots: a static
 trace in a task body is a dated hypothesis to re-verify, not a premise. A

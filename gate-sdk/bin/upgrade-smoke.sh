@@ -111,8 +111,9 @@ fi
 git -C "$CONS" -c user.email=smoke@example.invalid -c user.name=smoke \
     commit -q --no-verify --allow-empty -m "phase A: kits at $TO"
 
-# spec: gate-sdk/SPEC.md §upgrade-smoke — step 3: the red set must be a subset of TO's tightened-gates declaration (the docs/posts note whose front-matter release: names TO's version), its Tightened-gates lead tokens read through lib/declaration.sh — a section that resolves to neither an explicit None nor a token set is refused rather than compiled to an empty allowed-red set. TO unreleased (HEAD) resolves no version → no note → the red set must be empty.
+# spec: gate-sdk/SPEC.md §upgrade-smoke — step 3: the red set must be a subset of TO's tightened-gates declaration, resolved on two arms over lib/declaration.sh's one token predicate. TO tagged: the docs/posts note whose front-matter release: names the tag, its Tightened-gates lead tokens. TO untagged (the HEAD default): the declaration surface in TO's tree, appended by the build stage that landed or tightened the gate — so an untagged TO proves containment rather than emptiness.
 ver="$(git -C "$REPO" tag --points-at "$TO" --list 'v*' 2>/dev/null | head -1)"
+DECL_FILE="$TO_TREE/${GATE_SDK_WORKFLOW_DIR:-.workflow}/tightened-gates.txt"
 
 decl_src=""; decl_out=""; decl_st=0
 if [[ -n "$ver" ]]; then
@@ -124,6 +125,9 @@ if [[ -n "$ver" ]]; then
     if [[ -n "$decl_src" ]]; then
         decl_out="$(decl_section_tokens "$decl_src" "Tightened gates")"; decl_st=$?
     fi
+elif [[ -f "$DECL_FILE" ]]; then
+    decl_src="$DECL_FILE"
+    decl_out="$(decl_record_tokens "$DECL_FILE")"; decl_st=$?
 fi
 
 if [[ "$decl_st" -eq 2 ]]; then
@@ -154,9 +158,13 @@ if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
 fi
 
 if [[ ${#red[@]} -gt 0 && -z "$decl_src" ]]; then
-    echo "upgrade-smoke: FAIL — TO (${ver:-$TO}) reddened gate(s) but no release note declares a tightened-gates set:" >&2
+    echo "upgrade-smoke: FAIL — TO (${ver:-$TO}) reddened gate(s) but declares no tightened-gates set anywhere:" >&2
     printf '  %s\n' "${red[@]}" >&2
-    echo "  an unreleased TO must upgrade green; a red gate needs a note bullet (docs/install.md §The upgrade contract)." >&2
+    if [[ -n "$ver" ]]; then
+        echo "  no docs/posts note carries 'release: $ver'; a red gate needs a note bullet (docs/install.md §The upgrade contract)." >&2
+    else
+        echo "  an untagged TO reads ${DECL_FILE#"$TO_TREE"/}, which TO's tree does not carry; the build stage that lands or tightens a gate appends its name there (gate-sdk/SPEC.md §upgrade-smoke)." >&2
+    fi
     exit 1
 fi
 
@@ -167,9 +175,9 @@ done
 if [[ ${#undeclared[@]} -gt 0 ]]; then
     echo "upgrade-smoke: FAIL — gate(s) went red that TO's tightened-gates declaration does not name:" >&2
     for g in "${undeclared[@]}"; do echo "  $g" >&2; done
-    echo "  each red must be a bullet in the note's Tightened gates section, or the tree fixed (docs/install.md §The upgrade contract)." >&2
+    echo "  each red must be named in $decl_src — a bullet in the note's Tightened gates section, or a data line of the declaration surface — or the tree fixed (docs/install.md §The upgrade contract)." >&2
     exit 1
 fi
 
-echo "UPGRADE-SMOKE: clean ($FROM → $TO; ${#fromroots[@]}→${#toroots[@]} kits vendored, phase A deterministic, red set ${#red[@]} ⊆ ${#allowed[@]} declared)"
+echo "UPGRADE-SMOKE: clean ($FROM → $TO; ${#fromroots[@]}→${#toroots[@]} kits vendored, phase A deterministic, red set ${#red[@]} ⊆ ${#allowed[@]} declared by ${decl_src:-no declaration})"
 exit 0

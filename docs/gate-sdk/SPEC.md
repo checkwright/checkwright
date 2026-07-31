@@ -135,6 +135,15 @@ correct operation. So: **checked projections carry the header; local capture
 carries none.** That asymmetry is the substantive content of the
 tracked-vs-gitignored axis, not a convenience.
 
+**It follows that a tracked member which drains, drains header-preservingly.**
+The tier admits accumulation buffers as well as one-shot projections — a
+surface any session appends to and one session empties at a boundary — and for
+those the reclaim path cannot be local capture's `: > <file>`, which erases the
+header and reds this gate on the very commit that drains. Truncate to the
+header instead. Every draining member of this tier already does:
+`WORKFLOW-STATE.txt` at the iteration boundary, `gap-inbox.md` at close,
+`tightened-gates.txt` at the tag.
+
 **The header form.** A checked projection's first line is `# contract: `
 followed by one of two ruled payloads:
 
@@ -567,13 +576,10 @@ directions.
   one, which is what makes the bolded and bold-and-backticked spellings visible
   instead of silent.
 - **The record arm** — a declaration file's data lines, one bare gate name each
-  (`decl_record_tokens`). Such a surface is deliberately markup-free, so the
+  (`decl_record_tokens`). That surface is deliberately markup-free, so the
   spelling question does not arise on it at all. A missing file is the empty set
   rather than an error: a tree that has never declared one is not thereby
-  malformed. Its reader is the untagged-`TO` resolution
-  `upgrade-smoke-note-resolution` lands in this same iteration; the arm is
-  designed here because a second statement of the token predicate over there is
-  the very defect this unit closes, one surface on.
+  malformed.
 
 The status a caller branches on: **0** resolved, with the declared set on stdout
 (empty for an explicit `None`); **1** unparsed while not `None`, with the
@@ -593,8 +599,8 @@ closes the class permanently: no future markup variant can disarm the assertion,
 only red it.
 
 Callers, all three named: `bin/upgrade-smoke.sh` at its declaration-resolve step
-reads the note through the markdown arm (§upgrade-smoke); this repo's
-`check-tightened-gates-grammar` uses that arm's verdict at each note it walks; and
+uses both arms (§upgrade-smoke); this repo's `check-tightened-gates-grammar`
+uses the markdown arm's verdict at each note it walks; and
 `scripts/check-release-bump.sh` uses the markdown arm's *container* alone,
 counting bullets across all three of the note's fixed sections. That third caller
 is why the container and the token predicate are separable rather than one pass:
@@ -606,9 +612,10 @@ optionally-indented `-` or `*` — so the section a bump was derived from and th
 section an allowed-red set was parsed from were not guaranteed to be the same
 section. A sourced library, not a gate, so it owes no `good/`+`bad/` pair; its
 runtime lock-in is `gate-tests/lib-declaration.test.sh`, direct because the
-record arm has no caller fixture to ride. Its caller is a `bin/` tool that
-forgoes a pair by contract — so a corpus fixture would leave the arm the
-standing pre-release assertion depends on entirely unexercised.
+record arm has no caller fixture to ride. That arm's only caller is the smoke's
+untagged branch, and the smoke is a `bin/` tool that forgoes a pair — so a
+corpus fixture would leave the arm the standing pre-release assertion depends on
+entirely unexercised.
 
 The helper carries no section name and no gate name of its own — both are the
 caller's arguments, and it takes no configuration. That is where the seam falls:
@@ -750,17 +757,66 @@ is *not* in this consumer's `gates.list` (the phase-A sync never re-runs the
 installer, so it does not run in phase B); the smoke asserts the declaration's
 sufficiency for the gates that *do* run, and the upgrade skill
 (lifecycle-kit/SPEC.md §templates/upgrade.md) is the executor that registers the
-new ones. When TO is unreleased — the `HEAD` default resolving no version — no
-note names it and the red set must be empty: every run is then the standing
-pre-release assertion that the working tree upgrades cleanly from the last tag. A
-red gate absent from the declaration, or a missing note while reds exist, is a
-fail (exit 1); usage/environment failure is exit 2 (the gate exit
-convention). A declaration that does not parse is a fail too, and takes exit 1
-for the same reason: it is a contract violation rather than a broken environment.
+new ones. A
+red gate absent from the declaration, or a declaration that does not parse while
+reds exist, is a fail (exit 1); usage/environment failure is exit 2 (the gate exit
+convention). A malformed declaration is a contract violation rather than a broken
+environment, which is why it takes exit 1 and not 2.
 A `bin/` tool, not a gate — no `good/`+`bad/` fixture pair is owed;
 the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
 evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
 scratch (accepted as validate-stage cost, never pre-commit).
+
+**The declaration resolves on two arms, both over §lib/declaration.sh's one
+token predicate.** A **tagged TO** resolves its version from the `v*` tag
+pointing at it and its declaration from the `docs/posts/` note whose front-matter
+`release:` names that version — the Tightened-gates section's bullet lead tokens,
+whose grammar docs/install.md owns. An **untagged TO** — the `HEAD` default, and
+so every run of the standing pre-release assertion — reads
+`<workflow-dir>/tightened-gates.txt` out of TO's tree instead. It is *this* arm
+that makes the assertion satisfiable by an iteration that tightens something: the
+old rule resolved no version, so no note, so an empty declared set, so a red set
+that had to be empty — which no tightening iteration can be until the moment it
+is tagged. The empty-declaration rule survives as the narrow case (an empty
+declared set still forces an empty red set), not as the universal one.
+
+**The declaration surface**, `<workflow-dir>/tightened-gates.txt`, is a tracked
+checked projection (§The workflow directory) whose path derives from
+`GATE_SDK_WORKFLOW_DIR` — no knob of its own, since a knob naming this file would
+add a way to configure the assertion away without adding a way to satisfy it
+honestly. It always exists, header-only when the declared set is empty, so
+"absent" is never a state a reader must interpret. Its data lines are one bare
+gate name each and nothing else: no markup, no prose, no ordering significance —
+a rationale column would be a field the smoke never reads and the note's bullet
+prose already owns. Only gates that ship **inside a kit** are declared, because
+those are the only ones a consumer's vendored tree runs; a gate living solely in
+the consumer's own gates directory cannot appear in a vendored tree and is not
+part of any release's allowed-red set. Being tracked is load-bearing rather than
+incidental: the smoke reads the file out of a `git archive` of TO, which carries
+tracked content only.
+
+Its **producer** is the build stage that lands or tightens a gate, appending the
+name in the same unit (lifecycle-kit/templates/stages/build.md). Build is the
+only stage that knows what it tightened at the moment it tightens it, so the
+declaration is written from knowledge rather than reconstructed from a red — and
+an assertion that discovers its allowed-red set from the gate it was meant to
+check is its own trigger. A gate that lands **new** is appended too: docs/install.md
+defines the note's section as one bullet per gate that landed new or got
+stricter, so a surface holding only strictly-tightened gates would make the
+composition lossy. It costs the assertion nothing — containment is red ⊆
+declared, so a declared gate that never reds is inert.
+
+It **accumulates**, and that shape is chosen rather than inherited. Tightened
+gates is a *release*-level aggregate, not an iteration-level one: several
+internal iterations batching into one external release is a shape this repo
+wants, and under it a build stage authoring note prose directly would write into
+an artifact that does not exist yet and whose version it cannot know. Appending
+to a buffer composed once at the release boundary is correct under batching and
+degenerates gracefully to the one-iteration-one-release case. So an iteration
+closing on `release none` or a deferral carries its declarations forward, which
+is exactly what the next release's note must inherit. RELEASING.md §The procedure
+composes the note's Tightened-gates section from it at step 1 and drains it —
+truncating to the header, never clearing the file — at the tag in step 4.
 
 Knobs — config-via-env in the `<KIT>_<KNOB>` shape, defaults this repo's layout,
 each read exactly once at the resolve step:
@@ -780,11 +836,18 @@ the script pre-upgrade; it is consumed by the validate session's evidence file
 (this repo) or the operator's go/no-go on a consumer tree. The
 `GATE_SDK_UPGRADE_*` knobs are produced by the invoking environment (defaults
 emitted by the script itself, so the zero-config run works here) and read only
-at the resolve step. The tightened-gates declaration is produced by the release
-session (RELEASING.md) and consumed here (the allowed-red-set parse) and by the
-upgrade skill (the consumer checklist); its grammar owner is docs/install.md
-§The upgrade contract, its implementation §lib/declaration.sh, and this repo
-holds the corpus to it with `check-tightened-gates-grammar`.
+at the resolve step. The declaration path is derived from `GATE_SDK_WORKFLOW_DIR`
+at the same step. The tightened-gates declaration is produced by the build stage
+that lands or tightens a gate, appending to the declaration surface, and composed
+by close into the note at the release boundary; it is consumed at three named
+transitions — here at the resolve step on either arm (the allowed-red-set parse),
+by close when it composes and drains, and by the upgrade skill reading the note
+as the consumer's registration checklist. That third reader is unaffected by the
+two-arm resolution: it reads the *note*, which is unchanged as an artifact, and
+only the note's Tightened-gates section changed its source. The grammar's owner
+is docs/install.md §The upgrade contract; its implementation is
+§lib/declaration.sh, and this repo holds the corpus to it with
+`check-tightened-gates-grammar`.
 
 ### gen-pre-commit
 

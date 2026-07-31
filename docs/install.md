@@ -414,6 +414,12 @@ its note — and three sections under fixed names:
   be the one the smoke resolves. Registry membership is deliberately not
   asserted. A gate renamed or retired since a note shipped would make membership
   false about history without the record being wrong.
+
+  **A declaration precedes its release.** Because the upgrade smoke's untagged
+  arm reads a working tree's tightened-gates declaration surface rather than a
+  note (gate-sdk/SPEC.md §upgrade-smoke), an allowed-red set is owed from the
+  moment a gate is landed or tightened, not from the tag. Running the smoke
+  against your checkwright clone at an untagged `TO` is what reads it.
 - **Renamed knobs** — one bullet per rename, `old → new`; a knob *removal* is
   the same residue class (own-config orphaned) and is expressed `old → ∅`.
 - **Behavior changes** — one bullet per shipped change that alters what the kits

@@ -43,7 +43,18 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
      Behavior changes, authored to [docs/install.md](docs/install.md) §The
      upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under
      Renamed knobs); that pointer owns their grammar, this skeleton does not
-     restate it.
+     restate it. **Tightened gates is composed, not recalled** — its bullets come
+     from `.workflow/tightened-gates.txt`, the declaration surface each build
+     stage appended to as it landed or tightened a gate
+     (gate-sdk/SPEC.md §upgrade-smoke). One bullet per declared name, each given
+     the intent behind the move; an empty surface means a stated "None." Because
+     the surface accumulates across every iteration since the last tag, a release
+     batching several iterations inherits all of their declarations here.
+     **Honest limit, and it is yours at exactly this moment:** nothing asserts
+     the composed section's set equals the surface it was composed from. You
+     transcribe one into the other and drain by hand at step 4, and review is
+     what holds the agreement. It is mechanizable and filed as such; until it
+     lands, read the surface and the section against each other before moving on.
    - **Upgrading — sync/regen slot** — {the wholesale kit sync at `vX.Y.Z`, the
      generated artifacts to regenerate, then the full battery}.
    - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed
@@ -85,9 +96,16 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    grammar; a disposition block opens with a bare `<release> — <date>` line
    below it, never a `#` one.
 
-4. **Tag the iteration's final commit.** Tag `vX.Y.Z` on the iteration's final
+4. **Tag the iteration's final commit, and drain the declaration surface.** Tag
+   `vX.Y.Z` on the iteration's final
    commit and push it — `git tag -a vX.Y.Z` on the commit, then push the tag to
-   the origin. The closing session runs steps 4-7 itself when it holds the
+   the origin. The tag is also what discharges `.workflow/tightened-gates.txt`:
+   step 1 composed the note from it, so drain it here and only here — an
+   iteration closing on `release none` or a deferral carries its declarations
+   forward, which is exactly what the next release's note must inherit. Drain by
+   **truncating to the header line**, never by clearing the file: it is a tracked
+   checked projection whose header is required, and a whole-file clear reds
+   `check-workflow-tiering` on the release commit itself. The closing session runs steps 4-7 itself when it holds the
    credentials (the default — an authenticated `gh` login carrying `repo` scope
    and a working `git push`, confirmed with `gh auth status`); only a genuinely
    keyless sandbox defers these to the operator, whose push mechanics live in
