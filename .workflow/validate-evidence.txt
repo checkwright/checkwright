@@ -1,1 +1,23 @@
 # contract: evidence-manifest v1
+release-step-verification installer_smoke sha256=e32cece3c944e25a662bc6fb19a4106b3af44e76421eb6bfba62464179092804 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification gates sha256=191948ccdb25db063e5ddc3988c9980f8271575c2b3e02bef27bb19026a760bf pass=89 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification gate_sdk sha256=88387111c58e4e312dd2c51a4e1f8c79ed949be2a3fec5532f92bc35af2bc8d3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification canon_kit sha256=53f86c08f6cdef04eb8e8e2d3c3f46a93432f64a0c404fbfe741af65bab97f1b pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification guard_kit sha256=641f55e2064f186cb2340df8c91a22bbcff22fe376bd1527c388e9162c9262f4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification lifecycle_kit sha256=5f9077e6d8df174b6193fe6ba78a8ab96cf810bbf46392f4a0185b40726803d1 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification queue_kit sha256=4bc7b2cd8ebe7bf15d999e527ad7ebfac3c93623a453252ca1db41d7ab333710 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification site_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification scripts sha256=802df0d7a79c4695b01bb1431e024170399b4a72af982a77a77d404acc8c4ec2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification demo sha256=cb887ef2598a7aca31fe60c38bdecc564969c920123dc9407de4a073a862d86a pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification upgrade sha256=752e067893153a1d1ca8eba24572caebc25a01cdd142b4d18fef9f216a88dbd4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+release-step-verification index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
