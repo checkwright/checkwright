@@ -1248,10 +1248,10 @@
   which bullet form the smoke actually parses; promoted from the gap inbox the
   same day.
 
-- **gate-exemption-live-slug-derivation** [design-pending] —
-  `check-gate-exemption-tasks` resolves an `# until: <slug>` exemption against a
-  live-slug set it derives by scanning the wrong thing twice over, so an
-  exemption can resolve green against no task at all.
+- **gate-exemption-live-slug-derivation** [design-pending] — an exemption can
+  resolve green against no task at all. `check-gate-exemption-tasks` resolves an
+  `# until: <slug>` marker against a live-slug set it derives by scanning the
+  wrong thing, twice over.
   **(1) Section span.** The scan opens on the active and deferred headings and
   closes on Done / Lessons Learned with no reset on an unknown heading, so any
   section added between them is silently swept in as live. The icebox tier
@@ -1275,9 +1275,10 @@
   token-scan half added 2026-07-31 at align. Drained from the gap inbox by close,
   which triaged the two bullets as one unit on the align bullet's instruction.
 
-- **kit-index-page-vocabulary-ungated** [design-pending] —
-  `docs/queue-kit/index.md` carries governed tag vocabulary but is
-  hand-authored, outside the docs mirror, and under no content gate:
+- **kit-index-page-vocabulary-ungated** [design-pending] — a kit index page
+  carries governed vocabulary under no content gate. `docs/queue-kit/index.md`
+  enumerates the task tags but is hand-authored, outside the docs mirror, and
+  reached by no content assertion:
   `check-docs-kit-parity` and `check-docs-nav-reachable` read front matter and
   nav only. It survived this iteration's `[needs-spec]` → `[design-pending]`
   rename solely by accident — it happens to enumerate all five task tags and
