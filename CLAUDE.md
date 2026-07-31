@@ -64,12 +64,11 @@ artifact: `bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`
 (`check-graph` asserts both artifacts are fresh). Per-clone opt-in:
 `bash gate-sdk/bin/install-hooks.sh`.
 
-The enforcement map is a generated projection likewise — after a class-registry
-change (a gate's `tier=`, `kpis.list`, the settings hooks, a `# enforce:`
-marker), regenerate it:
-`bash gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`
-(`check-enforcement-fresh` byte-compares it). The docs-site projections are a
-separate roster — docs/site-architecture.md.
+The enforcement map is a generated projection likewise — a class-registry change
+(a gate's `tier=`, `kpis.list`, the settings hooks, a `# enforce:` marker) makes
+it stale, and `check-enforcement-fresh` byte-compares it and prints the regen
+command on red. The docs-site projections are a separate roster —
+docs/site-architecture.md.
 
 New gates copy `gate-sdk/templates/check-skeleton.sh` and ship with a
 `good/`+`bad/` fixture pair; the four contracts (output, fail-closed,

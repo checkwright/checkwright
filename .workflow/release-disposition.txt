@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+pre-adoption-grammar-break release deferred:v0.18.0 — minor earned by docs/install.md §Versioning (Tightened gates and Behavior changes both non-empty in the dated note, no decommission), derived over v0.17.0; the note is authored and committed but the operator holds the release, so RELEASING.md steps 4-7 did not run and no tag exists
