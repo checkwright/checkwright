@@ -166,9 +166,9 @@ line naming the dependency (ruby plus the kramdown-parser-gfm gem, or a
 `SITE_KIT_RENDERER` override) — a gate that cannot run its oracle refuses, never
 a false clean. That dependency joins the *consumer's* toolchain only when the
 consumer registers this gate; it stays outside env-probe's probe-set floor, and
-`docs/install.md`'s Requirements prose states the tier (SPEC-os-support.md owns
-that page's ruling). A consumer with no published docs site simply omits the
-gate by the registry-not-array convention and never installs the dependency.
+`docs/install.md`'s Requirements prose states the tier. A consumer with no
+published docs site simply omits the gate by the registry-not-array convention
+and never installs the dependency.
 
 The false-positive floor is the assertion's hard boundary, deliberately set. The
 backtick symptom rests on a property of well-formed markdown: every backtick

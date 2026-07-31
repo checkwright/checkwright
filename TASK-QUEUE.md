@@ -1700,6 +1700,133 @@
   next scope entry from the post-close gap inbox, its premise falsified against
   `check-graph`'s source in the same pass.
 
+- **resume-journal-deletion-vs-pull-channel** [design-pending] — two delegation
+  templates give the resume journal contradictory lifetimes, and a resumable
+  stage session is where they collide. `lifecycle-kit/templates/lead.md`
+  §Channel design designates the journal the lead's **pull channel** —
+  narration and findings go there so the message channel carries only
+  escalations, and the lead pulls from it for detail.
+  `delegation-kit/templates/agent-execution.md` tells the supervisor to
+  **delete** that same journal at the post-commit validation checkpoint. For a
+  one-shot delegated sweep both hold, because the agent returns and is never
+  resumed; for a stage session deliberately kept resumable under a lead, the
+  first validated commit destroys the channel the lead is supposed to keep
+  reading. Neither template owns the interaction alone, which is why the
+  deliverable is a contract resolution rather than a retiming.
+  **Live instance this iteration.** The lead deleted scope's journal after
+  validating its first two commits; scope resumed minutes later, found it gone
+  mid-session, rewrote it from context, and reported it as a suspected sandbox
+  or `.tmp/` reliability defect. Two costs, the second worse: an agent loses
+  working state it is still writing to, and a false defect signal is
+  manufactured against `.tmp/` and against
+  `agent-execution-backgrounding-role-scope`.
+  **Candidate resolution to beat:** keep the journal for the iteration, let the
+  boundary reset sweep it, `DONE` stays the completion marker. The cleanup is
+  already mechanized rather than merely mistimed —
+  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` in `scripts/lifecycle-config.sh` is
+  `(session-role)` alone, so `enter-stage.sh`'s boundary reset already wipes
+  `.tmp/`, journals included, at the next scope entry. That lets the supervisor
+  chore be **removed** outright instead of retimed.
+  **Known cost of that candidate, stated so it is not rediscovered:** a retained
+  journal blunts the cold-read "no `DONE` = interrupted" signal. The mitigation
+  is that per-stage journal naming plus the `WORKFLOW-STATE` cursor plus
+  `git log` disambiguate a stale journal better than presence/absence does, and
+  the boundary reset bounds the ambiguity window to the current iteration.
+  **Why `[design-pending]`:** which template states the resolved rule, and
+  whether the deletion step is retimed or deleted outright, is the open call —
+  the rule reaches two templates in two kits and one of them is a kit contract.
+  **Cost while deferred:** every lead-run iteration repeats it, and the
+  resulting false signals accrete against the wrong surfaces.
+  Debt: a contract resolution over two existing templates; adds no governed
+  name.
+  Filed 2026-07-31 by the lead mid-iteration as two gap bullets, the second
+  sharpening the first; merged into one entry at close because they name one
+  deliverable.
+
+- **post-immutability-machine-read-carveout** [design-pending] — the post
+  immutability rule and the machine-readable-note rule are stated on two pages
+  and neither records how they compose. `docs/site-architecture.md`
+  §Page-authoring rules calls dated `docs/posts/` immutable, "temporal-exempt
+  but still link/command-resolved"; `docs/install.md` §The upgrade contract
+  declares a shipped note's Tightened-gates lead tokens a machine-read allowed-
+  red set with one canonical spelling and no version cutoff. A shipped post
+  whose tokens are mis-spelled is therefore both immutable prose and a wrong
+  machine input, and no surface says which wins.
+  **The working reading, and its status.** `release-assertion-honesty` repaired
+  12 shipped bullets on the reading that the immutability carve-out already
+  admits mechanically-held elements — a post is immutable *as prose* while its
+  links, commands, and now its machine-read tokens stay resolved. The operator
+  declined to widen the governance sentence, so that reading survives only in a
+  transition-artifact amendment that is deleted at merge and in this entry.
+  **Why `[design-pending]`:** the call is how wide the carve-out is stated —
+  enumerate the mechanically-held element classes, or state the principle
+  (immutable as prose, live as machine input) and let the classes derive.
+  **Cost while deferred:** low and non-rotting today; nothing degrades while it
+  sits. The failure mode is a governance sentence that under-describes its own
+  carve-out, so the next session facing a shipped-post repair either re-derives
+  the reading from scratch or refuses a correct repair on immutability grounds.
+  Debt: a governance sentence widened on one page; adds no governed name.
+  Filed 2026-07-31 at spec; promoted at close from the gap inbox.
+
+- **tightened-gates-declaration-note-parity** [design-pending] — nothing asserts
+  that a release note's composed Tightened-gates set equals the
+  `.workflow/tightened-gates.txt` declaration surface it was composed from.
+  `upgrade-smoke-note-resolution` made build append declared gate names to that
+  tracked record and close transcribe them into the note's bullets and drain the
+  file, both **by hand**, so a dropped or added name between the two surfaces is
+  caught only by review — which is exactly what RELEASING.md step 1 states as
+  its honest limit.
+  Both sides are machine-readable by construction: bare names one per line on
+  the surface, backticked unbolded bullet lead tokens in the note under
+  `release-note-lead-token-grammar`'s canonical spelling, with
+  `check-tightened-gates-grammar`'s parser already extracting the note side. So
+  the parity assertion is mechanical, and the parser it needs already ships.
+  **Why `[design-pending]`:** the assertion only holds at the release commit —
+  before the tag the surface accumulates and no note exists; after the drain the
+  surface is header-only and the note is the sole record. Which commit the gate
+  binds on, and how it identifies the note under composition, is the open call.
+  **Cost while deferred — now realized, not hypothetical.** The filing costed
+  this as "low until the first release that ships a non-empty declared set".
+  That release is `v0.19.0`, composed this close from a one-name surface, so the
+  window is open from here on. A transcription slip either licenses an
+  undeclared red or declares a gate that never tightened, and the upgrade smoke
+  reads the note rather than the surface, so it cannot catch either.
+  Debt: one gate plus its fixture pair over two existing surfaces.
+  Filed 2026-07-31 at spec from the honest limit stated in the amendment's
+  producer delta; promoted at close, its cost re-read against the release it
+  now rides.
+
+- **prose-filename-citation-liveness** [design-pending] — a bare `<name>.md`
+  filename cited in governed prose can name no tracked file and nothing reds.
+  `check-md-refs` resolves markdown *links* only; `check-spec-pointer` resolves
+  `spec:`/`contract:` directives and free-prose `<path>.md §<heading>`
+  citations, so a citation with **no** `§heading` and no link syntax falls
+  between them.
+  **Instance, fixed at this close:** `site-kit/SPEC.md` and its `docs/` mirror
+  cited `SPEC-os-support.md` as owning `docs/install.md`'s Requirements ruling.
+  The amendment is deleted, so the pointer dangled. Close deleted the
+  parenthetical rather than repointing it — the same sentence already names
+  `docs/install.md`'s Requirements prose as the stater, and that page carries
+  the ruling. Same class as the seven citations the `release-assertion-honesty`
+  build sweep cleaned, which is what makes this recurring rather than a one-off:
+  every merged amendment deletes a file that governed prose may still name.
+  **Why `[design-pending]`:** the predicate needs care, and a naive one reds
+  correct prose. `docs/install.md` names `AGENTS.md` four times as a harness
+  convention file that is deliberately untracked here — a legitimate citation of
+  a filename with no in-tree target. Candidate narrowings: bind only the
+  `SPEC-*.md` amendment-naming convention (narrow, decidable, covers the whole
+  observed class), or extend `check-spec-pointer`'s free-prose extractor to the
+  headingless form behind an exclusion roster. Which, and whether it is a new
+  gate or an assertion inside an existing one, is the open call.
+  **Cost while deferred:** one dangling citation per merged amendment that
+  governed prose names, found only by a hand sweep somebody remembers to run;
+  the citations read as live pointers until then.
+  Debt: one gate plus its fixture pair, or an assertion added to an existing
+  gate.
+  Filed 2026-07-31 at close as the gap-generalization owed by the inline fix
+  above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
+  were both verified against source before filing.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
