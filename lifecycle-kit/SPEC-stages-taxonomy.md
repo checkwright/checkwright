@@ -16,11 +16,20 @@ published adoption path. The unit rides `pre-adoption-grammar-break` on the
 operator's launch-timing ruling recorded in the queue entry, so the break
 amortizes with the sibling queue-grammar break rather than standing as its own.
 
-Measured at authoring: **66 references across 31 files**. Of those, 8 are
-gate-visible couplings that red or silently degrade, 13 are `§templates/skills/`
-SPEC cross-references, 2 are markdown anchors into a renamed heading, 14 are
-regenerated docs-mirror lines, 5 are regenerated projection literals, and 4 are
-immutable published release notes that must not be touched.
+Measured at authoring and re-verified at align: **65 references across 33 files**
+carrying the plain literal (the authoring census said 66/31 and did not
+reproduce), **plus one occurrence no plain grep finds** — an escaped-slash regex,
+delta 5. Of those, 9 are gate-visible couplings that red or silently degrade,
+**15** are `§templates/skills/` SPEC cross-references, 2 are markdown anchors
+into a renamed heading, 14 are regenerated docs-mirror lines, 5 are regenerated
+projection literals, and 5 occurrences across 4 files are immutable published
+release notes that must not be touched.
+
+Two occurrences are stale-but-unenforced and are left to their owners:
+`TASK-QUEUE.md:1352` (an unrelated queue entry citing a stage-template path) and
+the sibling amendment's `:233`/`:308`. `scripts/check-kit-ref-liveness.sh:58,:60`
+valves both file classes, so neither reds; the sibling's own body names its path
+dependency.
 
 ## Seam ruling
 
@@ -135,22 +144,42 @@ triggering the gate, and a consumer that does bind it inherits the manifest.
 ### 5. The trigger literals, and the silent-enforcement loss — *design-bearing*
 
 Four gates carry `lifecycle-kit/templates/skills/*.md` in their `# graph:`
-manifests, and two of them carry it as a **`trigger=`**, not merely a
-`couples=`: `context-kit/checks/check-footprint-fresh.sh:2` (both fields) and
-`scripts/check-value-rollup-fresh.sh:2`.
+manifests. **Exactly one carries it as a `trigger=`** —
+`context-kit/checks/check-footprint-fresh.sh:2`, which carries it in both fields.
+The other three carry it as `couples=` only. (The authoring draft claimed two
+`trigger=` bearers and named `scripts/check-value-rollup-fresh.sh`; that file has
+no `trigger=` field at all.)
 
-A `trigger=` left pointing at a directory that no longer exists does not red —
-**it stops firing.** The freshness gates over `docs/footprint.md` and
+**The correction makes the hazard wider, not narrower.**
+`gate-sdk/bin/gen-pre-commit.sh:71` reads
+`trigger="$(manifest_field "$gate" trigger)"; trigger="${trigger:-$couples}"` —
+**`couples=` is the trigger fallback.** So every one of the four gates' staged-
+path conditions in the generated hook derives from this literal, whichever field
+holds it. A manifest left pointing at a directory that no longer exists does not
+red — **it stops firing.** The freshness gates over `docs/footprint.md` and
 `docs/value.md` would silently stop reacting to stage-template edits, and both
 artifacts would drift with nothing to catch them. This is the same failure class
 the sibling amendment's derivation delta closes on the tag side, and it is the
 reason this unit is not the cosmetic no-risk change its own queue entry called
-it. All four manifests retarget in the same commit:
+it. All four manifests retarget in the same commit, and all four matter equally:
 
 - `lifecycle-kit/checks/check-shim-restatement.sh:2` — couples
 - `lifecycle-kit/checks/check-skill-binding.sh:2` — couples (plus delta 4)
 - `context-kit/checks/check-footprint-fresh.sh:2` — couples **and** trigger
 - `scripts/check-value-rollup-fresh.sh:2` — couples
+
+**A fifth reader, invisible to a path sweep.** `drift-kit/bin/overhead-meter.sh:71`
+carries the path as an *escaped-slash awk regex* inside the overhead meter's
+fixed classifier table:
+`/lifecycle-kit\/templates\/skills|enter-stage|WORKFLOW-STATE|Execute the template at/`.
+A `grep templates/skills` does not find it, which is why the authoring census
+missed it. The alternation's other arms keep matching stage *invocations*, so the
+classifier does not break wholesale — what silently reclassifies is the residue
+this arm uniquely covered: bare path mentions with no invocation verb (a grep
+over the stage templates, a file read, a SPEC citation), which fall out of the
+`stage` bucket into `govdoc` or task. It retargets with the rest.
+`drift-kit/SPEC.md:324-346` documents the marker table without restating the
+path, so the script is the sole owner and no doc edit is owed.
 
 `check-reads-couples` cannot help here: `check-shim-restatement`'s walk passes a
 bare variable to `gate_find`, so its root is undecidable and the case is
@@ -209,16 +238,25 @@ thin shim), which is what makes root placement correct for the class.
 
 ### 9. Hand-edited prose references — *mechanical*
 
-Thirteen `§templates/skills/` SPEC cross-references retarget to
+Fifteen `§templates/skills/` SPEC cross-references retarget to
 `§templates/stages/` **except where the referent is a boundary skill**, which is
 the judgment a blind sweep gets wrong: `gate-sdk/SPEC.md:684` cites the section
 for the *upgrade* skill and retargets to `§templates/upgrade.md`, and
 `RELEASING.md:78` cites it for the *release-sweep* contract and retargets to
-`§templates/release-sweep.md`. The remainder — `lifecycle-kit/SPEC.md` (:225,
-:228, :493, :764, :1061, :1156), `canon-kit/SPEC.md:351`,
-`canon-kit/lib/spec.sh:194`, `scripts/check-release-bump.sh:27,:36`,
-`docs/install.md:359`, `lifecycle-kit/README.md:70` — are about the binding-shim
-or stage-skill grammar and retarget to `§templates/stages/`.
+`§templates/release-sweep.md`. The remainder — `lifecycle-kit/SPEC.md` (:493,
+:764, :1061, :1156), `canon-kit/SPEC.md:351`, `canon-kit/lib/spec.sh:194`,
+`scripts/check-release-bump.sh:27,:36`, `docs/install.md:359`,
+`lifecycle-kit/README.md:70` — are about the binding-shim or stage-skill grammar
+and retarget to `§templates/stages/`.
+
+Three more the authoring count missed, and one of them dangles:
+`lifecycle-kit/SPEC.md:1386` and `:1406` are the two boundary paragraphs' self-
+citations, absorbed by delta 2's section split. **`lifecycle-kit/SPEC.md:1420` is
+not absorbed by anything** — it sits inside `### templates/lead.md` ("it carries
+named slots, so it adopts the binding-shim grammar (§templates/skills/)") and
+retargets to `§templates/stages/`, which is also the direction delta 2 cites as
+the precedent the two new sections follow. (`:225` and `:228` are plain path
+literals, not `§`-form; they are covered by the adoption-mode prose below.)
 
 Plain-path prose: `lifecycle-kit/README.md:68` (the adoption line),
 `docs/install.md:307`, `RELEASING.md:4`, `.claude/agents/stage-session.md:16`,
@@ -262,9 +300,11 @@ obligation this move carries**, which raises its weight rather than lowering it.
 The release class is a **minor**: docs/install.md:349-351's pre-1.0 qualifier
 rides a non-decommission break on a minor while the line is 0.x, and :341-345
 reserves major for a release that *removes* a deprecated surface. Nothing is
-removed here — a path moves — so no major is earned. This unit and the sibling
-`needs-spec-tag-rename` ride **one** minor, which is what delivers the
-one-re-bind outcome the launch-timing ruling weighed.
+removed here — a path moves — so no major is earned. This unit and **both**
+siblings — `needs-spec-tag-rename` and `deferred-queue-carry-cost`, whose new
+gate declares under Tightened gates — ride **one** minor and **one** note, which
+is what delivers the one-re-bind outcome the launch-timing ruling weighed. No
+unit owns the note; each declares its own bullets into it.
 
 ## Producers and consumers
 
@@ -304,20 +344,31 @@ the two file-level couples (delta 4).
 canon-kit/SPEC.md:351, gate-sdk/SPEC.md:684, canon-kit/lib/spec.sh:194 — the
 cross-kit `§` refs, retargeted per delta 9.
 
-lifecycle-kit/README.md:68,:70 — the adoption glob line and its `§` ref.
+lifecycle-kit/SPEC.md:1420 — the `§` ref inside `### templates/lead.md`
+(delta 9).
 
-docs/install.md:232, :307, :359, :389 — two anchors and two prose paths.
+lifecycle-kit/README.md:68,:70 — the adoption glob line and its `§` ref
+(delta 9).
+
+docs/install.md:232, :389 — the two anchors (delta 3); :307, :359 — the two
+prose paths (delta 9).
 
 RELEASING.md:4, :78; scripts/check-release-bump.sh:27,:36;
-`.claude/agents/stage-session.md:16`; `templates/stages/scope.md:80`.
+`.claude/agents/stage-session.md:16`; `templates/stages/scope.md:80` — delta 9.
 
 `.claude/commands/{align,build,close,scope,spec,validate,release-sweep}.md:1` —
-the seven binding directives.
+the seven binding directives (delta 4).
 
 `context-kit/checks/check-footprint-fresh.sh:2`,
 `scripts/check-value-rollup-fresh.sh:2`,
 `lifecycle-kit/checks/check-shim-restatement.sh:2`,
-`lifecycle-kit/checks/check-skill-binding.sh:2` — the manifests.
+`lifecycle-kit/checks/check-skill-binding.sh:2` — the manifests (delta 5);
+`lifecycle-kit/checks/check-skill-binding.sh:2` also gains the two file-level
+couples (delta 4).
+
+`drift-kit/bin/overhead-meter.sh:71` — the classifier-table regex (delta 5).
+
+docs/posts/ — the release note's Behavior-changes bullet (delta 11).
 
 **Deliberately not updated:** the four `docs/posts/` notes (delta 10); every
 `gate-tests/` fixture (all use bare relative `templates/<name>.md` sandbox paths
@@ -382,7 +433,9 @@ none of which names a template directory.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
-- [ ] **Enforcement retargeted, not just renamed** — the two `trigger=` literals
-      point at the new directory and both freshness gates are observed firing on
-      a stage-template edit; the two promoted files carry file-level couples;
+- [ ] **Enforcement retargeted, not just renamed** — all four manifest literals
+      and `overhead-meter.sh`'s classifier regex point at the new directory, and
+      both freshness gates are observed firing on a stage-template edit (they
+      trigger off `couples=` by fallback, so all four matter, not just the one
+      `trigger=`); the two promoted files carry file-level couples;
       no `--no-verify`.

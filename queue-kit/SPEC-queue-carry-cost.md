@@ -7,13 +7,24 @@ counter-pressure that keeps it working — an **icebox** tier for entries whose 
 cost field says they are dormant, a per-entry size budget so the compression
 sticks, and a net-delta KPI that makes intake-versus-drain visible.
 
-Measured on the live queue at authoring: Deferred is **59 entries / 2,241
-lines**. Of those, **27** open `Cost while deferred` with low/zero/bounded/
-cosmetic and hold **903 lines** between them; **11** exceed 50 lines (3 of which
-are this iteration's own promotions, leaving **8** to compress); **8** carry no
-cost field at all, 5 of them `[roadmap:]`-tagged public-direction entries. Only
-**15** `Surfaced` marks exist file-wide against 46 `Filed <date>` lines, but only
-**2** deferred entries carry neither.
+Measured on the live queue at authoring (baseline `c003a56`; re-verified at
+align, and every figure below reconciles at that baseline): Deferred is
+**59 entries / 2,241 lines**. Of those, **27** open `Cost while deferred` with
+low/zero/bounded/cosmetic and hold **903 lines** between them; **11** exceed 50
+lines (3 of which are this iteration's own promotions, leaving **8** to
+compress); **8** carry no cost field at all, 5 of them `[roadmap:]`-tagged
+public-direction entries. **14** dated `Surfaced` marks exist file-wide against
+46 `Filed <date>` lines — they sit on **13** deferred entries and collapse to 9
+distinct dates — but only **2** deferred entries carry neither mark.
+
+Two conventions the numbers depend on, stated because a re-measurement that
+picks the other convention will not reproduce them. **Extents are raw** — an
+entry's lead line through the line before the next bullet at the same or
+shallower indent, trailing blank included, which is the same rule delta 3
+assertion A states; trimmed, the 903 reads 874 and the 11 reads 10, and
+`spec-internal-identifier-prefix-drift` sits exactly on the boundary at 51 raw /
+50 trimmed. The median is **34** (not 36) and the 75th percentile 43, which is
+what delta 3's cap calibration is read against.
 
 ## Seam ruling
 
@@ -91,7 +102,12 @@ An icebox entry is **its lead line and nothing else**:
   new code. `queue_roadmap_entries` walks `QUEUE_TASK_RE`, so the icebox enters
   its walk with the tier; `check-roadmap-fresh` assertion C then reds any
   `[roadmap:]` entry carrying no `roadmap-summary:` declaration — and a one-line
-  entry has nowhere to put one. Keeping the icebox *inside* the roadmap walk
+  entry has nowhere to put one. **The enforcement is conditional, and the SPEC
+  says so:** that gate exits clean at its top when `QUEUE_KIT_ROADMAP_FILE` is
+  empty, *before* assertion C runs, so the guarantee holds for a consumer that
+  publishes a roadmap page (this repo does) and degrades to convention for one
+  that does not. The eligibility rule binds either way; only its mechanical
+  backstop is knob-conditional. Keeping the icebox *inside* the roadmap walk
   rather than excluding it is the deliberate call: excluded, a `[roadmap:]` tag
   that drifted into the icebox would silently drop a public commitment; included,
   it reds. Nine deferred entries are `[roadmap:]`-tagged today and all nine stay
@@ -126,8 +142,9 @@ amendment, bounded below so it is not a flag-and-skip** — in three assertions:
   shallower indent (an entry's own lines; a sub-task is its own entry).
 - **(B) Icebox shape.** Every icebox entry is exactly one line — a continuation
   line under an icebox bullet is a violation. Skips clean when
-  `QUEUE_KIT_ICEBOX_SECTION` is empty, matching `check-roadmap-fresh`'s
-  empty-knob behavior.
+  `QUEUE_KIT_ICEBOX_SECTION` is empty, matching **`check-queue-slug-liveness`'s
+  empty-globs behavior** — the origin of that pattern, which
+  `check-roadmap-fresh` is itself a user of rather than the precedent for.
 - **(C) Cost present.** Every deferred entry carries a `Cost while deferred` bold
   lead-in. Deliberately **not** applied to the icebox: a one-line entry cannot
   carry the field, and it does not need to — *membership in the tier is itself
@@ -153,9 +170,12 @@ the date on its `Filed <date>` provenance line. Owner section: queue-kit/SPEC.md
 §The queue format.
 
 This is a correction with evidence behind it. `kpi-deferred-age` reads `Surfaced`
-alone, and practice has moved to `Filed <date> by <stage>`: 15 marks against 46
-filed lines, so the KPI currently sees **15 of 59** deferred entries. Under the
-fallback it sees **57 of 59**. Widening, not replacing — the 15 existing marks
+alone, and practice has moved to `Filed <date> by <stage>`: 14 dated marks
+against 46 filed lines, resting on **13 of 59** deferred entries. Under the
+fallback the input covers **57 of 59**. Stated precisely, because the KPI does
+not count entries — it de-duplicates the dates it finds and reports the oldest,
+so today's input is 9 distinct dates drawn from 13 entries, and the widening
+takes it to 57 entries' worth. Widening, not replacing — the existing marks
 keep their meaning (`Surfaced` records when the *premise* was observed and is the
 better premise-rot datum; `Filed` is the honest available fallback), so no
 migration of existing entries is owed.
@@ -166,13 +186,27 @@ cannot depend on queue-kit's `lib/queue.sh` without a cross-kit cycle — the sa
 reason `kpi-deferred-age` already re-implements the section scan inline. Both
 implementations carry a `spec:` line citing the owner section.
 
+**The two re-implemented scans in the tree disagree on a new section, and the
+divergence is deliberate rather than overlooked.** `kpi-deferred-age` resets on
+any unrecognized `## ` heading, so an icebox placed after Deferred drops out of
+its input automatically — correct, since an iceboxed entry's age is no longer
+the thing the KPI is trending. gate-sdk's `check-gate-exemption-tasks` has no
+such reset and sweeps the icebox in (delta 11) — also correct, for the opposite
+reason. Same shape, opposite behavior, both wanted; recorded so a later reader
+does not "fix" one into agreement with the other.
+
 ### 5. `bin/queue-index.sh`: the icebox tally and `--icebox-candidates` — *design-bearing*
 
-- **Tally line, both modes.** The icebox contributes exactly one line
-  (`Icebox: N entries`) to the index — never an entry listing. The index is
+- **Tally line, both deferred renderings.** The icebox contributes exactly one
+  line (`Icebox: N entries`) to the index — never an entry listing. The index is
   embedded in the always-loaded session-context surface, so listing the tier
   would re-import the tokens the tier exists to remove, while a bare count keeps
-  it visible.
+  it visible. **Precisely: the two `END`-block branches of `index` mode** — the
+  `--collapse-deferred` branch and the full one. `--collapse-deferred` is a flag
+  within index mode, not a mode; the tool's actual modes are `index` and
+  `extent`, and the tally must **not** reach `extent`, whose contract is two
+  integers and nothing else. The section dispatch needs a new icebox arm: an
+  `## Icebox` heading currently falls through to the catch-all and is invisible.
 - **`--icebox-candidates`** prints the eviction worklist: one line per deferred
   entry whose defer date is older than `QUEUE_KIT_ICEBOX_AGE_DAYS` (default 30),
   with the entry's line count and its cost-field opener. An entry with **no**
@@ -213,13 +247,24 @@ weight row volunteers none, because intake is the axis a filing session can act
 on inside the session.
 
 **Enabling handoff:** `drift-report.sh` already derives the iteration-start
-commit for its header, but only at print time — after the plugin loop. The
-derivation moves **above the `DRIFT_KIT_*` export loop** and is assigned to
-`DRIFT_KIT_ITERATION_START`, so the existing `compgen` export carries it to
-plugins with no new export list to drift out of parity. It is a driver handoff
-recomputed every run, not a consumer knob — the `DRIFT_KIT_KIT_ROOTS` precedent —
-and the header keeps reading the same value. With no baseline (a standalone run,
-a fresh clone) the plugin degrades to `n/a (no iteration baseline)` per row.
+commit for its header, but only at print time — after the plugin loop. **Both
+the `iteration_start` function definition and its invocation** move above the
+`DRIFT_KIT_*` export loop (a two-part move — relocating the call alone leaves it
+undefined), assigning `DRIFT_KIT_ITERATION_START`, so the existing `compgen`
+export carries it to plugins with no new export list to drift out of parity. Its
+inputs are already set by that point. It is a driver handoff recomputed every
+run, not a consumer knob — the same *class* as `DRIFT_KIT_KIT_ROOTS`, though not
+its mechanism: `KIT_ROOTS` is set after the loop and carries its own explicit
+`export`, so it is a precedent for the handoff shape and not for riding compgen.
+The header keeps reading the same value. With no baseline (a standalone run, a
+fresh clone) the plugin degrades to `n/a (no iteration baseline)` per row.
+
+**Priced, because the move is not free:** hoisting the derivation above the loop
+makes it run in `--trend` mode too, which today exits before ever computing it.
+That puts one `grep` and one `git log -S` over `.workflow/WORKFLOW-STATE.txt` on
+**every session start** via the context hook. Accepted — it is a single-file
+pickaxe over a file of a few dozen lines — but it is a per-session cost, not a
+per-report one, and a build session should not discover that after landing it.
 
 ### 7. canon-kit: the design-pending section set — *design-bearing*
 
@@ -230,8 +275,13 @@ now, with drift-kit's in delta 6). `lib/spec.sh` builds the design-pending regex
 from deferred **plus** icebox, omitting the icebox term when the knob is empty.
 
 `check-amendment-queue` assertion (b) then reads "every entry in a design-pending
-section carries `[needs-spec]`, and one already carrying `[spec:]` must be
-promoted" over both sections. Assertions (a) and (c) are untouched.
+section carries **the design-pending tag**, and one already carrying `[spec:]`
+must be promoted" over both sections. Assertions (a) and (c) are untouched.
+
+The tag is written abstractly here on purpose: the sibling `needs-spec-tag-rename`
+unit renames that token to `[design-pending]` in this same iteration, and this
+amendment's body is itself live grammar destined to merge into a canonical spec.
+Whichever unit lands second must not merge the other's stale spelling.
 
 ### 8. Close's eviction step and its roster declaration — *design-bearing*
 
@@ -280,6 +330,16 @@ of it authors prose or rules on a task:
   to `## Done`. That is a completed task — the decision was made and recorded in
   an owner doc — so Done is the honest home and conservation holds.
 
+  **The move is a rewrite to a bare slug line, not a relocation of the entry**,
+  and the distinction is load-bearing. `queue_done_slugs` matches only
+  `- <slug>` — no bold, no tag, no trailing prose. An entry carried into Done
+  with its `- **<slug>** [<the design-pending tag>] — …` shape intact matches
+  neither that adapter nor `queue_live_slugs`, so the slug lands in neither set
+  and `check-task-conservation` reds it as a lost task. Conservation holds for
+  this path *because* the entry is reduced to its slug; the design-pending tag
+  is dropped by that reduction rather than swapped, which is also why the
+  sibling unit's token migration must not visit these entries (its delta 6).
+
 Projected: ~2,241 → ~1,040 lines in the design-pending pool, with 27 of 59
 entries reduced to one line each.
 
@@ -327,13 +387,21 @@ because each looks like a non-event until it is not:
   That is an accident, and the amendment refuses to leave it as one: the icebox's
   placement **between the deferred and done sections is a stated contract**, and
   gate-sdk/SPEC.md §check-gate-exemption-tasks names this gate as the reader that
-  depends on it. **Accepted residual, and it is loud:** an icebox placed after the
-  done section drops those slugs from the set, so an exemption naming one reds
-  with "no live task" rather than passing open. The underlying fragility — that
-  gate-sdk's reader treats *any* section in that span as live — is pre-existing,
-  is not this unit's to fix (gate-sdk cannot depend on queue-kit for the section
-  set), and is filed to the gap inbox rather than absorbed here, per scope-gated
-  intake.
+  depends on it. **Accepted residual, and it is quiet — no gate enforces section
+  order:** nothing in the tree checks where a section sits.
+  `check-queue-sections` counts occurrences per required section with no
+  positional state, and no other gate carries one. An icebox placed after the
+  done section drops those slugs from that set, and the *only* way that surfaces
+  is an exemption naming an iceboxed slug reddening with "no live task" — which
+  requires such an exemption to exist. Otherwise the misplacement is silent. The
+  contract is therefore carried by the SPEC and by review, not by a gate, and
+  saying so is the honest form of the residual. The underlying fragility is
+  pre-existing, is not this unit's to fix (gate-sdk cannot depend on queue-kit
+  for the section set), and is filed to the gap inbox rather than absorbed here,
+  per scope-gated intake — the filed bullet understates it, and align has filed
+  the correction: the reader scans **every bold token on every line** in the
+  span, not bullet lead lines, so its live set is 109 tokens against 61 real
+  slugs and `# until: scope` resolves green against no task at all.
 - **context-kit's session-context hook is a consumer of the tally line.** Step 1
   of the hook runs `queue-index.sh`, collapsing the deferred section except on
   the close and scope stages. The icebox tally (delta 5) rides **both** branches,
@@ -342,6 +410,28 @@ because each looks like a non-event until it is not:
   work reads `--icebox-candidates` rather than the index. The integration prose
   in context-kit/SPEC.md is updated to say so, because a reader of that step
   would otherwise have to infer which branch the new tier lands on.
+
+### 12. Release-note declaration — *mechanical*
+
+Added at align: the unit lands a registered gate on a vendored consumer's tree
+and so owes a note bullet, which the amendment did not declare.
+
+`check-queue-entry-budget` declares under **Tightened gates**, whose grammar is
+"one bullet per gate that landed **new** or got stricter" and whose lead tokens
+are the release's mechanical allowed-red set (docs/install.md §The upgrade
+contract). It is an allowed-red on a real consumer, not a formality: assertions
+A and C bind the deferred section unconditionally, so any vendored queue with an
+over-cap or uncosted entry reds on upgrade. Only assertion B is knob-gated.
+
+Nothing else here earns a bullet. The three new knobs are **added, not renamed**
+— exactly the near-miss docs/install.md:414 names as a trailing clause on a
+"None." Renamed-knobs body, not a bullet. `kpi-queue-net-delta` and
+`kpi-deferred-age`'s widened input are advisory KPIs that never join
+`gates.list` — the other near-miss that section names.
+
+This unit rides **one minor with its two siblings and one shared release note**;
+none of the three owns the note alone, and the two renames' bullets are theirs
+to declare. The floor is minor on the Tightened-gates section alone.
 
 ## Producers and consumers
 
@@ -382,36 +472,45 @@ opener, both read by close's eviction judgment. No field is added without one.
 
 ## Existing sections updated
 
-queue-kit/SPEC.md — §The queue format (the icebox bullet; the four-field roster
-gains the `Cost while deferred` requirement and its gate; the defer-date
-definition), §The tag algebra (the design-pending tag now spans two sections;
-`[roadmap:]`'s "unconstrained by section" clause names the icebox exclusion and
-why assertion C enforces it), §Layout and configuration (three knobs, the derived
-required-sections rule, the three-kit cross-kit note), §lib/queue.sh
-(`QUEUE_TASK_RE`, the derivation), §bin/queue-index.sh (tally line,
-`--icebox-candidates`), §bin/roadmap.sh (reads three live task sections),
-§check-queue-sections, §check-task-names, §check-task-conservation,
-§check-tag-lead-line, §check-queue-slug-liveness, §check-queue-prose-precondition
-(one sentence each on icebox reach or deliberate non-reach), plus new §The icebox
-tier and §check-queue-entry-budget.
+queue-kit/SPEC.md — §The queue format (the icebox bullet, delta 1; the
+four-field roster gains the `Cost while deferred` requirement and its gate,
+delta 3; the defer-date definition, delta 4), §The tag algebra (the
+design-pending tag now spans two sections, delta 7; `[roadmap:]`'s
+"unconstrained by section" clause names the icebox exclusion and the
+knob-conditional limit on assertion C's backstop, delta 2), §Layout and
+configuration (three knobs, the derived required-sections rule, the three-kit
+cross-kit note, delta 10), §lib/queue.sh (`QUEUE_TASK_RE`, the derivation,
+delta 10), §bin/queue-index.sh (tally line on both index-mode branches,
+`--icebox-candidates`, delta 5), §bin/roadmap.sh (reads three live task
+sections, delta 1), §check-queue-sections (delta 10), §check-task-names,
+§check-task-conservation (including the bare-slug Done grammar the wontfix path
+depends on, delta 9), §check-tag-lead-line, §check-queue-slug-liveness,
+§check-queue-prose-precondition (one sentence each on icebox reach or deliberate
+non-reach, delta 1), plus new §The icebox tier (deltas 1, 2, 8) and
+§check-queue-entry-budget (delta 3).
 
 canon-kit/SPEC.md — §The amendment lifecycle (design-pending spans the icebox),
-§check-amendment-queue (assertion b), §Layout and configuration (the knob).
+§check-amendment-queue (assertion b), §Layout and configuration (the knob) —
+all three delta 7.
 
-drift-kit/SPEC.md — §The report skeleton (the baseline derived before the export
-loop), §The KPI plugin contract (`DRIFT_KIT_ITERATION_START` beside
-`DRIFT_KIT_KIT_ROOTS`), §Bundled KPIs (`kpi-deferred-age`'s widened input;
-`kpi-queue-net-delta`).
+drift-kit/SPEC.md — §The report skeleton (the baseline function and call moved
+above the export loop, and the per-`--trend` cost, delta 6), §The KPI plugin
+contract (`DRIFT_KIT_ITERATION_START` as a driver handoff, delta 6), §Bundled
+KPIs (`kpi-deferred-age`'s widened input and its unknown-heading reset, delta 4;
+`kpi-queue-net-delta`, delta 6).
 
 gate-sdk/SPEC.md — §check-gate-exemption-tasks (the live-section span it reads
 and the icebox's stated position within it, delta 11).
 
 context-kit/SPEC.md — the session-context hook's step 1 (the icebox is a tally on
-both branches).
+both branches, delta 11).
 
-queue-kit/README.md — the section roster gains the optional icebox tier.
+queue-kit/README.md — the section roster gains the optional icebox tier
+(delta 1).
 
-`.claude/commands/close.md` — the housekeeping binding's eviction step.
+`.claude/commands/close.md` — the housekeeping binding's eviction step (delta 8).
+
+docs/posts/ — the release note's Tightened-gates bullet (delta 12).
 
 **Deliberately not updated: `CLAUDE.md`.** Load-trigger residency — close's
 binding loads the eviction procedure and queue-kit/SPEC.md owns the tier, so a

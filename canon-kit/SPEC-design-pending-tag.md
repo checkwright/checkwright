@@ -11,12 +11,18 @@ token names an artifact that will never exist. This renames the token to
 every guard clause verbatim, and closes the one silent-failure path a token
 rename opens.
 
-Measured at authoring: the literal appears **161×** across **23 files**; **98×**
-in `TASK-QUEUE.md` (58 lead-line tags — one per deferred entry — and 40 in entry
-prose, mostly the recurring `**Why [needs-spec]:**` field idiom); the rest across
-two gate bodies, three kit SPECs, two READMEs, two templates, one smoke fixture,
-five gate-test inputs, the generated docs mirror, and one hand-authored site
-page. No variant spelling exists. No `expect.txt` in the tree contains it.
+Measured at authoring (baseline `7657141`): the literal appears **161×** across
+**23 files**; **98×** in `TASK-QUEUE.md` (58 lead-line tags — one per deferred
+entry — and 40 in entry prose, mostly a recurring `Why …` field idiom in several
+spellings, delta 6); the rest across two gate bodies, three kit SPECs, two
+READMEs, two templates, one smoke fixture, five gate-test inputs, the generated
+docs mirror, and one hand-authored site page. No variant spelling of the token
+itself exists. No `expect.txt` in the tree contains it — verified across all 172.
+
+Re-measured at align: **166× across 25 files**, 90 in `TASK-QUEUE.md` (56 lead
+lines). The census is stale, not wrong — the drift is this iteration's own two
+promotions out of Deferred plus the two sibling amendment files, which is
+precisely the population delta 7 governs.
 
 ## Seam ruling
 
@@ -74,10 +80,22 @@ renamed token or keep it section-wide under a truer name". **Keep it
 section-wide.** Narrowing it to feature-only — mirroring `[spec:]` — would drop
 the forbidden-in-active guard for every debt entry and break
 mandatory-on-every-entry, and those two clauses together are what make the
-cross-check *total*: every entry in the pool carries it, so any entry in an
-active section carrying it is a botched promotion, with no exempt population to
-hide in. Narrowing buys honesty the rename already delivers and pays for it in
-coverage.
+cross-check reach every *promotion*: every entry in the pool carries it, so any
+entry in an active section carrying it is a botched promotion. Narrowing buys
+honesty the rename already delivers and pays for it in coverage.
+
+**The check is not total, and the amendment does not claim it is.** Corrected at
+align, because the overstatement was load-bearing prose rather than colour:
+`check-amendment-queue` classifies any heading that is not a feature, active, or
+deferred section as `other` and skips every arm, so **`## Done` is an exempt
+population** — an entry moved Deferred → Done still carrying the tag reds
+nowhere, and `check-tag-lead-line` misses it too, since `QUEUE_TASK_RE` spans
+active plus deferred only. In practice a Done entry is a bare slug line
+(`queue_done_slugs` matches nothing else), so the tag is dropped by that grammar
+rather than by a gate. The guard is total over the promotion moves it exists to
+catch — Deferred → an active section — and silent on the disposition move. That
+is a pre-existing shape the rename neither creates nor closes; it is stated so
+the decision to keep the tag section-wide rests on the coverage it actually has.
 
 This is also what keeps the unit coherent with its sibling: batch 1 generalized
 canon-kit's **section set** (deferred plus icebox) rather than its tag set, and
@@ -147,19 +165,38 @@ function classes(line, arr,   i, nm, term) {
 ```
 
 `index()` on a literal replaces the regexes exactly — every current pattern is a
-literal prefix match — and removes the metacharacter-escaping hazard as a side
-effect. `enum-sets.sh` retargets its derivation from the `arr["<tag>"]` rows to
-this table. That derivation gets **more** robust, not less: the current grep can
-partially parse (some rows renamed, some not) and silently emit a short set,
-whereas a single `split()` line either matches or does not, and the existing
-`[[ ${#alltags[@]} -gt 0 ]] || exit 2` guard fails closed on the latter.
+literal prefix match, verified arm by arm at align — and removes the
+metacharacter-escaping hazard as a side effect. `enum-sets.sh` retargets its
+derivation from the `arr["<tag>"]` rows to this table; the class table is the
+only quoted-literal `split()` in the gate (the other takes an awk variable), so
+it is unambiguously greppable. Two honest notes on that retarget:
+
+- **The extraction trades one escaping hazard for another.** The current
+  derivation is a single capture group; the retarget must split on space and
+  strip a trailing `:` or `]`, and `]` is a bracket-expression metacharacter
+  needing care in the class. Net still favourable, but not free.
+- **The robustness argument holds in one direction, not both.** A missed table
+  yields zero tags and the existing `[[ ${#alltags[@]} -gt 0 ]] || exit 2` guard
+  fails closed — that is real. But the claim that the *current* grep "silently
+  emits a short set" on a partial rename is wrong for the rename described:
+  `arr["design-pending"]` still satisfies `[a-z][a-z-]*`, so a half-done key
+  rename emits a full set with a wrong member, not a short one. The set only
+  shortens if a rename leaves the charset. The two-direction desync above is the
+  real defect; this is not a second one.
+
+`enum-sets.sh:7`'s own `# spec:` line names ``the arr["<tag>"] rows
+check-tag-lead-line keys on`` as the derivation surface. It is a one-line-binding
+`spec:` comment under `check-comment-tier` and is rewritten with the retarget —
+leaving it would leave the file citing a surface it no longer reads.
 
 ### 5. `check-amendment-queue`: token swap, guard clauses verbatim — *mechanical*
 
 Thirteen occurrences in `canon-kit/checks/check-amendment-queue.sh` — three awk
 regexes, two classifier labels, two `case` labels, four operator-facing rejection
-or help strings. Every assertion, negation, and section scope is unchanged; only
-the literal moves. Assertion (a)'s prose arm keeps its guidance verbatim apart
+or help strings, and **the two header comments at `:23` and `:26`** describing
+assertions (a) and (b), which are under `check-comment-tier` governance and were
+missing from this itemisation (it summed to eleven). Every assertion, negation,
+and section scope is unchanged; only the literal moves. Assertion (a)'s prose arm keeps its guidance verbatim apart
 from the token ("say \"needs design\" in prose"), because the advice was never
 about the token's spelling.
 
@@ -179,15 +216,40 @@ states the composition rather than leaving build to discover it:
 
 **The sweeps compose into a single pass, entry by entry.** For each entry in a
 design-pending section, one visit performs: the token swap on the lead line, the
-token swap in the body's `**Why …:**` field idiom, the sibling's cost-field
-triage, and — where the sibling's judgment evicts the entry — the compression to
-a one-line icebox entry, which discards the body the token swap would otherwise
-have edited. **Eviction therefore settles before body edits**, or the pass edits
-prose it is about to delete.
+token swap in the body's `Why …` field idiom, the sibling's cost-field triage,
+and the sibling's **disposition** — evict to the icebox, rule wontfix, or keep.
+
+**Disposition settles first, then body edits.** Both dispositions destroy prose
+the token swap would otherwise have edited, so visiting them in the other order
+edits text it is about to delete:
+
+- **Evicted** → compressed to a one-line icebox entry; the body goes, the lead
+  line is rewritten from scratch and simply *carries* the new token.
+- **Ruled wontfix** → the entry is reduced to a bare `- <slug>` line under
+  `## Done` (the only shape `queue_done_slugs` matches; anything richer reds
+  `check-task-conservation` as a lost task). The lead line and its tag are
+  **deleted, not swapped** — this population must not be visited by the token
+  migration at all. The original composition omitted this disposition and named
+  only eviction; it is the case where "swap the token" is affirmatively wrong.
+- **Kept** → the full lead-line-plus-body swap, and the cost field triaged.
+
+**The body idiom is not one spelling, and a sweep keyed on one misses most of
+it.** `grep 'Why \[needs-spec\]'` returns **zero** hits — the token is backticked
+inside the bold run. Live variants at authoring: ``**Why `[needs-spec]`:**``
+(22), ``**Open design (why `[needs-spec]`, not a build unit):**``,
+``**Open design (why `[needs-spec]`):**``, ``**Why `[needs-spec]` and not
+closed:**``, ``**Design question (why [needs-spec], not a build unit):**`` and
+``**Design question (why [needs-spec], and why the value is the open part):**``
+— the last two *unbackticked*. The migration keys on the token, backticked or
+bare, never on the surrounding idiom.
 
 Ordering with the sibling amendment is a build-batch concern, not a contract:
 whichever lands first, the other's sweep must run over the *result*, and a second
-full-file rewrite is the failure this pairing exists to prevent.
+full-file rewrite is the failure this pairing exists to prevent. **This extends
+to `canon-kit/SPEC.md §check-amendment-queue`, which both units rewrite** — the
+sibling widens assertion (b) to a two-section read while this unit renames the
+token that assertion keys on, so the second to land edits the merged text, not
+the line numbers cited here.
 
 ### 7. Occurrences that name the old token *as* the old token do not migrate — *design-bearing*
 
@@ -199,14 +261,28 @@ a record rather than update a grammar.
 - `canon-kit/SPEC.md:560` — a frozen drift attestation that "names the set as it
   stood when the drift occurred", already carrying a `prose-enum-exempt` escape.
   Left exactly as it is.
-- This unit's own queue entry, including its `[needs-spec]` appears **98×`
+- This unit's own queue entry, including its "`[needs-spec]` appears **98×**"
   measurement, which is a dated observation of the pre-rename state and is the
   rename's own provenance.
+- **The unit slug `needs-spec-tag-rename` itself** — a fourth population,
+  neither live tag grammar nor a frozen token attestation. It survives at
+  `TASK-QUEUE.md:52`, `:60`, `:135` and
+  `lifecycle-kit/SPEC-stages-taxonomy.md:266`. The slug is **not** renamed:
+  `TASK-QUEUE.md:60` is a live lead line under `check-queue-slug-liveness` and
+  `check-task-conservation`, so renaming it would owe a Done-move and a
+  `[blocked-by:]` sweep for no gain. The DoD's "removals propagated" grep is
+  read against this exclusion, which is why the population is named here rather
+  than discovered when the grep comes back non-empty.
 
 Every other occurrence is live grammar and migrates. The three existing
 `prose-enum-exempt` escapes (`canon-kit/SPEC.md:325`, `:560`,
 `queue-kit/SPEC.md:530`) are carried through unchanged in placement — the
 migration must not silently drop an escape while rewriting the line under it.
+**"Unchanged in placement" means the covered lines must not grow**: the escape's
+reach is two lines (the comment's own line and the next), and
+`needs-spec` → `design-pending` lengthens every occurrence by three characters,
+so a reflow that pushes a tag onto a third line silently un-covers it. Preserving
+the comment while letting the line wrap is the failure this clause forbids.
 
 ### 8. Fixtures: the uncovered class gets covered — *design-bearing*
 
@@ -232,6 +308,19 @@ left to a grep.
   the lead line, which keeps `check-tag-lead-line` satisfied.
 - `lifecycle-kit/templates/skills/close.md:22,:65` — the gap-drain prose. The
   `.claude/commands/close.md` shim does **not** carry the token, so no shim edit.
+  **Path dependency:** the sibling `templates-stages-taxonomy-realignment` unit
+  moves this file to `lifecycle-kit/templates/stages/close.md` in the same
+  iteration. If that unit lands first the file is at the new path; a `git mv`
+  carries this edit along if it lands second. Either order works, neither is
+  assumed — the build batch resolves the path at edit time rather than trusting
+  the spelling here.
+- `queue-kit/SPEC-queue-carry-cost.md` — the sibling amendment's own body carries
+  the token where it restates `check-amendment-queue` assertion (b). That is live
+  grammar destined to merge into a canonical spec, not a historical mention, so
+  it migrates with everything else. Align abstracted it at its source; it is
+  named here because a tree-wide sweep that skips `SPEC-*.md` on the assumption
+  that amendments are scratch would miss it, and `check-kit-ref-liveness` valves
+  that path class.
 - `lifecycle-kit/bin/enter-stage.sh:140` — the gap-drain help string.
 - `docs/queue-kit/index.md:15` — hand-authored, **not** generated and not
   content-gated; it survives only because it enumerates all five tags and is in
@@ -288,22 +377,31 @@ its producer and both its readers, which delta 4 does.
 
 queue-kit/SPEC.md — §The tag algebra (the tag bullet at :66 and the body-field
 idiom at :31-32, which already writes the field abstractly as `Why <the
-design-pending tag>` and now names the token), §check-tag-lead-line (the governed
-tag enumeration at :435-436, the bare-prose "masks a needs-spec state" at :429,
-and a sentence stating the class table as the single source both the matcher and
-`enum-sets.sh` read), §check-queue-slug-liveness-adjacent prose at :314, and the
-`prose-enum-exempt` block at :530-531.
+design-pending tag>` and now names the token — deltas 1 and 6),
+§check-tag-lead-line (the governed tag enumeration at :435-436, the bare-prose
+"masks a needs-spec state" at :429, and a sentence stating the class table as the
+single source both the matcher and `enum-sets.sh` read — delta 4),
+§check-queue-slug-liveness-adjacent prose at :314 (delta 1), and the
+`prose-enum-exempt` block at :530-531 (delta 7).
 
 canon-kit/SPEC.md — §The amendment lifecycle (the **Design-pending** state
-bullet at :59-61 and the bidirectional-rule paragraph at :72),
-§check-amendment-queue (assertions (a) and (b) at :398-402), the content-tiering
-marker roster at :326-327 (the token, keeping its `prose-enum-exempt` escape),
-and :187, :211, :214. **:560-561 is deliberately not updated** (delta 7).
+bullet at :59-61 and the bidirectional-rule paragraph at :72 — deltas 1 and 2),
+§check-amendment-queue (assertions (a) and (b) at :398-402, plus the `## Done`
+coverage limit — deltas 2 and 5), the content-tiering marker roster at :326-327
+(the token, keeping its `prose-enum-exempt` escape — delta 7), and :187, :211,
+:214 (delta 1). **:560-561 is deliberately not updated** (delta 7). Line numbers
+are pre-merge: the sibling unit rewrites assertion (b) in this same section, so
+the second unit to land re-locates them (delta 6).
 
 lifecycle-kit/SPEC.md — :494 (close's gap-drain disposition) and :1041 (the
-deferred-filing model).
+deferred-filing model) — delta 1.
 
-README.md:89 and queue-kit/README.md:5 — the enumerating kit-roster rows.
+README.md:89 and queue-kit/README.md:5 — the enumerating kit-roster rows
+(delta 1; both also name `[precondition-ok:]`, which is outside the class table
+and the enum set and does not move).
+
+`scripts/enum-sets.sh` — the derivation at :8-9 and its `# spec:` line at :7
+(delta 4).
 
 `queue-kit/templates/TASK-QUEUE.md`, `lifecycle-kit/templates/skills/close.md`,
 `lifecycle-kit/bin/enter-stage.sh`, `drift-kit/smoke/install.sh`, the five
