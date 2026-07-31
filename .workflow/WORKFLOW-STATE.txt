@@ -7,3 +7,4 @@
 release-step-verification scope a6eb684d 2026-07-31
 release-step-verification spec a086ddad 2026-07-31
 release-step-verification align aa33e13c 2026-07-31
+release-step-verification build ad4b15e8 2026-08-01
