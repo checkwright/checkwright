@@ -1765,8 +1765,15 @@
   sits. The failure mode is a governance sentence that under-describes its own
   carve-out, so the next session facing a shipped-post repair either re-derives
   the reading from scratch or refuses a correct repair on immutability grounds.
+  That under-description is now demonstrable rather than predicted: close's
+  staleness sweep flagged the sentence independently, on the evidence that its
+  carve-out enumerates exactly two mechanically-held classes (links, commands)
+  while a third now exists — `check-tightened-gates-grammar` runs at
+  `tier=precommit` over `docs/posts/*.md` with no version floor, and seven
+  already-shipped notes were edited to satisfy it.
   Debt: a governance sentence widened on one page; adds no governed name.
-  Filed 2026-07-31 at spec; promoted at close from the gap inbox.
+  Filed 2026-07-31 at spec; promoted at close from the gap inbox, its cost
+  re-read at close against the sweep that found the same sentence unprompted.
 
 - **tightened-gates-declaration-note-parity** [design-pending] — nothing asserts
   that a release note's composed Tightened-gates set equals the
