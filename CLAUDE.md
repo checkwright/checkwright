@@ -42,12 +42,11 @@ A master push is verified against the remote oracle: watch the `gates`
 workflow to green (`gh run watch`) before calling the push done.
 
 Beyond the gate battery, the repo runs its own iteration lifecycle — one
-iteration per hardening or roadmap unit, the queue and stage roster below. Each
-stage session stamps `.workflow/WORKFLOW-STATE.txt` as its first step, and that
-file's last stamp *is* the current stage — the cursor has one source, and stage
-motion never writes the queue (`check-stage-evidence` / `check-stage-entry`
-enforce the stamp protocol; `check-lifecycle-registration` holds the block
-below in lockstep with the machine).
+iteration per hardening or roadmap unit. The stage cursor has exactly one
+source, the last stamp in `.workflow/WORKFLOW-STATE.txt`, and stage motion never
+writes the queue (`check-stage-evidence` / `check-stage-entry` enforce the stamp
+protocol; `check-lifecycle-registration` holds the block below in lockstep with
+the machine).
 
 <!-- lifecycle-kit:begin -->
 The repo runs lifecycle-kit's iteration state machine on `TASK-QUEUE.md` — one
