@@ -12,6 +12,59 @@
 
 ## New Features
 
+- **release-body-host-side-unverified** [spec: SPEC-release-body-probe.md] — required step, ungated
+  The GitHub Release body is a required step nothing can catch when it is
+  skipped, and it has already been skipped once. `RELEASING.md` step 6 says the
+  body points at the post, and says outright that the body "lives on the host,
+  out of the battery's reach". That honesty is precisely the gap: the step is
+  real, its output is public and effectively permanent, and its omission leaves
+  no residue in the tree for any gate to find.
+  **Absorbs `release-body-url-form`** (moved to Done — absorbed, not dropped).
+  That entry's two cheap deliverables had landed — the `v0.6.0` body repaired,
+  step 6 pinning the no-slash URL form — and its stated residue, "the
+  monitor-shaped half", *is* this deliverable over the same artifact: one probe
+  discharges both, presence killing the empty-body defect and resolution the
+  trailing-slash one. Its coupling to `rendered-site-link-monitor` ("promote the
+  two together") was reasoning by **shape**, not a dependency — the two probe
+  different surfaces, links *in release bodies* versus links *on* the rendered
+  site. That monitor stays deferred and unblocked, and gets cheaper for the
+  probe-arm mechanism this unit lays down.
+  **Verified by querying at the scope entry that ruled it, not by memory.** All
+  19 tags carry a `release:` note post, all 19 Releases carry exactly one
+  `checkwright.dev/posts/…` URL, and **all 19 now resolve 200** — because the
+  operator repaired `v0.18.0`'s empty body by hand between the filing and the
+  survey. That repair is what makes the class hole invisible again: it removed
+  the symptom from one artifact and left the hole where it was.
+  **The trap is still armed:** the trailing-slash form 404s today, so the probe
+  must assert *resolution*, never merely that some URL is present.
+  **Rate, corrected.** The filing said "one release in four has already lost its
+  pointer" — the rate across the three bodies close happened to sample,
+  overstating by roughly 4x. Over 19 releases: **one shipped empty** (`v0.18.0`),
+  **one shipped a 404ing URL** (`v0.6.0`), one near-miss caught in flight
+  (`v0.7.0`), both shipped defects since repaired by hand. The merge carries this
+  unit; it does not need the bad number.
+  **Deliverable:** a check that every tag carrying a release note has a Release
+  whose body resolves that note's URL. Both halves are queryable — the tag list
+  and the Release body over the API, the note's existence from the tree.
+  **Ruled a new arm on `site-kit/templates/site-health.yml`, not a close-stage
+  affordance:** an affordance cannot catch its own omission, since the failure
+  mode is a body never filled — exactly the case where the session skipped the
+  step and would skip the affordance too. `site-health.yml` is already the
+  sanctioned non-hermetic tier (site-kit/SPEC.md §The monitor boundary). Seam
+  ruled: generic probe mechanism in the kit, apex host from `docs/CNAME` as the
+  existing probe reads it, the note-URL pattern as consumer config.
+  The eight deltas with their work-class labels, the two-assertion split that
+  makes the trailing-slash trap catchable, causal completeness, and the ruled-out
+  alternatives: site-kit/SPEC-release-body-probe.md.
+  **The loss it closes is reader-facing** — someone arriving from the tag list
+  gets a tarball and no account of what changed — and both shipped defects above
+  were found by hand, long after the artifact went public.
+  Debt: one monitor arm on an existing shipped template; it adds a governed
+  name, which is what makes this the feature of its set.
+  Filed 2026-07-31 at close on evidence found while performing step 6; merged
+  with `release-body-url-form` and ruled monitor-shaped at the next scope entry;
+  amendment authored 2026-07-31 at spec.
+
 ## Technical Debt
 
 - **release-tag-oracle-ordering** — `RELEASING.md` never says
@@ -1926,56 +1979,6 @@
   Filed 2026-07-31 at close from the lead's dispatch, weighed as evidence and
   ruled **task**-shaped rather than lesson-shaped: the deliverable and its
   done-state are both nameable now, which is the litmus.
-
-- **release-body-host-side-unverified** [design-pending] — the GitHub Release
-  body is a required step nothing can catch when it is skipped, and it has
-  already been skipped once. `RELEASING.md` step 6 says the body points at the
-  post, and says outright that the body "lives on the host, out of the battery's
-  reach". That honesty is precisely the gap: the step is real, its output is
-  public and effectively permanent, and its omission leaves no residue in the
-  tree for any gate to find.
-  **Absorbs `release-body-url-form`** (moved to Done — absorbed, not dropped).
-  That entry's two cheap deliverables had landed — the `v0.6.0` body repaired,
-  step 6 pinning the no-slash URL form — and its stated residue, "the
-  monitor-shaped half", *is* this deliverable over the same artifact: one probe
-  discharges both, presence killing the empty-body defect and resolution the
-  trailing-slash one. Its coupling to `rendered-site-link-monitor` ("promote the
-  two together") was reasoning by **shape**, not a dependency — the two probe
-  different surfaces, links *in release bodies* versus links *on* the rendered
-  site. That monitor stays deferred and unblocked, and gets cheaper for the
-  probe-arm mechanism this unit lays down.
-  **Verified by querying at the scope entry that ruled it, not by memory.** All
-  19 tags carry a `release:` note post, all 19 Releases carry exactly one
-  `checkwright.dev/posts/…` URL, and **all 19 now resolve 200** — because the
-  operator repaired `v0.18.0`'s empty body by hand between the filing and the
-  survey. That repair is what makes the class hole invisible again: it removed
-  the symptom from one artifact and left the hole where it was.
-  **The trap is still armed:** the trailing-slash form 404s today, so the probe
-  must assert *resolution*, never merely that some URL is present.
-  **Rate, corrected.** The filing said "one release in four has already lost its
-  pointer" — the rate across the three bodies close happened to sample,
-  overstating by roughly 4x. Over 19 releases: **one shipped empty** (`v0.18.0`),
-  **one shipped a 404ing URL** (`v0.6.0`), one near-miss caught in flight
-  (`v0.7.0`), both shipped defects since repaired by hand. The merge carries this
-  unit; it does not need the bad number.
-  **Deliverable:** a check that every tag carrying a release note has a Release
-  whose body resolves that note's URL. Both halves are queryable — the tag list
-  and the Release body over the API, the note's existence from the tree.
-  **Ruled a new arm on `site-kit/templates/site-health.yml`, not a close-stage
-  affordance:** an affordance cannot catch its own omission, since the failure
-  mode is a body never filled — exactly the case where the session skipped the
-  step and would skip the affordance too. `site-health.yml` is already the
-  sanctioned non-hermetic tier (site-kit/SPEC.md §The monitor boundary). Seam
-  ruled: generic probe mechanism in the kit, apex host from `docs/CNAME` as the
-  existing probe reads it, the note-URL pattern as consumer config. Stays
-  `[design-pending]` until the `spec` stage authors the amendment.
-  **Cost while deferred:** the loss is reader-facing — someone arriving from the
-  tag list gets a tarball and no account of what changed — and both shipped
-  defects above were found by hand, long after the artifact went public.
-  Debt: one monitor arm on an existing shipped template; it adds a governed
-  name, which is what makes this the feature of its set.
-  Filed 2026-07-31 at close on evidence found while performing step 6; merged
-  with `release-body-url-form` and ruled monitor-shaped at the next scope entry.
 
 ## Icebox
 
