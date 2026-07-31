@@ -2,4 +2,3 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
-pre-adoption-grammar-break lesson rule delegation-kit/SPEC.md — A guard's `OK` is a floor, not a recommendation

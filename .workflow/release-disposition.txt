@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-pre-adoption-grammar-break release v0.18.0 — minor earned by docs/install.md §Versioning (Tightened gates and Behavior changes both non-empty in the dated note, no decommission), derived over v0.17.0; operator-authorized after an initial deferred: stamp, tagged on the iteration's final commit with master watched green first, and both publish channels landed
