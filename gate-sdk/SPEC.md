@@ -546,6 +546,69 @@ mechanism, so a second injector adds no second copy of the awk replace logic:
 a gate: exercised end-to-end wherever an installer that rides it runs
 (doctrine-kit and lifecycle-kit `smoke/install.sh`).
 
+### lib/declaration.sh
+
+The tightened-gates declaration grammar — **two container arms over one token
+predicate**, sourced by three callers. The token predicate is a bare gate name
+(`DECL_TOKEN_RE`); the container is the only thing that differs between the arms,
+which is what keeps two surfaces from re-opening the same defect from opposite
+directions.
+
+- **The markdown arm** — a note's `## <section>` bullet lead tokens
+  (`decl_section_bullets` for the container alone, `decl_section_tokens` for the
+  verdict). A bullet's
+  lead token is the backticked, unbolded bare gate name directly after the bullet
+  marker; a bullet shaped any other way yields *no* token rather than a stripped
+  one, which is what makes the bolded and bold-and-backticked spellings visible
+  instead of silent.
+- **The record arm** — a declaration file's data lines, one bare gate name each
+  (`decl_record_tokens`). Such a surface is deliberately markup-free, so the
+  spelling question does not arise on it at all. A missing file is the empty set
+  rather than an error: a tree that has never declared one is not thereby
+  malformed. Its reader is the untagged-`TO` resolution
+  `upgrade-smoke-note-resolution` lands in this same iteration; the arm is
+  designed here because a second statement of the token predicate over there is
+  the very defect this unit closes, one surface on.
+
+The status a caller branches on: **0** resolved, with the declared set on stdout
+(empty for an explicit `None`); **1** unparsed while not `None`, with the
+offending lines on stdout — which is empty when the section held no bullet at
+all; **2** the named section is absent. The record arm has no `None` body and so
+no status 2.
+
+The markdown arm reports the **trichotomy** the grammar defines: an explicit
+`None` body (the resolved empty set), a non-empty token list, or
+unparsed-and-not-`None`. The third arm is the one that earns the helper. A
+non-`none` section yielding zero tokens must not become "no allowed reds": on a
+green battery that passes silently over a note naming several gates, and on a red
+one it fails *loudly with a false message*, accusing the note of an omission it
+did not make. The assertion is not leniently disarmed there — it is severed from
+the artifact it claims to read. So the helper refuses, and the refusal is what
+closes the class permanently: no future markup variant can disarm the assertion,
+only red it.
+
+Callers, all three named: `bin/upgrade-smoke.sh` at its declaration-resolve step
+reads the note through the markdown arm (§upgrade-smoke); this repo's
+`check-tightened-gates-grammar` uses that arm's verdict at each note it walks; and
+`scripts/check-release-bump.sh` uses the markdown arm's *container* alone,
+counting bullets across all three of the note's fixed sections. That third caller
+is why the container and the token predicate are separable rather than one pass:
+Behavior-changes lead tokens are legitimately prose phrases, so the bump
+derivation needs the bullets without the token predicate. Before this helper the
+container was stated three times and two of the statements already disagreed —
+`section_bullets` matched `- ` at column zero where the smoke matched an
+optionally-indented `-` or `*` — so the section a bump was derived from and the
+section an allowed-red set was parsed from were not guaranteed to be the same
+section. A sourced library, not a gate, so it owes no `good/`+`bad/` pair; its
+runtime lock-in is `gate-tests/lib-declaration.test.sh`, direct because the
+record arm has no caller fixture to ride. Its caller is a `bin/` tool that
+forgoes a pair by contract — so a corpus fixture would leave the arm the
+standing pre-release assertion depends on entirely unexercised.
+
+The helper carries no section name and no gate name of its own — both are the
+caller's arguments, and it takes no configuration. That is where the seam falls:
+the parsing is kit mechanism, the parsed content is the consumer's.
+
 ### lib/test-hermetic.sh
 
 The bespoke-test hermeticity bootstrap, sourced as the first act of every
@@ -677,8 +740,7 @@ regenerates the generated artifacts — the contract's consumer phase-A steps
 consumer's `git status` shows changes only under the kit roots and the two
 regenerated artifacts — the pre-commit hook and the graph) and then, over the
 phase-B battery, that the **red set is a subset of TO's tightened-gates
-declaration** — the `docs/posts/` note whose front-matter `release:` names TO's
-version, parsed for the bullet lead tokens docs/install.md owns. A new N+1 gate
+declaration**. A new N+1 gate
 is *not* in this consumer's `gates.list` (the phase-A sync never re-runs the
 installer, so it does not run in phase B); the smoke asserts the declaration's
 sufficiency for the gates that *do* run, and the upgrade skill
@@ -686,9 +748,11 @@ sufficiency for the gates that *do* run, and the upgrade skill
 new ones. When TO is unreleased — the `HEAD` default resolving no version — no
 note names it and the red set must be empty: every run is then the standing
 pre-release assertion that the working tree upgrades cleanly from the last tag. A
-red gate absent from the declaration, or a missing/unparseable note while reds
-exist, is a fail (exit 1); usage/environment failure is exit 2 (the gate exit
-convention). A `bin/` tool, not a gate — no `good/`+`bad/` fixture pair is owed;
+red gate absent from the declaration, or a missing note while reds exist, is a
+fail (exit 1); usage/environment failure is exit 2 (the gate exit
+convention). A declaration that does not parse is a fail too, and takes exit 1
+for the same reason: it is a contract violation rather than a broken environment.
+A `bin/` tool, not a gate — no `good/`+`bad/` fixture pair is owed;
 the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
 evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
 scratch (accepted as validate-stage cost, never pre-commit).
@@ -714,7 +778,8 @@ emitted by the script itself, so the zero-config run works here) and read only
 at the resolve step. The tightened-gates declaration is produced by the release
 session (RELEASING.md) and consumed here (the allowed-red-set parse) and by the
 upgrade skill (the consumer checklist); its grammar owner is docs/install.md
-§The upgrade contract.
+§The upgrade contract, its implementation §lib/declaration.sh, and this repo
+holds the corpus to it with `check-tightened-gates-grammar`.
 
 ### gen-pre-commit
 

@@ -15,7 +15,7 @@ release's one allowed red.
 
 ## Tightened gates
 
-- **check-smoke-entry-guard** — new gate. Every `smoke/install.sh` and
+- `check-smoke-entry-guard` — new gate. Every `smoke/install.sh` and
   `smoke/violation.sh` that mutates the invoking tree must open with the
   entry-point guard `: "${SMOKE_KIT_ROOT:?…}"` before its first mutating
   command, so a bare invocation outside `run-consumer-smoke.sh` refuses instead

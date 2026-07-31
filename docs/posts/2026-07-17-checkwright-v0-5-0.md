@@ -15,7 +15,7 @@ names it.
 
 ## Tightened gates
 
-- **check-merge-attrs** — now also asserts forward-only union parity: the
+- `check-merge-attrs` — now also asserts forward-only union parity: the
   lifecycle gap inbox (`LIFECYCLE_KIT_GAP_INBOX_FILE`, default
   `.workflow/gap-inbox.md`) must carry a `merge=union` line in `.gitattributes`,
   so a gap filed on either side of a concurrent merge is never silently dropped.

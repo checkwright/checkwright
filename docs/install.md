@@ -397,15 +397,33 @@ its note — and three sections under fixed names:
 - **Tightened gates** — one bullet per gate that landed new or got stricter, the
   gate name the bullet's lead token. A mechanical consumer reads these lead
   tokens as the release's allowed-red set: the gates a clean upgrade may turn
-  red, each named here with the intent behind the move.
+  red, each named here with the intent behind the move. The token has one
+  canonical spelling. It is a **backticked, unbolded** bare gate name, directly
+  after the bullet marker (``- `check-foo` ``, then the prose). Backticks because
+  the token is a code identifier and this tree spells identifiers in backticks;
+  unbolded because bold is a rendering choice carrying no semantics, and it
+  collides with the one token a machine reads. So the section resolves to an
+  explicit empty set (a "None" body) or to a non-empty token set. Nothing else.
+  A non-"None" section that yields no token is a **defect in the release** rather
+  than a declaration of nothing: the parse would otherwise compile a note naming
+  several gates into an empty allowed-red set, passing vacuously on a green
+  battery and failing with a false message on a red one.
+  `check-tightened-gates-grammar` (this repo's `scripts/`) holds that over the
+  whole corpus, with no version cutoff — `GATE_SDK_UPGRADE_FROM` and
+  `GATE_SDK_UPGRADE_TO` make any historical pair a supported run, so any note may
+  be the one the smoke resolves. Registry membership is deliberately not
+  asserted. A gate renamed or retired since a note shipped would make membership
+  false about history without the record being wrong.
 - **Renamed knobs** — one bullet per rename, `old → new`; a knob *removal* is
   the same residue class (own-config orphaned) and is expressed `old → ∅`.
 - **Behavior changes** — one bullet per shipped change that alters what the kits
   *do* without landing or tightening a battery gate: a fail-closed convergence
   in a shared library, a runner's semantics, a skill or template behavior, a
   default's effect. The bullet's lead token is the changed surface's name (the
-  script, knob, template, or file), bolded like the other sections' lead tokens;
-  the rest states what moved and what, if anything, the consumer reconciles.
+  script, knob, template, or file), bolded; the rest states what moved and what,
+  if anything, the consumer reconciles. This section keeps its own spelling — its
+  lead tokens are legitimately prose phrases rather than identifiers, so the
+  Tightened-gates rule above does not reach it.
 
 "None" is a valid body for any of the three sections and must be stated, not
 omitted — a release that tightens nothing, renames nothing, and changes no

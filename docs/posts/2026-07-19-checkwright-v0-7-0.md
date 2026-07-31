@@ -17,7 +17,7 @@ now enforces the pin.
 
 ## Tightened gates
 
-- **check-test-hermetic** — gains assertion B: a credential-managing smoke
+- `check-test-hermetic` — gains assertion B: a credential-managing smoke
   script (one that assigns a `*_CRED_FILE`) must pin *every* own-kit bin call
   to a `*_CRED_FILE` path on the invocation line, or carry the existing
   `# hermetic-exempt: <reason>` valve. The trigger is the script's own

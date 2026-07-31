@@ -65,8 +65,9 @@ carrying all three of those. So it is **not** the second consumer that
 its place at a second consumer and there is none", and the matching `# spec:`
 comment at the extractor itself, stay true and are not edited by this unit.
 Stated because the opposite reading is the natural one, and because
-`SPEC-release-note-lead-token-grammar.md` invokes the *same* standing rule in the
-same iteration and does satisfy it — the two units meet that rule with opposite
+`release-note-lead-token-grammar` invoked the *same* standing rule earlier in the
+same iteration and did satisfy it, landing gate-sdk/SPEC.md §lib/declaration.sh —
+the two units meet that rule with opposite
 answers, and only the difference in what is being extracted decides it.
 
 The detector, over each `run:` body in the job:
@@ -180,7 +181,9 @@ pass, on two different arms, so the gate ships with no repair worklist and the
 two live arms each have a real in-tree witness beside their fixture one.
 
 This iteration's release note carries a Tightened-gates bullet for the new gate,
-spelled per `SPEC-release-note-lead-token-grammar.md`. Note that a new gate does
+spelled per docs/install.md §The upgrade contract's canonical spelling (a
+backticked, unbolded bare gate name), now held by
+`check-tightened-gates-grammar`. Note that a new gate does
 not red the upgrade smoke's phase B — §upgrade-smoke states that an N+1 gate is
 absent from the scratch consumer's `gates.list` because phase A never re-runs the
 installer — so the bullet is owed to the human upgrader, not to the smoke.
@@ -250,8 +253,8 @@ than configured into the kit.
   `# spec:` comment on the extractor itself — deliberately unchanged.** Both say
   a `lib/` helper earns its place at a second consumer and there is none; delta 2
   establishes that this gate is not that consumer, so both stay true. Named here
-  because the natural reading is the opposite one, and because a build session
-  landing `SPEC-release-note-lead-token-grammar.md` in the same iteration edits
+  because the natural reading is the opposite one, and because the build session
+  that landed `release-note-lead-token-grammar` earlier in this iteration edited
   that rule's *other* instance. Editing them on this unit's authority is the
   error; if a build session finds a design in which this gate does consume that
   extractor, that is an escalation rather than an edit.

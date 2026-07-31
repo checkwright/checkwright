@@ -53,8 +53,8 @@ contract — the same rule every tracked member here already follows
 
 Data lines are **one bare gate name each**, and nothing else: no markup, no
 prose, no ordering significance. The token predicate that decides what a bare
-gate name is belongs to `SPEC-release-note-lead-token-grammar.md`'s helper, not
-to this delta — see delta 2.
+gate name is belongs to the helper `release-note-lead-token-grammar` landed,
+gate-sdk/SPEC.md §lib/declaration.sh, not to this delta — see delta 2.
 
 The file always exists, header-only when the declared set is empty, so "absent"
 is never a state the reader has to interpret. **Draining it therefore truncates
@@ -86,7 +86,8 @@ usage/environment failure is exit 2. A malformed declaration is a contract
 violation, not a broken environment.
 
 **The token predicate is not this unit's to implement.**
-`SPEC-release-note-lead-token-grammar.md` delta 3 designs one helper carrying two
+`release-note-lead-token-grammar` landed one helper (gate-sdk/SPEC.md
+§lib/declaration.sh) carrying two
 *container* arms — a markdown section's bullet lead tokens, and this file's data
 lines — over one token predicate, and it names this surface as its second arm.
 So this delta supplies the container (a record file's data lines) and consumes
@@ -255,7 +256,7 @@ carries a consumer's roster.
   two-arm resolution and the exit-1 convention for a malformed declaration
   (delta 2). This is also the section the declaration surface's `# contract: `
   header points at (delta 1), and the section
-  `SPEC-release-note-lead-token-grammar.md` amends in the same iteration.
+  `release-note-lead-token-grammar` amended earlier in the same iteration.
 - **gate-sdk/SPEC.md §The workflow directory** — the new tracked member joins the
   checked-projection tier (delta 1).
 - **docs/install.md §The upgrade contract** — the Tightened-gates paragraph
@@ -275,8 +276,8 @@ carries a consumer's roster.
 - **`lifecycle-kit/templates/stages/build.md`** — the append step (delta 3).
 - **`gate-sdk/bin/upgrade-smoke.sh`** — the `# spec:` line at the
   declaration-resolve step (delta 4), alongside the resolution itself (delta 2).
-  `SPEC-release-note-lead-token-grammar.md` edits the same step in the same
-  iteration; delta 2 owns the ordering.
+  `release-note-lead-token-grammar` edited the same step earlier in the same
+  iteration; delta 2 owns the ordering, and that unit landed first as it required.
 - **`.workflow/validate-baseline.txt`** — the `upgrade` row (delta 6).
 - **CLAUDE.md §Housekeeping — deliberately unchanged.** Its statement that the
   release runbook is resident only at close's release step stays true under delta

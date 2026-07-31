@@ -35,24 +35,6 @@
   the ruling to author the release note; promoted from the gap inbox the same day;
   amendment authored 2026-07-31 at spec.
 
-- **release-note-lead-token-grammar** [spec: SPEC-release-note-lead-token-grammar.md]
-  — the release note's Tightened-gates lead-token grammar and the parser
-  consuming it disagree, so a bolded declaration compiles to an empty allowed-red
-  set without saying so. `docs/install.md` prescribes the one spelling the
-  `upgrade-smoke.sh` parser cannot read, and 12 of the 22 non-`none` bullets in
-  the shipped corpus parse to nothing.
-  **Deliverable:** one canonical spelling held by a gate rather than by
-  convention, one implementation of the grammar behind two callers, a parser that
-  refuses a silently-empty declaration, and the shipped corpus repaired to it.
-  The rule and the repair are scoped to **Tightened gates** — the neighbouring
-  Behavior-changes bullets legitimately carry prose lead tokens a corpus-wide
-  sweep would wrongly normalize. Design, the seam ruling, the post-immutability
-  ruling, and the ruled-out parser-widening alternative:
-  SPEC-release-note-lead-token-grammar.md.
-  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while checking
-  which bullet form the smoke actually parses; promoted from the gap inbox the
-  same day; amendment authored 2026-07-31 at spec.
-
 - **action-gh-repo-context** [spec: SPEC-action-gh-repo-context.md] — a workflow
   job that invokes `gh` while carrying neither a checkout nor a repo-context env
   cannot resolve a target repository, and nothing catches it until a tag fires.
@@ -1790,5 +1772,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- release-note-lead-token-grammar
 
 ## Lessons Learned

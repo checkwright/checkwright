@@ -7,6 +7,8 @@ SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SDK/lib/gate.sh"
 # shellcheck source=../lib/consumer-smoke.sh
 source "$SDK/lib/consumer-smoke.sh"
+# shellcheck source=../lib/declaration.sh
+source "$SDK/lib/declaration.sh"
 
 # spec: gate-sdk/SPEC.md §upgrade-smoke — resolve the source repo, FROM, and TO (each knob read exactly here)
 REPO="${GATE_SDK_UPGRADE_REPO:-$(git -C "$SDK" rev-parse --show-toplevel 2>/dev/null)}"
@@ -109,25 +111,35 @@ fi
 git -C "$CONS" -c user.email=smoke@example.invalid -c user.name=smoke \
     commit -q --no-verify --allow-empty -m "phase A: kits at $TO"
 
-# spec: gate-sdk/SPEC.md §upgrade-smoke — step 3: the red set must be a subset of TO's tightened-gates declaration (the docs/posts note whose front-matter release: names TO's version). TO unreleased (HEAD) resolves no version → no note → the red set must be empty.
+# spec: gate-sdk/SPEC.md §upgrade-smoke — step 3: the red set must be a subset of TO's tightened-gates declaration (the docs/posts note whose front-matter release: names TO's version), its Tightened-gates lead tokens read through lib/declaration.sh — a section that resolves to neither an explicit None nor a token set is refused rather than compiled to an empty allowed-red set. TO unreleased (HEAD) resolves no version → no note → the red set must be empty.
 ver="$(git -C "$REPO" tag --points-at "$TO" --list 'v*' 2>/dev/null | head -1)"
-note=""
+
+decl_src=""; decl_out=""; decl_st=0
 if [[ -n "$ver" ]]; then
     shopt -s nullglob
     for f in "$TO_TREE"/docs/posts/*.md; do
-        if grep -qE "^release:[[:space:]]+${ver}[[:space:]]*\$" "$f"; then note="$f"; break; fi
+        if grep -qE "^release:[[:space:]]+${ver}[[:space:]]*\$" "$f"; then decl_src="$f"; break; fi
     done
     shopt -u nullglob
+    if [[ -n "$decl_src" ]]; then
+        decl_out="$(decl_section_tokens "$decl_src" "Tightened gates")"; decl_st=$?
+    fi
+fi
+
+if [[ "$decl_st" -eq 2 ]]; then
+    echo "upgrade-smoke: FAIL — TO ($ver) resolves note $decl_src, which carries no 'Tightened gates' section:" >&2
+    echo "  every release note carries all three fixed sections (docs/install.md §The upgrade contract)." >&2
+    exit 1
+fi
+if [[ "$decl_st" -ne 0 ]]; then
+    echo "upgrade-smoke: FAIL — TO (${ver:-$TO})'s tightened-gates declaration does not parse, so it would resolve to a silently empty allowed-red set — $decl_src:" >&2
+    [[ -n "$decl_out" ]] && printf '  %s\n' "$decl_out" >&2
+    echo "  a declaration is either an explicit 'None' or a non-empty set of bare gate names; in a note each is the backticked, unbolded lead token of a bullet (docs/install.md §The upgrade contract)." >&2
+    exit 1
 fi
 
 allowed=()
-if [[ -n "$note" ]]; then
-    body="$(awk '/^##[[:space:]]+Tightened gates[[:space:]]*$/{f=1;next} /^##[[:space:]]/{f=0} f' "$note")"
-    if ! grep -qiE '^[[:space:]]*none\b' <<<"$body"; then
-        mapfile -t allowed < <(printf '%s\n' "$body" \
-            | sed -nE 's/^[[:space:]]*[-*][[:space:]]+`?([A-Za-z][A-Za-z0-9-]*)`?.*/\1/p' | sort -u)
-    fi
-fi
+mapfile -t allowed < <(printf '%s\n' "$decl_out" | grep -v '^[[:space:]]*$' | sort -u)
 
 out="$(run_battery)"; rc=$?
 red=()
@@ -141,7 +153,7 @@ if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
     read -r -a red <<<"${line#*FAILED: }"
 fi
 
-if [[ ${#red[@]} -gt 0 && -z "$note" ]]; then
+if [[ ${#red[@]} -gt 0 && -z "$decl_src" ]]; then
     echo "upgrade-smoke: FAIL — TO (${ver:-$TO}) reddened gate(s) but no release note declares a tightened-gates set:" >&2
     printf '  %s\n' "${red[@]}" >&2
     echo "  an unreleased TO must upgrade green; a red gate needs a note bullet (docs/install.md §The upgrade contract)." >&2

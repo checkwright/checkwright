@@ -10,6 +10,8 @@ set -uo pipefail
 SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
 # shellcheck source=../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
+# shellcheck source=../gate-sdk/lib/declaration.sh
+source "$SDK/lib/declaration.sh"
 
 POSTS_DIR="${1:-docs/posts}"
 DISPOSITION_FILE="${2:-.workflow/release-disposition.txt}"
@@ -74,13 +76,13 @@ prev="$(tail -n2 <<<"$sorted" | head -n1)"
 newest_v="${newest%%$'\t'*}"; newest_f="${newest#*$'\t'}"
 prev_v="${prev%%$'\t'*}"
 
-# spec: docs/install.md §The upgrade contract — all three fixed sections must be present; non-empty = at least one bullet
+# spec: docs/install.md §The upgrade contract — all three fixed sections must be present; non-empty = at least one bullet. The container is gate-sdk/lib/declaration.sh's, shared with the upgrade smoke and check-tightened-gates-grammar so the section a bump is derived from and the section an allowed-red set is parsed from cannot diverge.
 section_bullets() {  # $1=file  $2=section name; emits the bullet count, status 1 when the section is absent
-    awk -v sec="$2" '
-        /^## / { insec = (substr($0, 4) == sec); if (insec) found = 1; next }
-        insec && /^- / { n++ }
-        END { if (!found) exit 1; print n + 0 }
-    ' "$1"
+    local out st
+    out="$(decl_section_bullets "$1" "$2")"; st=$?
+    [[ "$st" -eq 0 ]] || return 1
+    grep -c . <<<"$out"
+    return 0
 }
 tg="$(section_bullets "$newest_f" "Tightened gates")" \
     || { echo "check-release-bump: newest note $newest_f has no 'Tightened gates' section — the floor cannot be derived (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
