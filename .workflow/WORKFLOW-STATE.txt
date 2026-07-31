@@ -4,4 +4,4 @@
 
 ---
 
-— scope a97c6b5d 2026-07-31
+release-assertion-honesty scope a97c6b5d 2026-07-31

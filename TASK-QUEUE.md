@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: release-assertion-honesty
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1205,6 +1205,13 @@
   are alternatives with different failure modes. Which one preserves the
   smoke's fail-closed character is unsettled, and picking wrong converts a
   proof into a formality.
+  **Premise sharpened 2026-07-31 at scope: the present behavior is SPECIFIED,
+  not accidental.** `upgrade-smoke.sh:112` carries a `# spec:` line stating the
+  intent outright — an unreleased TO resolves no version, so no note, so the
+  red set must be empty. The fix cannot converge the script onto a contract
+  that already says otherwise; it must revise that contract and
+  `docs/install.md`'s upgrade contract with it — which makes the unit
+  **feature-shaped, not debt**, owing an amendment before it can be promoted.
   **Do not promote the baseline row on a post-tag green — verified 2026-07-31.**
   Immediately after `v0.18.0` was tagged on the iteration's final commit, the
   smoke ran clean (`red set 0 ⊆ 3 declared`) because `TO` was momentarily a
