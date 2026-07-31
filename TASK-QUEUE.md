@@ -12,49 +12,6 @@
 
 ## New Features
 
-- **templates-stages-taxonomy-realignment** [spec: SPEC-stages-taxonomy.md] — the
-  tree scatters a class the SPEC names as one. `lead.md`, `release-sweep.md`, and
-  `upgrade.md` are each classified **"boundary skill, not a stage"**
-  (lifecycle-kit/SPEC.md:1375, :1391, :1417; lead cites "the release-sweep
-  precedent" at :157), yet the layout puts two of them inside `templates/skills/`
-  beside the stages and the third alone at `templates/` root.
-  **Deliverable:** the realignment, designed in
-  lifecycle-kit/SPEC-stages-taxonomy.md — `release-sweep.md` and `upgrade.md`
-  move up beside `lead.md`, `templates/skills/` becomes `templates/stages/`, and
-  the SPEC section splits so each boundary skill gets the file-level section
-  `templates/lead.md` already models. Two adoption globs that mean something, in
-  place of today's mixed bag plus a lone root file.
-  **Not the cosmetic no-risk change this entry claimed at filing.** The
-  amendment's reader survey found two silent-degradation paths a rename alone
-  would leave: two freshness gates carry the old directory as a `trigger=` and
-  would quietly stop firing rather than redden, and `check-skill-binding` couples
-  its templates file-by-file with no kit-wide glob, so the two promoted files
-  would land covered by nothing. Both are closed in the same unit,
-  enforcement-first. The other half is already caught — `check-skill-binding`
-  stats each shim's template path, so the seven binding directives red in the
-  same commit as the move.
-  **Cost while deferred:** zero — nothing rots, no gate gaps, no drift; the
-  residue is one layout that groups by a different axis than the SPEC's stated
-  one, with the SPEC prose carrying the true taxonomy correctly meanwhile.
-  **The hold-until trigger has fired — ruled by the operator 2026-07-29 at
-  scope.** This entry rides `pre-adoption-grammar-break` beside
-  `needs-spec-tag-rename`, which breaks the adoption path on the queue-grammar
-  axis and which this entry's sibling text already nominated by slug as the
-  shared release. The deciding weight was **launch timing, not the cosmetic
-  payoff**: the declared preview channel (`preview-release-cadence`) is the next
-  roadmap rung, and a taxonomy break landing *after* it makes adopters re-bind
-  twice. Weighed and outranked: the churn objection — the rename crosses ~13 SPEC
-  cross-references, the `.claude/commands/*.md` binding shims, and README, on a
-  different surface than the queue-grammar break — which argues for two clean
-  releases and loses to the one-re-bind timing point. The shared release is a
-  **minor** on the versioning criteria cited in the sibling entry.
-  **Filing class, triaged at scope: feature.** `templates/stages/` is a new
-  directory convention on a published adoption path, and the litmus names a file
-  or directory convention explicitly.
-  Filed 2026-07-25 by operator request, from a session tracing why only
-  lifecycle-kit carries a `templates/skills/` subdirectory; amendment authored
-  2026-07-31 at spec, where the 66-reference blast radius now lives.
-
 ## Technical Debt
 
 - **queue-index-title-tag-residue** — `bin/queue-index.sh` renders every tagged
@@ -1314,5 +1271,6 @@
 - root-page-render-coverage
 - needs-spec-tag-rename
 - deferred-queue-carry-cost
+- templates-stages-taxonomy-realignment
 
 ## Lessons Learned

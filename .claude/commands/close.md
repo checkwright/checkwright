@@ -1,4 +1,4 @@
-Execute the template at lifecycle-kit/templates/skills/close.md, applying the bindings below.
+Execute the template at lifecycle-kit/templates/stages/close.md, applying the bindings below.
 
 ## Bindings
 

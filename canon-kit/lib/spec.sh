@@ -196,7 +196,7 @@ spec_amendments() { gate_find "$1" -name "$CANON_KIT_AMENDMENT_GLOB" -type f 2>/
 
 # spec: canon-kit/SPEC.md §check-spec-pointer — a prose-surface candidate joins the
 #   manifest set iff slot-free: no `*<name: …>*` binding slot (the grammar
-#   lifecycle-kit/SPEC.md §templates/skills/ owns), no `CONSUMER BINDING` header.
+#   lifecycle-kit/SPEC.md §templates/stages/ owns), no `CONSUMER BINDING` header.
 _spec_slot_free() { ! grep -qE '\*<[a-z][a-z0-9-]*:|^CONSUMER BINDING' -- "$1"; }
 
 # spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs (kit-root pruned per CANON_KIT_SCAN_KIT_ROOTS) plus README.md at any depth and CLAUDE.md; explicit globs when CANON_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change. Slot-free CANON_KIT_PROSE_SURFACE_GLOBS candidates join the set (canon-kit/SPEC.md §check-spec-pointer).

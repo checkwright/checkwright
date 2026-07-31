@@ -1,4 +1,4 @@
-Execute the template at lifecycle-kit/templates/skills/scope.md, applying the bindings below.
+Execute the template at lifecycle-kit/templates/stages/scope.md, applying the bindings below.
 
 ## Bindings
 

@@ -227,10 +227,13 @@ the iteration branch) and every merged tree passed the battery post-reconcile.
 The kit is vendored beside gate-sdk (conventionally at `lifecycle-kit/`); its
 gates are registered in the consumer's `gates.list` by name and resolve
 through gate-sdk's multi-kit path (consumer gates dir first, then each kit's
-`checks/`). Stage skills adopt `templates/skills/*.md` in one of two modes —
-copied into the consumer's agent-skill directory with each named slot
+`checks/`). The kit's markdown templates are laid out on the stage/boundary axis
+this SPEC classifies them by: `templates/*.md` is exactly the **boundary skills**
+(`lead.md`, `release-sweep.md`, `upgrade.md`), `templates/stages/*.md` exactly
+the stage-class templates. Stage skills adopt `templates/stages/*.md` in one of
+two modes — copied into the consumer's agent-skill directory with each named slot
 overwritten, or a thin binding shim that references the template (the grammar
-and the contract both modes satisfy are §templates/skills/).
+and the contract both modes satisfy are §templates/stages/).
 
 The stage machine itself is config with this repo's lifecycle as the
 default: copy `templates/lifecycle-config.sh` into the gates dir as
@@ -495,7 +498,7 @@ close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-s
 
 **Producers and consumers.** Producer: any mid-iteration session (lead or stage)
 via `bin/file-gap.sh` — the knob default makes the channel live everywhere the
-kit is vendored. Consumers: the close skill's drain step (§templates/skills/)
+kit is vendored. Consumers: the close skill's drain step (§templates/stages/)
 dispositions every bullet — promoted to a deferred `[design-pending]` entry,
 fixed inline that session, or discarded with cause in the close commit message —
 then truncates the inbox to its header; the boundary refusal reads emptiness at
@@ -766,7 +769,7 @@ so a consumer wiring its release-disposition evidence here makes the close-stage
 disposition a mechanical boundary precondition rather than a decorative stamp.
 The check is **value-agnostic by construction** — it tests the first token only
 and never parses the value field — so a disposition grammar gaining a value (as
-it did with `deferred:<version>`, §templates/skills/) needs no
+it did with `deferred:<version>`, §templates/stages/) needs no
 widening here; recorded so a future value addition does not re-derive it.
 Fail-closed: a member that does not exist on disk is a refusal naming the path. A
 never-named (`—`) closing iteration has nothing to disposition and skips the
@@ -1063,7 +1066,7 @@ stage exactly, so a waiver is never read as an audit *stamp*).
 
 Calibration: the predecessor map deliberately omits a **trigger-gated stage**
 as anyone's mandatory predecessor — the audit stage, and equally a trigger-gated
-*authoring* stage where a roster splits one out (§templates/skills/) — because
+*authoring* stage where a roster splits one out (§templates/stages/) — because
 demanding its stamp before a successor would false-fire on an iteration that
 legitimately skipped it (an amendment-free iteration runs no audit; a debt-only
 one runs no authoring stage); the build→align re-check when align *did* run is
@@ -1124,10 +1127,16 @@ template path may point at any kit). Template slots are the `*<slot-name: …>*`
 tokens; a shim's bindings are the `**slot-name** —` lead lines under
 `## Bindings`; the directive's template path resolves relative to the current
 directory (the tree root at pre-commit). A skills dir that does not exist is
-fail-closed (exit 2). The `# graph:` couples the skills dir, the lifecycle
-templates dir, and each out-of-tree bound template (e.g.
-`delegation-kit/templates/agent-execution.md`) at `tier=precommit`, so a slot
-added to a template or a binding changed in a shim fires the gate. The good/bad pair drives the unbound-slot case;
+fail-closed (exit 2). The `# graph:` couples the skills dir, the stage-template
+dir, each boundary skill (`lead.md`, `release-sweep.md`, `upgrade.md`), and each
+out-of-tree bound template (e.g. `delegation-kit/templates/agent-execution.md`)
+at `tier=precommit`, so a slot added to a template or a binding changed in a shim
+fires the gate. The boundary skills are coupled **by name** because this couple
+carries no kit-wide `templates/*.md` glob: a bindable template left off it is one
+whose edits fire nothing, and the gate stays green while the coupling is gone.
+`upgrade.md` is listed even where no consumer binds it — the entry is about the
+template's edits re-triggering the gate, and a consumer that does bind it
+inherits the manifest. The good/bad pair drives the unbound-slot case;
 `gate-tests/check-skill-binding.test.sh` covers the orphan-binding,
 missing-template, and skip (no-directive / no-slots) cases the one pair cannot.
 
@@ -1157,10 +1166,11 @@ gate and is still a defect to fix on sight (the same doctrine as
 check-comment-tier's floor). The `# graph:` couples the skills dir, `CLAUDE.md`,
 and the kit template dirs at `tier=precommit`, so editing a shim or a corpus
 surface fires the gate. Because the corpus find recurses but the `kit:templates/*.md`
-couple does not, the one kit template *sub*directory that holds bound
-templates — `lifecycle-kit/templates/skills/*.md` (the stage-skill templates each
-stage shim binds) — is coupled explicitly beside it; a shim's own template is its
-likeliest collision surface, so it must re-trigger the gate. A red run names the
+couple does not, the one kit template *sub*directory it misses —
+`lifecycle-kit/templates/stages/*.md`, the stage-skill templates each stage shim
+binds — is coupled explicitly beside it; a shim's own template is its likeliest
+collision surface, so it must re-trigger the gate. The boundary skills need no
+such entry: they sit at `templates/` root, already inside the plain couple. A red run names the
 shim, the corpus surface, and the shared n-gram, so the fix (delete the
 restatement, keep a citation) is mechanical. The good/bad pair drives the plain restatement/clean split;
 `gate-tests/check-shim-restatement.test.sh` covers the no-directive skip, the
@@ -1238,7 +1248,7 @@ a reshaped `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` in the consumer config is backstopp
 by the whole-tree `run-gates.sh` battery (the `check-stage-skill-coverage`
 precedent).
 
-### templates/skills/
+### templates/stages/
 
 The stage-skill templates (`scope`/`align`/`build`/`validate`/`close`) carry
 the generic stage spine — the stamp first step (performed by invoking
@@ -1266,6 +1276,11 @@ The generic authoring how-to `spec.md` single-sources — causal completeness an
 canon-kit's bidirectional queue pairing — is the content `scope`'s conditional
 authoring step points at, so a default-roster `scope` that still authors reads it
 there.
+
+The directory holds the **stage-class** template set, not any one consumer's
+roster: it ships six templates while `LIFECYCLE_KIT_STAGES` defaults to five,
+because `spec.md` serves the split-authoring roster alone. Nothing derives a
+roster from this listing — the glob buys a legible layout, not a derivation.
 
 A consumer skill adopts a template in one of two modes; either way the executed
 skill states in one line what the stamp step does and supplies every
@@ -1377,10 +1392,13 @@ disposition line's mechanical reader is `enter-stage.sh`'s boundary require-chec
 (§bin/enter-stage.sh, `LIFECYCLE_KIT_BOUNDARY_REQUIRE`) when a consumer wires the
 file into that knob.
 
-Beside the stage skills sits `release-sweep.md` — a **boundary skill**, not a
-stage: it invokes no `enter-stage.sh` and stamps no state, so
-`check-stage-skill-coverage` never reads it (it governs only the configured
-stage set). It is the deprecation disposition walk at a major — invoked from
+### templates/release-sweep.md
+
+A **boundary skill**, not a stage — which is why it sits at `templates/` root
+beside `lead.md` rather than among the stage templates: it invokes no
+`enter-stage.sh` and stamps no state, so `check-stage-skill-coverage` never reads
+it (it governs only the configured stage set). It is the deprecation disposition
+walk at a major — invoked from
 close's release-disposition step when the derived bump is a major — forcing every
 marker on the `CANON_KIT_DEPRECATION_MARKERS` roster to a stamped disposition —
 decommission, carry-forward, or un-deprecate — the `check-lesson-disposition`
@@ -1388,14 +1406,16 @@ contract shape at a release boundary. canon-kit's `check-deprecation-task` holds
 each marker bound to a live task between majors; this sweep forces the standing
 inventory to a decision at the boundary the deprecations were promised against.
 It carries **named slots** (`inventory-command`, `evidence-gate`), so like the
-stage skills it adopts the binding-shim grammar (§templates/skills/) and
+stage skills it adopts the binding-shim grammar (§templates/stages/) and
 `check-skill-binding` holds the slot pairing; the stamp file is operator
 evidence riding the release commit — the kit wires no gate over it (a consumer
 may, through `evidence-gate`).
 
-Beside it sits `upgrade.md` — another **boundary skill**, not a stage: it
-invokes no `enter-stage.sh` and stamps no state, so `check-stage-skill-coverage`
-never reads it. It is the phase-B disposition walk a consumer runs when moving
+### templates/upgrade.md
+
+`upgrade.md` is a **boundary skill** too, at `templates/` root rather than among
+the stage templates: it invokes no `enter-stage.sh` and stamps no state, so
+`check-stage-skill-coverage` never reads it. It is the phase-B disposition walk a consumer runs when moving
 their vendored kits from one release to the next — the judgment half of the
 two-phase upgrade contract whose deterministic half (the wholesale kit-sync) and
 whose executable proof both live in gate-sdk (gate-sdk/SPEC.md §upgrade-smoke),
@@ -1408,7 +1428,7 @@ cadence at which a consumer judges the ungateable third of a template-slot chang
 — the shim fill that clears both `check-skill-binding` (slot-set drift) and
 `check-shim-restatement` (verbatim copy) yet duplicates what the new slot now
 means to own. It carries named slots (`gates-list`, `disposition-evidence`), so
-like the stage skills it adopts the binding-shim grammar (§templates/skills/) and
+like the stage skills it adopts the binding-shim grammar (§templates/stages/) and
 `check-skill-binding` holds the slot pairing when a consumer binds it. This repo
 binds no command for it — the repo is the kit source, never a vendored consumer,
 so it never upgrades itself; the template ships for consumers and the upgrade
@@ -1422,7 +1442,7 @@ restart-cost of a stage that would otherwise stop and surface to the user cold
 (§The state machine). Like `release-sweep.md` it is a **boundary skill, not a
 stage**: it invokes no `enter-stage.sh` and joins no stage set, so
 `check-stage-skill-coverage` never reads it. Like release-sweep it carries
-named slots, so it adopts the binding-shim grammar (§templates/skills/) — a
+named slots, so it adopts the binding-shim grammar (§templates/stages/) — a
 consumer copies-and-specializes it or binds it through a thin shim, and
 `check-skill-binding` holds the slot pairing either way (this repo's
 `.claude/commands/lead.md` shim).

@@ -374,7 +374,7 @@ same shapes:
   members read one identical set. The finder then folds in each
   `CANON_KIT_PROSE_SURFACE_GLOBS` candidate that is **slot-free**: it bears no
   lifecycle-kit binding slot (`*<name: …>*`, slot-name `[a-z][a-z0-9-]*` — the
-  grammar lifecycle-kit/SPEC.md §templates/skills/ owns) and no
+  grammar lifecycle-kit/SPEC.md §templates/stages/ owns) and no
   `CONSUMER BINDING` header. A slot-bearing candidate is silently excluded — a template still
   awaiting binding is a placeholder, not finished prose, and its coverage stays
   the shim/binding gates (§Layout and configuration states the knob). The

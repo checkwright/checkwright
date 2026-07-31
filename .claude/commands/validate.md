@@ -1,4 +1,4 @@
-Execute the template at lifecycle-kit/templates/skills/validate.md, applying the bindings below.
+Execute the template at lifecycle-kit/templates/stages/validate.md, applying the bindings below.
 
 ## Bindings
 

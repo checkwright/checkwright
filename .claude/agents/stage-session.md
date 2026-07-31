@@ -13,7 +13,7 @@ lead stamps nothing; you are the only writer of lifecycle state
 ## Ruling classes — what to escalate, what to decide alone
 
 Your stage skill already carries a build-time question triage (for the build
-stage, lifecycle-kit/templates/skills/build.md §Session ritual). Under a live
+stage, lifecycle-kit/templates/stages/build.md §Session ritual). Under a live
 lead, one branch of that triage changes destination: a question you would
 otherwise **stop and surface to the user** you instead **escalate to the
 lead** — every other branch is unchanged.

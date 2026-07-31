@@ -686,7 +686,7 @@ version, parsed for the bullet lead tokens docs/install.md owns. A new N+1 gate
 is *not* in this consumer's `gates.list` (the phase-A sync never re-runs the
 installer, so it does not run in phase B); the smoke asserts the declaration's
 sufficiency for the gates that *do* run, and the upgrade skill
-(lifecycle-kit/SPEC.md §templates/skills/) is the executor that registers the
+(lifecycle-kit/SPEC.md §templates/upgrade.md) is the executor that registers the
 new ones. When TO is unreleased — the `HEAD` default resolving no version — no
 note names it and the red set must be empty: every run is then the standing
 pre-release assertion that the working tree upgrades cleanly from the last tag. A

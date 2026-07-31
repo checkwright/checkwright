@@ -24,7 +24,7 @@ for f in "$POSTS_DIR"/*.md; do
 done
 shopt -u nullglob
 
-# spec: lifecycle-kit/SPEC.md §templates/skills/ — history ∪ live, the reader every
+# spec: lifecycle-kit/SPEC.md §templates/stages/ — history ∪ live, the reader every
 # truncated evidence file needs.
 collect_dispositions() {
     git log --reverse --format='%H' -p -U0 -- "$DISPOSITION_FILE" 2>/dev/null \
@@ -33,7 +33,7 @@ collect_dispositions() {
     return 0
 }
 
-# spec: lifecycle-kit/SPEC.md §templates/skills/ — a deferral is outstanding
+# spec: lifecycle-kit/SPEC.md §templates/stages/ — a deferral is outstanding
 # until a disposition line releases at or above its version; nothing tracks discharge.
 deferred=(); released=()
 while read -r _iter _kw value _rest; do

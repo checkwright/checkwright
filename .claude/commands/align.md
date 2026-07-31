@@ -1,4 +1,4 @@
-Execute the template at lifecycle-kit/templates/skills/align.md, applying the bindings below.
+Execute the template at lifecycle-kit/templates/stages/align.md, applying the bindings below.
 
 ## Bindings
 

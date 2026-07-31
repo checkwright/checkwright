@@ -70,9 +70,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
        # contract: lifecycle-kit/SPEC.md §check-lesson-disposition
 
-3. Adopt `templates/skills/*.md` in your agent-skill directory (e.g.
+3. Adopt `templates/stages/*.md` in your agent-skill directory (e.g.
    `.claude/commands/`): by default make each skill a binding shim that
-   references the template (SPEC.md §templates/skills/) — it tracks the kit, so
+   references the template (SPEC.md §templates/stages/) — it tracks the kit, so
    a re-vendor reaches it and the shim gates hold it thin. Or, as the sanctioned
    fork, copy each in and fill its named slots (`*<slot-name: …>*`) with your
    project's ritual — you then own the ritual prose, upgrades don't reach it,

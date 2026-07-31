@@ -1,7 +1,7 @@
 # Releasing Checkwright
 
 The repeatable release procedure — the **close stage's release-disposition
-step** invoked at *every* iteration close (lifecycle-kit/templates/skills/close.md;
+step** invoked at *every* iteration close (lifecycle-kit/templates/stages/close.md;
 this repo binds it in `.claude/commands/close.md`), not a separately
 operator-invoked ritual. Checkwright carries one semver line applied as git tags,
 the kits moving in lockstep — the versioning model is
@@ -75,7 +75,7 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 
 3. **Major only: sweep the deprecation markers.** When the bump is a major, run
    the release-sweep skill *before* the tag — the deprecation disposition walk at
-   the release boundary, its contract lifecycle-kit/SPEC.md §templates/skills/.
+   the release boundary, its contract lifecycle-kit/SPEC.md §templates/release-sweep.md.
    Every marker on the roster earns a stamped disposition in
    `.workflow/release-sweep-evidence.txt` before the tag; an empty roster is a
    stated "none". No marker rides into the next major undispositioned. That file

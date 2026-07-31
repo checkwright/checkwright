@@ -229,7 +229,7 @@ it and its gates hold the shim thin. Copying the template and filling its slots
 is the sanctioned fork: kept for legitimate structural divergence, but you then
 own its prose and an upgrade won't reach it. The shipping kit's SPEC owns the
 shim↔template contract — see lifecycle-kit's
-[stage-skill modes](lifecycle-kit/SPEC.md#templatesskills).
+[stage-skill modes](lifecycle-kit/SPEC.md#templatesstages).
 
 Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
 runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
@@ -304,7 +304,7 @@ The kit-injected always-loaded blocks (each kit's `<!-- kit:begin -->` /
 `<!-- kit:end -->` markers) land in whichever file `CONTEXT_KIT_SURFACES` names,
 so they inject into your agent file, not `CLAUDE.md`. The stage skills need no
 Claude shim grammar: the skill templates are plain markdown executed by path
-(`lifecycle-kit/templates/skills/*.md`), and the `.claude/` shims are one binding
+(`lifecycle-kit/templates/stages/*.md`), and the `.claude/` shims are one binding
 of that mechanism, not the mechanism itself — an `AGENTS.md` harness runs a stage
 by invoking its template directly.
 
@@ -356,7 +356,7 @@ reconcile, so the floor is read off the note rather than maintained beside it:
 The floor has a **second input**: a note also inherits the floor of any
 outstanding deferred release. When an iteration's criteria were met but the
 release was held back, its disposition line records the earned version as
-`deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/skills/), and
+`deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/stages/), and
 those criteria stay unconsumed until a release at or above that version ships.
 The next qualifying note carries them in its three sections and may not fall
 below that version — so a note's floor is the higher of what its own sections
@@ -386,7 +386,7 @@ you are current.
 Two shipped tools carry this contract. [The upgrade smoke](gate-sdk/SPEC.md#upgrade-smoke)
 is its executable proof — it drives both phases against a scratch consumer,
 asserting the phase-A sync is deterministic and the red set stays within the
-target note's declaration. [The upgrade skill](lifecycle-kit/SPEC.md#templatesskills)
+target note's declaration. [The upgrade skill](lifecycle-kit/SPEC.md#templatesupgrademd)
 is the phase-B disposition ritual a consumer runs to register the note's newly
 declared gates and disposition each red.
 

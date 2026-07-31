@@ -68,7 +68,7 @@ read -r total gate hook stage govdoc < <(
         { b = length($0); total += b }
         /PASS: check-|FAIL: check-|===== check|: clean \(|run-gate/                      { gate   += b; next }
         /<system-reminder>|PreToolUse|PostToolUse|SessionStart|bash-guard|hook error/    { hook   += b; next }
-        /lifecycle-kit\/templates\/skills|enter-stage|WORKFLOW-STATE|Execute the template at/ { stage += b; next }
+        /lifecycle-kit\/templates\/stages|enter-stage|WORKFLOW-STATE|Execute the template at/ { stage += b; next }
         /SPEC\.md|SPEC-|CLAUDE\.md|DOCTRINE\.md|BRIEF\.local/                            { govdoc += b; next }
         END { printf "%d %d %d %d %d\n", total+0, gate+0, hook+0, stage+0, govdoc+0 }
     ' "$transcript"

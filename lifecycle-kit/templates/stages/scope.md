@@ -77,7 +77,7 @@ detailed authoring how-to — causal
 completeness (every new field's producer, consumer, and named reader, surveyed
 across the whole component set) and the bidirectional queue pairing — is
 single-sourced in the authoring stage's template
-(`lifecycle-kit/templates/skills/spec.md`); a default-roster scope that authors
+(`lifecycle-kit/templates/stages/spec.md`); a default-roster scope that authors
 follows it here.
 
 A premise inherited from a queued task ("clean/mechanical", "already filed",

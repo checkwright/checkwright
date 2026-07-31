@@ -1,4 +1,4 @@
-Execute the template at lifecycle-kit/templates/skills/spec.md, applying the bindings below.
+Execute the template at lifecycle-kit/templates/stages/spec.md, applying the bindings below.
 
 ## Bindings
 
