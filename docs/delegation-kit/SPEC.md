@@ -639,6 +639,18 @@ its consumer session brief (`scripts/session-context.sh`) additionally prints
 the verdict line at SessionStart for planning-time visibility — a consumer-side
 edit; the context-kit template stays uncoupled from delegation-kit.
 
+**An `OK` verdict is a floor, not a recommendation.** The guard answers one
+question — is there headroom in the window *right now* — and blocks only on
+`PAUSE`. Everything else a dispatch decision turns on sits outside its reach:
+how long the dispatched work runs, whether it fans out beneath the checkpoint
+(the guard fires on the dispatch it gates, not on that dispatch's children),
+and whether anything forces the dispatch now rather than after the window
+resets. `OK` is therefore one input to that decision and never the decision
+itself; a dispatcher reading `OK` as "go" has substituted the guard's question
+for its own. The asymmetry is deliberate: a wrong `PAUSE` costs a delayed
+dispatch, while an `OK` that is right about headroom and silent about duration
+costs the work in flight.
+
 ## Testing
 
 `check-gate-tamper` speaks the full gate contract (`GATE-TAMPER: clean

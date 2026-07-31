@@ -1736,16 +1736,3 @@
 - queue-selection-order-implicit
 
 ## Lessons Learned
-
-- A guard's `OK` is a floor, not a recommendation — and the rule was stated this
-  iteration and then not applied to the dispatch that stated it. The budget guard
-  returned `OK` at 92% against a 95% threshold with roughly 23 minutes to the
-  five-hour reset, and the lead dispatched `close`, the longest stage in the
-  lifecycle, on that verdict. Waiting for the reset would have cost nothing:
-  no deadline forced it. The verdict was treated as the decision rather than as
-  one input to it, and the stage terminated at the wall mid-close.
-  Same shape as this iteration's earlier ruling that the upgrade smoke's
-  satisfaction is a floor and not the spec — three Tightened-gates bullets were
-  authored where the oracle demanded one, correctly. The principle was in force
-  and reached the release note; it did not reach the dispatch decision.
-  Recorded as the lead's error, not the stage session's.
