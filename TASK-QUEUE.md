@@ -1021,6 +1021,18 @@
   needs a principled trigger, and the honest outcome may be an opt-in
   `measured:`-style marker the author applies rather than a scanner that infers
   intent.
+  **Widened 2026-08-01: the surface set is not SPEC sections alone.** A third
+  instance landed in a **binding shim** — `.claude/commands/close.md`'s
+  release-policy slot said to derive the bump off the note's "two sections" and
+  called a no-bump iteration "both-None", where the cited owner fixes three; a
+  close read it against a three-section note at the moment it was deriving a
+  bump. `check-shim-restatement` cannot reach it by construction: it holds *copy
+  shape* (an n-gram shared with the corpus), and a restatement that is **wrong**
+  has diverged from its owner's wording, which is precisely what makes it not a
+  copy. So the scanner this entry designs must range over binding shims too, and
+  the instance argues for the opt-in-marker outcome over the inferring one.
+  Fixed at source by deleting the cardinal rather than correcting it, so the trap
+  is disarmed rather than re-armed.
   **Cost while deferred:** compounding and silent — this recurs at **every
   amendment that measures the tree**, the failure mode is a canonical doc
   asserting a false number, and detection is by hand at align if at all.
@@ -1646,6 +1658,12 @@
   omits them from is its generic `help:` footer, which covers manifest and
   parity reds where regeneration is not the remedy at all. So no echo line is
   missing and no gate change is owed.
+  **A second instance, found 2026-08-01 by close's brevity pass.** The
+  `ROADMAP.md` housekeeping bullet has the same shape — a prohibition (never
+  hand-edit the marker block) plus a regen command (`roadmap.sh --write`) that
+  `check-roadmap-fresh` already prints on red. It is deliberately left in place:
+  trimming it would settle this entry's open question by precedent instead of by
+  ruling. Whatever this unit decides applies to both bullets.
   **The residual question, and why it is still a unit.** The always-loaded block
   is a *forward* instruction — never hand-edit the generated hook; edit the
   manifest and regenerate — read before any red, not a recovery line read after
@@ -2011,6 +2029,44 @@
   suite reads as certified. Charged per validate run.
   Debt: a success-line change and/or a hash-input change; adds no governed name.
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's validate.
+
+- **always-loaded-brevity-reach** [design-pending] — `check-brevity` guards the
+  tidiest section of the always-loaded surface while the section that actually
+  grows is outside its reach, so the tier ratchets with no oracle. The gate's
+  target is a single named section (`CONTEXT_KIT_BREVITY_SECTION`, this repo's
+  conventions block, 17 lines); §Housekeeping is 59 of `CLAUDE.md`'s 189 lines —
+  31% of the surface — and no gate reads it. Measured at this close: the
+  always-loaded meter reads 197 lines against a committed baseline of 172,
+  **+25 (+14.5%)**, and the baseline stamp dates to `v0.8.0`, twelve releases
+  back. Every close's brevity pass is therefore the only detector, which is a
+  session's attention standing in for a gate — the shape enforcement-first exists
+  to refuse.
+  **Deliberately not reset.** Re-stamping the baseline at this close would clear
+  the drift signal by blessing the growth, which is the one thing the baseline is
+  for. It stays where it is until the ratchet is actually addressed.
+  **What this close found and left.** Four bullets carry a doc pointer and then
+  restate what is behind it — the `.tmp/`/`.metric/`/`.workflow/` bullet (13
+  lines, mostly mechanism the owning SPECs own, with only the `*.local.md` roster
+  genuinely resident-worthy), the `installer/` bullet (8 lines naming
+  `installer/README.md` as layout owner then carrying packing mechanics and a
+  scratch knob), the `demo/` bullet (compresses a `README.md` paragraph), and
+  `reserve/` (2 lines guarding a mistake no session is near). Each needs content
+  *relocated*, not merely deleted, which is unit-shaped rather than pass-shaped —
+  filed here rather than done under release pressure.
+  **Why `[design-pending]`:** pointing the gate at the whole file needs a budget
+  model it does not have. A single whole-file cap either strangles a legitimately
+  dense file or is set so loose it never fires; per-section budgets need a section
+  roster that is itself maintained. The candidate worth costing first is a
+  **ratchet** assertion rather than a cap — red when the surface grows against its
+  committed baseline without the baseline being deliberately re-stamped — which
+  needs no budget at all and makes the growth visible where it happens.
+  **Cost while deferred:** compounding directly in the tier the whole methodology
+  is trying to hold down, and paid by every session in this repo and every
+  consumer that vendors context-kit. The detector is a close-stage read, so it is
+  as reliable as the attention of whoever runs it.
+  Debt: one gate widened or one assertion added; adds one knob if a budget lands.
+  Filed 2026-08-01 by close's brevity pass, which measured the ratchet it could
+  not close.
 
 ## Icebox
 

@@ -49,8 +49,9 @@ queue-kit/SPEC.md §The tag algebra.
 **release-policy** — the procedure is RELEASING.md's reordered per-iteration
 close-stage steps; the bump criteria and the note grammar are docs/install.md
 §Versioning and §The upgrade contract (cited, never restated here). Derive the
-bump off the dated `docs/posts/` note's two sections; a qualifying iteration runs
-RELEASING.md's tag / GitHub Release / badge steps (a major runs release-sweep
-first, its boundary-only sub-procedure), a both-None iteration stamps `none`.
+bump off the dated `docs/posts/` note's fixed sections, whose roster and grammar
+that pointer owns; a qualifying iteration runs RELEASING.md's tag / GitHub
+Release / badge steps (a major runs release-sweep first, its boundary-only
+sub-procedure), an all-None iteration stamps `none`.
 Disposition evidence: `.workflow/release-disposition.txt` (committed,
 boundary-required and boundary-truncated per `scripts/lifecycle-config.sh`).

@@ -164,9 +164,11 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    site serves the bare form and 404s the slashed one. Open the link once the
    Release is published. The body lives on the host, out of the battery's reach,
    so its backstop is a monitor rather than a gate: `site-health.yml`'s
-   release-body arm asserts daily that each note's Release body carries that URL
-   and that the URL resolves, filing a `site-health` issue when it does not
-   (site-kit/SPEC.md §templates/site-health.yml). That arm's latency is exactly
+   release-body arm asserts daily that each note's Release body carries that URL,
+   and separately that every apex URL the body *actually carries* resolves —
+   two assertions over two different strings, which is exactly what catches the
+   slashed form a presence check alone lets through — filing a `site-health`
+   issue when either fails (site-kit/SPEC.md §templates/site-health.yml). That arm's latency is exactly
    why this hand-check stays — it is next-day and issue-shaped, while you are the
    only actor who can fix the body before anyone reads it. Verify by hand here;
    the arm is what catches the release where you did not.
