@@ -55,6 +55,20 @@ witness. One unprefixed call fails the arm by construction; there is no search
 for a positive example to be fooled by, and the arm costs almost nothing beyond
 the trigger that was already owed.
 
+**The scan is this gate's own, and §check-action-run-shell's extractor is not
+reusable here.** That extractor has no theory of `jobs:` at all — it tracks step
+column and block scalars per *file*, emits records carrying a block number and a
+start line but no job identity, extracts neither `uses:` nor `env:` lines, and
+rewrites `${{ … }}` before emitting. This gate needs a job-partitioned walk
+carrying all three of those. So it is **not** the second consumer that
+§check-action-run-shell's standing rule waits for: that section's "a helper earns
+its place at a second consumer and there is none", and the matching `# spec:`
+comment at the extractor itself, stay true and are not edited by this unit.
+Stated because the opposite reading is the natural one, and because
+`SPEC-release-note-lead-token-grammar.md` invokes the *same* standing rule in the
+same iteration and does satisfy it — the two units meet that rule with opposite
+answers, and only the difference in what is being extracted decides it.
+
 The detector, over each `run:` body in the job:
 
 - **Logical lines.** Backslash continuations are joined before matching, so a
@@ -96,13 +110,29 @@ The arm is deliberately the one the fixed instance used, and it is the arm that
 survives maintenance: a job-level `GH_REPO` cannot be undone by someone adding a
 new `gh` call, whereas per-call `--repo` can.
 
+**The step-level lookup is load-bearing, not completeness.** The fixed instance
+sets `GH_REPO` on the invoking step's `env:`, not at workflow or job root — so
+the one in-tree job this gate exists for passes on the *narrowest* of the three
+sub-arms. A gate implementing only the workflow- and job-level lookups would red
+`publish.yml` on day one and read as a false positive.
+
 ### Delta 5 — the valve {design-bearing}
 
-`# gh-repo-exempt: <reason>` on the job or on the step, following the kit's
-established `# <thing>-exempt: <reason>` marker shape (`# fail-closed-exempt:`,
-`# hermetic-exempt:`, `# assertion-strength-exempt:`). The reason is required and
-non-empty — a bare marker is a red, since the valve's whole value is the sentence
-saying which arm the author is standing outside of.
+`# gh-repo-exempt: <reason>` on the job or on the step, taking the kit's
+established `# <thing>-exempt:` marker shape (`# fail-closed-exempt:`,
+`# hermetic-exempt:`, `# assertion-strength-exempt:`).
+
+The reason is required and non-empty — a bare marker is a red, since the valve's
+whole value is the sentence saying which arm the author is standing outside of.
+**That requirement is a deliberate tightening, not conformance**, and saying so
+is the honest form: no sibling enforces it. `check-test-hermetic` and
+`check-assertion-strength` match their marker with the colon and read no reason;
+`check-gate-fail-closed` matches a bare `fail-closed-exempt` without even
+requiring the colon. Nor is there a shared marker parser in `lib/gate.sh` — each
+gate rolls its own, and this gate rolls a fourth. The tightening is worth its
+inconsistency here because this valve stands a job outside a *release-path*
+assertion, where an unexplained exemption is the failure mode the gate exists
+for; whether the siblings should follow is not this unit's question.
 
 ### Delta 6 — scope, and the composite-action limit {design-bearing}
 
@@ -115,19 +145,39 @@ The scan set is derived exactly as §check-action-pinning's is — a `gate_find`
 walk for `*.yml` and `*.yaml` from the scan root, with the shared prune set
 keeping it out of `gate-tests/` so the `bad/` fixture cannot red the whole-tree
 run. No roster, and **no new knob**: the scan set is derived and the prune set is
-the shared one. The Actions-shape predicate is §check-action-run-shell's.
+the shared one.
+
+The Actions-shape predicate is §check-action-run-shell's, **split rather than
+borrowed whole**. That gate asks one question, `^(jobs|runs):`, because it lints
+either shape's `run:` bodies alike. This gate needs the two arms apart: a
+`jobs:`-shaped file is the subject, a `runs:`-only file is the composite action
+skipped and counted above, and a file matching neither is outside the scan.
+Two lineages, named separately because they are separate — §check-action-pinning
+contributes the scan set and carries no Actions-shape predicate of its own
+(it walks every `*.yml`/`*.yaml` in the tree), while §check-action-run-shell
+contributes the predicate and carries no bearing on the scan set.
 
 ### Delta 7 — the landing checklist {mechanical}
 
 A `good/`+`bad/` fixture pair from `templates/check-skeleton.sh`; a `# graph:`
 manifest coupling the same YAML surfaces §check-action-pinning couples, `dir=one`
-(a one-way audit), `tier=precommit`; registration in `scripts/gates.list`; a
+(a one-way audit), `valve=none`, `tier=precommit`; registration in
+`scripts/gates.list` in the `action-` neighbourhood (the list is curated order,
+not alphabetical); a
 §check-action-gh-repo section in gate-sdk/SPEC.md placed after
 §check-action-run-shell; and the generated projections regenerated. The
 projection fan-out is owned by docs/site-architecture.md §Generated projections
 and their freshness gates together with CLAUDE.md's hook and graph regeneration
 rules — each freshness gate names its own regen command on red, so the set is
 recovered by running the battery rather than transcribed here.
+
+**The gate lands green on this tree, and the align audit is where that was
+established rather than discovered at build.** Exactly three of the tree's YAML
+files invoke `gh` in a `run:` body — `.github/workflows/publish.yml` (step-level
+`GH_REPO`), `.github/workflows/site-health.yml` and
+`site-kit/templates/site-health.yml` (both checkout-before-first-call). All three
+pass, on two different arms, so the gate ships with no repair worklist and the
+two live arms each have a real in-tree witness beside their fixture one.
 
 This iteration's release note carries a Tightened-gates bullet for the new gate,
 spelled per `SPEC-release-note-lead-token-grammar.md`. Note that a new gate does
@@ -196,6 +246,15 @@ than configured into the kit.
   surface for a semantic property ShellCheck is structurally blind to, so a
   reader arriving at the shell linter does not conclude the `run:` surface has
   one gate.
+- **gate-sdk/SPEC.md §check-action-run-shell's extractor paragraph, and the
+  `# spec:` comment on the extractor itself — deliberately unchanged.** Both say
+  a `lib/` helper earns its place at a second consumer and there is none; delta 2
+  establishes that this gate is not that consumer, so both stay true. Named here
+  because the natural reading is the opposite one, and because a build session
+  landing `SPEC-release-note-lead-token-grammar.md` in the same iteration edits
+  that rule's *other* instance. Editing them on this unit's authority is the
+  error; if a build session finds a design in which this gate does consume that
+  extractor, that is an escalation rather than an edit.
 - **`.github/workflows/publish.yml`** — the release job's `GH_REPO` comment
   (delta 9).
 - **`scripts/gates.list`** and the generated projections the new gate moves

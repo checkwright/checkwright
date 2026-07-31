@@ -6,6 +6,17 @@ set without saying so. This amendment gives the lead token one canonical
 spelling, gives the grammar one implementation, and makes a declaration that
 fails to parse loud rather than empty.
 
+**Where the disagreement actually lives, stated precisely because the delta
+depends on it.** The Tightened-gates bullet of docs/install.md §The upgrade
+contract states *no spelling at all* — only "the gate name the bullet's lead
+token". The bolding rule reaches it only by inheritance, from the
+Behavior-changes bullet's claim that its own lead tokens are "bolded like the
+other sections' lead tokens". So delta 1 is **adding** a spelling rule to a
+bullet that has none while **deleting** the cross-section claim that is the sole
+statement disagreeing with the parser. Both bullets are list items in that
+section's three-section list, not prose paragraphs — a build session told to edit
+"the Tightened-gates paragraph" will look for prose that does not exist.
+
 A **root-level amendment**: the ruling has no single owning component. The
 grammar is owned by a docs page, the parser by gate-sdk, and the corpus
 assertion by this repo's own gates.
@@ -16,7 +27,8 @@ assertion by this repo's own gates.
 
 The lead token of a **Tightened-gates** bullet is a **backticked, unbolded** bare
 gate name. docs/install.md §The upgrade contract owns that rule, stated in the
-Tightened-gates paragraph that already declares the section machine-readable.
+Tightened-gates bullet that already declares the section machine-readable ("A
+mechanical consumer reads these lead tokens as the release's allowed-red set").
 
 Backticks rather than bold because this token is a code identifier — a gate
 name — and this tree spells identifiers in backticks everywhere else. Bold is a
@@ -24,7 +36,7 @@ rendering choice carrying no semantics, and it collides with the one token a
 machine reads.
 
 **The rule reaches this section and no other, and the corpus is what decides
-that.** The Behavior-changes paragraph currently claims its lead tokens are
+that.** The Behavior-changes bullet currently claims its lead tokens are
 "bolded like the other sections' lead tokens" — a cross-section uniformity claim
 that is false about Tightened gates the moment this delta lands, so the clause is
 rewritten to stop asserting it. What replaces it is *not* the canonical spelling:
@@ -47,8 +59,22 @@ reading rather than smoke-asserted.
 ### Delta 2 — the parser refuses a silently-empty declaration {design-bearing}
 
 The failure this unit exists to kill is not the spelling. It is that a non-`none`
-Tightened-gates section yielding zero tokens becomes "no allowed reds"
-**silently**, disarming the one assertion the upgrade contract calls mechanical.
+Tightened-gates section yielding zero tokens becomes "no allowed reds" — a
+verdict the note plainly contradicts, reached without a word about it.
+
+**The harm is two-armed, and neither arm is leniency.** On a green battery the
+run passes silently, reporting `0 ⊆ 0 declared` over a note that names several
+gates. On a red one the containment check fails **loudly with a false message** —
+"gate(s) went red that TO's tightened-gates declaration does not name", about a
+declaration that names them. So the assertion is not disarmed into waving reds
+through; it is severed from the artifact it claims to read, passing vacuously or
+accusing the note of an omission the note did not make. Stated this way because
+the imprecise version ("disarmed") invites a fix aimed at strictness, and the
+defect is that the parse silently yields nothing to be strict about.
+
+The evidence is the corpus, not the argument: **7 of the 9 shipped non-`none`
+notes resolve to a fully empty allowed set today.** Only v0.2.0 and v0.18.0 parse
+at all.
 
 New invariant, independent of any spelling: a Tightened-gates section resolves to
 either an **explicit empty set** (a `None` body) or a **non-empty token set**. A
@@ -59,18 +85,53 @@ This is the arm that closes the class permanently. No future markup variant — 
 italicized token, a linked one, a prose paragraph where a bullet list belongs —
 can disarm the assertion any more; the worst it can do is red it.
 
-### Delta 3 — one implementation of the grammar, two callers {design-bearing}
+### Delta 3 — one implementation of the grammar, three callers {design-bearing}
 
 `gate-sdk/lib/` gains a helper that, given a note path and a section name,
 reports the trichotomy delta 2 defines: explicit-`None`, a lead-token list, or
-unparsed-and-not-`None`. `bin/upgrade-smoke.sh` calls it in place of its inline
-`sed` expression, and delta 4's gate is its second caller.
+unparsed-and-not-`None`. Its home is gate-sdk/SPEC.md **§Per-component
+contracts**, a new `### lib/<name>.sh` subsection beside §lib/gate.sh,
+§lib/inject.sh and §lib/test-hermetic.sh — there is no section called "the `lib/`
+roster", and that container is not exhaustive either (`lib/consumer-smoke.sh` is
+documented under §Consumer smoke instead).
 
-gate-sdk/SPEC.md §check-action-run-shell states the standing rule this satisfies:
-an inline extractor earns a `lib/` helper at a second consumer. There was none
-before; there is one now. The rule is not decoration here — this unit exists
-*because* two statements of the grammar disagreed, and landing a fix that leaves
-three statements would file the same defect forward.
+`bin/upgrade-smoke.sh` calls it in place of its inline `sed` expression, and
+delta 4's gate is its second caller.
+
+**Its third caller is `scripts/check-release-bump.sh`, and finding it is what
+corrects this delta's own count.** That gate carries `section_bullets()`, a
+private awk pass over the same three sections of the same corpus — a third
+statement of the container, under a spelling this unit did not go looking for
+because it counts bullets instead of extracting tokens. The two containers
+already **disagree**: `section_bullets` matches `/^- /` at column zero and a
+`/^## /` heading prefix, where the smoke matches `^[[:space:]]*[-*][[:space:]]+`
+and an anchored full-line heading. So the section a bump is derived from and the
+section an allowed-red set is parsed from are not, today, guaranteed to be the
+same section.
+
+It converts. Leaving it is precisely the defect this unit is closing — a fix that
+leaves three statements files the same defect forward — and delta 4 seats the new
+gate beside `check-release-bump` reading the same corpus, so a build session is
+already in that file. The conversion is **behavior-preserving on the shipped
+corpus**: `docs/posts/` carries no indented sub-bullet and no `*` bullet marker,
+so the two container predicates agree on every note that exists, and the count
+`check-release-bump` derives its bump from does not move. If a build session
+finds a note where they disagree, that is an escalation rather than a quiet
+re-derivation of a shipped bump.
+
+gate-sdk/SPEC.md §check-action-run-shell records the reasoning this follows,
+though it records it about its own extractor rather than as a repo-wide rule: a
+helper earns its place at a second consumer, and for that awk YAML extractor
+there is none. The note-section extractor now has two more, so the same reasoning
+lands on the opposite side.
+
+That reasoning is reached twice this iteration and answered oppositely, so the
+distinction is worth holding: it fires here, and it does **not** fire for
+`SPEC-action-gh-repo-context.md`, whose gate needs a job-partitioned walk that
+§check-action-run-shell's `run:`-body extractor cannot supply. That amendment's
+delta 2 owns the argument; **neither unit edits the other's instance**, and
+§check-action-run-shell's own "there is none" sentence and its mirrored `# spec:`
+comment stay true and untouched.
 
 **Two container arms, one token predicate.**
 `SPEC-upgrade-smoke-note-resolution.md` adds a second surface the same allowed-red
@@ -148,7 +209,12 @@ repair in the class the rule already admits.
 **The governance sentence is deliberately not amended.** Widening
 §Page-authoring rules to name machine-read elements generally was offered and
 declined, so the carve-out stays stated as it is and this reading stays local to
-this amendment. The consequence is recorded honestly: the tension between
+this amendment. Its exact words are narrower than the reading above needs, and
+that is the honest statement of the gap rather than an argument against it:
+"dated `docs/posts/` are immutable, temporal-exempt but still
+link/command-resolved (`scripts/canon-config.sh`)" — the parenthetical anchors
+"link/command-resolved" to what canon-kit's resolvers actually check, which does
+not include a lead token. The consequence is recorded honestly: the tension between
 docs/install.md declaring the section machine-readable and
 docs/site-architecture.md calling the posts immutable remains unrecorded on
 either governed surface, and is filed rather than resolved here.
@@ -170,11 +236,18 @@ unit's deliverable outright.
   helper as its implementation, and by the delta-4 gate as its predicate. One
   statement, three readers, which is the condition that was violated.
 - **The helper's trichotomy verdict** — produced by the `gate-sdk/lib/` helper.
-  Consumed at two named transitions: by `bin/upgrade-smoke.sh` at its
+  Consumed at three named transitions: by `bin/upgrade-smoke.sh` at its
   declaration-resolve step (for the containment assertion and delta 2's refusal),
-  and by the delta-4 gate at each note it walks. Both readers named; neither
-  verdict arm is unread — `None` drives the empty allowed set, a token list
-  drives the containment subset check, and the unparsed arm drives the refusal.
+  by the delta-4 gate at each note it walks, and by
+  `scripts/check-release-bump.sh` where `section_bullets` counts today. All three
+  readers named; neither verdict arm is unread — `None` drives the empty allowed
+  set and a zero count, a token list drives the containment subset check and the
+  bump derivation, and the unparsed arm drives the refusal.
+- **The helper's second container arm** — the record-file arm, produced for
+  `SPEC-upgrade-smoke-note-resolution.md` delta 1's declaration surface and
+  consumed by `bin/upgrade-smoke.sh`'s untagged arm. That amendment's delta 2
+  states it consumes this predicate rather than restating one, so the arm has a
+  named reader outside this unit.
 - **The new gate's verdict** — produced by the gate under the battery; consumed
   by the committing author through the generated pre-commit hook and by CI's
   required check. Its `# graph:` manifest is consumed by `gen-pre-commit.sh` and
@@ -191,22 +264,38 @@ unit's deliverable outright.
   gaining a spelling rule of its own (delta 1).
 - **gate-sdk/SPEC.md §upgrade-smoke** — the sentence describing the note as
   "parsed for the bullet lead tokens docs/install.md owns" gains the helper and
-  the refusal (deltas 2-3).
-- **gate-sdk/SPEC.md, the `lib/` roster** — the new helper's contract, including
-  its two container arms over one token predicate (delta 3).
-- **docs/site-architecture.md §Page-authoring rules — deliberately unchanged.**
-  Widening its immutability carve-out was offered and declined; the repair
-  proceeds on the rule as written. Named here so a build session does not amend
-  the governance surface on this amendment's authority.
-- **`scripts/gates.list`** and the generated projections the new gate moves —
-  each freshness gate names its own regen command on red, and the fan-out is
-  owned by docs/site-architecture.md §Generated projections and their freshness
-  gates.
-- **RELEASING.md §The procedure step 1 — deliberately unchanged.** It already
-  cites docs/install.md as the grammar's owner and must keep citing rather than
-  restate the canonical spelling; a second statement of the grammar in the
-  runbook is the defect this unit is closing, one surface over. Named here so the
-  build session does not helpfully add one.
+  the refusal (deltas 2-3). `SPEC-upgrade-smoke-note-resolution.md` amends this
+  same section and the same declaration-resolve step of the same script, and its
+  delta 2 states the ordering that binds both: **this unit lands first**, and the
+  declaration surface's data-line parse is written against this helper. Landing
+  the other first means writing a parse that is then replaced.
+- **gate-sdk/SPEC.md §Per-component contracts** — a new `### lib/<name>.sh`
+  subsection carrying the helper's contract, including its two container arms
+  over one token predicate (delta 3). Not "the `lib/` roster" — no such section
+  exists.
+- **`scripts/check-release-bump.sh`** — `section_bullets` converts to the helper
+  (delta 3), retiring the third container statement and the disagreement between
+  its bullet predicate and the smoke's.
+- **`docs/gate-sdk/SPEC.md`** — a generated mirror, so every gate-sdk/SPEC.md
+  edit above moves it; `check-docs-mirror-fresh` names its own regen command on
+  red, which is how the set is recovered rather than transcribed.
+- **docs/site-architecture.md §Page-authoring rules — deliberately unchanged
+  (delta 5, via the immutability ruling).** Widening its immutability carve-out
+  was offered and declined; the repair proceeds on the rule as written. Named
+  here so a build session does not amend the governance surface on this
+  amendment's authority.
+- **`scripts/gates.list`** and the generated projections the new gate moves
+  (delta 4) — each freshness gate names its own regen command on red, and the
+  fan-out is owned by docs/site-architecture.md §Generated projections and their
+  freshness gates.
+- **RELEASING.md §The procedure step 1 — deliberately unchanged (delta 1).** It
+  already cites docs/install.md as the grammar's owner and must keep citing
+  rather than restate the canonical spelling; a second statement of the grammar
+  in the runbook is the defect this unit is closing, one surface over. Named here
+  so the build session does not helpfully add one. Note that
+  `SPEC-upgrade-smoke-note-resolution.md` *does* amend that step, for its own
+  delta 3 — composing the section from the declaration surface, which changes the
+  section's source without restating its grammar.
 
 ## Definition of Done
 

@@ -35,13 +35,34 @@ workflow directory (gate-sdk/SPEC.md §The workflow directory).
 
 The extension is determined rather than chosen — a record file with a stated line
 grammar that a tool parses field-wise is `.txt` by that section's extension rule.
+That determination is itself the audit `.workflow/audit-roster.txt`'s
+`workflow-surface-extension` class calls for at any workflow-directory addition,
+a class standing at `last: never`; close stamps the roster, and this paragraph is
+the audit it stamps rather than a fresh one close must re-derive.
+
 Its first line is the `# contract: ` pointer header the tracked tier requires,
-naming this amendment's merged home and the line grammar. Data lines are **one
-bare gate name each**, and nothing else: no markup, no prose, no ordering
-significance.
+pointing at **gate-sdk/SPEC.md §upgrade-smoke** with the line grammar on the
+em-dash tail. That target is named rather than left to build: this amendment
+merges into three homes, `check-spec-pointer` resolves whichever one is picked,
+so the choice is a coin-flip unless ruled. §upgrade-smoke is where deltas 2 and 4
+land the two-arm resolution, which makes it the section stating the file's
+contract — the same rule every tracked member here already follows
+(`release-sweep-evidence.txt` → RELEASING.md §The procedure, `validate-baseline.txt`
+→ evidence-kit/SPEC.md §Baseline manifest, `gap-inbox.md` → lifecycle-kit/SPEC.md
+§The committed gap inbox).
+
+Data lines are **one bare gate name each**, and nothing else: no markup, no
+prose, no ordering significance. The token predicate that decides what a bare
+gate name is belongs to `SPEC-release-note-lead-token-grammar.md`'s helper, not
+to this delta — see delta 2.
 
 The file always exists, header-only when the declared set is empty, so "absent"
-is never a state the reader has to interpret.
+is never a state the reader has to interpret. **Draining it therefore truncates
+to the header, never the whole file.** The directory's local-capture tier reclaims
+by whole-file truncation (`: > <file>`), and that idiom applied here erases the
+header and reds `check-workflow-tiering` on the release commit itself. Both
+tracked members that drain — `WORKFLOW-STATE.txt` at the iteration boundary,
+`gap-inbox.md` at close — drain header-preservingly, and so does this one.
 
 **No new knob.** The path derives from the existing `GATE_SDK_WORKFLOW_DIR`, the
 way `GATE_SDK_GRAPH_ARTIFACT` derives its default. A knob naming this file would
@@ -64,6 +85,24 @@ missing or unparseable declaration while reds exist is a fail, and
 usage/environment failure is exit 2. A malformed declaration is a contract
 violation, not a broken environment.
 
+**The token predicate is not this unit's to implement.**
+`SPEC-release-note-lead-token-grammar.md` delta 3 designs one helper carrying two
+*container* arms — a markdown section's bullet lead tokens, and this file's data
+lines — over one token predicate, and it names this surface as its second arm.
+So this delta supplies the container (a record file's data lines) and consumes
+that helper's verdict; it does not state a second token predicate of its own.
+Landing an inline parse here would file forward the exact defect that unit
+exists to close, one surface over — three statements of one grammar where the
+complaint was two.
+
+**Build ordering, because the two units collide on two surfaces.** Both amend
+gate-sdk/SPEC.md §upgrade-smoke — this unit the untagged-`TO` sentence and the
+producers-and-consumers paragraph (delta 4), that unit the clause naming the note
+"parsed for the bullet lead tokens docs/install.md owns" — and both amend
+`bin/upgrade-smoke.sh` at the same declaration-resolve step. Land the helper
+first and this delta against it; landing this one first means writing a parse
+that is then replaced.
+
 ### Delta 3 — the producer: build appends, close composes and drains {design-bearing}
 
 **Build appends.** The build stage that tightens a gate appends its name to the
@@ -73,6 +112,19 @@ declaration is written from knowledge rather than reconstructed from a red — a
 validate discovering the set from the gate that was supposed to check it is
 exactly the shape that makes an assertion its own trigger.
 `lifecycle-kit/templates/stages/build.md` gains that step.
+
+**A gate that *lands new* is appended too, and the file's name does not narrow
+that.** docs/install.md §The upgrade contract defines the note's section as "one
+bullet per gate that **landed new or got stricter**" — so if close composes that
+section from this surface, a surface holding only strictly-tightened gates makes
+the composition lossy, and the new gate's bullet would have to come from
+somewhere else, which is the recall this delta exists to remove. It costs the
+smoke nothing: the assertion is red ⊆ declared, so a declared gate that never
+reds is inert, and §upgrade-smoke already states that an N+1 gate cannot red
+phase B because the phase-A sync never re-runs the installer. **This binds this
+iteration** — `SPEC-action-gh-repo-context.md` lands `check-action-gh-repo` as a
+new gate and its delta 7 owes that note bullet, so the very first use of this
+surface is a landed-new gate rather than a tightened one.
 
 **Close composes and drains.** RELEASING.md §The procedure step 1 already authors
 the note at close; its Tightened-gates section is now *composed from* the
@@ -96,15 +148,37 @@ now rather than migrated to later.
 residency.** Build writes a `.workflow/` record; it does not load RELEASING.md,
 which stays resident only at close's release step. CLAUDE.md §Housekeeping's
 statement to that effect stays true, and keeping it true is a constraint this
-design was shaped against rather than a side effect of it. The repo already runs
-this producer/consumer shape twice — `.workflow/release-disposition.txt` and the
-lesson-evidence file — so the pattern is attested rather than invented here.
+design was shaped against rather than a side effect of it.
 
-**Honest limit, stated because it is not gated.** The composed note and the
-declaration surface can disagree: close transcribes one into the other and drains
-by hand, and nothing asserts the note's Tightened-gates set equals the surface it
-was composed from. Review holds that agreement. It is mechanizable, and it is
-filed rather than built here because closing it is a unit rather than a line.
+**The shape is attested, and the nearest precedent is the closest thing this
+repo has to this file.** `.workflow/gap-inbox.md` is tracked, opens with a
+`# contract: ` header, is appended by any mid-iteration session that does not
+load close's triage doc, and is drained by close — every property this surface
+needs, already running. `.workflow/WORKFLOW-STATE.txt` is the second: appended by
+every stage session, truncated at the iteration boundary, tracked, headed. Those
+are the two to copy. `.workflow/release-disposition.txt` and the lesson-evidence
+file also run a write-here-read-there shape but are close-written single-writer
+records, so they model the tracking and not the accumulation.
+
+That is also the answer to the tier question this file raises on its face — a
+tracked accumulating buffer is not a third tier. §The workflow directory defines
+the tracked tier as *tracked, committed, gate-read*, this surface is all three,
+and two members of that tier are already accumulation buffers rather than
+projections. CLAUDE.md §Housekeeping's two-tier sentence needs no change.
+
+**Honest limit, stated because it is not gated — and it merges into
+RELEASING.md §The procedure step 1, not out of existence.** The composed note and
+the declaration surface can disagree: close transcribes one into the other and
+drains by hand, and nothing asserts the note's Tightened-gates set equals the
+surface it was composed from. Review holds that agreement. It is mechanizable,
+and it is filed rather than built here because closing it is a unit rather than a
+line.
+
+Naming the merge home is the substance, not the bookkeeping. This limit binds a
+*close* session at the moment it composes, so it has to be readable where close
+is already reading; stated only here it would be deleted with this amendment, and
+the filed gap would preserve the work item while losing the warning. The gap
+inbox is a work queue, not a surface anyone reads while writing a note.
 
 ### Delta 4 — the two statements of the old contract are revised {design-bearing}
 
@@ -113,6 +187,15 @@ producers-and-consumers paragraph, and the script's `# spec:` line at the
 declaration-resolve step. Both currently assert the empty-declaration rule as the
 contract; both state the two-arm resolution instead. Leaving either is the defect
 this unit was filed for, one surface over.
+
+**The producers-and-consumers paragraph names a third reader that survives the
+rewrite.** Besides the smoke, it names the upgrade skill (lifecycle-kit/SPEC.md
+§templates/upgrade.md) as a consumer of the declaration, reading it as the
+consumer's registration checklist. That reader is genuinely unaffected — it reads
+the *note*, and the note is unchanged as an artifact — but the rewrite changes
+the declaration's producer from "the release session" to build-appends-and-close-composes,
+and dropping the third reader while doing so is the removals-propagated failure
+this amendment's own Definition of Done bars.
 
 ### Delta 5 — docs/install.md states that a declaration precedes its release {design-bearing}
 
@@ -168,18 +251,32 @@ carries a consumer's roster.
 ## Existing sections updated
 
 - **gate-sdk/SPEC.md §upgrade-smoke** — the untagged-`TO` sentence and the
-  producers-and-consumers paragraph (delta 4); the two-arm resolution and the
-  exit-1 convention for a malformed declaration (delta 2).
+  producers-and-consumers paragraph, third reader preserved (delta 4); the
+  two-arm resolution and the exit-1 convention for a malformed declaration
+  (delta 2). This is also the section the declaration surface's `# contract: `
+  header points at (delta 1), and the section
+  `SPEC-release-note-lead-token-grammar.md` amends in the same iteration.
 - **gate-sdk/SPEC.md §The workflow directory** — the new tracked member joins the
   checked-projection tier (delta 1).
 - **docs/install.md §The upgrade contract** — the Tightened-gates paragraph
   (delta 5).
 - **RELEASING.md §The procedure** — step 1's Tightened-gates section composed
-  from the declaration surface, and step 4's drain at the tag (delta 3). The
-  runbook's residency is unchanged, and that is deliberate.
+  from the declaration surface, carrying delta 3's honest limit on note/surface
+  agreement at the point close composes; step 4's drain at the tag, stated as a
+  truncation to the header rather than a clear (deltas 1, 3). Step 3's sentence
+  on `.workflow/release-sweep-evidence.txt` is the model for how a tracked
+  workflow member is introduced in this runbook — one step away, same shape.
+  The runbook's residency is unchanged, and that is deliberate.
+- **`.workflow/audit-roster.txt` — deliberately not edited here.** Delta 1 is a
+  workflow-directory addition, which makes the `workflow-surface-extension` class
+  due; that roster's `last:` field is close's stamp to write after its review, not
+  an amendment edit. Named so build neither stamps it early nor treats delta 1's
+  extension argument as unrecorded.
 - **`lifecycle-kit/templates/stages/build.md`** — the append step (delta 3).
 - **`gate-sdk/bin/upgrade-smoke.sh`** — the `# spec:` line at the
   declaration-resolve step (delta 4), alongside the resolution itself (delta 2).
+  `SPEC-release-note-lead-token-grammar.md` edits the same step in the same
+  iteration; delta 2 owns the ordering.
 - **`.workflow/validate-baseline.txt`** — the `upgrade` row (delta 6).
 - **CLAUDE.md §Housekeeping — deliberately unchanged.** Its statement that the
   release runbook is resident only at close's release step stays true under delta
