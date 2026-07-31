@@ -1148,12 +1148,13 @@
   entry rides `pre-adoption-grammar-break` beside `needs-spec-tag-rename`, which
   breaks the adoption path on the queue-grammar axis and which this entry's
   sibling text already nominated by slug as the shared major. The deciding weight
-  was **launch timing, not the cosmetic payoff**: the design-partner preview is
-  the next roadmap rung, and a taxonomy break landing *after* it makes those
-  teams re-bind twice. Weighed and outranked: the churn objection — the rename
-  crosses ~15 `§templates/skills/` SPEC refs, the `.claude/commands/*.md` binding
-  shims, and README, on a different surface than the queue-grammar break — which
-  argues for two clean majors and loses to the one-re-bind timing point.
+  was **launch timing, not the cosmetic payoff**: the declared preview channel
+  (`preview-release-cadence`) is the next roadmap rung, and a taxonomy break
+  landing *after* it makes adopters re-bind twice. Weighed and outranked: the
+  churn objection — the rename crosses ~15 `§templates/skills/` SPEC refs, the
+  `.claude/commands/*.md` binding shims, and README, on a different surface than
+  the queue-grammar break — which argues for two clean majors and loses to the
+  one-re-bind timing point.
   **Filing class, triaged at scope: feature.** `templates/stages/` is a new
   directory convention on a published adoption path, and the litmus names a file
   or directory convention explicitly; it needs an amendment and the deprecation
