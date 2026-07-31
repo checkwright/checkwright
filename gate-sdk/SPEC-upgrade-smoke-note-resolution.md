@@ -123,9 +123,9 @@ somewhere else, which is the recall this delta exists to remove. It costs the
 smoke nothing: the assertion is red ⊆ declared, so a declared gate that never
 reds is inert, and §upgrade-smoke already states that an N+1 gate cannot red
 phase B because the phase-A sync never re-runs the installer. **This binds this
-iteration** — `SPEC-action-gh-repo-context.md` lands `check-action-gh-repo` as a
-new gate and its delta 7 owes that note bullet, so the very first use of this
-surface is a landed-new gate rather than a tightened one.
+iteration** — `action-gh-repo-context` lands `check-action-gh-repo` as a new gate
+(gate-sdk/SPEC.md §check-action-gh-repo) and owes that note bullet, so the very
+first use of this surface is a landed-new gate rather than a tightened one.
 
 **Close composes and drains.** RELEASING.md §The procedure step 1 already authors
 the note at close; its Tightened-gates section is now *composed from* the

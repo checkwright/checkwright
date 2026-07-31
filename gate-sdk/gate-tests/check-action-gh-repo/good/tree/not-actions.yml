@@ -1,0 +1,10 @@
+# Another CI schema spelling a shell step run:. It carries neither a top-level
+# jobs: nor a top-level runs: key, so it is outside the scan entirely — gate-sdk
+# ships no template for it and owns no contract over it.
+version: 2
+
+workflows:
+  build:
+    steps:
+      - run: |
+          gh release create v1.0.0

@@ -1,0 +1,11 @@
+# A composite action carries no job of its own and inherits the calling job's
+# repository context, so the assertion belongs to the caller. Skipped and counted.
+name: composite
+description: a runs:-shaped file with a gh call and no jobs: key
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        gh issue list --state open

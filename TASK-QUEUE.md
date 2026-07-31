@@ -35,22 +35,6 @@
   the ruling to author the release note; promoted from the gap inbox the same day;
   amendment authored 2026-07-31 at spec.
 
-- **action-gh-repo-context** [spec: SPEC-action-gh-repo-context.md] — a workflow
-  job that invokes `gh` while carrying neither a checkout nor a repo-context env
-  cannot resolve a target repository, and nothing catches it until a tag fires.
-  It took down `v0.17.0`'s `release` job on its first live run. The class is one
-  `check-action-run-shell` is structurally blind to: the shell is valid and the
-  defect is semantic, an assumption about the runner's filesystem.
-  **Deliverable:** a gate asserting that a job whose `run:` blocks invoke `gh`
-  contains a checkout ordered before the call, sets `GH_REPO`, or passes
-  `--repo` on every invocation. Placement, the detector, the three arms, the
-  valve, and the fixture-as-attested-miss:
-  gate-sdk/SPEC-action-gh-repo-context.md.
-  Filed 2026-07-27 by close (`release-path-hardening`), from the v0.17.0 release
-  job's first live failure; ruled a unit rather than a close-step patch, since
-  landing a consumer-reachable gate after validate has passed is the failure mode
-  that iteration exists to fix; amendment authored 2026-07-31 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -1774,5 +1758,6 @@
 ## Done
 
 - release-note-lead-token-grammar
+- action-gh-repo-context
 
 ## Lessons Learned

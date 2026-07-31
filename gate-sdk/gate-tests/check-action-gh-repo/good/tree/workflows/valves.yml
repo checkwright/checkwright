@@ -1,0 +1,39 @@
+name: accept-valves
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # A job-level valve. The marker sits at the job's own key column, so it binds
+  # the job and stands the whole of it outside every arm.
+  whole_job:
+    runs-on: ubuntu-latest
+    # gh-repo-exempt: the remote is established by a hand-rolled git clone, which
+    # is outside the gate's theory of how a repository context is set.
+    steps:
+      - name: a call the gate does not reach
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone https://github.com/owner/repo .
+          gh issue list --state open
+
+  # A step-level valve. The marker sits inside the step's keys, so it drops that
+  # step's invocations alone; the job's other calls stay in the detected set and
+  # are held to the arms.
+  one_step:
+    runs-on: ubuntu-latest
+    steps:
+      - name: the exempted step
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # gh-repo-exempt: this call targets a foreign repository resolved from a
+        # runtime input, so no tree-readable declaration can name it.
+        run: |
+          gh issue list --state open
+
+      - name: a sibling still held to the arms
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --repo owner/repo --state open

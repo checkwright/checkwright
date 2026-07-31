@@ -1,0 +1,78 @@
+name: reject-cases
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions: {}
+
+jobs:
+  # The attested miss, reproduced as it shipped: this job took down v0.17.0's
+  # release on its first live run, dying in seconds on "failed to run git: fatal:
+  # not a git repository" before its first API call — no Release created, no
+  # assets attached. It checks nothing out, sets GH_TOKEN and TAG but no GH_REPO,
+  # and passes no --repo, so gh has nothing to resolve a target repository from.
+  release:
+    needs: pack
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-package
+          path: dist
+
+      - name: attach the tarball and its checksum to the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          name="$(basename dist/*.tgz)"
+          ( cd dist && sha256sum "$name" > "$name.sha256" )
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --notes ""
+          fi
+          gh release upload "$TAG" "dist/$name" "dist/$name.sha256" --clobber
+
+  # The mixed-call case the arm is designed against. One call carries --repo and
+  # the next does not, so a witness-seeking arm would pass this job; the arm is
+  # universally quantified over the detected set, so the unprefixed call fails it.
+  mixed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: two calls, one prefixed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view v1.0.0 --repo owner/repo
+          gh release upload v1.0.0 dist/asset.tgz
+
+  # A checkout establishes a git remote only for the calls that follow it.
+  # Ordered after the first call it establishes nothing, and the ordering
+  # comparison is free once both line numbers are in hand.
+  late_checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: call before the checkout
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --state open
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+  # A bare marker is its own failure class with its own help: line. The valve's
+  # whole value is the sentence saying which arm the author stands outside of, so
+  # a marker with no reason exempts nothing and reds on the marker itself.
+  bare_valve:
+    runs-on: ubuntu-latest
+    # gh-repo-exempt:
+    steps:
+      - name: an unexplained exemption
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --state open

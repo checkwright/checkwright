@@ -36,6 +36,7 @@ check-root-tiering
 check-workflow-tiering
 check-action-pinning
 check-action-run-shell
+check-action-gh-repo
 check-core-files
 check-identity
 check-stage-evidence

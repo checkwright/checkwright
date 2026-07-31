@@ -1,0 +1,1 @@
+ACTION-GH-REPO: clean (6 job(s) invoking gh across 3 Actions-shaped file(s) of 5 walked, all resolving a repository; 11 invocation(s) detected, 1 job(s) invoking none, 1 exempt, 1 composite-action file(s) and 1 non-Actions file(s) skipped)

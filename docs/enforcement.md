@@ -63,6 +63,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-workflow-tiering | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-pinning | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-action-run-shell | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-action-gh-repo | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-core-files | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-identity | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-stage-evidence | precommit |

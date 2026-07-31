@@ -105,6 +105,7 @@ check-root-tiering
 check-workflow-tiering
 check-action-pinning
 check-action-run-shell
+check-action-gh-repo
 check-commit-msg
 check-commit-subject
 check-tree-terms

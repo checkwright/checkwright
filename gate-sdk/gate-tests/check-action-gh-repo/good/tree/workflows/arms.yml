@@ -1,0 +1,93 @@
+name: accept-cases
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions: {}
+
+jobs:
+  # The env arm on its narrowest sub-arm. The attested miss's repair sets GH_REPO
+  # on the invoking step, not at workflow or job root, so a gate implementing only
+  # the two outer lookups would red the one job it exists for.
+  step_env:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-package
+          path: dist
+
+      - name: attach the tarball to the Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --notes ""
+          fi
+          gh release upload "$TAG" dist/asset.tgz --clobber
+
+  job_env:
+    runs-on: ubuntu-latest
+    env:
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: the job-level lookup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --state open
+
+  # The checkout arm: the uses: ref before the @ is actions/checkout and its line
+  # precedes the job's first detected invocation.
+  checkout_arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: a call the checkout above establishes a remote for
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create site-health --color b60205 \
+            --description "Live-site monitoring probe failure" 2>/dev/null || true
+          open_num="$(gh issue list --label site-health --state open --json number)"
+          echo "$open_num"
+
+  # The --repo arm, universally quantified: every detected invocation carries it,
+  # including one whose --repo sits on a continuation line, which is only found
+  # because backslash continuations are joined before matching.
+  repo_arm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: every call prefixed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view v1.0.0 --repo owner/repo
+          gh release upload v1.0.0 dist/asset.tgz \
+            --clobber --repo owner/repo
+          if ! gh release view v2.0.0 --repo owner/repo; then
+            echo "absent"
+          fi
+
+  # Whole-word matching at command position. None of these is a gh invocation, so
+  # this job is counted as invoking none rather than armed: ghost and gh-pages are
+  # other words, a leading # is always a shell comment, and a bare gh inside a
+  # string is not in command position.
+  not_invocations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: tokens that are not the gh command
+        run: |
+          set -euo pipefail
+          ghost --version
+          git push origin gh-pages
+          # gh release create v9.9.9
+          echo "the gh CLI is not invoked here"

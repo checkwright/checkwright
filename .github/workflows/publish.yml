@@ -119,9 +119,7 @@ jobs:
       - name: attach the tarball and its checksum to the Release
         env:
           GH_TOKEN: ${{ github.token }}
-          # This job checks out nothing, so gh has no git remote to resolve a
-          # target repository from. Keep GH_REPO whenever the no-checkout design
-          # above holds — without it every gh call below dies before its request.
+          # spec: gate-sdk/SPEC.md §check-action-gh-repo — this job checks out nothing, so GH_REPO is the arm that gives gh a target repository to resolve
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
         run: |

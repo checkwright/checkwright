@@ -1,0 +1,4 @@
+# Accept case: a passing witness for each of the three arms (the env arm on all
+# three of its lookups), both valve placements, the whole-word and command-position
+# rules, and the two file shapes the Actions-shape predicate skips.
+tree

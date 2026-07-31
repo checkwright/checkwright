@@ -1,0 +1,18 @@
+name: accept-root-env
+
+on:
+  workflow_dispatch:
+
+env:
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  # The workflow-root lookup, the outermost of the env arm's three.
+  workflow_env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: no job- or step-level GH_REPO of its own
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue list --state open

@@ -1671,7 +1671,10 @@ Invariant: every GitHub Actions `run:` **literal block scalar** in a scanned YAM
 file is ShellCheck-clean at `-S warning` under the dialect the step actually
 runs. It closes the class §check-shellcheck's target derivation leaves open — a
 workflow's `run:` body is shell that nothing lints, shellchecks, or executes
-outside a push or a tag.
+outside a push or a tag. It is not the only gate on that surface:
+§check-action-gh-repo reads the same `run:` bodies for a **semantic** property
+ShellCheck is structurally blind to, so a reader arriving here should not
+conclude the `run:` surface has one gate.
 
 Kit mechanism rather than a consumer gate, and the deciding fact is that kits
 ship workflow templates carrying `run:` shell — §templates/gates-workflow.yml and
@@ -1804,6 +1807,151 @@ shared one, and the severity is the family's literal. A missing `shellcheck`
 binary is exit 2, as §check-shellcheck models. A tree holding no YAML exits clean
 on a zero count, the counted inertness that makes this kit mechanism: a consumer
 running no GitHub Actions pays nothing for it.
+
+### check-action-gh-repo
+
+Invariant: in every Actions-shaped YAML file, a **job** whose `run:` bodies
+invoke `gh` establishes a repository context — the job contains a checkout step
+ordered before its first such invocation, or `GH_REPO` is set at workflow, job,
+or invoking-step level, or every detected invocation in the job carries
+`--repo`. A job satisfying none of them cannot resolve a target repository, and
+nothing else catches it until a tag fires.
+
+The class is attested rather than hypothetical: it took down `v0.17.0`'s
+`release` job on its first live run, which died in seconds on `failed to run
+git: fatal: not a git repository` before its first API call, with no Release
+created and no assets attached. The failure mode is the worst-timed one
+available — green everywhere, red only at the tag, on the release path itself.
+§check-action-run-shell lints exactly that block and passes it: the shell is
+valid, the variables are quoted, the control flow is sound. The defect is
+**semantic**, an assumption about the runner's filesystem no syntactic linter can
+hold.
+
+Kit mechanism rather than a consumer gate, and the deciding fact is
+§check-action-run-shell's: a *kit* ships a workflow template carrying `gh` calls
+in its `run:` bodies — site-kit's `templates/site-health.yml`, a copy-out
+consumers vendor. A consumer gate would cover one tree and leave every downstream
+vendor of that template unchecked, and that the template belongs to a *different
+kit* is what makes the argument decisive. Named `action-`, not
+`check-workflow-*`, for §check-action-pinning's reason.
+
+**Scan set and the split predicate.** The walk is §check-action-pinning's —
+`gate_find` for `*.yml` / `*.yaml` from the scan root, shared prune set, no
+roster and **no new knob**. §check-action-run-shell's Actions-shape predicate is
+then split rather than borrowed whole, because this gate needs its two arms
+apart: a top-level `jobs:` key makes a file the subject; a `runs:`-shaped
+composite action is **skipped and counted**, having no job of its own and
+inheriting the calling job's repository context, so the assertion belongs to the
+caller; a file matching neither is outside the scan. Two lineages, named
+separately because they are separate — §check-action-pinning contributes the scan
+set and carries no Actions-shape predicate, §check-action-run-shell contributes
+the predicate and no bearing on the scan set.
+
+**The detector — the trigger and the `--repo` arm are one.** The gate must
+already answer "does this line invoke `gh`" to arm at all, so the arm is
+evaluated per detected invocation and is *universally quantified over the
+detected set* rather than satisfied by a witness. One unprefixed call fails the
+arm by construction; there is no search for a positive example to be fooled by,
+and a job mixing prefixed and unprefixed calls — the false negative the arm was
+designed against — reds. Over each `run:` body in the job:
+
+- **Logical lines.** Backslash continuations are joined before matching, so a
+  call split across lines is one unit and its `--repo` is found wherever on the
+  call it sits. A detected call's `--repo` is looked for only within that call's
+  own extent, which ends at the next `;` / `|` / `&`, so a second call on the
+  same logical line cannot lend the first one its flag.
+- **Command position.** A `gh` token counts when it is a whole word at the start
+  of a logical line, or immediately after a command separator or opener
+  (`|` `||` `&&` `;` `&` `(` `` ` `` `$(` `!` `{`), or after a
+  command-introducing keyword (`then`, `else`, `do`, `elif`). Whole-word matching
+  keeps `ghost` and `gh-pages` out. **`!` and `{` and the keywords are a
+  calibration the in-tree corpus forced**, not decoration: `publish.yml`'s
+  release job opens with `if ! gh release view`, and without `!` the gate would
+  take a later call as the job's *first* invocation and run the checkout arm's
+  ordering comparison against the wrong line.
+- **Comment lines.** A logical line whose first non-blank character is `#` is not
+  a command line — a leading `#` in shell is always a comment. A trailing `#`
+  comment is left in place, which over-detects and is the safe direction.
+- **Scalar forms.** A literal block scalar is scanned line-wise; a folded one is
+  scanned the same way even though folding would join its lines, and a plain
+  single-line scalar is scanned as one logical line. All three over-detect rather
+  than skip, which is why this gate refuses none of the forms
+  §check-action-run-shell refuses — it reads for one token, not for shell it must
+  reassemble faithfully.
+- **The bias, stated rather than left implicit.** Every ambiguity resolves toward
+  over-detection. A false positive costs a workflow author one `GH_REPO:` line or
+  one exemption marker; a false negative is the release-path failure this gate
+  exists for.
+
+**The checkout arm and its honest limit.** A step satisfies it when its `uses:`
+ref before the `@` is `actions/checkout` **and** its line precedes the job's
+first detected invocation; a checkout ordered after the call establishes nothing,
+and the ordering comparison is free once both line numbers are in hand. Any other
+means of establishing a git remote — a hand-rolled `git clone`, a different
+checkout action — is outside the gate's theory and takes the valve. That limit is
+stated rather than papered over with a looser match, because a looser match is
+what turns a semantic assertion back into a syntactic one.
+
+**The environment arm.** `GH_REPO` satisfies it when set at workflow-root `env:`,
+at `jobs.<id>.env:`, or on the `env:` of the step whose body carries the
+invocation. `gh` resolves its target repository from `GH_REPO` and from the git
+remote, so no other variable joins the arm; a consumer relying on a different
+mechanism takes the valve. The arm is the one the fixed instance used and the one
+that survives maintenance: a job-level `GH_REPO` cannot be undone by someone
+adding a new `gh` call, whereas per-call `--repo` can. **The step-level lookup is
+load-bearing, not completeness** — the fixed instance sets `GH_REPO` on the
+invoking step's `env:`, not at workflow or job root, so the one in-tree job this
+gate exists for passes on the *narrowest* of the three lookups, and a gate
+implementing only the outer two would red `publish.yml` on day one and read as a
+false positive.
+
+**The arms are disjoined per job, and each is quantified over the whole detected
+set.** A job passes on the checkout arm, or because every detected invocation has
+`GH_REPO` in scope, or because every one carries `--repo` — never by pairing a
+`GH_REPO` step with a `--repo` step. Mixing them reds, which is a false positive
+one `env:` line or one marker resolves, and the alternative — a per-invocation
+disjunction — would let a job satisfy the invariant in a way no reader of it
+could state.
+
+**The valve.** `# gh-repo-exempt: <reason>`, taking the kit's established
+`# <thing>-exempt:` marker shape. It binds by its own indentation: at or left of
+the job-id column it precedes a job, at the step-list dash column it precedes a
+step, and inside a step's keys it binds that step — a job-bound marker skips the
+job, a step-bound one drops that step's invocations from the detected set and
+leaves the job's others held to the arms. The reason is **required and
+non-empty**; a bare marker is its own failure class with its own `help:` line,
+since the valve's whole value is the sentence saying which arm the author is
+standing outside of. That requirement is a deliberate tightening, not
+conformance, and saying so is the honest form: no sibling enforces it —
+`check-test-hermetic` and `check-assertion-strength` match their marker with the
+colon and read no reason, `check-gate-fail-closed` matches a bare
+`fail-closed-exempt` without even requiring the colon, and there is no shared
+marker parser in `lib/gate.sh`. The tightening is worth its inconsistency here
+because this valve stands a job outside a *release-path* assertion, where an
+unexplained exemption is the failure mode the gate exists for; whether the
+siblings should follow is not this section's question.
+
+**The walk is this gate's own, and §check-action-run-shell's extractor is not
+reusable here.** That extractor has no theory of `jobs:` at all — it tracks step
+column and block scalars per *file*, emits records carrying a block number and a
+start line but no job identity, extracts neither `uses:` nor `env:` lines, and
+rewrites `${{ … }}` before emitting. This gate needs a job-partitioned walk
+carrying all three, so it is **not** the second consumer that section's standing
+rule waits for: its "a helper earns its place at a second consumer and there is
+none", and the matching `# spec:` comment at the extractor itself, stay true.
+Stated because the opposite reading is the natural one, and because
+§lib/declaration.sh met the *same* standing rule with the opposite answer — only
+the difference in what is being extracted decides it.
+
+Tier `precommit`; the `# graph:` couples the surfaces §check-action-pinning
+couples, `dir=one` — a one-way audit. A tree holding no YAML, or no job invoking
+`gh`, exits clean on a zero count, the counted inertness that makes this kit
+mechanism rather than a consumer gate. The `bad/` fixture is the attested miss
+itself — the `v0.17.0` release job as it shipped, with `contents: write`, a
+download-artifact step, no checkout, `GH_TOKEN` and `TAG` set and `GH_REPO`
+absent — so §When a gate earns its place's demand that a higher-false-positive
+gate wait for a real miss is met by a fixture that *is* the miss rather than an
+invention of one.
 
 ### check-commit-msg
 
