@@ -1205,6 +1205,15 @@
   are alternatives with different failure modes. Which one preserves the
   smoke's fail-closed character is unsettled, and picking wrong converts a
   proof into a formality.
+  **Do not promote the baseline row on a post-tag green — verified 2026-07-31.**
+  Immediately after `v0.18.0` was tagged on the iteration's final commit, the
+  smoke ran clean (`red set 0 ⊆ 3 declared`) because `TO` was momentarily a
+  tagged HEAD. That is the tag, not the fix: the defect is that an **untagged**
+  HEAD resolves no note, and the next commit restores it. Promoting the row on
+  that observation would encode the tagged-HEAD exception as the expectation and
+  hand the next iteration's validate a new-failure red on a defect already filed
+  and deferred — the exact case the held-constant idiom exists for. The row is
+  promoted when this entry is built, not when a tag happens to sit on HEAD.
   **Cost while deferred:** this slug holds `upgrade` red in the validate
   baseline, and the enforcement cost of that hold is the real charge. `upgrade`
   is a single-scenario suite, so while the row is held-red *any additional* red
