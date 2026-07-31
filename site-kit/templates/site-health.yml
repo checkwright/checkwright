@@ -7,10 +7,12 @@
 # a site-health issue and reds this run, never a merge. Recovery self-clears (a
 # green run closes the open issue). No README badge, by the standing ruling.
 #
-# Copy verbatim into .github/workflows/ and set ALT_DOMAIN below (or delete the
-# alternate-host probe if you serve no redirect alias). The apex host is read
-# from the CNAME file — no second place to keep it.
-# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, and cert expiry
+# Copy verbatim into .github/workflows/, then set two groups of env below or
+# delete the arm each belongs to: ALT_DOMAIN (drop probe #4 if you serve no
+# redirect alias), and the three RELEASE_NOTE_* knobs (drop probe #6 if you
+# publish no release notes). The apex host is read from the CNAME file — no
+# second place to keep it.
+# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, and release-body note pointers
 name: site-health
 
 on:
@@ -23,10 +25,13 @@ on:
         type: boolean
         default: false
 
-# GITHUB_TOKEN is read-only by default (a setting worth keeping); the issue
-# open/update/close path needs issues:write, nothing more.
+# A permissions: block is an allowlist, not an addition — every scope it omits is
+# none. issues:write carries the open/update/close path; contents:read is what
+# lets the probe read the tag list and the Release bodies. Without it those reads
+# 404, which reads like "no such Release" rather than "not permitted".
 permissions:
   issues: write
+  contents: read
 
 jobs:
   probe:
@@ -44,7 +49,20 @@ jobs:
           # the probe builds the URL from this at run time. Set to your redirect
           # alias, or delete this env and probe #4 below if you have none.
           ALT_DOMAIN: alt.example.com
+          # Release-note pointer arm (#6) — set all three, or delete them along
+          # with probe #6 below. Step-level workflow env, not the kit's SITE_KIT_*
+          # knobs: this file is copied and edited, never sourced, so it must not
+          # reach into a vendored gates dir. The host is deliberately absent —
+          # the CNAME file stays its single source, so a rename is one edit.
+          RELEASE_NOTE_GLOB: 'docs/posts/*.md'
+          RELEASE_NOTE_TAG_KEY: 'release'
+          # Path only; {slug} is the note filename minus its extension. Check the
+          # form your host actually serves — a generator that emits
+          # /posts/<slug>.html often serves the extensionless form too, and the
+          # value must match what your release bodies are written to carry.
+          RELEASE_NOTE_URL_PATH: '/posts/{slug}'
           FORCE_FAIL: ${{ inputs.force_fail }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           # A probe expects individual checks to fail; -e would abort the battery
           # on the first red, so disable it and collect failures explicitly.
@@ -102,6 +120,110 @@ jobs:
               [ "$days" -ge 14 ] || failures+=("certificate for $apex expires in $days day(s) (< 14): $expire")
             fi
           fi
+
+          # 6. every tracked release note naming an existing tag has a Release
+          #    whose body points at that note, and every apex URL that body
+          #    carries resolves. The two assertions run over two different
+          #    strings — presence over the URL derived here, resolution over the
+          #    URLs the body actually carries — and collapsing them re-opens the
+          #    defects this arm exists for (site-kit/SPEC.md §templates/site-health.yml).
+          #    Delete this whole block along with the RELEASE_NOTE_* env above if
+          #    you publish no release notes.
+          notes=()
+          shopt -s nullglob
+          for f in $RELEASE_NOTE_GLOB; do
+            notes+=("$f")
+          done
+          shopt -u nullglob
+          if [ "${#notes[@]}" -eq 0 ]; then
+            failures+=("release-note glob matched nothing: '$RELEASE_NOTE_GLOB' — set the RELEASE_NOTE_* env above, or delete this arm")
+          fi
+
+          # The tag list comes from the API, never `git tag`: checkout fetches no
+          # tags at depth 1, so a git-driven arm finds zero released notes and
+          # reads green forever. --paginate concatenates the pages' arrays, so
+          # count by streaming the names — --jq 'length' returns the last page's
+          # count, which understates exactly once pagination starts to matter.
+          tag_err="$(mktemp)"
+          tags="$(gh api --paginate 'repos/{owner}/{repo}/tags' --jq '.[].name' 2>"$tag_err")"
+          tag_rc=$?
+          if [ "$tag_rc" -ne 0 ]; then
+            # Asserted on the call's own exit status, never inferred from the
+            # count below: this step runs under `set +e`, so a failed call yields
+            # an empty tag list and a zero exit, every note then reads "not yet
+            # released", and the arm reports a clean run forever.
+            failures+=("could not read the tag list (gh exit $tag_rc): $(tr '\n' ' ' < "$tag_err")")
+            tags=""
+          fi
+          rm -f "$tag_err"
+          n_tags="$(grep -c . <<<"$tags")"
+
+          n_found="${#notes[@]}"; n_keyed=0; n_released=0; n_checked=0
+          for f in "${notes[@]:-}"; do
+            [ -n "$f" ] || continue
+            # Anchored inside the opening front-matter fence. A bare ^key: match
+            # also hits the body.
+            tag="$(awk -v key="$RELEASE_NOTE_TAG_KEY" '
+              /^---[[:space:]]*$/ { fm++; next }
+              fm == 1 && index($0, key ":") == 1 {
+                v = substr($0, length(key) + 2); sub(/^[[:space:]]+/, "", v); print v; exit
+              }' "$f")"
+            # A post carrying no tag key is not a release note. Silent by ruling:
+            # the census line below is how that case stays readable.
+            [ -n "$tag" ] || continue
+            n_keyed=$(( n_keyed + 1 ))
+            # A note whose tag is not on the remote is a legitimate skip — its
+            # release is deferred. This is why the tag list is not replaceable by
+            # the per-tag lookup below: a 404 there cannot tell that apart from a
+            # tag whose Release is genuinely missing.
+            grep -Fxq -- "$tag" <<<"$tags" || continue
+            n_released=$(( n_released + 1 ))
+
+            slug="${f##*/}"; slug="${slug%.*}"
+            want="https://$apex${RELEASE_NOTE_URL_PATH//\{slug\}/$slug}"
+
+            rel_err="$(mktemp)"
+            body="$(gh api "repos/{owner}/{repo}/releases/tags/$tag" --jq '.body // ""' 2>"$rel_err")"
+            rel_rc=$?
+            if [ "$rel_rc" -ne 0 ]; then
+              failures+=("$tag: no readable Release for a tag that exists (gh exit $rel_rc): $(tr '\n' ' ' < "$rel_err")")
+              rm -f "$rel_err"
+              continue
+            fi
+            rm -f "$rel_err"
+            n_checked=$(( n_checked + 1 ))
+
+            # Presence: containment, never equality — an older body may write a
+            # suffixed variant of its URL. Scheme-qualified, because a markdown
+            # link's visible label often repeats the URL scheme-less and would
+            # satisfy a scheme-less match while the link target went unchecked.
+            case "$body" in
+              *"$want"*) ;;
+              *) failures+=("$tag: Release body does not carry the note URL $want") ;;
+            esac
+
+            # Resolution: every apex URL as literally written in the body — this
+            # is what catches a trailing-slash URL that presence's containment
+            # lets through. Scheme-anchored so a label is never mistaken for a
+            # target. The trailing punctuation that occurs in practice is
+            # markdown-structural, `)` closing a link target and `)**` closing
+            # one inside bold, so the set covers `)` and `*` and strips a run.
+            # Deliberately not filtered to note URLs: a body's other apex links
+            # are covered too.
+            while read -r u; do
+              [ -n "$u" ] || continue
+              case "$u" in
+                "https://$apex"|"https://$apex/"*|"http://$apex"|"http://$apex/"*) ;;
+                *) continue ;;
+              esac
+              code="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' "$u")"
+              [ "$code" = 200 ] || failures+=("$tag: Release body URL $u did not answer 200 (got '$code')")
+            done < <(grep -oE 'https?://[^[:space:]<>"]+' <<<"$body" | sed -E 's/[).,;:!?*]+$//' | sort -u)
+          done
+
+          # Which zero-case a reader is in. A diagnostic, not an assertion — the
+          # rulings above are what make a vacuous pass impossible.
+          echo "release-body: $n_found note(s) found, $n_keyed keyed '$RELEASE_NOTE_TAG_KEY:', $n_released released of $n_tags remote tag(s), $n_checked checked"
 
           # DoD hook: a workflow_dispatch with force_fail=true exercises the issue
           # path on demand without waiting for a real outage.

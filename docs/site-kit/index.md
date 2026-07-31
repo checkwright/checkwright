@@ -27,10 +27,10 @@ The class list and the gate's honest limit live in the kit's
 [`SPEC.md`](SPEC.md#check-docs-render-fidelity).
 
 The template — `site-health.yml` — is a scheduled probe of the live site
-(HTTPS, redirects, certificate expiry). It verifies a deployment, not a tree, so
-it ships as a workflow a consumer copies rather than a gate: a monitor reds on
-causes no commit produced, and blocking a merge on one would be a false positive
-waiting to happen.
+(HTTPS, redirects, certificate expiry, and release-body note pointers). It
+verifies a deployment, not a tree, so it ships as a workflow a consumer copies
+rather than a gate: the line is where the asserted object lives, and none of what
+it asserts is in any checkout.
 
 ## Install
 

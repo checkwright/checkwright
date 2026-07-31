@@ -10,17 +10,29 @@ the other.
 
 ## The monitor boundary
 
-A gate verifies the tree: it is deterministic, hermetic, and reds only on a
-cause a commit produced, which is what lets it block a merge without false
-positives. A live-site probe is none of those — it reds on DNS, a Pages
-incident, or a stalled certificate renewal, none of which any commit caused.
-Enforcing deployment truth through a pre-commit or CI gate would break both the
-low-false-positive contract and the CI backstop's checkout-plus-bash
-hermeticity (gate-sdk/SPEC.md §Enforcement tiers). So the deployment probe is
-*monitoring*, not a gate: it ships as `templates/site-health.yml`, a scheduled
-workflow a consumer copies, and signals through an issue and a red run of its
-own, never a blocked merge. The tree-honesty half — that the repo never *cites*
-a stale host — is a real gate, because that is a property of the tree.
+**The line is where the asserted object lives.** A gate asserts over the tree: a
+checkout plus bash is all it needs, which is what makes it deterministic,
+hermetic, and safe to block a merge with. Deployment truth is in no checkout —
+the live host's responses, its certificate, and the bodies of the Releases it
+publishes are state no commit contains — so no gate can assert it, and enforcing
+it through a pre-commit or CI gate would break both the low-false-positive
+contract and the CI backstop's checkout-plus-bash hermeticity
+(gate-sdk/SPEC.md §Enforcement tiers).
+
+Object location governs rather than *whether a commit caused the failure*, and
+the difference is load-bearing. Some host-side failures are caused by nothing any
+commit did — DNS, a Pages incident, a stalled certificate renewal. Others are
+caused by a session skipping a step, which is commit-shaped in spirit and still
+ungateable, because the artifact it damaged sits on the host rather than in the
+tree. A criterion built on cause admits the first kind and stumbles on the
+second; a criterion built on where the object lives covers both, and stays true
+of every probe arm instead of only the arms whose causes it happens to list.
+
+So the deployment probe is *monitoring*, not a gate: it ships as
+`templates/site-health.yml`, a scheduled workflow a consumer copies, and signals
+through an issue and a red run of its own, never a blocked merge. The
+tree-honesty half — that the repo never *cites* a stale host — is a real gate,
+because that is a property of the tree.
 
 ## Layout and configuration
 
@@ -53,6 +65,13 @@ told to load but cannot find. Knobs:
   at its own renderer; an unresolvable one fails the gate closed.
 - `SITE_KIT_CONFIG_FILE` — the loader override; when set it must resolve, else
   the gate exits 2 rather than silently run on defaults.
+
+`templates/site-health.yml` is governed by none of these. Its knobs — `ALT_DOMAIN`
+and the three `RELEASE_NOTE_*` below — are **step-level workflow env** set in the
+copied file itself, not `SITE_KIT_*` knobs, and `lib/site.sh` never loads them.
+The template is copied and edited rather than sourced, so reaching into the gate
+config loader would couple a monitor to the gates dir and hard-code a vendored
+kit path into a workflow whose whole distribution model is verbatim copy.
 
 ## check-docs-cname-parity
 
@@ -247,11 +266,144 @@ The scheduled live-site probe, copied verbatim into a consumer's
 `.github/workflows/`. It reads the apex host from the CNAME file (the same
 source the gate trusts), then checks: the apex answers 200 over HTTPS, `www`
 and `http` redirect to the canonical origin, an optional `ALT_DOMAIN` redirect
-keeps its path, and the certificate is more than a fortnight from expiry. A
+keeps its path, the certificate is more than a fortnight from expiry, and every
+published release note is pointed at by a resolving URL in its Release body. A
 failure opens or updates a single `site-health` issue and reds the run;
 recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://`
 literal, so it does not itself trip the parity gate. A `# enforce:` marker rides
 the template so that, once copied, an enforcement map projects it as a monitor.
+
+The workflow's `permissions:` block is an **allowlist, not an addition** — every
+scope it omits is `none` — so reading the tag list and the Release bodies needs
+`contents: read` declared beside `issues: write`, and the probe step needs its own
+`GH_TOKEN`. On a public repository the declaration is redundant and the arm
+appears to work without it; at a private-repo consumer it is the difference
+between the arm working and the arm 404ing on every note, because GitHub masks an
+unauthorized read as an absent resource — the failure arrives looking like "no
+such Release" rather than "not permitted". No gate parses a `permissions:` block
+(workflow-security linting is an explicit non-goal, gate-sdk/SPEC.md
+§check-action-run-shell), so this one is held by review rather than by an oracle.
+
+**The release-body arm.** For every tracked release note whose front-matter tag
+key names a tag that exists on the remote, the arm asserts two properties over
+that tag's Release:
+
+- **Presence** — a Release exists for the tag, and its body *contains* the note's
+  canonical URL, derived **scheme-qualified** as `https://` plus the apex host
+  from the CNAME file plus the path from `RELEASE_NOTE_URL_PATH`. This is what
+  catches a body that was never filled in.
+- **Resolution** — every apex-hosted URL *as literally written in the body*
+  answers 200. This is what catches a body whose pointer is present but dead.
+
+**The two run over two different strings, and collapsing them re-opens the defect
+the other closes.** A body carrying a trailing-slash URL *contains* the
+slash-less form as a substring, so a presence-only check passes a pointer that
+404s; and a probe that derived the URL itself and then resolved *that* would
+confirm only its own arithmetic while the body stayed wrong. Presence runs over
+the URL the arm derives; resolution over the URLs the body actually carries.
+
+Presence is deliberately loose in one direction and strict in the other.
+*Containment, never equality*: a body may write a suffixed or otherwise decorated
+variant of the URL, so a token-equality test reds a corpus that is in fact
+correct — and the looseness that permits it is exactly what lets the
+trailing-slash form through, which is why resolution exists rather than a
+stricter presence. *Scheme-qualified*: a markdown link whose visible label
+repeats the URL scheme-less satisfies a scheme-less presence test while the link
+*target* goes unchecked, and a wrong-but-resolving target then passes both
+assertions with nothing red.
+
+URL extraction is **scheme-anchored over the whole body text**, never
+markdown-link-aware — only the scheme reliably separates a link target from a
+visible label — and a trailing **run** of punctuation is stripped from an
+extracted URL before it is resolved. The punctuation that occurs in practice is
+markdown-structural rather than sentential: a `)` closing a link target, or `)**`
+closing one inside bold. A stripping set written for the period captures those
+closers into the URL and reds a healthy corpus, so the set covers `)` and `*`,
+and strips a run rather than a single character — or `)**` merely becomes `)*`.
+The extracted set is **not** narrowed to note URLs: the assertion is over
+apex-hosted URLs, so a body's other apex links are covered deliberately.
+
+The tag list comes from the **API, paginated**, never from `git tag`.
+`actions/checkout` defaults to `fetch-depth: 1` and fetches no tags, so a
+`git tag`-driven arm finds zero released notes and reports green forever. Two
+properties of the call are load-bearing: `gh api --paginate` discharges the
+paging with no manual page loop, and because it *concatenates* the pages' arrays,
+`--jq 'length'` returns the last page's length rather than the total — so the
+count is taken by streaming the elements, and the pagination is forward-looking
+insurance no run will ever confirm until a consumer passes its first page. The
+tag list is not replaceable by a per-note Release-by-tag lookup: a 404 there
+cannot distinguish a tag that was never pushed (a legitimate skip for a note
+whose release is deferred) from a tag whose Release is missing (a real finding),
+and conflating them either reds every deferred note or hides a missing Release.
+
+**The arm's three knobs** are step-level workflow env on the probe step, set in
+the copied file the way `ALT_DOMAIN` already is (§Layout and configuration):
+
+- `RELEASE_NOTE_GLOB` — the tracked path glob enumerating release-note files.
+- `RELEASE_NOTE_TAG_KEY` — the front-matter key whose value is the tag a note
+  belongs to. Load-bearing rather than decorative: a posts directory holds posts
+  that are not release notes, and this key is what separates them. It is read
+  **anchored inside the opening front-matter fence**, so the same key spelled in
+  a note's body is not mistaken for the note's own tag.
+- `RELEASE_NOTE_URL_PATH` — the site path a note is published at, written with a
+  `{slug}` token the arm substitutes with the note filename minus its extension.
+  It holds the **path only**; the host is never repeated here, because the CNAME
+  file stays the single source for it and a host rename must stay a one-file
+  edit. This is the knob with no cross-check anywhere — nothing outside the site
+  generator derives a note's served URL — so it is the one a consumer can set
+  wrongly and see nothing red. The concrete trap: a generator that emits
+  `/posts/<slug>.html` while the host *also* serves the extensionless form makes
+  the suffixed value look the more literally correct of the two, and it reds
+  every body written to the bare form.
+
+**The zero-cases, ruled exhaustively.** Every count the arm ranges over can be
+zero, and each zero is either a finding or a legitimate pass; an unruled one is
+how the arm becomes a green that means nothing.
+
+- **The glob matches no notes** — a **finding**. A misconfigured
+  `RELEASE_NOTE_GLOB` is itself the defect, which is what makes "set these knobs
+  or delete the arm" an instruction rather than advice.
+- **The tag-list call fails** — a **finding**, asserted on the call's own exit
+  status with the API's error text (which carries the HTTP code) in the message,
+  never inferred from the count that follows. The probe step runs under `set +e`,
+  so a failed invocation yields an empty tag list and a zero exit; every note then
+  reads "not yet released" and the arm reports a clean run forever. On the
+  per-Release lookup a failure reads like "no such Release"; on the tag-list call
+  the same failure reads like "green".
+- **The per-Release lookup fails for a tag that exists** — a **finding**. The tag
+  list has already established that the tag is real, so this is the
+  missing-Release case rather than the deferred-release one.
+- **The glob matches notes and none carries the tag key** — **not** a finding,
+  stated so it is not added by symmetry with the first case. A consumer whose
+  notes genuinely precede its first release is in this state legitimately. It is
+  nonetheless the likelier of the two knob misconfigurations, precisely because
+  the glob's failure is loud and the key's is silent.
+- **Zero *released* notes** — not a finding, for the same reason.
+
+**The census line makes those states readable; the rulings above are what make a
+vacuous pass impossible.** On every run the arm prints four counts — notes found,
+of those carrying the tag key, of those released, of those checked. None of the
+four is another by construction: the gap between *found* and *keyed* separates a
+typo'd `RELEASE_NOTE_TAG_KEY` from a corpus that simply mixes notes with ordinary
+posts, the gap between *keyed* and *released* is the legitimate pre-release state,
+and the gap between *released* and *checked* is a Release the arm could not read.
+A three-count line renders the first two of those states identically, which is
+what the fourth number buys. This is the same shape as gate-sdk's vacuous-pass
+tripwire (§run-gates): a *reading* available to whoever opens the run log, not an
+assertion, and on a green run nobody opens it. It earns its place as the
+diagnostic naming which state a reader is in; it is not itself what stands
+between this arm and a vacuous pass.
+
+**Stated coverage limit.** The arm is driven from the tree's notes, so it is total
+over note→Release and silent on the reverse: a Release carrying no note anywhere
+in the tree reds nowhere. The deliverable is the note's pointer, and the
+population that has ever gone wrong is the pointer's.
+
+**Cost per run.** The paginated tag list, one Release lookup per released note,
+and one resolution request per distinct apex URL in each body — linear in release
+count, on a daily schedule, well inside the authenticated rate limit.
+Deliberately uncapped and unknobbed: a "newest N only" bound would stop probing
+exactly the old releases where this class of defect has actually been found.
 
 The template is starter-template-conformant: the kit's `smoke/install.sh`
 installs it verbatim as governed surface, so a regression that made it red any

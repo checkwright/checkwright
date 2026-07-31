@@ -25,9 +25,10 @@ absent; the dependency joins a consumer's toolchain only when the gate is
 registered.
 
 The template — `templates/site-health.yml` — is a scheduled probe of the live
-site (apex/www/http HTTPS, redirects, certificate expiry). It verifies a
-*deployment*, not a tree, so it ships as a workflow a consumer copies, never a
-gate: a monitor reds on causes no commit produced. See [SPEC.md](SPEC.md#the-monitor-boundary)
+site (apex/www/http HTTPS, redirects, certificate expiry, and release-body note
+pointers). It verifies a *deployment*, not a tree, so it ships as a workflow a
+consumer copies, never a gate: the line is where the asserted object lives, and
+none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary)
 for why that boundary is load-bearing.
 
 ## Install
@@ -56,8 +57,14 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    unset the gate holds on defaults and finds nothing.
 
 4. Optional live monitor — copy `templates/site-health.yml` verbatim into
-   `.github/workflows/`, set its `ALT_DOMAIN` (or drop the alternate-host probe),
-   and it opens/updates/closes a `site-health` issue on its own schedule.
+   `.github/workflows/`, then set two groups of step env or delete the arm each
+   belongs to: `ALT_DOMAIN` (drop the alternate-host probe if you serve no
+   redirect alias), and `RELEASE_NOTE_GLOB` / `RELEASE_NOTE_TAG_KEY` /
+   `RELEASE_NOTE_URL_PATH` (drop the release-body arm if you publish no release
+   notes). It opens/updates/closes a `site-health` issue on its own schedule.
+   The release-body arm needs the template's `contents: read` permission — it is
+   an allowlist, not an addition — and `RELEASE_NOTE_URL_PATH` is the value worth
+   checking twice: site-kit/SPEC.md §templates/site-health.yml names the trap.
 
 ## Test
 

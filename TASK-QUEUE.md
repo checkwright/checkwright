@@ -12,143 +12,7 @@
 
 ## New Features
 
-- **release-body-host-side-unverified** [spec: SPEC-release-body-probe.md] — required step, ungated
-  The GitHub Release body is a required step nothing can catch when it is
-  skipped, and it has already been skipped once. `RELEASING.md` step 6 says the
-  body points at the post, and says outright that the body "lives on the host,
-  out of the battery's reach". That honesty is precisely the gap: the step is
-  real, its output is public and effectively permanent, and its omission leaves
-  no residue in the tree for any gate to find.
-  **Absorbs `release-body-url-form`** (moved to Done — absorbed, not dropped).
-  That entry's two cheap deliverables had landed — the `v0.6.0` body repaired,
-  step 6 pinning the no-slash URL form — and its stated residue, "the
-  monitor-shaped half", *is* this deliverable over the same artifact: one probe
-  discharges both, presence killing the empty-body defect and resolution the
-  trailing-slash one. Its coupling to `rendered-site-link-monitor` ("promote the
-  two together") was reasoning by **shape**, not a dependency — the two probe
-  different surfaces, links *in release bodies* versus links *on* the rendered
-  site. That monitor stays deferred and unblocked, and gets cheaper for the
-  probe-arm mechanism this unit lays down.
-  **Verified by querying at the scope entry that ruled it, not by memory.** All
-  19 tags carry a `release:` note post, all 19 Releases carry exactly one
-  `checkwright.dev/posts/…` URL, and **all 19 now resolve 200** — because the
-  operator repaired `v0.18.0`'s empty body by hand between the filing and the
-  survey. That repair is what makes the class hole invisible again: it removed
-  the symptom from one artifact and left the hole where it was.
-  **The trap is still armed:** the trailing-slash form 404s today, so the probe
-  must assert *resolution*, never merely that some URL is present.
-  **Rate, corrected.** The filing said "one release in four has already lost its
-  pointer" — the rate across the three bodies close happened to sample,
-  overstating by roughly 4x. Over 19 releases: **one shipped empty** (`v0.18.0`),
-  **one shipped a 404ing URL** (`v0.6.0`), one near-miss caught in flight
-  (`v0.7.0`), both shipped defects since repaired by hand. The merge carries this
-  unit; it does not need the bad number.
-  **Deliverable:** a check that every tag carrying a release note has a Release
-  whose body resolves that note's URL. Both halves are queryable — the tag list
-  and the Release body over the API, the note's existence from the tree.
-  **Ruled a new arm on `site-kit/templates/site-health.yml`, not a close-stage
-  affordance:** an affordance cannot catch its own omission, since the failure
-  mode is a body never filled — exactly the case where the session skipped the
-  step and would skip the affordance too. `site-health.yml` is already the
-  sanctioned non-hermetic tier (site-kit/SPEC.md §The monitor boundary). Seam
-  ruled: generic probe mechanism in the kit, apex host from `docs/CNAME` as the
-  existing probe reads it, the note-URL pattern as consumer config.
-  The eight deltas with their work-class labels, the two-assertion split that
-  makes the trailing-slash trap catchable, causal completeness, and the ruled-out
-  alternatives: site-kit/SPEC-release-body-probe.md.
-  **The loss it closes is reader-facing** — someone arriving from the tag list
-  gets a tarball and no account of what changed — and both shipped defects above
-  were found by hand, long after the artifact went public.
-  Debt: one monitor arm on an existing shipped template; it adds a governed
-  name, which is what makes this the feature of its set.
-  Filed 2026-07-31 at close on evidence found while performing step 6; merged
-  with `release-body-url-form` and ruled monitor-shaped at the next scope entry;
-  amendment authored 2026-07-31 at spec.
-
 ## Technical Debt
-
-- **release-tag-oracle-ordering** — `RELEASING.md` never says
-  when master is pushed relative to step 4's tag, and the natural reading tags a
-  commit the remote oracle never verified. Step 4 says tag the iteration's final
-  commit; that final commit is the one step 4 itself creates, because the drain
-  and the disposition stamp are both tree writes. So the sequence a session
-  composes from the runbook is: push what exists, watch `gates` green, *then*
-  write the drain commit, tag it, push the tag — and the tag lands on a tree only
-  the local battery ever saw.
-  **Verified live at this release, and worked around rather than hit.** The
-  `v0.19.0` close caught it while writing the plan down, and pushed twice:
-  `fbc88cf` watched green, then the drain commit `bc0c215` pushed and watched
-  green before the tag was applied to it. Both runs passed, so the hole cost
-  nothing this time. It is filed because the workaround was one session's
-  judgment and nothing in the runbook asks for it.
-  **Re-verified against the running system at the scope entry that promoted it:**
-  step 4 still states no ordering and step 5 watches `publish.yml`, a different
-  workflow; `gh run list --workflow gates.yml` records `bc0c215` and `a306513`
-  both green — the two pushes the entry describes.
-  **Why it outranks a tidy-up.** `CLAUDE.md` makes the remote oracle the
-  authority over a master push, and a tag's whole purpose is to name an immutable
-  tree other people fetch. A tag on a locally-verified-only commit inverts that
-  authority, and it is invisible: every gate is green either way, and the only
-  tell is which SHA the `gates` run carries.
-  **Deliverable:** state the ordering in step 4 — drain-and-stamp commit first,
-  push master, watch the `gates` run *for that SHA* green, then tag and push the
-  tag. Stated, it is one push and one watch rather than the two this release
-  spent.
-  **Ruled prose alone — no check is owed, and that is what makes this debt.** The
-  battery is hermetic (no gate anywhere makes a network call), so a "does this
-  tag's commit carry a green `gates` run" check could only live in a workflow,
-  where it fires *after* the tag is already public — the moment this entry names
-  as too late. A check that can only report an irreversible act after the fact is
-  not the fix.
-  Debt: an ordering stated in an existing runbook step; adds no governed name.
-  Filed 2026-07-31 at close from running the release end to end; promoted as debt
-  at the next scope entry on the operator's prose-alone ruling.
-
-- **release-credential-precondition-scope-vs-permission** —
-  `RELEASING.md` step 4's credential precondition tests the wrong property. It
-  says the closing session runs steps 4-7 when it holds the credentials, "an
-  authenticated `gh` login carrying `repo` scope and a working `git push`,
-  confirmed with `gh auth status`". Both halves held at this release and step 6
-  still failed: `gh auth status` reports a token's **scopes**, and a scope is a
-  ceiling on what a token may attempt, never a grant of what the account may do
-  on a given repository.
-  **Verified live at the release.** The active account carried `repo` scope, and
-  `git push` worked — over SSH, which uses a key and never consults the `gh`
-  token at all, so that half of the precondition proves nothing about API writes.
-  `gh api repos/<owner>/<repo>` reported `push: false, admin: false` for the same
-  account, and `gh release edit` returned **HTTP 404**, which reads as "no such
-  release" rather than "not permitted": GitHub masks an unauthorized write as an
-  absent resource. Completed by switching to the second authenticated account,
-  whose repository permissions include `push`.
-  **Premise shift — that evidence no longer reproduces, and the entry is kept
-  anyway.** Re-verified at the scope entry that promoted it: the same account now
-  reports `{"admin":true,"maintain":true,"pull":true,"push":true,"triage":true}`
-  and an active `admin` org membership, so the 404 cannot currently recur. The
-  operator ruled **keep** knowing that. Urgency dropped; correctness did not —
-  step 4's text is unchanged and still tests scopes when it means permissions,
-  and the `git push` half still proves nothing because SSH never consults the
-  token. Recorded because an entry whose evidence silently stopped reproducing is
-  how a false premise survives to the next session.
-  **Deliverable:** state a precondition that tests the property actually needed —
-  the repository's own `permissions.push` for the active account, read with
-  `gh api repos/<owner>/<repo> --jq .permissions` — and record that a 404 on a
-  write is the permission signature rather than a missing object, since that is
-  the part a session will otherwise mis-diagnose under time pressure with a tag
-  already public. Two clauses ride with it, placed where a session mid-release
-  will read them: **a 404 on a write is a permission signature — resolve it by
-  fixing the permission, never by switching identity** (the `v0.19.0` close
-  switched `gh` accounts to get past exactly this 404, and a session that had run
-  the permissions query would have had no reason to); and a scope grant is a
-  **ceiling, not a grant**, so `gh auth status` listing `workflow` still proves
-  nothing about a given call — concretely live since the operator granted
-  `workflow` after the release.
-  **Ruled prose alone — no affordance, and that is what makes this debt.** The
-  needed check is a single command; wrapping one API call in a script is
-  ceremony.
-  Debt: one precondition restated in an existing runbook step, adding no
-  governed name of its own.
-  Filed 2026-07-31 at close from a 404 hit while performing step 6; promoted as
-  debt at the next scope entry on the operator's prose-alone ruling.
 
 ## Deferred
 
@@ -2015,5 +1879,8 @@
 ## Done
 
 - release-body-url-form
+- release-body-host-side-unverified
+- release-tag-oracle-ordering
+- release-credential-precondition-scope-vs-permission
 
 ## Lessons Learned

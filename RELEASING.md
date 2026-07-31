@@ -96,21 +96,47 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    grammar; a disposition block opens with a bare `<release> — <date>` line
    below it, never a `#` one.
 
-4. **Tag the iteration's final commit, and drain the declaration surface.** Tag
-   `vX.Y.Z` on the iteration's final
-   commit and push it — `git tag -a vX.Y.Z` on the commit, then push the tag to
-   the origin. The tag is also what discharges `.workflow/tightened-gates.txt`:
+4. **Tag the iteration's final commit, and drain the declaration surface.** The
+   drain and the disposition stamp are both tree writes, so the iteration's final
+   commit is the one this step creates — which fixes the ordering, and **the
+   ordering is not optional**: write the drain-and-stamp commit, push master,
+   watch the `gates` run *for that SHA* go green, and only then tag that commit
+   and push the tag. `CLAUDE.md` makes the remote oracle the authority over a
+   master push, and a tag's whole purpose is to name an immutable tree other
+   people fetch; tagging before the watch puts the tag on a tree only the local
+   battery ever saw, inverting that authority invisibly — every gate is green
+   either way, and the only tell is which SHA the `gates` run carries. Stated,
+   this is one push and one watch.
+
+   Tag with `git tag -a vX.Y.Z` on that commit, then push the tag to the origin.
+   The tag is also what discharges `.workflow/tightened-gates.txt`:
    step 1 composed the note from it, so drain it here and only here — an
    iteration closing on `release none` or a deferral carries its declarations
    forward, which is exactly what the next release's note must inherit. Drain by
    **truncating to the header line**, never by clearing the file: it is a tracked
    checked projection whose header is required, and a whole-file clear reds
-   `check-workflow-tiering` on the release commit itself. The closing session runs steps 4-7 itself when it holds the
-   credentials (the default — an authenticated `gh` login carrying `repo` scope
-   and a working `git push`, confirmed with `gh auth status`); only a genuinely
-   keyless sandbox defers these to the operator, whose push mechanics live in
-   the local ops runbook, outside the tree. Stamp `<iteration> release vX.Y.Z —
-   <basis>` into the disposition evidence.
+   `check-workflow-tiering` on the release commit itself. Stamp
+   `<iteration> release vX.Y.Z — <basis>` into the disposition evidence.
+
+   **The credential precondition — test the permission, not the scope.** The
+   closing session runs steps 4-7 itself when it holds the credentials (the
+   default); only a genuinely keyless sandbox defers these to the operator, whose
+   push mechanics live in the local ops runbook, outside the tree. The property
+   that decides it is the repository's own **`permissions.push` for the active
+   account**, read with `gh api repos/<owner>/<repo> --jq .permissions`. The two
+   things a session reaches for instead each prove nothing: `gh auth status`
+   reports a token's **scopes**, and a scope is a *ceiling* on what a token may
+   attempt rather than a grant of what the account may do on this repository; and
+   a working `git push` over SSH uses a key and never consults the `gh` token at
+   all, so it says nothing about API writes. Two clauses ride with it, placed
+   here because a session will need them mid-release with a tag already public:
+   - **A 404 on a write is a permission signature, not a missing object.** GitHub
+     masks an unauthorized write as an absent resource, so a `gh release edit`
+     returning 404 against a Release that plainly exists means *not permitted*.
+   - **Resolve it by fixing the permission, never by switching identity.**
+     Switching to another authenticated account gets past the 404 and leaves the
+     real defect — an account that cannot write where this runbook assumes it can
+     — in place and unrecorded.
 
 5. **Watch the publish workflow — both channels.** Pushing the tag is what
    publishes the installer package: `.github/workflows/publish.yml` fires on the
@@ -136,9 +162,14 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    Release a pointer to it, never a second copy of the note. Write the post URL
    **without a trailing slash** (`…/posts/<slug>`, not `…/posts/<slug>/`): the
    site serves the bare form and 404s the slashed one. Open the link once the
-   Release is published — the body lives on the host, out of the battery's
-   reach, so this verification is the only thing standing between a typo and a
-   dead link in a permanent artifact.
+   Release is published. The body lives on the host, out of the battery's reach,
+   so its backstop is a monitor rather than a gate: `site-health.yml`'s
+   release-body arm asserts daily that each note's Release body carries that URL
+   and that the URL resolves, filing a `site-health` issue when it does not
+   (site-kit/SPEC.md §templates/site-health.yml). That arm's latency is exactly
+   why this hand-check stays — it is next-day and issue-shaped, while you are the
+   only actor who can fix the body before anyone reads it. Verify by hand here;
+   the arm is what catches the release where you did not.
 
 7. **Verify the version badge.** Confirm the README release-version badge
    resolves the new tag. It is sourced from the GitHub tag list, so each release

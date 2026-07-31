@@ -184,5 +184,5 @@ leaves its section absent.
 
 | kit | surface |
 | --- | --- |
-| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, and cert expiry |
+| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, and release-body note pointers |
 
