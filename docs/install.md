@@ -385,8 +385,10 @@ you are current.
 
 Two shipped tools carry this contract. [The upgrade smoke](gate-sdk/SPEC.md#upgrade-smoke)
 is its executable proof — it drives both phases against a scratch consumer,
-asserting the phase-A sync is deterministic and the red set stays within the
-target note's declaration. [The upgrade skill](lifecycle-kit/SPEC.md#templatesupgrademd)
+asserting the phase-A sync is deterministic and the red set stays within `TO`'s
+tightened-gates declaration — the target note's when `TO` is a tag, and the
+declaration surface in `TO`'s own tree when it is
+not. [The upgrade skill](lifecycle-kit/SPEC.md#templatesupgrademd)
 is the phase-B disposition ritual a consumer runs to register the note's newly
 declared gates and disposition each red.
 
