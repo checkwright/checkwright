@@ -1184,6 +1184,70 @@
   Filed 2026-07-27 at align in front-door-readiness, while verifying the
   roadmap amendment's docs-home link; re-verified at close.
 
+- **upgrade-smoke-note-resolution** [design-pending] — the standing pre-release
+  assertion is unreachable in any iteration that tightens a gate.
+  `gate-sdk/bin/upgrade-smoke.sh:113` resolves the release note by
+  `git tag --points-at` on `TO`, and `TO` defaults to `HEAD`. An untagged HEAD —
+  every commit before `RELEASING.md` step 4 tags the iteration's final commit —
+  resolves no version, so the note lookup at `:115-121` is skipped entirely and
+  the any-red refusal at `:144` fires whatever the note declares. Verified
+  rather than read at validate: the `v0.18.0` note was authored and committed,
+  and the smoke's output was byte-identical to the pre-note run, printing
+  `TO (HEAD)` — the empty-version fallthrough of the message's own default. The
+  script's own spec line calls `TO=HEAD` the standing pre-release assertion that
+  the working tree upgrades cleanly from the last tag, and that assertion is
+  today satisfiable only by tightening nothing.
+  **Deliverable:** an untagged TO that resolves its intended declaration, so the
+  pre-release assertion proves containment rather than emptiness.
+  **Why `[design-pending]`:** the resolution rule is the open call. Reading the
+  highest note above FROM is the obvious candidate but lets an unshipped note
+  license reds; keying off the derived bump, or narrowing the refusal itself,
+  are alternatives with different failure modes. Which one preserves the
+  smoke's fail-closed character is unsettled, and picking wrong converts a
+  proof into a formality.
+  **Cost while deferred:** this slug holds `upgrade` red in the validate
+  baseline, and the enforcement cost of that hold is the real charge. `upgrade`
+  is a single-scenario suite, so while the row is held-red *any additional* red
+  arising inside the smoke — a non-deterministic phase A, a consumer file lost
+  to the sync, an undeclared gate — is invisible until the row is promoted back
+  to `pass`. Enforcement is suspended for the duration rather than narrowed,
+  which is the argument for taking this next iteration rather than letting it
+  sit.
+  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while executing
+  the ruling to author the release note; promoted from the gap inbox the same
+  day.
+
+- **release-note-lead-token-grammar** [design-pending] — the release note's
+  Tightened-gates lead-token grammar and the parser consuming it disagree, so a
+  bolded declaration compiles to an empty allowed-red set.
+  `gate-sdk/bin/upgrade-smoke.sh:127-128` extracts the set with a `sed`
+  expression whose token may be bare or backticked; a bolded token fails its
+  character class outright and yields nothing. `docs/install.md:406-407` states
+  Behavior-changes lead tokens are bolded like the other sections' lead tokens,
+  so the prose prescribes for Tightened gates the one spelling the parser
+  cannot read. Audited across every shipped note: 12 of 22 non-`none`
+  Tightened-gates bullets parse to an empty set — `v0.4.0`, `v0.5.0`, `v0.7.0`,
+  `v0.10.0` (four), `v0.13.0` (three), `v0.15.0`, `v0.17.0` — and `v0.13.0`'s
+  three are bold *and* backticked, which also parses empty. Only `v0.2.0`'s
+  seven and `v0.18.0`'s three parse. It never bit because the containment
+  branch is reached only when a red set coincides with a tagged TO.
+  **Deliverable:** one canonical spelling for the lead token, held by a gate
+  rather than by convention, and the shipped notes reconciled to it.
+  **Why `[design-pending]`:** the direction must not be settled by whoever
+  happens to fix it. Widening the parser to strip bold keeps every shipped note
+  as authored but blesses two spellings; narrowing the prose to backticks gives
+  one spelling but rewrites twelve published bullets. Which surface owns the
+  grammar is the question, not the edit.
+  **Cost while deferred:** low today and non-rotting — no shipped note's empty
+  set has ever been consulted — but it silently disarms the one assertion the
+  upgrade contract calls mechanical, so the first release shipping a real
+  allowed-red set would get no containment check at all. `v0.18.0`'s bullets are
+  authored backticked and unbolded as a local workaround, verified to parse,
+  which leaves the tree carrying both spellings meanwhile.
+  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while checking
+  which bullet form the smoke actually parses; promoted from the gap inbox the
+  same day.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
