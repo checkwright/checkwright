@@ -7,3 +7,4 @@
 release-assertion-honesty scope a97c6b5d 2026-07-31
 release-assertion-honesty spec a6c211e4 2026-07-31
 release-assertion-honesty align aa673eac 2026-07-31
+release-assertion-honesty build aadaae1c 2026-07-31
