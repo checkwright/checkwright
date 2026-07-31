@@ -1728,11 +1728,4 @@
 
 ## Done
 
-- root-page-render-coverage
-- needs-spec-tag-rename
-- deferred-queue-carry-cost
-- templates-stages-taxonomy-realignment
-- queue-index-title-tag-residue
-- queue-selection-order-implicit
-
 ## Lessons Learned
