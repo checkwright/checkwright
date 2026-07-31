@@ -66,6 +66,30 @@ An iteration that tightens nothing is untouched — no pending note, an empty
 declaration, an empty red set, green. The ordering binds exactly the iterations
 that owe a declaration.
 
+**Which stage performs it is the open half, and it is a lifecycle contract
+question rather than a mechanism one.** Three answers, with the recommendation
+stated so build does not pick one by default:
+
+- **The build stage authors the Tightened-gates section as it lands the
+  tightening** — recommended. Build is the only stage that knows what it
+  tightened at the moment it tightens it, so the declaration is written from
+  knowledge rather than reconstructed from a red. The note already exists as a
+  committed in-iteration artifact, so this moves *when* one section is filled,
+  not what the artifact is.
+- The validate stage authors it when the smoke reds. Reactive, and it makes the
+  assertion its own trigger — the gate tells you what to declare, which is the
+  shape that turns a proof into a formality.
+- Accept a held-red `upgrade` row for the window and author at close as today.
+  This reintroduces the enforcement suspension this unit exists to end, and is
+  recorded only so it is visibly rejected rather than silently available.
+
+Under the recommendation, two surfaces state a residency that stops being true
+for a tightening iteration and are updated with it: RELEASING.md step 1's
+close-stage framing, and CLAUDE.md §Housekeeping's claim that the release
+runbook is resident only at close's release step. A build session that must fill
+one section of the note loads that step, so the load-trigger widens from one
+stage to two — narrowly, and only for an iteration that tightens.
+
 ### Delta 3 — the two statements of the old contract are revised {design-bearing}
 
 gate-sdk/SPEC.md §upgrade-smoke's untagged-`TO` sentence and its
@@ -134,7 +158,16 @@ crosses. No consumer config is created, and none is owed.
 - **docs/install.md §The upgrade contract** — the Tightened-gates paragraph
   (delta 4).
 - **RELEASING.md §The procedure step 1** — the authoring-before-validate
-  ordering (delta 2).
+  ordering and its close-stage framing (delta 2).
+- **CLAUDE.md §Housekeeping** — the release runbook's load-trigger residency,
+  which delta 2 widens from close's release step alone to also the build stage of
+  an iteration that tightens a gate. Named because a load-trigger claim that has
+  quietly stopped being true is the failure mode the always-loaded tier is most
+  exposed to.
+- **lifecycle-kit's build-stage template** — the stage-assignment half of delta 2,
+  if the recommendation stands. This is the one delta that reaches a stage
+  contract rather than a mechanism, and it is flagged for the lead rather than
+  assumed.
 - **`gate-sdk/bin/upgrade-smoke.sh`** — the `# spec:` line at the
   declaration-resolve step (delta 3), alongside the resolution itself (delta 1).
 - **`.workflow/validate-baseline.txt`** — the `upgrade` row (delta 5).
