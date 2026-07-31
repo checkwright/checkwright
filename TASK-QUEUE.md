@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **upgrade-smoke-note-resolution** [spec: SPEC-upgrade-smoke-note-resolution.md]
-  — the standing pre-release assertion is unreachable in any iteration that
-  tightens a gate. `gate-sdk/bin/upgrade-smoke.sh` resolves the release note by a
-  tag pointing at `TO`, and `TO` defaults to `HEAD`, so every commit before the
-  iteration's final one resolves no version, no note, and an empty declaration —
-  and the behavior is **specified**, not accidental, which is what makes the unit
-  feature-shaped: the fix revises the contract rather than converging the script
-  onto it.
-  **Deliverable:** a `.workflow/` declaration surface build appends to as it
-  tightens or lands a gate, and close composes the note from, read by the smoke's
-  untagged arm, so an untagged `TO` proves containment rather than emptiness. The missing piece is
-  a **producer**, not a resolution rule — every rule the filing floated is a no-op
-  because at validate no artifact on disk names the gate just tightened. Deltas,
-  causal completeness, and the ruled-out alternatives:
-  gate-sdk/SPEC-upgrade-smoke-note-resolution.md.
-  **Do not promote the `upgrade` baseline row on a post-tag green** — immediately
-  after a tag the smoke runs clean because `TO` is momentarily a tagged `HEAD`,
-  and the next commit restores the defect. The row goes to `pass` when this is
-  built, and a green run this iteration does not by itself exercise the window.
-  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while executing
-  the ruling to author the release note; promoted from the gap inbox the same day;
-  amendment authored 2026-07-31 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -1759,5 +1736,6 @@
 
 - release-note-lead-token-grammar
 - action-gh-repo-context
+- upgrade-smoke-note-resolution
 
 ## Lessons Learned
