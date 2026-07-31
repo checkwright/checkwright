@@ -332,16 +332,45 @@ left to a grep.
 
 ### 10. Release-note declaration — the only compat obligation — *mechanical*
 
-The token is a governed grammar name a vendored consumer's queue carries, so the
-release note declares it under **Renamed knobs** as
-`[needs-spec] → [design-pending]`, per the three-section note structure
-docs/install.md owns.
+The token is a governed grammar name a vendored consumer's queue carries. It
+declares in **two** sections of the one shared note, because the two sections
+answer different questions and this rename owes both an answer.
+
+**Behavior changes** — `[needs-spec] → [design-pending]`, the bullet a human
+upgrader reconciles by rewriting their queue's tags. **Not Renamed knobs.**
+Ruled at align, and derivable rather than judged: docs/install.md scopes that
+section to config twice — `:416-419` lists the residue class as "knob renames in
+**your own config**", and `:421-423` maps "**own-config** knob renames and
+removals → Renamed knobs". A queue tag lives in the consumer's `TASK-QUEUE.md`,
+which is content, not own-config, so it lands in the "behavior your tree depends
+on" class the third section takes. The section is named "Renamed *knobs*", not
+"Renamed things"; the sibling path-move unit reaches the same section by the
+same reading.
+
+**Tightened gates** — `check-amendment-queue`, because it **reds on a clean
+upgrade**. Verified at align at the read site rather than assumed: a consumer
+whose Deferred entries still carry `[needs-spec]` trips the `deferred-open` arm
+(`:50-52`) on **every** such entry once the gate matches the new token, and the
+gate exits 1 (`:111`). That is precisely the allowed-red set those lead tokens
+are read as, mechanically, by a consumer's tooling — so the bullet is owed *in
+addition to* the Behavior-changes one, never instead of it. A rename that can
+turn a gate red owes both, and omitting the mechanical half is the failure that
+matters, because that is the half a machine acts on.
+
+**One gate changes and must *not* be listed: `check-tag-lead-line`.** Its class
+table stops recognizing `[needs-spec]`, so on an unmigrated consumer queue the
+lead-line guard silently **stops firing** rather than reddening. A stop-firing
+gate is not an allowed-red and would corrupt the set if listed — but it is a real
+consumer hazard, and it is exactly the silent direction delta 4's derivation
+closes on the kit side. The Behavior-changes bullet names it, since nothing
+mechanical will.
 
 With no deprecation window owed (§Ruled out), **the note is the entire compat
 obligation this rename carries** — which raises its weight rather than lowering
 it. It is the only artifact that will tell a consumer their queue's tags must be
-rewritten, and nothing mechanical will tell them: the migration happens in the
-consumer's tree, which `upgrade-smoke`'s phase A never touches.
+rewritten, and only the Tightened-gates bullet will tell their tooling which
+gate may go red saying so: the migration happens in the consumer's tree, which
+`upgrade-smoke`'s phase A never touches.
 
 The release class is a **minor**. docs/install.md:349-351's pre-1.0 qualifier
 rides a non-decommission break on a minor while the line is 0.x, and :341-345
@@ -349,7 +378,18 @@ reserves major for a decommission — a release that *removes* a deprecated
 surface, which this is not. :338 files even a knob rename *carrying* a
 deprecation path under Minor, so there is no reading on which a rename with no
 window earns more. `check-release-bump` independently floors the note off a
-patch on the Renamed-knobs section alone.
+patch: it ORs the three section counts (`:97`), so the floor holds on the
+Tightened-gates and Behavior-changes bullets above and never depended on the
+Renamed-knobs placement.
+
+**Renamed knobs reads "None." for this release, with a routing clause, not a
+denial.** docs/install.md:412-415 sanctions a trailing clause exactly where it
+rules out a near-miss a reader would otherwise mis-classify — and a note
+shipping two renames whose Renamed-knobs section reads "None." is that
+near-miss. But :415 forbids a clause that only restates the heading's own
+negation, so it must *route*: name that this release's renames are
+consumer-content and copied-out-template residue and point at Behavior changes.
+"None. — no own-config knob was renamed" is the deletable kind.
 
 ## Producers and consumers
 

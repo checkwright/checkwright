@@ -423,15 +423,24 @@ contract). It is an allowed-red on a real consumer, not a formality: assertions
 A and C bind the deferred section unconditionally, so any vendored queue with an
 over-cap or uncosted entry reds on upgrade. Only assertion B is knob-gated.
 
-Nothing else here earns a bullet. The three new knobs are **added, not renamed**
-— exactly the near-miss docs/install.md:414 names as a trailing clause on a
-"None." Renamed-knobs body, not a bullet. `kpi-queue-net-delta` and
-`kpi-deferred-age`'s widened input are advisory KPIs that never join
-`gates.list` — the other near-miss that section names.
+Nothing else here earns a bullet. The three new knobs are **added, not renamed**,
+and `kpi-queue-net-delta` and `kpi-deferred-age`'s widened input are advisory
+KPIs that never join `gates.list` — the two near-misses docs/install.md:414
+names as trailing-clause material rather than bullets.
 
 This unit rides **one minor with its two siblings and one shared release note**;
-none of the three owns the note alone, and the two renames' bullets are theirs
-to declare. The floor is minor on the Tightened-gates section alone.
+none of the three owns the note alone, and each declares its own bullets into it.
+The floor is minor on this unit's Tightened-gates bullet alone.
+
+**The shared note's Renamed-knobs section reads "None." for this release**, and
+the clause that qualifies it routes rather than denies (:415 forbids a clause
+that only restates the heading's negation). Both sibling renames declare under
+Behavior changes — a queue tag and a template path are consumer content and
+copied-out-template residue, not own-config knobs — so the clause names this
+unit's added-not-renamed knobs *and* points at Behavior changes for the two
+renames. Recorded here because this unit is the only one of the three with
+nothing in that section, so a build session assembling the note from three
+amendments would otherwise read three silences as an empty body with no clause.
 
 ## Producers and consumers
 

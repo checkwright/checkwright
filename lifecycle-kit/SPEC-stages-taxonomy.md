@@ -284,16 +284,44 @@ the historical name is preserved verbatim.**
 
 ### 11. Release-note declaration — the only compat obligation — *mechanical*
 
-A moved adoption path is not a knob and not a gate, so it declares under
-**Behavior changes** in the release note, per the three-section note structure
-docs/install.md owns. That section is explicitly *not* smoke-asserted —
-`upgrade-smoke` proves phase-A determinism and that the red set is declared, but
-the binding shims that break here live in the **consumer's** tree, which phase A
-never touches. The consumer-visible migration is therefore: retarget your shim
-directives from `templates/skills/<stage>.md` to `templates/stages/<stage>.md`,
-and from `templates/skills/{release-sweep,upgrade}.md` to
+The move declares in **two** sections of the one shared note.
+
+**Behavior changes** — the consumer-visible migration. The placement was right
+as authored, and align records the stronger reason: docs/install.md:423-426
+names "copied-out templates" as its own residue class and **explicitly folds it
+into Behavior changes**, on the stated reasoning that a copied-out template that
+then changed *is* depended-on behavior diverging from your copy. So this is not
+a "not a knob, so by elimination" placement — it is the class the section was
+designed to hold. The sibling token rename joins it by the same reading of
+:416-423, which scopes Renamed knobs to *own-config* knob renames.
+
+That section is explicitly *not* smoke-asserted — `upgrade-smoke` proves phase-A
+determinism and that the red set is declared, but the binding shims that break
+here live in the **consumer's** tree, which phase A never touches. The
+consumer-visible migration is therefore: retarget your shim directives from
+`templates/skills/<stage>.md` to `templates/stages/<stage>.md`, and from
+`templates/skills/{release-sweep,upgrade}.md` to
 `templates/{release-sweep,upgrade}.md`. The note states that verbatim, because
 nothing mechanical will state it for them.
+
+**Tightened gates** — `check-skill-binding`, because it **reds on a clean
+upgrade**. Verified at align at the read site: the gate's `DIR` defaults to
+`LIFECYCLE_KIT_SKILLS_DIR`, i.e. the *consumer's* `.claude/commands/`, and
+`:29-31` stats each shim's declared template and reds "binding directive names
+template '<path>' — no such file". After phase A replaces the kit directories,
+every consumer shim still naming `templates/skills/<stage>.md` names a file that
+no longer exists. This is the same forcing function delta 4 relies on inside
+this repo, seen from the consumer's side, and it fires for every bound stage.
+The bullet is owed **in addition to** the Behavior-changes one: the two sections
+answer different questions — what may turn red, versus what you reconcile by
+hand — and only the first is read mechanically.
+
+**`check-kit-ref-liveness` does not fire, and that is stated so build and close
+need not re-derive it.** It resolves a `<name>-kit` path *segment* against the
+live kit roots (its `spec:` line), not an arbitrary subdirectory: after the move
+`lifecycle-kit/templates/skills/...` still names `lifecycle-kit`, which is still
+a live root. The dangling *subdirectory* is invisible to it. No other gate reds
+on a consumer tree for this move.
 
 With no deprecation window owed (§Ruled out), **that note is the entire compat
 obligation this move carries**, which raises its weight rather than lowering it.
