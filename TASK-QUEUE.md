@@ -57,6 +57,94 @@
   spec, which is where the filing's full premise analysis and re-measurements
   now live.
 
+- **needs-spec-tag-rename** [spec: SPEC-design-pending-tag.md] — the
+  design-pending tag's *token* asserts something its own definition does not.
+  `spec` is feature-bound everywhere in the system — the ready-pole tag pairs
+  with an authored amendment, the `/spec` stage authors amendments, and
+  `check-amendment-queue` makes that tag feature-only — but the pending-pole
+  token is mandatory on every entry in a design-pending section, and a deferred
+  **debt** entry promotes with it *deleted, never converted*. For that fraction
+  the token names an artifact that will never exist. Its own owner doc already
+  defines it correctly as a "design-pending marker" (queue-kit/SPEC.md:66); it is
+  the token `needs-spec` that leaks the feature implication the definition does
+  not carry — a name that contradicts its own definition, on the naming-doctrine
+  tree.
+  **Deliverable:** the rename to `design-pending`, designed in
+  canon-kit/SPEC-design-pending-tag.md — the token swap across two gate bodies,
+  three kit SPECs, two READMEs, two templates and the queue; the derivation that
+  makes `check-tag-lead-line`'s class key and its matched literal one token,
+  closing the one direction of a botched rename that no gate catches; the fixture
+  the uncovered tag class was missing; and the rule that a mention whose subject
+  is the historical token is preserved verbatim. The amendment settles the two
+  calls this filing left open — the replacement spelling, and whether to narrow
+  the tag's meaning or keep it section-wide (kept section-wide, because totality
+  is what makes the forbidden-in-active check complete).
+  **Not a decommission:** the pending↔ready cross-check is load-bearing —
+  forbidden-in-active catches a stale tag on a botched promotion, and a
+  ready-pole tag sitting in a design-pending section forces one. Every guard
+  clause survives verbatim; only the token string changes.
+  **Cost while deferred:** low and non-rotting, rising toward launch — the
+  grammar is internally consistent and gated; the residue is one token whose name
+  every reader must mentally correct for the debt fraction, and a breaking rename
+  that is near-free today (no external adopter) but prices in with the first one.
+  **Both halves of that disposition were taken, ruled 2026-07-29 at scope.** This
+  entry is the spine of `pre-adoption-grammar-break`: it lands before launch, and
+  `templates-stages-taxonomy-realignment` folds into the same major on the
+  operator's launch-timing ruling recorded there. It adds no capability, so the
+  standing pre-launch prioritization bar never reached it and it runs under no
+  exception — only the sibling `deferred-queue-carry-cost` does.
+  **Sequencing:** the token migration and `deferred-queue-carry-cost`'s triage
+  sweep both rewrite every design-pending entry; they are paired into one
+  iteration precisely so the queue is rewritten once; the amendment states how
+  the two compose into a single pass rather than leaving build to discover it.
+  [precondition-ok: "design-pending" is this entry's subject, not a precondition]
+  Filed 2026-07-25 by operator request, on the observation that the token implies
+  a feature while deferred triage is a scope-stage decision; amendment authored
+  2026-07-31 at spec, where the measurements and the ruled-out spellings now
+  live.
+
+- **templates-stages-taxonomy-realignment** [spec: SPEC-stages-taxonomy.md] — the
+  tree scatters a class the SPEC names as one. `lead.md`, `release-sweep.md`, and
+  `upgrade.md` are each classified **"boundary skill, not a stage"**
+  (lifecycle-kit/SPEC.md:1375, :1391, :1417; lead cites "the release-sweep
+  precedent" at :157), yet the layout puts two of them inside `templates/skills/`
+  beside the stages and the third alone at `templates/` root.
+  **Deliverable:** the realignment, designed in
+  lifecycle-kit/SPEC-stages-taxonomy.md — `release-sweep.md` and `upgrade.md`
+  move up beside `lead.md`, `templates/skills/` becomes `templates/stages/`, and
+  the SPEC section splits so each boundary skill gets the file-level section
+  `templates/lead.md` already models. Two adoption globs that mean something, in
+  place of today's mixed bag plus a lone root file.
+  **Not the cosmetic no-risk change this entry claimed at filing.** The
+  amendment's reader survey found two silent-degradation paths a rename alone
+  would leave: two freshness gates carry the old directory as a `trigger=` and
+  would quietly stop firing rather than redden, and `check-skill-binding` couples
+  its templates file-by-file with no kit-wide glob, so the two promoted files
+  would land covered by nothing. Both are closed in the same unit,
+  enforcement-first. The other half is already caught — `check-skill-binding`
+  stats each shim's template path, so the seven binding directives red in the
+  same commit as the move.
+  **Cost while deferred:** zero — nothing rots, no gate gaps, no drift; the
+  residue is one layout that groups by a different axis than the SPEC's stated
+  one, with the SPEC prose carrying the true taxonomy correctly meanwhile.
+  **The hold-until trigger has fired — ruled by the operator 2026-07-29 at
+  scope.** This entry rides `pre-adoption-grammar-break` beside
+  `needs-spec-tag-rename`, which breaks the adoption path on the queue-grammar
+  axis and which this entry's sibling text already nominated by slug as the
+  shared major. The deciding weight was **launch timing, not the cosmetic
+  payoff**: the declared preview channel (`preview-release-cadence`) is the next
+  roadmap rung, and a taxonomy break landing *after* it makes adopters re-bind
+  twice. Weighed and outranked: the churn objection — the rename crosses ~13 SPEC
+  cross-references, the `.claude/commands/*.md` binding shims, and README, on a
+  different surface than the queue-grammar break — which argues for two clean
+  majors and loses to the one-re-bind timing point.
+  **Filing class, triaged at scope: feature.** `templates/stages/` is a new
+  directory convention on a published adoption path, and the litmus names a file
+  or directory convention explicitly.
+  Filed 2026-07-25 by operator request, from a session tracing why only
+  lifecycle-kit carries a `templates/skills/` subdirectory; amendment authored
+  2026-07-31 at spec, where the 66-reference blast radius now lives.
+
 ## Technical Debt
 
 - **queue-index-title-tag-residue** — `bin/queue-index.sh` renders every tagged
@@ -1110,117 +1198,6 @@
   party is asked to trust the record, which is the hosted rung's
   precondition anyway. Bounded. Surfaced 2026-07-25 in the operator's
   attestation-direction review.
-
-- **templates-stages-taxonomy-realignment** [needs-spec] — the tree scatters a class the
-  SPEC names as one. `lead.md`, `release-sweep.md`, and `upgrade.md` are each
-  classified **"boundary skill, not a stage"** (lifecycle-kit/SPEC.md:1375,
-  :1391, :1417; lead cites "the release-sweep precedent" at :157), yet the
-  layout puts two of them (`release-sweep`, `upgrade`) inside
-  `templates/skills/` beside the stages and the third (`lead`) alone at
-  `templates/` root. The realignment: move `release-sweep.md` + `upgrade.md`
-  up to `templates/` root beside `lead.md` (the boundary-skill class), and
-  rename `templates/skills/` → `templates/stages/` so the directory becomes
-  precisely the stage-class templates (`scope`, `spec`, `align`, `build`,
-  `validate`, `close`). Result: two pure adoption globs (root = boundary
-  skills, `stages/` = stages) mirroring the SPEC's own stage/boundary axis,
-  in place of today's mixed `skills/` bag plus a lone root file.
-  **Why deferred, not done:** the payoff is purely cosmetic and the cost is a
-  breaking rename of a **consumer-facing adoption path**. No correctness or
-  gate value — `check-stage-skill-coverage` reads the configured roster
-  (`LIFECYCLE_KIT_STAGES`), not the directory, and the roster can't be derived
-  from `stages/` anyway (`spec.md` sits in the dir but is out of the default
-  roster, and the roster is ordered and consumer-configurable), so there is no
-  derivation-first win hiding here. The path is published surface: the binding
-  shims hardcode it (`.claude/commands/*.md` → "Execute the template at
-  `lifecycle-kit/templates/skills/<stage>.md`"), ~15 SPEC `§templates/skills/`
-  refs point at it (including the binding-shim grammar section the boundary
-  skills themselves cite), README's adoption line names it, and any vendored
-  consumer adopted `templates/skills/`. Renaming it is a breaking change under
-  the kit's own upgrade contract — it needs a deprecation marker and a release
-  note, exactly the machinery `upgrade.md` narrates.
-  **Cost while deferred:** zero — nothing rots, no gate gaps, no drift; the
-  residue is one layout that groups by a different axis than the SPEC's stated
-  one, with the SPEC prose carrying the true taxonomy correctly meanwhile. The
-  disposition to hold: land it folded into the **next major that already
-  breaks the adoption path** for another reason, so the break amortizes rather
-  than standing as its own breaking release.
-  **That trigger has fired — ruled by the operator 2026-07-29 at scope.** This
-  entry rides `pre-adoption-grammar-break` beside `needs-spec-tag-rename`, which
-  breaks the adoption path on the queue-grammar axis and which this entry's
-  sibling text already nominated by slug as the shared major. The deciding weight
-  was **launch timing, not the cosmetic payoff**: the declared preview channel
-  (`preview-release-cadence`) is the next roadmap rung, and a taxonomy break
-  landing *after* it makes adopters re-bind twice. Weighed and outranked: the
-  churn objection — the rename crosses ~15 `§templates/skills/` SPEC refs, the
-  `.claude/commands/*.md` binding shims, and README, on a different surface than
-  the queue-grammar break — which argues for two clean majors and loses to the
-  one-re-bind timing point.
-  **Filing class, triaged at scope: feature.** `templates/stages/` is a new
-  directory convention on a published adoption path, and the litmus names a file
-  or directory convention explicitly; it needs an amendment and the deprecation
-  marker plus release note this entry already describes.
-  Filed 2026-07-25 by operator
-  request, from a session tracing why only lifecycle-kit carries a
-  `templates/skills/` subdirectory.
-
-- **needs-spec-tag-rename** [needs-spec] — the design-pending tag's *name*
-  asserts a falsehood over part of the set it governs. `spec` is feature-bound
-  everywhere in the system: `spec:` pairs with an authored amendment, the
-  `/spec` stage authors amendments, and `check-amendment-queue` makes `spec:`
-  **feature-only** ("a `spec:`-tagged entry in an active non-feature section
-  … is misfiled there — it belongs in a feature section"). But `[needs-spec]`
-  is mandatory on **every** Deferred entry, and Deferred is triaged into
-  feature-vs-debt only at scope — debt always promotes, features only where
-  scope authors. A deferred **debt** item promotes with its `[needs-spec]`
-  **deleted, never converted to `spec:`** (debt carries neither tag in the
-  active queue), so for the debt fraction the token names a spec that will
-  never exist. The tag's own owner doc already defines it correctly as a
-  "**design-pending marker**" (queue-kit/SPEC.md:59) — section-wide and
-  honest; it is the *token* `needs-spec` that leaks the feature implication the
-  definition does not carry. A name that contradicts its own definition, on the
-  naming-doctrine tree.
-  **Deliverable:** rename the pending-pole token to a design-state-honest
-  spelling — candidate `[design-pending]` (doc-aligned, verbatim from
-  queue-kit/SPEC.md:59); alternatives `[triage-pending]` / `[unscoped]` if
-  "design" still over-implies for debt (the one fact true of every deferred
-  entry is that scope has not triaged it). The `spec:` ready-pole stays — it
-  is correctly feature-bound. Breaking the `[needs-spec]`/`spec:` lexical
-  pairing is **intended**: the pending→`spec:` path is not guaranteed (debt
-  exits the pool with no tag), so the tokens must not imply it is. Touches
-  queue-kit (`check-tag-lead-line`, README, `TASK-QUEUE.md` template),
-  canon-kit (`check-amendment-queue` + SPEC), lifecycle-kit (close's gap-drain,
-  `enter-stage.sh` help text), the fixtures, docs, and a migration of every
-  existing Deferred entry. **Not a decommission:** the pending↔ready
-  cross-check is load-bearing (forbidden-in-active catches a stale tag on a
-  botched promotion; `spec:`-in-Deferred forces promotion) — rename preserves
-  every guard clause verbatim, only the token string changes. **Why
-  `[needs-spec]`:** the exact replacement token is the open call, and whether to
-  narrow the tag's *meaning* to match a renamed token or keep it section-wide
-  under a truer name is the design the spec settles.
-  **Cost while deferred:** low and non-rotting, rising toward launch — the
-  grammar is internally consistent and gated; the residue is one token whose
-  name every reader must mentally correct for the debt fraction, and a breaking
-  rename that is near-free today (no external adopter) but prices in with the
-  first one. Best landed before launch, or folded into the same major as
-  `templates-stages-taxonomy-realignment` (both are pre-adoption grammar
-  breaks).
-  **Both halves of that disposition were taken, ruled 2026-07-29 at scope.** This
-  entry is the spine of `pre-adoption-grammar-break`: it lands before launch, and
-  `templates-stages-taxonomy-realignment` folds into the same major on the
-  operator's launch-timing ruling recorded there. It adds no capability, so the
-  standing pre-launch prioritization bar never reached it and it runs under no
-  exception — only the sibling `deferred-queue-carry-cost` does.
-  **Sequencing constraint carried to `spec`:** the token migration rewrites every
-  Deferred entry, and so does `deferred-queue-carry-cost`'s part (d) triage
-  sweep. They are paired into one iteration precisely so the queue is rewritten
-  once; authoring the two amendments independently of that ordering would
-  re-introduce the double rewrite the pairing exists to avoid. Re-measured
-  2026-07-29 at scope: `[needs-spec]` now appears **98×** in `TASK-QUEUE.md`
-  across 61 Deferred entries, and queue-kit/SPEC.md:66 still carries the
-  "design-pending marker" definition this entry quotes.
-  Filed 2026-07-25 by operator request, from the same session, on the
-  observation that `[needs-spec]` implies a feature while deferred triage is a
-  scope-stage decision.
 
 - **md-section-near-miss-match** [needs-spec] — `context-kit/bin/md-section.sh`
   silently returns empty (exit 0, no output) on a near-miss heading query instead
