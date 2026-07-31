@@ -1,1 +1,23 @@
 # contract: evidence-manifest v1
+pre-adoption-grammar-break installer_smoke sha256=3bb50c22a9866e21bcf851ef00ee34c0e083b78378cf6bb526231734f79fcc40 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break gates sha256=702c72c5a549f1b7ffec89718698ef289ec0c79ee38f92d60eef01b89400d614 pass=87 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break gate_sdk sha256=73c6291f69ddd7aceb4ae99cbbf9f179e23b5b911c2461447597d9fac574bc30 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break canon_kit sha256=53f86c08f6cdef04eb8e8e2d3c3f46a93432f64a0c404fbfe741af65bab97f1b pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break delegation_kit sha256=fefbbc1616a4c22a4719d7d73ce7e270a2bd8711281e8ddd28aa08fe1880a67a pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break guard_kit sha256=641f55e2064f186cb2340df8c91a22bbcff22fe376bd1527c388e9162c9262f4 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break lifecycle_kit sha256=5f9077e6d8df174b6193fe6ba78a8ab96cf810bbf46392f4a0185b40726803d1 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break queue_kit sha256=4bc7b2cd8ebe7bf15d999e527ad7ebfac3c93623a453252ca1db41d7ab333710 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break site_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break scripts sha256=9ceea1fcc2c4360991a31d3b3b4d04707cb674b3194724c7612f94089836520e pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break demo sha256=cb887ef2598a7aca31fe60c38bdecc564969c920123dc9407de4a073a862d86a pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break upgrade sha256=6da09ae06678e13d944588a265b63890c76520b9b36b3cdd78cd8c13bb9d0214 pass=0 fail=1 ignore=0 verdict=new-failures 2026-07-31
+pre-adoption-grammar-break agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
+pre-adoption-grammar-break index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-07-31
