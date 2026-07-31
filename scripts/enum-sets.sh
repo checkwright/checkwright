@@ -5,8 +5,9 @@ set -uo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # spec: canon-kit/SPEC.md §check-prose-enum — the tag vocabulary is queue-kit's own parse surface: the class table check-tag-lead-line derives both its match literal and its arr[] key from — the gate's one quoted-literal split() — read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing
-_tagtable="$(grep -oE 'split\("[^"]+"' "$REPO/queue-kit/checks/check-tag-lead-line.sh" \
-    | head -1 | sed -E 's/^split\("//; s/"$//')"
+mapfile -t _splits < <(grep -oE 'split\("[^"]+"' "$REPO/queue-kit/checks/check-tag-lead-line.sh")
+(( ${#_splits[@]} == 1 )) || { echo "enum-sets: check-tag-lead-line.sh holds ${#_splits[@]} quoted-literal split() calls, not the one class table this derivation reads; anchor the read on the class table rather than on position" >&2; exit 2; }
+_tagtable="$(printf '%s\n' "${_splits[0]}" | sed -E 's/^split\("//; s/"$//')"
 # shellcheck disable=SC2086  # the table is a space-separated token list; word splitting is the parse
 mapfile -t alltags < <(printf '%s\n' $_tagtable | sed -E 's/[]:]$//' | sort -u)
 [[ ${#alltags[@]} -gt 0 ]] || { echo "enum-sets: no tags parsed from check-tag-lead-line.sh" >&2; exit 2; }

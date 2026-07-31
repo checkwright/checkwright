@@ -1248,6 +1248,358 @@
   which bullet form the smoke actually parses; promoted from the gap inbox the
   same day.
 
+- **gate-exemption-live-slug-derivation** [design-pending] —
+  `check-gate-exemption-tasks` resolves an `# until: <slug>` exemption against a
+  live-slug set it derives by scanning the wrong thing twice over, so an
+  exemption can resolve green against no task at all.
+  **(1) Section span.** The scan opens on the active and deferred headings and
+  closes on Done / Lessons Learned with no reset on an unknown heading, so any
+  section added between them is silently swept in as live. The icebox tier
+  landed this iteration relies on exactly that accident for its placement.
+  **(2) Token scan — strictly worse than (1).** Inside that span the awk reads
+  every bold-emphasis token on every line rather than bullet lead lines, so the
+  live set is 109 tokens against `queue_live_slugs`' 61 real slugs. Spurious
+  members include `scope`, `debt`, `monitor`, `never`, `minor`, `resolved`,
+  `source`, `output` — an `# until: scope` exemption resolves green today,
+  against no task, with no icebox involved.
+  **Why `[design-pending]`:** the two halves are one fix and the fix is a seam
+  question — gate-sdk needs a real slug parse it can own **without depending on
+  queue-kit for the section set**, which the provenance seam forbids. Candidates
+  are a gate-sdk-owned live-section knob, an explicit heading reset, or a
+  lead-line predicate; which one keeps the gate consumer-agnostic is the open
+  call.
+  **Cost while deferred:** low and non-rotting, but live now rather than
+  contingent on the icebox — the token half is exploitable at HEAD, and it fails
+  **open** (an exemption that should red resolves green) rather than loud.
+  Surfaced 2026-07-29 at spec while surveying readers for the icebox tier; the
+  token-scan half added 2026-07-31 at align. Drained from the gap inbox by close,
+  which triaged the two bullets as one unit on the align bullet's instruction.
+
+- **kit-index-page-vocabulary-ungated** [design-pending] —
+  `docs/queue-kit/index.md` carries governed tag vocabulary but is
+  hand-authored, outside the docs mirror, and under no content gate:
+  `check-docs-kit-parity` and `check-docs-nav-reachable` read front matter and
+  nav only. It survived this iteration's `[needs-spec]` → `[design-pending]`
+  rename solely by accident — it happens to enumerate all five task tags and
+  sits in `CANON_KIT_MANIFEST_FILES`, so `check-prose-enum` reaches it by
+  completeness rather than by design. A page enumerating four would have drifted
+  silently.
+  **Why `[design-pending]`:** the deliverable is not "gate this page" but a
+  ruling on what a kit index page *is* — a mirrored projection, a hand-authored
+  surface carrying a declared enum obligation, or prose that must not enumerate
+  at all. Each answer puts the fix in a different kit and a different gate.
+  **Cost while deferred:** low and non-rotting today, but every kit index page is
+  the same shape, so the exposure is per-page and grows with the docs site.
+  Surfaced 2026-07-31 at build while tracing what the tag rename reached; drained
+  from the gap inbox by close.
+
+- **knob-rename-compat-threshold** [design-pending] — lifecycle-kit/SPEC.md's
+  knob-rename compat precedent makes a rename compat-free "before the first
+  release tag … because no external consumer can have vendored the kit yet (the
+  first tag is a launch-comms prerequisite)". The tag was a proxy for that stated
+  premise and the two have come apart: 17 tags have shipped, launch has not
+  happened, and no external install has ever been observed — so the premise still
+  holds while the threshold reads as long crossed. It misfires on the next real
+  knob rename, demanding a deprecation window that protects nobody.
+  **Why `[design-pending]` — two open questions the fix must settle.** (i) What
+  observable ends the compat-free window in place of the first tag; the declared
+  `preview-release-cadence` rung is a nominee, not a ruling. (ii) Whether the
+  corrected clause generalizes beyond knobs: it is knob-scoped today — headed for
+  knobs, sitting above the `LIFECYCLE_KIT_*` roster, cited nowhere else — and that
+  scoping is exactly what kept it off this iteration's two renames.
+  **Cost while deferred:** zero today and non-rotting, since the clause governs
+  knob renames only and none is queued — but it bites the first time one is, and
+  it bites as a **false obligation** rather than a missing one, which is the
+  harder kind to notice.
+  Surfaced 2026-07-31 at spec, escalated and ruled during
+  `pre-adoption-grammar-break`; drained from the gap inbox by close.
+
+- **rule-reach-before-merits** [design-pending] — the iteration's recurring
+  failure mode, in both its forms, with no durable home. Six times a question
+  that presented as a merits call turned instead on the governing rule's **scope**.
+  **Form one — a rule invoked that does not reach the unit (five instances).** At
+  scope the operator's pre-launch bar was the Enhancement decision rule and three
+  of four units never reached it; at spec the knob-rename compat precedent reached
+  neither rename; at align the release note's Renamed-knobs section proved scoped
+  to own-config knobs twice over and so took neither rename either. In none was an
+  exception owed or taken — and logging an exception where the rule never reached
+  corrupts the record for the next reader.
+  **Form two — a governing mechanism that DID reach and went unread (one
+  instance).** Three sessions designed new mechanism for the close-entry refusal —
+  an early tag, a rescoped preflight, a new `verdict=` state, a smoke redesign —
+  before anyone read evidence-kit's held-constant-red baseline idiom, which already
+  covered the case exactly and needed no new mechanism at all.
+  They are one failure mode seen from two sides: **establish what a rule governs
+  before arguing where its line falls, and read the governing mechanism before
+  designing its replacement.**
+  **Why `[design-pending]`:** placement is the whole question. As stated it is a
+  delivery-doctrine rule — `doctrine-kit/DOCTRINE.md`, re-vendored, so it owes a
+  release-note bullet — with an always-loaded one-liner above it; but form two sits
+  close enough to the existing Oracle-first and Spec-over-precedent rules that it
+  may belong as a clause on one of them rather than as a new rule. Minting a rule
+  that restates a neighbour is the exact defect the doctrine's own content-tiering
+  rule forbids, so the split is the design.
+  **Cost while deferred:** the pattern recurred six times in one iteration and is
+  paid in rework rather than in tree state — a wrong scope read spends a session's
+  design effort on a rule that was never in play. Non-rotting; nothing degrades.
+  Surfaced across scope, spec, align, build and validate of
+  `pre-adoption-grammar-break`; drained from the gap inbox by close, which merged
+  the original three-instance lesson with its inverted-form correction.
+
+- **absence-statement-grammar** [design-pending] — operator-directed: prefer
+  omission over a sentence that restates absence, and a bare token (`None`, or a
+  dash) where a statement of absence *is* required. Live instance:
+  `queue-kit/bin/roadmap.sh`'s empty-horizon placeholder emits a full sentence
+  saying nothing is queued, asserted by its own gate test, where an empty section
+  says the same thing.
+  **The rule must not be blanket, and that is the design.** docs/install.md's
+  upgrade contract deliberately requires `None.` stated-never-omitted on the three
+  release-note sections, because there it is a checklist the reader must know was
+  considered — and that same passage already forbids a clause that only restates
+  the heading's own negation. Formulation to land: **state absence only where the
+  reader must know it was considered; omit where the structure already shows it;
+  when stated, a token, never a sentence.**
+  **Why `[design-pending]`:** it touches `doctrine-kit/DOCTRINE.md` (re-vendored,
+  so it owes a release-note bullet) plus one always-loaded `CLAUDE.md` line, and
+  changes `roadmap.sh`'s placeholder and its fixture — a doctrine ruling and a
+  behavior change in one unit, and the doctrine half must be worded so it does not
+  falsify the install-doc carve-out it sits above.
+  **Cost while deferred:** low and non-rotting but recurrent — agents keep landing
+  on the wrong side of a distinction the tree makes in practice and states nowhere.
+  Surfaced 2026-07-31, operator-directed; drained from the gap inbox by close.
+
+- **statusline-queue-section-counts** [design-pending] — operator request: surface
+  `TASK-QUEUE.md` section counts in the statusline in a compact layout — features,
+  debt, deferred, icebox as single-letter counters, the deferred counter explicitly
+  wanted. Needed for the operator's own statusline at minimum; extending
+  `delegation-kit/templates/statusline-usage.sh` for consumers is welcome if the
+  mechanism carries. That template already opens the queue (for the iteration name)
+  and the lifecycle state file (for the stage), so counts add no new file access
+  and no new dependency.
+  **The design question that must not be assumed away:** section names are consumer
+  config — `QUEUE_KIT_ICEBOX_SECTION` and its canon-kit and drift-kit counterparts
+  — so the counter must resolve **configured** section names. Hardcoding this
+  repo's four headings would put one consumer's layout into a kit literal, which is
+  the provenance seam.
+  **Two surfaces, separate edits:** the kit template is a consumer-copy producer,
+  so the operator's live statusline is a copy and will not update from a template
+  change.
+  **Cost while deferred:** low and non-rotting; the residue is that queue shape is
+  invisible at a glance and re-derived by running the queue index or opening the
+  file.
+  Surfaced 2026-07-31, operator request; drained from the gap inbox by close.
+
+- **contributor-writeback-disposition** [design-pending] — operator-directed: every
+  GitHub boundary-sweep disposition must write back to the contributor, and the
+  comment must be appreciative — explicitly **including** the discard cases. A
+  contribution declined without visible thanks spends community goodwill the
+  project cannot refund. Current state in this repo's scope shim (the kit template
+  carries no GitHub sweep, so this is local policy, not a kit change): five
+  dispositions across two lanes, only three write back at all, and none specifies
+  tone, so the discard cases read as bare rejection.
+  **(1) Promotion writes back nothing.** An issue we accept, queue, and work leaves
+  its reporter with silence — the worst case, because it is where we have most to
+  say. The clause also states no **fate** for a promoted issue: left open it
+  re-enters the per-lane cap at every boundary, and the sweep cannot distinguish
+  already-promoted from never-triaged, because the "Surfaced by GitHub issue #N"
+  citation lives on the queue entry rather than on the issue.
+  **(2) The cap falsifies any blanket promise.** The sweep caps each lane at five
+  items per boundary, so item six receives no disposition and no comment at all,
+  not even a decline; with one iteration running at a time the long tail waits in
+  silence across boundaries, and a contributor never reached cannot distinguish
+  queued from ignored. Either an acknowledgment pass cheap enough to run uncapped
+  while the analysis stays capped, or a promise worded to what the cap can keep.
+  **Do not fix the tone requirement without settling this**, or the result is a
+  stated commitment the mechanism cannot honour.
+  **(3) The decline needs a taxonomy, not a template.** The operator-directed shape
+  — thank, acknowledge the contribution lacks general applicability, suggest
+  implementing it locally — is credible here because gates resolve consumer-first
+  with kit shadowing and the provenance seam already mandates that non-general
+  content become optional consumer config. But it is honest **only** when the
+  reason really is "correct, but not general"; applied to wrong, duplicate, or
+  seam-crossing contributions it is a form letter, which reads as less respectful
+  than a short honest no. Minimum taxonomy: not-general, already-covered,
+  incorrect, seam-violating — plus, in the PR lane, right-idea-no-fixture, whose
+  honest closing is an invitation to resubmit rather than a decline.
+  **(4) Content tiering.** `CONTRIBUTING.md` is where a *contributor* reads what
+  happens to their contribution; the scope shim is where the *scope session* reads
+  the ritual. Different readers, so both may carry a line without it being
+  restatement — but that split must be ruled deliberately rather than duplicated by
+  accident.
+  Distinct from `security-advisory-lane`, an unswept third lane; this is a
+  write-back defect in a lane already swept.
+  **Cost while deferred:** low in tree terms and non-rotting, but it accrues
+  against people rather than code, and the repo is pre-launch — the first external
+  contributors meet whichever behaviour is in force then.
+  Surfaced 2026-07-31, operator-directed across three gap-inbox bullets; drained
+  and merged into one unit by close.
+
+- **lead-batching-roster-derivation** [design-pending] — an iteration lead that
+  batches by **amendment** silently drops every amendment-free unit scope promoted.
+  Instance: this iteration promoted five units; three carried an amendment and were
+  batched, and the two Technical Debt units carry none — a debt-lane unit converges
+  an implementation on existing spec and mints no governed name — so they fell out
+  of the batching entirely and the lead dispatched "batch 2 of 2". Caught only
+  because the build session read its own ritual's exit condition (an empty queue),
+  disagreed with the lead's framing, and escalated rather than exiting on it; a lead
+  ruling then opened batch 3.
+  **The defect is silent in the lead's own view:** nothing reddens, every amendment
+  merges, and the iteration looks complete from the amendment set alone. Same shape
+  as the rest of this iteration's findings — a roster keyed on the wrong thing
+  **stops covering** rather than reddening.
+  **Why `[design-pending]`:** two candidate fixes with different owners, neither
+  ruled — derive the lead's batching roster from scope's promotion record rather
+  than from the amendment set (a `lifecycle-kit/templates/lead.md` change), or
+  assert build's exit condition against the live queue in a gate rather than
+  leaving it to a session's reading (a new gate). The second is the oracle the
+  first lacks, and whether both are owed is the call.
+  **Cost while deferred:** low and non-rotting, but it recurs on every lead-run
+  iteration mixing amendment-bearing and debt-lane units, which is the common case
+  rather than the exception.
+  Surfaced 2026-07-31 at build; drained from the gap inbox by close.
+
+- **queue-index-blocked-by-assertions** [design-pending] — coverage hole in
+  `queue-kit/gate-tests/queue-index.test.sh`, pre-existing: the blocked-by tag's
+  re-echo and the ready/blocked marker (bullet vs cross) are asserted nowhere,
+  although the sibling drain-exempt echo is. Surfaced while fixing the title
+  rendering this iteration, because that fix restructured the very expression
+  concatenating the blocked-by suffix onto the title — the hole sat directly under
+  the change.
+  Verified by running rather than by reading that nothing regressed: a fixture
+  carrying a blocked entry, one whose lead line is all tag, and one carrying both
+  rendered byte-identically before and after the fix apart from the intended
+  separator change. But the assertion that would have caught a regression does not
+  exist, and the marker derivation is likewise unasserted.
+  **Cost while deferred:** low and non-rotting — two `want()` lines close it — and
+  the residue is only that a future edit to the title-and-tag concatenation can
+  regress the echo silently.
+  Surfaced 2026-07-31 at build; not folded into the fix commit because the unit's
+  commit had already landed under a HEAD moved by a concurrent session, so landing
+  it meant either a second commit on a closed unit or a rewrite of shared history.
+  Drained from the gap inbox by close.
+
+- **agent-execution-backgrounding-role-scope** [design-pending] — the
+  agent-execution protocol's backgrounding rule is stated for the **supervisor**
+  role and misreads as licence when a sub-agent loads the same doc.
+  `delegation-kit/templates/agent-execution.md` says to always dispatch in the
+  background and wait for the completion notification — correct and load-bearing
+  for a dispatching supervisor, but a stage session reads the same always-loaded
+  protocol, and "always background" generalizes wrongly to its own long-running
+  work.
+  Observed 2026-07-31 at validate: the session launched the whole validate suite in
+  the background, ended its turn to report progress, and its background child died
+  with it — the stage returned control with an entry stamp and no results, and the
+  suite was re-run from scratch. Silent the same way the rest of this iteration's
+  defects were: nothing reddens, the session reports in good faith, and missing
+  evidence looks like pending evidence.
+  **Why `[design-pending]`:** the fix is a role-scoping ruling on a shipped
+  always-loaded template, and the two candidates read differently for every
+  consumer — scope the rule to the dispatching role explicitly and add its
+  sub-agent counterpart (*work you must report on is awaited in the foreground,
+  however long; detaching it discards it when your turn ends*), or state it once in
+  role-neutral terms surviving both readings. An instance of
+  `rule-reach-before-merits`' first form, filed separately because the doc defect
+  is concrete and its own.
+  **Cost while deferred:** low in tree terms, non-rotting, but it recurs per stage
+  session running a long oracle — which is validate every iteration — and each
+  instance costs a full suite run rather than a wrong answer.
+  Surfaced 2026-07-31 at validate; drained from the gap inbox by close.
+
+- **context-pressure-signal** [design-pending] — operator request: a
+  usage-verdict-style context-pressure signal that **suggests** compaction, so the
+  decision stops depending on a lead's guess. The source needs no estimation: the
+  harness hands the context window's used percentage to the statusline, and
+  `delegation-kit/templates/statusline-usage.sh` already reads and renders it as
+  the ctx gauge, then drops it. The pipeline exists too — the statusline is the
+  `usage.txt` producer and `bin/usage-verdict.sh` its consumer — so the work is
+  roughly to add a context-used key to the payload and give it a verdict.
+  Explicitly **not** transcript parsing off `drift-kit/bin/overhead-meter.sh`:
+  bytes are not tokens, and the transcript outlives the window across a compact.
+  **Three constraints the design must settle.** (i) Only the statusline can produce
+  it — the usage poller reads an account endpoint for rate limits, and context
+  usage is a per-session client-side number no endpoint knows, so the key is
+  statusline-only and absent under the poller producer, which the payload's
+  optional-keys rule accommodates but the SPEC must state. (ii) **The real
+  problem** — `usage.txt` is one global file while context usage is per session.
+  Rate limits are per-account so sharing is correct for them; this repo runs a lead
+  plus concurrent stage sessions each rendering over the same path, so whoever
+  rendered last wins and a lead could read a stage session's number and act on it.
+  Sub-agents that render no statusline contribute nothing at all. Keying by session
+  id or writing per-session is the call. (iii) It suggests and never blocks —
+  unlike the budget guard, where a false negative kills a dispatch, a false
+  positive here costs context that did not need to be lost. Shape is a **hook, not
+  a gate**, on the agent-budget-guard precedent.
+  **Ownership is a genuine fork:** delegation-kit owns the pipeline and the
+  statusline template; context-kit owns session context and the session brief.
+  **Cost while deferred:** low and non-rotting, but the residue is that compaction
+  timing stays a judgment call made by the one party that cannot see the number.
+  Surfaced 2026-07-31, operator request superseding the lead's own first sketch;
+  drained from the gap inbox by close.
+
+- **workflow-state-direct-edit-guard** [design-pending] — operator question, worth a
+  unit: can a direct edit to the lifecycle state file that bypasses
+  `lifecycle-kit/bin/enter-stage.sh` be blocked? Findings, verified rather than
+  assumed.
+  **(1) Content-based detection is impossible and should not be attempted** — a
+  hand-written stamp is byte-identical to an `enter-stage` one by design, and any
+  marker `enter-stage` adds is equally writable by whoever is hand-editing.
+  **(2) Much of the bypass is already closed**, which was not obvious:
+  `check-evidence-manifest`, `check-stage-entry` and `check-stage-evidence` are all
+  registered gates, and the manifest check reads the cursor out of the state file
+  itself — so a hand-stamped `close` entry reds at the offender's first commit on
+  the same assertion that refused the entry. The entry preflight and the pre-commit
+  gate are the same code reading the same cursor.
+  **(3) The missing lever** is a `PreToolUse` matcher on Write|Edit denying the
+  state file; today `PreToolUse` matches only Bash and Agent, and guard-kit's
+  bash-guard is the established precedent for exactly this shape.
+  **(4) The actual hole is neither** — the cursor is the **worktree** file's last
+  stamp and every reader reads the working tree, while gates fire only at commit.
+  An uncommitted hand-edit moves the cursor immediately for the whole session, and
+  a session that never commits its stamp is never caught at all. That window is
+  ungated by construction and a Write/Edit guard is the only thing that reaches it.
+  Residual and unclosable in-repo: `--no-verify`, and a human editing outside the
+  agent tooling.
+  **Why `[design-pending]`:** which kit owns a Write/Edit-side guard is unsettled —
+  guard-kit owns the tool-call guard mechanism while lifecycle-kit owns the state
+  file — and the settings hooks are a pinned surface, so the unit changes one.
+  **Cost while deferred:** low today and non-rotting, but it is the integrity floor
+  under every lifecycle claim the repo makes, so the exposure is reputational
+  rather than mechanical.
+  Surfaced 2026-07-31 by the close-entry refusal the same day, where `enter-stage`'s
+  own refusal text openly offered a deliberate hand-stamp and the session declined
+  on the close ritual's rule — i.e. the current control is the agent's judgment,
+  which is what this request wants to stop relying on. Drained by close.
+
+- **readme-roster-enum-coverage** [design-pending] — a kit README enumerating a
+  **derivable** set is outside every parity gate, so it drifts silently while the
+  battery stays green. `check-readme-roster` holds one roster per README — the
+  `checks/` basenames — and nothing else; `check-prose-enum` holds only the sets
+  `scripts/enum-sets.sh` declares, which today is the queue tag vocabulary and
+  nothing else.
+  **Two instances, both found by close's step-5 staleness read rather than by an
+  oracle.** (1) drift-kit/README.md enumerates the bundled lead KPIs one-for-one
+  and omitted `kpi-queue-net-delta`, shipped this iteration and registered in
+  `scripts/kpis.list` — a registry that is exactly an enum-set source. (2)
+  queue-kit/README.md's `## Use` block enumerates `bin/queue-index.sh`'s
+  invocations and omitted `--icebox-candidates`, while queue-kit/SPEC.md states
+  the tool's three modes outright; the README is the only invocation surface a
+  reader gets. Both were corrected by hand at that close, which is the
+  Enforcement-first shape the doctrine bars — the fix landed without the gate.
+  **Why `[design-pending]`:** an enum set is cheap to declare and expensive to
+  land, because declaring one obliges **every** prose enumeration of that set,
+  tree-wide, to be complete. The unit owes a survey of what a `drift-kpi` set
+  would red before it is declared, plus a ruling on whether a tool's *modes* are
+  an enum set at all or want a different parity shape — the modes live in a
+  SPEC sentence and an argument parser, neither of which is a registry file.
+  The count half of this class is `spec-measured-count-gate`'s, not this
+  entry's: a bare cardinal qualifying a roster is a different scanner from a
+  membership check.
+  **Cost while deferred:** low and non-rotting, but it is paid once per close —
+  the staleness read is the only detector, so every README roster is held by a
+  session's attention rather than by a gate.
+  Surfaced 2026-07-31 by close's top-level staleness review, which found both
+  instances; filed rather than fixed because the enum-set survey is the work.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
