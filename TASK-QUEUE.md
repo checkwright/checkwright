@@ -1339,6 +1339,15 @@
   may belong as a clause on one of them rather than as a new rule. Minting a rule
   that restates a neighbour is the exact defect the doctrine's own content-tiering
   rule forbids, so the split is the design.
+  **A third candidate rides the same placement question, and only that question.**
+  Twice this iteration an oracle's *satisfaction* was read as the spec: the
+  upgrade smoke's demand for one Tightened-gates bullet where the contract wanted
+  three, and the budget guard's `OK` read as a dispatch decision. Generalized —
+  *an oracle's pass is a floor, not the specification* — that is a doctrine rule
+  sitting beside Oracle-first, and it is named here rather than filed separately
+  because whoever settles new-rule-versus-clause for the two forms above settles
+  it for this one in the same motion. The concrete half is already landed in
+  delegation-kit/SPEC.md at the guard's contract; only the doctrine tier is open.
   **Cost while deferred:** the pattern recurred six times in one iteration and is
   paid in rework rather than in tree state — a wrong scope read spends a session's
   design effort on a rule that was never in play. Non-rotting; nothing degrades.
@@ -1492,18 +1501,36 @@
   suite was re-run from scratch. Silent the same way the rest of this iteration's
   defects were: nothing reddens, the session reports in good faith, and missing
   evidence looks like pending evidence.
-  **Why `[design-pending]`:** the fix is a role-scoping ruling on a shipped
-  always-loaded template, and the two candidates read differently for every
-  consumer — scope the rule to the dispatching role explicitly and add its
-  sub-agent counterpart (*work you must report on is awaited in the foreground,
-  however long; detaching it discards it when your turn ends*), or state it once in
-  role-neutral terms surviving both readings. An instance of
-  `rule-reach-before-merits`' first form, filed separately because the doc defect
-  is concrete and its own.
+  **Second instance — the resume journal does not reach a search sub-agent.** The
+  protocol's resume-journal mechanics are written for a dispatched *stage* agent:
+  the agent writes, the supervisor deletes. An Explore-class read-only child
+  journals nothing, so its findings exist only as a return value in its parent's
+  context and are un-resumable by construction. Observed 2026-07-31 at this close,
+  which dispatched two audit sweeps and then hit the session wall; both had already
+  returned, which was luck rather than design — had the wall landed mid-sweep the
+  audit work would have been lost with no record that it ran, and the resuming
+  session would have had no way to know it was owed. Deliverable for this half:
+  the protocol states that findings a parent will act on are committed or
+  journaled before the parent proceeds on them.
+  **Why `[design-pending]`, and why the slug is narrower than the unit:** both
+  halves are one defect — a shipped always-loaded protocol states its rules for
+  the dispatching role and leaves the sub-agent role unstated — so the fix is one
+  role-scoping pass, not two patches, and a consumer should read a coherent
+  protocol rather than two amendments to it. The open call is the same for both:
+  scope each rule to the dispatching role explicitly and add its sub-agent
+  counterpart (*work you must report on is awaited in the foreground, however
+  long; detaching it discards it when your turn ends*; *findings you will act on
+  are made durable before you act*), or state each once in role-neutral terms
+  surviving both readings. The slug names the first instance only, because it was
+  filed first and a deferred slug is conserved rather than renamed.
+  An instance of `rule-reach-before-merits`' first form, filed separately from it
+  because the doc defect is concrete and its own.
   **Cost while deferred:** low in tree terms, non-rotting, but it recurs per stage
   session running a long oracle — which is validate every iteration — and each
-  instance costs a full suite run rather than a wrong answer.
-  Surfaced 2026-07-31 at validate; drained from the gap inbox by close.
+  instance costs a full suite run rather than a wrong answer; the second half
+  costs a whole sweep, silently, whenever a parent dies mid-fan-out.
+  Surfaced 2026-07-31 at validate; second half 2026-07-31 at close, from its own
+  termination. Drained from the gap inbox by close.
 
 - **context-pressure-signal** [design-pending] — operator request: a
   usage-verdict-style context-pressure signal that **suggests** compaction, so the
@@ -1600,6 +1627,73 @@
   Surfaced 2026-07-31 by close's top-level staleness review, which found both
   instances; filed rather than fixed because the enum-set survey is the work.
 
+- **nested-dispatch-ungoverned** [design-pending] — the dispatch layer's rules are
+  written for the **root** dispatch and silently exempt everything below it. Two
+  halves, filed as one unit because they are the same defect over the same
+  boundary and a fix for either alone leaves a reader governed on one axis and
+  not the other.
+  **(a) Budget.** The per-dispatch guard fires on the `Agent` call it gates, not
+  on that call's children. It ran exactly once for this close stage — at the
+  lead's dispatch, `used=92% -> OK` — and the stage then spawned two read-only
+  audit children drawing heavily against the same five-hour pool, with nothing
+  re-checking between that verdict and the wall the session hit. A per-dispatch
+  guard therefore under-measures **precisely the dispatches that cost most**: the
+  ones that fan out.
+  **(b) Tier.** The lead's ruling-config tiers what the *lead* dispatches — a
+  cheaper tier for the mechanical stage, per-batch tiering where a stage's batches
+  differ — and says nothing about what a stage session's own sub-agents run on.
+  Close inherited the judgment tier and its two audit sweeps inherited it in turn,
+  so read-heavy mechanical work ran at the most expensive tier available.
+  **Why one unit:** both are a rule that stops reaching rather than reddening at
+  the same layer boundary, and both admit the same two candidate shapes — re-arm
+  or re-state the rule *inside* the stage session before its own dispatches, or
+  make the root decision account for the expected fan-out. Settling one shape for
+  budget and the other for tier would be an accident, not a design; and a
+  half-covered nested layer ("your children are budgeted but not tiered") is the
+  state that produced this.
+  **Why `[design-pending]`:** ownership forks. The budget half is delegation-kit
+  mechanism with a real hook to change; the tier half is ruling-config prose with
+  no oracle possible, since a sub-agent's tier leaves no tracked artifact. Whether
+  one rule can carry both, and where it lives so that a stage session actually
+  loads it, is the open call.
+  **Cost while deferred:** paid per fan-out, not per iteration, and the charge is
+  a terminated session rather than a wrong answer — this close died at the wall
+  and was resumed, and the tier half made the sweeps that killed it dearer than
+  they needed to be. Non-rotting; nothing in the tree degrades while it sits.
+  Surfaced 2026-07-31 by the lead from this close's own termination; routed
+  through the gap inbox and drained by the resumed close.
+
+- **close-generated-finding-route** [design-pending] — the gap inbox is drained
+  **once, at close**, and close is the stage that generates findings by design —
+  the audit sweeps, the lesson disposition, the staleness read, the release
+  disposition. Anything close generates, or that close's own failure generates,
+  necessarily postdates its drain, so a close-generated finding has no drainer
+  inside its own iteration. This is not a filer's timing error to work around; it
+  is untimeable.
+  `bin/file-gap.sh` already warns that a filing made while the cursor sits at the
+  last configured stage may have no stage left to drain it, but it frames that as
+  the filer's problem. The design implication is stronger: the drain-once shape
+  has its blind spot exactly where the lifecycle is most productive of findings,
+  and the sanctioned fallback — the next scope entry refuses until the entering
+  session promotes the bullets itself — silently pushes one iteration's record
+  across the boundary into the next one's.
+  **Evidence it is live rather than theoretical:** this iteration. The drain
+  landed claiming 24 bullets dispositioned; five more findings arrived after it,
+  and close re-drained.
+  **Why `[design-pending]` — three candidates, three different failure modes.** A
+  second drain pass late in close, after its own findings have settled, can loop.
+  A re-arm refusing close's completion while the inbox is non-empty can deadlock
+  close against its own filings. An explicit rule routing close-generated findings
+  straight to the queue or to Lessons, never through the inbox, loses the inbox's
+  one uniform capture channel and reintroduces the mid-iteration index contention
+  the inbox exists to prevent. Picking among them is the work.
+  **Cost while deferred:** low and non-rotting in tree terms, but it is paid every
+  iteration that closes productively, and it is paid as a **record** defect — the
+  findings survive, in the wrong iteration's ledger.
+  Surfaced 2026-07-31 by the lead, deliberately **not** filed to the inbox on the
+  ground that filing it there would compound the defect it names; drained by close
+  in the same pass as the inbox.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -1642,3 +1736,16 @@
 - queue-selection-order-implicit
 
 ## Lessons Learned
+
+- A guard's `OK` is a floor, not a recommendation — and the rule was stated this
+  iteration and then not applied to the dispatch that stated it. The budget guard
+  returned `OK` at 92% against a 95% threshold with roughly 23 minutes to the
+  five-hour reset, and the lead dispatched `close`, the longest stage in the
+  lifecycle, on that verdict. Waiting for the reset would have cost nothing:
+  no deadline forced it. The verdict was treated as the decision rather than as
+  one input to it, and the stage terminated at the wall mid-close.
+  Same shape as this iteration's earlier ruling that the upgrade smoke's
+  satisfaction is a floor and not the spec — three Tightened-gates bullets were
+  authored where the oracle demanded one, correctly. The principle was in force
+  and reached the release note; it did not reach the dispatch decision.
+  Recorded as the lead's error, not the stage session's.
