@@ -4,11 +4,4 @@
 
 ---
 
-release-assertion-honesty scope a97c6b5d 2026-07-31
-release-assertion-honesty spec a6c211e4 2026-07-31
-release-assertion-honesty align aa673eac 2026-07-31
-release-assertion-honesty build aadaae1c 2026-07-31
-release-assertion-honesty build a892d358 2026-07-31
-release-assertion-honesty build afdc8cea 2026-07-31
-release-assertion-honesty validate a3b487c8 2026-07-31
-release-assertion-honesty close ae688f9a 2026-07-31
+— scope a6eb684d 2026-07-31
