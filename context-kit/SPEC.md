@@ -88,6 +88,11 @@ session. Steps, in order:
    cursor-lag rule below — firing on close is what hands the full board to
    the first scope session, which reads `close` at session start. On any
    other stage the full listing is pure recurring cost.
+   A configured icebox tier rides **both** branches as a one-line tally, so
+   this step needs no new stage routing: a dormant entry is already one line,
+   so there is no full listing of it to withhold, and the eviction work that
+   reads the tier reads `queue-index.sh --icebox-candidates` rather than this
+   index.
 2. **Dirty-surface pre-run** — for each component with uncommitted
    changes, pre-run the matching surface index (default: `pub-index` over
    top-level dirs containing `src/`), so a resumed session's editing

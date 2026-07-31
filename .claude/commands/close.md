@@ -30,6 +30,15 @@ queue-kit/SPEC.md §The tag algebra.
     iteration for every audit performed. This is the cadence the
     Enforcement-first carve-out owes (doctrine-kit/DOCTRINE.md
     §Methodology-maintenance rules).
+  - **Backlog eviction** — run `bash queue-kit/bin/queue-index.sh
+    --icebox-candidates` and disposition each row: evict (rewrite the lead line
+    as a self-contained sentence, delete the body, move it under `## Icebox`),
+    rule wontfix (the ruling lands as a one-line boundary note in the owning
+    SPEC and the slug is **rewritten to a bare `- <slug>` line** under
+    `## Done` — a relocated entry reds `check-task-conservation`), or keep it
+    in Deferred with the trigger that keeps it there. Eligibility and the
+    grammar are queue-kit/SPEC.md §The icebox tier; the worklist bounds how
+    much to read, it does not decide.
   - **Trajectory projection** — after the template's Clear-Done step lands the
     `close` stamp in history, regenerate the projection (`bash
     drift-kit/bin/trajectory.sh --emit > docs/evidence-data.md`) and commit it

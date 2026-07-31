@@ -12,51 +12,6 @@
 
 ## New Features
 
-- **deferred-queue-carry-cost** [spec: SPEC-queue-carry-cost.md] — the deferred
-  section carries 59 entries / 2,241 lines, the arithmetic of an intake
-  asymmetry the doctrine itself creates: gap disposition plus scope-gated intake
-  make filing mandatory and cheap while the only exit is building the entry —
-  demand-gated promotion exists, but no symmetric eviction. 27 entries
-  self-describe their deferred cost as low and non-rotting — decision records
-  carried as work items — and the tally the session banner steers by counts them
-  identically with actionable debt.
-  **Deliverable:** one carry-reduction unit, designed in
-  queue-kit/SPEC-queue-carry-cost.md — an `Icebox` tier joined to the live task
-  sections (so eviction is a conserved move), a `check-queue-entry-budget` gate
-  bounding a deferred entry above (size) and below (a required cost field), a
-  two-row `kpi-queue-net-delta`, and the one-time triage sweep that seeds the
-  icebox and rules the admitted-wontfix entries into their owning SPECs. The
-  amendment settles every design call this filing left open: icebox placement,
-  the iceboxed entry's tag state, the cap and age values, whether any entry-body
-  field becomes required, and the `draft:` state — ruled out on triage evidence,
-  with the reasoning recorded so it is not re-proposed.
-  **Cost while deferred:** compounding with every filing — the queue is read by
-  every scope session and curated by every close, and the intake rate outruns
-  closure with no counter-pressure; the filing threshold does not scale with
-  queue size. Bounded: nothing reds; the cost is carry weight and a steering
-  tally that overstates actionable debt.
-  **Feature at the litmus, corrected 2026-07-29 at spec** — it mints governed
-  names (the icebox tier, its gate, three config knobs, the KPI), so it belongs
-  in this section; the "debt-shaped at triage" reading this entry carried at
-  filing was wrong on the new-names test.
-  **Runs under an explicit operator exception, ruled 2026-07-29 at scope.** This
-  unit is the one member of the `pre-adoption-grammar-break` set that *adds
-  capability*, so it is the one member the standing pre-launch prioritization bar
-  defers, and it clears none of that bar's tests on a strict reading. The
-  operator granted the exception on the compounding-carry evidence, not on a
-  reframe: the bar reaches this entry and was overridden. The sibling units in
-  the set add no capability, so the bar never reached them and none of them runs
-  under an exception — do not read one onto them. Enforcement-first binds the
-  size-cap gate to the triage sweep in one unit; a sweep-only variant is
-  doctrine-blocked, not a cheaper option to be re-proposed.
-  **Sequencing:** the sibling `needs-spec-tag-rename` rewrites every deferred
-  entry and so does this unit's triage sweep — the two are paired into one
-  iteration precisely so the queue is rewritten once.
-  Filed 2026-07-28 by operator request, from a session assessing whether the
-  queue's 30-to-56 deferred growth is healthy; amendment authored 2026-07-29 at
-  spec, which is where the filing's full premise analysis and re-measurements
-  now live.
-
 - **templates-stages-taxonomy-realignment** [spec: SPEC-stages-taxonomy.md] — the
   tree scatters a class the SPEC names as one. `lead.md`, `release-sweep.md`, and
   `upgrade.md` are each classified **"boundary skill, not a stage"**
@@ -154,89 +109,6 @@
 
 ## Deferred
 
-- **runtime-dir-two-tier-detector** [design-pending] — `check-tracking-claim`'s
-  `is two-tier` predicate is rule-provable only for a directory the ignore rules
-  match *whole* (a `dir/` pattern) that also carries a force-added tracked member:
-  `git check-ignore --no-index <dir>` matches the whole-dir rule, and `git
-  ls-files <dir>` finds the tracked member. A directory whose ignored members are
-  matched by **file patterns** — the directory itself matching no rule, e.g.
-  `.workflow/` under `.workflow/*.log` + specific-file ignores — has no rule-based
-  two-tier proof: `check-ignore --no-index .workflow/` is a no-match, so the gate
-  reads it as one-tier and the claim reds. The gate fix (this iteration) moved the
-  ignored side from a presence read (`ls-files --others --ignored`, which listed
-  only files that exist and so made `.workflow/`'s claim verify locally but red in
-  a fileless CI checkout) to the rule-based `check-ignore --no-index`; that fix is
-  correct and deterministic, but it cannot prove the file-pattern two-tier shape,
-  so `.workflow/`'s two-tier fact was **unbound from the gate** in CLAUDE.md and is
-  now carried as prose citing gate-sdk/SPEC.md §The workflow directory.
-  **Deliverable:** a rules-based detector that proves two-tier for the
-  file-pattern shape and re-binds `.workflow/ is two-tier` — probing candidate
-  member paths under the directory via `check-ignore --no-index` (which resolves
-  on non-existent paths), or reading the ignore patterns that target inside the
-  directory. **Why `[design-pending]`:** enumerating "would-be-ignored members" of a
-  directory without the files present is the open design — a probe-path approach
-  needs a principled candidate set, and a pattern-reading approach re-implements a
-  slice of gitignore matching (negations, nested `.gitignore`, precedence), whose
-  false-positive floor is the whole question. The honest outcome may be that the
-  file-pattern two-tier shape stays a prose-only description and the predicate's
-  reach is documented as bounded to whole-dir patterns.
-  **Cost while deferred:** low and non-rotting — the gate is correct and
-  deterministic over what it reaches (whole-dir gitignored, force-added two-tier),
-  `.tmp/`/`.metric/` stay gated, and `.workflow/`'s two-tier fact is stated
-  accurately in prose; the residue is one true directory-tiering fact the battery
-  cannot mechanically hold. Filed 2026-07-22 by close, operator-blessed, from the
-  remote-oracle red on this iteration's release commit (the gate shipped
-  presence-based and failed its first CI run).
-
-- **done-slug-commit-naming-gate** [design-pending] — `kpi-task-split` reads a Done
-  slug's feature/debt class off the commit its message names, via
-  `git log -1 --grep=<slug>`. Nothing requires a landing commit to name its
-  slug, so a correctly-typed `fix` commit that omits it leaves the row
-  **unclassified** and the KPI reports `0f/0d`. Reproduced this iteration on all
-  four units: `1dac2f9`, `9c5aeb2`, `a740a7b` are each typed `fix(delegation)`
-  and each moves its slug(s) into Done **in the same commit**, yet none names a
-  slug in its message — so the newest matching commit for every one of the four
-  is the `chore(scope)` opener, and the split read `0f / 0d of 4 done (4
-  unclassified)` for an iteration that was unambiguously four debt units.
-  **Gap generalization — this class is gateable, and precisely.** The commit-msg
-  hook holds both inputs the rule needs: a commit whose diff **adds a slug line
-  to the queue's Done section** must name that slug in its message. Both halves
-  are mechanical, the trigger is narrow (only Done-moving commits arm it), and
-  there is no judgment in the match — the low-false-positive contract looks
-  satisfiable without a new vocabulary. The queue-section parse already exists in
-  `kpi-task-split`'s awk and in queue-kit's gates.
-  **Open design (why `[design-pending]`, not a build unit):** whether the rule binds
-  the *moving* commit or merely requires *some* commit in the range to name the
-  slug — a build may legitimately land the fix in one commit and move the queue
-  line in another, and the strict form would then red on a correct sequence. That
-  choice decides the gate's shape and its false-positive surface, and it is a
-  queue-kit-vs-gate-sdk placement call besides (queue-format knowledge versus
-  commit-message mechanism).
-  **Cost while deferred:** low per-iteration but silently compounding — the
-  headline lead KPI reads `n/a`-shaped noise whenever the convention lapses, and
-  the lapse is invisible until close reads the report. `trajectory.sh` is
-  unaffected (it splits range commits by subject and recorded this iteration's
-  debt correctly), so the published evidence stays honest; what degrades is the
-  live dashboard the lead steers by. Bounded: nothing breaks, no gate reds.
-  Debt: converges a KPI onto a stated convention; adds no governed name unless
-  the gate lands. Filed 2026-07-22 by close, from this iteration's own
-  unclassified split.
-
-- **enter-stage-simulate-no-write-fixture** [design-pending] — add a regression
-  fixture asserting `enter-stage.sh --simulate <stage>` leaves the tree
-  byte-identical after a *successful* (non-refused) boundary entry. The guard
-  now present at `lifecycle-kit/bin/enter-stage.sh:168-171` (the `sim` exit ahead
-  of every write) has no test pinning it, so a future refactor could silently
-  re-introduce the success-path write. This is the second half of the now-closed
-  enter-stage-simulate-writes entry (Done): the behavioral fix is verified
-  present, and only its regression guard is missing. Consider also asserting the
-  `(simulate)` marker prints on the success path so an honoured flag stays visible.
-  Debt: adds a fixture to shipped mechanism, no governed name.
-  **Cost while deferred:** low and non-rotting — the fix is present; the exposure
-  is a future un-caught regression on a rarely-touched dry-run path.
-  Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
-
-
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
@@ -252,6 +124,10 @@
   launch crawl (launch-readiness-gate validate) shows recurrence worth
   automating. Surfaced 2026-07-16 in the launch triage that scoped
   launch-readiness-gate.
+  **Cost while deferred:** low and non-rotting — the tree-side reference gates
+  and the deployment probe still hold render and deployment truth; the residue
+  is that external link rot on the rendered site is found by a reader rather
+  than by a scheduled crawl.
 - **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
   Harness plugin/marketplace packaging
@@ -290,11 +166,19 @@
   live manifest format at promotion; deciding it now would be deciding it
   against a format that will have moved. Recorded 2026-07-26 by close
   (`activation-path`).
+  **Cost while deferred:** zero mechanism rots — the install-ownership contract
+  this must package against is already written and maintained by the installer's
+  `init`; what is foregone is a discovery surface, and the plugin substrate's
+  motion means a design taken early would be retaken at promotion anyway.
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
 - **benchmark-ab-experiment** [design-pending] [roadmap: later/adoption] — a controlled A/B trial.
   roadmap-summary: A controlled experiment measuring drift with and without governance.
+  **Cost while deferred:** zero — the self-referential drift-trajectory route
+  already carries the claim this rung would upgrade, and the measurement half it
+  consumes ships independently; what is foregone is an externally-comparable
+  number the project does not currently claim.
   The controlled differential
   experiment: same model, same dependent-task series, two arms (ungoverned
   loop vs Checkwright-governed), drift *accumulation across the series* as
@@ -330,6 +214,9 @@
   launch-readiness-gate build) is the first concretely prose-shaped kit
   mechanism and the natural profile seed. Surfaced 2026-07-16 in the same
   launch triage that scoped launch-readiness-gate.
+  **Cost while deferred:** zero — the kits make no non-code claim to falsify,
+  core dilution is ruled out on record, and the named seeds stay accurate until
+  a non-code consumer vendors a kit and reports friction.
 - **hosted-attestation-service** [design-pending] [roadmap: later/commercial] — hosted attestation.
   roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.
   The team/paid rung: gates
@@ -340,30 +227,25 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
+  **Cost while deferred:** zero — this is a service rather than tree mechanism,
+  so nothing rots; the residue is that gate runs stay self-attested, which binds
+  only when a party the committing agents cannot touch is asked to trust them.
 - **spec-internal-identifier-prefix-drift** [design-pending] — SPEC prose naming a
   script's **internal** variable spelling where the public knob is the contract
   name. Found by the config-seam-hardening close audit of the
-  `internal-identifier-restatement` roster class, and fixed there: seven sites
-  in delegation-kit/SPEC.md named `PAUSE_PCT`, `PAUSE_PCT_7D`, `LOGIN_WINDOW`,
-  `REFRESH_CMD`, `REFRESH_MIN_AGE` — each of which exists in
-  `bin/usage-verdict.sh` only as a local assigned straight from its
-  `DELEGATION_KIT_`-prefixed env knob. The same doc's §Layout roster names the
-  prefixed spelling correctly, so the drift was prose-vs-roster *within one
-  file*.
+  `internal-identifier-restatement` roster class, and fixed there: seven sites in
+  delegation-kit/SPEC.md named locals of `bin/usage-verdict.sh` that exist only as
+  assignments from their `DELEGATION_KIT_`-prefixed env knobs, while the same
+  doc's §Layout roster had the prefixed spelling right — prose-vs-roster drift
+  *within one file*.
   **Cost while deferred:** the fix is a rename away from rotting — renaming the
   local in the script silently falsifies the prose, and only the roster class's
   audit cadence catches it, at iteration granularity.
   **The manual fix is demonstrably incomplete — an eighth site surfaced
-  2026-07-19.** The `tooling-signal-honesty` close audit swept the class
-  mechanically and found `DELEGATION_KIT_STALE_AGE` cited as bare `STALE_AGE` at
-  delegation-kit/SPEC.md:200, a survivor the config-seam-hardening pass missed
-  while correctly fixing seven neighbours in the same file (the §Layout roster two
-  hundred lines below had the prefixed spelling right the whole time). Fixed at
-  that close. This is the demand evidence the entry was waiting on: a hand sweep
-  of one file missed one instance in eight, so the audit cadence is catching
-  what review does not — and a ~20-line scan expressed the whole class, which is
-  itself evidence the low-false-positive boundary is tighter than feared (one hit,
-  zero false positives, across every kit SPEC in the tree).
+  2026-07-19** and was fixed at that close. That is the demand evidence the entry
+  was waiting on: a hand sweep of one file missed one instance in eight, so the
+  audit cadence catches what review does not, and a ~20-line scan expressed the
+  whole class.
   The parent class is on the audit roster precisely because it is **un-gateable**
   (public contract names are legitimate citations). This entry is the narrower
   sub-class that does look gateable: a backtick-quoted `^[A-Z][A-Z0-9_]*$` token
@@ -392,119 +274,53 @@
   also establish that the bare token and the prefixed one denote the *same*
   contract — the discriminator the design pass actually owes.
 
-- **stage-lag-disambiguation** [design-pending] —
-  narrow the session-context hook's accepted over-firing by distinguishing a
-  first-of-stage session from a restarted predecessor session, using the session
-  id the stage-cursor migration puts in the state file's last stamp.
-  **The rule was never wrong, only wrongly argued.** context-kit's cursor-lag
-  rule (context-kit/SPEC.md §The session-context hook) already survived the
-  stage-cursor migration on its *lag* ground: the hook fires at session start,
-  before the arriving skill's
-  first step writes the cursor, so a first-of-stage session still reads the
-  predecessor's value. What the migration retired is the rule's former stated
-  **justification** — "no header value distinguishes [a first-of-stage session]
-  from a restarted predecessor session" — and the over-firing cost it accepted
-  on that basis. The header carried one value; the state file's last stamp
-  carries `<iter> <stage> <session-id> <date>`, so the id distinguishes exactly
-  the two cases the rule says are indistinguishable: ids match = restarted
-  session of the stamped stage, ids differ = new session whose stage has not
-  stamped yet. Found by the stage-cursor-extraction align audit; deliberately
-  left out of that amendment's envelope (a behavior widening coupled to a
-  mechanical migration muddies what its fixture proves).
-  **Cost — larger than the comparison it looks like.** The session id *is*
-  reachable from the hook payload, so the premise holds: the session-role
-  signal already reads it (`scripts/session-context.sh`, spec at
-  context-kit/SPEC.md §The session-context hook), and the stamp's 8-char id
-  already matches the
-  `${hook_sid:0:8}` comparison shape that code uses. But that read sits inside
-  the `[[ -f "$ROLE_FILE" && ! -t 0 ]]` guard, and **stdin is consumable
-  exactly once** — so the payload read must be hoisted to the unconditional
-  path before a stage derivation can use it. (The stage-cursor migration added
-  a *named-file* cursor read ahead of that guard, deliberately consuming no
-  stdin, so it left this hoist untouched.) The hoist is the real work, and it
-  lands on a hook whose contract is "never fails a session" and "signal absent =
-  byte-identical output": a read that today happens only for lead-marked
-  sessions would happen every fire. Note the audience inversion that makes the
-  hoist unavoidable rather than incidental — the sessions this entry serves are
-  stage sessions, which carry *no* role marker, i.e. precisely the case the
-  current guard skips. Scope: the hoist plus its no-payload/`-t 0` fallbacks,
-  the comparison, and a fixture pair proving both the first-of-stage and
-  restarted-predecessor cases; both kit template and consumer copy.
-  **Cost while deferred:** low and non-rotting — the over-firing is the
-  documented accepted cost, not a defect, and the rule stays correct on its lag
-  ground. Unblocked: `stage-cursor-extraction` has reached Done, so this entry
-  is pickable.
-
 - **heterogeneous-agent-delegation** [design-pending] [roadmap: later/ecosystem] — foreign agents.
   roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.
-  Cross-vendor stage dispatch:
-  a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
-  (Codex, etc.), extending the homogeneous multi-agent / multi-operator model to a
-  heterogeneous fleet. Cashes the public "no IDE/model/harness lock-in"
-  positioning claim, and is the purest expression of the thesis — governance
-  enforced at the git/gate boundary, not by trusting the author. It splits along a
-  **two-substrate line**. *Already agent-neutral:* the verification substrate (git
-  + the gate battery + the bash stamp state machine) does not care who
-  authored the diff — a foreign agent's commit is gated identically; and the
-  concurrent-agent coordination primitive is the shared git-index/HEAD
-  serialization, vendor-neutral already. *Homogeneous today — the real work,
-  worst-first:* (1) the **escalation resume model** — the lead's whole value is
-  resuming a paused stage in place instead of cold-restarting. **Re-ranked by
-  the 2026-07-25 amendment below:** the founding premise ("a foreign agent
-  cannot be resumed headless, so escalation means cold restarts") is stale —
-  headless warm-resume exists per vendor, so (1) collapses into (2) as a
-  property of the chosen transport, plumbing after all. (2) **dispatch
+  Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding
+  agent, extending the homogeneous multi-agent model to a heterogeneous fleet.
+  It cashes the public no-lock-in claim and is the purest expression of the
+  thesis — governance enforced at the git/gate boundary, not by trusting the
+  author. *Already agent-neutral:* the verification substrate (git, the gate
+  battery, the bash stamp state machine) does not care who authored the diff,
+  and the concurrent-agent coordination primitive is the shared git-index/HEAD
+  serialization. *Homogeneous today — the real work, worst-first:*
+  (1) the **escalation resume model** collapses into (2) as a property of the
+  chosen transport, per the 2026-07-25 amendment below; (2) **dispatch
   transport** — today the harness `Agent`/`SendMessage`/task-notification; a
-  foreign agent needs a transport-neutral handoff (committed worklist, issue,
-  spawned process). The adapter contract is "open / prompt /
-  permission-request / resume" spoken over each vendor's structured machine
-  plane, never its TUI: a screen-scrape relay (tmux send-keys/capture-pane)
-  is adapter-of-last-resort for a vendor shipping no machine interface at
-  all — it yields rendered frames instead of turn events, answers dialogs by
+  foreign agent needs a transport-neutral handoff. The adapter contract is
+  "open / prompt / permission-request / resume" spoken over each vendor's
+  structured **machine plane, never its TUI**: a screen-scrape relay is
+  adapter-of-last-resort for a vendor shipping no machine interface at all —
+  it yields rendered frames instead of turn events, answers dialogs by
   heuristic, and bets on the vendor's least-stable surface. (3) **budget
-  oracle** — `usage-verdict.sh` is Anthropic-OAuth-specific; a heterogeneous
-  fleet has N vendor-keyed oracles (the same seam as this session's
-  credential-swap / token-usage tasks); the vendors' JSONL event streams
-  carry token-usage events — raw oracle material the TUI path would have to
-  scrape from a status bar. (4) **stage-contract expression** —
-  `/build` is a Claude Code skill (markdown + tool bindings); the lifecycle
-  machinery is already neutral bash but the skill prose is not, so the contract
-  needs an agent-agnostic form.
-  **Seam ruling (on record):** generic mechanism only — the dispatch transport,
-  budget oracle, and escalation channel become consumer-config seams (harness-native
-  one adapter, foreign-agent another). A kit literal naming a vendor crosses the
-  provenance seam and is ruled out, same pattern as `prose-profile`. **Economic
-  why:** extends the existing per-batch model-tiering lever (the split-lead
-  posture's whole point) across vendors — route each stage to whichever vendor's
-  model wins. **Prerequisite cluster:** interacts with `hosted-attestation-service`
-  (its neutral-party angle; multi-operator-semantics its named prerequisite),
-  `plugin-marketplace` (the harness-absorption hedge), and this session's
-  credential-swap budget-oracle tasks. **Demand-gated — demand attested
-  (2026-07-23):** the operator holds working foreign-vendor subscriptions
-  (Codex; Gemini Enterprise via the Antigravity CLI) and wants read-heavy
-  delegation routed to them for token-budget headroom — exactly the
-  per-batch vendor-routing lever named above, and with three vendors live
-  the N-keyed budget-oracle seam (3) is no longer hypothetical. First slice
-  at promotion: not full stage dispatch but a foreign-CLI executor for the
-  already-pre-authorized read-heavy audit / mechanical-sweep class (dispatch
-  transport: a spawned non-interactive CLI process — `codex exec`-shaped,
-  one adapter per vendor as consumer config; the escalation-resume
-  sub-problem (1) is moot for autonomous read-only work, so it stays
-  unblocked-on). Promotion-eligible at the next scope session.
-  **Design-memory amendment (2026-07-25, verified against the installed
-  CLIs):** the operator probed the interactive-TUI-relay alternative (drive
-  vendor TUIs under tmux, relay via send-keys/capture-pane) for session
-  resume and token efficiency. Ruling: those benefits live in the vendor's
-  session store, not the TUI — the APIs are stateless, and both modes replay
-  the same on-disk transcript against the same server-side prompt cache, so
-  interactive-vs-headless is a rendering choice, not a state choice. Verified
-  locally: Codex ships `codex exec resume <session-id> "<prompt>"` (headless
-  warm-resume by id, `--json` JSONL turn events) plus `mcp-server` (stdio)
-  and an experimental `app-server`; Claude Code pairs `-p --resume` with
-  bidirectional stream-json. Gemini CLI speaks ACP (unverified — not
-  installed here). First slice unchanged; escalation-with-warm-resume lands
-  as a cheap second increment (`exec resume`) on the same adapter, not a new
-  architecture.
+  oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet
+  has N vendor-keyed oracles, the same seam as the credential-swap entries, and
+  the vendors' JSONL event streams carry the token-usage events a TUI path would
+  scrape from a status bar. (4) **stage-contract expression** — the lifecycle
+  machinery is neutral bash but the stage-skill prose is not.
+  **Seam ruling (on record):** generic mechanism only — transport, budget oracle,
+  and escalation channel become consumer-config seams; a kit literal naming a
+  vendor crosses the provenance seam and is ruled out, the `prose-profile`
+  pattern. It extends the per-batch model-tiering lever across vendors, and
+  interacts with `hosted-attestation-service`, `plugin-marketplace`, and the
+  credential-swap budget-oracle entries.
+  **Demand-gated — demand attested (2026-07-23):** the operator holds working
+  foreign-vendor subscriptions and wants read-heavy delegation routed to them for
+  budget headroom, and with three vendors live the N-keyed oracle seam is no
+  longer hypothetical. First slice at promotion: a foreign-CLI executor for the
+  already-pre-authorized read-heavy audit / mechanical-sweep class over a spawned
+  non-interactive CLI process, one adapter per vendor as consumer config — not
+  full stage dispatch. Promotion-eligible at the next scope session.
+  **Design-memory amendment (2026-07-25, verified against the installed CLIs):**
+  the TUI-relay alternative was probed for session resume and token efficiency.
+  Ruling: those benefits live in the vendor's session store, not the TUI — the
+  APIs are stateless and both modes replay the same on-disk transcript against
+  the same server-side prompt cache, so interactive-vs-headless is a rendering
+  choice, not a state choice. Headless warm-resume by session id and JSONL turn
+  events ship today on the vendors probed, which is what makes (1) plumbing.
+  **Cost while deferred:** the foregone lever is live — read-heavy audits and
+  mechanical sweeps all bill against one vendor's budget while three
+  subscriptions are held — and this design memory ages against fast-moving CLIs.
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
 
@@ -552,80 +368,6 @@
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
 
-- **stage-economics-smoke-jq-arm-dormant** [design-pending] — drift-kit's smoke
-  asserts the jq-absent degradation of `bin/stage-economics.sh`, but the
-  assertion never executes. `drift-kit/smoke/install.sh:171` branches on the
-  **host's** jq (`command -v jq`), so the degradation arm at `:189` — "without
-  jq must emit its degradation notice" — is reached only on a jq-less machine.
-  Neither this machine nor CI is one (the gates workflow image carries jq), so
-  the arm is **dormant on every runner that actually runs it**: a correct
-  assertion that no run has ever evaluated. **This is a testability gap, not a
-  defect** — the stage-economics-report validate verified the degradation by
-  hand (jq masked → exit 0, `jq not found` notice, 0 rows logged), so the
-  behavior is known-good; what is missing is the *automation* of that check.
-  Fix direction: exercise the arm unconditionally rather than conditionally —
-  a second tool run under a PATH sandbox with jq masked, asserted alongside the
-  jq-present run, so both arms evaluate on every host. **Scope: drift-kit's
-  smoke only.** Deliberately not generalized to a smoke-authoring rule — one
-  instance is not evidence for a general rule, and gate-sdk's own jq consumers
-  do not assert their degradation at all, so a blanket rule would manufacture
-  work against a pattern nobody has shown to be wrong.
-  **Cost while deferred:** low and non-rotting. The asserted behavior was
-  hand-verified at ship, and the arm cannot *false-green* anything — it is
-  skipped, not passed. The real cost is narrow: a future regression in the
-  jq-absent path (say a reordering that emits the notice after an unguarded
-  `jq` call) lands unnoticed, because the only mechanism watching that path
-  never runs. Bounded by the degradation path being small and rarely touched.
-  Filed 2026-07-18 by lead ruling at the stage-economics-report close.
-
-- **hermetic-bin-roster-config** [design-pending] — `check-test-hermetic` assertion
-  B catches *partial* credential pinning but not *absent* pinning. B arms only
-  when the smoke script itself contains a `*_CRED_FILE=` assignment, so a smoke
-  script that calls a credential-consuming own-kit bin and pins nothing at all
-  is never flagged. The narrow trigger was deliberate and correct — an
-  unconditional every-own-bin-call-must-pin rule false-positives across the
-  credential-free kits — so the hole is a known limit of the trigger, not a bug
-  in it.
-  **Design question (why deferred, not a build fix):** closing it needs a
-  per-kit roster of credential-consuming bins, and that roster is exactly the
-  content the provenance seam keeps out of a kit — it is optional consumer
-  config (the `check-graph` / `scripts/graph-vocab.sh` pattern), never a
-  gate-sdk literal. So the deliverable is a config seam and its fall-open
-  default, an align-shaped design pass rather than an assertion tweak.
-  **Remaining scope is the roster design only — the one-line leak was split out
-  and fixed separately.** The concrete `delegation-kit/smoke/install.sh`
-  threshold leak this entry recorded is now its own promoted debt unit,
-  `delegation-smoke-threshold-pin` (2026-07-21, operator ruling): it needed no
-  config seam, only the export the sibling test script already uses. What stays
-  here is the part that genuinely earns a design pass — the per-kit roster of
-  credential-consuming bins and its fall-open default. Do not re-file the pin.
-  **Cost while deferred:** low and bounded — the gate still catches the partial
-  case that actually regressed here; the uncovered case is a kit shipping a
-  credential-consuming smoke with no pin at all — reproduced 2026-07-21 (was:
-  "no kit does today" as of 2026-07-19).
-  Cost to close: roughly one iteration. Surfaced 2026-07-19 by the validate
-  re-entry on `derivation-by-precedent`, downstream of that iteration's
-  operator-authorized hermeticity fix rather than of its precedent-doctrine
-  envelope.
-  **Reproduced 2026-07-21** by the `lifecycle-rule-placement` validate
-  re-entry: `delegation-kit/smoke/install.sh` pins `DELEGATION_KIT_CRED_FILE`
-  for its live 95%-reading `usage-verdict.sh` assertion but never pins
-  `DELEGATION_KIT_PAUSE_PCT`/`_7D`, so it inherits whatever the ambient
-  session env carries. That session's env happened to carry
-  `DELEGATION_KIT_PAUSE_PCT=100` / `_7D=100` (an operator override for an
-  unrelated stale pre-login budget reading, later reverted in config but
-  already exported into the live process — reverting the file cannot unexport
-  it from inherited child env), which pushed the 95% reading's expected PAUSE
-  (exit 1) to OK (exit 0) — turning demo, consumer_smoke, upgrade, and
-  agents_md_smoke red, since all four share that installer. Controlled by
-  re-running with both vars unset (no code change): all four suites passed,
-  confirming the ambient-env leak, not a code regression, was the cause. The
-  one-line fix: `smoke/install.sh` should `export DELEGATION_KIT_PAUSE_PCT`/
-  `_7D` around its 95%-reading assertion the same way
-  `delegation-kit/bin/run-usage-tests.sh` already pins
-  `DELEGATION_KIT_PAUSE_PCT=0` around its own. Still build-routed tech-debt —
-  not fixed at this validate re-entry.
-
 - **release-body-url-form** [design-pending] — *residue only: the two cheap
   deliverables are done (see below); what remains is the monitor-shaped half,
   promotable only together with `rendered-site-link-monitor`.* The `v0.6.0`
@@ -672,9 +414,10 @@
   shape: tighten the always-loaded line (or the doctrine-kit section behind it) to
   name the generalize-to-class-then-gate reflex for runtime/behavioral defects,
   not only duplication — a `doctrine-kit/DOCTRINE.md` change, re-vendored to
-  upgrade, so it sits outside an incident-fix commit's envelope. **Cost while
-  deferred:** each behavioral bug fixed in a maintenance turn risks shipping
-  without its paired low-FP gate until a reviewer prompts. Surfaced 2026-07-19 by
+  upgrade, so it sits outside an incident-fix commit's envelope.
+  **Cost while deferred:** each behavioral bug fixed in a maintenance turn risks
+  shipping without its paired low-FP gate until a reviewer prompts.
+  Surfaced 2026-07-19 by
   the check-graph `maxEdges` fix (the coupling graph outgrew Mermaid's 500-edge
   render cap): the one-line render fix landed, but the paired render-cap gate —
   exactly the low-FP gate enforcement-first says to land in the same unit — was
@@ -723,138 +466,6 @@
   projected economics, and this is the loop that confirms or retires that
   projection with recorded data.
 
-- **split-posture-waiver-writer** [design-pending] — in the split-lead posture the
-  lead issues stage rulings (e.g. an align waiver) but commits no lifecycle
-  state by design (the lead stamps nothing; only stage sessions write), so a
-  lead-issued **waiver stamp** has no clean writer. This iteration's
-  `trajectory-stage-roster-hardcode align-waived cbc94da8 2026-07-19` line was
-  carried into the *build* session's entry commit (`6b22f38`) as a piggyback,
-  because no stage owns the waiver and the lead cannot commit it. The protocol
-  worked here only because the build session was told to carry it; nothing in
-  the stage skills or lifecycle SPEC prescribes *which* stage commit a pending
-  waiver rides, nor guarantees the carry happens at all.
-  **Design question (why deferred, not fixed inline):** the fix is a protocol
-  ruling on the seam, not a code tweak — options include (a) codify in the
-  next-stage skill/entry contract that a stage session carries any pending
-  lead-issued waiver into its entry commit (formalize the piggyback that
-  happened), (b) a lead-invokable waiver-writer that appends the stamp without
-  the lead becoming a lifecycle-state writer (tension with the split posture's
-  "lead writes none" invariant), or (c) route the waiver through the same
-  committed-worklist channel the dispatch uses. Choosing among these is a
-  split-posture-vs-state-machine seam ruling that belongs in
-  lifecycle-kit's SPEC / the lead template, so it earns a scope pass.
-  **Cost while deferred:** low and non-rotting — the waiver *did* land correctly
-  here and `check-stage-evidence` accepts the line, so the machine is not
-  broken. The cost is recurrence risk: every future split-posture waiver
-  re-litigates which stage commit carries it, and a stage session that stamps
-  its entry without carrying a pending waiver would leave the waiver
-  uncommitted — living only in the message channel, which is transport, never a
-  store (CLAUDE.md §How to escalate). Surfaced 2026-07-19 by the
-  `trajectory-stage-roster-hardcode` close, filed by lead-dispatch instruction.
-
-- **supervisor-verification-attestation** [design-pending] — the resume-journal
-  recovery contract now rests on an **unattested** supervisor duty. The
-  `resume-journal-done-marker-compliance` amendment (this iteration) rescoped the
-  DONE-absence clause so that on the ordinary path "the supervisor consumed the
-  agent's return and ran its post-commit verification (§Validate after every agent
-  commit)" *is* the recovery contract, making the `DONE` marker redundant. That
-  promotion is correct — DONE was false-reading completed runs as interrupted —
-  but it moves the load onto a step nothing checks: no mechanism records that the
-  supervisor actually ran the verification before deleting the journal, so a
-  skipped verification is indistinguishable from a performed one.
-  **Deliberately out of the amendment's envelope:** the operator ruled plain (b),
-  which excluded marker enforcement and gate mechanization by name — the amendment
-  fixes the *reading* of the contract, and mechanizing the *check* is separate
-  work, filed rather than smuggled in.
-  **Design question (why [design-pending], not a build unit):** the verification
-  happens **after** the commit it verifies, so the pre-commit battery cannot reach
-  it — a gate is the wrong shape on ordering grounds alone, the same
-  wrong-shape finding as `rendered-site-link-monitor`'s. The open design is what
-  an attestation would even be: a supervisor-written stamp (another
-  self-asserted-completion marker, which lifecycle-kit/SPEC.md §The stamp protocol
-  rules out as proving a claim rather than completion), a next-dispatch preflight
-  that refuses until the prior batch's verification is on record, or an honest
-  ruling that the duty stays unmechanized and the SPEC's existing
-  **Honest limit** paragraph is widened to say so. Note `check-gate-tamper`
-  already mechanizes one slice (agent gate-edit *shape*) and its own text concedes
-  the by-eye review remains a supervisor duty — so the precedent in-kit is a
-  partial floor plus a stated limit, not full mechanization.
-  **Cost while deferred:** low today, structurally rising. Under a single
-  attentive supervisor the verification does happen (this iteration's every batch
-  was verified); the exposure grows with dispatch volume and with the split-lead
-  posture, where the lead accepting a stage session's return is exactly the
-  unattested step. Bounded by the delete being idempotent and the journal being
-  scratch — a missed verification costs a late-caught regression, never lost work.
-  Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
-  plain-(b) ruling named.
-
-- **assertion-strength-exit-header-reach** [design-pending] —
-  `check-assertion-strength` is armed by callee `# exit:` headers, and **two
-  scripts in the tree declare one** (`delegation-kit/bin/usage-verdict.sh`,
-  `delegation-kit/bin/usage-trend.sh`; the other two hits are the gate's own
-  fixtures). Of those, `usage-trend.sh` declares its codes in prose with no
-  uppercase token, so it yields an **empty** token→code map — leaving
-  `usage-verdict.sh`'s `PAUSE`→1 / `STALE`→2 as the gate's entire live
-  vocabulary, over 2 call sites out of 54 scanned scripts. Recorded as an
-  honest limit in gate-sdk/SPEC.md §check-assertion-strength.
-  **What the close sweep changes about the premise.** The limit reads as though
-  the reach were inherently narrow; it is narrow **by adoption**. A count of the
-  bin roster found **29 of 64 scripts exit with a code >1**, i.e. carry a
-  three-valued contract a header could declare. That is a materially larger
-  candidate surface than "one script" suggests.
-  **Design question (why [design-pending], and why the value is the open part):**
-  the mechanism is trivial — add `# exit:` headers across the bin roster. The
-  unresolved question is whether it buys reach or ceremony. The gate fires only
-  when a guard's *failure message names a verdict token*, and for most of the 29
-  the code >1 arm is a generic error exit (usage error, unreadable input) rather
-  than a named verdict a caller relays, as `usage-verdict.sh`'s is. Headers
-  declaring `2 USAGE` / `2 UNREADABLE` would arm the gate against a smoke guard
-  claiming "fails on unreadable input" while checking only truthiness — a
-  plausible real defect class, but one nobody has shown to have occurred. So the
-  design pass must establish the value before prescribing the convention;
-  concluding "not worth it" and widening the SPEC's honest limit to say *why* is
-  a legitimate outcome of this entry.
-  **Cost while deferred:** low and non-rotting — the gate is correct and clean
-  over what it reaches, and the SPEC states the limit rather than overclaiming.
-  The cost is that each reader re-derives the adoption-vs-inherent distinction,
-  as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
-  lead instruction.
-
-- **gate-spec-claim-assertion-parity** [design-pending] — the generalization the
-  `render-fidelity-inline-span-leak` entry flagged as a deliberately-unsettled
-  `/spec` question, ruled here: a gate whose **SPEC prose names a failure class
-  its assertions do not implement**. This iteration's defect is the instance —
-  `check-docs-render-fidelity`'s section described the severed-span defense
-  (`gettalong/kramdown#843`) while its assertion matched only a multi-backtick
-  fence run, so the prose claimed a defense the code omitted.
-  **Ruling — the general class is a human-audit class, not gateable.** The two
-  in-kit precedents that look adjacent both key on a **structured token**:
-  `check-assertion-strength` reads callee `# exit:` codes and
-  `check-gate-assertion-strength` reads the runtime **failure message** string.
-  A SPEC's claimed-defense is unstructured natural-language prose with no such
-  token, so correlating prose intent to code behaviour is the by-eye
-  faithful-artifact residue `check-gate-tamper` and `check-assertion-strength`
-  already concede as a stated limit plus partial floor — not a deterministic,
-  low-false-positive assertion. No gate is built for the general class.
-  **Why `[design-pending]` and not closed:** a *narrower structured sub-class* could
-  be gateable via a **claimed-defense annotation** convention — an author tags a
-  claimed failure class with a machine-readable marker and a gate correlates the
-  marker to a present assertion. That is a genuine new-gate initiative, filed
-  here per `new-initiative-filing-default` (a broader new-gate build is filed,
-  never smuggled into this iteration's lean single-unit envelope), demand-gated.
-  The open design is whether the annotation buys reach or ceremony — the same
-  reach-vs-ceremony question as `assertion-strength-exit-header-reach`; the
-  honest outcome may be to record the general class as a permanent human-audit
-  limit in `gate-sdk/SPEC.md` near `check-assertion-strength` and build nothing,
-  a widest-true-tier placement call in its own right (gate-sdk honest limit vs a
-  meta-gate doctrine line).
-  **Cost while deferred:** low and non-rotting — this iteration's instance is
-  fixed and the general class stays a review tripwire; the recurrence cost is
-  that a future gate can overclaim in prose versus its assertions and only human
-  audit catches it. Debt/analysis, adds no governed name unless the annotation
-  convention is built. Filed 2026-07-20 by the `render-fidelity-leak-coverage`
-  spec, settling the flagged `/spec` question.
-
 - **build-stage-tier-economics** [design-pending] — measure whether the `build`
   stage downgrades from Opus to Sonnet net-positive rather than flipping on
   intuition; a ruling-config tier re-judgment (`.claude/agents/stage-session.md`
@@ -894,118 +505,51 @@
   `spec-split-promotion-review` (evidence-gated tier promotion) and
   `benchmark-ab-experiment` (which holds model constant and varies governance —
   this holds stage constant and varies model). Debt/analysis: settles a
-  ruling-config tier by data, adds no governed name. Filed 2026-07-20 by lead
+  ruling-config tier by data, adds no governed name.
+  **Cost while deferred:** low and non-rotting — validate's adopted downgrade
+  already banks the affordable half of this lever, and every figure here is
+  provisional until the prerequisite corrects the rows; the residue is that
+  build's and close's tiers stay set by intuition rather than by a priced A/B.
+  Filed 2026-07-20 by lead
   ruling during the `render-fidelity-leak-coverage` spec, from an operator
   question.
 
-- **upgrade-smoke-phase-a-regen-derivation** [design-pending] —
-  `gate-sdk/bin/upgrade-smoke.sh` phase A swaps in the tip-of-tree kits then
-  regenerates a **hardcoded roster** of generated artifacts — pre-commit,
-  check-graph, and (as of `cd5dd59`) install-doctrine's digest — plus a **literal
-  `CLAUDE.md`** in the determinism whitelist. Both are hand-maintained copies of a
-  fact the vendored kits already own: which artifacts each kit's installer
-  regenerates. A kit that adds or renames a generated artifact (as doctrine-kit
-  just did, reddening `check-doctrine-registration` in phase B until `cd5dd59`
-  patched the roster) silently falls out of phase A until someone hand-edits the
-  roster — the maintain-a-derivable antipattern derivation-first rules out.
-  **Design direction:** derive the regen set from the vendored kits' own installers
-  (each kit owns its generated-artifact targets), so phase A re-runs whatever the
-  vendored kits install rather than a literal list, and the determinism whitelist
-  follows from those targets rather than naming `CLAUDE.md` by hand. This is the
-  interim flagged in `cd5dd59`'s message.
-  Debt: converges an existing smoke onto a derived roster; adds no governed name.
-  **Cost while deferred:** low but rot-prone — each new or renamed generated
-  artifact in any vendorable kit re-opens the same phase-A staleness, caught only
-  when a downstream phase-B gate reds and someone re-derives the cause (as
-  `cd5dd59` did). Cost to close: roughly one iteration. Filed 2026-07-21 by build
-  during `lifecycle-rule-placement`'s model correction.
-
-- **supervision-overhead-unmeasured** [design-pending] — the `supervision` row is
-  now the iteration's third-largest line and has never been examined. Re-derived
-  at this close: supervision **$6.9870 of a $37.26 iteration total, 18.8%** —
-  larger than every stage but build 1 ($9.3255), and larger than scope ($5.3941),
-  spec ($5.2158), and align ($3.2266) individually. It went unexamined because
-  until Delta B landed *this iteration* it was **not a distinct row at all** —
-  the lead's burn was attributed nowhere. Note the scale comparison that makes
-  this the priority: `stage-tiering-unit-is-the-batch` (above) fights over ~$2 of
-  build-tier spread; this line is more than three times that.
-  **First experiment, to run as recorded here:** run the **next** iteration's
-  lead session on Sonnet and measure it against this iteration's Opus baseline of
-  $6.9870. The `supervision` row makes that a clean A/B, which is exactly what
-  Delta B was built to enable. It could not be tried mid-iteration — a session
-  cannot re-tier itself — so the binding change necessarily applies to a future
-  lead session, and the baseline above is the number it is measured against.
-  **Window declined 2026-07-22 for `budget-oracle-honesty` — deliberately, not
-  missed (operator ruling at that iteration's scope).** The experiment was live
-  and expiring: a lead session cannot re-tier itself, so running it meant
-  restarting the already-Opus lead at iteration open. Declined on the asymmetry
-  between the two axes — the cost side now has 17 priced Opus supervision rows
-  and the quality side has **no read at all**, and this entry's own risk
-  paragraph says a bad ruling would score as a *saving*. Running a cost-only A/B
-  on the tier that makes rulings would produce a number that cannot be
-  interpreted. This iteration's Opus supervision cost therefore lands as another
-  baseline row, and the experiment stays blocked on the quality-read design this
-  entry already owes rather than on an absent opportunity.
-  **Baseline premise corrected 2026-07-22 by the scope survey — larger than
-  filed.** This entry frames the A/B against the single $6.9870 figure. In fact
-  `.metric/stage-economics-log.txt` carries **17 priced Opus `supervision` rows**
-  spanning ~15 iterations, $3.2016 to $19.1464. The comparison is therefore
-  against a distribution, not a point, which both strengthens the eventual A/B
-  and sharpens the caveat below: a single Sonnet run must be read against that
-  spread, and a spread that wide may swallow the effect entirely.
-  **Window declined again 2026-07-22 for `workflow-surface-tiering` (operator
-  ruling at that iteration's scope), on the same grounds as the first
-  declination — the quality read this entry owes still does not exist, and a
-  cost-only A/B on the tier that makes rulings returns a number that cannot be
-  interpreted. Second consecutive declination; that iteration's Opus supervision
-  cost lands as another baseline row.**
-  **Premise sharpened at that scope — the spread argument cuts harder than this
-  entry states, and it re-ranks the entry's own open work.** Re-counted:
-  `.metric/stage-economics-log.txt` now holds **24 `supervision` rows**, the
-  priced Opus ones still running $3.2016 to $19.1464 — a **6x** spread. Read
-  against that, a single Sonnet lead session is not merely underpowered at the
-  margin; it is uninterpretable in principle, because any plausible tier effect
-  sits well inside the existing variance. So the experiment as filed would
-  return an unusable number **even if the quality read existed**. The
-  consequence is a re-ordering this entry does not currently carry: it reads as
-  though the quality read were the sole blocker and the cost read were ready,
-  when in fact **both legs are blocked**. The cost leg needs either many
-  repeated runs (n≫1, at one lead session per iteration) or a
-  variance-controlled comparison that normalizes for iteration size — the
-  obvious candidate being cost per unit delivered rather than cost per
-  iteration. Design that normalization *before* the quality read: an
-  uninterpretable cost axis makes the quality axis moot, and the reverse does
-  not hold. Landed here so the next scope reads the corrected case rather than
-  re-deriving it from the log.
-  **A measurement caveat on the baseline itself:** supervision is the only row
-  still growing while close runs, so any figure quoted for it is a snapshot. The
-  lead's own mid-close read was $6.4552 (17.6% of $36.72); this close's read is
-  $6.9870. The A/B must therefore compare rows read at the *same* lifecycle
-  point, not two convenience snapshots.
-  **The risk this experiment carries, which is a different class from
-  validate's.** Supervision is where **rulings** happen. This iteration's
-  highest-judgment act was a supervision-axis ruling — the intent oracle's
-  finding that age *inverts* at a cliff, which redirected the whole
-  `price-table-age-kpi` unit and is the reason it shipped an expiry header rather
-  than an age-only KPI. Downgrading the tier that makes rulings is not the
-  already-vindicated validate downgrade, whose rows are mechanical
-  oracle-running; the failure mode is not a bigger bill but a **bad ruling that
-  costs a rebuild**, which the cost row would score as a *saving*. So the
-  experiment needs a **quality read alongside the cost read**, and the design
-  question this entry owes is what that read is — a rebuild count, an escalation
-  correctness sample, or an honest ruling that the axis is unmeasurable at n=1.
+- **supervision-overhead-unmeasured** [design-pending] — supervision is roughly a
+  fifth of an iteration's priced burn and has never been examined. It went
+  unexamined because it was not a distinct row at all until the attribution fix
+  landed; the figures live in `.metric/stage-economics-log.txt` and are read from
+  there rather than restated here. The obvious experiment — run a lead session on
+  Sonnet against the Opus baseline — has been **declined twice at scope**
+  (2026-07-22, both times on the same grounds), and the premise has since
+  sharpened enough to re-rank the entry's own open work.
+  **Both legs are blocked, which this entry used to obscure.** Re-counted at that
+  scope: 24 `supervision` rows, the priced Opus ones spanning a **6x** range. Read
+  against that spread a single Sonnet lead session is not merely underpowered, it
+  is uninterpretable in principle — any plausible tier effect sits well inside the
+  existing variance — so the experiment as filed returns an unusable number *even
+  if the quality read existed*. The cost leg therefore needs either many repeated
+  runs (n≫1, at one lead session per iteration) or a variance-controlled
+  comparison normalizing for iteration size, the obvious candidate being **cost
+  per unit delivered** rather than cost per iteration. **Design that
+  normalization before the quality read:** an uninterpretable cost axis makes the
+  quality axis moot, and the reverse does not hold. A further constraint on any
+  comparison: supervision is the only row still growing while close runs, so rows
+  must be read at the *same* lifecycle point, never at two convenience snapshots.
+  **The risk is a different class from validate's.** Supervision is where
+  **rulings** happen, so the failure mode is not a bigger bill but a **bad ruling
+  that costs a rebuild** — which the cost row would score as a *saving*. That is
+  why a quality read is owed at all, and the design question this entry carries is
+  what that read is: a rebuild count, an escalation-correctness sample, or an
+  honest ruling that the axis is unmeasurable at n=1. It is also why the two
+  declinations were correct rather than missed windows: the cost side has many
+  priced Opus rows and the quality side has no read at all.
   **What cannot be harvested by delegation.** Supervision splits internally the
-  same way `build` did — mechanical routing/verification versus genuine rulings —
-  so the batch-tiering answer looks transferable. It is not: the verification
-  half is **not delegable away from the supervising session**, because the
-  supervisor re-running the battery and diffing every agent commit *is* the
-  protocol (`delegation-kit/templates/agent-execution.md`, "Validate after every
-  agent commit"). A supervision split can therefore be tiered but not delegated,
-  which narrows the available levers to the tier question this experiment tests.
-  **Why the figures are usable at all:** same provenance as the entry above —
-  this is the first iteration whose meter output is trustworthy, being the
-  iteration that fixed the meter's attribution, and the `supervision` row exists
-  at all only because of that fix.
+  way `build` does — mechanical routing/verification versus genuine rulings — so
+  the batch-tiering answer looks transferable. It is not: the verification half is
+  **not delegable away from the supervising session**, because the supervisor
+  re-running the battery and diffing every agent commit *is* the protocol
+  (`delegation-kit/templates/agent-execution.md`). A supervision split can be
+  tiered but not delegated, which narrows the levers to the tier question.
   Debt/analysis: measures an unexamined cost line and may re-tier a lead binding;
   adds no governed name.
   **Cost while deferred:** the largest unexamined line in the iteration budget,
@@ -1052,202 +596,54 @@
   Surfaced 2026-07-23 in the same external review (its release-signaling
   finding).
 
-- **scope-amendment-authoring-gate** [design-pending] — on a roster carrying a
-  dedicated authoring stage, nothing stops the **scope** stage from doing
-  `spec`'s job: `4e10265` authored both of this iteration's amendment files and
-  landed both amendment-ref promotions in one `chore(scope)` commit, and every gate
-  stayed green — `check-amendment-queue`'s bidirectional rule is satisfied by a
-  paired amendment *whenever* it was written, and the stamp protocol only checks
-  that a stage's predecessor stamped, never that a stage's **output** was produced
-  under its own cursor. The stage evidence then records an authoring stage that
-  authored nothing, which is exactly the auditability the state machine exists to
-  provide.
-  **Gap generalization — the inputs are already at the hook.** The pre-commit
-  hook can read the stage cursor (last stamp in `.workflow/WORKFLOW-STATE.txt`)
-  and the staged diff; the roster and its predecessor map are in
-  `LIFECYCLE_KIT_STAGES` / `LIFECYCLE_KIT_PREDECESSOR`. Narrow rule: when the
-  roster contains `spec` and the cursor is `scope`, a staged diff that **adds** an
-  amendment file (`<kit>/SPEC-*.md`) or **adds** an amendment-ref tag (canon-kit's
-  spec-ref form) to a queue entry is the violation. Trigger is narrow, both
-  halves are mechanical, and the match carries no judgment.
-  **Open design (why `[design-pending]`, not a build unit):** three choices decide the
-  gate's shape. (1) **Scope** — the narrow scope/spec rule, or its general form: a
-  stage-scoped write-surface table where each stage declares the surfaces it may
-  write and a commit under stage X touching stage Y's surface reds. The general
-  form is worth far more and is a much larger design (every stage's surface set
-  must be enumerable and correct, and stages legitimately share surfaces). (2)
-  **Placement** — lifecycle-kit owns the cursor and the roster; canon-kit owns
-  amendment files and the bidirectional rule. The rule needs both, so ownership is
-  a real seam call, not a coin flip. (3) **Deliberate-early valve** — an operator
-  may sanction early authoring (this iteration's amendments were kept, not
-  reverted), so the gate needs a legible override, and a bypass-by-`--no-verify`
-  is not one.
-  Known false-positive surface to specify against: close's merge step **deletes**
-  amendment files and drops their refs under a `close` cursor (deletions and
-  removals must not arm the rule), and a debt-only iteration skips `spec`
-  entirely, so scope authoring nothing is the normal case there.
-  **Cost:** a real check plus a `good/`+`bad/` fixture pair, its `# graph:`
-  manifest, the regenerated pre-commit hook and graph artifact, and a
-  `gates.list` row — a full gate landing, not a one-liner; the general form
-  multiplies that by the write-surface table it would have to enumerate and keep
-  true. Feature by the litmus: it adds a governed name.
-  **Cost while deferred:** low per occurrence, and the failure is silent — the
-  amendments produced this way were sound, so nothing is wrong downstream; what
-  degrades is the stage evidence's truthfulness, and it degrades invisibly
-  (a green battery is not evidence against it). Recurred once so far.
-  Filed 2026-07-24 by spec, operator-ruled, from this iteration's own
-  scope/spec conflation.
-
-- **exit-echo-decoration-guard-vs-habit** [design-pending] — stage-session (sonnet)
-  agents decorate an otherwise-allowlisted command with a trailing `; echo
-  EXIT:$?` (or a leading `echo EXIT:$?;`) to read an exit status the harness
-  **already reports**. The `$?` is a shell *expansion*, and bash-guard's own
-  banner states no allowlist entry can suppress an expansion — so the triage
-  criterion (guard-kit/SPEC.md §The triage criterion) **cannot** resolve this to
-  (a) allowlist. It resolves to either a **guard rewrite/steer** that recognises
-  the benign decoration and steers to the bare form, or a **habit-change** note
-  for stage-sessions to drop it. Both are guard-kit design decisions.
-  Reproduced this iteration: 7 fall-throughs in `.workflow/prompt-friction.log`
-  containing `EXIT:` (validate-stage, operator-reported), the residue
-  `scan-prompts.sh` folds into its `echo` pattern rank.
-  **Open design (why `[design-pending]`):** a steer must strip a benign trailing/leading
-  `echo <literal>$?` around an allowlisted command *without* widening the very
-  expansion-suppression hole the banner warns against — a general "strip trailing
-  echo" rule has a safety surface that is the whole question, so the choice
-  between a narrowly-shaped steer and a documented habit-change (no new mechanism)
-  is the design, plus the steer-vs-note call itself. **Sibling in the same
-  decision surface:** the broader compound exploratory-read fall-throughs
-  (`grep`/`ls`/`git status`/`find` chained with `;`, the dominant `scan-prompts`
-  ranks this iteration) share one root — stage-sessions decorate/chain benign
-  commands — and this iteration already landed the `cat`/`find` compound
-  read-steers and per-segment matching; widening the steer set to the other
-  read verbs is the same guard-rewrite-vs-habit call, so scope should weigh them
-  together.
-  **Cost while deferred:** low and non-rotting — pure recurring prompt friction,
-  no gate reds, no correctness impact; the harness surfaces exit status already,
-  so every decorated call re-hits one avoidable prompt and nothing downstream
-  degrades. Bounded. Debt: a guard steer adds no governed name; a habit-change
-  note adds none either. Filed 2026-07-25 by close, operator-reported, from this
-  iteration's validate-stage permission friction.
-
-- **evidence-journal-hash-chain** [design-pending] — tamper-evidence for the
-  evidence trail itself, kit-side and infrastructure-free: each evidence
-  record (a stage stamp, a gate-run evidence line) carries the hash of its
-  predecessor, making the journal an append-only chain whose retroactive
-  edits — a rewritten verdict, a silently dropped red run — break the chain
-  and are detectable by a standalone offline verifier, no service involved.
-  This is the first cryptographic rung under **hosted-attestation-service**
-  and useful alone before it: a chained journal is exactly the record a
-  neutral party later countersigns or logs, and today's integrity story
-  (git history plus content hashes) proves nothing about omission.
-  **Open design (why `[design-pending]`):** which surfaces chain (the
-  WORKFLOW-STATE stamp stream spans tracked projections and gitignored
-  local capture; gate evidence is per-iteration), the chain's scope and
-  reset boundary (per-iteration vs continuous), where the genesis hash
-  anchors, and the record envelope — a DSSE/in-toto-compatible statement
-  shape would make the chained record double as the attestation wire
-  format, a contract decision that outlives the journal and should be
-  taken deliberately, not defaulted.
-  **Cost while deferred:** zero mechanism rots and nothing regresses — the
-  gap is a missing guarantee, not drift, and it only bites when a third
-  party is asked to trust the record, which is the hosted rung's
-  precondition anyway. Bounded. Surfaced 2026-07-25 in the operator's
-  attestation-direction review.
-
-- **md-section-near-miss-match** [design-pending] — `context-kit/bin/md-section.sh`
-  silently returns empty (exit 0, no output) on a near-miss heading query instead
-  of matching or failing loudly. This session it was queried with `wakeup-guard`
-  and `The knowledge-friction loop` while the actual headings were
-  `wakeup-guard (template)` and a differently-worded line, and the tool matched
-  only on exact/leading text — reproduced twice. The silent-empty result
-  mis-signals "no such section" and pushes the caller to read the gate/mechanism
-  **source** as a fallback, which is the source-prediction anti-pattern
-  (oracle-first / the knowledge-friction lesson this iteration gave a doc home in
-  guard-kit/SPEC.md §escalation-guard). **Design direction:** prefix/substring
-  heading match, or fail loudly with a `did you mean <closest heading>`
-  suggestion, never exit 0 empty. **Optional adjunct:** an advisory guard nudging
-  a non-gate-authoring session that Reads a check's `.sh` toward the SPEC + running
-  the gate (advisory-only, the honest ceiling for a judgment boundary).
-  **Why `[design-pending]`:** the match-relaxation has a real false-positive surface —
-  a prefix/substring match can silently resolve to the *wrong* section, so
-  choosing among prefix-only, substring, and fail-loud-with-suggestion is the open
-  design, and the advisory-guard adjunct is a second guard-kit-vs-context-kit
-  placement question. Not a close-stage inline fix: changing a shared tool's match
-  semantics wants a fixture pair and belongs in a scoped unit, not a drive-by.
-  **Cost while deferred:** low and non-rotting — the tool is correct on an exact
-  query; the exposure is a caller silently mis-reading a near-miss as "absent" and
-  source-reading as fallback, the exact loop the doctrine names. Filed 2026-07-25
-  by close, drained from the committed gap inbox (`c5c595c`).
-
 - **validate-verb-collision-and-check-routing** [design-pending] — two coupled
   defects with one root: the delegation discipline verb collides with the
   `/validate` stage noun, and that collision misroutes the lead's
   post-delegation check onto the evidence producer.
-  **(1) Verb collision.** The lifecycle stage `/validate` (runs `run-validate`,
-  the broad checksuite) shares its term with the delegation discipline "validate
-  after every agent commit" (the lead re-runs the gate battery to verify a
-  sub-agent's self-report). The verb is performed right *before* the stage, so
-  completing the lead-side verify reads as completing the stage — this iteration a
-  lead conflated them and nearly skipped the `/validate` stage, jumping build to
-  close. **Cheapest true fix:** rename the delegation discipline **verb**
+  **(1) Verb collision.** The lifecycle stage `/validate` shares its term with the
+  delegation discipline "validate after every agent commit". The verb is performed
+  right *before* the stage, so completing the lead-side verify reads as completing
+  the stage — a lead conflated them and nearly skipped `/validate`, jumping build
+  to close. **Cheapest true fix:** rename the delegation discipline **verb**
   (validate → verify or re-check) in `delegation-kit/templates/agent-execution.md`
-  and the lead binding, leaving the load-bearing stage name (`/validate`,
-  `run-validate`, the state machine, gates, docs) untouched. Renaming the stage is
-  rejected as invasive for a confusion the verb rename fully resolves.
+  and the lead binding, leaving the load-bearing stage name untouched. Renaming
+  the stage is rejected as invasive for a confusion the verb rename resolves.
   **(2) Check-routing gap the collision causes.** The post-delegation-check
-  binding (`validate-battery`: re-run `run-gates` + the touched kit's
-  `run-gate-tests`) carves out no case for when the *delegated stage is `/validate`
+  binding carves out no case for when the *delegated stage is `/validate`
   itself*. There the naive "re-run the battery to check it" is **wrong**:
   `/validate` is the evidence producer, so re-running `run-validate` mutates or
-  duplicates the committed execution evidence rather than verifying it. The correct
-  lead-side check for the validate stage is to **read** its committed evidence
-  manifest (`.workflow/validate-evidence.txt`), never to re-run. The binding must
-  distinguish **work-producing stages** (spec, build → re-run the battery, safe
-  and idempotent) from the **evidence-producing stage** (`/validate` → read the
-  committed manifest, never re-run). The two defects travel together because the
-  verb rename is what stops the check discipline mis-attaching to the evidence
-  producer.
-  **Recorded instances, both caught by the operator and by nothing else.**
-  *First (filing iteration):* a lead acting on the vague default moved to re-run
-  `run-validate` to "verify" the validate stage, twice. *Second
-  (`supply-chain-trust-baseline`):* a lead ran the full `run-gates` battery after
-  the validate stage's commit, as its standing "verify independently after every
-  agent commit" discipline — precisely the case this part names as wrong.
-  **What the second instance sharpens.** The two re-runs are not equally harmful,
-  and the binding must say which is which. `run-gates` writes nothing under
-  `.workflow` (see `evidence-row-upsert-order`, whose premise was corrected on
-  exactly this point), so re-running it is inert on the evidence and merely
-  wasted work; `run-validate` is the sole writer, so re-running *it* is the one
-  that mutates committed execution evidence. The reason a lead reaches for
-  `run-gates` here is that it is the generic post-delegation check and carries no
-  carve-out — the routing defect is real for both, the corruption risk only for
-  the second. Part (2)'s wording should split them rather than attributing the
-  mutation to any re-run.
+  duplicates the committed execution evidence rather than verifying it. The
+  correct lead-side check is to **read** its committed evidence manifest, never to
+  re-run. The binding must distinguish **work-producing stages** (re-run the
+  battery, safe and idempotent) from the **evidence-producing stage** (read the
+  committed manifest). The two defects travel together because the verb rename is
+  what stops the check discipline mis-attaching to the evidence producer.
+  **Fired in two consecutive iterations, operator-caught both times** — once
+  moving to re-run `run-validate` to "verify" the validate stage, once running the
+  full `run-gates` battery after the validate stage's commit. **The two re-runs
+  are not equally harmful, and part (2)'s wording must split them:** `run-gates`
+  writes nothing under `.workflow`, so re-running it is inert on the evidence and
+  merely wasted work, while `run-validate` is the sole writer. The routing defect
+  is real for both, the corruption risk only for the second.
   **Disposition after recurrence — unchanged, cost raised, insufficiency named.**
-  The recurrence does not make a different fix correct: the verb rename plus the
-  work-vs-evidence carve-out is still the cheapest true fix, and nothing in the
-  second instance argues for renaming the stage. What it does establish is that
-  the prose fix is **not sufficient on its own** — it removes the ambiguity but
-  installs no oracle, and a lead reaching for the generic check still gets no red.
-  Gap generalization, per the close ritual: the check class that would catch this
-  is a gate over a lead's *tool invocations*, and no scanner is buildable — a
-  lead's choice of command leaves no tracked artifact for the battery to read.
-  The nearest buildable proxy is the liveness sentinel filed under
-  `validate-producer-liveness-unobservable`, which covers only the concurrent
-  case, not a sequential re-run. So the unit ships the prose fix knowing
-  detection stays human, and that limit belongs in the binding it lands.
-  **Why `[design-pending]`:** a prose rename plus a binding-semantics change across
-  `delegation-kit`'s dispatch template and the lead binding, with a
-  grep-propagation pass — a shipped-kit surface change that wants a scoped unit,
-  not a close drive-by; and the work-vs-evidence carve-out is a delegation-kit SPEC
-  ruling, not a wording tweak. **Cost while deferred:** raised from "low but
-  recurrent" — it has now fired in two consecutive iterations, each time detected
-  only by an operator catch, so the in-band cost is unbounded until someone
-  happens to look: every delegated `/validate` re-litigates whether the lead
-  re-runs or reads, and the verb keeps inviting the skip-the-stage conflation.
+  The verb rename plus the work-vs-evidence carve-out is still the cheapest true
+  fix. What recurrence establishes is that the prose fix is **not sufficient on
+  its own**: it removes the ambiguity but installs no oracle. The check class that
+  would catch this is a gate over a lead's *tool invocations*, and no scanner is
+  buildable — a lead's choice of command leaves no tracked artifact to read. The
+  nearest buildable proxy is `validate-producer-liveness-unobservable`, which
+  covers the concurrent case, not a sequential re-run. So the unit ships the prose
+  fix knowing detection stays human, and that limit belongs in the binding.
+  **Why `[design-pending]`:** a prose rename plus a binding-semantics change
+  across `delegation-kit`'s dispatch template and the lead binding, with a
+  grep-propagation pass, and the work-vs-evidence carve-out is a SPEC ruling
+  rather than a wording tweak.
+  **Cost while deferred:** raised from "low but recurrent" — it has fired in two
+  consecutive iterations, detected only by an operator catch both times, so the
+  in-band cost is unbounded until someone happens to look.
   Filed 2026-07-25 by close, draining the committed gap inbox (`0eec298`) merged
-  with the lead's post-dispatch third triage item (the check-routing half);
-  second instance added the same day by close.
+  with the lead's post-dispatch third triage item; second instance added the same
+  day by close.
 
 - **core-files-kit-coverage-derived** [design-pending] — `scripts/core-files.list`
   carries a block headed "One SPEC.md per kit (each kit's canonical contract)"
@@ -1289,70 +685,6 @@
   audit — the amendment's A3 edits this same file, so the gap is adjacent to its
   envelope without being inside it. Lead ruling, scope-gated intake.
 
-- **amendment-update-target-coverage** [design-pending] — an entry under an
-  amendment's `## Existing sections updated` heading can name no owning delta,
-  and nothing catches it. `supply-chain-trust-baseline` shipped two such entries
-  of eight: the CLAUDE.md §Housekeeping enumeration and the gate-sdk/README.md
-  roster row. Both were adopted correctly by a build batch reading intent, so
-  nothing shipped wrong. The exposure is that an unclaimed target is
-  indistinguishable from one a batch may skip, leaving the batch to decide on
-  its own authority which it is.
-  **Deliverable — a canon-kit gate asserting every entry under that heading
-  cites a delta the same amendment defines.** The authoring-side rule landed at
-  this close (canon-kit/templates/SPEC-amendment.md) and align now carries the
-  manual verification (lifecycle-kit/templates/skills/align.md); this entry is
-  the assertion those two currently stand in for.
-  **Why `[design-pending]`:** the delta-letter grammar is convention, not contract.
-  `**A1.` through `**D1.` is how amendments have happened to number their
-  deltas; no surface pins it, and a gate cannot match a grammar the template
-  never specifies. The design call is whether canon-kit fixes that numbering
-  (and reds a non-conforming amendment) or weakens the assertion to "cites some
-  bold token defined above" — a proxy thin enough to fail gate-sdk/SPEC.md
-  §When a gate earns its place.
-  **Cost while deferred:** bounded. The failure mode is an edit adopted by
-  judgment rather than one dropped, and the align duty now names it.
-  Debt: one gate over an existing governed structure; adds no governed name.
-  Filed 2026-07-25 by close, from the `supply-chain-trust-baseline` lesson
-  triage.
-
-- **gap-inbox-commit-ownership** [design-pending] — the gap inbox has an unowned
-  commit seam and an under-advertised entry point, both hit this iteration by a
-  lead filing a bullet mid-iteration. Two halves, one unit.
-  **(1) Who commits a lead-filed bullet is unspecified.** lifecycle-kit/SPEC.md
-  §The committed gap inbox calls the channel committed and names any
-  mid-iteration session, lead or stage, a producer; lifecycle-kit/templates/lead.md
-  holds that every lifecycle-state write happens in a stage session, and the
-  lead has no stage session of its own to carry the bullet. `bin/file-gap.sh`
-  warns about the cursor consequence and says nothing about the commit
-  obligation, so the producer derives whether to commit alone, ride a concurrent
-  stage session's commit, or wait for a clean checkpoint.
-  **(2) The always-loaded tier advertises only the narrower channel.** CLAUDE.md
-  §Housekeeping names `kfric.sh` as the any-session capture affordance and never
-  mentions `file-gap.sh`, so the work-shaped channel is visible only after
-  loading lifecycle-kit/SPEC.md. That channel carries the harder consequence: a
-  bullet blocks the next scope entry. The asymmetry is standing pressure toward
-  the kfric overload drift-kit/SPEC.md §The knowledge-friction loop warns
-  against.
-  **Half (2) is STALE — observed 2026-07-29 at scope, deliberately not re-costed
-  there.** CLAUDE.md §Housekeeping now carries the `file-gap.sh` pointer beside
-  the `kfric.sh` one, so the advertising asymmetry this half describes is
-  already closed. Left standing for close to triage with the rest of its drain,
-  since this entry sits in no active unit and a half-stale premise is close's
-  call, not a scope-stage rewrite. Only half (1) — who commits a lead-filed
-  bullet — is known open; re-verify before promoting either half.
-  **Deliverable:** the SPEC names the commit owner, `file-gap.sh` says so at the
-  point of capture, and one always-loaded line pairs the two channels by their
-  seam.
-  **Why `[design-pending]`:** the ownership rule is the open call, not the wording.
-  "The producer commits it alone" is one candidate and it collides with the
-  shared-index discipline whenever a stage session holds a dirty index; the
-  alternative defers the bullet to the next clean checkpoint and widens the
-  window in which a filed gap is uncommitted.
-  **Cost while deferred:** low, and it recurs per lead-filed bullet.
-  Debt: docs plus one stderr string; adds no governed name.
-  Filed 2026-07-25 by close, from the `supply-chain-trust-baseline` gap-inbox
-  drain (both halves one unit, as the bullet filed them).
-
 - **security-advisory-lane** [design-pending] — `SECURITY.md` (shipped this
   iteration) directs reporters to GitHub private vulnerability reporting, and
   nothing on our side is named as the reader. Advisories are a surface distinct
@@ -1387,54 +719,6 @@
   Debt: small-to-medium; the constraint is the design, not the code.
   Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
   inbox (two bullets merged at triage, costed once).
-
-- **evidence-row-upsert-order** [design-pending] — `evidence-kit/bin/run-validate.sh`
-  upserts each suite's row in `.workflow/validate-evidence.txt` as a
-  delete-then-append: `awk` filters the `(iteration, suite)` line out into a
-  temp, the new line is appended, the temp is `mv`'d over the manifest. So a
-  re-run **relocates** the row to the end rather than updating it in place. The
-  content is unchanged (same sha256, same counts, same date), so no evidence is
-  corrupted; what a re-run produces is a reordering.
-  **Correction to this entry's original premise, 2026-07-25.** It was filed
-  claiming any battery run — not just validate's — rewrites the `gates` row.
-  That is false. `gate-sdk/bin/run-gates.sh` contains no `.workflow` reference
-  at all and writes nothing there; `run-validate.sh` is the sole writer.
-  Re-verified by running the bare battery on a clean tree: 81/81 green, `git
-  status` unchanged. The clause claiming this cost a close entry a false
-  clean-tree report falls with the premise — the battery was never the writer,
-  so a lead's post-delegation battery run never dirtied the manifest.
-  **What actually caused the churn.** The validate session's `run-validate` was
-  still executing in the background when close was dispatched, and its writes
-  raced the close commits. Fingerprint in the committed manifests: `gates` is
-  first in `EVIDENCE_KIT_SUITES` (`scripts/evidence-config.sh`) and first in the
-  prior iteration's manifest at `7692335`, but **last** in this iteration's at
-  `ae70eae`, both carrying all 21 suites clean. One relocated row with no
-  content change is a second pass that had upserted only its first suite — a
-  live producer, not a property of the battery. The concurrency itself is filed
-  separately as `validate-producer-liveness-unobservable`; this entry keeps only
-  the ordering defect.
-  **Why the ordering is still worth fixing on its own merits.** A relocating
-  upsert makes the manifest's line order non-deterministic, so a repeated or
-  concurrent write surfaces as a diff with no content behind it, and every
-  session reading that diff pays the same churn-or-evidence judgment — cheap to
-  get wrong either way: committing noise into a stage record, or discarding a
-  row that mattered. Under a stable order the race above would have been
-  invisible in the tree; it is the ordering that turned a benign re-run into a
-  session-visible defect.
-  **Deliverable:** an order-stable upsert, so re-running an unchanged suite
-  leaves the file byte-identical.
-  **Why `[design-pending]`:** the writer's `# spec:` line declares the current
-  semantics deliberately — "a re-run supersedes this iteration's prior line for
-  the suite, then appends" — so recency order may be the intended contract
-  rather than an accident, and an in-place update changes it. Whether the
-  manifest's line order is contractual (and if so, which order) is
-  evidence-kit/SPEC.md §Evidence manifest's ruling, not a patch to the script.
-  **Cost while deferred:** low per hit, and rarer than first filed — it needs a
-  repeated or concurrent run-validate, not any battery run. No gate catches it
-  because nothing is wrong with the file's content. Debt: converges a writer
-  onto a stable ordering; adds no governed name.
-  Filed 2026-07-25 by close; premise corrected the same day by close after
-  re-deriving the writer set.
 
 - **local-overlay-git-blanket-grant** [design-pending] — the local permission overlay
   carries `Bash(git *)`, a single glob granting **every** git subcommand without a
@@ -1511,21 +795,18 @@
 
 - **lead-dispatch-requires-completion-notification** [design-pending] — the lead has
   no stated precondition for dispatching stage N+1, and the one it improvised is
-  wrong: artifact state. This iteration the lead verified that validate's commit
-  had landed with complete evidence, the tree was clean, the battery green, and
-  `enter-stage.sh --simulate close` cleared — then dispatched close on that basis,
-  into a still-running `run-validate`. Every one of those checks passed while the
-  producer was mid-write, because `run-validate` commits its evidence and keeps
-  going: **the terminal commit existing is fully compatible with the process still
-  executing.** The lead dispatched on the *absence* of a completion notification
-  rather than its arrival.
-  **The generalizable trap, worth the entry on its own.** The operator mentioned
-  having "approved it only now upon return," referring to a permission prompt the
-  validate session had stalled on. The lead read that as the stall resolving and
-  therefore the stage being finished. It means the opposite: an approval prompt
-  gates a command **starting**, so that message was positive evidence the battery
-  had just *begun*. Any signal about a prompt being answered is a start signal,
-  never a completion one.
+  wrong: artifact state. A lead checked that validate's commit had landed with
+  complete evidence, the tree was clean, the battery green, and a simulated close
+  entry cleared — then dispatched close into a still-running `run-validate`. Every
+  check passed while the producer was mid-write, because `run-validate` commits
+  its evidence and keeps going: **the terminal commit existing is fully compatible
+  with the process still executing.** The lead dispatched on the *absence* of a
+  completion notification rather than its arrival.
+  **The generalizable trap, worth the entry on its own.** The lead read an
+  operator's note about having just answered a stalled permission prompt as the
+  stage being finished. It means the opposite: an approval prompt gates a command
+  **starting**. Any signal about a prompt being answered is a start signal, never
+  a completion one.
   **Deliverable:** a dispatch precondition in
   `lifecycle-kit/templates/lead.md` — stage N+1 is dispatched on stage N's agent
   **completion notification**, never on the presence of its commit or any
@@ -1541,19 +822,16 @@
   unreadable, while "is the producer still running?" is exactly what the lock
   sentinel under `validate-producer-liveness-unobservable` reads. The two are one
   unit — prose rule on the dispatch side, oracle on the artifact side.
-  **Disposition of the incident as a set, which differs from the lead's read.**
-  The lead proposed this rule as the actual fix with the others as symptoms it
-  prevents. Half right. It is the proximate cause and the cheapest fix, so it goes
-  first. It is not sufficient alone, and this queue already carries the reason:
-  `validate-verb-collision-and-check-routing` established this same iteration that
-  a prose fix with no oracle recurs and is caught only by an operator. Shipping
-  this rule without the sentinel repeats that pattern knowingly. Also retracted
-  here: the incident was briefly read as `check-evidence-manifest` being
-  grammar-only. It is not — see the assertion-A note under
-  `validate-producer-liveness-unobservable`. Three real findings, not four:
-  the dispatch decision (this entry), the observability gap (the sentinel), and
-  the artifact churn (`evidence-row-upsert-order`), which is worth fixing on its
-  own merits and is not merely a symptom.
+  **Disposition of the incident as a set.** This rule is the proximate cause and
+  the cheapest fix, so it goes first — but it is not sufficient alone, and the
+  queue carries the reason: `validate-verb-collision-and-check-routing` establishes
+  that a prose fix with no oracle recurs and is caught only by an operator.
+  Shipping this without the sentinel repeats that pattern knowingly. Three real
+  findings, not four: the dispatch decision (this entry), the observability gap
+  (the sentinel), and the artifact churn (`evidence-row-upsert-order`), which is
+  worth fixing on its own merits rather than as a symptom. A fourth reading — that
+  `check-evidence-manifest` is grammar-only — is retracted; see the assertion-A
+  note under `validate-producer-liveness-unobservable`.
   **Why `[design-pending]`:** it adds a precondition to a shipped template's dispatch
   contract and states a limit (prose-only, human-enforced) that
   lifecycle-kit/SPEC.md should own explicitly rather than leave implied.
@@ -1613,28 +891,27 @@
   case the default existed for. The globs were almost certainly meant to be
   additive: the comment above them explains the `*/checks/*.sh` reach and says
   nothing about giving anything up.
-  **Deliverable:** restore the dropped glob —
-  `("*/checks/*.sh" "scripts/check-*.sh" "gate-sdk/lib/gate.sh" "gate-sdk/bin/run-gate-tests.sh")`
-  — with a fixture arm proving that a `scripts/` gate edit co-staged with
-  product code is blocked, which no existing arm covers. Check the same
-  replace-not-extend hazard on `DELEGATION_KIT_META_PATHS` while there; that one
-  re-declares every default it overrides, so it is correct today by hand rather
-  than by mechanism. One doc correction rides along: delegation-kit/SPEC.md's
-  knob roster says this repo's config *widens* `GATE_FILES` — what a reader
-  would assume, and the opposite of what the mechanism does. The SPEC should
-  state the replace-not-extend semantics where it states the default.
-  **Why deferred rather than fixed in the batch that found it:** the cost is not
-  the one-line array. Widening coverage may red-line commit shapes this repo's
-  own history relies on — a consumer gate landing beside the product change it
-  gates is exactly the shape the assertion rejects — so the fix needs a survey
-  of recent gate-touching commits before it lands, and a survey is not a
-  build-batch side errand. Scope-gated intake.
-  **Cost while deferred:** the assertion this repo advertises does not hold
-  where it matters most. An agent can co-stage a weakening of
-  `scripts/check-install-toolchain.sh` — or any consumer gate — with the product
-  change that gate would have caught, and the tamper gate stays silent; the
-  kit's own default covers precisely that case. Non-rotting, but the exposure is
-  permanent until the glob returns.
+  **The coverage half has landed — re-verified 2026-07-31 at build against
+  `scripts/delegation-config.sh`.** The array now carries `scripts/check-*.sh`
+  beside the other three globs, with the replace-not-extend hazard written into
+  the comment above it, and delegation-kit/SPEC.md was corrected at the same
+  close. What this entry still owes is the *mechanism*, not the value.
+  **Deliverable, as it now stands:** a fixture arm proving that a `scripts/` gate
+  edit co-staged with product code is blocked, which no existing arm covers; and
+  the same replace-not-extend audit on `DELEGATION_KIT_META_PATHS`, which
+  re-declares every default it overrides and so is correct by hand rather than by
+  mechanism. The open design question is whether a consumer array should extend
+  rather than replace — a kit-wide declaration-semantics ruling, not a config
+  edit.
+  **Why deferred rather than fixed in the batch that found it:** widening
+  coverage may red-line commit shapes this repo's own history relies on — a
+  consumer gate landing beside the product change it gates is exactly the shape
+  the assertion rejects — so the fix needs a survey of recent gate-touching
+  commits before it lands. Scope-gated intake.
+  **Cost while deferred:** low, and lower than this entry claimed before the
+  correction above — the coverage hole is closed, so what remains is that the
+  correct value is held by hand: nothing pins the glob, no fixture arm would red
+  if it were dropped again, and `META_PATHS` carries the same unpinned shape.
   Filed 2026-07-26 by build, on the lead's ruling during the
   `platform-support-contract` floor batch, from a probe of `check-gate-tamper`'s
   resolved runtime config.
@@ -1675,13 +952,10 @@
 
 - **installer-lifecycle-verbs** [design-pending] [roadmap: next/adoption] — update, diff, uninstall.
   roadmap-summary: update, diff and uninstall, so an install can be managed after init.
-  The installer's second phase:
-  `update`, `diff`, and `uninstall`, the verbs that manage an install after
-  `init` has made one. Phase 1 (`init`, `doctor`, `--dry-run`, the manifest, the
-  profiles, the packaging, and the consumer smoke) shipped in `activation-path`;
-  this phase was ruled a separate build unit at promotion and is filed here on
-  the lead's ruling at that iteration's merge, so it survives the amendment that
-  governed it.
+  The installer's second phase: `update`, `diff`, and `uninstall`, the verbs that
+  manage an install after `init` has made one. Phase 1 shipped in
+  `activation-path`; this phase was ruled a separate build unit at promotion and
+  is filed here so it survives the amendment that governed it.
   **The manifest is already the contract, and that is what makes this additive.**
   All six `checkwright.lock` fields — `schema`, `version`, `commit`, `profile`,
   `kits`, `files` — carry a phase-1 reader today (installer/README.md §The
@@ -1709,22 +983,14 @@
      files by hand against the manifest. Mechanical, since `files` records every
      path with its hash — but manual, with no verb.
   2. **Discoverability, not capability, on upgrade.** Upgrade *is* supported
-     today and is spelled `npx checkwright@<newer> init`. `init.sh`'s re-run
-     refusal gates on a version difference, but `sort -V` narrows it to the
-     downgrade direction only (it dies solely when the *package* is the older
-     of the two); an upgrade falls straight through, the profile is re-read from
-     the lock, and `claim()` rewrites only files whose hashes still match the
-     manifest while reporting and preserving anything the adopter edited. So
-     `--force` is not the upgrade path and never needed to be. What it costs to
-     have no `update` verb is that nobody guesses `init` for an upgrade.
-  3. **The cross-version upgrade is implemented but not smoke-covered.**
-     `installer/consumer-smoke/run-smoke.sh` packs one `$VERSION` and asserts
-     the same-version re-run leaves the tree unchanged — idempotence, not a
-     version bump. The falls-through-and-re-applies path therefore has no
-     automated exercise; the first adopter moving off v0.16.0 runs it first.
-     Closing this is cheap and does not need the verbs: pack twice at two
-     stamped versions and assert the bump re-applies while preserving a
-     deliberately-edited file.
+     today and is spelled `npx checkwright@<newer> init`: the re-run refusal
+     narrows to the downgrade direction only, an upgrade falls straight through,
+     the profile is re-read from the lock, and only files whose hashes still
+     match the manifest are rewritten — anything the adopter edited is reported
+     and preserved. So `--force` is not the upgrade path and never needed to be.
+     What it costs to have no `update` verb is that nobody guesses `init`.
+  3. **The cross-version upgrade is implemented but not smoke-covered** — carved
+     out as `installer-upgrade-smoke-arm`, which does not need these verbs.
   `--dry-run` already covers most of what a deferred `diff` would add: it
   prints the file plan and the manifest that would be written. Non-rotting, and
   bounded by the manifest being correct and complete meanwhile — the data an
@@ -1734,51 +1000,27 @@
   merge, from scope the amendment governed and its deletion would otherwise
   have dropped.
 
-- **installer-smoke-manifest-write-collision** [design-pending] — `installer_smoke`
-  (new this iteration in `EVIDENCE_KIT_SUITES`) sits 18th of 22 suites in
-  `scripts/evidence-config.sh`'s roster, behind `gates` and every kit fixture
-  suite, `guard_tests`, `usage_tests`, `budget_guard_tests`, `trend_tests`, and
-  `demo`. `evidence-kit/bin/run-validate.sh` upserts each suite's row into the
-  tracked `.workflow/validate-evidence.txt` manifest as it goes, so by the time
-  `installer_smoke`'s turn arrives 17 prior suites have already dirtied that
-  tracked file. `installer/consumer-smoke/run-smoke.sh` (and the
-  `scripts/pack-installer.sh` it drives) both hard-refuse a dirty `git status
-  --porcelain`, so a full `bash evidence-kit/bin/run-validate.sh` run
-  deterministically reds `installer_smoke` on every invocation — not a race,
-  a guaranteed collision between the roster's order and the spine's own
-  write mechanism.
-  **Confirmed this session.** The full-battery run for `activation-path
-  validate` logged `installer_smoke -> new-failures`, log reading "the
-  worktree is dirty". Stashing `.workflow/validate-evidence.txt`'s in-flight
-  diff and re-running `installer/consumer-smoke/run-smoke.sh` alone on the
-  now-clean tree passed all three profiles (starter/delegation/full) cleanly
-  — matching the lead's independently reported clean run. The suite itself
-  is sound; the codified spine's own write order is what breaks it.
-  **Interim mitigation landed this session:** `installer_smoke` was reordered
-  strictly first in `EVIDENCE_KIT_SUITES` (ahead of `gates`), with a
-  load-bearing comment in `scripts/evidence-config.sh` explaining why the
-  position matters. Verified before landing: grepped every configured
-  suite's run command for a `git status`/porcelain precondition —
-  `installer_smoke` (via `scripts/pack-installer.sh`) is the *only* one that
-  requires this repo's own tree be clean; this session's own prior run is
-  corroborating evidence, since the other 21 suites passed on a
-  progressively dirtied tree. Also confirmed no gate, evidence-kit contract,
-  or parser assumption pins `gates` (or anything else) to roster position 1
-  — it was only `scripts/evidence-config.sh`'s own hand-chosen first entry.
-  A **baseline hold was tried and reverted the same session.** Holding
-  `installer_smoke installer_smoke fail <slug>` constant in
-  `.workflow/validate-baseline.txt` was the first disposition attempted; it
-  was wrong and has been dropped. `installer_smoke` carries no
-  `EVIDENCE_KIT_PARSER_installer_smoke`, so it falls to the default
-  `exit-code` parser, whose entire parsed result is one row. Any nonzero
-  exit — a dirty tree, a broken profile, a pack failure, a genuine `init`
-  regression — produces the identical row, and a held-constant baseline
-  entry classifies all of them `clean` alike. The hold did not preserve a
-  known red; it blinded the suite to every other failure mode. That is why
-  holding it constant is not a viable disposition on its own, and why the
-  reorder — imperfect as an interim step — is the mitigation that landed
-  instead: it lets the suite's real result stand rather than papering over
-  it.
+- **installer-smoke-manifest-write-collision** [design-pending] — a guaranteed
+  collision between the validate roster's order and the spine's own write
+  mechanism. `run-validate.sh` upserts each suite's row into the tracked
+  `.workflow/validate-evidence.txt` manifest as it goes, while `installer_smoke`
+  (via `scripts/pack-installer.sh`) hard-refuses a dirty `git status --porcelain`
+  — so with the suite anywhere but first, every full run deterministically reds
+  it. Not a race. Reproduced at `activation-path validate`: the suite logged
+  "the worktree is dirty", and re-running it alone on a clean tree passed all
+  three profiles.
+  **Interim mitigation landed:** `installer_smoke` reordered strictly first in
+  `EVIDENCE_KIT_SUITES`, with a load-bearing comment on why position matters.
+  Two facts verified before landing, and they are what the durable fix rests on:
+  `installer_smoke` is the **only** configured suite requiring this repo's own
+  tree to be clean, and **nothing pins any suite to roster position 1**.
+  **A baseline hold was tried and reverted the same session** — the negative
+  result worth keeping. `installer_smoke` carries no parser override, so it falls
+  to the default `exit-code` parser whose entire result is one row: a dirty tree,
+  a broken profile, a pack failure and a genuine `init` regression all produce
+  the identical row, and a held-constant baseline classifies every one of them
+  `clean`. The hold did not preserve a known red, it blinded the suite to every
+  other failure mode.
   **Deliverable — the durable fix, not yet built.** The reorder is
   positional and fragile: it re-breaks silently the moment a second
   clean-tree-requiring suite lands anywhere but first, and nothing asserts
@@ -1888,56 +1130,6 @@
   captured as a knowledge-friction re-derivation against
   `installer/lib/common/recipe.sh`; both converge here.
 
-- **operator-authored-unit-set** [design-pending] — lifecycle-kit/SPEC.md's
-  standing-scope-directive clause models exactly one shape: a **lead-authored**
-  menu, "a theme bounding scope's survey and never a slug list". This iteration
-  ran the other shape — an **operator-authored slug list** naming all four units
-  before scope opened. That is legitimate in substance (the operator owns what
-  the project builds) but unmodeled in the contract, and the clause's own stated
-  hazard — a pre-authored menu pre-empting scope's premise re-verification — is
-  precisely the hazard the operator case carries, with nothing written to
-  address it.
-  **Deliverable:** model the operator-authored unit set explicitly in the
-  standing-scope-directive clause, and restate the premise-re-verification
-  obligation as **scope's own regardless of who authored the list** — the
-  re-verification is not a check on the author's authority, it is scope's
-  contract with the tree.
-  **Why `[design-pending]`:** it amends a lifecycle-kit SPEC clause that governs
-  stage-entry semantics for every consumer, and the honest form may be a
-  generalization (any pre-authored unit set, author-agnostic) rather than a
-  second enumerated case — that choice is the design.
-  **Cost while deferred:** low but recurring — every operator-directed iteration
-  runs a shape the contract does not describe, and scope's re-verification rests
-  on convention rather than on a written obligation. Nothing reds; the residue is
-  a governing clause narrower than the practice it governs.
-  Filed 2026-07-26 by close (`release-path-hardening`), draining the gap inbox;
-  surfaced by that iteration's scope and routed to spec by the lead for filing,
-  deliberately not fixed in-iteration.
-
-- **tarball-build-attestation** [design-pending] — `release-tarball-delivery-channel`
-  ships the Release tarball beside a `.sha256`, and that checksum proves
-  **transfer integrity only**: checksum and tarball share one origin and one TLS
-  session, so a consumer who fetches both from a compromised release fetches a
-  matched pair. The **build-provenance** property — this artifact was built by
-  this workflow from this commit — stays exclusive to the npm channel, which has
-  `--provenance`. The tarball is now the primary channel, so the stronger
-  property lives on the secondary one.
-  **Deliverable:** a signed build attestation on the tarball channel —
-  `actions/attest-build-provenance` at publish time, verified by
-  `gh attestation verify` at install time — plus the install-path documentation
-  that makes verification a step a Node-free adopter can actually run.
-  **Why `[design-pending]`:** it adds a fourth pinned `uses:` ref to `publish.yml`
-  (a supply-chain-surface change the supply-chain-trust-baseline contract
-  governs), and the install-side half is an open question: an attestation nobody
-  verifies buys nothing, but `gh attestation verify` reintroduces a toolchain
-  dependency on the channel whose whole premise is needing none.
-  **Cost while deferred:** bounded and non-rotting — the checksum is honest about
-  what it proves and the docs claim no more. The residue is a primary channel
-  with a weaker integrity story than the secondary one, which inverts as adoption
-  moves to the tarball. Costed at roughly one small unit.
-  Filed 2026-07-26 by close (`release-path-hardening`) off the gap inbox's
-  tarball-checksum bullet; ruled outside the shipping unit's envelope at align.
-
 - **spec-measured-count-gate** [design-pending] — a **measured count authored into a
   canonical SPEC section goes stale with no oracle**. Reproduced twice in one
   iteration: the align audit found `gate-sdk/SPEC-action-run-shell.md` B2's block
@@ -1964,63 +1156,6 @@
   asserting a false number, and detection is by hand at align if at all.
   Filed 2026-07-26 by close (`release-path-hardening`), draining the
   stale-measured-count bullet; costed at roughly one small unit.
-
-- **action-run-shell-scan-predicate** [design-pending] —
-  `check-action-run-shell`'s scan predicate is a **kit literal with no consumer
-  seam**. The align ruling narrowed extraction to files carrying a top-level
-  `jobs:` or `runs:` key, which is right for what gate-sdk claims, but it leaves
-  a consumer whose shell genuinely lives in another CI dialect with no way to opt
-  that surface in — CircleCI's `- run:` is the concrete case, and the extractor
-  handles it correctly, so the reach is a policy choice, not a capability limit.
-  **Deliverable:** a consumer-configurable scan predicate on the gate-sdk
-  config-via-env pattern, defaulting to the Actions shape so **no consumer
-  inherits a wider reach by accident**. The shape is the
-  `check-graph` / `scripts/graph-vocab.sh` optional-consumer-config pattern the
-  provenance seam already prescribes, so the precedent exists.
-  **Why `[design-pending]`:** it adds a knob to a gate that has none, and
-  `gate-sdk/SPEC.md`'s no-new-knob claim for this gate would need re-deriving —
-  a contract edit, not a script patch.
-  **Cost while deferred:** low — the gate is correct and complete over what it
-  claims, and the narrowing is documented. The residue is a consumer with
-  non-Actions CI shell getting no coverage and no opt-in, which surfaces only
-  when such a consumer adopts. Costed at roughly one small unit.
-  Filed 2026-07-26 by close (`release-path-hardening`) from the scan-predicate
-  bullet; deliberately out of that unit's envelope at align.
-
-- **scratch-execution-allowlist-bar** [design-pending] — the prompt-friction triage
-  keeps surfacing one dominant class that must **never** be allowlisted, and
-  nothing records why. This close's scan ranked `bash .tmp/<script>.sh` first by
-  a wide margin (24 calls across 13 one-off script names, against 7 for the next
-  pattern), and it will rank first at every close: writing a throwaway probe into
-  `.tmp/` and running it is the repo's *sanctioned* scratch form — `bash-guard`
-  actively steers sessions toward it, and `.claude/settings.json` already grants
-  `rm .tmp/*`.
-  **Why the obvious triage answer is wrong.** By guard-kit's criterion the
-  pattern looks like a textbook allowlist candidate (safe, static, glob-matched,
-  and already the form to reinforce). It is not. `.tmp/` content is by
-  construction **agent-authored**, so the permission prompt on `bash .tmp/*.sh`
-  is the single point at which a human sees agent-written code before it
-  executes. Granting it would convert "every dangerous command prompts" into
-  "write it to scratch and it does not" — a general bypass of every other guard
-  in the settings, earned by one line.
-  **Deliverable (enforcement-first, and this class is gateable):** a guard-kit
-  assertion that reds a **committed** allowlist entry granting bare execution
-  (`bash`, `sh`, `source`, `.`) of a path under an agent-writable scratch
-  directory, plus the one-line rule in guard-kit/SPEC.md §The triage criterion
-  that the gate enforces. Both halves land together, per Enforcement-first.
-  **Why `[design-pending]`:** the scratch-directory set is the design. `.tmp/` is
-  this repo's binding, not a kit literal, so the gate needs the consumer seam the
-  provenance seam prescribes (the `check-graph` / `graph-vocab.sh` pattern) — and
-  the honest predicate may be wider than scratch (any agent-writable path,
-  including a gitignored generated directory), which changes both the knob and
-  the false-positive surface.
-  **Cost while deferred:** low per close, but it is pure re-derivation — every
-  close re-reaches the same conclusion from scratch about the same top-ranked
-  pattern, and a close that reasons less carefully files the grant instead. The
-  standing bar is currently held by nothing but each session's judgment.
-  Filed 2026-07-26 by close (`release-path-hardening`), from its own
-  prompt-friction triage; the local overlay carried no redundant entries to
-  prune this iteration.
 
 - **action-gh-repo-context** [design-pending] — a workflow job that invokes `gh`
   while carrying **neither a checkout nor a repo-context env** cannot resolve a
@@ -2064,21 +1199,18 @@
   roadmap-summary: The gate battery as one native binary: no GNU userland, sub-second runs.
   Port the battery off bash-plus-GNU-userland onto a single native compiled
   binary (Rust the lead candidate), because every structural pain the current
-  stack carries is substrate-bound, not fixable in place. The inventory today:
-  76 check scripts, ~14.3k lines of shell across `*/checks`, `*/bin`, and
-  `scripts/`, 85 registry entries. The pains, each already live: the platform
-  reality is Linux-only — stock macOS ships bash 3.2 and a BSD userland
-  (docs/install.md §Requirements states it outright) and Windows is WSL-only
-  (`platform-support-ci-matrix` carries that half); the
-  bash/git/jq/awk/sort/shellcheck assortment has independent release
-  lifecycles, with cross-version workarounds already in tree; battery
-  wall-time has grown from tens of seconds toward minutes on some batteries,
-  most of it process-spawn cost rather than work; shellcheck is a linter, not
-  a compiler, and bash offers no type system under 14k lines; and check
-  source in the consumer's tree feeds the source-prediction anti-pattern —
-  agents reading gate scripts to predict verdicts instead of running the
-  oracle, a recurring token sink the delegation rules fight behaviorally
-  rather than structurally.
+  stack carries is substrate-bound, not fixable in place. Scale is read off
+  `gates.list` and `*/checks`, never restated here. The pains, each already
+  live: the platform reality is Linux-only — stock macOS ships bash 3.2 and a
+  BSD userland (docs/install.md §Requirements states it outright) and Windows is
+  WSL-only (`platform-support-ci-matrix` carries that half); the
+  bash/git/jq/awk/sort/shellcheck assortment has independent release lifecycles,
+  with cross-version workarounds already in tree; battery wall-time has grown
+  toward minutes, most of it process-spawn cost rather than work; shellcheck is
+  a linter, not a compiler, and bash offers no type system at this size; and
+  check source in the consumer's tree feeds the source-prediction anti-pattern —
+  agents reading gate scripts to predict verdicts instead of running the oracle,
+  a token sink the delegation rules fight behaviorally rather than structurally.
   **Deliverable:** one multi-call binary (busybox-style, one subcommand per
   check), with `gates.list` resolution dispatching per-entry to binary
   subcommand or script so the port lands cohort by cohort, slowest and
@@ -2087,10 +1219,7 @@
   keep the shell escape hatch, so registry-plus-shadowing semantics survive
   verbatim; per-platform release artifacts (Linux, macOS, native Windows)
   with published checksums and publicly buildable source; git the sole
-  runtime dependency (shelled out, not embedded). Expected wins: the battery
-  in the sub-second class, native macOS/Windows with no GNU-toolchain floor,
-  the cross-utility version matrix gone, a real unit-test harness under the
-  fixtures, and vendored binaries giving an agent nothing to read.
+  runtime dependency (shelled out, not embedded).
   **Why `[design-pending]`:** the consumer-extensibility model is the design that
   decides everything else — script escape hatch as first-class vs a
   declarative check DSL vs native plugins — plus language choice (Rust vs
@@ -2148,63 +1277,42 @@
   Filed 2026-07-27 at align in front-door-readiness, while verifying the
   roadmap amendment's docs-home link; re-verified at close.
 
-- **root-page-render-coverage** [design-pending] — *re-based at close; read the
-  negative finding before reopening.* No gate renders a governed markdown
-  surface at the repo root: `check-docs-render-fidelity` enumerates tracked
-  pages under `docs/` only. This was filed twice this iteration as a live
-  defect — a `:end` marker absorbed into a list item in `ROADMAP.md`, and a
-  code span severed across lines 21-22 of `RELEASING.md` — and **both filings
-  were wrong**. Close rendered each case through both parsers: the Pages parser
-  (kramdown) corrupts them, but no reader of a root page is served by kramdown.
-  The Jekyll source is `docs/`, the mirror's source set is kit
-  SPEC/README/DOCTRINE only, so no root page has a site URL; readers reach them
-  through GitHub's repository view, which is CommonMark (`cmark-gfm`) and
-  renders both cases correctly — the severed span joins into one `<code>` and
-  the following heading promotes normally. The renderer-to-surface mapping now
-  has an owner (docs/site-architecture.md §Page-authoring rules), which is the
-  actual fix for what went wrong here.
-  **Deliverable, if anything:** fidelity coverage for the one root page a
-  *machine* writes — `ROADMAP.md` — keyed on the renderer that serves it.
-  **Why `[design-pending]`:** the honest outcome may well be *build nothing*, and a
-  scope opening this should be willing to close it unbuilt. The repo's
-  toolchain has ruby/kramdown but no CommonMark renderer, so this means a new
-  gate dependency; the hand-authored root pages need no coverage at all (a
-  human sees the rendering on github.com); and the emitter's output shape is
-  narrow — headings, bullets, a placeholder line — with author-written
-  single-sentence summaries as the only free text. Zero CommonMark-real defects
-  have been demonstrated, against two kramdown-only false alarms.
-  **Cost while deferred:** low, and now correctly understood as low. The
-  residue is that a queue summary containing an unbalanced fence or a stray
-  pipe could reach `ROADMAP.md` unrendered-checked. The compounding cost — two
-  sessions mis-attributing a root page to the Pages parser — is already paid
-  off by the site-architecture edit.
-  Filed 2026-07-28 at build, re-filed at validate, re-based at close in
-  front-door-readiness after rendering every root manifest page through both
-  parsers.
+## Icebox
 
+  Dormant entries, one line each: the cost field said the carry was low, no
+  `[roadmap:]` commitment rides on it, and no named event is waiting to
+  promote it. Still live work — a legal `[blocked-by:]` target, conserved on
+  the way in and on the way back out. The removed body is recoverable from
+  the evicting commit (`git log -p -S'<slug>' -- TASK-QUEUE.md`).
 
-- **capture-affordance-help-flag** [design-pending] — `lifecycle-kit/bin/file-gap.sh` takes
-  exactly one free-text argument, so `--help` satisfies its arity check and is
-  **filed as a gap**. Not hypothetical: a session ran
-  `bash lifecycle-kit/bin/file-gap.sh --help` this iteration and the resulting
-  `- <date> — --help` bullet sat in the committed inbox until close drained it.
-  The blast radius is larger than a typo because the inbox is boundary-blocking
-  — a spurious bullet refuses the next scope entry. The script already has a
-  `usage()` it only reaches on misuse, so the fix is a `-h|--help` case.
-  Sibling `drift-kit/bin/kfric.sh` is safe only by accident (it takes two args,
-  so `--help` alone fails arity); 3 of 17 kit `bin/` scripts handle `--help`
-  today, so the class is worth a sweep rather than a one-line patch.
-  **Deliverable:** `-h|--help` handling on the single-free-text-argument
-  capture affordances, and a decision on whether the convention becomes a
-  gate-sdk/kit authoring rule for `bin/` tools generally.
-  **Cost while deferred:** low but recurring and self-concealing — the failure
-  writes a committed record that looks like a filing, and the next scope entry
-  is the thing that trips over it.
-  Filed 2026-07-28 at close in front-door-readiness, from the prompt-friction
-  log's own evidence of the invocation.
+- **runtime-dir-two-tier-detector** [design-pending] — No two-tier proof for file-pattern ignores.
+- **done-slug-commit-naming-gate** [design-pending] — Done-moving commits need not name their slug.
+- **enter-stage-simulate-no-write-fixture** [design-pending] — Guard present, unpinned by a fixture.
+- **stage-lag-disambiguation** [design-pending] — Hook over-firing is accepted, not a defect.
+- **stage-economics-smoke-jq-arm-dormant** [design-pending] — Its jq-absent arm never runs anywhere.
+- **hermetic-bin-roster-config** [design-pending] — Pinning coverage needs a consumer roster seam.
+- **split-posture-waiver-writer** [design-pending] — A lead-issued waiver stamp has no writer.
+- **supervisor-verification-attestation** [design-pending] — The verification duty is unattested.
+- **assertion-strength-exit-header-reach** [design-pending] — Wider header reach may be ceremony.
+- **gate-spec-claim-assertion-parity** [design-pending] — Ruled a human-audit class, not gateable.
+- **upgrade-smoke-phase-a-regen-derivation** [design-pending] — A hand-held regen roster; rot-prone.
+- **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
+- **exit-echo-decoration-guard-vs-habit** [design-pending] — Prompt friction only, nothing degrades.
+- **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
+- **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
+- **amendment-update-target-coverage** [design-pending] — Align checks it by hand; no gate yet.
+- **gap-inbox-commit-ownership** [design-pending] — Who commits a lead-filed bullet is unspecified.
+- **evidence-row-upsert-order** [design-pending] — A re-run relocates the row; no content is wrong.
+- **operator-authored-unit-set** [design-pending] — The contract omits operator-authored unit sets.
+- **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
+- **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
+- **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
+- **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
 
+- root-page-render-coverage
 - needs-spec-tag-rename
+- deferred-queue-carry-cost
 
 ## Lessons Learned

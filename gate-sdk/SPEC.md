@@ -965,6 +965,20 @@ violations. Scope is in-script exemption arrays only; inline per-site
 directives (`# fail-closed-exempt:`, `# no-fixture:`) stay out — they are
 local and self-evident via their adjacent comment.
 
+**The live-section span is positional, and a consumer's optional queue tiers
+ride on that.** The scan opens on the first of those headings and closes on the
+done or lessons heading, with **no reset on an unknown heading**, so any
+section a consumer places *between* the deferred and done sections is swept
+into the live set. queue-kit's optional icebox tier (queue-kit/SPEC.md §The
+icebox tier) states its position as a contract for exactly this reason: an
+exemption backed by an iceboxed task keeps resolving, because an iceboxed task
+is unbuilt. gate-sdk cannot depend on queue-kit for the section set, so the
+coupling is carried by both SPECs rather than by code, and **nothing enforces
+section order** — an icebox placed after the done section silently drops those
+slugs from the live set. The same-shaped scan in drift-kit's `kpi-deferred-age`
+*does* reset on an unknown heading and so excludes the tier; same shape,
+opposite behavior, both wanted.
+
 ### check-graph
 
 Invariant: the `# graph:` manifest on every `gates.list` member is well-formed

@@ -226,6 +226,10 @@ if staged_matches 'TASK-QUEUE.md'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
+    run_gate check-queue-entry-budget queue-kit/checks/check-queue-entry-budget.sh
+fi
+
+if staged_matches 'TASK-QUEUE.md'; then
     run_gate check-task-names queue-kit/checks/check-task-names.sh
 fi
 

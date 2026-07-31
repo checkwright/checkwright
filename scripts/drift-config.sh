@@ -5,3 +5,6 @@
 source "${BASH_SOURCE[0]%/*}/lifecycle-config.sh"
 # shellcheck disable=SC2034  # consumed by drift-kit/bin/trajectory.sh after sourcing
 DRIFT_KIT_STAGES=("${LIFECYCLE_KIT_STAGES[@]}")
+# spec: drift-kit/SPEC.md §Layout and configuration — the icebox counterpart of queue-config's and canon-config's section knob; the three are independent by kit and set together by a consumer enabling the tier
+# shellcheck disable=SC2034  # consumed by drift-kit KPI plugins after the collator's export loop
+DRIFT_KIT_ICEBOX_SECTION=Icebox

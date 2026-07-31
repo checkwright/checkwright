@@ -1,0 +1,4 @@
+beta-idea — 9 lines (cap 6)
+no 'Cost while deferred' field
+gamma-idea
+delta-idea — 3 content lines; an icebox entry is exactly one

@@ -1,6 +1,10 @@
 # shellcheck shell=bash
 # spec: canon-kit/SPEC.md §Layout and configuration — this repo's canon-kit consumer config
 
+# spec: canon-kit/SPEC.md §Layout and configuration — the design-pending section set is deferred plus icebox; this repo runs the icebox tier, so its canon-kit counterpart of QUEUE_KIT_ICEBOX_SECTION is set here
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_ICEBOX_SECTION=Icebox
+
 # comment-tier-exempt: this repo's component specs ARE the kit SPECs (a reference-spec corpus with no Definition-of-Done), so DoD-singleton runs at-most-one
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_DOD_MODE=at-most-one

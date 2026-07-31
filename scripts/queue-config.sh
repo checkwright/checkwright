@@ -11,3 +11,5 @@ QUEUE_KIT_HORIZONS=(now next later)
 QUEUE_KIT_TRACKS=(adoption reliability ecosystem commercial)
 # shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
 QUEUE_KIT_ROADMAP_FILE=ROADMAP.md
+# shellcheck disable=SC2034  # consumed by queue-kit/lib/queue.sh after sourcing
+QUEUE_KIT_ICEBOX_SECTION=Icebox

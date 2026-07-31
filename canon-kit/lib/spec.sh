@@ -29,6 +29,7 @@ declare -p CANON_KIT_FEATURE_SECTIONS &>/dev/null || CANON_KIT_FEATURE_SECTIONS=
 declare -p CANON_KIT_ACTIVE_SECTIONS  &>/dev/null || CANON_KIT_ACTIVE_SECTIONS=("New Features" "Technical Debt")
 
 [[ -v CANON_KIT_DEFERRED_SECTION ]] || CANON_KIT_DEFERRED_SECTION="Deferred"
+[[ -v CANON_KIT_ICEBOX_SECTION ]]   || CANON_KIT_ICEBOX_SECTION=""
 
 [[ -v CANON_KIT_DOD_HEADING ]] || CANON_KIT_DOD_HEADING="Definition of Done"
 [[ -v CANON_KIT_DOD_MODE ]]    || CANON_KIT_DOD_MODE="exactly-one"
@@ -133,8 +134,12 @@ spec_alt() { local IFS='|'; printf '%s' "$*"; }
 SPEC_FEATURE_RE="^## ($(spec_alt "${CANON_KIT_FEATURE_SECTIONS[@]}"))[[:space:]]*$"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_ACTIVE_RE="^## ($(spec_alt "${CANON_KIT_ACTIVE_SECTIONS[@]}"))[[:space:]]*$"
+# spec: canon-kit/SPEC.md §The amendment lifecycle — the design-pending regex is the section *set*, deferred plus a configured icebox, so the tag's section-wide rule and the queue-resolution walk reach both with no per-gate edit; the icebox term is omitted when the knob is empty
+_sk_dp=("$CANON_KIT_DEFERRED_SECTION")
+[[ -n "$CANON_KIT_ICEBOX_SECTION" ]] && _sk_dp+=("$CANON_KIT_ICEBOX_SECTION")
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
-SPEC_DEFERRED_RE="^## ${CANON_KIT_DEFERRED_SECTION}[[:space:]]*$"
+SPEC_DEFERRED_RE="^## ($(spec_alt "${_sk_dp[@]}"))[[:space:]]*$"
+unset _sk_dp
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_SECTION_RE="^## "
 
@@ -471,6 +476,8 @@ _sk_errs=()
 [[ ${#CANON_KIT_FEATURE_SECTIONS[@]} -gt 0 ]] || _sk_errs+=("CANON_KIT_FEATURE_SECTIONS is empty")
 [[ ${#CANON_KIT_ACTIVE_SECTIONS[@]} -gt 0 ]]  || _sk_errs+=("CANON_KIT_ACTIVE_SECTIONS is empty")
 [[ -n "$CANON_KIT_DEFERRED_SECTION" ]] || _sk_errs+=("CANON_KIT_DEFERRED_SECTION is empty")
+[[ "$CANON_KIT_ICEBOX_SECTION" != "$CANON_KIT_DEFERRED_SECTION" ]] \
+    || _sk_errs+=("CANON_KIT_ICEBOX_SECTION must not name the deferred section")
 [[ -n "$CANON_KIT_DOD_HEADING" ]]      || _sk_errs+=("CANON_KIT_DOD_HEADING is empty")
 [[ "$CANON_KIT_DOD_MODE" == "exactly-one" || "$CANON_KIT_DOD_MODE" == "at-most-one" ]] \
     || _sk_errs+=("CANON_KIT_DOD_MODE must be exactly-one|at-most-one (got '$CANON_KIT_DOD_MODE')")

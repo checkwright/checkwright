@@ -28,6 +28,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-queue-hygiene
    check-queue-sections
    check-queue-wrap
+   check-queue-entry-budget
    check-tag-lead-line
    check-task-names
    check-task-conservation
@@ -44,7 +45,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 2. Give your queue file the section skeleton — copy
    `templates/TASK-QUEUE.md` and fill it in (it shows one example entry per
    grammar shape). The default sections are `New Features` / `Technical Debt`
-   (active), `Deferred`, `Done`.
+   (active), `Deferred`, `Done` — plus an optional `Icebox` tier between the
+   last two for backlogs whose carry weight has become the problem, off by
+   default (`QUEUE_KIT_ICEBOX_SECTION`).
 
 3. Optional — reshape the grammar: copy `templates/queue-config.sh` into your
    gates dir and override section names, the wrap budget, prose-lead tokens, or

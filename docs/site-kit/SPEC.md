@@ -109,6 +109,12 @@ rendered text — which is exactly the symptom the assertion keys on, so the gat
 a standing defense against the whole class rather than a stopgap against one
 backtick-fence shape of it.
 
+**Reach is `SITE_KIT_DOCS_DIR`, and stays there.** A repo-root page has no site
+URL and is served by the forge's own CommonMark view, so a kramdown-only
+divergence there is not reader-visible and this gate is right not to walk it.
+The renderer-to-surface map is a consumer's own documentation concern, not a
+widened scan.
+
 The scan enumerates tracked `*.md` files under `SITE_KIT_DOCS_DIR` via
 `git ls-files` (every underscore-prefixed directory segment excluded — those are
 Jekyll internals, not published pages), strips Jekyll front matter so it renders

@@ -77,6 +77,7 @@ leaves its section absent.
 | [queue-kit](queue-kit/index.md) | check-queue-hygiene | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-wrap | precommit |
 | [queue-kit](queue-kit/index.md) | check-tag-lead-line | precommit |
+| [queue-kit](queue-kit/index.md) | check-queue-entry-budget | precommit |
 | [queue-kit](queue-kit/index.md) | check-task-names | precommit |
 | [queue-kit](queue-kit/index.md) | check-task-conservation | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-prose-precondition | precommit |
@@ -134,6 +135,7 @@ leaves its section absent.
 | [drift-kit](drift-kit/index.md) | kpi-gate-runtime |
 | [drift-kit](drift-kit/index.md) | kpi-overhead |
 | [drift-kit](drift-kit/index.md) | kpi-price-table-age |
+| [drift-kit](drift-kit/index.md) | kpi-queue-net-delta |
 | [drift-kit](drift-kit/index.md) | kpi-knowledge-friction |
 
 ## Guards

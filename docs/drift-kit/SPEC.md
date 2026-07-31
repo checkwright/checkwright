@@ -33,14 +33,24 @@ lives in a plugin:
    consumer KPI dir first, then each vendored kit's `kpis/` (the gate-sdk
    resolution pattern: a consumer shadows a bundled KPI by dropping a
    same-named file in its own dir).
-2. Run each plugin, collect its rows, and group them into the two labeled
+2. Derive the iteration-start commit **before** the plugin export loop, not at
+   print time, and assign it to `DRIFT_KIT_ITERATION_START` so the loop carries
+   it to every plugin. Both the derivation and its invocation sit above the
+   loop — relocating the call alone would leave it undefined — and its inputs
+   are already set by that point. The report header keeps reading the same
+   value. **Priced, because the position is not free:** deriving it above the
+   loop runs it in `--trend` mode as well as in the full report, so one `grep`
+   and one single-file `git log -S` run on every session start through the
+   context hook. Accepted — a pickaxe over a file of a few dozen lines — but it
+   is a per-session cost rather than a per-report one.
+3. Run each plugin, collect its rows, and group them into the two labeled
    sections — the honesty labels are the frame's contract:
    - header: `=== Drift KPIs (advisory — trend, not level) ===`, plus the
      iteration-start commit when derivable;
    - `--- Lead (weighted high — act before drift compounds) ---`;
    - `--- Lag (weighted low — undercounts by construction) ---`;
    - footer: `Read trend across sessions; lag KPIs lower-bound only.`
-3. `--trend` emits a single compact line instead — the fragment each plugin
+4. `--trend` emits a single compact line instead — the fragment each plugin
    volunteers, joined with `·` — consumed by context-kit's session-context
    hook (`CONTEXT_KIT_DRIFT_REPORT`, already wired in its template).
 
@@ -78,6 +88,14 @@ roster, and falls back to its own derivation when run standalone without it.
 The driver's handoff, not a consumer knob: `drift-report.sh` recomputes it
 every run.
 
+`DRIFT_KIT_ITERATION_START` is the same *class* of handoff — recomputed every
+run, never a consumer knob — but not the same mechanism: `KIT_ROOTS` is
+assigned after the export loop and carries its own explicit `export`, while the
+iteration-start commit is assigned *before* the loop and rides `compgen`, so no
+new export list exists to drift out of parity. A plugin reading it gets the
+empty string when no baseline is derivable and degrades to `n/a` on its own
+rows rather than dying.
+
 Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch;
 a measurement needing state (a baseline, a log) reads a file some
 *other* mechanism owns and stamps its reading-age caveat when the file is a
@@ -106,9 +124,38 @@ The generic set — each coupled to a kit-governed surface, each degrading to
   (`SPEC-*.md`, git add-date; fixture and template paths excluded, matching the
   published-evidence extractor's amendment-latency harvest); the pressure gauge
   behind canon-kit's short-lived-amendment rule.
-- **kpi-deferred-age** — age of the oldest `Surfaced <date>` mark
-  (queue-kit's ungated convention) in the queue's deferred section:
-  premise-rot pressure on design-pending work.
+- **kpi-deferred-age** — age of the oldest **defer date** in the queue's
+  deferred section: premise-rot pressure on design-pending work. The defer
+  date is queue-kit/SPEC.md §The queue format's definition — the `Surfaced`
+  mark where an entry carries one, else the `Filed` provenance date — which
+  this plugin re-implements rather than sourcing, because a dependency on
+  queue-kit's lib would close a cross-kit cycle. Accepted residual: one owner
+  doc, two implementations, both carrying a `spec:` line citing the owner.
+  Both marks count, because a pool whose entries carry provenance lines rather
+  than `Surfaced` marks would otherwise leave the input covering a fraction of
+  it. The KPI de-duplicates the dates it finds and reports the oldest, so it
+  trends dates rather than counting entries. Its unknown-heading reset drops an
+  icebox placed after the deferred section out of the input **by
+  construction**, which is wanted: an evicted entry's age is not the thing this
+  KPI trends. gate-sdk's `check-gate-exemption-tasks` carries the
+  same-shaped scan with the opposite behavior, deliberately (gate-sdk/SPEC.md
+  §check-gate-exemption-tasks) — recorded so a later reader does not "fix" one
+  into agreement with the other.
+- **kpi-queue-net-delta** — the design-pending pool at the iteration-start
+  commit against the worktree, as **two rows, because one number would be
+  gameable**: *entry net delta* (`filed − drained`, where filed is a slug now
+  deferred that was in neither section at the baseline and drained is a slug
+  that has left the pool entirely) and *carry weight* (the two sections' line
+  count now against the baseline). An icebox move counts as **neither** — it is
+  compression, not intake and not closure. The two axes move independently:
+  intake pressure moves the first, compression the second, so a session that
+  mass-evicted to flatter the delta row moves the weight row instead and the
+  gaming is visible rather than hidden — the argument `kpi-price-table-age`
+  makes for carrying two rows that point different ways. `--trend` volunteers
+  one fragment, `qnet <±N>`, per the one-per-plugin rule; the weight row
+  volunteers none, because intake is the axis a filing session can act on
+  inside the session. With no baseline (a standalone run, a fresh clone) both
+  rows degrade to `n/a (no iteration baseline)`.
 - **kpi-prompt-friction** — distinct/total prompting calls via guard-kit's
   `scan-prompts.sh --count`; `n/a` when guard-kit or its log is absent.
 - **kpi-always-loaded** — the standing per-session surface: level and
@@ -704,6 +751,12 @@ Knobs (this repo's layout as defaults):
 - `DRIFT_KIT_DONE_SECTION` / `DRIFT_KIT_DEFERRED_SECTION` — queue section
   headings the task-split and deferred-age KPIs scan; defaults `Done` /
   `Deferred` (queue-kit's).
+- `DRIFT_KIT_ICEBOX_SECTION` — the design-pending pool's second section,
+  queue-kit's optional icebox tier; default **empty**, meaning the pool is the
+  deferred section alone. Read by `kpi-queue-net-delta` so an eviction reads as
+  compression rather than as closure. The same independent-knob shape
+  queue-kit and canon-kit carry: a consumer enabling the tier sets each, and
+  one left unset degrades that kit to "no icebox".
 - `DRIFT_KIT_TRAJECTORY_SURFACES` — the state-file paths the trajectory
   extractor harvests, given as `<state-file> <evidence-file>`; default
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` and its

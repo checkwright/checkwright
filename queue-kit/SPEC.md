@@ -25,16 +25,32 @@ as `##` sections over column-0 bullets:
 - **The deferred section** (default `Deferred`) — parked tasks, excluded from
   selection; `###` subsections are presentation, not semantics. An entry's
   prose may carry a `Surfaced <date>` mark — an ungated convention recording
-  when the premise was filed; drift-kit's deferred-age KPI is its reader.
-  A deferred body is free prose, but four **ungated** bold-lead-in fields
-  recur and are worth reaching for, each answering a question a later scope
-  asks: `Deliverable` (what landing looks like), `Why [design-pending]` (what
-  the open design actually is), `Cost while deferred` (the
-  Gap-disposition rule's costing — the most-used of the four), and a
-  closing `Filed <date> by <stage>` provenance line. None is required and no
-  gate reads them; an entry uses the ones that carry weight for it.
+  when the premise was observed. A deferred body is free prose, and four
+  bold-lead-in fields recur, each answering a question a later scope asks:
+  `Deliverable` (what landing looks like), `Why [design-pending]` (what the
+  open design actually is), `Cost while deferred`, and a closing
+  `Filed <date> by <stage>` provenance line. Three are conventions no gate
+  reads; **`Cost while deferred` is required** — the Gap-disposition rule's
+  costing, held by `check-queue-entry-budget` (§check-queue-entry-budget),
+  which also caps the entry's total length. The field's bold lead-in is
+  line-local like a tag: split across a reflow it is invisible to the scanner
+  and the entry reads as uncosted.
+- **The icebox section** (optional, `QUEUE_KIT_ICEBOX_SECTION`, default
+  **empty** — no section, no tier) — dormant tasks compressed to one line
+  each, sitting **after the deferred section and before the done section**.
+  Live work, not history: §The icebox tier owns the tier, its grammar, its
+  eligibility rule, and the position contract a cross-kit reader depends on.
 - **The done section** (default `Done`) — one line per completed task, the
   bare slug only; prose about what happened lives in git history.
+
+The **defer date** of an entry is its `Surfaced <date>` mark when present, else
+the date on its `Filed <date>` provenance line. One definition, two readers —
+drift-kit's deferred-age KPI and `bin/queue-index.sh --icebox-candidates`.
+Widening, not replacing: `Surfaced` records when the premise was observed and
+is the better premise-rot datum, `Filed` is the honest available fallback, so
+no entry owes a migration. drift-kit re-implements the definition rather than
+sourcing `lib/queue.sh`, because a kit dependency the other way would close a
+cross-kit cycle; both implementations cite this section.
 - Any other section (an iteration header, a lessons section) is outside the
   grammar and ignored by every gate except the file-wide hygiene axes.
 
@@ -42,9 +58,101 @@ An entry is a column-0 `- **slug** — prose…` bullet; continuation lines are
 indented, never column 0. An *indented* bullet with a bold lead-in is a
 sub-task (same grammar); with a plain or italic lead-in it is a prose note
 and is left alone. Slugs match `[a-z0-9][a-z0-9-]*` in one global, unique
-namespace across active + deferred + sub-tasks — a slug is the task's stable
-handle for its whole life: `[blocked-by:]` references it and the done-section
-line carries it verbatim. The slug grammar is kit mechanism, not config.
+namespace across active + deferred + icebox + sub-tasks — a slug is the task's
+stable handle for its whole life: `[blocked-by:]` references it and the
+done-section line carries it verbatim. The slug grammar is kit mechanism, not
+config.
+
+### The icebox tier
+
+The deferred pool has an intake asymmetry the delivery doctrine itself creates:
+gap disposition and scope-gated intake make filing mandatory and cheap, while
+the only exit is *building* the entry. The icebox is the missing exit — a third
+**live** task section holding entries whose own cost field says they are
+dormant, each compressed to its lead line.
+
+close-surface: TASK-QUEUE.md#Deferred advisory
+
+`advisory` is the honest mode: no structural forcing function refuses on an
+untriaged backlog, and inventing one would redden an unrelated commit over a
+curation opinion. That is what makes eviction *symmetric* to promotion —
+promotion is forced by the scoping stage's exit condition, eviction gets roster
+visibility and an auditable skip.
+
+**It joins the shared task adapters rather than standing outside them**, and
+that is the whole design:
+
+- **Eviction is a conserved move.** `check-task-conservation` diffs the live
+  slug set at HEAD against the worktree, so deferred → icebox keeps the slug
+  live and the gate stays silent. No sanctioned disappearance needs inventing,
+  and none exists — every exit from the design-pending pool is conserved:
+  deferred → icebox, icebox → deferred on real recurrence, and either → done
+  for a ruled wontfix.
+- **One namespace, one parse.** `check-task-names` keeps slug uniqueness and
+  `[blocked-by:]` resolution across the whole pool; an iceboxed slug is a legal
+  blocker target, because it is unbuilt.
+- **The living-prose contract keeps reaching it**, so a page citing an
+  iceboxed task stays green — correct, because the task is dormant, not landed.
+- **Tags stay lead-line-governed**, with no gate edit.
+
+Every gate keyed on the shared task regex therefore widens with **no change to
+any gate file** — the widening is entirely in `lib/queue.sh`, which is what the
+one-adapter rule was built to buy. `check-queue-prose-precondition` deliberately does not
+reach the tier: forward-looking phrasing is normal vocabulary in a parked
+entry, the same exemption the deferred section already carries.
+
+**The grammar is the lead line and nothing else:**
+
+```
+- **<slug>** [design-pending] — <one sentence: what it is, and why it is dormant>
+```
+
+- **It carries the same `[design-pending]` tag every deferred entry carries.**
+  No `[icebox]` tag is minted: section membership *is* the state, and a tag
+  restating its own section is the two-sources defect. What generalizes across
+  the amendment lifecycle is the design-pending **section set**, not its tag
+  set. The "why it is dormant" clause is written where it fits and otherwise
+  left to the tier — membership already declares it.
+- **No `###` subsections and no sub-tasks.** Grouping is presentation on a
+  surface whose entire purpose is minimum residency, and a sub-task is a
+  continuation line the shape rule rejects.
+- **A `[roadmap:]`-tagged entry is not icebox-eligible**, and the rule needs no
+  new code: the roadmap parse walks the live task sections, so the tier enters
+  its walk, and `check-roadmap-fresh` then reds any `[roadmap:]` entry carrying
+  no `roadmap-summary:` declaration — which a one-line entry has nowhere to
+  put. **The enforcement is conditional:** that gate exits clean at its top
+  when `QUEUE_KIT_ROADMAP_FILE` is empty, so the guarantee holds for a consumer
+  publishing a roadmap page and degrades to convention for one that is not.
+  The eligibility rule binds either way. Keeping the tier *inside* the roadmap
+  walk rather than excluding it is deliberate: excluded, a `[roadmap:]` tag
+  that drifted into the icebox would silently drop a public commitment;
+  included, it reds.
+- **The narrative is recoverable, not discarded.** The commit that iceboxes an
+  entry necessarily contains the removed body in its own diff, so recovery is
+  `git log -p -S'<slug>' -- <queue-file>` — a pickaxe that depends on no
+  commit-message convention. Nothing is copied into the queue to point at it.
+
+**Eligibility**, judged at the closing stage: the entry's cost field opens in
+the low class; it carries no `[roadmap:]` tag; and it has **no live promotion
+trigger** — an entry whose promotion waits on a named expected event (a launch,
+a first external adopter, a sibling unit landing) stays deferred, because it
+has a trigger, just not a date.
+
+**Nothing files directly into the icebox.** The only producer is the eviction
+step: a newly filed finding has never been triaged and so cannot be pre-judged
+dormant. That keeps the tier from becoming a dumping ground and keeps the
+net-delta KPI honest.
+
+**Position is a contract, not a preference.** The read order is pickable →
+parked → dormant → history, and a cross-kit reader depends on the tier sitting
+between the deferred and done sections (gate-sdk/SPEC.md
+§check-gate-exemption-tasks). **Accepted residual, and it is quiet: no gate
+enforces section order.** `check-queue-sections` counts occurrences per
+required section with no positional state, and no other gate carries one. A
+misplaced icebox surfaces only as an exemption naming an iceboxed slug
+reddening with "no live task" — which requires such an exemption to exist.
+Otherwise the misplacement is silent. The contract is carried by this SPEC and
+by review rather than by a gate, and saying so is the honest form of it.
 
 ### The tag algebra
 
@@ -63,8 +171,9 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   deferred blocker stands; it is unbuilt); a blocker in the done section is a
   *stale* tag that must be removed, because the tag alone marks a task
   unpickable.
-- `[design-pending]` — design-pending marker. queue-kit parses and displays it;
-  the placement semantics (deferred-section-wide enforcement, promotion
+- `[design-pending]` — design-pending marker, spanning **both** design-pending
+  sections (deferred and, where configured, the icebox). queue-kit parses and
+  displays it; the placement semantics (section-wide enforcement, promotion
   rules) are canon-kit's amendment lifecycle and land with that kit.
 - `[spec: <file>]` — spec-ready pointer. Same split: syntax here, amendment
   semantics in canon-kit.
@@ -96,7 +205,12 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   `[roadmap:]` tag; an untagged entry is simply not projected, the normal case.
   Placement is unconstrained by section — an active entry and a deferred entry
   may both be projected, because the projection is about public direction, not
-  selection order. Field validity is `check-roadmap-fresh`'s assertion B.
+  selection order. The **icebox is the one exclusion**, and it falls out of the
+  declaration rule rather than needing one: a one-line entry has nowhere to put
+  a `roadmap-summary:`, so a `[roadmap:]` tag that drifted into the tier reds
+  on assertion C wherever `QUEUE_KIT_ROADMAP_FILE` is set (§The icebox tier
+  states the knob-conditional limit on that backstop). Field validity is
+  `check-roadmap-fresh`'s assertion B.
 
 A tagged entry also carries a **`roadmap-summary: <text>` declaration** — one
 indented line in the entry body holding the single sentence the public page
@@ -164,6 +278,16 @@ Knobs:
   `("New Features" "Technical Debt")`, order = selection order.
 - `QUEUE_KIT_DEFERRED_SECTION` / `QUEUE_KIT_DONE_SECTION` — defaults
   `Deferred` / `Done`.
+- `QUEUE_KIT_ICEBOX_SECTION` — default **empty**: no icebox tier at all, and no
+  kit-shaped empty section on the consumer's queue. A twelve-entry backlog has
+  no carry problem, and shipping the section anyway would leak the same posture
+  `QUEUE_KIT_HORIZONS` and `QUEUE_KIT_PROSE_SURFACE_GLOBS` already ship empty to
+  avoid. Naming the deferred section is malformed config.
+- `QUEUE_KIT_ENTRY_LINE_CAP` — positive integer, default `50`; the per-entry
+  line cap `check-queue-entry-budget` assertion A holds over the deferred
+  section.
+- `QUEUE_KIT_ICEBOX_AGE_DAYS` — positive integer, default `30`; the defer-date
+  age filter for `bin/queue-index.sh --icebox-candidates`, and nothing else.
 - `QUEUE_KIT_WRAP_BUDGET` — default `100` (`check-queue-wrap` gate floor).
 - `QUEUE_KIT_PROSE_LEADS` — array of column-0 lead tokens exempt from the
   hygiene gate's no-prose axis, default `("Protocol:")`.
@@ -179,7 +303,11 @@ Knobs:
   exactly once (`check-queue-sections`), default = the iteration header
   (`Iteration:`, prefix-matched for its dynamic suffix) plus `New Features` /
   `Technical Debt` / `Deferred` / `Done` / `Lessons Learned`. A trailing `:`
-  marks a prefix-matched heading; every other entry is matched exactly.
+  marks a prefix-matched heading; every other entry is matched exactly. A
+  configured `QUEUE_KIT_ICEBOX_SECTION` is **appended by derivation**, never by
+  a second consumer list: an icebox configured but absent from the file would
+  otherwise let every icebox assertion pass open on a section that is not
+  there, the exact fail-open class `check-queue-sections` exists to stop.
 - `QUEUE_KIT_LESSON_TAGS` — array of bare harvest-tag names, default empty; the
   consumer-named outbound lesson vocabulary (§The tag algebra), read by
   `check-tag-lead-line` for placement. Names, sinks, and handling are consumer
@@ -213,7 +341,12 @@ publishes no roadmap gets a clean skip rather than a kit-shaped one.
 
 Cross-kit note: lifecycle-kit's `LIFECYCLE_KIT_ACTIVE_SECTIONS` carries the same
 default. The knobs are independent (either kit runs without the other); a
-consumer renaming its active sections sets both.
+consumer renaming its active sections sets both. The icebox section name spans
+every kit that reads the tier, on the same independent-knob shape —
+`QUEUE_KIT_ICEBOX_SECTION` here, `CANON_KIT_ICEBOX_SECTION` for the
+amendment lifecycle, `DRIFT_KIT_ICEBOX_SECTION` for the queue KPIs — so a
+consumer enabling the tier sets each of them, and one left unset degrades that
+kit to "no icebox" rather than to a wrong section.
 
 ## Per-component contracts
 
@@ -230,6 +363,11 @@ broken grammar, and the roadmap vocabulary is validated as a pair (§Layout and
 configuration) rather than per-array, because the failure the check exists to
 stop is one array set alone. Validation failures are collected and reported
 together, then exit 2.
+
+The icebox is *derived* here rather than configured twice: a non-empty
+`QUEUE_KIT_ICEBOX_SECTION` joins both the shared task regex and the effective
+required-sections set, and when it is empty every icebox regex is the empty
+string so each reader degrades to "no icebox" rather than to "every section".
 
 `queue_roadmap_entries <queue-file>` is the single `[roadmap:]` and
 `roadmap-summary:` parse, shared by `bin/roadmap.sh` and `check-roadmap-fresh` so
@@ -268,7 +406,38 @@ per-`###`-subsection tally — generic over whatever subsection names the file
 has (a hardcoded tally table would be consumer rule content), with
 entries under no subsection tallied as `(top)`.
 
-Both modes append an **attention block** when the `## Lessons Learned` section
+A configured icebox contributes exactly **one line** to the index —
+`<section>: N entries` — and never an entry listing, on **both** `index`-mode
+renderings (`--collapse-deferred` is a flag within that mode, not a mode of its
+own; the tool's modes are `index`, `extent`, and `icebox-candidates`). The
+tally must not reach `extent`, whose contract is two integers and nothing else.
+The reasoning is the surface's: this output is embedded in the always-loaded
+session-context brief, so listing the tier would re-import the very tokens the
+tier exists to remove, while a bare count keeps it visible. An unconfigured
+icebox emits no line at all.
+
+`--icebox-candidates` prints the closing stage's eviction worklist over the
+deferred section: one line per entry whose defer date (§The queue format) is
+older than `QUEUE_KIT_ICEBOX_AGE_DAYS` **and** whose cost field opens in the low
+class, carrying the entry's line count and that opener. An entry with no defer
+date is listed as `(undated)` and an uncosted one as `(uncosted)` rather than
+filtered out — an absent input appears rather than vanishing.
+
+Both filters are deliberately **non-load-bearing**: this is a worklist filter
+in a projection tool, not a threshold in a gate, so miscalibration costs a
+longer or shorter review list and never a wrong disposition. That is what
+dissolves "an eviction age threshold needs a policy owner" — the *judgment* is
+the closing stage's, held to §The icebox tier's eligibility rule, and the
+worklist only bounds how much it must look at. Matching a cost-class opener on
+prose would be an unacceptable heuristic in a gate; in an advisory worklist it
+is exactly the right ceiling. **A pool younger than the age threshold yields an
+empty worklist**, which is correct and is not a reason to seed a tier by hand
+against the tool: eligibility is the rule, the worklist is the convenience.
+
+No queue-mutating tool is added — `--extent <slug>` already yields the line
+range an eviction deletes.
+
+Both index renderings append an **attention block** when the `## Lessons Learned` section
 carries `[attend]` entries (§The tag algebra): each such entry's lead line,
 capped at `QUEUE_KIT_ATTEND_CAP` (default 3) with overflow noted as
 `(+N more [attend])`. Lead lines only, never bodies — the block is
@@ -282,8 +451,11 @@ The public-roadmap emitter: a tool, not a gate (no `# graph:` manifest),
 following `bin/queue-index.sh`. `--emit` prints the generated block to stdout;
 `--write` splices it between the markers in `QUEUE_KIT_ROADMAP_FILE` through
 gate-sdk's `inject_marker_block`, leaving every byte outside them untouched. It
-reads the live task sections only — active plus deferred, never the done section,
-because a shipped item is history, not direction.
+reads the live task sections only — active, deferred, and a configured icebox,
+never the done section, because a shipped item is history, not direction. The
+icebox enters that walk on purpose even though no icebox entry can be
+projectable: excluded, a `[roadmap:]` tag that drifted into the tier would
+silently drop a public commitment; included, it reds (§The icebox tier).
 
 The emit grammar is a contract on both sides: `check-roadmap-fresh` byte-compares
 it and a reader consumes it as the page's body.
@@ -408,8 +580,46 @@ silently find *nothing* — passing open — when a heading is dropped or
 misspelled. A trailing `:` on a required entry marks a dynamic-suffix heading
 (the iteration header, whose suffix is its iteration name) and is
 prefix-matched; every other entry is matched exactly. A grep error (not a
-no-match) is fail-closed (exit 2). The `# graph:` couples the queue file at
-`tier=precommit`.
+no-match) is fail-closed (exit 2). The required set is the configured array
+**plus the derived icebox heading** (§Layout and configuration), which is what
+closes the half-configured hole by construction. The `# graph:` couples the
+queue file at `tier=precommit`.
+
+### check-queue-entry-budget
+
+Invariant, one statement from two sides: **a deferred entry is a costed filing
+— bounded above so it is not an inlined amendment, bounded below so it is not a
+flag-and-skip.** Three assertions:
+
+- **(A) Size.** No deferred entry exceeds `QUEUE_KIT_ENTRY_LINE_CAP` lines,
+  counted as the lead line through the line before the next bullet at the same
+  or shallower indent — the same extent `bin/queue-index.sh --extent` yields, so
+  the range the gate measures is the range an eviction deletes. A sub-task
+  nests inside its parent's extent and is measured as its own entry too.
+- **(B) Icebox shape.** Every icebox entry is exactly one line; a continuation
+  line under an icebox bullet is a violation. Skips clean when
+  `QUEUE_KIT_ICEBOX_SECTION` is empty, the empty-knob behavior
+  `check-queue-slug-liveness` originates.
+- **(C) Cost present.** Every top-level deferred entry carries a
+  `Cost while deferred` bold lead-in. Deliberately **not** applied to the
+  icebox: a one-line entry cannot carry the field and does not need to —
+  membership in the tier is itself the cost declaration (low, non-rotting, no
+  live trigger). The requirement binds exactly where the section does not
+  already imply the answer.
+
+Calibration: `QUEUE_KIT_ENTRY_LINE_CAP` defaults to `50`. The cap's job is to
+keep compression from regrowing rather than to force the initial cut, so it is
+calibrated at the tail rather than the body — above the 75th percentile of a
+real pool, with no natural break in the distribution to read a value off. It is
+a stated policy with a stated purpose rather than a derived one, and it is a
+knob for exactly that reason. The scan is line-local: the cost field's bold
+lead-in must sit on one line, the same reason a tag must sit on its lead line
+(§check-tag-lead-line), and a lead-in split by a reflow reads as absent. (C)
+binds top-level entries only — a sub-task is covered by its parent's costing.
+
+**The active sections are uncapped**, and the reason is structural: an active
+entry's residency is one iteration by the drain rule, so it has no carry to
+cap. The carry problem is the deferred pool's alone.
 
 ### check-queue-wrap
 
@@ -462,23 +672,35 @@ the lead — negligible severity, not reflow-realistic.
 
 ### check-task-names
 
-Invariant: every active-section and deferred-section entry (and every
-sub-task) leads with a valid kebab-case slug, unique across the file; every
-done-section entry is a bare slug only; every `[blocked-by: X]` resolves to a
-live task, and one pointing at a done slug is flagged stale.
+Invariant: every entry in a live task section — active, deferred, and a
+configured icebox — and every sub-task leads with a valid kebab-case slug,
+unique across the file; every done-section entry is a bare slug only; every
+`[blocked-by: X]` resolves to a live task, and one pointing at a done slug is
+flagged stale.
 
-Calibration: active and deferred share one namespace so resolution works
-regardless of where the target lives; the non-bold indented bullet is the
-documented prose-note escape; done slugs are validated as tokens but not
-cross-checked against the live namespace. Help texts cite this SPEC.
+Calibration: the live task sections share one namespace so resolution works
+regardless of where the target lives — an iceboxed slug is a legal blocker
+target, because it is unbuilt. The non-bold indented bullet is the documented
+prose-note escape; done slugs are validated as tokens but not cross-checked
+against the live namespace. Help texts cite this SPEC.
 
 ### check-task-conservation
 
-Invariant: every live slug (active + deferred, sub-tasks included) present at
-HEAD is still present in the working tree — live or done. A slug vanishing
-from both is a lost task: the absence class diff-review reliably misses (you
-notice wrong things present, not right things missing). Half-applied moves,
-botched renames, and undocumented withdrawals all fire.
+Invariant: every live slug (active + deferred + icebox, sub-tasks included)
+present at HEAD is still present in the working tree — live or done. A slug
+vanishing from both is a lost task: the absence class diff-review reliably
+misses (you notice wrong things present, not right things missing).
+Half-applied moves, botched renames, and undocumented withdrawals all fire.
+
+**Eviction to the icebox is conserved by construction** — the slug stays in the
+live set, so the gate stays silent and no sanctioned-disappearance escape had
+to be invented. The done side is where care is owed: a done entry is matched as
+a **bare `- <slug>` line and nothing else** — no bold, no tag, no trailing
+prose. An entry *carried* into the done section with its
+`- **<slug>** [design-pending] — …` shape intact therefore matches neither the
+done grammar nor the live one, lands in no set, and reds here as a lost task.
+Dispositioning an entry to done is a **rewrite to its slug**, not a relocation
+of the entry; the tag is dropped by that reduction rather than swapped.
 
 Calibration: diffs `git show HEAD:<queue>` against the worktree, hence
 `no-fixture:` (a committed fixture has HEAD == worktree; the bad case needs
@@ -500,7 +722,9 @@ queue tag, not an HTML comment, so it survives the hygiene gate).
 Calibration: the trigger set (`QUEUE_KIT_PRECONDITION_REGEX`) is deliberately
 narrow — forward-looking phrasing only, past-tense narration stripped before
 matching — and scoped to the active sections (the deferred section uses
-"revisit when" as normal vocabulary and is exempt). FP-bearing by
+"revisit when" as normal vocabulary and is exempt, and the icebox inherits that
+exemption for the same reason: forward-looking phrasing is what a parked entry
+is *for*). FP-bearing by
 construction (parsing prose intent); the blocking grade is justified by a
 silent pick attested in production use and the bounded scope.
 
@@ -510,7 +734,9 @@ Invariant: on every prose surface named by `QUEUE_KIT_PROSE_SURFACE_GLOBS`,
 every slug-shaped bold-code token — `` **`<token>`** `` whose token matches the
 slug grammar (`[a-z0-9][a-z0-9-]*`, so a `--flag` mention falls outside) —
 resolves against the queue's live slug set (`lib/queue.sh`'s `queue_live_slugs`,
-active + deferred). A token naming no live task is a dead membership claim,
+active + deferred + icebox — a page citing an iceboxed task stays green,
+correctly: the task is dormant, not landed). A token naming no live task is a
+dead membership claim,
 reported by file, line, and slug. The slug set excludes done tasks by
 construction: prose about landed work must drop the bold-code form and cite the
 owning SPEC instead, so a living page can never keep calling a landed task

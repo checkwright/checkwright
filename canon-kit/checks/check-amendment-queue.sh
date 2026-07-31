@@ -23,8 +23,9 @@ errors=""
 # (a) feature-section entries missing [spec:], any [design-pending] in the
 #     active sections (entries, sub-bullets, or prose — a mention masks a
 #     missing tag), and a [spec:]-tagged entry misfiled in an active
-#     non-feature section; (b) deferred entries missing [design-pending], and a
-#     deferred entry already carrying [spec:] (promote it). One awk pass.
+#     non-feature section; (b) design-pending-section entries (deferred plus a
+#     configured icebox) missing [design-pending], and one already carrying
+#     [spec:] (promote it). One awk pass.
 qout="$(awk -v featre="$SPEC_FEATURE_RE" -v activere="$SPEC_ACTIVE_RE" \
             -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
     $0 ~ sectre {
@@ -72,9 +73,9 @@ done <<< "$qout"
 
 (( ${#missing[@]} )) && errors+="feature-section entries without [spec:] (spec-writing is an authoring-stage activity — write the amendment, then promote):"$'\n'"$(printf '  %s\n' "${missing[@]}")"$'\n'
 (( ${#an[@]} ))      && errors+="[design-pending] tag in an active-queue entry (move it to $CANON_KIT_DEFERRED_SECTION):"$'\n'"$(printf '  %s\n' "${an[@]}")"$'\n'
-(( ${#pn[@]} ))      && errors+="[design-pending] tag in active-queue prose ($CANON_KIT_DEFERRED_SECTION-only tag; say \"needs design\" in prose):"$'\n'"$(printf '  %s\n' "${pn[@]}")"$'\n'
-(( ${#dopen[@]} ))   && errors+="$CANON_KIT_DEFERRED_SECTION entries without [design-pending] (all deferred work is design-pending):"$'\n'"$(printf '  %s\n' "${dopen[@]}")"$'\n'
-(( ${#dready[@]} ))  && errors+="$CANON_KIT_DEFERRED_SECTION entries already carrying [spec:] (promote to a feature section):"$'\n'"$(printf '  %s\n' "${dready[@]}")"$'\n'
+(( ${#pn[@]} ))      && errors+="[design-pending] tag in active-queue prose (a design-pending-section-only tag; say \"needs design\" in prose):"$'\n'"$(printf '  %s\n' "${pn[@]}")"$'\n'
+(( ${#dopen[@]} ))   && errors+="design-pending-section entries without [design-pending] (all deferred work is design-pending):"$'\n'"$(printf '  %s\n' "${dopen[@]}")"$'\n'
+(( ${#dready[@]} ))  && errors+="design-pending-section entries already carrying [spec:] (promote to a feature section):"$'\n'"$(printf '  %s\n' "${dready[@]}")"$'\n'
 (( ${#mready[@]} ))  && errors+="[spec:]-tagged entries misfiled in an active non-feature section (a spec-ready entry belongs in a feature section):"$'\n'"$(printf '  %s\n' "${mready[@]}")"$'\n'
 
 # (c) bidirectional pairing on disk: every [spec:] ref resolves to a file, and
@@ -107,9 +108,9 @@ if [[ -n "$errors" ]]; then
     echo "check-amendment-queue: Task↔amendment bidirectional-rule violation(s):"
     echo ""
     printf '%s' "$errors"
-    echo "  help: pair every amendment with a [spec: …] queue entry and vice versa; tag every $CANON_KIT_DEFERRED_SECTION entry [design-pending]; give every feature entry a [spec:] ref"
+    echo "  help: pair every amendment with a [spec: …] queue entry and vice versa; tag every design-pending-section entry [design-pending]; give every feature entry a [spec:] ref"
     exit 1
 fi
 
-echo "AMENDMENT-QUEUE: clean (every amendment ↔ a queue entry; feature entries spec-ready; deferred entries design-pending)"
+echo "AMENDMENT-QUEUE: clean (every amendment ↔ a queue entry; feature entries spec-ready; every design-pending-section entry tagged)"
 exit 0

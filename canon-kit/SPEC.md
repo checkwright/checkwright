@@ -56,9 +56,13 @@ the roster splits one out).
 A feature task is therefore in exactly one of two states, marked with the
 queue tags whose syntax queue-kit defines:
 
-- **Design-pending** — no amendment yet; the entry sits in the deferred
-  section tagged `[design-pending]`, excluded from selection. Every deferred
-  entry carries the tag: all deferred work is design-pending by definition.
+- **Design-pending** — no amendment yet; the entry sits in a **design-pending
+  section** tagged `[design-pending]`, excluded from selection. That set is
+  the deferred section plus, where the consumer configures one, queue-kit's
+  optional icebox tier (`CANON_KIT_ICEBOX_SECTION`; the tier is
+  queue-kit/SPEC.md §The icebox tier). A dormant entry is unbuilt design, so
+  the state and its tag reach it unchanged. Every entry in the set carries the
+  tag — all such work is design-pending by definition.
   The token names the *state*, not a promised artifact — a deferred **debt**
   entry promotes with the tag deleted rather than converted, and the tag has
   to be true of that entry too.
@@ -224,6 +228,11 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   violation.
 - `CANON_KIT_DEFERRED_SECTION` — default `Deferred`: the section whose
   every entry requires `[design-pending]`.
+- `CANON_KIT_ICEBOX_SECTION` — scalar, default **empty**: the second
+  design-pending section, queue-kit's optional icebox tier. Empty means the
+  set is the deferred section alone. Naming the deferred section is malformed
+  config. What generalizes here is the section **set**, not the tag set — no
+  icebox-specific tag exists or is wanted.
 - `CANON_KIT_DOD_HEADING` — default `Definition of Done`;
   `CANON_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one`
   (a reference-spec corpus like this repo's kits carries no DoD).
@@ -334,7 +343,10 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
-consumer renaming its sections sets both. Valve and marker spellings <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
+consumer renaming its sections sets both — and the icebox section name spans
+every kit that reads the tier on that same shape (queue-kit's
+`QUEUE_KIT_ICEBOX_SECTION`, this knob, drift-kit's `DRIFT_KIT_ICEBOX_SECTION`),
+each degrading to "no icebox" rather than to a wrong section when left unset. Valve and marker spellings <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
 (`[design-pending]`, `[spec:]`, `vision-introduces` / `spec-introduces`,
 `spec-embedded-source-exempt: <reason>`) are mechanism, not config.
 
@@ -350,8 +362,10 @@ same shapes:
 - **Section grammar and queue resolution:** the section-regex builders the
   queue-facing gates use (queue-kit's rule — both sides of a section boundary
   must parse identically), and the one queue walk that emits a live slug for a
-  bold lead-in bullet in an active or deferred section and a done slug for a
-  bare-slug bullet outside them — the single grammar `check-todo-task-liveness`
+  bold lead-in bullet in an active or **design-pending** section — deferred
+  plus a configured icebox, built as one regex so the tag rule and the walk can
+  never disagree on the set — and a done slug for a bare-slug bullet outside
+  them; the single grammar `check-todo-task-liveness`
   and `check-deprecation-task` resolve a `task: <slug>` binding through (each
   caller builds its own live/done map and fail-closes on the walk status).
 - **Finders:** the canonical-spec / amendment finders the spec-scanning gates
@@ -410,8 +424,8 @@ Invariant: the bidirectional rule holds — (a) no feature-section entry
 without `[spec:]`, no `[design-pending]` anywhere in the active sections
 (entries or prose; a prose mention masks the tag's absence), and no
 `[spec:]`-tagged entry in an active non-feature section (a spec-ready
-entry is misfiled there — it belongs in a feature section); (b) every
-deferred entry carries `[design-pending]`, and a deferred entry already
+entry is misfiled there — it belongs in a feature section); (b) every entry in
+a **design-pending section** carries `[design-pending]`, and one already
 carrying `[spec:]` must be promoted; (c) every amendment on disk pairs
 with a `[spec:]` queue entry and every `[spec:]` ref resolves to a file.
 

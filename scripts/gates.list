@@ -50,6 +50,7 @@ check-queue-sections
 check-queue-hygiene
 check-queue-wrap
 check-tag-lead-line
+check-queue-entry-budget
 check-task-names
 check-task-conservation
 check-queue-prose-precondition

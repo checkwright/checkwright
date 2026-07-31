@@ -41,7 +41,20 @@ unset _ds_cfg
 : "${DRIFT_KIT_METRIC_DIR:=.metric}"
 : "${DRIFT_KIT_DONE_SECTION:=Done}"
 : "${DRIFT_KIT_DEFERRED_SECTION:=Deferred}"
+: "${DRIFT_KIT_ICEBOX_SECTION:=}"
 declare -p DRIFT_KIT_KPI_DIRS >/dev/null 2>&1 || DRIFT_KIT_KPI_DIRS=("${GATE_SDK_GATES_DIR:-scripts}")
+
+iteration_start() {
+    local state="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt" iter
+    [[ -f "$DRIFT_KIT_QUEUE_FILE" ]] || return 0
+    iter="$(grep -m1 '^## Iteration:' "$DRIFT_KIT_QUEUE_FILE" 2>/dev/null \
+        | sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//')"
+    [[ -n "$iter" ]] || return 0
+    git log --format='%h' -S"$iter scope " -- "$state" 2>/dev/null | tail -1
+}
+
+# spec: drift-kit/SPEC.md §The KPI plugin contract — a driver handoff, not a consumer knob: derived here so the compgen export below carries it to plugins with no new export list to drift out of parity. Priced: hoisting it above the loop runs it in --trend too, putting one grep and one single-file git pickaxe on every session start via the context hook.
+DRIFT_KIT_ITERATION_START="$(iteration_start)"
 
 # spec: drift-kit/SPEC.md §The KPI plugin contract — export every scalar DRIFT_KIT_* (arrays skipped: unexportable, collator-internal), so a config override reaches plugins with no fixed list to drift
 for _dv in $(compgen -v DRIFT_KIT_); do
@@ -79,15 +92,6 @@ resolve_kpi() {
 registry_members() {
     [[ -f "$DRIFT_KIT_KPIS_FILE" ]] || return 0
     grep -Ev '^[[:space:]]*(#|$)' "$DRIFT_KIT_KPIS_FILE" || true
-}
-
-iteration_start() {
-    local state="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt" iter
-    [[ -f "$DRIFT_KIT_QUEUE_FILE" ]] || return 0
-    iter="$(grep -m1 '^## Iteration:' "$DRIFT_KIT_QUEUE_FILE" 2>/dev/null \
-        | sed -E 's/^## Iteration:[[:space:]]*//; s/[[:space:]]*\[stage:.*$//')"
-    [[ -n "$iter" ]] || return 0
-    git log --format='%h' -S"$iter scope " -- "$state" 2>/dev/null | tail -1
 }
 
 if [[ "${1:-}" == "--trend" ]]; then
@@ -137,9 +141,8 @@ print_section() {
     done
 }
 
-start="$(iteration_start)"
 header="=== Drift KPIs (advisory — trend, not level) ==="
-[[ -n "$start" ]] && header="$header  [iteration start $start]"
+[[ -n "$DRIFT_KIT_ITERATION_START" ]] && header="$header  [iteration start $DRIFT_KIT_ITERATION_START]"
 printf '%s\n\n' "$header"
 
 printf -- '--- Lead (weighted high — act before drift compounds) ---\n'

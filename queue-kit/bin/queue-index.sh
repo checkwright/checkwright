@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # spec: queue-kit/SPEC.md §bin/queue-index.sh — compact queue surface for task selection (a tool, not a gate; no # graph: manifest)
 #
-# usage: queue-index.sh [--collapse-deferred] [--extent <slug>] [queue-file]
-#   default: iteration header + active (• ready / ✗ blocked) + deferred titles;
-#   --collapse-deferred: per-### tally; --extent <slug>: "<start> <end>" line range
+# usage: queue-index.sh [--collapse-deferred] [--extent <slug>] [--icebox-candidates] [queue-file]
+#   default: header + active (• ready / ✗ blocked) + deferred titles + icebox tally;
+#   --collapse-deferred: per-### tally; --extent <slug>: "<start> <end>"; --icebox-candidates: eviction worklist
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -15,7 +15,8 @@ while (($#)); do
     case "$1" in
         --collapse-deferred) collapse=1; shift ;;
         --extent) mode=extent; slug="${2:-}"; shift 2 || true ;;
-        -h|--help) sed -n '3,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --icebox-candidates) mode=candidates; shift ;;
+        -h|--help) sed -n '3,5p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
         -*) echo "queue-index: unknown option: $1" >&2; exit 2 ;;
         *)  file="$1"; shift ;;
     esac
@@ -45,12 +46,54 @@ if [[ "$mode" == extent ]]; then
     exit 0
 fi
 
+if [[ "$mode" == candidates ]]; then
+    cutoff="$(date -d "$QUEUE_KIT_ICEBOX_AGE_DAYS days ago" +%F 2>/dev/null)" \
+        || { echo "queue-index: cannot compute the age cutoff (date -d unavailable)" >&2; exit 2; }
+    # spec: queue-kit/SPEC.md §bin/queue-index.sh — an advisory worklist, never a verdict: the age filter only bounds how much close must look at, and the cost-class opener is printed for the reading judgment rather than matched on
+    awk -v defre="$QUEUE_DEFERRED_RE" -v sectre="$QUEUE_SECTION_RE" -v cutoff="$cutoff" '
+        function opener(t) {
+            sub(/^.*\*\*Cost while deferred:?\*\*:?[[:space:]]*/, "", t)
+            sub(/[[:space:]]*$/, "", t)
+            if (length(t) > 48) t = substr(t, 1, 47) "…"
+            return (t == "" ? "(unstated)" : t)
+        }
+        # spec: queue-kit/SPEC.md §bin/queue-index.sh — the low cost class is matched on the opener as prose, which is an unacceptable heuristic in a gate and exactly the right ceiling in an advisory worklist; an uncosted entry is listed too, because an absent input appears rather than vanishing
+        function lowclass(t) { return (t ~ /^(low|zero|bounded|cosmetic)/) }
+        function flush(   d) {
+            if (slug == "") return
+            d = (surfaced != "" ? surfaced : filed)
+            if ((d == "" || d < cutoff) && (cost == "" || lowclass(cost)))
+                printf "%-46s %4dl  %-11s %s\n", slug, FNR - start, \
+                       (d == "" ? "(undated)" : d), (cost == "" ? "(uncosted)" : cost)
+            slug = ""; surfaced = ""; filed = ""; cost = ""
+        }
+        $0 ~ sectre { flush(); ind = ($0 ~ defre); next }
+        !ind { next }
+        /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
+            flush()
+            match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
+            slug = substr($0, RSTART + 2, RLENGTH - 4); start = FNR
+        }
+        slug == "" { next }
+        match($0, /Surfaced [0-9]{4}-[0-9]{2}-[0-9]{2}/) {
+            if (surfaced == "") surfaced = substr($0, RSTART + 9, 10)
+        }
+        match($0, /Filed [0-9]{4}-[0-9]{2}-[0-9]{2}/) {
+            if (filed == "") filed = substr($0, RSTART + 6, 10)
+        }
+        /\*\*Cost while deferred/ { if (cost == "") cost = opener($0) }
+        END { FNR++; flush() }
+    ' "$FILE"
+    exit 0
+fi
+
 hdr="$(grep -m1 '^## Iteration:' "$FILE" || true)"
 [[ -n "$hdr" ]] && { echo "$hdr"; echo ""; }
 
 awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
     -v lessonsre="$QUEUE_LESSONS_RE" -v cap="$QUEUE_KIT_ATTEND_CAP" \
-    -v sectre="$QUEUE_SECTION_RE" -v collapse="$collapse" '
+    -v sectre="$QUEUE_SECTION_RE" -v collapse="$collapse" \
+    -v iceboxre="$QUEUE_ICEBOX_RE" -v iceboxname="$QUEUE_KIT_ICEBOX_SECTION" '
     function title(line,   t) {
         t = line
         sub(/^[[:space:]]*-[[:space:]]+/, "", t)
@@ -77,8 +120,12 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
     }
     $0 ~ activere   { sec = "active";   next }
     $0 ~ deferredre { sec = "deferred"; next }
+    iceboxre != "" && $0 ~ iceboxre { sec = "icebox"; next }
     $0 ~ lessonsre  { sec = "lessons";  next }
     $0 ~ sectre     { sec = "other";    next }
+
+    # spec: queue-kit/SPEC.md §bin/queue-index.sh — the icebox is a tally and never a listing: this surface is embedded in the always-loaded session brief, so listing the tier would re-import the very tokens the tier exists to remove
+    sec == "icebox" && /^-[[:space:]]/ && match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/) { ni++; next }
 
     sec == "lessons" && /^-[[:space:]]/ && /\[attend\]/ {
         nl++
@@ -120,6 +167,7 @@ awk -v activere="$QUEUE_ACTIVE_RE" -v deferredre="$QUEUE_DEFERRED_RE" \
             if (dn == 0) print "  (none)"
             for (i = 1; i <= dn; i++) printf "  %s\n", dtitle[i]
         }
+        if (iceboxre != "") printf "%s: %d entries\n", iceboxname, ni + 0
         if (nl > 0) {
             print ""
             print "Attention (Lessons [attend], this iteration):"

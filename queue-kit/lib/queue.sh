@@ -30,12 +30,20 @@ declare -p QUEUE_KIT_ACTIVE_SECTIONS &>/dev/null \
     || QUEUE_KIT_ACTIVE_SECTIONS=("New Features" "Technical Debt")
 
 [[ -v QUEUE_KIT_DEFERRED_SECTION ]] || QUEUE_KIT_DEFERRED_SECTION="Deferred"
+[[ -v QUEUE_KIT_ICEBOX_SECTION ]]   || QUEUE_KIT_ICEBOX_SECTION=""
 [[ -v QUEUE_KIT_DONE_SECTION ]]     || QUEUE_KIT_DONE_SECTION="Done"
 
 [[ -v QUEUE_KIT_WRAP_BUDGET ]] || QUEUE_KIT_WRAP_BUDGET=100
 
+[[ -v QUEUE_KIT_ENTRY_LINE_CAP ]] || QUEUE_KIT_ENTRY_LINE_CAP=50
+
+[[ -v QUEUE_KIT_ICEBOX_AGE_DAYS ]] || QUEUE_KIT_ICEBOX_AGE_DAYS=30
+
 declare -p QUEUE_KIT_REQUIRED_SECTIONS &>/dev/null \
     || QUEUE_KIT_REQUIRED_SECTIONS=("Iteration:" "New Features" "Technical Debt" "Deferred" "Done" "Lessons Learned")
+
+# spec: queue-kit/SPEC.md §Layout and configuration — the icebox joins the required set by derivation, never by a second consumer list: a configured-but-absent section would let every icebox assertion pass open on a section that is not there
+[[ -n "$QUEUE_KIT_ICEBOX_SECTION" ]] && QUEUE_KIT_REQUIRED_SECTIONS+=("$QUEUE_KIT_ICEBOX_SECTION")
 
 declare -p QUEUE_KIT_PROSE_LEADS &>/dev/null || QUEUE_KIT_PROSE_LEADS=("Protocol:")
 
@@ -63,10 +71,17 @@ queue_alt() { local IFS='|'; printf '%s' "$*"; }
 QUEUE_ACTIVE_RE="^## ($(queue_alt "${QUEUE_KIT_ACTIVE_SECTIONS[@]}"))[[:space:]]*$"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 QUEUE_DEFERRED_RE="^## ${QUEUE_KIT_DEFERRED_SECTION}[[:space:]]*$"
+# spec: queue-kit/SPEC.md §The icebox tier — an unset knob leaves a regex nothing can match, so every icebox reader degrades to "no icebox" rather than to "every section"
+# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
+QUEUE_ICEBOX_RE="${QUEUE_KIT_ICEBOX_SECTION:+^## ${QUEUE_KIT_ICEBOX_SECTION}[[:space:]]*$}"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 QUEUE_DONE_RE="^## ${QUEUE_KIT_DONE_SECTION}[[:space:]]*$"
+_qk_task_sections=("${QUEUE_KIT_ACTIVE_SECTIONS[@]}" "$QUEUE_KIT_DEFERRED_SECTION")
+# spec: queue-kit/SPEC.md §The icebox tier — the icebox is a *live* task section: joining the shared task regex is what makes eviction a conserved move and carries slug uniqueness, blocker resolution, the living-prose contract and the lead-line guard onto the tier with no gate edit
+[[ -n "$QUEUE_KIT_ICEBOX_SECTION" ]] && _qk_task_sections+=("$QUEUE_KIT_ICEBOX_SECTION")
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
-QUEUE_TASK_RE="^## ($(queue_alt "${QUEUE_KIT_ACTIVE_SECTIONS[@]}" "$QUEUE_KIT_DEFERRED_SECTION"))[[:space:]]*$"
+QUEUE_TASK_RE="^## ($(queue_alt "${_qk_task_sections[@]}"))[[:space:]]*$"
+unset _qk_task_sections
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 QUEUE_SECTION_RE="^## "
 # spec: queue-kit/SPEC.md §The tag algebra — the Lessons heading is fixed spelling (a required-sections default), read by queue-index + check-tag-lead-line; no knob
@@ -154,6 +169,12 @@ _qk_errs=()
     || _qk_errs+=("QUEUE_KIT_WRAP_BUDGET must be a positive integer (got '$QUEUE_KIT_WRAP_BUDGET')")
 [[ "$QUEUE_KIT_ATTEND_CAP" =~ ^[0-9]+$ && "$QUEUE_KIT_ATTEND_CAP" -gt 0 ]] \
     || _qk_errs+=("QUEUE_KIT_ATTEND_CAP must be a positive integer (got '$QUEUE_KIT_ATTEND_CAP')")
+[[ "$QUEUE_KIT_ENTRY_LINE_CAP" =~ ^[0-9]+$ && "$QUEUE_KIT_ENTRY_LINE_CAP" -gt 0 ]] \
+    || _qk_errs+=("QUEUE_KIT_ENTRY_LINE_CAP must be a positive integer (got '$QUEUE_KIT_ENTRY_LINE_CAP')")
+[[ "$QUEUE_KIT_ICEBOX_AGE_DAYS" =~ ^[0-9]+$ && "$QUEUE_KIT_ICEBOX_AGE_DAYS" -gt 0 ]] \
+    || _qk_errs+=("QUEUE_KIT_ICEBOX_AGE_DAYS must be a positive integer (got '$QUEUE_KIT_ICEBOX_AGE_DAYS')")
+[[ "$QUEUE_KIT_ICEBOX_SECTION" != "$QUEUE_KIT_DEFERRED_SECTION" ]] \
+    || _qk_errs+=("QUEUE_KIT_ICEBOX_SECTION must not name the deferred section")
 [[ -n "$QUEUE_KIT_PRECONDITION_REGEX" ]] || _qk_errs+=("QUEUE_KIT_PRECONDITION_REGEX is empty")
 [[ ${#QUEUE_KIT_REQUIRED_SECTIONS[@]} -gt 0 ]] || _qk_errs+=("QUEUE_KIT_REQUIRED_SECTIONS is empty")
 [[ -n "$QUEUE_KIT_ROADMAP_MARKER" ]] || _qk_errs+=("QUEUE_KIT_ROADMAP_MARKER is empty")
