@@ -1029,53 +1029,53 @@
 
 - **native-gate-binary-port** [design-pending] [roadmap: next/reliability] — a new gate substrate.
   roadmap-summary: The gate battery as one native binary: no GNU userland, sub-second runs.
-  Port the battery off bash-plus-GNU-userland onto a single native compiled
-  binary (Rust the lead candidate), because every structural pain the current
-  stack carries is substrate-bound, not fixable in place. Scale is read off
-  `gates.list` and `*/checks`, never restated here. The pains, each already
-  live: the platform reality is Linux-only — stock macOS ships bash 3.2 and a
-  BSD userland (docs/install.md §Requirements states it outright) and Windows is
-  WSL-only (`platform-support-ci-matrix` carries that half); the
-  bash/git/jq/awk/sort/shellcheck assortment has independent release lifecycles,
-  with cross-version workarounds already in tree; battery wall-time has grown
-  toward minutes, most of it process-spawn cost rather than work; shellcheck is
-  a linter, not a compiler, and bash offers no type system at this size; and
-  check source in the consumer's tree feeds the source-prediction anti-pattern —
-  agents reading gate scripts to predict verdicts instead of running the oracle,
-  a token sink the delegation rules fight behaviorally rather than structurally.
-  **Deliverable:** one multi-call binary (busybox-style, one subcommand per
-  check), with `gates.list` resolution dispatching per-entry to binary
-  subcommand or script so the port lands cohort by cohort, slowest and
-  meta-gates first; each ported gate's `good/`+`bad/` fixture pair is the
-  mechanical parity oracle before its script retires; consumer-authored gates
-  keep the shell escape hatch, so registry-plus-shadowing semantics survive
-  verbatim; per-platform release artifacts (Linux, macOS, native Windows)
-  with published checksums and publicly buildable source; git the sole
-  runtime dependency (shelled out, not embedded).
-  **Why `[design-pending]`:** the consumer-extensibility model is the design that
-  decides everything else — script escape hatch as first-class vs a
-  declarative check DSL vs native plugins — plus language choice (Rust vs
-  Go), the dogfood question (this repo must run built artifacts or the
-  opacity win is consumer-only, and the Rust source sits readable in-tree
-  regardless), the trust inversion (an auditable script becoming an opaque
-  binary in a pre-commit hook demands reproducible builds and checksums —
-  opacity to agents is opacity to human adopters too), and the
-  cross-compile/release pipeline including how `pack-installer` ships
-  per-platform payloads. A multi-iteration track: cost the design spike
-  separately from the port, since the spike decides whether the port is a
-  cohort per iteration or worse.
-  **Cost while deferred:** compounding on three axes — every new gate adds
-  shell to the eventual port, battery duration grows with the roster and is
-  a per-commit tax already, and the source-prediction token waste recurs per
-  session. Bounded in kind: nothing breaks; the current substrate is correct
-  on Linux and fully gated. Interacts with `platform-support-ci-matrix`
-  (native binaries change what a platform leg must prove — the binary runs,
-  not that a GNU floor is met) and with the front-door requirements story
-  (one static binary is a stronger install claim than the utility list).
-  Feature-shaped at triage: it adds governed names — the binary, its
-  subcommand surface, the dispatch knob — on top of new mechanism.
-  Filed 2026-07-28 by operator request, from a session assessing the shell
-  substrate's structural limits against a native-binary port.
+  Port the battery off bash-plus-GNU-userland onto one native compiled binary
+  (Rust the lead candidate). Scale is read off `gates.list` and `*/checks`, never
+  restated here. Standing pains: Linux-only reach (stock macOS ships bash 3.2 and
+  a BSD userland per docs/install.md §Requirements, Windows is WSL-only —
+  `platform-support-ci-matrix` carries that half); a toolchain of independently
+  versioned utilities; battery wall-time trending toward minutes, mostly
+  process-spawn cost; and check source in the consumer's tree feeding the
+  source-prediction anti-pattern.
+  **Measured evidence (2026-08-01, operator-directed — evidence only; it opens no
+  work, costs nothing further, and the entry stays unpromoted).**
+  `release-step-verification` produced eleven defects, sorted by whether a port
+  removes them. **Four are removed:** the opt-in shell error model (a probe under
+  `set +e` turned a failed `gh` call into an empty list and a zero exit, reporting
+  green forever from its own data source dying); the regex dialect split (a word
+  boundary in GNU grep is a backspace in POSIX awk); textual parameter expansion
+  leaving artifacts in derived values; and the heaviest, hand-rolled parsers
+  standing in for real ones — the live instance being
+  `action-run-shell-yaml-anchor-fail-open`, where an anchored `run:` body goes
+  silently unlinted. A real parser handles anchors by construction, and several
+  gates share that shape. **Seven survive unchanged, and they are the ceiling:**
+  CI-checkout and API-pagination semantics, evidence that does not identify what
+  it certifies (`gate-tests-suite-identity-in-evidence`), presence asserted where
+  resolution was needed, an ambiguous census, a SPEC claiming coverage the wiring
+  lacks (`smoke-battery-workflow-gate-coverage`), and a required permission with
+  no oracle (`workflow-permissions-scope-oracle`). **Consequence for scope:**
+  justify the port on *silent success* and on real parsers replacing regex
+  approximation, never on the vaguer claim that shell is error-prone; do **not**
+  sell it as closing `vacuous-assertion-count-discipline`, whose dominant class is
+  assertion *design* and ports intact. Landing the port then relaxing is the
+  failure mode to design against.
+  **Deliverable:** one multi-call binary (one subcommand per check), `gates.list`
+  dispatching per-entry to binary subcommand or script so the port lands cohort by
+  cohort, slowest and meta-gates first; each ported gate's `good/`+`bad/` pair is
+  the parity oracle before its script retires; consumer gates keep the shell
+  escape hatch; per-platform artifacts with checksums and publicly buildable
+  source; git the sole runtime dependency.
+  **Why `[design-pending]`:** the consumer-extensibility model decides everything
+  else — escape hatch vs declarative check DSL vs native plugins — plus language
+  choice, the dogfood question, and the trust inversion (opacity to agents is
+  opacity to human adopters too, so reproducible builds and checksums are owed).
+  Distribution is the hard part, not the language: kits vendor as text with zero
+  build step (`reserve/` holds the crates.io reservation). Cost the spike apart.
+  **Cost while deferred:** every new gate adds shell to the eventual port, battery
+  duration is a per-commit tax already, and source-prediction waste recurs per
+  session. Nothing breaks — the substrate is correct on Linux and fully gated.
+  Feature-shaped at triage: it adds governed names. Filed 2026-07-28 by operator
+  request, from a session assessing the shell substrate's structural limits.
 
 - **docs-root-link-grammar** [design-pending] — a hand-authored `docs/` page that
   links a path *outside* `docs/` with a bare relative link resolves on disk but
@@ -1844,6 +1844,174 @@
   ruled **task**-shaped rather than lesson-shaped: the deliverable and its
   done-state are both nameable now, which is the litmus.
 
+- **lead-iteration-open-authorization** [design-pending] — the iteration lead may
+  open an iteration on its own inference, and opening one is the operator's call.
+  lifecycle-kit/templates/lead.md §Opening an iteration requires only the
+  operator's standing **directive** — a theme bounding scope's survey — and
+  explicitly permits proceeding without even that ("absent a directive, the lead
+  dispatches scope undirected"). The directive slot presupposes the decision to
+  open has already been made and is silent on who makes it; re-verified at this
+  close, the file contains no authorization word at all, and
+  `lifecycle-kit/bin/enter-stage.sh` carries no floor either — its first-stage
+  branch differs only in stamping `—` for the iteration name.
+  **The live instance.** The operator said "fix all" about four outstanding
+  release defects, two of them edits to governed surfaces; the lead read that as
+  authorization to open an iteration, reset the boundary, dispatch scope, and
+  stamp — and the operator then stated plainly that they had not asked for one
+  and that opening one requires their explicit approval. The inference was
+  defensible on the *content* (governed-surface edits do route through the
+  lifecycle) and wrong on the *scale*, which was the operator's to choose.
+  **Deliverable:** state in lead.md that opening an iteration requires explicit
+  operator authorization, distinct from and prior to the standing directive, and
+  that an ambiguous instruction to fix filed work is not that authorization — the
+  lead asks. **Why `[design-pending]`:** whether a mechanical floor is buildable
+  is the open question. Prose requests and guards enforce, so the shape worth
+  costing is an `enter-stage.sh` first-stage precondition; against it, the
+  authorization is a fact about a conversation, and every encoding of it
+  (a flag, a stamped operator line) is forgeable by the same session it binds.
+  **Cost while deferred:** a lead can spend an iteration's full opening cost on a
+  scale the operator never chose, and the only detector is the operator noticing
+  after the stamp has landed. Recurs per iteration opened under ambiguity.
+  Debt: one prose rule, optionally one precondition; adds no governed name
+  unless the floor lands.
+  Filed 2026-08-01 at close from the gap inbox, operator-directed, from a live
+  instance in this iteration's own opening.
+
+- **smoke-battery-workflow-gate-coverage** [design-pending] — the consumer smoke
+  installs workflow templates but no smoke gate lints their Actions shape, so a
+  template regression reaches a consumer unopposed. The scratch battery is the
+  union of what each kit's `smoke/install.sh` appends to `gates.list`, and
+  `check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo` and
+  `check-enforcement-fresh` are in **no** kit's smoke `gates.list`. Re-verified at
+  this close: `site-kit/smoke/install.sh` genuinely does copy
+  `templates/site-health.yml` verbatim into the scratch tree, so the install half
+  is real — but of the registered smoke gates only `check-tree-terms` and
+  `check-docs-cname-parity` read the installed file at all, and both only scan it
+  for terms and host aliases. Nothing lints its run bodies, its action pins, or
+  its job shape. The SPEC sentence that inferred coverage from the install was
+  narrowed to what the smoke actually exercises in the same close that filed this
+  (site-kit/SPEC.md §templates/site-health.yml), so the tree no longer claims the
+  coverage — this entry is the coverage itself, still absent.
+  **Why `[design-pending]`:** registering four gates into a smoke `gates.list` is
+  the obvious move and may be the wrong one — the smoke's purpose is proving a
+  *vendored kit installs and runs*, not re-running the host battery inside it, and
+  a smoke that grows toward the full roster stops being a smoke. The design
+  question is which predicate earns a scratch-battery slot: plausibly only the
+  gates that read a surface the install *writes*.
+  **Cost while deferred:** charged against every edit to a shipped workflow
+  template; a template shipping a defective `run:` body is caught by this repo's
+  own battery over its own copy, and by nothing over the template.
+  Debt: smoke wiring over existing gates; adds no governed name.
+  Filed 2026-08-01 at close from the gap inbox, filed at spec while surveying the
+  readers of site-health.yml.
+
+- **action-run-shell-yaml-anchor-fail-open** [design-pending] — the gate whose
+  whole job is linting workflow bash silently drops a `run:` body written behind a
+  YAML anchor. gate-sdk/SPEC.md states `check-action-run-shell` refuses "a YAML
+  anchor or alias as the `run:` value, since no anchor resolution is attempted";
+  the implementation's refusal arms cover only the folded scalar, the explicit
+  indent indicator, the alias sigil, and the unbalanced GitHub expression. There
+  is no anchor arm, so `run: &anchor |` matches none of them, is non-empty, and
+  falls through to the plain-scalar counter — its body lines are never linted.
+  Re-verified at this close by execution, three ways over one identical body: the
+  literal `run: |` form reds (SC2034 + SC2154), the alias form refuses loudly, and
+  the anchor form exits 0 reporting "0 run: block(s) linted, 1 plain-scalar run:
+  value(s) skipped". A fail-open of the same vacuous-pass class
+  `vacuous-assertion-count-discipline` tracks, and the skipped-count line is
+  exactly the diagnostic that made it visible.
+  **Deliverable:** the missing code arm plus a `bad/` fixture over an anchored
+  `run:` value. Explicitly **not** a narrowing of the SPEC line — the SPEC states
+  the correct contract and narrowing it would bless the fail-open.
+  **Cost while deferred:** a workflow author who anchors a `run:` value gets a
+  green gate over unlinted bash, and nothing distinguishes that from a clean pass.
+  No instance is in tree today, so the charge is latent rather than accruing.
+  Debt: one refusal arm and one fixture in an existing gate; adds no governed name.
+  Filed 2026-08-01 at close from the gap inbox, surfaced at this iteration's align
+  audit while verifying an amendment claim about the gate's fail-closed set.
+
+- **workflow-permissions-scope-oracle** [design-pending] — no gate parses a
+  workflow `permissions:` block, so every scope a workflow needs is landed on
+  reading alone. Re-verified exhaustively at this close: no check script matches
+  `permissions:` at all, and every `permissions` hit across the tree is `jq` over
+  the harness `settings.json`, an unrelated concept. The failure mode is concrete
+  and this iteration supplied it: a `permissions:` block is an **allowlist**, an
+  undeclared scope makes the read come back as an HTTP 404, and a 404 on a read is
+  indistinguishable from an absent resource — the site-health release-body arm
+  needs `contents: read` and would have reported "no such Release" without it.
+  On a public repository the omission stays invisible until a private-repo
+  consumer copies the workflow.
+  **Precedent, stated precisely** (the gap's own framing overstated it):
+  gate-sdk/SPEC.md declares **GitHub-expression injection** a non-goal and defers
+  it to "a dedicated workflow-security linter". It does *not* rule the whole
+  workflow-security category out of scope, so that line is supporting precedent
+  for keeping the gate narrow, never a standing exclusion to argue against.
+  **Deliverable:** a gate far narrower than a security linter — a workflow job
+  whose `run:` bodies invoke `gh`, or that checks out, must declare the scopes
+  those calls consume, starting with `contents: read`. Tree-local, hermetic,
+  cheap: one gate, a `good/`+`bad/` fixture pair, a `gates.list` row, a graph
+  manifest.
+  **Cost while deferred:** charged against every workflow that gains an API call;
+  the detector today is a 404 read as a missing object, which is the exact
+  misreading `release-credential-precondition-scope-vs-permission` was filed for.
+  Debt: one gate plus fixtures; adds one governed gate name when it lands.
+  Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's
+  align audit against all nine gates that read workflow YAML.
+
+- **template-copy-parity-yaml-widening** [design-pending] — a kit `.yml` template
+  and this repository's copy of it are mirrored by hand and a missed half is caught
+  by nothing. Re-verified at this close: `check-template-copy-parity` globs
+  `*/templates/*.sh` against the gates dir — three pairs in this tree, none of them
+  YAML — and no other gate compares two hand-maintained copies of anything. Every
+  other parity or freshness gate compares a **generated** projection against its
+  source, which is a different problem. The duplication cannot be removed, because
+  kit-template-plus-consumer-copy *is* the distribution model, so enforcement-first
+  prefers a remedy that is unavailable here and gating is the fallback — and the
+  fallback is absent.
+  **Why byte parity is the wrong assertion.** The two `site-health.yml` files
+  diverge today across eight hunks, and the divergence is largely *correct*:
+  `ALT_DOMAIN` is `alt.example.com` in the template and this repo's own host in the
+  copy, and the template's "copy verbatim, then set or delete this arm" adoption
+  comments have no place in an instance. The shape that fits is the declared-
+  divergence contract `check-template-copy-parity` already implements for `.sh`,
+  widened from that extension to a registered template/copy pair of any extension —
+  which also means the copy side stops being hard-wired to the gates dir.
+  **Cost while deferred:** charged against every future edit to either copy. This
+  iteration widened the exposure rather than creating it — the release-body arm
+  adds a second hand-mirrored block to the same pair, and its own amendment stated
+  outright that nothing catches a missed half.
+  Debt: one existing gate widened plus a pair registry; adds one consumer knob.
+  Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's align
+  audit against the full gate roster.
+
+- **gate-tests-suite-identity-in-evidence** [design-pending] — the validate
+  manifest's per-suite hash cannot tell two suites apart, so it certifies that
+  *some* suite ran clean rather than that *this* one did. evidence-kit's
+  `run-validate.sh` hashes each suite's captured stdout+stderr as the manifest's
+  identity check, but the hash carries no suite name or fingerprint of its own — it
+  is only as discriminating as the wrapped tool's output, and
+  `gate-sdk/bin/run-gate-tests.sh` ends with `GATE-TESTS: clean ($pairs pairs,
+  $unit unit tests)`, naming neither the kit nor the files it ran. Two kits with
+  matching counts therefore produce byte-identical logs and identical hashes.
+  Confirmed live this iteration and re-verified at close: `evidence_kit` and
+  `site_kit` both carry
+  `sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d` in the
+  committed evidence, reproduced across independent re-runs. Verified
+  genuine-by-construction rather than a mis-wire — the two suites resolve distinct
+  commands against their own correct kit directories and genuinely have matching
+  counts (2 pairs, 3 unit tests each).
+  **Why `[design-pending]`:** two fixes with different reach. Having
+  `run-gate-tests.sh` name its kit in the success line sharpens the hash for free
+  and helps every log reader, but it fixes only this producer; hashing something
+  suite-identifying (the invoked command) alongside the log bytes fixes the
+  manifest for every wrapped tool, including ones this repo does not own. They are
+  not exclusive and the second is the one that generalizes.
+  **Cost while deferred:** the manifest is weak evidence exactly where it is
+  load-bearing — it cannot separate "suite X's correct result" from "some other
+  suite emitting the same generic message", so a silently-skipped or mis-pointed
+  suite reads as certified. Charged per validate run.
+  Debt: a success-line change and/or a hash-input change; adds no governed name.
+  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's validate.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -1877,10 +2045,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- release-body-url-form
-- release-body-host-side-unverified
-- release-tag-oracle-ordering
-- release-credential-precondition-scope-vs-permission
 
 ## Lessons Learned

@@ -63,3 +63,4 @@
 | front-door-readiness | sc sp a b v c | 6f/2d | 2 · ≤1d | 22s clean | 86 |
 | pre-adoption-grammar-break | sc sp a b v c | 5f/1d | 3 · ≤2d | 25s 2✗ | 87 |
 | release-assertion-honesty | sc sp a b v c | 6f/0d | 3 · ≤0d | 22s clean | 89 |
+| release-step-verification | sc sp a b v c | 2f/0d | 1 · ≤1d | 22s clean | 89 |

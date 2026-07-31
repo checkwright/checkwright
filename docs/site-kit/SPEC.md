@@ -271,7 +271,7 @@ The scheduled live-site probe, copied verbatim into a consumer's
 `.github/workflows/`. It reads the apex host from the CNAME file (the same
 source the gate trusts), then checks: the apex answers 200 over HTTPS, `www`
 and `http` redirect to the canonical origin, an optional `ALT_DOMAIN` redirect
-keeps its path, the certificate is more than a fortnight from expiry, and every
+keeps its path, the certificate is at least a fortnight from expiry, and every
 published release note is pointed at by a resolving URL in its Release body. A
 failure opens or updates a single `site-health` issue and reds the run;
 recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://`
@@ -323,8 +323,9 @@ visible label — and a trailing **run** of punctuation is stripped from an
 extracted URL before it is resolved. The punctuation that occurs in practice is
 markdown-structural rather than sentential: a `)` closing a link target, or `)**`
 closing one inside bold. A stripping set written for the period captures those
-closers into the URL and reds a healthy corpus, so the set covers `)` and `*`,
-and strips a run rather than a single character — or `)**` merely becomes `)*`.
+closers into the URL and reds a healthy corpus, so the set carries the markdown
+closers alongside sentence punctuation (the template owns the set), and strips a
+run rather than a single character — or `)**` merely becomes `)*`.
 The extracted set is **not** narrowed to note URLs: the assertion is over
 apex-hosted URLs, so a body's other apex links are covered deliberately.
 
@@ -386,14 +387,16 @@ how the arm becomes a green that means nothing.
 - **Zero *released* notes** — not a finding, for the same reason.
 
 **The census line makes those states readable; the rulings above are what make a
-vacuous pass impossible.** On every run the arm prints four counts — notes found,
-of those carrying the tag key, of those released, of those checked. None of the
-four is another by construction: the gap between *found* and *keyed* separates a
-typo'd `RELEASE_NOTE_TAG_KEY` from a corpus that simply mixes notes with ordinary
-posts, the gap between *keyed* and *released* is the legitimate pre-release state,
-and the gap between *released* and *checked* is a Release the arm could not read.
-A three-count line renders the first two of those states identically, which is
-what the fourth number buys. This is the same shape as gate-sdk's vacuous-pass
+vacuous pass impossible.** On every run the arm prints a census of what it ranged
+over — notes found, of those carrying the tag key, of those released against the
+remote tag count, and of those checked. No count in it is another by
+construction: the gap between *found* and *keyed* separates a typo'd
+`RELEASE_NOTE_TAG_KEY` from a corpus that simply mixes notes with ordinary posts,
+the gap between *keyed* and *released* is the legitimate pre-release state, and
+the gap between *released* and *checked* is a Release the arm could not read.
+Collapsing *found* into *keyed* would render the first two of those states
+identically, which is what reporting them apart buys. This is the same shape as
+gate-sdk's vacuous-pass
 tripwire (§run-gates): a *reading* available to whoever opens the run log, not an
 assertion, and on a green run nobody opens it. It earns its place as the
 diagnostic naming which state a reader is in; it is not itself what stands
@@ -410,10 +413,19 @@ count, on a daily schedule, well inside the authenticated rate limit.
 Deliberately uncapped and unknobbed: a "newest N only" bound would stop probing
 exactly the old releases where this class of defect has actually been found.
 
-The template is starter-template-conformant: the kit's `smoke/install.sh`
-installs it verbatim as governed surface, so a regression that made it red any
-vendored kit's gate would surface in the consumer smoke rather than at a
-consumer.
+The kit's `smoke/install.sh` installs the template verbatim into the scratch tree
+as governed surface. **What that buys is narrower than the install suggests, and
+is stated here rather than inferred from it.** The scratch battery is the union of
+what each kit's `smoke/install.sh` registers, and of those gates only
+`check-tree-terms` and `check-docs-cname-parity` read the installed workflow at
+all — one for tree terms, the other for configured host aliases in `://` form.
+None of the gates that lint a workflow's *Actions shape* — its `run:` bodies, its
+action pins, its `gh` repository context — is registered in any kit's smoke
+`gates.list`, so none of them runs over the installed file. The smoke therefore
+catches a template that leaks a term or a host alias, and nothing else about it; a
+regression in the workflow's bash or its pinning surfaces at a consumer, not here.
+Closing that is a change to smoke wiring rather than to this template, and is
+carried as deferred work in the consumer's queue.
 
 ## Out of scope
 
