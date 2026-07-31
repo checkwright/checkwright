@@ -20,9 +20,12 @@
   and the behavior is **specified**, not accidental, which is what makes the unit
   feature-shaped: the fix revises the contract rather than converging the script
   onto it.
-  **Deliverable:** the declaration resolved from the `TO` tree over a version
-  window opened by `FROM`, so an untagged `TO` proves containment rather than
-  emptiness. Deltas, causal completeness, and the ruled-out alternatives:
+  **Deliverable:** a `.workflow/` declaration surface build appends to as it
+  tightens and close composes the note from, read by the smoke's untagged arm, so
+  an untagged `TO` proves containment rather than emptiness. The missing piece is
+  a **producer**, not a resolution rule — every rule the filing floated is a no-op
+  because at validate no artifact on disk names the gate just tightened. Deltas,
+  causal completeness, and the ruled-out alternatives:
   gate-sdk/SPEC-upgrade-smoke-note-resolution.md.
   **Do not promote the `upgrade` baseline row on a post-tag green** — immediately
   after a tag the smoke runs clean because `TO` is momentarily a tagged `HEAD`,
@@ -41,8 +44,11 @@
   **Deliverable:** one canonical spelling held by a gate rather than by
   convention, one implementation of the grammar behind two callers, a parser that
   refuses a silently-empty declaration, and the shipped corpus repaired to it.
-  Design, the seam ruling, the post-immutability ruling, and the ruled-out
-  parser-widening alternative: SPEC-release-note-lead-token-grammar.md.
+  The rule and the repair are scoped to **Tightened gates** — the neighbouring
+  Behavior-changes bullets legitimately carry prose lead tokens a corpus-wide
+  sweep would wrongly normalize. Design, the seam ruling, the post-immutability
+  ruling, and the ruled-out parser-widening alternative:
+  SPEC-release-note-lead-token-grammar.md.
   Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while checking
   which bullet form the smoke actually parses; promoted from the gap inbox the
   same day; amendment authored 2026-07-31 at spec.

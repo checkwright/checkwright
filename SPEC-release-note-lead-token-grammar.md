@@ -12,27 +12,37 @@ assertion by this repo's own gates.
 
 ## What changes
 
-### Delta 1 — one canonical spelling, owned by docs/install.md {design-bearing}
+### Delta 1 — one canonical spelling for the Tightened-gates lead token {design-bearing}
 
-The lead token of a bullet in each of the three fixed sections is a
-**backticked, unbolded** bare name. docs/install.md §The upgrade contract owns
-that rule; its Behavior-changes paragraph currently prescribes the opposite —
-lead tokens "bolded like the other sections' lead tokens" — which is both false
-of two of the three sections and, for Tightened gates, the one spelling the
-parser cannot read. That clause is replaced by the canonical spelling, stated
-once for all three sections.
+The lead token of a **Tightened-gates** bullet is a **backticked, unbolded** bare
+gate name. docs/install.md §The upgrade contract owns that rule, stated in the
+Tightened-gates paragraph that already declares the section machine-readable.
 
-Backticks rather than bold because the lead token is a code identifier in every
-section: a gate name under Tightened gates, a knob name under Renamed knobs, a
-script/knob/template/file name under Behavior changes. This tree spells
-identifiers in backticks everywhere else, and bold is a rendering choice that
-carries no semantics while colliding with the one token a machine reads.
+Backticks rather than bold because this token is a code identifier — a gate
+name — and this tree spells identifiers in backticks everywhere else. Bold is a
+rendering choice carrying no semantics, and it collides with the one token a
+machine reads.
 
-**Honest limit, stated where the rule is.** Only the Tightened-gates section is
-gated (delta 4) — it is the only one a machine parses. The other two sections'
-spelling is a convention docs/install.md states and review holds, exactly
-parallel to that page's existing honest limit on Behavior-changes bullets being
-declared for reading rather than smoke-asserted.
+**The rule reaches this section and no other, and the corpus is what decides
+that.** The Behavior-changes paragraph currently claims its lead tokens are
+"bolded like the other sections' lead tokens" — a cross-section uniformity claim
+that is false about Tightened gates the moment this delta lands, so the clause is
+rewritten to stop asserting it. What replaces it is *not* the canonical spelling:
+an audit of every shipped Behavior-changes bullet finds lead tokens that are
+legitimately prose phrases rather than identifiers — `**stage cursor**`,
+`**same-stage re-entry**`, `**scope boundary scratch wipe**`, `**Release
+assets**` — and backticking those would be a prose rewrite, not a normalization.
+That section keeps its own spelling; only the false uniformity claim goes.
+
+**Renamed knobs is left unruled, deliberately.** Every shipped note declares it
+`None`, so there is no corpus to normalize and no reader to protect. Legislating
+a spelling over an empty set would be a rule with no attested drift axis, which
+is the trivially-true shape gate-sdk/SPEC.md §When a gate earns its place bars.
+
+**Honest limit, stated where the rule is.** Only Tightened gates is gated (delta
+4), because it is the only section a machine parses — exactly parallel to that
+page's existing honest limit on Behavior-changes bullets being declared for
+reading rather than smoke-asserted.
 
 ### Delta 2 — the parser refuses a silently-empty declaration {design-bearing}
 
@@ -62,6 +72,18 @@ before; there is one now. The rule is not decoration here — this unit exists
 *because* two statements of the grammar disagreed, and landing a fix that leaves
 three statements would file the same defect forward.
 
+**Two container arms, one token predicate.**
+`SPEC-upgrade-smoke-note-resolution.md` adds a second surface the same allowed-red
+set is read from — a `.workflow/` declaration file of bare gate names, written
+during the iteration. The helper therefore carries two *container* arms (a
+markdown section's bullet lead tokens; a record file's data lines) over **one**
+token predicate, and the container is the only thing that differs between them.
+That is what keeps the two surfaces from re-opening this unit's own defect from a
+new direction: the declaration file is deliberately markup-free, so the spelling
+question does not arise on it at all, and close's composition step is the one
+place a bare declared name becomes a backticked note bullet — an output this
+amendment's delta 1 governs and delta 4 then holds.
+
 ### Delta 4 — a consumer gate holds the corpus {design-bearing}
 
 A new gate in this repo's `scripts/` asserts, over every note under
@@ -89,12 +111,19 @@ note's declaration must stay machine-readable indefinitely.
 
 ### Delta 5 — the corpus is repaired to the canonical spelling {mechanical}
 
-The audit at authoring found 12 of the 22 non-`none` Tightened-gates bullets
+**The repair is scoped to the Tightened-gates section, and that scoping is
+load-bearing rather than incidental.** A bolded-lead-token sweep run corpus-wide
+would reach Behavior-changes bullets, whose lead tokens are legitimately prose
+phrases (delta 1); normalizing those would be a prose rewrite of published posts
+and would falsify this delta's whole warrant, which is that no claim changes. The
+sweep is section-scoped or it is wrong.
+
+Within that section the audit at authoring found 12 of the 22 non-`none` bullets
 unreadable by the parser: eight bolded (`v0.4.0`, `v0.5.0`, `v0.7.0`, `v0.10.0`
 with four, `v0.17.0`) and four bold-and-backticked (`v0.13.0` with three,
-`v0.15.0`). Every lead token in the corpus is a bare gate name — no paths, no
-links, no multi-token leads — so the repair strips the bold emphasis, leaves or
-adds the backticks, and changes no claim any note makes.
+`v0.15.0`). Every lead token there is a bare gate name — no paths, no links, no
+multi-token leads — so the repair strips the bold emphasis, leaves or adds the
+backticks, and changes no claim any note makes.
 
 The repair set is **derived by running delta 4's gate**, never transcribed from
 this paragraph into the fix; the figures above are dated evidence that the repair
@@ -110,13 +139,19 @@ drift — "but still link/command-resolved": the mechanically-held elements of a
 post are repaired when they break, which is why a rotted link in a shipped note
 is fixed rather than preserved.
 
-A Tightened-gates lead token is a third mechanically-held element. docs/install.md
-declares the section machine-readable — a mechanical consumer reads these lead
-tokens as the release's allowed-red set — so a section that is *not*
-machine-readable is a **defect in the shipped artifact**, not a record of what
-was said. Delta 5 is repair in the class the rule already admits, and
-§Page-authoring rules gains the lead token as its third named member so the next
-reader does not have to re-derive this.
+A Tightened-gates lead token is such an element. docs/install.md declares the
+section machine-readable — a mechanical consumer reads these lead tokens as the
+release's allowed-red set — so a section that is *not* machine-readable is a
+**defect in the shipped artifact**, not a record of what was said. Delta 5 is
+repair in the class the rule already admits.
+
+**The governance sentence is deliberately not amended.** Widening
+§Page-authoring rules to name machine-read elements generally was offered and
+declined, so the carve-out stays stated as it is and this reading stays local to
+this amendment. The consequence is recorded honestly: the tension between
+docs/install.md declaring the section machine-readable and
+docs/site-architecture.md calling the posts immutable remains unrecorded on
+either governed surface, and is filed rather than resolved here.
 
 **Ruled out: widening the parser to strip bold.** It leaves the corpus untouched,
 which is its whole appeal, and it fails on two counts. It blesses four spellings
@@ -149,17 +184,20 @@ unit's deliverable outright.
 
 ## Existing sections updated
 
-- **docs/install.md §The upgrade contract** — the Behavior-changes bolding clause
-  and the canonical spelling for all three sections (delta 1); the
-  Tightened-gates paragraph gaining the trichotomy (delta 2); the new gate named
-  where the section's mechanical character is claimed (delta 4).
+- **docs/install.md §The upgrade contract** — the Tightened-gates paragraph gains
+  the canonical spelling (delta 1) and the trichotomy (delta 2), and names the new
+  gate where the section's mechanical character is claimed (delta 4); the
+  Behavior-changes paragraph loses its cross-section uniformity clause without
+  gaining a spelling rule of its own (delta 1).
 - **gate-sdk/SPEC.md §upgrade-smoke** — the sentence describing the note as
   "parsed for the bullet lead tokens docs/install.md owns" gains the helper and
   the refusal (deltas 2-3).
-- **gate-sdk/SPEC.md, the `lib/` roster** — the new helper's contract (delta 3).
-- **docs/site-architecture.md §Page-authoring rules** — the lead token as the
-  third mechanically-held member of the post-repair class (the immutability
-  ruling).
+- **gate-sdk/SPEC.md, the `lib/` roster** — the new helper's contract, including
+  its two container arms over one token predicate (delta 3).
+- **docs/site-architecture.md §Page-authoring rules — deliberately unchanged.**
+  Widening its immutability carve-out was offered and declined; the repair
+  proceeds on the rule as written. Named here so a build session does not amend
+  the governance surface on this amendment's authority.
 - **`scripts/gates.list`** and the generated projections the new gate moves —
   each freshness gate names its own regen command on red, and the fan-out is
   owned by docs/site-architecture.md §Generated projections and their freshness

@@ -2,8 +2,8 @@
 
 The standing pre-release assertion — `bin/upgrade-smoke.sh` at its `TO=HEAD`
 default — is satisfiable today only by an iteration that tightens nothing. This
-amendment makes the allowed-red declaration resolvable at an untagged `TO`, so
-the assertion proves containment rather than emptiness.
+amendment gives an untagged `TO` a declaration to be contained by, so the
+assertion proves containment rather than emptiness.
 
 The premise this rests on, and the reason the unit is feature-shaped: the present
 behavior is **specified, not accidental**. The script's `# spec:` line at the
@@ -12,102 +12,118 @@ unreleased `TO` resolves no version, so no note, so the red set must be empty. A
 fix cannot converge the script onto a contract that already says otherwise; it
 revises the contract, which is what earns the amendment.
 
+**A script-only fix is a no-op, not a relocation.** Both resolution rules the
+queue entry floated fail in the normal flow, and for the same reason: at the
+moment validate runs, no artifact on disk names the gate this iteration
+tightened. Reading the highest note above the baseline finds the *previous*
+release's Tightened-gates set, which cannot contain a gate tightened since;
+keying off the derived bump looks for a note that does not exist yet. The refusal
+fires either way. The entry's framing was misled by `pre-adoption-grammar-break`,
+where the note *was* on disk at validate — but only under a one-off ruling to
+author it early, not because any contract required it. That one-off is itself the
+evidence that the missing piece is a **producer**, and that assigning it belongs
+in the contract rather than in a session's judgment.
+
 ## What changes
 
-### Delta 1 — the declaration is a property of the TO tree, resolved over a version window {design-bearing}
+### Delta 1 — a declaration surface, written during the iteration {design-bearing}
 
-`TO`'s version is resolved from a tag pointing at `TO`. Every commit before the
-iteration's final one is untagged, so the resolution yields nothing and the
-declaration is empty for the whole iteration. Replace the key, not the artifact:
-the note already lives in the extracted `TO` tree and is already committed before
-the tag — only the way `TO` is matched to it changes.
+The gap is that the allowed-red set has no home between the moment a gate is
+tightened and the moment a release note is composed. Add one:
+`<workflow-dir>/tightened-gates.txt`, a **tracked checked projection** of the
+workflow directory (gate-sdk/SPEC.md §The workflow directory).
 
-The new resolution, at the same step:
+The extension is determined rather than chosen — a record file with a stated line
+grammar that a tool parses field-wise is `.txt` by that section's extension rule.
+Its first line is the `# contract: ` pointer header the tracked tier requires,
+naming this amendment's merged home and the line grammar. Data lines are **one
+bare gate name each**, and nothing else: no markup, no prose, no ordering
+significance.
 
-1. **`fromver`** — the version `FROM` stands at: the newest `v*` tag reachable
-   from `FROM`. `FROM` is a knob, so it need not itself be a tag; what the window
-   needs is the version already released at the baseline. A `FROM` from which no
-   `v*` tag is reachable is exit 2 — an unversioned baseline opens no window, and
-   guessing one would license reds against nothing.
-2. **`TO` tagged** — unchanged. The version is the `v*` tag pointing at `TO`, and
-   the note is the `TO`-tree post whose `release:` key names it.
-3. **`TO` untagged** — the **pending note**: the `TO`-tree post under
-   `docs/posts/` whose `release:` version is strictly greater than `fromver`.
-   - Exactly one such note — it is the declaration, read exactly as a tagged
-     `TO`'s note is read.
-   - None — the declaration is empty and the red set must be empty. This is
-     today's rule, kept, but as the narrow case rather than the universal one:
-     an iteration that reddened a gate and declared nothing has declared nothing.
-     The refusal at that branch names the missing pending note as the remedy
-     instead of only reporting that no note was found.
-   - More than one — exit 1. Two unreleased notes above the baseline is a tree
-     the upgrade contract does not describe, and silently picking one would
-     choose which declaration governs without saying so.
+The file always exists, header-only when the declared set is empty, so "absent"
+is never a state the reader has to interpret.
 
-The version comparison orders `release:` keys the way `check-release-bump`
-already orders this same corpus; the window is `(fromver, ∞)`, open at the
-baseline so a note at `fromver` — the release already reconciled at `FROM` —
-can never license a red at `TO`. That exclusion is the load-bearing half of the
-window: without it, an iteration that tightens a gate while authoring no note
-would inherit `FROM`'s own declaration and mask exactly the reds the assertion
-exists to catch.
+**No new knob.** The path derives from the existing `GATE_SDK_WORKFLOW_DIR`, the
+way `GATE_SDK_GRAPH_ARTIFACT` derives its default. A knob naming this file would
+add a way to configure the assertion away without adding a way to satisfy it
+honestly.
 
-### Delta 2 — the note-authoring step moves ahead of validate for a tightening iteration {design-bearing}
+### Delta 2 — the smoke resolves an untagged TO from the declaration surface {design-bearing}
 
-This is the causal consequence, and it is why the delta cannot stop at the
-script. The declaration's producer is the release session (RELEASING.md §The
-procedure step 1) and its consumer is the `upgrade` validate suite, which runs
-**earlier in the same iteration**. Under delta 1 the producer must be reachable
-before the consumer, so step 1's "in-iteration" qualifier tightens into a stated
-ordering: an iteration that tightens a gate authors the note's Tightened-gates
-section before validate, or its `upgrade` suite is honestly red until it does.
+The `TO`-tagged arm is unchanged: the version is the `v*` tag pointing at `TO`,
+and the note is the `TO`-tree post whose `release:` key names it.
 
-An iteration that tightens nothing is untouched — no pending note, an empty
-declaration, an empty red set, green. The ordering binds exactly the iterations
-that owe a declaration.
+The untagged arm stops asking a tag what version `TO` is and reads the
+declaration surface out of the `TO` tree instead. The declared set is the file's
+data lines; an empty set means the red set must be empty, which is today's rule
+kept as the narrow case rather than the universal one.
 
-**Which stage performs it is the open half, and it is a lifecycle contract
-question rather than a mechanism one.** Three answers, with the recommendation
-stated so build does not pick one by default:
+A data line that is not a bare gate-name token is a **fail, exit 1** — not exit
+2. gate-sdk/SPEC.md §upgrade-smoke already states the convention this follows: a
+missing or unparseable declaration while reds exist is a fail, and
+usage/environment failure is exit 2. A malformed declaration is a contract
+violation, not a broken environment.
 
-- **The build stage authors the Tightened-gates section as it lands the
-  tightening** — recommended. Build is the only stage that knows what it
-  tightened at the moment it tightens it, so the declaration is written from
-  knowledge rather than reconstructed from a red. The note already exists as a
-  committed in-iteration artifact, so this moves *when* one section is filled,
-  not what the artifact is.
-- The validate stage authors it when the smoke reds. Reactive, and it makes the
-  assertion its own trigger — the gate tells you what to declare, which is the
-  shape that turns a proof into a formality.
-- Accept a held-red `upgrade` row for the window and author at close as today.
-  This reintroduces the enforcement suspension this unit exists to end, and is
-  recorded only so it is visibly rejected rather than silently available.
+### Delta 3 — the producer: build appends, close composes and drains {design-bearing}
 
-Under the recommendation, two surfaces state a residency that stops being true
-for a tightening iteration and are updated with it: RELEASING.md step 1's
-close-stage framing, and CLAUDE.md §Housekeeping's claim that the release
-runbook is resident only at close's release step. A build session that must fill
-one section of the note loads that step, so the load-trigger widens from one
-stage to two — narrowly, and only for an iteration that tightens.
+**Build appends.** The build stage that tightens a gate appends its name to the
+declaration surface in the same unit that lands the tightening. Build is the only
+stage that knows what it tightened at the moment it tightens it, so the
+declaration is written from knowledge rather than reconstructed from a red — and
+validate discovering the set from the gate that was supposed to check it is
+exactly the shape that makes an assertion its own trigger.
+`lifecycle-kit/templates/stages/build.md` gains that step.
 
-### Delta 3 — the two statements of the old contract are revised {design-bearing}
+**Close composes and drains.** RELEASING.md §The procedure step 1 already authors
+the note at close; its Tightened-gates section is now *composed from* the
+declaration surface rather than recalled. The surface is drained when the tag is
+pushed (step 4) and only then — an iteration closing on `release none` or a
+deferral carries its declarations forward, which is exactly what the next
+release's note must inherit.
+
+**Why the producer appends rather than authors.** Tightened gates is a
+**release-level aggregate**, not an iteration-level one. Several internal
+iterations batching into one external release is a shape this repo already wants,
+and under it a build stage that authored note prose directly would be writing
+into an artifact that does not exist yet and whose version it cannot know. A
+build stage that appends a name to an accumulating surface, composed once at the
+release boundary, is correct under batching and degenerates gracefully to the
+one-iteration-one-release case. The two shapes are indistinguishable today and
+diverge exactly when batching arrives, which is why the aggregate shape is chosen
+now rather than migrated to later.
+
+**This deliberately does not widen the release runbook's load-trigger
+residency.** Build writes a `.workflow/` record; it does not load RELEASING.md,
+which stays resident only at close's release step. CLAUDE.md §Housekeeping's
+statement to that effect stays true, and keeping it true is a constraint this
+design was shaped against rather than a side effect of it. The repo already runs
+this producer/consumer shape twice — `.workflow/release-disposition.txt` and the
+lesson-evidence file — so the pattern is attested rather than invented here.
+
+**Honest limit, stated because it is not gated.** The composed note and the
+declaration surface can disagree: close transcribes one into the other and drains
+by hand, and nothing asserts the note's Tightened-gates set equals the surface it
+was composed from. Review holds that agreement. It is mechanizable, and it is
+filed rather than built here because closing it is a unit rather than a line.
+
+### Delta 4 — the two statements of the old contract are revised {design-bearing}
 
 gate-sdk/SPEC.md §upgrade-smoke's untagged-`TO` sentence and its
 producers-and-consumers paragraph, and the script's `# spec:` line at the
-declaration-resolve step. Both currently assert the empty-declaration rule as
-the contract; both state the window instead. Leaving either is the defect this
-unit was filed for, one surface over.
+declaration-resolve step. Both currently assert the empty-declaration rule as the
+contract; both state the two-arm resolution instead. Leaving either is the defect
+this unit was filed for, one surface over.
 
-### Delta 4 — docs/install.md states that the declaration is a working-tree artifact {design-bearing}
+### Delta 5 — docs/install.md states that a declaration precedes its release {design-bearing}
 
 §The upgrade contract describes the note as the thing a release ships. Under
-delta 1 a consumer running the smoke against their checkwright clone at an
-untagged `TO` resolves the **pending** note, so the declaration is owed from the
-moment a gate tightens rather than from the tag. One sentence, in the
+delta 2 a consumer running the smoke against their checkwright clone at an
+untagged `TO` reads the declaration surface, so an allowed-red set is owed from
+the moment a gate tightens rather than from the tag. One sentence, in the
 Tightened-gates paragraph that already names the section as the mechanical
 allowed-red set.
 
-### Delta 5 — the `upgrade` validate baseline row is promoted {mechanical}
+### Delta 6 — the `upgrade` validate baseline row is promoted {mechanical}
 
 `.workflow/validate-baseline.txt` holds `upgrade` at `fail` against this slug.
 The hold ends when this lands, and the row goes to `pass` with the slug dropped.
@@ -115,62 +131,61 @@ The hold ends when this lands, and the row goes to `pass` with the slug dropped.
 Two traps the queue entry recorded, both binding here. **Do not promote the row
 on a post-tag green**: immediately after a tag, `TO` is momentarily a tagged
 `HEAD` and the smoke runs clean for that reason alone; the next commit restores
-the defect. **Do not read a green as proof the window works**: this iteration
-may tighten no existing gate, in which case the red set is empty and the window
-is never exercised live. The exercise is delta 1's own argument and the smoke's
-assertion messages, not a green run.
+the defect. **Do not read a green as proof the mechanism works**: this iteration
+may tighten no existing gate, in which case the declared set and the red set are
+both empty and the untagged arm is never exercised against a non-empty set. That
+exercise belongs to the argument above and to the smoke's own assertion messages,
+not to a green run.
 
 ## Producers and consumers
 
-- **`fromver`** — produced at the resolve step from `GATE_SDK_UPGRADE_FROM`
-  (default: the source repo's newest `v*` tag, already emitted by the script, so
-  the zero-config run resolves it). Consumed only by the window predicate, in
-  the same script, at the same step. It crosses no process boundary and is not a
-  new interface; it is a local derivation named here because the window's
-  correctness depends on which version it stands for.
-- **The pending note** — produced by the release session as a committed
-  `docs/posts/` post in the `TO` tree (RELEASING.md §The procedure step 1).
-  Consumed by the smoke's declaration parse and by the human upgrader reading the
-  site. The producer is reachable rather than test-only: notes are authored and
-  committed before the tag today, so delta 2 changes only the producer's ordering
-  relative to this consumer, not whether it runs.
-- **The ambiguity refusal** — produced at the resolve step when the window holds
-  more than one note; consumed by the operator through exit 1 and the assertion
-  message naming each candidate. It is the only new failure mode, and its reader
-  is the operator, at the resolve transition.
-- **No new field, no new knob.** The knob roster in §upgrade-smoke
-  (`GATE_SDK_UPGRADE_REPO` / `_FROM` / `_TO`, and `GATE_SDK_TMP_DIR` for scratch)
-  is unchanged, so that list takes no delta. The resolution is derived entirely
-  from refs the script already holds — which is the point: a knob here would let
-  a consumer configure away the assertion.
+- **The declaration surface** — produced by the build stage of an iteration that
+  tightens a gate (delta 3), appending one gate name per line;
+  `lifecycle-kit/templates/stages/build.md` is the step that makes the producer
+  reachable rather than aspirational. Consumed at two named transitions: by
+  `bin/upgrade-smoke.sh` at its declaration-resolve step on the untagged arm, and
+  by close's release step (RELEASING.md step 1) when it composes the note's
+  Tightened-gates section. Drained by close at the tag (step 4).
+- **Each data line** — a gate name, read by both consumers above. There is no
+  second field, deliberately: a rationale column would be a field the smoke never
+  reads and the note's bullet prose already owns.
+- **The header line** — produced by whoever creates the file; consumed by
+  `check-workflow-tiering` (the tracked tier's header requirement) and by
+  `check-spec-pointer` (its pointer payload must resolve).
+- **The composed note** — produced by close, consumed by the smoke's tagged arm
+  and by the human upgrader reading the site. Unchanged as an artifact; only its
+  Tightened-gates section's *source* changes.
+- **No new knob.** The knob roster in §upgrade-smoke (`GATE_SDK_UPGRADE_REPO` /
+  `_FROM` / `_TO`, and `GATE_SDK_TMP_DIR` for scratch) is unchanged, and the
+  declaration path derives from `GATE_SDK_WORKFLOW_DIR` (delta 1).
 
-**Seam.** Everything in this amendment is generic mechanism: a version window
-over a directory of dated notes. The `docs/posts/` literal the script already
-carries is unchanged and stays a kit literal — it names a layout convention
-site-kit's own defaults reference, not private rule content, and no vocabulary
-crosses. No consumer config is created, and none is owed.
+**Seam.** The mechanism is generic — a tracked record file of names, read by a
+tool that already reads the consumer's tree. The gate names in it are consumer
+content, supplied by the consumer's own build sessions, and the path derives from
+a knob the consumer already sets. Nothing private crosses, and no kit literal
+carries a consumer's roster.
 
 ## Existing sections updated
 
 - **gate-sdk/SPEC.md §upgrade-smoke** — the untagged-`TO` sentence and the
-  producers-and-consumers paragraph (delta 3); the knob roster is explicitly
-  unchanged (delta 1's producers-and-consumers note above).
+  producers-and-consumers paragraph (delta 4); the two-arm resolution and the
+  exit-1 convention for a malformed declaration (delta 2).
+- **gate-sdk/SPEC.md §The workflow directory** — the new tracked member joins the
+  checked-projection tier (delta 1).
 - **docs/install.md §The upgrade contract** — the Tightened-gates paragraph
-  (delta 4).
-- **RELEASING.md §The procedure step 1** — the authoring-before-validate
-  ordering and its close-stage framing (delta 2).
-- **CLAUDE.md §Housekeeping** — the release runbook's load-trigger residency,
-  which delta 2 widens from close's release step alone to also the build stage of
-  an iteration that tightens a gate. Named because a load-trigger claim that has
-  quietly stopped being true is the failure mode the always-loaded tier is most
-  exposed to.
-- **lifecycle-kit's build-stage template** — the stage-assignment half of delta 2,
-  if the recommendation stands. This is the one delta that reaches a stage
-  contract rather than a mechanism, and it is flagged for the lead rather than
-  assumed.
+  (delta 5).
+- **RELEASING.md §The procedure** — step 1's Tightened-gates section composed
+  from the declaration surface, and step 4's drain at the tag (delta 3). The
+  runbook's residency is unchanged, and that is deliberate.
+- **`lifecycle-kit/templates/stages/build.md`** — the append step (delta 3).
 - **`gate-sdk/bin/upgrade-smoke.sh`** — the `# spec:` line at the
-  declaration-resolve step (delta 3), alongside the resolution itself (delta 1).
-- **`.workflow/validate-baseline.txt`** — the `upgrade` row (delta 5).
+  declaration-resolve step (delta 4), alongside the resolution itself (delta 2).
+- **`.workflow/validate-baseline.txt`** — the `upgrade` row (delta 6).
+- **CLAUDE.md §Housekeeping — deliberately unchanged.** Its statement that the
+  release runbook is resident only at close's release step stays true under delta
+  3. Named here so a build session does not reach for it on the assumption that
+  moving the producer must move the runbook; if a build session finds a design in
+  which it must, that is an escalation rather than an edit.
 
 ## Definition of Done
 
