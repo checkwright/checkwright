@@ -1853,17 +1853,17 @@ designed against — reds. Over each `run:` body in the job:
 - **Logical lines.** Backslash continuations are joined before matching, so a
   call split across lines is one unit and its `--repo` is found wherever on the
   call it sits. A detected call's `--repo` is looked for only within that call's
-  own extent, which ends at the next `;` / `|` / `&`, so a second call on the
-  same logical line cannot lend the first one its flag.
-- **Command position.** A `gh` token counts when it is a whole word at the start
-  of a logical line, or immediately after a command separator or opener
-  (`|` `||` `&&` `;` `&` `(` `` ` `` `$(` `!` `{`), or after a
-  command-introducing keyword (`then`, `else`, `do`, `elif`). Whole-word matching
-  keeps `ghost` and `gh-pages` out. **`!` and `{` and the keywords are a
-  calibration the in-tree corpus forced**, not decoration: `publish.yml`'s
-  release job opens with `if ! gh release view`, and without `!` the gate would
-  take a later call as the job's *first* invocation and run the checkout arm's
-  ordering comparison against the wrong line.
+  own extent, so a second call on the same logical line cannot lend the first one
+  its flag.
+- **Command position.** A `gh` token counts only where a shell would read it as a
+  command: opening a logical line, or following a command separator, an opener, or
+  a command-introducing keyword. Whole-word matching keeps `ghost` and `gh-pages`
+  out. The check owns the roster of separators, openers, and keywords, and
+  **that roster is a calibration the in-tree corpus forced**, not decoration:
+  `publish.yml`'s release job opens with `if ! gh release view`, and without the
+  negation among the openers the gate would take a later call as the job's *first*
+  invocation and run the checkout arm's ordering comparison against the wrong
+  line.
 - **Comment lines.** A logical line whose first non-blank character is `#` is not
   a command line — a leading `#` in shell is always a comment. A trailing `#`
   comment is left in place, which over-detects and is the safe direction.
@@ -1927,11 +1927,10 @@ unexplained exemption is the failure mode the gate exists for; whether the
 siblings should follow is not this section's question.
 
 **The walk is this gate's own, and §check-action-run-shell's extractor is not
-reusable here.** That extractor has no theory of `jobs:` at all — it tracks step
-column and block scalars per *file*, emits records carrying a block number and a
-start line but no job identity, extracts neither `uses:` nor `env:` lines, and
-rewrites `${{ … }}` before emitting. This gate needs a job-partitioned walk
-carrying all three, so it is **not** the second consumer that section's standing
+reusable here.** That extractor has no theory of `jobs:` at all: it partitions by
+*file*, and what it emits carries no job identity and none of the `uses:` or
+`env:` lines the arms read. This gate needs a job-partitioned walk carrying all
+three, so it is **not** the second consumer that section's standing
 rule waits for: its "a helper earns its place at a second consumer and there is
 none", and the matching `# spec:` comment at the extractor itself, stay true.
 Stated because the opposite reading is the natural one, and because
@@ -1941,10 +1940,10 @@ the difference in what is being extracted decides it.
 Tier `precommit`; the `# graph:` couples the surfaces §check-action-pinning
 couples, `dir=one` — a one-way audit. A tree holding no YAML, or no job invoking
 `gh`, exits clean on a zero count, the counted inertness that makes this kit
-mechanism rather than a consumer gate. The `bad/` fixture is the attested miss
-itself — the `v0.17.0` release job as it shipped, with `contents: write`, a
-download-artifact step, no checkout, `GH_TOKEN` and `TAG` set and `GH_REPO`
-absent — so §When a gate earns its place's demand that a higher-false-positive
+mechanism rather than a consumer gate. The `bad/` fixture opens on the attested
+miss itself — the `v0.17.0` release job as it shipped — and carries further
+reject jobs for the arms that one does not exercise, so §When a gate earns its
+place's demand that a higher-false-positive
 gate wait for a real miss is met by a fixture that *is* the miss rather than an
 invention of one.
 
