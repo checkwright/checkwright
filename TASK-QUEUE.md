@@ -1881,6 +1881,99 @@
   ruled **task**-shaped rather than lesson-shaped: the deliverable and its
   done-state are both nameable now, which is the litmus.
 
+- **release-tag-oracle-ordering** [design-pending] — `RELEASING.md` never says
+  when master is pushed relative to step 4's tag, and the natural reading tags a
+  commit the remote oracle never verified. Step 4 says tag the iteration's final
+  commit; that final commit is the one step 4 itself creates, because the drain
+  and the disposition stamp are both tree writes. So the sequence a session
+  composes from the runbook is: push what exists, watch `gates` green, *then*
+  write the drain commit, tag it, push the tag — and the tag lands on a tree only
+  the local battery ever saw.
+  **Verified live at this release, and worked around rather than hit.** The
+  `v0.19.0` close caught it while writing the plan down, and pushed twice:
+  `fbc88cf` watched green, then the drain commit `bc0c215` pushed and watched
+  green before the tag was applied to it. Both runs passed, so the hole cost
+  nothing this time. It is filed because the workaround was one session's
+  judgment and nothing in the runbook asks for it.
+  **Why it outranks a tidy-up.** `CLAUDE.md` makes the remote oracle the
+  authority over a master push, and a tag's whole purpose is to name an immutable
+  tree other people fetch. A tag on a locally-verified-only commit inverts that
+  authority, and it is invisible: every gate is green either way, and the only
+  tell is which SHA the `gates` run carries.
+  **Deliverable:** state the ordering in step 4 — drain-and-stamp commit first,
+  push master, watch the `gates` run *for that SHA* green, then tag and push the
+  tag. Stated, it is one push and one watch rather than the two this release
+  spent.
+  **Why `[design-pending]`:** whether prose alone suffices or a check is owed is
+  the open call. It is mechanically decidable — "does this tag's commit have a
+  successful `gates` run" is one API query — but it needs the network, which no
+  gate in this battery makes, so it cannot be a battery gate as things stand.
+  **Cost while deferred:** every release re-derives the ordering, and the failure
+  mode is silent — a tag ships on a tree the remote never validated, and nothing
+  afterward says so.
+  Debt: an ordering stated in an existing runbook step, optionally a check.
+  Filed 2026-07-31 at close, from running the release end to end.
+
+- **release-body-host-side-unverified** [design-pending] — the GitHub Release
+  body is a required step nothing can catch when it is skipped, and it has
+  already been skipped once. `RELEASING.md` step 6 says the body points at the
+  post, and says outright that the body "lives on the host, out of the battery's
+  reach". That honesty is precisely the gap: the step is real, its output is
+  public and effectively permanent, and its omission leaves no residue in the
+  tree for any gate to find.
+  **Verified at this close by querying, not by memory.** `v0.16.0` and `v0.17.0`
+  each carry the one-line pointer to their note; `v0.18.0`'s body is **empty**,
+  zero characters — so the immediately preceding release shipped a permanent
+  public artifact with no route to its own release note. Deliberately not fixed
+  here: retro-editing a shipped Release is a judgment about a published artifact
+  and the operator owns it. It is one `gh release edit` if wanted.
+  **Deliverable:** a check that every tag carrying a release note has a Release
+  whose body resolves that note's URL. Both halves are queryable — the tag list
+  and the Release body over the API, the note's existence from the tree.
+  **Why `[design-pending]`:** it cannot be a battery gate. Every gate here is
+  hermetic and reads the tree; this one needs the network and an authenticated
+  client, and it fails differently when the token is wrong — see
+  `release-credential-precondition-scope-vs-permission`, filed from the same
+  release. Whether it belongs in the `site-health` workflow, which already makes
+  network calls, or as a close-stage affordance, is the open call.
+  **Cost while deferred:** one release in four has already lost its pointer, and
+  the loss is reader-facing — someone arriving from the tag list gets a tarball
+  and no account of what changed.
+  Debt: a check over an existing host-side artifact; adds no governed name.
+  Filed 2026-07-31 at close, on evidence found while performing step 6.
+
+- **release-credential-precondition-scope-vs-permission** [design-pending] —
+  `RELEASING.md` step 4's credential precondition tests the wrong property. It
+  says the closing session runs steps 4-7 when it holds the credentials, "an
+  authenticated `gh` login carrying `repo` scope and a working `git push`,
+  confirmed with `gh auth status`". Both halves held at this release and step 6
+  still failed: `gh auth status` reports a token's **scopes**, and a scope is a
+  ceiling on what a token may attempt, never a grant of what the account may do
+  on a given repository.
+  **Verified live.** The active account carried `repo` scope, and `git push`
+  worked — over SSH, which uses a key and never consults the `gh` token at all,
+  so that half of the precondition proves nothing about API writes.
+  `gh api repos/<owner>/<repo>` reported `push: false, admin: false` for the same
+  account, and `gh release edit` returned **HTTP 404**, which reads as "no such
+  release" rather than "not permitted": GitHub masks an unauthorized write as an
+  absent resource. Completed by switching to the second authenticated account,
+  whose repository permissions include `push`.
+  **Deliverable:** state a precondition that tests the property actually needed —
+  the repository's own `permissions.push` for the active account — and record
+  that a 404 on a write is the permission signature rather than a missing object,
+  since that is the part a session will otherwise mis-diagnose under time
+  pressure with a tag already public.
+  **Why `[design-pending]`:** whether the runbook states a better manual check or
+  ships an affordance that runs it is the open call, and it interacts with
+  `release-body-host-side-unverified`, which needs the same authenticated client.
+  **Cost while deferred:** step 4 branches for the session that *cannot* do this
+  (the keyless sandbox), but has no branch for the session that believes it can
+  and is wrong — which is the case that actually occurred. It fails mid-release,
+  after the tag is already public.
+  Debt: one precondition restated in an existing runbook step, adding no
+  governed name of its own.
+  Filed 2026-07-31 at close, from a 404 hit while performing step 6.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
