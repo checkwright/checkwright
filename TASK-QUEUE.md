@@ -1704,6 +1704,82 @@
   ground that filing it there would compound the defect it names; drained by close
   in the same pass as the inbox.
 
+- **npm-publish-approval-posture-unrecorded** [design-pending] — the
+  `npm-publish` environment's two weakening settings are written down nowhere,
+  so the actual strength of the control `RELEASING.md` step 5 names is knowable
+  only by querying the repo. Live config: one required reviewer, who is also the
+  account that pushes release tags; `prevent_self_review: false`;
+  `can_admins_bypass: true`; no deployment branch policy.
+  **This entry is the narrowed residue of a filed claim that is false, and the
+  correction is the point.** Close filed the `v0.18.0` publish as having run "in
+  12s with no approval requested" — the approval environment failing to gate an
+  irreversible public publish. It gated. The `npm` job declares
+  `environment: npm-publish` at job level; that run's deployment sat `waiting`
+  for 77 seconds before `queued`; the run's approvals API records one `approved`
+  entry whose user id matches the triggering actor; and the operator confirms
+  they approved it. The "12s" was the job's post-approval runtime, not the wall
+  clock from the tag push. `can_admins_bypass` did not fire — a bypass leaves no
+  approval entry, and one exists. **Step 5's wording is accurate as written:**
+  it claims a hold, never independent review, so the overclaim reading that
+  motivated the filing does not survive either.
+  **What survives verification, and only this.** (i) `can_admins_bypass: true`
+  leaves a standing path on which the stated hold would not hold. It is
+  available to the same single account either way, so its real cost is not an
+  unauthorized publish but a publish landing with **no approval record** — and
+  that record is the entire output of the control for a solo operator.
+  (ii) Neither setting's posture is recorded, so a reader cannot tell deliberate
+  from accidental, and a well-meant hardening pass setting
+  `prevent_self_review: true` would **deadlock the channel**: the project is
+  single-maintainer by standing ruling, so no second reviewer exists to approve
+  a release.
+  **Why `[design-pending]`:** what a solo-operator approval environment is *for*
+  is the ruling — a confirmation step producing an audit record, rather than
+  independent review — and that ruling decides both whether `can_admins_bypass`
+  should be flipped and what the private ops runbook's desired state should say.
+  Settling it first is the difference between recording a posture and inventing
+  an overclaim, which is how this entry came to be filed wrong the first time.
+  **Cost while deferred:** low and non-rotting. The control works today; the
+  residue is an unrecorded posture on a pre-launch supply-chain surface, plus
+  one bypass path that has never fired.
+  Debt: records deliberate repo-settings desired state; adds no governed name.
+  Filed 2026-07-31 by close after the `v0.18.0` release, on a premise the
+  operator contradicted at the source; re-verified against the run and narrowed
+  to this residue at the next scope entry.
+
+- **always-loaded-regen-block-residency** [design-pending] — `CLAUDE.md`'s
+  generated-hook paragraph carries two regeneration commands in the
+  always-loaded tier, and the stated reason for leaving them there does not
+  survive checking. Close's brevity pass trimmed only the enforcement-map half,
+  on the ground that `check-enforcement-fresh` prints its regen command on red
+  while `check-graph` does not.
+  **That premise is false — verified at this scope, do not re-derive it.**
+  `check-graph` prints **both** commands verbatim on exactly the reds where
+  regenerating is the remedy: its hook-freshness assertion emits `regenerate:
+  bash gate-sdk/bin/gen-pre-commit.sh --write` for a missing or stale hook, and
+  its artifact assertion emits `regenerate: bash gate-sdk/checks/check-graph.sh
+  --emit > <artifact>` for a missing or stale graph artifact — each with the
+  *resolved* knob path rather than a literal, which is strictly better than
+  `check-enforcement-fresh`'s single hardcoded help line. What `check-graph`
+  omits them from is its generic `help:` footer, which covers manifest and
+  parity reds where regeneration is not the remedy at all. So no echo line is
+  missing and no gate change is owed.
+  **The residual question, and why it is still a unit.** The always-loaded block
+  is a *forward* instruction — never hand-edit the generated hook; edit the
+  manifest and regenerate — read before any red, not a recovery line read after
+  one. Whether that earns always-loaded residency is the open call, and it is
+  load-trigger residency applied to a surface no gate settles: the recovery path
+  is already covered by the gate, so what remains resident is the prohibition
+  plus the workflow, and the honest outcome may be the prohibition alone with
+  the commands behind a load trigger.
+  **Cost while deferred:** low and non-rotting, but charged against a tier
+  trending the wrong way — the always-loaded KPI read 198 lines at this
+  boundary, +26 across the closing iteration — and the falsified premise above
+  was on course to be paid a second time by whoever picked the bullet up.
+  Debt: a residency ruling over existing prose; adds no governed name.
+  Filed 2026-07-31 by close as cheap-and-declined scope creep; promoted at the
+  next scope entry from the post-close gap inbox, its premise falsified against
+  `check-graph`'s source in the same pass.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
