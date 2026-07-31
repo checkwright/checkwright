@@ -5,3 +5,4 @@
 ---
 
 release-step-verification scope a6eb684d 2026-07-31
+release-step-verification spec a086ddad 2026-07-31
