@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+release-assertion-honesty release v0.19.0 — minor earned by docs/install.md §Versioning (Tightened gates and Behavior changes both non-empty in the dated note, no decommission), derived over v0.18.0 with no outstanding deferral to inherit; operator-authorized, Tightened gates composed from .workflow/tightened-gates.txt and parity-proven through the shipped parser before the drain, surface drained to its header here and the tag applied to this commit
