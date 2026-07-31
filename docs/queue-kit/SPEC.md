@@ -68,6 +68,25 @@ stable handle for its whole life: `[blocked-by:]` references it and the
 done-section line carries it verbatim. The slug grammar is kit mechanism, not
 config.
 
+**Section order sequences an iteration; it does not rank it.** The default
+`("New Features" "Technical Debt")` is read as selection order (§Layout and
+configuration), and the argument for it is not that features outrank debt:
+position starves nothing, because an active entry's residency is one iteration
+by the drain rule — the drain stage's entry requires the active sections empty
+(lifecycle-kit/SPEC.md §check-stage-entry) — so every promoted entry lands in
+the same iteration whichever section holds it. What ranks is the promoting
+stage's decision to put an entry in an active section at all; order within them
+is a sequencing default, the posture the roadmap projection already states
+outright for queue order generally (§bin/roadmap.sh).
+
+Features lead on the feature/debt asymmetry canon-kit owns (canon-kit/SPEC.md
+§The amendment lifecycle): a feature merges an amendment into the canonical
+spec, debt converges an implementation on the spec as it already stands.
+Reversed, a debt entry sharing an owner doc with a sibling amendment converges
+on text the same iteration is about to rewrite. It stays a default rather than
+a rule — the array is consumer config, and a consumer whose iterations do not
+mix the two kinds reorders it freely.
+
 ### The icebox tier
 
 The deferred pool has an intake asymmetry the delivery doctrine itself creates:
@@ -280,7 +299,8 @@ Knobs:
 - `QUEUE_KIT_QUEUE_FILE` — default `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}`;
   every gate also takes the file as `$1` (fixture capability).
 - `QUEUE_KIT_ACTIVE_SECTIONS` — array, default
-  `("New Features" "Technical Debt")`, order = selection order.
+  `("New Features" "Technical Debt")`, order = selection order (§The queue
+  format argues the default).
 - `QUEUE_KIT_DEFERRED_SECTION` / `QUEUE_KIT_DONE_SECTION` — defaults
   `Deferred` / `Done`.
 - `QUEUE_KIT_ICEBOX_SECTION` — default **empty**: no icebox tier at all, and no

@@ -14,25 +14,6 @@
 
 ## Technical Debt
 
-- **queue-selection-order-implicit** — `queue-kit/SPEC.md`
-  documents section order as selection order, so the default section sequence
-  silently makes `New Features` outrank `Technical Debt` in what scope picks
-  first. Unlike the spec-tag requirement that `CANON_KIT_FEATURE_SECTIONS`
-  places on `New Features` alone, which is principled and argued, this ordering
-  policy is embedded in section sequence with no stated argument anywhere.
-  Either state the argument or make selection order explicit rather than
-  positional. Surfaced while ruling on whether the two active sections should
-  collapse into one — they should not, but this rides along on their sequence.
-  Debt: latent policy with no owner doc.
-  **Rides `pre-adoption-grammar-break` as the rider, ruled 2026-07-29 at scope.**
-  Same owner doc as the iteration's size-cap and icebox work, so the argument
-  lands in a section the sibling amendments are already opening. If the
-  resolution mints an explicit ordering declaration rather than stating the
-  argument in prose, that is a governed name and the unit is misfiled here —
-  escalate rather than minting it from the debt lane.
-  Filed 2026-07-20 by lead while ruling on the active-section question;
-  promoted 2026-07-29 at scope as this iteration's rider.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
@@ -1242,5 +1223,6 @@
 - deferred-queue-carry-cost
 - templates-stages-taxonomy-realignment
 - queue-index-title-tag-residue
+- queue-selection-order-implicit
 
 ## Lessons Learned
