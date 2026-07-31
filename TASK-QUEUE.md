@@ -89,8 +89,11 @@
   that is near-free today (no external adopter) but prices in with the first one.
   **Both halves of that disposition were taken, ruled 2026-07-29 at scope.** This
   entry is the spine of `pre-adoption-grammar-break`: it lands before launch, and
-  `templates-stages-taxonomy-realignment` folds into the same major on the
-  operator's launch-timing ruling recorded there. It adds no capability, so the
+  `templates-stages-taxonomy-realignment` folds into the same release on the
+  operator's launch-timing ruling recorded there. **That release is a minor**,
+  ruled 2026-07-31 at spec: docs/install.md:349-351's pre-1.0 qualifier rides a
+  non-decommission break on a minor, and :338 files even a rename carrying a
+  deprecation path there. Neither unit removes a deprecated surface. It adds no capability, so the
   standing pre-launch prioritization bar never reached it and it runs under no
   exception — only the sibling `deferred-queue-carry-cost` does.
   **Sequencing:** the token migration and `deferred-queue-carry-cost`'s triage
@@ -131,13 +134,14 @@
   scope.** This entry rides `pre-adoption-grammar-break` beside
   `needs-spec-tag-rename`, which breaks the adoption path on the queue-grammar
   axis and which this entry's sibling text already nominated by slug as the
-  shared major. The deciding weight was **launch timing, not the cosmetic
+  shared release. The deciding weight was **launch timing, not the cosmetic
   payoff**: the declared preview channel (`preview-release-cadence`) is the next
   roadmap rung, and a taxonomy break landing *after* it makes adopters re-bind
   twice. Weighed and outranked: the churn objection — the rename crosses ~13 SPEC
   cross-references, the `.claude/commands/*.md` binding shims, and README, on a
   different surface than the queue-grammar break — which argues for two clean
-  majors and loses to the one-re-bind timing point.
+  releases and loses to the one-re-bind timing point. The shared release is a
+  **minor** on the versioning criteria cited in the sibling entry.
   **Filing class, triaged at scope: feature.** `templates/stages/` is a new
   directory convention on a published adoption path, and the litmus names a file
   or directory convention explicitly.

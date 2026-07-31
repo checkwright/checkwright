@@ -241,13 +241,26 @@ left to a grep.
   is **regenerated, never hand-edited** — `check-docs-mirror-fresh` byte-compares
   it and fails loudly.
 
-### 10. Release-note declaration — *mechanical*
+### 10. Release-note declaration — the only compat obligation — *mechanical*
 
 The token is a governed grammar name a vendored consumer's queue carries, so the
-release note declares it under **Renamed knobs** as `[needs-spec] → [design-pending]`,
-per the note structure docs/install.md owns. This is a breaking-but-not-
-decommissioning change; §Ruled out records why it takes no deprecation window,
-and that ruling is the escalated one.
+release note declares it under **Renamed knobs** as
+`[needs-spec] → [design-pending]`, per the three-section note structure
+docs/install.md owns.
+
+With no deprecation window owed (§Ruled out), **the note is the entire compat
+obligation this rename carries** — which raises its weight rather than lowering
+it. It is the only artifact that will tell a consumer their queue's tags must be
+rewritten, and nothing mechanical will tell them: the migration happens in the
+consumer's tree, which `upgrade-smoke`'s phase A never touches.
+
+The release class is a **minor**. docs/install.md:349-351's pre-1.0 qualifier
+rides a non-decommission break on a minor while the line is 0.x, and :341-345
+reserves major for a decommission — a release that *removes* a deprecated
+surface, which this is not. :338 files even a knob rename *carrying* a
+deprecation path under Minor, so there is no reading on which a rename with no
+window earns more. `check-release-bump` independently floors the note off a
+patch on the Renamed-knobs section alone.
 
 ## Producers and consumers
 
@@ -312,21 +325,32 @@ session that never files.
 - **Narrowing the tag to feature-only.** Delta 2 — it costs the totality that
   makes forbidden-in-active a complete check.
 - **`[triage-pending]` and `[unscoped]`.** Delta 1.
-- **A deprecation window or compat shim for the old token.** *This ruling is
-  escalated to the lead and is not settled here.* The mechanical facts: the tree
-  has **no** alias, shim, or dual-resolution convention; the one deprecation gate
+- **A deprecation window or compat shim for the old token.** Ruled 2026-07-31 at
+  spec: **no window is owed, because no clause reaches this rename.**
+  lifecycle-kit/SPEC.md:239-244 is the nearest-looking rule and it does not
+  apply — it is headed *"Knob-rename compat precedent"*, sits inside §Layout and
+  configuration immediately above the `LIFECYCLE_KIT_*` roster it governs, and is
+  cited nowhere else in the tree. Its second sentence's bare "a rename" is loose
+  drafting inside a knob-scoped clause, not a wider grant. This unit renames a
+  queue-tag token, not a knob. **This is a scoping finding, not an exception
+  taken** — nothing is waived, and a later reader should not re-litigate it as
+  one.
+
+  The mechanical facts are recorded because they would have blocked compliance
+  even had the clause reached: the tree has **no** alias, shim, or
+  dual-resolution convention anywhere, and the one deprecation gate
   (`check-deprecation-task`) binds `task: <slug>` markers on a *source-comment*
-  surface via `CANON_KIT_DEPRECATION_MARKERS`, a roster this repo does not set —
-  so it structurally does not reach a queue-tag literal, and honoring it would
-  mean inventing the roster, the marker surface, and the dual-parse together.
-  Against that, lifecycle-kit/SPEC.md:239-244 rules that "from the first tag
-  onward a rename owes the queue-bound deprecation mechanism and a
-  tightened-gates/release-note declaration", and the line is at v0.17.0. The
-  clause's own stated rationale, however, is "because no external consumer can
-  have vendored the kit yet (the first tag is a launch-comms prerequisite)" —
-  a premise the tag was a *proxy* for and which has drifted from it, since 17
-  tags have shipped with no launch and no observed external install. Resolving
-  that proxy is an envelope question neither queue entry settles.
+  surface via `CANON_KIT_DEPRECATION_MARKERS` — a roster this repo does not set,
+  on which the gate no-ops. It structurally does not reach a queue-tag literal.
+  A window would have meant inventing the roster, the marker surface, and the
+  dual-parse together, mid-iteration.
+
+  **Filed, not fixed here:** that clause's "before the first release tag"
+  threshold is a proxy for "nobody has vendored this" which has come loose from
+  its premise — 17 tags have shipped with no launch and no observed external
+  install — and it will misfire on the next real *knob* rename. Amending a
+  governing clause is a new initiative and goes through scope-gated intake, so
+  it rides the gap inbox for close to triage rather than this unit.
 - **Retitling the entry's `Why [needs-spec]:` body field to a new fixed name.**
   The four deferred body fields are explicitly ungated conventions that
   queue-kit/SPEC.md already writes abstractly; the sweep swaps the token inside

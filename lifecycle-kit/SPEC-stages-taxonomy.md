@@ -244,17 +244,27 @@ This is the same guard the sibling amendment states for the token's frozen
 attestations, and the two units share the rule: **a reference whose subject is
 the historical name is preserved verbatim.**
 
-### 11. Release-note declaration — *mechanical*
+### 11. Release-note declaration — the only compat obligation — *mechanical*
 
 A moved adoption path is not a knob and not a gate, so it declares under
-**Behavior changes** in the release note, per the note structure docs/install.md
-owns. That section is explicitly *not* smoke-asserted — `upgrade-smoke` proves
-phase-A determinism and that the red set is declared, but the binding shims that
-break here live in the **consumer's** tree, which phase A never touches. The
-consumer-visible migration is therefore: retarget your shim directives from
-`templates/skills/<stage>.md` to `templates/stages/<stage>.md`, and from
-`templates/skills/{release-sweep,upgrade}.md` to `templates/{release-sweep,upgrade}.md`.
-The note states that verbatim, because nothing mechanical will state it for them.
+**Behavior changes** in the release note, per the three-section note structure
+docs/install.md owns. That section is explicitly *not* smoke-asserted —
+`upgrade-smoke` proves phase-A determinism and that the red set is declared, but
+the binding shims that break here live in the **consumer's** tree, which phase A
+never touches. The consumer-visible migration is therefore: retarget your shim
+directives from `templates/skills/<stage>.md` to `templates/stages/<stage>.md`,
+and from `templates/skills/{release-sweep,upgrade}.md` to
+`templates/{release-sweep,upgrade}.md`. The note states that verbatim, because
+nothing mechanical will state it for them.
+
+With no deprecation window owed (§Ruled out), **that note is the entire compat
+obligation this move carries**, which raises its weight rather than lowering it.
+The release class is a **minor**: docs/install.md:349-351's pre-1.0 qualifier
+rides a non-decommission break on a minor while the line is 0.x, and :341-345
+reserves major for a release that *removes* a deprecated surface. Nothing is
+removed here — a path moves — so no major is earned. This unit and the sibling
+`needs-spec-tag-rename` ride **one** minor, which is what delivers the
+one-re-bind outcome the launch-timing ruling weighed.
 
 ## Producers and consumers
 
@@ -334,18 +344,27 @@ none of which names a template directory.
   the roster is ordered and consumer-configurable and the directory ships a
   superset. There is no derivation win here and the amendment declines to claim
   one.
-- **A compat directory or symlink at `templates/skills/`.** *This ruling is
-  escalated to the lead and is not settled here* — it is the same question the
-  sibling amendment raises, and the two must be answered together. The queue
-  entry asserts this unit "needs a deprecation marker and a release note, exactly
-  the machinery `upgrade.md` narrates". That framing is **factually off on the
-  first half**: `upgrade.md` names no deprecation marker anywhere — it narrates
-  the release-note-plus-gate-registration half — and the actual marker machinery
+- **A compat directory or symlink at `templates/skills/`.** Ruled 2026-07-31 at
+  spec: **no window is owed, because no clause reaches this move.**
+  lifecycle-kit/SPEC.md:239-244 is the nearest-looking rule and does not apply —
+  it is headed *"Knob-rename compat precedent"*, sits inside §Layout and
+  configuration immediately above the `LIFECYCLE_KIT_*` roster it governs, and is
+  cited nowhere else in the tree; its bare "a rename" is loose drafting inside a
+  knob-scoped clause. This unit renames a directory, not a knob. **A scoping
+  finding, not an exception taken.** (The clause's own threshold has separately
+  drifted from its premise; that defect is filed for close, not fixed here.)
+
+  The queue entry asserted this unit "needs a deprecation marker and a release
+  note, exactly the machinery `upgrade.md` narrates". That is **factually off on
+  the first half, and the correction is not a narrowing of the deliverable**:
+  `upgrade.md` contains no occurrence of "deprecat" at all — it narrates the
+  release-note-plus-gate-registration half — so the entry asserted a fact about a
+  file's contents the file does not contain. The actual marker machinery
   (`check-deprecation-task` + `release-sweep.md`) resolves `task: <slug>`
   bindings on a *source-comment* surface via `CANON_KIT_DEPRECATION_MARKERS`, a
   roster this repo does not set. There is no directory-level marker, no alias
-  convention, and no shim precedent anywhere in the tree. Honoring the entry
-  literally would mean inventing all three.
+  convention, and no shim precedent anywhere in the tree. Scope's real deliverable
+  — the rename plus a declared release note — is intact and is delta 11.
 
 ## Definition of Done
 
