@@ -1753,6 +1753,37 @@
   operator contradicted at the source; re-verified against the run and narrowed
   to this residue at the next scope entry.
 
+- **gap-bullet-premise-verification** [design-pending] — a gap-inbox bullet
+  asserts mechanism under no verification bar, and a false one is paid by
+  whoever drains it. Two of the three bullets re-verified at this boundary were
+  false at their central claim, both filed by the same close: one asserted the
+  npm approval environment did not gate the `v0.18.0` publish (it gated — the
+  deployment held 77 seconds and an approval is recorded), the other that
+  `check-graph` prints no regeneration command on a red verdict (it prints both,
+  with resolved knob paths). Each was falsified by a single command.
+  **Why this is not `close-generated-finding-route`'s ground.** That entry owns
+  *when* a close-generated finding gets drained; this one owns whether its
+  factual claims were ever checked. A correctly-routed bullet carrying a false
+  mechanism lands in the queue as a false premise — and this queue's own
+  convention of dating premise corrections into entry bodies is the evidence
+  that such a premise can then survive iterations before anyone re-derives it.
+  **Why `[design-pending]`:** the affordance must not become a checkpoint. The
+  inbox exists because deferred capture is no capture, so a verification bar
+  that slows filing would trade a known failure mode for the one the inbox was
+  built to prevent. Candidate shapes, with different costs: `bin/file-gap.sh`
+  prompting for the command that establishes the claim, a grammar separating
+  observation from inferred mechanism, or leaving capture untouched and making
+  re-verification an explicit named step of the drain. The third adds no capture
+  friction at all and is the one to beat.
+  **Cost while deferred:** paid by the draining session, which either re-derives
+  the mechanism or promotes a false premise into the queue where it reads as
+  established; two instances in one boundary, from one close. Low and
+  non-rotting — nothing in the tree degrades while it sits.
+  Debt: a filing-or-drain discipline over an existing affordance; adds no
+  governed name unless a grammar lands.
+  Filed 2026-07-31 at scope from its own gap-inbox disposition; the lead ruled
+  the observation durable but outside this iteration's ruled unit set.
+
 - **always-loaded-regen-block-residency** [design-pending] — `CLAUDE.md`'s
   generated-hook paragraph carries two regeneration commands in the
   always-loaded tier, and the stated reason for leaving them there does not
