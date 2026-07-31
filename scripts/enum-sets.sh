@@ -4,9 +4,11 @@ set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# spec: canon-kit/SPEC.md §check-prose-enum — the tag vocabulary is queue-kit's own parse surface: the arr["<tag>"] rows check-tag-lead-line keys on, read from the gate rather than re-listed here
-mapfile -t alltags < <(grep -oE 'arr\["[a-z][a-z-]*"\]' "$REPO/queue-kit/checks/check-tag-lead-line.sh" \
-    | sed -E 's/arr\["([a-z-]+)"\]/\1/' | sort -u)
+# spec: canon-kit/SPEC.md §check-prose-enum — the tag vocabulary is queue-kit's own parse surface: the class table check-tag-lead-line derives both its match literal and its arr[] key from — the gate's one quoted-literal split() — read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing
+_tagtable="$(grep -oE 'split\("[^"]+"' "$REPO/queue-kit/checks/check-tag-lead-line.sh" \
+    | head -1 | sed -E 's/^split\("//; s/"$//')"
+# shellcheck disable=SC2086  # the table is a space-separated token list; word splitting is the parse
+mapfile -t alltags < <(printf '%s\n' $_tagtable | sed -E 's/[]:]$//' | sort -u)
 [[ ${#alltags[@]} -gt 0 ]] || { echo "enum-sets: no tags parsed from check-tag-lead-line.sh" >&2; exit 2; }
 
 # spec: canon-kit/SPEC.md §check-prose-enum — the Lessons channel: [attend] (queue-kit/SPEC.md §The Lessons Learned channel) plus this repo's configured harvest tags; the rest are task/selection tags

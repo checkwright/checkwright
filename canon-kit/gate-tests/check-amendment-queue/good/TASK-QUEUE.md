@@ -10,6 +10,6 @@
 
 ## Deferred
 
-- **later-thing** [needs-spec] — a design-pending idea; needs a ruling first.
+- **later-thing** [design-pending] — a design-pending idea; needs a ruling first.
 
 ## Done

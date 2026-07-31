@@ -496,7 +496,7 @@ close-surface: .workflow/gap-inbox.md forced=lifecycle-kit/SPEC.md §bin/enter-s
 **Producers and consumers.** Producer: any mid-iteration session (lead or stage)
 via `bin/file-gap.sh` — the knob default makes the channel live everywhere the
 kit is vendored. Consumers: the close skill's drain step (§templates/skills/)
-dispositions every bullet — promoted to a deferred `[needs-spec]` queue entry,
+dispositions every bullet — promoted to a deferred `[design-pending]` entry,
 fixed inline that session, or discarded with cause in the close commit message —
 then truncates the inbox to its header; the boundary refusal reads emptiness at
 the next scope entry as the backstop. Each bullet's two fields have named
@@ -1043,7 +1043,7 @@ entries by successor entry. A roster whose drain stage is terminal (zero
 successors) is refused fail-closed at config load (§lib/stages.sh's
 validator): an exemption with no reachable backstop would be permanent.
 Ruled-but-unpromoted work is never exempt residue — it files as Deferred
-`[needs-spec]` for a later scope's promotion (deferred-filing is the model
+`[design-pending]` for a later scope's promotion (deferred-filing is the model
 for designed-but-unscheduled work); and (C)
 audit-trigger — an audit-entry-stage header carrying a cross-component
 amendment signal but no `<iter> <audit-stage>` stamp demands either that

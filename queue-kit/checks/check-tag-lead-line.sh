@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
-# spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag (blocked-by/spec/needs-spec/drain-exempt/roadmap in the task sections, attend + configured lesson tags in Lessons) sits on its bullet's lead line, the only line the tag readers scan
+# spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag (blocked-by/spec/design-pending/drain-exempt/roadmap in the task sections, attend + configured lesson tags in Lessons) sits on its bullet's lead line, the only line the tag readers scan
 #
 # usage: check-tag-lead-line.sh [queue-file]
 #   Defaults to the configured queue file (QUEUE_KIT_QUEUE_FILE).
@@ -19,15 +19,18 @@ FILE="${1:-$QUEUE_KIT_QUEUE_FILE}"
 lessontags="${QUEUE_KIT_LESSON_TAGS[*]+"${QUEUE_KIT_LESSON_TAGS[*]}"}"
 out="$(awk -v taskre="$QUEUE_TASK_RE" -v lessonsre="$QUEUE_LESSONS_RE" \
     -v sectre="$QUEUE_SECTION_RE" -v lessontags="$lessontags" '
-    BEGIN { nlt = split(lessontags, lt, " ") }
-    function classes(line, arr,   i) {
+    # spec: queue-kit/SPEC.md §check-tag-lead-line — one class table, each entry the tag name plus its bracket terminator; the match literal and the arr[] key both come off it, and scripts/enum-sets.sh reads this same table
+    BEGIN {
+        ncls = split("blocked-by: spec: design-pending] attend] drain-exempt: roadmap:", cls, " ")
+        nlt  = split(lessontags, lt, " ")
+    }
+    function classes(line, arr,   i, nm, term) {
         delete arr
-        if (line ~ /\[blocked-by:/)  arr["blocked-by"] = 1
-        if (line ~ /\[spec:/)        arr["spec"]       = 1
-        if (line ~ /\[needs-spec\]/) arr["needs-spec"] = 1
-        if (line ~ /\[attend\]/)     arr["attend"]     = 1
-        if (line ~ /\[drain-exempt:/) arr["drain-exempt"] = 1
-        if (line ~ /\[roadmap:/)     arr["roadmap"]      = 1
+        for (i = 1; i <= ncls; i++) {
+            term = substr(cls[i], length(cls[i]))
+            nm   = substr(cls[i], 1, length(cls[i]) - 1)
+            if (index(line, "[" nm term)) arr[nm] = 1
+        }
         for (i = 1; i <= nlt; i++)
             if (index(line, "[" lt[i] "]")) arr[lt[i]] = 1
     }

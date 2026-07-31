@@ -20,10 +20,10 @@ ROOT="${2:-.}"
 
 errors=""
 
-# (a) feature-section entries missing [spec:], any [needs-spec] in the
+# (a) feature-section entries missing [spec:], any [design-pending] in the
 #     active sections (entries, sub-bullets, or prose — a mention masks a
 #     missing tag), and a [spec:]-tagged entry misfiled in an active
-#     non-feature section; (b) deferred entries missing [needs-spec], and a
+#     non-feature section; (b) deferred entries missing [design-pending], and a
 #     deferred entry already carrying [spec:] (promote it). One awk pass.
 qout="$(awk -v featre="$SPEC_FEATURE_RE" -v activere="$SPEC_ACTIVE_RE" \
             -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
@@ -36,19 +36,19 @@ qout="$(awk -v featre="$SPEC_FEATURE_RE" -v activere="$SPEC_ACTIVE_RE" \
     }
     (sec == "feature" || sec == "active") {
         if ($0 ~ /^- /) {
-            if ($0 ~ /\[needs-spec\]/)
-                printf "active-needs-spec\t%d\t%s\n", FNR, $0
+            if ($0 ~ /\[design-pending\]/)
+                printf "active-design-pending\t%d\t%s\n", FNR, $0
             else if (sec == "feature" && $0 !~ /\[spec:/)
                 printf "missing-spec\t%d\t%s\n", FNR, $0
             else if (sec == "active" && $0 ~ /\[spec:/)
                 printf "misfiled-ready\t%d\t%s\n", FNR, $0
-        } else if ($0 ~ /\[needs-spec\]/) {
-            printf "prose-needs-spec\t%d\t%s\n", FNR, $0
+        } else if ($0 ~ /\[design-pending\]/) {
+            printf "prose-design-pending\t%d\t%s\n", FNR, $0
         }
         next
     }
     sec == "deferred" && $0 ~ /^- / {
-        if ($0 !~ /\[needs-spec\]/)
+        if ($0 !~ /\[design-pending\]/)
             printf "deferred-open\t%d\t%s\n", FNR, $0
         else if ($0 ~ /\[spec:/)
             printf "deferred-ready\t%d\t%s\n", FNR, $0
@@ -62,8 +62,8 @@ while IFS=$'\t' read -r class ln text; do
     [[ -n "$class" ]] || continue
     case "$class" in
         missing-spec)      missing+=("$QUEUE:$ln: $text") ;;
-        active-needs-spec) an+=("$QUEUE:$ln: $text") ;;
-        prose-needs-spec)  pn+=("$QUEUE:$ln: $text") ;;
+        active-design-pending) an+=("$QUEUE:$ln: $text") ;;
+        prose-design-pending)  pn+=("$QUEUE:$ln: $text") ;;
         deferred-open)     dopen+=("$QUEUE:$ln: $text") ;;
         deferred-ready)    dready+=("$QUEUE:$ln: $text") ;;
         misfiled-ready)    mready+=("$QUEUE:$ln: $text") ;;
@@ -71,9 +71,9 @@ while IFS=$'\t' read -r class ln text; do
 done <<< "$qout"
 
 (( ${#missing[@]} )) && errors+="feature-section entries without [spec:] (spec-writing is an authoring-stage activity — write the amendment, then promote):"$'\n'"$(printf '  %s\n' "${missing[@]}")"$'\n'
-(( ${#an[@]} ))      && errors+="[needs-spec] tag in an active-queue entry (move it to $CANON_KIT_DEFERRED_SECTION):"$'\n'"$(printf '  %s\n' "${an[@]}")"$'\n'
-(( ${#pn[@]} ))      && errors+="[needs-spec] tag in active-queue prose ($CANON_KIT_DEFERRED_SECTION-only tag; say \"needs design\" in prose):"$'\n'"$(printf '  %s\n' "${pn[@]}")"$'\n'
-(( ${#dopen[@]} ))   && errors+="$CANON_KIT_DEFERRED_SECTION entries without [needs-spec] (all deferred work is design-pending):"$'\n'"$(printf '  %s\n' "${dopen[@]}")"$'\n'
+(( ${#an[@]} ))      && errors+="[design-pending] tag in an active-queue entry (move it to $CANON_KIT_DEFERRED_SECTION):"$'\n'"$(printf '  %s\n' "${an[@]}")"$'\n'
+(( ${#pn[@]} ))      && errors+="[design-pending] tag in active-queue prose ($CANON_KIT_DEFERRED_SECTION-only tag; say \"needs design\" in prose):"$'\n'"$(printf '  %s\n' "${pn[@]}")"$'\n'
+(( ${#dopen[@]} ))   && errors+="$CANON_KIT_DEFERRED_SECTION entries without [design-pending] (all deferred work is design-pending):"$'\n'"$(printf '  %s\n' "${dopen[@]}")"$'\n'
 (( ${#dready[@]} ))  && errors+="$CANON_KIT_DEFERRED_SECTION entries already carrying [spec:] (promote to a feature section):"$'\n'"$(printf '  %s\n' "${dready[@]}")"$'\n'
 (( ${#mready[@]} ))  && errors+="[spec:]-tagged entries misfiled in an active non-feature section (a spec-ready entry belongs in a feature section):"$'\n'"$(printf '  %s\n' "${mready[@]}")"$'\n'
 
@@ -107,7 +107,7 @@ if [[ -n "$errors" ]]; then
     echo "check-amendment-queue: Task↔amendment bidirectional-rule violation(s):"
     echo ""
     printf '%s' "$errors"
-    echo "  help: pair every amendment with a [spec: …] queue entry and vice versa; tag every $CANON_KIT_DEFERRED_SECTION entry [needs-spec]; give every feature entry a [spec:] ref"
+    echo "  help: pair every amendment with a [spec: …] queue entry and vice versa; tag every $CANON_KIT_DEFERRED_SECTION entry [design-pending]; give every feature entry a [spec:] ref"
     exit 1
 fi
 

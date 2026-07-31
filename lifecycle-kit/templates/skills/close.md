@@ -19,13 +19,13 @@ write is involved. Commit the stamp on its own.
 
 **Where close's own captures file.** Close never writes the active queue
 sections — promoting a unit into them is scope's. Every finding close itself
-captures files instead as a Deferred `[needs-spec]` entry for a later scope to
-promote: a lesson turned task, a drained gap, a housekeeping or triage finding,
-or a dispatch's "capture as debt". The active sections must be empty at the
-drain boundary, so a finding mis-filed into one is caught only later as a red
-`check-stage-entry` at the next iteration's entry; filing to Deferred keeps the
-boundary clean (lifecycle-kit/SPEC.md §check-stage-entry owns the deferred-filing
-model for ruled-but-unpromoted work).
+captures files instead as a Deferred `[design-pending]` entry for a later scope
+to promote: a lesson turned task, a drained gap, a housekeeping or triage
+finding, or a dispatch's "capture as debt". The active sections must be empty
+at the drain boundary, so a finding mis-filed into one is caught only later as
+a red `check-stage-entry` at the next iteration's entry; filing to Deferred
+keeps the boundary clean (lifecycle-kit/SPEC.md §check-stage-entry owns the
+deferred-filing model for ruled-but-unpromoted work).
 
 1. **Process Lessons Learned** → durable rules or debt tasks, then clear the
    section. **Give each entry an explicit disposition before clearing, and
@@ -62,7 +62,7 @@ model for ruled-but-unpromoted work).
 2. **Drain the gap inbox** (`LIFECYCLE_KIT_GAP_INBOX_FILE`,
    §The committed gap inbox) → disposition every `- <date> — <gap>` bullet,
    then **truncate the inbox to its `# contract:` header**. The disposition set
-   is →promote (file a deferred `[needs-spec]` queue entry for the gap),
+   is →promote (file a deferred `[design-pending]` queue entry for the gap),
    →fix (resolve it inline this session), or →discard (state why in the close
    commit message — the bullet's own prose is the disposition body). The date
    feeds the staleness read (an aged bullet is a signal, not a free pass).

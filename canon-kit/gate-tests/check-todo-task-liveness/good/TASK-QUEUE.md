@@ -14,7 +14,7 @@
 
 ## Deferred
 
-- **later-thing** [needs-spec] — a deferred design.
+- **later-thing** [design-pending] — a deferred design.
 
 ## Done
 

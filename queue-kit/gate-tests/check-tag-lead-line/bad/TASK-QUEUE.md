@@ -14,6 +14,9 @@
 
 ## Deferred
 
+- **delta-idea** — a parked idea whose state marker reflowed off the lead
+  line: it is still [design-pending] but no tag reader scans this far.
+
 ## Done
 
 ## Lessons Learned

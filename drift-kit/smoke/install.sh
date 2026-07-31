@@ -20,7 +20,7 @@ cat > "$work/TASK-QUEUE.md" <<'EOF'
 # TASK-QUEUE.md
 ## Iteration: smoke
 ## Deferred
-- **foo** [needs-spec] — a thing. Surfaced 2025-01-01.
+- **foo** [design-pending] — a thing. Surfaced 2025-01-01.
 ## Done
 EOF
 

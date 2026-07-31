@@ -14,7 +14,7 @@
 
 ## Deferred
 
-- **third-thing** [needs-spec] [roadmap: someday/beta] — a demand-gated rung.
+- **third-thing** [design-pending] [roadmap: someday/beta] — a demand-gated rung.
   roadmap-summary: A rung promoted when a consumer's demand attests it.
 
 ## Done

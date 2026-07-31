@@ -34,7 +34,7 @@
 
 ### Someday
 
-- **example-deferred** — a design-pending entry. [needs-spec]
+- **example-deferred** — a design-pending entry. [design-pending]
 
 ## Done
 

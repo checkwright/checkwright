@@ -28,8 +28,8 @@ as `##` sections over column-0 bullets:
   when the premise was filed; drift-kit's deferred-age KPI is its reader.
   A deferred body is free prose, but four **ungated** bold-lead-in fields
   recur and are worth reaching for, each answering a question a later scope
-  asks: `Deliverable` (what landing looks like), `Why <the design-pending
-  tag>` (what the open design actually is), `Cost while deferred` (the
+  asks: `Deliverable` (what landing looks like), `Why [design-pending]` (what
+  the open design actually is), `Cost while deferred` (the
   Gap-disposition rule's costing — the most-used of the four), and a
   closing `Filed <date> by <stage>` provenance line. None is required and no
   gate reads them; an entry uses the ones that carry weight for it.
@@ -63,7 +63,7 @@ slug set on the configured prose surfaces (§check-queue-slug-liveness).
   deferred blocker stands; it is unbuilt); a blocker in the done section is a
   *stale* tag that must be removed, because the tag alone marks a task
   unpickable.
-- `[needs-spec]` — design-pending marker. queue-kit parses and displays it;
+- `[design-pending]` — design-pending marker. queue-kit parses and displays it;
   the placement semantics (deferred-section-wide enforcement, promotion
   rules) are canon-kit's amendment lifecycle and land with that kit.
 - `[spec: <file>]` — spec-ready pointer. Same split: syntax here, amendment
@@ -311,9 +311,9 @@ from swallowing its marker.
 
 Honest limit — the lead line is a shared budget, and `[roadmap:]` competes for it
 with every other tag the entry carries. Against `check-queue-wrap`'s floor a
-`[spec: <file>]` tag is far wider than `[needs-spec]`, so an entry carrying a spec
-pointer and a long slug may have room for the `[roadmap:]` tag but none for prose
-after it. That costs nothing now the summary lives on its own declaration line:
+`[spec: <file>]` tag is far wider than `[design-pending]`, so an entry carrying
+a spec pointer and a long slug may have room for the `[roadmap:]` tag but none
+for prose after it. That costs nothing now the summary lives on its own line:
 the lead line needs room for the tag alone. It does bound the tag itself — a
 sufficiently long slug plus spec pointer leaves no room even for that, and such an
 entry is unprojectable until the pointer drops at the amendment's merge. A true
@@ -426,20 +426,32 @@ fenced-code blocks, and lines over budget solely due to one unbreakable token
 
 Invariant: every **lead-line-scoped** tag sits on its bullet's lead line — the
 only line *its* readers scan; such a tag pushed to a continuation line by a
-reflow silently unblocks a task, masks a needs-spec state, voids a drain
+reflow silently unblocks a task, masks a design-pending state, voids a drain
 exemption, or drops a lesson out of the attention block. Membership tracks reader semantics, not §The tag
 algebra: a tag is governed here when its readers scan lead lines alone, so the
 set is narrower than the algebra's and `[precondition-ok:]` is deliberately
 outside it — `check-queue-prose-precondition` honors that tag anywhere in the
 entry, leaving it no lead-line requirement to enforce. The governed set and
 scanned surface both widen with the lesson channels: `[blocked-by:]` /
-`[spec:]` / `[needs-spec]` / `[drain-exempt:]` / `[roadmap:]` in the task
+`[spec:]` / `[design-pending]` / `[drain-exempt:]` / `[roadmap:]` in the task
 sections (active + deferred), plus
 `[attend]` and every `QUEUE_KIT_LESSON_TAGS` name in the `## Lessons Learned`
 section — the section `queue-index.sh` now reads, which retires the old "parsed
 by no reader" exemption for it. Couples
 the width-only wrap gate to the tag-parsing tools over the same surface: gate
 the coupling, not just each side.
+
+The gate states that set **once**, as a class table of `<name><terminator>`
+tokens (`]` for a bare tag, `:` for a field tag) from which both the match
+literal and the class key are derived. That single statement is the whole
+point: a table entry naming the tag once cannot desync its matcher from its
+key, and the desync had one silent direction — a key renamed without its regex
+leaves every downstream reader agreeing while the matcher hunts a token no
+entry carries, and the lead-line guard for that class dies with nothing
+reddening. The table is also the **derivation surface** a consumer's enum
+emitter reads for the tag vocabulary (this repo's `scripts/enum-sets.sh` →
+`check-prose-enum`), so it is the single source for the spelling on both the
+enforcement and the prose side.
 
 Calibration: lead-class rule — a tag of class C on a continuation line is a
 violation only when the lead line lacks class C (prose that mentions a tag
@@ -528,7 +540,7 @@ combined-tree copy clears the stage gates too.
 ## Out of scope
 
 <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
-The amendment lifecycle around `[needs-spec]`/`[spec:]` (section-wide
+The amendment lifecycle around `[design-pending]`/`[spec:]` (section-wide
 enforcement, promotion procedure, `check-amendment-queue`) is canon-kit's
 scope. Code-comment TODO scanning (`TODO(task:<slug>)` resolution against
 the queue) couples to source-file conventions and is canon-kit's, on the

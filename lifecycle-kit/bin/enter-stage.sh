@@ -137,7 +137,7 @@ if [[ "$first" == 1 && -f "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]]; then
         fi
         echo "enter-stage: iteration-boundary entry to '$stage' refused — $LIFECYCLE_KIT_GAP_INBOX_FILE holds untriaged gap bullets; every gap is dispositioned before the next iteration begins (nothing written):" >&2
         printf '%s\n' "$gaps" >&2
-        echo "  help: if the closing stage has not run yet, run its gap-drain step — disposition each bullet (promote to a deferred [needs-spec] entry, fix inline, or discard with cause in the commit message), then truncate the inbox to its header." >&2
+        echo "  help: if the closing stage has not run yet, run its gap-drain step — disposition each bullet (promote to a deferred [design-pending] entry, fix inline, or discard with cause in the commit message), then truncate the inbox to its header." >&2
         echo "  help: if it has already run, these bullets were filed after the drain and no stage is coming back for them: disposition them here, in this entering session — promote each directly to the deferred queue (or fix it), truncate the inbox to its header, commit, and re-run enter-stage $stage. Deleting a bullet without a disposition is not a drain." >&2
         exit 1
     fi

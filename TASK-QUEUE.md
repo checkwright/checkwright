@@ -57,55 +57,6 @@
   spec, which is where the filing's full premise analysis and re-measurements
   now live.
 
-- **needs-spec-tag-rename** [spec: SPEC-design-pending-tag.md] — the
-  design-pending tag's *token* asserts something its own definition does not.
-  `spec` is feature-bound everywhere in the system — the ready-pole tag pairs
-  with an authored amendment, the `/spec` stage authors amendments, and
-  `check-amendment-queue` makes that tag feature-only — but the pending-pole
-  token is mandatory on every entry in a design-pending section, and a deferred
-  **debt** entry promotes with it *deleted, never converted*. For that fraction
-  the token names an artifact that will never exist. Its own owner doc already
-  defines it correctly as a "design-pending marker" (queue-kit/SPEC.md:66); it is
-  the token `needs-spec` that leaks the feature implication the definition does
-  not carry — a name that contradicts its own definition, on the naming-doctrine
-  tree.
-  **Deliverable:** the rename to `design-pending`, designed in
-  canon-kit/SPEC-design-pending-tag.md — the token swap across two gate bodies,
-  three kit SPECs, two READMEs, two templates and the queue; the derivation that
-  makes `check-tag-lead-line`'s class key and its matched literal one token,
-  closing the one direction of a botched rename that no gate catches; the fixture
-  the uncovered tag class was missing; and the rule that a mention whose subject
-  is the historical token is preserved verbatim. The amendment settles the two
-  calls this filing left open — the replacement spelling, and whether to narrow
-  the tag's meaning or keep it section-wide (kept section-wide, because totality
-  is what makes the forbidden-in-active check complete).
-  **Not a decommission:** the pending↔ready cross-check is load-bearing —
-  forbidden-in-active catches a stale tag on a botched promotion, and a
-  ready-pole tag sitting in a design-pending section forces one. Every guard
-  clause survives verbatim; only the token string changes.
-  **Cost while deferred:** low and non-rotting, rising toward launch — the
-  grammar is internally consistent and gated; the residue is one token whose name
-  every reader must mentally correct for the debt fraction, and a breaking rename
-  that is near-free today (no external adopter) but prices in with the first one.
-  **Both halves of that disposition were taken, ruled 2026-07-29 at scope.** This
-  entry is the spine of `pre-adoption-grammar-break`: it lands before launch, and
-  `templates-stages-taxonomy-realignment` folds into the same release on the
-  operator's launch-timing ruling recorded there. **That release is a minor**,
-  ruled 2026-07-31 at spec: docs/install.md:349-351's pre-1.0 qualifier rides a
-  non-decommission break on a minor, and :338 files even a rename carrying a
-  deprecation path there. Neither unit removes a deprecated surface. It adds no capability, so the
-  standing pre-launch prioritization bar never reached it and it runs under no
-  exception — only the sibling `deferred-queue-carry-cost` does.
-  **Sequencing:** the token migration and `deferred-queue-carry-cost`'s triage
-  sweep both rewrite every design-pending entry; they are paired into one
-  iteration precisely so the queue is rewritten once; the amendment states how
-  the two compose into a single pass rather than leaving build to discover it.
-  [precondition-ok: "design-pending" is this entry's subject, not a precondition]
-  Filed 2026-07-25 by operator request, on the observation that the token implies
-  a feature while deferred triage is a scope-stage decision; amendment authored
-  2026-07-31 at spec, where the measurements and the ruled-out spellings now
-  live.
-
 - **templates-stages-taxonomy-realignment** [spec: SPEC-stages-taxonomy.md] — the
   tree scatters a class the SPEC names as one. `lead.md`, `release-sweep.md`, and
   `upgrade.md` are each classified **"boundary skill, not a stage"**
@@ -203,7 +154,7 @@
 
 ## Deferred
 
-- **runtime-dir-two-tier-detector** [needs-spec] — `check-tracking-claim`'s
+- **runtime-dir-two-tier-detector** [design-pending] — `check-tracking-claim`'s
   `is two-tier` predicate is rule-provable only for a directory the ignore rules
   match *whole* (a `dir/` pattern) that also carries a force-added tracked member:
   `git check-ignore --no-index <dir>` matches the whole-dir rule, and `git
@@ -222,7 +173,7 @@
   file-pattern shape and re-binds `.workflow/ is two-tier` — probing candidate
   member paths under the directory via `check-ignore --no-index` (which resolves
   on non-existent paths), or reading the ignore patterns that target inside the
-  directory. **Why `[needs-spec]`:** enumerating "would-be-ignored members" of a
+  directory. **Why `[design-pending]`:** enumerating "would-be-ignored members" of a
   directory without the files present is the open design — a probe-path approach
   needs a principled candidate set, and a pattern-reading approach re-implements a
   slice of gitignore matching (negations, nested `.gitignore`, precedence), whose
@@ -237,7 +188,7 @@
   remote-oracle red on this iteration's release commit (the gate shipped
   presence-based and failed its first CI run).
 
-- **done-slug-commit-naming-gate** [needs-spec] — `kpi-task-split` reads a Done
+- **done-slug-commit-naming-gate** [design-pending] — `kpi-task-split` reads a Done
   slug's feature/debt class off the commit its message names, via
   `git log -1 --grep=<slug>`. Nothing requires a landing commit to name its
   slug, so a correctly-typed `fix` commit that omits it leaves the row
@@ -254,7 +205,7 @@
   there is no judgment in the match — the low-false-positive contract looks
   satisfiable without a new vocabulary. The queue-section parse already exists in
   `kpi-task-split`'s awk and in queue-kit's gates.
-  **Open design (why `[needs-spec]`, not a build unit):** whether the rule binds
+  **Open design (why `[design-pending]`, not a build unit):** whether the rule binds
   the *moving* commit or merely requires *some* commit in the range to name the
   slug — a build may legitimately land the fix in one commit and move the queue
   line in another, and the strict form would then red on a correct sequence. That
@@ -271,7 +222,7 @@
   the gate lands. Filed 2026-07-22 by close, from this iteration's own
   unclassified split.
 
-- **enter-stage-simulate-no-write-fixture** [needs-spec] — add a regression
+- **enter-stage-simulate-no-write-fixture** [design-pending] — add a regression
   fixture asserting `enter-stage.sh --simulate <stage>` leaves the tree
   byte-identical after a *successful* (non-refused) boundary entry. The guard
   now present at `lifecycle-kit/bin/enter-stage.sh:168-171` (the `sim` exit ahead
@@ -286,7 +237,7 @@
   Filed 2026-07-20 by scope, the closed entry's own second ask (operator ruling).
 
 
-- **rendered-site-link-monitor** [needs-spec] — durable coverage for the
+- **rendered-site-link-monitor** [design-pending] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
   and external link rot recurs, and the tree-side reference gates
   (check-md-refs, check-docs-nav-reachable, check-docs-render-fidelity) plus
@@ -301,7 +252,7 @@
   launch crawl (launch-readiness-gate validate) shows recurrence worth
   automating. Surfaced 2026-07-16 in the launch triage that scoped
   launch-readiness-gate.
-- **plugin-marketplace** [needs-spec] [roadmap: later/ecosystem] — harness plugin packaging.
+- **plugin-marketplace** [design-pending] [roadmap: later/ecosystem] — harness plugin packaging.
   roadmap-summary: The stage skills and guards installable as a harness plugin.
   Harness plugin/marketplace packaging
   of the stage skills and guards; anti-drift gate shape: manifest ↔ shipped
@@ -342,7 +293,7 @@
   Surfaced 2026-07-09 in adoption-track's split; evidence artifact retained:
   upstream Claude Code issue #75214 (project config can't lift the Task
   ask-first default), surfaced dogfooding the delegation nudge 2026-07-07.
-- **benchmark-ab-experiment** [needs-spec] [roadmap: later/adoption] — a controlled A/B experiment.
+- **benchmark-ab-experiment** [design-pending] [roadmap: later/adoption] — a controlled A/B trial.
   roadmap-summary: A controlled experiment measuring drift with and without governance.
   The controlled differential
   experiment: same model, same dependent-task series, two arms (ungoverned
@@ -362,7 +313,7 @@
   that tool: verifying the split-lead posture's savings
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
-- **prose-profile** [needs-spec] [roadmap: later/ecosystem] — a profile for non-code repos.
+- **prose-profile** [design-pending] [roadmap: later/ecosystem] — a profile for non-code repos.
   roadmap-summary: A profile for documentation repos, where there is no build to gate.
   The non-code universality rung: a third
   consumer shaped as a prose/documentation repo (no build, no test suite)
@@ -379,7 +330,7 @@
   launch-readiness-gate build) is the first concretely prose-shaped kit
   mechanism and the natural profile seed. Surfaced 2026-07-16 in the same
   launch triage that scoped launch-readiness-gate.
-- **hosted-attestation-service** [needs-spec] [roadmap: later/commercial] — a neutral attestation.
+- **hosted-attestation-service** [design-pending] [roadmap: later/commercial] — hosted attestation.
   roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.
   The team/paid rung: gates
   verified server-side by a party the committing agents cannot touch —
@@ -389,7 +340,7 @@
   roadmap marker, not a scaffold; hosting and sequencing decisions are on
   record in the operator's local brief, and multi-operator-semantics
   is its prerequisite mechanism. Surfaced 2026-07-07.
-- **spec-internal-identifier-prefix-drift** [needs-spec] — SPEC prose naming a
+- **spec-internal-identifier-prefix-drift** [design-pending] — SPEC prose naming a
   script's **internal** variable spelling where the public knob is the contract
   name. Found by the config-seam-hardening close audit of the
   `internal-identifier-restatement` roster class, and fixed there: seven sites
@@ -441,7 +392,7 @@
   also establish that the bare token and the prefixed one denote the *same*
   contract — the discriminator the design pass actually owes.
 
-- **stage-lag-disambiguation** [needs-spec] —
+- **stage-lag-disambiguation** [design-pending] —
   narrow the session-context hook's accepted over-firing by distinguishing a
   first-of-stage session from a restarted predecessor session, using the session
   id the stage-cursor migration puts in the state file's last stamp.
@@ -484,7 +435,7 @@
   ground. Unblocked: `stage-cursor-extraction` has reached Done, so this entry
   is pickable.
 
-- **heterogeneous-agent-delegation** [needs-spec] [roadmap: later/ecosystem] — cross-vendor stages.
+- **heterogeneous-agent-delegation** [design-pending] [roadmap: later/ecosystem] — foreign agents.
   roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.
   Cross-vendor stage dispatch:
   a Claude Code lead delegating a stage (e.g. `/build`) to a foreign coding agent
@@ -557,7 +508,7 @@
   Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
   on external-agent delegation).
 
-- **background-credential-swap-support** [needs-spec] — first-class support for
+- **background-credential-swap-support** [design-pending] — first-class support for
   swapping the Anthropic OAuth credential out from under in-flight agents (to
   spread burn across accounts), which the budget oracle does not model today.
   Four components, worst-first; all delegation-kit SPEC+code, all demand-gated
@@ -601,7 +552,7 @@
   cross-references. Surfaced 2026-07-17 in the release-in-lifecycle session
   (kfric plus one operator-raised refinement).
 
-- **stage-economics-smoke-jq-arm-dormant** [needs-spec] — drift-kit's smoke
+- **stage-economics-smoke-jq-arm-dormant** [design-pending] — drift-kit's smoke
   asserts the jq-absent degradation of `bin/stage-economics.sh`, but the
   assertion never executes. `drift-kit/smoke/install.sh:171` branches on the
   **host's** jq (`command -v jq`), so the degradation arm at `:189` — "without
@@ -627,7 +578,7 @@
   never runs. Bounded by the degradation path being small and rarely touched.
   Filed 2026-07-18 by lead ruling at the stage-economics-report close.
 
-- **hermetic-bin-roster-config** [needs-spec] — `check-test-hermetic` assertion
+- **hermetic-bin-roster-config** [design-pending] — `check-test-hermetic` assertion
   B catches *partial* credential pinning but not *absent* pinning. B arms only
   when the smoke script itself contains a `*_CRED_FILE=` assignment, so a smoke
   script that calls a credential-consuming own-kit bin and pins nothing at all
@@ -675,7 +626,7 @@
   `DELEGATION_KIT_PAUSE_PCT=0` around its own. Still build-routed tech-debt —
   not fixed at this validate re-entry.
 
-- **release-body-url-form** [needs-spec] — *residue only: the two cheap
+- **release-body-url-form** [design-pending] — *residue only: the two cheap
   deliverables are done (see below); what remains is the monitor-shaped half,
   promotable only together with `rendered-site-link-monitor`.* The `v0.6.0`
   GitHub Release body linked
@@ -712,7 +663,7 @@
   recurring per-release chance of repeating it until the runbook pins the form.
   Surfaced 2026-07-19 by the close-stage release step for `derivation-by-precedent`,
   verifying that the URL its own release body advertises actually resolves.
-- **enforcement-first-behavioral-regressions** [needs-spec] — the always-loaded
+- **enforcement-first-behavioral-regressions** [design-pending] — the always-loaded
   enforcement-first rule ("the fix and the gate that catches it land in one unit;
   removing the duplication outranks gating it") anchors its second clause — and
   every neighbouring doctrine example (content-tiering, de-literalization) — in
@@ -729,7 +680,7 @@
   exactly the low-FP gate enforcement-first says to land in the same unit — was
   added only on explicit request.
 
-- **spec-split-promotion-review** [needs-spec] — after the six-stage roster has
+- **spec-split-promotion-review** [design-pending] — after the six-stage roster has
   run **≥N iterations with `spec`-stage economics actually recorded on the
   trajectory**, re-run the `/economics` read; if the split shows the projected
   cache/context win, **promote the `spec` stage to the kit default** via a new
@@ -772,7 +723,7 @@
   projected economics, and this is the loop that confirms or retires that
   projection with recorded data.
 
-- **split-posture-waiver-writer** [needs-spec] — in the split-lead posture the
+- **split-posture-waiver-writer** [design-pending] — in the split-lead posture the
   lead issues stage rulings (e.g. an align waiver) but commits no lifecycle
   state by design (the lead stamps nothing; only stage sessions write), so a
   lead-issued **waiver stamp** has no clean writer. This iteration's
@@ -801,7 +752,7 @@
   store (CLAUDE.md §How to escalate). Surfaced 2026-07-19 by the
   `trajectory-stage-roster-hardcode` close, filed by lead-dispatch instruction.
 
-- **supervisor-verification-attestation** [needs-spec] — the resume-journal
+- **supervisor-verification-attestation** [design-pending] — the resume-journal
   recovery contract now rests on an **unattested** supervisor duty. The
   `resume-journal-done-marker-compliance` amendment (this iteration) rescoped the
   DONE-absence clause so that on the ordinary path "the supervisor consumed the
@@ -815,7 +766,7 @@
   which excluded marker enforcement and gate mechanization by name — the amendment
   fixes the *reading* of the contract, and mechanizing the *check* is separate
   work, filed rather than smuggled in.
-  **Design question (why [needs-spec], not a build unit):** the verification
+  **Design question (why [design-pending], not a build unit):** the verification
   happens **after** the commit it verifies, so the pre-commit battery cannot reach
   it — a gate is the wrong shape on ordering grounds alone, the same
   wrong-shape finding as `rendered-site-link-monitor`'s. The open design is what
@@ -837,7 +788,7 @@
   Filed 2026-07-19 by the `tooling-signal-honesty` close, as the follow-up the
   plain-(b) ruling named.
 
-- **assertion-strength-exit-header-reach** [needs-spec] —
+- **assertion-strength-exit-header-reach** [design-pending] —
   `check-assertion-strength` is armed by callee `# exit:` headers, and **two
   scripts in the tree declare one** (`delegation-kit/bin/usage-verdict.sh`,
   `delegation-kit/bin/usage-trend.sh`; the other two hits are the gate's own
@@ -851,7 +802,7 @@
   bin roster found **29 of 64 scripts exit with a code >1**, i.e. carry a
   three-valued contract a header could declare. That is a materially larger
   candidate surface than "one script" suggests.
-  **Design question (why [needs-spec], and why the value is the open part):**
+  **Design question (why [design-pending], and why the value is the open part):**
   the mechanism is trivial — add `# exit:` headers across the bin roster. The
   unresolved question is whether it buys reach or ceremony. The gate fires only
   when a guard's *failure message names a verdict token*, and for most of the 29
@@ -869,7 +820,7 @@
   as this close did. Filed 2026-07-20 by the `verdict-reader-honesty` close, by
   lead instruction.
 
-- **gate-spec-claim-assertion-parity** [needs-spec] — the generalization the
+- **gate-spec-claim-assertion-parity** [design-pending] — the generalization the
   `render-fidelity-inline-span-leak` entry flagged as a deliberately-unsettled
   `/spec` question, ruled here: a gate whose **SPEC prose names a failure class
   its assertions do not implement**. This iteration's defect is the instance —
@@ -885,7 +836,7 @@
   faithful-artifact residue `check-gate-tamper` and `check-assertion-strength`
   already concede as a stated limit plus partial floor — not a deterministic,
   low-false-positive assertion. No gate is built for the general class.
-  **Why `[needs-spec]` and not closed:** a *narrower structured sub-class* could
+  **Why `[design-pending]` and not closed:** a *narrower structured sub-class* could
   be gateable via a **claimed-defense annotation** convention — an author tags a
   claimed failure class with a machine-readable marker and a gate correlates the
   marker to a present assertion. That is a genuine new-gate initiative, filed
@@ -904,7 +855,7 @@
   convention is built. Filed 2026-07-20 by the `render-fidelity-leak-coverage`
   spec, settling the flagged `/spec` question.
 
-- **build-stage-tier-economics** [needs-spec] — measure whether the `build`
+- **build-stage-tier-economics** [design-pending] — measure whether the `build`
   stage downgrades from Opus to Sonnet net-positive rather than flipping on
   intuition; a ruling-config tier re-judgment (`.claude/agents/stage-session.md`
   / the lead template's ruling-config, which invites re-judging every tier).
@@ -947,7 +898,7 @@
   ruling during the `render-fidelity-leak-coverage` spec, from an operator
   question.
 
-- **upgrade-smoke-phase-a-regen-derivation** [needs-spec] —
+- **upgrade-smoke-phase-a-regen-derivation** [design-pending] —
   `gate-sdk/bin/upgrade-smoke.sh` phase A swaps in the tip-of-tree kits then
   regenerates a **hardcoded roster** of generated artifacts — pre-commit,
   check-graph, and (as of `cd5dd59`) install-doctrine's digest — plus a **literal
@@ -969,7 +920,7 @@
   `cd5dd59` did). Cost to close: roughly one iteration. Filed 2026-07-21 by build
   during `lifecycle-rule-placement`'s model correction.
 
-- **supervision-overhead-unmeasured** [needs-spec] — the `supervision` row is
+- **supervision-overhead-unmeasured** [design-pending] — the `supervision` row is
   now the iteration's third-largest line and has never been examined. Re-derived
   at this close: supervision **$6.9870 of a $37.26 iteration total, 18.8%** —
   larger than every stage but build 1 ($9.3255), and larger than scope ($5.3941),
@@ -1063,7 +1014,7 @@
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
 
-- **preview-release-cadence** [needs-spec] [roadmap: next/adoption] — a declared preview channel.
+- **preview-release-cadence** [design-pending] [roadmap: next/adoption] — a preview channel.
   roadmap-summary: A declared preview channel and a slower, calmer release cadence.
   Reset release signaling for a
   pre-1.0 audience: declare a preview/alpha channel, batch internal
@@ -1101,7 +1052,7 @@
   Surfaced 2026-07-23 in the same external review (its release-signaling
   finding).
 
-- **scope-amendment-authoring-gate** [needs-spec] — on a roster carrying a
+- **scope-amendment-authoring-gate** [design-pending] — on a roster carrying a
   dedicated authoring stage, nothing stops the **scope** stage from doing
   `spec`'s job: `4e10265` authored both of this iteration's amendment files and
   landed both amendment-ref promotions in one `chore(scope)` commit, and every gate
@@ -1119,7 +1070,7 @@
   amendment file (`<kit>/SPEC-*.md`) or **adds** an amendment-ref tag (canon-kit's
   spec-ref form) to a queue entry is the violation. Trigger is narrow, both
   halves are mechanical, and the match carries no judgment.
-  **Open design (why `[needs-spec]`, not a build unit):** three choices decide the
+  **Open design (why `[design-pending]`, not a build unit):** three choices decide the
   gate's shape. (1) **Scope** — the narrow scope/spec rule, or its general form: a
   stage-scoped write-surface table where each stage declares the surfaces it may
   write and a commit under stage X touching stage Y's surface reds. The general
@@ -1147,7 +1098,7 @@
   Filed 2026-07-24 by spec, operator-ruled, from this iteration's own
   scope/spec conflation.
 
-- **exit-echo-decoration-guard-vs-habit** [needs-spec] — stage-session (sonnet)
+- **exit-echo-decoration-guard-vs-habit** [design-pending] — stage-session (sonnet)
   agents decorate an otherwise-allowlisted command with a trailing `; echo
   EXIT:$?` (or a leading `echo EXIT:$?;`) to read an exit status the harness
   **already reports**. The `$?` is a shell *expansion*, and bash-guard's own
@@ -1159,7 +1110,7 @@
   Reproduced this iteration: 7 fall-throughs in `.workflow/prompt-friction.log`
   containing `EXIT:` (validate-stage, operator-reported), the residue
   `scan-prompts.sh` folds into its `echo` pattern rank.
-  **Open design (why `[needs-spec]`):** a steer must strip a benign trailing/leading
+  **Open design (why `[design-pending]`):** a steer must strip a benign trailing/leading
   `echo <literal>$?` around an allowlisted command *without* widening the very
   expansion-suppression hole the banner warns against — a general "strip trailing
   echo" rule has a safety surface that is the whole question, so the choice
@@ -1179,7 +1130,7 @@
   note adds none either. Filed 2026-07-25 by close, operator-reported, from this
   iteration's validate-stage permission friction.
 
-- **evidence-journal-hash-chain** [needs-spec] — tamper-evidence for the
+- **evidence-journal-hash-chain** [design-pending] — tamper-evidence for the
   evidence trail itself, kit-side and infrastructure-free: each evidence
   record (a stage stamp, a gate-run evidence line) carries the hash of its
   predecessor, making the journal an append-only chain whose retroactive
@@ -1189,7 +1140,7 @@
   and useful alone before it: a chained journal is exactly the record a
   neutral party later countersigns or logs, and today's integrity story
   (git history plus content hashes) proves nothing about omission.
-  **Open design (why `[needs-spec]`):** which surfaces chain (the
+  **Open design (why `[design-pending]`):** which surfaces chain (the
   WORKFLOW-STATE stamp stream spans tracked projections and gitignored
   local capture; gate evidence is per-iteration), the chain's scope and
   reset boundary (per-iteration vs continuous), where the genesis hash
@@ -1203,7 +1154,7 @@
   precondition anyway. Bounded. Surfaced 2026-07-25 in the operator's
   attestation-direction review.
 
-- **md-section-near-miss-match** [needs-spec] — `context-kit/bin/md-section.sh`
+- **md-section-near-miss-match** [design-pending] — `context-kit/bin/md-section.sh`
   silently returns empty (exit 0, no output) on a near-miss heading query instead
   of matching or failing loudly. This session it was queried with `wakeup-guard`
   and `The knowledge-friction loop` while the actual headings were
@@ -1217,7 +1168,7 @@
   suggestion, never exit 0 empty. **Optional adjunct:** an advisory guard nudging
   a non-gate-authoring session that Reads a check's `.sh` toward the SPEC + running
   the gate (advisory-only, the honest ceiling for a judgment boundary).
-  **Why `[needs-spec]`:** the match-relaxation has a real false-positive surface —
+  **Why `[design-pending]`:** the match-relaxation has a real false-positive surface —
   a prefix/substring match can silently resolve to the *wrong* section, so
   choosing among prefix-only, substring, and fail-loud-with-suggestion is the open
   design, and the advisory-guard adjunct is a second guard-kit-vs-context-kit
@@ -1228,7 +1179,7 @@
   source-reading as fallback, the exact loop the doctrine names. Filed 2026-07-25
   by close, drained from the committed gap inbox (`c5c595c`).
 
-- **validate-verb-collision-and-check-routing** [needs-spec] — two coupled
+- **validate-verb-collision-and-check-routing** [design-pending] — two coupled
   defects with one root: the delegation discipline verb collides with the
   `/validate` stage noun, and that collision misroutes the lead's
   post-delegation check onto the evidence producer.
@@ -1285,7 +1236,7 @@
   `validate-producer-liveness-unobservable`, which covers only the concurrent
   case, not a sequential re-run. So the unit ships the prose fix knowing
   detection stays human, and that limit belongs in the binding it lands.
-  **Why `[needs-spec]`:** a prose rename plus a binding-semantics change across
+  **Why `[design-pending]`:** a prose rename plus a binding-semantics change across
   `delegation-kit`'s dispatch template and the lead binding, with a
   grep-propagation pass — a shipped-kit surface change that wants a scoped unit,
   not a close drive-by; and the work-vs-evidence carve-out is a delegation-kit SPEC
@@ -1298,7 +1249,7 @@
   with the lead's post-dispatch third triage item (the check-routing half);
   second instance added the same day by close.
 
-- **core-files-kit-coverage-derived** [needs-spec] — `scripts/core-files.list`
+- **core-files-kit-coverage-derived** [design-pending] — `scripts/core-files.list`
   carries a block headed "One SPEC.md per kit (each kit's canonical contract)"
   that lists **9 of the 11** kit SPECs: `site-kit/SPEC.md` and
   `doctrine-kit/SPEC.md` are absent, as is `doctrine-kit/DOCTRINE.md` (which
@@ -1316,7 +1267,7 @@
   the suffix). This entry is the same move over the core-file manifest: every
   `gate_kit_roots` member's canonical SPEC is pinned by derivation, not by a
   line someone remembered to add.
-  **Why `[needs-spec]`:** the derived set's boundary is the open design, not the
+  **Why `[design-pending]`:** the derived set's boundary is the open design, not the
   assertion. Kit SPECs are uniform, but `doctrine-kit/DOCTRINE.md` is a per-kit
   *deliverable* with no counterpart in the other ten, and the same manifest pins
   surfaces no derivation reaches (workflow instances, generated projections, the
@@ -1338,7 +1289,7 @@
   audit — the amendment's A3 edits this same file, so the gap is adjacent to its
   envelope without being inside it. Lead ruling, scope-gated intake.
 
-- **amendment-update-target-coverage** [needs-spec] — an entry under an
+- **amendment-update-target-coverage** [design-pending] — an entry under an
   amendment's `## Existing sections updated` heading can name no owning delta,
   and nothing catches it. `supply-chain-trust-baseline` shipped two such entries
   of eight: the CLAUDE.md §Housekeeping enumeration and the gate-sdk/README.md
@@ -1351,7 +1302,7 @@
   this close (canon-kit/templates/SPEC-amendment.md) and align now carries the
   manual verification (lifecycle-kit/templates/skills/align.md); this entry is
   the assertion those two currently stand in for.
-  **Why `[needs-spec]`:** the delta-letter grammar is convention, not contract.
+  **Why `[design-pending]`:** the delta-letter grammar is convention, not contract.
   `**A1.` through `**D1.` is how amendments have happened to number their
   deltas; no surface pins it, and a gate cannot match a grammar the template
   never specifies. The design call is whether canon-kit fixes that numbering
@@ -1364,7 +1315,7 @@
   Filed 2026-07-25 by close, from the `supply-chain-trust-baseline` lesson
   triage.
 
-- **gap-inbox-commit-ownership** [needs-spec] — the gap inbox has an unowned
+- **gap-inbox-commit-ownership** [design-pending] — the gap inbox has an unowned
   commit seam and an under-advertised entry point, both hit this iteration by a
   lead filing a bullet mid-iteration. Two halves, one unit.
   **(1) Who commits a lead-filed bullet is unspecified.** lifecycle-kit/SPEC.md
@@ -1392,7 +1343,7 @@
   **Deliverable:** the SPEC names the commit owner, `file-gap.sh` says so at the
   point of capture, and one always-loaded line pairs the two channels by their
   seam.
-  **Why `[needs-spec]`:** the ownership rule is the open call, not the wording.
+  **Why `[design-pending]`:** the ownership rule is the open call, not the wording.
   "The producer commits it alone" is one candidate and it collides with the
   shared-index discipline whenever a stage session holds a dirty index; the
   alternative defers the bullet to the next clean checkpoint and widens the
@@ -1402,7 +1353,7 @@
   Filed 2026-07-25 by close, from the `supply-chain-trust-baseline` gap-inbox
   drain (both halves one unit, as the bullet filed them).
 
-- **security-advisory-lane** [needs-spec] — `SECURITY.md` (shipped this
+- **security-advisory-lane** [design-pending] — `SECURITY.md` (shipped this
   iteration) directs reporters to GitHub private vulnerability reporting, and
   nothing on our side is named as the reader. Advisories are a surface distinct
   from issues and PRs, returned by neither `gh issue list` nor `gh pr list`.
@@ -1415,7 +1366,7 @@
   **Honest limit:** advisories are not unread. GitHub notifies maintainers, so
   this is an unswept lane rather than a black hole, which is what kept it out of
   the in-flight unit.
-  **Why `[needs-spec]` — the lane owes three decisions, and copying the Issues
+  **Why `[design-pending]` — the lane owes three decisions, and copying the Issues
   lane settles none of them.**
   *Disposition grammar under a public queue:* advisories are private and
   TASK-QUEUE.md is public, so a promoted entry citing an unfixed vulnerability
@@ -1437,7 +1388,7 @@
   Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
   inbox (two bullets merged at triage, costed once).
 
-- **evidence-row-upsert-order** [needs-spec] — `evidence-kit/bin/run-validate.sh`
+- **evidence-row-upsert-order** [design-pending] — `evidence-kit/bin/run-validate.sh`
   upserts each suite's row in `.workflow/validate-evidence.txt` as a
   delete-then-append: `awk` filters the `(iteration, suite)` line out into a
   temp, the new line is appended, the temp is `mv`'d over the manifest. So a
@@ -1472,7 +1423,7 @@
   session-visible defect.
   **Deliverable:** an order-stable upsert, so re-running an unchanged suite
   leaves the file byte-identical.
-  **Why `[needs-spec]`:** the writer's `# spec:` line declares the current
+  **Why `[design-pending]`:** the writer's `# spec:` line declares the current
   semantics deliberately — "a re-run supersedes this iteration's prior line for
   the suite, then appends" — so recency order may be the intended contract
   rather than an accident, and an in-place update changes it. Whether the
@@ -1485,7 +1436,7 @@
   Filed 2026-07-25 by close; premise corrected the same day by close after
   re-deriving the writer set.
 
-- **local-overlay-git-blanket-grant** [needs-spec] — the local permission overlay
+- **local-overlay-git-blanket-grant** [design-pending] — the local permission overlay
   carries `Bash(git *)`, a single glob granting **every** git subcommand without a
   prompt. The destructive ones ride it: `git reset --hard`, `git clean -fd`, `git
   push --force`, `git rm -r`. `bash-guard`'s project rules cover only two narrow
@@ -1502,7 +1453,7 @@
   read-only verbs no longer need it — `git status|log|show|diff|rev-parse|
   ls-remote|tag -l|check-ignore` were promoted to the committed allowlist this
   close, which is what makes the narrowing affordable.
-  **Why `[needs-spec]`:** the general question is whether guard-kit should ship a
+  **Why `[design-pending]`:** the general question is whether guard-kit should ship a
   *breadth* criterion beside its redundancy one — a check that reds a local glob
   whose match set includes a known-destructive command — and if so, where the
   destructive set is owned without becoming a maintained roster. That is a
@@ -1519,7 +1470,7 @@
   remainder.
   Filed 2026-07-25 by close, from the tooling-friction triage.
 
-- **validate-producer-liveness-unobservable** [needs-spec] — a stage session can
+- **validate-producer-liveness-unobservable** [design-pending] — a stage session can
   report its stage done while its own oracle is still executing, and nothing in
   the lifecycle can see it. This iteration the validate session's `run-validate`
   was still running in the background when the lead dispatched close; its writes
@@ -1544,7 +1495,7 @@
   `EVIDENCE_KIT_TMP_DIR` for the duration of a run and releases it on exit; the
   close-entry preflight reds on a held lock, so a stage entry cannot be stamped
   while the prior stage's producer is still writing.
-  **Why `[needs-spec]`:** it adds a runtime artifact needing a named reclaim path
+  **Why `[design-pending]`:** it adds a runtime artifact needing a named reclaim path
   (the runtime-artifact lifecycle rule), a stale-lock policy for a crashed run,
   and a knob; and evidence-kit/SPEC.md owns the writer contract while
   lifecycle-kit owns the preflight, so which kit holds the lock is a
@@ -1558,7 +1509,7 @@
   Filed 2026-07-25 by close, from the operator's observation of the live
   `run-validate` and the row-relocation fingerprint at `ae70eae`.
 
-- **lead-dispatch-requires-completion-notification** [needs-spec] — the lead has
+- **lead-dispatch-requires-completion-notification** [design-pending] — the lead has
   no stated precondition for dispatching stage N+1, and the one it improvised is
   wrong: artifact state. This iteration the lead verified that validate's commit
   had landed with complete evidence, the tree was clean, the battery green, and
@@ -1603,7 +1554,7 @@
   the dispatch decision (this entry), the observability gap (the sentinel), and
   the artifact churn (`evidence-row-upsert-order`), which is worth fixing on its
   own merits and is not merely a symptom.
-  **Why `[needs-spec]`:** it adds a precondition to a shipped template's dispatch
+  **Why `[design-pending]`:** it adds a precondition to a shipped template's dispatch
   contract and states a limit (prose-only, human-enforced) that
   lifecycle-kit/SPEC.md should own explicitly rather than leave implied.
   **Cost while deferred:** every multi-stage iteration with a live lead can
@@ -1614,7 +1565,7 @@
   decision; the operator ruled stage sequencing the lead's accountability, which
   is why this is a lead rule rather than a stage-session or gate concern.
 
-- **platform-support-ci-matrix** [needs-spec] [roadmap: next/reliability] — a CI leg per platform.
+- **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a leg per platform.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
   The per-platform half carved out
   of `platform-support-contract` when that entry was scoped down to the floor
@@ -1650,7 +1601,7 @@
   Filed 2026-07-26 by scope, operator ruling at the `activation-path` unit-set
   escalation, split from `platform-support-contract`.
 
-- **gate-tamper-consumer-gate-coverage** [needs-spec] — this repo's gates
+- **gate-tamper-consumer-gate-coverage** [design-pending] — this repo's gates
   are outside `check-gate-tamper` entirely, and the override that did it looks
   like an oversight rather than a decision. `delegation-kit/lib/delegation.sh`
   defaults `DELEGATION_KIT_GATE_FILES` to `<gates-dir>/check-*.sh` plus the
@@ -1688,7 +1639,7 @@
   `platform-support-contract` floor batch, from a probe of `check-gate-tamper`'s
   resolved runtime config.
 
-- **lint-scope-hook-trigger** [needs-spec] — `GATE_SDK_LINT_EXTRA_DIRS` widens
+- **lint-scope-hook-trigger** [design-pending] — `GATE_SDK_LINT_EXTRA_DIRS` widens
   what `check-shellcheck` scans but cannot widen when the generated hook fires
   it. The hook's trigger is expanded from the gate's `# graph:` couples
   (`scripts/*.sh,kit:*.sh`), and `kit:` resolves to kit roots — a set no
@@ -1722,7 +1673,7 @@
   doctor + manifest batch, after measuring both the glob behavior and the
   gate's runtime.
 
-- **installer-lifecycle-verbs** [needs-spec] [roadmap: next/adoption] — update, diff, uninstall.
+- **installer-lifecycle-verbs** [design-pending] [roadmap: next/adoption] — update, diff, uninstall.
   roadmap-summary: update, diff and uninstall, so an install can be managed after init.
   The installer's second phase:
   `update`, `diff`, and `uninstall`, the verbs that manage an install after
@@ -1783,7 +1734,7 @@
   merge, from scope the amendment governed and its deletion would otherwise
   have dropped.
 
-- **installer-smoke-manifest-write-collision** [needs-spec] — `installer_smoke`
+- **installer-smoke-manifest-write-collision** [design-pending] — `installer_smoke`
   (new this iteration in `EVIDENCE_KIT_SUITES`) sits 18th of 22 suites in
   `scripts/evidence-config.sh`'s roster, behind `gates` and every kit fixture
   suite, `guard_tests`, `usage_tests`, `budget_guard_tests`, `trend_tests`, and
@@ -1839,7 +1790,7 @@
   clean-tree-requiring suite is not first — a scanner for "requires a clean
   tree" would need each suite to declare that need rather than inferring it
   from grepping its script, which is itself an open design question.
-  **Why `[needs-spec]`:** candidate (a) changes the writer contract
+  **Why `[design-pending]`:** candidate (a) changes the writer contract
   `evidence-row-upsert-order` already covers ("a re-run supersedes this
   iteration's prior line for the suite, then appends") — an
   `evidence-kit/SPEC.md` ruling, not a script patch, and the two entries
@@ -1856,7 +1807,7 @@
   Filed 2026-07-26 by validate (`activation-path`), from the full evidence
   battery run.
 
-- **installer-upgrade-smoke-arm** [needs-spec] — `installer/consumer-smoke/run-smoke.sh`
+- **installer-upgrade-smoke-arm** [design-pending] — `installer/consumer-smoke/run-smoke.sh`
   packs a single `$VERSION` and asserts the same-version re-run leaves the tree
   unchanged (idempotence). The **cross-version** upgrade path — `init.sh`'s
   version check falling through in the upgrade direction, the profile re-read
@@ -1876,7 +1827,7 @@
   Filed 2026-07-26 by close (`activation-path`), correcting a false
   no-upgrade-path premise against `installer/lib/init.sh`.
 
-- **gate-file-coverage-closure** [needs-spec] — the missing check class behind a
+- **gate-file-coverage-closure** [design-pending] — the missing check class behind a
   hole this close fixed inline: nothing asserts that every gate script in the
   tree is matched by some `DELEGATION_KIT_GATE_FILES` glob, so a gate can sit
   outside `check-gate-tamper`'s assertion-A coverage silently. It did: this
@@ -1892,7 +1843,7 @@
   Cheap and mechanically decidable — the coverage set and the glob set are both
   already in hand at gate time. Needs a `gate-sdk` fixture pair and a home
   (delegation-kit, since it reads that kit's knob).
-  **Why `[needs-spec]`:** it makes coverage-completeness a delegation-kit
+  **Why `[design-pending]`:** it makes coverage-completeness a delegation-kit
   contract, which is a SPEC assertion, not just a new script.
   **Cost while deferred:** the config is correct today but unheld — the next
   consumer-resident gate, or the next kit-glob edit, can reopen the identical
@@ -1901,7 +1852,7 @@
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
 
-- **kit-owned-install-recipe** [needs-spec] — a kit's **zero-config gate
+- **kit-owned-install-recipe** [design-pending] — a kit's **zero-config gate
   subset** (the gates it can register in a fresh consumer with no
   adopter-authored surface) is encoded twice, and no surface owns it: once in
   each kit's `smoke/install.sh` for its scratch consumer, and once in
@@ -1924,7 +1875,7 @@
   gate with a fixture pair. This is the De-literalization and Derivation-first
   fix in one: the roster stops being prose-and-literal in two places and
   becomes a thing each kit owns and the installer calls.
-  **Why `[needs-spec]`:** it adds a kit-root structural predicate (every kit
+  **Why `[design-pending]`:** it adds a kit-root structural predicate (every kit
   ships an install entry point), which is a `gate-sdk/SPEC.md` contract change
   across all eleven kits, not a script patch.
   **Cost while deferred:** the two rosters drift open-loop — every kit that
@@ -1937,7 +1888,7 @@
   captured as a knowledge-friction re-derivation against
   `installer/lib/common/recipe.sh`; both converge here.
 
-- **operator-authored-unit-set** [needs-spec] — lifecycle-kit/SPEC.md's
+- **operator-authored-unit-set** [design-pending] — lifecycle-kit/SPEC.md's
   standing-scope-directive clause models exactly one shape: a **lead-authored**
   menu, "a theme bounding scope's survey and never a slug list". This iteration
   ran the other shape — an **operator-authored slug list** naming all four units
@@ -1951,7 +1902,7 @@
   obligation as **scope's own regardless of who authored the list** — the
   re-verification is not a check on the author's authority, it is scope's
   contract with the tree.
-  **Why `[needs-spec]`:** it amends a lifecycle-kit SPEC clause that governs
+  **Why `[design-pending]`:** it amends a lifecycle-kit SPEC clause that governs
   stage-entry semantics for every consumer, and the honest form may be a
   generalization (any pre-authored unit set, author-agnostic) rather than a
   second enumerated case — that choice is the design.
@@ -1963,7 +1914,7 @@
   surfaced by that iteration's scope and routed to spec by the lead for filing,
   deliberately not fixed in-iteration.
 
-- **tarball-build-attestation** [needs-spec] — `release-tarball-delivery-channel`
+- **tarball-build-attestation** [design-pending] — `release-tarball-delivery-channel`
   ships the Release tarball beside a `.sha256`, and that checksum proves
   **transfer integrity only**: checksum and tarball share one origin and one TLS
   session, so a consumer who fetches both from a compromised release fetches a
@@ -1975,7 +1926,7 @@
   `actions/attest-build-provenance` at publish time, verified by
   `gh attestation verify` at install time — plus the install-path documentation
   that makes verification a step a Node-free adopter can actually run.
-  **Why `[needs-spec]`:** it adds a fourth pinned `uses:` ref to `publish.yml`
+  **Why `[design-pending]`:** it adds a fourth pinned `uses:` ref to `publish.yml`
   (a supply-chain-surface change the supply-chain-trust-baseline contract
   governs), and the install-side half is an open question: an attestation nobody
   verifies buys nothing, but `gh attestation verify` reintroduces a toolchain
@@ -1987,7 +1938,7 @@
   Filed 2026-07-26 by close (`release-path-hardening`) off the gap inbox's
   tarball-checksum bullet; ruled outside the shipping unit's envelope at align.
 
-- **spec-measured-count-gate** [needs-spec] — a **measured count authored into a
+- **spec-measured-count-gate** [design-pending] — a **measured count authored into a
   canonical SPEC section goes stale with no oracle**. Reproduced twice in one
   iteration: the align audit found `gate-sdk/SPEC-action-run-shell.md` B2's block
   count wrong twice over (five, then six; the tree carried eight) and, worse,
@@ -2002,7 +1953,7 @@
   candidate is narrow — a **bare cardinal qualifying a derived roster** in a SPEC
   section whose subject is a `gate_find`-derived set — and it is filed here
   rather than left as prose, per the Gap-disposition rule.
-  **Why `[needs-spec]`:** the false-positive surface *is* the design. "Bare
+  **Why `[design-pending]`:** the false-positive surface *is* the design. "Bare
   cardinal near a roster noun" over-matches legitimate prose (a contract that
   genuinely fixes a count — "the four contracts", "both halves"), so the gate
   needs a principled trigger, and the honest outcome may be an opt-in
@@ -2014,7 +1965,7 @@
   Filed 2026-07-26 by close (`release-path-hardening`), draining the
   stale-measured-count bullet; costed at roughly one small unit.
 
-- **action-run-shell-scan-predicate** [needs-spec] —
+- **action-run-shell-scan-predicate** [design-pending] —
   `check-action-run-shell`'s scan predicate is a **kit literal with no consumer
   seam**. The align ruling narrowed extraction to files carrying a top-level
   `jobs:` or `runs:` key, which is right for what gate-sdk claims, but it leaves
@@ -2026,7 +1977,7 @@
   inherits a wider reach by accident**. The shape is the
   `check-graph` / `scripts/graph-vocab.sh` optional-consumer-config pattern the
   provenance seam already prescribes, so the precedent exists.
-  **Why `[needs-spec]`:** it adds a knob to a gate that has none, and
+  **Why `[design-pending]`:** it adds a knob to a gate that has none, and
   `gate-sdk/SPEC.md`'s no-new-knob claim for this gate would need re-deriving —
   a contract edit, not a script patch.
   **Cost while deferred:** low — the gate is correct and complete over what it
@@ -2036,7 +1987,7 @@
   Filed 2026-07-26 by close (`release-path-hardening`) from the scan-predicate
   bullet; deliberately out of that unit's envelope at align.
 
-- **scratch-execution-allowlist-bar** [needs-spec] — the prompt-friction triage
+- **scratch-execution-allowlist-bar** [design-pending] — the prompt-friction triage
   keeps surfacing one dominant class that must **never** be allowlisted, and
   nothing records why. This close's scan ranked `bash .tmp/<script>.sh` first by
   a wide margin (24 calls across 13 one-off script names, against 7 for the next
@@ -2057,7 +2008,7 @@
   (`bash`, `sh`, `source`, `.`) of a path under an agent-writable scratch
   directory, plus the one-line rule in guard-kit/SPEC.md §The triage criterion
   that the gate enforces. Both halves land together, per Enforcement-first.
-  **Why `[needs-spec]`:** the scratch-directory set is the design. `.tmp/` is
+  **Why `[design-pending]`:** the scratch-directory set is the design. `.tmp/` is
   this repo's binding, not a kit literal, so the gate needs the consumer seam the
   provenance seam prescribes (the `check-graph` / `graph-vocab.sh` pattern) — and
   the honest predicate may be wider than scratch (any agent-writable path,
@@ -2071,7 +2022,7 @@
   prompt-friction triage; the local overlay carried no redundant entries to
   prune this iteration.
 
-- **action-gh-repo-context** [needs-spec] — a workflow job that invokes `gh`
+- **action-gh-repo-context** [design-pending] — a workflow job that invokes `gh`
   while carrying **neither a checkout nor a repo-context env** cannot resolve a
   target repository, and nothing catches it until a tag fires. This is not
   hypothetical: it took down `v0.17.0`'s `release` job on its first live run.
@@ -2092,7 +2043,7 @@
   `--repo` on every `gh` invocation. All three inputs are readable from the
   workflow text, and the trigger is narrow — only jobs that actually call `gh`
   arm it.
-  **Why `[needs-spec]`:** placement and reach are undecided. It reads the same
+  **Why `[design-pending]`:** placement and reach are undecided. It reads the same
   Actions-shape surface as `check-action-run-shell` and so probably belongs in
   gate-sdk, but that makes it consumer-reachable — which means a fixture pair, a
   SPEC section, `gates.list` registration, three regenerated projections, and a
@@ -2109,7 +2060,7 @@
   landing a consumer-reachable gate after validate has passed is the failure mode
   this iteration exists to fix.
 
-- **native-gate-binary-port** [needs-spec] [roadmap: next/reliability] — replace the gate substrate.
+- **native-gate-binary-port** [design-pending] [roadmap: next/reliability] — a new gate substrate.
   roadmap-summary: The gate battery as one native binary: no GNU userland, sub-second runs.
   Port the battery off bash-plus-GNU-userland onto a single native compiled
   binary (Rust the lead candidate), because every structural pain the current
@@ -2140,7 +2091,7 @@
   in the sub-second class, native macOS/Windows with no GNU-toolchain floor,
   the cross-utility version matrix gone, a real unit-test harness under the
   fixtures, and vendored binaries giving an agent nothing to read.
-  **Why `[needs-spec]`:** the consumer-extensibility model is the design that
+  **Why `[design-pending]`:** the consumer-extensibility model is the design that
   decides everything else — script escape hatch as first-class vs a
   declarative check DSL vs native plugins — plus language choice (Rust vs
   Go), the dogfood question (this repo must run built artifacts or the
@@ -2165,7 +2116,7 @@
   Filed 2026-07-28 by operator request, from a session assessing the shell
   substrate's structural limits against a native-binary port.
 
-- **docs-root-link-grammar** [needs-spec] — a hand-authored `docs/` page that
+- **docs-root-link-grammar** [design-pending] — a hand-authored `docs/` page that
   links a path *outside* `docs/` with a bare relative link resolves on disk but
   404s on the rendered site, which is served from `docs/` as its root.
   `check-md-refs` resolves the target on disk and stays green, so nothing
@@ -2181,7 +2132,7 @@
   **Deliverable:** a gate asserting that a link from a `docs/` page to a target
   outside `docs/` uses the blob form, plus — under enforcement-first, in the
   same unit — the sweep of the existing violations.
-  **Why `[needs-spec]`:** the boundary predicate needs care. Relative links
+  **Why `[design-pending]`:** the boundary predicate needs care. Relative links
   *within* `docs/` are correct and must stay silent; the mirror's own pages are
   generated and already conform; and the rule must not fire on anchors or
   absolute URLs. Whether this is a new gate or an assertion inside
@@ -2197,7 +2148,7 @@
   Filed 2026-07-27 at align in front-door-readiness, while verifying the
   roadmap amendment's docs-home link; re-verified at close.
 
-- **root-page-render-coverage** [needs-spec] — *re-based at close; read the
+- **root-page-render-coverage** [design-pending] — *re-based at close; read the
   negative finding before reopening.* No gate renders a governed markdown
   surface at the repo root: `check-docs-render-fidelity` enumerates tracked
   pages under `docs/` only. This was filed twice this iteration as a live
@@ -2214,7 +2165,7 @@
   actual fix for what went wrong here.
   **Deliverable, if anything:** fidelity coverage for the one root page a
   *machine* writes — `ROADMAP.md` — keyed on the renderer that serves it.
-  **Why `[needs-spec]`:** the honest outcome may well be *build nothing*, and a
+  **Why `[design-pending]`:** the honest outcome may well be *build nothing*, and a
   scope opening this should be willing to close it unbuilt. The repo's
   toolchain has ruby/kramdown but no CommonMark renderer, so this means a new
   gate dependency; the hand-authored root pages need no coverage at all (a
@@ -2232,7 +2183,7 @@
   parsers.
 
 
-- **capture-affordance-help-flag** [needs-spec] — `lifecycle-kit/bin/file-gap.sh` takes
+- **capture-affordance-help-flag** [design-pending] — `lifecycle-kit/bin/file-gap.sh` takes
   exactly one free-text argument, so `--help` satisfies its arity check and is
   **filed as a gap**. Not hypothetical: a session ran
   `bash lifecycle-kit/bin/file-gap.sh --help` this iteration and the resulting
@@ -2253,5 +2204,7 @@
   log's own evidence of the invocation.
 
 ## Done
+
+- needs-spec-tag-rename
 
 ## Lessons Learned

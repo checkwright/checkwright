@@ -62,8 +62,11 @@ A feature task is therefore in exactly one of two states, marked with the
 queue tags whose syntax queue-kit defines:
 
 - **Design-pending** — no amendment yet; the entry sits in the deferred
-  section tagged `[needs-spec]`, excluded from selection. Every deferred
+  section tagged `[design-pending]`, excluded from selection. Every deferred
   entry carries the tag: all deferred work is design-pending by definition.
+  The token names the *state*, not a promised artifact — a deferred **debt**
+  entry promotes with the tag deleted rather than converted, and the tag has
+  to be true of that entry too.
 - **Spec-ready** — the amendment exists; the entry sits in the feature
   section tagged `[spec: <ref>]`, eligible for selection.
 
@@ -74,8 +77,17 @@ the deferred entry — without the pairing, design rationale and ruled-out
 alternatives get re-derived under build pressure. Technical debt needs no
 amendment (it fixes behavior to an existing spec); a debt task that needs a
 design *ruling* is design work — it goes to the deferred section
-`[needs-spec]` until scope rules on it. Enforced by
+`[design-pending]` until scope rules on it. Enforced by
 `check-amendment-queue`.
+
+The tag is a **checksum on the promotion move**, not a second source of the
+state its section already carries. Its redundancy is the mechanism: a
+promotion crosses a section boundary *and* swaps the tag, so
+forbidden-in-active catches a move that dropped the swap and
+`[spec:]`-in-design-pending catches a swap that dropped the move. That is
+also the test a further tag has to pass: a tag marking a move that crosses no
+pending/ready boundary adds a state name without adding a caught error class,
+and is refused.
 
 The feature/debt litmus is **new names**: a task that adds any name to a
 governed surface — a script, a config knob, a file or directory convention,
@@ -189,7 +201,7 @@ docs-site page dir (`docs/canon-kit/`). Generic vocabulary names the spec
 *artifact* discipline rather than the brand and is fixed regardless of the
 kit's name: the `SPEC.md` canonical-spec filename, the `SPEC-*.md` amendment
 glob, the `spec:` and `contract:` source directives, the `[spec:]` and
-`[needs-spec]` queue tags, the `check-spec-*` gate names, and the internal
+`[design-pending]` queue tags, the `check-spec-*` gate names, and the internal
 `lib/spec.sh` loader (where "spec" names the discipline). The consumer gate
 `check-kit-ref-liveness` (a check-skeleton copy in `scripts/` — the
 dangling-reference hazard is a kit author's, so it is not templated into
@@ -213,10 +225,10 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 - `CANON_KIT_FEATURE_SECTIONS` — array, default `("New Features")`: active
   sections whose entries require `[spec:]`.
 - `CANON_KIT_ACTIVE_SECTIONS` — array, default
-  `("New Features" "Technical Debt")`: sections where `[needs-spec]` is a
+  `("New Features" "Technical Debt")`: sections where `[design-pending]` is a
   violation.
 - `CANON_KIT_DEFERRED_SECTION` — default `Deferred`: the section whose
-  every entry requires `[needs-spec]`.
+  every entry requires `[design-pending]`.
 - `CANON_KIT_DOD_HEADING` — default `Definition of Done`;
   `CANON_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one`
   (a reference-spec corpus like this repo's kits carries no DoD).
@@ -328,7 +340,7 @@ unset, and the loader exits 2 on a malformed config. Knobs:
 Cross-kit note: the section knobs carry the same defaults as queue-kit's;
 the knobs are independent (either kit runs without the other), so a
 consumer renaming its sections sets both. Valve and marker spellings <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->
-(`[needs-spec]`, `[spec:]`, `vision-introduces` / `spec-introduces`,
+(`[design-pending]`, `[spec:]`, `vision-introduces` / `spec-introduces`,
 `spec-embedded-source-exempt: <reason>`) are mechanism, not config.
 
 ## Per-component contracts
@@ -400,11 +412,11 @@ same shapes:
 ### check-amendment-queue
 
 Invariant: the bidirectional rule holds — (a) no feature-section entry
-without `[spec:]`, no `[needs-spec]` anywhere in the active sections
+without `[spec:]`, no `[design-pending]` anywhere in the active sections
 (entries or prose; a prose mention masks the tag's absence), and no
 `[spec:]`-tagged entry in an active non-feature section (a spec-ready
 entry is misfiled there — it belongs in a feature section); (b) every
-deferred entry carries `[needs-spec]`, and a deferred entry already
+deferred entry carries `[design-pending]`, and a deferred entry already
 carrying `[spec:]` must be promoted; (c) every amendment on disk pairs
 with a `[spec:]` queue entry and every `[spec:]` ref resolves to a file.
 
@@ -413,6 +425,17 @@ repo-relative path (resolved directly — the generalization that lets a
 consumer point a task at any design artifact, e.g. this repo's kit-SPEC
 drafts). Sub-bullets and prose notes are outside the entry grammar;
 `precommit` tier.
+
+Coverage limit, stated because the tag's section-wide reach invites the
+stronger claim: any heading that is not a feature, active, or deferred
+section classifies as `other` and skips every arm, so the **done section is
+an exempt population** — an entry moved out of design-pending into it still
+carrying the tag reds nowhere, and queue-kit's lead-line gate misses it too
+(its scanned surface is the task sections alone). In practice the done
+grammar is a bare slug line, so the tag is dropped by that grammar rather
+than by a gate. The guard is total over the *promotion* moves it exists to
+catch — design-pending → an active section — and silent on the disposition
+move.
 
 ### check-spec-dod-singleton
 

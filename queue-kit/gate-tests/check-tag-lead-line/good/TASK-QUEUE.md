@@ -17,7 +17,8 @@
 
 ### Later
 
-- **gamma-feature** — revisit when the alpha surface settles.
+- **gamma-feature** [design-pending] — revisit when the alpha surface settles.
+  a continuation mentioning [design-pending] is tolerated (lead carries it).
 
 ## Done
 
