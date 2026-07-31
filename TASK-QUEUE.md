@@ -12,6 +12,57 @@
 
 ## New Features
 
+- **upgrade-smoke-note-resolution** [spec: SPEC-upgrade-smoke-note-resolution.md]
+  — the standing pre-release assertion is unreachable in any iteration that
+  tightens a gate. `gate-sdk/bin/upgrade-smoke.sh` resolves the release note by a
+  tag pointing at `TO`, and `TO` defaults to `HEAD`, so every commit before the
+  iteration's final one resolves no version, no note, and an empty declaration —
+  and the behavior is **specified**, not accidental, which is what makes the unit
+  feature-shaped: the fix revises the contract rather than converging the script
+  onto it.
+  **Deliverable:** the declaration resolved from the `TO` tree over a version
+  window opened by `FROM`, so an untagged `TO` proves containment rather than
+  emptiness. Deltas, causal completeness, and the ruled-out alternatives:
+  gate-sdk/SPEC-upgrade-smoke-note-resolution.md.
+  **Do not promote the `upgrade` baseline row on a post-tag green** — immediately
+  after a tag the smoke runs clean because `TO` is momentarily a tagged `HEAD`,
+  and the next commit restores the defect. The row goes to `pass` when this is
+  built, and a green run this iteration does not by itself exercise the window.
+  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while executing
+  the ruling to author the release note; promoted from the gap inbox the same day;
+  amendment authored 2026-07-31 at spec.
+
+- **release-note-lead-token-grammar** [spec: SPEC-release-note-lead-token-grammar.md]
+  — the release note's Tightened-gates lead-token grammar and the parser
+  consuming it disagree, so a bolded declaration compiles to an empty allowed-red
+  set without saying so. `docs/install.md` prescribes the one spelling the
+  `upgrade-smoke.sh` parser cannot read, and 12 of the 22 non-`none` bullets in
+  the shipped corpus parse to nothing.
+  **Deliverable:** one canonical spelling held by a gate rather than by
+  convention, one implementation of the grammar behind two callers, a parser that
+  refuses a silently-empty declaration, and the shipped corpus repaired to it.
+  Design, the seam ruling, the post-immutability ruling, and the ruled-out
+  parser-widening alternative: SPEC-release-note-lead-token-grammar.md.
+  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while checking
+  which bullet form the smoke actually parses; promoted from the gap inbox the
+  same day; amendment authored 2026-07-31 at spec.
+
+- **action-gh-repo-context** [spec: SPEC-action-gh-repo-context.md] — a workflow
+  job that invokes `gh` while carrying neither a checkout nor a repo-context env
+  cannot resolve a target repository, and nothing catches it until a tag fires.
+  It took down `v0.17.0`'s `release` job on its first live run. The class is one
+  `check-action-run-shell` is structurally blind to: the shell is valid and the
+  defect is semantic, an assumption about the runner's filesystem.
+  **Deliverable:** a gate asserting that a job whose `run:` blocks invoke `gh`
+  contains a checkout ordered before the call, sets `GH_REPO`, or passes
+  `--repo` on every invocation. Placement, the detector, the three arms, the
+  valve, and the fixture-as-attested-miss:
+  gate-sdk/SPEC-action-gh-repo-context.md.
+  Filed 2026-07-27 by close (`release-path-hardening`), from the v0.17.0 release
+  job's first live failure; ruled a unit rather than a close-step patch, since
+  landing a consumer-reachable gate after validate has passed is the failure mode
+  that iteration exists to fix; amendment authored 2026-07-31 at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -1064,44 +1115,6 @@
   Filed 2026-07-26 by close (`release-path-hardening`), draining the
   stale-measured-count bullet; costed at roughly one small unit.
 
-- **action-gh-repo-context** [design-pending] — a workflow job that invokes `gh`
-  while carrying **neither a checkout nor a repo-context env** cannot resolve a
-  target repository, and nothing catches it until a tag fires. This is not
-  hypothetical: it took down `v0.17.0`'s `release` job on its first live run.
-  `.github/workflows/publish.yml`'s release job downloads the packed artifact and
-  deliberately checks out nothing (the job needs no source, and its own header
-  argues that design), but set only `GH_TOKEN` and `TAG` — so `gh` fell back to
-  resolving the repo from a git remote that was not there and died in 7s on
-  `failed to run git: fatal: not a git repository`, before its first API call.
-  No Release was created and no assets were attached.
-  **Gap generalization — the class is real and ShellCheck is structurally blind
-  to it.** `check-action-run-shell`, which this same iteration shipped, lints
-  exactly this block and passes it: the shell is valid, the variables are quoted,
-  the control flow is sound. The defect is **semantic** — an assumption about the
-  runner's filesystem that no syntactic linter can hold. So the gate that exists
-  is not the gate this needed, and that distinction is the entry's whole point.
-  **Deliverable:** an assertion that a job whose `run:` blocks invoke `gh` either
-  contains a checkout step, sets `GH_REPO` (job- or step-level), or passes
-  `--repo` on every `gh` invocation. All three inputs are readable from the
-  workflow text, and the trigger is narrow — only jobs that actually call `gh`
-  arm it.
-  **Why `[design-pending]`:** placement and reach are undecided. It reads the same
-  Actions-shape surface as `check-action-run-shell` and so probably belongs in
-  gate-sdk, but that makes it consumer-reachable — which means a fixture pair, a
-  SPEC section, `gates.list` registration, three regenerated projections, and a
-  Tightened-gates bullet in the next note. The `--repo`-on-every-call arm is also
-  the fiddly one: proving *every* invocation carries it is a per-line read, and a
-  job mixing prefixed and unprefixed calls is the false-negative to design out.
-  **Cost while deferred:** the concrete instance is fixed (the release job now
-  sets `GH_REPO`, bound by a comment to the no-checkout design), so what stays
-  open is the class — any future `gh`-using job repeats it, and the failure mode
-  is the worst-timed one available: green everywhere, red only at the tag, on the
-  release path itself. Costed at roughly one small unit.
-  Filed 2026-07-27 by close (`release-path-hardening`), from the v0.17.0 release
-  job's first live failure; ruled a unit rather than a close-step patch, since
-  landing a consumer-reachable gate after validate has passed is the failure mode
-  this iteration exists to fix.
-
 - **native-gate-binary-port** [design-pending] [roadmap: next/reliability] — a new gate substrate.
   roadmap-summary: The gate battery as one native binary: no GNU userland, sub-second runs.
   Port the battery off bash-plus-GNU-userland onto a single native compiled
@@ -1183,86 +1196,6 @@
   ruling does not transfer.
   Filed 2026-07-27 at align in front-door-readiness, while verifying the
   roadmap amendment's docs-home link; re-verified at close.
-
-- **upgrade-smoke-note-resolution** [design-pending] — the standing pre-release
-  assertion is unreachable in any iteration that tightens a gate.
-  `gate-sdk/bin/upgrade-smoke.sh:113` resolves the release note by
-  `git tag --points-at` on `TO`, and `TO` defaults to `HEAD`. An untagged HEAD —
-  every commit before `RELEASING.md` step 4 tags the iteration's final commit —
-  resolves no version, so the note lookup at `:115-121` is skipped entirely and
-  the any-red refusal at `:144` fires whatever the note declares. Verified
-  rather than read at validate: the `v0.18.0` note was authored and committed,
-  and the smoke's output was byte-identical to the pre-note run, printing
-  `TO (HEAD)` — the empty-version fallthrough of the message's own default. The
-  script's own spec line calls `TO=HEAD` the standing pre-release assertion that
-  the working tree upgrades cleanly from the last tag, and that assertion is
-  today satisfiable only by tightening nothing.
-  **Deliverable:** an untagged TO that resolves its intended declaration, so the
-  pre-release assertion proves containment rather than emptiness.
-  **Why `[design-pending]`:** the resolution rule is the open call. Reading the
-  highest note above FROM is the obvious candidate but lets an unshipped note
-  license reds; keying off the derived bump, or narrowing the refusal itself,
-  are alternatives with different failure modes. Which one preserves the
-  smoke's fail-closed character is unsettled, and picking wrong converts a
-  proof into a formality.
-  **Premise sharpened 2026-07-31 at scope: the present behavior is SPECIFIED,
-  not accidental.** `upgrade-smoke.sh:112` carries a `# spec:` line stating the
-  intent outright — an unreleased TO resolves no version, so no note, so the
-  red set must be empty. The fix cannot converge the script onto a contract
-  that already says otherwise; it must revise that contract and
-  `docs/install.md`'s upgrade contract with it — which makes the unit
-  **feature-shaped, not debt**, owing an amendment before it can be promoted.
-  **Do not promote the baseline row on a post-tag green — verified 2026-07-31.**
-  Immediately after `v0.18.0` was tagged on the iteration's final commit, the
-  smoke ran clean (`red set 0 ⊆ 3 declared`) because `TO` was momentarily a
-  tagged HEAD. That is the tag, not the fix: the defect is that an **untagged**
-  HEAD resolves no note, and the next commit restores it. Promoting the row on
-  that observation would encode the tagged-HEAD exception as the expectation and
-  hand the next iteration's validate a new-failure red on a defect already filed
-  and deferred — the exact case the held-constant idiom exists for. The row is
-  promoted when this entry is built, not when a tag happens to sit on HEAD.
-  **Cost while deferred:** this slug holds `upgrade` red in the validate
-  baseline, and the enforcement cost of that hold is the real charge. `upgrade`
-  is a single-scenario suite, so while the row is held-red *any additional* red
-  arising inside the smoke — a non-deterministic phase A, a consumer file lost
-  to the sync, an undeclared gate — is invisible until the row is promoted back
-  to `pass`. Enforcement is suspended for the duration rather than narrowed,
-  which is the argument for taking this next iteration rather than letting it
-  sit.
-  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while executing
-  the ruling to author the release note; promoted from the gap inbox the same
-  day.
-
-- **release-note-lead-token-grammar** [design-pending] — the release note's
-  Tightened-gates lead-token grammar and the parser consuming it disagree, so a
-  bolded declaration compiles to an empty allowed-red set.
-  `gate-sdk/bin/upgrade-smoke.sh:127-128` extracts the set with a `sed`
-  expression whose token may be bare or backticked; a bolded token fails its
-  character class outright and yields nothing. `docs/install.md:406-407` states
-  Behavior-changes lead tokens are bolded like the other sections' lead tokens,
-  so the prose prescribes for Tightened gates the one spelling the parser
-  cannot read. Audited across every shipped note: 12 of 22 non-`none`
-  Tightened-gates bullets parse to an empty set — `v0.4.0`, `v0.5.0`, `v0.7.0`,
-  `v0.10.0` (four), `v0.13.0` (three), `v0.15.0`, `v0.17.0` — and `v0.13.0`'s
-  three are bold *and* backticked, which also parses empty. Only `v0.2.0`'s
-  seven and `v0.18.0`'s three parse. It never bit because the containment
-  branch is reached only when a red set coincides with a tagged TO.
-  **Deliverable:** one canonical spelling for the lead token, held by a gate
-  rather than by convention, and the shipped notes reconciled to it.
-  **Why `[design-pending]`:** the direction must not be settled by whoever
-  happens to fix it. Widening the parser to strip bold keeps every shipped note
-  as authored but blesses two spellings; narrowing the prose to backticks gives
-  one spelling but rewrites twelve published bullets. Which surface owns the
-  grammar is the question, not the edit.
-  **Cost while deferred:** low today and non-rotting — no shipped note's empty
-  set has ever been consulted — but it silently disarms the one assertion the
-  upgrade contract calls mechanical, so the first release shipping a real
-  allowed-red set would get no containment check at all. `v0.18.0`'s bullets are
-  authored backticked and unbolded as a local workaround, verified to parse,
-  which leaves the tree carrying both spellings meanwhile.
-  Surfaced 2026-07-31 at validate in pre-adoption-grammar-break while checking
-  which bullet form the smoke actually parses; promoted from the gap inbox the
-  same day.
 
 - **gate-exemption-live-slug-derivation** [design-pending] — an exemption can
   resolve green against no task at all. `check-gate-exemption-tasks` resolves an
