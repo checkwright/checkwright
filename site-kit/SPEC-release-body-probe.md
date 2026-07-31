@@ -24,9 +24,10 @@ For every tracked release note in the consumer's tree whose front-matter tag key
 names a tag that exists on the remote, the arm asserts two properties over that
 tag's Release:
 
-- **Presence** — a Release exists for the tag, and its body contains the note's
-  derived canonical URL (apex host from the CNAME file, path from the configured
-  pattern). This is the assertion that kills the empty-body class.
+- **Presence** — a Release exists for the tag, and its body **contains** the
+  note's derived canonical URL, derived **scheme-qualified**: `https://` + the
+  apex host from the CNAME file + the path from the configured pattern. This is
+  the assertion that kills the empty-body class.
 - **Resolution** — every apex-hosted URL *as literally written in the body*
   answers 200. This is the assertion that kills the trailing-slash class.
 
@@ -37,21 +38,71 @@ probe that derived the URL itself and then resolved *that* would confirm its own
 arithmetic while the body stayed wrong. Presence runs over the URL the arm
 derives; resolution runs over the URLs the body actually carries.
 
+Presence is therefore deliberately loose in one direction and strict in the
+other, and the shipped corpus punishes inverting either. *Containment, never
+equality*: `v0.1.0`'s body writes the `.html`-suffixed form of its URL, so a
+token-equality test reds it on day one — and the looseness that saves `v0.1.0` is
+the same looseness that lets the trailing-slash form through, which is why
+resolution exists rather than a stricter presence. *Scheme-qualified*: two bodies
+carry a markdown link whose visible label repeats the URL scheme-less, so a
+presence test over a scheme-less string is satisfied by the label while the link
+target goes unchecked — and a wrong-but-resolving target then passes both
+assertions with nothing red.
+
 URL extraction is **scheme-anchored over the whole body text**, never
 markdown-link-aware: the shipped corpus carries both shapes — a markdown link
-whose visible label repeats the URL scheme-less, and a bare URL sitting in
-running prose — and only the scheme reliably separates a target from a label.
-Trailing sentence punctuation is stripped from an extracted URL before it is
-resolved, so a URL ending a sentence does not red on a captured period.
+whose visible label repeats the URL scheme-less (2 bodies), and a bare URL
+sitting in running prose (17) — and only the scheme reliably separates a target
+from a label.
 
-**The arm fails closed on an empty note set.** A glob matching no notes is a
-misconfiguration and is itself a finding, which is what makes "set these knobs or
-delete the block" an instruction rather than advice. Zero *released* notes is
-not a finding — a repository whose notes all precede its first tag is a
-legitimate pre-release state and passes. The arm prints a census line (notes
-found, of those released, of those checked) on every run, so a reader of the run
-log can see the arm did work rather than infer it from silence. That distinction
-is the whole difference between this arm and a vacuous pass.
+**A trailing punctuation run is stripped from an extracted URL before it is
+resolved, and the punctuation that actually occurs is markdown-structural, not
+sentential.** The corpus was measured rather than imagined: of 23 apex URLs
+across 19 bodies, **zero** are followed by sentence punctuation and **six**, in
+six different tags, are followed by a `)` closing a link target or a `)**`
+closing a link target inside bold. A stripping set written for the period —
+`[.,;:!?]` — captures `…-v0-19-0)**` and `…/install)` and reds six tags on the
+arm's first run. The set must cover `)` and `*`, and must strip a *run* rather
+than one character, or `)**` merely becomes `)*`.
+
+Not every apex URL in a body is a note pointer: four bodies also link
+`…/install` in a prose-labelled markdown link. Resolution covers those
+deliberately — the assertion is over apex-hosted URLs, not over note URLs — so
+the arm must not filter the extracted set down to the note pattern.
+
+**The zero-cases, ruled exhaustively — this is where the arm is won or lost.**
+Every count the arm ranges over can be zero, and each zero is either a finding or
+a legitimate pass; leaving one unruled is how the arm becomes a green that means
+nothing.
+
+- **The glob matches no notes** — a finding. A misconfigured `RELEASE_NOTE_GLOB`
+  is itself the defect, which is what makes "set these knobs or delete the block"
+  an instruction rather than advice.
+- **The tag-list call fails** — a finding, and it must be asserted on the call's
+  own exit status and HTTP code, never inferred from the count that follows. The
+  probe step runs under `set +e`, so a failed `gh` invocation yields an empty tag
+  list and a zero exit; every note is then unreleased, and the arm reports a
+  clean run forever. This is the same masking Delta 3 describes, one call
+  earlier: on the per-Release lookup a 404 reads like "no such Release", but on
+  the tag-list call it reads like "green".
+- **The glob matches notes and none carries the tag key** — *not* fail-closed,
+  and stated so a build session does not add a red here by symmetry with the
+  first case. A consumer whose notes genuinely precede its first release is in
+  this state legitimately. It is nonetheless the likelier of the two knob
+  misconfigurations, precisely because the glob's failure is loud and the key's
+  is silent, so it is the census line's primary job to make it readable.
+- **Zero *released* notes** — not a finding, for the same reason: a repository
+  whose notes all precede its first tag is a legitimate pre-release state.
+
+**The census line makes vacuity readable; the rules above are what make it
+impossible.** The arm prints notes found, of those released, of those checked on
+every run — the same shape as gate-sdk's vacuous-pass tripwire (§run-gates),
+where a "0 files scanned" clean line is a *reading* available to whoever opens
+the banner, not an assertion. On a green run nobody opens it. So the census line
+is the diagnostic that tells a reader which zero-case they are in, and it earns
+its place for that; it is not itself the thing standing between this arm and a
+vacuous pass. Against this repository today the line reads 20 notes found, 19
+released, 19 checked.
 
 ### Delta 2 — three consumer knobs on the probe step's `env:` — **design-bearing**
 
@@ -62,19 +113,37 @@ template as an editable placeholder in the established `ALT_DOMAIN` shape:
 
 - **`RELEASE_NOTE_GLOB`** — the tracked path glob enumerating release-note files.
 - **`RELEASE_NOTE_TAG_KEY`** — the front-matter key whose value is the tag a note
-  belongs to. Load-bearing rather than decorative: a notes directory routinely
-  holds posts that are not release notes, and the key is what separates them.
+  belongs to. Load-bearing rather than decorative: a notes directory holds posts
+  that are not release notes — one of this repository's 20 today — and the key is
+  what separates them. Here it is the front-matter key `release`, and the
+  non-note post carries no front matter at all.
 - **`RELEASE_NOTE_URL_PATH`** — the site path a note is published at, written
   with a `{slug}` token the arm substitutes with the note filename minus its
   extension. It holds the **path only**; the host is never repeated here, because
   the CNAME file stays the single source for it.
 
-**Holding the host out of the knobs is a gate constraint, not only taste.**
-`check-docs-cname-parity` runs on every commit over every tracked file and reds a
-configured host alias appearing in a `://` URL, so a probe that hard-coded a site
-URL would red the battery in this repository and in any consumer that configured
-its aliases. The `ALT_DOMAIN` idiom — a bare hostname in `env:`, the URL built at
-run time — is the shape that survives that gate, and these knobs keep it.
+This is the one knob of the three with no prior art in the tree and no
+cross-check anywhere — nothing in this repository derives a note's served URL
+outside Liquid at render time, which no bash can reach — so it is also the one a
+build session can set wrongly and see nothing. The trap is concrete: the site's
+generator emits `/posts/<slug>.html` and the host *additionally* serves the
+extensionless form, so `/posts/{slug}.html` is the more literally-correct-looking
+value and it reds every body written per `RELEASING.md`, which pins the bare
+form. **The value is `/posts/{slug}`.** The other two knobs are `docs/posts/*.md`
+— already the coupling glob on five gates' `# graph:` manifests — and `release`.
+
+**Holding the host out of the knobs is SSOT and cutover, and the gate reaches
+only half of it.** `check-docs-cname-parity` reds a configured host *alias* in a
+`://` URL and exempts the CNAME host itself even when that host is also listed
+among the aliases — so hard-coding `https://<apex>/posts/…` would pass the
+battery cleanly here, as this repository's own tracked prose citing its apex in a
+URL already demonstrates. The gate constrains `ALT_DOMAIN`, which names an
+alias; it does not constrain an apex-hosted note path. What holds the host out of
+`RELEASE_NOTE_URL_PATH` is that the CNAME file is the single gated source for it
+and a host rename must stay a one-file edit — the reason the existing probe reads
+the host from that file rather than from its own `env:`. These knobs keep the
+`ALT_DOMAIN` *shape* (a bare value in `env:`, the URL built at run time) for
+consistency and for the alias case, not because a gate would otherwise fire.
 
 These are **step-level workflow env, not `SITE_KIT_*` knobs**, and are not loaded
 by `lib/site.sh`. The template is copied and edited, not sourced — `ALT_DOMAIN`
@@ -101,7 +170,16 @@ a two-line pin; knowing it is owed is the design.
 
 **No gate anywhere parses a `permissions:` block**, so this delta has no oracle
 and is landed on the reading alone. Stated because a build session that assumed
-a green battery meant a verified permission would be assuming wrong.
+a green battery meant a verified permission would be assuming wrong. The claim
+was tested at align rather than taken on faith — a literal grep, a concept grep
+across the `GITHUB_TOKEN` / `GH_TOKEN` / least-privilege / token-scope
+spellings, and an inspection of all nine gates that read workflow YAML at all —
+and it holds; gate-sdk/SPEC.md §check-action-run-shell declares workflow-security
+linting an explicit non-goal, so the absence is a standing ruling rather than an
+oversight. A narrower gate than that non-goal is buildable (a job whose `run:`
+bodies invoke `gh` must declare the scopes those calls consume), and it is filed
+as costed debt on the gap inbox rather than started here — the delta itself
+cannot be reshaped to need less, because the permission is genuinely required.
 
 ### Delta 4 — the tag list comes from the API, never `git tag` — **design-bearing**
 
@@ -110,6 +188,15 @@ a green battery meant a verified permission would be assuming wrong.
 the exact vacuous-pass class the `v0.19.0` note closed elsewhere in this
 repository. The arm reads the tag list over the API, paginated so a consumer past
 the first page is not silently truncated.
+
+`gh api --paginate` discharges the paging with no manual page loop. Two
+measurements bound the claim honestly: the API's default page is 30 and this
+repository has 19 tags, so the pagination is **forward-looking and unexercised
+here** — it buys nothing today and everything at tag 31, which is also why no
+run of the arm will ever tell us it works. And `--paginate` concatenates the
+pages' arrays, so `--jq 'length'` returns the *last page's* length rather than
+the total: the census number would understate exactly once pagination begins to
+matter. Count by streaming the elements.
 
 The tag list is genuinely needed and is not replaceable by a per-note
 Release-by-tag lookup: a 404 on that call cannot distinguish "the tag was never
@@ -137,31 +224,50 @@ hook nor the check-graph artifact goes stale.
 
 `.github/workflows/site-health.yml` is a consumer copy that already diverges from
 the template by comment wording and its `ALT_DOMAIN` value. It takes the same arm
-with this repository's knob values filled in. **No parity or freshness gate
-exists between the two files** — not `check-template-copy-parity`, which pairs
-`.sh` templates against the gates dir — so the mirroring is done by hand and a
-missed half is caught by nothing. That is why it is its own delta rather than a
-clause on Delta 1.
+with this repository's knob values filled in (Delta 2 names all three). **No
+parity or freshness gate exists between the two files** — not
+`check-template-copy-parity`, which pairs `.sh` templates against the gates dir —
+so the mirroring is done by hand and a missed half is caught by nothing. Checked
+against the whole gate roster at align rather than assumed: no gate compares two
+hand-maintained copies of anything outside that `.sh` pairing. That is why it is
+its own delta rather than a clause on Delta 1. The missing oracle is pre-existing
+debt this arm widens rather than creates — the two files already diverge — and it
+is filed as costed debt on the gap inbox, shaped after
+`check-template-copy-parity`'s declared-divergence contract rather than a byte
+compare, since these two copies are *meant* to differ.
 
 ### Delta 7 — the site-kit spec and README — **design-bearing**
 
 `site-kit/SPEC.md` §templates/site-health.yml gains the arm, its three knobs, the
-fail-closed-on-empty-glob rule, and the coverage limit below. §Layout and
-configuration gains the sentence separating the monitor's step env from the
+zero-case rulings, and the coverage limit below. §Layout and configuration gains
+the sentence separating the monitor's step env from the
 `SITE_KIT_*` knobs `lib/site.sh` resolves. §The monitor boundary gains the
 refinement below. `site-kit/README.md` updates its paragraph on the template and
-its Install step 4. `site-kit/SPEC.md` is byte-mirrored under `docs/`, so the
-mirror is regenerated in the same unit or `check-docs-mirror-fresh` reds.
+its Install step 4 — which already carries the `ALT_DOMAIN` set-or-delete idiom
+the three knobs join. `site-kit/SPEC.md` **and `site-kit/README.md`** are both
+byte-mirrored under `docs/`, so both mirrors are regenerated in the same unit or
+`check-docs-mirror-fresh` reds.
+
+**§The monitor boundary is edited in place, never renamed.**
+`gate-sdk/bin/enforcement-map.sh` hard-codes that heading's title and slug as the
+monitor class's owner reference, so a rename would break the emitter silently and
+stale `docs/enforcement.md` by a second route — a cross-kit coupling that exists
+nowhere in either kit's prose.
 
 **The boundary refinement, which is the design content of this delta.** The
-section draws the gate/monitor line at *whether a commit caused the failure* — a
-probe reds on DNS, an incident, a stalled renewal, none of them commit-shaped.
-This arm does not fit that framing: its failure cause **is** commit-shaped in
-spirit, a session that skipped a step, and it is still not gateable. The line
-that actually holds is **where the asserted object lives**: a gate asserts over
-the tree, and the Release body is host state no checkout contains. Stating the
-line that way keeps the section true of every arm instead of true of the original
-five and awkward about this one.
+section carries two framings and leans on the weaker one: it opens "A gate
+verifies the tree", then justifies the line by *whether a commit caused the
+failure* and enumerates three causes — DNS, a Pages incident, a stalled renewal
+— none of them commit-shaped. This arm does not fit that second framing: its
+failure cause **is** commit-shaped in spirit, a session that skipped a step, and
+it is still not gateable. The refinement promotes the framing already in the
+section's first sentence to the one that governs: the line is **where the
+asserted object lives**, a gate asserts over the tree, and the Release body is
+host state no checkout contains. That keeps the section true of every arm
+instead of true of the three causes it happens to list and awkward about this
+one. (The probe's five numbered arms are enumerated in the template and
+summarized in §templates/site-health.yml, not here — that is the separate
+listed edit, and this section stays cause-free.)
 
 **Stated coverage limit.** The arm is driven from the tree's notes, so it is
 total over note→Release and silent on the reverse: a Release carrying no note
@@ -220,21 +326,43 @@ re-derives them nor works around them:
   `${{` on a body line — so the arm stays a plain `run: |` literal block and
   keeps expression syntax out of its body.
 - `check-action-gh-repo` requires a job invoking `gh` to carry a checkout ordered
-  before the call, set `GH_REPO`, or pass `--repo` everywhere. The probe step's
-  checkout is already the job's first step, so the arm's `gh` calls satisfy it as
-  written and no redundant `--repo` is owed.
-- `check-docs-cname-parity`, as Delta 2 states.
+  before the call, set `GH_REPO`, pass `--repo` everywhere, or declare a
+  `# gh-repo-exempt:` valve; the disjunction is evaluated per job, not per call.
+  The probe step's checkout is already the job's first step, so the arm's `gh`
+  calls satisfy it as written, no redundant `--repo` is owed, and no valve is.
+- `check-docs-cname-parity`, as Delta 2 states — which is to say it constrains
+  `ALT_DOMAIN` and not this arm's knobs.
 
-**Cost per run.** Two API calls plus one per released note, and one resolution
-request per apex URL in each body — linear in release count, on a daily
-schedule, well inside the authenticated rate limit. Deliberately uncapped and
-unknobbed: the two shipped defects were found in old releases, which is precisely
-the population a "newest N only" bound would stop probing.
+**Prior art the arm should copy rather than re-derive.** Note enumeration by
+front-matter tag key already exists three times in this tree, in two different
+spellings: `scripts/check-release-bump.sh` anchors the key *inside* the opening
+`---` fence and builds the tag→file map this arm needs;
+`scripts/check-tightened-gates-grammar.sh` and `gate-sdk/bin/upgrade-smoke.sh`
+match `^release:` anywhere in the file. The arm cannot reuse any of them as code
+— Delta 2's reason for not sourcing `lib/site.sh` applies to a copied workflow
+just as hard — but it is writing a fourth spelling of a shipped grammar, and the
+anchored one is the spelling to copy. The looser two are a latent
+false-positive surface, not this unit's to fix.
+
+**Cost per run.** The paginated tag list plus one Release lookup per released
+note, and one resolution request per apex URL in each body — linear in release
+count, on a daily schedule, well inside the authenticated rate limit. Measured
+against this repository today: 19 tags on one page, 19 Release lookups, 23
+resolution requests. Deliberately uncapped and unknobbed: the two shipped defects
+were found in old releases, which is precisely the population a "newest N only"
+bound would stop probing.
+
+**The arm lands green.** All 19 tags carry a Release, every body carries at
+least one apex URL, and all 23 resolve 200 as literally written — verified at
+this align audit, not assumed — so no companion repair ships with the arm and a
+red on its first dispatch is a defect in the arm, not in the corpus. That is
+what makes the DoD's "exercised, not assumed" item a real test rather than a
+formality.
 
 ## Existing sections updated
 
 - `site-kit/SPEC.md` §templates/site-health.yml — the arm, its knobs, the
-  empty-glob rule, the coverage limit (Delta 7, describing Deltas 1-2).
+  zero-case rulings, the coverage limit (Delta 7, describing Deltas 1-2).
 - `site-kit/SPEC.md` §Layout and configuration — the step-env versus
   `SITE_KIT_*` separation (Delta 7, describing Delta 2).
 - `site-kit/SPEC.md` §The monitor boundary — the tree-versus-host refinement
@@ -247,11 +375,29 @@ the population a "newest N only" bound would stop probing.
   (Deltas 1-3, 5, 6).
 - `RELEASING.md` step 6 — the expired "out of the battery's reach" reasoning
   (Delta 8).
+- `docs/site-kit/index.md` and root `README.md`'s site-kit registry row — both
+  restate the probe's arm roster in hand-authored prose ("HTTPS, redirects,
+  certificate expiry") and both go stale the moment the arm lands (Delta 7,
+  describing Delta 1). **Neither is generated and neither is gated**:
+  `check-docs-kit-parity` holds the `docs/kits.md` row and the nav block, never
+  the prose, and root `README.md` carries no marker block at all. This is Delta
+  6's uncaught-mirroring problem one level out — the same roster restated in four
+  places, two of them with an oracle and two without.
 
-Three generated projections go stale on the above and are regenerated in the same
-unit rather than left to a later gate run: the enforcement map (Delta 5), the
-docs mirror of `site-kit/SPEC.md` (Delta 7), and the value rollup, which couples
-`.github/workflows/*.yml` and so re-fires on Delta 6.
+**The projections, corrected by running the edit set rather than reasoning about
+it.** Two *gated* projections go stale, producing three stale files, and all are
+regenerated in the same unit rather than left to a later gate run:
+
+- `docs/enforcement.md` — `check-enforcement-fresh` (Delta 5), from the
+  `.github/workflows/` marker alone; the template's marker projects nothing.
+- `docs/site-kit/SPEC.md` **and** `docs/site-kit/README.md` —
+  `check-docs-mirror-fresh` (Delta 7). Both, not just the SPEC.
+
+The value rollup does **not** go stale. `.github/workflows/*.yml` sits in its
+`couples=` manifest, which decides when the gate *runs*, not what the projection
+*contains*: the rollup carries per-class row counts, and this unit edits an
+existing marker's text without adding a row. Re-firing is not staleness, and the
+two are easy to conflate because the gate does execute.
 
 ## Ruled out
 
@@ -295,6 +441,9 @@ Recorded so build does not re-litigate them under time pressure.
       deferred).
 - [ ] **Both copies carry the arm** — the kit template and this repository's
       workflow, mirrored by hand because no gate compares them (Delta 6).
+- [ ] **The arm roster reads the same in all four places** — both workflow header
+      comments, `docs/site-kit/index.md`, and root `README.md`'s registry row.
+      Two of the four have an oracle; this checkbox is the oracle for the others.
 - [ ] **The arm is exercised, not assumed** — dispatched once after landing, with
       the census line in the run log showing a non-zero checked count. An arm
       that has only ever been reasoned about is the vacuous pass this design
