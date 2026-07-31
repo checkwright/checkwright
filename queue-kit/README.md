@@ -13,9 +13,11 @@ Why: an agent picks work by *parsing*, not reading — so everything selection
 trusts (section position, slugs, tags) must be grammar a gate can enforce, and
 everything a human writes freely (task prose) must stay off the parse path.
 Drift between what the prose says and what the parser sees is the failure mode;
-all but one of the gates each close one instance of it — a tag reflowed off its
+all but two of the gates each close one instance of it — a tag reflowed off its
 lead line, a duplicate slug, a lost task, a forward precondition stated in
-prose but never tagged. See [SPEC.md](SPEC.md) for the full contracts.
+prose but never tagged. The two exceptions hold a different axis: projection
+freshness, and the deferred pool's per-entry budget. See [SPEC.md](SPEC.md) for
+the full contracts.
 
 ## Install
 
@@ -56,11 +58,13 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 ## Use
 
 ```bash
-bash queue-kit/bin/queue-index.sh                     # header + active (• ready / ✗ blocked) + deferred
-bash queue-kit/bin/queue-index.sh --collapse-deferred # deferred as a per-### tally
-bash queue-kit/bin/queue-index.sh --extent <slug>     # inclusive line range of one entry's subtree
-bash queue-kit/bin/roadmap.sh --emit                  # the public roadmap block, to stdout
-bash queue-kit/bin/roadmap.sh --write                 # splice it into the configured projection page
+bash queue-kit/bin/queue-index.sh                       # header + active (• ready / ✗ blocked) + deferred + icebox tally
+bash queue-kit/bin/queue-index.sh --collapse-deferred   # deferred as a per-### tally
+bash queue-kit/bin/queue-index.sh --extent <slug>       # inclusive line range of one entry's subtree
+bash queue-kit/bin/queue-index.sh --icebox-candidates   # the closing stage's eviction worklist
+bash queue-kit/bin/lesson-sink.sh <tag>                 # route a harvested lesson body to its configured sink
+bash queue-kit/bin/roadmap.sh --emit                    # the public roadmap block, to stdout
+bash queue-kit/bin/roadmap.sh --write                   # splice it into the configured projection page
 ```
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and

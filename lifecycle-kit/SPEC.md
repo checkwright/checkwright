@@ -325,7 +325,7 @@ declaration (the deprecation-lifecycle and upgrade-path rungs).
   unset-knob consumer gets a clean wipe of an already-disposable surface.
   Boundary-only, and paired with the scratch dir it reads (`GATE_SDK_TMP_DIR`)
   rather than adding a directory knob of its own. **The tier split matters:** the
-  `.gitkeep` exemption is a kit invariant this knob cannot unset, and `PRESERVE`
+  `.gitkeep` exemption is a kit invariant this knob cannot unset, and this knob
   is the consumer keep-list layered on top — a reader who takes the knob for the
   wipe's only keep rule would reintroduce the tracked-file deletion.
 - `LIFECYCLE_KIT_BOUNDARY_REQUIRE` — array of repo-relative files each of which
@@ -713,7 +713,8 @@ naming the wiped set in its report the way it already names the truncated set.
 Truncate and wipe share the boundary trigger and the report line and **nothing
 else**: truncate rewrites a *tracked* file down to its `# contract:` header, so
 the file survives with an empty body; the wipe *deletes* untracked scratch
-members outright. `PRESERVE` is therefore a keep-list for the delete and never a
+members outright. `LIFECYCLE_KIT_BOUNDARY_PRESERVE` is therefore a keep-list for
+the delete and never a
 truncate target. The wipe runs last — after the truncate loop and after
 enter-stage removes its own temp files — so those temporaries are never
 candidates, and it is **boundary-only**: an ordinary stage entry appends and
@@ -730,10 +731,11 @@ surviving (the tool `mkdir -p`s the scratch dir, and the wipe removes members,
 not the dir); it is recorded with its real reason so a later reader does not
 retire it as redundant, and it is generic-consumer mechanism rather than a fact
 about any one checkout — a consumer that gitignores its scratch dir wholesale
-never exercises it. Shipping the exemption as `PRESERVE`'s *default* is **ruled
-out**: a defaulted bash array is replaced, not merged, when a consumer assigns
-it, so protection would decrease as configuration increases and any consumer
-setting `PRESERVE` for its own reasons would silently lose the exemption. A
+never exercises it. Shipping the exemption as `LIFECYCLE_KIT_BOUNDARY_PRESERVE`'s
+*default* is **ruled out**: a defaulted bash array is replaced, not merged, when a
+consumer assigns it, so protection would decrease as configuration increases and
+any consumer setting that knob for its own reasons would silently lose the
+exemption. A
 git-aware "spare any tracked file" rule is **ruled out** too — it makes
 filesystem behavior git-dependent for one case, and it would spare any tracked
 file parked in scratch, re-opening the accumulation the wipe exists to close.
@@ -744,7 +746,8 @@ start, age-guarded precisely so a concurrent same-checkout session's in-flight
 scratch survives (context-kit/SPEC.md §The session-context hook). The boundary
 wipe is deliberately **not** age-guarded: it fires once, at the iteration
 transition, where the only scratch a consumer means to carry across is by
-definition named in `PRESERVE` — an age guard there would leave the previous
+definition named in `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — an age guard there would
+leave the previous
 iteration's fresh residue behind, which is the whole thing being reclaimed. Two
 triggers, two postures, one directory; neither mechanism reads the other.
 

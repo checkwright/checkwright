@@ -88,13 +88,13 @@ roster, and falls back to its own derivation when run standalone without it.
 The driver's handoff, not a consumer knob: `drift-report.sh` recomputes it
 every run.
 
-`DRIFT_KIT_ITERATION_START` is the same *class* of handoff — recomputed every
-run, never a consumer knob — but not the same mechanism: `KIT_ROOTS` is
-assigned after the export loop and carries its own explicit `export`, while the
-iteration-start commit is assigned *before* the loop and rides `compgen`, so no
-new export list exists to drift out of parity. A plugin reading it gets the
-empty string when no baseline is derivable and degrades to `n/a` on its own
-rows rather than dying.
+`DRIFT_KIT_ITERATION_START` is the same *class* of handoff as
+`DRIFT_KIT_KIT_ROOTS` — computed by the driver every run, reaching every plugin
+as exported environment, never a consumer knob. What it does not share is the
+parity hazard: it introduces no fixed export list that could drift out of step
+with the knob set it travels beside. A plugin reading it gets the empty string
+when no baseline is derivable and degrades to `n/a` on its own rows rather than
+dying.
 
 Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch;
 a measurement needing state (a baseline, a log) reads a file some

@@ -501,7 +501,8 @@ CI entry point (wiring CI is out of scope here).
 
 The family's single sourced library — values + adapters, never gate structure.
 It gives a gate author the fail-closed guard `fail_closed`, the walk adapters
-(`gate_find` / `GATE_GREP_EXCLUDES` / `gate_path_pruned` over `GATE_PRUNE_DIRS`),
+(`gate_find` / `GATE_GREP_EXCLUDES` / `gate_path_pruned` over the dirs
+`GATE_SDK_PRUNE_DIRS` names),
 the registry helpers that resolve a check consumer-first across kit dirs
 (`gate_resolve`, `gate_kit_roots` / `gate_kit_roots_rel`, `gate_check_dirs` —
 the multi-kit resolution path other kits' gates ride), and the `# graph:`

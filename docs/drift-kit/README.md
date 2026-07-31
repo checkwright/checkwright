@@ -108,10 +108,10 @@ A KPI plugin is `kpi-<name>.sh`, resolved through `kpis.list` against your KPI
 dirs then each vendored kit's `kpis/`. Add your own by dropping a plugin in your
 gates dir and naming it in the registry; shadow a bundled one with a same-named
 file. The bundled set (drift-kit/SPEC.md §Bundled KPIs) covers, as lead KPIs, the
-queue split, the gate backlog, amendment/deferred age, prompt friction, the
-always-loaded surface, the local permission overlay, gate runtime, session
-overhead, and the price table's age and expiry; and one lag KPI,
-`kpi-knowledge-friction`, fed by the loop below.
+queue split and its per-iteration net delta, the gate backlog, amendment/deferred
+age, prompt friction, the always-loaded surface, the local permission overlay,
+gate runtime, session overhead, and the price table's age and expiry; and one lag
+KPI, `kpi-knowledge-friction`, fed by the loop below.
 
 ## Test
 
