@@ -65,3 +65,4 @@
 | release-assertion-honesty | sc sp a b v c | 6f/0d | 3 · ≤0d | 22s clean | 89 |
 | release-step-verification | sc sp a b v c | 2f/0d | 1 · ≤1d | 22s clean | 89 |
 | delegation-reach-and-gate-cost | sc sp a b v c | 4f/0d | 4 · ≤0d | 22s clean | 90 |
+| release-signaling-reset | sc sp a b v c | 8f/2d | 4 · ≤0d | 22s clean | 92 |

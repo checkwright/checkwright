@@ -27,7 +27,10 @@ rather than declined — say so on the same private thread.
 
 While the version line is pre-1.0, only the newest `v*` tag is supported. There
 are no backports: a fix lands on `master` and ships in the next tag, and
-upgrading to it is the remedy. The two-phase upgrade contract
+upgrading to it is the remedy. Releases otherwise defer by default, but a
+security or supply-chain fix is a release trigger and does not wait out the
+ordinary cadence — the trigger set is `.claude/commands/close.md`'s release
+policy. The two-phase upgrade contract
 ([docs/install.md](docs/install.md)) is what makes that a mechanical move rather
 than a migration.
 

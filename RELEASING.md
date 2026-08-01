@@ -18,12 +18,13 @@ links and commands resolve under the doc gates.
 Every iteration close dispositions the release boundary and records the outcome
 as one line in `.workflow/release-disposition.txt` (the boundary-required
 disposition evidence read by the next iteration's scope entry,
-lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none> —
-<one-line basis>`.
+lifecycle-kit/SPEC.md §bin/enter-stage.sh). The line's grammar — every legal form
+of the version field, including the deferral form step 2 below writes — is owned
+by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
 
 1. **Author the release-note post — in-iteration.** Add a dated `docs/posts/`
-   entry carrying a `release: vX.Y.Z` front-matter key and the three sections the
-   upgrade contract names — tightened gates, renamed knobs, and behavior changes.
+   entry carrying a `release: vX.Y.Z` front-matter key and every fixed section
+   the upgrade contract's roster names; the skeleton below walks them in order.
    The parseable grammar (front-matter key, section names, bullet lead tokens) is
    owned by [docs/install.md](docs/install.md) §The upgrade contract; "none" is a
    valid section body and is stated, never omitted. The note joins the nav by its
@@ -102,7 +103,8 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    grammar; a disposition block opens with a bare `<release> — <date>` line
    below it, never a `#` one.
 
-4. **Tag the iteration's final commit, and drain the declaration surface.** The
+4. **Tag the iteration's final commit, and drain the tightened-gates declaration
+   surface.** The
    drain and the disposition stamp are both tree writes, so the iteration's final
    commit is the one this step creates — which fixes the ordering, and **the
    ordering is not optional**. It binds in two places. First, **the note-authoring

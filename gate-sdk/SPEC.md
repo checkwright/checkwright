@@ -602,11 +602,10 @@ counting bullets across the note's declaration-bearing sections. That third call
 is why the container and the token predicate are separable rather than one pass:
 Behavior-changes lead tokens are legitimately prose phrases, so the bump
 derivation needs the bullets without the token predicate. Before this helper the
-container was stated three times and two of the statements already disagreed —
-`section_bullets` matched `- ` at column zero where the smoke matched an
-optionally-indented `-` or `*` — so the section a bump was derived from and the
-section an allowed-red set was parsed from were not guaranteed to be the same
-section. A sourced library, not a gate, so it owes no `good/`+`bad/` pair; its
+container was stated three times and two of the statements already disagreed on
+whether a bullet marker could be indented, so the section a bump was derived from
+and the section an allowed-red set was parsed from were not guaranteed to be the
+same section. A sourced library, not a gate, so it owes no `good/`+`bad/` pair; its
 runtime lock-in is `gate-tests/lib-declaration.test.sh`, direct because the
 record arm has no caller fixture to ride. That arm's only caller is the smoke's
 untagged branch, and the smoke is a `bin/` tool that forgoes a pair — so a
@@ -776,8 +775,8 @@ that had to be empty — which no tightening iteration can be until the moment i
 is tagged. The empty-declaration rule survives as the narrow case (an empty
 declared set still forces an empty red set), not as the universal one.
 
-**The declaration surface**, `<workflow-dir>/tightened-gates.txt`, is a tracked
-checked projection (§The workflow directory) whose path derives from
+**The tightened-gates declaration surface**, `<workflow-dir>/tightened-gates.txt`,
+is a tracked checked projection (§The workflow directory) whose path derives from
 `GATE_SDK_WORKFLOW_DIR` — no knob of its own, since a knob naming this file would
 add a way to configure the assertion away without adding a way to satisfy it
 honestly. It always exists, header-only when the declared set is empty, so
@@ -834,7 +833,7 @@ the script pre-upgrade; it is consumed by the validate session's evidence file
 emitted by the script itself, so the zero-config run works here) and read only
 at the resolve step. The declaration path is derived from `GATE_SDK_WORKFLOW_DIR`
 at the same step. The tightened-gates declaration is produced by the build stage
-that lands or tightens a gate, appending to the declaration surface, and composed
+that lands or tightens a gate, appending to that surface, and composed
 by close into the note at the release boundary; it is consumed at three named
 transitions — here at the resolve step on either arm (the allowed-red-set parse),
 by close when it composes and drains, and by the upgrade skill reading the note

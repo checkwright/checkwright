@@ -656,8 +656,10 @@ Invariant: no line exceeds the `QUEUE_KIT_WRAP_BUDGET` gate floor (default
 parse; the tripwire fires before that lands.
 
 Calibration: three exemptions mirror the wrapping convention — table rows,
-fenced-code blocks, and lines over budget solely due to one unbreakable token
-(URL, path). Width is Unicode code points, not bytes.
+fenced-code blocks, and lines whose own longest token itself exceeds the budget
+(URL, path). That third one is narrower than "over budget because of one long
+token": a 101-column line whose longest token is 55 is **not** exempt, because
+the token still wraps. Width is Unicode code points, not bytes.
 
 ### check-tag-lead-line
 

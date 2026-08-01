@@ -429,7 +429,9 @@ derive and what an outstanding deferral carries. `check-release-bump` reads both
 The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
 orders the release notes by version and reds a patch-only bump whose note
 declares tightened gates, renamed knobs, or behavior changes (and fails closed
-if any fixed section is absent). The major criteria stay judgment —
+if any fixed section is absent). That presence assertion binds the **newest**
+note only, so adding a fixed section to the roster above costs no historical
+backfill across the published corpus. The major criteria stay judgment —
 a decommission is a semantic fact no section grammar carries — so the gate
 holds only the floor.
 

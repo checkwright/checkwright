@@ -108,11 +108,22 @@ recoverable:
   to a tracked kit file's line count — which is why a prose-only SPEC edit reds
   it. Both are `docs/value.md`'s inputs, so a red in either implies a rollup
   regen.
-- **The graph artifact** — `docs/check-graph.html` and the generated pre-commit
-  hook are one pair with one trigger, a gate's `# graph:` manifest: regenerate
-  the hook (`bash gate-sdk/bin/gen-pre-commit.sh --write`) and then the artifact
+- **The trajectory projection** — `docs/evidence-data.md` is the published
+  evidence extractor's output (`bash drift-kit/bin/trajectory.sh --emit >
+  docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it), stale on a
+  stage stamp or a release disposition. Its regen rides the close stage's
+  Clear-Done commit, because the gate is blind at the enter-close commit by
+  construction.
+- **The roadmap projection** — `ROADMAP.md` is a root projection of the queue's
+  curated `[roadmap:]` tags (`bash queue-kit/bin/roadmap.sh --write`,
+  `check-roadmap-fresh` byte-gates its marker block), stale on any `[roadmap:]`
+  tag edit. Never hand-edited.
+- **The graph artifact** — `docs/check-graph.html` and the generated `pre-commit`
+  and `commit-msg` hooks are one set with one trigger, a gate's `# graph:`
+  manifest: one command emits both hooks
+  (`bash gate-sdk/bin/gen-pre-commit.sh --write`), then the artifact
   (`bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`), which
-  `check-graph` asserts fresh together. The hook itself is never hand-edited;
+  `check-graph` asserts fresh together. The hooks are never hand-edited;
   that rule is resident in `CLAUDE.md` because a session about to edit it is not
   looking at a red gate.
 - **The new-gate fan-out** — the other wide trigger, and the one with no single
@@ -129,8 +140,8 @@ recoverable:
   docs/footprint.md` — a new script is new token cost), `docs/value.md`'s rollup
   block (`bash scripts/gen-value-rollup.sh`, derived from the two above),
   `docs/check-graph.html` (`bash gate-sdk/checks/check-graph.sh --emit >
-  docs/check-graph.html`), and — for a `tier=precommit` gate — the generated
-  hook (`bash gate-sdk/bin/gen-pre-commit.sh --write`). The same list applies to
+  docs/check-graph.html`), and — for a hook-tier gate — the generated hooks
+  (`bash gate-sdk/bin/gen-pre-commit.sh --write`). The same list applies to
   any edit that changes a kit's line count, which is why a prose-only SPEC edit
   can red the footprint and rollup gates.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements

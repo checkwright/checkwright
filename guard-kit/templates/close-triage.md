@@ -14,6 +14,12 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    - **Habit change** (a noted convention) for a true one-off.
    Caution: an allowlist entry can *mask* a steering opportunity — before
    blessing a form, confirm it is the one to reinforce.
+   **Diagnose before you reach for the allowlist.** A pattern can rank high while
+   already being granted: an allowlist entry matches a *bare* command, so a call
+   that chains (`&&`, `;`), redirects, or expands breaks the match and prompts
+   anyway. Check a ranked pattern against the committed allowlist first — if it is
+   already there, the finding is (c) habit change, and adding coverage buys
+   nothing while reading as a fix.
 3. **Review the wakeup log** if the wakeup-guard is wired: read
    `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
 4. **Prune the local overlay.** Run

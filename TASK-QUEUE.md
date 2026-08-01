@@ -1170,6 +1170,11 @@
   **Cost while deferred:** low and non-rotting, but live now rather than
   contingent on the icebox — the token half is exploitable at HEAD, and it fails
   **open** (an exemption that should red resolves green) rather than loud.
+  **Class, ruled 2026-08-01 at close:** every candidate fix above adds a name to
+  a governed surface — a gate-sdk live-section knob, or a heading/lead-line
+  predicate another component must honor — so canon-kit/SPEC.md's new-names
+  litmus makes this a **feature** owing an amendment, and it promotes into a
+  feature section rather than Technical Debt.
   Surfaced 2026-07-29 at spec while surveying readers for the icebox tier; the
   token-scan half added 2026-07-31 at align. Drained from the gap inbox by close,
   which triaged the two bullets as one unit on the align bullet's instruction.
@@ -1597,7 +1602,11 @@
   governed prose names, found only by a hand sweep somebody remembers to run;
   the citations read as live pointers until then.
   Debt: one gate plus its fixture pair, or an assertion added to an existing
-  gate.
+  gate. **That line states the unit's size, not its class** — on the shipped
+  path it mints a script name and a `scripts/gates.list` registration, so
+  canon-kit/SPEC.md's new-names litmus makes it a **feature** owing an
+  amendment. It promotes into a feature section; only the
+  assertion-on-an-existing-gate variant would be debt.
   Filed 2026-07-31 at close as the gap-generalization owed by the inline fix
   above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
   were both verified against source before filing.
@@ -1874,6 +1883,15 @@
   Nor is the id the obstacle — dispatched stage sessions do resolve distinct
   session ids (this survey's own stamp differs from its lead's), so
   `bin/session-id.sh` was never the blocker.
+  **Practice confirmed correct once, 2026-08-01.** This iteration's two build
+  batches each wrote their own stamp — two `build` lines with distinct session
+  ids in `.workflow/WORKFLOW-STATE.txt` — so a per-batch trail is achievable
+  under the instruction both templates already carry, and the fork below is a
+  live choice rather than a repair. A second limit confirmed alongside it:
+  `bin/enter-stage.sh --simulate` **cannot predict a distinct session's entry**,
+  so it never answers whether a sibling batch will stamp; the simulate read is a
+  gate on *this* session's entry only, which bounds what any lead-side
+  pre-dispatch check can learn from it.
   **Not a defect today.** Nothing gates on the missing lines, and the stage
   cursor is the *last* stamp, so it is correct either way — this is doctrine
   drift, not breakage.
@@ -1984,6 +2002,204 @@
   to a shipped surface.
   Filed 2026-08-01 by close's prompt-friction triage.
 
+- **release-disposition-grammar-consolidation** [design-pending] — the release
+  disposition line's version-field grammar is restated on five surfaces and the
+  restatements drift. Owner: lifecycle-kit/SPEC.md §templates/stages/ (three
+  forms, correct); `.workflow/release-disposition.txt`'s header and
+  `.claude/commands/close.md` also carry three forms;
+  `lifecycle-kit/templates/stages/close.md` was corrected in-iteration, and
+  RELEASING.md was de-literalized to a citation at this close — so both known
+  stale copies are gone, but the restatement **shape** is untouched and the next
+  form added rots the same way.
+  **The placeholder-spelling half rides here too.** Prose splits between
+  `deferred:vX.Y.Z` (RELEASING.md, docs/install.md, the check-release-bump
+  fixtures) and `deferred:<version>` (the disposition header, the kit SPEC).
+  `scripts/check-release-bump.sh` settles which is honest: it matches
+  `deferred:v*` and strips `deferred:v`, so a literal `v` immediately after the
+  colon is **required**. The `<version>` form is not wrong but hides that
+  requirement inside the placeholder, and it is the spelling the owning SPEC uses.
+  **Why `[design-pending]`:** Enforcement-first ranks removing the duplication
+  above gating it and de-literalization puts the value in the owning SPEC with
+  prose citing the name, so the unit is one consolidation rather than five point
+  fixes plus a restatement gate. The question it must settle: how much a
+  **vendored** template may cite rather than restate before it stops being usable
+  standalone by a consumer who has not read the kit SPEC.
+  `check-shim-restatement` cannot reach this class — a restatement that has
+  *diverged* no longer matches its owner's wording.
+  **Cost while deferred:** each surviving copy is a place the next grammar change
+  must be hand-propagated, with no oracle over the propagation.
+  Debt: converges wording on names the spec already carries; adds no governed
+  name unless the consolidation mints a citation convention.
+  Filed 2026-08-01 at close from the gap inbox — scope's narrower RELEASING.md
+  filing and align's spelling filing both supersede into this entry.
+
+- **release-bump-deferred-floor-unenforced** [design-pending] —
+  `scripts/check-release-bump.sh` does not implement the deferred-floor invariant
+  `docs/install.md` §Versioning asserts. The page states a later note "may not
+  fall below that version"; the gate only refuses a **patch-only** bump while a
+  deferral is outstanding, and never compares the new note's version numerically
+  against the floor. A deferred **major** discharged as a minor therefore passes
+  silently — the patch-only guard is skipped entirely.
+  **Live rather than hypothetical.** This close stamps a deferral, and the
+  `preview-release-cadence` policy makes outstanding deferrals routine. Within
+  that policy's own trigger set the major case is covered by policy alone (a
+  major releases immediately and never waits behind the cadence floor) — which is
+  exactly the coverage that evaporates when the policy is later edited by someone
+  who does not know the gate is not holding it.
+  **Why `[design-pending]`:** the fix is a numeric semver comparison against the
+  derived outstanding floor, which needs the history ∪ live outstanding-set
+  reader (lifecycle-kit/SPEC.md §templates/stages/) wired into a gate that today
+  reads only the newest note.
+  **Cost while deferred:** a stated invariant with no oracle — policy prose holds
+  it, which is the thing a gate exists to stop trusting.
+  Debt: converges the gate on an invariant the page already states; adds no
+  governed name.
+  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's align.
+
+- **upgrade-contract-rename-routing-unstated** [design-pending] —
+  `docs/install.md` §The upgrade contract never states that a **gate-name**
+  rename or a **file/directory-convention** rename routes to the note's
+  "Behavior changes" section. The section's bullet-lead definition structurally
+  admits both, and the mapping paragraph covers a *consumer's* residue classes
+  rather than this project's own renames, so the routing is inferred and no
+  release note to date instantiates it.
+  **What leans on it.** lifecycle-kit's knob-rename compat clause
+  (`knob-rename-compat-threshold`, Delta 3) rests on that routing to establish
+  that its knob-scoping leaves no rename class without a home — the check that
+  licenses filing no gap for the widening question. That delta was softened at
+  align to state the inference *as* an inference; this entry is what would make
+  the reasoning stand on something stated.
+  **Why `[design-pending]`:** stating it changes what the upgrade contract
+  asserts to consumers — note-grammar semantics rather than wording, so a scope
+  call rather than a close fix.
+  **Cost while deferred:** low and non-rotting — the routing is admissible today
+  so no note is wrong; the residue is a downstream clause leaning on an inference.
+  Class: **feature** if it states a new routing obligation, debt if it only makes
+  an admitted one explicit — canon-kit/SPEC.md's new-names litmus decides at
+  promotion.
+  Filed 2026-08-01 at close from the gap inbox; align filed it after softening
+  the delta that leans on the routing.
+
+- **fanout-child-dispatcher-addressing** [design-pending] — a dispatched stage
+  session's own read-only fan-out children have no documented way to address
+  their dispatcher, so they fall back to messaging the iteration lead. Two of
+  four children one align session dispatched did exactly that, both reporting the
+  same cause: the agent-type name is not a valid address, and a dispatched stage
+  session is not `main`, so the child's only reachable named endpoint is the lead.
+  **Systematic, not a slip.** The misdelivery is benign for a read-only sweep
+  (the lead relayed both) but it is silent and repeatable, and it routes a stage
+  session's internal audit traffic onto the one channel delegation-kit reserves
+  for decision-shaped escalation.
+  **Surfaces:** `delegation-kit/templates/agent-execution.md` (specifies the
+  fan-out) and `lifecycle-kit/templates/lead.md` (specifies the
+  stage-session/lead channel). The fix is either to state the address a child
+  uses for its dispatcher, or to state that a child returns via its **return
+  value only** and never messages. Evidence for the second: this close dispatched
+  two fan-out children under a return-only instruction stated explicitly in the
+  prompt, and both complied — so the return-only form is workable, and the open
+  question is what it costs a child that genuinely needs to ask.
+  **Why `[design-pending]`:** it is a cross-kit channel contract, and the two
+  candidate shapes differ in exactly that cost.
+  **Cost while deferred:** lead-context pollution proportional to fan-out width,
+  paid on every dispatched stage that fans out.
+  Class: **feature** — it mints a channel contract two kits must honor, so it
+  owes an amendment under canon-kit/SPEC.md's new-names litmus.
+  Filed 2026-08-01 at close from the gap inbox; align filed it off its own
+  fan-out's misdelivery.
+
+- **release-note-section-set-derivation** [design-pending] — the release note's
+  fixed-section set is held by `scripts/check-release-bump.sh` as parallel
+  hardcoded calls, so a fifth section is added by copying a call rather than by
+  extending one roster, and **no gate asserts that the gate's set equals the
+  page's**.
+  **The disease this is the residue of.** The section *count* was hand-maintained
+  as a literal across `gate-sdk/bin/upgrade-smoke.sh`,
+  `scripts/check-tightened-gates-grammar.sh`, `check-release-bump`'s spec
+  comment, `gate-sdk/SPEC.md` and several `docs/install.md` sentences, while the
+  set itself was separate hardcoded calls with no array and no length. Nothing
+  derived the number and nothing reddened when it was wrong — the test "if this
+  number were wrong tomorrow, does anything red?" answered no at every site. It
+  had already rotted: adding one section took a by-hand three-to-four edit at
+  every site, and align's census of those sites — itself a hand roster — omitted
+  `upgrade-smoke.sh`, which build's re-run caught. **The census only had to exist
+  because nothing derived it.** The prose half is closed: every count is gone and
+  the prose now names two *classes*, with `docs/install.md` §The upgrade contract
+  owning the roster by enumerating it.
+  **A ruling that must not be re-derived.** The obvious consolidation — put the
+  set in `gate-sdk/lib/declaration.sh` beside the shared container — is **ruled
+  out**: those section names are consumer content, and a kit literal carrying one
+  project's release-note vocabulary crosses the provenance seam (CLAUDE.md §The
+  provenance seam), the same ground on which the note-parity gate stays out of
+  gate-sdk. So the unit is consumer-side: one rostered set in this repo's
+  `scripts/`, derived from or gated against the page.
+  **Why `[design-pending]`:** the seam ruling fixes *where*, not *how* — derive
+  the gate's set from the page at runtime, or hold both and gate the parity. The
+  two differ in fail-closed behavior when the page is unreadable, which is the
+  open call.
+  **Cost while deferred:** a fifth section is added by copy, and the gate's set
+  can silently diverge from the roster the page owns — the exact shape that
+  survived a dedicated audit stage once already.
+  Debt: converges a duplicated set onto one roster; adds no governed name unless
+  the parity arm becomes its own gate, which the promoting scope call settles.
+  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build
+  on an operator-raised doctrine check.
+
+- **md-refs-tree-link-resolution** [design-pending] —
+  `scripts/gen-docs-mirror.sh` emits a `/tree/` form for off-root **directory**
+  targets, and `check-md-refs`' self-repo pass recognizes only the
+  `/blob/<ref>/` prefix — so a `/tree/` link falls through to the external-URL
+  skip and is resolved by nothing.
+  **Not a live defect:** the generator's output is correct by construction, so no
+  `/tree/` link is wrong today. A coverage hole rather than a violation, and out
+  of `docs-root-link-grammar`'s boundary because that rule fires on **relative**
+  links while a `/tree/` link is absolute and already converted.
+  **Why `[design-pending]`:** the likely fix is one more prefix arm in the
+  self-repo pass, whose identity derivation and pinned ref
+  (`CANON_KIT_DOCS_BLOB_REF`) already exist — but confirm first whether a
+  `/tree/` target should resolve to a *directory* in-tree, since that is the one
+  case `check-docs-link-convention`'s directory-target rule deliberately routes
+  elsewhere. Two gates disagreeing about directory targets is the design
+  question; the missing arm is not.
+  **Cost while deferred:** low and non-rotting while the generator is the only
+  producer; the hole opens the moment a `/tree/` link is hand-written.
+  Debt: converges a resolver on a link form its own generator already emits,
+  minting nothing.
+  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build,
+  recorded in `docs-root-link-grammar`'s Producers-and-consumers section rather
+  than flagged-and-skipped.
+
+- **stage-stamp-ordering-unenforced** [design-pending] — `check-stage-evidence`
+  accepts a stage stamp that lands **after** commits already made under it, so
+  the stamp proves invocation but not that it preceded the work it authorizes.
+  **Observed with the battery green throughout.** This iteration's build batch 1
+  stamped `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits
+  had already landed build-stage edits under that unstamped entry. Nothing caught
+  it — not `check-stage-evidence`, not `check-stage-entry`, not the pre-commit
+  hook. Batch 2 stamped first and **the difference was invisible to every gate**,
+  which is the point: the ordering is session discipline with no oracle, while
+  `lifecycle-kit/templates/stages/build.md` states the stamp as the "First step"
+  and says to commit it on its own. The prescription exists; only enforcement is
+  missing.
+  **Candidate shape to weigh at design:** assert that the commit introducing a
+  stage's stamp is not preceded, within the same stage window, by commits
+  touching that stage's own output surfaces — decidable from git history, though
+  the surface set is the hard part. A cheap approximation misfires on a
+  same-stage re-entry, where a second session's stamp legitimately follows the
+  first session's commits; that case is **confirmed real** this iteration, not
+  hypothetical (see `batch-split-stamp-ownership`). A narrower and possibly
+  sufficient form: assert only that the **first** stamp for an iteration+stage
+  pair is not preceded by non-stamp commits since the prior stage's stamp.
+  **Why `[design-pending]`:** it narrows how a shipped evidence contract is read,
+  and the surface-set question has no cheap answer.
+  **Cost while deferred:** the stamp protocol's central claim — that a stamp
+  marks a boundary the work happened after — is unattested, and a violation is
+  invisible in a fully green battery.
+  Class: mints a gate name if the oracle lands, so canon-kit/SPEC.md's new-names
+  litmus makes it a **feature** on that path; debt only if it lands as an
+  assertion inside `check-stage-evidence`. The promoting scope call settles it.
+  Filed 2026-08-01 at close from the gap inbox; build filed it against its own
+  batch-1 stamp.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -2017,11 +2233,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- knob-rename-compat-threshold
-- preview-release-cadence
-- tightened-gates-declaration-note-parity
-- docs-root-link-grammar
-- npm-publish-approval-posture-unrecorded
 
 ## Lessons Learned

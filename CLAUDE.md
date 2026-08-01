@@ -153,9 +153,8 @@ the skill on a blocking verdict — so they are not resident here.
   UI settings. The release runbook is the load-triggered tier, resident only at
   close's release step.
 - `ROADMAP.md` is a generated root projection of this queue's curated
-  `[roadmap:]` tags — never hand-edit its marker block; regenerate it
-  (`bash queue-kit/bin/roadmap.sh --write`), mechanism at queue-kit/SPEC.md
-  §check-roadmap-fresh.
+  `[roadmap:]` tags — never hand-edit its marker block; it is rostered with its
+  trigger and regen command like every other generated projection.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome, page-authoring rules,
   generated projections + regen commands, and docs gate roster live in the
