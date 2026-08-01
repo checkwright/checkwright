@@ -1089,6 +1089,52 @@
   Feature-shaped at triage: it adds governed names. Filed 2026-07-28 by operator
   request, from a session assessing the shell substrate's structural limits.
 
+- **state-representation-integrity** [design-pending] — repo state lives in text
+  files whose invariants — slug uniqueness, cross-entry `blocked-by` and `spec`
+  targets resolving, one evidence record per suite — are properties of the
+  readers, not of the format. Each is enforced by a gate that greps, so an
+  invariant with no gate is silently unenforced rather than merely unchecked.
+  **Measured evidence (2026-08-01, operator-directed), to be weighed at a future
+  scope entry and opening nothing now.** Asked whether an embedded database should
+  replace the text surfaces. Against `release-step-verification`'s eleven defects,
+  a store with constraints prevents **two**: the interrupted validate run leaving
+  a half-written evidence file (a transaction rolls it back), and
+  `gate-tests-suite-identity-in-evidence` (a primary key makes an unidentifiable
+  record unrepresentable). The other nine are CI-checkout and API-pagination
+  semantics, assertion design, and missing oracles — untouched by storage. The
+  counterweight belongs in the entry too: `check-task-conservation` *did* catch a
+  deleted slug, as a grep over text.
+  **Diffability is load-bearing here, not incidental.** `TASK-QUEUE.md` and the
+  gap inbox are reviewed in diffs, merged across concurrent sessions by
+  `merge=union`, and carry paragraphs of human reasoning. A binary store ends
+  `git diff`, `git blame`, line-level review and union-merge; prose in a TEXT
+  column buys no integrity over the part that matters most.
+  **So split by shape, never convert wholesale.** Machine-written append-only
+  records — the evidence manifest, `WORKFLOW-STATE.txt`, `tightened-gates.txt`,
+  `gates.list` — are tables pretending to be files, but their concrete need is
+  atomic append and self-identifying records, a far smaller fix than a database.
+  Human-authored documents stay diffable text.
+  **Deliverable, and it converges with `native-gate-binary-port`:** both reduce to
+  *parse once into a typed model and validate there* — one parser and a schema
+  replacing N hand-rolled greps. A store is one way to reach that model, a real
+  deserializer over typed structs another. Cost them together or the same work is
+  counted twice. The middle path is this repo's derivation-first rule one level
+  further: keep text canonical and generate a freshness-gated queryable index, as
+  `check-graph`, `ROADMAP.md` and the enforcement map already do, so gates run
+  uniqueness and referential-integrity queries against the projection. That keeps
+  diffs, centralises parsing, and trades *prevention* for after-the-fact
+  validation — which is the bargain the gate model already makes.
+  **The strongest argument for a store is one nobody has made yet:** there is no
+  concurrency primitive. Shared-index contention, `merge=union` as a workaround,
+  and a live session's journal clobbered mid-iteration are symptoms of its
+  absence. Weigh it apart from the integrity case.
+  **Cost while deferred:** gates keep hand-rolling parsers over state surfaces and
+  integrity stays gate-enforced rather than structural — caught at commit where a
+  gate exists, silent where none does. Nothing breaks today.
+  Filed 2026-08-01 by operator request at close, on evidence the same iteration
+  produced; a sibling rather than an addition because `check-queue-entry-budget`
+  refused the combined body.
+
 - **docs-root-link-grammar** [design-pending] — a hand-authored `docs/` page that
   links a path *outside* `docs/` with a bare relative link resolves on disk but
   404s on the rendered site, which is served from `docs/` as its root.
