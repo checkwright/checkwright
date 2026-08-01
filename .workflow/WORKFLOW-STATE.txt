@@ -4,9 +4,4 @@
 
 ---
 
-delegation-reach-and-gate-cost scope a76eb5f1 2026-08-01
-delegation-reach-and-gate-cost spec a2cd5a41 2026-08-01
-delegation-reach-and-gate-cost align a37b8b6a 2026-08-01
-delegation-reach-and-gate-cost build a566e7c3 2026-08-01
-delegation-reach-and-gate-cost validate a7e331a7 2026-08-01
-delegation-reach-and-gate-cost close a1412322 2026-08-01
+— scope aa141c6f 2026-08-01

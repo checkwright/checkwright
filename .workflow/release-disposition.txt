@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-delegation-reach-and-gate-cost release v0.21.0 — minor: two tightened-gates declarations (check-agent-tier-explicit new, check-docs-render-fidelity arms a batch default on a vendored consumer) plus a bash-floor behavior change
