@@ -25,6 +25,16 @@ faith, and the loss looked like something else.
   hit the session wall; both had already returned, which was luck. Had the wall
   landed mid-sweep, the audit work would have been lost with no record it ran.
 
+**A third instance, found by the audit the first two triggered.** The align
+pass over this amendment found the same defect in a rule neither incident
+touched: **Serialize on shared files** tells a supervisor to "dispatch, await
+notification, validate, dispatch the next" — a waiting mechanism a dispatched
+agent may not use, once delta 1 rules out ending its turn on detached work. No
+loss is attested against it, because this repo barely reaches that arm; a
+consumer's dispatched agent supervising committing children reaches it
+squarely. Delta 4 covers it. Two failures plus one audit finding is why the
+pass is over **three** rules, not the two filed.
+
 One defect, one role-scoping pass. **No existing bold lead-in is renamed** — a
 lead-in is a rule's stable name and `check-rule-citation` resolves the SPEC's
 citations forward into it, so folding a role marker into one would rename the
@@ -36,7 +46,7 @@ queue entry's echo of it, "done entirely in the bullet bodies" — overstated it
 Delta 2 adds a **whole new bullet with a new lead-in**, which is not a body edit.
 That is safe under the same gate for the opposite reason: the gate resolves SPEC
 citations *forward* into the template's lead-in set, so a new lead-in enlarges
-the resolvable set and can only fail if delta 4's citation of it disagrees
+the resolvable set and can only fail if delta 5's citation of it disagrees
 verbatim. The constraint that actually binds is *no rename*, not *bodies only*.
 
 **Sequencing — a three-deep chain in this iteration's delegation lane, in this
@@ -189,7 +199,56 @@ Stated as a semantic delta because the debt unit landing first owns the
 surrounding text: wherever the read-only-fan-out caveat ends up worded, it gains
 the receiving-end clause and loses nothing.
 
-### Delta 4 — the SPEC records both failure surfaces {design-bearing}
+### Delta 4 — serialization is by completion, not by notification {design-bearing}
+
+Appended to the body of **Serialize on shared files;
+≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise**; the lead-in is untouched.
+
+Found at align, after the two failures above were already written up: this is the
+**third** bullet stating its mechanic for the dispatching role only. It says
+agents that edit a shared file "run one at a time — dispatch, await
+notification, validate, dispatch the next". *Await notification* is the
+background-and-notify pattern, which delta 1 has just ruled out for a dispatched
+agent. So the bullet hands a dispatched supervisor a serialization recipe whose
+waiting step it may not use, and the reader is left to invent one.
+
+The fix is to state the invariant the recipe was only ever a spelling of:
+
+> Serialization is by **completion**, not by notification: the next dispatch
+> begins after the previous one has *returned and been validated*. A supervisor
+> reaches that point via the completion notification; a **dispatched agent**
+> reaches it in-turn, awaiting each child before dispatching the next (delta 1 —
+> it cannot end its turn to wait). The ordering requirement is identical for
+> both; only the waiting mechanism differs, and neither role may overlap two
+> agents on a shared file or the git index.
+
+**Why this generality and not "it barely bites here."** In *this* repo the
+serialize arm is nearly unreachable: a stage session is banned from sibling
+dispatch (`lifecycle-kit/templates/lead.md` §Economics) and its sanctioned
+children are read-only fan-outs that neither commit nor touch the index, so they
+ride the unlocked ≤`DELEGATION_KIT_FAN_WIDTH`-wide arm instead. The rule is
+unfollowable for a **consumer's** dispatched agent whose children *do* commit —
+which is the case the template ships for. Scoping the delta to this repo's
+reach would make it read as speculative and would be the wrong tier besides:
+`agent-execution.md` is kit mechanism, so the clause is written for any harness
+with a parent/child dispatch model, and this repo's narrow exposure is the
+reason no incident is attested against this bullet rather than a reason to
+weaken it.
+
+**No incident, stated plainly.** Deltas 1 and 2 each rest on an attested loss;
+this one does not. It is admitted on consistency instead: the same defect, in
+the same file, found by the audit the first two triggered, where leaving the
+third instance standing after a pass named "one role-scoping pass" is what
+invites the re-filing this iteration is already paying for elsewhere.
+
+**And it earns no SPEC paragraph, deliberately.** §The delegation model admits
+only rationale that pays for residency — a failure surface, a calibration
+history, or a correctness bound. This delta has none: no loss, no wrong turn to
+record, and the correctness bound in that section is the *width* cap, which the
+clause does not touch. Delta 5 therefore still records **two** failure surfaces,
+not three, and the absence is a judgment rather than an oversight.
+
+### Delta 5 — the SPEC records both failure surfaces {design-bearing}
 
 §The delegation model keeps "only the rationale that earns spec residency (a
 failure surface, a calibration history, a bound that is correctness rather than
@@ -212,7 +271,7 @@ template's **<name>** rule`) rather than restating it:
 Delta 2's new lead-in must match its citation verbatim; `check-rule-citation`
 resolves it forward and is the oracle for this delta.
 
-### Delta 5 — the consumer's agent definition gains one pointer {mechanical}
+### Delta 6 — the consumer's agent definition gains one pointer {mechanical}
 
 `.claude/agents/stage-session.md` §Standing dispatch policy is the surface every
 dispatched stage session loads unconditionally — including the validate session
@@ -233,7 +292,7 @@ residency was considered and rejected: it fights load-trigger residency, and the
 one surface that would need it — a session with no dispatch trigger at all — is
 a wider unit than this one.
 
-### Delta 6 — landing {mechanical}
+### Delta 7 — landing {mechanical}
 
 The docs-site mirror of delegation-kit/SPEC.md and the other generated
 projections, regenerated; each freshness gate names its own regen command on
@@ -242,12 +301,12 @@ this unit must leave green.
 
 ## Producers and consumers
 
-Deltas 1-3 add **rules**, not machinery; delta 4 adds SPEC rationale, delta 5 a
-consumer-side pointer, delta 6 regenerated projections. So causal completeness
+Deltas 1-4 add **rules**, not machinery; delta 5 adds SPEC rationale, delta 6 a
+consumer-side pointer, delta 7 regenerated projections. So causal completeness
 here is about who reads the rules and at which transition. Nothing new is
-emitted, so no field is introduced that could lack a reader. (Deltas 5 and 6
-have no bullet of their own below: delta 5's reader is named inside delta 1's
-bullet, which is the arm it makes reachable, and delta 6 emits nothing a reader
+emitted, so no field is introduced that could lack a reader. (Deltas 6 and 7
+have no bullet of their own below: delta 6's reader is named inside delta 1's
+bullet, which is the arm it makes reachable, and delta 7 emits nothing a reader
 could lack.)
 
 - **The backgrounding arm (delta 1)** — *Producer:* the protocol template, read
@@ -257,7 +316,7 @@ could lack.)
   the supervisor, unchanged, at its dispatch transition. Its enabling load is
   real rather than nominal: the template is loaded by `/agent-execution`, whose
   block message the budget guard prints, **and** the arm is cited from the
-  consumer agent definition (delta 5), which a dispatched stage session loads
+  consumer agent definition (delta 6), which a dispatched stage session loads
   unconditionally. That second path is what makes the rule reachable by the role
   that broke it.
 - **The durability rule (delta 2)** — *Producer:* the protocol template.
@@ -269,7 +328,14 @@ could lack.)
   §Resume journal. *Consumers:* the dispatching parent (now told it owes the
   landing) and the read-only child (still told it owes no journal). The two
   readings are disjoint, which is the point of the narrowing.
-- **The SPEC paragraphs (delta 4)** — *Producer:* §The delegation model.
+- **The serialization clause (delta 4)** — *Producer:* the protocol template.
+  *Consumer:* a dispatched agent that supervises **committing** children, at the
+  transition where it starts the next one — the reader for whom "await
+  notification" was not an available step. The supervisor's reading is
+  unchanged. No new artifact: the clause renames the existing waiting step's
+  invariant rather than adding a signal, so nothing is emitted that could lack a
+  reader.
+- **The SPEC paragraphs (delta 5)** — *Producer:* §The delegation model.
   *Consumers:* a maintainer reading for rationale, and `check-rule-citation`,
   which reads the citations mechanically and reds if a cited name does not
   resolve to a template lead-in.
@@ -286,17 +352,19 @@ kit could not have named generically.
 - **`delegation-kit/templates/agent-execution.md`** — the **Background +
   notification, never poll** body (delta 1); the new **Findings you will act on
   are durable before you act on them** bullet (delta 2); the read-only-fan-out
-  caveat inside the resume-journal bullet (delta 3, after the debt unit lands).
+  caveat inside the resume-journal bullet (delta 3, after the debt unit lands);
+  the **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise**
+  body (delta 4). All three existing lead-ins verbatim.
 - **delegation-kit/SPEC.md §The delegation model** — the two rationale
-  paragraphs and their rule citations (delta 4).
+  paragraphs and their rule citations (delta 5).
 - **delegation-kit/SPEC.md §Resume journal — agent writes, supervisor deletes**
   — the caveat's receiving-end clause (delta 3), in the same section the debt
   unit edits for lifetime; the two edits are disjoint sentences and the debt
   unit's lands first.
 - **`.claude/agents/stage-session.md` §Standing dispatch policy** — the pointer
-  bullet (delta 5).
+  bullet (delta 6).
 - **The docs-site mirror of delegation-kit/SPEC.md** and the other generated
-  projections (delta 6).
+  projections (delta 7).
 
 ## Definition of Done
 

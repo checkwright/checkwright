@@ -40,15 +40,20 @@ knob. The 271 ms `awk` fan-out is **not** claimed here: delta 7's projection
 carries it forward unchanged, so this unit's measured case stays independently
 checkable against the spawn-hoist unit's.
 
-**And it is not the spawn-hoist unit's either, as that entry is currently
-written — flagged at align rather than assumed.** An earlier draft assigned the
-fan-out to "the mechanical spawn-hoist debt entry". Read at the entry, that
-unit's worklist names `check-tree-terms`, `check-spec-pointer`, `check-md-refs`,
-`check-comment-tier`, `check-trajectory-fresh`, `check-docs-cmd` and
-`check-docs-nav-reachable`, and it explicitly excludes "the docs renderer". So
-the 271 ms has no owner today. Whose it becomes is a scope call, not this
-amendment's to make; what this amendment owes is to stop asserting an ownership
-that does not exist.
+**Where the fan-out does belong, settled at align.** An earlier draft disclaimed
+it to "the mechanical spawn-hoist debt entry" on the strength of that entry's
+*exclusion* sentence, which actually excluded the docs renderer — leaving the
+271 ms orphaned. `gate-battery-spawn-hoists` now **names this gate's four
+per-page `awk` spawns in its measured worklist**, so the disclaimer points at a
+worklist entry rather than at an inference.
+
+**Ordering that follows from it.** That unit hoists spawns out of the render
+loop delta 3 rewrites, so it lands **after** this one; otherwise it optimises a
+loop about to be replaced. The two share
+`site-kit/checks/check-docs-render-fidelity.sh` and no longer run in parallel.
+Delta 7's projection is the handoff: this unit leaves ~450 ms of render plus an
+unchanged ~271 ms of `awk`, and that residue is the spawn-hoist unit's opening
+measurement.
 
 ## What changes
 

@@ -20,7 +20,13 @@
   suite, ended its turn, and lost the child with it. The resume-journal mechanics
   reach a mutating agent only, so a read-only child's findings live solely as a
   return value in a parent that may die holding them.
-  **Deliverable:** one role-scoping pass over both rules. **No existing bold
+  **Deliverable:** one role-scoping pass over **three** rules — the two above
+  plus **Serialize on shared files**, which align found stating the same
+  dispatching-role-only mechanic ("dispatch, await notification") that delta 1
+  rules out for a dispatched agent. No loss is attested against the third; it is
+  admitted on consistency, and it bites a consumer's dispatched agent whose
+  children commit rather than this repo, whose stage sessions are banned from
+  sibling dispatch and fan out read-only. **No existing bold
   lead-in is renamed**, because `check-rule-citation` resolves the SPEC's
   citations forward into it; edits to existing rules land in the bullet
   **bodies**, and one delta adds a new bullet with a new lead-in (which the
@@ -112,7 +118,11 @@
   The batch default is therefore filled only when the per-document renderer is
   still at its kit default.
   **Surface note for batching:** site-kit only — shares no surface with the three
-  delegation-lane units and may run in parallel with them.
+  delegation-lane units and may run in parallel with them. It does share
+  `site-kit/checks/check-docs-render-fidelity.sh` with
+  **`gate-battery-spawn-hoists`** since align added that gate's `awk` fan-out to
+  the debt worklist, so **this unit lands first** and the hoist follows onto the
+  rewritten loop.
   Feature-shaped at triage: it changes a governed knob's contract. Filed 2026-08-01
   by scope from its own measurement of the battery, alongside the mechanical half
   promoted to Technical Debt; amendment authored 2026-08-01 at spec.
@@ -180,13 +190,30 @@
   reaches `check-graph`, `check-reads-couples` and `gen-pre-commit.sh` at once.
   `check-tree-terms` (`gate-sdk/checks/check-tree-terms.sh:47`) re-materialises a
   six-line pattern file by process substitution 429 times and should cost about
-  20ms. The rest of the worklist is the same shape across `check-spec-pointer`,
-  `check-md-refs`, `check-comment-tier`, `check-trajectory-fresh`,
-  `check-docs-cmd` and `check-docs-nav-reachable`.
-  **Scope limit, deliberate:** this entry does not touch the two external-tool
-  costs (the docs renderer, ShellCheck) — the renderer is
+  20ms. `check-docs-render-fidelity` spawns four `awk` processes per page
+  (`site-kit/checks/check-docs-render-fidelity.sh:140,145,147,149`) — 4 × 68
+  pages, measured at 271ms, added to this worklist at align 2026-08-01: it is
+  in-gate `fork`/`exec` re-paid per item, exactly this entry's stated shape, and
+  it was orphaned before (this entry never named it and
+  **`docs-renderer-batch-contract`** disclaimed it here). The rest of the
+  worklist is the same shape across `check-spec-pointer`, `check-md-refs`,
+  `check-comment-tier`, `check-trajectory-fresh`, `check-docs-cmd` and
+  `check-docs-nav-reachable`.
+  **Scope limit, deliberate:** this entry does not touch the two **external-tool**
+  costs — the ruby docs renderer and ShellCheck. The renderer is
   **`docs-renderer-batch-contract`**, which changes a shipped knob's contract and
-  so is not mechanical, and ShellCheck is one process already.
+  so is not mechanical, and ShellCheck is one process already. The limit is the
+  external tools only, never the gates' own in-gate spawns: a gate that shells
+  out to the renderer still owns its `awk` fan-out, which is why
+  `check-docs-render-fidelity` appears in the worklist above.
+  **Sequence after `docs-renderer-batch-contract`.** That unit rewrites the very
+  render loop these `awk` spawns sit in (its delta 3), so hoisting first would
+  optimise a loop about to be replaced and force a judgment merge. Landing
+  second, the hoist applies to the new loop cleanly and that unit's projection
+  (~450ms render plus an unchanged ~271ms of `awk`) is exactly the baseline this
+  one then improves. The two share
+  `site-kit/checks/check-docs-render-fidelity.sh`, so they no longer run in
+  parallel — see that entry's surface note.
   Debt: converges the gates onto their existing output contracts; adds no
   governed name. Filed and promoted 2026-08-01 by scope into
   `delegation-reach-and-gate-cost` (operator ruling), from this session's
