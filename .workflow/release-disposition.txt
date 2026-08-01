@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-release-signaling-reset release deferred:v0.22.0 — minor earned (tightened gates: check-docs-link-convention); no cadence trigger fired — v0.21.0 is 3h old against the 7-day floor, no decommission, no security or supply-chain fix, no operator direction; the preview-channel declaration reaches readers on the master push and its --prerelease arm binds whichever tag comes next, so nothing decays by waiting
