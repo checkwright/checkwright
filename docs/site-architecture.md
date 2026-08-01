@@ -104,7 +104,7 @@ recoverable:
   `<!-- toolchain:begin -->` bullets and `context-kit/lib/toolfloor.sh`'s
   `PROBE_SET` array both directions — name, version floor, and implementation
   token, since each bullet's parenthetical renders its roster element verbatim
-  (`` - `bash` (≥ 4.0) — … ``, `` - `awk` (GNU) — … ``, both axes comma-joined,
+  (`` - `bash` (≥ 4.3) — … ``, `` - `awk` (GNU) — … ``, both axes comma-joined,
   no parenthetical for an unconstrained member). Elements are derivable, purpose
   clauses hand prose, so a roster edit reds the docs list without an emitter
   handshake. The gate greps the roster and never sources it: a fixture path is

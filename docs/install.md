@@ -78,10 +78,11 @@ your `PATH`, and the note says what breaks without it:
 
 <!-- toolchain:begin -->
 
-- `bash` (≥ 4.0) — every gate and both generated git hooks are Bash scripts;
-  nothing in the battery runs without it. Three constructs force the floor:
-  associative arrays, `mapfile`, and the lowercasing case expansion, spread
-  across the gate libraries, the checks, and canon-kit's prose tooling.
+- `bash` (≥ 4.3) — every gate and both generated git hooks are Bash scripts;
+  nothing in the battery runs without it. The floor is the highest construct the
+  battery runs: a nameref (`local -n`) in the gate library every check sources.
+  Associative arrays, `mapfile`, and the lowercasing case expansion are more
+  widespread but only reach 4.0.
 - `git` — the gates read tracked files and the hooks fire at commit time; the
   model is git-native end to end.
 - `jq` — the settings and evidence gates, and guard-kit's JSON tooling, parse

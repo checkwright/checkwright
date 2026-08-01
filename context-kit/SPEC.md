@@ -258,10 +258,17 @@ is provable).
 
 The constrained members and what forces each:
 
-- `bash:4.0` — three independent bash-4.0 constructs: `declare -A` (gate-sdk,
-  guard-kit, delegation-kit, evidence-kit checks), `mapfile` (widespread across
-  the kits), and the `${x,,}` case expansion (canon-kit's `lib/spec.sh` and
-  checks, a delegation-kit template).
+- `bash:4.3` — the floor is set by the **highest** construct the battery runs,
+  not the most numerous. Three bash-4.0 constructs are widespread — `declare -A`
+  (gate-sdk, guard-kit, delegation-kit, evidence-kit checks), `mapfile` (across
+  the kits), the `${x,,}` case expansion (canon-kit's `lib/spec.sh` and checks, a
+  delegation-kit template) — but the **nameref** (`local -n`, bash 4.3) outranks
+  them: `gate-sdk/lib/gate.sh`'s couples expander, which every gate sources, and
+  `canon-kit/checks/check-comment-tier.sh`. The nameref in the shared gate
+  library makes 4.3 universal rather than one leaf gate's requirement, so a
+  consumer below it cannot run the battery at all. Recorded here because the
+  earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the
+  battery would fail with an obscure syntax error.
 - `awk::GNU` — no version floor, one implementation constraint: the 3-arg
   `match()` in `check-gate-assertions`, whose dependency gate-sdk/SPEC.md
   §check-gate-assertions already owns.
@@ -297,8 +304,8 @@ gate-sdk/SPEC.md §The gate model requires of a gate, applied to a probe that is
 not one.
 
 **The rendered verdict.** Each toolchain bullet carries the probed banner and,
-for a constrained member, the constraint and its verdict — `` (floor 4.0, ok) ``,
-`` (requires GNU — below contract) ``, `` (floor 4.0 — unverified) ``; an
+for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
+`` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an
 unconstrained member carries no parenthetical. A `**Below contract:**` line joins
 the existing `**Absent:**` line, reading `none` when clean and otherwise naming
 each failing member through the verdict's own fields: `below` and `wrong-impl`
