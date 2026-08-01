@@ -14,34 +14,6 @@
 
 ## Technical Debt
 
-- **action-run-shell-yaml-anchor-fail-open** — the gate whose whole job is
-  linting workflow bash silently drops a `run:` body written behind a YAML
-  anchor. gate-sdk/SPEC.md states `check-action-run-shell` refuses "a YAML
-  anchor or alias as the `run:` value, since no anchor resolution is attempted";
-  the implementation's refusal arms cover only the folded scalar, the explicit
-  indent indicator, the alias sigil, and the unbalanced GitHub expression. There
-  is no anchor arm, so `run: &anchor |` matches none of them, is non-empty, and
-  falls through to the plain-scalar counter — its body lines are never linted.
-  Verified by execution at the 2026-08-01 close, three ways over one identical
-  body: the literal `run: |` form reds (SC2034 + SC2154), the alias form refuses
-  loudly, and the anchor form exits 0 reporting "0 run: block(s) linted, 1
-  plain-scalar run: value(s) skipped". Re-verified by source read at the
-  2026-08-01 scope survey — not re-executed, so the execution evidence above is
-  the close's rather than this survey's. A fail-open of the same vacuous-pass
-  class `vacuous-assertion-count-discipline` tracks, and the skipped-count line
-  is exactly the diagnostic that made it visible.
-  **Deliverable:** the missing code arm plus a `bad/` fixture over an anchored
-  `run:` value. Explicitly **not** a narrowing of the SPEC line — the SPEC states
-  the correct contract and narrowing it would bless the fail-open.
-  **Debt, not feature:** one refusal arm and one fixture inside an existing gate;
-  the SPEC already carries the contract, so no governed name is added. The
-  marker the deferred section carries was deleted rather than converted at
-  promotion: the deliverable was stated definitively at filing, so this entry
-  owed no design ruling.
-  Filed 2026-08-01 at close from the gap inbox, surfaced at the
-  release-signaling-reset align audit while verifying an amendment claim about
-  the gate's fail-closed set.
-
 - **smoke-battery-workflow-gate-coverage** — the consumer smoke installs
   workflow templates but no smoke gate lints their Actions shape, so a template
   regression reaches a consumer unopposed. The scratch battery is the union of
@@ -2119,5 +2091,6 @@
 - local-overlay-git-blanket-grant
 - core-files-kit-coverage-derived
 - security-advisory-lane
+- action-run-shell-yaml-anchor-fail-open
 
 ## Lessons Learned

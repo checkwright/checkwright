@@ -53,6 +53,21 @@ check_case indicator '      - run: |2
 # C — a YAML alias as the run: value. No anchor resolution is attempted.
 check_case alias '      - run: *setup' 2 "a YAML alias as the run: value (run: *setup)"
 
+# C2 — the anchor half of the same rule. This fell through every refusal arm and
+# landed on the plain-scalar counter, so an anchored body was reported skipped and
+# never linted: a silent fail-open in the gate whose whole job is linting this
+# shell. The body below is ShellCheck-dirty, so a regression here reads as clean.
+check_case anchor '      - run: &setup |
+          echo "$undefined_var"
+          unused=1' 2 "a YAML anchor on the run: value (run: &setup |)"
+
+# C3 — an anchor on a plain scalar refuses too: the anchor is what we cannot
+# resolve, independent of the scalar style it decorates.
+check_case anchor_plain '      - run: &setup echo hi' 2 "a YAML anchor on the run: value (run: &setup echo hi)"
+
+# C4 — a quoted value merely beginning with & is an ordinary string, not an anchor.
+check_case anchor_quoted '      - run: "echo && echo"' 0 "0 run: block(s) linted"
+
 # D — an unbalanced GitHub expression on a body line: substituting it would mangle
 # the fragment, so the line is refused rather than linted wrong.
 check_case unbalanced '      - run: |
@@ -84,5 +99,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-action-run-shell.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-action-run-shell.test: ok (folded scalars, an explicit indentation indicator, a YAML alias and an unbalanced GitHub expression each refuse at exit 2 naming the construct; |- and |+ extract normally; a refusable construct outside the Actions-shape subject is skipped and counted rather than refused)"
+echo "check-action-run-shell.test: ok (folded scalars, an explicit indentation indicator, a YAML alias, a YAML anchor on either scalar style and an unbalanced GitHub expression each refuse at exit 2 naming the construct; |- and |+ extract normally; a quoted value merely starting with & is not an anchor; a refusable construct outside the Actions-shape subject is skipped and counted rather than refused)"
 exit 0

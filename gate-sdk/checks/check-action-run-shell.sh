@@ -93,6 +93,7 @@ function processkey(rest, col,   v) {
     if (v ~ /^>/)        refuse(FNR, "a folded block scalar (run: " v ")")
     if (v ~ /^\|[0-9]/)  refuse(FNR, "an explicit block-scalar indentation indicator (run: " v ")")
     if (v ~ /^\*/)       refuse(FNR, "a YAML alias as the run: value (run: " v ")")
+    if (v ~ /^&/)        refuse(FNR, "a YAML anchor on the run: value (run: " v ")")
     if (v ~ /^\|[-+]?$/) { startblock(col, FNR); return }
     if (v == "") return
     printf "P\t%d\n", FNR
@@ -175,7 +176,8 @@ for f in "${files[@]}"; do
                 echo "  $f:$a: $b" >&2
                 echo "  help: a multi-line run: body in an Actions-shaped file must be a literal block" >&2
                 echo "        scalar written 'run: |' (or '|-' / '|+'), with no explicit indentation" >&2
-                echo "        indicator and no YAML alias, and every \${{ }} on a body line balanced." >&2
+                echo "        indicator and no YAML anchor or alias, and every \${{ }} on a body line" >&2
+                echo "        balanced." >&2
                 exit 2
                 ;;
             P) plain=$((plain + 1)) ;;
