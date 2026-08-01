@@ -98,6 +98,24 @@ recoverable:
   Advisory count is derived from the enforcement map). Each of the four gates
   names its own regen command on a red, so recovery is mechanical once the
   fan-out is known — knowing it in advance is the part nothing else states.
+- **The new-gate fan-out** — the other wide trigger, and the one with no single
+  owner elsewhere: `gate-sdk/SPEC.md`'s kit-landing checklist covers the kit-side
+  obligations (SPEC section, `good/`+`bad/` fixture pair, the README's
+  `<!-- gate-roster:begin -->` block, `smoke/`, registration in
+  `scripts/gates.list`) and is silent on the projections a new gate stales,
+  because a kit may not name a consumer's docs surfaces. Assembled here so the
+  next author reads the list instead of discovering it one red gate at a time:
+  the on-site SPEC mirror (`bash scripts/gen-docs-mirror.sh --write`),
+  `docs/enforcement.md` (`bash gate-sdk/bin/enforcement-map.sh --emit >
+  docs/enforcement.md` — the gate joins the class registry),
+  `docs/footprint.md` (`bash context-kit/bin/footprint.sh --emit >
+  docs/footprint.md` — a new script is new token cost), `docs/value.md`'s rollup
+  block (`bash scripts/gen-value-rollup.sh`, derived from the two above),
+  `docs/check-graph.html` (`bash gate-sdk/checks/check-graph.sh --emit >
+  docs/check-graph.html`), and — for a `tier=precommit` gate — the generated
+  hook (`bash gate-sdk/bin/gen-pre-commit.sh --write`). The same list applies to
+  any edit that changes a kit's line count, which is why a prose-only SPEC edit
+  can red the footprint and rollup gates.
 - **The install-toolchain parity contract** — `docs/install.md`'s Requirements
   section holds the toolchain list to the probe roster:
   `check-install-toolchain` asserts whole-element parity between its
