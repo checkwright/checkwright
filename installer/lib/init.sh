@@ -204,11 +204,11 @@ if [[ -n "$PRIOR_FILES" ]]; then
 fi
 
 # spec: installer/README.md §init — the generated projections are produced by the vendored tools themselves, never restated by the installer: the hook generator and the graph emitter are gate-sdk's, so a consumer's artifacts are the ones their own gate-sdk makes
-GENERATED=("$GATES_DIR/git-hooks/pre-commit" ".workflow/CHECK-GRAPH.html")
+GENERATED=("$GATES_DIR/git-hooks/pre-commit" "$GATES_DIR/CHECK-GRAPH.html")
 if (( ! DRY )); then
     ( cd "$ROOT" && bash "$ROOT/gate-sdk/bin/gen-pre-commit.sh" --write ) >/dev/null \
         || die "gate-sdk's hook generator failed"
-    ( cd "$ROOT" && bash "$ROOT/gate-sdk/checks/check-graph.sh" --emit ) > "$ROOT/.workflow/CHECK-GRAPH.html" \
+    ( cd "$ROOT" && bash "$ROOT/gate-sdk/checks/check-graph.sh" --emit ) > "$ROOT/$GATES_DIR/CHECK-GRAPH.html" \
         || die "gate-sdk's graph emitter failed"
 fi
 [[ -f "$ROOT/$GATES_DIR/git-hooks/commit-msg" ]] && GENERATED+=("$GATES_DIR/git-hooks/commit-msg")
