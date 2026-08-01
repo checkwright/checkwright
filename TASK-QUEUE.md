@@ -48,6 +48,44 @@
   Surfaced 2026-08-01 by the align audit; filed at close from the gap inbox;
   promoted 2026-08-01 by spec.
 
+- **spec-roster-enumeration-derivation** [spec: SPEC-derived-roster-sets.md] — a
+  batch of **kit SPEC-vs-code roster drift**, filed as one unit because every
+  instance shares one root cause (a hand-maintained roster beside a derivable
+  set) and each re-arms the moment it is hand-corrected. None changes any gate's
+  behaviour. The seven instances are re-verified live and enumerated in the
+  amendment, which owns them from here — the entry no longer carries the list.
+  **Ruled at spec 2026-08-01 — no kit gains a gate, an assertion, or a knob.**
+  canon-kit's `check-prose-enum` already scans every `*/SPEC.md` and already
+  accepts consumer-declared sets through `CANON_KIT_ENUM_SETS_CMD`; the whole
+  mechanism exists and no declared set names these members. The token is four
+  **derived set families** in `scripts/enum-sets.sh` — per-kit libs, per-kit
+  `gate-tests/*.test.sh`, per-lib function definitions, per-lib callers — each
+  member computed from the tree, so the eighth instance in an unaudited kit is
+  caught the day its paragraph is written. The seam holds by construction: every
+  set lives in this repo's consumer emitter, and canon-kit ships the emit grammar
+  alone.
+  **Two instances close by reshaping prose, not by declaring a set.** Instance
+  (6) is a cross-document absence, which a paragraph-scoped gate structurally
+  cannot see; instance (7) is a *narrative* enumeration naming no file, which the
+  literal matcher cannot see either. Both are rewritten to name their members
+  literally, and the derived set then holds them. The ruled-out alternative — a
+  third scope field on the emit grammar, giving whole-file completeness — is
+  recorded in the amendment with its reasons.
+  **One instance is dispositioned without an oracle, deliberately.** Instance (2)
+  is a false description of a file, not a roster behind a growing set, and its
+  class is exactly two sites with no growth vector: every kit's config template
+  is a two-line pointer stub *by correct design*, since the knob table has one
+  home. Gating a class that cannot grow is the flagged-and-gated shape.
+  **Corrections beyond the filed entry, from the spec-stage re-verification:**
+  instance (4) is short by **two** adapters, not one (`ek_parser_for` as well as
+  `ek_suite_cmd`); instance (3)'s `lib/delegation.sh` is named **nowhere** in
+  that SPEC, not merely absent from one list; and instance (1)'s "no caller
+  fixture to ride" is false alongside its caller count.
+  **Cost while deferred:** low per instance and non-rotting, but the count grows
+  once per audit — this batch is what a single align fan-out found.
+  Surfaced 2026-08-01 by the align audit's cross-spec fan-out; drained into the
+  queue at close; promoted 2026-08-01 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2163,52 +2201,6 @@
   the kit's own smoke, so the testing claim reads stronger than it is.
   Surfaced 2026-08-01 by the align audit's kit SPEC-vs-code sweep; filed at
   close from the gap inbox.
-
-- **spec-roster-enumeration-derivation** [design-pending] — a batch of **kit
-  SPEC-vs-code roster drift**, filed as one unit because every instance shares
-  one root cause (a hand-maintained roster beside a derivable set) and each
-  re-arms the moment it is hand-corrected. None changes any gate's behaviour.
-  (1) gate-sdk/SPEC.md:597 names three callers of `lib/declaration.sh` as "all
-  three named", but `scripts/check-tightened-gates-note-parity.sh` is a fourth
-  calling both `decl_section_tokens` and `decl_record_tokens`; this also
-  falsifies line 610's "the record arm's only caller is the smoke's untagged
-  branch" and its "no caller fixture to ride", since the good/bad fixture pair
-  under `scripts/gate-tests/check-tightened-gates-note-parity` exists.
-  (2) canon-kit/SPEC.md:1407 calls `templates/canon-config.sh` "the consumer
-  config template documenting every knob"; the file is a two-line stub pointing
-  back at SPEC.md's knob table and documents none.
-  (3) delegation-kit/SPEC.md:677-701 enumerates `bin`, `checks`, `gate-tests`,
-  `templates` and `smoke` but never `lib/delegation.sh`, which is load-bearing
-  (sourced by two bin tools and two gates).
-  (4) evidence-kit/SPEC.md:64-66 enumerates `lib/evidence.sh`'s shared adapters
-  as if exhaustive but omits `ek_suite_cmd`, used at `bin/run-validate.sh:30`.
-  (5) context-kit/SPEC.md:627-631 and 749-752 name and justify
-  `check-memory-off.test.sh` but never `check-brevity.test.sh`, run by the same
-  runner.
-  (6) canon-kit/gate-tests carries four `.test.sh` files (`check-comment-tier`,
-  `check-docs-link-convention`, `check-md-refs`, `check-tracking-claim`) not
-  named by the per-gate idiom the SPEC uses for its other six.
-  (7) site-kit/SPEC.md's fixture-coverage paragraph omits
-  `gate-tests/check-docs-render-fidelity-foreign.test.sh` beside its span, table
-  and batch siblings.
-  **Why `[design-pending]` and why one unit rather than seven edits:** several
-  of these rosters are **computable from the tree** (a lib file list, a
-  gate-tests basename set, a caller grep), and `check-kit-enum` already solves
-  exactly this shape for `couples` fields via the kit glob token. The unit owes
-  a ruling on which of the seven are derivable and a design for the token that
-  derives them; seven hand corrections would leave the class intact.
-  **That ruling is ANSWERED 2026-08-01 by the undirected scope survey: all seven
-  are mechanically derivable**, each a set-difference over a `lib/*.sh` list, a
-  `gate-tests/*.test.sh` basename set, or a `source`/call-site grep. So the unit
-  owes the **token design** alone, not the survey. Instance (1) is also worse
-  than filed: `scripts/check-tightened-gates-note-parity.sh` sources
-  `lib/declaration.sh` and calls **both** `decl_section_tokens` and
-  `decl_record_tokens`, so gate-sdk/SPEC.md's "all three named" *and* its "no
-  caller fixture to ride" are both false — the fixture pair is on disk.
-  **Cost while deferred:** low per instance and non-rotting, but the count grows
-  once per audit — this batch is what a single align fan-out found.
-  Surfaced 2026-08-01 by the align audit's cross-spec fan-out; drained into the
-  queue at close.
 
 - **advisory-lane-draft-state-unswept** [design-pending] — the Advisories lane
   probes `state=triage`, which is correctly the **undispositioned** set:
