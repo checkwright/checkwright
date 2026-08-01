@@ -2147,6 +2147,15 @@
   real model prices would publish a consumer's roster). So what remains is one
   template line plus the ruling — not a survey. Re-verify before trusting this:
   it is a dated finding.
+  **Seam constraint the ruling must carry, ruled at scope 2026-08-01.** A flat
+  "a kit's `templates/` registry must be the full bundled set" is **unsafe** as
+  stated: applied to `price-table.tsv` it would force a kit literal enumerating
+  real model ids and prices, which is exactly the provenance seam
+  (CLAUDE.md §The provenance seam). The rule must be predicated on
+  *registries of things the kit itself ships* (its own KPI plugins, its own gate
+  names) and must exempt a template whose rows are consumer rule content the kit
+  deliberately stubs. Land that carve-out in the contract, not as a per-file
+  exception list.
   Shares its design question with `queue-kit-starter-template-red` (part 2):
   both ask whether a kit's install-time registry may be a subset of what the kit
   ships. Distinct instance and distinct surface from
