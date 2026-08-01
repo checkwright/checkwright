@@ -885,8 +885,14 @@ pointer **directive** on a governed source resolves, and every free-prose
 directive set is exactly what `check-comment-tier` blesses by shape: full-line
 `spec:` / `contract:` comments on the governed sources, plus the `# contract:`
 headers on the workflow directory's **tracked** members (gate-sdk/SPEC.md §The
-workflow directory owns that tier; a version-marker payload resolves as no path
-and rides `CANON_KIT_COMMENT_WHITELIST`). A directive's target grammar is
+workflow directory owns that tier). That section rules two `contract:` payloads,
+and this gate honours both: a **version-marker** payload (`<format-name> v<N>`,
+matched on that section's own anchored shape, and only after `contract:` — a
+`spec:` directive wearing the shape still resolves as a path) is a wire-format
+version its owning gate parses, so it names no path, resolves as none, and is
+counted on the clean line rather than skipped silently. Discriminating it here is
+what keeps the form usable without a per-consumer whitelist entry. A directive's
+target grammar is
 `<path> [§<heading>]`: `<path>` (repo-relative) must be a tracked file, and when
 a `§<heading>` fragment is present the file must carry a matching markdown
 heading; a pointer without `§` resolves file-only. Reddens on a missing or

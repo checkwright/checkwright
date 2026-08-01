@@ -1,1 +1,2 @@
 §heading not found in SPEC-target.md
+target file not found: widget-manifest

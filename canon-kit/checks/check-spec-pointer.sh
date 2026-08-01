@@ -106,6 +106,7 @@ while IFS= read -r -d '' _tf; do TRACKED["$_tf"]=1; done < <(git -C "$ROOT" ls-f
 errors=()
 scanned=0
 pointers=0
+markers=0
 while IFS= read -r f; do
     [[ -n "$f" ]] || continue
     rel="${f#"$ROOT"/}"; rel="${rel#./}"
@@ -115,8 +116,14 @@ while IFS= read -r f; do
     fail_closed "$st" SPEC-POINTER "awk extract ($rel)"
     while IFS=$'\t' read -r _file lineno body; do
         [[ -n "$body" ]] || continue
-        pointers=$((pointers + 1))
         if [[ "$body" == spec:* ]]; then after="${body#spec:}"; else after="${body#contract:}"; fi
+        # spec: gate-sdk/SPEC.md §The workflow directory — contract: rules two payloads, and the version-marker form is a wire-format version its owning gate parses rather than a doc pointer, so it names no path to resolve
+        payload="${after#"${after%%[![:space:]]*}"}"; payload="${payload%"${payload##*[![:space:]]}"}"
+        if [[ "$body" == contract:* && "$payload" =~ ^[a-z0-9-]+\ v[0-9]+$ ]]; then
+            markers=$((markers + 1))
+            continue
+        fi
+        pointers=$((pointers + 1))
         # comment-tier-exempt: a § inside the em-dash prose tail is not a heading marker
         sig="${after%% — *}"; sig="${sig%% -- *}"
         read -r path prest <<< "$sig"
@@ -176,5 +183,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "  help: a spec:/contract: directive and a free-prose <path>.md §<heading> citation each bind a site to the requirement that governs it — the binding is only live if it resolves. Fix the <path> (repo-relative, tracked) or the §<heading> to name the current target, or drop the § fragment for a file-only pointer. A renamed heading updates every inbound pointer and citation in the same commit."
     exit 1
 fi
-echo "SPEC-POINTER: clean ($pointers directive pointer(s) across $scanned governed source(s); $prose_cites prose citation(s) across $manifests manifest file(s); every target file tracked and named §heading present)"
+echo "SPEC-POINTER: clean ($pointers directive pointer(s) across $scanned governed source(s), $markers version-marker header(s) skipped as naming no path; $prose_cites prose citation(s) across $manifests manifest file(s); every target file tracked and named §heading present)"
 exit 0

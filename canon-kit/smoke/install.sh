@@ -24,6 +24,7 @@ check-md-refs
 check-prose-enum
 check-prose-tells
 check-spec-fence-balance
+check-spec-pointer
 check-todo-task-liveness
 check-tracking-claim
 EOF
