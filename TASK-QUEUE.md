@@ -33,36 +33,6 @@
   Surfaced 2026-07-31 at build; drained from the gap inbox by close; amendment
   authored 2026-08-01 at spec.
 
-- **docs-renderer-batch-contract** [spec: SPEC-docs-renderer-batch-contract.md] —
-  `SITE_KIT_RENDERER` is specified as a **stdin→stdout single-document** command,
-  so `check-docs-render-fidelity` starts one renderer process per tracked page.
-  That shape, not the rendering, is the whole cost. Re-measured at spec on this
-  tree: the gate is 14373ms of a 40054ms battery — the single largest line in it —
-  and of that, 68 pages through 68 fresh interpreters take 13875ms while the same
-  pages through one interpreter take 450ms. The gate's own per-page `awk` fan-out
-  is 271ms and belongs to **`gate-battery-spawn-hoists`**, not here.
-  **Deliverable:** a second, **optional** knob (`SITE_KIT_RENDERER_BATCH`) framing
-  N documents over one stream, with the per-document contract unchanged and still
-  the fallback, so no consumer breaks and the framing obligation is opt-in. The
-  oracle stays the real Pages parser. Deltas, the framing convention, the
-  ruled-out content-hash cache, and causal completeness:
-  site-kit/SPEC-docs-renderer-batch-contract.md.
-  **The seam call that decides the unit:** filling the batch default
-  unconditionally would silently defeat a consumer's deliberate
-  `SITE_KIT_RENDERER` version pin, replacing a pinned oracle with the kit's
-  unpinned one and reporting clean against a parser build the consumer rejected.
-  The batch default is therefore filled only when the per-document renderer is
-  still at its kit default.
-  **Surface note for batching:** site-kit only — shares no surface with the three
-  delegation-lane units and may run in parallel with them. It does share
-  `site-kit/checks/check-docs-render-fidelity.sh` with
-  **`gate-battery-spawn-hoists`** since align added that gate's `awk` fan-out to
-  the debt worklist, so **this unit lands first** and the hoist follows onto the
-  rewritten loop.
-  Feature-shaped at triage: it changes a governed knob's contract. Filed 2026-08-01
-  by scope from its own measurement of the battery, alongside the mechanical half
-  promoted to Technical Debt; amendment authored 2026-08-01 at spec.
-
 ## Technical Debt
 
 - **gate-battery-spawn-hoists** — the gate battery costs 40977ms on this tree
@@ -80,11 +50,18 @@
   `check-tree-terms` (`gate-sdk/checks/check-tree-terms.sh:47`) re-materialises a
   six-line pattern file by process substitution 429 times and should cost about
   20ms. `check-docs-render-fidelity` spawns four `awk` processes per page
-  (`site-kit/checks/check-docs-render-fidelity.sh:140,145,147,149`) — 4 × 68
+  (`site-kit/checks/check-docs-render-fidelity.sh:156,188,190,192` since
+  `docs-renderer-batch-contract` landed; the same four were at `140,145,147,149`
+  when this worklist was written) — 4 × 68
   pages, measured at 271ms, added to this worklist at align 2026-08-01: it is
   in-gate `fork`/`exec` re-paid per item, exactly this entry's stated shape, and
   it was orphaned before (this entry never named it and
-  **`docs-renderer-batch-contract`** disclaimed it here). The rest of the
+  **`docs-renderer-batch-contract`** disclaimed it here). That unit's delta 3
+  split the old single per-page loop in two, so the four now sit in two loops
+  over page-indexed parallel arrays: the front-matter strip (`:156`) builds
+  `bodies`, and the three scans (`:188,190,192`) run in the scan loop that reads
+  them back. None were hoisted, and the split is if anything friendlier to the
+  hoist — one batched `awk` per loop. The rest of the
   worklist is the same shape across `check-spec-pointer`, `check-md-refs`,
   `check-comment-tier`, `check-trajectory-fresh`, `check-docs-cmd` and
   `check-docs-nav-reachable`.
@@ -2097,5 +2074,6 @@
 - resume-journal-deletion-vs-pull-channel
 - agent-execution-backgrounding-role-scope
 - nested-dispatch-ungoverned
+- docs-renderer-batch-contract
 
 ## Lessons Learned

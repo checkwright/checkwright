@@ -4,7 +4,7 @@
 #
 # usage: check-docs-render-fidelity.sh [docs-dir] [config-file]
 #   defaults SITE_KIT_DOCS_DIR; config-file overrides SITE_KIT_CONFIG_FILE so a
-#   fixture supplies its own SITE_KIT_RENDERER / docs dir.
+#   fixture supplies its own renderer knobs / docs dir.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -23,12 +23,28 @@ git rev-parse --git-dir >/dev/null 2>&1 || {
     echo "check-docs-render-fidelity: not a git repository — cannot enumerate tracked pages" >&2; exit 2; }
 [[ -d "$DOCS" ]] || { echo "check-docs-render-fidelity: docs dir not found: $DOCS" >&2; exit 2; }
 
-probe="$(printf '# probe\n' | "${SITE_KIT_RENDERER[@]}" 2>/dev/null)"; pst=$?
-if [[ "$pst" -ne 0 || -z "$probe" ]]; then
-    echo "check-docs-render-fidelity: renderer '${SITE_KIT_RENDERER[*]}' could not run (exit $pst)" >&2
-    echo "  help: install the Pages parser — ruby plus the kramdown-parser-gfm gem — or point" >&2
-    echo "        SITE_KIT_RENDERER at a stdin->stdout GFM-to-HTML command" >&2
-    exit 2
+# spec: site-kit/SPEC.md §check-docs-render-fidelity — probe the oracle the gate will actually run, and only that one: a set batch knob is the consumer's statement of which parser is authoritative, so a batch-only setup is never refused over a per-document renderer this run will not invoke
+if [[ ${#SITE_KIT_RENDERER_BATCH[@]} -gt 0 ]]; then
+    bprobe=0
+    while IFS= read -r -d '' d; do
+        [[ -n "${d//[[:space:]]/}" ]] && bprobe=$((bprobe + 1))
+    done < <(printf '%s\n\000' '# probe one' '# probe two' | "${SITE_KIT_RENDERER_BATCH[@]}" 2>/dev/null)
+    if [[ "$bprobe" -ne 2 ]]; then
+        echo "check-docs-render-fidelity: batch renderer '${SITE_KIT_RENDERER_BATCH[*]}' failed its probe" >&2
+        echo "  (2 documents in, $bprobe non-empty document(s) back)" >&2
+        echo "  help: SITE_KIT_RENDERER_BATCH must read NUL-terminated documents from stdin and write" >&2
+        echo "        one NUL-terminated HTML document per input, in order; unset it to fall back to" >&2
+        echo "        the per-document SITE_KIT_RENDERER contract" >&2
+        exit 2
+    fi
+else
+    probe="$(printf '# probe\n' | "${SITE_KIT_RENDERER[@]}" 2>/dev/null)"; pst=$?
+    if [[ "$pst" -ne 0 || -z "$probe" ]]; then
+        echo "check-docs-render-fidelity: renderer '${SITE_KIT_RENDERER[*]}' could not run (exit $pst)" >&2
+        echo "  help: install the Pages parser — ruby plus the kramdown-parser-gfm gem — or point" >&2
+        echo "        SITE_KIT_RENDERER at a stdin->stdout GFM-to-HTML command" >&2
+        exit 2
+    fi
 fi
 
 listing="$(git ls-files -- "$DOCS")"; st=$?
@@ -135,12 +151,39 @@ BEGIN { infence=0; fchar=""; flen=0; count=0; prevpipe=0 }
 }
 END { print count+0 }'
 
-findings=()
+bodies=()
 for page in "${pages[@]}"; do
     body="$(awk "$strip_fm" "$page")"; bst=$?
     fail_closed "$bst" DOCS-RENDER-FIDELITY front-matter-strip
-    html="$(printf '%s\n' "$body" | "${SITE_KIT_RENDERER[@]}")"; rst=$?
-    fail_closed "$rst" DOCS-RENDER-FIDELITY renderer
+    bodies+=("$body")
+done
+
+htmls=()
+if [[ ${#SITE_KIT_RENDERER_BATCH[@]} -gt 0 ]]; then
+    # spec: site-kit/SPEC.md §check-docs-render-fidelity — command substitution strips NUL, so the framed stream is read through a process substitution: it never passes through $(…), and the loop body stays in this shell
+    while IFS= read -r -d '' html; do
+        while [[ "$html" == *$'\n' ]]; do html="${html%$'\n'}"; done
+        htmls+=("$html")
+    done < <(printf '%s\n\000' "${bodies[@]}" | "${SITE_KIT_RENDERER_BATCH[@]}")
+    # spec: site-kit/SPEC.md §check-docs-render-fidelity — the count assertion stands in for the per-page exit status process substitution discarded, so it catches renderer death, truncation and framing error alike, and refuses (2) rather than reporting a finding (1)
+    if [[ ${#htmls[@]} -ne ${#pages[@]} ]]; then
+        echo "check-docs-render-fidelity: batch renderer returned ${#htmls[@]} document(s) for ${#pages[@]} page(s)" >&2
+        echo "  help: SITE_KIT_RENDERER_BATCH must write exactly one NUL-terminated HTML document per" >&2
+        echo "        NUL-terminated input document, in order; a short count is a renderer that died" >&2
+        echo "        mid-stream, truncated its output, or framed it wrongly" >&2
+        exit 2
+    fi
+else
+    for body in "${bodies[@]}"; do
+        html="$(printf '%s\n' "$body" | "${SITE_KIT_RENDERER[@]}")"; rst=$?
+        fail_closed "$rst" DOCS-RENDER-FIDELITY renderer
+        htmls+=("$html")
+    done
+fi
+
+findings=()
+for i in "${!pages[@]}"; do
+    page="${pages[$i]}"; body="${bodies[$i]}"; html="${htmls[$i]}"
 
     read -r leak rcount rtbl < <(printf '%s\n' "$html" | awk "$rendered_scan"); ast=$?
     fail_closed "$ast" DOCS-RENDER-FIDELITY rendered-scan

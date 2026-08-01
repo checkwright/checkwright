@@ -25,5 +25,19 @@ unset _st_cfg
 declare -p SITE_KIT_ALIASES &>/dev/null || SITE_KIT_ALIASES=()
 declare -p SITE_KIT_EXEMPT_PATHS &>/dev/null \
     || SITE_KIT_EXEMPT_PATHS=("*/gate-tests/*" "*docs/posts/*")
-declare -p SITE_KIT_RENDERER &>/dev/null \
-    || SITE_KIT_RENDERER=(ruby -e 'require "kramdown"; require "kramdown-parser-gfm"; STDOUT.write(Kramdown::Document.new(STDIN.read, input: "GFM").to_html)')
+if declare -p SITE_KIT_RENDERER &>/dev/null; then
+    _st_renderer_overridden=1
+else
+    _st_renderer_overridden=0
+    SITE_KIT_RENDERER=(ruby -e 'require "kramdown"; require "kramdown-parser-gfm"; STDOUT.write(Kramdown::Document.new(STDIN.read, input: "GFM").to_html)')
+fi
+
+# spec: site-kit/SPEC.md §lib/site.sh — the one conditional default: filling the batch knob for a consumer who pinned SITE_KIT_RENDERER would replace their pinned oracle with this unpinned one and report clean against a parser build they rejected
+if ! declare -p SITE_KIT_RENDERER_BATCH &>/dev/null; then
+    if [[ "$_st_renderer_overridden" -eq 0 ]]; then
+        SITE_KIT_RENDERER_BATCH=(ruby -e 'require "kramdown"; require "kramdown-parser-gfm"; d = STDIN.read.split("\x00", -1); d.pop; d.each { |s| STDOUT.write(Kramdown::Document.new(s, input: "GFM").to_html); STDOUT.write("\x00") }')
+    else
+        SITE_KIT_RENDERER_BATCH=()
+    fi
+fi
+unset _st_renderer_overridden

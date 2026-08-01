@@ -63,11 +63,29 @@ told to load but cannot find. Knobs:
   aliases, and dated posts are immutable published artifacts.
 - `SITE_KIT_DOCS_DIR` — the docs-site root `check-docs-render-fidelity` walks
   for tracked markdown pages, default `docs`.
-- `SITE_KIT_RENDERER` — array, the stdin→stdout GFM-to-HTML command
-  `check-docs-render-fidelity` renders each page through, default the kramdown
-  CLI invocation with GFM input — `ruby -e '…Kramdown::Document…input: "GFM"…'`,
-  the parser GitHub Pages pins. A consumer whose Pages stack differs points this
+- `SITE_KIT_RENDERER` — array, the stdin→stdout **single-document** GFM-to-HTML
+  command, default the kramdown CLI invocation with GFM input —
+  `ruby -e '…Kramdown::Document…input: "GFM"…'`, the parser GitHub Pages pins.
+  It is the contract `check-docs-render-fidelity` renders each page through when
+  `SITE_KIT_RENDERER_BATCH` is empty: one of the gate's two renderer contracts,
+  and the fallback of the pair. A consumer whose Pages stack differs points this
   at its own renderer; an unresolvable one fails the gate closed.
+- `SITE_KIT_RENDERER_BATCH` — array, **optional**: a command rendering N
+  documents over one stream, `NUL`-terminated in both directions and
+  count-preserving, the framing specified in §check-docs-render-fidelity. Setting
+  it collapses the gate's per-page interpreter restarts into a single process,
+  which is where substantially all of that gate's cost lives. Its default is the
+  batch form of the same kramdown-with-GFM-input invocation `SITE_KIT_RENDERER`
+  defaults to — a `ruby -e` loop splitting stdin on `NUL` and writing one
+  `NUL`-terminated HTML document per input — filled **only when
+  `SITE_KIT_RENDERER` is itself still at its kit default.** Filling it
+  unconditionally would defeat a deliberate pin: a consumer who points
+  `SITE_KIT_RENDERER` at the version-locked bundle below, not knowing a second
+  knob now exists, would have that pinned oracle replaced by this unpinned one
+  and the gate would report clean against a parser build they explicitly
+  rejected — a false clean produced by an upgrade. Under the rule they instead
+  keep the per-document path at its own cost and its own semantics, and opt in by
+  pointing this knob at the batch form of their own pinned renderer.
 - `SITE_KIT_CONFIG_FILE` — the loader override; when set it must resolve, else
   the gate exits 2 rather than silently run on defaults.
 
@@ -189,6 +207,49 @@ consumer registers this gate; it stays outside env-probe's probe-set floor, and
 published docs site simply omits the gate by the registry-not-array convention
 and never installs the dependency.
 
+**The batch stream, and why the count is the fail-closed.** One renderer process
+per page is the gate's whole cost — the interpreter restarts, not the rendering —
+so where `SITE_KIT_RENDERER_BATCH` is non-empty the gate renders the corpus over
+one stream instead. The framing is `NUL`-terminated in both directions: the gate
+writes each front-matter-stripped body, `NUL`-terminated, to the command's stdin,
+and the command writes each rendered document to stdout in the **same order**,
+each `NUL`-terminated. `NUL` is a *terminator* rather than a separator, so N
+documents produce exactly N `NUL`s with no trailing-empty ambiguity, and it is
+unforgeable by page content for a stronger reason than rarity: bash cannot hold a
+`NUL` in a variable, so the gate's own reader has already dropped any `NUL` in
+the source before framing happens. A sentinel line would be forgeable — by a docs
+page describing this contract, first of all. Length-prefixed framing is equally
+sound and loses only on the obligation it puts on a consumer, who would have to
+implement exact-byte reads where splitting on a byte is a one-liner in every
+language a Pages stack might use.
+
+Two implementation constraints follow, and a natural reading of the contract
+breaks both. **Command substitution strips `NUL`**, so the batch output must
+never pass through `$(…)`; the gate reads it with `while IFS= read -r -d ''` from
+a **process substitution**, which also keeps the loop body in the current shell
+so the findings it appends to survive. Writer and reader being separate processes
+is what makes the exchange deadlock-free. **Process substitution discards the
+renderer's exit status**, so the batch path cannot keep the per-page fail-closed
+the per-document loop has — and a renderer that dies mid-stream yields fewer
+documents than pages. The gate therefore compares documents-read against
+pages-enumerated after the loop, which detects renderer death, truncation and
+framing error alike, one check standing in for the status the shell threw away.
+It exits 2 — a refusal to run the oracle — never 1, which would report a finding
+about the docs. Per-document scanning is unchanged: each document read off the
+stream goes through the same assertions, and the source-side scans are untouched.
+
+**Probe routing.** The gate probes the oracle it will actually run, and only that
+one. With the batch knob empty it probes `SITE_KIT_RENDERER` on a one-line
+document exactly as above. With the batch knob set it probes the batch command
+instead, on a probe that exercises the framing as well as the parser: two
+one-line documents in, exactly two non-empty documents back. Probing the
+per-document renderer too would refuse a batch-only consumer over a renderer this
+run never invokes. A **failing** batch probe exits 2 and does not fall back: a
+set knob is the consumer's deliberate statement about which parser is
+authoritative, so quietly rendering through a different one is the same
+false-clean class the fill condition in §Layout and configuration closes from the
+other direction. A gate that cannot run its configured oracle refuses.
+
 The false-positive floor is the assertion's hard boundary, deliberately set. The
 backtick symptom rests on a property of well-formed markdown: every backtick
 belongs to a code span, which renders inside `<code>` and is excluded from the
@@ -238,9 +299,18 @@ test isolating it — a page with no fence, no surplus heading and no table, who
 only defect is the severed span, reds span-only and clears in the
 doubled-backtick form — so a widening that reds nothing new cannot pass. The
 table assertion likewise carries its own unit test (a collapsed table reds
-table-only, a trailing blank clears).
+table-only, a trailing blank clears). The batch contract carries a unit test of
+its own for the same reason — the good/bad pair sets no renderer knob, so it
+already runs the batch path and cannot by itself distinguish that path from the
+fallback. That test asserts the kit's two renderer defaults render a corpus
+byte-identically, that a pinned `SITE_KIT_RENDERER` suppresses the batch default,
+that the batch path and the per-document fallback return the same verdict on the
+same pages, and that a wrong document count and an unresolvable batch command
+each exit 2. The count case uses a stub that always emits two documents, so it
+passes the two-document probe and is caught only by the corpus count — a stub the
+probe already rejected would never reach the assertion under test.
 The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
-lets a fixture point the docs dir and renderer at a synthetic tree without
+lets a fixture point the docs dir and renderer knobs at a synthetic tree without
 touching consumer config. `precommit` tier, coupling the docs tree.
 
 Parser-version fidelity (a second honest limit). The oracle is faithful to the
@@ -252,18 +322,40 @@ introduced between the two versions. The exact-pin recipe closes that gap for a
 consumer that needs it: point `SITE_KIT_RENDERER` at a version-locked bundle —
 a `bundle exec ruby …Kramdown…` invocation whose `Gemfile.lock` pins kramdown
 (and `kramdown-parser-gfm`) to the versions the `github-pages` gem resolves — so
-the oracle and the deploy render byte-for-byte the same parser build. The kit
-does not auto-resolve that pin: fetching the Pages-locked gemset at gate time
-would break the hermetic no-network render contract the oracle depends on (a
-gate must run offline and deterministically), so the pin stays a consumer's
-deliberate `SITE_KIT_RENDERER` override, not kit-run machinery.
+the oracle and the deploy render byte-for-byte the same parser build. Pin
+`SITE_KIT_RENDERER_BATCH` in the same motion, at the batch form of that same
+locked bundle, or leave it unset: those are the two states in which the gate runs
+the parser build the pin names. Overriding only the per-document knob already
+leaves the batch knob empty by its fill rule, so a half-applied pin costs speed
+rather than fidelity — but a consumer who set a batch renderer earlier and pins
+only the per-document one afterwards has pinned the knob the gate will not use.
+The kit does not auto-resolve the pin: fetching the Pages-locked gemset at gate
+time would break the hermetic no-network render contract the oracle depends on (a
+gate must run offline and deterministically), so it stays a consumer's deliberate
+override, not kit-run machinery.
+
+Renderer agreement (a third honest limit). Where a consumer sets both renderer
+knobs, the kit cannot verify that their batch renderer agrees document-for-
+document with their per-document one; a divergent pair yields a divergent oracle,
+and nothing in the framing contract can detect that. What the kit does hold is
+its own pair: the two defaults are asserted byte-identical over a corpus by
+fixture, so the zero-config path is covered by construction rather than by
+assumption.
 
 ## lib/site.sh
 
 The sourced config loader: it loads `SITE_KIT_CONFIG_FILE` (or the gates-dir
-`site-config.sh` when that env is unset), then fills every knob's default, so a
+`site-config.sh` when that env is unset), then fills each knob's default, so a
 gate and a fixture read one resolved configuration. It carries no gate logic —
 structure stays in the check, values in config, defaults here.
+
+Every knob's default is filled whenever the consumer left it unset, with one
+exception the loader is the only place to state: `SITE_KIT_RENDERER_BATCH` is
+filled only where the loader also owns `SITE_KIT_RENDERER` — where the consumer
+overrode neither. A consumer who overrode the per-document renderer and left the
+batch knob unset gets an empty batch array instead of a default, so the gate
+keeps running the oracle they chose; §Layout and configuration states the rule
+with the false clean it exists to prevent.
 
 ## templates/site-health.yml
 
