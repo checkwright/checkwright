@@ -190,12 +190,25 @@ produces.
 a tracked, in-tree declaration the project maintains. In this repo that producer
 is the `Release channel:` line in `docs/install.md` §Versioning, written by hand
 into a tracked page (that page is not on `scripts/core-files.list`; tracked-ness is
-what the claim needs and all it needs) and held against the publish workflow by
-`check-release-channel-parity` (`preview-release-cadence`, Delta 1). So the input
-is not merely named: it is produced by a surface that exists in every clone and is
-gated against drift. That is the check this amendment most needed to pass, because
-a threshold reading a declaration nobody maintains is the prose equivalent of a
+what the claim needs and all it needs) and held by `check-release-channel-parity`
+(`preview-release-cadence`, Delta 1) against **both** the publish workflow
+(Invariant A) and the project's own version line (Invariant B). So the input is not
+merely named: it is produced by a surface that exists in every clone and is gated
+against drift. That is the check this amendment most needed to pass, because a
+threshold reading a declaration nobody maintains is the prose equivalent of a
 producer whose enabling config no deployment sets.
+
+**Invariant B exists for this clause, and the dependency is stated here so the
+coupling is visible from both ends.** It was added by operator ruling at align
+2026-08-01 after the align audit found that nothing held the channel against the
+version line: a `v1.0.0` could ship with `preview` still declared, and this clause
+would read a stale pre-GA posture and hold the compat window open past general
+availability — the same hazard as the silence case Delta 1 rules against, arriving
+by staleness instead of by omission. Delta 1 rules that silence is treated as
+*past* the threshold; Invariant B is what stops a **stale** declaration from
+becoming the third, ungoverned case. A reader who deletes B on the grounds that it
+only serves the publishing story should read this paragraph first: it also serves
+this rule, in another kit.
 *Consumer of the rule:* the build-stage session performing a knob rename, which
 reads the clause to decide whether it owes a shim and a deprecation marker. This
 is a human-and-agent-read rule with no gate reader — see §Enforcement below, where
@@ -287,4 +300,14 @@ amendment's entire footprint is one paragraph of generic prose in a kit SPEC.
       not two.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks. (The knob-versus-general scoping is settled in Delta 3, not
-      filed; §Delta 3 records why no filing is owed.)
+      filed; §Delta 3 records why no filing is owed. The narrower
+      `Behavior changes` routing gap reason 2 depends on **was** filed at align
+      2026-08-01 — do not re-file it, and do not re-strengthen reason 2 back into
+      an assertion of established convention.)
+- [ ] **Ordering honored, and it is the constraint least likely to survive a
+      session boundary.** This clause's general-availability criterion reads the
+      `Release channel:` declaration that `preview-release-cadence` Delta 1
+      introduces. That declaration lands **before or with** this clause, never
+      after. If the two are built in separate sessions, check the sibling's state
+      before landing this one — a rewritten clause whose criterion points at a
+      declaration that does not yet exist is a threshold nothing can satisfy.

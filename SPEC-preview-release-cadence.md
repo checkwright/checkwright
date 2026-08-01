@@ -26,7 +26,7 @@ ever invokes the primitive. Delta 2 supplies exactly that and nothing more.
 
 ## What changes
 
-### Delta 1 — a declared release channel, gated against the publish posture *{design-bearing}*
+### Delta 1 — a declared release channel, gated against the publish posture and the version line *{design-bearing}*
 
 `docs/install.md` §Versioning gains a subsection **The release channel**, opening
 with a one-line machine-readable declaration of fixed shape:
@@ -85,23 +85,54 @@ prerelease suffix, so nothing here forecloses the change; it is cheap to make
 when its condition fires and wrong to make before.
 
 **New gate — `check-release-channel-parity`** (this repo's `scripts/`,
-repo-root-governed beside `check-release-bump`, whose surfaces are the same two
-tiers). Invariant: the channel declared in `docs/install.md` §Versioning and the
-prerelease posture of the Release-creating step in
-`.github/workflows/publish.yml` agree — `preview` demands `--prerelease` on that
-invocation, `stable` demands its absence. Fail-closed on a missing or duplicated
-declaration line, an unrecognized channel value, or a `publish.yml` with no
-recognizable Release-creating step: a gate that cannot find one of its two
-surfaces refuses (exit 2) rather than passing. `tier=precommit` — both surfaces
-are tracked files a commit can desynchronize. Ships with its `good/`+`bad/`
-fixture pair per gate-sdk/SPEC.md's fixture-pair contract and registers in
-`scripts/gates.list`.
+repo-root-governed beside `check-release-bump`). It asserts **two invariants over
+three surfaces**, and the second was added by operator ruling at align 2026-08-01
+— **a settled decision, not an author's preference; it is not to be simplified
+back to a two-surface gate.**
+
+**Invariant A — channel ⟷ publish posture.** The channel declared in
+`docs/install.md` §Versioning and the prerelease posture of the Release-creating
+step in `.github/workflows/publish.yml` agree: `preview` demands `--prerelease`
+on that invocation, `stable` demands its absence.
+
+**Invariant B — channel ⟷ version line.** The channel agrees with the project's
+own version line, read from the newest tag by creator date: while that version is
+`0.x` the channel must be `preview`; from `v1.0.0` onward it must be `stable`.
+
+*Why B exists, stated so its removal is visibly a regression.* Delta 1 defines the
+channel as **derived** from the version line — "it flips to `stable` at `v1.0.0`".
+Without B, a `v1.0.0` ships with `preview` declared and `--prerelease` still set,
+A passes because both its surfaces agree, and both are wrong. The argument for A
+is the argument for B: an ungated declaration is a comment. Applying that to one
+pair of surfaces and not the other is the inconsistency B removes. B also protects
+a *second* consumer — lifecycle-kit's knob-rename compat clause reads this
+declaration as its general-availability threshold (§Producers and consumers), so a
+stale `preview` would hold that compat window open past GA.
+
+**Fail-closed** (exit 2, never a pass) on: a missing or duplicated declaration
+line; an unrecognized channel value; a `publish.yml` with no recognizable
+Release-creating step; or a newest tag that does not parse as semver. A gate that
+cannot find one of its surfaces declines to certify.
+
+**The one dormancy, ruled here rather than left to the implementer.** A repository
+with **no tags at all** has no version line, so Invariant B has nothing to compare.
+B is dormant there and A still asserts — and the gate **says B is dormant** in its
+clean output, so a reader can tell "checked and agreeing" from "nothing to check".
+This is the note-parity gate's dormancy discipline, applied for the same reason.
+Refusing instead would red on a legitimate pre-first-release state; passing
+silently would let the corpus's stronger claim disappear unannounced.
+
+`tier=precommit` — the two file surfaces are tracked files a commit can
+desynchronize, and the tag read is local. Ships with its `good/`+`bad/` fixture
+pair per gate-sdk/SPEC.md's fixture-pair contract; the `bad/` pair must cover
+**both invariants**, since a fixture proving only A would leave B unproven and B
+is the arm a later simplification would delete. Registers in `scripts/gates.list`.
 
 This is the enforcement-first pairing for Delta 1: the declaration and the gate
-that stops it drifting from the workflow land in one unit. Without it the
-declaration is a comment — the exact failure mode the entry's sibling units keep
-finding, where a stated posture and the machine that implements it diverge with
-nothing watching.
+that stops it drifting from the workflow *and from the version line it is derived
+from* land in one unit. Without it the declaration is a comment — the exact
+failure mode the entry's sibling units keep finding, where a stated posture and
+the machine that implements it diverge with nothing watching.
 
 ### Delta 2 — an external cadence policy over the existing deferral primitive *{design-bearing}*
 
@@ -147,6 +178,23 @@ across every iteration since the last tag, a release batching several iterations
 inherits all of their declarations here"* — so the note-composition half needs no
 change; batching is the shape it was already written for, and the two deferral
 stacks above are it having been exercised. What changes is how often, not whether.
+
+**One kit-template line is corrected here, because this delta is what makes it
+dangerous.** `lifecycle-kit/templates/stages/close.md`:103 states the disposition
+grammar as `<iteration> release <version|none> — <one-line basis>` — two forms,
+omitting `deferred:<version>`. That template is what a close session reads to learn
+what to stamp, and this delta makes `deferred:` the **default** disposition, so the
+sanctioned spelling for the now-common case would be missing from the instruction
+that mandates it. The line gains the third form. Ruled by the operator at align
+2026-08-01 with the footprint cost accepted explicitly (§Existing sections updated).
+
+*Scoped deliberately narrow.* The same enum is restated on five surfaces and a
+second restatement (`RELEASING.md`:21-22) is also stale. Consolidating all five onto
+their owning SPEC is the correct enforcement-first fix and it is **filed as a gap,
+not done here** — it carries its own design question (how much a *vendored* template
+may cite before it stops being usable standalone by a consumer who has not read the
+kit SPEC), which deserves a unit rather than a rider on a release-policy amendment.
+What lands here is only the line this delta puts at risk.
 
 **The honest limit, stated rather than papered over.** No gate reds a release cut
 too soon. The four triggers above are the cases where a fast release is *correct*,
@@ -202,8 +250,9 @@ to four. Verified mechanically safe at this spec: that presence check binds the
 **newest note only** (`scripts/check-release-bump.sh` — the three
 `section_bullets "$newest_f" …` calls, never iterated over the full row set), so
 the historical corpus is untouched and no retro-fabricated summaries are owed.
-(`docs/posts/` holds 21 posts but 20 release notes: the undated announcement post
-carries no front matter and no `release:` key, so it is not a note at all.) The section parses with the same
+(`docs/posts/` holds 21 posts but 20 release notes: the announcement post carries
+no front-matter block and so no `release:` key, and is not a note at all.) The
+section parses with the same
 `gate-sdk/lib/declaration.sh` `decl_section_bullets` container the other three
 use, so the note's four sections cannot diverge in how they are read.
 
@@ -225,15 +274,39 @@ tracked content in a tracked page, present in every clone, so there is no
 deployment on which the producer is unset. (`docs/install.md` is *not* on
 `scripts/core-files.list`; tracked-ness alone carries the claim, and the stronger
 pinning premise is not available and is not needed.)
-*Consumers, both named:* (1) `check-release-channel-parity`, which reads the line
-and the `publish.yml` Release step and reds on disagreement — the gate is the
+*Consumers, all three named:* (1) `check-release-channel-parity`, which reads the
+line against the `publish.yml` Release step (Invariant A) and against the newest
+tag's version (Invariant B), reddening on either disagreement — the gate is the
 declaration's reader, which is what keeps it from being a comment; (2) a human
 reader of the rendered `docs/install.md` page, for whom the line is the answer to
-"is this stable yet".
+"is this stable yet"; (3) **lifecycle-kit's knob-rename compat clause**, which
+reads this declaration as the project's general-availability posture to decide
+whether a knob rename owes a compat shim and a deprecation window.
+
+*The third consumer is a cross-amendment coupling and is stated at both ends.*
+That clause is `knob-rename-compat-threshold` Delta 1, whose §Producers and
+consumers names this line as the producer of the input it reads. The coupling
+runs one way — the kit clause states a generic criterion and never names this page
+(that seam is ruled in the sibling's §The seam) — but it makes the declaration
+load-bearing beyond this amendment, and it is why Invariant B is not optional
+polish: a stale `preview` past `v1.0.0` would silently hold that compat window
+open. **Ordering follows from it: the channel declaration lands before or with the
+sibling's clause, never after**, because the criterion is unsatisfiable here until
+the declaration exists.
+
 *Every field has a reader:* the declaration carries exactly one field, the channel
-value, read by the gate at the parity comparison and by the reader at the
-question. The value's two admissible spellings are both read — `preview` demands
-the flag, `stable` demands its absence — so neither is a write-only state.
+value, read by the gate at both parity comparisons, by the human reader at the
+question, and by the sibling clause at a rename decision. The value's two
+admissible spellings are both read — `preview` demands the flag and forbids a
+`1.x` version line, `stable` demands the flag's absence and a `1.x` version line —
+so neither is a write-only state.
+
+**The version line** (existing state, newly read by Delta 1).
+*Producer:* the close stage's release-disposition step, which cuts the tag; the
+newest tag by creator date is the version line. No new state — this delta adds a
+reader to a value the release path already produces.
+*Consumer:* `check-release-channel-parity`'s Invariant B. Dormant, and reported as
+dormant, in a repository with no tags.
 
 **The `--prerelease` flag** (changed interface, Delta 1).
 *Producer:* `.github/workflows/publish.yml`'s `release` job, on the tag-push
@@ -325,14 +398,29 @@ one gate's widening rather than three.
   sentence describes `scripts/check-release-bump.sh` as *"counting bullets across
   all three of the note's fixed sections"*. Delta 3 makes the note carry four while
   that caller still counts three, so the sentence becomes false and is reworded to
-  name the three it means. **This is the amendment's only kit-side edit, and it is
-  named rather than absorbed** because §The seam below rules the seam explicitly and
-  an unlisted kit surface would contradict it. It does not disturb that ruling:
-  gate-sdk gains no mechanism, no knob, and no new name — the sentence documents a
-  *consumer* gate's behavior, and the correction keeps a kit SPEC's description of
-  the consumer accurate rather than pushing anything across the seam.
-- **No other kit SPEC changes.** Every remaining surface above is
-  repo-root-governed. The seam ruling is §The seam below.
+  name the three it means.
+- **`lifecycle-kit/templates/stages/close.md`:103** (Delta 2) — the disposition
+  grammar gains its third form, `deferred:<version>`. Operator-ruled at align
+  2026-08-01; rationale and scoping in Delta 2.
+
+**The footprint ruling, rewritten rather than left contradicted.** Earlier drafts of
+this amendment asserted *"no kit SPEC changes — every surface above is
+repo-root-governed."* **That is no longer true, and the sentence is replaced instead
+of being quietly outlived.** The two entries directly above are kit-side: one kit
+SPEC sentence and one kit template line. An amendment asserting a footprint it does
+not have is precisely the stated-posture-versus-reality divergence this iteration
+exists to close, and shipping a fresh instance of it *inside* the unit that fixes it
+would be the defect wearing the fix's name.
+
+The corrected ruling: **every other surface is repo-root-governed, and the two
+kit-side edits are narrow by construction.** Neither adds mechanism, a knob, a
+`<KIT>_<KNOB>` name, or any new governed name to a kit — one corrects a kit SPEC's
+description of a *consumer* gate's behavior, the other adds a missing member to an
+enum the kit already owns and already spells in full in its own SPEC. Nothing
+crosses the provenance seam in either direction; §The seam below stands unchanged
+and is what to read for the substantive ruling. The exception is that the unit
+creating an exposure carries the fix for it, and the broader consolidation is
+gapped rather than absorbed.
 
 ## The seam
 
@@ -379,3 +467,19 @@ generalize the four surfaces to config, not to literals.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
+- [ ] **The two align rulings are landed as ruled, not as re-derived.** Both were
+      escalated and decided by the operator on 2026-08-01, and both are the kind a
+      build session reading only the deltas would plausibly "simplify" back out.
+      (1) `check-release-channel-parity` ships **two invariants over three
+      surfaces** — the version-line arm is not optional, and its `bad/` fixture arm
+      must exist or the arm is unproven. (2) `lifecycle-kit/templates/stages/
+      close.md`:103 gains the `deferred:` form, which is why this amendment has a
+      kit-side footprint at all; the rewritten footprint ruling in §Existing
+      sections updated is the current one and the "no kit SPEC changes" phrasing it
+      replaced must not reappear.
+- [ ] **Cross-amendment ordering honored** — the `Release channel:` declaration
+      lands **before or with** `knob-rename-compat-threshold`'s rewritten clause,
+      never after, because that clause's general-availability criterion is
+      unsatisfiable until the declaration exists. If the two amendments are built in
+      separate sessions, this is the constraint that does not survive being
+      guessed at: check the sibling's state before landing either.
