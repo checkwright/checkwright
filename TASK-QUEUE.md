@@ -48,44 +48,6 @@
   Surfaced 2026-08-01 by the align audit; filed at close from the gap inbox;
   promoted 2026-08-01 by spec.
 
-- **spec-roster-enumeration-derivation** [spec: SPEC-derived-roster-sets.md] — a
-  batch of **kit SPEC-vs-code roster drift**, filed as one unit because every
-  instance shares one root cause (a hand-maintained roster beside a derivable
-  set) and each re-arms the moment it is hand-corrected. None changes any gate's
-  behaviour. The seven instances are re-verified live and enumerated in the
-  amendment, which owns them from here — the entry no longer carries the list.
-  **Ruled at spec 2026-08-01 — no kit gains a gate, an assertion, or a knob.**
-  canon-kit's `check-prose-enum` already scans every `*/SPEC.md` and already
-  accepts consumer-declared sets through `CANON_KIT_ENUM_SETS_CMD`; the whole
-  mechanism exists and no declared set names these members. The token is four
-  **derived set families** in `scripts/enum-sets.sh` — per-kit libs, per-kit
-  `gate-tests/*.test.sh`, per-lib function definitions, per-lib callers — each
-  member computed from the tree, so the eighth instance in an unaudited kit is
-  caught the day its paragraph is written. The seam holds by construction: every
-  set lives in this repo's consumer emitter, and canon-kit ships the emit grammar
-  alone.
-  **Two instances close by reshaping prose, not by declaring a set.** Instance
-  (6) is a cross-document absence, which a paragraph-scoped gate structurally
-  cannot see; instance (7) is a *narrative* enumeration naming no file, which the
-  literal matcher cannot see either. Both are rewritten to name their members
-  literally, and the derived set then holds them. The ruled-out alternative — a
-  third scope field on the emit grammar, giving whole-file completeness — is
-  recorded in the amendment with its reasons.
-  **One instance is dispositioned without an oracle, deliberately.** Instance (2)
-  is a false description of a file, not a roster behind a growing set, and its
-  class is exactly two sites with no growth vector: every kit's config template
-  is a two-line pointer stub *by correct design*, since the knob table has one
-  home. Gating a class that cannot grow is the flagged-and-gated shape.
-  **Corrections beyond the filed entry, from the spec-stage re-verification:**
-  instance (4) is short by **two** adapters, not one (`ek_parser_for` as well as
-  `ek_suite_cmd`); instance (3)'s `lib/delegation.sh` is named **nowhere** in
-  that SPEC, not merely absent from one list; and instance (1)'s "no caller
-  fixture to ride" is false alongside its caller count.
-  **Cost while deferred:** low per instance and non-rotting, but the count grows
-  once per audit — this batch is what a single align fan-out found.
-  Surfaced 2026-08-01 by the align audit's cross-spec fan-out; drained into the
-  queue at close; promoted 2026-08-01 by spec.
-
 - **kit-template-registry-completeness** [spec: gate-sdk/SPEC-template-registry-parity.md]
   — **drift-kit's bundled-KPI claim outruns its shipped registry.**
   drift-kit/SPEC.md lists `kpi-queue-net-delta` among the bundled Lead KPIs and
@@ -2345,5 +2307,6 @@
 ## Done
 
 - queue-kit-starter-template-red
+- spec-roster-enumeration-derivation
 
 ## Lessons Learned

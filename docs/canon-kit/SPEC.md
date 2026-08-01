@@ -623,6 +623,13 @@ emitting one `<set-name>`⇥`<member>` line per member, loaded through
 parse is fail-closed (exit 2). A member matches word-bounded — bracketed
 (`[spec:]`) or bare (`spec`), neither an alphanumeric nor a hyphen abutting, so a
 stem never matches inside a longer tag — and the attested drift used bare stems.
+The grammar stays two fields. A third, scoping a set to a whole file rather than
+a paragraph, was weighed against a **cross-document** absence — members spread
+over per-section prose, which a paragraph-scoped judge structurally cannot see —
+and refused: it changes a wire grammar whose fail-closed rule rejects a third
+field, and a document-scoped completeness test has a far worse false-positive
+profile, since any mention anywhere satisfies it. Reshaping such prose into a
+roster the paragraph judge can read closes the same case with no grammar change.
 
 The scanned set and the paragraph walk are the shared `spec_manifest_files`
 finder and `spec_manifest_walk_awk` driver (§lib/spec.sh); this gate's
