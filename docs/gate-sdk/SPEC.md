@@ -603,7 +603,7 @@ Callers, all three named: `bin/upgrade-smoke.sh` at its declaration-resolve step
 uses both arms (§upgrade-smoke); this repo's `check-tightened-gates-grammar`
 uses the markdown arm's verdict at each note it walks; and
 `scripts/check-release-bump.sh` uses the markdown arm's *container* alone,
-counting bullets across all three of the note's fixed sections. That third caller
+counting bullets across the note's declaration-bearing sections. That third caller
 is why the container and the token predicate are separable rather than one pass:
 Behavior-changes lead tokens are legitimately prose phrases, so the bump
 derivation needs the bullets without the token predicate. Before this helper the

@@ -41,7 +41,7 @@ for f in "$POSTS_DIR"/*.md; do
             fi
             ;;
         *)
-            errors+=("$f: no '$SECTION' section — every release note carries all three fixed sections")
+            errors+=("$f: no '$SECTION' section — every release note carries the fixed sections its note grammar rosters")
             ;;
     esac
 done

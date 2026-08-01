@@ -25,6 +25,10 @@ release: v$2
 
 # Fixture v$2
 
+## In brief
+
+- Fixture note: the four fixed sections, In brief first.
+
 ## Tightened gates
 
 $3
@@ -61,6 +65,10 @@ release: v0.2.0
 ---
 
 # Fixture v0.2.0
+
+## In brief
+
+- Present, so this case isolates the absent Behavior-changes section.
 
 ## Tightened gates
 
@@ -134,9 +142,79 @@ check_deferral "single-note-deferral-red" "$h" \
     'alpha release deferred:v0.2.0 — held back
 ' 1 "single-note tree cannot ride it out"
 
+# --- the In brief presence assertion, and the predicate that arms it ---------
+# It binds a note under composition (declared version carries no tag) and is
+# dormant on a published note, which is what keeps the historical corpus free of
+# retro-fabricated summaries. The good/bad pair cannot hold either arm: it runs
+# inside this repository, where the fixtures' versions resolve against real tags.
+
+# I — newest note under composition and missing In brief: fail-closed (exit 2).
+i="$tmp/inbrief-absent/posts"
+write_note "$i" "0.1.0" "None." "None."
+mkdir -p "$i"
+cat >"$i/note-0.2.0.md" <<'EOF'
+---
+release: v0.2.0
+---
+
+# Fixture v0.2.0
+
+## Tightened gates
+
+None.
+
+## Renamed knobs
+
+None.
+
+## Behavior changes
+
+None.
+EOF
+check_case "inbrief-absent-under-composition" "$tmp/inbrief-absent" 2 "has no 'In brief' section"
+
+# J — the same tree with the section present: clean, and the state is reported.
+j="$tmp/inbrief-present/posts"
+write_note "$j" "0.1.0" "None." "None."
+write_note "$j" "0.2.0" "None." "None."
+check_case "inbrief-present-under-composition" "$tmp/inbrief-present" 0 "In brief presence asserted"
+
+# K — the newest note's version is tagged, so it is published history: the
+# assertion is dormant and says so rather than demanding a fabricated summary.
+k="$tmp/inbrief-dormant"
+mkdir -p "$k"
+git -C "$k" init -q 2>/dev/null
+git -C "$k" config user.email t@example.invalid
+git -C "$k" config user.name t
+: >"$k/seed"
+git -C "$k" add seed
+git -C "$k" commit -qm seed
+git -C "$k" tag -a v0.2.0 -m v0.2.0
+write_note "$k/posts" "0.1.0" "None." "None."
+cat >"$k/posts/note-0.2.0.md" <<'EOF'
+---
+release: v0.2.0
+---
+
+# Fixture v0.2.0
+
+## Tightened gates
+
+None.
+
+## Renamed knobs
+
+None.
+
+## Behavior changes
+
+None.
+EOF
+check_case "inbrief-dormant-when-tagged" "$k" 0 "In brief presence dormant"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-bump.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, and passes a minor)"
+echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, and passes a minor; the In brief presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged)"
 exit 0

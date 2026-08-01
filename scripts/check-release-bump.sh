@@ -76,7 +76,7 @@ prev="$(tail -n2 <<<"$sorted" | head -n1)"
 newest_v="${newest%%$'\t'*}"; newest_f="${newest#*$'\t'}"
 prev_v="${prev%%$'\t'*}"
 
-# spec: docs/install.md §The upgrade contract — all three fixed sections must be present; non-empty = at least one bullet. The container is gate-sdk/lib/declaration.sh's, shared with the upgrade smoke and check-tightened-gates-grammar so the section a bump is derived from and the section an allowed-red set is parsed from cannot diverge.
+# spec: docs/install.md §The upgrade contract — every fixed section must be present, and the declaration-bearing ones derive the floor, where non-empty = at least one bullet. The container is gate-sdk/lib/declaration.sh's, shared with the upgrade smoke and check-tightened-gates-grammar so the section a bump is derived from and the section an allowed-red set is parsed from cannot diverge.
 section_bullets() {  # $1=file  $2=section name; emits the bullet count, status 1 when the section is absent
     local out st
     out="$(decl_section_bullets "$1" "$2")"; st=$?
@@ -84,6 +84,14 @@ section_bullets() {  # $1=file  $2=section name; emits the bullet count, status 
     grep -c . <<<"$out"
     return 0
 }
+# spec: docs/install.md §The upgrade contract — the In brief presence assertion binds a note under composition; a note published before the section existed is history and is not retro-fitted
+if ! git rev-parse -q --verify "refs/tags/v$newest_v" >/dev/null 2>&1; then
+    in_brief_state="asserted"
+    section_bullets "$newest_f" "In brief" >/dev/null \
+        || { echo "check-release-bump: newest note $newest_f is under composition (v$newest_v carries no tag) and has no 'In brief' section — the 30-second human read is a fixed section, not optional (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
+else
+    in_brief_state="dormant"
+fi
 tg="$(section_bullets "$newest_f" "Tightened gates")" \
     || { echo "check-release-bump: newest note $newest_f has no 'Tightened gates' section — the floor cannot be derived (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
 rk="$(section_bullets "$newest_f" "Renamed knobs")" \
@@ -106,5 +114,5 @@ if [[ "$patch_only" -eq 1 && ( "$tg" -gt 0 || "$rk" -gt 0 || "$bc" -gt 0 || -n "
     exit 1
 fi
 
-echo "RELEASE-BUMP: clean (newest note v$newest_v holds the derivable floor over v$prev_v${deferred_floor:+, inheriting outstanding deferral v$deferred_floor}; ${#rows[@]} note(s))"
+echo "RELEASE-BUMP: clean (newest note v$newest_v holds the derivable floor over v$prev_v${deferred_floor:+, inheriting outstanding deferral v$deferred_floor}; ${#rows[@]} note(s); In brief presence $in_brief_state)"
 exit 0

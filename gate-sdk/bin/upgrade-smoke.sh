@@ -132,7 +132,7 @@ fi
 
 if [[ "$decl_st" -eq 2 ]]; then
     echo "upgrade-smoke: FAIL — TO ($ver) resolves note $decl_src, which carries no 'Tightened gates' section:" >&2
-    echo "  every release note carries all three fixed sections (docs/install.md §The upgrade contract)." >&2
+    echo "  every release note carries the fixed sections its note grammar rosters (docs/install.md §The upgrade contract)." >&2
     exit 1
 fi
 if [[ "$decl_st" -ne 0 ]]; then

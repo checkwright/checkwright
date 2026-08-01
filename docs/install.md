@@ -391,12 +391,13 @@ A repository with **no tags at all** has no version line, so B is dormant there
 while A still asserts. The gate *reports* that dormancy in its clean output, so a
 reader can tell "checked and agreeing" from "nothing to check".
 
-What earns each bump derives from the release note itself — its three fixed
-sections (§The upgrade contract below) already declare everything phase B must
-reconcile, so the floor is read off the note rather than maintained beside it:
+What earns each bump derives from the release note itself — its
+declaration-bearing sections (§The upgrade contract below) already declare
+everything phase B must reconcile, so the floor is read off the note rather than
+maintained beside it:
 
-- **Patch** — all three note sections are "None": a phase-A-only sync, fixes and
-  docs that tighten nothing a consumer must reconcile.
+- **Patch** — every declaration-bearing section is "None": a phase-A-only sync,
+  fixes and docs that tighten nothing a consumer must reconcile.
 - **Minor** — any section is non-empty: the release carries phase-B work —
   a new or stricter gate, a knob rename riding its deprecation path, or a
   behavior change a consumer's tree may depend on (blind-upgrade-safe is exactly
@@ -421,14 +422,14 @@ outstanding deferred release. When an iteration's criteria were met but the
 release was held back, its disposition line records the earned version as
 `deferred:vX.Y.Z` (lifecycle-kit/SPEC.md §templates/stages/), and
 those criteria stay unconsumed until a release at or above that version ships.
-The next qualifying note carries them in its three sections and may not fall
+The next qualifying note carries them in its declaration-bearing sections and may not fall
 below that version — so a note's floor is the higher of what its own sections
 derive and what an outstanding deferral carries. `check-release-bump` reads both.
 
 The derivable half is gated: `check-release-bump` (this repo's `scripts/`)
 orders the release notes by version and reds a patch-only bump whose note
 declares tightened gates, renamed knobs, or behavior changes (and fails closed
-if any of the three fixed sections is absent). The major criteria stay judgment —
+if any fixed section is absent). The major criteria stay judgment —
 a decommission is a semantic fact no section grammar carries — so the gate
 holds only the floor.
 
@@ -457,8 +458,35 @@ declared gates and disposition each red.
 
 Release notes are dated posts under `docs/posts/`. Each carries a
 `release: vX.Y.Z` key in its front matter — the key that resolves a version to
-its note — and three sections under fixed names:
+its note — and these sections under fixed names. This list is the roster: **In
+brief** is the human read, and the sections after it are the
+**declaration-bearing** ones a mechanical consumer reconciles. Prose elsewhere
+names those classes rather than counting their members, so adding a section
+here does not silently falsify a sentence somewhere else.
 
+- **In brief** — placed first, immediately after the opener and ahead of
+  Tightened gates. Three to five bullets of plain language, each answering *what
+  you get* or *whether you must act*. A bullet lead here is a plain phrase, never
+  a gate or knob name. The declaration-bearing sections below already carry those
+  tokens; this section exists to be readable without them. **In brief has no
+  "None" form**, unlike every section below it. A release with nothing worth
+  saying to a human is a patch, and says that in one bullet. It bears no
+  declaration. It feeds no bump criterion and no allowed-red set, and nothing
+  reads it but the human upgrader. Its position ahead of the migration detail is
+  deliberate: the opener's one-sentence slot is a lede, and in practice it
+  summarizes the engineering instead of answering whether the reader must act.
+
+  What holds it is `check-release-bump`'s presence assertion, and that assertion
+  **binds a note under composition** — the newest note whose declared version
+  carries no tag yet. A note published before this section existed is history. It
+  is not retro-fitted with a fabricated summary, and the assertion goes dormant
+  on it, reporting which state it is in rather than going quiet. The
+  predicate is `check-tightened-gates-note-parity`'s, adopted so that release
+  state is read one way across the corpus. Its residual is that sibling's too: a
+  note authored and drained inside a single commit is never seen under
+  composition, so what carries the section into existence is the split
+  choreography the release runbook prescribes, whose chrome skeleton holds its
+  slot.
 - **Tightened gates** — one bullet per gate that landed new or got stricter, the
   gate name the bullet's lead token. A mechanical consumer reads these lead
   tokens as the release's allowed-red set: the gates a clean upgrade may turn
