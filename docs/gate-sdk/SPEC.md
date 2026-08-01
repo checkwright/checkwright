@@ -540,18 +540,27 @@ kit's `smoke/install.sh` carries `# smoke-unregistered: <gate-name> — <reason>
 beside its registration block: kit-local, sitting where a reader looking at
 registration already is, and readable off the vendored copy the harness has in
 hand. Both fields are read, the name to match and the reason into the harness's
-report. A declaration naming a gate that *is* registered, or one that kit does
-not ship, is itself a finding — a stale valve is the failure mode a declaration
-surface has, and it is cheap to catch at the same transition.
+report. Three shapes of stale valve are findings, all caught at the same
+transition because a declaration surface's failure mode is going stale: a
+declaration naming a gate that *is* registered; one naming a gate that kit does
+not ship; and one naming a gate the probe already exempts — that last is the
+anti-inversion clause enforced, since a reason written where none is owed is a
+reason nobody reads and the beginning of a maintained roster. A declaration line
+missing either field is likewise a finding.
 
 **The counts are permanent, and the cost is reported rather than cached.** The
 clean line carries three: gates registered, self-declared (the corroborated
 exit-2 set), and hand-declared. The hand-declared number is the one that says
 whether the derivation is decaying into a maintained roster, so it is printed
-every run rather than left to an audit. If the added wall-clock is material, the
-sanctioned response is to report it — never to sample, and never to cache a
-verdict across runs, a cached exemption being a maintained exemption wearing a
-derivation's clothes.
+every run rather than left to an audit. The phase's own wall-clock and verdict
+split ride a second line,
+`CONSUMER-SMOKE: accounting — <n> unregistered gate(s) probed in <ms>ms (<s> self-declared, <h> hand-declared, <u> unaccounted)`,
+printed
+on a red run as well as a green one, since a cost measured only when everything
+already passes is a cost nobody sees while fixing. If the added wall-clock is
+material, the sanctioned response is to report it — never to sample, and never to
+cache a verdict across runs, a cached exemption being a maintained exemption
+wearing a derivation's clothes.
 
 **Never at pre-commit.** `run-consumer-smoke.sh` is a `bin/` tool, never a
 registered gate, so the accounting costs the pre-commit battery exactly nothing.

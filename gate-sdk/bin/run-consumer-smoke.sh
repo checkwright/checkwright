@@ -70,6 +70,116 @@ fi
 # spec: gate-sdk/SPEC.md §Consumer smoke — hard reset (not checkout) so a violation that staged its shape is unstaged too
 restore() { ( cd "$SCRATCH" && git reset -q --hard && git clean -qfd ); }
 
+# spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: one pass over the union of the vendored kits' checks/ against the scratch registry, between the green-battery assertion and the violation phase
+# spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: thecorroborating probe's tree: the invoking repo that ships the kits, where a kit's own surfaces exist
+HOST_TREE="${SDK%/*}"
+# spec: gate-sdk/SPEC.md §Consumer smoke — the scratch consumer is zero-config, so its registry sits at gate-sdk's default gates dir, where that kit's own smoke/install.sh writes it
+scratch_list="$SCRATCH/scripts/gates.list"
+[[ -f "$scratch_list" ]] || {
+    echo "run-consumer-smoke: no gate registry at $scratch_list after install" >&2
+    exit 2
+}
+
+declare -A acct_registered=() acct_kit=() acct_root=()
+declare -A acct_reason=() acct_declkit=() acct_selfset=()
+
+while IFS= read -r g; do
+    [[ -n "$g" ]] && acct_registered["$g"]=1
+done < <(gates_list_members "$scratch_list")
+
+shopt -s nullglob
+for r in "${roots[@]}"; do
+    kit="$(basename "$r")"
+    acct_root["$kit"]="$r"
+    for f in "$SCRATCH/$kit"/checks/check-*.sh; do
+        g="$(basename "$f" .sh)"
+        acct_kit["$g"]="$kit"
+    done
+done
+shopt -u nullglob
+
+for r in "${roots[@]}"; do
+    kit="$(basename "$r")"
+    while IFS= read -r line; do
+        line="${line#*smoke-unregistered:}"
+        read -r dg reason <<<"$line"
+        reason="${reason#—}"; reason="${reason#--}"; reason="${reason#-}"; reason="${reason# }"
+        if [[ -z "$dg" || -z "$reason" ]]; then
+            echo "CONSUMER-SMOKE: FAIL — $kit/smoke/install.sh has a '# smoke-unregistered:' line missing its gate name or its reason"
+            echo "  help: the shape is '# smoke-unregistered: <gate-name> — <reason>'; both fields are read (gate-sdk/SPEC.md §Consumer smoke)."
+            exit 1
+        fi
+        acct_reason["$dg"]="$reason"
+        acct_declkit["$dg"]="$kit"
+    done < <(grep -E '^[[:space:]]*#[[:space:]]*smoke-unregistered:' "$SCRATCH/$kit/smoke/install.sh" || true)
+done
+
+mapfile -t acct_unreg < <(
+    for g in "${!acct_kit[@]}"; do
+        [[ -n "${acct_registered[$g]:-}" ]] || printf '%s\n' "$g"
+    done | sort
+)
+
+acct_self=0
+acct_hand=0
+acct_bad=()
+acct_stale=()
+acct_start_ns=$(date +%s%N)
+for g in "${acct_unreg[@]}"; do
+    [[ -n "$g" ]] || continue
+    kit="${acct_kit[$g]}"
+    ( cd "$SCRATCH" && "$SCRATCH/$kit/checks/$g.sh" ) >/dev/null 2>&1
+    rc_s=$?
+    rc_h=""
+    if [[ "$rc_s" -eq 2 ]]; then
+        # spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: exit 2 is usage/environment failure generally, so the permanent exemption is granted only when the same gate does NOT exit 2 where its surface exists
+        ( cd "$HOST_TREE" && "${acct_root[$kit]}/checks/$g.sh" ) >/dev/null 2>&1
+        rc_h=$?
+        if [[ "$rc_h" -ne 2 ]]; then
+            acct_selfset["$g"]=1
+            acct_self=$((acct_self + 1))
+            continue
+        fi
+    fi
+    # spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: a declaration is honoured only from the kit that ships the gate, so a foreign-kit line leaves the omission unaccounted as well as stale
+    if [[ -n "${acct_reason[$g]:-}" && "${acct_declkit[$g]}" == "$kit" ]]; then
+        acct_hand=$((acct_hand + 1))
+        continue
+    fi
+    acct_bad+=("$kit/checks/$g.sh — scratch exit $rc_s${rc_h:+, invoking-repo exit $rc_h}")
+done
+acct_ms=$(( ($(date +%s%N) - acct_start_ns) / 1000000 ))
+
+if [[ ${#acct_reason[@]} -gt 0 ]]; then
+    for g in "${!acct_reason[@]}"; do
+        dk="${acct_declkit[$g]}"
+        if [[ -n "${acct_registered[$g]:-}" ]]; then
+            acct_stale+=("$dk declares $g unregistered, but it is registered")
+        elif [[ "${acct_kit[$g]:-}" != "$dk" ]]; then
+            acct_stale+=("$dk declares $g, which that kit does not ship")
+        elif [[ -n "${acct_selfset[$g]:-}" ]]; then
+            acct_stale+=("$dk declares $g, which the probe already exempts — probe first, reasons second")
+        fi
+    done
+fi
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — a probe may leave scratch artifacts; the violation phase starts from the committed baseline
+restore
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: the measured cost is reported on every run, red or green, and never cached across runs
+echo "CONSUMER-SMOKE: accounting — ${#acct_unreg[@]} unregistered gate(s) probed in ${acct_ms}ms ($acct_self self-declared, $acct_hand hand-declared, ${#acct_bad[@]} unaccounted)"
+
+if [[ ${#acct_bad[@]} -gt 0 || ${#acct_stale[@]} -gt 0 ]]; then
+    echo "CONSUMER-SMOKE: FAIL — the registration accounting is not satisfied"
+    for l in "${acct_bad[@]:-}"; do [[ -n "$l" ]] && echo "  unaccounted: $l"; done
+    for l in "${acct_stale[@]:-}"; do [[ -n "$l" ]] && echo "  stale declaration: $l"; done
+    echo ""
+    echo "  help: register the gate in that kit's smoke/install.sh, or declare the omission"
+    echo "        beside its registration block with '# smoke-unregistered: <gate-name> — <reason>'"
+    echo "        (gate-sdk/SPEC.md §Consumer smoke)."
+    exit 1
+fi
+
 fired=0
 for r in "${roots[@]}"; do
     kit="$(basename "$r")"
@@ -108,5 +218,5 @@ if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
     exit 1
 fi
 
-echo "CONSUMER-SMOKE: clean ($installed kits installed, $fired violations fired)"
+echo "CONSUMER-SMOKE: clean ($installed kits installed, $fired violations fired, ${#acct_registered[@]} gates registered, $acct_self self-declared, $acct_hand hand-declared)"
 exit 0
