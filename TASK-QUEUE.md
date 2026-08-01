@@ -35,56 +35,6 @@
 
 ## Technical Debt
 
-- **gate-battery-spawn-hoists** — the gate battery costs 40977ms on this tree
-  (89 gates, `.tmp/gate-timings.txt`), and about 12.0s of that is in-gate
-  `fork`/`exec` the gates re-pay per item for no benefit. This entry is the
-  mechanical half: hoist and batch the repeated spawns, changing no gate's output
-  contract and no configured name. Each gate's `good/`+`bad/` fixture pair is the
-  parity oracle, and `run-gates.sh`'s own timings file is the measurement.
-  **Measured worklist, worst first** — the numbers are read off a battery run and
-  restated nowhere; re-measure rather than trust this list if it has aged.
-  The single highest-leverage fix is hoisting `gate_kit_roots_rel` out of
-  `gate_expand_couples` (`gate-sdk/lib/gate.sh:139`): it forks roughly fourteen
-  processes per call and is called once or twice per gate per pass, so one fix
-  reaches `check-graph`, `check-reads-couples` and `gen-pre-commit.sh` at once.
-  `check-tree-terms` (`gate-sdk/checks/check-tree-terms.sh:47`) re-materialises a
-  six-line pattern file by process substitution 429 times and should cost about
-  20ms. `check-docs-render-fidelity` spawns four `awk` processes per page
-  (`site-kit/checks/check-docs-render-fidelity.sh:156,188,190,192` since
-  `docs-renderer-batch-contract` landed; the same four were at `140,145,147,149`
-  when this worklist was written) — 4 × 68
-  pages, measured at 271ms, added to this worklist at align 2026-08-01: it is
-  in-gate `fork`/`exec` re-paid per item, exactly this entry's stated shape, and
-  it was orphaned before (this entry never named it and
-  **`docs-renderer-batch-contract`** disclaimed it here). That unit's delta 3
-  split the old single per-page loop in two, so the four now sit in two loops
-  over page-indexed parallel arrays: the front-matter strip (`:156`) builds
-  `bodies`, and the three scans (`:188,190,192`) run in the scan loop that reads
-  them back. None were hoisted, and the split is if anything friendlier to the
-  hoist — one batched `awk` per loop. The rest of the
-  worklist is the same shape across `check-spec-pointer`, `check-md-refs`,
-  `check-comment-tier`, `check-trajectory-fresh`, `check-docs-cmd` and
-  `check-docs-nav-reachable`.
-  **Scope limit, deliberate:** this entry does not touch the two **external-tool**
-  costs — the ruby docs renderer and ShellCheck. The renderer is
-  **`docs-renderer-batch-contract`**, which changes a shipped knob's contract and
-  so is not mechanical, and ShellCheck is one process already. The limit is the
-  external tools only, never the gates' own in-gate spawns: a gate that shells
-  out to the renderer still owns its `awk` fan-out, which is why
-  `check-docs-render-fidelity` appears in the worklist above.
-  **Sequence after `docs-renderer-batch-contract`.** That unit rewrites the very
-  render loop these `awk` spawns sit in (its delta 3), so hoisting first would
-  optimise a loop about to be replaced and force a judgment merge. Landing
-  second, the hoist applies to the new loop cleanly and that unit's projection
-  (~450ms render plus an unchanged ~271ms of `awk`) is exactly the baseline this
-  one then improves. The two share
-  `site-kit/checks/check-docs-render-fidelity.sh`, so they no longer run in
-  parallel — see that entry's surface note.
-  Debt: converges the gates onto their existing output contracts; adds no
-  governed name. Filed and promoted 2026-08-01 by scope into
-  `delegation-reach-and-gate-cost` (operator ruling), from this session's
-  measurement of the battery.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
@@ -2075,5 +2025,6 @@
 - agent-execution-backgrounding-role-scope
 - nested-dispatch-ungoverned
 - docs-renderer-batch-contract
+- gate-battery-spawn-hoists
 
 ## Lessons Learned
