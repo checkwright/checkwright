@@ -242,12 +242,13 @@ shape this whole unit is about.
   true — that paragraph is currently the contract this defect violated with
   nothing to catch it (deltas 1, 2).
 - **gate-sdk/SPEC.md §Consumer smoke, Producers and consumers** — the accounting
-  phase, the three counts, and the second reader of the gate exit contract.
+  phase, the three counts, and the second reader of the gate exit contract
+  (deltas 2, 3).
 - **site-kit/SPEC.md** — the paragraph owning the "reads a surface the install
   writes" predicate cites gate-sdk's §Consumer smoke as the predicate's owner
   from here, keeping its local application and dropping the general statement.
   One owner per fact: the predicate now binds every kit, so a kit-local copy is
-  the parallel source content tiering forbids.
+  the parallel source content tiering forbids (delta 2).
 - **queue-kit/templates/TASK-QUEUE.md** — the cost field (delta 1).
 - **queue-kit/smoke/install.sh**, and every other kit's, as the measurement
   directs (delta 4).

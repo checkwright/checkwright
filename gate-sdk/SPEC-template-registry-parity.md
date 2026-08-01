@@ -167,16 +167,17 @@ silencing stderr on any path probe.
   principle to `.list` templates, so a reader arriving at either meets both and
   does not read the two `templates/` gates as one overlapping pair. They do not
   overlap: that gate compares a template to a *consumer copy* of itself, this one
-  compares a template to the *kit directory it registers*.
+  compares a template to the *kit directory it registers* (delta 3).
 - **gate-sdk/README.md** — the gate joins the kit's register-the-gates block
   between its `gate-roster:` markers, which `check-readme-roster` asserts against
-  the shipped `checks/` basenames; a gate landed without that line is red.
+  the shipped `checks/` basenames; a gate landed without that line is red
+  (delta 3).
 - **drift-kit/SPEC.md §templates/** — `kpis.list` documented as the full bundled
   set, citing the gate (delta 5).
 - **drift-kit/templates/kpis.list** — the missing line (delta 4).
 - **docs/site-architecture.md §Generated projections** — the new gate's fan-out,
   per that section's standing roster; named here so build treats it as claimed
-  work rather than an orphan a batch adopts on its own authority.
+  work rather than an orphan a batch adopts on its own authority (delta 3).
 
 ## Definition of Done
 

@@ -183,11 +183,11 @@ mistyped path reads a live reader as absent.
   (the generated pre-commit hook, the graph artifact, the enforcement map, the
   footprint rollup, the docs mirror) follows that section's standing roster for
   a new gate; it is named here so build treats it as claimed work rather than an
-  orphan a batch adopts on its own authority.
+  orphan a batch adopts on its own authority (delta 1).
 - **evidence-kit/README.md** — the gate joins the kit's register-the-gates block
   between its `gate-roster:` markers, which `check-readme-roster` asserts
   against the kit's shipped `checks/` basenames; a gate landed without that line
-  is red.
+  is red (delta 1).
 
 ## Definition of Done
 
