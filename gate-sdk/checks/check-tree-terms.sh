@@ -34,20 +34,24 @@ fi
 listing="$(git ls-files -- "$SCANROOT")"; st=$?
 fail_closed "$st" TREE-TERMS git-ls-files
 
-patfile="$(printf '%s\n' "$patterns")"
-hits=""
-scanned=0
+# spec: gate-sdk/SPEC.md §check-tree-terms — the filter pass (pruned dirs, the pattern-file's own basename, non-regular files) stays a per-path loop with no fork in it; the grep itself batches every surviving path into one process instead of re-materialising the pattern file and re-execing grep per file
+paths=()
 while IFS= read -r path; do
     [[ -n "$path" ]] || continue
     gate_path_pruned "$path" && continue
     base="${path##*/}"
     [[ "$base" == msg-patterns* ]] && continue
     [[ -f "$path" ]] || continue
-    scanned=$((scanned + 1))
-    m="$(grep -EnHf <(printf '%s\n' "$patfile") "$path")"; mst=$?
-    [[ "$mst" -le 1 ]] || fail_closed "$mst" TREE-TERMS grep
-    [[ -n "$m" ]] && hits+="$m"$'\n'
+    paths+=("$path")
 done <<< "$listing"
+scanned="${#paths[@]}"
+
+hits=""
+if [[ "$scanned" -gt 0 ]]; then
+    m="$(grep -EnHf <(printf '%s\n' "$patterns") "${paths[@]}")"; mst=$?
+    [[ "$mst" -le 1 ]] || fail_closed "$mst" TREE-TERMS grep
+    [[ -n "$m" ]] && hits="$m"$'\n'
+fi
 
 if [[ -n "$hits" ]]; then
     echo "check-tree-terms: tracked file(s) match a banned pattern (leaked local/private term):"
