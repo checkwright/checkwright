@@ -1469,15 +1469,53 @@ plain `rm`, a `git rm`, and a listed-but-never-added path alike, with no
 The manifest is optional consumer config (the `graph-vocab.sh` pattern): the
 path knob is `GATE_SDK_CORE_FILES_FILE` (default
 `<gates-dir>/core-files.list`), registry-style — one repo-relative path per
-line, `#` comments and blanks ignored. An absent manifest is clean with a note;
+line **or** a `kit:<path>` token, `#` comments and blanks ignored. An absent
+manifest is clean with a note;
 an empty or comment-only manifest is clean; a present-but-unreadable manifest
 is fail-closed (exit 2). Calibration: the intentional-removal valve is the
 manifest itself — retiring a surface means deleting its line in the same commit
 that removes the file, a diff-visible edit that needs no exemption tag, so the
-gate is re-scoped in the open, never weakened to pass. The gate's `# graph:`
-couples the manifest (`tier=precommit`), so an edit to `core-files.list`
-re-fires it; the whole-tree `run-gates.sh` battery is the backstop for a
+gate is re-scoped in the open, never weakened to pass.
+
+A `kit:<path>` line derives one `<kit-root>/<path>` entry per `gate_kit_roots`
+member through `gate_expand_couples_var` — the same expansion, the same root
+set, and the same spelling `# graph:` `couples=` fields already use (§check-graph
+owns them; nothing about them is re-specified here). What is new is only that
+`check-core-files` is a second reader of it. A manifest with no `kit:` line
+behaves exactly as before, so no consumer's manifest changes meaning.
+
+**One restriction, and it is fail-closed.** The expansion is unconditional: it
+emits `<root>/<path>` per root with no existence test. In a `couples=` field the
+result is matched as a glob against tracked files, so a wildcard is meaningful
+there. This reader instead *requires* each expanded path to exist and be tracked,
+and "every kit has at least one file matching `checks/*.sh`" is a different
+invariant from "this path exists". A `kit:` token carrying a wildcard is
+therefore refused with exit 2 and a message naming the limit — one expansion, two
+readers, one stated restriction, never divergent semantics.
+
+Because a derived line makes a **new kit** change the checked set without any
+manifest edit, the gate's `# graph:` couples the manifest *and* the derived
+basenames (`kit:SPEC.md,kit:README.md`, `tier=precommit`): staging a twelfth
+kit's spec or README on the commit that creates it re-fires the gate, so the
+guarantee holds at the perturbation rather than one tier out at the whole-tree
+battery. That battery stays the backstop for a
 pure-deletion commit the `ACMR` pre-commit filter would skip.
+
+**What a consumer derives, and what it hand-lists.** The manifest derives a
+surface that is uniform across kit roots and hand-lists everything else, and
+uniformity is decidable by running the expansion rather than by taste: a basename
+every kit root carries expands to a set that wholly exists and is therefore
+derivable, while a single-kit deliverable would expand to one existing path and
+N-1 missing ones — proving it is a hand line rather than a derivation someone
+failed to spot. Surfaces with no kit-root shape at all (a queue, repo-root
+chrome, workflows, an installer entry point) stay an honest hand list.
+
+**A derived line is worth taking even where another gate looks like it covers
+the same surface, unless that coverage is direct.** The discriminator is whether
+the other gate asserts the surface's existence *as its subject* or merely trips
+over its absence while checking something else. Incidental coverage keys on a
+property that can change for unrelated reasons, and it vanishes the moment that
+property does — which is exactly the failure a core-file pin exists to prevent.
 
 ### check-identity
 

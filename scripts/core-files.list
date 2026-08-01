@@ -1,5 +1,6 @@
 # Checkwright core-file manifest — gate-sdk/SPEC.md §check-core-files.
-# One repo-relative path per line (`#` comments, blank lines ignored). The gate
+# One repo-relative path per line, or a `kit:<basename>` token deriving one path
+# per kit root (`#` comments, blank lines ignored). The gate
 # is red when a listed path is missing from the worktree or untracked. Retiring
 # a surface deliberately means deleting its line in the same commit that removes
 # the file — that manifest edit is the diff-visible intentional-removal valve.
@@ -49,16 +50,14 @@ scripts/identity.conf
 scripts/git-hooks/pre-commit
 docs/check-graph.html
 
-# One SPEC.md per kit (each kit's canonical contract).
-gate-sdk/SPEC.md
-lifecycle-kit/SPEC.md
-queue-kit/SPEC.md
-canon-kit/SPEC.md
-delegation-kit/SPEC.md
-context-kit/SPEC.md
-guard-kit/SPEC.md
-drift-kit/SPEC.md
-evidence-kit/SPEC.md
+# Derived per kit root: each kit's canonical contract and its entry-point README.
+# These expand to one path per kit root, so kit twelve is covered on the commit
+# that creates it — no line here to remember.
+kit:SPEC.md
+kit:README.md
+# Hand-held: a single-kit deliverable with no per-kit counterpart, so no kit:
+# token can express it (kit:DOCTRINE.md would demand it of all eleven roots).
+doctrine-kit/DOCTRINE.md
 
 # Held-constant validate baseline + committed per-run evidence manifest.
 .workflow/validate-baseline.txt

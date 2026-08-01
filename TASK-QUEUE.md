@@ -56,51 +56,6 @@
   Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
   inbox (two bullets merged at triage, costed once). Promoted 2026-08-01 by spec.
 
-- **core-files-kit-coverage-derived** [spec: gate-sdk/SPEC-core-files-kit-coverage-derived.md]
-  — `scripts/core-files.list` carries a block headed "One SPEC.md per kit (each
-  kit's canonical contract)" that lists **9 of the 11** kit SPECs:
-  `site-kit/SPEC.md` and `doctrine-kit/SPEC.md` are absent, as is
-  `doctrine-kit/DOCTRINE.md` (which `CANON_KIT_MANIFEST_FILES` does carry). The
-  block is a hand-maintained roster of a **derivable** set — `gate_kit_roots` ×
-  `SPEC.md` — which is the maintain-a-derivable antipattern derivation-first
-  rules out; and `check-core-files` asserts only that *listed* paths exist, never
-  that the derivable set is covered, so the omission is invisible to a green
-  battery.
-  **Deliverable — the derived coverage assertion, not the three-line backfill.**
-  Backfilling the two missing names re-arms the identical drift for kit twelve:
-  that is the defect, not the fix.
-  **Both open calls settled at spec (2026-08-01), and the deliverable is
-  narrower than filed.** The entry asked for a coverage *assertion* and posed
-  placement as new-assertion-versus-sibling-gate. Neither is built: gate-sdk
-  already ships a `kit:<glob>` token (`gate_expand_couples_var`) that expands to
-  one path per `gate_kit_roots` member, and `check-kit-enum`'s help text already
-  names that token as the fix for exactly this class. The nine hand lines become
-  `kit:SPEC.md`, the coverage property becomes true by construction, and there is
-  nothing left to assert — enforcement-first's own ordering, where removing the
-  duplication outranks gating it. **No new gate, no new assertion, no new knob.**
-  *Boundary:* the manifest derives what is uniform across kit roots and
-  hand-lists the rest. `doctrine-kit/DOCTRINE.md` is provably hand-held —
-  `kit:DOCTRINE.md` would expand to eleven paths of which ten do not exist — and
-  is added as a hand line, closing a real pin gap. Kit READMEs are ruled out: a
-  deleted kit README is caught *directly* by `check-readme-roster`, so pinning
-  eleven more lines would add no guarantee.
-  **Cost while deferred — the exposure the entry left open is now established,
-  and it is narrower than feared.** Traced statically at spec: a silent `rm
-  site-kit/SPEC.md` today reds **only** `check-docs-mirror-fresh`'s orphan
-  branch (the committed mirror page loses its source). It is not caught by
-  `check-core-files`, `check-kit-registration`, `check-docs-kit-parity`,
-  `check-gate-assertions`, or canon-kit's manifest finders. So the hole is narrow
-  rather than absent — and that coverage is **incidental**, a docs-mirror side
-  effect that would vanish for any kit leaving the mirror. The derivation-first
-  defect stays the primary justification, as filed.
-  Feature, and the litmus holds under the narrowed deliverable: admitting `kit:`
-  into the core-files manifest grammar adds a file convention to a governed
-  surface, which is a name even though no gate is minted.
-  Filed 2026-07-25 by align, from the `supply-chain-trust-baseline` cross-spec
-  audit — the amendment's A3 edits this same file, so the gap is adjacent to its
-  envelope without being inside it. Lead ruling, scope-gated intake.
-  Promoted 2026-08-01 by spec, deliverable narrowed to the derivation above.
-
 ## Technical Debt
 
 - **action-run-shell-yaml-anchor-fail-open** — the gate whose whole job is
@@ -2202,5 +2157,6 @@
 
 - always-loaded-regen-block-residency
 - local-overlay-git-blanket-grant
+- core-files-kit-coverage-derived
 
 ## Lessons Learned

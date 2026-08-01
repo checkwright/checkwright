@@ -173,7 +173,7 @@ if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml' '.github/
     run_gate check-action-gh-repo gate-sdk/checks/check-action-gh-repo.sh
 fi
 
-if staged_matches 'scripts/core-files.list'; then
+if staged_matches 'scripts/core-files.list' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-kit/SPEC.md' 'delegation-kit/SPEC.md' 'doctrine-kit/SPEC.md' 'drift-kit/SPEC.md' 'evidence-kit/SPEC.md' 'guard-kit/SPEC.md' 'lifecycle-kit/SPEC.md' 'queue-kit/SPEC.md' 'site-kit/SPEC.md' 'gate-sdk/README.md' 'canon-kit/README.md' 'context-kit/README.md' 'delegation-kit/README.md' 'doctrine-kit/README.md' 'drift-kit/README.md' 'evidence-kit/README.md' 'guard-kit/README.md' 'lifecycle-kit/README.md' 'queue-kit/README.md' 'site-kit/README.md'; then
     run_gate check-core-files gate-sdk/checks/check-core-files.sh
 fi
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/core-files.list dir=one valve=none tier=precommit
+# graph: couples=scripts/core-files.list,kit:SPEC.md,kit:README.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-core-files — every path in the core-files manifest exists in the worktree and is tracked
 #
 # usage: check-core-files.sh [manifest]
@@ -18,11 +18,34 @@ if [[ ! -e "$MANIFEST" ]]; then
 fi
 [[ -r "$MANIFEST" ]] || { echo "check-core-files: manifest not readable: $MANIFEST" >&2; exit 2; }
 
-mapfile -t paths < <(gates_list_members "$MANIFEST")
-if [[ ${#paths[@]} -eq 0 ]]; then
+mapfile -t lines < <(gates_list_members "$MANIFEST")
+if [[ ${#lines[@]} -eq 0 ]]; then
     echo "CORE-FILES: clean (manifest $MANIFEST lists no paths)"
     exit 0
 fi
+
+# spec: gate-sdk/SPEC.md §check-core-files — a kit: line derives one path per kit root; the
+# wildcard refusal is fail-closed because this reader requires each expanded path to exist,
+# which is a different invariant from the glob match a couples= field performs
+paths=(); _cf_expanded=""
+for line in "${lines[@]}"; do
+    if [[ "$line" == kit:* ]]; then
+        case "${line#kit:}" in
+            *'*'* | *'?'* | *'['*)
+                echo "check-core-files: kit: token carries a wildcard in $MANIFEST: $line" >&2
+                echo "  help: this manifest requires every expanded path to exist and be tracked," >&2
+                echo "        which a wildcard cannot express — name an exact per-kit basename" >&2
+                echo "        (e.g. kit:SPEC.md), or hand-list the paths." >&2
+                exit 2
+                ;;
+        esac
+        gate_expand_couples_var _cf_expanded "$line"
+        IFS=',' read -ra _cf_parts <<<"$_cf_expanded"
+        paths+=("${_cf_parts[@]}")
+    else
+        paths+=("$line")
+    fi
+done
 
 git rev-parse --git-dir >/dev/null 2>&1 || {
     echo "check-core-files: not a git repository — cannot verify tracked status" >&2; exit 2; }
@@ -48,5 +71,5 @@ if [[ ${#missing[@]} -gt 0 || ${#untracked[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "CORE-FILES: clean ($present listed path(s) present and tracked in $MANIFEST)"
+echo "CORE-FILES: clean ($present manifest path(s) present and tracked in $MANIFEST)"
 exit 0
