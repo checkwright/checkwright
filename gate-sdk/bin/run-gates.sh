@@ -60,7 +60,7 @@ select_for() {
         }
         couples="$(gate_manifest_field "$src" couples)"
         trigger="$(gate_manifest_field "$src" trigger)"; trigger="${trigger:-$couples}"
-        trigger="$(gate_expand_couples "$trigger")"
+        gate_expand_couples_var trigger "$trigger"
         mode="$(gate_manifest_field "$src" mode)"
         IFS=',' read -ra globs <<<"$trigger"
         if [[ "$trigger" == '*' ]]; then

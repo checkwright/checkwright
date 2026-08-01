@@ -112,7 +112,7 @@ emit_graph() {
                 valve=*)   valve="${kv#valve=}" ;;
             esac
         done
-        couples="$(gate_expand_couples "$couples")"
+        gate_expand_couples_var couples "$couples"
         C_COUPLES[$c]="$couples"; C_DIR[$c]="$dir"; C_VALVE[$c]="$valve"
         local -a csurf; IFS=',' read -ra csurf <<<"$couples"
         for s in "${csurf[@]}"; do NODE_SEEN[$s]=1; done
@@ -517,8 +517,8 @@ for c in "${CHECKS[@]}"; do
             *) errors+=("MANIFEST: $script unknown manifest key '$kv'") ;;
         esac
     done
-    couples="$(gate_expand_couples "$couples")"
-    [[ -n "$trigger" ]] && trigger="$(gate_expand_couples "$trigger")"
+    gate_expand_couples_var couples "$couples"
+    [[ -n "$trigger" ]] && gate_expand_couples_var trigger "$trigger"
     [[ "$dir" == bi || "$dir" == one ]]            || errors+=("MANIFEST: $script dir= must be bi|one (got '$dir')")
     [[ "$valve" == none || "$valve" == PROPOSED ]] || errors+=("MANIFEST: $script valve= must be none|PROPOSED (got '$valve')")
     [[ "$tier" == precommit || "$tier" == align-only || "$tier" == commit-msg ]] || errors+=("MANIFEST: $script tier= must be precommit|align-only|commit-msg (got '$tier')")

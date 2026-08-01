@@ -102,7 +102,9 @@ findings=()
 
 for src in "${sources[@]+"${sources[@]}"}"; do
     [[ -f "$src" ]] || continue
-    couples="$(gate_expand_couples "$(gate_manifest_field "$src" couples)")"
+    couples=""
+    couples_field="$(gate_manifest_field "$src" couples)"
+    gate_expand_couples_var couples "$couples_field"
     IFS=',' read -ra COUPLE_GLOBS <<<"$couples"
     walks="$(extract_walks "$src")"; st=$?
     fail_closed "$st" READS-COUPLES "awk walk-scan($src)"
