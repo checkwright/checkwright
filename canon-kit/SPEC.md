@@ -785,7 +785,9 @@ topology exists). `align-only` tier.
 
 Invariant: every full-line comment on a governed source is one of — a
 machine directive (a comment a tool parses: `graph:`, `shellcheck`,
-`contract:`), a reason directive (a spec pointer, usage synopsis, or
+`contract:`, `smoke-unregistered:` — the last read by
+`run-consumer-smoke.sh` off a kit's vendored `smoke/install.sh`, gate-sdk/SPEC.md
+§Consumer smoke), a reason directive (a spec pointer, usage synopsis, or
 positional justification: `spec:`, `usage:`, `exception-list:`,
 `no-fixture:`, `assertion`, `permanent:`, `TODO(task:`,
 `TODO(spec-ambiguity)`, which blesses a bounded window — its own line plus
