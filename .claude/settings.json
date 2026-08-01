@@ -110,7 +110,6 @@
       "Bash(ls)",
       "Bash(ls *)",
       "Bash(grep *)",
-      "Bash(awk *)",
       "Bash(pgrep *)",
       "Bash(command -v *)",
       "Bash(shellcheck *)",
