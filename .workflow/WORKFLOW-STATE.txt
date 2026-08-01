@@ -4,4 +4,4 @@
 
 ---
 
-— scope a8d0dd24 2026-08-01
+shipped-roster-parity scope a8d0dd24 2026-08-01
