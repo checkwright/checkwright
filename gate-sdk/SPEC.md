@@ -158,6 +158,21 @@ it — so the requirement is the **prefix with a ruled payload**. Both payload
 forms are machine-recognizable, which is what keeps the rule a rule rather than
 a description.
 
+**The coupling-graph artifact is not a member of this tier.** A rendered HTML
+document opens with a doctype, so it can carry neither payload form and stay a
+valid document; and it is tracked and freshness-gated, so local capture is not
+open to it either. It fits no row of a partition this section calls total, which
+makes its placement here a defect in the emitting default rather than a case the
+partition widens for — `check-workflow-tiering` reddens on it, correctly, in any
+consumer that registers the gate under kit defaults. Its home is the **gates
+dir**, `<gates-dir>/CHECK-GRAPH.html`, on three grounds: `gen-pre-commit.sh`'s
+hook is already a generated projection gate-sdk owns and already lives there, so
+the two artifacts sit under one owner instead of straddling two directories; the
+gates dir is a root entry every consumer allowlists anyway, so no adopter pays a
+new root surface (§check-root-tiering); and it presumes no `docs/`, which a
+published-site path would. A consumer wanting it on a site repoints
+`GATE_SDK_GRAPH_ARTIFACT` (§check-graph), which is what that knob is for.
+
 **The extension rule keys on writer and reader, not on tier.** These are two
 independent axes, and conflating them is why the convention resisted statement:
 the directory holds tracked `.md` beside gitignored `.md`, so no extension
