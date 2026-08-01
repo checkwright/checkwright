@@ -27,6 +27,7 @@ unset _dk_cfg
 [[ -v DELEGATION_KIT_REFRESH_MIN_AGE ]] || DELEGATION_KIT_REFRESH_MIN_AGE=60
 [[ -v DELEGATION_KIT_USAGE_HISTORY ]] || DELEGATION_KIT_USAGE_HISTORY=""
 [[ -v DELEGATION_KIT_FAN_WIDTH ]] || DELEGATION_KIT_FAN_WIDTH=2
+[[ -v DELEGATION_KIT_AGENT_DIR ]] || DELEGATION_KIT_AGENT_DIR=".claude/agents"
 
 declare -p DELEGATION_KIT_GATE_FILES &>/dev/null || DELEGATION_KIT_GATE_FILES=(
     "${GATE_SDK_GATES_DIR:-scripts}/check-*.sh"
@@ -71,6 +72,7 @@ _dk_errs=()
     || _dk_errs+=("DELEGATION_KIT_REFRESH_MIN_AGE must be a non-negative integer (got '$DELEGATION_KIT_REFRESH_MIN_AGE')")
 [[ "$DELEGATION_KIT_FAN_WIDTH" =~ ^[0-9]+$ && "$DELEGATION_KIT_FAN_WIDTH" -gt 0 ]] \
     || _dk_errs+=("DELEGATION_KIT_FAN_WIDTH must be a positive integer (got '$DELEGATION_KIT_FAN_WIDTH')")
+[[ -n "$DELEGATION_KIT_AGENT_DIR" ]] || _dk_errs+=("DELEGATION_KIT_AGENT_DIR is empty")
 [[ ${#DELEGATION_KIT_GATE_FILES[@]} -gt 0 ]] || _dk_errs+=("DELEGATION_KIT_GATE_FILES is empty")
 [[ ${#DELEGATION_KIT_META_PATHS[@]} -gt 0 ]] || _dk_errs+=("DELEGATION_KIT_META_PATHS is empty")
 if [[ ${#_dk_errs[@]} -gt 0 ]]; then

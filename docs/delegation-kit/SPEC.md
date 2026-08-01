@@ -115,6 +115,24 @@ consumer). Registration is the opt-in valve: a consumer wanting pure advice
 does not wire the hook. No new persistent state and no new key on the
 `usage.txt` contract — the verdict line is the only interface.
 
+**Covered at every depth, aggregated at none.** The hook's registration is
+session-wide, so it fires inside dispatched sessions too: a dispatched
+session's own dispatches re-arm it, carrying that session's identity, and the
+coverage reaches every depth rather than stopping at the root. What it cannot
+do is **aggregate** — each fire is independent and holds no state about the
+tree, so a verdict prices the one call it gates and never the subtree that call
+opens. That pairing is what the subtree clause of the template's
+**Budget-check before *each* dispatch in a fan-out** rule exists to compensate,
+and stating both halves here is what stops the next reader re-filing either.
+Calibration history, because the silence invited the wrong turn: the hook
+script is stateless and carries no depth counter, and a scope survey read that
+as *the guard does not reach below the root* and filed against it. The reading
+of the script was exact; the inference from it was false. A guard whose output
+is only ever seen by the session it fires in looks absent from every other
+vantage point — so a supervisor counting its own hook fires is watching a
+strict undercount of its own tree, which is the observation the residual
+projection gap is stated against rather than a coverage gap to be re-armed.
+
 A knob-raise ruling has one working transport in this harness: the settings
 env block (`.claude/settings.local.json`), which hooks re-read per fire — the
 raised `DELEGATION_KIT_PAUSE_PCT` reaches the guard on the next dispatch with
@@ -125,7 +143,29 @@ Propagation is asymmetric within a live session: the hook re-reads the file
 per fire, but the Bash tool environment retains an injected value after the
 entry is deleted until the session restarts — an in-session `usage-verdict`
 run and a hook fire can judge against different thresholds in that window, so
-the hook's verdict line, not an in-session re-run, is the acting reading.
+the hook's verdict line, not an in-session re-run, is the acting reading. That
+this transport *works* is not a permission to use it for everything a harness
+env var reaches: the subagent-model override below rides the same block and is
+refused there, so the two must not read as one sanction.
+
+**The subagent-model environment override is refused, and the reason is
+precedence.** Model resolution runs in a fixed order — the subagent-model
+environment override, then a dispatch's own `model` parameter, then the agent
+definition's `model:` frontmatter, then the dispatching conversation's model —
+and the environment rung sits *above* the per-dispatch parameter. Setting it
+would pin every subagent to a cheap tier in one line, and would thereby
+silently defeat a supervisor's deliberate per-batch tier pin, the mechanism
+`lifecycle-kit/templates/lead.md` §Economics — batch, and compact where it pays
+depends on to tier a batch by its work classes. A lever that overrides the
+deliberate choice is not a default; it is a ceiling, so it is recorded as
+rejected rather than left to be rediscovered as an improvement. The correct
+rung is the **frontmatter**, third in the chain: it supplies the standing
+default the template's **Match the dispatched model and effort to the unit's
+shape** rule asks for while the per-dispatch parameter still overrides it. The
+same rule's affirmative-selection clause is why the field is *stated* rather
+than left out — an omitted `model:` resolves to the literal `inherit`, so
+omission spells the dispatcher's tier rather than a neutral absence, and
+`check-agent-tier-explicit` is that clause's oracle over the tracked surface.
 
 ### One template, a resident pointer
 
@@ -272,6 +312,35 @@ semantic weakening inside a legitimate scripts-only commit — the by-eye
 diff review of agent gate edits remains a supervisor duty. `--fixture <dir>`
 injects `staged-files` / `added-exemptions` lists (fixture-pair test
 capability); live mode reads `git diff --cached`.
+
+## check-agent-tier-explicit
+
+Every agent definition under `DELEGATION_KIT_AGENT_DIR` declares a `model:`
+field in its frontmatter. This is the oracle over the tracked half of the
+template's **Match the dispatched model and effort to the unit's shape** rule:
+the per-dispatch habit leaves no artifact, but a standing choice does, and the
+gate reads it.
+
+**It polices silence, not the choice.** An explicit `inherit`-valued `model:`
+**passes** — a dispatched session that should ride its dispatcher's tier is a
+legitimate answer and the gate has no business overruling it. What reds is
+*omission*, the one state indistinguishable from not having thought about it,
+and the one state that is not the neutral absence it looks like — the refused
+environment override and the precedence chain behind that reading are in
+§The delegation model. A reader arriving at this gate expecting it to enforce
+cheapness has the wrong model of it.
+
+**Counted inertness.** A consumer with no such directory — or one holding no
+definitions — scans zero and reports a clean counted line, the derived-scan-set
+shape the kit's other gates use. There is no roster and no registration list to
+maintain: the scan set is the directory's contents.
+
+**Honest limit.** It holds the tracked surface only. A dispatch naming no agent
+type and no `model` parameter inherits and leaves no artifact for any gate to
+read, so the gate converts the standing-choice class from unenforceable to
+enforced and leaves the per-dispatch class to the rule's prose. That is
+strictly better than nothing and not a claim to have closed the tier question
+mechanically.
 
 ## usage-verdict
 
@@ -608,8 +677,10 @@ delegation-kit/
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
   checks/check-rule-citation.sh
+  checks/check-agent-tier-explicit.sh
   gate-tests/check-gate-tamper/{good,bad}/
   gate-tests/check-rule-citation/{good,bad}/
+  gate-tests/check-agent-tier-explicit/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
@@ -674,6 +745,12 @@ layout as defaults):
   window raises the affordable width, not the reviewable one, so budget is
   never the sole input to widening. `usage-verdict` surfaces the live value
   as the `width=` field (§usage-verdict), the knob's mechanical reader.
+- `DELEGATION_KIT_AGENT_DIR` — the directory `check-agent-tier-explicit` walks
+  for agent definitions; default `.claude/agents`, this harness's conventional
+  agent-definition location, validated non-empty by the loader. Positional `$1`
+  overrides (fixture injection). A consumer whose harness keeps definitions
+  elsewhere repoints it; one with no such directory leaves it and the gate
+  reports its counted-inert clean line (§check-agent-tier-explicit).
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
   `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh")` plus the gate-sdk lib and
@@ -715,8 +792,9 @@ edit; the context-kit template stays uncoupled from delegation-kit.
 **An `OK` verdict is a floor, not a recommendation.** The guard answers one
 question — is there headroom in the window *right now* — and blocks only on
 `PAUSE`. Everything else a dispatch decision turns on sits outside its reach:
-how long the dispatched work runs, whether it fans out beneath the checkpoint
-(the guard fires on the dispatch it gates, not on that dispatch's children),
+how long the dispatched work runs, what a fan-out beneath the checkpoint will
+cost in total (the guard re-arms on those children but prices each of them
+alone: covered at every depth, aggregated at none — §The delegation model),
 and whether anything forces the dispatch now rather than after the window
 resets. `OK` is therefore one input to that decision and never the decision
 itself; a dispatcher reading `OK` as "go" has substituted the guard's question
@@ -735,6 +813,13 @@ costs the work in flight.
 `good/`+`bad/` fixture pair (a citation resolving to a template lead-in vs one
 naming an absent lead-in), driven by `run-gate-tests.sh` over fixture-local
 spec + template files passed as its two positional arguments.
+
+`check-agent-tier-explicit` speaks the same gate contract and ships the standard
+`good/`+`bad/` fixture pair over a fixture-local agent directory passed as its
+one positional argument. The `good/` side carries both passing shapes — a
+definition naming a cheaper class outright and one declaring `inherit` — so the
+pair proves the gate discriminates omission from choice rather than merely
+finding a `model:` string; the `bad/` side omits the field.
 
 `usage-verdict` does not fit the gate contract (a three-state verdict, not a
 clean/violation pair), so — like guard-kit's guard-tests — the kit ships

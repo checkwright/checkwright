@@ -31,6 +31,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    check-gate-tamper
    check-rule-citation   # holds SPEC §The delegation model's rule citations to the template
+   check-agent-tier-explicit   # every tracked agent definition states a model: tier
    ```
    <!-- gate-roster:end -->
 
@@ -85,7 +86,7 @@ directly with `--fixture <dir>` only for testing.
 ## Test
 
 ```bash
-bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # check-gate-tamper fixtures
+bash gate-sdk/bin/run-gate-tests.sh delegation-kit/gate-tests delegation-kit/checks  # every gate's fixture pair
 bash delegation-kit/bin/run-usage-tests.sh                                           # usage-verdict verdict table
 bash delegation-kit/bin/run-budget-guard-tests.sh                                    # budget-guard action table
 bash delegation-kit/bin/run-trend-tests.sh                                           # usage-trend segmentation assertions

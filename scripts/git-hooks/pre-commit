@@ -367,6 +367,10 @@ if staged_matches 'delegation-kit/SPEC.md' 'delegation-kit/templates/agent-execu
     run_gate check-rule-citation delegation-kit/checks/check-rule-citation.sh
 fi
 
+if staged_matches '.claude/agents/*.md'; then
+    run_gate check-agent-tier-explicit delegation-kit/checks/check-agent-tier-explicit.sh
+fi
+
 if staged_matches 'CLAUDE.md'; then
     run_gate check-brevity context-kit/checks/check-brevity.sh
 fi

@@ -14,6 +14,7 @@ export DELEGATION_KIT_PAUSE_PCT_7D=95
 cat >> scripts/gates.list <<'EOF'
 # delegation-kit
 check-gate-tamper
+check-agent-tier-explicit
 EOF
 
 snap="$(mktemp)"

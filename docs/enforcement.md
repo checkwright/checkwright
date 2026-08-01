@@ -113,6 +113,7 @@ leaves its section absent.
 | [evidence-kit](evidence-kit/index.md) | check-evidence-manifest | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-gate-tamper | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-rule-citation | precommit |
+| [delegation-kit](delegation-kit/index.md) | check-agent-tier-explicit | precommit |
 | [context-kit](context-kit/index.md) | check-brevity | precommit |
 | [context-kit](context-kit/index.md) | check-settings-pins | precommit |
 | [context-kit](context-kit/index.md) | check-memory-off | precommit |

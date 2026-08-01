@@ -132,6 +132,13 @@ reach-through, not a change to this protocol; every rule below still applies.
   window-expensive than its
   subagent-token total suggests, so size waves to leave the next one headroom, or
   accept one wave per window.
+  **The projection reaches downward as well as forward.** The guard re-arms at
+  every depth — a dispatched session's own dispatches fire it too — but each
+  verdict prices **one call**, never the subtree that call opens. Nothing
+  between a dispatch and its children's children ever sees the whole. So budget
+  a dispatch you expect to fan out for its **subtree**, not its own turn, and
+  read a child's fan-out as your spend even though its verdicts land in a
+  context you never see.
   **Do not read live budget off the statusline while parked on a dispatch.**
   Observed: the harness statusline does not refresh while the main session waits
   on a background agent's completion notification, so its displayed budget
@@ -155,8 +162,14 @@ reach-through, not a change to this protocol; every rule below still applies.
   whose description commits to review work, never one that disclaims it (an
   excerpt-locator serves pure search, not audit). Selection sits with the
   dispatching session — its context holds what selection
-  needs — and a standing choice lands in a tracked agent-type definition, never
-  per-dispatch habit.
+  needs — and it is **affirmative**: an unselected dispatch does not fall back
+  to a cheap default, it **inherits the dispatcher's tier**, so declining to
+  choose silently buys the most expensive tier in reach — and buys it precisely
+  for the read-only fan-outs that are the cheapest work you dispatch. That is
+  why a standing choice lands in a tracked agent-type definition rather than
+  per-dispatch habit, and why an omitted `model:` field there is not a neutral
+  default but the inherit default: the field is stated even when the answer is
+  to inherit.
 - **Never revert substantial completed work on your own design judgment** —
   especially an expensive delegated sweep. Surface the tension and wait for the
   explicit go-ahead before discarding it: a self-judged revert forfeits the

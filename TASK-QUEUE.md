@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **nested-dispatch-ungoverned** [spec: SPEC-nested-dispatch-ungoverned.md] — the
-  dispatch layer's budget and tier rules were filed as written for the **root**
-  dispatch and silently exempting everything below it. Both premises were
-  re-verified while authoring the amendment and **the budget half's was false**:
-  settings-registered hooks fire inside dispatched sessions, so the guard already
-  re-arms at every depth. Verified first-hand — the `spec` session is itself a
-  dispatched stage session and its own child dispatch fired the guard. The
-  observation behind the filing ("it ran exactly once") described what the lead
-  could see, not what happened.
-  **Deliverable, now cheaper on one half and larger on the other.** Budget
-  collapses to a clause: the verdict is per call and depth-blind, so a dispatch
-  expected to fan out is budgeted for its **subtree**, and a supervisor watching
-  its own hook fires is watching a strict undercount. Tier holds exactly as filed
-  and gains the artifact the entry believed impossible — an agent definition
-  omitting `model:` defaults to the literal `inherit`, so the tracked frontmatter
-  is both the fix and the gateable surface. Deltas, the ruled-out environment
-  override (it sits *above* the lead's per-batch `model` pin in the precedence
-  chain), and causal completeness:
-  delegation-kit/SPEC-nested-dispatch-ungoverned.md.
-  **Ships a new gate** (`check-agent-tier-explicit`) and a read-only audit agent
-  type, so the release note owes a Tightened-gates bullet.
-  **Surface note for batching:** serialize against
-  **`agent-execution-backgrounding-role-scope`** — same template, same SPEC
-  section.
-  Surfaced 2026-07-31 by the lead from close's own termination; routed through the
-  gap inbox and drained by the resumed close; amendment authored 2026-08-01 at
-  spec.
-
 - **lead-batching-roster-derivation** [spec: SPEC-lead-batching-roster-derivation.md]
   — an iteration lead that batches by **amendment** silently drops every
   amendment-free unit scope promoted; a debt unit mints no governed name, so it
@@ -2124,5 +2096,6 @@
 
 - resume-journal-deletion-vs-pull-channel
 - agent-execution-backgrounding-role-scope
+- nested-dispatch-ungoverned
 
 ## Lessons Learned
