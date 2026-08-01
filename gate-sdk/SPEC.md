@@ -762,6 +762,14 @@ the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
 evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
 scratch (accepted as validate-stage cost, never pre-commit).
 
+**What it does not cover.** The transition it proves is the *vendored kit
+directories* moving FROM→TO — phase A replaces them wholesale, in tree. It never
+re-runs an installer, so a consumer's **cross-version init path** is outside its
+reach entirely: a green `upgrade` suite is evidence about kit contents, not about
+whatever activation surface a consumer ships to deliver them. State it here
+rather than leaving it inferable from the phase-A step list, since the suite's
+name invites the wider reading.
+
 **The declaration resolves on two arms, both over §lib/declaration.sh's one
 token predicate.** A **tagged TO** resolves its version from the `v*` tag
 pointing at it and its declaration from the `docs/posts/` note whose front-matter

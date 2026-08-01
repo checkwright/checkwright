@@ -33,8 +33,21 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
      not a proof of narrowness: probes are witnesses, and no completeness is
      claimed (the section is absent entirely when no probes are declared).
 
+   - **Not content-pinned**: an entry naming a *script path* rather than a fixed
+     command grants whatever that file says at run time, so its meaning changes
+     whenever the file does — and a path under the gitignored scratch dir is
+     rewritable by any session. Read the shape, not the literal: it reads as a
+     specific command until one notices the target is writable. Such a run has a
+     sanctioned form already — `bin/scratch-run.sh`, whose echo-at-execution is
+     the compensating control (§scratch-run) — so route the run through the
+     runner and remove the direct-path grant. Removing instances without applying
+     this criterion re-arms for the next one.
+
    Then, by judgment, prune the remaining one-off exact-string local entries and
    promote recurring safe patterns to the committed `settings.json` as globs.
+   Widening the committed set is the **consumer's** call, not the session's: an
+   agent may propose a standing grant and may prune, but it does not widen its
+   own auto-allow set on its own say-so.
 5. **Clear the friction log** — its named reclaim path:
    `: > .workflow/prompt-friction.log`. Run each clear as its own bare command:
    the allowlist entry is an exact string, so compounding it (`&&`, `;`, a

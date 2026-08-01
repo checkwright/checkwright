@@ -2013,6 +2013,197 @@
   Filed 2026-08-01 at close from the gap inbox; build filed it against its own
   batch-1 stamp.
 
+- **amendment-deletion-content-completeness** [design-pending] — a closed
+  amendment can be **deleted with part of its content landing in no canonical
+  spec**, and the merge rule has no completeness oracle at deletion time.
+  **Observed, not hypothetical.** `SPEC-supply-chain-trust-baseline.md`'s
+  causal-chain rationale (its A1) survives only in git history, so the next
+  amendment on that surface **re-derived** it rather than inheriting it — the
+  re-derivation is the cost, paid in full.
+  **Why `[design-pending]`:** spec-over-precedent makes git history a
+  non-canonical tier, so "recoverable from the deleting commit" is not an
+  answer here the way it is for an icebox eviction — an evicted queue body is
+  dormant work, whereas a merged rationale is *live doctrine* a later reader is
+  entitled to read forward. The oracle is the hard part: deciding that every
+  claim in a deleted amendment landed somewhere canonical means diffing prose
+  meaning, not tokens. Cheaper shapes to weigh first — require the deleting
+  commit to name each destination section per amendment section, or forbid
+  deletion outright and require an explicit `merged-into:` field the gate can
+  resolve.
+  **Cost while deferred:** unbounded and silent — each deletion may drop
+  rationale, and the loss is invisible until someone re-derives it, which is
+  exactly what happened here and cost this iteration a spec cycle.
+  Filed 2026-08-01 at close from the gap inbox.
+
+- **battery-roster-hand-copy** [design-pending] — the root README's pre-commit
+  battery block is a **second hand-maintained copy of a set another surface
+  already owns**, and it is incomplete. README.md §This repo, governed lists one
+  `run-gate-tests.sh` line per kit plus the consumer-gate fixtures plus the
+  guard-kit decision table, but **four** fast per-kit runners that
+  `scripts/evidence-config.sh` hand-lists are absent:
+  `delegation-kit/bin/run-usage-tests.sh`,
+  `delegation-kit/bin/run-budget-guard-tests.sh`,
+  `delegation-kit/bin/run-trend-tests.sh`, and
+  `context-kit/bin/run-index-tests.sh`. Each is listed in its own kit's README
+  §Test beside that kit's gate-tests line — exactly the pairing guard-kit gets
+  in the root README — so the omission is asymmetric rather than principled. A
+  contributor touching `delegation-kit/bin/usage-verdict.sh` or
+  `context-kit/bin/md-index.sh` and following the root README runs the gate
+  fixtures and none of these. CLAUDE.md §This repo is governed by its own kits
+  carries the same roster in the same shape, so a fix touches both surfaces.
+  **Why `[design-pending]` rather than a four-line backfill:**
+  `evidence-config.sh` already *derives* the gate-tests suites via
+  `gate_fixture_suites` and hand-lists these four, so the derivation-first
+  question is whether the battery block should be **generated** from
+  `EVIDENCE_KIT_SUITES` rather than extended by hand — and, upstream of that,
+  whether the four hand-listed entries should be derivable at their own source
+  too. A hand-corrected roster re-arms immediately.
+  Sibling class, distinct surface: `readme-roster-enum-coverage` holds *kit*
+  README prose enumerating a derivable set; this is the **root** README
+  enumerating a set `scripts/evidence-config.sh` owns. Neither entry's body
+  carries the other's instance.
+  **Cost while deferred:** a contributor following the documented battery runs
+  a strict subset of it, so a red one of these four reaches CI rather than the
+  pre-commit hook.
+  Surfaced 2026-08-01 by the align audit; filed at close from the gap inbox.
+
+- **queue-kit-starter-template-red** [design-pending] — **queue-kit ships a
+  starter template that fails the kit's own gate, and its smoke cannot see it.**
+  Two coupled parts, filed together because the second explains why the first
+  survived.
+  (1) queue-kit/SPEC.md:782-788 claims `templates/TASK-QUEUE.md` "ships
+  battery-clean when copied verbatim". It does not: the template's only deferred
+  entry (`queue-kit/templates/TASK-QUEUE.md:37`) carries no `Cost while
+  deferred` field, so `check-queue-entry-budget` assertion C reds on a verbatim
+  copy under kit defaults. **Verified live** at the align audit; the other nine
+  queue-kit gates pass clean on the same copy. This part is mechanical.
+  (2) `queue-kit/smoke/install.sh:8-17` registers only **7 of the 10** shipped
+  gates, omitting `check-queue-entry-budget`, `check-queue-sections` and
+  `check-queue-slug-liveness` — so consumer smoke never runs the gate that would
+  have caught (1). This part is design-bearing.
+  **Why `[design-pending]`:** deciding whether a kit's smoke must register
+  **every** gate it ships (versus a deliberate subset) is a gate-sdk
+  Consumer-smoke contract question with a blast radius across all eleven kits'
+  `install.sh`. `smoke-battery-workflow-gate-coverage`, landed this iteration,
+  rules a scratch-battery slot by "the gate reads a surface the install writes";
+  that predicate may or may not settle this case and the interaction should be
+  **checked rather than assumed**.
+  Shares its design question with `kit-template-registry-completeness` — both
+  ask whether a kit's install-time registry may be a subset of what the kit
+  ships — and the two are cheapest to rule together even though their mechanical
+  halves differ.
+  **Cost while deferred:** a consumer following the documented starter path gets
+  a red battery on their first run, which is the worst possible first
+  impression and is paid by every new adopter until fixed.
+  Surfaced 2026-08-01 by the align audit's verbatim-copy run; filed at close
+  from the gap inbox.
+
+- **kit-template-registry-completeness** [design-pending] — **drift-kit's
+  bundled-KPI claim outruns its shipped registry.** drift-kit/SPEC.md:139-153
+  lists `kpi-queue-net-delta` among the bundled Lead KPIs and the plugin exists
+  at `drift-kit/kpis/kpi-queue-net-delta.sh`, but `drift-kit/templates/kpis.list`
+  — the kit's own install-time registry — omits it; only this repo's consumer
+  copy `scripts/kpis.list` carries it. Because `drift-kit/smoke/install.sh`
+  copies the template, the smoke never registers or exercises that KPI, which
+  weakens the kit's "asserts one row per registered KPI" testing claim at
+  drift-kit/SPEC.md:803.
+  **Why `[design-pending]` rather than a one-line template add:** the fix turns
+  on whether `templates/kpis.list` is meant to be the **full bundled set** or a
+  deliberate starter subset, and the SPEC does not say. If it is the full set,
+  the same question sweeps across **every** kit shipping a `templates/` registry
+  beside a richer consumer copy — that survey is the work.
+  Shares its design question with `queue-kit-starter-template-red` (part 2):
+  both ask whether a kit's install-time registry may be a subset of what the kit
+  ships. Distinct instance and distinct surface from
+  `readme-roster-enum-coverage`, which holds *prose* enumerations, not registry
+  files.
+  **Cost while deferred:** low and non-rotting, but a shipped KPI is untested by
+  the kit's own smoke, so the testing claim reads stronger than it is.
+  Surfaced 2026-08-01 by the align audit's kit SPEC-vs-code sweep; filed at
+  close from the gap inbox.
+
+- **spec-roster-enumeration-derivation** [design-pending] — a batch of **kit
+  SPEC-vs-code roster drift**, filed as one unit because every instance shares
+  one root cause (a hand-maintained roster beside a derivable set) and each
+  re-arms the moment it is hand-corrected. None changes any gate's behaviour.
+  (1) gate-sdk/SPEC.md:597 names three callers of `lib/declaration.sh` as "all
+  three named", but `scripts/check-tightened-gates-note-parity.sh` is a fourth
+  calling both `decl_section_tokens` and `decl_record_tokens`; this also
+  falsifies line 610's "the record arm's only caller is the smoke's untagged
+  branch" and its "no caller fixture to ride", since the good/bad fixture pair
+  under `scripts/gate-tests/check-tightened-gates-note-parity` exists.
+  (2) canon-kit/SPEC.md:1407 calls `templates/canon-config.sh` "the consumer
+  config template documenting every knob"; the file is a two-line stub pointing
+  back at SPEC.md's knob table and documents none.
+  (3) delegation-kit/SPEC.md:677-701 enumerates `bin`, `checks`, `gate-tests`,
+  `templates` and `smoke` but never `lib/delegation.sh`, which is load-bearing
+  (sourced by two bin tools and two gates).
+  (4) evidence-kit/SPEC.md:64-66 enumerates `lib/evidence.sh`'s shared adapters
+  as if exhaustive but omits `ek_suite_cmd`, used at `bin/run-validate.sh:30`.
+  (5) context-kit/SPEC.md:627-631 and 749-752 name and justify
+  `check-memory-off.test.sh` but never `check-brevity.test.sh`, run by the same
+  runner.
+  (6) canon-kit/gate-tests carries four `.test.sh` files (`check-comment-tier`,
+  `check-docs-link-convention`, `check-md-refs`, `check-tracking-claim`) not
+  named by the per-gate idiom the SPEC uses for its other six.
+  (7) site-kit/SPEC.md's fixture-coverage paragraph omits
+  `gate-tests/check-docs-render-fidelity-foreign.test.sh` beside its span, table
+  and batch siblings.
+  **Why `[design-pending]` and why one unit rather than seven edits:** several
+  of these rosters are **computable from the tree** (a lib file list, a
+  gate-tests basename set, a caller grep), and `check-kit-enum` already solves
+  exactly this shape for `couples` fields via the kit glob token. The unit owes
+  a ruling on which of the seven are derivable and a design for the token that
+  derives them; seven hand corrections would leave the class intact.
+  **Cost while deferred:** low per instance and non-rotting, but the count grows
+  once per audit — this batch is what a single align fan-out found.
+  Surfaced 2026-08-01 by the align audit's cross-spec fan-out; drained into the
+  queue at close.
+
+- **advisory-lane-draft-state-unswept** [design-pending] — the Advisories lane
+  probes `state=triage`, which is correctly the **undispositioned** set:
+  accepting a report moves it to `draft`, so `triage` is exactly what nobody has
+  ruled on yet. But a "fix under embargo" disposition is **ongoing rather than
+  terminal-in-practice** — the advisory sits in `draft` until publication, and
+  no lane looks at `draft`, so an embargoed fix that stalls is invisible to
+  every later boundary sweep. The lane closes the intake hole and leaves a
+  follow-through hole one state downstream.
+  **Options at design:** add a second probe for `state=draft` with a
+  re-raise-only disposition, or rule that the thread's notifications are
+  sufficient and record that ruling.
+  **Cost while deferred:** low and bounded — GitHub keeps notifying maintainers
+  and the thread is the work record (the same honest limit the lane's own
+  preamble states), so this is **unswept rather than unwatched**; the residue is
+  that nothing systematically re-raises a stalled embargo.
+  Surfaced 2026-08-01 at build while deriving the state literal from GitHub's
+  documented enum (lead ruling R3); filed at close from the gap inbox.
+
+- **path-pinned-allow-entry-oracle** [design-pending] — the **gap generalization
+  owed** by close's ruling that a standing allow entry naming a *script path* is
+  not content-pinned (guard-kit/SPEC.md §The close-stage triage step, landed
+  this close). The criterion now exists in prose and the three instances were
+  pruned, but **nothing reds the next one**: the shape reads as a specific
+  literal command until a reader notices the target sits in a writable,
+  gitignored dir, and the two mechanical reports
+  (`compare-settings-allow`'s redundancy and breadth sets) both returned empty
+  on exactly these entries, so neither detector reaches the class.
+  **Missing check class:** a settings-allowlist scanner asserting that no
+  `Bash(...)` allow entry names a path under `GATE_SDK_TMP_DIR` unless the
+  executing command is `bin/scratch-run.sh` — mechanically decidable from the
+  settings JSON plus the scratch-dir knob, and it is the same reader
+  `check-settings-pins` already has.
+  **Why `[design-pending]`:** the boundary is the work, not the scan. A grant
+  naming a *tracked* script is content-pinned by review; one naming an
+  untracked-but-stable path may be either; and the rule should plausibly reach
+  the committed `settings.json` as well as the local overlay, which is a
+  policy question about the consumer's own file. Whether this is a new gate or
+  an assertion inside `check-settings-pins` also settles its class.
+  **Cost while deferred:** low per instance and detectable at close, but the
+  detector is a session's attention — the reason this was filed as a criterion
+  question rather than a removal request is precisely that removing instances
+  without an oracle re-arms.
+  Filed 2026-08-01 at close, as the gap generalization for the inline fix.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -2046,12 +2237,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- always-loaded-regen-block-residency
-- local-overlay-git-blanket-grant
-- core-files-kit-coverage-derived
-- security-advisory-lane
-- action-run-shell-yaml-anchor-fail-open
-- smoke-battery-workflow-gate-coverage
 
 ## Lessons Learned

@@ -506,7 +506,12 @@ dispositions — prune the listed redundant local entries, and for each entry th
 breadth report names, either narrow the glob or record that its breadth is
 intended — then by judgment prune the remaining one-off exact-string local
 entries and promote recurring safe patterns to the committed settings as
-globs; clear the friction log. Goal: the local set stays small, every
+globs; clear the friction log. Two judgments the reports cannot make sit in
+that last step. An entry naming a **script path** rather than a fixed command is
+not content-pinned — it grants whatever the file says at run time — and its
+sanctioned form is `bin/scratch-run.sh` (§scratch-run), whose echo is the
+compensating control; and widening the committed set is the consumer's call,
+since a session does not widen its own auto-allow set on its own say-so. Goal: the local set stays small, every
 durable pattern lives in the committed, reviewable allowlist, and no local glob
 auto-allows a command the consumer declared bad. One step, two reports, one
 reader — no new invocation point and no new schedule.
