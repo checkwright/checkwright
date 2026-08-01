@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: supply-chain-posture-round-two
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,71 @@
 ## New Features
 
 ## Technical Debt
+
+- **action-run-shell-yaml-anchor-fail-open** — the gate whose whole job is
+  linting workflow bash silently drops a `run:` body written behind a YAML
+  anchor. gate-sdk/SPEC.md states `check-action-run-shell` refuses "a YAML
+  anchor or alias as the `run:` value, since no anchor resolution is attempted";
+  the implementation's refusal arms cover only the folded scalar, the explicit
+  indent indicator, the alias sigil, and the unbalanced GitHub expression. There
+  is no anchor arm, so `run: &anchor |` matches none of them, is non-empty, and
+  falls through to the plain-scalar counter — its body lines are never linted.
+  Verified by execution at the 2026-08-01 close, three ways over one identical
+  body: the literal `run: |` form reds (SC2034 + SC2154), the alias form refuses
+  loudly, and the anchor form exits 0 reporting "0 run: block(s) linted, 1
+  plain-scalar run: value(s) skipped". Re-verified by source read at the
+  2026-08-01 scope survey — not re-executed, so the execution evidence above is
+  the close's rather than this survey's. A fail-open of the same vacuous-pass
+  class `vacuous-assertion-count-discipline` tracks, and the skipped-count line
+  is exactly the diagnostic that made it visible.
+  **Deliverable:** the missing code arm plus a `bad/` fixture over an anchored
+  `run:` value. Explicitly **not** a narrowing of the SPEC line — the SPEC states
+  the correct contract and narrowing it would bless the fail-open.
+  **Debt, not feature:** one refusal arm and one fixture inside an existing gate;
+  the SPEC already carries the contract, so no governed name is added. The
+  marker the deferred section carries was deleted rather than converted at
+  promotion: the deliverable was stated definitively at filing, so this entry
+  owed no design ruling.
+  Filed 2026-08-01 at close from the gap inbox, surfaced at the
+  release-signaling-reset align audit while verifying an amendment claim about
+  the gate's fail-closed set.
+
+- **smoke-battery-workflow-gate-coverage** — the consumer smoke installs
+  workflow templates but no smoke gate lints their Actions shape, so a template
+  regression reaches a consumer unopposed. The scratch battery is the union of
+  what each kit's `smoke/install.sh` appends to `gates.list`, and
+  `check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo` and
+  `check-enforcement-fresh` are in **no** kit's smoke `gates.list`. Re-verified
+  at the 2026-08-01 scope survey over the union of every `smoke/install.sh`
+  (34 gate names): the four above are absent, and so is `check-core-files` —
+  a fifth, unnamed at filing. `site-kit/smoke/install.sh` genuinely does copy
+  `templates/site-health.yml` verbatim into the scratch tree, so the install
+  half is real, but of the registered smoke gates only `check-tree-terms` and
+  `check-docs-cname-parity` read the installed file at all, and both only scan
+  it for terms and host aliases. Nothing lints its run bodies, its action pins,
+  or its job shape. The SPEC sentence that inferred coverage from the install
+  was narrowed to what the smoke actually exercises in the same close that filed
+  this (site-kit/SPEC.md §templates/site-health.yml), so the tree no longer
+  claims the coverage — this entry is the coverage itself, still absent.
+  **Scope ruling 2026-08-01 — the predicate, which is what unblocked promotion.**
+  The entry asked which gates earn a scratch-battery slot, warning that
+  registering four gates wholesale may be the wrong move because a smoke that
+  grows toward the full roster stops being a smoke. The ruling takes the entry's
+  own candidate: **a gate earns a scratch-battery slot when it reads a surface
+  the install writes.** That predicate is decidable per gate rather than
+  negotiable, and it holds the smoke to its stated purpose — proving a vendored
+  kit installs and runs — instead of re-running the host battery inside it.
+  Applying it is the build stage's, and it is expected to *split* the five:
+  the three action gates read `templates/site-health.yml`, which
+  `site-kit/smoke/install.sh` writes; `check-enforcement-fresh` and
+  `check-core-files` read projections and a manifest no install writes, so on
+  this predicate they earn no slot and their absence stops being a defect.
+  Build verifies that split against the installs rather than inheriting it.
+  **Debt, not feature:** smoke wiring that registers existing gate names into
+  existing `gates.list` heredocs; the predicate above is a selection rule stated
+  in this ruling, not a new governed name.
+  Filed 2026-08-01 at close from the gap inbox, filed at spec while surveying
+  the readers of site-health.yml.
 
 ## Deferred
 
@@ -998,6 +1063,16 @@
   **Cost while deferred:** compounding and silent — this recurs at **every
   amendment that measures the tree**, the failure mode is a canonical doc
   asserting a false number, and detection is by hand at align if at all.
+  **Cost reduction found 2026-08-01 at scope — weigh it before building a gate.**
+  `canon-kit/checks/check-manifest-count.sh` already bans bare cardinals over
+  governed collection nouns and takes an extensible `CANON_KIT_COUNT_NOUNS` list.
+  It misses the cited instances for configuration reasons, not design ones: its
+  `couples=` (`*SPEC*.md,*README.md,CLAUDE.md`) never reaches
+  `.claude/commands/*.md` where the third landed, and its default nouns lack
+  "sections"/"blocks" with `scripts/canon-config.sh` setting no override. So this
+  may discharge as a `couples=` widening plus a noun override. Not equivalent to
+  the design above, though: the widening buys coverage on the *inferring* side,
+  the side this entry doubted — so the cheaper answer may still be the wrong one.
   Filed 2026-07-26 by close (`release-path-hardening`), draining the
   stale-measured-count bullet; costed at roughly one small unit.
 
@@ -1504,46 +1579,6 @@
   Filed 2026-07-31 at scope from its own gap-inbox disposition; the lead ruled
   the observation durable but outside this iteration's ruled unit set.
 
-- **always-loaded-regen-block-residency** [design-pending] — `CLAUDE.md`'s
-  generated-hook paragraph carries two regeneration commands in the
-  always-loaded tier, and the stated reason for leaving them there does not
-  survive checking. Close's brevity pass trimmed only the enforcement-map half,
-  on the ground that `check-enforcement-fresh` prints its regen command on red
-  while `check-graph` does not.
-  **That premise is false — verified at this scope, do not re-derive it.**
-  `check-graph` prints **both** commands verbatim on exactly the reds where
-  regenerating is the remedy: its hook-freshness assertion emits `regenerate:
-  bash gate-sdk/bin/gen-pre-commit.sh --write` for a missing or stale hook, and
-  its artifact assertion emits `regenerate: bash gate-sdk/checks/check-graph.sh
-  --emit > <artifact>` for a missing or stale graph artifact — each with the
-  *resolved* knob path rather than a literal, which is strictly better than
-  `check-enforcement-fresh`'s single hardcoded help line. What `check-graph`
-  omits them from is its generic `help:` footer, which covers manifest and
-  parity reds where regeneration is not the remedy at all. So no echo line is
-  missing and no gate change is owed.
-  **A second instance, found 2026-08-01 by close's brevity pass.** The
-  `ROADMAP.md` housekeeping bullet has the same shape — a prohibition (never
-  hand-edit the marker block) plus a regen command (`roadmap.sh --write`) that
-  `check-roadmap-fresh` already prints on red. It is deliberately left in place:
-  trimming it would settle this entry's open question by precedent instead of by
-  ruling. Whatever this unit decides applies to both bullets.
-  **The residual question, and why it is still a unit.** The always-loaded block
-  is a *forward* instruction — never hand-edit the generated hook; edit the
-  manifest and regenerate — read before any red, not a recovery line read after
-  one. Whether that earns always-loaded residency is the open call, and it is
-  load-trigger residency applied to a surface no gate settles: the recovery path
-  is already covered by the gate, so what remains resident is the prohibition
-  plus the workflow, and the honest outcome may be the prohibition alone with
-  the commands behind a load trigger.
-  **Cost while deferred:** low and non-rotting, but charged against a tier
-  trending the wrong way — the always-loaded KPI read 198 lines at this
-  boundary, +26 across the closing iteration — and the falsified premise above
-  was on course to be paid a second time by whoever picked the bullet up.
-  Debt: a residency ruling over existing prose; adds no governed name.
-  Filed 2026-07-31 by close as cheap-and-declined scope creep; promoted at the
-  next scope entry from the post-close gap inbox, its premise falsified against
-  `check-graph`'s source in the same pass.
-
 - **post-immutability-machine-read-carveout** [design-pending] — the post
   immutability rule and the machine-readable-note rule are stated on two pages
   and neither records how they compose. `docs/site-architecture.md`
@@ -1690,58 +1725,6 @@
   unless the floor lands.
   Filed 2026-08-01 at close from the gap inbox, operator-directed, from a live
   instance in this iteration's own opening.
-
-- **smoke-battery-workflow-gate-coverage** [design-pending] — the consumer smoke
-  installs workflow templates but no smoke gate lints their Actions shape, so a
-  template regression reaches a consumer unopposed. The scratch battery is the
-  union of what each kit's `smoke/install.sh` appends to `gates.list`, and
-  `check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo` and
-  `check-enforcement-fresh` are in **no** kit's smoke `gates.list`. Re-verified at
-  this close: `site-kit/smoke/install.sh` genuinely does copy
-  `templates/site-health.yml` verbatim into the scratch tree, so the install half
-  is real — but of the registered smoke gates only `check-tree-terms` and
-  `check-docs-cname-parity` read the installed file at all, and both only scan it
-  for terms and host aliases. Nothing lints its run bodies, its action pins, or
-  its job shape. The SPEC sentence that inferred coverage from the install was
-  narrowed to what the smoke actually exercises in the same close that filed this
-  (site-kit/SPEC.md §templates/site-health.yml), so the tree no longer claims the
-  coverage — this entry is the coverage itself, still absent.
-  **Why `[design-pending]`:** registering four gates into a smoke `gates.list` is
-  the obvious move and may be the wrong one — the smoke's purpose is proving a
-  *vendored kit installs and runs*, not re-running the host battery inside it, and
-  a smoke that grows toward the full roster stops being a smoke. The design
-  question is which predicate earns a scratch-battery slot: plausibly only the
-  gates that read a surface the install *writes*.
-  **Cost while deferred:** charged against every edit to a shipped workflow
-  template; a template shipping a defective `run:` body is caught by this repo's
-  own battery over its own copy, and by nothing over the template.
-  Debt: smoke wiring over existing gates; adds no governed name.
-  Filed 2026-08-01 at close from the gap inbox, filed at spec while surveying the
-  readers of site-health.yml.
-
-- **action-run-shell-yaml-anchor-fail-open** [design-pending] — the gate whose
-  whole job is linting workflow bash silently drops a `run:` body written behind a
-  YAML anchor. gate-sdk/SPEC.md states `check-action-run-shell` refuses "a YAML
-  anchor or alias as the `run:` value, since no anchor resolution is attempted";
-  the implementation's refusal arms cover only the folded scalar, the explicit
-  indent indicator, the alias sigil, and the unbalanced GitHub expression. There
-  is no anchor arm, so `run: &anchor |` matches none of them, is non-empty, and
-  falls through to the plain-scalar counter — its body lines are never linted.
-  Re-verified at this close by execution, three ways over one identical body: the
-  literal `run: |` form reds (SC2034 + SC2154), the alias form refuses loudly, and
-  the anchor form exits 0 reporting "0 run: block(s) linted, 1 plain-scalar run:
-  value(s) skipped". A fail-open of the same vacuous-pass class
-  `vacuous-assertion-count-discipline` tracks, and the skipped-count line is
-  exactly the diagnostic that made it visible.
-  **Deliverable:** the missing code arm plus a `bad/` fixture over an anchored
-  `run:` value. Explicitly **not** a narrowing of the SPEC line — the SPEC states
-  the correct contract and narrowing it would bless the fail-open.
-  **Cost while deferred:** a workflow author who anchors a `run:` value gets a
-  green gate over unlinted bash, and nothing distinguishes that from a clean pass.
-  No instance is in tree today, so the charge is latent rather than accruing.
-  Debt: one refusal arm and one fixture in an existing gate; adds no governed name.
-  Filed 2026-08-01 at close from the gap inbox, surfaced at this iteration's align
-  audit while verifying an amendment claim about the gate's fail-closed set.
 
 - **workflow-permissions-scope-oracle** [design-pending] — no gate parses a
   workflow `permissions:` block, so every scope a workflow needs is landed on
@@ -2233,5 +2216,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- always-loaded-regen-block-residency
 
 ## Lessons Learned
