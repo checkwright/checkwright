@@ -812,11 +812,22 @@ contracts do not fit; context-kit's reasoning). `smoke/install.sh` builds
 the throwaway consumer, registers the bundled set, and asserts: exit 0 with
 both section headers and **at least** one row per registered KPI; a registry
 naming a missing plugin yields its visible `n/a` row without failing; `--trend`
-emits exactly one line. A floor, not equality, because a plugin owns one *or
-more* rows — `kpi-queue-net-delta` (§Bundled KPIs) emits two by design — so
-equality would red the moment the bundled set contains a multi-row plugin. Its
-honest limit: a multi-row plugin can offset a sibling that contributed none, and
-nothing here maps a row back to the plugin that emitted it. The trajectory extractor needs committed history the
+emits exactly one line; and, per registered name resolving to a bundled plugin,
+that **the plugin itself emits a row when invoked directly**.
+
+A floor, not equality, because a plugin owns one *or more* rows —
+`kpi-queue-net-delta` (§Bundled KPIs) emits two by design — so equality would red
+the moment the bundled set contains a multi-row plugin. The per-plugin probe
+beside it is what carries the bite the floor cannot: the report substitutes its
+own `n/a (plugin failed)` row for a plugin that exits non-zero or emits nothing,
+so the row count holds even where every plugin is silent, and a multi-row plugin
+would in any case offset a sibling contributing none. Contribution is the
+property, not health — an `n/a` row is a row — and a name resolving to no plugin
+is skipped, that row being the report's own and asserted separately. The probe
+asserts it probed something, so a resolution change cannot make it vacuous.
+Residual limit, stated because it is real: neither assertion pins *which* plugin
+emitted a given row, so a plugin emitting the wrong number of rows is not caught.
+The trajectory extractor needs committed history the
 throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
 fake-history repo — one closed, range-bounded iteration — and asserts the
 table parses, that iteration's row is emitted, and the in-flight iteration's

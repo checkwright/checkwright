@@ -53,6 +53,31 @@ grep -q 'kpi-does-not-exist.*n/a' <<<"$out" || fail "missing plugin did not yiel
 awk '/^--- Lag/{f=1;next} /^Read trend/{f=0} f' <<<"$out" | grep -q 'knowledge friction.*n/a' \
     || fail "kpi-knowledge-friction did not render an n/a row under the Lag section (log absent in the throwaway consumer)"
 
+# spec: drift-kit/SPEC.md §Testing — the per-plugin contribution probe: the report masks a silent
+# plugin with its own 'n/a (plugin failed)' row, so the floor above cannot see one; a name
+# resolving to no plugin is skipped.
+plugin() {
+    DRIFT_KIT_KPIS_FILE="$work/kpis.list" \
+    DRIFT_KIT_QUEUE_FILE="$work/TASK-QUEUE.md" \
+    DRIFT_KIT_TMP_DIR="$work" \
+    DRIFT_KIT_TIMINGS_FILE="$work/no-such-timings.txt" \
+    bash "$1"
+}
+
+probed=0
+while IFS= read -r kname; do
+    [[ -n "$kname" ]] || continue
+    kpath="$SMOKE_KIT_ROOT/kpis/$kname.sh"
+    [[ -f "$kpath" ]] || continue
+    set +e
+    pout="$(plugin "$kpath")"; prc=$?
+    set -e
+    [[ "$prc" -eq 0 ]] || fail "$kname exited $prc standalone — the report would mask it as 'n/a (plugin failed)'"
+    [[ -n "$pout" ]] || fail "$kname emitted no row standalone — the report would mask it as 'n/a (plugin failed)', so the row-count floor cannot see it"
+    probed=$((probed + 1))
+done < <(grep -Ev '^[[:space:]]*(#|$)' "$work/kpis.list")
+[[ "$probed" -gt 0 ]] || fail "no registered name resolved to a bundled plugin — the per-plugin probe asserted nothing"
+
 set +e
 trend="$(report --trend)"; trc=$?
 set -e
