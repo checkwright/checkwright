@@ -698,7 +698,7 @@ drift-kit/
   bin/stage-economics.sh         # the stage × model × iteration spend pricer
   kpis/kpi-*.sh                  # the bundled generic set
   templates/drift-config.sh
-  templates/kpis.list            # example registry (consumer copies + prunes)
+  templates/kpis.list            # the shipped registry: every bundled KPI (consumer copies + prunes)
   templates/kpi-deprecated-surface.sh   # example toolchain-shaped KPI (§Out of scope)
   templates/close-knowledge.md
   templates/price-table.tsv      # placeholder + schema for the stage-economics price table (consumer fills the roster)
@@ -709,6 +709,15 @@ drift-kit/
 
 Registers no gates (advisory; the guard-kit precedent), so no `checks/`,
 `gate-tests/`, or `smoke/violation.sh`.
+
+`templates/kpis.list` names every plugin in `kpis/`, never a starter subset: it
+is the kit's claim about what it bundles, which the roster above, this SPEC, and
+the smoke's per-KPI row assertion are all stated over. Pruning is the
+*consumer's* act on its own copy, and the template's header says so.
+`gate-sdk/SPEC.md §check-template-registry-parity` holds the two in parity both
+ways — the sibling-directory pairing is what puts this template in that gate's
+population, and `templates/kpi-deprecated-surface.sh`, an example a consumer
+adapts rather than a bundled plugin, out of it.
 
 Config follows the established kit pattern: copy `templates/drift-config.sh`
 into the gates dir (or point `DRIFT_KIT_CONFIG_FILE` elsewhere) and override
@@ -806,9 +815,13 @@ The report and every bundled plugin are advisory plain text over live git
 state — not fixture-stable, so no expected-output corpus (the gate
 contracts do not fit; context-kit's reasoning). `smoke/install.sh` builds
 the throwaway consumer, registers the bundled set, and asserts: exit 0 with
-both section headers and one row per registered KPI; a registry naming a
-missing plugin yields its visible `n/a` row without failing; `--trend`
-emits exactly one line. The trajectory extractor needs committed history the
+both section headers and **at least** one row per registered KPI; a registry
+naming a missing plugin yields its visible `n/a` row without failing; `--trend`
+emits exactly one line. A floor, not equality, because a plugin owns one *or
+more* rows — `kpi-queue-net-delta` (§Bundled KPIs) emits two by design — so
+equality would red the moment the bundled set contains a multi-row plugin. Its
+honest limit: a multi-row plugin can offset a sibling that contributed none, and
+nothing here maps a row back to the plugin that emitted it. The trajectory extractor needs committed history the
 throwaway consumer lacks, so `smoke/install.sh` proves it against a hermetic
 fake-history repo — one closed, range-bounded iteration — and asserts the
 table parses, that iteration's row is emitted, and the in-flight iteration's

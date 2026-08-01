@@ -1,0 +1,5 @@
+# Fixture template of consumer rule content: rows are the consumer's own
+# vocabulary, not names of artifacts beta-kit ships — so there is no
+# beta-kit/rules/ sibling and the template is out of population structurally.
+some-rule-token
+another-rule-token

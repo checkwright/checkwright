@@ -48,39 +48,6 @@
   Surfaced 2026-08-01 by the align audit; filed at close from the gap inbox;
   promoted 2026-08-01 by spec.
 
-- **kit-template-registry-completeness** [spec: gate-sdk/SPEC-template-registry-parity.md]
-  — **drift-kit's bundled-KPI claim outruns its shipped registry.**
-  drift-kit/SPEC.md lists `kpi-queue-net-delta` among the bundled Lead KPIs and
-  the plugin exists at `drift-kit/kpis/kpi-queue-net-delta.sh`, but
-  `drift-kit/templates/kpis.list` — the kit's own install-time registry — omits
-  it; only this repo's consumer copy `scripts/kpis.list` carries it. Because
-  `drift-kit/smoke/install.sh` copies the template, the smoke never registers or
-  exercises that KPI, which weakens the kit's "asserts one row per registered
-  KPI" testing claim.
-  **Ruled at spec 2026-08-01 — the full bundled set.** A starter subset is
-  refused because nothing distinguishes it from an omission: it is exactly what a
-  dropped line looks like, which is how this instance survived. The consumer's
-  *copy* stays the consumer's to prune, as the template header already says.
-  **The seam carve-out is structural, per scope's contract-level ruling.** The
-  population derives from layout, never a roster (§check-template-copy-parity's
-  own principle, one axis over): a template enters it when
-  `<kit>/templates/<name>.list` has a sibling **directory** `<kit>/<name>/`
-  holding the artifacts it registers. `price-table.tsv` and `msg-patterns.list`
-  are out of population *structurally* — their rows are consumer rule content the
-  kit stubs, so there is no sibling directory of kit-shipped artifacts to pair
-  with. Deliberately not a per-file exception list, which would re-arm on the
-  next such template with a kit literal publishing a private vocabulary as the
-  cost of forgetting.
-  **Boundary held:** this rules what a kit's shipped registry must *contain*, and
-  nothing about where a kit's install entry point *lives* —
-  `kit-owned-install-recipe` is untouched and un-prejudged.
-  New gate `check-template-registry-parity` (gate-sdk), two assertions, both
-  directions, no new knob. One template line is the whole mechanical fix.
-  **Cost while deferred:** low and non-rotting, but a shipped KPI is untested by
-  the kit's own smoke, so the testing claim reads stronger than it is.
-  Surfaced 2026-08-01 by the align audit's kit SPEC-vs-code sweep; filed at
-  close from the gap inbox; promoted 2026-08-01 by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -2308,5 +2275,6 @@
 
 - queue-kit-starter-template-red
 - spec-roster-enumeration-derivation
+- kit-template-registry-completeness
 
 ## Lessons Learned

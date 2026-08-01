@@ -115,6 +115,7 @@ check-commit-msg
 check-commit-subject
 check-tree-terms
 check-template-copy-parity
+check-template-registry-parity
 ```
 <!-- gate-roster:end -->
 

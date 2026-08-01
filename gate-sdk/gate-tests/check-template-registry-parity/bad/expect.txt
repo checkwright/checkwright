@@ -1,0 +1,1 @@
+alpha-kit/templates/widgets.list does not register shipped artifact: widget-two

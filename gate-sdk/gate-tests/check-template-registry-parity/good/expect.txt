@@ -1,0 +1,1 @@
+clean (1 shipped registry template(s) in name-set parity with the sibling directory each registers; 1 .list template(s) with no such sibling skipped)

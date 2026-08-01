@@ -2234,7 +2234,12 @@ with **no** same-named file under the gates dir is silently skipped, not failed.
 An unpaired template was never vendored out and has no copy to be in parity
 with; running a template in place (this repo wires two from the template path
 itself) is a legitimate adoption mode, so failing closed there would red a tree
-for six files that are working as designed.
+for six files that are working as designed. The same principle applies one axis
+over in `check-template-registry-parity` (§check-template-registry-parity),
+which derives *its* population from layout too — so a reader arriving at either
+meets both. They do not overlap: this gate compares a template to a **consumer
+copy** of itself, that one compares a template to the **kit directory it
+registers**.
 
 **Byte parity is ruled out, on measurement**, and so is containment in either
 direction. Every executable pair diverges deliberately: the consumer copies add
@@ -2298,6 +2303,75 @@ already repaired, so `good/` proves green-on-a-sanctioned-`spec:`-prose-differen
 (alongside an unpaired template and a divergent `*-config.sh` pair, proving both
 scope exclusions) and `bad/` proves all three assertions red on a hand-edited
 copy. Tier `precommit`.
+
+### check-template-registry-parity
+
+Invariant: a kit's shipped `.list` registry template names exactly the artifacts
+of the sibling directory it registers. Two assertions, per registry: (A) every
+shipped artifact is registered — a bundled plugin absent from the template is
+red, the finding this gate landed on; and (B) every registry line resolves to a
+shipped artifact — a line naming no file is red, so a retired plugin cannot
+leave a line that installs a broken registry into every consumer. Each finding
+names the kit, the template, and the member.
+
+**A kit template that registers artifacts the kit itself ships names every one
+of them.** The consumer's *copy* is the consumer's to prune — drift-kit's
+`templates/kpis.list` header already says so — but the shipped template is the
+kit's claim about what it bundles, and the kit's SPEC roster, its README, and
+its smoke's coverage assertions are all stated over that set. A deliberate
+starter subset is refused because nothing distinguishes it from an omission: it
+is exactly what a dropped line looks like, which is how drift-kit's missing
+`kpi-queue-net-delta` line survived a shipped registry, a smoke that copies it,
+and a SPEC that named the KPI.
+
+**Scope derives from layout, never a roster** — §check-template-copy-parity's
+rule, applied one axis over. A template enters the population when
+`<kit>/templates/<name>.list` has a sibling **directory** `<kit>/<name>/`
+holding the artifacts the list registers; a `.list` with no such sibling is
+skipped-and-counted, not failed, the same silent-skip exclusion its sibling gate
+gives an unpaired template. Shipped members are the basenames of that
+directory's `*.sh` files, extension stripped, read from `git ls-files` so an
+untracked scratch file forces no registry line; registry members are the
+non-comment, non-blank lines — the `gates.list` grammar `gates_list_members`
+reads, the same grammar `drift-kit/bin/drift-report.sh` resolves its registry
+through, so the gate calls a name registered exactly when the consumer's
+resolver would.
+
+**The population predicate carries the provenance seam, and that is why it is
+structural.** The flat form of the rule — *a kit's `templates/` registry must be
+the full bundled set* — is unsafe as stated: applied to
+`drift-kit/templates/price-table.tsv` it would force a kit literal enumerating a
+model roster, which is precisely the seam (CLAUDE.md §The provenance seam). Two
+kinds of template are out of population, both by construction and in this order:
+one that is not a `.list` at all never reaches the sibling test (`price-table.tsv`
+exits there, on its extension); one that is a `.list` whose rows are consumer
+rule content the kit stubs generically — `gate-sdk/templates/msg-patterns.list`,
+whose rows are `grep -E` patterns — has no sibling directory of kit artifacts,
+because having no kit-shipped artifacts to register *is* the same fact as having
+no sibling directory of them. This is deliberately **not a per-file exception
+list**, and that is the whole point of the shape: an exception list re-arms on
+the next template of this kind, since someone must remember to extend it, and
+the failure mode of forgetting is a kit literal publishing a private vocabulary.
+
+A second structural consequence, stated so it is not read as an omission:
+`drift-kit/templates/kpi-deprecated-surface.sh` is an example plugin shipped *as
+a template* for a consumer to adapt. It is not in `drift-kit/kpis/`, so it is
+not a bundled artifact and is not required in the registry — the shipped set is
+the sibling directory's contents and nothing else.
+
+Sweep: kit roots come from `gate_kit_roots` (the `GATE_SDK_KIT_DIRS` knob —
+§Layout and configuration), the sibling roster meta-gates' shape; config adds
+**no new knob**. Positional form `check-template-registry-parity.sh [root]`
+resolves relative kit roots against a fixture tree (the case dir's
+`gate-sdk-config.sh` names the fixture kits); bare, it sweeps against the git
+toplevel. Fail-closed: a non-repo cwd with no root argument, an empty kit
+roster, an unreadable template or sibling directory, or a failed `git ls-files`
+is exit 2, never a false clean. `dir=bi` — either side going stale is the
+defect, which is what (A) and (B) split between them — tier `precommit`. The
+fixture pair synthesizes both sides at once: `good/` proves green on a registry
+in parity while carrying both structural exclusions (a `.list` with no sibling,
+and a non-`.list` template), and `bad/` proves a registry that is one-sided in
+each direction at the same time.
 
 ### templates/check-skeleton.sh
 

@@ -95,3 +95,4 @@ check-brevity
 check-settings-pins
 check-memory-off
 check-template-copy-parity
+check-template-registry-parity

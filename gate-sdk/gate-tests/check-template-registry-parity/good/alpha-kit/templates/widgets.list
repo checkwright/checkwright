@@ -1,0 +1,4 @@
+# Fixture registry — one plugin name per line, # comments (the gates.list
+# grammar). The shipped set is alpha-kit/widgets/.
+widget-one
+widget-two

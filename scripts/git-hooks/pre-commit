@@ -393,5 +393,9 @@ if staged_matches '*/templates/*.sh' 'scripts/*.sh'; then
     run_gate check-template-copy-parity gate-sdk/checks/check-template-copy-parity.sh
 fi
 
+if staged_matches 'gate-sdk/templates/*.list' 'canon-kit/templates/*.list' 'context-kit/templates/*.list' 'delegation-kit/templates/*.list' 'doctrine-kit/templates/*.list' 'drift-kit/templates/*.list' 'evidence-kit/templates/*.list' 'guard-kit/templates/*.list' 'lifecycle-kit/templates/*.list' 'queue-kit/templates/*.list' 'site-kit/templates/*.list' 'gate-sdk/*/*.sh' 'canon-kit/*/*.sh' 'context-kit/*/*.sh' 'delegation-kit/*/*.sh' 'doctrine-kit/*/*.sh' 'drift-kit/*/*.sh' 'evidence-kit/*/*.sh' 'guard-kit/*/*.sh' 'lifecycle-kit/*/*.sh' 'queue-kit/*/*.sh' 'site-kit/*/*.sh'; then
+    run_gate check-template-registry-parity gate-sdk/checks/check-template-registry-parity.sh
+fi
+
 printf 'pre-commit: %d gate(s) passed.\n' "$_ran"
 exit 0

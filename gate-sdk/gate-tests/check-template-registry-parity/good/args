@@ -1,0 +1,8 @@
+# Anchor the sweep at this case dir: gate-sdk-config.sh (auto-sourced at cwd)
+# names the synthetic kits via GATE_SDK_KIT_DIRS; their relative roots resolve
+# against the positional root. alpha-kit is the in-population case — a .list
+# template beside the directory whose artifacts it registers, in parity both
+# ways. beta-kit carries the two structural exclusions: rules.list has no
+# beta-kit/rules/ sibling (skipped-and-counted), and table.tsv is not a .list
+# at all, so it never reaches the sibling test.
+.

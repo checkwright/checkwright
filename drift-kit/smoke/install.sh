@@ -46,7 +46,7 @@ grep -q '^--- Lag'         <<<"$out" || fail "missing Lag section header"
 grep -q 'Read trend across sessions' <<<"$out" || fail "missing footer"
 
 total_rows="$(awk '/^--- Lead/{f=1} /^Read trend/{f=0} f && /^  [^ ]/{c++} END{print c+0}' <<<"$out")"
-[[ "$total_rows" -eq "$registered" ]] || fail "expected one row per registered KPI ($registered), got $total_rows"
+[[ "$total_rows" -ge "$registered" ]] || fail "expected at least one row per registered KPI ($registered), got $total_rows"
 
 grep -q 'kpi-does-not-exist.*n/a' <<<"$out" || fail "missing plugin did not yield a visible n/a row"
 

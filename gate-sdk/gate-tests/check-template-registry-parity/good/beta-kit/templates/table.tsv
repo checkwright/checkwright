@@ -1,0 +1,4 @@
+# Fixture non-.list template: schema + placeholder rows the consumer fills.
+# Excluded upstream of the sibling test by not being a .list at all.
+key	value
+placeholder	0

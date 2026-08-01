@@ -29,6 +29,7 @@ check-readme-roster
 check-reads-couples
 check-smoke-entry-guard
 check-template-copy-parity
+check-template-registry-parity
 check-test-hermetic
 check-workflow-tiering
 EOF

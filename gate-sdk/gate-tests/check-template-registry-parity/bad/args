@@ -1,0 +1,4 @@
+# Same anchoring as good/. alpha-kit's registry is one-sided in both
+# directions at once: widget-two ships and is unregistered (assertion A),
+# widget-three is registered and ships nothing (assertion B).
+.
