@@ -87,33 +87,6 @@
   producer delta; promoted at close, its cost re-read against the release it
   now rides.
 
-- **knob-rename-compat-threshold** [spec: SPEC-knob-rename-compat-threshold.md]
-  lifecycle-kit/SPEC.md's
-  knob-rename compat precedent makes a rename compat-free "before the first
-  release tag … because no external consumer can have vendored the kit yet (the
-  first tag is a launch-comms prerequisite)". The tag was a proxy for that stated
-  premise and the two have come apart: 17 tags have shipped, launch has not
-  happened, and no external install has ever been observed — so the premise still
-  holds while the threshold reads as long crossed. It misfires on the next real
-  knob rename, demanding a deprecation window that protects nobody.
-  **Both open questions, settled at promotion.** (i) The observable is the
-  project's own declared general-availability posture, not any tag — and the
-  clause splits, because it carried one threshold for two obligations: the
-  release-note *declaration* stays owed from the first tag (a tag distributes),
-  while the *shim and deprecation window* are owed only from the declared GA
-  posture (a shim is owed to a promise, not to a distribution event).
-  **`preview-release-cadence` is promoted to a ruling** — its channel declaration
-  is the observable this repo reads. (ii) It stays knob-scoped: the deprecation
-  mechanism it points at is knob-shaped, non-knob renames already route through
-  the note's Behavior-changes section so no class is uncovered, and widening it
-  is a doctrine-tier placement call **`rule-reach-before-merits`** already owns.
-  **Cost while deferred:** zero today and non-rotting, since the clause governs
-  knob renames only and none is queued — but it bites the first time one is, and
-  it bites as a **false obligation** rather than a missing one, which is the
-  harder kind to notice.
-  Surfaced 2026-07-31 at spec, escalated and ruled during
-  `pre-adoption-grammar-break`; drained from the gap inbox by close.
-
 - **docs-root-link-grammar** [spec: SPEC-docs-root-link-grammar.md]
   A hand-authored `docs/` page that
   links a path *outside* `docs/` with a bare relative link resolves on disk but
@@ -2248,5 +2221,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- knob-rename-compat-threshold
 
 ## Lessons Learned

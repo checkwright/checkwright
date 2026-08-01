@@ -239,12 +239,71 @@ the template carries no second copy. The loader validates the machine
 non-integer n-gram width, a malformed preflight entry) and exits 2 on a
 malformed config — a broken machine must not gate anything.
 
-Knob-rename compat precedent: before the first release tag a knob rename is
-compat-free — no read-the-old-name shim, no deprecation window — because no
-external consumer can have vendored the kit yet (the first tag is a
-launch-comms prerequisite). From the first tag onward a rename owes the
-queue-bound deprecation mechanism and a tightened-gates/release-note
+Knob-rename compat precedent. A rename carries two obligations of different
+natures, and each answers to its own threshold.
+
+**Declaration — owed from the first release tag, unconditionally.** A tagged
+release is a distribution, and whoever vendored it reads the note to learn what
+moved. From the first tag onward a rename owes a tightened-gates/release-note
 declaration (the deprecation-lifecycle and upgrade-path rungs).
+
+**Compat shim and deprecation window — owed from the project's declared
+general-availability posture onward, never from a tag.** While a project's own
+declared stability posture is pre-general-availability, a knob rename is
+compat-free: no read-the-old-name shim, no deprecation window, no queue-bound
+deprecation marker. The declaration is still owed, so a consumer who vendored
+early is never surprised. They are told; they are simply not carried.
+
+The observable is a declared posture rather than an adoption count, because the
+obligation is normative rather than empirical. You owe a migration path because
+you promised stability, not because you counted users. A project that has
+promised nothing owes nothing, and owes it the instant it promises, whether or
+not anyone has installed. "The first observed external install" reads the premise
+most literally and is rejected: it cannot be falsified from the tree, and it
+makes the obligation turn on a fact outside the project's control. A tag was a
+bad proxy for that same reason rather than one that merely aged — it measures
+distribution where the obligation tracks promise, so it would have drifted under
+any release history, fast or slow.
+
+**Fail-safe direction.** A project declaring no stability posture at all is
+treated as **past** the threshold: the compat obligation applies. Silence must
+not read as still-pre-GA, because that is the reading under which a project that
+never got round to declaring anything grants itself a permanent exemption. The
+window is opened by an explicit pre-GA declaration and by nothing else.
+
+The clause is knob-scoped, and the scoping is substantive rather than accidental:
+
+1. **The mechanism it points at is knob-shaped.** The deprecation path it invokes
+   is the queue-bound deprecation markers and the release note's `Renamed knobs`
+   section, whose `old → new` / `old → ∅` grammar is specific to config names. A
+   rule reaching gate names or file conventions would point at a mechanism that
+   does not accept them.
+2. **No class is left without a home.** A non-knob rename — a gate name, a file
+   or directory convention — is structurally accommodated by the release note's
+   `Behavior changes` section, whose bullet lead is defined as the changed
+   surface's name (script, knob, template, or file), a definition that already
+   admits each of those classes. What the note grammar does not yet carry is a
+   sentence explicitly *routing* non-knob renames there, so this is a sound
+   structural inference rather than an established convention. The narrow scoping
+   leaves no rename without a section shaped for it, which is all this reason
+   claims.
+3. **Widening it would restate a neighbour.** A general "any governed name" rule
+   is doctrine-tier, and that placement call belongs to doctrine rather than to a
+   kit SPEC, which would otherwise settle a doctrine question from the inside and
+   duplicate whatever lands there.
+
+No gate reads this clause, and that is a ruling rather than an omission. The
+predicate a gate would need is *"this commit renames a knob"*, which is not
+decidable from a diff without a knob-identity model no kit has; an approximation
+would fire on additions and removals alike and be valved into silence. The
+clause's reader is the build-stage session performing the rename, which reads it
+to decide whether it owes a shim and a deprecation marker.
+
+A consumer points the general-availability criterion at whatever stability
+declaration it maintains. The kit states the criterion and never the instance:
+naming one project's channel vocabulary here would ship that project's release
+posture as everyone's, and no knob is introduced to read the value either, since
+the clause's reader is a human or agent rather than a gate.
 
 - `LIFECYCLE_KIT_STAGES` — the stage roster, in order; default
   `(scope align build validate close)`.
