@@ -15,6 +15,7 @@ check-docs-cname-parity
 check-action-pinning
 check-action-run-shell
 check-action-gh-repo
+check-docs-render-fidelity
 EOF
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — the gated source of truth for the

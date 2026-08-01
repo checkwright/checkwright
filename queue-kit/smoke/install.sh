@@ -14,6 +14,9 @@ check-task-names
 check-task-conservation
 check-queue-prose-precondition
 check-roadmap-fresh
+check-queue-entry-budget
+check-queue-sections
+check-queue-slug-liveness
 EOF
 
 cp "$SMOKE_KIT_ROOT/templates/TASK-QUEUE.md" TASK-QUEUE.md

@@ -9,6 +9,8 @@ cat >> scripts/gates.list <<'EOF'
 # lifecycle-kit
 check-stage-evidence
 check-stage-entry
+check-close-surfaces
+check-merge-attrs
 EOF
 
 if [[ ! -f TASK-QUEUE.md ]]; then

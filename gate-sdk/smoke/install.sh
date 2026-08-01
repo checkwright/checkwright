@@ -18,6 +18,18 @@ check-gate-assertions
 check-graph
 check-commit-msg
 check-tree-terms
+check-assertion-strength
+check-commit-subject
+check-core-files
+check-exec-bit
+check-hook-exec-bit
+check-identity
+check-kit-enum
+check-readme-roster
+check-reads-couples
+check-smoke-entry-guard
+check-template-copy-parity
+check-test-hermetic
 EOF
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path

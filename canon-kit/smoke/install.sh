@@ -11,6 +11,21 @@ check-amendment-queue
 check-spec-dod-singleton
 check-spec-derivable-section
 check-spec-embedded-source
+check-comment-tier
+check-deprecation-task
+check-docs-cmd
+check-docs-link-convention
+check-install-claim
+check-knob-citation
+check-knob-default-coupling
+check-manifest-count
+check-manifest-temporal
+check-md-refs
+check-prose-enum
+check-prose-tells
+check-spec-fence-balance
+check-todo-task-liveness
+check-tracking-claim
 EOF
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — seed check-amendment-queue's surface (guarded; carries lifecycle-kit's inert header so the seed composes with the stage gates)

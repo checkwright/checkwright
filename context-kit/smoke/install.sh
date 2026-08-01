@@ -8,6 +8,8 @@ SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 cat >> scripts/gates.list <<'EOF'
 # context-kit
 check-brevity
+check-memory-off
+check-settings-pins
 EOF
 
 cp "$SMOKE_KIT_ROOT/templates/context-config.sh"  scripts/context-config.sh
