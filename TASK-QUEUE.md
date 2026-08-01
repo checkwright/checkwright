@@ -2167,11 +2167,4 @@
 
 ## Done
 
-- resume-journal-deletion-vs-pull-channel
-- agent-execution-backgrounding-role-scope
-- nested-dispatch-ungoverned
-- docs-renderer-batch-contract
-- gate-battery-spawn-hoists
-- lead-batching-roster-derivation
-
 ## Lessons Learned
