@@ -4,4 +4,4 @@
 
 ---
 
-— scope a76eb5f1 2026-08-01
+delegation-reach-and-gate-cost scope a76eb5f1 2026-08-01

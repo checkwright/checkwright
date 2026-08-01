@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: delegation-reach-and-gate-cost
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,79 @@
 ## New Features
 
 ## Technical Debt
+
+- **resume-journal-deletion-vs-pull-channel** — two delegation templates give the
+  resume journal contradictory lifetimes, and a resumable stage session is where
+  they collide. `lifecycle-kit/templates/lead.md` §Channel design designates the
+  journal the lead's **pull channel** — narration and findings go there so the
+  message channel carries only escalations, and the lead pulls from it for
+  detail. `delegation-kit/templates/agent-execution.md` tells the supervisor to
+  **delete** that same journal at the post-commit validation checkpoint. For a
+  one-shot delegated sweep both hold, because the agent returns and is never
+  resumed; for a stage session deliberately kept resumable under a lead, the
+  first validated commit destroys the channel the lead is supposed to keep
+  reading. Neither template owns the interaction alone, which is why the
+  deliverable is a contract resolution rather than a retiming.
+  **Live instance:** the lead deleted scope's journal after validating its first
+  two commits; scope resumed minutes later, found it gone mid-session, rewrote it
+  from context, and reported it as a suspected sandbox or `.tmp/` reliability
+  defect. Two costs, the second worse: an agent loses working state it is still
+  writing to, and a false defect signal is manufactured against `.tmp/` and
+  against **`agent-execution-backgrounding-role-scope`**.
+  **Premise re-verified at promotion, and the reach is wider than filed — three
+  files, not two.** `lead.md:132-138` states the pull channel and imports
+  delegation-kit's journal mechanics "unchanged"; `agent-execution.md:51-52` and
+  `delegation-kit/SPEC.md:132` both state the supervisor deletion, the second as a
+  SPEC section heading; and `.claude/agents/stage-session.md:56-60` mirrors the
+  deletion into this consumer's agent definition. No resumable-session exception
+  exists on any of the four. A resolution that edits two surfaces leaves two
+  stating the old rule.
+  **Candidate resolution to beat:** keep the journal for the iteration, let the
+  boundary reset sweep it, `DONE` stays the completion marker. The cleanup is
+  already mechanized rather than merely mistimed —
+  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` in `scripts/lifecycle-config.sh` is
+  `(session-role)` alone, so `enter-stage.sh`'s boundary reset already wipes
+  `.tmp/`, journals included, at the next scope entry. That lets the supervisor
+  chore be **removed** outright instead of retimed.
+  **Known cost of that candidate, stated so it is not rediscovered:** a retained
+  journal blunts the cold-read "no `DONE` = interrupted" signal. The mitigation is
+  that per-stage journal naming plus the `WORKFLOW-STATE` cursor plus `git log`
+  disambiguate a stale journal better than presence/absence does, and the boundary
+  reset bounds the ambiguity window to the current iteration.
+  Debt: a contract resolution over existing templates; adds no governed name.
+  Filed 2026-07-31 by the lead mid-iteration as two gap bullets, the second
+  sharpening the first; merged into one entry at close because they name one
+  deliverable. Promoted 2026-08-01 into `delegation-reach-and-gate-cost`
+  (operator ruling) — land it first in the delegation lane: it is the cheapest
+  member, it is the one this iteration's own sessions keep paying, and settling
+  the journal's lifetime is a precondition for
+  **`agent-execution-backgrounding-role-scope`**'s durability half.
+
+- **gate-battery-spawn-hoists** — the gate battery costs 40977ms on this tree
+  (89 gates, `.tmp/gate-timings.txt`), and about 12.0s of that is in-gate
+  `fork`/`exec` the gates re-pay per item for no benefit. This entry is the
+  mechanical half: hoist and batch the repeated spawns, changing no gate's output
+  contract and no configured name. Each gate's `good/`+`bad/` fixture pair is the
+  parity oracle, and `run-gates.sh`'s own timings file is the measurement.
+  **Measured worklist, worst first** — the numbers are read off a battery run and
+  restated nowhere; re-measure rather than trust this list if it has aged.
+  The single highest-leverage fix is hoisting `gate_kit_roots_rel` out of
+  `gate_expand_couples` (`gate-sdk/lib/gate.sh:139`): it forks roughly fourteen
+  processes per call and is called once or twice per gate per pass, so one fix
+  reaches `check-graph`, `check-reads-couples` and `gen-pre-commit.sh` at once.
+  `check-tree-terms` (`gate-sdk/checks/check-tree-terms.sh:47`) re-materialises a
+  six-line pattern file by process substitution 429 times and should cost about
+  20ms. The rest of the worklist is the same shape across `check-spec-pointer`,
+  `check-md-refs`, `check-comment-tier`, `check-trajectory-fresh`,
+  `check-docs-cmd` and `check-docs-nav-reachable`.
+  **Scope limit, deliberate:** this entry does not touch the two external-tool
+  costs (the docs renderer, ShellCheck) — the renderer is
+  **`docs-renderer-batch-contract`**, which changes a shipped knob's contract and
+  so is not mechanical, and ShellCheck is one process already.
+  Debt: converges the gates onto their existing output contracts; adds no
+  governed name. Filed and promoted 2026-08-01 by scope into
+  `delegation-reach-and-gate-cost` (operator ruling), from this session's
+  measurement of the battery.
 
 ## Deferred
 
@@ -1040,25 +1113,27 @@
   stale-measured-count bullet; costed at roughly one small unit.
 
 - **native-gate-binary-port** [design-pending] [roadmap: next/reliability] — a new gate substrate.
-  roadmap-summary: The gate battery as one native binary: no GNU userland, sub-second runs.
+  roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
   Port the battery off bash-plus-GNU-userland onto one native compiled binary
-  (Rust the lead candidate). Scale is read off `gates.list` and `*/checks`, never
-  restated here. Standing pains: Linux-only reach (stock macOS ships bash 3.2 and
-  a BSD userland per docs/install.md §Requirements, Windows is WSL-only —
-  `platform-support-ci-matrix` carries that half); a toolchain of independently
-  versioned utilities; battery wall-time trending toward minutes, mostly
-  process-spawn cost; and check source in the consumer's tree feeding the
-  source-prediction anti-pattern.
-  **Measured evidence (2026-08-01, operator-directed — evidence only; it opens no
-  work, costs nothing further, and the entry stays unpromoted).**
+  (Rust the lead candidate); scale is read off `gates.list` and `*/checks`.
+  Standing pains: Linux-only reach (docs/install.md §Requirements;
+  `platform-support-ci-matrix` carries that half); independently versioned
+  utilities; and check source in the consumer's tree feeding source-prediction.
+  **Wall-time is not among them; this entry claimed otherwise until scope
+  measured it 2026-08-01.** Battery 40977ms/89 gates: starting the 89 bash
+  processes is ~445ms (1%); in-gate spawn — the only bucket a port collapses — is
+  12039ms (29%), so a *perfect* port lands at ~29s; and half the battery
+  (20373ms) is third-party tools a port must still invoke. The in-bash route now
+  filed as **`gate-battery-spawn-hoists`** + **`docs-renderer-batch-contract`** reaches ~7-8s.
+  **Correctness evidence (2026-08-01, operator-directed).**
   `release-step-verification` produced eleven defects, sorted by whether a port
   removes them. **Four are removed:** the opt-in shell error model (a probe under
   `set +e` turned a failed `gh` call into an empty list and a zero exit, reporting
   green forever from its own data source dying); the regex dialect split (a word
   boundary in GNU grep is a backspace in POSIX awk); textual parameter expansion
   leaving artifacts in derived values; and the heaviest, hand-rolled parsers
-  standing in for real ones — the live instance being
-  `action-run-shell-yaml-anchor-fail-open`, where an anchored `run:` body goes
+  standing in for real ones — live instance
+  `action-run-shell-yaml-anchor-fail-open`, an anchored `run:` body going
   silently unlinted. A real parser handles anchors by construction, and several
   gates share that shape. **Seven survive unchanged, and they are the ceiling:**
   CI-checkout and API-pagination semantics, evidence that does not identify what
@@ -1066,28 +1141,26 @@
   resolution was needed, an ambiguous census, a SPEC claiming coverage the wiring
   lacks (`smoke-battery-workflow-gate-coverage`), and a required permission with
   no oracle (`workflow-permissions-scope-oracle`). **Consequence for scope:**
-  justify the port on *silent success* and on real parsers replacing regex
-  approximation, never on the vaguer claim that shell is error-prone; do **not**
-  sell it as closing `vacuous-assertion-count-discipline`, whose dominant class is
-  assertion *design* and ports intact. Landing the port then relaxing is the
-  failure mode to design against.
+  justify the port on *silent success* and real parsers replacing regex
+  approximation — never on speed, never on the vaguer claim that shell is
+  error-prone, and not as closing `vacuous-assertion-count-discipline`, whose
+  dominant class is assertion *design* and ports intact. Landing the port then
+  relaxing is the failure mode to design against.
   **Deliverable:** one multi-call binary (one subcommand per check), `gates.list`
-  dispatching per-entry to binary subcommand or script so the port lands cohort by
-  cohort, slowest and meta-gates first; each ported gate's `good/`+`bad/` pair is
-  the parity oracle before its script retires; consumer gates keep the shell
-  escape hatch; per-platform artifacts with checksums and publicly buildable
-  source; git the sole runtime dependency.
+  dispatching per-entry to subcommand or script so the port lands cohort by
+  cohort, slowest and meta-gates first; each gate's fixture pair is the parity
+  oracle before its script retires; consumer gates keep the shell escape hatch;
+  per-platform checksummed artifacts, buildable source, git the sole dependency.
   **Why `[design-pending]`:** the consumer-extensibility model decides everything
   else — escape hatch vs declarative check DSL vs native plugins — plus language
   choice, the dogfood question, and the trust inversion (opacity to agents is
   opacity to human adopters too, so reproducible builds and checksums are owed).
-  Distribution is the hard part, not the language: kits vendor as text with zero
-  build step (`reserve/` holds the crates.io reservation). Cost the spike apart.
-  **Cost while deferred:** every new gate adds shell to the eventual port, battery
-  duration is a per-commit tax already, and source-prediction waste recurs per
-  session. Nothing breaks — the substrate is correct on Linux and fully gated.
-  Feature-shaped at triage: it adds governed names. Filed 2026-07-28 by operator
-  request, from a session assessing the shell substrate's structural limits.
+  Distribution is the hard part, not the language: kits vendor as text, zero build
+  step. Cost the spike apart.
+  **Cost while deferred:** every new gate adds shell to the eventual port, the
+  four silent-failure classes stay reachable, and source-prediction waste recurs
+  per session. Nothing breaks — correct on Linux and fully gated. Feature-shaped:
+  it adds governed names. Filed 2026-07-28 by operator request.
 
 - **state-representation-integrity** [design-pending] — repo state lives in text
   files whose invariants — slug uniqueness, cross-entry `blocked-by` and `spec`
@@ -1410,45 +1483,50 @@
 - **agent-execution-backgrounding-role-scope** [design-pending] — the
   agent-execution protocol's backgrounding rule is stated for the **supervisor**
   role and misreads as licence when a sub-agent loads the same doc.
-  `delegation-kit/templates/agent-execution.md` says to always dispatch in the
-  background and wait for the completion notification — correct and load-bearing
-  for a dispatching supervisor, but a stage session reads the same always-loaded
+  `delegation-kit/templates/agent-execution.md:18-20` says to always dispatch in
+  the background and wait for the completion notification — load-bearing for a
+  dispatching supervisor, but a stage session reads the same always-loaded
   protocol, and "always background" generalizes wrongly to its own long-running
-  work.
-  Observed 2026-07-31 at validate: the session launched the whole validate suite in
-  the background, ended its turn to report progress, and its background child died
-  with it — the stage returned control with an entry stamp and no results, and the
-  suite was re-run from scratch. Silent the same way the rest of this iteration's
-  defects were: nothing reddens, the session reports in good faith, and missing
-  evidence looks like pending evidence.
+  work. Premise re-verified 2026-08-01: the rule still carries no role qualifier.
+  Observed 2026-07-31 at validate: the session backgrounded the whole validate
+  suite, ended its turn to report progress, and its child died with it — an entry
+  stamp, no results, the suite re-run from scratch. Silent: nothing reddens, the
+  session reports in good faith, and missing evidence looks like pending evidence.
   **Second instance — the resume journal does not reach a search sub-agent.** The
   protocol's resume-journal mechanics are written for a dispatched *stage* agent:
   the agent writes, the supervisor deletes. An Explore-class read-only child
   journals nothing, so its findings exist only as a return value in its parent's
-  context and are un-resumable by construction. Observed 2026-07-31 at this close,
-  which dispatched two audit sweeps and then hit the session wall; both had already
-  returned, which was luck rather than design — had the wall landed mid-sweep the
-  audit work would have been lost with no record that it ran, and the resuming
-  session would have had no way to know it was owed. Deliverable for this half:
-  the protocol states that findings a parent will act on are committed or
-  journaled before the parent proceeds on them.
+  context and are un-resumable by construction. Observed 2026-07-31 at close,
+  which dispatched two audit sweeps then hit the session wall; both had already
+  returned, which was luck — had the wall landed mid-sweep the audit work would
+  have been lost with no record that it ran. Deliverable for this half: the
+  protocol states that findings a parent will act on are committed or journaled
+  before the parent proceeds on them.
+  **Conflict this half must resolve, found 2026-08-01 by scope.**
+  `agent-execution.md:58-66` already rules the opposite for exactly this case —
+  for a **read-only fan-out** the return value *is* the contract, because a
+  backgrounded agent's sandbox may block the journal write. `git log -S` dates
+  that caveat to `b340246`, 2026-07-05, three weeks before the incident above: an
+  independent ruling to overturn on evidence, not debris from the false signal
+  **`resume-journal-deletion-vs-pull-channel`** describes.
+  **Mechanical constraint on any role-scoping pass:**
+  `delegation-kit/checks/check-rule-citation.sh` resolves each SPEC citation
+  forward into a template bullet's bold lead-in verbatim. Role scoping is free in
+  bullet bodies; folding a role marker into a lead-in renames the rule and drags
+  the delegation-kit/SPEC.md citations into the same commit.
   **Why `[design-pending]`, and why the slug is narrower than the unit:** both
   halves are one defect — a shipped always-loaded protocol states its rules for
   the dispatching role and leaves the sub-agent role unstated — so the fix is one
-  role-scoping pass, not two patches, and a consumer should read a coherent
-  protocol rather than two amendments to it. The open call is the same for both:
-  scope each rule to the dispatching role explicitly and add its sub-agent
-  counterpart (*work you must report on is awaited in the foreground, however
-  long; detaching it discards it when your turn ends*; *findings you will act on
-  are made durable before you act*), or state each once in role-neutral terms
-  surviving both readings. The slug names the first instance only, because it was
-  filed first and a deferred slug is conserved rather than renamed.
-  An instance of `rule-reach-before-merits`' first form, filed separately from it
-  because the doc defect is concrete and its own.
+  role-scoping pass, not two patches. The open call is the same for both: scope
+  each rule to the dispatching role and add its sub-agent counterpart (*work you
+  must report on is awaited in the foreground, however long; detaching it
+  discards it when your turn ends*; *findings you will act on are made durable
+  before you act*), or state each once in role-neutral terms surviving both
+  readings. The slug names the first instance only; a deferred slug is conserved.
+  An instance of `rule-reach-before-merits`' first form; the defect is its own.
   **Cost while deferred:** low in tree terms, non-rotting, but it recurs per stage
-  session running a long oracle — which is validate every iteration — and each
-  instance costs a full suite run rather than a wrong answer; the second half
-  costs a whole sweep, silently, whenever a parent dies mid-fan-out.
+  session running a long oracle — validate, every iteration — at a full suite run
+  each; the second half costs a whole sweep when a parent dies mid-fan-out.
   Surfaced 2026-07-31 at validate; second half 2026-07-31 at close, from its own
   termination. Drained from the gap inbox by close.
 
@@ -1558,12 +1636,24 @@
   audit children drawing heavily against the same five-hour pool, with nothing
   re-checking between that verdict and the wall the session hit. A per-dispatch
   guard therefore under-measures **precisely the dispatches that cost most**: the
-  ones that fan out.
-  **(b) Tier.** The lead's ruling-config tiers what the *lead* dispatches — a
-  cheaper tier for the mechanical stage, per-batch tiering where a stage's batches
-  differ — and says nothing about what a stage session's own sub-agents run on.
-  Close inherited the judgment tier and its two audit sweeps inherited it in turn,
-  so read-heavy mechanical work ran at the most expensive tier available.
+  ones that fan out. Re-verified 2026-08-01: `scripts/agent-budget-guard.sh` is
+  eighteen stateless lines wired once at `.claude/settings.json:146-154` — no
+  depth counter, no re-arm, and no inheritance into the dispatched session.
+  **(b) Tier — premise corrected 2026-08-01 by the scope survey, and the
+  deliverable is cheaper than filed.** As filed, this half said the tier rule
+  says nothing about what a stage session's own sub-agents run on. True of the
+  *ruling config* (`.claude/commands/lead.md:5-27` filling
+  `lifecycle-kit/templates/lead.md:155-157`), false of the protocol:
+  `delegation-kit/templates/agent-execution.md:104-117` already states it
+  role-neutrally — *"Match the dispatched model and effort to the unit's shape …
+  Selection sits with the dispatching session"* — and *the dispatching session*
+  reaches a stage session dispatching its own children. So the rule **reached and
+  went unapplied**, because the harness default inherits the parent's model:
+  doing nothing silently picks the most expensive tier available. Close inherited
+  the judgment tier and its two audit sweeps inherited it in turn. The deliverable
+  is therefore *make the existing role-neutral rule bite against a silently
+  inheriting default* — a re-arm, or a cheaper default for the read-only class —
+  not a new nested tier rule.
   **Why one unit:** both are a rule that stops reaching rather than reddening at
   the same layer boundary, and both admit the same two candidate shapes — re-arm
   or re-state the rule *inside* the stage session before its own dispatches, or
@@ -1727,48 +1817,34 @@
   next scope entry from the post-close gap inbox, its premise falsified against
   `check-graph`'s source in the same pass.
 
-- **resume-journal-deletion-vs-pull-channel** [design-pending] — two delegation
-  templates give the resume journal contradictory lifetimes, and a resumable
-  stage session is where they collide. `lifecycle-kit/templates/lead.md`
-  §Channel design designates the journal the lead's **pull channel** —
-  narration and findings go there so the message channel carries only
-  escalations, and the lead pulls from it for detail.
-  `delegation-kit/templates/agent-execution.md` tells the supervisor to
-  **delete** that same journal at the post-commit validation checkpoint. For a
-  one-shot delegated sweep both hold, because the agent returns and is never
-  resumed; for a stage session deliberately kept resumable under a lead, the
-  first validated commit destroys the channel the lead is supposed to keep
-  reading. Neither template owns the interaction alone, which is why the
-  deliverable is a contract resolution rather than a retiming.
-  **Live instance this iteration.** The lead deleted scope's journal after
-  validating its first two commits; scope resumed minutes later, found it gone
-  mid-session, rewrote it from context, and reported it as a suspected sandbox
-  or `.tmp/` reliability defect. Two costs, the second worse: an agent loses
-  working state it is still writing to, and a false defect signal is
-  manufactured against `.tmp/` and against
-  `agent-execution-backgrounding-role-scope`.
-  **Candidate resolution to beat:** keep the journal for the iteration, let the
-  boundary reset sweep it, `DONE` stays the completion marker. The cleanup is
-  already mechanized rather than merely mistimed —
-  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` in `scripts/lifecycle-config.sh` is
-  `(session-role)` alone, so `enter-stage.sh`'s boundary reset already wipes
-  `.tmp/`, journals included, at the next scope entry. That lets the supervisor
-  chore be **removed** outright instead of retimed.
-  **Known cost of that candidate, stated so it is not rediscovered:** a retained
-  journal blunts the cold-read "no `DONE` = interrupted" signal. The mitigation
-  is that per-stage journal naming plus the `WORKFLOW-STATE` cursor plus
-  `git log` disambiguate a stale journal better than presence/absence does, and
-  the boundary reset bounds the ambiguity window to the current iteration.
-  **Why `[design-pending]`:** which template states the resolved rule, and
-  whether the deletion step is retimed or deleted outright, is the open call —
-  the rule reaches two templates in two kits and one of them is a kit contract.
-  **Cost while deferred:** every lead-run iteration repeats it, and the
-  resulting false signals accrete against the wrong surfaces.
-  Debt: a contract resolution over two existing templates; adds no governed
-  name.
-  Filed 2026-07-31 by the lead mid-iteration as two gap bullets, the second
-  sharpening the first; merged into one entry at close because they name one
-  deliverable.
+- **docs-renderer-batch-contract** [design-pending] — `SITE_KIT_RENDERER` is
+  specified as a **stdin→stdout single-document** command
+  (site-kit/SPEC.md §Layout and configuration), so
+  `check-docs-render-fidelity` starts one renderer process per tracked page.
+  That shape, not the rendering, is the whole cost: measured on this tree, 68
+  pages through 68 fresh interpreters take 14080ms, the same pages through one
+  interpreter take 448ms, and the gate's entire bash/awk fan-out is 288ms. The
+  gate is 14551ms of a 40977ms battery — **the single largest line in it, and
+  97% of that line is interpreter restarts**.
+  **Deliverable:** a batch renderer contract, so the oracle stays the real Pages
+  parser (the gate's whole point — a reimplementation would assert nothing) while
+  the process starts collapse to one.
+  **Why `[design-pending]`, and why this is not folded into
+  **`gate-battery-spawn-hoists`**:** it changes a shipped, documented consumer
+  knob, and the seam is the design. A batch command must frame N documents over
+  one stream, which means a delimiter convention a consumer's own renderer has to
+  honour; the alternatives are a second optional knob beside the existing one
+  (per-document stays the fallback, so no consumer breaks) or a content-hash
+  cache that keeps the contract untouched and pays only on changed pages. Those
+  three differ in what they oblige a consumer to implement, which is a
+  provenance-seam call, not an implementation choice.
+  **Cost while deferred:** paid per battery run and per docs commit — the gate is
+  `tier=precommit` and coupled to `docs/*.md`, so every documentation commit pays
+  about fourteen seconds before it lands, and the tax grows linearly with the
+  docs tree. Nothing rots; the gate is correct, only slow.
+  Feature-shaped at triage: it changes a governed knob's contract. Filed
+  2026-08-01 by scope from its own measurement of the battery, alongside the
+  mechanical half promoted to Technical Debt.
 
 - **post-immutability-machine-read-carveout** [design-pending] — the post
   immutability rule and the machine-readable-note rule are stated on two pages
