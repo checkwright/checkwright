@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,.workflow/CHECK-GRAPH.html,docs/check-graph.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
+# graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,scripts/CHECK-GRAPH.html,docs/check-graph.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
 set -uo pipefail
 
@@ -9,7 +9,6 @@ source "$SDK/lib/gate.sh"
 
 GATES_DIR="$(gate_sdk_gates_dir)"
 LIST="$GATES_DIR/gates.list"
-WORKFLOW_DIR="${GATE_SDK_WORKFLOW_DIR:-.workflow}"
 HOOK="${GATE_SDK_HOOKS_DIR:-$GATES_DIR/git-hooks}/pre-commit"
 GEN="$SDK/bin/gen-pre-commit.sh"
 
@@ -95,7 +94,7 @@ resolve_member() {
 
 emit_graph() {
     local checks
-    local resolved_artifact="${GATE_SDK_GRAPH_ARTIFACT:-$WORKFLOW_DIR/CHECK-GRAPH.html}"
+    local resolved_artifact="${GATE_SDK_GRAPH_ARTIFACT:-$GATES_DIR/CHECK-GRAPH.html}"
     mapfile -t checks < <(gates_list_members "$LIST" | sort -u)
     declare -A C_COUPLES C_DIR C_VALVE NODE_SEEN
     local c src man kv couples dir valve s
@@ -586,9 +585,9 @@ if [[ "$has_msg_gate" -eq 1 ]]; then
 fi
 
 # assertion E: the coupling-graph artifact matches --emit; its path is the
-# GATE_SDK_GRAPH_ARTIFACT knob (workflow-dir default), so a consumer that
+# GATE_SDK_GRAPH_ARTIFACT knob (gates-dir default), so a consumer that
 # republishes the artifact elsewhere gets its own path in every remedy line
-ARTIFACT="${GATE_SDK_GRAPH_ARTIFACT:-$WORKFLOW_DIR/CHECK-GRAPH.html}"
+ARTIFACT="${GATE_SDK_GRAPH_ARTIFACT:-$GATES_DIR/CHECK-GRAPH.html}"
 ARTIFACT_DIR="$(dirname "$ARTIFACT")"
 emitted="$(emit_graph)"
 if [[ ! -f "$ARTIFACT" ]]; then

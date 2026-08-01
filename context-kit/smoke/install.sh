@@ -37,7 +37,7 @@ qtpl="$SMOKE_KIT_ROOT/../queue-kit/templates/TASK-QUEUE.md"
 [[ -f TASK-QUEUE.md || ! -f "$qtpl" ]] || cp "$qtpl" TASK-QUEUE.md
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
-bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
+bash "$SDK/checks/check-graph.sh" --emit > scripts/CHECK-GRAPH.html
 
 hook_out="$(bash scripts/session-context.sh 2>/dev/null)"; rc=$?
 if [[ "$rc" -ne 0 ]]; then

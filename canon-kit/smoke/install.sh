@@ -51,4 +51,4 @@ EOF
 fi
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
-bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
+bash "$SDK/checks/check-graph.sh" --emit > scripts/CHECK-GRAPH.html

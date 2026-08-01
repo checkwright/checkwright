@@ -83,7 +83,7 @@ if staged_matches 'gate-sdk/smoke/*.sh' 'canon-kit/smoke/*.sh' 'context-kit/smok
     run_gate check-assertion-strength gate-sdk/checks/check-assertion-strength.sh
 fi
 
-if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/git-hooks/pre-commit' '.workflow/CHECK-GRAPH.html' 'docs/check-graph.html' 'SPEC-*.md' '*/SPEC-*.md'; then
+if staged_matches 'scripts/gates.list' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh' 'scripts/git-hooks/pre-commit' 'scripts/CHECK-GRAPH.html' 'docs/check-graph.html' 'SPEC-*.md' '*/SPEC-*.md'; then
     run_gate check-graph gate-sdk/checks/check-graph.sh
 fi
 

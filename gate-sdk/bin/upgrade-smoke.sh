@@ -83,7 +83,7 @@ for r in "${fromroots[@]}"; do kitname_seen["$(basename "$r")"]=1; done
 
 ( cd "$CONS" && bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null ) \
     || { echo "upgrade-smoke: phase A gen-pre-commit failed at TO ($TO)" >&2; exit 2; }
-( cd "$CONS" && bash gate-sdk/checks/check-graph.sh --emit > .workflow/CHECK-GRAPH.html ) \
+( cd "$CONS" && bash gate-sdk/checks/check-graph.sh --emit > scripts/CHECK-GRAPH.html ) \
     || { echo "upgrade-smoke: phase A check-graph --emit failed at TO ($TO)" >&2; exit 2; }
 if [[ -f "$CONS/doctrine-kit/bin/install-doctrine.sh" ]]; then
     ( cd "$CONS" && bash doctrine-kit/bin/install-doctrine.sh >/dev/null ) \
@@ -96,7 +96,7 @@ stray=()
 while IFS= read -r p; do
     [[ -n "$p" ]] || continue
     case "$p" in
-        scripts/git-hooks/pre-commit|.workflow/CHECK-GRAPH.html|CLAUDE.md) continue ;;
+        scripts/git-hooks/pre-commit|scripts/CHECK-GRAPH.html|CLAUDE.md) continue ;;
     esac
     top="${p%%/*}"
     [[ -n "${kitname_seen[$top]:-}" ]] || stray+=("$p")

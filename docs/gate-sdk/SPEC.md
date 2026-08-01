@@ -55,7 +55,7 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
 `.workflow`; the directory's two-tier membership rule, header form, and
 extension rule are §The workflow directory), `GATE_SDK_GRAPH_ARTIFACT` (default
-`<workflow-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
+`<gates-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
 e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
 (default unset = quiet green; any non-empty value restores the full per-gate
@@ -554,6 +554,16 @@ probes green gets registered, which moves it out of the probe set and into the
 battery, where it was going to run anyway — 36 of those 41 disposition exactly
 that way, which is why the hand-declared count stays small even though the
 derivation's share of the sweep is a minority.
+
+**Not derived from the README roster.** The kit's `<!-- gate-roster:begin -->`
+block already carries full `checks/` parity (`check-readme-roster`) and
+per-gate annotations naming each gate's subject surface, so deriving
+`smoke/install.sh`'s registration from it would unify the roster and its
+reasons on paper. Declined on a boundary, not on merit: it would turn
+`smoke/install.sh` from an executable install recipe into a derivation over a
+doc, which is what `kit-owned-install-recipe` (open, design-pending) asks
+whether a kit's install-time roster should look like at all — deciding that
+shape from inside this contract would pre-empt it sideways.
 
 **The declaration valve.** Where a kit author judges an exit-0 or exit-1 omission
 legitimate — a vacuous pass that is not real coverage is the honest case — that
@@ -1270,7 +1280,7 @@ the check derives its guarantees — each `couples=` surface is covered by the
 gate's `trigger=` globs (trigger defaulting to couples), so editing a coupled
 surface always fires the gate; and the committed pre-commit hook, the commit-msg
 hook (when any gate is `tier=commit-msg`), and the coupling-graph projection at
-`GATE_SDK_GRAPH_ARTIFACT` (default `<workflow-dir>/CHECK-GRAPH.html`) each equal
+`GATE_SDK_GRAPH_ARTIFACT` (default `<gates-dir>/CHECK-GRAPH.html`) each equal
 their generator's `--emit` output, down to every emitted asset href resolving
 under the artifact's own directory. The remedy lines print the resolved artifact
 path, so a consumer that republishes it (this repo serves `docs/check-graph.html`)
@@ -1283,7 +1293,7 @@ parity re-fires through the normal registry path once the gate lands.
 Dual-couple manifest: the artifact path is a knob, but check-graph's own
 `# graph:` manifest is kit-shipped static text a consumer never edits, so it
 cannot read the knob. It lists **both** artifact homes as couples — the
-workflow-dir default and `docs/check-graph.html` — so the generated hook
+gates-dir default and `docs/check-graph.html` — so the generated hook
 re-fires on whichever a consumer publishes to. For a default consumer the docs
 path is simply an inert trigger pattern that never stages; couples↔trigger
 parity holds because the hook derives from the same manifest.

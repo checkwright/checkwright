@@ -30,6 +30,7 @@ check-reads-couples
 check-smoke-entry-guard
 check-template-copy-parity
 check-test-hermetic
+check-workflow-tiering
 EOF
 
 # smoke-unregistered: check-root-tiering — its subject is the consumer-curated root manifest GATE_SDK_ROOT_ALLOWLIST (default scripts/root-allowlist.list), which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
@@ -38,7 +39,7 @@ EOF
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
-bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
+bash "$SDK/checks/check-graph.sh" --emit > scripts/CHECK-GRAPH.html
 
 # spec: gate-sdk/SPEC.md §run-gates — quiet green, loud red: green is one summary line, red prints verbatim, GATE_SDK_VERBOSE restores the banner roll
 q="$PWD/.tmp/quiet-smoke"
