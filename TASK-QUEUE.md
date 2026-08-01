@@ -2204,6 +2204,117 @@
   without an oracle re-arms.
   Filed 2026-08-01 at close, as the gap generalization for the inline fix.
 
+- **price-table-roster-coverage-oracle** [design-pending] — **the missing check
+  class behind a price-table row that was absent for roughly ten iterations.**
+  The instance is fixed: the consumer price table carried no row for the model
+  class every stage but `validate` had ridden since the
+  `supply-chain-trust-baseline` iteration, so every Opus stage row and every
+  supervision row across that span priced to `cost=n/a`; the row was
+  transcribed and the rows re-priced at this close. The meter degraded exactly
+  as specified (drift-kit/SPEC.md §The stage-economics meter, the
+  incomplete-pricing caveat) and reported the caveat, so nothing was ever wrong
+  with the tool — the table was stale in a dimension its freshness KPI cannot
+  see. `kpi-price-table-age` reads only the two dating headers and never a row
+  (drift-kit/SPEC.md §Bundled KPIs), so a table whose `priced-as-of:` and
+  `prices-valid-through:` are both current reads healthy while the roster
+  underneath it has fallen behind the models actually running. **Nothing reds
+  the next one** — that is the whole of what remains here.
+  **Missing check class:** an assertion that every model id appearing in the
+  trend log has a row in the price table. The oracle question is where the
+  observed roster is read *from*: the trend log lives under the gitignored
+  `DRIFT_KIT_METRIC_DIR`, so a gate cannot read it on a fresh clone or in CI,
+  and the transcripts it derives from are outside the tree entirely. That
+  pushes the check toward a KPI (advisory, runs where the metric dir exists)
+  rather than a gate — which is a placement ruling, not a scan.
+  **Why `[design-pending]`:** the seam. A kit literal enumerating model ids
+  would publish the consumer's model roster, the same provenance boundary that
+  made the price table consumer config in the first place, so the check must
+  derive the roster from consumer-side data and can assert nothing about which
+  models *should* appear. Whether that is a drift-kit KPI beside
+  `kpi-price-table-age`, an assertion inside the meter's own run, or a third
+  dating header naming the priced roster is the open question.
+  **Cost while deferred:** low *now* and re-arming. With the row transcribed the
+  cost column is live again, so the carrying cost is no longer the blank field —
+  it is that the next roster churn reproduces the same ten-iteration blind spot,
+  and the churn is not under this repo's control. The detector in the meantime
+  is a session noticing `cost=n/a` in a report, which is exactly how this one
+  was found: late, and only because someone read the output closely.
+  Surfaced 2026-08-01 by the `/economics` run at close, whose entire Opus-side
+  cost column degraded; the row landed the same session, and the entry was
+  re-scoped from the instance to the oracle it still owes.
+
+- **economics-posture-binding-stale** [design-pending] — the `/economics`
+  consumer shim binds its posture slot by **restating** the model posture
+  ("every stage rides Opus") rather than citing the surface that owns it. That
+  ruling has since moved: the lead shim now records a **Split** posture —
+  `validate` dispatched with a `sonnet` override, `build` tiered per batch, the
+  remaining stages on the Opus default — and the measured rows confirm the tree
+  runs the split, not the restatement. So the report's verdict slot asks the
+  reader to judge a posture the repo no longer runs, and the reader has to
+  notice the contradiction from the data to avoid answering the wrong question.
+  This is a de-literalization defect in a consumer binding: the binding's job is
+  to name *where* the ruling lives so the report reads it live, and a binding
+  that inlines the ruling's content is a second copy that drifts silently.
+  Rewriting this one binding is mechanical; the class is what needs a design.
+  **Missing check class:** an assertion that no consumer command shim restates a
+  ruling another shim owns. Both shims are `.claude/commands/*.md` binding
+  blocks, so the surface is small and already in the tree, but the predicate
+  ("restates" versus "cites") is not mechanically decidable in general — the
+  tractable form is narrower, something like: a binding whose prose names
+  another shim as the owner must not also assert that ruling's content.
+  **Why `[design-pending]`:** the decidable predicate is the work. A binding
+  legitimately summarizes to give the template a usable slot value, so a check
+  that reds on any overlap would red on correct bindings; one that reds only on
+  exact restatement would have missed this instance, since the drift was a
+  *changed* ruling rather than a copied sentence. Whether the durable fix is a
+  check at all — versus a rule that a binding slot may only carry a pointer,
+  enforced by the template's own slot grammar — is the open question, and it
+  reaches lifecycle-kit's binding contract, not just this repo's shims.
+  **Cost while deferred:** low per instance but silent, which is the bad shape.
+  Nothing reds; the report simply answers a stale question, and the staleness is
+  visible only to a reader who cross-checks the binding against the live ruling.
+  It re-arms on every posture change, and posture is re-judged whenever the
+  harness model roster churns.
+  Surfaced 2026-08-01 by the `/economics` run at close, when the priced rows
+  contradicted the posture the binding named; filed from the gap inbox.
+
+- **align-context-draw-growth** [design-pending] — **align's cache-read draw has
+  roughly doubled across the ten iterations of the current model era** (the
+  trend is in `.metric/stage-economics-log.txt`; figures are read from there,
+  not restated here), making it the second-largest `cr` draw in a recent
+  iteration behind build. The **tier** question this started as is settled and
+  is not what remains: align now rides the cheaper tier by the ruling recorded
+  in `.claude/commands/lead.md`, taken on its work class — verification against
+  an already-authored contract — with the spend only saying the tier was worth
+  re-judging. What that ruling does **not** answer is why a stage whose output
+  is a plan is reading more context every iteration.
+  **The hypothesis:** align is carrying context its work does not need. If so
+  the fix is context shaping — what the stage loads at entry, and whether its
+  batches reset — and that saving is available **at either tier**, so the
+  tier-down banked a fraction of it rather than resolving it.
+  **Why `[design-pending]`:** nothing yet distinguishes the two readings, and
+  they call for opposite work. Growth could be **load-side** (the stage's
+  always-loaded set and skill body have grown, so every align session starts
+  heavier) or **work-side** (align legitimately audits more surface as the tree
+  grows, and the draw is honest). The first is a context-budget defect worth
+  fixing; the second is the cost of a bigger repo and should be left alone.
+  Telling them apart needs the entry draw separated from the accumulated draw —
+  a measurement the meter does not currently make, since it sums a session
+  rather than profiling it.
+  **The tier-down makes this harder to see, deliberately noted:** a cheaper
+  per-token rate makes a growing draw read flat in dollars, so this trend must
+  be judged on the `cr` column and never on `cost`. The ruling in the lead
+  binding carries that watch condition; this entry is its backlog half.
+  **Cost while deferred:** low and slow-rotting — the draw grows a few million
+  cache-read tokens per iteration, which the tier-down now prices at a fifth of
+  what it did. The real carry is diagnostic, not monetary: the longer the trend
+  runs unexplained, the harder it is to tell a load-side regression from
+  ordinary repo growth, because there is no clean earlier baseline to compare
+  against once both have moved.
+  Surfaced 2026-08-01 by the `/economics` run at close as the competing
+  hypothesis behind an align tier question; the tier half was ruled the same
+  session and this entry re-scoped to the half that is still open.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no

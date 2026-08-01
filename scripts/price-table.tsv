@@ -2,7 +2,7 @@
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
 # One row per model id as it appears in a transcript's message.model.
 #
-# priced-as-of: 2026-07-20 — transcribed from the published Anthropic model-pricing
+# priced-as-of: 2026-08-01 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
 # so nothing but this date says when it was last checked; re-verify against the
 # published table when kpi-price-table-age raises it.
@@ -24,8 +24,15 @@
 # That moves the Opus:Sonnet ratio from 2.5x to ~1.67x on every column — any tier
 # comparison run after that date against these numbers overstates the saving.
 #
+# KNOWN UNDERCOUNT: fast mode bills the same model id at a different rate — Opus 5 at
+# speed=fast is 10 / 50 per MTok, double the standard row below. The meter keys a price
+# on the model id alone and cannot see the speed field, so any fast-mode turn prices at
+# the standard rate and the reported cost is a floor. There is one row per model id by
+# construction, so this is a stated limit rather than a second row.
+#
 # model	input	output	cache_read	cache_creation
 claude-fable-5	0.00001	0.00005	0.000001	0.00002
+claude-opus-5	0.000005	0.000025	0.0000005	0.00001
 claude-opus-4-8	0.000005	0.000025	0.0000005	0.00001
 claude-sonnet-5	0.000002	0.00001	0.0000002	0.000004
 claude-haiku-4-5	0.000001	0.000005	0.0000001	0.000002
