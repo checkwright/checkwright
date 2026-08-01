@@ -12,6 +12,162 @@
 
 ## New Features
 
+- **preview-release-cadence** [spec: SPEC-preview-release-cadence.md] [roadmap: next/adoption]
+  roadmap-summary: A declared preview channel and a slower, calmer release cadence.
+  A preview channel. Reset release signaling for a
+  pre-1.0 audience: declare a preview/alpha channel, batch internal
+  iterations into a slower external cadence (weekly-class) so consumers stop
+  reading thirteen-releases-in-nine-days as churn, publish
+  checksum-verifiable release assets instead of bare tag pointers, and keep
+  a 30-second human changelog beside the migration detail. Separates
+  internal iteration completion from public version publication — a
+  RELEASING.md policy change more than a mechanism.
+  **Premise corrected 2026-07-25 by the undirected scope survey, re-counted
+  2026-07-26 and again 2026-07-27 — the count is larger than filed and the
+  rhythm held.** This entry says "thirteen-releases-in-nine-days"; the tree now
+  carries **17 tags in 14 days**, `v0.1.0` (2026-07-14) through `v0.17.0`
+  (2026-07-27). The finding is not a one-off burst that has since settled — the
+  cadence continued at roughly a release a day across the whole window, and the
+  count has risen at every re-read (13 → 14 → 15 → 17), which strengthens rather
+  than dates the signaling argument.
+  **The inherited checksum-verifiable-asset deliverable is SATISFIED — corrected
+  2026-07-27 by scope.** This entry absorbed `supply-chain-trust-baseline`'s
+  carved-out "publish checksum-verifiable release assets instead of bare tag
+  pointers" (2026-07-25, operator-approved) on the ground that the convention
+  should land with the cadence it depends on. `release-tarball-delivery-channel`
+  shipped it independently: `v0.17.0` is the first release carrying assets —
+  `checkwright-0.17.0.tgz` beside its `.sha256` — where `v0.16.0` carried none.
+  The deliverable is struck; what this entry still owns is the **signaling** half
+  alone (a declared preview channel, a slower external cadence batching internal
+  iterations, and a 30-second human changelog beside the migration detail). The
+  residual integrity question — that a checksum sharing one origin with its
+  tarball proves transfer integrity only — is `tarball-build-attestation`'s, not
+  this entry's.
+  **Cost while deferred:** zero pre-announcement; at announcement the
+  release history itself signals instability to exactly the risk-averse
+  teams the trust story targets. The inherited checksummed-asset gap no longer
+  contributes — it is closed, per the correction above.
+  Surfaced 2026-07-23 in the same external review (its release-signaling
+  finding).
+
+- **tightened-gates-declaration-note-parity** [spec: SPEC-tightened-gates-note-parity.md]
+  Nothing asserts
+  that a release note's composed Tightened-gates set equals the
+  `.workflow/tightened-gates.txt` declaration surface it was composed from.
+  `upgrade-smoke-note-resolution` made build append declared gate names to that
+  tracked record and close transcribe them into the note's bullets and drain the
+  file, both **by hand**, so a dropped or added name between the two surfaces is
+  caught only by review — which is exactly what RELEASING.md step 1 states as
+  its honest limit.
+  Both sides are machine-readable by construction: bare names one per line on
+  the surface, backticked unbolded bullet lead tokens in the note under
+  `release-note-lead-token-grammar`'s canonical spelling, with
+  `check-tightened-gates-grammar`'s parser already extracting the note side. So
+  the parity assertion is mechanical, and the parser it needs already ships.
+  **The open call, settled at promotion.** It was posed as "the assertion only
+  holds at the release commit", and that framing was too coarse: the release
+  choreography is two commits, not one — the note is authored in one and the
+  surface drained in the next — so both sides are non-empty and comparable in the
+  gap between them. The amendment binds there, arming on "the newest note's
+  version carries no tag yet" and disarming on its own once tagged.
+  **Cost while deferred — now realized, not hypothetical.** The filing costed
+  this as "low until the first release that ships a non-empty declared set".
+  That release is `v0.19.0`, composed this close from a one-name surface, so the
+  window is open from here on. A transcription slip either licenses an
+  undeclared red or declares a gate that never tightened, and the upgrade smoke
+  reads the note rather than the surface, so it cannot catch either.
+  **Litmus corrected at promotion (2026-08-01, spec).** The entry carried a
+  `Debt:` line reading "one gate plus its fixture pair over two existing
+  surfaces". That is the *size*, not the class: a new gate adds a script name and
+  a `scripts/gates.list` registration, and canon-kit's new-names litmus makes any
+  task adding a name to a governed surface a feature "however small the diff".
+  It promotes as a feature with an amendment, and the sibling entries proposing
+  gates carry the same misfiling for a later scope to correct on the same ground.
+  Filed 2026-07-31 at spec from the honest limit stated in the amendment's
+  producer delta; promoted at close, its cost re-read against the release it
+  now rides.
+
+- **knob-rename-compat-threshold** [spec: SPEC-knob-rename-compat-threshold.md]
+  lifecycle-kit/SPEC.md's
+  knob-rename compat precedent makes a rename compat-free "before the first
+  release tag … because no external consumer can have vendored the kit yet (the
+  first tag is a launch-comms prerequisite)". The tag was a proxy for that stated
+  premise and the two have come apart: 17 tags have shipped, launch has not
+  happened, and no external install has ever been observed — so the premise still
+  holds while the threshold reads as long crossed. It misfires on the next real
+  knob rename, demanding a deprecation window that protects nobody.
+  **Both open questions, settled at promotion.** (i) The observable is the
+  project's own declared general-availability posture, not any tag — and the
+  clause splits, because it carried one threshold for two obligations: the
+  release-note *declaration* stays owed from the first tag (a tag distributes),
+  while the *shim and deprecation window* are owed only from the declared GA
+  posture (a shim is owed to a promise, not to a distribution event).
+  **`preview-release-cadence` is promoted to a ruling** — its channel declaration
+  is the observable this repo reads. (ii) It stays knob-scoped: the deprecation
+  mechanism it points at is knob-shaped, non-knob renames already route through
+  the note's Behavior-changes section so no class is uncovered, and widening it
+  is a doctrine-tier placement call **`rule-reach-before-merits`** already owns.
+  **Cost while deferred:** zero today and non-rotting, since the clause governs
+  knob renames only and none is queued — but it bites the first time one is, and
+  it bites as a **false obligation** rather than a missing one, which is the
+  harder kind to notice.
+  Surfaced 2026-07-31 at spec, escalated and ruled during
+  `pre-adoption-grammar-break`; drained from the gap inbox by close.
+
+- **docs-root-link-grammar** [spec: SPEC-docs-root-link-grammar.md]
+  A hand-authored `docs/` page that
+  links a path *outside* `docs/` with a bare relative link resolves on disk but
+  404s on the rendered site, which is served from `docs/` as its root.
+  `check-md-refs` resolves the target on disk and stays green, so nothing
+  catches it; `jekyll-relative-links` cannot rewrite it either, because the
+  target is outside the Jekyll source and so has no built URL to rewrite to.
+  Verified live at close: `docs/orchestration.md` lines 90 and 108 both link
+  `../lifecycle-kit/templates/lead.md`, two reader-facing broken links standing
+  today. The generated mirror already emits the self-repo blob grammar for
+  exactly this reason (`scripts/gen-docs-mirror.sh` rewrites source and
+  directory links), and `docs/index.md` reaches `ROADMAP.md` that way by hand —
+  so the correct form is established and only the hand-authored path is
+  unguarded.
+  **Deliverable:** a gate asserting that a link from a `docs/` page to a target
+  outside `docs/` uses the blob form, plus — under enforcement-first, in the
+  same unit — the sweep of the existing violations.
+  **The open call, settled at promotion — with a third option the entry did not
+  have.** It was posed as "a new gate, or an assertion inside `check-md-refs`",
+  worrying correctly that folding it in gives a disk-resolution gate a
+  site-topology opinion. It is **neither**: it is a third rule on
+  `check-docs-link-convention`, which is already scoped to the docs root by
+  `CANON_KIT_LINK_ROOT` and already owns the *shape* of relative links while
+  ceding *resolution* to `check-md-refs`. That option was absent because the unit
+  was scoped as a site-kit surface — **it is canon-kit's**; site-kit owns no
+  docs-link gate at all (see the surface correction below). `check-md-refs` is
+  left untouched, which is what the stated worry asked for. The boundary
+  predicate's edges are each ruled in the amendment; the generated mirror pages
+  are deliberately **not** exempted, so the rule doubles as a regression test on
+  the generator's rewrite.
+  **Cost while deferred:** two reader-facing broken links stand on the rendered
+  site, and every hand-authored docs page added meanwhile can add another
+  silently. Not covered by `rendered-site-link-monitor`, whose scope is
+  external-URL rot and which rules a hermetic gate out on false-positive
+  grounds — this class is intra-repo and decidable from the tree alone, so that
+  ruling does not transfer.
+  **Ruled into `release-signaling-reset` as a deliberate second surface
+  (2026-08-01, operator ruling at that scope's unit-set escalation).** The
+  iteration's other four units share the release surface; this one is `docs/` +
+  a kit. **Surface premise corrected 2026-08-01 at spec: the kit is canon-kit,
+  not site-kit.** site-kit owns exactly two gates (`check-docs-cname-parity`,
+  `check-docs-render-fidelity`) and no docs-link gate; `check-docs-link-convention`
+  and canon-kit/SPEC.md §The reference-link grammar — which already *prescribes*
+  the blob form for this exact case — are both canon-kit's. The ruling stands
+  unchanged (the unit is still a deliberate second surface); only which kit it
+  lands in was wrong. The amortization dilution was named at the escalation and accepted
+  knowingly, because these are the only currently-broken reader-facing artifacts
+  in the queue — re-verified live at that scope: `docs/orchestration.md`:90 and
+  :108. Fixing the two links **without** the gate was explicitly rejected, on
+  enforcement-first. Recorded so the next reader does not read an off-surface
+  unit in a single-surface iteration as an accident.
+  Filed 2026-07-27 at align in front-door-readiness, while verifying the
+  roadmap amendment's docs-home link; re-verified at close.
+
 ## Technical Debt
 
 - **npm-publish-approval-posture-unrecorded** — the `npm-publish` environment's
@@ -483,44 +639,6 @@
   wasted. Bounded and non-rotting — nothing breaks, and the row now accumulates
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
-
-- **preview-release-cadence** [design-pending] [roadmap: next/adoption] — a preview channel.
-  roadmap-summary: A declared preview channel and a slower, calmer release cadence.
-  Reset release signaling for a
-  pre-1.0 audience: declare a preview/alpha channel, batch internal
-  iterations into a slower external cadence (weekly-class) so consumers stop
-  reading thirteen-releases-in-nine-days as churn, publish
-  checksum-verifiable release assets instead of bare tag pointers, and keep
-  a 30-second human changelog beside the migration detail. Separates
-  internal iteration completion from public version publication — a
-  RELEASING.md policy change more than a mechanism.
-  **Premise corrected 2026-07-25 by the undirected scope survey, re-counted
-  2026-07-26 and again 2026-07-27 — the count is larger than filed and the
-  rhythm held.** This entry says "thirteen-releases-in-nine-days"; the tree now
-  carries **17 tags in 14 days**, `v0.1.0` (2026-07-14) through `v0.17.0`
-  (2026-07-27). The finding is not a one-off burst that has since settled — the
-  cadence continued at roughly a release a day across the whole window, and the
-  count has risen at every re-read (13 → 14 → 15 → 17), which strengthens rather
-  than dates the signaling argument.
-  **The inherited checksum-verifiable-asset deliverable is SATISFIED — corrected
-  2026-07-27 by scope.** This entry absorbed `supply-chain-trust-baseline`'s
-  carved-out "publish checksum-verifiable release assets instead of bare tag
-  pointers" (2026-07-25, operator-approved) on the ground that the convention
-  should land with the cadence it depends on. `release-tarball-delivery-channel`
-  shipped it independently: `v0.17.0` is the first release carrying assets —
-  `checkwright-0.17.0.tgz` beside its `.sha256` — where `v0.16.0` carried none.
-  The deliverable is struck; what this entry still owns is the **signaling** half
-  alone (a declared preview channel, a slower external cadence batching internal
-  iterations, and a 30-second human changelog beside the migration detail). The
-  residual integrity question — that a checksum sharing one origin with its
-  tarball proves transfer integrity only — is `tarball-build-attestation`'s, not
-  this entry's.
-  **Cost while deferred:** zero pre-announcement; at announcement the
-  release history itself signals instability to exactly the risk-averse
-  teams the trust story targets. The inherited checksummed-asset gap no longer
-  contributes — it is closed, per the correction above.
-  Surfaced 2026-07-23 in the same external review (its release-signaling
-  finding).
 
 - **validate-verb-collision-and-check-routing** [design-pending] — two coupled
   defects with one root: the delegation discipline verb collides with the
@@ -1241,47 +1359,6 @@
   produced; a sibling rather than an addition because `check-queue-entry-budget`
   refused the combined body.
 
-- **docs-root-link-grammar** [design-pending] — a hand-authored `docs/` page that
-  links a path *outside* `docs/` with a bare relative link resolves on disk but
-  404s on the rendered site, which is served from `docs/` as its root.
-  `check-md-refs` resolves the target on disk and stays green, so nothing
-  catches it; `jekyll-relative-links` cannot rewrite it either, because the
-  target is outside the Jekyll source and so has no built URL to rewrite to.
-  Verified live at close: `docs/orchestration.md` lines 90 and 108 both link
-  `../lifecycle-kit/templates/lead.md`, two reader-facing broken links standing
-  today. The generated mirror already emits the self-repo blob grammar for
-  exactly this reason (`scripts/gen-docs-mirror.sh` rewrites source and
-  directory links), and `docs/index.md` reaches `ROADMAP.md` that way by hand —
-  so the correct form is established and only the hand-authored path is
-  unguarded.
-  **Deliverable:** a gate asserting that a link from a `docs/` page to a target
-  outside `docs/` uses the blob form, plus — under enforcement-first, in the
-  same unit — the sweep of the existing violations.
-  **Why `[design-pending]`:** the boundary predicate needs care. Relative links
-  *within* `docs/` are correct and must stay silent; the mirror's own pages are
-  generated and already conform; and the rule must not fire on anchors or
-  absolute URLs. Whether this is a new gate or an assertion inside
-  `check-md-refs` (which already resolves every link and knows the target path)
-  is the open call — folding it in reuses the traversal, but gives a
-  disk-resolution gate a site-topology opinion.
-  **Cost while deferred:** two reader-facing broken links stand on the rendered
-  site, and every hand-authored docs page added meanwhile can add another
-  silently. Not covered by `rendered-site-link-monitor`, whose scope is
-  external-URL rot and which rules a hermetic gate out on false-positive
-  grounds — this class is intra-repo and decidable from the tree alone, so that
-  ruling does not transfer.
-  **Ruled into `release-signaling-reset` as a deliberate second surface
-  (2026-08-01, operator ruling at that scope's unit-set escalation).** The
-  iteration's other four units share the release surface; this one is `docs/` +
-  site-kit. The amortization dilution was named at the escalation and accepted
-  knowingly, because these are the only currently-broken reader-facing artifacts
-  in the queue — re-verified live at that scope: `docs/orchestration.md`:90 and
-  :108. Fixing the two links **without** the gate was explicitly rejected, on
-  enforcement-first. Recorded so the next reader does not read an off-surface
-  unit in a single-surface iteration as an accident.
-  Filed 2026-07-27 at align in front-door-readiness, while verifying the
-  roadmap amendment's docs-home link; re-verified at close.
-
 - **gate-exemption-live-slug-derivation** [design-pending] — an exemption can
   resolve green against no task at all. `check-gate-exemption-tasks` resolves an
   `# until: <slug>` marker against a live-slug set it derives by scanning the
@@ -1327,27 +1404,6 @@
   the same shape, so the exposure is per-page and grows with the docs site.
   Surfaced 2026-07-31 at build while tracing what the tag rename reached; drained
   from the gap inbox by close.
-
-- **knob-rename-compat-threshold** [design-pending] — lifecycle-kit/SPEC.md's
-  knob-rename compat precedent makes a rename compat-free "before the first
-  release tag … because no external consumer can have vendored the kit yet (the
-  first tag is a launch-comms prerequisite)". The tag was a proxy for that stated
-  premise and the two have come apart: 17 tags have shipped, launch has not
-  happened, and no external install has ever been observed — so the premise still
-  holds while the threshold reads as long crossed. It misfires on the next real
-  knob rename, demanding a deprecation window that protects nobody.
-  **Why `[design-pending]` — two open questions the fix must settle.** (i) What
-  observable ends the compat-free window in place of the first tag; the declared
-  `preview-release-cadence` rung is a nominee, not a ruling. (ii) Whether the
-  corrected clause generalizes beyond knobs: it is knob-scoped today — headed for
-  knobs, sitting above the `LIFECYCLE_KIT_*` roster, cited nowhere else — and that
-  scoping is exactly what kept it off this iteration's two renames.
-  **Cost while deferred:** zero today and non-rotting, since the clause governs
-  knob renames only and none is queued — but it bites the first time one is, and
-  it bites as a **false obligation** rather than a missing one, which is the
-  harder kind to notice.
-  Surfaced 2026-07-31 at spec, escalated and ruled during
-  `pre-adoption-grammar-break`; drained from the gap inbox by close.
 
 - **rule-reach-before-merits** [design-pending] — the iteration's recurring
   failure mode, in both its forms, with no durable home. Six times a question
@@ -1726,34 +1782,6 @@
   Debt: a governance sentence widened on one page; adds no governed name.
   Filed 2026-07-31 at spec; promoted at close from the gap inbox, its cost
   re-read at close against the sweep that found the same sentence unprompted.
-
-- **tightened-gates-declaration-note-parity** [design-pending] — nothing asserts
-  that a release note's composed Tightened-gates set equals the
-  `.workflow/tightened-gates.txt` declaration surface it was composed from.
-  `upgrade-smoke-note-resolution` made build append declared gate names to that
-  tracked record and close transcribe them into the note's bullets and drain the
-  file, both **by hand**, so a dropped or added name between the two surfaces is
-  caught only by review — which is exactly what RELEASING.md step 1 states as
-  its honest limit.
-  Both sides are machine-readable by construction: bare names one per line on
-  the surface, backticked unbolded bullet lead tokens in the note under
-  `release-note-lead-token-grammar`'s canonical spelling, with
-  `check-tightened-gates-grammar`'s parser already extracting the note side. So
-  the parity assertion is mechanical, and the parser it needs already ships.
-  **Why `[design-pending]`:** the assertion only holds at the release commit —
-  before the tag the surface accumulates and no note exists; after the drain the
-  surface is header-only and the note is the sole record. Which commit the gate
-  binds on, and how it identifies the note under composition, is the open call.
-  **Cost while deferred — now realized, not hypothetical.** The filing costed
-  this as "low until the first release that ships a non-empty declared set".
-  That release is `v0.19.0`, composed this close from a one-name surface, so the
-  window is open from here on. A transcription slip either licenses an
-  undeclared red or declares a gate that never tightened, and the upgrade smoke
-  reads the note rather than the surface, so it cannot catch either.
-  Debt: one gate plus its fixture pair over two existing surfaces.
-  Filed 2026-07-31 at spec from the honest limit stated in the amendment's
-  producer delta; promoted at close, its cost re-read against the release it
-  now rides.
 
 - **prose-filename-citation-liveness** [design-pending] — a bare `<name>.md`
   filename cited in governed prose can name no tracked file and nothing reds.
