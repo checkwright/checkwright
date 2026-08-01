@@ -12,6 +12,145 @@
 
 ## New Features
 
+- **security-advisory-lane** [spec: SPEC-security-advisory-lane.md] — `SECURITY.md`
+  directs reporters to GitHub private vulnerability reporting, and nothing on our
+  side is named as the reader. Advisories are a surface distinct from issues and
+  PRs, returned by neither `gh issue list` nor `gh pr list`. The scope skill's
+  GitHub boundary sweep (.claude/commands/scope.md §The GitHub boundary sweep)
+  has exactly two lanes, Issues and PRs, while asserting nothing lives
+  triaged-but-unqueued anywhere else — so the assertion is now false for the one
+  lane whose items are the most time-critical.
+  **Honest limit:** advisories are not unread. GitHub notifies maintainers, so
+  this is an unswept lane rather than a black hole, which is what kept it out of
+  the in-flight unit.
+  **Three rulings landed at spec (2026-08-01), all in the amendment.**
+  *Disposition grammar:* both candidate carriers are public — `TASK-QUEUE.md` by
+  construction and the gap inbox deliberately (lifecycle-kit/SPEC.md §The
+  committed gap inbox rules a per-clone buffer out) — so the lane's dispositions
+  are stated over the advisory thread, and the public tree says **nothing** until
+  publication. Partial disclosure is refused rather than formatted.
+  *Latency:* the lane sweeps at the boundary like its siblings. The premise that
+  this makes latency a problem is **corrected**: the boundary cadence has run at
+  roughly one iteration per day against an advertised ~1-week acknowledgement, so
+  a sweep lane meets the published windows with margin. `SECURITY.md` is not
+  edited and its windows are not tightened, per the cost line below.
+  *Severity carve-out:* **refused.** Speed is not the gap; the release axis
+  already carries a security carve-out (`SECURITY.md` §Supported versions); the
+  misfit is disclosure rather than severity; a severity tier would mint a
+  vocabulary `SECURITY.md` deliberately lacks whose only reader is a bypass; and
+  `doctrine-kit` is vendored, so a carve-out there ships one project's security
+  posture as everyone's doctrine. **Neither `CLAUDE.md` §Delivery doctrine nor
+  `doctrine-kit/DOCTRINE.md` is touched by this unit.**
+  **Premise dropped at spec:** the entry cited
+  `SPEC-supply-chain-trust-baseline.md` §causal chains as live prose to correct.
+  That amendment merged without landing its A1 disclosure-route text into any
+  canonical spec; it survives only in git history. The amendment derives the
+  chain fresh rather than inheriting it.
+  **Cost while deferred:** until the interrupt path exists, `SECURITY.md`'s
+  current windows must not be tightened. Promising a response the machinery
+  cannot deliver is the overclaim shape this iteration existed to remove, one
+  level up from the gate overclaim it did remove.
+  Debt: small-to-medium; the constraint is the design, not the code. Feature by
+  the new-names litmus: the lane adds a disposition grammar and a sweep duty to a
+  governed binding.
+  Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
+  inbox (two bullets merged at triage, costed once). Promoted 2026-08-01 by spec.
+
+- **core-files-kit-coverage-derived** [spec: gate-sdk/SPEC-core-files-kit-coverage-derived.md]
+  — `scripts/core-files.list` carries a block headed "One SPEC.md per kit (each
+  kit's canonical contract)" that lists **9 of the 11** kit SPECs:
+  `site-kit/SPEC.md` and `doctrine-kit/SPEC.md` are absent, as is
+  `doctrine-kit/DOCTRINE.md` (which `CANON_KIT_MANIFEST_FILES` does carry). The
+  block is a hand-maintained roster of a **derivable** set — `gate_kit_roots` ×
+  `SPEC.md` — which is the maintain-a-derivable antipattern derivation-first
+  rules out; and `check-core-files` asserts only that *listed* paths exist, never
+  that the derivable set is covered, so the omission is invisible to a green
+  battery.
+  **Deliverable — the derived coverage assertion, not the three-line backfill.**
+  Backfilling the two missing names re-arms the identical drift for kit twelve:
+  that is the defect, not the fix.
+  **Both open calls settled at spec (2026-08-01), and the deliverable is
+  narrower than filed.** The entry asked for a coverage *assertion* and posed
+  placement as new-assertion-versus-sibling-gate. Neither is built: gate-sdk
+  already ships a `kit:<glob>` token (`gate_expand_couples_var`) that expands to
+  one path per `gate_kit_roots` member, and `check-kit-enum`'s help text already
+  names that token as the fix for exactly this class. The nine hand lines become
+  `kit:SPEC.md`, the coverage property becomes true by construction, and there is
+  nothing left to assert — enforcement-first's own ordering, where removing the
+  duplication outranks gating it. **No new gate, no new assertion, no new knob.**
+  *Boundary:* the manifest derives what is uniform across kit roots and
+  hand-lists the rest. `doctrine-kit/DOCTRINE.md` is provably hand-held —
+  `kit:DOCTRINE.md` would expand to eleven paths of which ten do not exist — and
+  is added as a hand line, closing a real pin gap. Kit READMEs are ruled out: a
+  deleted kit README is caught *directly* by `check-readme-roster`, so pinning
+  eleven more lines would add no guarantee.
+  **Cost while deferred — the exposure the entry left open is now established,
+  and it is narrower than feared.** Traced statically at spec: a silent `rm
+  site-kit/SPEC.md` today reds **only** `check-docs-mirror-fresh`'s orphan
+  branch (the committed mirror page loses its source). It is not caught by
+  `check-core-files`, `check-kit-registration`, `check-docs-kit-parity`,
+  `check-gate-assertions`, or canon-kit's manifest finders. So the hole is narrow
+  rather than absent — and that coverage is **incidental**, a docs-mirror side
+  effect that would vanish for any kit leaving the mirror. The derivation-first
+  defect stays the primary justification, as filed.
+  Feature, and the litmus holds under the narrowed deliverable: admitting `kit:`
+  into the core-files manifest grammar adds a file convention to a governed
+  surface, which is a name even though no gate is minted.
+  Filed 2026-07-25 by align, from the `supply-chain-trust-baseline` cross-spec
+  audit — the amendment's A3 edits this same file, so the gap is adjacent to its
+  envelope without being inside it. Lead ruling, scope-gated intake.
+  Promoted 2026-08-01 by spec, deliverable narrowed to the derivation above.
+
+- **local-overlay-git-blanket-grant** [spec: guard-kit/SPEC-local-overlay-git-blanket-grant.md]
+  — the local permission overlay carries `Bash(git *)`, a single glob granting
+  **every** git subcommand without a prompt. The destructive ones ride it: `git
+  reset --hard`, `git clean -fd`, `git push --force`, `git rm -r`. `bash-guard`'s
+  project rules cover only two narrow cases (`git commit --no-verify`, `git clean
+  -x/-X`), so everything else in that set is auto-allowed by the blanket rather
+  than by a judgment about it.
+  **Why it survived this long.** `compare-settings-allow.sh` reports it
+  non-redundant and therefore never flags it — correctly, since the committed set
+  holds no glob that covers it. The tool answers "is this entry redundant?", and
+  the question this entry needs is "is this entry *too broad?*", which nothing
+  asks. That is the gap, not the entry itself.
+  **Deliverable:** replace the blanket with the write-side verbs the workflow
+  actually uses, leaving destructive git to prompt. The read-only verbs no longer
+  need it — they were promoted to the committed allowlist this close, which is
+  what makes the narrowing affordable.
+  **The open call settled at spec (2026-08-01), and it moves the deliverable off
+  a gate.** The entry's cost line anticipated "one gate class". The amendment
+  ships **none**, on two independent grounds. guard-kit registers no gates by
+  stated category (guard-kit/README.md) and has no `checks/` dir, so minting one
+  would ripple through `gates.list`, the generated hook, `check-kit-registration`,
+  `check-docs-kit-parity`, `check-readme-roster` and three projections. And on
+  the merits a breadth finding is operator-intent-dependent, over a gitignored
+  per-machine file CI cannot see — the high-FP shape gate-sdk/SPEC.md §When a
+  gate earns its place holds back for an attested miss, which has not occurred.
+  The criterion instead becomes `compare-settings-allow`'s second report, reusing
+  `guard_allow_match` with its arguments swapped, read at the close-stage triage
+  step that already consumes that tool.
+  *Where the destructive set lives:* a new `GUARD_KIT_BREADTH_PROBES` knob,
+  default empty, declared in the consumer's `guard-config.sh` — never a kit
+  literal. They are **probes, not a roster**: each is a witness that a glob is
+  too broad, and no completeness is claimed, which is what keeps a missing entry
+  from ever becoming a false green.
+  *The instance:* the narrowed verbs land in the **committed** allowlist, not
+  re-granted locally, so the narrowing is reviewable rather than another
+  invisible local fact. `git push` is ruled to keep prompting — CLAUDE.md budgets
+  one to two pushes per iteration and wants each deliberate, so the prompt is
+  nearly free.
+  **Cost while deferred:** an unprompted destructive git command is a
+  low-probability, high-cost event, and the overlay is local-only so the exposure
+  is one machine rather than every consumer. Debt: narrows a local grant and adds
+  one advisory report plus one knob; adds no gate and no `gates.list` member.
+  **Why close did not just narrow it here:** the triage step's mandate is
+  promote-and-prune, and re-shaping a grant model mid-release — with a tag and a
+  push still to run in this same session — is bad sequencing regardless of
+  authority. The promotion and the dead-entry prune landed; this is the costed
+  remainder.
+  Filed 2026-07-25 by close, from the tooling-friction triage.
+  Promoted 2026-08-01 by spec, the gate ruled out as above.
+
 ## Technical Debt
 
 - **action-run-shell-yaml-anchor-fail-open** — the gate whose whole job is
@@ -541,115 +680,6 @@
   Filed 2026-07-25 by close, draining the committed gap inbox (`0eec298`) merged
   with the lead's post-dispatch third triage item; second instance added the same
   day by close.
-
-- **core-files-kit-coverage-derived** [design-pending] — `scripts/core-files.list`
-  carries a block headed "One SPEC.md per kit (each kit's canonical contract)"
-  that lists **9 of the 11** kit SPECs: `site-kit/SPEC.md` and
-  `doctrine-kit/SPEC.md` are absent, as is `doctrine-kit/DOCTRINE.md` (which
-  `CANON_KIT_MANIFEST_FILES` does carry). The block is a hand-maintained roster
-  of a **derivable** set — `gate_kit_roots` × `SPEC.md` — which is the
-  maintain-a-derivable antipattern derivation-first rules out; and
-  `check-core-files` asserts only that *listed* paths exist, never that the
-  derivable set is covered, so the omission is invisible to a green battery.
-  **Deliverable — the derived coverage assertion, not the three-line backfill.**
-  Backfilling the two missing names re-arms the identical drift for kit twelve:
-  that is the defect, not the fix. Two in-kit precedents give the shape, both
-  bidirectional parity over a derived set — `check-readme-roster` (each kit
-  README's roster block ↔ that kit's `checks/` basenames) and `check-kit-enum`
-  (a `couples=` set naming two or more kit roots must name every root carrying
-  the suffix). This entry is the same move over the core-file manifest: every
-  `gate_kit_roots` member's canonical SPEC is pinned by derivation, not by a
-  line someone remembered to add.
-  **Why `[design-pending]`:** the derived set's boundary is the open design, not the
-  assertion. Kit SPECs are uniform, but `doctrine-kit/DOCTRINE.md` is a per-kit
-  *deliverable* with no counterpart in the other ten, and the same manifest pins
-  surfaces no derivation reaches (workflow instances, generated projections, the
-  validate baseline). The rule must therefore state which slice it owns and
-  leave the remainder an honest hand list, or it over-reaches into a roster that
-  is legitimately hand-held. Placement is a second call: a new assertion inside
-  `check-core-files` versus a sibling gate.
-  **Cost while deferred — the derivation-first defect is confirmed, the safety
-  hole is not.** Confirmed: the block's stated per-kit invariant is false today
-  and degrades silently as kits land. Unconfirmed: whether an unpinned kit SPEC
-  is genuinely deletable without a red anywhere. `scripts/gen-docs-mirror.sh
-  --list` derives all eleven kits' SPEC and README plus DOCTRINE.md, so a
-  deleted kit SPEC would plausibly surface through `check-docs-mirror-fresh` or
-  `check-docs-kit-parity` — not destructively verified here, so whoever picks
-  this up should establish the real exposure before costing the gate against it.
-  Debt: converges an existing manifest onto a derived roster; adds no governed
-  name unless the assertion lands.
-  Filed 2026-07-25 by align, from the `supply-chain-trust-baseline` cross-spec
-  audit — the amendment's A3 edits this same file, so the gap is adjacent to its
-  envelope without being inside it. Lead ruling, scope-gated intake.
-
-- **security-advisory-lane** [design-pending] — `SECURITY.md` (shipped this
-  iteration) directs reporters to GitHub private vulnerability reporting, and
-  nothing on our side is named as the reader. Advisories are a surface distinct
-  from issues and PRs, returned by neither `gh issue list` nor `gh pr list`.
-  The scope skill's GitHub boundary sweep (.claude/commands/scope.md §The GitHub
-  boundary sweep) has exactly two lanes, Issues and PRs, while asserting nothing
-  lives triaged-but-unqueued anywhere else — so the assertion is now false for
-  the one lane whose items are the most time-critical.
-  SPEC-supply-chain-trust-baseline.md §causal chains named the route's producer
-  and called the external reporter its consumer, but the reporter is the sender.
-  **Honest limit:** advisories are not unread. GitHub notifies maintainers, so
-  this is an unswept lane rather than a black hole, which is what kept it out of
-  the in-flight unit.
-  **Why `[design-pending]` — the lane owes three decisions, and copying the Issues
-  lane settles none of them.**
-  *Disposition grammar under a public queue:* advisories are private and
-  TASK-QUEUE.md is public, so a promoted entry citing an unfixed vulnerability
-  publishes it. The lane needs its own dispositions (fix under embargo,
-  advisory-only, decline with cause) and a rule for what a public entry may say
-  before the advisory is published.
-  *Response latency:* scope runs at iteration boundaries, so a sweep-lane duty
-  makes acknowledgement latency equal to the time until the next scope entry.
-  That is systematic disposition, not speed.
-  *Whether scope-gated intake gains an exception:* what delivers a fast critical
-  response is an interrupt, a rule that a critical advisory preempts the running
-  iteration. CLAUDE.md §Delivery doctrine has no severity carve-out, and a
-  security interrupt is the one case that plausibly earns one.
-  **Cost while deferred:** until the interrupt path exists, `SECURITY.md`'s
-  current windows must not be tightened. Promising a response the machinery
-  cannot deliver is the overclaim shape this iteration existed to remove, one
-  level up from the gate overclaim it did remove.
-  Debt: small-to-medium; the constraint is the design, not the code.
-  Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
-  inbox (two bullets merged at triage, costed once).
-
-- **local-overlay-git-blanket-grant** [design-pending] — the local permission overlay
-  carries `Bash(git *)`, a single glob granting **every** git subcommand without a
-  prompt. The destructive ones ride it: `git reset --hard`, `git clean -fd`, `git
-  push --force`, `git rm -r`. `bash-guard`'s project rules cover only two narrow
-  cases (`git commit --no-verify`, `git clean -x/-X`), so everything else in that
-  set is auto-allowed by the blanket rather than by a judgment about it.
-  **Why it survived this long.** `compare-settings-allow.sh` reports it
-  non-redundant and therefore never flags it — correctly, since the committed set
-  holds no glob that covers it. The tool answers "is this entry redundant?", and
-  the question this entry needs is "is this entry *too broad?*", which nothing
-  asks. That is the gap, not the entry itself.
-  **Deliverable:** replace the blanket with the write-side verbs the workflow
-  actually uses (`git checkout <path>`, `git push origin master`, `git tag -a`,
-  `git add`, `git commit`, `git stash`), leaving destructive git to prompt. The
-  read-only verbs no longer need it — `git status|log|show|diff|rev-parse|
-  ls-remote|tag -l|check-ignore` were promoted to the committed allowlist this
-  close, which is what makes the narrowing affordable.
-  **Why `[design-pending]`:** the general question is whether guard-kit should ship a
-  *breadth* criterion beside its redundancy one — a check that reds a local glob
-  whose match set includes a known-destructive command — and if so, where the
-  destructive set is owned without becoming a maintained roster. That is a
-  guard-kit/SPEC.md ruling; narrowing this one overlay is the instance, not the
-  fix.
-  **Cost while deferred:** an unprompted destructive git command is a
-  low-probability, high-cost event, and the overlay is local-only so the exposure
-  is one machine rather than every consumer. Debt: narrows a local grant and adds
-  one gate class; adds no governed name to a shipped surface.
-  **Why close did not just narrow it here:** the triage step's mandate is
-  promote-and-prune, and re-shaping a grant model mid-release — with a tag and a
-  push still to run in this same session — is bad sequencing regardless of
-  authority. The promotion and the dead-entry prune landed; this is the costed
-  remainder.
-  Filed 2026-07-25 by close, from the tooling-friction triage.
 
 - **validate-producer-liveness-unobservable** [design-pending] — a stage session can
   report its stage done while its own oracle is still executing, and nothing in
