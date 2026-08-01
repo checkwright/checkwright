@@ -510,12 +510,12 @@ any install writes — the gates that lint a workflow's Actions shape:
 regression in the workflow's bash, its action pins, or its `gh` repository
 context reds the smoke rather than surfacing at a consumer.
 
-**A gate earns a scratch-battery slot when it reads a surface the install
-writes** — the rule that keeps the smoke proving a vendored kit installs and
-runs, instead of drifting toward a second copy of the host battery. Those
-qualify because this install writes the workflow they lint; a gate whose
-subject no install writes would either pass vacuously or fail-closed on an
-absent projection, and neither outcome is coverage.
+Those four qualify under the registration accounting's predicate — a gate earns a
+scratch-battery slot when it reads a surface the install writes — because this
+install writes the workflow they lint. The predicate binds every kit and is owned
+by gate-sdk/SPEC.md §Consumer smoke, which also rules on the omissions: what this
+kit leaves unregistered is decided by the accounting's probe, not by a judgment
+recorded here.
 
 ## Out of scope
 

@@ -416,7 +416,8 @@ temp dir (`git init`, seed commit), vendors each kit root by copy (default:
 then argument order. It then commits the installed baseline and asserts the
 full battery is green under **zero consumer config** (the positive green token
 `All N gates passed` — the defaults-on-a-vendored-tree assertion no fixture
-suite makes). Per kit shipping `smoke/violation.sh` it fires one crafted
+suite makes). It then runs the registration accounting (below) over the union of
+the vendored kits' gates. Per kit shipping `smoke/violation.sh` it fires one crafted
 violation, re-runs the battery, asserts a non-zero exit **and** a `FAIL:`
 line naming the expected gate, then restores the tree (`git reset --hard &&
 git clean -fd` — a hard reset, not `git checkout`, so a violation that staged
@@ -424,7 +425,8 @@ its shape is unstaged too: an index-reading gate like `check-gate-tamper` sees
 only the index) before the next kit; it asserts green once more after the last
 restore. Exit codes follow the gate convention (0 all hold, 1 an assertion
 failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
-(<n> kits installed, <m> violations fired)`. `--keep` retains the temp dir and
+(<n> kits installed, <m> violations fired, <r> gates registered, <s>
+self-declared, <h> hand-declared)`. `--keep` retains the temp dir and
 prints its path (the temp-dir write's named reclaim path).
 
 The scratch-consumer build itself — temp dir, seed commit, vendor-by-copy, the
@@ -466,7 +468,9 @@ enforcing it.
   `SMOKE_KIT_ROOT` = the vendored copy of the installing kit. The executable
   form of that kit's README install steps: register its gates in
   `scripts/gates.list`, establish the minimal governed surface its gates need
-  to be green, and regenerate the hook + graph artifacts. It may assume gate-sdk
+  to be green, and regenerate the hook + graph artifacts. *Which* gates it
+  registers is not the author's discretion — *The registration accounting*
+  below rules on every omission. It may assume gate-sdk
   is already installed (it runs first), nothing else. A non-zero exit aborts the
   harness with exit 2 (a broken installer is an environment failure, not a gate
   finding).
@@ -480,6 +484,80 @@ enforcing it.
   in the evidence. The file
   is rightly absent only where no battery-reddening violation is craftable —
   a kit that registers no gates has nothing to redden.
+
+**The registration accounting.** A gate earns a scratch-battery slot when it
+**reads a surface the install writes** — the rule that keeps the smoke proving a
+vendored kit installs and runs, instead of drifting toward a second copy of the
+host battery. A gate whose subject no install writes would either pass vacuously
+or fail-closed on an absent projection, and neither outcome is coverage. The rule
+binds every kit, and it is **evaluated, not transcribed**: on every run the
+harness accounts for each shipped-but-unregistered gate, so an omission is either
+derived-justified or declared, never silent. An unregistered gate is how a live
+contract violation survives — the harness cannot redden on a gate nothing runs.
+
+The accounting is one pass in `run-consumer-smoke.sh`, between the green-battery
+assertion and the violation phase, over the **union**: every vendored kit's
+`checks/` basenames against the scratch consumer's `scripts/gates.list`. The tree
+is already built and green at that point, so the pass adds no install and no
+second tree. Each unregistered gate is run in the scratch consumer and its exit
+code read against §Output contract's three meanings — the authority here, and the
+only one (`check-gate-fail-closed` is a static lint over `awk`/`jq` captures and
+asserts nothing about a gate's behaviour on an absent surface).
+
+**One reading is not enough, and the second probe is not redundant.** Exit 2 is
+usage/environment failure *generally* — a missing binary, a malformed config, a
+non-repo cwd, an empty roster, or an absent subject surface — and only the last
+is a justified omission. Because the exit-2 verdict grants a **permanent**
+exemption owing no written reason, ever, it is the one verdict nobody will
+re-examine; granting it off that ambiguous signal would turn the never-reviewed
+row into a false-exemption channel, silently and permanently justifying a gate
+that is merely broken here. So it is **corroborated**: the same gate is re-run in
+the invoking repo, where the kit's own surfaces exist. An absent-surface gate
+exits 2 only in the scratch consumer; an environmentally-broken one exits 2 in
+both. Removing the second probe as belt-and-braces re-opens the channel.
+
+| probe (scratch consumer) | probe (invoking repo) | verdict |
+|---|---|---|
+| exit 2 | exit 0 or 1 | **Justified omission**, self-declaring: the surface it reads is genuinely absent. No written reason owed, now or ever. |
+| exit 2 | exit 2 | **Not exempt** — broken or environment-dependent, not surface-absent. Declare or red. |
+| exit 0 | — | Green here and registering costs nothing: an unexplained omission. Red unless declared. |
+| exit 1 | — | Green nowhere: the gate finds real violations and nothing runs it. **The hiding shape.** Red unless declared. |
+
+Only the exit-2 rows reach the corroborating probe.
+
+**Probe first, reasons second.** The exemption is *derived* — recomputed from the
+tree every run, so it cannot go stale, be forgotten, or be copied wrong — and the
+written reason is a residual valve for the exit-0/exit-1 minority, never the
+mechanism. An implementation that collects reasons for every unregistered gate
+and consults the probe afterwards has inverted this contract and is wrong however
+green it runs. The probe set is self-limiting: a gate that probes green gets
+registered, which moves it out of the probe set and into the battery, where it
+was going to run anyway.
+
+**The declaration valve.** Where a kit author judges an exit-0 or exit-1 omission
+legitimate — a vacuous pass that is not real coverage is the honest case — that
+kit's `smoke/install.sh` carries `# smoke-unregistered: <gate-name> — <reason>`
+beside its registration block: kit-local, sitting where a reader looking at
+registration already is, and readable off the vendored copy the harness has in
+hand. Both fields are read, the name to match and the reason into the harness's
+report. A declaration naming a gate that *is* registered, or one that kit does
+not ship, is itself a finding — a stale valve is the failure mode a declaration
+surface has, and it is cheap to catch at the same transition.
+
+**The counts are permanent, and the cost is reported rather than cached.** The
+clean line carries three: gates registered, self-declared (the corroborated
+exit-2 set), and hand-declared. The hand-declared number is the one that says
+whether the derivation is decaying into a maintained roster, so it is printed
+every run rather than left to an audit. If the added wall-clock is material, the
+sanctioned response is to report it — never to sample, and never to cache a
+verdict across runs, a cached exemption being a maintained exemption wearing a
+derivation's clothes.
+
+**Never at pre-commit.** `run-consumer-smoke.sh` is a `bin/` tool, never a
+registered gate, so the accounting costs the pre-commit battery exactly nothing.
+The two sibling callers of `csmoke_vendor_and_install` do not run it: they build
+the same baseline for a different assertion, and charging them for a verdict they
+do not consume would be a cost with no reader.
 
 **CI tool provisioning.** A gate whose oracle shells out beyond the
 checkout+bash baseline (a renderer, a language runtime) is provisioned in the CI
@@ -497,7 +575,12 @@ and the first combined tree is where a per-kit-clean template still reddens a
 foreign kit's gate. The obligation is mechanical, not ritual: where a kit ships
 such a template, its `smoke/install.sh` installs it **verbatim** (no fill-in)
 as the governed surface, so a template regression against any kit reddens the
-harness instead of waiting for a hand-run validate proof. A template that
+harness instead of waiting for a hand-run validate proof. That "mechanical" claim
+is only as good as the scratch battery's coverage, which is why *The registration
+accounting* above is its enabling mechanism: a template installed verbatim but
+linted by a gate nothing registers is ritual wearing mechanism's clothes, and
+that is precisely how a starter queue shipped reddening its own kit's gate with
+no harness able to see it. A template that
 composes with a downstream kit's contract carries that kit's inert scaffold —
 queue-kit's starter queue ships lifecycle-kit's iteration header so the
 verbatim copy clears the stage gates too, and a single-kit adopter deletes it.
@@ -509,6 +592,22 @@ assertion; `SMOKE_KIT_ROOT` is produced by the harness per invocation and read
 by the scripts to copy from their own kit; the harness verdict is consumed by
 the validate-stage ritual (which gates on the success token) and is the natural
 CI entry point (wiring CI is out of scope here).
+
+The **accounting phase** is produced by `run-consumer-smoke.sh` on every
+invocation — no enabling knob, since the harness *is* a consumer's
+`consumer_smoke` validate suite, so the producer is reachable in the real
+configuration and not only under test. It reads the vendored kits' `checks/`
+directories, the scratch `scripts/gates.list`, and the vendored
+`smoke/install.sh` declarations, all present in the scratch tree once
+`csmoke_vendor_and_install` has run; its findings are consumed by the same
+harness verdict, adding to an existing channel rather than opening one. Its
+**three counts** are read on the clean line by the operator at the validate
+transition, and the hand-declared count specifically by whoever owns the
+iteration, as the number whose growth says the derivation is decaying into a
+maintained roster. The **gate exit contract** (§Output contract) gains a second
+reader in that phase, beside `run-gates.sh` — no gate is modified and none
+acquires an obligation it did not already carry; what the phase adds is the
+disambiguation of exit 2, which the contract deliberately leaves general.
 
 ## Per-component contracts
 
@@ -733,7 +832,8 @@ test layer parallel to the gates, never a `gates.list` member.
 
 The scratch-consumer install+violation harness (§Consumer smoke): vendors the
 kit roots into a fresh temp repo, drives each `smoke/install.sh`, asserts the
-full battery is green under zero config, then fires each `smoke/violation.sh`
+full battery is green under zero config, runs the registration accounting over
+every shipped-but-unregistered gate, then fires each `smoke/violation.sh`
 and asserts the battery reddens at the named gate before restoring. A `bin/`
 tool, never a `gates.list` member — it is pre-commit-unfit by runtime budget
 and is the proof that the kit defaults hold on a vendored-kit tree.
