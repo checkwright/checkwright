@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: release-signaling-reset
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,60 @@
 ## New Features
 
 ## Technical Debt
+
+- **npm-publish-approval-posture-unrecorded** — the `npm-publish` environment's
+  two weakening settings are written down nowhere, so the actual strength of the
+  control `RELEASING.md` step 5 names is knowable only by querying the repo.
+  **The settings below are NOT re-verified — establish them before designing
+  against them.** They were filed 2026-07-31 and deliberately left unchecked at
+  the 2026-08-01 scope survey rather than stretch the boundary sweep's `gh`
+  budget: one required reviewer, who is also the account that pushes release
+  tags; `prevent_self_review: false`; `can_admins_bypass: true`; no deployment
+  branch policy. The first session to act on this entry runs the environment read
+  and corrects this paragraph before anything else — this iteration has already
+  falsified two inherited premises at their central claim, and this one is merely
+  unestablished, which reads the same until somebody looks.
+  **This entry is the narrowed residue of a filed claim that is false, and the
+  correction is the point.** Close filed the `v0.18.0` publish as having run "in
+  12s with no approval requested" — the approval environment failing to gate an
+  irreversible public publish. It gated. The `npm` job declares
+  `environment: npm-publish` at job level; that run's deployment sat `waiting`
+  for 77 seconds before `queued`; the run's approvals API records one `approved`
+  entry whose user id matches the triggering actor; and the operator confirms
+  they approved it. The "12s" was the job's post-approval runtime, not the wall
+  clock from the tag push. `can_admins_bypass` did not fire — a bypass leaves no
+  approval entry, and one exists. **Step 5's wording is accurate as written:**
+  it claims a hold, never independent review, so the overclaim reading that
+  motivated the filing does not survive either.
+  **What survives verification, and only this.** (i) `can_admins_bypass: true`
+  leaves a standing path on which the stated hold would not hold. It is
+  available to the same single account either way, so its real cost is not an
+  unauthorized publish but a publish landing with **no approval record** — and
+  that record is the entire output of the control for a solo operator.
+  (ii) Neither setting's posture is recorded, so a reader cannot tell deliberate
+  from accidental, and a well-meant hardening pass setting
+  `prevent_self_review: true` would **deadlock the channel**: the project is
+  single-maintainer by standing ruling, so no second reviewer exists to approve
+  a release.
+  **Scope ruling 2026-08-01 — this is what unblocked promotion.** A solo-operator
+  approval environment is a **confirmation step that produces an audit record**,
+  never independent review: with one maintainer, independent review is
+  unavailable by construction, and claiming it would be the overclaim this entry
+  exists to avoid. Two consequences bound the unit. (1) The deliverable is to
+  **record** the posture — `OPS.local.md`'s desired state, plus whatever
+  `RELEASING.md` step 5 owes — so a later reader can tell deliberate from
+  accidental. (2) `prevent_self_review: true` is ruled **out permanently**, not
+  deferred: it deadlocks the channel against a single maintainer, and that is a
+  property of the project's standing structure rather than of its current size.
+  Whether to flip `can_admins_bypass` is **the operator's and is not this unit's
+  to decide** — it is a live repo-settings change on a supply-chain surface; the
+  ruling establishes only that its cost is a publish with no approval record,
+  never an unauthorized publish.
+  Debt: records deliberate repo-settings desired state; adds no governed name.
+  Filed 2026-07-31 by close after the `v0.18.0` release, on a premise the
+  operator contradicted at the source; re-verified against the run and narrowed
+  to this residue at the next scope entry. Promoted 2026-08-01 by operator ruling
+  at that scope's unit-set escalation.
 
 ## Deferred
 
@@ -1214,6 +1268,15 @@
   external-URL rot and which rules a hermetic gate out on false-positive
   grounds — this class is intra-repo and decidable from the tree alone, so that
   ruling does not transfer.
+  **Ruled into `release-signaling-reset` as a deliberate second surface
+  (2026-08-01, operator ruling at that scope's unit-set escalation).** The
+  iteration's other four units share the release surface; this one is `docs/` +
+  site-kit. The amortization dilution was named at the escalation and accepted
+  knowingly, because these are the only currently-broken reader-facing artifacts
+  in the queue — re-verified live at that scope: `docs/orchestration.md`:90 and
+  :108. Fixing the two links **without** the gate was explicitly rejected, on
+  enforcement-first. Recorded so the next reader does not read an off-surface
+  unit in a single-surface iteration as an accident.
   Filed 2026-07-27 at align in front-door-readiness, while verifying the
   roadmap amendment's docs-home link; re-verified at close.
 
@@ -1558,48 +1621,6 @@
   Surfaced 2026-07-31 by the lead, deliberately **not** filed to the inbox on the
   ground that filing it there would compound the defect it names; drained by close
   in the same pass as the inbox.
-
-- **npm-publish-approval-posture-unrecorded** [design-pending] — the
-  `npm-publish` environment's two weakening settings are written down nowhere,
-  so the actual strength of the control `RELEASING.md` step 5 names is knowable
-  only by querying the repo. Live config: one required reviewer, who is also the
-  account that pushes release tags; `prevent_self_review: false`;
-  `can_admins_bypass: true`; no deployment branch policy.
-  **This entry is the narrowed residue of a filed claim that is false, and the
-  correction is the point.** Close filed the `v0.18.0` publish as having run "in
-  12s with no approval requested" — the approval environment failing to gate an
-  irreversible public publish. It gated. The `npm` job declares
-  `environment: npm-publish` at job level; that run's deployment sat `waiting`
-  for 77 seconds before `queued`; the run's approvals API records one `approved`
-  entry whose user id matches the triggering actor; and the operator confirms
-  they approved it. The "12s" was the job's post-approval runtime, not the wall
-  clock from the tag push. `can_admins_bypass` did not fire — a bypass leaves no
-  approval entry, and one exists. **Step 5's wording is accurate as written:**
-  it claims a hold, never independent review, so the overclaim reading that
-  motivated the filing does not survive either.
-  **What survives verification, and only this.** (i) `can_admins_bypass: true`
-  leaves a standing path on which the stated hold would not hold. It is
-  available to the same single account either way, so its real cost is not an
-  unauthorized publish but a publish landing with **no approval record** — and
-  that record is the entire output of the control for a solo operator.
-  (ii) Neither setting's posture is recorded, so a reader cannot tell deliberate
-  from accidental, and a well-meant hardening pass setting
-  `prevent_self_review: true` would **deadlock the channel**: the project is
-  single-maintainer by standing ruling, so no second reviewer exists to approve
-  a release.
-  **Why `[design-pending]`:** what a solo-operator approval environment is *for*
-  is the ruling — a confirmation step producing an audit record, rather than
-  independent review — and that ruling decides both whether `can_admins_bypass`
-  should be flipped and what the private ops runbook's desired state should say.
-  Settling it first is the difference between recording a posture and inventing
-  an overclaim, which is how this entry came to be filed wrong the first time.
-  **Cost while deferred:** low and non-rotting. The control works today; the
-  residue is an unrecorded posture on a pre-launch supply-chain surface, plus
-  one bypass path that has never fired.
-  Debt: records deliberate repo-settings desired state; adds no governed name.
-  Filed 2026-07-31 by close after the `v0.18.0` release, on a premise the
-  operator contradicted at the source; re-verified against the run and narrowed
-  to this residue at the next scope entry.
 
 - **gap-bullet-premise-verification** [design-pending] — a gap-inbox bullet
   asserts mechanism under no verification bar, and a false one is paid by
