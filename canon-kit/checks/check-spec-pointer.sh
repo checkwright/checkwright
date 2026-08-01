@@ -99,6 +99,10 @@ FNR == 1 { flush(); fence = 0 }
 END { flush() }
 AWK
 
+# spec: canon-kit/SPEC.md §check-spec-pointer — the tracked-file membership set, filled once from a single git ls-files pass rather than a per-pointer `git ls-files --error-unmatch` exec
+declare -A TRACKED=()
+while IFS= read -r -d '' _tf; do TRACKED["$_tf"]=1; done < <(git -C "$ROOT" ls-files -z)
+
 errors=()
 scanned=0
 pointers=0
@@ -133,7 +137,7 @@ while IFS= read -r f; do
             errors+=("$rel:$lineno: target file not found: $path")
             continue
         fi
-        if ! git -C "$ROOT" ls-files --error-unmatch -- "$path" >/dev/null 2>&1; then
+        if [[ -z "${TRACKED[$path]:-}" ]]; then
             errors+=("$rel:$lineno: target file untracked: $path")
             continue
         fi
@@ -156,7 +160,7 @@ if [[ ${#manifest_files[@]} -gt 0 ]]; then
     while IFS=$'\t' read -r pfile plineno ppath pfrag; do
         [[ -n "$ppath" ]] || continue
         [[ -f "$ROOT/$ppath" ]] || continue
-        git -C "$ROOT" ls-files --error-unmatch -- "$ppath" >/dev/null 2>&1 || continue
+        [[ -n "${TRACKED[$ppath]:-}" ]] || continue
         prose_cites=$((prose_cites + 1))
         [[ -n "$pfrag" ]] || continue
         if ! heading_present "$ROOT/$ppath" "$pfrag" prefix; then
