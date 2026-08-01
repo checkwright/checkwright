@@ -1,1 +1,23 @@
 # contract: evidence-manifest v1
+delegation-reach-and-gate-cost installer_smoke sha256=015c410b16dae557b469ea48cb7eef5925fda0717d08760d181ed72974148db0 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost gates sha256=76321c75c9eae833f1a16b8fd80c05d40629cbd7d5fb1e1e650cdba45b1bba71 pass=90 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost gate_sdk sha256=88387111c58e4e312dd2c51a4e1f8c79ed949be2a3fec5532f92bc35af2bc8d3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost canon_kit sha256=53f86c08f6cdef04eb8e8e2d3c3f46a93432f64a0c404fbfe741af65bab97f1b pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost guard_kit sha256=641f55e2064f186cb2340df8c91a22bbcff22fe376bd1527c388e9162c9262f4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost lifecycle_kit sha256=5f9077e6d8df174b6193fe6ba78a8ab96cf810bbf46392f4a0185b40726803d1 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost queue_kit sha256=4bc7b2cd8ebe7bf15d999e527ad7ebfac3c93623a453252ca1db41d7ab333710 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost scripts sha256=802df0d7a79c4695b01bb1431e024170399b4a72af982a77a77d404acc8c4ec2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost demo sha256=fd4644cb6e4fdb2888d2f8a764e54af64be518ea4378c702d449b898d97c1013 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost upgrade sha256=bc36b93be13da7d99164b99cb97cc32921e074e35dbbdb5823f5cda091e600f7 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+delegation-reach-and-gate-cost index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
