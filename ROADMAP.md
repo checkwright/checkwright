@@ -9,11 +9,16 @@ mechanism is [queue-kit/SPEC.md](queue-kit/SPEC.md) §bin/roadmap.sh.
 
 ## How to read it
 
-**The horizons are confidence, not dates.** `now` is what the current iteration
-is building. `next` is what the queue is shaped to pick up after it. `later` is
-direction the project has committed to as *direction*: the design memory is
-written down and the sequencing is not. No horizon carries a date, and none of
-them is a promise.
+**The horizons are confidence, not dates.** They record how firmly the project
+has committed to a direction: `now` is nearest-term, `next` is what the queue is
+shaped to pick up after it, and `later` is direction committed to as *direction*
+— the design memory is written down and the sequencing is not. No horizon
+carries a date, and none of them is a promise.
+
+**A horizon is not a status.** An item sits under `now` because a maintainer
+curated it there, not because an iteration is building it — placement on this
+page is about public direction, never internal selection order. So an empty
+`now` means nothing is curated at that band, not that work has stopped.
 
 **Ordering inside a horizon is queue order, not a rank.** The queue records the
 order a maintainer picks work in; it encodes no priority between items, so read
