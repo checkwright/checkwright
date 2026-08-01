@@ -98,6 +98,23 @@ recoverable:
   Advisory count is derived from the enforcement map). Each of the four gates
   names its own regen command on a red, so recovery is mechanical once the
   fan-out is known — knowing it in advance is the part nothing else states.
+- **The enforcement map** — `docs/enforcement.md` is the class registry's
+  projection, stale on any **class-registry** change rather than on a content
+  edit: a gate's `tier=`, a `scripts/kpis.list` entry, the settings hooks, a
+  `# enforce:` marker. `check-enforcement-fresh` byte-compares it (`bash
+  gate-sdk/bin/enforcement-map.sh --emit > docs/enforcement.md`). Its sibling
+  `docs/footprint.md` is the per-kit token cost (`bash
+  context-kit/bin/footprint.sh --emit > docs/footprint.md`), stale on any change
+  to a tracked kit file's line count — which is why a prose-only SPEC edit reds
+  it. Both are `docs/value.md`'s inputs, so a red in either implies a rollup
+  regen.
+- **The graph artifact** — `docs/check-graph.html` and the generated pre-commit
+  hook are one pair with one trigger, a gate's `# graph:` manifest: regenerate
+  the hook (`bash gate-sdk/bin/gen-pre-commit.sh --write`) and then the artifact
+  (`bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`), which
+  `check-graph` asserts fresh together. The hook itself is never hand-edited;
+  that rule is resident in `CLAUDE.md` because a session about to edit it is not
+  looking at a red gate.
 - **The new-gate fan-out** — the other wide trigger, and the one with no single
   owner elsewhere: `gate-sdk/SPEC.md`'s kit-landing checklist covers the kit-side
   obligations (SPEC section, `good/`+`bad/` fixture pair, the README's

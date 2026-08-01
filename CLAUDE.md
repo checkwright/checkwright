@@ -62,17 +62,13 @@ The state machine, its stamp protocol, and the per-stage contracts:
 <!-- lifecycle-kit:end -->
 
 The pre-commit hook is **generated** — never hand-edit
-`scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and run
-`bash gate-sdk/bin/gen-pre-commit.sh --write`, then regenerate the graph
-artifact: `bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`
-(`check-graph` asserts both artifacts are fresh). Per-clone opt-in:
-`bash gate-sdk/bin/install-hooks.sh`.
-
-The enforcement map is a generated projection likewise — a class-registry change
-(a gate's `tier=`, `kpis.list`, the settings hooks, a `# enforce:` marker) makes
-it stale, and `check-enforcement-fresh` byte-compares it and prints the regen
-command on red. The docs-site projections are a separate roster —
-docs/site-architecture.md.
+`scripts/git-hooks/pre-commit`; edit a gate's `# graph:` manifest and regenerate.
+Per-clone opt-in: `bash gate-sdk/bin/install-hooks.sh`. Every generated
+projection — that hook, the graph artifact, the enforcement map, the footprint
+and value rollup, the docs mirror — is rostered with its trigger and regen
+command in [docs/site-architecture.md](docs/site-architecture.md) §Generated
+projections, which also carries the full fan-out a new gate stales; each
+freshness gate prints its own command on red.
 
 New gates copy `gate-sdk/templates/check-skeleton.sh` and ship with a
 `good/`+`bad/` fixture pair; the four contracts (output, fail-closed,
