@@ -6,3 +6,4 @@
 
 supply-chain-posture-round-two scope aeb9933e 2026-08-01
 supply-chain-posture-round-two spec a5455480 2026-08-01
+supply-chain-posture-round-two align ac454dbe 2026-08-01
