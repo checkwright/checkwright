@@ -51,16 +51,36 @@ job creates the GitHub Release; while the channel is `preview` that creation
 carries `--prerelease`, so every Release page states the posture without a human
 remembering to. Nothing else in the publish path changes.
 
-**Ruled out — an npm dist-tag split.** The obvious stronger signal is publishing
-to a `preview` (or `next`) dist-tag rather than npm's default `latest`. It is
-rejected: `docs/install.md` §Quick start documents a one-command install, and a
+**Ruled out — an npm dist-tag split. Escalated at spec and ruled by the operator
+2026-08-01; this is a settled decision, not an author's preference or an
+unfinished half.** The obvious stronger signal is publishing to a `preview` (or
+`next`) dist-tag rather than npm's default `latest`. It is rejected:
+`docs/install.md` §Quick start documents a one-command install, and a
 non-`latest` dist-tag makes that command resolve to nothing until the reader
 learns to append `@preview`. That converts an honest signal into a
-time-to-first-value regression on the precise surface this project's own
-weakness list names first. Honest signaling that costs the front door is a bad
-trade at pre-launch; the Release flag and the declaration carry the message at
-no install cost. Recorded so a later hardening pass does not "finish the job" by
-adding `--tag` to the publish step.
+time-to-first-value regression on the precise surface this project's own weakness
+list names first. The trade was put to the operator in exactly those terms — a
+machine-readable channel signal bought with front-door friction — and declined.
+Honest signaling that costs the front door is a bad trade at pre-launch; the
+Release flag and the declaration carry the message at no install cost.
+
+**Recorded so a later hardening pass does not "finish the job" by adding `--tag`
+to the publish step.** Two things make that reading wrong rather than merely
+unsanctioned. The channel is *fully* declared by Delta 1 as it stands — the
+prose declaration and the `--prerelease` flag are the whole mechanism, held in
+parity by a gate, so there is no dangling half a dist-tag would complete. And the
+absence of `--tag` in `.github/workflows/publish.yml` is **load-bearing
+configuration**, not an omission: it is what keeps the documented install
+command working, so a pass that adds it silently breaks §Quick start.
+
+**The one condition that reopens this**, stated so the decision is falsifiable
+rather than permanent: a dist-tag split becomes the right call once the
+documented front door no longer resolves through the default tag — i.e. once
+`docs/install.md` §Quick start stops promising a bare one-command install, or
+once a stable line exists to hold `latest` while preview moves off it. Neither
+holds today. `scripts/pack-installer.sh`'s version regex already admits a
+prerelease suffix, so nothing here forecloses the change; it is cheap to make
+when its condition fires and wrong to make before.
 
 **New gate — `check-release-channel-parity`** (this repo's `scripts/`,
 repo-root-governed beside `check-release-bump`, whose surfaces are the same two

@@ -216,10 +216,29 @@
   accidental. (2) `prevent_self_review: true` is ruled **out permanently**, not
   deferred: it deadlocks the channel against a single maintainer, and that is a
   property of the project's standing structure rather than of its current size.
-  Whether to flip `can_admins_bypass` is **the operator's and is not this unit's
+  Whether to flip `can_admins_bypass` was **the operator's and not this unit's
   to decide** — it is a live repo-settings change on a supply-chain surface; the
-  ruling establishes only that its cost is a publish with no approval record,
-  never an unauthorized publish.
+  scope ruling established only that its cost is a publish with no approval
+  record, never an unauthorized publish.
+  **Operator ruling 2026-08-01 at spec — `can_admins_bypass` STAYS `true`, and
+  the posture is accepted rather than postponed.** This settles the one question
+  scope left open, on premises now verified rather than filed (above). It is a
+  **decision, not a discovery**: no live repo-settings change is made this
+  iteration, and the flip is *not* deferred as a later unit either — there is no
+  open gap here to reopen, and a later reader finding `can_admins_bypass: true`
+  is looking at a chosen posture. Three things fix it. (1) **The accepted cost,
+  stated as the position:** a publish can land with no approval record. For a
+  solo operator that record is the control's entire output, so the accepted cost
+  is the control silently producing nothing on one path — not an unauthorized
+  publish, which the single-account structure makes unavailable either way.
+  (2) **Why accepting beats flipping:** the bypass path is reachable only by the
+  same account that holds the reviewer slot and pushes the tags, so `false` would
+  remove a path that account can already walk by approving, buying a record it
+  can already choose to produce, at the cost of a setting that can deadlock an
+  urgent publish with no second party to unblock it. (3) **What the unit still
+  owes is unchanged** — *record* the posture (`OPS.local.md` desired state, plus
+  whatever `RELEASING.md` step 5 owes) so deliberate reads as deliberate. Build
+  transcribes this ruling; it does not re-derive it.
   Debt: records deliberate repo-settings desired state; adds no governed name.
   Filed 2026-07-31 by close after the `v0.18.0` release, on a premise the
   operator contradicted at the source; re-verified against the run and narrowed
