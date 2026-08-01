@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: canon-kit/SPEC.md §check-prose-enum — this repo's enum-set emitter: the queue tag vocabulary, derived (not restated) from queue-kit's own lead-line tag parser plus the configured lesson tags. One <set-name><TAB><member> line per member. Two sets, because the tags partition by role: the task/selection tags list together in prose, the Lessons channel tags list together — a paragraph naming one role's tags is not enumerating the other.
+# spec: canon-kit/SPEC.md §check-prose-enum — this repo's enum-set emitter: the queue tag vocabulary plus four derived roster families over the kit tree. One <set-name><TAB><member> line per member, every member read from the tree or from the gate that owns it, never restated. The tags partition by role into two sets: the task/selection tags list together in prose, the Lessons channel tags list together — a paragraph naming one role's tags is not enumerating the other.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,4 +25,27 @@ for t in "${alltags[@]}"; do
 done
 for t in "${lessons[@]}"; do
     printf 'queue-lessons-tag\t%s\n' "$t"
+done
+
+# spec: canon-kit/SPEC.md §check-prose-enum — the kit-root anchor for every derived family is gate-sdk's own kit-root derivation, so the sets cannot enumerate a different tree than the battery runs on
+# shellcheck source=../gate-sdk/lib/gate.sh
+source "$REPO/gate-sdk/lib/gate.sh"
+mapfile -t kits < <(cd "$REPO" && gate_kit_roots_rel)
+(( ${#kits[@]} > 0 )) || { echo "enum-sets: gate_kit_roots_rel enumerated no kit roots" >&2; exit 2; }
+
+# spec: canon-kit/SPEC.md §check-prose-enum — a member is a file basename, never a path: the basename matches prose spelling the file kit-relative, repo-relative or bare, because the matcher's word boundary accepts the leading slash
+emit() { local sname="$1"; shift; local m; for m in "$@"; do printf '%s\t%s\n' "$sname" "$m"; done; }
+
+for kit in "${kits[@]}"; do
+    # spec: canon-kit/SPEC.md §check-prose-enum — a lib/ that tracks no top-level *.sh is a layout this derivation can no longer read, so it fail-closes rather than emitting the silently empty set
+    if [[ -d "$REPO/$kit/lib" ]]; then
+        mapfile -t libs < <(cd "$REPO" && git ls-files "$kit/lib" | grep -E "^$kit/lib/[^/]+\.sh\$")
+        (( ${#libs[@]} > 0 )) || { echo "enum-sets: $kit/lib tracks no top-level *.sh" >&2; exit 2; }
+        emit "$kit-lib" "${libs[@]##*/}"
+    fi
+    # spec: canon-kit/SPEC.md §check-prose-enum — a gate-tests/ holding only good/bad fixture directories ships no bespoke unit test; that empty set is a measured normal state, not a broken derivation
+    if [[ -d "$REPO/$kit/gate-tests" ]]; then
+        mapfile -t tests < <(cd "$REPO" && git ls-files "$kit/gate-tests" | grep -E "^$kit/gate-tests/[^/]+\.test\.sh\$")
+        (( ${#tests[@]} > 0 )) && emit "$kit-gate-test" "${tests[@]##*/}"
+    fi
 done

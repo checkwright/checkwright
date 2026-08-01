@@ -352,6 +352,16 @@ each degrading to "no icebox" rather than to a wrong section when left unset. Va
 
 ## Per-component contracts
 
+Each gate below owns its own section — the assertion, its fixture pair, and the
+reason for any bespoke unit test beside it. The bespoke unit tests are named
+together here, because a roster spread across per-gate sections is one no reader
+and no oracle sees whole: `check-comment-tier.test.sh`,
+`check-deprecation-task.test.sh`, `check-docs-link-convention.test.sh`,
+`check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
+`check-manifest-count.test.sh`, `check-md-refs.test.sh`,
+`check-prose-enum.test.sh`, `check-spec-dod-singleton.test.sh` and
+`check-tracking-claim.test.sh`.
+
 ### lib/spec.sh
 
 The sourced config loader plus shared adapters — values and adapters only,
@@ -636,6 +646,35 @@ lead-line tag parser plus `QUEUE_KIT_LESSON_TAGS` — derived, not restated; the
 two roles are separate sets because a paragraph naming one role's tags is not
 enumerating the other. A set a consumer can only hand-list is that consumer's
 own drift to own; the kit contract asks only for the emit grammar.
+
+The same emitter adds two roster families over the kit tree, one set per kit
+root: a `<kit>-lib` set of the tracked top-level `lib/*.sh` basenames and a
+`<kit>-gate-test` set of the tracked top-level `gate-tests/*.test.sh` basenames,
+with the roots read from `gate_kit_roots_rel` (gate-sdk/SPEC.md §lib/gate.sh) so
+the sets cannot enumerate a tree the battery does not. A new kit, lib or unit
+test enrols with no edit, which is the property a hand correction per stale
+roster would not have. Members are basenames rather than paths because a
+basename matches prose spelling the file kit-relative, repo-relative or bare —
+the boundary rule above accepts the leading slash. The families fail closed
+where an empty result contradicts the shape they read (no kit roots at all, or a
+`lib/` tracking no top-level `*.sh`) and stay silent where emptiness is real: a
+`gate-tests/` holding only `good/`+`bad/` fixture directories ships no bespoke
+unit test, and that is a normal kit.
+
+Two further families — a per-lib set of its function names, and a per-lib set of
+the files sourcing it — were derived, measured against this tree and refused;
+the reason is recorded so neither is re-minted. Both fail on one property: a
+lib's functions and its sourcers are a vocabulary prose *discusses*, not a set
+prose *rosters*, so the set-difference is real while the finding is false. The
+function family reported an omission at every passage explaining how two helpers
+interact, none of them a roster, and it is unsound against the matcher besides —
+the word boundary above excludes `_`, so `guard_allow` reads as present inside
+`guard_allow_match`, a false clean in exactly the family it was added for. The
+caller family's one intended site is a caller roster written as narrative, which
+the hand-list adjacency rule correctly declines to judge, so it was inert there
+while still firing falsely on a README row naming two of a kit's tools. The rule
+the pair teaches: declare a derived set when the tree shape it reads is one the
+prose rosters — a layout is such a shape, an incidental relation is not.
 
 Calibration follows the count gate's procedure: tuned against this tree, every
 hit dispositioned — cite the set, complete the list, or site-exempt with reason.
