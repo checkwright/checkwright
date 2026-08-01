@@ -357,10 +357,11 @@ kit could not have named generically.
   body (delta 4). All three existing lead-ins verbatim.
 - **delegation-kit/SPEC.md §The delegation model** — the two rationale
   paragraphs and their rule citations (delta 5).
-- **delegation-kit/SPEC.md §Resume journal — agent writes, supervisor deletes**
-  — the caveat's receiving-end clause (delta 3), in the same section the debt
-  unit edits for lifetime; the two edits are disjoint sentences and the debt
-  unit's lands first.
+- **delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
+  sweeps** — the caveat's receiving-end clause (delta 3), in the same section
+  the debt unit edits for lifetime; the two edits are disjoint sentences and
+  the debt unit's lands first. (The section heading is the debt unit's rename:
+  the old name asserted the deleted chore.)
 - **`.claude/agents/stage-session.md` §Standing dispatch policy** — the pointer
   bullet (delta 6).
 - **The docs-site mirror of delegation-kit/SPEC.md** and the other generated

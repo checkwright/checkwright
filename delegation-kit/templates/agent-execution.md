@@ -37,7 +37,7 @@ reach-through, not a change to this protocol; every rule below still applies.
 - **Gate-driven worklist where one exists.** Drive the sweep from the gate's
   output, so an interrupt loses only the in-flight uncommitted unit and a fresh
   session re-runs the gate to resume.
-- **Resume journal — agent writes, supervisor deletes.** The agent `Write`s a
+- **Resume journal — agent writes, scratch reset sweeps.** The agent `Write`s a
   running progress journal (findings triaged, edits applied, what remains) to a
   repo-local gitignored scratch dir in the main checkout — `.tmp/` here — never a
   temporary worktree (deleted with the worktree) nor a system temp dir (a restart
@@ -48,14 +48,23 @@ reach-through, not a change to this protocol; every rule below still applies.
   `DONE` marker. Each finding is
   written into the journal *inline as it is confirmed* — never "see final
   output": the agent's return message dies with the session, so a pointer-only
-  journal makes `DONE` lie about recoverability. **Agents have no `rm`, so the
-  supervisor deletes the journal at the post-commit validation checkpoint.** A
-  journal *without* a `DONE` marker signals interruption only in a **cold read**
+  journal makes `DONE` lie about recoverability. **Nobody deletes a journal
+  while the work it covers is live** — not the agent (no `rm`) and not the
+  supervisor, whose deletion would take the file out from under a resumed agent
+  and destroy its own pull channel mid-unit. Cleanup is the consumer's scratch
+  reset at its next work-unit boundary, not a chore in this protocol. `DONE` is
+  the completion marker and counts **only as the file's last line**: a session
+  resumed past its own marker appends after it. A journal *without* a `DONE`
+  marker signals interruption only in a **cold read**
   — the supervisor found a journal but never consumed the agent's return (its
   session died before returning); there, no `DONE` = interrupted, resume from
   it. On the ordinary path the supervisor consumed the return and ran its
   post-commit verification, which *is* the completion attest, so the missing
-  marker is redundant, not a signal of interruption. **Caveat — a background agent's sandbox may block
+  marker is redundant, not a signal of interruption. Since every journal now
+  outlives its session, presence alone signals nothing — tell a live journal
+  from a spent one by its per-session name, the work cursor, and `git log`
+  (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
+  sweeps). **Caveat — a background agent's sandbox may block
   the journal write.** `run_in_background` agents have been observed unable to
   `Write` to the granted path and silently falling back to returning findings in
   their final message — which makes the journal mechanic non-functional exactly

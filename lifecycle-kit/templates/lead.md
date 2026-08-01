@@ -132,10 +132,17 @@ goes to the operator, never substituted by the lead's own judgment.
 ## Channel design
 
 Two channels, each with one job. Routine narration and findings go to the
-**resume journal** (a pull channel — delegation-kit's journal mechanics apply
-unchanged). The **message channel** carries only the escalation classes. This
+**resume journal** (a pull channel — delegation-kit's journal mechanics own
+the rest). The **message channel** carries only the escalation classes. This
 is how verbosity is controlled: by channel design, not by asking a session to
 be quiet.
+
+A pull channel is read, never consumed: the lead **does not delete** a stage
+session's journal, at the post-commit checkpoint or anywhere else. A resumable
+session is still writing to it, and deleting it is how a lead destroys the
+channel it is meant to keep reading for the rest of the unit. It is swept with
+the rest of the scratch dir at the iteration boundary
+(delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps).
 
 ## Policy is config, not prose
 

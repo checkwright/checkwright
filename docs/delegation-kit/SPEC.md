@@ -134,7 +134,7 @@ doctrine lives behind the trigger, not in the always-loaded file. Honest limit:
 the guard enforces budget mechanically, not protocol literacy — a session that
 dispatches without invoking the skill carries only the resident pointer.
 
-## Resume journal — agent writes, supervisor deletes
+## Resume journal — agent writes, scratch reset sweeps
 
 A mutating agent `Write`s a running progress journal (findings triaged,
 edits applied, what remains) to a repo-local gitignored scratch directory
@@ -148,20 +148,52 @@ predictable across coding agents. The agent updates the journal as it
 goes; on success it appends a `DONE` marker. Each finding lands in the journal *inline as it is
 confirmed* — never "see final output": the agent's return message dies with
 the session, so a pointer-only journal makes `DONE` lie about
-recoverability. Agents have no `rm`; the supervisor deletes the journal at
-the post-commit validation checkpoint. Whether a journal *without* `DONE`
-signals interruption turns on whether the supervisor consumed the agent's
-return. On the ordinary completion path the supervisor received the return and
-ran its post-commit verification (§Validate after every agent commit); that
-return plus the verification *is* the recovery contract, attesting completion
-directly, so the `DONE` marker is redundant and a journal without it does
-**not** imply interruption. Only in a **cold read** — the supervisor finds a
-journal but never consumed a return, the agent's session having died before
-returning (a background sandbox died, a crash, a timeout) — is the marker the
-sole signal, and there the original reading holds: no `DONE` = interrupted,
-resume from it. The inline-findings rule above is exactly that cold arm's
-insurance — with no surviving return, a pointer-only journal would make a
-would-be `DONE` lie about recoverability.
+recoverability.
+
+**Lifetime — the journal outlives every session that reads it.** No party
+deletes a journal while the work it covers is live. Agents have no `rm`, and
+the supervisor does not delete one either: a journal is swept by the
+consumer's own scratch reset at its next work-unit boundary, a mechanism the
+consumer already owns (here, `enter-stage.sh`'s boundary wipe of `.tmp/` at
+the next scope entry — lifecycle-kit/SPEC.md §bin/enter-stage.sh). Two things
+break when the supervisor deletes on its own schedule instead, and both appear
+only once a dispatched agent is **resumable** rather than one-shot: a resumed
+agent is still writing to the file, and a supervisor treating the journal as
+its **pull channel** (lifecycle-kit/templates/lead.md §Channel design)
+destroys at the first validated commit the channel it is supposed to keep
+reading. A one-shot sweep hides both, which is why an eager deletion chore
+read as correct for as long as it did.
+
+**Attested.** A supervisor deleted a resumable session's journal after
+validating that session's first commits; the session resumed minutes later,
+found the file gone mid-write, rebuilt it from context, and reported the
+disappearance as a suspected scratch-directory reliability defect. The lost
+working state was the cheaper half — the false defect signal, raised against
+the scratch dir and against an unrelated sibling unit, is what retention is
+priced against. The same supervisor then retained two later sessions'
+journals against the then-governed text; that deviation is what this section
+now states.
+
+**Reading `DONE` under retention.** Retention costs the *presence* of a
+journal its meaning: every journal now survives its session, so finding one
+signals nothing by itself. The marker still carries the completion claim, with
+one sharpening a resumable session forces — `DONE` is meaningful **only as the
+file's last line**, since a session resumed past its own marker appends after
+it, and a mid-file `DONE` claims a completion the later content contradicts.
+Whether a *missing* marker signals interruption still turns on whether the
+supervisor consumed the agent's return. On the ordinary completion path it
+did, and that return plus its post-commit verification (§Validate after every
+agent commit) *is* the recovery contract, so the marker is redundant there.
+Only in a **cold read** — a journal found with no return ever consumed, the
+agent's session having died before returning (a background sandbox died, a
+crash, a timeout) — is the marker the sole signal, and there the original
+reading holds: no `DONE` = interrupted, resume from it. A live journal is told
+from a spent one by per-session journal naming, the consumer's own work
+cursor, and `git log`, which together say more than presence ever did, and the
+boundary sweep bounds the ambiguity to the current work unit. The
+inline-findings rule above is that cold arm's insurance — with no surviving
+return, a pointer-only journal would make a would-be `DONE` lie about
+recoverability.
 
 **Caveat — the sandbox may block the journal write.** Background agents
 have been observed unable to `Write` to the granted path, silently falling

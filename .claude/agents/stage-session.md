@@ -54,9 +54,8 @@ carries only what varies: the stage skill to invoke, the batch's task slugs, and
 batch-specific pointers such as the journal path.
 
 - **Resume journal.** Narration and findings go to the resume journal, not the
-  message channel; the mechanics (the agent writes, the lead deletes) are
-  delegation-kit's:
-  delegation-kit/SPEC.md §Resume journal — agent writes, supervisor deletes.
+  message channel; the mechanics are delegation-kit's:
+  delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
   The dispatch names the journal path.
 - **Shared git index.** A concurrent session may share the index; follow the
   shared-index discipline in CLAUDE.md §This repo is governed by its own kits,

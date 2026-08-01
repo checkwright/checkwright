@@ -129,53 +129,6 @@
 
 ## Technical Debt
 
-- **resume-journal-deletion-vs-pull-channel** — two delegation templates give the
-  resume journal contradictory lifetimes, and a resumable stage session is where
-  they collide. `lifecycle-kit/templates/lead.md` §Channel design designates the
-  journal the lead's **pull channel** — narration and findings go there so the
-  message channel carries only escalations, and the lead pulls from it for
-  detail. `delegation-kit/templates/agent-execution.md` tells the supervisor to
-  **delete** that same journal at the post-commit validation checkpoint. For a
-  one-shot delegated sweep both hold, because the agent returns and is never
-  resumed; for a stage session deliberately kept resumable under a lead, the
-  first validated commit destroys the channel the lead is supposed to keep
-  reading. Neither template owns the interaction alone, which is why the
-  deliverable is a contract resolution rather than a retiming.
-  **Live instance:** the lead deleted scope's journal after validating its first
-  two commits; scope resumed minutes later, found it gone mid-session, rewrote it
-  from context, and reported it as a suspected sandbox or `.tmp/` reliability
-  defect. Two costs, the second worse: an agent loses working state it is still
-  writing to, and a false defect signal is manufactured against `.tmp/` and
-  against **`agent-execution-backgrounding-role-scope`**.
-  **Premise re-verified at promotion, and the reach is wider than filed — four
-  files, not two.** `lead.md:132-138` states the pull channel and imports
-  delegation-kit's journal mechanics "unchanged"; `agent-execution.md:51-52` and
-  `delegation-kit/SPEC.md:132` both state the supervisor deletion, the second as a
-  SPEC section heading; and `.claude/agents/stage-session.md:56-60` mirrors the
-  deletion into this consumer's agent definition. No resumable-session exception
-  exists on any of the four. A resolution that edits two surfaces leaves two
-  stating the old rule.
-  **Candidate resolution to beat:** keep the journal for the iteration, let the
-  boundary reset sweep it, `DONE` stays the completion marker. The cleanup is
-  already mechanized rather than merely mistimed —
-  `LIFECYCLE_KIT_BOUNDARY_PRESERVE` in `scripts/lifecycle-config.sh` is
-  `(session-role)` alone, so `enter-stage.sh`'s boundary reset already wipes
-  `.tmp/`, journals included, at the next scope entry. That lets the supervisor
-  chore be **removed** outright instead of retimed.
-  **Known cost of that candidate, stated so it is not rediscovered:** a retained
-  journal blunts the cold-read "no `DONE` = interrupted" signal. The mitigation is
-  that per-stage journal naming plus the `WORKFLOW-STATE` cursor plus `git log`
-  disambiguate a stale journal better than presence/absence does, and the boundary
-  reset bounds the ambiguity window to the current iteration.
-  Debt: a contract resolution over existing templates; adds no governed name.
-  Filed 2026-07-31 by the lead mid-iteration as two gap bullets, the second
-  sharpening the first; merged into one entry at close because they name one
-  deliverable. Promoted 2026-08-01 into `delegation-reach-and-gate-cost`
-  (operator ruling) — land it first in the delegation lane: it is the cheapest
-  member, it is the one this iteration's own sessions keep paying, and settling
-  the journal's lifetime is a precondition for
-  **`agent-execution-backgrounding-role-scope`**'s durability half.
-
 - **gate-battery-spawn-hoists** — the gate battery costs 40977ms on this tree
   (89 gates, `.tmp/gate-timings.txt`), and about 12.0s of that is in-gate
   `fork`/`exec` the gates re-pay per item for no benefit. This entry is the
@@ -2204,5 +2157,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- resume-journal-deletion-vs-pull-channel
 
 ## Lessons Learned
