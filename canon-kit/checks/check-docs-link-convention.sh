@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit
-# spec: canon-kit/SPEC.md §check-docs-link-convention — docs pages cite downward: no directory-target relative link (name the file), a kit page's back-link to its own README/SPEC carries a #section anchor
+# spec: canon-kit/SPEC.md §check-docs-link-convention — docs pages cite downward: no directory-target relative link (name the file), a kit page's back-link to its own README/SPEC carries a #section anchor, no relative link to a target resolving outside the docs root
 #
 # usage: check-docs-link-convention.sh [docs-root]   (default CANON_KIT_LINK_ROOT;
 #   the optional arg points the fixture pair at a synthetic docs tree)
@@ -51,6 +51,11 @@ for f in "${pages[@]}"; do
             exempt "$f" "$lno" || bad+=("$f:$lno: directory-target link '$tgt' → $p/ — name the file (e.g. $tgt/index.md), not the directory")
             continue
         fi
+        if [[ -e "$p" && "$p" != "$ROOT"/* ]]; then
+            exempt "$f" "$lno" \
+                || bad+=("$f:$lno: off-root relative link '$tgt' → $p — resolves outside $ROOT/, so it 404s on a site served from $ROOT/ alone; cite it in the absolute self-repo blob form")
+            continue
+        fi
         if [[ -n "$kit" && -z "$anchor" ]]; then
             b="$(basename "$p")"
             [[ ( "$b" == README.md || "$b" == SPEC.md ) && "$(basename "$(dirname "$p")")" == "$kit" ]] \
@@ -63,9 +68,11 @@ if [[ ${#bad[@]} -gt 0 ]]; then
     echo "check-docs-link-convention: docs page link(s) break a shape convention (resolution is check-md-refs' job; this gate owns shape):"
     printf '  %s\n' "${bad[@]}"
     echo "  help: name the file a directory link points at (kit/index.md, not kit/); give a kit page's"
-    echo "        back-link to its own README/SPEC a #section anchor. Per-site valve: a 'docs-link-exempt:"
-    echo "        <reason>' HTML comment on the link line or the one above."
+    echo "        back-link to its own README/SPEC a #section anchor; cite a target outside the docs"
+    echo "        root with the absolute self-repo blob form (canon-kit/SPEC.md §The reference-link"
+    echo "        grammar) rather than relatively. Per-site valve: a 'docs-link-exempt: <reason>'"
+    echo "        HTML comment on the link line or the one above."
     exit 1
 fi
-echo "DOCS-LINK-CONVENTION: clean (${#pages[@]} docs page(s), $links relative link(s); no directory target, kit back-links anchored)"
+echo "DOCS-LINK-CONVENTION: clean (${#pages[@]} docs page(s), $links relative link(s); no directory target, kit back-links anchored, no off-root relative target)"
 exit 0

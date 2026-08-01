@@ -12,60 +12,6 @@
 
 ## New Features
 
-- **docs-root-link-grammar** [spec: SPEC-docs-root-link-grammar.md]
-  A hand-authored `docs/` page that
-  links a path *outside* `docs/` with a bare relative link resolves on disk but
-  404s on the rendered site, which is served from `docs/` as its root.
-  `check-md-refs` resolves the target on disk and stays green, so nothing
-  catches it; `jekyll-relative-links` cannot rewrite it either, because the
-  target is outside the Jekyll source and so has no built URL to rewrite to.
-  Verified live at close: `docs/orchestration.md` lines 90 and 108 both link
-  `../lifecycle-kit/templates/lead.md`, two reader-facing broken links standing
-  today. The generated mirror already emits the self-repo blob grammar for
-  exactly this reason (`scripts/gen-docs-mirror.sh` rewrites source and
-  directory links), and `docs/index.md` reaches `ROADMAP.md` that way by hand —
-  so the correct form is established and only the hand-authored path is
-  unguarded.
-  **Deliverable:** a gate asserting that a link from a `docs/` page to a target
-  outside `docs/` uses the blob form, plus — under enforcement-first, in the
-  same unit — the sweep of the existing violations.
-  **The open call, settled at promotion — with a third option the entry did not
-  have.** It was posed as "a new gate, or an assertion inside `check-md-refs`",
-  worrying correctly that folding it in gives a disk-resolution gate a
-  site-topology opinion. It is **neither**: it is a third rule on
-  `check-docs-link-convention`, which is already scoped to the docs root by
-  `CANON_KIT_LINK_ROOT` and already owns the *shape* of relative links while
-  ceding *resolution* to `check-md-refs`. That option was absent because the unit
-  was scoped as a site-kit surface — **it is canon-kit's**; site-kit owns no
-  docs-link gate at all (see the surface correction below). `check-md-refs` is
-  left untouched, which is what the stated worry asked for. The boundary
-  predicate's edges are each ruled in the amendment; the generated mirror pages
-  are deliberately **not** exempted, so the rule doubles as a regression test on
-  the generator's rewrite.
-  **Cost while deferred:** two reader-facing broken links stand on the rendered
-  site, and every hand-authored docs page added meanwhile can add another
-  silently. Not covered by `rendered-site-link-monitor`, whose scope is
-  external-URL rot and which rules a hermetic gate out on false-positive
-  grounds — this class is intra-repo and decidable from the tree alone, so that
-  ruling does not transfer.
-  **Ruled into `release-signaling-reset` as a deliberate second surface
-  (2026-08-01, operator ruling at that scope's unit-set escalation).** The
-  iteration's other four units share the release surface; this one is `docs/` +
-  a kit. **Surface premise corrected 2026-08-01 at spec: the kit is canon-kit,
-  not site-kit.** site-kit owns exactly two gates (`check-docs-cname-parity`,
-  `check-docs-render-fidelity`) and no docs-link gate; `check-docs-link-convention`
-  and canon-kit/SPEC.md §The reference-link grammar — which already *prescribes*
-  the blob form for this exact case — are both canon-kit's. The ruling stands
-  unchanged (the unit is still a deliberate second surface); only which kit it
-  lands in was wrong. The amortization dilution was named at the escalation and accepted
-  knowingly, because these are the only currently-broken reader-facing artifacts
-  in the queue — re-verified live at that scope: `docs/orchestration.md`:90 and
-  :108. Fixing the two links **without** the gate was explicitly rejected, on
-  enforcement-first. Recorded so the next reader does not read an off-surface
-  unit in a single-surface iteration as an accident.
-  Filed 2026-07-27 at align in front-door-readiness, while verifying the
-  roadmap amendment's docs-home link; re-verified at close.
-
 ## Technical Debt
 
 - **npm-publish-approval-posture-unrecorded** — the `npm-publish` environment's
@@ -2150,5 +2096,6 @@
 - knob-rename-compat-threshold
 - preview-release-cadence
 - tightened-gates-declaration-note-parity
+- docs-root-link-grammar
 
 ## Lessons Learned
