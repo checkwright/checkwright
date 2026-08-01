@@ -330,6 +330,10 @@
   mis-attributed rows would settle a tier question on noise; (2) the `≥N
   iterations` threshold this entry leaves unset still needs a value, and five
   recorded iterations is the number now on the table.
+  **Carry-over (1) discharged 2026-08-01 by the undirected scope survey:**
+  `stage-economics-honesty` has landed, attribution fix included, so the rows are
+  no longer mis-attributed and this entry is **pickable with nothing left
+  blocking it**. Only carry-over (2) — the unset `≥N` — stands.
   **Cost while deferred:** one queue line; the backlog-aging review re-raises it
   every iteration until the data exists to run it. Filed 2026-07-19 by lead
   ruling at the `stage-posture-split-tuning` close — the split shipped on
@@ -350,18 +354,18 @@
   single highest-value lever no longer holds. And the already-adopted
   validate→Sonnet downgrade **demonstrably works**: validate is the cheapest
   stage by a wide margin with no observed quality cost, which is the affirmative
-  precedent this A/B is testing for build. Treat every figure here as provisional
-  until the prerequisite below lands — they carry the same attribution defects.
+  precedent this A/B is testing for build. These figures predate the attribution
+  fix; re-read them from the log rather than trusting them as transcribed.
   The superseded token-only reading: build ~100–175k output, 5–25M cache-read per
   run versus close/validate ~7–49k output.
   **Two design blockers:** (1) ~~the decision metric is uninstrumented~~ —
   **resolved**: a price table now exists and the meter prices instead of
   reporting `cost=n/a`. It is replaced by a sharper blocker: the figures are
   priced but **mis-attributed**, so `stage-economics-attribution-honesty` is
-  now this task's hard prerequisite. Running the A/B on today's rows would
-  compare two noisy numbers — one session bearing two stamps is billed to both
-  stages in full, unstamped continuation sessions vanish, and the lead's own
-  supervision burn lands in no row at all. Sequence that task first. (2) the
+  now this task's hard prerequisite. **Discharged 2026-08-01 by the undirected
+  scope survey:** that fix landed inside `stage-economics-honesty` (one
+  transcript, one row), so the rows are priced *and* honestly attributed and this
+  task is **unblocked**; it is also self-labelled Debt below. (2) the
   metric must be **net delivered-work cost** — price-weighted tokens + rework
   round-trips + the supervisor's by-eye gate-diff burden + escalation load
   shifted onto the Opus lead — not single-pass token price; a cheaper builder
@@ -377,8 +381,8 @@
   this holds stage constant and varies model). Debt/analysis: settles a
   ruling-config tier by data, adds no governed name.
   **Cost while deferred:** low and non-rotting — validate's adopted downgrade
-  already banks the affordable half of this lever, and every figure here is
-  provisional until the prerequisite corrects the rows; the residue is that
+  already banks the affordable half of this lever, and the prerequisite that
+  made the rows provisional has now landed; the residue is that
   build's and close's tiers stay set by intuition rather than by a priced A/B.
   Filed 2026-07-20 by lead
   ruling during the `render-fidelity-leak-coverage` spec, from an operator
@@ -1076,6 +1080,15 @@
   predicate another component must honor — so canon-kit/SPEC.md's new-names
   litmus makes this a **feature** owing an amendment, and it promotes into a
   feature section rather than Technical Debt.
+  **Head candidate for the next iteration — operator ruling 2026-08-01 at the
+  `shipped-roster-parity` unit-set escalation.** Weighed for inclusion in that
+  iteration and deliberately left out: it sits on gate-sdk's exemption scan
+  rather than on a kit's install-time registry, so bundling it would have paid a
+  second design setup inside a single-ruling iteration. It is named the head
+  candidate for the next iteration **on its own merits** — it is the only
+  *fail-open* in this queue, and for a project whose stated strength is
+  deterministic self-testing gates, a green that means nothing is the worst
+  failure class shipped.
   Surfaced 2026-07-29 at spec while surveying readers for the icebox tier; the
   token-scan half added 2026-07-31 at align. Drained from the gap inbox by close,
   which triaged the two bullets as one unit on the align bullet's instruction.
@@ -2049,8 +2062,14 @@
   in the root README — so the omission is asymmetric rather than principled. A
   contributor touching `delegation-kit/bin/usage-verdict.sh` or
   `context-kit/bin/md-index.sh` and following the root README runs the gate
-  fixtures and none of these. CLAUDE.md §This repo is governed by its own kits
-  carries the same roster in the same shape, so a fix touches both surfaces.
+  fixtures and none of these.
+  **Premise corrected 2026-08-01 by the undirected scope survey — wider and
+  narrower than filed, in one correction.** *Wider:* the omission is **seven**
+  suites, not four — the four named above plus `consumer_smoke`, `upgrade` and
+  `agents_md_smoke`. *Narrower:* the claim that CLAUDE.md "carries the same
+  roster in the same shape, so a fix touches both surfaces" is **wrong** —
+  CLAUDE.md §This repo is governed by its own kits is a pure pointer with no
+  duplicate roster, so this is **one** surface. Do not budget the second edit.
   **Why `[design-pending]` rather than a four-line backfill:**
   `evidence-config.sh` already *derives* the gate-tests suites via
   `gate_fixture_suites` and hand-lists these four, so the derivation-first
@@ -2092,6 +2111,15 @@
   ask whether a kit's install-time registry may be a subset of what the kit
   ships — and the two are cheapest to rule together even though their mechanical
   halves differ.
+  **Re-verified live 2026-08-01 by the undirected scope survey, with a
+  reproduction trap worth carrying into build.** 9 of the 10 shipped gates pass
+  on a verbatim copy and `check-queue-entry-budget` reds on `example-deferred`,
+  exactly as filed. But the reproduction must run from a **scratch cwd**: from
+  the repo root `queue-kit/lib/queue.sh` auto-sources this repo's
+  `scripts/queue-config.sh`, so the gate reads consumer config and gives a false
+  clean. Relatedly, `run-consumer-smoke.sh queue-kit` reports clean — not a
+  contradiction but the entry's own point, since the smoke never registers the
+  gate that reds.
   **Cost while deferred:** a consumer following the documented starter path gets
   a red battery on their first run, which is the worst possible first
   impression and is paid by every new adopter until fixed.
@@ -2109,9 +2137,16 @@
   drift-kit/SPEC.md:803.
   **Why `[design-pending]` rather than a one-line template add:** the fix turns
   on whether `templates/kpis.list` is meant to be the **full bundled set** or a
-  deliberate starter subset, and the SPEC does not say. If it is the full set,
-  the same question sweeps across **every** kit shipping a `templates/` registry
-  beside a richer consumer copy — that survey is the work.
+  deliberate starter subset, and the SPEC does not say.
+  **The survey this entry called "the work" is DONE, and its wide-class premise
+  is falsified — 2026-08-01, undirected scope.** Across all ten `*/templates/`
+  dirs only **three** files are registry-shaped, and this `kpis.list` is the
+  **only** genuine subset omission: `gate-sdk/templates/msg-patterns.list`
+  matches its consumer copy, and `drift-kit/templates/price-table.tsv` ships
+  placeholder rows *by design* under the provenance seam (a kit literal naming
+  real model prices would publish a consumer's roster). So what remains is one
+  template line plus the ruling — not a survey. Re-verify before trusting this:
+  it is a dated finding.
   Shares its design question with `queue-kit-starter-template-red` (part 2):
   both ask whether a kit's install-time registry may be a subset of what the kit
   ships. Distinct instance and distinct surface from
@@ -2155,6 +2190,14 @@
   exactly this shape for `couples` fields via the kit glob token. The unit owes
   a ruling on which of the seven are derivable and a design for the token that
   derives them; seven hand corrections would leave the class intact.
+  **That ruling is ANSWERED 2026-08-01 by the undirected scope survey: all seven
+  are mechanically derivable**, each a set-difference over a `lib/*.sh` list, a
+  `gate-tests/*.test.sh` basename set, or a `source`/call-site grep. So the unit
+  owes the **token design** alone, not the survey. Instance (1) is also worse
+  than filed: `scripts/check-tightened-gates-note-parity.sh` sources
+  `lib/declaration.sh` and calls **both** `decl_section_tokens` and
+  `decl_record_tokens`, so gate-sdk/SPEC.md's "all three named" *and* its "no
+  caller fixture to ride" are both false — the fixture pair is on disk.
   **Cost while deferred:** low per instance and non-rotting, but the count grows
   once per audit — this batch is what a single align fan-out found.
   Surfaced 2026-08-01 by the align audit's cross-spec fan-out; drained into the
