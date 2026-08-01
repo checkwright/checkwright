@@ -307,6 +307,10 @@ if staged_matches 'docs/posts/*.md' 'docs/install.md'; then
     run_gate check-tightened-gates-grammar scripts/check-tightened-gates-grammar.sh
 fi
 
+if staged_matches 'docs/posts/*.md' '.workflow/tightened-gates.txt'; then
+    run_gate check-tightened-gates-note-parity scripts/check-tightened-gates-note-parity.sh
+fi
+
 if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml'; then
     run_gate check-npm-publish-spec scripts/check-npm-publish-spec.sh
 fi

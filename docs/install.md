@@ -508,6 +508,21 @@ here does not silently falsify a sentence somewhere else.
   asserted. A gate renamed or retired since a note shipped would make membership
   false about history without the record being wrong.
 
+  **A sibling gate makes a separate claim, and neither is the other's coverage.**
+  The grammar gate holds each note's section *well-formed*.
+  `check-tightened-gates-note-parity` (also this repo's `scripts/`) holds a note
+  *under composition* **equal to the declaration surface it was composed from**,
+  as set equality in both directions — both, because each direction costs
+  something different: a name on the surface and missing from the note is a gate
+  that tightened and shipped undeclared, licensing a red the upgrade smoke would
+  wave through, while a name in the note and missing from the surface declares a
+  gate that never tightened and sends consumers hunting a reconcile that does not
+  exist. It arms on a note whose declared version carries no tag yet and disarms
+  once tagged, reporting its dormancy rather than letting a drained surface read
+  as verification. It rides `gate-sdk/lib/declaration.sh`'s parsers, never a
+  private one. That is what stops it passing while the smoke reads a different
+  token set from the same bytes.
+
   **A declaration precedes its release.** Because the upgrade smoke's untagged
   arm reads a working tree's tightened-gates declaration surface rather than a
   note (gate-sdk/SPEC.md §upgrade-smoke), an allowed-red set is owed from the
@@ -543,7 +558,7 @@ copied out that then changed *is* depended-on behavior diverging from your copy 
 it is behavior-folded, not dropped. Four classes, three sections, by that
 folding.
 
-Honest limit on the third section: **Behavior-changes bullets are declared for
+Honest limit on Behavior changes: **its bullets are declared for
 the human upgrader, not smoke-asserted.** A non-gate change cannot red the
 battery, so the upgrade smoke's containment assertion (defined over battery
 reds) does not read this section — it fixes where such changes are stated and

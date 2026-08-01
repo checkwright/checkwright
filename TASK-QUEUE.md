@@ -12,43 +12,6 @@
 
 ## New Features
 
-- **tightened-gates-declaration-note-parity** [spec: SPEC-tightened-gates-note-parity.md]
-  Nothing asserts
-  that a release note's composed Tightened-gates set equals the
-  `.workflow/tightened-gates.txt` declaration surface it was composed from.
-  `upgrade-smoke-note-resolution` made build append declared gate names to that
-  tracked record and close transcribe them into the note's bullets and drain the
-  file, both **by hand**, so a dropped or added name between the two surfaces is
-  caught only by review — which is exactly what RELEASING.md step 1 states as
-  its honest limit.
-  Both sides are machine-readable by construction: bare names one per line on
-  the surface, backticked unbolded bullet lead tokens in the note under
-  `release-note-lead-token-grammar`'s canonical spelling, with
-  `check-tightened-gates-grammar`'s parser already extracting the note side. So
-  the parity assertion is mechanical, and the parser it needs already ships.
-  **The open call, settled at promotion.** It was posed as "the assertion only
-  holds at the release commit", and that framing was too coarse: the release
-  choreography is two commits, not one — the note is authored in one and the
-  surface drained in the next — so both sides are non-empty and comparable in the
-  gap between them. The amendment binds there, arming on "the newest note's
-  version carries no tag yet" and disarming on its own once tagged.
-  **Cost while deferred — now realized, not hypothetical.** The filing costed
-  this as "low until the first release that ships a non-empty declared set".
-  That release is `v0.19.0`, composed this close from a one-name surface, so the
-  window is open from here on. A transcription slip either licenses an
-  undeclared red or declares a gate that never tightened, and the upgrade smoke
-  reads the note rather than the surface, so it cannot catch either.
-  **Litmus corrected at promotion (2026-08-01, spec).** The entry carried a
-  `Debt:` line reading "one gate plus its fixture pair over two existing
-  surfaces". That is the *size*, not the class: a new gate adds a script name and
-  a `scripts/gates.list` registration, and canon-kit's new-names litmus makes any
-  task adding a name to a governed surface a feature "however small the diff".
-  It promotes as a feature with an amendment, and the sibling entries proposing
-  gates carry the same misfiling for a later scope to correct on the same ground.
-  Filed 2026-07-31 at spec from the honest limit stated in the amendment's
-  producer delta; promoted at close, its cost re-read against the release it
-  now rides.
-
 - **docs-root-link-grammar** [spec: SPEC-docs-root-link-grammar.md]
   A hand-authored `docs/` page that
   links a path *outside* `docs/` with a bare relative link resolves on disk but
@@ -2186,5 +2149,6 @@
 
 - knob-rename-compat-threshold
 - preview-release-cadence
+- tightened-gates-declaration-note-parity
 
 ## Lessons Learned

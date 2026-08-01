@@ -105,7 +105,16 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 4. **Tag the iteration's final commit, and drain the declaration surface.** The
    drain and the disposition stamp are both tree writes, so the iteration's final
    commit is the one this step creates — which fixes the ordering, and **the
-   ordering is not optional**: write the drain-and-stamp commit, push master,
+   ordering is not optional**. It binds in two places. First, **the note-authoring
+   commit of step 1 precedes this drain-and-stamp commit, and the two are not to
+   be squashed into one**: in the window between them the note and the surface are
+   both non-empty and comparable, which is the only window in which
+   `check-tightened-gates-note-parity` can hold them equal. Compose and drain in a
+   single commit and the gate never sees a comparable state — it does not red, it
+   simply has nothing to say, so the parity claim is silently forfeited.
+   Enforcement of the split is this runbook's, not that gate's: a pre-commit gate
+   cannot tell "note and drain in one commit" from "note authored while the
+   surface was already empty". Second: write the drain-and-stamp commit, push master,
    watch the `gates` run *for that SHA* go green, and only then tag that commit
    and push the tag. `CLAUDE.md` makes the remote oracle the authority over a
    master push, and a tag's whole purpose is to name an immutable tree other

@@ -848,7 +848,10 @@ two-arm resolution: it reads the *note*, which is unchanged as an artifact, and
 only the note's Tightened-gates section changed its source. The grammar's owner
 is docs/install.md §The upgrade contract; its implementation is
 §lib/declaration.sh, and this repo holds the corpus to it with
-`check-tightened-gates-grammar`.
+`check-tightened-gates-grammar`. The surface has a second consumer-side reader:
+`check-tightened-gates-note-parity` compares it against the note composed from it
+while that note is still untagged, so the compose-then-drain flow specified here
+is held equal at its one comparable moment rather than by review.
 
 ### gen-pre-commit
 
