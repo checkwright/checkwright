@@ -346,8 +346,9 @@ Every registered gate's header carries a one-line coupling manifest:
 
 - `couples=` — the surfaces the gate binds (comma-separated globs). One token
   is special: `kit:<glob>`, which the shared manifest reader in `lib/gate.sh`
-  (`gate_expand_couples`) expands to `<kit-root>/<glob>` — repo-root-relative —
-  for every `gate_kit_roots` member at read time; the same reader feeds
+  (`gate_expand_couples_var`) expands to `<kit-root>/<glob>` —
+  repo-root-relative — for every `gate_kit_roots` member at read time; the same
+  reader feeds
   `gen-pre-commit` (hook emission), `check-graph` (freshness + the HTML
   projection), and `run-gates --for` (path-scoped selection §run-gates), so
   emitter, checker, and selector cannot desync on the kit set. A
@@ -659,7 +660,7 @@ contract); the runner captures it.
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
 agent-callable half of the oracle-first rule: it resolves the registry exactly
 as a bare run, then runs only the members whose *effective trigger* (`trigger=`
-else `couples=`, expanded through `gate_expand_couples`) glob-matches at least
+else `couples=`, expanded through `gate_expand_couples_var`) glob-matches at least
 one given repo-relative path. Registry order and per-gate output are unchanged;
 a bare `run-gates.sh` keeps its behavior. The loop this buys — edit → run
 coupled gates → read the verdict+help — is strictly cheaper than reading gate
@@ -672,7 +673,7 @@ staged-path matching**: the glob step is `gate_staged_matches` in `lib/gate.sh`,
 whose body `gen-pre-commit` emits verbatim as the hook's `staged_matches` (the
 self-contained hook and the selector share one source, held in sync by
 check-graph's freshness assertion §check-graph), and both draw the `# graph:`
-fields through `gate_manifest_field` + `gate_expand_couples` — the single reader
+fields through `gate_manifest_field` + `gate_expand_couples_var` — the single reader
 §The `# graph:` manifest names. Two hook behaviors the selector reproduces
 beyond that matcher: a `trigger=*` gate is selected for every path, and a
 `mode=staged` gate — whose hook branch matches by git pathspec (exact path or
@@ -867,7 +868,7 @@ failure report as before) or when `GATE_SDK_VERBOSE` is set, and a fully green
 hook run prints one summary line carrying its executed-invocation count. The
 wrapper lives in the emitter's heredoc, so the freshness assertion carries any
 change into the committed hooks. A `trigger=`/`couples=` `kit:<glob>` token is emitted *expanded*
-(via `gate_expand_couples`), so adding a kit later reddens `check-graph`
+(via `gate_expand_couples_var`), so adding a kit later reddens `check-graph`
 (committed hook ≠ `--emit`) until regeneration — the freshness gate keeps the
 static hooks honest across a kit-set change.
 

@@ -892,8 +892,8 @@ heading while the structured directive and the markdown-link anchor were both
 verdict-checked. It scans the manifest set (`spec_manifest_files`, the same
 surface the manifest-narration gate family reads) over a blank-line-delimited
 paragraph join so a heading that wraps a line reassembles, and resolves the
-heading through the one shared `heading_present` helper — one heading-resolution
-path, two callers. Free prose runs on past the heading with no delimiter, so
+heading through one shared resolution path — the directive pass and the
+citation pass call the same helper, so they cannot diverge. Free prose runs on past the heading with no delimiter, so
 the citation pass matches a heading as a boundary-anchored **prefix** of the
 fragment where the directive pass matches it whole. A cited path that is not a
 tracked file is out of this pass's scope — path liveness stays with the gates

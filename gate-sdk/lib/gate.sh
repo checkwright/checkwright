@@ -170,7 +170,7 @@ gate_expand_couples() {
     printf '%s\n' "$__gate_expand_couples_result"
 }
 
-# spec: gate-sdk/SPEC.md §The `# graph:` manifest — read one field from a resolved gate's `# graph:` line; the shared field reader gen-pre-commit and run-gates --for selection draw the manifest through (the couples-token expansion stays gate_expand_couples, the reader check-graph also shares). Emits the value, empty when the field is absent; never fails on a missing field.
+# spec: gate-sdk/SPEC.md §The `# graph:` manifest — read one field from a resolved gate's `# graph:` line; the shared field reader gen-pre-commit and run-gates --for selection draw the manifest through (the couples-token expansion is gate_expand_couples_var, the reader check-graph also shares). Emits the value, empty when the field is absent; never fails on a missing field.
 gate_manifest_field() {
     local src="$1" key="$2" man kv
     man="$(grep -m1 '^# graph: ' "$src" 2>/dev/null || true)"

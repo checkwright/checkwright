@@ -220,9 +220,9 @@ language a Pages stack might use.
 
 Two implementation constraints follow, and a natural reading of the contract
 breaks both. **Command substitution strips `NUL`**, so the batch output must
-never pass through `$(…)`; the gate reads it with `while IFS= read -r -d ''` from
-a **process substitution**, which also keeps the loop body in the current shell
-so the findings it appends to survive. Writer and reader being separate processes
+never pass through `$(…)`; the gate reads it through a **process substitution**
+instead, which also keeps the loop body in the current shell so the findings it
+appends to survive. Writer and reader being separate processes
 is what makes the exchange deadlock-free. **Process substitution discards the
 renderer's exit status**, so the batch path cannot keep the per-page fail-closed
 the per-document loop has — and a renderer that dies mid-stream yields fewer
