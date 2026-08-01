@@ -2016,6 +2016,90 @@
   Filed 2026-08-01 by close's brevity pass, which measured the ratchet it could
   not close.
 
+- **batch-split-stamp-ownership** [design-pending] — who stamps the per-session
+  audit trail when a live lead splits one stage across several batch sessions is
+  unowned, and the two surfaces disagree in effect.
+  `lifecycle-kit/templates/stages/build.md`'s "Every session still stamps"
+  paragraph predates the lead/batch split and tells every build session to
+  append a fresh stamp; a live lead splitting build into batches tells batches
+  2..n not to re-stamp. This iteration recorded **one** `build` line in
+  `.workflow/WORKFLOW-STATE.txt` for five batch sessions.
+  **Not a defect today.** Nothing gates on the missing lines, and the stage
+  cursor is the *last* stamp, so it is correct either way — this is doctrine
+  drift, not breakage.
+  **The ruling the entry wants** is twofold and neither half is close's to make:
+  which surface owns the rule under a batch split (`templates/lead.md` is as
+  implicated as `stages/build.md`), and whether a per-session trail is worth
+  restoring at all — the evidence file's stated contract is one line per
+  stage-skill invocation, which a batch session *is*, so restoring it means
+  either stamping per batch or narrowing the contract to per stage.
+  **Why `[design-pending]`:** it changes a shipped template's stamp contract and
+  possibly `check-stage-evidence`'s reading of it, and it recurs on every batched
+  stage, not just build.
+  **Cost while deferred:** the trail silently under-reports session count on
+  every batched stage, so the evidence file cannot answer "how many sessions did
+  this stage take" — an economics question the drift KPIs would otherwise want.
+  Debt: one paragraph moved or narrowed across two templates; adds no governed
+  name.
+  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
+
+- **gate-spawn-hoist-residual** [design-pending] — `gate-battery-spawn-hoists`
+  closed most of its worklist and left a named remainder, recorded so the next
+  pass starts from measurement rather than from this list.
+  **Unmeasured, same shape:** `check-comment-tier`, `check-trajectory-fresh`,
+  `check-docs-cmd`, and `check-docs-nav-reachable` all carry the in-gate
+  fork/exec-per-item shape the landed hoists removed elsewhere, but were neither
+  measured nor hoisted (the pass was time-boxed after the near-miss below).
+  **Attempted and reverted:** `check-spec-pointer`'s `heading_present`. A
+  bash-extglob port of its strippar/isprefix awk match logic was byte-identical
+  to the awk original on small inputs and **pathologically slow** on this tree's
+  real prose fragments (several thousand characters) — bash's extglob `%%`
+  suffix match has none of awk's linear-time regex guarantees, turning a 2.7s
+  gate into 25s+. Only the tracked-file-set caching landed (safe: no
+  size-dependent blowup).
+  **Deliverable:** per-target-file batching of the frag queries that keeps the
+  match logic inside **one awk process per unique file** — not a bash port. The
+  reverted attempt is the standing evidence that a bash port is the wrong shape.
+  **Why `[design-pending]`:** the worklist above is already demonstrably stale
+  twice over, so the unit begins by re-measuring against the post-hoist battery
+  (23706ms/90 gates, `check-shellcheck` now the largest line at ~5.9s) and may
+  find the remaining four are not worth the change.
+  **Cost while deferred:** bounded and non-rotting — the gates are correct, just
+  slower than they need to be, and the battery is already 42% faster than it was.
+  Debt: awk-batching inside up to five gates; adds no governed name.
+  Filed 2026-08-01 at close from the gap inbox, by the batch that time-boxed it.
+
+- **template-spec-restatement-reach** [design-pending] — the gap generalization
+  behind this close's resume-journal fix: `check-shim-restatement` holds
+  **binding shims** (`.claude/commands/*.md`) to an n-gram-disjointness contract
+  against a dedup corpus, and nothing holds the far heavier **template ↔ owning
+  SPEC** pair to anything. Attested cost: `delegation-kit/SPEC.md` §Resume
+  journal and `templates/agent-execution.md`'s resume-journal bullet drifted into
+  near sentence-for-sentence restatement, and one build unit wrote the retention
+  resolution and the `DONE`-as-last-line clause into **both** in parallel because
+  no oracle held them to one owner. Close deduplicated them by hand; nothing
+  stops the next lifetime edit doing the same thing again.
+  **The mechanism already exists.** `lifecycle-kit/checks/check-shim-restatement.sh`
+  is the whole implementation — normalize, emit every N-word window, intersect
+  against a corpus index. The unit is a second (surface, corpus) pairing of that
+  same machine, not new code.
+  **Why `[design-pending]`, and the honest objection.** The shim contract is
+  *bind consumer residue, cite kit-owned procedure* — a shim legitimately
+  restates nothing. A SPEC legitimately restates its template's **contract
+  clauses**, because a consumer reading the SPEC alone must learn what the kit
+  requires. So a naive port reds on correct text, and the design question is what
+  the exemption is: an explicit contract block the gate skips, a higher `N` for
+  this pairing, or a direction-sensitive rule (the SPEC may cite the template,
+  never the reverse). Answering that is the unit; porting the gate is an
+  afternoon.
+  **Cost while deferred:** paid per lifetime edit to any kit whose SPEC and
+  template both discuss the same rule, and paid as a *silent* two-surface edit —
+  the failure mode is a one-surface edit nobody catches, i.e. exactly the
+  contradiction that build unit had to resolve.
+  Debt: one gate widened or forked plus its fixture pair; adds one knob if the
+  exemption is configurable.
+  Filed 2026-08-01 by close, generalizing the gap it fixed inline.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
