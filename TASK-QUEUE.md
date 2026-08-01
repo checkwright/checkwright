@@ -1065,14 +1065,16 @@
   Port the battery off bash-plus-GNU-userland onto one native compiled binary
   (Rust the lead candidate); scale is read off `gates.list` and `*/checks`.
   Standing pains: Linux-only reach (docs/install.md §Requirements;
-  `platform-support-ci-matrix` carries that half); independently versioned
-  utilities; and check source in the consumer's tree feeding source-prediction.
-  **Wall-time is not among them; this entry claimed otherwise until scope
-  measured it 2026-08-01.** Battery 40977ms/89 gates: starting the 89 bash
-  processes is ~445ms (1%); in-gate spawn — the only bucket a port collapses — is
-  12039ms (29%), so a *perfect* port lands at ~29s; and half the battery
-  (20373ms) is third-party tools a port must still invoke. The in-bash route now
-  filed as **`gate-battery-spawn-hoists`** + **`docs-renderer-batch-contract`** reaches ~7-8s.
+  `platform-support-ci-matrix` carries that half); utilities on independent
+  lifecycles (the declared bash floor is already wrong — gap inbox 2026-08-01);
+  a compiler replacing contracts the sdk enforces by discipline plus meta-gates;
+  and the sharpest — **an agent cannot read a binary**, so oracle-first becomes
+  structural instead of doctrine it can route around (consumer-side; this repo keeps its source).
+  **Wall-time is mis-costed here in both directions.** The entry claimed speed
+  until scope measured it 2026-08-01; that correction over-charged the port with a
+  third-party floor mostly its own input — `check-shellcheck` is 5921ms of a
+  23718ms/90-gate battery, linting each kit's own bash, so a port deletes it.
+  In-bash: **`gate-battery-parallel-execution`**, **`gate-battery-result-cache`**.
   **Correctness evidence (2026-08-01, operator-directed).**
   `release-step-verification` produced eleven defects, sorted by whether a port
   removes them. **Four are removed:** the opt-in shell error model (a probe under
@@ -1094,21 +1096,69 @@
   error-prone, and not as closing `vacuous-assertion-count-discipline`, whose
   dominant class is assertion *design* and ports intact. Landing the port then
   relaxing is the failure mode to design against.
-  **Deliverable:** one multi-call binary (one subcommand per check), `gates.list`
-  dispatching per-entry to subcommand or script so the port lands cohort by
-  cohort, slowest and meta-gates first; each gate's fixture pair is the parity
-  oracle before its script retires; consumer gates keep the shell escape hatch;
-  per-platform checksummed artifacts, buildable source, git the sole dependency.
+  **Deliverable:** one multi-call binary, a subcommand per check; `gates.list` dispatching
+  per-entry to subcommand or script so it lands cohort by cohort, slowest and meta-gates first;
+  each gate's fixture pair is the parity oracle before its script retires; consumer gates keep
+  the shell escape hatch; checksummed per-platform artifacts, buildable source, needing only git.
   **Why `[design-pending]`:** the consumer-extensibility model decides everything
   else — escape hatch vs declarative check DSL vs native plugins — plus language
   choice, the dogfood question, and the trust inversion (opacity to agents is
   opacity to human adopters too, so reproducible builds and checksums are owed).
-  Distribution is the hard part, not the language: kits vendor as text, zero build
-  step. Cost the spike apart.
+  Distribution is the hard part: kits vendor as text, zero build step. Cost apart.
   **Cost while deferred:** every new gate adds shell to the eventual port, the
-  four silent-failure classes stay reachable, and source-prediction waste recurs
-  per session. Nothing breaks — correct on Linux and fully gated. Feature-shaped:
-  it adds governed names. Filed 2026-07-28 by operator request.
+  silent-failure classes above stay reachable, source-prediction waste recurs per
+  session. Nothing breaks — correct on Linux, fully gated. Feature-shaped: it
+  adds governed names. Filed 2026-07-28 by operator request.
+
+- **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
+  serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
+  landed: 23718ms/90 gates, of which `check-shellcheck` alone is 5921ms. Spread
+  across cores the remaining gates sum to well under that, so **`check-shellcheck`
+  becomes the critical path** and the battery floors at roughly its cost —
+  splitting its corpus across workers is what breaks the bound, not the scheduler.
+  **The deliverable is the concurrency contract, not the scheduler.** Per-gate
+  scratch isolation (`.tmp/` is one shared dir today); the timings file as a
+  contended writer; deterministic output ordering under interleaved completion,
+  so a red reads the same way twice; and an ordering constraint between gates
+  that regenerate projections (`check-graph`, `check-enforcement-fresh`, the
+  rollups) and gates that read them.
+  **Adjacent lever, same measurement:** several gates each walk the whole tracked
+  file tree independently. One shared walk feeding many readers is a structural
+  win per-gate hoisting cannot reach, and is what one binary does natively.
+  **Relation to `native-gate-binary-port`:** the port subsumes this — a native
+  binary gets worker threads nearly free — so a port-first ruling closes this
+  entry rather than duplicating it. Filed anyway because it pays if the port
+  slips, and the isolation contract is owed either way.
+  **Cost while deferred:** every validate and every close pays the serial battery,
+  and each new gate lengthens it — the cost grows with the roster and is paid by
+  every session, not once. Nothing is incorrect while deferred.
+  Debt: no governed name. Filed 2026-08-01 by the lead at operator direction,
+  from the battery profile measured during `delegation-reach-and-gate-cost`.
+
+- **gate-battery-result-cache** [design-pending] — re-run the battery over an unchanged tree and
+  every gate redoes its work. This iteration ran it well past half a dozen times,
+  nearly always over trees where most gates' coupled inputs had not moved.
+  **The cache key is already derivable, which is the whole case.** Every gate
+  declares its inputs in its `# graph: couples=` manifest — the same source
+  `gen-pre-commit.sh` projects the hook from — so a key is a content hash over
+  the expanded couples plus the gate's own source. Nothing new to maintain, and
+  `check-graph` already gates the manifest's freshness.
+  **Opening question, to be answered rather than assumed:**
+  **`docs-renderer-batch-contract`** ruled a content-hash cache *out* inside its
+  own scope 2026-08-01. Whether that reasoning generalises from one renderer to
+  the battery is this entry's first work — inherit it or overturn it on evidence,
+  never ignore it.
+  **The risk is invalidation, not speed.** A gate whose real inputs exceed its
+  declared couples would be skipped while stale — a false green, the exact
+  failure class the battery exists to prevent. `check-reads-couples` is the
+  existing oracle for that gap and would become load-bearing rather than
+  advisory, so its own coverage is a precondition, not a detail.
+  **Relation to `native-gate-binary-port`:** the port makes this ordinary
+  engineering instead of shell bookkeeping; a port-first ruling closes it.
+  **Cost while deferred:** repeated full-battery runs inside one session are the
+  dominant waste — a stage that validates after each commit re-runs every gate
+  over a tree it just proved. Nothing is incorrect while deferred.
+  Debt: no governed name. Filed 2026-08-01 by the lead at operator direction.
 
 - **state-representation-integrity** [design-pending] — repo state lives in text
   files whose invariants — slug uniqueness, cross-entry `blocked-by` and `spec`
