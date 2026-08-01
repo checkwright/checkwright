@@ -12,6 +12,109 @@
 
 ## New Features
 
+- **agent-execution-backgrounding-role-scope** [spec: SPEC-backgrounding-role-scope.md]
+  — the agent-execution protocol states its rules for the **dispatching** role
+  and leaves the dispatched role unstated, and two rules have now failed that
+  way. The backgrounding rule ("always dispatch in the background and wait")
+  reads as licence to a stage session, which backgrounded its whole validate
+  suite, ended its turn, and lost the child with it. The resume-journal mechanics
+  reach a mutating agent only, so a read-only child's findings live solely as a
+  return value in a parent that may die holding them.
+  **Deliverable:** one role-scoping pass over both rules, done entirely in the
+  bullet **bodies** — every bold lead-in stays verbatim, because
+  `check-rule-citation` resolves the SPEC's citations forward into it. Deltas,
+  causal completeness, and the ruled-out alternatives:
+  delegation-kit/SPEC-backgrounding-role-scope.md.
+  **The read-only-fan-out caveat is narrowed, not overturned** — its evidence is
+  about a *child's* sandbox blocking the child's write, while the new requirement
+  binds the *parent* that holds the only copy, so the duty moves to the receiving
+  end and the older ruling keeps its content. Overturning it would put the write
+  back where writes are attested to fail.
+  **Surface note for batching:** shares
+  `delegation-kit/templates/agent-execution.md` and `delegation-kit/SPEC.md` with
+  **`nested-dispatch-ungoverned`** (serialize the two) and touches
+  `.claude/agents/stage-session.md`, which
+  **`resume-journal-deletion-vs-pull-channel`** also edits — that debt unit lands
+  first and this amendment is written against whatever text it leaves.
+  Surfaced 2026-07-31 at validate; second half the same day at close, from its own
+  termination. Drained from the gap inbox by close; amendment authored 2026-08-01
+  at spec.
+
+- **nested-dispatch-ungoverned** [spec: SPEC-nested-dispatch-ungoverned.md] — the
+  dispatch layer's budget and tier rules were filed as written for the **root**
+  dispatch and silently exempting everything below it. Both premises were
+  re-verified while authoring the amendment and **the budget half's was false**:
+  settings-registered hooks fire inside dispatched sessions, so the guard already
+  re-arms at every depth. Verified first-hand — the `spec` session is itself a
+  dispatched stage session and its own child dispatch fired the guard. The
+  observation behind the filing ("it ran exactly once") described what the lead
+  could see, not what happened.
+  **Deliverable, now cheaper on one half and larger on the other.** Budget
+  collapses to a clause: the verdict is per call and depth-blind, so a dispatch
+  expected to fan out is budgeted for its **subtree**, and a supervisor watching
+  its own hook fires is watching a strict undercount. Tier holds exactly as filed
+  and gains the artifact the entry believed impossible — an agent definition
+  omitting `model:` defaults to the literal `inherit`, so the tracked frontmatter
+  is both the fix and the gateable surface. Deltas, the ruled-out environment
+  override (it sits *above* the lead's per-batch `model` pin in the precedence
+  chain), and causal completeness:
+  delegation-kit/SPEC-nested-dispatch-ungoverned.md.
+  **Ships a new gate** (`check-agent-tier-explicit`) and a read-only audit agent
+  type, so the release note owes a Tightened-gates bullet.
+  **Surface note for batching:** serialize against
+  **`agent-execution-backgrounding-role-scope`** — same template, same SPEC
+  section.
+  Surfaced 2026-07-31 by the lead from close's own termination; routed through the
+  gap inbox and drained by the resumed close; amendment authored 2026-08-01 at
+  spec.
+
+- **lead-batching-roster-derivation** [spec: SPEC-lead-batching-roster-derivation.md]
+  — an iteration lead that batches by **amendment** silently drops every
+  amendment-free unit scope promoted; a debt unit mints no governed name, so it
+  carries no `[spec:]` ref to key on. Instance: five units promoted, two debt
+  units dropped, "batch 2 of 2" dispatched, caught only by a build session
+  disagreeing with its lead.
+  **The filed "no oracle" premise is stale, and refuting it is most of the
+  unit.** `check-stage-entry`'s drain-entry assertion already requires the active
+  queue sections to be empty at drain-stage entry (`validate` here), and a
+  promoted debt entry is in its population. Run rather than reasoned about:
+  `enter-stage.sh --simulate validate` against this iteration's live queue refuses
+  and names both outstanding debt units. So the defect is detected **late**, not
+  undetected, and the second candidate fix — a new gate — is **refused**.
+  **Deliverable:** the batching roster derived from the promoted unit set rather
+  than the amendment set, plus its existing mechanical floor named where the rule
+  is stated, with `--simulate <drain-stage>` as the lead's cheap early read before
+  declaring a stage's batches complete. No new gate, no new mechanism. Deltas and
+  causal completeness: lifecycle-kit/SPEC-lead-batching-roster-derivation.md.
+  Surfaced 2026-07-31 at build; drained from the gap inbox by close; amendment
+  authored 2026-08-01 at spec.
+
+- **docs-renderer-batch-contract** [spec: SPEC-docs-renderer-batch-contract.md] —
+  `SITE_KIT_RENDERER` is specified as a **stdin→stdout single-document** command,
+  so `check-docs-render-fidelity` starts one renderer process per tracked page.
+  That shape, not the rendering, is the whole cost. Re-measured at spec on this
+  tree: the gate is 14373ms of a 40054ms battery — the single largest line in it —
+  and of that, 68 pages through 68 fresh interpreters take 13875ms while the same
+  pages through one interpreter take 450ms. The gate's own per-page `awk` fan-out
+  is 271ms and belongs to **`gate-battery-spawn-hoists`**, not here.
+  **Deliverable:** a second, **optional** knob (`SITE_KIT_RENDERER_BATCH`) framing
+  N documents over one stream, with the per-document contract unchanged and still
+  the fallback, so no consumer breaks and the framing obligation is opt-in. The
+  oracle stays the real Pages parser. Deltas, the framing convention, the
+  ruled-out content-hash cache, and causal completeness:
+  site-kit/SPEC-docs-renderer-batch-contract.md.
+  **The seam call that decides the unit:** filling the batch default
+  unconditionally would silently defeat a consumer's deliberate
+  `SITE_KIT_RENDERER` version pin, replacing a pinned oracle with the kit's
+  unpinned one and reporting clean against a parser build the consumer rejected.
+  The batch default is therefore filled only when the per-document renderer is
+  still at its kit default.
+  **Surface note for batching:** site-kit only — shares no surface with the three
+  delegation-lane units and may run in parallel with them.
+  Feature-shaped at triage: it changes a governed knob's contract. Filed 2026-08-01
+  by scope from its own measurement of the battery, alongside the mechanical half
+  promoted to Technical Debt; amendment authored 2026-08-01 at spec.
+
 ## Technical Debt
 
 - **resume-journal-deletion-vs-pull-channel** — two delegation templates give the
@@ -1436,30 +1539,6 @@
   Surfaced 2026-07-31, operator-directed across three gap-inbox bullets; drained
   and merged into one unit by close.
 
-- **lead-batching-roster-derivation** [design-pending] — an iteration lead that
-  batches by **amendment** silently drops every amendment-free unit scope promoted.
-  Instance: this iteration promoted five units; three carried an amendment and were
-  batched, and the two Technical Debt units carry none — a debt-lane unit converges
-  an implementation on existing spec and mints no governed name — so they fell out
-  of the batching entirely and the lead dispatched "batch 2 of 2". Caught only
-  because the build session read its own ritual's exit condition (an empty queue),
-  disagreed with the lead's framing, and escalated rather than exiting on it; a lead
-  ruling then opened batch 3.
-  **The defect is silent in the lead's own view:** nothing reddens, every amendment
-  merges, and the iteration looks complete from the amendment set alone. Same shape
-  as the rest of this iteration's findings — a roster keyed on the wrong thing
-  **stops covering** rather than reddening.
-  **Why `[design-pending]`:** two candidate fixes with different owners, neither
-  ruled — derive the lead's batching roster from scope's promotion record rather
-  than from the amendment set (a `lifecycle-kit/templates/lead.md` change), or
-  assert build's exit condition against the live queue in a gate rather than
-  leaving it to a session's reading (a new gate). The second is the oracle the
-  first lacks, and whether both are owed is the call.
-  **Cost while deferred:** low and non-rotting, but it recurs on every lead-run
-  iteration mixing amendment-bearing and debt-lane units, which is the common case
-  rather than the exception.
-  Surfaced 2026-07-31 at build; drained from the gap inbox by close.
-
 - **queue-index-blocked-by-assertions** [design-pending] — coverage hole in
   `queue-kit/gate-tests/queue-index.test.sh`, pre-existing: the blocked-by tag's
   re-echo and the ready/blocked marker (bullet vs cross) are asserted nowhere,
@@ -1479,56 +1558,6 @@
   commit had already landed under a HEAD moved by a concurrent session, so landing
   it meant either a second commit on a closed unit or a rewrite of shared history.
   Drained from the gap inbox by close.
-
-- **agent-execution-backgrounding-role-scope** [design-pending] — the
-  agent-execution protocol's backgrounding rule is stated for the **supervisor**
-  role and misreads as licence when a sub-agent loads the same doc.
-  `delegation-kit/templates/agent-execution.md:18-20` says to always dispatch in
-  the background and wait for the completion notification — load-bearing for a
-  dispatching supervisor, but a stage session reads the same always-loaded
-  protocol, and "always background" generalizes wrongly to its own long-running
-  work. Premise re-verified 2026-08-01: the rule still carries no role qualifier.
-  Observed 2026-07-31 at validate: the session backgrounded the whole validate
-  suite, ended its turn to report progress, and its child died with it — an entry
-  stamp, no results, the suite re-run from scratch. Silent: nothing reddens, the
-  session reports in good faith, and missing evidence looks like pending evidence.
-  **Second instance — the resume journal does not reach a search sub-agent.** The
-  protocol's resume-journal mechanics are written for a dispatched *stage* agent:
-  the agent writes, the supervisor deletes. An Explore-class read-only child
-  journals nothing, so its findings exist only as a return value in its parent's
-  context and are un-resumable by construction. Observed 2026-07-31 at close,
-  which dispatched two audit sweeps then hit the session wall; both had already
-  returned, which was luck — had the wall landed mid-sweep the audit work would
-  have been lost with no record that it ran. Deliverable for this half: the
-  protocol states that findings a parent will act on are committed or journaled
-  before the parent proceeds on them.
-  **Conflict this half must resolve, found 2026-08-01 by scope.**
-  `agent-execution.md:58-66` already rules the opposite for exactly this case —
-  for a **read-only fan-out** the return value *is* the contract, because a
-  backgrounded agent's sandbox may block the journal write. `git log -S` dates
-  that caveat to `b340246`, 2026-07-05, three weeks before the incident above: an
-  independent ruling to overturn on evidence, not debris from the false signal
-  **`resume-journal-deletion-vs-pull-channel`** describes.
-  **Mechanical constraint on any role-scoping pass:**
-  `delegation-kit/checks/check-rule-citation.sh` resolves each SPEC citation
-  forward into a template bullet's bold lead-in verbatim. Role scoping is free in
-  bullet bodies; folding a role marker into a lead-in renames the rule and drags
-  the delegation-kit/SPEC.md citations into the same commit.
-  **Why `[design-pending]`, and why the slug is narrower than the unit:** both
-  halves are one defect — a shipped always-loaded protocol states its rules for
-  the dispatching role and leaves the sub-agent role unstated — so the fix is one
-  role-scoping pass, not two patches. The open call is the same for both: scope
-  each rule to the dispatching role and add its sub-agent counterpart (*work you
-  must report on is awaited in the foreground, however long; detaching it
-  discards it when your turn ends*; *findings you will act on are made durable
-  before you act*), or state each once in role-neutral terms surviving both
-  readings. The slug names the first instance only; a deferred slug is conserved.
-  An instance of `rule-reach-before-merits`' first form; the defect is its own.
-  **Cost while deferred:** low in tree terms, non-rotting, but it recurs per stage
-  session running a long oracle — validate, every iteration — at a full suite run
-  each; the second half costs a whole sweep when a parent dies mid-fan-out.
-  Surfaced 2026-07-31 at validate; second half 2026-07-31 at close, from its own
-  termination. Drained from the gap inbox by close.
 
 - **context-pressure-signal** [design-pending] — operator request: a
   usage-verdict-style context-pressure signal that **suggests** compaction, so the
@@ -1624,54 +1653,6 @@
   session's attention rather than by a gate.
   Surfaced 2026-07-31 by close's top-level staleness review, which found both
   instances; filed rather than fixed because the enum-set survey is the work.
-
-- **nested-dispatch-ungoverned** [design-pending] — the dispatch layer's rules are
-  written for the **root** dispatch and silently exempt everything below it. Two
-  halves, filed as one unit because they are the same defect over the same
-  boundary and a fix for either alone leaves a reader governed on one axis and
-  not the other.
-  **(a) Budget.** The per-dispatch guard fires on the `Agent` call it gates, not
-  on that call's children. It ran exactly once for this close stage — at the
-  lead's dispatch, `used=92% -> OK` — and the stage then spawned two read-only
-  audit children drawing heavily against the same five-hour pool, with nothing
-  re-checking between that verdict and the wall the session hit. A per-dispatch
-  guard therefore under-measures **precisely the dispatches that cost most**: the
-  ones that fan out. Re-verified 2026-08-01: `scripts/agent-budget-guard.sh` is
-  eighteen stateless lines wired once at `.claude/settings.json:146-154` — no
-  depth counter, no re-arm, and no inheritance into the dispatched session.
-  **(b) Tier — premise corrected 2026-08-01 by the scope survey, and the
-  deliverable is cheaper than filed.** As filed, this half said the tier rule
-  says nothing about what a stage session's own sub-agents run on. True of the
-  *ruling config* (`.claude/commands/lead.md:5-27` filling
-  `lifecycle-kit/templates/lead.md:155-157`), false of the protocol:
-  `delegation-kit/templates/agent-execution.md:104-117` already states it
-  role-neutrally — *"Match the dispatched model and effort to the unit's shape …
-  Selection sits with the dispatching session"* — and *the dispatching session*
-  reaches a stage session dispatching its own children. So the rule **reached and
-  went unapplied**, because the harness default inherits the parent's model:
-  doing nothing silently picks the most expensive tier available. Close inherited
-  the judgment tier and its two audit sweeps inherited it in turn. The deliverable
-  is therefore *make the existing role-neutral rule bite against a silently
-  inheriting default* — a re-arm, or a cheaper default for the read-only class —
-  not a new nested tier rule.
-  **Why one unit:** both are a rule that stops reaching rather than reddening at
-  the same layer boundary, and both admit the same two candidate shapes — re-arm
-  or re-state the rule *inside* the stage session before its own dispatches, or
-  make the root decision account for the expected fan-out. Settling one shape for
-  budget and the other for tier would be an accident, not a design; and a
-  half-covered nested layer ("your children are budgeted but not tiered") is the
-  state that produced this.
-  **Why `[design-pending]`:** ownership forks. The budget half is delegation-kit
-  mechanism with a real hook to change; the tier half is ruling-config prose with
-  no oracle possible, since a sub-agent's tier leaves no tracked artifact. Whether
-  one rule can carry both, and where it lives so that a stage session actually
-  loads it, is the open call.
-  **Cost while deferred:** paid per fan-out, not per iteration, and the charge is
-  a terminated session rather than a wrong answer — this close died at the wall
-  and was resumed, and the tier half made the sweeps that killed it dearer than
-  they needed to be. Non-rotting; nothing in the tree degrades while it sits.
-  Surfaced 2026-07-31 by the lead from this close's own termination; routed
-  through the gap inbox and drained by the resumed close.
 
 - **close-generated-finding-route** [design-pending] — the gap inbox is drained
   **once, at close**, and close is the stage that generates findings by design —
@@ -1816,35 +1797,6 @@
   Filed 2026-07-31 by close as cheap-and-declined scope creep; promoted at the
   next scope entry from the post-close gap inbox, its premise falsified against
   `check-graph`'s source in the same pass.
-
-- **docs-renderer-batch-contract** [design-pending] — `SITE_KIT_RENDERER` is
-  specified as a **stdin→stdout single-document** command
-  (site-kit/SPEC.md §Layout and configuration), so
-  `check-docs-render-fidelity` starts one renderer process per tracked page.
-  That shape, not the rendering, is the whole cost: measured on this tree, 68
-  pages through 68 fresh interpreters take 14080ms, the same pages through one
-  interpreter take 448ms, and the gate's entire bash/awk fan-out is 288ms. The
-  gate is 14551ms of a 40977ms battery — **the single largest line in it, and
-  97% of that line is interpreter restarts**.
-  **Deliverable:** a batch renderer contract, so the oracle stays the real Pages
-  parser (the gate's whole point — a reimplementation would assert nothing) while
-  the process starts collapse to one.
-  **Why `[design-pending]`, and why this is not folded into
-  **`gate-battery-spawn-hoists`**:** it changes a shipped, documented consumer
-  knob, and the seam is the design. A batch command must frame N documents over
-  one stream, which means a delimiter convention a consumer's own renderer has to
-  honour; the alternatives are a second optional knob beside the existing one
-  (per-document stays the fallback, so no consumer breaks) or a content-hash
-  cache that keeps the contract untouched and pays only on changed pages. Those
-  three differ in what they oblige a consumer to implement, which is a
-  provenance-seam call, not an implementation choice.
-  **Cost while deferred:** paid per battery run and per docs commit — the gate is
-  `tier=precommit` and coupled to `docs/*.md`, so every documentation commit pays
-  about fourteen seconds before it lands, and the tax grows linearly with the
-  docs tree. Nothing rots; the gate is correct, only slow.
-  Feature-shaped at triage: it changes a governed knob's contract. Filed
-  2026-08-01 by scope from its own measurement of the battery, alongside the
-  mechanical half promoted to Technical Debt.
 
 - **post-immutability-machine-read-carveout** [design-pending] — the post
   immutability rule and the machine-readable-note rule are stated on two pages
