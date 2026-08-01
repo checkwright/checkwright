@@ -5,3 +5,4 @@
 ---
 
 shipped-roster-parity scope a8d0dd24 2026-08-01
+shipped-roster-parity spec ab8921b4 2026-08-01
