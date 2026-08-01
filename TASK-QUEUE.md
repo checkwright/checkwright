@@ -12,50 +12,6 @@
 
 ## New Features
 
-- **security-advisory-lane** [spec: SPEC-security-advisory-lane.md] — `SECURITY.md`
-  directs reporters to GitHub private vulnerability reporting, and nothing on our
-  side is named as the reader. Advisories are a surface distinct from issues and
-  PRs, returned by neither `gh issue list` nor `gh pr list`. The scope skill's
-  GitHub boundary sweep (.claude/commands/scope.md §The GitHub boundary sweep)
-  has exactly two lanes, Issues and PRs, while asserting nothing lives
-  triaged-but-unqueued anywhere else — so the assertion is now false for the one
-  lane whose items are the most time-critical.
-  **Honest limit:** advisories are not unread. GitHub notifies maintainers, so
-  this is an unswept lane rather than a black hole, which is what kept it out of
-  the in-flight unit.
-  **Three rulings landed at spec (2026-08-01), all in the amendment.**
-  *Disposition grammar:* both candidate carriers are public — `TASK-QUEUE.md` by
-  construction and the gap inbox deliberately (lifecycle-kit/SPEC.md §The
-  committed gap inbox rules a per-clone buffer out) — so the lane's dispositions
-  are stated over the advisory thread, and the public tree says **nothing** until
-  publication. Partial disclosure is refused rather than formatted.
-  *Latency:* the lane sweeps at the boundary like its siblings. The premise that
-  this makes latency a problem is **corrected**: the boundary cadence has run at
-  roughly one iteration per day against an advertised ~1-week acknowledgement, so
-  a sweep lane meets the published windows with margin. `SECURITY.md` is not
-  edited and its windows are not tightened, per the cost line below.
-  *Severity carve-out:* **refused.** Speed is not the gap; the release axis
-  already carries a security carve-out (`SECURITY.md` §Supported versions); the
-  misfit is disclosure rather than severity; a severity tier would mint a
-  vocabulary `SECURITY.md` deliberately lacks whose only reader is a bypass; and
-  `doctrine-kit` is vendored, so a carve-out there ships one project's security
-  posture as everyone's doctrine. **Neither `CLAUDE.md` §Delivery doctrine nor
-  `doctrine-kit/DOCTRINE.md` is touched by this unit.**
-  **Premise dropped at spec:** the entry cited
-  `SPEC-supply-chain-trust-baseline.md` §causal chains as live prose to correct.
-  That amendment merged without landing its A1 disclosure-route text into any
-  canonical spec; it survives only in git history. The amendment derives the
-  chain fresh rather than inheriting it.
-  **Cost while deferred:** until the interrupt path exists, `SECURITY.md`'s
-  current windows must not be tightened. Promising a response the machinery
-  cannot deliver is the overclaim shape this iteration existed to remove, one
-  level up from the gate overclaim it did remove.
-  Debt: small-to-medium; the constraint is the design, not the code. Feature by
-  the new-names litmus: the lane adds a disposition grammar and a sweep duty to a
-  governed binding.
-  Filed 2026-07-25 by close, draining the `supply-chain-trust-baseline` gap
-  inbox (two bullets merged at triage, costed once). Promoted 2026-08-01 by spec.
-
 ## Technical Debt
 
 - **action-run-shell-yaml-anchor-fail-open** — the gate whose whole job is
@@ -1300,8 +1256,8 @@
   comment must be appreciative — explicitly **including** the discard cases. A
   contribution declined without visible thanks spends community goodwill the
   project cannot refund. Current state in this repo's scope shim (the kit template
-  carries no GitHub sweep, so this is local policy, not a kit change): five
-  dispositions across two lanes, only three write back at all, and none specifies
+  carries no GitHub sweep, so this is local policy, not a kit change): nine
+  dispositions across three lanes, only three write back at all, and none specifies
   tone, so the discard cases read as bare rejection.
   **(1) Promotion writes back nothing.** An issue we accept, queue, and work leaves
   its reporter with silence — the worst case, because it is where we have most to
@@ -1332,8 +1288,12 @@
   the ritual. Different readers, so both may carry a line without it being
   restatement — but that split must be ruled deliberately rather than duplicated by
   accident.
-  Distinct from `security-advisory-lane`, an unswept third lane; this is a
-  write-back defect in a lane already swept.
+  **Premise corrected 2026-08-01 at build:** `security-advisory-lane` landed, so
+  the old exclusion ("an unswept third lane") is void and the design pass owes
+  the Advisories lane an explicit ruling. Do not assume same-treatment — its
+  dispositions are stated on the private advisory thread until publication, so
+  write-back lands on a different surface and audience, and two of its four
+  (*advisory-only*, *declined with cause*) are discard cases in this sense.
   **Cost while deferred:** low in tree terms and non-rotting, but it accrues
   against people rather than code, and the repo is pre-launch — the first external
   contributors meet whichever behaviour is in force then.
@@ -2158,5 +2118,6 @@
 - always-loaded-regen-block-residency
 - local-overlay-git-blanket-grant
 - core-files-kit-coverage-derived
+- security-advisory-lane
 
 ## Lessons Learned

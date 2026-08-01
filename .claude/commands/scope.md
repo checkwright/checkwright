@@ -30,7 +30,10 @@ resolution is canon-kit/SPEC.md §check-amendment-queue.
 
 **The GitHub boundary sweep** — after the brief read, before promotion triage,
 sweep the public repo's intake. `TASK-QUEUE.md` stays the sole owner of work
-state; nothing lives triaged-but-unqueued anywhere else. Cap: the top five
+state and nothing lives triaged-but-unqueued across the three lanes below —
+with one sanctioned exception, stated here because it is what makes the claim
+true rather than merely asserted: an **unpublished advisory**, whose record is
+its own thread until publication (Advisories, below). Cap: the top five
 items per lane per boundary — a per-item analysis heavier than a read is
 delegated under the usage verdict (CLAUDE.md §Agent execution). Overflow beyond
 five stays on the tracker for the next boundary (the tracker's own open-item
@@ -49,6 +52,35 @@ interactive sweep; no pre-commit or session-context hook makes a network call.
   cause*, or *reviewed with findings* — the findings warranting design or
   follow-on work become queue entries citing `PR #N`, posted as the review. The
   third is a disposition, not a skip: the PR carries an actionable review after.
+- **Advisories** — `gh api 'repos/{owner}/{repo}/security-advisories?state=triage'`;
+  take the top five, oldest first. `triage` is GitHub's documented state for an
+  advisory a reporter submitted through private vulnerability reporting and which
+  awaits maintainer action; accepting one moves it to `draft`, so `triage` is
+  exactly the undispositioned set (REST *List repository security advisories*,
+  whose `state` enum is `triage`/`draft`/`published`/`closed`). **Read that
+  literal from here, never from memory:** the endpoint does not validate the
+  parameter — an unknown state returns `[]` at exit 0, indistinguishable from a
+  clean lane — so a misremembered literal is a silent fail-open the sweep cannot
+  feel.
+
+  This lane's items are secret, which is the whole of how it differs from its
+  siblings: its dispositions are stated **on the advisory thread**, and until the
+  advisory is published the public tree says nothing. Not a redacted entry, not a
+  placeholder slug, not a count — a public entry naming a fix's shape against an
+  unpublished advisory tells a reader which surface to look at and when, so
+  partial disclosure is refused rather than formatted. Four dispositions, each
+  terminal:
+  *fix under embargo* — tracked on the thread; its queue entry lands **at
+  publication**, on the existing provenance sentence (`Surfaced <date> by security
+  advisory <id>`, no new tag, as above);
+  *advisory-only* — assessed, no code change owed, published with the assessment,
+  nothing enters the queue;
+  *declined with cause* — the thread carries the reason and the advisory is
+  closed (the Issues lane's *closed with cause* under embargo);
+  *not a vulnerability, but real work* — an ordinary defect leaves the lane for
+  ordinary intake immediately, so the embargo rule can never park ordinary work
+  out of sight.
+  No linked-and-skipped middle state (gap disposition), as above.
 
 **handoff** — lay out the branches per docs/orchestration.md §Running an
 iteration under a lead. Dispatched by a live split-posture lead, there is no
