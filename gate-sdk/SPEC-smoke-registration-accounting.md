@@ -50,18 +50,41 @@ site-kit-local commentary and binds nobody. It is promoted into §Consumer smoke
 as the rule for every kit, and — the substance of this delta — it is
 **evaluated** rather than transcribed.
 
-The evaluation is the gate's own exit code, and it is exact rather than a proxy.
-gate-sdk's exit contract already fixes the three meanings (0 pass, 1 findings, 2
-usage/environment failure), and `check-gate-fail-closed` already enforces that a
-gate whose subject surface is missing exits 2 rather than passing falsely. So
-"the surface this gate reads is absent from this consumer" is a fact the gate
-already reports, on a channel already gated. The accounting reads it:
+The evaluation is the gate's own exit code, read against gate-sdk's **output
+contract** (§Output contract) — the sole authority for what an exit code means:
+**0** clean, **1** violation, **2** harness/usage error. Every shipped gate
+signals on that contract and `check-gate-output` holds the family to it, so the
+channel is already produced and already governed.
 
-| Probe result for a shipped-but-unregistered gate | Verdict |
-|---|---|
-| exit 2 | **Self-declaring justified omission.** The surface it reads is not there. No written reason, now or ever. |
-| exit 0 | Green here, and registering costs nothing — an unexplained omission. Red unless declared. |
-| exit 1 | Green nowhere: the gate finds real violations in the scratch consumer and nothing runs it. **The hiding shape**, and this instance. Red unless declared. |
+**One exit-2 reading is not sufficient, and the reason is in the contract
+itself.** Exit 2 is usage/environment failure *generally* — a missing binary, a
+malformed config, a non-repo cwd, an empty roster, **or** an absent subject
+surface. Only the last is a justified omission; the rest are a broken gate or a
+broken environment. A single probe in the scratch consumer cannot tell them
+apart, and the exit-2 row is the one row granting a **permanent** exemption with
+no written reason owed, now or ever — the one row nobody will ever review.
+Reading it off an ambiguous signal turns the never-reviewed row into a
+false-exemption channel: a gate exiting 2 because the scratch tree merely lacks a
+dependency would be recorded as permanently, silently justified.
+
+**So the exemption is corroborated by a second probe**, run in the invoking repo
+— the tree the harness was launched from, where the kit's own surfaces exist. An
+absent-surface gate exits 2 only in the scratch consumer. An
+environmentally-broken one exits 2 in both, fails corroboration, and drops to the
+declare-or-red rows. The corroboration is not belt-and-braces to be simplified
+away later: it is the entire difference between "this surface is absent *here*"
+and "this gate does not run *anywhere*", and without it the permanent-exemption
+row cannot be trusted.
+
+| probe (scratch consumer) | probe (invoking repo) | Verdict |
+|---|---|---|
+| exit 2 | exit 0 or 1 | **Justified omission**, self-declaring. The surface it reads is genuinely absent from the consumer. No written reason, now or ever. |
+| exit 2 | exit 2 | **Not exempt.** The gate is broken or environment-dependent, not surface-absent. Declare or red. |
+| exit 0 | — | Green here, and registering costs nothing — an unexplained omission. Red unless declared. |
+| exit 1 | — | Green nowhere: the gate finds real violations in the scratch consumer and nothing runs it. **The hiding shape**, and this instance. Red unless declared. |
+
+The second probe runs only for a gate that exited 2 in the scratch consumer; the
+exit-0 and exit-1 rows are decided by the first probe alone and never reach it.
 
 **The exemption is derived, not maintained.** That is the whole reason this
 shape was chosen over a per-gate declared roster: the justification for the
@@ -96,9 +119,11 @@ surprised by its own KPI:
   registered, which moves it out of the probe set and into the battery, where it
   was going to run anyway. The steady state is the fail-closed set plus the
   declared set, and it shrinks as the accounting is satisfied rather than growing.
-- **The absolute cost is one gate invocation per unregistered gate on a small
-  scratch tree**, currently at most the 51 that are unregistered today, falling
-  from there. Build measures the real wall-clock and reports it.
+- **The absolute cost is at most two gate invocations per unregistered gate** —
+  one on a small scratch tree for every member of the probe set, plus the
+  corroborating one on the invoking repo for the exit-2 subset only. Currently at
+  most the 51 that are unregistered today, falling from there. Build measures the
+  real wall-clock and reports it.
 
 If build's measurement shows the added `consumer_smoke` wall-clock is material
 anyway, the sanctioned mitigation is to report it, not to weaken the derivation
@@ -109,8 +134,8 @@ maintained exemption wearing a derivation's clothes.
 
 The residual — how many unregistered gates land on exit 0 or exit 1 and so need
 a human judgment — **is not measured**, and this amendment deliberately does not
-guess it. Build measures the exit-code distribution across all 51 **before
-writing a single declaration**.
+guess it. Build measures the corroborated verdict distribution across all 51
+**before writing a single declaration**.
 
 **A large residual is a finding build reports, never scope it absorbs.** The
 distribution is reported to the lead as a result in its own right, because it
@@ -135,7 +160,8 @@ registration lines for gates that probe green. queue-kit's is already known:
 which queue-kit's own install writes verbatim, and both are unregistered today.
 `check-queue-slug-liveness` is the third omission and is expected to be the
 self-declaring kind (its prose-surface glob defaults empty, so it has no subject
-in a zero-config consumer) — expected, not assumed: the probe rules on it.
+in a zero-config consumer) — expected, not assumed: the probes rule on it,
+corroboration included.
 
 Mechanical because the probe is the oracle — run it, register what it names,
 stop when it is green. The judgment this delta does **not** contain is which
@@ -212,12 +238,22 @@ the failure mode a declaration surface has, and it is cheap to catch at the same
 transition.
 
 **The gate exit contract (existing interface, new reader).**
-Producer: every shipped gate, unchanged — `check-gate-fail-closed` already holds
-the exit-2-on-absent-surface behaviour this delta depends on, so no gate is
-modified and no gate acquires an obligation it did not already carry. Consumer:
-the accounting phase becomes a second reader of the exit code, beside
-`run-gates.sh`. This is the delta's load-bearing dependency and the reason it
-needs no new mechanism: the fact it wants is already produced and already gated.
+Producer: every shipped gate, unchanged. The authority is §Output contract's
+three exit meanings — **not** `check-gate-fail-closed`, which is a static lint
+over `awk`/`jq` command-substitution captures and asserts nothing whatever about
+how a gate behaves when its subject surface is absent. No gate is modified and no
+gate acquires an obligation it did not already carry. Consumer: the accounting
+phase becomes a second reader of the exit code, beside `run-gates.sh` — twice for
+an exit-2 gate, once for every other.
+
+The exit code is already produced and already governed; what it is *not* is
+already **disambiguated**, because exit 2 is the contract's general
+usage/environment code rather than an absent-surface code. The delta supplies
+that discrimination itself, from the corroborating probe. This preserves the
+delta's premise rather than weakening it: the exemption stays **derived** from
+the tree on every run, nothing becomes hand-maintained, and no gate, knob, or
+fixture is added — the second probe is one extra invocation over a set that is
+already self-limiting.
 
 **Whole-component-set reader survey.** `smoke/install.sh` is read by
 `run-consumer-smoke.sh`, `context-kit/smoke/agents-md.sh` and
@@ -235,7 +271,8 @@ shape this whole unit is about.
 
 - **gate-sdk/SPEC.md §Consumer smoke** — the `smoke/install.sh` bullet's "register
   its gates in `scripts/gates.list`" clause becomes the accounting contract: the
-  promoted predicate, the exit-code table, the declaration valve and its stale-
+  promoted predicate, the two-probe exit-code table and why corroboration is what
+  makes the permanent exemption sound, the declaration valve and its stale-
   declaration finding, and the statement that the exemption is derived (delta 2).
   The *Starter-template conformance* paragraph gains the sentence naming the
   accounting as the mechanism that makes its own "mechanical, not ritual" claim
