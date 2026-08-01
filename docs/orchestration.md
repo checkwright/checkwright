@@ -87,7 +87,7 @@ prices. To drive an iteration under it:
    sessions it dispatches, so the history reads identically whether or not a
    lead drove it. Its first step records the session-role marker the
    session-context hook reads, so lead sessions stop drawing executor-facing
-   craft rules ([the lead template](../lifecycle-kit/templates/lead.md) carries
+   craft rules ([the lead template](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md) carries
    the step).
 2. **The lead dispatches `/scope` as a background stage session on the
    judgment tier.** Scope bounds the iteration — surveying the tree and the
@@ -105,7 +105,7 @@ prices. To drive an iteration under it:
    mechanical oracle-running rides a cheaper tier, while `build` is tiered **per
    batch** from its deltas' work-class labels, its judgment-heavy work staying
    on the premium tier (the per-batch tier-differentiation rule,
-   [the lead template](../lifecycle-kit/templates/lead.md) §Economics). A stage whose
+   [the lead template](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays) §Economics). A stage whose
    work splits into batches is N sibling stage sessions the lead dispatches and
    validates (each a same-stage re-entry), never a stage session sub-dispatching
    its own siblings (`lifecycle-kit/SPEC.md §templates/lead.md`, the

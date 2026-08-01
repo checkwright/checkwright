@@ -1160,13 +1160,17 @@ gate body, config, a directory: files the site does not render — cites the tre
 with an absolute GitHub blob link
 `https://<host>/<owner>/<repo>/blob/<ref>/<path>[#anchor]`, anchored when it
 names a section, because a relative link into the unrendered surrounding tree
-would 404 on a site that serves `docs/` alone. Both are the downward-citation
-shape of the tiering topology, one on-site and one off. Resolution of the blob
-form belongs to `check-md-refs`' self-repo pass (identity derivation and the
-ref knob live there); `check-docs-link-convention` owns the shape of the
-relative links that stay inside `docs/`. The mirror is what a site opts into,
-not a precondition of the grammar: absent a published mirror, rendered-document
-references fall back to the same off-site blob form as source references.
+would 404 on a site that serves `docs/` alone. **That prescription is held by
+`check-docs-link-convention`'s off-root rule** (§check-docs-link-convention
+below): a relative link whose target resolves outside the site root is a
+violation, so the requirement above is enforced rather than merely stated.
+Both are the downward-citation shape of the tiering topology, one on-site and
+one off. Resolution of the blob form belongs to `check-md-refs`' self-repo pass
+(identity derivation and the ref knob live there); `check-docs-link-convention`
+owns the shape of the relative links that stay inside `docs/`. The mirror is
+what a site opts into, not a precondition of the grammar: absent a published
+mirror, rendered-document references fall back to the same off-site blob form
+as source references.
 
 ### check-docs-link-convention
 
@@ -1187,6 +1191,20 @@ there:
   back to that same kit's own `README.md` or `SPEC.md` must carry a `#section`
   anchor. A page cites downward into a *named* section, never at the whole spec —
   the anti-restatement doctrine expressed as a link shape.
+- **No off-root relative link.** A relative link whose target *resolves* to an
+  existing path outside `CANON_KIT_LINK_ROOT` must instead cite the absolute
+  self-repo blob form (§The reference-link grammar). The rule turns on the
+  resolved path, not the link text, so a `../`-prefixed link that resolves back
+  under the root is silent. Only resolving targets are classified — a relative
+  target that resolves to nothing is `check-md-refs`' finding alone, and this
+  rule does not double-report it; a directory target outside the root still
+  satisfies the first rule's predicate first and is reported there, once.
+  Anchors and absolute URLs never fire, by the gate's existing scope. Generated
+  mirror pages (`generated: true` front matter) are in scope, deliberately: their
+  off-root conformance is a property of the generator that emits them, which is a
+  thing that can regress, and exempting them would blind the corpus's larger half.
+  The existing `docs-link-exempt: <reason>` valve suppresses this rule as it does
+  the other two — no second valve.
 
 The scanned tree is `CANON_KIT_LINK_ROOT` (default `docs`; the fixture pair
 overrides it with a positional arg pointing at a synthetic tree), walked for
