@@ -102,11 +102,24 @@ place:
 > a lead about to declare a stage's batches complete should run it first.
 
 No new mechanism: the simulation flag and its use for gating an expensive
-dispatch are already the template's, one section earlier. What is added is the
-*second* occasion for it — before declaring a stage complete, not only before
-dispatching into one — and the naming of which assertion it consults. The
-oracle-first rule made concrete for the one decision the lead was making from
-memory.
+dispatch are already the template's, at `lead.md:66` in **§The lead model** —
+"or gates an expensive dispatch cheaply first with `enter-stage.sh --simulate
+<stage>`", inside the never-hand-derive-prior-stage-completeness paragraph. (An
+earlier draft placed it "one section earlier"; corrected at align — it is six
+sections earlier, and knowing which section matters because the floor text must
+cite it rather than restate it.) What is added is the *second* occasion for it —
+before declaring a stage complete, not only before dispatching into one — and
+the naming of which assertion it consults. The oracle-first rule made concrete
+for the one decision the lead was making from memory.
+
+**The section heading changes, and that is part of the delta.** The heading is
+`## Mechanical floor — the escalation-shape guard`; a second floor under it makes
+the subtitle wrong. It becomes the general floor heading (`## Mechanical floor`),
+which is what its own "Prompts request; guards enforce" opening already promises.
+Checked at align: no tracked file outside this amendment cites the section, so
+the rename dangles nothing — but it is stated here so a build session renames it
+deliberately instead of leaving a subtitle that contradicts the section's
+contents.
 
 The floor's honest limit belongs with it: it fires on the queue's *residue*, so
 it catches a dropped unit and says nothing about a unit batched onto the wrong
@@ -126,6 +139,24 @@ citing, never restating — so the index stays a projection of the template rath
 than a second statement of the rule. §check-stage-entry needs no edit: assertion
 B is unchanged, and this unit adds a second *reader* of it, not a second
 behavior.
+
+**Which clause absorbs the floor, because the section already mentions
+`--simulate` and must not say it twice.** Found at align:
+`lifecycle-kit/SPEC.md` already carries "the lead never hand-derives prior-stage
+completeness from WORKFLOW-STATE or the git log (it dispatches and trusts
+`enter-stage.sh`'s fail-closed refusal, **or gates an expensive dispatch with
+`--simulate`**, §bin/enter-stage.sh)" as a corollary of the
+stamps-authoritative invariant — the same mechanism this delta would otherwise
+introduce a second time, two clauses away, in one section. So the split is:
+
+- The **dispatch-granularity clause** gains only the roster derivation (delta 1)
+  — the promoted unit set rather than the amendment set.
+- The **existing `--simulate` corollary** gains the second occasion (delta 2) —
+  it already says "gates an expensive dispatch"; it becomes "gates an expensive
+  dispatch, and reads drain-entry before declaring a stage's batches complete".
+
+One mechanism, one home, which is the content-tiering rule applied to this
+amendment's own edit rather than only to the template's.
 
 ## Producers and consumers
 
@@ -168,15 +199,19 @@ baked into the template text.
 - **`lifecycle-kit/templates/lead.md` §Economics — batch, and compact where it
   pays** — the **Batch dispatches by shared surface** bullet body (delta 1).
 - **`lifecycle-kit/templates/lead.md` §Mechanical floor** — the drain-entry
-  backstop and the early `--simulate` read (delta 2). The section is presently
-  about the escalation-shape guard alone; it becomes the template's floor
-  section generally, which is the placement its own "Prompts request; guards
-  enforce" opening already promises.
+  backstop and the early `--simulate` read, plus the heading's rename to the
+  general `## Mechanical floor` (delta 2). The section is presently about the
+  escalation-shape guard alone; it becomes the template's floor section
+  generally, which is the placement its own "Prompts request; guards enforce"
+  opening already promises.
 - **lifecycle-kit/SPEC.md §templates/lead.md** — the dispatch-granularity clause
-  of the ownership enumeration (delta 3).
+  gains the roster derivation, and the existing `--simulate` corollary of the
+  stamps-authoritative invariant gains the declare-complete occasion (delta 3;
+  the two-clause split is stated under that delta).
 - **The docs-site mirror of lifecycle-kit/SPEC.md** and the other generated
   projections, regenerated; each freshness gate names its own regen command on
-  red.
+  red (delta 3's landing — this unit adds no delta of its own for the
+  projections, so they ride the SPEC edit that stales them).
 
 No change to `check-stage-entry`, its fixtures, or its SPEC section: this unit
 adds a reader of assertion B, not a behavior.

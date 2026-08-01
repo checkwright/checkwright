@@ -25,18 +25,46 @@ faith, and the loss looked like something else.
   hit the session wall; both had already returned, which was luck. Had the wall
   landed mid-sweep, the audit work would have been lost with no record it ran.
 
-One defect, one role-scoping pass. This amendment does the pass **in the bullet
-bodies only** — every bold lead-in is preserved verbatim, because a lead-in is a
-rule's stable name and `check-rule-citation` resolves the SPEC's citations
-forward into it. Folding a role marker into a lead-in would rename the rule and
-drag the citations into the same commit for no semantic gain.
+One defect, one role-scoping pass. **No existing bold lead-in is renamed** — a
+lead-in is a rule's stable name and `check-rule-citation` resolves the SPEC's
+citations forward into it, so folding a role marker into one would rename the
+rule and drag the citations into the same commit for no semantic gain. Every
+edit to an existing rule therefore lands in its **body**.
 
-**Sequencing.** The debt unit resolving the resume journal's contradictory
-lifetimes lands **first** in this iteration's delegation lane and edits two of
-the same surfaces. Nothing here restates the journal's lifetime or its deletion
-timing; where these deltas touch the journal they cite it. Delta 3 is stated as
-a semantic delta against whatever text that unit leaves, deliberately, rather
-than as a verbatim before/after that would go stale between the two commits.
+*Precision corrected at align:* an earlier phrasing of that constraint — and the
+queue entry's echo of it, "done entirely in the bullet bodies" — overstated it.
+Delta 2 adds a **whole new bullet with a new lead-in**, which is not a body edit.
+That is safe under the same gate for the opposite reason: the gate resolves SPEC
+citations *forward* into the template's lead-in set, so a new lead-in enlarges
+the resolvable set and can only fail if delta 4's citation of it disagrees
+verbatim. The constraint that actually binds is *no rename*, not *bodies only*.
+
+**Sequencing — a three-deep chain in this iteration's delegation lane, in this
+order.**
+
+1. `resume-journal-deletion-vs-pull-channel` (the debt unit) resolves the
+   journal's contradictory lifetimes across four surfaces and lands **first**.
+   Nothing here restates the journal's lifetime or its deletion timing; delta 3
+   is stated as a semantic delta against whatever text that unit leaves,
+   deliberately, rather than as a verbatim before/after that would go stale
+   between the two commits. Deltas 2 and 3 state their journal assumptions
+   explicitly below rather than depending on today's wording silently.
+2. **This unit.**
+3. `nested-dispatch-ungoverned` lands **after** this one, not merely serialized
+   against it. Its delta 6 authors an agent definition that *cites* delta 2's
+   durability rule, so the rule must exist first. Both queue entries say only
+   "serialize the two" with no direction, and no gate supplies it:
+   `check-rule-citation` scans only `delegation-kit/SPEC.md` §The delegation
+   model forward into `templates/agent-execution.md`, so a citation dangling
+   from a consumer agent definition reddens nothing. The order is a build-batch
+   obligation, recorded here because it is the only governed surface that holds
+   it.
+
+Both units also edit `delegation-kit/SPEC.md` §The delegation model — this one
+appends two rationale paragraphs, that one corrects the per-dispatch-freshness
+paragraph and the settings-env-block paragraph. The paragraphs are disjoint, so
+ordering is a merge convenience there; the citation dependency above is what
+makes the order load-bearing.
 
 ## What changes
 
@@ -53,8 +81,9 @@ actually survives*:
 > and its session lives on, so a backgrounded dispatch wakes it by notification
 > — that is the sanctioned pattern above. A **dispatched agent's** turn end *is*
 > its session end: it returns and terminates, taking every background child with
-> it. So an agent awaits its own long-running work in the **foreground**, however
-> long, and never ends a turn to report progress on work still running.
+> it. So a dispatched agent **never ends a turn on work still running** — it
+> awaits its own long-running work to completion, however long, and reports only
+> results it holds.
 
 **Why this phrasing and not a role-neutral one.** A neutral "never end your turn
 with detached work" was drafted and rejected: it forbids the supervisor pattern
@@ -64,6 +93,19 @@ and they differ on one fact — whether turn end and session end coincide — so
 naming that fact scopes both arms at once without asserting either as a bare
 prohibition. A reader who knows *why* transfers the rule to a case the bullet
 does not enumerate.
+
+**Why the rule is a turn-end prohibition and not "dispatch in the foreground",
+corrected at align on first-hand evidence.** An earlier phrasing told a
+dispatched agent to await its work "in the **foreground**". That names a lever
+the agent may not have: this align session dispatched two read-only sweeps
+**without** requesting backgrounding and the harness detached them anyway,
+returning them as background tasks with completion notifications. Foreground is
+a choice for a shell command and not reliably a choice for an `Agent` dispatch,
+so a rule stated on it is unfollowable exactly where it is needed. What the
+agent always controls is whether it **ends its turn** while work is outstanding,
+and that is the only thing the loss turned on — so that is what the rule
+mandates. (Same evidence shape as the propagation fact the sibling amendment
+records: a dispatched session observing its own dispatch.)
 
 **Provenance of the fact, stated honestly.** That backgrounded work survives a
 turn is documented harness behavior. That a *subagent's* return terminates its
@@ -94,6 +136,29 @@ shape and the same rule.
 The cost is bounded by design: it obliges a write on **receipt**, not a running
 narration, so a parent pays one write per returned child rather than a second
 journal discipline.
+
+**What this rule assumes about the journal, stated rather than inherited.** The
+debt unit landing ahead of it is rewriting the journal's lifetime, so the rule
+must say what it needs rather than lean on today's sentences:
+
+- It needs the journal to **outlive the session that wrote it**, at least until
+  a resumer or the supervisor has read it. Today's text does not guarantee that
+  — the supervisor deletes at the post-commit validation checkpoint, so a
+  parent's own entry can be swept before anyone cold-reads it. The debt unit's
+  candidate resolution (retain for the iteration, let the boundary reset sweep)
+  supplies exactly what this rule needs; a resolution that kept eager deletion
+  would leave **a commit** as the only discharge, which the rule already permits
+  and which is the fallback if the lifetime lands the other way.
+- It does **not** depend on the `DONE` marker. The debt entry records that
+  retaining the journal blunts the cold-read "no `DONE` = interrupted" signal;
+  this rule reads the journal for *content*, never for the marker, so that
+  blunting costs it nothing.
+- **Whose journal, when the holder is not a dispatched agent.** The mechanics
+  are written for an agent writing for its supervisor, so a top-level session
+  has no journal in the contract. For that reader the rule's discharge is the
+  commit — a top-level session is by construction the one that can commit. A
+  session that *is* dispatched already has a journal path granted, and that is
+  the one it writes to. Neither case needs a new artifact.
 
 ### Delta 3 — the read-only-fan-out caveat is narrowed, not overturned {design-bearing}
 
@@ -177,9 +242,13 @@ this unit must leave green.
 
 ## Producers and consumers
 
-Both deltas add **rules**, not machinery, so causal completeness here is about
-who reads them and at which transition. Nothing new is emitted, so no field is
-introduced that could lack a reader.
+Deltas 1-3 add **rules**, not machinery; delta 4 adds SPEC rationale, delta 5 a
+consumer-side pointer, delta 6 regenerated projections. So causal completeness
+here is about who reads the rules and at which transition. Nothing new is
+emitted, so no field is introduced that could lack a reader. (Deltas 5 and 6
+have no bullet of their own below: delta 5's reader is named inside delta 1's
+bullet, which is the arm it makes reachable, and delta 6 emits nothing a reader
+could lack.)
 
 - **The backgrounding arm (delta 1)** — *Producer:* the protocol template, read
   at the dispatch/long-running-work decision. *Consumers:* (a) a dispatched

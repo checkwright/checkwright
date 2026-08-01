@@ -20,9 +20,11 @@
   suite, ended its turn, and lost the child with it. The resume-journal mechanics
   reach a mutating agent only, so a read-only child's findings live solely as a
   return value in a parent that may die holding them.
-  **Deliverable:** one role-scoping pass over both rules, done entirely in the
-  bullet **bodies** — every bold lead-in stays verbatim, because
-  `check-rule-citation` resolves the SPEC's citations forward into it. Deltas,
+  **Deliverable:** one role-scoping pass over both rules. **No existing bold
+  lead-in is renamed**, because `check-rule-citation` resolves the SPEC's
+  citations forward into it; edits to existing rules land in the bullet
+  **bodies**, and one delta adds a new bullet with a new lead-in (which the
+  forward-resolving gate accepts). Deltas,
   causal completeness, and the ruled-out alternatives:
   delegation-kit/SPEC-backgrounding-role-scope.md.
   **The read-only-fan-out caveat is narrowed, not overturned** — its evidence is
@@ -135,7 +137,7 @@
   defect. Two costs, the second worse: an agent loses working state it is still
   writing to, and a false defect signal is manufactured against `.tmp/` and
   against **`agent-execution-backgrounding-role-scope`**.
-  **Premise re-verified at promotion, and the reach is wider than filed — three
+  **Premise re-verified at promotion, and the reach is wider than filed — four
   files, not two.** `lead.md:132-138` states the pull channel and imports
   delegation-kit's journal mechanics "unchanged"; `agent-execution.md:51-52` and
   `delegation-kit/SPEC.md:132` both state the supervisor deletion, the second as a

@@ -10,7 +10,7 @@ scratch that dies at the next boundary reset.** On this tree, 68 tracked pages:
 
 | what | measured |
 | --- | --- |
-| the whole battery (89 gates) | 40054 ms |
+| the whole battery (89 gates, the count on the day of measurement) | 40054 ms |
 | `check-docs-render-fidelity` alone | 14373 ms |
 | 68 pages, a fresh interpreter each (the gate's real shape) | 13875 ms |
 | the same 68 pages through **one** interpreter | 450 ms |
@@ -21,15 +21,34 @@ battery. The probe that produced the last three rows is re-derivable in a dozen
 lines: render each page with `ruby -e` in a loop, then pipe the page list into
 one `ruby -e` that loops internally, and time both.
 
+**The gate count is a snapshot, not a constant, and a sibling unit moves it.**
+`nested-dispatch-ungoverned` ships `check-agent-tier-explicit` in this same
+iteration, taking the battery to 90 gates. No gate holds this literal —
+`check-manifest-count` scans canonical specs, `README.md` and `CLAUDE.md`, and
+excludes amendments — so it is stated as a dated reading rather than a fact the
+tree will keep true. The ratios above are what the argument rests on, and they
+are unchanged by a gate that adds no render work.
+
 The tax is paid per battery run *and* per docs commit — the gate is
 `tier=precommit` coupling `docs/*.md`, so every documentation commit pays it
 before it lands, and it grows linearly with the docs tree. Nothing rots; the
 gate is correct, only slow.
 
-**Scope boundary.** The `awk` fan-out above is the *other* unit's — the
-mechanical spawn-hoist debt entry — and is untouched here. This amendment
-changes only the renderer contract, which is the half that cannot be mechanical
-because it changes a shipped, documented consumer knob.
+**Scope boundary.** This amendment changes only the renderer contract — the half
+that cannot be mechanical, because it changes a shipped, documented consumer
+knob. The 271 ms `awk` fan-out is **not** claimed here: delta 7's projection
+carries it forward unchanged, so this unit's measured case stays independently
+checkable against the spawn-hoist unit's.
+
+**And it is not the spawn-hoist unit's either, as that entry is currently
+written — flagged at align rather than assumed.** An earlier draft assigned the
+fan-out to "the mechanical spawn-hoist debt entry". Read at the entry, that
+unit's worklist names `check-tree-terms`, `check-spec-pointer`, `check-md-refs`,
+`check-comment-tier`, `check-trajectory-fresh`, `check-docs-cmd` and
+`check-docs-nav-reachable`, and it explicitly excludes "the docs renderer". So
+the 271 ms has no owner today. Whose it becomes is a scope call, not this
+amendment's to make; what this amendment owes is to stop asserting an ownership
+that does not exist.
 
 ## What changes
 
@@ -41,8 +60,9 @@ stdin→stdout single-document contract, unchanged and still the fallback. When
 the batch knob is empty the gate runs exactly the loop it runs today.
 
 **Why not replace the contract.** `SITE_KIT_RENDERER` is shipped and documented;
-a consumer pointing it at a bespoke renderer (the §Parser-version fidelity
-version-pin recipe is the sanctioned example) would break on upgrade, and every
+a consumer pointing it at a bespoke renderer (the version-pin recipe in
+§check-docs-render-fidelity's *Parser-version fidelity* passage is the
+sanctioned example) would break on upgrade, and every
 such consumer would be obliged to implement a framing protocol to get back to
 working. Additive is the only shape where no consumer breaks and the framing
 obligation is opt-in.
@@ -55,8 +75,8 @@ weight:
    a silent pass. A cache key that misses any input to the verdict — the
    renderer build, the gate's own scan logic — greens pages that would now red,
    and correct keying requires hashing the renderer's resolved gem set, which is
-   exactly the thing §Parser-version fidelity already says the kit will not
-   resolve at gate time.
+   exactly the thing the *Parser-version fidelity* passage already says the kit
+   will not resolve at gate time.
 2. **It concedes the hermetic contract.** The oracle depends on running offline
    and deterministically; persistent cross-run state is the opposite property,
    and `check-test-hermetic` polices that direction in this tree already.
@@ -125,9 +145,10 @@ renderer death, truncation, and framing error alike — one check standing in fo
 the status the shell threw away. It must therefore exit 2 (fail-closed,
 "cannot run my oracle"), never 1 (a finding about the docs).
 
-Per-document scanning is unchanged: each document read off the stream goes
-through the existing `rendered_scan`, and the source-side `awk` passes are
-untouched.
+Per-document scanning is unchanged: each document read off the stream is piped
+through the existing `rendered_scan` awk program — a shell variable holding awk
+source, not a function, so it is reused verbatim — and the source-side `awk`
+passes are untouched.
 
 ### Delta 4 — the default, and the coupling that keeps a pin honest {design-bearing}
 
@@ -142,7 +163,7 @@ and §Layout and configuration states it there — one home for the value.
 
 **The hazard this coupling exists to close.** Filling the batch default
 unconditionally would silently defeat a deliberate override: a consumer who
-points `SITE_KIT_RENDERER` at the §Parser-version fidelity version-locked bundle
+points `SITE_KIT_RENDERER` at the *Parser-version fidelity* version-locked bundle
 but does not know a second knob now exists would have their pinned oracle
 replaced by the kit's *unpinned* batch default, and the gate would report clean
 against a parser build the consumer explicitly rejected. That is a false clean
@@ -153,8 +174,17 @@ itself still at its kit default.** A consumer who overrode the per-document
 renderer and set no batch knob gets the per-document path at today's cost and
 today's semantics — slower, and correct. Opting in is one line: point
 `SITE_KIT_RENDERER_BATCH` at the batch form of their own pinned renderer. The
-version-pin recipe in §Parser-version fidelity is updated to name both knobs, so
-the pin is not half-applied by a reader following it.
+version-pin recipe is updated to name both knobs, so the pin is not
+half-applied by a reader following it.
+
+**Where that recipe actually lives, verified at align rather than assumed.**
+`Parser-version fidelity` is **not** a `site-kit/SPEC.md` section — it is a
+bolded paragraph lead-in *inside* §check-docs-render-fidelity (the file's
+sections are §The monitor boundary, §Layout and configuration,
+§check-docs-cname-parity, §check-docs-render-fidelity, §lib/site.sh,
+§templates/site-health.yml, §Out of scope). Every reference to it in this
+amendment names the passage, not a section, and the edit lands inside
+§check-docs-render-fidelity.
 
 ### Delta 5 — probing the batch oracle, and never downgrading silently {design-bearing}
 
@@ -179,18 +209,39 @@ run its configured oracle refuses.
 
 The kit cannot verify that a consumer's batch renderer agrees document-for-
 document with their per-document one; a divergent pair yields a divergent
-oracle. This is the same obligation §check-docs-render-fidelity already places
-on a consumer who overrides the renderer at all — "point this at your own
-renderer" has always meant "and be right about it" — so the amendment widens the
-existing obligation rather than inventing a new class of trust. What the kit
-does hold: its own two defaults agree, asserted by fixture (delta 7), so the
-zero-config path is covered by construction.
+oracle.
+
+**Stated as a new limit, because the existing text does not already carry it.**
+An earlier draft justified this as merely widening an obligation the SPEC
+already placed on any consumer who overrides the renderer. Checked at align, it
+does not: the only sentence on the subject is §Layout and configuration's "A
+consumer whose Pages stack differs points this at its own renderer; an
+unresolvable one fails the gate closed" — which states the mechanism and the
+fail-closed behavior, not a correctness obligation on the consumer's choice. So
+this delta **adds** the agreement limit rather than widening one, and it is
+placed with §check-docs-render-fidelity's other stated limits.
+
+What the kit does hold: its own two defaults agree, asserted by fixture
+(delta 7), so the zero-config path is covered by construction.
 
 ### Delta 7 — fixtures and the landing checklist {mechanical}
 
-The gate's `good/`+`bad/` pair supplies its own renderer through the positional
-`[docs-dir] [config-file]` form, so batch coverage costs a fixture config rather
-than new machinery. What the fixtures must add:
+The gate **accepts** a positional `[docs-dir] [config-file]` form
+(`check-docs-render-fidelity.sh:15-16,20`), and that is the seam batch coverage
+rides.
+
+**Corrected at align — the fixtures do not use it today.** An earlier draft said
+the pair "supplies its own renderer" through that form and priced this delta as
+a config file. Read at the fixture: `good/args` and `bad/args` each carry only
+`tree/docs`, the three companion `.test.sh` files invoke the gate with one
+positional, no fixture `site-config.sh` exists, and the fixtures render through
+the **real installed kramdown**. So this delta is the *first* use of the
+config-file positional in this gate's fixtures — still mechanical, but it is new
+fixture wiring plus a stub batch renderer, not a one-line config. Costing it
+honestly here is the point; a build session that budgeted a config edit would be
+surprised.
+
+What the fixtures must add:
 
 - a fixture config setting the batch knob, so the batch path is the one under
   test rather than an untaken branch;
@@ -262,9 +313,10 @@ entirely is unaffected.
   contract, the two-arm probe routing, and the count-assertion-as-fail-closed
   (deltas 2, 3, 5). Its honest-limit passage gains delta 6's renderer-agreement
   limit, placed with the other stated limits rather than appended.
-- **site-kit/SPEC.md §Parser-version fidelity** — the version-pin recipe names
-  both knobs, so a consumer following it pins the oracle the gate will actually
-  run (delta 4).
+- **site-kit/SPEC.md §check-docs-render-fidelity, its *Parser-version fidelity*
+  passage** (a paragraph lead-in in that section, not a section of its own) —
+  the version-pin recipe names both knobs, so a consumer following it pins the
+  oracle the gate will actually run (delta 4).
 - **site-kit/SPEC.md §lib/site.sh** — the loader's "fills every knob's default"
   sentence, which is no longer unconditionally true of every knob: the batch
   default is conditional on the per-document knob (delta 4).

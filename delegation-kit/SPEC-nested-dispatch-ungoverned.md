@@ -52,6 +52,20 @@ same reader. The correction changes the halves' *sizes*, not their kinship: one
 collapses to a clause, the other grows the artifact the entry believed could not
 exist.
 
+**Sequencing — this unit lands LAST in the delegation lane, and the order is
+directional.** The queue's surface notes say only "serialize" against
+`agent-execution-backgrounding-role-scope`. Established at align: the direction
+is fixed, because delta 6's agent definition **cites** that amendment's
+durability rule, which does not exist until it lands. No gate supplies the
+order — `check-rule-citation` scans only `delegation-kit/SPEC.md` §The
+delegation model forward into `templates/agent-execution.md`, so a citation
+dangling from a consumer agent definition reddens nothing. The full chain is
+`resume-journal-deletion-vs-pull-channel` → `agent-execution-backgrounding-role-scope`
+→ **this unit**. The two amendments' edits to §The delegation model are disjoint
+paragraphs (this one corrects the per-dispatch-freshness and settings-env-block
+paragraphs; that one appends two rationale paragraphs), so the shared section is
+a merge concern only — the citation is what makes the order load-bearing.
+
 ## What changes
 
 ### Delta 1 — the budget rule gains its subtree clause {design-bearing}
@@ -170,6 +184,33 @@ scanned directory declares a `model:` field in its frontmatter.
   better than nothing, and not a claim to have closed the tier half
   mechanically.
 
+**The four gate contracts, named rather than left to the meta-gates to
+discover** (gate-sdk/SPEC.md §The gate model; an earlier draft specified only
+the fixture pair, and a contract a new gate meets by accident is a build-stage
+surprise):
+
+- **Output** (§The gate model, the output contract). Clean is exactly one line
+  `AGENT-TIER-EXPLICIT: clean (<parenthetical>)` — the stable upper-token id
+  paired with the counted scan set, which is also how the counted-inert case
+  reports (zero definitions scanned is a clean line, not a skip). A finding is
+  one line per offending definition giving its path and the missing field, then
+  a `help:` line naming the concrete action — add an explicit `model:`, and
+  `inherit` is a valid answer. Exits: 0 clean, 1 finding, 2 harness error.
+  Enforced by `check-gate-output` plus the `good/` fixture.
+- **Fail-closed** (§The gate model, the fail-closed contract). The gate branches
+  on the **exit status** of every subprocess it captures — the definition
+  enumeration and the frontmatter parse — never on the emptiness of their
+  output, since an empty parse is exactly what a crashed parser and a
+  `model:`-bearing file both look like. `fail_closed` at each capture; no
+  `# fail-closed-exempt:`. Enforced by `check-gate-fail-closed`.
+- **Fixture pair** (§The gate model). A `good/`+`bad/` pair under the kit's
+  tests dir, from the check skeleton — delta 7. No `# no-fixture:` claim: a
+  reddening violation is trivially craftable (a definition with no `model:`).
+  Enforced by `check-gate-fixture-coverage`.
+- **Self-lint** (§The gate model). ShellCheck at `-S warning`, with any
+  suppression inline and justified — never a `.shellcheckrc`. Enforced by
+  `check-shellcheck`.
+
 ### Delta 6 — a tracked agent type for the read-only audit class {design-bearing}
 
 The rule says an audit or survey "rides the type whose description commits to
@@ -198,12 +239,50 @@ what it returned before acting on it.
 ### Delta 7 — landing {mechanical}
 
 A `good/`+`bad/` fixture pair for the new gate from the check skeleton, its
-`# graph:` manifest coupling the agent-definition surface, registration in this
-repo's `gates.list`, a §check-agent-tier-explicit section in
-delegation-kit/SPEC.md, and the generated projections regenerated — the
-pre-commit hook, the graph artifact, the enforcement map, and the docs mirror,
-each recovered by running the battery rather than transcribed here. This
-iteration's release note carries a Tightened-gates bullet for the new gate.
+`# graph:` manifest coupling the agent-definition surface (`tier=` lives there,
+not in the registry line), registration in this repo's `gates.list` as a bare
+name, a §check-agent-tier-explicit section in delegation-kit/SPEC.md, and the
+generated projections regenerated — the pre-commit hook, the graph artifact, the
+enforcement map, and the docs mirror, each recovered by running the battery
+rather than transcribed here. This iteration's release note carries a
+Tightened-gates bullet for the new gate.
+
+**Four more obligations a new gate incurs here, added at align — each verified
+against the surface that would go stale, because "the battery recovers it" is
+true only of the freshness-gated ones.**
+
+- `delegation-kit/README.md`'s gate-roster marker block, held to `checks/`
+  basename parity by `check-readme-roster`. Freshness-gated, so the battery does
+  catch it — named because the kit-landing checklist owns it explicitly.
+- `docs/value.md`'s rollup, where delegation-kit's gate count is the literal
+  `2`. Regenerated by its own emitter and byte-gated by
+  `check-value-rollup-fresh`.
+- `docs/footprint.md`'s token-cost table, the same shape.
+- `delegation-kit/smoke/install.sh`'s `gates.list` append is a **judgment call,
+  not an automatic add**: it registers `check-gate-tamper` alone today and
+  deliberately not `check-rule-citation`, because the smoke consumer is a
+  scratch tree that need not carry the kit's own SPEC and template. This gate is
+  counted-inert on a tree with no agent-definition directory, so registering it
+  is safe and demonstrates the inert path; land it registered unless the smoke
+  run says otherwise.
+
+**Unenforced literal this unit falsifies, costed rather than skipped.** The
+battery goes from 89 gates to 90, and the "89 gates" literal is restated in
+`TASK-QUEUE.md` (the `gate-battery-spawn-hoists` entry and one Deferred entry)
+and in `site-kit/SPEC-docs-renderer-batch-contract.md`'s measurement table. No
+gate holds any of them: `check-manifest-count` scans canonical specs, `README.md`
+and `CLAUDE.md`, and excludes amendments and the queue. The site-kit amendment
+has been marked at align to state its count as a dated reading; the queue
+literals are read-once measurement records that name their own run, so they are
+left as filed rather than chased.
+
+**The new agent definition joins a scan set beyond this gate's.**
+`scripts/canon-config.sh` lists `.claude/agents/*.md` in
+`CANON_KIT_PROSE_SURFACE_GLOBS`, and canon-kit's loader folds slot-free
+candidates from that glob into the manifest set the manifest-narration gate
+family reads (`canon-kit/lib/spec.sh`, §check-spec-pointer). So delta 6's file is
+governed by that family from the moment it lands — a `# spec:`-style pointer
+obligation, not merely a frontmatter field.
 
 ## Producers and consumers
 
