@@ -32,6 +32,8 @@ check-template-copy-parity
 check-test-hermetic
 EOF
 
+# smoke-unregistered: check-root-tiering — its subject is the consumer-curated root manifest GATE_SDK_ROOT_ALLOWLIST (default scripts/root-allowlist.list), which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
+
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list
 

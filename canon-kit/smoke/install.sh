@@ -28,6 +28,8 @@ check-todo-task-liveness
 check-tracking-claim
 EOF
 
+# smoke-unregistered: check-surface-duplication — the glossary topology it reads (CANON_KIT_GLOSSARY_FILE, default GLOSSARY.md) is optional and this tree ships none, so its exit 2 is uncorroborated only because the invoking repo lacks the same optional surface, not because the gate is broken
+
 # spec: gate-sdk/SPEC.md §Consumer smoke — seed check-amendment-queue's surface (guarded; carries lifecycle-kit's inert header so the seed composes with the stage gates)
 if [[ ! -f TASK-QUEUE.md ]]; then
     cat > TASK-QUEUE.md <<'EOF'
