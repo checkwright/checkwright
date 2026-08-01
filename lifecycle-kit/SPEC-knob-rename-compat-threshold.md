@@ -98,8 +98,12 @@ launch announcement."* That instance is owned by this iteration's
 `preview-release-cadence` amendment, which replaces it with the release-channel
 declaration. Named here so the pair lands one reading rather than two: the tags
 are pre-GA iteration artifacts and the announcement is a separate, later event.
-Neither amendment may land its correction while the other's instance stands, or
-the tree carries the contradiction it just removed.
+**Stated as a sequencing rule rather than a mutual precondition**, because
+"neither lands while the other's instance stands" is a deadlock no order satisfies:
+the two corrections land in the **same commit**, or `preview-release-cadence`'s
+first. What must not happen is this clause landing while `docs/install.md`'s
+instance still stands — which is the same direction the ordering below requires for
+an independent reason.
 
 **Ordering, because it is load-bearing.** Delta 1's compat threshold names a
 declared general-availability posture. In *this* repo that declaration is the
@@ -124,27 +128,54 @@ re-litigate it:
    section, whose `old → new` / `old → ∅` grammar is specific to config names. A
    rule reaching gate names or file conventions would point at a mechanism that
    does not accept them.
-2. **There is no uncovered class**, which is the load-bearing check. A non-knob
-   rename — a gate name, a file or directory convention — already routes through
-   the release note's `Behavior changes` section under `docs/install.md` §The
-   upgrade contract. The narrow scoping leaves no rename undeclared; it routes
-   different renames to the mechanisms shaped for them.
+2. **No class is left without a home**, which is the load-bearing check — and it is
+   stated at the strength the tree actually supports. A non-knob rename — a gate
+   name, a file or directory convention — is **structurally accommodated** by the
+   release note's `Behavior changes` section under `docs/install.md` §The upgrade
+   contract, whose bullet lead is defined as *"the changed surface's name (the
+   script, knob, template, or file), bolded"* — a definition that already admits
+   every one of those classes. What the page does **not** carry is a sentence
+   explicitly *routing* non-knob renames there, and no release note to date
+   instantiates one, so this is a sound structural inference rather than an
+   established convention. Recording the difference matters: the narrow scoping
+   leaves no rename without a section shaped for it, which is all this reason
+   claims, but the routing is inferred and the missing sentence is filed as a gap
+   rather than asserted away.
 3. **Widening it would restate a neighbour.** A general "any governed name" rule
    is doctrine-tier, and that placement call — new rule versus clause on an
-   existing one — is precisely what the deferred `rule-reach-before-merits` unit
-   owns. Minting the wider rule here would settle a doctrine question from inside
-   a kit SPEC and duplicate whatever that unit lands.
+   existing one — is the jurisdiction the deferred `rule-reach-before-merits` unit
+   holds. (That entry states the general placement question rather than naming this
+   knob-widening case among its instances, so this is its jurisdiction applied, not
+   a literal citation.) Minting the wider rule here would settle a doctrine
+   question from inside a kit SPEC and duplicate whatever that unit lands.
 
-**No gap is filed for the widening, and the absence is deliberate**: reason 2
-establishes there is no uncovered class, so there is nothing to cost. What remains
-is a placement question already filed under another slug, not a hole in coverage.
+**No gap is filed for the widening itself, and the absence is deliberate**: reason 2
+establishes every rename class has a section shaped for it, so the widening costs
+nothing to leave unbuilt, and what remains is a placement question already filed
+under another slug rather than a hole in coverage. **One narrower gap is owed and
+is filed**: `docs/install.md` §The upgrade contract never states that a gate-name
+or file/convention rename routes to `Behavior changes`, which reason 2 infers from
+the section's own lead-token definition. Reason 2 stands on that inference; the
+sentence that would make it explicit is a real absence and is filed rather than
+flagged-and-skipped.
 
 ### Delta 4 — the restatement sweep *{mechanical}*
 
 Grep the tree for restatements of the first-tag threshold and the
 launch-prerequisite claim outside the two instances Deltas 1–2 own, and correct or
 delete what turns up. Purely mechanical: the ruling is fixed, the sweep executes
-it.
+it. This is the iteration's **only** sweep for this premise —
+`preview-release-cadence` cites it rather than running a second pass.
+
+**The sweep run at this spec turned up exactly one further target, and it is a
+generated projection rather than prose.** `docs/lifecycle-kit/SPEC.md` mirrors the
+clause, so it carries the old paragraph until the mirror is regenerated. The remedy
+is a `scripts/gen-docs-mirror.sh` regen (fan-out and command:
+`docs/site-architecture.md` §Generated projections), **never a hand-edit** — editing
+a generated page is the defect the roster exists to prevent. Everything else the
+grep surfaces is a false positive: a v0.1.0 post describing that release as "the
+first tagged release", an unrelated harvest tag reusing the term, and the queue
+entry's own quoted framing of the defect being fixed.
 
 ## Producers and consumers
 
@@ -158,7 +189,8 @@ produces.
 *Producer of the input it reads:* the consumer's own declared stability posture —
 a tracked, in-tree declaration the project maintains. In this repo that producer
 is the `Release channel:` line in `docs/install.md` §Versioning, written by hand
-into a core-files-pinned page and held against the publish workflow by
+into a tracked page (that page is not on `scripts/core-files.list`; tracked-ness is
+what the claim needs and all it needs) and held against the publish workflow by
 `check-release-channel-parity` (`preview-release-cadence`, Delta 1). So the input
 is not merely named: it is produced by a surface that exists in every clone and is
 gated against drift. That is the check this amendment most needed to pass, because
@@ -180,12 +212,23 @@ amendment and is verified here only to confirm the split severs nothing.
 ruling rather than an omission. The predicate a gate would need is *"this commit
 renames a knob"*, which is not decidable from a diff without a knob-identity model
 no kit has; a gate approximating it would fire on additions and removals and would
-be valved into silence. The enforcement-first doctrine's own ordering applies and
-is satisfied by a different move: *removing the duplication outranks gating it.*
-What this amendment removes is a **contradiction between two governed surfaces** —
-lifecycle-kit's clause and `docs/install.md` §Versioning's pre-1.0 qualifier no
-longer disagree about whether a breaking rename may ride a minor. Making the two
-surfaces agree is the higher-ranked fix, and it is the one available here.
+be valved into silence.
+
+What this amendment removes instead is a **contradiction between two governed
+surfaces** — lifecycle-kit's clause and `docs/install.md` §Versioning's pre-1.0
+qualifier no longer disagree about whether a breaking rename may ride a minor.
+
+**Stated precisely, because the neighbouring doctrine clause is easy to over-claim
+here.** Enforcement-first ranks *removing the duplication* above gating it, and a
+contradiction is not a duplication: the stronger move would be to delete one surface
+and leave a single owner. That move is **unavailable, and its unavailability is
+structural rather than a shortfall of effort**. §The seam below rules that the kit
+states a criterion and never an instance, while the consumer states the instance —
+so a kit clause and a consumer page saying compatible things about stability is the
+correct kit/consumer split, not a duplication awaiting collapse. There is no single
+surface both readers could share. Reconciling the two is therefore the most the
+ordering makes available here, and the residual is a rule with no gate reader,
+recorded rather than papered over.
 
 ## Existing sections updated
 

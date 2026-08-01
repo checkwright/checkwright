@@ -17,8 +17,10 @@ release channel, a prerelease posture, or a cadence — searched across
 **Scope discipline — one mechanism here is already shipped and is not
 redesigned.** `docs/install.md` §Versioning already specifies the batching
 primitive: a close whose criteria were met but whose release was held back stamps
-`deferred:vX.Y.Z`, and `check-release-bump` reads that floor and refuses to let a
-later note fall below it. Batching internal iterations into a slower external
+`deferred:vX.Y.Z`, and `check-release-bump` reads that floor when it derives a later
+note's bump (its real extent is stated in Delta 2's honest limit, which is narrower
+than the runbook prose and is corrected there rather than inherited). Batching
+internal iterations into a slower external
 cadence therefore needs **no new state and no new gate** — it needs a policy that
 ever invokes the primitive. Delta 2 supplies exactly that and nothing more.
 
@@ -106,9 +108,23 @@ nothing watching.
 The close stage's release-disposition step reads the consumer's `release-policy`
 slot (lifecycle-kit/templates/stages/close.md) and either releases or stamps an
 explicit line. This repo's binding in `.claude/commands/close.md` today names
-RELEASING.md's procedure and the disposition-evidence path but states **no
-criteria for whether to release at all** — which is why every close has released,
-and why the tag history reads as churn.
+RELEASING.md's procedure and the disposition-evidence path, and does state a
+**bump-derived** criterion — an all-None iteration stamps `none`. What it states
+nowhere is a **cadence** criterion: nothing asks whether a qualifying iteration
+should release *now*, so every iteration whose note earns a bump takes a tag, and
+the tag history reads as churn.
+
+**The primitive this delta invokes is not theoretical — it has already run,
+including in the shape defer-by-default will make routine.** The disposition
+history carries three `none` stamps and roughly ten `deferred:` stamps, among them
+two consecutive-deferral stacks that discharged correctly:
+`permission-posture-reconciliation` then `per-batch-tiering`, released together at
+`v0.14.0`; and `front-door-readiness` then `pre-adoption-grammar-break`, released
+together at `v0.18.0`. In both stacks the floor stayed at the *same* version rather
+than rising, which is the semver-correct behavior — accumulated minors do not
+compound into two minors. So this delta is not asking an untested mechanism to
+carry new weight; it raises the frequency of a path already exercised, multi-
+deferral form included.
 
 The binding gains a cadence criterion. A close **defers by default** and tags only
 when a release trigger fires:
@@ -129,18 +145,33 @@ the accumulated declarations ride the next qualifying release. RELEASING.md's
 step 1 already anticipates this exactly — *"Because the surface accumulates
 across every iteration since the last tag, a release batching several iterations
 inherits all of their declarations here"* — so the note-composition half needs no
-change; batching is the shape it was already written for, merely never exercised.
+change; batching is the shape it was already written for, and the two deferral
+stacks above are it having been exercised. What changes is how often, not whether.
 
 **The honest limit, stated rather than papered over.** No gate reds a release cut
 too soon. The four triggers above are the cases where a fast release is *correct*,
 so a timing gate would need an override valve covering all four and would end up
-policing the valve rather than the cadence. What *is* already gated is the half
-that can silently lose information: `check-release-bump` refuses to let a later
-note fall below an outstanding `deferred:` floor, so a deferral cannot quietly
-evaporate. Timing is policy under a mandatory disposition stamp — and that stamp
-is not nothing, because lifecycle-kit already rules that silence is not a
-disposition. This limit is recorded here so a later reader does not read the
-missing gate as an oversight and mint the weak one.
+policing the valve rather than the cadence.
+
+What *is* already gated is the half that can silently lose information — but its
+coverage is narrower than the governed prose claims, and this delta states the real
+extent rather than inheriting the claim. `check-release-bump` reads the outstanding
+`deferred:` floor and, while one stands, refuses a **patch-only** bump: an
+accumulated deferral cannot be discharged by a release that pretends nothing
+accumulated. What it does **not** do is compare the new note's version numerically
+against the floor, so it would not catch a deferred *major* discharged as a minor.
+`docs/install.md` §Versioning asserts the stronger invariant — a later note *"may
+not fall below that version"* — and the gate implements the weaker one. That
+divergence predates this unit and closing it is a gate change rather than a policy
+one, so it is filed rather than fixed here; it is named because defer-by-default
+raises the number of outstanding deferrals and so raises exposure to it. Within
+this delta's own trigger set the exposure is covered by policy rather than by the
+gate: a major releases immediately and never waits behind the cadence floor.
+
+Timing is policy under a mandatory disposition stamp — and that stamp is not
+nothing, because lifecycle-kit already rules that silence is not a disposition.
+This limit is recorded here so a later reader does not read the missing gate as an
+oversight and mint the weak one.
 
 ### Delta 3 — a 30-second human section, ahead of the migration detail *{design-bearing}*
 
@@ -169,8 +200,10 @@ what "beside the migration detail" in the queue entry asks for.
 closed when a fixed section is absent; the assertion widens from three sections
 to four. Verified mechanically safe at this spec: that presence check binds the
 **newest note only** (`scripts/check-release-bump.sh` — the three
-`section_bullets "$newest_f" …` calls), so the 21 historical posts are untouched
-and no retro-fabricated summaries are owed. The section parses with the same
+`section_bullets "$newest_f" …` calls, never iterated over the full row set), so
+the historical corpus is untouched and no retro-fabricated summaries are owed.
+(`docs/posts/` holds 21 posts but 20 release notes: the undated announcement post
+carries no front matter and no `release:` key, so it is not a note at all.) The section parses with the same
 `gate-sdk/lib/declaration.sh` `decl_section_bullets` container the other three
 use, so the note's four sections cannot diverge in how they are read.
 
@@ -188,8 +221,10 @@ rulings Deltas 1–3 already fixed; no judgment left in it.
 **The channel declaration** (new interface, Delta 1).
 *Producer:* a human editing `docs/install.md` §Versioning — the single line
 `Release channel: **preview**`. Its enabling configuration is nothing: the line is
-tracked content in a core-files-pinned page (`scripts/core-files.list`), present
-in every clone, so there is no deployment on which the producer is unset.
+tracked content in a tracked page, present in every clone, so there is no
+deployment on which the producer is unset. (`docs/install.md` is *not* on
+`scripts/core-files.list`; tracked-ness alone carries the claim, and the stronger
+pinning premise is not available and is not needed.)
 *Consumers, both named:* (1) `check-release-channel-parity`, which reads the line
 and the `publish.yml` Release step and reds on disagreement — the gate is the
 declaration's reader, which is what keeps it from being a comment; (2) a human
@@ -255,6 +290,24 @@ one gate's widening rather than three.
   beside the three sections it already owns (Delta 3), and states the
   no-`None`-form exception explicitly, since every other section it governs has
   one.
+- **The count-bearing sentences that say "three"** (Delta 3). Adding a fourth fixed
+  section puts every sentence that counts them in play, and **no gate parses this
+  prose**, so a stale count survives a green battery — this entry exists because
+  nothing else will catch it. A census at align found **eleven prose sentences
+  across four files** (`RELEASING.md` ×3, `docs/install.md` ×6, `gate-sdk/SPEC.md`
+  ×1, plus the two gates' message and spec-comment text), and the roster is
+  deliberately *not* copied here: it would be a derived list maintained by hand,
+  and the build stage re-runs the census against the tree it is editing.
+
+  **What is stated here is the discriminator, because it is a design ruling and
+  most of those sentences must NOT change.** A sentence counting *how many fixed
+  sections the note has* becomes four. A sentence counting *the sections that bear
+  declarations* — the bump inputs, the `None`-form roster, the residue-class folding
+  — stays three, because `## In brief` bears none by Delta 3's own ruling that it
+  feeds no bump criterion and has no `None` form. Only the newest-note **presence**
+  assertion widens. A bare three→four sweep would therefore introduce more errors
+  than it fixes; the count words are not interchangeable and the editor must read
+  each sentence's referent.
 - **`RELEASING.md` §The procedure, step 1** — chrome skeleton gains the
   `## In brief` entry in position (Delta 4).
 - **`RELEASING.md` §The procedure, step 2** — states that `## In brief` is not a
@@ -268,8 +321,18 @@ one gate's widening rather than three.
   graph artifact; the full fan-out and its regen commands are
   `docs/site-architecture.md` §Generated projections, which the build stage runs
   rather than this amendment restating.
-- **No kit SPEC changes.** Every surface above is repo-root-governed. The seam
-  ruling is §The seam below.
+- **`gate-sdk/SPEC.md`, the `decl_section_bullets` caller list** (Delta 3) — one
+  sentence describes `scripts/check-release-bump.sh` as *"counting bullets across
+  all three of the note's fixed sections"*. Delta 3 makes the note carry four while
+  that caller still counts three, so the sentence becomes false and is reworded to
+  name the three it means. **This is the amendment's only kit-side edit, and it is
+  named rather than absorbed** because §The seam below rules the seam explicitly and
+  an unlisted kit surface would contradict it. It does not disturb that ruling:
+  gate-sdk gains no mechanism, no knob, and no new name — the sentence documents a
+  *consumer* gate's behavior, and the correction keeps a kit SPEC's description of
+  the consumer accurate rather than pushing anything across the seam.
+- **No other kit SPEC changes.** Every remaining surface above is
+  repo-root-governed. The seam ruling is §The seam below.
 
 ## The seam
 
@@ -308,9 +371,11 @@ generalize the four surfaces to config, not to literals.
 - [ ] **Amendment deleted** — this file removed on merge; none remain at the
       repo root (`ls SPEC-*.md`).
 - [ ] **Removals propagated** — the false *"The first tag rides the launch
-      announcement"* sentence is gone from `docs/install.md`, and grepped
-      tree-wide for any restatement of it (`knob-rename-compat-threshold` carries
-      the lifecycle-kit-side instance; both must land the same reading).
+      announcement"* sentence is gone from `docs/install.md`. The tree-wide sweep
+      for restatements of the first-tag premise is **not repeated here**: it is
+      `knob-rename-compat-threshold` Delta 4, which owns it as a delta and covers
+      both instances. One sweep, one owner. This box is satisfied by that delta
+      having run and by the two amendments landing the same reading.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).

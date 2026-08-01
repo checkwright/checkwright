@@ -63,8 +63,15 @@ is ruled rather than left to the implementer:
 - **Only resolving targets are classified**, and this is the anti-double-report
   rule. A relative target that resolves to nothing is `check-md-refs`' finding and
   must stay only its finding; this rule fires solely where the target resolves to
-  a tracked path that happens to sit outside the root. The two gates therefore
+  an **existing** path that happens to sit outside the root. The two gates therefore
   partition the failure space rather than overlapping it — one red per defect.
+  *Existence, not tracked-ness*: the gate already performs both halves of this read
+  for its directory-target rule — a pure-path `realpath -m` resolution against the
+  source file's directory, then a filesystem test on the result — so the rule needs
+  no capability the gate lacks. Keying on tracked-ness instead would add a git query
+  to a gate that makes none, and would buy nothing, because the partition being drawn
+  is between targets that resolve and targets that do not — exactly what the
+  existence test already decides.
 - **Directory targets stay the first rule's finding.** A relative link naming a
   directory outside the root satisfies the no-directory-target rule's predicate
   first; it is reported there, once, and this rule does not double-report it.

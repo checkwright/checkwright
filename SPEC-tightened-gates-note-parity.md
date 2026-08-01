@@ -8,7 +8,10 @@ filename matches the gate this amendment introduces.)*
 Close the honest limit RELEASING.md step 1 states about itself: *"nothing asserts
 the composed section's set equals the surface it was composed from. You transcribe
 one into the other and drain by hand at step 4, and review is what holds the
-agreement."* This amendment supplies the assertion and deletes that limit.
+agreement. It is mechanizable and filed as such; until it lands, read the surface
+and the section against each other before moving on."* This amendment supplies the
+assertion and deletes that limit — the runbook's own *"filed as such"* is this unit
+coming due.
 
 Both sides are machine-readable and both parsers already ship in
 `gate-sdk/lib/declaration.sh` — `decl_record_tokens` reads the bare-name-per-line
@@ -25,16 +28,15 @@ release choreography is not one commit but two, and the surfaces are comparable
 in the gap between them.
 
 Verified against `git log`, the last three releases each ran the same two-commit
-shape:
+shape. The **shape** is what recurs; the commit subjects vary in wording across the
+three and nothing here keys on them:
 
-- `docs(release): author the vX.Y.Z release note` — composes the note's
-  Tightened-gates bullets **from** the surface. The surface is untouched and still
-  carries every accumulated name. **Both sides are non-empty and equal here, by
-  construction.**
-- `chore(release): stamp the vX.Y.Z release disposition and drain the
-  declarations` — truncates the surface to its header line, stamps the
-  disposition, and is the commit the tag points at (confirmed:
-  `git rev-list -n1 v0.21.0` is that commit).
+- a note-authoring commit — composes the note's Tightened-gates bullets **from** the
+  surface. The surface is untouched and still carries every accumulated name.
+  **Both sides are non-empty and equal here, by construction.**
+- a drain-and-stamp commit — truncates the surface to its header line, stamps the
+  disposition, and is the commit the tag points at (confirmed for all three:
+  `git rev-list -n1 <tag>` is that commit in each case).
 
 So there is a live window — every commit from the note's authoring until the tag
 lands — in which the assertion is not merely holdable but *cheap*, and after which
@@ -44,16 +46,28 @@ it is meaningless because one side is deliberately empty.
 composition.** The gate arms on exactly that and disarms on its own, with no
 state file, no marker, and nothing for a human to remember:
 
-- **Armed** — the newest `docs/posts/` note declares `release: vX.Y.Z` and
-  `git tag --points-at`/`git rev-parse` finds no `vX.Y.Z`. The note is being
-  composed; assert parity.
-- **Dormant** — every note's version is tagged. The surface has been drained by
-  contract and the note is the sole record; there is nothing to compare, and
-  comparing anyway would red permanently on every clone forever.
+- **Armed** — the newest release note declares `release: vX.Y.Z` and
+  `git tag --points-at` finds no `vX.Y.Z`. The note is being composed; assert
+  parity.
+- **Dormant** — every release note's version is tagged. The surface has been
+  drained by contract and the note is the sole record; there is nothing to
+  compare, and comparing anyway would red permanently on every clone forever.
+
+**The note set is `docs/posts/` filtered by the `release:` key, and the filter is
+mandatory rather than incidental.** The directory is not all release notes: it also
+holds the announcement post, which carries no front-matter block at all and so no
+`release:` key.
+Deriving the set by listing `docs/posts/*.md` would classify that post as
+untagged — tripping the more-than-one-untagged refusal below against any real
+in-flight note, and reading as a permanently untagged note on its own. Either way
+the gate would refuse forever on every clone, so the filter is the difference
+between a fail-closed gate and a broken one. The existing grammar gates already
+select on that key; this gate selects the same way.
 
 This is the same tag-resolution move `gate-sdk/bin/upgrade-smoke.sh` already makes
-to pick its declaration source, so the gate reads release state the one way this
-tree already reads it, rather than inventing a second reading.
+to pick its declaration source (its untagged-`TO` arm reads the surface, its tagged
+arm reads the note), so the gate reads release state the one way this tree already
+reads it, rather than inventing a second reading.
 
 ## What changes
 
@@ -73,8 +87,9 @@ containment would catch only the first.
 
 **Resolution and fail-closed behavior.** The gate refuses (exit 2) rather than
 passing when it cannot establish its own preconditions: more than one untagged
-note (the release choreography admits exactly one in flight, and two means a
-state this gate cannot reason about); a note whose Tightened-gates section is
+note *in that filtered set* (the release choreography admits exactly one in
+flight, and two means a state this gate cannot reason about); a note whose
+Tightened-gates section is
 absent or unparseable; a declaration surface missing its required header line. A
 gate that cannot find one of its two surfaces declines to certify — it never
 reports clean. Where no note is untagged, the gate reports clean **and says it is
@@ -187,13 +202,13 @@ carries its reason rather than reading as ceremony.
   deliverable.
 - **`RELEASING.md` §The procedure** — gains the note-before-drain ordering
   statement (Delta 3), beside step 4's existing tag-ordering invariant.
-- **`docs/install.md` §The upgrade contract** — the paragraph naming
+- **`docs/install.md` §The upgrade contract** (Delta 1) — the paragraph naming
   `check-tightened-gates-grammar` as what holds the Tightened-gates section over
   the corpus gains its sibling: the grammar gate holds each note's section
   *well-formed*, the parity gate holds a note under composition *equal to the
   surface*. Two gates, two claims, stated together so a reader does not read
   either as the other's coverage.
-- **`gate-sdk/SPEC.md` §upgrade-smoke** — the section owns
+- **`gate-sdk/SPEC.md` §upgrade-smoke** (Delta 1) — the section owns
   `.workflow/tightened-gates.txt`'s contract and describes the accumulate/compose/
   drain flow this amendment now constrains. It gains one sentence naming the
   consumer-side parity gate as a second reader of the surface. **Nothing else in
