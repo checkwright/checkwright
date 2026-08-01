@@ -159,7 +159,12 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    Two sibling jobs then consume that one artifact — `release` attaches the
    tarball and its `.sha256` to the GitHub Release (the primary channel), and
    `npm` runs `npm publish --provenance` from the runner (the secondary one,
-   held behind its approval environment). Nothing is published by hand, and
+   held behind its approval environment). That hold is a **confirmation step
+   that produces an approval record**, and claiming more would be an overclaim:
+   the project is single-maintainer by standing ruling, so the reviewer and the
+   tag pusher are one account and independent review is unavailable by
+   construction. Expect the run to pause and to need your approval before the
+   `npm` job starts. Nothing is published by hand, and
    **there is no version to edit** — the pack script stamps the version from the
    tag being packed and the job refuses a tarball whose stamp disagrees with it
    (docs/install.md §Versioning owns the one-semver-line rule this derives from).

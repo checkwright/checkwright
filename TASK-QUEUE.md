@@ -14,81 +14,6 @@
 
 ## Technical Debt
 
-- **npm-publish-approval-posture-unrecorded** — the `npm-publish` environment's
-  two weakening settings are written down nowhere, so the actual strength of the
-  control `RELEASING.md` step 5 names is knowable only by querying the repo.
-  **Settings VERIFIED 2026-08-01 at spec — every filed premise holds, and the
-  design below now stands on established fact.** The entry demanded the first
-  session to act on it run the environment read before anything else; it ran
-  (`gh api repos/:owner/:repo/environments/npm-publish`) and returns: exactly one
-  `required_reviewers` protection rule, carrying `prevent_self_review: false` and
-  a single reviewer — the maintainer account, which is also the account that
-  pushes release tags — beside `can_admins_bypass: true` and a null
-  `deployment_branch_policy`. The environment's `updated_at` still equals its
-  `created_at`, so nothing has been touched since it was made. This iteration
-  falsified two inherited premises at their central claim; this one survived the
-  same test, and the record now says so rather than leaving it unestablished.
-  **This entry is the narrowed residue of a filed claim that is false, and the
-  correction is the point.** Close filed the `v0.18.0` publish as having run "in
-  12s with no approval requested" — the approval environment failing to gate an
-  irreversible public publish. It gated. The `npm` job declares
-  `environment: npm-publish` at job level; that run's deployment sat `waiting`
-  for 77 seconds before `queued`; the run's approvals API records one `approved`
-  entry whose user id matches the triggering actor; and the operator confirms
-  they approved it. The "12s" was the job's post-approval runtime, not the wall
-  clock from the tag push. `can_admins_bypass` did not fire — a bypass leaves no
-  approval entry, and one exists. **Step 5's wording is accurate as written:**
-  it claims a hold, never independent review, so the overclaim reading that
-  motivated the filing does not survive either.
-  **What survives verification, and only this.** (i) `can_admins_bypass: true`
-  leaves a standing path on which the stated hold would not hold. It is
-  available to the same single account either way, so its real cost is not an
-  unauthorized publish but a publish landing with **no approval record** — and
-  that record is the entire output of the control for a solo operator.
-  (ii) Neither setting's posture is recorded, so a reader cannot tell deliberate
-  from accidental, and a well-meant hardening pass setting
-  `prevent_self_review: true` would **deadlock the channel**: the project is
-  single-maintainer by standing ruling, so no second reviewer exists to approve
-  a release.
-  **Scope ruling 2026-08-01 — this is what unblocked promotion.** A solo-operator
-  approval environment is a **confirmation step that produces an audit record**,
-  never independent review: with one maintainer, independent review is
-  unavailable by construction, and claiming it would be the overclaim this entry
-  exists to avoid. Two consequences bound the unit. (1) The deliverable is to
-  **record** the posture — `OPS.local.md`'s desired state, plus whatever
-  `RELEASING.md` step 5 owes — so a later reader can tell deliberate from
-  accidental. (2) `prevent_self_review: true` is ruled **out permanently**, not
-  deferred: it deadlocks the channel against a single maintainer, and that is a
-  property of the project's standing structure rather than of its current size.
-  Whether to flip `can_admins_bypass` was **the operator's and not this unit's
-  to decide** — it is a live repo-settings change on a supply-chain surface; the
-  scope ruling established only that its cost is a publish with no approval
-  record, never an unauthorized publish.
-  **Operator ruling 2026-08-01 at spec — `can_admins_bypass` STAYS `true`, and
-  the posture is accepted rather than postponed.** This settles the one question
-  scope left open, on premises now verified rather than filed (above). It is a
-  **decision, not a discovery**: no live repo-settings change is made this
-  iteration, and the flip is *not* deferred as a later unit either — there is no
-  open gap here to reopen, and a later reader finding `can_admins_bypass: true`
-  is looking at a chosen posture. Three things fix it. (1) **The accepted cost,
-  stated as the position:** a publish can land with no approval record. For a
-  solo operator that record is the control's entire output, so the accepted cost
-  is the control silently producing nothing on one path — not an unauthorized
-  publish, which the single-account structure makes unavailable either way.
-  (2) **Why accepting beats flipping:** the bypass path is reachable only by the
-  same account that holds the reviewer slot and pushes the tags, so `false` would
-  remove a path that account can already walk by approving, buying a record it
-  can already choose to produce, at the cost of a setting that can deadlock an
-  urgent publish with no second party to unblock it. (3) **What the unit still
-  owes is unchanged** — *record* the posture (`OPS.local.md` desired state, plus
-  whatever `RELEASING.md` step 5 owes) so deliberate reads as deliberate. Build
-  transcribes this ruling; it does not re-derive it.
-  Debt: records deliberate repo-settings desired state; adds no governed name.
-  Filed 2026-07-31 by close after the `v0.18.0` release, on a premise the
-  operator contradicted at the source; re-verified against the run and narrowed
-  to this residue at the next scope entry. Promoted 2026-08-01 by operator ruling
-  at that scope's unit-set escalation.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
@@ -2097,5 +2022,6 @@
 - preview-release-cadence
 - tightened-gates-declaration-note-parity
 - docs-root-link-grammar
+- npm-publish-approval-posture-unrecorded
 
 ## Lessons Learned
