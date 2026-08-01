@@ -1468,8 +1468,10 @@ resume journal, escalations to the message channel), the compact economics —
 the split-where-the-tail-dominates rule, the unified posture's handoff compact,
 and operator-suggested compacts at the acceptance
 boundaries that pay under the cold-wakes-times-compressible-residue rule —
-with the dispatch-granularity rule (batch units sharing a kit or SPEC
-surface, split on a model-tier change or a delegation-kit split trigger) and
+with the dispatch-granularity rule (the roster derived from every unit the
+iteration promoted rather than from the amendment set, then batch units
+sharing a kit or SPEC surface, split on a model-tier change or a
+delegation-kit split trigger) and
 the lead-owns-batching clause (an intra-stage batch split is N sibling stage
 sessions the lead dispatches and validates — each a same-stage re-entry,
 §The state machine — and a stage session never dispatches a sibling stage
@@ -1478,9 +1480,17 @@ the stamps-authoritative invariant carried from §The state machine as the
 design's load-bearing rule — with its two corollaries: the lead never
 hand-derives prior-stage completeness from WORKFLOW-STATE or the git log (it
 dispatches and trusts `enter-stage.sh`'s fail-closed refusal, or gates an
-expensive dispatch with `--simulate`, §bin/enter-stage.sh), and a ruling
+expensive dispatch with `--simulate`, and reads that same drain-entry verdict
+**before** declaring a stage's batches complete rather than after,
+§bin/enter-stage.sh), and a ruling
 whose acting session is not imminent is filed to a durable governed surface
-in the moment it is made. The template also carries the lead's first step —
+in the moment it is made. An earlier second assertion over the drain
+assertion's own population is **ruled out** on record: an amendment-keyed
+roster has dropped a promoted unit in practice and `check-stage-entry` named
+it at the refused entry, so the defect is detected late — at the price of one
+wasted dispatch — rather than undetected, and a duplicate reading of one fact
+would buy only the timing the simulate read already buys for free.
+The template also carries the lead's first step —
 writing the session-role marker context-kit's hook reads
 (context-kit/SPEC.md §The session-context hook). Dispatch safety is not re-owned — it inherits
 delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation

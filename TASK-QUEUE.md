@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **lead-batching-roster-derivation** [spec: SPEC-lead-batching-roster-derivation.md]
-  — an iteration lead that batches by **amendment** silently drops every
-  amendment-free unit scope promoted; a debt unit mints no governed name, so it
-  carries no `[spec:]` ref to key on. Instance: five units promoted, two debt
-  units dropped, "batch 2 of 2" dispatched, caught only by a build session
-  disagreeing with its lead.
-  **The filed "no oracle" premise is stale, and refuting it is most of the
-  unit.** `check-stage-entry`'s drain-entry assertion already requires the active
-  queue sections to be empty at drain-stage entry (`validate` here), and a
-  promoted debt entry is in its population. Run rather than reasoned about:
-  `enter-stage.sh --simulate validate` against this iteration's live queue refuses
-  and names both outstanding debt units. So the defect is detected **late**, not
-  undetected, and the second candidate fix — a new gate — is **refused**.
-  **Deliverable:** the batching roster derived from the promoted unit set rather
-  than the amendment set, plus its existing mechanical floor named where the rule
-  is stated, with `--simulate <drain-stage>` as the lead's cheap early read before
-  declaring a stage's batches complete. No new gate, no new mechanism. Deltas and
-  causal completeness: lifecycle-kit/SPEC-lead-batching-roster-derivation.md.
-  Surfaced 2026-07-31 at build; drained from the gap inbox by close; amendment
-  authored 2026-08-01 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -2076,5 +2055,6 @@
 - nested-dispatch-ungoverned
 - docs-renderer-batch-contract
 - gate-battery-spawn-hoists
+- lead-batching-roster-derivation
 
 ## Lessons Learned

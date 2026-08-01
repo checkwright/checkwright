@@ -194,6 +194,15 @@ consequences:
   context is actually common; split where the model tier changes or a
   delegation-kit split trigger fires — per-batch model tiering is the dominant
   window lever, not token counts.
+  The set being batched is **every unit the iteration promoted** — every
+  top-level entry in the configured active queue sections, debt units as much as
+  feature units — never the amendment set. A debt unit converges an
+  implementation on existing spec and mints no governed name, so it carries no
+  `[spec:]` ref; keying the roster on amendments makes exactly the
+  amendment-free half of the queue invisible, and it disappears silently because
+  the units that vanish are the ones that left no artifact to miss. Derive the
+  roster from the queue, which is the record of what was promoted, and re-read
+  it rather than carrying a count.
 - **Tier each batch to its work class.** The lead reads the **work-class**
   labels of the deltas in a batch — via the `[spec:]` amendments the batch's
   entries point at, where `/spec` emits one `{mechanical | design-bearing}` tag
@@ -265,7 +274,7 @@ Cache-keepalive pinging is ruled out: at batched escalation rates the idle
 re-warm pings cost more than the cold reads they avoid, burn the shared budget
 window, and invite idle-turn drift.
 
-## Mechanical floor — the escalation-shape guard
+## Mechanical floor
 
 Prompts request; guards enforce. The four-header escalation shape has an
 optional guard-kit mechanical floor — a SendMessage guard registered in the
@@ -276,3 +285,19 @@ kit mechanism; the ruling-class roster stays consumer config (above).
 *<escalation-guard: whether this consumer wires the optional guard-kit
 SendMessage guard for its stage sessions, or leaves it inert — the mechanical
 floor and where its opt-in lives.>*
+
+The floor under the batching-roster rule is `check-stage-entry`'s drain-entry
+assertion: the drain stage refuses to be entered while the active queue still
+carries entries, so a dropped unit surfaces as a **refused entry** at the next
+stage rather than never. That is a backstop, not the working signal — it costs
+a dispatch to learn from. Read it early and cheaply instead: the `--simulate`
+read §The lead model already names for gating an expensive dispatch, aimed at
+the drain stage, returns the same verdict with no session spent. Run it
+**before** declaring a stage's batches complete, not after — a simulate run
+that follows the declaration confirms the drop instead of preventing it, which
+is how an amendment-keyed roster has already lost a promoted unit in practice.
+
+The floor's honest limit belongs with it: it fires on the queue's *residue*, so
+it catches a dropped unit and says nothing about a unit batched onto the wrong
+surface or tiered wrongly. Those stay prompt-side — the ordinary
+prompts-request/guards-enforce split rather than a gap.
