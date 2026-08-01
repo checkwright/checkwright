@@ -12,42 +12,6 @@
 
 ## New Features
 
-- **agent-execution-backgrounding-role-scope** [spec: SPEC-backgrounding-role-scope.md]
-  — the agent-execution protocol states its rules for the **dispatching** role
-  and leaves the dispatched role unstated, and two rules have now failed that
-  way. The backgrounding rule ("always dispatch in the background and wait")
-  reads as licence to a stage session, which backgrounded its whole validate
-  suite, ended its turn, and lost the child with it. The resume-journal mechanics
-  reach a mutating agent only, so a read-only child's findings live solely as a
-  return value in a parent that may die holding them.
-  **Deliverable:** one role-scoping pass over **three** rules — the two above
-  plus **Serialize on shared files**, which align found stating the same
-  dispatching-role-only mechanic ("dispatch, await notification") that delta 1
-  rules out for a dispatched agent. No loss is attested against the third; it is
-  admitted on consistency, and it bites a consumer's dispatched agent whose
-  children commit rather than this repo, whose stage sessions are banned from
-  sibling dispatch and fan out read-only. **No existing bold
-  lead-in is renamed**, because `check-rule-citation` resolves the SPEC's
-  citations forward into it; edits to existing rules land in the bullet
-  **bodies**, and one delta adds a new bullet with a new lead-in (which the
-  forward-resolving gate accepts). Deltas,
-  causal completeness, and the ruled-out alternatives:
-  delegation-kit/SPEC-backgrounding-role-scope.md.
-  **The read-only-fan-out caveat is narrowed, not overturned** — its evidence is
-  about a *child's* sandbox blocking the child's write, while the new requirement
-  binds the *parent* that holds the only copy, so the duty moves to the receiving
-  end and the older ruling keeps its content. Overturning it would put the write
-  back where writes are attested to fail.
-  **Surface note for batching:** shares
-  `delegation-kit/templates/agent-execution.md` and `delegation-kit/SPEC.md` with
-  **`nested-dispatch-ungoverned`** (serialize the two) and touches
-  `.claude/agents/stage-session.md`, which
-  **`resume-journal-deletion-vs-pull-channel`** also edits — that debt unit lands
-  first and this amendment is written against whatever text it leaves.
-  Surfaced 2026-07-31 at validate; second half the same day at close, from its own
-  termination. Drained from the gap inbox by close; amendment authored 2026-08-01
-  at spec.
-
 - **nested-dispatch-ungoverned** [spec: SPEC-nested-dispatch-ungoverned.md] — the
   dispatch layer's budget and tier rules were filed as written for the **root**
   dispatch and silently exempting everything below it. Both premises were
@@ -2159,5 +2123,6 @@
 ## Done
 
 - resume-journal-deletion-vs-pull-channel
+- agent-execution-backgrounding-role-scope
 
 ## Lessons Learned

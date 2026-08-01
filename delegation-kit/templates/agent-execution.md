@@ -17,7 +17,17 @@ reach-through, not a change to this protocol; every rule below still applies.
   stops and reports rather than choosing.
 - **Background + notification, never poll.** Always `run_in_background`; wait for
   the completion notification; do not read the output file. Backgrounding keeps
-  the main loop free to redirect.
+  the main loop free to redirect. Backgrounding survives a **turn**, not a
+  **session**. A supervisor's turn ends and its session lives on, so a
+  backgrounded dispatch wakes it by notification — that is the sanctioned
+  pattern just stated. A **dispatched agent's** turn end *is* its session end:
+  it returns and terminates, taking every background child with it. So a
+  dispatched agent **never ends a turn on work still running** — it awaits its
+  own long-running work to completion, however long, and reports only results
+  it holds. Awaiting, not "dispatch in the foreground": foreground is a choice
+  for a shell command and not reliably one for an `Agent` dispatch, which the
+  harness may detach whether or not backgrounding was requested. What an agent
+  always controls is whether it ends its turn while work is outstanding.
 - **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
   Agents that edit a shared file (see the roster below) run one at a time —
   dispatch, await notification, validate, dispatch the next. Independent
@@ -29,6 +39,13 @@ reach-through, not a change to this protocol; every rule below still applies.
   `isolation: worktree` (own index); reserve the unlocked
   ≤`DELEGATION_KIT_FAN_WIDTH`-wide bound for **read-only** fan-outs. "No lockfile
   churn" is a false safety signal — the index is shared regardless.
+  Serialization is by **completion**, not by notification: the next dispatch
+  begins after the previous one has *returned and been validated*. A supervisor
+  reaches that point via the completion notification; a **dispatched agent**
+  reaches it in-turn, awaiting each child before dispatching the next (it cannot
+  end its turn to wait — see the backgrounding rule). The ordering requirement
+  is identical for both; only the waiting mechanism differs, and neither role
+  may overlap two agents on a shared file or the git index.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —
@@ -72,7 +89,23 @@ reach-through, not a change to this protocol; every rule below still applies.
   (audit, survey), the return value *is* the contract — don't rely on a journal.
   Reserve the journal / worktree isolation for agents that **mutate files**, and
   for those grant the journal path explicitly before dispatch rather than
-  assuming the write succeeds.
+  assuming the write succeeds. A contract has two ends, though: the child owes
+  no journal, and the **parent** owes the durable landing of what it received
+  before acting on it (next bullet). The caveat is about a backgrounded child's
+  write failing silently, so it never licensed the parent — which has already
+  demonstrated it can write, being the session that granted the path.
+
+- **Findings you will act on are durable before you act on them.** A child's
+  return value lives only in your context, and your context dies with your
+  session. Before you *act* on a dispatched agent's findings — edit against
+  them, rule from them, plan the next wave on them — land them somewhere that
+  survives you: a commit, or your own journal. The write is the parent's,
+  discharged on receipt, not a chore delegated back to the child. This binds
+  whoever holds findings they will act on, at any depth. It costs one write per
+  returned child, not a running narration. A session that is itself dispatched
+  writes to the journal path it was granted; a top-level session has no journal
+  in this contract and discharges by committing, which it is by construction
+  able to do.
 - **Validate after every agent commit** — a sub-agent's "passed" claim is not
   trustworthy. Re-run the relevant gates (the sweep's own gate) and the consumer
   validate battery below. **Diff every gate change in an agent commit before

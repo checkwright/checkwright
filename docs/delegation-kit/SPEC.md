@@ -46,6 +46,40 @@ disjointness — so the cap is a correctness bound, never a preference a consume
 may configure up for committing agents (the knob's derivation: §Layout and
 configuration).
 
+The template's **Background + notification, never poll** rule reads as
+universal but is not, and the sentence that scopes it is a fact rather than a
+role list: backgrounding survives a turn, and a dispatched agent's turn end is
+its session end. Attested failure surface — a stage session read the rule,
+backgrounded its whole validate suite, ended its turn to report progress, and
+its child died with it: an entry stamp, no results, the suite re-run from
+scratch. Nothing reddened, because missing evidence is indistinguishable from
+pending evidence. Two phrasings were drafted and rejected on the way to the
+current one, and both failures are instructive: a role-neutral "never end your
+turn with detached work" forbids the supervisor pattern the same rule
+prescribes, and "await it in the **foreground**" names a lever the agent may
+not have — dispatches made *without* requesting backgrounding have been
+observed detached anyway, so a rule stated on foreground is unfollowable
+exactly where it is needed. That a subagent's return terminates its background
+children is **attested here and inferred from the harness docs, not stated by
+them**; the rule is anchored on the invariant instead — an agent's contract
+with its caller is its return value, so work whose result is not in the return
+did not happen as far as the caller is concerned. A harness that changed the
+reaping behaviour would cost the rule a sentence, not its content.
+
+The template's **Findings you will act on are durable before you act on them**
+rule rests on a near-loss rather than a loss: a close stage dispatched two
+audit sweeps and then hit the session wall. Both had already returned, which
+was luck; had the wall landed mid-sweep the audit work would have been gone
+with no record it ran. The gap is that the journal mechanics are written for a
+dispatched *mutating* agent, so a read-only child journals nothing and its
+findings exist only as a return value in the parent's context. The fix
+deliberately does **not** overturn the read-only-fan-out caveat in §Resume
+journal — that caveat was re-examined against this evidence and kept, with its
+duty relocated to the receiving end, because overturning it would put the write
+back exactly where the observed failures are. Recorded here because the rule
+and the caveat otherwise read as each other's contradiction and the next
+reader re-litigates them.
+
 `templates/agent-budget-guard.sh` closes the gap the template's
 **Budget-check before *each* dispatch in a fan-out** rule leaves when it relies
 on the agent *choosing* to run the tool: a memory-quoted percentage acts in its
@@ -201,7 +235,14 @@ back to returning findings in the final message — which defeats the journal
 exactly when it matters (a long, interruptible run). So: for a read-only
 fan-out the return value *is* the contract — no journal; for mutating
 agents, grant the journal path explicitly before dispatch rather than
-assuming the write succeeds.
+assuming the write succeeds. That contract has two ends. The caveat's
+evidence is about **the child's** write failing silently, and its true
+content is *do not make recoverability depend on a backgrounded child's
+write* — which is why it is kept rather than overturned by the template's
+**Findings you will act on are durable before you act on them** rule. That
+rule's duty falls on **the parent**, which has already demonstrated it can
+write, being the session that granted the path. The two are disjoint
+readings of one contract, not each other's contradiction.
 
 ## Validate after every agent commit
 
