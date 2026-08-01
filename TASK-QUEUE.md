@@ -17,15 +17,17 @@
 - **npm-publish-approval-posture-unrecorded** — the `npm-publish` environment's
   two weakening settings are written down nowhere, so the actual strength of the
   control `RELEASING.md` step 5 names is knowable only by querying the repo.
-  **The settings below are NOT re-verified — establish them before designing
-  against them.** They were filed 2026-07-31 and deliberately left unchecked at
-  the 2026-08-01 scope survey rather than stretch the boundary sweep's `gh`
-  budget: one required reviewer, who is also the account that pushes release
-  tags; `prevent_self_review: false`; `can_admins_bypass: true`; no deployment
-  branch policy. The first session to act on this entry runs the environment read
-  and corrects this paragraph before anything else — this iteration has already
-  falsified two inherited premises at their central claim, and this one is merely
-  unestablished, which reads the same until somebody looks.
+  **Settings VERIFIED 2026-08-01 at spec — every filed premise holds, and the
+  design below now stands on established fact.** The entry demanded the first
+  session to act on it run the environment read before anything else; it ran
+  (`gh api repos/:owner/:repo/environments/npm-publish`) and returns: exactly one
+  `required_reviewers` protection rule, carrying `prevent_self_review: false` and
+  a single reviewer — the maintainer account, which is also the account that
+  pushes release tags — beside `can_admins_bypass: true` and a null
+  `deployment_branch_policy`. The environment's `updated_at` still equals its
+  `created_at`, so nothing has been touched since it was made. This iteration
+  falsified two inherited premises at their central claim; this one survived the
+  same test, and the record now says so rather than leaving it unestablished.
   **This entry is the narrowed residue of a filed claim that is false, and the
   correction is the point.** Close filed the `v0.18.0` publish as having run "in
   12s with no approval requested" — the approval environment failing to gate an
