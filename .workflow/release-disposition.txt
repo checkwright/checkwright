@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-release-step-verification release v0.20.0 — minor: Tightened gates and Renamed knobs are both a stated None, Behavior changes is non-empty (site-health.yml gains the release-body probe arm and the contents: read scope it needs); operator-authorized for this release only.
