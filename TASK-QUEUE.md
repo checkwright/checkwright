@@ -665,53 +665,53 @@
 
 - **lead-dispatch-requires-completion-notification** [design-pending] — the lead has
   no stated precondition for dispatching stage N+1, and the one it improvised is
-  wrong: artifact state. A lead checked that validate's commit had landed with
-  complete evidence, the tree was clean, the battery green, and a simulated close
-  entry cleared — then dispatched close into a still-running `run-validate`. Every
-  check passed while the producer was mid-write, because `run-validate` commits
-  its evidence and keeps going: **the terminal commit existing is fully compatible
-  with the process still executing.** The lead dispatched on the *absence* of a
-  completion notification rather than its arrival.
+  wrong: artifact state. A lead checked validate's commit had landed with complete
+  evidence, the tree clean, the battery green, and a simulated close entry
+  cleared — then dispatched close into a still-running `run-validate`. Every check
+  passed mid-write because `run-validate` commits its evidence and keeps going:
+  **the terminal commit existing is fully compatible with the process still
+  executing.** The lead dispatched on the *absence* of a completion notification.
   **The generalizable trap, worth the entry on its own.** The lead read an
   operator's note about having just answered a stalled permission prompt as the
-  stage being finished. It means the opposite: an approval prompt gates a command
-  **starting**. Any signal about a prompt being answered is a start signal, never
-  a completion one.
-  **Deliverable:** a dispatch precondition in
-  `lifecycle-kit/templates/lead.md` — stage N+1 is dispatched on stage N's agent
-  **completion notification**, never on the presence of its commit or any
-  tree-state check, because artifact state cannot distinguish "finished" from
-  "still writing." It belongs beside the existing post-delegation verify
-  discipline, which specifies what to check *after* a stage and is silent on how
-  the lead knows the stage is over.
-  **Assertability — checked, not assumed.** The precondition is **prose-only**.
-  The notification is harness session state with no tracked artifact, so no
-  battery gate can read it; the precedent is the sibling-dispatch clause, prose in
-  the same template for the same reason. But the *negative* is assertable, and
-  that is the pairing that matters: "did the lead get a notification?" is
-  unreadable, while "is the producer still running?" is exactly what the lock
-  sentinel under `validate-producer-liveness-unobservable` reads. The two are one
-  unit — prose rule on the dispatch side, oracle on the artifact side.
+  stage being finished. It means the opposite — an approval prompt gates a command
+  **starting**, so any prompt-answered signal is a start signal, never a
+  completion one.
+  **Deliverable:** a dispatch precondition in `lifecycle-kit/templates/lead.md` —
+  stage N+1 is dispatched on stage N's agent **completion notification**, never on
+  its commit or any tree-state check, because artifact state cannot distinguish
+  "finished" from "still writing." It belongs beside the post-delegation verify
+  discipline, which says what to check *after* a stage and is silent on how the
+  lead knows the stage is over.
+  **Not already covered by the adjacent paragraph — re-verified 2026-08-01 at
+  scope.** `templates/lead.md`:62-67 (never hand-derive prior-stage completeness;
+  trust `enter-stage.sh`'s refusal or `--simulate`) is a **gating** rule, predates
+  the incident, and is silent on **liveness** — the simulated entry cleared
+  mid-write, which is the proof.
+  **Assertability — checked, not assumed.** The precondition is **prose-only**:
+  the notification is harness session state with no tracked artifact, so no
+  battery gate can read it (precedent: the sibling-dispatch clause, prose in the
+  same template for the same reason). But the *negative* is assertable, which is
+  the pairing that matters — "is the producer still running?" is exactly what the
+  lock sentinel under `validate-producer-liveness-unobservable` reads. The two are
+  one unit: prose rule on the dispatch side, oracle on the artifact side.
   **Disposition of the incident as a set.** This rule is the proximate cause and
-  the cheapest fix, so it goes first — but it is not sufficient alone, and the
-  queue carries the reason: `validate-verb-collision-and-check-routing` establishes
-  that a prose fix with no oracle recurs and is caught only by an operator.
-  Shipping this without the sentinel repeats that pattern knowingly. Three real
-  findings, not four: the dispatch decision (this entry), the observability gap
-  (the sentinel), and the artifact churn (`evidence-row-upsert-order`), which is
-  worth fixing on its own merits rather than as a symptom. A fourth reading — that
-  `check-evidence-manifest` is grammar-only — is retracted; see the assertion-A
-  note under `validate-producer-liveness-unobservable`.
-  **Why `[design-pending]`:** it adds a precondition to a shipped template's dispatch
-  contract and states a limit (prose-only, human-enforced) that
-  lifecycle-kit/SPEC.md should own explicitly rather than leave implied.
+  cheapest fix, so it goes first — but not alone:
+  `validate-verb-collision-and-check-routing` establishes that a prose fix with no
+  oracle recurs and is caught only by an operator. Three real findings, not four —
+  the dispatch decision (this entry), the observability gap (the sentinel), and
+  the artifact churn (`evidence-row-upsert-order`), worth fixing on its own
+  merits. A fourth reading, that `check-evidence-manifest` is grammar-only, is
+  retracted; see the assertion-A note under the sentinel entry.
+  **Why `[design-pending]`:** it adds a precondition to a shipped template's
+  dispatch contract and states a limit (prose-only, human-enforced) that
+  lifecycle-kit/SPEC.md should own explicitly rather than imply.
   **Cost while deferred:** every multi-stage iteration with a live lead can
   re-run this race, and the cost lands on the next stage session, which fights a
   file changing underneath it. Debt: one template rule plus one SPEC limit; adds
   no governed name.
-  Filed 2026-07-25 by close, from the lead's own account of the dispatch
-  decision; the operator ruled stage sequencing the lead's accountability, which
-  is why this is a lead rule rather than a stage-session or gate concern.
+  Filed 2026-07-25 by close, from the lead's own account; the operator ruled stage
+  sequencing the lead's accountability, which is why this is a lead rule rather
+  than a stage-session or gate concern.
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a leg per platform.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
@@ -2018,29 +2018,41 @@
 
 - **batch-split-stamp-ownership** [design-pending] — who stamps the per-session
   audit trail when a live lead splits one stage across several batch sessions is
-  unowned, and the two surfaces disagree in effect.
-  `lifecycle-kit/templates/stages/build.md`'s "Every session still stamps"
-  paragraph predates the lead/batch split and tells every build session to
-  append a fresh stamp; a live lead splitting build into batches tells batches
-  2..n not to re-stamp. This iteration recorded **one** `build` line in
+  unowned. This iteration recorded **one** `build` line in
   `.workflow/WORKFLOW-STATE.txt` for five batch sessions.
+  **Premise corrected 2026-08-01 by the undirected scope survey — the filed
+  diagnosis was wrong and the next reader would otherwise re-derive it.** The
+  entry said "the two surfaces disagree in effect", with
+  `lifecycle-kit/templates/stages/build.md`'s "Every session still stamps"
+  paragraph against a lead that "tells batches 2..n not to re-stamp". **The
+  surfaces agree.** build.md:45 does say every build session re-runs
+  `enter-stage.sh build`; `lifecycle-kit/templates/lead.md`:226-230 says batches
+  are "N sibling stage sessions … each entering through `enter-stage.sh` as a
+  same-stage re-entry … each leaving its own stamp and the cursor staying put" —
+  the same instruction, not its opposite, and present since 2026-07-17, two weeks
+  before the divergence. So the gap is **practice against instruction**, not
+  instruction against instruction: the batches simply did not run the entry.
+  Nor is the id the obstacle — dispatched stage sessions do resolve distinct
+  session ids (this survey's own stamp differs from its lead's), so
+  `bin/session-id.sh` was never the blocker.
   **Not a defect today.** Nothing gates on the missing lines, and the stage
   cursor is the *last* stamp, so it is correct either way — this is doctrine
   drift, not breakage.
-  **The ruling the entry wants** is twofold and neither half is close's to make:
-  which surface owns the rule under a batch split (`templates/lead.md` is as
-  implicated as `stages/build.md`), and whether a per-session trail is worth
-  restoring at all — the evidence file's stated contract is one line per
-  stage-skill invocation, which a batch session *is*, so restoring it means
-  either stamping per batch or narrowing the contract to per stage.
-  **Why `[design-pending]`:** it changes a shipped template's stamp contract and
-  possibly `check-stage-evidence`'s reading of it, and it recurs on every batched
+  **The ruling the entry wants,** restated against the corrected diagnosis: is a
+  per-session trail worth restoring at all — the evidence file's stated contract
+  is one line per stage-skill invocation, which a batch session *is*, so the fork
+  is stamping per batch or narrowing the contract to per stage. If per batch, the
+  second half is what makes an instruction both templates already carry actually
+  bind, since prose alone demonstrably did not.
+  **Why `[design-pending]`:** it either narrows a shipped stamp contract and
+  `check-stage-evidence`'s reading of it, or adds an oracle where two templates
+  now rely on a dispatched session's compliance; and it recurs on every batched
   stage, not just build.
   **Cost while deferred:** the trail silently under-reports session count on
   every batched stage, so the evidence file cannot answer "how many sessions did
   this stage take" — an economics question the drift KPIs would otherwise want.
-  Debt: one paragraph moved or narrowed across two templates; adds no governed
-  name.
+  Debt: one contract narrowed, or one oracle added; adds no governed name unless
+  the oracle lands.
   Filed 2026-08-01 at close from the gap inbox, filed by this iteration's build.
 
 - **gate-spawn-hoist-residual** [design-pending] — `gate-battery-spawn-hoists`
