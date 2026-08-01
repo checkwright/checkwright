@@ -8,6 +8,13 @@ SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 cat >> scripts/gates.list <<'EOF'
 # site-kit
 check-docs-cname-parity
+# spec: gate-sdk/SPEC.md §Consumer smoke — gate-sdk gates registered by the kit whose
+# install writes their subject: the site-health workflow copied in below is the only
+# Actions-shaped surface any install writes, so these three lint installed content
+# rather than passing vacuously.
+check-action-pinning
+check-action-run-shell
+check-action-gh-repo
 EOF
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — the gated source of truth for the

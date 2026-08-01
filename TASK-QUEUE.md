@@ -14,46 +14,6 @@
 
 ## Technical Debt
 
-- **smoke-battery-workflow-gate-coverage** — the consumer smoke installs
-  workflow templates but no smoke gate lints their Actions shape, so a template
-  regression reaches a consumer unopposed. The scratch battery is the union of
-  what each kit's `smoke/install.sh` appends to `gates.list`, and
-  `check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo` and
-  `check-enforcement-fresh` are in **no** kit's smoke `gates.list`. Re-verified
-  at the 2026-08-01 scope survey and again at the align audit over the union of
-  every `smoke/install.sh` (**29** gate names — gate-sdk's install writes the
-  scratch `gates.list` with nine, the other kits append twenty, and no name
-  repeats; the survey's "34" counted `check-` tokens including comments and
-  `spec:` tags): the four above are absent, and so is `check-core-files` —
-  a fifth, unnamed at filing. `site-kit/smoke/install.sh` genuinely does copy
-  `templates/site-health.yml` verbatim into the scratch tree, so the install
-  half is real, but of the registered smoke gates only `check-tree-terms` and
-  `check-docs-cname-parity` read the installed file at all, and both only scan
-  it for terms and host aliases. Nothing lints its run bodies, its action pins,
-  or its job shape. The SPEC sentence that inferred coverage from the install
-  was narrowed to what the smoke actually exercises in the same close that filed
-  this (site-kit/SPEC.md §templates/site-health.yml), so the tree no longer
-  claims the coverage — this entry is the coverage itself, still absent.
-  **Scope ruling 2026-08-01 — the predicate, which is what unblocked promotion.**
-  The entry asked which gates earn a scratch-battery slot, warning that
-  registering four gates wholesale may be the wrong move because a smoke that
-  grows toward the full roster stops being a smoke. The ruling takes the entry's
-  own candidate: **a gate earns a scratch-battery slot when it reads a surface
-  the install writes.** That predicate is decidable per gate rather than
-  negotiable, and it holds the smoke to its stated purpose — proving a vendored
-  kit installs and runs — instead of re-running the host battery inside it.
-  Applying it is the build stage's, and it is expected to *split* the five:
-  the three action gates read `templates/site-health.yml`, which
-  `site-kit/smoke/install.sh` writes; `check-enforcement-fresh` and
-  `check-core-files` read projections and a manifest no install writes, so on
-  this predicate they earn no slot and their absence stops being a defect.
-  Build verifies that split against the installs rather than inheriting it.
-  **Debt, not feature:** smoke wiring that registers existing gate names into
-  existing `gates.list` heredocs; the predicate above is a selection rule stated
-  in this ruling, not a new governed name.
-  Filed 2026-08-01 at close from the gap inbox, filed at spec while surveying
-  the readers of site-health.yml.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
@@ -2092,5 +2052,6 @@
 - core-files-kit-coverage-derived
 - security-advisory-lane
 - action-run-shell-yaml-anchor-fail-open
+- smoke-battery-workflow-gate-coverage
 
 ## Lessons Learned

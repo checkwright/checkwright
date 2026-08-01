@@ -506,18 +506,21 @@ Deliberately uncapped and unknobbed: a "newest N only" bound would stop probing
 exactly the old releases where this class of defect has actually been found.
 
 The kit's `smoke/install.sh` installs the template verbatim into the scratch tree
-as governed surface. **What that buys is narrower than the install suggests, and
-is stated here rather than inferred from it.** The scratch battery is the union of
-what each kit's `smoke/install.sh` registers, and of those gates only
-`check-tree-terms` and `check-docs-cname-parity` read the installed workflow at
-all — one for tree terms, the other for configured host aliases in `://` form.
-None of the gates that lint a workflow's *Actions shape* — its `run:` bodies, its
-action pins, its `gh` repository context — is registered in any kit's smoke
-`gates.list`, so none of them runs over the installed file. The smoke therefore
-catches a template that leaks a term or a host alias, and nothing else about it; a
-regression in the workflow's bash or its pinning surfaces at a consumer, not here.
-Closing that is a change to smoke wiring rather than to this template, and is
-carried as deferred work in the consumer's queue.
+as governed surface, and registers the gates that read it. The scratch battery is
+the union of what each kit's `smoke/install.sh` registers; this kit contributes
+`check-docs-cname-parity` and — because it writes the only Actions-shaped surface
+any install writes — the gates that lint a workflow's Actions shape:
+`check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo`.
+`check-tree-terms` reads the installed file too, for tree terms. So a template
+regression in the workflow's bash, its action pins, or its `gh` repository
+context reds the smoke rather than surfacing at a consumer.
+
+**A gate earns a scratch-battery slot when it reads a surface the install
+writes** — the rule that keeps the smoke proving a vendored kit installs and
+runs, instead of drifting toward a second copy of the host battery. Those
+qualify because this install writes the workflow they lint; a gate whose
+subject no install writes would either pass vacuously or fail-closed on an
+absent projection, and neither outcome is coverage.
 
 ## Out of scope
 
