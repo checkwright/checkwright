@@ -289,21 +289,32 @@ line) landed then, and this assertion mechanizes the channel. The good/bad
 fixture pair exercises the span-corruption symptom (a bad page whose severed span
 leaks a stray backtick and a raw placeholder tag, a good page whose faithful code
 spans render clean) alongside the fence/heading case. Because that bad page would
-red on its fence run alone, the span assertion also carries its own hermetic unit
-test isolating it — a page with no fence, no surplus heading and no table, whose
-only defect is the severed span, reds span-only and clears in the
-doubled-backtick form — so a widening that reds nothing new cannot pass. The
-table assertion likewise carries its own unit test (a collapsed table reds
-table-only, a trailing blank clears). The batch contract carries a unit test of
-its own for the same reason — the good/bad pair sets no renderer knob, so it
-already runs the batch path and cannot by itself distinguish that path from the
-fallback. That test asserts the kit's two renderer defaults render a corpus
-byte-identically, that a pinned `SITE_KIT_RENDERER` suppresses the batch default,
-that the batch path and the per-document fallback return the same verdict on the
-same pages, and that a wrong document count and an unresolvable batch command
-each exit 2. The count case uses a stub that always emits two documents, so it
-passes the two-document probe and is caught only by the corpus count — a stub the
-probe already rejected would never reach the assertion under test.
+red on its fence run alone, every assertion the pair cannot isolate carries a
+hermetic unit test of its own, named here rather than described:
+`check-docs-render-fidelity-span.test.sh`,
+`check-docs-render-fidelity-table.test.sh`,
+`check-docs-render-fidelity-foreign.test.sh` and
+`check-docs-render-fidelity-batch.test.sh`.
+
+The span test runs a page with no fence, no surplus heading and no table, whose
+only defect is the severed span: it reds span-only and clears in the
+doubled-backtick form, so a widening that reds nothing new cannot pass. The table
+test is that same shape — a collapsed table reds table-only, a trailing blank
+clears. The foreign test holds the SVG/MathML exemption to its *scope*: a page
+carrying inline `<svg>` clears, because the exemption follows the subtree by
+open/close depth rather than a name list, while a bare `<path>` outside any
+`<svg>` still reds — and that second half is what keeps the first from passing
+under a blanket widening, which would clear the good page at the cost of the
+placeholder tokens the assertion exists for. The batch test exists because the
+good/bad pair sets no renderer knob, so it already runs the batch path and cannot
+by itself distinguish that path from the fallback; it asserts that the kit's two
+renderer defaults render a corpus byte-identically, that a pinned
+`SITE_KIT_RENDERER` suppresses the batch default, that the batch path and the
+per-document fallback return the same verdict on the same pages, and that a wrong
+document count and an unresolvable batch command each exit 2. The count case uses
+a stub that always emits two documents, so it passes the two-document probe and is
+caught only by the corpus count — a stub the probe already rejected would never
+reach the assertion under test.
 The positional form `check-docs-render-fidelity.sh [docs-dir] [config-file]`
 lets a fixture point the docs dir and renderer knobs at a synthetic tree without
 touching consumer config. `precommit` tier, coupling the docs tree.
