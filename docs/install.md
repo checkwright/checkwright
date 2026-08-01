@@ -327,7 +327,69 @@ Two honest limits:
 
 The repository carries one semver line, applied as git tags, with the kits
 moving in lockstep: a kit earns its own version only if it is ever split out
-for independent adoption. The first tag rides the launch announcement.
+for independent adoption.
+
+### The release channel
+
+Release channel: **preview**
+
+The two admissible values are `preview` and `stable`. That line is prose a reader
+sees and a token a gate reads — read off a line of its own rather than a bracketed
+tag, the same one-line-declaration shape queue-kit's `roadmap-summary:` uses and
+for the same reason.
+
+The channel is a statement about **audience and support expectations**, not a
+second artifact stream. While it reads `preview` the version line is 0.x, and
+breaking changes ride minors under the pre-1.0 qualifier below. The tag rhythm
+under `preview` is an artifact of internal iteration rather than a stability
+signal: the tags are preview-channel iteration artifacts, and a launch
+announcement is a separate, later event. The channel flips to `stable` at
+`v1.0.0`, the same deliberate cut this section calls the first stability promise —
+now with a surface that says so before a reader infers it from tag density.
+
+**Mechanized on exactly one surface.** `.github/workflows/publish.yml`'s `release`
+job creates the GitHub Release, and while the channel is `preview` that creation
+carries `--prerelease`, so every Release page states the posture without a human
+remembering to. Nothing else in the publish path changes. In particular the npm
+publish carries no `--tag`, and its absence is **load-bearing configuration**
+rather than an omission: a non-default dist-tag would make §Quick start's
+one-command install resolve to nothing until a reader learned to append the
+channel, trading an honest signal for a time-to-first-value regression on the
+front door. That trade was put to the operator in those terms and declined. It
+becomes the right call only once §Quick start stops promising a bare one-command
+install, or once a stable line exists to hold `latest` while preview moves off it.
+Neither holds today. Nothing forecloses the change either:
+`scripts/pack-installer.sh`'s version regex already admits a prerelease suffix.
+
+`check-release-channel-parity` (this repo's `scripts/`) holds the declaration
+against two surfaces, so it cannot become a comment:
+
+- **Invariant A — channel ⟷ publish posture.** The channel and the prerelease
+  posture of the Release-creating step in `.github/workflows/publish.yml` agree:
+  `preview` demands `--prerelease` on that invocation, `stable` demands its
+  absence.
+- **Invariant B — channel ⟷ version line.** The channel agrees with the version
+  line, read from the newest tag by creator date: while that version is `0.x` the
+  channel must be `preview`; from `v1.0.0` onward it must be `stable`.
+
+B is not optional polish. The channel is *derived* from the version line, so
+without B a `v1.0.0` could ship with `preview` declared and `--prerelease` still
+set — A passes because both of its surfaces agree, and both are wrong. B also
+protects a second consumer: lifecycle-kit's knob-rename compat precedent reads
+this declaration as its general-availability threshold, so a stale `preview` would
+hold that compat window open past GA.
+
+The gate fails closed rather than passing whenever it cannot find a surface it
+needs. Exit 2, never a clean line, on each of:
+
+- a declaration line that is missing or duplicated;
+- a channel value it does not recognize;
+- a `publish.yml` with no recognizable Release-creating step;
+- a newest tag that does not parse as semver.
+
+A repository with **no tags at all** has no version line, so B is dormant there
+while A still asserts. The gate *reports* that dormancy in its clean output, so a
+reader can tell "checked and agreeing" from "nothing to check".
 
 What earns each bump derives from the release note itself — its three fixed
 sections (§The upgrade contract below) already declare everything phase B must

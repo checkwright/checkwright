@@ -299,6 +299,10 @@ if staged_matches 'docs/posts/*.md' 'docs/install.md' '.workflow/release-disposi
     run_gate check-release-bump scripts/check-release-bump.sh
 fi
 
+if staged_matches 'docs/install.md' '.github/workflows/publish.yml'; then
+    run_gate check-release-channel-parity scripts/check-release-channel-parity.sh
+fi
+
 if staged_matches 'docs/posts/*.md' 'docs/install.md'; then
     run_gate check-tightened-gates-grammar scripts/check-tightened-gates-grammar.sh
 fi

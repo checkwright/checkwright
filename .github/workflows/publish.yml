@@ -140,8 +140,9 @@ jobs:
           # Create the Release if the tag has none yet, so the assets are on it from
           # the moment it exists; the operator fills in the body afterwards
           # (RELEASING.md §The procedure step 6).
+          # spec: docs/install.md §Versioning — the declared release channel is `preview`, so the Release states that posture; check-release-channel-parity holds the two in agreement
           if ! gh release view "$TAG" >/dev/null 2>&1; then
-            gh release create "$TAG" --title "$TAG" --notes ""
+            gh release create "$TAG" --title "$TAG" --prerelease --notes ""
           fi
           gh release upload "$TAG" "dist/$name" "dist/$name.sha256" --clobber
           echo "attached $name and $name.sha256 to $TAG"

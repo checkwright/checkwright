@@ -1,0 +1,8 @@
+jobs:
+  release:
+    steps:
+      - name: attach the tarball and its checksum to the Release
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --prerelease --notes ""
+          fi

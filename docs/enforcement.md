@@ -96,6 +96,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-install-claim | precommit |
 | (consumer) | check-installer-no-deps | precommit |
 | (consumer) | check-release-bump | precommit |
+| (consumer) | check-release-channel-parity | precommit |
 | (consumer) | check-tightened-gates-grammar | precommit |
 | (consumer) | check-npm-publish-spec | precommit |
 | [canon-kit](canon-kit/index.md) | check-manifest-temporal | precommit |

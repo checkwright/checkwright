@@ -71,6 +71,7 @@ check-install-toolchain
 check-install-claim
 check-installer-no-deps
 check-release-bump
+check-release-channel-parity
 check-tightened-gates-grammar
 check-npm-publish-spec
 check-manifest-temporal

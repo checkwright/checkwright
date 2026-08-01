@@ -1,0 +1,3 @@
+# install-md publish-yml version-line — the version is passed explicitly so the
+# fixture is stable against this repository's own tag line moving.
+install.md publish.yml 0.21.0
