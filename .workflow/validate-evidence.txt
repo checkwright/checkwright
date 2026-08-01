@@ -1,1 +1,23 @@
 # contract: evidence-manifest v1
+supply-chain-posture-round-two installer_smoke sha256=fade70537db89b69b151a2641656729697b031c634c0df912a794c6dac1c3a53 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two gates sha256=fb14c8a80e2ad83907951d514e62350ec0e35a8b711ac377cfe990ed719c0a0a pass=92 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two gate_sdk sha256=8f3d6caed1ce724d61d9c64786f34d291d7e0464a6fa609286720f871264cb89 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two canon_kit sha256=fd29d62e4ed611a98b72a32b6afbef610cccd90a74d81ec0208231287fc9a1a4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two evidence_kit sha256=1065526da8cb11a7fd6176adfde255374b9bcb95a8240a6591ea47fa43367c6d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two guard_kit sha256=776855f49f35b5c60d574faa8e88d370bfca381233856dae1d3be50edb34502f pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two lifecycle_kit sha256=5f9077e6d8df174b6193fe6ba78a8ab96cf810bbf46392f4a0185b40726803d1 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two queue_kit sha256=4bc7b2cd8ebe7bf15d999e527ad7ebfac3c93623a453252ca1db41d7ab333710 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two demo sha256=70eaaebca112ad079725489e95796927ceb3159240b1467931032c19b985f268 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two consumer_smoke sha256=8a3131c3e7e579a9ac2b8f0c341742f4069008289a43fc8374dfd7c7d497876a pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two upgrade sha256=c3f09a8774ae400c873580d0fddbd4c934c0b8e659db2c57fde4ccd2e73dd172 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
+supply-chain-posture-round-two index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-01
