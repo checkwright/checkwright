@@ -206,7 +206,9 @@ subset re-promotes at a later scope under its own iteration.
 **Reopen after close** is barred as an in-place edit. Stamps are append-only
 within an iteration and scope is the only reset, so there is no gate-legal way
 to continue a closed iteration's evidence file — and no history rewrite is
-sanctioned to fake one (doctrine-kit rule 16 territory). The sanctioned shape
+sanctioned to fake one (doctrine-kit's *Re-verify volatile state before a git
+history rewrite* territory — cited by name, since a rule number re-arms the
+drift every later insertion causes). The sanctioned shape
 is a successor iteration: a post-close defect files as a debt entry and the
 follow-up iteration proceeds normally; the closed iteration's record stays
 immutable.

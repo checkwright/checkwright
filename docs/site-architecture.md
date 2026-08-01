@@ -24,8 +24,14 @@ value (the release notes under the Releases page). `check-docs-nav-reachable`
 holds every docs page to a `title:` front-matter block and reachability from the
 rendered nav (a nav slot, a relative-link walk seeded from the nav set, or the
 generated-sibling suffix rule), with `scripts/docs-offnav.list` the allowlist for
-pages off-nav by design. `check-docs-render-fidelity` holds the rendered Liquid
-against the front-matter facts it projects. The kit registry lives on
+pages off-nav by design. That same gate models the front-matter facts and the
+derived-children rule; no separate gate covers them.
+`check-docs-render-fidelity` asks a different question. It renders every tracked
+docs page through the Pages parser and holds the output against markdown
+corruption: a code span leaking a stray backtick or a raw tag into text, a
+code-fenced heading promoted to a real one, or fewer rendered tables than the
+source has GitHub-Flavored Markdown table starts. A missing renderer fails it
+closed (site-kit/SPEC.md §check-docs-render-fidelity). The kit registry lives on
 `docs/kits.md` (the Kit Reference page); `check-docs-kit-parity` holds every kit's
 row there and the nav child block (`nav_parent: kits` + `nav_child_order`) on
 every `docs/<kit>/index.md`.

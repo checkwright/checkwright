@@ -493,6 +493,7 @@ guard-kit/
   guard-tests/cases.tsv     # expected-decision <TAB> command
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message
   gate-tests/scratch-run.test.sh    # bespoke unit test, run by gate-sdk's runner
+  gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/wakeup-guard.sh

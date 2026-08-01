@@ -115,9 +115,10 @@ disposition rule reaching this lane unchanged.
 
 The entry's third question — whether scope-gated intake gains an exception so a
 critical advisory preempts the running iteration. **Ruled: no.** Neither
-`CLAUDE.md` §Delivery doctrine nor `doctrine-kit/DOCTRINE.md` item 11 is edited
-by this unit, and the reasons are recorded here so the question is not
-re-litigated as an oversight:
+`CLAUDE.md` §Delivery doctrine nor `doctrine-kit/DOCTRINE.md`'s *Scope-gated
+intake* (item 11 today; cited by name because the number shifts under later
+insertions) is edited by this unit, and the reasons are recorded here so the
+question is not re-litigated as an oversight:
 
 1. **The exception would buy latency nothing promises.** Per the diagnosis, the
    boundary cadence already meets the advertised windows with margin. An
@@ -134,8 +135,8 @@ re-litigated as an oversight:
    `SECURITY.md` carries no severity language at all; its only distinction is
    confirmed versus unconfirmed. Minting `critical` here would create a token
    whose only reader is a bypass — and "this is urgent" as a general bypass is
-   precisely the over-action failure doctrine item 11 exists to catch. That item
-   states it "licenses no self-exemption"; this unit takes it at its word.
+   precisely the over-action failure *Scope-gated intake* exists to catch. That
+   rule states it "licenses no self-exemption"; this unit takes it at its word.
 5. **`doctrine-kit` is vendored.** A security carve-out in `DOCTRINE.md` ships
    one project's security posture as every consumer's delivery doctrine — the
    provenance seam, refused on that ground alone even if 1–4 had gone the other
@@ -212,8 +213,8 @@ true rather than gated.
   the only security carve-out this project makes (the diagnosis). Listed here
   because a reader will expect the security policy to move and must see that the
   absence is ruled rather than overlooked.
-- **`CLAUDE.md` §Delivery doctrine and `doctrine-kit/DOCTRINE.md` item 11** —
-  **not edited**, per Delta 3. Listed for the same reason: the queue entry names
+- **`CLAUDE.md` §Delivery doctrine and `doctrine-kit/DOCTRINE.md` §*Scope-gated
+  intake*** — **not edited**, per Delta 3. Listed for the same reason: the queue entry names
   the carve-out, so silence about these two surfaces would read as an omission.
 - **No kit SPEC changes, no gate, no knob, no queue-tag change.**
 
