@@ -37,16 +37,29 @@ fi
 # spec: canon-kit/SPEC.md §check-md-refs — the self-repo blob-link prefix, derived from origin through the shared gate.sh adapter (git@ and https forms normalize to one identity); CANON_KIT_DOCS_BLOB_REF is the ref policy, empty ⇒ no origin, the self-repo pass is skipped
 self_repo_prefix="$(gate_self_repo_prefix "$CANON_KIT_DOCS_BLOB_REF")"
 
-slugify() {
-    local s="${1,,}"
-    printf '%s' "$s" | sed -E 's/[^a-z0-9 _-]//g; s/ +/-/g'
-}
+# spec: canon-kit/SPEC.md §check-md-refs — the tracked-file membership set, filled once from a single git ls-files pass rather than a per-link `git ls-files --error-unmatch` exec; check-ignore and the directory listing stay per-call (the fallback path, not the hot one)
+declare -A TRACKED=()
+while IFS= read -r -d '' _tf; do TRACKED["$_tf"]=1; done < <(git ls-files -z)
+
+# spec: canon-kit/SPEC.md §check-md-refs — anchor_ok memoizes a target file's slug set on first use: one heading-extraction sed and one bulk slugify sed per file, however many anchors across however many links cite it, instead of re-forking sed per heading per link
+declare -A ANCHOR_SLUGS=()
+declare -A ANCHOR_SLUGS_DONE=()
 
 anchor_ok() {  # $1=target file, $2=anchor slug
-    local h
-    while IFS= read -r h; do
-        [[ "$(slugify "$h")" == "$2" ]] && return 0
-    done < <(sed -nE 's/^#{1,6}[[:space:]]+(.*[^[:space:]])[[:space:]]*$/\1/p' "$1")
+    local file="$1" headings s
+    if [[ -z "${ANCHOR_SLUGS_DONE[$file]:-}" ]]; then
+        ANCHOR_SLUGS_DONE["$file"]=1
+        headings="$(sed -nE 's/^#{1,6}[[:space:]]+(.*[^[:space:]])[[:space:]]*$/\1/p' "$file")"
+        if [[ -n "$headings" ]]; then
+            headings="${headings,,}"
+            ANCHOR_SLUGS["$file"]="$(sed -E 's/[^a-z0-9 _-]//g; s/ +/-/g' <<< "$headings")"
+        else
+            ANCHOR_SLUGS["$file"]=""
+        fi
+    fi
+    while IFS= read -r s; do
+        [[ "$s" == "$2" ]] && return 0
+    done <<< "${ANCHOR_SLUGS[$file]}"
     return 1
 }
 
@@ -54,7 +67,7 @@ target_resolves() {  # $1=repo-relative path
     local p="$1"
     [[ "$p" == ..* ]] && return 1
     if [[ -f "$p" ]]; then
-        git ls-files --error-unmatch -- "$p" >/dev/null 2>&1 && return 0
+        [[ -n "${TRACKED[$p]:-}" ]] && return 0
         git check-ignore -q -- "$p" && return 0
         return 1
     fi
