@@ -22,16 +22,25 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    nothing while reading as a fix.
 3. **Review the wakeup log** if the wakeup-guard is wired: read
    `.workflow/wakeup-attempts.log`, act on any surfaced intent, then delete it.
-4. **Prune the local overlay.** Run
-   `bash guard-kit/bin/compare-settings-allow.sh` and remove every listed
-   `settings.local.json` entry (a committed glob already grants it). Then, by
-   judgment, prune the remaining one-off exact-string local entries and promote
-   recurring safe patterns to the committed `settings.json` as globs.
+4. **Prune and narrow the local overlay.** Run
+   `bash guard-kit/bin/compare-settings-allow.sh` — it reports two sets, and
+   each has its own disposition.
+   - **Redundant**: remove every listed `settings.local.json` entry (a committed
+     glob already grants it).
+   - **Too broad**: for every entry the breadth report names, either narrow the
+     glob or record that its breadth is intended. The probe printed beside it is
+     the witness — the command that glob auto-allows. An empty breadth report is
+     not a proof of narrowness: probes are witnesses, and no completeness is
+     claimed (the section is absent entirely when no probes are declared).
+
+   Then, by judgment, prune the remaining one-off exact-string local entries and
+   promote recurring safe patterns to the committed `settings.json` as globs.
 5. **Clear the friction log** — its named reclaim path:
    `: > .workflow/prompt-friction.log`. Run each clear as its own bare command:
    the allowlist entry is an exact string, so compounding it (`&&`, `;`, a
    trailing `echo`/`wc`) breaks the match and forces the very prompt this step
    just triaged away.
 
-Goal: the local set stays small, and every durable pattern lives in the
-committed, reviewable allowlist.
+Goal: the local set stays small, every durable pattern lives in the
+committed, reviewable allowlist, and no local glob auto-allows a command you
+declared bad.

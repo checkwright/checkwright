@@ -52,15 +52,16 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 Configuration follows the established kit pattern — override any knob in
 `guard-config.sh` (log paths, settings paths, `GUARD_KIT_RO_SCRIPTS`,
-`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`); defaults are this repo's
-layout.
+`GUARD_KIT_RO_BINS`, `GUARD_KIT_SCRATCH_DIRS`, `GUARD_KIT_BREADTH_PROBES`);
+defaults are this repo's layout, and the probe set defaults to empty because
+its contents are your project's vocabulary, not the kit's.
 
 ## Use
 
 ```bash
 bash guard-kit/bin/scan-prompts.sh                  # rank what prompted, filtered by the allowlist
 bash guard-kit/bin/scan-prompts.sh --count          # <patterns>/<occurrences> token (drift KPI)
-bash guard-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants
+bash guard-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants, and those a probe proves too broad
 ```
 
 ## Test

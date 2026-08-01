@@ -48,8 +48,8 @@ host repository's residue.
 | drift-kit | — | 69l · ~1123t |
 | evidence-kit | — | — |
 | gate-sdk | — | — |
-| guard-kit | — | 37l · ~596t |
+| guard-kit | — | 46l · ~731t |
 | lifecycle-kit | 5l · ~76t | 927l · ~14730t |
 | queue-kit | — | 43l · ~379t |
 | site-kit | — | — |
-| **total** | 22l · ~423t | 1422l · ~22448t |
+| **total** | 22l · ~423t | 1431l · ~22583t |

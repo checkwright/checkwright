@@ -101,56 +101,6 @@
   envelope without being inside it. Lead ruling, scope-gated intake.
   Promoted 2026-08-01 by spec, deliverable narrowed to the derivation above.
 
-- **local-overlay-git-blanket-grant** [spec: guard-kit/SPEC-local-overlay-git-blanket-grant.md]
-  — the local permission overlay carries `Bash(git *)`, a single glob granting
-  **every** git subcommand without a prompt. The destructive ones ride it: `git
-  reset --hard`, `git clean -fd`, `git push --force`, `git rm -r`. `bash-guard`'s
-  project rules cover only two narrow cases (`git commit --no-verify`, `git clean
-  -x/-X`), so everything else in that set is auto-allowed by the blanket rather
-  than by a judgment about it.
-  **Why it survived this long.** `compare-settings-allow.sh` reports it
-  non-redundant and therefore never flags it — correctly, since the committed set
-  holds no glob that covers it. The tool answers "is this entry redundant?", and
-  the question this entry needs is "is this entry *too broad?*", which nothing
-  asks. That is the gap, not the entry itself.
-  **Deliverable:** replace the blanket with the write-side verbs the workflow
-  actually uses, leaving destructive git to prompt. The read-only verbs no longer
-  need it — they were promoted to the committed allowlist this close, which is
-  what makes the narrowing affordable.
-  **The open call settled at spec (2026-08-01), and it moves the deliverable off
-  a gate.** The entry's cost line anticipated "one gate class". The amendment
-  ships **none**, on two independent grounds. guard-kit registers no gates by
-  stated category (guard-kit/README.md) and has no `checks/` dir, so minting one
-  would ripple through `gates.list`, the generated hook, `check-kit-registration`,
-  `check-docs-kit-parity`, `check-readme-roster` and three projections. And on
-  the merits a breadth finding is operator-intent-dependent, over a gitignored
-  per-machine file CI cannot see — the high-FP shape gate-sdk/SPEC.md §When a
-  gate earns its place holds back for an attested miss, which has not occurred.
-  The criterion instead becomes `compare-settings-allow`'s second report, reusing
-  `guard_allow_match` with its arguments swapped, read at the close-stage triage
-  step that already consumes that tool.
-  *Where the destructive set lives:* a new `GUARD_KIT_BREADTH_PROBES` knob,
-  default empty, declared in the consumer's `guard-config.sh` — never a kit
-  literal. They are **probes, not a roster**: each is a witness that a glob is
-  too broad, and no completeness is claimed, which is what keeps a missing entry
-  from ever becoming a false green.
-  *The instance:* the narrowed verbs land in the **committed** allowlist, not
-  re-granted locally, so the narrowing is reviewable rather than another
-  invisible local fact. `git push` is ruled to keep prompting — CLAUDE.md budgets
-  one to two pushes per iteration and wants each deliberate, so the prompt is
-  nearly free.
-  **Cost while deferred:** an unprompted destructive git command is a
-  low-probability, high-cost event, and the overlay is local-only so the exposure
-  is one machine rather than every consumer. Debt: narrows a local grant and adds
-  one advisory report plus one knob; adds no gate and no `gates.list` member.
-  **Why close did not just narrow it here:** the triage step's mandate is
-  promote-and-prune, and re-shaping a grant model mid-release — with a tag and a
-  push still to run in this same session — is bad sequencing regardless of
-  authority. The promotion and the dead-entry prune landed; this is the costed
-  remainder.
-  Filed 2026-07-25 by close, from the tooling-friction triage.
-  Promoted 2026-08-01 by spec, the gate ruled out as above.
-
 ## Technical Debt
 
 - **action-run-shell-yaml-anchor-fail-open** — the gate whose whole job is
@@ -2251,5 +2201,6 @@
 ## Done
 
 - always-loaded-regen-block-residency
+- local-overlay-git-blanket-grant
 
 ## Lessons Learned

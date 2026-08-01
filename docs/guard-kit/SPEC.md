@@ -37,7 +37,8 @@ conventions without depending on its registry.
    local-overlay upper bound), grouped by command
    pattern. Each recurring pattern is resolved by the **triage criterion**
    (below); `bin/compare-settings-allow.sh` lists the local-overlay entries
-   a committed glob already grants (the deterministic prune set). Then the
+   a committed glob already grants (the prune set) and those a declared probe
+   proves too broad (the narrowing set). Then the
    log is cleared — its named reclaim path.
 3. **Steady state** — friction low and justified: the committed
    `settings.json` carries every durable pattern (reviewable, shared), the
@@ -422,7 +423,39 @@ so one glob test covers both forms — the match core is `guard_allow_match`
 in `lib/guard.sh`, shared with rule 14. Read-only — reports candidates, never
 mutates (the operator prunes). It is the detector, not the policy: a
 non-redundant local entry can still be one-off junk worth pruning by
-judgment. `--count` emits the bare count.
+judgment.
+
+The tool asks a **second question over the same two files**: which local entries
+are *too broad*. Redundancy asks whether a committed glob already grants a local
+entry; breadth asks whether a local glob would auto-allow a command the consumer
+called bad. Both are one call to `guard_allow_match` — the breadth question
+simply swaps its arguments, `guard_allow_match <probe> <local-glob>`, so there is
+no second matching implementation and the `:*` normalization is shared. The two
+findings are reported as distinct sets, and breadth is advisory in the same sense
+as redundancy: the report names the local glob and the one probe that witnesses
+its breadth, and the operator disposes — narrow the glob, or record that the
+breadth is intended.
+
+The probe set is consumer config (`GUARD_KIT_BREADTH_PROBES`, §Layout and
+configuration), and it is **probes rather than a roster**: each entry is a single
+witness whose auto-allowance would be bad, not a member of a set claimed
+complete. A missing probe costs one witness and can never produce a false green,
+because no completeness is claimed — and nothing here may come to claim it, since
+a report worded as coverage would be the false-confidence proxy gate-sdk/SPEC.md
+§When a gate earns its place refuses. With no probes declared the breadth section
+is omitted entirely rather than printed clean, so a consumer that declared no
+vocabulary cannot read silence as coverage.
+
+This is the criterion's home rather than a gate, and the placement is ruled
+rather than defaulted: the subject is a gitignored per-machine file CI cannot
+see, and the verdict is operator-intent-dependent (a blanket grant is fine in a
+throwaway sandbox), which is the high-false-positive shape §When a gate earns its
+place holds back for an attested miss. What replaces the gate is a scheduled
+reader — §The close-stage triage step — the same mechanism the redundancy
+criterion has relied on since it shipped.
+
+`--count` emits both bare counts on one line, redundancy first and breadth
+second.
 
 ## wakeup-guard (template)
 
@@ -468,11 +501,15 @@ log — the advisory is transient, so nothing accrues for the close-stage triage
 its close-stage skill — it fills the tooling-friction placeholder in
 lifecycle-kit's close template. The step: run `scan-prompts`, resolve each
 recurring pattern by the triage criterion; review and delete the wakeup
-log if present; run `compare-settings-allow` and prune the listed local
-entries, then by judgment prune the remaining one-off exact-string local
+log if present; run `compare-settings-allow` and take its **two**
+dispositions — prune the listed redundant local entries, and for each entry the
+breadth report names, either narrow the glob or record that its breadth is
+intended — then by judgment prune the remaining one-off exact-string local
 entries and promote recurring safe patterns to the committed settings as
-globs; clear the friction log. Goal: the local set stays small and every
-durable pattern lives in the committed, reviewable allowlist.
+globs; clear the friction log. Goal: the local set stays small, every
+durable pattern lives in the committed, reviewable allowlist, and no local glob
+auto-allows a command the consumer declared bad. One step, two reports, one
+reader — no new invocation point and no new schedule.
 
 The friction log is a capture-tier surface with no forcing function — nothing
 refuses a close that skips it — so it declares itself advisory on the
@@ -494,6 +531,7 @@ guard-kit/
   guard-tests/escalation-cases.tsv  # expected-decision <TAB> to <TAB> message
   gate-tests/scratch-run.test.sh    # bespoke unit test, run by gate-sdk's runner
   gate-tests/scan-prompts.test.sh   # bespoke unit test, run by gate-sdk's runner
+  gate-tests/compare-settings-allow.test.sh  # bespoke unit test, run by gate-sdk's runner
   templates/bash-guard.sh   # consumer copy: generic rules on, marked
                             #   consumer-rules section
   templates/wakeup-guard.sh
@@ -526,6 +564,14 @@ repo's layout as defaults):
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/wakeup-attempts.log`.
 - `GUARD_KIT_SETTINGS` — default `.claude/settings.json`.
 - `GUARD_KIT_SETTINGS_LOCAL` — default `.claude/settings.local.json`.
+- `GUARD_KIT_BREADTH_PROBES` — array of permission-rule strings, each a witness
+  that a local glob is too broad (§compare-settings-allow); default empty, in
+  which case the breadth report is absent and the tool behaves exactly as it did
+  before the criterion shipped. Entries are full permission-rule strings rather
+  than bare commands, matching the settings vocabulary the tool already reads on
+  both sides, so a consumer can probe non-`Bash` rules with the same mechanism.
+  The kit ships **no** default probes: every string naming a command is the
+  consumer's vocabulary, never the kit's (CLAUDE.md §The provenance seam).
 - `GUARD_KIT_RO_SCRIPTS` — array of globs eligible for the
   absolute→relative rewrite (rule 4); default `("check-*.sh")`.
 - `GUARD_KIT_RO_BINS` — read-only pipeline roster (rule 13); default the
@@ -561,6 +607,14 @@ the installed guard, asserting a block — the install is self-verifying.
 There is no `smoke/violation.sh`: the kit registers no gates, so no
 battery-reddening violation is craftable (gate-sdk/SPEC.md §Consumer smoke
 makes that file conditional on exactly this).
+
+`compare-settings-allow`'s breadth criterion takes the same bespoke lane for the
+same reason, at `gate-tests/compare-settings-allow.test.sh`: a firing probe
+(a blanket local glob reported with its witness), a non-firing one (a narrow
+entry reporting clean), and the empty-knob silence that proves the section is
+omitted rather than printed clean. It drives the tool through
+`GUARD_KIT_CONFIG_FILE` pointed at a sandbox config, so the consumer's own probe
+array cannot leak into the fixture.
 
 A shipped `bin/` tool that is not a hook takes neither lane. `bin/scratch-run.sh`
 (§scratch-run) is tested by a bespoke unit test at
