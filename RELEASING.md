@@ -39,6 +39,10 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
    - **Opener (fixed, verbatim)** — the reserved framing, then a per-release
      summary slot: *"Checkwright is the verification layer under agent
      orchestration, and this release {one- or two-sentence summary}."*
+   - **In brief (fixed, no `None` form)** — placed immediately after the
+     Opener, ahead of the three variable sections below. Grammar owned by
+     [docs/install.md](docs/install.md) §The upgrade contract; cite it, never
+     restate it.
    - **The three variable sections** — Tightened gates, Renamed knobs, and
      Behavior changes, authored to [docs/install.md](docs/install.md) §The
      upgrade contract's grammar (a knob *removal* is expressed `old → ∅` under
@@ -50,11 +54,11 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
      the intent behind the move; an empty surface means a stated "None." Because
      the surface accumulates across every iteration since the last tag, a release
      batching several iterations inherits all of their declarations here.
-     **Honest limit, and it is yours at exactly this moment:** nothing asserts
-     the composed section's set equals the surface it was composed from. You
-     transcribe one into the other and drain by hand at step 4, and review is
-     what holds the agreement. It is mechanizable and filed as such; until it
-     lands, read the surface and the section against each other before moving on.
+     **Held by a gate, not by review:** `check-tightened-gates-note-parity`
+     asserts the composed section's token set equals the surface it was
+     composed from while the note is under composition (its declared version
+     carries no tag yet), so the transcription this step performs is checked
+     at commit time rather than trusted to a manual read-across.
    - **Upgrading — sync/regen slot** — {the wholesale kit sync at `vX.Y.Z`, the
      generated artifacts to regenerate, then the full battery}.
    - **Upgrading — allowed-red slot (two-way)** — state either "**No allowed
@@ -70,7 +74,9 @@ lifecycle-kit/SPEC.md §bin/enter-stage.sh): `<iteration> release <version|none>
 
 2. **Derive the bump off the note.** Choose the bump by
    [docs/install.md](docs/install.md) §Versioning's criteria (the derivable floor
-   is gated by `check-release-bump`), read off the note's three sections. An
+   is gated by `check-release-bump`), read off the note's three variable
+   sections — `## In brief` feeds no bump criterion, so do not look for one
+   there. An
    iteration meeting no bump criterion earns **none**: stamp `<iteration> release
    none — <basis>` into the disposition evidence and stop — no tag, no GitHub
    Release. A patch stays available on operator judgment for an urgent fix.
