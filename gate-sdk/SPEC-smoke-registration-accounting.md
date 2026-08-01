@@ -29,13 +29,18 @@ With that line, queue-kit/SPEC.md §templates/'s claim that the template "ships
 battery-clean when copied verbatim" becomes true as written; no prose changes.
 
 **The reproduction trap, carried from the entry because it will otherwise cost a
-build session.** The red reproduces only from a **scratch cwd**. From the repo
-root, `queue-kit/lib/queue.sh` auto-sources this repo's
-`scripts/queue-config.sh`, so the gate reads consumer config and returns a false
-clean. A build session that checks from the repo root will conclude the defect
-is already fixed. Relatedly, `run-consumer-smoke.sh queue-kit` reports clean
-today — not a contradiction but this entry's whole point, since the smoke never
-registers the gate that reds.
+build session.** The red reproduces only when the template path is passed
+**explicitly**. `check-queue-entry-budget.sh` defaults its subject to
+`${1:-$QUEUE_KIT_QUEUE_FILE}`, and this repo's `scripts/queue-config.sh` sets
+neither `QUEUE_KIT_QUEUE_FILE` nor `GATE_SDK_QUEUE_FILE`, so on a bare
+invocation `queue-kit/lib/queue.sh`'s own default resolves the subject to the
+literal `TASK-QUEUE.md` — this repo's own, already-compliant queue file, not
+the template. A build session that runs the gate with no positional argument
+will conclude the defect is already fixed; passing
+`queue-kit/templates/TASK-QUEUE.md` explicitly reproduces the red regardless of
+cwd. Relatedly, `run-consumer-smoke.sh queue-kit` reports clean today — not a
+contradiction but this entry's whole point, since the smoke never registers
+the gate that reds.
 
 ### 2. The registration accounting {design-bearing}
 
