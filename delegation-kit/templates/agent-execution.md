@@ -20,14 +20,24 @@ reach-through, not a change to this protocol; every rule below still applies.
   the main loop free to redirect. Backgrounding survives a **turn**, not a
   **session**. A supervisor's turn ends and its session lives on, so a
   backgrounded dispatch wakes it by notification — that is the sanctioned
-  pattern just stated. A **dispatched agent's** turn end *is* its session end:
-  it returns and terminates, taking every background child with it. So a
+  pattern just stated. A **dispatched agent's** turn end *is* its session end,
+  and what that reliably kills is the **observer, not the work**: an `Agent`
+  child is reaped with its parent, but a shell `run_in_background` child
+  survives — orphaned, still writing, with nothing left able to read it. The
+  survivor is the worse case, because it keeps mutating shared files while the
+  next actor moves against them. Either way the caller gets no result, so a
   dispatched agent **never ends a turn on work still running** — it awaits its
   own long-running work to completion, however long, and reports only results
   it holds. Awaiting, not "dispatch in the foreground": foreground is a choice
   for a shell command and not reliably one for an `Agent` dispatch, which the
-  harness may detach whether or not backgrounding was requested. What an agent
-  always controls is whether it ends its turn while work is outstanding.
+  harness may detach whether or not backgrounding was requested. And not by
+  ending the turn to wait for the completion notification — that is the one act
+  that revokes the channel, which is how a *careful* reader reaches this
+  failure. Wait **in-turn on a condition** instead: loop on the work's own
+  artifact (evidence file, lock, exit marker) with the harness's waiting
+  primitive. Never-poll governs waiting on an `Agent`'s completion notification,
+  a channel a supervisor has; condition-waiting is the only one a dispatched
+  role has.
 - **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
   Agents that edit a shared file (see the roster below) run one at a time —
   dispatch, await notification, validate, dispatch the next. Independent

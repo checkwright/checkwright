@@ -60,11 +60,31 @@ prescribes, and "await it in the **foreground**" names a lever the agent may
 not have — dispatches made *without* requesting backgrounding have been
 observed detached anyway, so a rule stated on foreground is unfollowable
 exactly where it is needed. That a subagent's return terminates its background
-children is **attested here and inferred from the harness docs, not stated by
-them**; the rule is anchored on the invariant instead — an agent's contract
+children was **attested here and inferred from the harness docs, not stated by
+them**, and a counter-observation has since narrowed it: a validate session
+backgrounded a *shell* producer, ended its turn, and the process kept running
+and kept writing its output file for minutes. Reaping holds for an `Agent`
+child and not for a shell one, so the rule's mechanism is the unconditional
+loss of the **observer**, not the conditional loss of the work — and the
+surviving-producer case is the worse of the two, since it is
+`validate-producer-liveness-unobservable`'s hazard (an unread producer mutating
+shared files while the next actor moves) arriving through the backgrounding
+door. The rule is anchored on the invariant either way — an agent's contract
 with its caller is its return value, so work whose result is not in the return
-did not happen as far as the caller is concerned. A harness that changed the
-reaping behaviour would cost the rule a sentence, not its content.
+did not happen as far as the caller is concerned — which is why the
+counter-observation cost the rule a sentence and not its content, exactly as
+this paragraph predicted a reaping change would.
+
+**Why that correction needed an affordance, not just a better reason.** The
+session that produced the counter-observation reasoned *correctly* into the
+failure: it read the producer-liveness hazard, concluded it must not let the
+next actor proceed until the producer finished, and ended its turn to wait for
+the completion notification — the one act that destroys that channel for a
+dispatched role. A rule whose correct application requires a channel the reader
+does not have is defeated by careful readers and not only careless ones, so the
+template names the channel a dispatched role *does* have: an in-turn wait on the
+work's own artifact. This is the case where the backgrounding rule and the
+liveness hazard meet and neither, alone, covered it.
 
 The template's **Findings you will act on are durable before you act on them**
 rule rests on a near-loss rather than a loss: a close stage dispatched two
