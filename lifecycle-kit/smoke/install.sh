@@ -11,6 +11,7 @@ check-stage-evidence
 check-stage-entry
 check-close-surfaces
 check-merge-attrs
+check-lifecycle-registration
 EOF
 
 if [[ ! -f TASK-QUEUE.md ]]; then
@@ -39,6 +40,9 @@ cat > .workflow/WORKFLOW-STATE.txt <<EOF
 
 — scope smoke001 $(date +%F)
 EOF
+
+# spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
+bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null
 
 bash "$SDK/bin/gen-pre-commit.sh" --write >/dev/null
 bash "$SDK/checks/check-graph.sh" --emit > .workflow/CHECK-GRAPH.html
