@@ -1490,8 +1490,8 @@ expensive dispatch with `--simulate`, and reads that same drain-entry verdict
 §bin/enter-stage.sh), and a ruling
 whose acting session is not imminent is filed to a durable governed surface
 in the moment it is made. An earlier second assertion over the drain
-assertion's own population is **ruled out** on record: an amendment-keyed
-roster has dropped a promoted unit in practice and `check-stage-entry` named
+assertion's own population is **ruled out** on record: a batching roster has
+dropped a promoted unit in practice and `check-stage-entry` named
 it at the refused entry, so the defect is detected late — at the price of one
 wasted dispatch — rather than undetected, and a duplicate reading of one fact
 would buy only the timing the simulate read already buys for free.

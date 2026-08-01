@@ -294,8 +294,11 @@ a dispatch to learn from. Read it early and cheaply instead: the `--simulate`
 read §The lead model already names for gating an expensive dispatch, aimed at
 the drain stage, returns the same verdict with no session spent. Run it
 **before** declaring a stage's batches complete, not after — a simulate run
-that follows the declaration confirms the drop instead of preventing it, which
-is how an amendment-keyed roster has already lost a promoted unit in practice.
+that follows the declaration confirms the drop instead of preventing it, and a
+roster has already lost a promoted unit in practice. Keying the roster on the
+wrong set is only one way to lose a unit: a plain miscount against the queue
+loses one just as quietly, and neither failure reddens on its own. That is why
+the rule is to re-read the queue rather than to key it differently.
 
 The floor's honest limit belongs with it: it fires on the queue's *residue*, so
 it catches a dropped unit and says nothing about a unit batched onto the wrong
