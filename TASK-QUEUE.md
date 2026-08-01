@@ -86,6 +86,39 @@
   Surfaced 2026-08-01 by the align audit's cross-spec fan-out; drained into the
   queue at close; promoted 2026-08-01 by spec.
 
+- **kit-template-registry-completeness** [spec: gate-sdk/SPEC-template-registry-parity.md]
+  — **drift-kit's bundled-KPI claim outruns its shipped registry.**
+  drift-kit/SPEC.md lists `kpi-queue-net-delta` among the bundled Lead KPIs and
+  the plugin exists at `drift-kit/kpis/kpi-queue-net-delta.sh`, but
+  `drift-kit/templates/kpis.list` — the kit's own install-time registry — omits
+  it; only this repo's consumer copy `scripts/kpis.list` carries it. Because
+  `drift-kit/smoke/install.sh` copies the template, the smoke never registers or
+  exercises that KPI, which weakens the kit's "asserts one row per registered
+  KPI" testing claim.
+  **Ruled at spec 2026-08-01 — the full bundled set.** A starter subset is
+  refused because nothing distinguishes it from an omission: it is exactly what a
+  dropped line looks like, which is how this instance survived. The consumer's
+  *copy* stays the consumer's to prune, as the template header already says.
+  **The seam carve-out is structural, per scope's contract-level ruling.** The
+  population derives from layout, never a roster (§check-template-copy-parity's
+  own principle, one axis over): a template enters it when
+  `<kit>/templates/<name>.list` has a sibling **directory** `<kit>/<name>/`
+  holding the artifacts it registers. `price-table.tsv` and `msg-patterns.list`
+  are out of population *structurally* — their rows are consumer rule content the
+  kit stubs, so there is no sibling directory of kit-shipped artifacts to pair
+  with. Deliberately not a per-file exception list, which would re-arm on the
+  next such template with a kit literal publishing a private vocabulary as the
+  cost of forgetting.
+  **Boundary held:** this rules what a kit's shipped registry must *contain*, and
+  nothing about where a kit's install entry point *lives* —
+  `kit-owned-install-recipe` is untouched and un-prejudged.
+  New gate `check-template-registry-parity` (gate-sdk), two assertions, both
+  directions, no new knob. One template line is the whole mechanical fix.
+  **Cost while deferred:** low and non-rotting, but a shipped KPI is untested by
+  the kit's own smoke, so the testing claim reads stronger than it is.
+  Surfaced 2026-08-01 by the align audit's kit SPEC-vs-code sweep; filed at
+  close from the gap inbox; promoted 2026-08-01 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2161,46 +2194,6 @@
   impression and is paid by every new adopter until fixed.
   Surfaced 2026-08-01 by the align audit's verbatim-copy run; filed at close
   from the gap inbox.
-
-- **kit-template-registry-completeness** [design-pending] — **drift-kit's
-  bundled-KPI claim outruns its shipped registry.** drift-kit/SPEC.md:139-153
-  lists `kpi-queue-net-delta` among the bundled Lead KPIs and the plugin exists
-  at `drift-kit/kpis/kpi-queue-net-delta.sh`, but `drift-kit/templates/kpis.list`
-  — the kit's own install-time registry — omits it; only this repo's consumer
-  copy `scripts/kpis.list` carries it. Because `drift-kit/smoke/install.sh`
-  copies the template, the smoke never registers or exercises that KPI, which
-  weakens the kit's "asserts one row per registered KPI" testing claim at
-  drift-kit/SPEC.md:803.
-  **Why `[design-pending]` rather than a one-line template add:** the fix turns
-  on whether `templates/kpis.list` is meant to be the **full bundled set** or a
-  deliberate starter subset, and the SPEC does not say.
-  **The survey this entry called "the work" is DONE, and its wide-class premise
-  is falsified — 2026-08-01, undirected scope.** Across all ten `*/templates/`
-  dirs only **three** files are registry-shaped, and this `kpis.list` is the
-  **only** genuine subset omission: `gate-sdk/templates/msg-patterns.list`
-  matches its consumer copy, and `drift-kit/templates/price-table.tsv` ships
-  placeholder rows *by design* under the provenance seam (a kit literal naming
-  real model prices would publish a consumer's roster). So what remains is one
-  template line plus the ruling — not a survey. Re-verify before trusting this:
-  it is a dated finding.
-  **Seam constraint the ruling must carry, ruled at scope 2026-08-01.** A flat
-  "a kit's `templates/` registry must be the full bundled set" is **unsafe** as
-  stated: applied to `price-table.tsv` it would force a kit literal enumerating
-  real model ids and prices, which is exactly the provenance seam
-  (CLAUDE.md §The provenance seam). The rule must be predicated on
-  *registries of things the kit itself ships* (its own KPI plugins, its own gate
-  names) and must exempt a template whose rows are consumer rule content the kit
-  deliberately stubs. Land that carve-out in the contract, not as a per-file
-  exception list.
-  Shares its design question with `queue-kit-starter-template-red` (part 2):
-  both ask whether a kit's install-time registry may be a subset of what the kit
-  ships. Distinct instance and distinct surface from
-  `readme-roster-enum-coverage`, which holds *prose* enumerations, not registry
-  files.
-  **Cost while deferred:** low and non-rotting, but a shipped KPI is untested by
-  the kit's own smoke, so the testing claim reads stronger than it is.
-  Surfaced 2026-08-01 by the align audit's kit SPEC-vs-code sweep; filed at
-  close from the gap inbox.
 
 - **advisory-lane-draft-state-unswept** [design-pending] — the Advisories lane
   probes `state=triage`, which is correctly the **undispositioned** set:
