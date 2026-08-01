@@ -2100,6 +2100,39 @@
   exemption is configurable.
   Filed 2026-08-01 by close, generalizing the gap it fixed inline.
 
+- **guard-command-prefix-wrapper** [design-pending] — a transparent prefix
+  displaces the token the guard matches on, so an already-allowlisted read-only
+  command prompts anyway. Two shapes, one mechanism, measured at this close's
+  prompt-friction triage as **35 of 108 prompting calls (~32%) — the largest
+  class by a wide margin**: `time bash <allowlisted-script>` and
+  `/usr/bin/time -f '<fmt>' bash <allowlisted-script>` (31), where the leading
+  token is `time` rather than `bash`; and `git -c core.pager=cat <subcommand>`
+  (4+), where the read-only-subcommand recognition reads `-c` instead of
+  `status`/`log`/`tag`.
+  **Why a guard rule and not an allowlist entry** — the triage criterion's own
+  test. `Bash(time *)` would grant *anything* under `time`, which is the guard
+  defeated rather than configured; the decision needs logic no static glob can
+  express (strip the wrapper, then re-test the *wrapped* command against the
+  committed allowlist with the matcher the guard already has).
+  **Deliverable:** a generic-ruleset rule in `guard-kit/lib/guard.sh` that
+  strips a recognized transparent prefix and re-tests via `guard_allow_match`,
+  plus a `guard-tests/cases.tsv` pair and its SPEC rule entry. `scan-prompts.sh`
+  already has half of it — its `strip_prefix()` handles `sudo `/`timeout ` for
+  ranking purposes only, so the live hook and the scanner disagree about what is
+  covered, which is its own small defect.
+  **Why `[design-pending]`:** the wrapper roster is the design question. `time`
+  and `git -c` are safe because they are transparent, but `env VAR=v <cmd>`,
+  `nice`, `nohup`, and `xargs` are not uniformly so (`env` can replace `PATH`),
+  so the rule needs a stated closed roster and a reason for its boundary rather
+  than a "strip anything that looks like a wrapper" heuristic.
+  **Cost while deferred:** roughly a third of all permission prompts in an
+  iteration, all of them on commands the operator already blessed — the pure
+  interruption cost this loop exists to retire, and it grows with profiling work
+  (this iteration was a performance iteration, which is why `time` dominated).
+  Debt: one guard rule plus a fixture pair and one roster; adds no governed name
+  to a shipped surface.
+  Filed 2026-08-01 by close's prompt-friction triage.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
