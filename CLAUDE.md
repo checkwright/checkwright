@@ -38,8 +38,13 @@ committing.
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
 
-A master push is verified against the remote oracle: watch the `gates`
-workflow to green (`gh run watch`) before calling the push done.
+A master push is verified against the remote oracle: watch the `gates` workflow
+to green (`gh run watch`) before calling the push done — and **budget one to two
+pushes per iteration**. Commits accumulate locally and ride a single watched push
+at close; a release tag earns the second run (`publish`). Every push also costs a
+`pages-build-deployment`, so a nine-push day buys one push's information nine
+times over at nine times the wall-clock. Never hand-dispatch `site-health` — it
+runs on a schedule.
 
 Beyond the gate battery, the repo runs its own iteration lifecycle — one
 iteration per hardening or roadmap unit. The stage cursor has exactly one
