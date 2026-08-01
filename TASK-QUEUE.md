@@ -12,44 +12,6 @@
 
 ## New Features
 
-- **preview-release-cadence** [spec: SPEC-preview-release-cadence.md] [roadmap: next/adoption]
-  roadmap-summary: A declared preview channel and a slower, calmer release cadence.
-  A preview channel. Reset release signaling for a
-  pre-1.0 audience: declare a preview/alpha channel, batch internal
-  iterations into a slower external cadence (weekly-class) so consumers stop
-  reading thirteen-releases-in-nine-days as churn, publish
-  checksum-verifiable release assets instead of bare tag pointers, and keep
-  a 30-second human changelog beside the migration detail. Separates
-  internal iteration completion from public version publication — a
-  RELEASING.md policy change more than a mechanism.
-  **Premise corrected 2026-07-25 by the undirected scope survey, re-counted
-  2026-07-26 and again 2026-07-27 — the count is larger than filed and the
-  rhythm held.** This entry says "thirteen-releases-in-nine-days"; the tree now
-  carries **17 tags in 14 days**, `v0.1.0` (2026-07-14) through `v0.17.0`
-  (2026-07-27). The finding is not a one-off burst that has since settled — the
-  cadence continued at roughly a release a day across the whole window, and the
-  count has risen at every re-read (13 → 14 → 15 → 17), which strengthens rather
-  than dates the signaling argument.
-  **The inherited checksum-verifiable-asset deliverable is SATISFIED — corrected
-  2026-07-27 by scope.** This entry absorbed `supply-chain-trust-baseline`'s
-  carved-out "publish checksum-verifiable release assets instead of bare tag
-  pointers" (2026-07-25, operator-approved) on the ground that the convention
-  should land with the cadence it depends on. `release-tarball-delivery-channel`
-  shipped it independently: `v0.17.0` is the first release carrying assets —
-  `checkwright-0.17.0.tgz` beside its `.sha256` — where `v0.16.0` carried none.
-  The deliverable is struck; what this entry still owns is the **signaling** half
-  alone (a declared preview channel, a slower external cadence batching internal
-  iterations, and a 30-second human changelog beside the migration detail). The
-  residual integrity question — that a checksum sharing one origin with its
-  tarball proves transfer integrity only — is `tarball-build-attestation`'s, not
-  this entry's.
-  **Cost while deferred:** zero pre-announcement; at announcement the
-  release history itself signals instability to exactly the risk-averse
-  teams the trust story targets. The inherited checksummed-asset gap no longer
-  contributes — it is closed, per the correction above.
-  Surfaced 2026-07-23 in the same external review (its release-signaling
-  finding).
-
 - **tightened-gates-declaration-note-parity** [spec: SPEC-tightened-gates-note-parity.md]
   Nothing asserts
   that a release note's composed Tightened-gates set equals the
@@ -2223,5 +2185,6 @@
 ## Done
 
 - knob-rename-compat-threshold
+- preview-release-cadence
 
 ## Lessons Learned

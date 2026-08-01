@@ -50,8 +50,36 @@ queue-kit/SPEC.md §The tag algebra.
 close-stage steps; the bump criteria and the note grammar are docs/install.md
 §Versioning and §The upgrade contract (cited, never restated here). Derive the
 bump off the dated `docs/posts/` note's fixed sections, whose roster and grammar
-that pointer owns; a qualifying iteration runs RELEASING.md's tag / GitHub
-Release / badge steps (a major runs release-sweep first, its boundary-only
-sub-procedure), an all-None iteration stamps `none`.
+that pointer owns; an all-None iteration stamps `none`.
+
+**A close defers by default and tags only when a release trigger fires.** The
+bump criterion says what a release would be worth; the cadence criterion says
+whether to cut it now. Without the second, every iteration earning a bump takes a
+tag and the tag history reads as churn to the pre-launch audience
+`docs/install.md` §Versioning declares the channel for. A qualifying iteration
+runs RELEASING.md's tag / GitHub Release / badge steps (a major runs
+release-sweep first, its boundary-only sub-procedure) when any of:
+
+- **Elapsed time** — the newest tag's creator date is at least 7 days old
+  (`git for-each-ref --sort=-creatordate --count=1 refs/tags`). A floor, never a
+  schedule: it permits a release and never forces one.
+- **A major** — the accumulated notes since the newest tag derive a major bump
+  under §Versioning (a decommission). A decommission waiting behind the cadence
+  floor is a deprecation promise coming due late, so it releases immediately.
+- **A security or supply-chain fix** in the batch. Reaching users late is the
+  whole cost being avoided.
+- **Explicit operator direction**, recorded in the disposition line's basis.
+
+Otherwise stamp `<iteration> release deferred:vX.Y.Z — <basis>` and let the
+accumulated declarations ride the next qualifying release. RELEASING.md step 1
+already composes a batched note from every declaration accumulated since the last
+tag, so nothing about note composition changes — only how often a tag is cut.
+
+*The honest limit.* No gate reds a release cut too soon. Each trigger above is a
+case where a fast release is correct, so a timing gate would need an override
+valve covering all of them and would end up policing the valve rather than the
+cadence. Timing is policy under a mandatory disposition stamp, and that stamp is
+not nothing: silence is not a disposition.
+
 Disposition evidence: `.workflow/release-disposition.txt` (committed,
 boundary-required and boundary-truncated per `scripts/lifecycle-config.sh`).

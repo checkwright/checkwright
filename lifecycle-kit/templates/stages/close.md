@@ -100,10 +100,14 @@ deferred-filing model for ruled-but-unpromoted work).
    execute its release procedure or stamp an explicit no-release line. Silence
    is not a disposition — a close that says nothing about release is incomplete.
    Stamp one line into the consumer-named disposition-evidence file:
-   `<iteration> release <version|none> — <one-line basis>` (the
-   `check-lesson-disposition` contract shape at the release boundary, the same
-   lineage release-sweep's stamp follows) — `<version>` is the tag applied,
-   `none` states the both-None (or consumer-equivalent) outcome. Ordering: a tag
+   `<iteration> release <version|none|deferred:<version>> — <one-line basis>`
+   (the `check-lesson-disposition` contract shape at the release boundary, the
+   same lineage release-sweep's stamp follows) — `<version>` is the tag applied,
+   `none` states the both-None (or consumer-equivalent) outcome, and
+   `deferred:<version>` records criteria that were met while the release was held
+   back, flooring the next qualifying note at that version. A consumer's release
+   policy may make deferral the default disposition, so this third form is the
+   common one under such a policy rather than an exception. Ordering: a tag
    names a commit, so the tag-and-host-release half of the procedure runs *after*
    the iteration's final commit lands; the note-authoring and stamp halves ride
    the close commits themselves.
