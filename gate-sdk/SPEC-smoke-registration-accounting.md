@@ -87,12 +87,31 @@ The second probe runs only for a gate that exited 2 in the scratch consumer; the
 exit-0 and exit-1 rows are decided by the first probe alone and never reach it.
 
 **The exemption is derived, not maintained.** That is the whole reason this
-shape was chosen over a per-gate declared roster: the justification for the
-large majority of omissions is computed from the tree every run and cannot go
-stale, be forgotten, or be copied wrong. The hand-written reason is a
-**residual valve for the exit-0/exit-1 minority**, not the mechanism. An
-implementation that collects reasons for every unregistered gate and consults
-the probe afterwards has inverted this delta and is wrong however green it runs.
+shape was chosen over a per-gate declared roster — and the measurement pass
+(delta 3) settles what the reason actually is, because it is not coverage.
+Of 48 unregistered gates the derivation justified **7**; the other 41 landed on
+exit 0 or exit 1 and owed a human disposition. By count the derivation is a
+minority mechanism.
+
+Its worth is that it is **self-limiting and cannot decay**. The 7 it covers are
+exactly the exit-2 row — the one verdict granting a permanent exemption owing no
+written reason ever, and so the one nobody will re-examine. Taking that row out
+of human hands is worth more than the count suggests: the justification is
+recomputed from the tree every run, so it cannot go stale, be forgotten, or be
+copied wrong, and the largest permanently-unreviewable class stops depending on
+a line someone wrote once. The corroborating probe is what makes it worth having
+at all — it is what caught `check-surface-duplication`, whose exit 2 in both
+trees a single-probe reading would have granted a silent permanent exemption.
+
+What the measurement does *not* support is calling the written reason a rare
+residual. It stays a **small standing set** for a different reason: of the 41,
+36 were dispositioned by **registration** — the self-limiting property working
+as designed, a gate that probes green leaving the probe set for the battery —
+which is why the hand-declared count on the clean line ends small even though
+the derivation's share of the initial sweep did not. That printed count, not the
+derivation's coverage, is what keeps this honest. An implementation that
+collects reasons for every unregistered gate and consults the probe afterwards
+has still inverted this delta and is wrong however green it runs.
 
 **The declaration valve.** Where a kit author judges an exit-0 or exit-1
 omission legitimate — a vacuous pass that is not real coverage is the honest
@@ -121,8 +140,8 @@ surprised by its own KPI:
   declared set, and it shrinks as the accounting is satisfied rather than growing.
 - **The absolute cost is at most two gate invocations per unregistered gate** —
   one on a small scratch tree for every member of the probe set, plus the
-  corroborating one on the invoking repo for the exit-2 subset only. Currently at
-  most the 51 that are unregistered today, falling from there. Build measures the
+  corroborating one on the invoking repo for the exit-2 subset only. At most the
+  48 unregistered at the sweep's start, falling from there. Build measures the
   real wall-clock and reports it.
 
 If build's measurement shows the added `consumer_smoke` wall-clock is material
@@ -134,7 +153,7 @@ maintained exemption wearing a derivation's clothes.
 
 The residual — how many unregistered gates land on exit 0 or exit 1 and so need
 a human judgment — **is not measured**, and this amendment deliberately does not
-guess it. Build measures the corroborated verdict distribution across all 51
+guess it. Build measures the corroborated verdict distribution across all 48
 **before writing a single declaration**.
 
 **A large residual is a finding build reports, never scope it absorbs.** The
@@ -158,10 +177,13 @@ Whatever the measurement returns, the kits' `smoke/install.sh` scripts gain the
 registration lines for gates that probe green. queue-kit's is already known:
 `check-queue-entry-budget` and `check-queue-sections` both read `TASK-QUEUE.md`,
 which queue-kit's own install writes verbatim, and both are unregistered today.
-`check-queue-slug-liveness` is the third omission and is expected to be the
-self-declaring kind (its prose-surface glob defaults empty, so it has no subject
-in a zero-config consumer) — expected, not assumed: the probes rule on it,
-corroboration included.
+`check-queue-slug-liveness` is the third omission and was expected to be the
+self-declaring kind, on the reasoning that its prose-surface glob defaults empty
+and so leaves it no subject in a zero-config consumer. **The probe overturned
+that**: it exits 0 and is registered like the other two. Recorded rather than
+quietly amended, because it is this delta's own argument landing on its author —
+the prediction was reasoned from the gate's source and was still wrong, which is
+why the probes rule and no predicted verdict is assumed.
 
 Mechanical because the probe is the oracle — run it, register what it names,
 stop when it is green. The judgment this delta does **not** contain is which
@@ -180,7 +202,7 @@ that the accounting is aimed at the right defect.
 a costed gap.** Declined. It is the cheapest option by a wide margin and it
 trades enforcement-first for a costed deferral on a defect class whose own queue
 entry already states the objection: a hand-corrected roster re-arms immediately.
-Registering two gates in one kit while fifty-one omissions stay silent leaves
+Registering two gates in one kit while forty-eight omissions stay silent leaves
 the mechanism that hid this defect fully intact, and the next instance is found
 by the next adopter rather than by the harness.
 
@@ -200,8 +222,17 @@ available to it.
 **Registering every shipped gate unconditionally.** Declined on the ground
 site-kit already argued for its own case: a gate whose subject no install writes
 either passes vacuously or fail-closes, and neither outcome is coverage. Forcing
-all 51 would trade a silent-omission defect for a scratch battery whose green is
+all 48 would trade a silent-omission defect for a scratch battery whose green is
 less meaningful than the one it replaced.
+
+The measurement narrows how much this alternative actually cost: 36 of the 48
+*did* read a surface some install writes and were registered, so unconditional
+registration would have been right for three quarters of the set and wrong for
+the remaining 12 — the 7 that fail closed on an absent subject plus the 5 the
+probe put on a hiding-shape or failed-corroboration verdict. The conclusion
+holds and its scale does not: the option is declined for those 12, not for a
+majority, and the accounting's value is that it finds them rather than that most
+gates need finding.
 
 ## Producers and consumers
 
