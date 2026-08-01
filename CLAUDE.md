@@ -42,9 +42,8 @@ A master push is verified against the remote oracle: watch the `gates` workflow
 to green (`gh run watch`) before calling the push done — and **budget one to two
 pushes per iteration**. Commits accumulate locally and ride a single watched push
 at close; a release tag earns the second run (`publish`). Every push also costs a
-`pages-build-deployment`, so a nine-push day buys one push's information nine
-times over at nine times the wall-clock. Never hand-dispatch `site-health` — it
-runs on a schedule.
+`pages-build-deployment`, so drip-pushing re-buys one push's information at N
+times the wall-clock. Never hand-dispatch `site-health` — it runs on a schedule.
 
 Beyond the gate battery, the repo runs its own iteration lifecycle — one
 iteration per hardening or roadmap unit. The stage cursor has exactly one
@@ -123,11 +122,11 @@ live in the owning SPEC section — cited, never restated.
 ## Agent execution (all stages)
 
 Delegation is pre-authorized for read-heavy audits and mechanical rename/merge
-sweeps (the session-context nudge) — this repo's judgment on what dispatch needs
-no ask. **Full protocol: `/agent-execution`.** The safety rules, resume-journal
-mechanics, validate-after-commit set, and gate-driven worklist load behind that
-trigger — a delegated `Agent` dispatch, whose per-dispatch budget guard names
-the skill on a blocking verdict — so they are not resident here.
+sweeps — no ask needed. **Full protocol: `/agent-execution`.** The safety rules,
+resume-journal mechanics, validate-after-commit set, and gate-driven worklist
+load behind that trigger — a delegated `Agent` dispatch, whose per-dispatch
+budget guard names the skill on a blocking verdict — so they are not resident
+here.
 
 ## Housekeeping
 
