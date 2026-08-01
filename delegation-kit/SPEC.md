@@ -225,25 +225,20 @@ dispatches without invoking the skill carries only the resident pointer.
 
 ## Resume journal — agent writes, scratch reset sweeps
 
-A mutating agent `Write`s a running progress journal (findings triaged,
-edits applied, what remains) to a repo-local gitignored scratch directory
-in the main checkout — never a temporary worktree (a worktree-isolated
-agent's own tree is deleted with the worktree, taking the journal) nor a
-system temp dir (a restart wipes tmpfs). The supervisor names that path
-**absolute into the main checkout** in the dispatch prompt, so a
-worktree-isolated agent writes to the surviving checkout, not its doomed
-tree. Repo-dir-local scratch is reboot-survivable, cheap to clean, and
-predictable across coding agents. The agent updates the journal as it
-goes; on success it appends a `DONE` marker. Each finding lands in the journal *inline as it is
-confirmed* — never "see final output": the agent's return message dies with
-the session, so a pointer-only journal makes `DONE` lie about
-recoverability.
+**The contract, in four clauses.** A mutating agent journals to a repo-local
+gitignored scratch directory in the main checkout; the supervisor grants that
+path **absolute** in the dispatch prompt; each finding lands inline as it is
+confirmed; a `DONE` marker is appended on success. The operative text — what
+each clause requires of an agent, and why a temporary worktree and a system
+temp dir both fail the survivability test — is
+`templates/agent-execution.md`'s **Resume journal — agent writes, scratch reset
+sweeps** bullet, which is the surface an agent loads. This section owns what
+that bullet cannot carry: the lifetime rule's reasoning, the attestation it was
+priced against, and the two readings the marker carries.
 
-**Lifetime — the journal outlives every session that reads it.** No party
-deletes a journal while the work it covers is live. Agents have no `rm`, and
-the supervisor does not delete one either: a journal is swept by the
-consumer's own scratch reset at its next work-unit boundary, a mechanism the
-consumer already owns (here, `enter-stage.sh`'s boundary wipe of `.tmp/` at
+**Lifetime — why retention rather than an eager deletion chore.** Cleanup is
+the consumer's own scratch reset at its next work-unit boundary, a mechanism
+the consumer already owns (here, `enter-stage.sh`'s boundary wipe of `.tmp/` at
 the next scope entry — lifecycle-kit/SPEC.md §bin/enter-stage.sh). Two things
 break when the supervisor deletes on its own schedule instead, and both appear
 only once a dispatched agent is **resumable** rather than one-shot: a resumed
@@ -287,10 +282,9 @@ recoverability.
 **Caveat — the sandbox may block the journal write.** Background agents
 have been observed unable to `Write` to the granted path, silently falling
 back to returning findings in the final message — which defeats the journal
-exactly when it matters (a long, interruptible run). So: for a read-only
-fan-out the return value *is* the contract — no journal; for mutating
-agents, grant the journal path explicitly before dispatch rather than
-assuming the write succeeds. That contract has two ends. The caveat's
+exactly when it matters (a long, interruptible run). The template's
+read-only-fan-out carve-out and its grant-the-path-explicitly clause both
+follow from this observation. That contract has two ends. The caveat's
 evidence is about **the child's** write failing silently, and its true
 content is *do not make recoverability depend on a backgrounded child's
 write* — which is why it is kept rather than overturned by the template's
