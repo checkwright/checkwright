@@ -776,9 +776,10 @@ is ground truth, the prose the audited follower.
 
 ### templates/
 
-`queue-config.sh` — the consumer config template documenting every knob (the
-`# spec:` pointer to the §Layout knob table, which now includes
-`QUEUE_KIT_LESSON_SINKS` and its local-overlay reminder).
+`queue-config.sh` — the consumer config template: a two-line `# spec:` pointer
+to the §Layout knob table (which now includes `QUEUE_KIT_LESSON_SINKS` and its
+local-overlay reminder), so the table stays the one owner of the knob roster
+rather than a parallel copy in the template drifting against it.
 `TASK-QUEUE.md` — a starter queue skeleton: the sections in default order,
 one example entry per grammar shape shown under `Technical Debt` (the
 `[spec:]`-gated `New Features` carries teaching prose only, since a spec-ready

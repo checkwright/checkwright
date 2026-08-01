@@ -2,10 +2,10 @@
 # Direct unit test of gate-sdk/lib/declaration.sh — the two container arms and
 # the resolve/refuse trichotomy (gate-sdk/SPEC.md §lib/declaration.sh).
 #
-# Why a direct test: the record arm has no caller fixture to ride. Its only
-# caller is bin/upgrade-smoke.sh's untagged branch, and the smoke is a bin tool
-# whose contract forgoes a good/bad pair — so a corpus fixture would leave the
-# arm the standing pre-release assertion depends on entirely unexercised. The
+# Why a direct test: bin/upgrade-smoke.sh's record-arm caller is a bin tool
+# whose contract forgoes a good/bad pair, so this is that branch's runtime
+# lock-in independent of scripts/check-tightened-gates-note-parity's own
+# good/bad pair on the record arm (gate-sdk/SPEC.md §lib/declaration.sh). The
 # markdown arm's callers do carry fixtures; its status-2 and empty-section arms
 # are still checked here, being unreachable from a well-formed corpus.
 #

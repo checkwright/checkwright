@@ -686,6 +686,9 @@ delegation-kit/
   bin/run-usage-tests.sh          # verdict decision-table runner
   bin/run-budget-guard-tests.sh   # budget-guard decision-table runner
   bin/run-trend-tests.sh          # trend-reporter assertion runner
+  lib/delegation.sh               # shared helpers: sourced by bin/usage-verdict.sh,
+                                   #   bin/usage-trend.sh, checks/check-gate-tamper.sh,
+                                   #   checks/check-agent-tier-explicit.sh
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
   usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
   usage-tests/trend-history.log   # fixture history for the trend runner

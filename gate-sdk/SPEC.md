@@ -733,23 +733,27 @@ the artifact it claims to read. So the helper refuses, and the refusal is what
 closes the class permanently: no future markup variant can disarm the assertion,
 only red it.
 
-Callers, all three named: `bin/upgrade-smoke.sh` at its declaration-resolve step
+Callers, all four named: `bin/upgrade-smoke.sh` at its declaration-resolve step
 uses both arms (§upgrade-smoke); this repo's `check-tightened-gates-grammar`
-uses the markdown arm's verdict at each note it walks; and
-`scripts/check-release-bump.sh` uses the markdown arm's *container* alone,
-counting bullets across the note's declaration-bearing sections. That third caller
-is why the container and the token predicate are separable rather than one pass:
-Behavior-changes lead tokens are legitimately prose phrases, so the bump
-derivation needs the bullets without the token predicate. Before this helper the
-container was stated three times and two of the statements already disagreed on
-whether a bullet marker could be indented, so the section a bump was derived from
-and the section an allowed-red set was parsed from were not guaranteed to be the
-same section. A sourced library, not a gate, so it owes no `good/`+`bad/` pair; its
-runtime lock-in is `gate-tests/lib-declaration.test.sh`, direct because the
-record arm has no caller fixture to ride. That arm's only caller is the smoke's
-untagged branch, and the smoke is a `bin/` tool that forgoes a pair — so a
-corpus fixture would leave the arm the standing pre-release assertion depends on
-entirely unexercised.
+uses the markdown arm's verdict at each note it walks; `scripts/check-tightened-gates-note-parity.sh`
+also uses both arms, comparing a note's `Tightened gates` section
+(`decl_section_tokens`) against its `DECL_FILE` argument's record set
+(`decl_record_tokens`); and `scripts/check-release-bump.sh` uses the markdown
+arm's *container* alone, counting bullets across the note's declaration-bearing
+sections. That last caller is why the container and the token predicate are
+separable rather than one pass: Behavior-changes lead tokens are legitimately
+prose phrases, so the bump derivation needs the bullets without the token
+predicate. Before this helper the container was stated three times and two of
+the statements already disagreed on whether a bullet marker could be indented,
+so the section a bump was derived from and the section an allowed-red set was
+parsed from were not guaranteed to be the same section. A sourced library, not
+a gate, so it owes no `good/`+`bad/` pair; its runtime lock-in is
+`gate-tests/lib-declaration.test.sh`. The record arm is also exercised through
+`scripts/gate-tests/check-tightened-gates-note-parity`'s own `good/`+`bad/`
+pair, whose `tightened-gates.txt` fixture drives `decl_record_tokens` via the
+gate's `DECL_FILE` argument. The direct unit test keeps its place — it is
+still the arm's runtime lock-in — standing on its own rather than on an
+absence that is not there.
 
 The helper carries no section name and no gate name of its own — both are the
 caller's arguments, and it takes no configuration. That is where the seam falls:

@@ -1417,7 +1417,10 @@ by `check-prose-tells` at scan time and no other component.
 
 ### templates/
 
-`canon-config.sh` — the consumer config template documenting every knob.
+`canon-config.sh` — the consumer config template: a two-line `# spec:` pointer
+to the §Layout and configuration knob table, so the table stays the one owner
+of the knob roster rather than a parallel copy in the template drifting
+against it.
 `SPEC-amendment.md` — the amendment skeleton: delta sections plus the
 Definition-of-Done checklist (causal completeness, no information lost on
 merge, amendment deleted, none remaining, gaps filed as debt).

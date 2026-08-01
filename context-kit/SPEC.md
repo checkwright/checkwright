@@ -628,6 +628,7 @@ context-kit/
   gate-tests/check-settings-pins/{good,bad}/
   gate-tests/check-memory-off/{good,bad}/
   gate-tests/check-footprint-fresh/{good,bad}/
+  gate-tests/check-brevity.test.sh      # the unmatched-section axis the pair cannot hold
   gate-tests/check-memory-off.test.sh   # the local-override axis the pair cannot hold
   index-tests/                   # fixture corpus + expected outputs
   templates/session-context.sh   # consumer copy: marked consumer sections
@@ -746,7 +747,12 @@ fixture pair; the footprint pair drives the hermetic two-argument mode
 memory-off gates take a `--fixture <dir>` injection (the check-identity
 precedent): the settings-pins pair reads `<dir>/settings.json` against
 `<dir>/settings-pins.conf`; the memory-off pair scans `<dir>/memory` for
-content. The memory-off local-override axis — an untracked
+content. Two direct unit tests hold the axes the pairs fix and so cannot
+express: `check-brevity.test.sh` holds the unmatched-section resolution (the
+pair fixes `CONTEXT_KIT_BREVITY_SECTION` at the stock default and always
+supplies a file carrying it, so neither case can express a section that
+resolves to nothing — an unmatched section is exit 2, a broken machine rather
+than a clean tree). The memory-off local-override axis — an untracked
 `settings.local.json` that re-enables a pinned key past an empty dir — cannot
 be a good/bad pair (the pair fixes the dir axis), so `check-memory-off.test.sh`
 holds it.

@@ -66,7 +66,9 @@ Knobs, this repo's surface names as defaults:
 ### lib/evidence.sh
 
 The sourced config loader: consumer config first, kit defaults fill what it
-left unset, then validation. It also owns the shared adapters — `ek_parse` (the
+left unset, then validation. It also owns the shared adapters — `ek_suite_cmd`
+(a suite's configured run command, `EVIDENCE_KIT_RUN_<suite>`), `ek_parser_for`
+(the per-suite parser resolution, detailed below), `ek_parse` (the
 parser dispatch), `ek_diff` (the per-scenario baseline diff, §bin/diff-baseline.sh),
 `ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_run_key`
 header readers plus the `ek_state_stage` cursor reader that let the kit read
