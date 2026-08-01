@@ -35,6 +35,9 @@
 ### Someday
 
 - **example-deferred** — a design-pending entry. [design-pending]
+  **Cost while deferred:** what staying parked costs — a red gate, a stale
+  doc, a foregone lever — stated so a later scope can weigh it against the
+  work of landing it.
 
 ## Done
 
