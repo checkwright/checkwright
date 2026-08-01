@@ -64,15 +64,14 @@ if [[ ${#pages[@]} -eq 0 ]]; then
     exit 0
 fi
 
-strip_fm='NR==1 && $0=="---" { fm=1; next } fm==1 && $0=="---" { fm=0; next } fm==1 { next } { print }'
-
 rendered_scan='
 BEGIN {
-    inpre=0; leak=0; h=0; tbl=0; fgn=0
     # spec: site-kit/SPEC.md §check-docs-render-fidelity — the known-HTML-element set is a kit built-in, not a config seam
     split("a abbr address area article aside audio b base bdi bdo blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd label legend li link main map mark menu meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script search section select slot small source span strong style sub summary sup table tbody td template textarea tfoot th thead time title tr track u ul var video wbr", A, " ")
     for (i in A) HTMLEL[A[i]]=1
 }
+# spec: site-kit/SPEC.md §check-docs-render-fidelity — BEGINFILE/ENDFILE (GNU awk) reset the per-page state and emit the result the instant the file ends, so one process fed every page html file reproduces what re-execing this program once per page produced
+BEGINFILE { inpre=0; leak=0; h=0; tbl=0; fgn=0 }
 {
     t=$0
     while (match(t, /<h[1-6][ >]/)) { h++; t=substr(t, RSTART+RLENGTH) }
@@ -101,10 +100,10 @@ BEGIN {
     gsub(/<[^>]*>/, "", s)
     if (s ~ /`/) leak=1
 }
-END { print leak+0, h+0, tbl+0 }'
+ENDFILE { print leak+0, h+0, tbl+0 }'
 
 source_headings='
-BEGIN { infence=0; fchar=""; flen=0; count=0; prevblank=1; previsatx=0 }
+BEGINFILE { infence=0; fchar=""; flen=0; count=0; prevblank=1; previsatx=0 }
 {
     s=$0; n=0
     while (substr(s,1,1)==" ") { s=substr(s,2); n++ }
@@ -125,11 +124,11 @@ BEGIN { infence=0; fchar=""; flen=0; count=0; prevblank=1; previsatx=0 }
     if (n<=3 && s ~ /^#{1,6}([ \t]|$)/) { count++; prevblank=0; previsatx=1; next }
     prevblank=($0 ~ /^[ \t]*$/); previsatx=0
 }
-END { print count+0 }'
+ENDFILE { print count+0 }'
 
 # spec: site-kit/SPEC.md §check-docs-render-fidelity — count source GFM table starts (a pipe row followed by a | --- | delimiter row) outside code fences
 source_tables='
-BEGIN { infence=0; fchar=""; flen=0; count=0; prevpipe=0 }
+BEGINFILE { infence=0; fchar=""; flen=0; count=0; prevpipe=0 }
 {
     s=$0; n=0
     while (substr(s,1,1)==" ") { s=substr(s,2); n++ }
@@ -149,13 +148,29 @@ BEGIN { infence=0; fchar=""; flen=0; count=0; prevpipe=0 }
     if ($0 ~ /^[ \t]*$/) { prevpipe=0; next }
     prevpipe = (index($0, "|") > 0) ? 1 : 0
 }
-END { print count+0 }'
+ENDFILE { print count+0 }'
+
+# spec: site-kit/SPEC.md §check-docs-render-fidelity — one awk process strips front matter from every page at once (a page-indexed temp file per output, gawk's ARGIND keying the filename to the page it came from) rather than re-execing awk once per page; BEGINFILE/ARGIND are GNU awk (already the family's toolchain floor, docs/install.md)
+WORK="$(mktemp -d)" || { echo "check-docs-render-fidelity: could not create a scratch dir" >&2; exit 2; }
+trap 'rm -rf "$WORK"' EXIT
+
+for i in "${!pages[@]}"; do : > "$WORK/body.$i"; done
+
+awk -v outdir="$WORK" '
+BEGINFILE { outfile = outdir "/body." (ARGIND - 1); fm = 0 }
+FNR==1 && $0=="---" { fm=1; next }
+fm==1 && $0=="---" { fm=0; next }
+fm==1 { next }
+{ print > outfile }
+' "${pages[@]}"
+bst=$?
+fail_closed "$bst" DOCS-RENDER-FIDELITY front-matter-strip
 
 bodies=()
-for page in "${pages[@]}"; do
-    body="$(awk "$strip_fm" "$page")"; bst=$?
-    fail_closed "$bst" DOCS-RENDER-FIDELITY front-matter-strip
-    bodies+=("$body")
+body_files=()
+for i in "${!pages[@]}"; do
+    bodies+=("$(<"$WORK/body.$i")")
+    body_files+=("$WORK/body.$i")
 done
 
 htmls=()
@@ -181,16 +196,31 @@ else
     done
 fi
 
+# spec: site-kit/SPEC.md §check-docs-render-fidelity — each of the three per-page scans batches into one awk process across every page's file (gawk's ENDFILE emits the scan's result line the instant a file finishes, in ARGV order, so one process substitution-free command substitution yields one result line per page) rather than re-execing awk once per page per scan
+html_files=()
+for i in "${!pages[@]}"; do
+    printf '%s\n' "${htmls[$i]}" > "$WORK/html.$i"
+    html_files+=("$WORK/html.$i")
+done
+
+rscan_out="$(awk "$rendered_scan" "${html_files[@]}")"; ast=$?
+fail_closed "$ast" DOCS-RENDER-FIDELITY rendered-scan
+mapfile -t rscan_lines <<< "$rscan_out"
+
+heading_out="$(awk "$source_headings" "${body_files[@]}")"; sst=$?
+fail_closed "$sst" DOCS-RENDER-FIDELITY source-scan
+mapfile -t heading_lines <<< "$heading_out"
+
+table_out="$(awk "$source_tables" "${body_files[@]}")"; tst=$?
+fail_closed "$tst" DOCS-RENDER-FIDELITY source-table-scan
+mapfile -t table_lines <<< "$table_out"
+
 findings=()
 for i in "${!pages[@]}"; do
-    page="${pages[$i]}"; body="${bodies[$i]}"; html="${htmls[$i]}"
-
-    read -r leak rcount rtbl < <(printf '%s\n' "$html" | awk "$rendered_scan"); ast=$?
-    fail_closed "$ast" DOCS-RENDER-FIDELITY rendered-scan
-    scount="$(printf '%s\n' "$body" | awk "$source_headings")"; sst=$?
-    fail_closed "$sst" DOCS-RENDER-FIDELITY source-scan
-    stbl="$(printf '%s\n' "$body" | awk "$source_tables")"; tst=$?
-    fail_closed "$tst" DOCS-RENDER-FIDELITY source-table-scan
+    page="${pages[$i]}"
+    read -r leak rcount rtbl <<< "${rscan_lines[$i]}"
+    scount="${heading_lines[$i]}"
+    stbl="${table_lines[$i]}"
 
     [[ "$leak" -eq 1 ]] && findings+=("$page: a code-span corruption symptom (a stray backtick, or a raw non-HTML-element tag) leaked into rendered text — a code span or fenced block failed to parse")
     [[ "$rcount" -gt "$scount" ]] && findings+=("$page: $rcount rendered heading(s) exceed $scount source heading(s) outside code — a code-fenced '#' line was promoted")
