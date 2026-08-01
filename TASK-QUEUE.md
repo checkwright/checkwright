@@ -187,8 +187,11 @@
   what each kit's `smoke/install.sh` appends to `gates.list`, and
   `check-action-pinning`, `check-action-run-shell`, `check-action-gh-repo` and
   `check-enforcement-fresh` are in **no** kit's smoke `gates.list`. Re-verified
-  at the 2026-08-01 scope survey over the union of every `smoke/install.sh`
-  (34 gate names): the four above are absent, and so is `check-core-files` —
+  at the 2026-08-01 scope survey and again at the align audit over the union of
+  every `smoke/install.sh` (**29** gate names — gate-sdk's install writes the
+  scratch `gates.list` with nine, the other kits append twenty, and no name
+  repeats; the survey's "34" counted `check-` tokens including comments and
+  `spec:` tags): the four above are absent, and so is `check-core-files` —
   a fifth, unnamed at filing. `site-kit/smoke/install.sh` genuinely does copy
   `templates/site-health.yml` verbatim into the scratch tree, so the install
   half is real, but of the registered smoke gates only `check-tree-terms` and

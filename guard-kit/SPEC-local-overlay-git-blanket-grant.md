@@ -196,11 +196,16 @@ firing probe, a non-firing probe, and the empty-knob silence.
   joins the knob roster with its default-empty semantics (Delta 2).
 - **`guard-kit/SPEC.md` §The close-stage triage step** — the breadth set added
   as a second disposition beside the prune (Delta 3).
-- **`guard-kit/SPEC.md` §Testing** — the new `gate-tests/` case named (Delta 2's
-  testing paragraph).
-- **`guard-kit/bin/compare-settings-allow.sh`**, **`guard-kit/templates/guard-config.sh`**
-  (the knob's skeleton entry), and the consumer's `guard-config.sh` and
-  `.claude/settings.json` (Delta 4). The local overlay edit is untracked by
+- **`guard-kit/SPEC.md` §Testing** — the new `gate-tests/` case named, covering
+  a firing probe and a non-firing one (Delta 1) and the empty-knob silence
+  (Delta 2); the reasoning is the **Testing** paragraph under §Producers and
+  consumers, not a paragraph inside either delta.
+- **`guard-kit/bin/compare-settings-allow.sh`** — the breadth report and its
+  `--count` treatment (Delta 1), reading the knob (Delta 2).
+- **`guard-kit/templates/guard-config.sh`** — the knob's skeleton entry (Delta 2).
+- **The consumer's `guard-config.sh`** — the probe array written non-empty
+  (Delta 2's knob, given its value by Delta 4) — and **`.claude/settings.json`**,
+  the narrowed committed verbs (Delta 4). The local overlay edit is untracked by
   construction.
 - **`guard-kit/lib/guard.sh`** — **not edited.** `guard_allow_match` is reused
   as-is; listed so build does not add a breadth variant of a primitive that

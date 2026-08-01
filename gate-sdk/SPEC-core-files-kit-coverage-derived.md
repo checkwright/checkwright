@@ -207,7 +207,8 @@ the entry stated; the pin converts an incidental catch into a direct one.
   rather than restate them. Listed so build does not helpfully re-document the
   token in two places.
 - **`gate-sdk/gate-tests/check-core-files/`** — the fixture pair gains coverage
-  for an expanding `kit:` line and for the wildcard refusal, per the
+  for an expanding `kit:` line and for the wildcard refusal (Delta 1, whose
+  grammar and fail-closed restriction are what the pair exercises), per the
   fixture-pair discipline.
 
 ## The seam
