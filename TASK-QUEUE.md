@@ -119,6 +119,61 @@
   Surfaced 2026-08-01 by the align audit's kit SPEC-vs-code sweep; filed at
   close from the gap inbox; promoted 2026-08-01 by spec.
 
+- **queue-kit-starter-template-red** [spec: gate-sdk/SPEC-smoke-registration-accounting.md]
+  — **queue-kit ships a starter template that fails the kit's own gate, and its
+  smoke cannot see it.** Two coupled parts, filed together because the second
+  explains why the first survived. (1) `queue-kit/templates/TASK-QUEUE.md`'s lone
+  deferred entry carries no `Cost while deferred` field, so
+  `check-queue-entry-budget` assertion C reds on a verbatim copy under kit
+  defaults — **mechanical**. (2) `queue-kit/smoke/install.sh` registers 7 of the
+  10 shipped gates, omitting the one that would have caught (1) —
+  **design-bearing**.
+  **Reframed at spec 2026-08-01:** part 1 is a live violation of a gate-sdk
+  contract that *already exists*. §Consumer smoke's starter-template conformance
+  rule already requires a shipped template to be battery-clean and already calls
+  the obligation mechanical rather than ritual; an unregistered gate defeats that
+  mechanism. Part 2 is what makes the existing contract enforceable.
+  **Ruled by the operator 2026-08-01 — derived accounting.** The "reads a surface
+  the install writes" predicate is promoted from site-kit-local commentary into
+  gate-sdk §Consumer smoke and, the substance, is **evaluated rather than
+  transcribed**: a shipped-but-unregistered gate is probed in the scratch
+  consumer, and its exit code is the verdict — exit 2 is a self-declaring
+  justified omission needing no written reason ever, exit 0 or 1 is red unless a
+  `# smoke-unregistered:` valve declares it. The exemption is derived, never
+  maintained; the hand-written reason is a residual valve for the minority, and
+  an implementation that collects reasons first and probes second has inverted
+  the ruling.
+  **Runtime is bounded by where it runs:** one pass in `run-consumer-smoke.sh`
+  over the union, on the scratch tree the harness has already built and greened —
+  no extra install, no per-kit repetition, and **zero** pre-commit cost, since
+  the harness is a `bin/` tool and the `consumer_smoke` validate suite. The probe
+  set is self-limiting: a gate that probes green gets registered and leaves it.
+  **The residual is unmeasured and build measures it first.** How many of the 51
+  shipped-but-unregistered gates land on exit 0/1 is not guessed here. A large
+  residual is a **finding build reports to the lead**, not scope it absorbs —
+  if most omissions need hand-written reasons then this option and full declared
+  completeness converge, and that is a fact the operator wants surfaced. The
+  harness's clean line carries three counts permanently (registered,
+  self-declared, hand-declared) so the hand-declared number's growth is legible
+  without an audit.
+  **Rejected alternatives recorded in the amendment:** contract-plus-instance
+  with the accounting filed (trades enforcement-first for a costed deferral on a
+  class whose entry already objects that a hand-corrected roster re-arms);
+  deriving registration from the kit README `gate-roster:` block (refused on the
+  `kit-owned-install-recipe` boundary, not on merit — it would decide that open
+  entry's question sideways); registering everything unconditionally (a vacuous
+  pass is not coverage).
+  **Reproduction trap carried into build:** the red reproduces only from a
+  **scratch cwd** — from the repo root `queue-kit/lib/queue.sh` auto-sources this
+  repo's `scripts/queue-config.sh` and the gate gives a false clean.
+  **Ordering:** part 1 lands before part 2's queue-kit registrations, or the
+  harness correctly reds.
+  **Cost while deferred:** a consumer following the documented starter path gets
+  a red battery on their first run, which is the worst possible first
+  impression and is paid by every new adopter until fixed.
+  Surfaced 2026-08-01 by the align audit's verbatim-copy run; filed at close
+  from the gap inbox; promoted 2026-08-01 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2154,46 +2209,6 @@
   rationale, and the loss is invisible until someone re-derives it, which is
   exactly what happened here and cost this iteration a spec cycle.
   Filed 2026-08-01 at close from the gap inbox.
-
-- **queue-kit-starter-template-red** [design-pending] — **queue-kit ships a
-  starter template that fails the kit's own gate, and its smoke cannot see it.**
-  Two coupled parts, filed together because the second explains why the first
-  survived.
-  (1) queue-kit/SPEC.md:782-788 claims `templates/TASK-QUEUE.md` "ships
-  battery-clean when copied verbatim". It does not: the template's only deferred
-  entry (`queue-kit/templates/TASK-QUEUE.md:37`) carries no `Cost while
-  deferred` field, so `check-queue-entry-budget` assertion C reds on a verbatim
-  copy under kit defaults. **Verified live** at the align audit; the other nine
-  queue-kit gates pass clean on the same copy. This part is mechanical.
-  (2) `queue-kit/smoke/install.sh:8-17` registers only **7 of the 10** shipped
-  gates, omitting `check-queue-entry-budget`, `check-queue-sections` and
-  `check-queue-slug-liveness` — so consumer smoke never runs the gate that would
-  have caught (1). This part is design-bearing.
-  **Why `[design-pending]`:** deciding whether a kit's smoke must register
-  **every** gate it ships (versus a deliberate subset) is a gate-sdk
-  Consumer-smoke contract question with a blast radius across all eleven kits'
-  `install.sh`. `smoke-battery-workflow-gate-coverage`, landed this iteration,
-  rules a scratch-battery slot by "the gate reads a surface the install writes";
-  that predicate may or may not settle this case and the interaction should be
-  **checked rather than assumed**.
-  Shares its design question with `kit-template-registry-completeness` — both
-  ask whether a kit's install-time registry may be a subset of what the kit
-  ships — and the two are cheapest to rule together even though their mechanical
-  halves differ.
-  **Re-verified live 2026-08-01 by the undirected scope survey, with a
-  reproduction trap worth carrying into build.** 9 of the 10 shipped gates pass
-  on a verbatim copy and `check-queue-entry-budget` reds on `example-deferred`,
-  exactly as filed. But the reproduction must run from a **scratch cwd**: from
-  the repo root `queue-kit/lib/queue.sh` auto-sources this repo's
-  `scripts/queue-config.sh`, so the gate reads consumer config and gives a false
-  clean. Relatedly, `run-consumer-smoke.sh queue-kit` reports clean — not a
-  contradiction but the entry's own point, since the smoke never registers the
-  gate that reds.
-  **Cost while deferred:** a consumer following the documented starter path gets
-  a red battery on their first run, which is the worst possible first
-  impression and is paid by every new adopter until fixed.
-  Surfaced 2026-08-01 by the align audit's verbatim-copy run; filed at close
-  from the gap inbox.
 
 - **advisory-lane-draft-state-unswept** [design-pending] — the Advisories lane
   probes `state=triage`, which is correctly the **undispositioned** set:
