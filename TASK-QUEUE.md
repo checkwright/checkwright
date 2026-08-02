@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-gate-substrate
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,25 @@
 ## New Features
 
 ## Technical Debt
+
+- **battery-baseline-capture** — persist a per-gate timing baseline for the current
+  bash battery as committed evidence, **before any gate's script retires**. Ordered
+  first in `native-gate-substrate` because the measurement is perishable, not because
+  it is urgent: `run-gates.sh` writes per-gate ms plus a `TOTAL` to its scratch
+  timings file and truncates it every run, and `.tmp/` is wiped at each scope
+  boundary — which is why no earlier measurement survived for this scope to verify.
+  Once a cohort ports, the pre-port number is unrecoverable.
+  **What it must record**, so a later speed claim is checkable: per-gate rows rather
+  than `TOTAL` (the port lands cohort by cohort, so the battery is mixed-substrate
+  throughout and only per-gate deltas are attributable), the tree commit and a
+  `gates.list` content hash, the environment, and repeated runs rather than one.
+  **Debt, not a feature — the boundary stated so the call is checkable.** It follows
+  the `.workflow/` baseline convention `validate-baseline.txt` and
+  `always-loaded-baseline.txt` already establish, under a directory contract gate-sdk
+  owns, so it converges on names the specs carry rather than adding one. If the
+  design grows a knob or a tool of its own it has become a feature, and `/spec` owes
+  it an amendment.
+  Promoted 2026-08-02 by scope into `native-gate-substrate`.
 
 ## Deferred
 
@@ -919,51 +938,42 @@
   roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
   Port the battery off bash-plus-GNU-userland onto one native compiled binary
   (Rust the lead candidate); scale is read off `gates.list` and `*/checks`.
-  Standing pains: utilities on independent lifecycles; a compiler replacing
-  contracts the sdk enforces by discipline plus meta-gates; and the sharpest,
-  **gate opacity**, this entry's sharpest ground since it was filed: an agent that
-  can *read* a gate's bash predicts its verdict and acts on the prediction instead
-  of running it, so a binary makes executing the cheapest way to know.
-  **Sharpened 2026-08-02 at scope — the strength turns on reachability in the
-  consumer tree**, which makes the original's "consumer-side; this repo keeps its
-  source" load-bearing rather than a caveat: measured *here* the benefit reads nil,
-  because this repo dogfoods from source. Two bounds. Never secrecy — a binary is
-  reverse-engineerable, and the trust inversion is real. And `init` vendors every
-  kit file, fixtures included (`installer/lib/init.sh`:131-132), so a consumer
-  agent keeps the `good/`+`bad/` pair — which discloses a gate's *shape*, never its
-  predicate. **Open for the amendment:** whether a ported gate's source vendors into
-  the consumer tree as kits do today; if it does, opacity is nil there too.
-  **Two grounds this must not rest on, both falsified 2026-08-02 at scope.**
-  *Speed:* "a port deletes `check-shellcheck`" is wrong — 49% of its corpus is
-  non-gate bash — and no timing artifact survives, so a baseline is captured before
-  the first cohort retires a script, or the claim is unfalsifiable. Concurrency is
-  reported apart from substrate: the in-bash siblings below get it too.
-  *Platform reach:* a gate-only port retires **one** of six
-  `context-kit/lib/toolfloor.sh` pins (`awk::GNU`) — `bash:4.3` survives on namerefs
-  in kit `bin/`, `sort::coreutils` on `date -d`/`stat -c`/`realpath` there and in the
-  hook emitter, and `npx checkwright init` hands to bash, so Windows stays blocked.
-  **Correctness evidence (2026-08-01, operator-directed) — the surviving ground.**
-  `release-step-verification`'s eleven defects sort into four a port removes (the
-  opt-in shell error model, which reported green forever from its own data source
-  dying; the regex dialect split; textual parameter expansion; hand-rolled parsers)
-  and six it does not, among them `gate-tests-suite-identity-in-evidence` and
-  `workflow-permissions-scope-oracle`. Caution: the parser class's named live
-  instance closed 2026-08-01 in awk by an explicit refusal arm, so "only a real
-  parser closes this class" overstates. Landing then relaxing is the failure mode.
-  **Deliverable:** one multi-call binary, a subcommand per check; `gates.list` dispatching
-  per-entry to subcommand or script so it lands cohort by cohort, slowest and meta-gates first;
-  each gate's fixture pair is the parity oracle before its script retires; consumer gates keep
-  the shell escape hatch; checksummed per-platform artifacts, buildable source, needing only git.
-  **Why `[design-pending]`:** the consumer-extensibility model decides everything else
-  (escape hatch vs check DSL vs native plugins), plus language choice, the dogfood
-  question, and the trust inversion. Distribution is the hard part: kits vendor as text.
-  **Cost while deferred:** every new gate adds shell to the eventual port, the
-  silent-failure classes stay reachable, and source-prediction waste recurs per
-  session. **It is a net drain on the queue, not a generator:** promoting it closes
-  `gate-battery-parallel-execution` and `gate-battery-result-cache` outright and
-  converges with `state-representation-integrity` — each says so in its own body.
-  Nothing breaks meanwhile — correct on Linux, fully gated. Feature-shaped: adds
-  governed names. Filed 2026-07-28 by operator request.
+  **Ground — gate opacity.** An agent that can *read* a gate's bash predicts its
+  verdict and acts on that instead of running it; a binary makes executing the
+  cheapest way to know. Strength is a **range** the payload ruling fixes: a
+  binary-plus-documented-rule payload approaches structural, one still shipping
+  sources and fixtures degrades to friction. Never secrecy — binaries are
+  reverse-engineerable. Unmeasurable here: this repo dogfoods from source.
+  **Second ground — correctness.** Four of `release-step-verification`'s eleven
+  defects are removed by a real substrate (opt-in shell error model, regex dialect
+  split, textual parameter expansion, hand-rolled parsers); six survive it. Caution:
+  the parser class's live instance closed in awk 2026-08-01, so "only a real parser
+  closes this" overstates. Landing the port then relaxing is the failure mode.
+  **Two grounds it must NOT rest on, both falsified 2026-08-02 at scope.** *Speed* —
+  a port does not delete `check-shellcheck`, and no timing artifact survives, so a
+  baseline is captured before the first cohort retires a script. *Platform reach* —
+  it retires one of six `context-kit/lib/toolfloor.sh` pins; the rest survive in kit
+  `bin/` and the hook emitter, and `init` hands to bash, so Windows stays blocked.
+  **Two open design questions slice 1 blocks on; the amendment owes both.**
+  (1) *The `# graph:` manifest* — `gen-pre-commit.sh` projects the hook's trigger
+  subset from each gate's manifest and `check-graph` holds it byte-fresh, so a
+  subcommand carrying none breaks the chain. Settled before any gate ports.
+  (2) *The consumer payload* — `gate-payload-disclosure-ruling`, the companion that
+  holds it and the lever that fixes opacity's range.
+  **Closed alternative:** a bash portability floor — costed 2026-08-02 and rejected
+  (stock macOS bash 3.2 is unreachable by shims; `mapfile`/`declare -A` in 56 of 100
+  checks). The costing is the amendment's to record, not this entry's.
+  **Deliverable:** one multi-call binary, a subcommand per check; `gates.list`
+  dispatching per entry to subcommand or script so it lands cohort by cohort; each
+  gate's fixture pair the parity oracle, **executed** not merely present
+  (`check-gate-fixture-coverage` asserts existence only); consumer gates keep the
+  shell hatch; checksummed artifacts and buildable source, whose "only git" clause
+  tensions with (2).
+  **Cost while deferred:** every new gate adds shell to the eventual port and the
+  silent-failure classes stay reachable. **A net drain on the queue, not a generator:**
+  promoting it closes `gate-battery-parallel-execution` and `gate-battery-result-cache`
+  and converges with `state-representation-integrity`. Feature-shaped: adds governed
+  names. Filed 2026-07-28 by operator request.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
@@ -2539,11 +2549,65 @@
   **Why `[design-pending]`:** the projection needs a parseable edge grammar the queue
   does not declare today, and declaring one touches queue-kit/SPEC.md §The tag algebra
   — a contract change rather than a script.
+  **Split 2026-08-02 by operator ruling — this entry is now the remainder.** The
+  derivable half is selected into `native-gate-substrate` as a unit and `/spec` owns
+  its amendment; what stays here is the un-gateable half above, which must not vanish
+  because the tool half shipped.
   **Cost while deferred:** one wrongly-ranked unit set per scope, argued confidently
   from real evidence, detectable only by an operator who remembers the entry. It does
   not rot, but it recurs exactly where being wrong is most expensive — the iteration's
   composition decision. Absorbs the narrower gap-inbox bullet filed the same day.
   Filed 2026-08-02 by scope, operator-directed after the omission above.
+
+- **gate-payload-disclosure-ruling** [design-pending] — what a compiled gate ships to a
+  consumer tree. Companion to `native-gate-binary-port`, inside that entry's envelope
+  and filed apart so neither body sprawls.
+  **Today's answer is an artifact of the substrate, not a choice:** a bash gate *is*
+  its source, so there is nothing else to ship. Measured 2026-08-02 —
+  `scripts/pack-installer.sh`:80 copies whole kit roots, `installer/lib/init.sh`:130-132
+  writes every file of each, and a profile selects kits and never files, so a consumer
+  receives `checks/`, `gate-tests/`, `smoke/`, `lib/` and `bin/` entire, over both
+  transports.
+  **Once gates compile it becomes a lever:** binary plus documented rule, or sources
+  and fixtures as now. That choice is what fixes the opacity range the parent states,
+  which is why it is a first-class design question rather than a packaging detail.
+  **Counterweight the ruling must carry:** withholding sources **raises** the
+  reproducible-build and checksum obligation, because a consumer who cannot read the
+  gate has only the build's attestation — and "buildable source, needing only git" is
+  already in the parent's own deliverable.
+  **A contract question that must not be discovered late:** the `good/`+`bad/` fixture
+  pair is a gate-sdk contract held by meta-gates, and whether that contract is
+  development-side or shipping-side is unstated today.
+  **Cost while deferred:** the parent's headline benefit stays a range rather than a
+  value, so a first cohort could land on a substrate whose main justification is still
+  unsettled. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
+  decision the port owns rather than an inheritance from the bash era.
+
+- **queue-entry-evidence-tier** [design-pending] — a queue entry has no tier beneath it,
+  so every fact a later session must not re-derive gets written into the entry body and
+  the body grows without bound. Reproduced 2026-08-02: one scope session ordered three
+  additions into `native-gate-binary-port` — a sharpened rationale, a promotion
+  dividend, a costed negative result — each justified by "a later session must not
+  re-derive this", taking the entry to 55 lines against a 50-line cap.
+  **No oracle covers the error itself.** `check-queue-entry-budget` caps a body but is
+  silent on where displaced content belongs, and `check-brevity` couples to `CLAUDE.md`
+  alone — so nothing reds on the tiering mistake, only on its symptom, and only after
+  the mistake is made.
+  **The existing affordances and their limits.** Companion entries and sub-tasks work
+  when the displaced content is *work*; they do not model a closed negative result,
+  which is a record rather than a task. An amendment is the right home for design
+  rationale but lives only while its unit does. The gap is a durable in-tree tier for
+  facts that are neither work nor live design.
+  **Two constraints that rule out the obvious fallback.** A session transcript cannot
+  be cited: this repo is public and CLAUDE.md forbids internal session references in
+  tracked files. And under spec-over-precedent, history evidences *that* an alternative
+  was costed, never *that the costing is right* — so a pointer to a session is weaker
+  than it looks even where it would be legal.
+  **Cost while deferred:** entry bodies keep absorbing evidence, and the only detector
+  is a cap that fires after the tiering decision has already gone wrong.
+  Filed 2026-08-02 by scope on operator intake. The operator previously proposed an
+  evidence-submission mechanism and it was declined in favour of boxed entries; this
+  failure mode is the ground for revisiting that ruling.
 
 ## Icebox
 
