@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-port-unblocking
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,81 @@
 ## New Features
 
 ## Technical Debt
+
+- **native-gate-language-ruling** — record a closed language decision. Land the
+  substrate language and the alternative it beat in gate-sdk/SPEC.md beside
+  §Porting a gate to the binary substrate, so the choice survives the amendment that
+  implements it. Sibling in shape to `bash-portability-floor-costing`: the
+  deliverable is the recording, and what follows is neither re-derived nor re-opened.
+  **Ruled 2026-08-02 by the operator, final: Rust.** The alternative weighed and
+  **refused is Go**, on three stated grounds — larger binaries, poor memory
+  management under a primitive garbage collector, and a weaker compiler. The
+  comparison had already been made in an earlier session; the ruling had to be
+  restated because no surface carried it, which is the cost this entry exists to end.
+  **Why a distinct entry rather than parent prose:** the operator's standing rule
+  that a task compression must be lossless — anything that will not fit is relocated
+  to a linked task, never dropped. The parent red on `check-queue-entry-budget` three
+  times on 2026-08-02, so the decision could not fit there, and it had already been
+  lost once: the 2026-07-28 filing carried `language choice (Rust vs Go)` as an open
+  question and the compression removed it without answering it.
+  **Debt, not a feature:** the ruling is closed and the work is prose in an existing
+  SPEC section — no script, knob, convention, tag, or contract another component must
+  honor, so the amendment litmus (canon-kit/SPEC.md §The amendment lifecycle) does
+  not reach it.
+  **Verified undone 2026-08-02 at scope:** zero hits tree-wide, outside this file,
+  for the ruling or its grounds. Promoted by scope on the operator's unit-set ruling.
+
+- **bash-portability-floor-costing** — record a closed costing. Land the costed
+  rejection of a bash portability floor in gate-sdk/SPEC.md beside §Porting a gate to
+  the binary substrate, so the reasoning outlives the amendment that carries it.
+  Companion to `native-gate-binary-port`: the work is the recording, and the costing
+  below is not to be re-derived.
+  **What was costed 2026-08-02:** shimming or dropping the GNU-only constructs the
+  battery depends on — the gate library's nameref and `realpath --relative-to`, gawk's
+  3-arg `match()`, `sort -V`, `date -d`, `stat -c`. Blast radius about 25 files, mostly
+  single call sites, two shared libraries carrying most of the leverage: an estimated
+  2-4 small units.
+  **Why closed rather than deferred:** it cannot deliver the reach it would be bought
+  for. Stock macOS bash 3.2 is unreachable by shims, and `mapfile`/`declare -A` appear
+  in **57 of 96** checks — recounted 2026-08-02 at scope against the filed "56 of 100",
+  conclusion unchanged — so the floor buys BSD-userland tolerance, never a stock-macOS
+  install, which is the thing the port is wanted for. Record the recounted figure.
+  **Debt, not a feature:** as with `native-gate-language-ruling`, the ruling is closed
+  and the deliverable is prose in an existing SPEC section.
+  **Verified undone 2026-08-02 at scope:** zero hits tree-wide, outside this file, for
+  the costing. It does not close the narrower installer-and-probe trade, which stays
+  with `install-path-gnu-userland-undeclared`. Promoted by scope on the operator's
+  unit-set ruling; the operator supplied this argument from memory twice in one
+  session because no surface carried it.
+
+- **scope-survey-counter-evidence** — scope's premise re-verification is a
+  confirmation channel: it reads an entry *for* falsifiable claims, finds them, and
+  never runs a pass for evidence the other way. Reproduced 2026-08-02 on
+  `native-gate-binary-port`, where a scope falsified four premises and recommended
+  against the unit, while the entry's self-declared sharpest ground (gate opacity)
+  went uncited and three siblings stating that the port closes or converges with them
+  went unaggregated. The operator supplied both from memory.
+  **The derivable half shipped** as `queue-inbound-edge-projection`
+  (`queue-kit/bin/queue-edges.sh`), which sums a slug's inbound edges and carries each
+  citing line verbatim; build narrowed the ask to a stdout tool with cause in
+  queue-kit/SPEC.md §bin/queue-edges.sh — a later session must not helpfully restore
+  the projection. What remains is the un-gateable half alone.
+  **Deliverable: one line in `.workflow/audit-roster.txt`** naming the
+  survey-engagement class — whether a survey engaged an entry's strongest ground and
+  aggregated its inbound edges before ranking. That is a session act with no
+  mechanical residue, the `close-surface-actually-read` class exactly, and that
+  sibling class is already a roster member with a declared one-line format — so this
+  is a populated-surface edit, not a design act. Debt for that reason.
+  **Promotion-ready as of 2026-08-02 at close; promoted at the next scope**, whose own
+  conduct is the standing evidence: that session aggregated inbound edges with the
+  shipped tool before ranking and engaged the opacity ground — the behaviour the
+  roster line names.
+  **Not recorded by untagging:** the lead ruled the deferred-section design marker be
+  dropped and the oracle refused, correctly — queue-kit/SPEC.md §The icebox tier makes it
+  section membership carried by every deferred entry alike, so it never discriminated
+  readiness. Readiness is body content.
+  Filed 2026-08-02 by scope, operator-directed. Absorbs the narrower gap-inbox bullet
+  filed the same day.
 
 ## Deferred
 
@@ -935,10 +1010,12 @@
   fixtures**, and a static binary as a stronger front-door install claim than the
   utility list. Both stood in the 2026-07-28 filing; neither has been falsified.
   **Two grounds it must NOT rest on, both falsified 2026-08-02 at scope.** *Speed* —
-  a port does not delete `check-shellcheck`, and no timing artifact survives, so a
-  baseline is captured before the first cohort retires a script. *Platform reach* —
-  it retires one of six `context-kit/lib/toolfloor.sh` pins; the rest survive in kit
-  `bin/` and the hook emitter, and `init` hands to bash, so Windows stays blocked.
+  a port does not delete `check-shellcheck`; the pre-port baseline has since been
+  captured (`.workflow/gate-timing-baseline.txt`) and already reads stale, which is
+  `gate-timing-baseline-comparability`. *Platform reach* — re-counted 2026-08-02: it
+  retires one of **seven** `context-kit/lib/toolfloor.sh` pins and the substrate work
+  itself added one (`cargo:1.56`); the rest survive in kit `bin/` and the hook
+  emitter, and `init` hands to bash, so Windows stays blocked.
   **Open design questions, each held by a linked entry — none may be dropped again.**
   (1) *The `# graph:` manifest* — ruled by `native-gate-dispatch-seam`, slice 1.
   (2) *The consumer payload* — `gate-payload-disclosure-ruling`.
@@ -2518,75 +2595,6 @@
   Filed 2026-08-02 by scope from supplemental operator intake during the unit-set
   survey; scope-gated intake, so filed costed rather than started.
 
-- **scope-survey-counter-evidence** [design-pending] — scope's premise re-verification
-  is a confirmation channel: it reads an entry *for* falsifiable claims, finds them,
-  and never runs a pass for evidence the other way. Reproduced 2026-08-02 on
-  `native-gate-binary-port`, where this scope falsified four of the entry's premises
-  and recommended against the unit as "no adopter-visible capability" and "a
-  deferred-task generator" — while the entry's self-declared sharpest ground (gate
-  opacity, filed 2026-07-28) went uncited, and three sibling entries stating that the
-  port *closes or converges with them* went unaggregated. The operator supplied both
-  from memory rather than reading them off the tree.
-  **Two hypotheses, tested rather than assumed — the second needed correcting, and the
-  correction is what decides the fix.**
-  (1) *Confirmation channel — holds.* Both delegated sweeps asked only "verify claim X
-  / is premise Y still true": ten numbered questions, every one a falsification test,
-  none asking what the entry claims in its own favour. Four falsifications returned,
-  the thesis was complete, and the survey stopped.
-  (2) *Cross-references structurally invisible — does not hold.* The sibling entries
-  were read, and one was edited in the same session. The failure was **aggregation,
-  not retrieval**: nothing sums an entry's inbound edges into its own cost/benefit. So
-  a prose rule to "follow the cross-references" would not have changed the outcome,
-  because they were followed.
-  **Deliverable, split by what an oracle can reach — and the derivable half shipped
-  2026-08-02** as `queue-inbound-edge-projection`: the citation grammar the queue used
-  but never declared, plus `queue-kit/bin/queue-edges.sh`, which sums a slug's inbound
-  edges and carries each citing line verbatim. Scope's premise re-verification now
-  aggregates before ranking. Build narrowed this entry's "generated and
-  freshness-gated" ask to a stdout tool, with cause reasoned in queue-kit/SPEC.md
-  §bin/queue-edges.sh — a later session must not helpfully restore the projection.
-  What stays here is the un-gateable half alone, which must not vanish because the
-  tool half shipped.
-  *Un-gateable — stated plainly rather than dressed as mechanism.* Whether a survey
-  engaged an entry's strongest ground is a session act with no mechanical residue: the
-  `close-surface-actually-read` class exactly. Its home is `.workflow/audit-roster.txt`
-  as a named class, not one more prose step that drifts.
-  **Promotion-ready as of 2026-08-02 at close — no design work remains.** The original
-  reservation (an edge grammar the queue did not declare) was discharged this
-  iteration; the roster above is live with three classes and a declared
-  one-line-per-class format, and the sibling class this entry reasons from is already
-  a member — so adding a class is a populated-surface edit, not a design act; and the
-  entry has zero inbound edges. The deliverable is one roster line naming the
-  survey-engagement class. *Recorded here rather than by untagging:* the lead ruled the
-  marker be dropped, and the oracle refuses it — correctly, since queue-kit/SPEC.md
-  §The icebox tier makes that marker **section membership** carried by every deferred
-  entry alike, so it never discriminated readiness. Readiness is body content.
-  **Cost while deferred:** one wrongly-ranked unit set per scope, argued confidently
-  from real evidence, detectable only by an operator who remembers the entry. It does
-  not rot, but it recurs exactly where being wrong is most expensive — the iteration's
-  composition decision. Absorbs the narrower gap-inbox bullet filed the same day.
-  Filed 2026-08-02 by scope, operator-directed after the omission above.
-
-- **bash-portability-floor-costing** [design-pending] — record a closed costing.
-  Land the costed rejection of a bash portability floor in the canonical SPEC beside
-  `native-gate-binary-port`'s substrate section, so the reasoning outlives the
-  amendment that carries it. Companion to that entry: the work is the recording, and
-  the costing below is not to be re-derived.
-  **What was costed 2026-08-02:** shimming or dropping the GNU-only constructs the
-  battery depends on — the gate library's nameref and `realpath --relative-to`, gawk's
-  3-arg `match()`, `sort -V`, `date -d`, `stat -c`. Blast radius about 25 files, mostly
-  single call sites, two shared libraries carrying most of the leverage: an estimated
-  2-4 small units.
-  **Why closed rather than deferred:** it cannot deliver the reach it would be bought
-  for. Stock macOS bash 3.2 is unreachable by shims, and `mapfile`/`declare -A` appear
-  in 56 of 100 checks — so the floor buys BSD-userland tolerance, never a stock-macOS
-  install, which is the thing the port is wanted for.
-  **Cost while deferred:** the operator supplied this argument from memory twice in one
-  session because no surface carried it; until it lands, the next substrate discussion
-  re-derives it a fourth time.
-  Filed 2026-08-02 by scope on the lead's ruling that a closed costing belongs in a
-  companion entry rather than in the parent's body.
-
 - **gate-payload-disclosure-ruling** [design-pending] — what a compiled gate ships to a
   consumer tree. Companion to `native-gate-binary-port`, inside that entry's envelope
   and filed apart so neither body sprawls.
@@ -2613,29 +2621,12 @@
   binary-versus-sources framing above otherwise hides.
   **Cost while deferred:** the parent's headline benefit stays a range rather than a
   value, so a first cohort could land on a substrate whose main justification is still
-  unsettled. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
+  unsettled. **Taken into the `native-port-unblocking` iteration by operator direction
+  2026-08-02**, and not separably from `native-gate-vendoring-model`: the cheapest
+  install model on the table — a descriptor declaring a shell fallback, so an absent
+  binary degrades to it — hands the consumer the source and settles this entry by
+  accident. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
   decision the port owns rather than an inheritance from the bash era.
-
-- **native-gate-language-ruling** [design-pending] — record a closed language decision.
-  Land the substrate language and the alternative it beat in the canonical SPEC, so
-  the choice survives the amendment that implements it. Sibling in shape to
-  `bash-portability-floor-costing`: the deliverable is the recording, and what
-  follows is neither re-derived nor re-opened.
-  **Ruled 2026-08-02 by the operator, final: Rust.** The alternative weighed and
-  **refused is Go**, on three stated grounds — larger binaries, poor memory
-  management under a primitive garbage collector, and a weaker compiler. The
-  comparison had already been made in an earlier session; the ruling had to be
-  restated because no surface carried it, which is the cost this entry exists to end.
-  **Why a distinct entry rather than parent prose:** the operator's standing rule
-  that a task compression must be lossless — anything that will not fit is relocated
-  to a linked task, never dropped. The parent red on `check-queue-entry-budget` three
-  times on 2026-08-02, so the decision could not fit there, and it had already been
-  lost once: the 2026-07-28 filing carried `language choice (Rust vs Go)` as an open
-  question and the compression removed it without answering it.
-  **Cost while deferred:** the parent states the language and no surface states why,
-  so the next substrate discussion re-derives the Go comparison a third time — which
-  is what happened on 2026-08-02.
-  Filed 2026-08-02 by spec on the operator's ruling, restoring a dropped ground.
 
 - **native-gate-vendoring-model** [design-pending] — how a binary-substrate kit installs.
   **Distribution is the hard part, not the language** — the parent's oldest constraint,
@@ -2674,6 +2665,8 @@
   (crate, descriptor spelling, resolution split, conservation contract, parity gate)
   waits on an install model, and the reference-only implementation is the only thing
   keeping the crate's tests from asserting over nothing.
+  **Taken into the `native-port-unblocking` iteration by operator direction
+  2026-08-02**, ahead of nearer-payoff work, on exactly the cost above.
   Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
   Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
   reverted the port.
@@ -2857,33 +2850,66 @@
   (fresh build every run); the exposure is local pre-commit-gated commits only.
   Filed 2026-08-02 at close from the gap inbox; found during validate.
 
-- **native-gate-meta-layer-reach** [design-pending] — the meta-gates do not reach
-  a ported gate's implementation, in two independent places found by running the
-  battery rather than by reading it.
-  **(1) `check-gate-tamper`'s path roster excludes `native/`,** so a commit editing
-  a ported gate's implementation alongside any gate file is **refused**. Discovered
-  at commit time during `native-gate-dispatch-seam` build: the crate and a gate
-  widening could not land together. Slice 1 sequenced around it — implementation in
-  one commit, descriptor in another — and the conservation table records it, but the
-  constraint gets *worse per port*, because the natural unit "edit the gate's rule
-  and its declaration together" is precisely what the roster forbids. Same gate,
-  second hole: `extract_exemptions()` parses a shell `# exception-list:` array
-  literal and has no implementation-side equivalent.
-  **(2) `check-reads-couples` records coverage as absent rather than providing it.**
-  It refuses (exit 2) on a `.gate` member unless the descriptor carries a
-  `# reads-couples-exempt:` reason. Slice 1's single ported gate was honest here —
-  its one walk was already undecidable and skipped-and-counted in shell, verified by
-  running the pre-port script through the gate — so the port ended no assertion. A
-  second port need not be so lucky, and the exemption is **free-text with no task
-  binding**, which is the shape that accumulates silently.
-  **Why `[design-pending]`:** both want the same ruling — whether a meta-gate reads
-  a substrate-neutral descriptor or learns each substrate — which is
-  `gate-authoring-sdk-surface`'s question seen from the enforcement side. Splitting
-  them before that ruling would answer it twice, differently.
-  **Cost while deferred:** zero today (one reverted port, no live `.gate` dispatch);
-  from the second port on, the natural commit unit is forbidden and a growing pile of
-  free-text exemptions stands in for coverage that was never provided.
-  Filed 2026-08-02 at close from the gap inbox; found by build and by validate.
+- **native-gate-meta-layer-reach** [design-pending] — `check-reads-couples` has no
+  binary-side equivalent, and until one exists no further gate can be ported.
+  **Narrowed 2026-08-02 at scope to this half alone**, by operator ruling; the
+  `check-gate-tamper` half left as `gate-tamper-roster-native-reach` and stays
+  deferred. gate-sdk/SPEC.md §Porting a gate to the binary substrate names this
+  absence as one of the two prerequisites a second port needs, the other being
+  `native-gate-vendoring-model`.
+  **The filed premise was falsified at the narrowing, and that correction is what
+  makes the split safe.** This entry said the gate refuses "unless the descriptor
+  carries a `# reads-couples-exempt:` reason", free-text and unbound to a task —
+  "the shape that accumulates silently". No such exemption exists:
+  `gate-sdk/checks/check-reads-couples.sh`:107-115 refuses exit 2 on any `.gate`
+  member unconditionally and says so in its own help — "There is deliberately no
+  descriptor-level exemption: a port that could opt out of this in a sentence would
+  end the assertion it must replace." The opt-out lived exactly as long as the live
+  port did and was removed with it. So the risk is not silent accumulation but a
+  **hard wall** — and this half no longer shares a ruling with the tamper half,
+  which was the whole reason the two could not be split before.
+  **What slice 1 proved, kept because it bounds the deliverable:** its single ported
+  gate was honest here — the one walk was already undecidable and
+  skipped-and-counted in shell, verified by running the pre-port script through the
+  gate — so that port ended no assertion. A second port need not be so lucky.
+  **Why `[design-pending]`:** the deliverable is a binary-side walk analysis ending
+  the same assertion the shell parser does, and whether that belongs to each
+  substrate or to a substrate-neutral descriptor is still
+  `gate-authoring-sdk-surface`'s question — narrowed here, not answered.
+  **Ordered into `native-port-unblocking` by operator direction 2026-08-02**, on the
+  ground that a second port is impossible for as long as this stands.
+  **Cost while deferred:** zero today (no live `.gate` dispatch); from the moment a
+  port is attempted it stops being a cost and becomes a refusal — the battery halts.
+  Filed 2026-08-02 at close from the gap inbox; found by validate. Narrowed, and its
+  premise corrected against the tree, 2026-08-02 at scope.
+
+- **gate-tamper-roster-native-reach** [design-pending] — `check-gate-tamper` does not
+  reach a ported gate's implementation. Split 2026-08-02 at scope from
+  `native-gate-meta-layer-reach` by operator ruling, when that entry narrowed to its
+  `check-reads-couples` half; this is the tamper half, unchanged in substance.
+  **The roster excludes `native/`,** so a commit editing a ported gate's
+  implementation alongside any gate file is **refused**. Discovered at commit time
+  during `native-gate-dispatch-seam` build: the crate and a gate widening could not
+  land together. Slice 1 sequenced around it — implementation in one commit,
+  descriptor in another — and the conservation table records it, but the constraint
+  gets *worse per port*, because the natural unit "edit the gate's rule and its
+  declaration together" is precisely what the roster forbids. Verified 2026-08-02 at
+  scope: the roster is `scripts/delegation-config.sh`'s `DELEGATION_KIT_META_PATHS`
+  unioned with the kit roots, and `native/` is in neither. Same gate, second hole:
+  `extract_exemptions()` parses a shell `# exception-list:` array literal and has no
+  implementation-side equivalent.
+  **Why `[design-pending]`:** it wants the ruling `gate-authoring-sdk-surface` holds
+  — whether a meta-gate reads a substrate-neutral descriptor or learns each
+  substrate — and that entry is horizon-set to ecosystem work, so this one waits.
+  **Why it did not ride the narrowing:** it is commit ergonomics, not a correctness
+  block. gate-sdk/SPEC.md §Porting a gate to the binary substrate names only the
+  `check-reads-couples` half as a second-port prerequisite; this half was sequenced
+  around once already and can be again.
+  **Cost while deferred:** zero today (no live `.gate` dispatch); from the second
+  port on, the natural commit unit is forbidden and every port pays the same
+  two-commit sequencing tax.
+  Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-02
+  at scope.
 
 - **gate-timing-baseline-comparability** [design-pending] — a baseline with no
   comparer decays into a number nobody can use. `battery-baseline-capture` shipped
@@ -2909,6 +2935,17 @@
   numbers advisory) and a freshness gate that invalidates the baseline on roster
   or environment change (cheap, but it deletes the only pre-port measurement the
   repo will ever be able to take). Those are opposite answers, not a size question.
+  **Held out of the `native-port-unblocking` iteration 2026-08-02 by operator
+  ruling — a trigger, not a dismissal.** That iteration unblocks a second port
+  without landing one, and this entry's surfaces (`.workflow/`, drift-kit) share
+  nothing with the gate-sdk SPEC surface the iteration amends, so it buys no
+  amortization. It becomes urgent the moment a second port is *scheduled*: that is
+  the comparison moment, and the baseline must be ruled before it arrives.
+  **Staleness measured rather than asserted, recomputed 2026-08-02 at scope so the
+  next reader need not:** the header pins gates.list sha256
+  `bd6c1cc8f8b89154d03fd80d4609d2b29efe82b5971dded6017564366923d5c9`; the file today
+  hashes `19074f2be101376afb8b490a7ad08cf3cef303b4e97e40bec6f3619247a7800e`. The
+  registry stands at 95 entries against the baseline's 94 rows.
   **Cost while deferred:** the port's headline justification stays unmeasurable in
   the one tree that could measure it — the before-numbers exist and quietly stop
   being comparable to any after-numbers, with no surface saying so.
