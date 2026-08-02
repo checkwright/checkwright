@@ -98,6 +98,10 @@ your `PATH`, and the note says what breaks without it:
 - `shellcheck` — the `check-shellcheck` meta-gate runs
   [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
   lint finding blocks the commit.
+- `cargo` (≥ 1.56) — a build-time requirement, not a runtime one: the `native/`
+  crate compiles the gates that dispatch to a binary subcommand, and the floor is
+  the crate's `edition = "2021"`. Only contributors building the tree need it;
+  a ported gate shells out to git at runtime and embeds nothing.
 
 <!-- toolchain:end -->
 

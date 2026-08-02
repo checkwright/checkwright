@@ -282,6 +282,16 @@ The constrained members and what forces each:
   the battery at all rather than failing one gate. The representative member is
   the binary carrying a forcing construct, which is also the floor predicate's
   own comparison tool.
+- `cargo:1.56` — a **contributor/build** floor, not a runtime one: it is forced by
+  the `native/` crate's `edition = "2021"`, the first edition rustc accepts at
+  1.56. `cargo` is the member rather than `rustc` because `cargo build` is what the
+  contributor routine and the `gates` workflow actually invoke, and the two ship as
+  one toolchain sharing a version banner — the representative-member rule the
+  `sort::coreutils` entry above states. The floor tracks the edition the crate
+  declares, not whatever rustc a given box happens to carry; pinning the latter
+  would be exactly the aspiration this section's rule forbids. Runtime is
+  unaffected: git remains the sole runtime dependency of a ported gate, shelled out
+  rather than embedded (`native-gate-vendoring-model` owns that constraint).
 Every other member is a bare name — no construct in the battery forces a version
 on it (the `jq` usage is 1.5-era throughout), so none is pinned.
 
