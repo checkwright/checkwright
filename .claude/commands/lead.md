@@ -26,23 +26,16 @@ the template §Economics "Tier each batch to its work class" rule now names:
   *verification against an already-authored contract*: it audits the tree and
   the spec against each other and reports divergence, rather than generating the
   contract, which is `spec`'s work. That reading is what tiers it — the measured
-  spend only says the tier is worth re-judging, never which way. It was taken
-  provisionally, on the one stage carrying an adversarial-audit role, against a
-  named revert signal: a missed spec defect surfacing as a build round-trip,
-  one such miss outweighing the saving.
-  **Verdict after the first full iteration on it (`shipped-roster-parity`,
-  2026-08-02): keep.** The miss-shaped failure did not occur — align found the
-  iteration's one load-bearing defect and reached the same escalation the lead
-  reached, from its own evidence rather than by being told. That is the
-  departure's premise holding, not merely its absence of harm. The revert
-  signal stays live and unchanged; one confirming iteration retires the
-  provisional label, not the watch.
+  spend only says the tier is worth re-judging, never which way.
+  **Ruled kept 2026-08-02**, after its first full iteration, on the criterion the
+  departure was taken under: the revert signal — a missed spec defect surfacing as
+  a build round-trip — did not fire, and align found that iteration's one
+  load-bearing defect and reached the lead's own escalation from its own evidence.
+  The signal stays live; the ruling retired the provisional label, not the watch.
   **Watch the draw, not the dollars** — a cheaper per-token rate makes a growing
-  draw read flat in cost, so the trend is judged on the `cr` column of
-  `.metric/stage-economics-log.txt`, never on `cost`. Reading at this verdict:
-  align's cache-read fell against the preceding iterations rather than
-  continuing to climb, so the growth this watch exists for did not appear in
-  the tiering-down iteration. One point is not a trend — keep reading it.
+  draw read flat in cost, so align's trend is judged on the `cr` column of
+  `.metric/stage-economics-log.txt`, never on `cost`. It fell at the ruling rather
+  than continuing to climb; one point is not a trend.
 
 scope, `spec`, and close stay on Opus, their generative and verificational
 judgment being what justifies the tier. Re-judge every tier when the harness

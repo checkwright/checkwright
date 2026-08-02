@@ -2420,9 +2420,4 @@
 
 ## Done
 
-- queue-kit-starter-template-red
-- spec-roster-enumeration-derivation
-- kit-template-registry-completeness
-- battery-roster-hand-copy
-
 ## Lessons Learned

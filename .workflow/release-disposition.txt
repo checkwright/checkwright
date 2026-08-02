@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
+shipped-roster-parity release deferred:v0.22.0 — no cadence trigger fired: newest tag v0.21.0 is 26 hours old against a 7-day floor, the batch carries no decommission and no security or supply-chain fix, and no operator direction was given. Own bump derives Minor (tightened-gates.txt is non-empty: check-template-registry-parity and check-battery-roster landed this iteration, atop two carried from the last deferral), which meets but does not exceed the outstanding v0.22.0 floor, so the floor is unchanged and the declarations ride the next qualifying release. Second consecutive deferral at this version — stated, not silent.
