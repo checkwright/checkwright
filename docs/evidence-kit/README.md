@@ -28,6 +28,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    ```
    check-evidence-baseline
    check-evidence-manifest
+   check-battery-roster
    ```
    <!-- gate-roster:end -->
 

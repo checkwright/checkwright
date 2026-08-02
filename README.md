@@ -102,9 +102,18 @@ kit is split out only if it earns independent adoption.
 ## This repo, governed
 
 The gates registered in [`scripts/gates.list`](scripts/gates.list) run on this
-tree. Before committing, run the full battery, each kit's fixture suite, and the
-guard-kit decision table:
+tree. What a *commit* owes is the full battery plus the touched kit's fixture
+suite — that selection rule is [`CLAUDE.md`](CLAUDE.md)'s, stated there and not
+restated here.
 
+The block below is a different thing: the **register of this repo's runnable
+verification suites**, the set the validate stage runs in full. It is held in
+name-set parity with the configured `EVIDENCE_KIT_SUITES` by
+`check-battery-roster`, so the register is complete by enforcement — a suite
+validate runs and this block omits is red, and so is a line whose command runs
+no configured suite.
+
+<!-- battery-roster:begin -->
 ```bash
 bash gate-sdk/bin/run-gates.sh                                                      # full battery
 bash gate-sdk/bin/run-gate-tests.sh gate-sdk/gate-tests gate-sdk/checks             # gate-sdk fixtures
@@ -119,8 +128,17 @@ bash gate-sdk/bin/run-gate-tests.sh doctrine-kit/gate-tests doctrine-kit/checks 
 bash gate-sdk/bin/run-gate-tests.sh scripts/gate-tests                              # consumer-gate fixtures
 bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                            # guard-kit bin unit tests
 bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
+bash delegation-kit/bin/run-usage-tests.sh                                          # delegation-kit usage accounting
+bash delegation-kit/bin/run-budget-guard-tests.sh                                   # delegation-kit budget guard
+bash delegation-kit/bin/run-trend-tests.sh                                          # delegation-kit trend reader
+bash context-kit/bin/run-index-tests.sh                                             # context-kit index tools
+bash context-kit/smoke/agents-md.sh                                                 # the AGENTS.md projection, end to end
+bash gate-sdk/bin/run-consumer-smoke.sh                                             # every kit installs into a scratch consumer
+bash gate-sdk/bin/upgrade-smoke.sh                                                  # a vendored tree upgrades in place
 bash installer/consumer-smoke/run-smoke.sh                                          # the activation path, per profile
+bash demo/run-demo.sh                                                               # the adoption walkthrough
 ```
+<!-- battery-roster:end -->
 
 `bash gate-sdk/bin/install-hooks.sh` opts this clone into the generated
 pre-commit and commit-msg hooks. The repo also runs lifecycle-kit's own iteration state

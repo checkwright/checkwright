@@ -1537,7 +1537,19 @@ line** — every kit root with
 tracked `gate-tests/` files (`git ls-files <kit>/gate-tests/`) has a line in the
 runner doc naming `<kit>/gate-tests` (the documented fixture-runner
 invocation), so a kit whose fixtures never entered the battery is red. A kit
-without `gate-tests/` (guard-kit, drift-kit) owes nothing under B.
+shipping no tracked `gate-tests/` files (drift-kit) owes nothing under B — the
+carve-out is derived from the tree per run, not a standing list, so a kit that
+grows fixtures loses it the moment they are tracked.
+
+B is deliberately redundant with evidence-kit's `check-battery-roster`
+(evidence-kit/SPEC.md §check-battery-roster), whose assertion (A) holds the same
+runner doc against the configured suite roster and, where that config derives
+the fixture suites from the `gate-tests/` roots, supersets B. The redundancy is
+kept on a dependency direction: **gate-sdk may not read evidence-kit config**,
+so B is the arm that survives a gate-sdk-only adoption — the more common shape —
+and retiring it would trade a duplicate finding for a coverage hole. One
+omission named differently from each side (a kit root here, a suite there) is a
+duplicate finding, not a contradiction.
 
 Config, the standard kit shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 is A's doc, `GATE_SDK_RUNNER_DOC` (default `README.md`) is B's; both resolve

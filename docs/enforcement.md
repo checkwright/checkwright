@@ -113,6 +113,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-deprecation-task | precommit |
 | [evidence-kit](evidence-kit/index.md) | check-evidence-baseline | precommit |
 | [evidence-kit](evidence-kit/index.md) | check-evidence-manifest | precommit |
+| [evidence-kit](evidence-kit/index.md) | check-battery-roster | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-gate-tamper | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-rule-citation | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-agent-tier-explicit | precommit |

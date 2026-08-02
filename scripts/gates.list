@@ -88,6 +88,7 @@ check-todo-task-liveness
 check-deprecation-task
 check-evidence-baseline
 check-evidence-manifest
+check-battery-roster
 check-gate-tamper
 check-rule-citation
 check-agent-tier-explicit

@@ -2,3 +2,4 @@
 check-docs-link-convention
 check-action-run-shell
 check-template-registry-parity
+check-battery-roster

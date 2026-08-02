@@ -12,42 +12,6 @@
 
 ## New Features
 
-- **battery-roster-hand-copy** [spec: evidence-kit/SPEC-battery-roster.md] — the
-  root README's pre-commit battery block is a **second hand-maintained copy of a
-  set another surface already owns**, and it is incomplete. README.md §This repo,
-  governed lists one `run-gate-tests.sh` line per kit plus the consumer-gate
-  fixtures plus the guard-kit decision table, but seven suites that
-  `scripts/evidence-config.sh` carries are absent:
-  `delegation-kit/bin/run-usage-tests.sh`,
-  `delegation-kit/bin/run-budget-guard-tests.sh`,
-  `delegation-kit/bin/run-trend-tests.sh`, `context-kit/bin/run-index-tests.sh`,
-  `consumer_smoke`, `upgrade` and `agents_md_smoke`. A contributor touching
-  `delegation-kit/bin/usage-verdict.sh` or `context-kit/bin/md-index.sh` and
-  following the root README runs the gate fixtures and none of these. CLAUDE.md
-  carries no duplicate roster, so this is **one** surface — do not budget a
-  second edit.
-  **Ruled at spec 2026-08-01 — a parity gate, not a generated block.** The
-  derivation-first question the entry posed (generate the block from
-  `EVIDENCE_KIT_SUITES`?) is answered against generation, on the precedent
-  gate-sdk/SPEC.md §check-readme-roster already set for the identical shape: the
-  roster *names* are derivable but the per-line annotation clauses beside them
-  are hand prose, so a gate asserts parity over a human-read register rather than
-  an emitter replacing it. New gate `check-battery-roster` (evidence-kit), new
-  knob `EVIDENCE_KIT_RUNNER_DOC`, a `battery-roster:` marker pair in the README.
-  **Second ruling — the block's framing is corrected, not just completed.**
-  Completed under its current "before committing" framing the block would tell a
-  contributor to run the demo, both smokes and the upgrade smoke on every commit,
-  which contradicts CLAUDE.md's per-commit rule. It is reframed as the register
-  of the repo's runnable verification suites — the set validate runs in full.
-  **Third ruling — the overlap with `check-kit-registration` assertion B is kept
-  and stated on both sides**, because gate-sdk may not read evidence-kit config
-  and B is the arm that survives a gate-sdk-only adoption.
-  **Cost while deferred:** a contributor following the documented battery runs
-  a strict subset of it, so a red one of these suites reaches CI rather than the
-  pre-commit hook.
-  Surfaced 2026-08-01 by the align audit; filed at close from the gap inbox;
-  promoted 2026-08-01 by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -2276,5 +2240,6 @@
 - queue-kit-starter-template-red
 - spec-roster-enumeration-derivation
 - kit-template-registry-completeness
+- battery-roster-hand-copy
 
 ## Lessons Learned

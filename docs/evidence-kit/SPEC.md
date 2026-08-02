@@ -60,6 +60,14 @@ Knobs, this repo's surface names as defaults:
   regen, container teardown) kept on the consumer side of the spine.
 - `EVIDENCE_KIT_PERMANENT_SLUGS` — blocking slugs that satisfy baseline liveness
   without a live queue task.
+- `EVIDENCE_KIT_RUNNER_DOC` (default `README.md`, resolved against the git
+  toplevel) — the doc whose battery-roster block `check-battery-roster` holds
+  against the suite roster. It is gate-local: nothing in the validate run path
+  reads it, so the loader fills no default for it and the gate carries its own.
+  The name mirrors gate-sdk's `GATE_SDK_RUNNER_DOC` deliberately — in a tree
+  vendoring both kits the two name the same physical doc for two different
+  assertions, and a reader who has met one should not have to learn a second
+  vocabulary for the other.
 
 ## Per-component contracts
 
@@ -213,6 +221,74 @@ Argument mode `$1 $2 $3` (manifest, queue, state) makes it fixture-capable; the
 close-entry and stamp-coupling assertions are covered by
 `gate-tests/check-evidence-manifest.test.sh`.
 
+### check-battery-roster
+
+Invariant: the configured runner doc's battery-roster block holds name-set
+parity with `EVIDENCE_KIT_SUITES`, both directions. The suite roster is
+machine-owned and the doc block is a hand copy of it — the
+`check-readme-roster` fork (gate-sdk/SPEC.md §check-readme-roster) applied to
+the validate battery: the register stays a human-read list carrying per-line
+annotation prose an emitter would have to invent, and a gate holds it honest
+rather than generating it.
+
+Marker vocabulary follows that gate verbatim in shape: the doc wraps its
+register in `<!-- battery-roster:begin -->` / `<!-- battery-roster:end -->`
+markers, which may carry leading indentation (the scan trims surrounding
+whitespace before matching, since a README nests the block inside a list item).
+Inside the markers a **roster line** is a line whose content begins with
+`bash `; a trailing `#` annotation clause is prose the gate never reads.
+Outside the markers nothing is scanned, so the same command appearing elsewhere
+in the doc for a different rhetorical job neither satisfies nor violates the
+gate — which is why the block, not the whole doc, is the unit.
+
+A suite's **documented invocation** is `EVIDENCE_KIT_RUN_<suite>` normalized by
+stripping a leading `env` token and any leading `VAR=value` assignments, with
+or without that token: the run environment is a validate-harness concern (this
+repo's `gates` suite runs under gate-sdk's `GATE_SDK_VERBOSE` knob, whose value
+that kit's SPEC owns, to emit the per-gate tails its parser reads) and not
+something a contributor types. What remains is
+compared as an exact string, whitespace-collapsed on both sides so the block's
+annotation alignment carries no meaning.
+
+Two assertions over the suite set versus the roster set:
+
+- **(A) every suite is documented** — a member of `EVIDENCE_KIT_SUITES` whose
+  normalized invocation matches no roster line is red;
+- **(B) every roster line resolves to a suite** — a roster line whose command
+  matches no suite's normalized invocation is red, so a retired suite cannot
+  leave a stale line telling a contributor to run a command that is not a
+  configured suite.
+
+Each finding names the suite (A) or the command and its line (B), and the doc.
+A suite with no `EVIDENCE_KIT_RUN_<suite>` configured has no documented
+invocation to compare and is passed over: `bin/run-validate.sh` already exits 2
+on it, and reporting it here would send the reader to the doc to fix a config
+bug.
+
+The overlap with `check-kit-registration` assertion B (gate-sdk/SPEC.md
+§check-kit-registration) is deliberate. That assertion requires every kit root
+with tracked `gate-tests/` files to have a runner-doc line naming
+`<kit>/gate-tests`; because this repo's config derives exactly those roots into
+`EVIDENCE_KIT_SUITES` through `gate_fixture_suites`, assertion (A) here is a
+superset of that arm for a consumer running both kits. It is kept rather than
+retired on a dependency direction: gate-sdk may not read evidence-kit's
+configuration, so B is the arm that survives a gate-sdk-only adoption, which is
+the more common shape. Both sections say so, each naming the other, so the next
+reader who notices the redundancy finds the reason instead of re-deriving it.
+One omission reported from both sides is a duplicate finding, not a
+contradiction — the two name different sets (a kit root, a suite) in their
+output.
+
+Config: `EVIDENCE_KIT_RUNNER_DOC` (§Layout and configuration); positional form
+`check-battery-roster.sh [runner-doc]` overrides it against a hermetic fixture
+tree, the sibling meta-gates' shape. Fail-closed: a configured doc that does not
+exist, a doc carrying no marker block, an empty suite roster, or a non-repo cwd
+with no positional argument is a misconfiguration (exit 2), never a false clean.
+There is no empty-knob valve — a consumer keeping no runner doc opts out by not
+registering the gate in its `gates.list`, gate-sdk's registry opt-out shape. The
+fail-closed branches and the normalization arms beyond the one good/bad pair are
+covered by `gate-tests/check-battery-roster.test.sh`.
+
 ## lifecycle-kit integration
 
 Integration is two generic knobs on lifecycle-kit's side of the seam, each
@@ -250,6 +326,14 @@ evidence line proves the green result once the suites have run.
   forward, by the hosted-attestation payload. Every field has a reader there:
   iteration (A/C scoping), suite + verdict + counts (A's green-block test),
   sha256 (audit pinning of the producing log), date (A's stamp-ordering floor).
+- **Suite roster** (`EVIDENCE_KIT_SUITES` + `EVIDENCE_KIT_RUN_<suite>`) —
+  produced by consumer config, wholly or in part derived there; consumed by
+  `run-validate.sh` (what to run), by `check-evidence-manifest` (A's green
+  block), by `check-battery-roster` (the doc-parity compare), and — behind a
+  `declare -p` probe, so evidence-kit stays optional — by gate-sdk's
+  `bin/enforcement-map.sh`. Every one of them reads it by sourcing the config
+  through the loader rather than parsing the file, so a suite a derivation loop
+  adds is visible to all of them with no second parse to keep in step.
 - **Baseline line** — produced by human commits (initial seed, promotions);
   consumed by `diff-baseline.sh` (the per-scenario diff) and
   `check-evidence-baseline` (grammar, liveness, coverage).

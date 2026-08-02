@@ -367,6 +367,10 @@ if staged_matches '.workflow/validate-evidence.txt' 'TASK-QUEUE.md' '.workflow/W
     run_gate check-evidence-manifest evidence-kit/checks/check-evidence-manifest.sh
 fi
 
+if staged_matches 'README.md' 'scripts/evidence-config.sh' 'gate-sdk/lib/gate.sh'; then
+    run_gate check-battery-roster evidence-kit/checks/check-battery-roster.sh
+fi
+
 if staged_matches 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
     run_gate check-gate-tamper delegation-kit/checks/check-gate-tamper.sh
 fi

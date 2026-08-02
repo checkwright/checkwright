@@ -23,6 +23,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    check-evidence-baseline
    check-evidence-manifest
+   check-battery-roster
    ```
    <!-- gate-roster:end -->
 
