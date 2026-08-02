@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: vacuous-green-elimination
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,57 @@
 ## New Features
 
 ## Technical Debt
+
+- **vacuous-assertion-count-discipline** — an assertion that passes without
+  asserting has three attested instances in this tree and no craft rule names it.
+  In all three the tell was a **count**, never an exit code: the run was green and
+  the set it ranged over was empty.
+  **The three, all from `release-assertion-honesty`, all inside the fix for this
+  very class** — which is the evidence that it recurs, not the irony: (i) a
+  `None` predicate that silently matched nothing once it moved from `grep -E` to
+  awk, because `\b` is a word boundary in ERE and a backspace in awk's regex
+  (`awk '/\bNone\b/'` matches nothing on a literal `None` that `grep -cE
+  '\bNone\b'` counts 1); (ii) a helper arm that would have shipped with no
+  fixture to exercise it; (iii) a verification probe that mutated a gate the
+  consumer never registers, so it reported a 0-wide red set against a non-empty
+  declaration and read as a pass.
+  A fourth instance, live at HEAD and found while scoping this iteration:
+  `check-gate-exemption-tasks` reports `0 exemption array(s)` because no
+  `# exception-list:`-tagged array exists tree-wide — a green ranging over an
+  empty set, sitting under `gate-exemption-live-slug-derivation`'s fail-open.
+  **Where the concept already lives, partially.** `gate-sdk/SPEC.md` §run-gates
+  names the *vacuous-pass tripwire* — a gate's clean line carries its scanned
+  count, and `GATE_SDK_VERBOSE` is the reading that surfaces it — and
+  `doctrine-kit/DOCTRINE.md` rule 22 carries the runner half. What is unnamed is
+  the rule for a verification the *session itself* writes: a probe, a mutation,
+  a predicate under edit. The tripwire exists for the battery and nowhere else.
+  **Deliverable:** a craft rule in `doctrine-kit/DOCTRINE.md` §Engineering-craft
+  rules — a verification whose subject is a set reports that set's size, because
+  an exit code cannot distinguish "asserted and held" from "asserted nothing";
+  and a mutation probe is valid only against a target the assertion actually
+  ranges over. Its *Enforced by* line reads judgment, and must state the
+  two-of-three split below honestly rather than promise a scanner. Landing it is
+  a scoped unit rather than a passing edit because rule 11 licenses no
+  self-exemption.
+  **Gap generalization, per instance.** (i) is fixture-shaped — the missing
+  coverage is a good/bad pair over the `None` body, which the existing
+  fixture-pair contract already requires, so this is enforcement that went
+  unexercised rather than enforcement that is absent. (ii) is per-arm fixture
+  coverage, already carried as the iceboxed
+  `stage-economics-smoke-jq-arm-dormant`; a branch-coverage assertion over a
+  check's fixture corpus is its buildable form. (iii) is **not** gateable:
+  whether a session's mutation probe targeted something its assertion ranges
+  over is a property of a session act that leaves no residue in the tree.
+  **Scope ruling 2026-08-02 — the open call is closed: one craft rule, no gate.**
+  This entry was parked on whether it ships as a rule alone
+  or a rule plus the branch-coverage gate that generalization (ii) wants. It
+  ships as the rule alone, on the entry's own evidence: (i) is already required
+  by the fixture-pair contract, (ii) is separately conserved as the iceboxed
+  `stage-economics-smoke-jq-arm-dormant` and bundling it here would duplicate a
+  live entry, and (iii) is not gateable at all. A gate added here would therefore
+  either re-file iceboxed work or promise coverage two of the three instances
+  cannot receive. Filed 2026-07-31 at close, ruled task-shaped rather than
+  lesson-shaped because the deliverable and its done-state were both nameable.
 
 ## Deferred
 
@@ -1053,45 +1104,44 @@
   refused the combined body.
 
 - **gate-exemption-live-slug-derivation** [design-pending] — an exemption can
-  resolve green against no task at all. `check-gate-exemption-tasks` resolves an
-  `# until: <slug>` marker against a live-slug set it derives by scanning the
-  wrong thing, twice over.
-  **(1) Section span.** The scan opens on the active and deferred headings and
-  closes on Done / Lessons Learned with no reset on an unknown heading, so any
-  section added between them is silently swept in as live. The icebox tier
-  landed this iteration relies on exactly that accident for its placement.
-  **(2) Token scan — strictly worse than (1).** Inside that span the awk reads
-  every bold-emphasis token on every line rather than bullet lead lines, so the
-  live set is 109 tokens against `queue_live_slugs`' 61 real slugs. Spurious
-  members include `scope`, `debt`, `monitor`, `never`, `minor`, `resolved`,
-  `source`, `output` — an `# until: scope` exemption resolves green today,
-  against no task, with no icebox involved.
-  **Why `[design-pending]`:** the two halves are one fix and the fix is a seam
-  question — gate-sdk needs a real slug parse it can own **without depending on
-  queue-kit for the section set**, which the provenance seam forbids. Candidates
-  are a gate-sdk-owned live-section knob, an explicit heading reset, or a
-  lead-line predicate; which one keeps the gate consumer-agnostic is the open
-  call.
-  **Cost while deferred:** low and non-rotting, but live now rather than
-  contingent on the icebox — the token half is exploitable at HEAD, and it fails
-  **open** (an exemption that should red resolves green) rather than loud.
-  **Class, ruled 2026-08-01 at close:** every candidate fix above adds a name to
-  a governed surface — a gate-sdk live-section knob, or a heading/lead-line
-  predicate another component must honor — so canon-kit/SPEC.md's new-names
-  litmus makes this a **feature** owing an amendment, and it promotes into a
-  feature section rather than Technical Debt.
-  **Head candidate for the next iteration — operator ruling 2026-08-01 at the
-  `shipped-roster-parity` unit-set escalation.** Weighed for inclusion in that
-  iteration and deliberately left out: it sits on gate-sdk's exemption scan
-  rather than on a kit's install-time registry, so bundling it would have paid a
-  second design setup inside a single-ruling iteration. It is named the head
-  candidate for the next iteration **on its own merits** — it is the only
-  *fail-open* in this queue, and for a project whose stated strength is
-  deterministic self-testing gates, a green that means nothing is the worst
-  failure class shipped.
+  resolve green against no task at all. `check-gate-exemption-tasks` derives its
+  live-slug set by reading **every bold-emphasis token on every line** of the
+  scanned span rather than bullet lead lines
+  (`gate-sdk/checks/check-gate-exemption-tasks.sh`, the `match($0,
+  /\*\*[a-z0-9][a-z0-9-]*\*\*/)` loop), so any bolded lowercase word in queue
+  prose enters the set. Measured at HEAD: **160 tokens against 94 real bullet
+  slugs — 66 spurious**. Members today include `count`, `every`, `feature`,
+  `first`, `directory`, `generated`, `liveness` — an `# until: count` exemption
+  resolves green against no task.
+  **A former "section span" half was struck 2026-08-02 at scope, on
+  spec-over-precedent — do not re-file it.** It claimed the scan's lack of a
+  reset on an unknown heading was a second defect. gate-sdk/SPEC.md
+  §check-gate-exemption-tasks specifies that span as deliberate and contractual,
+  and names "nothing enforces section order" as accepted residue; that text
+  predates the ruling calling the behavior an accident, so the owner doc governs.
+  **Why `[design-pending]`:** the fix is a seam question — gate-sdk needs a slug
+  parse it can own **without depending on queue-kit for the queue format**, which
+  the provenance seam forbids. A lead-line predicate is the obvious shape.
+  **Cost while deferred: low but *rotting*, and it fails open.** Corrected
+  2026-08-02 from a filed "low and non-rotting": the spurious set scales with
+  queue prose — 109-against-61 when filed, 160-against-94 at HEAD — so the carry
+  grows with every entry written. It fails **open** rather than loud. The defect
+  is armed but unexploited: the gate reports `0 exemption array(s)` at HEAD, a
+  zero-width green filed as the fourth instance under
+  `vacuous-assertion-count-discipline`.
+  **Class, ruled 2026-08-01 at close, re-affirmed 2026-08-02 at scope:** the
+  candidate fixes add a name to a governed surface — a gate-sdk live-section
+  knob, or a lead-line predicate another component must honor — so
+  canon-kit/SPEC.md's new-names litmus makes this a **feature** owing an
+  amendment. Striking the section-span half removed the live-section-knob
+  disjunct only; the lead-line predicate trips the litmus independently, so the
+  class survives unchanged and is not being re-made.
+  **Selected for `vacuous-green-elimination` 2026-08-02** by operator at scope's
+  unit-set escalation, discharging the 2026-08-01 head-candidate ruling that
+  named it the only fail-open in this queue. It stays in this section under the
+  bidirectional rule; `/spec` authors the amendment and pairs the entry.
   Surfaced 2026-07-29 at spec while surveying readers for the icebox tier; the
-  token-scan half added 2026-07-31 at align. Drained from the gap inbox by close,
-  which triaged the two bullets as one unit on the align bullet's instruction.
+  token-scan half added 2026-07-31 at align.
 
 - **kit-index-page-vocabulary-ungated** [design-pending] — a kit index page
   carries governed vocabulary under no content gate. `docs/queue-kit/index.md`
@@ -1500,53 +1550,6 @@
   Filed 2026-07-31 at close as the gap-generalization owed by the inline fix
   above; the `check-md-refs` blind spot and the `AGENTS.md` false-positive case
   were both verified against source before filing.
-
-- **vacuous-assertion-count-discipline** [design-pending] — an assertion that
-  passes without asserting now has three attested instances in this tree and no
-  craft rule names it. In all three the tell was a **count**, never an exit code:
-  the run was green and the set it ranged over was empty.
-  **The three, all from `release-assertion-honesty`, all inside the fix for this
-  very class** — which is the evidence that it recurs, not the irony: (i) a
-  `None` predicate that silently matched nothing once it moved from `grep -E` to
-  awk, because `\b` is a word boundary in ERE and a backspace in awk's regex
-  (verified at this close: `awk '/\bNone\b/'` matches nothing on a literal
-  `None` that `grep -cE '\bNone\b'` counts 1); (ii) a helper arm that would have
-  shipped with no fixture to exercise it; (iii) a verification probe that
-  mutated a gate the consumer never registers, so it reported a 0-wide red set
-  against a non-empty declaration and read as a pass.
-  **Where the concept already lives, partially.** `gate-sdk/SPEC.md` §run-gates
-  names the *vacuous-pass tripwire* — a gate's clean line carries its scanned
-  count, and `GATE_SDK_VERBOSE` is the reading that surfaces it — and
-  `doctrine-kit/DOCTRINE.md` rule 22 carries the runner half. What is unnamed is
-  the rule for a verification the *session itself* writes: a probe, a mutation,
-  a predicate under edit. The tripwire exists for the battery and nowhere else.
-  **Deliverable:** a craft rule in `doctrine-kit/DOCTRINE.md` §Engineering-craft
-  rules — a verification whose subject is a set reports that set's size, because
-  an exit code cannot distinguish "asserted and held" from "asserted nothing";
-  and a mutation probe is valid only against a target the assertion actually
-  ranges over. Filed rather than landed at close deliberately: rule 11 licenses
-  no self-exemption, so amending this doctrine is a scoped unit.
-  **Gap generalization, per instance.** (i) is fixture-shaped — the missing
-  coverage is a good/bad pair over the `None` body, which the existing
-  fixture-pair contract already requires, so this is enforcement that went
-  unexercised rather than enforcement that is absent. (ii) is per-arm fixture
-  coverage, already carried as the iceboxed
-  `stage-economics-smoke-jq-arm-dormant`; a branch-coverage assertion over a
-  check's fixture corpus is its buildable form. (iii) is **not** gateable:
-  whether a session's mutation probe targeted something its assertion ranges
-  over is a property of a session act that leaves no residue in the tree.
-  **Why `[design-pending]`:** whether this ships as one craft rule, or as a rule
-  plus the branch-coverage gate (ii) wants, is the open call — and a rule whose
-  *Enforced by* line reads "judgment" must state the two-of-three split above
-  honestly rather than promise a scanner.
-  **Cost while deferred:** low and non-rotting in the tree; charged instead
-  against every future assertion-shaped unit, where the failure mode is a green
-  that means nothing and is indistinguishable from a green that means something.
-  Debt: one doctrine rule, optionally one gate; adds no governed name unless the
-  gate lands.
-  Filed 2026-07-31 at close from the lead's dispatch, weighed as evidence and
-  ruled **task**-shaped rather than lesson-shaped: the deliverable and its
-  done-state are both nameable now, which is the litmus.
 
 - **lead-iteration-open-authorization** [design-pending] — the iteration lead may
   open an iteration on its own inference, and opening one is the operator's call.
@@ -2245,6 +2248,15 @@
   the refused `<kit>-<lib>-fn` family (canon-kit/SPEC.md §check-prose-enum
   records that refusal); out of scope there because the unit's premise forbade
   a canon-kit change.
+  **Selected for `vacuous-green-elimination` 2026-08-02** by operator, as that
+  set's consumer-facing false clean. **Class: feature** — it does not fix
+  behavior to an existing spec: canon-kit/SPEC.md §check-prose-enum states the
+  boundary as "neither alnum nor hyphen abutting", which this unit *changes*,
+  and the widened matcher becomes a contract every consumer declaring an enum
+  set must honor. That owes an amendment under the new-names litmus, so the
+  entry waits here for `/spec` to author and pair it.
+  Premise re-verified at HEAD: `canon-kit/checks/check-prose-enum.sh:54` reads
+  `if (bc !~ /[[:alnum:]-]/ && ac !~ /[[:alnum:]-]/) return pp`.
 
 - **gate-fixture-expect-conjunction** [design-pending] — `run-gate-tests` matches
   a case's `expect.txt` with `grep -qF`, so a **multi-line expect reads as
@@ -2256,9 +2268,10 @@
   Blast radius measured at close: **3 of 187 tracked `expect.txt` files are
   multi-line** — `check-spec-pointer` (canon-kit), `check-queue-entry-budget`
   and `check-tag-lead-line` (queue-kit), all `bad/` cases. All three were
-  probed against a conjunction reading and **all nine of their lines currently
-  hold**, so the tightening reds nothing today; what is missing is the
-  guarantee, not a present green-that-should-be-red.
+  probed against a conjunction reading and **all eight of their lines currently
+  hold** (2 + 4 + 2; corrected 2026-08-02 at scope from a filed "nine"), so the
+  tightening reds nothing today; what is missing is the guarantee, not a present
+  green-that-should-be-red.
   The work: make the runner treat a multi-line expect as a conjunction (a
   `grep -qF` per non-empty line), state the semantics in gate-sdk/SPEC.md
   §run-gate-tests, and cover it in the runner's own fixture pair. The runner is
@@ -2271,6 +2284,15 @@
   Surfaced 2026-08-02 while writing `check-template-registry-parity`'s pair,
   whose `bad/` tree fires both assertions but could pin only one; worked around
   there by pinning assertion A alone.
+  **Selected for `vacuous-green-elimination` 2026-08-02** by operator — the
+  fixture-corpus member of that set. **Class: feature** — gate-sdk/SPEC.md
+  §run-gate-tests currently says the case "print its substring", singular, and
+  this unit rewrites that semantics into a conjunction every kit's fixture pairs
+  must then honor. Changing what a shipped contract asserts owes an amendment,
+  so the entry waits here for `/spec`.
+  Premise re-verified at HEAD: `gate-sdk/bin/run-gate-tests.sh:60` matches with
+  `grep -qF -- "$expect" <<<"$out"`; 3 of 187 tracked `expect.txt` files carry
+  more than one line.
 
 - **template-registry-population-predicate** [design-pending] — a **contingent**
   residual in `check-template-registry-parity`'s population predicate
