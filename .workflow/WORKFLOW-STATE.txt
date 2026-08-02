@@ -4,13 +4,4 @@
 
 ---
 
-native-gate-substrate scope a3d42602 2026-08-02
-native-gate-substrate spec a78cc11a 2026-08-02
-native-gate-substrate align a23d3445 2026-08-02
-native-gate-substrate build aaa946ef 2026-08-02
-native-gate-substrate build a9ebc8fd 2026-08-02
-native-gate-substrate build a2c39c5b 2026-08-02
-native-gate-substrate validate abd9a529 2026-08-02
-native-gate-substrate build a0ce6cc7 2026-08-02
-native-gate-substrate validate adb33a94 2026-08-02
-native-gate-substrate close aab94fc8 2026-08-02
+— scope a8e29ba3 2026-08-02

@@ -2,5 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-native-gate-substrate release deferred:v0.22.0 — minor earned (tightened-gates non-empty: check-gate-substrate-parity lands, 7 declarations now accumulated since v0.21.0) but no cadence trigger fired: newest tag v0.21.0 is 1 day old against the 7-day floor, no decommission, no security or supply-chain fix, no operator direction; floor unchanged from the outstanding v0.22.0 deferral.
-
