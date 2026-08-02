@@ -389,3 +389,30 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     contract and the quiet-default run surfaces
     ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates).
     *Stages:* build
+
+23. **An assertion reports the size of the set it ranged over.** A verification a
+    session writes — a scan, a probe, a predicate under edit — whose subject is a
+    set prints that set's size beside its verdict, because an exit code cannot
+    distinguish *asserted and held* from *asserted nothing*: both are zero
+    failures. The corollary governs the probe that proves an assertion bites — a
+    mutation is valid only against a target the assertion actually ranges over,
+    or it reports an empty red set and reads as a pass. *Quiet green, loud red*
+    puts that count on a batch runner's summary line; this is the same tripwire
+    one altitude down, for the one-off verification a session writes and reads
+    inside the session.
+    *Under agent work:* an agent writes the check and reads its verdict in one
+    motion, so the exit code is the only evidence it holds that the check bit —
+    and a predicate just rewritten (a regex carried between dialects, a path list
+    narrowed) fails by matching nothing, which is indistinguishable from success.
+    A printed count is the one signal that survives the rewrite.
+    *Enforced by:* judgment, over a class only partly mechanizable — stated
+    honestly rather than promised to a scanner. Shipped: the vacuous-pass
+    tripwire in [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates, and the
+    `good/`+`bad/` fixture pair every gate already owes
+    ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §The gate model), which exercises a
+    predicate rather than trusting it. Buildable but unbuilt: a branch-coverage
+    assertion over a check's fixture corpus, for the arm that ships with no
+    fixture to run it. Unreachable: whether a session's mutation probe targeted
+    something its assertion ranges over is a property of a session act that
+    leaves no residue in the tree, so that third stays judgment.
+    *Stages:* build, validate

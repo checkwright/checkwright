@@ -14,57 +14,6 @@
 
 ## Technical Debt
 
-- **vacuous-assertion-count-discipline** — an assertion that passes without
-  asserting has three attested instances in this tree and no craft rule names it.
-  In all three the tell was a **count**, never an exit code: the run was green and
-  the set it ranged over was empty.
-  **The three, all from `release-assertion-honesty`, all inside the fix for this
-  very class** — which is the evidence that it recurs, not the irony: (i) a
-  `None` predicate that silently matched nothing once it moved from `grep -E` to
-  awk, because `\b` is a word boundary in ERE and a backspace in awk's regex
-  (`awk '/\bNone\b/'` matches nothing on a literal `None` that `grep -cE
-  '\bNone\b'` counts 1); (ii) a helper arm that would have shipped with no
-  fixture to exercise it; (iii) a verification probe that mutated a gate the
-  consumer never registers, so it reported a 0-wide red set against a non-empty
-  declaration and read as a pass.
-  A fourth instance, live at HEAD and found while scoping this iteration:
-  `check-gate-exemption-tasks` reports `0 exemption array(s)` because no
-  `# exception-list:`-tagged array exists tree-wide — a green ranging over an
-  empty set, sitting under `gate-exemption-live-slug-derivation`'s fail-open.
-  **Where the concept already lives, partially.** `gate-sdk/SPEC.md` §run-gates
-  names the *vacuous-pass tripwire* — a gate's clean line carries its scanned
-  count, and `GATE_SDK_VERBOSE` is the reading that surfaces it — and
-  `doctrine-kit/DOCTRINE.md` rule 22 carries the runner half. What is unnamed is
-  the rule for a verification the *session itself* writes: a probe, a mutation,
-  a predicate under edit. The tripwire exists for the battery and nowhere else.
-  **Deliverable:** a craft rule in `doctrine-kit/DOCTRINE.md` §Engineering-craft
-  rules — a verification whose subject is a set reports that set's size, because
-  an exit code cannot distinguish "asserted and held" from "asserted nothing";
-  and a mutation probe is valid only against a target the assertion actually
-  ranges over. Its *Enforced by* line reads judgment, and must state the
-  two-of-three split below honestly rather than promise a scanner. Landing it is
-  a scoped unit rather than a passing edit because rule 11 licenses no
-  self-exemption.
-  **Gap generalization, per instance.** (i) is fixture-shaped — the missing
-  coverage is a good/bad pair over the `None` body, which the existing
-  fixture-pair contract already requires, so this is enforcement that went
-  unexercised rather than enforcement that is absent. (ii) is per-arm fixture
-  coverage, already carried as the iceboxed
-  `stage-economics-smoke-jq-arm-dormant`; a branch-coverage assertion over a
-  check's fixture corpus is its buildable form. (iii) is **not** gateable:
-  whether a session's mutation probe targeted something its assertion ranges
-  over is a property of a session act that leaves no residue in the tree.
-  **Scope ruling 2026-08-02 — the open call is closed: one craft rule, no gate.**
-  This entry was parked on whether it ships as a rule alone
-  or a rule plus the branch-coverage gate that generalization (ii) wants. It
-  ships as the rule alone, on the entry's own evidence: (i) is already required
-  by the fixture-pair contract, (ii) is separately conserved as the iceboxed
-  `stage-economics-smoke-jq-arm-dormant` and bundling it here would duplicate a
-  live entry, and (iii) is not gateable at all. A gate added here would therefore
-  either re-file iceboxed work or promise coverage two of the three instances
-  cannot receive. Filed 2026-07-31 at close, ruled task-shaped rather than
-  lesson-shaped because the deliverable and its done-state were both nameable.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
@@ -2343,5 +2292,6 @@
 - gate-fixture-expect-conjunction
 - gate-exemption-live-slug-derivation
 - prose-enum-identifier-boundary-class
+- vacuous-assertion-count-discipline
 
 ## Lessons Learned
