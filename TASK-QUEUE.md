@@ -960,9 +960,8 @@
   subcommand carrying none breaks the chain. Settled before any gate ports.
   (2) *The consumer payload* — `gate-payload-disclosure-ruling`, the companion that
   holds it and the lever that fixes opacity's range.
-  **Closed alternative:** a bash portability floor — costed 2026-08-02 and rejected
-  (stock macOS bash 3.2 is unreachable by shims; `mapfile`/`declare -A` in 56 of 100
-  checks). The costing is the amendment's to record, not this entry's.
+  **Closed alternative:** a bash portability floor, costed 2026-08-02 and rejected —
+  `bash-portability-floor-costing` holds the costing and lands it in the SPEC.
   **Deliverable:** one multi-call binary, a subcommand per check; `gates.list`
   dispatching per entry to subcommand or script so it lands cohort by cohort; each
   gate's fixture pair the parity oracle, **executed** not merely present
@@ -2559,6 +2558,26 @@
   composition decision. Absorbs the narrower gap-inbox bullet filed the same day.
   Filed 2026-08-02 by scope, operator-directed after the omission above.
 
+- **bash-portability-floor-costing** [design-pending] — record a closed costing.
+  Land the costed rejection of a bash portability floor in the canonical SPEC beside
+  `native-gate-binary-port`'s substrate section, so the reasoning outlives the
+  amendment that carries it. Companion to that entry: the work is the recording, and
+  the costing below is not to be re-derived.
+  **What was costed 2026-08-02:** shimming or dropping the GNU-only constructs the
+  battery depends on — the gate library's nameref and `realpath --relative-to`, gawk's
+  3-arg `match()`, `sort -V`, `date -d`, `stat -c`. Blast radius about 25 files, mostly
+  single call sites, two shared libraries carrying most of the leverage: an estimated
+  2-4 small units.
+  **Why closed rather than deferred:** it cannot deliver the reach it would be bought
+  for. Stock macOS bash 3.2 is unreachable by shims, and `mapfile`/`declare -A` appear
+  in 56 of 100 checks — so the floor buys BSD-userland tolerance, never a stock-macOS
+  install, which is the thing the port is wanted for.
+  **Cost while deferred:** the operator supplied this argument from memory twice in one
+  session because no surface carried it; until it lands, the next substrate discussion
+  re-derives it a fourth time.
+  Filed 2026-08-02 by scope on the lead's ruling that a closed costing belongs in a
+  companion entry rather than in the parent's body.
+
 - **gate-payload-disclosure-ruling** [design-pending] — what a compiled gate ships to a
   consumer tree. Companion to `native-gate-binary-port`, inside that entry's envelope
   and filed apart so neither body sprawls.
@@ -2583,31 +2602,36 @@
   unsettled. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
   decision the port owns rather than an inheritance from the bash era.
 
-- **queue-entry-evidence-tier** [design-pending] — a queue entry has no tier beneath it,
-  so every fact a later session must not re-derive gets written into the entry body and
-  the body grows without bound. Reproduced 2026-08-02: one scope session ordered three
-  additions into `native-gate-binary-port` — a sharpened rationale, a promotion
-  dividend, a costed negative result — each justified by "a later session must not
-  re-derive this", taking the entry to 55 lines against a 50-line cap.
-  **No oracle covers the error itself.** `check-queue-entry-budget` caps a body but is
-  silent on where displaced content belongs, and `check-brevity` couples to `CLAUDE.md`
-  alone — so nothing reds on the tiering mistake, only on its symptom, and only after
-  the mistake is made.
-  **The existing affordances and their limits.** Companion entries and sub-tasks work
-  when the displaced content is *work*; they do not model a closed negative result,
-  which is a record rather than a task. An amendment is the right home for design
-  rationale but lives only while its unit does. The gap is a durable in-tree tier for
-  facts that are neither work nor live design.
-  **Two constraints that rule out the obvious fallback.** A session transcript cannot
-  be cited: this repo is public and CLAUDE.md forbids internal session references in
-  tracked files. And under spec-over-precedent, history evidences *that* an alternative
-  was costed, never *that the costing is right* — so a pointer to a session is weaker
-  than it looks even where it would be legal.
-  **Cost while deferred:** entry bodies keep absorbing evidence, and the only detector
-  is a cap that fires after the tiering decision has already gone wrong.
+- **queue-entry-evidence-tier** [design-pending] — **not "how is cut detail recovered"
+  — that is solved. The gap is that a reader cannot tell detail was ever cut.**
+  `check-queue-entry-budget`'s own help names the recovery path
+  (`git log -p -S'<slug>'`), which is tracked, public-safe and needs no session
+  transcript. What no surface carries is the *signal*: a compressed entry looks
+  identical to an entry that was always short, so a session with a question it cannot
+  answer has no way to know an evicting commit holds the answer, nor which one.
+  Reproduced 2026-08-02: one scope session pushed `native-gate-binary-port` over the
+  cap three times and compressed it back, and nothing in the entry now records that
+  the worked arguments exist upstream.
+  **The budget is gated and the gate works — this is not ungated drift.** The cap is
+  50 and it is measured on the entry's **raw extent**, blanks included (assertion A,
+  `n = bound - o_start[i]`), not on content lines; content lines are counted only for
+  the icebox shape rule. It red thrice on that entry this session and forced each
+  compression, so the discipline held. What it cannot do is say where the cut went.
+  **A design constraint that is not obvious from the queue's prose, verified in the
+  gate's awk:** a nested sub-task is counted into every open parent
+  (`for (i = 1; i <= nopen; i++) o_nb[i]++`), so **sub-tasks do not relieve a parent's
+  budget — only a companion top-level entry does.** A mechanism that routed overflow
+  into sub-tasks would be defeated by the gate it has to live under.
+  **One more constraint:** the repo is public and CLAUDE.md forbids internal session
+  references in tracked files, so no entry may point at a transcript. And under
+  spec-over-precedent an evicting commit evidences *that* a thing was costed, never
+  *that the costing is right* — so the signal must lead to a ruling surface, not stop
+  at history.
+  **Cost while deferred:** compression stays silently lossy in practice — the bytes
+  survive in git, and the knowledge that they are worth fetching does not.
   Filed 2026-08-02 by scope on operator intake. The operator previously proposed an
   evidence-submission mechanism and it was declined in favour of boxed entries; this
-  failure mode is the ground for revisiting that ruling.
+  narrower shape is the ground for revisiting that ruling.
 
 ## Icebox
 
