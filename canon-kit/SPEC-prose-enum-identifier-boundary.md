@@ -215,7 +215,7 @@ and the reason.
 
 **Two measurements taken at this HEAD, because the unit's whole premise is that
 this tree cannot produce evidence:** `scripts/enum-sets.sh` emits 69 members
-across 12 sets, **zero** of which contain an underscore; and an all-pairs
+across 21 sets, **zero** of which contain an underscore; and an all-pairs
 within-set prefix test finds **zero** members that are a strict prefix of a
 sibling. So the widening is confirmed to change no verdict here — by computation
 rather than by the hyphenation argument alone, which was the reasoning the entry

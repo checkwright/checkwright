@@ -266,8 +266,8 @@ which is the same false-negative shape this unit is about.
   slugs on **bullet lead lines** within the scanned span, one per entry, not
   every bold token in the span. A new paragraph states the seam ruling — the
   lead-line format is carried by SPEC prose in each holding kit rather than by a
-  code dependency, gate-sdk is the third holder of the same predicate text, and
-  the three-edit residue is named. It sits beside the existing
+  code dependency, gate-sdk is the fifth holder of the same predicate text, and
+  the five-edit residue is named. It sits beside the existing
   *live-section span is positional* paragraph, which already argues the identical
   seam for the section set and is otherwise unchanged (deltas 1, 2).
 - **gate-sdk/SPEC.md §check-gate-exemption-tasks** — the clean-line contract
@@ -279,7 +279,7 @@ which is the same false-negative shape this unit is about.
   grammar paragraph itself is unchanged — this amendment reads that format, it
   does not alter it.
 - **canon-kit/SPEC.md §lib/spec.sh** — the `spec_queue_slugs` bullet notes it is
-  one of three independent holders, for the same reason.
+  one of five independent holders, for the same reason.
 - **docs/site-architecture.md §Generated projections** — no new gate and no
   `# graph:` manifest change, so neither the pre-commit hook nor the graph
   artifact goes stale on this amendment's account. The docs mirror of
