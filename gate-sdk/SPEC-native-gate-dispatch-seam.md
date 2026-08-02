@@ -140,7 +140,15 @@ Gates whose corpus is kit directories, templates, smoke scripts, or hooks
 (`check-kit-registration`, `check-template-copy-parity`,
 `check-template-registry-parity`, `check-smoke-entry-guard`, `check-hook-exec-bit`,
 `check-test-hermetic`, `check-assertion-strength`) are not substrate-sensitive by
-the derivation above and are untouched.
+the derivation above and are untouched. Nor are gates whose `couples=` names
+`scripts/*.sh`/`kit:*.sh` only as a **reverse trigger** — a script changing may
+invalidate what they assert — while their actual scanned corpus is the governed-doc
+set (`check-install-claim`, `check-prose-enum`, `check-docs-cmd`,
+`check-queue-slug-liveness`): verified by reading each one, none reads a gate
+script's *content* as its assertion target, so a `.gate` descriptor changes nothing
+they check. `check-docs-cmd` is the one exception worth naming: it will correctly
+(not vacuously) red on a doc that still fences the deleted `.sh` path after a port,
+which is real signal, not the vacuity this table exists to close.
 
 **The new gate: `check-gate-substrate-parity`.** Three assertions:
 
