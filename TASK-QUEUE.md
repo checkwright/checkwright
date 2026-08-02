@@ -12,6 +12,104 @@
 
 ## New Features
 
+- **gate-exemption-live-slug-derivation** [spec: gate-sdk/SPEC-exemption-live-slug-derivation.md]
+  — **an exemption can resolve green against no task at all.**
+  `check-gate-exemption-tasks` derives its live-slug set by reading every
+  bold-emphasis token on every line of the scanned span rather than bullet lead
+  lines, so any bolded lowercase word in queue prose enters the set. Re-measured
+  at spec: **159 tokens against 94 real lead-line slugs — 65 spurious**.
+  **Seam ruled at spec 2026-08-02 — re-implement and cite from both ends.**
+  gate-sdk carries the lead-line predicate as its own code, verbatim the text
+  queue-kit's `queue_live_slugs` and canon-kit's `spec_queue_slugs` already
+  carry independently: no dependency, **no new knob**. Not a new rule —
+  queue-kit/SPEC.md §The queue format already states it for drift-kit, and the
+  reciprocal half is added there. Evidence the re-implementation is faithful:
+  the predicate reproduces `queue_live_slugs`'s answer exactly, 94 for 94. The
+  whitespace-tolerant anchor is the *correct* one rather than a tolerance — an
+  indented bold lead-in is a sub-task and sub-task slugs share the global
+  namespace, so a column-0 anchor would fail **closed** on that class.
+  **The struck half stays struck**: the section-span defect was refused
+  2026-08-02 on spec-over-precedent, and the span, its
+  no-reset-on-unknown-heading behavior and the icebox coupling riding on it are
+  untouched. Do not re-file it.
+  Three deltas, all **design-bearing**: the predicate swap, a live-slug count on
+  the clean line, and the fixture case that pins the tightening. The present pair
+  passes identically before and after the change, so re-running it is **not**
+  evidence — build must add the case whose queue bolds a non-slug token in prose.
+  **Ordering** [precondition-ok: not a blocker — the amendment names two sound
+  routes and this unit is buildable on either. Landing `gate-fixture-expect-conjunction`
+  first buys the stronger fixture (all three findings pinned as a conjunction);
+  landing this one first is sound with `expect.txt` re-pointed at the new
+  finding alone. Sequencing is the lead's batch-cut call, not a dependency]**:**
+  the new `bad/` case wants a multi-line `expect.txt`, which only means a
+  conjunction once the sibling lands. The third route — adding the case and
+  leaving `expect.txt` untouched — is refused outright.
+  Surfaced 2026-07-29 at spec while surveying readers for the icebox tier;
+  token-scan half added 2026-07-31 at align; promoted 2026-08-02 by spec.
+
+- **gate-fixture-expect-conjunction** [spec: gate-sdk/SPEC-fixture-expect-conjunction.md]
+  — **a multi-line `expect.txt` reads as alternatives, not a conjunction.**
+  `run-gate-tests` matches with `grep -qF`, which splits a multi-line pattern
+  into separate fixed strings and matches any, so a `bad/` case asserting two
+  findings passes when only one fires. The author who wrote two lines pinned one
+  and nothing said otherwise: §run-gate-tests says the case "print its substring",
+  singular, and never states the limit. The worst shape in this iteration's set —
+  the other units weaken a *gate's* green, this one weakens the **fixture pair**
+  that proves a gate works, and a pair that under-asserts is worse than an absent
+  one because it reads as coverage.
+  Blast radius measured at close: **3 of 187** tracked `expect.txt` files are
+  multi-line, 8 lines between them, and all 8 currently hold — so the tightening
+  is expected to red nothing. Expected, not assumed: build re-derives the set at
+  its own HEAD and treats any red as this unit's thesis arriving as evidence.
+  Four deltas: the per-line conjunction with blank lines asserting nothing and
+  order deliberately not required (**design-bearing**); a failure report naming
+  **every** missing line rather than the first (**design-bearing**); the
+  semantics stated in §run-gate-tests as a contract every kit's fixture authors
+  write against (**mechanical**); the coverage (**design-bearing**).
+  **Coverage shape corrected at spec:** the runner is a `bin/` tool, not a
+  `gates.list` member, so it owes no fixture pair — the coverage is a bespoke
+  `gate-sdk/gate-tests/run-gate-tests.test.sh` on the `run-for-path.test.sh`
+  precedent, sourcing `lib/test-hermetic.sh`, with the inner invocation's scratch
+  tests dir holding no `*.test.sh` so the self-invocation cannot recurse.
+  Build writes the two-line-expect-with-one-finding case **first** and watches it
+  fail against the unpatched runner; it is the only case that changes verdict in
+  the direction the defect lives.
+  Surfaced 2026-08-02 while writing `check-template-registry-parity`'s pair,
+  whose `bad/` tree fires both assertions but could pin only one; promoted
+  2026-08-02 by spec.
+
+- **prose-enum-identifier-boundary-class** [spec: canon-kit/SPEC-prose-enum-identifier-boundary.md]
+  — **a false clean live for every `check-prose-enum` consumer**, not a
+  repo-local wrinkle. `_sk_present` bounds a member match with `[[:alnum:]-]`, a
+  class excluding `_`, so an underscore-separated identifier reads as present
+  inside a longer sibling and a paragraph naming only `guard_allow_match`
+  silently satisfies the member `guard_allow`. A member that falsely reads as
+  present is one the gate stops asking about, so the omission is reported clean
+  with nothing in the output to suggest a judgment was skipped.
+  Nothing in this tree is currently wrong — its declared sets are file basenames
+  and bracketed tags, all hyphenated — and that inertness is why it needed
+  filing rather than fixing in passing: the tree cannot red on it, so no local
+  evidence will ever surface it. The carry grows with adoption, not with time.
+  **The widened class is the tree's existing convention arriving late**, ruled at
+  spec: `check-readme-roster.sh:62` and `canon-kit/lib/spec.sh:286` already use
+  `[[:alnum:]_-]` for identifier tokens; `check-prose-enum.sh:54` is the outlier.
+  The widening is **exactly one character** — `.` and `/` must stay out, because
+  the kit-relative and repo-relative basename spellings depend on matching across
+  them. `lib/spec.sh:320-321` is a *prose-noun* boundary, a different rule that
+  happens to share a spelling, and is deliberately not touched. A boundary-class
+  knob is refused: its only possible setting is the value that re-opens this bug.
+  Four deltas: the class widening (**design-bearing**); the battery re-run, which
+  moves verdicts in **both** directions and is expected to move none here
+  (**mechanical**); the prefix-sibling case in `check-prose-enum.test.sh`, which
+  build writes first and watches go *green against the unpatched gate*
+  (**design-bearing**); and the correction of the `<kit>-lib-fn` refusal passage,
+  whose secondary argument this falsifies — the family **stays refused** on its
+  roster-versus-vocabulary ground, and the struck clause was the sighting this
+  unit came from (**design-bearing**).
+  Surfaced 2026-08-02 by `spec-roster-enumeration-derivation` while measuring
+  that refused family; out of scope there because the unit's premise forbade a
+  canon-kit change. Promoted 2026-08-02 by spec.
+
 ## Technical Debt
 
 - **vacuous-assertion-count-discipline** — an assertion that passes without
@@ -1103,46 +1201,6 @@
   produced; a sibling rather than an addition because `check-queue-entry-budget`
   refused the combined body.
 
-- **gate-exemption-live-slug-derivation** [design-pending] — an exemption can
-  resolve green against no task at all. `check-gate-exemption-tasks` derives its
-  live-slug set by reading **every bold-emphasis token on every line** of the
-  scanned span rather than bullet lead lines
-  (`gate-sdk/checks/check-gate-exemption-tasks.sh`, the `match($0,
-  /\*\*[a-z0-9][a-z0-9-]*\*\*/)` loop), so any bolded lowercase word in queue
-  prose enters the set. Measured at HEAD: **160 tokens against 94 real bullet
-  slugs — 66 spurious**. Members today include `count`, `every`, `feature`,
-  `first`, `directory`, `generated`, `liveness` — an `# until: count` exemption
-  resolves green against no task.
-  **A former "section span" half was struck 2026-08-02 at scope, on
-  spec-over-precedent — do not re-file it.** It claimed the scan's lack of a
-  reset on an unknown heading was a second defect. gate-sdk/SPEC.md
-  §check-gate-exemption-tasks specifies that span as deliberate and contractual,
-  and names "nothing enforces section order" as accepted residue; that text
-  predates the ruling calling the behavior an accident, so the owner doc governs.
-  **Why `[design-pending]`:** the fix is a seam question — gate-sdk needs a slug
-  parse it can own **without depending on queue-kit for the queue format**, which
-  the provenance seam forbids. A lead-line predicate is the obvious shape.
-  **Cost while deferred: low but *rotting*, and it fails open.** Corrected
-  2026-08-02 from a filed "low and non-rotting": the spurious set scales with
-  queue prose — 109-against-61 when filed, 160-against-94 at HEAD — so the carry
-  grows with every entry written. It fails **open** rather than loud. The defect
-  is armed but unexploited: the gate reports `0 exemption array(s)` at HEAD, a
-  zero-width green filed as the fourth instance under
-  `vacuous-assertion-count-discipline`.
-  **Class, ruled 2026-08-01 at close, re-affirmed 2026-08-02 at scope:** the
-  candidate fixes add a name to a governed surface — a gate-sdk live-section
-  knob, or a lead-line predicate another component must honor — so
-  canon-kit/SPEC.md's new-names litmus makes this a **feature** owing an
-  amendment. Striking the section-span half removed the live-section-knob
-  disjunct only; the lead-line predicate trips the litmus independently, so the
-  class survives unchanged and is not being re-made.
-  **Selected for `vacuous-green-elimination` 2026-08-02** by operator at scope's
-  unit-set escalation, discharging the 2026-08-01 head-candidate ruling that
-  named it the only fail-open in this queue. It stays in this section under the
-  bidirectional rule; `/spec` authors the amendment and pairs the entry.
-  Surfaced 2026-07-29 at spec while surveying readers for the icebox tier; the
-  token-scan half added 2026-07-31 at align.
-
 - **kit-index-page-vocabulary-ungated** [design-pending] — a kit index page
   carries governed vocabulary under no content gate. `docs/queue-kit/index.md`
   enumerates the task tags but is hand-authored, outside the docs mirror, and
@@ -2219,80 +2277,6 @@
   Surfaced 2026-08-01 by the `/economics` run at close as the competing
   hypothesis behind an align tier question; the tier half was ruled the same
   session and this entry re-scoped to the half that is still open.
-
-- **prose-enum-identifier-boundary-class** [design-pending] — **a false clean
-  live for every `check-prose-enum` consumer**, not a repo-local wrinkle.
-  `_sk_present` bounds a member match with `[[:alnum:]-]`
-  (canon-kit/checks/check-prose-enum.sh), a class that excludes `_`, so an
-  underscore-separated identifier reads as present inside a longer sibling —
-  premise re-verified at close against guard-kit/SPEC.md's `guard_allow` /
-  `guard_allow_match` pair, which is exactly that shape. The failure direction
-  is what makes this worth a unit rather than a note: a paragraph naming only
-  the longer sibling silently satisfies the shorter member, so any consumer
-  declaring a set of function names — or any other underscore-bearing
-  identifier family — gets a green that means nothing, with nothing in the
-  output to suggest it. Nothing in this tree is currently wrong: its declared
-  sets are file basenames and bracketed tags (`scripts/enum-sets.sh`), all
-  hyphenated, so no member can be a prefix of a sibling across an underscore.
-  That inertness is the reason it needs filing rather than fixing in passing —
-  the tree cannot red on it, so no local evidence will ever surface it.
-  The work: widen the boundary class to include `_`, re-run the full battery
-  for reds the widening exposes, and extend `check-prose-enum.test.sh` with a
-  prefix-sibling case (the widening is a change to what the gate asserts, so it
-  is a spec-stage unit, not a build-stage edit).
-  **Cost while deferred:** low here, unbounded elsewhere — zero risk to this
-  tree by the hyphenation argument above, but every consumer vendoring
-  canon-kit carries a check whose green is conditional on a naming convention
-  the kit never states. The carry grows with adoption, not with time.
-  Surfaced 2026-08-02 by `spec-roster-enumeration-derivation` while measuring
-  the refused `<kit>-<lib>-fn` family (canon-kit/SPEC.md §check-prose-enum
-  records that refusal); out of scope there because the unit's premise forbade
-  a canon-kit change.
-  **Selected for `vacuous-green-elimination` 2026-08-02** by operator, as that
-  set's consumer-facing false clean. **Class: feature** — it does not fix
-  behavior to an existing spec: canon-kit/SPEC.md §check-prose-enum states the
-  boundary as "neither alnum nor hyphen abutting", which this unit *changes*,
-  and the widened matcher becomes a contract every consumer declaring an enum
-  set must honor. That owes an amendment under the new-names litmus, so the
-  entry waits here for `/spec` to author and pair it.
-  Premise re-verified at HEAD: `canon-kit/checks/check-prose-enum.sh:54` reads
-  `if (bc !~ /[[:alnum:]-]/ && ac !~ /[[:alnum:]-]/) return pp`.
-
-- **gate-fixture-expect-conjunction** [design-pending] — `run-gate-tests` matches
-  a case's `expect.txt` with `grep -qF`, so a **multi-line expect reads as
-  alternatives, not a conjunction**: a `bad/` case asserting two findings passes
-  when only one fires. This weakens every fixture that relies on a multi-line
-  expect, and silently — the author who wrote two lines believes both are
-  pinned. gate-sdk/SPEC.md §run-gate-tests says the case "print its substring"
-  (singular) and never states the limit, so nothing warns them.
-  Blast radius measured at close: **3 of 187 tracked `expect.txt` files are
-  multi-line** — `check-spec-pointer` (canon-kit), `check-queue-entry-budget`
-  and `check-tag-lead-line` (queue-kit), all `bad/` cases. All three were
-  probed against a conjunction reading and **all eight of their lines currently
-  hold** (2 + 4 + 2; corrected 2026-08-02 at scope from a filed "nine"), so the
-  tightening reds nothing today; what is missing is the guarantee, not a present
-  green-that-should-be-red.
-  The work: make the runner treat a multi-line expect as a conjunction (a
-  `grep -qF` per non-empty line), state the semantics in gate-sdk/SPEC.md
-  §run-gate-tests, and cover it in the runner's own fixture pair. The runner is
-  the fixture-pair contract's enforcer, so this is a change to what every kit's
-  pairs assert — a spec-stage unit.
-  **Cost while deferred:** low today and rising with fixture count — the three
-  known multi-line expects hold, but nothing stops the next one from being
-  written under the wrong belief, and a fixture that under-asserts is worse
-  than one that is absent because it reads as coverage.
-  Surfaced 2026-08-02 while writing `check-template-registry-parity`'s pair,
-  whose `bad/` tree fires both assertions but could pin only one; worked around
-  there by pinning assertion A alone.
-  **Selected for `vacuous-green-elimination` 2026-08-02** by operator — the
-  fixture-corpus member of that set. **Class: feature** — gate-sdk/SPEC.md
-  §run-gate-tests currently says the case "print its substring", singular, and
-  this unit rewrites that semantics into a conjunction every kit's fixture pairs
-  must then honor. Changing what a shipped contract asserts owes an amendment,
-  so the entry waits here for `/spec`.
-  Premise re-verified at HEAD: `gate-sdk/bin/run-gate-tests.sh:60` matches with
-  `grep -qF -- "$expect" <<<"$out"`; 3 of 187 tracked `expect.txt` files carry
-  more than one line.
 
 - **template-registry-population-predicate** [design-pending] — a **contingent**
   residual in `check-template-registry-parity`'s population predicate
