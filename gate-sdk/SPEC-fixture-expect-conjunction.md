@@ -99,13 +99,19 @@ acquire a `.test.sh`.
 | blank line among two real lines | — | passes; the blank asserts nothing |
 | multi-line `good/expect.txt`, one line absent | passes | fails |
 
-Row 1 is the unit. It is the only case that changes verdict in the direction the
-defect lives, and a test suite that omits it proves nothing — this whole
-iteration exists because assertions that cannot fail were shipped as if they
-could. Build writes row 1 first, watches it **fail against the unpatched
-runner**, and only then applies delta 1. Row 3 exists because the disjunction is
-symmetric and a fix that only checks the first line would pass row 1 and still be
-wrong.
+Rows 1, 3 and 6 are the ones that change verdict, and row 1 is the unit — the
+minimal, canonical shape of the defect. A test suite that omits it proves
+nothing: this whole iteration exists because assertions that cannot fail were
+shipped as if they could. Build writes row 1 first, watches it **fail against the
+unpatched runner**, and only then applies delta 1.
+
+Row 3 is not redundant with row 1. The disjunction is symmetric, so a fix that
+checks only the *first* line would turn row 1 red and still leave the defect
+live; row 3 is what forbids that fix. Row 6 carries the `good/` side, which is
+where a reader would most easily assume the rule does not apply. Rows 2, 4 and 5
+change nothing and are there to pin that the tightening is narrow — a conjunction
+that also broke the single-line case would be a regression wearing a fix's
+clothes.
 
 ### 5. The existing corpus is re-verified, not assumed {mechanical}
 
