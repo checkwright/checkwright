@@ -534,6 +534,49 @@ Gates whose corpus is kit directories, smoke scripts or hooks
 `check-test-hermetic`, `check-assertion-strength`) are not substrate-sensitive
 by the derivation above and are untouched.
 
+## What the dispatch seam does not settle
+
+Recorded because a deferral nobody wrote down is indistinguishable from a
+question nobody asked — and this entry has already lost worked arguments to
+compression once.
+
+**Dogfooding is settled in one direction and open in the other.** A registered
+member dispatching to a compiled subcommand at `tier=precommit` puts
+`gate_command` on the pre-commit path, and `gate_command` is fail-closed on an
+absent binary. So this repo **does** build and run the binary from source at
+commit time, and `cargo` is a hard commit-time requirement — the toolchain floor
+records it (context-kit/SPEC.md §bin/env-probe). Stating that plainly matters,
+because the earlier framing that the seam "defers whether this repo runs built
+artifacts at all" is not what the seam does: porting one gate decides it. What
+remains genuinely open is the *other* end — whether this repo, or a consumer,
+ever runs a **prebuilt or released** artifact rather than one built from source.
+No compiled artifact is committed, and nothing here assumes one ever will be.
+
+**The consumer payload is untouched and deliberately reachable either way.**
+Keeping the manifest as tracked text is what earns that: hook generation runs
+consumer-side, so the seam works identically whichever way the payload question
+rules. Vendoring and the extensibility model are likewise unchanged — this slice
+ships no artifact and changes nothing about how a kit installs.
+
+**Opacity is not claimed.** This repo builds from source and the implementation
+sits readable in-tree, so the benefit delivered here is the seam and the
+conservation contract, not the headline ground the port is sometimes argued on.
+Claiming otherwise would be the "land it then relax" failure inverted.
+
+**The language-agnostic reading is visible and not built.** The layer above the
+descriptor is substrate-blind (§The `# graph:` manifest), which makes a
+gate-authoring SDK — the descriptor as the neutral surface of a gate, its
+predicate in any language — a coherent next thing rather than a wish. Slice 1
+declines to build or widen to it, and declines to foreclose it; the initiative
+is carried as its own queue entry so the framing outlives the session that saw
+it.
+
+**One thing this slice did not defer.** The manifest-class/implementation
+SSOT split is *enforced*, not trusted to habit
+(§check-gate-substrate-parity assertion D) — noted here because the natural
+outcome for a rule stated only in prose is that the first tired session breaks
+it.
+
 ## Consumer smoke
 
 The fixture suites prove each gate in isolation on contrived case dirs, and a
