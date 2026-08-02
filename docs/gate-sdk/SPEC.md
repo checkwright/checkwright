@@ -550,6 +550,20 @@ Gates whose corpus is kit directories, smoke scripts or hooks
 `check-test-hermetic`, `check-assertion-strength`) are not substrate-sensitive
 by the derivation above and are untouched.
 
+**Reference-only implementations.** The section carries one further disposition,
+in the other direction: an implementation the binary carries that **no descriptor
+dispatches to**. Assertion B's default reading of that is "a gate nothing
+declares" — dead code, or the residue of a half-finished port — and it is red.
+The exception is an implementation deliberately kept ahead of any live port, so
+that the substrate stays exercised by real tests rather than sitting unproven
+until the next port needs it. That is a disposition, not a licence: naming it
+here is what distinguishes it from the stranded implementation the assertion
+exists to catch, and a subcommand not named here still reds.
+
+| Subcommand | Disposition |
+|---|---|
+| `check-action-pinning` | **Reference-only.** Its live port was reverted (§Porting a gate to the binary substrate); the gate is shell again and no descriptor dispatches here. The module stays because retiring it would leave the crate with no gate implementation at all, and `cargo test` plus the `native_crate` evidence suite would go green over nothing — the vacuity this whole section exists to refuse. It is the crate's only executed proof that a gate's rule survives the substrate. |
+
 ## What the dispatch seam does not settle
 
 Recorded because a deferral nobody wrote down is indistinguishable from a
@@ -1396,7 +1410,7 @@ Holds the dispatch seam honest: a gate's implementation may move to a compiled
 subcommand, but not by quietly deleting the declaration other gates read or the
 record of what that move costs. Usage
 `check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
-steers the fixture pair onto hermetic copies of each surface. Three assertions.
+steers the fixture pair onto hermetic copies of each surface. Four assertions.
 
 - **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
   exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
@@ -1407,10 +1421,22 @@ steers the fixture pair onto hermetic copies of each surface. Three assertions.
 - **assertion B — subcommand parity, both directions.** The set of `.gate`
   descriptors across the resolve dirs equals the binary's reported subcommand
   roster (`--list`). A descriptor naming no subcommand is a gate that cannot
-  run; a subcommand with no descriptor is a gate nothing declares. With
-  descriptors present and the binary absent or non-executable the gate exits 2,
-  never 0 — the §Fail-closed contract, since "cannot verify" and "verified
-  equal" must not share an exit code.
+  run; a subcommand with no descriptor is a gate nothing declares — unless the
+  conservation section dispositions it `reference-only`, the one allowance and
+  the reason it is recorded there rather than in the crate (§Meta-gate
+  conservation for the binary substrate). With descriptors present and the
+  binary absent or non-executable the gate exits 2, never 0 — the §Fail-closed
+  contract, since "cannot verify" and "verified equal" must not share an exit
+  code. **The two halves are gated separately, and that is the correction the
+  reverted port paid for**: the roster half runs whenever the binary is
+  *readable*, descriptor count irrelevant. Under the original single guard —
+  the whole assertion behind `descriptors > 0` — a tree with zero descriptors
+  skipped both directions, which is precisely the state an unported tree is in
+  and the one a stranded implementation hides in. The remaining gap is stated
+  rather than closed: with no descriptors *and* no built binary there is nothing
+  to read, so the assertion counts zero and says so in its clean line. Demanding
+  a build artifact from every reader would re-import, into the auditor, the
+  build-time coupling the revert removed.
 - **assertion C — disposition coverage.** Every substrate-sensitive member
   carries a disposition line in §Meta-gate conservation for the binary
   substrate. The set is **derived at runtime** — a member whose expanded
@@ -1430,6 +1456,20 @@ steers the fixture pair onto hermetic copies of each surface. Three assertions.
 It stays a **shell** gate: a gate that audits the port is not a gate the port
 may consume, or assertion B would be checking a roster through the very binary
 whose roster is in question.
+
+Its coverage is split across three oracles because assertion B's three
+configurations cannot all live in one fixture pair, and naming where each is
+proved is what keeps the split from reading as a hole: the `good/`+`bad/` pair
+covers **descriptors and a binary** (parity both ways, the reference-only
+allowance, and each refusal); this repo's own battery covers **no descriptors,
+binary present** — the post-revert tree, where the roster half is the only live
+half; and the consumer smoke covers **no descriptors, no binary** — a vendored
+tree, where the gate must run clean rather than fail-close, which is the
+configuration the reverted port made unreachable.
+
+It is registered in gate-sdk's consumer-smoke install: it needs no consumer
+config, and a vendored tree is exactly where a descriptor with nothing behind it
+would land.
 
 ### check-test-hermetic
 

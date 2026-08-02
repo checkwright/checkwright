@@ -24,6 +24,16 @@ mapfile -t MEMBERS < <(gates_list_members "$LIST")
 RESOLVE_DIRS=("$GATES_DIR")
 while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots_rel)
 
+# spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — the one
+# disposition surface, read by assertion B's reference-only allowance and assertion C
+section="$(awk -v s="$SECTION" '
+    $0 == s { inb = 1; next }
+    inb && /^## / { inb = 0 }
+    inb { print }
+' "$DOC")"; st=$?
+fail_closed "$st" check-gate-substrate-parity awk
+[[ -n "$section" ]] || { echo "check-gate-substrate-parity: no '$SECTION' section in $DOC" >&2; exit 2; }
+
 findings=()
 
 # assertion A: each member resolves to exactly one declaration — a dir carrying
@@ -43,8 +53,8 @@ for m in "${MEMBERS[@]}"; do
 done
 
 # assertion B: the .gate descriptors on disk and the binary's reported subcommand
-# roster are the same set — a descriptor naming no subcommand is a gate that
-# cannot run; a subcommand with no descriptor is a gate nothing declares
+# roster are the same set, with 'reference-only' the one dispositioned exception
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity
 mapfile -t DESCRIPTORS < <(
     for d in "${RESOLVE_DIRS[@]}"; do
         [[ -d "$d" ]] || continue
@@ -56,22 +66,31 @@ mapfile -t DESCRIPTORS < <(
 )
 BIN="${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
 subcommands=()
-if [[ ${#DESCRIPTORS[@]} -gt 0 ]]; then
-    if [[ ! -x "$BIN" ]]; then
-        echo "check-gate-substrate-parity: $BIN is absent or not executable, but ${#DESCRIPTORS[@]} .gate descriptor(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
-        echo "  help: build it — cargo build --release --manifest-path native/Cargo.toml" >&2
-        exit 2
-    fi
+refonly=0
+roster_read=0
+if [[ ${#DESCRIPTORS[@]} -gt 0 && ! -x "$BIN" ]]; then
+    echo "check-gate-substrate-parity: $BIN is absent or not executable, but ${#DESCRIPTORS[@]} .gate descriptor(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
+    echo "  help: build it — cargo build --release --manifest-path native/Cargo.toml" >&2
+    exit 2
+fi
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the roster half is gated on a
+# readable binary, never on descriptor count
+if [[ -x "$BIN" ]]; then
+    roster_read=1
     listing="$("$BIN" --list)"; st=$?
     fail_closed "$st" check-gate-substrate-parity "$BIN --list"
     mapfile -t subcommands < <(printf '%s\n' "$listing" | grep -v '^$' | sort -u)
-    for g in "${DESCRIPTORS[@]}"; do
+    for g in "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}"; do
         printf '%s\n' "${subcommands[@]}" | grep -qx -- "$g" \
             || findings+=("descriptor names no subcommand: $g.gate declares a gate the binary does not carry")
     done
     for s in "${subcommands[@]}"; do
-        printf '%s\n' "${DESCRIPTORS[@]}" | grep -qx -- "$s" \
-            || findings+=("subcommand nothing declares: the binary carries '$s' with no $s.gate descriptor")
+        printf '%s\n' "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}" | grep -qx -- "$s" && continue
+        if grep -F -- "\`$s\`" <<<"$section" | grep -qi -- 'reference-only'; then
+            refonly=$((refonly + 1))
+            continue
+        fi
+        findings+=("subcommand nothing declares: the binary carries '$s' with no $s.gate descriptor and no reference-only disposition in $SECTION")
     done
 fi
 
@@ -81,14 +100,6 @@ fi
 mapfile -t DECLPATHS < <(
     for m in "${MEMBERS[@]}"; do gate_resolve "$m" "${RESOLVE_DIRS[@]}" || true; done
 )
-section="$(awk -v s="$SECTION" '
-    $0 == s { inb = 1; next }
-    inb && /^## / { inb = 0 }
-    inb { print }
-' "$DOC")"; st=$?
-fail_closed "$st" check-gate-substrate-parity awk
-[[ -n "$section" ]] || { echo "check-gate-substrate-parity: no '$SECTION' section in $DOC" >&2; exit 2; }
-
 sensitive=0
 for m in "${MEMBERS[@]}"; do
     src="$(gate_resolve "$m" "${RESOLVE_DIRS[@]}")" || continue
@@ -130,7 +141,9 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     printf '  %s\n' "${findings[@]}"
     echo "  help: one declaration per member — delete the stale .sh or .gate where a dir"
     echo "        carries both. Keep the descriptor set and the binary's --list roster equal:"
-    echo "        add the missing .gate, or drop the subcommand nothing declares."
+    echo "        add the missing .gate, or drop the subcommand nothing declares — or,"
+    echo "        for an implementation deliberately kept ahead of any live port, give it"
+    echo "        a 'reference-only' disposition naming it in $SECTION."
     echo "        A substrate-sensitive member with no disposition is recorded in"
     echo "        $DOC $SECTION — say ported, retained, or retired with cause;"
     echo "        an unrecorded one silently stops asserting when a gate ports."
@@ -140,5 +153,10 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; ${#DESCRIPTORS[@]} descriptor(s) in parity with the subcommand roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation)"
+if [[ "$roster_read" == 1 ]]; then
+    roster="${#DESCRIPTORS[@]} descriptor(s) in parity with the ${#subcommands[@]}-subcommand roster, $refonly reference-only"
+else
+    roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
+fi
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation)"
 exit 0
