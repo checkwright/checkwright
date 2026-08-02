@@ -459,6 +459,12 @@ rather than empty, because a tab counts as IFS whitespace: a reader splitting on
 it coalesces an empty column and silently shifts every field after it, so a
 fixed-arity line must never carry one.
 
+The in-body citation scan (§The tag algebra) is deliberately **not** here: it
+has one reader, and this library holds adapters two or more readers share. It
+lives in `bin/queue-edges.sh`, which sources this library for the section
+regexes and `queue_live_slugs` it does share. A second reader of body-position
+slug tokens is what would promote the scan into this roster.
+
 The loader sources the consumer config, then a `<config>.local.sh` overlay
 beside it when present — last write wins. This is the tracked-name /
 gitignored-value split (the `msg-patterns.local.list` precedent): a private
@@ -522,6 +528,81 @@ capped at `QUEUE_KIT_ATTEND_CAP` (default 3) with overflow noted as
 always-loaded through the session-context hook that embeds this output, so the
 cap is its token budget. This is the inbound lesson channel reaching every
 later session of the iteration with zero consumer-hook edits.
+
+This is a *task-selection* surface, walking bullet lead lines. Its sibling
+`bin/queue-edges.sh` walks entry **bodies** to aggregate citations — a
+different question over the same file (§bin/queue-edges.sh). They stay two
+tools rather than one tool with a fourth mode, because folding them would give
+one tool two jobs and two output grammars.
+
+### bin/queue-edges.sh
+
+The inbound-citation aggregator: a tool, not a gate (no `# graph:` manifest),
+following `bin/queue-index.sh`. It reads the queue, writes **stdout only**, and
+mutates nothing.
+
+```
+usage: queue-edges.sh [--inbound <slug>] [queue-file]
+  default: every live slug with at least one inbound edge, and its citing entries
+  --inbound <slug>: the inbound set for one slug
+```
+
+**Inbound only.** An outbound view is refused for want of a reader: an entry's
+outbound edges *are* its own body, which a session asking the question is
+already reading. Inbound is the direction invisible without a scan of the whole
+file — which is the entire finding this tool answers. Nothing anywhere sums an
+entry's inbound edges into that entry's own cost and benefit, so a survey that
+reads every sibling entry individually can still misrank a unit that several of
+them separately depend on. The tool is that missing sum, which is also what
+makes splitting an entry safe: a split scatters an entry's weight across
+siblings, and this is what adds it back up.
+
+Targets print in queue order — the order every other reader of this file walks
+— each with its inbound count, then one line per citing edge. A slug with no
+inbound edges is absent from the default listing and yields empty output under
+`--inbound`; that is the normal case, not a finding. A `--inbound` slug that is
+not live exits 1 with a message on stderr rather than printing nothing, because
+silence from this tool has to mean "no inbound edges" and nothing else.
+
+**Each edge carries the citing entry's slug and its citing line verbatim**
+(surrounding whitespace stripped, since the output re-indents). This is what
+buys a relation's *kind* without declaring a vocabulary for one: the nature of
+the relation is already written, in the citing author's own words, by the
+person who understood it. Quoting it beats a one-token classification from a
+fixed set, and it is free. It also keeps the tool honest about precision — a
+citation that is a passing mention rather than a relation is *visibly* a
+passing mention once its line is on screen, so a reader discards it in the time
+it takes to read one line. Recall is what the surface needs, and a
+high-recall list whose noise self-identifies is the right trade.
+
+A citation is attributed to the **nearest preceding slug bullet**, so a
+sub-task cites in its own name rather than its parent's, and a lead line
+contributes its `[blocked-by:]` tag alone — never its prose, which is title and
+tags rather than relation.
+
+The body-citation scan lives **in this tool, not in `lib/queue.sh`**: it has
+exactly one reader, and the library's rule is shared adapters (§lib/queue.sh).
+It reuses that library's section regexes and `queue_live_slugs`; a second
+reader of body-position slugs is what would move it.
+
+**No tracked projection, and no freshness gate.** A tracked artifact needs a
+reader who cannot run the tool, and there is none — the one consumer is a
+session with a shell. A generated public page like the roadmap is tracked
+because its audience is outside the repo; this has no such audience. Against
+that, a committed copy of derived edges over what is typically a repo's
+highest-churn file would restale on essentially every queue edit, buying a
+per-commit regeneration tax for zero benefit. Derivation-first is satisfied by
+deriving on demand: that rule's "generate and freshness-gate" clause governs a
+copy that is *needed*, and this one is not. `bin/queue-index.sh` writes nothing
+and is gated by nothing, for the same reason.
+
+**Not a gate, either.** There is nothing to red: an entry with no inbound edges
+is normal, and an entry with many is not a defect. The adjacent temptation —
+redding on a backticked token that resolves to no live slug — is refused
+outright, because those are overwhelmingly legitimate citations of landed work
+(§The tag algebra), and `check-queue-slug-liveness` already owns the liveness
+invariant on the surfaces where a dead reference *is* a false claim. Extending
+it inward would red on good prose.
 
 ### bin/roadmap.sh
 
