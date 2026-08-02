@@ -366,7 +366,42 @@ Three concentric tiers, each an outer backstop for the one inside it:
 
 ## The `# graph:` manifest
 
-Every registered gate's header carries a one-line coupling manifest:
+Every registered gate's **declaration path** carries a one-line coupling
+manifest in its header. The declaration path has two spellings: the gate's own
+`<name>.sh`, or — where the implementation is a compiled subcommand — the
+`<name>.gate` descriptor beside it (§lib/gate.sh resolves between them). The
+manifest grammar below is identical in both; every reader greps it out of the
+declaration path as text and none requires that path to be shell.
+
+**The `.gate` descriptor.** A gate whose implementation is a binary subcommand
+keeps a **non-executable** declaration file `<dir>/<name>.gate` carrying only
+the lines its readers need: the `# graph:` manifest (required), its `# spec:`
+pointer, and an optional `# no-fixture:` opt-out. Nothing else. It is data — it
+is never sourced and never run.
+
+**Its existence is the dispatch declaration, and the subcommand name is the gate
+name.** There is no dispatch field, no second registry and no mapping table,
+because each would be a name that could drift from the thing it names. The one
+fact is the file's presence; the subcommand is derived from the name that
+already identifies the gate everywhere else. Every field it carries has a named
+reader — `# graph:` by the manifest readers below, `# spec:` by
+canon-kit's `check-spec-pointer`, `# no-fixture:` by
+§check-gate-fixture-coverage — and the descriptor carries no field that lacks
+one, reserving nothing against a future reader.
+
+Two shapes were refused, each on a constraint rather than on taste. **The binary
+emitting its own manifest** would make hook generation depend on executing the
+binary, but `installer/lib/init.sh` runs `gen-pre-commit.sh --write` in the
+*consumer* tree; keeping the manifest as tracked text is what makes the seam
+payload-neutral by construction. **A shell stub carrying the manifest and
+exec'ing the binary** would stay inside the `*.sh` corpora of `check-shellcheck`,
+`check-comment-tier`, `check-gate-output` and the rest, which would then scan a
+three-line file and report `clean` — coverage that reads as real and asserts
+nothing. A `.gate` descriptor is *honestly outside* those corpora instead of
+trivially passing inside them, and §Meta-gate conservation for the binary
+substrate is what makes that honesty auditable.
+
+The manifest grammar:
 
 ```
 # graph: couples=<globs> dir=bi|one valve=none|PROPOSED tier=precommit|align-only|commit-msg [mode=staged|whole-tree] [trigger=<globs>] [gen=manual]
