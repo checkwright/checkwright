@@ -12,6 +12,119 @@
 
 ## New Features
 
+- **native-gate-vendoring-model** [spec: SPEC-native-gate-vendoring-model.md] — how a
+  binary-substrate kit installs. [precondition-ok: this entry is the unblocker — the
+  second port it names waits on it, not the reverse]
+  **Distribution is the hard part, not the language** — the parent's oldest constraint,
+  dropped by the 2026-08-02 compression and restored here. Kits vendor as **text with
+  zero build step**: `installer/lib/init.sh` writes every file of a selected kit, and a
+  profile selects kits rather than files. A gate that is a compiled subcommand has no
+  text to write, so the install model is what the port breaks first — before any
+  question of what a consumer may read.
+  **The extensibility model decides everything else**, in the filing's own words:
+  script escape hatch as first-class vs a declarative check DSL vs native plugins.
+  Only the first is recorded today, as the parent deliverable's "consumer gates keep
+  the shell hatch"; the two alternatives were dropped with no recorded rejection, so
+  a later session re-derives them from nothing.
+  **A constraint that must not be lost again:** git is the sole runtime dependency,
+  **shelled out, not embedded**. What the parent carries now — "buildable source,
+  needing only git" — is a different and weaker claim, about the build, not the run.
+  **Boundary with `gate-payload-disclosure-ruling`, stated so neither sprawls:** that
+  entry rules what a compiled gate *discloses* to a consumer; this one rules how it
+  *arrives* there. Neither answers the other, and the parent needs both.
+  **This is now a hard prerequisite for any second port, and the cost is measured.**
+  Slice 1 ported one gate, hit exactly this, and **reverted the port**. Mechanism, run
+  not reasoned: a `.gate` descriptor lives under a kit root and therefore vendors;
+  `native/` ships no `checks/` or `smoke/`, so `gate_kit_roots()` never includes it and
+  no consumer ever receives the crate. `gate_command` fail-closes exit 2 on the absent
+  binary, and that exit is a *dispatch-harness* error — it kills the **calling battery**,
+  not just its member. A freshly vendored consumer's pre-commit battery died on
+  invocation; `demo`, `consumer_smoke` and `agents_md_smoke` all reproduced it.
+  So the entry's own line — "the install model is what the port breaks first" — is
+  confirmed, and its old "Nothing is incorrect meanwhile" is retired: something was
+  incorrect, for the length of one iteration. gate-sdk/SPEC.md §Porting a gate to the
+  binary substrate states it as **criterion 5** — a gate is portable only if its
+  vendored form remains runnable — and that criterion is unsatisfiable for any gate in
+  a vendoring kit until this entry rules. A second port is blocked on it, not parallel
+  to it.
+  **Cost while deferred:** the seam sits built and unusable — every retained piece
+  (crate, descriptor spelling, resolution split, conservation contract, parity gate)
+  waits on an install model, and the reference-only implementation is the only thing
+  keeping the crate's tests from asserting over nothing.
+  **Taken into the `native-port-unblocking` iteration by operator direction
+  2026-08-02**, ahead of nearer-payoff work, on exactly the cost above.
+  Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
+  Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
+  reverted the port.
+
+- **gate-payload-disclosure-ruling** [spec: SPEC-gate-payload-disclosure-ruling.md] —
+  what a compiled gate ships to a
+  consumer tree. Companion to `native-gate-binary-port`, inside that entry's envelope
+  and filed apart so neither body sprawls.
+  **Today's answer is an artifact of the substrate, not a choice:** a bash gate *is*
+  its source, so there is nothing else to ship. Measured 2026-08-02 —
+  `scripts/pack-installer.sh`:80 copies whole kit roots, `installer/lib/init.sh`:130-132
+  writes every file of each, and a profile selects kits and never files, so a consumer
+  receives `checks/`, `gate-tests/`, `smoke/`, `lib/` and `bin/` entire, over both
+  transports.
+  **Once gates compile it becomes a lever:** binary plus documented rule, or sources
+  and fixtures as now. That choice is what fixes the opacity range the parent states,
+  which is why it is a first-class design question rather than a packaging detail.
+  **Counterweight the ruling must carry:** withholding sources **raises** the
+  reproducible-build and checksum obligation, because a consumer who cannot read the
+  gate has only the build's attestation — and "buildable source, needing only git" is
+  already in the parent's own deliverable.
+  **A contract question that must not be discovered late:** the `good/`+`bad/` fixture
+  pair is a gate-sdk contract held by meta-gates, and whether that contract is
+  development-side or shipping-side is unstated today.
+  **The distinction that makes that question tractable, restored 2026-08-02 from a
+  parent revision a compression dropped:** `init` vendors every kit file, fixtures
+  included, so a consumer agent keeps the pair — which discloses a gate's *shape*,
+  never its predicate. Shape-without-predicate is the middle option the
+  binary-versus-sources framing above otherwise hides.
+  **Cost while deferred:** the parent's headline benefit stays a range rather than a
+  value, so a first cohort could land on a substrate whose main justification is still
+  unsettled. **Taken into the `native-port-unblocking` iteration by operator direction
+  2026-08-02**, and not separably from `native-gate-vendoring-model`: the cheapest
+  install model on the table — a descriptor declaring a shell fallback, so an absent
+  binary degrades to it — hands the consumer the source and settles this entry by
+  accident. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
+  decision the port owns rather than an inheritance from the bash era.
+
+- **native-gate-meta-layer-reach** [spec: SPEC-native-gate-meta-layer-reach.md] —
+  `check-reads-couples` has no
+  binary-side equivalent, and until one exists no further gate can be ported.
+  **Narrowed 2026-08-02 at scope to this half alone**, by operator ruling; the
+  `check-gate-tamper` half left as `gate-tamper-roster-native-reach` and stays
+  deferred. gate-sdk/SPEC.md §Porting a gate to the binary substrate names this
+  absence as one of the two prerequisites a second port needs, the other being
+  `native-gate-vendoring-model`.
+  **The filed premise was falsified at the narrowing, and that correction is what
+  makes the split safe.** This entry said the gate refuses "unless the descriptor
+  carries a `# reads-couples-exempt:` reason", free-text and unbound to a task —
+  "the shape that accumulates silently". No such exemption exists:
+  `gate-sdk/checks/check-reads-couples.sh`:107-115 refuses exit 2 on any `.gate`
+  member unconditionally and says so in its own help — "There is deliberately no
+  descriptor-level exemption: a port that could opt out of this in a sentence would
+  end the assertion it must replace." The opt-out lived exactly as long as the live
+  port did and was removed with it. So the risk is not silent accumulation but a
+  **hard wall** — and this half no longer shares a ruling with the tamper half,
+  which was the whole reason the two could not be split before.
+  **What slice 1 proved, kept because it bounds the deliverable:** its single ported
+  gate was honest here — the one walk was already undecidable and
+  skipped-and-counted in shell, verified by running the pre-port script through the
+  gate — so that port ended no assertion. A second port need not be so lucky.
+  **The design question, narrowed:** the deliverable is a binary-side walk analysis ending
+  the same assertion the shell parser does, and whether that belongs to each
+  substrate or to a substrate-neutral descriptor is still
+  `gate-authoring-sdk-surface`'s question — narrowed here, not answered.
+  **Ordered into `native-port-unblocking` by operator direction 2026-08-02**, on the
+  ground that a second port is impossible for as long as this stands.
+  **Cost while deferred:** zero today (no live `.gate` dispatch); from the moment a
+  port is attempted it stops being a cost and becomes a refusal — the battery halts.
+  Filed 2026-08-02 at close from the gap inbox; found by validate. Narrowed, and its
+  premise corrected against the tree, 2026-08-02 at scope.
+
 ## Technical Debt
 
 - **native-gate-language-ruling** — record a closed language decision. Land the
@@ -2595,82 +2708,6 @@
   Filed 2026-08-02 by scope from supplemental operator intake during the unit-set
   survey; scope-gated intake, so filed costed rather than started.
 
-- **gate-payload-disclosure-ruling** [design-pending] — what a compiled gate ships to a
-  consumer tree. Companion to `native-gate-binary-port`, inside that entry's envelope
-  and filed apart so neither body sprawls.
-  **Today's answer is an artifact of the substrate, not a choice:** a bash gate *is*
-  its source, so there is nothing else to ship. Measured 2026-08-02 —
-  `scripts/pack-installer.sh`:80 copies whole kit roots, `installer/lib/init.sh`:130-132
-  writes every file of each, and a profile selects kits and never files, so a consumer
-  receives `checks/`, `gate-tests/`, `smoke/`, `lib/` and `bin/` entire, over both
-  transports.
-  **Once gates compile it becomes a lever:** binary plus documented rule, or sources
-  and fixtures as now. That choice is what fixes the opacity range the parent states,
-  which is why it is a first-class design question rather than a packaging detail.
-  **Counterweight the ruling must carry:** withholding sources **raises** the
-  reproducible-build and checksum obligation, because a consumer who cannot read the
-  gate has only the build's attestation — and "buildable source, needing only git" is
-  already in the parent's own deliverable.
-  **A contract question that must not be discovered late:** the `good/`+`bad/` fixture
-  pair is a gate-sdk contract held by meta-gates, and whether that contract is
-  development-side or shipping-side is unstated today.
-  **The distinction that makes that question tractable, restored 2026-08-02 from a
-  parent revision a compression dropped:** `init` vendors every kit file, fixtures
-  included, so a consumer agent keeps the pair — which discloses a gate's *shape*,
-  never its predicate. Shape-without-predicate is the middle option the
-  binary-versus-sources framing above otherwise hides.
-  **Cost while deferred:** the parent's headline benefit stays a range rather than a
-  value, so a first cohort could land on a substrate whose main justification is still
-  unsettled. **Taken into the `native-port-unblocking` iteration by operator direction
-  2026-08-02**, and not separably from `native-gate-vendoring-model`: the cheapest
-  install model on the table — a descriptor declaring a shell fallback, so an absent
-  binary degrades to it — hands the consumer the source and settles this entry by
-  accident. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
-  decision the port owns rather than an inheritance from the bash era.
-
-- **native-gate-vendoring-model** [design-pending] — how a binary-substrate kit installs.
-  **Distribution is the hard part, not the language** — the parent's oldest constraint,
-  dropped by the 2026-08-02 compression and restored here. Kits vendor as **text with
-  zero build step**: `installer/lib/init.sh` writes every file of a selected kit, and a
-  profile selects kits rather than files. A gate that is a compiled subcommand has no
-  text to write, so the install model is what the port breaks first — before any
-  question of what a consumer may read.
-  **The extensibility model decides everything else**, in the filing's own words:
-  script escape hatch as first-class vs a declarative check DSL vs native plugins.
-  Only the first is recorded today, as the parent deliverable's "consumer gates keep
-  the shell hatch"; the two alternatives were dropped with no recorded rejection, so
-  a later session re-derives them from nothing.
-  **A constraint that must not be lost again:** git is the sole runtime dependency,
-  **shelled out, not embedded**. What the parent carries now — "buildable source,
-  needing only git" — is a different and weaker claim, about the build, not the run.
-  **Boundary with `gate-payload-disclosure-ruling`, stated so neither sprawls:** that
-  entry rules what a compiled gate *discloses* to a consumer; this one rules how it
-  *arrives* there. Neither answers the other, and the parent needs both.
-  **This is now a hard prerequisite for any second port, and the cost is measured.**
-  Slice 1 ported one gate, hit exactly this, and **reverted the port**. Mechanism, run
-  not reasoned: a `.gate` descriptor lives under a kit root and therefore vendors;
-  `native/` ships no `checks/` or `smoke/`, so `gate_kit_roots()` never includes it and
-  no consumer ever receives the crate. `gate_command` fail-closes exit 2 on the absent
-  binary, and that exit is a *dispatch-harness* error — it kills the **calling battery**,
-  not just its member. A freshly vendored consumer's pre-commit battery died on
-  invocation; `demo`, `consumer_smoke` and `agents_md_smoke` all reproduced it.
-  So the entry's own line — "the install model is what the port breaks first" — is
-  confirmed, and its old "Nothing is incorrect meanwhile" is retired: something was
-  incorrect, for the length of one iteration. gate-sdk/SPEC.md §Porting a gate to the
-  binary substrate states it as **criterion 5** — a gate is portable only if its
-  vendored form remains runnable — and that criterion is unsatisfiable for any gate in
-  a vendoring kit until this entry rules. A second port is blocked on it, not parallel
-  to it.
-  **Cost while deferred:** the seam sits built and unusable — every retained piece
-  (crate, descriptor spelling, resolution split, conservation contract, parity gate)
-  waits on an install model, and the reference-only implementation is the only thing
-  keeping the crate's tests from asserting over nothing.
-  **Taken into the `native-port-unblocking` iteration by operator direction
-  2026-08-02**, ahead of nearer-payoff work, on exactly the cost above.
-  Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
-  Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
-  reverted the port.
-
 - **gate-authoring-sdk-surface** [design-pending] [roadmap: next/ecosystem] — a gate-authoring SDK.
   `.gate` as the substrate-neutral surface. **Operator-surfaced during
   `native-gate-dispatch-seam` build; filed so the framing outlives the session that
@@ -2849,39 +2886,6 @@
   from the first commit of the second port onward. CI is unaffected either way
   (fresh build every run); the exposure is local pre-commit-gated commits only.
   Filed 2026-08-02 at close from the gap inbox; found during validate.
-
-- **native-gate-meta-layer-reach** [design-pending] — `check-reads-couples` has no
-  binary-side equivalent, and until one exists no further gate can be ported.
-  **Narrowed 2026-08-02 at scope to this half alone**, by operator ruling; the
-  `check-gate-tamper` half left as `gate-tamper-roster-native-reach` and stays
-  deferred. gate-sdk/SPEC.md §Porting a gate to the binary substrate names this
-  absence as one of the two prerequisites a second port needs, the other being
-  `native-gate-vendoring-model`.
-  **The filed premise was falsified at the narrowing, and that correction is what
-  makes the split safe.** This entry said the gate refuses "unless the descriptor
-  carries a `# reads-couples-exempt:` reason", free-text and unbound to a task —
-  "the shape that accumulates silently". No such exemption exists:
-  `gate-sdk/checks/check-reads-couples.sh`:107-115 refuses exit 2 on any `.gate`
-  member unconditionally and says so in its own help — "There is deliberately no
-  descriptor-level exemption: a port that could opt out of this in a sentence would
-  end the assertion it must replace." The opt-out lived exactly as long as the live
-  port did and was removed with it. So the risk is not silent accumulation but a
-  **hard wall** — and this half no longer shares a ruling with the tamper half,
-  which was the whole reason the two could not be split before.
-  **What slice 1 proved, kept because it bounds the deliverable:** its single ported
-  gate was honest here — the one walk was already undecidable and
-  skipped-and-counted in shell, verified by running the pre-port script through the
-  gate — so that port ended no assertion. A second port need not be so lucky.
-  **Why `[design-pending]`:** the deliverable is a binary-side walk analysis ending
-  the same assertion the shell parser does, and whether that belongs to each
-  substrate or to a substrate-neutral descriptor is still
-  `gate-authoring-sdk-surface`'s question — narrowed here, not answered.
-  **Ordered into `native-port-unblocking` by operator direction 2026-08-02**, on the
-  ground that a second port is impossible for as long as this stands.
-  **Cost while deferred:** zero today (no live `.gate` dispatch); from the moment a
-  port is attempted it stops being a cost and becomes a refusal — the battery halts.
-  Filed 2026-08-02 at close from the gap inbox; found by validate. Narrowed, and its
-  premise corrected against the tree, 2026-08-02 at scope.
 
 - **gate-tamper-roster-native-reach** [design-pending] — `check-gate-tamper` does not
   reach a ported gate's implementation. Split 2026-08-02 at scope from
