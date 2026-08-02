@@ -588,10 +588,12 @@
   **Re-verified 2026-08-02 at scope, and a second un-defer trigger named.** The
   workflow count moved (two → three); the substance is unchanged — still zero
   non-Linux legs, no `matrix:` key anywhere, and the adopter trigger unfired. The
-  second trigger: **`native-gate-binary-port` promoting**. That entry's deliverable
-  is checksummed per-platform artifacts, which cannot be built or smoked without
-  exactly the legs this entry supplies — so the port makes this a prerequisite, not
-  the other way round.
+  second trigger: **`native-gate-binary-port` reaching distribution** — refined the
+  same day, because "prerequisite" first stated it too strongly. The two are
+  *different jobs* sharing only runner spend: that entry needs binary build+smoke
+  legs in `publish.yml`, this one specs install-smoke of the bash battery. So
+  neither blocks the other's start, and the port's per-platform obligation attaches
+  to its artifacts clause — the release boundary, not the first ported cohort.
   **The un-defer trigger, carried so the reason is not re-derived:** the gap
   that motivates the legs is now *stated* rather than contradicted —
   `platform-support-contract` landed the floor contract, so `docs/install.md`
