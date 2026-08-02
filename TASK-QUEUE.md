@@ -53,37 +53,6 @@
   Surfaced 2026-07-29 at spec while surveying readers for the icebox tier;
   token-scan half added 2026-07-31 at align; promoted 2026-08-02 by spec.
 
-- **gate-fixture-expect-conjunction** [spec: gate-sdk/SPEC-fixture-expect-conjunction.md]
-  — **a multi-line `expect.txt` reads as alternatives, not a conjunction.**
-  `run-gate-tests` matches with `grep -qF`, which splits a multi-line pattern
-  into separate fixed strings and matches any, so a `bad/` case asserting two
-  findings passes when only one fires. The author who wrote two lines pinned one
-  and nothing said otherwise: §run-gate-tests says the case "print its substring",
-  singular, and never states the limit. The worst shape in this iteration's set —
-  the other units weaken a *gate's* green, this one weakens the **fixture pair**
-  that proves a gate works, and a pair that under-asserts is worse than an absent
-  one because it reads as coverage.
-  Blast radius measured at close: **3 of 187** tracked `expect.txt` files are
-  multi-line, 8 lines between them, and all 8 currently hold — so the tightening
-  is expected to red nothing. Expected, not assumed: build re-derives the set at
-  its own HEAD and treats any red as this unit's thesis arriving as evidence.
-  Four deltas: the per-line conjunction with blank lines asserting nothing and
-  order deliberately not required (**design-bearing**); a failure report naming
-  **every** missing line rather than the first (**design-bearing**); the
-  semantics stated in §run-gate-tests as a contract every kit's fixture authors
-  write against (**mechanical**); the coverage (**design-bearing**).
-  **Coverage shape corrected at spec:** the runner is a `bin/` tool, not a
-  `gates.list` member, so it owes no fixture pair — the coverage is a bespoke
-  `gate-sdk/gate-tests/run-gate-tests.test.sh` on the `run-for-path.test.sh`
-  precedent, sourcing `lib/test-hermetic.sh`, with the inner invocation's scratch
-  tests dir holding no `*.test.sh` so the self-invocation cannot recurse.
-  Build writes the two-line-expect-with-one-finding case **first** and watches it
-  fail against the unpatched runner; it is the only case that changes verdict in
-  the direction the defect lives.
-  Surfaced 2026-08-02 while writing `check-template-registry-parity`'s pair,
-  whose `bad/` tree fires both assertions but could pin only one; promoted
-  2026-08-02 by spec.
-
 - **prose-enum-identifier-boundary-class** [spec: canon-kit/SPEC-prose-enum-identifier-boundary.md]
   — **a false clean live for every `check-prose-enum` consumer**, not a
   repo-local wrinkle. `_sk_present` bounds a member match with `[[:alnum:]-]`, a
@@ -2443,5 +2412,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- gate-fixture-expect-conjunction
 
 ## Lessons Learned

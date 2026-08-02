@@ -254,8 +254,9 @@ When a gate is written or edited, it ships with — or updates — its
 `good/`+`bad/` fixture pair under `<tests-dir>/<gate>/`, run by
 `run-gate-tests.sh`. A gate that prints `clean` on broken input is invisible to
 every static check; the only proof it fails closed and that its error text is
-right is a known-bad input (the `bad/` case asserting exit 1 + an `expect.txt`
-substring), paired with a `good/` case asserting acceptance. Coverage is
+right is a known-bad input (the `bad/` case asserting exit 1 + its `expect.txt`
+line(s) — every one of them, §run-gate-tests owning the semantics), paired with
+a `good/` case asserting acceptance. Coverage is
 enforced by `check-gate-fixture-coverage`: every registry member carries either
 a pair or a `# no-fixture: <reason>` header annotation — the honest, reviewable
 escape for whole-tree scanners whose state has no static-fixture representation
@@ -837,10 +838,21 @@ Golden-fixture runner. Each `<tests-dir>/<gate>/` holds `good/` + `bad/` case
 dirs; the runner `cd`s into the case dir and invokes the gate (resolved against
 the consumer gates dir, then each vendored kit's `checks/`) with the args in the case's
 `args` file (`#` lines stripped). `good/` must exit 0 (and, when
-`good/expect.txt` exists, print its substring); `bad/` must exit 1 and print
-`bad/expect.txt`'s substring — a rejection substring is required, so the *right*
-finding fired. Exit 2 from a gate marks the fixture malformed (harness error,
-distinct from logic failure). Fixture-pair hermeticity is the `cd` into the case
+`good/expect.txt` exists, satisfy it); `bad/` must exit 1 and satisfy
+`bad/expect.txt` — a rejection expectation is required, so the *right*
+finding fired. An `expect.txt` is a **conjunction**: every non-blank line must
+appear literally in the case's combined output, and the case fails when any one
+of them does not. So **a case pinning two findings writes two lines**, which is
+what the plural form is for — the semantics both files share, `good/`'s being
+optional to supply and identical once supplied. Matching stays
+**order-independent** (requiring the printed order would couple every fixture to
+a report ordering several gates do not fix and none contracts, and a fixture
+pinning two findings cares that both fired, not which printed first), and a
+blank or whitespace-only line asserts nothing — it is a separator, not a pin, a
+line `grep -F` would match against any output at all. A failing case names
+**every** missing line rather than the first, so one re-run resolves the case
+instead of revealing one absent pin per run. Exit 2 from a gate marks the
+fixture malformed (harness error, distinct from logic failure). Fixture-pair hermeticity is the `cd` into the case
 dir: a gate resolving its `<KIT>_CONFIG_FILE` under the cwd finds only the case's
 own files (and a fixture may ship its own cwd-relative config deliberately).
 `<tests-dir>/*.test.sh` unit tests run after the pairs; each must exit 0 — and
@@ -867,7 +879,14 @@ ruled out — `check-test-hermetic`'s assertion A enumerates
 `<kit-root>/gate-tests/*.test.sh` only, so a test outside that directory silently
 escapes the bootstrap-or-marker obligation that is the whole reason this lane
 lives here. The runner is a
-test layer parallel to the gates, never a `gates.list` member.
+test layer parallel to the gates, never a `gates.list` member — so, like
+§upgrade-smoke's tool, it owes no `good/`+`bad/` pair of its own and a pair
+would sit outside `check-gate-fixture-coverage`'s registry authority set,
+audited by nothing. Its own coverage is the bespoke
+`gate-tests/run-gate-tests.test.sh`, which drives it over scratch fixture trees
+to pin the expect-line conjunction above; the inner invocation is bounded by
+handing it a tests dir holding fixture dirs and **no** `*.test.sh`, so it runs
+pairs and returns.
 
 ### run-consumer-smoke
 

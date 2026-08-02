@@ -57,9 +57,17 @@ run_case() {
         printf '    %s\n' "$out"
         return 1
     fi
-    if [[ -n "$expect" ]] && ! grep -qF -- "$expect" <<<"$out"; then
-        echo "  FAIL: $gate $(basename "$casedir") exit $rc OK but output lacks expected substring:"
-        echo "        want: $expect"
+    # Every non-blank expect line is its own assertion: grep -F would read a
+    # multi-line pattern as alternatives and pass on any one of them.
+    local -a missing=()
+    local want
+    while IFS= read -r want; do
+        [[ -z "${want//[[:space:]]/}" ]] && continue
+        grep -qF -- "$want" <<<"$out" || missing+=("$want")
+    done <<<"$expect"
+    if [[ "${#missing[@]}" -gt 0 ]]; then
+        echo "  FAIL: $gate $(basename "$casedir") exit $rc OK but output lacks expected line(s):"
+        printf '        missing: %s\n' "${missing[@]}"
         printf '    %s\n' "$out"
         return 1
     fi
