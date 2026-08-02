@@ -2173,11 +2173,11 @@
   predicate; flagged then as contingent, not a present defect, and re-verified
   against the shipped gate at close.
 
-- **companion-toolkit-profile** [design-pending] — govern a tree whose specs an
-  **external spec-authoring toolkit produced**: a consumer profile for the case
-  where the specs Checkwright gates were written by a second toolkit's workflow
-  rather than by this one's `spec` stage. The interop rung, and the one that
-  cashes the front-door claim below.
+- **companion-toolkit-profile** [design-pending] [roadmap: next/ecosystem] — the interop rung.
+  roadmap-summary: Gate a tree whose specs another toolkit's workflow wrote.
+  Govern a tree whose specs an **external spec-authoring toolkit produced** — a
+  consumer profile for when the specs Checkwright gates were written by a second
+  toolkit's workflow, not by this one's `spec` stage. It cashes the claim below.
   **The design is already decided and is not what this entry holds.** Two
   rulings on record settle it: `prose-profile` rules that a profile ships as an
   adapter delivered as optional consumer config and never as a kit literal, and
