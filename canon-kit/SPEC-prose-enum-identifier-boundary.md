@@ -34,14 +34,29 @@ both abutting characters are outside the identifier class — so `guard_allow`
 is present in "the `guard_allow` helper" and absent from "the
 `guard_allow_match` pair", which is what a reader means by both sentences.
 
-**This is not a new convention; it is the tree's existing one, arriving late.**
-The widened class is already what the neighbours use for exactly this job:
+**The tree already treats `_` as a name character everywhere it builds an
+identifier token** — and the distinction between those sites and this one is
+worth drawing precisely rather than claiming more support than exists:
 
-| Site | Class | Job |
+| Site | Class | What it does |
 |---|---|---|
-| `gate-sdk/checks/check-readme-roster.sh:62` | `[[:alnum:]_-]` | gate-name token |
-| `canon-kit/lib/spec.sh:286` | `[[:alnum:]_-]` | identifier-shaped token |
-| `canon-kit/checks/check-prose-enum.sh:54` | `[[:alnum:]-]` | **the outlier** |
+| `gate-sdk/checks/check-readme-roster.sh:62` | `[[:alnum:]_-]` | *token shape* — matches a gate name; `_` is part of the name |
+| `canon-kit/lib/spec.sh:286` | `[[:alnum:]_-]` | *token shape* — the count gate's wedge-word builder |
+| `canon-kit/lib/spec.sh:320-321` | `[[:alnum:]]` / `[[:alnum:]-]` | *boundary* — but for a prose **noun**, and asymmetric between the two sides |
+| `canon-kit/checks/check-prose-enum.sh:54` | `[[:alnum:]-]` | *boundary*, for an **identifier** — the site under change |
+
+The first two are not the same idiom: a token-shape regex is not a
+boundary-presence test, and citing them as precedent for the boundary rule would
+be overclaiming. What they *do* establish is the premise the change rests on —
+that in this tree an underscore is interior to a name, not a break between two.
+Once that is granted, an identifier boundary that treats `_` as a break is simply
+inconsistent with how the same tree spells its names.
+
+The third row is the only other **boundary** in the tree, and it is a genuinely
+different rule: it guards a prose noun against gluing to a following word
+("gate" inside "gatekeepers"), and it is asymmetric — the leading side omits the
+hyphen the trailing side carries. It is an independently written copy, not a
+shared helper.
 
 **What stays unchanged, and why the widening is exactly one character.** The
 class must keep excluding `.` and `/`, and this is load-bearing rather than
@@ -58,7 +73,10 @@ against gluing to a following word ("gate" inside "gatekeepers"), not an
 identifier against gluing to a sibling. English nouns do not compound across
 underscores, so widening it would add nothing and would quietly imply the two
 boundaries are one rule. They are two rules that happen to have shared a
-spelling; build must not "fix" the sibling for consistency.
+spelling — and only half-shared it, since that site's *leading* boundary
+(`bc ~ /[[:alnum:]]/`) omits the hyphen its trailing side carries. Build must not
+"fix" the sibling for consistency, and must not read its asymmetry as a bug on
+this amendment's account: it is a separate question this unit does not open.
 
 **Rejected: make the class a knob.** `CANON_KIT_ENUM_BOUNDARY_CLASS` or similar
 is refused. Config-via-env carries a *consumer's* posture — its surfaces, its
@@ -190,9 +208,25 @@ configured by `scripts/enum-sets.sh`, covered by
 `canon-kit/gate-tests/check-prose-enum/{good,bad}/` plus
 `canon-kit/gate-tests/check-prose-enum.test.sh`, rostered in canon-kit/README.md,
 and specified at canon-kit/SPEC.md §check-prose-enum (mirrored to
-`docs/canon-kit/SPEC.md`). `_sk_present` has no caller outside its own file. The
-two sibling boundary classes are enumerated in delta 1, with the one that must
-not change and the reason. Build re-runs this survey against the tree before
+`docs/canon-kit/SPEC.md`). `_sk_present` has no caller outside its own file, and
+`sk_on_pflush` in that same file is its only one. The sibling boundary and
+token-shape classes are enumerated in delta 1, with the one that must not change
+and the reason.
+
+**Two measurements taken at this HEAD, because the unit's whole premise is that
+this tree cannot produce evidence:** `scripts/enum-sets.sh` emits 69 members
+across 12 sets, **zero** of which contain an underscore; and an all-pairs
+within-set prefix test finds **zero** members that are a strict prefix of a
+sibling. So the widening is confirmed to change no verdict here — by computation
+rather than by the hyphenation argument alone, which was the reasoning the entry
+was filed on and is now checked. `check-prose-enum.test.sh` currently holds ten
+cases (the empty-default skip, two fail-closed escapes, bracketed
+incomplete/complete, scattered mentions, multi-set independence, and the three
+exempt escapes) and **none of them touches the boundary class** — which is the
+coverage gap delta 3 fills, and the reason the new case cannot be a variation on
+an existing one.
+
+Build re-runs this survey against the tree before
 implementing, with **no `2>/dev/null` on any path probe** — a silenced stderr on
 a mistyped path reads a live reader as absent, which is the same false-negative
 shape this whole unit is about.

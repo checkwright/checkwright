@@ -20,14 +20,20 @@
   at spec: **159 tokens against 94 real lead-line slugs — 65 spurious**.
   **Seam ruled at spec 2026-08-02 — re-implement and cite from both ends.**
   gate-sdk carries the lead-line predicate as its own code, verbatim the text
-  queue-kit's `queue_live_slugs` and canon-kit's `spec_queue_slugs` already
-  carry independently: no dependency, **no new knob**. Not a new rule —
+  **four** existing holders already carry independently — `queue_live_slugs`,
+  `spec_queue_slugs`, and two inline scans a function-name grep does not find
+  (`check-task-names.sh`, `kpi-queue-net-delta.sh`'s `pool()`). No dependency,
+  **no new knob**; gate-sdk becomes the fifth. Not a new rule —
   queue-kit/SPEC.md §The queue format already states it for drift-kit, and the
   reciprocal half is added there. Evidence the re-implementation is faithful:
   the predicate reproduces `queue_live_slugs`'s answer exactly, 94 for 94. The
   whitespace-tolerant anchor is the *correct* one rather than a tolerance — an
   indented bold lead-in is a sub-task and sub-task slugs share the global
   namespace, so a column-0 anchor would fail **closed** on that class.
+  **Residue stated with its size:** a queue-format change costs five hand edits
+  and no gate enforces any. Not this unit's to fix — whether five hand-coupled
+  parsers earn a shared derivation or a conformance gate is a different unit,
+  neither answered nor foreclosed here.
   **The struck half stays struck**: the section-span defect was refused
   2026-08-02 on spec-over-precedent, and the span, its
   no-reset-on-unknown-heading behavior and the icebox coupling riding on it are

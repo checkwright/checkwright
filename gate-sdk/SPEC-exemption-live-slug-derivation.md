@@ -39,19 +39,33 @@ this section." Re-implement, and cite from both ends. gate-sdk's case is the sam
 rule with a stronger reason — not a cycle but a layering inversion, since
 gate-sdk is the substrate every other kit vendors.
 
-Two kits already carry this exact predicate independently, and neither depends
-on the other:
+**Four independent holders already exist**, across three kits, none depending on
+another. The set was surveyed rather than assumed, and it is larger than the two
+the obvious grep finds:
 
-| Holder | Line | Predicate |
+| Holder | Site | Shape |
 |---|---|---|
-| queue-kit | `lib/queue.sh:95` (`queue_live_slugs`) | `/^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/` |
-| canon-kit | `lib/spec.sh:150` (`spec_queue_slugs`) | the same text, character for character |
+| queue-kit | `lib/queue.sh:91` (`queue_live_slugs`) | `/^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/` |
+| canon-kit | `lib/spec.sh:147` (`spec_queue_slugs`) | the same text, character for character |
+| queue-kit | `checks/check-task-names.sh:19-70` | its **own** inline awk `live[slug]=1` scan — it shares `queue.sh`'s section *regexes* but not the derivation |
+| drift-kit | `kpis/kpi-queue-net-delta.sh:21-37` (`pool()`) | same lead-in scan, deliberately narrowed to deferred+icebox, and it **does** reset on an unknown heading |
 
-gate-sdk becomes the third holder of the same text. What it must **not** do —
-and the reason this needed a ruling rather than a build edit — is invent a
-*fourth dialect*: a predicate that is nearly the queue format would fail
+gate-sdk becomes the **fifth** holder of the lead-line rule. What it must **not**
+do — and the reason this needed a ruling rather than a build edit — is invent a
+*fifth dialect*: a predicate that is nearly the queue format would fail
 differently from its siblings on the same queue, and the divergence would be
-invisible because all three run green on a well-formed file.
+invisible because all of them run green on a well-formed file.
+
+Two facts in that table are worth build's attention rather than a glance. The
+third row shows the re-implementation rule is already applied *within* queue-kit
+itself, so a kit does not always route through its own lib. The fourth shows the
+holders **already diverge deliberately** on the span — `kpi-queue-net-delta`
+resets on an unknown heading where `check-gate-exemption-tasks` does not, the
+same "same shape, opposite behavior, both wanted" pairing
+§check-gate-exemption-tasks already draws with `kpi-deferred-age`. That is the
+precise reason this amendment changes the **line predicate** and leaves the span
+alone: the line predicate is the part every holder agrees on, and the span is the
+part each holder is entitled to choose.
 
 **Rejected: source queue-kit's `lib/queue.sh` from gate-sdk.** It is the obvious
 DRY move and it is refused on the seam. gate-sdk is the *substrate* every kit
@@ -189,24 +203,58 @@ established convention for carrying scanned counts, so it opens no channel.
 **The bullet lead-line format (existing cross-kit interface, new holder).**
 Producer: the operator or stage session writing a queue entry, under queue-kit's
 lead-line rule — unchanged, and already gated by queue-kit's own lead-line gate.
-Consumer: three independent parsers after this lands — `queue_live_slugs`,
-`spec_queue_slugs`, and gate-sdk's walk. The coupling is carried by SPEC prose in
-each kit, never by code, which is the same seam mechanism
-§check-gate-exemption-tasks already uses for the section set. **The honest cost:
-a queue-format change now requires three edits and no gate enforces the third**,
-exactly as no gate enforces the section-set coupling today. That residue is
-accepted on the same ground the existing one is — a cross-kit code dependency
-would cost more than the divergence risk — and it is stated in the SPEC rather
-than left for a reader to discover.
+Consumer: **five** independent parsers after this lands — `queue_live_slugs`,
+`spec_queue_slugs`, `check-task-names.sh`'s inline scan,
+`kpi-queue-net-delta.sh`'s `pool()`, and gate-sdk's walk. The coupling is carried
+by SPEC prose in each kit, never by code, which is the same seam mechanism
+§check-gate-exemption-tasks already uses for the section set.
+
+**The honest cost, and it is larger than this amendment first assumed: a
+queue-format change requires five edits and no gate enforces any of them.** The
+survey is the reason the number is right — a grep for the *function* names finds
+two holders, and the other two are inline scans that no naming convention
+surfaces. That is not an argument against the seam ruling, which is settled by
+layering rather than by count. It is an argument that the residue is worth
+stating in the SPEC with its size rather than as a vague caution, because the
+next person to change the queue format will otherwise find the two that are easy
+to find. Accepted on the same ground the existing section-set residue is — a
+cross-kit code dependency would cost more than the divergence risk — and
+gate-sdk's arrival does not change the shape of the problem, only its census.
+
+Build should not read that as licence to fix it here. Whether five hand-coupled
+parsers earn a shared derivation, a conformance test, or a gate is a real
+question and a **different unit**; this amendment neither answers it nor
+forecloses it, and a build session that starts answering it has left its scope.
 
 **Whole-component-set reader survey.** The gate itself is invoked by
 `scripts/gates.list` (registry), the generated pre-commit hook, and
 `run-gates.sh`; its fixture pair lives at
 `gate-sdk/gate-tests/check-gate-exemption-tasks/`; its behavior is described in
 gate-sdk/SPEC.md §check-gate-exemption-tasks, mirrored to `docs/gate-sdk/SPEC.md`
-by the docs projection, and rostered in gate-sdk/README.md. Nothing outside
-`check-gate-exemption-tasks.sh` reads its live-slug set — it is a local
-associative array, never exported, never written to a file. Build re-runs this
+by the docs projection, and rostered in gate-sdk/README.md; it is also seeded
+into a fresh consumer by `gate-sdk/smoke/install.sh` and
+`installer/lib/common/recipe.sh`, so the tightened predicate reaches every new
+adopter through the normal install path with no migration step.
+
+Nothing outside `check-gate-exemption-tasks.sh` reads its live-slug set — it is a
+local associative array, never exported, never written to a file. **One
+cross-component reader of the neighbouring surface exists and is named because a
+survey that missed it would be the false negative this unit is about:**
+`delegation-kit/checks/check-gate-tamper.sh:37-58` (`extract_exemptions`) parses
+`# exception-list:`-tagged arrays independently, for a different invariant — a
+staged gate-file diff must not add an exemption alongside other staged files. It
+reads the **arrays**, never the queue, so this amendment does not touch it and it
+needs no edit. It is listed so the next change to the exemption *tag* format —
+which this one is not — knows where to look.
+
+Current population, measured: **zero** production `# exception-list:` arrays
+exist tree-wide; the only two are the gate's own fixture pair. So the tightening
+cannot break a live `# until:` today, and the defect stays armed-but-unexploited
+exactly as the queue entry claims. That is also why delta 3's fixture case is the
+*only* evidence this change can produce — there is no production instance for it
+to fix.
+
+Build re-runs this
 survey against the tree before implementing, with **no `2>/dev/null` on any path
 probe**: a silenced stderr on a mistyped path reads a live reader as absent,
 which is the same false-negative shape this unit is about.

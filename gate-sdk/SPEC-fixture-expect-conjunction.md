@@ -115,11 +115,19 @@ clothes.
 
 ### 5. The existing corpus is re-verified, not assumed {mechanical}
 
-Measured at scope: **3 of 187** tracked `expect.txt` files are multi-line —
-`check-spec-pointer` (canon-kit), `check-queue-entry-budget` and
-`check-tag-lead-line` (queue-kit), all `bad/` cases, 8 lines between them (2 + 4
-+ 2). All eight were probed against a conjunction reading and all currently hold,
-so **the tightening is expected to red nothing**.
+Measured at scope and re-derived at spec against HEAD: **3 of 187** tracked
+`expect.txt` files are multi-line, all `bad/` cases, 8 lines between them.
+
+| File | Lines |
+|---|---|
+| `queue-kit/gate-tests/check-tag-lead-line/bad/expect.txt` | 2 |
+| `queue-kit/gate-tests/check-queue-entry-budget/bad/expect.txt` | 4 |
+| `canon-kit/gate-tests/check-spec-pointer/bad/expect.txt` | 2 |
+
+All eight lines were probed against a conjunction reading and all currently hold,
+so **the tightening is expected to red nothing**. The disjunction was also
+confirmed empirically rather than inferred from the `grep -F` man page: a
+two-line pattern whose second line is absent from the target still matches.
 
 Expected, not assumed. Build re-runs the full fixture battery after delta 1 and
 treats any red as a real finding: a line that no longer holds is a fixture that
@@ -164,13 +172,32 @@ writing an expect line that does not hold, which the runner then reds on. There
 is no migration and no per-kit action: the contract tightens, the corpus already
 satisfies it, and the enforcement is the runner itself.
 
-**Whole-component-set reader survey.** `run-gate-tests.sh` is invoked by this
-repo's per-kit fixture battery (README.md §This repo, governed), by the CI
-`gates` workflow as its own step, and by the evidence-kit validate suite that
-runs the fixture corpus; the fixture trees it reads live at
-`<kit>/gate-tests/*/{good,bad}/`. Its contract prose lives at gate-sdk/SPEC.md
-§run-gate-tests and §Fixture pairs, mirrored to `docs/gate-sdk/SPEC.md` by the
-docs projection. Build re-runs this survey against the tree before implementing,
+**Whole-component-set reader survey.** Programmatic invokers of
+`run-gate-tests.sh`, surveyed rather than assumed:
+`scripts/evidence-config.sh:10-13`, which derives one suite per kit from
+`gate_fixture_suites` and is the path `/validate` actually runs through;
+`.github/workflows/gates.yml:41`, the authoritative CI step; and
+`gate-sdk/templates/gates-workflow.yml:49`, the same line in the template
+consumers copy — so **a consumer inherits the new semantics by vendoring, with
+no workflow edit**. Beyond those, each kit's README documents a manual
+invocation line. `delegation-kit/lib/delegation.sh:35` and
+`scripts/delegation-config.sh:18` name the runner's **path** in
+`check-gate-tamper`'s meta-isolated gate-file set; they never read its output,
+but they do mean an edit to it is a tamper-gate-relevant file — build should
+expect that gate to have an opinion about the diff.
+
+**`run_case` is the only reader of `expect.txt` or `args` in the tree.** This was
+checked against every gate-sdk meta-gate that plausibly inspects fixtures —
+`check-gate-fixture-coverage`, `check-test-hermetic`, `check-gate-assertions`,
+`check-gate-fail-closed`, `check-gate-output` — and none of them opens either
+file; the coverage gate asserts a pair *exists* and never reads inside it. The
+only other mentions tree-wide are prose comments in three bespoke tests
+describing their own authoring choices. That single-reader property is what makes
+this change safe to make in one function.
+
+Contract prose lives at gate-sdk/SPEC.md §run-gate-tests and
+§Fixture-pair discipline, mirrored to `docs/gate-sdk/SPEC.md` by the docs
+projection. Build re-runs this survey against the tree before implementing,
 with **no `2>/dev/null` on any path probe** — a silenced stderr on a mistyped
 path reads a live reader as absent.
 
