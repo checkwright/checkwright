@@ -936,8 +936,9 @@
 
 - **native-gate-binary-port** [design-pending] [roadmap: next/reliability] — a new gate substrate.
   roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
-  Port the battery off bash-plus-GNU-userland onto one native compiled binary
-  (Rust the lead candidate); scale is read off `gates.list` and `*/checks`.
+  Port the battery off bash-plus-GNU-userland onto one native compiled binary in
+  **Rust — settled, not a candidate**; `native-gate-language-ruling` holds the
+  decision and the alternative refused. Scale is read off `gates.list` and `*/checks`.
   **Ground — gate opacity.** An agent that can *read* a gate's bash predicts its
   verdict and acts on that instead of running it; a binary makes executing the
   cheapest way to know. Strength is a **range** the payload ruling fixes: a
@@ -949,25 +950,29 @@
   split, textual parameter expansion, hand-rolled parsers); six survive it. Caution:
   the parser class's live instance closed in awk 2026-08-01, so "only a real parser
   closes this" overstates. Landing the port then relaxing is the failure mode.
+  **Third ground, restored 2026-08-02 — a real unit-test harness under the
+  fixtures**, and a static binary as a stronger front-door install claim than the
+  utility list. Both stood in the 2026-07-28 filing; neither has been falsified.
   **Two grounds it must NOT rest on, both falsified 2026-08-02 at scope.** *Speed* —
   a port does not delete `check-shellcheck`, and no timing artifact survives, so a
   baseline is captured before the first cohort retires a script. *Platform reach* —
   it retires one of six `context-kit/lib/toolfloor.sh` pins; the rest survive in kit
   `bin/` and the hook emitter, and `init` hands to bash, so Windows stays blocked.
-  **Two open design questions slice 1 blocks on; the amendment owes both.**
-  (1) *The `# graph:` manifest* — `gen-pre-commit.sh` projects the hook's trigger
-  subset from each gate's manifest and `check-graph` holds it byte-fresh, so a
-  subcommand carrying none breaks the chain. Settled before any gate ports.
-  (2) *The consumer payload* — `gate-payload-disclosure-ruling`, the companion that
-  holds it and the lever that fixes opacity's range.
+  **Open design questions, each held by a linked entry — none may be dropped again.**
+  (1) *The `# graph:` manifest* — ruled by `native-gate-dispatch-seam`, slice 1.
+  (2) *The consumer payload* — `gate-payload-disclosure-ruling`.
+  (3) *Vendoring and the extensibility model* — `native-gate-vendoring-model`.
+  (4) *The dogfood question* — `native-gate-dogfood-ruling`.
   **Closed alternative:** a bash portability floor, costed 2026-08-02 and rejected —
   `bash-portability-floor-costing` holds the costing and lands it in the SPEC.
   **Deliverable:** one multi-call binary, a subcommand per check; `gates.list`
   dispatching per entry to subcommand or script so it lands cohort by cohort; each
   gate's fixture pair the parity oracle, **executed** not merely present
-  (`check-gate-fixture-coverage` asserts existence only); consumer gates keep the
-  shell hatch; checksummed artifacts and buildable source, whose "only git" clause
-  tensions with (2).
+  (`check-gate-fixture-coverage` asserts existence only) and green **before** the
+  script it replaces retires; consumer gates keep the shell hatch; checksummed
+  artifacts and buildable source, whose "only git" clause tensions with (2).
+  **Sequencing, restored from the filing:** cost the design spike apart from the
+  port — the spike decides whether the port is a cohort per iteration or worse.
   **Cost while deferred:** every new gate adds shell to the eventual port and the
   silent-failure classes stay reachable. **A net drain on the queue, not a generator:**
   promoting it closes `gate-battery-parallel-execution` and `gate-battery-result-cache`
@@ -2597,10 +2602,82 @@
   **A contract question that must not be discovered late:** the `good/`+`bad/` fixture
   pair is a gate-sdk contract held by meta-gates, and whether that contract is
   development-side or shipping-side is unstated today.
+  **The distinction that makes that question tractable, restored 2026-08-02 from a
+  parent revision a compression dropped:** `init` vendors every kit file, fixtures
+  included, so a consumer agent keeps the pair — which discloses a gate's *shape*,
+  never its predicate. Shape-without-predicate is the middle option the
+  binary-versus-sources framing above otherwise hides.
   **Cost while deferred:** the parent's headline benefit stays a range rather than a
   value, so a first cohort could land on a substrate whose main justification is still
   unsettled. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
   decision the port owns rather than an inheritance from the bash era.
+
+- **native-gate-language-ruling** [design-pending] — record a closed language decision.
+  Land the substrate language and the alternative it beat in the canonical SPEC, so
+  the choice survives the amendment that implements it. Sibling in shape to
+  `bash-portability-floor-costing`: the deliverable is the recording, and what
+  follows is neither re-derived nor re-opened.
+  **Ruled 2026-08-02 by the operator, final: Rust.** The alternative weighed and
+  **refused is Go**, on three stated grounds — larger binaries, poor memory
+  management under a primitive garbage collector, and a weaker compiler. The
+  comparison had already been made in an earlier session; the ruling had to be
+  restated because no surface carried it, which is the cost this entry exists to end.
+  **Why a distinct entry rather than parent prose:** the operator's standing rule
+  that a task compression must be lossless — anything that will not fit is relocated
+  to a linked task, never dropped. The parent red on `check-queue-entry-budget` three
+  times on 2026-08-02, so the decision could not fit there, and it had already been
+  lost once: the 2026-07-28 filing carried `language choice (Rust vs Go)` as an open
+  question and the compression removed it without answering it.
+  **Cost while deferred:** the parent states the language and no surface states why,
+  so the next substrate discussion re-derives the Go comparison a third time — which
+  is what happened on 2026-08-02.
+  Filed 2026-08-02 by spec on the operator's ruling, restoring a dropped ground.
+
+- **native-gate-vendoring-model** [design-pending] — how a binary-substrate kit installs.
+  **Distribution is the hard part, not the language** — the parent's oldest constraint,
+  dropped by the 2026-08-02 compression and restored here. Kits vendor as **text with
+  zero build step**: `installer/lib/init.sh` writes every file of a selected kit, and a
+  profile selects kits rather than files. A gate that is a compiled subcommand has no
+  text to write, so the install model is what the port breaks first — before any
+  question of what a consumer may read.
+  **The extensibility model decides everything else**, in the filing's own words:
+  script escape hatch as first-class vs a declarative check DSL vs native plugins.
+  Only the first is recorded today, as the parent deliverable's "consumer gates keep
+  the shell hatch"; the two alternatives were dropped with no recorded rejection, so
+  a later session re-derives them from nothing.
+  **A constraint that must not be lost again:** git is the sole runtime dependency,
+  **shelled out, not embedded**. What the parent carries now — "buildable source,
+  needing only git" — is a different and weaker claim, about the build, not the run.
+  **Boundary with `gate-payload-disclosure-ruling`, stated so neither sprawls:** that
+  entry rules what a compiled gate *discloses* to a consumer; this one rules how it
+  *arrives* there. Neither answers the other, and the parent needs both.
+  **Cost while deferred:** a first cohort could land against an install model that
+  cannot ship it, discovered at the release boundary rather than at design time.
+  Nothing is incorrect meanwhile.
+  Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
+
+- **native-gate-dogfood-ruling** [design-pending] — must this repo run built artifacts?
+  Restored from the 2026-07-28 filing, which still states it best: **"this repo must
+  run built artifacts or the opacity win is consumer-only, and the Rust source sits
+  readable in-tree regardless."** The 2026-08-02 compression dropped it without
+  answering it; what the parent carries now — "Unmeasurable here: this repo dogfoods
+  from source" — states the present condition, never whether it should change.
+  **The same lever as `gate-payload-disclosure-ruling`, seen from the other end:** that
+  entry asks what a consumer receives, this one asks what this repo runs. Both decide
+  whether an agent can read the predicate it is about to be judged by. Rule them
+  together, or the same argument gets made twice.
+  **What it costs either way, so the trade is visible.** Running built artifacts here
+  makes the battery depend on a compiled toolchain at every commit and adds a pin to
+  `context-kit/lib/toolfloor.sh`'s probe roster; running from source keeps that
+  toolchain optional and keeps the port's headline benefit unmeasurable in the one
+  tree that exercises it daily.
+  **It neither blocks nor is blocked by slice 1.** `native-gate-dispatch-seam` is
+  deliberately payload-neutral, because hook generation runs consumer-side
+  (`installer/lib/init.sh` invokes `gen-pre-commit.sh --write`), so a slice depending
+  on this ruling could not generate a hook without the binary present.
+  **Cost while deferred:** the opacity ground stays unmeasurable in this tree, so the
+  port's sharpest justification is argued rather than observed.
+  Filed 2026-08-02 by spec, restoring a ground a compression dropped.
 
 - **queue-entry-evidence-tier** [design-pending] — **not "how is cut detail recovered"
   — that is solved. The gap is that a reader cannot tell detail was ever cut.**
@@ -2627,6 +2704,11 @@
   spec-over-precedent an evicting commit evidences *that* a thing was costed, never
   *that the costing is right* — so the signal must lead to a ruling surface, not stop
   at history.
+  **Empirical support, measured 2026-08-02 by spec.** Recovery via `git log -p -S`
+  **worked**: every ground dropped from this entry's own reproduction case came back
+  intact from the filing diff. What failed was *signal* — nobody knew to look, and the
+  arguments were supplied from memory twice the same day instead. That is evidence for
+  the narrowing already applied here, not grounds to re-open the shape.
   **Cost while deferred:** compression stays silently lossy in practice — the bytes
   survive in git, and the knowledge that they are worth fetching does not.
   Filed 2026-08-02 by scope on operator intake. The operator previously proposed an
