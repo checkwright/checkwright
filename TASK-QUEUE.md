@@ -2503,6 +2503,46 @@
   Filed 2026-08-02 by scope from supplemental operator intake during the unit-set
   survey; scope-gated intake, so filed costed rather than started.
 
+- **scope-survey-counter-evidence** [design-pending] — scope's premise re-verification
+  is a confirmation channel: it reads an entry *for* falsifiable claims, finds them,
+  and never runs a pass for evidence the other way. Reproduced 2026-08-02 on
+  `native-gate-binary-port`, where this scope falsified four of the entry's premises
+  and recommended against the unit as "no adopter-visible capability" and "a
+  deferred-task generator" — while the entry's self-declared sharpest ground (gate
+  opacity, filed 2026-07-28) went uncited, and three sibling entries stating that the
+  port *closes or converges with them* went unaggregated. The operator supplied both
+  from memory rather than reading them off the tree.
+  **Two hypotheses, tested rather than assumed — the second needed correcting, and the
+  correction is what decides the fix.**
+  (1) *Confirmation channel — holds.* Both delegated sweeps asked only "verify claim X
+  / is premise Y still true": ten numbered questions, every one a falsification test,
+  none asking what the entry claims in its own favour. Four falsifications returned,
+  the thesis was complete, and the survey stopped.
+  (2) *Cross-references structurally invisible — does not hold.* The sibling entries
+  were read, and one was edited in the same session. The failure was **aggregation,
+  not retrieval**: nothing sums an entry's inbound edges into its own cost/benefit. So
+  a prose rule to "follow the cross-references" would not have changed the outcome,
+  because they were followed.
+  **Deliverable, split by what an oracle can reach.**
+  *Derivable — the half that would actually have changed the outcome.* The edges are
+  already written and near-structured: a `Relation to <slug>` heading in two entries,
+  "converges with `<slug>`" in a third. Derive per slug the set of entries naming it,
+  so a promotion dividend is read off a projection instead of noticed. Derivation-first,
+  a tool beside `bin/queue-index.sh`, generated and freshness-gated, never maintained.
+  Not a gate — there is nothing to red.
+  *Un-gateable — stated plainly rather than dressed as mechanism.* Whether a survey
+  engaged an entry's strongest ground is a session act with no mechanical residue: the
+  `close-surface-actually-read` class exactly. Its home is `.workflow/audit-roster.txt`
+  as a named class, not one more prose step that drifts.
+  **Why `[design-pending]`:** the projection needs a parseable edge grammar the queue
+  does not declare today, and declaring one touches queue-kit/SPEC.md §The tag algebra
+  — a contract change rather than a script.
+  **Cost while deferred:** one wrongly-ranked unit set per scope, argued confidently
+  from real evidence, detectable only by an operator who remembers the entry. It does
+  not rot, but it recurs exactly where being wrong is most expensive — the iteration's
+  composition decision. Absorbs the narrower gap-inbox bullet filed the same day.
+  Filed 2026-08-02 by scope, operator-directed after the omission above.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
