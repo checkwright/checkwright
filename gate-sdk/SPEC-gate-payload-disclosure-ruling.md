@@ -8,7 +8,25 @@ rules what a compiled gate **discloses** to the consumer it judges.
 The iteration's envelope is **unblock, not port**. This amendment lands a ruling
 and the assertion that holds it; it lands no port.
 
+## The objectives this ruling serves
+
+**Ruled 2026-08-03 by the operator as a project-trajectory pivot**, recorded in
+full at **`native-gate-vendoring-model`** §The objectives this ruling serves —
+the install and dependency model owns them, and this amendment points rather
+than restates. The one that decides everything here is objective 3:
+
+> **Opacity is a goal, not a side effect.** Withholding a gate's implementation
+> source is wanted: it favours *execution* of a gate over *analysis* of it by
+> the coding agents the gate exists to hold.
+
+That reverses the direction the substrate seam was argued under, where opacity
+was explicitly not claimed, and it voids the ruling below.
+
 ## The ruling
+
+> **Void, being re-authored.** This ruling was authored before the objective
+> above was visible. It is retained only until the re-authoring lands in this
+> same file.
 
 **The payload discloses the predicate. Opacity is refused as a goal, and the
 refusal is permanent rather than provisional.**
