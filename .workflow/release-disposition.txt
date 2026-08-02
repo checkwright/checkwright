@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written:
 #   <iteration> release <version|none|deferred:<version>> — <one-line basis>
 
-vacuous-green-elimination release deferred:v0.22.0 — minor earned (tightened gates: check-gate-exemption-tasks, check-prose-enum) and floored at the outstanding v0.22.0 deferral, but no cadence trigger fired: newest tag v0.21.0 is 30h old against the 7-day floor, no decommission, no security or supply-chain fix in the batch, no operator direction
