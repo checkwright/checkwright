@@ -77,6 +77,15 @@ exercises is observed by nothing, and the declaration for it rests on the author
 The `?` line exists for exactly that case, and a gate whose author cannot bound
 a root declares `?` rather than guessing.
 
+**Where that verification runs, restated under the trajectory pivot.** Both unit
+tests are `cargo test`, so they run in this repo and in CI and **never in a
+consumer tree** — under **`native-gate-vendoring-model`** a consumer installs a
+prebuilt binary and receives no crate source, so there is nothing there to run
+them against and nothing there to edit. That is not a weakening: it makes the
+division explicit. The declaration is held to executed behaviour **upstream**,
+and the consumer's own independent check is the fixture pair, which
+**`gate-payload-disclosure-ruling`** rules shipping-side for exactly this reason.
+
 ### 3. `check-reads-couples` consumes the report instead of refusing {design-bearing}
 
 For a member resolving to a `.gate`, the gate invokes
@@ -103,7 +112,17 @@ stays. A port ends the assertion by answering it, never by opting out of it.
 Its `# graph:` `couples=` gains the crate's source glob, so an edit to a gate's
 implementation re-fires the gate that checks its reads. Without that the
 assertion would be live and unreachable — coupled to shell sources only, on a
-rule whose subject moved.
+rule whose subject moved. The couple fires **in this repo**, where the
+implementation is tracked; in a consumer tree the crate source is absent by
+ruling, so there is no edit for it to catch and a glob matching nothing is the
+correct outcome rather than a hole.
+
+**This delta invokes a binary and does not care where it came from.** Nothing
+here assumes a locally built one: the invocation is through
+`GATE_SDK_NATIVE_BIN`, the same knob every other binary reader uses, and a
+prebuilt artifact placed by the installer answers `--reads` identically to one
+`cargo` produced. The pivot from build-from-source to prebuilt-per-platform
+leaves this amendment's mechanism untouched.
 
 ### 4. The read-set does not live in the descriptor, and that refusal is the design {design-bearing}
 

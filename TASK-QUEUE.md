@@ -172,6 +172,16 @@
   with `install-path-gnu-userland-undeclared`. Promoted by scope on the operator's
   unit-set ruling; the operator supplied this argument from memory twice in one
   session because no surface carried it.
+  **Re-verified 2026-08-03 against the operator's trajectory pivot: the conclusion is
+  confirmed, not inverted, and this entry stays as promoted.** The pivot minimizes bash to
+  the unavoidable and moves the battery to native binaries — the same direction this
+  costing already points. It rejects investing in bash *portability*; the pivot rejects
+  investing in bash at all, so the costing is a step on the trajectory rather than a
+  casualty of it. What the pivot does change is the standing of the costing's own premise:
+  it argues from platform reach being the thing the port is wanted for, and
+  `native-gate-binary-port` had ruled platform reach out as a port ground. The pivot
+  reinstates it. **Land the recording citing the pivot as the superseding ground**, not the
+  parent's ruled-out one, or the prose lands arguing from a ground its own parent denies.
 
 - **scope-survey-counter-evidence** — scope's premise re-verification is a
   confirmation channel: it reads an entry *for* falsifiable claims, finds them, and
@@ -203,6 +213,70 @@
   filed the same day.
 
 ## Deferred
+
+- **powershell-installer-surface** [design-pending] — a native Windows install path.
+  The installer is bash end to end, so native Windows is unreachable:
+  `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so
+  Windows stays blocked" — and `platform-support-ci-matrix` covers Windows only as a
+  **WSL** CI leg, which is a Linux userland wearing a Windows badge rather than a native
+  path. No entry claims this ground today.
+  **Ordered by the operator's trajectory pivot 2026-08-03**, whose objective 2 is every
+  major OS including Windows and whose objective 6 is a script-interpreter surface that is
+  minimal and dual-implementable — bash for Linux and macOS, PowerShell for Windows. The
+  objective set is recorded in `native-gate-vendoring-model`'s amendment.
+  **What the vendoring ruling already fixes the shape to, so this designs less than it
+  looks like:** the bootstrap's whole job becomes resolve the platform, place the matching
+  prebuilt binary, invoke it. Everything conditional lives on the far side of that invoke,
+  and `install-step-relocation` is what moves it there. So this is a port of a three-step
+  bootstrap, not of the installer as it stands — and its size depends on that relocation
+  landing first.
+  **Why it is design-pending:** two live shapes with different maintenance costs — two
+  hand-kept bootstraps held in parity by a smoke leg, versus one bootstrap generated from a
+  single declaration. Neither is obviously right at three steps, and the choice binds every
+  later step that cannot move into the binary.
+  **Cost while deferred:** the pivot's OS-reach objective stays unmet on the one platform
+  it names that no current path reaches, and every install-path change is authored
+  bash-first, which is the habit that made this entry necessary.
+  Filed 2026-08-03 by spec, on the operator's trajectory pivot.
+
+- **install-step-relocation** [design-pending] — move the install's shell steps into the binary.
+  `installer/lib/init.sh` runs two consumer-side shell steps after it writes:
+  `gen-pre-commit.sh --write` and `check-graph.sh --emit`. Each is a pure function of
+  tracked text, and each is a natural subcommand of a binary the vendoring ruling puts on
+  disk before either of them runs.
+  **Ordered by the operator's trajectory pivot 2026-08-03**, objective 6 — the
+  script-interpreter surface shrinks to the unavoidable. This entry is most of what makes
+  it shrink: with these two relocated the bootstrap is resolve-the-platform,
+  place-the-binary, invoke, which is small enough to be written twice.
+  `powershell-installer-surface` is the entry that pays if this one does not land first.
+  **Why it is design-pending:** both steps are **generated projections** with freshness
+  gates and regen commands rostered in docs/site-architecture.md, so relocating them moves
+  a generator without moving its gate — and whether that gate then invokes a shell command
+  or a subcommand is a contract question `gate-authoring-sdk-surface` touches.
+  **Cost while deferred:** the bootstrap keeps two steps that cannot be written in
+  PowerShell without duplicating real logic, so the Windows path stays expensive for as
+  long as this stands.
+  Filed 2026-08-03 by spec; the pivot's objective 6 is what surfaced it.
+
+- **instruction-surface-bash-focus** [design-pending] — the always-loaded surfaces assume bash.
+  `CLAUDE.md` and the instruction surfaces beside it are written around a shell battery:
+  the gate-authoring conventions, the fixture idiom, the housekeeping rules and the
+  delegation guidance all name bash mechanisms as the default case. Under the trajectory
+  pivot the default case becomes a native binary behind a minimal dual-implementable
+  bootstrap, so those surfaces teach a shape the project is leaving. No entry claims this
+  ground today.
+  **Ordered by the operator's trajectory pivot 2026-08-03**; the objective set is recorded
+  in `native-gate-vendoring-model`'s amendment, which names this rewrite as needed and
+  explicitly not started there.
+  **Why it is design-pending:** the rewrite is not a find-and-replace. An always-loaded
+  surface is costed per session, so the question is which bash specifics stay resident
+  because they are still the common case, which move behind a load trigger, and which are
+  deleted — and that depends on how far the port has actually got, which makes the trigger
+  a threshold rather than a date.
+  **Cost while deferred:** every session is oriented by a surface describing the substrate
+  the project is moving off, and the correction is paid per session in re-derivation rather
+  than once in an edit.
+  Filed 2026-08-03 by spec; the pivot names this rewrite and does not start it.
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
   reader-facing link liveness of the rendered checkwright.dev site. Internal
@@ -1149,6 +1223,9 @@
   promoting it closes `gate-battery-parallel-execution` and `gate-battery-result-cache`
   and converges with `state-representation-integrity`. Feature-shaped: adds governed
   names. Filed 2026-07-28 by operator request.
+  **Ground 1 and the ruled-out platform-reach ground are superseded 2026-08-03 by the
+  operator's trajectory pivot** — opacity is a goal, OS reach an objective; the objective
+  set is recorded in `native-gate-vendoring-model`'s amendment. Body rewrite pending.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit

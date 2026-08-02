@@ -71,278 +71,339 @@ Four facts, each measured against the tree rather than argued:
   crate declares no dependencies at all (`native/Cargo.toml`, empty
   `[dependencies]`), which is what makes every option below cheap or expensive.
 
+## What the ruling may and may not claim
+
+The pivot is a trajectory; this iteration is one step on it. The tree still runs
+a shell battery and every gate in it is shell, so the ruling below is the
+**model** the substrate installs under, and it is inert until a gate ports —
+which this iteration's envelope forbids.
+
+That distinction is binding on the prose deltas: no user-facing surface may
+state the dependency floor the objectives aim at as though it were reached. A
+requirement page that claims git-only today is false, and the front door is
+exactly where a false claim costs the most.
+
+## The ruling
+
+**The payload ships a prebuilt gate binary, selected by platform. The consumer
+builds nothing, installs no toolchain, and receives no gate implementation
+source.**
+
+Building from vendored crate source at install time was ruled and is void:
+it adds a Rust toolchain to a dependency floor objective 1 is collapsing, it is
+unreachable for the non-technical adopter objective 5 admits, and it ships the
+very source objective 3 wants withheld. Recorded rather than deleted, because the
+next session to reach for the cheap answer should find it already costed.
+
+### Weighing the two costs a prebuilt payload actually carries
+
+Both were real objections before the objectives were visible. They are weighed
+here against the objectives rather than against nothing.
+
+**Cost 1 — the single-artifact model.** `scripts/pack-installer.sh` assembles one
+payload that both transports consume. Two shapes survive the pivot: **one payload
+carrying every declared target**, or **one payload per target**, the
+optional-dependency shape the npm ecosystem uses.
+
+*Ruled: one payload, carrying every declared target.* The **installed** footprint
+is one binary either way — the installer writes only the matching target — so
+objective 4 is served identically, and the difference is download size alone,
+bounded by the target roster. Against that, the per-target shape multiplies the
+publish path, the digest set, and the attestation surface by the roster size,
+which is precisely what cost 2 makes expensive. Collapsing N attestation
+surfaces to one is worth a bounded download.
+
+*The revisit trigger is stated so it is a measurement and not a taste:* revisit
+when the payload's download size becomes an adoption barrier — when the roster
+grows past the platforms **`platform-support-ci-matrix`** commits to, or when a
+single target's binary stops being small. Objective 4 makes that a number
+somebody can watch, not an opinion.
+
+**Cost 2 — the obligation opacity buys.** A consumer who cannot read the gate has
+only the publisher's word for what it does, so the integrity story stops being
+garnish and becomes the whole of what replaced reading the source. That
+obligation is now **taken on deliberately** rather than avoided.
+
+*Ruled: ship the achievable floor and claim nothing beyond it.* The floor is a
+published per-target digest and an installer that verifies the artifact against
+it before writing (delta 6). A genuinely reproducible build — a third party
+rebuilding to the same bytes — is a larger program, and the queue already holds
+its ground: **`tarball-build-attestation`**, whose one line says the checksum
+proves transfer only and the docs agree. It is the entry this obligation lands
+on, and the pivot is what turns it from a nicety into the thing that replaced
+reading the source.
+
+The honesty rule binds the prose, and today's release is the reason it has to:
+`.github/workflows/publish.yml`'s checksum step says of itself that what it
+proves is *same origin, same TLS session* — corruption and truncation, never a
+compromised host. A governed surface may therefore say *verified against a
+published digest*, and may **not** say *reproducible*, until that entry lands.
+
 ## What changes
 
-> **Superseded, being re-authored.** The deltas below were authored before the
-> objectives above were visible and rule *build from vendored crate source at
-> install time*, which objectives 1, 2 and 5 void. They are retained only until
-> the re-authoring lands in this same file.
+### 1. The substrate ships prebuilt, and its source does not ship {design-bearing}
 
-### 1. The payload gains a component class beside kits {design-bearing}
+`native/` stays a non-kit — it gains no `checks/` and no `smoke/`, the predicate
+that makes a root directory a kit (CLAUDE.md §Housekeeping) — and, decisively,
+**the crate root stays outside every kit root**, so the vendoring set
+`gate_kit_roots_rel` derives can never reach the implementation. That is
+objective 3 held by structure rather than by rule, and
+**`gate-payload-disclosure-ruling`** delta 5 is the assertion that keeps it
+structural.
 
-`scripts/pack-installer.sh` packs two things instead of one: **kit roots**
-(unchanged, `gate_kit_roots_rel`-derived) and, new, **payload components** —
-named repo-root directories that are not kits and whose vendoring is conditional.
-The substrate crate is the class's first and only member.
+`scripts/pack-installer.sh` gains an **artifact class** beside its kit roots: the
+gate binary, built once per declared target by the release workflow and placed in
+the payload under its target name. It is not copied from the working tree — no
+build output is tracked, and the release is the only thing that produces it.
 
-`native/` **stays a non-kit.** It gains no `checks/` and no `smoke/`, because that
-predicate is what makes a root directory a kit (CLAUDE.md §Housekeeping) and
-`gate-sdk/bin/run-consumer-smoke.sh`:38-44 refuses any kit root shipping no
-`smoke/install.sh`. Making the crate a kit to give it a ride would put a Rust
-crate inside the vendoring set unconditionally, which is the opposite of the
-ruling below.
+The **target roster is a tracked declaration with one owner** and exactly two
+readers: the release workflow reads it to know what to build, and the installer
+reads it to know what to look for. One roster, two readers, no second spelling —
+a hand-maintained duplicate of a platform list in a workflow file is the
+maintained-roster anti-pattern derivation-first refuses.
 
-The crate root is a knob on the kit convention (§Layout and configuration):
-`GATE_SDK_NATIVE_CRATE`, default `native`. The existing `GATE_SDK_NATIVE_SRC`
-default is **derived** from it (`$GATE_SDK_NATIVE_CRATE/src`) rather than
-restated, so the crate's location has one owner.
+**The size of this change is stated rather than implied.**
+`.github/workflows/publish.yml` has no build matrix, no OS-specific runner and no
+compiled artifact anywhere: `pack` runs on one runner, and one
+platform-agnostic tarball reaches both transports. The roster, the matrix, the
+per-target build and the per-target digest are all new, and none of them is a
+tweak to an existing mechanism.
 
-The component is copied **from `git ls-files`**, not `cp -R`. The kit loop's
-`cp -R` is safe because a kit root holds no build output; the crate root holds
-`target/`, which is gitignored and would otherwise ride a locally-built tree into
-a published payload. Deriving the packed set from tracking status makes that
-unrepresentable rather than remembered.
+### 2. Platform resolution, and the bootstrap that is left {design-bearing}
 
-### 2. Substrate need is derived from the selected payload {design-bearing}
+The installer resolves the host to a target name and selects the matching
+artifact. That resolution is the **irreducible interpreter surface**: the binary
+cannot select itself, so something outside it must run first.
 
-`installer/lib/init.sh`, after `KITS` resolves (`:93`) and before any write,
-scans the selected kits' payload dirs for `*.gate`. One or more means the
-selection needs the substrate; zero means it does not.
+Objective 6 binds the shape of what is left rather than its existence. The
+bootstrap's whole job is: **resolve the platform, place the matching binary,
+invoke it.** It is small enough to be written twice — `uname -s`/`uname -m` on
+the bash path, the equivalent environment read on the PowerShell path — because
+everything conditional lives on the other side of the invoke. Designing the
+PowerShell path is **`powershell-installer-surface`**'s work and is explicitly
+not done here.
 
-**No new declaration anywhere.** Not a third `profiles.list` column, not a
-per-kit capability file, and above all not a descriptor field: the descriptor
-"carries no field that lacks a reader, reserving nothing against a future reader"
-(§The `# graph:` manifest), and its existence is already the dispatch
-declaration. A kit needs the substrate exactly when it carries a member that
-dispatches to it, which is a fact the payload already states. Derivation-first —
-a declared requirement is a second source that drifts from the descriptor set it
-describes.
+This amendment's binding obligation to that objective is negative and checkable:
+**it adds no new shell-only install step.** The prior ruling's install-time
+`cargo build` was exactly such a step; the ruling that replaces it is a file
+copy.
 
-### 3. Substrate resolution moves to install time, and never blocks the install {design-bearing}
+### 3. Zero build step becomes literal {design-bearing}
 
-This is the ruling. `init` resolves the substrate **before it writes**, using the
-toolchain floor's existing `cargo` member (`context-kit/lib/toolfloor.sh`'s
-`PROBE_SET`, the same probe `installer/lib/doctor.sh` already renders, whose
-verdict set — `ok`, `absent`, `below`, `wrong-impl`, `uncomparable` — is already
-closed). Two outcomes, and neither is a refusal:
+The prior ruling preserved zero-build-step *per selection* — true for any profile
+carrying no `.gate` member, conditional otherwise. Under this ruling **no
+selection ever builds**, which is what objective 5 requires: a prose-profile
+adopter's install is a download, a platform match, and a copy.
 
-- **Toolchain present.** The crate component is written alongside the kits, built
-  once as a post-write step, and the built binary joins `GENERATED`
-  (`init.sh`:206-213) beside the pre-commit hook and the graph artifact — a
-  generated file the install records, never a vendored file it `claim`s and
-  hashes.
-- **Toolchain absent or below floor.** The install proceeds and **the `.gate`
-  descriptors are not written**. The affected members are not seeded into the
-  consumer's `gates.list`; each is recorded there instead as a structured comment
-  line (delta 4). Nothing in the consumer tree references a binary that is not
-  there.
+### 4. An unavailable platform omits and declares {design-bearing}
 
-**Why not refuse the selection.** A governance tool whose install can fail on a
-toolchain the adopter did not know it wanted is a time-to-first-value regression
-paid by every adopter to serve the few who want a compiled gate. The install
-keeps its zero-build-step guarantee unconditionally; the substrate is an upgrade a
-consumer takes, not a toll the front door charges.
+The mechanism the prior ruling introduced survives with its trigger replaced: not
+*the toolchain is missing* but **no artifact exists for this platform**.
 
-**Why not degrade to a shell fallback.** A descriptor declaring a shell
-implementation to fall back to is the cheapest thing on the table and it is
-wrong twice: it obliges every ported gate to keep two implementations and a
-parity proof between them for as long as it lives, and it hands the consumer the
-predicate as a side effect, settling **`gate-payload-disclosure-ruling`** by
-accident rather than by ruling. That entry rules the payload; this one must not
-pre-empt it with an install mechanism.
+The install still succeeds — objectives 4 and 5 both refuse an install that can
+fail on something the adopter did not choose. The affected members' descriptors
+are not written and the members are not seeded into the consumer's `gates.list`;
+each is recorded there as `# omitted: <name> substrate-unavailable`, a comment
+line `gates_list_members` (gate-sdk/lib/gate.sh:66-68) already strips from the
+live set. Named readers, unchanged: `gate-sdk/bin/run-gates.sh` prints the count
+and the remedy as a **separate** line beside its summary — separate because
+`gate-sdk/bin/run-consumer-smoke.sh`:60-68 greps `All N gates passed` verbatim —
+and `installer/lib/doctor.sh` reports it against the platform that caused it.
 
-**Why not vendor a prebuilt binary.** `init.sh`'s copy loop is unfiltered and
-binary-safe, so a prebuilt artifact placed in a kit dir would vendor with no code
-change at all — which is precisely why the refusal has to be explicit. It
-multiplies one payload by a platform matrix, and `scripts/pack-installer.sh`
-builds exactly one tarball that both transports consume
-(`.github/workflows/publish.yml` publishes the same artifact to npm and the
-Release). It also converts this project into a binary distributor, taking on a
-reproducible-build and provenance obligation that
-**`gate-payload-disclosure-ruling`** names as the precondition for shipping any
-artifact at all. The digest on the Release asset and npm's publish provenance
-cover the *package*, not a per-platform gate binary's reproducibility.
+**The honest limit, stated because it worsens as the pivot proceeds.** With one
+gate ported, an unsupported platform loses one gate. With the battery ported, it
+loses the battery. So the target roster **is** the support contract rather than a
+build convenience, and **`platform-support-ci-matrix`** owns which platforms that
+contract names. A consumer on a platform outside it gets a working install and an
+honest, counted statement of what it cannot run — never a green battery over a
+silently smaller roster.
 
-**Ordering is load-bearing.** The substrate build runs **before**
-`gen-pre-commit.sh --write`, because the hook's `run_gate` lines come from
-`gate_command`, which exits 2 on an absent binary. `check-graph.sh --emit`
-(`init.sh`:212) reads declaration paths as text and is unaffected by the
-ordering either way.
+### 5. The artifact is recorded in `checkwright.lock` as its own class {design-bearing}
 
-**`gate_command`'s exit 2 is unchanged**, and this ruling is what makes it
-unreachable in a correctly vendored tree. It stays the fail-closed backstop for a
-tree that took the substrate and then lost or stale-ed its binary — which is the
-one place that error belongs.
+`checkwright.lock` records vendored files by content hash and generated files
+separately. The binary is neither: it is not authored text the install claimed,
+and it is not locally reproducible the way the pre-commit hook is. It joins as a
+third class — an **artifact** entry carrying the target name and the digest.
 
-### 4. An omitted member is declared and counted, never silent {design-bearing}
+Two readers, one record, which is why the class earns its place:
 
-A gate that is not running must not be indistinguishable from a gate that is
-running clean — the vacuous-green class §Meta-gate conservation for the binary
-substrate exists to refuse.
+- **Uninstall exactness.** Objective 4's trial lifecycle needs the uninstall to
+  remove precisely what the install wrote, and a binary the lock does not name is
+  a file uninstall either leaves behind or guesses at.
+  **`installer-lifecycle-verbs`** owns the verbs; this record is what makes the
+  uninstall verb able to be exact.
+- **Integrity re-verification.** The same digest lets `doctor` tell a consumer
+  whether the binary they are running is the one that was installed.
 
-The record rides the registry, not a new file: `installer/lib/common/recipe.sh`'s
-roster seeding writes an omitted member into the consumer's `gates.list` as
-`# omitted: <name> substrate-absent`, a comment line `gates_list_members`
-(gate-sdk/lib/gate.sh:66-68) already strips from the live set. Its named readers:
+### 6. The artifact is verified against a published digest before it is written {design-bearing}
 
-- `gate-sdk/bin/run-gates.sh` counts those lines and prints the count and the
-  one-command remedy as a **separate line** beside its summary — separate because
-  `gate-sdk/bin/run-consumer-smoke.sh`:60-68 greps the existing
-  `All N gates passed` line verbatim, and that assertion stays intact.
-- `installer/lib/doctor.sh` reports the same count against the toolchain verdict
-  that caused it, which is where an adopter looks for the remedy.
+Cost 2's floor, made mechanism. The release publishes a per-target digest; the
+installer computes the digest of the artifact it is about to write and refuses on
+a mismatch — refuses at that step specifically, rather than proceeding and
+recording a bad hash, because a consumer who cannot read the gate has nothing
+else standing between them and a substituted binary.
 
-The record sits in the consumer's tracked `gates.list`, so it is reviewable in
-their history rather than buried in install-time stdout. Re-running `init` on a
-machine that has since gained the toolchain converts the comment back into a live
-member with no hand edit.
+This is the one place the ruling *adds* a requirement rather than removing one,
+and it is added because opacity is a goal rather than in spite of it.
 
-### 5. The crate's empty dependency set becomes an enforced precondition {design-bearing}
+### 7. Install-time logic moves toward the binary — named, not built {design-bearing}
 
-An install-time build is acceptable only while it is network-free and bounded. A
-single dependency turns a post-write step into a registry fetch inside somebody
-else's repository, on a machine whose network policy this project cannot see.
+Objective 6 is served long-term by shrinking what the bootstrap must do, and the
+shell steps the install runs today are the candidates:
+`gen-pre-commit.sh --write` and `check-graph.sh --emit`, both invoked
+consumer-side by `installer/lib/init.sh`. Each is a pure function of tracked text
+and each is a natural subcommand of a binary that is already present by the time
+they run.
 
-`check-gate-substrate-parity` gains **assertion E**: the crate manifest declares
-no `[dependencies]` and no `[build-dependencies]`, and the crate carries no
-`build.rs`. Its `# graph:` `couples=` gains the crate manifest path so an edit
-re-fires it.
+That relocation is **filed as `install-step-relocation`, not built here** — it is
+gate-sdk work with its own contract questions, and doing it inside a vendoring
+ruling would widen this iteration's unit set.
 
-A crate unit test was weighed and refused for this one: the claim is consumed by
-the **shell** install path and must hold in a tree with no toolchain, and a
-`cargo test` cannot run where cargo is the thing in question. The parity gate is
-already the auditor that stays shell so it never depends on the substrate it
-audits (§check-gate-substrate-parity).
+What binds here is only the negative: no new shell-only install step, and no
+design that would have to be unbuilt when the relocation lands. The ordering
+constraint the prior ruling introduced disappears with the build step it existed
+for — a copied binary is present before any post-write step runs.
 
-### 6. Upgrade rebuilds unconditionally {design-bearing}
+### 8. `gate_command`'s fail-closed exit is unchanged {mechanical}
 
-On upgrade into a tree that took the substrate, the crate source is rewritten and
-the binary is **rebuilt unconditionally** before hook regeneration. Consumer-side
-crate source changes only ever through the installer, so an unconditional rebuild
-closes the consumer half of binary freshness by construction rather than by
-comparison.
+`gate_command` (gate-sdk/lib/gate.sh:96-103) exits 2 on an absent or
+non-executable binary, and that stays exactly as it is. This ruling makes it
+unreachable in a correctly installed tree — a member is either present with its
+artifact or omitted and declared — and leaves it as the backstop for a tree whose
+binary was deleted or replaced.
 
-This does **not** absorb **`native-binary-freshness-ungated`**, which is the
-in-repo development half: a contributor editing Rust source and skipping the
-rebuild. That entry stays deferred and stays true.
+### 9. The extensibility model is ruled, with its rejections re-grounded {design-bearing}
 
-`gate-sdk/bin/upgrade-smoke.sh`'s phase-A determinism diff compares the vendored
-tree against itself; the built binary and the crate's `target/` are generated
-output and join the exclusion the generated hook and graph artifact already
-carry.
+**The shell escape hatch stays first-class**, and the pivot narrows what that
+means rather than removing it: a consumer may author their own gates as shell in
+their own resolve dir, with consumer-first resolution and `.sh` beating `.gate`
+within a dir (gate-sdk/lib/gate.sh:70-85). That is a choice made on the
+consumer's own machine about their own code; it places **no interpreter in the
+shipped payload's dependency floor**, which is what objective 1 governs.
+Forbidding it would strand every consumer-authored gate to buy nothing.
 
-### 7. The extensibility model is ruled, with its rejections recorded {design-bearing}
-
-The **script escape hatch stays first-class**: a consumer authors gates as shell
-in their own resolve dir, and consumer-first resolution with `.sh` beating
-`.gate` within a dir (gate-sdk/lib/gate.sh:70-85) means a consumer can shadow a
-ported kit gate with their own shell script and win. That is recorded today only
-as a deliverable line; it becomes the ruled model, with the two alternatives
-refused rather than dropped:
+The two alternatives stay refused, and objective 3 strengthens the second
+refusal rather than weakening it:
 
 - **A declarative check DSL.** Refused: a DSL is a language carrying none of a
-  language's tooling — no debugger, no test framework, no editor support — and
-  this repo's own battery is the evidence against its expressible set, since the
-  gates carrying real judgment are exactly the ones a rule language would not
-  hold. The declarative half a DSL is wanted for already exists as the `# graph:`
-  manifest, which is data every reader greps as text.
-- **Native plugins.** Refused: a dynamically-loaded plugin ABI is a stability
-  contract this project would own forever and a supply-chain surface it would own
-  in every consumer tree. The multi-call binary plus the shell hatch already
-  spans both ends of the substrate range, and **`gate-authoring-sdk-surface`**
-  owns the neutral-surface question that a plugin ABI would foreclose.
+  language's tooling, and this repo's own battery is the evidence against its
+  expressible set — the gates carrying real judgment are exactly the ones a rule
+  language would not hold. The declarative half it is wanted for already exists
+  as the `# graph:` manifest, which every reader greps as text with no build.
+- **Native plugins.** Refused, and more firmly under the pivot: a dynamically
+  loaded third-party plugin is a stability contract this project would own
+  forever *and* an unattested execution path inside the one artifact whose
+  integrity delta 6 exists to guarantee. Opacity that any loaded object can
+  step around is not opacity. **`gate-authoring-sdk-surface`** owns the neutral
+  authoring surface a plugin ABI would foreclose.
 
-### 8. Criterion 5 and the second-port prerequisite are restated as ruled {mechanical}
+### 10. Criterion 5 and the second-port prerequisite are restated as ruled {mechanical}
 
 §Porting a gate to the binary substrate criterion 5 states the ruled condition —
-a vendored form stays runnable because the substrate is resolved at install time
-and a member whose substrate is absent is omitted and declared — in place of the
-"unsatisfiable until `native-gate-vendoring-model` rules" text. The
-second-port-prerequisite paragraph (§What is retained, and what a second port
-must do first) records the vendoring half as satisfied. §What the dispatch seam
-does not settle's vendoring paragraph is rewritten to state the ruled model.
+a vendored form stays runnable because the artifact is selected and verified at
+install time, and a member with no artifact for the host platform is omitted and
+declared — in place of its "unsatisfiable until `native-gate-vendoring-model`
+rules" text. §What is retained, and what a second port must do first records the
+vendoring half as satisfied. §What the dispatch seam does not settle's vendoring
+paragraph is rewritten to the ruled model.
 
-### 9. The install path's requirement claims are corrected {design-bearing}
+### 11. The requirement surfaces state today's tree and the ruled direction, separately {design-bearing}
 
-`docs/install.md` §Requirements carries a `cargo` bullet claiming the floor is
-contributor-and-CI only and that "a gate on that substrate shells out to git at
-runtime and embeds nothing". The first half stops being true for a consumer whose
-selection carries a `.gate` member; the second half stays true and is worth
-keeping. The bullet is rewritten to state the conditional install-time role, the
-zero-build-step guarantee that survives it, and the omit-and-declare outcome.
+`docs/install.md` §Requirements carries a `cargo` bullet scoping the Rust floor
+to contributors and CI. Under this ruling a consumer never builds, so the bullet
+becomes true *and* narrower: cargo is a contributor-and-CI floor only, with no
+install-time role at all. That is a smaller claim than the one it replaces, not a
+larger one.
 
-`installer/README.md` §Requirements gains the same conditional in its
-delivery-path framing. `CLAUDE.md` §Housekeeping's `native/` bullet, which states
-that a second port is blocked on this entry, records the ruled install model
-instead.
+What the same page must **not** acquire is the pivot's target floor stated as
+present fact. The battery is shell today and needs what it needs; the page states
+that, and states the ruled direction as direction. `installer/README.md`
+§Requirements takes the same treatment. `CLAUDE.md` §Housekeeping's `native/`
+bullet records the ruled install model in place of its "blocked on
+`native-gate-vendoring-model`" line — and the wider rewrite `CLAUDE.md` needs
+off its bash focus is **`instruction-surface-bash-focus`**, filed and not started
+here.
 
 ## Producers and consumers
 
-**Payload component (new payload class).**
-Producer: `scripts/pack-installer.sh`'s component loop, `git ls-files`-derived,
-run at every release pack. Consumer: `installer/lib/init.sh`'s write step.
-Enabling config: `GATE_SDK_NATIVE_CRATE` (default `native`), set nowhere and
-therefore live at its default in this repo and in every consumer — the crate is
-at `native/` in the payload by construction, since the component's packed name is
-its basename exactly as the kit loop's is.
+**Target roster (new tracked declaration).**
+Producer: authored once, tracked, with the crate. Consumers, both named and both
+real: the release workflow's build matrix, and the installer's artifact
+selection. Its enabling config is its own tracked presence — nothing sets it, so
+there is no configuration under which a producer exists and no reader is
+reachable. A target added to the roster and not built fails the release, which is
+the correct place for that failure.
 
-**Substrate-need signal (derived, not stored).**
-Producer: `init.sh`'s `*.gate` scan over the selected kits' payload dirs, which
-runs on every install and every upgrade. Consumer: the same function's branch on
-it. It is a local, never persisted — nothing else may read it, because a stored
-copy would be a second source for a fact the payload already carries.
+**Payload artifact (new payload class).**
+Producer: the release workflow, once per declared target, at publish time.
+Consumer: `installer/lib/init.sh`'s selection-and-copy step. It is never produced
+from a working tree and never tracked, so no local build can substitute for it.
 
-**Toolchain verdict.**
-Producer: `context-kit/lib/toolfloor.sh`'s `tool_floor_check` on the `cargo`
-member of `PROBE_SET`, already invoked by `installer/lib/doctor.sh`. Consumer:
-`init.sh`'s two-outcome branch (delta 3), and `doctor.sh`'s report (delta 4).
-The verdict set is closed and already handles the fail-closed `uncomparable` arm,
-so no new state is introduced — an existing producer gains a second consumer.
+**Platform resolution (derived, never stored).**
+Producer: the installer bootstrap's platform probe — **new, and new is the
+finding**: no platform-triple derivation exists in the tree.
+`context-kit/lib/toolfloor.sh` does no OS or architecture logic at all, and
+`context-kit/bin/env-probe.sh`'s single `OS:` field is an unparsed
+`uname -s -r -m` string rendered for a human to read in `ENV.local.md`. That
+field is explicitly **not** the producer: making a human-read free-text line into
+a machine-consumed selector is how a display string becomes a contract nobody
+declared. Consumer: the artifact selection step. The resolution is a local — a
+stored copy would be a second source for a fact the host answers, and would go
+stale the first time a tree moved between machines.
 
-**Built binary.**
-Producer: `init.sh`'s post-write build step. Consumers: `gate_command`
-(gate-sdk/lib/gate.sh:96-105) at every battery run, and
-`check-gate-substrate-parity` assertion B's `--list` read. Its enabling config is
-`GATE_SDK_NATIVE_BIN`, already live at its default. It is recorded in `GENERATED`
-and therefore in the install's record of generated files, and it is **not**
-`claim`ed — a generated artifact is not a vendored file and must not be hashed as
-one.
+**Artifact record in `checkwright.lock` (new state, one new field pair).**
+Producer: `installer/lib/init.sh` after a verified write. Consumers: the
+uninstall verb (**`installer-lifecycle-verbs`**) reads the path to remove exactly
+what was written; `installer/lib/doctor.sh` reads the digest to re-verify the
+binary in place. The record carries the target name and the digest and nothing
+else, because those two are what the two readers read — no field is reserved
+against a future reader.
+
+**Published digest (new release output).**
+Producer: the release workflow, beside each artifact. Consumer: the installer's
+pre-write verification (delta 6), and `doctor`'s re-verification through the lock
+record. This is the one new external contract the ruling creates, and it has a
+named reader at a named transition on both sides.
 
 **Omitted-member record.**
-Producer: `installer/lib/common/recipe.sh`'s roster seeding, on an install whose
-substrate resolution failed. Consumers, both named and both new readers of an
-existing file: `gate-sdk/bin/run-gates.sh`'s summary line, and
-`installer/lib/doctor.sh`'s report. The record has exactly one field beyond the
-member name — the reason token `substrate-absent` — and its reader is the remedy
-text those two consumers print. No further field is added, because none has a
-reader.
+Producer: `installer/lib/common/recipe.sh`'s roster seeding, when the host's
+platform has no artifact. Consumers: `gate-sdk/bin/run-gates.sh`'s summary line
+and `installer/lib/doctor.sh`'s report. One field beyond the member name — the
+reason token `substrate-unavailable` — read by the remedy text those two print.
 
-**Assertion E's input.**
-Producer: the crate manifest, a tracked file. Consumer:
-`check-gate-substrate-parity`, whose `couples=` gains the path so the assertion
-re-fires on an edit. Its verdict has no downstream state.
+**Existing integration this changes.** `installer/lib/init.sh`'s post-write
+sequence gains a write step and loses nothing; `scripts/pack-installer.sh` gains
+an artifact class; the release workflow gains a build matrix and a digest
+emission. `context-kit/lib/toolfloor.sh`'s `cargo` member keeps its
+contributor-and-CI role and acquires no install-time consumer — the prior ruling
+gave it one and this ruling takes it back, which is a removal to propagate rather
+than an addition to make.
 
 ## Existing sections updated
 
 Owned by this amendment, each named with the delta that claims it:
 
-- gate-sdk/SPEC.md §Porting a gate to the binary substrate — criterion 5, and
-  §What is retained, and what a second port must do first (delta 8).
+- gate-sdk/SPEC.md §Porting a gate to the binary substrate — criterion 5 and
+  §What is retained, and what a second port must do first (delta 10); the port's
+  own justification, which this ruling's grounds change (delta 1).
 - gate-sdk/SPEC.md §What the dispatch seam does not settle — the vendoring
-  paragraph (delta 8).
-- gate-sdk/SPEC.md §Layout and configuration — `GATE_SDK_NATIVE_CRATE` joins the
-  knob roster and `GATE_SDK_NATIVE_SRC`'s default becomes derived (delta 1).
-- gate-sdk/SPEC.md §check-gate-substrate-parity — assertion E (delta 5).
-- gate-sdk/SPEC.md §run-gates — the summary's omitted-member line (delta 4).
-- gate-sdk/SPEC.md §upgrade-smoke — the generated-output exclusion (delta 6).
+  paragraph (delta 10).
+- gate-sdk/SPEC.md §Layout and configuration — the target-roster declaration and
+  any knob the artifact selection takes (deltas 1, 2).
 - gate-sdk/SPEC.md §Consumer smoke — the vendored-tree runnability statement,
-  which is criterion 5's other reader (delta 3).
-- context-kit/SPEC.md §bin/env-probe — the `cargo` member's role gains the
-  conditional install-time reading beside its build-and-CI one (delta 9).
-- `installer/README.md` and `docs/install.md` §Requirements (delta 9);
+  criterion 5's other reader (delta 4).
+- gate-sdk/SPEC.md §run-gates — the summary's omitted-member line (delta 4).
+- gate-sdk/SPEC.md §upgrade-smoke — the artifact's treatment in the
+  determinism diff, which must not read a platform-selected binary as drift
+  (delta 5).
+- context-kit/SPEC.md §bin/env-probe — the `cargo` member's scope, corrected to
+  contributor-and-CI with no install-time consumer (delta 11).
+- `installer/README.md` and `docs/install.md` §Requirements (delta 11);
   canon-kit's `check-install-claim` holds the primary-install-path claim across
   governed install sections and is the reader that must stay green.
-- `CLAUDE.md` §Housekeeping — the `native/` bullet (delta 9).
+- `CLAUDE.md` §Housekeeping — the `native/` bullet (delta 11).
+- `RELEASING.md` — the release gains a build matrix, per-target artifacts and a
+  digest emission, so the runbook that drives it changes with them (deltas 1, 6).
 
 ## Definition of Done
 
@@ -355,9 +416,12 @@ Owned by this amendment, each named with the delta that claims it:
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls gate-sdk/SPEC-*.md`).
 - [ ] **Removals propagated** — grepped every spec for names this change
-      retired; nothing dangles.
+      retired; nothing dangles. The install-time toolchain role the prior ruling
+      introduced is one of them.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
-- [ ] **No port lands.** The iteration's envelope is unblock; a second port is
-      out of scope and no `.gate` member is added to any kit.
+- [ ] **No port lands.** The iteration's envelope is unblock; no `.gate` member
+      is added to any kit.
+- [ ] **No surface claims a dependency floor the tree has not reached.** The
+      objectives are the direction; the requirement pages state the tree.
