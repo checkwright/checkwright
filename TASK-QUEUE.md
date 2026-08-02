@@ -2662,6 +2662,38 @@
   Nothing is incorrect meanwhile.
   Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
 
+- **gate-authoring-sdk-surface** [design-pending] — `.gate` as the substrate-neutral
+  surface of a gate-authoring SDK. **Operator-surfaced during `native-gate-dispatch-seam`
+  build; filed so the framing outlives the session that saw it.**
+  **The observation:** because the manifest lives outside the implementation, the
+  graph, hook, and meta-gate layers never learn what implements a gate. That is not
+  a Rust seam that happens to work — it is a **language-agnostic** one. A gate could
+  be written in any language behind a descriptor, and slice 1 already avoided baking
+  a language into the descriptor format, the resolution path, and
+  `check-gate-substrate-parity` assertion D (whose comment-leader match is `#`, `//`
+  and `/*` deliberately). `GATE_SDK_NATIVE_SRC` is a path knob, not a language knob,
+  for the same reason.
+  **Why it is an SDK question and not a port question:** the port asks "how does
+  *this* gate move"; this asks what a **third party** needs to author a gate on any
+  substrate — the descriptor contract, the subcommand calling convention, the output
+  contract, and the fixture-pair obligation, which are already the four things
+  gate-sdk holds. The kit is most of an SDK already; what is missing is the statement
+  that the substrate is a parameter.
+  **Boundary with the two live companions, so none sprawls:**
+  `native-gate-vendoring-model` rules how a compiled gate *arrives*;
+  `gate-payload-disclosure-ruling` rules what it *discloses*; this one rules what a
+  gate *is* independent of substrate. This entry is also the one that makes the
+  disclosure question tractable rather than merely deferred — a descriptor discloses
+  a gate's **shape** without its **predicate**, which is the distinction that ruling
+  turns on.
+  **Not started, and deliberately not widened into slice 1**: building it would have
+  meant generalizing a seam with exactly one instance, which is the shape of a design
+  that fits nothing later.
+  **Cost while deferred:** each further port hardens substrate-specific assumptions
+  by habit rather than by ruling, and the cheapest moment to keep the seam neutral is
+  before the second language exists — not after.
+  Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
+
 - **native-gate-dogfood-ruling** [design-pending] — must this repo run built artifacts?
   Restored from the 2026-07-28 filing, which still states it best: **"this repo must
   run built artifacts or the opacity win is consumer-only, and the Rust source sits
