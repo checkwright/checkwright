@@ -6,3 +6,4 @@
 
 native-gate-substrate scope a3d42602 2026-08-02
 native-gate-substrate spec a78cc11a 2026-08-02
+native-gate-substrate align a23d3445 2026-08-02
