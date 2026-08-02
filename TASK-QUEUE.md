@@ -12,6 +12,32 @@
 
 ## New Features
 
+- **native-gate-dispatch-seam** [spec: SPEC-native-gate-dispatch-seam.md] — slice 1 of
+  `native-gate-binary-port`: the seam that lets a gate's implementation become a
+  compiled subcommand while its declaration stays where every reader already looks,
+  plus the contract that stops the move from silently deleting assertions.
+  **The larger half is conservation, not dispatch.** A gate today is one shell file
+  carrying the rule, the `# graph:` manifest, the output-contract strings, its
+  `# spec:`/`# assertion` directives, and the greppable evidence that its reads stay
+  inside its declared couples. Twelve meta-gates read that file, and nine of them stop
+  asserting by finding nothing and printing `clean` — a false green of exactly the
+  class the preceding iteration was spent eliminating.
+  **What lands:** `gate_resolve` returning a declaration path with a `.gate` arm and a
+  new `gate_command` returning an invocation argv; the non-executable `.gate`
+  descriptor whose existence is the dispatch declaration; one multi-call Rust crate at
+  `native/`; a disposition — ported, retained, or retired with cause — recorded for
+  every substrate-sensitive meta-gate, with the set *derived* from the manifests
+  rather than maintained; `check-gate-substrate-parity` holding all three; fixture
+  pairs executed through the same dispatch; and one gate ported end to end.
+  **The manifest ruling this slice owed:** the manifest stays
+  tracked text. `installer/lib/init.sh` runs `gen-pre-commit.sh --write` in the
+  consumer tree, so a manifest obtainable only by executing the binary would couple
+  this slice to `gate-payload-disclosure-ruling`. Text keeps it payload-neutral.
+  **Deferred on purpose, each to a linked entry:** `native-gate-dogfood-ruling`,
+  `gate-payload-disclosure-ruling`, `native-gate-vendoring-model`. Opacity is not
+  claimed here — this repo builds from source.
+  Promoted 2026-08-02 by spec, authoring the amendment.
+
 ## Technical Debt
 
 - **battery-baseline-capture** — persist a per-gate timing baseline for the current
