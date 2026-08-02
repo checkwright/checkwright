@@ -166,3 +166,15 @@ recoverable:
   handshake. The gate greps the roster and never sources it: a fixture path is
   untrusted input, so the reader that lints the array must not be made to execute
   the file it reads.
+
+**A derived surface earns a row here only when it has a reader who cannot run
+the emitter** — a public page, a file a fresh clone needs before its tooling
+works. Derivation-first is satisfied by deriving on demand otherwise, and a
+committed copy of a high-churn source's derivation buys a per-commit
+regeneration tax for nobody. So a tool whose only consumer is a session with a
+shell stays off this roster and gets no freshness gate:
+`queue-kit/bin/queue-index.sh` and `bin/queue-edges.sh` are the standing
+instances, the latter with its refusal reasoned in its own contract
+(queue-kit/SPEC.md §bin/queue-edges.sh). Their absence is a ruling, not an
+oversight — the question to ask of a new derived surface is who reads it, not
+whether it could be generated.
