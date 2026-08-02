@@ -15,6 +15,7 @@ check-gate-fail-closed
 check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
+check-gate-substrate-parity
 check-graph
 check-commit-msg
 check-tree-terms

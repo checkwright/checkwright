@@ -1,3 +1,0 @@
-# graph: couples=.github/workflows/*.yml,.github/workflows/*.yaml,.github/ISSUE_TEMPLATE/*.yml,docs/_config.yml,kit:templates/*.yml,kit:templates/*.yaml,native/src/gates/action_pinning.rs dir=one valve=none tier=precommit
-# spec: gate-sdk/SPEC.md §check-action-pinning — every `uses:` ref in a scanned YAML file is immutable: a full 40-hex commit SHA, or a repo-local ./ path git pins at checkout
-# reads-couples-exempt: the shell predecessor's single walk was already undecidable and skipped-and-counted, so this port converts a counted skip into a counted exemption and ends no assertion; the scan root is an argument, which is what makes the walk unresolvable in either substrate
