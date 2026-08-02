@@ -917,47 +917,47 @@
   roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
   Port the battery off bash-plus-GNU-userland onto one native compiled binary
   (Rust the lead candidate); scale is read off `gates.list` and `*/checks`.
-  Standing pains: Linux-only reach (docs/install.md §Requirements;
-  `platform-support-ci-matrix` carries that half); utilities on independent
-  lifecycles (the declared bash floor is already wrong — gap inbox 2026-08-01);
-  a compiler replacing contracts the sdk enforces by discipline plus meta-gates;
-  and the sharpest — **an agent cannot read a binary**, so oracle-first becomes
-  structural instead of doctrine it can route around (consumer-side; this repo keeps its source).
-  **Wall-time is no argument either way — falsified 2026-08-02 at scope.** "A port
-  deletes `check-shellcheck`" is wrong: 49% of that gate's 188-file corpus is non-gate
-  bash (installer, `demo/`, kit dirs, 21 `scripts/*.sh`) widened deliberately by
-  `scripts/gate-sdk-config.sh`; and no timing artifact survives to re-derive the old
-  figures. In-bash: **`gate-battery-parallel-execution`**, **`gate-battery-result-cache`**.
-  **Correctness evidence (2026-08-01, operator-directed).**
-  `release-step-verification` produced eleven defects, sorted by whether a port
-  removes them. **Four are removed:** the opt-in shell error model (a probe under
-  `set +e` turned a failed `gh` call into an empty list and a zero exit, reporting
-  green forever from its own data source dying); the regex dialect split (a word
-  boundary in GNU grep is a backspace in POSIX awk); textual parameter expansion
-  leaving artifacts in derived values; and hand-rolled parsers standing in for real
-  ones. **That last one's named live instance is gone (2026-08-02 at scope):** the
-  anchored `run:` fail-open closed 2026-08-01 in awk, by an explicit refusal arm — so
-  "only a real parser closes this class" is falsified by the tree's own fix.
-  **Six survive — the ceiling, one fewer since `smoke-battery-workflow-gate-coverage`
-  landed:** CI-checkout and API-pagination semantics, evidence that does not identify
-  what it certifies (`gate-tests-suite-identity-in-evidence`), presence asserted where
-  resolution was needed, an ambiguous census, and a required permission with no oracle
-  (`workflow-permissions-scope-oracle`). **Consequence for scope:** justify the port on
-  *silent success* and real parsers replacing regex approximation — never on speed, and
-  not as closing `vacuous-assertion-count-discipline`, whose dominant class is assertion
-  *design* and ports intact. Landing the port then relaxing is the failure mode to
-  design against. It does **not** unlock `platform-support-ci-matrix` — its own
-  per-platform artifacts need matrix-shaped CI, so that entry is a prerequisite rather
-  than a beneficiary (direction checked 2026-08-02 at scope).
+  Standing pains: utilities on independent lifecycles; a compiler replacing
+  contracts the sdk enforces by discipline plus meta-gates; and the sharpest,
+  **gate opacity**, this entry's sharpest ground since it was filed: an agent that
+  can *read* a gate's bash predicts its verdict and acts on the prediction instead
+  of running it, so a binary makes executing the cheapest way to know.
+  **Sharpened 2026-08-02 at scope — the original's "consumer-side; this repo keeps
+  its source" qualifier is right but stops short, in two directions.** Opacity is
+  never secrecy: a binary is reverse-engineerable. And it is friction, not a
+  barrier — every gate ships readable `good/`+`bad/` fixtures, a red names the
+  offending surface, and the rule is documented in prose besides, so the
+  implementation is the least informative of four readable surfaces. Honest form:
+  oracle-first *default-favored*, not structural. More is a vacuous claim.
+  **Two grounds this must not rest on, both falsified 2026-08-02 at scope.**
+  *Speed:* "a port deletes `check-shellcheck`" is wrong — 49% of its 188-file corpus
+  is non-gate bash, widened deliberately by `scripts/gate-sdk-config.sh` — and no
+  timing artifact survives, so a baseline is captured before the port or the claim
+  is unfalsifiable. In-bash siblings: `gate-battery-parallel-execution`,
+  `gate-battery-result-cache`.
+  *Platform reach:* a gate-only port retires **one** of the six
+  `context-kit/lib/toolfloor.sh` pins (`awk::GNU`) — `bash:4.3` survives on namerefs
+  in kit `bin/`, `sort::coreutils` on `date -d`/`stat -c`/`realpath` there and in the
+  hook emitter, `git`/`jq`/`shellcheck` are untouched, and `npx checkwright init`
+  hands to bash, so native Windows stays blocked (docs/install.md:63-65).
+  **Correctness evidence (2026-08-01, operator-directed) — the surviving ground.**
+  `release-step-verification`'s eleven defects sort into four a port removes — the
+  opt-in shell error model (a probe under `set +e` reported green forever from its
+  own data source dying), the regex dialect split, textual parameter expansion, and
+  hand-rolled parsers — and six it does not (CI-checkout and API-pagination
+  semantics, `gate-tests-suite-identity-in-evidence`, presence asserted where
+  resolution was needed, an ambiguous census, `workflow-permissions-scope-oracle`).
+  Caution: the parser class's named live instance was closed 2026-08-01 in awk by an
+  explicit refusal arm, so "only a real parser closes this class" overstates.
+  Landing the port then relaxing is the failure mode to design against.
   **Deliverable:** one multi-call binary, a subcommand per check; `gates.list` dispatching
   per-entry to subcommand or script so it lands cohort by cohort, slowest and meta-gates first;
   each gate's fixture pair is the parity oracle before its script retires; consumer gates keep
   the shell escape hatch; checksummed per-platform artifacts, buildable source, needing only git.
-  **Why `[design-pending]`:** the consumer-extensibility model decides everything
-  else — escape hatch vs declarative check DSL vs native plugins — plus language
-  choice, the dogfood question, and the trust inversion (opacity to agents is
-  opacity to human adopters too, so reproducible builds and checksums are owed).
-  Distribution is the hard part: kits vendor as text, zero build step. Cost apart.
+  **Why `[design-pending]`:** the consumer-extensibility model decides everything else
+  (escape hatch vs check DSL vs native plugins), plus language choice, the dogfood
+  question, and the trust inversion reproducible builds and checksums answer.
+  Distribution is the hard part: kits vendor as text, zero build step.
   **Cost while deferred:** every new gate adds shell to the eventual port, the
   silent-failure classes above stay reachable, source-prediction waste recurs per
   session. Nothing breaks — correct on Linux, fully gated. Feature-shaped: it
