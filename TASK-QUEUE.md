@@ -12,47 +12,6 @@
 
 ## New Features
 
-- **gate-exemption-live-slug-derivation** [spec: gate-sdk/SPEC-exemption-live-slug-derivation.md]
-  — **an exemption can resolve green against no task at all.**
-  `check-gate-exemption-tasks` derives its live-slug set by reading every
-  bold-emphasis token on every line of the scanned span rather than bullet lead
-  lines, so any bolded lowercase word in queue prose enters the set. Re-measured
-  at spec: **159 tokens against 94 real lead-line slugs — 65 spurious**.
-  **Seam ruled at spec 2026-08-02 — re-implement and cite from both ends.**
-  gate-sdk carries the lead-line predicate as its own code, verbatim the text
-  **four** existing holders already carry independently — `queue_live_slugs`,
-  `spec_queue_slugs`, and two inline scans a function-name grep does not find
-  (`check-task-names.sh`, `kpi-queue-net-delta.sh`'s `pool()`). No dependency,
-  **no new knob**; gate-sdk becomes the fifth. Not a new rule —
-  queue-kit/SPEC.md §The queue format already states it for drift-kit, and the
-  reciprocal half is added there. Evidence the re-implementation is faithful:
-  the predicate reproduces `queue_live_slugs`'s answer exactly, 94 for 94. The
-  whitespace-tolerant anchor is the *correct* one rather than a tolerance — an
-  indented bold lead-in is a sub-task and sub-task slugs share the global
-  namespace, so a column-0 anchor would fail **closed** on that class.
-  **Residue stated with its size:** a queue-format change costs five hand edits
-  and no gate enforces any. Not this unit's to fix — whether five hand-coupled
-  parsers earn a shared derivation or a conformance gate is a different unit,
-  neither answered nor foreclosed here.
-  **The struck half stays struck**: the section-span defect was refused
-  2026-08-02 on spec-over-precedent, and the span, its
-  no-reset-on-unknown-heading behavior and the icebox coupling riding on it are
-  untouched. Do not re-file it.
-  Three deltas, all **design-bearing**: the predicate swap, a live-slug count on
-  the clean line, and the fixture case that pins the tightening. The present pair
-  passes identically before and after the change, so re-running it is **not**
-  evidence — build must add the case whose queue bolds a non-slug token in prose.
-  **Ordering** [precondition-ok: not a blocker — the amendment names two sound
-  routes and this unit is buildable on either. Landing `gate-fixture-expect-conjunction`
-  first buys the stronger fixture (all three findings pinned as a conjunction);
-  landing this one first is sound with `expect.txt` re-pointed at the new
-  finding alone. Sequencing is the lead's batch-cut call, not a dependency]**:**
-  the new `bad/` case wants a multi-line `expect.txt`, which only means a
-  conjunction once the sibling lands. The third route — adding the case and
-  leaving `expect.txt` untouched — is refused outright.
-  Surfaced 2026-07-29 at spec while surveying readers for the icebox tier;
-  token-scan half added 2026-07-31 at align; promoted 2026-08-02 by spec.
-
 - **prose-enum-identifier-boundary-class** [spec: canon-kit/SPEC-prose-enum-identifier-boundary.md]
   — **a false clean live for every `check-prose-enum` consumer**, not a
   repo-local wrinkle. `_sk_present` bounds a member match with `[[:alnum:]-]`, a
@@ -2414,5 +2373,6 @@
 ## Done
 
 - gate-fixture-expect-conjunction
+- gate-exemption-live-slug-derivation
 
 ## Lessons Learned

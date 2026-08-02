@@ -1263,7 +1263,9 @@ kit-roots derivation, as `check-test-hermetic`'s do.
 Invariant: every element of an `# exception-list:`-tagged array in a
 `check-*.sh` gate carries exactly one of two disposition annotations —
 `# until: <slug>` (temporary; must resolve to a live task in the queue file's
-New Features / Technical Debt / Deferred sections) or `# permanent: <reason>`
+New Features / Technical Debt / Deferred sections — *live* meaning the slug on a
+**bullet lead line** within that span, one per entry, never every bold token in
+it) or `# permanent: <reason>`
 (structural out-of-scope). An element with neither, a `# until:` slug that is
 Done-only or missing, or elements sharing the array's opening `=(` line are
 violations. Scope is in-script exemption arrays only; inline per-site
@@ -1283,6 +1285,59 @@ section order** — an icebox placed after the done section silently drops those
 slugs from the live set. The same-shaped scan in drift-kit's `kpi-deferred-age`
 *does* reset on an unknown heading and so excludes the tier; same shape,
 opposite behavior, both wanted.
+
+**The live slug of an entry is the bold lead-in of its bullet lead line**, one
+per entry — the line predicate
+`^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*`, from which the first
+bold token is the slug. Reading every bold token on every line of the span
+instead is a fail-open, and the loud kind of one: entry prose bolds ordinary
+words, so any bolded lowercase word joins the live set, an `# until:` resolves
+against no task at all, and the gate's clean line still claims every element
+declares until-with-live-task. The whitespace tolerance is the format rather
+than a tolerance — an indented bold lead-in is a sub-task, and sub-task slugs
+share the one global namespace an `# until:` may name (queue-kit/SPEC.md §The
+queue format), so a column-0 anchor would drop that class and fail *closed* at
+the other end. A holder that wants entries only is entitled to that narrower
+anchor; the level is the reader's choice, the predicate is not.
+
+The seam is the one the section set above already takes: **gate-sdk cannot
+depend on queue-kit for the lead-line format, so the coupling is carried by both
+SPECs rather than by code.** Sourcing `lib/queue.sh` from gate-sdk is refused on
+layering — gate-sdk is the substrate every kit vendors, and a queue format must
+not become a precondition for running any gate; a consumer vendoring gate-sdk
+and no queue-kit still gets a working exemption gate. Re-implement and cite from
+both ends is not a new ruling: queue-kit/SPEC.md §The queue format already
+states it for drift-kit, with a cycle rather than a layering inversion as the
+reason. No knob: the lead-line shape is not a consumer's posture but the one
+format the `# until:` contract is written against, and a consumer free to
+redefine it could redefine it back into the fail-open this closes.
+
+**The honest cost, stated with its size: eight independent holders now carry
+that predicate and no gate enforces their agreement** — `queue_live_slugs` and
+`queue_roadmap_entries` (queue-kit/lib/queue.sh), `spec_queue_slugs`
+(canon-kit/lib/spec.sh), the inline scans in queue-kit's `check-task-names` and
+`check-queue-entry-budget`, `bin/queue-index.sh` (which carries it twice, in the
+`--extent` and `--icebox-candidates` walks), drift-kit's `kpi-queue-net-delta`
+`pool()`, and this gate. They are named because a grep for the *function* names
+finds two of them and the rest are inline scans no naming convention surfaces —
+which is how the count was twice under-stated before it was surveyed. The risk
+and the cost do not sit in the same place: a **set builder** with a wrong
+predicate fails silently, in wrong membership, which is this gate's own defect
+class, while a **per-bullet extractor** fails loudly and locally — a missing
+index row, an extent measured wrong. So a format change costs all eight edits
+and endangers only the few that build sets. Accepted on the same ground as the
+section-set residue above: a cross-kit code dependency would cost more than the
+divergence risk. Whether eight hand-coupled parsers earn a shared derivation, a
+conformance test, or a gate is a real question and a **different unit**; this
+section neither answers it nor forecloses it.
+
+Clean-line contract: the line reports the exemption-array count **and** the
+derived live-slug count. Both are §run-gates' vacuous-pass tripwire applied to
+this gate's two sets, and they read in opposite directions — an empty array set
+means the gate ranged over nothing, while an absurdly *large* slug set is the
+fail-open above, silent by construction because every `# until:` then resolves.
+A number on the line is what makes the second readable without an audit, and its
+drift is the signal that the predicate has come loose from a reformatted queue.
 
 ### check-graph
 

@@ -50,7 +50,17 @@ Widening, not replacing: `Surfaced` records when the premise was observed and
 is the better premise-rot datum, `Filed` is the honest available fallback, so
 no entry owes a migration. drift-kit re-implements the definition rather than
 sourcing `lib/queue.sh`, because a kit dependency the other way would close a
-cross-kit cycle; both implementations cite this section.
+cross-kit cycle; both implementations cite this section. That is the general
+rule for this format, not a one-off for drift-kit: **a kit that cannot depend on
+queue-kit re-implements the predicate and both ends cite this section.** Its
+holders, each independent: `queue_live_slugs` and `queue_roadmap_entries` here,
+`bin/queue-index.sh`'s walks, the inline scans in `check-task-names` and
+`check-queue-entry-budget`, canon-kit's `spec_queue_slugs`, drift-kit's
+`kpi-queue-net-delta`, and gate-sdk's `check-gate-exemption-tasks` — whose
+reason is stronger than a cycle (gate-sdk is the substrate every kit vendors, so
+depending on queue-kit would invert the layering and make a queue format a
+precondition for running any gate) and whose own residue accounting lives at
+gate-sdk/SPEC.md §check-gate-exemption-tasks.
 - Any other section (an iteration header, a lessons section) is outside the
   grammar and ignored by every gate except the file-wide hygiene axes.
 

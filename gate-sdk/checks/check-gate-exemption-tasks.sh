@@ -26,11 +26,9 @@ done < <(awk '
     /^## Deferred/       { s=1; next }
     /^## Done/           { s=0 }
     /^## Lessons Learned/{ s=0 }
-    s {
-        while (match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)) {
-            print substr($0, RSTART+2, RLENGTH-4)
-            $0 = substr($0, RSTART+RLENGTH)
-        }
+    s && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
+        match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
+        print substr($0, RSTART+2, RLENGTH-4)
     }
 ' "$QUEUE" 2>/dev/null)
 
@@ -102,5 +100,5 @@ if [[ ${#errors[@]} -gt 0 ]]; then
     echo "  help: annotate each exemption element '# until: <live-slug>' or '# permanent: <reason>'"
     exit 1
 fi
-echo "GATE-EXEMPTION-TASKS: clean ($arrays exemption array(s); every element declares until-with-live-task or permanent-with-reason)"
+echo "GATE-EXEMPTION-TASKS: clean ($arrays exemption array(s), ${#IS_LIVE[@]} live task slug(s); every element declares until-with-live-task or permanent-with-reason)"
 exit 0

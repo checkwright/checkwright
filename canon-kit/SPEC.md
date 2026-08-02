@@ -377,7 +377,12 @@ same shapes:
   never disagree on the set — and a done slug for a bare-slug bullet outside
   them; the single grammar `check-todo-task-liveness`
   and `check-deprecation-task` resolve a `task: <slug>` binding through (each
-  caller builds its own live/done map and fail-closes on the walk status).
+  caller builds its own live/done map and fail-closes on the walk status). That
+  walk's bullet lead-line predicate is re-implemented here rather than sourced,
+  making canon-kit one of the format's independent holders under the
+  re-implement-and-cite-from-both-ends rule
+  (queue-kit/SPEC.md §The queue format); the holder census and the residue it
+  leaves live at gate-sdk/SPEC.md §check-gate-exemption-tasks.
 - **Finders:** the canonical-spec / amendment finders the spec-scanning gates
   share, and the manifest-set finder the narration-gate family shares —
   canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its
