@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned
-// walk: the same prune-dir set, read from the same GATE_SDK_PRUNE_DIRS knob so the
-// two substrates cannot scan different trees. The default literal below is the one
-// check-knob-default-coupling holds against the shell default.
+// walk, reading the same GATE_SDK_PRUNE_DIRS knob so the two substrates cannot
+// scan different trees
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -56,4 +55,36 @@ pub fn find_files(root: &Path, exts: &[&str]) -> Result<Vec<PathBuf>, String> {
     }
     out.sort();
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — the
+    // executed coupling for the one knob default this crate duplicates, which
+    // check-knob-default-coupling cannot reach (shell idioms, kit roots only)
+    #[test]
+    fn prune_default_equals_the_shell_libraries() {
+        let lib = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../gate-sdk/lib/gate.sh");
+        let text = fs::read_to_string(&lib)
+            .unwrap_or_else(|e| panic!("cannot read {}: {}", lib.display(), e));
+        let line = text
+            .lines()
+            .find(|l| l.trim_start().starts_with("GATE_PRUNE_DIRS=("))
+            .expect("no GATE_PRUNE_DIRS=(…) default in gate-sdk/lib/gate.sh");
+        let inner = line
+            .split_once('(')
+            .and_then(|(_, r)| r.split_once(')'))
+            .map(|(v, _)| v)
+            .expect("malformed GATE_PRUNE_DIRS array literal");
+        let shell: Vec<&str> = inner.split_whitespace().collect();
+        let rust: Vec<&str> = PRUNE_DIRS_DEFAULT.split_whitespace().collect();
+        assert_eq!(
+            rust, shell,
+            "the native prune-dir default has drifted from the shell library's; \
+             the two substrates would scan different trees"
+        );
+    }
 }

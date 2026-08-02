@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-action-pinning — every `uses:` ref in a scanned YAML
 // file is immutable: a full 40-hex commit SHA, or a repo-local ./ path git pins at
-// checkout. Ported to the binary substrate; the fixture pair is the parity oracle and
-// runs against whichever substrate the member resolves to (§run-gate-tests).
+// checkout
 use crate::walk;
 use std::path::Path;
 
@@ -151,7 +150,6 @@ mod tests {
         assert_eq!(uses_value("  # uses: a/b@v1"), Some("a/b@v1"));
         assert_eq!(uses_value("  #uses: a/b@v1"), Some("a/b@v1"));
         assert_eq!(uses_value("  # - uses: a/b@v1"), Some("a/b@v1"));
-        // a dash with no following space is not the list-item arm
         assert_eq!(uses_value("-uses: a/b@v1"), None);
         assert_eq!(uses_value("name: uses: not-a-ref"), None);
         assert_eq!(uses_value("run: echo uses:"), None);
@@ -170,9 +168,7 @@ mod tests {
         assert!(is_immutable("./.github/actions/local"));
         assert!(!is_immutable("owner/action@v5"));
         assert!(!is_immutable("owner/action@main"));
-        // 39 hex is a near-miss the shell regex also rejects
         assert!(!is_immutable(&format!("owner/action@{}", &SHA[..39])));
-        // uppercase hex is not the lowercase class the shell regex names
         assert!(!is_immutable(&format!("owner/action@{}", SHA.to_uppercase())));
     }
 }

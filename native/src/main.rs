@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the multi-call binary gate_command dispatches
-// a .gate-declared registry member to. One subcommand per ported gate, named exactly
-// as the gate; `--list` reports the roster check-gate-substrate-parity assertion B
-// compares against the .gate descriptors on disk.
+// a .gate-declared registry member to; `--list` reports the subcommand roster
+// check-gate-substrate-parity assertion B compares against the descriptors on disk
 mod gates;
 mod walk;
 
@@ -27,8 +26,7 @@ fn main() {
     }
 
     // spec: gate-sdk/SPEC.md §Fail-closed contract — an unknown subcommand is a
-    // harness error, never a pass: a registry member dispatching to a subcommand this
-    // binary does not carry must fail the battery rather than report nothing to say.
+    // harness error, never a pass
     match gates::lookup(first) {
         Some(f) => exit(f(&argv[1..])),
         None => {
