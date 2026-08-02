@@ -1545,11 +1545,15 @@ B is deliberately redundant with evidence-kit's `check-battery-roster`
 (evidence-kit/SPEC.md §check-battery-roster), whose assertion (A) holds the same
 runner doc against the configured suite roster and, where that config derives
 the fixture suites from the `gate-tests/` roots, supersets B. The redundancy is
-kept on a dependency direction: **gate-sdk may not read evidence-kit config**,
-so B is the arm that survives a gate-sdk-only adoption — the more common shape —
-and retiring it would trade a duplicate finding for a coverage hole. One
-omission named differently from each side (a kit root here, a suite there) is a
-duplicate finding, not a contradiction.
+kept on a dependency direction: **a gate-sdk gate may not require evidence-kit
+config**. The line is between reading it opportunistically and asserting over
+it — §enforcement-map reads that config where a consumer has one and emits no
+suite rows where it does not, which an assertion cannot do, since a gate with
+nothing to compare against is either fail-closed or a false clean. So B is the
+arm that survives a gate-sdk-only adoption — the more common shape — and
+retiring it would trade a duplicate finding for a coverage hole. One omission
+named differently from each side (a kit root here, a suite there) is a duplicate
+finding, not a contradiction.
 
 Config, the standard kit shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 is A's doc, `GATE_SDK_RUNNER_DOC` (default `README.md`) is B's; both resolve

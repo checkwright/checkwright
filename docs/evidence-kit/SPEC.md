@@ -271,9 +271,11 @@ with tracked `gate-tests/` files to have a runner-doc line naming
 `<kit>/gate-tests`; because this repo's config derives exactly those roots into
 `EVIDENCE_KIT_SUITES` through `gate_fixture_suites`, assertion (A) here is a
 superset of that arm for a consumer running both kits. It is kept rather than
-retired on a dependency direction: gate-sdk may not read evidence-kit's
-configuration, so B is the arm that survives a gate-sdk-only adoption, which is
-the more common shape. Both sections say so, each naming the other, so the next
+retired on a dependency direction: a gate-sdk gate may not require this kit's
+config — gate-sdk's `bin/enforcement-map.sh` reads the suite roster where a
+consumer has one, but an assertion cannot, having no honest verdict when it is
+absent. So B is the arm that survives a gate-sdk-only adoption, which is the
+more common shape. Both sections say so, each naming the other, so the next
 reader who notices the redundancy finds the reason instead of re-deriving it.
 One omission reported from both sides is a duplicate finding, not a
 contradiction — the two name different sets (a kit root, a suite) in their
