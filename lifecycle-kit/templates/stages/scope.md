@@ -84,6 +84,18 @@ A premise inherited from a queued task ("clean/mechanical", "already filed",
 "dead code") is a dated hypothesis — re-verify it against the current tree
 before building on it, whether or not this stage goes on to author.
 
+That re-verifies the entry's *own* claims — which is the half a survey already
+reads. The other half is what the **rest of the queue** says about that entry:
+its inbound citations, summed. Reading sibling entries one at a time never
+produces that sum, so a unit that several siblings separately converge on,
+subsume, or block against can be read carefully and still ranked low — the
+failure is aggregation, not retrieval, and no amount of following
+cross-references fixes it. So before ranking a candidate, aggregate its inbound
+edges (queue-kit/SPEC.md §bin/queue-edges.sh) and read what cites it. The
+promotion dividend lives in the total and in no single entry, which is also why
+splitting an entry is safe only against that total: a split scatters an entry's
+weight across siblings, and the sum is what puts it back together.
+
 When done, **set the iteration name without waiting for confirmation** and
 inform the user: replace the `—` placeholder in the queue header AND update
 the WORKFLOW-STATE scope stamp to match (`check-stage-evidence` requires
