@@ -542,18 +542,20 @@ Only the exit-2 rows reach the corroborating probe.
 
 **Probe first, reasons second.** The exemption is *derived* — recomputed from the
 tree every run, so it cannot go stale, be forgotten, or be copied wrong. That is
-its worth, and its worth is not coverage: on this tree's sweep the derivation
-justified 7 of 48 unregistered gates, and the other 41 owed a human disposition.
-What the 7 buy is the row that matters most — the permanent exemption owing no
-written reason ever, the one nobody re-examines — taken out of human hands rather
-than left to a line written once. The written reason is the valve for the rest,
-never the mechanism, and an implementation that collects reasons for every
+its worth, and its worth is not coverage: on a real sweep the derivation justifies
+only a minority of the unregistered gates and the rest owe a human disposition.
+What that minority buys is the row that matters most — the permanent exemption
+owing no written reason ever, the one nobody re-examines — taken out of human hands
+rather than left to a line written once. The written reason is the valve for the
+rest, never the mechanism, and an implementation that collects reasons for every
 unregistered gate and consults the probe afterwards has inverted this contract
 and is wrong however green it runs. The probe set is self-limiting: a gate that
 probes green gets registered, which moves it out of the probe set and into the
-battery, where it was going to run anyway — 36 of those 41 disposition exactly
-that way, which is why the hand-declared count stays small even though the
-derivation's share of the sweep is a minority.
+battery, where it was going to run anyway — most of that remainder dispositions
+exactly that way, which is why the hand-declared count stays small even though the
+derivation's share of the sweep is a minority. The live figures are deliberately
+not restated here: the accounting line prints registered / self-declared /
+hand-declared / unaccounted on every run, and it is the only authority for them.
 
 **Not derived from the README roster.** The kit's `<!-- gate-roster:begin -->`
 block already carries full `checks/` parity (`check-readme-roster`) and

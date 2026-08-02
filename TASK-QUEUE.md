@@ -1354,11 +1354,23 @@
   The count half of this class is `spec-measured-count-gate`'s, not this
   entry's: a bare cardinal qualifying a roster is a different scanner from a
   membership check.
+  **Third instance, 2026-08-02, and it widens the class past READMEs:** `CLAUDE.md`
+  §This repo enumerates the generated projections ("that hook, the graph artifact,
+  the enforcement map, the footprint and value rollup, the docs mirror") while
+  docs/site-architecture.md §Generated projections is the declared roster — and the
+  copy is already short by one, omitting `ROADMAP.md`, which the Housekeeping bullet
+  below then has to re-attach by saying it is rostered "like every other generated
+  projection". So the class reaches the **always-loaded** surface, where a stale
+  enumeration is paid by every session rather than by a reader who opens a README.
+  Left unfixed on purpose: correcting the copy is the Enforcement-first shape this
+  entry already names, and a `generated-projection` enum set is exactly the kind
+  the survey above must cost first.
   **Cost while deferred:** low and non-rotting, but it is paid once per close —
   the staleness read is the only detector, so every README roster is held by a
-  session's attention rather than by a gate.
-  Surfaced 2026-07-31 by close's top-level staleness review, which found both
-  instances; filed rather than fixed because the enum-set survey is the work.
+  session's attention rather than by a gate. The third instance raises that: one
+  of the drifting rosters now sits on the surface every session loads.
+  Surfaced 2026-07-31 by close's top-level staleness review, which found the first
+  two; filed rather than fixed because the enum-set survey is the work.
 
 - **close-generated-finding-route** [design-pending] — the gap inbox is drained
   **once, at close**, and close is the stage that generates findings by design —
