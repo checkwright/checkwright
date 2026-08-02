@@ -14,7 +14,7 @@ target=""; file=""
 while (($#)); do
     case "$1" in
         --inbound) target="${2:-}"; shift 2 || true ;;
-        -h|--help) sed -n '3,6p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -h|--help) sed -n '4,6p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
         -*) echo "queue-edges: unknown option: $1" >&2; exit 2 ;;
         *)  file="$1"; shift ;;
     esac
