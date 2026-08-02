@@ -41,6 +41,11 @@ entering build session (lifecycle-kit/SPEC.md §check-stage-entry).
 naming inconsistencies, undocumented contracts, contradictions; name the
 entry grammar any backfill task filed from a finding is written against.>* Resolve every
 finding in the affected spec or amendment — never ad-hoc, never deferred.
+When both could hold it, **the surviving surface wins**: an amendment is deleted
+at merge, so a correction written into one and deleted in the same commit that
+lands it leaves no trace in history at all — the diff shows a file added and
+removed, and the reasoning is unrecoverable by any later reader. Land it in the
+canonical spec the amendment merges into, and let the amendment cite it.
 Commit all spec changes in a single `chore:` commit.
 
 **Audit the amendment against itself before auditing it against the tree.** Two

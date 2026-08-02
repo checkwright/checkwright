@@ -2406,6 +2406,41 @@
   Filed 2026-08-02 at validate to the gap inbox; promoted at close, its premise
   corrected against the agent definition's git history before filing.
 
+- **scratch-run-steer-rule** [design-pending] — the sanctioned form for executing
+  a scratch script exists, is allowlisted, and nothing steers anyone to it, so
+  sessions reach for the direct path and pay a permission prompt every time.
+  `guard-kit/bin/scratch-run.sh` is granted by the **committed** allowlist
+  (`Bash(bash guard-kit/bin/scratch-run.sh *)`), while a direct `bash .tmp/x.sh`
+  is granted by nothing and prompts on every distinct script name — by design,
+  since a path under the gitignored scratch dir is rewritable by any session, and
+  scratch-run's echo-at-execution is the compensating control that buys the grant
+  (guard-kit/SPEC.md §scratch-run).
+  **Measured, not asserted:** this iteration's friction log ranks direct
+  `bash .tmp/*.sh` calls as roughly twenty prompts across seventeen distinct
+  one-off script names — the single largest prompting class once the guard's own
+  deliberate steers (`cat`, `grep`, `find`) are set aside, and every one of them
+  avoidable by one word of command.
+  **Shape:** a `scripts/bash-guard.sh` steer arm on a direct scratch-dir
+  execution, pointing at the runner — the same shape the guard already uses to
+  steer `cat` to Read, an absolute repo path to its relative form, and the
+  harness scratchpad to `.tmp/`. The bar itself is **not** being lowered: the
+  prompt on the direct form is the control, and the steer routes to the form that
+  already paid for its grant rather than granting the direct one.
+  **Why `[design-pending]`:** it needs the guard-kit decision-table arm and its
+  fixture, and one real ruling — whether the steer fires on the scratch dir alone
+  or on any `bash <path>.sh` that no allowlist entry covers, which is a much wider
+  net and would collide with legitimate one-off tool invocations. Interacts with
+  the iceboxed `scratch-execution-allowlist-bar`, which records that each close
+  re-derives the standing bar; a steer that names the bar in its message would
+  retire that re-derivation as a side effect.
+  **Cost while deferred:** about twenty interruptions per iteration, paid by
+  whichever session is doing measurement work, and it falls hardest on exactly
+  the sessions that probe the tree most. Non-rotting, bounded, and invisible to
+  every gate — the friction log is the only detector, and it is advisory.
+  Debt: one guard arm plus its decision-table fixture; adds no governed name.
+  Filed 2026-08-02 by close's tooling-friction triage, the ranked log read against
+  the committed allowlist rather than the local overlay.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -2439,10 +2474,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- gate-fixture-expect-conjunction
-- gate-exemption-live-slug-derivation
-- prose-enum-identifier-boundary-class
-- vacuous-assertion-count-discipline
 
 ## Lessons Learned

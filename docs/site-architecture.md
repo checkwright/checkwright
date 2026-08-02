@@ -112,8 +112,12 @@ recoverable:
   `docs/footprint.md` is the per-kit token cost (`bash
   context-kit/bin/footprint.sh --emit > docs/footprint.md`), stale on any change
   to a tracked kit file's line count — which is why a prose-only SPEC edit reds
-  it. Both are `docs/value.md`'s inputs, so a red in either implies a rollup
-  regen.
+  it. **Tracked is literal, and it sets the ordering:** a file this iteration adds
+  has no footprint cost until it is staged, so regenerate the footprint (and the
+  rollup that joins it) *after* `git add`, never before — regenerate first and the
+  new file is invisible to the emitter, so `check-footprint-fresh` reds at the
+  very commit the regen was meant to clear. Both are `docs/value.md`'s inputs, so
+  a red in either implies a rollup regen.
 - **The trajectory projection** — `docs/evidence-data.md` is the published
   evidence extractor's output (`bash drift-kit/bin/trajectory.sh --emit >
   docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it), stale on a
