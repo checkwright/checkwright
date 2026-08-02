@@ -235,8 +235,12 @@ Marker vocabulary follows that gate verbatim in shape: the doc wraps its
 register in `<!-- battery-roster:begin -->` / `<!-- battery-roster:end -->`
 markers, which may carry leading indentation (the scan trims surrounding
 whitespace before matching, since a README nests the block inside a list item).
-Inside the markers a **roster line** is a line whose content begins with
-`bash `; a trailing `#` annotation clause is prose the gate never reads.
+Inside the markers a **roster line** is a line whose content begins with a bare
+lowercase command word (`bash …`, `cargo …`) — the interpreter is not part of
+the grammar, so a suite whose runner is not a shell script is rosterable without
+widening a literal each time; the fenced-block delimiters and any prose fail the
+match by not starting with a lowercase letter. A trailing `#` annotation clause
+is prose the gate never reads.
 Outside the markers nothing is scanned, so the same command appearing elsewhere
 in the doc for a different rhetorical job neither satisfies nor violates the
 gate — which is why the block, not the whole doc, is the unit.

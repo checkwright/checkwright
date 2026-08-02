@@ -45,7 +45,7 @@ roster="$(awk -v b="$BEGIN" -v e="$END" '
     { line = $0; sub(/#.*$/, "", line); gsub(/^[ \t]+|[ \t\r]+$/, "", line); gsub(/[ \t]+/, " ", line) }
     line == b { inb = 1; next }
     line == e { inb = 0; next }
-    inb && line ~ /^bash / { print FNR ":" line }
+    inb && line ~ /^[a-z][a-z0-9_-]* / { print FNR ":" line }
 ' "$DOC")"; st=$?
 fail_closed "$st" check-battery-roster awk
 
