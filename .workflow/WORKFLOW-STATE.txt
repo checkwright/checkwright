@@ -12,3 +12,4 @@ native-gate-substrate build a9ebc8fd 2026-08-02
 native-gate-substrate build a2c39c5b 2026-08-02
 native-gate-substrate validate abd9a529 2026-08-02
 native-gate-substrate build a0ce6cc7 2026-08-02
+native-gate-substrate validate adb33a94 2026-08-02
