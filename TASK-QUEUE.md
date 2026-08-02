@@ -38,6 +38,29 @@
   claimed here — this repo builds from source.
   Promoted 2026-08-02 by spec, authoring the amendment.
 
+- **queue-inbound-edge-projection** [spec: SPEC-queue-inbound-edges.md] — the derivable
+  half of `scope-survey-counter-evidence`: nothing sums an entry's *inbound* edges into
+  its own cost/benefit, so a promotion dividend is noticed rather than read.
+  **The diagnosis constrains the design:** the failure was aggregation, not retrieval.
+  The sibling entries were read, one was edited in the same session, and the unit was
+  still ranked wrongly — so a prose rule to follow the cross-references fixes nothing.
+  **What lands:** the citation grammar the queue uses but has never declared — a
+  single-backtick slug token in an entry body, resolved against the live slug set,
+  with the blocked-by tag folded in as the one already-structured edge class; and
+  `bin/queue-edges.sh`, a stdout tool beside `bin/queue-index.sh` emitting each
+  inbound edge with its citing line verbatim, so the relation's kind comes from the
+  prose that already carries it. The reader is scope's premise re-verification step.
+  **Three refusals carry the design.** No relational vocabulary is declared — a kit
+  literal spelling one project's verbs crosses the provenance seam, and there are at
+  least a dozen live phrasings. No new declaration line — the ~48 edges are already
+  written, and hand-authoring them is the maintained-roster anti-pattern paid for in
+  `check-queue-entry-budget` evictions. No tracked artifact and no freshness gate —
+  the one consumer has a shell, and a committed copy of the highest-churn file's
+  derived edges would restale on nearly every queue edit.
+  **Not a gate**, and the tempting one is refused on evidence: a backticked token
+  resolving to no live slug is usually a legitimate citation of landed work.
+  Promoted 2026-08-02 by spec on the operator's split ruling, with its amendment.
+
 ## Technical Debt
 
 - **battery-baseline-capture** — persist a per-gate timing baseline for the current
@@ -2580,9 +2603,9 @@
   does not declare today, and declaring one touches queue-kit/SPEC.md §The tag algebra
   — a contract change rather than a script.
   **Split 2026-08-02 by operator ruling — this entry is now the remainder.** The
-  derivable half is selected into `native-gate-substrate` as a unit and `/spec` owns
-  its amendment; what stays here is the un-gateable half above, which must not vanish
-  because the tool half shipped.
+  derivable half is `queue-inbound-edge-projection`, promoted with its amendment; what
+  stays here is the un-gateable half above, which must not vanish because the tool
+  half shipped.
   **Cost while deferred:** one wrongly-ranked unit set per scope, argued confidently
   from real evidence, detectable only by an operator who remembers the entry. It does
   not rot, but it recurs exactly where being wrong is most expensive — the iteration's
