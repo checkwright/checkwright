@@ -63,25 +63,6 @@
 
 ## Technical Debt
 
-- **battery-baseline-capture** — persist a per-gate timing baseline for the current
-  bash battery as committed evidence, **before any gate's script retires**. Ordered
-  first in `native-gate-substrate` because the measurement is perishable, not because
-  it is urgent: `run-gates.sh` writes per-gate ms plus a `TOTAL` to its scratch
-  timings file and truncates it every run, and `.tmp/` is wiped at each scope
-  boundary — which is why no earlier measurement survived for this scope to verify.
-  Once a cohort ports, the pre-port number is unrecoverable.
-  **What it must record**, so a later speed claim is checkable: per-gate rows rather
-  than `TOTAL` (the port lands cohort by cohort, so the battery is mixed-substrate
-  throughout and only per-gate deltas are attributable), the tree commit and a
-  `gates.list` content hash, the environment, and repeated runs rather than one.
-  **Debt, not a feature — the boundary stated so the call is checkable.** It follows
-  the `.workflow/` baseline convention `validate-baseline.txt` and
-  `always-loaded-baseline.txt` already establish, under a directory contract gate-sdk
-  owns, so it converges on names the specs carry rather than adding one. If the
-  design grows a knob or a tool of its own it has become a feature, and `/spec` owes
-  it an amendment.
-  Promoted 2026-08-02 by scope into `native-gate-substrate`.
-
 ## Deferred
 
 - **rendered-site-link-monitor** [design-pending] — durable coverage for the
@@ -2797,5 +2778,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- battery-baseline-capture
 
 ## Lessons Learned
