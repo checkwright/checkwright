@@ -38,29 +38,6 @@
   claimed here — this repo builds from source.
   Promoted 2026-08-02 by spec, authoring the amendment.
 
-- **queue-inbound-edge-projection** [spec: SPEC-queue-inbound-edges.md] — the derivable
-  half of `scope-survey-counter-evidence`: nothing sums an entry's *inbound* edges into
-  its own cost/benefit, so a promotion dividend is noticed rather than read.
-  **The diagnosis constrains the design:** the failure was aggregation, not retrieval.
-  The sibling entries were read, one was edited in the same session, and the unit was
-  still ranked wrongly — so a prose rule to follow the cross-references fixes nothing.
-  **What lands:** the citation grammar the queue uses but has never declared — a
-  single-backtick slug token in an entry body, resolved against the live slug set,
-  with the blocked-by tag folded in as the one already-structured edge class; and
-  `bin/queue-edges.sh`, a stdout tool beside `bin/queue-index.sh` emitting each
-  inbound edge with its citing line verbatim, so the relation's kind comes from the
-  prose that already carries it. The reader is scope's premise re-verification step.
-  **Three refusals carry the design.** No relational vocabulary is declared — a kit
-  literal spelling one project's verbs crosses the provenance seam, and there are at
-  least a dozen live phrasings. No new declaration line — the 58 edges are already
-  written, and hand-authoring them is the maintained-roster anti-pattern paid for in
-  `check-queue-entry-budget` evictions. No tracked artifact and no freshness gate —
-  the one consumer has a shell, and a committed copy of the highest-churn file's
-  derived edges would restale on nearly every queue edit.
-  **Not a gate**, and the tempting one is refused on evidence: a backticked token
-  resolving to no live slug is usually a legitimate citation of landed work.
-  Promoted 2026-08-02 by spec on the operator's split ruling, with its amendment.
-
 ## Technical Debt
 
 ## Deferred
@@ -2569,24 +2546,23 @@
   not retrieval**: nothing sums an entry's inbound edges into its own cost/benefit. So
   a prose rule to "follow the cross-references" would not have changed the outcome,
   because they were followed.
-  **Deliverable, split by what an oracle can reach.**
-  *Derivable — the half that would actually have changed the outcome.* The edges are
-  already written and near-structured: a `Relation to <slug>` heading in two entries,
-  "converges with `<slug>`" in a third. Derive per slug the set of entries naming it,
-  so a promotion dividend is read off a projection instead of noticed. Derivation-first,
-  a tool beside `bin/queue-index.sh`, generated and freshness-gated, never maintained.
-  Not a gate — there is nothing to red.
+  **Deliverable, split by what an oracle can reach — and the derivable half shipped
+  2026-08-02** as `queue-inbound-edge-projection`: the citation grammar the queue used
+  but never declared, plus `queue-kit/bin/queue-edges.sh`, which sums a slug's inbound
+  edges and carries each citing line verbatim. Scope's premise re-verification now
+  aggregates before ranking. Build narrowed this entry's "generated and
+  freshness-gated" ask to a stdout tool, with cause reasoned in queue-kit/SPEC.md
+  §bin/queue-edges.sh — a later session must not helpfully restore the projection.
+  What stays here is the un-gateable half alone, which must not vanish because the
+  tool half shipped.
   *Un-gateable — stated plainly rather than dressed as mechanism.* Whether a survey
   engaged an entry's strongest ground is a session act with no mechanical residue: the
   `close-surface-actually-read` class exactly. Its home is `.workflow/audit-roster.txt`
   as a named class, not one more prose step that drifts.
-  **Why `[design-pending]`:** the projection needs a parseable edge grammar the queue
-  does not declare today, and declaring one touches queue-kit/SPEC.md §The tag algebra
-  — a contract change rather than a script.
-  **Split 2026-08-02 by operator ruling — this entry is now the remainder.** The
-  derivable half is `queue-inbound-edge-projection`, promoted with its amendment; what
-  stays here is the un-gateable half above, which must not vanish because the tool
-  half shipped.
+  **Why `[design-pending]` — re-examine before promoting.** The original reason is
+  discharged: the edge grammar landed. What remains is whether naming a new
+  `.workflow/audit-roster.txt` class is itself design-bearing. Tag left as found —
+  a queue disposition, not the shipping unit's to rule.
   **Cost while deferred:** one wrongly-ranked unit set per scope, argued confidently
   from real evidence, detectable only by an operator who remembers the entry. It does
   not rot, but it recurs exactly where being wrong is most expensive — the iteration's
@@ -2780,5 +2756,6 @@
 ## Done
 
 - battery-baseline-capture
+- queue-inbound-edge-projection
 
 ## Lessons Learned
