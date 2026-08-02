@@ -236,10 +236,12 @@ _spec_comment_surface() {  # $1=root  $2=1 keeps templates/ shell sources, else 
         done
         shopt -u nullglob globstar
     else
+        # spec: canon-kit/SPEC.md §lib/spec.sh — the governed-source corpus spans
+        #   both gate declaration spellings and the ported implementation
         if [[ "$incl" == "1" ]]; then
-            gate_find "$root" -name '*.sh' -type f 2>/dev/null | _spec_prune_kit_roots "$root" | sort
+            gate_find "$root" \( -name '*.sh' -o -name '*.gate' -o -name '*.rs' \) -type f 2>/dev/null | _spec_prune_kit_roots "$root" | sort
         else
-            gate_find "$root" -name '*.sh' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
+            gate_find "$root" \( -name '*.sh' -o -name '*.gate' -o -name '*.rs' \) -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
         fi
         # spec: canon-kit/SPEC.md §check-spec-pointer — the workflow directory's
         #   tracked tier, whatever the extension: the capture tier is gitignored

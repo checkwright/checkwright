@@ -40,6 +40,10 @@ CANON_KIT_MANIFEST_FILES=(
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")
 
+# comment-tier-exempt: reserve/ is the crates.io name-reservation placeholder, not developed in (CLAUDE.md §Housekeeping) — its lib.rs carries the registry blurb crates.io renders, which is the file's whole purpose and answers to no SPEC section
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_COMMENT_WHITELIST=("reserve/*")
+
 # comment-tier-exempt: this repo's install transports and the sections they are held over — the vocabulary is consumer config because a kit literal spelling a transport would publish one project's distribution model; the section regex is anchored so a heading merely mentioning a script name (### install-hooks) never selects, and the posts valve keeps a published release note immutable the same way CANON_KIT_TEMPORAL_EXEMPT_PATHS already does
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_INSTALL_TRANSPORTS_CMD="bash scripts/install-transports.sh"

@@ -37,11 +37,16 @@ for r in "${KIT_ROOTS[@]}"; do
     [[ -d "$abs/checks" ]] || { skipped=$((skipped + 1)); continue; }
     swept=$((swept + 1))
 
+    # spec: gate-sdk/SPEC.md §check-readme-roster — both declaration spellings
     shipped=""
     shopt -s nullglob
     for f in "$abs/checks/"*.sh; do
         bn="${f##*/}"
         shipped+="${bn%.sh}"$'\n'
+    done
+    for f in "$abs/checks/"*.gate; do
+        bn="${f##*/}"
+        shipped+="${bn%.gate}"$'\n'
     done
     shopt -u nullglob
 

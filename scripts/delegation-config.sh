@@ -13,7 +13,9 @@ DELEGATION_KIT_REFRESH_CMD="bash delegation-kit/templates/usage-poller.sh"
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_GATE_FILES=(
     "*/checks/*.sh"
+    "*/checks/*.gate"
     "scripts/check-*.sh"
+    "scripts/check-*.gate"
     "gate-sdk/lib/gate.sh"
     "gate-sdk/bin/run-gate-tests.sh"
 )

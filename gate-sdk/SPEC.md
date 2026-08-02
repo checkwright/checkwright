@@ -489,7 +489,7 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk `spec_comment_surface` hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. |
-| `check-knob-default-coupling` | **Retained, corpus extended** to the Rust module for any knob-default literal it declares — its own `gate_find` walks each kit root independently of the shared `spec.sh` primitives, so this is a second, separate widening. |
+| `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it therefore cannot reach — the crate's prune-dir default against `lib/gate.sh`'s — is closed by an **executed** assertion instead: a unit test in the crate reads the shell library and compares the two literals, failing on drift. Recorded this way because a disposition that names a mechanism which cannot fire is the same defect as no disposition. |
 | `check-gate-tamper` | **Retained, extended**: its `is_gate_file()` glob roster gains the `.gate` spelling, or a ported gate's edit escapes the isolation rule. Two known limits, recorded so a later port is not the session that discovers them: its `extract_exemptions()` parser reads a shell `# exception-list:` array literal and has no Rust-source equivalent, and its **meta-layer path roster does not contain `native/`**, so a commit editing a gate's Rust implementation alongside its descriptor is refused. Neither binds slice 1 — the one ported gate carries no exemption list, and its Rust module lands in a commit separate from its descriptor. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
 | `check-docs-cmd`, `check-install-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
@@ -1207,6 +1207,10 @@ named in `GATE_SDK_LINT_EXTRA_DIRS` passes ShellCheck at `-S warning` (the
 self-lint contract). A missing `shellcheck` binary is exit 2 — a gate that
 cannot run is not clean.
 
+A `.gate`-dispatched member is outside this corpus **with cause** — there is no
+shell to lint, and `cargo clippy` at deny-warnings is the substrate equivalent
+(§Meta-gate conservation for the binary substrate, which owns the reasoning).
+
 That derivation is also the answer to "does anything lint my workflows?", and on
 its own the answer is no: `.github/workflows/*.yml` sits under no kit root and
 under no gates dir, so it is unreached here by construction. §check-action-run-shell
@@ -1254,6 +1258,12 @@ opt-out. Only `awk`/`jq` captures are checked: `grep`'s exit 1 on no-match is
 expected, here-string captures read data already in memory, and arithmetic
 `$((…))` is never matched. A parser wrapped inside a shell function is not
 visible to this static scan; the opt-out covers residual false positives.
+
+A `.gate`-dispatched member is outside this corpus **with cause**: the defect —
+branching on a captured value's emptiness when the subprocess died — is
+unrepresentable once a fallible call returns a `Result` that cannot be ignored
+(§Meta-gate conservation for the binary substrate). A real substrate win, not a
+gap.
 
 ### check-gate-fixture-coverage
 
@@ -1625,7 +1635,17 @@ H).
 Invariant: for every registered gate, every **statically resolvable recursive
 walk** in its source has its tracked read-set covered by the gate's expanded
 `couples=` — the reads⊆couples half `check-graph` leaves to the author
-(§The `# graph:` manifest). This is check-graph's coverage sibling: check-graph
+(§The `# graph:` manifest).
+
+**A member resolving to a `.gate` makes this gate refuse: exit 2, never a
+pass.** Its walk parser reads shell, so a binary gate yields zero walks and the
+gate would print `clean` — the single worst vacuity available at the substrate
+seam, because the absence of findings is indistinguishable from an absence of
+coverage. Refusing is the §Fail-closed contract applied to a corpus the scanner
+cannot see, and it stands until a binary-side equivalent exists
+(§Meta-gate conservation for the binary substrate).
+
+This is check-graph's coverage sibling: check-graph
 proves editing a *coupled* surface fires the gate; check-reads-couples proves
 the couples name every surface a resolvable walk *reads*, so no recursion hides
 a surface the couple never listed.
@@ -1812,7 +1832,10 @@ step to the un-gated remainder (row descriptions, per-kit READMEs).
 ### check-readme-roster
 
 Invariant: every kit README's register-the-gates block holds name-set parity
-with the kit's shipped `checks/` basenames, both directions. This is the
+with the kit's shipped `checks/` basenames, both directions — over **both**
+declaration spellings, `*.sh` and `*.gate`, since a ported gate is still a gate
+the kit ships and would otherwise drop out of its README roster in both
+directions at once. This is the
 `check-install-toolchain` fork applied a second time: the roster names are
 derivable (the `checks/` script basenames, extension stripped), the per-gate
 annotation clauses beside them are hand prose, so a gate asserts parity over a
@@ -1994,7 +2017,12 @@ the backstop for a mode-only change no `ACMR` content filter would surface.
 ### check-exec-bit
 
 Invariant: every tracked `*.sh` path matching an exec-glob carries git *index*
-mode `100755`. The class is by-path-invoked kit scripts — gate-sdk's runner
+mode `100755`, **and every tracked `*.gate` descriptor carries `100644`**. The
+second is stated as an assertion rather than left implicit so that "a descriptor
+is not executable" cannot read as "a descriptor is not covered": the descriptor
+is data — a manifest and directives, never sourced and never run — and an
+executable one invites a reader to run a file carrying no interpreter line. The
+first class is by-path-invoked kit scripts — gate-sdk's runner
 (`run-gates.sh`), drift-kit's collator (`drift-report.sh`), and lifecycle-kit's
 entry preflight all invoke kit scripts **by path**, and a shebang'd `bin/` tool
 is by-convention path-invocable — so a script committed `100644` degrades

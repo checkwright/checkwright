@@ -102,6 +102,17 @@ findings=()
 
 for src in "${sources[@]+"${sources[@]}"}"; do
     [[ -f "$src" ]] || continue
+    # spec: gate-sdk/SPEC.md §check-reads-couples — refuse rather than pass on a
+    # .gate member: the shell walk parser finds nothing in a binary gate and
+    # would print clean, which is a false green, not an absence of findings
+    if [[ "$src" == *.gate ]]; then
+        echo "check-reads-couples: $src dispatches to the native binary, whose walks this" >&2
+        echo "shell parser cannot read — it would find zero walks and report clean, which is a" >&2
+        echo "false green. Refusing rather than passing; the check could not run." >&2
+        echo "  help: implement the binary-side reads-couples equivalent before porting a gate" >&2
+        echo "        whose reads this gate is relied on to cover, or keep the gate in shell." >&2
+        exit 2
+    fi
     couples=""
     couples_field="$(gate_manifest_field "$src" couples)"
     gate_expand_couples_var couples "$couples_field"

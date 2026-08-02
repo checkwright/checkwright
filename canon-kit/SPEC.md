@@ -383,6 +383,18 @@ same shapes:
   re-implement-and-cite-from-both-ends rule
   (queue-kit/SPEC.md §The queue format); the holder census and the residue it
   leaves live at gate-sdk/SPEC.md §check-gate-exemption-tasks.
+- **The governed comment surface:** `spec_comment_surface` and
+  `spec_comment_surface_with_templates` — the one corpus primitive
+  `check-spec-pointer`, `check-comment-tier`, `check-todo-task-liveness` and
+  `check-deprecation-task` all call, the pair differing only in whether
+  `templates/` sources are pruned. Its file set spans **both gate declaration
+  spellings and the ported implementation**: `*.sh`, the `*.gate` descriptor,
+  and `*.rs`. Stated once here rather than at each of the four callers, since a
+  gate whose rule became a compiled subcommand must not have its `# spec:`
+  pointer, its comment tier, or a `TODO(task:)` marker silently drop out of
+  coverage — the widening is made at the shared primitive so no caller can
+  inherit a narrower corpus than its siblings
+  (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate).
 - **Finders:** the canonical-spec / amendment finders the spec-scanning gates
   share, and the manifest-set finder the narration-gate family shares —
   canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its

@@ -69,7 +69,8 @@ arrays=0
 scan_files=()
 shopt -s nullglob
 for d in "${DIRS[@]}"; do
-    scan_files+=("$d"/*.sh)
+    # spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate
+    scan_files+=("$d"/*.sh "$d"/*.gate)
 done
 shopt -u nullglob
 

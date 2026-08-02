@@ -47,10 +47,20 @@ is_pruned() {
 }
 
 bad=(); count=0
+notexec=(); dcount=0
 while IFS= read -r line; do
     [[ -n "$line" ]] || continue
     mode="${line%% *}"
     path="${line#*$'\t'}"
+    # assertion: a .gate descriptor is data — never sourced, never run — so it
+    # must be committed non-executable; stated so "not executable" cannot read
+    # as "not covered" (gate-sdk/SPEC.md §check-exec-bit)
+    if [[ "$path" == *.gate ]]; then
+        is_pruned "$path" && continue
+        dcount=$((dcount + 1))
+        [[ "$mode" == 100644 ]] || notexec+=("$path (index mode $mode)")
+        continue
+    fi
     [[ "$path" == *.sh ]] || continue
     matched=0
     for g in "${EXEC_GLOBS[@]}"; do
@@ -72,5 +82,14 @@ if [[ ${#bad[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "EXEC-BIT: clean ($count by-path-invoked script(s) at index mode 100755)"
+if [[ ${#notexec[@]} -gt 0 ]]; then
+    echo "check-exec-bit: .gate descriptor(s) committed executable — a descriptor is data"
+    echo "carrying a manifest and directives, never sourced and never run; an executable one"
+    echo "invites a reader to run a file with no interpreter line:"
+    printf '  %s\n' "${notexec[@]}"
+    echo "  help: git update-index --chmod=-x <path> (and chmod -x locally), then recommit."
+    exit 1
+fi
+
+echo "EXEC-BIT: clean ($count by-path-invoked script(s) at index mode 100755; $dcount .gate descriptor(s) non-executable)"
 exit 0
