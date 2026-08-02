@@ -1,1 +1,23 @@
 # contract: evidence-manifest v1
+vacuous-green-elimination installer_smoke sha256=709730efea4f0b8c0d7309f81988a22e1e656838a211c51642f58589fdb9efc9 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination gates sha256=3bef8a792b05b064174dc1222f5f1aafb18691905529a8a9fb2474f0b4fffe91 pass=94 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination gate_sdk sha256=ebc86b57af17eb9ede226006b2ca3acab073dc511381fc0cf89d66ec338c2fe7 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination canon_kit sha256=fd29d62e4ed611a98b72a32b6afbef610cccd90a74d81ec0208231287fc9a1a4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination evidence_kit sha256=48d3335dd0d627713fd607013b1cc6a0049e60b8f4a1905b441b7699d4c844c2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination guard_kit sha256=776855f49f35b5c60d574faa8e88d370bfca381233856dae1d3be50edb34502f pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination lifecycle_kit sha256=5f9077e6d8df174b6193fe6ba78a8ab96cf810bbf46392f4a0185b40726803d1 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination queue_kit sha256=4bc7b2cd8ebe7bf15d999e527ad7ebfac3c93623a453252ca1db41d7ab333710 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination demo sha256=8d06d0bcbb99340490bdc3d6893c9b5cd1abd29342534fa359d0fe174dab323b pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination consumer_smoke sha256=d568e37e3f96c1dfb3d73142d04964b3d678ad18209b227a9b3714c8169d6c13 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination upgrade sha256=f4c4f338cce32be09f3705ad3aef6534d386d97004bdad9e5b0720fd17c493d5 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
+vacuous-green-elimination index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-02
