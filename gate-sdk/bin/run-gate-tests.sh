@@ -25,16 +25,24 @@ pairs=0
 logic_fail=0
 harness_fail=0
 
+# spec: gate-sdk/SPEC.md §run-gate-tests — the case runs whatever the member dispatches to: gate_command yields the shell script's one-element argv or the binary's two-element `<binary> <name>`, so the fixture pair is the parity oracle across both substrates rather than a shell-only one. argv[0] is absolutized here because the case runs after a `cd` into its own dir and the binary knob's default is deliberately a repo-relative path (§lib/gate.sh).
 run_case() {
     local gate="$1" casedir="$2" want="$3" expect="$4"
-    local gate_path
-    if ! gate_path="$(gate_resolve "$gate" "${GATE_DIRS[@]+"${GATE_DIRS[@]}"}")"; then
-        echo "  HARNESS: $gate.sh resolves in none of: ${GATE_DIRS[*]}"
+    local -a argv=()
+    if ! mapfile -t argv < <(gate_command "$gate" "${GATE_DIRS[@]+"${GATE_DIRS[@]}"}"); then
+        echo "  HARNESS: $gate resolves in none of: ${GATE_DIRS[*]}"
         return 2
     fi
-    if [[ ! -x "$gate_path" ]]; then
-        echo "  HARNESS: $gate_path is not executable"
+    if [[ ${#argv[@]} -eq 0 ]]; then
+        echo "  HARNESS: $gate resolves in none of: ${GATE_DIRS[*]}"
         return 2
+    fi
+    if [[ ! -x "${argv[0]}" ]]; then
+        echo "  HARNESS: ${argv[0]} is not executable"
+        return 2
+    fi
+    if [[ "${argv[0]}" != /* ]]; then
+        argv[0]="$(cd "$(dirname "${argv[0]}")" && pwd)/$(basename "${argv[0]}")"
     fi
 
     local -a args=()
@@ -44,7 +52,7 @@ run_case() {
     fi
 
     local out rc
-    out="$( cd "$casedir" && "$gate_path" "${args[@]+"${args[@]}"}" 2>&1 )"
+    out="$( cd "$casedir" && "${argv[@]}" "${args[@]+"${args[@]}"}" 2>&1 )"
     rc=$?
 
     if [[ "$rc" -eq 2 ]]; then
@@ -60,16 +68,31 @@ run_case() {
     # Every non-blank expect line is its own assertion: grep -F would read a
     # multi-line pattern as alternatives and pass on any one of them.
     local -a missing=()
-    local want
-    while IFS= read -r want; do
-        [[ -z "${want//[[:space:]]/}" ]] && continue
-        grep -qF -- "$want" <<<"$out" || missing+=("$want")
+    local want_line
+    while IFS= read -r want_line; do
+        [[ -z "${want_line//[[:space:]]/}" ]] && continue
+        grep -qF -- "$want_line" <<<"$out" || missing+=("$want_line")
     done <<<"$expect"
     if [[ "${#missing[@]}" -gt 0 ]]; then
         echo "  FAIL: $gate $(basename "$casedir") exit $rc OK but output lacks expected line(s):"
         printf '        missing: %s\n' "${missing[@]}"
         printf '    %s\n' "$out"
         return 1
+    fi
+
+    # spec: gate-sdk/SPEC.md §Output contract — asserted at runtime, both cases
+    if [[ "$want" -eq 0 ]]; then
+        if ! grep -qE '^[A-Z][A-Z0-9-]*: clean \(.*\)$' <<<"$out"; then
+            echo "  FAIL: $gate $(basename "$casedir") exited 0 but emitted no '<NAME>: clean (…)' line"
+            printf '    %s\n' "$out"
+            return 1
+        fi
+    else
+        if ! grep -qE '(^|[[:space:]])help:' <<<"$out"; then
+            echo "  FAIL: $gate $(basename "$casedir") reported a violation with no 'help:' remedy line"
+            printf '    %s\n' "$out"
+            return 1
+        fi
     fi
     return 0
 }

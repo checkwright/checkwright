@@ -32,14 +32,17 @@ chmod +x "$scratch/checks/stub-gate.sh"
 
 # mk_tree <name> <good-say> <good-expect> <bad-say> <bad-expect>; an empty
 # good-expect ships no good/expect.txt (the optional side of the asymmetry).
+# Each say gets the output-contract line its exit code owes (§Output contract,
+# asserted at runtime by run_case) appended, so these rows keep testing the
+# expect.txt conjunction rather than doubling as output-contract cases.
 mk_tree() {
     local name="$1" good_say="$2" good_expect="$3" bad_say="$4" bad_expect="$5"
     local dir="$scratch/$name/stub-gate"
     mkdir -p "$dir/good" "$dir/bad"
-    printf '%s\n' "$good_say" > "$dir/good/say"
+    printf '%s\nSTUB-GATE: clean (stub)\n' "$good_say" > "$dir/good/say"
     printf '0\n' > "$dir/good/rc"
     [[ -n "$good_expect" ]] && printf '%s\n' "$good_expect" > "$dir/good/expect.txt"
-    printf '%s\n' "$bad_say" > "$dir/bad/say"
+    printf '%s\n  help: stub remedy\n' "$bad_say" > "$dir/bad/say"
     printf '1\n' > "$dir/bad/rc"
     printf '%s\n' "$bad_expect" > "$dir/bad/expect.txt"
     echo "$scratch/$name"
@@ -105,6 +108,37 @@ assert_rc  all-missing "$rc" 1
 assert_has all-missing 'missing: beta fired' "$out"
 assert_has all-missing 'missing: gamma fired' "$out"
 
+# The output contract, asserted at runtime rather than by grepping a gate's
+# source (§Output contract). A clean case that satisfies every expect line but
+# emits no canonical clean line is still a failure — this is the assertion that
+# survives a gate's source becoming a compiled subcommand there is nothing to
+# grep.
+mk_no_clean_line() {
+    local dir="$scratch/no-clean/stub-gate"
+    mkdir -p "$dir/good" "$dir/bad"
+    printf 'gamma ok\n' > "$dir/good/say"; printf '0\n' > "$dir/good/rc"
+    printf 'gamma ok\n' > "$dir/good/expect.txt"
+    printf 'alpha fired\n  help: stub remedy\n' > "$dir/bad/say"; printf '1\n' > "$dir/bad/rc"
+    printf 'alpha fired\n' > "$dir/bad/expect.txt"
+    echo "$scratch/no-clean"
+}
+out="$(run_tree "$(mk_no_clean_line)")"; rc=$?
+assert_rc  no-clean "$rc" 1
+assert_has no-clean "emitted no '<NAME>: clean" "$out"
+
+# The symmetric half: a violating case with no help: remedy line.
+mk_no_help_line() {
+    local dir="$scratch/no-help/stub-gate"
+    mkdir -p "$dir/good" "$dir/bad"
+    printf 'STUB-GATE: clean (stub)\n' > "$dir/good/say"; printf '0\n' > "$dir/good/rc"
+    printf 'alpha fired\n' > "$dir/bad/say"; printf '1\n' > "$dir/bad/rc"
+    printf 'alpha fired\n' > "$dir/bad/expect.txt"
+    echo "$scratch/no-help"
+}
+out="$(run_tree "$(mk_no_help_line)")"; rc=$?
+assert_rc  no-help "$rc" 1
+assert_has no-help "no 'help:' remedy line" "$out"
+
 [[ "$fails" -eq 0 ]] || { echo "run-gate-tests.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named)"
+echo "run-gate-tests.test: clean (expect.txt is a per-line conjunction, order-independent, blanks inert, all missing lines named; the output contract is asserted at runtime on both cases)"
 exit 0

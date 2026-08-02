@@ -910,12 +910,30 @@ non-zero).
 ### run-gate-tests
 
 Golden-fixture runner. Each `<tests-dir>/<gate>/` holds `good/` + `bad/` case
-dirs; the runner `cd`s into the case dir and invokes the gate (resolved against
-the consumer gates dir, then each vendored kit's `checks/`) with the args in the case's
-`args` file (`#` lines stripped). `good/` must exit 0 (and, when
+dirs; the runner `cd`s into the case dir and invokes the gate with the args in
+the case's `args` file (`#` lines stripped). `good/` must exit 0 (and, when
 `good/expect.txt` exists, satisfy it); `bad/` must exit 1 and satisfy
 `bad/expect.txt` — a rejection expectation is required, so the *right*
-finding fired. An `expect.txt` is a **conjunction**: every non-blank line must
+finding fired.
+
+**The case runs whatever the member dispatches to.** The invocation resolves
+through `gate_command` (§lib/gate.sh), so a case runs `<binary> <name>` for a
+`.gate`-declared member exactly where it runs the script for a shell one, and
+the executable guard applies to the resolved argv's first element. This is what
+makes the fixture pair an **executed** parity oracle across both substrates
+rather than a shell-only one — `check-gate-fixture-coverage` asserts a pair
+*exists* and never runs it, so without this the pair would be an unrun
+assertion the moment a gate ported. The ordering is binding: a ported gate's
+pair passes against the subcommand **before** the script it replaces is
+deleted, never after. argv[0] is absolutized before the `cd`, because the binary
+knob's default is deliberately a repo-relative path.
+
+**The output contract is asserted here, at runtime** (§Output contract). A
+`good/` case must emit the canonical `^<NAME>: clean (<parenthetical>)$` line
+and a `bad/` case must emit a `help:` remedy line — on top of exit code and
+`expect.txt`. This applies to **every** fixtured member on either substrate, so
+it is a strengthening for shell gates too, not merely a replacement for a source
+grep that a ported gate leaves nothing to read. An `expect.txt` is a **conjunction**: every non-blank line must
 appear literally in the case's combined output, and the case fails when any one
 of them does not. So **a case pinning two findings writes two lines**, which is
 what the plural form is for — the semantics both files share, `good/`'s being
