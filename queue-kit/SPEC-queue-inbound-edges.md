@@ -46,7 +46,10 @@ contains:
 **No relational vocabulary is declared, and that refusal is the design.** The live
 corpus phrases relations at least a dozen ways — `Relation to`, `converges with`,
 `converges on`, `subsumes`, `closes`, `Sibling to`, `Couples to`, `Companion to`,
-`carved out of`, `split from`, `prerequisite`, `hard dependency on`. Enumerating
+`carved out of`, `split from`, `prerequisite`, `hard dependency on` — and, checked
+against the tree rather than transcribed, resolves to 58 body-backtick-to-live-slug
+edges today, not a round number; "the corpus as it stands" is a moving count by
+construction and this figure is a snapshot, not a maintained one. Enumerating
 them in a kit would be brittle against prose that keeps inventing phrasings, and —
 the decisive objection — **a kit literal spelling one project's relational verbs
 would ship that project's vocabulary as everyone's**. That is the provenance seam,
@@ -56,7 +59,7 @@ vocabulary to leak and no consumer config to invent.
 
 **A new declaration line was weighed and refused.** The obvious alternative is a
 `relates: <kind> <slug>` line on the `roadmap-summary:` pattern. It is precise and
-it carries a kind. It is also wrong here on three counts: the ~48 edges already
+it carries a kind. It is also wrong here on three counts: the 58 edges already
 written would each need hand-authoring, which is the maintained-roster anti-pattern
 the derivation-first rule forbids; those lines would land inside entries measured
 against `check-queue-entry-budget`'s raw-line cap, and sub-tasks do not relieve a
@@ -149,8 +152,9 @@ ground truth). Extending it inward would red on good prose.
 ## Producers and consumers
 
 **The citation (existing prose, newly governed).**
-Producer: an author writing an entry body — already producing them, ~48 times in
-the live corpus, with no configuration enabling or disabling it. This is the
+Producer: an author writing an entry body — already producing them, 58 times in
+the live corpus (a snapshot count, not a maintained one — see §The tag algebra),
+with no configuration enabling or disabling it. This is the
 delta's whole economy: the producer needs no change and no migration, so the
 grammar is satisfied by the tree on the day it lands.
 Consumer: `bin/queue-edges.sh`'s body scan — the file's only reader of a
@@ -194,24 +198,24 @@ implementing, with stderr unsilenced on every path probe.
   the unresolved-token rule and the no-vocabulary refusal are stated here, since a
   later reader's first instinct will be to add both.
 - **queue-kit/SPEC.md §bin/queue-edges.sh** — new per-component contract section:
-  interface, the inbound-only ruling, the output shape, and the two refusals of
-  delta 5 with their causes.
+  interface and the inbound-only ruling (delta 2), the output shape (delta 3), and
+  the two refusals (delta 5) with their causes.
 - **queue-kit/SPEC.md §bin/queue-index.sh** — one line drawing the boundary to the
   new sibling, so the "why two tools" question is answered where a reader looking
   at either will meet it (delta 2). It cites the new section rather than restating
   its contract.
 - **queue-kit/SPEC.md §lib/queue.sh** — the body-citation scanner joins the
   primitive roster if it lands in the shared library rather than in the tool; the
-  section states which, so a third reader knows where to find it.
+  section states which, so a third reader knows where to find it (delta 2).
 - **queue-kit/README.md** — the `bin/` command list gains its `queue-edges.sh`
   lines in the same shape as the `queue-index.sh` and `roadmap.sh` entries above
-  them.
+  them (delta 2).
 - **lifecycle-kit/templates/stages/scope.md** — the dated-hypothesis paragraph
   gains the aggregation half and cites queue-kit for the mechanism (delta 4). This
   is the delta that makes the amendment cross-component.
 - **lifecycle-kit/SPEC.md §templates/stages/** — if that section enumerates what
-  the scope template obliges, the aggregation step joins it; otherwise it is
-  untouched and the template edit stands alone.
+  the scope template obliges, the aggregation step joins it (delta 4); otherwise it
+  is untouched and the template edit stands alone.
 - **`scope-survey-counter-evidence`** — the queue entry keeps its un-gateable half
   and states that the derivable half shipped, so the remainder does not read as the
   whole. Its `.workflow/audit-roster.txt` class is untouched by this unit.

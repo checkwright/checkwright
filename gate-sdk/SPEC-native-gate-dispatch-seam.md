@@ -11,11 +11,15 @@ That second half is the larger half, and it is why this slice exists at all.
 A gate today is one shell file carrying five different things: the rule, the
 `# graph:` manifest, the output-contract strings, its `# spec:` and `# assertion`
 directives, and the greppable evidence that its reads stay inside its declared
-couples. Twelve meta-gates read that file. Delete it and twelve assertions stop
-applying — and **nine of them stop by finding nothing and printing `clean`**, which
-is a false green, not a red. The iteration immediately before this one existed to
-eliminate exactly that class. A port that reintroduces it at scale, one gate at a
-time, would be the most expensive way this repo has yet found to lose coverage.
+couples. **Nineteen** meta-gates read that file (§Meta-gate conservation for the
+binary substrate tabulates all nineteen; the figure is derived from the manifests,
+never hand-counted, and this sentence is checked against that table rather than the
+other way around). Delete the file and nineteen assertions stop applying — and most
+of them stop by finding nothing and printing `clean`, which is a false green, not a
+red, because their own file-selection is a literal `*.sh` glob with no `.gate` arm.
+The iteration immediately before this one existed to eliminate exactly that class.
+A port that reintroduces it at scale, one gate at a time, would be the most
+expensive way this repo has yet found to lose coverage.
 
 ## What changes
 
@@ -118,16 +122,19 @@ them (§Existing sections updated):
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
-| `check-gate-output` | **Ported, and strengthened.** Its source-grep for `: clean`/`help:` was always a proxy for behavior. The assertion moves into `run-gate-tests.sh`: a `good/` case's output must match the clean-line grammar, and a `bad/` case's must carry a `help:` line. Applies to **shell gates too** — the port pays a dividend here rather than relaxing. |
+| `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it.** Its source-grep for `: clean`/`help:` was always a proxy for behavior; for the 93 of 94 registry members carrying a fixture pair, the assertion moves into `run-gate-tests.sh`: a `good/` case's output must match the clean-line grammar, and a `bad/` case's must carry a `help:` line — applies to **shell gates too**, the port pays a dividend here rather than relaxing. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no `good/`/`bad/` case for a fixture-runner assertion to ever reach, so its `: clean`/`help:` lines keep the source-grep as their only oracle. Fully retiring the static check in favor of the runtime one would silently zero out its output-contract coverage — the exact vacuity class this table exists to close. |
 | `check-gate-fail-closed` | **Retired with cause** — the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable once a fallible call returns a `Result` that cannot be ignored. This is a real substrate win and is stated as one. |
 | `check-reads-couples` | **Retained, and must fail closed.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity in this table. Until the binary-side equivalent exists it **refuses** (exit 2) on a member resolving to a `.gate`, rather than passing. |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker is matched on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
-| `check-comment-tier` | **Retained, corpus extended** to the Rust module. The descriptor's own lines are directives by construction. |
-| `check-spec-pointer` | **Retained unchanged** — the descriptor carries the `# spec:` line. |
+| `check-comment-tier` | **Retained, corpus extended** to the Rust module and the `.gate` descriptor. The descriptor's own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates`, the shared corpus primitive this gate calls, gains a `*.gate` arm beside its hard-coded `*.sh` `gate_find` (see the `check-spec-pointer` row below — the two gates share this one function, so the widening is made once, not twice). |
+| `check-spec-pointer` | **Retained, and its corpus depends on the same widening as `check-comment-tier`'s** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared `spec_comment_surface` (not `_with_templates`) in `canon-kit/lib/spec.sh`, today also a hard-coded `*.sh` `gate_find` with no `.gate` arm; absent that one shared fix, a ported gate's `# spec:` line would silently stop being checked, which is exactly the vacuity class this table exists to close. Once the shared primitive gains the `.gate` arm, check-spec-pointer's own probe logic needs no further change — the descriptor already carries the `# spec:` line. |
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without this a ported gate silently drops out of its kit README's roster in both directions. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
-| `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh` | **Survive unchanged** — all four read the declaration path as text, which the descriptor still is. |
+| `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the `.gate` descriptor, the same shape as `check-comment-tier`: both walk `canon-kit/lib/spec.sh`'s `spec_comment_surface` (all tracked `*.sh`, unconditionally) hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise silently stop being tracked. |
+| `check-knob-default-coupling` | **Retained, corpus extended** to the Rust module for any knob-default literal it declares — its own `gate_find` walks every `*.sh` under each kit root independently of the shared `spec.sh` primitives above, so this is a second, separate widening. |
+| `check-gate-tamper` | **Retained, two assertions extended separately**: its `is_gate_file()` glob roster (`DELEGATION_KIT_GATE_FILES`) gains the `.gate` spelling, or a future gate's tamper-isolation exemption goes unchecked; its `extract_exemptions()` parser, which reads a shell `# exception-list:` array literal, has no Rust-source equivalent yet and is out of scope for this slice's one ported gate (`check-spec-fence-balance` carries no exemption list) — flagged here so a later port that does isn't the session that discovers the gap. |
+| `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
 
 Gates whose corpus is kit directories, templates, smoke scripts, or hooks
 (`check-kit-registration`, `check-template-copy-parity`,
@@ -268,7 +275,13 @@ the delta that makes slice 1 cross-component in *contract* as well as in code.
 or execute it are: `gate-sdk/lib/gate.sh`, `gate-sdk/bin/` (`run-gates.sh`,
 `run-gate-tests.sh`, `gen-pre-commit.sh`, `enforcement-map.sh`,
 `install-hooks.sh`), `gate-sdk/checks/` (the meta-gates tabulated in delta 4),
-`canon-kit/checks/` (`check-comment-tier`, `check-spec-pointer`), the generated
+`canon-kit/lib/spec.sh` (`spec_comment_surface` and `spec_comment_surface_with_templates`,
+the shared corpus primitive `check-spec-pointer` and `check-comment-tier` both call —
+named explicitly because delta 4's table gives these two gates different-looking
+dispositions that resolve to one shared fix), `canon-kit/checks/`
+(`check-comment-tier`, `check-spec-pointer`, `check-todo-task-liveness`,
+`check-deprecation-task`, `check-knob-default-coupling`), `delegation-kit/checks/`
+(`check-gate-tamper`), the generated
 `scripts/git-hooks/pre-commit` and `commit-msg`, `scripts/gates.list`,
 `installer/lib/init.sh` (which regenerates the hook consumer-side), and the
 `gates` CI workflow. Build re-runs this survey against its own HEAD before
@@ -297,8 +310,11 @@ strands a reader nobody noticed.
   section, assertions A/B/C, matching the `# assertion` markers
   `check-gate-assertions` will demand (delta 4).
 - **gate-sdk/SPEC.md §Output contract** — the clean/`help:` grammar becomes a
-  *runtime* assertion of the fixture runner rather than a source-grep proxy; it
-  cites §run-gate-tests for the mechanism instead of restating it (delta 4).
+  *runtime* assertion of the fixture runner rather than a source-grep proxy for
+  the 93 fixtured members; it cites §run-gate-tests for the mechanism instead of
+  restating it, and states the one `# no-fixture:` member's carve-out (the static
+  source-grep is its only oracle and stays) so the contract's coverage is total
+  across all 94, not 93-of-94 (delta 4).
 - **gate-sdk/SPEC.md §run-gate-tests** — the invocation resolves through
   `gate_command`; the new output-grammar assertions on `good/` and `bad/` cases are
   specified here, since this section already owns the runner's contract
@@ -315,6 +331,12 @@ strands a reader nobody noticed.
 - **canon-kit/SPEC.md §check-comment-tier** — the governed-source corpus reaches the
   Rust module; the comment-leader-independent marker match is stated where the
   directive grammar already lives (delta 4).
+- **canon-kit/SPEC.md §lib/spec.sh** — `spec_comment_surface` and
+  `spec_comment_surface_with_templates` gain the `.gate` arm beside their hard-coded
+  `*.sh` `gate_find`, stated once at the shared primitive rather than twice at its
+  two callers (`check-spec-pointer`, `check-comment-tier`); `check-todo-task-liveness`
+  and `check-deprecation-task` inherit the same widening through the same call
+  (delta 4).
 - **context-kit/SPEC.md §bin/env-probe** — the new `PROBE_SET` member and, beside
   it, the construct that forces the floor, which that section requires of every
   member (delta 6).
@@ -335,7 +357,7 @@ strands a reader nobody noticed.
   is a new gate, which stales the full new-gate fan-out that section already
   rosters (SPEC mirror, enforcement map, footprint, value rollup, `check-graph`,
   and the generated hooks for a `tier=precommit` gate). No new projection is added;
-  build regenerates from the rostered commands rather than re-deriving them.
+  build regenerates from the rostered commands rather than re-deriving them (delta 4).
 
 ## Definition of Done
 

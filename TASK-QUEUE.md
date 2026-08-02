@@ -52,7 +52,7 @@
   prose that already carries it. The reader is scope's premise re-verification step.
   **Three refusals carry the design.** No relational vocabulary is declared — a kit
   literal spelling one project's verbs crosses the provenance seam, and there are at
-  least a dozen live phrasings. No new declaration line — the ~48 edges are already
+  least a dozen live phrasings. No new declaration line — the 58 edges are already
   written, and hand-authoring them is the maintained-roster anti-pattern paid for in
   `check-queue-entry-budget` evictions. No tracked artifact and no freshness gate —
   the one consumer has a shell, and a committed copy of the highest-churn file's
