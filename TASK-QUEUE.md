@@ -922,46 +922,46 @@
   **gate opacity**, this entry's sharpest ground since it was filed: an agent that
   can *read* a gate's bash predicts its verdict and acts on the prediction instead
   of running it, so a binary makes executing the cheapest way to know.
-  **Sharpened 2026-08-02 at scope — the original's "consumer-side; this repo keeps
-  its source" qualifier is right but stops short, in two directions.** Opacity is
-  never secrecy: a binary is reverse-engineerable. And it is friction, not a
-  barrier — every gate ships readable `good/`+`bad/` fixtures, a red names the
-  offending surface, and the rule is documented in prose besides, so the
-  implementation is the least informative of four readable surfaces. Honest form:
-  oracle-first *default-favored*, not structural. More is a vacuous claim.
+  **Sharpened 2026-08-02 at scope — the strength turns on reachability in the
+  consumer tree**, which makes the original's "consumer-side; this repo keeps its
+  source" load-bearing rather than a caveat: measured *here* the benefit reads nil,
+  because this repo dogfoods from source. Two bounds. Never secrecy — a binary is
+  reverse-engineerable, and the trust inversion is real. And `init` vendors every
+  kit file, fixtures included (`installer/lib/init.sh`:131-132), so a consumer
+  agent keeps the `good/`+`bad/` pair — which discloses a gate's *shape*, never its
+  predicate. **Open for the amendment:** whether a ported gate's source vendors into
+  the consumer tree as kits do today; if it does, opacity is nil there too.
   **Two grounds this must not rest on, both falsified 2026-08-02 at scope.**
-  *Speed:* "a port deletes `check-shellcheck`" is wrong — 49% of its 188-file corpus
-  is non-gate bash, widened deliberately by `scripts/gate-sdk-config.sh` — and no
-  timing artifact survives, so a baseline is captured before the port or the claim
-  is unfalsifiable. In-bash siblings: `gate-battery-parallel-execution`,
-  `gate-battery-result-cache`.
-  *Platform reach:* a gate-only port retires **one** of the six
+  *Speed:* "a port deletes `check-shellcheck`" is wrong — 49% of its corpus is
+  non-gate bash — and no timing artifact survives, so a baseline is captured before
+  the first cohort retires a script, or the claim is unfalsifiable. Concurrency is
+  reported apart from substrate: the in-bash siblings below get it too.
+  *Platform reach:* a gate-only port retires **one** of six
   `context-kit/lib/toolfloor.sh` pins (`awk::GNU`) — `bash:4.3` survives on namerefs
   in kit `bin/`, `sort::coreutils` on `date -d`/`stat -c`/`realpath` there and in the
-  hook emitter, `git`/`jq`/`shellcheck` are untouched, and `npx checkwright init`
-  hands to bash, so native Windows stays blocked (docs/install.md:63-65).
+  hook emitter, and `npx checkwright init` hands to bash, so Windows stays blocked.
   **Correctness evidence (2026-08-01, operator-directed) — the surviving ground.**
-  `release-step-verification`'s eleven defects sort into four a port removes — the
-  opt-in shell error model (a probe under `set +e` reported green forever from its
-  own data source dying), the regex dialect split, textual parameter expansion, and
-  hand-rolled parsers — and six it does not (CI-checkout and API-pagination
-  semantics, `gate-tests-suite-identity-in-evidence`, presence asserted where
-  resolution was needed, an ambiguous census, `workflow-permissions-scope-oracle`).
-  Caution: the parser class's named live instance was closed 2026-08-01 in awk by an
-  explicit refusal arm, so "only a real parser closes this class" overstates.
-  Landing the port then relaxing is the failure mode to design against.
+  `release-step-verification`'s eleven defects sort into four a port removes (the
+  opt-in shell error model, which reported green forever from its own data source
+  dying; the regex dialect split; textual parameter expansion; hand-rolled parsers)
+  and six it does not, among them `gate-tests-suite-identity-in-evidence` and
+  `workflow-permissions-scope-oracle`. Caution: the parser class's named live
+  instance closed 2026-08-01 in awk by an explicit refusal arm, so "only a real
+  parser closes this class" overstates. Landing then relaxing is the failure mode.
   **Deliverable:** one multi-call binary, a subcommand per check; `gates.list` dispatching
   per-entry to subcommand or script so it lands cohort by cohort, slowest and meta-gates first;
   each gate's fixture pair is the parity oracle before its script retires; consumer gates keep
   the shell escape hatch; checksummed per-platform artifacts, buildable source, needing only git.
   **Why `[design-pending]`:** the consumer-extensibility model decides everything else
   (escape hatch vs check DSL vs native plugins), plus language choice, the dogfood
-  question, and the trust inversion reproducible builds and checksums answer.
-  Distribution is the hard part: kits vendor as text, zero build step.
+  question, and the trust inversion. Distribution is the hard part: kits vendor as text.
   **Cost while deferred:** every new gate adds shell to the eventual port, the
-  silent-failure classes above stay reachable, source-prediction waste recurs per
-  session. Nothing breaks — correct on Linux, fully gated. Feature-shaped: it
-  adds governed names. Filed 2026-07-28 by operator request.
+  silent-failure classes stay reachable, and source-prediction waste recurs per
+  session. **It is a net drain on the queue, not a generator:** promoting it closes
+  `gate-battery-parallel-execution` and `gate-battery-result-cache` outright and
+  converges with `state-representation-integrity` — each says so in its own body.
+  Nothing breaks meanwhile — correct on Linux, fully gated. Feature-shaped: adds
+  governed names. Filed 2026-07-28 by operator request.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
