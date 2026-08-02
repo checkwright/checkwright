@@ -455,6 +455,52 @@ The manifest grammar:
 - `gen=manual` — the gate's hook block is bespoke and round-trips verbatim
   between `# >>> manual: <gate>` / `# <<< manual: <gate>` sentinels.
 
+## Meta-gate conservation for the binary substrate
+
+A gate's shell file carries five different things at once: the rule, the
+`# graph:` manifest, the output-contract strings, its `# spec:`/`# assertion`
+directives, and the greppable evidence that its reads stay inside its declared
+couples. Porting the rule to a compiled subcommand removes the file the other
+four are read from — so a port that records nothing **silently ends** the
+assertions those readers make, and most of them end by finding nothing and
+printing `clean`. A false green, not a red. This section is the contract that
+stops that, and `check-gate-substrate-parity` assertion C is what makes it
+machine-held rather than remembered.
+
+**The substrate-sensitive set is derived, never maintained.** A registry member
+is substrate-sensitive when its expanded `couples=` covers the **declaration
+path of a registry member** — the derivation `check-gate-substrate-parity`
+performs at runtime, so no count or roster here can rot. (The test is against
+registry members' declaration paths specifically, not against every `*.sh`
+under a resolve dir: `scripts/queue-config.sh` sits in the gates dir and is not
+a gate, and matching it would over-report.) Every derived member takes exactly
+one recorded disposition below, and a member the section does not name is red.
+
+| Meta-gate | Disposition for a `.gate`-dispatched member |
+|---|---|
+| `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
+| `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. |
+| `check-gate-fail-closed` | **Retired with cause** — the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable once a fallible call returns a `Result` that cannot be ignored. A real substrate win, stated as one. |
+| `check-reads-couples` | **Retained, and must fail closed.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here. Until a binary-side equivalent exists it **refuses** (exit 2) on a member resolving to a `.gate`, rather than passing. |
+| `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
+| `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
+| `check-comment-tier` | **Retained, corpus extended** to the Rust module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates` gains a `*.gate` arm — the shared primitive, widened once (see the `check-spec-pointer` row). |
+| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared `spec_comment_surface` in `canon-kit/lib/spec.sh`; absent that one shared fix a ported gate's `# spec:` line would silently stop being checked. Once the primitive gains the `.gate` arm its own probe logic needs no change — the descriptor already carries the line. |
+| `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. |
+| `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
+| `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk `spec_comment_surface` hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. |
+| `check-knob-default-coupling` | **Retained, corpus extended** to the Rust module for any knob-default literal it declares — its own `gate_find` walks each kit root independently of the shared `spec.sh` primitives, so this is a second, separate widening. |
+| `check-gate-tamper` | **Retained, extended**: its `is_gate_file()` glob roster gains the `.gate` spelling, or a ported gate's edit escapes the isolation rule. Two known limits, recorded so a later port is not the session that discovers them: its `extract_exemptions()` parser reads a shell `# exception-list:` array literal and has no Rust-source equivalent, and its **meta-layer path roster does not contain `native/`**, so a commit editing a gate's Rust implementation alongside its descriptor is refused. Neither binds slice 1 — the one ported gate carries no exemption list, and its Rust module lands in a commit separate from its descriptor. |
+| `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
+| `check-docs-cmd`, `check-install-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
+| `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
+| `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
+
+Gates whose corpus is kit directories, smoke scripts or hooks
+(`check-kit-registration`, `check-smoke-entry-guard`, `check-hook-exec-bit`,
+`check-test-hermetic`, `check-assertion-strength`) are not substrate-sensitive
+by the derivation above and are untouched.
+
 ## Consumer smoke
 
 The fixture suites prove each gate in isolation on contrived case dirs, and a
@@ -1241,6 +1287,39 @@ side without the other, but not adding an assertion while forgetting *both*
 its marker and the contract. A first paragraph that embeds the literal pattern
 in example prose self-matches — the failure is loud (a false positive forcing
 a reword), never a silent miss, so it is accepted. Requires GNU awk.
+
+### check-gate-substrate-parity
+
+Holds the dispatch seam honest: a gate's implementation may move to a compiled
+subcommand, but not by quietly deleting the declaration other gates read or the
+record of what that move costs. Usage
+`check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
+steers the fixture pair onto hermetic copies of each surface. Three assertions.
+
+- **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
+  exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
+  ambiguous dispatch and is red, rather than being silently settled by
+  `gate_resolve`'s within-dir precedence: that precedence exists so a consumer
+  can *shadow* a kit's gate, and using it to paper over a half-finished port
+  would hide the state a port passes through.
+- **assertion B — subcommand parity, both directions.** The set of `.gate`
+  descriptors across the resolve dirs equals the binary's reported subcommand
+  roster (`--list`). A descriptor naming no subcommand is a gate that cannot
+  run; a subcommand with no descriptor is a gate nothing declares. With
+  descriptors present and the binary absent or non-executable the gate exits 2,
+  never 0 — the §Fail-closed contract, since "cannot verify" and "verified
+  equal" must not share an exit code.
+- **assertion C — disposition coverage.** Every substrate-sensitive member
+  carries a disposition line in §Meta-gate conservation for the binary
+  substrate. The set is **derived at runtime** — a member whose expanded
+  `couples=` covers the declaration path of a registry member — so it cannot
+  drift from a maintained roster. **This is the anti-vacuity assertion**: a new
+  meta-gate over gate source, added later by a session that never read the
+  conservation section, reds until its disposition is recorded.
+
+It stays a **shell** gate: a gate that audits the port is not a gate the port
+may consume, or assertion B would be checking a roster through the very binary
+whose roster is in question.
 
 ### check-test-hermetic
 

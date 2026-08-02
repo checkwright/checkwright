@@ -5,3 +5,4 @@ check-template-registry-parity
 check-battery-roster
 check-gate-exemption-tasks
 check-prose-enum
+check-gate-substrate-parity

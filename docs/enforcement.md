@@ -38,6 +38,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | check-gate-fail-closed | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-fixture-coverage | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-gate-exemption-tasks | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-gate-substrate-parity | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-test-hermetic | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-assertion-strength | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-graph | precommit |

@@ -1,0 +1,3 @@
+GATE-SUBSTRATE-PARITY: clean
+1 descriptor(s) in parity
+1 substrate-sensitive member(s) all dispositioned

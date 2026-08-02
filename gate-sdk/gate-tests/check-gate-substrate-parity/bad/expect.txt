@@ -1,0 +1,4 @@
+ambiguous dispatch
+descriptor names no subcommand
+subcommand nothing declares
+no recorded disposition: check-alpha
