@@ -103,20 +103,14 @@ findings=()
 for src in "${sources[@]+"${sources[@]}"}"; do
     [[ -f "$src" ]] || continue
     # spec: gate-sdk/SPEC.md §check-reads-couples — a .gate member's walks are
-    # unreadable to this shell parser, so it counts an explicit exemption and
-    # refuses without one; silence would be a false green, not a finding
+    # unreadable to this shell parser, and there is no descriptor-level opt-out
     if [[ "$src" == *.gate ]]; then
-        if grep -q 'reads-couples-exempt:' "$src"; then
-            exempt=$((exempt + 1))
-            continue
-        fi
         echo "check-reads-couples: $src dispatches to the native binary, whose walks this" >&2
         echo "shell parser cannot read — it would find zero walks and report clean, which is a" >&2
         echo "false green. Refusing rather than passing; the check could not run." >&2
-        echo "  help: record the gap in the descriptor — '# reads-couples-exempt: <reason>'" >&2
-        echo "        naming what covers the gate's reads instead — or implement the" >&2
-        echo "        binary-side equivalent, or keep the gate in shell. An unrecorded" >&2
-        echo "        uncovered read is the vacuity this arm exists to refuse." >&2
+        echo "  help: implement the binary-side equivalent, or keep the gate in shell." >&2
+        echo "        There is deliberately no descriptor-level exemption: a port that could" >&2
+        echo "        opt out of this in a sentence would end the assertion it must replace." >&2
         exit 2
     fi
     couples=""

@@ -524,7 +524,7 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. |
 | `check-gate-fail-closed` | **Retired with cause** — the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable once a fallible call returns a `Result` that cannot be ignored. A real substrate win, stated as one. |
-| `check-reads-couples` | **Retained, and must fail closed.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here. Until a binary-side equivalent exists it **refuses** (exit 2) on a member resolving to a `.gate`, rather than passing. |
+| `check-reads-couples` | **Retained, and must fail closed.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here. Until a binary-side equivalent exists it **refuses** (exit 2) on a member resolving to a `.gate`, rather than passing. No descriptor-level opt-out: the live port added one and it is removed with the port (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates` gains `*.gate` **and `*.rs`** arms — the shared primitive, widened once (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. |
@@ -1779,6 +1779,25 @@ seam, because the absence of findings is indistinguishable from an absence of
 coverage. Refusing is the §Fail-closed contract applied to a corpus the scanner
 cannot see, and it stands until a binary-side equivalent exists
 (§Meta-gate conservation for the binary substrate).
+
+**There is deliberately no descriptor-level exemption.** The live port briefly
+shipped one — a `# reads-couples-exempt:` line in the descriptor bought the
+member a pass — on the argument that the one ported gate's single walk was
+already undecidable, so the exemption converted a counted skip into a counted
+exemption and ended no assertion. That was true of that gate and false as a
+rule: the *next* port has resolvable walks, and an opt-out written in one
+sentence is how a port ends the assertion it was supposed to replace rather
+than replacing it. The allowance was also never written here, so the refusal
+this section states and the behavior the gate had disagreed — the divergence
+that makes "land it then relax" hard to see. Removed with the port. A binary
+gate's read coverage is a **prerequisite** for the next port, not a paperwork
+step inside it.
+
+Because no `.gate` member exists anywhere in the tree, this arm has no live
+instance and its clean line reports a counted zero. `gate-tests/check-reads-couples.test.sh`
+is what keeps that a counted zero rather than an untested branch: it drives the
+refusal on a bare descriptor, on one claiming the removed exemption, and drives
+the shell arm alongside so the refusal cannot be passing for a parse failure.
 
 This is check-graph's coverage sibling: check-graph
 proves editing a *coupled* surface fires the gate; check-reads-couples proves
