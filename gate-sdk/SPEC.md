@@ -103,7 +103,10 @@ multi-call binary `gate_command` dispatches a `.gate`-declared member to — see
 §lib/gate.sh). Its default is a **stable relative path** deliberately: the
 generated pre-commit hook persists the emitted argv, and a machine-specific
 absolute path baked into a tracked hook would make `check-graph`'s byte-freshness
-comparison machine-dependent. Paths are
+comparison machine-dependent. And `GATE_SDK_NATIVE_SRC` (default `native/src`;
+the implementation tree §check-gate-substrate-parity assertion D holds free of
+manifest-class annotation — a **path, not a language**, so the knob assumes
+nothing about what implements a ported gate). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
@@ -389,6 +392,35 @@ canon-kit's `check-spec-pointer`, `# no-fixture:` by
 §check-gate-fixture-coverage — and the descriptor carries no field that lacks
 one, reserving nothing against a future reader.
 
+**The descriptor is a durable surface, not port scaffolding.** Its reason does
+not expire with the port that introduced it: `installer/lib/init.sh` runs
+`gen-pre-commit.sh --write` in the *consumer* tree, so the manifest must stay
+readable **with no build and no execution**, and that constraint only
+strengthens as more gates port.
+
+**Annotations partition by reader, and the partition is a rule.**
+
+- **Manifest-class** — the `# graph:` manifest, and anything else whose reader
+  must work without a build — lives in the descriptor **only**. It is never
+  emitted into, nor hand-written in, the implementation. Held by
+  §check-gate-substrate-parity assertion D.
+- **Locality-class** — `# spec:` with its one-line binding, and the
+  comment-tier directives — binds to a *line of implementation*, so it **stays
+  in the implementation**: moving it to a companion file destroys the binding
+  that gives it meaning. The corpus primitive
+  `canon-kit/lib/spec.sh` reaches the implementation for exactly this reason
+  (canon-kit/SPEC.md §lib/spec.sh), so those assertions stay live on a ported
+  gate instead of going dark.
+
+**The layer above the descriptor is substrate-blind.** Because the manifest sits
+outside the implementation, the graph, hook, and meta-gate layers read a gate's
+declaration without knowing what implements it — a gate could be implemented in
+any language behind a descriptor, and nothing in this format or in the
+resolution path assumes otherwise. Slice 1 neither builds nor claims that
+generality; it only declines to foreclose it where a neutral choice cost the
+same. The same property is what keeps the deferred consumer-payload question
+tractable: a descriptor discloses a gate's *shape* without its *predicate*.
+
 Two shapes were refused, each on a constraint rather than on taste. **The binary
 emitting its own manifest** would make hook generation depend on executing the
 binary, but `installer/lib/init.sh` runs `gen-pre-commit.sh --write` in the
@@ -484,14 +516,15 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-reads-couples` | **Retained, and must fail closed.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here. Until a binary-side equivalent exists it **refuses** (exit 2) on a member resolving to a `.gate`, rather than passing. |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
-| `check-comment-tier` | **Retained, corpus extended** to the Rust module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates` gains a `*.gate` arm — the shared primitive, widened once (see the `check-spec-pointer` row). |
-| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared `spec_comment_surface` in `canon-kit/lib/spec.sh`; absent that one shared fix a ported gate's `# spec:` line would silently stop being checked. Once the primitive gains the `.gate` arm its own probe logic needs no change — the descriptor already carries the line. |
+| `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates` gains `*.gate` **and `*.rs`** arms — the shared primitive, widened once (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. |
+| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared `spec_comment_surface` in `canon-kit/lib/spec.sh`; absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. Once the primitive gains the `.gate` and `*.rs` arms its own probe logic needs no change. |
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk `spec_comment_surface` hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. |
 | `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it therefore cannot reach — the crate's prune-dir default against `lib/gate.sh`'s — is closed by an **executed** assertion instead: a unit test in the crate reads the shell library and compares the two literals, failing on drift. Recorded this way because a disposition that names a mechanism which cannot fire is the same defect as no disposition. |
 | `check-gate-tamper` | **Retained, extended**: its `is_gate_file()` glob roster gains the `.gate` spelling, or a ported gate's edit escapes the isolation rule. Two known limits, recorded so a later port is not the session that discovers them: its `extract_exemptions()` parser reads a shell `# exception-list:` array literal and has no Rust-source equivalent, and its **meta-layer path roster does not contain `native/`**, so a commit editing a gate's Rust implementation alongside its descriptor is refused. Neither binds slice 1 — the one ported gate carries no exemption list, and its Rust module lands in a commit separate from its descriptor. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
+| `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
 | `check-docs-cmd`, `check-install-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
@@ -1326,6 +1359,14 @@ steers the fixture pair onto hermetic copies of each surface. Three assertions.
   drift from a maintained roster. **This is the anti-vacuity assertion**: a new
   meta-gate over gate source, added later by a session that never read the
   conservation section, reds until its disposition is recorded.
+- **assertion D — one writable home for the manifest.** No file under the
+  implementation tree (`GATE_SDK_NATIVE_SRC`, default `native/src`) carries a
+  manifest-class annotation. The comment leader is matched as `#`, `//` or
+  `/*`, so the assertion is **language-agnostic**: it holds for whatever
+  language sits behind a descriptor, not for Rust alone. This enforces the
+  reader partition below, and it is a live assertion rather than a convention —
+  two writable sources of one truth drift silently, and this is the truth every
+  build-free reader depends on.
 
 It stays a **shell** gate: a gate that audits the port is not a gate the port
 may consume, or assertion B would be checking a roster through the very binary

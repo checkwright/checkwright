@@ -115,12 +115,23 @@ for i in "${!RUN_MEMBERS[@]}"; do
     fi
     start_ns=$(date +%s%N)
     out=""; ok=1
-    if gate_path="$(gate_resolve "$c" "${RESOLVE_DIRS[@]}")"; then
-        if out="$("$gate_path" "${args[@]}" 2>&1)"; then
+    # spec: gate-sdk/SPEC.md §lib/gate.sh — execute the invocation argv, keeping
+    # gate_command's exit 2 (dispatch harness error) distinct from its exit 1
+    # (nothing declares this member)
+    argv_out="$(gate_command "$c" "${RESOLVE_DIRS[@]}" 2>&1)"; cstatus=$?
+    argv=()
+    [[ -n "$argv_out" && "$cstatus" -eq 0 ]] && mapfile -t argv <<<"$argv_out"
+    if [[ "$cstatus" -eq 0 && ${#argv[@]} -gt 0 ]]; then
+        if out="$("${argv[@]}" "${args[@]}" 2>&1)"; then
             tail="  PASS: $c"
         else
             rc=$?; ok=0; tail="  FAIL: $c (exit $rc)"; failed+=("$c")
         fi
+    elif [[ "$cstatus" -eq 2 ]]; then
+        ok=0
+        out="$argv_out"
+        tail="  FAIL: $c (dispatch harness error, exit 2)"
+        failed+=("$c")
     else
         ok=0
         out="$c listed in $LIST but resolves in none of: ${RESOLVE_DIRS[*]}"

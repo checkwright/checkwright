@@ -22,11 +22,19 @@ while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
 missing=()
 no_help=()
 total=0
+runtime=0
 while IFS= read -r m; do
     [[ -n "$m" ]] || continue
     total=$((total + 1))
     if ! src="$(gate_resolve "$m" "${RESOLVE_DIRS[@]}")"; then
         missing+=("$m (source resolves in none of: ${RESOLVE_DIRS[*]})")
+        continue
+    fi
+    # spec: gate-sdk/SPEC.md §Output contract — the source-grep is the oracle only
+    # for a member no fixture case can reach; every fixtured member is asserted on
+    # its real output by the runner (§run-gate-tests), which no substrate escapes
+    if ! grep -q '^# no-fixture:' "$src"; then
+        runtime=$((runtime + 1))
         continue
     fi
     if ! grep -Eq '(echo|printf).*: clean' "$src"; then
@@ -61,5 +69,5 @@ if [[ ${#missing[@]} -gt 0 || ${#no_help[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "GATE-OUTPUT: clean ($total gates.list members emit a '<NAME>: clean' success line + a 'help:' remedy)"
+echo "GATE-OUTPUT: clean ($total gates.list member(s): $((total - runtime)) source-grepped as no-fixture members, $runtime asserted on real output by run-gate-tests)"
 exit 0

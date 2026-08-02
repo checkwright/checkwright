@@ -109,6 +109,22 @@ for m in "${MEMBERS[@]}"; do
         || findings+=("no recorded disposition: $m is substrate-sensitive (its couples= covers a gate declaration path) but $SECTION does not name it")
 done
 
+# assertion D: manifest-class annotations live in the declaration only — a second
+# writable copy in the implementation is an SSOT violation that drifts silently,
+# and the manifest must stay readable with no build and no execution
+IMPL_DIR="${GATE_SDK_NATIVE_SRC:-native/src}"
+impl_scanned=0
+if [[ -d "$IMPL_DIR" ]]; then
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        impl_scanned=$((impl_scanned + 1))
+        while IFS= read -r hit; do
+            [[ -n "$hit" ]] || continue
+            findings+=("manifest-class annotation in implementation source: $f:${hit%%:*} — the '# graph:' manifest belongs to the declaration path alone")
+        done < <(grep -nE '^[[:space:]]*(#|//|/\*)[[:space:]]*graph:[[:space:]]' "$f" || true)
+    done < <(gate_find "$IMPL_DIR" -type f)
+fi
+
 if [[ ${#findings[@]} -gt 0 ]]; then
     echo "check-gate-substrate-parity: the gate substrate seam is not conserved:"
     printf '  %s\n' "${findings[@]}"
@@ -118,8 +134,11 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "        A substrate-sensitive member with no disposition is recorded in"
     echo "        $DOC $SECTION — say ported, retained, or retired with cause;"
     echo "        an unrecorded one silently stops asserting when a gate ports."
+    echo "  help: delete a manifest-class annotation from implementation source — the"
+    echo "        '# graph:' manifest has exactly one writable home, the declaration"
+    echo "        path, so that every reader of it works with no build and no execution."
     exit 1
 fi
 
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; ${#DESCRIPTORS[@]} descriptor(s) in parity with the subcommand roster; $sensitive substrate-sensitive member(s) all dispositioned)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; ${#DESCRIPTORS[@]} descriptor(s) in parity with the subcommand roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation)"
 exit 0

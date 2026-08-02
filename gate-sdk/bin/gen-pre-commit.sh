@@ -30,6 +30,16 @@ resolve_rel() {
     gate_resolve "$1" "${REL_DIRS[@]}"
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the hook is a persisted consumer of the
+# invocation argv, so it emits `<binary> <name>` for a ported member; the knob's
+# relative default is what keeps the tracked hook byte-identical across clones
+command_rel() {
+    local -a argv=()
+    mapfile -t argv < <(gate_command "$1" "${REL_DIRS[@]}") || return 1
+    [[ ${#argv[@]} -gt 0 ]] || return 1
+    printf '%s' "${argv[*]}"
+}
+
 declare -A MANUAL=()
 read_manual() {
     local line name="" buf=""
@@ -72,7 +82,7 @@ emit_block() {
     gate_expand_couples_var trigger "$trigger"
     mode="$(manifest_field "$gate" mode)"
     gen="$(manifest_field "$gate" gen)"
-    relpath="$(resolve_rel "$gate")" || relpath="$GATES_DIR/$gate.sh"
+    relpath="$(command_rel "$gate")" || relpath="$GATES_DIR/$gate.sh"
 
     printf '\n'
     if [[ "$gen" == manual ]]; then
@@ -238,7 +248,7 @@ HEAD
     local c relpath
     while IFS= read -r c; do
         [[ -n "$c" ]] || continue
-        relpath="$(resolve_rel "$c")" || relpath="$GATES_DIR/$c.sh"
+        relpath="$(command_rel "$c")" || relpath="$GATES_DIR/$c.sh"
         printf '\nrun_gate %s %s "$msg_file"\n' "$c" "$relpath"
     done < <(commit_msg_gates)
 
