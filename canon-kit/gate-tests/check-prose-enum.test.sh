@@ -119,9 +119,32 @@ The fast pair alpha/beta short-circuits.
 EOF
 check_case "per-site-exempt-escape" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/three.sh"
 
+# The identifier boundary: an underscore separates two names, so a member must
+# not read as present inside a longer sibling. Only a declared set can hold
+# underscore members, so the pair — which runs on the repo's own hyphenated
+# config — cannot reach this at all.
+cat >"$SANDBOX/guards.sh" <<'EOF'
+CANON_KIT_ENUM_SETS_CMD='printf "guard\tguard_allow\nguard\tguard_allow_match\nguard\tguard_deny\n"'
+EOF
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# prefix sibling
+
+The guard_allow_match, guard_deny pair covers the whole surface.
+EOF
+check_case "prefix-sibling-trips" 1 "but omits: guard_allow" CANON_KIT_CONFIG_FILE="$SANDBOX/guards.sh"
+
+# The mirror: spelled in its own right the member is present, so the boundary is
+# a boundary and not a blanket non-match.
+cat >"$SANDBOX/SPEC.md" <<'EOF'
+# prefix sibling complete
+
+The guard_allow, guard_allow_match, guard_deny trio is the whole surface.
+EOF
+check_case "prefix-sibling-complete-clean" 0 "PROSE-ENUM: clean" CANON_KIT_CONFIG_FILE="$SANDBOX/guards.sh"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-prose-enum.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-prose-enum.test.sh: clean (empty-skip + fail-closed error/parse + bracketed match + scattered non-engage + multiset independence + subset/partitive/per-site escapes)"
+echo "check-prose-enum.test.sh: clean (empty-skip + fail-closed error/parse + bracketed match + scattered non-engage + multiset independence + subset/partitive/per-site escapes + identifier boundary)"
 exit 0

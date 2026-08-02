@@ -404,7 +404,12 @@ same shapes:
   matches the same total shapes — including a total whose cardinal and noun
   straddle a prose wrap, reported at the cardinal's physical line. The boundary
   rule and the mechanical exemptions live in one shared fragment, so no sibling
-  drifts from another in what it counts as a total (§check-manifest-count).
+  drifts from another in what it counts as a total (§check-manifest-count). That
+  boundary guards a prose **noun** against gluing to a following word ("gate"
+  inside "gatekeepers") — a different rule from the enum matcher's **identifier**
+  boundary (§check-prose-enum), which the two once spelled alike and only
+  half-alike at that. English nouns do not compound across underscores, so the
+  noun rule stays as it is; the shared spelling was never a shared rule.
 - **The enum sets** arrive through the consumer's `CANON_KIT_ENUM_SETS_CMD`,
   validated and fail-closing (exit 2) on a command error or an unparsable line
   (§check-prose-enum).
@@ -621,8 +626,18 @@ Set declarations are consumer config, never gate literals (the provenance seam):
 emitting one `<set-name>`⇥`<member>` line per member, loaded through
 `spec_enum_sets` (§lib/spec.sh); a command that fails or a line that does not
 parse is fail-closed (exit 2). A member matches word-bounded — bracketed
-(`[spec:]`) or bare (`spec`), neither an alphanumeric nor a hyphen abutting, so a
-stem never matches inside a longer tag — and the attested drift used bare stems.
+(`[spec:]`) or bare (`spec`), neither an alphanumeric, a hyphen, nor an
+underscore abutting, so a stem never matches inside a longer tag, and an
+**underscore-separated identifier never reads as present inside a longer
+sibling**: `guard_allow` is named by "the `guard_allow` helper" and not by "the
+`guard_allow_match` pair", which is what a reader means by both sentences. A
+member that falsely reads as present is one the gate stops asking about, so the
+paragraph omitting it reports clean — the silent direction, and the reason the
+class holds the whole identifier rather than most of it. `.` and `/` stay
+*outside* the class deliberately, and that is what makes the identifier reading
+exactly one character wide: a basename member matches prose spelling the file
+kit-relative, repo-relative or bare (below), which admitting either would break.
+The attested drift used bare stems.
 The grammar stays two fields. A third, scoping a set to a whole file rather than
 a paragraph, was weighed against a **cross-document** absence — members spread
 over per-section prose, which a paragraph-scoped judge structurally cannot see —
@@ -679,10 +694,16 @@ the reason is recorded so neither is re-minted. Both fail on one property: a
 lib's functions and its sourcers are a vocabulary prose *discusses*, not a set
 prose *rosters*, so the set-difference is real while the finding is false. The
 function family reported an omission at every passage explaining how two helpers
-interact, none of them a roster, and it is unsound against the matcher besides —
-the word boundary above excludes `_`, so `guard_allow` reads as present inside
-`guard_allow_match`, a false clean in exactly the family it was added for. The
-caller family's one intended site is a caller roster written as narrative, which
+interact, none of them a roster — the measurement that is dispositive on its own,
+and the one that produced the rule this paragraph ends on. The refusal rests on
+that ground alone. It rests **not at all** on the matcher, which bounds an
+identifier on the underscore too (above), so `guard_allow` is absent from a
+paragraph naming only `guard_allow_match`: a refusal resting partly on a broken
+matcher would invite exactly the wrong inference — fix the matcher, re-mint the
+family. That matcher defect was sighted while measuring this very family, which
+is where the identifier boundary rule came from and why the family is named here
+as its origin rather than as a second reason to refuse.
+The caller family's one intended site is a caller roster written as narrative, which
 the hand-list adjacency rule correctly declines to judge, so it was inert there
 while still firing falsely on a README row naming two of a kit's tools. The rule
 the pair teaches: declare a derived set when the tree shape it reads is one the
@@ -693,7 +714,10 @@ hit dispositioned — cite the set, complete the list, or site-exempt with reaso
 The good/bad pair covers a bare comma hand list dropping a member and the
 marked-subset cases; `check-prose-enum.test.sh` covers the config-driven paths
 (the empty-default skip, the fail-closed escapes, bracketed matching, multi-set
-independence, the exempt escapes) the pair cannot reach. `precommit` tier.
+independence, the exempt escapes, and the identifier boundary's prefix-sibling
+pair) the pair cannot reach — the boundary case needs a declared set holding
+underscore members, which is a config no pair running on the consumer's own
+hyphenated sets can supply. `precommit` tier.
 
 ### check-knob-citation
 

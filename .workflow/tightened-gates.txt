@@ -4,3 +4,4 @@ check-action-run-shell
 check-template-registry-parity
 check-battery-roster
 check-gate-exemption-tasks
+check-prose-enum

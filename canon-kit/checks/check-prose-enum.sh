@@ -51,7 +51,7 @@ function _sk_present(low, m,   lm, start, idx, pp, bc, ac) {
         pp = start + idx - 1
         bc = (pp > 1) ? substr(low, pp - 1, 1) : " "
         ac = (pp + lm <= length(low)) ? substr(low, pp + lm, 1) : " "
-        if (bc !~ /[[:alnum:]-]/ && ac !~ /[[:alnum:]-]/) return pp
+        if (bc !~ /[[:alnum:]_-]/ && ac !~ /[[:alnum:]_-]/) return pp
         start = pp + 1
     }
 }

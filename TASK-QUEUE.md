@@ -12,38 +12,6 @@
 
 ## New Features
 
-- **prose-enum-identifier-boundary-class** [spec: canon-kit/SPEC-prose-enum-identifier-boundary.md]
-  — **a false clean live for every `check-prose-enum` consumer**, not a
-  repo-local wrinkle. `_sk_present` bounds a member match with `[[:alnum:]-]`, a
-  class excluding `_`, so an underscore-separated identifier reads as present
-  inside a longer sibling and a paragraph naming only `guard_allow_match`
-  silently satisfies the member `guard_allow`. A member that falsely reads as
-  present is one the gate stops asking about, so the omission is reported clean
-  with nothing in the output to suggest a judgment was skipped.
-  Nothing in this tree is currently wrong — its declared sets are file basenames
-  and bracketed tags, all hyphenated — and that inertness is why it needed
-  filing rather than fixing in passing: the tree cannot red on it, so no local
-  evidence will ever surface it. The carry grows with adoption, not with time.
-  **The widened class is the tree's existing convention arriving late**, ruled at
-  spec: `check-readme-roster.sh:62` and `canon-kit/lib/spec.sh:286` already use
-  `[[:alnum:]_-]` for identifier tokens; `check-prose-enum.sh:54` is the outlier.
-  The widening is **exactly one character** — `.` and `/` must stay out, because
-  the kit-relative and repo-relative basename spellings depend on matching across
-  them. `lib/spec.sh:320-321` is a *prose-noun* boundary, a different rule that
-  happens to share a spelling, and is deliberately not touched. A boundary-class
-  knob is refused: its only possible setting is the value that re-opens this bug.
-  Four deltas: the class widening (**design-bearing**); the battery re-run, which
-  moves verdicts in **both** directions and is expected to move none here
-  (**mechanical**); the prefix-sibling case in `check-prose-enum.test.sh`, which
-  build writes first and watches go *green against the unpatched gate*
-  (**design-bearing**); and the correction of the `<kit>-lib-fn` refusal passage,
-  whose secondary argument this falsifies — the family **stays refused** on its
-  roster-versus-vocabulary ground, and the struck clause was the sighting this
-  unit came from (**design-bearing**).
-  Surfaced 2026-08-02 by `spec-roster-enumeration-derivation` while measuring
-  that refused family; out of scope there because the unit's premise forbade a
-  canon-kit change. Promoted 2026-08-02 by spec.
-
 ## Technical Debt
 
 - **vacuous-assertion-count-discipline** — an assertion that passes without
@@ -2374,5 +2342,6 @@
 
 - gate-fixture-expect-conjunction
 - gate-exemption-live-slug-derivation
+- prose-enum-identifier-boundary-class
 
 ## Lessons Learned
