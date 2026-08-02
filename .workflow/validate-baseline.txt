@@ -89,8 +89,8 @@ guard_tests guard_tests pass
 usage_tests usage_tests pass
 budget_guard_tests budget_guard_tests pass
 trend_tests trend_tests pass
-demo demo pass
-consumer_smoke consumer_smoke pass
+demo demo fail native-gate-vendoring-model
+consumer_smoke consumer_smoke fail native-gate-vendoring-model
 upgrade upgrade pass
-agents_md_smoke agents_md_smoke pass
+agents_md_smoke agents_md_smoke fail native-gate-vendoring-model
 index_tests index_tests pass
