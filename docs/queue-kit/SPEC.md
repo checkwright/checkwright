@@ -200,6 +200,52 @@ grammar: a **bold-code token** — `` **`<slug>`** `` whose token matches the
 slug grammar — which `check-queue-slug-liveness` resolves against the live
 slug set on the configured prose surfaces (§check-queue-slug-liveness).
 
+Inside the queue file, that same token in **single backticks** — matching the
+slug grammar, appearing in an entry's **body** rather than on its lead line —
+is a **citation** of the named entry: the relation an author already drew while
+writing about something else. The two forms are deliberately different claims.
+The bold-code form is a *membership* claim, and a dead one is a false statement
+`check-queue-slug-liveness` reds on; the in-body citation is a *reference*,
+aggregated by `bin/queue-edges.sh` (§bin/queue-edges.sh) and audited by
+nothing. The rules below make citations parseable, each covering a shape a live
+corpus contains:
+
+- **Resolution is against the live slug set** — `queue_live_slugs`: active,
+  deferred, and a configured icebox, the existing source of truth.
+- **An unresolved token is not an error; it is simply not an edge.** This is the
+  load-bearing rule. Entries legitimately name *landed* work — a closed defect
+  class, a shipped contract, a settled ruling — and that citation is valuable
+  prose no gate may punish, which is why no liveness assertion reaches inward
+  from the configured prose surfaces (§check-queue-slug-liveness).
+- **Self-citation is not an edge** — an entry naming its own slug in its own
+  body is narration, not a relation.
+- **`[blocked-by: <slug>]` is an edge too**, and the one already-structured
+  class: including it makes an inbound set complete rather than merely
+  prose-derived.
+
+**No relational vocabulary is declared, and that refusal is the design.** Prose
+phrases a relation many ways and keeps inventing more, so an enumerated verb set
+would be brittle the day it landed — and, decisively, a kit literal spelling one
+project's relational verbs would ship that project's vocabulary as everyone's.
+That is the provenance seam, the same reason `[roadmap:]`'s horizons and tracks
+are consumer-configured arrays rather than kit literals. Declaring no vocabulary
+means there is no vocabulary to leak and no consumer config to invent: a
+relation's *kind* rides the citing line itself, quoted verbatim
+(§bin/queue-edges.sh).
+
+**A `relates: <kind> <slug>` declaration on the `roadmap-summary:` pattern was
+weighed and refused.** It is precise and it carries a kind — and it is wrong
+here on three counts. Every citation a corpus has already written would need
+hand-authoring, the maintained-roster anti-pattern derivation-first forbids;
+those lines would land inside entries measured against
+`check-queue-entry-budget`'s raw-line cap, where sub-tasks do not relieve a
+parent's budget, so precision would be paid for in evictions; and a
+hand-declared edge can be forgotten in exactly the moment it matters, whereas a
+citation written in prose is written because the author was already thinking
+about the relation. The derived grammar costs zero lines in every entry and is
+satisfied by any corpus that already cross-references — no migration, and no
+adoption step between landing it and reading it.
+
 - `[blocked-by: <slug>]` — the entry is unpickable until `<slug>` completes.
   Repeat per blocker. Must resolve to a live task (active or deferred — a
   deferred blocker stands; it is unbuilt); a blocker in the done section is a
