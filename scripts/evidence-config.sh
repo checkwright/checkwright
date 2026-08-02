@@ -12,7 +12,7 @@ while IFS=$'\t' read -r _suite _tests _checks; do
     declare "EVIDENCE_KIT_RUN_$_suite=bash gate-sdk/bin/run-gate-tests.sh $_tests${_checks:+ $_checks}"
 done < <(gate_fixture_suites)
 unset _suite _tests _checks
-EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests demo consumer_smoke upgrade agents_md_smoke index_tests)
+EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests demo consumer_smoke upgrade agents_md_smoke index_tests native_crate)
 
 EVIDENCE_KIT_PARSER=exit-code
 
@@ -29,3 +29,4 @@ EVIDENCE_KIT_RUN_consumer_smoke='bash gate-sdk/bin/run-consumer-smoke.sh'
 EVIDENCE_KIT_RUN_upgrade='bash gate-sdk/bin/upgrade-smoke.sh'
 EVIDENCE_KIT_RUN_agents_md_smoke='bash context-kit/smoke/agents-md.sh'
 EVIDENCE_KIT_RUN_index_tests='bash context-kit/bin/run-index-tests.sh'
+EVIDENCE_KIT_RUN_native_crate='cargo test --release --manifest-path native/Cargo.toml'

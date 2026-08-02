@@ -1,0 +1,17 @@
+[package]
+name = "checkwright-gates"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.56"
+description = "Multi-call binary carrying the gate implementations that have moved off the shell substrate"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "checkwright-gates"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 2

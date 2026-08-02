@@ -132,6 +132,7 @@ bash delegation-kit/bin/run-usage-tests.sh                                      
 bash delegation-kit/bin/run-budget-guard-tests.sh                                   # delegation-kit budget guard
 bash delegation-kit/bin/run-trend-tests.sh                                          # delegation-kit trend reader
 bash context-kit/bin/run-index-tests.sh                                             # context-kit index tools
+cargo test --release --manifest-path native/Cargo.toml                              # native crate unit tests
 bash context-kit/smoke/agents-md.sh                                                 # the AGENTS.md projection, end to end
 bash gate-sdk/bin/run-consumer-smoke.sh                                             # every kit installs into a scratch consumer
 bash gate-sdk/bin/upgrade-smoke.sh                                                  # a vendored tree upgrades in place

@@ -184,6 +184,7 @@ leaves its section absent.
 | [gate-sdk](gate-sdk/index.md) | upgrade |
 | [context-kit](context-kit/index.md) | agents_md_smoke |
 | [context-kit](context-kit/index.md) | index_tests |
+| (consumer) | native_crate |
 
 ## Monitors
 

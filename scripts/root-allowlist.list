@@ -40,6 +40,10 @@ installer
 # crates.io name-reservation placeholder (not developed in; the npm name is installer/)
 reserve
 
+# Rust crate carrying the gate implementations that moved off the shell substrate
+# (not a kit — it carries no checks/ or smoke/; build output is gitignored)
+native
+
 # The kits (this is a kit monorepo — each kit is a top-level root)
 gate-sdk
 lifecycle-kit
