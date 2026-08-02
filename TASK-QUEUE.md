@@ -183,53 +183,53 @@
 
 - **heterogeneous-agent-delegation** [design-pending] [roadmap: later/ecosystem] — foreign agents.
   roadmap-summary: Dispatch a stage to any vendor's coding agent, gated identically.
-  Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding
-  agent, extending the homogeneous multi-agent model to a heterogeneous fleet.
-  It cashes the public no-lock-in claim and is the purest expression of the
-  thesis — governance enforced at the git/gate boundary, not by trusting the
-  author. *Already agent-neutral:* the verification substrate (git, the gate
-  battery, the bash stamp state machine) does not care who authored the diff,
-  and the concurrent-agent coordination primitive is the shared git-index/HEAD
-  serialization. *Homogeneous today — the real work, worst-first:*
-  (1) the **escalation resume model** collapses into (2) as a property of the
-  chosen transport, per the 2026-07-25 amendment below; (2) **dispatch
-  transport** — today the harness `Agent`/`SendMessage`/task-notification; a
-  foreign agent needs a transport-neutral handoff. The adapter contract is
-  "open / prompt / permission-request / resume" spoken over each vendor's
-  structured **machine plane, never its TUI**: a screen-scrape relay is
-  adapter-of-last-resort for a vendor shipping no machine interface at all —
-  it yields rendered frames instead of turn events, answers dialogs by
-  heuristic, and bets on the vendor's least-stable surface. (3) **budget
-  oracle** — the verdict tool is Anthropic-OAuth-specific; a heterogeneous fleet
-  has N vendor-keyed oracles, the same seam as the credential-swap entries, and
-  the vendors' JSONL event streams carry the token-usage events a TUI path would
-  scrape from a status bar. (4) **stage-contract expression** — the lifecycle
-  machinery is neutral bash but the stage-skill prose is not.
-  **Seam ruling (on record):** generic mechanism only — transport, budget oracle,
-  and escalation channel become consumer-config seams; a kit literal naming a
-  vendor crosses the provenance seam and is ruled out, the `prose-profile`
-  pattern. It extends the per-batch model-tiering lever across vendors, and
-  interacts with `hosted-attestation-service`, `plugin-marketplace`, and the
-  credential-swap budget-oracle entries.
+  Cross-vendor stage dispatch: a lead delegating a stage to a foreign coding agent,
+  extending the homogeneous multi-agent model to a heterogeneous fleet. It cashes the
+  public no-lock-in claim and is the purest expression of the thesis — governance enforced
+  at the git/gate boundary, not by trusting the author. *Already agent-neutral:* the
+  verification substrate (git, the gate battery, the bash stamp state machine) does not
+  care who authored the diff, and the coordination primitive is the shared git-index/HEAD
+  serialization. *Homogeneous today — the real work, worst-first:* (1) the **escalation
+  resume model** collapses into (2) as a property of the chosen transport, per the 2026-07-25
+  amendment below; (2) **dispatch transport** — today the harness
+  `Agent`/`SendMessage`/task-notification; a foreign agent needs a transport-neutral
+  handoff. The adapter contract is "open / prompt / permission-request / resume" spoken over
+  each vendor's structured **machine plane, never its TUI**: a screen-scrape relay is the
+  adapter of last resort for a vendor shipping no machine interface at all — it yields
+  rendered frames not turn events, answers dialogs by heuristic, and bets on the vendor's
+  least-stable surface. (3) **budget oracle** — the verdict tool is
+  Anthropic-OAuth-specific; a heterogeneous fleet has N vendor-keyed oracles, the same seam
+  as the credential-swap entries, and the vendors' JSONL event streams carry the token-usage
+  events a TUI path would scrape from a status bar. (4) **stage-contract expression** — the
+  lifecycle machinery is neutral bash but the stage-skill prose is not.
+  **Seam ruling (on record):** generic mechanism only — transport, budget oracle, and
+  escalation channel become consumer-config seams; a kit literal naming a vendor crosses
+  the provenance seam and is ruled out, the `prose-profile` pattern. It extends the
+  per-batch model-tiering lever across vendors, and interacts with
+  `hosted-attestation-service`, `plugin-marketplace`, and the credential-swap entries.
   **Demand-gated — demand attested (2026-07-23):** the operator holds working
-  foreign-vendor subscriptions and wants read-heavy delegation routed to them for
-  budget headroom, and with three vendors live the N-keyed oracle seam is no
-  longer hypothetical. First slice at promotion: a foreign-CLI executor for the
-  already-pre-authorized read-heavy audit / mechanical-sweep class over a spawned
-  non-interactive CLI process, one adapter per vendor as consumer config — not
-  full stage dispatch. Promotion-eligible at the next scope session.
-  **Design-memory amendment (2026-07-25, verified against the installed CLIs):**
-  the TUI-relay alternative was probed for session resume and token efficiency.
-  Ruling: those benefits live in the vendor's session store, not the TUI — the
-  APIs are stateless and both modes replay the same on-disk transcript against
-  the same server-side prompt cache, so interactive-vs-headless is a rendering
-  choice, not a state choice. Headless warm-resume by session id and JSONL turn
+  foreign-vendor subscriptions and wants read-heavy delegation routed to them for budget
+  headroom, and with three vendors live the N-keyed oracle seam is no longer hypothetical.
+  First slice at promotion: a foreign-CLI executor for the already-pre-authorized
+  read-heavy audit / mechanical-sweep class over a spawned non-interactive CLI process,
+  one adapter per vendor as consumer config — not full stage dispatch.
+  Promotion-eligible at the next scope session.
+  **Design-memory amendment (2026-07-25):** the TUI-relay alternative was probed for
+  session resume and token efficiency. Ruling: those benefits live in the vendor's session
+  store, not the TUI — the APIs are stateless and both modes replay the same on-disk
+  transcript against the same server-side prompt cache, so interactive-vs-headless is a
+  rendering choice, not a state choice. Headless warm-resume by session id and JSONL turn
   events ship today on the vendors probed, which is what makes (1) plumbing.
-  **Cost while deferred:** the foregone lever is live — read-heavy audits and
-  mechanical sweeps all bill against one vendor's budget while three
-  subscriptions are held — and this design memory ages against fast-moving CLIs.
-  Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question
-  on external-agent delegation).
+  **Verification capability (2026-08-02):** those probes ran against **installed binaries**
+  — the foreign CLIs are present on the development machine — so the executor is verifiable
+  rather than inferred from vendor documentation. Under oracle-first that is a change to
+  the unit's risk, not a convenience, and it sharpens the first slice: the executor ships
+  with a smoke that actually invokes them, the shape every kit already uses. The machine
+  profile (context-kit/SPEC.md §bin/env-probe, local-only) owns which CLIs and how.
+  **Cost while deferred:** the foregone lever is live — read-heavy audits and mechanical
+  sweeps all bill against one vendor's budget while three subscriptions are held — and
+  this design memory ages against fast-moving CLIs.
+  Surfaced 2026-07-17 in the release-in-lifecycle lead session (operator question).
 
 - **background-credential-swap-support** [design-pending] — first-class support for
   swapping the Anthropic OAuth credential out from under in-flight agents (to
@@ -1715,9 +1715,8 @@
   under the instruction both templates already carry, and the fork below is a
   live choice rather than a repair. A second limit confirmed alongside it:
   `bin/enter-stage.sh --simulate` **cannot predict a distinct session's entry**,
-  so it never answers whether a sibling batch will stamp; the simulate read is a
-  gate on *this* session's entry only, which bounds what any lead-side
-  pre-dispatch check can learn from it.
+  so it never answers whether a sibling batch will stamp — it gates *this*
+  session's entry only, which bounds any lead-side pre-dispatch check.
   **Not a defect today.** Nothing gates on the missing lines, and the stage
   cursor is the *last* stamp, so it is correct either way — this is doctrine
   drift, not breakage.
@@ -1731,6 +1730,9 @@
   `check-stage-evidence`'s reading of it, or adds an oracle where two templates
   now rely on a dispatched session's compliance; and it recurs on every batched
   stage, not just build.
+  **Regressed 2026-08-02:** nine build batches, one stamp — the once-correct
+  practice did not hold, and since economics attributes one row per transcript,
+  the lead binding's per-batch tier lever is unmeasurable while the trail is not.
   **Cost while deferred:** the trail silently under-reports session count on
   every batched stage, so the evidence file cannot answer "how many sessions did
   this stage take" — an economics question the drift KPIs would otherwise want.
@@ -2202,6 +2204,187 @@
   Surfaced 2026-08-01 by the `/economics` run at close as the competing
   hypothesis behind an align tier question; the tier half was ruled the same
   session and this entry re-scoped to the half that is still open.
+
+- **prose-enum-identifier-boundary-class** [design-pending] — **a false clean
+  live for every `check-prose-enum` consumer**, not a repo-local wrinkle.
+  `_sk_present` bounds a member match with `[[:alnum:]-]`
+  (canon-kit/checks/check-prose-enum.sh), a class that excludes `_`, so an
+  underscore-separated identifier reads as present inside a longer sibling —
+  premise re-verified at close against guard-kit/SPEC.md's `guard_allow` /
+  `guard_allow_match` pair, which is exactly that shape. The failure direction
+  is what makes this worth a unit rather than a note: a paragraph naming only
+  the longer sibling silently satisfies the shorter member, so any consumer
+  declaring a set of function names — or any other underscore-bearing
+  identifier family — gets a green that means nothing, with nothing in the
+  output to suggest it. Nothing in this tree is currently wrong: its declared
+  sets are file basenames and bracketed tags (`scripts/enum-sets.sh`), all
+  hyphenated, so no member can be a prefix of a sibling across an underscore.
+  That inertness is the reason it needs filing rather than fixing in passing —
+  the tree cannot red on it, so no local evidence will ever surface it.
+  The work: widen the boundary class to include `_`, re-run the full battery
+  for reds the widening exposes, and extend `check-prose-enum.test.sh` with a
+  prefix-sibling case (the widening is a change to what the gate asserts, so it
+  is a spec-stage unit, not a build-stage edit).
+  **Cost while deferred:** low here, unbounded elsewhere — zero risk to this
+  tree by the hyphenation argument above, but every consumer vendoring
+  canon-kit carries a check whose green is conditional on a naming convention
+  the kit never states. The carry grows with adoption, not with time.
+  Surfaced 2026-08-02 by `spec-roster-enumeration-derivation` while measuring
+  the refused `<kit>-<lib>-fn` family (canon-kit/SPEC.md §check-prose-enum
+  records that refusal); out of scope there because the unit's premise forbade
+  a canon-kit change.
+
+- **gate-fixture-expect-conjunction** [design-pending] — `run-gate-tests` matches
+  a case's `expect.txt` with `grep -qF`, so a **multi-line expect reads as
+  alternatives, not a conjunction**: a `bad/` case asserting two findings passes
+  when only one fires. This weakens every fixture that relies on a multi-line
+  expect, and silently — the author who wrote two lines believes both are
+  pinned. gate-sdk/SPEC.md §run-gate-tests says the case "print its substring"
+  (singular) and never states the limit, so nothing warns them.
+  Blast radius measured at close: **3 of 187 tracked `expect.txt` files are
+  multi-line** — `check-spec-pointer` (canon-kit), `check-queue-entry-budget`
+  and `check-tag-lead-line` (queue-kit), all `bad/` cases. All three were
+  probed against a conjunction reading and **all nine of their lines currently
+  hold**, so the tightening reds nothing today; what is missing is the
+  guarantee, not a present green-that-should-be-red.
+  The work: make the runner treat a multi-line expect as a conjunction (a
+  `grep -qF` per non-empty line), state the semantics in gate-sdk/SPEC.md
+  §run-gate-tests, and cover it in the runner's own fixture pair. The runner is
+  the fixture-pair contract's enforcer, so this is a change to what every kit's
+  pairs assert — a spec-stage unit.
+  **Cost while deferred:** low today and rising with fixture count — the three
+  known multi-line expects hold, but nothing stops the next one from being
+  written under the wrong belief, and a fixture that under-asserts is worse
+  than one that is absent because it reads as coverage.
+  Surfaced 2026-08-02 while writing `check-template-registry-parity`'s pair,
+  whose `bad/` tree fires both assertions but could pin only one; worked around
+  there by pinning assertion A alone.
+
+- **template-registry-population-predicate** [design-pending] — a **contingent**
+  residual in `check-template-registry-parity`'s population predicate
+  (gate-sdk/SPEC-template-registry-parity.md, closed): a `templates/<X>.list`
+  enters the parity population iff a sibling `<X>/` directory exists. If a kit
+  ever ships a `.list` template of *consumer rule content* whose basename
+  happens to match one of its own directories of kit-shipped `.sh` artifacts,
+  the predicate admits a private vocabulary into a parity check it can never
+  satisfy. No such case exists: two `.list` templates exist tree-wide
+  (`kpis.list`, `msg-patterns.list`), and the predicate is sound against both.
+  Why this is filed rather than fixed: the direction is a **false red**, which
+  announces itself the moment the colliding template lands, and the obvious
+  pre-emptive fix — an exception naming the private-vocabulary template — is
+  the kit literal the provenance seam refuses, which is precisely why the
+  predicate is structural in the first place. The residual is the price of the
+  seam-respecting design, not a defect in it.
+  The one thing that is not free: the gate is `valve=none`, so a consumer who
+  hits the collision has no suppression path short of renaming their own
+  template. If this is ever worth work, the work is a valve rather than a
+  widened predicate.
+  **Cost while deferred:** near-zero and non-rotting — a self-announcing false
+  red on a case no tree has produced. Not iceboxed only because a named event
+  waits: the next `.list` template landing in any kit is the moment to re-read
+  this entry.
+  Surfaced 2026-08-01 by `kit-template-registry-completeness` while writing the
+  predicate; flagged then as contingent, not a present defect, and re-verified
+  against the shipped gate at close.
+
+- **companion-toolkit-profile** [design-pending] — govern a tree whose specs an
+  **external spec-authoring toolkit produced**: a consumer profile for the case
+  where the specs Checkwright gates were written by a second toolkit's workflow
+  rather than by this one's `spec` stage. The interop rung, and the one that
+  cashes the front-door claim below.
+  **The design is already decided and is not what this entry holds.** Two
+  rulings on record settle it: `prose-profile` rules that a profile ships as an
+  adapter delivered as optional consumer config and never as a kit literal, and
+  `heterogeneous-agent-delegation` rules that a kit literal naming a vendor
+  crosses the provenance seam outright. So the shape is a consumer-side profile
+  over a declared artifact layout — the `check-graph` / `graph-vocab` pattern —
+  and any per-toolkit specifics stay in consumer config. What is open is the
+  *substance*: which of the lifecycle's assumptions actually break when the
+  amendment set is authored elsewhere (canon-kit's amendment lifecycle and the
+  spec-ready pointer semantics are the obvious load-bearing ones), and whether a
+  tested two-toolkit consumer is buildable without a kit ever naming one.
+  **Intake provenance:** this was never declined or costed — it is the
+  opportunities half of the same operator-commissioned external product review
+  (artifact local-only) whose *weaknesses* half was filed on 2026-07-23 as six
+  launch-facing rungs (`launch-activation-cli`, `front-door-outcome-rewrite`,
+  `supply-chain-trust-baseline`, `platform-support-contract`,
+  `preview-release-cadence`, `public-roadmap-projection`, all since landed).
+  That intake's stated filter was the review's "top pre-announcement gaps", so
+  the growth half fell **consciously outside a stated filter rather than being
+  missed**; the gap this entry closes is the absent intake record, not that
+  session's judgment. The review's own growth sequence opens here.
+  **Cost while deferred — not zero, and this is the entry's sharpest fact.**
+  `README.md` and `docs/index.md` both already assert, on the first screen,
+  "It complements the workflow you already run. Keep your spec process, your
+  prompts, your harness." **No queue or roadmap entry backs that with a tested
+  two-toolkit consumer.** The claim is not false — harness-neutrality is real
+  and "complements" is a far weaker assertion than "integrates with X" — but it
+  is *published and unproven*, in a project whose entire pitch is that claims
+  are mechanically proven rather than asserted. The carry is therefore
+  reputational and front-door-resident, and it accrues on every reader, not on
+  the passage of time.
+  Surfaced 2026-08-02 at close by an intake pass over the external review's
+  unfiled half.
+
+- **design-partner-preview** [design-pending] — a narrow external preview before
+  any broad announcement: five-to-ten teams already delegating multi-step agent
+  work, installs observed live rather than by written feedback, instrumented for
+  time-to-first-green, first useful red, false-positive dispositions, and 7/30-day
+  retention per kit. It is the first rung on this queue whose deliverable is
+  **evidence from outside this tree** rather than a tree change.
+  **Sequencing is the load-bearing part.** The preview runs *before*
+  `benchmark-ab-experiment`, so pilot findings shape that experiment's task
+  classes and metrics rather than being retrofitted to them; per-gate
+  true/false-positive history and profile retention are preview deliverables,
+  not pre-launch builds. Broad announcement waits on the activation path, the
+  trust baseline, and two externally observed defect stories. The full launch
+  ruling behind this sequencing is operator material and stays in the local-only
+  private brief; this entry carries only the queue-visible rung.
+  **Intake provenance:** item 4 of the external review's own priority order, and
+  like `companion-toolkit-profile` it fell outside the 2026-07-23 intake's
+  "top pre-announcement gaps" filter rather than being judged and declined —
+  consciously out of scope for that pass, with no record left behind.
+  **Cost while deferred:** the highest of this intake, and it compounds. Every
+  claim in the tree that would be strongest with external evidence — false
+  positives, retention, time-to-first-value — stays supported by internal
+  dogfooding alone, and no external install has ever been observed. That is not
+  a rot risk that ages passively: each iteration adds governed surface whose
+  quality is unattested outside, so the volume of unattested claim grows while
+  the evidence stays at zero. Deferring also silently defers
+  `benchmark-ab-experiment`, since running it first would fix the wrong metrics.
+  Surfaced 2026-08-02 at close, in the same intake pass, as the review's own
+  fourth-ranked priority.
+
+- **external-gate-quality-evidence** [design-pending] — durable, published
+  evidence of **gate quality as experienced outside this tree**: per-gate
+  true/false-positive history, the disposition of each red a non-author hit, and
+  whether a red changed behaviour or was worked around. The review's own
+  suggested new initiative, and the direct answer to the standing threat that a
+  false positive converts the enforcement advantage into bypass and distrust —
+  every blocking gate raises the stakes of a wrong red.
+  **Why it is not just a report.** The tree already publishes evidence
+  projections, so the mechanism exists; what does not exist is a *population* to
+  measure. A red in this repo is authored and dispositioned by the same party,
+  which cannot distinguish a gate that is right from a gate whose author agrees
+  with it. That makes this entry structurally downstream of
+  `design-partner-preview` — not blocked by it in the tag sense, since a
+  narrower internal cut is conceivable, but the honest version needs external
+  reds. The open design question is which of the two it should be, and whether
+  the collection surface is a per-gate field the disposition already records or
+  a new capture stream.
+  **Intake provenance:** the third unfiled item of the external review's growth
+  half, outside the 2026-07-23 intake's stated pre-announcement filter rather
+  than declined by it.
+  **Cost while deferred:** moderate and asymmetric. The gate-quality claim is
+  currently supported by fixture pairs and a green battery, which prove a gate
+  does what its author specified and say nothing about whether that was the
+  right thing to specify — exactly the gap this measures. The carry is that the
+  first externally-hit false positive will be argued from anecdote, because no
+  baseline exists to argue from. It does not rot, but it cannot be
+  retroactively collected either: the history it wants starts accruing only once
+  someone decides to record it.
+  Surfaced 2026-08-02 at close, in the same intake pass, as the third and last
+  of the growth half's unfiled items.
 
 ## Icebox
 
