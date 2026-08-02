@@ -905,8 +905,8 @@ directive for a genuinely-local fact below SPEC altitude that neither tier
 owns.
 
 The governed-source corpus reaches the **implementation of a ported gate**, not
-just shell: `spec_comment_surface_with_templates` (§lib/spec.sh) spans `*.sh`,
-the `*.gate` descriptor, and `*.rs`. This is the load-bearing half of the reader
+just shell — `spec_comment_surface_with_templates` (§lib/spec.sh), which owns
+the file set. This is the load-bearing half of the reader
 partition gate-sdk/SPEC.md §The `# graph:` manifest states — locality-class
 directives bind to a line of implementation and therefore stay there, so the
 tier rule has to follow them across the substrate or go dark exactly where it

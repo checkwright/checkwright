@@ -145,14 +145,14 @@ here.
   gitignored, local-only.
 - `reserve/` holds the crates.io name-reservation placeholder — do not develop
   in it (the npm name is the `installer/` package below).
-- `native/` is the Rust crate holding gate implementations that moved off the
-  shell substrate — one multi-call binary, one subcommand per ported gate,
-  declared by a `.gate` descriptor (gate-sdk/SPEC.md §The `# graph:` manifest).
-  It is **not a kit**: it carries no `checks/` and no `smoke/`, which is the
-  predicate that makes a root directory one. Its build output (`native/target/`)
-  is gitignored and never committed; a registry member dispatching to it means
-  the battery needs `cargo build --release --manifest-path native/Cargo.toml`
-  first, and `gate_command` is fail-closed (exit 2) when the binary is absent.
+- `native/` is the Rust crate for gate implementations off the shell substrate —
+  one multi-call binary, one subcommand per ported gate, declared by a `.gate`
+  descriptor. **No gate is ported today:** the seam ships, the one live port was
+  reverted, and a second is blocked on `native-gate-vendoring-model`. It is
+  **not a kit** — no `checks/`, no `smoke/`, the predicate that makes a root
+  directory one; `native/target/` is gitignored and never committed. Dispatch,
+  descriptor format, port criteria and the toolchain floor:
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
   `SECURITY.md`, and `RELEASING.md` are governed repo-meta (tracked,
   core-files-pinned, in the spec manifest so their links/commands resolve like

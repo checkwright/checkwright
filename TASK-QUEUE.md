@@ -2885,6 +2885,35 @@
   free-text exemptions stands in for coverage that was never provided.
   Filed 2026-08-02 at close from the gap inbox; found by build and by validate.
 
+- **gate-timing-baseline-comparability** [design-pending] — a baseline with no
+  comparer decays into a number nobody can use. `battery-baseline-capture` shipped
+  `.workflow/gate-timing-baseline.txt` this iteration — 94 per-gate rows × 3 runs,
+  captured deliberately *before* any gate ports off bash. Its extension and tier
+  are correct (checked projection, `# contract:` pointer header, a stated
+  field-wise line grammar — audited at close under the roster's
+  `workflow-surface-extension` class). What it has is **no reader**: nothing in the
+  tree parses it, and `kpi-gate-runtime` reads a single live timings file rather
+  than a baseline-versus-current pair, though `DRIFT_KIT_TIMINGS_FILE` shows the
+  seam where a comparer would attach.
+  **Why that is not merely "not yet".** The comparison moment is the second port,
+  which is now blocked behind `native-gate-vendoring-model` and may be far off,
+  while the baseline's own validity conditions decay meanwhile. Two already have,
+  measured at close the same iteration the file landed: the header pins a
+  `gates.list` sha256 that no longer matches (the 95th gate landed after capture),
+  and the header's environment line pins a kernel, bash build and CPU count that a
+  later comparison will almost certainly not reproduce. The pins are doing their
+  job — they make the drift *visible* — but nothing reads them, so nothing will
+  refuse an apples-to-oranges comparison when it is finally made.
+  **Why `[design-pending]`:** the choice is between a comparer that normalizes
+  (re-measuring the shared gate set on the current box, which makes the stored
+  numbers advisory) and a freshness gate that invalidates the baseline on roster
+  or environment change (cheap, but it deletes the only pre-port measurement the
+  repo will ever be able to take). Those are opposite answers, not a size question.
+  **Cost while deferred:** the port's headline justification stays unmeasurable in
+  the one tree that could measure it — the before-numbers exist and quietly stop
+  being comparable to any after-numbers, with no surface saying so.
+  Filed 2026-08-02 at close by the `workflow-surface-extension` roster audit.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -2918,9 +2947,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- battery-baseline-capture
-- queue-inbound-edge-projection
-- native-gate-dispatch-seam
 
 ## Lessons Learned
