@@ -580,11 +580,18 @@
   floors are; this entry is the mechanism that proves a platform actually meets
   them, and the support matrix's per-platform rows are only as honest as the
   legs behind them.
-  **Why deferred rather than built alongside the floors:** the repo runs two
-  workflows (`.github/workflows/gates.yml`, `site-health.yml`), neither a
+  **Why deferred rather than built alongside the floors:** the repo runs three
+  workflows (`.github/workflows/gates.yml`, `publish.yml`, `site-health.yml`), none a
   matrix, so this is new runner spend on macOS and WSL images — and **no macOS
   or WSL adopter exists** to attest the spend. Demand-gated on exactly that,
   like the other adoption rungs.
+  **Re-verified 2026-08-02 at scope, and a second un-defer trigger named.** The
+  workflow count moved (two → three); the substance is unchanged — still zero
+  non-Linux legs, no `matrix:` key anywhere, and the adopter trigger unfired. The
+  second trigger: **`native-gate-binary-port` promoting**. That entry's deliverable
+  is checksummed per-platform artifacts, which cannot be built or smoked without
+  exactly the legs this entry supplies — so the port makes this a prerequisite, not
+  the other way round.
   **The un-defer trigger, carried so the reason is not re-derived:** the gap
   that motivates the legs is now *stated* rather than contradicted —
   `platform-support-contract` landed the floor contract, so `docs/install.md`
@@ -916,32 +923,32 @@
   a compiler replacing contracts the sdk enforces by discipline plus meta-gates;
   and the sharpest — **an agent cannot read a binary**, so oracle-first becomes
   structural instead of doctrine it can route around (consumer-side; this repo keeps its source).
-  **Wall-time is mis-costed here in both directions.** The entry claimed speed
-  until scope measured it 2026-08-01; that correction over-charged the port with a
-  third-party floor mostly its own input — `check-shellcheck` is 5921ms of a
-  23718ms/90-gate battery, linting each kit's own bash, so a port deletes it.
-  In-bash: **`gate-battery-parallel-execution`**, **`gate-battery-result-cache`**.
+  **Wall-time is no argument either way — falsified 2026-08-02 at scope.** "A port
+  deletes `check-shellcheck`" is wrong: 49% of that gate's 188-file corpus is non-gate
+  bash (installer, `demo/`, kit dirs, 21 `scripts/*.sh`) widened deliberately by
+  `scripts/gate-sdk-config.sh`; and no timing artifact survives to re-derive the old
+  figures. In-bash: **`gate-battery-parallel-execution`**, **`gate-battery-result-cache`**.
   **Correctness evidence (2026-08-01, operator-directed).**
   `release-step-verification` produced eleven defects, sorted by whether a port
   removes them. **Four are removed:** the opt-in shell error model (a probe under
   `set +e` turned a failed `gh` call into an empty list and a zero exit, reporting
   green forever from its own data source dying); the regex dialect split (a word
   boundary in GNU grep is a backspace in POSIX awk); textual parameter expansion
-  leaving artifacts in derived values; and the heaviest, hand-rolled parsers
-  standing in for real ones — live instance
-  `action-run-shell-yaml-anchor-fail-open`, an anchored `run:` body going
-  silently unlinted. A real parser handles anchors by construction, and several
-  gates share that shape. **Seven survive unchanged, and they are the ceiling:**
-  CI-checkout and API-pagination semantics, evidence that does not identify what
-  it certifies (`gate-tests-suite-identity-in-evidence`), presence asserted where
-  resolution was needed, an ambiguous census, a SPEC claiming coverage the wiring
-  lacks (`smoke-battery-workflow-gate-coverage`), and a required permission with
-  no oracle (`workflow-permissions-scope-oracle`). **Consequence for scope:**
-  justify the port on *silent success* and real parsers replacing regex
-  approximation — never on speed, never on the vaguer claim that shell is
-  error-prone, and not as closing `vacuous-assertion-count-discipline`, whose
-  dominant class is assertion *design* and ports intact. Landing the port then
-  relaxing is the failure mode to design against.
+  leaving artifacts in derived values; and hand-rolled parsers standing in for real
+  ones. **That last one's named live instance is gone (2026-08-02 at scope):** the
+  anchored `run:` fail-open closed 2026-08-01 in awk, by an explicit refusal arm — so
+  "only a real parser closes this class" is falsified by the tree's own fix.
+  **Six survive — the ceiling, one fewer since `smoke-battery-workflow-gate-coverage`
+  landed:** CI-checkout and API-pagination semantics, evidence that does not identify
+  what it certifies (`gate-tests-suite-identity-in-evidence`), presence asserted where
+  resolution was needed, an ambiguous census, and a required permission with no oracle
+  (`workflow-permissions-scope-oracle`). **Consequence for scope:** justify the port on
+  *silent success* and real parsers replacing regex approximation — never on speed, and
+  not as closing `vacuous-assertion-count-discipline`, whose dominant class is assertion
+  *design* and ports intact. Landing the port then relaxing is the failure mode to
+  design against. It does **not** unlock `platform-support-ci-matrix` — its own
+  per-platform artifacts need matrix-shaped CI, so that entry is a prerequisite rather
+  than a beneficiary (direction checked 2026-08-02 at scope).
   **Deliverable:** one multi-call binary, a subcommand per check; `gates.list` dispatching
   per-entry to subcommand or script so it lands cohort by cohort, slowest and meta-gates first;
   each gate's fixture pair is the parity oracle before its script retires; consumer gates keep
@@ -962,6 +969,10 @@
   across cores the remaining gates sum to well under that, so **`check-shellcheck`
   becomes the critical path** and the battery floors at roughly its cost —
   splitting its corpus across workers is what breaks the bound, not the scheduler.
+  **Premise dated 2026-08-02 at scope, twice over.** `gates.list` now registers 94,
+  and no timing artifact survives in the tree — `.metric/` holds economics and usage
+  only — so the figures above are re-measured before they are built on, not trusted
+  as transcribed. The critical-path *shape* is unaffected by the count.
   **The deliverable is the concurrency contract, not the scheduler.** Per-gate
   scratch isolation (`.tmp/` is one shared dir today); the timings file as a
   contended writer; deterministic output ordering under interleaved completion,
@@ -2174,32 +2185,43 @@
   crosses the provenance seam outright. So the shape is a consumer-side profile
   over a declared artifact layout — the `check-graph` / `graph-vocab` pattern —
   and any per-toolkit specifics stay in consumer config. What is open is the
-  *substance*: which of the lifecycle's assumptions actually break when the
-  amendment set is authored elsewhere (canon-kit's amendment lifecycle and the
-  spec-ready pointer semantics are the obvious load-bearing ones), and whether a
-  tested two-toolkit consumer is buildable without a kit ever naming one.
-  **Intake provenance:** this was never declined or costed — it is the
-  opportunities half of the same operator-commissioned external product review
-  (artifact local-only) whose *weaknesses* half was filed on 2026-07-23 as six
-  launch-facing rungs (`launch-activation-cli`, `front-door-outcome-rewrite`,
-  `supply-chain-trust-baseline`, `platform-support-contract`,
-  `preview-release-cadence`, `public-roadmap-projection`, all since landed).
-  That intake's stated filter was the review's "top pre-announcement gaps", so
-  the growth half fell **consciously outside a stated filter rather than being
-  missed**; the gap this entry closes is the absent intake record, not that
-  session's judgment. The review's own growth sequence opens here.
+  *substance* — which lifecycle assumptions break when the amendment set is authored
+  elsewhere, and whether a tested two-toolkit consumer is buildable without a kit
+  ever naming one.
+  **Survey run 2026-08-02 at scope — three corrections, so a spec pass starts here.**
+  (1) *Cheaper than filed:* the load-bearing knobs already exist as consumer config
+  (`CANON_KIT_SPEC_NAME`, `_AMENDMENT_GLOB`, `_QUEUE_FILE`, `_DOD_MODE`;
+  `LIFECYCLE_KIT_AMENDMENT_GLOB`, `_CONTRACT_TOKENS`). The work is *proving them
+  sufficient*, not inventing a profile format. (2) *The sharpest break is a silent
+  one:* `check-stage-entry` assertion C reads literal `SPEC.md`/`proto/` substrings
+  inside amendment bodies as its cross-component signal, so a foreign layout makes it
+  **never fire** — the align audit is skipped with no red. An interop consumer is
+  not merely unsupported, it is silently under-gated. `check-spec-pointer` breaks the
+  same way on non-markdown artifacts. (3) *The deepest coupling is process, not
+  config:* `check-spec-derivable-section`/`check-spec-embedded-source` assume the
+  canonical-spec-plus-short-lived-amendment model itself, which a toolkit keeping
+  many living per-feature specs does not fit at any knob setting.
+  **The discharge pattern already exists in-tree.** docs/positioning.md §The tiered
+  compatibility claim says "This is tested, not asserted" and cites context-kit's
+  `smoke/agents-md.sh`. That is the shape the three claims below owe.
+  **Seam re-verified clean:** no tracked file names an external spec toolkit.
+  **Intake provenance:** never declined or costed — the opportunities half of the
+  same operator-commissioned external review whose *weaknesses* half was filed
+  2026-07-23 as six launch-facing rungs, all since landed. That intake's filter was
+  the review's "top pre-announcement gaps", so the growth half fell consciously
+  outside a stated filter rather than being missed; the gap here is the absent
+  intake record, not that session's judgment.
   **Cost while deferred — not zero, and this is the entry's sharpest fact.**
-  `README.md` and `docs/index.md` both already assert, on the first screen,
-  "It complements the workflow you already run. Keep your spec process, your
-  prompts, your harness." **No queue or roadmap entry backs that with a tested
-  two-toolkit consumer.** The claim is not false — harness-neutrality is real
-  and "complements" is a far weaker assertion than "integrates with X" — but it
-  is *published and unproven*, in a project whose entire pitch is that claims
-  are mechanically proven rather than asserted. The carry is therefore
-  reputational and front-door-resident, and it accrues on every reader, not on
-  the passage of time.
-  Surfaced 2026-08-02 at close by an intake pass over the external review's
-  unfiled half.
+  `README.md`:16-17 and `docs/index.md`:17-18 both already assert, on the first
+  screen, "It complements the workflow you already run. Keep your spec process, your
+  prompts, your harness." — and docs/orchestration.md:22-23 makes the same move for
+  orchestration ("It complements your orchestration setup; it does not replace it"),
+  a third site found 2026-08-02 at scope. **No queue or roadmap entry backs any of
+  the three with a tested consumer.** Not false — "complements" is far weaker than
+  "integrates with X" — but *published and unproven*, in a project whose whole pitch
+  is that claims are mechanically proven rather than asserted. The carry is
+  reputational and front-door-resident, accruing on every reader rather than with
+  time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
 - **design-partner-preview** [design-pending] — a narrow external preview before
   any broad announcement: five-to-ten teams already delegating multi-step agent
@@ -2440,6 +2462,46 @@
   Debt: one guard arm plus its decision-table fixture; adds no governed name.
   Filed 2026-08-02 by close's tooling-friction triage, the ranked log read against
   the committed allowlist rather than the local overlay.
+
+- **customer-facing-iteration-cadence** [design-pending] — operator-directed: formalize
+  a cadence so internal iterations cannot starve customer-facing ones. The ask was "X
+  internal iterations per one roadmap/customer-facing one, with high-priority
+  exceptions"; the survey below re-shapes it twice before any design starts.
+  **A rule of this job already exists and has no oracle — that is the real gap.** The
+  operator's local brief carries a stricter standing bound (finish only work that cuts
+  time-to-first-value, closes a trust/supply-chain gap, or produces external proof;
+  defer the rest until five external installs exist), with an exception clause already
+  requiring the public queue entry to carry the exception and its reason. It is
+  private, prose-only, and unenforced. So the subject is *giving the standing rule an
+  oracle*, not adding a second, weaker ratio beside it.
+  **Starvation bound, not a fixed ratio.** A ratio misfires in both directions on this
+  tree: it forces a customer-facing iteration when none is ready — two of the three
+  `next` roadmap items are demand-gated on adopters who do not exist — and it makes
+  "internal" a quota to pad. A bound (no more than N consecutive iterations without a
+  customer-facing one; the N+1st is either customer-facing or files a costed, named
+  exception) never forces unready work, and turns the exception from a loophole into a
+  filed artifact. That is the anti-vacuity property, and the failure mode to design
+  against is the one `vacuous-green-elimination` just named: an exception clause broad
+  enough to swallow its own rule.
+  **Why `[design-pending]` — the classification data exists on no tracked surface.**
+  `WORKFLOW-STATE.txt` is truncated at every scope boundary; roadmap tags ride
+  entries that pass through Done, which close clears; `.metric/` is gitignored and
+  account-bearing, so no gate may read it. A cadence rule over today's tree is
+  therefore prose-only — the weak deliverable enforcement-first refuses. It becomes
+  gateable with one small addition, and the pattern is already shipped:
+  `.workflow/audit-roster.txt` is a tracked `due: <event> — last: <iteration>` roster
+  that close reads and stamps. A `last:` stamp plus a boundary-incremented counter
+  makes the gate a comparison rather than a history reconstruction.
+  **Seam:** bound, stamp and counter are generic mechanism; the "customer-facing"
+  predicate is consumer config, the `graph-vocab.sh` pattern — a kit literal deciding
+  what counts as customer-facing would publish a product judgment.
+  **Cost while deferred:** low and non-rotting while an operator directs composition
+  by hand, which is exactly what the directive that surfaced this did. Measured at
+  filing: the last two closes (`shipped-roster-parity`, `vacuous-green-elimination`)
+  were internal and the Deferred pool stands at 71 — a two-iteration run, not a
+  chronic one, so the bound would be preventive rather than remedial.
+  Filed 2026-08-02 by scope from supplemental operator intake during the unit-set
+  survey; scope-gated intake, so filed costed rather than started.
 
 ## Icebox
 
