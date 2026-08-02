@@ -780,6 +780,26 @@ binds top-level entries only — a sub-task is covered by its parent's costing.
 entry's residency is one iteration by the drain rule, so it has no carry to
 cap. The carry problem is the deferred pool's alone.
 
+**Compression is lossless, and the split is authorization-gated.** An entry
+that will not fit is compressed by *answering* grounds, never by dropping or
+summarizing them away; a ground that survives unanswered is relocated into a
+distinct linked entry. The gate cannot hold this: it sees an entry's current
+extent, and judging whether a removed line was answered or discarded is
+semantic. So the rule is a stated authoring contract, and the remedy carries
+its own authorization — a parent session (the iteration lead), or the operator
+in the absence of one, grants permission to split and issues the recipe with
+the ruling. A session blocked by the cap does not self-serve the split, the
+same lineage as a `check-stage-entry` assertion C waiver
+(lifecycle-kit/SPEC.md §check-stage-entry), and the gate's failure text
+therefore cites this section rather than inlining the recipe.
+
+*Why the cap is not widened for exceptional content.* Assertion A's bound is
+the amendment-inlining line above, not a length preference, so raising the
+number moves the number without moving the line — and the entries that would
+claim an exception are the likeliest ungoverned amendments. A conditional cap
+collapses back into authorization anyway, or it is the self-issued exemption
+the delegation doctrine already names as the standard failure mode.
+
 ### check-queue-wrap
 
 Invariant: no line exceeds the `QUEUE_KIT_WRAP_BUDGET` gate floor (default

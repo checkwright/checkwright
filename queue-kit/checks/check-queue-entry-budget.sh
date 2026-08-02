@@ -94,9 +94,11 @@ if [[ -n "$out" ]]; then
         echo "membership in it is itself the cost declaration):"
         printf '  %s\n' "${shape[@]}"
     fi
-    echo "  help: compress the body to the cap, add the cost field, or evict the entry to"
-    echo "        the icebox as a one-line lead. The removed narrative stays recoverable"
-    echo "        from the evicting commit's own diff (git log -p -S'<slug>')."
+    echo "  help: add the cost field, or evict the entry to the icebox as a one-line lead."
+    echo "        Over the cap: compress by ANSWERING grounds, never by dropping them —"
+    echo "        an unanswered ground is relocated to a linked entry, and that split is"
+    echo "        authorization-gated, not self-served (queue-kit/SPEC.md"
+    echo "        section check-queue-entry-budget)."
     exit 1
 fi
 

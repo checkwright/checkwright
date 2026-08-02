@@ -66,6 +66,19 @@ fail-closed refusal (relayed in the stage session's report), or gates an
 expensive dispatch cheaply first with `enter-stage.sh --simulate <stage>`
 (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — oracle-first made concrete.
 
+**Relay, never assert.** The lead manages on *optimal* rather than extensive
+context, so on any topic it has not mastered it acknowledges and relays — it
+does not hand down a tree fact as a ruling. The asymmetry is the reason: a
+stage session writes lifecycle state and is held to oracle-first, fixture
+pairs and a validate battery, while the lead writes no state and so has no
+verification discipline, yet its rulings steer what stage sessions land. A
+claim reasoned from one narrow grep and delivered as instruction spends a
+stage session's work against it, and nothing reds. So a factual claim travels
+as a claim with its provenance attached ("read off X, unverified"), leaving
+the stage session — which holds the oracle — to run it. What the lead rules
+alone is scope, envelope and priority: the things no gate can decide and no
+grep can answer.
+
 Whether the lead may ever run a stage *inline* is the consumer's
 session-boundary posture (`LIFECYCLE_KIT_SESSION_BOUNDARY`,
 lifecycle-kit/SPEC.md §Layout and configuration). Under the strict posture

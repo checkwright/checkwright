@@ -56,7 +56,10 @@ left linked-but-unqueued: the queue is the only place work waits.
 
 - **Battery-green in CI.** Run it locally first: `bash gate-sdk/bin/run-gates.sh`
   for the full battery, then the fixture runners the
-  [README](README.md) lists. A red PR is not reviewed until it is green.
+  [README](README.md) lists — one of which builds and tests the `native/` crate,
+  so a local run wants the whole toolchain roster in
+  [docs/install.md](docs/install.md) §Requirements, `cargo` included. A red PR is
+  not reviewed until it is green.
 - **Fix the tree, never weaken the gate.** A PR that relaxes a gate to pass
   instead of fixing what it caught is the defect, not the fix — this is
   check-gate-tamper's doctrine ([delegation-kit/SPEC.md](delegation-kit/SPEC.md)

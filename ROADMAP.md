@@ -61,6 +61,7 @@ _Nothing is queued under this horizon._
 - **`installer-lifecycle-verbs`** *(adoption)* — update, diff and uninstall, so an install can be managed after init.
 - **`native-gate-binary-port`** *(reliability)* — The gate battery as one native binary: real parsers, no GNU userland.
 - **`companion-toolkit-profile`** *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
+- **`gate-authoring-sdk-surface`** *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.
 
 ### later
 

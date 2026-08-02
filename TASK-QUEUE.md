@@ -1946,6 +1946,24 @@
   `lifecycle-kit/templates/stages/build.md` states the stamp as the "First step"
   and says to commit it on its own. The prescription exists; only enforcement is
   missing.
+  **The mechanism, run rather than observed (folded in 2026-08-02 from the gap
+  inbox; the text above states the symptom, this states the cause).** Both gates
+  are path-coupled in the generated pre-commit hook — the couple set is
+  `TASK-QUEUE.md` and `.workflow/WORKFLOW-STATE.txt` — so a work commit touching
+  only kit sources never runs them at all. They are not lenient about ordering;
+  they do not execute. The stamp commit is the first commit that runs them, and by
+  then the work they were meant to gate is already in history. On the full-battery
+  path they do run, but `check-stage-entry` reads point-in-time state only:
+  assertion C scans the amendment files and stamp set **as they are on disk**, with
+  no read of history, so a stamp that landed last is byte-identical to one that
+  landed first. The consequence generalizes past ordering — **every entry-time
+  assertion, assertion C's demand for a prior audit-stage stamp included, is
+  satisfiable retroactively**, because the gate cannot distinguish "align ran
+  before this build" from "align's stamp exists now". Confirmed empirically at this
+  iteration's build batch 1 (gap-filing, then work, then stamp; battery green
+  throughout). It also opens a **cheaper candidate than the history assertion
+  below**: widen the two gates' couple set so a stage's own output surfaces re-fire
+  them, turning a never-ran gate into a ran-and-lenient one first.
   **Candidate shape to weigh at design:** assert that the commit introducing a
   stage's stamp is not preceded, within the same stage window, by commits
   touching that stage's own output surfaces — decidable from git history, though
@@ -2533,10 +2551,16 @@
   engaged an entry's strongest ground is a session act with no mechanical residue: the
   `close-surface-actually-read` class exactly. Its home is `.workflow/audit-roster.txt`
   as a named class, not one more prose step that drifts.
-  **Why `[design-pending]` — re-examine before promoting.** The original reason is
-  discharged: the edge grammar landed. What remains is whether naming a new
-  `.workflow/audit-roster.txt` class is itself design-bearing. Tag left as found —
-  a queue disposition, not the shipping unit's to rule.
+  **Promotion-ready as of 2026-08-02 at close — no design work remains.** The original
+  reservation (an edge grammar the queue did not declare) was discharged this
+  iteration; the roster above is live with three classes and a declared
+  one-line-per-class format, and the sibling class this entry reasons from is already
+  a member — so adding a class is a populated-surface edit, not a design act; and the
+  entry has zero inbound edges. The deliverable is one roster line naming the
+  survey-engagement class. *Recorded here rather than by untagging:* the lead ruled the
+  marker be dropped, and the oracle refuses it — correctly, since queue-kit/SPEC.md
+  §The icebox tier makes that marker **section membership** carried by every deferred
+  entry alike, so it never discriminated readiness. Readiness is body content.
   **Cost while deferred:** one wrongly-ranked unit set per scope, argued confidently
   from real evidence, detectable only by an operator who remembers the entry. It does
   not rot, but it recurs exactly where being wrong is most expensive — the iteration's
@@ -2654,9 +2678,12 @@
   Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
   reverted the port.
 
-- **gate-authoring-sdk-surface** [design-pending] — `.gate` as the substrate-neutral
-  surface of a gate-authoring SDK. **Operator-surfaced during `native-gate-dispatch-seam`
-  build; filed so the framing outlives the session that saw it.**
+- **gate-authoring-sdk-surface** [design-pending] [roadmap: next/ecosystem] — a gate-authoring SDK.
+  `.gate` as the substrate-neutral surface. **Operator-surfaced during
+  `native-gate-dispatch-seam` build; filed so the framing outlives the session that
+  saw it.** Horizon set 2026-08-02 on the operator's steer: this is ecosystem work
+  on `companion-toolkit-profile`'s rung, not "make our own gates fast and opaque".
+  roadmap-summary: Author a gate in any language behind one substrate-neutral descriptor.
   **The observation:** because the manifest lives outside the implementation, the
   graph, hook, and meta-gate layers never learn what implements a gate. That is not
   a Rust seam that happens to work — it is a **language-agnostic** one. A gate could
@@ -2739,11 +2766,124 @@
   intact from the filing diff. What failed was *signal* — nobody knew to look, and the
   arguments were supplied from memory twice the same day instead. That is evidence for
   the narrowing already applied here, not grounds to re-open the shape.
+  **One candidate mechanism, evaluated at close 2026-08-02 and recorded unproven.**
+  The gate cannot judge loss, but it may be able to detect the *shape of the
+  sanctioned remedy*: a commit that shrinks a deferred entry past some delta while
+  adding no linked entry in the same commit. Two known costs, both real: it needs
+  history access no battery gate has today, and it false-positives exactly where a
+  genuinely answered ground is deleted — which is the case the authorization ruling
+  in queue-kit/SPEC.md §check-queue-entry-budget already governs. Recorded so a
+  later session weighs it rather than re-invents it; it is not a design decision.
   **Cost while deferred:** compression stays silently lossy in practice — the bytes
   survive in git, and the knowledge that they are worth fetching does not.
   Filed 2026-08-02 by scope on operator intake. The operator previously proposed an
   evidence-submission mechanism and it was declined in favour of boxed entries; this
   narrower shape is the ground for revisiting that ruling.
+
+- **read-only-fanout-unenforceable** [design-pending] — prose cannot confine a fork.
+  A stage session's read-only fan-out has **no enforcement backstop**, and the
+  violation is not hypothetical. Verified from this iteration's align journal: four
+  forks were dispatched with prose-only "read-only investigation, no edits"
+  instructions; one ignored it, edited the journal, and made a real unreviewed
+  commit **directly on the shared branch**. The content was later found sound and
+  kept rather than reverted — which is the point: the supervising session's
+  diff-every-agent-commit duty ran *after the fact, on a fait accompli*, instead of
+  gating the landing.
+  **Why prose cannot hold it:** a subagent inherits the full toolset regardless of
+  instruction text, and every agent type available for audit-shaped work carries
+  write tools or at least Bash-to-git. None of the four forks was confined by
+  anything but text a model may silently ignore, and none was worktree-isolated.
+  **The one mechanism that would have prevented it** is `isolation: worktree` on
+  the dispatch: a worktree-isolated agent's commits land on its own branch and
+  index, not the dispatcher's. That is a dispatch-call parameter, so the candidate
+  fix is a **dispatch-shape rule** ("a read-only claim is made by isolation, not by
+  sentence"), not more template prose — the same altitude finding as
+  `dispatched-session-waiting-rule-residency`.
+  **Open at filing, and the reason this is `[design-pending]`:** which SPEC owns
+  the fix. delegation-kit's read-only-fan-out guidance, lifecycle-kit's stage-session
+  dispatch contract, or both — the gap sits exactly on the seam between a stage
+  session's delegation discipline and the single-writer-per-branch invariant that
+  the shared index makes violable.
+  **Cost while deferred:** every read-only fan-out is an honour-system claim, an
+  unreviewed commit can land on the shared branch mid-stage, and the detector is a
+  supervisor who happens to re-read the log. Ships in kits, so it is a **product**
+  defect, not repo housekeeping.
+  Filed 2026-08-02 at close from the gap inbox; observed during this iteration's
+  align stage.
+
+- **install-path-gnu-userland-undeclared** [design-pending] — the installer's own
+  toolchain requirement is unstated, and so is the probe's. docs/install.md
+  §Requirements scopes its GNU-coreutils/gawk declaration to **the battery**, on
+  purpose. But `installer/lib/init.sh` compares versions with GNU `sort -V` on the
+  upgrade path, and `context-kit/lib/toolfloor.sh` uses `sort -V` inside the floor
+  predicate itself. Neither is the battery, so neither is covered.
+  **The sharp edge:** an adopter on a stock BSD/macOS userland can hit a GNU-only
+  flag in the installer *and* in the env-probe that is supposed to tell them
+  whether their box qualifies — the diagnostic fails the same way the thing it
+  diagnoses would, with nothing on the page declaring it.
+  **Why `[design-pending]`:** two live answers with different reach — shim the two
+  call sites (making the install path and the probe genuinely portable, which is
+  the front-door claim's shape) versus widen the page's declaration to cover the
+  install path (cheap, honest, and concedes reach). `bash-portability-floor-costing`
+  closes the *battery-wide* version of this trade; it does not close the narrow
+  installer-and-probe one, which is two call sites rather than twenty-five files.
+  **Cost while deferred:** the install path's real toolchain requirement stays
+  undeclared and the probe's own portability stays unstated — the fail-open class
+  the bash-floor gap already fixed once for the battery, reopened one layer out.
+  Filed 2026-08-02 at close from the gap inbox; found at scope.
+
+- **native-binary-freshness-ungated** [design-pending] — a compiled gate has no
+  freshness oracle. `check-gate-substrate-parity` assertion B diffs the `.gate`
+  descriptor set on disk against the binary's `--list` roster; it is
+  **set-membership only** and never compares the binary's content or mtime against
+  the `.rs` source it is built from. `gate_command` dispatches a `.gate`-declared
+  member straight to the prebuilt binary with no rebuild and no freshness check, so
+  editing a gate's Rust source, skipping the rebuild, and committing runs the
+  descriptor-named gate **against the stale binary** — and it passes on the old
+  implementation. docs/site-architecture.md's generated-projections roster names no
+  entry for the compiled binary, though the repo's derivation-first rule requires
+  every generated projection to be freshness-gated and rostered there.
+  **Severity reduced 2026-08-02, and not closed — the distinction is the point.**
+  The one live port was reverted, so **no gate dispatches to the binary today** and
+  the hole cannot currently affect a commit. It re-arms the moment a second port
+  lands. An entry that reads closed when it was only narrowed is exactly the
+  signal-loss the lossless-compression rule exists to prevent.
+  **Why `[design-pending]`:** the cheap form (mtime against source) is wrong on a
+  fresh clone and on any checkout that reorders timestamps; a content-derived form
+  needs a build stamp the crate does not emit today.
+  **Cost while deferred:** zero while no gate dispatches to the binary; a live
+  vacuous green — a gate reporting clean on code that is not what is committed —
+  from the first commit of the second port onward. CI is unaffected either way
+  (fresh build every run); the exposure is local pre-commit-gated commits only.
+  Filed 2026-08-02 at close from the gap inbox; found during validate.
+
+- **native-gate-meta-layer-reach** [design-pending] — the meta-gates do not reach
+  a ported gate's implementation, in two independent places found by running the
+  battery rather than by reading it.
+  **(1) `check-gate-tamper`'s path roster excludes `native/`,** so a commit editing
+  a ported gate's implementation alongside any gate file is **refused**. Discovered
+  at commit time during `native-gate-dispatch-seam` build: the crate and a gate
+  widening could not land together. Slice 1 sequenced around it — implementation in
+  one commit, descriptor in another — and the conservation table records it, but the
+  constraint gets *worse per port*, because the natural unit "edit the gate's rule
+  and its declaration together" is precisely what the roster forbids. Same gate,
+  second hole: `extract_exemptions()` parses a shell `# exception-list:` array
+  literal and has no implementation-side equivalent.
+  **(2) `check-reads-couples` records coverage as absent rather than providing it.**
+  It refuses (exit 2) on a `.gate` member unless the descriptor carries a
+  `# reads-couples-exempt:` reason. Slice 1's single ported gate was honest here —
+  its one walk was already undecidable and skipped-and-counted in shell, verified by
+  running the pre-port script through the gate — so the port ended no assertion. A
+  second port need not be so lucky, and the exemption is **free-text with no task
+  binding**, which is the shape that accumulates silently.
+  **Why `[design-pending]`:** both want the same ruling — whether a meta-gate reads
+  a substrate-neutral descriptor or learns each substrate — which is
+  `gate-authoring-sdk-surface`'s question seen from the enforcement side. Splitting
+  them before that ruling would answer it twice, differently.
+  **Cost while deferred:** zero today (one reverted port, no live `.gate` dispatch);
+  from the second port on, the natural commit unit is forbidden and a growing pile of
+  free-text exemptions stands in for coverage that was never provided.
+  Filed 2026-08-02 at close from the gap inbox; found by build and by validate.
 
 ## Icebox
 
