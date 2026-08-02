@@ -241,9 +241,20 @@ restatement of the violation. A gate with multiple distinct failure classes
 gives each its own `help:` line. Exit codes: **0** clean, **1** violation,
 **2** harness/usage error.
 
-Enforced by `check-gate-output` (the static half — it asserts each member's
-source carries both a `: clean` emission and a `help:` emission); the `good/`
-fixture is the behavioral half that catches a clean line that never executes.
+Enforced **at runtime, on real output**, by the fixture runner: a `good/` case
+must emit the canonical clean line and a `bad/` case a `help:` line
+(§run-gate-tests owns the mechanism). That is the oracle for every fixtured
+member, on either substrate — a source grep was only ever a proxy for the
+behavior, and it reads nothing at all once a gate's rule is a compiled
+subcommand.
+
+`check-gate-output` keeps the **static** half for the one class the runtime
+assertion cannot reach: a member carrying `# no-fixture:`, which has no
+`good/`/`bad/` case for the runner to execute (§check-gate-fixture-coverage).
+For those the source grep is the only oracle, so it stays. Retiring it outright
+in favour of the runtime check would silently zero that member's
+output-contract coverage — total coverage across the registry is the point, and
+94-of-95 dressed as complete is the failure this split avoids.
 
 ### Fail-closed contract
 

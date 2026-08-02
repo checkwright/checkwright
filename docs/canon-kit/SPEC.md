@@ -904,6 +904,16 @@ second copy no gate reads. `comment-tier-exempt: <reason>` is the honest
 directive for a genuinely-local fact below SPEC altitude that neither tier
 owns.
 
+The governed-source corpus reaches the **implementation of a ported gate**, not
+just shell: `spec_comment_surface_with_templates` (§lib/spec.sh) spans `*.sh`,
+the `*.gate` descriptor, and `*.rs`. This is the load-bearing half of the reader
+partition gate-sdk/SPEC.md §The `# graph:` manifest states — locality-class
+directives bind to a line of implementation and therefore stay there, so the
+tier rule has to follow them across the substrate or go dark exactly where it
+still applies. A descriptor's own lines are directives by construction. Marker
+matching is on the **token**, independent of the comment leader, so `//` and `#`
+carry the same directives and no language earns a quieter standard.
+
 One shape overrides the window: a full-line comment carrying a **restated
 collection total** — the count grammar of §check-manifest-count, over the same
 `CANON_KIT_COUNT_COLLECTIONS` vocabulary — is flagged even where a directive
