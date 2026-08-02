@@ -4,9 +4,4 @@
 
 ---
 
-shipped-roster-parity scope a8d0dd24 2026-08-01
-shipped-roster-parity spec ab8921b4 2026-08-01
-shipped-roster-parity align a711cd27 2026-08-01
-shipped-roster-parity build adc0d41a 2026-08-01
-shipped-roster-parity validate a3600ed6 2026-08-02
-shipped-roster-parity close a9d88ba8 2026-08-02
+— scope a25be0cf 2026-08-02
