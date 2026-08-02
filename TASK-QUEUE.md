@@ -1314,20 +1314,26 @@
   entry's: a bare cardinal qualifying a roster is a different scanner from a
   membership check.
   **Third instance, 2026-08-02, and it widens the class past READMEs:** `CLAUDE.md`
-  §This repo enumerates the generated projections ("that hook, the graph artifact,
-  the enforcement map, the footprint and value rollup, the docs mirror") while
-  docs/site-architecture.md §Generated projections is the declared roster — and the
-  copy is already short by one, omitting `ROADMAP.md`, which the Housekeeping bullet
-  below then has to re-attach by saying it is rostered "like every other generated
-  projection". So the class reaches the **always-loaded** surface, where a stale
-  enumeration is paid by every session rather than by a reader who opens a README.
-  Left unfixed on purpose: correcting the copy is the Enforcement-first shape this
-  entry already names, and a `generated-projection` enum set is exactly the kind
-  the survey above must cost first.
-  **Cost while deferred:** low and non-rotting, but it is paid once per close —
-  the staleness read is the only detector, so every README roster is held by a
-  session's attention rather than by a gate. The third instance raises that: one
-  of the drifting rosters now sits on the surface every session loads.
+  §This repo enumerates the generated projections while docs/site-architecture.md
+  §Generated projections is the declared roster. So the class reaches the
+  **always-loaded** surface, where a stale enumeration is paid by every session
+  rather than by a reader who opens a README. Left unfixed on purpose: correcting
+  the copy is the Enforcement-first shape this entry already names, and a
+  `generated-projection` enum set is exactly the kind the survey above must cost
+  first.
+  **Re-read at the next close (2026-08-02) — the copy is short by two classes,
+  and the second one is a drift event rather than an omission.** Beyond
+  `ROADMAP.md`, which the Housekeeping bullet below re-attaches by hand, the
+  enumeration omits the **trajectory projection** (`docs/evidence-data.md`)
+  outright: it entered the site-architecture roster at `5cfc477`, while CLAUDE.md's
+  paragraph was last touched at `965d208`, which predates it. The copy has
+  therefore already drifted by the exact mechanism this entry predicts — a roster
+  gaining a member the copy never heard about — with no oracle between the two
+  events. That is the recurrence the enum-set survey was waiting on.
+  **Cost while deferred:** low and non-rotting, but paid once per close — the
+  staleness read is the only detector, so every roster is held by a session's
+  attention rather than by a gate. Raised by the third instance: one of the
+  drifting rosters sits on the surface every session loads, and has now drifted.
   Surfaced 2026-07-31 by close's top-level staleness review, which found the first
   two; filed rather than fixed because the enum-set survey is the work.
 
@@ -2254,6 +2260,151 @@
   someone decides to record it.
   Surfaced 2026-08-02 at close, in the same intake pass, as the third and last
   of the growth half's unfiled items.
+
+- **lead-line-parser-conformance** [design-pending] — eight independent holders
+  re-implement queue-kit's bullet lead-line predicate, coupled only by SPEC
+  prose, and no mechanism catches divergence. The census and the residue
+  accounting are owned by gate-sdk/SPEC.md §check-gate-exemption-tasks and are
+  deliberately not restated here; this entry owns the *mechanism*, which that
+  section explicitly leaves to a different unit.
+  **The re-implement-and-cite-from-both-ends rule is NOT being re-litigated.**
+  queue-kit/SPEC.md §The queue format and the gate-sdk section above both state
+  it, for two different reasons (a cross-kit cycle for drift-kit, a layering
+  inversion for gate-sdk), and that ruling stands. What is missing is any oracle
+  over agreement.
+  **The hard constraint on any candidate, and the reason a naive one reds on
+  wanted behavior:** the holders diverge on the section **span** deliberately —
+  drift-kit's `kpi-deferred-age` resets on an unknown heading and so excludes the
+  icebox tier, `check-gate-exemption-tasks` does not reset and so includes it,
+  and **both behaviors are wanted**. So a conformance mechanism must scope to the
+  **line predicate alone**.
+  **Second divergence axis, verified at this close and not in the original
+  filing:** `bin/queue-index.sh`'s default index-mode walk matches lead lines with
+  a column-0 `/^-[[:space:]]/` anchor rather than the tolerant
+  `^[[:space:]]*-[[:space:]]+` one, so indented sub-task bullets are invisible to
+  it. That is *sanctioned* — the gate-sdk section rules the indent level the
+  reader's choice and the predicate not — but it means a conformance mechanism
+  must also decide which level it holds, or it reds on a holder exercising a
+  sanctioned narrowing. A whole-holder text-identity assertion is therefore
+  already known to be wrong.
+  **Candidate shapes, none ruled:** a conformance test asserting every holder
+  returns the same slug set for one fixture queue; a gate asserting the line
+  predicate's text is identical across declared holders; or accept the residue and
+  merely roster the holders so the next format change is findable. The third is
+  also the form that would retire the hand-maintained census in the gate-sdk
+  section, which is the Derivation-first half of the prize.
+  **Why `[design-pending]`:** the holders span four kits with a layering ban
+  between two of them, so where the shared fixture or the declared-holder roster
+  *lives* is a cross-kit ruling before it is a script.
+  **Cost while deferred:** a format change costs all eight edits and endangers
+  the few that build sets — a set builder with a wrong predicate fails silently,
+  in wrong membership, which is `check-gate-exemption-tasks`' own shipped defect
+  class. Two of the holders are inline scans no function-name grep finds, which
+  is how the census was twice under-stated before a whole-tree survey ran.
+  Non-rotting while the format holds still; the exposure is entirely at the next
+  format change.
+  Filed 2026-08-02 at spec by the causal-completeness reader survey for
+  `gate-exemption-live-slug-derivation`, explicitly scoped out of that amendment;
+  promoted at close from the gap inbox, its census re-verified against the tree
+  rather than re-derived from the filing.
+
+- **unqualified-section-citation-liveness** [design-pending] — a bare `(§Heading)`
+  citation in governed prose — the same-file form, with no `<path>.md` prefix —
+  resolves to nothing and no gate reds. The two citation gates each miss it from
+  a different side: `check-md-refs` resolves markdown *links* only, and
+  `check-spec-pointer`'s prose extractor requires a `<path>.md §` prefix before it
+  will look (the `match(s, /…\.md[[:space:]]*§/)` guard), so the qualified form is
+  held and the unqualified one is not.
+  **Instance, fixed at this close:** gate-sdk/SPEC.md cited `§check-fixture-pair`
+  as the authority for "a registered gate still owes its `good/`+`bad/` pair"; no
+  such section exists — the gate is `check-gate-fixture-coverage`, named correctly
+  seven lines later in the same paragraph. A reader chasing the load-bearing half
+  of that sentence landed nowhere.
+  **The class is large and currently unverified:** a mechanical sweep of the kit
+  SPECs plus `CLAUDE.md` and `DOCTRINE.md` counted 171 parenthesized unqualified
+  citations, against which a crude same-file resolver flagged 11 — one genuine
+  (the instance above) and the rest artifacts of the crude predicate. Those
+  artifacts are the design: they are the false-positive classes a real gate must
+  answer for.
+  **Why `[design-pending]` — three named false-positive classes, all observed in
+  that sweep.** (1) **Cross-file antecedent:** `site-kit/SPEC.md` cites
+  `(§run-gates)`, a gate-sdk section, and gate-sdk/SPEC.md cites
+  `(§check-spec-pointer)`, a canon-kit one — bare, with the owning path named
+  earlier in the paragraph. `check-spec-pointer` already implements a blank-line
+  paragraph join for the qualified form, so the antecedent rule has an
+  implementation to extend rather than invent, but whether a bare citation should
+  bind to the nearest prior path or be required to qualify itself is the ruling
+  this entry owes. (2) **Prose tail:** `(§Bundled KPIs / §Layout and
+  configuration)`, `(§run-gates owns the contract)` — where the heading name ends
+  and prose resumes is not syntactic. (3) **Possessive and inflected forms:**
+  `(§check-stage-entry's trigger-gated-stage calibration)`.
+  **Shape:** an assertion inside `check-spec-pointer` rather than a new gate — it
+  already owns heading resolution in both exact and prefix modes, already walks
+  the manifest set, and already carries the paragraph join. Sibling to
+  `prose-filename-citation-liveness`, which is the same family (a citation form
+  falling between the two gates) from the other end: that one is a path with no
+  heading, this one a heading with no path. A promoting scope should cost them
+  together and may find one predicate covers both.
+  **Cost while deferred:** 171 live unqualified citations across the governed doc
+  set, held by nothing. Each merged amendment and each renamed section can strand
+  one, and the only detector is a reader who follows the pointer — which is how
+  the instance above was found, one iteration after the paragraph was rewritten.
+  Debt: an assertion added to an existing gate and its fixture arm; adds no
+  governed name — the new-names litmus does not fire, which is what separates it
+  from `prose-filename-citation-liveness`' shipped-path variant.
+  Filed 2026-08-02 at spec to the gap inbox as the dangling pointer; promoted at
+  close as the gap-generalization that inline fix owed, with the coverage gap
+  verified against both gates' source and the class sized by sweep.
+
+- **dispatched-session-waiting-rule-residency** [design-pending] — a dispatched
+  stage session ends its turn to await a completion notification, orphaning the
+  work it started, because the in-turn condition-waiting rule is not operative at
+  the tier the session actually loads. Observed 2026-08-02: the validate session
+  started `run-validate.sh` in the background and ended its turn to wait,
+  orphaning the run — the failure
+  delegation-kit/templates/agent-execution.md names under **Background +
+  notification, never poll**. No harm landed (the lead waited on the orphan's
+  exit condition), but the surviving orphan is the case that protocol calls the
+  worse one: it keeps mutating shared files while the next actor moves against
+  them.
+  **Premise corrected at close against the file's history — the original filing
+  said the rule "is not resident", and that is not what happened.**
+  `.claude/agents/stage-session.md` has carried a **Your turn end is your session
+  end** bullet since 2026-08-01 (`7dd914a`), one iteration before the incident. So
+  a bullet naming the rule *was* resident and the failure happened anyway. What
+  that bullet does is **point** — it names the two rules and cites
+  agent-execution.md for "both rules and their reasoning", which the session must
+  open to get the operative instruction. The defect is therefore about **pointer
+  versus operative statement at the always-loaded tier**, not about absence, and
+  a promoting scope that fixes the absence will fix nothing.
+  **Why `[design-pending]`, and why the obvious fix is not obviously right.**
+  Stating the rule inline restates delegation-kit's text in a consumer's agent
+  definition, which is the duplication Content-tiering forbids — but
+  Load-trigger residency cuts the other way, since agent-execution.md is reached
+  only by a skill trigger while the agent definition is the one surface a
+  dispatched session always loads. Which rule governs here is a doctrine ruling,
+  and if the answer is "restate", delegation-kit/SPEC.md should sanction the
+  restatement rather than leaving a consumer to fork the prose.
+  **The enforcement-first half, and its honest limit.** The current mitigation is
+  that the lead restates the rule in every dispatch prompt — an unenforced
+  convention of exactly the kind this repo converts to mechanism. But no gate can
+  read a session's choice to end a turn: it leaves no tracked artifact, the same
+  reason `validate-verb-collision-and-check-routing` records that its prose fix
+  installs no oracle. The nearest buildable oracle is the lock sentinel under
+  `validate-producer-liveness-unobservable`, which detects the *consequence* (a
+  producer still running at the next stage's entry) rather than the act. Those two
+  entries and this one are one incident class read from three angles; a promoting
+  scope should read all three before costing any.
+  **Cost while deferred:** a silent failure mode with a live trigger — the
+  tiering that routes validate and align to a cheaper model puts non-residence
+  exactly where long oracle batteries are the whole work class. Paid entirely by
+  the next session, which fights a file changing underneath it. Bounded: it needs
+  a backgrounded producer, and the lead's dispatch-prompt restatement suppresses
+  it whenever the lead remembers.
+  Debt: a paragraph in one agent definition plus a SPEC sanction permitting it;
+  no new governed name.
+  Filed 2026-08-02 at validate to the gap inbox; promoted at close, its premise
+  corrected against the agent definition's git history before filing.
 
 ## Icebox
 

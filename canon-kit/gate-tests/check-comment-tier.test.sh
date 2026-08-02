@@ -10,8 +10,9 @@
 # run-gate-tests passes to neither. The good/bad pair covers the shell classifier
 # (directive run, exempt, heredoc skip) and the count override's mainline; these
 # cover the mechanism a consumer activates by widening the surface, plus the
-# paragraph-join wrap the pair's single-substring expect.txt cannot pin —
-# which line a wrapped total reports at, and that the exempt valve reaches it.
+# paragraph-join wrap — which line a wrapped total reports at, and that the
+# exempt valve reaches it. Those two are here for the same config reason as the
+# rest: each pins CANON_KIT_COMMENT_SURFACE to its own one-file roster.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail

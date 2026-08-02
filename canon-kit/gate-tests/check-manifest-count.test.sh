@@ -7,9 +7,11 @@
 # fixture. The good/bad pair covers the cardinal+noun shapes (adjacent, wedged,
 # noun-then-range, wrapped) and the mechanical exemptions (threshold, per,
 # partition, partitive, inline-code, fence, per-site marker); these cases cover
-# the knobs, plus the paragraph-join edges the pair's expect.txt substring
-# cannot pin: which physical line a wrapped span reports at, that the join never
-# double-reports a same-line hit, and that a paragraph break blocks the join.
+# the knobs, plus the paragraph-join edges. Two reasons hold those here, and
+# neither is expect.txt's old single-substring limit (lines are a conjunction
+# now): they need their own scan root, which run-gate-tests gives no fixture
+# beyond the one pair, and "the join never double-reports a same-line hit" is a
+# negative — expect.txt asserts presence only, so absence has no pair spelling.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail

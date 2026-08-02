@@ -874,7 +874,7 @@ kit (`gate_kit_roots` keys on `checks/` **or** `smoke/` — §lib/gate.sh). A
 unit-test-only dir prints `0 pairs` beside its unit count, so the shape reads as
 deliberate rather than silent. This widens what a *tests dir* may contain, never
 what a *gate* may omit: a registered gate still owes its `good/`+`bad/` pair
-(§check-fixture-pair). Rehoming such a test in the owning kit's own runner is
+(§check-gate-fixture-coverage). Rehoming such a test in the owning kit's own runner is
 ruled out — `check-test-hermetic`'s assertion A enumerates
 `<kit-root>/gate-tests/*.test.sh` only, so a test outside that directory silently
 escapes the bootstrap-or-marker obligation that is the whole reason this lane
