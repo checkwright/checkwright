@@ -67,12 +67,41 @@ gates_list_members() {
     grep -Ev '^[[:space:]]*(#|$)' "$1" || true
 }
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *declaration* path: the file whose text carries the `# graph:` manifest and the `# spec:`/`# assertion` directives. Dirs are tried consumer-first and `.sh` beats `.gate` within a dir, so a consumer shadowing a ported gate with its own shell script still wins. A dir carrying both spellings for one name is ambiguous dispatch, caught by check-gate-substrate-parity assertion A rather than silently ordered here.
 gate_resolve() {
     local g="$1" d
     shift
     for d in "$@"; do
         if [[ -f "$d/$g.sh" ]]; then
             printf '%s\n' "$d/$g.sh"
+            return 0
+        fi
+        if [[ -f "$d/$g.gate" ]]; then
+            printf '%s\n' "$d/$g.gate"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one. Emits one argv element per line. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing.
+gate_command() {
+    local g="$1" d bin
+    shift
+    for d in "$@"; do
+        if [[ -f "$d/$g.sh" ]]; then
+            printf '%s\n' "$d/$g.sh"
+            return 0
+        fi
+        if [[ -f "$d/$g.gate" ]]; then
+            bin="${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+            if [[ ! -x "$bin" ]]; then
+                printf 'gate_command: %s dispatches to the native binary, but %s is ' "$g" "$bin" >&2
+                printf 'absent or not executable — the gate could not run; treating as ' >&2
+                printf 'failure (not clean). Build it: cargo build --release --manifest-path native/Cargo.toml\n' >&2
+                exit 2
+            fi
+            printf '%s\n%s\n' "$bin" "$g"
             return 0
         fi
     done

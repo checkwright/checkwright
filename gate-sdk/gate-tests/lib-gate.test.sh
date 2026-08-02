@@ -70,9 +70,49 @@ got="$(gate_resolve check-one "$sandbox/a" "$sandbox/b")"
 gate_resolve check-missing "$sandbox/a" "$sandbox/b" >/dev/null \
     && { echo "  FAIL: gate_resolve found a nonexistent gate"; fails=$((fails + 1)); }
 
+# --- declaration path vs invocation argv (the .gate dispatch seam) ------------
+: >"$sandbox/b/check-ported.gate"
+got="$(gate_resolve check-ported "$sandbox/a" "$sandbox/b")"
+[[ "$got" == "$sandbox/b/check-ported.gate" ]] \
+    || { echo "  FAIL: gate_resolve did not find a .gate declaration (got '$got')"; fails=$((fails + 1)); }
+
+# .sh beats .gate within a dir — the shadowing property the registry contract rests on
+: >"$sandbox/b/check-both.sh"; : >"$sandbox/b/check-both.gate"
+got="$(gate_resolve check-both "$sandbox/a" "$sandbox/b")"
+[[ "$got" == "$sandbox/b/check-both.sh" ]] \
+    || { echo "  FAIL: gate_resolve let .gate win inside a dir (got '$got')"; fails=$((fails + 1)); }
+
+# an earlier dir's .gate still beats a later dir's .sh — dir order is the outer loop
+: >"$sandbox/a/check-order.gate"; : >"$sandbox/b/check-order.sh"
+got="$(gate_resolve check-order "$sandbox/a" "$sandbox/b")"
+[[ "$got" == "$sandbox/a/check-order.gate" ]] \
+    || { echo "  FAIL: gate_resolve broke consumer-first dir order (got '$got')"; fails=$((fails + 1)); }
+
+# gate_command: a shell gate yields its one-element argv
+got="$(gate_command check-one "$sandbox/a" "$sandbox/b" | paste -sd' ' -)"
+[[ "$got" == "$sandbox/b/check-one.sh" ]] \
+    || { echo "  FAIL: gate_command shell argv was '$got'"; fails=$((fails + 1)); }
+
+# gate_command: a .gate member yields <binary> <name> when the binary is executable
+printf '#!/bin/sh\n' > "$sandbox/fakebin"; chmod +x "$sandbox/fakebin"
+got="$(GATE_SDK_NATIVE_BIN="$sandbox/fakebin" gate_command check-ported "$sandbox/a" "$sandbox/b" | paste -sd' ' -)"
+[[ "$got" == "$sandbox/fakebin check-ported" ]] \
+    || { echo "  FAIL: gate_command native argv was '$got'"; fails=$((fails + 1)); }
+
+# fail-closed: an absent binary is exit 2, never a skip and never a pass
+( GATE_SDK_NATIVE_BIN="$sandbox/nope" gate_command check-ported "$sandbox/a" "$sandbox/b" >/dev/null 2>&1 )
+[[ "$?" -eq 2 ]] \
+    || { echo "  FAIL: gate_command did not exit 2 on an absent native binary"; fails=$((fails + 1)); }
+
+# fail-closed: present but non-executable is the same harness error
+: >"$sandbox/notexec"; chmod -x "$sandbox/notexec"
+( GATE_SDK_NATIVE_BIN="$sandbox/notexec" gate_command check-ported "$sandbox/a" "$sandbox/b" >/dev/null 2>&1 )
+[[ "$?" -eq 2 ]] \
+    || { echo "  FAIL: gate_command did not exit 2 on a non-executable native binary"; fails=$((fails + 1)); }
+
 if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune; registry + resolution)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune; registry + resolution; .gate declaration/argv split + dispatch fail-closed)"
 exit 0

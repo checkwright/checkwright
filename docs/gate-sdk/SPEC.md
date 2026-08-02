@@ -22,9 +22,15 @@ override with `GATE_SDK_GATES_DIR`) holding:
 
 - `gates.list` — the registry: one gate name per line (`#` comments and blank
   lines ignored). A listed name resolves to `<gates-dir>/<name>.sh` first, then
-  each vendored kit's `checks/<name>.sh` — so any kit's shipped gates are
+  `<gates-dir>/<name>.gate`, then each vendored kit's `checks/<name>.sh` and
+  `checks/<name>.gate` — `.sh` beating `.gate` **within** a dir, dirs tried
+  consumer-first. So any kit's shipped gates are
   registered by name alone, and a consumer can shadow one by dropping a
-  same-named file in its own gates dir. The kit set defaults to gate-sdk plus
+  same-named file in its own gates dir — including shadowing a ported gate with
+  its own shell script. The `.gate` spelling is the non-executable declaration of
+  a gate whose implementation is a binary subcommand (§The `# graph:` manifest);
+  resolution returns it as a declaration path, while execution resolves
+  separately through `gate_command` (§lib/gate.sh). The kit set defaults to gate-sdk plus
   every sibling directory holding a `checks/` **or** a `smoke/` (a vendored
   Checkwright kit — a gateless kit is discovered by its `smoke/` alone);
   override with `GATE_SDK_KIT_DIRS` (space-separated kit roots).
@@ -96,7 +102,13 @@ the path segments whose subtrees `check-exec-bit` exempts — see there), `GATE_
 monitor-marker scan root — see §enforcement-map), and
 `GATE_SDK_LINT_EXTRA_DIRS` (default empty; space-separated directories whose
 direct `*.sh` members join `check-shellcheck`'s derived scan set — the seam for
-a shipped script that sits under no kit root — see §check-shellcheck). Paths are
+a shipped script that sits under no kit root — see §check-shellcheck), and
+`GATE_SDK_NATIVE_BIN` (default `native/target/release/checkwright-gates`; the
+multi-call binary `gate_command` dispatches a `.gate`-declared member to — see
+§lib/gate.sh). Its default is a **stable relative path** deliberately: the
+generated pre-commit hook persists the emitted argv, and a machine-specific
+absolute path baked into a tracked hook would make `check-graph`'s byte-freshness
+comparison machine-dependent. Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
@@ -680,6 +692,34 @@ reader needs outlive the refactor that renames a helper:
   so adding a kit enrols its fixtures with no hand-list to drift.
 - `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor the
   couples globs share.
+
+**Resolution splits into a declaration path and an invocation argv.** A gate's
+implementation may live in a compiled subcommand while its declaration stays a
+tracked text file, so the two jobs the one resolver used to serve stop having the
+same answer:
+
+- `gate_resolve` returns the **declaration path** — the file whose text carries
+  the `# graph:` manifest and the `# spec:`/`# assertion` directives. Within each
+  search dir it tries `<name>.sh` first, then `<name>.gate` (§The `# graph:`
+  manifest names the descriptor). Dir order stays consumer-first and `.sh` beats
+  `.gate` **within a dir**, which is what preserves registry-plus-shadowing: a
+  consumer shadowing a kit's ported gate with its own shell script still wins.
+  Every text reader is unchanged by the second spelling, because
+  `gate_manifest_field` greps the manifest out of whatever path it is handed and
+  has never required the file to be shell. A dir carrying both spellings for one
+  name is ambiguous dispatch and is red (§check-gate-substrate-parity assertion
+  A), never resolved by ordering.
+- `gate_command` returns the **invocation argv**, one element per line: the
+  one-element `<dir>/<name>.sh`, or the two-element `<binary> <name>`. Its
+  callers are the execution sites — §run-gates, §run-gate-tests, and
+  §gen-pre-commit, which does not execute the argv but *emits* it into the hook.
+
+The binary's path is the knob `GATE_SDK_NATIVE_BIN` (§Layout and configuration),
+never a literal. An **absent or non-executable** binary when a registry member
+dispatches to it is a harness error — **exit 2, never a skip and never a pass**.
+This is §Fail-closed contract applied to dispatch: the failure a skip would
+create is a battery that silently stops running a gate whenever a build is
+missing, which is the worst available outcome.
 
 `fail_closed` must be passed *only* a status that genuinely means the check
 could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is
