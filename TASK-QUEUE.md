@@ -2631,10 +2631,28 @@
   **Boundary with `gate-payload-disclosure-ruling`, stated so neither sprawls:** that
   entry rules what a compiled gate *discloses* to a consumer; this one rules how it
   *arrives* there. Neither answers the other, and the parent needs both.
-  **Cost while deferred:** a first cohort could land against an install model that
-  cannot ship it, discovered at the release boundary rather than at design time.
-  Nothing is incorrect meanwhile.
+  **This is now a hard prerequisite for any second port, and the cost is measured.**
+  Slice 1 ported one gate, hit exactly this, and **reverted the port**. Mechanism, run
+  not reasoned: a `.gate` descriptor lives under a kit root and therefore vendors;
+  `native/` ships no `checks/` or `smoke/`, so `gate_kit_roots()` never includes it and
+  no consumer ever receives the crate. `gate_command` fail-closes exit 2 on the absent
+  binary, and that exit is a *dispatch-harness* error — it kills the **calling battery**,
+  not just its member. A freshly vendored consumer's pre-commit battery died on
+  invocation; `demo`, `consumer_smoke` and `agents_md_smoke` all reproduced it.
+  So the entry's own line — "the install model is what the port breaks first" — is
+  confirmed, and its old "Nothing is incorrect meanwhile" is retired: something was
+  incorrect, for the length of one iteration. gate-sdk/SPEC.md §Porting a gate to the
+  binary substrate states it as **criterion 5** — a gate is portable only if its
+  vendored form remains runnable — and that criterion is unsatisfiable for any gate in
+  a vendoring kit until this entry rules. A second port is blocked on it, not parallel
+  to it.
+  **Cost while deferred:** the seam sits built and unusable — every retained piece
+  (crate, descriptor spelling, resolution split, conservation contract, parity gate)
+  waits on an install model, and the reference-only implementation is the only thing
+  keeping the crate's tests from asserting over nothing.
   Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
+  Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
+  reverted the port.
 
 - **gate-authoring-sdk-surface** [design-pending] — `.gate` as the substrate-neutral
   surface of a gate-authoring SDK. **Operator-surfaced during `native-gate-dispatch-seam`

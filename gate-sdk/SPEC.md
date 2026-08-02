@@ -559,29 +559,113 @@ exists to catch, and a subcommand not named here still reds.
 |---|---|
 | `check-action-pinning` | **Reference-only.** Its live port was reverted (§Porting a gate to the binary substrate); the gate is shell again and no descriptor dispatches here. The module stays because retiring it would leave the crate with no gate implementation at all, and `cargo test` plus the `native_crate` evidence suite would go green over nothing — the vacuity this whole section exists to refuse. It is the crate's only executed proof that a gate's rule survives the substrate. |
 
+## Porting a gate to the binary substrate
+
+Slice 1 ported one gate end to end and then **reverted the port**, keeping
+everything else it built. This section is the record of what that cost bought,
+written here rather than left in a commit message because a later reader
+deciding whether to port will read the spec and would otherwise re-attempt it
+into the same wall.
+
+### The port-candidate criteria
+
+A gate is a candidate only if **all six** hold. The first four were stated at
+design time; the last two were paid for, and each is named with what it cost.
+
+1. **Registered** in `gates.list` — an unregistered gate proves no dispatch.
+2. **Carries a fixture pair** — parity between substrates is proved by running
+   both against the same cases, never asserted.
+3. **`tier=precommit`** — it lands in the generated hook, so a green
+   `check-graph` after the port is end-to-end proof the manifest survived the
+   substrate change.
+4. **Not itself substrate-sensitive** — porting a gate that audits gate sources
+   makes the parity proof self-referential.
+5. **Its vendored form stays runnable.** *Measured, not reasoned.* A `.gate`
+   descriptor under a vendoring kit root reaches every consumer; the binary does
+   not, because `native/` ships no `checks/` or `smoke/` and that predicate is
+   what makes a root directory a kit. `gate_command` is fail-closed on an absent
+   binary and its exit 2 is a **dispatch-harness** error, so it takes down the
+   *calling battery*, not just its own member. A freshly vendored consumer's
+   pre-commit battery therefore died on invocation. This criterion is
+   unsatisfiable for any gate in a vendoring kit until
+   `native-gate-vendoring-model` rules how a compiled gate arrives — which is
+   why that entry is now a hard prerequisite for a second port rather than a
+   parallel concern.
+6. **Its corpus derivation is self-contained**, unless the duplication the port
+   creates is machine-held. Found at re-selection, one step earlier than
+   criterion 5: `check-spec-fence-balance`, which the amendment named, derives
+   its corpus from a config-driven shell derivation and is not `mode=staged`, so
+   a ported form must re-implement that derivation with nothing holding the two
+   copies together. `check-action-pinning` was selected instead.
+
+### What the reverted port established
+
+Not nothing, and worth separating from what it broke:
+
+- Both substrates were **byte-identical** on the fixture pair, on the live tree,
+  and on an edge-case tree (uppercase hex, a 39-hex near miss, quoted refs,
+  comment leaders, a non-matching dash). The seam carries a gate's rule without
+  changing its verdict.
+- The manifest survived the substrate change: the generated hook, the graph
+  artifact, and every declaration-reading meta-gate kept working against a
+  descriptor.
+- The conservation table was **exercised rather than imagined** — each
+  disposition ran against a real ported member.
+- Two relaxations that a port makes tempting were found only because a live
+  instance existed: `check-reads-couples` acquired an undocumented
+  descriptor-level opt-out (§check-reads-couples), and
+  `check-gate-substrate-parity` assertion B turned out to go dark at zero
+  descriptors (§check-gate-substrate-parity). Both are fixed; neither would have
+  been visible without the port, and neither survives it.
+
+### What is retained, and what a second port must do first
+
+Retained: the crate at `native/`, the descriptor spelling and its
+specification, the `gate_resolve` / `gate_command` split, the conservation
+contract and its disposition table, `check-gate-substrate-parity` with all four
+assertions, the fixture-runner's substrate-blind dispatch, the toolchain floor
+pin, and the CI crate build/clippy/test legs. The crate keeps its
+`check-action-pinning` implementation as a `reference-only` disposition, so
+`cargo test` and the `native_crate` evidence suite assert against a real gate
+rule rather than going green over an empty crate.
+
+**The seam was the deliverable; the live port was the demonstration.** A second
+port needs criterion 5 satisfiable first — `native-gate-vendoring-model` — and
+needs `check-reads-couples`' binary-side equivalent to exist rather than be
+opted out of. Both are prerequisites, not follow-ups.
+
 ## What the dispatch seam does not settle
 
 Recorded because a deferral nobody wrote down is indistinguishable from a
 question nobody asked — and this entry has already lost worked arguments to
 compression once.
 
-**Dogfooding is settled in one direction and open in the other.** A registered
-member dispatching to a compiled subcommand at `tier=precommit` puts
-`gate_command` on the pre-commit path, and `gate_command` is fail-closed on an
-absent binary. So this repo **does** build and run the binary from source at
-commit time, and `cargo` is a hard commit-time requirement — the toolchain floor
-records it (context-kit/SPEC.md §bin/env-probe). Stating that plainly matters,
-because the earlier framing that the seam "defers whether this repo runs built
-artifacts at all" is not what the seam does: porting one gate decides it. What
-remains genuinely open is the *other* end — whether this repo, or a consumer,
-ever runs a **prebuilt or released** artifact rather than one built from source.
-No compiled artifact is committed, and nothing here assumes one ever will be.
+**Dogfooding is open again, and the revert is what reopened it.** While the port
+was live this read: a registered member dispatching to a compiled subcommand at
+`tier=precommit` puts `gate_command` on the pre-commit path, `gate_command` is
+fail-closed on an absent binary, so this repo built and ran the binary at commit
+time and `cargo` was a hard commit-time requirement. With no `.gate` member left,
+none of that holds: **no gate dispatches to the binary, and `cargo` is not
+required to commit.** What the repo still does is weaker and worth stating
+exactly — `check-gate-substrate-parity` reads the binary's `--list` roster *when
+it is built*, and CI builds, clippies and tests the crate. The toolchain floor
+pin stays for those (context-kit/SPEC.md §bin/env-probe); it is a build-and-CI
+floor now, not a commit-time one. `native-gate-dogfood-ruling` is therefore live
+rather than decided, and the lesson that outlasts both readings is that
+*porting one gate decided it* — the dogfood question is settled by the first
+live port, whenever that lands, and not by argument beforehand.
 
-**The consumer payload is untouched and deliberately reachable either way.**
-Keeping the manifest as tracked text is what earns that: hook generation runs
-consumer-side, so the seam works identically whichever way the payload question
-rules. Vendoring and the extensibility model are likewise unchanged — this slice
-ships no artifact and changes nothing about how a kit installs.
+**The consumer payload is untouched. Vendoring is not — that claim was false.**
+Keeping the manifest as tracked text does earn the payload half: hook generation
+runs consumer-side, so the seam works identically whichever way the payload
+question rules. The vendoring half said "this slice ships no artifact and
+changes nothing about how a kit installs", and shipping no artifact is exactly
+the problem: the descriptor vendors and the binary does not, so the slice
+changed how a kit installs by making one kit's vendored form unrunnable
+(§Porting a gate to the binary substrate, criterion 5). The extensibility model
+is genuinely unchanged. This is the correction the revert paid for, and
+`native-gate-vendoring-model`'s cost is measured rather than hypothetical
+because of it.
 
 **Opacity is not claimed.** This repo builds from source and the implementation
 sits readable in-tree, so the benefit delivered here is the seam and the
