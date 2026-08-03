@@ -145,9 +145,33 @@
   iteration, stamps no cursor, and may span or precede one — so where it sits relative to
   the state machine is the open question, and `trajectory-ruling-record` owns the surface
   it would exit onto.
+  **Operator direction 2026-08-03 — the dispatch contract, and none of it is automatic.**
+  *The delegation protocol passes by citation, not inheritance.* `/consult` cites
+  `delegation-kit/templates/agent-execution.md` the way CLAUDE.md §Agent execution and the
+  stage-session config already do; stating it matters because the failure mode is copying
+  the protocol into the skill and creating a second content tier that drifts.
+  *Model selection is a sharper hazard here than for a stage session.* An unselected
+  dispatch inherits the dispatcher's tier rather than defaulting cheap, and a consult
+  session is judgment-tier by nature while most of its dispatches are read-only research —
+  so an unselected fan-out buys the most expensive tier for the cheapest work. The skill
+  discharges this in its own standing dispatch policy.
+  *The journal does not inherit, and that is the finding.* agent-execution states that a
+  top-level session has no journal in this contract and discharges by committing, which it
+  is by construction able to do. A consult session is top-level, its commit discharge fires
+  only at exit, and this entry's own grounds are a consultation that died without landing.
+  The carve-out's premise also fails: able-to-commit is untrue for any session running
+  alongside a committing agent, which is the normal condition during an active iteration.
+  **Measured, not argued:** this iteration's lead wrote scratch notes as an ad-hoc journal
+  on three separate occasions, each time because a live stage session held the shared index.
+  **The added deliverable is a decision** — widen the top-level carve-out to grant a journal
+  to any session that cannot currently commit (smaller, and it reaches the lead role too),
+  or give `/consult` its own in-flight surface. The entry must also say what a consult
+  session does when its exit commit is blocked by a live agent, else the exit requirement is
+  unsatisfiable exactly when the iteration is busiest.
   **Cost while deferred:** a strategy session's output stays a transcript, and the next one
   costs what this one cost — a relay, a reconstruction, and a stale instruction surface.
-  Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake.
+  Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake. Operator
+  direction on the dispatch and journal contract landed 2026-08-03 at close.
 
 - **lossless-compression-codification** [design-pending] — the standing rule has no surface.
   **Operator-directed filing 2026-08-03.** Land it in queue-kit/SPEC.md beside
@@ -2985,6 +3009,357 @@
   the one tree that could measure it — the before-numbers exist and quietly stop
   being comparable to any after-numbers, with no surface saying so.
   Filed 2026-08-02 at close by the `workflow-surface-extension` roster audit.
+
+- **fork-dispatch-prohibition** [design-pending] — state the never-a-fork rule where
+  dispatchers read it, and arm it at the dispatch call.
+  A context-inheriting fork dispatched by the align stage as a read-only audit completed
+  the whole stage instead, commits included: a fork reads its parent's job as its own.
+  Verified 2026-08-03 — a never-a-fork rule exists at `lifecycle-kit/templates/lead.md`
+  but reaches neither the dispatcher nor this failure. It binds the lead's intent-oracle
+  dispatch, is grounded in model-tier inheritance rather than write-scope, and sits in a
+  template no stage session reads, while delegation-kit says nothing about forks at all
+  — its agent-type bullet only selects *toward* types that commit to review work, which
+  a fork does not disclaim.
+  **The ruled home, operator direction 2026-08-03.** The prohibition is stated in
+  `delegation-kit/templates/agent-execution.md` — the surface every delegating session
+  loads via CLAUDE.md §Agent execution — **per dispatching context, each with its own
+  grounds**, under one unifying ground: *a fork is wrong exactly when the dispatch's
+  purpose is that the child does less than the parent* (narrower authority for a
+  read-only audit, narrower cost for the tier-split oracle), because a fork inherits full
+  context and the dispatcher's model and so defeats whichever narrowing motivated the
+  dispatch. It stays correct where the child does the same job at the same authority and
+  only parallelism or isolation is wanted. The lead template's sentence then shrinks to a
+  citation, with its tier-economics grounds as one named instance.
+  **Enforcement is mechanizable and not by a gate** — a dispatch never enters the tracked
+  tree — but by a PreToolUse hook on the `Agent` matcher, the channel
+  `.claude/settings.json` already runs for `scripts/agent-budget-guard.sh`: it receives
+  the subagent type in the same payload and re-arms at every depth, which is exactly
+  where this fork slipped through. The block can be unconditional — no sanctioned fork
+  use exists in this doctrine.
+  **Deliverable:** the per-context statement in the agent-execution template, the
+  lead-template shrink to a citation, and the hook arm.
+  **Why `[design-pending]`:** two costs to design against. `.claude/settings.json` is
+  pinned by `check-settings-pins`, so arming the hook is a pinned-surface edit; and the
+  kit-shaped form ships as a delegation-kit template with a consumer binding rather than
+  a repo-local script, else the doctrine ships without its enforcement.
+  **Cost while deferred:** every dispatch that exists to narrow a child's authority can be
+  answered by a fork that ignores the narrowing, and the failure is invisible — the fork
+  reports success on work it was never authorized to do.
+  Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
+
+- **meta-gate-conservation-record-reach** [design-pending] — the conservation record
+  under-describes what `check-gate-tamper` refuses, on both halves.
+  `gate-sdk/SPEC.md` §Meta-gate conservation records the `native/`-excluded roster as
+  refusing "a commit editing a gate's Rust implementation alongside its descriptor",
+  mitigated by "neither binds slice 1". Verified 2026-08-03 by the
+  `native-gate-meta-layer-reach` build, which the gate blocked.
+  **Both halves under-describe it.** The refused co-staging was the crate alongside a gate
+  *script*, not a descriptor — the rule is every gate file, and the recorded wording names
+  only the descriptor case a reader is least likely to hit. And it now binds *routinely*
+  rather than not at all: every crate-plus-gate change of the shape this iteration opened
+  must land as two commits.
+  **Deliverable:** the wording correction, plus a decision on whether the two-commit split
+  is the intended contract or a roster gap.
+  **Why `[design-pending]`:** the decision is the entry. The split is arguably the right
+  outcome — a meta-gate that let an implementation and its own guard land together would
+  be conserving nothing — but that is not what the record predicts, so correcting the
+  prose without ruling the contract only relocates the surprise.
+  **Cost while deferred:** a reader planning a port budgets against a record that
+  understates both the rule's reach and its frequency, and meets the two-commit tax at the
+  pre-commit hook instead.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 1.
+
+- **couples-dynamic-root-resolution** [design-pending] — the skipped-and-counted bucket is
+  where trigger-drift hides, and its dominant subset is decidable.
+  Verified 2026-08-03: `check-reads-couples`' root resolver handles a bare quoted literal,
+  a KIT-prefixed token and a REPO_ROOT-prefixed token, and nothing else — so a walk root
+  held in a *variable* falls to skipped and is never checked.
+  **The live instance is this repo's own gate.** `check-gate-substrate-parity` assertion D
+  walks the crate source recursively, but the gate's `couples=` never named it, so an
+  implementation edit that plants a manifest-class annotation does not re-fire the gate at
+  pre-commit. That hole stood for an unknown period with no couples token to re-fire it —
+  the skipped bucket doing nothing. Assertion E's `couples=` widening fixed the same defect
+  class for the crate root; assertion E's new kit-root walk lands in the same bucket. The
+  instance fix is one manifest token pair mirroring what `check-reads-couples` already
+  couples, and it is deliberately **not** landed bare: enforcement-first binds the instance
+  fix to the check that catches the class, so both land in this unit.
+  **The decidable subset, with no false-positive surface:** an assignment whose value is a
+  parameter expansion with a literal default — the universal kit idiom CLAUDE.md
+  §Conventions declares. Following one such assignment in the same file would have caught
+  assertion D.
+  **Deliverable:** that resolver extension, the assertion-D couples fix as its pinning
+  instance, and a named cadence for the residue.
+  **Why `[design-pending]`:** the residue is the open design. A truly dynamic root stays
+  undecidable, so per the enforcement-first false-positive carve-out it needs a named
+  cadence rather than a bare counter — and today the count is printed and nothing reviews
+  it. Whether that cadence is a roster class, a close step or a threshold is unruled.
+  **Cost while deferred:** every gate whose walk root is a variable is uncoupled and
+  silently under-triggered, and the repo's own substrate-parity gate is one of them — a
+  green battery that never re-ran the assertion.
+  Filed 2026-08-03 at close from the gap inbox, merging the assertion-D instance into its
+  class; both found by build batch 2.
+
+- **amendment-landing-citation-assertions** [design-pending] — nothing validates an
+  amendment's landing citations, and align fixed five instances bare.
+  Align corrected five amendment-citation defects with no mechanism named and none landed
+  — the enforcement-first stop signal (doctrine-kit/DOCTRINE.md: a green instance fix is
+  the stop signal to ask what check should have caught it). `check-amendment-queue` is the
+  only registered amendment gate and asserts the bidirectional queue-amendment rule and
+  spec-readiness only.
+  **The class splits by decidability, and two thirds of it is gateable at zero FP.**
+  *(1)* Every delta the amendment marks as landing carries an "Existing sections updated"
+  entry — decidable from the amendment file alone, and it catches four of the five
+  (vendoring deltas 3 and 9, meta-layer deltas 1 and 2). *(2)* Every citation's named file
+  exists and contains the named heading — the same shape as the repo's existing `spec:`
+  pointer resolution. *(3)* **Not gateable, high FP:** whether a delta prescribes an edit
+  its target actually needs. Vendoring delta 11 prescribed a cargo-bullet treatment for
+  `installer/README.md` §Requirements, which carries no such bullet at all. Per the
+  false-positive carve-out this becomes a stated manual duty whose cadence event is the
+  align stage — which already performs this tree-verification by hand.
+  Also in the class: `gate-payload-disclosure-ruling`'s crate-path knob was credited to
+  `native-gate-vendoring-model`, which declares no such knob.
+  **Deliverable:** assertions (1) and (2) inside `check-amendment-queue` — extending beats
+  adding, and its `couples=` already reach `TASK-QUEUE.md` and the amendment glob — plus
+  (3) written into the align stage template as a named duty.
+  **Why `[design-pending]`:** (3)'s placement is the open call. A duty stated in a stage
+  template is only as good as the stage that reads it, and this iteration's own evidence
+  (`enforcement-first-load-trigger`) is that a stage template is not a reliable carrier.
+  **Cost while deferred:** an amendment can claim a delta landed, name a file that does not
+  carry it, and merge green — after which the claim is deleted with the amendment and
+  nothing records that it was false.
+  Filed 2026-08-03 at close from the gap inbox; found by align.
+
+- **amendment-owner-position-citation** [design-pending] — prose may cite a merged
+  amendment as *settled history*, never as a live *owner*; today it does both.
+  Amendments are deleted on merge (canon-kit/SPEC.md §Merging an amendment), so a citation
+  naming one in owner position dangles the moment it merges — by construction, not by
+  oversight. This is the inverse direction of the class
+  `amendment-landing-citation-assertions` covers (amendment-to-spec landing citations) and
+  of `amendment-deletion-content-completeness` (content that fails to land): here the
+  canonical side is the one that goes stale.
+  **Re-verified 2026-08-03 at close against the tree, and half the filing was already
+  false.** The `gate-sdk/SPEC.md` instances the base bullet named are **gone** — build
+  batch 5 repointed them to `TRAJECTORY.md` when the ruling record landed, and the slug now
+  has zero occurrences in that file. The live residue is entirely inside `TASK-QUEUE.md`
+  deferred bodies, and the sweep found **five**, not the two validate filed: three more
+  naming `gate-payload-disclosure-ruling` and one naming `native-gate-meta-layer-reach`,
+  all phrased in present tense against slugs that are now bare `## Done` lines.
+  `check-spec-pointer` catches none — it matches path-form only, and all five are slug-form.
+  **The design question is exactly where those five differ from two that are fine.** The
+  tag algebra's unresolved-token rule *explicitly* sanctions naming landed work: "entries
+  legitimately name a closed defect class, a shipped contract, a settled ruling, and that
+  citation is valuable prose no gate may punish." Two live citations do it correctly — they
+  say a merged slug *holds* a decision, past tense, settled. The five defective ones say a
+  merged slug *rules* something, present tense, as though the reader could go read it. Both
+  forms sit in the tree today, which is the calibration set.
+  **Deliverable:** repoint the five to `TRAJECTORY.md`, then extend `check-amendment-queue`
+  (its `couples=` already reach `TASK-QUEUE.md` and the amendment glob) with an
+  owner-position assertion. Structural removal first, gate second.
+  **Why `[design-pending]`:** owner position needs a decidable spelling that separates those
+  two forms, and tense is not mechanically decidable. The tractable proxy is the
+  `§`-heading form and the amendment path form; whether that catches enough of the
+  present-tense class to be worth its false-negative surface is the open call, and getting
+  it wrong permissively punishes the prose the tag algebra protects.
+  **Cost while deferred:** five false statements stand in the queue, each pointing a future
+  scope at a content-free Done line, and the next merged amendment adds more for free.
+  Filed 2026-08-03 at close from the gap inbox, merging the validate-filed instances into
+  the base class and re-verifying both against the tree; found by build batch 1 and
+  validate, corrected and widened at close.
+
+- **payload-disclosure-claim-owner** [design-pending] — two governed install surfaces now
+  disagree about what a consumer receives.
+  `installer/README.md` §init still claims that what governs your tree afterwards is
+  committed source you can read — true today and false at the first ported gate, since
+  `gate-sdk/SPEC.md` §Consumer payload rules that a compiled gate's implementation source
+  does not ship. Build batch 1 corrected the sibling claim on `docs/install.md` (adding
+  §What a gate discloses, because it qualifies the opening claim on that page) and left
+  this one.
+  **Why it was left, and it is not an oversight.** It belongs to no delta of
+  `native-gate-vendoring-model` — delta 3 owned only §init's zero-build-step claim, and
+  widening it to the disclosure claim would have edited an already-merged amendment's
+  envelope.
+  **Defect class:** a disclosure claim about the vendored payload restated across governed
+  install surfaces with one owner and no oracle.
+  **Deliverable, structural rather than a new gate:** canon-kit's `check-install-claim`
+  already gives the primary-install-path claim one declared owner and holds every governed
+  install section to it. The same shape extends to a payload-disclosure claim with
+  §Consumer payload as the owner. The §init correction and the `check-install-claim`
+  extension land in one unit.
+  **Why `[design-pending]`:** the claim's *tense* is the open call. No gate is ported today,
+  so the readable-source claim is true of every tree that exists; the correction has to say
+  something true both now and after the first port without reading as a warning about a
+  thing that has not happened.
+  **Cost while deferred:** the two install surfaces a prospective adopter reads contradict
+  each other on the one property the vendoring model exists to rule, and the contradiction
+  becomes a false statement rather than an incomplete one at the first port.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 3.
+
+- **amendment-done-move-assertions** [design-pending] — a task can be marked done with its
+  amendment left undeleted on disk, and the battery stays green.
+  The amendment-merge Done-move contract is stated twice and gated nowhere, and the hole is
+  exactly the one `check-amendment-queue`'s bidirectional rule exists to close.
+  canon-kit/SPEC.md §Merging an amendment requires the completed entry to move to `## Done`
+  *dropping* its spec-pointer tag; queue-kit/SPEC.md §The queue format makes a Done entry a
+  bare slug line. Verified 2026-08-03 against the tree: nothing checks either.
+  **Why it falls through.** `check-amendment-queue`'s awk classifies only the feature,
+  active and deferred sections, so `## Done` falls to the unclassified bucket — while its
+  every-amendment-has-an-entry assertion collects spec-pointer refs with a whole-file grep,
+  so a tag left on a Done entry still *satisfies* that half. queue-kit's
+  `check-queue-sections`, `check-tag-lead-line`, `check-task-conservation` and
+  `check-queue-hygiene` all assert other things. Net effect: the silent-amendment-survival
+  failure the bidirectional rule was built against.
+  **Defect class:** a state-machine transition whose completion contract is prose-only on
+  the terminal side.
+  **Deliverable, gateable at zero FP inside an existing gate:** a done-section arm in
+  `check-amendment-queue` — a configured done-section name beside the active-sections knob,
+  then (i) no spec-pointer tag on a done entry and (ii) done entries are bare slug lines. The
+  `couples=` already reach `TASK-QUEUE.md` and the amendment glob, so no new gate and no new
+  trigger set; extending beats adding.
+  **Why `[design-pending]`:** the done-section name is a second consumer knob for a section
+  canon-kit does not otherwise know about, and whether canon-kit should learn queue-kit's
+  section vocabulary at all — rather than queue-kit asserting the Done shape and canon-kit
+  asserting only the tag — is the layering call.
+  **Cost while deferred:** zero while every merge is hand-checked; the failure mode is
+  silent, so its first instance is also its discovery.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 3 while establishing
+  which dispositions of a partially-landed amendment the oracles actually permit.
+
+- **partitive-exemption-line-scope** [design-pending] — `check-manifest-count` is stricter
+  than its own spec, and the gap is one line break wide.
+  Verified 2026-08-03 by build batch 4: prose reading "appeared in 57 of" / "the 96 checks
+  counted that day" reds as a restated collection total purely because the line broke
+  between the partitive marker and the cardinal — the same sentence reflowed onto one line
+  passes.
+  **Root cause, decidable and narrow.** The partitive exemption in `canon-kit/lib/spec.sh`
+  tests a *same-line* prefix regex against the text preceding the cardinal, so a partitive
+  marker on the previous line is invisible to it — while canon-kit/SPEC.md
+  §check-manifest-count states the exemption as a property of the *sentence*, a partitive
+  marker on either side of the match, with no line-scoped qualifier. The gate being
+  stricter than its own spec is the defect, not the reverse.
+  **The cost is paid quietly and then paid wrongly.** It is invisible until it fires, and
+  the remedy the help line offers is the exemption tag — which would bless a non-violation
+  permanently and corrupt the exemption's meaning for every later reader. A low-FP-contract
+  violation that converts into a corrupted exemption set.
+  **Deliverable, and the machinery already exists:** `check-manifest-count.sh` already
+  carries a wrapped-paragraph hook beside the line hook, so the paragraph-joined text is
+  available at the match site. Test the partitive prefix against the joined paragraph
+  rather than the raw line, or carry a one-line lookback for the prefix window. The fix
+  belongs in `canon-kit/lib/spec.sh` where both gates read it — `check-prose-enum` shares
+  the same adapter and inherits the same defect — not in either gate. Plus a `good/`
+  fixture case pinning a wrapped partitive, the regression the current pair does not carry.
+  **Why `[design-pending]`:** paragraph-joined and one-line-lookback are not the same
+  contract. Joining widens the exemption to any partitive anywhere in the paragraph, a real
+  false-negative surface; the lookback is narrower and arbitrary. The spec says sentence,
+  and neither implements a sentence.
+  **Cost while deferred:** every author whose partitive happens to wrap pays a red gate and
+  is offered an exemption tag as the remedy, so each occurrence risks permanently corrupting
+  the exemption set rather than merely costing a reflow.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 4.
+
+- **root-doc-roster-registration-parity** [design-pending] — a new tracked root doc must
+  join three rosters and only one of them is enforced.
+  Verified 2026-08-03 while landing `TRAJECTORY.md`: `scripts/root-allowlist.list`
+  (`check-root-tiering` reds on any tracked root entry not covered),
+  `scripts/core-files.list` (`check-core-files` only reds listed-but-missing, never
+  missing-but-should-be-listed), and the manifest-files array in `scripts/canon-config.sh`
+  (nothing reds on a non-member). The allowlist has exactly one reader,
+  `check-root-tiering`, and no gate couples allowlist membership to either of the other two.
+  **Net effect:** a root doc that joins only the allowlist is battery-green while being
+  unpinned against silent deletion *and* outside the doc-gate corpus — so its links,
+  commands, spec pointers, manifest counts and temporal narration are all ungoverned. The
+  failure is invisible and grows with every reader the doc acquires.
+  **Defect class:** a governed surface whose registration is split across N rosters with
+  enforcement on only one.
+  **A fourth axis, added at close from the same landing.** A root doc also owes an inbound
+  orientation link from a landing page, and nothing enforces that either: `TRAJECTORY.md`
+  was reachable only from a SPEC deep-link and the always-loaded housekeeping roster until
+  close added the README pointer by hand. Same shape, same invisibility, and it is the
+  axis a *reader* actually pays for.
+  **Deliverable, an extension rather than a new gate:** `check-root-tiering` already reads
+  the allowlist and its subject already *is* the root set, so add an assertion that every
+  allowlisted tracked root markdown file is also a `core-files.list` line, a manifest
+  member, and the target of at least one link from a declared landing-page set. Its
+  `couples=` must widen to `scripts/core-files.list` and `scripts/canon-config.sh`, or the
+  assertion will not re-fire when either roster changes.
+  **Why `[design-pending]`:** it is not zero-FP without a stated exemption set, checked
+  against today's tree rather than assumed. `TASK-QUEUE.md` is core-files-pinned but
+  deliberately outside the manifest set (queue-kit owns its corpus), and the `SPEC-*.md`
+  amendments are deliberately in neither (transient tier). So the deliverable is the
+  assertion *plus* a two-member exemption declaration, and where that declaration lives —
+  gate literal, consumer config, or a per-file tag — is the open call and touches the
+  provenance seam.
+  **Cost while deferred:** every root doc added from here forward is one forgotten roster
+  line away from being ungoverned, silently, with the battery green.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 5.
+
+- **enforcement-first-load-trigger** [design-pending] — enforcement-first has no load
+  trigger anywhere in the lifecycle, which is why findings this iteration landed bare and
+  were triaged retroactively.
+  Verified 2026-08-03: zero occurrences of the rule's name anywhere in
+  `lifecycle-kit/templates/` — no stage skill, no lead template, carries it.
+  **It exists in exactly two tiers and neither fires at the moment of discovery.** The
+  always-loaded CLAUDE.md line is a *summary* — the fix and the gate land in one unit —
+  that omits every part of the procedure which changes behaviour: the green-instance-fix
+  stop signal, the structural-first ladder, the false-positive carve-out, the named-cadence
+  requirement. The full procedure in `doctrine-kit/DOCTRINE.md` is load-triggered with
+  nothing in the lifecycle loading it. Load-trigger residency says a rule is resident only
+  when no stage, skill or tool loads it; this one is neither resident in useful form nor
+  triggered, so it fires only when a session already remembers it.
+  **Evidence it is placement and not context pressure:** the align stage — a fresh session
+  with a narrow brief and its stage skill loaded — fixed five instances bare, identically
+  to a saturated routing-tier lead.
+  **Two mechanisms, ranked.** *(1) Structural and cheapest* — put the triage step in the
+  stage ritual where findings are discovered, so it costs a paragraph rather than a
+  dispatch. *(2) Mechanical and self-applying* — `lifecycle-kit/bin/file-gap.sh` takes free
+  text, so a bullet saying only that something is broken passes; requiring the three fields
+  the doctrine asks for (defect class; mechanism, or the structural removal that obviates
+  it; decidability call with a cadence when un-gateable) makes triage unskippable, because
+  filing is the one step every finding already passes through. A dedicated triage subagent
+  is the third option and fits a batch at close or a class needing a tree survey — but the
+  decidability call is the load-bearing judgment, and getting it wrong permissively produces
+  exactly the noisy gate the doctrine warns erodes the battery's authority, so it does not
+  ride the cheapest tier.
+  **Why `[design-pending]`:** (2) is a refusal on a capture affordance whose design premise
+  is that refusing capture pushes a finding back into session context — the deferred-capture
+  antipattern the inbox exists to prevent. Reconciling a required-fields check with that
+  premise is unruled.
+  **Cost while deferred:** the class is self-demonstrating — this iteration's gap inbox is
+  the evidence, and the bullets carrying a named mechanism carry it because some session
+  happened to remember a rule nothing loaded.
+  Filed 2026-08-03 at close from the gap inbox; found by the lead.
+
+- **self-revert-reminder-expectation** [design-pending] — a dispatched agent that reverts
+  its own edits gets a harness reminder indistinguishable from an injected instruction.
+  Observed 2026-08-03: a read-only audit sweep verifying the crate's unit-test
+  falsifiability mutated source, reverted it, and received a note saying the file was
+  modified by the user or a linter, that the change was intentional, that it should not
+  revert it, and that it should not tell the user — so it reported a suspected prompt
+  injection. The lead received the identical message twice in the same session for mundane
+  causes (a gap-inbox append landing under it; a build batch sweeping its working-tree edit
+  into a commit), which is what identifies it as genuine harness behaviour rather than an
+  attack.
+  **The hazard is not the false alarm; it is the true-belief case.** Falsifiability testing
+  *requires* mutating source and reverting it, so this fires every time — and an agent that
+  obeys leaves its mutation in the tree while reporting success. A broken crate behind a
+  green report.
+  **Two mechanisms, ranked.** *(1) Structural* — a falsifiability check runs against a
+  scratch copy rather than the tracked tree, so no revert is ever needed and the reminder
+  never fires. *(2) Stated* — a standing line in
+  `delegation-kit/templates/agent-execution.md` telling a dispatched agent that this
+  specific reminder is expected after a self-revert and does not countermand its brief;
+  cheap, but it does not remove the surface. Not gateable: nothing about it enters the
+  tracked tree.
+  **Related to `fork-dispatch-prohibition`** — both are cases where a dispatched agent's
+  authority is narrower than what some in-context text invites it to do.
+  **Why `[design-pending]`:** (1) is the real fix and it is not free — a scratch-copy
+  falsifiability harness has to reproduce enough of the build to make the mutation
+  meaningful, and whether that lives in the crate's own test tooling or in the gate-test
+  runner is unruled. (2) alone teaches an agent to discount a class of harness message,
+  which is a cost worth naming before paying.
+  **Cost while deferred:** every falsifiability check dispatched to an agent is one obedient
+  reading away from silently leaving a mutation in the tree behind a green report.
+  Filed 2026-08-03 at close from the gap inbox; observed by the lead across three
+  occurrences.
 
 ## Icebox
 
