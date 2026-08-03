@@ -12,6 +12,101 @@
 
 ## New Features
 
+- **native-artifact-publish-path** [spec: SPEC-artifact-publish-path.md] [roadmap: now/reliability]
+  roadmap-summary: Build and publish the gate binary per target, with a published digest.
+  The publish side of the seam `native-gate-vendoring-model` ruled. That amendment merged
+  and is gone, so the model is carried here rather than cited; the rulings this entry
+  inherits and may not re-litigate are TRAJECTORY.md's.
+  **The ruled model.** *A tracked target roster with one owner and exactly two readers* —
+  the release workflow reads it to know what to build, the installer reads it to know what
+  to look for. No second spelling: a hand-maintained platform list inside a workflow file
+  is the maintained-roster anti-pattern derivation-first refuses. A target added to the
+  roster and not built fails the release, which is the correct place for that failure.
+  *An artifact class in `scripts/pack-installer.sh` beside its kit roots* — the gate
+  binary, built once per declared target by the release and placed in the payload under its
+  target name. Never produced from a working tree and never tracked, so no local build can
+  substitute for it.
+  *One payload carrying every declared target, not one payload per target.* Ruled on the
+  numbers: the installed footprint is one binary either way, since the installer writes only
+  the matching target, so the difference is download size alone and is bounded by the
+  roster — while the per-target shape multiplies the publish path, the digest set and the
+  attestation surface by the roster size. **Revisit trigger, a measurement rather than a
+  taste:** when download size becomes an adoption barrier — the roster growing past what
+  `platform-support-ci-matrix` commits to, or one target's binary ceasing to be small.
+  *A published per-target digest beside each artifact.* The one new external contract the
+  model creates, with a named reader at a named transition on both sides:
+  `native-artifact-install-path`'s pre-write verification, and `doctor`'s re-verification
+  through the lock record.
+  **Surfaces it still owes:** gate-sdk/SPEC.md §Layout and configuration (the roster
+  declaration and any knob the selection takes) and `RELEASING.md` (the runbook gains the
+  matrix, the per-target artifacts and the digest emission).
+  **The size is measured, not guessed.** `.github/workflows/publish.yml` has no build
+  matrix, no OS-specific runner and no compiled artifact anywhere — `pack` runs on one
+  runner and one platform-agnostic tarball reaches both transports. Every piece above is
+  new, and none is a tweak to something already there.
+  **Split out 2026-08-03 by operator ruling** — this iteration lands the model plus only
+  what is exercisable today, and nothing artifact-side is: no kit carries a `.gate` member
+  and the iteration's envelope forbids adding one, so this would be built against zero
+  instances.
+  **Why it is design-pending:** the roster's spelling is a contract between a workflow and
+  an installer, and the digest's publication shape decides what
+  `tarball-build-attestation` can later strengthen without a migration. Neither is settled
+  by the vendoring ruling, which fixes the model and deliberately not the wire.
+  **Cost while deferred:** zero today, and it is the hard prerequisite the moment a second
+  port is wanted — the ruled install model cannot place an artifact nothing produces.
+  Filed 2026-08-03 by spec on the operator's publish/consume split; the ruled model
+  relocated into it by build at the amendment's merge.
+
+- **native-artifact-install-path** [spec: SPEC-artifact-install-path.md]
+  — place and verify the artifact.
+  The consume side of the same seam. `native-gate-vendoring-model` merged and is gone, so
+  the ruled model is carried here; the rulings it inherits are TRAJECTORY.md's.
+  **The ruled model.** *Platform resolution, derived and never stored.* The installer
+  resolves the host to a target name and selects the matching artifact — the irreducible
+  interpreter surface, since the binary cannot select itself. The resolution stays a local:
+  a stored copy is a second source for a fact the host answers, stale the first time a tree
+  moves between machines.
+  *Pre-write digest verification.* The installer computes the digest of what it is about to
+  write and refuses on a mismatch — at that step, not after recording a bad hash, because a
+  consumer who cannot read the gate has nothing else standing between them and a
+  substituted binary. It is the one place the model adds a requirement rather than removing
+  one, and it is added because opacity is a goal.
+  *An `artifact` entry in `checkwright.lock`, the schema's first named class.* The lock is
+  one flat `files` map, path to content hash, with no class discriminator; the
+  vendored/generated split is a write-time behavior (`claim()`'s hash-guard applies to
+  vendored paths only) rather than something the schema names. The binary is neither, so it
+  joins as its own entry carrying the target name and the digest and nothing else — those
+  two are what its two readers read: `installer-lifecycle-verbs`' uninstall removes exactly
+  what was written, and `doctor` re-verifies the binary in place.
+  *Omit and declare, triggered by no artifact for this platform.* The install still
+  succeeds — it must not fail on something the adopter did not choose. The affected
+  members' descriptors are not written and the members are not seeded into the consumer's
+  `gates.list`; each is recorded there as `# omitted: <name> substrate-unavailable`, a
+  comment line `gates_list_members` already strips from the live set. `run-gates.sh` prints
+  the count and remedy as a **separate** line beside its summary — separate because
+  `run-consumer-smoke.sh` greps `All N gates passed` verbatim — and `doctor` reports it
+  against the platform that caused it.
+  **Surfaces it still owes:** gate-sdk/SPEC.md §Consumer smoke, §run-gates and
+  §upgrade-smoke (the artifact must not read as determinism drift), and
+  `installer/README.md` §The manifest.
+  **A finding that shapes it, verified 2026-08-03:** no platform-triple derivation exists
+  in the tree. `context-kit/lib/toolfloor.sh` does no OS or architecture logic at all, and
+  `context-kit/bin/env-probe.sh`'s single `OS:` field is an unparsed `uname -s -r -m`
+  string rendered for a human to read. That field is **not** the producer — promoting a
+  display string to a machine-consumed selector is how a contract nobody declared comes
+  into being.
+  **Blocked rather than merely later:** nothing exists to select or verify until artifacts
+  and digests do, so not even a fixture reaches it without inventing the blocker's roster.
+  **Why it is design-pending:** omit-and-declare's honesty degrades as the ported set
+  grows — one gate missing at first, the whole battery on an unsupported platform later —
+  so the target roster is a support contract rather than a build convenience, and
+  `platform-support-ci-matrix` owns which platforms it names. Never a green battery over a
+  silently smaller roster.
+  **Cost while deferred:** zero today; from the first published artifact onward it is what
+  stands between a consumer and an unverified binary.
+  Filed 2026-08-03 by spec, the consume half of the operator's split; the model relocated
+  into it by build at the amendment's merge.
+
 ## Technical Debt
 
 - **install-path-gnu-userland-undeclared** — the installer's own
@@ -192,101 +287,6 @@
   battery run.
 
 ## Deferred
-
-- **native-artifact-publish-path** [design-pending] [roadmap: now/reliability] — build and publish.
-  roadmap-summary: Build and publish the gate binary per target, with a published digest.
-  The publish side of the seam `native-gate-vendoring-model` ruled. That amendment merged
-  and is gone, so the model is carried here rather than cited; the rulings this entry
-  inherits and may not re-litigate are TRAJECTORY.md's.
-  **The ruled model.** *A tracked target roster with one owner and exactly two readers* —
-  the release workflow reads it to know what to build, the installer reads it to know what
-  to look for. No second spelling: a hand-maintained platform list inside a workflow file
-  is the maintained-roster anti-pattern derivation-first refuses. A target added to the
-  roster and not built fails the release, which is the correct place for that failure.
-  *An artifact class in `scripts/pack-installer.sh` beside its kit roots* — the gate
-  binary, built once per declared target by the release and placed in the payload under its
-  target name. Never produced from a working tree and never tracked, so no local build can
-  substitute for it.
-  *One payload carrying every declared target, not one payload per target.* Ruled on the
-  numbers: the installed footprint is one binary either way, since the installer writes only
-  the matching target, so the difference is download size alone and is bounded by the
-  roster — while the per-target shape multiplies the publish path, the digest set and the
-  attestation surface by the roster size. **Revisit trigger, a measurement rather than a
-  taste:** when download size becomes an adoption barrier — the roster growing past what
-  `platform-support-ci-matrix` commits to, or one target's binary ceasing to be small.
-  *A published per-target digest beside each artifact.* The one new external contract the
-  model creates, with a named reader at a named transition on both sides:
-  `native-artifact-install-path`'s pre-write verification, and `doctor`'s re-verification
-  through the lock record.
-  **Surfaces it still owes:** gate-sdk/SPEC.md §Layout and configuration (the roster
-  declaration and any knob the selection takes) and `RELEASING.md` (the runbook gains the
-  matrix, the per-target artifacts and the digest emission).
-  **The size is measured, not guessed.** `.github/workflows/publish.yml` has no build
-  matrix, no OS-specific runner and no compiled artifact anywhere — `pack` runs on one
-  runner and one platform-agnostic tarball reaches both transports. Every piece above is
-  new, and none is a tweak to something already there.
-  **Split out 2026-08-03 by operator ruling** — this iteration lands the model plus only
-  what is exercisable today, and nothing artifact-side is: no kit carries a `.gate` member
-  and the iteration's envelope forbids adding one, so this would be built against zero
-  instances.
-  **Why it is design-pending:** the roster's spelling is a contract between a workflow and
-  an installer, and the digest's publication shape decides what
-  `tarball-build-attestation` can later strengthen without a migration. Neither is settled
-  by the vendoring ruling, which fixes the model and deliberately not the wire.
-  **Cost while deferred:** zero today, and it is the hard prerequisite the moment a second
-  port is wanted — the ruled install model cannot place an artifact nothing produces.
-  Filed 2026-08-03 by spec on the operator's publish/consume split; the ruled model
-  relocated into it by build at the amendment's merge.
-
-- **native-artifact-install-path** [design-pending] [blocked-by: native-artifact-publish-path]
-  — place and verify the artifact.
-  The consume side of the same seam. `native-gate-vendoring-model` merged and is gone, so
-  the ruled model is carried here; the rulings it inherits are TRAJECTORY.md's.
-  **The ruled model.** *Platform resolution, derived and never stored.* The installer
-  resolves the host to a target name and selects the matching artifact — the irreducible
-  interpreter surface, since the binary cannot select itself. The resolution stays a local:
-  a stored copy is a second source for a fact the host answers, stale the first time a tree
-  moves between machines.
-  *Pre-write digest verification.* The installer computes the digest of what it is about to
-  write and refuses on a mismatch — at that step, not after recording a bad hash, because a
-  consumer who cannot read the gate has nothing else standing between them and a
-  substituted binary. It is the one place the model adds a requirement rather than removing
-  one, and it is added because opacity is a goal.
-  *An `artifact` entry in `checkwright.lock`, the schema's first named class.* The lock is
-  one flat `files` map, path to content hash, with no class discriminator; the
-  vendored/generated split is a write-time behavior (`claim()`'s hash-guard applies to
-  vendored paths only) rather than something the schema names. The binary is neither, so it
-  joins as its own entry carrying the target name and the digest and nothing else — those
-  two are what its two readers read: `installer-lifecycle-verbs`' uninstall removes exactly
-  what was written, and `doctor` re-verifies the binary in place.
-  *Omit and declare, triggered by no artifact for this platform.* The install still
-  succeeds — it must not fail on something the adopter did not choose. The affected
-  members' descriptors are not written and the members are not seeded into the consumer's
-  `gates.list`; each is recorded there as `# omitted: <name> substrate-unavailable`, a
-  comment line `gates_list_members` already strips from the live set. `run-gates.sh` prints
-  the count and remedy as a **separate** line beside its summary — separate because
-  `run-consumer-smoke.sh` greps `All N gates passed` verbatim — and `doctor` reports it
-  against the platform that caused it.
-  **Surfaces it still owes:** gate-sdk/SPEC.md §Consumer smoke, §run-gates and
-  §upgrade-smoke (the artifact must not read as determinism drift), and
-  `installer/README.md` §The manifest.
-  **A finding that shapes it, verified 2026-08-03:** no platform-triple derivation exists
-  in the tree. `context-kit/lib/toolfloor.sh` does no OS or architecture logic at all, and
-  `context-kit/bin/env-probe.sh`'s single `OS:` field is an unparsed `uname -s -r -m`
-  string rendered for a human to read. That field is **not** the producer — promoting a
-  display string to a machine-consumed selector is how a contract nobody declared comes
-  into being.
-  **Blocked rather than merely later:** nothing exists to select or verify until artifacts
-  and digests do, so not even a fixture reaches it without inventing the blocker's roster.
-  **Why it is design-pending:** omit-and-declare's honesty degrades as the ported set
-  grows — one gate missing at first, the whole battery on an unsupported platform later —
-  so the target roster is a support contract rather than a build convenience, and
-  `platform-support-ci-matrix` owns which platforms it names. Never a green battery over a
-  silently smaller roster.
-  **Cost while deferred:** zero today; from the first published artifact onward it is what
-  stands between a consumer and an unverified binary.
-  Filed 2026-08-03 by spec, the consume half of the operator's split; the model relocated
-  into it by build at the amendment's merge.
 
 - **stage-session-ruling-class** [design-pending] — reversing a ruling is operator-class.
   **Operator-directed filing 2026-08-03.** Add to the escalate-versus-decide roster in
