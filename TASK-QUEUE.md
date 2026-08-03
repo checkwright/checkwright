@@ -134,6 +134,17 @@
   `bash-portability-floor-costing` closes the *battery-wide* version of this trade;
   it does not close the narrow installer-and-probe one, which is two call sites
   rather than twenty-five files.
+  **Collides with `native-artifact-install-path`, verified at align 2026-08-03.**
+  That amendment's own docs/install.md §Requirements delta — the install path's
+  digest-tool requirement, `sha256sum` **or** `shasum` — lands in the same
+  paragraph this entry's `sort -V` widening must land in: the "some requirements
+  belong to an install path rather than to the battery" paragraph, not the
+  battery's toolchain roster. Same page, same section, same iteration; the
+  amendment already names the collision and states the rule (whichever lands
+  second states both requirements or reverts the first). Build must not draft
+  these as two independent diffs against a stale copy of the paragraph: land both
+  requirement statements in one rewrite, in the same commit or in immediately
+  consecutive ones, each reading the paragraph as the other left it.
   **Cost while deferred:** the install path's real toolchain requirement stays
   undeclared and the probe's own portability stays unstated — the fail-open class
   the bash-floor gap already fixed once for the battery, reopened one layer out.

@@ -233,9 +233,9 @@ through the existing config seam (`init.sh`:152-187).
 
 **Ordering is load-bearing**, and the existing order already serves it: the
 config seam is written at `:152-187`, before `gen-pre-commit.sh --write` at
-`:206`. The hook's `run_gate` lines come from `gate_command`, which reads the
+`:209`. The hook's `run_gate` lines come from `gate_command`, which reads the
 knob, so the seam must be in place before the hook is generated. `check-graph.sh
---emit` (`:212`) reads declaration paths as text and is unaffected either way.
+--emit` (`:211`) reads declaration paths as text and is unaffected either way.
 
 **Why the seam rather than changing the knob's default.** `GATE_SDK_NATIVE_BIN`'s
 default is `native/target/release/checkwright-gates`, and its **stable relative
