@@ -12,60 +12,37 @@
 
 ## New Features
 
-- **native-gate-vendoring-model** [spec: SPEC-native-gate-vendoring-model.md] — how a
-  binary-substrate kit installs. [precondition-ok: this entry is the unblocker — the
-  second port it names waits on it, not the reverse]
-  **Distribution is the hard part, not the language** — the parent's oldest constraint,
-  dropped by the 2026-08-02 compression and restored here. Kits vendor as **text with
-  zero build step**: `installer/lib/init.sh` writes every file of a selected kit, and a
-  profile selects kits rather than files. A gate that is a compiled subcommand has no
-  text to write, so the install model is what the port breaks first — before any
-  question of what a consumer may read.
-  **The extensibility model decides everything else**, in the filing's own words:
-  script escape hatch as first-class vs a declarative check DSL vs native plugins.
-  Only the first is recorded today, as the parent deliverable's "consumer gates keep
-  the shell hatch"; the two alternatives were dropped with no recorded rejection, so
-  a later session re-derives them from nothing.
-  **A constraint that must not be lost again:** git is the sole runtime dependency,
-  **shelled out, not embedded**. What the parent carries now — "buildable source,
-  needing only git" — is a different and weaker claim, about the build, not the run.
-  **Boundary with `gate-payload-disclosure-ruling`, stated so neither sprawls:** that
-  entry rules what a compiled gate *discloses* to a consumer; this one rules how it
-  *arrives* there. Neither answers the other, and the parent needs both.
-  **This is now a hard prerequisite for any second port, and the cost is measured.**
-  Slice 1 ported one gate, hit exactly this, and **reverted the port**. Mechanism, run
-  not reasoned: a `.gate` descriptor lives under a kit root and therefore vendors;
-  `native/` ships no `checks/` or `smoke/`, so `gate_kit_roots()` never includes it and
-  no consumer ever receives the crate. `gate_command` fail-closes exit 2 on the absent
-  binary, and that exit is a *dispatch-harness* error — it kills the **calling battery**,
-  not just its member. A freshly vendored consumer's pre-commit battery died on
-  invocation; `demo`, `consumer_smoke` and `agents_md_smoke` all reproduced it.
-  So the entry's own line — "the install model is what the port breaks first" — is
-  confirmed, and its old "Nothing is incorrect meanwhile" is retired: something was
-  incorrect, for the length of one iteration. gate-sdk/SPEC.md §Porting a gate to the
-  binary substrate states it as **criterion 5** — a gate is portable only if its
-  vendored form remains runnable — and that criterion is unsatisfiable for any gate in
-  a vendoring kit until this entry rules. A second port is blocked on it, not parallel
-  to it.
-  **Cost while deferred:** the seam sits built and unusable — every retained piece
-  (crate, descriptor spelling, resolution split, conservation contract, parity gate)
-  waits on an install model, and the reference-only implementation is the only thing
-  keeping the crate's tests from asserting over nothing.
-  **Taken into the `native-port-unblocking` iteration by operator direction
-  2026-08-02**, ahead of nearer-payoff work, on exactly the cost above.
-  Filed 2026-08-02 by spec, restoring grounds a compression dropped rather than answered.
-  Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
-  reverted the port.
-
 ## Technical Debt
 
 ## Deferred
 
 - **native-artifact-publish-path** [design-pending] — build and publish the per-target gate binary.
-  The publish side of the seam `native-gate-vendoring-model` rules: a tracked **target
-  roster** with one owner, a release build matrix reading it, a per-target build, and a
-  **published per-target digest**. Design source is that amendment; this entry implements
-  it and does not re-derive it.
+  The publish side of the seam `native-gate-vendoring-model` ruled. That amendment merged
+  and is gone, so the model is carried here rather than cited; the rulings this entry
+  inherits and may not re-litigate are TRAJECTORY.md's.
+  **The ruled model.** *A tracked target roster with one owner and exactly two readers* —
+  the release workflow reads it to know what to build, the installer reads it to know what
+  to look for. No second spelling: a hand-maintained platform list inside a workflow file
+  is the maintained-roster anti-pattern derivation-first refuses. A target added to the
+  roster and not built fails the release, which is the correct place for that failure.
+  *An artifact class in `scripts/pack-installer.sh` beside its kit roots* — the gate
+  binary, built once per declared target by the release and placed in the payload under its
+  target name. Never produced from a working tree and never tracked, so no local build can
+  substitute for it.
+  *One payload carrying every declared target, not one payload per target.* Ruled on the
+  numbers: the installed footprint is one binary either way, since the installer writes only
+  the matching target, so the difference is download size alone and is bounded by the
+  roster — while the per-target shape multiplies the publish path, the digest set and the
+  attestation surface by the roster size. **Revisit trigger, a measurement rather than a
+  taste:** when download size becomes an adoption barrier — the roster growing past what
+  `platform-support-ci-matrix` commits to, or one target's binary ceasing to be small.
+  *A published per-target digest beside each artifact.* The one new external contract the
+  model creates, with a named reader at a named transition on both sides:
+  `native-artifact-install-path`'s pre-write verification, and `doctor`'s re-verification
+  through the lock record.
+  **Surfaces it still owes:** gate-sdk/SPEC.md §Layout and configuration (the roster
+  declaration and any knob the selection takes) and `RELEASING.md` (the runbook gains the
+  matrix, the per-target artifacts and the digest emission).
   **The size is measured, not guessed.** `.github/workflows/publish.yml` has no build
   matrix, no OS-specific runner and no compiled artifact anywhere — `pack` runs on one
   runner and one platform-agnostic tarball reaches both transports. Every piece above is
@@ -80,30 +57,58 @@
   by the vendoring ruling, which fixes the model and deliberately not the wire.
   **Cost while deferred:** zero today, and it is the hard prerequisite the moment a second
   port is wanted — the ruled install model cannot place an artifact nothing produces.
-  Filed 2026-08-03 by spec, on the operator's publish/consume split.
+  Filed 2026-08-03 by spec on the operator's publish/consume split; the ruled model
+  relocated into it by build at the amendment's merge.
 
 - **native-artifact-install-path** [design-pending] [blocked-by: native-artifact-publish-path]
   — place and verify the artifact.
-  The consume side of the same seam: platform resolution, artifact selection, **pre-write
-  digest verification**, the `checkwright.lock` artifact class, and omit-and-declare for a
-  host whose platform has no artifact. Design source is `native-gate-vendoring-model`;
-  this entry implements it.
+  The consume side of the same seam. `native-gate-vendoring-model` merged and is gone, so
+  the ruled model is carried here; the rulings it inherits are TRAJECTORY.md's.
+  **The ruled model.** *Platform resolution, derived and never stored.* The installer
+  resolves the host to a target name and selects the matching artifact — the irreducible
+  interpreter surface, since the binary cannot select itself. The resolution stays a local:
+  a stored copy is a second source for a fact the host answers, stale the first time a tree
+  moves between machines.
+  *Pre-write digest verification.* The installer computes the digest of what it is about to
+  write and refuses on a mismatch — at that step, not after recording a bad hash, because a
+  consumer who cannot read the gate has nothing else standing between them and a
+  substituted binary. It is the one place the model adds a requirement rather than removing
+  one, and it is added because opacity is a goal.
+  *An `artifact` entry in `checkwright.lock`, the schema's first named class.* The lock is
+  one flat `files` map, path to content hash, with no class discriminator; the
+  vendored/generated split is a write-time behavior (`claim()`'s hash-guard applies to
+  vendored paths only) rather than something the schema names. The binary is neither, so it
+  joins as its own entry carrying the target name and the digest and nothing else — those
+  two are what its two readers read: `installer-lifecycle-verbs`' uninstall removes exactly
+  what was written, and `doctor` re-verifies the binary in place.
+  *Omit and declare, triggered by no artifact for this platform.* The install still
+  succeeds — it must not fail on something the adopter did not choose. The affected
+  members' descriptors are not written and the members are not seeded into the consumer's
+  `gates.list`; each is recorded there as `# omitted: <name> substrate-unavailable`, a
+  comment line `gates_list_members` already strips from the live set. `run-gates.sh` prints
+  the count and remedy as a **separate** line beside its summary — separate because
+  `run-consumer-smoke.sh` greps `All N gates passed` verbatim — and `doctor` reports it
+  against the platform that caused it.
+  **Surfaces it still owes:** gate-sdk/SPEC.md §Consumer smoke, §run-gates and
+  §upgrade-smoke (the artifact must not read as determinism drift), and
+  `installer/README.md` §The manifest.
   **A finding that shapes it, verified 2026-08-03:** no platform-triple derivation exists
   in the tree. `context-kit/lib/toolfloor.sh` does no OS or architecture logic at all, and
   `context-kit/bin/env-probe.sh`'s single `OS:` field is an unparsed `uname -s -r -m`
   string rendered for a human to read. That field is **not** the producer — promoting a
   display string to a machine-consumed selector is how a contract nobody declared comes
   into being.
-  **Blocked rather than merely later:** there is nothing to select and nothing to verify
-  until artifacts and digests exist, so this cannot be exercised ahead of its blocker even
-  in fixtures without inventing the roster the blocker owns.
+  **Blocked rather than merely later:** nothing exists to select or verify until artifacts
+  and digests do, so not even a fixture reaches it without inventing the blocker's roster.
   **Why it is design-pending:** omit-and-declare's honesty degrades as the ported set
   grows — one gate missing at first, the whole battery on an unsupported platform later —
-  so what the target roster commits to is a support contract, and
-  `platform-support-ci-matrix` holds the other end of it.
+  so the target roster is a support contract rather than a build convenience, and
+  `platform-support-ci-matrix` owns which platforms it names. Never a green battery over a
+  silently smaller roster.
   **Cost while deferred:** zero today; from the first published artifact onward it is what
   stands between a consumer and an unverified binary.
-  Filed 2026-08-03 by spec, the consume half of the operator's split.
+  Filed 2026-08-03 by spec, the consume half of the operator's split; the model relocated
+  into it by build at the amendment's merge.
 
 - **stage-session-ruling-class** [design-pending] — reversing a ruling is operator-class.
   **Operator-directed filing 2026-08-03.** Add to the escalate-versus-decide roster in
@@ -172,7 +177,7 @@
   **Ordered by the operator's trajectory pivot 2026-08-03**, whose objective 2 is every
   major OS including Windows and whose objective 6 is a script-interpreter surface that is
   minimal and dual-implementable — bash for Linux and macOS, PowerShell for Windows. The
-  objective set is recorded in `native-gate-vendoring-model`'s amendment.
+  objective set is recorded in TRAJECTORY.md.
   **What the vendoring ruling already fixes the shape to, so this designs less than it
   looks like:** the bootstrap's whole job becomes resolve the platform, place the matching
   prebuilt binary, invoke it. Everything conditional lives on the far side of that invoke,
@@ -215,8 +220,8 @@
   bootstrap, so those surfaces teach a shape the project is leaving. No entry claims this
   ground today.
   **Ordered by the operator's trajectory pivot 2026-08-03**; the objective set is recorded
-  in `native-gate-vendoring-model`'s amendment, which names this rewrite as needed and
-  explicitly not started there.
+  in TRAJECTORY.md, and objective 6 is what names this rewrite as needed without starting
+  it.
   **Why it is design-pending:** the rewrite is not a find-and-replace. An always-loaded
   surface is costed per session, so the question is which bash specifics stay resident
   because they are still the common case, which move behind a load trigger, and which are
@@ -1155,7 +1160,7 @@
   **Open design questions, each held by a linked entry — none may be dropped again.**
   (1) *The `# graph:` manifest* — ruled by `native-gate-dispatch-seam`, slice 1.
   (2) *The consumer payload* — `gate-payload-disclosure-ruling`.
-  (3) *Vendoring and the extensibility model* — `native-gate-vendoring-model`.
+  (3) *Vendoring and the extensibility model* — ruled by `native-gate-vendoring-model`.
   (4) *The dogfood question* — `native-gate-dogfood-ruling`.
   **Closed alternative:** a bash portability floor, costed 2026-08-02 and rejected —
   `bash-portability-floor-costing` holds the costing and lands it in the SPEC.
@@ -1174,7 +1179,7 @@
   names. Filed 2026-07-28 by operator request.
   **Ground 1 and the ruled-out platform-reach ground are superseded 2026-08-03 by the
   operator's trajectory pivot** — opacity is a goal, OS reach an objective; the objective
-  set is recorded in `native-gate-vendoring-model`'s amendment. Body rewrite pending.
+  set is recorded in TRAJECTORY.md. Body rewrite pending.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
@@ -2952,7 +2957,7 @@
   than a baseline-versus-current pair, though `DRIFT_KIT_TIMINGS_FILE` shows the
   seam where a comparer would attach.
   **Why that is not merely "not yet".** The comparison moment is the second port,
-  which is now blocked behind `native-gate-vendoring-model` and may be far off,
+  which is now blocked behind `native-artifact-publish-path` and may be far off,
   while the baseline's own validity conditions decay meanwhile. Two already have,
   measured at close the same iteration the file landed: the header pins a
   `gates.list` sha256 that no longer matches (the 95th gate landed after capture),
@@ -3021,5 +3026,6 @@
 - bash-portability-floor-costing
 - scope-survey-counter-evidence
 - trajectory-ruling-record
+- native-gate-vendoring-model
 
 ## Lessons Learned

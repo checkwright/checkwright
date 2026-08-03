@@ -862,8 +862,10 @@ it.
 What a gate on the binary substrate **discloses** to the consumer it judges.
 Its reach is exactly that: it rules what a *gate* ships, not whether this repo
 runs built artifacts — that is `native-gate-dogfood-ruling`, which asks the same
-lever from the other end. How a compiled gate *arrives* is
-`native-gate-vendoring-model`'s; this section is what arrives with it.
+lever from the other end. How a compiled gate *arrives* is ruled at §Porting a
+gate to the binary substrate (criterion 5) and implemented by
+`native-artifact-publish-path` and `native-artifact-install-path`; this section
+is what arrives with it.
 
 **The payload withholds the predicate.** A gate on the binary substrate reaches
 a consumer as its `.gate` descriptor, its `# spec:` pointer and the SPEC section
@@ -910,7 +912,7 @@ needs:
 **The obligation opacity buys.** A consumer who cannot read the gate has only
 the publisher's word for it, so the integrity story is the whole of what
 replaced reading the source. The achievable floor is a published per-target
-digest verified before the artifact is written (`native-gate-vendoring-model`).
+digest verified before the artifact is written (`native-artifact-install-path`).
 What that floor does not provide is a reproducible build, and the queue holds
 that ground as `tarball-build-attestation`: the checksum proves transfer only.
 The pivot changes what that entry is worth rather than what it says — while

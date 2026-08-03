@@ -296,7 +296,7 @@ The constrained members and what forces each:
   declares, not whatever rustc a given box happens to carry; pinning the latter
   would be exactly the aspiration this section's rule forbids. Runtime is
   unaffected: git remains the sole runtime dependency of a ported gate, shelled out
-  rather than embedded (`native-gate-vendoring-model` owns that constraint).
+  rather than embedded (TRAJECTORY.md §The closed rulings owns that constraint).
 Every other member is a bare name — no construct in the battery forces a version
 on it (the `jq` usage is 1.5-era throughout), so none is pinned.
 
