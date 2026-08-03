@@ -93,7 +93,7 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
 
 # spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
 assert_install() {   # $1 = profile, $2 = scratch consumer dir
-    local profile="$1" C="$2" out rc before after LOCK mismatch checked path want got
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked path want got target seam bin list
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
@@ -137,6 +137,26 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ "$before" == "$after" ]] || fail "$profile: re-running init changed the tree — the install is not idempotent"
     [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "$profile: the re-run left the worktree dirty"
     say "re-run: tree unchanged"
+
+    # spec: installer/README.md §The consumer smoke — the artifact arm takes whichever outcome the payload and host produce: with a packed artifact the target, the digest and an executable binary at the seam's path; with none, the omission arm below, which is what reds if init ever records an artifact the payload did not carry
+    target="$(jq -r '.artifact.target // ""' "$LOCK")"
+    seam="$(jq -r '.files | keys[] | select(endswith("/gate-sdk-config.sh")) // ""' "$LOCK" | head -n1)"
+    if [[ -n "$target" ]]; then
+        [[ -n "$seam" && -f "$C/$seam" ]] || fail "$profile: an artifact is recorded but no gate-sdk config seam names its path"
+        bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
+        [[ -n "$bin" && -x "$C/$bin" ]] || fail "$profile: no executable gate binary at '${bin:-<unset>}'"
+        [[ "$(sha256sum "$C/$bin" | cut -d' ' -f1)" == "$(jq -r '.artifact.digest' "$LOCK")" ]] \
+            || fail "$profile: the installed gate binary does not match the digest the manifest recorded"
+        say "artifact: $target verified in place at $bin"
+    else
+        list="$(jq -r '.files | keys[] | select(endswith("/gates.list"))' "$LOCK" | head -n1)"
+        [[ -n "$list" ]] || fail "$profile: the manifest records no gates.list"
+        ! grep -q '^# omitted:' "$C/$list" \
+            || fail "$profile: the registry declares omitted members while the manifest records no artifact"
+        [[ -z "$seam" ]] || ! grep -q '^GATE_SDK_NATIVE_BIN=' "$C/$seam" \
+            || fail "$profile: no artifact was installed, yet the config seam points at a gate binary"
+        say "artifact: none packed — omitted, and nothing claims one"
+    fi
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
     [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$profile: doctor exited $rc inside the installed consumer"; }

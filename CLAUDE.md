@@ -153,7 +153,11 @@ here.
   workflow builds and digests one binary per line, and the payload carries them —
   so a second port waits on the install side alone. It is
   **not a kit** — no `checks/`, no `smoke/`, the predicate that makes a root
-  directory one; `native/target/` is gitignored and never committed. Dispatch,
+  directory one; `native/target/` is gitignored and never committed. The consume
+  half now ships too: `init` resolves the host to a target, verifies the matching
+  artifact against its published digest **before** writing it, records it in
+  `checkwright.lock`, and omits-and-declares rather than failing when no verified
+  binary reaches a platform — installer/README.md §The gate binary. Dispatch,
   descriptor format, port criteria and the toolchain floor:
   gate-sdk/SPEC.md §Porting a gate to the binary substrate.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,

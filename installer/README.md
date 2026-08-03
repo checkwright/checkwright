@@ -124,6 +124,109 @@ matters — a roster naming a gate that fails to resolve reds it — but not a
 kit that adds a zero-config gate this roster never learns about. Collapsing the
 two into one per-kit source is filed as queued work, not papered over here.
 
+## The gate binary
+
+A gate whose implementation is a compiled subcommand needs that binary on disk
+before it can run, and `init` is what puts it there. It **selects, verifies and
+places** — it never builds, and it never fetches. Everything below sits inside
+the irreducible bootstrap the vendoring ruling leaves outside the binary
+(gate-sdk/SPEC.md §Porting a gate to the binary substrate): the binary cannot
+select itself, so something must resolve the platform, verify the artifact, and
+place it. Each step is deliberately small enough to be written twice, in bash
+and in PowerShell.
+
+**Platform resolution is derived and never stored.** `target_of_host()` maps
+`uname -s` and `uname -m` to one Rust target triple, and to the empty string on
+a host that maps to none. It runs once per `init`, after the profile's kit set
+resolves and before anything is written. The result stays a local: a stored copy
+would be a second source for a fact the host already answers, and it is stale
+the first time a vendored tree moves between machines — the case that matters
+most, since a vendored tree is shared by construction. Two fields rather than
+`uname -a` because that is the smallest input that answers the question, and it
+is what a PowerShell half can answer without parsing prose. Nothing reads the
+kernel version, so nothing collects it.
+
+**Selection has three outcomes, and collapsing any two is the defect.** The
+payload carries the target roster verbatim beside the artifacts
+(gate-sdk/SPEC.md §Consumer payload), and `init` reads it rather than inferring
+support from a directory's presence:
+
+| the host resolves to | the payload holds | outcome |
+| --- | --- | --- |
+| a target **not** in the roster | — | **omit and declare** — a supported outcome, not a failure |
+| a target **in** the roster | its binary and sidecar | verify, then write |
+| a target **in** the roster | nothing, or half the pair | **refuse** — the payload is broken |
+
+The third row is the whole reason the roster is read. Without it `init` cannot
+tell a platform that was never committed to from a platform that was committed
+to and whose artifact went missing, and reading the second as the first turns a
+publisher defect into a silently smaller green battery. A payload assembled with
+no artifacts at all carries no `artifact/` directory, so it reads as the first
+row and never as a payload whose every target went missing. The refusal is the
+one place this path fails an install, and it belongs there: a missing artifact
+for a **declared** target is a defect the adopter cannot act on and must not
+inherit silently.
+
+**The digest is verified before anything is written.** `init` computes the
+artifact's SHA-256 and compares it against the sidecar that travelled with it,
+and only then writes. The ordering is the whole of it: a consumer who cannot
+read the gate has nothing else standing between them and a substituted binary,
+and a post-write check has already put it on disk. A mismatch refuses — never a
+warning, never a write.
+
+`sha256sum` is tried first, then `shasum -a 256`, because stock macOS ships the
+second and not the first. When **neither** resolves the install proceeds and the
+artifact is omitted rather than written unverified. Both halves are load-bearing:
+never write what was not verified, and never fail an install over something the
+adopter did not choose.
+
+*The honest bound, stated so no surface overclaims it.* The digest travelled
+inside the same payload as the artifact, so it catches corruption and a
+substitution made to the artifact alone — not a compromised publisher, which no
+in-payload value can. What raises it above a self-check is that the identical
+bytes are published on the Release, so a human can cross-check the value out of
+band. The claim is **verified against a published digest**, never *reproducible*.
+
+**Omission is declared and counted.** An omitted member rides the registry
+rather than a new file: `init` writes `# omitted: <name> <reason>` into the
+consumer's `gates.list` in place of the member's name — a comment line the
+runner already strips from the live set. The record then sits in the consumer's
+tracked history where a reviewer reads it, instead of scrolling past in
+install-time stdout, and a re-run on a machine that has since gained a hasher
+converts it back into a live member with no hand edit. Two reason tokens,
+because there are two remedies:
+
+- `substrate-unavailable` — this host's platform has no declared artifact. There
+  is no adopter action; the platform is not in the support roster.
+- `digest-unverifiable` — an artifact exists but no hasher does. Install
+  `sha256sum` or `shasum` and re-run `init`.
+
+A third token would need a third remedy to earn its place. Which members are
+affected is derived from the payload, never maintained here: a starting-roster
+gate the payload declares as `<kit>/checks/<name>.gate` — and does not also ship
+as a shell script — is one that dispatches to the binary. `run-gates.sh` reports
+the count and remedy on a line of its own beside its summary
+(gate-sdk/SPEC.md §run-gates), and `doctor` reports it against the reason that
+caused it.
+
+**The install location has one owner.** The binary is written to your gates
+directory beside the `gates.list` seeded there, and `init` sets
+`GATE_SDK_NATIVE_BIN` to that path in `<gates-dir>/gate-sdk-config.sh` — the
+optional persistent config seam gate-sdk's library already sources when it
+exists (gate-sdk/SPEC.md §Layout and configuration). `init` creates that file
+when it places an artifact; gate-sdk ships no config template, and adding one
+would be worse than writing the file here, since the template seam copies
+unconditionally and would overwrite an adopter's own overrides on every re-run.
+The knob's own default is unchanged and still names the crate's build output,
+because it is a **stable relative path** on purpose: the generated hook persists
+the emitted argv, so a machine-specific path baked into a tracked hook would make
+the graph artifact's freshness comparison machine-dependent.
+
+**Ordering is load-bearing.** The config seam and the binary are both in place
+before the pre-commit hook is generated, because the generator resolves each
+member's invocation argv and a `.gate` member resolves to this binary. A hook
+generated first would resolve a dispatch it cannot make.
+
 ## doctor
 
 `checkwright doctor` tells you whether this machine meets the toolchain the
@@ -137,7 +240,16 @@ It has two behaviors, selected by where you run it rather than by a flag. Run
 anywhere, it reports the toolchain verdict. Run inside a repository that has
 been vendored into, it additionally reads `checkwright.lock` and reports the
 installed release, the upstream commit it came from, the profile, and the kit
-set.
+set — plus, where one was installed, the gate binary's target re-verified
+against its recorded digest **in place**, and any omitted members against the
+reason that caused them (§The gate binary).
+
+Those last two **report without setting the verdict**, and the asymmetry is
+deliberate rather than lenient. The exit status is the toolchain contract, and
+`init` gates its own precondition on it — so reddening here for a swapped or
+missing binary would block the `init` re-run that is the finding's own remedy.
+A binary that cannot be dispatched to is caught where it is dispatched from: the
+battery treats it as a harness error rather than a skip.
 
 `doctor` defines no floor of its own. It sources the toolchain roster out of
 its own `payload/` and renders whatever verdict that roster's predicate
@@ -199,13 +311,39 @@ the shape behind it.
 | `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
 | `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
 | `files` | each written path with its content hash | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten |
+| `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
 
-A recorded hash is `git hash-object`, never `sha256sum`. Not a portability
-detail worth burying: macOS ships `shasum` rather than `sha256sum`, and the
-answer is not a new tool requirement — git is already something the toolchain
-contract asserts, its object hash is content-addressed and stable, so the
-manifest's integrity story stays inside the toolchain that contract already
+A recorded **`files`** hash is `git hash-object`, never `sha256sum`. Not a
+portability detail worth burying: macOS ships `shasum` rather than `sha256sum`,
+and the answer is not a new tool requirement — git is already something the
+toolchain contract asserts, its object hash is content-addressed and stable, so
+the manifest's integrity story stays inside the toolchain that contract already
 covers.
+
+**Two hash families, on two classes of file, each stated where it is used.** The
+scope above is exactly `files`, and `artifact` is deliberately outside it. The
+two hashes answer different questions and are not unified. A `files` hash is
+**change detection** — has the adopter edited something `init` wrote — where
+collision resistance is not the property needed and staying inside git's
+already-asserted toolchain is worth more. The artifact's digest is an
+**integrity claim**, published for a reader to cross-check; `git hash-object`
+defaults to SHA-1, and a SHA-1 supply-chain digest would undercut the one claim
+§The gate binary makes.
+
+That is also why `artifact` is its own key rather than a `files` row. A `files`
+entry means *hashed with `git hash-object`, rewritten when unmodified*, and this
+one is hashed with SHA-256 against a published value and rewritten on a
+different rule — so a `files` row would put two hash families on one map and
+break the invariant the consumer smoke asserts over every entry in it. The
+binary is still written by `init` and still tracked. A new optional top-level key
+is additive within the versioned wire key: a reader that does not know it sees
+the same manifest it always did.
+
+**The path is absent, and that is not an omission.** The install location has
+exactly one owner — `GATE_SDK_NATIVE_BIN` in your `gate-sdk-config.sh` — and
+that value is what the battery actually dispatches to. A stored copy could
+disagree with the live one, so every reader that wants the path resolves it from
+the same owner.
 
 ## The consumer smoke
 
@@ -248,6 +386,25 @@ because dropping every `PATH` entry carrying `node` would take `/usr/bin` with
 it wherever Node is installed there. The residue is that a payload merely
 *probing* for a Node binary still finds a name; one that *runs* it fails loudly
 and says which name it reached.
+
+**The artifact arm rides the per-profile post-conditions**, taking whichever of
+§The gate binary's two outcomes the payload and the host actually produce. The
+smoke packs with no artifacts, so today it is always the **omission** arm: no
+binary is written, no `artifact` key reaches the manifest, and the registry
+carries no live member dispatching to a binary. Asserting that is not
+ceremony — it is what reds if `init` ever fabricates an artifact record from a
+payload that carried none, which is the failure mode that would make the
+manifest lie about what is on disk. The **placement** arm — the target matching
+the host's resolution, the digest matching the payload sidecar, the binary on
+disk at the seam's path and executable — is asserted by the same lines the
+moment a run packs artifacts.
+
+*The honest limit, and it is a real one.* Because the smoke packs no artifacts,
+the placement half of that arm is unexercised by any automated suite. The write
+path is verified by hand against a real built binary, which is evidence with a
+date on it rather than a standing assertion. Closing it means the smoke building
+or fetching a binary to pack, which is queued work rather than something this
+section papers over.
 
 Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
 worktree. It needs a clean worktree, because the pack step refuses to stamp a

@@ -13,6 +13,8 @@ source "$INSTALLER/lib/common/lock.sh"
 source "$INSTALLER/lib/common/profile.sh"
 # shellcheck source=./common/recipe.sh
 source "$INSTALLER/lib/common/recipe.sh"
+# shellcheck source=./common/digest.sh
+source "$INSTALLER/lib/common/digest.sh"
 
 # spec: installer/README.md §What init seeds — the consumer-layout names init writes against; they are gate-sdk's and canon-kit's own defaults, so a tree init made is the zero-config tree those kits expect
 GATES_DIR="scripts"
@@ -61,6 +63,8 @@ COMMIT="$(jq -r '.checkwright.commit // ""' "$PKG" 2>/dev/null)"
 
 LOCK="$(lock_path "$ROOT")"
 PRIOR_FILES=""
+PRIOR_ARTIFACT_TARGET=""
+PRIOR_ARTIFACT_DIGEST=""
 if [[ -f "$LOCK" ]]; then
     lock_schema_ok "$LOCK" || die "$CHECKWRIGHT_LOCK_FILE carries a schema this build does not know" \
         "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for."
@@ -75,6 +79,8 @@ if [[ -f "$LOCK" ]]; then
     fi
     [[ -n "$PROFILE" ]] || PROFILE="$(lock_field "$LOCK" profile)"
     PRIOR_FILES="$(jq -r 'if (.files | type) == "object" then (.files | to_entries[] | "\(.key)\t\(.value)") else empty end' "$LOCK" 2>/dev/null)"
+    PRIOR_ARTIFACT_TARGET="$(jq -r '.artifact.target // ""' "$LOCK" 2>/dev/null)"
+    PRIOR_ARTIFACT_DIGEST="$(jq -r '.artifact.digest // ""' "$LOCK" 2>/dev/null)"
 fi
 
 PROFILE="${PROFILE:-starter}"
@@ -93,6 +99,60 @@ KITS=()
 while IFS= read -r k; do [[ -n "$k" ]] && KITS+=("$k"); done < <(profile_kits "$INSTALLER" "$PROFILE")
 [[ ${#KITS[@]} -gt 0 ]] || die "profile '$PROFILE' resolves to no kit in this payload" \
     "every kit a profile names must exist in the package payload; this one names none that do."
+
+# spec: installer/README.md §The gate binary — the host answers what platform this is, so the answer stays a local and is never persisted: a stored copy is stale the first time a vendored tree moves between machines, which is the case that matters most. Two fields rather than `uname -a` because that is the smallest input answering the question and the one a PowerShell half can answer without parsing prose
+target_of_host() {   # -> the Rust target triple this host is, empty when it maps to none
+    case "$(uname -s 2>/dev/null)/$(uname -m 2>/dev/null)" in
+        Linux/x86_64)               printf 'x86_64-unknown-linux-gnu' ;;
+        Linux/aarch64|Linux/arm64)  printf 'aarch64-unknown-linux-gnu' ;;
+        Darwin/x86_64)              printf 'x86_64-apple-darwin' ;;
+        Darwin/arm64)               printf 'aarch64-apple-darwin' ;;
+        *) : ;;
+    esac
+}
+
+ARTIFACT_SRC=""; ARTIFACT_PATH=""; ARTIFACT_TARGET=""; ARTIFACT_DIGEST=""; OMIT_REASON=""
+
+# spec: installer/README.md §The gate binary — selection has three outcomes and collapsing any two is the defect, which is why the payload's roster copy is read rather than a directory's presence inferred from: without it a platform that was never committed to and one whose artifact went missing look identical, and reading the second as the first turns a broken payload into a silently smaller green battery
+select_artifact() {
+    local roster target src want got names
+    if [[ ! -d "$PAYLOAD/artifact" ]]; then
+        OMIT_REASON="substrate-unavailable"
+        return 0
+    fi
+    roster="$PAYLOAD/artifact/targets.list"
+    [[ -f "$roster" ]] || die "this payload carries prebuilt gate binaries but no target roster" \
+        "the roster is copied verbatim beside them at pack time; artifacts without one cannot be selected from and the payload is broken, not narrower."
+    target="$(target_of_host)"
+    if [[ -z "$target" ]] || ! grep -Ev '^[[:space:]]*(#|$)' "$roster" | grep -qxF "$target"; then
+        OMIT_REASON="substrate-unavailable"
+        return 0
+    fi
+    src="$PAYLOAD/artifact/$target"
+    mapfile -t names < <(find "$src" -maxdepth 1 -type f ! -name '*.sha256' -printf '%P\n' 2>/dev/null | sort)
+    [[ ${#names[@]} -eq 1 && -f "$src/${names[0]}.sha256" ]] \
+        || die "the payload declares $target but carries no complete artifact for it" \
+           "a declared target whose binary or .sha256 sidecar is missing is a publisher defect you cannot act on — refusing rather than installing a battery that silently shrank." 1
+    if [[ -z "$(digest_hasher)" ]]; then
+        OMIT_REASON="digest-unverifiable"
+        return 0
+    fi
+    want="$(awk 'NR==1{print $1}' "$src/${names[0]}.sha256")"
+    got="$(digest_of "$src/${names[0]}")"
+    [[ -n "$want" && "$want" == "$got" ]] \
+        || die "the prebuilt gate binary for $target does not match its published digest" \
+           "nothing unverified is ever written, so this refuses rather than warning. Re-download the package; a persistent mismatch means the artifact was altered after it was built." 1
+    ARTIFACT_SRC="$src/${names[0]}"
+    ARTIFACT_PATH="$GATES_DIR/${names[0]}"
+    ARTIFACT_TARGET="$target"
+    ARTIFACT_DIGEST="$got"
+}
+select_artifact
+
+# spec: installer/README.md §What init seeds — a starting-roster member whose implementation is a binary subcommand is what an omission omits; the payload's own declaration decides, so nothing here maintains a second roster of which gates are ported
+dispatches_to_binary() {   # $1 = kit, $2 = gate name -> 0 iff the payload declares it as a binary subcommand
+    [[ -f "$PAYLOAD/$1/checks/$2.gate" && ! -f "$PAYLOAD/$1/checks/$2.sh" ]]
+}
 
 prior_hash() {   # $1 = repo-relative path -> the hash the manifest recorded for it, empty when unrecorded
     [[ -n "$PRIOR_FILES" ]] || return 0
@@ -135,14 +195,22 @@ done
 mkdir -p "$ROOT/$GATES_DIR" "$ROOT/.workflow" 2>/dev/null
 GATES_LIST="$GATES_DIR/gates.list"
 if claim "$GATES_LIST"; then
+    # spec: installer/README.md §The gate binary — an omitted member rides the registry rather than a new file: `# omitted: <name> <reason>` is a comment line the runner already strips from the live set, so the record sits in the consumer's tracked history where a reviewer reads it, and a re-run on a machine that has since gained a hasher converts it back into a live member with no hand edit
     plan_gates() {
+        local m
         printf '%s\n' "# Checkwright gate registry — written by 'checkwright init' (profile: $PROFILE)." \
             "# Each kit's starting subset; its README names the full roster to grow into."
         for kit in "${KITS[@]}"; do
             mapfile -t g < <(recipe_gates "$kit")
             [[ ${#g[@]} -gt 0 ]] || continue
             printf '# %s\n' "$kit"
-            printf '%s\n' "${g[@]}"
+            for m in "${g[@]}"; do
+                if [[ -n "$OMIT_REASON" ]] && dispatches_to_binary "$kit" "$m"; then
+                    printf '# omitted: %s %s\n' "$m" "$OMIT_REASON"
+                else
+                    printf '%s\n' "$m"
+                fi
+            done
         done
     }
     (( DRY )) || plan_gates > "$ROOT/$GATES_LIST" || die "could not write $GATES_LIST"
@@ -185,6 +253,37 @@ for kit in "${KITS[@]}"; do
         fi
     )
 done
+
+# spec: installer/README.md §The gate binary — the write comes after every config seam is in place and before the hook is generated, because the generator resolves each member's invocation argv and a `.gate` member resolves to this binary: the knob must name it and the file must be there, or the generator reports a dispatch it cannot make
+SEAM="$GATES_DIR/gate-sdk-config.sh"
+if [[ -n "$ARTIFACT_TARGET" ]]; then
+    if claim "$ARTIFACT_PATH"; then
+        if (( ! DRY )); then
+            # spec: installer/README.md §The manifest — an on-disk artifact that still verifies against the recorded digest is not rewritten, which is what makes a bare re-run leave the tree byte-identical
+            if [[ "$PRIOR_ARTIFACT_TARGET" != "$ARTIFACT_TARGET" \
+               || "$PRIOR_ARTIFACT_DIGEST" != "$ARTIFACT_DIGEST" \
+               || ! -f "$ROOT/$ARTIFACT_PATH" \
+               || "$(digest_of "$ROOT/$ARTIFACT_PATH")" != "$ARTIFACT_DIGEST" ]]; then
+                cp "$ARTIFACT_SRC" "$ROOT/$ARTIFACT_PATH" && chmod +x "$ROOT/$ARTIFACT_PATH" \
+                    || die "could not write $ARTIFACT_PATH"
+            fi
+        fi
+        record "$ARTIFACT_PATH"
+    fi
+    # spec: gate-sdk/SPEC.md §Layout and configuration — the install location has one owner and it is this knob, which is why the lock records no path: a consumer's binary sits in their gates directory while the knob's default names the crate's build output, and only the seam can say so without relocating it for every existing reader
+    if claim "$SEAM"; then
+        if (( ! DRY )); then
+            {
+                [[ -f "$ROOT/$SEAM" ]] || printf '%s\n' \
+                    "# gate-sdk consumer config — sourced by lib/gate.sh; written by 'checkwright init'."
+                [[ -f "$ROOT/$SEAM" ]] && grep -v '^GATE_SDK_NATIVE_BIN=' "$ROOT/$SEAM"
+                printf 'GATE_SDK_NATIVE_BIN=%s\n' "$ARTIFACT_PATH"
+            } > "$ROOT/$SEAM.tmp" \
+                && mv "$ROOT/$SEAM.tmp" "$ROOT/$SEAM" || die "could not write $SEAM"
+        fi
+        printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$SEAM" || record "$SEAM"
+    fi
+fi
 
 # spec: installer/README.md §What init seeds — a guarded seed is written once and kept thereafter, so a re-run must re-claim it: dropping it from the manifest would disown a file init created, and an uninstall that reads this roster would then leave it behind
 under_kit() {   # $1 = repo-relative path -> 0 iff it lies inside one of this profile's kit directories
@@ -234,7 +333,12 @@ manifest() {
             printf '%s:%s' "$(jq -Rn --arg v "$f" '$v')" \
                 "$(jq -Rn --arg v "$( (( DRY )) && [[ ! -f "$ROOT/$f" ]] && printf '(pending)' || lock_hash "$ROOT/$f")" '$v')"
         done
-        printf '}}'
+        printf '}'
+        # spec: installer/README.md §The manifest — the binary is neither vendored nor generated, so it joins as its own key rather than a files[] row: a files[] entry means hashed with git hash-object and rewritten when unmodified, and this one is hashed with SHA-256 against a published value and rewritten on a different rule. Its absence on a run that omitted the artifact is the omission's machine-readable form
+        [[ -n "$ARTIFACT_TARGET" ]] && printf ',"artifact":{"target":%s,"digest":%s}' \
+            "$(jq -Rn --arg v "$ARTIFACT_TARGET" '$v')" \
+            "$(jq -Rn --arg v "$ARTIFACT_DIGEST" '$v')"
+        printf '}'
     } | jq -S .
 }
 
@@ -244,6 +348,12 @@ if (( DRY )); then
     printf 'would write %d file(s), including:\n' "$(( ${#WRITTEN[@]} + 1 ))"
     printf '  %s\n' "$GATES_LIST" "$CHECKWRIGHT_LOCK_FILE"
     for kit in "${KITS[@]}"; do printf '  %s/ (%d files)\n' "$kit" "$(find "$PAYLOAD/$kit" -type f | wc -l)"; done
+    if [[ -n "$ARTIFACT_TARGET" ]]; then
+        printf '\nwould place the %s gate binary at %s (digest verified against the payload sidecar)\n' \
+            "$ARTIFACT_TARGET" "$ARTIFACT_PATH"
+    else
+        printf '\nwould omit the prebuilt gate binary (%s) and declare it in %s\n' "$OMIT_REASON" "$GATES_LIST"
+    fi
     if [[ ${#CHANGED[@]} -gt 0 ]]; then
         printf '\nwould leave %d changed file(s) alone (--force to overwrite):\n' "${#CHANGED[@]}"
         printf '  %s\n' "${CHANGED[@]}"

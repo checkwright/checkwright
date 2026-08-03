@@ -150,6 +150,24 @@ done
 printf 'TOTAL %d\n' "$total_ms" >> "$TIMINGS"
 
 printf '\n===== gates summary =====\n'
+# spec: gate-sdk/SPEC.md §run-gates — a declared omission is what keeps `All N gates passed.` honest as the roster-collapse tripwire: an omitted member shrinks N legitimately, so it is reported on its own line beside the summary. Separate is load-bearing rather than tidy — the consumer smokes match the green phrase against this output, so the line must not carry it
+report_omissions() {
+    local reason count
+    while read -r count reason; do
+        [[ -n "$reason" ]] || continue
+        case "$reason" in
+            substrate-unavailable)
+                printf '%d gate(s) omitted (%s): no prebuilt gate binary is published for this platform.\n' \
+                    "$count" "$reason" ;;
+            digest-unverifiable)
+                printf '%d gate(s) omitted (%s): install sha256sum or shasum, then re-run checkwright init.\n' \
+                    "$count" "$reason" ;;
+            *)
+                printf '%d gate(s) omitted (%s).\n' "$count" "$reason" ;;
+        esac
+    done < <(awk '$1 == "#" && $2 == "omitted:" { print $4 }' "$LIST" | sort | uniq -c)
+}
+report_omissions
 if [[ ${#failed[@]} -eq 0 ]]; then
     printf 'All %d gates passed.\n' "${#RUN_MEMBERS[@]}"
     exit 0

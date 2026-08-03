@@ -104,9 +104,10 @@ your `PATH`, and the note says what breaks without it:
   `edition = "2021"`. Only contributors building the tree need it — no gate
   dispatches to the binary today, so a commit does not require it; CI builds,
   lints and tests the crate every run. Installing Checkwright never builds it
-  and never will: a compiled gate is ruled to arrive prebuilt for your platform,
-  so no install path asks you for Rust. A gate on that substrate shells out to
-  git at runtime and embeds nothing.
+  and never will: every tagged release now publishes a prebuilt binary for each
+  platform in the declared target roster, and `init` picks yours and verifies it
+  against its published digest, so no install path asks you for Rust. A gate on
+  that substrate shells out to git at runtime and embeds nothing.
 
 <!-- toolchain:end -->
 
@@ -137,6 +138,24 @@ anyway. The **`npx` installer** wants Node. **Manual vendoring** wants nothing
 beyond the roster. Nothing in the gate battery uses Node on any of the three, so
 a consumer who would rather not add it takes either of the other two paths and
 loses nothing.
+
+Two requirements belong to the installer *itself* — to `init`, whichever
+transport delivered it — and they are stated here for the same reason: they are
+not what the battery asserts, so the roster above would be the wrong place to
+claim them.
+
+- **A GNU `sort`.** `init`'s upgrade path compares two versions with `sort -V`,
+  and `context-kit/bin/env-probe.sh` uses the same flag inside the floor
+  predicate. The second is the sharper edge: a stock BSD or macOS userland can
+  fail the probe that exists to tell you whether your box qualifies, in the same
+  way the thing it diagnoses would fail. So the GNU-first instruction above is
+  the install path's requirement too, not the battery's alone. It narrows on its
+  own once these steps move behind a compiled binary.
+- **`sha256sum` or `shasum`.** `init` verifies a prebuilt gate binary against
+  its published digest before writing it, and it will take either hasher —
+  `shasum` is there because stock macOS ships it instead. Neither present is not
+  a failed install: the affected gates are omitted and declared rather than
+  written unverified, and `init` tells you which and why.
 
 Publishing a docs site is an optional wider tier. A consumer that registers
 site-kit's render-fidelity gate — which re-renders every page through the

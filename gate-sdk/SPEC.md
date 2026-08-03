@@ -103,7 +103,14 @@ multi-call binary `gate_command` dispatches a `.gate`-declared member to — see
 §lib/gate.sh). Its default is a **stable relative path** deliberately: the
 generated pre-commit hook persists the emitted argv, and a machine-specific
 absolute path baked into a tracked hook would make `check-graph`'s byte-freshness
-comparison machine-dependent. And `GATE_SDK_NATIVE_SRC` (default `native/src`;
+comparison machine-dependent. **A vendored consumer's value is set for them**, to
+the binary's place in their gates directory, by the installer writing this knob
+into their `gate-sdk-config.sh` (installer/README.md §The gate binary) — the
+config seam exists so a value can be relocated without the default moving.
+Deriving the default from `GATE_SDK_GATES_DIR` instead was weighed and refused:
+it would silently relocate the binary for every existing reader, and make this
+repo's own layout the exception to a convention whose stated rule is that this
+repo's layout *is* the default. And `GATE_SDK_NATIVE_SRC` (default `native/src`;
 the implementation tree §check-gate-substrate-parity assertion D holds free of
 manifest-class annotation — a **path, not a language**, so the knob assumes
 nothing about what implements a ported gate). And `GATE_SDK_NATIVE_CRATE`
@@ -1078,6 +1085,17 @@ failed, 2 usage/environment); the success token is `CONSUMER-SMOKE: clean
 self-declared, <h> hand-declared)`. `--keep` retains the temp dir and
 prints its path (the temp-dir write's named reclaim path).
 
+**This harness installs no gate binary, and the reason bounds what it proves.**
+It vendors kit roots **by copy** and never runs the installer, so no payload,
+no target roster and no artifact are in play: its scratch consumer registers
+whatever each `smoke/install.sh` registers, holds no `# omitted:` record, and
+its `All N gates passed` assertion is untouched by the artifact path. A ported
+gate would therefore be registered here with no binary to dispatch to — which
+`gate_command` treats as a harness error rather than a skip (§lib/gate.sh), so
+the gap reds rather than passing vacuously. Proving the *install* path is the
+installer's own smoke (installer/README.md §The consumer smoke), the one caller
+that packs a payload and runs `init` against it.
+
 The scratch-consumer build itself — temp dir, seed commit, vendor-by-copy, the
 `smoke/install.sh` loop, the installed-baseline commit — is factored into
 `lib/consumer-smoke.sh` (`csmoke_vendor_and_install`, which sets `SCRATCH` and
@@ -1474,7 +1492,21 @@ line alone, whose executed-gate count (`All N gates passed.`) is the
 roster-collapse tripwire — a battery that silently shrank shows a smaller N. A
 failing or erroring member prints its `===== <name> =====` banner and its
 captured output verbatim, always — the red path is the feedback channel and
-never quiets. `GATE_SDK_VERBOSE` (any non-empty value) restores the full banner
+never quiets.
+
+**A declared omission is what keeps that tripwire honest.** A member the
+installer omitted because no verified binary reached this platform is recorded
+in the registry as `# omitted: <name> <reason>` (installer/README.md §The gate
+binary) — a comment line, so `gates_list_members` strips it and N shrinks
+legitimately. The runner counts those lines and prints the count and its remedy
+beside the summary, one line per reason token present, so a declared omission
+stays distinguishable from the regression the tripwire exists to catch. **The
+line is separate from the summary and carries none of its text**, and that is
+load-bearing rather than tidy: `run-consumer-smoke.sh` and the installer's own
+smoke both match the green phrase against this output, so a remedy folded into
+the summary line would either break their assertion or make the phrase match on
+a run that omitted half the battery. A registry with no omission lines prints
+nothing extra, so the zero case adds no output at all. `GATE_SDK_VERBOSE` (any non-empty value) restores the full banner
 roll, the on-demand reading for the vacuous-pass tripwire (a "0 files scanned"
 clean line is visible only in the gate's own banner). Env over flag by the kit
 convention: one mechanism serves the interactive run, the generated hooks, and
@@ -1636,6 +1668,18 @@ reach entirely: a green `upgrade` suite is evidence about kit contents, not abou
 whatever activation surface a consumer ships to deliver them. State it here
 rather than leaving it inferable from the phase-A step list, since the suite's
 name invites the wider reading.
+
+**The gate binary sits on the far side of that same limit**, and it is recorded
+here rather than quietly folded into the determinism assertion. That assertion
+covers changes under the kit roots plus the two regenerated artifacts; phase A
+replaces the vendored directories in tree and never runs an installer, so the
+artifact write is outside its reach entirely and an installed binary is neither
+a determinism finding nor a determinism exemption. Widening the assertion to
+name it would claim coverage this tool cannot have. The install path's own
+idempotence proof is the installer's smoke (installer/README.md §The consumer
+smoke), which does re-run `init`, and the rule that satisfies it is the
+manifest's: an on-disk artifact that still verifies against the recorded digest
+is not rewritten (installer/README.md §The manifest).
 
 **The declaration resolves on two arms, both over §lib/declaration.sh's one
 token predicate.** A **tagged TO** resolves its version from the `v*` tag

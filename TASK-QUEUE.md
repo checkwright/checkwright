@@ -12,107 +12,7 @@
 
 ## New Features
 
-- **native-artifact-install-path** [spec: SPEC-artifact-install-path.md]
-  — place and verify the artifact.
-  The consume side of the same seam. `native-gate-vendoring-model` merged and is gone, so
-  the ruled model is carried here; the rulings it inherits are TRAJECTORY.md's.
-  **The ruled model.** *Platform resolution, derived and never stored.* The installer
-  resolves the host to a target name and selects the matching artifact — the irreducible
-  interpreter surface, since the binary cannot select itself. The resolution stays a local:
-  a stored copy is a second source for a fact the host answers, stale the first time a tree
-  moves between machines.
-  *Pre-write digest verification.* The installer computes the digest of what it is about to
-  write and refuses on a mismatch — at that step, not after recording a bad hash, because a
-  consumer who cannot read the gate has nothing else standing between them and a
-  substituted binary. It is the one place the model adds a requirement rather than removing
-  one, and it is added because opacity is a goal.
-  *An `artifact` entry in `checkwright.lock`, the schema's first named class.* The lock is
-  one flat `files` map, path to content hash, with no class discriminator; the
-  vendored/generated split is a write-time behavior (`claim()`'s hash-guard applies to
-  vendored paths only) rather than something the schema names. The binary is neither, so it
-  joins as its own entry carrying the target name and the digest and nothing else — those
-  two are what its two readers read: `installer-lifecycle-verbs`' uninstall removes exactly
-  what was written, and `doctor` re-verifies the binary in place.
-  *Omit and declare, triggered by no artifact for this platform.* The install still
-  succeeds — it must not fail on something the adopter did not choose. The affected
-  members' descriptors are not written and the members are not seeded into the consumer's
-  `gates.list`; each is recorded there as `# omitted: <name> substrate-unavailable`, a
-  comment line `gates_list_members` already strips from the live set. `run-gates.sh` prints
-  the count and remedy as a **separate** line beside its summary — separate because
-  `run-consumer-smoke.sh` greps `All N gates passed` verbatim — and `doctor` reports it
-  against the platform that caused it.
-  **Surfaces it still owes:** gate-sdk/SPEC.md §Consumer smoke, §run-gates and
-  §upgrade-smoke (the artifact must not read as determinism drift), and
-  `installer/README.md` §The manifest.
-  **A finding that shapes it, verified 2026-08-03:** no platform-triple derivation exists
-  in the tree. `context-kit/lib/toolfloor.sh` does no OS or architecture logic at all, and
-  `context-kit/bin/env-probe.sh`'s single `OS:` field is an unparsed `uname -s -r -m`
-  string rendered for a human to read. That field is **not** the producer — promoting a
-  display string to a machine-consumed selector is how a contract nobody declared comes
-  into being.
-  **Blocked rather than merely later:** nothing exists to select or verify until artifacts
-  and digests do, so not even a fixture reaches it without inventing the blocker's roster.
-  **Why it is design-pending:** omit-and-declare's honesty degrades as the ported set
-  grows — one gate missing at first, the whole battery on an unsupported platform later —
-  so the target roster is a support contract rather than a build convenience, and
-  `platform-support-ci-matrix` owns which platforms it names. Never a green battery over a
-  silently smaller roster.
-  **Cost while deferred:** zero today; from the first published artifact onward it is what
-  stands between a consumer and an unverified binary.
-  Filed 2026-08-03 by spec, the consume half of the operator's split; the model relocated
-  into it by build at the amendment's merge.
-
 ## Technical Debt
-
-- **install-path-gnu-userland-undeclared** — the installer's own
-  toolchain requirement is unstated, and so is the probe's. docs/install.md
-  §Requirements scopes its GNU-coreutils/gawk declaration to **the battery**, on
-  purpose. But `installer/lib/init.sh` compares versions with GNU `sort -V` on the
-  upgrade path, and `context-kit/lib/toolfloor.sh` uses `sort -V` inside the floor
-  predicate itself. Neither is the battery, so neither is covered.
-  **The sharp edge:** an adopter on a stock BSD/macOS userland can hit a GNU-only
-  flag in the installer *and* in the env-probe that is supposed to tell them
-  whether their box qualifies — the diagnostic fails the same way the thing it
-  diagnoses would, with nothing on the page declaring it.
-  **Ruled at scope 2026-08-03, promoting this entry: widen the declaration, do not
-  shim.** The two live answers were shimming the two call sites versus stating the
-  install path's real requirement on the page. Three grounds, none of them a
-  preference: TRAJECTORY.md's interpreter policy binds every unit touching the
-  install path to **add no new shell-only install step**, and a shim adds shell
-  rather than removing it; the shim's surface is chartered to stop being bash at
-  all (`install-step-relocation` moves these steps behind the binary's invoke, and
-  `powershell-installer-surface` re-implements the Windows half), so it is work
-  with a known expiry; and declaring converges the install path onto the pattern
-  the floor contract already states for the battery, which is what makes this unit
-  debt rather than new portability behavior. The ruling does not foreclose the
-  shim — when `install-step-relocation` lands, the declaration narrows on its own.
-  `bash-portability-floor-costing` closes the *battery-wide* version of this trade;
-  it does not close the narrow installer-and-probe one, which is two call sites
-  rather than twenty-five files.
-  **Collides with `native-artifact-install-path`, verified at align 2026-08-03.**
-  That amendment's own docs/install.md §Requirements delta — the install path's
-  digest-tool requirement, `sha256sum` **or** `shasum` — lands in the same
-  paragraph this entry's `sort -V` widening must land in: the "some requirements
-  belong to an install path rather than to the battery" paragraph, not the
-  battery's toolchain roster. Same page, same section, same iteration; the
-  amendment already names the collision and states the rule (whichever lands
-  second states both requirements or reverts the first). Build must not draft
-  these as two independent diffs against a stale copy of the paragraph: land both
-  requirement statements in one rewrite, in the same commit or in immediately
-  consecutive ones, each reading the paragraph as the other left it.
-  **A third edit to the same section rides the same rewrite, ruled 2026-08-04.**
-  §Requirements' `cargo` bullet says a compiled gate *"is ruled to arrive prebuilt
-  for your platform"* — a statement about a ruling, authored before any artifact
-  existed. `native-artifact-publish-path` has since landed and published them, so
-  the bullet is understated rather than wrong and `check-install-claim` stays
-  green: this is a sharpening, not a defect fix. It originates in that merged
-  amendment's own §Existing sections updated and its task is closed, so it is
-  recorded here — with the other two — because one session writing the whole page
-  is what keeps the three from reverting each other.
-  **Cost while deferred:** the install path's real toolchain requirement stays
-  undeclared and the probe's own portability stays unstated — the fail-open class
-  the bash-floor gap already fixed once for the battery, reopened one layer out.
-  Filed 2026-08-02 at close from the gap inbox; found at scope.
 
 - **release-bump-deferred-floor-unenforced** —
   `scripts/check-release-bump.sh` does not implement the deferred-floor invariant
@@ -3405,5 +3305,7 @@
 ## Done
 
 - native-artifact-publish-path
+- native-artifact-install-path
+- install-path-gnu-userland-undeclared
 
 ## Lessons Learned

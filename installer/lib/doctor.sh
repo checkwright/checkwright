@@ -28,6 +28,8 @@ esac
 source "$FLOOR"
 # shellcheck source=./common/lock.sh
 source "$INSTALLER/lib/common/lock.sh"
+# shellcheck source=./common/digest.sh
+source "$INSTALLER/lib/common/digest.sh"
 
 # spec: context-kit/SPEC.md §bin/env-probe — both version probes read from /dev/null, and `-V` is only the fallback: a tool rejecting `--version` would otherwise reach a `-V` that reads inherited stdin and hangs
 probe_banner() {   # $1 = tool -> its raw version banner, empty when the tool is absent
@@ -79,6 +81,44 @@ else
     printf '  %-12s %s\n' commit "$(lock_field "$LOCK" commit)"
     printf '  %-12s %s\n' profile "$(lock_field "$LOCK" profile)"
     printf '  %-12s %s\n' kits "$(lock_field "$LOCK" kits)"
+
+    # spec: installer/README.md §The gate binary — the recorded digest's second reader: re-verifying the binary in place is the only thing standing between a consumer and one swapped after install, and the path is resolved from the knob that owns it rather than from a copy the manifest would otherwise have to store
+    artifact_target="$(jq -r '.artifact.target // ""' "$LOCK" 2>/dev/null)"
+    artifact_digest="$(jq -r '.artifact.digest // ""' "$LOCK" 2>/dev/null)"
+    if [[ -n "$artifact_target" ]]; then
+        seam="$(jq -r '.files | keys[] | select(endswith("/gate-sdk-config.sh"))' "$LOCK" 2>/dev/null | head -n1)"
+        bin=""
+        [[ -n "$seam" && -f "$ROOT/$seam" ]] \
+            && bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$ROOT/$seam" | head -n1)"
+        # spec: installer/README.md §doctor — an artifact finding reports without setting the verdict, and that is deliberate rather than lenient: the exit status is the toolchain contract init gates on, so failing it here would block the re-run that is this finding's own remedy
+        if [[ -z "$bin" || ! -f "$ROOT/$bin" ]]; then
+            printf '  %-12s %s — recorded, but nothing at the path GATE_SDK_NATIVE_BIN names; re-run init\n' \
+                artifact "$artifact_target"
+        elif [[ "$(digest_of "$ROOT/$bin")" == "$artifact_digest" ]]; then
+            printf '  %-12s %s (verified in place)\n' artifact "$artifact_target"
+        else
+            printf '  %-12s %s — DIGEST MISMATCH, %s differs from what init wrote; re-run init\n' \
+                artifact "$artifact_target" "$bin"
+        fi
+    fi
+
+    # spec: installer/README.md §The gate binary — the omitted-member record's second reader, reported against the reason that caused it because a remedy is what an adopter comes here for
+    list="$(jq -r '.files | keys[] | select(endswith("/gates.list"))' "$LOCK" 2>/dev/null | head -n1)"
+    if [[ -n "$list" && -f "$ROOT/$list" ]]; then
+        while read -r count reason; do
+            [[ -n "$reason" ]] || continue
+            case "$reason" in
+                substrate-unavailable)
+                    printf '  %-12s %d gate(s), %s — no prebuilt binary is published for this platform\n' \
+                        omitted "$count" "$reason" ;;
+                digest-unverifiable)
+                    printf '  %-12s %d gate(s), %s — install sha256sum or shasum, then re-run init\n' \
+                        omitted "$count" "$reason" ;;
+                *)
+                    printf '  %-12s %d gate(s), %s\n' omitted "$count" "$reason" ;;
+            esac
+        done < <(awk '$1 == "#" && $2 == "omitted:" { print $4 }' "$ROOT/$list" | sort | uniq -c)
+    fi
 fi
 
 if (( FAILED )); then
