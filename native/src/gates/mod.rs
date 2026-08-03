@@ -113,8 +113,9 @@ mod tests {
         );
     }
 
-    // spec: gate-sdk/SPEC.md §run-gate-tests — the case's `args` file, read on the runner's
-    // own terms (`#` lines stripped) so this test and the runner cannot disagree.
+    // spec: gate-sdk/SPEC.md §run-gate-tests — the case's `args` file on the runner's own
+    // terms: drop lines starting `#`, then split the rest on whitespace as its unquoted
+    // expansion does, so this test and the runner cannot disagree about one case's argv.
     fn case_args(case: &std::path::Path) -> Vec<String> {
         let p = case.join("args");
         let text = match std::fs::read_to_string(&p) {
@@ -122,8 +123,8 @@ mod tests {
             Err(_) => return Vec::new(),
         };
         text.lines()
-            .map(str::trim)
-            .filter(|l| !l.is_empty() && !l.starts_with('#'))
+            .filter(|l| !l.starts_with('#'))
+            .flat_map(str::split_whitespace)
             .map(String::from)
             .collect()
     }
