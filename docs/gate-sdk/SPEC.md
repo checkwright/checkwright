@@ -665,6 +665,58 @@ exactly as that section bounds it, raised cost of analysis and never
 confidentiality. A later session weighing a port weighs that ruling, not the
 constraint set this record was written under.
 
+### The decisions this substrate already closed
+
+Two questions behind the port are settled. Both are recorded here because the
+only surface that ever held them was a queue entry, a compression dropped each,
+and each was then restated from memory rather than read — so this subsection is
+the two of them landing where the component that depends on them can be read
+alone. Reading them does not reopen them. The authoring rule that would have
+prevented both losses is `lossless-compression-codification`'s to state, and a
+durable home for the project's closed rulings is `trajectory-ruling-record`'s to
+build; neither is this section's work.
+
+**The substrate language is Rust — ruled 2026-08-02, final.** The alternative
+weighed and refused is **Go**, on three grounds: larger binaries, poorer memory
+management under a primitive garbage collector, and a weaker compiler. The first
+of those is not a matter of taste here, because footprint is a first-class cost
+under the objectives the trajectory pivot records
+(gate-sdk/SPEC-native-gate-vendoring-model.md §The objectives this ruling
+serves) and the payload ships one prebuilt binary per declared target
+(§Consumer payload), so binary size is paid per target on every adopter's
+machine. The comparison had been made in an earlier session and lost with the
+compression that dropped it; it is written down rather than left to the next
+session's judgement.
+
+**A bash portability floor was costed and rejected — closed, not deferred.**
+What was costed: shimming or dropping the GNU-only constructs the battery
+depends on — the gate library's nameref and `realpath --relative-to`, gawk's
+three-argument `match()`, `sort -V`, `date -d`, `stat -c`. The blast radius was
+about 25 files, mostly single call sites, with two shared libraries carrying
+most of the leverage, for an estimated two to four small units. It is rejected
+because it cannot deliver the reach it would be bought for: stock macOS ships
+bash 3.2, which no shim reaches, and `mapfile` / `declare -A` appeared
+in 57 of the 96 checks counted that day — so the floor buys BSD-userland
+tolerance and never a stock-macOS install.
+
+**That rejection stands on the trajectory pivot, and deliberately not on this
+section's own case for a port.** `native-gate-binary-port` ruled platform reach
+out as a ground for porting, so an argument from reach would contradict the
+entry it sits under. The pivot reinstates reach: it names every major operating
+system and makes the non-technical adopter a design constraint (§The objectives
+this ruling serves, cited above). Read against those, a floor reaching BSD
+userlands but not a stock macOS install fails an objective rather than a
+preference — and the pivot's own direction, shrinking the interpreter surface to
+the unavoidable, is the one this costing already pointed, which makes the
+costing a step on the trajectory rather than a casualty of it. The narrower
+installer-and-probe trade this does **not** close stays
+`install-path-gnu-userland-undeclared`'s.
+
+The figures above are a **dated measurement, not a live claim** about this tree:
+they record what the floor would have cost when it was rejected. A later session
+must not refresh them against the current battery — a recount is a step toward
+re-deciding, and only the operator reopens a closed ruling.
+
 ### The port-candidate criteria
 
 A gate is a candidate only if **all six** hold. The first four were stated at

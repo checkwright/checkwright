@@ -59,91 +59,6 @@
 
 ## Technical Debt
 
-- **native-gate-language-ruling** — record a closed language decision. Land the
-  substrate language and the alternative it beat in gate-sdk/SPEC.md beside
-  §Porting a gate to the binary substrate, so the choice survives the amendment that
-  implements it. Sibling in shape to `bash-portability-floor-costing`: the
-  deliverable is the recording, and what follows is neither re-derived nor re-opened.
-  **Ruled 2026-08-02 by the operator, final: Rust.** The alternative weighed and
-  **refused is Go**, on three stated grounds — larger binaries, poor memory
-  management under a primitive garbage collector, and a weaker compiler. The
-  comparison had already been made in an earlier session; the ruling had to be
-  restated because no surface carried it, which is the cost this entry exists to end.
-  **Why a distinct entry rather than parent prose:** the operator's standing rule
-  that a task compression must be lossless — anything that will not fit is relocated
-  to a linked task, never dropped. The parent red on `check-queue-entry-budget` three
-  times on 2026-08-02, so the decision could not fit there, and it had already been
-  lost once: the 2026-07-28 filing carried `language choice (Rust vs Go)` as an open
-  question and the compression removed it without answering it.
-  **Debt, not a feature:** the ruling is closed and the work is prose in an existing
-  SPEC section — no script, knob, convention, tag, or contract another component must
-  honor, so the amendment litmus (canon-kit/SPEC.md §The amendment lifecycle) does
-  not reach it.
-  **Verified undone 2026-08-02 at scope:** zero hits tree-wide, outside this file,
-  for the ruling or its grounds. Promoted by scope on the operator's unit-set ruling.
-
-- **bash-portability-floor-costing** — record a closed costing. Land the costed
-  rejection of a bash portability floor in gate-sdk/SPEC.md beside §Porting a gate to
-  the binary substrate, so the reasoning outlives the amendment that carries it.
-  Companion to `native-gate-binary-port`: the work is the recording, and the costing
-  below is not to be re-derived.
-  **What was costed 2026-08-02:** shimming or dropping the GNU-only constructs the
-  battery depends on — the gate library's nameref and `realpath --relative-to`, gawk's
-  3-arg `match()`, `sort -V`, `date -d`, `stat -c`. Blast radius about 25 files, mostly
-  single call sites, two shared libraries carrying most of the leverage: an estimated
-  2-4 small units.
-  **Why closed rather than deferred:** it cannot deliver the reach it would be bought
-  for. Stock macOS bash 3.2 is unreachable by shims, and `mapfile`/`declare -A` appear
-  in **57 of 96** checks — recounted 2026-08-02 at scope against the filed "56 of 100",
-  conclusion unchanged — so the floor buys BSD-userland tolerance, never a stock-macOS
-  install, which is the thing the port is wanted for. Record the recounted figure.
-  **Debt, not a feature:** as with `native-gate-language-ruling`, the ruling is closed
-  and the deliverable is prose in an existing SPEC section.
-  **Verified undone 2026-08-02 at scope:** zero hits tree-wide, outside this file, for
-  the costing. It does not close the narrower installer-and-probe trade, which stays
-  with `install-path-gnu-userland-undeclared`. Promoted by scope on the operator's
-  unit-set ruling; the operator supplied this argument from memory twice in one
-  session because no surface carried it.
-  **Re-verified 2026-08-03 against the operator's trajectory pivot: the conclusion is
-  confirmed, not inverted, and this entry stays as promoted.** The pivot minimizes bash to
-  the unavoidable and moves the battery to native binaries — the same direction this
-  costing already points. It rejects investing in bash *portability*; the pivot rejects
-  investing in bash at all, so the costing is a step on the trajectory rather than a
-  casualty of it. What the pivot does change is the standing of the costing's own premise:
-  it argues from platform reach being the thing the port is wanted for, and
-  `native-gate-binary-port` had ruled platform reach out as a port ground. The pivot
-  reinstates it. **Land the recording citing the pivot as the superseding ground**, not the
-  parent's ruled-out one, or the prose lands arguing from a ground its own parent denies.
-
-- **scope-survey-counter-evidence** — scope's premise re-verification is a
-  confirmation channel: it reads an entry *for* falsifiable claims, finds them, and
-  never runs a pass for evidence the other way. Reproduced 2026-08-02 on
-  `native-gate-binary-port`, where a scope falsified four premises and recommended
-  against the unit, while the entry's self-declared sharpest ground (gate opacity)
-  went uncited and three siblings stating that the port closes or converges with them
-  went unaggregated. The operator supplied both from memory.
-  **The derivable half shipped** as `queue-inbound-edge-projection`
-  (`queue-kit/bin/queue-edges.sh`), which sums a slug's inbound edges and carries each
-  citing line verbatim; build narrowed the ask to a stdout tool with cause in
-  queue-kit/SPEC.md §bin/queue-edges.sh — a later session must not helpfully restore
-  the projection. What remains is the un-gateable half alone.
-  **Deliverable: one line in `.workflow/audit-roster.txt`** naming the
-  survey-engagement class — whether a survey engaged an entry's strongest ground and
-  aggregated its inbound edges before ranking. That is a session act with no
-  mechanical residue, the `close-surface-actually-read` class exactly, and that
-  sibling class is already a roster member with a declared one-line format — so this
-  is a populated-surface edit, not a design act. Debt for that reason.
-  **Promotion-ready as of 2026-08-02 at close; promoted at the next scope**, whose own
-  conduct is the standing evidence: that session aggregated inbound edges with the
-  shipped tool before ranking and engaged the opacity ground — the behaviour the
-  roster line names.
-  **Not recorded by untagging:** the lead ruled the deferred-section design marker be
-  dropped and the oracle refused, correctly — queue-kit/SPEC.md §The icebox tier makes it
-  section membership carried by every deferred entry alike, so it never discriminated
-  readiness. Readiness is body content.
-  Filed 2026-08-02 by scope, operator-directed. Absorbs the narrower gap-inbox bullet
-  filed the same day.
-
 ## Deferred
 
 - **native-artifact-publish-path** [design-pending] — build and publish the per-target gate binary.
@@ -3142,5 +3057,8 @@
 
 - native-gate-meta-layer-reach
 - gate-payload-disclosure-ruling
+- native-gate-language-ruling
+- bash-portability-floor-costing
+- scope-survey-counter-evidence
 
 ## Lessons Learned
