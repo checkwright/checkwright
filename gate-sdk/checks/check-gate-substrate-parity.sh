@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,kit:checks/*.sh,kit:checks/*.gate,gate-sdk/SPEC.md dir=one valve=none tier=precommit
-# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, and a recorded disposition for every substrate-sensitive member
+# graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,native/* dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, a recorded disposition for every substrate-sensitive member, and no implementation source inside the vendoring set
 #
 # usage: check-gate-substrate-parity.sh [gates-dir] [conservation-doc]
 #   two args: steer onto hermetic fixture copies of each surface.
@@ -136,6 +136,35 @@ if [[ -d "$IMPL_DIR" ]]; then
     done < <(gate_find "$IMPL_DIR" -type f)
 fi
 
+# assertion E: opacity is held by structure — a ported gate's implementation source
+# may not reach the vendoring set, whose members are exactly the kit roots
+# spec: gate-sdk/SPEC.md §Consumer payload
+CRATE="${GATE_SDK_NATIVE_CRATE:-native}"
+CRATE="${CRATE%/}"
+declare -A DESCRIPTOR_SET=()
+for g in "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}"; do DESCRIPTOR_SET["$g"]=1; done
+kit_scanned=0
+while IFS= read -r root; do
+    root="${root%/}"
+    if [[ "$CRATE" == "$root" || "$CRATE" == "$root"/* ]]; then
+        findings+=("crate root inside the vendoring set: $CRATE sits under kit root $root — a kit root vendors whole, so the implementation source would ship with it")
+    fi
+    [[ ${#DESCRIPTOR_SET[@]} -gt 0 && -d "$root" ]] || continue
+    kit_scanned=$((kit_scanned + 1))
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        base="${f##*/}"
+        stem="${base%.*}"
+        # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — an extensionless name is out of reach by contract, and .gate/.sh are owned by the descriptor itself and by assertion A
+        [[ "$stem" == "$base" ]] && continue
+        ext="${base##*.}"
+        [[ "$ext" == gate || "$ext" == sh ]] && continue
+        if [[ -n "${DESCRIPTOR_SET[$stem]:-}" ]]; then
+            findings+=("implementation sibling in the vendoring set: $f shares its name with the $stem.gate descriptor — a ported gate's implementation may not sit under a kit root")
+        fi
+    done < <(gate_find "$root" -type f)
+done < <(gate_kit_roots_rel)
+
 if [[ ${#findings[@]} -gt 0 ]]; then
     echo "check-gate-substrate-parity: the gate substrate seam is not conserved:"
     printf '  %s\n' "${findings[@]}"
@@ -150,6 +179,9 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "  help: delete a manifest-class annotation from implementation source — the"
     echo "        '# graph:' manifest has exactly one writable home, the declaration"
     echo "        path, so that every reader of it works with no build and no execution."
+    echo "  help: move a ported gate's implementation out of every kit root, and keep the"
+    echo "        crate root outside them too — a kit root vendors whole, so anything"
+    echo "        under one ships, and the payload withholds the predicate by structure."
     exit 1
 fi
 
@@ -158,5 +190,5 @@ if [[ "$roster_read" == 1 ]]; then
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root)"
 exit 0

@@ -111,7 +111,14 @@ absolute path baked into a tracked hook would make `check-graph`'s byte-freshnes
 comparison machine-dependent. And `GATE_SDK_NATIVE_SRC` (default `native/src`;
 the implementation tree §check-gate-substrate-parity assertion D holds free of
 manifest-class annotation — a **path, not a language**, so the knob assumes
-nothing about what implements a ported gate). Paths are
+nothing about what implements a ported gate). And `GATE_SDK_NATIVE_CRATE`
+(default `native`; the crate root that owns the build manifest, held outside
+every kit root by §check-gate-substrate-parity assertion E). The two native
+path knobs stay distinct because they answer different questions:
+`GATE_SDK_NATIVE_SRC` names the implementation tree a gate's rule lives in,
+`GATE_SDK_NATIVE_CRATE` the root that would carry that tree with it if it moved,
+and only the second decides whether the implementation sits inside the vendoring
+set (§Consumer payload). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
@@ -294,6 +301,39 @@ escape for whole-tree scanners whose state has no static-fixture representation
 (e.g. a HEAD-vs-worktree diff). A fixture-*capable* gate carrying the valve as
 a stopgap is filed as debt and fixtured, never given a dishonest "infeasible"
 reason.
+
+**The pair is shipping-side, and under §Consumer payload it is the consumer's
+whole verification oracle.** It vendors already — `installer/lib/init.sh`
+enumerates a kit's payload with an unfiltered `find . -type f`, so the pair
+arrives whole. What the ruling changes is its weight rather than its delivery:
+with the predicate withheld it is **the only thing a consumer can independently
+check**, where alongside readable source it was a convenience. The pair plus
+`run-gate-tests.sh` is the entire answer to *does this
+binary do what its SPEC section says*. `gate_command`'s substrate-blind dispatch
+(§run-gate-tests) is what makes it work across substrates, so nothing new is
+built here — only the statement that the property is a contract and may not be
+dropped to slim a payload.
+
+**What the pair is evidence *of* differs by tree, and the distinction is not
+pedantry.** In this repo it is post-build verification. In a consumer tree it is
+**post-install acceptance evidence**: nothing is built there, the artifact
+arrives prebuilt and digest-verified, so the question is not *did my build come
+out right* — that question does not exist for a consumer — but *does the
+artifact I was given behave as the specification I was given says it behaves*,
+answered against cases the publisher is held to by the same meta-gates. The
+digest answers **which** artifact arrived; the pair answers **what it does**.
+The payload ships an answer to both, which is the whole of what replaces reading
+the rule. It is also the consumer-side answer to the honest limit §Meta-gate
+conservation for the binary substrate records: the crate-side verification of a
+gate's declared read-set runs where cargo runs, and that is never a consumer
+tree.
+
+**Ruled: the pair ships.** The open question was whether opacity extends to it,
+since a `good/`+`bad/` pair shows an agent what passes and what fails. It does
+not extend. Fixtures disclose a gate's **shape**, never its **predicate**, and
+the pair is the consumer's only parity oracle for a binary they cannot read;
+withholding it would spend the trust story to buy marginal opacity, since the
+help text and the SPEC section ship regardless.
 
 ### Self-lint
 
@@ -616,6 +656,15 @@ written here rather than left in a commit message because a later reader
 deciding whether to port will read the spec and would otherwise re-attempt it
 into the same wall.
 
+**One of the grounds a port is argued on has changed since, and it changed by
+ruling rather than by drift.** The slice was built under the constraint that
+opacity is not claimed, so the case for a port rested on the seam and the
+conservation contract alone. §Consumer payload now rules withholding a gate's
+predicate a goal, which makes opacity a ground a port may argue on — bounded
+exactly as that section bounds it, raised cost of analysis and never
+confidentiality. A later session weighing a port weighs that ruling, not the
+constraint set this record was written under.
+
 ### The port-candidate criteria
 
 A gate is a candidate only if **all six** hold. The first four were stated at
@@ -723,10 +772,13 @@ is genuinely unchanged. This is the correction the revert paid for, and
 `native-gate-vendoring-model`'s cost is measured rather than hypothetical
 because of it.
 
-**Opacity is not claimed.** This repo builds from source and the implementation
-sits readable in-tree, so the benefit delivered here is the seam and the
-conservation contract, not the headline ground the port is sometimes argued on.
-Claiming otherwise would be the "land it then relax" failure inverted.
+**Opacity has left this section — it is ruled, not deferred.** The slice was
+argued under the reading that opacity is *not* claimed, and that reading is void:
+§Consumer payload rules withholding a gate's predicate a goal, and states
+precisely what the claim is and is not. What this section keeps is the narrower
+question the ruling does not reach — whether *this* repo runs built artifacts
+rather than source, which stays `native-gate-dogfood-ruling`, sharpened by the
+pivot rather than answered by it.
 
 **The language-agnostic reading is visible and not built.** The layer above the
 descriptor is substrate-blind (§The `# graph:` manifest), which makes a
@@ -741,6 +793,75 @@ SSOT split is *enforced*, not trusted to habit
 (§check-gate-substrate-parity assertion D) — noted here because the natural
 outcome for a rule stated only in prose is that the first tired session breaks
 it.
+
+## Consumer payload
+
+What a gate on the binary substrate **discloses** to the consumer it judges.
+Its reach is exactly that: it rules what a *gate* ships, not whether this repo
+runs built artifacts — that is `native-gate-dogfood-ruling`, which asks the same
+lever from the other end. How a compiled gate *arrives* is
+`native-gate-vendoring-model`'s; this section is what arrives with it.
+
+**The payload withholds the predicate.** A gate on the binary substrate reaches
+a consumer as its `.gate` descriptor, its `# spec:` pointer and the SPEC section
+that pointer binds to, its `good/`+`bad/` fixture pair, and a prebuilt,
+digest-verified binary. **Its implementation source does not ship.** A consumer
+receives everything needed to run a gate, act on its verdict, and verify it
+behaves as specified, and does not receive the rule's text.
+
+This serves the objective `native-gate-vendoring-model` §The objectives this
+ruling serves records in full — that opacity is a goal and not a side effect,
+because withholding a gate's implementation favours *execution* of it over
+*analysis* of it by the coding agents the gate exists to hold. It reverses the
+ground the dispatch seam was built under, where opacity was explicitly not
+claimed; the reversal is a ruled trajectory pivot, and the earlier reading is
+void wherever it survives.
+
+**What the objective buys, stated precisely so it is not oversold.** The
+beneficiary is one failure mode: a coding agent told to make a battery green
+reads the gate blocking it and edits its way around the predicate instead of
+fixing the defect. Withholding the source removes the cheapest path to that. It
+does **not** make the rule secret — a binary is reverse-engineerable, the
+fixture pair discloses shape, and the SPEC section states the invariant on
+purpose. The claim is *raised cost of analysis relative to execution*, never
+confidentiality, and no governed surface may state it as the latter. That bound
+is what makes the claim honest; it is not a hedge to be softened later.
+
+**What opacity does not extend to, and why each exclusion is load-bearing.** A
+withholding rule with no stated boundary grows until the tool is unusable. Four
+things ship, each because withholding it would break something the product
+needs:
+
+- **The `.gate` descriptor**, because its manifest readers must work with no
+  build and no execution — `installer/lib/init.sh` runs `gen-pre-commit.sh
+  --write` in the consumer tree (§The `# graph:` manifest).
+- **The `# spec:` pointer and its SPEC section**, because a gate that goes red
+  without an explicable invariant is an unactionable block, and an unactionable
+  block is how a blocking gate turns into a bypassed one.
+- **The gate's own output and help text**, because the remedy line is the
+  product. A gate that says only *no* is worse than no gate.
+- **The `good/`+`bad/` fixture pair**, which is shipping-side and is the
+  consumer's whole verification oracle once the source is withheld
+  (§Fixture-pair discipline owns what it is evidence of).
+
+**The obligation opacity buys.** A consumer who cannot read the gate has only
+the publisher's word for it, so the integrity story is the whole of what
+replaced reading the source. The achievable floor is a published per-target
+digest verified before the artifact is written (`native-gate-vendoring-model`).
+What that floor does not provide is a reproducible build, and the queue holds
+that ground as `tarball-build-attestation`: the checksum proves transfer only.
+The pivot changes what that entry is worth rather than what it says — while
+sources shipped it was a supply-chain nicety, and with sources withheld it is
+the consumer's only remaining basis for trust.
+
+**The rule is held by structure, not by discipline.** It is violated
+structurally — a ported gate's implementation source reaching the vendoring set,
+which is exactly the kit roots — so it is checked structurally, by
+§check-gate-substrate-parity assertion E. The gate a prior reading of this
+question proposed, a NUL-byte scan enforcing *no artifact ships*, is dropped
+with its reason on record rather than carried on momentum: it enforced the
+ruling under which shipping a binary was the violation, and under this one
+shipping a binary is the point.
 
 ## Consumer smoke
 
@@ -1545,7 +1666,7 @@ Holds the dispatch seam honest: a gate's implementation may move to a compiled
 subcommand, but not by quietly deleting the declaration other gates read or the
 record of what that move costs. Usage
 `check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
-steers the fixture pair onto hermetic copies of each surface. Four assertions.
+steers the fixture pair onto hermetic copies of each surface. Five assertions.
 
 - **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
   exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
@@ -1587,6 +1708,34 @@ steers the fixture pair onto hermetic copies of each surface. Four assertions.
   reader partition below, and it is a live assertion rather than a convention —
   two writable sources of one truth drift silently, and this is the truth every
   build-free reader depends on.
+- **assertion E — no implementation source inside the vendoring set.** The
+  ruling of §Consumer payload is withholding a gate's predicate, and what a
+  consumer receives is exactly the kit roots (`gate_kit_roots`), so the ruling
+  is violated structurally and is checked structurally in two halves. **No
+  implementation sibling:** for every `<name>.gate` the resolve dirs declare, no
+  file named `<name>.<ext>` exists anywhere under any kit root — the natural
+  mistake of putting a ported gate's implementation beside its descriptor, where
+  it vendors. **The crate root is outside every kit root:**
+  `GATE_SDK_NATIVE_CRATE` resolves to no path under any `gate_kit_roots` member.
+  That half is the non-vacuous one in an unported tree, and it reds on the single
+  edit that would silently undo the whole ruling — relocating the crate to give
+  it a ride into the payload. It is folded into this gate rather than shipped as
+  its own because the descriptor set it reads is the one this gate already
+  derives, and a separate gate would duplicate that derivation to add nothing.
+
+  Three calibrations, each drawing a boundary rather than trimming for
+  convenience. The extension test is **extension-agnostic**: any extension but
+  the two spoken for reds, because a roster of implementation languages is a
+  maintained set that rots and would contradict assertion D's own
+  language-agnosticism. `.gate` is spoken for by the descriptor itself and `.sh`
+  by assertion A, which owns within-dir ambiguity and by §Layout and
+  configuration sanctions a consumer's shell shadow of a ported gate. And an
+  **extensionless** name is deliberately out of reach: a built artifact named
+  after its gate is an artifact-placement question this section does not own, and
+  an assertion that reds on it would prejudge one. The honest residual, stated
+  rather than discovered: with no descriptors declared the sibling half scans
+  nothing and says so in its clean line — an unported tree has no ported gate's
+  source to misplace, and the crate half stays live throughout.
 
 It stays a **shell** gate: a gate that audits the port is not a gate the port
 may consume, or assertion B would be checking a roster through the very binary
@@ -1601,6 +1750,17 @@ binary present** — the post-revert tree, where the roster half is the only liv
 half; and the consumer smoke covers **no descriptors, no binary** — a vendored
 tree, where the gate must run clean rather than fail-close, which is the
 configuration the reverted port made unreachable.
+
+**Assertion E's couples were widened for it, and the widening is the finding.**
+The manifest carried `kit:checks/*.sh,kit:checks/*.gate`, which covers neither
+subject assertion E reads: not a non-shell file dropped beside a descriptor, and
+not the crate root at all. An assertion that never re-fires is an assertion that
+never runs, so the couple became `kit:checks/*` — the one location the sibling
+mistake lands — plus `native/*` for the crate root a relocation stages away
+from. What stays uncoupled is the recursive sweep of every kit root: coupling a
+whole kit root recursively would fire this gate on nearly every commit to buy a
+trigger for a case the full battery already reaches, and the sweep reads file
+*names*, never file content, so there is no content surface to bind.
 
 It is registered in gate-sdk's consumer-smoke install: it needs no consumer
 config, and a vendored tree is exactly where a descriptor with nothing behind it

@@ -57,40 +57,6 @@
   Cost promoted from hypothetical to measured 2026-08-02 by the build repair that
   reverted the port.
 
-- **gate-payload-disclosure-ruling** [spec: SPEC-gate-payload-disclosure-ruling.md] —
-  what a compiled gate ships to a
-  consumer tree. Companion to `native-gate-binary-port`, inside that entry's envelope
-  and filed apart so neither body sprawls.
-  **Today's answer is an artifact of the substrate, not a choice:** a bash gate *is*
-  its source, so there is nothing else to ship. Measured 2026-08-02 —
-  `scripts/pack-installer.sh`:80 copies whole kit roots, `installer/lib/init.sh`:130-132
-  writes every file of each, and a profile selects kits and never files, so a consumer
-  receives `checks/`, `gate-tests/`, `smoke/`, `lib/` and `bin/` entire, over both
-  transports.
-  **Once gates compile it becomes a lever:** binary plus documented rule, or sources
-  and fixtures as now. That choice is what fixes the opacity range the parent states,
-  which is why it is a first-class design question rather than a packaging detail.
-  **Counterweight the ruling must carry:** withholding sources **raises** the
-  reproducible-build and checksum obligation, because a consumer who cannot read the
-  gate has only the build's attestation — and "buildable source, needing only git" is
-  already in the parent's own deliverable.
-  **A contract question that must not be discovered late:** the `good/`+`bad/` fixture
-  pair is a gate-sdk contract held by meta-gates, and whether that contract is
-  development-side or shipping-side is unstated today.
-  **The distinction that makes that question tractable, restored 2026-08-02 from a
-  parent revision a compression dropped:** `init` vendors every kit file, fixtures
-  included, so a consumer agent keeps the pair — which discloses a gate's *shape*,
-  never its predicate. Shape-without-predicate is the middle option the
-  binary-versus-sources framing above otherwise hides.
-  **Cost while deferred:** the parent's headline benefit stays a range rather than a
-  value, so a first cohort could land on a substrate whose main justification is still
-  unsettled. **Taken into the `native-port-unblocking` iteration by operator direction
-  2026-08-02**, and not separably from `native-gate-vendoring-model`: the cheapest
-  install model on the table — a descriptor declaring a shell fallback, so an absent
-  binary degrades to it — hands the consumer the source and settles this entry by
-  accident. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
-  decision the port owns rather than an inheritance from the bash era.
-
 ## Technical Debt
 
 - **native-gate-language-ruling** — record a closed language decision. Land the
@@ -3175,5 +3141,6 @@
 ## Done
 
 - native-gate-meta-layer-reach
+- gate-payload-disclosure-ruling
 
 ## Lessons Learned

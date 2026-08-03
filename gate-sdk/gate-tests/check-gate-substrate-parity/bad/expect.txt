@@ -4,3 +4,5 @@ subcommand nothing declares
 no reference-only disposition
 no recorded disposition: check-alpha
 manifest-class annotation in implementation source
+implementation sibling in the vendoring set: kitroot/check-orphan.rs
+crate root inside the vendoring set: kitroot/native

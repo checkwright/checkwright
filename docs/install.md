@@ -241,6 +241,28 @@ shim↔template contract — see lifecycle-kit's
 Start with [gate-sdk](gate-sdk/index.md) — the other kits register into its
 runner — then add kits in the order the [kit map](index.md#the-kits) lists them.
 
+### What a gate discloses
+
+Worth knowing before you adopt, because it qualifies the opening claim on this
+page. Today every gate is a shell script and you read all of it. The ruled
+direction is that a gate whose implementation moves to a compiled binary ships
+four things and withholds one. It ships its declaration. It ships its `# spec:`
+pointer with the specification section behind it. It ships its `good/`+`bad/`
+fixture pair. It ships the binary itself, verified against a published digest
+before anything is written to your tree. What it does not ship is the
+implementation source. [gate-sdk/SPEC.md](gate-sdk/SPEC.md#consumer-payload) is
+where that is ruled and bounded.
+
+The reason is narrow and worth stating as narrowly as it holds. A coding agent
+told to make your battery green will, if it can, read the gate blocking it and
+edit its way around the rule instead of fixing what the rule caught. Withholding
+the implementation raises the cost of analysing a gate relative to the cost of
+running it. It does not make the rule a secret. A binary can be taken apart. The
+fixture pair shows you what passes and what fails. The specification section
+states the invariant on purpose. What you keep is the ability to run the gate
+and to hold it to its own fixtures, which is what this page means by verifying
+rather than trusting.
+
 ## Reviewing the pre-commit hook before you install it
 
 Step 4 above points a clone's git hooks at bash from this tree, which is worth
