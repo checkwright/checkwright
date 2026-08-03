@@ -98,12 +98,15 @@ your `PATH`, and the note says what breaks without it:
 - `shellcheck` — the `check-shellcheck` meta-gate runs
   [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
   lint finding blocks the commit.
-- `cargo` (≥ 1.56) — a build-time requirement, not a runtime one: the `native/`
-  crate carries the gate implementations that can dispatch to a binary
-  subcommand, and the floor is the crate's `edition = "2021"`. Only contributors
-  building the tree need it — no gate dispatches to the binary today, so a commit
-  does not require it; CI builds, lints and tests the crate every run. A gate on
-  that substrate shells out to git at runtime and embeds nothing.
+- `cargo` (≥ 1.56) — a contributor-and-CI requirement with **no install-time
+  role at all**: the `native/` crate carries the gate implementations that can
+  dispatch to a binary subcommand, and the floor is the crate's
+  `edition = "2021"`. Only contributors building the tree need it — no gate
+  dispatches to the binary today, so a commit does not require it; CI builds,
+  lints and tests the crate every run. Installing Checkwright never builds it
+  and never will: a compiled gate is ruled to arrive prebuilt for your platform,
+  so no install path asks you for Rust. A gate on that substrate shells out to
+  git at runtime and embeds nothing.
 
 <!-- toolchain:end -->
 
@@ -139,6 +142,25 @@ Publishing a docs site is an optional wider tier. A consumer that registers
 site-kit's render-fidelity gate — which re-renders every page through the
 GitHub Pages parser — additionally needs Ruby with the `kramdown-parser-gfm`
 gem. A consumer that publishes no docs site never installs it.
+
+### Where this is heading
+
+Everything above is what the tree requires today, and today is what you install
+against. The direction is a separate thing and is stated separately, because a
+requirements page that quotes a floor it has not reached costs you the install
+it was written to make easy.
+
+The direction: the battery moves off shell onto compiled gates. Those gates ship
+prebuilt rather than built on your machine, and the floor they aim at is **git
+alone** — git shelled out, never embedded. What survives is one small bootstrap
+that has to resolve your platform before any binary can run. It is deliberately
+small enough to exist twice, which is what would make a native Windows path
+possible where the roster above can only offer WSL.
+
+None of that is reached. Every gate in the battery is a shell script today, and
+the requirements above are what those scripts actually invoke. When a
+requirement drops it drops from that list — the list is where you will see it,
+not this paragraph.
 
 ## Quick start
 

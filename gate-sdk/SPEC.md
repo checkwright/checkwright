@@ -679,11 +679,17 @@ design time; the last two were paid for, and each is named with what it cost.
    what makes a root directory a kit. `gate_command` is fail-closed on an absent
    binary and its exit 2 is a **dispatch-harness** error, so it takes down the
    *calling battery*, not just its own member. A freshly vendored consumer's
-   pre-commit battery therefore died on invocation. This criterion is
-   unsatisfiable for any gate in a vendoring kit until
-   `native-gate-vendoring-model` rules how a compiled gate arrives — which is
-   why that entry is now a hard prerequisite for a second port rather than a
-   parallel concern.
+   pre-commit battery therefore died on invocation. **The condition that
+   satisfies this criterion is ruled**: the payload carries a prebuilt binary
+   per declared target, built by the release and never from a working tree; the
+   installer resolves the host to a target, verifies the matching artifact
+   against a published digest, and copies it — no selection ever builds; and a
+   member the host's platform has no artifact for is left out of the consumer's
+   `gates.list` and recorded there as an omitted member rather than dispatched
+   into an absent binary. What a second port waits on is therefore the artifacts
+   that model describes, not a further ruling —
+   `native-artifact-publish-path` produces and publishes them,
+   `native-artifact-install-path` places and verifies them.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives
@@ -730,9 +736,12 @@ behavior by two crate unit tests, consumed by the gate in place of its refusal
 (§check-reads-couples, §Meta-gate conservation for the binary substrate). It was
 built and proved **without a port**: against the reference-only implementation and
 a hermetic fixture, so no `.gate` member had to be added to a kit to end the
-refusal. **Criterion 5 remains**: a second port still waits on
-`native-gate-vendoring-model` to rule how a compiled gate arrives in a consumer
-tree.
+refusal. **The criterion 5 half is ruled rather than open**: how a compiled gate
+arrives in a consumer tree is settled (criterion 5 above). What it leaves is not
+a decision but a build — the artifacts and the digests that model selects from
+do not exist yet, so criterion 5 is satisfiable and not yet satisfied, and a
+second port lands after `native-artifact-publish-path` and
+`native-artifact-install-path` rather than after another ruling.
 
 ## What the dispatch seam does not settle
 
@@ -755,17 +764,23 @@ rather than decided, and the lesson that outlasts both readings is that
 *porting one gate decided it* — the dogfood question is settled by the first
 live port, whenever that lands, and not by argument beforehand.
 
-**The consumer payload is untouched. Vendoring is not — that claim was false.**
-Keeping the manifest as tracked text does earn the payload half: hook generation
-runs consumer-side, so the seam works identically whichever way the payload
-question rules. The vendoring half said "this slice ships no artifact and
-changes nothing about how a kit installs", and shipping no artifact is exactly
-the problem: the descriptor vendors and the binary does not, so the slice
-changed how a kit installs by making one kit's vendored form unrunnable
-(§Porting a gate to the binary substrate, criterion 5). The extensibility model
-is genuinely unchanged. This is the correction the revert paid for, and
-`native-gate-vendoring-model`'s cost is measured rather than hypothetical
-because of it.
+**Vendoring has left this section — it is ruled, not deferred.** The slice's
+claim that it "ships no artifact and changes nothing about how a kit installs"
+was false in its second half, and shipping no artifact is what made it false:
+the descriptor vendors and the binary does not, so the slice changed how a kit
+installs by making one kit's vendored form unrunnable. That is the correction
+the revert paid for, and the model that answers it is criterion 5's own text
+(§Porting a gate to the binary substrate) — a prebuilt per-target binary in the
+payload, digest-verified before it is written, omit-and-declare where the target
+roster carries no artifact for the host. The payload half of the claim stands
+unchanged: keeping the manifest as tracked text means hook generation runs
+consumer-side, so the seam works identically whichever way the payload question
+rules.
+
+**The extensibility model has left this section too.** The slice recorded it as
+"genuinely unchanged", which with no reason stated is indistinguishable from
+unexamined — and this entry has lost two of its three options to exactly that
+once already. §The extensibility model rules it.
 
 **Opacity has left this section — it is ruled, not deferred.** The slice was
 argued under the reading that opacity is *not* claimed, and that reading is void:
@@ -857,6 +872,38 @@ question proposed, a NUL-byte scan enforcing *no artifact ships*, is dropped
 with its reason on record rather than carried on momentum: it enforced the
 ruling under which shipping a binary was the violation, and under this one
 shipping a binary is the point.
+
+## The extensibility model
+
+How a consumer extends the battery, ruled rather than deferred. Three shapes
+were ever on the table and two of them were dropped once with no rejection
+recorded, which is how a later session re-derives a settled question from
+nothing.
+
+**The shell escape hatch stays first-class.** A consumer authors their own gates
+as shell in their own resolve dir; resolution stays consumer-first and `.sh`
+beats `.gate` within a dir (§lib/gate.sh), so a consumer shadowing a ported kit
+gate with their own script still wins. Withholding a gate's predicate does not
+narrow this, because it is a choice made on the consumer's own machine about the
+consumer's own code — it puts no interpreter into the *shipped payload's*
+dependency floor, which is the floor the trajectory governs. Forbidding it would
+strand every consumer-authored gate to buy nothing.
+
+**A declarative check DSL is refused.** A DSL is a language carrying none of a
+language's tooling, and this repo's own battery is the evidence against its
+expressible set: the gates carrying real judgment are exactly the ones a rule
+language would not hold. The declarative half a DSL is wanted for already exists
+as the `# graph:` manifest, which every reader greps as text with no build
+(§The `# graph:` manifest).
+
+**Native plugins are refused**, and §Consumer payload strengthens that refusal
+rather than weakening it. A dynamically loaded third-party plugin is a stability
+contract this project would own forever *and* an unattested execution path
+inside the one artifact whose integrity the pre-write digest verification exists
+to guarantee. Opacity any loaded object can step around is not opacity. The
+neutral authoring surface a plugin ABI would foreclose is
+`gate-authoring-sdk-surface`'s to design, and refusing the ABI is what keeps it
+open.
 
 ## Consumer smoke
 
@@ -1152,7 +1199,12 @@ never a literal. An **absent or non-executable** binary when a registry member
 dispatches to it is a harness error — **exit 2, never a skip and never a pass**.
 This is §Fail-closed contract applied to dispatch: the failure a skip would
 create is a battery that silently stops running a gate whenever a build is
-missing, which is the worst available outcome.
+missing, which is the worst available outcome. The ruled install model leaves
+this exactly as it is and makes it unreachable in a correctly installed tree —
+a member arrives either with its verified artifact or not at all, omitted from
+`gates.list` and recorded there (§Porting a gate to the binary substrate,
+criterion 5) — so exit 2 is the backstop for a tree whose binary was deleted or
+replaced, never the path an unsupported platform takes.
 
 `fail_closed` must be passed *only* a status that genuinely means the check
 could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is

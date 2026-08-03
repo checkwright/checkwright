@@ -54,6 +54,14 @@ with its version floors, is on the install page.
 package's own payload into your repository and commits it. One command, and
 what governs your tree afterwards is committed source you can read.
 
+**No selection builds.** Not "no profile that happens to carry only shell
+gates" — no selection, ever. `init` writes files and compiles nothing, so it
+asks for no toolchain and cannot fail on one. A gate whose implementation is a
+compiled subcommand reaches you as a prebuilt binary picked for your platform
+and checked against a published digest before it is written, which is what makes
+zero build step a property of `init` itself rather than of which profile you
+picked (gate-sdk/SPEC.md §Porting a gate to the binary substrate, criterion 5).
+
 Three preconditions, and all three **refuse** rather than warn — a partial
 install is the outcome none of them may produce, so every one is checked before
 a single file is written:

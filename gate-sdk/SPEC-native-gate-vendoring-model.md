@@ -156,7 +156,7 @@ kit roots exist.
 
 | Delta | Disposition |
 |---|---|
-| 3, 8, 9, 10, 11 | **Lands here.** The ruled model as spec prose, `gate_command` unchanged, and the requirement-surface corrections. |
+| 3, 8, 9, 10, 11 | **Landed 2026-08-03** and merged out of this file. Homes: gate-sdk/SPEC.md §Porting a gate to the binary substrate (criterion 5, §What is retained), §What the dispatch seam does not settle, §The extensibility model (new), §lib/gate.sh; `installer/README.md` §init; `docs/install.md` §Requirements; `CLAUDE.md` §Housekeeping. |
 | 1, 2, 6 | **Filed: `native-artifact-publish-path`** — the target roster, the release build matrix, the per-target build, and the published digest. Publish side of the seam. |
 | 4, 5, and the consume half of 2 and 6 | **Filed: `native-artifact-install-path`** — platform resolution, artifact selection, pre-write digest verification, the lock's artifact class, and omit-and-declare. Consume side, blocked on the publish side because it has nothing to select or verify until artifacts exist. |
 
@@ -222,13 +222,6 @@ This amendment's binding obligation to that objective is negative and checkable:
 **it adds no new shell-only install step.** The prior ruling's install-time
 `cargo build` was exactly such a step; the ruling that replaces it is a file
 copy.
-
-### 3. Zero build step becomes literal {design-bearing}
-
-The prior ruling preserved zero-build-step *per selection* — true for any profile
-carrying no `.gate` member, conditional otherwise. Under this ruling **no
-selection ever builds**, which is what objective 5 requires: a prose-profile
-adopter's install is a download, a platform match, and a copy.
 
 ### 4. An unavailable platform omits and declares {design-bearing}
 
@@ -304,81 +297,6 @@ design that would have to be unbuilt when the relocation lands. The ordering
 constraint the prior ruling introduced disappears with the build step it existed
 for — a copied binary is present before any post-write step runs.
 
-### 8. `gate_command`'s fail-closed exit is unchanged {mechanical}
-
-`gate_command` (gate-sdk/lib/gate.sh:96-103) exits 2 on an absent or
-non-executable binary, and that stays exactly as it is. This ruling makes it
-unreachable in a correctly installed tree — a member is either present with its
-artifact or omitted and declared — and leaves it as the backstop for a tree whose
-binary was deleted or replaced.
-
-### 9. The extensibility model is ruled, with its rejections re-grounded {design-bearing}
-
-**The shell escape hatch stays first-class**, and the pivot narrows what that
-means rather than removing it: a consumer may author their own gates as shell in
-their own resolve dir, with consumer-first resolution and `.sh` beating `.gate`
-within a dir (gate-sdk/lib/gate.sh:70-85). That is a choice made on the
-consumer's own machine about their own code; it places **no interpreter in the
-shipped payload's dependency floor**, which is what objective 1 governs.
-Forbidding it would strand every consumer-authored gate to buy nothing.
-
-The two alternatives stay refused, and objective 3 strengthens the second
-refusal rather than weakening it:
-
-- **A declarative check DSL.** Refused: a DSL is a language carrying none of a
-  language's tooling, and this repo's own battery is the evidence against its
-  expressible set — the gates carrying real judgment are exactly the ones a rule
-  language would not hold. The declarative half it is wanted for already exists
-  as the `# graph:` manifest, which every reader greps as text with no build.
-- **Native plugins.** Refused, and more firmly under the pivot: a dynamically
-  loaded third-party plugin is a stability contract this project would own
-  forever *and* an unattested execution path inside the one artifact whose
-  integrity delta 6 exists to guarantee. Opacity that any loaded object can
-  step around is not opacity. **`gate-authoring-sdk-surface`** owns the neutral
-  authoring surface a plugin ABI would foreclose.
-
-### 10. Criterion 5 and the second-port prerequisite are restated as ruled {mechanical}
-
-§Porting a gate to the binary substrate criterion 5 states the ruled condition —
-a vendored form stays runnable because the artifact is selected and verified at
-install time, and a member with no artifact for the host platform is omitted and
-declared — in place of its "unsatisfiable until `native-gate-vendoring-model`
-rules" text. §What is retained, and what a second port must do first records the
-vendoring half as satisfied. §What the dispatch seam does not settle's vendoring
-paragraph is rewritten to the ruled model.
-
-### 11. The requirement surfaces state today's tree and the ruled direction, separately {design-bearing}
-
-`docs/install.md` §Requirements carries a `cargo` bullet scoping the Rust floor
-to contributors and CI. Under this ruling a consumer never builds, so the bullet
-becomes true *and* narrower: cargo is a contributor-and-CI floor only, with no
-install-time role at all. That is a smaller claim than the one it replaces, not a
-larger one.
-
-What the same page must **not** acquire is the pivot's target floor stated as
-present fact. The battery is shell today and needs what it needs; the page states
-that, and states the ruled direction as direction.
-
-**`installer/README.md` §Requirements carries no `cargo` bullet to correct** —
-verified against the tree rather than assumed: that section scopes only the
-two delivery-path requirements (Node for the npm transport, `curl`/`tar`/
-`sha256sum` for the Release tarball) and explicitly defers the toolchain
-roster to `docs/install.md` ("The toolchain the battery does assert, with its
-version floors, is on the install page"). There is nothing there for this
-delta to touch. `CLAUDE.md` §Housekeeping's `native/`
-bullet records the ruled install model in place of its "blocked on
-`native-gate-vendoring-model`" line — and the wider rewrite `CLAUDE.md` needs
-off its bash focus is **`instruction-surface-bash-focus`**, filed and not started
-here.
-
-`context-kit/SPEC.md` §bin/env-probe's `cargo` member already carries this
-scope — "a contributor/build floor, not a runtime one... Runtime is unaffected:
-git remains the sole runtime dependency of a ported gate, shelled out rather
-than embedded (`native-gate-vendoring-model` owns that constraint)" — written
-ahead of this amendment and consistent with it rather than needing it. No edit
-is owed there; this amendment re-verifies the claim rather than correcting it,
-so a later reader does not open work that is already done.
-
 ## Producers and consumers
 
 **Target roster (new tracked declaration).**
@@ -436,36 +354,22 @@ than an addition to make.
 
 ## Existing sections updated
 
-Owned by this amendment, each named with the delta that claims it:
+Owned by this amendment, each named with the delta that claims it. The landed
+deltas' entries are struck from this list as they land, so what remains here is
+exactly what the two filed entries still owe.
 
-- gate-sdk/SPEC.md §Porting a gate to the binary substrate — criterion 5 and
-  §What is retained, and what a second port must do first (delta 10); the port's
-  own justification, which this ruling's grounds change (delta 1).
-- gate-sdk/SPEC.md §What the dispatch seam does not settle — the vendoring
-  paragraph (delta 10); the extensibility-model paragraph, re-grounded under
-  objective 3 rather than left as "genuinely unchanged" with no reason stated
-  (delta 9).
+- gate-sdk/SPEC.md §Porting a gate to the binary substrate — the port's own
+  justification, which this ruling's grounds change (delta 1). Criterion 5 and
+  §What is retained, and what a second port must do first are **landed**
+  (delta 10).
 - gate-sdk/SPEC.md §Layout and configuration — the target-roster declaration and
   any knob the artifact selection takes (deltas 1, 2).
-- `installer/README.md` §init — the zero-build-step claim ("checkwright init
-  vendors... into your repository and commits it") gains the ruled statement
-  that no selection ever builds, not merely the profiles carrying no `.gate`
-  member (delta 3).
 - gate-sdk/SPEC.md §Consumer smoke — the vendored-tree runnability statement,
   criterion 5's other reader (delta 4).
 - gate-sdk/SPEC.md §run-gates — the summary's omitted-member line (delta 4).
 - gate-sdk/SPEC.md §upgrade-smoke — the artifact's treatment in the
   determinism diff, which must not read a platform-selected binary as drift
   (delta 5).
-- context-kit/SPEC.md §bin/env-probe — the `cargo` member's scope, re-verified
-  already contributor-and-CI with no install-time consumer; no edit owed
-  (delta 11).
-- `docs/install.md` §Requirements (delta 11); canon-kit's `check-install-claim`
-  holds the primary-install-path claim across governed install sections and is
-  the reader that must stay green. `installer/README.md` §Requirements carries
-  no corresponding bullet and is not touched (delta 11; re-verified against the
-  tree, see the delta's own text).
-- `CLAUDE.md` §Housekeeping — the `native/` bullet (delta 11).
 - `installer/README.md` §The manifest — the field table gains a new field for
   the artifact entry (target name, digest). **Re-verified against the tree:**
   today's table has one `files` row, a flat path→hash map covering both
