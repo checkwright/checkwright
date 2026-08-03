@@ -402,11 +402,31 @@ is never sourced and never run.
 name.** There is no dispatch field, no second registry and no mapping table,
 because each would be a name that could drift from the thing it names. The one
 fact is the file's presence; the subcommand is derived from the name that
-already identifies the gate everywhere else. Every field it carries has a named
-reader — `# graph:` by the manifest readers below, `# spec:` by
-canon-kit's `check-spec-pointer`, `# no-fixture:` by
-§check-gate-fixture-coverage — and the descriptor carries no field that lacks
-one, reserving nothing against a future reader.
+already identifies the gate everywhere else. **The field roster is closed**, and
+every field on it has a named reader — `# graph:` by the manifest readers below,
+`# spec:` by canon-kit's `check-spec-pointer`, `# no-fixture:` by
+§check-gate-fixture-coverage. The descriptor carries no field that lacks one,
+reserving nothing against a future reader.
+
+**One field is refused rather than merely absent, and the refusal is the design.**
+A `# reads:` line declaring the gate's walk roots is the obvious cheap way to
+answer §check-reads-couples, and it is rejected: nothing would hold it to the
+implementation, so it is the removed `# reads-couples-exempt:` opt-out with more
+words — a self-declaration whose would-be reader could not verify what it read.
+The read set lives in the crate's registry instead, where a unit test runs the
+member and compares the declaration against the roots it actually walked. This is
+also why §check-gate-substrate-parity assertion D's manifest-class partition is
+left unchanged deliberately: a roots declaration is *implementation data*, not
+manifest-class, so it belongs in the implementation and not in the build-free
+surface.
+
+**The interface that answers is substrate-neutral; its placement is not settled
+here.** The contract is *a declaration path's substrate answers what it reads* —
+shell answers by parse, the binary answers by `--reads`. Whether a later authoring
+SDK relocates that contract to a substrate-neutral surface stays
+`gate-authoring-sdk-surface`'s question, narrowed by this and deliberately not
+answered: one substrate's answer is added without adding a shape that would have to
+be unbuilt to generalize.
 
 **The descriptor is a durable surface, not port scaffolding.** Its reason does
 not expire with the port that introduced it: `installer/lib/init.sh` runs
@@ -529,7 +549,7 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. |
 | `check-gate-fail-closed` | **Retired with cause** — the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable once a fallible call returns a `Result` that cannot be ignored. A real substrate win, stated as one. |
-| `check-reads-couples` | **Retained, and must fail closed.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here. Until a binary-side equivalent exists it **refuses** (exit 2) on a member resolving to a `.gate`, rather than passing. No descriptor-level opt-out: the live port added one and it is removed with the port (§check-reads-couples). |
+| `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each `REGISTRY` member carries its roots beside its name and function pointer (a member added without them fails to compile), `walk.rs` is the crate's only sanctioned filesystem walk and records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside `walk.rs` names a filesystem-walk API or vendors a walker, because a direct walk would be invisible to the recorder and unverify A. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
 | `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates` gains `*.gate` **and `*.rs`** arms — the shared primitive, widened once (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. |
@@ -544,6 +564,30 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-docs-cmd`, `check-install-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
+
+**The declared read set's honest limit, stated rather than discovered.** Unit test
+A's coverage is the fixture corpus. That is bounded by a contract rather than by
+luck — every ported gate carries a `good/`+`bad/` pair (§Fixture-pair discipline),
+enforced by §check-gate-fixture-coverage — but a walk reachable only on an input no
+case exercises is observed by nothing, and the declaration for it rests on the
+author. The `?` line exists for exactly that case: a gate whose author cannot bound
+a root declares `?` rather than guessing, and the reader counts it as undecidable
+instead of trusting it as empty. Test A holds a `?` to its arity, not to nothing —
+each one absorbs a single unmatched observed root, so a second undeclared walk still
+reds.
+
+**Where that verification runs, and where it does not.** Both unit tests are
+`cargo test`, so they run in this repo and in CI and **never in a consumer tree**:
+`native/` ships no `checks/` and no `smoke/`, so it is not a kit root and no
+consumer ever receives the crate source — there is nothing there to run them
+against and nothing there to edit. That is not a weakening; it makes the division
+explicit. The declaration is held to executed behavior **upstream**, and the
+consumer's own independent check is the `good/`+`bad/` pair, which `init` vendors
+along with every other kit file and which discloses a gate's *shape* without its
+predicate. It also means the gate's consumption path assumes nothing about where
+the binary came from: the invocation is through `GATE_SDK_NATIVE_BIN`, the knob
+every other binary reader uses, and an installed artifact answers `--reads`
+identically to one `cargo` produced.
 
 Gates whose corpus is kit directories, smoke scripts or hooks
 (`check-kit-registration`, `check-smoke-entry-guard`, `check-hook-exec-bit`,
@@ -562,7 +606,7 @@ exists to catch, and a subcommand not named here still reds.
 
 | Subcommand | Disposition |
 |---|---|
-| `check-action-pinning` | **Reference-only.** Its live port was reverted (§Porting a gate to the binary substrate); the gate is shell again and no descriptor dispatches here. The module stays because retiring it would leave the crate with no gate implementation at all, and `cargo test` plus the `native_crate` evidence suite would go green over nothing — the vacuity this whole section exists to refuse. It is the crate's only executed proof that a gate's rule survives the substrate. |
+| `check-action-pinning` | **Reference-only.** Its live port was reverted (§Porting a gate to the binary substrate); the gate is shell again and no descriptor dispatches here. The module stays for two reasons, and the second is now load-bearing in its own right. Retiring it would leave the crate with no gate implementation at all, and `cargo test` plus the `native_crate` evidence suite would go green over nothing — the vacuity this whole section exists to refuse; it is the crate's only executed proof that a gate's rule survives the substrate. It is also **the one member the read-declaration unit tests above can assert over**: with an empty registry both A and B pass trivially, so retiring this module would silently convert the mechanism that ends `check-reads-couples`' refusal into two green tests over nothing. Its declared root is `?`, the honest answer for a scan root taken from the gate's own first argument — the same shape the shell parser calls undecidable — and test A still holds that `?` to walking exactly one root. |
 
 ## Porting a gate to the binary substrate
 
@@ -635,9 +679,16 @@ pin, and the CI crate build/clippy/test legs. The crate keeps its
 rule rather than going green over an empty crate.
 
 **The seam was the deliverable; the live port was the demonstration.** A second
-port needs criterion 5 satisfiable first — `native-gate-vendoring-model` — and
-needs `check-reads-couples`' binary-side equivalent to exist rather than be
-opted out of. Both are prerequisites, not follow-ups.
+port had two prerequisites, not follow-ups. **The `check-reads-couples` half is
+satisfied:** the binary-side equivalent exists rather than being opted out of — a
+`--reads` arm answering what a member walks, registry-declared and held to executed
+behavior by two crate unit tests, consumed by the gate in place of its refusal
+(§check-reads-couples, §Meta-gate conservation for the binary substrate). It was
+built and proved **without a port**: against the reference-only implementation and
+a hermetic fixture, so no `.gate` member had to be added to a kit to end the
+refusal. **Criterion 5 remains**: a second port still waits on
+`native-gate-vendoring-model` to rule how a compiled gate arrives in a consumer
+tree.
 
 ## What the dispatch seam does not settle
 
@@ -1861,13 +1912,45 @@ walk** in its source has its tracked read-set covered by the gate's expanded
 `couples=` — the reads⊆couples half `check-graph` leaves to the author
 (§The `# graph:` manifest).
 
-**A member resolving to a `.gate` makes this gate refuse: exit 2, never a
-pass.** Its walk parser reads shell, so a binary gate yields zero walks and the
-gate would print `clean` — the single worst vacuity available at the substrate
-seam, because the absence of findings is indistinguishable from an absence of
-coverage. Refusing is the §Fail-closed contract applied to a corpus the scanner
-cannot see, and it stands until a binary-side equivalent exists
-(§Meta-gate conservation for the binary substrate).
+**A member resolving to a `.gate` is answered by the substrate, not parsed.** Its
+walk parser reads shell, so a binary gate yields zero walks and the gate would
+print `clean` — the single worst vacuity available at the substrate seam, because
+the absence of findings is indistinguishable from an absence of coverage. The way
+past that is to give the gate an answer, never to give the port an exemption: for a
+`.gate` member the gate invokes `"$GATE_SDK_NATIVE_BIN" --reads "<name>"`
+(§Layout and configuration) and feeds the reported roots into the same coverage
+assertion the shell arm uses.
+
+**The `--reads` report.** One line per walk root and nothing else — no count line
+and no header, because the count is derivable from the lines and a transcribed
+total would be a second source for it. Each line is either a repo-relative
+directory path, for a root the gate declares, or a single `?`, for a root it cannot
+bound statically. Both line kinds have a named reader at a named transition: a path
+is read by the tracked-file enumeration below, at the per-root coverage loop; a `?`
+by the skip counter, at the clean-line parenthetical — the same reader the shell
+arm's unresolvable roots already have. There is no third line kind because there is
+no third reader. The producer is the binary's `--reads` arm, printing the declared
+roots each registry member carries — data held to what the code actually walks by
+two crate-side unit tests (§Meta-gate conservation for the binary substrate).
+
+**The coverage assertion itself is unchanged; only the source of the roots
+differs** — a shell parse for a `.sh` member, the substrate's own report for a
+`.gate` one. Two calibrations follow from what a binary does *not* report, and both
+err toward demanding more coverage rather than less. A reported root is filtered by
+the prune list exactly as a `gate_find` walk is, because the crate's single
+sanctioned walk prunes on the same `GATE_SDK_PRUNE_DIRS` knob (§lib/gate.sh). And
+no literal `-name` primary is extractable from a binary, so the enumeration is
+unfiltered — the same answer the shell arm already gives a walk whose pattern is a
+variable. A ported gate therefore narrows by declaring a tighter root, never by
+declaring a pattern.
+
+**The refusal survives, narrowed to the two cases where the gate still cannot
+see.** The binary absent or not executable while a `.gate` member is registered is
+exit 2 — the same fail-closed shape §check-gate-substrate-parity assertion B uses
+for the same condition. `--reads` exiting non-zero for a declared member is exit 2,
+so a descriptor naming a subcommand the binary does not carry cannot read as "reads
+nothing". Both are the §Fail-closed contract applied to a corpus the gate cannot
+see: "cannot verify" and "verified covered" must not share an exit code.
 
 **There is deliberately no descriptor-level exemption.** The live port briefly
 shipped one — a `# reads-couples-exempt:` line in the descriptor bought the
@@ -1878,15 +1961,23 @@ rule: the *next* port has resolvable walks, and an opt-out written in one
 sentence is how a port ends the assertion it was supposed to replace rather
 than replacing it. The allowance was also never written here, so the refusal
 this section states and the behavior the gate had disagreed — the divergence
-that makes "land it then relax" hard to see. Removed with the port. A binary
-gate's read coverage is a **prerequisite** for the next port, not a paperwork
-step inside it.
+that makes "land it then relax" hard to see. Removed with the port, and not
+reinstated by the consumption path above: a port ends this assertion by
+**answering** it, never by opting out of it.
 
 Because no `.gate` member exists anywhere in the tree, this arm has no live
-instance and its clean line reports a counted zero. `gate-tests/check-reads-couples.test.sh`
-is what keeps that a counted zero rather than an untested branch: it drives the
-refusal on a bare descriptor, on one claiming the removed exemption, and drives
-the shell arm alongside so the refusal cannot be passing for a parse failure.
+instance and its clean line reports a counted zero.
+`gate-tests/check-reads-couples.test.sh` is what keeps that a counted zero rather
+than an untested branch, and it is what **proves the mechanism without a port**.
+It drives the consumption path against a stub binary — a reported root whose
+tracked reads its couples cover, one whose couples stop a level short, and one
+reporting `?` — both surviving refusals, a descriptor still claiming the removed
+exemption (which buys it nothing, so the opt-out cannot return unnoticed), and the
+shell arm alongside so no case can be passing for a parse failure. One case runs
+the **real** binary rather than a stub, so the grammar under test is the one the
+substrate actually emits; it is skipped and named in the test's own summary line
+when the binary is not built, because the file is hermetic and never builds one.
+Naming the skip is what keeps it from reading as a silent pass.
 
 This is check-graph's coverage sibling: check-graph
 proves editing a *coupled* surface fires the gate; check-reads-couples proves
@@ -1923,9 +2014,14 @@ remainder. Manifest `tier=precommit trigger=*`: the unconditional trigger is
 load-bearing, not laziness — the invariant breaks two ways, a gate edit that
 changes a walk *or* a new subdirectory grown under a walked root, and no couple
 glob can name a directory that does not exist yet. Its own `couples=` names what
-it reads as content (every `checks/` dir plus `gates.list`); the tracked-file
-enumeration is `git ls-files` metadata, not a content read, so it needs no
-couple. The hermetic fixture affordance: positional gate-source arguments make
+it reads as content (every `checks/` dir, `gates.list`, and the crate's source —
+an edit to a gate's implementation changes what it walks, so without that couple
+the assertion would be live and unreachable, coupled to shell sources only on a
+rule whose subject had moved); the tracked-file enumeration is `git ls-files`
+metadata, not a content read, so it needs no couple. The crate couple fires **in
+this repo**, where the implementation is tracked; a consumer tree receives no
+crate source by ruling, so there is no edit for it to catch and a glob matching
+nothing is the correct outcome rather than a hole. The hermetic fixture affordance: positional gate-source arguments make
 the gate analyze the given source(s) with `git ls-files` anchored to the case
 dir, instead of walking the real `gates.list`.
 

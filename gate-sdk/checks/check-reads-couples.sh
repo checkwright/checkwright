@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=kit:checks/*.sh,scripts/*.sh,scripts/gates.list dir=one valve=none tier=precommit trigger=*
+# graph: couples=kit:checks/*.sh,scripts/*.sh,scripts/gates.list,native/src/*.rs,native/src/gates/*.rs dir=one valve=none tier=precommit trigger=*
 # spec: gate-sdk/SPEC.md §check-reads-couples — every statically resolvable recursive walk in a registered gate has its tracked read set covered by the gate's expanded couples; the undecidable remainder is skipped-and-counted
 set -uo pipefail
 
@@ -83,6 +83,34 @@ path_matches_glob() {
     return 0
 }
 
+# spec: gate-sdk/SPEC.md §check-reads-couples — the per-root coverage assertion, shared by
+# both substrates: a root the shell parse resolved and a root the binary reported land here
+# identically, so porting a gate changes where the root came from and nothing else.
+cover_root() {
+    local root="$1" prune="$2" namepat="$3" gname="$4" where="$5"
+    local listing gst f covered g
+    if [[ "$root" == "." ]]; then
+        listing="$(git ls-files)"; gst=$?
+    else
+        listing="$(git ls-files -- "$root")"; gst=$?
+    fi
+    [[ "$gst" -eq 0 ]] || { echo "check-reads-couples: git ls-files failed for root '$root'" >&2; exit 2; }
+    while IFS= read -r f; do
+        [[ -n "$f" ]] || continue
+        [[ "$prune" == 1 ]] && gate_path_pruned "$f" && continue
+        if [[ -n "$namepat" ]]; then
+            # shellcheck disable=SC2053  # namepat is the glob, deliberately unquoted
+            [[ "${f##*/}" == $namepat ]] || continue
+        fi
+        covered=0
+        for g in "${COUPLE_GLOBS[@]}"; do
+            path_matches_glob "$f" "$g" && { covered=1; break; }
+        done
+        [[ "$covered" == 1 ]] || \
+            findings+=("$gname: $where reads tracked '$f' — no couple covers it (couples: $couples)")
+    done <<<"$listing"
+}
+
 sources=()
 if [[ $# -gt 0 ]]; then
     sources=("$@")
@@ -102,21 +130,49 @@ findings=()
 
 for src in "${sources[@]+"${sources[@]}"}"; do
     [[ -f "$src" ]] || continue
-    # spec: gate-sdk/SPEC.md §check-reads-couples — a .gate member's walks are
-    # unreadable to this shell parser, and there is no descriptor-level opt-out
-    if [[ "$src" == *.gate ]]; then
-        echo "check-reads-couples: $src dispatches to the native binary, whose walks this" >&2
-        echo "shell parser cannot read — it would find zero walks and report clean, which is a" >&2
-        echo "false green. Refusing rather than passing; the check could not run." >&2
-        echo "  help: implement the binary-side equivalent, or keep the gate in shell." >&2
-        echo "        There is deliberately no descriptor-level exemption: a port that could" >&2
-        echo "        opt out of this in a sentence would end the assertion it must replace." >&2
-        exit 2
-    fi
+    gname="$(basename "$src")"; gname="${gname%.sh}"; gname="${gname%.gate}"
     couples=""
     couples_field="$(gate_manifest_field "$src" couples)"
     gate_expand_couples_var couples "$couples_field"
     IFS=',' read -ra COUPLE_GLOBS <<<"$couples"
+
+    # spec: gate-sdk/SPEC.md §check-reads-couples — a .gate member's walks are unreadable to
+    # this shell parser, so the substrate reports them instead: `--reads` answers what the
+    # binary walks and the coverage assertion below is unchanged.
+    if [[ "$src" == *.gate ]]; then
+        bin="${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+        if [[ ! -x "$bin" ]]; then
+            echo "check-reads-couples: $src dispatches to the native binary, but $bin is absent" >&2
+            echo "or not executable — the declared read set cannot be read, so the coverage" >&2
+            echo "assertion could not run; treating as failure (not clean)." >&2
+            echo "  help: build it (cargo build --release --manifest-path native/Cargo.toml), or" >&2
+            echo "        install the prebuilt artifact, then re-run." >&2
+            exit 2
+        fi
+        reads="$("$bin" --reads "$gname" 2>&1)"; rst=$?
+        if [[ "$rst" -ne 0 ]]; then
+            echo "check-reads-couples: '$bin --reads $gname' exited $rst — the gate's own read set" >&2
+            echo "is unavailable, so this check could not run; treating as failure (not clean)." >&2
+            printf '  %s\n' "$reads" >&2
+            echo "  help: the binary must answer --reads for every subcommand a descriptor" >&2
+            echo "        declares. There is deliberately no descriptor-level exemption: a port" >&2
+            echo "        that could opt out of this in a sentence would end the assertion it" >&2
+            echo "        must replace." >&2
+            exit 2
+        fi
+        while IFS= read -r root; do
+            [[ -n "$root" ]] || continue
+            # spec: gate-sdk/SPEC.md §check-reads-couples — '?' is the substrate's own honesty
+            # marker, counted by the same skip counter the shell arm's unresolvable roots use.
+            if [[ "$root" == '?' ]]; then
+                skipped=$((skipped + 1)); continue
+            fi
+            analyzed=$((analyzed + 1))
+            cover_root "$root" 1 "" "$gname" "declared read root '$root' (--reads)"
+        done <<<"$reads"
+        continue
+    fi
+
     walks="$(extract_walks "$src")"; st=$?
     fail_closed "$st" READS-COUPLES "awk walk-scan($src)"
     [[ -n "$walks" ]] || continue
@@ -128,26 +184,8 @@ for src in "${sources[@]+"${sources[@]}"}"; do
         fi
         analyzed=$((analyzed + 1))
         namepat="$(name_pattern "$rawline")"
-        if [[ "$root" == "." ]]; then
-            listing="$(git ls-files)"; gst=$?
-        else
-            listing="$(git ls-files -- "$root")"; gst=$?
-        fi
-        [[ "$gst" -eq 0 ]] || { echo "check-reads-couples: git ls-files failed for root '$root'" >&2; exit 2; }
-        while IFS= read -r f; do
-            [[ -n "$f" ]] || continue
-            [[ "$cmd" == gate_find ]] && gate_path_pruned "$f" && continue
-            if [[ -n "$namepat" ]]; then
-                # shellcheck disable=SC2053  # namepat is the glob, deliberately unquoted
-                [[ "${f##*/}" == $namepat ]] || continue
-            fi
-            covered=0
-            for g in "${COUPLE_GLOBS[@]}"; do
-                path_matches_glob "$f" "$g" && { covered=1; break; }
-            done
-            [[ "$covered" == 1 ]] || \
-                findings+=("$(basename "$src" .sh): recursive walk over '$root' (line $lno) reads tracked '$f' — no couple covers it (couples: $couples)")
-        done <<<"$listing"
+        prune=0; [[ "$cmd" == gate_find ]] && prune=1
+        cover_root "$root" "$prune" "$namepat" "$gname" "recursive walk over '$root' (line $lno)"
     done <<<"$walks"
 done
 

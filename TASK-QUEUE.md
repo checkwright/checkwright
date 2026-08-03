@@ -91,40 +91,6 @@
   accident. Filed 2026-08-02 by scope, on the operator's ruling that the payload is a
   decision the port owns rather than an inheritance from the bash era.
 
-- **native-gate-meta-layer-reach** [spec: SPEC-native-gate-meta-layer-reach.md] —
-  `check-reads-couples` has no
-  binary-side equivalent, and until one exists no further gate can be ported.
-  **Narrowed 2026-08-02 at scope to this half alone**, by operator ruling; the
-  `check-gate-tamper` half left as `gate-tamper-roster-native-reach` and stays
-  deferred. gate-sdk/SPEC.md §Porting a gate to the binary substrate names this
-  absence as one of the two prerequisites a second port needs, the other being
-  `native-gate-vendoring-model`.
-  **The filed premise was falsified at the narrowing, and that correction is what
-  makes the split safe.** This entry said the gate refuses "unless the descriptor
-  carries a `# reads-couples-exempt:` reason", free-text and unbound to a task —
-  "the shape that accumulates silently". No such exemption exists:
-  `gate-sdk/checks/check-reads-couples.sh`:107-115 refuses exit 2 on any `.gate`
-  member unconditionally and says so in its own help — "There is deliberately no
-  descriptor-level exemption: a port that could opt out of this in a sentence would
-  end the assertion it must replace." The opt-out lived exactly as long as the live
-  port did and was removed with it. So the risk is not silent accumulation but a
-  **hard wall** — and this half no longer shares a ruling with the tamper half,
-  which was the whole reason the two could not be split before.
-  **What slice 1 proved, kept because it bounds the deliverable:** its single ported
-  gate was honest here — the one walk was already undecidable and
-  skipped-and-counted in shell, verified by running the pre-port script through the
-  gate — so that port ended no assertion. A second port need not be so lucky.
-  **The design question, narrowed:** the deliverable is a binary-side walk analysis ending
-  the same assertion the shell parser does, and whether that belongs to each
-  substrate or to a substrate-neutral descriptor is still
-  `gate-authoring-sdk-surface`'s question — narrowed here, not answered.
-  **Ordered into `native-port-unblocking` by operator direction 2026-08-02**, on the
-  ground that a second port is impossible for as long as this stands.
-  **Cost while deferred:** zero today (no live `.gate` dispatch); from the moment a
-  port is attempted it stops being a cost and becomes a refusal — the battery halts.
-  Filed 2026-08-02 at close from the gap inbox; found by validate. Narrowed, and its
-  premise corrected against the tree, 2026-08-02 at scope.
-
 ## Technical Debt
 
 - **native-gate-language-ruling** — record a closed language decision. Land the
@@ -3207,5 +3173,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- native-gate-meta-layer-reach
 
 ## Lessons Learned
