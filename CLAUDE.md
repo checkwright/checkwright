@@ -164,6 +164,10 @@ here.
 - `ROADMAP.md` is a generated root projection of this queue's curated
   `[roadmap:]` tags — never hand-edit its marker block; it is rostered with its
   trigger and regen command like every other generated projection.
+- [`TRAJECTORY.md`](TRAJECTORY.md) is the hand-authored ruling record — the
+  objectives, the closed operator rulings, and the port sequence; a recorded
+  ruling is closed, so re-verify facts against the tree and escalate rather
+  than reverse one.
 - `docs/` is the public GitHub-Pages site (served from `docs/` on master via its
   `CNAME`), repo-root-governed, no owning kit. Its chrome, page-authoring rules,
   generated projections + regen commands, and docs gate roster live in the

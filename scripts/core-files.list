@@ -9,6 +9,8 @@
 TASK-QUEUE.md
 # Public direction: the generated projection of the queue's curated [roadmap:] tags.
 ROADMAP.md
+# Ruling record: the objectives, the closed operator rulings, and the port sequence.
+TRAJECTORY.md
 .workflow/WORKFLOW-STATE.txt
 README.md
 CLAUDE.md

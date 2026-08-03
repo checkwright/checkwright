@@ -105,46 +105,6 @@
   stands between a consumer and an unverified binary.
   Filed 2026-08-03 by spec, the consume half of the operator's split.
 
-- **trajectory-ruling-record** [design-pending] — a tracked home for the closed rulings.
-  **Operator-directed filing 2026-08-03.** Deliverable, three parts that are one surface:
-  a root-governed **`TRAJECTORY.md`** carrying the six objectives and the closed rulings —
-  Rust final with the Go refusal grounds, the bash-portability-floor rejection, git
-  shelled-out, the interpreter policy, and opacity with its attestation counterweight —
-  promoted out of `native-gate-vendoring-model`'s amendment, which then cites it; **one
-  always-loaded CLAUDE.md pointer line**; and the **scope-ritual read** added beside the
-  private brief, carrying the sentence *"a recorded operator ruling is closed — re-verify
-  facts, never rulings; only the operator reopens one."*
-  **Distinct from ROADMAP.md by content class, and cross-linked rather than merged.**
-  ROADMAP is a generated projection of this queue — *what is next*. TRAJECTORY is a
-  hand-authored ruling record — *toward what, under which closed rulings*. Merging them
-  would put hand-authored content inside a generated marker block, which the projection
-  overwrites.
-  **Merged and not merged, with the judgment stated.** The three parts above merge because
-  they are create, register and load for one surface, and a surface nothing loads is not a
-  surface. `instruction-surface-bash-focus` stays separate: it shares the CLAUDE.md file
-  but not the content class — a pointer to a new record versus a rewrite of bash-specific
-  guidance — and its trigger is a threshold on how far the port has got, so merging would
-  bind a now-doable unit to a gated one.
-  **Sequencing note:** an amendment never outlives its implementation, so if
-  `native-gate-vendoring-model` merges first the objectives land in a component SPEC and
-  this entry relocates them rather than promoting them. Cheaper before than after.
-  **PRIORITY DIRECTIVE — the port track's sequence.** Ruled 2026-08-03 by the operator and
-  carried here so a scope session reads it from a governed surface rather than a thread;
-  it is deliverable content of `TRAJECTORY.md`, not commentary on this entry. The track
-  sequences toward **per-profile coherence, not whole-corpus completion**. Order:
-  (1) this iteration's model; (2) the publish-side pipeline, `native-artifact-publish-path`;
-  (3) a first ported cohort chosen to make **one shipped profile** fully native end to end;
-  (4) `installer-lifecycle-verbs`, with the uninstall verb; (5) `prose-profile` completion —
-  the **earliest external-install channel** under the re-ruled preview cohort recorded in
-  `BRIEF.local.md`, not post-launch polish; (6) `companion-toolkit-profile`.
-  `instruction-surface-bash-focus` unblocks on a threshold, not a date, per its own entry.
-  Surge-channel launch stays gated behind the private brief's readiness rule, and
-  launch-comms execution runs on its own clock under the surface that owns distribution.
-  **Cost while deferred:** the project's ruling record lives inside an amendment file that
-  is deleted on merge, so its home disappears exactly when the work it governs lands, and
-  the sequence above stays a thread nobody inherits.
-  Filed 2026-08-03 by spec on operator-directed intake; the trajectory surface itself.
-
 - **stage-session-ruling-class** [design-pending] — reversing a ruling is operator-class.
   **Operator-directed filing 2026-08-03.** Add to the escalate-versus-decide roster in
   `.claude/agents/stage-session.md` and lifecycle-kit's lead template: **any action that
@@ -3060,5 +3020,6 @@
 - native-gate-language-ruling
 - bash-portability-floor-costing
 - scope-survey-counter-evidence
+- trajectory-ruling-record
 
 ## Lessons Learned

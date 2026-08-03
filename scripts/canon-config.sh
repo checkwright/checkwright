@@ -17,7 +17,7 @@ CANON_KIT_SCAN_KIT_ROOTS=1
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_TEMPORAL_EXEMPT_SECTIONS=("Out of scope")
 
-# comment-tier-exempt: the docs/ site joins the governed manifest set by explicit wiring — this knob replaces the default set, so it enumerates the prior default (CLAUDE.md, README.md at any depth, kit SPEC.md/README.md — single-level globs skip the gate-tests/ fixtures the finder pruned) plus the docs/ living pages, the dated posts, the root contribution, conduct, disclosure, release, and public-direction surfaces (CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, RELEASING.md, ROADMAP.md), and the doctrine deliverable (doctrine-kit/DOCTRINE.md) so its links and commands resolve under the doc gates
+# comment-tier-exempt: the docs/ site joins the governed manifest set by explicit wiring — this knob replaces the default set, so it enumerates the prior default (CLAUDE.md, README.md at any depth, kit SPEC.md/README.md — single-level globs skip the gate-tests/ fixtures the finder pruned) plus the docs/ living pages, the dated posts, the root contribution, conduct, disclosure, release, public-direction and ruling-record surfaces (CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, RELEASING.md, ROADMAP.md, TRAJECTORY.md), and the doctrine deliverable (doctrine-kit/DOCTRINE.md) so its links and commands resolve under the doc gates
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_MANIFEST_FILES=(
     "CLAUDE.md"
@@ -27,6 +27,7 @@ CANON_KIT_MANIFEST_FILES=(
     "SECURITY.md"
     "RELEASING.md"
     "ROADMAP.md"
+    "TRAJECTORY.md"
     "*/SPEC.md"
     "*/README.md"
     "reserve/*/README.md"

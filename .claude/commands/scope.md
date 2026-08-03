@@ -18,7 +18,11 @@ silently drop the lead's role suppression mid-session. The rest is purely
 disposable scratch (CLAUDE.md §Housekeeping — persistent trends live in
 `.metric/`), and a resume journal from a closed iteration is dead by definition.
 
-**ritual** — read `BRIEF.local.md` (local-only brief); run the GitHub
+**ritual** — read `BRIEF.local.md` (local-only brief) and the tracked ruling
+record this survey ranks against, TRAJECTORY.md §The objectives plus
+TRAJECTORY.md §The closed rulings and its sequence directive; **a recorded
+operator ruling is closed — re-verify facts, never rulings; only the operator
+reopens one.** Then run the GitHub
 boundary sweep (below); decide the unit's
 layout, config surface, and worklist; name the iteration after the unit. Hold
 the provenance seam per CLAUDE.md §The provenance seam (never cross it) and

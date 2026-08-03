@@ -12,39 +12,19 @@ landing one is explicitly outside its envelope.
 
 ## The objectives this ruling serves
 
-**Ruled 2026-08-03 by the operator as a project-trajectory pivot.** This section
-is the durable record of it, and it is the ground every ruling below stands on;
-a later session weighing an alternative weighs it against these, not against the
-constraint set the substrate seam was built under.
+**Ruled 2026-08-03 by the operator as a project-trajectory pivot**, and the
+durable record of it is TRAJECTORY.md §The objectives — this amendment cites it
+rather than carrying it, because an amendment is deleted on merge and the
+objectives outlive every ruling below. They are the ground each of those rulings
+stands on; a later session weighing an alternative weighs it against them, not
+against the constraint set the substrate seam was built under.
 
-The pivot: **port the battery to native binaries, and reduce what a consumer
-must have to git alone.** Six objectives, each of which decides something below:
-
-1. **The dependency floor collapses to git.** What a consumer needs today —
-   bash, awk, the GNU userland — stops being acceptable. git stays, shelled out
-   rather than embedded.
-2. **All major operating systems, Windows included.** A bash-only install path
-   fails native Windows, so it fails the objective.
-3. **Opacity is a goal, not a side effect.** Withholding a gate's implementation
-   source is wanted: it favours *execution* of a gate over *analysis* of it by
-   the coding agents the gate exists to hold. This reverses the direction the
-   substrate seam was argued under, where opacity was explicitly not claimed.
-4. **Footprint is a first-class cost.** An adopter installs, tries, and
-   uninstalls without growing their managed code base or their dependency set.
-   The trial lifecycle is part of the product, not an afterthought.
-5. **Non-technical adopters are a design constraint.** A prose-profile consumer
-   will not install a toolchain and may not have one. Any step that assumes a
-   developer machine excludes them.
-6. **The script-interpreter surface shrinks to the unavoidable.** Where an
-   interpreter is genuinely unavoidable it must be dual-implementable — bash for
-   Linux and macOS, PowerShell for Windows — and everything else moves into the
-   binary. Designing that Windows surface is **`powershell-installer-surface`**'s
-   work, not this amendment's; this amendment's obligation is to add no new
-   shell-only install step and to assume no POSIX shell.
-
-Objective 3 is the one that reverses a prior ruling rather than adding to it,
-and **`gate-payload-disclosure-ruling`** owns its consequences. Objectives 1, 2
-and 5 are jointly what voids building from vendored source at install time.
+What this amendment owes those objectives, over and above citing them: objective
+6's Windows half is **`powershell-installer-surface`**'s work, not this
+amendment's, and this amendment's own obligation to it is negative — add no new
+shell-only install step, and assume no POSIX shell. Objective 3's consequences
+are **`gate-payload-disclosure-ruling`**'s. Objectives 1, 2 and 5 are jointly
+what voids building from vendored source at install time.
 
 ## The constraint set the ruling has to satisfy
 
@@ -169,10 +149,10 @@ compression loss this project keeps paying for; each filed entry cites this
 amendment as its design source rather than restating it.
 
 **Both filed entries inherit the objectives and the closed rulings**
-(§The objectives this ruling serves). A session picking either one re-verifies
-facts against the tree and does not re-litigate the rulings — prebuilt payload,
-git-only floor, opacity-as-goal and the Rust substrate are closed, and only the
-operator reopens a closed ruling.
+(TRAJECTORY.md). A session picking either one re-verifies facts against the tree
+and does not re-litigate the rulings — prebuilt payload, git-only floor,
+opacity-as-goal and the Rust substrate are closed, and only the operator reopens
+a closed ruling.
 
 ## What changes
 
