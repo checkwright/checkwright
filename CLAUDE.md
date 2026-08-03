@@ -148,9 +148,8 @@ here.
 - `native/` is the Rust crate for gate implementations off the shell substrate —
   one multi-call binary, one subcommand per ported gate, declared by a `.gate`
   descriptor. **No gate is ported today:** the seam ships and the one live port
-  was reverted. How a compiled gate arrives is now ruled — prebuilt per target
-  in the payload, digest-verified before it is written, never built at install
-  time — so a second port waits on those artifacts, not on a ruling. It is
+  was reverted. How a compiled gate arrives is now ruled, so a second port waits
+  on those artifacts rather than on a decision. It is
   **not a kit** — no `checks/`, no `smoke/`, the predicate that makes a root
   directory one; `native/target/` is gitignored and never committed. Dispatch,
   descriptor format, port criteria and the toolchain floor:

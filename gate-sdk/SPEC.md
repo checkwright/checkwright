@@ -1421,7 +1421,11 @@ non-zero).
 
 Golden-fixture runner. Each `<tests-dir>/<gate>/` holds `good/` + `bad/` case
 dirs; the runner `cd`s into the case dir and invokes the gate with the args in
-the case's `args` file (`#` lines stripped). `good/` must exit 0 (and, when
+the case's `args` file: `#` lines are stripped and the surviving text is
+word-split on whitespace into argv, **not** taken one argument per line — so an
+argument containing a space is unexpressible in this file, and any second
+implementation of the runner (the crate's own parity test among them) must
+reproduce the splitting rule, not guess it. `good/` must exit 0 (and, when
 `good/expect.txt` exists, satisfy it); `bad/` must exit 1 and satisfy
 `bad/expect.txt` — a rejection expectation is required, so the *right*
 finding fired.
