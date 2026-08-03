@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-artifact-path
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,9 +14,187 @@
 
 ## Technical Debt
 
+- **install-path-gnu-userland-undeclared** — the installer's own
+  toolchain requirement is unstated, and so is the probe's. docs/install.md
+  §Requirements scopes its GNU-coreutils/gawk declaration to **the battery**, on
+  purpose. But `installer/lib/init.sh` compares versions with GNU `sort -V` on the
+  upgrade path, and `context-kit/lib/toolfloor.sh` uses `sort -V` inside the floor
+  predicate itself. Neither is the battery, so neither is covered.
+  **The sharp edge:** an adopter on a stock BSD/macOS userland can hit a GNU-only
+  flag in the installer *and* in the env-probe that is supposed to tell them
+  whether their box qualifies — the diagnostic fails the same way the thing it
+  diagnoses would, with nothing on the page declaring it.
+  **Ruled at scope 2026-08-03, promoting this entry: widen the declaration, do not
+  shim.** The two live answers were shimming the two call sites versus stating the
+  install path's real requirement on the page. Three grounds, none of them a
+  preference: TRAJECTORY.md's interpreter policy binds every unit touching the
+  install path to **add no new shell-only install step**, and a shim adds shell
+  rather than removing it; the shim's surface is chartered to stop being bash at
+  all (`install-step-relocation` moves these steps behind the binary's invoke, and
+  `powershell-installer-surface` re-implements the Windows half), so it is work
+  with a known expiry; and declaring converges the install path onto the pattern
+  the floor contract already states for the battery, which is what makes this unit
+  debt rather than new portability behavior. The ruling does not foreclose the
+  shim — when `install-step-relocation` lands, the declaration narrows on its own.
+  `bash-portability-floor-costing` closes the *battery-wide* version of this trade;
+  it does not close the narrow installer-and-probe one, which is two call sites
+  rather than twenty-five files.
+  **Cost while deferred:** the install path's real toolchain requirement stays
+  undeclared and the probe's own portability stays unstated — the fail-open class
+  the bash-floor gap already fixed once for the battery, reopened one layer out.
+  Filed 2026-08-02 at close from the gap inbox; found at scope.
+
+- **release-bump-deferred-floor-unenforced** —
+  `scripts/check-release-bump.sh` does not implement the deferred-floor invariant
+  `docs/install.md` §Versioning asserts. The page states a later note "may not
+  fall below that version"; the gate only refuses a **patch-only** bump while a
+  deferral is outstanding, and never compares the new note's version numerically
+  against the floor. A deferred **major** discharged as a minor therefore passes
+  silently — the patch-only guard is skipped entirely.
+  **Live rather than hypothetical.** This close stamps a deferral, and the
+  `preview-release-cadence` policy makes outstanding deferrals routine. Within
+  that policy's own trigger set the major case is covered by policy alone (a
+  major releases immediately and never waits behind the cadence floor) — which is
+  exactly the coverage that evaporates when the policy is later edited by someone
+  who does not know the gate is not holding it.
+  **No ruling was owed here, which is why it promotes as debt.** The tag recorded
+  the work's shape rather than an open call: the fix is a numeric semver
+  comparison against the derived outstanding floor, which needs the history ∪ live
+  outstanding-set reader (lifecycle-kit/SPEC.md §templates/stages/) wired into a
+  gate that today reads only the newest note. That is an existing reader wired
+  into an existing gate, minting no name.
+  **Live this iteration, verified at scope 2026-08-03:**
+  `.workflow/release-disposition.txt` carries an outstanding `deferred:v0.22.0`
+  and `.workflow/tightened-gates.txt` holds seven declarations since v0.21.0, so
+  the floor this gate fails to enforce is one an actual close must discharge.
+  **Cost while deferred:** a stated invariant with no oracle — policy prose holds
+  it, which is the thing a gate exists to stop trusting.
+  Debt: converges the gate on an invariant the page already states; adds no
+  governed name.
+  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's align.
+
+- **release-disposition-grammar-consolidation** — the release
+  disposition line's version-field grammar is restated on five surfaces and the
+  restatements drift. Owner: lifecycle-kit/SPEC.md §templates/stages/ (three
+  forms, correct); `.workflow/release-disposition.txt`'s header and
+  `.claude/commands/close.md` also carry three forms;
+  `lifecycle-kit/templates/stages/close.md` was corrected in-iteration, and
+  RELEASING.md was de-literalized to a citation at this close — so both known
+  stale copies are gone, but the restatement **shape** is untouched and the next
+  form added rots the same way.
+  **The placeholder-spelling half rides here too.** Prose splits between
+  `deferred:vX.Y.Z` (RELEASING.md, docs/install.md, the check-release-bump
+  fixtures) and `deferred:<version>` (the disposition header, the kit SPEC).
+  `scripts/check-release-bump.sh` settles which is honest: it matches
+  `deferred:v*` and strips `deferred:v`, so a literal `v` immediately after the
+  colon is **required**. The `<version>` form is not wrong but hides that
+  requirement inside the placeholder, and it is the spelling the owning SPEC uses.
+  Enforcement-first ranks removing the duplication above gating it and
+  de-literalization puts the value in the owning SPEC with prose citing the name,
+  so the unit is one consolidation rather than five point fixes plus a
+  restatement gate.
+  **Ruled at scope 2026-08-03, promoting this entry: a vendored template cites
+  its kit SPEC, and the standalone-usability worry does not survive its own
+  premise.** The open call was how much a vendored template may cite rather than
+  restate before a consumer who has not read the kit SPEC loses the thread. It is
+  settled by the two always-loaded rules already named above — de-literalization
+  and content-tiering — against a fact about vendoring: a kit ships its `SPEC.md`
+  (the kit-landing checklist requires it), so a vendored consumer *has* the owner
+  and the citation resolves in their tree. "Has not read" is therefore a reading
+  cost, never an absent surface, and paying it once beats maintaining five copies
+  that drift. Restatement stays available only where a form is load-bearing at
+  the point of use; the placeholder spelling above is such a case, since
+  `scripts/check-release-bump.sh` requires the literal `v`.
+  `check-shim-restatement` cannot reach this class — a restatement that has
+  *diverged* no longer matches its owner's wording.
+  **Cost while deferred:** each surviving copy is a place the next grammar change
+  must be hand-propagated, with no oracle over the propagation.
+  Debt: converges wording on names the spec already carries; adds no governed
+  name unless the consolidation mints a citation convention.
+  Filed 2026-08-01 at close from the gap inbox — scope's narrower RELEASING.md
+  filing and align's spelling filing both supersede into this entry.
+
+- **installer-upgrade-smoke-arm** — `installer/consumer-smoke/run-smoke.sh`
+  packs a single `$VERSION` and asserts the same-version re-run leaves the tree
+  unchanged (idempotence). The **cross-version** upgrade path — `init.sh`'s
+  version check falling through in the upgrade direction, the profile re-read
+  from the lock, `claim()` re-applying while preserving adopter-edited files —
+  therefore ships in v0.16.0 with no automated exercise. It is implemented and
+  was read against the source, not run.
+  **Deliverable:** pack twice at two stamped versions in the scratch consumer;
+  assert the bump re-applies the recorded profile, leaves a deliberately-edited
+  file untouched, reports it as changed, and updates the lock's `version`.
+  Extends the suite that already exists rather than adding one.
+  **Scope note:** it asserts behavior installer/README.md §init and §The
+  manifest already specify — no contract question, just uncovered ground, so a
+  spec pass should be short.
+  **Cost while deferred:** the first adopter to move off v0.16.0 is the first
+  execution of that path. Carved out of `installer-lifecycle-verbs` because it
+  needs none of the verbs and is much cheaper than they are.
+  Filed 2026-07-26 by close (`activation-path`), correcting a false
+  no-upgrade-path premise against `installer/lib/init.sh`.
+
+- **installer-smoke-manifest-write-collision** — a guaranteed
+  collision between the validate roster's order and the spine's own write
+  mechanism. `run-validate.sh` upserts each suite's row into the tracked
+  `.workflow/validate-evidence.txt` manifest as it goes, while `installer_smoke`
+  (via `scripts/pack-installer.sh`) hard-refuses a dirty `git status --porcelain`
+  — so with the suite anywhere but first, every full run deterministically reds
+  it. Not a race. Reproduced at `activation-path validate`: the suite logged
+  "the worktree is dirty", and re-running it alone on a clean tree passed all
+  three profiles.
+  **Interim mitigation landed:** `installer_smoke` reordered strictly first in
+  `EVIDENCE_KIT_SUITES`, with a load-bearing comment on why position matters.
+  Two facts verified before landing, and they are what the durable fix rests on:
+  `installer_smoke` is the **only** configured suite requiring this repo's own
+  tree to be clean, and **nothing pins any suite to roster position 1**.
+  **A baseline hold was tried and reverted the same session** — the negative
+  result worth keeping. `installer_smoke` carries no parser override, so it falls
+  to the default `exit-code` parser whose entire result is one row: a dirty tree,
+  a broken profile, a pack failure and a genuine `init` regression all produce
+  the identical row, and a held-constant baseline classifies every one of them
+  `clean`. The hold did not preserve a known red, it blinded the suite to every
+  other failure mode.
+  **Deliverable — the durable fix, not yet built.** The reorder is
+  positional and fragile: it re-breaks silently the moment a second
+  clean-tree-requiring suite lands anywhere but first, and nothing asserts
+  the ordering, so the failure mode is silent regression, not a red. The
+  durable fix is one of: (a) have `run-validate.sh` batch its manifest
+  writes to scratch and fold them into the tracked file only after every
+  suite has run, removing the write-order dependency entirely, or (b) an
+  assertion (a gate, or a `run-validate.sh` precondition) that reds when a
+  clean-tree-requiring suite is not first — a scanner for "requires a clean
+  tree" would need each suite to declare that need rather than inferring it
+  from grepping its script, which is itself an open design question.
+  **Ruled at scope 2026-08-03, promoting this entry: candidate (a).** Batch the
+  manifest writes to scratch and fold them into the tracked file only after every
+  suite has run. Two grounds, both determined rather than preferred.
+  Enforcement-first ranks removing a defect above gating it, and (a) removes the
+  write-order dependency outright while (b) only asserts an ordering that (a)
+  makes irrelevant. And (b) needs each suite to declare its own preconditions
+  machine-readably — a declaration mechanism this repo does not have, so it mints
+  a governed name and would flip this unit to feature-shaped, which the promotion
+  did not sanction.
+  **Consequence to carry into build:** (a) changes the writer contract
+  `evidence-row-upsert-order` already covers ("a re-run supersedes this
+  iteration's prior line for the suite, then appends"), so it is an
+  `evidence-kit/SPEC.md` ruling rather than a script patch, and it may subsume
+  that deferred entry rather than merely touching it. Close should re-read
+  `evidence-row-upsert-order` against what lands here.
+  **Cost while deferred — corrected.** The reorder closes the deterministic
+  every-run red. What remains open is the silent-regression exposure: a
+  second clean-tree-requiring suite landing anywhere but first would
+  reintroduce the identical collision with no gate to catch it, discoverable
+  only by a session noticing the red and re-deriving this same diagnosis.
+  Debt: converges `run-validate.sh`'s writer onto an order-independent
+  mechanism, or adds a declared-precondition gate; no governed name yet.
+  Filed 2026-07-26 by validate (`activation-path`), from the full evidence
+  battery run.
+
 ## Deferred
 
-- **native-artifact-publish-path** [design-pending] — build and publish the per-target gate binary.
+- **native-artifact-publish-path** [design-pending] [roadmap: now/reliability] — build and publish.
+  roadmap-summary: Build and publish the gate binary per target, with a published digest.
   The publish side of the seam `native-gate-vendoring-model` ruled. That amendment merged
   and is gone, so the model is carried here rather than cited; the rulings this entry
   inherits and may not re-litigate are TRAJECTORY.md's.
@@ -975,75 +1153,6 @@
   Filed 2026-07-26 by build on the lead's ruling at the `activation-installer`
   merge, from scope the amendment governed and its deletion would otherwise
   have dropped.
-
-- **installer-smoke-manifest-write-collision** [design-pending] — a guaranteed
-  collision between the validate roster's order and the spine's own write
-  mechanism. `run-validate.sh` upserts each suite's row into the tracked
-  `.workflow/validate-evidence.txt` manifest as it goes, while `installer_smoke`
-  (via `scripts/pack-installer.sh`) hard-refuses a dirty `git status --porcelain`
-  — so with the suite anywhere but first, every full run deterministically reds
-  it. Not a race. Reproduced at `activation-path validate`: the suite logged
-  "the worktree is dirty", and re-running it alone on a clean tree passed all
-  three profiles.
-  **Interim mitigation landed:** `installer_smoke` reordered strictly first in
-  `EVIDENCE_KIT_SUITES`, with a load-bearing comment on why position matters.
-  Two facts verified before landing, and they are what the durable fix rests on:
-  `installer_smoke` is the **only** configured suite requiring this repo's own
-  tree to be clean, and **nothing pins any suite to roster position 1**.
-  **A baseline hold was tried and reverted the same session** — the negative
-  result worth keeping. `installer_smoke` carries no parser override, so it falls
-  to the default `exit-code` parser whose entire result is one row: a dirty tree,
-  a broken profile, a pack failure and a genuine `init` regression all produce
-  the identical row, and a held-constant baseline classifies every one of them
-  `clean`. The hold did not preserve a known red, it blinded the suite to every
-  other failure mode.
-  **Deliverable — the durable fix, not yet built.** The reorder is
-  positional and fragile: it re-breaks silently the moment a second
-  clean-tree-requiring suite lands anywhere but first, and nothing asserts
-  the ordering, so the failure mode is silent regression, not a red. The
-  durable fix is one of: (a) have `run-validate.sh` batch its manifest
-  writes to scratch and fold them into the tracked file only after every
-  suite has run, removing the write-order dependency entirely, or (b) an
-  assertion (a gate, or a `run-validate.sh` precondition) that reds when a
-  clean-tree-requiring suite is not first — a scanner for "requires a clean
-  tree" would need each suite to declare that need rather than inferring it
-  from grepping its script, which is itself an open design question.
-  **Why `[design-pending]`:** candidate (a) changes the writer contract
-  `evidence-row-upsert-order` already covers ("a re-run supersedes this
-  iteration's prior line for the suite, then appends") — an
-  `evidence-kit/SPEC.md` ruling, not a script patch, and the two entries
-  likely converge on one fix. Candidate (b) needs a declaration mechanism
-  this repo doesn't have yet (no suite currently states its own
-  preconditions in a machine-readable way).
-  **Cost while deferred — corrected.** The reorder closes the deterministic
-  every-run red. What remains open is the silent-regression exposure: a
-  second clean-tree-requiring suite landing anywhere but first would
-  reintroduce the identical collision with no gate to catch it, discoverable
-  only by a session noticing the red and re-deriving this same diagnosis.
-  Debt: converges `run-validate.sh`'s writer onto an order-independent
-  mechanism, or adds a declared-precondition gate; no governed name yet.
-  Filed 2026-07-26 by validate (`activation-path`), from the full evidence
-  battery run.
-
-- **installer-upgrade-smoke-arm** [design-pending] — `installer/consumer-smoke/run-smoke.sh`
-  packs a single `$VERSION` and asserts the same-version re-run leaves the tree
-  unchanged (idempotence). The **cross-version** upgrade path — `init.sh`'s
-  version check falling through in the upgrade direction, the profile re-read
-  from the lock, `claim()` re-applying while preserving adopter-edited files —
-  therefore ships in v0.16.0 with no automated exercise. It is implemented and
-  was read against the source, not run.
-  **Deliverable:** pack twice at two stamped versions in the scratch consumer;
-  assert the bump re-applies the recorded profile, leaves a deliberately-edited
-  file untouched, reports it as changed, and updates the lock's `version`.
-  Extends the suite that already exists rather than adding one.
-  **Scope note:** it asserts behavior installer/README.md §init and §The
-  manifest already specify — no contract question, just uncovered ground, so a
-  spec pass should be short.
-  **Cost while deferred:** the first adopter to move off v0.16.0 is the first
-  execution of that path. Carved out of `installer-lifecycle-verbs` because it
-  needs none of the verbs and is much cheaper than they are.
-  Filed 2026-07-26 by close (`activation-path`), correcting a false
-  no-upgrade-path premise against `installer/lib/init.sh`.
 
 - **gate-file-coverage-closure** [design-pending] — the missing check class behind a
   hole this close fixed inline: nothing asserts that every gate script in the
@@ -2013,60 +2122,6 @@
   to a shipped surface.
   Filed 2026-08-01 by close's prompt-friction triage.
 
-- **release-disposition-grammar-consolidation** [design-pending] — the release
-  disposition line's version-field grammar is restated on five surfaces and the
-  restatements drift. Owner: lifecycle-kit/SPEC.md §templates/stages/ (three
-  forms, correct); `.workflow/release-disposition.txt`'s header and
-  `.claude/commands/close.md` also carry three forms;
-  `lifecycle-kit/templates/stages/close.md` was corrected in-iteration, and
-  RELEASING.md was de-literalized to a citation at this close — so both known
-  stale copies are gone, but the restatement **shape** is untouched and the next
-  form added rots the same way.
-  **The placeholder-spelling half rides here too.** Prose splits between
-  `deferred:vX.Y.Z` (RELEASING.md, docs/install.md, the check-release-bump
-  fixtures) and `deferred:<version>` (the disposition header, the kit SPEC).
-  `scripts/check-release-bump.sh` settles which is honest: it matches
-  `deferred:v*` and strips `deferred:v`, so a literal `v` immediately after the
-  colon is **required**. The `<version>` form is not wrong but hides that
-  requirement inside the placeholder, and it is the spelling the owning SPEC uses.
-  **Why `[design-pending]`:** Enforcement-first ranks removing the duplication
-  above gating it and de-literalization puts the value in the owning SPEC with
-  prose citing the name, so the unit is one consolidation rather than five point
-  fixes plus a restatement gate. The question it must settle: how much a
-  **vendored** template may cite rather than restate before it stops being usable
-  standalone by a consumer who has not read the kit SPEC.
-  `check-shim-restatement` cannot reach this class — a restatement that has
-  *diverged* no longer matches its owner's wording.
-  **Cost while deferred:** each surviving copy is a place the next grammar change
-  must be hand-propagated, with no oracle over the propagation.
-  Debt: converges wording on names the spec already carries; adds no governed
-  name unless the consolidation mints a citation convention.
-  Filed 2026-08-01 at close from the gap inbox — scope's narrower RELEASING.md
-  filing and align's spelling filing both supersede into this entry.
-
-- **release-bump-deferred-floor-unenforced** [design-pending] —
-  `scripts/check-release-bump.sh` does not implement the deferred-floor invariant
-  `docs/install.md` §Versioning asserts. The page states a later note "may not
-  fall below that version"; the gate only refuses a **patch-only** bump while a
-  deferral is outstanding, and never compares the new note's version numerically
-  against the floor. A deferred **major** discharged as a minor therefore passes
-  silently — the patch-only guard is skipped entirely.
-  **Live rather than hypothetical.** This close stamps a deferral, and the
-  `preview-release-cadence` policy makes outstanding deferrals routine. Within
-  that policy's own trigger set the major case is covered by policy alone (a
-  major releases immediately and never waits behind the cadence floor) — which is
-  exactly the coverage that evaporates when the policy is later edited by someone
-  who does not know the gate is not holding it.
-  **Why `[design-pending]`:** the fix is a numeric semver comparison against the
-  derived outstanding floor, which needs the history ∪ live outstanding-set
-  reader (lifecycle-kit/SPEC.md §templates/stages/) wired into a gate that today
-  reads only the newest note.
-  **Cost while deferred:** a stated invariant with no oracle — policy prose holds
-  it, which is the thing a gate exists to stop trusting.
-  Debt: converges the gate on an invariant the page already states; adds no
-  governed name.
-  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's align.
-
 - **upgrade-contract-rename-routing-unstated** [design-pending] —
   `docs/install.md` §The upgrade contract never states that a **gate-name**
   rename or a **file/directory-convention** rename routes to the note's
@@ -2895,27 +2950,6 @@
   defect, not repo housekeeping.
   Filed 2026-08-02 at close from the gap inbox; observed during this iteration's
   align stage.
-
-- **install-path-gnu-userland-undeclared** [design-pending] — the installer's own
-  toolchain requirement is unstated, and so is the probe's. docs/install.md
-  §Requirements scopes its GNU-coreutils/gawk declaration to **the battery**, on
-  purpose. But `installer/lib/init.sh` compares versions with GNU `sort -V` on the
-  upgrade path, and `context-kit/lib/toolfloor.sh` uses `sort -V` inside the floor
-  predicate itself. Neither is the battery, so neither is covered.
-  **The sharp edge:** an adopter on a stock BSD/macOS userland can hit a GNU-only
-  flag in the installer *and* in the env-probe that is supposed to tell them
-  whether their box qualifies — the diagnostic fails the same way the thing it
-  diagnoses would, with nothing on the page declaring it.
-  **Why `[design-pending]`:** two live answers with different reach — shim the two
-  call sites (making the install path and the probe genuinely portable, which is
-  the front-door claim's shape) versus widen the page's declaration to cover the
-  install path (cheap, honest, and concedes reach). `bash-portability-floor-costing`
-  closes the *battery-wide* version of this trade; it does not close the narrow
-  installer-and-probe one, which is two call sites rather than twenty-five files.
-  **Cost while deferred:** the install path's real toolchain requirement stays
-  undeclared and the probe's own portability stays unstated — the fail-open class
-  the bash-floor gap already fixed once for the battery, reopened one layer out.
-  Filed 2026-08-02 at close from the gap inbox; found at scope.
 
 - **native-binary-freshness-ungated** [design-pending] — a compiled gate has no
   freshness oracle. `check-gate-substrate-parity` assertion B diffs the `.gate`

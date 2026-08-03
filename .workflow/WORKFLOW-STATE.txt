@@ -4,4 +4,4 @@
 
 ---
 
-— scope ae6c8311 2026-08-03
+native-artifact-path scope ae6c8311 2026-08-03
