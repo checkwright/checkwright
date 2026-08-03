@@ -53,7 +53,7 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-- **`native-artifact-publish-path`** *(reliability)* — Build and publish the gate binary per target, with a published digest.
+_Nothing is queued under this horizon._
 
 ### next
 

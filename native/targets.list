@@ -6,8 +6,25 @@
 # copy of it to tell "this platform was never committed to" (omit and declare)
 # from "committed to, artifact missing" (a broken payload).
 #
-# A target joins this roster only when a green run has produced and exercised its
-# artifact, and never beyond what docs/install.md §Requirements already states —
-# the widening trigger is `platform-support-ci-matrix` landing a CI leg for the
-# platform, after which widening is one line here plus one runner mapping.
+# It ships one target, and the grounds are measured rather than cautious:
+#   - x86_64-unknown-linux-gnu is the only platform .github/workflows/ has a
+#     runner for — every job is ubuntu-latest and no other runner is declared.
+#   - It is the only platform this repo has green evidence for at all: every
+#     gate run, fixture suite, consumer smoke and CI leg is Linux.
+#   - WSL is Linux and resolves to this same target, so docs/install.md
+#     §Requirements' Windows-through-WSL claim is served exactly as far as that
+#     page already claims and no further; native Windows waits on
+#     `powershell-installer-surface`.
+#   - A macOS target would be built on a runner no workflow has, and
+#     cross-compiling one from ubuntu-latest is worse than omitting it: it would
+#     publish an artifact no run has ever executed.
+#
+# This is not a narrowing of the trajectory — the objectives are the direction
+# and this roster is the tree. A one-target roster makes the omit-and-declare
+# path the normal path for a macOS adopter on day one, which ships that path
+# exercised rather than as the dead code the vacuous-green class exists to
+# refuse. A target joins only when a green run has produced and exercised its
+# artifact, and never beyond what docs/install.md §Requirements already states;
+# the widening trigger is `platform-support-ci-matrix` landing a CI leg, after
+# which widening is one line here plus one runner mapping.
 x86_64-unknown-linux-gnu

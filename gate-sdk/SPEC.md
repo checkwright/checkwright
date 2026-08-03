@@ -955,6 +955,19 @@ platform is reasoned about. Widening is therefore mechanical and cheap by
 construction: because the build matrix is roster-derived, a new platform is one
 roster line plus one runner mapping, never a workflow rewrite.
 
+**One payload carries every declared target, not one payload per target**, and
+the artifacts are never produced from a working tree: the pack step takes them
+from the run artifacts the build legs uploaded and builds nothing itself, so a
+locally-built binary can never substitute for a released one — the same reasoning
+the vendoring ruling applied to the crate source, arriving one layer out. The
+one-payload shape is ruled on the numbers: the *installed* footprint is one
+binary either way, since the installer writes only the matching target, so the
+difference against a per-target payload is download size alone and is bounded by
+the roster — while the per-target shape multiplies the publish path, the digest
+set and the attestation surface by the roster size. **The revisit trigger is a
+measurement rather than a taste:** the roster growing past what a CI matrix
+commits to, or one target's binary ceasing to be small.
+
 **The obligation opacity buys.** A consumer who cannot read the gate has only
 the publisher's word for it, so the integrity story is the whole of what
 replaced reading the source. The achievable floor is a published per-target

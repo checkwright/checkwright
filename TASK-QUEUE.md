@@ -12,51 +12,6 @@
 
 ## New Features
 
-- **native-artifact-publish-path** [spec: SPEC-artifact-publish-path.md] [roadmap: now/reliability]
-  roadmap-summary: Build and publish the gate binary per target, with a published digest.
-  The publish side of the seam `native-gate-vendoring-model` ruled. That amendment merged
-  and is gone, so the model is carried here rather than cited; the rulings this entry
-  inherits and may not re-litigate are TRAJECTORY.md's.
-  **The ruled model.** *A tracked target roster with one owner and exactly two readers* —
-  the release workflow reads it to know what to build, the installer reads it to know what
-  to look for. No second spelling: a hand-maintained platform list inside a workflow file
-  is the maintained-roster anti-pattern derivation-first refuses. A target added to the
-  roster and not built fails the release, which is the correct place for that failure.
-  *An artifact class in `scripts/pack-installer.sh` beside its kit roots* — the gate
-  binary, built once per declared target by the release and placed in the payload under its
-  target name. Never produced from a working tree and never tracked, so no local build can
-  substitute for it.
-  *One payload carrying every declared target, not one payload per target.* Ruled on the
-  numbers: the installed footprint is one binary either way, since the installer writes only
-  the matching target, so the difference is download size alone and is bounded by the
-  roster — while the per-target shape multiplies the publish path, the digest set and the
-  attestation surface by the roster size. **Revisit trigger, a measurement rather than a
-  taste:** when download size becomes an adoption barrier — the roster growing past what
-  `platform-support-ci-matrix` commits to, or one target's binary ceasing to be small.
-  *A published per-target digest beside each artifact.* The one new external contract the
-  model creates, with a named reader at a named transition on both sides:
-  `native-artifact-install-path`'s pre-write verification, and `doctor`'s re-verification
-  through the lock record.
-  **Surfaces it still owes:** gate-sdk/SPEC.md §Layout and configuration (the roster
-  declaration and any knob the selection takes) and `RELEASING.md` (the runbook gains the
-  matrix, the per-target artifacts and the digest emission).
-  **The size is measured, not guessed.** `.github/workflows/publish.yml` has no build
-  matrix, no OS-specific runner and no compiled artifact anywhere — `pack` runs on one
-  runner and one platform-agnostic tarball reaches both transports. Every piece above is
-  new, and none is a tweak to something already there.
-  **Split out 2026-08-03 by operator ruling** — this iteration lands the model plus only
-  what is exercisable today, and nothing artifact-side is: no kit carries a `.gate` member
-  and the iteration's envelope forbids adding one, so this would be built against zero
-  instances.
-  **Why it is design-pending:** the roster's spelling is a contract between a workflow and
-  an installer, and the digest's publication shape decides what
-  `tarball-build-attestation` can later strengthen without a migration. Neither is settled
-  by the vendoring ruling, which fixes the model and deliberately not the wire.
-  **Cost while deferred:** zero today, and it is the hard prerequisite the moment a second
-  port is wanted — the ruled install model cannot place an artifact nothing produces.
-  Filed 2026-08-03 by spec on the operator's publish/consume split; the ruled model
-  relocated into it by build at the amendment's merge.
-
 - **native-artifact-install-path** [spec: SPEC-artifact-install-path.md]
   — place and verify the artifact.
   The consume side of the same seam. `native-gate-vendoring-model` merged and is gone, so
@@ -3439,5 +3394,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- native-artifact-publish-path
 
 ## Lessons Learned
