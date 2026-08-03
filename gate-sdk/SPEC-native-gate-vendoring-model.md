@@ -139,6 +139,41 @@ proves is *same origin, same TLS session* — corruption and truncation, never a
 compromised host. A governed surface may therefore say *verified against a
 published digest*, and may **not** say *reproducible*, until that entry lands.
 
+## What this iteration builds, and what is filed
+
+**Ruled 2026-08-03 by the operator: split at the publish/consume seam.** This
+iteration lands the **model** — the deltas below as ruled — plus only the
+mechanism that is exercisable today. The implementation that produces and places
+artifacts is filed as its own costed work, citing this amendment. The pivot is a
+trajectory and this iteration is one step on it; the step does not swallow the
+track.
+
+The seam is sharp because nothing in the tree carries a `.gate` member and the
+envelope forbids adding one, so every artifact-side mechanism would be built
+against zero instances. What *is* exercisable today is exercisable against real
+instances: the crate exists, the reference-only implementation exists, and the
+kit roots exist.
+
+| Delta | Disposition |
+|---|---|
+| 3, 8, 9, 10, 11 | **Lands here.** The ruled model as spec prose, `gate_command` unchanged, and the requirement-surface corrections. |
+| 1, 2, 6 | **Filed: `native-artifact-publish-path`** — the target roster, the release build matrix, the per-target build, and the published digest. Publish side of the seam. |
+| 4, 5, and the consume half of 2 and 6 | **Filed: `native-artifact-install-path`** — platform resolution, artifact selection, pre-write digest verification, the lock's artifact class, and omit-and-declare. Consume side, blocked on the publish side because it has nothing to select or verify until artifacts exist. |
+
+Delta 7 files itself by construction — it names **`install-step-relocation`** and
+builds nothing.
+
+The deltas are **not** deleted into those entries. They are the ruled model and
+they stay here, because an entry that has to re-derive its own design is the
+compression loss this project keeps paying for; each filed entry cites this
+amendment as its design source rather than restating it.
+
+**Both filed entries inherit the objectives and the closed rulings**
+(§The objectives this ruling serves). A session picking either one re-verifies
+facts against the tree and does not re-litigate the rulings — prebuilt payload,
+git-only floor, opacity-as-goal and the Rust substrate are closed, and only the
+operator reopens a closed ruling.
+
 ## What changes
 
 ### 1. The substrate ships prebuilt, and its source does not ship {design-bearing}

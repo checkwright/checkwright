@@ -214,6 +214,148 @@
 
 ## Deferred
 
+- **native-artifact-publish-path** [design-pending] — build and publish the per-target gate binary.
+  The publish side of the seam `native-gate-vendoring-model` rules: a tracked **target
+  roster** with one owner, a release build matrix reading it, a per-target build, and a
+  **published per-target digest**. Design source is that amendment; this entry implements
+  it and does not re-derive it.
+  **The size is measured, not guessed.** `.github/workflows/publish.yml` has no build
+  matrix, no OS-specific runner and no compiled artifact anywhere — `pack` runs on one
+  runner and one platform-agnostic tarball reaches both transports. Every piece above is
+  new, and none is a tweak to something already there.
+  **Split out 2026-08-03 by operator ruling** — this iteration lands the model plus only
+  what is exercisable today, and nothing artifact-side is: no kit carries a `.gate` member
+  and the iteration's envelope forbids adding one, so this would be built against zero
+  instances.
+  **Why it is design-pending:** the roster's spelling is a contract between a workflow and
+  an installer, and the digest's publication shape decides what
+  `tarball-build-attestation` can later strengthen without a migration. Neither is settled
+  by the vendoring ruling, which fixes the model and deliberately not the wire.
+  **Cost while deferred:** zero today, and it is the hard prerequisite the moment a second
+  port is wanted — the ruled install model cannot place an artifact nothing produces.
+  Filed 2026-08-03 by spec, on the operator's publish/consume split.
+
+- **native-artifact-install-path** [design-pending] [blocked-by: native-artifact-publish-path]
+  — place and verify the artifact.
+  The consume side of the same seam: platform resolution, artifact selection, **pre-write
+  digest verification**, the `checkwright.lock` artifact class, and omit-and-declare for a
+  host whose platform has no artifact. Design source is `native-gate-vendoring-model`;
+  this entry implements it.
+  **A finding that shapes it, verified 2026-08-03:** no platform-triple derivation exists
+  in the tree. `context-kit/lib/toolfloor.sh` does no OS or architecture logic at all, and
+  `context-kit/bin/env-probe.sh`'s single `OS:` field is an unparsed `uname -s -r -m`
+  string rendered for a human to read. That field is **not** the producer — promoting a
+  display string to a machine-consumed selector is how a contract nobody declared comes
+  into being.
+  **Blocked rather than merely later:** there is nothing to select and nothing to verify
+  until artifacts and digests exist, so this cannot be exercised ahead of its blocker even
+  in fixtures without inventing the roster the blocker owns.
+  **Why it is design-pending:** omit-and-declare's honesty degrades as the ported set
+  grows — one gate missing at first, the whole battery on an unsupported platform later —
+  so what the target roster commits to is a support contract, and
+  `platform-support-ci-matrix` holds the other end of it.
+  **Cost while deferred:** zero today; from the first published artifact onward it is what
+  stands between a consumer and an unverified binary.
+  Filed 2026-08-03 by spec, the consume half of the operator's split.
+
+- **trajectory-ruling-record** [design-pending] — a tracked home for the closed rulings.
+  **Operator-directed filing 2026-08-03.** Deliverable, three parts that are one surface:
+  a root-governed **`TRAJECTORY.md`** carrying the six objectives and the closed rulings —
+  Rust final with the Go refusal grounds, the bash-portability-floor rejection, git
+  shelled-out, the interpreter policy, and opacity with its attestation counterweight —
+  promoted out of `native-gate-vendoring-model`'s amendment, which then cites it; **one
+  always-loaded CLAUDE.md pointer line**; and the **scope-ritual read** added beside the
+  private brief, carrying the sentence *"a recorded operator ruling is closed — re-verify
+  facts, never rulings; only the operator reopens one."*
+  **Distinct from ROADMAP.md by content class, and cross-linked rather than merged.**
+  ROADMAP is a generated projection of this queue — *what is next*. TRAJECTORY is a
+  hand-authored ruling record — *toward what, under which closed rulings*. Merging them
+  would put hand-authored content inside a generated marker block, which the projection
+  overwrites.
+  **Merged and not merged, with the judgment stated.** The three parts above merge because
+  they are create, register and load for one surface, and a surface nothing loads is not a
+  surface. `instruction-surface-bash-focus` stays separate: it shares the CLAUDE.md file
+  but not the content class — a pointer to a new record versus a rewrite of bash-specific
+  guidance — and its trigger is a threshold on how far the port has got, so merging would
+  bind a now-doable unit to a gated one.
+  **Sequencing note:** an amendment never outlives its implementation, so if
+  `native-gate-vendoring-model` merges first the objectives land in a component SPEC and
+  this entry relocates them rather than promoting them. Cheaper before than after.
+  **PRIORITY DIRECTIVE — the port track's sequence.** Ruled 2026-08-03 by the operator and
+  carried here so a scope session reads it from a governed surface rather than a thread;
+  it is deliverable content of `TRAJECTORY.md`, not commentary on this entry. The track
+  sequences toward **per-profile coherence, not whole-corpus completion**. Order:
+  (1) this iteration's model; (2) the publish-side pipeline, `native-artifact-publish-path`;
+  (3) a first ported cohort chosen to make **one shipped profile** fully native end to end;
+  (4) `installer-lifecycle-verbs`, with the uninstall verb; (5) `prose-profile` completion —
+  the **earliest external-install channel** under the re-ruled preview cohort recorded in
+  `BRIEF.local.md`, not post-launch polish; (6) `companion-toolkit-profile`.
+  `instruction-surface-bash-focus` unblocks on a threshold, not a date, per its own entry.
+  Surge-channel launch stays gated behind the private brief's readiness rule, and
+  launch-comms execution runs on its own clock under the surface that owns distribution.
+  **Cost while deferred:** the project's ruling record lives inside an amendment file that
+  is deleted on merge, so its home disappears exactly when the work it governs lands, and
+  the sequence above stays a thread nobody inherits.
+  Filed 2026-08-03 by spec on operator-directed intake; the trajectory surface itself.
+
+- **stage-session-ruling-class** [design-pending] — reversing a ruling is operator-class.
+  **Operator-directed filing 2026-08-03.** Add to the escalate-versus-decide roster in
+  `.claude/agents/stage-session.md` and lifecycle-kit's lead template: **any action that
+  reverses, demotes, or re-scopes a trajectory objective or a recorded operator ruling is
+  operator-class — escalate, never rule, urgency notwithstanding.**
+  **Grounds, both from this iteration and both instructive because neither was sloppy:**
+  the 2026-08-02 autonomous unport ruling, and the 2026-08-02/03 spec inversion. Each was
+  technically well-grounded on the evidence available to the session that made it, and
+  each was strategy-reversing. A rule that only catches bad reasoning would have caught
+  neither.
+  **Debt-shaped, so a later scope promotes it without an amendment:** the ruling is closed
+  and the deliverable is prose in existing rosters — no script, knob, convention, tag, or
+  contract another component must honor.
+  **It ships in a kit**, so it is a product rule rather than repo housekeeping: the lead
+  template is lifecycle-kit's, and every consumer running the lifecycle inherits the class.
+  **Cost while deferred:** the roster a stage session reads names scope, envelope and
+  cross-component gaps as escalation classes and does not name this one, so the next
+  well-grounded reversal has the same clear path the last two had.
+  Filed 2026-08-03 by spec, on operator-directed intake.
+
+- **consultation-landing-contract** [design-pending] — a landing contract for strategy sessions.
+  **Operator-directed filing 2026-08-03.** Deliverable: a `/consult` skill for operator
+  strategy sessions. On entry it reads the private brief, the trajectory surface and the
+  queue; on exit **every closed ruling has landed in a governed surface**, every refused
+  alternative is recorded with its grounds, and any always-loaded surface the ruling stales
+  is flagged or filed.
+  **Grounds, and they are measured:** the 2026-07-28 pivot consultation persisted exactly
+  one queue entry and left every instruction surface describing the prior substrate. That
+  cost is still being paid — this iteration reconstructed the objectives behind the port
+  from a relay rather than from a surface, and `instruction-surface-bash-focus` exists
+  because the instruction surfaces were never touched.
+  **Why it is design-pending:** a consultation is not a lifecycle stage — it has no
+  iteration, stamps no cursor, and may span or precede one — so where it sits relative to
+  the state machine is the open question, and `trajectory-ruling-record` owns the surface
+  it would exit onto.
+  **Cost while deferred:** a strategy session's output stays a transcript, and the next one
+  costs what this one cost — a relay, a reconstruction, and a stale instruction surface.
+  Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake.
+
+- **lossless-compression-codification** [design-pending] — the standing rule has no surface.
+  **Operator-directed filing 2026-08-03.** Land it in queue-kit/SPEC.md beside
+  §check-queue-entry-budget: **compression relocates to a linked entry, never drops**, and
+  **a ruling the operator restates from memory is filed as a recording entry in the
+  moment**.
+  **Grounds, all from one entry:** compressing the port parent dropped the Rust-versus-Go
+  choice, the dogfood question, and "distribution is the hard part, not the language" —
+  each restored later from memory, twice in one day, because no surface carried them.
+  `native-gate-language-ruling` and `bash-portability-floor-costing` are the recording
+  entries that rule names, and both were filed after the loss rather than in the moment.
+  **Distinct from `queue-entry-evidence-tier`, which stays separate:** that entry asks how
+  a reader *knows* detail was cut; this one states what an author does instead of cutting.
+  Neither answers the other, and both live under the same cap the budget gate enforces.
+  **Debt-shaped, so a later scope promotes it without an amendment:** the rule is closed
+  and what it needs is prose in a SPEC section that already exists.
+  **Cost while deferred:** the rule is enforced by whoever remembers it, which is the
+  failure mode it exists to name.
+  Filed 2026-08-03 by spec; the compression half of operator-directed intake.
+
 - **powershell-installer-surface** [design-pending] — a native Windows install path.
   The installer is bash end to end, so native Windows is unreachable:
   `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so

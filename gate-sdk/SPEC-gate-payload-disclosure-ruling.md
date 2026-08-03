@@ -94,18 +94,31 @@ what its SPEC section says*. `gate_command`'s substrate-blind dispatch
 no new mechanism is needed — only the statement that the property is a contract
 and may not be dropped to slim a payload.
 
+**What the pair is evidence *of*, restated under the prebuilt model.** In a
+consumer tree the pair is **acceptance evidence for a shipped artifact**, not a
+build check. Nothing is built there: the binary arrives prebuilt and
+digest-verified (**`native-gate-vendoring-model`**), so running the pair is not
+"did my build come out right" — that question does not exist for a consumer.
+It is *does the artifact I was given behave as the specification I was given says
+it behaves*, answered against cases the publisher is held to by the same
+meta-gates. The digest answers **which** artifact arrived; the pair answers
+**what it does**. Those are different questions and the payload ships an answer
+to both, which is the whole of what replaces reading the rule.
+
 It is also the consumer-side answer to the honest limit
 **`native-gate-meta-layer-reach`** records: that amendment's crate-side
 verification of a gate's declared read-set runs where cargo runs, which under
 **`native-gate-vendoring-model`** is never a consumer tree.
 
-**This is the one place the ruling pulls against its own objective, and it is
-escalated rather than decided.** A `good/`+`bad/` pair shows an agent what passes
-and what fails, which is analysis material. The recommendation on record is to
-ship it — an agent that games a gate from its fixtures can game it from its help
-text and its SPEC section, both of which must ship for the tool to be usable, and
-withholding it leaves a consumer with nothing verifiable at all. But that trade
-is the operator's, because it spends against objective 3 directly.
+**Ruled 2026-08-03 by the operator: the fixture pair ships.** The question was
+whether opacity extends to it, since a `good/`+`bad/` pair shows an agent what
+passes and what fails. It does not extend. The recorded
+shape-without-predicate distinction stands — fixtures disclose a gate's
+**shape**, never its **predicate** — and the pair is the consumer's only parity
+oracle for a binary they cannot read. Withholding it would spend the trust story
+to buy marginal opacity, since the help text and the SPEC section ship
+regardless. Recorded as a closed ruling: re-verify the facts under it, never the
+ruling itself.
 
 ### 4. The obligation opacity buys is named, and lands on an existing entry {design-bearing}
 
@@ -186,10 +199,12 @@ never re-fires is an assertion that never runs.
 Producer: the kit's `gate-tests/<name>/{good,bad}/` tree, written when the gate
 is authored and required by `check-gate-fixture-coverage`. Consumer, in the
 **consumer** tree rather than this one: `gate-sdk/bin/run-gate-tests.sh`,
-resolving the member through `gate_command` and therefore running the consumer's
-own installed binary against the shipped cases. That consumer is new — the pair
-has always vendored, and this amendment names the reader that makes the vendoring
-a contract instead of an accident.
+resolving the member through `gate_command` and therefore running the artifact
+the install placed and verified, against the cases the publisher is held to. That
+consumer is new — the pair has always vendored, and this amendment names the
+reader that makes the vendoring a contract instead of an accident. Its transition
+is **post-install acceptance**, not post-build verification: there is no build in
+a consumer tree for it to verify.
 
 **No new fields.** The descriptor gains none: it "carries no field that lacks a
 reader, reserving nothing against a future reader" (§The `# graph:` manifest),
