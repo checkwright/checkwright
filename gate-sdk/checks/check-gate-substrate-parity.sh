@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,native/* dir=one valve=none tier=precommit
-# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, a recorded disposition for every substrate-sensitive member, and no implementation source inside the vendoring set
+# graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,native/*,.github/workflows/publish.yml dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, a recorded disposition for every substrate-sensitive member, no implementation source inside the vendoring set, and one owner for the target roster the artifact path derives from
 #
 # usage: check-gate-substrate-parity.sh [gates-dir] [conservation-doc]
 #   two args: steer onto hermetic fixture copies of each surface.
@@ -64,7 +64,7 @@ mapfile -t DESCRIPTORS < <(
         done
     done | sort -u
 )
-BIN="${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+BIN="$(gate_native_bin)"
 subcommands=()
 refonly=0
 roster_read=0
@@ -165,6 +165,92 @@ while IFS= read -r root; do
     done < <(gate_find "$root" -type f)
 done < <(gate_kit_roots_rel)
 
+# assertion F: the target roster has one owner and the publish path derives from it
+# — the roster is what asserts platform support, so a second spelling of it (a
+# platform literal in the build matrix) or a second producer of a published digest
+# is the failure this assertion exists to make impossible
+# spec: gate-sdk/SPEC.md §Consumer payload
+ROSTER="$(gate_native_targets_file)"
+roster_targets=0
+roster_state="absent"
+if [[ -f "$ROSTER" ]]; then
+    roster_state="read"
+    mapfile -t TARGETS < <(gates_list_members "$ROSTER")
+    if [[ ${#TARGETS[@]} -eq 0 ]]; then
+        findings+=("empty target roster: $ROSTER declares no target — a roster asserting no platform support cannot be the surface that asserts it")
+    fi
+    for t in "${TARGETS[@]}"; do
+        roster_targets=$((roster_targets + 1))
+        [[ "$t" =~ ^[A-Za-z0-9_]+(-[A-Za-z0-9_.]+){2,3}$ ]] \
+            || findings+=("malformed target triple: '$t' in $ROSTER is not <arch>-<vendor>-<os>[-<env>]")
+    done
+elif [[ ${#DESCRIPTORS[@]} -gt 0 ]]; then
+    findings+=("no target roster: $ROSTER is absent, but ${#DESCRIPTORS[@]} .gate descriptor(s) need a prebuilt binary per declared target — the payload has no declared platform set to carry one for")
+fi
+
+WORKFLOW="${GATE_SDK_NATIVE_PUBLISH_WORKFLOW:-.github/workflows/publish.yml}"
+wf_state="absent"
+wf_matrix=0
+wf_jobs=0
+if [[ -f "$WORKFLOW" ]]; then
+    wf_state="read"
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F, roster-derived matrix: every value in a matrix declaration is a GitHub expression, never a literal
+    matrix_lits="$(awk '
+        function ind(s,   n) { n = match(s, /[^ ]/); return (n == 0) ? -1 : n - 1 }
+        inb {
+            if ($0 ~ /^[[:space:]]*$/) next
+            if (ind($0) > keycol) {
+                if ($0 !~ /^[[:space:]]*#/ && index($0, "${{") == 0)
+                    printf "%d\t%s\n", FNR, $0
+                next
+            }
+            inb = 0
+        }
+        /^[[:space:]]*matrix:[[:space:]]*$/ { inb = 1; keycol = ind($0); n++; next }
+        /^[[:space:]]*matrix:[[:space:]]*[^[:space:]]/ {
+            n++
+            if (index($0, "${{") == 0) printf "%d\t%s\n", FNR, $0
+        }
+        END { printf "#\t%d\n", n }
+    ' "$WORKFLOW")"; st=$?
+    fail_closed "$st" check-gate-substrate-parity "awk matrix($WORKFLOW)"
+    while IFS=$'\t' read -r ln text; do
+        [[ -n "$ln" ]] || continue
+        if [[ "$ln" == "#" ]]; then wf_matrix="$text"; continue; fi
+        text="${text#"${text%%[![:space:]]*}"}"
+        findings+=("matrix declaration not roster-derived: $WORKFLOW:$ln '$text' is a literal where an expression over $ROSTER belongs — a hand-written platform in a build matrix is a second spelling of the support commitment")
+    done <<<"$matrix_lits"
+
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F, one producer per digest: a job computes at most one, and a job that downloads a run artifact and uploads none computes none
+    digests="$(awk '
+        function emit() { if (job != "") printf "%s\t%d\t%d\t%d\n", job, d, dl, ul }
+        /^jobs:[[:space:]]*$/ { injobs = 1; next }
+        injobs && /^[^[:space:]#]/ { emit(); job = ""; injobs = 0 }
+        injobs && /^  [A-Za-z0-9_-]+:[[:space:]]*$/ {
+            emit()
+            job = $0; sub(/^ +/, "", job); sub(/:.*$/, "", job)
+            d = 0; dl = 0; ul = 0
+            next
+        }
+        job != "" {
+            if ($0 !~ /^[[:space:]]*#/ && $0 ~ /sha256sum/ && $0 !~ /sha256sum[[:space:]]+-c/) d++
+            if ($0 ~ /uses:[[:space:]]*[^[:space:]]*download-artifact/) dl = 1
+            if ($0 ~ /uses:[[:space:]]*[^[:space:]]*upload-artifact/) ul = 1
+        }
+        END { emit() }
+    ' "$WORKFLOW")"; st=$?
+    fail_closed "$st" check-gate-substrate-parity "awk digests($WORKFLOW)"
+    while IFS=$'\t' read -r job d dl ul; do
+        [[ -n "$job" ]] || continue
+        wf_jobs=$((wf_jobs + 1))
+        if [[ "$d" -gt 1 ]]; then
+            findings+=("digest recomputed: job '$job' in $WORKFLOW computes $d digests — each is emitted once, where its bytes are produced, and moved thereafter")
+        elif [[ "$d" -gt 0 && "$dl" == 1 && "$ul" == 0 ]]; then
+            findings+=("digest computed by a consumer: job '$job' in $WORKFLOW downloads a run artifact, produces none, and still computes a digest — it must move the sidecar it received, never re-derive it")
+        fi
+    done <<<"$digests"
+fi
+
 if [[ ${#findings[@]} -gt 0 ]]; then
     echo "check-gate-substrate-parity: the gate substrate seam is not conserved:"
     printf '  %s\n' "${findings[@]}"
@@ -182,6 +268,11 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "  help: move a ported gate's implementation out of every kit root, and keep the"
     echo "        crate root outside them too — a kit root vendors whole, so anything"
     echo "        under one ships, and the payload withholds the predicate by structure."
+    echo "  help: the target roster is the one surface asserting platform support — keep"
+    echo "        every live line a well-formed target triple, derive the publish"
+    echo "        workflow's matrix from it rather than spelling a platform there, and"
+    echo "        emit each artifact's digest in exactly one step, where its bytes are"
+    echo "        produced. A runner mapping may name a platform; a matrix may not."
     exit 1
 fi
 
@@ -190,5 +281,5 @@ if [[ "$roster_read" == 1 ]]; then
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
 exit 0

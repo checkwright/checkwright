@@ -3,3 +3,5 @@ GATE-SUBSTRATE-PARITY: clean
 1 substrate-sensitive member(s) all dispositioned
 1 implementation source(s) free of manifest-class annotation
 1 kit root(s) scanned for an implementation sibling, crate root crate outside every kit root
+target roster read at targets.list with 1 well-formed target(s)
+publish workflow read at publish.yml, 1 matrix declaration(s) roster-derived across 2 job(s) with one producer per digest

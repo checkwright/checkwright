@@ -75,7 +75,7 @@ if staged_matches 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*
     run_gate check-gate-exemption-tasks gate-sdk/checks/check-gate-exemption-tasks.sh
 fi
 
-if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*' 'gate-sdk/SPEC.md' 'native/*'; then
+if staged_matches 'scripts/gates.list' 'gate-sdk/checks/*' 'canon-kit/checks/*' 'context-kit/checks/*' 'delegation-kit/checks/*' 'doctrine-kit/checks/*' 'drift-kit/checks/*' 'evidence-kit/checks/*' 'guard-kit/checks/*' 'lifecycle-kit/checks/*' 'queue-kit/checks/*' 'site-kit/checks/*' 'gate-sdk/SPEC.md' 'native/*' '.github/workflows/publish.yml'; then
     run_gate check-gate-substrate-parity gate-sdk/checks/check-gate-substrate-parity.sh
 fi
 

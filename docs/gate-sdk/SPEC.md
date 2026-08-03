@@ -118,7 +118,21 @@ path knobs stay distinct because they answer different questions:
 `GATE_SDK_NATIVE_SRC` names the implementation tree a gate's rule lives in,
 `GATE_SDK_NATIVE_CRATE` the root that would carry that tree with it if it moved,
 and only the second decides whether the implementation sits inside the vendoring
-set (§Consumer payload). Paths are
+set (§Consumer payload). And `GATE_SDK_NATIVE_TARGETS_FILE` (default **derived**
+from `GATE_SDK_NATIVE_CRATE` as `<crate>/targets.list`, exactly as
+`GATE_SDK_NATIVE_SRC`'s default is, so the crate's location keeps one owner; the
+target roster §Consumer payload rules the platform-support surface, read through
+`gate_native_targets` — see §lib/gate.sh). And
+`GATE_SDK_NATIVE_PUBLISH_WORKFLOW` (default `.github/workflows/publish.yml`; the
+workflow §check-gate-substrate-parity assertion F holds roster-derived and
+one-producer-per-digest — a consumer whose release rides elsewhere points the
+knob at it, and a consumer with no such workflow is reported rather than red,
+because a publish path that does not exist is not one to audit). The roster and
+the workflow are **consumer config, never kit literals**: the knob, the line
+grammar and the assertions are gate-sdk mechanism, while *which* platforms a
+project commits to is that project's own support commitment — a kit literal
+spelling one project's would ship it as everyone's (CLAUDE.md §The provenance
+seam). Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
@@ -744,10 +758,14 @@ design time; the last two were paid for, and each is named with what it cost.
    against a published digest, and copies it — no selection ever builds; and a
    member the host's platform has no artifact for is left out of the consumer's
    `gates.list` and recorded there as an omitted member rather than dispatched
-   into an absent binary. What a second port waits on is therefore the artifacts
-   that model describes, not a further ruling —
-   `native-artifact-publish-path` produces and publishes them,
-   `native-artifact-install-path` places and verifies them.
+   into an absent binary. The producing half of that model is **built**: the
+   publish workflow's roster-derived build matrix emits one binary and one digest
+   sidecar per declared target, `scripts/pack-installer.sh` verifies each against
+   its sidecar and places them in the payload, and the Release publishes them
+   (§Consumer payload). What a second port still waits on is the placing half —
+   `native-artifact-install-path` selects the host's artifact, verifies it before
+   writing, and omits-and-declares a member whose platform the roster carries no
+   artifact for.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives
@@ -914,10 +932,65 @@ needs:
   consumer's whole verification oracle once the source is withheld
   (§Fixture-pair discipline owns what it is evidence of).
 
+**The target roster is the surface that asserts platform support.** One Rust
+target triple per live line in the file `GATE_SDK_NATIVE_TARGETS_FILE` names
+(§Layout and configuration), with one owner and three readers: the publish
+workflow's roster job derives its build matrix from it, `scripts/pack-installer.sh`
+packs one artifact directory per line and copies the roster verbatim into the
+payload as its one publication, and the installer reads that payload copy to
+select the host's artifact. A hand-maintained platform list inside the workflow
+would be the maintained roster derivation-first refuses, and would leave the
+build's idea of the supported set and the installer's idea in two files to drift
+silently; **a target in the roster that no build leg produced fails the release**,
+which is the correct place for that failure.
+
+The installer needs the roster rather than inferring support from a directory's
+presence because the two cases it must separate look identical without it:
+*this platform was never committed to* (omit and declare — a supported outcome)
+and *this platform was committed to and the artifact is missing* (a broken
+payload — a refusal). Collapsing them silently degrades a supported platform into
+a green battery over a smaller roster. A payload assembled with no artifacts at
+all carries no `artifact/` directory and no roster copy, so it reads as the first
+case and never as a payload whose every target went missing.
+
+**A roster line is a support commitment, so it is bounded twice.** It may not
+exceed what the project's own install documentation already states, and a target
+joins only when a green run has produced and exercised its artifact — not when a
+platform is reasoned about. Widening is therefore mechanical and cheap by
+construction: because the build matrix is roster-derived, a new platform is one
+roster line plus one runner mapping, never a workflow rewrite.
+
 **The obligation opacity buys.** A consumer who cannot read the gate has only
 the publisher's word for it, so the integrity story is the whole of what
 replaced reading the source. The achievable floor is a published per-target
 digest verified before the artifact is written (`native-artifact-install-path`).
+Each build leg writes `<binary>.sha256` beside its binary, in `sha256sum -c`
+format with a bare filename inside it — the same shape the release already uses
+for the tarball, and the shape the install page documents a reader verifying.
+**One producer, two publications, and no recomputation anywhere:** the bytes the
+build leg wrote are the bytes the payload carries *and* the bytes the Release
+attaches, because every later hop moves the file rather than re-deriving its
+contents. A second `sha256sum` on a later job is exactly what lets a published
+digest and an installed digest diverge while both look computed, so the rule is
+held mechanically by §check-gate-substrate-parity assertion F rather than by
+review. Per-artifact sidecars rather than a combined `SHA256SUMS` or a JSON
+manifest, because an attestation's subject list is `{name, digest}` pairs: a
+sidecar maps onto a subject one-to-one and `tarball-build-attestation` can later
+land *beside* these files with no migration and no digest value changing, where a
+manifest would mint a schema and a version key for the same information.
+
+The Release publishes the per-target binaries and their sidecars alongside the
+tarball, renamed per target because Release assets are flat. The **content** of
+each sidecar is left alone — its bare filename is the name the file carries in
+the payload, where the machine verification happens, and rewriting it would mint
+a second spelling of one published fact. What that publication buys is that the
+digest an installer verifies against has a source outside the payload it travels
+in; a digest shipped only alongside its own artifact certifies nothing.
+
+**What the digest proves, at its honest bound.** It is a transfer- and
+substitution-integrity claim: the artifact in the payload is byte-identical to
+the one the release built. It is **not** evidence the build host was
+uncompromised.
 What that floor does not provide is a reproducible build, and the queue holds
 that ground as `tarball-build-attestation`: the checksum proves transfer only.
 The pivot changes what that entry is worth rather than what it says — while
@@ -1232,6 +1305,15 @@ reader needs outlive the refactor that renames a helper:
   so adding a kit enrols its fixtures with no hand-list to drift.
 - `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor the
   couples globs share.
+- `gate_native_targets` is the **target roster's single reader**: one Rust target
+  triple per live line, `#`-comments and blank lines stripped by the same
+  `gates_list_members` grammar `scripts/gates.list` uses. An absent roster emits
+  nothing and returns 1, so a caller tells *no roster declared* from *a roster
+  declaring nothing* rather than reading both as no targets — the distinction
+  §Consumer payload's omit-and-declare path turns on. Its two path accessors,
+  `gate_native_targets_file` and `gate_native_bin`, exist so each knob default has
+  one home across the readers that gained one with the artifact path (the publish
+  workflow, `scripts/pack-installer.sh`, §check-gate-substrate-parity).
 
 **Resolution splits into a declaration path and an invocation argv.** A gate's
 implementation may live in a compiled subcommand while its declaration stays a
@@ -1777,7 +1859,7 @@ Holds the dispatch seam honest: a gate's implementation may move to a compiled
 subcommand, but not by quietly deleting the declaration other gates read or the
 record of what that move costs. Usage
 `check-gate-substrate-parity.sh [gates-dir] [conservation-doc]`; the two-arg form
-steers the fixture pair onto hermetic copies of each surface. Five assertions.
+steers the fixture pair onto hermetic copies of each surface. Six assertions.
 
 - **assertion A — declaration uniqueness.** Each `gates.list` member resolves to
   exactly one declaration. A dir carrying both `<name>.sh` and `<name>.gate` is
@@ -1847,6 +1929,33 @@ steers the fixture pair onto hermetic copies of each surface. Five assertions.
   rather than discovered: with no descriptors declared the sibling half scans
   nothing and says so in its clean line — an unported tree has no ported gate's
   source to misplace, and the crate half stays live throughout.
+- **assertion F — one owner for the target roster.** §Consumer payload rules the
+  roster the single surface asserting platform support, and prose cannot hold
+  *no second spelling* — so the three ways that ownership breaks are checked
+  here rather than at review. **The roster is well formed:** every live line of
+  `GATE_SDK_NATIVE_TARGETS_FILE` is a `<arch>-<vendor>-<os>[-<env>]` triple and
+  the file is non-empty, because a roster asserting no platform support cannot be
+  the surface that asserts it. **The build matrix is roster-derived:** every value
+  in a `matrix:` declaration of `GATE_SDK_NATIVE_PUBLISH_WORKFLOW` is a GitHub
+  expression, never a literal — a hand-written platform there is a second
+  spelling of the support commitment. The runner mapping is untouched by this and
+  deliberately so: it is a *runner selection*, not a support declaration, and it
+  is the one place a platform name may appear in the workflow. **Each digest has
+  one producer:** a step *computes* a digest when it invokes `sha256sum` without
+  `-c`; no job may compute more than one, and a job that downloads a run artifact
+  and uploads none may compute none at all. Verification (`sha256sum -c`) is
+  unrestricted — it is what `pack-installer.sh` and the installer do, and it is
+  the opposite of the failure being prevented.
+
+  Two absences are reported rather than red, and each for a stated reason. A
+  **missing publish workflow** is not a publish path to audit: a consumer whose
+  release rides elsewhere points the knob at it, and one with no release at all
+  has nothing here to get wrong. A **missing roster** is red only when a `.gate`
+  descriptor exists — a descriptor needs a prebuilt binary per declared target, so
+  a payload carrying one with no declared platform set is broken, while an
+  unported consumer simply has no platforms to commit to. That coupling is what
+  keeps the assertion from being either vacuous in this repo (which has a roster
+  and is checked in full) or hostile to a consumer that has no crate.
 
 It stays a **shell** gate: a gate that audits the port is not a gate the port
 may consume, or assertion B would be checking a roster through the very binary

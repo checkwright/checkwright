@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # spec: CLAUDE.md §Housekeeping — assemble the installer package out of tree and npm-pack it there; the payload is derived from the repo's own kit roots at pack time, so no second copy of any kit is ever checked in or written inside the worktree
 #
-# usage: pack-installer.sh [--version <semver>] [--out <dir>]
-#   --version  the version to stamp (default: the newest reachable git tag)
-#   --out      where the tarball lands (default: INSTALLER_PACK_TMP_DIR)
+# usage: pack-installer.sh [--version <semver>] [--out <dir>] [--artifacts <dir>]
+#   --version default: the newest reachable git tag; --out default: INSTALLER_PACK_TMP_DIR
+#   --artifacts <dir>/<target>/ holds a roster target's binary + sidecar; omitted, none pack
 set -uo pipefail
 
 SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
@@ -18,10 +18,12 @@ cd "$ROOT" || exit 2
 
 VERSION=""
 OUT=""
+ARTIFACTS=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --version) VERSION="${2:-}"; shift 2 ;;
         --out) OUT="${2:-}"; shift 2 ;;
+        --artifacts) ARTIFACTS="${2:-}"; shift 2 ;;
         *) echo "pack-installer: unknown argument: $1" >&2; exit 2 ;;
     esac
 done
@@ -82,6 +84,42 @@ while IFS= read -r kit; do
 done < <(gate_kit_roots_rel)
 [[ "$packed" -gt 0 ]] || { echo "pack-installer: no kit roots enumerated — the payload would be empty." >&2; exit 2; }
 
+# spec: gate-sdk/SPEC.md §Consumer payload — the prebuilt gate binaries ride beside the kit roots, one directory per roster target, each with the digest sidecar its build leg emitted; the script never builds one, so a locally-built binary can never substitute for a released one
+artifacts=0
+if [[ -n "$ARTIFACTS" ]]; then
+    [[ -d "$ARTIFACTS" ]] || { echo "pack-installer: artifact directory not found: $ARTIFACTS" >&2; exit 2; }
+    ROSTER="$(gate_native_targets_file)"
+    mapfile -t targets < <(gate_native_targets) || {
+        echo "pack-installer: no target roster at $ROSTER — there is no declared platform set to pack artifacts for." >&2
+        exit 2
+    }
+    [[ ${#targets[@]} -gt 0 ]] || { echo "pack-installer: the target roster at $ROSTER declares no targets." >&2; exit 2; }
+    binary="$(gate_native_bin)"; binary="${binary##*/}"
+    mkdir -p "$ASM/payload/artifact" || exit 2
+    for target in "${targets[@]}"; do
+        src="$ARTIFACTS/$target"
+        [[ -d "$src" ]] || {
+            echo "pack-installer: roster target '$target' has no artifact directory at $src." >&2
+            echo "  help: every declared target's build leg must have run; a roster target no leg built is a broken payload, not a narrower one." >&2
+            exit 2
+        }
+        [[ -f "$src/$binary" && -f "$src/$binary.sha256" ]] || {
+            echo "pack-installer: $target is missing $binary or its .sha256 sidecar in $src." >&2
+            exit 2
+        }
+        ( cd "$src" && sha256sum -c --status "$binary.sha256" ) || {
+            echo "pack-installer: $target's sidecar does not match the binary beside it in $src." >&2
+            echo "  help: the digest is emitted once by the build leg and only ever moved; a mismatch here means the bytes changed after it was written." >&2
+            exit 2
+        }
+        mkdir -p "$ASM/payload/artifact/$target" || exit 2
+        cp "$src/$binary" "$src/$binary.sha256" "$ASM/payload/artifact/$target/" || exit 2
+        artifacts=$((artifacts + 1))
+    done
+    # spec: gate-sdk/SPEC.md §Consumer payload — the roster's one publication, copied verbatim, never regenerated or filtered
+    cp "$ROSTER" "$ASM/payload/artifact/targets.list" || exit 2
+fi
+
 stamped="$(jq --arg v "$VERSION" --arg c "$COMMIT" \
     '.version = $v | .checkwright.commit = $c' "$ASM/package.json")" || {
     echo "pack-installer: could not stamp installer/package.json." >&2
@@ -103,5 +141,5 @@ shopt -u nullglob
 }
 mv "${tarballs[0]}" "$OUT/" || exit 2
 
-echo "PACK: ${OUT%/}/${tarballs[0]##*/} (version $VERSION, commit ${COMMIT:0:12}, $packed kit(s) in payload)"
+echo "PACK: ${OUT%/}/${tarballs[0]##*/} (version $VERSION, commit ${COMMIT:0:12}, $packed kit(s) in payload, $artifacts prebuilt gate binary/binaries)"
 exit 0

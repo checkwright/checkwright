@@ -6,3 +6,7 @@ no recorded disposition: check-alpha
 manifest-class annotation in implementation source
 implementation sibling in the vendoring set: kitroot/check-orphan.rs
 crate root inside the vendoring set: kitroot/native
+malformed target triple: 'notatriple'
+matrix declaration not roster-derived: publish.yml
+digest recomputed: job 'build'
+digest computed by a consumer: job 'release'

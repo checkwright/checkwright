@@ -157,9 +157,13 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
 
 5. **Watch the publish workflow — both channels.** Pushing the tag is what
    publishes the installer package: `.github/workflows/publish.yml` fires on the
-   tag alone and assembles the package once with `scripts/pack-installer.sh`.
-   Two sibling jobs then consume that one artifact — `release` attaches the
-   tarball and its `.sha256` to the GitHub Release (the primary channel), and
+   tag alone. It first **builds** one gate binary and one
+   digest sidecar per target in the roster the build matrix is derived from
+   (gate-sdk/SPEC.md §Consumer payload — no platform is spelled in the workflow).
+   It then **assembles** the package once with `scripts/pack-installer.sh`, which
+   verifies each artifact against its sidecar before placing it. Two sibling jobs
+   then consume that one artifact — `release` attaches the tarball, the per-target
+   binaries and every `.sha256` to the GitHub Release (the primary channel), and
    `npm` runs `npm publish --provenance` from the runner (the secondary one,
    held behind its approval environment). That hold is a **confirmation step
    that produces an approval record**, and claiming more would be an overclaim:

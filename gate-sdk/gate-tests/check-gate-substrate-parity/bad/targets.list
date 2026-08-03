@@ -1,0 +1,3 @@
+# hermetic fixture roster — one well-formed target and one that is not a triple
+x86_64-unknown-linux-gnu
+notatriple

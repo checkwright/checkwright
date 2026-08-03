@@ -1,0 +1,15 @@
+# Hermetic fixture: a publish workflow whose matrix is roster-derived and whose
+# digests have one producer each. Not a runnable workflow — only the shape
+# assertion F reads.
+jobs:
+  build:
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.roster.outputs.legs) }}
+    steps:
+      - run: sha256sum "$binary" > "$binary.sha256"
+      - uses: actions/upload-artifact@0000000000000000000000000000000000000000
+  release:
+    steps:
+      - uses: actions/download-artifact@0000000000000000000000000000000000000000
+      - run: sha256sum -c "$binary.sha256"

@@ -94,7 +94,7 @@ gate_command() {
             return 0
         fi
         if [[ -f "$d/$g.gate" ]]; then
-            bin="${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+            bin="$(gate_native_bin)"
             if [[ ! -x "$bin" ]]; then
                 printf 'gate_command: %s dispatches to the native binary, but %s is ' "$g" "$bin" >&2
                 printf 'absent or not executable — the gate could not run; treating as ' >&2
@@ -106,6 +106,25 @@ gate_command() {
         fi
     done
     return 1
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — the one home of GATE_SDK_NATIVE_BIN's default, so a knob default gains readers without gaining spellings
+gate_native_bin() {
+    printf '%s\n' "${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+}
+
+# spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_TARGETS_FILE, defaulted off GATE_SDK_NATIVE_CRATE so the crate's location keeps one owner
+gate_native_targets_file() {
+    local crate="${GATE_SDK_NATIVE_CRATE:-native}"
+    printf '%s\n' "${GATE_SDK_NATIVE_TARGETS_FILE:-${crate%/}/targets.list}"
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the target roster's single reader; an absent roster returns 1 and emits nothing, so a caller tells "no roster declared" from "a roster declaring nothing" rather than reading both as no targets
+gate_native_targets() {
+    local f
+    f="$(gate_native_targets_file)"
+    [[ -f "$f" ]] || return 1
+    gates_list_members "$f"
 }
 
 gate_kit_roots() {

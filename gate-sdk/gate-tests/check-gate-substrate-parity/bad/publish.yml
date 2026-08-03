@@ -1,0 +1,15 @@
+# Hermetic fixture: a publish workflow spelling its platform set by hand and
+# computing one digest twice, plus a pure-consumer job re-deriving another.
+jobs:
+  build:
+    strategy:
+      matrix:
+        target: x86_64-unknown-linux-gnu
+    steps:
+      - run: sha256sum "$binary" > "$binary.sha256"
+      - run: sha256sum "$binary" > "$binary.sha256"
+      - uses: actions/upload-artifact@0000000000000000000000000000000000000000
+  release:
+    steps:
+      - uses: actions/download-artifact@0000000000000000000000000000000000000000
+      - run: sha256sum "$tarball" > "$tarball.sha256"
