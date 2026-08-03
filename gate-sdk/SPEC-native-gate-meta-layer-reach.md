@@ -202,12 +202,14 @@ generated pre-commit hook, both of which regenerate from the manifest.
 Owned by this amendment, each named with the delta that claims it:
 
 - gate-sdk/SPEC.md §check-reads-couples — the refusal arm becomes the
-  consumption arm plus two narrowed refusals; the no-exemption paragraph stays
-  and the counted-zero paragraph is restated against the new cases
-  (deltas 3, 4, 6).
+  consumption arm plus two narrowed refusals, describing the `--reads` report
+  it consumes; the no-exemption paragraph stays and the counted-zero paragraph
+  is restated against the new cases (deltas 1, 3, 4, 6).
 - gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — the
-  `check-reads-couples` row, and the reference-only disposition's second
-  justification (deltas 5, 6).
+  `check-reads-couples` row states the binary-side equivalent: the `--reads`
+  interface and the registry roots field held to executed behavior by unit
+  tests A and B; and the reference-only disposition's second justification
+  (deltas 1, 2, 5, 6).
 - gate-sdk/SPEC.md §Porting a gate to the binary substrate — the second-port
   prerequisite (delta 5).
 - gate-sdk/SPEC.md §The `# graph:` manifest — the descriptor's field roster is

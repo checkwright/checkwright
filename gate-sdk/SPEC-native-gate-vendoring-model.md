@@ -255,10 +255,15 @@ silently smaller roster.
 
 ### 5. The artifact is recorded in `checkwright.lock` as its own class {design-bearing}
 
-`checkwright.lock` records vendored files by content hash and generated files
-separately. The binary is neither: it is not authored text the install claimed,
-and it is not locally reproducible the way the pre-commit hook is. It joins as a
-third class — an **artifact** entry carrying the target name and the digest.
+`checkwright.lock` today records every written path — vendored and generated
+alike — under one flat `files` map, path to content hash, with no class
+discriminator; the vendored/generated split is a write-time behavior
+(`claim()`'s hash-guard applies to vendored paths only, and a generated path is
+unconditionally regenerated and recorded) rather than a distinction the schema
+itself names. The binary is neither of the two behaviors: it is not authored
+text the install claimed, and it is not locally reproducible the way the
+pre-commit hook is. It joins as a new field — an **artifact** entry carrying
+the target name and the digest, the schema's first named class.
 
 Two readers, one record, which is why the class earns its place:
 
@@ -352,12 +357,27 @@ larger one.
 
 What the same page must **not** acquire is the pivot's target floor stated as
 present fact. The battery is shell today and needs what it needs; the page states
-that, and states the ruled direction as direction. `installer/README.md`
-§Requirements takes the same treatment. `CLAUDE.md` §Housekeeping's `native/`
+that, and states the ruled direction as direction.
+
+**`installer/README.md` §Requirements carries no `cargo` bullet to correct** —
+verified against the tree rather than assumed: that section scopes only the
+two delivery-path requirements (Node for the npm transport, `curl`/`tar`/
+`sha256sum` for the Release tarball) and explicitly defers the toolchain
+roster to `docs/install.md` ("The toolchain the battery does assert, with its
+version floors, is on the install page"). There is nothing there for this
+delta to touch. `CLAUDE.md` §Housekeeping's `native/`
 bullet records the ruled install model in place of its "blocked on
 `native-gate-vendoring-model`" line — and the wider rewrite `CLAUDE.md` needs
 off its bash focus is **`instruction-surface-bash-focus`**, filed and not started
 here.
+
+`context-kit/SPEC.md` §bin/env-probe's `cargo` member already carries this
+scope — "a contributor/build floor, not a runtime one... Runtime is unaffected:
+git remains the sole runtime dependency of a ported gate, shelled out rather
+than embedded (`native-gate-vendoring-model` owns that constraint)" — written
+ahead of this amendment and consistent with it rather than needing it. No edit
+is owed there; this amendment re-verifies the claim rather than correcting it,
+so a later reader does not open work that is already done.
 
 ## Producers and consumers
 
@@ -422,21 +442,38 @@ Owned by this amendment, each named with the delta that claims it:
   §What is retained, and what a second port must do first (delta 10); the port's
   own justification, which this ruling's grounds change (delta 1).
 - gate-sdk/SPEC.md §What the dispatch seam does not settle — the vendoring
-  paragraph (delta 10).
+  paragraph (delta 10); the extensibility-model paragraph, re-grounded under
+  objective 3 rather than left as "genuinely unchanged" with no reason stated
+  (delta 9).
 - gate-sdk/SPEC.md §Layout and configuration — the target-roster declaration and
   any knob the artifact selection takes (deltas 1, 2).
+- `installer/README.md` §init — the zero-build-step claim ("checkwright init
+  vendors... into your repository and commits it") gains the ruled statement
+  that no selection ever builds, not merely the profiles carrying no `.gate`
+  member (delta 3).
 - gate-sdk/SPEC.md §Consumer smoke — the vendored-tree runnability statement,
   criterion 5's other reader (delta 4).
 - gate-sdk/SPEC.md §run-gates — the summary's omitted-member line (delta 4).
 - gate-sdk/SPEC.md §upgrade-smoke — the artifact's treatment in the
   determinism diff, which must not read a platform-selected binary as drift
   (delta 5).
-- context-kit/SPEC.md §bin/env-probe — the `cargo` member's scope, corrected to
-  contributor-and-CI with no install-time consumer (delta 11).
-- `installer/README.md` and `docs/install.md` §Requirements (delta 11);
-  canon-kit's `check-install-claim` holds the primary-install-path claim across
-  governed install sections and is the reader that must stay green.
+- context-kit/SPEC.md §bin/env-probe — the `cargo` member's scope, re-verified
+  already contributor-and-CI with no install-time consumer; no edit owed
+  (delta 11).
+- `docs/install.md` §Requirements (delta 11); canon-kit's `check-install-claim`
+  holds the primary-install-path claim across governed install sections and is
+  the reader that must stay green. `installer/README.md` §Requirements carries
+  no corresponding bullet and is not touched (delta 11; re-verified against the
+  tree, see the delta's own text).
 - `CLAUDE.md` §Housekeeping — the `native/` bullet (delta 11).
+- `installer/README.md` §The manifest — the field table gains a new field for
+  the artifact entry (target name, digest). **Re-verified against the tree:**
+  today's table has one `files` row, a flat path→hash map covering both
+  vendored and generated paths with no class discriminator; the
+  vendored/generated split delta 5 opens with is a write-time behavior
+  (`claim()`'s hash-guard applies to vendored paths only) rather than an
+  existing schema-level class. The artifact is still a new field the table
+  does not carry today, which is delta 5's point regardless (delta 5).
 - `RELEASING.md` — the release gains a build matrix, per-target artifacts and a
   digest emission, so the runbook that drives it changes with them (deltas 1, 6).
 

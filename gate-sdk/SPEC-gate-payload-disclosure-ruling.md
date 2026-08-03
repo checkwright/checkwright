@@ -157,10 +157,13 @@ substrate it audits — gains **assertion E**:
   file named `<name>` with a recognized implementation extension exists anywhere
   under any kit root. This catches the natural mistake: putting a ported gate's
   Rust beside its descriptor, where it would vendor.
-- **The crate root is outside every kit root.** `GATE_SDK_NATIVE_CRATE` resolves
-  to no path under any `gate_kit_roots` member. This is the non-vacuous half: it
-  reds the moment somebody relocates the crate to give it a ride into the
-  payload, which is the one edit that would silently un-do the whole ruling.
+- **The crate root is outside every kit root.** `GATE_SDK_NATIVE_CRATE` — a new
+  knob **this amendment introduces** (default `native`, the crate root that owns
+  `Cargo.toml`; distinct from the existing `GATE_SDK_NATIVE_SRC`, which resolves
+  to `native/src` and already serves assertion D) — resolves to no path under any
+  `gate_kit_roots` member. This is the non-vacuous half: it reds the moment
+  somebody relocates the crate to give it a ride into the payload, which is the
+  one edit that would silently un-do the whole ruling.
 
 Folding into the existing gate rather than shipping a new one is deliberate: the
 assertion's corpus is the descriptor set that gate already derives, and a
@@ -187,13 +190,15 @@ section and its consumers are the sessions and the assertion below.
 **Assertion E's inputs.**
 Producer: the tracked tree — the `.gate` descriptor set under
 `gate_kit_roots_rel` members, which `check-gate-substrate-parity` already
-enumerates, plus the resolved `GATE_SDK_NATIVE_CRATE` path (the knob
-**`native-gate-vendoring-model`** introduces; this assertion is its second
-reader, which is what keeps the crate root from acquiring a second spelling
-here). Consumer: the gate itself, at its existing run. Its `couples=` gains
-nothing — the kit roots and the crate root are already in its trigger set — and
-that is worth verifying at build rather than assuming, because an assertion that
-never re-fires is an assertion that never runs.
+enumerates, plus the resolved `GATE_SDK_NATIVE_CRATE` path. **The knob is this
+amendment's own** — not `native-gate-vendoring-model`'s, which asserts the crate
+root's placement as a structural fact (delta 1) but introduces no path knob for
+it — so assertion E is the knob's sole producer and sole reader alike, and no
+second spelling is at risk because there is no second amendment reaching for one.
+Consumer: the gate itself, at its existing run. Its `couples=` gains nothing —
+the kit roots and the crate root are already in its trigger set — and that is
+worth verifying at build rather than assuming, because an assertion that never
+re-fires is an assertion that never runs.
 
 **The fixture pair as a shipping artifact.**
 Producer: the kit's `gate-tests/<name>/{good,bad}/` tree, written when the gate
@@ -220,6 +225,8 @@ Owned by this amendment, each named with the delta that claims it:
 - gate-sdk/SPEC.md §Fixture-pair discipline — the shipping-side statement and its
   consumer-tree reader (delta 3).
 - gate-sdk/SPEC.md §check-gate-substrate-parity — assertion E (delta 5).
+- gate-sdk/SPEC.md §Layout and configuration — the new `GATE_SDK_NATIVE_CRATE`
+  knob assertion E resolves, this amendment's own (delta 5).
 - gate-sdk/SPEC.md §Porting a gate to the binary substrate — the port's
   justification, where opacity moves from a ground not claimed to a ground ruled
   (delta 1).
