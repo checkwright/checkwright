@@ -3395,12 +3395,4 @@
 
 ## Done
 
-- native-gate-meta-layer-reach
-- gate-payload-disclosure-ruling
-- native-gate-language-ruling
-- bash-portability-floor-costing
-- scope-survey-counter-evidence
-- trajectory-ruling-record
-- native-gate-vendoring-model
-
 ## Lessons Learned
