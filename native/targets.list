@@ -1,0 +1,13 @@
+# Checkwright's gate-binary target roster — gate-sdk/SPEC.md §Consumer payload.
+# One Rust target triple per line; `#`-comments and blank lines are stripped,
+# the same line grammar scripts/gates.list uses. This file is the single surface
+# asserting which platforms a released gate binary is built for: the publish
+# workflow derives its build matrix from it, and the installer reads the payload
+# copy of it to tell "this platform was never committed to" (omit and declare)
+# from "committed to, artifact missing" (a broken payload).
+#
+# A target joins this roster only when a green run has produced and exercised its
+# artifact, and never beyond what docs/install.md §Requirements already states —
+# the widening trigger is `platform-support-ci-matrix` landing a CI leg for the
+# platform, after which widening is one line here plus one runner mapping.
+x86_64-unknown-linux-gnu
