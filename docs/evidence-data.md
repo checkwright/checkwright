@@ -70,3 +70,4 @@
 | shipped-roster-parity | sc sp a b v c | 10f/6d | 4 · ≤1d | 22s clean | 94 |
 | vacuous-green-elimination | sc sp a b v c | 6f/0d | 3 · ≤0d | 22s clean | 94 |
 | native-gate-substrate | sc sp a b v c | 13f/4d | 2 · ≤0d | 36s 4✗ | 95 |
+| native-port-unblocking | sc sp a b v c | 10f/1d | 3 · ≤0d | 23s clean | 95 |
