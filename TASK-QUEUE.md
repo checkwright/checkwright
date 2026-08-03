@@ -100,6 +100,15 @@
   these as two independent diffs against a stale copy of the paragraph: land both
   requirement statements in one rewrite, in the same commit or in immediately
   consecutive ones, each reading the paragraph as the other left it.
+  **A third edit to the same section rides the same rewrite, ruled 2026-08-04.**
+  §Requirements' `cargo` bullet says a compiled gate *"is ruled to arrive prebuilt
+  for your platform"* — a statement about a ruling, authored before any artifact
+  existed. `native-artifact-publish-path` has since landed and published them, so
+  the bullet is understated rather than wrong and `check-install-claim` stays
+  green: this is a sharpening, not a defect fix. It originates in that merged
+  amendment's own §Existing sections updated and its task is closed, so it is
+  recorded here — with the other two — because one session writing the whole page
+  is what keeps the three from reverting each other.
   **Cost while deferred:** the install path's real toolchain requirement stays
   undeclared and the probe's own portability stays unstated — the fail-open class
   the bash-floor gap already fixed once for the battery, reopened one layer out.
