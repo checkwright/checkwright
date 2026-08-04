@@ -9,3 +9,4 @@ ruling-capture-contracts spec a5c6cee1 2026-08-04
 ruling-capture-contracts align a7ad9da4 2026-08-04
 ruling-capture-contracts build a2388b59 2026-08-04
 ruling-capture-contracts build a772f396 2026-08-04
+ruling-capture-contracts build ad8339cf 2026-08-04
