@@ -661,8 +661,13 @@
   the next session, which fights a file changing underneath it and cannot
   distinguish churn from evidence. Rare — it needs a backgrounded producer — but
   it cost this iteration three restores once dispatch overlapped, and the only
-  detector was the operator. Debt: one runtime artifact plus one preflight
-  assertion; adds no governed name to a shipped surface.
+  detector was the operator. Size: one runtime artifact plus one preflight
+  assertion.
+  **Feature-shaped — self-label corrected 2026-08-04 at close.** The line here read
+  "adds no governed name to a shipped surface" while the `[design-pending]` clause
+  three paragraphs up names a knob; canon-kit/SPEC.md §The amendment lifecycle's
+  litmus makes any name added to a governed surface a feature, so promoting this
+  authors an amendment.
   Filed 2026-07-25 by close, from the operator's observation of the live
   `run-validate` and the row-relocation fingerprint at `ae70eae`.
 
@@ -1613,7 +1618,11 @@
   **Cost while deferred:** charged against every workflow that gains an API call;
   the detector today is a 404 read as a missing object, which is the exact
   misreading `release-credential-precondition-scope-vs-permission` was filed for.
-  Debt: one gate plus fixtures; adds one governed gate name when it lands.
+  Size: one gate plus fixtures.
+  **Feature-shaped — self-label corrected 2026-08-04 at close.** This line read
+  "Debt" while naming the governed gate name it mints; canon-kit/SPEC.md §The
+  amendment lifecycle's litmus makes that a feature, so promoting it authors an
+  amendment.
   Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's
   align audit against all nine gates that read workflow YAML.
 
@@ -1639,7 +1648,11 @@
   iteration widened the exposure rather than creating it — the release-body arm
   adds a second hand-mirrored block to the same pair, and its own amendment stated
   outright that nothing catches a missed half.
-  Debt: one existing gate widened plus a pair registry; adds one consumer knob.
+  Size: one existing gate widened plus a pair registry.
+  **Feature-shaped — self-label corrected 2026-08-04 at close**, on the same read as
+  its `workflow-permissions-scope-oracle` sibling: the label read "Debt" while naming
+  the consumer knob it mints, and canon-kit/SPEC.md §The amendment lifecycle's litmus
+  makes any such name a feature, so promoting it authors an amendment.
   Filed 2026-08-01 at close from the gap inbox, confirmed at this iteration's align
   audit against the full gate roster.
 
@@ -3123,6 +3136,80 @@
   Filed 2026-08-03 at close from the gap inbox; observed by the lead across three
   occurrences.
 
+- **init-claim-stickiness** [design-pending] — non-destructive lasts one upgrade, then inverts.
+  **Reproduced end to end 2026-08-04** — three packed versions, scratch consumer — while
+  building `installer-upgrade-smoke-arm`. At v1 the manifest owns a vendored file; the adopter
+  edits and commits it; the v2 upgrade correctly leaves it alone and reports it changed. But
+  `claim()` returning 1 means `copy_in` never calls `record()`, and the guarded-seed re-claim
+  loop skips `under_kit` paths, so the file drops out of the new manifest's `files[]`. At v3
+  `prior_hash()` finds nothing, `claim()` returns 0, and `init` overwrites the edit with **no
+  report at all**.
+  **The protection is not sticky — it lasts one upgrade and then inverts**, which is the shape
+  installer/README.md §init's "never overwritten, unless you pass `--force`" promise is read as
+  ruling out. Silent adopter data loss on the second upgrade, in the shipped activation surface.
+  **Candidate fix:** `record()` an unclaimed file into `files[]` at the hash `init` last wrote —
+  not the adopter's — so a later run still recognises it as changed; that keeps `uninstall`'s
+  roster complete too.
+  **Why `[design-pending]`:** it changes what a `files[]` hash *means* for a file `init` did not
+  write this run, so it wants a spec pass on installer/README.md §The manifest before the code.
+  **Cost while deferred:** every adopter who edits a vendored file loses that edit on their
+  second upgrade, unreported. The new upgrade arm asserts the one-upgrade case only, so the
+  suite stays green over it. No adopter has upgraded twice yet, which is the only reason this is
+  not already live — the cost rises with every release, not with time.
+  Filed 2026-08-04 at close from the gap inbox; reproduced at build, not inferred from the code.
+
+- **consumer-smoke-artifact-arm** [design-pending] — the placement branch never executes.
+  `installer/consumer-smoke/run-smoke.sh` packs with no `--artifacts`, so the gate binary's
+  placement path — target resolution, pre-write digest verification, the seam knob, and the
+  artifact lock record — has no automated exercise. The assertions landed with
+  `native-artifact-install-path`; only their **omission branch** runs today, and the placement
+  branch is dead until a run packs a binary.
+  **What stands behind it is dated evidence, not a standing assertion:** it was verified by hand
+  at that build against a locally built binary. A hand-verified path under a green suite reads
+  as covered, which is the whole hazard.
+  **Deliverable:** the smoke builds or fetches a binary to pack. Distinct from
+  `installer-upgrade-smoke-arm`, whose deliverable is packing twice at two versions for the
+  cross-version upgrade path and which touches no artifact.
+  **Why `[design-pending]`:** whether the smoke *builds* a binary — a `cargo` dependency the
+  suite does not have today, against the toolchain floor — or *fabricates* a stand-in with a
+  matching digest — cheap and hermetic, but then it exercises placement without exercising the
+  real producer — is unruled, and that ruling decides what the arm is worth.
+  **Cost while deferred:** the publish path ships binaries the install path is only
+  hand-verified to place, so the first regression in target resolution or digest verification
+  reaches an adopter rather than the battery.
+  Filed 2026-08-04 at close from the gap inbox; deliberately deferred at build.
+
+- **behavior-change-surface** [design-pending] — no accumulating declaration surface.
+  A tightened gate has one and a behavior change does not — and gate-sdk/SPEC.md §upgrade-smoke's
+  own rationale for the former covers the latter without modification: it grounds
+  `.workflow/tightened-gates.txt` on build being the only stage that knows what it tightened at
+  the moment it tightens it, so the declaration is *written from knowledge* rather than
+  reconstructed later. docs/install.md §The upgrade contract requires a Behavior changes section
+  in every release note and gives it no such surface, while that set is judgment-laden rather
+  than diff-derivable — so composing it at close means reconstructing an author's judgment from
+  commits.
+  **Deliverable:** the missing surface, carrying the three things `tightened-gates.txt` has and
+  this would need — a `# contract:` header, a drain protocol at the tag, and a freshness or
+  parity gate.
+  **Open design question the promoting scope answers first — deliberately unresolved here:**
+  whether this is a second `.workflow/` file or a widening of the existing one. A
+  behavior-change bullet carries a changed-surface name plus prose, while the existing surface
+  is specified as bare gate names and nothing else.
+  **Measured, which is why the cost is not hypothetical.** The "each batch records its own set"
+  convention was invented at batch 4 (`13f8091`) in response to this gap being filed at
+  `df6fd3d`. Batches 1 and 2 closed before it existed and recorded nothing — a case-insensitive
+  scan of every diff in the iteration finds the phrase only in those two later commits. So
+  `native-artifact-publish-path`, `native-artifact-install-path` and
+  `install-path-gnu-userland-undeclared` carry **no declaration, not a declared "none"**, and
+  close reconstructed their sets from commit bodies so the next note need not: *publish-path* —
+  the parity gate rides Tightened gates, leaving the descriptor and roster path as its behavior
+  set; *install-path* — `init`, `doctor` and the lock/digest resolvers changed, and `c5c19e6`
+  and `d13c1f6` are defect fixes whose own bodies say they "would have reached an adopter";
+  *gnu-userland* — documentation only, no shipped-code path.
+  **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
+  release note, against evidence that is coldest when the batch count is highest.
+  Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -3148,7 +3235,6 @@
 - **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
 - **amendment-update-target-coverage** [design-pending] — Align checks it by hand; no gate yet.
 - **gap-inbox-commit-ownership** [design-pending] — Who commits a lead-filed bullet is unspecified.
-- **evidence-row-upsert-order** [design-pending] — A re-run relocates the row; no content is wrong.
 - **operator-authored-unit-set** [design-pending] — The contract omits operator-authored unit sets.
 - **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
 - **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
@@ -3164,5 +3250,6 @@
 - release-disposition-grammar-consolidation
 - installer-upgrade-smoke-arm
 - installer-smoke-manifest-write-collision
+- evidence-row-upsert-order
 
 ## Lessons Learned

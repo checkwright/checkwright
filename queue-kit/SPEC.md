@@ -160,6 +160,11 @@ entry, the same exemption the deferred section already carries.
   entry necessarily contains the removed body in its own diff, so recovery is
   `git log -p -S'<slug>' -- <queue-file>` — a pickaxe that depends on no
   commit-message convention. Nothing is copied into the queue to point at it.
+  **Recovery is mandatory before any ruling on the entry**, not merely
+  available: the lead line is a one-clause summary that carries neither the
+  deliverable nor the blocking design question, so promoting a dormant entry,
+  or ruling a build has subsumed one, is judged against the recovered body.
+  Ruling off the line alone is ruling off a summary written to be dropped.
 
 **Eligibility**, judged at the closing stage: the entry's cost field opens in
 the low class; it carries no `[roadmap:]` tag; and it has **no live promotion

@@ -183,7 +183,19 @@ writes, no evidence files. Every stamp originates in the stage session via
 `enter-stage.sh` (lifecycle-kit/SPEC.md §The state machine). Lead-does-stamping
 is ruled out, not merely omitted: it breaks this invariant, and under the
 `stage` posture of `LIFECYCLE_KIT_SESSION_BOUNDARY` a lead stamp is exactly the
-self-reported skip `check-stage-evidence` exists to catch. An answer that
+self-reported skip `check-stage-evidence` exists to catch.
+
+**The lead stamping nothing is not the batch stamping nothing**, and the two
+read alike from here. A dispatched batch stamps on entry like any stage session:
+an intra-stage split makes the second batch a *session*, not a re-entry to
+suppress, and a sibling stamp naming a stage the cursor already sits on moves
+nothing — the stage skill owns that rule and its gate tolerance
+(lifecycle-kit/templates/stages/build.md). Directing a batch not to stamp is
+therefore not conflict-avoidance; it silently spends the per-session audit trail
+the stamp exists to provide, and no later session can repair it, because
+backdating a stamp falsifies the trail rather than restoring it.
+
+An answer that
 amounts to a design ruling is landed **by the stage session**, in the governed
 surface it belongs to (the amendment, the queue entry), *before* the session
 acts on it — and a ruling whose acting session is **not imminent** is filed to

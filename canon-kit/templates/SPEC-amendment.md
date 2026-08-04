@@ -5,7 +5,11 @@
   change. Name it after the feature (SPEC-<feature>.md, e.g. SPEC-sqlite.md —
   never SPEC-PHASE3-SQLITE.md), place it in the owning component's directory
   (a governance/workflow ruling with no owning component lives at the repo
-  root), and pair it with a queue entry tagged [spec: SPEC-<feature>.md]. It
+  root), and pair it with a queue entry tagged [spec: SPEC-<feature>.md]. The
+  basename need not match that entry's slug: the ref resolves as a bare
+  basename tree-wide, and swapping a long slug into the tag can push the
+  entry's lead line past the queue's wrap budget — so a shorter basename than
+  the slug is the fix, not a mismatch to avoid. It
   describes ONLY what is added or changed — do not restate the canonical spec.
   It is a transition artifact: merged into the canonical spec and deleted when
   the work completes (an amendment never outlives its implementation).
