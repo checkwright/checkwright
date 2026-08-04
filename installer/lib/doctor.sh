@@ -86,7 +86,7 @@ else
     artifact_target="$(jq -r '.artifact.target // ""' "$LOCK" 2>/dev/null)"
     artifact_digest="$(jq -r '.artifact.digest // ""' "$LOCK" 2>/dev/null)"
     if [[ -n "$artifact_target" ]]; then
-        seam="$(jq -r '.files | keys[] | select(endswith("/gate-sdk-config.sh"))' "$LOCK" 2>/dev/null | head -n1)"
+        seam="$(lock_own_file "$LOCK" /gate-sdk-config.sh)"
         bin=""
         [[ -n "$seam" && -f "$ROOT/$seam" ]] \
             && bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$ROOT/$seam" | head -n1)"
@@ -103,7 +103,7 @@ else
     fi
 
     # spec: installer/README.md §The gate binary — the omitted-member record's second reader, reported against the reason that caused it because a remedy is what an adopter comes here for
-    list="$(jq -r '.files | keys[] | select(endswith("/gates.list"))' "$LOCK" 2>/dev/null | head -n1)"
+    list="$(lock_own_file "$LOCK" /gates.list)"
     if [[ -n "$list" && -f "$ROOT/$list" ]]; then
         while read -r count reason; do
             [[ -n "$reason" ]] || continue

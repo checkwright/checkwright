@@ -50,6 +50,8 @@ say "installed $(jq -r '.version' "$PKG_ROOT/package.json") from $(basename "$TA
 printf 'profile invariant\n'
 # shellcheck source=../lib/common/profile.sh
 source "$PKG_ROOT/lib/common/profile.sh"
+# shellcheck source=../lib/common/lock.sh
+source "$PKG_ROOT/lib/common/lock.sh"
 mapfile -t PAYLOAD_KITS < <(profile_payload_kits "$PKG_ROOT")
 [[ ${#PAYLOAD_KITS[@]} -gt 0 ]] || fail "the installed payload carries no kit"
 mapfile -t PROFILES < <(profile_names "$PKG_ROOT")
@@ -140,7 +142,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
 
     # spec: installer/README.md §The consumer smoke — the artifact arm takes whichever outcome the payload and host produce: with a packed artifact the target, the digest and an executable binary at the seam's path; with none, the omission arm below, which is what reds if init ever records an artifact the payload did not carry
     target="$(jq -r '.artifact.target // ""' "$LOCK")"
-    seam="$(jq -r '.files | keys[] | select(endswith("/gate-sdk-config.sh")) // ""' "$LOCK" | head -n1)"
+    seam="$(lock_own_file "$LOCK" /gate-sdk-config.sh)"
     if [[ -n "$target" ]]; then
         [[ -n "$seam" && -f "$C/$seam" ]] || fail "$profile: an artifact is recorded but no gate-sdk config seam names its path"
         bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
@@ -149,7 +151,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
             || fail "$profile: the installed gate binary does not match the digest the manifest recorded"
         say "artifact: $target verified in place at $bin"
     else
-        list="$(jq -r '.files | keys[] | select(endswith("/gates.list"))' "$LOCK" | head -n1)"
+        list="$(lock_own_file "$LOCK" /gates.list)"
         [[ -n "$list" ]] || fail "$profile: the manifest records no gates.list"
         ! grep -q '^# omitted:' "$C/$list" \
             || fail "$profile: the registry declares omitted members while the manifest records no artifact"

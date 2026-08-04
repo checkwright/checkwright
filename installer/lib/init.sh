@@ -274,8 +274,10 @@ if [[ -n "$ARTIFACT_TARGET" ]]; then
     if claim "$SEAM"; then
         if (( ! DRY )); then
             {
+                # spec: gate-sdk/SPEC.md §Layout and configuration — the seam is a sourced shell file, so it carries the same two directives every kit's shipped config template carries: without them the consumer's own check-shellcheck reds on the file init just wrote them
                 [[ -f "$ROOT/$SEAM" ]] || printf '%s\n' \
-                    "# gate-sdk consumer config — sourced by lib/gate.sh; written by 'checkwright init'."
+                    "# shellcheck shell=bash" \
+                    "# shellcheck disable=SC2034  # consumed by gate-sdk/lib/gate.sh after sourcing"
                 [[ -f "$ROOT/$SEAM" ]] && grep -v '^GATE_SDK_NATIVE_BIN=' "$ROOT/$SEAM"
                 printf 'GATE_SDK_NATIVE_BIN=%s\n' "$ARTIFACT_PATH"
             } > "$ROOT/$SEAM.tmp" \

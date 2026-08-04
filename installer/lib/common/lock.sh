@@ -26,3 +26,14 @@ lock_field() {   # $1 = manifest path, $2 = field name -> its value, arrays spac
 lock_hash() {   # $1 = file -> the content hash a files[] entry records
     git hash-object -- "$1"
 }
+
+# spec: installer/README.md §The manifest — resolve one of the consumer's *own* seam files out of files[]. A bare suffix match is not a resolver: the vendored kits carry fixture trees with their own scripts/gates.list and scripts/gate-sdk-config.sh, so matching on the tail alone picks whichever sorts first — a fixture, not the tree's real seam. The recorded kit set is what excludes them, and it is the same predicate init writes with
+lock_own_file() {   # $1 = manifest path, $2 = path suffix -> the consumer's own matching path, empty when none
+    jq -r --arg sfx "$2" '
+        (.kits // []) as $k
+        | (.files // {} | keys)
+        | map(select(endswith($sfx)))
+        | map(select(. as $p | ($k | any(. as $kit | $p | startswith($kit + "/"))) | not))
+        | first // ""
+    ' "$1" 2>/dev/null
+}
