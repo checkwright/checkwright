@@ -3260,6 +3260,43 @@
   — gate-sdk/SPEC.md is mirrored to the docs site, so the contradiction shipped.
   Filed 2026-08-04 at close; the instances it would have caught were fixed the same session.
 
+- **enter-stage-arg-position-silent-drop** [design-pending] — `--simulate` after the stage
+  is silently dropped, and the read-only preflight runs the destructive reset instead.
+  `bin/enter-stage.sh` parses the flag positionally — it tests `$1` for `--simulate` and
+  shifts — so `enter-stage.sh scope --simulate` leaves `$1` as the stage, never sets the
+  simulate bit, and treats the flag as a trailing argument nothing reads. Nothing refuses
+  the extra argument and nothing in the output says the flag was ignored.
+  **Why this one argument's position is not an ordinary usage nit.** The dropped token is
+  the only thing separating a read-only preflight from an iteration-boundary reset. The
+  real run truncates `.workflow/WORKFLOW-STATE.txt`, rewrites the queue header to `—`,
+  truncates every `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member — including the release
+  disposition a close just wrote — and wipes `.tmp` past the keep-list. So the failure mode
+  of a typo'd read-only command is destroying the iteration state the command was being run
+  to inspect, and the one unrecoverable casualty is `.tmp`: the boundary wipe is not a git
+  operation, so a session journal goes with it while the tracked half restores clean.
+  **Measured 2026-08-04 at this close**, on the close session's own verification step. Every
+  tracked write was reverted from the index and the close's state restored; the wiped `.tmp`
+  journals were not, and were not needed because the work was already committed. That
+  recovery depended on the run happening with a clean tree — the same mistake with
+  uncommitted work in the tree loses it.
+  **Deliverable, and why the obvious fix is not the whole fix:** accept the flag in any
+  position, which is a two-line change. But permissiveness is the weaker half — the
+  load-bearing part is that an argument the script does not recognize must be a **refusal**,
+  not a silent ignore, which is this repo's own fail-closed rule applied to its own tooling.
+  A tool that silently discards what it cannot parse fails open on exactly the input a user
+  got wrong.
+  **Why `[design-pending]`:** whether the refusal belongs in this script alone or as a shared
+  argument contract across `lifecycle-kit/bin/` is the open call — `file-gap.sh` already has
+  a filed sibling symptom (`capture-affordance-help-flag`, icebox: it files `--help` as a
+  gap), which says the class is the kit's argument handling and not this one script.
+  Related and worth reading together: `enter-stage-simulate-no-write-fixture` (icebox) pins
+  the no-write guard with a fixture, and would **not** have caught this — a fixture written
+  the documented way puts the flag first and passes.
+  **Cost while deferred:** every session that reaches for the preflight can destroy the
+  state it meant to inspect, and the sessions most likely to run it are stage sessions at a
+  boundary, which is exactly when the state is most valuable and least reconstructible.
+  Filed 2026-08-04 at close, from the close session's own misfire.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
