@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the codified validate spine: optional pre-hook, run each suite foreground, parse, diff the baseline slice per-scenario, append the evidence line. Never edits the baseline, never retries, surfaces a non-zero suite verbatim.
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the codified validate spine: optional pre-hook, run each suite foreground, parse, diff the baseline slice per-scenario, batch the evidence lines and fold them into the manifest once the whole roster has run. Never edits the baseline, never retries, surfaces a non-zero suite verbatim.
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,6 +25,9 @@ manifest="$EVIDENCE_KIT_MANIFEST_FILE"
 mkdir -p "$EVIDENCE_KIT_TMP_DIR"
 today="$(date +%F)"
 overall=0
+
+# spec: evidence-kit/SPEC.md §Evidence manifest — the run accumulates its rows here and touches the tracked manifest only after the last suite, so no suite runs against a tree the spine has already written to
+batch="$(mktemp "$EVIDENCE_KIT_TMP_DIR/validate-evidence-batch.XXXXXX")" || exit 2
 
 for suite in "${EVIDENCE_KIT_SUITES[@]}"; do
     cmd="$(ek_suite_cmd "$suite")"
@@ -67,16 +70,20 @@ for suite in "${EVIDENCE_KIT_SUITES[@]}"; do
 
     hash="$(sha256sum "$log" | awk '{print $1}')"; hs=$?
     fail_closed "$hs" run-validate sha256sum
-    line="$key $suite sha256=$hash pass=$npass fail=$nfail ignore=$nignore verdict=$verdict $today"
-
-    # spec: evidence-kit/SPEC.md §Evidence manifest — a re-run supersedes this iteration's prior line for the suite, then appends
-    tmpm="$EVIDENCE_KIT_TMP_DIR/validate-evidence.$$"
-    awk -v k="$key" -v s="$suite" '!($1 == k && $2 == s)' "$manifest" >"$tmpm"; as=$?
-    fail_closed "$as" run-validate awk
-    printf '%s\n' "$line" >>"$tmpm"
-    mv "$tmpm" "$manifest"
+    printf '%s\n' "$key $suite sha256=$hash pass=$npass fail=$nfail ignore=$nignore verdict=$verdict $today" >>"$batch"
 
     echo "run-validate: $suite -> $verdict (pass=$npass fail=$nfail ignore=$nignore)"
 done
+
+# spec: evidence-kit/SPEC.md §Evidence manifest — one fold, after the last suite: this iteration's prior line for every suite the run covered is superseded and the batch re-appended in roster order, so a repeated run leaves the line order unchanged
+tmpm="$EVIDENCE_KIT_TMP_DIR/validate-evidence.$$"
+awk -v k="$key" -v bf="$batch" '
+    FILENAME == bf { superseded[$2] = 1; next }
+    !($1 == k && ($2 in superseded))
+' "$batch" "$manifest" >"$tmpm"; as=$?
+fail_closed "$as" run-validate awk
+cat "$batch" >>"$tmpm"
+mv "$tmpm" "$manifest"
+rm -f "$batch"
 
 exit "$overall"

@@ -145,15 +145,39 @@ absent from the baseline falls under the classification-cost rule.
 
 ### Evidence manifest
 
-Committed, append-per-run. The file header is a `# contract: evidence-manifest v1`
+Committed, written once per run. The file header is a `# contract: evidence-manifest v1`
 line — the versioned wire format the deferred hosted-attestation service consumes
 as its attestation payload. Each data line is
 `<iteration> <suite> sha256=<log-hash> pass=<n> fail=<n> ignore=<n>
-verdict=<clean|new-failures> <date>`, and a re-run of a suite within the same
-iteration supersedes that iteration's prior line for the suite. The captured log
+verdict=<clean|new-failures> <date>`, and a run supersedes that iteration's
+prior line for every suite it ran. The captured log
 stays uncommitted under the tmp dir; its digest pins which run produced the
 counts. The iteration key scopes the line so the boundary-truncate knob can
 clear the manifest at the start of the next iteration.
+
+**The spine touches this file only after its last suite has run**, and that is
+contract rather than implementation detail. `run-validate` accumulates its rows
+under the tmp dir and folds them in as a single write, dropping this iteration's
+prior line for each suite the run covered and re-appending the batch in
+configured-suite order.
+
+What that buys is a suite free to sit anywhere in the roster even when its own
+precondition is a clean worktree. A spine writing per suite dirties the tree
+before such a suite's turn, so every full run reddens it for no reason but
+roster position — a collision the writer manufactures and no suite can defend
+itself against. Pinning it to the front of the roster is mitigation, not a fix:
+nothing asserts the position, so a second such suite re-breaks it silently.
+Under one fold nothing pins any suite anywhere.
+
+Line order follows the configured roster rather than run history, so a repeat
+run rewrites this iteration's rows where they already were instead of relocating
+each to the end — a run whose counts and date are unchanged leaves the file
+byte-identical, and a concurrent or repeated producer stops surfacing as a diff
+with no content behind it. An aborted run writes nothing: it leaves the manifest
+as it found it, which is what the abort's own diagnostic already claims. The
+partial manifest that used to survive such an abort was never admissible anyway —
+§check-evidence-manifest's close-entry assertion wants a clean line for every
+configured suite.
 
 The header is a wire-format version marker, not a doc pointer —
 gate-sdk/SPEC.md §The workflow directory rules that as one of the two payload
@@ -168,8 +192,10 @@ baseline is pointer-form and needs no whitelist entry.
 
 The codified spine: the optional per-suite pre-hook, then each suite run
 foreground, parsed, diffed against the baseline's suite slice per-scenario, and
-recorded as one appended evidence line whose verdict is `clean` unless the diff
-finds a new failure. It never edits the baseline, never retries, and surfaces a
+recorded as one evidence line whose verdict is `clean` unless the diff
+finds a new failure. The lines batch under the tmp dir and reach the manifest in
+the single fold §Evidence manifest rules, so a suite never runs against a tree
+the spine has already written to. It never edits the baseline, never retries, and surfaces a
 non-zero suite exit verbatim. A log with no parseable result is a run failure,
 not an empty diff. Its own exit is non-zero when any suite records
 `new-failures`. Not a gate — a `bin/` tool exercised end-to-end in `smoke/`.

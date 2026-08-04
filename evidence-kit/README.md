@@ -47,7 +47,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    `libtest` for per-test result logs, or your own log-parsing command).
 
 4. Record evidence at validate — run `bash evidence-kit/bin/run-validate.sh`; it
-   runs each suite, diffs the baseline, and appends one evidence line per suite.
+   runs each suite, diffs the baseline, and records one evidence line per suite —
+   written to the manifest in a single fold once the whole roster has run, so a
+   suite needing a clean worktree may sit anywhere in it.
 
 5. Optional lifecycle integration — set `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to the
    evidence manifest so a new iteration starts from the contract header, and the
