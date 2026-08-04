@@ -112,10 +112,15 @@ reach-through, not a change to this protocol; every rule below still applies.
   survives you: a commit, or your own journal. The write is the parent's,
   discharged on receipt, not a chore delegated back to the child. This binds
   whoever holds findings they will act on, at any depth. It costs one write per
-  returned child, not a running narration. A session that is itself dispatched
-  writes to the journal path it was granted; a top-level session has no journal
-  in this contract and discharges by committing, which it is by construction
-  able to do.
+  returned child, not a running narration. The obligation is **durability**, and
+  committing and journalling are two ways to discharge it — a session uses
+  whichever is available to it. A dispatched session journals, to the path it was
+  granted, because it cannot commit. A top-level session commits, because it can.
+  A top-level session that *cannot* commit right now — another session is holding
+  the shared index, the normal condition while an iteration is running — journals
+  for as long as that holds, and discharges by committing when the index frees.
+  Neither the supervising role nor a session running outside any dispatch is
+  exempt: the axis is what the session can do at this moment, never what it is.
 - **Validate after every agent commit** — a sub-agent's "passed" claim is not
   trustworthy. Re-run the relevant gates (the sweep's own gate) and the consumer
   validate battery below. **Diff every gate change in an agent commit before

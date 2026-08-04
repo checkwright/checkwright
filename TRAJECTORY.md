@@ -18,6 +18,16 @@ operator-class, and a finding that appears to contradict an objective is an
 escalation rather than a stage-level or lead-level decision, however
 well-grounded. Only the operator reopens a closed ruling.
 
+**Who may record a ruling here.** A session **records** a ruling the operator
+closed; it never **authors** one. The authority is the ruling's existence, not
+the recording session's role — so no roster of permitted writers is maintained,
+and none needs to be. A recording names the ruling's date, and where the
+mechanism has a canonical home it points there rather than restating it.
+Reversing, demoting or re-scoping a recorded ruling stays operator-class,
+unchanged. The honest limit: this is an authoring contract, not a gate. Nothing
+mechanizes *the operator closed this*, and nothing should — the alternative is a
+session attesting to its own consent, which is worth less than the rule.
+
 **Where the grounds live.** A ruling whose mechanism already has a canonical
 home is registered here with a pointer to that home rather than restated —
 one owner per fact, as everywhere else. What this file *owns* is what has no

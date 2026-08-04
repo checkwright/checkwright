@@ -231,7 +231,8 @@ gates are registered in the consumer's `gates.list` by name and resolve
 through gate-sdk's multi-kit path (consumer gates dir first, then each kit's
 `checks/`). The kit's markdown templates are laid out on the stage/boundary axis
 this SPEC classifies them by: `templates/*.md` is exactly the **boundary skills**
-(`lead.md`, `release-sweep.md`, `upgrade.md`), `templates/stages/*.md` exactly
+(`lead.md`, `release-sweep.md`, `upgrade.md`, `consult.md`),
+`templates/stages/*.md` exactly
 the stage-class templates. Stage skills adopt `templates/stages/*.md` in one of
 two modes — copied into the consumer's agent-skill directory with each named slot
 overwritten, or a thin binding shim that references the template (the grammar
@@ -1192,8 +1193,8 @@ tokens; a shim's bindings are the `**slot-name** —` lead lines under
 `## Bindings`; the directive's template path resolves relative to the current
 directory (the tree root at pre-commit). A skills dir that does not exist is
 fail-closed (exit 2). The `# graph:` couples the skills dir, the stage-template
-dir, each boundary skill (`lead.md`, `release-sweep.md`, `upgrade.md`), and each
-out-of-tree bound template (e.g. `delegation-kit/templates/agent-execution.md`)
+dir, each boundary skill (`lead.md`, `release-sweep.md`, `upgrade.md`,
+`consult.md`), and each out-of-tree bound template (e.g. `delegation-kit/templates/agent-execution.md`)
 at `tier=precommit`, so a slot added to a template or a binding changed in a shim
 fires the gate. The boundary skills are coupled **by name** because this couple
 carries no kit-wide `templates/*.md` glob: a bindable template left off it is one
@@ -1566,3 +1567,65 @@ agent-definition carrying the standing dispatch policy the dispatch names (the
 ruling-class roster and everything else true of every dispatch, not improvised
 per prompt), and whether the consumer wires the optional escalation-shape guard
 (guard-kit/SPEC.md §wakeup-guard) or leaves it inert.
+
+### templates/consult.md
+
+The **operator strategy session** template, and a **boundary skill** of the class
+§Layout and configuration enumerates: like `lead.md` it invokes no
+`enter-stage.sh`, stamps nothing, and joins no stage set, so
+`check-stage-skill-coverage` never reads it. The classification is what makes it
+cost no new mechanism. A consultation may run before an iteration opens, between
+stages, or across an iteration boundary, and a template with no cursor is at odds
+with none of those. It carries named slots, so it adopts the
+binding-shim grammar (§templates/stages/) and `check-skill-binding` holds the
+slot pairing.
+
+*A seventh stage was ruled out.* It would need a predecessor entry in
+`LIFECYCLE_KIT_STAGES`, a fixed position in the walk, and a stamp — none of which
+a session that may precede or span an iteration has — and it would make
+`check-stage-entry` assertion A demand a consult stamp on every iteration that
+legitimately holds no consultation.
+
+**What the template owns** is a landing contract: the session's exit condition is
+that every ruling the operator closed has reached a governed surface, every
+refused alternative is recorded with its grounds, and every always-loaded surface
+those rulings stale is corrected, flagged, or filed. Two mechanisms are what make
+that reachable rather than aspirational, and both are stated in the ritual. A
+ruling lands **at the moment it closes**, not at exit, so an interrupted session
+loses at most the ruling in flight rather than the session's whole output. And
+the session journals while it cannot commit, on the durability rule at its owning
+tier (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
+sweeps), which is what converts a shared index held by a live stage session from
+data loss into latency. The journal's reclaim is the existing boundary wipe of
+the scratch dir (§bin/enter-stage.sh) and no `LIFECYCLE_KIT_BOUNDARY_PRESERVE`
+entry is added — a preserved journal would outlive the session that can interpret
+it, its content having been discharged into a commit at exit.
+
+**Write authority is not this template's to grant.** Who may record a ruling on a
+consumer's ruling record is stated by that record, at the widest tier true for
+every reader of it — every session that closes a ruling with the operator faces
+the question, not only a consult session. What the skill adds on top is
+obligation: elsewhere recording a closed ruling is permitted, here a consultation
+that did not record one has not exited.
+
+Dispatch safety is inherited by citation rather than re-owned
+(delegation-kit/templates/agent-execution.md), on the same rule
+§templates/lead.md follows — a copied protocol is a second content tier that
+drifts. The template does state **tier selection** in its own right, because the
+hazard is sharper here than for a stage session: an unselected dispatch inherits
+the dispatcher's tier, and a consultation runs at the judgment tier while most of
+what it dispatches is read-only research, so an unselected fan-out buys the most
+expensive tier for the cheapest work.
+
+Consumer residue stays in exactly **two named slots**, and the split is the
+provenance seam rather than a convenience — `entry-reading` (the surfaces a
+consultation reads on entry) and `landing-surfaces` (the surfaces a closed ruling
+may land on, by ruling class). A consumer's entry set reaches its private
+context, and a kit literal naming it would publish a private surface; its landing
+set names that consumer's own governance layout, and a kit shipping those names
+would ship one project's layout as everyone's. What stays kit mechanism is the
+shape: a consultation has an entry read-set and an exit landing-set, and every
+closed ruling reaches the landing set before the session ends. Each slot has a
+named reader — the entry step and the exit check respectively — and
+`check-skill-binding` requires the shim to bind exactly that set, so an unbound
+slot or an orphan binding is caught mechanically rather than by review.

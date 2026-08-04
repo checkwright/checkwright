@@ -293,6 +293,24 @@ rule's duty falls on **the parent**, which has already demonstrated it can
 write, being the session that granted the path. The two are disjoint
 readings of one contract, not each other's contradiction.
 
+**Journalling is a discharge path, not a dispatched session's privilege.** The
+template's durability rule turns on **capability, never role** — a session
+journals when it cannot commit and commits when it can — and this section owns
+why the earlier role-keyed reading failed. That reading granted the journal to a
+dispatched session and denied it to a top-level one, on the premise that a
+top-level session is by construction able to commit. The premise is false
+whenever another session holds the shared index, which is the *normal* condition
+while a work unit is in flight rather than an edge case: the supervising role
+improvised scratch notes on three separate occasions in one iteration, each time
+because a live dispatched session held the index. Improvised scratch is the
+journal mechanism with none of its contract — no granted path inside the sweep's
+reach, no inline landing, no marker — so the failure was silent and the
+reconstruction cost was paid per occurrence. Widening by capability rather than
+carving out a second surface per role is what keeps the reclaim story unchanged:
+every discharge path still lands in the same scratch directory the consumer's
+own work-unit boundary already sweeps, so no new lifetime, keep-list entry, or
+inbound-triage surface is created by the widening.
+
 ## Validate after every agent commit
 
 Re-run the relevant gates plus the consumer's validate battery (for this

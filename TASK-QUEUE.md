@@ -12,55 +12,6 @@
 
 ## New Features
 
-- **consultation-landing-contract** [spec: SPEC-consult.md] — a landing contract for consultations.
-  **Operator-directed filing 2026-08-03.** Deliverable: a `/consult` skill for operator
-  strategy sessions. On entry it reads the private brief, the trajectory surface and the
-  queue; on exit **every closed ruling has landed in a governed surface**, every refused
-  alternative is recorded with its grounds, and any always-loaded surface the ruling stales
-  is flagged or filed.
-  **Grounds, and they are measured:** the 2026-07-28 pivot consultation persisted exactly
-  one queue entry and left every instruction surface describing the prior substrate. That
-  cost is still being paid — this iteration reconstructed the objectives behind the port
-  from a relay rather than from a surface, and `instruction-surface-bash-focus` exists
-  because the instruction surfaces were never touched.
-  **Why it needed design:** a consultation is not a lifecycle stage — it has no
-  iteration, stamps no cursor, and may span or precede one — so where it sits relative to
-  the state machine is the open question, and `trajectory-ruling-record` owns the surface
-  it would exit onto.
-  **Operator direction 2026-08-03 — the dispatch contract, and none of it is automatic.**
-  *The delegation protocol passes by citation, not inheritance.* `/consult` cites
-  `delegation-kit/templates/agent-execution.md` the way CLAUDE.md §Agent execution and the
-  stage-session config already do; stating it matters because the failure mode is copying
-  the protocol into the skill and creating a second content tier that drifts.
-  *Model selection is a sharper hazard here than for a stage session.* An unselected
-  dispatch inherits the dispatcher's tier rather than defaulting cheap, and a consult
-  session is judgment-tier by nature while most of its dispatches are read-only research —
-  so an unselected fan-out buys the most expensive tier for the cheapest work. The skill
-  discharges this in its own standing dispatch policy.
-  *The journal does not inherit, and that is the finding.* agent-execution states that a
-  top-level session has no journal in this contract and discharges by committing, which it
-  is by construction able to do. A consult session is top-level, its commit discharge fires
-  only at exit, and this entry's own grounds are a consultation that died without landing.
-  The carve-out's premise also fails: able-to-commit is untrue for any session running
-  alongside a committing agent, which is the normal condition during an active iteration.
-  **Measured, not argued:** this iteration's lead wrote scratch notes as an ad-hoc journal
-  on three separate occasions, each time because a live stage session held the shared index.
-  **Third measured ground, 2026-08-04:** the incident-recurrence consultation (filed as
-  `incident-recurrence-promotion-signal`) ran as an ordinary session — its findings lived
-  only in the transcript until the operator directed a queue filing by hand, which is
-  exactly the exit contract this skill mechanizes.
-  **The added deliverable is a decision** — widen the top-level carve-out to grant a journal
-  to any session that cannot currently commit (smaller, and it reaches the lead role too),
-  or give `/consult` its own in-flight surface. The entry must also say what a consult
-  session does when its exit commit is blocked by a live agent, else the exit requirement is
-  unsatisfiable exactly when the iteration is busiest.
-  **Cost while deferred:** a strategy session's output stays a transcript, and the next one
-  costs what this one cost — a relay, a reconstruction, and a stale instruction surface.
-  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator** — the
-  ruling-landing half of the theme; `/spec` authors its amendment and promotes it.
-  Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake. Operator
-  direction on the dispatch and journal contract landed 2026-08-03 at close.
-
 - **incident-recurrence-promotion-signal** [spec: SPEC-recurrence.md] — a recurring incident's fix
   stays deferred on merit prose no ranking reads, so recurrence never forces a
   promotion decision.
@@ -3305,5 +3256,6 @@
 
 ## Done
 
+- consultation-landing-contract
 
 ## Lessons Learned

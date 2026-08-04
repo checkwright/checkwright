@@ -197,7 +197,7 @@ if staged_matches '.claude/commands/*.md'; then
     run_gate check-stage-skill-coverage lifecycle-kit/checks/check-stage-skill-coverage.sh
 fi
 
-if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/stages/*.md' 'lifecycle-kit/templates/lead.md' 'lifecycle-kit/templates/release-sweep.md' 'lifecycle-kit/templates/upgrade.md' 'delegation-kit/templates/agent-execution.md'; then
+if staged_matches '.claude/commands/*.md' 'lifecycle-kit/templates/stages/*.md' 'lifecycle-kit/templates/lead.md' 'lifecycle-kit/templates/release-sweep.md' 'lifecycle-kit/templates/upgrade.md' 'lifecycle-kit/templates/consult.md' 'delegation-kit/templates/agent-execution.md'; then
     run_gate check-skill-binding lifecycle-kit/checks/check-skill-binding.sh
 fi
 
