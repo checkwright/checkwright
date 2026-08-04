@@ -31,6 +31,22 @@
   **Cost while deferred:** the first adopter to move off v0.16.0 is the first
   execution of that path. Carved out of `installer-lifecycle-verbs` because it
   needs none of the verbs and is much cheaper than they are.
+  **Built 2026-08-04 at build. Behavior change for an upgrading adopter: none.**
+  The arm asserts behavior `init` already had and installer/README.md §init and
+  §The manifest already specify; nothing in the shipped install path changed.
+  It packs a second tarball one patch version above the first, installs
+  `starter` from it, commits an adopter edit to a vendored file, then runs the
+  second package's `init` with no flags — asserting the recorded version bumps,
+  the profile and kit set survive, the edited file is byte-identical afterwards,
+  and `init` named it in its changed-file report. It refuses to run unless the
+  derived version sorts strictly above the packed one, so it cannot quietly
+  become a second test of the downgrade refusal.
+  **A defect the arm surfaced is filed to the gap inbox** (2026-08-04) rather
+  than fixed here: the non-destructive guarantee survives exactly one upgrade,
+  after which the edited file drops out of the manifest's `files[]` and the next
+  upgrade overwrites it with no report. Reproduced across three packed versions;
+  the fix is an `init.sh` change wanting a §The manifest spec pass, outside this
+  unit's envelope, and the arm asserts the one-upgrade case only.
   Filed 2026-07-26 by close (`activation-path`), correcting a false
   no-upgrade-path premise against `installer/lib/init.sh`.
 
@@ -88,6 +104,33 @@
   only by a session noticing the red and re-deriving this same diagnosis.
   Debt: converges `run-validate.sh`'s writer onto an order-independent
   mechanism, or adds a declared-precondition gate; no governed name yet.
+  **Built 2026-08-04 at build, candidate (a) as ruled.** `run-validate`
+  accumulates its rows in a scratch batch and folds them into the tracked
+  manifest in one write after the last suite. The ordering contract that needed
+  is stated in evidence-kit/SPEC.md §Evidence manifest, the owner the promotion
+  named. The position pin and its `TODO(task:)` are gone and `installer_smoke`
+  sits back where it was, so a real validate run exercises the fix rather than
+  merely not needing it. Regression assertion in evidence-kit's consumer smoke:
+  a suite that reds if the manifest already carries a data line at its turn,
+  verified red under the old writer and green under the new.
+  **Behavior change for an upgrading adopter — evidence-kit ships, so this unit
+  has a set.** The evidence manifest is written once per run rather than per
+  suite, so a consumer that pinned a clean-tree-requiring suite to position 1
+  can drop the pin. An aborted run now writes nothing rather than keeping the
+  rows it reached; that partial evidence was never admissible at close either
+  way (`check-evidence-manifest` wants a clean line for every configured suite).
+  And a manifest an interrupted run had left in write-recency order is
+  normalised to configured-suite order by the first run after the upgrade — one
+  diff with no content behind it. No gate reds and no gate was tightened.
+  **`evidence-row-upsert-order` is subsumed**, checked against what was built
+  rather than assumed. Its deliverable was an order-stable upsert leaving a
+  re-run byte-identical, and its blocking question was whether manifest line
+  order is contractual and which order. The fold answers both: order is a
+  function of the configured roster alone, and §Evidence manifest now says so.
+  Its recorded fingerprint — a second pass that had upserted only its first
+  suite, relocating that row to the end with no content change — was reproduced
+  against a patched pre-fix copy and is gone after. Nothing of it survives as
+  work, so close can clear the Icebox line.
   Filed 2026-07-26 by validate (`activation-path`), from the full evidence
   battery run.
 
