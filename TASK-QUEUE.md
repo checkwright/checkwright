@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: ruling-capture-contracts
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -14,9 +14,7 @@
 
 ## Technical Debt
 
-## Deferred
-
-- **stage-session-ruling-class** [design-pending] — reversing a ruling is operator-class.
+- **stage-session-ruling-class** — reversing a ruling is operator-class.
   **Operator-directed filing 2026-08-03.** Add to the escalate-versus-decide roster in
   `.claude/agents/stage-session.md` and lifecycle-kit's lead template: **any action that
   reverses, demotes, or re-scopes a trajectory objective or a recorded operator ruling is
@@ -35,6 +33,27 @@
   cross-component gaps as escalation classes and does not name this one, so the next
   well-grounded reversal has the same clear path the last two had.
   Filed 2026-08-03 by spec, on operator-directed intake.
+
+- **lossless-compression-codification** — the standing rule has no surface.
+  **Operator-directed filing 2026-08-03.** Land it in queue-kit/SPEC.md beside
+  §check-queue-entry-budget: **compression relocates to a linked entry, never drops**, and
+  **a ruling the operator restates from memory is filed as a recording entry in the
+  moment**.
+  **Grounds, all from one entry:** compressing the port parent dropped the Rust-versus-Go
+  choice, the dogfood question, and "distribution is the hard part, not the language" —
+  each restored later from memory, twice in one day, because no surface carried them.
+  `native-gate-language-ruling` and `bash-portability-floor-costing` are the recording
+  entries that rule names, and both were filed after the loss rather than in the moment.
+  **Distinct from `queue-entry-evidence-tier`, which stays separate:** that entry asks how
+  a reader *knows* detail was cut; this one states what an author does instead of cutting.
+  Neither answers the other, and both live under the same cap the budget gate enforces.
+  **Debt-shaped, so a later scope promotes it without an amendment:** the rule is closed
+  and what it needs is prose in a SPEC section that already exists.
+  **Cost while deferred:** the rule is enforced by whoever remembers it, which is the
+  failure mode it exists to name.
+  Filed 2026-08-03 by spec; the compression half of operator-directed intake.
+
+## Deferred
 
 - **consultation-landing-contract** [design-pending] — a landing contract for strategy sessions.
   **Operator-directed filing 2026-08-03.** Deliverable: a `/consult` skill for operator
@@ -80,27 +99,10 @@
   unsatisfiable exactly when the iteration is busiest.
   **Cost while deferred:** a strategy session's output stays a transcript, and the next one
   costs what this one cost — a relay, a reconstruction, and a stale instruction surface.
+  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator** — the
+  ruling-landing half of the theme; `/spec` authors its amendment and promotes it.
   Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake. Operator
   direction on the dispatch and journal contract landed 2026-08-03 at close.
-
-- **lossless-compression-codification** [design-pending] — the standing rule has no surface.
-  **Operator-directed filing 2026-08-03.** Land it in queue-kit/SPEC.md beside
-  §check-queue-entry-budget: **compression relocates to a linked entry, never drops**, and
-  **a ruling the operator restates from memory is filed as a recording entry in the
-  moment**.
-  **Grounds, all from one entry:** compressing the port parent dropped the Rust-versus-Go
-  choice, the dogfood question, and "distribution is the hard part, not the language" —
-  each restored later from memory, twice in one day, because no surface carried them.
-  `native-gate-language-ruling` and `bash-portability-floor-costing` are the recording
-  entries that rule names, and both were filed after the loss rather than in the moment.
-  **Distinct from `queue-entry-evidence-tier`, which stays separate:** that entry asks how
-  a reader *knows* detail was cut; this one states what an author does instead of cutting.
-  Neither answers the other, and both live under the same cap the budget gate enforces.
-  **Debt-shaped, so a later scope promotes it without an amendment:** the rule is closed
-  and what it needs is prose in a SPEC section that already exists.
-  **Cost while deferred:** the rule is enforced by whoever remembers it, which is the
-  failure mode it exists to name.
-  Filed 2026-08-03 by spec; the compression half of operator-directed intake.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path.
   The installer is bash end to end, so native Windows is unreachable:
@@ -3163,6 +3165,10 @@
   second upgrade, unreported. The new upgrade arm asserts the one-upgrade case only, so the
   suite stays green over it. No adopter has upgraded twice yet, which is the only reason this is
   not already live — the cost rises with every release, not with time.
+  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator**, confirming
+  the TRAJECTORY.md ruling unsuperseded: the spec pass on installer/README.md §The manifest
+  precedes any code. Feature-shaped under canon-kit's contract limb (it changes what a
+  `files[]` hash means for `doctor` and `uninstall`), so `/spec` authors and promotes it.
   Filed 2026-08-04 at close from the gap inbox; reproduced at build, not inferred from the code.
 
 - **consumer-smoke-artifact-arm** [design-pending] — the placement branch never executes.
@@ -3261,6 +3267,8 @@
   **Cost while deferred:** the port directive silently outranks every recurring
   incident, the sole detector stays the operator, and each recurrence re-pays
   recovery — three validate restores once, a runaway fork cascade this time.
+  **Operator-ruled into iteration `ruling-capture-contracts` 2026-08-04** — the counted
+  recurrence-signal half; `/spec` authors this entry's amendment and promotes it.
   Filed 2026-08-04 on operator direction after close, under the sanctioned
   direct-filing exception; grounds verified against transcripts and the queue.
 
