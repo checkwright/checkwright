@@ -12,3 +12,4 @@ ruling-capture-contracts build a772f396 2026-08-04
 ruling-capture-contracts build ad8339cf 2026-08-04
 ruling-capture-contracts build a96d8b93 2026-08-04
 ruling-capture-contracts validate aef449b3 2026-08-04
+ruling-capture-contracts close a3c2a8f2 2026-08-04
