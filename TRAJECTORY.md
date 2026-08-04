@@ -123,6 +123,35 @@ a published digest* and may **not** say *reproducible*. What opacity buys, what
 it does not extend to, and why the claim is raised cost of analysis rather than
 confidentiality are owned by gate-sdk/SPEC.md §Consumer payload.
 
+**The first tag that publishes binaries is the operator's call, not the
+cadence's — ruled 2026-08-04.** Every close already dispositions the release
+boundary against its criteria and may defer; none of that machinery changes.
+What is added is narrow and one-shot: **the close that would cut the first tag
+carrying prebuilt gate binaries as Release assets escalates to the operator
+before tagging, whatever the criteria returned** — the escalation is owed on a
+*release* verdict as much as on a deferral, because a cadence trigger firing is
+not consent. Two things make this a ruling rather than a preference. The
+elapsed-time trigger is a timing device and was never meant to decide whether
+the project starts shipping executables, so leaving the two coupled means a date
+decides it. And the coupling is invisible until the day it fires: a disposition
+line that merely *names* the situation is read by a session under no obligation
+to stop. The ruling is spent once that tag is cut; ordinary cadence governs
+every tag after it.
+
+**`init-claim-stickiness` enters through the next scope's standing directive —
+ruled 2026-08-04.** It is neither left to win an undirected survey nor filed
+straight into an active section. The defect: `init`'s non-destructive re-run
+guarantee survives exactly one upgrade and then inverts, because the
+adopter-edited file drops out of the new manifest's tracked roster, so the
+*next* upgrade overwrites it with no changed-file report at all. Reproduced end
+to end across three packed versions at build, in the shipped activation surface,
+and the only reason it is not already live is that no adopter has upgraded twice
+— the exposure grows per release rather than per day. **The sequencing is part
+of the ruling: the spec pass on installer/README.md §The manifest comes before
+any code.** The candidate fix changes what a recorded hash *means* for a file
+`init` did not write that run, which is a contract change rather than a repair,
+and settling it in code first would be settling it by implementation.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
