@@ -3243,13 +3243,5 @@
 
 ## Done
 
-- native-artifact-publish-path
-- native-artifact-install-path
-- install-path-gnu-userland-undeclared
-- release-bump-deferred-floor-unenforced
-- release-disposition-grammar-consolidation
-- installer-upgrade-smoke-arm
-- installer-smoke-manifest-write-collision
-- evidence-row-upsert-order
 
 ## Lessons Learned
