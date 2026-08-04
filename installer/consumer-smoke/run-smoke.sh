@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant and a cross-version upgrade, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -208,5 +208,54 @@ say "mask: node, npm and npx resolve to failing shims"
 C="$(consumer "download")" || fail "could not build a scratch consumer for the download arm"
 assert_install "$PROFILE_DERIVED" "$C"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked)\n' "${#PROFILES[@]}"
+# spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
+printf 'upgrade arm (cross-version, starter profile)\n'
+UP_VERSION="$(awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${VERSION%%[-+]*}")"
+[[ "$VERSION" != "$UP_VERSION" \
+   && "$(printf '%s\n%s\n' "$VERSION" "$UP_VERSION" | sort -V | head -n1)" == "$VERSION" ]] \
+    || fail "the arm derived $UP_VERSION from $VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
+UP="$SCRATCH/upgrade"
+mkdir -p "$UP"
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --version "$UP_VERSION" --out "$UP" 2>&1)" \
+    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the upgrade pack step failed."; }
+say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
+shopt -s nullglob
+up_tarballs=("$UP"/*.tgz)
+shopt -u nullglob
+[[ ${#up_tarballs[@]} -eq 1 ]] || fail "expected exactly one upgrade tarball, found ${#up_tarballs[@]}"
+( cd "$UP" && tar -xzf "${up_tarballs[0]##*/}" ) || fail "tar could not extract the upgrade tarball"
+
+C="$(consumer upgrade)" || fail "could not build a scratch consumer for the upgrade arm"
+out="$( cd "$C" && "$CW" init --profile starter 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "the upgrade arm's starting install failed"; }
+LOCK="$C/checkwright.lock"
+[[ "$(jq -r '.version' "$LOCK")" == "$VERSION" ]] || fail "the upgrade arm did not start at $VERSION"
+was_kits="$(jq -r '.kits | join(" ")' "$LOCK")"
+say "installed $VERSION at the starter profile ($was_kits)"
+
+# spec: installer/README.md §init — the adopter's edit is committed, because init refuses a dirty worktree: the case under test is a file changed since init wrote it, not an uncommitted one
+EDITED="gate-sdk/README.md"
+[[ "$(jq -r --arg f "$EDITED" '.files | has($f)' "$LOCK")" == "true" ]] \
+    || fail "the starter manifest does not record $EDITED — the arm has nothing whose adopter edit it can assert"
+printf '\nAn adopter edited this line.\n' >> "$C/$EDITED"
+EDITED_WANT="$(git hash-object -- "$C/$EDITED")"
+git -C "$C" add -- "$EDITED" && git -C "$C" commit -q -m "edit a vendored file" \
+    || fail "could not commit the adopter edit in the scratch consumer"
+
+out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "the cross-version re-run of init failed — the version check did not fall through in the upgrade direction"; }
+[[ "$(jq -r '.version' "$LOCK")" == "$UP_VERSION" ]] \
+    || fail "the manifest records $(jq -r '.version' "$LOCK") after upgrading to $UP_VERSION"
+[[ "$(jq -r '.profile' "$LOCK")" == "starter" ]] \
+    || fail "the upgrade was run with no --profile and did not re-read starter from the manifest"
+[[ "$(jq -r '.kits | join(" ")' "$LOCK")" == "$was_kits" ]] \
+    || fail "the upgrade changed the recorded kit set from '$was_kits' to '$(jq -r '.kits | join(" ")' "$LOCK")'"
+[[ "$(git hash-object -- "$C/$EDITED")" == "$EDITED_WANT" ]] \
+    || fail "the upgrade overwrote $EDITED, which the adopter had changed since init wrote it"
+grep -qF "$EDITED" <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "the upgrade left $EDITED alone but did not report it as changed"; }
+[[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the upgrade left the worktree dirty"
+say "upgrade: $VERSION -> $UP_VERSION, profile re-read, $EDITED preserved and reported"
+
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked and the cross-version upgrade arm)\n' "${#PROFILES[@]}"
 exit 0

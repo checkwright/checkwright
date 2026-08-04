@@ -376,8 +376,8 @@ the largest payload with the widest `doctor` toolchain read. The smoke's
 preflight still requires `npm` and `node`, because packing needs them; the
 masking is around this arm's `init` only.
 
-Two arms, two load-bearing properties, neither displacing the other. The
-offline tarball install is what turns "this is a one-shot vendoring installer,
+Those transport arms carry two load-bearing properties, neither displacing the
+other. The offline tarball install is what turns "this is a one-shot vendoring installer,
 not a dependency channel" from a claim into an assertion: a package that
 installs and runs with no registry access after the fetch is not resolving
 anything on your behalf. The masked-`PATH` arm is what turns "the Release
@@ -392,6 +392,18 @@ because dropping every `PATH` entry carrying `node` would take `/usr/bin` with
 it wherever Node is installed there. The residue is that a payload merely
 *probing* for a Node binary still finds a name; one that *runs* it fails loudly
 and says which name it reached.
+
+**The upgrade arm** drives a cross-version run, because every arm above installs
+at one version and re-runs at that same one. It packs a second tarball a patch
+version higher, installs `starter` from the first, has the adopter edit and
+commit a vendored file, then runs the second package's `init` with no flags at
+all. What only that reaches: the manifest's version comparison falling *through*
+in the upgrade direction rather than refusing, the profile re-read from the
+manifest when none is passed, and `claim()` re-applying the payload around a file
+that has changed since `init` wrote it — left alone, reported, and still the
+adopter's afterwards. The upgrade version is derived from the one packed first
+and the arm refuses to run unless the derivation is strictly higher, so it cannot
+quietly turn into a second test of the downgrade refusal.
 
 **The artifact arm rides the per-profile post-conditions**, taking whichever of
 §The gate binary's two outcomes the payload and the host actually produce. The
