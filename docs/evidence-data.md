@@ -72,3 +72,4 @@
 | native-gate-substrate | sc sp a b v c | 13f/4d | 2 · ≤0d | 36s 4✗ | 95 |
 | native-port-unblocking | sc sp a b v c | 10f/1d | 3 · ≤0d | 23s clean | 95 |
 | native-artifact-path | sc sp a b v c | 5f/5d | 2 · ≤1d | 23s clean | 95 |
+| ruling-capture-contracts | sc sp a b v c | 3f/2d | 3 · ≤0d | 23s clean | 95 |

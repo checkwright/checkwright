@@ -2355,24 +2355,25 @@
 - **dispatched-session-waiting-rule-residency** [design-pending] — a dispatched
   stage session ends its turn to await a completion notification, orphaning the
   work it started, because the in-turn condition-waiting rule is not operative at
-  the tier the session actually loads. Observed 2026-08-02: the validate session
-  started `run-validate.sh` in the background and ended its turn to wait,
-  orphaning the run — the failure
+  the tier the session actually loads.
+  recurrence: dispatched-session-waiting-rule-residency 2026-08-04
+  Observed 2026-08-02 and again 2026-08-04, both times the validate session starting
+  `run-validate.sh` in the background and ending its turn to wait — the failure
   delegation-kit/templates/agent-execution.md names under **Background +
-  notification, never poll**. No harm landed (the lead waited on the orphan's
-  exit condition), but the surviving orphan is the case that protocol calls the
-  worse one: it keeps mutating shared files while the next actor moves against
-  them.
-  **Premise corrected at close against the file's history — the original filing
-  said the rule "is not resident", and that is not what happened.**
+  notification, never poll**. Neither orphan landed harm (the lead found the second
+  alive by PID and waited on its exit condition), but a surviving orphan is the case
+  that protocol calls the worse one: it keeps mutating shared files while the next
+  actor moves against them.
+  **Premise corrected at close, and the recurrence confirms the correction.** The
+  original filing said the rule "is not resident"; that is not what happened.
   `.claude/agents/stage-session.md` has carried a **Your turn end is your session
-  end** bullet since 2026-08-01 (`7dd914a`), one iteration before the incident. So
-  a bullet naming the rule *was* resident and the failure happened anyway. What
-  that bullet does is **point** — it names the two rules and cites
-  agent-execution.md for "both rules and their reasoning", which the session must
-  open to get the operative instruction. The defect is therefore about **pointer
-  versus operative statement at the always-loaded tier**, not about absence, and
-  a promoting scope that fixes the absence will fix nothing.
+  end** bullet since 2026-08-01 (`7dd914a`), before either incident — and the second
+  fired with the lead *also* restating the rule in the dispatch prompt. What that
+  bullet does is **point**: it names the two rules and cites agent-execution.md for
+  "both rules and their reasoning", which the session must open to get the operative
+  instruction. The defect is **pointer versus operative statement at the
+  always-loaded tier**, not absence, and a promoting scope that fixes the absence
+  fixes nothing.
   **Why `[design-pending]`, and why the obvious fix is not obviously right.**
   Stating the rule inline restates delegation-kit's text in a consumer's agent
   definition, which is the duplication Content-tiering forbids — but
@@ -2381,22 +2382,20 @@
   dispatched session always loads. Which rule governs here is a doctrine ruling,
   and if the answer is "restate", delegation-kit/SPEC.md should sanction the
   restatement rather than leaving a consumer to fork the prose.
-  **The enforcement-first half, and its honest limit.** The current mitigation is
-  that the lead restates the rule in every dispatch prompt — an unenforced
-  convention of exactly the kind this repo converts to mechanism. But no gate can
-  read a session's choice to end a turn: it leaves no tracked artifact, the same
-  reason `validate-verb-collision-and-check-routing` records that its prose fix
-  installs no oracle. The nearest buildable oracle is the lock sentinel under
+  **The enforcement-first half, and its honest limit.** No gate can read a session's
+  choice to end a turn: it leaves no tracked artifact, the same reason
+  `validate-verb-collision-and-check-routing` records that its prose fix installs no
+  oracle. The nearest buildable oracle is the lock sentinel under
   `validate-producer-liveness-unobservable`, which detects the *consequence* (a
   producer still running at the next stage's entry) rather than the act. Those two
   entries and this one are one incident class read from three angles; a promoting
   scope should read all three before costing any.
-  **Cost while deferred:** a silent failure mode with a live trigger — the
-  tiering that routes validate and align to a cheaper model puts non-residence
-  exactly where long oracle batteries are the whole work class. Paid entirely by
-  the next session, which fights a file changing underneath it. Bounded: it needs
-  a backgrounded producer, and the lead's dispatch-prompt restatement suppresses
-  it whenever the lead remembers.
+  **Cost while deferred — unbounded, as of the recurrence.** A silent failure mode
+  with a live trigger: the tiering that routes validate and align to a cheaper model
+  puts non-residence exactly where long oracle batteries are the whole work class,
+  and it is paid by the next session, fighting a file that changes underneath it. The
+  bound previously claimed here was the lead's dispatch-prompt restatement; 2026-08-04
+  fired straight through it, so no bound is claimed now.
   Debt: a paragraph in one agent definition plus a SPEC sanction permitting it;
   no new governed name.
   Filed 2026-08-02 at validate to the gap inbox; promoted at close, its premise
@@ -2823,6 +2822,11 @@
   **Cost while deferred:** an amendment can claim a delta landed, name a file that does not
   carry it, and merge green — after which the claim is deleted with the amendment and
   nothing records that it was false.
+  **The deferred cost was paid 2026-08-04, exactly as written.** A build batch found a
+  false citation in an amendment that align's audit had already passed as
+  zero-divergence — assertion (2)'s case, and the second stage to miss it by hand.
+  That align passes this class by eye is now measured, not assumed, which retires the
+  argument that the manual duty under (3) can also carry (2).
   Filed 2026-08-03 at close from the gap inbox; found by align.
 
 - **amendment-owner-position-citation** [design-pending] — prose may cite a merged
@@ -3108,6 +3112,122 @@
   **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
   release note, against evidence that is coldest when the batch count is highest.
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
+
+- **installer-payload-relinquish-stickiness** [design-pending] — a relinquished path can
+  be silently re-claimed, which is `init-claim-stickiness` from the other direction.
+  When the payload stops shipping a path, `init` drops it from `checkwright.lock`'s `files[]`
+  correctly — that half works. But the lock is the only record that the adopter ever owned
+  the file, so a later payload re-adding the same path meets an unclaimed name and writes
+  through an adopter edit with no refusal. Same damage as the stickiness defect this
+  iteration fixed, reached by a different cause: a deliberate relinquish rather than a claim
+  refusal. Bounded out of `init-claim-stickiness` by its own amendment (delta 6), so this is
+  the residual that unit declined on purpose, not a regression in it; the merged contract it
+  would extend is installer/README.md §The manifest.
+  **Why `[design-pending]`:** the fix needs a *third* state the lock does not have — "once
+  ours, now relinquished" — and where that lives is the call. A tombstone in `files[]` grows
+  the lock without bound across an installer's life; inferring it from the digest history
+  needs history the lock does not keep. Neither is obviously right, and picking wrong makes
+  the lock's own format the next migration.
+  **Cost while deferred:** an adopter edit lost with no message, in the narrow window where a
+  path leaves the payload and comes back. Bounded by how rarely a payload relinquishes, which
+  is exactly why it will be cold when it fires.
+  Filed 2026-08-04 at close from the gap inbox; found by spec, bounded out of the claim unit.
+
+- **consumer-smoke-subset-accounting-verdict** [design-pending] — a per-kit smoke run reds an
+  accounting the subset cannot decide, and says nothing about it.
+  `gate-sdk/bin/run-consumer-smoke.sh` given a KIT SUBSET reds the registration accounting on
+  gates the no-arg run accounts for: `check-action-gh-repo`, `check-action-pinning` and
+  `check-action-run-shell` probe exit 0 in a two-kit scratch consumer and self-declare in the
+  full one. So a per-kit invocation prints a FAIL that is not a repo finding, and nothing in
+  its output says the verdict needs the full roster — the reader has no way to tell an
+  artifact of the subset from a real one. Master itself is clean (11 kits probed, 0
+  unaccounted), independently confirmed 2026-08-04.
+  **Deliverable, and the design choice inside it:** either scope the accounting assertion to
+  the invoked subset (correct verdict, weaker coverage) or keep it whole-roster and have the
+  subset run *say so* — print that the accounting line is advisory under a subset and
+  suppress its contribution to the exit code. The second is cheaper and keeps one accounting
+  algorithm; the first is what a reader naively expects.
+  **Cost while deferred:** every per-kit smoke run costs a false-alarm investigation, and the
+  habit that pays it is worse than the alarm — a reader who learns to discount this FAIL
+  discounts the true one. Already paid twice this iteration, including one bullet filed
+  against master on the strength of it and retracted.
+  Filed 2026-08-04 at close from the gap inbox; the false red corrected in place mid-iteration.
+
+- **pack-installer-root-provenance** [design-pending] — the smoke packs whatever tree the
+  caller's cwd is in, and reports success either way.
+  `scripts/pack-installer.sh` resolves its root from cwd (`git rev-parse --show-toplevel`)
+  while `installer/consumer-smoke/run-smoke.sh` resolves its repo from its own path. Run the
+  smoke from a linked worktree or any second checkout and the two disagree: pack assembles
+  the payload from cwd's tree, the smoke asserts against it, and the run looks entirely
+  normal — it even prints a PACK line naming the *other* tree's commit. The failure is not a
+  red that needs explaining; it is a **green that asserts nothing about the tree under test**,
+  which is the worse half of the two.
+  **Measured, not theoretical:** it produced two green-but-meaningless smoke runs during this
+  iteration's batch C before anyone noticed the PACK line named the wrong commit.
+  **Deliverable:** give `pack-installer.sh` a root the caller passes, or have it refuse when
+  its own resolved root and the invoking script's disagree. The refusal is the smaller change
+  and fails closed; the parameter is the cleaner contract and moves the choice to every
+  caller. Left open because the second answer touches every call site.
+  **Cost while deferred:** the installer's only end-to-end oracle can pass without testing the
+  tree being released, and the condition that triggers it — working from a worktree — is
+  exactly the setup a parallel iteration uses.
+  Filed 2026-08-04 at close from the gap inbox; found by build.
+
+- **session-model-identity-verification** [design-pending] — a session cannot report or
+  verify the model tier it is running at.
+  The session-context hook prints iteration, budget and drift; `drift-report` prints neither.
+  Nothing surfaces the running model, so a session cannot state its own tier without a human
+  hand-reading the harness transcript, and no stage can assert the tier it was dispatched at.
+  **Operator-proposed shape, recorded 2026-08-04:** a `usage-verdict`-shaped check — snapshot
+  in, exit 0/1/2, fail-soft — reusing `lifecycle-kit/bin/session-id.sh`'s projects-dir
+  derivation, with the *tier expectation in consumer config* rather than a kit literal. Both
+  halves of that placement are forced: a baked model-name ladder is drift by construction
+  (delegation-kit's agent-execution rule keys tiering to capability, not to a name), and the
+  provenance seam keeps product constants out of kit literals regardless.
+  **Feature-shaped, so it wants `/spec`, not a debt promotion.** It spans derivation lifecycle
+  or context, verdict delegation, and a consumer config surface, and it introduces a new
+  governed name. Cross-kit ownership plus a new name is the amendment threshold, and a scope
+  that promotes this straight to build will be authoring the contract inside the build.
+  **Cost while deferred:** every tiering rule in the tree is unverifiable — including the two
+  filed alongside this one. `consult-tier-declaration` blocks on it outright, and the
+  `Co-Authored-By` attribution defect has no derivable fix without it.
+  Filed 2026-08-04 at close from the gap inbox; filed by the lead.
+
+- **consult-tier-declaration** [design-pending] [blocked-by: session-model-identity-verification]
+  — `/consult` governs the tier of what it dispatches and asserts nothing about its own.
+  The skill landed this iteration to carry judgment-tier boundary questions, and its own
+  amendment argues it is judgment-tier *by nature* — yet it declares no floor for the session
+  running it and verifies nothing at entry. A consultation answered at a cheap tier is
+  indistinguishable, in the record, from one answered at the tier the skill was built for.
+  **Operator direction 2026-08-04:** it must run on the top model and verify that at entry.
+  **The shape that keeps the seam intact:** the *skill* declares its own floor, the *kit*
+  never spells a model name — the same split `session-model-identity-verification` sets up,
+  which is why this blocks on it rather than racing it. Without the mechanism this entry is a
+  prose assertion of the kind that already failed twice this iteration.
+  **Cost while deferred:** the repo's one escalation-grade skill is silently downgradeable,
+  and the failure is invisible in the artifact — a thin consultation reads as a short one.
+  Filed 2026-08-04 at close from the gap inbox; filed by the lead on operator direction.
+
+- **co-authored-by-trailer-attribution** [design-pending] — the model trailer is a baked
+  prompt literal, so public history misattributes authorship.
+  The `Co-Authored-By` line is copied from the harness prompt rather than derived from the
+  running model, and tracked public history carries the result. **Measured 2026-08-04:** the
+  lead session ran one model for two hours while its prompt's trailer named another, and the
+  validate stage session ran a third for all 82 of its messages while both of its commits are
+  signed with the first — two tiers, one baked literal, both wrong. Within this single
+  iteration five stage commits carry the trailer and five do not, so the convention is neither
+  uniform nor accurate, and no gate enforces either shape.
+  **The decision comes before the fix:** whether the repo wants the trailer at all. Dropping
+  it costs nothing and ends the defect; keeping it obliges deriving it, which needs
+  `session-model-identity-verification` and is why this is filed beside that entry rather than
+  under it — the drop answer needs no mechanism, so this is not simply blocked.
+  **Why it is not merely cosmetic:** this is a public repo and the trailer is an authorship
+  claim in tracked history. A wrong one is not a stale comment; it is a false statement about
+  who wrote a commit, published, and it cannot be corrected without a rewrite.
+  **Cost while deferred:** every commit adds another misattributed record, and the cost of the
+  eventual correction grows monotonically with the count — history is the one surface this
+  repo cannot re-generate.
+  Filed 2026-08-04 at close from the gap inbox; filed by the lead, measured that session.
 
 ## Icebox
 
