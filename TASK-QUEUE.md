@@ -12,6 +12,130 @@
 
 ## New Features
 
+- **consultation-landing-contract** [spec: SPEC-consult.md] — a landing contract for consultations.
+  **Operator-directed filing 2026-08-03.** Deliverable: a `/consult` skill for operator
+  strategy sessions. On entry it reads the private brief, the trajectory surface and the
+  queue; on exit **every closed ruling has landed in a governed surface**, every refused
+  alternative is recorded with its grounds, and any always-loaded surface the ruling stales
+  is flagged or filed.
+  **Grounds, and they are measured:** the 2026-07-28 pivot consultation persisted exactly
+  one queue entry and left every instruction surface describing the prior substrate. That
+  cost is still being paid — this iteration reconstructed the objectives behind the port
+  from a relay rather than from a surface, and `instruction-surface-bash-focus` exists
+  because the instruction surfaces were never touched.
+  **Why it needed design:** a consultation is not a lifecycle stage — it has no
+  iteration, stamps no cursor, and may span or precede one — so where it sits relative to
+  the state machine is the open question, and `trajectory-ruling-record` owns the surface
+  it would exit onto.
+  **Operator direction 2026-08-03 — the dispatch contract, and none of it is automatic.**
+  *The delegation protocol passes by citation, not inheritance.* `/consult` cites
+  `delegation-kit/templates/agent-execution.md` the way CLAUDE.md §Agent execution and the
+  stage-session config already do; stating it matters because the failure mode is copying
+  the protocol into the skill and creating a second content tier that drifts.
+  *Model selection is a sharper hazard here than for a stage session.* An unselected
+  dispatch inherits the dispatcher's tier rather than defaulting cheap, and a consult
+  session is judgment-tier by nature while most of its dispatches are read-only research —
+  so an unselected fan-out buys the most expensive tier for the cheapest work. The skill
+  discharges this in its own standing dispatch policy.
+  *The journal does not inherit, and that is the finding.* agent-execution states that a
+  top-level session has no journal in this contract and discharges by committing, which it
+  is by construction able to do. A consult session is top-level, its commit discharge fires
+  only at exit, and this entry's own grounds are a consultation that died without landing.
+  The carve-out's premise also fails: able-to-commit is untrue for any session running
+  alongside a committing agent, which is the normal condition during an active iteration.
+  **Measured, not argued:** this iteration's lead wrote scratch notes as an ad-hoc journal
+  on three separate occasions, each time because a live stage session held the shared index.
+  **Third measured ground, 2026-08-04:** the incident-recurrence consultation (filed as
+  `incident-recurrence-promotion-signal`) ran as an ordinary session — its findings lived
+  only in the transcript until the operator directed a queue filing by hand, which is
+  exactly the exit contract this skill mechanizes.
+  **The added deliverable is a decision** — widen the top-level carve-out to grant a journal
+  to any session that cannot currently commit (smaller, and it reaches the lead role too),
+  or give `/consult` its own in-flight surface. The entry must also say what a consult
+  session does when its exit commit is blocked by a live agent, else the exit requirement is
+  unsatisfiable exactly when the iteration is busiest.
+  **Cost while deferred:** a strategy session's output stays a transcript, and the next one
+  costs what this one cost — a relay, a reconstruction, and a stale instruction surface.
+  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator** — the
+  ruling-landing half of the theme; `/spec` authors its amendment and promotes it.
+  Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake. Operator
+  direction on the dispatch and journal contract landed 2026-08-03 at close.
+
+- **incident-recurrence-promotion-signal** [spec: SPEC-recurrence.md] — a recurring incident's fix
+  stays deferred on merit prose no ranking reads, so recurrence never forces a
+  promotion decision.
+  **Operator-directed filing 2026-08-04, interstitial after close.** Two incident
+  families recurred across three-plus iterations while their fixes sat deferred. The
+  validate-producer race (`validate-producer-liveness-unobservable`,
+  `lead-dispatch-requires-completion-notification`,
+  `validate-verb-collision-and-check-routing` — the last already records firing in
+  two consecutive iterations, operator-caught both) recurred again this iteration.
+  The fork failure mode (`fork-dispatch-prohibition`, filed at the prior close)
+  re-fired one filing cycle later inside scope itself, verified 2026-08-04 from the
+  session transcripts: the deferred-queue survey agent dispatched its classify
+  fan-out as forks, each fork inherited the fan-out plan as its own and re-dispatched
+  it — nine fork dispatches, four-plus dispatch levels, operator-recovered.
+  **Why scope structurally cannot promote them.** The TRAJECTORY priority directive
+  bounds each survey to the port-track theme; the composition test then bundles by
+  shared surface, which lifecycle/delegation surfaces never share with that theme;
+  and the one aggregation scope runs (`bin/queue-edges.sh`) measures citation
+  density, not incidence. Recurrence lives only as prose amendments inside entries,
+  and the drift report counts defer-age, kfric and gate-backlog but no incident
+  recurrence — so "fired again" is captured faithfully and aggregated nowhere.
+  **Deliverable — three pieces, deliberately not a parallel hotfix track:** (1)
+  recurrence counted at the capture channel — a `file-gap.sh` filing matching a live
+  deferred slug becomes a dated machine-readable recurrence stamp on that slug, with
+  the drift report growing the derived incident column; (2) a pre-emption rule in
+  scope — a slug over the recurrence threshold enters the proposed unit set
+  regardless of theme, escalated for operator ruling via scope's existing escalation
+  shape, so the theme-versus-incident collision is decided rather than silently
+  resolved in the theme's favour; (3) the interstitial lane drift-kit already names
+  ("filed or hotfixed after a close") gets governed — a repo-local mitigation may
+  land interstitially while the entry stays open for the kit-shaped form, capped to
+  changes adding no governed name.
+  **Why not a hotfix track:** it violates scope-gated intake, contends on stage
+  surfaces, and most incident fixes are feature-shaped, so a "hotfix" of them is an
+  unreviewed iteration; the lane half-exists, the missing part is the signal.
+  **Why it needed design:** the recurrence grammar (lead-line field versus dated
+  body line), the threshold, and which SPEC owns each piece (queue-kit the grammar,
+  drift-kit the counter, lifecycle-kit the scope rule) are cross-kit rulings. The
+  counter is the oracle the promotion discipline lacks — a rule that relies on scope
+  noticing recurrence prose is the same unoracled prose fix one level up, the
+  pattern `validate-verb-collision-and-check-routing` already proved recurs.
+  **Cost while deferred:** the port directive silently outranks every recurring
+  incident, the sole detector stays the operator, and each recurrence re-pays
+  recovery — three validate restores once, a runaway fork cascade this time.
+  **Operator-ruled into iteration `ruling-capture-contracts` 2026-08-04** — the counted
+  recurrence-signal half; `/spec` authors this entry's amendment and promotes it.
+  Filed 2026-08-04 on operator direction after close, under the sanctioned
+  direct-filing exception; grounds verified against transcripts and the queue.
+
+- **init-claim-stickiness** [spec: SPEC-claim.md] — non-destructive lasts exactly one upgrade.
+  **Reproduced end to end 2026-08-04** — three packed versions, scratch consumer — while
+  building `installer-upgrade-smoke-arm`. At v1 the manifest owns a vendored file; the adopter
+  edits and commits it; the v2 upgrade correctly leaves it alone and reports it changed. But
+  `claim()` returning 1 means `copy_in` never calls `record()`, and the guarded-seed re-claim
+  loop skips `under_kit` paths, so the file drops out of the new manifest's `files[]`. At v3
+  `prior_hash()` finds nothing, `claim()` returns 0, and `init` overwrites the edit with **no
+  report at all**.
+  **The protection is not sticky — it lasts one upgrade and then inverts**, which is the shape
+  installer/README.md §init's "never overwritten, unless you pass `--force`" promise is read as
+  ruling out. Silent adopter data loss on the second upgrade, in the shipped activation surface.
+  **Candidate fix:** `record()` an unclaimed file into `files[]` at the hash `init` last wrote —
+  not the adopter's — so a later run still recognises it as changed; that keeps `uninstall`'s
+  roster complete too.
+  **Why it needed design:** it changes what a `files[]` hash *means* for a file `init` did not
+  write this run, so it wants a spec pass on installer/README.md §The manifest before the code.
+  **Cost while deferred:** every adopter who edits a vendored file loses that edit on their
+  second upgrade, unreported. The new upgrade arm asserts the one-upgrade case only, so the
+  suite stays green over it. No adopter has upgraded twice yet, which is the only reason this is
+  not already live — the cost rises with every release, not with time.
+  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator**, confirming
+  the TRAJECTORY.md ruling unsuperseded: the spec pass on installer/README.md §The manifest
+  precedes any code. Feature-shaped under canon-kit's contract limb (it changes what a
+  `files[]` hash means for `doctor` and `uninstall`), so `/spec` authors and promotes it.
+  Filed 2026-08-04 at close from the gap inbox; reproduced at build, not inferred from the code.
+
 ## Technical Debt
 
 - **stage-session-ruling-class** — reversing a ruling is operator-class.
@@ -54,55 +178,6 @@
   Filed 2026-08-03 by spec; the compression half of operator-directed intake.
 
 ## Deferred
-
-- **consultation-landing-contract** [design-pending] — a landing contract for strategy sessions.
-  **Operator-directed filing 2026-08-03.** Deliverable: a `/consult` skill for operator
-  strategy sessions. On entry it reads the private brief, the trajectory surface and the
-  queue; on exit **every closed ruling has landed in a governed surface**, every refused
-  alternative is recorded with its grounds, and any always-loaded surface the ruling stales
-  is flagged or filed.
-  **Grounds, and they are measured:** the 2026-07-28 pivot consultation persisted exactly
-  one queue entry and left every instruction surface describing the prior substrate. That
-  cost is still being paid — this iteration reconstructed the objectives behind the port
-  from a relay rather than from a surface, and `instruction-surface-bash-focus` exists
-  because the instruction surfaces were never touched.
-  **Why it is design-pending:** a consultation is not a lifecycle stage — it has no
-  iteration, stamps no cursor, and may span or precede one — so where it sits relative to
-  the state machine is the open question, and `trajectory-ruling-record` owns the surface
-  it would exit onto.
-  **Operator direction 2026-08-03 — the dispatch contract, and none of it is automatic.**
-  *The delegation protocol passes by citation, not inheritance.* `/consult` cites
-  `delegation-kit/templates/agent-execution.md` the way CLAUDE.md §Agent execution and the
-  stage-session config already do; stating it matters because the failure mode is copying
-  the protocol into the skill and creating a second content tier that drifts.
-  *Model selection is a sharper hazard here than for a stage session.* An unselected
-  dispatch inherits the dispatcher's tier rather than defaulting cheap, and a consult
-  session is judgment-tier by nature while most of its dispatches are read-only research —
-  so an unselected fan-out buys the most expensive tier for the cheapest work. The skill
-  discharges this in its own standing dispatch policy.
-  *The journal does not inherit, and that is the finding.* agent-execution states that a
-  top-level session has no journal in this contract and discharges by committing, which it
-  is by construction able to do. A consult session is top-level, its commit discharge fires
-  only at exit, and this entry's own grounds are a consultation that died without landing.
-  The carve-out's premise also fails: able-to-commit is untrue for any session running
-  alongside a committing agent, which is the normal condition during an active iteration.
-  **Measured, not argued:** this iteration's lead wrote scratch notes as an ad-hoc journal
-  on three separate occasions, each time because a live stage session held the shared index.
-  **Third measured ground, 2026-08-04:** the incident-recurrence consultation (filed as
-  `incident-recurrence-promotion-signal`) ran as an ordinary session — its findings lived
-  only in the transcript until the operator directed a queue filing by hand, which is
-  exactly the exit contract this skill mechanizes.
-  **The added deliverable is a decision** — widen the top-level carve-out to grant a journal
-  to any session that cannot currently commit (smaller, and it reaches the lead role too),
-  or give `/consult` its own in-flight surface. The entry must also say what a consult
-  session does when its exit commit is blocked by a live agent, else the exit requirement is
-  unsatisfiable exactly when the iteration is busiest.
-  **Cost while deferred:** a strategy session's output stays a transcript, and the next one
-  costs what this one cost — a relay, a reconstruction, and a stale instruction surface.
-  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator** — the
-  ruling-landing half of the theme; `/spec` authors its amendment and promotes it.
-  Filed 2026-08-03 by spec; the exit-contract half of operator-directed intake. Operator
-  direction on the dispatch and journal contract landed 2026-08-03 at close.
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path.
   The installer is bash end to end, so native Windows is unreachable:
@@ -3145,32 +3220,6 @@
   Filed 2026-08-03 at close from the gap inbox; observed by the lead across three
   occurrences.
 
-- **init-claim-stickiness** [design-pending] — non-destructive lasts one upgrade, then inverts.
-  **Reproduced end to end 2026-08-04** — three packed versions, scratch consumer — while
-  building `installer-upgrade-smoke-arm`. At v1 the manifest owns a vendored file; the adopter
-  edits and commits it; the v2 upgrade correctly leaves it alone and reports it changed. But
-  `claim()` returning 1 means `copy_in` never calls `record()`, and the guarded-seed re-claim
-  loop skips `under_kit` paths, so the file drops out of the new manifest's `files[]`. At v3
-  `prior_hash()` finds nothing, `claim()` returns 0, and `init` overwrites the edit with **no
-  report at all**.
-  **The protection is not sticky — it lasts one upgrade and then inverts**, which is the shape
-  installer/README.md §init's "never overwritten, unless you pass `--force`" promise is read as
-  ruling out. Silent adopter data loss on the second upgrade, in the shipped activation surface.
-  **Candidate fix:** `record()` an unclaimed file into `files[]` at the hash `init` last wrote —
-  not the adopter's — so a later run still recognises it as changed; that keeps `uninstall`'s
-  roster complete too.
-  **Why `[design-pending]`:** it changes what a `files[]` hash *means* for a file `init` did not
-  write this run, so it wants a spec pass on installer/README.md §The manifest before the code.
-  **Cost while deferred:** every adopter who edits a vendored file loses that edit on their
-  second upgrade, unreported. The new upgrade arm asserts the one-upgrade case only, so the
-  suite stays green over it. No adopter has upgraded twice yet, which is the only reason this is
-  not already live — the cost rises with every release, not with time.
-  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator**, confirming
-  the TRAJECTORY.md ruling unsuperseded: the spec pass on installer/README.md §The manifest
-  precedes any code. Feature-shaped under canon-kit's contract limb (it changes what a
-  `files[]` hash means for `doctor` and `uninstall`), so `/spec` authors and promotes it.
-  Filed 2026-08-04 at close from the gap inbox; reproduced at build, not inferred from the code.
-
 - **consumer-smoke-artifact-arm** [design-pending] — the placement branch never executes.
   `installer/consumer-smoke/run-smoke.sh` packs with no `--artifacts`, so the gate binary's
   placement path — target resolution, pre-write digest verification, the seam knob, and the
@@ -3222,55 +3271,6 @@
   **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
   release note, against evidence that is coldest when the batch count is highest.
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
-
-- **incident-recurrence-promotion-signal** [design-pending] — a recurring incident's fix
-  stays deferred on merit prose no ranking reads, so recurrence never forces a
-  promotion decision.
-  **Operator-directed filing 2026-08-04, interstitial after close.** Two incident
-  families recurred across three-plus iterations while their fixes sat deferred. The
-  validate-producer race (`validate-producer-liveness-unobservable`,
-  `lead-dispatch-requires-completion-notification`,
-  `validate-verb-collision-and-check-routing` — the last already records firing in
-  two consecutive iterations, operator-caught both) recurred again this iteration.
-  The fork failure mode (`fork-dispatch-prohibition`, filed at the prior close)
-  re-fired one filing cycle later inside scope itself, verified 2026-08-04 from the
-  session transcripts: the deferred-queue survey agent dispatched its classify
-  fan-out as forks, each fork inherited the fan-out plan as its own and re-dispatched
-  it — nine fork dispatches, four-plus dispatch levels, operator-recovered.
-  **Why scope structurally cannot promote them.** The TRAJECTORY priority directive
-  bounds each survey to the port-track theme; the composition test then bundles by
-  shared surface, which lifecycle/delegation surfaces never share with that theme;
-  and the one aggregation scope runs (`bin/queue-edges.sh`) measures citation
-  density, not incidence. Recurrence lives only as prose amendments inside entries,
-  and the drift report counts defer-age, kfric and gate-backlog but no incident
-  recurrence — so "fired again" is captured faithfully and aggregated nowhere.
-  **Deliverable — three pieces, deliberately not a parallel hotfix track:** (1)
-  recurrence counted at the capture channel — a `file-gap.sh` filing matching a live
-  deferred slug becomes a dated machine-readable recurrence stamp on that slug, with
-  the drift report growing the derived incident column; (2) a pre-emption rule in
-  scope — a slug over the recurrence threshold enters the proposed unit set
-  regardless of theme, escalated for operator ruling via scope's existing escalation
-  shape, so the theme-versus-incident collision is decided rather than silently
-  resolved in the theme's favour; (3) the interstitial lane drift-kit already names
-  ("filed or hotfixed after a close") gets governed — a repo-local mitigation may
-  land interstitially while the entry stays open for the kit-shaped form, capped to
-  changes adding no governed name.
-  **Why not a hotfix track:** it violates scope-gated intake, contends on stage
-  surfaces, and most incident fixes are feature-shaped, so a "hotfix" of them is an
-  unreviewed iteration; the lane half-exists, the missing part is the signal.
-  **Why `[design-pending]`:** the recurrence grammar (lead-line field versus dated
-  body line), the threshold, and which SPEC owns each piece (queue-kit the grammar,
-  drift-kit the counter, lifecycle-kit the scope rule) are cross-kit rulings. The
-  counter is the oracle the promotion discipline lacks — a rule that relies on scope
-  noticing recurrence prose is the same unoracled prose fix one level up, the
-  pattern `validate-verb-collision-and-check-routing` already proved recurs.
-  **Cost while deferred:** the port directive silently outranks every recurring
-  incident, the sole detector stays the operator, and each recurrence re-pays
-  recovery — three validate restores once, a runaway fork cascade this time.
-  **Operator-ruled into iteration `ruling-capture-contracts` 2026-08-04** — the counted
-  recurrence-signal half; `/spec` authors this entry's amendment and promotes it.
-  Filed 2026-08-04 on operator direction after close, under the sanctioned
-  direct-filing exception; grounds verified against transcripts and the queue.
 
 ## Icebox
 
