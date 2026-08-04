@@ -69,6 +69,10 @@
   alongside a committing agent, which is the normal condition during an active iteration.
   **Measured, not argued:** this iteration's lead wrote scratch notes as an ad-hoc journal
   on three separate occasions, each time because a live stage session held the shared index.
+  **Third measured ground, 2026-08-04:** the incident-recurrence consultation (filed as
+  `incident-recurrence-promotion-signal`) ran as an ordinary session — its findings lived
+  only in the transcript until the operator directed a queue filing by hand, which is
+  exactly the exit contract this skill mechanizes.
   **The added deliverable is a decision** — widen the top-level carve-out to grant a journal
   to any session that cannot currently commit (smaller, and it reaches the lead role too),
   or give `/consult` its own in-flight surface. The entry must also say what a consult
@@ -2820,6 +2824,9 @@
   **Cost while deferred:** every dispatch that exists to narrow a child's authority can be
   answered by a fork that ignores the narrowing, and the failure is invisible — the fork
   reports success on work it was never authorized to do.
+  **Recurred 2026-08-04 in scope's own survey fan-out** — a self-replicating fork
+  cascade, operator-recovered; the incident record and the promotion mechanism it
+  motivates live under `incident-recurrence-promotion-signal`.
   Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
 
 - **meta-gate-conservation-record-reach** [design-pending] — the conservation record
@@ -3209,6 +3216,53 @@
   **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
   release note, against evidence that is coldest when the batch count is highest.
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
+
+- **incident-recurrence-promotion-signal** [design-pending] — a recurring incident's fix
+  stays deferred on merit prose no ranking reads, so recurrence never forces a
+  promotion decision.
+  **Operator-directed filing 2026-08-04, interstitial after close.** Two incident
+  families recurred across three-plus iterations while their fixes sat deferred. The
+  validate-producer race (`validate-producer-liveness-unobservable`,
+  `lead-dispatch-requires-completion-notification`,
+  `validate-verb-collision-and-check-routing` — the last already records firing in
+  two consecutive iterations, operator-caught both) recurred again this iteration.
+  The fork failure mode (`fork-dispatch-prohibition`, filed at the prior close)
+  re-fired one filing cycle later inside scope itself, verified 2026-08-04 from the
+  session transcripts: the deferred-queue survey agent dispatched its classify
+  fan-out as forks, each fork inherited the fan-out plan as its own and re-dispatched
+  it — nine fork dispatches, four-plus dispatch levels, operator-recovered.
+  **Why scope structurally cannot promote them.** The TRAJECTORY priority directive
+  bounds each survey to the port-track theme; the composition test then bundles by
+  shared surface, which lifecycle/delegation surfaces never share with that theme;
+  and the one aggregation scope runs (`bin/queue-edges.sh`) measures citation
+  density, not incidence. Recurrence lives only as prose amendments inside entries,
+  and the drift report counts defer-age, kfric and gate-backlog but no incident
+  recurrence — so "fired again" is captured faithfully and aggregated nowhere.
+  **Deliverable — three pieces, deliberately not a parallel hotfix track:** (1)
+  recurrence counted at the capture channel — a `file-gap.sh` filing matching a live
+  deferred slug becomes a dated machine-readable recurrence stamp on that slug, with
+  the drift report growing the derived incident column; (2) a pre-emption rule in
+  scope — a slug over the recurrence threshold enters the proposed unit set
+  regardless of theme, escalated for operator ruling via scope's existing escalation
+  shape, so the theme-versus-incident collision is decided rather than silently
+  resolved in the theme's favour; (3) the interstitial lane drift-kit already names
+  ("filed or hotfixed after a close") gets governed — a repo-local mitigation may
+  land interstitially while the entry stays open for the kit-shaped form, capped to
+  changes adding no governed name.
+  **Why not a hotfix track:** it violates scope-gated intake, contends on stage
+  surfaces, and most incident fixes are feature-shaped, so a "hotfix" of them is an
+  unreviewed iteration; the lane half-exists, the missing part is the signal.
+  **Why `[design-pending]`:** the recurrence grammar (lead-line field versus dated
+  body line), the threshold, and which SPEC owns each piece (queue-kit the grammar,
+  drift-kit the counter, lifecycle-kit the scope rule) are cross-kit rulings. The
+  counter is the oracle the promotion discipline lacks — a rule that relies on scope
+  noticing recurrence prose is the same unoracled prose fix one level up, the
+  pattern `validate-verb-collision-and-check-routing` already proved recurs.
+  **Cost while deferred:** the port directive silently outranks every recurring
+  incident, the sole detector stays the operator, and each recurrence re-pays
+  recovery — three validate restores once, a runaway fork cascade this time.
+  Filed 2026-08-04 on operator direction after close, under the sanctioned
+  direct-filing exception; grounds verified against transcripts and the queue.
 
 ## Icebox
 
