@@ -3293,10 +3293,4 @@
 
 ## Done
 
-- consultation-landing-contract
-- incident-recurrence-promotion-signal
-- init-claim-stickiness
-- stage-session-ruling-class
-- lossless-compression-codification
-
 ## Lessons Learned
