@@ -12,32 +12,6 @@
 
 ## New Features
 
-- **init-claim-stickiness** [spec: SPEC-claim.md] — non-destructive lasts exactly one upgrade.
-  **Reproduced end to end 2026-08-04** — three packed versions, scratch consumer — while
-  building `installer-upgrade-smoke-arm`. At v1 the manifest owns a vendored file; the adopter
-  edits and commits it; the v2 upgrade correctly leaves it alone and reports it changed. But
-  `claim()` returning 1 means `copy_in` never calls `record()`, and the guarded-seed re-claim
-  loop skips `under_kit` paths, so the file drops out of the new manifest's `files[]`. At v3
-  `prior_hash()` finds nothing, `claim()` returns 0, and `init` overwrites the edit with **no
-  report at all**.
-  **The protection is not sticky — it lasts one upgrade and then inverts**, which is the shape
-  installer/README.md §init's "never overwritten, unless you pass `--force`" promise is read as
-  ruling out. Silent adopter data loss on the second upgrade, in the shipped activation surface.
-  **Candidate fix:** `record()` an unclaimed file into `files[]` at the hash `init` last wrote —
-  not the adopter's — so a later run still recognises it as changed; that keeps `uninstall`'s
-  roster complete too.
-  **Why it needed design:** it changes what a `files[]` hash *means* for a file `init` did not
-  write this run, so it wants a spec pass on installer/README.md §The manifest before the code.
-  **Cost while deferred:** every adopter who edits a vendored file loses that edit on their
-  second upgrade, unreported. The new upgrade arm asserts the one-upgrade case only, so the
-  suite stays green over it. No adopter has upgraded twice yet, which is the only reason this is
-  not already live — the cost rises with every release, not with time.
-  **Ruled into iteration `ruling-capture-contracts` 2026-08-04 by the operator**, confirming
-  the TRAJECTORY.md ruling unsuperseded: the spec pass on installer/README.md §The manifest
-  precedes any code. Feature-shaped under canon-kit's contract limb (it changes what a
-  `files[]` hash means for `doctor` and `uninstall`), so `/spec` authors and promotes it.
-  Filed 2026-08-04 at close from the gap inbox; reproduced at build, not inferred from the code.
-
 ## Technical Debt
 
 - **stage-session-ruling-class** — reversing a ruling is operator-class.
@@ -3209,5 +3183,6 @@
 
 - consultation-landing-contract
 - incident-recurrence-promotion-signal
+- init-claim-stickiness
 
 ## Lessons Learned

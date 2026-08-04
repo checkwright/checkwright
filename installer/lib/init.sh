@@ -161,6 +161,15 @@ prior_hash() {   # $1 = repo-relative path -> the hash the manifest recorded for
     done <<<"$PRIOR_FILES"
 }
 
+WRITTEN=()
+declare -A CARRIED=()
+# spec: installer/README.md §The manifest — a recorded hash is what init last wrote at that path, so an entry init did not write this run carries its hash forward verbatim instead of letting manifest() hash the tree at emit time: hashing the tree there would file the adopter's own content as init's, and the next run would find cur == want, claim the path and overwrite it silently
+record() {   # $1 = repo-relative path, $2 = the hash to emit for it; omitted, the tree is hashed at emit time
+    WRITTEN+=("$1")
+    [[ -n "${2:-}" ]] && CARRIED["$1"]="$2"
+    return 0
+}
+
 # spec: installer/README.md §init — the non-destructive re-run: a file whose recorded hash still matches is init's to rewrite, one that has changed since is the adopter's and is reported rather than overwritten
 CHANGED=()
 claim() {   # $1 = repo-relative path -> 0 iff init may write it
@@ -172,11 +181,10 @@ claim() {   # $1 = repo-relative path -> 0 iff init may write it
     [[ "$cur" == "$want" ]] && return 0
     (( FORCE )) && return 0
     CHANGED+=("$1")
+    # spec: installer/README.md §The manifest — the carry-forward belongs to the refusal itself rather than to each caller, because this is the single point where the roster would otherwise lose the path and every call site refuses through it: absence of a key reads as "never installed" on the next run, which is the one reading that lets init overwrite the adopter with no report at all
+    record "$1" "$want"
     return 1
 }
-
-WRITTEN=()
-record() { WRITTEN+=("$1"); }
 
 copy_in() {   # $1 = source file, $2 = repo-relative destination
     claim "$2" || return 0
@@ -287,7 +295,7 @@ if [[ -n "$ARTIFACT_TARGET" ]]; then
     fi
 fi
 
-# spec: installer/README.md §What init seeds — a guarded seed is written once and kept thereafter, so a re-run must re-claim it: dropping it from the manifest would disown a file init created, and an uninstall that reads this roster would then leave it behind
+# spec: installer/README.md §What init seeds — a guarded seed is written once and kept thereafter, so a re-run must re-claim it at its recorded hash: dropping it from the manifest would disown a file init created, and an uninstall that reads this roster would then leave it behind. Whether the tree still agrees is not the question the roster answers — an adopter-edited seed is exactly the entry the carry-forward exists for, so it is re-claimed at the hash init wrote rather than dropped for disagreeing
 under_kit() {   # $1 = repo-relative path -> 0 iff it lies inside one of this profile's kit directories
     local k
     for k in "${KITS[@]}"; do [[ "$1" == "$k/"* ]] && return 0; done
@@ -299,8 +307,7 @@ if [[ -n "$PRIOR_FILES" ]]; then
         under_kit "$p" && continue
         printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$p" && continue
         [[ -f "$ROOT/$p" ]] || continue
-        [[ "$(lock_hash "$ROOT/$p")" == "$h" ]] || continue
-        record "$p"
+        record "$p" "$h"
     done <<<"$PRIOR_FILES"
 fi
 
@@ -318,6 +325,16 @@ for g in "${GENERATED[@]}"; do
     record "$g"
 done
 
+# spec: installer/README.md §The manifest — what init wrote this run is a subset of the roster it records, because a path left alone for the adopter is carried forward rather than written; the two part company here so every reader downstream takes the one it means, and staging takes the written set: folding an adopter's file into the vendoring commit is what the clean-worktree precondition exists to prevent
+STAGE=()
+for f in "${WRITTEN[@]}"; do [[ -n "${CARRIED[$f]:-}" ]] || STAGE+=("$f"); done
+
+files_hash() {   # $1 = repo-relative path -> the hash its files[] entry carries
+    [[ -n "${CARRIED[$1]:-}" ]] && { printf '%s' "${CARRIED[$1]}"; return 0; }
+    (( DRY )) && [[ ! -f "$ROOT/$1" ]] && { printf '(pending)'; return 0; }
+    lock_hash "$ROOT/$1"
+}
+
 manifest() {
     local f
     {
@@ -333,7 +350,7 @@ manifest() {
             (( first )) || printf ','
             first=0
             printf '%s:%s' "$(jq -Rn --arg v "$f" '$v')" \
-                "$(jq -Rn --arg v "$( (( DRY )) && [[ ! -f "$ROOT/$f" ]] && printf '(pending)' || lock_hash "$ROOT/$f")" '$v')"
+                "$(jq -Rn --arg v "$(files_hash "$f")" '$v')"
         done
         printf '}'
         # spec: installer/README.md §The manifest — the binary is neither vendored nor generated, so it joins as its own key rather than a files[] row: a files[] entry means hashed with git hash-object and rewritten when unmodified, and this one is hashed with SHA-256 against a published value and rewritten on a different rule. Its absence on a run that omitted the artifact is the omission's machine-readable form
@@ -347,7 +364,7 @@ manifest() {
 if (( DRY )); then
     printf 'checkwright init --dry-run (profile: %s, version: %s)\n\n' "$PROFILE" "$VERSION"
     printf 'would vendor %d kit(s): %s\n' "${#KITS[@]}" "${KITS[*]}"
-    printf 'would write %d file(s), including:\n' "$(( ${#WRITTEN[@]} + 1 ))"
+    printf 'would write %d file(s), including:\n' "$(( ${#STAGE[@]} + 1 ))"
     printf '  %s\n' "$GATES_LIST" "$CHECKWRIGHT_LOCK_FILE"
     for kit in "${KITS[@]}"; do printf '  %s/ (%d files)\n' "$kit" "$(find "$PAYLOAD/$kit" -type f | wc -l)"; done
     if [[ -n "$ARTIFACT_TARGET" ]]; then
@@ -368,6 +385,7 @@ fi
 
 manifest > "$LOCK" || die "could not write $CHECKWRIGHT_LOCK_FILE"
 WRITTEN+=("$CHECKWRIGHT_LOCK_FILE")
+STAGE+=("$CHECKWRIGHT_LOCK_FILE")
 
 if [[ ${#CHANGED[@]} -gt 0 ]]; then
     printf '\n%d file(s) have changed since init wrote them and were left alone:\n' "${#CHANGED[@]}"
@@ -375,7 +393,7 @@ if [[ ${#CHANGED[@]} -gt 0 ]]; then
     printf '  help: review the differences; re-run with --force to take the packaged version.\n\n'
 fi
 
-git -C "$ROOT" add -- "${WRITTEN[@]}" || die "could not stage the vendored files"
+git -C "$ROOT" add -- "${STAGE[@]}" || die "could not stage the vendored files"
 
 # spec: installer/README.md §init — idempotence is a property of the tree, so a re-run that changed nothing reports and exits clean rather than failing on an empty commit: "nothing to do" is the success case, not an error
 if git -C "$ROOT" diff --cached --quiet; then

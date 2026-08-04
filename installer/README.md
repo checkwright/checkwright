@@ -87,7 +87,10 @@ run the battery.
 **Re-running is idempotent and non-destructive.** A second `init` reads each
 recorded hash from the manifest: a file whose hash still matches is `init`'s to
 rewrite, and one that has changed since is **yours** — it is reported and left
-alone, never overwritten, unless you pass `--force`. A re-run that finds
+alone, never overwritten, unless you pass `--force`. That does not expire at the
+next upgrade: a file reported as changed stays on `init`'s roster at the hash
+`init` wrote there, so every later run reads it the same way and reports it
+again. A re-run that finds
 nothing to change says so and exits clean; an unchanged tree is the success
 case, not an error. A payload older than the recorded install is refused as a
 silent downgrade — `--force` covers that refusal too, which is what makes a
@@ -316,8 +319,31 @@ the shape behind it.
 | `commit` | the 40-hex commit the payload was assembled from | `doctor` prints it — it is what lets a reviewer resolve the vendored tree to an exact upstream state |
 | `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
 | `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
-| `files` | each written path with its content hash | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten |
+| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way |
 | `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
+
+**A recorded hash is what `init` last wrote at that path** — on whichever run
+last wrote it — and not the state of the tree at the end of the current run. The
+two readings coincide for every path `init` rewrites and part company for exactly
+one class: a path `init` left alone because you had edited it. That path stays in
+`files` at the hash `init` put there, carried forward from the previous manifest
+rather than recomputed, so the next run still has something to compare your
+content against, still finds it different, and still leaves it alone. **A path
+leaves the roster only when `init` stops shipping it.** Editing a file changes who
+may write it; it never changes whether `init` is tracking it.
+
+The hash carried forward is the one `init` wrote, not the one this payload would
+have written. Either would protect the file, so protection does not decide it —
+the **revert** does. Restore the file to what `init` put there and it is `init`'s
+to rewrite again, which works only when the recorded hash is what `init` actually
+wrote; recording an intended write would report the path as changed forever and
+would record a write that never happened.
+
+That is a change of meaning, not of shape, so the wire key stays
+`checkwright-lock v1`. A reader built before it meets one of these entries, finds
+a hash that disagrees with the tree, and does exactly what it does today: reports
+the file changed and leaves it alone. The old behavior on the new data is the
+behavior the new meaning wants, so there is nothing for a version key to protect.
 
 A recorded **`files`** hash is `git hash-object`, never `sha256sum`. Not a
 portability detail worth burying: macOS ships `shasum` rather than `sha256sum`,
@@ -339,8 +365,12 @@ defaults to SHA-1, and a SHA-1 supply-chain digest would undercut the one claim
 That is also why `artifact` is its own key rather than a `files` row. A `files`
 entry means *hashed with `git hash-object`, rewritten when unmodified*, and this
 one is hashed with SHA-256 against a published value and rewritten on a
-different rule — so a `files` row would put two hash families on one map and
-break the invariant the consumer smoke asserts over every entry in it. The
+different rule — so a `files` row would put two hash families on one map. The
+uniformity that map is held to is the hash *function* across every entry, which
+is why the argument survives the paragraphs above: it never rested on an entry
+agreeing with the tree. The consumer smoke does assert that agreement entry by
+entry, against a **freshly initialized** consumer, where no adopter edit exists
+for a carried-forward hash to come from. The
 binary is still written by `init` and still tracked. A new optional top-level key
 is additive within the versioned wire key: a reader that does not know it sees
 the same manifest it always did.
@@ -401,9 +431,16 @@ all. What only that reaches: the manifest's version comparison falling *through*
 in the upgrade direction rather than refusing, the profile re-read from the
 manifest when none is passed, and `claim()` re-applying the payload around a file
 that has changed since `init` wrote it — left alone, reported, and still the
-adopter's afterwards. The upgrade version is derived from the one packed first
-and the arm refuses to run unless the derivation is strictly higher, so it cannot
-quietly turn into a second test of the downgrade refusal.
+adopter's afterwards.
+
+It then chains a **third** version onto the same consumer with no fresh edit,
+because one hop only shows the protection starting. The second hop is where it
+either persists or inverts, and nothing above reaches it: the already-edited,
+already-reported file must still be the adopter's and must still be reported, and
+the manifest the first hop wrote must still carry it. Each version is derived from
+the one packed before it and the arm refuses to run unless the derivation is
+strictly higher, so neither hop can quietly turn into a second test of the
+downgrade refusal.
 
 **The artifact arm rides the per-profile post-conditions**, taking whichever of
 §The gate binary's two outcomes the payload and the host actually produce. The

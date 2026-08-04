@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant and a cross-version upgrade, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant and a two-hop cross-version upgrade, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -209,10 +209,13 @@ C="$(consumer "download")" || fail "could not build a scratch consumer for the d
 assert_install "$PROFILE_DERIVED" "$C"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
-printf 'upgrade arm (cross-version, starter profile)\n'
-UP_VERSION="$(awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${VERSION%%[-+]*}")"
-[[ "$VERSION" != "$UP_VERSION" \
-   && "$(printf '%s\n%s\n' "$VERSION" "$UP_VERSION" | sort -V | head -n1)" == "$VERSION" ]] \
+printf 'upgrade arm (two cross-version hops, starter profile)\n'
+next_patch() { awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${1%%[-+]*}"; }
+upgrade_direction() {   # $1 = from, $2 = to -> 0 iff $2 sorts strictly above $1
+    [[ "$1" != "$2" && "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
+}
+UP_VERSION="$(next_patch "$VERSION")"
+upgrade_direction "$VERSION" "$UP_VERSION" \
     || fail "the arm derived $UP_VERSION from $VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
 UP="$SCRATCH/upgrade"
 mkdir -p "$UP"
@@ -255,7 +258,38 @@ out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
 grep -qF "$EDITED" <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "the upgrade left $EDITED alone but did not report it as changed"; }
 [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the upgrade left the worktree dirty"
-say "upgrade: $VERSION -> $UP_VERSION, profile re-read, $EDITED preserved and reported"
+# spec: installer/README.md §The manifest — the roster is what carries the protection to the next hop, so it is asserted directly and not only through its effect: a dropped entry reads as "never installed" next run, and an entry recorded at the adopter's own hash reads as unchanged — both let the following init claim the path, so both are named apart
+[[ "$(jq -r --arg f "$EDITED" '.files | has($f)' "$LOCK")" == "true" ]] \
+    || fail "the upgrade dropped $EDITED from the manifest roster — the next run would read its absence as 'never installed'"
+[[ "$(jq -r --arg f "$EDITED" '.files[$f]' "$LOCK")" != "$EDITED_WANT" ]] \
+    || fail "the upgrade recorded the adopter's own hash for $EDITED — the next run would find it unchanged and claim it"
+say "upgrade: $VERSION -> $UP_VERSION, profile re-read, $EDITED preserved, reported and still on the roster"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked and the cross-version upgrade arm)\n' "${#PROFILES[@]}"
+# spec: installer/README.md §The consumer smoke — the second hop is the one the first cannot stand in for: one upgrade shows the protection starting, and only the next shows whether it persists or inverts, so the same consumer is carried across a third version with no fresh adopter edit
+UP2_VERSION="$(next_patch "$UP_VERSION")"
+upgrade_direction "$UP_VERSION" "$UP2_VERSION" \
+    || fail "the arm derived $UP2_VERSION from $UP_VERSION, which is not the upgrade direction — it would assert the downgrade refusal instead"
+UP2="$SCRATCH/upgrade2"
+mkdir -p "$UP2"
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" --version "$UP2_VERSION" --out "$UP2" 2>&1)" \
+    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the second upgrade pack step failed."; }
+say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
+shopt -s nullglob
+up2_tarballs=("$UP2"/*.tgz)
+shopt -u nullglob
+[[ ${#up2_tarballs[@]} -eq 1 ]] || fail "expected exactly one second-upgrade tarball, found ${#up2_tarballs[@]}"
+( cd "$UP2" && tar -xzf "${up2_tarballs[0]##*/}" ) || fail "tar could not extract the second-upgrade tarball"
+
+out="$( cd "$C" && bash "$UP2/package/bin/checkwright.sh" init 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "the second cross-version re-run of init failed"; }
+[[ "$(jq -r '.version' "$LOCK")" == "$UP2_VERSION" ]] \
+    || fail "the manifest records $(jq -r '.version' "$LOCK") after upgrading to $UP2_VERSION"
+[[ "$(git hash-object -- "$C/$EDITED")" == "$EDITED_WANT" ]] \
+    || fail "the second upgrade overwrote $EDITED — the protection lasted one upgrade and then inverted"
+grep -qF "$EDITED" <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "the second upgrade left $EDITED alone but did not report it as changed"; }
+[[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the second upgrade left the worktree dirty"
+say "second upgrade: $UP_VERSION -> $UP2_VERSION, $EDITED still the adopter's and still reported"
+
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked and the two-hop cross-version upgrade arm)\n' "${#PROFILES[@]}"
 exit 0
