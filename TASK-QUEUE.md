@@ -2673,7 +2673,8 @@
   than a baseline-versus-current pair, though `DRIFT_KIT_TIMINGS_FILE` shows the
   seam where a comparer would attach.
   **Why that is not merely "not yet".** The comparison moment is the second port,
-  which is now blocked behind `native-artifact-publish-path` and may be far off,
+  which waits on the operator-gated first tag publishing binaries — not on
+  `native-artifact-publish-path`, which landed 2026-08-03 — and may be far off,
   while the baseline's own validity conditions decay meanwhile. Two already have,
   measured at close the same iteration the file landed: the header pins a
   `gates.list` sha256 that no longer matches (the 95th gate landed after capture),
@@ -3228,6 +3229,36 @@
   eventual correction grows monotonically with the count — history is the one surface this
   repo cannot re-generate.
   Filed 2026-08-04 at close from the gap inbox; filed by the lead, measured that session.
+
+- **intra-file-pendency-contradiction-scan** [design-pending] — one file can call the same
+  slug landed in one section and pending in another, and nothing reads both.
+  Found at close 2026-08-04 by the `capability-pendency-after-landing` audit:
+  gate-sdk/SPEC.md said a second port "lands after `native-artifact-publish-path` and
+  `native-artifact-install-path`" while, ninety lines later, the same file said criterion 5
+  is "implemented by `native-artifact-publish-path` and `native-artifact-install-path`". Both
+  landed 2026-08-03. Two sections, two tenses, one file, one slug pair.
+  **Why the existing coverage did not catch it, which is the point.** The
+  `capability-pendency-after-landing` roster class *did* run at that iteration's own close
+  and missed it, because the class is scoped as a human sweep of governed prose against the
+  tree — an unbounded read whose reach depends on which files the sweeper opens. The stale
+  paragraph was written mid-iteration and never revisited after the same iteration's later
+  commit discharged it, so the tree-comparison the class prescribes never reached it.
+  **Deliverable, and why it is narrower than the class it sits under:** a scan for one
+  *decidable* shape — a governed file citing a slug in a landed construction ("implemented
+  by", "built", "ships") and in a pending construction ("waits on", "lands after", "does not
+  exist yet", "not yet") within the same file. It needs no tree comparison and no judgment
+  about what is actually live: the contradiction is internal, so the file falsifies itself.
+  That is what makes it gateable where its parent class is not.
+  **Why `[design-pending]`:** the construction vocabulary is the whole gate, and a literal
+  phrase list in a kit is drift by construction plus a provenance-seam problem — the
+  vocabulary is consumer editorial. It wants the `check-graph` / `graph-vocab.sh` treatment,
+  optional consumer config, which is a design call rather than a size one. Also open: whether
+  a legitimate "X landed, Y still waits on it" sentence pair trips it, which decides whether
+  the predicate is per-slug or per-slug-per-section.
+  **Cost while deferred:** the class stays a sweep whose reach is whoever runs it, and its
+  one measured miss cost a full iteration of a governed SPEC contradicting itself in public
+  — gate-sdk/SPEC.md is mirrored to the docs site, so the contradiction shipped.
+  Filed 2026-08-04 at close; the instances it would have caught were fixed the same session.
 
 ## Icebox
 

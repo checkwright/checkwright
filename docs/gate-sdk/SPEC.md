@@ -768,10 +768,14 @@ design time; the last two were paid for, and each is named with what it cost.
    publish workflow's roster-derived build matrix emits one binary and one digest
    sidecar per declared target, `scripts/pack-installer.sh` verifies each against
    its sidecar and places them in the payload, and the Release publishes them
-   (§Consumer payload). What a second port still waits on is the placing half —
-   `native-artifact-install-path` selects the host's artifact, verifies it before
-   writing, and omits-and-declares a member whose platform the roster carries no
-   artifact for.
+   (§Consumer payload). The placing half is **built** too: `init` resolves the host
+   to a target, refuses on a digest mismatch rather than warning, and
+   omits-and-declares a member whose platform the roster carries no artifact for
+   (`native-artifact-install-path`). Both halves of the model therefore ship. What a
+   second port waits on is not a build: the first tag publishing binaries as Release
+   assets is the operator's call (TRAJECTORY.md), so no adopter can reach a prebuilt
+   binary until it is cut, and `consumer-smoke-artifact-arm` records that the
+   placement branch has no executing test until one is.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives
@@ -818,12 +822,13 @@ behavior by two crate unit tests, consumed by the gate in place of its refusal
 (§check-reads-couples, §Meta-gate conservation for the binary substrate). It was
 built and proved **without a port**: against the reference-only implementation and
 a hermetic fixture, so no `.gate` member had to be added to a kit to end the
-refusal. **The criterion 5 half is ruled rather than open**: how a compiled gate
-arrives in a consumer tree is settled (criterion 5 above). What it leaves is not
-a decision but a build — the artifacts and the digests that model selects from
-do not exist yet, so criterion 5 is satisfiable and not yet satisfied, and a
-second port lands after `native-artifact-publish-path` and
-`native-artifact-install-path` rather than after another ruling.
+refusal. **The criterion 5 half is now satisfied, not merely ruled:** how a
+compiled gate arrives in a consumer tree is settled (criterion 5 above), and both
+mechanism halves are built — `native-artifact-publish-path` produces the artifacts
+and digests, `native-artifact-install-path` selects, verifies and places them.
+Neither prerequisite is outstanding. A second port therefore waits on no build and
+no further ruling; what stands between it and an adopter is the operator-gated first
+tag that publishes binaries as Release assets (TRAJECTORY.md).
 
 ## What the dispatch seam does not settle
 
