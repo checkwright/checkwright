@@ -70,10 +70,12 @@ release-sweep first, its boundary-only sub-procedure) when any of:
   whole cost being avoided.
 - **Explicit operator direction**, recorded in the disposition line's basis.
 
-Otherwise stamp `<iteration> release deferred:vX.Y.Z — <basis>` and let the
-accumulated declarations ride the next qualifying release. RELEASING.md step 1
-already composes a batched note from every declaration accumulated since the last
-tag, so nothing about note composition changes — only how often a tag is cut.
+Otherwise stamp the disposition line's deferral form (lifecycle-kit/SPEC.md
+§templates/stages/ — `deferred:vX.Y.Z`, the version the criteria would have
+shipped as) and let the accumulated declarations ride the next qualifying
+release. RELEASING.md step 1 already composes a batched note from every
+declaration accumulated since the last tag, so nothing about note composition
+changes — only how often a tag is cut.
 
 *The honest limit.* No gate reds a release cut too soon. Each trigger above is a
 case where a fast release is correct, so a timing gate would need an override

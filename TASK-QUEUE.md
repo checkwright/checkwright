@@ -14,76 +14,6 @@
 
 ## Technical Debt
 
-- **release-bump-deferred-floor-unenforced** —
-  `scripts/check-release-bump.sh` does not implement the deferred-floor invariant
-  `docs/install.md` §Versioning asserts. The page states a later note "may not
-  fall below that version"; the gate only refuses a **patch-only** bump while a
-  deferral is outstanding, and never compares the new note's version numerically
-  against the floor. A deferred **major** discharged as a minor therefore passes
-  silently — the patch-only guard is skipped entirely.
-  **Live rather than hypothetical.** This close stamps a deferral, and the
-  `preview-release-cadence` policy makes outstanding deferrals routine. Within
-  that policy's own trigger set the major case is covered by policy alone (a
-  major releases immediately and never waits behind the cadence floor) — which is
-  exactly the coverage that evaporates when the policy is later edited by someone
-  who does not know the gate is not holding it.
-  **No ruling was owed here, which is why it promotes as debt.** The tag recorded
-  the work's shape rather than an open call: the fix is a numeric semver
-  comparison against the derived outstanding floor, which needs the history ∪ live
-  outstanding-set reader (lifecycle-kit/SPEC.md §templates/stages/) wired into a
-  gate that today reads only the newest note. That is an existing reader wired
-  into an existing gate, minting no name.
-  **Live this iteration, verified at scope 2026-08-03:**
-  `.workflow/release-disposition.txt` carries an outstanding `deferred:v0.22.0`
-  and `.workflow/tightened-gates.txt` holds seven declarations since v0.21.0, so
-  the floor this gate fails to enforce is one an actual close must discharge.
-  **Cost while deferred:** a stated invariant with no oracle — policy prose holds
-  it, which is the thing a gate exists to stop trusting.
-  Debt: converges the gate on an invariant the page already states; adds no
-  governed name.
-  Filed 2026-08-01 at close from the gap inbox, filed by this iteration's align.
-
-- **release-disposition-grammar-consolidation** — the release
-  disposition line's version-field grammar is restated on five surfaces and the
-  restatements drift. Owner: lifecycle-kit/SPEC.md §templates/stages/ (three
-  forms, correct); `.workflow/release-disposition.txt`'s header and
-  `.claude/commands/close.md` also carry three forms;
-  `lifecycle-kit/templates/stages/close.md` was corrected in-iteration, and
-  RELEASING.md was de-literalized to a citation at this close — so both known
-  stale copies are gone, but the restatement **shape** is untouched and the next
-  form added rots the same way.
-  **The placeholder-spelling half rides here too.** Prose splits between
-  `deferred:vX.Y.Z` (RELEASING.md, docs/install.md, the check-release-bump
-  fixtures) and `deferred:<version>` (the disposition header, the kit SPEC).
-  `scripts/check-release-bump.sh` settles which is honest: it matches
-  `deferred:v*` and strips `deferred:v`, so a literal `v` immediately after the
-  colon is **required**. The `<version>` form is not wrong but hides that
-  requirement inside the placeholder, and it is the spelling the owning SPEC uses.
-  Enforcement-first ranks removing the duplication above gating it and
-  de-literalization puts the value in the owning SPEC with prose citing the name,
-  so the unit is one consolidation rather than five point fixes plus a
-  restatement gate.
-  **Ruled at scope 2026-08-03, promoting this entry: a vendored template cites
-  its kit SPEC, and the standalone-usability worry does not survive its own
-  premise.** The open call was how much a vendored template may cite rather than
-  restate before a consumer who has not read the kit SPEC loses the thread. It is
-  settled by the two always-loaded rules already named above — de-literalization
-  and content-tiering — against a fact about vendoring: a kit ships its `SPEC.md`
-  (the kit-landing checklist requires it), so a vendored consumer *has* the owner
-  and the citation resolves in their tree. "Has not read" is therefore a reading
-  cost, never an absent surface, and paying it once beats maintaining five copies
-  that drift. Restatement stays available only where a form is load-bearing at
-  the point of use; the placeholder spelling above is such a case, since
-  `scripts/check-release-bump.sh` requires the literal `v`.
-  `check-shim-restatement` cannot reach this class — a restatement that has
-  *diverged* no longer matches its owner's wording.
-  **Cost while deferred:** each surviving copy is a place the next grammar change
-  must be hand-propagated, with no oracle over the propagation.
-  Debt: converges wording on names the spec already carries; adds no governed
-  name unless the consolidation mints a citation convention.
-  Filed 2026-08-01 at close from the gap inbox — scope's narrower RELEASING.md
-  filing and align's spelling filing both supersede into this entry.
-
 - **installer-upgrade-smoke-arm** — `installer/consumer-smoke/run-smoke.sh`
   packs a single `$VERSION` and asserts the same-version re-run leaves the tree
   unchanged (idempotence). The **cross-version** upgrade path — `init.sh`'s
@@ -3307,5 +3237,7 @@
 - native-artifact-publish-path
 - native-artifact-install-path
 - install-path-gnu-userland-undeclared
+- release-bump-deferred-floor-unenforced
+- release-disposition-grammar-consolidation
 
 ## Lessons Learned

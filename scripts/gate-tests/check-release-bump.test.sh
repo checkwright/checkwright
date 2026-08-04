@@ -142,6 +142,25 @@ check_deferral "single-note-deferral-red" "$h" \
     'alpha release deferred:v0.2.0 — held back
 ' 1 "single-note tree cannot ride it out"
 
+# I' — a deferred floor above what a non-patch bump reaches: the gap
+# release-bump-deferred-floor-unenforced named. patch_only is false (nmin
+# differs), so the phase-B block above never fires, and the numeric floor is
+# the only thing that can catch a deferred major discharged as a minor.
+l="$tmp/deferred-minor-under-floor"
+write_note "$l/posts" "0.1.0" "None." "None."
+write_note "$l/posts" "0.2.0" "None." "None."
+check_deferral "outstanding-deferral-minor-under-floor-red" "$l" \
+    'alpha release deferred:v0.3.0 — held back
+' 1 "falls below an outstanding deferred release (v0.3.0)"
+
+# J' — the same higher deferral, but the bump clears it numerically: clean.
+m="$tmp/deferred-minor-clears-floor"
+write_note "$m/posts" "0.1.0" "None." "None."
+write_note "$m/posts" "0.3.0" "None." "None."
+check_deferral "outstanding-deferral-minor-clears-floor-clean" "$m" \
+    'alpha release deferred:v0.3.0 — held back
+' 0 "inheriting outstanding deferral v0.3.0"
+
 # --- the In brief presence assertion, and the predicate that arms it ---------
 # It binds a note under composition (declared version carries no tag) and is
 # dormant on a published note, which is what keeps the historical corpus free of
@@ -216,5 +235,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-release-bump.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, and passes a minor; the In brief presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged)"
+echo "check-release-bump.test: ok (absent Behavior-changes section fails closed; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, passes a minor that clears it, and reds a minor bump the numeric floor still sits above; the In brief presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged)"
 exit 0

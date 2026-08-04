@@ -85,7 +85,9 @@ section_bullets() {  # $1=file  $2=section name; emits the bullet count, status 
     return 0
 }
 # spec: docs/install.md §The upgrade contract — the In brief presence assertion binds a note under composition; a note published before the section existed is history and is not retro-fitted
-if ! git rev-parse -q --verify "refs/tags/v$newest_v" >/dev/null 2>&1; then
+under_composition=0
+git rev-parse -q --verify "refs/tags/v$newest_v" >/dev/null 2>&1 || under_composition=1
+if [[ "$under_composition" -eq 1 ]]; then
     in_brief_state="asserted"
     section_bullets "$newest_f" "In brief" >/dev/null \
         || { echo "check-release-bump: newest note $newest_f is under composition (v$newest_v carries no tag) and has no 'In brief' section — the 30-second human read is a fixed section, not optional (docs/install.md §The upgrade contract owns the note grammar)" >&2; exit 2; }
@@ -111,6 +113,15 @@ if [[ "$patch_only" -eq 1 && ( "$tg" -gt 0 || "$rk" -gt 0 || "$bc" -gt 0 || -n "
     [[ "$bc" -gt 0 ]] && echo "  $newest_f: $bc behavior-change bullet(s)"
     [[ -n "$deferred_floor" ]] && echo "  $DISPOSITION_FILE: an outstanding deferred release (v$deferred_floor) whose unconsumed criteria this note inherits"
     echo "  help: bump the minor instead (re-key the note's 'release:' and re-tag the plan), or move the declared work out of this release's note."
+    exit 1
+fi
+
+# spec: docs/install.md §Versioning — the floor's second input binds the next
+# qualifying note numerically, gated on under_composition (the In brief
+# assertion's own "not retro-fitted against history" rule).
+if [[ "$under_composition" -eq 1 && -n "$deferred_floor" ]] && [[ "$(printf '%s\n%s\n' "$deferred_floor" "$newest_v" | sort -V | tail -n1)" == "$deferred_floor" && "$newest_v" != "$deferred_floor" ]]; then
+    echo "check-release-bump: v$newest_v falls below an outstanding deferred release (v$deferred_floor) recorded in $DISPOSITION_FILE — docs/install.md §Versioning: a later note may not fall below that version:"
+    echo "  help: bump to v$deferred_floor or above, or discharge the deferral with a disposition line releasing at or above it."
     exit 1
 fi
 

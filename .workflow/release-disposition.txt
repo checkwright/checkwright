@@ -1,4 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
-# One line per iteration at its release boundary, close-written:
-#   <iteration> release <version|none|deferred:<version>> — <one-line basis>
+# One line per iteration at its release boundary, close-written; the line
+# grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
