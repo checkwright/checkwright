@@ -4,9 +4,4 @@
 
 ---
 
-native-artifact-path scope ae6c8311 2026-08-03
-native-artifact-path spec a6ec324a 2026-08-03
-native-artifact-path align adc0a906 2026-08-03
-native-artifact-path build acc93604 2026-08-04
-native-artifact-path validate ac2153f3 2026-08-04
-native-artifact-path close a2ee3642 2026-08-04
+— scope a68b891d 2026-08-04
