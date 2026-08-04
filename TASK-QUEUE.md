@@ -14,45 +14,6 @@
 
 ## Technical Debt
 
-- **stage-session-ruling-class** — reversing a ruling is operator-class.
-  **Operator-directed filing 2026-08-03.** Add to the escalate-versus-decide roster in
-  `.claude/agents/stage-session.md` and lifecycle-kit's lead template: **any action that
-  reverses, demotes, or re-scopes a trajectory objective or a recorded operator ruling is
-  operator-class — escalate, never rule, urgency notwithstanding.**
-  **Grounds, both from this iteration and both instructive because neither was sloppy:**
-  the 2026-08-02 autonomous unport ruling, and the 2026-08-02/03 spec inversion. Each was
-  technically well-grounded on the evidence available to the session that made it, and
-  each was strategy-reversing. A rule that only catches bad reasoning would have caught
-  neither.
-  **Debt-shaped, so a later scope promotes it without an amendment:** the ruling is closed
-  and the deliverable is prose in existing rosters — no script, knob, convention, tag, or
-  contract another component must honor.
-  **It ships in a kit**, so it is a product rule rather than repo housekeeping: the lead
-  template is lifecycle-kit's, and every consumer running the lifecycle inherits the class.
-  **Cost while deferred:** the roster a stage session reads names scope, envelope and
-  cross-component gaps as escalation classes and does not name this one, so the next
-  well-grounded reversal has the same clear path the last two had.
-  Filed 2026-08-03 by spec, on operator-directed intake.
-
-- **lossless-compression-codification** — the standing rule has no surface.
-  **Operator-directed filing 2026-08-03.** Land it in queue-kit/SPEC.md beside
-  §check-queue-entry-budget: **compression relocates to a linked entry, never drops**, and
-  **a ruling the operator restates from memory is filed as a recording entry in the
-  moment**.
-  **Grounds, all from one entry:** compressing the port parent dropped the Rust-versus-Go
-  choice, the dogfood question, and "distribution is the hard part, not the language" —
-  each restored later from memory, twice in one day, because no surface carried them.
-  `native-gate-language-ruling` and `bash-portability-floor-costing` are the recording
-  entries that rule names, and both were filed after the loss rather than in the moment.
-  **Distinct from `queue-entry-evidence-tier`, which stays separate:** that entry asks how
-  a reader *knows* detail was cut; this one states what an author does instead of cutting.
-  Neither answers the other, and both live under the same cap the budget gate enforces.
-  **Debt-shaped, so a later scope promotes it without an amendment:** the rule is closed
-  and what it needs is prose in a SPEC section that already exists.
-  **Cost while deferred:** the rule is enforced by whoever remembers it, which is the
-  failure mode it exists to name.
-  Filed 2026-08-03 by spec; the compression half of operator-directed intake.
-
 ## Deferred
 
 - **powershell-installer-surface** [design-pending] — a native Windows install path.
@@ -3184,5 +3145,7 @@
 - consultation-landing-contract
 - incident-recurrence-promotion-signal
 - init-claim-stickiness
+- stage-session-ruling-class
+- lossless-compression-codification
 
 ## Lessons Learned

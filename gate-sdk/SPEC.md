@@ -689,9 +689,8 @@ and each was then restated from memory rather than read — so this subsection i
 the two of them landing where the component that depends on them can be read
 alone. Reading them does not reopen them. The project-wide register of closed
 rulings is TRAJECTORY.md, which points here for these two rather than restating
-them; the authoring rule that would have prevented both losses is
-`lossless-compression-codification`'s to state, and that is not this section's
-work.
+them; the authoring rule that would have prevented both losses is stated where
+it belongs, queue-kit/SPEC.md §check-queue-entry-budget, rather than here.
 
 **The substrate language is Rust — ruled 2026-08-02, final.** The alternative
 weighed and refused is **Go**, on three grounds: larger binaries, poorer memory

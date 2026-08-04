@@ -854,6 +854,21 @@ claim an exception are the likeliest ungoverned amendments. A conditional cap
 collapses back into authorization anyway, or it is the self-issued exemption
 the delegation doctrine already names as the standard failure mode.
 
+**A ruling the operator restates from memory is filed in the moment.** The
+compression rule above is an authoring contract, so a break in it is silent, and
+it surfaces in one recognisable form: the operator supplies a closed decision
+from memory because no surface carries it any more. That restatement is the
+moment the content is in hand and the cheapest it will ever be, so it is filed
+*then*, as a **recording entry** — never noted for a later pass. Deferring the
+filing is not a cheaper version of it: the ruling stays exactly where it was
+lost from, and the next session pays the same restatement over again. A
+recording entry is the queue's holding pen for a decision in flight, never its
+home; its deliverable is the ruling landed in the surface that owns it, one
+owner per fact as everywhere else, and the entry is done when that surface
+carries it. The gate cannot hold this either, for the same reason it cannot hold
+compression: nothing distinguishes a sentence that was recalled from one that
+was read.
+
 ### check-queue-wrap
 
 Invariant: no line exceeds the `QUEUE_KIT_WRAP_BUDGET` gate floor (default

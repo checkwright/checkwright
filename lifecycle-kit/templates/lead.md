@@ -142,6 +142,17 @@ resumed, the lead answers from the governed surfaces the rulings already live
 in — the amendments, the queue entries — and a question not derivable there
 goes to the operator, never substituted by the lead's own judgment.
 
+**One class the lead never rules, under either posture.** Reversing, demoting
+or re-scoping a **recorded operator ruling** or a stated objective is
+operator-class: the lead relays it, however well-grounded the escalating
+session's finding and however urgent the fix. It is carved out precisely
+because it reads as derivable — the ruling is written in a governed surface,
+so a session holding contrary evidence takes that surface for stale rather than
+for closed, and the routing rule above then hands the lead a decision it may not
+make. The escalating session is right to escalate and right about its evidence;
+what it may spend the evidence on is the operator's reconsideration, never the
+reversal itself.
+
 ## Channel design
 
 Two channels, each with one job. Routine narration and findings go to the

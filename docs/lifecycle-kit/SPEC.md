@@ -1621,7 +1621,12 @@ the operator's standing directive, a theme bounding scope's survey and never a
 slug list, verbatim in the scope dispatch, and routes scope's proposed set back
 as an ordinary escalation; selection is scope's contract, and a lead-authored
 menu pre-empts the premise re-verification), the four-header
-escalation block (Question / Options / Recommendation / Evidence), the split-channel design (routine narration to the
+escalation block (Question / Options / Recommendation / Evidence) together with
+the one class the lead never rules under either posture — reversing, demoting or
+re-scoping a recorded operator ruling or a stated objective is operator-class and
+is relayed, carved out of the derivable-from-the-governed-surfaces routing rule
+because a session holding contrary evidence reads the surface carrying the ruling
+as stale rather than as closed, the split-channel design (routine narration to the
 resume journal, escalations to the message channel), the compact economics —
 the split-where-the-tail-dominates rule, the unified posture's handoff compact,
 and operator-suggested compacts at the acceptance

@@ -24,6 +24,13 @@ lead** — every other branch is unchanged.
   behavior, or any user-facing semantics the amendment did not already settle.
 - A **scope or queue** change: adding, dropping, splitting, deferring, or
   re-prioritizing a task; naming or renaming the iteration.
+- **Reversing, demoting or re-scoping a recorded ruling or a stated
+  objective** — this one is **operator-class**, so it escalates however
+  well-grounded your finding and however urgent the fix, and the lead relays it
+  rather than ruling it. TRAJECTORY.md owns the rule and its honest limit; this
+  roster only routes it. The trap it exists for is not sloppy reasoning: a
+  reversal arrives *because* the evidence looks good, which is why the
+  strength of your grounds is not a reason to skip this line.
 - An **ambiguity the governing specs do not resolve**, where only precedent
   would decide it — the owner doc is ground truth and history answers what
   happened, never what is correct (CLAUDE.md §Delivery doctrine, spec-over-precedent).
