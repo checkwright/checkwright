@@ -227,6 +227,38 @@ ptmiss="$(ptkpi "$work/no-such-price-table.tsv")"
 [[ "$(grep -c '^lead' <<<"$ptmiss")" -eq 1 ]] || fail "with no table the KPI emits one row, not an expiry row for a table that is not there: $ptmiss"
 grep -q 'n/a (no price table)' <<<"$ptmiss" || fail "absent price table must degrade fail-visibly: $ptmiss"
 
+# spec: drift-kit/SPEC.md §Testing — kpi-incident-recurrence over purpose-built queues:
+# the sum across declarations, the highest-count slug, the trend fragment, and the two
+# degradations. Fixture-stable, like kpi-price-table-age: it reads a file the fixture writes.
+irkpi() { DRIFT_KIT_QUEUE_FILE="$1" bash "$SMOKE_KIT_ROOT/kpis/kpi-incident-recurrence.sh" "${2:-}"; }
+
+ir_q="$work/recurrence-queue.md"
+cat > "$ir_q" <<'EOF'
+# TASK-QUEUE.md
+## Iteration: smoke
+## Deferred
+- **thrice** [design-pending] — a finding re-filed three times.
+  recurrence: thrice 2026-08-01 2026-08-02 2026-08-04
+- **once** [design-pending] — a finding re-filed once.
+  recurrence: once 2026-08-04
+## Done
+EOF
+set +e
+irout="$(irkpi "$ir_q")"; irrc=$?
+set -e
+[[ "$irrc" -eq 0 ]] || fail "kpi-incident-recurrence exited $irrc (advisory plugins always exit 0)"
+[[ "$(grep -c '^lag' <<<"$irout")" -eq 1 ]] || fail "kpi-incident-recurrence must emit exactly one lag row: $irout"
+grep -q '4 re-filing(s) recorded' <<<"$irout" || fail "the count must sum dates across every declaration, not count declarations: $irout"
+grep -q 'highest thrice at 3' <<<"$irout" || fail "the highest-count slug row is missing or wrong: $irout"
+[[ "$(irkpi "$ir_q" --trend)" == 'recur 4' ]] || fail "kpi-incident-recurrence --trend not 'recur 4': $(irkpi "$ir_q" --trend)"
+
+irnone="$(irkpi "$work/TASK-QUEUE.md")"
+grep -q 'n/a (no recurrence declaration in the queue)' <<<"$irnone" \
+    || fail "a queue with no declaration must degrade fail-visibly rather than reporting 0: $irnone"
+[[ -z "$(irkpi "$work/TASK-QUEUE.md" --trend)" ]] || fail "--trend must emit nothing when no declaration exists"
+grep -q 'n/a (no queue file)' <<<"$(irkpi "$work/no-such-queue.md")" \
+    || fail "an absent queue file must degrade fail-visibly"
+
 # spec: drift-kit/SPEC.md §Testing — the stage-economics join over a synthetic fixture set:
 # a WORKFLOW-STATE stamp file, a transcript whose basename normalizes to the stamped
 # session8, and a placeholder price table. Known tokens in, known trend line out.

@@ -71,6 +71,16 @@ deferred-filing model for ruled-but-unpromoted work).
    Lessons. The next iteration's scope entry refuses a non-empty inbox
    (§bin/enter-stage.sh), so an undrained gap blocks the boundary rather than
    crossing it silently.
+   **Stamp the recurrence, in addition to the disposition.** Resolve each
+   bullet's prose against the live slug set yourself — a bullet may carry a
+   `recurrence of <slug>:` marker from `bin/file-gap.sh`, but a raw append is a
+   legal fallback, so the marker is a convenience and this re-resolution is the
+   channel. On a match, append the bullet's date to that entry's `recurrence:`
+   declaration (creating the line when absent), in this same queue-writing
+   commit — never *instead of* the bullet's own disposition. It is idempotent per
+   (slug, date): a slug already carrying today's date gains nothing. A slug that
+   resolves only in the done section is not a recurrence — the finding recurred
+   after its fix landed, which is a new defect, and it files as one.
 3. **Sweep the inbound triage surfaces** — run `bin/close-surfaces.sh` and
    disposition every row (§The close-surface roster). The roster is derived, not
    enumerated here or in the binding below: a `forced=` row has a structural

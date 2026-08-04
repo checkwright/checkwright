@@ -212,6 +212,20 @@ Lag:
   line count of the knowledge-friction log (§The knowledge-friction loop).
   Lag by construction: only what a session *noticed and logged* is counted,
   so the value lower-bounds the real rate.
+- **kpi-incident-recurrence** — re-filings of the same finding, summed over the
+  queue's `recurrence:` declarations (queue-kit/SPEC.md §The tag algebra owns the
+  grammar), plus the highest-count slug. Like `kpi-deferred-age` it re-implements
+  the read rather than sourcing queue-kit's lib, under the same accepted residual
+  — one owner doc, two implementations, both carrying a `spec:` line citing the
+  owner. **The lag label is a measurement claim, not a priority one.** A
+  recurrence nobody files is uncounted, exactly `kpi-knowledge-friction`'s
+  structure, so lag is the honest fidelity tier even though the metric is highly
+  actionable. Actionability rides lifecycle-kit's pre-emption rule and its
+  `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`, never this report's weighting — which is
+  why the counter and the rule are two pieces and not one. A report-only signal
+  would have reproduced the defect the pair exists to fix: a faithful record no
+  ranking reads. `--trend` emits `recur <N>`; with no declaration anywhere it
+  degrades to `n/a (no recurrence declaration in the queue)`.
 
 The lag section is expected to be sparse — most lag measurements (review
 finding rates, detection latency) are manual tallies, and the kit ships no
@@ -298,7 +312,10 @@ commit that is not a close. Each closed iteration N owns the commit range
 from the root up to its close commit); no range-scoped column reads HEAD, so an
 interstitial commit — filed or hotfixed after a close, before the next scope —
 falls into the *next* iteration's range and surfaces only when that iteration
-closes, leaving every published row byte-identical until a new close lands.
+closes, leaving every published row byte-identical until a new close lands. That
+sentence is range arithmetic: it is descriptive of a commit that happens, and
+*when* one may legitimately be made is lifecycle-kit/SPEC.md §Deviation
+transitions' interstitial-mitigation rule, which leaves this accounting unchanged.
 Totals conserve across rows: every commit up to the last close belongs to
 exactly one range. The extractor reads no now-relative field (no age-from-today)
 either, so re-emission over an unchanged closed history is byte-identical —
@@ -884,7 +901,13 @@ and whose `prices-valid-through:` has passed reads a fresh age row and an
 has not tested the feature: the age row is reassuring in exactly that case,
 which is the defect. The no-table degradation is asserted to emit its single
 `n/a (no price table)` row, and the report-wide one-row-per-registered-KPI
-assertion covers that shape from the other side. Gate-sdk's `check-shellcheck`
+assertion covers that shape from the other side. `kpi-incident-recurrence` is
+fixture-stable on the same grounds — it reads declarations out of a queue file the
+fixture writes — so `smoke/install.sh` drives it over a purpose-built queue and
+asserts the single lag row, that the count **sums dates across declarations**
+rather than counting declarations, the highest-count slug, the `recur <N>` trend
+fragment, and both degradations (a queue with no declaration, and no queue file at
+all) including the trend's silence under the first. Gate-sdk's `check-shellcheck`
 lints all kit sources as usual.
 
 ## Out of scope

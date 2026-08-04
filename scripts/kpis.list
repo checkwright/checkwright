@@ -18,5 +18,7 @@ kpi-queue-net-delta
 
 # Lag — weighted low; undercounts by construction. kpi-knowledge-friction reads
 # drift-kit's knowledge-friction loop (its capture convention + close triage);
-# n/a until this iteration's log has an entry.
+# n/a until this iteration's log has an entry. kpi-incident-recurrence reads the
+# queue's recurrence: declarations; n/a until close's drain stamps one.
 kpi-knowledge-friction
+kpi-incident-recurrence

@@ -12,55 +12,6 @@
 
 ## New Features
 
-- **incident-recurrence-promotion-signal** [spec: SPEC-recurrence.md] — a recurring incident's fix
-  stays deferred on merit prose no ranking reads, so recurrence never forces a
-  promotion decision.
-  **Operator-directed filing 2026-08-04, interstitial after close.** Two incident
-  families recurred across three-plus iterations while their fixes sat deferred. The
-  validate-producer race (`validate-producer-liveness-unobservable`,
-  `lead-dispatch-requires-completion-notification`,
-  `validate-verb-collision-and-check-routing` — the last already records firing in
-  two consecutive iterations, operator-caught both) recurred again this iteration.
-  The fork failure mode (`fork-dispatch-prohibition`, filed at the prior close)
-  re-fired one filing cycle later inside scope itself, verified 2026-08-04 from the
-  session transcripts: the deferred-queue survey agent dispatched its classify
-  fan-out as forks, each fork inherited the fan-out plan as its own and re-dispatched
-  it — nine fork dispatches, four-plus dispatch levels, operator-recovered.
-  **Why scope structurally cannot promote them.** The TRAJECTORY priority directive
-  bounds each survey to the port-track theme; the composition test then bundles by
-  shared surface, which lifecycle/delegation surfaces never share with that theme;
-  and the one aggregation scope runs (`bin/queue-edges.sh`) measures citation
-  density, not incidence. Recurrence lives only as prose amendments inside entries,
-  and the drift report counts defer-age, kfric and gate-backlog but no incident
-  recurrence — so "fired again" is captured faithfully and aggregated nowhere.
-  **Deliverable — three pieces, deliberately not a parallel hotfix track:** (1)
-  recurrence counted at the capture channel — a `file-gap.sh` filing matching a live
-  deferred slug becomes a dated machine-readable recurrence stamp on that slug, with
-  the drift report growing the derived incident column; (2) a pre-emption rule in
-  scope — a slug over the recurrence threshold enters the proposed unit set
-  regardless of theme, escalated for operator ruling via scope's existing escalation
-  shape, so the theme-versus-incident collision is decided rather than silently
-  resolved in the theme's favour; (3) the interstitial lane drift-kit already names
-  ("filed or hotfixed after a close") gets governed — a repo-local mitigation may
-  land interstitially while the entry stays open for the kit-shaped form, capped to
-  changes adding no governed name.
-  **Why not a hotfix track:** it violates scope-gated intake, contends on stage
-  surfaces, and most incident fixes are feature-shaped, so a "hotfix" of them is an
-  unreviewed iteration; the lane half-exists, the missing part is the signal.
-  **Why it needed design:** the recurrence grammar (lead-line field versus dated
-  body line), the threshold, and which SPEC owns each piece (queue-kit the grammar,
-  drift-kit the counter, lifecycle-kit the scope rule) are cross-kit rulings. The
-  counter is the oracle the promotion discipline lacks — a rule that relies on scope
-  noticing recurrence prose is the same unoracled prose fix one level up, the
-  pattern `validate-verb-collision-and-check-routing` already proved recurs.
-  **Cost while deferred:** the port directive silently outranks every recurring
-  incident, the sole detector stays the operator, and each recurrence re-pays
-  recovery — three validate restores once, a runaway fork cascade this time.
-  **Operator-ruled into iteration `ruling-capture-contracts` 2026-08-04** — the counted
-  recurrence-signal half; `/spec` authors this entry's amendment and promotes it.
-  Filed 2026-08-04 on operator direction after close, under the sanctioned
-  direct-filing exception; grounds verified against transcripts and the queue.
-
 - **init-claim-stickiness** [spec: SPEC-claim.md] — non-destructive lasts exactly one upgrade.
   **Reproduced end to end 2026-08-04** — three packed versions, scratch consumer — while
   building `installer-upgrade-smoke-arm`. At v1 the manifest owns a vendored file; the adopter
@@ -3257,5 +3208,6 @@
 ## Done
 
 - consultation-landing-contract
+- incident-recurrence-promotion-signal
 
 ## Lessons Learned

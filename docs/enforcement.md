@@ -145,6 +145,7 @@ leaves its section absent.
 | [drift-kit](drift-kit/index.md) | kpi-price-table-age |
 | [drift-kit](drift-kit/index.md) | kpi-queue-net-delta |
 | [drift-kit](drift-kit/index.md) | kpi-knowledge-friction |
+| [drift-kit](drift-kit/index.md) | kpi-incident-recurrence |
 
 ## Guards
 

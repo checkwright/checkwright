@@ -317,6 +317,50 @@ comfortably a sentence, and needing no block-end rule a reflow could silently
 truncate. `check-roadmap-fresh`'s assertion C makes the tag and the declaration
 mandatory for each other in both directions.
 
+An entry that has been **re-filed** carries a second declaration on the same
+pattern, `recurrence: <slug> <YYYY-MM-DD> [<YYYY-MM-DD>…]` — one indented body
+line naming the entry's own slug, then one date per re-filing, appended in order
+and never rewritten. The initial filing is not a recurrence and is not listed, so
+the count is the number of dates. It is a declaration rather than a tag for the
+reasons the paragraph above gives: its readers scan a line of its own, and it
+marks no move across a pending/ready boundary, so it fails canon-kit's
+further-tag test. `check-tag-lead-line` does not govern it, and it cannot collide
+with the bracket scans.
+
+The **self-naming slug field is mechanism, not decoration**. `check-queue-hygiene`
+rejects any exact-duplicate non-blank line across the whole file, unnormalized, so
+a slug-free `recurrence: <date>` on two entries stamped the same day would red the
+gate — and same-day recurrence on two entries is exactly the case the declaration
+exists to record. Naming the slug makes the line unique by construction. It also
+makes the declaration resolvable by one anchored grep with no entry-boundary
+parsing, which is what lets its two readers — lifecycle-kit's scope pre-emption
+rule (lifecycle-kit/SPEC.md §Layout and configuration,
+`LIFECYCLE_KIT_RECURRENCE_THRESHOLD`) and drift-kit's `kpi-incident-recurrence`
+(drift-kit/SPEC.md §Bundled KPIs) — each read it without depending on the other's
+kit. Self-citation is already narration rather than an edge (above), so the field
+costs no new rule. That one-grep property is also why **no `bin/queue-index.sh`
+recurrence mode exists** — the obvious home, refused: drift-kit could not call it
+without the cycle its own KPI already records, which would leave lifecycle-kit's
+rule as the only caller, and §bin/queue-index.sh already resists a further mode on
+the grounds that folding jobs together gives one tool two output grammars.
+
+**One line with appended dates, not one line per recurrence.** The per-recurrence
+form is byte-unique on the (slug, date) pair and is refused anyway: it grows an
+entry linearly against `check-queue-entry-budget`'s cap, so a *machine* writer
+could push a deferred entry past that cap and red some later, unrelated session's
+commit — and the cap's remedy is authorization-gated (§check-queue-entry-budget: a
+session blocked by it does not self-serve the split). The single-line form costs
+one entry line forever regardless of count. Its own ceiling is
+`check-queue-wrap`'s budget, reached after a handful of dates on a long slug, and
+reaching it is the *correct* complaint: a slug recorded as recurring that many
+times without anyone promoting it is a governance failure, surfaced loudly rather
+than absorbed.
+
+Unlike the `relates:` declaration refused above, no corpus needs migrating. The
+line is **machine-written** by the closing stage's gap-inbox drain
+(lifecycle-kit/SPEC.md §The committed gap inbox) and hand-read; an entry with no
+declaration is simply an entry that has not recurred.
+
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`
 plus `check-tag-lead-line` read that section's lead lines too. That section is

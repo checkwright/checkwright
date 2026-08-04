@@ -55,6 +55,20 @@ and the proposed unit set is escalated for ruling before promotion: to the lead
 under the split posture, to the user directly under none — the stage's ordinary
 stop. The destination changes; the proposal step does not.
 
+A **deferred** entry whose recurrence count has reached
+`LIFECYCLE_KIT_RECURRENCE_THRESHOLD` enters the proposed unit set **regardless of
+theme**, and rides that same escalation. The directive still bounds the survey;
+what it may no longer do is silently outrank a counted recurrence. The count is
+the number of dates on the entry's `recurrence:` declaration
+(queue-kit/SPEC.md §The tag algebra) — one anchored grep over the deferred
+section, no tool and no queue-kit dependency. It is scoped to deferred entries
+because promotion is the decision it forces; an entry already active is being
+built. **The collision is decided, not resolved in the theme's favour**: the rule
+does not promote, it puts the unit in front of the authority this stage already
+escalates to. An automatic promotion would be a second intake path around
+scope-gated intake, and the failure this rule answers was never that the ruling
+went the wrong way — it was that the collision never reached anyone.
+
 **Weigh the iteration's cost before opening it — the economic composition test.**
 A lone sub-threshold unit may not justify a whole iteration's fixed cost: either
 bundle related-surface deferred entries into the iteration, or argue the unit is

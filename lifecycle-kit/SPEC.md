@@ -208,6 +208,31 @@ is a successor iteration: a post-close defect files as a debt entry and the
 follow-up iteration proceeds normally; the closed iteration's record stays
 immutable.
 
+**The interstitial mitigation** is the shape that fits *between* a close and the
+next scope. A repo-local mitigation for a recurring incident may land directly in
+that window while the incident's queue entry stays open for the kit-shaped form.
+One cap makes it admissible: **it adds no governed name** — canon-kit's
+feature/debt litmus read the other way (canon-kit/SPEC.md §The amendment
+lifecycle, where a task adding any name to a governed surface is a feature and
+needs an amendment). So an interstitial landing is admissible exactly when it is
+debt-shaped; anything feature-shaped waits for scope. The entry stays open either
+way, because the mitigation is repo-local and the entry's deliverable is not. Like
+every shape here it introduces no tooling, state, stamp grammar or tag — the cap
+is an existing litmus and the landing is an ordinary commit. It **widens Reopen
+after close** rather than competing with it: routing a post-close defect to a debt
+entry and a normal follow-up iteration is the right answer for a first occurrence
+and the wrong one for the fourth, and the fourth is now countable
+(queue-kit/SPEC.md §The tag algebra, the `recurrence:` declaration). The commit
+accounting already holds and needs no change — an interstitial commit falls into
+the *next* iteration's range and surfaces when that iteration closes
+(drift-kit/SPEC.md §The published-evidence extractor).
+
+**A parallel hotfix track is refused**, recorded here so it is not re-proposed: it
+violates scope-gated intake, it contends on live stage surfaces, and most incident
+fixes are feature-shaped — so a "hotfix" of them is an unreviewed iteration. The
+lane this shape governs already half-existed; what was missing was the signal that
+says when to use it.
+
 **The close-merge** is the concurrent-close shape, and like the others it
 composes existing mechanism (the merge-supersede rule of §Multi-operator
 semantics, not new tooling). Iteration boundaries serialize on the integration
@@ -371,6 +396,16 @@ the clause's reader is a human or agent rather than a gate.
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by `bin/file-gap.sh`,
   its `merge=union` attribute verified by `check-merge-attrs`, drained by the
   close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
+- `LIFECYCLE_KIT_RECURRENCE_THRESHOLD` — positive integer, default `2`; the
+  recorded re-filing count at which a **deferred** entry enters the scope stage's
+  proposed unit set regardless of the standing directive's theme (the pre-emption
+  rule, §templates/stages/). Two recorded re-filings is a third incidence of the
+  same finding. It is a stated policy with a stated purpose rather than a derived
+  number, and a knob for that reason — `QUEUE_KIT_ENTRY_LINE_CAP`'s posture. The
+  count it is read against is the date count of the entry's `recurrence:`
+  declaration (queue-kit/SPEC.md §The tag algebra owns that grammar). That rule is
+  its only reader: queue-kit owns the declaration and reads no threshold,
+  drift-kit reports the count and applies no verdict.
 - `LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS` — the consumer's `close-surface:`
   declaration surfaces beyond the resolved kit roots (§The close-surface
   roster); default `*/SPEC.md`. It deliberately does **not** default to
@@ -503,7 +538,11 @@ friction, and routes here.
 **The surface.** `.workflow/gap-inbox.md` (knob `LIFECYCLE_KIT_GAP_INBOX_FILE`,
 §Layout and configuration) is a committed, append-only capture buffer. Grammar:
 a `# contract:` prose header, then one `- <YYYY-MM-DD> — <gap prose>` bullet per
-gap. Committed, not gitignored — a per-clone buffer fragments the backlog across
+gap, optionally carrying a **recurrence marker** between the date and the prose:
+``- <YYYY-MM-DD> — recurrence of `<slug>`: <gap prose>``. The single-backticked
+slug is queue-kit's existing in-body citation form (queue-kit/SPEC.md §The tag
+algebra), borrowed rather than re-spelled. Committed, not gitignored — a
+per-clone buffer fragments the backlog across
 operators, the finding that rules the gitignored friction log out as the channel.
 
 **The affordance.** `bin/file-gap.sh "<gap prose>"` (the `bin/kfric.sh` pattern:
@@ -512,6 +551,38 @@ bullet, seeding the contract header when the inbox does not yet exist. It is
 advisory tooling, not a gate — no fixture pair is owed; the raw append (a bullet
 line into the inbox) stays a legal fallback, the grammar being the surface's
 contract, not the writer.
+
+It also **resolves the prose against the live slug set** at capture and, on a
+match, stamps the recurrence marker into the bullet it was already writing. The
+live set is every column-0 `- **<slug>** —` entry bullet in the queue file
+*outside* the fixed-spelling `## Lessons Learned` section — that is exactly
+active, deferred, and a configured icebox — and it needs **no section knob of its
+own** because both exclusions fall out of grammar the kit already reads. The done
+section is excluded by construction: a done entry is a bare-slug line, outside the
+entry grammar queue-kit/SPEC.md §The queue format defines. Lessons is excluded by
+name, and must be: a lesson lead line is outside that grammar for every *gate*,
+but it may legitimately be *written* in the entry shape (`- **slug** [tag] —
+prose`), so a grammar-only scan would resolve a live lesson as a queue entry and
+stamp a declaration onto something that is not one. The `## Lessons Learned`
+literal is fixed spelling rather than config (queue-kit/SPEC.md §The tag algebra),
+and this kit already carries it — `bin/enter-stage.sh`'s boundary refusal and
+`check-lesson-disposition` both scan it.
+The done exclusion is the substantive half: a finding that recurs *after* its fix
+landed is a new defect, not a recurrence, and files as one. Resolution is
+lifecycle-kit's own awk over the
+queue — the shape `check-stage-entry` assertion B already takes — never
+queue-kit's `queue_live_slugs`, because reaching for it would close a cross-kit
+cycle. queue-kit/SPEC.md §The queue format states that as the general rule (a kit
+that cannot depend on queue-kit re-implements the predicate and both ends cite the
+owner section), and drift-kit's `kpi-deferred-age` records the same accepted
+residual.
+
+**The tool writes no queue file, and that is the load-bearing constraint on the
+whole channel.** This inbox exists precisely because a gap surfaced mid-stage has
+no committed place to land except the queue file a stage session is already
+contending on. A `file-gap.sh` that stamped a `recurrence:` declaration onto a
+queue entry would do the one thing the inbox was built to prevent. The queue write
+therefore belongs to the closing stage's drain, which writes the queue anyway.
 
 It also **warns at the point of capture**, reading the cursor
 (`lifecycle_current_stage`) to say which consequence the filer is buying: an
@@ -559,9 +630,29 @@ kit is vendored. Consumers: the close skill's drain step (§templates/stages/)
 dispositions every bullet — promoted to a deferred `[design-pending]` entry,
 fixed inline that session, or discarded with cause in the close commit message —
 then truncates the inbox to its header; the boundary refusal reads emptiness at
-the next scope entry as the backstop. Each bullet's two fields have named
-readers: the date feeds close's staleness judgment, the prose is the disposition
-body.
+the next scope entry as the backstop.
+
+That drain step is also the **sole producer** of the `recurrence:` declaration
+(queue-kit/SPEC.md §The tag algebra): a bullet naming a live slug stamps a
+recurrence date onto that entry's declaration — creating the line when absent,
+appending the date when present — **in addition to** its ordinary disposition,
+never instead of it. It is reachable at every close with no enabling config,
+since the drain is already mandatory and the boundary refusal already forces it,
+and no mid-iteration path writes the declaration at all. The drain
+**re-resolves the prose itself** rather than trusting the capture-time marker,
+and that is what makes the channel whole: a raw append into the inbox stays a
+legal fallback, so a bullet filed without the tool carries no marker and must
+still be counted. The marker is a capture-time convenience; the drain is the
+channel. Stamping is **idempotent per (slug, date)** — two filings of one slug on
+one day record one date, the day being the only resolution the bullet's own
+grammar has, and inventing a finer one would claim precision this channel does not
+carry.
+
+Each bullet's three fields have named readers: the date feeds close's staleness
+judgment and becomes the stamped recurrence date, the prose is the disposition
+body and the drain's own resolution input, and the optional recurrence marker is
+read by the filer at capture (via stderr) and by the drain as a convenience it
+does not depend on.
 
 ## The close-surface roster
 
