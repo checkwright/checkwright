@@ -244,12 +244,18 @@ set — plus, where one was installed, the gate binary's target re-verified
 against its recorded digest **in place**, and any omitted members against the
 reason that caused them (§The gate binary).
 
-Those last two **report without setting the verdict**, and the asymmetry is
-deliberate rather than lenient. The exit status is the toolchain contract, and
-`init` gates its own precondition on it — so reddening here for a swapped or
-missing binary would block the `init` re-run that is the finding's own remedy.
-A binary that cannot be dispatched to is caught where it is dispatched from: the
-battery treats it as a harness error rather than a skip.
+Those last two **report without setting the exit status**, and the asymmetry is
+deliberate rather than lenient. The status is the toolchain contract, and `init`
+gates its own precondition on it — so reddening here for a swapped or missing
+binary would block the `init` re-run that is the finding's own remedy. A binary
+that cannot be dispatched to is caught where it is dispatched from: the battery
+treats it as a harness error rather than a skip.
+
+Not setting the status is not the same as staying quiet about it, and the
+verdict line says which state it is in. A run carrying an artifact finding
+reports the toolchain clean **and names the finding**, rather than signing off
+as plainly clean — a `doctor` that printed `DIGEST MISMATCH` above and `clean`
+below would be the surface teaching a reader to disbelieve the last line.
 
 `doctor` defines no floor of its own. It sources the toolchain roster out of
 its own `payload/` and renders whatever verdict that roster's predicate

@@ -55,6 +55,7 @@ render() {   # $1 = tool, $2 = verdict words -> one report line; sets FAILED whe
 }
 
 FAILED=0
+ARTIFACT_FINDING=""
 printf 'toolchain\n'
 for elem in "${PROBE_SET[@]}"; do
     tool_floor_parse "$elem"
@@ -94,11 +95,13 @@ else
         if [[ -z "$bin" || ! -f "$ROOT/$bin" ]]; then
             printf '  %-12s %s — recorded, but nothing at the path GATE_SDK_NATIVE_BIN names; re-run init\n' \
                 artifact "$artifact_target"
+            ARTIFACT_FINDING="the recorded gate binary is not on disk"
         elif [[ "$(digest_of "$ROOT/$bin")" == "$artifact_digest" ]]; then
             printf '  %-12s %s (verified in place)\n' artifact "$artifact_target"
         else
             printf '  %-12s %s — DIGEST MISMATCH, %s differs from what init wrote; re-run init\n' \
                 artifact "$artifact_target" "$bin"
+            ARTIFACT_FINDING="the installed gate binary does not match its recorded digest"
         fi
     fi
 
@@ -125,6 +128,12 @@ if (( FAILED )); then
     printf '\nDOCTOR: below contract\n'
     printf '  help: install or upgrade each tool reported above; the floors are the ones the gate battery needs to run, not preferences.\n'
     exit 1
+fi
+# spec: installer/README.md §doctor — the verdict line names an artifact finding rather than swallowing it: the exit status stays the toolchain contract, but a run that reported a digest mismatch must not sign off as plainly clean
+if [[ -n "$ARTIFACT_FINDING" ]]; then
+    printf '\nDOCTOR: toolchain clean, 1 artifact finding — %s\n' "$ARTIFACT_FINDING"
+    printf '  help: re-run init; it re-verifies the published digest and rewrites the binary.\n'
+    exit 0
 fi
 printf '\nDOCTOR: clean\n'
 exit 0
