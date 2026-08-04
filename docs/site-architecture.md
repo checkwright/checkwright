@@ -123,7 +123,9 @@ recoverable:
   docs/evidence-data.md`, `check-trajectory-fresh` byte-gates it), stale on a
   stage stamp or a release disposition. Its regen rides the close stage's
   Clear-Done commit, because the gate is blind at the enter-close commit by
-  construction.
+  construction. **The name collides and the two surfaces are unrelated:**
+  `check-trajectory-fresh` and `trajectory.sh` govern *this* generated page, never
+  the hand-authored `TRAJECTORY.md` ruling record, which no gate byte-checks.
 - **The roadmap projection** — `ROADMAP.md` is a root projection of the queue's
   curated `[roadmap:]` tags (`bash queue-kit/bin/roadmap.sh --write`,
   `check-roadmap-fresh` byte-gates its marker block), stale on any `[roadmap:]`
