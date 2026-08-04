@@ -1,1 +1,2 @@
 # contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one `- <YYYY-MM-DD> — <gap>` bullet per gap below (filed via lifecycle-kit/bin/file-gap.sh).
+- 2026-08-04 — installer: a path the payload stops shipping leaves checkwright.lock files[] correctly, but a later payload re-adding it can then overwrite an adopter edit silently — the same failure shape as init-claim-stickiness from a different cause (deliberate relinquish, not a claim refusal); bounded out of SPEC-claim.md delta 6
