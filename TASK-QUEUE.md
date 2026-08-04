@@ -16,6 +16,26 @@
 
 ## Deferred
 
+- **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
+  **Operator-ruled 2026-08-04, at the close of `ruling-capture-contracts`.** The drain that
+  stamps the `recurrence:` declaration takes gap-inbox bullets as its sole input, which the
+  amendment made the mechanism's single auditable producer. The open question is whether it
+  should also stamp a recurrence the closing stage resolves for itself.
+  **Grounds, from the iteration that built the mechanism:** `amendment-landing-citation-assertions`
+  genuinely re-occurred — a build session found a false citation in an amendment the audit
+  stage had passed as zero-divergence, which is that entry's own assertion (2) case and what
+  its cost field predicted. It reached close as dispatch prose rather than a bullet, so close
+  recorded dated prose evidence and no declaration. Faithfully captured, aggregated nowhere —
+  the exact failure the counter exists to end, one channel over.
+  **Why it needed a ruling rather than a fix in place:** widening the input widens what a
+  machine writer may stamp onto the queue, and the single-producer property is what makes the
+  count auditable. Both halves were deliberate, so which one yields is not close's to decide.
+  **Cost while deferred:** a recurrence observed anywhere but the capture channel misses both
+  `kpi-incident-recurrence` and scope's pre-emption threshold, so the theme keeps outranking
+  it silently — with the counter shipped, that silence now reads as evidence of no recurrence.
+  Filed by the lead on operator direction under the direct-filing exception; the operator ruled
+  file-a-unit over both keep-as-is and next-iteration-priority.
+
 - **powershell-installer-surface** [design-pending] — a native Windows install path.
   The installer is bash end to end, so native Windows is unreachable:
   `native-gate-binary-port` states the limit in its own words — "`init` hands to bash, so
