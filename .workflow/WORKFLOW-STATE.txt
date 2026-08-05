@@ -5,3 +5,4 @@
 ---
 
 install-claim-contract scope a25e29a5 2026-08-05
+install-claim-contract spec abb24bc9 2026-08-05
