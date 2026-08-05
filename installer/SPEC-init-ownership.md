@@ -12,6 +12,15 @@ the operator's envelope reversal of 2026-08-05), and
 `installer-config-seam-silent-revert` (promoted debt, same governed claim, same
 rewritten sentence).
 
+**This is a cross-component amendment.** It changes the contracts of three
+components — `installer/` (§init, §What init seeds, §The gate binary, §The
+manifest, §The consumer smoke), `gate-sdk/SPEC.md` §lib/inject.sh, and
+`doctrine-kit/SPEC.md` §install-doctrine — after the operator's ruling of
+2026-08-05 widened the envelope to cover the doctrine block (Delta 3b). It stays
+filed under `installer/` because the install-ownership claim is the question all
+eleven deltas answer; the other two components are reached by that claim rather
+than co-owning it.
+
 ## What changes
 
 ### The rule
@@ -140,11 +149,9 @@ non-destructive on a tree that has grown since" directly above the one arm of
 `recipe_seed` that has no such guard. Every sibling arm (`:52`, `:70`, `:75`,
 `:82`) does. The comment overclaims uniform behavior the function has never had.
 
-### Delta 3b — the doctrine block *(escalated, not settled here)*
+### Delta 3b — the doctrine block: the finding *(context for Deltas 8-10)*
 
-A **third** instance of the same class was found while verifying the two above,
-and it is not folded in because closing it properly leaves this amendment's
-envelope. `recipe_seed`'s doctrine-kit arm (`recipe.sh:87-90`) invokes
+A **third** instance of the same class. `recipe_seed`'s doctrine-kit arm (`recipe.sh:87-90`) invokes
 `doctrine-kit/bin/install-doctrine.sh` unconditionally on every run; that script
 (`:43`) hands the packaged digest to `gate-sdk/lib/inject.sh`'s
 `inject_marker_block`, which always rewrites the whole span between
@@ -161,24 +168,152 @@ grants — and silently in the strict sense: if the trim was the adopter's only
 edit to the agent file, the post-rewrite hash equals the recorded one and `claim`
 emits no `CHANGED` line.
 
-Two fixes with materially different envelopes, which is why this is escalated
-rather than decided:
+**Operator ruling, 2026-08-05: trim-preserving injection.** The envelope widens
+to a cross-component amendment, and the cost was accepted with it. The rejected
+alternative is recorded so it is not re-derived: an installer-side claim — `init`
+claiming `AGENT_FILE` before calling the doctrine arm and skipping on refusal —
+stays in one component, but the agent file is the file an adopter is *certain* to
+edit, so the doctrine block would stop updating after their first edit and a
+consumer whose newly vendored `DOCTRINE.md` gained a rule would red on
+`check-doctrine-registration` with no `init` path to fix it. It trades a silent
+revert for a stuck upgrade path, which is not the better failure.
 
-- **Installer-side claim.** `init` claims `AGENT_FILE` *before* calling the
-  doctrine arm and skips the call on a refusal. Stays inside this envelope and
-  touches one component — but the agent file is the file an adopter is
-  *certain* to edit, so the doctrine block would stop updating after their first
-  edit, and a consumer whose newly vendored `DOCTRINE.md` gained a rule would
-  then red on `check-doctrine-registration` with no `init` path to fix it.
-- **Trim-preserving injection.** The injector reads the existing block, captures
-  declared trims, and re-emits them — the round-trip `gate-sdk/bin/gen-pre-commit.sh`
-  already performs for `gen=manual` regions (`:44-58`, `:88-97`), so the pattern
-  is precedented in this tree rather than invented. It is the right design and it
-  changes **doctrine-kit's** `§install-doctrine` contract and possibly
-  `gate-sdk/lib/inject.sh`'s, making this a cross-component amendment.
+The ruling lands as Deltas 8-10 below. Its shape — which component owns which
+half — is spec's to author and is settled there.
 
-Until it is ruled, no delta here touches the doctrine arm, and the claim rewrites
-in Deltas 4 and 5 are worded so they do not assert the guarantee for it.
+### The agent file is the one path where `init` owns a *span*, not a file
+
+Stated here because Deltas 8-10 only make sense against it, and because no
+surface presently says it. Every other path in `files[]` is a whole file `init`
+wrote. `CLAUDE.md` is not: `recipe_seed` creates it only when absent
+(`recipe.sh:52` shape, via `init.sh:251-259`), `install-doctrine.sh` owns the
+span between its two markers on every run, and everything outside that span is
+the adopter's and is never touched.
+
+Two consequences follow, and both are properties rather than defects:
+
+- `claim`'s whole-file comparison reports the agent file as changed as soon as
+  the adopter edits *anywhere* in it. That report is true, and it does not stop
+  the span from being maintained — the injector runs before `claim` is consulted,
+  which is exactly why the ruled option keeps the doctrine block upgradable.
+- Reverting an **unsanctioned** edit *inside* the generated span is intended.
+  The declared trim is the sanctioned customization channel and, after Delta 9,
+  the only one preserved; a reworded bullet is not a supported edit and would red
+  `check-doctrine-registration`'s assertion C independently. Named so this bound
+  is not mistaken for the defect Delta 9 fixes.
+
+### Delta 8 — `read_marker_block` *(design-bearing)*
+
+`gate-sdk/lib/inject.sh` gains a second function,
+`read_marker_block <file> <begin> <end>`: it prints the inner content of an
+existing block (markers exclusive), prints nothing and exits 0 when the markers
+are absent, and exits 2 on a begin marker without its end — the same refusal
+`inject_marker_block` already makes (`:17-18`), so the two functions agree on
+what a malformed target is rather than each deciding for itself.
+
+**`inject_marker_block` is unchanged.** The round-trip becomes *read, compute,
+emit* in the caller — the shape `gate-sdk/bin/gen-pre-commit.sh` already uses for
+`gen=manual` regions — rather than a preserve-rule pushed down into the shared
+helper. That choice is the provenance seam doing real work here: the alternative
+of a preserve-regex parameter would have gate-sdk carrying one kit's marker
+vocabulary, shipping doctrine-kit's `doctrine-digest-trim` spelling to every
+consumer of a generic injector. The helper keeps owning **placement and
+retrieval** and learns nothing about what any caller preserves.
+
+### Delta 9 — the doctrine installer honors declared trims *(design-bearing)*
+
+`doctrine-kit/bin/install-doctrine.sh` reads the current block through Delta 8's
+function, harvests every
+`<!-- doctrine-digest-trim: <rule name> — <reason> -->` line in it, and then, for
+each methodology rule, emits **either** its bullet **or** — when that rule name
+is trimmed — the harvested marker line **verbatim, in the bullet's position**.
+In-place rather than appended, so the consumer's reason stays where the rule it
+answers would have been; the gate accepts the marker anywhere in the digest
+section (doctrine-kit/SPEC.md:104-110), so readability decides.
+
+Preserving the marker alone would not have been enough, and this is the part
+worth being explicit about: a re-emit that kept the trim *and* the bullet would
+satisfy the gate's assertions B and C while handing the consumer back the rule
+they removed — defeating the customization while appearing to honor it.
+Honoring the trim means substituting for the bullet.
+
+Four behaviors the contract fixes:
+
+- **No trims declared → byte-identical output to today.** Load-bearing rather
+  than incidental: without it every consumer's agent file churns on every
+  upgrade, and `claim` starts reporting a file nobody edited.
+- **A trim naming a rule the current doctrine no longer has** is carried
+  forward *and named in the report*. A rule renamed upstream then surfaces at
+  the re-vendor moment, which is the moment doctrine-kit's own
+  declared-not-silent design says the consumer's decision gets reconciled.
+- **Duplicate trims for one rule** — the first is emitted, the duplicate is
+  reported. Silently collapsing them would be the same class of quiet edit-loss
+  one layer up.
+- The action line `install-doctrine.sh` already echoes (`:44`) gains the count
+  of trims carried and any finding above, so the round-trip is observable in
+  `init`'s own output rather than only in the diff.
+
+**Contract text owed.** `doctrine-kit/SPEC.md` §install-doctrine gains the
+round-trip and its honest bound (the block is generated; the declared trim is the
+only preserved customization). `gate-sdk/SPEC.md` §lib/inject.sh gains
+`read_marker_block` and the sentence that the module owns placement and
+retrieval and no caller's vocabulary.
+
+### Delta 10 — the doctrine round-trip's acceptor *(design-bearing)*
+
+`gate-sdk/SPEC.md:1399-1401` already names the coverage tier for anything riding
+`inject.sh`: "a sourced library, not a gate — exercised end-to-end wherever an
+installer that rides it runs (doctrine-kit and lifecycle-kit `smoke/install.sh`)".
+So the assertion belongs in `doctrine-kit/smoke/install.sh` (`:16` already runs
+the installer) and nowhere new: install, declare a trim in the emitted block,
+re-run the installer, and assert the trim survives, its bullet is still absent,
+and `check-doctrine-registration` is green across the re-run. Today the second
+run silently restores the bullet and drops the marker, so this reds without
+Delta 9.
+
+Registering a gate instead was weighed and refused for the reason that SPEC
+section already gives: `inject.sh` is a sourced library with no gate surface, and
+inventing one for it would put a second coverage tier on a module whose tier is
+already decided.
+
+### Delta 11 — the release-note erratum *(design-bearing)*
+
+`docs/posts/2026-07-26-checkwright-v0-16-0.md:102-103` tells an adopter that on a
+re-run "the profile is re-read from your `checkwright.lock`, and files you have
+modified are **preserved and reported rather than overwritten**" — unqualified,
+in the voice of an upgrade instruction. It was false when published, and the post
+already carries an `**Erratum, added 2026-07-26.**` block (`:87`) for an unrelated
+defect, so the mechanism and its placement convention exist.
+
+**Scope, stated from this amendment's own findings rather than from the
+question that raised it.** The erratum covers **three** file classes, not one,
+and each was already false on the publication date:
+
+1. every kit's `templates/*-config.sh` copied into the gates directory — eight
+   kits ship one;
+2. `gate-sdk`'s `msg-patterns.list`, which reaches the `starter` profile and so
+   the *smallest* install;
+3. the doctrine digest block's declared trims, the customization
+   doctrine-kit's SPEC grants by contract.
+
+Dating verified rather than assumed: classes 1 and 2 landed in `af54e2b`
+(2026-07-26) — the very release this post announces — and the trim marker in
+`ec73bad` (2026-07-11), so all three predate publication.
+
+A fourth path to the same false sentence is **named separately and not merged
+into the three**, because its reachability differs: the roster defect (Delta 1)
+overwrites a modified file only in the window where a payload relinquishes a path
+and a later one re-adds it, whereas classes 1-3 fire on any bare re-run at the
+same version, with no upgrade and no `--force`.
+
+**Not softened, per the operator's ruling of 2026-08-05.** The erratum publishes
+while the fix is in flight, and that was accepted explicitly rather than
+tolerated. So it states plainly that the claim was wrong when published, and it
+may say the fix is in progress; it may **not** imply the fix has landed, and it
+may not hedge the admission into a caveat. The immutability convention governing
+dated posts (`CANON_KIT_TEMPORAL_EXEMPT_PATHS`) protects a post from being
+*rewritten* — the erratum block is how this corpus corrects a published claim,
+which is why the post already contains one.
 
 ### Delta 4 — the gate binary's replacement premise *(design-bearing)*
 
@@ -206,15 +341,9 @@ mechanical because the replacement text is determined by Deltas 1-4 — the
 judgment was spent there, and each site either restates the rule (rewrite to the
 new one) or points at it (leave the pointer, verify the target).
 
-One site inside it is **escalated rather than mechanical** and is excluded from
-the delta until ruled: `docs/posts/2026-07-26-checkwright-v0-16-0.md:99-105`
-tells an adopter that "files you have modified are preserved and reported rather
-than overwritten" — unqualified, and false for two file classes on the day it
-published. Dated posts are governed as immutable published artifacts
-(`CANON_KIT_TEMPORAL_EXEMPT_PATHS`), and that same post already carries an
-erratum block for an unrelated defect, so the precedent for correcting one
-exists. Whether a published claim that was wrong when published owes an erratum
-is a user-facing call no governing spec settles.
+The published release note is **not** in this delta: correcting a claim that was
+false when published is its own judgment and its own work class, so it is Delta
+11.
 
 ### Delta 6 — the smoke's relinquish arm *(design-bearing)*
 
@@ -306,6 +435,16 @@ existing field.
 | --- | --- | --- |
 | `recipe_config_seam_plan` — one `<src>\t<dest>` line per `templates/*-config.sh` | `installer/lib/common/recipe.sh`, called from `init.sh`'s per-kit seam loop on every non-`--dry-run` *and* `--dry-run` run | `init.sh` in the parent shell: `copy_in "$src" "$dest"` |
 | `recipe_seed`'s plan channel — the `<src>\t<dest>` line its gate-sdk arm emits in place of a copy | `installer/lib/common/recipe.sh`, called from the same loop | the same `copy_in` call site |
+| `read_marker_block <file> <begin> <end>` — the existing block's inner content | `gate-sdk/lib/inject.sh`, sourced by every agent-file injector; called on **every** `install-doctrine.sh` run, which `init` reaches through `recipe_seed`'s doctrine arm on every non-dry run — so its enabling path is the default install, not a flag | `doctrine-kit/bin/install-doctrine.sh`, which harvests declared trims from it before emitting |
+| the harvested trim set — `<rule name>` → the marker line verbatim | `install-doctrine.sh`'s harvest of `read_marker_block`'s output | `block()`, at the per-rule emit transition: a trimmed name emits its marker in place of its bullet |
+
+`read_marker_block` carries no fields of its own — it returns the block's text —
+and the harvested set's two fields both have named readers at named transitions:
+`<rule name>` is read by `block()` when deciding bullet-or-marker for that rule,
+and the marker **line** is read by `block()` when emitting it. Nothing else
+consumes either. `install-doctrine.sh`'s action line (`:44`) is the reader for
+the two findings Delta 9 adds (a trim naming no live rule; a duplicate), and
+`init` relays that line as part of `recipe_seed`'s output.
 
 Field readers, per the every-field-has-a-named-reader rule: `<src>` is read by
 `copy_in`'s `cp` (`init.sh:191`) and by nothing else; `<dest>` is read by
@@ -400,6 +539,38 @@ them on its own authority.
   new seam arm; the file header's `# spec:` (`:2`) enumerates the arms and gains
   them.
 
+**Deltas 8-10 — the doctrine round-trip (the cross-component half):**
+
+- `gate-sdk/SPEC.md` §lib/inject.sh (`:1385-1401`) — presently "one function,
+  `inject_marker_block`". It becomes two, and the section states that the module
+  owns placement and retrieval while block generation *and any preservation rule*
+  stay with the caller. Its coverage sentence (`:1399-1401`) already names
+  `smoke/install.sh` as the tier and needs no change beyond the new function.
+- `gate-sdk/lib/inject.sh` — Delta 8's site; the module header `# spec:` (`:2`)
+  and the per-function contract comment (`:4`) gain the second function.
+- `doctrine-kit/SPEC.md` §install-doctrine — the installer's contract gains the
+  trim round-trip, the in-place substitution rule, the no-trims-is-a-no-op
+  guarantee, and the two reported findings.
+- `doctrine-kit/SPEC.md` §check-doctrine-registration (`:104-110`) — assertion
+  B's declared-trim paragraph is **verified true and unchanged**; it is the
+  contract `init` was breaking, not a statement the fix alters. Cited by Delta 9
+  rather than rewritten.
+- `doctrine-kit/SPEC.md` §Out of scope (`:229-233`) — "a trim is declared, not
+  silent, so the gate holds the resident set and the doctrine in name-lockstep
+  modulo those declarations" is likewise true and unchanged, and after Delta 9 it
+  is finally true *end to end* rather than only of the gate. No edit; recorded so
+  build does not read the fix as contradicting it.
+- `doctrine-kit/bin/install-doctrine.sh` — Delta 9's site: `block()` (`:21-41`),
+  the invocation (`:43`), and the action line (`:44`).
+- `doctrine-kit/smoke/install.sh` — Delta 10's site (`:16` already runs the
+  installer).
+
+**Delta 11 — the published claim:**
+
+- `docs/posts/2026-07-26-checkwright-v0-16-0.md` — a second erratum block, in the
+  placement convention the existing one at `:87` sets, against the claim at
+  `:102-103`.
+
 **Verified as needing no change**, recorded so build does not re-open them:
 
 - `gate-sdk/SPEC.md` §upgrade-smoke (`:1639-1693`) — disclaims this territory
@@ -429,7 +600,12 @@ them on its own authority.
       component (`ls installer/SPEC-*.md`).
 - [ ] **Removals propagated** — grepped every spec for names this change
       retired (`under_kit`, `recipe_config_seam`, and the "stops shipping it"
-      rule); nothing dangles.
+      rule); nothing dangles. `inject_marker_block` is **not** retired — Delta 8
+      adds beside it and every existing caller keeps working unchanged.
+- [ ] **Cross-component merge** — the three components' sections merge together:
+      an `installer/README.md` that describes the trim round-trip while
+      `doctrine-kit/SPEC.md` does not (or the reverse) is the half-merge this
+      amendment's span makes possible.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
