@@ -235,9 +235,13 @@ directory beside the `gates.list` seeded there, and `init` sets
 `GATE_SDK_NATIVE_BIN` to that path in `<gates-dir>/gate-sdk-config.sh` — the
 optional persistent config seam gate-sdk's library already sources when it
 exists (gate-sdk/SPEC.md §Layout and configuration). `init` creates that file
-when it places an artifact; gate-sdk ships no config template, and adding one
-would be worse than writing the file here, since the template seam copies
-unconditionally and would overwrite an adopter's own overrides on every re-run.
+when it places an artifact, and gate-sdk ships no config template for it because
+**the seam file's content is resolved at install time rather than shipped**: its
+one line sets `GATE_SDK_NATIVE_BIN` to the path the artifact was actually placed
+at, and that path does not exist until selection has run. A static template could
+only be copied and then immediately rewritten — the same file written twice, with
+the copy contributing nothing. That is a property of the value, not of how the
+template seam happens to copy, so it does not expire when the copy changes.
 The knob's own default is unchanged and still names the crate's build output,
 because it is a **stable relative path** on purpose: the generated hook persists
 the emitted argv, so a machine-specific path baked into a tracked hook would make
