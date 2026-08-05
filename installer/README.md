@@ -441,6 +441,18 @@ the same owner.
 registered as a validate suite so a bit-rotted activation path is a red
 validate rather than a discovery at announcement.
 
+**Run it with the current directory inside the tree under test.** The script
+resolves that tree from its own path, while `scripts/pack-installer.sh` — which
+it invokes to build the payload — resolves the tree it packs from the current
+directory. Invoke a clone's copy by path from somewhere else and the two
+disagree silently: the run packs the *invoking* tree and asserts a green
+activation path for source the clone never contributed, printing an ordinary
+success. Use `env -C <clone>` for a second checkout or a worktree. The rule is
+stated as an invocation requirement because that is what it is under either
+resolution of the disagreement: today nothing detects it, and a version that
+refuses on a mismatch would refuse exactly the invocations this sentence tells
+you not to make.
+
 It packs the package, installs it **from the resulting tarball with
 `--offline`**, and drives a scratch consumer once per profile: `init`, then the
 battery must be green, then the manifest must agree with the tree it describes

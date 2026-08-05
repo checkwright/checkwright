@@ -2389,10 +2389,11 @@
   work it started, because the in-turn condition-waiting rule is not operative at
   the tier the session actually loads.
   recurrence: dispatched-session-waiting-rule-residency 2026-08-04
-  Observed 2026-08-02 and again 2026-08-04, both times the validate session starting
-  `run-validate.sh` in the background and ending its turn to wait — the failure
+  Observed 2026-08-02, 2026-08-04 and 2026-08-05 — every time the validate session
+  starting `run-validate.sh` in the background and ending its turn to wait — the failure
   delegation-kit/templates/agent-execution.md names under **Background +
-  notification, never poll**. Neither orphan landed harm (the lead found the second
+  notification, never poll**. The third fired through a dispatch prompt that named the
+  rule, as the second did. Neither orphan landed harm (the lead found the second
   alive by PID and waited on its exit condition), but a surviving orphan is the case
   that protocol calls the worse one: it keeps mutating shared files while the next
   actor moves against them.
@@ -3397,6 +3398,33 @@
   `gate-sdk-config.sh` it inspected on any tree that ever narrowed its profile, and a
   diagnostic that reports the wrong file confidently is worse than one that reports none.
   Filed 2026-08-05 by close, draining the gap inbox.
+
+- **poll-sleep-guard-steer** [design-pending] — polling to wait is the one half of the
+  never-poll rule that leaves a tracked artifact, and nothing reads it.
+  `bash guard-kit/bin/scan-prompts.sh` ranked bare `sleep` as this iteration's **top**
+  prompting pattern at 16 calls — a session waiting on background work by sleeping in the
+  foreground, roughly forty minutes of turns spent not-waiting-correctly. It is the same
+  rule `dispatched-session-waiting-rule-residency` records, approached from the opposite
+  side: that entry is a session ending its turn to wait, this is a session refusing to.
+  **Why this half is different, and why the difference is the whole entry.** That entry
+  states, correctly, that no gate can read a session's choice to *end a turn* — the act
+  leaves no tracked artifact. A **poll does**: it is a `Bash` call, on the exact surface
+  `scripts/bash-guard.sh` already reads and already steers (`cat`→Read, `sed`→Read, bare
+  allowlisted commands→undecorated). So the enforcement-first half that the turn-end class
+  honestly cannot have is available here, cheaply, and no entry has noticed that.
+  **Why `[design-pending]`:** a blanket `sleep` block is wrong. The sanctioned wait *is* a
+  condition loop, and this repo's own sessions run `until <cond>; do sleep N; done`
+  legitimately; a smoke or a probe may need a settle. So the rule has to separate a bare
+  foreground `sleep` from a sleep inside a condition loop, and decide whether the steer
+  names the notification channel, the harness's monitor form, or both — a guard-kit
+  contract question, since the rule is generic mechanism while the named better form is
+  consumer/harness vocabulary that must not become a kit literal (the provenance seam).
+  **Cost while deferred:** the cheapest available detector for a rule that has now fired in
+  three consecutive iterations goes unbuilt, and every polled wait bills a full-price turn
+  for a session doing nothing — paid per occurrence, on the tiered stages where long oracle
+  batteries are the whole work class.
+  Filed 2026-08-05 by close, from its own prompt-friction triage; scope-gated intake, so it
+  is filed rather than started.
 
 ## Icebox
 
