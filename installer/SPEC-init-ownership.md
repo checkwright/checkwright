@@ -249,9 +249,27 @@ Four behaviors the contract fixes:
 - **Duplicate trims for one rule** — the first is emitted, the duplicate is
   reported. Silently collapsing them would be the same class of quiet edit-loss
   one layer up.
-- The action line `install-doctrine.sh` already echoes (`:44`) gains the count
-  of trims carried and any finding above, so the round-trip is observable in
-  `init`'s own output rather than only in the diff.
+- **The report has two channels, and the split is load-bearing.** Each finding
+  above goes to **stderr**; the action line `install-doctrine.sh` already echoes
+  (`:44`) keeps stdout and gains the count of trims carried.
+  `recipe_seed`'s doctrine arm runs the installer under `>/dev/null`
+  (`recipe.sh:86`), and it must: `recipe_seed`'s own stdout is `init`'s
+  machine-read channel of seeded paths and plans, so a human-readable line
+  written into it would corrupt the manifest roster. Findings therefore ride the
+  one channel that survives the install path. The standing rule this instances,
+  worth stating because it will recur: **an installer a machine may drive puts
+  findings on stderr and narration on stdout** — and it stays silent on a clean
+  run, because stderr chatter on success is how a channel gets ignored.
+
+  *Corrected 2026-08-05, at build batch 2.* The first authoring of this bullet
+  claimed the action line made the round-trip "observable in `init`'s own output
+  rather than only in the diff", and named `init` as relaying it. Both were
+  wrong on a fact this amendment had already read and failed to apply — the
+  `>/dev/null` at `recipe.sh:86`. What the intent actually required was that **a
+  reconciliation the consumer owes never be silent on the install path**, which
+  stderr satisfies exactly. The trim *count* is genuinely not visible on the
+  `init` path, and that is now the contract rather than a shortfall: the carried
+  trims are visible where an adopter reads them, in the commit `init` makes.
 
 **Contract text owed.** `doctrine-kit/SPEC.md` §install-doctrine gains the
 round-trip and its honest bound (the block is generated; the declared trim is the
@@ -270,6 +288,18 @@ re-run the installer, and assert the trim survives, its bullet is still absent,
 and `check-doctrine-registration` is green across the re-run. Today the second
 run silently restores the bullet and drops the marker, so this reds without
 Delta 9.
+
+**That triad is the floor, not the ceiling — corrected 2026-08-05 at build batch
+2.** Delta 9 contracts *four* behaviors and this delta specified an acceptor for
+one of them, which was an under-specification here rather than latitude for
+build. Two of the four — the carried-and-reported orphan trim, and the
+first-wins-and-reported duplicate — had no automated acceptor at all until build
+extended the arm to them, correctly and inside this envelope: the amendment
+already asserts the behavior, and how widely a suite covers an asserted behavior
+is calibration. The fourth, the no-trims byte-identical no-op, already has its
+acceptor one level up — `installer/consumer-smoke/run-smoke.sh`'s per-profile
+"a re-run must leave the tree object identical" reaches the agent file with
+everything else, which is why it needed nothing new here.
 
 Registering a gate instead was weighed and refused for the reason that SPEC
 section already gives: `inject.sh` is a sourced library with no gate surface, and
@@ -442,9 +472,21 @@ existing field.
 and the harvested set's two fields both have named readers at named transitions:
 `<rule name>` is read by `block()` when deciding bullet-or-marker for that rule,
 and the marker **line** is read by `block()` when emitting it. Nothing else
-consumes either. `install-doctrine.sh`'s action line (`:44`) is the reader for
-the two findings Delta 9 adds (a trim naming no live rule; a duplicate), and
-`init` relays that line as part of `recipe_seed`'s output.
+consumes either.
+
+The two findings Delta 9 adds (a trim naming no live rule; a duplicate) have
+their reader on **stderr**, which `init` inherits unredirected — so the adopter
+running the install is the named reader, at the install transition. They are
+deliberately *not* read through `recipe_seed`: that function's stdout is `init`'s
+machine-read seeded-paths/plan channel, and `recipe.sh:86` sends the installer's
+stdout to `/dev/null` precisely so nothing human-readable can enter it. The
+action line's trim **count** therefore has no reader on the `init` path, and this
+amendment no longer claims one — its reader is whoever invokes
+`install-doctrine.sh` directly, and on the `init` path the carried trims are read
+from the commit `init` makes. (Corrected 2026-08-05 at build batch 2; the first
+authoring named `init` as a relay that `recipe.sh:86` makes impossible — a row
+naming a reader that does not read, which is the defect this section exists to
+prevent, authored into the section itself.)
 
 Field readers, per the every-field-has-a-named-reader rule: `<src>` is read by
 `copy_in`'s `cp` (`init.sh:191`) and by nothing else; `<dest>` is read by
