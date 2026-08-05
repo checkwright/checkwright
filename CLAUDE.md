@@ -178,8 +178,8 @@ here.
 - `installer/` is the published activation surface (bash inside, shipped over
   two transports from one payload — the Release tarball and the npm package),
   repo-root-governed, no owning kit; its layout is
-  installer/README.md. It must never carry `checks/` or `smoke/` — that
-  predicate is what makes a root directory a kit. Its payload is never
+  installer/README.md. Not a kit either, and must not become one — by the same
+  predicate stated under `native/` above. Its payload is never
   committed: `scripts/pack-installer.sh` assembles it out of tree from this
   repo's kit roots and stamps the version from the tag
   (`INSTALLER_PACK_TMP_DIR` its scratch knob, writing nothing in-tree).
