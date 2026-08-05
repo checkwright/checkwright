@@ -12,6 +12,49 @@
 
 ## New Features
 
+- **init-claim-stickiness** [spec: SPEC-init-ownership.md] — `init` disowns a path the
+  payload stopped shipping, so the next payload to re-add it overwrites the adopter's
+  edits with no refusal and no report.
+  `installer/lib/init.sh:307` skips prior-manifest entries that are `under_kit` on the
+  premise that `copy_in` re-claims them (`:195-201`). That premise breaks the moment a kit
+  stops shipping a path: nothing visits it, the entry leaves `files[]`, and on the return
+  hop `prior_hash` (`:157-162`) is empty — which `claim` (`:178`) reads as "never
+  installed" and writes through.
+  **Entered by the TRAJECTORY.md ruling of 2026-08-04**, now carrying its *Discharged
+  2026-08-05* clause. That ruling's sequencing is part of it and is satisfied here: the
+  spec pass on installer/README.md §The manifest comes before any code, because what a
+  recorded hash *means* for a file `init` did not write that run is a contract change
+  rather than a repair, and settling it in code would settle it by implementation.
+  The amendment rules the roster's exit condition — ownership ends when the file leaves
+  the tree, never because the payload stopped shipping it — and finds no third lock state
+  is needed. Promoted by spec 2026-08-05; the entry is new because the ruling carried the
+  unit in place of a queue entry.
+
+- **installer-payload-relinquish-stickiness** [spec: SPEC-init-ownership.md] — a
+  relinquished path can be silently re-claimed, which is `init-claim-stickiness` from the
+  other direction.
+  When the payload stops shipping a path, `init` drops it from `checkwright.lock`'s
+  `files[]` — and that drop is the defect rather than the working half, because the lock
+  is the only record that the adopter ever owned the file. A later payload re-adding the
+  same path meets an unclaimed name and writes through an adopter edit with no refusal.
+  **Envelope reversal, operator-ruled 2026-08-05.** Delta 6's boundary is withdrawn: this
+  entry merges into the `install-claim-contract` unit and is spec'd as one design question
+  with the claim-stickiness defect. The ground is evidence postdating that boundary — a
+  three-hop reproduction (ship, relinquish, re-add) shows the relinquish and the claim
+  refusal are one continuous failure rather than two halves, so the third lock state both
+  need is a single decision and settling one alone would make the lock's format the next
+  migration. Recorded here so the reversal reads from the ruling, never inferred later from
+  the merge itself.
+  **What the deferral cost, now that it is answered:** the entry deferred on a dilemma —
+  a tombstone growing the lock without bound versus an inference needing history the lock
+  does not keep. Both branches assumed the roster tracks the payload's shipping set. It
+  does not, and under the amendment's rule a relinquished path is an ordinary entry rather
+  than a new state; the growth objection dissolves because the existence test is already
+  the reaper. Its own prose asserting the drop "correctly — that half works" was corrected
+  at promotion, having been the premise that made the dilemma look real.
+  Filed 2026-08-04 at close from the gap inbox; found by spec, bounded out of the claim
+  unit, and merged back into it by ruling. Promoted by spec 2026-08-05.
+
 ## Technical Debt
 
 - **installer-config-seam-silent-revert** — `init` reverts an adopter's config edits on
@@ -808,9 +851,9 @@
   these verbs are second readers of a schema that already exists rather than a
   schema revision, and a `/spec` pass should not re-derive that off
   `installer/lib/common/lock.sh`.
-  **Acceptance shape:** `uninstall` removes only manifest-recorded files —
-  never a file the adopter wrote, which is exactly what the per-file hash the
-  manifest already records is for; `diff` reports drift between the recorded
+  **Acceptance shape:** `uninstall` removes only manifest-recorded files — never a
+  file the adopter wrote, which the per-file hash makes true only once
+  `install-claim-contract` lands; `diff` reports drift between the recorded
   hashes and the tree; and `installer/consumer-smoke/run-smoke.sh` covers
   install → update → uninstall per profile, extending the suite it already runs
   rather than standing up a second one. Every mutating verb carries `--dry-run`,
@@ -3152,34 +3195,6 @@
   **Cost while deferred:** exactly that reconstruction, paid again by whoever composes each
   release note, against evidence that is coldest when the batch count is highest.
   Filed 2026-08-04 at close from the gap inbox; the design question left open on purpose.
-
-- **installer-payload-relinquish-stickiness** [design-pending] — a relinquished path can
-  be silently re-claimed, which is `init-claim-stickiness` from the other direction.
-  When the payload stops shipping a path, `init` drops it from `checkwright.lock`'s `files[]`
-  correctly — that half works. But the lock is the only record that the adopter ever owned
-  the file, so a later payload re-adding the same path meets an unclaimed name and writes
-  through an adopter edit with no refusal. Same damage as the stickiness defect this
-  iteration fixed, reached by a different cause: a deliberate relinquish rather than a claim
-  refusal. Bounded out of `init-claim-stickiness` by its own amendment (delta 6), so this is
-  the residual that unit declined on purpose, not a regression in it; the merged contract it
-  would extend is installer/README.md §The manifest.
-  **Why `[design-pending]`:** the fix needs a *third* state the lock does not have — "once
-  ours, now relinquished" — and where that lives is the call. A tombstone in `files[]` grows
-  the lock without bound across an installer's life; inferring it from the digest history
-  needs history the lock does not keep. Neither is obviously right, and picking wrong makes
-  the lock's own format the next migration.
-  **Cost while deferred:** an adopter edit lost with no message, in the narrow window where a
-  path leaves the payload and comes back. Bounded by how rarely a payload relinquishes, which
-  is exactly why it will be cold when it fires.
-  Filed 2026-08-04 at close from the gap inbox; found by spec, bounded out of the claim unit.
-  **Envelope reversal, operator-ruled 2026-08-05.** Delta 6's boundary is withdrawn: this
-  entry merges into the `install-claim-contract` unit and is spec'd as one design question
-  with the claim-stickiness defect. The ground is evidence postdating that boundary — a
-  three-hop reproduction (ship, relinquish, re-add) shows the relinquish and the claim
-  refusal are one continuous failure rather than two halves, so the third lock state both
-  need is a single decision and settling one alone would make the lock's format the next
-  migration. Recorded here so the reversal reads from the ruling, never inferred later from
-  the merge itself.
 
 - **consumer-smoke-subset-accounting-verdict** [design-pending] — a per-kit smoke run reds an
   accounting the subset cannot decide, and says nothing about it.
