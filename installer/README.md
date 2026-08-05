@@ -353,6 +353,20 @@ rather than recomputed, so the next run still has something to compare your
 content against, still finds it different, and still leaves it alone. Editing a
 file changes who may write it; it never changes whether `init` is tracking it.
 
+**One entry is a span rather than a file, and it is still an ordinary entry.**
+Everything above reads a `files` row as a whole file `init` wrote. The agent
+file is the exception: `init` creates it only when it is absent, and thereafter
+authors only the marker-bounded doctrine block *inside* it — everything outside
+that span is yours and is never read or rewritten. The row is nonetheless
+whole-file, hashed and compared like every other, and two things follow. Your
+edit **anywhere** in the file marks the entry changed, which is a true report
+rather than a defect. And that report does not stop the span from being
+maintained: the block is injected before the file is claimed, so the doctrine
+block keeps upgrading on every run while the rest of the file stays yours. What
+survives *inside* the span across that rewrite is doctrine-kit's contract rather
+than this installer's — its declared-trim round-trip and the bound on it are
+`doctrine-kit/SPEC.md` §install-doctrine.
+
 **A path leaves the roster when the file leaves the tree, and at no other
 moment.** `init` owns a path because it wrote the file there, so only the file's
 disappearance can end that. A release that stops shipping the path does not: the
