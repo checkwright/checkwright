@@ -3459,8 +3459,4 @@
 
 ## Done
 
-- init-claim-stickiness
-- installer-payload-relinquish-stickiness
-- installer-config-seam-silent-revert
-
 ## Lessons Learned
