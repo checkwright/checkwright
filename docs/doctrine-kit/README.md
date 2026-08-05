@@ -67,6 +67,11 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    inside the digest section. The gate holds the digest in per-rule lockstep with
    the doctrine modulo declared trims, so a silent omission stays red; point
    `DOCTRINE_KIT_DIGEST_SECTION` at your heading if it is not `## Delivery doctrine`.
+   The declaration survives the next run: the installer reads your block before it
+   rewrites it and carries each declared marker back into the trimmed rule's
+   position, so re-vendoring never restores a rule you removed. That is the only
+   customization it preserves — see
+   [SPEC.md](SPEC.md#install-doctrine) for the bound and the two findings it reports.
 
 ## Test
 
