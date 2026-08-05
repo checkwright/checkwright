@@ -166,6 +166,37 @@ that did not carry the unit; the operator ruled the silence a relay gap rather
 than a re-disposition, and the unit entered as the `install-claim-contract`
 iteration. The ruling is spent — a later scope owes it nothing.
 
+**The release policy's security-or-supply-chain trigger reads narrowly — ruled
+2026-08-05.** It fires on a vulnerability or a compromised artifact. An
+**install-path data-loss repair does not fire it**, however severe, and however
+plainly the cost lands on whoever upgrades before it ships.
+`install-claim-contract` is the case that settles it: a bare `init` at the same
+version, with no `--force`, silently reverted the config template of every kit
+that ships one, gate-sdk's `msg-patterns.list`, and a declared doctrine trim —
+and the criterion
+still does not fire. The reason is the channel. `docs/install.md` §Versioning
+declares it `preview` with an audience it describes as internal iteration, so
+*reaching users late* — the entire cost that trigger exists to avoid — has no
+measured population to land on.
+
+Two things make this a ruling rather than a preference. It was reached twice and
+settled neither time: the `ruling-capture-contracts` close raised it, routed it
+to the operator, and received no direction; the `install-claim-contract` close
+reached the identical question on a broader instance of the same defect class. A
+question two closes have spent real judgment on and neither could close will
+re-fire on the next install-path integrity fix, and each firing spends that
+judgment again for an outcome the cadence floor usually reaches anyway. Second,
+the asymmetry the deferral rests on is worth recording once: a wrong deferral is
+corrected by rewriting one line, and a wrong tag is public.
+
+**The honest limit.** This narrows a criterion, so it can only be wrong in one
+direction — an install-path defect that genuinely does reach users late will now
+read as not-firing, and no gate catches that. What bounds it is the same clause
+that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` at
+`v1.0.0` reopens it rather than inheriting it. Nothing here narrows the operator
+direction trigger, which remains available for exactly the urgent case this
+paragraph declines to automate.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
