@@ -246,7 +246,13 @@ ever adds.
 Re-running is idempotent and non-destructive: it reads the per-file hash
 recorded in `checkwright.lock`, rewrites what still matches, and **reports
 rather than overwrites** anything you have changed since, unless you pass
-`--force`. `--dry-run` prints the file plan and the manifest and writes nothing.
+`--force`. Every file `init` rewrites is claimed before it is written, so that
+covers each kit's config seam and the commit-message patterns — the files you are
+most expected to edit — as well as the vendored kit source. Nor does the
+protection expire: `init` owns a path because it wrote the file there, so the
+path keeps its recorded hash until the file leaves your tree, across later
+upgrades and across a release that stops shipping it. `--dry-run` prints the file
+plan and the manifest and writes nothing.
 
 `checkwright.lock` is the install-ownership record — what was installed, from
 which upstream commit, and which files the installer owns. That commit field is

@@ -480,21 +480,60 @@ and says which name it reached.
 **The upgrade arm** drives a cross-version run, because every arm above installs
 at one version and re-runs at that same one. It packs a second tarball a patch
 version higher, installs `starter` from the first, has the adopter edit and
-commit a vendored file, then runs the second package's `init` with no flags at
+commit two vendored files, then runs the second package's `init` with no flags at
 all. What only that reaches: the manifest's version comparison falling *through*
 in the upgrade direction rather than refusing, the profile re-read from the
 manifest when none is passed, and `claim()` re-applying the payload around a file
 that has changed since `init` wrote it — left alone, reported, and still the
-adopter's afterwards.
+adopter's afterwards. The roster is asserted directly rather than only through
+that effect, because two different manifests leave the same intact file on this
+hop and neither survives the next: an entry dropped altogether reads as *never
+installed* on the following run, and an entry recorded at the adopter's own hash
+reads as *unchanged*. Both would let the next `init` claim the path, so both are
+named apart.
+
+The second edited file is the **relinquish subject**, and it is what makes the arm
+reach §The manifest's exit rule at all. The pack step assembles every version from
+one worktree, so two hops would otherwise carry byte-identical payloads and no
+path would ever leave a kit's shipped set — the arm therefore deletes that path
+from the *extracted package's own* `payload/` before the hop runs, rather than
+through a flag on the publishing path, which leaves the publisher no way to ship a
+payload with a hole in it. The subject is chosen against a criterion rather than
+by taste: a `starter`-kit payload file `init` records in `files` that no `init`
+step and neither generated projection reads, so dropping it exercises the roster's
+exit condition and nothing else. On this hop the file must be untouched on disk
+and must **still be on the roster at the hash `init` wrote there** — disowning it
+here is exactly what would arm the next release to write through the adopter's
+edits.
 
 It then chains a **third** version onto the same consumer with no fresh edit,
 because one hop only shows the protection starting. The second hop is where it
 either persists or inverts, and nothing above reaches it: the already-edited,
 already-reported file must still be the adopter's and must still be reported, and
-the manifest the first hop wrote must still carry it. Each version is derived from
-the one packed before it and the arm refuses to run unless the derivation is
-strictly higher, so neither hop can quietly turn into a second test of the
-downgrade refusal.
+the manifest the first hop wrote must still carry it. It is also the hop whose
+payload **re-adds** the relinquished path, which is where the ownership rule pays:
+that path must meet the carried claim, be refused, be reported, and keep `init`'s
+own hash on the roster. Without the exit rule this hop overwrites it silently, so
+the defect is reproduced end to end rather than argued about. Each version is
+derived from the one packed before it and the arm refuses to run unless the
+derivation is strictly higher, so neither hop can quietly turn into a second test
+of the downgrade refusal.
+
+**The seam arm** covers the two surfaces `init` rewrites on every run — a
+`templates/*-config.sh` destination and gate-sdk's `msg-patterns.list` — which no
+arm above reaches. That is not an oversight in those arms: the upgrade arm's
+subject is an ordinary vendored file on the plain `copy_in`/`claim` path, so they
+exercise a different file class and stay true without covering this one. This arm
+re-runs at the **same version with no flags**, which is the whole point — the
+class needs no upgrade and no `--force`, so an arm that only ran across versions
+would attribute it to a path it does not live on. It is its own scratch consumer
+at the `delegation` profile: `starter` is gate-sdk alone and gate-sdk ships no
+config template, so the templates are reachable only from `delegation` up, and an
+adopter edit inside the per-profile loop would break the file-by-file agreement
+that loop exists to assert. After the adopter edits and commits both, the re-run
+must leave both byte-identical, name both as changed, and still record `init`'s
+hash for each rather than the adopter's. It reuses the already-installed package,
+so it costs no second pack.
 
 **The artifact arm rides the per-profile post-conditions**, taking whichever of
 §The gate binary's two outcomes the payload and the host actually produce. The
