@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-claim-contract
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,25 @@
 ## New Features
 
 ## Technical Debt
+
+- **installer-config-seam-silent-revert** — `init` reverts an adopter's config edits on
+  every re-run, at the same version, and reports nothing.
+  `recipe_config_seam` (installer/lib/common/recipe.sh:11) copies every
+  `templates/*-config.sh` unconditionally; `init.sh:231` claims those paths only
+  afterwards. So `claim` hashes the file (init.sh:180) *after* the overwrite has already
+  landed, finds current equal to wanted, emits no CHANGED line, and the adopter's edit is
+  gone. No upgrade, no `--force` — the overwrite destroys the evidence the refusal is
+  computed from.
+  **Eight kits ship such a template** (canon, context, delegation, drift, evidence, guard,
+  lifecycle, queue). gate-sdk ships none, and installer/README.md:220-222 reasons from
+  this very copy to explain why — while §init (:87-99) promises a re-run is
+  non-destructive. One governed file states both.
+  **Bounded into this unit by operator ruling 2026-08-05.** It needs no schema decision of
+  its own, but it rewrites the same README claim the unit's spec pass is already
+  rewriting, so shipping the contract fix without it would leave the repaired claim false.
+  Surfaced 2026-08-05 by scope's premise re-verification of the ruled claim-stickiness
+  defect; filed to the gap inbox before promotion, so close's drain dispositions it as
+  promoted rather than open.
 
 ## Deferred
 
@@ -3153,6 +3172,14 @@
   path leaves the payload and comes back. Bounded by how rarely a payload relinquishes, which
   is exactly why it will be cold when it fires.
   Filed 2026-08-04 at close from the gap inbox; found by spec, bounded out of the claim unit.
+  **Envelope reversal, operator-ruled 2026-08-05.** Delta 6's boundary is withdrawn: this
+  entry merges into the `install-claim-contract` unit and is spec'd as one design question
+  with the claim-stickiness defect. The ground is evidence postdating that boundary — a
+  three-hop reproduction (ship, relinquish, re-add) shows the relinquish and the claim
+  refusal are one continuous failure rather than two halves, so the third lock state both
+  need is a single decision and settling one alone would make the lock's format the next
+  migration. Recorded here so the reversal reads from the ruling, never inferred later from
+  the merge itself.
 
 - **consumer-smoke-subset-accounting-verdict** [design-pending] — a per-kit smoke run reds an
   accounting the subset cannot decide, and says nothing about it.

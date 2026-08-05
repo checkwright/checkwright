@@ -161,6 +161,10 @@ of the ruling: the spec pass on installer/README.md §The manifest comes before
 any code.** The candidate fix changes what a recorded hash *means* for a file
 `init` did not write that run, which is a contract change rather than a repair,
 and settling it in code first would be settling it by implementation.
+**Discharged 2026-08-05.** The scope this named ran under an undirected directive
+that did not carry the unit; the operator ruled the silence a relay gap rather
+than a re-disposition, and the unit entered as the `install-claim-contract`
+iteration. The ruling is spent — a later scope owes it nothing.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
