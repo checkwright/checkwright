@@ -163,7 +163,7 @@ prior_hash() {   # $1 = repo-relative path -> the hash the manifest recorded for
 
 WRITTEN=()
 declare -A CARRIED=()
-# spec: installer/README.md §The manifest — a recorded hash is what init last wrote at that path, so an entry init did not write this run carries its hash forward verbatim instead of letting manifest() hash the tree at emit time: hashing the tree there would file the adopter's own content as init's, and the next run would find cur == want, claim the path and overwrite it silently
+# spec: installer/README.md §The manifest — a recorded hash is what init last wrote at that path, so an entry init did not write this run — because it refused the write, or because this payload no longer ships the path — carries its hash forward verbatim instead of letting manifest() hash the tree at emit time: hashing the tree there would file the adopter's own content as init's, and the next run would find cur == want, claim the path and overwrite it silently
 record() {   # $1 = repo-relative path, $2 = the hash to emit for it; omitted, the tree is hashed at emit time
     WRITTEN+=("$1")
     [[ -n "${2:-}" ]] && CARRIED["$1"]="$2"
@@ -181,7 +181,7 @@ claim() {   # $1 = repo-relative path -> 0 iff init may write it
     [[ "$cur" == "$want" ]] && return 0
     (( FORCE )) && return 0
     CHANGED+=("$1")
-    # spec: installer/README.md §The manifest — the carry-forward belongs to the refusal itself rather than to each caller, because this is the single point where the roster would otherwise lose the path and every call site refuses through it: absence of a key reads as "never installed" on the next run, which is the one reading that lets init overwrite the adopter with no report at all
+    # spec: installer/README.md §The manifest — the carry-forward belongs to the refusal itself rather than to each caller, because this is the single point where the roster would otherwise lose the path and every call site refuses through it: absence of a key reads as "never installed" on the next run, which is the one reading that lets init overwrite the adopter with no report at all. Recording on the refusal is also what makes the exit condition below a strict subset — a live path is in WRITTEN either way, so only relinquished ones reach the carry-forward loop
     record "$1" "$want"
     return 1
 }
@@ -295,16 +295,10 @@ if [[ -n "$ARTIFACT_TARGET" ]]; then
     fi
 fi
 
-# spec: installer/README.md §What init seeds — a guarded seed is written once and kept thereafter, so a re-run must re-claim it at its recorded hash: dropping it from the manifest would disown a file init created, and an uninstall that reads this roster would then leave it behind. Whether the tree still agrees is not the question the roster answers — an adopter-edited seed is exactly the entry the carry-forward exists for, so it is re-claimed at the hash init wrote rather than dropped for disagreeing
-under_kit() {   # $1 = repo-relative path -> 0 iff it lies inside one of this profile's kit directories
-    local k
-    for k in "${KITS[@]}"; do [[ "$1" == "$k/"* ]] && return 0; done
-    return 1
-}
+# spec: installer/README.md §The manifest — the roster's exit condition, and it is the whole rule: init owns a path because it wrote the file there, so ownership ends when the file leaves the tree and at no other moment. Dropping an entry would disown a file init created, and an uninstall reading this roster would then leave it behind. A payload that stops shipping a path is not that moment either — the file is still on disk, it may carry the adopter's edits, and disowning it is precisely what lets a later payload re-adding the same path write straight through them. So membership and existence are the only tests: every path this payload still ships has already reached claim(), which records it on the write and on the refusal alike, leaving exactly the paths no copy_in visited this run to reach here
 if [[ -n "$PRIOR_FILES" ]]; then
     while IFS=$'\t' read -r p h; do
         [[ -n "$p" ]] || continue
-        under_kit "$p" && continue
         printf '%s\n' "${WRITTEN[@]}" | grep -qxF "$p" && continue
         [[ -f "$ROOT/$p" ]] || continue
         record "$p" "$h"
@@ -325,7 +319,7 @@ for g in "${GENERATED[@]}"; do
     record "$g"
 done
 
-# spec: installer/README.md §The manifest — what init wrote this run is a subset of the roster it records, because a path left alone for the adopter is carried forward rather than written; the two part company here so every reader downstream takes the one it means, and staging takes the written set: folding an adopter's file into the vendoring commit is what the clean-worktree precondition exists to prevent
+# spec: installer/README.md §The manifest — what init wrote this run is a subset of the roster it records, because a path left alone for the adopter and a path this payload no longer ships are both carried forward rather than written; the two part company here so every reader downstream takes the one it means, and staging takes the written set: folding an adopter's file into the vendoring commit is what the clean-worktree precondition exists to prevent
 STAGE=()
 for f in "${WRITTEN[@]}"; do [[ -n "${CARRIED[$f]:-}" ]] || STAGE+=("$f"); done
 

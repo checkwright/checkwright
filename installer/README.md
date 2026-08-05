@@ -90,7 +90,12 @@ rewrite, and one that has changed since is **yours** — it is reported and left
 alone, never overwritten, unless you pass `--force`. That does not expire at the
 next upgrade: a file reported as changed stays on `init`'s roster at the hash
 `init` wrote there, so every later run reads it the same way and reports it
-again. A re-run that finds
+again. It does not expire when a release **stops shipping** the file either.
+`init` owns what it wrote there, not what the current payload happens to carry,
+so the path stays on the roster at that hash and a release that later re-adds it
+meets the same protection rather than a clean slate — which is the one window in
+which an unowned path could otherwise be written straight over your edits. A
+re-run that finds
 nothing to change says so and exits clean; an unchanged tree is the success
 case, not an error. A payload older than the recorded install is refused as a
 silent downgrade — `--force` covers that refusal too, which is what makes a
@@ -319,7 +324,7 @@ the shape behind it.
 | `commit` | the 40-hex commit the payload was assembled from | `doctor` prints it — it is what lets a reviewer resolve the vendored tree to an exact upstream state |
 | `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
 | `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
-| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way |
+| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path |
 | `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
 
 **A recorded hash is what `init` last wrote at that path** — on whichever run
@@ -328,9 +333,24 @@ two readings coincide for every path `init` rewrites and part company for exactl
 one class: a path `init` left alone because you had edited it. That path stays in
 `files` at the hash `init` put there, carried forward from the previous manifest
 rather than recomputed, so the next run still has something to compare your
-content against, still finds it different, and still leaves it alone. **A path
-leaves the roster only when `init` stops shipping it.** Editing a file changes who
-may write it; it never changes whether `init` is tracking it.
+content against, still finds it different, and still leaves it alone. Editing a
+file changes who may write it; it never changes whether `init` is tracking it.
+
+**A path leaves the roster when the file leaves the tree, and at no other
+moment.** `init` owns a path because it wrote the file there, so only the file's
+disappearance can end that. A release that stops shipping the path does not: the
+file is still on disk, it may carry your edits, and disowning it is exactly what
+would let a later release re-adding the same path write straight through them.
+
+**A relinquished path is an ordinary entry, not a state of its own.** When a
+release stops shipping something `init` created, nothing visits that path on the
+run, so it is carried forward at the hash `init` last wrote there — the same
+carry-forward, the same `files` row, the same protection every other entry gets.
+There is no *once ours, now relinquished* state for a reader to learn. Nor can
+the roster grow without bound from it: the existence test is already the reaper,
+so `files` is bounded by the files `init` created that still exist, which is the
+ownership set itself. What `init` never does is delete, so a path no release
+ships any more stays on disk and stays yours to remove.
 
 The hash carried forward is the one `init` wrote, not the one this payload would
 have written. Either would protect the file, so protection does not decide it —
@@ -342,8 +362,11 @@ would record a write that never happened.
 That is a change of meaning, not of shape, so the wire key stays
 `checkwright-lock v1`. A reader built before it meets one of these entries, finds
 a hash that disagrees with the tree, and does exactly what it does today: reports
-the file changed and leaves it alone. The old behavior on the new data is the
-behavior the new meaning wants, so there is nothing for a version key to protect.
+the file changed and leaves it alone. A retained relinquished entry passes the
+same test even more quietly — that reader's payload does not ship the path, so it
+never asks whether it may write there and does nothing with the entry at all. The
+old behavior on the new data is the behavior the new meaning wants, so there is
+nothing for a version key to protect.
 
 A recorded **`files`** hash is `git hash-object`, never `sha256sum`. Not a
 portability detail worth burying: macOS ships `shasum` rather than `sha256sum`,

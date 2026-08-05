@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant and a two-hop cross-version upgrade, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant and a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -240,10 +240,23 @@ say "installed $VERSION at the starter profile ($was_kits)"
 EDITED="gate-sdk/README.md"
 [[ "$(jq -r --arg f "$EDITED" '.files | has($f)' "$LOCK")" == "true" ]] \
     || fail "the starter manifest does not record $EDITED — the arm has nothing whose adopter edit it can assert"
+# spec: installer/README.md §The manifest — the relinquish subject is chosen against a criterion, not by taste: a starter-kit payload file init records in files[] that no init step and neither generated projection reads, so dropping it from one hop's payload exercises the roster's exit condition and nothing else
+RELINQUISHED="gate-sdk/templates/check-skeleton.sh"
+[[ "$(jq -r --arg f "$RELINQUISHED" '.files | has($f)' "$LOCK")" == "true" ]] \
+    || fail "the starter manifest does not record $RELINQUISHED — the relinquish arm has no subject"
+R_INIT_HASH="$(jq -r --arg f "$RELINQUISHED" '.files[$f]' "$LOCK")"
 printf '\nAn adopter edited this line.\n' >> "$C/$EDITED"
+printf '\n# An adopter edited this line.\n' >> "$C/$RELINQUISHED"
 EDITED_WANT="$(git hash-object -- "$C/$EDITED")"
-git -C "$C" add -- "$EDITED" && git -C "$C" commit -q -m "edit a vendored file" \
-    || fail "could not commit the adopter edit in the scratch consumer"
+R_WANT="$(git hash-object -- "$C/$RELINQUISHED")"
+git -C "$C" add -- "$EDITED" "$RELINQUISHED" && git -C "$C" commit -q -m "edit two vendored files" \
+    || fail "could not commit the adopter edits in the scratch consumer"
+
+# spec: installer/README.md §The consumer smoke — the relinquish is performed on the extracted package's own payload rather than through a pack flag: pack-installer assembles every version from one worktree, so without this the two hops carry byte-identical payloads and no path ever leaves a kit's shipped set. Mutating the test's own extracted copy keeps the publishing path with no way to ship a payload with a hole in it
+rm -f "$UP/package/payload/$RELINQUISHED" \
+    || fail "could not drop $RELINQUISHED from the upgrade payload"
+[[ ! -f "$UP/package/payload/$RELINQUISHED" ]] \
+    || fail "the upgrade payload still ships $RELINQUISHED — the relinquish hop would assert nothing"
 
 out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the cross-version re-run of init failed — the version check did not fall through in the upgrade direction"; }
@@ -263,7 +276,14 @@ grep -qF "$EDITED" <<<"$out" \
     || fail "the upgrade dropped $EDITED from the manifest roster — the next run would read its absence as 'never installed'"
 [[ "$(jq -r --arg f "$EDITED" '.files[$f]' "$LOCK")" != "$EDITED_WANT" ]] \
     || fail "the upgrade recorded the adopter's own hash for $EDITED — the next run would find it unchanged and claim it"
-say "upgrade: $VERSION -> $UP_VERSION, profile re-read, $EDITED preserved, reported and still on the roster"
+# spec: installer/README.md §The manifest — a path leaves the roster when the file leaves the tree and at no other moment, so the hop whose payload stopped shipping it must still carry it at the hash init wrote there: dropping it here is what makes the re-adding hop below read the path as never installed
+[[ "$(git hash-object -- "$C/$RELINQUISHED")" == "$R_WANT" ]] \
+    || fail "the upgrade touched $RELINQUISHED, which its payload no longer ships"
+[[ "$(jq -r --arg f "$RELINQUISHED" '.files | has($f)' "$LOCK")" == "true" ]] \
+    || fail "the upgrade disowned $RELINQUISHED because its payload stopped shipping it — the next release to re-add the path would write straight through the adopter's edits"
+[[ "$(jq -r --arg f "$RELINQUISHED" '.files[$f]' "$LOCK")" == "$R_INIT_HASH" ]] \
+    || fail "the upgrade kept $RELINQUISHED on the roster at a hash other than the one init wrote there"
+say "upgrade: $VERSION -> $UP_VERSION, profile re-read, $EDITED preserved and reported, $RELINQUISHED relinquished and still owned"
 
 # spec: installer/README.md §The consumer smoke — the second hop is the one the first cannot stand in for: one upgrade shows the protection starting, and only the next shows whether it persists or inverts, so the same consumer is carried across a third version with no fresh adopter edit
 UP2_VERSION="$(next_patch "$UP_VERSION")"
@@ -288,8 +308,15 @@ out="$( cd "$C" && bash "$UP2/package/bin/checkwright.sh" init 2>&1 )" \
     || fail "the second upgrade overwrote $EDITED — the protection lasted one upgrade and then inverted"
 grep -qF "$EDITED" <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "the second upgrade left $EDITED alone but did not report it as changed"; }
+# spec: installer/README.md §The manifest — the re-adding hop is where the ownership rule pays: this payload ships $RELINQUISHED again, so it must meet the carried claim and refuse, which is the whole defect reproduced end to end rather than argued about
+[[ "$(git hash-object -- "$C/$RELINQUISHED")" == "$R_WANT" ]] \
+    || fail "the re-adding payload overwrote $RELINQUISHED — the roster did not carry the ownership across the relinquish"
+grep -qF "$RELINQUISHED" <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "the re-adding payload left $RELINQUISHED alone but did not report it as changed"; }
+[[ "$(jq -r --arg f "$RELINQUISHED" '.files[$f]' "$LOCK")" == "$R_INIT_HASH" ]] \
+    || fail "the re-adding payload recorded $RELINQUISHED at a hash other than the one init wrote there"
 [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the second upgrade left the worktree dirty"
-say "second upgrade: $UP_VERSION -> $UP2_VERSION, $EDITED still the adopter's and still reported"
+say "second upgrade: $UP_VERSION -> $UP2_VERSION, $EDITED still the adopter's and still reported, $RELINQUISHED re-added and refused"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked and the two-hop cross-version upgrade arm)\n' "${#PROFILES[@]}"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked and the two-hop cross-version upgrade arm carrying the relinquish and re-add)\n' "${#PROFILES[@]}"
 exit 0
