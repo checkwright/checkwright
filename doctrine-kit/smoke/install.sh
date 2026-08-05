@@ -54,8 +54,37 @@ fi
 bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
     || { echo "doctrine smoke: check-doctrine-registration is not green across the trim round-trip" >&2; exit 1; }
 
-# spec: doctrine-kit/SPEC.md §install-doctrine — the other direction, and the reason the smoke's steady state is an untrimmed consumer: withdrawing the declaration restores the bullet where it was
-grep -vF -- "$SMOKE_TRIM" CLAUDE.md > CLAUDE.md.smoke && mv CLAUDE.md.smoke CLAUDE.md
+# spec: doctrine-kit/SPEC.md §install-doctrine — the two reported findings, each carried *and* named. Both ride stderr, so this captures that channel and not stdout
+SMOKE_ORPHAN="<!-- doctrine-digest-trim: Rule-that-left — smoke: renamed upstream -->"
+SMOKE_DUP="<!-- doctrine-digest-trim: $SMOKE_TRIMMED — smoke: a second declaration for one rule -->"
+awk -v e="$SMOKE_END" -v orphan="$SMOKE_ORPHAN" -v dup="$SMOKE_DUP" '
+    $0 == e { print orphan; print dup }
+    { print }
+' CLAUDE.md > CLAUDE.md.smoke && mv CLAUDE.md.smoke CLAUDE.md
+
+SMOKE_ERR="$(bash "$SMOKE_KIT_ROOT/bin/install-doctrine.sh" 2>&1 >/dev/null)"
+if ! smoke_block | grep -qF -- "$SMOKE_ORPHAN"; then
+    echo "doctrine smoke: the re-run dropped a trim naming no live rule — a rule renamed upstream must survive to the re-vendor moment, not vanish before the consumer can reconcile it" >&2
+    exit 1
+fi
+case "$SMOKE_ERR" in
+    *Rule-that-left*) : ;;
+    *) echo "doctrine smoke: a trim naming no live rule was carried but never reported (stderr was: $SMOKE_ERR)" >&2; exit 1 ;;
+esac
+if [[ "$(smoke_block | grep -cF -- "doctrine-digest-trim: $SMOKE_TRIMMED")" != "1" ]]; then
+    echo "doctrine smoke: the duplicate trim for '$SMOKE_TRIMMED' was not carried exactly once" >&2
+    exit 1
+fi
+case "$SMOKE_ERR" in
+    *duplicate*"$SMOKE_TRIMMED"*) : ;;
+    *) echo "doctrine smoke: the duplicate trim for '$SMOKE_TRIMMED' was collapsed silently (stderr was: $SMOKE_ERR)" >&2; exit 1 ;;
+esac
+# spec: doctrine-kit/SPEC.md §install-doctrine — carrying an unmatched trim forward is only safe if the gate tolerates one; a gate that red on it would hand the consumer a broken battery instead of a reconciliation
+bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
+    || { echo "doctrine smoke: check-doctrine-registration reds on a carried-forward trim naming no live rule — carrying it forward would break the consumer's battery" >&2; exit 1; }
+
+# spec: doctrine-kit/SPEC.md §install-doctrine — the other direction, and the reason the smoke's steady state is an untrimmed consumer: withdrawing the declarations restores the bullet where it was
+grep -v -F -e "$SMOKE_TRIM" -e "$SMOKE_ORPHAN" -e "$SMOKE_DUP" CLAUDE.md > CLAUDE.md.smoke && mv CLAUDE.md.smoke CLAUDE.md
 bash "$SMOKE_KIT_ROOT/bin/install-doctrine.sh" >/dev/null
 if ! smoke_block | grep -qF -- "- **$SMOKE_TRIMMED**"; then
     echo "doctrine smoke: withdrawing the trim for '$SMOKE_TRIMMED' did not restore its bullet" >&2
