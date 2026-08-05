@@ -33,6 +33,14 @@
   **Cost while deferred:** a recurrence observed anywhere but the capture channel misses both
   `kpi-incident-recurrence` and scope's pre-emption threshold, so the theme keeps outranking
   it silently — with the counter shipped, that silence now reads as evidence of no recurrence.
+  **Second attested instance, 2026-08-05 at the `install-claim-contract` close.** The validate
+  session ended its turn with `run-validate.sh` still running — a live re-occurrence of
+  `validate-producer-liveness-unobservable`, with `dispatched-session-waiting-rule-residency`
+  as the residency gap underneath it — and it reached close through `bin/kfric.sh` rather than
+  a gap bullet, so neither entry's count moved. Recorded here as prose rather than stamped,
+  which is the deferral behaving exactly as written and is why this reads as evidence rather
+  than as a workaround: two iterations running, the only recurrences the mechanism has
+  actually seen are the two it cannot count.
   Filed by the lead on operator direction under the direct-filing exception; the operator ruled
   file-a-unit over both keep-as-is and next-iteration-priority.
 
@@ -606,6 +614,10 @@
   three paragraphs up names a knob; canon-kit/SPEC.md §The amendment lifecycle's
   litmus makes any name added to a governed surface a feature, so promoting this
   authors an amendment.
+  **Fired again 2026-08-05**, attested under `recurrence-drain-input-widening` (which owns
+  why it reached no count) — a dispatched validate session ended its turn with `run-validate`
+  still running; detected only by the coordinator reading the PID from outside, so every
+  instance this entry records has been caught by a person rather than by the lifecycle.
   Filed 2026-07-25 by close, from the operator's observation of the live
   `run-validate` and the row-relocation fingerprint at `ae70eae`.
 
@@ -3156,6 +3168,7 @@
 
 - **pack-installer-root-provenance** [design-pending] — the smoke packs whatever tree the
   caller's cwd is in, and reports success either way.
+  recurrence: pack-installer-root-provenance 2026-08-05
   `scripts/pack-installer.sh` resolves its root from cwd (`git rev-parse --show-toplevel`)
   while `installer/consumer-smoke/run-smoke.sh` resolves its repo from its own path. Run the
   smoke from a linked worktree or any second checkout and the two disagree: pack assembles
@@ -3163,12 +3176,24 @@
   normal — it even prints a PACK line naming the *other* tree's commit. The failure is not a
   red that needs explaining; it is a **green that asserts nothing about the tree under test**,
   which is the worse half of the two.
-  **Measured, not theoretical:** it produced two green-but-meaningless smoke runs during this
-  iteration's batch C before anyone noticed the PACK line named the wrong commit.
+  **Measured, not theoretical:** it produced two green-but-meaningless smoke runs during that
+  iteration's batch C before anyone noticed the PACK line named the wrong commit, and it
+  recurred 2026-08-05 (the date above) costing `install-claim-contract`'s build another full
+  ~10-minute run that proved nothing.
+  **A second precondition trap on the same seam, found the same day.** The upgrade arm packs
+  *mid-run*, so `pack-installer.sh`'s dirty-worktree refusal fires against whatever the tree
+  looks like minutes into a ~10-minute suite rather than at invocation. Any concurrent edit
+  — an ordinary thing during a run that long — surfaces as a refusal whose message is about
+  the worktree and not about the timing, so the reading is a broken installer rather than a
+  precondition checked at the wrong moment. Same root as the cwd defect: `pack-installer.sh`
+  asserts against a tree it resolves for itself at a moment it chooses, while its caller
+  believes it fixed both.
   **Deliverable:** give `pack-installer.sh` a root the caller passes, or have it refuse when
   its own resolved root and the invoking script's disagree. The refusal is the smaller change
   and fails closed; the parameter is the cleaner contract and moves the choice to every
-  caller. Left open because the second answer touches every call site.
+  caller. Left open because the second answer touches every call site. The precondition half
+  is separable and cheaper: hoist the worktree check to invocation, so the suite refuses
+  before spending ten minutes rather than during them.
   **Cost while deferred:** the installer's only end-to-end oracle can pass without testing the
   tree being released, and the condition that triggers it — working from a worktree — is
   exactly the setup a parallel iteration uses.
@@ -3296,6 +3321,82 @@
   state it meant to inspect, and the sessions most likely to run it are stage sessions at a
   boundary, which is exactly when the state is most valuable and least reconstructible.
   Filed 2026-08-04 at close, from the close session's own misfire.
+
+- **native-port-entry-premise-carry** [design-pending] — three falsified claims in
+  `native-gate-binary-port`'s body, carried here because that entry sits at the line cap.
+  Scope's premise re-verification 2026-08-05 found three of that entry's body claims stale,
+  and the entry measures at exactly `check-queue-entry-budget`'s per-entry cap, so the
+  corrections cannot ride it. The operator ruled the same day that the body rewrite belongs
+  to that unit's own scope next iteration. This entry is the carrier that gets the findings
+  there; it designs nothing and is deleted when the rewrite lands.
+  **The three corrections.** (1) The Deliverable clause still promises checksummed
+  artifacts and buildable source, which TRAJECTORY.md ruled void. (2) Of the four open
+  design questions the entry declares none may be dropped again, three are ruled and no
+  longer exist as entries — only the dogfood ruling is live. (3) The entry already declares
+  "Body rewrite pending" without saying what is pending; these are it.
+  **Compression is the remedy, and it is the one `check-queue-entry-budget` itself names**
+  on a red — answer the grounds rather than drop them. Three open questions collapsing to
+  one is net-shorter, so the rewrite fits inside the cap the entry currently sits at; this
+  is not a request for an eviction or a cap exemption.
+  **Cost while deferred:** the queue's highest-inbound entry argues from three claims its
+  own iteration falsified, so any scope ranking it reads answered questions as live grounds
+  and re-derives the corrections that this entry already holds.
+  Filed 2026-08-05 by close, draining the gap inbox under the operator's routing ruling.
+
+- **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
+  a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
+  `bin/file-gap.sh` stamps its recurrence marker on any bounded substring match of a live
+  slug in a bullet's prose, and the close drain re-resolves the same way. A bullet that
+  *cites* an entry — a correction to it, a finding adjacent to it, a note that it blocks
+  something — is counted as that entry re-occurring.
+  **Two readers consume the count**, which is what makes an inflated one expensive rather
+  than untidy: lifecycle-kit's scope pre-emption threshold
+  (`LIFECYCLE_KIT_RECURRENCE_THRESHOLD`) and drift-kit's `kpi-incident-recurrence`. An
+  inflated count promotes an entry that never recurred, and spends the pre-emption budget
+  the threshold exists to ration.
+  **The filing is its own evidence.** The bullet behind this entry had to be phrased around
+  the resolver to avoid a false stamp. A capture affordance that must be evaded to stay
+  accurate is miscalibrated, and evasion is not a property the channel can rely on — the
+  next author does not know to evade, which is precisely when the count goes wrong.
+  **Sibling of `recurrence-drain-input-widening`, from the opposite direction** — that entry
+  asks what the drain misses, this asks what it over-counts. Both are questions about the
+  same declaration's input, so a scope taking either should cost the other; taking one
+  alone risks fixing the count in one direction while it stays wrong in the other.
+  **Why `[design-pending]`:** the discriminator is the whole design. Prose distinguishing
+  "this recurred" from "this is about that" carries no syntactic tell, so the honest answers
+  run from a filer-supplied flag to dropping automatic resolution entirely and leaving the
+  drain's session-side re-resolution as the sole channel — and that last one changes
+  lifecycle-kit's single-auditable-producer property, a contract call rather than a fix.
+  **Cost while deferred:** every citing bullet silently over-counts, the two readers above
+  cannot tell an inflated count from a real one, and this count is the only aggregated
+  recurrence signal the project has.
+  Filed 2026-08-05 by close, draining the gap inbox; found 2026-08-05 at scope.
+
+- **lock-own-file-narrowed-profile-drift** [design-pending] — `doctor` misreports which
+  `gates.list` it inspected on any tree whose install profile ever narrowed.
+  `installer/lib/common/lock.sh:31`'s `lock_own_file` resolves a consumer's own seam file by
+  taking the `files[]` keys that end in a suffix and excluding those prefixed with a
+  recorded `.kits` member. The exclusion is only as complete as `.kits`, and `files[]`
+  outlives it: a full→starter re-run leaves every previously vendored canon-kit, site-kit
+  and drift-kit path on the roster through init's carry-forward (`installer/lib/init.sh`,
+  the refusal-path record) while `.kits` shrinks to the starter set. Those retained keys
+  stop being excluded, and the function's own documented failure mode fires —
+  `canon-kit/gate-tests/<case>/good/scripts/gates.list` matches the suffix and `doctor`
+  reports a vendored fixture as the consumer's real registry.
+  **Pre-existing and reachable today.** A profile narrowing is not the version downgrade
+  the lock refuses, so nothing blocks the path. Found by spec 2026-08-05 while verifying
+  `install-claim-contract`'s ownership rule — the amendment left it open deliberately, as
+  outside its envelope, rather than missing it.
+  **Why `[design-pending]`:** the exclusion predicate and the roster's retention rule now
+  disagree by construction, and which one yields is the design. Narrowing `files[]` on a
+  profile change would undo the carry-forward that stops a re-run overwriting an adopter
+  silently; widening the exclusion to every kit the payload can ship puts a payload fact
+  into a consumer-tree resolver. Neither is obviously right, and both touch the manifest
+  contract installer/README.md §The manifest owns.
+  **Cost while deferred:** `doctor` silently misreports the `gates.list` and
+  `gate-sdk-config.sh` it inspected on any tree that ever narrowed its profile, and a
+  diagnostic that reports the wrong file confidently is worse than one that reports none.
+  Filed 2026-08-05 by close, draining the gap inbox.
 
 ## Icebox
 
