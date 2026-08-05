@@ -517,18 +517,25 @@ them on its own authority.
 - `docs/install.md:246-249` — "Re-running is idempotent and non-destructive… it
   **reports rather than overwrites** anything you have changed since" — a
   restatement of the §init claim on the install page, rewritten with it.
-- `TASK-QUEUE.md:3158` — the promoted `installer-payload-relinquish-stickiness`
-  entry states "`init` drops it from `checkwright.lock`'s `files[]` **correctly —
-  that half works**", asserting as sound design the exact behavior Delta 1
-  reverses. Corrected as part of the promotion, since the entry's own framing
-  (a residual "from the other direction") does not survive the merge.
-- `TASK-QUEUE.md:811-817` — `installer-lifecycle-verbs`' acceptance shape rests
-  on "`uninstall` removes only manifest-recorded files — never a file the adopter
-  wrote, which is exactly what the per-file hash the manifest already records is
-  for." Presently false for the two classes above: an edited `msg-patterns.list`
-  hashes as unchanged, so a verb built to that criterion would delete an
-  adopter's file believing it its own. Rewritten so a later `spec` on that entry
-  does not inherit a false premise; the entry keeps its own scope.
+- `TASK-QUEUE.md:33-56` (align-verified — the amendment's original `:3158`
+  citation had drifted from the promotion reflow) — the promoted
+  `installer-payload-relinquish-stickiness` entry stated "`init` drops it from
+  `checkwright.lock`'s `files[]` **correctly — that half works**", asserting as
+  sound design the exact behavior Delta 1 reverses. **Already corrected**, at
+  promotion rather than pending here: the entry's prose (`:53-54`) now narrates
+  its own correction in past tense, since the entry's original framing (a
+  residual "from the other direction") does not survive the merge. Build's
+  action is to verify the current text, not to rewrite it again.
+- `TASK-QUEUE.md:854-857` (align-verified — the amendment's original `:811-817`
+  citation had drifted the same way) — `installer-lifecycle-verbs`' acceptance
+  shape rested on "`uninstall` removes only manifest-recorded files — never a
+  file the adopter wrote, which is exactly what the per-file hash the manifest
+  already records is for." Presently false for the two classes above: an edited
+  `msg-patterns.list` hashes as unchanged, so a verb built to that criterion
+  would delete an adopter's file believing it its own. **Already rewritten** —
+  the current text reads "…which the per-file hash makes true only once
+  `install-claim-contract` lands" — so a later `spec` on that entry does not
+  inherit a false premise; build verifies rather than re-edits.
 - `installer/README.md` §The consumer smoke — the upgrade-arm paragraph
   (`:426-443`) gains Deltas 6 and 7, and the honest-limit paragraph is re-checked
   against what the new arms cover.
@@ -551,6 +558,19 @@ them on its own authority.
 - `doctrine-kit/SPEC.md` §install-doctrine — the installer's contract gains the
   trim round-trip, the in-place substitution rule, the no-trims-is-a-no-op
   guarantee, and the two reported findings.
+- `installer/README.md` §The manifest — **added by align audit, no prior site
+  named it.** The "recorded hash is what `init` last wrote at that path" passage
+  (`:325-346`) gains the agent-file exception this amendment's own "The agent
+  file is the one path where `init` owns a span, not a file" section states:
+  `CLAUDE.md` is a `files[]` entry like any other (whole-file hash, whole-file
+  change detection), but `init` only ever authors the marker-bounded span inside
+  it, so an adopter edit anywhere in the file — not only inside the span — marks
+  the entry changed, and that report does not stop the span from being
+  maintained on every run. Without this bullet the fact would exist only in the
+  amendment, which is deleted at merge, and no surviving surface would state it
+  — the half-merge the amendment's own DoD checkbox warns against, on this
+  amendment's own unrostered content rather than a hypothetical one. Cites
+  `doctrine-kit/SPEC.md` §install-doctrine rather than restating its round-trip.
 - `doctrine-kit/SPEC.md` §check-doctrine-registration (`:104-110`) — assertion
   B's declared-trim paragraph is **verified true and unchanged**; it is the
   contract `init` was breaking, not a statement the fix alters. Cited by Delta 9
@@ -584,9 +604,10 @@ them on its own authority.
 - `installer/consumer-smoke/run-smoke.sh:239-292` — remains true; see Delta 7.
 - `docs/install.md:27-28` — generic ("both reach the same `init`, write the same
   `checkwright.lock`"); asserts neither claim.
-- `TASK-QUEUE.md:17-34` — `installer-config-seam-silent-revert` describes the
-  defect *as* a defect and is accurate; it dispositions at close rather than
-  being rewritten here.
+- `TASK-QUEUE.md:60-77` (align-verified — the amendment's original `:17-34`
+  citation had drifted from the promotion reflow) — `installer-config-seam-silent-revert`
+  describes the defect *as* a defect and is accurate; it dispositions at close
+  rather than being rewritten here.
 
 ## Definition of Done
 
