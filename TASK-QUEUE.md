@@ -12,69 +12,7 @@
 
 ## New Features
 
-- **init-claim-stickiness** [spec: SPEC-init-ownership.md] — `init` disowns a path the
-  payload stopped shipping, so the next payload to re-add it overwrites the adopter's
-  edits with no refusal and no report.
-  `installer/lib/init.sh:307` skips prior-manifest entries that are `under_kit` on the
-  premise that `copy_in` re-claims them (`:195-201`). That premise breaks the moment a kit
-  stops shipping a path: nothing visits it, the entry leaves `files[]`, and on the return
-  hop `prior_hash` (`:157-162`) is empty — which `claim` (`:178`) reads as "never
-  installed" and writes through.
-  **Entered by the TRAJECTORY.md ruling of 2026-08-04**, now carrying its *Discharged
-  2026-08-05* clause. That ruling's sequencing is part of it and is satisfied here: the
-  spec pass on installer/README.md §The manifest comes before any code, because what a
-  recorded hash *means* for a file `init` did not write that run is a contract change
-  rather than a repair, and settling it in code would settle it by implementation.
-  The amendment rules the roster's exit condition — ownership ends when the file leaves
-  the tree, never because the payload stopped shipping it — and finds no third lock state
-  is needed. Promoted by spec 2026-08-05; the entry is new because the ruling carried the
-  unit in place of a queue entry.
-
-- **installer-payload-relinquish-stickiness** [spec: SPEC-init-ownership.md] — a
-  relinquished path can be silently re-claimed, which is `init-claim-stickiness` from the
-  other direction.
-  When the payload stops shipping a path, `init` drops it from `checkwright.lock`'s
-  `files[]` — and that drop is the defect rather than the working half, because the lock
-  is the only record that the adopter ever owned the file. A later payload re-adding the
-  same path meets an unclaimed name and writes through an adopter edit with no refusal.
-  **Envelope reversal, operator-ruled 2026-08-05.** Delta 6's boundary is withdrawn: this
-  entry merges into the `install-claim-contract` unit and is spec'd as one design question
-  with the claim-stickiness defect. The ground is evidence postdating that boundary — a
-  three-hop reproduction (ship, relinquish, re-add) shows the relinquish and the claim
-  refusal are one continuous failure rather than two halves, so the third lock state both
-  need is a single decision and settling one alone would make the lock's format the next
-  migration. Recorded here so the reversal reads from the ruling, never inferred later from
-  the merge itself.
-  **What the deferral cost, now that it is answered:** the entry deferred on a dilemma —
-  a tombstone growing the lock without bound versus an inference needing history the lock
-  does not keep. Both branches assumed the roster tracks the payload's shipping set. It
-  does not, and under the amendment's rule a relinquished path is an ordinary entry rather
-  than a new state; the growth objection dissolves because the existence test is already
-  the reaper. Its own prose asserting the drop "correctly — that half works" was corrected
-  at promotion, having been the premise that made the dilemma look real.
-  Filed 2026-08-04 at close from the gap inbox; found by spec, bounded out of the claim
-  unit, and merged back into it by ruling. Promoted by spec 2026-08-05.
-
 ## Technical Debt
-
-- **installer-config-seam-silent-revert** — `init` reverts an adopter's config edits on
-  every re-run, at the same version, and reports nothing.
-  `recipe_config_seam` (installer/lib/common/recipe.sh:11) copies every
-  `templates/*-config.sh` unconditionally; `init.sh:231` claims those paths only
-  afterwards. So `claim` hashes the file (init.sh:180) *after* the overwrite has already
-  landed, finds current equal to wanted, emits no CHANGED line, and the adopter's edit is
-  gone. No upgrade, no `--force` — the overwrite destroys the evidence the refusal is
-  computed from.
-  **Eight kits ship such a template** (canon, context, delegation, drift, evidence, guard,
-  lifecycle, queue). gate-sdk ships none, and installer/README.md:220-222 reasons from
-  this very copy to explain why — while §init (:87-99) promises a re-run is
-  non-destructive. One governed file states both.
-  **Bounded into this unit by operator ruling 2026-08-05.** It needs no schema decision of
-  its own, but it rewrites the same README claim the unit's spec pass is already
-  rewriting, so shipping the contract fix without it would leave the repaired claim false.
-  Surfaced 2026-08-05 by scope's premise re-verification of the ruled claim-stickiness
-  defect; filed to the gap inbox before promotion, so close's drain dispositions it as
-  promoted rather than open.
 
 ## Deferred
 
@@ -852,8 +790,8 @@
   schema revision, and a `/spec` pass should not re-derive that off
   `installer/lib/common/lock.sh`.
   **Acceptance shape:** `uninstall` removes only manifest-recorded files — never a
-  file the adopter wrote, which the per-file hash makes true only once
-  `install-claim-contract` lands; `diff` reports drift between the recorded
+  file the adopter wrote, which the per-file hash makes true now that
+  `install-claim-contract` has landed; `diff` reports drift between the recorded
   hashes and the tree; and `installer/consumer-smoke/run-smoke.sh` covers
   install → update → uninstall per profile, extending the suite it already runs
   rather than standing up a second one. Every mutating verb carries `--dry-run`,
@@ -3391,5 +3329,9 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- init-claim-stickiness
+- installer-payload-relinquish-stickiness
+- installer-config-seam-silent-revert
 
 ## Lessons Learned
