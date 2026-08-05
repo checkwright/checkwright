@@ -1,15 +1,13 @@
 # shellcheck shell=bash
-# spec: installer/README.md §What init seeds — sourceable owner of the per-kit install recipe: the starting gate roster a kit registers in a fresh consumer, and the seam surfaces it needs before those gates can run. Every function here prints one repo-relative path per file it wrote, which is what the manifest's files[] is built from
+# spec: installer/README.md §What init seeds — sourceable owner of the per-kit install recipe: the starting gate roster a kit registers in a fresh consumer, and the seam surfaces it needs before those gates can run. Two output channels, and the difference is who writes the file: a bare repo-relative path is one this module seeded itself and init need only claim for the roster, while a '<src>\t<dest>' pair is a plan init performs through copy_in. Both feed the manifest's files[]
 
-# spec: installer/README.md §What init seeds — the config seam is derived, never listed: a kit's consumer config is whatever `templates/*-config.sh` it ships, and the destination is always the gates dir under the file's own name
-recipe_config_seam() {   # $1 = kit payload dir, $2 = consumer root, $3 = gates dir
-    local t base dest
+# spec: installer/README.md §What init seeds — the config seam is derived, never listed: a kit's consumer config is whatever `templates/*-config.sh` it ships, and the destination is always the gates dir under the file's own name. It plans and writes nothing, because the seam is rewritten on every run and is the file class whose whole purpose is to be edited: a copy landing before claim() hashes the tree destroys the very evidence the refusal is computed from, so the write belongs to copy_in
+recipe_config_seam_plan() {   # $1 = kit payload dir, $2 = gates dir -> one '<src><TAB><dest>' line per config template
+    local t base
     shopt -s nullglob
     for t in "$1"/templates/*-config.sh; do
         base="${t##*/}"
-        dest="$3/$base"
-        cp "$t" "$2/$dest" || return 1
-        printf '%s\n' "$dest"
+        printf '%s\t%s/%s\n' "$t" "$2" "$base"
     done
     shopt -u nullglob
 }
@@ -45,8 +43,8 @@ recipe_needs_agent_file() {   # $1 = kit name -> 0 iff one of its starting gates
     case "$1" in context-kit|doctrine-kit) return 0 ;; *) return 1 ;; esac
 }
 
-# spec: installer/README.md §What init seeds — a seam surface is written only when it is absent: init owns what it created, never what the adopter authored, which is what keeps a re-run non-destructive on a tree that has grown since
-recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root, $4 = queue file
+# spec: installer/README.md §What init seeds — seed what is absent, plan what must be claimed. A surface init creates once and then leaves alone is written here only when it is absent, which is what keeps a re-run non-destructive on a tree that has grown since; a surface init rewrites on every run is never written here at all but planned for copy_in, because only claim() can compare the adopter's content before the overwrite lands. The two disciplines are not interchangeable and each arm below takes the one its surface needs
+recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root, $4 = queue file; prints seeded paths and '<src><TAB><dest>' plans
     local kit="$1" pay="$2" root="$3" queue="$4"
 
     if recipe_needs_queue "$kit" && [[ ! -f "$root/$queue" ]]; then
@@ -63,8 +61,7 @@ recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root, $4 
     case "$kit" in
         gate-sdk)
             [[ -f "$pay/templates/msg-patterns.list" ]] || return 0
-            cp "$pay/templates/msg-patterns.list" "$root/$GATES_DIR/msg-patterns.list" || return 1
-            printf '%s\n' "$GATES_DIR/msg-patterns.list" ;;
+            printf '%s\t%s/msg-patterns.list\n' "$pay/templates/msg-patterns.list" "$GATES_DIR" ;;
         evidence-kit)
             mkdir -p "$root/.workflow" || return 1
             if [[ ! -f "$root/.workflow/validate-baseline.txt" ]]; then

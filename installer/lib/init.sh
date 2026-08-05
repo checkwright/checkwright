@@ -226,19 +226,19 @@ if claim "$GATES_LIST"; then
 fi
 
 for kit in "${KITS[@]}"; do
+    # spec: installer/README.md §What init seeds — the recipe's plan channel is performed here, in the parent shell, and that is load-bearing rather than stylistic: the producer sits inside a process substitution, where every record() and CHANGED append would be discarded, so the plan may be produced in a subshell and the writes may not
     while IFS= read -r p; do
         [[ -n "$p" ]] || continue
-        claim "$p" && record "$p"
+        if [[ "$p" == *$'\t'* ]]; then
+            IFS=$'\t' read -r seam_src seam_dest <<<"$p"
+            copy_in "$seam_src" "$seam_dest"
+        else
+            claim "$p" && record "$p"
+        fi
     done < <(
+        # spec: installer/README.md §init — --dry-run resolves the same seam plan the real run would, out of the same enumerator rather than a second spelling of the glob: copy_in already writes nothing under --dry-run, so the plan needs no dry variant and cannot drift from the run it predicts
+        recipe_config_seam_plan "$PAYLOAD/$kit" "$GATES_DIR"
         if (( DRY )); then
-            # spec: installer/README.md §init — --dry-run resolves the same seam plan the real run would, by listing what each recipe would touch without letting it write
-            recipe_config_seam_names() {
-                local t
-                shopt -s nullglob
-                for t in "$PAYLOAD/$kit"/templates/*-config.sh; do printf '%s/%s\n' "$GATES_DIR" "${t##*/}"; done
-                shopt -u nullglob
-            }
-            recipe_config_seam_names
             recipe_needs_queue "$kit" && [[ ! -f "$ROOT/$QUEUE_FILE" ]] && printf '%s\n' "$QUEUE_FILE"
             case "$kit" in
                 gate-sdk)      printf '%s/msg-patterns.list\n' "$GATES_DIR" ;;
@@ -247,7 +247,6 @@ for kit in "${KITS[@]}"; do
                 doctrine-kit)  printf '%s\n' "$AGENT_FILE" ;;
             esac
         else
-            recipe_config_seam "$PAYLOAD/$kit" "$ROOT" "$GATES_DIR" || die "could not seed $kit's config seam"
             if recipe_needs_agent_file "$kit" && [[ ! -f "$ROOT/$AGENT_FILE" ]]; then
                 # spec: installer/README.md §What init seeds — the seeded agent file carries the section heading context-kit's brevity gate reads by default, so the gate init registers has the surface it was pointed at from the first commit
                 printf '%s\n' "# $AGENT_FILE" "" \

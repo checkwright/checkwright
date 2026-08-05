@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant and a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, and a same-version seam arm over the two surfaces init rewrites every run, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -318,5 +318,38 @@ grep -qF "$RELINQUISHED" <<<"$out" \
 [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "the second upgrade left the worktree dirty"
 say "second upgrade: $UP_VERSION -> $UP2_VERSION, $EDITED still the adopter's and still reported, $RELINQUISHED re-added and refused"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked and the two-hop cross-version upgrade arm carrying the relinquish and re-add)\n' "${#PROFILES[@]}"
+# spec: installer/README.md §What init seeds — the seam arm is its own consumer, because the per-profile loop asserts the manifest agrees with the tree file by file against a freshly initialized consumer and an adopter edit inside it would break the assertion it is there to make. It reuses the already-installed package with no extra pack, and it re-runs at the same version with no flags: this class needs no upgrade and no --force, so an arm that only ran across versions would attribute it to a path it does not live on
+printf 'seam arm (same-version re-run, delegation profile)\n'
+SC="$(consumer seam)" || fail "could not build a scratch consumer for the seam arm"
+out="$( cd "$SC" && "$CW" init --profile delegation 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "the seam arm's install failed"; }
+say "init: $(grep -m1 '^INIT:' <<<"$out")"
+SEAM_LOCK="$SC/checkwright.lock"
+# spec: installer/README.md §What init seeds — the two surfaces init rewrites on every run: a templates/*-config.sh destination (starter is gate-sdk alone and gate-sdk ships no config template, so these are reachable from delegation up) and gate-sdk's msg-patterns.list, which reaches the starter profile and so the smallest install
+SEAM_EDITED=(scripts/queue-config.sh scripts/msg-patterns.list)
+declare -A SEAM_INIT_HASH=() SEAM_WANT=()
+for f in "${SEAM_EDITED[@]}"; do
+    [[ "$(jq -r --arg f "$f" '.files | has($f)' "$SEAM_LOCK")" == "true" ]] \
+        || fail "the delegation manifest does not record $f — the seam arm has nothing whose adopter edit it can assert"
+    SEAM_INIT_HASH["$f"]="$(jq -r --arg f "$f" '.files[$f]' "$SEAM_LOCK")"
+    printf '\n# An adopter edited this line.\n' >> "$SC/$f"
+    SEAM_WANT["$f"]="$(git hash-object -- "$SC/$f")"
+done
+git -C "$SC" add -- "${SEAM_EDITED[@]}" && git -C "$SC" commit -q -m "edit the seam surfaces" \
+    || fail "could not commit the adopter's seam edits in the scratch consumer"
+
+out="$( cd "$SC" && "$CW" init 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "the seam arm's same-version re-run of init failed"; }
+for f in "${SEAM_EDITED[@]}"; do
+    [[ "$(git hash-object -- "$SC/$f")" == "${SEAM_WANT[$f]}" ]] \
+        || fail "the re-run overwrote $f — it is copied into the consumer outside claim(), so the comparison ran against the copy rather than the adopter's content"
+    grep -qF "$f" <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "the re-run left $f alone but did not report it as changed"; }
+    [[ "$(jq -r --arg f "$f" '.files[$f]' "$SEAM_LOCK")" == "${SEAM_INIT_HASH[$f]}" ]] \
+        || fail "the re-run recorded $f at a hash other than the one init wrote there"
+done
+[[ -z "$(git -C "$SC" status --porcelain)" ]] || fail "the seam arm's re-run left the worktree dirty"
+say "seam: ${SEAM_EDITED[*]} preserved, reported and still recorded at init's hash"
+
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, and the same-version seam arm)\n' "${#PROFILES[@]}"
 exit 0

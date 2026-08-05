@@ -116,6 +116,19 @@ whatever `templates/*-config.sh` it ships, and the destination is always your
 gates directory under the file's own name. A kit that grows a config template
 is picked up with no edit here.
 
+**Everything `init` seeds takes one of two disciplines, and which one follows
+from whether `init` keeps rewriting the file.** A surface `init` creates once and
+then leaves to you — the queue file, the agent file, the evidence manifests, the
+workflow-state file — is written **only when it is absent**, so a re-run never
+disturbs a tree that has grown since. A surface `init` rewrites on every run —
+every kit's config seam, and gate-sdk's `msg-patterns.list` — is **claimed
+before it is written**, on the same non-destructive path as any vendored file:
+the recipe *plans* the copy and `init` performs it, so your edit is compared
+against the recorded hash while it is still on disk. Landing the copy first would
+destroy the very evidence the comparison is made from, and these are precisely
+the files whose whole purpose is to be edited by you — which is why the ordering
+is stated here rather than left to each recipe.
+
 The **starting gate roster** is the subset a fresh consumer begins with, not
 the kit's full roster — the same distinction gate-sdk's own README draws. A
 gate whose subject you have not authored yet has nothing to read: canon-kit's
