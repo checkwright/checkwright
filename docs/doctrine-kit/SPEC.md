@@ -57,9 +57,11 @@ updated where it sits. A begin marker without its end is a malformed target: the
 installer refuses (exit 2) rather than guess the block bounds. The agent file
 must already exist — the installer edits an always-loaded file, it does not mint
 one — so a missing target is exit 2. The marker insert/replace itself is not
-this installer's code: it rides gate-sdk's shared `lib/inject.sh` helper
-(`inject_marker_block`), the single copy `lifecycle-kit`'s injector also uses;
-`install-doctrine.sh` supplies only the block content (the digest) on stdin.
+this installer's code: it rides gate-sdk's shared `lib/inject.sh` helpers
+(`inject_marker_block` to write, `read_marker_block` to read the block as it
+stands), the single copy `lifecycle-kit`'s injector also uses;
+`install-doctrine.sh` supplies the block content (the digest) on stdin and owns
+every rule about what survives from one run to the next.
 
 The block is the always-loaded shape applied to the doctrine itself: a one-line
 digest of the methodology-maintenance rules plus a markdown link to the doctrine
@@ -74,6 +76,57 @@ check-doctrine-registration's contract). Trimming a rule the consumer does not
 keep resident stays legal, but rides a declared-trim marker rather than a silent
 deletion: the gate asserts name-lockstep modulo declared trims (§check-doctrine-registration
 assertion B).
+
+**The declared-trim round-trip.** A generated block that is unconditionally
+rewritten would revoke that right on the next run — and revoke it *silently*,
+because a trim the installer restores to a bullet leaves an agent file whose
+hash matches what the installer last recorded. So the run is read-compute-emit
+rather than emit: `read_marker_block` returns the block as it stands, the
+installer harvests every
+`<!-- doctrine-digest-trim: <rule name> — <reason> -->` line out of it, and each
+digest rule is emitted as **either** its bullet **or** — when that rule's name is
+trimmed — the harvested marker line verbatim, **in the bullet's position**.
+Substitution, not addition: a block carrying the trim *and* its bullet would
+satisfy assertions B and C while handing the consumer back the rule they
+removed, which is the customization defeated while appearing honored. In-place
+rather than appended so the consumer's reason stays where the rule it answers
+would have been; the gate accepts the marker anywhere in the digest section, so
+readability decides. The rule names the substitution keys on are the digest's
+own bullet names, read exactly as assertion C reads them — installer and gate
+never disagree about which rule a marker names.
+
+Four behaviors the round-trip fixes:
+
+- **No trims declared → byte-identical output.** Load-bearing rather than
+  incidental: without it every consumer's agent file churns on every upgrade,
+  and the installer's caller starts reporting a file nobody edited.
+- **A trim naming no rule in the current digest** — a rule renamed or dropped
+  upstream — is carried forward *and* reported. It has no bullet position to
+  take, so it is carried at the digest's end. Surfacing it at the re-vendor
+  moment is the declared-not-silent design working: that is the moment the
+  consumer's decision gets reconciled.
+- **Duplicate trims for one rule** — the first is carried, the duplicate
+  dropped and reported. Silently collapsing them would be the same class of
+  quiet edit-loss one layer up.
+- **The report has two channels, and the split is deliberate.** The action line
+  on stdout gains the count of trims carried and a tally of the findings above.
+  Each finding itself goes to **stderr**, because the installer's caller of
+  record — the vendoring installer's seed step — discards this script's stdout
+  (its own stdout is a machine-read channel of seeded paths), and a
+  reconciliation the consumer owes must not be silent on the install path.
+
+**The honest bound.** The block is generated, and the declared trim is the only
+customization preserved across a run. An unsanctioned edit *inside* the span — a
+reworded bullet, an added line — is reverted by design, and would red
+§check-doctrine-registration assertion C independently; everything *outside* the
+markers is the adopter's and is never read or written. Stating the bound is what
+makes the preserved case a contract rather than an accident.
+
+The round-trip's acceptor is `smoke/install.sh`, per the coverage tier
+gate-sdk/SPEC.md §lib/inject.sh sets for a sourced library with no gate surface:
+it declares a trim in the block the installer just emitted, re-runs the
+installer, and holds that the marker survived in the trimmed bullet's position,
+that the bullet is gone, and that the gate is green across the re-run.
 
 Positional overrides `install-doctrine.sh [agent-file [doctrine-file]]` let a
 smoke or a fixture point both paths at a scratch tree without touching consumer
