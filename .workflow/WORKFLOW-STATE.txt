@@ -11,3 +11,4 @@ install-claim-contract build a4d64cb3 2026-08-05
 install-claim-contract build a19db29e 2026-08-05
 install-claim-contract build abdcfd35 2026-08-05
 install-claim-contract validate ac0f150e 2026-08-05
+install-claim-contract close a6fff7db 2026-08-05
