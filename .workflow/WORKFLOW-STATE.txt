@@ -4,12 +4,4 @@
 
 ---
 
-ruling-capture-contracts scope a68b891d 2026-08-04
-ruling-capture-contracts spec a5c6cee1 2026-08-04
-ruling-capture-contracts align a7ad9da4 2026-08-04
-ruling-capture-contracts build a2388b59 2026-08-04
-ruling-capture-contracts build a772f396 2026-08-04
-ruling-capture-contracts build ad8339cf 2026-08-04
-ruling-capture-contracts build a96d8b93 2026-08-04
-ruling-capture-contracts validate aef449b3 2026-08-04
-ruling-capture-contracts close a3c2a8f2 2026-08-04
+— scope a25e29a5 2026-08-05
