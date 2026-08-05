@@ -103,12 +103,18 @@ Four behaviors the round-trip fixes:
 - **Duplicate trims for one rule** — the first is carried, the duplicate
   dropped and reported. Silently collapsing them would be the same class of
   quiet edit-loss one layer up.
-- **The report has two channels, and the split is deliberate.** The action line
-  on stdout gains the count of trims carried and a tally of the findings above.
-  Each finding itself goes to **stderr**, because the installer's caller of
-  record — the vendoring installer's seed step — discards this script's stdout
-  (its own stdout is a machine-read channel of seeded paths), and a
-  reconciliation the consumer owes must not be silent on the install path.
+- **The report has two channels, and the split is deliberate.** The standing
+  rule it instances: an installer a machine may drive puts **findings on
+  stderr** and narration on stdout, and stays silent on a clean run — stderr
+  chatter on success is how a channel gets ignored. So each finding above goes
+  to stderr, and the action line on stdout gains the count of trims carried and
+  a tally of those findings. What makes the rule binding here rather than merely
+  tidy is the caller class this script has: a vendoring installer whose own
+  stdout is a machine-read channel of seeded paths must discard this script's,
+  so stdout is exactly where a reconciliation the consumer owes would be lost.
+  The honest consequence is that under such a caller the count has no reader —
+  the carried trims are read from the commit that install makes — while every
+  finding still reaches whoever ran it.
 
 **The honest bound.** The block is generated, and the declared trim is the only
 customization preserved across a run. An unsanctioned edit *inside* the span — a
