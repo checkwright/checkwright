@@ -84,6 +84,12 @@ design *ruling* is design work — it goes to the deferred section
 `[design-pending]` until scope rules on it. Enforced by
 `check-amendment-queue`.
 
+An amendment file is **outside the governed manifest**: `CANON_KIT_MANIFEST_FILES`
+globs `*/SPEC.md`, which `SPEC-<name>.md` does not match, so the prose and knob
+gates never scan one. Their obligations attach at the merge rather than at the
+amendment — an amendment may carry a citation or a knob mention that would red
+once integrated, and §Merging an amendment step 2 is where that debt comes due.
+
 The tag is a **checksum on the promotion move**, not a second source of the
 state its section already carries. Its redundancy is the mechanism: a
 promotion crosses a section boundary *and* swaps the tag, so
