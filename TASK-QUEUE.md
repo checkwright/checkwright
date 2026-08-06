@@ -12,12 +12,6 @@
 
 ## New Features
 
-  One incident class read from four angles, promoted together. The causal order is
-  the order below: the residency rule makes a stage session's completion signal
-  truthful, the dispatch rule makes the lead depend on that signal instead of on
-  artifact state, the lock detects the residual case where the signal is wrong
-  anyway, and the verify rename fixes the check the lead runs afterwards.
-
 ## Technical Debt
 
 ## Deferred
@@ -3480,10 +3474,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- validate-producer-liveness-unobservable
-- dispatched-session-waiting-rule-residency
-- lead-dispatch-requires-completion-notification
-- validate-verb-collision-and-check-routing
 
 ## Lessons Learned
