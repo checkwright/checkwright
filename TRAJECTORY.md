@@ -216,6 +216,32 @@ that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` a
 direction trigger, which remains available for exactly the urgent case this
 paragraph declines to automate.
 
+**The next iteration's subject is delegation burn, and the meter grows to see
+it — ruled 2026-08-06 by the operator.** Two halves, ruled together. The
+iteration takes **token waste as its subject rather than any one filed entry**,
+sub-agent burn included; and `bin/stage-economics.sh` is extended to price the
+fan-out subtree, so the reduction is measured rather than asserted.
+
+The measurement that prompted it is recorded where it belongs — in the queue
+entries it grounds, never restated here: `fork-dispatch-prohibition` (a
+prohibition the operator ruled and designed 2026-08-03, never armed, now on its
+third firing with the cost priced), `stage-fanout-burn-unbilled` (the meter
+prices stamped stage sessions only, so a stage's fan-out bills to no row), and
+`cross-stage-census-duplication` (consecutive stages buying one roster twice).
+All three were filed 2026-08-06 from an operator consultation that priced the
+last eight iterations' transcripts.
+
+**The two halves are ordered by the second, and that ordering is a consequence
+rather than a second ruling.** A waste-reduction iteration that cannot price the
+tier it targets can only assert its result, and the fan-out tier is exactly
+where close-over-close variance now sits — so the meter extension is what makes
+the rest falsifiable. Scope still owns the cut.
+
+**The honest limit.** *All* token waste sources is a direction, not a scope. The
+unbounded reading is unsatisfiable in one iteration and no gate bounds it; what
+bounds it is scope's ordinary sizing against the measured entries above, and a
+source found but not cut is a costed Deferred entry like any other.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
