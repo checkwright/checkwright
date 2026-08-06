@@ -288,6 +288,18 @@ under load a descriptive sentence reads as background about one's situation
 rather than as a constraint on the next action. The defect this rule names is
 therefore pointer-versus-operative-statement, never absence.
 
+**Operative is not obeyed, and a fourth firing is the attestation.** A dispatched
+session ended its turn on work still running while the waiting rule sat in that
+session's own agent definition as a bare imperative, restated under (a)–(c) —
+the compliant form this sanction licenses. So the diagnosis above names a cause
+*removed*, not the defect *closed*: residency makes a rule reachable at the point
+of use, and reachable is not obeyed. Every restatement this sanction licenses is
+a request delivered where it is read. Weigh it as one — worth its small drift
+surface for the failure mode it does remove, and never a substitute for an
+oracle where one is buildable. In the attested instance what caught the
+consequence was the artifact-side oracle below, with the prose already in its
+strengthened form.
+
 **No gate is owed, and not for budget.** No check can read a session's choice to
 end a turn — the act leaves no tracked artifact. The anti-restatement gates were
 checked against a sanctioned restatement rather than assumed inert, since a
