@@ -32,8 +32,7 @@ bash gate-sdk/bin/run-gates.sh   # full battery
 
 The per-kit fixture-runner battery — one `run-gate-tests.sh` line per kit, the
 consumer-gate fixtures, the guard-kit decision table — lives in
-[README.md](README.md) §This repo, governed; run the touched kit's suite before
-committing.
+[README.md](README.md) §This repo, governed.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
@@ -124,9 +123,7 @@ live in the owning SPEC section — cited, never restated.
 Delegation is pre-authorized for read-heavy audits and mechanical rename/merge
 sweeps — no ask needed. **Full protocol: `/agent-execution`.** The safety rules,
 resume-journal mechanics, verify-after-commit set, and gate-driven worklist
-load behind that trigger — a delegated `Agent` dispatch, whose per-dispatch
-budget guard names the skill on a blocking verdict — so they are not resident
-here.
+load behind that trigger, so they are not resident here.
 
 ## Housekeeping
 
