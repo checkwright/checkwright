@@ -325,8 +325,11 @@ for these two members by the dispositions already recorded.
   its declaration a descriptor; the invariants themselves are unchanged, and
   saying so explicitly is what keeps a substrate change from reading as a rule
   change.
-- **`native/src/gates/mod.rs`'s registry and `native/README`-side roster** — owned
-  by delta 1.
+- **`native/src/gates/mod.rs`'s registry** — owned by delta 1. No `native/README`
+  exists to carry a sibling roster: `native/` ships no README at all (the same
+  fact that makes it not a kit root, CLAUDE.md §Housekeeping), so the registry
+  entry is the only surface this delta updates here. Corrected at align —
+  the align audit found the phrase citing a non-existent surface.
 - **CLAUDE.md §Housekeeping** — owned by deltas 1-2. The `native/` bullet states
   "**No gate is ported today:** the seam ships, the one live port was reverted".
   That becomes false at delta 2 and is corrected in the same unit.
