@@ -205,14 +205,48 @@ to end beats a partial port spread across every profile.
 
 1. The vendoring model — how a compiled gate arrives in a consumer tree.
 2. The publish-side pipeline, `native-artifact-publish-path`.
-3. A first ported cohort, chosen to make **one shipped profile** fully native
-   end to end.
+3. A first ported cohort, chosen by the port-candidate criteria
+   (gate-sdk/SPEC.md §The port-candidate criteria) **wherever the qualifying
+   gates live — never to complete a profile**. Re-ruled 2026-08-06; below.
 4. `installer-lifecycle-verbs`, with the uninstall verb.
 5. `prose-profile` completion — the **earliest external-install channel** under
    the re-ruled preview cohort, not post-launch polish. Which cohort that is
    stays in the operator's local brief; this file records only that the
    sequence turns on it.
 6. `companion-toolkit-profile`.
+
+**Step 3 is re-ruled 2026-08-06 by the operator: the first cohort is selected by
+the criteria, not by a profile.** The 2026-08-03 preamble above stands as
+written and is deliberately not edited: its ruling is *per-profile coherence,
+not whole-corpus completion*, and that survives intact. **Its illustrative
+clause — "one shipped profile fully native end to end" — is superseded here and
+must not be read as a roster census.** What is settled is **where that coherence
+is measured: at the adopter's floor — install, get value, uninstall, on the
+dependency floor objective 1 names — and never at a roster substrate census.**
+
+The grounds are structural, not a matter of appetite. While criterion 4 stands,
+**no** profile can be fully native by census, first cohort or last: every
+profile carries gate-sdk (`installer/profiles.list` — "gate-sdk is forced in",
+and `full` derives every kit root), its roster is meta-gate-dominated, and a
+consumer's own gates keep the shell hatch, so the meta-gates' subject stays
+shell indefinitely. `starter` is the case that shows it — gate-sdk alone, whose
+zero-config roster (`installer/lib/common/recipe.sh`) held exactly one gate
+clearing all six criteria when it was counted at the ruling. A step 3 that had
+to complete a profile was therefore unsatisfiable
+as written, and reading the endpoint as a census would re-import that one rung
+later.
+
+Two alternatives were refused, and the difference between them is the part worth
+keeping. **Relaxing criterion 4 is refused for the first cohort only**, with a
+named re-entry condition: the criterion-clearing corpus exhausted *and* the
+parity oracle held off the shell substrate. That is a sequencing refusal rather
+than a permanent one — criterion 4 is what stops the parity proof being
+self-referential, and the first cohort is the worst moment to weaken the oracle.
+**Deferring the track until the old clause could be met is refused outright:** a
+second port waits on no build and no further ruling (gate-sdk/SPEC.md §What is
+retained, and what a second port must do first), and the publication control such
+a deferral would buy already exists as the operator-gated first tag ruled
+2026-08-04 above.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
 per its own queue entry. Surge-channel launch stays gated behind the private
