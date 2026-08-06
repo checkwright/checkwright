@@ -107,21 +107,46 @@ Each delta carries its `{mechanical | design-bearing}` work class.
    SPEC states (`check-knob-default-coupling`).
 
 2. **Lock claim and release in `bin/run-validate.sh`** — {design-bearing}
-   The claim writes the owning PID and the run key to `EVIDENCE_KIT_LOCK_FILE`.
+   The claim publishes the owning PID and the run key to `EVIDENCE_KIT_LOCK_FILE`.
    Placement is asserted, not left to the implementer: **after** the three
    preflight guards and the `mkdir -p "$EVIDENCE_KIT_TMP_DIR"` (a run that
    refuses to start must not claim), and **before** the batch file is created (so
    no evidence work happens outside the lock's cover).
-   The release is `trap 'rm -f …' EXIT`, installed at claim time. A trap is
-   required rather than a tail line, and the reason is countable: the script has
-   nine exit paths — six `exit 2` guards, one `exit 1` parse failure, two
-   `fail_closed` sites — plus its terminal exit, so a tail-line release would
+
+   **The claim is atomic create-exclusive, never check-then-write.** See §The
+   atomicity ruling below for why this is required rather than careful. The
+   asserted property is two-part: the claim **succeeds for exactly one producer**,
+   and the lock is **fully populated or absent**, never half-written. The
+   sanctioned form is the one this file already uses to publish the manifest —
+   build the record in a temp file under the same scratch dir, then `ln` it into
+   place, which fails if the target exists. `mkdir` and a `set -C` redirect are
+   atomic on the first half only: each leaves a window where the lock exists and
+   its record does not, which the reader would have to parse around.
+
+   **The release is conditional — remove only if the lock is still ours.** The
+   `trap … EXIT` compares the recorded PID against `$$` and removes nothing on a
+   mismatch. An unconditional `rm -f` is wrong for a reason worth stating,
+   because it reproduces this unit's own defect inside the unit's own mechanism:
+   the lock is a single-holder artifact, so with an unconditional claim *and* an
+   unconditional release, whichever producer exits first deletes the survivor's
+   lock, after which the preflight reads green with a producer still live.
+   Atomic claim does **not** make this redundant, and the residual case is
+   concrete: a producer reclaimed as stale by a second producer can still have
+   its own `EXIT` trap fire afterwards, and an unconditional release would then
+   delete the reclaimer's live lock. Atomicity is what makes "still ours"
+   *answerable* — a record that cannot be overwritten is a record whose PID can
+   be trusted — and conditional release is what acts on the answer.
+
+   A trap is required rather than a tail line, and the reason is countable: the
+   script has nine exit paths — six `exit 2` guards, one `exit 1` parse failure,
+   two `fail_closed` sites — plus its terminal exit, so a tail-line release would
    leak the lock on every failure path, which is the population that matters most
    (a crashed run is exactly when a stale lock appears). The idiom precedent is
    `lifecycle-kit/bin/enter-stage.sh`, which claims temp files under the same
    scratch dir with `trap … EXIT` and disarms the trap once ownership transfers.
-   Design-bearing because the placement is load-bearing and because the script
-   installs no trap today, so the claim introduces the file's first one.
+   Design-bearing because the placement, the atomicity and the release predicate
+   are each load-bearing, and because the script installs no trap today, so the
+   claim introduces the file's first one.
 
 3. **New gate `check-producer-liveness`** — {design-bearing}
    An evidence-kit gate. It reads `EVIDENCE_KIT_LOCK_FILE`; it is green when the
@@ -146,6 +171,25 @@ Each delta carries its `{mechanical | design-bearing}` work class.
 5. **evidence-kit/SPEC.md sections** — {design-bearing}
    The knob roster, the writer contract, a new gate section, the seam paragraph,
    and the causal roster, each named under §Existing sections updated below.
+
+6. **Writer-side refusal in `bin/run-validate.sh`** — {design-bearing}
+   `run-validate` refuses to start while a live lock is held, exiting non-zero
+   with the blocking run key. **Operator-ruled 2026-08-06**; see §The ruling
+   record below for the refused alternatives and their grounds.
+   The refusal predicate is the same PID-liveness test the reader uses, and it
+   falls out of the atomic claim rather than being a second mechanism: the claim
+   either succeeds — in which case no live holder existed — or fails, and the
+   failure branch is the refusal.
+   **The stale-reclaim protocol, bounded and asserted:** on a failed claim, read
+   the existing lock; a **live** PID refuses immediately; a **dead** PID is
+   reclaimed by removing the lock and retrying the claim **exactly once**. A
+   second failure refuses rather than looping — it means another producer won the
+   reclaim race, so its lock is live and refusing is the correct answer. This
+   resolves the two-contender stale case without an unbounded retry: both may
+   remove and relink, exactly one `ln` succeeds, and the loser's re-read finds a
+   live PID.
+   Design-bearing: the refusal predicate, the bounded reclaim, and the exit code
+   are all new asserted behavior on a shipped surface.
 
 ## Producers and consumers
 
@@ -183,13 +227,20 @@ Each delta carries its `{mechanical | design-bearing}` work class.
 
 **Every field has a named reader.**
 
-- `pid` — read by `check-producer-liveness`'s liveness predicate, at the
-  stage-entry transition. It is the whole verdict.
-- `run key` — read by `check-producer-liveness` when it composes its refusal
-  line, at the same transition. Its reader is the operator standing at a refused
-  entry, who must choose between waiting for the named run and reclaiming a lock
-  whose owner is gone; a refusal that cannot name the run leaves that choice
-  unserved.
+- `pid` — read at **three** named transitions, all by the same liveness
+  predicate:
+  1. `check-producer-liveness`, at the stage-entry transition (and, inheriting
+     it, at `--simulate`). It is the whole verdict.
+  2. `run-validate` itself, at the **run-start** transition, on a failed atomic
+     claim — the refusal predicate of delta 6.
+  3. `run-validate`'s `EXIT` trap, at the **release** transition, compared
+     against `$$` to answer "is this still ours" — the release predicate of
+     delta 2.
+- `run key` — read when a refusal line is composed, at two transitions: by
+  `check-producer-liveness` at stage entry, and by `run-validate` at run start
+  (delta 6). Its reader is the operator standing at a refusal, who must choose
+  between waiting for the named run and reclaiming a lock whose owner is gone; a
+  refusal that cannot name the run leaves that choice unserved.
 - A **start timestamp was considered and removed.** It has no named reader once
   the stale policy is PID-liveness rather than age, and the causal-completeness
   rule removes a field with no reader rather than carrying it for plausibility.
@@ -204,9 +255,12 @@ stays fixed.
 - `evidence-kit/SPEC.md` §Layout and configuration — the knob roster gains
   `EVIDENCE_KIT_LOCK_FILE` with its default. Owned by delta 1.
 - `evidence-kit/SPEC.md` §bin/run-validate.sh — the writer contract gains the
-  claim/release pair and states the placement assertion. The section currently
-  describes the spine as guards → per-suite loop → single fold; the lock bounds
-  that spine and the prose must say where. Owned by delta 2.
+  claim/release pair, the placement assertion, the atomicity property, and the
+  refusal-plus-bounded-reclaim behavior. The section currently describes the
+  spine as guards → per-suite loop → single fold, and describes the tool's own
+  exit as non-zero only when a suite records `new-failures`; both statements
+  change, since the lock now bounds the spine and a held lock is a second
+  non-zero exit. Owned by deltas 2 and 6.
 - `evidence-kit/SPEC.md` — a new §check-producer-liveness section beside the
   existing gate sections. Owned by delta 3.
 - `evidence-kit/SPEC.md` §lifecycle-kit integration — this section currently
@@ -223,17 +277,62 @@ stays fixed.
   grammar, argv and refusal semantics are unchanged, and no lifecycle-kit knob
   moves. Owned by delta 4.
 
-## Considered and deferred
+## The ruling record
 
-**Writer-side refusal — `run-validate` refusing to start while a live lock is
-held.** This is the natural mutex reading, and it closes a hole the preflight
-cannot: a session can run `run-validate` without entering a stage, so two
-producers can still race the manifest with every stage entry green. It is
-recorded here rather than asserted above because it **widens `run-validate`'s
-asserted behavior** — a new refusal on a shipped surface — beyond the deliverable
-the queue entry filed, which names only the entry-side red. Escalated to the
-lead; if taken, it becomes a sixth delta {design-bearing} and a second named
-consumer of the `pid` field, at the run-start transition.
+**Operator-closed 2026-08-06: writer-side refusal is taken** (delta 6). The
+deciding argument is that a lock the producer itself does not check is not a
+mutex: a session can run `run-validate` without entering a stage, so the
+entry-side red alone leaves two producers able to race the manifest with every
+stage entry green.
+
+This is a **deliberate widening, not a correction of an under-filing.** The queue
+entry's original scope — the entry-side preflight red — was congruent with the
+defect it named, which was the *observability* gap. Delta 6 adds prevention on
+top of detection because the ruling judged detection insufficient, and the record
+says so plainly rather than letting a later reader infer the original filing was
+sloppy.
+
+Two alternatives were weighed and **refused**, recorded with their grounds:
+
+- **Entry-side red plus a stated limit, with the unguarded path filed as a new
+  gap.** Refused because the unguarded path is not a completeness worry to be
+  filed and forgotten — it is *documented behavior in this repo*.
+  `delegation-kit/SPEC-verify-verb.md` records a lead moving to re-run
+  `run-validate` to "verify" the validate stage, operator-caught, in a defect
+  class that fired in two consecutive iterations. Filing a gap against a path
+  something already walks defers a known live hazard.
+- **Entry-side red plus a stated limit alone.** Refused on enforcement-first: the
+  fix and the check that catches it land in one unit, and a stated limit is
+  neither.
+
+## The atomicity ruling
+
+**The lead raised a check-then-write race and asked for it to be ruled against
+the source rather than accepted. Ruled: the race is real, and taking delta 6 is
+what introduces it.**
+
+Delta 2 as originally written was an *unconditional* write with no predicate, so
+no time-of-check window existed — there was no check. Delta 6 adds one, and a
+naive read-then-claim would let producer A and producer B both observe a clear
+lock and both claim, B's record overwriting A's. That reintroduces precisely the
+two-producer case delta 6 was taken to close, and it would silently defeat
+conditional release as well, since "still ours" cannot be answered from a record
+that another producer overwrote.
+
+Hence the atomic create-exclusive asserted in delta 2. The claim's success *is*
+the check, so there is no interval between them to lose. The verification behind
+this ruling is that `bin/run-validate.sh` already publishes the manifest by
+building a temp file and moving it into place, so an atomic-publish idiom is
+house-consistent here rather than newly imported; the lock's variant differs only
+in using a link, which fails on an existing target instead of replacing it.
+
+The reader gains a guarantee from the same property, which is why it is asserted
+as two-part: because the record is published whole, `check-producer-liveness`
+never has to parse a partially written lock or decide what an empty one means.
+
+Nothing here widens the envelope further — the atomicity, the bounded reclaim and
+the release predicate are all mechanics inside delta 2 and delta 6's stated
+intent, so they are settled here rather than escalated.
 
 ## Out of the envelope, stated so build does not drift into it
 
@@ -259,6 +358,15 @@ gate's red is not a recurrence declaration and must not stamp one.
       (`check-knob-default-coupling`).
 - [ ] **Gate contracts green** — `good/`+`bad/` fixture pair, fail-closed
       behavior, output shape, self-lint, per gate-sdk's four contracts.
+- [ ] **The claim is atomic** — create-exclusive, not read-then-write, and the
+      record is published whole. A claim that reads before writing has
+      reintroduced the two-producer case delta 6 was taken to close, and has
+      defeated the release predicate with it.
+- [ ] **The release is conditional** — the `EXIT` trap removes the lock only when
+      the recorded PID is still ours; an unconditional `rm -f` reproduces this
+      unit's own defect inside its own mechanism.
+- [ ] **Reclaim is bounded** — a dead-PID lock is reclaimed with exactly one
+      retry, and a second failure refuses rather than looping.
 - [ ] **Amendment deleted** — this file removed on merge; `ls evidence-kit/SPEC-*.md`
       returns none.
 - [ ] **Removals propagated** — grepped every spec for names this change retired;
