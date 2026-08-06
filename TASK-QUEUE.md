@@ -3189,6 +3189,52 @@
   false premise sitting in a survey input at exactly the moment a scope decides what to promote.
   Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
 
+- **guard-steer-grant-mismatch** [design-pending] — the guard steers sessions onto forms the
+  committed allowlist does not grant, so obeying it costs a prompt.
+  Attested at the 2026-08-06 close triage. `scripts/bash-guard.sh` refuses a shell expansion
+  and names `git -C <dir>` as the better form; `git -C` sits behind no committed glob, so
+  every session that obeys the steer prompts — 4 calls this iteration. The same shape one
+  step down: the allowlist grants `chmod +x *` while the tree's actual motions are
+  `chmod 755` and `chmod 644` on fixture stubs and descriptors, which that glob cannot match.
+  **Why it is a class and not two typos.** A guard rule and an allowlist glob are authored on
+  different surfaces by different motions, and nothing reads them against each other. The
+  triage procedure already warns that an allowlist entry can *mask* a steering opportunity
+  (guard-kit/templates/close-triage.md); this is the mirror it does not name — a steer with
+  no grant behind it, which reads as ordinary friction rather than as a missing pair.
+  **Why `[design-pending]`:** the cheap fix is the wrong one. Granting every steered-to form
+  widens the auto-allow set, which that same template rules the **consumer's** call and never
+  a session's, so the deliverable is at most a *report* pairing each guard steer against the
+  committed globs — and whether the steer strings are mechanically extractable from a
+  consumer's guard script at all is the open question. Provenance seam: the steer vocabulary
+  is this consumer's, so no kit may carry the pairs.
+  **Cost while deferred:** the friction loop the close triage exists to drain refills from
+  the guard itself, and each close re-derives the same mismatches off the same log.
+  Filed 2026-08-06 at close, from its own prompt-friction triage; scope-gated intake, so the
+  report is costed here rather than built here.
+
+- **kfric-empty-log-ambiguity** [design-pending] — an empty knowledge-friction log is read as
+  no friction, and it is equally consistent with no capture.
+  `.workflow/knowledge-friction.log` read **empty** at the 2026-08-06 close, across an
+  iteration that added a Rust module, a build-time source stamp and a new gate. The same
+  iteration's prompt-friction log records a build session reading a *deleted* `.gate`
+  descriptor out of git history to shape the one it was writing — a prior deliverable
+  consulted because no surface carries an example, which is exactly the class
+  drift-kit/templates/close-knowledge.md names and `bin/kfric.sh` exists to stamp. It was not
+  stamped, and nothing noticed.
+  **The reader is what makes it expensive.** `kpi-knowledge-friction` trends the log toward
+  zero and reads that trend as the tier contract's holes filling. A sensor with an
+  in-the-moment capture discipline and no independent floor cannot tell a filled hole from an
+  unstamped one, so the KPI reads best exactly where it is least trustworthy.
+  **Why `[design-pending]`:** the honest answers differ in kind. A corroborating signal is
+  cheap and weak — the prompt log already records history archaeology and close already reads
+  both surfaces. A per-stage capture prompt is stronger and is precisely the standing-
+  instruction tax context-kit's brevity machinery rejects. Stating the limit on the KPI
+  instead — an empty log is not evidence of zero — costs one line and buys no detection.
+  Which is right turns on whether the KPI is meant to be trusted at zero, a contract call.
+  **Cost while deferred:** the one KPI measuring the tier contract's completeness reads best
+  exactly when nobody is capturing, and no other signal contradicts it.
+  Filed 2026-08-06 at close, from its own knowledge-friction sweep.
+
 - **lock-own-file-narrowed-profile-drift** [design-pending] — `doctor` misreports which
   `gates.list` it inspected on any tree whose install profile ever narrowed.
   `installer/lib/common/lock.sh:31`'s `lock_own_file` resolves a consumer's own seam file by
