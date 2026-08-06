@@ -148,6 +148,25 @@ line that merely *names* the situation is read by a session under no obligation
 to stop. The ruling is spent once that tag is cut; ordinary cadence governs
 every tag after it.
 
+**That tag is cut at `native-first-port-cohort`'s close — ruled 2026-08-06.**
+The escalation the ruling above owes the operator is **answered in advance**:
+consent is on record here, so the close that cuts this tag owes no second ask.
+That ruling still spends itself at the tag, exactly as it says.
+
+What this settles beyond timing is the first cohort's shape.
+`native-gate-binary-port` lands its **implementations** and **holds its `.gate`
+descriptors** for a follow-up unit gated on the tag. The ground is measured
+rather than argued: a vendored descriptor with no binary behind it takes down a
+freshly installed consumer's battery — `gate-sdk/bin/run-consumer-smoke.sh` reds
+on it, as it did at the reverted slice-1 port — which gate-sdk/SPEC.md §Consumer
+smoke already rules the deliberate outcome rather than a defect, and criterion 5
+of §The port-candidate criteria states that no adopter can reach a prebuilt
+binary until this tag is cut. **This is not the deferral the PRIORITY DIRECTIVE
+below refuses.** That refusal is of deferring the *track*, and the track
+advances: both cohort members' rules ship now as compiled subcommands, proved
+byte-identical against the shell gates they replace. What waits is one two-line
+declaration per member, on a scheduled tag rather than on a further ruling.
+
 **`init-claim-stickiness` enters through the next scope's standing directive —
 ruled 2026-08-04.** It is neither left to win an undirected survey nor filed
 straight into an active section. The defect: `init`'s non-destructive re-run

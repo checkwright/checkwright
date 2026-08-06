@@ -17,6 +17,22 @@ queue entry, so ending the entry at cohort scope reverses no recorded ruling.
 TRAJECTORY.md's PRIORITY DIRECTIVE sequences toward *per-profile coherence, not
 whole-corpus completion*, and its step 3 is "a first ported cohort".
 
+**Re-scoped by the operator 2026-08-06, at build, on a measured finding.** This
+unit lands the cohort's **implementations** and **holds its two `.gate`
+descriptors**. Build applied the descriptors and ran the oracles: a vendored
+descriptor with no binary behind it reds a freshly installed consumer's battery
+(`gate-sdk/bin/run-consumer-smoke.sh`), which §Consumer smoke already rules the
+deliberate outcome rather than a defect, and criterion 5 of §The port-candidate
+criteria states that no adopter can reach a prebuilt binary until the first tag
+publishing them is cut. That tag is now scheduled — the operator ruled it at this
+iteration's close (TRAJECTORY.md §The closed rulings) — so the descriptors are a
+held remainder with a dated precondition rather than an open question, filed as
+`native-gate-cohort-descriptors`. **The deltas that assert a live descriptor move
+with them** and are marked below; what stays is everything a tree with no
+descriptor can actually hold. The unit completes at *cohort implemented,
+descriptor gated on the tag*, and the Definition of Done is written to that line
+so no item on it can be ticked by a state that has not happened.
+
 ## The cohort
 
 **Two members: `check-action-pinning` and `check-action-gh-repo`.**
@@ -144,7 +160,7 @@ ordering, which is what `action_pinning.rs` already demonstrates. A YAML crate
 would be the artifact's first dependency, and footprint is a first-class cost
 under objective 4.
 
-### 2. The two `.gate` descriptors {mechanical}
+### 2. The two `.gate` descriptors {mechanical} — HELD, moved to `native-gate-cohort-descriptors`
 
 `gate-sdk/checks/check-action-pinning.gate` and
 `gate-sdk/checks/check-action-gh-repo.gate`, each non-executable, carrying only
@@ -155,6 +171,11 @@ coexist even briefly. The manifest lines move across verbatim; the substrate
 change must not be an occasion to edit a coupling.
 
 Mechanical: the manifests already exist and the assertion battery is the oracle.
+
+**Held.** Both descriptors were written and applied at build to run the oracles,
+then withdrawn; the finding and the scheduled precondition are in the re-scope
+note above. The delta moves whole — descriptors, both `.sh` deletions, and the
+`check-docs-cmd` sweep over any governed doc still fencing a deleted path.
 
 ### 3. The parity proof, and why it must precede delta 2 {design-bearing}
 
@@ -175,6 +196,15 @@ Design-bearing because a weaker reading of "green before the script retires" —
 run the fixture suite after the swap and see it pass — proves the new
 implementation against itself and proves nothing about parity.
 
+**Done, and the hold is what makes step 3's ordering pay twice.** Both members
+were compared byte for byte across substrates on stdout, stderr and exit status —
+each fixture pair, the live tree, `.github`, an absent scan root and a YAML-free
+one — while both implementations still existed. Step 3 alone moves to
+`native-gate-cohort-descriptors`. The proof does **not** move with it and does not
+need re-running there: it is the comparison that requires both substrates present,
+which is exactly the state this unit leaves behind and the descriptor unit will
+not have. A later session must not read the swap's absence as a missing proof.
+
 ### 4. Sequencing forced by `check-gate-tamper` {mechanical}
 
 `check-gate-tamper`'s meta-path roster does not contain `native/`, so **a commit
@@ -188,27 +218,65 @@ commit separate from its descriptor.
 as a delta rather than left to a build session to rediscover at a refused commit,
 which is where slice 1 found it.
 
-### 5. §Meta-gate conservation, the reference-only table {design-bearing}
+**Met, and it cost more than the split.** Delta 1 could not commit at all on its
+first attempt: with the subcommand built and no descriptor declaring it,
+`check-gate-substrate-parity` assertion B reds a *stranded implementation*. The
+split delta 4 forces is therefore not merely two commits — it routes through a
+state the parity gate refuses, and the way through is the conservation section's
+own `reference-only` disposition rather than `--no-verify`. Under the hold that
+state is no longer transient, which is why delta 5 inverts (below). A session
+landing the held descriptors will meet the mirror image: the descriptor commit
+makes those rows false and must remove them in the same commit.
 
-`check-action-pinning`'s row currently reads **Reference-only** — *"its live port
-was reverted; the gate is shell again and no descriptor dispatches here."* Delta 2
-makes that false. The row is removed, and the table is left **empty with its
-meaning stated**: no implementation is currently held ahead of a live port, which
-is the table's healthy state and not a defect. The paragraph above it keeps its
-job unchanged — a subcommand with no descriptor and no row still reds under
-assertion B.
+### 5. §Meta-gate conservation, the reference-only table {design-bearing} — INVERTED by the hold
 
-The two reasons that row gave for keeping the module both survive, and stating
-that is the point of writing this out. The crate no longer risks going green over
-nothing, because two live members now exist for `cargo test` and the `native_crate`
-evidence suite to assert over. And the read-declaration unit tests keep a
-non-empty registry to run against — with two members rather than one, so test A's
-coverage strengthens rather than lapsing.
+As written, this delta emptied the table: `check-action-pinning`'s row reads
+**Reference-only** — *"its live port was reverted; the gate is shell again and no
+descriptor dispatches here"* — and delta 2 would have made it false.
 
-### 6. What the cohort settles, and what it arms {design-bearing}
+**Delta 2 is held, so the table does the opposite: it gains a second row.**
+`check-action-gh-repo` is now an implementation deliberately kept ahead of a live
+port, which is precisely the disposition the table exists to record, and without
+that row assertion B reads the new subcommand as a stranded implementation and
+reds. Emptying the table moves to `native-gate-cohort-descriptors` along with the
+descriptors that would make it true.
 
-Three consequences follow from a live descriptor, and each is stated because a
-reader would otherwise have to derive it:
+That is not a workaround, and the distinction is the whole point of the
+disposition: the table separates *deliberately held ahead* from *stranded*, and a
+cohort whose descriptors wait on a scheduled tag is the first case by
+construction. The paragraph above it keeps its job unchanged — a subcommand with
+neither a descriptor nor a row still reds.
+
+The two reasons the original row gave for keeping its module both survive and now
+apply twice over. The crate does not risk going green over nothing: two real gate
+rules exist for `cargo test` and the `native_crate` evidence suite to assert over
+rather than one. And the read-declaration unit tests run against a **two-member**
+registry, so unit test A holds a `?` to its arity across two members and its
+coverage strengthens rather than lapsing — the outcome the original row wanted,
+reached by the hold rather than by the port.
+
+### 6. What the cohort settles, and what it arms {design-bearing} — HELD; none of the three fires
+
+**All three consequences below are consequences of a *live descriptor*, and the
+hold means none of them fires in this unit.** They move to
+`native-gate-cohort-descriptors` whole. Recording that here rather than deleting
+it is the point: each of the three is a *coupling to another unit*, and a coupling
+that silently stops applying is how a sibling ships against a premise that has
+become false.
+
+What is true in the tree this unit leaves behind, stated so no reader has to
+re-derive it: no `.gate` descriptor exists, both shell gates remain the registered
+implementations, nothing dispatches to the binary, `cargo` is **not** a
+commit-time requirement, the stale-binary path stays inert, and
+`installer/README.md` §init's readable-source claim stays **true** rather than
+becoming false. The two sibling amendments in this iteration were both authored
+against the opposite of that — each argues from the cohort's descriptors landing
+here — so each needs its trigger and its "ships with the cohort" exit condition
+re-read against this hold before it is built. That re-read is the iteration
+lead's, not this amendment's, and it is named here so it cannot be missed.
+
+The three, as originally written, each stated because a reader would otherwise
+have to derive it:
 
 - **The dogfood question is settled by this cohort, not by argument.**
   gate-sdk/SPEC.md §What the dispatch seam does not settle says exactly that:
@@ -330,13 +398,22 @@ for these two members by the dispositions already recorded.
   fact that makes it not a kit root, CLAUDE.md §Housekeeping), so the registry
   entry is the only surface this delta updates here. Corrected at align —
   the align audit found the phrase citing a non-existent surface.
-- **CLAUDE.md §Housekeeping** — owned by deltas 1-2. The `native/` bullet states
-  "**No gate is ported today:** the seam ships, the one live port was reverted".
-  That becomes false at delta 2 and is corrected in the same unit.
+- **CLAUDE.md §Housekeeping** — owned by delta 2, which is held, so **this edit is
+  held with it and the bullet is deliberately left alone.** The clause "**No gate
+  is ported today:** the seam ships, the one live port was reverted" would have
+  become false at delta 2; under the hold it stays true, because "ported" here
+  means *a gate dispatches to the binary* and none does. Correcting it now would
+  be the defect, not the fix — it would announce a port the tree does not have.
+  The clause's second half is the part a later session must re-read: the seam
+  still ships and the reverted port is still the only one, but the crate now
+  carries two proved rules waiting on a descriptor, which the bullet does not say
+  and which `native-gate-cohort-descriptors` is the entry for.
 - **docs/install.md §Requirements and the toolchain roster** — owned by delta 6,
-  only if the dogfood settlement changes what a *contributor* to this repo needs.
-  The consumer-facing floor is unchanged, and the amendment says so rather than
-  leaving a reader to infer it.
+  held with it. It was conditional on the dogfood settlement changing what a
+  *contributor* needs; the settlement does not happen here and `cargo` does not
+  become a commit-time requirement, so nothing is owed. The consumer-facing floor
+  is unchanged either way, which the amendment states rather than leaving to
+  inference.
 
 ## Cross-component notice
 
@@ -357,21 +434,41 @@ stage is owed before build entry, and `spec` recommends `align` as the next stag
       coherent document a reader who never saw the amendment can use alone.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the
       component (`ls gate-sdk/SPEC-*.md`).
-- [ ] **Removals propagated** — grepped every spec for names this change
-      retired; nothing dangles.
-- [ ] **Gaps filed** — including the two this amendment already names:
-      `native-gate-dogfood-ruling`'s disposition, and the tamper-roster
-      accommodation if `gate-tamper-roster-native-reach` has not landed.
-- [ ] **Parity proved by execution, before the swap** — both members byte-identical
-      across substrates on their fixture pairs and on the live tree, with the
-      comparison run while both implementations still exist.
-- [ ] **Two commits, not one** — Rust modules and descriptors land separately, or
-      `check-gate-tamper` refuses the commit.
+- [ ] **Nothing retired, and that is asserted rather than assumed** — the hold
+      retires no name, so the usual removal grep has no subject and must not be
+      ticked as though it did. What is asserted instead: **no `.gate` descriptor
+      exists anywhere in the tree** and both `check-action-*.sh` are still
+      registered in `scripts/gates.list` at completion. That is the hold, stated
+      as a checkable fact rather than as an intention.
+- [ ] **Gaps filed** — `native-gate-dogfood-ruling`'s disposition (which this
+      unit no longer settles), the tamper-roster accommodation if
+      `gate-tamper-roster-native-reach` has not landed, and the held-descriptor
+      unit `native-gate-cohort-descriptors`.
+- [ ] **Parity proved by execution, while both implementations exist** — both
+      members byte-identical across substrates on stdout, stderr and exit status,
+      over each fixture pair, the live tree and the edge roots. This is the item
+      the hold makes *more* load-bearing, not less: the descriptor unit will not
+      have both substrates present, so this proof cannot be deferred to it.
+- [ ] **The implementation commit is isolated and its intermediate state is
+      dispositioned** — `check-gate-tamper`'s roster does not reach `native/`, and
+      `check-gate-substrate-parity` assertion B reds an implementation no
+      descriptor declares. Both members therefore carry a `reference-only` row in
+      §Meta-gate conservation for as long as the descriptors are held. **Recorded
+      through the spec's own mechanism, never `--no-verify`.**
 - [ ] **The crate gains no dependency** — this cohort's rules are hand-rolled
       parsing, as `action_pinning.rs` already is.
 - [ ] **The successor entry is filed before the head's Done-move**, carrying
       `[roadmap: next/reliability]` and exactly one `roadmap-summary:`, with
       `ROADMAP.md` regenerated — so the public commitment never lapses.
-- [ ] **Ships with its two siblings** — the freshness oracle and the disclosure
-      correction land in this iteration, because this cohort is what arms the one
-      and falsifies the other.
+- [ ] **The hold is recorded where its actor will find it** — the tag's schedule
+      in TRAJECTORY.md §The closed rulings (an operator ruling, recorded not
+      authored), and the held work as its own filed unit. A hold that lives only
+      in a session's reasoning is a dropped deliverable.
+- [ ] **The sibling coupling is re-ruled, not silently inherited** — this cohort
+      was promoted with the freshness oracle and the disclosure correction on the
+      stated causal ground that it *arms the one and falsifies the other*. Under
+      the hold it does neither, so that ground no longer holds and both siblings'
+      "ships with the cohort" exit conditions are unsatisfiable as written. The
+      re-ruling is the iteration lead's; what this item requires of the unit is
+      that the finding is **surfaced before either sibling is built**, never left
+      for the sibling's own build session to discover.
