@@ -3262,6 +3262,38 @@
   Filed 2026-08-06 at close, from the runtime-artifact lifecycle check and an audit sweep
   that measured the sink's age.
 
+- **release-drain-ordering-contradiction** [design-pending] — RELEASING.md step 4 prescribes a
+  commit its own battery refuses.
+  Step 4 makes the tightened-gates drain and the disposition stamp one commit, calls that the
+  iteration's final commit, and requires pushing it and watching the `gates` run for that SHA
+  green *before* tagging. `check-tightened-gates-note-parity` arms on a note whose declared
+  version carries no tag yet, and its only dormancy arm is that every note is tagged — so the
+  truncation reds it in both directions, nine declared gates against an emptied surface. It is
+  `tier=precommit` and a battery member, so the prescribed commit is refused locally and the
+  watch it requires would red remotely. No ordering satisfies both surfaces.
+  **Attested at the v0.22.0 cut, and it could not have surfaced earlier.** The gate landed in
+  `release-signaling-reset`, after v0.21.0 was tagged, so this was the first release cut under
+  it. Ruled option A by the lead 2026-08-06 — the drain yields and lands as a follow-up commit
+  once the tag has disarmed the gate — on the ground that the gate is executable, was written
+  later, and encodes tag-then-drain in its own dormancy message, while step 4 was simply never
+  updated to match. The release shipped on that reading and the runbook was deliberately left
+  unedited mid-release, because changing the procedure you are executing is how a cut becomes
+  its own precedent.
+  **What this entry owes is the text, not the decision.** Step 4's prose still describes the
+  refused sequence, so the next release re-derives the contradiction and re-reaches a ruling
+  already made. The edit is small and the care is in what must survive it: the one-commit
+  coupling is defended by a stated parity-window reason and the watch-before-tag ordering by a
+  separate stated reason about the remote oracle, and the rewrite must keep both arguments
+  while moving only the drain.
+  **Why `[design-pending]`:** where the follow-up commit belongs is genuinely open. Riding the
+  next iteration's push holds the two-push budget and leaves the surface undrained on the
+  remote between releases; its own push buys immediacy at a cost CLAUDE.md rations. A third
+  answer is to state the gate's dormancy model in the runbook as the contract it already is,
+  making the follow-up's timing a consumer's call rather than a step.
+  **Cost while deferred:** every release re-derives a settled contradiction, and re-derives it
+  at the worst moment — mid-cut, with a note committed and a tag pending.
+  Filed 2026-08-06 at close, on the lead's ruling, from the cut that hit it.
+
 - **lock-own-file-narrowed-profile-drift** [design-pending] — `doctor` misreports which
   `gates.list` it inspected on any tree whose install profile ever narrowed.
   `installer/lib/common/lock.sh:31`'s `lock_own_file` resolves a consumer's own seam file by
