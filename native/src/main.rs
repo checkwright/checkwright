@@ -25,10 +25,19 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --source-stamp | <gate-name> [args...]");
             exit(2);
         }
     };
+
+    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the baked stamp's only reader.
+    // A top-level flag, never a registry member: check-gate-substrate-parity assertion B
+    // equates the descriptor set with the `--list` roster, so a stamp arm inside that
+    // roster would read as a subcommand nothing declares.
+    if first == "--source-stamp" {
+        println!("{}", env!("CHECKWRIGHT_SOURCE_STAMP"));
+        exit(0);
+    }
 
     if first == "--list" {
         for n in gates::names() {
@@ -63,5 +72,46 @@ fn main() {
     match gates::lookup(first) {
         Some(f) => exit(f(&argv[1..])),
         None => no_such_gate(first),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::process::Command;
+
+    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the executed cross-substrate
+    // coupling for the stamp, the shape check-knob-default-coupling's disposition sets:
+    // the baked constant against the shell library's computation of the same thing
+    #[test]
+    fn source_stamp_agrees_with_the_shell_library() {
+        let crate_dir = env!("CARGO_MANIFEST_DIR");
+        let top = Command::new("git")
+            .args(["-C", crate_dir, "rev-parse", "--show-toplevel"])
+            .output()
+            .expect("cannot run git rev-parse --show-toplevel");
+        assert!(top.status.success(), "git rev-parse --show-toplevel failed");
+        let root = String::from_utf8_lossy(&top.stdout).trim().to_string();
+
+        let out = Command::new("bash")
+            .arg("-c")
+            .arg("source gate-sdk/lib/gate.sh; gate_native_source_stamp")
+            .current_dir(&root)
+            .env("GATE_SDK_NATIVE_CRATE", crate_dir)
+            .output()
+            .expect("cannot run the shell stamp computation");
+        assert!(
+            out.status.success(),
+            "gate_native_source_stamp failed: {}",
+            String::from_utf8_lossy(&out.stderr).trim()
+        );
+        let shell = String::from_utf8_lossy(&out.stdout).trim().to_string();
+        assert!(!shell.is_empty(), "gate_native_source_stamp emitted nothing");
+        assert_eq!(
+            env!("CHECKWRIGHT_SOURCE_STAMP"),
+            shell,
+            "the baked source stamp and gate-sdk/lib/gate.sh's computation of it have \
+             diverged — one side's git invocation is no longer the other's, which is \
+             exactly the canonicalization drift git-as-hasher exists to prevent"
+        );
     }
 }
