@@ -29,29 +29,57 @@ written so that this is harmless — it says what a gate discloses *by rule*, no
 how many gates are compiled today — and the Definition of Done binds the two
 batches to one iteration rather than to one commit.
 
-## The finding the entry does not carry: four surfaces, not one
+## The finding the entry does not carry: the count itself is the defect
 
 The entry names `installer/README.md:55` and records that build batch 1 already
 corrected "the sibling claim on `docs/install.md`". Re-verified against the tree
-at authoring, the corpus is **four** claims across two documents, and the batch-1
-correction is itself one of the four that the cohort falsifies:
+at authoring, the corpus was measured at **four** claims across two documents.
+Re-verified again at align, against delta 3's own `all-source` boundary rather
+than against the authoring pass's list, it is larger than that and spans a
+**third** document:
 
-1. `installer/README.md` §init — "what governs your tree afterwards is committed
-   source you can read."
-2. `docs/install.md` H1 preamble — "the kit directories live in your repository
-   as committed source."
-3. `docs/install.md` one-shot-vendoring paragraph — "what governs your tree is
-   still committed, auditable source you read before you run it."
-4. `docs/install.md` §What a gate discloses — "Today every gate is a shell script
-   and you read all of it. **The ruled direction is** that a gate whose
-   implementation moves to a compiled binary…" — batch 1's own correction,
-   written in the future tense the cohort retires.
+- `installer/README.md` §What this package is — "What governs your tree
+  afterwards is committed, auditable source you read before you run it." —
+  missed at authoring: a different section of the same file than §init, so a
+  file-level check would have missed it too.
+- `installer/README.md` §init — "what governs your tree afterwards is committed
+  source you can read."
+- `docs/install.md`'s intro, the GitHub-Release-transport bullet — "a
+  downloaded, checksummed, extracted tarball you read before running it is the
+  most auditable form of the same one-shot vendoring." — missed at authoring.
+- `docs/install.md`'s intro, the one-shot-vendoring paragraph — "what governs
+  your tree is still committed, auditable source you read before you run it."
+- `docs/install.md` §Quick start — "what governs your tree is meant to be
+  source you read before you run it," restating the intro's claim inline
+  rather than citing it — missed at authoring.
+- `docs/install.md` §What a gate discloses — "Today every gate is a shell script
+  and you read all of it. **The ruled direction is** that a gate whose
+  implementation moves to a compiled binary…" — batch 1's own correction,
+  written in the future tense the cohort retires.
+- `SECURITY.md` §Threat boundary — "Vendoring is a copy you read before you
+  run it," naming the reviewable artifact as vendoring's whole point — missed
+  at authoring, in a document neither pass had scoped as an install surface,
+  and the sharper instance of the defect for being a security claim.
 
-This is the defect class the entry names — *a disclosure claim about the vendored
-payload restated across governed install surfaces with one owner and no oracle* —
-measured rather than asserted. Four restatements is also the argument against
-fixing them by hand and stopping: the fifth is written by the next author of an
-install section, and nothing sees it.
+Plus one site that needs a qualifier rather than a correction: `docs/install.md`'s
+H1 preamble ("the kit directories live in your repository as committed source")
+names the vendoring model, stays true of it, and is not part of the overclaiming
+class — delta 4 still touches it, for precision beside the claims that are wrong.
+
+**The count is not the fact worth landing — its own instability is.** Measured
+twice in one iteration, it grew from four to seven against a deliberately
+widened search for the same phrasing family, in a document neither pass had
+scoped as relevant. A third pass would plausibly find an eighth. This is the
+defect class the entry names — *a disclosure claim restated across governed
+surfaces with no owner and no oracle* — demonstrating itself against the two
+sessions that tried to enumerate it by hand rather than merely being asserted
+by them. Fixing the list above by hand and stopping repeats the failure the
+entry already names, one level up: the eighth restatement is written by the
+next author of a governed doc, and a hand count is exactly the thing with no
+mechanism to notice it. What closes the class is `check-payload-claim`
+assertion B (delta 2/3), run against the corrected tree — the list above is
+retained only as delta 4's build worklist, the sites known at align time, and
+is superseded by the gate's own verdict rather than trusted as complete.
 
 ## What changes
 
@@ -98,8 +126,9 @@ class.
   globs defaulting to empty — the identical composition `check-install-claim`
   uses, so a consumer configures one scanned-set idiom rather than two.
 - **(A) Singleton owner.** Exactly one declaration across the scanned set. Zero
-  is the defect the gate exists for — nothing owns the claim, so four surfaces
-  drift with nothing watching — and two owners is that defect wearing a different
+  is the defect the gate exists for — nothing owns the claim, so an unbounded
+  number of surfaces drift with nothing watching, as the align audit's own
+  recount just demonstrated — and two owners is that defect wearing a different
   shape. A `<claim-id>` outside the configured vocabulary is **fail-closed (exit
   2)**, not a violation: with no resolvable declared class the gate holds nothing
   to compare against and must not run rather than pass.
@@ -145,43 +174,65 @@ passing. `precommit` tier.
 - `predicate-withheld` — the declared class. Its ERE recognizes the ruled
   phrasing: a gate's implementation source not shipping, the predicate withheld,
   the binary arriving digest-verified.
-- `all-source` — the class the four surfaces above assert and which the port
+- `all-source` — the class the surfaces above assert and which the port
   falsifies. Its ERE recognizes the readable-everything phrasings actually found
   in the tree, narrowly enough that a sentence about the *kit directories*
   vendoring as committed source — which stays true — is not matched.
 
 Design-bearing because the pattern boundary **is** the gate's false-positive
-contract: `all-source` must catch "committed source you can read" and "you read
-all of it" while staying silent on "the kit directories live in your repository
-as committed source" once that sentence is qualified. Writing those two EREs is
-the judgment this delta carries, and the `bad/` fixture is the near-miss.
+contract: `all-source` must catch "committed source you can read," "source you
+read before you run it" (the corpus's most common phrasing, not "you read all of
+it," which is `docs/install.md`'s own outlier), and "you read all of it," while
+staying silent on "the kit directories live in your repository as committed
+source" once that sentence is qualified. Writing those EREs is the judgment this
+delta carries, and the `bad/` fixture is the near-miss. **The align audit
+measured the snapshot above against a candidate ERE built from this boundary's
+own description** (not the final pattern delta 3 will author, which does not
+exist yet) — so the count correction above is evidence for this boundary's
+shape, not a substitute for writing the real EREs at build time.
 
 `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` is set to `("docs/posts/*")` — a published
 dated post is an immutable artifact and states what was true when it was
 published, the same valve `CANON_KIT_INSTALL_CLAIM_EXCLUDE` already carries for
 the same corpus and the same reason.
 
-### 4. The four prose corrections {design-bearing}
+### 4. The prose corrections {design-bearing}
 
-Each surface is corrected to the declared class, in the present tense:
+Each surface in the snapshot above is corrected to the declared class, in the
+present tense. Named as "the prose corrections" rather than by a count: the
+worklist below is delta 4's scope as align could measure it, and it is
+`check-payload-claim` (delta 2/3), not this list, that asserts nothing was
+missed.
 
-- **`installer/README.md` §init** — the sentence keeps its shape and stops
-  overclaiming: what governs your tree afterwards is committed and auditable —
-  every gate's declaration, its `# spec:` pointer, and its `good/`+`bad/` fixture
-  pair — and a gate whose implementation is compiled arrives as a
-  digest-verified binary rather than as source. It cites gate-sdk/SPEC.md
-  §Consumer payload, which is where the rule and its bound live; it does not
-  restate the bound.
-- **`docs/install.md` H1 preamble and one-shot-vendoring paragraph** — both keep
-  their subject, which is the vendoring model rather than the gate corpus, and
-  both stop asserting that everything governing the tree is readable source. The
-  H1 preamble gains the qualifier and a link to §What a gate discloses on the
-  same page.
+- **`installer/README.md` §What this package is and §init** — both sentences
+  keep their shape and stop overclaiming: what governs your tree afterwards is
+  committed and auditable — every gate's declaration, its `# spec:` pointer,
+  and its `good/`+`bad/` fixture pair — and a gate whose implementation is
+  compiled arrives as a digest-verified binary rather than as source. Both cite
+  gate-sdk/SPEC.md §Consumer payload, which is where the rule and its bound
+  live; neither restates the bound.
+- **`docs/install.md`'s intro** — the GitHub-Release-transport bullet and the
+  one-shot-vendoring paragraph both keep their subject, which is the vendoring
+  model rather than the gate corpus, and both stop asserting that everything
+  governing the tree is readable source. The H1 preamble gains the qualifier and
+  a link to §What a gate discloses on the same page; it was never part of the
+  overclaiming class, only imprecise beside it.
+- **`docs/install.md` §Quick start** — the curl-pipe-shell rationale currently
+  restates the intro's claim inline rather than citing it, so correcting the
+  intro alone would leave this copy false. It is rewritten to point at the
+  intro's corrected sentence instead of duplicating it, so a later edit to the
+  intro cannot leave this copy stale the way it left this copy uncorrected once
+  already.
 - **`docs/install.md` §What a gate discloses** — retensed. "Today every gate is a
   shell script and you read all of it" and "the ruled direction is" both go; the
   section states the rule as it holds, names that most gates are shell today and
   that this is a fact about the corpus rather than about the contract, and keeps
   its narrow reason paragraph unchanged.
+- **`SECURITY.md` §Threat boundary** — "Vendoring is a copy you read before you
+  run it" is corrected to name what is committed and auditable (the same four
+  things §Consumer payload ships), not the whole vendored tree. The section's
+  actual point — that reviewing the diff at adoption and each upgrade is the
+  trust step — survives unchanged for what still ships as source.
 
 Design-bearing: each correction has to be true, has to survive the port count
 changing, and must not drift into the confidentiality claim gate-sdk/SPEC.md
@@ -266,8 +317,11 @@ caller, preserving `check-install-claim`'s contract untouched) and
   withholding rule this section already states, pointing at
   canon-kit/SPEC.md §check-payload-claim for what binds the two. The ruling
   itself is unchanged; nothing here reopens it.
-- **`installer/README.md` §init and `docs/install.md`** — owned by delta 4, four
-  claims across two documents as enumerated above.
+- **`installer/README.md` (§What this package is, §init), `docs/install.md`
+  (its intro, §Quick start, §What a gate discloses), and `SECURITY.md` §Threat
+  boundary** — owned by delta 4, the snapshot enumerated above.
+  `check-payload-claim` assertion B is the completeness oracle once built, not
+  this list.
 - **docs/site-architecture.md §Generated projections** — owned by delta 5, only
   in the sense that this gate's landing runs the fan-out that section rosters.
   No new row: `check-payload-claim` emits no projection.
@@ -276,10 +330,13 @@ caller, preserving `check-install-claim`'s contract untouched) and
 
 This amendment changes the contracts of **canon-kit** (a new gate, two knobs, a
 generalized library function), **gate-sdk** (§Consumer payload gains the
-declaration it is the owner of), and **installer** (§init's claim), and edits the
-consumer docs surface. That is a cross-component amendment on
+declaration it is the owner of), and **installer** (§What this package is and
+§init's claims), and edits the consumer docs surface and this repo's
+root-governed `SECURITY.md`. That is a cross-component amendment on
 `check-stage-entry` assertion C's own test, so the audit stage is owed before
-build entry — see the recommendation the `spec` session records with it.
+build entry — see the recommendation the `spec` session records with it, and
+see the align stage's own re-measurement above, which is what found the
+`SECURITY.md` instance and widened this notice.
 
 ## Definition of Done
 
@@ -296,9 +353,14 @@ build entry — see the recommendation the `spec` session records with it.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
-- [ ] **All four claims corrected, and the gate reds on any of them** — the
-      `bad/` fixture is one of the four sentences verbatim, so a re-introduction
-      is caught rather than trusted.
+- [ ] **No governed-doc line matches `all-source` outside its declared form —
+      asserted by running the gate, never by a tally.** `check-payload-claim`
+      assertion B over the corrected tree is the completeness check; a hand
+      count is explicitly refused here because align's own re-measurement grew
+      from four to seven in one iteration against the same tree, which is the
+      failure mode a checked-box tally cannot see itself fail. The `bad/`
+      fixture holds one corrected-to-original sentence verbatim, so a
+      reintroduction reds rather than a count going stale.
 - [ ] **The confidentiality bound is not softened** — no corrected surface states
       the payload rule as secrecy; the claim stays raised cost of analysis
       relative to execution (gate-sdk/SPEC.md §Consumer payload).
