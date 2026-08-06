@@ -12,10 +12,23 @@ source, skipping the rebuild, and committing runs the descriptor-named gate
 reporting clean on code that is not what is committed is the vacuous green the
 whole battery exists to refuse.
 
-The hole is inert today — no gate dispatches to the binary — and re-arms at the
-first commit of the second port. `native-gate-binary-port` lands that port in
-this iteration, so this amendment and that one ship together or the cohort ships
-the hole.
+**The hole is dormant, and this amendment lands ahead of it deliberately.** No
+`.gate` descriptor exists in the tree and none lands this iteration: the first
+cohort ported its rules and **held its descriptors** to the follow-up unit
+`native-gate-cohort-descriptors` (operator-ruled 2026-08-06,
+TRAJECTORY.md §The closed rulings), so nothing dispatches to the binary and
+nothing can currently run stale. The hole arms at the first commit that lands a
+descriptor, whenever that is.
+
+Building the oracle now rather than then is enforcement-first in its purest
+form: the oracle exists **before** the hole it guards opens, so the commit that
+opens it is already covered rather than depending on that session remembering
+what this one found. The design pays for the dormancy by construction — delta
+3's trigger coupling makes a zero-descriptor tree a clean report rather than a
+special case — so a dormant oracle costs one report line and nothing else. What
+dormancy does cost is the proof: with no live descriptor to steal, the stale
+case must be proved through the fixture pair, and proved non-vacuously (see the
+Definition of Done).
 
 ## Why the entry stayed design-pending, and what settles it
 
@@ -241,13 +254,16 @@ reds until delta 4 lands.
   by delta 4. The disposition table gains the `check-gate-binary-fresh` row.
 - **gate-sdk/SPEC.md — new §check-gate-binary-fresh** — owned by delta 3. The
   gate's contract section, which its `# spec:` pointer binds to.
-- **gate-sdk/SPEC.md §Porting a gate to the binary substrate, §What is retained**
-  — owned by delta 3. That subsection currently states that a second port waits
-  on no build and no further ruling. It stays true and gains one clause: what a
-  second port now also *carries* is the freshness oracle, because a live
-  descriptor is what arms the stale-binary path. Without this the section reads
-  as though a port needs nothing, which was accurate only while the hole was
-  inert.
+- **gate-sdk/SPEC.md §Porting a gate to the binary substrate, §What is retained,
+  and where the second port stands** — owned by delta 3. Read the subsection
+  before transforming it: it was renamed and its closing sentence rewritten
+  earlier this iteration, and it now closes on the scheduled first-binaries tag
+  ("A second port waits on exactly that one scheduled event, and on nothing
+  else"), with the cohort holding its descriptors. That stays true and gains one
+  clause: what a *landing descriptor* also carries is the freshness oracle,
+  because a live descriptor is what arms the stale-binary path. Without it the
+  section reads as though the tag is the last thing standing between the port and
+  a consumer, which is accurate only while the hole is dormant.
 - **gate-sdk/SPEC.md §Layout and configuration** — owned by delta 3, only to
   record that the new gate reads the existing `GATE_SDK_NATIVE_BIN` and
   `GATE_SDK_NATIVE_CRATE` knobs. No knob is added; the entry exists so the knob
@@ -297,9 +313,16 @@ assertion C's own test, so the audit stage is owed before build entry.
 - [ ] **One algorithm, not two** — the stamp computation is the same git
       invocation on both sides, verified by a case where the two agree over a
       tree neither side special-cases.
-- [ ] **The stale case reds** — proved by executing it, not by reading the gate:
-      edit a crate source file, do not rebuild, and confirm the gate reds with a
-      live descriptor present.
-- [ ] **Ships with the cohort** — this and `native-gate-binary-port` land in the
-      same iteration, so no commit exists where a descriptor dispatches to a
-      binary nothing holds fresh.
+- [ ] **The stale case reds, non-vacuously** — proved by executing it, not by
+      reading the gate. With no descriptor in the tree the proof runs through the
+      fixture pair's two-argument form: a fixture descriptor set plus a stub
+      binary whose stamp names a source state the fixture tree no longer carries.
+      The non-vacuity is the load-bearing half — a gate reporting zero because
+      nothing exists has proved nothing, so the red must be shown to come from
+      the **stamp mismatch** and not from the zero-descriptor path, and the
+      `good/` case must reach the comparison rather than exiting early.
+- [ ] **Lands ahead of the descriptors** — the oracle is in the tree before the
+      first `.gate` descriptor is, so no commit ever exists where a descriptor
+      dispatches to a binary nothing holds fresh. Satisfied by landing: it does
+      **not** require a descriptor this iteration, and the cohort deliberately
+      holds its own.
