@@ -2323,13 +2323,13 @@
   contract, and the fixture-pair obligation, which are already the four things
   gate-sdk holds. The kit is most of an SDK already; what is missing is the statement
   that the substrate is a parameter.
-  **Boundary with the two live companions, so none sprawls:**
-  `native-gate-vendoring-model` rules how a compiled gate *arrives*;
-  `gate-payload-disclosure-ruling` rules what it *discloses*; this one rules what a
-  gate *is* independent of substrate. This entry is also the one that makes the
-  disclosure question tractable rather than merely deferred — a descriptor discloses
-  a gate's **shape** without its **predicate**, which is the distinction that ruling
-  turns on.
+  **Boundary against the two questions already settled, so this one does not sprawl:**
+  how a compiled gate *arrives* and what it *discloses* are both ruled and recorded
+  (TRAJECTORY.md §The closed rulings; gate-sdk/SPEC.md §Consumer payload). What stays
+  open is what a gate *is* independent of substrate, and that is this entry alone. The
+  distinction it supplies outlived those rulings and is why it was worth keeping — a
+  descriptor discloses a gate's **shape** without its **predicate**, which is the line
+  the disclosure ruling drew.
   **Not started, and deliberately not widened into slice 1**: building it would have
   meant generalizing a seam with exactly one instance, which is the shape of a design
   that fits nothing later.
@@ -2344,10 +2344,11 @@
   readable in-tree regardless."** The 2026-08-02 compression dropped it without
   answering it; what the parent carries now — "Unmeasurable here: this repo dogfoods
   from source" — states the present condition, never whether it should change.
-  **The same lever as `gate-payload-disclosure-ruling`, seen from the other end:** that
-  entry asks what a consumer receives, this one asks what this repo runs. Both decide
-  whether an agent can read the predicate it is about to be judged by. Rule them
-  together, or the same argument gets made twice.
+  **The same lever as the disclosure question, seen from the other end — and that end is
+  now ruled.** What a consumer receives is settled (TRAJECTORY.md §The closed rulings: the
+  payload ships a prebuilt binary and no gate implementation source); what this repo runs
+  is not. Both decide whether an agent can read the predicate it is about to be judged by,
+  so the settled end is this entry's strongest precedent rather than its open companion.
   **What it costs either way, so the trade is visible.** Running built artifacts here
   makes the battery depend on a compiled toolchain at every commit and adds a pin to
   `context-kit/lib/toolfloor.sh`'s probe roster; running from source keeps that
@@ -3098,6 +3099,31 @@
   Filed 2026-08-06 at spec, under the lead's split ruling, before the head's Done-move so
   that `ROADMAP.md` never loses the commitment.
 
+- **native-gate-cohort-descriptors** [design-pending] — the first cohort's two `.gate`
+  descriptors, held back from the port that proved them.
+  `native-gate-binary-port` ported `check-action-pinning` and `check-action-gh-repo` to
+  compiled subcommands and proved both byte-identical against the shell gates they
+  replace, then held the declaration half on an operator ruling: a vendored descriptor
+  with no binary behind it reds a freshly installed consumer's battery
+  (`gate-sdk/bin/run-consumer-smoke.sh`), which gate-sdk/SPEC.md §Consumer smoke rules the
+  deliberate outcome rather than a defect, and criterion 5 of §The port-candidate criteria
+  states no adopter reaches a prebuilt binary until the first tag publishing them is cut.
+  **The precondition is this close's own tag**, ruled 2026-08-06 (TRAJECTORY.md §The
+  closed rulings). Once it lands nothing stands between this entry and a scope but
+  ranking — no further ruling is owed, and no blocker tag rides this entry for that reason.
+  **Deliverable:** `gate-sdk/checks/check-action-{pinning,gh-repo}.gate` carrying the
+  `.sh` manifests verbatim, non-executable, with both `.sh` deleted in the same commit
+  (parity assertion A forbids coexistence); that commit may not also touch `native/`
+  (`check-gate-tamper`'s meta-path roster). Then the prose that turns with it: the
+  reference-only table emptied and what an empty table means stated, the dogfood
+  settlement in §What the dispatch seam does not settle, the two §check-action-* sections,
+  and CLAUDE.md §Housekeeping's "no gate is ported today" clause, true until this lands.
+  **Cost while deferred:** the crate carries two rules no descriptor dispatches to, so the
+  substrate stays proved but unused; `check-gate-binary-fresh` stays dormant at zero
+  descriptors, an oracle with nothing to read; and the awk pin the port exists to retire
+  keeps its hold on the toolchain floor.
+  Filed 2026-08-06 at close, draining the gap inbox; captured 2026-08-06 at build.
+
 - **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
   a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
   recurrence: gap-resolver-mention-overcount 2026-08-06
@@ -3114,6 +3140,15 @@
   the resolver to avoid a false stamp. A capture affordance that must be evaded to stay
   accurate is miscalibrated, and evasion is not a property the channel can rely on — the
   next author does not know to evade, which is precisely when the count goes wrong.
+  **The heuristic is most wrong exactly where filing matters most** — attested 2026-08-06,
+  when a build session's held-remainder filing was stamped `recurrence of` the head entry
+  purely because its prose named the entry it is the remainder *of*. The highest-value
+  citations are the ones that name their parent: a successor, a remainder, a correction. The
+  routing consequence is the expensive half — a recurrence tells close to stamp a date onto
+  an existing entry, so uncorrected this would have absorbed a follow-up unit into an entry
+  that had just completed. It was caught at capture, the first firing that was; the
+  corrective is already legal, so what is missing is not a mechanism but any prompt telling
+  the filer to check.
   **One of three faces of the same bounded-substring predicate** — `recurrence-drain-input-widening`
   asks what the drain misses when no bullet exists, this asks what it over-counts, and
   `recurrence-resolver-literal-match-only` asks what it misses when a bullet exists and does
@@ -3129,6 +3164,30 @@
   cannot tell an inflated count from a real one, and this count is the only aggregated
   recurrence signal the project has.
   Filed 2026-08-05 by close, draining the gap inbox; found 2026-08-05 at scope.
+
+- **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
+  live entry reads exactly like one that does, and nothing names the difference.
+  queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
+  rather than a membership claim, aggregated by `bin/queue-edges.sh` and "audited by
+  nothing". That is a deliberate choice and stays right — entries legitimately name landed
+  work and no gate may punish it — but its cost is now attested rather than hypothetical.
+  **The attestation.** Three ruled-and-deleted slugs were cited across four live entries, and
+  two of those entries argued *from* them in the present tense: one framed a "Boundary with
+  the two live companions" whose companions were both dead and settled. A scope session
+  ranking such an entry reads closed rulings as open questions, which is a false premise in a
+  survey input. Both were corrected inline at the 2026-08-06 close; nothing stops the next.
+  **Why a report and not a gate**, which is the design half already half-answered. A red is
+  wrong here by the SPEC's own reasoning, so the cheapest true form is a *listing*:
+  `bin/queue-edges.sh` already resolves every in-body citation against the live set and drops
+  the misses on the floor, so naming them costs one output section and no new scan — the
+  no-red posture kept, the silence ended.
+  **What is genuinely open:** where the listing is read (a close step, a scope survey input,
+  or both), and whether a citation of *landed* work should be distinguishable in prose at all
+  — a grammar question the SPEC left unanswered when it refused a relational vocabulary, and
+  answering it the wrong way re-imports the maintained-roster anti-pattern that refusal avoided.
+  **Cost while deferred:** dead citations accumulate at the rate rulings close, and each is a
+  false premise sitting in a survey input at exactly the moment a scope decides what to promote.
+  Filed 2026-08-06 at close, draining the gap inbox; found 2026-08-06 at scope.
 
 - **lock-own-file-narrowed-profile-drift** [design-pending] — `doctor` misreports which
   `gates.list` it inspected on any tree whose install profile ever narrowed.
@@ -3185,6 +3244,7 @@
 
 - **waiting-rule-fourth-firing-post-fix** [design-pending] — the residency rule fired again,
   under its own freshly-strengthened prose.
+  recurrence: waiting-rule-fourth-firing-post-fix 2026-08-06
   `dispatched-session-waiting-rule-residency` shipped this iteration. Batch 2 (`a046c06`)
   landed its residency half into `.claude/agents/stage-session.md` as a bare imperative —
   never end a turn on work still running, and never end one in order to wait. The **validate**
@@ -3200,15 +3260,77 @@
   refused it regardless. The lock ended up absent rather than stale, so conditional release
   behaved as specified and no work was lost. Enforcement held exactly where a gate existed and
   failed exactly where only prose did — an enforcement-first result produced by dogfooding.
-  **Why `[design-pending]`, and the boundary on it.** Whether the residency amendment's prose
-  half should now carry a stated limit — that it requests rather than enforces — is a change to
-  a shipped amendment's asserted scope. It is **flagged to the operator and unruled**; this
-  entry records the incident and does not settle it. `poll-sleep-guard-steer` is the same rule
-  from the side that *does* leave a tracked artifact, so a scope taking either should cost both.
-  **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is an
-  anecdote spread across four iterations' histories, and each further firing costs an orphaned
+  **The operator ruled the prose half on 2026-08-06** — delegation-kit/SPEC.md §Operative
+  residency now states that the rule requests rather than enforces, so the amendment-scope
+  question this entry flagged is settled and no longer part of it.
+  **Why `[design-pending]` still.** What survives the ruling is the enforcement question the
+  ruling deliberately did not answer: given that prose alone does not hold, what does.
+  `poll-sleep-guard-steer` is the same rule from the side that *does* leave a tracked
+  artifact, so a scope taking either should cost both; `waiting-rule-carrier-reach` is the
+  question of which sessions the prose even reaches, and the two firings stamped above are
+  its evidence rather than this entry's.
+  **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is
+  an anecdote spread across six firings' histories, and each further firing costs an orphaned
   producer plus the lead turn that discovers it.
   Filed 2026-08-06 by close, recording this iteration's central incident.
+
+- **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
+  whose definitions name it, and both firings this iteration were outside that set.
+  **Fifth firing — a carrier that names the rule nowhere.** Scope dispatched an `audit-sweep`
+  agent for the port-candidate census; it ended its turn on a live child fork after roughly
+  14.5 minutes of tool work, returning "still waiting on the batch-2 fork's resend" and no
+  census, and had to be resumed by message. The four firings
+  `waiting-rule-fourth-firing-post-fix` records all ran through carriers that *do* name the
+  rule — the `stage-session` definition, a dispatch prompt. The `audit-sweep` definition
+  carries no residency clause at all, so this is evidence about the rule's **reach** rather
+  than about prose-versus-enforcement strength.
+  **Sixth firing — a second carrier class, and the more dangerous one.** The validate session
+  backgrounded its own `run-validate.sh` and ended the turn in order to wait on it. For a
+  dispatched session a turn end is a session end, so the observer died while the shell child
+  survived, orphaned and still writing — and the harness fired a completion notification
+  anyway, because that notification means only "no live `Agent` children" and is silent about
+  a backgrounded shell child. Nothing was lost: the lead read the process table, found the
+  producer live under its lock, barred a second one, and the resumed session waited in-turn
+  and finished inside its ceiling.
+  **What makes the sixth a distinct question rather than more of the fifth.** A shell child
+  is not an agent, so no agent definition governs it however many definitions carry the
+  clause — and the one signal a supervisor would trust to say the work is done is precisely
+  the signal that is wrong here.
+  **Why `[design-pending]`:** the two candidate homes trade off and neither covers both
+  classes. Putting the clause on every dispatched agent type's definition is per-type
+  maintenance a newly added type silently opts out of; putting it on the dispatching side as
+  a standing clause in the dispatch-prompt template reaches every type but only through prose
+  a dispatcher must remember to send. Neither answers the shell-child class, where the honest
+  fix may be a liveness read rather than a rule. Provenance seam: the notification's
+  semantics are harness vocabulary, so a kit may state the obligation and not the mechanism.
+  **Cost while deferred:** every dispatch to a type whose definition omits the clause is
+  unprotected, and a backgrounded producer under a session with no live lead is lost
+  silently — the sixth firing cost nothing only because a lead happened to be watching.
+  Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
+
+- **subagent-parent-addressing** [design-pending] — a fan-out dispatched by a stage session
+  has no route back to the session that dispatched it.
+  Attested 2026-08-06: a stage session's read-only fan-out could not address its parent by
+  name, failed to resolve `stage-session`, and fell back to routing its whole audit report to
+  the lead. It cost nothing because a lead was live to relay it, and that is exactly the
+  measurement — the same session running standalone, with no lead above it, would have lost
+  the audit silently while the dispatch itself reported success.
+  **The asymmetry is the finding.** A child's *final report* returns to its dispatcher by
+  construction, so the ordinary path is safe; what has no route is a mid-run message — an
+  escalation, a partial finding, a question the child must resolve before it can finish. The
+  one escalation address a stage session's own definition names reaches the **lead**, which
+  is right for a stage session and wrong for its grandchild, and nothing states the
+  difference, so the fallback looks like compliance.
+  **Why `[design-pending]`:** the addressing mechanism is harness vocabulary, so the
+  provenance seam forbids a kit literal for it — a kit may state the obligation (a dispatch
+  names the address its child escalates to) and must leave the address to consumer config or
+  to the dispatch prompt. Whether that obligation belongs in the dispatch-prompt template, in
+  delegation-kit's dispatch contract, or in a refusal — no grandchild fan-out may be given
+  work needing a mid-run channel — is the open call, and the third is cheapest if it holds.
+  **Cost while deferred:** every fan-out under a stage session is one silent-loss event away
+  from an audit that reported success and delivered nothing, and the loss is invisible in
+  precisely the standalone configuration that has no lead to notice it.
+  Filed 2026-08-06 at close, on a gap the iteration lead held rather than routed to the inbox.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
   its unit were the iteration's only one.
@@ -3474,9 +3596,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- native-port-entry-premise-carry
-- native-gate-binary-port
-- native-binary-freshness-ungated
 
 ## Lessons Learned

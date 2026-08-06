@@ -75,3 +75,4 @@
 | ruling-capture-contracts | sc sp a b v c | 3f/2d | 3 · ≤0d | 23s clean | 95 |
 | install-claim-contract | sc sp a b v c | 1f/3d | 1 · ≤0d | 23s clean | 95 |
 | background-producer-liveness | sc sp a b v c | 6f/1d | 4 · ≤0d | 23s clean | 95 |
+| native-first-port-cohort | sc sp a b v c | 6f/0d | 3 · ≤0d | 23s clean | 96 |
