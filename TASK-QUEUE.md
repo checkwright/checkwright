@@ -3399,37 +3399,37 @@
 - **subagent-parent-addressing** [design-pending] — a fan-out dispatched by a stage session
   has no route back to the session that dispatched it.
   **Merged 2026-08-06** with `fanout-child-dispatcher-addressing` (filed 2026-08-01, retired
-  to Done here): one defect filed five days apart, neither citing the other.
-  **Attested three times across two iterations**, which answers both cheap dismissals — a
-  single mis-worded prompt, and an iteration-local fluke. 2026-08-01: two of four children an
-  align session dispatched messaged the lead instead of their dispatcher. 2026-08-06: align's
-  audit fan-out repeated it, then close's release-note fan-out hours later, different stage,
-  different prompt. Each cost nothing only because a lead was live to relay; standalone, the
-  report is lost silently while the dispatch reports success.
-  **The cause is the address space — verified 2026-08-06 against the channel tools, not
-  inferred.** The message tool's recipient is a teammate name or `main`; no relative address
-  (parent, dispatcher) exists, the dispatch tool mints no name, and a child is told neither
-  its own identity nor its parent's though the harness records that edge in its spawn record.
-  So `main` is the only name resolving for anyone: right for a stage session, one level too
-  high for its grandchild, and no prompt wording reaches it. The asymmetry is what stays
-  costly — the final report returns by construction; only the mid-run message has no route.
-  **The downward half is answered, and is not what was filed.** The 2026-08-06 widening read
-  the control channel as absent both ways, off a dispatcher that could not stop its stalled
-  fan-out. Stopping in fact works given a name or a spawn-result id: what is missing is the
-  dispatcher's *handle* — no name is minted, and a dispatcher blocked on a foreground dispatch
-  holds neither the returned id nor a turn to use it. Dispatch shape, not a missing mechanism;
-  a two-level probe settles the remainder before anything is designed on it.
-  **Deliverable — one of two, the third now answered.**
-  (1) **A durable artifact instead of a message:** the dispatcher mints a path, names it in
-  the prompt, the child writes as it goes. Already this repo's idiom (resume journals, the gap
-  inbox) and strictly stronger than a message: a message loses everything when a child dies
-  before returning and a file does not, which is exactly the loss costed below. Stop takes the
-  same shape, a sentinel the child checks — cooperative, so a wedged child stays unreachable.
+  by this merge): one defect filed twice, neither citing the other. Attested three times
+  across two iterations — an align fan-out and a close fan-out both messaged the lead instead
+  of their dispatcher, ruling out a mis-worded prompt and an iteration-local fluke.
+  **Upward is impossible, not merely unstated** — settled 2026-08-06 by a two-level probe, so
+  what follows is measured. The child's sends to an invented dispatcher name and to its own
+  agent-type name both failed with "No agent named ... is reachable"; only `to: "main"`
+  succeeded, landing in the top session and skipping the dispatcher. Neither level knows its
+  own identity or its parent's, so no prompt and no dispatch convention can supply the
+  address: it does not exist. Two corollaries — a message reaching `main` is attributed to the
+  sender's *type*, so a fan-out wider than one is ambiguous at the receiving end; and a child
+  resumed by its dispatcher's message still cannot reply, so being addressed creates no
+  return path.
+  **Downward works, given the handle.** The dispatch return carries an opaque child handle at
+  the nested level too, not only from `main`, and a send to it succeeded — so the widening
+  reading that channel absent both ways is corrected: what failed was a dispatcher blocked on
+  a *foreground* dispatch, holding neither the handle nor a turn. Dispatch shape, not a gap.
+  **A third cause the probe found.** The message and stop tools are *deferred* for a
+  dispatched agent — callable only after a discovery call it must know to make — and the task
+  tools were absent outright. A child needing to escalate may not hold the channel at all.
+  **Deliverable — the probe re-ranked these.**
+  (1) **A durable artifact instead of a message** for anything mid-run: the dispatcher mints a
+  path, names it in the prompt, the child writes as it goes. Already this repo's idiom (resume
+  journals, the gap inbox), now the only upward route that exists, and stronger than a message
+  would be — a file survives a child that dies before returning, the loss costed below. Stop
+  takes the same shape, a sentinel the child checks: cooperative, so a wedged child stays out.
   (2) **Return-value only**, plus the matching refusal — no grandchild fan-out gets work
-  needing a mid-run channel. Attested workable: two children complied under an explicit
-  return-only clause.
-  (3) State the address a child uses — **refused**, kept rather than deleted because both
-  filings reached for it first: the verified cause above voids it.
+  needing a mid-run channel. Attested workable; the probe makes it near-mandatory.
+  (3) **A dispatch-shape rule for the downward half**, now cheap and unblocked: a dispatcher
+  wanting control over its fan-out dispatches in the background and retains the handle.
+  (4) State the address a child uses — **refused on evidence**, kept rather than deleted
+  because both filings reached for it first.
   **Enforcement rides one chokepoint** — a PreToolUse hook on the dispatch matcher, the
   channel `scripts/agent-budget-guard.sh` already uses and the one `fork-dispatch-prohibition`
   already needs, carrying the depth clause beside the fork ban. Three doctrines, one hook.
@@ -3437,14 +3437,14 @@
   (`delegation-kit/templates/agent-execution.md` specifies the fan-out,
   `lifecycle-kit/templates/lead.md` the stage-session/lead channel), and (1) and (2) trade
   differently on what a child that genuinely needs to ask may do. Provenance seam: addressing
-  is harness vocabulary, so a kit states the obligation and leaves the address to consumer
-  config — also why (1) clears the seam and (3) never could.
+  is harness vocabulary, so a kit states the obligation and leaves the handle to consumer
+  config — also why (1) and (3) clear it and (4) never could.
   **Cost while deferred:** every fan-out under a stage session is one silent-loss event from
   an audit that reported success and delivered nothing, invisible in exactly the standalone
   configuration with no lead to notice; plus lead-context pollution per fan-out width.
   Class: **feature** — the channel contract it mints owes an amendment under canon-kit/SPEC.md.
-  Filed 2026-08-01 at close as the older slug; re-filed and merged 2026-08-06 at operator
-  direction, on a consultation that verified the cause against the channel tools.
+  Filed 2026-08-01 at close as the older slug; merged and probe-settled 2026-08-06 at
+  operator direction.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
   its unit were the iteration's only one.
