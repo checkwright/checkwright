@@ -5,3 +5,4 @@
 ---
 
 native-first-port-cohort scope aa5bc929 2026-08-06
+native-first-port-cohort spec a224532c 2026-08-06
