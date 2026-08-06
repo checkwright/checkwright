@@ -741,8 +741,8 @@ re-deciding, and only the operator reopens a closed ruling.
 
 ### The port-candidate criteria
 
-A gate is a candidate only if **all six** hold. The first four were stated at
-design time; the last two were paid for, and each is named with what it cost.
+A gate is a candidate only if **all seven** hold. The first four were stated at
+design time; the last three were paid for, and each is named with what it cost.
 
 1. **Registered** in `gates.list` — an unregistered gate proves no dispatch.
 2. **Carries a fixture pair** — parity between substrates is proved by running
@@ -784,6 +784,81 @@ design time; the last two were paid for, and each is named with what it cost.
    a ported form must re-implement that derivation with nothing holding the two
    copies together. `check-action-pinning` was selected instead.
 
+   The qualification the clause carries — *unless the duplication the port
+   creates is machine-held* — is what admits a shared-library corpus call like
+   `gate_find`, and the distinction is not the presence of a shared call but
+   whether a machine notices when the two sides diverge. The crate's single
+   sanctioned walk is the binary-side counterpart and its prune-dir default is
+   held against `lib/gate.sh`'s by an **executed** unit test (§Meta-gate
+   conservation for the binary substrate, the `check-knob-default-coupling`
+   row). `check-spec-fence-balance`, the counter-example the criterion was
+   written against, is a *config-driven* derivation with nothing holding its two
+   copies together at all.
+7. **Its rule invokes no external program the payload does not carry.** *Found
+   at first-cohort selection.* `check-action-run-shell` clears all six above and
+   is still unportable: it requires `shellcheck` on `PATH`, refusing when it is
+   absent and invoking it per extracted block, so a compiled form would move a
+   toolchain requirement from this repo's contributors onto every adopter — the
+   dependency floor TRAJECTORY.md objective 1 exists to collapse, against an
+   adopter objective 5 admits who will not install a toolchain. git is the one
+   sanctioned exception, because it is the floor. Recorded rather than left as a
+   silent skip, because every mechanical screen puts that gate *in*: it shares
+   the cohort's corpus family and its walk and reads no knob, and the fact that
+   excludes it is one none of the six criteria sees.
+
+### The first cohort, and the rule that selects the next
+
+**Two members: `check-action-pinning` and `check-action-gh-repo`** — one cohort
+rather than two coincidences, and the pairing is the whole reason. They share one
+corpus derivation byte for byte (§check-action-gh-repo: *"The walk is
+§check-action-pinning's"*), read no knob between them, and declare the same
+single unbounded walk root. The substrate work is therefore done **once** and
+proved **twice**. `check-action-pinning` needed no new implementation at all: the
+crate already carried its rule as the `reference-only` disposition, kept live so
+the substrate would stay exercised until a port needed it, and this cohort is
+what that disposition was held for.
+
+**The exclusions are recorded, because the next selector meets them again.**
+`check-memory-off` fails criterion 2 decisively: its `--fixture <dir>` arm is a
+different code path from its live arm, and the live arm's corpus is not in the
+tree at all — it is the harness memory directory under `HOME`. A gate whose
+fixture arm bypasses the derivation being ported has no parity oracle for the
+part that matters, which is criterion 4's self-referential-parity hazard arriving
+through another door. (It also word-splits an override into multiple globs and
+reads four knobs — the weaker ground, recorded second so resting on it does not
+leave the stronger one unwritten.) `check-action-run-shell` is the near miss and
+is criterion 7's own case, above.
+
+**The next cohort is the largest set of criteria-clearing gates sharing one
+corpus derivation.** Shared derivation is the axis because it is what made this
+cohort cheap — the walk is ported once and proved N times, and the parity
+comparison is over one corpus shape rather than N. Selecting by kit, by profile,
+or by whatever is easiest next all re-import work this cohort only paid once. Two
+standing bounds the criteria do not carry: **criterion 4 is not relaxed** —
+TRAJECTORY.md refuses that for the first cohort with a named re-entry condition
+(the criterion-clearing corpus exhausted *and* the parity oracle held off the
+shell substrate), and neither holds; and **criterion 7 binds** — a gate whose
+rule shells out to anything but git is out until its dependency is designed away,
+never ported and patched later.
+
+**What this cohort landed, and what it deliberately did not.** Both rules ship as
+compiled subcommands, proved byte-identical against the shell gates on each
+fixture pair, the live tree and the edge roots — the comparison run **while both
+implementations still existed**, which is the only order in which parity can be
+proved at all, since §check-gate-substrate-parity assertion A forbids a
+descriptor and a script coexisting in one dir. The **descriptors are held**: a
+vendored `.gate` with no binary behind it reds a freshly installed consumer's
+battery (§Consumer smoke states that outcome deliberately), and criterion 5 above
+records that no adopter can reach a prebuilt binary until the first tag
+publishing them is cut. That tag is scheduled rather than open
+(TRAJECTORY.md §The closed rulings) and the held work is its own queue unit, so
+both members carry a `reference-only` disposition meanwhile
+(§Meta-gate conservation for the binary substrate) and their shell scripts remain
+the registered implementations. **The port is therefore proved but not live**,
+and every consequence that follows from a *live* descriptor — the dogfood
+settlement, the stale-binary path arming, the disclosure claim turning false —
+waits with it.
+
 ### What the reverted port established
 
 Not nothing, and worth separating from what it broke:
@@ -804,16 +879,18 @@ Not nothing, and worth separating from what it broke:
   descriptors (§check-gate-substrate-parity). Both are fixed; neither would have
   been visible without the port, and neither survives it.
 
-### What is retained, and what a second port must do first
+### What is retained, and where the second port stands
 
 Retained: the crate at `native/`, the descriptor spelling and its
 specification, the `gate_resolve` / `gate_command` split, the conservation
-contract and its disposition table, `check-gate-substrate-parity` with all four
-assertions, the fixture-runner's substrate-blind dispatch, the toolchain floor
-pin, and the CI crate build/clippy/test legs. The crate keeps its
-`check-action-pinning` implementation as a `reference-only` disposition, so
-`cargo test` and the `native_crate` evidence suite assert against a real gate
-rule rather than going green over an empty crate.
+contract and its disposition table, `check-gate-substrate-parity` with every
+assertion that section enumerates, the fixture-runner's substrate-blind
+dispatch, the toolchain floor pin, and the CI crate build/clippy/test legs. The
+crate carries **both** first-cohort rules as `reference-only` implementations
+(§The first cohort, and the rule that selects the next), so `cargo test` and the
+`native_crate` evidence suite assert against real gate rules rather than going
+green over an empty crate — and the read-declaration unit tests hold a `?` to its
+arity across two members rather than one.
 
 **The seam was the deliverable; the live port was the demonstration.** A second
 port had two prerequisites, not follow-ups. **The `check-reads-couples` half is
@@ -827,9 +904,18 @@ refusal. **The criterion 5 half is now satisfied, not merely ruled:** how a
 compiled gate arrives in a consumer tree is settled (criterion 5 above), and both
 mechanism halves are built — `native-artifact-publish-path` produces the artifacts
 and digests, `native-artifact-install-path` selects, verifies and places them.
-Neither prerequisite is outstanding. A second port therefore waits on no build and
-no further ruling; what stands between it and an adopter is the operator-gated first
-tag that publishes binaries as Release assets (TRAJECTORY.md).
+Neither prerequisite is outstanding, and the second port has since been **built
+and proved**: every member of the first cohort ships its rule as a compiled
+subcommand, byte-identical to the shell gate it reproduces.
+
+**What still stands between that port and an adopter is the operator-gated first
+tag that publishes binaries as Release assets (TRAJECTORY.md).** It is not a
+prerequisite to *porting* — that is done — but it is a prerequisite to
+*declaring*, and the distinction is the one a later reader most needs: a `.gate`
+descriptor vendors and the binary does not, so a descriptor landing before that
+tag hands every consumer a member that cannot run (§Consumer smoke). The cohort
+therefore holds its descriptors and keeps its shell scripts registered. A second
+port waits on exactly that one scheduled event, and on nothing else.
 
 ## What the dispatch seam does not settle
 

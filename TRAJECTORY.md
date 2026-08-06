@@ -263,7 +263,7 @@ than a permanent one — criterion 4 is what stops the parity proof being
 self-referential, and the first cohort is the worst moment to weaken the oracle.
 **Deferring the track until the old clause could be met is refused outright:** a
 second port waits on no build and no further ruling (gate-sdk/SPEC.md §What is
-retained, and what a second port must do first), and the publication control such
+retained, and where the second port stands), and the publication control such
 a deferral would buy already exists as the operator-gated first tag ruled
 2026-08-04 above.
 

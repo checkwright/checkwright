@@ -12,66 +12,16 @@
 
 ## New Features
 
-  The first ported cohort and the two claims it falsifies, promoted together. The
-  causal order is the order below: the freshness oracle must exist before a
-  descriptor arms the stale-binary path, and the disclosure correction must land in
-  the same iteration as the cohort that makes the old claim false.
-
-- **native-gate-binary-port** [spec: SPEC-cohort.md] [roadmap: next/reliability] — the
-  first ported cohort.
-  roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
-  Port the battery off bash-plus-GNU-userland onto one native compiled binary in
-  **Rust — settled, not a candidate.** The language ruling and the
-  costed-and-rejected bash portability floor both live at gate-sdk/SPEC.md §The
-  decisions this substrate already closed.
-  **Scoped to the first cohort by the lead 2026-08-06**, per TRAJECTORY.md's step 3.
-  The amendment names the two members — `check-action-pinning`, whose module the crate
-  already carries as its reference-only implementation, and `check-action-gh-repo`,
-  which shares its walk byte for byte — plus the two exclusions and the rule that
-  selects the next cohort. `native-gate-port-remaining-corpus` carries the remainder.
-  **Ground — opacity, now an objective rather than an argument.** TRAJECTORY.md
-  §The objectives rules withholding a gate's implementation a goal, and gate-sdk/SPEC.md
-  §Consumer payload states the claim with its exact bound: raised cost of analysis
-  relative to execution, never confidentiality. This supersedes the filing's
-  strength-is-a-range framing, written under the reading that opacity is not claimed.
-  **Second ground — correctness.** Four of `release-step-verification`'s eleven defects
-  are removed by a real substrate (opt-in shell error model, regex dialect split,
-  textual parameter expansion, hand-rolled parsers); six survive it. Caution: the
-  parser class's live instance closed in awk 2026-08-01, so "only a real parser closes
-  this" overstates. Landing the port then relaxing is the failure mode.
-  **Third ground — a real unit-test harness under the fixtures**, and a static binary
-  as a stronger front-door install claim than the utility list.
-  **One ground it must not rest on — speed.** A port does not delete
-  `check-shellcheck`, and the pre-port baseline already reads stale, which is
-  `gate-timing-baseline-comparability`. **Platform reach is no longer on that list:**
-  the 2026-08-02 ruling-out was superseded by the trajectory pivot, which makes every
-  major operating system objective 2. The pin arithmetic survives as a dated
-  measurement — one of seven `context-kit/lib/toolfloor.sh` pins retired, one
-  (`cargo:1.56`) added by the substrate work — bounding how much of the objective one
-  port buys rather than refuting the ground.
-  **The four open design questions are down to one, and that is the correction.**
-  Three are ruled and their entries no longer exist: the `# graph:` manifest, the
-  consumer payload, and vendoring-plus-extensibility all live in gate-sdk/SPEC.md
-  (§The `# graph:` manifest, §Consumer payload, §Porting a gate to the binary
-  substrate criterion 5, §The extensibility model). The fourth is the dogfood
-  question, **`native-gate-dogfood-ruling`**, which this cohort settles by landing
-  rather than by argument.
-  **Deliverable.** One multi-call binary, a subcommand per check; `gates.list`
-  dispatching per entry to subcommand or script so it lands cohort by cohort; each
-  gate's fixture pair the parity oracle, **executed** not merely present
-  (`check-gate-fixture-coverage` asserts existence only) and proved **while both
-  implementations still exist**, since assertion A forbids them coexisting in a dir;
-  consumer gates keep the shell hatch. What reaches a consumer is a prebuilt
-  per-target binary verified against a published digest and **no implementation
-  source** — the filing's checksummed-artifacts-and-buildable-source clause is void
-  under TRAJECTORY.md, which rules building from vendored crate source at install
-  time out.
-  **A net drain on the queue, not a generator:** it closes
-  `gate-battery-parallel-execution` and `gate-battery-result-cache` and converges with
-  `state-representation-integrity`. Feature-shaped: adds governed names.
-  Filed 2026-07-28 by operator request; body rewritten 2026-08-06 at spec, discharging
-  `native-port-entry-premise-carry` by answering the three ruled design questions
-  rather than dropping them.
+  The first ported cohort landed its implementations and **held its descriptors**
+  (operator-ruled 2026-08-06, TRAJECTORY.md §The closed rulings), which dissolves
+  the causal order these three were promoted under: with no descriptor, the cohort
+  neither arms the stale-binary path nor falsifies the disclosure claim. The
+  freshness oracle stays here and builds dormant-but-correct ahead of the
+  descriptors — its own design already handles a zero-descriptor tree. The
+  disclosure correction was **demoted** to Deferred by the same ruling, to
+  re-promote with `native-gate-cohort-descriptors`: its claim does not become
+  false until a descriptor lands, so correcting it now would assert a tree state
+  that does not exist.
 
 - **native-binary-freshness-ungated** [spec: SPEC-binary-freshness.md] — a compiled
   gate has no freshness oracle. `check-gate-substrate-parity` assertion B diffs the
@@ -103,36 +53,50 @@
   authored 2026-08-06 at spec, which rules the hashing algorithm and the roster
   question that kept it design-pending.
 
-- **payload-disclosure-claim-owner** [spec: SPEC-payload-claim.md] — two governed
-  install surfaces disagree about what a consumer receives.
+## Technical Debt
+
+## Deferred
+
+- **payload-disclosure-claim-owner** [design-pending] — two governed install
+  surfaces disagree about what a consumer receives.
   `installer/README.md` §init claims that what governs your tree afterwards is
   committed source you can read — true of every tree that exists today and false at
   the first ported gate, since `gate-sdk/SPEC.md` §Consumer payload rules that a
   compiled gate's implementation source does not ship.
   **Defect class:** a disclosure claim about the vendored payload restated across
   governed install surfaces with one owner and no oracle.
-  **The tense question that left it needing design is settled by this
-  iteration**, not by judgment. It had to say something true both before and after
-  the first port without reading as a warning about a thing that had not happened;
-  the cohort lands here, so the corrected claim is written in the present.
-  **Measured at promotion: four claims, not one.** Re-verified against the tree, the
-  corpus is `installer/README.md` §init plus three sentences on `docs/install.md` —
-  its H1 preamble, its one-shot-vendoring paragraph, and §What a gate discloses,
-  which is build batch 1's own correction and is written in the future tense the
-  cohort retires. Four restatements is also the argument against fixing them by hand
-  and stopping.
+  **Demoted 2026-08-06 at build, by the demote ritual** (lifecycle-kit/SPEC.md
+  §The state machine's hatches) — moved back here with its tag restored and its
+  amendment deleted in the same commit. The trigger is what moved: the correction
+  was promoted on the premise that the first cohort makes the §init claim false in
+  this iteration, and the cohort **held its descriptors**, so the claim stays
+  categorically true. Correcting it now would assert a tree state that does not
+  exist — and one drafted line ("most gates are shell today") would be flatly
+  wrong, since all of them are.
+  **The design is not lost and must not be re-derived.** `canon-kit/SPEC-payload-claim.md`
+  was authored 2026-08-06 at spec and settles both hard questions — the tense, and
+  the corpus re-measured to four claims (`installer/README.md` §init plus three
+  sentences on `docs/install.md`: its H1 preamble, its one-shot-vendoring
+  paragraph, and §What a gate discloses). Recover it from history rather than
+  rewriting it: `git log -p -- canon-kit/SPEC-payload-claim.md`. Its tense ruling
+  is the one thing a re-promotion must re-read rather than adopt, since it was
+  written for an iteration that lands a descriptor.
   **Deliverable, structural rather than prose:** a declared owner and an oracle, the
   shape `check-install-claim` already gives the primary-install-path claim. The
   amendment rules it a **sibling gate** rather than that gate's extension — one is
   positional and install-section-scoped, the other is membership over the whole
   governed doc set — and keeps the vocabulary as consumer config, since a spelling
   of what a payload discloses is one project's distribution model.
+  **Promotion trigger:** re-promote **with** `native-gate-cohort-descriptors`, the
+  unit that lands the held descriptors and thereby makes the claim false. That is a
+  named expected event rather than a date, so this entry is not icebox-eligible.
+  **Cost while deferred:** none today — the claim it corrects is still true, which
+  is precisely why it was demoted. The cost begins the moment a descriptor lands:
+  from that commit four governed install surfaces overstate what a consumer
+  receives, with one owner and no oracle, on the adoption path.
   Filed 2026-08-03 at close from the gap inbox; found by build batch 3. Amendment
-  authored 2026-08-06 at spec, which settles the tense and re-measures the corpus.
-
-## Technical Debt
-
-## Deferred
+  authored 2026-08-06 at spec; demoted 2026-08-06 at build under the operator's
+  hold ruling.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   **Operator-ruled 2026-08-04, at the close of `ruling-capture-contracts`.** The drain that
@@ -3553,5 +3517,6 @@
 ## Done
 
 - native-port-entry-premise-carry
+- native-gate-binary-port
 
 ## Lessons Learned
