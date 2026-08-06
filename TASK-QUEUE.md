@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: delegation-burn-reduction
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -2500,17 +2500,17 @@
   only parallelism or isolation is wanted. The lead template's sentence then shrinks to a
   citation, with its tier-economics grounds as one named instance.
   **Enforcement is mechanizable and not by a gate** — a dispatch never enters the tracked
-  tree — but by a PreToolUse hook on the `Agent` matcher, the channel
-  `.claude/settings.json` already runs for `scripts/agent-budget-guard.sh`: it receives
-  the subagent type in the same payload and re-arms at every depth, which is exactly
-  where this fork slipped through. The block can be unconditional — no sanctioned fork
-  use exists in this doctrine.
+  tree — but by a PreToolUse hook on the `Agent` matcher, which re-arms at every depth,
+  exactly where this fork slipped through. The block can be unconditional — no sanctioned
+  fork use exists in this doctrine. **Re-verified 2026-08-06 at scope:** that hook is
+  already armed for `scripts/agent-budget-guard.sh`, so the channel is live; but the
+  guard reads no stdin, so reading the dispatched subagent type is new parsing.
   **Deliverable:** the per-context statement in the agent-execution template, the
   lead-template shrink to a citation, and the hook arm.
-  **Why `[design-pending]`:** two costs to design against. `.claude/settings.json` is
-  pinned by `check-settings-pins`, so arming the hook is a pinned-surface edit; and the
-  kit-shaped form ships as a delegation-kit template with a consumer binding rather than
-  a repo-local script, else the doctrine ships without its enforcement.
+  **Why `[design-pending]`:** one cost, not the two once filed — the kit-shaped form must
+  ship as a delegation-kit template with a consumer binding, not a repo-local script,
+  else the doctrine ships without its enforcement. The pinned-surface cost is **answered**:
+  `scripts/settings-pins.conf` pins two keys, neither under `.hooks`.
   **Cost while deferred:** every dispatch that exists to narrow a child's authority can be
   answered by a fork that ignores the narrowing, and the failure is invisible — the fork
   reports success on work it was never authorized to do.
@@ -2525,8 +2525,8 @@
   it" in its prompt, so fork was chosen to inject rules the roster types lack, not
   for context inheritance: every one received a self-contained brief and still paid
   to re-materialize its parent's context. The cost while deferred is no longer
-  argued but measured, and the design here is already ruled — only the two
-  `[design-pending]` costs stand between this entry and a build.
+  argued but measured, and the design here is already ruled — only the one remaining
+  `[design-pending]` cost stands between this entry and a build.
   Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
 
 - **meta-gate-conservation-record-reach** [design-pending] — the conservation record
@@ -3702,6 +3702,24 @@
   the path. Whether the meter may read that file at all is the ruling: it is a
   harness-private artifact under no contract, and reading it couples the meter to a
   shape nothing holds still.
+  **Re-verified 2026-08-06 at scope — the attribution key did not survive it.** A search
+  for `spawn-record` and its spellings returns exactly **one** hit in the whole repo: this
+  entry's own prose above. No path, no schema, and no reference from
+  `drift-kit/bin/stage-economics.sh` or `drift-kit/SPEC.md` §The stage-economics meter. The
+  sibling spawn-record file is therefore a hypothesis about the harness rather than an
+  observed artifact, and the ruling this entry poses cannot be answered by reading the
+  tree. Probe for it before designing against it.
+  **A fallback needing no harness contract — design input, not a ruling.** Take the
+  attribution key from the *dispatcher* rather than the harness: a dispatching session
+  already mints a path and names it in its child's prompt, this repo's resume-journal
+  idiom, which `subagent-parent-addressing` independently ranks as the only upward route
+  that exists. Carrying the stage identity in that minted path makes a fan-out
+  attributable at any depth by a tracked artifact under this project's own contract, with
+  no coupling to a shape nothing holds still. It is also the convention
+  `cross-stage-census-duplication` needs, which is why the two may be one design.
+  **Depth 1 is already discharged and must not be rebuilt:** the lead-from-path derivation
+  and the `supervision` row it feeds are shipped. What this entry adds is the grandchild
+  case alone.
   **Cost while deferred:** the one economics surface read close-over-close under-reports
   every fan-out-heavy stage, and under-reports it hardest on exactly the iterations
   worth investigating. Sibling: `supervision-overhead-unmeasured`, the lead's own row,

@@ -242,6 +242,29 @@ unbounded reading is unsatisfiable in one iteration and no gate bounds it; what
 bounds it is scope's ordinary sizing against the measured entries above, and a
 source found but not cut is a costed Deferred entry like any other.
 
+**The cut is five units — ruled 2026-08-06 by the operator at the
+`delegation-burn-reduction` scope.** The ruling above left this slot open —
+*Scope still owns the cut* — and this records what filled it, in build order:
+
+1. `stage-fanout-burn-unbilled`, first, by the ordering the ruling above fixed.
+2. `fork-dispatch-prohibition` and 3. `subagent-parent-addressing`, as one batch:
+   both are enforced at the single PreToolUse dispatch chokepoint, so one hook
+   edit and one doctrine-template edit carry two doctrines.
+4. `cross-stage-census-duplication`.
+5. `read-only-fanout-unenforceable` — **the operator's own extension, taken over
+   scope's recommendation to leave it deferred.**
+
+Point 5 is the half worth recording, because it crosses the theme this ruling
+set. That entry's cost is a correctness cost — an unreviewed fan-out commit on
+the shared branch — not a burn cost, which is why scope proposed against it. What
+bought it was marginal cost rather than theme: it is a further doctrine on a hook
+the batch above opens regardless, and the surface is open exactly once. A later
+session reading the theme alone would find unit 5 anomalous and re-derive the
+argument; it is written down here instead.
+
+All five are features by the new-names litmus, so `spec` authors their amendments
+and pairs them in — scope promoted none of them.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
