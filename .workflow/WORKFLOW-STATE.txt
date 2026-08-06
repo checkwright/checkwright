@@ -7,3 +7,4 @@
 delegation-burn-reduction scope a1c6c7af 2026-08-06
 delegation-burn-reduction spec a8fb45fc 2026-08-06
 delegation-burn-reduction spec a929dd3d 2026-08-06
+delegation-burn-reduction align a3ac5c7d 2026-08-07
