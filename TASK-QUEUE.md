@@ -18,32 +18,6 @@
   artifact state, the lock detects the residual case where the signal is wrong
   anyway, and the verify rename fixes the check the lead runs afterwards.
 
-- **dispatched-session-waiting-rule-residency** [spec: SPEC-residency.md] — a dispatched
-  stage session ends its turn to await a completion notification, orphaning the work it
-  started, because the in-turn condition-waiting rule is not operative at the tier the
-  session actually loads.
-  recurrence: dispatched-session-waiting-rule-residency 2026-08-04
-  Observed 2026-08-02, 2026-08-04 and 2026-08-05 — each time the validate session starting
-  `run-validate.sh` in the background and ending its turn to wait, the failure
-  delegation-kit/templates/agent-execution.md names under **Background + notification,
-  never poll**. The third fired through a dispatch prompt that named the rule, as the
-  second did. Neither orphan landed harm, but a surviving orphan is the case that protocol
-  calls the worse one: it keeps mutating shared files while the next actor moves against
-  them.
-  **The premise correction that survives promotion:** the rule is not absent. The agent
-  definition has carried a **Your turn end is your session end** bullet since before either
-  of the first two incidents; what it does is *point*. The amendment rules the defect to be
-  pointer-versus-operative-statement at the always-loaded tier, corrects delegation-kit's
-  own role-blind rationale for the pointer posture, and sanctions the bounded restatement
-  that fixes it under a named rule.
-  **Self-label corrected at promotion.** The body read "Debt: … no new governed name" while
-  its own deliverable asked delegation-kit/SPEC.md to sanction a restatement — a contract
-  every consumer honors, which canon-kit's litmus makes a feature. The design ruling that
-  filled this body now lives in the amendment, where causal completeness has a home.
-  Filed 2026-08-02 at validate to the gap inbox; promoted at close, its premise corrected
-  against the agent definition's git history; label corrected and amendment authored
-  2026-08-06 at spec.
-
 - **lead-dispatch-requires-completion-notification** [spec: SPEC-dispatch-signal.md] — the
   lead has no stated precondition for dispatching stage N+1, and the one it improvised is
   wrong: artifact state.
@@ -3341,5 +3315,6 @@
 ## Done
 
 - validate-producer-liveness-unobservable
+- dispatched-session-waiting-rule-residency
 
 ## Lessons Learned

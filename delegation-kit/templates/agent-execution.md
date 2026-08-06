@@ -11,6 +11,13 @@ For a **deletion, rename, or heavy cross-spec audit** dispatch, also load the
 mechanical pre-flight in [dispatch-checklists.md](dispatch-checklists.md) — a
 reach-through, not a change to this protocol; every rule below still applies.
 
+Two bullets below — **Background + notification, never poll** and **Findings you
+will act on are durable before you act on them** — bind a dispatched role that
+fires no trigger loading this template, so each is also stated as a bare
+imperative in the consumer's always-loaded agent definition under
+delegation-kit/SPEC.md §Operative residency. That copy is sanctioned rather than
+drift: do not delete it on sight, and when either rule changes here, propagate.
+
 - **Supervisor owns rulings; agents surface, never guess.** SECURITY and design
   rulings (e.g. a privileged caller set, a naming collision) are decided by the
   supervisor and handed down; an agent that hits anything its brief doesn't cover

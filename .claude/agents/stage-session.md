@@ -64,12 +64,16 @@ batch-specific pointers such as the journal path.
   message channel; the mechanics are delegation-kit's:
   delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps.
   The dispatch names the journal path.
-- **Your turn end is your session end.** You are a dispatched agent, so
-  backgrounded work does not survive your turn the way a supervisor's does, and
-  findings you hold live only in your context. Both rules and their reasoning
-  live in delegation-kit/templates/agent-execution.md — its **Background +
+- **Your turn end is your session end.** Never end a turn on work still
+  running, and never end one in order to *wait*: wait in-turn instead, on the
+  work's own artifact, for as long as it takes, and report only results you
+  hold. Write findings down to your resume journal *before* you act on them,
+  never after. Both rules, their reasoning,
+  and the mechanics of an in-turn wait live in
+  delegation-kit/templates/agent-execution.md — its **Background +
   notification, never poll** and **Findings you will act on are durable before
-  you act on them** bullets.
+  you act on them** bullets; stating them here as imperatives is sanctioned by
+  delegation-kit/SPEC.md §Operative residency.
 - **Shared git index.** A concurrent session may share the index; follow the
   shared-index discipline in CLAUDE.md §This repo is governed by its own kits,
   not a copy here.

@@ -222,11 +222,86 @@ The consumer's CLAUDE.md carries no digest of the bullets, only a resident
 pointer: the pre-authorization sentence (consumer judgment on what delegation
 needs no ask) and `/agent-execution`. Rationale: a rule is resident only when it
 has no load trigger (the load-trigger-residency doctrine), and every protocol
-bullet triggers at `Agent` dispatch — which already has a mechanical seam, the
+bullet triggers at `Agent` dispatch **for the role that dispatches** — which
+already has a mechanical seam, the
 per-dispatch budget guard, whose block message names `/agent-execution`. The
 doctrine lives behind the trigger, not in the always-loaded file. Honest limit:
 the guard enforces budget mechanically, not protocol literacy — a session that
 dispatches without invoking the skill carries only the resident pointer.
+
+**That role qualifier is load-bearing rather than hedging.** Stated without it,
+the rationale is role-blind: a *dispatched* role fires no such trigger — it is
+not dispatching at all, it is executing a stage, and no stage skill or stage
+template loads this protocol — so for that reader the pointer posture leaves the
+rule unreached, which is how a posture nobody disputes produced three incidents.
+§Operative residency governs that case, and the bounded imperative it sanctions
+in a consumer's always-loaded agent definition is this same doctrine applied at a
+different reader, not an exception carved out of this paragraph.
+
+### Operative residency
+
+A rule may be **restated as an imperative in a surface that does not own it**
+when all three of these hold:
+
+- **(a) Unreachable trigger.** The actor the rule binds never fires a trigger
+  that loads the rule's owning doc. This is a property of the *reader*, settled
+  by asking which triggers that reader actually fires.
+- **(b) Imperative only.** What is restated is the instruction. The reasoning,
+  the failure analysis, and the mechanism stay with the owner.
+- **(c) Adjacent citation.** The restatement names the owning surface beside
+  itself, so the owner stays the single place the rule is explained and changed.
+
+Each condition has a reader at a transition rather than being self-evident: (a)
+and (b) are read by whoever authors a restatement, at authoring, and again by a
+reviewer or an authoring stage assessing an existing one; (c) is the pointer any
+later reader — and any content-tiering check — follows back to the owner. The
+reader the sanction exists for is the third and never inspects a condition at
+all: the bound actor, which receives the imperative at the tier it always loads,
+which is the whole point.
+
+**The anti-licence clause is part of the rule, not commentary.** The sanction is
+keyed on (a): a rule that the bound actor's own skill or template already loads
+fails (a) and stays a pointer. Without that clause this reads as "duplicate when
+it feels important", which is the failure content-tiering exists to prevent and
+would cost more than the gap it closes.
+
+**This is load-trigger residency's own logic, not an exception to it.** That
+doctrine earns a rule a place in an always-loaded file only when no stage, skill,
+or tool-call trigger exists to load it, and the decisive question is *exists for
+whom*. A trigger that exists but that the bound actor never fires is, for that
+actor, no trigger. The doctrine's stated justification — a rule a stage or a tool
+call would load anyway costs nothing to defer and everything to keep resident —
+does not merely fail for such an actor, it inverts: nothing loads it anyway, so
+deferring costs everything.
+
+**Content-tiering is satisfied by bounding what is copied, which is what (b) is
+for.** The restatement is still a restatement, which is why it needs this
+sanction rather than an argument; but its drift surface is one instruction rather
+than a slab, and the place the rule is explained and changed stays single.
+
+The attested subjects are the template's **Background + notification, never
+poll** rule and its **Findings you will act on are durable before you act on
+them** rule, both of which bind a dispatched session. Three such sessions read a
+*descriptive* pointer to them at the always-loaded tier and derived no constraint
+from it. The derivations were easy, which is what makes the failure instructive:
+under load a descriptive sentence reads as background about one's situation
+rather than as a constraint on the next action. The defect this rule names is
+therefore pointer-versus-operative-statement, never absence.
+
+**No gate is owed, and not for budget.** No check can read a session's choice to
+end a turn — the act leaves no tracked artifact. The anti-restatement gates were
+checked against a sanctioned restatement rather than assumed inert, since a
+sanction that required weakening a gate would be the wrong sanction:
+`check-shim-restatement` scans binding shims under the skills directory against a
+corpus of the consumer's always-loaded file plus kit templates, so a consumer's
+agent definition is neither its scanned surface nor its corpus, and
+`check-surface-duplication`'s predicate is a glossary term's definition on a
+canonical SPEC surface, which reaches no agent definition either. The sanction
+therefore ships with **no gate exemption** — and the honest converse ships with
+it: nothing in the battery would catch a *non*-compliant restatement, so (a)–(c)
+are review-enforced. The nearest buildable oracle detects a *consequence* rather
+than the act — `check-producer-liveness` reads a producer still running at the
+next stage's entry (evidence-kit/SPEC.md §check-producer-liveness).
 
 ## Resume journal — agent writes, scratch reset sweeps
 

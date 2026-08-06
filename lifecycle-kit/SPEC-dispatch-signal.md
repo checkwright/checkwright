@@ -79,7 +79,8 @@ the place where it *can* be discharged — the next section.
 
 The **negative is assertable**, and that pairing is the whole disposition:
 "is the producer still running?" is exactly what the liveness lock reads.
-`evidence-kit/SPEC-liveness-lock.md` is that oracle, and the two amendments are
+`check-producer-liveness` (evidence-kit/SPEC.md §check-producer-liveness) is that
+oracle, and the two halves are
 one unit — **prose rule on the dispatch side, oracle on the artifact side.**
 Shipping the oracle while leaving this rule unstated is the specific failure to
 avoid: it would install a detector for the consequence while leaving the decision
@@ -89,15 +90,16 @@ recurs and is caught only by an operator. The converse holds too — this rule w
 no oracle is the shape that already recurred.
 
 There is a third member, and stating it completes the causal story rather than
-widening the unit. `delegation-kit/SPEC-residency.md` is what makes the signal
+widening the unit. Operative residency (delegation-kit/SPEC.md §Operative
+residency) is what makes the signal
 this rule depends on **truthful**: a dispatched session that ends its turn on
 still-running work emits a completion notification that lies. So the set reads:
-that amendment makes the signal honest, this one makes the lead depend on it, and
+that rule makes the signal honest, this one makes the lead depend on it, and
 the lock's entry-side reader detects the residual case where it is wrong anyway.
 (The lock also gained a writer-side refusal for a distinct, adjacent hazard — a
 second or out-of-band producer racing the manifest — which is not part of this
 incident class and does not close this residual case;
-evidence-kit/SPEC-liveness-lock.md §The ruling record.)
+evidence-kit/SPEC.md §bin/run-validate.sh.)
 
 ## What changes
 
@@ -149,7 +151,7 @@ answered by naming the signal's ends honestly:
   arrives, which is the delegation protocol's never-poll pattern that a
   supervisor role already has.
 - **The assertable complement** — `check-producer-liveness` at the stage-entry
-  transition, specified in `evidence-kit/SPEC-liveness-lock.md`. It consumes no
+  transition, specified in evidence-kit/SPEC.md §check-producer-liveness. It consumes no
   part of this signal; it independently answers the negative from the artifact
   side, which is why the pair covers the case where the signal itself is wrong.
 
@@ -185,10 +187,15 @@ kind of stage.
 - [ ] **Causal completeness** — the signal's producer and consumer are named, the
       producer's out-of-tree location is stated as the cause of the prose-only
       limit, and the assertable complement is named.
-- [ ] **The pair ships together** — this amendment and
-      `evidence-kit/SPEC-liveness-lock.md` are both merged, or neither is. A
+- [ ] **The pair ships together** — this amendment and the producer-liveness
+      oracle are both merged, or neither is. A
       merge that lands the oracle alone leaves the dispatch decision ungoverned,
       which is the failure this set exists to end.
+      **Discharged at the iteration, not the commit** (operator-relayed ruling,
+      2026-08-06): the oracle merged first at `aba9960`, and a symmetric reading
+      would deadlock both halves since neither could go first. Build stays in
+      build until the queue empties and close refuses entry on a non-empty active
+      queue, so the iteration cannot close with this half unmerged.
 - [ ] **Merged with no information lost** — the gating-versus-liveness boundary
       lands in the template's prose, not as an appendix.
 - [ ] **Amendment deleted** — this file removed on merge; `ls lifecycle-kit/SPEC-*.md`
