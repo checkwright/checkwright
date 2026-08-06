@@ -11,6 +11,8 @@ check-evidence-baseline
 check-evidence-manifest
 EOF
 
+# smoke-unregistered: check-producer-liveness — entry-preflight only, never gates.list-registered: its subject is a producer-in-flight transition, not tree state, and a consumer battery that includes itself (this repo's does) would red every run against the lock run-validate just claimed (evidence-kit/SPEC.md §check-producer-liveness)
+
 mkdir -p .workflow
 [[ -f .workflow/validate-baseline.txt ]] \
     || printf '# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug>]\n' > .workflow/validate-baseline.txt
