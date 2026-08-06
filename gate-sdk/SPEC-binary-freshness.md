@@ -288,9 +288,12 @@ assertion C's own test, so the audit stage is owed before build entry.
 - [ ] **Gaps filed** — cross-component gaps discovered during the work filed as
       debt tasks (a build-time causal gap is resolved that session, not
       deferred).
-- [ ] **The crate gains no dependency** — `native/Cargo.toml`'s `[dependencies]`
-      is still empty after this lands. A digest crate would be the first, and the
-      whole point of the git-as-hasher ruling is that none is needed.
+- [ ] **This delta adds no crate dependency** — `native/Cargo.toml`'s
+      `[dependencies]` gains nothing from the stamp work. A digest crate would be
+      the artifact's first, and the whole point of the git-as-hasher ruling is
+      that none is needed. Stated of this delta rather than of the tree, so that
+      a sibling unit adding one for its own reason does not falsify a checklist
+      item it never owned.
 - [ ] **One algorithm, not two** — the stamp computation is the same git
       invocation on both sides, verified by a case where the two agree over a
       tree neither side special-cases.

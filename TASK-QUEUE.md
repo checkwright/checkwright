@@ -17,6 +17,62 @@
   descriptor arms the stale-binary path, and the disclosure correction must land in
   the same iteration as the cohort that makes the old claim false.
 
+- **native-gate-binary-port** [spec: SPEC-cohort.md] [roadmap: next/reliability] — the
+  first ported cohort.
+  roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
+  Port the battery off bash-plus-GNU-userland onto one native compiled binary in
+  **Rust — settled, not a candidate.** The language ruling and the
+  costed-and-rejected bash portability floor both live at gate-sdk/SPEC.md §The
+  decisions this substrate already closed.
+  **Scoped to the first cohort by the lead 2026-08-06**, per TRAJECTORY.md's step 3.
+  The amendment names the two members — `check-action-pinning`, whose module the crate
+  already carries as its reference-only implementation, and `check-action-gh-repo`,
+  which shares its walk byte for byte — plus the two exclusions and the rule that
+  selects the next cohort. `native-gate-port-remaining-corpus` carries the remainder.
+  **Ground — opacity, now an objective rather than an argument.** TRAJECTORY.md
+  §The objectives rules withholding a gate's implementation a goal, and gate-sdk/SPEC.md
+  §Consumer payload states the claim with its exact bound: raised cost of analysis
+  relative to execution, never confidentiality. This supersedes the filing's
+  strength-is-a-range framing, written under the reading that opacity is not claimed.
+  **Second ground — correctness.** Four of `release-step-verification`'s eleven defects
+  are removed by a real substrate (opt-in shell error model, regex dialect split,
+  textual parameter expansion, hand-rolled parsers); six survive it. Caution: the
+  parser class's live instance closed in awk 2026-08-01, so "only a real parser closes
+  this" overstates. Landing the port then relaxing is the failure mode.
+  **Third ground — a real unit-test harness under the fixtures**, and a static binary
+  as a stronger front-door install claim than the utility list.
+  **One ground it must not rest on — speed.** A port does not delete
+  `check-shellcheck`, and the pre-port baseline already reads stale, which is
+  `gate-timing-baseline-comparability`. **Platform reach is no longer on that list:**
+  the 2026-08-02 ruling-out was superseded by the trajectory pivot, which makes every
+  major operating system objective 2. The pin arithmetic survives as a dated
+  measurement — one of seven `context-kit/lib/toolfloor.sh` pins retired, one
+  (`cargo:1.56`) added by the substrate work — bounding how much of the objective one
+  port buys rather than refuting the ground.
+  **The four open design questions are down to one, and that is the correction.**
+  Three are ruled and their entries no longer exist: the `# graph:` manifest, the
+  consumer payload, and vendoring-plus-extensibility all live in gate-sdk/SPEC.md
+  (§The `# graph:` manifest, §Consumer payload, §Porting a gate to the binary
+  substrate criterion 5, §The extensibility model). The fourth is the dogfood
+  question, **`native-gate-dogfood-ruling`**, which this cohort settles by landing
+  rather than by argument.
+  **Deliverable.** One multi-call binary, a subcommand per check; `gates.list`
+  dispatching per entry to subcommand or script so it lands cohort by cohort; each
+  gate's fixture pair the parity oracle, **executed** not merely present
+  (`check-gate-fixture-coverage` asserts existence only) and proved **while both
+  implementations still exist**, since assertion A forbids them coexisting in a dir;
+  consumer gates keep the shell hatch. What reaches a consumer is a prebuilt
+  per-target binary verified against a published digest and **no implementation
+  source** — the filing's checksummed-artifacts-and-buildable-source clause is void
+  under TRAJECTORY.md, which rules building from vendored crate source at install
+  time out.
+  **A net drain on the queue, not a generator:** it closes
+  `gate-battery-parallel-execution` and `gate-battery-result-cache` and converges with
+  `state-representation-integrity`. Feature-shaped: adds governed names.
+  Filed 2026-07-28 by operator request; body rewritten 2026-08-06 at spec, discharging
+  `native-port-entry-premise-carry` by answering the three ruled design questions
+  rather than dropping them.
+
 - **native-binary-freshness-ungated** [spec: SPEC-binary-freshness.md] — a compiled
   gate has no freshness oracle. `check-gate-substrate-parity` assertion B diffs the
   `.gate` descriptor set on disk against the binary's `--list` roster; it is
@@ -861,56 +917,6 @@
   the side this entry doubted — so the cheaper answer may still be the wrong one.
   Filed 2026-07-26 by close (`release-path-hardening`), draining the
   stale-measured-count bullet; costed at roughly one small unit.
-
-- **native-gate-binary-port** [design-pending] [roadmap: next/reliability] — a new gate substrate.
-  roadmap-summary: The gate battery as one native binary: real parsers, no GNU userland.
-  Port the battery off bash-plus-GNU-userland onto one native compiled binary in
-  **Rust — settled, not a candidate**; `native-gate-language-ruling` holds the
-  decision and the alternative refused. Scale is read off `gates.list` and `*/checks`.
-  **Ground — gate opacity.** An agent that can *read* a gate's bash predicts its
-  verdict and acts on that instead of running it; a binary makes executing the
-  cheapest way to know. Strength is a **range** the payload ruling fixes: a
-  binary-plus-documented-rule payload approaches structural, one still shipping
-  sources and fixtures degrades to friction. Never secrecy — binaries are
-  reverse-engineerable. Unmeasurable here: this repo dogfoods from source.
-  **Second ground — correctness.** Four of `release-step-verification`'s eleven
-  defects are removed by a real substrate (opt-in shell error model, regex dialect
-  split, textual parameter expansion, hand-rolled parsers); six survive it. Caution:
-  the parser class's live instance closed in awk 2026-08-01, so "only a real parser
-  closes this" overstates. Landing the port then relaxing is the failure mode.
-  **Third ground, restored 2026-08-02 — a real unit-test harness under the
-  fixtures**, and a static binary as a stronger front-door install claim than the
-  utility list. Both stood in the 2026-07-28 filing; neither has been falsified.
-  **Two grounds it must NOT rest on, both falsified 2026-08-02 at scope.** *Speed* —
-  a port does not delete `check-shellcheck`; the pre-port baseline has since been
-  captured (`.workflow/gate-timing-baseline.txt`) and already reads stale, which is
-  `gate-timing-baseline-comparability`. *Platform reach* — re-counted 2026-08-02: it
-  retires one of **seven** `context-kit/lib/toolfloor.sh` pins and the substrate work
-  itself added one (`cargo:1.56`); the rest survive in kit `bin/` and the hook
-  emitter, and `init` hands to bash, so Windows stays blocked.
-  **Open design questions, each held by a linked entry — none may be dropped again.**
-  (1) *The `# graph:` manifest* — ruled by `native-gate-dispatch-seam`, slice 1.
-  (2) *The consumer payload* — `gate-payload-disclosure-ruling`.
-  (3) *Vendoring and the extensibility model* — ruled by `native-gate-vendoring-model`.
-  (4) *The dogfood question* — `native-gate-dogfood-ruling`.
-  **Closed alternative:** a bash portability floor, costed 2026-08-02 and rejected —
-  `bash-portability-floor-costing` holds the costing and lands it in the SPEC.
-  **Deliverable:** one multi-call binary, a subcommand per check; `gates.list`
-  dispatching per entry to subcommand or script so it lands cohort by cohort; each
-  gate's fixture pair the parity oracle, **executed** not merely present
-  (`check-gate-fixture-coverage` asserts existence only) and green **before** the
-  script it replaces retires; consumer gates keep the shell hatch; checksummed
-  artifacts and buildable source, whose "only git" clause tensions with (2).
-  **Sequencing, restored from the filing:** cost the design spike apart from the
-  port — the spike decides whether the port is a cohort per iteration or worse.
-  **Cost while deferred:** every new gate adds shell to the eventual port and the
-  silent-failure classes stay reachable. **A net drain on the queue, not a generator:**
-  promoting it closes `gate-battery-parallel-execution` and `gate-battery-result-cache`
-  and converges with `state-representation-integrity`. Feature-shaped: adds governed
-  names. Filed 2026-07-28 by operator request.
-  **Ground 1 and the ruled-out platform-reach ground are superseded 2026-08-03 by the
-  operator's trajectory pivot** — opacity is a goal, OS reach an objective; the objective
-  set is recorded in TRAJECTORY.md. Body rewrite pending.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
@@ -3145,26 +3151,29 @@
   boundary, which is exactly when the state is most valuable and least reconstructible.
   Filed 2026-08-04 at close, from the close session's own misfire.
 
-- **native-port-entry-premise-carry** [design-pending] — three falsified claims in
-  `native-gate-binary-port`'s body, carried here because that entry sits at the line cap.
-  Scope's premise re-verification 2026-08-05 found three of that entry's body claims stale,
-  and the entry measures at exactly `check-queue-entry-budget`'s per-entry cap, so the
-  corrections cannot ride it. The operator ruled the same day that the body rewrite belongs
-  to that unit's own scope next iteration. This entry is the carrier that gets the findings
-  there; it designs nothing and is deleted when the rewrite lands.
-  **The three corrections.** (1) The Deliverable clause still promises checksummed
-  artifacts and buildable source, which TRAJECTORY.md ruled void. (2) Of the four open
-  design questions the entry declares none may be dropped again, three are ruled and no
-  longer exist as entries — only the dogfood ruling is live. (3) The entry already declares
-  "Body rewrite pending" without saying what is pending; these are it.
-  **Compression is the remedy, and it is the one `check-queue-entry-budget` itself names**
-  on a red — answer the grounds rather than drop them. Three open questions collapsing to
-  one is net-shorter, so the rewrite fits inside the cap the entry currently sits at; this
-  is not a request for an eviction or a cap exemption.
-  **Cost while deferred:** the queue's highest-inbound entry argues from three claims its
-  own iteration falsified, so any scope ranking it reads answered questions as live grounds
-  and re-derives the corrections that this entry already holds.
-  Filed 2026-08-05 by close, draining the gap inbox under the operator's routing ruling.
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: next/reliability] —
+  the battery beyond the first cohort.
+  roadmap-summary: The rest of the battery onto the native binary, cohort by cohort.
+  Successor to `native-gate-binary-port`, which the lead scoped to the first cohort
+  2026-08-06 so that the head could complete without the public roadmap commitment
+  lapsing. This entry carries the remainder of the corpus and inherits the head's
+  grounds rather than restating them: gate-sdk/SPEC.md §Porting a gate to the binary
+  substrate owns the criteria, §Consumer payload the payload rule, and TRAJECTORY.md
+  §The objectives the direction all three serve.
+  **What the first cohort leaves settled, so this entry does not re-derive it:** the
+  seven port-candidate criteria including the external-program screen the cohort paid
+  for, the parity procedure (compare while both implementations still exist), the
+  two-commit sequencing `check-gate-tamper` forces, and the next-cohort selection rule
+  — the largest set of criteria-clearing gates sharing one corpus derivation.
+  **What is genuinely open here.** Whether the criterion-4 corpus is large enough to
+  finish without relaxing it, and TRAJECTORY.md's named re-entry condition for that
+  relaxation — the criterion-clearing corpus exhausted *and* the parity oracle held off
+  the shell substrate. Neither holds today, so this is the entry that will meet it.
+  **Cost while deferred:** every new gate adds shell to the eventual port, the
+  silent-failure classes stay reachable across the unported corpus, and the GNU-userland
+  pins the port exists to retire keep their hold on the toolchain floor.
+  Filed 2026-08-06 at spec, under the lead's split ruling, before the head's Done-move so
+  that `ROADMAP.md` never loses the commitment.
 
 - **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
   a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
@@ -3542,5 +3551,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- native-port-entry-premise-carry
 
 ## Lessons Learned
