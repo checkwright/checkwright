@@ -3768,6 +3768,4 @@
 
 ## Done
 
-- fanout-child-dispatcher-addressing
-
 ## Lessons Learned
