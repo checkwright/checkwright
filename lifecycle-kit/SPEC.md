@@ -156,6 +156,31 @@ nothing the tracked surfaces do not already hold. The lead is a boundary skill,
 not a stage — it stamps nothing and joins no stage set, so the coverage gate
 never reads it (the release-sweep precedent, §templates/lead.md).
 
+**Honest limit on the lead's dispatch precondition.** A lead dispatches stage
+N+1 on stage N's **agent completion notification**, never on an artifact — not
+its commit, its stamp, a clean tree, a green battery, or a cleared `--simulate`
+(§templates/lead.md). That precondition is **prose-only and human-enforced**, and
+the cause is structural rather than budgetary. The signal's **producer is the
+harness**, emitting it when the dispatched session's turn ends — outside every
+governed tree, which is not a gap to close but the direct reason no gate can read
+it; its enabling configuration is the dispatch itself, since the lead dispatches
+in the background with notification (delegation-kit/SPEC.md §The delegation
+model), so the producer is reachable on the ordinary path. Its **consumer is the
+lead**, at the dispatch transition for stage N+1, by the lead's own in-turn wait
+rather than a read. Its **truthfulness** is not the harness's to guarantee: a
+dispatched session that ends its turn on still-running work emits a notification
+that lies, which is what delegation-kit/SPEC.md §Operative residency exists to
+prevent. The limit is recorded here rather than left to be inferred from the
+absence of a gate, because an unstated version reads as an oversight for a later
+session to fix by building the impossible gate. Naming it is also what routes the
+enforcement duty to where it *can* be discharged: the **negative is** assertable
+from the artifact side. A producer-liveness gate wired into
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT` (evidence-kit/SPEC.md §check-producer-liveness)
+answers *is the producer still running?* independently of the signal, which is
+what covers the case where the signal itself is wrong. Precedent for a
+prose-only rule in the same template: the no-sibling-dispatch clause, prose for
+the same reason.
+
 ### Deviation transitions
 
 The stages walk `scope → align → build → validate → close` in order by
@@ -1610,7 +1635,12 @@ dispatch policy in the ruling-config slot), the lead model (dispatch a
 stage session as a background agent whose prompt is that stage's ordinary skill
 invocation, with the inline-run posture sentence reading
 `LIFECYCLE_KIT_SESSION_BOUNDARY` — inline stage runs banned under `stage`,
-the sanctioned blocked-dispatch fallback under `iteration`), the
+the sanctioned blocked-dispatch fallback under `iteration`; and the
+completion-notification dispatch precondition, with the prompt-answered-signal
+trap and the gating-versus-liveness boundary that keeps it from reading as a
+reversal of the hand-derivation corollary below — its honest limit is recorded
+in §The state machine and it is standing lead policy under the
+policy-is-config rule), the
 opening-an-iteration contract (the lead never selects the unit set — it relays
 the operator's standing directive, a theme bounding scope's survey and never a
 slug list, verbatim in the scope dispatch, and routes scope's proposed set back

@@ -59,12 +59,52 @@ override rides the `.claude/settings.local.json` env block — delegation-kit/SP
 §The delegation model. Load `/agent-execution` for the protocol and follow it
 there — it is not restated here.
 
+**Stage N+1 is dispatched on stage N's agent completion notification — never on
+its commit, its stamp, a clean tree, a green battery, or a cleared
+`--simulate`.** Completion is a fact about a *session*; every one of those others
+is a fact about an *artifact*, and no artifact distinguishes "finished" from
+"still writing". The attested failure is exactly that gap: a lead confirmed the
+validate stage's commit had landed with complete evidence, the tree clean, the
+battery green and a simulated close entry cleared — then dispatched close into a
+still-running `run-validate`. Every check passed mid-write, because the producer
+commits its evidence and keeps going, so the terminal commit existing is fully
+compatible with the process still executing.
+
+**Any prompt-answered signal is a start signal, never a completion one.** The
+same lead read an operator's note about having just answered a stalled permission
+prompt as the stage being finished. It means the opposite: an approval prompt
+gates a command **starting**, so such a note timestamps a beginning. Stated here
+rather than left as incident lore, because the misreading is available to any
+lead on any harness that prompts, and it reads as good news at exactly the moment
+the lead wants good news.
+
 The lead never hand-derives prior-stage completeness — reading WORKFLOW-STATE
 or the git log to decide whether a dispatch may proceed re-derives what the
 machinery already rules on. It dispatches and trusts `enter-stage.sh`'s
 fail-closed refusal (relayed in the stage session's report), or gates an
 expensive dispatch cheaply first with `enter-stage.sh --simulate <stage>`
 (lifecycle-kit/SPEC.md §bin/enter-stage.sh) — oracle-first made concrete.
+
+**That rule and the precondition above answer different questions, and reading
+them as one makes the pair unusable.** This one is a *gating* rule: *may stage
+N+1 proceed?* — a question about preconditions the machinery owns, which
+`--simulate` answers correctly and cheaply and which the lead must not re-derive
+by hand. The precondition is a *liveness* rule: *is stage N over?* — which no
+instantaneous read answers at all. The incident is the proof they are two
+questions rather than one stated twice: the lead followed this rule faithfully,
+ran `--simulate`, and the simulated entry cleared mid-write. A rule told to trust
+an instantaneous read is not at fault for failing to answer a question about
+duration; it was never asked. `--simulate` keeps its whole job. What it never
+was, and must now be said not to be, is evidence that the prior stage is over.
+
+One qualification, because `--simulate` runs every matching entry-preflight
+command: where a consumer wires a producer-liveness gate onto that hook,
+`--simulate` inherits it and the specific mid-write clearing above stops
+happening. That is a real narrowing rather than a repeal — an instantaneous read
+is still instantaneous, so a producer starting a moment later is still unseen,
+and the gate sees only producers that claim a lock. Completion stays a fact about
+a session; what the gate contributes is to shrink the window in which being wrong
+about it goes undetected.
 
 **Relay, never assert.** The lead manages on *optimal* rather than extensive
 context, so on any topic it has not mastered it acknowledges and relays — it
@@ -182,6 +222,12 @@ misplaced: the same sentence appearing in two dispatch prompts. The
 agent-definition points at its owning docs rather than restating them
 (content-tiering) — it cites delegation-kit's resume-journal mechanics, say,
 never transcribes them.
+
+The rule cuts both ways: policy binding the **lead itself** is standing too, and
+its tracked source is this template rather than the agent definition it
+dispatches. The completion-notification dispatch precondition (§The lead model)
+is standing policy of exactly that kind, named here so it is stated once and not
+re-improvised in each dispatch prompt.
 
 *<ruling-config: the tracked agent-definition the lead dispatches and the roster
 it carries — its path, the subagent type the dispatch names, and where the

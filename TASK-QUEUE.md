@@ -18,27 +18,6 @@
   artifact state, the lock detects the residual case where the signal is wrong
   anyway, and the verify rename fixes the check the lead runs afterwards.
 
-- **lead-dispatch-requires-completion-notification** [spec: SPEC-dispatch-signal.md] — the
-  lead has no stated precondition for dispatching stage N+1, and the one it improvised is
-  wrong: artifact state.
-  A lead checked validate's commit had landed with complete evidence, the tree clean, the
-  battery green, and a simulated close entry cleared — then dispatched close into a
-  still-running `run-validate`. Every check passed mid-write, because `run-validate` commits
-  its evidence and keeps going: the terminal commit existing is fully compatible with the
-  process still executing. The lead dispatched on the *absence* of a completion
-  notification.
-  **The generalizable trap, carried into the template rather than left as incident lore:**
-  the lead read an operator's note about having just answered a stalled permission prompt as
-  the stage being finished. It means the opposite — an approval prompt gates a command
-  *starting*, so any prompt-answered signal is a start signal, never a completion one.
-  **Self-label corrected at promotion.** The body read "Debt: … adds no governed name" three
-  lines below its own statement that it "adds a precondition to a shipped template's dispatch
-  contract" — the litmus's contract arm verbatim. It elevates the completion notification
-  from a delegation convenience to an inter-component protocol signal the lead depends on.
-  Filed 2026-07-25 by close, from the lead's own account; the operator ruled stage sequencing
-  the lead's accountability, which is why this is a lead rule rather than a stage-session or
-  gate concern. Label corrected and amendment authored 2026-08-06 at spec.
-
 - **validate-verb-collision-and-check-routing** [spec: SPEC-verify-verb.md] — two coupled
   defects with one root: the delegation discipline verb collides with the `/validate` stage
   noun, and that collision misroutes the lead's post-delegation check onto the evidence
@@ -3316,5 +3295,6 @@
 
 - validate-producer-liveness-unobservable
 - dispatched-session-waiting-rule-residency
+- lead-dispatch-requires-completion-notification
 
 ## Lessons Learned
