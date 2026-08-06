@@ -38,6 +38,7 @@ declare -p EVIDENCE_KIT_SUITES &>/dev/null || EVIDENCE_KIT_SUITES=()
 [[ -v EVIDENCE_KIT_QUEUE_FILE ]]    || EVIDENCE_KIT_QUEUE_FILE="${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}"
 [[ -v EVIDENCE_KIT_STATE_FILE ]]    || EVIDENCE_KIT_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
 [[ -v EVIDENCE_KIT_TMP_DIR ]]       || EVIDENCE_KIT_TMP_DIR="${GATE_SDK_TMP_DIR:-.tmp}"
+[[ -v EVIDENCE_KIT_LOCK_FILE ]]     || EVIDENCE_KIT_LOCK_FILE="$EVIDENCE_KIT_TMP_DIR/run-validate.lock"
 [[ -v EVIDENCE_KIT_RUN_ID ]]        || EVIDENCE_KIT_RUN_ID=""
 [[ -v EVIDENCE_KIT_PRE_HOOK ]]      || EVIDENCE_KIT_PRE_HOOK=""
 declare -p EVIDENCE_KIT_SCENARIO_GLOBS &>/dev/null || declare -A EVIDENCE_KIT_SCENARIO_GLOBS=()
@@ -108,6 +109,23 @@ ek_parse() {
             $parser "$log"
             ;;
     esac
+}
+
+# spec: evidence-kit/SPEC.md §The producer-liveness lock — the one liveness predicate all three readers share; `kill -0` is the cheap same-uid answer and `ps -p` the portable fallback, so a live process this uid may not signal reads held rather than free
+ek_pid_alive() {
+    local pid="${1:-}"
+    [[ "$pid" =~ ^[1-9][0-9]*$ ]] || return 1
+    kill -0 "$pid" 2>/dev/null && return 0
+    ps -p "$pid" >/dev/null 2>&1
+}
+
+# spec: evidence-kit/SPEC.md §The producer-liveness lock — prints the lock record's '<pid> <run key>'; 1 = no lock (the free reading), 2 = a lock that does not parse, which no reader may treat as free
+ek_lock_read() {
+    local lock="${1:-$EVIDENCE_KIT_LOCK_FILE}" line
+    [[ -f "$lock" ]] || return 1
+    IFS= read -r line <"$lock" || return 2
+    [[ "$line" =~ ^pid=([1-9][0-9]*)[[:space:]]run=([^[:space:]]+)$ ]] || return 2
+    printf '%s %s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"
 }
 
 ek_data_lines() {

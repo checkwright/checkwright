@@ -5,7 +5,12 @@ LIFECYCLE_KIT_BOUNDARY_TRUNCATE=(.workflow/validate-evidence.txt .workflow/relea
 LIFECYCLE_KIT_BOUNDARY_REQUIRE=(.workflow/release-disposition.txt)
 # spec: context-kit/SPEC.md §The session-context hook — the one scratch member this repo carries across the boundary: the marker the hook reads to suppress the delegation nudge for a lead session, whose lifetime is that live session's, not the iteration's
 LIFECYCLE_KIT_BOUNDARY_PRESERVE=(session-role)
-LIFECYCLE_KIT_ENTRY_PREFLIGHT=('close=evidence-kit/checks/check-evidence-manifest.sh .workflow/validate-evidence.txt')
+# spec: evidence-kit/SPEC.md §check-producer-liveness — the liveness gate is wired at the entry and nowhere else: `close=` is the filed case, `validate=` stops a second validate batch entering while a first batch's run-validate is live. It is deliberately absent from gates.list — this repo's `gates` suite is the battery run-validate itself invokes, so a registered liveness gate would red every validate run against its own lock.
+LIFECYCLE_KIT_ENTRY_PREFLIGHT=(
+    'close=evidence-kit/checks/check-evidence-manifest.sh .workflow/validate-evidence.txt'
+    'validate=evidence-kit/checks/check-producer-liveness.sh .tmp/run-validate.lock'
+    'close=evidence-kit/checks/check-producer-liveness.sh .tmp/run-validate.lock'
+)
 # spec: lifecycle-kit/SPEC.md §Layout and configuration — this repo's session-boundary posture: 'iteration' sanctions the lead's inline fallback; cost accepted that the dogfood evidence stops demonstrating the strict posture
 LIFECYCLE_KIT_SESSION_BOUNDARY=iteration
 # spec: lifecycle-kit/SPEC.md §The close-surface roster — this repo's declaration surfaces beyond the kit SPECs: the always-loaded agent file, the doctrine deliverable, and the stage-skill bindings, which own the consumer-side capture surfaces no kit may name

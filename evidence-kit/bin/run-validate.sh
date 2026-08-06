@@ -26,6 +26,41 @@ mkdir -p "$EVIDENCE_KIT_TMP_DIR"
 today="$(date +%F)"
 overall=0
 
+# spec: evidence-kit/SPEC.md §The producer-liveness lock — release only if the lock is still ours: an out-of-band removal lets a second producer claim the freed slot, and an unconditional rm would delete that live holder's record
+lock_release() {
+    local holder
+    holder="$(ek_lock_read "$EVIDENCE_KIT_LOCK_FILE")" || return 0
+    [[ "${holder%% *}" == "$$" ]] && rm -f "$EVIDENCE_KIT_LOCK_FILE"
+    return 0
+}
+
+lock_refuse() {
+    rm -f "$lock_tmp"
+    echo "run-validate: $1" >&2
+    exit 2
+}
+
+# spec: evidence-kit/SPEC.md §The producer-liveness lock — the claim sits after the guards and the scratch mkdir (a run that refuses to start must not claim) and before any evidence work; the record is built whole in a temp file and `ln`ed into place, so the claim is create-exclusive and the lock is never half-written
+lock_tmp="$(mktemp "$EVIDENCE_KIT_TMP_DIR/run-validate-lock.XXXXXX")" || exit 2
+printf 'pid=%s run=%s\n' "$$" "$key" >"$lock_tmp"
+reclaimed=0
+while ! ln "$lock_tmp" "$EVIDENCE_KIT_LOCK_FILE" 2>/dev/null; do
+    holder="$(ek_lock_read "$EVIDENCE_KIT_LOCK_FILE")"; hs=$?
+    if [[ "$hs" -eq 2 ]]; then
+        lock_refuse "the lock $EVIDENCE_KIT_LOCK_FILE carries no readable 'pid=<n> run=<key>' record — refusing to start; delete it if no producer is running"
+    fi
+    if [[ "$hs" -eq 0 ]] && ek_pid_alive "${holder%% *}"; then
+        lock_refuse "a producer is already running for run key '${holder#* }' (pid ${holder%% *}) — refusing to start; wait for that run to finish, or delete $EVIDENCE_KIT_LOCK_FILE once pid ${holder%% *} is gone"
+    fi
+    # spec: evidence-kit/SPEC.md §The producer-liveness lock — a dead or vanished holder is reclaimed exactly once; a second failed claim means the slot is not ours to take, so refusing beats looping
+    [[ "$reclaimed" -eq 0 ]] \
+        || lock_refuse "could not claim $EVIDENCE_KIT_LOCK_FILE after reclaiming a stale lock — refusing to start rather than retrying; another producer won the reclaim race, or that path is not writable"
+    reclaimed=1
+    rm -f "$EVIDENCE_KIT_LOCK_FILE"
+done
+rm -f "$lock_tmp"
+trap lock_release EXIT
+
 # spec: evidence-kit/SPEC.md §Evidence manifest — the run accumulates its rows here and touches the tracked manifest only after the last suite, so no suite runs against a tree the spine has already written to
 batch="$(mktemp "$EVIDENCE_KIT_TMP_DIR/validate-evidence-batch.XXXXXX")" || exit 2
 

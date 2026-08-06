@@ -65,38 +65,6 @@
   the lead's accountability, which is why this is a lead rule rather than a stage-session or
   gate concern. Label corrected and amendment authored 2026-08-06 at spec.
 
-- **validate-producer-liveness-unobservable** [spec: SPEC-liveness-lock.md] — a stage session
-  can report its stage done while its own oracle is still executing, and nothing in the
-  lifecycle can see it. The validate session's `run-validate` was still running when the lead
-  dispatched close; its writes landed on `.workflow/validate-evidence.txt` underneath the
-  close session's commits (the churn recorded under `evidence-row-upsert-order`).
-  **What did not catch it, and why — neither is a coverage hole; both are liveness holes.**
-  The lead's post-dispatch check is `git status` / `git log`, blind to a live process. The
-  close-entry preflight is blind for a different reason: it reads a file at an instant, and
-  the file can change a second later. What the preflight *already* asserts is recorded in the
-  amendment so the entry is not read as filed on a false premise — assertion A's suite-roster
-  completeness is real, and a torn read is unreachable because the manifest is relocated by
-  `mv`, never briefly absent. The gap is liveness alone.
-  **Feature-shaped — self-label corrected 2026-08-04 at close**, before this promotion: the
-  line read "adds no governed name to a shipped surface" while the clause three paragraphs
-  above it named a knob.
-  **Fired again 2026-08-05**, attested under `recurrence-drain-input-widening` (which owns why
-  it reached no count) — a dispatched validate session ended its turn with `run-validate` still
-  running, detected only by the coordinator reading the PID from outside. Every instance this
-  entry records has been caught by a person rather than by the lifecycle.
-  **Scope widened by operator ruling 2026-08-06, and deliberately so.** The filed deliverable
-  was the entry-side preflight red alone; the unit now also has `run-validate` refuse to start
-  while a live lock is held. A lock the producer itself does not check is not a mutex — a
-  session can run `run-validate` without entering a stage, so detection alone left two
-  producers able to race the manifest with every stage entry green. Recorded as a widening
-  rather than a correction: the original scope was congruent with the defect the entry named,
-  which was the observability gap, and prevention was added on top of detection rather than
-  in place of a mis-filing.
-  Filed 2026-07-25 by close, from the operator's observation of the live `run-validate` and the
-  row-relocation fingerprint; amendment authored 2026-08-06 at spec, which rules the cross-kit
-  ownership question and the stale-lock policy that kept it design-pending, plus the claim
-  atomicity the widened scope turned out to require.
-
 - **validate-verb-collision-and-check-routing** [spec: SPEC-verify-verb.md] — two coupled
   defects with one root: the delegation discipline verb collides with the `/validate` stage
   noun, and that collision misroutes the lead's post-delegation check onto the evidence
@@ -3371,5 +3339,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- validate-producer-liveness-unobservable
 
 ## Lessons Learned

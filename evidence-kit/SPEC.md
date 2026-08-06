@@ -46,6 +46,10 @@ Knobs, this repo's surface names as defaults:
 - `EVIDENCE_KIT_BASELINE_FILE` (default `.workflow/validate-baseline.txt`),
   `EVIDENCE_KIT_MANIFEST_FILE` (default `.workflow/validate-evidence.txt`),
   `EVIDENCE_KIT_SKIP_FILE` (default `.workflow/validate-skips.txt`).
+- `EVIDENCE_KIT_LOCK_FILE` — the producer-liveness lock (§The producer-liveness
+  lock), default `run-validate.lock` under `EVIDENCE_KIT_TMP_DIR`. It resolves
+  *through* the scratch knob rather than beside it, so a consumer that moves the
+  scratch dir moves the lock with it and never has to keep two paths in step.
 - `EVIDENCE_KIT_QUEUE_FILE` / `EVIDENCE_KIT_STATE_FILE` — the lifecycle surfaces
   read for the manifest's optional close-entry and stamp-coupling assertions;
   they default through gate-sdk's `GATE_SDK_QUEUE_FILE` / `GATE_SDK_WORKFLOW_DIR`.
@@ -73,7 +77,8 @@ left unset, then validation. It also owns the shared adapters — `ek_suite_cmd`
 (a suite's configured run command, `EVIDENCE_KIT_RUN_<suite>`), `ek_parser_for`
 (the per-suite parser resolution, detailed below), `ek_parse` (the
 parser dispatch), `ek_diff` (the per-scenario baseline diff, §bin/diff-baseline.sh),
-`ek_data_lines`, and the self-contained `ek_queue_iteration` / `ek_run_key`
+`ek_data_lines`, the `ek_pid_alive` / `ek_lock_read` lock adapters
+(§The producer-liveness lock), and the self-contained `ek_queue_iteration` / `ek_run_key`
 header readers plus the `ek_state_stage` cursor reader that let the kit read
 lifecycle state without a lifecycle-kit dependency. The two axes come from two
 surfaces: the queue header names the iteration, the state file's **last data
@@ -183,17 +188,155 @@ form requires. `check-evidence-manifest` owns it (asserts the first line is
 (`CANON_KIT_COMMENT_WHITELIST`), since a version marker resolves as no path; the
 baseline is pointer-form and needs no whitelist entry.
 
+### The producer-liveness lock
+
+Uncommitted, under `EVIDENCE_KIT_LOCK_FILE`. A stage stamp proves invocation and
+an evidence line proves a green result, but neither can say a producer is *still
+running* — a file read at an instant cannot carry that, and the manifest's own
+guarantees do not reach it: §check-evidence-manifest's assertion A already
+asserts suite-roster completeness at a close cursor, and the spine's single fold
+means a torn read is unreachable. The gap is liveness alone, and the lock is the
+artifact that closes it.
+
+The record is one line, `pid=<n> run=<key>`, where `<key>` is the evidence-line
+key `ek_run_key` yields. Both fields have named readers and nothing else is
+carried: a start timestamp was considered and removed, because once the stale
+policy is PID-liveness rather than age it has no reader, and a field with no
+reader is removed rather than kept for plausibility.
+
+**The lock is held if and only if the recorded PID is alive**, which makes a
+leaked lock self-invalidating — the shape this methodology already relies on for
+the session-role marker, whose id match means a stale marker self-invalidates.
+An **age-based TTL is rejected outright**: a long validate run outlives any
+honest TTL, and a long run is precisely the case the lock exists for, so a TTL
+tuned short enough to reclaim a crashed run promptly is guaranteed to declare a
+healthy long run dead — restoring the false-green the lock removes.
+
+`ek_pid_alive` is the one predicate all three readers share, and its two legs are
+a ruling rather than belt-and-braces. `kill -0` is the cheap same-uid answer, but
+it conflates *no such process* with *not yours*: against a producer running under
+another uid it reports the live process as dead, which is a false **free**
+reading — the one direction this design may not take. `ps -p` answers existence
+without needing the permission to signal, so it runs as the fallback and any
+evidence of existence means held. Reading `/proc` to confirm process *identity*
+is rejected separately: it is unportable, and the OS-reach objective makes a
+Linux-only predicate a cost rather than a refinement.
+
+**PID reuse is a named, accepted residual.** A recycled PID yields a false
+*held* reading, which refuses a stage entry that could have proceeded — a
+fail-closed direction costing one file deletion to clear, against a defect that
+would otherwise cost the next session an evidence file changing underneath it.
+The same direction reaches the writer's own refusal, which reads the identical
+predicate: a recycled PID makes `run-validate` over-refuse by the same
+mechanism. One cause, one direction, one clearance — a restated instance of the
+residual, not a second one to weigh.
+
+**The claim is atomic create-exclusive, never check-then-write**, and the
+asserted property is two-part: it succeeds for exactly one producer, *and* the
+record publishes whole. The idiom is the one the spine already uses to publish
+the manifest — build the record in a temp file under the same scratch dir, then
+`ln` it into place, which fails if the target exists. `mkdir` and a `set -C`
+redirect are atomic on the first half only: each leaves a window where the lock
+exists and its record does not, which every reader would then have to parse
+around. Because the record publishes whole, a reader never has to interpret a
+partial lock or decide what an empty one means, so an unparseable lock is
+corruption and fails closed rather than reading free.
+
+The atomicity is *required* rather than careful, and what makes it so is the
+writer-side refusal (§bin/run-validate.sh). An unconditional claim has no
+predicate and so no time-of-check window; adding the refusal adds one, and a
+naive read-then-claim would let two producers both observe a clear lock and both
+claim, the second's record overwriting the first's. That reintroduces exactly
+the two-producer case the refusal exists to close, and defeats conditional
+release with it — "still ours" cannot be answered from a record another producer
+overwrote. The claim's success *is* the check, so there is no interval between
+them to lose.
+
+**The release is conditional — remove only if the lock is still ours.** The
+`EXIT` trap compares the recorded PID against the running shell's and removes
+nothing on a mismatch. An unconditional `rm -f` reproduces this artifact's own
+defect inside its own mechanism: the lock is single-holder, so with an
+unconditional claim *and* an unconditional release whichever producer exits
+first deletes the survivor's lock, after which a preflight reads free with a
+producer still live. Atomicity does not make the condition redundant, and the
+residual it closes is **not** the `EXIT`-trap race it first suggests: a trap runs
+synchronously as part of its process's own exit and completes before that
+process reads as dead, and the one exception — `SIGKILL` — skips the trap
+entirely rather than deferring it. So a producer correctly identified as stale
+cannot later run its trap. The case that remains is a lock removed by some path
+*other than* the reclaim below — an operator deleting an apparently-stuck lock,
+or a future code path: producer A is still alive and unaware, producer B claims
+the freed slot, and A's unconditional release would delete B's live lock.
+Atomicity is what makes "still ours" *answerable*; conditional release is what
+acts on the answer.
+
+The reclaim path a runtime artifact owes is three layers, and all three are
+asserted: the `EXIT` trap, which covers every exit path the spine has; the
+readers' PID-liveness predicate, which makes a leaked file inert; and the
+consumer's scratch-boundary wipe, which removes it. No close-surface declaration
+is owed — that obligation attaches to capture-tier members of the workflow
+directory, and this lock lives in the scratch tier.
+
+**evidence-kit owns the lock at both ends; lifecycle-kit contributes only the
+hook it already ships.** The lock is a property of the *producer's run*, and this
+kit owns the producer and the scratch directory it lives under. The reader need
+not live in lifecycle-kit: `LIFECYCLE_KIT_ENTRY_PREFLIGHT` is already a generic
+per-stage hook naming no evidence surface, so a second evidence-kit gate on that
+roster adds no new cross-kit dependency at all — the consumer wires it exactly as
+it already wires the manifest gate (§lifecycle-kit integration). The rejected
+alternative is worth recording: a lock held by lifecycle-kit would force that kit
+to know this one's scratch knob — a downward dependency onto one specific
+producer kit — and would generalize wrongly, since lifecycle-kit would then have
+to model every possible producer's lock rather than one hook any producer's gate
+can hang from.
+
 ### bin/run-validate.sh
 
-The codified spine: the optional per-suite pre-hook, then each suite run
+The codified spine, bounded by the producer-liveness lock: the guards, the
+claim, then the optional per-suite pre-hook and each suite run
 foreground, parsed, diffed against the baseline's suite slice per-scenario, and
 recorded as one evidence line whose verdict is `clean` unless the diff
 finds a new failure. The lines batch under the tmp dir and reach the manifest in
 the single fold §Evidence manifest rules, so a suite never runs against a tree
 the spine has already written to. It never edits the baseline, never retries, and surfaces a
 non-zero suite exit verbatim. A log with no parseable result is a run failure,
-not an empty diff. Its own exit is non-zero when any suite records
-`new-failures`. Not a gate — a `bin/` tool exercised end-to-end in `smoke/`.
+not an empty diff. Not a gate — a `bin/` tool exercised end-to-end in `smoke/`,
+with the lock's own behavior pinned by `gate-tests/producer-lock.test.sh`.
+
+**The claim's placement is asserted, not left to the implementer**: after the
+preflight guards and the scratch `mkdir` — a run that refuses to start must not
+claim — and before the batch file is created, so no evidence work happens
+outside the lock's cover. Release is the `EXIT` trap, conditional on the record
+still being ours (§The producer-liveness lock owns both properties and the
+reasons they are load-bearing). A trap rather than a tail line, because the
+script exits from many guard and fail-closed sites besides its terminal exit, and
+a tail-line release would leak the lock on every failure path — the population
+that matters most, since a crashed run is exactly when a stale lock appears. The
+idiom precedent is `lifecycle-kit/bin/enter-stage.sh`, which claims temp files
+under a scratch dir with an `EXIT` trap.
+
+**It refuses to start while a live lock is held**, and the refusal falls out of
+the atomic claim rather than being a second mechanism: the claim either succeeds
+— in which case no holder existed — or fails, and the failure branch is the
+refusal. On a failed claim it reads the existing lock; a **live** PID refuses
+immediately, naming the blocking run key, with no reclaim attempted. A **dead**
+PID (or a lock that has vanished since the claim failed) is reclaimed by removing
+the lock and retrying **exactly once**; a second failure refuses rather than
+looping, which resolves the two-contender stale case without an unbounded retry —
+both contenders may remove and relink, exactly one `ln` succeeds, and the loser's
+re-read finds a live PID. A lock that does not parse refuses outright.
+
+This is why the tool has **two** non-zero exits with different meanings: exit 1
+when a suite records `new-failures` — the verdict — and the guards' exit 2 when
+the run cannot start at all, which a held or unclaimable lock now joins. The
+refusal is a start-time verdict about the world, not a result, so it takes the
+guards' code and not the verdict's.
+
+The reason a producer that never enters a stage is worth guarding is that the
+entry-side reader cannot see it: a session can run this tool without entering a
+stage, so an entry-side red alone would leave two producers able to race the
+manifest with every stage entry green. A lock the producer itself does not check
+is not a mutex.
 
 ### bin/diff-baseline.sh
 
@@ -316,6 +459,45 @@ registering the gate in its `gates.list`, gate-sdk's registry opt-out shape. The
 fail-closed branches and the normalization arms beyond the one good/bad pair are
 covered by `gate-tests/check-battery-roster.test.sh`.
 
+### check-producer-liveness
+
+Invariant: no stage entry while the evidence producer is still running. It reads
+`EVIDENCE_KIT_LOCK_FILE` and is green when the lock is absent or names a dead
+PID, red when it names a live one — printing the blocking run key, so the
+operator can tell *wait for that run* from *reclaim a lock whose owner is gone*.
+A lock that does not parse is exit 2: the claim publishes the record whole
+(§The producer-liveness lock), so an unparseable lock is corruption and never a
+free reading.
+
+This is a new gate rather than a fourth assertion on `check-evidence-manifest`,
+because that gate's charter is manifest *content* — the close-entry green block,
+the grammar, the stamp coupling — and liveness is a different class. A separate
+gate also earns its own fixture pair instead of widening an existing gate's
+charter.
+
+Argument mode `check-producer-liveness.sh [lock-file]` makes it fixture-capable
+and is how the entry hook points it at the lock (§lifecycle-kit integration);
+extra arguments are ignored, so the hook's trailing `<queue> <state>` argv passes
+through harmlessly.
+
+**It belongs on the entry hook and not in a `gates.list` battery**, and the
+reason is structural rather than a matter of taste. Its subject is a transition —
+*is a producer in flight right now* — where every battery member's subject is
+tree state. A consumer whose validate roster includes its own gate battery (this
+repo's does: the `gates` suite *is* the battery) would have `run-validate` invoke
+this gate while holding the lock it just claimed, reddening every validate run
+against its own record. The kit therefore ships the gate registered nowhere and
+wired at the entry, which is also the honest reading of its argument mode: it
+takes the lock path because its caller is a stage entry, not a whole-tree sweep.
+
+The fixture pair carries the two static verdicts — a dead PID and a live one.
+Its `bad/` case names PID 1, the one PID a checked-in fixture can assert the
+liveness of on every platform, which is exactly what `ek_pid_alive`'s `ps -p`
+leg makes reliable: under `kill -0` alone, an unprivileged run reads init as
+dead and the case would silently invert. Everything the pair cannot hold — a
+live PID the test itself owns, the unparseable-lock exit, and the writer-side
+behavior — is covered by `gate-tests/producer-lock.test.sh`.
+
 ## lifecycle-kit integration
 
 Integration is two generic knobs on lifecycle-kit's side of the seam, each
@@ -329,18 +511,42 @@ iteration starts with a manifest carrying only its contract header — which is
 what makes assertion (B)'s foreign-iteration test able to catch a skipped
 truncation.
 
-`LIFECYCLE_KIT_ENTRY_PREFLIGHT` runs this gate as a close-entry pre-flight: a
-consumer sets `close=…/check-evidence-manifest.sh <manifest>`, and
-`bin/enter-stage.sh` runs it against the candidate temp state file (the
-prospective close stamp appended) and the live queue, so assertion (A)'s
-close-entry green-block check fires *before* the stamp is
-written — the missing evidence becomes a refusal at the entry (pointing at
-run-validate) instead of a self-referential deadlock at pre-commit, where the
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT` carries **both** of this kit's entry-side gates,
+at three stage keys between them. `bin/enter-stage.sh` runs each matching entry
+against the candidate temp state file (the prospective stamp appended) and the
+live queue, appending that `<queue> <state>` argv to whatever the entry names, and
+a non-zero exit refuses the entry with nothing written.
+
+`check-evidence-manifest` is wired at `close=`, its command naming the manifest
+(`close=…/check-evidence-manifest.sh <manifest>`),
+so assertion (A)'s close-entry green-block check fires *before* the
+stamp is written — the missing evidence becomes a refusal at the entry (pointing
+at run-validate) instead of a self-referential deadlock at pre-commit, where the
 `gates` suite that would produce the evidence re-runs this same red gate
 against the already-stamped cursor. Belt-and-braces behind the validate
 skill's run-validate wiring, not a replacement for it; for a consumer that
 wires it, assertion (A)'s enforcement point moves one step earlier, from
 commit to entry.
+
+`check-producer-liveness` is wired at `close=` **and** `validate=`
+(`<stage>=…/check-producer-liveness.sh <lock-file>`). `close=` is the case the
+gate was filed for — a lead dispatching close into a still-running producer.
+`validate=` is added because this roster is an exact per-stage match, and a
+second validate batch entering while a first batch's `run-validate` is live is
+the same hazard with a worse outcome: two producers folding the same manifest.
+Which keys a consumer wires is config, not asserted kit behavior — a consumer
+whose producer runs at another stage wires its own.
+
+The **read-only `--simulate` mode inherits this gate with no extra wiring**, and
+that is the highest-value consumer rather than a bookkeeping detail: it runs
+every matching preflight entry, so a lead gating an expensive dispatch with a
+simulated entry stops being blind to a live producer. It does **not** make a
+dispatch rule redundant, and the boundary has to be stated or the pair reads as
+over-built: a simulated entry remains an instantaneous read, so a producer that
+starts a second later is still unseen, and the gate covers only producers that
+claim this lock. A lead dispatching on artifact state is still dispatching on
+artifact state — it merely has one more artifact. A dispatch rule governs what
+the lead waits *for*; this gate narrows what survives being wrong about it.
 
 The validate stage records evidence on a commit later than the entry stamp
 (assertion C's re-arm scoping): the stamp proves invocation at entry, the
@@ -361,6 +567,20 @@ evidence line proves the green result once the suites have run.
   `bin/enforcement-map.sh`. Every one of them reads it by sourcing the config
   through the loader rather than parsing the file, so a suite a derivation loop
   adds is visible to all of them with no second parse to keep in step.
+- **Producer-liveness lock** — produced by `run-validate.sh` at the claim point,
+  which sits on the ordinary path (the validate stage runs it, and it is the only
+  writer of the manifest); its enabling config carries a default in the loader, so
+  it resolves in every deployed configuration rather than only under a test
+  harness. Consumed by `check-producer-liveness` through the entry-preflight hook
+  and, inheriting it with no extra wiring, by that hook's read-only simulate mode.
+  Both fields have named readers at named transitions: `pid` at three — the gate
+  at the stage-entry transition, `run-validate` at run start on a failed claim
+  (the refusal), and its `EXIT` trap at release, compared against the running
+  shell to answer *is this still ours*; `run key` at the two transitions where a
+  refusal line is composed, whose reader is the operator standing at that refusal
+  choosing between waiting and reclaiming. Reclaimed by the `EXIT` trap, by the
+  readers' liveness predicate making a leak inert, and by the consumer's
+  scratch-boundary wipe.
 - **Baseline line** — produced by human commits (initial seed, promotions);
   consumed by `diff-baseline.sh` (the per-scenario diff) and
   `check-evidence-baseline` (grammar, liveness, coverage).

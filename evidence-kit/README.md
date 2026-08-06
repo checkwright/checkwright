@@ -7,11 +7,13 @@ contract (`# contract: evidence-manifest v1`) an external verifier can consume,
 so the kit is adoptable with or without an iteration lifecycle.
 
 The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness,
-scenario coverage) and `check-evidence-manifest` (manifest grammar and, where
-lifecycle drives the tree, close-entry green block + validate-stamp coupling).
-The `bin/` tools that drive it: `run-validate.sh` (the codified spine that runs
-the suites and records evidence) and `diff-baseline.sh` (the situational runtime
-diff). See [SPEC.md](SPEC.md) for the full contracts.
+scenario coverage), `check-evidence-manifest` (manifest grammar and, where
+lifecycle drives the tree, close-entry green block + validate-stamp coupling),
+`check-battery-roster` (the runner doc's battery block against the suite roster)
+and `check-producer-liveness` (no stage entry while the producer is still
+running). The `bin/` tools that drive it: `run-validate.sh` (the codified spine
+that runs the suites and records evidence) and `diff-baseline.sh` (the
+situational runtime diff). See [SPEC.md](SPEC.md) for the full contracts.
 
 ## Install
 
@@ -24,6 +26,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-evidence-baseline
    check-evidence-manifest
    check-battery-roster
+   check-producer-liveness   # entry hook only — never gates.list, see step 6
    ```
    <!-- gate-roster:end -->
 
@@ -54,6 +57,14 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 5. Optional lifecycle integration — set `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to the
    evidence manifest so a new iteration starts from the contract header, and the
    manifest gate's close-entry and stamp-coupling assertions arm automatically.
+
+6. Wire `check-producer-liveness` on `LIFECYCLE_KIT_ENTRY_PREFLIGHT` rather than
+   in `gates.list`, its command naming the lock file
+   (`<stage>=evidence-kit/checks/check-producer-liveness.sh <lock-file>`),
+   at whichever stage entries must not begin while `run-validate`
+   is still running. It asks whether a producer is in flight, not whether the
+   tree is consistent, so a battery that `run-validate` itself invokes would red
+   every run against that run's own lock. See SPEC.md §check-producer-liveness.
 
 ## Test
 
