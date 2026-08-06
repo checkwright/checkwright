@@ -12,6 +12,68 @@
 
 ## New Features
 
+  The first ported cohort and the two claims it falsifies, promoted together. The
+  causal order is the order below: the freshness oracle must exist before a
+  descriptor arms the stale-binary path, and the disclosure correction must land in
+  the same iteration as the cohort that makes the old claim false.
+
+- **native-binary-freshness-ungated** [spec: SPEC-binary-freshness.md] — a compiled
+  gate has no freshness oracle. `check-gate-substrate-parity` assertion B diffs the
+  `.gate` descriptor set on disk against the binary's `--list` roster; it is
+  **set-membership only** and never compares the binary's content against the `.rs`
+  source it is built from. `gate_command` dispatches a `.gate`-declared member
+  straight to the prebuilt binary with no rebuild and no freshness check, so editing
+  a gate's Rust source, skipping the rebuild, and committing runs the
+  descriptor-named gate **against the stale binary** — and it passes on the old
+  implementation.
+  **Inert today, armed by this iteration.** The one live port was reverted, so no
+  gate dispatches to the binary and the hole cannot currently affect a commit. It
+  re-arms at the first commit of the second port, which `native-gate-binary-port`
+  lands here — so the two ship together or the cohort ships the hole.
+  **What kept it needing design, and what settles it.** The cheap form (mtime
+  against source) is wrong on a fresh clone and on any checkout that reorders
+  timestamps; a content-derived form needs a build stamp the crate does not emit.
+  Both stand. The amendment rules the algorithm: **git is the hasher** — the crate
+  declares no dependencies at all, so a digest crate or a hand-rolled SHA-256 is
+  refused, and both sides of the comparison call the same git invocation rather than
+  two implementations of one hash.
+  **One premise corrected at promotion.** The body claimed the compiled binary
+  belongs on docs/site-architecture.md's generated-projections roster. That roster's
+  own admission rule is narrower — a derived surface earns a row only when it has a
+  reader who cannot run the emitter — and the binary is not committed at all. It
+  earns a standing-absence line beside the two instances already recorded there, not
+  a freshness row.
+  Filed 2026-08-02 at close from the gap inbox; found during validate. Amendment
+  authored 2026-08-06 at spec, which rules the hashing algorithm and the roster
+  question that kept it design-pending.
+
+- **payload-disclosure-claim-owner** [spec: SPEC-payload-claim.md] — two governed
+  install surfaces disagree about what a consumer receives.
+  `installer/README.md` §init claims that what governs your tree afterwards is
+  committed source you can read — true of every tree that exists today and false at
+  the first ported gate, since `gate-sdk/SPEC.md` §Consumer payload rules that a
+  compiled gate's implementation source does not ship.
+  **Defect class:** a disclosure claim about the vendored payload restated across
+  governed install surfaces with one owner and no oracle.
+  **The tense question that left it needing design is settled by this
+  iteration**, not by judgment. It had to say something true both before and after
+  the first port without reading as a warning about a thing that had not happened;
+  the cohort lands here, so the corrected claim is written in the present.
+  **Measured at promotion: four claims, not one.** Re-verified against the tree, the
+  corpus is `installer/README.md` §init plus three sentences on `docs/install.md` —
+  its H1 preamble, its one-shot-vendoring paragraph, and §What a gate discloses,
+  which is build batch 1's own correction and is written in the future tense the
+  cohort retires. Four restatements is also the argument against fixing them by hand
+  and stopping.
+  **Deliverable, structural rather than prose:** a declared owner and an oracle, the
+  shape `check-install-claim` already gives the primary-install-path claim. The
+  amendment rules it a **sibling gate** rather than that gate's extension — one is
+  positional and install-section-scoped, the other is membership over the whole
+  governed doc set — and keeps the vocabulary as consumer config, since a spelling
+  of what a payload discloses is one project's distribution model.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 3. Amendment
+  authored 2026-08-06 at spec, which settles the tense and re-measures the corpus.
+
 ## Technical Debt
 
 ## Deferred
@@ -2445,31 +2507,6 @@
   Filed 2026-08-02 at close from the gap inbox; observed during this iteration's
   align stage.
 
-- **native-binary-freshness-ungated** [design-pending] — a compiled gate has no
-  freshness oracle. `check-gate-substrate-parity` assertion B diffs the `.gate`
-  descriptor set on disk against the binary's `--list` roster; it is
-  **set-membership only** and never compares the binary's content or mtime against
-  the `.rs` source it is built from. `gate_command` dispatches a `.gate`-declared
-  member straight to the prebuilt binary with no rebuild and no freshness check, so
-  editing a gate's Rust source, skipping the rebuild, and committing runs the
-  descriptor-named gate **against the stale binary** — and it passes on the old
-  implementation. docs/site-architecture.md's generated-projections roster names no
-  entry for the compiled binary, though the repo's derivation-first rule requires
-  every generated projection to be freshness-gated and rostered there.
-  **Severity reduced 2026-08-02, and not closed — the distinction is the point.**
-  The one live port was reverted, so **no gate dispatches to the binary today** and
-  the hole cannot currently affect a commit. It re-arms the moment a second port
-  lands. An entry that reads closed when it was only narrowed is exactly the
-  signal-loss the lossless-compression rule exists to prevent.
-  **Why `[design-pending]`:** the cheap form (mtime against source) is wrong on a
-  fresh clone and on any checkout that reorders timestamps; a content-derived form
-  needs a build stamp the crate does not emit today.
-  **Cost while deferred:** zero while no gate dispatches to the binary; a live
-  vacuous green — a gate reporting clean on code that is not what is committed —
-  from the first commit of the second port onward. CI is unaffected either way
-  (fresh build every run); the exposure is local pre-commit-gated commits only.
-  Filed 2026-08-02 at close from the gap inbox; found during validate.
-
 - **gate-tamper-roster-native-reach** [design-pending] — `check-gate-tamper` does not
   reach a ported gate's implementation. Split 2026-08-02 at scope from
   `native-gate-meta-layer-reach` by operator ruling, when that entry narrowed to its
@@ -2712,34 +2749,6 @@
   Filed 2026-08-03 at close from the gap inbox, merging the validate-filed instances into
   the base class and re-verifying both against the tree; found by build batch 1 and
   validate, corrected and widened at close.
-
-- **payload-disclosure-claim-owner** [design-pending] — two governed install surfaces now
-  disagree about what a consumer receives.
-  `installer/README.md` §init still claims that what governs your tree afterwards is
-  committed source you can read — true today and false at the first ported gate, since
-  `gate-sdk/SPEC.md` §Consumer payload rules that a compiled gate's implementation source
-  does not ship. Build batch 1 corrected the sibling claim on `docs/install.md` (adding
-  §What a gate discloses, because it qualifies the opening claim on that page) and left
-  this one.
-  **Why it was left, and it is not an oversight.** It belongs to no delta of
-  `native-gate-vendoring-model` — delta 3 owned only §init's zero-build-step claim, and
-  widening it to the disclosure claim would have edited an already-merged amendment's
-  envelope.
-  **Defect class:** a disclosure claim about the vendored payload restated across governed
-  install surfaces with one owner and no oracle.
-  **Deliverable, structural rather than a new gate:** canon-kit's `check-install-claim`
-  already gives the primary-install-path claim one declared owner and holds every governed
-  install section to it. The same shape extends to a payload-disclosure claim with
-  §Consumer payload as the owner. The §init correction and the `check-install-claim`
-  extension land in one unit.
-  **Why `[design-pending]`:** the claim's *tense* is the open call. No gate is ported today,
-  so the readable-source claim is true of every tree that exists; the correction has to say
-  something true both now and after the first port without reading as a warning about a
-  thing that has not happened.
-  **Cost while deferred:** the two install surfaces a prospective adopter reads contradict
-  each other on the one property the vendoring model exists to rule, and the contradiction
-  becomes a false statement rather than an incomplete one at the first port.
-  Filed 2026-08-03 at close from the gap inbox; found by build batch 3.
 
 - **amendment-done-move-assertions** [design-pending] — a task can be marked done with its
   amendment left undeleted on disk, and the battery stays green.
