@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — one module per ported gate; the
 // subcommand name is the gate name, so no mapping table exists to drift
+pub mod action_gh_repo;
 pub mod action_pinning;
 
 pub type GateFn = fn(&[String]) -> i32;
@@ -8,10 +9,11 @@ pub type GateFn = fn(&[String]) -> i32;
 // walk roots, the data `--reads` prints. A member added without them fails to compile, so
 // the declaration cannot be silently omitted.
 pub const REGISTRY: &[(&str, GateFn, &[&str])] = &[
-    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is this
-    // gate's first argument with a default, the same variable-first-argument shape the
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because each member's scan root is
+    // its own first argument with a default, the same variable-first-argument shape the
     // shell parser calls undecidable and skips-and-counts.
     ("check-action-pinning", action_pinning::run, &["?"]),
+    ("check-action-gh-repo", action_gh_repo::run, &["?"]),
 ];
 
 pub fn lookup(name: &str) -> Option<GateFn> {
