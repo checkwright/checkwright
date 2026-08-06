@@ -138,7 +138,11 @@ amendment and `lifecycle-kit/SPEC-dispatch-signal.md` are the other two members
 of this incident class: this one makes the completion notification **truthful**
 (a session that does not end its turn on live work emits a signal that does not
 lie), the dispatch amendment makes the lead depend on that signal instead of on
-artifact state, and the lock detects the residual case where it is wrong anyway.
+artifact state, and the lock's entry-side reader detects the residual case where
+it is wrong anyway. (The lock also gained a writer-side refusal for a distinct,
+adjacent hazard — a second or out-of-band producer racing the manifest — which
+is not part of this incident class and does not close this residual case;
+evidence-kit/SPEC-liveness-lock.md §The ruling record.)
 
 ## What changes
 

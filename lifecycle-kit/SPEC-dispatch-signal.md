@@ -93,7 +93,11 @@ widening the unit. `delegation-kit/SPEC-residency.md` is what makes the signal
 this rule depends on **truthful**: a dispatched session that ends its turn on
 still-running work emits a completion notification that lies. So the set reads:
 that amendment makes the signal honest, this one makes the lead depend on it, and
-the lock detects the residual case where it is wrong anyway.
+the lock's entry-side reader detects the residual case where it is wrong anyway.
+(The lock also gained a writer-side refusal for a distinct, adjacent hazard — a
+second or out-of-band producer racing the manifest — which is not part of this
+incident class and does not close this residual case;
+evidence-kit/SPEC-liveness-lock.md §The ruling record.)
 
 ## What changes
 

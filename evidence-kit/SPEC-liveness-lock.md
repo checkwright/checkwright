@@ -23,9 +23,15 @@ ungoverned. The Definition of Done below binds them.
 A third amendment completes the causal story:
 `delegation-kit/SPEC-residency.md` is what keeps the completion notification
 truthful in the first place, since a dispatched session that ends its turn on
-still-running work emits a signal that lies. This lock is the detector for the
-residual case where the signal is wrong anyway — which is precisely why it is
-worth building even though the two prose rules exist.
+still-running work emits a signal that lies. The entry-side reader
+(`check-producer-liveness`, at stage entry and inheriting into `--simulate`) is
+the detector for the residual case where the signal is wrong anyway — which is
+precisely why it is worth building even though the two prose rules exist. Delta
+6's writer-side refusal is not a second detector for that same case: close never
+invokes `run-validate`, so there is nothing there for it to refuse. It is
+adjacent coverage for a distinct hazard the residency/dispatch-signal chain does
+not name — a second or out-of-band `run-validate` invocation racing the
+manifest — named explicitly where it is ruled (§The ruling record).
 
 ## The cross-kit ruling (why this entry stayed design-pending)
 
@@ -80,6 +86,14 @@ file changing underneath it. Reading `/proc` to confirm the process identity is
 rejected as well: it is unportable, and the trajectory's OS-reach objective makes
 a Linux-only predicate a cost rather than a refinement.
 
+The same false-*held* direction reaches a second reader once delta 6 ships:
+`run-validate`'s own writer-side refusal reads the identical PID-liveness
+predicate, so a recycled PID makes the *writer* over-refuse (declining to start)
+by the same mechanism that makes the entry-side reader over-refuse. Both
+manifestations share one cause, one direction (fail-closed, never false-green),
+and one clearance (delete the file); this is a restated instance of the residual
+above, not a second one to weigh separately.
+
 The **reclaim path** the runtime-artifact lifecycle rule demands
 (lifecycle-kit/templates/stages/close.md step 6 — "a write-path needs a paired
 reclaim-path") is named in three layers, and the amendment asserts all three:
@@ -131,11 +145,23 @@ Each delta carries its `{mechanical | design-bearing}` work class.
    unconditional release, whichever producer exits first deletes the survivor's
    lock, after which the preflight reads green with a producer still live.
    Atomic claim does **not** make this redundant, and the residual case is
-   concrete: a producer reclaimed as stale by a second producer can still have
-   its own `EXIT` trap fire afterwards, and an unconditional release would then
-   delete the reclaimer's live lock. Atomicity is what makes "still ours"
-   *answerable* — a record that cannot be overwritten is a record whose PID can
-   be trusted — and conditional release is what acts on the answer.
+   concrete, though it is not the one an `EXIT`-trap race first suggests: an
+   `EXIT` trap runs synchronously as part of a process's own exit and is fully
+   complete before that process reads as dead to `kill -0` (the sole exception,
+   SIGKILL, skips the trap entirely rather than deferring it — verified by
+   probe, `.tmp/align-trap-probe.sh`: a process inside its own `EXIT` trap still
+   reads **live**). So a producer this design's own dead-PID reclaim has
+   correctly identified as stale cannot later run its trap — either the trap
+   already ran (and the producer released its own lock before any staleness was
+   observable) or it never runs at all. The real residual case is a lock removed
+   by any path *other than* delta 6's dead-PID reclaim: an operator manually
+   deleting an apparently-stuck lock, or a future code path. There, producer A
+   is still alive, unaware its lock was removed; producer B claims the freed
+   slot; A eventually exits and, with an unconditional release, deletes B's live
+   lock. Atomicity is what makes "still ours" *answerable* — a record that
+   cannot be overwritten is a record whose PID can be trusted — and conditional
+   release is what acts on the answer, for exactly this out-of-band-removal
+   case rather than for the reclaim path the design itself controls.
 
    A trap is required rather than a tail line, and the reason is countable: the
    script has nine exit paths — six `exit 2` guards, one `exit 1` parse failure,
