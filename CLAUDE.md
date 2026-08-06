@@ -151,7 +151,9 @@ here.
   delivery path — publish and install — now ship, so a second port waits on
   nothing but the porting. It is **not a kit** — no `checks/`, no `smoke/`, the
   predicate that makes a root directory one; `native/target/` is gitignored and
-  never committed. Dispatch, descriptor format, port criteria and the toolchain
+  never committed, so its build currency is enforced rather than rostered — by
+  `check-gate-binary-fresh`, dormant until a descriptor makes the binary
+  load-bearing. Dispatch, descriptor format, port criteria and the toolchain
   floor: gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,

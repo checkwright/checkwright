@@ -10,6 +10,7 @@ check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
 check-gate-substrate-parity
+check-gate-binary-fresh
 check-test-hermetic
 check-assertion-strength
 check-graph

@@ -88,6 +88,7 @@ check-gate-fail-closed
 check-gate-fixture-coverage
 check-gate-assertions
 check-gate-substrate-parity
+check-gate-binary-fresh
 check-test-hermetic
 check-assertion-strength
 check-gate-exemption-tasks

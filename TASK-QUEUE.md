@@ -12,47 +12,6 @@
 
 ## New Features
 
-  The first ported cohort landed its implementations and **held its descriptors**
-  (operator-ruled 2026-08-06, TRAJECTORY.md §The closed rulings), which dissolves
-  the causal order these three were promoted under: with no descriptor, the cohort
-  neither arms the stale-binary path nor falsifies the disclosure claim. The
-  freshness oracle stays here and builds dormant-but-correct ahead of the
-  descriptors — its own design already handles a zero-descriptor tree. The
-  disclosure correction was **demoted** to Deferred by the same ruling, to
-  re-promote with `native-gate-cohort-descriptors`: its claim does not become
-  false until a descriptor lands, so correcting it now would assert a tree state
-  that does not exist.
-
-- **native-binary-freshness-ungated** [spec: SPEC-binary-freshness.md] — a compiled
-  gate has no freshness oracle. `check-gate-substrate-parity` assertion B diffs the
-  `.gate` descriptor set on disk against the binary's `--list` roster; it is
-  **set-membership only** and never compares the binary's content against the `.rs`
-  source it is built from. `gate_command` dispatches a `.gate`-declared member
-  straight to the prebuilt binary with no rebuild and no freshness check, so editing
-  a gate's Rust source, skipping the rebuild, and committing runs the
-  descriptor-named gate **against the stale binary** — and it passes on the old
-  implementation.
-  **Inert today, armed by this iteration.** The one live port was reverted, so no
-  gate dispatches to the binary and the hole cannot currently affect a commit. It
-  re-arms at the first commit of the second port, which `native-gate-binary-port`
-  lands here — so the two ship together or the cohort ships the hole.
-  **What kept it needing design, and what settles it.** The cheap form (mtime
-  against source) is wrong on a fresh clone and on any checkout that reorders
-  timestamps; a content-derived form needs a build stamp the crate does not emit.
-  Both stand. The amendment rules the algorithm: **git is the hasher** — the crate
-  declares no dependencies at all, so a digest crate or a hand-rolled SHA-256 is
-  refused, and both sides of the comparison call the same git invocation rather than
-  two implementations of one hash.
-  **One premise corrected at promotion.** The body claimed the compiled binary
-  belongs on docs/site-architecture.md's generated-projections roster. That roster's
-  own admission rule is narrower — a derived surface earns a row only when it has a
-  reader who cannot run the emitter — and the binary is not committed at all. It
-  earns a standing-absence line beside the two instances already recorded there, not
-  a freshness row.
-  Filed 2026-08-02 at close from the gap inbox; found during validate. Amendment
-  authored 2026-08-06 at spec, which rules the hashing algorithm and the roster
-  question that kept it design-pending.
-
 ## Technical Debt
 
 ## Deferred
@@ -3518,5 +3477,6 @@
 
 - native-port-entry-premise-carry
 - native-gate-binary-port
+- native-binary-freshness-ungated
 
 ## Lessons Learned

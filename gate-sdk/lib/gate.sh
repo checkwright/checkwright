@@ -113,10 +113,37 @@ gate_native_bin() {
     printf '%s\n' "${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
 }
 
+# spec: gate-sdk/SPEC.md §Layout and configuration — the one home of GATE_SDK_NATIVE_CRATE's default, trailing slash stripped, so its three shell readers share a spelling rather than each carrying one
+gate_native_crate() {
+    local crate="${GATE_SDK_NATIVE_CRATE:-native}"
+    printf '%s\n' "${crate%/}"
+}
+
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_TARGETS_FILE, defaulted off GATE_SDK_NATIVE_CRATE so the crate's location keeps one owner
 gate_native_targets_file() {
-    local crate="${GATE_SDK_NATIVE_CRATE:-native}"
-    printf '%s\n' "${GATE_SDK_NATIVE_TARGETS_FILE:-${crate%/}/targets.list}"
+    local crate
+    crate="$(gate_native_crate)"
+    printf '%s\n' "${GATE_SDK_NATIVE_TARGETS_FILE:-$crate/targets.list}"
+}
+
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the tree side of the source stamp: the same three git invocations native/build.rs bakes into the binary, so the comparison stays one algorithm rather than two implementations of one. Returns 1 emitting nothing when git cannot answer, so a caller fails closed rather than comparing against an empty string.
+gate_native_source_stamp() {
+    local crate listing hashed stamp i
+    local -a paths=() hashes=()
+    crate="$(gate_native_crate)"
+    listing="$(git -C "$crate" ls-files 2>/dev/null)" || return 1
+    [[ -n "$listing" ]] || return 1
+    mapfile -t paths <<<"$listing"
+    hashed="$(git -C "$crate" hash-object -- "${paths[@]}" 2>/dev/null)" || return 1
+    mapfile -t hashes <<<"$hashed"
+    [[ ${#hashes[@]} -eq ${#paths[@]} ]] || return 1
+    local manifest=""
+    for ((i = 0; i < ${#paths[@]}; i++)); do
+        manifest+="${hashes[i]} ${paths[i]}"$'\n'
+    done
+    stamp="$(printf '%s' "$manifest" | git -C "$crate" hash-object --stdin 2>/dev/null)" || return 1
+    [[ -n "$stamp" ]] || return 1
+    printf '%s\n' "$stamp"
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the target roster's single reader; an absent roster returns 1 and emits nothing, so a caller tells "no roster declared" from "a roster declaring nothing" rather than reading both as no targets

@@ -1,0 +1,2 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — fixture descriptor in a kit resolve dir, so the red is reported against the whole dispatching set rather than one dir's

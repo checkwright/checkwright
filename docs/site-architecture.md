@@ -180,3 +180,19 @@ instances, the latter with its refusal reasoned in its own contract
 (queue-kit/SPEC.md §bin/queue-edges.sh). Their absence is a ruling, not an
 oversight — the question to ask of a new derived surface is who reads it, not
 whether it could be generated.
+
+**The compiled gate binary is the third standing instance, and it fails the
+admission test in both directions.** It is not committed at all (`native/target/`
+is gitignored), so there is no tracked copy for a freshness gate to byte-compare;
+and every reader of it in this repo can run the emitter, which is `cargo build`. A
+consumer is not a counter-example: a consumer never receives the crate source and
+never builds, and the artifact they do receive is held by a published digest
+verified before it is written (gate-sdk/SPEC.md §Consumer payload) — a different
+guarantee with a different mechanism. What the binary does owe is build currency,
+and that obligation is discharged by an oracle rather than by a row here:
+`check-gate-binary-fresh` (gate-sdk/SPEC.md §check-gate-binary-fresh) compares the
+binary's baked source stamp against the crate's tracked source whenever a `.gate`
+descriptor makes it load-bearing. Recorded because the derivation-first reflex
+reads "generated artifact" and reaches for this roster; the answer is that the
+roster's admission rule is narrower than that reflex, and the obligation has a
+home.

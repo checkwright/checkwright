@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# A binary built from the source the fixture tree carries: its baked stamp is the
+# one stamp.txt reports, so the gate must reach the comparison and find them equal.
+[[ "${1:-}" == --source-stamp ]] && { echo 4f1c2a90bb7e5d3168ac04e2f5b7391dd0c6a812; exit 0; }
+exit 2

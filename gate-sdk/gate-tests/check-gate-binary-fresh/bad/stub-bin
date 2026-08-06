@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# A binary built from a source state this fixture tree no longer carries: its baked
+# stamp is not stamp.txt's. The near-miss this case must not collapse into is the
+# zero-descriptor tree, which exits 0 — so a red here can only be the stamp mismatch.
+[[ "${1:-}" == --source-stamp ]] && { echo 7b30e5148d6ca2f09e1b84ff2d5c7a6033819e4c; exit 0; }
+exit 2

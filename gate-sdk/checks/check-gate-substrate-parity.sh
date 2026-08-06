@@ -139,8 +139,7 @@ fi
 # assertion E: opacity is held by structure — a ported gate's implementation source
 # may not reach the vendoring set, whose members are exactly the kit roots
 # spec: gate-sdk/SPEC.md §Consumer payload
-CRATE="${GATE_SDK_NATIVE_CRATE:-native}"
-CRATE="${CRATE%/}"
+CRATE="$(gate_native_crate)"
 declare -A DESCRIPTOR_SET=()
 for g in "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}"; do DESCRIPTOR_SET["$g"]=1; done
 kit_scanned=0
