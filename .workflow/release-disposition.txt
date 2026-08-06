@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+native-first-port-cohort release v0.22.0 — explicit operator direction, recorded 2026-08-06 in TRAJECTORY.md §The closed rulings, which cuts the first tag publishing prebuilt gate binaries at this close and answers the 2026-08-04 escalation in advance; minor earned by nine tightened-gate declarations accumulated across eleven iterations, no decommission in range, discharging the outstanding deferral at v0.22.0.
