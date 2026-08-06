@@ -67,7 +67,12 @@ twice**, and the entry is corrected on promotion:
 2. `guard-kit/templates/escalation-guard.sh` is the closer precedent: a
    *doctrine* guard on a non-`Bash` matcher, advisory, tested by its own second
    decision table, with its provenance seam explicitly ruled — the kit owns the
-   grammar, the consumer owns the roster.
+   grammar, the consumer owns the roster. This repo leaves it unwired by design
+   (guard-kit/SPEC.md §escalation-guard), so it is precedent for the
+   *template-plus-binding-mechanism* shape, not for a live wired instance; delta
+   9 below follows `agent-budget-guard`'s wired precedent instead, so the
+   blocker's "ships with its enforcement" half rests on citation 1 and delta 9,
+   not on citation 2 alone.
 
 So the blocker resolves by citation rather than by design, and the entry's own
 `[design-pending]` framing was the last thing standing between it and a build.
@@ -510,7 +515,18 @@ Each named with the delta that owns it.
    earns spec residency (a failure surface, a calibration history, a bound that
    is correctness rather than preference)". Three attested failure surfaces and
    the chokepoint reasoning qualify; the rule text itself stays in the template
-   and is cited by name.
+   and is cited by name. **The chokepoint's payload-field roster lands here
+   verbatim, not merely gestured at** — §The chokepoint — what a `PreToolUse`
+   hook can actually read is where D3's whole basis lives (`agent_id`'s presence
+   being a *documented* field rather than an inferred one), and losing that
+   enumeration and its sourcing at merge would leave D3's trigger unexplained to
+   a reader who never saw the amendment. Carry the honest limit with it: the fact
+   is sourced from the harness's own published hook contract, fetched rather than
+   asserted from memory, not from anything in this tree — the same footing as
+   `CLAUDE_CODE_CHILD_SESSION`'s "verified, not trusted" treatment in
+   lifecycle-kit/SPEC.md §bin/session-id.sh — so a future harness revision
+   changing the payload shape is a drift this SPEC cannot self-detect; only
+   re-reading the hook contract catches it.
 3. **delegation-kit/SPEC.md §One template, a resident pointer** (delta 5). Its
    honest limit currently reads that "the guard enforces budget mechanically, not
    protocol literacy". After this change that is too narrow — a second guard
@@ -551,13 +567,19 @@ Each named with the delta that owns it.
 
 Stated here because a later author working one unit will not read the others.
 
-- **To `stage-fanout-burn-unbilled` (batch 1, already merged into its own
-  amendment).** Nothing in this amendment changes the meter, the fan-out row, or
-  the attribution key. The relationship runs the other way: batch 1's fan-out row
-  is the instrument that measures whether this amendment worked, so the two are
-  measurement and treatment of one iteration. If this amendment lands and fork
-  spend does not fall in the next close's trend log, the guard is unwired or D2's
-  roster is empty — check the registration before re-opening the doctrine.
+- **To `stage-fanout-burn-unbilled` (batch 1, already authored into its own
+  amendment file, `drift-kit/SPEC-fanout-attribution.md` — not yet merged into
+  drift-kit/SPEC.md, same as this one).** Nothing in this amendment changes the
+  meter, the fan-out row, or the attribution key. The relationship runs the
+  other way: batch 1's fan-out row is the instrument that measures whether this
+  amendment worked, so the two are measurement and treatment of one iteration.
+  **The row is an aggregate proxy, not a fork-labeled figure**: its `<stage>`
+  column carries no dispatch-type dimension, so a fork's cost and a typed
+  dispatch's cost under the same anchor sum into one number. If this amendment
+  lands and the anchor's fan-out total does not fall in the next close's trend
+  log, the guard is unwired or D2's roster is empty — check the registration
+  before re-opening the doctrine; a fallen total is consistent with the guard
+  working but, absent a type dimension, is not on its own proof of it.
 - **To `cross-stage-census-duplication`** (this batch's second amendment,
   `lifecycle-kit/SPEC-survey-carryforward.md`). Delta 4's durable-artifact
   contract is the *escalation* channel — mid-run, dispatcher-minted, per-dispatch.

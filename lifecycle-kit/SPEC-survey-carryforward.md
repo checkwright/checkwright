@@ -407,8 +407,9 @@ Stated here because a later author working one unit will not read the others.
   survey record is a hand-off, single-path, per-iteration, and written by the
   *parent* after the child returns. Their readers, lifetimes, and discovery keys
   all differ. This amendment cites that one and extends nothing in it.
-- **To `stage-fanout-burn-unbilled`** (batch 1, merged into
-  `drift-kit/SPEC-fanout-attribution.md`). Its fan-out row is the instrument that
+- **To `stage-fanout-burn-unbilled`** (batch 1, already authored into
+  `drift-kit/SPEC-fanout-attribution.md` — not yet merged into drift-kit/SPEC.md,
+  same as this one). Its fan-out row is the instrument that
   measures whether this amendment worked — a scope-and-spec pair that stops
   double-buying a census shows up as a fall in the two stages' fan-out rows.
   Nothing in the meter changes. The premise correction runs the other way and is
