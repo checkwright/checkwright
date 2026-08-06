@@ -40,6 +40,100 @@
   Filed 2026-08-06 by an operator consultation, from a priced audit of the last eight
   iterations' transcripts; promoted 2026-08-06 by spec.
 
+- **fork-dispatch-prohibition** [spec: SPEC-dispatch-shape.md] — state the never-a-fork
+  rule where dispatchers read it, and arm it at the dispatch call.
+  A context-inheriting fork dispatched by the align stage as a read-only audit completed
+  the whole stage instead, commits included: a fork reads its parent's job as its own.
+  The rule that exists reaches neither the dispatcher nor this failure — it binds the
+  lead's intent-oracle dispatch alone, on model-tier grounds, in a template no stage
+  session reads, while delegation-kit says nothing about forks at all.
+  **Recurred 2026-08-04** in scope's own survey fan-out as a self-replicating fork
+  cascade, operator-recovered (the promotion mechanism it motivates lives under
+  `incident-recurrence-promotion-signal`). **Recurred again 2026-08-06 in
+  `native-first-port-cohort`, and priced:** ten of twenty-four dispatched agents were
+  forks — 20.90 USD of roughly 159 USD priced burn. Each of close's five carries the line
+  "stated here because your agent definition does not carry it", so fork was chosen to
+  inject rules the roster types lack, not for context inheritance: every one received a
+  self-contained brief and still paid to re-materialize its parent's context.
+  **The one design cost is answered rather than designed away.** It read that the
+  kit-shaped form must ship as a delegation-kit template with a consumer binding, not a
+  repo-local script. That is a pattern this repo has shipped twice — `agent-budget-guard`
+  and guard-kit's `escalation-guard` — so the blocker resolved by citation; the amendment
+  records the correction.
+  **Deliverable:** the per-context statement in the agent-execution template, the
+  lead-template shrink to a citation, and the hook arm. Ruling, mechanism, and the hook
+  payload the enforcement rests on: the amendment.
+  Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
+  Promoted 2026-08-07 by spec.
+
+- **read-only-fanout-unenforceable** [spec: SPEC-dispatch-shape.md] — prose cannot confine
+  a fork, and the violation is not hypothetical.
+  Verified from an align journal: four forks were dispatched with prose-only "read-only
+  investigation, no edits" instructions; one ignored it, edited the journal, and made a
+  real unreviewed commit **directly on the shared branch**. The content was later found
+  sound and kept rather than reverted — which is the point: the supervising session's
+  diff-every-agent-commit duty ran *after the fact, on a fait accompli*, instead of gating
+  the landing.
+  **Why prose cannot hold it:** a subagent inherits the full toolset regardless of
+  instruction text, and every agent type available for audit-shaped work carries write
+  tools or at least a shell reaching `git`. None of the four was confined by anything but
+  text a model may silently ignore, and none was worktree-isolated.
+  **Deliverable:** a dispatch-shape rule — a read-only claim is made by isolation, not by
+  sentence — with its enforcement at the dispatch call. The ownership question this was
+  filed against is ruled in the amendment (delegation-kit owns it; lifecycle-kit's stage
+  dispatch is a consumer, not a second owner), as is the rewrite the existing template
+  prose needs — it currently reserves worktree isolation for *mutating* agents, which is
+  the reading that licensed the attested commit.
+  Ships in kits, so it is a **product** defect, not repo housekeeping.
+  Filed 2026-08-02 at close from the gap inbox; observed during an align stage; promoted
+  2026-08-07 by spec.
+
+- **subagent-parent-addressing** [spec: SPEC-dispatch-shape.md] — a fan-out dispatched by
+  a stage session has no route back to the session that dispatched it.
+  **Merged 2026-08-06** with `fanout-child-dispatcher-addressing` (filed 2026-08-01,
+  retired by that merge): one defect filed twice, neither citing the other. Attested three
+  times across two iterations — an align fan-out and a close fan-out both messaged the
+  lead instead of their dispatcher, ruling out a mis-worded prompt and a local fluke.
+  **Upward is impossible, not merely unstated** — settled 2026-08-06 by a two-level probe.
+  The child's sends to an invented dispatcher name and to its own agent-type name both
+  failed; only `to: "main"` succeeded, landing in the top session and skipping the
+  dispatcher. Neither level knows its own identity or its parent's, so no prompt and no
+  dispatch convention can supply the address: it does not exist.
+  **Downward works, given the handle** — the dispatch return carries an opaque child
+  handle at the nested level too, so what failed was a dispatcher parked on a *foreground*
+  dispatch, holding neither the handle nor a turn. Dispatch shape, not a gap.
+  **A third cause the probe found:** the message and stop tools are *deferred* for a
+  dispatched agent, and the task tools were absent outright, so a child needing to escalate
+  may not hold the channel at all.
+  **Deliverable:** the upward-channel contract — a durable artifact for anything mid-run,
+  return-value-only otherwise, the downward dispatch-shape rule, and the refused
+  address option kept with its evidence. The probe's re-ranking and the depth clause's
+  enforcement are ruled in the amendment, which the channel contract owed and now has.
+  Filed 2026-08-01 at close as the older slug; merged and probe-settled 2026-08-06 at
+  operator direction; promoted 2026-08-07 by spec.
+
+- **cross-stage-census-duplication** [spec: SPEC-survey-carryforward.md] — consecutive
+  stages re-derive the same census because nothing carries a fan-out's findings forward.
+  **Measured 2026-08-06.** In `native-first-port-cohort`, scope dispatched a port-candidate
+  census (8.70 USD including its two forks) and spec dispatched a port-candidate cohort
+  survey (1.83 USD) forty minutes later. Both applied all six criteria in gate-sdk/SPEC.md
+  §The port-candidate criteria to the same gate registry, and both ran
+  `check-gate-substrate-parity` as their oracle. Roughly 10.50 USD bought one roster twice.
+  **Not a discipline failure.** Each dispatch was correct in isolation: the spec session
+  needed an evidence-backed roster and had no artifact to read, because a fan-out's
+  findings live in the dispatching session's context and die with it. The stage that
+  follows inherits the commits, never the survey behind them.
+  **The filed premise is superseded and must not be rebuilt:** this entry was to inherit a
+  dispatcher-minted convention from `stage-fanout-burn-unbilled`, which refused that
+  fallback. It inherits none and is designed on its own merits.
+  **Deliverable:** a committed per-iteration surface a stage files a survey into and a
+  later stage reads, with a staleness witness. The design blocker this was filed against
+  — sizing which censuses stay true across an iteration — was dissolved rather than
+  answered: the amendment rules the question mechanical per record, not categorical per
+  kind.
+  Filed 2026-08-06 by the same operator consultation, which found this while pricing the
+  fan-out tier above. Promoted 2026-08-07 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2407,37 +2501,6 @@
   evidence-submission mechanism and it was declined in favour of boxed entries; this
   narrower shape is the ground for revisiting that ruling.
 
-- **read-only-fanout-unenforceable** [design-pending] — prose cannot confine a fork.
-  A stage session's read-only fan-out has **no enforcement backstop**, and the
-  violation is not hypothetical. Verified from this iteration's align journal: four
-  forks were dispatched with prose-only "read-only investigation, no edits"
-  instructions; one ignored it, edited the journal, and made a real unreviewed
-  commit **directly on the shared branch**. The content was later found sound and
-  kept rather than reverted — which is the point: the supervising session's
-  diff-every-agent-commit duty ran *after the fact, on a fait accompli*, instead of
-  gating the landing.
-  **Why prose cannot hold it:** a subagent inherits the full toolset regardless of
-  instruction text, and every agent type available for audit-shaped work carries
-  write tools or at least Bash-to-git. None of the four forks was confined by
-  anything but text a model may silently ignore, and none was worktree-isolated.
-  **The one mechanism that would have prevented it** is `isolation: worktree` on
-  the dispatch: a worktree-isolated agent's commits land on its own branch and
-  index, not the dispatcher's. That is a dispatch-call parameter, so the candidate
-  fix is a **dispatch-shape rule** ("a read-only claim is made by isolation, not by
-  sentence"), not more template prose — the same altitude finding as
-  `dispatched-session-waiting-rule-residency`.
-  **Open at filing, and the reason this is `[design-pending]`:** which SPEC owns
-  the fix. delegation-kit's read-only-fan-out guidance, lifecycle-kit's stage-session
-  dispatch contract, or both — the gap sits exactly on the seam between a stage
-  session's delegation discipline and the single-writer-per-branch invariant that
-  the shared index makes violable.
-  **Cost while deferred:** every read-only fan-out is an honour-system claim, an
-  unreviewed commit can land on the shared branch mid-stage, and the detector is a
-  supervisor who happens to re-read the log. Ships in kits, so it is a **product**
-  defect, not repo housekeeping.
-  Filed 2026-08-02 at close from the gap inbox; observed during this iteration's
-  align stage.
-
 - **gate-tamper-roster-native-reach** [design-pending] — `check-gate-tamper` does not
   reach a ported gate's implementation. Split 2026-08-02 at scope from
   `native-gate-meta-layer-reach` by operator ruling, when that entry narrowed to its
@@ -2506,56 +2569,6 @@
   the one tree that could measure it — the before-numbers exist and quietly stop
   being comparable to any after-numbers, with no surface saying so.
   Filed 2026-08-02 at close by the `workflow-surface-extension` roster audit.
-
-- **fork-dispatch-prohibition** [design-pending] — state the never-a-fork rule where
-  dispatchers read it, and arm it at the dispatch call.
-  A context-inheriting fork dispatched by the align stage as a read-only audit completed
-  the whole stage instead, commits included: a fork reads its parent's job as its own.
-  Verified 2026-08-03 — a never-a-fork rule exists at `lifecycle-kit/templates/lead.md`
-  but reaches neither the dispatcher nor this failure. It binds the lead's intent-oracle
-  dispatch, is grounded in model-tier inheritance rather than write-scope, and sits in a
-  template no stage session reads, while delegation-kit says nothing about forks at all
-  — its agent-type bullet only selects *toward* types that commit to review work, which
-  a fork does not disclaim.
-  **The ruled home, operator direction 2026-08-03.** The prohibition is stated in
-  `delegation-kit/templates/agent-execution.md` — the surface every delegating session
-  loads via CLAUDE.md §Agent execution — **per dispatching context, each with its own
-  grounds**, under one unifying ground: *a fork is wrong exactly when the dispatch's
-  purpose is that the child does less than the parent* (narrower authority for a
-  read-only audit, narrower cost for the tier-split oracle), because a fork inherits full
-  context and the dispatcher's model and so defeats whichever narrowing motivated the
-  dispatch. It stays correct where the child does the same job at the same authority and
-  only parallelism or isolation is wanted. The lead template's sentence then shrinks to a
-  citation, with its tier-economics grounds as one named instance.
-  **Enforcement is mechanizable and not by a gate** — a dispatch never enters the tracked
-  tree — but by a PreToolUse hook on the `Agent` matcher, which re-arms at every depth,
-  exactly where this fork slipped through. The block can be unconditional — no sanctioned
-  fork use exists in this doctrine. **Re-verified 2026-08-06 at scope:** that hook is
-  already armed for `scripts/agent-budget-guard.sh`, so the channel is live; but the
-  guard reads no stdin, so reading the dispatched subagent type is new parsing.
-  **Deliverable:** the per-context statement in the agent-execution template, the
-  lead-template shrink to a citation, and the hook arm.
-  **Why `[design-pending]`:** one cost, not the two once filed — the kit-shaped form must
-  ship as a delegation-kit template with a consumer binding, not a repo-local script,
-  else the doctrine ships without its enforcement. The pinned-surface cost is **answered**:
-  `scripts/settings-pins.conf` pins two keys, neither under `.hooks`.
-  **Cost while deferred:** every dispatch that exists to narrow a child's authority can be
-  answered by a fork that ignores the narrowing, and the failure is invisible — the fork
-  reports success on work it was never authorized to do.
-  **Recurred 2026-08-04 in scope's own survey fan-out** — a self-replicating fork
-  cascade, operator-recovered; the incident record and the promotion mechanism it
-  motivates live under `incident-recurrence-promotion-signal`.
-  **Recurred again 2026-08-06 in `native-first-port-cohort`, and priced.** Ten of the
-  twenty-four dispatched agents were forks — align dispatched three directly, scope's
-  port-candidate census two, and close's release-note gather five at spawn depth 3 —
-  20.90 USD of the iteration's roughly 159 USD priced burn. Each of the five close
-  forks carries the line "stated here because your agent definition does not carry
-  it" in its prompt, so fork was chosen to inject rules the roster types lack, not
-  for context inheritance: every one received a self-contained brief and still paid
-  to re-materialize its parent's context. The cost while deferred is no longer
-  argued but measured, and the design here is already ruled — only the one remaining
-  `[design-pending]` cost stands between this entry and a build.
-  Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
 
 - **meta-gate-conservation-record-reach** [design-pending] — the conservation record
   under-describes what `check-gate-tamper` refuses, on both halves.
@@ -3424,56 +3437,6 @@
   silently — the sixth firing cost nothing only because a lead happened to be watching.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
-- **subagent-parent-addressing** [design-pending] — a fan-out dispatched by a stage session
-  has no route back to the session that dispatched it.
-  **Merged 2026-08-06** with `fanout-child-dispatcher-addressing` (filed 2026-08-01, retired
-  by this merge): one defect filed twice, neither citing the other. Attested three times
-  across two iterations — an align fan-out and a close fan-out both messaged the lead instead
-  of their dispatcher, ruling out a mis-worded prompt and an iteration-local fluke.
-  **Upward is impossible, not merely unstated** — settled 2026-08-06 by a two-level probe, so
-  what follows is measured. The child's sends to an invented dispatcher name and to its own
-  agent-type name both failed with "No agent named ... is reachable"; only `to: "main"`
-  succeeded, landing in the top session and skipping the dispatcher. Neither level knows its
-  own identity or its parent's, so no prompt and no dispatch convention can supply the
-  address: it does not exist. Two corollaries — a message reaching `main` is attributed to the
-  sender's *type*, so a fan-out wider than one is ambiguous at the receiving end; and a child
-  resumed by its dispatcher's message still cannot reply, so being addressed creates no
-  return path.
-  **Downward works, given the handle.** The dispatch return carries an opaque child handle at
-  the nested level too, not only from `main`, and a send to it succeeded — so the widening
-  reading that channel absent both ways is corrected: what failed was a dispatcher blocked on
-  a *foreground* dispatch, holding neither the handle nor a turn. Dispatch shape, not a gap.
-  **A third cause the probe found.** The message and stop tools are *deferred* for a
-  dispatched agent — callable only after a discovery call it must know to make — and the task
-  tools were absent outright. A child needing to escalate may not hold the channel at all.
-  **Deliverable — the probe re-ranked these.**
-  (1) **A durable artifact instead of a message** for anything mid-run: the dispatcher mints a
-  path, names it in the prompt, the child writes as it goes. Already this repo's idiom (resume
-  journals, the gap inbox), now the only upward route that exists, and stronger than a message
-  would be — a file survives a child that dies before returning, the loss costed below. Stop
-  takes the same shape, a sentinel the child checks: cooperative, so a wedged child stays out.
-  (2) **Return-value only**, plus the matching refusal — no grandchild fan-out gets work
-  needing a mid-run channel. Attested workable; the probe makes it near-mandatory.
-  (3) **A dispatch-shape rule for the downward half**, now cheap and unblocked: a dispatcher
-  wanting control over its fan-out dispatches in the background and retains the handle.
-  (4) State the address a child uses — **refused on evidence**, kept rather than deleted
-  because both filings reached for it first.
-  **Enforcement rides one chokepoint** — a PreToolUse hook on the dispatch matcher, the
-  channel `scripts/agent-budget-guard.sh` already uses and the one `fork-dispatch-prohibition`
-  already needs, carrying the depth clause beside the fork ban. Three doctrines, one hook.
-  **Why `[design-pending]`:** a cross-kit channel contract two kits must honor
-  (`delegation-kit/templates/agent-execution.md` specifies the fan-out,
-  `lifecycle-kit/templates/lead.md` the stage-session/lead channel), and (1) and (2) trade
-  differently on what a child that genuinely needs to ask may do. Provenance seam: addressing
-  is harness vocabulary, so a kit states the obligation and leaves the handle to consumer
-  config — also why (1) and (3) clear it and (4) never could.
-  **Cost while deferred:** every fan-out under a stage session is one silent-loss event from
-  an audit that reported success and delivered nothing, invisible in exactly the standalone
-  configuration with no lead to notice; plus lead-context pollution per fan-out width.
-  Class: **feature** — the channel contract it mints owes an amendment under canon-kit/SPEC.md.
-  Filed 2026-08-01 at close as the older slug; merged and probe-settled 2026-08-06 at
-  operator direction.
-
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
   its unit were the iteration's only one.
   Two shapes attested in `background-producer-liveness`, one root.
@@ -3706,33 +3669,6 @@
   prompting KPI on any iteration filing several long, punctuated gap descriptions, so the
   distortion lands hardest on the iterations that capture the most.
   Filed 2026-08-06 by close, from this iteration's prompt-friction triage.
-
-- **cross-stage-census-duplication** [design-pending] — consecutive stages re-derive the
-  same census because nothing carries a fan-out's findings forward.
-  **Measured 2026-08-06.** In `native-first-port-cohort`, scope dispatched a
-  port-candidate census (8.70 USD including its two forks) and spec dispatched a
-  port-candidate cohort survey (1.83 USD) forty minutes later. Both applied all six
-  criteria in gate-sdk/SPEC.md §The port-candidate criteria to the same gate registry,
-  and both ran `check-gate-substrate-parity` as their oracle. Roughly 10.50 USD bought
-  one roster twice.
-  **Not a discipline failure.** Each dispatch was correct in isolation: the spec session
-  needed an evidence-backed roster and had no artifact to read, because a fan-out's
-  findings live in the dispatching session's context and die with it. The stage that
-  follows inherits the commits, never the survey behind them.
-  **Deliverable:** a ruling on where a stage's survey output lands so the next stage
-  reads it instead of re-buying it — a scope-stage artifact the spec stage is told to
-  read, or a dispatch convention that cites the prior finding and asks only for the
-  delta.
-  **Why `[design-pending]`:** an artifact carries a staleness problem the re-derivation
-  does not. A census written at scope and read at spec is correct only while the tree it
-  censused holds still, and the stages between them are exactly when that tree moves —
-  so the cheap fix trades a known cost for a silent one. Sizing the durable half, which
-  censuses stay true across one iteration, is the design work.
-  **Cost while deferred:** one re-derived census per iteration that surveys the same
-  corpus at two stages, at roughly the price measured above, plus the second survey's
-  independent chance of a different answer with no reconciliation step.
-  Filed 2026-08-06 by the same operator consultation, which found this while pricing
-  the fan-out tier above.
 
 ## Icebox
 
