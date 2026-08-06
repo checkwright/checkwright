@@ -2544,6 +2544,16 @@
   **Recurred 2026-08-04 in scope's own survey fan-out** — a self-replicating fork
   cascade, operator-recovered; the incident record and the promotion mechanism it
   motivates live under `incident-recurrence-promotion-signal`.
+  **Recurred again 2026-08-06 in `native-first-port-cohort`, and priced.** Ten of the
+  twenty-four dispatched agents were forks — align dispatched three directly, scope's
+  port-candidate census two, and close's release-note gather five at spawn depth 3 —
+  20.90 USD of the iteration's roughly 159 USD priced burn. Each of the five close
+  forks carries the line "stated here because your agent definition does not carry
+  it" in its prompt, so fork was chosen to inject rules the roster types lack, not
+  for context inheritance: every one received a self-contained brief and still paid
+  to re-materialize its parent's context. The cost while deferred is no longer
+  argued but measured, and the design here is already ruled — only the two
+  `[design-pending]` costs stand between this entry and a build.
   Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
 
 - **meta-gate-conservation-record-reach** [design-pending] — the conservation record
@@ -3675,6 +3685,63 @@
   prompting KPI on any iteration filing several long, punctuated gap descriptions, so the
   distortion lands hardest on the iterations that capture the most.
   Filed 2026-08-06 by close, from this iteration's prompt-friction triage.
+
+- **stage-fanout-burn-unbilled** [design-pending] — a stage's fan-out subtree bills to
+  no economics row, and that is now where the variance lives.
+  `bin/stage-economics.sh` prices the stamped stage-session transcript only. The
+  audit-sweeps and forks that session dispatches carry no stamp, so they fall into the
+  unstamped upper-bound counter instead — declared behavior, not a defect
+  (drift-kit/SPEC.md §The stage-economics meter states it as a bound, never an
+  attribution).
+  **Measured 2026-08-06.** `native-first-port-cohort`'s close row reads 27.81 USD while
+  the close subtree — three audit-sweeps plus five spawn-depth-3 forks under the
+  release-note gather — cost 41.77 USD. That 13.96 USD gap is precisely the spike an
+  operator reading the trend log would want surfaced, and it is the largest close
+  fan-out on record: the previous seven closes ran 0.46 to 3.98 USD of fan-out against
+  7.63 to 22.26 USD of stage-session burn. Close-over-close variance has moved into the
+  tier the meter cannot price.
+  **Deliverable:** a fan-out row per (iteration, stage), or a subtree total folded into
+  the stage row with the split reported.
+  **Why `[design-pending]`:** the attribution key. A subagent transcript names its lead
+  in its own path, which is what already makes the supervision row derivable with no
+  stamp — but a *grandchild* names only that same lead, never the stage session between
+  them, so the parent edge has to come from the sibling spawn-record file rather than
+  the path. Whether the meter may read that file at all is the ruling: it is a
+  harness-private artifact under no contract, and reading it couples the meter to a
+  shape nothing holds still.
+  **Cost while deferred:** the one economics surface read close-over-close under-reports
+  every fan-out-heavy stage, and under-reports it hardest on exactly the iterations
+  worth investigating. Sibling: `supervision-overhead-unmeasured`, the lead's own row,
+  which the same path derivation already reaches.
+  Filed 2026-08-06 by an operator consultation, from a priced audit of the last eight
+  iterations' transcripts.
+
+- **cross-stage-census-duplication** [design-pending] — consecutive stages re-derive the
+  same census because nothing carries a fan-out's findings forward.
+  **Measured 2026-08-06.** In `native-first-port-cohort`, scope dispatched a
+  port-candidate census (8.70 USD including its two forks) and spec dispatched a
+  port-candidate cohort survey (1.83 USD) forty minutes later. Both applied all six
+  criteria in gate-sdk/SPEC.md §The port-candidate criteria to the same gate registry,
+  and both ran `check-gate-substrate-parity` as their oracle. Roughly 10.50 USD bought
+  one roster twice.
+  **Not a discipline failure.** Each dispatch was correct in isolation: the spec session
+  needed an evidence-backed roster and had no artifact to read, because a fan-out's
+  findings live in the dispatching session's context and die with it. The stage that
+  follows inherits the commits, never the survey behind them.
+  **Deliverable:** a ruling on where a stage's survey output lands so the next stage
+  reads it instead of re-buying it — a scope-stage artifact the spec stage is told to
+  read, or a dispatch convention that cites the prior finding and asks only for the
+  delta.
+  **Why `[design-pending]`:** an artifact carries a staleness problem the re-derivation
+  does not. A census written at scope and read at spec is correct only while the tree it
+  censused holds still, and the stages between them are exactly when that tree moves —
+  so the cheap fix trades a known cost for a silent one. Sizing the durable half, which
+  censuses stay true across one iteration, is the design work.
+  **Cost while deferred:** one re-derived census per iteration that surveys the same
+  corpus at two stages, at roughly the price measured above, plus the second survey's
+  independent chance of a different answer with no reconciliation step.
+  Filed 2026-08-06 by the same operator consultation, which found this while pricing
+  the fan-out tier above.
 
 ## Icebox
 
