@@ -3383,11 +3383,14 @@
 
 - **subagent-parent-addressing** [design-pending] — a fan-out dispatched by a stage session
   has no route back to the session that dispatched it.
-  Attested 2026-08-06: a stage session's read-only fan-out could not address its parent by
-  name, failed to resolve `stage-session`, and fell back to routing its whole audit report to
-  the lead. It cost nothing because a lead was live to relay it, and that is exactly the
-  measurement — the same session running standalone, with no lead above it, would have lost
-  the audit silently while the dispatch itself reported success.
+  **Attested twice in one iteration, which is what makes it a pattern rather than a slip.**
+  Align's audit fan-out could not address its parent by name, failed to resolve
+  `stage-session`, and routed its whole report to the lead; close's release-note fan-out did
+  the identical thing hours later, from a different stage, under a different prompt. Both
+  cost nothing because a lead was live to relay them, and that is exactly the measurement —
+  either session running standalone, with no lead above it, would have lost its report
+  silently while the dispatch itself reported success. Two independent firings also rule out
+  the cheap explanation that one prompt simply named the wrong address.
   **The asymmetry is the finding.** A child's *final report* returns to its dispatcher by
   construction, so the ordinary path is safe; what has no route is a mid-run message — an
   escalation, a partial finding, a question the child must resolve before it can finish. The
