@@ -319,7 +319,7 @@ break when the supervisor deletes on its own schedule instead, and both appear
 only once a dispatched agent is **resumable** rather than one-shot: a resumed
 agent is still writing to the file, and a supervisor treating the journal as
 its **pull channel** (lifecycle-kit/templates/lead.md §Channel design)
-destroys at the first validated commit the channel it is supposed to keep
+destroys at the first verified commit the channel it is supposed to keep
 reading. A one-shot sweep hides both, which is why an eager deletion chore
 read as correct for as long as it did.
 
@@ -341,7 +341,7 @@ file's last line**, since a session resumed past its own marker appends after
 it, and a mid-file `DONE` claims a completion the later content contradicts.
 Whether a *missing* marker signals interruption still turns on whether the
 supervisor consumed the agent's return. On the ordinary completion path it
-did, and that return plus its post-commit verification (§Validate after every
+did, and that return plus its post-commit verification (§Verify after every
 agent commit) *is* the recovery contract, so the marker is redundant there.
 Only in a **cold read** — a journal found with no return ever consumed, the
 agent's session having died before returning (a background sandbox died, a
@@ -386,7 +386,7 @@ every discharge path still lands in the same scratch directory the consumer's
 own work-unit boundary already sweeps, so no new lifetime, keep-list entry, or
 inbound-triage surface is created by the widening.
 
-## Validate after every agent commit
+## Verify after every agent commit
 
 Re-run the relevant gates plus the consumer's validate battery (for this
 repo and any gate-sdk consumer: `bash gate-sdk/bin/run-gates.sh` and the
@@ -397,8 +397,49 @@ agent commit before accepting**: an agent blocked by a gate will weaken it
 (a false exemption) rather than fix the code — "the gate is in my way"
 almost always means the code doesn't fit the convention.
 
-`check-gate-tamper` is the mechanical floor under that duty. Two
-assertions, blocking the two attested tamper shapes:
+**The act is `verify`; the artifact stays the `validate battery`.** The
+discipline is an act a supervisor performs; the battery is the command set
+that act runs. One word for both made *completing the act* read as completing
+whatever else the consumer names with that word — attested where a consumer's
+stage roster carries it, and the near-miss was a skipped stage. Renaming the
+act rather than the artifact is the cheap side: the battery is a binding-slot
+name every consumer's shim carries (§One template, a resident pointer, read by
+`check-skill-binding`), while the act is named only in prose. The result reads
+coherently — *you verify an agent's commit by re-running the relevant gates and
+the consumer's validate battery* — and the act and the artifact having
+different names is the distinction that was missing.
+
+**A verify step never runs the producer of what it is verifying.** Re-running
+is safe and idempotent exactly when the dispatched unit's output is *work* and
+the check's output is *a verdict about that work*; it stops being safe the
+moment those coincide. Where a unit's deliverable **is** an evidence artifact,
+the verify is a **read of the committed artifact**, never a re-execution of
+what wrote it: re-running the producer mutates or duplicates the very record
+the check exists to confirm.
+
+**The two wrong re-runs are not equally harmful, and a supervisor needs the
+split.** A check that writes nothing the artifact depends on is *inert* on it —
+misrouted and wasted work, with nothing lost. Re-running the artifact's **sole
+writer** is *destructive*. The routing defect is the same in both; only the
+second leaves evidence to restore, and the supervisor that has already run the
+wrong one reads this split to learn which one it is holding. Collapsing them
+would either overstate the harm of a wasteful re-run or understate the harm of
+the destructive one.
+
+**Honest limit — this rule installs no oracle**, and recurrence is what
+establishes it matters rather than a projection: the misrouting fired in two
+consecutive iterations and an operator caught it both times. The check class
+that would catch it is a gate over a *supervisor's choice of command*, and no
+scanner is buildable — the choice leaves no tracked artifact to read, the same
+structural reason §Operative residency owes no gate. A consumer whose evidence
+producer claims a liveness lock has a partial artifact-side proxy; its coverage
+boundary is that consumer's own mechanism to state, not this section's. So
+detection stays human, and it is stated here rather than left implicit because
+an unstated limit reads as an oversight for a later session to close with a
+gate that cannot exist.
+
+`check-gate-tamper` is the mechanical floor under the diff-every-gate-change
+duty. Two assertions, blocking the two attested tamper shapes:
 
 - **A — gate-edit isolation.** A commit that touches a gate file (the
   `DELEGATION_KIT_GATE_FILES` globs) may touch only meta-layer paths

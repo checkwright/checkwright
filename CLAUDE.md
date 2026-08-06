@@ -123,7 +123,7 @@ live in the owning SPEC section — cited, never restated.
 
 Delegation is pre-authorized for read-heavy audits and mechanical rename/merge
 sweeps — no ask needed. **Full protocol: `/agent-execution`.** The safety rules,
-resume-journal mechanics, validate-after-commit set, and gate-driven worklist
+resume-journal mechanics, verify-after-commit set, and gate-driven worklist
 load behind that trigger — a delegated `Agent` dispatch, whose per-dispatch
 budget guard names the skill on a blocking verdict — so they are not resident
 here.

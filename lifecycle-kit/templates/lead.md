@@ -53,11 +53,23 @@ lifecycle-state write — the entry stamp, commits, evidence — happens **in th
 stage session**, never in the lead.
 
 Dispatch mechanics are delegation-kit's, unchanged: dispatch in the background
-with notification, honor the per-dispatch budget guard, and validate after any
+with notification, honor the per-dispatch budget guard, and verify after any
 agent commit. The guard blocks only on PAUSE (STALE and OK advise); a deliberate
 override rides the `.claude/settings.local.json` env block — delegation-kit/SPEC.md
 §The delegation model. Load `/agent-execution` for the protocol and follow it
 there — it is not restated here.
+
+**When the dispatched stage is the evidence-producing stage, the lead's verify
+is a read of the committed evidence — never a re-run of the producer.** This is
+the lifecycle instance of delegation-kit's no-producer-re-run rule
+(delegation-kit/SPEC.md §Verify after every agent commit, which owns the generic
+rule and why re-running is safe for work and unsafe for evidence); only a stage
+roster knows which stage that is, which is why the instance lands here. Both
+misroutes are attested and the harm splits between them: re-running the whole
+gate battery writes nothing under the workflow directory, so it is inert on the
+evidence and merely wasted; re-running the evidence producer, the manifest's
+sole writer, mutates or duplicates the committed record. Read the manifest the
+stage committed and judge it.
 
 **Stage N+1 is dispatched on stage N's agent completion notification — never on
 its commit, its stamp, a clean tree, a green battery, or a cleared
@@ -307,7 +319,7 @@ consequences:
   every assignment when the harness model roster churns.
 - **An intra-stage batch split is the lead's to own.** When a stage's work
   splits into batches, those batches are **N sibling stage sessions the lead
-  dispatches and validates** — each entering through `enter-stage.sh` as a
+  dispatches and verifies** — each entering through `enter-stage.sh` as a
   same-stage re-entry (lifecycle-kit/SPEC.md §The state machine: N sessions may
   enter one stage, each leaving its own stamp and the cursor staying put). A stage session **never dispatches a sibling stage session**: a stage
   that sub-dispatches its own batches nests a second supervisor at the lead's
@@ -340,7 +352,7 @@ consequences:
   pointers, not state. Verify the spend afterward with delegation-kit's
   usage-verdict rather than assuming forgiveness.
 - **Suggest a compact at the paying acceptance boundaries.** After a stage
-  session's work is accepted — its commits validated, its rulings landed in
+  session's work is accepted — its commits verified, its rulings landed in
   governed surfaces — and before the next dispatch, the lead *suggests* a
   compact to the operator. Compaction is operator-invoked; the lead can only
   recommend (the honest limit), so the suggestion is one line in the lead's

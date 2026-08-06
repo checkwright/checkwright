@@ -18,31 +18,6 @@
   artifact state, the lock detects the residual case where the signal is wrong
   anyway, and the verify rename fixes the check the lead runs afterwards.
 
-- **validate-verb-collision-and-check-routing** [spec: SPEC-verify-verb.md] — two coupled
-  defects with one root: the delegation discipline verb collides with the `/validate` stage
-  noun, and that collision misroutes the lead's post-delegation check onto the evidence
-  producer.
-  **(1)** The verb is performed right *before* the stage, so completing the lead-side check
-  reads as completing the stage — a lead conflated them and nearly skipped `/validate`,
-  jumping build to close.
-  **(2)** The post-delegation-check binding carves out no case for when the delegated stage
-  is the evidence producer, where the naive "re-run the battery to check it" mutates or
-  duplicates the committed evidence rather than verifying it.
-  **Fired in two consecutive iterations, operator-caught both times** — once moving to re-run
-  `run-validate` to "verify" the validate stage, once running the full `run-gates` battery
-  after the validate stage's commit. The two re-runs are not equally harmful and the wording
-  splits them: `run-gates` writes nothing under `.workflow`, so re-running it is inert on the
-  evidence and merely wasted work, while `run-validate` is the sole writer.
-  **What recurrence established, and the amendment carries:** the prose fix is not sufficient
-  on its own — it removes the ambiguity but installs no oracle, and no scanner is buildable
-  because a lead's choice of command leaves no tracked artifact. The lock sentinel covers the
-  concurrent case, not a sequential re-run, so detection stays human and that limit ships in
-  the binding.
-  Filed 2026-07-25 by close, draining the committed gap inbox merged with the lead's
-  post-dispatch third triage item; second instance added the same day. Amendment authored
-  2026-08-06 at spec, ruling the verb (`verify`), the noun that is *not* renamed, and the
-  seam between delegation-kit's generic rule and lifecycle-kit's stage instance.
-
 ## Technical Debt
 
 ## Deferred
@@ -3296,5 +3271,6 @@
 - validate-producer-liveness-unobservable
 - dispatched-session-waiting-rule-residency
 - lead-dispatch-requires-completion-notification
+- validate-verb-collision-and-check-routing
 
 ## Lessons Learned

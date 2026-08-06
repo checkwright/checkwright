@@ -47,7 +47,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   role has.
 - **Serialize on shared files; ≤`DELEGATION_KIT_FAN_WIDTH`-wide otherwise.**
   Agents that edit a shared file (see the roster below) run one at a time —
-  dispatch, await notification, validate, dispatch the next. Independent
+  dispatch, await notification, verify, dispatch the next. Independent
   read-only units may run ≤`DELEGATION_KIT_FAN_WIDTH`-wide. **The git index and
   HEAD are shared files for every agent that commits**, independent of
   source-file disjointness: two committing agents racing `git add`/`git commit`
@@ -57,7 +57,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   ≤`DELEGATION_KIT_FAN_WIDTH`-wide bound for **read-only** fan-outs. "No lockfile
   churn" is a false safety signal — the index is shared regardless.
   Serialization is by **completion**, not by notification: the next dispatch
-  begins after the previous one has *returned and been validated*. A supervisor
+  begins after the previous one has *returned and been verified*. A supervisor
   reaches that point via the completion notification; a **dispatched agent**
   reaches it in-turn, awaiting each child before dispatching the next (it cannot
   end its turn to wait — see the backgrounding rule). The ordering requirement
@@ -128,9 +128,16 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   for as long as that holds, and discharges by committing when the index frees.
   Neither the supervising role nor a session running outside any dispatch is
   exempt: the axis is what the session can do at this moment, never what it is.
-- **Validate after every agent commit** — a sub-agent's "passed" claim is not
+- **Verify after every agent commit** — a sub-agent's "passed" claim is not
   trustworthy. Re-run the relevant gates (the sweep's own gate) and the consumer
-  validate battery below. **Diff every gate change in an agent commit before
+  validate battery below — the act is `verify`, the artifact is the battery.
+  **Never verify a unit by re-running the producer of what it delivered**: where
+  the unit's deliverable *is* an evidence artifact, the verify is a **read** of
+  the committed artifact, because re-running its sole writer overwrites or
+  duplicates the record instead of checking it. Having already run the wrong
+  check, read delegation-kit/SPEC.md §Verify after every agent commit for which
+  of the two re-runs you are holding — only one of them leaves evidence to
+  restore. **Diff every gate change in an agent commit before
   accepting** — a gate modification inside a feature commit is a supervisor-owned
   ruling; an agent blocked by a gate will weaken it (a false exemption) to make
   its commit pass instead of fixing the code. "The gate is in my way" almost
@@ -139,7 +146,7 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   two attested shapes (a gate edit co-staged with product code; a new path/glob
   exemption co-staged with the file it excuses) — but it does **not** catch
   semantic weakening inside a legitimate scripts-only commit, so the by-eye diff
-  review remains your duty (delegation-kit/SPEC.md §Validate after every agent
+  review remains your duty (delegation-kit/SPEC.md §Verify after every agent
   commit — the honest limit).
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
   `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —

@@ -13,7 +13,7 @@ past it, or reports a false pass turns a saving into a hazard. delegation-kit
 is the protocol that makes delegation safe.
 
 It supplies the supervisor rules (serialize on the shared index, one commit per
-unit, a resume journal, validate after every agent commit), a trustworthy
+unit, a resume journal, verify after every agent commit), a trustworthy
 budget verdict, and a commit-shape gate that blocks the attested
 gate-weakening shapes.
 

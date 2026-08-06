@@ -1,7 +1,7 @@
 DISPATCH CHECKLISTS — a reach-through from [agent-execution.md](agent-execution.md),
 loaded only when a dispatch is a deletion, a rename, or a heavy cross-spec audit.
 It adds no new protocol: the safety, budget, resume-journal, and
-validate-after-commit rules stay in `agent-execution.md` and still apply in full.
+verify-after-commit rules stay in `agent-execution.md` and still apply in full.
 This file is the mechanical pre-flight for those dispatch shapes — the steps an
 agent skips by reflex and the supervisor pays for later. Owned by
 delegation-kit/SPEC.md §One template, a resident pointer.

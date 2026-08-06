@@ -32,7 +32,7 @@ downward so the invariant stays in one place.
   battery after every commit it makes, and a dedicated gate blocks any commit
   that weakens the gates themselves — so an agent cannot silently disarm the
   checks that judge it, whether by accident or to make its own work pass. Owned
-  by `delegation-kit/SPEC.md §Validate after every agent commit`.
+  by `delegation-kit/SPEC.md §Verify after every agent commit`.
 - **Every dispatch is metered.** A per-dispatch budget guard sits in front of
   each delegated agent, so fanning work out cannot silently run away with the
   token budget — the orchestrator gets a mechanical stop, not a surprise bill.
@@ -107,7 +107,7 @@ prices. To drive an iteration under it:
    on the premium tier (the per-batch tier-differentiation rule,
    [the lead template](https://github.com/checkwright/checkwright/blob/master/lifecycle-kit/templates/lead.md#economics-batch-and-compact-where-it-pays) §Economics). A stage whose
    work splits into batches is N sibling stage sessions the lead dispatches and
-   validates (each a same-stage re-entry), never a stage session sub-dispatching
+   verifies (each a same-stage re-entry), never a stage session sub-dispatching
    its own siblings (`lifecycle-kit/SPEC.md §templates/lead.md`, the
    lead-owns-batching clause).
 5. **A blocked stage escalates to the lead and resumes in place** rather than

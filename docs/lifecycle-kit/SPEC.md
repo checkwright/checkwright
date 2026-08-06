@@ -186,6 +186,23 @@ what covers the case where the signal itself is wrong. Precedent for a
 prose-only rule in the same template: the no-sibling-dispatch clause, prose for
 the same reason.
 
+**Honest limit on the lead's post-dispatch check routing.** The rule that the
+lead's verify of the evidence-producing stage is a **read** of the committed
+evidence rather than a re-run of the producer (§templates/lead.md, applying
+delegation-kit/SPEC.md §Verify after every agent commit) is likewise
+**prose-only and human-enforced**, and for the generic reason that section
+states: the subject is a lead's *choice of command*, which leaves no tracked
+artifact any check could read. The nearest artifact-side proxy is
+`check-producer-liveness` on the entry-preflight hook (evidence-kit/SPEC.md
+§check-producer-liveness), and its coverage boundary must be stated precisely or
+this limit reads as closed when it is not: that gate answers *is a producer
+running now*, so it covers the **concurrent** case — a producer still live when
+the next entry is stamped — and not a **sequential** re-run, where a lead
+re-runs the producer after it has cleanly exited, holds no lock, and reds
+nothing. The two limits in this section are the same shape from opposite sides
+of one dispatch: the one above is about waiting for stage N to be *over*, this
+one about which command is safe *once it is*.
+
 ### Deviation transitions
 
 The stages walk `scope → align → build → validate → close` in order by
@@ -1666,7 +1683,7 @@ iteration promoted rather than from the amendment set, then batch units
 sharing a kit or SPEC surface, split on a model-tier change or a
 delegation-kit split trigger) and
 the lead-owns-batching clause (an intra-stage batch split is N sibling stage
-sessions the lead dispatches and validates — each a same-stage re-entry,
+sessions the lead dispatches and verifies — each a same-stage re-entry,
 §The state machine — and a stage session never dispatches a sibling stage
 session), and
 the stamps-authoritative invariant carried from §The state machine as the
@@ -1687,8 +1704,14 @@ The template also carries the lead's first step —
 writing the session-role marker context-kit's hook reads
 (context-kit/SPEC.md §The session-context hook). Dispatch safety is not re-owned — it inherits
 delegation-kit's protocol by citation (delegation-kit/SPEC.md §The delegation
-model: background dispatch, the per-dispatch budget guard, validate after any
-agent commit). Consumer residue stays in named slots — the tracked
+model: background dispatch, the per-dispatch budget guard, verify after any
+agent commit) — with one lifecycle **instance** the generic rule cannot state
+because it would have to name a stage: when the dispatched stage is the
+evidence-producing one, the lead's verify is a read of the committed evidence
+manifest rather than a re-run of its producer, the harm splitting between an
+inert battery re-run and a destructive producer re-run (delegation-kit/SPEC.md
+§Verify after every agent commit owns the generic rule and the split; its honest
+limit here is recorded in §The state machine). Consumer residue stays in named slots — the tracked
 agent-definition carrying the standing dispatch policy the dispatch names (the
 ruling-class roster and everything else true of every dispatch, not improvised
 per prompt), and whether the consumer wires the optional escalation-shape guard

@@ -63,7 +63,7 @@ left linked-but-unqueued: the queue is the only place work waits.
 - **Fix the tree, never weaken the gate.** A PR that relaxes a gate to pass
   instead of fixing what it caught is the defect, not the fix — this is
   check-gate-tamper's doctrine ([delegation-kit/SPEC.md](delegation-kit/SPEC.md)
-  §Validate after every agent commit). A gate change lands with the fixture that
+  §Verify after every agent commit). A gate change lands with the fixture that
   proves it and the reasoning in the PR body.
 - **DCO sign-off on every commit.** Sign each commit (`git commit -s` adds the
   `Signed-off-by:` line); it certifies the
