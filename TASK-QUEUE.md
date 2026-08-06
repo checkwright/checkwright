@@ -3390,7 +3390,10 @@
   cost nothing because a lead was live to relay them, and that is exactly the measurement —
   either session running standalone, with no lead above it, would have lost its report
   silently while the dispatch itself reported success. Two independent firings also rule out
-  the cheap explanation that one prompt simply named the wrong address.
+  the cheap explanation that one prompt simply named the wrong address. A third
+  observation from the same day widens the class past addressing: a dispatcher whose
+  own fan-out stalled could not **stop** it either, so the control channel is absent
+  in both directions and a wedged child is unreachable rather than merely unheard.
   **The asymmetry is the finding.** A child's *final report* returns to its dispatcher by
   construction, so the ordinary path is safe; what has no route is a mid-run message — an
   escalation, a partial finding, a question the child must resolve before it can finish. The
