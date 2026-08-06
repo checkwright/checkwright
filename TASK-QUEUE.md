@@ -12,6 +12,107 @@
 
 ## New Features
 
+  One incident class read from four angles, promoted together. The causal order is
+  the order below: the residency rule makes a stage session's completion signal
+  truthful, the dispatch rule makes the lead depend on that signal instead of on
+  artifact state, the lock detects the residual case where the signal is wrong
+  anyway, and the verify rename fixes the check the lead runs afterwards.
+
+- **dispatched-session-waiting-rule-residency** [spec: SPEC-residency.md] — a dispatched
+  stage session ends its turn to await a completion notification, orphaning the work it
+  started, because the in-turn condition-waiting rule is not operative at the tier the
+  session actually loads.
+  recurrence: dispatched-session-waiting-rule-residency 2026-08-04
+  Observed 2026-08-02, 2026-08-04 and 2026-08-05 — each time the validate session starting
+  `run-validate.sh` in the background and ending its turn to wait, the failure
+  delegation-kit/templates/agent-execution.md names under **Background + notification,
+  never poll**. The third fired through a dispatch prompt that named the rule, as the
+  second did. Neither orphan landed harm, but a surviving orphan is the case that protocol
+  calls the worse one: it keeps mutating shared files while the next actor moves against
+  them.
+  **The premise correction that survives promotion:** the rule is not absent. The agent
+  definition has carried a **Your turn end is your session end** bullet since before either
+  of the first two incidents; what it does is *point*. The amendment rules the defect to be
+  pointer-versus-operative-statement at the always-loaded tier, corrects delegation-kit's
+  own role-blind rationale for the pointer posture, and sanctions the bounded restatement
+  that fixes it under a named rule.
+  **Self-label corrected at promotion.** The body read "Debt: … no new governed name" while
+  its own deliverable asked delegation-kit/SPEC.md to sanction a restatement — a contract
+  every consumer honors, which canon-kit's litmus makes a feature. The design ruling that
+  filled this body now lives in the amendment, where causal completeness has a home.
+  Filed 2026-08-02 at validate to the gap inbox; promoted at close, its premise corrected
+  against the agent definition's git history; label corrected and amendment authored
+  2026-08-06 at spec.
+
+- **lead-dispatch-requires-completion-notification** [spec: SPEC-dispatch-signal.md] — the
+  lead has no stated precondition for dispatching stage N+1, and the one it improvised is
+  wrong: artifact state.
+  A lead checked validate's commit had landed with complete evidence, the tree clean, the
+  battery green, and a simulated close entry cleared — then dispatched close into a
+  still-running `run-validate`. Every check passed mid-write, because `run-validate` commits
+  its evidence and keeps going: the terminal commit existing is fully compatible with the
+  process still executing. The lead dispatched on the *absence* of a completion
+  notification.
+  **The generalizable trap, carried into the template rather than left as incident lore:**
+  the lead read an operator's note about having just answered a stalled permission prompt as
+  the stage being finished. It means the opposite — an approval prompt gates a command
+  *starting*, so any prompt-answered signal is a start signal, never a completion one.
+  **Self-label corrected at promotion.** The body read "Debt: … adds no governed name" three
+  lines below its own statement that it "adds a precondition to a shipped template's dispatch
+  contract" — the litmus's contract arm verbatim. It elevates the completion notification
+  from a delegation convenience to an inter-component protocol signal the lead depends on.
+  Filed 2026-07-25 by close, from the lead's own account; the operator ruled stage sequencing
+  the lead's accountability, which is why this is a lead rule rather than a stage-session or
+  gate concern. Label corrected and amendment authored 2026-08-06 at spec.
+
+- **validate-producer-liveness-unobservable** [spec: SPEC-liveness-lock.md] — a stage session
+  can report its stage done while its own oracle is still executing, and nothing in the
+  lifecycle can see it. The validate session's `run-validate` was still running when the lead
+  dispatched close; its writes landed on `.workflow/validate-evidence.txt` underneath the
+  close session's commits (the churn recorded under `evidence-row-upsert-order`).
+  **What did not catch it, and why — neither is a coverage hole; both are liveness holes.**
+  The lead's post-dispatch check is `git status` / `git log`, blind to a live process. The
+  close-entry preflight is blind for a different reason: it reads a file at an instant, and
+  the file can change a second later. What the preflight *already* asserts is recorded in the
+  amendment so the entry is not read as filed on a false premise — assertion A's suite-roster
+  completeness is real, and a torn read is unreachable because the manifest is relocated by
+  `mv`, never briefly absent. The gap is liveness alone.
+  **Feature-shaped — self-label corrected 2026-08-04 at close**, before this promotion: the
+  line read "adds no governed name to a shipped surface" while the clause three paragraphs
+  above it named a knob.
+  **Fired again 2026-08-05**, attested under `recurrence-drain-input-widening` (which owns why
+  it reached no count) — a dispatched validate session ended its turn with `run-validate` still
+  running, detected only by the coordinator reading the PID from outside. Every instance this
+  entry records has been caught by a person rather than by the lifecycle.
+  Filed 2026-07-25 by close, from the operator's observation of the live `run-validate` and the
+  row-relocation fingerprint; amendment authored 2026-08-06 at spec, which rules the cross-kit
+  ownership question and the stale-lock policy that kept it design-pending.
+
+- **validate-verb-collision-and-check-routing** [spec: SPEC-verify-verb.md] — two coupled
+  defects with one root: the delegation discipline verb collides with the `/validate` stage
+  noun, and that collision misroutes the lead's post-delegation check onto the evidence
+  producer.
+  **(1)** The verb is performed right *before* the stage, so completing the lead-side check
+  reads as completing the stage — a lead conflated them and nearly skipped `/validate`,
+  jumping build to close.
+  **(2)** The post-delegation-check binding carves out no case for when the delegated stage
+  is the evidence producer, where the naive "re-run the battery to check it" mutates or
+  duplicates the committed evidence rather than verifying it.
+  **Fired in two consecutive iterations, operator-caught both times** — once moving to re-run
+  `run-validate` to "verify" the validate stage, once running the full `run-gates` battery
+  after the validate stage's commit. The two re-runs are not equally harmful and the wording
+  splits them: `run-gates` writes nothing under `.workflow`, so re-running it is inert on the
+  evidence and merely wasted work, while `run-validate` is the sole writer.
+  **What recurrence established, and the amendment carries:** the prose fix is not sufficient
+  on its own — it removes the ambiguity but installs no oracle, and no scanner is buildable
+  because a lead's choice of command leaves no tracked artifact. The lock sentinel covers the
+  concurrent case, not a sequential re-run, so detection stays human and that limit ships in
+  the binding.
+  Filed 2026-07-25 by close, draining the committed gap inbox merged with the lead's
+  post-dispatch third triage item; second instance added the same day. Amendment authored
+  2026-08-06 at spec, ruling the verb (`verify`), the noun that is *not* renamed, and the
+  seam between delegation-kit's generic rule and lifecycle-kit's stage instance.
+
 ## Technical Debt
 
 ## Deferred
@@ -523,153 +624,6 @@
   wasted. Bounded and non-rotting — nothing breaks, and the row now accumulates
   per-iteration baselines whether or not the experiment runs.
   Filed 2026-07-22 by close, from the same lead-side economics review.
-
-- **validate-verb-collision-and-check-routing** [design-pending] — two coupled
-  defects with one root: the delegation discipline verb collides with the
-  `/validate` stage noun, and that collision misroutes the lead's
-  post-delegation check onto the evidence producer.
-  **(1) Verb collision.** The lifecycle stage `/validate` shares its term with the
-  delegation discipline "validate after every agent commit". The verb is performed
-  right *before* the stage, so completing the lead-side verify reads as completing
-  the stage — a lead conflated them and nearly skipped `/validate`, jumping build
-  to close. **Cheapest true fix:** rename the delegation discipline **verb**
-  (validate → verify or re-check) in `delegation-kit/templates/agent-execution.md`
-  and the lead binding, leaving the load-bearing stage name untouched. Renaming
-  the stage is rejected as invasive for a confusion the verb rename resolves.
-  **(2) Check-routing gap the collision causes.** The post-delegation-check
-  binding carves out no case for when the *delegated stage is `/validate`
-  itself*. There the naive "re-run the battery to check it" is **wrong**:
-  `/validate` is the evidence producer, so re-running `run-validate` mutates or
-  duplicates the committed execution evidence rather than verifying it. The
-  correct lead-side check is to **read** its committed evidence manifest, never to
-  re-run. The binding must distinguish **work-producing stages** (re-run the
-  battery, safe and idempotent) from the **evidence-producing stage** (read the
-  committed manifest). The two defects travel together because the verb rename is
-  what stops the check discipline mis-attaching to the evidence producer.
-  **Fired in two consecutive iterations, operator-caught both times** — once
-  moving to re-run `run-validate` to "verify" the validate stage, once running the
-  full `run-gates` battery after the validate stage's commit. **The two re-runs
-  are not equally harmful, and part (2)'s wording must split them:** `run-gates`
-  writes nothing under `.workflow`, so re-running it is inert on the evidence and
-  merely wasted work, while `run-validate` is the sole writer. The routing defect
-  is real for both, the corruption risk only for the second.
-  **Disposition after recurrence — unchanged, cost raised, insufficiency named.**
-  The verb rename plus the work-vs-evidence carve-out is still the cheapest true
-  fix. What recurrence establishes is that the prose fix is **not sufficient on
-  its own**: it removes the ambiguity but installs no oracle. The check class that
-  would catch this is a gate over a lead's *tool invocations*, and no scanner is
-  buildable — a lead's choice of command leaves no tracked artifact to read. The
-  nearest buildable proxy is `validate-producer-liveness-unobservable`, which
-  covers the concurrent case, not a sequential re-run. So the unit ships the prose
-  fix knowing detection stays human, and that limit belongs in the binding.
-  **Why `[design-pending]`:** a prose rename plus a binding-semantics change
-  across `delegation-kit`'s dispatch template and the lead binding, with a
-  grep-propagation pass, and the work-vs-evidence carve-out is a SPEC ruling
-  rather than a wording tweak.
-  **Cost while deferred:** raised from "low but recurrent" — it has fired in two
-  consecutive iterations, detected only by an operator catch both times, so the
-  in-band cost is unbounded until someone happens to look.
-  Filed 2026-07-25 by close, draining the committed gap inbox (`0eec298`) merged
-  with the lead's post-dispatch third triage item; second instance added the same
-  day by close.
-
-- **validate-producer-liveness-unobservable** [design-pending] — a stage session can
-  report its stage done while its own oracle is still executing, and nothing in
-  the lifecycle can see it. This iteration the validate session's `run-validate`
-  was still running in the background when the lead dispatched close; its writes
-  landed on `.workflow/validate-evidence.txt` underneath the close session's
-  commits (the churn recorded under `evidence-row-upsert-order`).
-  **What did not catch it, and why.** The lead's post-dispatch check is `git
-  status` / `git log`, both blind to a live process. The close-entry preflight
-  (`LIFECYCLE_KIT_ENTRY_PREFLIGHT`, `scripts/lifecycle-config.sh`) is blind for a
-  different reason: it reads a file at an instant, and the file can change a
-  second later. Neither is a coverage hole; both are liveness holes.
-  **What the preflight already asserts — recorded so this entry is not filed on
-  a false premise, as its sibling above was.** `check-evidence-manifest` is not
-  grammar-only. Assertion A, armed at a `close` cursor, walks
-  `EVIDENCE_KIT_SUITES` and errors on any configured suite with no clean line for
-  the iteration and on any clean line predating the earliest validate stamp — so
-  suite-roster completeness *is* asserted, and already derived from the
-  configured roster rather than a maintained list. A truncated manifest reds at
-  the close entry today. Nor is a torn read reachable: `run-validate` builds each
-  revision in a temp file and `mv`s it over the manifest, so a row is relocated,
-  never briefly absent. The gap is liveness alone.
-  **Deliverable:** a liveness sentinel — `run-validate` claims a lock under
-  `EVIDENCE_KIT_TMP_DIR` for the duration of a run and releases it on exit; the
-  close-entry preflight reds on a held lock, so a stage entry cannot be stamped
-  while the prior stage's producer is still writing.
-  **Why `[design-pending]`:** it adds a runtime artifact needing a named reclaim path
-  (the runtime-artifact lifecycle rule), a stale-lock policy for a crashed run,
-  and a knob; and evidence-kit/SPEC.md owns the writer contract while
-  lifecycle-kit owns the preflight, so which kit holds the lock is a
-  cross-kit ruling, not an implementation choice.
-  **Cost while deferred:** silent at the moment it happens and paid entirely by
-  the next session, which fights a file changing underneath it and cannot
-  distinguish churn from evidence. Rare — it needs a backgrounded producer — but
-  it cost this iteration three restores once dispatch overlapped, and the only
-  detector was the operator. Size: one runtime artifact plus one preflight
-  assertion.
-  **Feature-shaped — self-label corrected 2026-08-04 at close.** The line here read
-  "adds no governed name to a shipped surface" while the `[design-pending]` clause
-  three paragraphs up names a knob; canon-kit/SPEC.md §The amendment lifecycle's
-  litmus makes any name added to a governed surface a feature, so promoting this
-  authors an amendment.
-  **Fired again 2026-08-05**, attested under `recurrence-drain-input-widening` (which owns
-  why it reached no count) — a dispatched validate session ended its turn with `run-validate`
-  still running; detected only by the coordinator reading the PID from outside, so every
-  instance this entry records has been caught by a person rather than by the lifecycle.
-  Filed 2026-07-25 by close, from the operator's observation of the live
-  `run-validate` and the row-relocation fingerprint at `ae70eae`.
-
-- **lead-dispatch-requires-completion-notification** [design-pending] — the lead has
-  no stated precondition for dispatching stage N+1, and the one it improvised is
-  wrong: artifact state. A lead checked validate's commit had landed with complete
-  evidence, the tree clean, the battery green, and a simulated close entry
-  cleared — then dispatched close into a still-running `run-validate`. Every check
-  passed mid-write because `run-validate` commits its evidence and keeps going:
-  **the terminal commit existing is fully compatible with the process still
-  executing.** The lead dispatched on the *absence* of a completion notification.
-  **The generalizable trap, worth the entry on its own.** The lead read an
-  operator's note about having just answered a stalled permission prompt as the
-  stage being finished. It means the opposite — an approval prompt gates a command
-  **starting**, so any prompt-answered signal is a start signal, never a
-  completion one.
-  **Deliverable:** a dispatch precondition in `lifecycle-kit/templates/lead.md` —
-  stage N+1 is dispatched on stage N's agent **completion notification**, never on
-  its commit or any tree-state check, because artifact state cannot distinguish
-  "finished" from "still writing." It belongs beside the post-delegation verify
-  discipline, which says what to check *after* a stage and is silent on how the
-  lead knows the stage is over.
-  **Not already covered by the adjacent paragraph — re-verified 2026-08-01 at
-  scope.** `templates/lead.md`:62-67 (never hand-derive prior-stage completeness;
-  trust `enter-stage.sh`'s refusal or `--simulate`) is a **gating** rule, predates
-  the incident, and is silent on **liveness** — the simulated entry cleared
-  mid-write, which is the proof.
-  **Assertability — checked, not assumed.** The precondition is **prose-only**:
-  the notification is harness session state with no tracked artifact, so no
-  battery gate can read it (precedent: the sibling-dispatch clause, prose in the
-  same template for the same reason). But the *negative* is assertable, which is
-  the pairing that matters — "is the producer still running?" is exactly what the
-  lock sentinel under `validate-producer-liveness-unobservable` reads. The two are
-  one unit: prose rule on the dispatch side, oracle on the artifact side.
-  **Disposition of the incident as a set.** This rule is the proximate cause and
-  cheapest fix, so it goes first — but not alone:
-  `validate-verb-collision-and-check-routing` establishes that a prose fix with no
-  oracle recurs and is caught only by an operator. Three real findings, not four —
-  the dispatch decision (this entry), the observability gap (the sentinel), and
-  the artifact churn (`evidence-row-upsert-order`), worth fixing on its own
-  merits. A fourth reading, that `check-evidence-manifest` is grammar-only, is
-  retracted; see the assertion-A note under the sentinel entry.
-  **Why `[design-pending]`:** it adds a precondition to a shipped template's
-  dispatch contract and states a limit (prose-only, human-enforced) that
-  lifecycle-kit/SPEC.md should own explicitly rather than imply.
-  **Cost while deferred:** every multi-stage iteration with a live lead can
-  re-run this race, and the cost lands on the next stage session, which fights a
-  file changing underneath it. Debt: one template rule plus one SPEC limit; adds
-  no governed name.
-  Filed 2026-07-25 by close, from the lead's own account; the operator ruled stage
-  sequencing the lead's accountability, which is why this is a lead rule rather
-  than a stage-session or gate concern.
 
 - **platform-support-ci-matrix** [design-pending] [roadmap: next/reliability] — a leg per platform.
   roadmap-summary: A CI install-smoke leg per supported platform, or an honest label.
@@ -2383,56 +2337,6 @@
   Filed 2026-08-02 at spec to the gap inbox as the dangling pointer; promoted at
   close as the gap-generalization that inline fix owed, with the coverage gap
   verified against both gates' source and the class sized by sweep.
-
-- **dispatched-session-waiting-rule-residency** [design-pending] — a dispatched
-  stage session ends its turn to await a completion notification, orphaning the
-  work it started, because the in-turn condition-waiting rule is not operative at
-  the tier the session actually loads.
-  recurrence: dispatched-session-waiting-rule-residency 2026-08-04
-  Observed 2026-08-02, 2026-08-04 and 2026-08-05 — every time the validate session
-  starting `run-validate.sh` in the background and ending its turn to wait — the failure
-  delegation-kit/templates/agent-execution.md names under **Background +
-  notification, never poll**. The third fired through a dispatch prompt that named the
-  rule, as the second did. Neither orphan landed harm (the lead found the second
-  alive by PID and waited on its exit condition), but a surviving orphan is the case
-  that protocol calls the worse one: it keeps mutating shared files while the next
-  actor moves against them.
-  **Premise corrected at close, and the recurrence confirms the correction.** The
-  original filing said the rule "is not resident"; that is not what happened.
-  `.claude/agents/stage-session.md` has carried a **Your turn end is your session
-  end** bullet since 2026-08-01 (`7dd914a`), before either incident — and the second
-  fired with the lead *also* restating the rule in the dispatch prompt. What that
-  bullet does is **point**: it names the two rules and cites agent-execution.md for
-  "both rules and their reasoning", which the session must open to get the operative
-  instruction. The defect is **pointer versus operative statement at the
-  always-loaded tier**, not absence, and a promoting scope that fixes the absence
-  fixes nothing.
-  **Why `[design-pending]`, and why the obvious fix is not obviously right.**
-  Stating the rule inline restates delegation-kit's text in a consumer's agent
-  definition, which is the duplication Content-tiering forbids — but
-  Load-trigger residency cuts the other way, since agent-execution.md is reached
-  only by a skill trigger while the agent definition is the one surface a
-  dispatched session always loads. Which rule governs here is a doctrine ruling,
-  and if the answer is "restate", delegation-kit/SPEC.md should sanction the
-  restatement rather than leaving a consumer to fork the prose.
-  **The enforcement-first half, and its honest limit.** No gate can read a session's
-  choice to end a turn: it leaves no tracked artifact, the same reason
-  `validate-verb-collision-and-check-routing` records that its prose fix installs no
-  oracle. The nearest buildable oracle is the lock sentinel under
-  `validate-producer-liveness-unobservable`, which detects the *consequence* (a
-  producer still running at the next stage's entry) rather than the act. Those two
-  entries and this one are one incident class read from three angles; a promoting
-  scope should read all three before costing any.
-  **Cost while deferred — unbounded, as of the recurrence.** A silent failure mode
-  with a live trigger: the tiering that routes validate and align to a cheaper model
-  puts non-residence exactly where long oracle batteries are the whole work class,
-  and it is paid by the next session, fighting a file that changes underneath it. The
-  bound previously claimed here was the lead's dispatch-prompt restatement; 2026-08-04
-  fired straight through it, so no bound is claimed now.
-  Debt: a paragraph in one agent definition plus a SPEC sanction permitting it;
-  no new governed name.
-  Filed 2026-08-02 at validate to the gap inbox; promoted at close, its premise
-  corrected against the agent definition's git history before filing.
 
 - **scratch-run-steer-rule** [design-pending] — the sanctioned form for executing
   a scratch script exists, is allowlisted, and nothing steers anyone to it, so
