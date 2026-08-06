@@ -3442,6 +3442,66 @@
   Filed 2026-08-06 by close from the gap inbox; both instances reached `## Done`, so the class is
   all that survives.
 
+- **exit-echo-decoration-guard-vs-habit** [design-pending] — an agent chains otherwise
+  allowlisted read-only commands into one probe, and the whole probe prompts.
+  recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06
+  Stage sessions join independent read-only calls — `grep`, `find`, `cat`, `ls`, `echo`, git
+  subcommands — into one multi-statement `Bash` call, which resolves to no single allowlist
+  glob and prompts every time; the trailing `; echo EXIT:$?` decoration is one shape of the
+  same root. The `$?` is a shell *expansion*, and bash-guard's own banner states no allowlist
+  entry can suppress an expansion, so guard-kit/SPEC.md §The triage criterion **cannot**
+  resolve this to (a) allowlist. It resolves to either a **guard steer** that recognises the
+  benign shape and rewrites toward the per-statement form, or a **habit change** for stage
+  sessions. Both are guard-kit design decisions.
+  **Evicted to the icebox 2026-08-05, recurred 2026-08-06 at dominant scale**, which is the
+  icebox tier's own re-entry condition. `scan-prompts.sh` ranked 20 `grep`, 18 `find`, 9
+  `cat`, 8 `ls`, 4 `echo` and a long tail of single leading tokens as prompting — roughly 78
+  of this iteration's 106 prompting calls. The majority were verified by inspection to be
+  several statements joined by a **literal newline**, never by `;` or `&&`, which is the only
+  separator `guard_split_compound` segments on: every statement would match a glob alone, and
+  the blob matches nothing.
+  **Second contributor, newly identified:** correctly piped diagnostics fail too —
+  `find … | xargs …` and `find … | sort` segment fine but `xargs` and `sort` are absent from
+  `GUARD_KIT_RO_BINS`' default roster, and nothing grants a bare `find` or `xargs`. So the
+  fix has at least two independent halves, which is new information the icebox line could not
+  carry.
+  **Why `[design-pending]`:** a steer has to recognise the benign multi-statement shape
+  without widening the expansion-suppression hole the banner warns about, and the choice
+  between a narrowly-shaped steer and a documented habit change is the design.
+  **Cost while deferred:** the dominant prompting pattern in two consecutive iterations, paid
+  once per call on exactly the read-heavy stages the delegation doctrine wants cheap. No gate
+  reds and nothing degrades, which is why it iceboxed the first time — but the carry is no
+  longer low.
+  Filed 2026-07-25 by close, operator-reported; iceboxed 2026-08-05; evicted back to Deferred
+  2026-08-06 by close on attested recurrence (queue-kit/SPEC.md §The icebox tier).
+
+- **scan-prompts-truncation-quote-desync** [design-pending] — the friction log's own truncation
+  can make `scan-prompts` misreport an already-allowlisted command as prompting.
+  `guard_log_fallthrough`'s 500-character log truncation can land inside an unclosed
+  double-quoted argument. `scan-prompts.sh`'s skeleton pass protects only *balanced* quoted
+  spans, so a literal `;` later in the now-unprotected prose reads to
+  `guard_split_compound` as a statement break, splitting one allowlisted command into
+  segments that match nothing.
+  **Verified rather than asserted.** `lifecycle-kit/bin/file-gap.sh`'s nine fall-through lines
+  were isolated and re-scanned one at a time: the three reported as prompting are exactly the
+  three whose truncated prose carries a bare `;` inside an unclosed quote, and
+  `guard_allow_match` independently confirms the committed `bash lifecycle-kit/bin/file-gap.sh`
+  glob covers the un-mangled argument. The calls almost certainly never prompted — only the
+  log's analysis of itself is wrong.
+  **Deliverable:** one of — make the skeleton pass tolerant of an unbalanced trailing quote
+  (protect from the last unmatched opener through end of line); size the per-entry cut so a
+  truncated quote is rare for prose-bearing callers; or stop truncating an advisory scratch
+  file whose disk cost is trivial. Plus a fixture reproducing the shape, since
+  `scan-prompts`' KPI claim (guard-kit/SPEC.md §scan-prompts) does not hold for it today.
+  **Why `[design-pending]`:** the three candidates trade differently — the first needs a
+  precise rule stated and pinned, the second only shrinks the window without closing it, and
+  the third trades log bulk for correctness on a knob drift-kit's overhead reporting also reads.
+  **Cost while deferred:** low, bounded, and false-positive-only — a genuinely uncovered
+  command still prompts correctly. It inflates the close-triage worklist and drift-kit's
+  prompting KPI on any iteration filing several long, punctuated gap descriptions, so the
+  distortion lands hardest on the iterations that capture the most.
+  Filed 2026-08-06 by close, from this iteration's prompt-friction triage.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -3462,7 +3522,6 @@
 - **gate-spec-claim-assertion-parity** [design-pending] — Ruled a human-audit class, not gateable.
 - **upgrade-smoke-phase-a-regen-derivation** [design-pending] — A hand-held regen roster; rot-prone.
 - **scope-amendment-authoring-gate** [design-pending] — Scope can do spec's job and stay green.
-- **exit-echo-decoration-guard-vs-habit** [design-pending] — Prompt friction only, nothing degrades.
 - **evidence-journal-hash-chain** [design-pending] — Tamper-evidence wanted only by a hosted rung.
 - **md-section-near-miss-match** [design-pending] — Empty on a near miss; correct on an exact query.
 - **amendment-update-target-coverage** [design-pending] — Align checks it by hand; no gate yet.
