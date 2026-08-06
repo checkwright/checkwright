@@ -200,8 +200,9 @@ paragraph declines to automate.
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
-coherence, not whole-corpus completion**: one shipped profile fully native end
-to end beats a partial port spread across every profile.
+coherence, not whole-corpus completion**: one profile coherent at the adopter's
+floor — install, get value, uninstall — beats a partial port spread across every
+profile.
 
 1. The vendoring model — how a compiled gate arrives in a consumer tree.
 2. The publish-side pipeline, `native-artifact-publish-path`.
@@ -216,13 +217,12 @@ to end beats a partial port spread across every profile.
 6. `companion-toolkit-profile`.
 
 **Step 3 is re-ruled 2026-08-06 by the operator: the first cohort is selected by
-the criteria, not by a profile.** The 2026-08-03 preamble above stands as
-written and is deliberately not edited: its ruling is *per-profile coherence,
-not whole-corpus completion*, and that survives intact. **Its illustrative
-clause — "one shipped profile fully native end to end" — is superseded here and
-must not be read as a roster census.** What is settled is **where that coherence
-is measured: at the adopter's floor — install, get value, uninstall, on the
-dependency floor objective 1 names — and never at a roster substrate census.**
+the criteria, not by a profile.** The 2026-08-03 ruling itself — *per-profile
+coherence, not whole-corpus completion* — survives intact; what the same ruling
+settles on 2026-08-06 is **where that coherence is measured: at the adopter's
+floor — install, get value, uninstall, on the dependency floor objective 1
+names — and never at a roster substrate census.** The preamble above illustrates
+the floor reading, which is why it must not be read as a roster census.
 
 The grounds are structural, not a matter of appetite. While criterion 4 stands,
 **no** profile can be fully native by census, first cohort or last: every
