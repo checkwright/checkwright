@@ -3235,6 +3235,33 @@
   exactly when nobody is capturing, and no other signal contradicts it.
   Filed 2026-08-06 at close, from its own knowledge-friction sweep.
 
+- **reclaim-precondition-outside-the-tree** [design-pending] — a declared `reclaim=` can be
+  runnable and still un-runnable, and the gate that demands one cannot tell.
+  `check-close-surfaces` blocks a capture-tier declaration that names no `reclaim=`, which
+  is the right floor and is not the whole obligation. `.workflow/essay-harvest.md` declares
+  `: > .workflow/essay-harvest.md` — a command any close can execute — but its *precondition*
+  is "merged into the essay", and the essay lives outside this tree. So the reclaim has never
+  fired: the sink now carries entries dated back to 2026-07-10, seven-plus iterations of
+  operator material, each close correctly declining to truncate.
+  **The bind is what makes it a defect rather than a slow queue.** A close that runs the
+  declared reclaim destroys material it cannot re-derive; a close that declines lets a
+  capture surface grow without bound, and does so *correctly* every time, so nothing ever
+  reads as wrong. The declaration's own text is what hides it — a reclaim command that
+  executes is indistinguishable, to the gate and to a reader, from a reclaim that discharges.
+  **Why `[design-pending]`:** the candidates are a grammar change and a posture change, and
+  they are not the same size. A `reclaim=` could carry its precondition (who or what must act
+  first), which the gate could then require but never verify — honest, cheap, and still
+  unenforceable. Or the surface could be ruled *not* capture-tier at all, since what it
+  accumulates is an operator's material rather than a session's, and a tier whose reclaim no
+  session may run may be the wrong tier. Provenance seam: what the precondition *is* — an
+  essay, a person, an external merge — is consumer content, so a kit may demand the field and
+  never a vocabulary for it.
+  **Cost while deferred:** every close spends a judgment call re-deciding not to truncate,
+  reaches the same answer, and leaves no residue that the answer was reached — which is
+  exactly the shape the close-surface roster was built to end.
+  Filed 2026-08-06 at close, from the runtime-artifact lifecycle check and an audit sweep
+  that measured the sink's age.
+
 - **lock-own-file-narrowed-profile-drift** [design-pending] — `doctor` misreports which
   `gates.list` it inspected on any tree whose install profile ever narrowed.
   `installer/lib/common/lock.sh:31`'s `lock_own_file` resolves a consumer's own seam file by
