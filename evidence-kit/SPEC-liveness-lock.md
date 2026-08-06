@@ -365,6 +365,12 @@ gate's red is not a recurrence declaration and must not stamp one.
 - [ ] **The release is conditional** — the `EXIT` trap removes the lock only when
       the recorded PID is still ours; an unconditional `rm -f` reproduces this
       unit's own defect inside its own mechanism.
+- [ ] **The writer refuses a live lock** — `run-validate` exits non-zero and
+      names the blocking run key when the atomic claim fails against a *live*
+      PID, refusing immediately with no reclaim attempt. This is delta 6's
+      headline behavior — distinct from the bounded-reclaim path the next bullet
+      tests, and a build that only implements reclaim has not implemented the
+      refusal the operator ruling actually took.
 - [ ] **Reclaim is bounded** — a dead-PID lock is reclaimed with exactly one
       retry, and a second failure refuses rather than looping.
 - [ ] **Amendment deleted** — this file removed on merge; `ls evidence-kit/SPEC-*.md`
