@@ -2674,6 +2674,7 @@
 
 - **amendment-owner-position-citation** [design-pending] — prose may cite a merged
   amendment as *settled history*, never as a live *owner*; today it does both.
+  recurrence: amendment-owner-position-citation 2026-08-06
   Amendments are deleted on merge (canon-kit/SPEC.md §Merging an amendment), so a citation
   naming one in owner position dangles the moment it merges — by construction, not by
   oversight. This is the inverse direction of the class
@@ -2688,6 +2689,15 @@
   naming `gate-payload-disclosure-ruling` and one naming `native-gate-meta-layer-reach`,
   all phrased in present tense against slugs that are now bare `## Done` lines.
   `check-spec-pointer` catches none — it matches path-form only, and all five are slug-form.
+  **Recurred 2026-08-06 on a second surface that re-verification did not cover, falsifying its
+  "entirely inside `TASK-QUEUE.md`" scoping.** Sibling amendments *inside one iteration* cite
+  each other by path, so merge order decides which side dangles: `SPEC-verify-verb.md` cited
+  `evidence-kit/SPEC-liveness-lock.md` and `lifecycle-kit/SPEC-dispatch-signal.md`, both
+  merged away by earlier batches, leaving two dead pointers inside a governing input the last
+  batch had to repoint by hand before it could reason from it. Nothing fired on either. This
+  surface is path-form, so unlike the five slug-form instances it is in `check-spec-pointer`'s
+  reach — and its cost lands on the session reading the amendment as governing input, not on a
+  reader of the queue.
   **The design question is exactly where those five differ from two that are fine.** The
   tag algebra's unresolved-token rule *explicitly* sanctions naming landed work: "entries
   legitimately name a closed defect class, a shipped contract, a settled ruling, and that
@@ -3155,6 +3165,7 @@
 
 - **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
   a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
+  recurrence: gap-resolver-mention-overcount 2026-08-06
   `bin/file-gap.sh` stamps its recurrence marker on any bounded substring match of a live
   slug in a bullet's prose, and the close drain re-resolves the same way. A bullet that
   *cites* an entry — a correction to it, a finding adjacent to it, a note that it blocks
@@ -3168,10 +3179,12 @@
   the resolver to avoid a false stamp. A capture affordance that must be evaded to stay
   accurate is miscalibrated, and evasion is not a property the channel can rely on — the
   next author does not know to evade, which is precisely when the count goes wrong.
-  **Sibling of `recurrence-drain-input-widening`, from the opposite direction** — that entry
-  asks what the drain misses, this asks what it over-counts. Both are questions about the
-  same declaration's input, so a scope taking either should cost the other; taking one
-  alone risks fixing the count in one direction while it stays wrong in the other.
+  **One of three faces of the same bounded-substring predicate** — `recurrence-drain-input-widening`
+  asks what the drain misses when no bullet exists, this asks what it over-counts, and
+  `recurrence-resolver-literal-match-only` asks what it misses when a bullet exists and does
+  not spell the slug. All three are questions about the same declaration's input, so a scope
+  taking any one should cost the other two; taking one alone risks fixing the count in one
+  direction while it stays wrong in the others.
   **Why `[design-pending]`:** the discriminator is the whole design. Prose distinguishing
   "this recurred" from "this is about that" carries no syntactic tell, so the honest answers
   run from a filer-supplied flag to dropping automatic resolution entirely and leaving the
@@ -3213,7 +3226,7 @@
   `bash guard-kit/bin/scan-prompts.sh` ranked bare `sleep` as this iteration's **top**
   prompting pattern at 16 calls — a session waiting on background work by sleeping in the
   foreground, roughly forty minutes of turns spent not-waiting-correctly. It is the same
-  rule `dispatched-session-waiting-rule-residency` records, approached from the opposite
+  rule `waiting-rule-fourth-firing-post-fix` records, approached from the opposite
   side: that entry is a session ending its turn to wait, this is a session refusing to.
   **Why this half is different, and why the difference is the whole entry.** That entry
   states, correctly, that no gate can read a session's choice to *end a turn* — the act
@@ -3229,11 +3242,211 @@
   contract question, since the rule is generic mechanism while the named better form is
   consumer/harness vocabulary that must not become a kit literal (the provenance seam).
   **Cost while deferred:** the cheapest available detector for a rule that has now fired in
-  three consecutive iterations goes unbuilt, and every polled wait bills a full-price turn
+  four consecutive iterations goes unbuilt, and every polled wait bills a full-price turn
   for a session doing nothing — paid per occurrence, on the tiered stages where long oracle
   batteries are the whole work class.
   Filed 2026-08-05 by close, from its own prompt-friction triage; scope-gated intake, so it
   is filed rather than started.
+
+- **waiting-rule-fourth-firing-post-fix** [design-pending] — the residency rule fired again,
+  under its own freshly-strengthened prose.
+  `dispatched-session-waiting-rule-residency` shipped this iteration. Batch 2 (`a046c06`)
+  landed its residency half into `.claude/agents/stage-session.md` as a bare imperative —
+  never end a turn on work still running, and never end one in order to wait. The **validate**
+  session of this same iteration was then dispatched under that updated definition and did it
+  anyway: it ended its turn with `run-validate` still executing, orphaning the producer. Four
+  consecutive iterations now; the third firing went through a dispatch prompt that named the
+  rule, the fourth through the strengthened agent definition itself.
+  **Not a recurrence — a new defect.** The slug resolves only in `## Done`, and the firing came
+  *after* its fix landed, which the drain rule files as new work rather than a recurrence stamp.
+  **The mechanical half held, and that is the other side of the finding.** The lead ran
+  `check-producer-liveness` rather than guessing, got a live PID, waited in-turn on the lock,
+  and did not dispatch close into a mutating manifest; the `close=` entry preflight would have
+  refused it regardless. The lock ended up absent rather than stale, so conditional release
+  behaved as specified and no work was lost. Enforcement held exactly where a gate existed and
+  failed exactly where only prose did — an enforcement-first result produced by dogfooding.
+  **Why `[design-pending]`, and the boundary on it.** Whether the residency amendment's prose
+  half should now carry a stated limit — that it requests rather than enforces — is a change to
+  a shipped amendment's asserted scope. It is **flagged to the operator and unruled**; this
+  entry records the incident and does not settle it. `poll-sleep-guard-steer` is the same rule
+  from the side that *does* leave a tracked artifact, so a scope taking either should cost both.
+  **Cost while deferred:** the project's only evidence that prose-alone enforcement fails is an
+  anecdote spread across four iterations' histories, and each further firing costs an orphaned
+  producer plus the lead turn that discovers it.
+  Filed 2026-08-06 by close, recording this iteration's central incident.
+
+- **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
+  its unit were the iteration's only one.
+  Two shapes attested in `background-producer-liveness`, one root.
+  (1) **Reciprocal.** `evidence-kit/SPEC-liveness-lock.md` and
+  `lifecycle-kit/SPEC-dispatch-signal.md` each carried a mirror "ships together with the other"
+  item. Written symmetrically it reads as blocking to each side and neither half can go first;
+  batch 1 merged only by reasoning past its own DoD, and nothing in either amendment asserted
+  the iteration-level reading that makes that correct.
+  (2) **Broader, and strictly containing (1).** The merge assertion `ls <kit>/SPEC-*.md returns
+  none` is carried by *every* amendment for a kit with more than one in flight. It is satisfiable
+  only by whichever batch merges that kit's last amendment; the earlier batches' identical copies
+  are unsatisfiable at their own commit, for a reason nothing in either amendment states.
+  **The general shape is the entry** — a DoD item whose satisfiability depends on sibling units
+  the amendment never names. Triaging the two instances separately is what produced two gap
+  bullets for one defect.
+  **The reading is already ruled.** The operator ruled shape (1) discharged at the iteration, not
+  the commit, on the mechanical ground that build stays in build until the queue empties and
+  close refuses entry on a non-empty active queue; that ruling is landed at canon-kit/SPEC.md
+  §Merging an amendment. What stays open is the *authoring* side.
+  **Why `[design-pending]`:** the candidates differ in kind — a template change (the shipped DoD
+  checklist names the iteration as the discharge horizon), an authoring rule (an amendment may
+  not assert over files it does not own), or an assertion on the amendment glob that reds a
+  cross-amendment path reference inside a DoD item. Which is right depends on whether sibling
+  dependence is ever legitimate, and that is unruled.
+  **Cost while deferred:** every multi-amendment iteration ships DoD items that are false at
+  their own commit, and each costs a build session the reasoning-past that batch 1 paid — the
+  exact move a DoD exists to make unnecessary.
+  Filed 2026-08-06 by close, merging two gap-inbox bullets into the class both name.
+
+- **recurrence-resolver-literal-match-only** [design-pending] — a real recurrence whose bullet
+  does not spell the slug is drained as a fresh entry.
+  The gap-inbox recurrence resolver matches a literal slug substring in a bullet's prose — at
+  capture (`bin/file-gap.sh`'s live-slug scan) and again at the close drain, which re-resolves
+  the same way. A filer who describes a defect rather than naming it produces a bullet that is
+  present, is a genuine recurrence, and matches nothing; the drain files it as a new entry,
+  fragmenting the backlog the inbox exists to keep whole.
+  **The third face of one matcher, which is why the three cost together.**
+  `gap-resolver-mention-overcount` covers the inflating direction only (a bare mention counted as
+  a recurrence); `recurrence-drain-input-widening` covers a recurrence reaching close with no
+  bullet at all. Neither covers a bullet that is present and fails to match. All three are the
+  same bounded-substring predicate from three sides, and a scope taking one alone re-derives the
+  other two.
+  **Attested twice in one drain, in the over-counting direction.** Two of this iteration's nine
+  bullets carried an auto-stamped recurrence prefix fired by a bare mention — one naming
+  `gap-resolver-mention-overcount`, one naming `recurrence-drain-input-widening` — and both had
+  to be struck by hand at the drain.
+  **Why `[design-pending]`:** the under-matching direction has no syntactic remedy at all. The
+  over-counting sibling can at least imagine a filer-supplied flag; here the missing signal is in
+  the filer's head, so the honest candidates are a required recurrence-or-new field on
+  `file-gap.sh`, or accepting the drain's session-side re-resolution as the only real channel —
+  the same contract call `gap-resolver-mention-overcount` already names.
+  **Cost while deferred:** the recurrence count under-reports in a direction nobody can audit,
+  and its two readers — scope's pre-emption threshold and `kpi-incident-recurrence` — see a
+  backlog that looks less repetitive than it is.
+  Filed 2026-08-06 by close from the gap inbox.
+
+- **section-prose-outlives-its-entries** [design-pending] — Clear-Done removes the entries and
+  leaves the prose that framed them.
+  A scope-authored preamble under an active section describes the entries beneath it. Close's
+  Clear-Done step moves those entries to `## Done` and touches nothing else — precedent
+  `e3d893e`, `f8433ac` — so the preamble survives as prose naming a causal order that points at
+  nothing. No gate reds: prose is not an entry, and no gate reads the relation between them.
+  **Instance, fixed at this close.** `## New Features` kept `background-producer-liveness`'s
+  four-unit causal-order preamble after all four entries reached `## Done`. Lead-ruled 2026-08-06
+  at the end of build that close removes it explicitly; the removal rides this close's Clear-Done
+  commit, and the class is what survives.
+  **Why `[design-pending]`:** the tractable rule is not obvious. "An active section with no
+  entries has no body" is decidable and would have caught this instance, but it over-fires on a
+  section preamble that is a standing authoring rule rather than a gloss on the current entries,
+  and `TASK-QUEUE.md` carries both kinds. Separating them needs either a marker on
+  iteration-scoped prose or a ruling that active sections may not carry standing prose at all —
+  a queue-format contract change.
+  **Cost while deferred:** every iteration whose scope writes a section preamble leaves one
+  behind at close, and each stranded preamble tells the next scope a causal story about entries
+  that are gone.
+  Filed 2026-08-06 by close from the gap inbox; instance fixed inline in the same commit.
+
+- **amendment-roster-stale-by-construction** [design-pending] — the enumeration that makes a
+  sweep mechanical is stale the moment a sibling batch lands.
+  An amendment that enumerates a rename or sweep roster up front is doing the very thing that
+  makes such a delta mechanical rather than design-bearing. The roster is authored at spec time
+  and is stale by construction as soon as any sibling batch writes prose on the same files, and
+  nothing reds.
+  **Attested this iteration.** The verb-rename roster was authored at spec; an earlier build
+  batch then added ~77 lines to `delegation-kit/SPEC.md` and ~46 to
+  `lifecycle-kit/templates/lead.md` without pre-applying the rename. The sweeping batch
+  re-derived against the tree only because the lead flagged it, finding five sites the roster
+  missed — one in `docs/delegation-kit/index.md`, a hand-authored page
+  `scripts/gen-docs-mirror.sh` does not write, so no mirror regen would ever have corrected it.
+  The enumeration also undercounted its own stated four citation sites.
+  **Shape:** either a freshness assertion that a roster is re-derived at sweep time, or a stated
+  rule that an enumerated roster is a floor and never the answer. The instance went green, which
+  is exactly the enforcement-first stop signal to ask what check should have caught it.
+  **Why `[design-pending]`:** a freshness assertion needs a re-derivation command the amendment
+  can name, and a rename roster's derivation is a grep whose pattern is the amendment's own
+  content — so the gate would assert a grep against a grep. The floor-not-answer rule is cheap
+  and unenforceable, and choosing between an unenforceable rule and an expensive gate is the
+  design.
+  **Cost while deferred:** every multi-batch iteration carrying a sweep unit ships a roster its
+  own later batches falsify, and the only detector is a lead who happens to flag it — which is
+  what happened here and is not a mechanism.
+  Filed 2026-08-06 by close from the gap inbox; the sweep instance itself landed green.
+
+- **unregistered-gate-fixture-coverage** [design-pending] — the fixture-pair contract is
+  asserted over the registry, not over the gates.
+  `check-gate-fixture-coverage` walks `gates.list` members, so a kit gate that ships deliberately
+  unregistered carries no fixture obligation at all: evidence-kit's `check-producer-liveness` (an
+  entry-preflight gate, kept out of `gates.list` because this repo's battery is what it locks
+  against) and canon-kit's `check-surface-duplication` can lose or never gain their `good/`+`bad/`
+  pair with nothing red. `run-gate-tests.sh` executes whatever pair directories exist, so an
+  absent pair reads as zero coverage rather than as a harness error — the silent direction.
+  **Found at the build that created the first entry-only gate**
+  (`validate-producer-liveness-unobservable`), which is what turned an always-true assertion into
+  a false one.
+  **Shape:** widen the assertion from the registry to every kit `checks/` member, in both
+  declaration spellings, keeping the existing no-fixture opt-out. The false-positive surface is
+  bounded precisely because that opt-out already exists — a gate that genuinely owes no pair
+  declares it.
+  **Why `[design-pending]`:** "every kit `checks/` member" is a claim about what a kit root is,
+  and gate-sdk/SPEC.md's kit predicate is the authority; widening a gate to walk kit roots
+  couples it to that predicate, and the coupling wants stating before it ships.
+  **Cost while deferred:** the four gate-sdk contracts bind registered gates only, and the
+  exception set grows by one each time a gate is deliberately unregistered — which this iteration
+  established as a supported pattern rather than an oddity.
+  Filed 2026-08-06 by close from the gap inbox; found at build, shape supplied by the filer.
+
+- **link-wrapped-section-citation-liveness** [design-pending] — a section citation inside a
+  markdown link is invisible to both citation gates.
+  `check-spec-pointer`'s prose extractor guards on a `.md` *immediately* followed by the section
+  sign, so it looks only where the two are adjacent. The reference-link form
+  `[path.md](path.md) §Heading` puts a `)` between them: the guard never fires, the heading is
+  never resolved, and this holds even though the file is in the governed manifest and
+  `check-md-refs` has already resolved the link half. Live at `CONTRIBUTING.md:65-66`.
+  **Third member of a family the queue already carries**, and the one that makes the family a
+  predicate question rather than three fixes: `prose-filename-citation-liveness` is a path with
+  no heading, `unqualified-section-citation-liveness` is a heading with no path, and this is a
+  path *and* a heading that the adjacency guard splits. That second entry already says one
+  predicate may cover both of the others; this is the evidence that the guard's window, not the
+  citation form, is the variable, so a promoting scope should cost all three together.
+  **Why `[design-pending]`:** widening the guard to tolerate an intervening `)` is a
+  two-character change and almost certainly wrong alone. The honest fix decides what the
+  extractor's window *is* — nearest preceding `.md` in the paragraph, or the link target — and
+  that decision is shared with the two siblings.
+  **Cost while deferred:** a renamed heading strands this citation with nothing red, inside a
+  governed repo-meta file whose whole purpose is telling a contributor where to go.
+  Found at spec 2026-08-06 while sizing the verb rename's blast radius, verified against the
+  gate's own extraction logic rather than inferred; filed 2026-08-06 by close from the gap inbox.
+
+- **queue-tier-label-correction-cost** [design-pending] — a wrong debt/feature label is cheapest
+  to leave wrong.
+  Two of `background-producer-liveness`'s four units — the lead dispatch-precondition entry and
+  the dispatched-session waiting-rule entry — self-labelled as debt adding no governed name,
+  while both delivered exactly what canon-kit/SPEC.md's litmus counts as a feature: a contract
+  another component must honor (a dispatch precondition the lead must honor; a kit SPEC sanction).
+  Both bodies also fired the misfiling tell — a multi-paragraph design ruling inlined where no
+  gate sees it.
+  **Scope read the labels correctly and still did not fix them.** It routed all four units to the
+  authoring stage on the corrected reading, which is the behavior the label exists to drive, and
+  left the labels standing: both entries sat at `check-queue-entry-budget`'s line cap, so editing
+  a label first required finding a compensating trim. The correction was strictly more expensive
+  than the miscarriage it fixed.
+  **Why `[design-pending]`:** the label is not mechanically derivable — the litmus turns on
+  whether a body delivers a contract, the same semantic judgment `check-queue-entry-budget`'s
+  compression rule already declines to gate. The tractable question is the *friction*, not the
+  label: whether a label-only edit should be exempt from the cap (a one-token diff cannot regrow
+  an entry), whether the cap should be measured below the lead line, or whether nothing changes
+  and the cost is correct.
+  **Cost while deferred:** every mislabeled entry that reaches the cap stays mislabeled, and the
+  label's two readers — the authoring-stage routing rule and the new-names litmus — read a value
+  its author already knew was wrong.
+  Filed 2026-08-06 by close from the gap inbox; both instances reached `## Done`, so the class is
+  all that survives.
 
 ## Icebox
 

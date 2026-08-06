@@ -132,7 +132,13 @@ supplies the checklist they invoke and the gate behind the promotion rule.
    embedded wire-delta becomes a citation to the now-existing contract
    file — the amendment's exemption is file-scoped, so once step 3 deletes
    the file `check-spec-embedded-source` re-arms and a kept embed goes red.
-3. Delete the amendment file; verify none remain for the component.
+3. Delete the amendment file; verify none remain for the component. **The
+   none-remain half is discharged at the iteration, not at the commit** — with
+   sibling amendments in flight for one component, only the batch merging the
+   last of them can satisfy it, and the earlier batches' identical assertions are
+   unsatisfiable at their own commits. The horizon is the iteration because the
+   build stage stays resident until the queue empties and close refuses entry on
+   a non-empty active queue.
 4. Move the queue entry to `## Done`, dropping its `[spec:]` tag — the
    amendment it referenced is gone, and `check-amendment-queue` requires
    every `[spec:]` ref to resolve to a file on disk.
