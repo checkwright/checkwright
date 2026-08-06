@@ -39,6 +39,16 @@ question about duration; it was never asked. `--simulate` keeps its whole job.
 What it never was, and must now be said not to be, is evidence that the prior
 stage is over.
 
+**One qualification, because the paired amendment changes what `--simulate`
+sees.** `--simulate` runs every matching entry-preflight command, so once the
+producer-liveness lock ships it inherits that gate and the specific mid-write
+clearing above stops happening. That is a real narrowing and the template should
+not overstate the blindness. It is not a repeal: `--simulate` is still an
+instantaneous read, so a producer starting a moment later is still unseen, and
+the gate sees only producers that claim a lock. The rule therefore stands as
+written — completion is a fact about a session — and the gate's contribution is
+to shrink the window in which being wrong about it goes undetected.
+
 The queue entry re-verified at scope that the adjacent paragraph does not already
 cover this: it predates the incident and is silent on liveness. That
 re-verification stands and is the reason this is an addition rather than an edit.

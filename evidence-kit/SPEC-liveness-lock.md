@@ -157,11 +157,29 @@ Each delta carries its `{mechanical | design-bearing}` work class.
   under a test harness. The producer is reachable on the ordinary path: the
   validate stage skill runs `run-validate`, which is the only writer of the
   evidence manifest.
-- **Consumer** — `check-producer-liveness`, invoked by
+- **Consumer, first** — `check-producer-liveness`, invoked by
   `lifecycle-kit/bin/enter-stage.sh`'s preflight loop with the argv that loop
   already passes (`<queue> <state>`), at the `validate` and `close` stage keys
   the consumer wires. The mechanism is the existing hook; nothing new couples the
   two kits.
+- **Consumer, second — `enter-stage.sh --simulate <stage>`, and it is the one
+  worth naming explicitly.** The read-only preflight mode runs *every matching*
+  `LIFECYCLE_KIT_ENTRY_PREFLIGHT` entry, so it inherits this gate with no extra
+  wiring. That matters beyond bookkeeping: a lead gating an expensive dispatch
+  with `--simulate` is today blind to a live producer — the incident behind
+  `lead-dispatch-requires-completion-notification` is precisely a simulated close
+  entry clearing mid-write — and once this lock ships, that same command reports
+  the live run instead of clearing. The reader was found by surveying the
+  component set rather than the obvious call path, and it is the highest-value
+  consumer of the artifact.
+
+  **It does not make the paired prose rule redundant**, and the boundary must be
+  stated or the pair looks over-built: `--simulate` remains an instantaneous
+  read, so a producer that starts a second later is still unseen, and the gate
+  covers only producers that claim this lock. A lead that dispatches on artifact
+  state is still dispatching on artifact state — it merely has one more artifact.
+  The prose rule governs what the lead waits *for*; this gate narrows what
+  survives being wrong about it.
 
 **Every field has a named reader.**
 
