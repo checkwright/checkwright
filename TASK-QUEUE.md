@@ -12,6 +12,34 @@
 
 ## New Features
 
+- **stage-fanout-burn-unbilled** [spec: SPEC-fanout-attribution.md] — a stage's fan-out
+  subtree bills to no economics row, and that is now where the variance lives.
+  `bin/stage-economics.sh` prices the stamped stage-session transcript only. The
+  audit-sweeps and forks that session dispatches carry no stamp, so they fall into the
+  unstamped upper-bound counter instead — declared behavior, not a defect
+  (drift-kit/SPEC.md §The stage-economics meter states it as a bound, never an
+  attribution).
+  **Measured 2026-08-06.** `native-first-port-cohort`'s close row reads 27.81 USD while
+  the close subtree — three audit-sweeps plus five spawn-depth-3 forks under the
+  release-note gather — cost 41.77 USD. That 13.96 USD gap is precisely the spike an
+  operator reading the trend log would want surfaced, and it is the largest close
+  fan-out on record: the previous seven closes ran 0.46 to 3.98 USD of fan-out against
+  7.63 to 22.26 USD of stage-session burn. Close-over-close variance has moved into the
+  tier the meter cannot price.
+  **Deliverable:** a fan-out row per (iteration, stage), the alternative fold ruled out.
+  **The attribution key is ruled and the ruling lives in the amendment**, which also
+  records the probe it rests on and why the dispatcher-minted fallback this entry
+  carried as design input was refused. One consequence reaches a sibling: this unit
+  needs no dispatch convention, so `cross-stage-census-duplication` no longer inherits
+  one and is designed on its own merits.
+  **Depth 1 is already discharged and must not be rebuilt:** the lead-from-path derivation
+  and the `supervision` row it feeds are shipped. What this entry adds is the grandchild
+  case alone.
+  Sibling: `supervision-overhead-unmeasured`, the lead's own row, which the same path
+  derivation already reaches.
+  Filed 2026-08-06 by an operator consultation, from a priced audit of the last eight
+  iterations' transcripts; promoted 2026-08-06 by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -3678,54 +3706,6 @@
   prompting KPI on any iteration filing several long, punctuated gap descriptions, so the
   distortion lands hardest on the iterations that capture the most.
   Filed 2026-08-06 by close, from this iteration's prompt-friction triage.
-
-- **stage-fanout-burn-unbilled** [design-pending] — a stage's fan-out subtree bills to
-  no economics row, and that is now where the variance lives.
-  `bin/stage-economics.sh` prices the stamped stage-session transcript only. The
-  audit-sweeps and forks that session dispatches carry no stamp, so they fall into the
-  unstamped upper-bound counter instead — declared behavior, not a defect
-  (drift-kit/SPEC.md §The stage-economics meter states it as a bound, never an
-  attribution).
-  **Measured 2026-08-06.** `native-first-port-cohort`'s close row reads 27.81 USD while
-  the close subtree — three audit-sweeps plus five spawn-depth-3 forks under the
-  release-note gather — cost 41.77 USD. That 13.96 USD gap is precisely the spike an
-  operator reading the trend log would want surfaced, and it is the largest close
-  fan-out on record: the previous seven closes ran 0.46 to 3.98 USD of fan-out against
-  7.63 to 22.26 USD of stage-session burn. Close-over-close variance has moved into the
-  tier the meter cannot price.
-  **Deliverable:** a fan-out row per (iteration, stage), or a subtree total folded into
-  the stage row with the split reported.
-  **Why `[design-pending]`:** the attribution key. A subagent transcript names its lead
-  in its own path, which is what already makes the supervision row derivable with no
-  stamp — but a *grandchild* names only that same lead, never the stage session between
-  them, so the parent edge has to come from the sibling spawn-record file rather than
-  the path. Whether the meter may read that file at all is the ruling: it is a
-  harness-private artifact under no contract, and reading it couples the meter to a
-  shape nothing holds still.
-  **Re-verified 2026-08-06 at scope — the attribution key did not survive it.** A search
-  for `spawn-record` and its spellings returns exactly **one** hit in the whole repo: this
-  entry's own prose above. No path, no schema, and no reference from
-  `drift-kit/bin/stage-economics.sh` or `drift-kit/SPEC.md` §The stage-economics meter. The
-  sibling spawn-record file is therefore a hypothesis about the harness rather than an
-  observed artifact, and the ruling this entry poses cannot be answered by reading the
-  tree. Probe for it before designing against it.
-  **A fallback needing no harness contract — design input, not a ruling.** Take the
-  attribution key from the *dispatcher* rather than the harness: a dispatching session
-  already mints a path and names it in its child's prompt, this repo's resume-journal
-  idiom, which `subagent-parent-addressing` independently ranks as the only upward route
-  that exists. Carrying the stage identity in that minted path makes a fan-out
-  attributable at any depth by a tracked artifact under this project's own contract, with
-  no coupling to a shape nothing holds still. It is also the convention
-  `cross-stage-census-duplication` needs, which is why the two may be one design.
-  **Depth 1 is already discharged and must not be rebuilt:** the lead-from-path derivation
-  and the `supervision` row it feeds are shipped. What this entry adds is the grandchild
-  case alone.
-  **Cost while deferred:** the one economics surface read close-over-close under-reports
-  every fan-out-heavy stage, and under-reports it hardest on exactly the iterations
-  worth investigating. Sibling: `supervision-overhead-unmeasured`, the lead's own row,
-  which the same path derivation already reaches.
-  Filed 2026-08-06 by an operator consultation, from a priced audit of the last eight
-  iterations' transcripts.
 
 - **cross-stage-census-duplication** [design-pending] — consecutive stages re-derive the
   same census because nothing carries a fan-out's findings forward.
