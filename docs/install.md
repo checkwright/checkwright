@@ -111,10 +111,9 @@ your `PATH`, and the note says what breaks without it:
   prebuilt Release asset for a declared target, digest-verified before `init`
   writes it, and where no asset matches your host `init` omits the ported gates
   from your registry and records why — so no install path asks you for Rust. That
-  publish path is built and the first tag carrying those assets has not yet been
-  cut; until it is, a release ships the payload alone and an adopter runs the
-  omit path by default. A gate on that substrate shells out to git at runtime and
-  embeds nothing.
+  publish path builds and attaches those assets from the tag itself, so what any
+  one release carries is read off its own Release page rather than asserted here.
+  A gate on that substrate shells out to git at runtime and embeds nothing.
 
 <!-- toolchain:end -->
 
@@ -183,10 +182,11 @@ that has to resolve your platform before any binary can run. It is deliberately
 small enough to exist twice, which is what would make a native Windows path
 possible where the roster above can only offer WSL.
 
-None of that is reached. Every gate in the battery is a shell script today, and
-the requirements above are what those scripts actually invoke. When a
-requirement drops it drops from that list — the list is where you will see it,
-not this paragraph.
+That direction is now underway rather than announced: the first cohort has
+ported, and the rest of the battery is still shell. The requirements above are
+what the shell gates actually invoke, so they stand until the gates that invoke
+them do not. When a requirement drops it drops from that list — the list is
+where you will see it, not this paragraph.
 
 ## Quick start
 

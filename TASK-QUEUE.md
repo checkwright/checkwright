@@ -3746,6 +3746,27 @@
   pass is read as evidence the amendments were right.
   Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
+- **survey-edge-aggregation-residue** [design-pending] — the audit that asks whether a scope
+  survey aggregated inbound edges has nothing to read.
+  `templates/stages/scope.md` requires it plainly — aggregate a candidate's inbound edges
+  before ranking it, because the promotion dividend lives in the total and in no single entry.
+  The `survey-engagement` audit class then asks each close whether that pass ran, and declares
+  its only residue to be "the survey's own reasoning".
+  **Attested this close: that residue does not carry the claim.** Scope's reasoning landed in a
+  commit message recording *conclusions* — three premise falsifications, and one entry's
+  self-declared strongest ground engaged and answered rather than merely refuted, which is the
+  counter-evidence half done properly. Nothing in any artifact says whether an edge sum was
+  taken for any candidate, so the audit can neither confirm nor fault it. An audit that cannot
+  return either verdict is not un-gateable, it is unanswerable.
+  **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
+  becoming ceremony, a stage writing down that it did the thing rather than doing it. The
+  honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
+  survey record, or accepting that this class is not auditable and retiring the roster line
+  rather than restamping it each close.
+  **Cost while deferred:** every close restamps an audit it did not actually perform, which is
+  worse than a skipped audit — the roster reads as coverage.
+  Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -3777,10 +3798,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- native-gate-dogfood-ruling
-- consumer-smoke-artifact-arm
-- native-gate-cohort-descriptors
-- payload-disclosure-claim-owner
 
 ## Lessons Learned
