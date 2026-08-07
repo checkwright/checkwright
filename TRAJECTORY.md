@@ -309,9 +309,9 @@ What makes unit 2 an insertion rather than a re-cut is that unit 1 *supplies the
 ruling it has been waiting on*. `consumer-smoke-artifact-arm` sat
 `[design-pending]` on one open question — whether its smoke **builds** a binary,
 "a `cargo` dependency the suite does not have today, against the toolchain
-floor", or **fabricates** a stand-in. Unit 1 rules exactly that dependency, so
-the entry's blocker is discharged by its predecessor rather than by a separate
-call.
+floor", or **fabricates** a stand-in. That dependency is exactly what the
+dogfood ruling settles, so the entry's blocker is discharged by its predecessor
+rather than by a separate call.
 
 The honest limit, recorded because it is the reason this ruling exists: the
 descriptors entry asserted "no further ruling is owed" and has since yielded a

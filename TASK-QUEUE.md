@@ -12,6 +12,27 @@
 
 ## New Features
 
+- **native-gate-dogfood-ruling** [spec: SPEC-dogfood.md] — must this repo run built
+  artifacts? **Ruled yes**; the ruling, its trade in both directions, and the ground
+  that makes it forced rather than preferred are the amendment's
+  (`gate-sdk/SPEC-dogfood.md`). Unit **1 of 4** and first by a forced ordering
+  (TRAJECTORY.md §The closed rulings): landing a descriptor settles this question by
+  implementation, which is the move `init-claim-stickiness` ruled against, so the spec
+  pass precedes the code.
+  **Scope of the deltas:** gate-sdk/SPEC.md §What the dispatch seam does not settle
+  (the dogfooding paragraph retired for the settlement), context-kit/SPEC.md's
+  `cargo:1.56` roster entry (its contributor-side tier sharpens to commit-time where a
+  descriptor is live), and one sentence on §check-gate-binary-fresh.
+  **Every sentence lands as a rule, never as a count** — the present-tense tree turns
+  are `native-gate-cohort-descriptors`', because turning them here would assert a state
+  that does not exist yet.
+  **One entry premise is false and the amendment corrects it:** this ruling adds no pin
+  to `context-kit/lib/toolfloor.sh`'s probe roster — `cargo:1.56` is already a member at
+  the already-correct floor, so `PROBE_SET` and its parity with `docs/install.md` are
+  undisturbed. What changes there is prose.
+  Filed 2026-08-02 by spec, restoring a ground a compression dropped; promoted
+  2026-08-07 at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2332,30 +2353,6 @@
   by habit rather than by ruling, and the cheapest moment to keep the seam neutral is
   before the second language exists — not after.
   Filed 2026-08-02 by build, on an operator ruling, during `native-gate-dispatch-seam`.
-
-- **native-gate-dogfood-ruling** [design-pending] — must this repo run built artifacts?
-  Restored from the 2026-07-28 filing, which still states it best: **"this repo must
-  run built artifacts or the opacity win is consumer-only, and the Rust source sits
-  readable in-tree regardless."** The 2026-08-02 compression dropped it without
-  answering it; what the parent carries now — "Unmeasurable here: this repo dogfoods
-  from source" — states the present condition, never whether it should change.
-  **The same lever as the disclosure question, seen from the other end — and that end is
-  now ruled.** What a consumer receives is settled (TRAJECTORY.md §The closed rulings: the
-  payload ships a prebuilt binary and no gate implementation source); what this repo runs
-  is not. Both decide whether an agent can read the predicate it is about to be judged by,
-  so the settled end is this entry's strongest precedent rather than its open companion.
-  **What it costs either way, so the trade is visible.** Running built artifacts here
-  makes the battery depend on a compiled toolchain at every commit and adds a pin to
-  `context-kit/lib/toolfloor.sh`'s probe roster; running from source keeps that
-  toolchain optional and keeps the port's headline benefit unmeasurable in the one
-  tree that exercises it daily.
-  **It neither blocks nor is blocked by slice 1.** `native-gate-dispatch-seam` is
-  deliberately payload-neutral, because hook generation runs consumer-side
-  (`installer/lib/init.sh` invokes `gen-pre-commit.sh --write`), so a slice depending
-  on this ruling could not generate a hook without the binary present.
-  **Cost while deferred:** the opacity ground stays unmeasurable in this tree, so the
-  port's sharpest justification is argued rather than observed.
-  Filed 2026-08-02 by spec, restoring a ground a compression dropped.
 
 - **queue-entry-evidence-tier** [design-pending] — **not "how is cut detail recovered"
   — that is solved. The gap is that a reader cannot tell detail was ever cut.**
