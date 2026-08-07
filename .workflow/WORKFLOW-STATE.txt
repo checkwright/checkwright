@@ -13,3 +13,4 @@ delegation-burn-reduction build a2762530 2026-08-07
 delegation-burn-reduction build a93a2361 2026-08-07
 delegation-burn-reduction build a2c7876c 2026-08-07
 delegation-burn-reduction validate a6c4a604 2026-08-07
+delegation-burn-reduction build a77966b5 2026-08-07
