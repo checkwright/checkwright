@@ -1511,6 +1511,12 @@
   **ratchet** assertion rather than a cap — red when the surface grows against its
   committed baseline without the baseline being deliberately re-stamped — which
   needs no budget at all and makes the growth visible where it happens.
+  **Re-measured 2026-08-07: 213 lines, +41 against the same unmoved baseline.** The
+  ratchet advanced another 16 lines in the iterations since the reading above, so the
+  drift is compounding rather than settling, and the baseline is again deliberately
+  not re-stamped. This close's brevity pass returned one line, from a `native/` bullet
+  restating port history gate-sdk's SPEC owns — which is the measure of what a
+  pass-shaped fix recovers against a unit-shaped problem.
   **Cost while deferred:** compounding directly in the tier the whole methodology
   is trying to hold down, and paid by every session in this repo and every
   consumer that vendors context-kit. The detector is a close-stage read, so it is

@@ -144,9 +144,8 @@ load behind that trigger, so they are not resident here.
   in it (the npm name is the `installer/` package below).
 - `native/` is the Rust crate for gate implementations off the shell substrate —
   one multi-call binary, one subcommand per ported gate. **No gate is ported
-  today:** the seam ships, the one live port was reverted, and both halves of the
-  delivery path — publish and install — now ship, so a second port waits on
-  nothing but the porting. It is **not a kit** — no `checks/`, no `smoke/`, the
+  today** — the seam and both delivery halves ship, so only the porting waits.
+  It is **not a kit** — no `checks/`, no `smoke/`, the
   predicate that makes a root directory one; `native/target/` is gitignored and
   never committed, so its build currency is enforced rather than rostered — by
   `check-gate-binary-fresh`, dormant until a descriptor makes the binary
