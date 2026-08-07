@@ -142,9 +142,12 @@ a tree that has done nothing wrong those would red on day one, so they are
 registered when the surface exists rather than at install. Each kit's README
 names the full roster to grow into.
 
-*The honest limit.* That per-kit starting roster is knowledge this installer
-holds, and each kit's `smoke/install.sh` holds a second encoding of the same
-fact for its own scratch consumer. The consumer smoke catches the drift that
+*The honest limit.* That per-kit starting roster is `recipe_gates` in
+`lib/common/recipe.sh`, and that function is the **whole** of a fresh
+consumer's registry — what a tree `init` just made will run is read there, never
+inferred from a kit's full roster or from this repo's own `gates.list`. Each
+kit's `smoke/install.sh` holds a second encoding of the same fact for its own
+scratch consumer. The consumer smoke catches the drift that
 matters — a roster naming a gate that fails to resolve reds it — but not a
 kit that adds a zero-config gate this roster never learns about. Collapsing the
 two into one per-kit source is filed as queued work, not papered over here.

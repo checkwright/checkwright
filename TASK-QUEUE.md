@@ -436,28 +436,24 @@
   stage downgrades from Opus to Sonnet net-positive rather than flipping on
   intuition; a ruling-config tier re-judgment (`.claude/agents/stage-session.md`
   / the lead template's ruling-config, which invites re-judging every tier).
-  Grounding, **corrected** against priced rows (the earlier token-only reading
-  below predates both the price table and the split-lead posture, and overstated
-  build's lead): under the current split-lead posture the priced spread is build
-  $2.59–10.96, close $5.83–7.81, validate-on-Sonnet $0.54–1.44. Two readings
-  follow, and neither matches the original grounding. **Close is comparable to
+  Grounding, **corrected** against priced rows: the split-lead spread is build
+  $2.59–10.96, close $5.83–7.81, validate-on-Sonnet $0.54–1.44, and neither
+  reading it yields matches the original grounding. **Close is comparable to
   build, not an order of magnitude below it** — so close is a tier candidate in
   its own right, arguably ahead of build, and the premise that build is the
   single highest-value lever no longer holds. And the already-adopted
   validate→Sonnet downgrade **demonstrably works**: validate is the cheapest
   stage by a wide margin with no observed quality cost, which is the affirmative
-  precedent this A/B is testing for build. These figures predate the attribution
-  fix; re-read them from the log rather than trusting them as transcribed.
-  The superseded token-only reading: build ~100–175k output, 5–25M cache-read per
-  run versus close/validate ~7–49k output.
-  **Two design blockers:** (1) ~~the decision metric is uninstrumented~~ —
-  **resolved**: a price table now exists and the meter prices instead of
-  reporting `cost=n/a`. It is replaced by a sharper blocker: the figures are
-  priced but **mis-attributed**, so `stage-economics-attribution-honesty` is
-  now this task's hard prerequisite. **Discharged 2026-08-01 by the undirected
-  scope survey:** that fix landed inside `stage-economics-honesty` (one
-  transcript, one row), so the rows are priced *and* honestly attributed and this
-  task is **unblocked**; it is also self-labelled Debt below. (2) the
+  precedent this A/B is testing for build. Re-read the figures from the log
+  rather than trusting them as transcribed, and read the `cr` column rather than
+  `cost` — a falling per-token rate makes a growing draw read flat in dollars.
+  The superseded token-only reading is in history.
+  **One design blocker remains; the first two are answered.** Both the
+  uninstrumented metric and the mis-attributed rows are **discharged** — a price
+  table exists, the meter prices instead of reporting `cost=n/a`, and
+  `stage-economics-honesty` landed the one-transcript-one-row attribution fix on
+  2026-08-01, so this task is **unblocked** and self-labelled Debt below. What
+  stands: the
   metric must be **net delivered-work cost** — price-weighted tokens + rework
   round-trips + the supervisor's by-eye gate-diff burden + escalation load
   shifted onto the Opus lead — not single-pass token price; a cheaper builder
@@ -472,6 +468,12 @@
   `benchmark-ab-experiment` (which holds model constant and varies governance —
   this holds stage constant and varies model). Debt/analysis: settles a
   ruling-config tier by data, adds no governed name.
+  **Datum, `native-cohort-activation` (2026-08-07): the per-batch lever paid nothing.** Every
+  delta of all four units was classed before dispatch; each unit carried at least one
+  design-bearing delta, so no batch was downgradeable and all four rode Opus. That is evidence
+  *for* the per-build-class rule above — the classification was cheap and correctly returned
+  *no* — but it warns that a whole iteration can be design-bearing, so the lever's expected
+  value depends on the mix a scope cuts, which the A/B must sample rather than assume.
   **Cost while deferred:** low and non-rotting — validate's adopted downgrade
   already banks the affordable half of this lever, and the prerequisite that
   made the rows provisional has now landed; the residue is that
@@ -2947,19 +2949,22 @@
   the resolver to avoid a false stamp. A capture affordance that must be evaded to stay
   accurate is miscalibrated, and evasion is not a property the channel can rely on — the
   next author does not know to evade, which is precisely when the count goes wrong.
-  **The heuristic is most wrong exactly where filing matters most** — attested 2026-08-06,
-  when a build session's held-remainder filing was stamped `recurrence of` the head entry
-  purely because its prose named the entry it is the remainder *of*. The highest-value
-  citations are the ones that name their parent: a successor, a remainder, a correction. The
-  routing consequence is the expensive half — a recurrence tells close to stamp a date onto
-  an existing entry, so uncorrected this would have absorbed a follow-up unit into an entry
-  that had just completed. It was caught at capture, the first firing that was; the
-  corrective is already legal, so what is missing is not a mechanism but any prompt telling
-  the filer to check.
-  **Second firing 2026-08-07, on a scope session's own filing.** A gap bullet naming
-  `ruling-record-condition-staleness-probe` **in order to distinguish itself from it** —
-  three sentences arguing the two are separate findings — was stamped a recurrence of
-  exactly that entry. The predicted worst case twice running, both from the capture side.
+  **The heuristic is most wrong exactly where filing matters most, and that is settled by
+  four attestations rather than argued** (2026-08-06, and three on 2026-08-07). The
+  highest-value citations are the ones that name their parent — a successor, a remainder, a
+  correction, or a bullet arguing it is *distinct* from the entry it names — and every firing
+  was one of those. The routing consequence is the expensive half: a recurrence tells close to
+  stamp a date onto an existing entry, so uncorrected the first would have absorbed a follow-up
+  unit into an entry that had just completed. All four were caught, none by the mechanism; the
+  corrective is already legal, so what is missing is not a mechanism but any prompt telling the
+  filer to check.
+  **The resolver never checks the section** — the third and fourth firings named slugs resolving
+  **only** in `## Done`, which the drain contract already rules is not a recurrence at all. That
+  is the sharpest statement of the defect: the one rule here that is mechanically decidable is a
+  rule the drain applies by hand and the producer does not apply. It is a fix rather than a
+  design question, and the half a scope can take without settling the discriminator.
+  **At threshold — enters the next scope's proposed set on that basis**, whatever the theme:
+  two dates on `recurrence:` and the only entry standing there.
   **One of three faces of the same bounded-substring predicate** — `recurrence-drain-input-widening`
   asks what the drain misses when no bullet exists, this asks what it over-counts, and
   `recurrence-resolver-literal-match-only` asks what it misses when a bullet exists and does
@@ -3469,12 +3474,16 @@
   over condition-bearing rulings that escalates, plus whatever declaration makes a condition
   machine-readable — a ruling stating its own discharge event is the design question, since a
   prose condition carries no syntactic tell.
-  **Verified live at this close: one condition unfired, one already missed.** The
-  `gate-sdk/SPEC.md` rows conditioned on the first binaries tag still hold — the newest tag
-  publishes no binaries and predates the workflow steps that would build them. The companion
-  ruling naming one specific iteration's close as the tag point did *not* hold: that close
-  passed without cutting the tag, and no surface says so. That is the shape a probe catches
-  and a discharging unit cannot.
+  **Verified live at the 2026-08-06 close: one condition unfired, one already missed.** The
+  `gate-sdk/SPEC.md` rows conditioned on the first binaries tag still held, and the companion
+  ruling naming one specific iteration's close as the tag point did *not*: that close passed
+  without cutting the tag, and no surface said so. That is the shape a probe catches and a
+  discharging unit cannot.
+  **The unfired condition fired at the 2026-08-07 close** — v0.22.0 is the first tag publishing
+  binaries, so every row conditioned on it discharged in one event. Re-read those rows against
+  the tag rather than against this paragraph: what the entry now attests is that a *second*
+  condition changed state with no probe watching, which is the recurrence the deliverable exists
+  to catch rather than a fact about any one row.
   **Why `[design-pending]`:** the condition vocabulary is the whole design, and the
   escalation-only boundary rules out the cheap fix.
   **Cost while deferred:** a ruling read as live after its condition passed steers the very
@@ -3634,6 +3643,108 @@
   member, who reads the convention, finds the shipped counter-example, and re-derives which
   half to follow.
   Filed 2026-08-07 by close, from the workflow-surface-extension audit its roster made due.
+
+- **consumer-smoke-accounting-spelling-unpinned** [design-pending] — the accounting reads both
+  gate spellings, and nothing holds it there.
+  `run-consumer-smoke.sh`'s registration accounting now unions `check-*.sh` with `check-*.gate`
+  (gate-sdk/SPEC.md §Consumer smoke — the registration accounting), but that widening is stated
+  in prose and pinned by no fixture. The defect it prevents is the silent one: a ported gate
+  dropping out of the accounting's universe leaves no probe, no declaration and no finding, so
+  a regression reads as a clean run rather than a red.
+  **Why `[design-pending]`:** the harness is a `bin/` tool rather than a registry member, which
+  is exactly what `check-gate-assertions`' assertion C cannot reach, so pinning it means
+  standing up a second whole-consumer scratch tree inside a fixture — the cost is the design
+  question, not the assertion.
+  **Cost while deferred:** the one accounting that proves a ported gate is still counted is
+  itself uncounted, and its failure mode is invisible by construction.
+  Trigger: the next unit touching that accounting, or a second gate cohort porting.
+  Filed 2026-08-07 by close, promoting the lead's gap-inbox filing at `d790c10`.
+
+- **release-asset-claim-class-owner** [design-pending] — a reader-facing claim about what a
+  Release ships is maintained by hand, with no oracle.
+  `docs/install.md`'s cargo bullet asserts what a tagged release publishes. The descriptors unit
+  corrected the sentence and **ruled the gap accepted-ungated** rather than minting a gate:
+  the class has exactly one instance, and a registry for one member is the move the payload-claim
+  design refuses on its own axis. This entry carries that ruling's named trigger so it survives
+  the gap inbox's truncation.
+  **Why `[design-pending]`:** the open question is whether a release-asset claim is its own class
+  or a second axis of `check-payload-claim`'s vocabulary — one asks what a Release *ships*, the
+  other what a consumer *receives*, and collapsing them wrongly is harder to unwind than leaving
+  them apart.
+  **Cost while deferred:** one published claim about Release contents sits on the adoption path
+  held only by hand — the exact shape that produced `payload-disclosure-claim-owner` one claim
+  class over.
+  Trigger: a **second** release-asset claim appearing on any governed surface, at which point
+  both axes collapse into `check-payload-claim` rather than into a third gate.
+  Filed 2026-08-07 by close, promoting spec's gap-inbox filing at `06e379c`.
+
+- **build-stage-tightened-gates-write-pair** [design-pending] — the stage template names one of
+  the two writes a tightened gate owes.
+  `lifecycle-kit/templates/stages/build.md` instructs a build session to append the bare gate
+  name to `.workflow/tightened-gates.txt`. That is half the obligation: the dated release note
+  owes a matching bullet, and `check-tightened-gates-note-parity` holds the two against each
+  other **in the same commit**. A session following the template literally stages an incomplete
+  pair and reds its own commit.
+  **Two independent build batches hit this in one iteration**, which is what makes it a template
+  defect rather than a session lapse — the second batch had no way to learn from the first.
+  **Why `[design-pending]`:** the deliverable is nameable (say both writes, cite the parity
+  gate), so the open part is only placement — whether the note bullet belongs in the build
+  template, in the release runbook the template would then have to load, or in the gate's own
+  red output, which is the surface that already knows both halves. A scope may promote this
+  straight to a task.
+  **Cost while deferred:** every build stage that tightens a gate reds once and re-derives the
+  second write from the gate's failure, which is the knowledge-friction loop paying for a
+  sentence.
+  Filed 2026-08-07 by close, carried from build batch 4.
+
+- **cargo-grant-committed-vs-overlay** [design-pending] — a commit-time requirement is granted
+  only by an untracked file.
+  The dogfood ruling made `cargo build --release --manifest-path native/Cargo.toml` a
+  **commit-time** requirement in this tree (CLAUDE.md §Housekeeping), so every session now runs
+  it — yet `Bash(cargo build *)` and `Bash(cargo test *)` live in the gitignored
+  `.claude/settings.local.json` and not in the committed allowlist. Measured this iteration:
+  six calls granted only by the overlay. A fresh clone that installs the hooks therefore prompts
+  on the command the hook effectively requires, and the grant that makes the tree workable is
+  the one thing a clone does not receive.
+  **Why `[design-pending]`:** widening the committed allowlist is the consumer's call, not a
+  session's (guard-kit/SPEC.md §The triage criterion), and the honest options differ in breadth —
+  a glob over all `cargo build`, an exact grant of the one manifest-pinned command, or routing
+  the build through a tracked `bin/` script that is granted by path like every other kit tool.
+  **Cost while deferred:** the friction lands hardest on a first-time contributor, who meets it
+  before any of the tooling that would explain it.
+  Filed 2026-08-07 by close, from its own prompt-friction triage.
+
+- **align-checklist-fanout-calibration** [design-pending] — align converges at zero divergence
+  while build finds the defects it should have caught.
+  **Read this entry as calibration, not as the revert signal.** The standing align tiering ruling
+  names one live revert trigger: *a missed spec defect surfacing as a build round-trip*. It did
+  **not** fire this iteration — every defect was fixed in-envelope by the build session that
+  found it, none round-tripped, and nothing here is grounds to revert the tier. Conflating the
+  two is the specific misreading this entry exists to prevent.
+  **What did happen, `native-cohort-activation`.** Align passed all four amendments at zero
+  divergence. The four build batches then found **ten** real defects. Six were fan-out and roster
+  misses of one shape: a section a change touched that the amendment's "Existing sections updated"
+  roster failed to name, or a reader-facing surface still asserting a predicate the change
+  retired — twice in the release note itself, which is the front door.
+  **Most were catchable two ways**, and neither is a judgment call: grep the unit slug tree-wide,
+  and read each delta against its own **DoD** rather than against its "what this keeps" list. The
+  second is the sharper one — a "keeps" list is the author's claim about what a change does not
+  touch, so align reading it as a boundary inherits the exact blind spot that produced the miss.
+  **Why `[design-pending]`:** a mechanical fan-out check over an amendment's roster is a real
+  candidate and is already filed as `amendment-update-target-coverage`, so the open question is
+  the split — how much of this is a checklist edit to the align template, how much is a gate, and
+  whether a "keeps" list should keep its standing as an input at all.
+  **A second, separate failure class, recorded beside this one rather than folded into it.** The
+  validate session — also Sonnet — ended its turn on work still running in order to wait for it,
+  which its standing dispatch policy forbids outright. Corrected in-flight; it recovered fully,
+  re-verifying the first run's actual state rather than assuming it. That is a **protocol** miss,
+  not a judgment miss, and it belongs to the dispatch-policy surface rather than to align's
+  checklist. Kept adjacent because both are tier-calibration evidence and the two get read
+  together; kept distinct because a fix for either does nothing for the other.
+  **Cost while deferred:** align keeps returning a clean verdict that build then falsifies, so
+  the stage's signal value decays toward zero while its cost does not — and a zero-divergence
+  pass is read as evidence the amendments were right.
+  Filed 2026-08-07 by close, from the lead's per-batch tiering watch.
 
 ## Icebox
 

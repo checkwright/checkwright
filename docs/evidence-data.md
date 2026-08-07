@@ -77,3 +77,4 @@
 | background-producer-liveness | sc sp a b v c | 6f/1d | 4 · ≤0d | 23s clean | 95 |
 | native-first-port-cohort | sc sp a b v c | 6f/0d | 3 · ≤0d | 23s clean | 96 |
 | delegation-burn-reduction | sc sp a b v c | 5f/3d | 3 · ≤1d | 31s 1✗ | 97 |
+| native-cohort-activation | sc sp a b v c | 8f/1d | 4 · ≤0d | 24s clean | 98 |
