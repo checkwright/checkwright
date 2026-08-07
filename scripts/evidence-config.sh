@@ -9,7 +9,7 @@ while IFS=$'\t' read -r _suite _tests _checks; do
     declare "EVIDENCE_KIT_RUN_$_suite=bash gate-sdk/bin/run-gate-tests.sh $_tests${_checks:+ $_checks}"
 done < <(gate_fixture_suites)
 unset _suite _tests _checks
-EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests trend_tests demo installer_smoke consumer_smoke upgrade agents_md_smoke index_tests native_crate)
+EVIDENCE_KIT_SUITES+=(guard_tests usage_tests budget_guard_tests dispatch_guard_tests trend_tests demo installer_smoke consumer_smoke upgrade agents_md_smoke index_tests native_crate)
 
 EVIDENCE_KIT_PARSER=exit-code
 
@@ -19,6 +19,7 @@ EVIDENCE_KIT_RUN_gates='env GATE_SDK_VERBOSE=1 bash gate-sdk/bin/run-gates.sh'
 EVIDENCE_KIT_RUN_guard_tests='bash guard-kit/bin/run-guard-tests.sh'
 EVIDENCE_KIT_RUN_usage_tests='bash delegation-kit/bin/run-usage-tests.sh'
 EVIDENCE_KIT_RUN_budget_guard_tests='bash delegation-kit/bin/run-budget-guard-tests.sh'
+EVIDENCE_KIT_RUN_dispatch_guard_tests='bash delegation-kit/bin/run-dispatch-guard-tests.sh'
 EVIDENCE_KIT_RUN_trend_tests='bash delegation-kit/bin/run-trend-tests.sh'
 EVIDENCE_KIT_RUN_demo='bash demo/run-demo.sh'
 EVIDENCE_KIT_RUN_installer_smoke='bash installer/consumer-smoke/run-smoke.sh'

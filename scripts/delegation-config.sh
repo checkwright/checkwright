@@ -1,6 +1,10 @@
 # shellcheck shell=bash
 # spec: delegation-kit/SPEC.md §Layout and configuration — this repo's delegation-kit consumer config
 
+# spec: delegation-kit/SPEC.md §The delegation model — this repo's D2 roster: audit-sweep is dispatched read-only by its own agent-definition description ("it mutates nothing"); stage-session is not read-only and stays off, and a type with no Edit/Write tools is still not exempt from declaring isolation once dispatched read-only (it still reaches git through its shell) — there is none such in this roster today
+# shellcheck disable=SC2034  # consumed by delegation-kit/templates/agent-dispatch-guard.sh after sourcing
+DELEGATION_KIT_READONLY_TYPES=(audit-sweep)
+
 # spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; usage-trend.sh reports the evolution
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_USAGE_HISTORY=".metric/usage-history.log"

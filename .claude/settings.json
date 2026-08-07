@@ -154,6 +154,10 @@
           {
             "type": "command",
             "command": "bash scripts/agent-budget-guard.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash scripts/agent-dispatch-guard.sh"
           }
         ]
       }

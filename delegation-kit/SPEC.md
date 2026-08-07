@@ -978,10 +978,12 @@ delegation-kit/
   bin/usage-trend.sh              # footprint trend reporter over the history log
   bin/run-usage-tests.sh          # verdict decision-table runner
   bin/run-budget-guard-tests.sh   # budget-guard decision-table runner
+  bin/run-dispatch-guard-tests.sh # dispatch-guard decision-table runner (D1/D2/D3)
   bin/run-trend-tests.sh          # trend-reporter assertion runner
   lib/delegation.sh               # shared helpers for the usage tools and the kit's gates
   usage-tests/cases.tsv           # expected-verdict <TAB> scenario knobs
   usage-tests/budget-guard-cases.tsv  # expected-action <TAB> scenario knobs
+  usage-tests/dispatch-guard-cases.tsv  # expected-outcome <TAB> scenario knobs
   usage-tests/trend-history.log   # fixture history for the trend runner
   checks/check-gate-tamper.sh
   checks/check-rule-citation.sh
@@ -1082,6 +1084,23 @@ layout as defaults):
   filter: a
   prefix the consumer declared cannot be lost, and without `gate.sh` the config
   is used exactly as written.
+- `DELEGATION_KIT_READONLY_TYPES` — agent-type names the consumer dispatches for
+  read-only work; D2's only trigger (§The delegation model). Default empty, in
+  which case D2 is inert by construction. Every entry is the consumer's own
+  agent roster, never the kit's (CLAUDE.md §The provenance seam) — the same
+  reasoning that ships `GUARD_KIT_BREADTH_PROBES` with no default probes.
+  Deliberately not knobbed alongside it, each ruled out for a stated reason: a
+  fork-type-name knob and an accepted-isolation-values knob — `fork` and
+  `worktree` are the **harness's** dispatch vocabulary, and a guard template
+  carries its harness's tool vocabulary as literals the same way
+  `wakeup-guard.sh` matches `ScheduleWakeup`/`CronCreate` literally, so
+  knobbing them would imply a portability the mechanism does not have; a
+  warn-only or per-rule opt-out — a doctrine downgradable per session is the
+  honour system these rules exist to end, so the valve stays the whole guard's
+  registration, never a finer one; and accepting `isolation: remote` as
+  satisfying D2 — plausibly correct (a remote agent cannot touch the local
+  index) but unverified from here, and remote availability is gated, so it is
+  excluded with its reason recorded rather than admitted on plausibility.
 
 `check-gate-tamper` registers in the consumer's `gates.list`
 (tier: precommit) — in this repo's too; dogfooding is day-one, and agents
@@ -1220,6 +1239,36 @@ result: PAUSE → `block` (exit 2, verdict on stderr), OK/RESET-OK/STALE/unreada
 its firing (PAUSE) and non-firing (the four advise cases) — the fixture-pair
 discipline again — and every case asserts the live verdict text rides the
 output so a memory-quoted percentage cannot be the acting source.
+
+`agent-dispatch-guard.sh` takes its own decision-table lane rather than
+guard-kit's `guard-tests/` (keyed on a command, or a to+message — neither can
+express a dispatch's parameters, the same reason the budget guard has its own
+runner) or the budget guard's table (a different payload grammar again):
+`usage-tests/dispatch-guard-cases.tsv` pairs an expected outcome
+(`block`/`advise`/`fallthrough`) with `subagent_type isolation nested desc`,
+and `bin/run-dispatch-guard-tests.sh` drives the *template* with a built Agent
+hook payload — `tool_input.subagent_type`/`.isolation`, and, for a nested case,
+the top-level `agent_id`/`agent_type` the harness only sets inside a subagent —
+classifying block (exit 2) / advise (exit 0, `additionalContext` present) /
+fallthrough (exit 0, empty stdout). The table fixes one roster for its whole
+run, `DELEGATION_KIT_READONLY_TYPES=(ro-type)`, supplied through a generated
+config file and `DELEGATION_KIT_CONFIG_FILE`; a `subagent_type` prefixed
+`noroster:` runs instead with no config file at all (an empty declare),
+stripped before it reaches the guard — the row that proves D2 is inert on the
+roster's *absence*, not merely on this dispatch's type missing from a
+populated one. Every rule carries a firing and a non-firing case (the
+fixture-pair discipline, transplanted): D1 — a fork blocks, a typed dispatch
+under an empty roster does not; D2 — a rostered type without isolation blocks,
+the same type with `isolation: worktree` does not, an unrostered type under a
+populated roster does not, and the empty-roster case does not; D3 — a payload
+carrying `agent_id` advises, one without it falls through. The degradation
+posture gets its own case rather than being asserted only in prose: an
+unparseable payload (`subagent_type` `UNPARSEABLE`, sent as invalid JSON on
+stdin) advises rather than blocks — the assertion that makes delta 6's
+fail-open-but-loud posture testable, not merely stated, and the one case this
+lane must not drop for brevity. The runner strips ambient `DELEGATION_KIT_*` at
+every invocation, the discipline `run-budget-guard-tests.sh` already uses, so a
+consumer's live roster or config-file pointer cannot leak into the fixture.
 
 `smoke/install.sh` copies the templates and `bin/` tools into the scratch
 consumer, registers the tamper gate, and drives one crafted snapshot

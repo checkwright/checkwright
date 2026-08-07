@@ -1,0 +1,30 @@
+# Agent dispatch-guard decision table — <decision><TAB><subagent_type><TAB><isolation><TAB><nested><TAB><desc>.
+# decision is block (exit 2) / advise (exit 0, additionalContext) / fallthrough
+# (exit 0, no output). Tab-separated; # and blank lines ignored. '-' marks an
+# absent isolation/nested value — never a truly empty field between tabs, since
+# a whitespace IFS collapses runs of empty fields (the exact bug the guard's own
+# jq-to-read split works around; see agent-dispatch-guard.sh).
+#
+# The runner fixes one roster for the whole table: DELEGATION_KIT_READONLY_TYPES=(ro-type).
+# A subagent_type prefixed 'noroster:' runs with no roster config at all (an
+# empty declare), proving D2 stays inert on the roster's absence rather than on
+# this type's absence from a populated one; the prefix is stripped before it
+# reaches the guard's payload. subagent_type UNPARSEABLE sends invalid JSON on
+# stdin instead of a built payload.
+
+# D1 — the fork ban is unconditional
+block	fork	-	-	a fork dispatch blocks regardless of isolation or roster
+fallthrough	noroster:other-type	-	-	a typed, non-fork dispatch is not blocked (no roster configured)
+
+# D2 — a declared read-only type without isolation: worktree
+block	ro-type	-	-	a rostered type dispatched without isolation: worktree blocks
+fallthrough	ro-type	worktree	-	the same rostered type with isolation: worktree does not block
+fallthrough	other-type	-	-	a typed dispatch outside a populated roster does not block
+fallthrough	noroster:ro-type	-	-	D2 stays inert against an empty roster, even naming the type that would otherwise match
+
+# D3 — nested-dispatch advisory (never blocks)
+advise	other-type	-	yes	a payload carrying agent_id advises: this dispatch creates a grandchild
+fallthrough	other-type	-	-	a payload with no agent_id falls through D3 untouched
+
+# Degradation — fail-open, but loud
+advise	UNPARSEABLE	-	-	an unparseable payload advises rather than blocks, naming what could not be enforced

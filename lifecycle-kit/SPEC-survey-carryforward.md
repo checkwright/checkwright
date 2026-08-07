@@ -398,8 +398,9 @@ Each named with the delta that owns it.
 Stated here because a later author working one unit will not read the others.
 
 - **To `fork-dispatch-prohibition` / `read-only-fanout-unenforceable` /
-  `subagent-parent-addressing`** (this batch's first amendment,
-  `delegation-kit/SPEC-dispatch-shape.md`). That amendment's delta 4 prescribes a
+  `subagent-parent-addressing`** (this batch's first amendment, merged into
+  delegation-kit/SPEC.md §The delegation model — its `A child's only upward
+  route is a durable artifact` rule). That merged rule prescribes a
   **durable artifact** as a dispatched child's only upward route. This one
   prescribes a **durable artifact** for a stage's survey findings. They are
   deliberately different artifacts and must not be merged: the escalation channel

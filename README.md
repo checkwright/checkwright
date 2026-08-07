@@ -133,6 +133,7 @@ bash gate-sdk/bin/run-gate-tests.sh guard-kit/gate-tests                        
 bash guard-kit/bin/run-guard-tests.sh                                               # guard-kit decision table
 bash delegation-kit/bin/run-usage-tests.sh                                          # delegation-kit usage accounting
 bash delegation-kit/bin/run-budget-guard-tests.sh                                   # delegation-kit budget guard
+bash delegation-kit/bin/run-dispatch-guard-tests.sh                                 # delegation-kit dispatch-shape guard
 bash delegation-kit/bin/run-trend-tests.sh                                          # delegation-kit trend reader
 bash context-kit/bin/run-index-tests.sh                                             # context-kit index tools
 cargo test --release --manifest-path native/Cargo.toml                              # native crate unit tests

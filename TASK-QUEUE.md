@@ -12,78 +12,6 @@
 
 ## New Features
 
-- **fork-dispatch-prohibition** [spec: SPEC-dispatch-shape.md] — state the never-a-fork
-  rule where dispatchers read it, and arm it at the dispatch call.
-  A context-inheriting fork dispatched by the align stage as a read-only audit completed
-  the whole stage instead, commits included: a fork reads its parent's job as its own.
-  The rule that exists reaches neither the dispatcher nor this failure — it binds the
-  lead's intent-oracle dispatch alone, on model-tier grounds, in a template no stage
-  session reads, while delegation-kit says nothing about forks at all.
-  **Recurred 2026-08-04** in scope's own survey fan-out as a self-replicating fork
-  cascade, operator-recovered (the promotion mechanism it motivates lives under
-  `incident-recurrence-promotion-signal`). **Recurred again 2026-08-06 in
-  `native-first-port-cohort`, and priced:** ten of twenty-four dispatched agents were
-  forks — 20.90 USD of roughly 159 USD priced burn. Each of close's five carries the line
-  "stated here because your agent definition does not carry it", so fork was chosen to
-  inject rules the roster types lack, not for context inheritance: every one received a
-  self-contained brief and still paid to re-materialize its parent's context.
-  **The one design cost is answered rather than designed away.** It read that the
-  kit-shaped form must ship as a delegation-kit template with a consumer binding, not a
-  repo-local script. That is a pattern this repo has shipped twice — `agent-budget-guard`
-  and guard-kit's `escalation-guard` — so the blocker resolved by citation; the amendment
-  records the correction.
-  **Deliverable:** the per-context statement in the agent-execution template, the
-  lead-template shrink to a citation, and the hook arm. Ruling, mechanism, and the hook
-  payload the enforcement rests on: the amendment.
-  Filed 2026-08-03 at close from the gap inbox; found by the align stage's own failure.
-  Promoted 2026-08-07 by spec.
-
-- **read-only-fanout-unenforceable** [spec: SPEC-dispatch-shape.md] — prose cannot confine
-  a fork, and the violation is not hypothetical.
-  Verified from an align journal: four forks were dispatched with prose-only "read-only
-  investigation, no edits" instructions; one ignored it, edited the journal, and made a
-  real unreviewed commit **directly on the shared branch**. The content was later found
-  sound and kept rather than reverted — which is the point: the supervising session's
-  diff-every-agent-commit duty ran *after the fact, on a fait accompli*, instead of gating
-  the landing.
-  **Why prose cannot hold it:** a subagent inherits the full toolset regardless of
-  instruction text, and every agent type available for audit-shaped work carries write
-  tools or at least a shell reaching `git`. None of the four was confined by anything but
-  text a model may silently ignore, and none was worktree-isolated.
-  **Deliverable:** a dispatch-shape rule — a read-only claim is made by isolation, not by
-  sentence — with its enforcement at the dispatch call. The ownership question this was
-  filed against is ruled in the amendment (delegation-kit owns it; lifecycle-kit's stage
-  dispatch is a consumer, not a second owner), as is the rewrite the existing template
-  prose needs — it currently reserves worktree isolation for *mutating* agents, which is
-  the reading that licensed the attested commit.
-  Ships in kits, so it is a **product** defect, not repo housekeeping.
-  Filed 2026-08-02 at close from the gap inbox; observed during an align stage; promoted
-  2026-08-07 by spec.
-
-- **subagent-parent-addressing** [spec: SPEC-dispatch-shape.md] — a fan-out dispatched by
-  a stage session has no route back to the session that dispatched it.
-  **Merged 2026-08-06** with `fanout-child-dispatcher-addressing` (filed 2026-08-01,
-  retired by that merge): one defect filed twice, neither citing the other. Attested three
-  times across two iterations — an align fan-out and a close fan-out both messaged the
-  lead instead of their dispatcher, ruling out a mis-worded prompt and a local fluke.
-  **Upward is impossible, not merely unstated** — settled 2026-08-06 by a two-level probe.
-  The child's sends to an invented dispatcher name and to its own agent-type name both
-  failed; only `to: "main"` succeeded, landing in the top session and skipping the
-  dispatcher. Neither level knows its own identity or its parent's, so no prompt and no
-  dispatch convention can supply the address: it does not exist.
-  **Downward works, given the handle** — the dispatch return carries an opaque child
-  handle at the nested level too, so what failed was a dispatcher parked on a *foreground*
-  dispatch, holding neither the handle nor a turn. Dispatch shape, not a gap.
-  **A third cause the probe found:** the message and stop tools are *deferred* for a
-  dispatched agent, and the task tools were absent outright, so a child needing to escalate
-  may not hold the channel at all.
-  **Deliverable:** the upward-channel contract — a durable artifact for anything mid-run,
-  return-value-only otherwise, the downward dispatch-shape rule, and the refused
-  address option kept with its evidence. The probe's re-ranking and the depth clause's
-  enforcement are ruled in the amendment, which the channel contract owed and now has.
-  Filed 2026-08-01 at close as the older slug; merged and probe-settled 2026-08-06 at
-  operator direction; promoted 2026-08-07 by spec.
-
 - **cross-stage-census-duplication** [spec: SPEC-survey-carryforward.md] — consecutive
   stages re-derive the same census because nothing carries a fan-out's findings forward.
   **Measured 2026-08-06.** In `native-first-port-cohort`, scope dispatched a port-candidate
@@ -3675,5 +3603,8 @@
 ## Done
 
 - stage-fanout-burn-unbilled
+- fork-dispatch-prohibition
+- read-only-fanout-unenforceable
+- subagent-parent-addressing
 
 ## Lessons Learned
