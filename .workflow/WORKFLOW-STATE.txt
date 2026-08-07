@@ -9,3 +9,4 @@ native-cohort-activation spec ac8db4c7 2026-08-07
 native-cohort-activation align a3e3a736 2026-08-07
 native-cohort-activation build ad9ea370 2026-08-07
 native-cohort-activation validate afaf3400 2026-08-07
+native-cohort-activation close a40401e0 2026-08-07
