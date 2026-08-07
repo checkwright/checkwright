@@ -11,3 +11,4 @@ delegation-burn-reduction align a3ac5c7d 2026-08-07
 delegation-burn-reduction build a8619385 2026-08-07
 delegation-burn-reduction build a2762530 2026-08-07
 delegation-burn-reduction build a93a2361 2026-08-07
+delegation-burn-reduction build a2c7876c 2026-08-07
