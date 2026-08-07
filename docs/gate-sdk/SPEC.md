@@ -779,8 +779,11 @@ design time; the last three were paid for, and each is named with what it cost.
    (`native-artifact-install-path`). Both halves of the model therefore ship. What a
    second port waits on is not a build: the first tag publishing binaries as Release
    assets is the operator's call (TRAJECTORY.md), so no adopter can reach a prebuilt
-   binary until it is cut, and `consumer-smoke-artifact-arm` records that the
-   placement branch has no executing test until one is.
+   binary until it is cut. The placement branch does not wait on that tag for its
+   evidence — `consumer-smoke-artifact-arm` gave the consumer smoke a leg that builds
+   the binary and packs it, so every invocation drives selection, pre-write digest
+   verification and placement against a real artifact
+   (installer/README.md §The consumer smoke).
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives

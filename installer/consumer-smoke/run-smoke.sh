@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, and a same-version seam arm over the two surfaces init rewrites every run, the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a same-version seam arm over the two surfaces init rewrites every run, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,7 +16,8 @@ say() { printf '  %s\n' "$*"; }
 fail() { printf 'INSTALLER-SMOKE: FAIL — %s\n' "$*"; exit 1; }
 blocked() { printf 'INSTALLER-SMOKE: %s\n' "$*" >&2; exit 2; }
 
-for tool in npm node jq git tar sha256sum; do
+# spec: installer/README.md §The consumer smoke — cargo and rustc join the preflight because the artifact arm builds the binary it packs; they refuse here with every other missing tool, since a machine that cannot compile the crate has not falsified the install path
+for tool in npm node jq git tar sha256sum cargo rustc; do
     command -v "$tool" >/dev/null 2>&1 || blocked "$tool not found on PATH — the smoke cannot run."
 done
 [[ -z "$(git -C "$REPO" status --porcelain)" ]] \
@@ -52,6 +53,9 @@ printf 'profile invariant\n'
 source "$PKG_ROOT/lib/common/profile.sh"
 # shellcheck source=../lib/common/lock.sh
 source "$PKG_ROOT/lib/common/lock.sh"
+# spec: installer/README.md §The gate binary — which members an omission covers is derived from the payload, so the arm asserting the record reads that derivation out of the installed package rather than carrying a second copy of it
+# shellcheck source=../lib/common/recipe.sh
+source "$PKG_ROOT/lib/common/recipe.sh"
 mapfile -t PAYLOAD_KITS < <(profile_payload_kits "$PKG_ROOT")
 [[ ${#PAYLOAD_KITS[@]} -gt 0 ]] || fail "the installed payload carries no kit"
 mapfile -t PROFILES < <(profile_names "$PKG_ROOT")
@@ -95,7 +99,7 @@ consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
 
 # spec: installer/README.md §The consumer smoke — one encoding of the post-conditions, read by both transports, so the two arms cannot drift into asserting different things about the same install; ENTRY is the invocation of the installed entry point and RUN_PATH the PATH every step runs under, which is what lets the download arm mask node/npm without a second copy of the assertions
 assert_install() {   # $1 = profile, $2 = scratch consumer dir
-    local profile="$1" C="$2" out rc before after LOCK mismatch checked path want got target seam bin list
+    local profile="$1" C="$2" out rc before after LOCK mismatch checked path want got target seam bin list k m line omitted want_omitted n_omitted
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" init --profile "$profile" 2>&1 )" \
         || { printf '%s\n' "$out" >&2; fail "init failed for the $profile profile"; }
@@ -140,24 +144,45 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "$profile: the re-run left the worktree dirty"
     say "re-run: tree unchanged"
 
-    # spec: installer/README.md §The consumer smoke — the artifact arm takes whichever outcome the payload and host produce: with a packed artifact the target, the digest and an executable binary at the seam's path; with none, the omission arm below, which is what reds if init ever records an artifact the payload did not carry
+    # spec: installer/README.md §The gate binary — the arm takes whichever of the selection outcomes the payload and host produce, and the set init must omit is derived from the consumer's own vendored tree rather than spelled here: a literal would read as green on today's tree, where nothing dispatches to a binary, and stop asserting on the first tree where something does
     target="$(jq -r '.artifact.target // ""' "$LOCK")"
     seam="$(lock_own_file "$LOCK" /gate-sdk-config.sh)"
+    list="$(lock_own_file "$LOCK" /gates.list)"
+    [[ -n "$list" ]] || fail "$profile: the manifest records no gates.list"
+    omitted="$(sed -n 's/^# omitted: \([^[:space:]]*\).*$/\1/p' "$C/$list" | sort)"
+    want_omitted="$(
+        for k in "${lock_kits[@]}"; do
+            while IFS= read -r m; do
+                [[ -n "$m" ]] || continue
+                [[ -f "$C/$k/checks/$m.gate" && ! -f "$C/$k/checks/$m.sh" ]] && printf '%s\n' "$m"
+            done < <(recipe_gates "$k")
+        done | sort
+    )"
+    n_omitted="$(grep -c . <<<"$omitted")"
     if [[ -n "$target" ]]; then
         [[ -n "$seam" && -f "$C/$seam" ]] || fail "$profile: an artifact is recorded but no gate-sdk config seam names its path"
         bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$seam" | head -n1)"
         [[ -n "$bin" && -x "$C/$bin" ]] || fail "$profile: no executable gate binary at '${bin:-<unset>}'"
         [[ "$(sha256sum "$C/$bin" | cut -d' ' -f1)" == "$(jq -r '.artifact.digest' "$LOCK")" ]] \
             || fail "$profile: the installed gate binary does not match the digest the manifest recorded"
-        say "artifact: $target verified in place at $bin"
+        # spec: installer/README.md §The manifest — the binary and the seam are files init wrote, so both are on the roster it records: a path init created and did not record reads as "never installed" next run, which is the reading that lets the following install write straight through it
+        for path in "$bin" "$seam"; do
+            [[ "$(jq -r --arg f "$path" '.files | has($f)' "$LOCK")" == "true" ]] \
+                || fail "$profile: init wrote $path on the placement path but the manifest roster does not record it"
+        done
+        [[ "$n_omitted" -eq 0 ]] \
+            || fail "$profile: the artifact was placed, so nothing is omitted, yet the registry declares $n_omitted: $omitted"
+        say "artifact: $target verified in place at $bin, recorded with the seam, nothing omitted"
     else
-        list="$(lock_own_file "$LOCK" /gates.list)"
-        [[ -n "$list" ]] || fail "$profile: the manifest records no gates.list"
-        ! grep -q '^# omitted:' "$C/$list" \
-            || fail "$profile: the registry declares omitted members while the manifest records no artifact"
         [[ -z "$seam" ]] || ! grep -q '^GATE_SDK_NATIVE_BIN=' "$C/$seam" \
             || fail "$profile: no artifact was installed, yet the config seam points at a gate binary"
-        say "artifact: none packed — omitted, and nothing claims one"
+        [[ "$omitted" == "$want_omitted" ]] \
+            || fail "$profile: the registry omits [${omitted//$'\n'/ }] where this payload dispatches [${want_omitted//$'\n'/ }] to the binary"
+        while IFS= read -r line; do
+            [[ -z "$line" || "$line" =~ ^#\ omitted:\ [^[:space:]]+\ [^[:space:]]+$ ]] \
+                || fail "$profile: malformed omission record '$line' — the record carries a member and the reason token naming its remedy"
+        done < <(grep '^# omitted:' "$C/$list")
+        say "artifact: none packed — $n_omitted member(s) omitted and declared, exactly the ones this payload dispatches to a binary"
     fi
 
     out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
@@ -351,5 +376,95 @@ done
 [[ -z "$(git -C "$SC" status --porcelain)" ]] || fail "the seam arm's re-run left the worktree dirty"
 say "seam: ${SEAM_EDITED[*]} preserved, reported and still recorded at init's hash"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, and the same-version seam arm)\n' "${#PROFILES[@]}"
+# spec: installer/README.md §The consumer smoke — the artifact arm builds the binary it packs rather than fabricating a stand-in with a matching digest: a stand-in would drive the placement path while leaving the one thing most likely to break — the real build's digest agreeing with what init verifies before writing — covered by nothing
+printf 'artifact arm (host build, placement branch and the two refusals)\n'
+# spec: gate-sdk/SPEC.md §Layout and configuration — the native knobs are read through gate-sdk's own accessors, from the tree under test, so the arm cannot drift from the roster or from a knob override; in a subshell because the library auto-sources a consumer config seam off the current directory and this script is not one of its consumers
+native() {   # $@ = a gate-sdk accessor and its arguments, resolved against the tree under test
+    # shellcheck source=../../gate-sdk/lib/gate.sh
+    ( cd "$REPO" && source gate-sdk/lib/gate.sh && "$@" )
+}
+NATIVE_BIN="$(native gate_native_bin)"; NATIVE_BIN="${NATIVE_BIN##*/}"
+NATIVE_CRATE="$(native gate_native_crate)"
+ROSTER_FILE="$(native gate_native_targets_file)"
+[[ "$ROSTER_FILE" == /* ]] || ROSTER_FILE="$REPO/$ROSTER_FILE"
+mapfile -t ROSTER < <(native gate_native_targets)
+[[ ${#ROSTER[@]} -gt 0 ]] \
+    || blocked "no declared target at $ROSTER_FILE — there is no platform set to build for."
+HOST_TARGET="$(rustc -vV 2>/dev/null | awk '/^host:/{print $2}')"
+[[ -n "$HOST_TARGET" ]] || blocked "rustc reported no host target — the arm cannot tell which roster line this machine satisfies."
+# spec: installer/README.md §The consumer smoke — pack refuses a roster target no leg built, so a host build satisfies --artifacts only while the roster is this host alone; the moment it declares a second target the arm blocks here naming its own remedy rather than packing a payload with a hole in it
+[[ ${#ROSTER[@]} -eq 1 && "${ROSTER[0]}" == "$HOST_TARGET" ]] \
+    || blocked "the roster declares ${ROSTER[*]} and this host is $HOST_TARGET — a host build no longer satisfies pack's all-targets demand. Steer this arm's pack at the host alone with GATE_SDK_NATIVE_TARGETS_FILE, or give the leg a cross-compiling build."
+
+ART="$SCRATCH/artifacts/$HOST_TARGET"
+mkdir -p "$ART"
+build_out="$(cargo build --release --manifest-path "$REPO/$NATIVE_CRATE/Cargo.toml" 2>&1)" \
+    || { printf '%s\n' "$build_out" >&2; blocked "the crate would not compile for $HOST_TARGET."; }
+BUILT="$REPO/$NATIVE_CRATE/target/release/$NATIVE_BIN"
+[[ -x "$BUILT" ]] || blocked "cargo reported success but there is no executable at $BUILT."
+cp "$BUILT" "$ART/$NATIVE_BIN" || fail "could not stage the built binary for packing"
+# spec: gate-sdk/SPEC.md §Consumer payload — the digest is emitted once, here, where the bytes are produced: pack re-verifies this sidecar and init verifies it again before writing, so both readers check a value neither of them computed
+( cd "$ART" && sha256sum "$NATIVE_BIN" > "$NATIVE_BIN.sha256" ) \
+    || fail "could not emit the digest sidecar beside the built binary"
+[[ -z "$(git -C "$REPO" status --porcelain)" ]] \
+    || fail "the build leg left the worktree dirty — the crate's output must land in gitignored build space and the artifact directory in the smoke's own scratch"
+
+ARTP="$SCRATCH/artifact-pack"
+mkdir -p "$ARTP"
+PACK_OUT="$(INSTALLER_PACK_TMP_DIR="$SCRATCH" bash "$REPO/scripts/pack-installer.sh" \
+    --version "$VERSION" --out "$ARTP" --artifacts "$SCRATCH/artifacts" 2>&1)" \
+    || { printf '%s\n' "$PACK_OUT" >&2; blocked "the artifact pack step failed."; }
+say "$(grep -m1 '^PACK:' <<<"$PACK_OUT")"
+shopt -s nullglob
+art_tarballs=("$ARTP"/*.tgz)
+shopt -u nullglob
+[[ ${#art_tarballs[@]} -eq 1 ]] || fail "expected exactly one artifact tarball, found ${#art_tarballs[@]}"
+( cd "$ARTP" && tar -xzf "${art_tarballs[0]##*/}" ) || fail "tar could not extract the artifact tarball"
+PAY_ART="$ARTP/package/payload/artifact"
+[[ -f "$PAY_ART/targets.list" && -f "$PAY_ART/$HOST_TARGET/$NATIVE_BIN" && -f "$PAY_ART/$HOST_TARGET/$NATIVE_BIN.sha256" ]] \
+    || fail "the artifact payload carries no complete $HOST_TARGET artifact beside a verbatim roster copy"
+say "built $NATIVE_BIN for $HOST_TARGET and packed it with the sidecar this leg emitted"
+
+ENTRY=(bash "$ARTP/package/bin/checkwright.sh")
+RUN_PATH="$PATH"
+C="$(consumer artifact)" || fail "could not build a scratch consumer for the artifact arm"
+assert_install starter "$C"
+LOCK="$C/checkwright.lock"
+# spec: installer/README.md §The gate binary — target resolution is asserted against what the toolchain says this host is, not against whatever init selected: the two derivations are independent (uname pair versus rustc's own triple) and only comparing them catches a mapping that resolves confidently to the wrong roster line
+[[ "$(jq -r '.artifact.target' "$LOCK")" == "$HOST_TARGET" ]] \
+    || fail "init selected '$(jq -r '.artifact.target' "$LOCK")' where rustc reports this host as $HOST_TARGET"
+[[ "$(jq -r '.artifact.digest' "$LOCK")" == "$(awk 'NR==1{print $1}' "$ART/$NATIVE_BIN.sha256")" ]] \
+    || fail "the manifest records a digest other than the one this arm's build leg emitted"
+
+# spec: installer/README.md §The gate binary — the third selection outcome, and the one the other two are told apart from: a host the payload never committed to omits and declares, so it must exit clean and write a registry rather than refuse the way a declared-but-absent target does
+printf '%s\n' "other-${HOST_TARGET#*-}" > "$PAY_ART/targets.list" \
+    || fail "could not narrow the payload roster off this host"
+NC="$(consumer artifact-undeclared)" || fail "could not build a scratch consumer for the undeclared-host leg"
+out="$( cd "$NC" && "${ENTRY[@]}" init --profile starter 2>&1 )" \
+    || { printf '%s\n' "$out" >&2; fail "init refused a payload that simply does not commit to this platform — 'never declared' omits and declares, it does not fail the install"; }
+[[ "$(jq -r 'has("artifact")' "$NC/checkwright.lock")" == "false" ]] \
+    || fail "the payload declares no artifact for this host, yet the manifest records one"
+say "host off the payload roster: omitted and declared, install clean"
+cp "$ROSTER_FILE" "$PAY_ART/targets.list" || fail "could not restore the payload roster"
+
+# spec: installer/README.md §The gate binary — the verification is pre-write, so the assertion is on the consumer's tree and not only on the exit code: a warn-then-install would exit non-zero too, and only an untouched tree tells the two apart
+printf 'tampered\n' >> "$PAY_ART/$HOST_TARGET/$NATIVE_BIN"
+TC="$(consumer artifact-tampered)" || fail "could not build a scratch consumer for the tampered-artifact leg"
+before="$(git -C "$TC" rev-parse 'HEAD^{tree}')"
+out="$( cd "$TC" && "${ENTRY[@]}" init --profile starter 2>&1 )"; rc=$?
+[[ "$rc" -ne 0 ]] || { printf '%s\n' "$out" >&2; fail "init installed a gate binary whose bytes do not match the digest published beside it"; }
+[[ "$(git -C "$TC" rev-parse 'HEAD^{tree}')" == "$before" && -z "$(git -C "$TC" status --porcelain)" && ! -f "$TC/checkwright.lock" ]] \
+    || fail "the digest refusal left the consumer changed — it was checked after something was written, not before"
+say "tampered artifact: refused with nothing written"
+
+# spec: installer/README.md §The gate binary — a declared target whose artifact went missing is the outcome that must not collapse into the omission above: same host, same roster, and the only difference is the missing pair, so a run that omitted here would be reading a broken payload as a narrower one
+rm -f "$PAY_ART/$HOST_TARGET/$NATIVE_BIN" || fail "could not remove the declared target's binary"
+AC="$(consumer artifact-absent)" || fail "could not build a scratch consumer for the declared-but-absent leg"
+out="$( cd "$AC" && "${ENTRY[@]}" init --profile starter 2>&1 )"; rc=$?
+[[ "$rc" -ne 0 ]] || { printf '%s\n' "$out" >&2; fail "the payload declares $HOST_TARGET and carries no artifact for it, and init installed anyway — a broken payload read as a narrower one"; }
+[[ ! -f "$AC/checkwright.lock" && -z "$(git -C "$AC" status --porcelain)" ]] \
+    || fail "the broken-payload refusal still wrote into the consumer"
+say "declared target with no artifact: refused, not omitted"
+
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
 exit 0
