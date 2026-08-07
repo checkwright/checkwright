@@ -213,7 +213,13 @@ would invalidate every survey, which returns the mechanism to zero use. The
 
 ### 3. `bin/file-survey.sh` — the writer
 
-**{mechanical}**
+**{design-bearing}**
+
+*(Tagged `{mechanical}` when authored; corrected at align's finding. The delta's
+own prose below calls its auto-stamping decision "the delta's one non-obvious
+point" and "load-bearing", which is the definition of design-bearing the
+stage-template's work-class rule states. The tier call is the operator's; this
+note records the correction so the contract stops contradicting itself.)*
 
 `bin/file-survey.sh "<question>" "<corpus>" "<oracle>" "<finding>"` appends one
 block, seeding the contract header when the record does not yet exist. It follows
