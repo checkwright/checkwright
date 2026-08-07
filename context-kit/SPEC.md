@@ -282,7 +282,15 @@ The constrained members and what forces each:
   the battery at all rather than failing one gate. The representative member is
   the binary carrying a forcing construct, which is also the floor predicate's
   own comparison tool.
-- `cargo:1.56` — a **contributor/build** floor, not a runtime one: it is forced by
+- `cargo:1.56` — a **contributor-side** floor, never a runtime one, and it carries
+  two tiers because two kinds of tree read it. Where a `.gate` descriptor is live
+  it is a **commit-time** floor — `gate_command` puts the binary on the pre-commit
+  path and is fail-closed on an absent one, so the battery will not run without a
+  built crate (gate-sdk/SPEC.md §What the dispatch seam does not settle); that is
+  this repo, once its first cohort lands. Everywhere else it stays the weaker
+  **contributor/build** floor: a consumer tree receives a prebuilt binary and never
+  a crate, so nothing there compiles at commit time. Both tiers rest on the same
+  forcing fact —
   the `native/` crate's `edition = "2021"`, the first edition rustc accepts at
   1.56. `cargo` is the member rather than `rustc` because `cargo build` is what the
   contributor routine and the `gates` workflow actually invoke, and the two ship as

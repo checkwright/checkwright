@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **native-gate-dogfood-ruling** [spec: SPEC-dogfood.md] — must this repo run built
-  artifacts? **Ruled yes**; the ruling, its trade in both directions, and the ground
-  that makes it forced rather than preferred are the amendment's
-  (`gate-sdk/SPEC-dogfood.md`). Unit **1 of 4** and first by a forced ordering
-  (TRAJECTORY.md §The closed rulings): landing a descriptor settles this question by
-  implementation, which is the move `init-claim-stickiness` ruled against, so the spec
-  pass precedes the code.
-  **Scope of the deltas:** gate-sdk/SPEC.md §What the dispatch seam does not settle
-  (the dogfooding paragraph retired for the settlement), context-kit/SPEC.md's
-  `cargo:1.56` roster entry (its contributor-side tier sharpens to commit-time where a
-  descriptor is live), and one sentence on §check-gate-binary-fresh.
-  **Every sentence lands as a rule, never as a count** — the present-tense tree turns
-  are `native-gate-cohort-descriptors`', because turning them here would assert a state
-  that does not exist yet.
-  **One entry premise is false and the amendment corrects it:** this ruling adds no pin
-  to `context-kit/lib/toolfloor.sh`'s probe roster — `cargo:1.56` is already a member at
-  the already-correct floor, so `PROBE_SET` and its parity with `docs/install.md` are
-  undisturbed. What changes there is prose.
-  Filed 2026-08-02 by spec, restoring a ground a compression dropped; promoted
-  2026-08-07 at spec.
-
 - **consumer-smoke-artifact-arm** [spec: SPEC-smoke-artifact.md] — the placement
   branch never executes. `installer/consumer-smoke/run-smoke.sh` packs with no
   `--artifacts`, so the gate binary's placement path — target resolution, pre-write
@@ -3762,5 +3741,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- native-gate-dogfood-ruling
 
 ## Lessons Learned

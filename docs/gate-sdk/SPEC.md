@@ -940,20 +940,49 @@ Recorded because a deferral nobody wrote down is indistinguishable from a
 question nobody asked — and this entry has already lost worked arguments to
 compression once.
 
-**Dogfooding is open again, and the revert is what reopened it.** While the port
-was live this read: a registered member dispatching to a compiled subcommand at
-`tier=precommit` puts `gate_command` on the pre-commit path, `gate_command` is
-fail-closed on an absent binary, so this repo built and ran the binary at commit
-time and `cargo` was a hard commit-time requirement. With no `.gate` member left,
-none of that holds: **no gate dispatches to the binary, and `cargo` is not
-required to commit.** What the repo still does is weaker and worth stating
+**Dogfooding is ruled, not deferred: this repo runs built artifacts.** It is
+recorded here rather than left to the first live port because making a compiled
+toolchain a precondition of this repo's own battery is a change to what the
+contract *means*, and settling one in code first is the move
+`init-claim-stickiness` ruled against (TRAJECTORY.md §The closed rulings). Both
+halves hold at once — a port is what *determines* the answer, and the answer is
+written down before the port lands.
+
+**The mechanism, stated as a rule rather than as a count.** A registered member
+dispatching to a compiled subcommand at `tier=precommit` puts `gate_command` on
+the pre-commit path, and `gate_command` is fail-closed on an absent binary
+(§lib/gate.sh) — so wherever a `.gate` descriptor is live in this tree, the repo
+builds and runs the binary at commit time and `cargo` is a **commit-time**
+requirement here rather than a build-and-CI one. That is true before and after
+any particular descriptor lands, which is why it is a condition on descriptors
+and not a claim about how many exist.
+
+**Where the tree stands meanwhile.** With no `.gate` member registered, none of
+that has bitten yet: **no gate dispatches to the binary, and `cargo` is not
+required to commit.** What the repo does today is weaker and worth stating
 exactly — `check-gate-substrate-parity` reads the binary's `--list` roster *when
 it is built*, and CI builds, clippies and tests the crate. The toolchain floor
-pin stays for those (context-kit/SPEC.md §bin/env-probe); it is a build-and-CI
-floor now, not a commit-time one. `native-gate-dogfood-ruling` is therefore live
-rather than decided, and the lesson that outlasts both readings is that
-*porting one gate decided it* — the dogfood question is settled by the first
-live port, whenever that lands, and not by argument beforehand.
+pin stays for those (context-kit/SPEC.md §bin/env-probe) at its build-and-CI
+tier, and sharpens to the commit-time tier under the rule above.
+
+**The trade, in both directions**, recorded because a ruling whose cost is not
+written down gets reopened by whoever first pays it. It **costs**: the battery
+depends on a compiled toolchain at every commit, `cargo` moves from a
+build-and-CI floor to a commit-time one for this tree, and a fresh clone cannot
+commit until it has built the crate once. It **buys** what the alternative
+forfeits: running the shell scripts here would keep that toolchain optional and
+keep the port's headline benefit unmeasurable in the one tree that exercises it
+daily.
+
+**And the alternative is not actually available, which is the ground that stops
+this being re-argued as a preference.** A descriptor and its shell script cannot
+coexist in one resolve dir (§check-gate-substrate-parity assertion A), and the
+kit tree this repo runs its gates from *is* the tree that vendors to consumers.
+There is no arrangement in which a consumer dispatches to the binary while this
+repo runs the shell script. Ruling *no* would therefore not be "this repo
+dogfoods differently" — it would be refusing the port outright, against the
+PRIORITY DIRECTIVE (TRAJECTORY.md). The ruling is forced by mechanism, which is
+the durable form of the older reading that *porting one gate decides it*.
 
 **Vendoring has left this section — it is ruled, not deferred.** The slice's
 claim that it "ships no artifact and changes nothing about how a kit installs"
@@ -976,10 +1005,10 @@ once already. §The extensibility model rules it.
 **Opacity has left this section — it is ruled, not deferred.** The slice was
 argued under the reading that opacity is *not* claimed, and that reading is void:
 §Consumer payload rules withholding a gate's predicate a goal, and states
-precisely what the claim is and is not. What this section keeps is the narrower
-question the ruling does not reach — whether *this* repo runs built artifacts
-rather than source, which stays `native-gate-dogfood-ruling`, sharpened by the
-pivot rather than answered by it.
+precisely what the claim is and is not. The narrower question the opacity ruling
+does not reach — whether *this* repo runs built artifacts rather than source —
+was sharpened by the pivot rather than answered by it, and is now ruled in its
+own right at the head of this section.
 
 **The language-agnostic reading is visible and not built.** The layer above the
 descriptor is substrate-blind (§The `# graph:` manifest), which makes a
@@ -999,8 +1028,9 @@ it.
 
 What a gate on the binary substrate **discloses** to the consumer it judges.
 Its reach is exactly that: it rules what a *gate* ships, not whether this repo
-runs built artifacts — that is `native-gate-dogfood-ruling`, which asks the same
-lever from the other end. How a compiled gate *arrives* is ruled at §Porting a
+runs built artifacts — that is the same lever from the other end, and it is
+ruled at §What the dispatch seam does not settle. How a compiled gate *arrives*
+is ruled at §Porting a
 gate to the binary substrate (criterion 5) and implemented by
 `native-artifact-publish-path` and `native-artifact-install-path`; this section
 is what arrives with it.
@@ -2259,6 +2289,18 @@ root, so it is never vendored). The tree side is `gate_native_source_stamp`
 on a mismatch. The failure text names both stamps, the descriptors that dispatch
 to the binary, and the rebuild command, so the remedy is in the output rather than
 in a reader's memory.
+
+**Running the crate's tests does not discharge the rebuild, and this is measured
+rather than reasoned.** `cargo test` compiles its own harness — a different
+artifact from the binary `GATE_SDK_NATIVE_BIN` names, which is what this gate
+reads. A full `cargo test --release` can pass every test in the crate, including
+the one proving both substrates compute the source stamp identically, and leave
+this gate red on the stamp baked into a stale binary. So the obligation is
+`cargo build --release` as **its own named step**: a tree with a live descriptor
+must build the binary before it commits, and a contributor routine that states a
+`cargo test` line has not stated that step. Recorded here because the omission is
+invisible from a green test run — the exact shape of vacuous green the section
+above exists to refuse.
 
 **Trigger coupling: zero descriptors is a clean report, not a skipped assertion.**
 No gate dispatches to the binary, so nothing can run stale — the same coupling
