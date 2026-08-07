@@ -318,6 +318,43 @@ descriptors entry asserted "no further ruling is owed" and has since yielded a
 hard blocker under each of two independent examinations. A third is not
 excluded, and the standing direction is to escalate one rather than absorb it.
 
+**CORRECTION appended 2026-08-07 at close, by operator ruling. The text above
+stands unstruck; one of its stated grounds does not.** The ordering clause
+immediately above claims that landing unit 3 without unit 2 would red both smoke
+harnesses **and every adopter on `init`'s own omit path**. The adopter half is
+**false**, and it was falsified by oracle during unit 3's build rather than by
+argument: `recipe_gates` in `installer/lib/common/recipe.sh` is the whole of a
+consumer's starting registry, and it names neither binary meta-gate. A real
+`init` consumer built with both descriptors on disk, both replaced `.sh` files
+deleted, no binary and no crate ran **24 of 24 green with zero `# omitted:`
+lines**. The witness is runnable and the finding is recorded at
+`.workflow/survey-record.md` (2026-08-07, build).
+
+**The smoke half was true, and true by a different mechanism than the one stated
+here.** `run-consumer-smoke.sh` did red — but because `site-kit/smoke/install.sh`
+registers both ported gates for its own scratch consumer, not because the
+meta-gates glob disk. A registered member dispatching with no binary is an
+ordinary harness error; it needed no registry-blindness to arrive. Getting the
+mechanism right matters more than getting the verdict right, because the next
+port reads this clause for *which trees to check* — and the answer is two
+questions, not one: which trees **declare** a descriptor, and which trees
+**register** it.
+
+**The decision this ruling made is unaffected and stands.** Unit 2 earned its
+place on grounds this correction does not touch: it made `init`'s placement
+branch executable for the first time, and it fixed an assertion that was
+inverted — asserting the *absence* of the `# omitted:` record where the design
+requires asserting its presence, and passing only because nothing had yet
+ported. The ordering was right; one of the four sentences arguing for it was
+not.
+
+This is appended rather than substituted deliberately, and the reason is the
+record's own purpose. Striking the clause would destroy the evidence of what was
+believed when the unit was pulled in, which is exactly what a ruling record
+exists to preserve. Leaving it silent would let the next reader lean on a ground
+that no longer holds. A recorded ruling is closed to reversal; it is not closed
+to a correction that says which of its grounds survived contact with an oracle.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
