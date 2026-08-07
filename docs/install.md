@@ -98,16 +98,21 @@ your `PATH`, and the note says what breaks without it:
 - `shellcheck` — the `check-shellcheck` meta-gate runs
   [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
   lint finding blocks the commit.
-- `cargo` (≥ 1.56) — a contributor-and-CI requirement with **no install-time
-  role at all**: the `native/` crate carries the gate implementations that can
-  dispatch to a binary subcommand, and the floor is the crate's
-  `edition = "2021"`. Only contributors building the tree need it — no gate
-  dispatches to the binary today, so a commit does not require it; CI builds,
-  lints and tests the crate every run. Installing Checkwright never builds it
-  and never will: every tagged release now publishes a prebuilt binary for each
-  platform in the declared target roster, and `init` picks yours and verifies it
-  against its published digest, so no install path asks you for Rust. A gate on
-  that substrate shells out to git at runtime and embeds nothing.
+- `cargo` (≥ 1.56) — a **contributor** requirement with **no install-time role at
+  all**: the `native/` crate carries the gate implementations that dispatch to a
+  binary subcommand, and the floor is the crate's `edition = "2021"`. Gates in
+  this repo now dispatch there, so a contributor builds the binary
+  (`cargo build --release --manifest-path native/Cargo.toml`) **before
+  committing** — `cargo test` compiles a different artifact and does not
+  discharge it; CI builds, lints and tests the crate every run. Installing
+  Checkwright never builds it and never will. The binary reaches an adopter as a
+  prebuilt Release asset for a declared target, digest-verified before `init`
+  writes it, and where no asset matches your host `init` omits the ported gates
+  from your registry and records why — so no install path asks you for Rust. That
+  publish path is built and the first tag carrying those assets has not yet been
+  cut; until it is, a release ships the payload alone and an adopter runs the
+  omit path by default. A gate on that substrate shells out to git at runtime and
+  embeds nothing.
 
 <!-- toolchain:end -->
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# graph: couples=kit:checks/*.gate,native/* dir=one valve=none tier=precommit
-# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — whenever a .gate descriptor makes the binary load-bearing, the binary was built from the source now in the tree
+# graph: couples=kit:checks/*.gate,scripts/gates.list,native/* dir=one valve=none tier=precommit
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — whenever a registered member resolving to a .gate descriptor makes the binary load-bearing, the binary was built from the source now in the tree
 #
 # usage: check-gate-binary-fresh.sh [gates-dir] [tree-stamp-file]
 #   No second argument: computes the tree-side stamp from the crate's tracked
@@ -13,6 +13,7 @@ source "$SDK/lib/gate.sh"
 
 GATES_DIR="${1:-$(gate_sdk_gates_dir)}"
 STAMP_FILE="${2:-}"
+LIST="$GATES_DIR/gates.list"
 BIN="$(gate_native_bin)"
 CRATE="$(gate_native_crate)"
 REBUILD="cargo build --release --manifest-path $CRATE/Cargo.toml"
@@ -31,19 +32,36 @@ mapfile -t DESCRIPTORS < <(
     done | sort -u
 )
 
-# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — zero descriptors is a clean report,
-# not a skipped assertion: nothing dispatches to the binary, so nothing can run stale.
-# Deliberately *not* the split-halves shape check-gate-substrate-parity assertion B
-# uses, for the reason that section states.
-if [[ ${#DESCRIPTORS[@]} -eq 0 ]]; then
-    echo "GATE-BINARY-FRESH: clean (0 .gate descriptor(s) across ${#RESOLVE_DIRS[@]} resolve dir(s), so nothing dispatches to $BIN and no build can be stale; crate $CRATE unread)"
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — a descriptor on disk is a declaration; a
+# registered member resolving to one is a dispatch, and only a dispatch makes the binary
+# load-bearing. The live registry is therefore an input, and an absent one is "cannot verify".
+[[ -f "$LIST" ]] || {
+    echo "check-gate-binary-fresh: no gate registry at $LIST — the live member set is what decides whether the binary is load-bearing, so the check could not run; treating as failure (not clean)" >&2
+    echo "  help: pass the gates dir carrying gates.list as the first argument, or set GATE_SDK_GATES_DIR." >&2
+    exit 2
+}
+mapfile -t DISPATCHING < <(
+    while IFS= read -r m; do
+        [[ -n "$m" ]] || continue
+        src="$(gate_resolve "$m" "${RESOLVE_DIRS[@]}")" || continue
+        [[ "$src" == *.gate ]] && printf '%s\n' "$m"
+    done < <(gates_list_members "$LIST")
+)
+
+# spec: gate-sdk/SPEC.md §check-gate-binary-fresh — nothing dispatching is a clean report, not a
+# skipped assertion: no gate dispatches to the binary, so nothing can run stale. Both counts are
+# named, so a reader can tell "no descriptors" from "descriptors nothing dispatches to".
+# Deliberately *not* the split-halves shape check-gate-substrate-parity assertion B uses, for
+# the reason that section states.
+if [[ ${#DISPATCHING[@]} -eq 0 ]]; then
+    echo "GATE-BINARY-FRESH: clean (${#DESCRIPTORS[@]} .gate descriptor(s) across ${#RESOLVE_DIRS[@]} resolve dir(s), 0 dispatched to by a live member of $LIST, so nothing dispatches to $BIN and no build can be stale; crate $CRATE unread)"
     exit 0
 fi
 
 # spec: gate-sdk/SPEC.md §Fail-closed contract — with the binary load-bearing, an absent
 # or unreadable one is "cannot verify", which must not share an exit code with "verified fresh"
 if [[ ! -x "$BIN" ]]; then
-    echo "check-gate-binary-fresh: $BIN is absent or not executable, but ${#DESCRIPTORS[@]} .gate descriptor(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
+    echo "check-gate-binary-fresh: $BIN is absent or not executable, but ${#DISPATCHING[@]} registered member(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
     echo "  help: build it — $REBUILD" >&2
     exit 2
 fi
@@ -77,12 +95,12 @@ if [[ "$baked" != "$tree" ]]; then
     echo "check-gate-binary-fresh: the gate binary was not built from the source now in the tree:"
     echo "  $BIN reports source stamp $baked"
     echo "  $source_desc hashes to $tree"
-    echo "  ${#DESCRIPTORS[@]} descriptor(s) dispatch to that binary: ${DESCRIPTORS[*]}"
+    echo "  ${#DISPATCHING[@]} descriptor(s) dispatch to that binary: ${DISPATCHING[*]}"
     echo "  help: rebuild it — $REBUILD"
     echo "        Until then the descriptor-named gate(s) above run the old implementation"
     echo "        and pass on code that is not what is committed."
     exit 1
 fi
 
-echo "GATE-BINARY-FRESH: clean (${#DESCRIPTORS[@]} .gate descriptor(s) across ${#RESOLVE_DIRS[@]} resolve dir(s); $BIN built from the source now in $source_desc, stamp $baked)"
+echo "GATE-BINARY-FRESH: clean (${#DESCRIPTORS[@]} .gate descriptor(s) across ${#RESOLVE_DIRS[@]} resolve dir(s), ${#DISPATCHING[@]} dispatched to by a live member of $LIST; $BIN built from the source now in $source_desc, stamp $baked)"
 exit 0

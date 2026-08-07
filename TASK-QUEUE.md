@@ -12,30 +12,6 @@
 
 ## New Features
 
-- **native-gate-cohort-descriptors** [spec: SPEC-cohort-descriptors.md] — the first
-  cohort's two `.gate` descriptors, held back from the port that proved them, go live.
-  Unit **3 of 4**. `native-gate-binary-port` ported `check-action-pinning` and
-  `check-action-gh-repo` and proved both byte-identical, then held the declaration
-  half; the first-binaries tag is cut at this iteration's close.
-  **The held-descriptor premise was half wrong, verified by oracle at spec.** A
-  vendored `.gate` with no binary reds a consumer's battery — true. That the tag
-  clears it — false. Both binary meta-gates glob `*.gate` on disk and read no
-  registry, so `run-consumer-smoke.sh` (which installs no binary by design), unit 2's
-  omission leg, and **every adopter on `init`'s own omit path** stay red no matter what
-  is tagged. The amendment carries the correction: a descriptor on disk is a
-  declaration, and only a **registered member resolving to one** makes the binary
-  load-bearing.
-  **Deliverable:** the two descriptors (manifests verbatim, non-executable, both `.sh`
-  deleted in the same commit, which may not touch `native/`); the corrected predicate;
-  the two displaced oracle configurations relocated into fixtures; the `.gate` spelling
-  in `DELEGATION_KIT_GATE_FILES`' kit default; and the prose that turns with the tree,
-  including `docs/install.md` §Requirements' cargo bullet **entire** — its structure is
-  a contrast, so correcting one half leaves it incoherent.
-  **The corrected bullet lands ungated and the amendment rules that gap** rather than
-  passing it in silence: accepted ungated, filed with its cost and a named trigger.
-  Filed 2026-08-06 at close, draining the gap inbox; captured 2026-08-06 at build.
-  Promoted 2026-08-07 at spec, on the corrected premise above.
-
 - **payload-disclosure-claim-owner** [spec: SPEC-payload-claim.md] — two governed
   install surfaces disagree about what a consumer receives. `installer/README.md`
   §init claims what governs your tree afterwards is committed source you can read —
@@ -3721,5 +3697,6 @@
 
 - native-gate-dogfood-ruling
 - consumer-smoke-artifact-arm
+- native-gate-cohort-descriptors
 
 ## Lessons Learned

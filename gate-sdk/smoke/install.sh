@@ -16,7 +16,6 @@ check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
 check-gate-substrate-parity
-check-gate-binary-fresh
 check-graph
 check-commit-msg
 check-tree-terms
@@ -37,6 +36,7 @@ check-workflow-tiering
 EOF
 
 # smoke-unregistered: check-root-tiering — its subject is the consumer-curated root manifest GATE_SDK_ROOT_ALLOWLIST (default scripts/root-allowlist.list), which no kit install can author: the vendored root set is per-adoption and gate-sdk installs first, before that set exists
+# spec: gate-sdk/SPEC.md §Consumer smoke — check-gate-binary-fresh is deliberately NOT registered here and deliberately carries no declaration: its subject is the crate the binary was built from, GATE_SDK_NATIVE_CRATE is kept outside every kit root by design, so the probe derives the exemption every run and a written reason would be the inversion the accounting refuses
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — ship the tracked default pattern list; the local companion is absent, exercising the fresh-clone path
 cp "$SDK/templates/msg-patterns.list" scripts/msg-patterns.list

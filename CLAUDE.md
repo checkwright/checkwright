@@ -143,13 +143,14 @@ load behind that trigger, so they are not resident here.
 - `reserve/` holds the crates.io name-reservation placeholder — do not develop
   in it (the npm name is the `installer/` package below).
 - `native/` is the Rust crate for gate implementations off the shell substrate —
-  one multi-call binary, one subcommand per ported gate. **No gate is ported
-  today** — the seam and both delivery halves ship, so only the porting waits.
+  one multi-call binary, one subcommand per ported gate. **The first cohort is
+  live**, so `cargo build --release --manifest-path native/Cargo.toml` is a
+  **commit-time** requirement in this tree and `cargo test` does not discharge it.
   It is **not a kit** — no `checks/`, no `smoke/`, the
   predicate that makes a root directory one; `native/target/` is gitignored and
   never committed, so its build currency is enforced rather than rostered — by
-  `check-gate-binary-fresh`, dormant until a descriptor makes the binary
-  load-bearing. Dispatch, descriptor format, port criteria and the toolchain
+  `check-gate-binary-fresh`, armed wherever a registered member resolves to a
+  descriptor. Dispatch, descriptor format, port criteria and the toolchain
   floor: gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,

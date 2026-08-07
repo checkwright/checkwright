@@ -1,0 +1,4 @@
+# Hermetic fixture registry — both descriptors are registered members, so both
+# dispatch and the stale binary is the violation this case asserts.
+check-ported
+check-vendored

@@ -1,0 +1,4 @@
+# Hermetic fixture registry — both descriptors are registered members, so both
+# dispatch and the binary is load-bearing.
+check-ported
+check-vendored

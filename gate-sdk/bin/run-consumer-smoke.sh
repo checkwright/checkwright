@@ -87,12 +87,13 @@ while IFS= read -r g; do
     [[ -n "$g" ]] && acct_registered["$g"]=1
 done < <(gates_list_members "$scratch_list")
 
+# spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting reads *declaration paths*, both spellings: a gate whose implementation ported to a compiled subcommand still ships, still earns or forfeits a scratch-battery slot, and must not leave this pass's universe by changing substrate
 shopt -s nullglob
 for r in "${roots[@]}"; do
     kit="$(basename "$r")"
     acct_root["$kit"]="$r"
-    for f in "$SCRATCH/$kit"/checks/check-*.sh; do
-        g="$(basename "$f" .sh)"
+    for f in "$SCRATCH/$kit"/checks/check-*.sh "$SCRATCH/$kit"/checks/check-*.gate; do
+        g="$(basename "$f")"; g="${g%.*}"
         acct_kit["$g"]="$kit"
     done
 done
@@ -124,16 +125,25 @@ acct_self=0
 acct_hand=0
 acct_bad=()
 acct_stale=()
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting probes through gate_command's substrate-blind dispatch, so a ported gate is probed as the gate it is rather than skipped for want of a .sh; an unresolvable dispatch is the exit-2 the contract already means by "could not run"
+acct_probe() {  # acct_probe <tree> <checks-dir> <gate>
+    local argv=()
+    mapfile -t argv < <( cd "$1" && gate_command "$3" "$2" 2>/dev/null )
+    [[ ${#argv[@]} -gt 0 ]] || return 2
+    ( cd "$1" && "${argv[@]}" ) >/dev/null 2>&1
+}
+
 acct_start_ns=$(date +%s%N)
 for g in "${acct_unreg[@]}"; do
     [[ -n "$g" ]] || continue
     kit="${acct_kit[$g]}"
-    ( cd "$SCRATCH" && "$SCRATCH/$kit/checks/$g.sh" ) >/dev/null 2>&1
+    acct_probe "$SCRATCH" "$SCRATCH/$kit/checks" "$g"
     rc_s=$?
     rc_h=""
     if [[ "$rc_s" -eq 2 ]]; then
         # spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: exit 2 is usage/environment failure generally, so the permanent exemption is granted only when the same gate does NOT exit 2 where its surface exists
-        ( cd "$HOST_TREE" && "${acct_root[$kit]}/checks/$g.sh" ) >/dev/null 2>&1
+        acct_probe "$HOST_TREE" "${acct_root[$kit]}/checks" "$g"
         rc_h=$?
         if [[ "$rc_h" -ne 2 ]]; then
             acct_selfset["$g"]=1
@@ -146,7 +156,7 @@ for g in "${acct_unreg[@]}"; do
         acct_hand=$((acct_hand + 1))
         continue
     fi
-    acct_bad+=("$kit/checks/$g.sh — scratch exit $rc_s${rc_h:+, invoking-repo exit $rc_h}")
+    acct_bad+=("$kit ships $g — scratch exit $rc_s${rc_h:+, invoking-repo exit $rc_h}")
 done
 acct_ms=$(( ($(date +%s%N) - acct_start_ns) / 1000000 ))
 

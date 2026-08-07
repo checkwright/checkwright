@@ -36,9 +36,21 @@ fail_closed "$st" check-gate-substrate-parity awk
 
 findings=()
 
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F's publishing-tree test: the
+# crate's *tracked source* is here, step 1 of §check-gate-binary-fresh's source stamp reused rather
+# than spelled twice — source, so build output under the crate root cannot read as a publisher
+crate_source_here() {
+    [[ -d "$1" ]] || return 1
+    [[ -n "$(git -C "$1" ls-files 2>/dev/null)" ]]
+}
+
 # assertion A: each member resolves to exactly one declaration — a dir carrying
 # both <name>.sh and <name>.gate is ambiguous dispatch, never resolved by order
 declared=0
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — a descriptor on disk is a declaration;
+# a registered member resolving to one is a dispatch, and only a dispatch makes the binary
+# load-bearing. Derived here because assertion A already resolves every member.
+dispatching=0
 for m in "${MEMBERS[@]}"; do
     for d in "${RESOLVE_DIRS[@]}"; do
         if [[ -f "$d/$m.sh" && -f "$d/$m.gate" ]]; then
@@ -49,6 +61,7 @@ for m in "${MEMBERS[@]}"; do
         findings+=("unresolvable member: $m declares in none of: ${RESOLVE_DIRS[*]}")
         continue
     fi
+    [[ "$src" == *.gate ]] && dispatching=$((dispatching + 1))
     declared=$((declared + 1))
 done
 
@@ -68,8 +81,10 @@ BIN="$(gate_native_bin)"
 subcommands=()
 refonly=0
 roster_read=0
-if [[ ${#DESCRIPTORS[@]} -gt 0 && ! -x "$BIN" ]]; then
-    echo "check-gate-substrate-parity: $BIN is absent or not executable, but ${#DESCRIPTORS[@]} .gate descriptor(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fail-closed arm is on the corrected
+# predicate: descriptors nothing registered dispatches to leave the binary not load-bearing
+if [[ "$dispatching" -gt 0 && ! -x "$BIN" ]]; then
+    echo "check-gate-substrate-parity: $BIN is absent or not executable, but $dispatching registered member(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
     echo "  help: build it — cargo build --release --manifest-path native/Cargo.toml" >&2
     exit 2
 fi
@@ -183,8 +198,11 @@ if [[ -f "$ROSTER" ]]; then
         [[ "$t" =~ ^[A-Za-z0-9_]+(-[A-Za-z0-9_.]+){2,3}$ ]] \
             || findings+=("malformed target triple: '$t' in $ROSTER is not <arch>-<vendor>-<os>[-<env>]")
     done
-elif [[ ${#DESCRIPTORS[@]} -gt 0 ]]; then
-    findings+=("no target roster: $ROSTER is absent, but ${#DESCRIPTORS[@]} .gate descriptor(s) need a prebuilt binary per declared target — the payload has no declared platform set to carry one for")
+elif [[ "$dispatching" -gt 0 ]] && crate_source_here "$CRATE"; then
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion F rides the corrected
+    # predicate *and* the publishing-tree test: declaring platform support is the act of the tree
+    # that builds and publishes the artifact, and a consumer receives kit roots but never the crate
+    findings+=("no target roster: $ROSTER is absent, but $dispatching registered member(s) dispatch to the binary and $CRATE carries tracked source here — a tree that builds the artifact declares the platforms it carries one for")
 fi
 
 WORKFLOW="${GATE_SDK_NATIVE_PUBLISH_WORKFLOW:-.github/workflows/publish.yml}"
@@ -280,5 +298,5 @@ if [[ "$roster_read" == 1 ]]; then
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
-echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
+echo "GATE-SUBSTRATE-PARITY: clean ($declared member(s) with one declaration each, $dispatching of them dispatching to the binary; $roster; $sensitive substrate-sensitive member(s) all dispositioned; $impl_scanned implementation source(s) free of manifest-class annotation; $kit_scanned kit root(s) scanned for an implementation sibling, crate root $CRATE outside every kit root; target roster $roster_state at $ROSTER with $roster_targets well-formed target(s); publish workflow $wf_state at $WORKFLOW, $wf_matrix matrix declaration(s) roster-derived across $wf_jobs job(s) with one producer per digest)"
 exit 0

@@ -1064,13 +1064,23 @@ layout as defaults):
   reports its counted-inert clean line (§check-agent-tier-explicit).
 - `DELEGATION_KIT_GATE_FILES` — globs naming gate files for tamper
   assertion A; default
-  `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh")` plus the gate-sdk lib and
-  runners. A consumer declaration **replaces** this default outright rather
+  `("${GATE_SDK_GATES_DIR:-scripts}/check-*.sh" "${GATE_SDK_GATES_DIR:-scripts}/check-*.gate")`
+  plus the gate-sdk lib and
+  runners. **Both declaration spellings are on the default**, because a gate's
+  declaration path is `<name>.sh` *or* `<name>.gate`
+  (gate-sdk/SPEC.md §The `# graph:` manifest)
+  and a consumer on the default would otherwise receive a
+  ported gate whose edits escape the isolation rule entirely — the widening the
+  `check-gate-tamper` row of
+  gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate
+  mandates, come due at the first live descriptor.
+  A consumer declaration **replaces** this default outright rather
   than extending it — the loader guards it with `declare -p … ||`, so the
   default is the no-declaration fallback, not a base to append to. A consumer
   adding kit-shipped globs must therefore restate any default glob it still
-  wants covered (this repo's config names `*/checks/*.sh` **and**
-  `scripts/check-*.sh`, because it has gates in both places). Contrast
+  wants covered (this repo's config names `*/checks/*.sh` and `*/checks/*.gate`
+  **and** their `scripts/check-*` counterparts, because it has gates in both
+  places). Contrast
   `DELEGATION_KIT_META_PATHS` below, whose kit-root union *is* additive — the
   two knobs do not behave alike.
 - `DELEGATION_KIT_META_PATHS` — prefixes counted as meta-layer for
