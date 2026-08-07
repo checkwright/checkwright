@@ -33,6 +33,29 @@
   Filed 2026-08-02 by spec, restoring a ground a compression dropped; promoted
   2026-08-07 at spec.
 
+- **consumer-smoke-artifact-arm** [spec: SPEC-smoke-artifact.md] — the placement
+  branch never executes. `installer/consumer-smoke/run-smoke.sh` packs with no
+  `--artifacts`, so the gate binary's placement path — target resolution, pre-write
+  digest verification, the seam knob, the artifact lock record — has no automated
+  exercise; only the **omission branch** runs. What stands behind the other half is
+  dated hand-verification, and a hand-verified path under a green suite reads as
+  covered.
+  **The open question is ruled: the smoke builds** (`installer/SPEC-smoke-artifact.md`).
+  Unit **2 of 4**, inserted 2026-08-07 by the operator because unit 1 discharges this
+  entry's only stated objection to *builds* — the `cargo` dependency — and because
+  unit 3 cannot land without it.
+  **The ground the entry lacked, verified at spec:** `pack-installer.sh --artifacts`
+  iterates **every** roster target and exits 2 on the first with no artifact directory.
+  `native/targets.list` declares exactly one (`x86_64-unknown-linux-gnu`), so a host
+  build satisfies it whole with no cross-compilation. That fact is about today's
+  roster, so the amendment records the re-entry for when it grows.
+  **Binds to unit 3 in both directions:** this unit's omission leg goes red the moment
+  descriptors land, and stays green only once unit 3 teaches the two binary meta-gates
+  to read a declared omission. Neither unit is complete without the other.
+  Distinct from `installer-upgrade-smoke-arm`, which touches no artifact.
+  Filed 2026-08-04 at close from the gap inbox; deliberately deferred at build;
+  promoted 2026-08-07 at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2767,27 +2790,6 @@
   reading away from silently leaving a mutation in the tree behind a green report.
   Filed 2026-08-03 at close from the gap inbox; observed by the lead across three
   occurrences.
-
-- **consumer-smoke-artifact-arm** [design-pending] — the placement branch never executes.
-  `installer/consumer-smoke/run-smoke.sh` packs with no `--artifacts`, so the gate binary's
-  placement path — target resolution, pre-write digest verification, the seam knob, and the
-  artifact lock record — has no automated exercise. The assertions landed with
-  `native-artifact-install-path`; only their **omission branch** runs today, and the placement
-  branch is dead until a run packs a binary.
-  **What stands behind it is dated evidence, not a standing assertion:** it was verified by hand
-  at that build against a locally built binary. A hand-verified path under a green suite reads
-  as covered, which is the whole hazard.
-  **Deliverable:** the smoke builds or fetches a binary to pack. Distinct from
-  `installer-upgrade-smoke-arm`, whose deliverable is packing twice at two versions for the
-  cross-version upgrade path and which touches no artifact.
-  **Why `[design-pending]`:** whether the smoke *builds* a binary — a `cargo` dependency the
-  suite does not have today, against the toolchain floor — or *fabricates* a stand-in with a
-  matching digest — cheap and hermetic, but then it exercises placement without exercising the
-  real producer — is unruled, and that ruling decides what the arm is worth.
-  **Cost while deferred:** the publish path ships binaries the install path is only
-  hand-verified to place, so the first regression in target resolution or digest verification
-  reaches an adopter rather than the battery.
-  Filed 2026-08-04 at close from the gap inbox; deliberately deferred at build.
 
 - **behavior-change-surface** [design-pending] — no accumulating declaration surface.
   A tightened gate has one and a behavior change does not — and gate-sdk/SPEC.md §upgrade-smoke's
