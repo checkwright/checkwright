@@ -3685,6 +3685,50 @@
   Filed 2026-08-07 by close, as the iteration's candidate lesson; the observation came from
   the lead, the evidence and the framing from this drain.
 
+- **dispatch-worktree-reds-the-battery** [design-pending] — a live agent worktree sits inside
+  the tree, is not ignored, and fails the pre-commit battery while it exists.
+  An isolated dispatch materialises `.claude/worktrees/agent-<id>/`, a full second copy of the
+  repo. `.gitignore` covers only `.claude/settings.local.json*`, so the directory shows as
+  untracked and, worse, every tree-walking gate descends into it. Measured at this close: with
+  one worktree live the battery went red on `check-comment-tier` (the whitelist is
+  path-scoped, so the copy's files dodge the match), and both `check-value-rollup-fresh` and
+  `check-enforcement-fresh` went stale because their emitters counted the duplicated `smoke/`
+  and workflow files. The same battery passed 97 of 97 the moment the worktree was released.
+  **This is now on the sanctioned path, which is what makes it worth filing.** The dispatch
+  guard landed this iteration *requires* `isolation: worktree` for a read-only agent type, so
+  the collision is no longer exotic: any session that dispatches a read-only audit the way the
+  guard demands cannot commit until that audit finishes. It cost two rejected commits here.
+  **Why `[design-pending]`:** ignoring the path is one line and clearly right for `git status`,
+  but it does **not** fix the gates — a gitignored directory is still walked by a `find`-based
+  scanner, so the real question is whether kit scanners owe a shared exclusion root and where
+  that roster lives. Relocating worktrees outside the repo would fix both at once and is the
+  harness's call, not the tree's.
+  **Cost while deferred:** every isolated dispatch blocks the committing session for its
+  duration, and the failure is misattributed by construction — the red names the session's own
+  files, not the dispatch, so the natural reading is that the session broke something.
+  Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches.
+
+- **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
+  a `.txt` and read like an `.md`, and the convention does not resolve the hybrid.
+  gate-sdk/SPEC.md §The workflow directory splits the directory by extension: `.txt` is a
+  record file whose grammar a gate parses field-wise, `.md` is a prose surface machine-read
+  only for emptiness or a bullet count. `.workflow/survey-record.md` does both.
+  `check-survey-record` parses every block field-wise — exact key order, no stray line,
+  non-empty `corpus` and `oracle`, and a `rev` that must be a 40-hex sha naming a real commit —
+  which is materially deeper than the `.md` tier's stated bound and is almost word-for-word the
+  `.txt` tier's test. Its content is nonetheless genuinely prose: a natural-language question
+  meant to be searched, closing on a free-form `finding` a later session judges before citing.
+  **Not a mis-typing so much as a tier the split does not have.** The tracking axis is fine and
+  the `# contract:` header is correct; what is unresolved is where a record-plus-judgment file
+  belongs when the convention offers only record or prose.
+  **Why `[design-pending]`:** the honest options are renaming the surface, widening the `.md`
+  tier's machine-read bound to admit a validating gate, or naming a third tier — and the last
+  one costs every consumer that has internalised the two.
+  **Cost while deferred:** low and non-rotting; it is paid by the next author adding a workflow
+  member, who reads the convention, finds the shipped counter-example, and re-derives which
+  half to follow.
+  Filed 2026-08-07 by close, from the workflow-surface-extension audit its roster made due.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
