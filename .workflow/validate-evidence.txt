@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+delegation-burn-reduction gates sha256=08d5ef67d8183f1fd3ebd4b19445aab556bd490809217e7ba9bea2c857ba5269 pass=97 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction gate_sdk sha256=dc6a43104da09a45baf285d375331912d745214796a752b44d9b8ccdeb35ff52 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction canon_kit sha256=fd29d62e4ed611a98b72a32b6afbef610cccd90a74d81ec0208231287fc9a1a4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction guard_kit sha256=776855f49f35b5c60d574faa8e88d370bfca381233856dae1d3be50edb34502f pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction lifecycle_kit sha256=106a4469cdbf3a4ccfc3810c189ab2f1df9a79ed21b60095bab0f90af9c7f1f7 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction queue_kit sha256=0fb8ae0cd6cd3e5357ddede4d3d4f49ae48de8b22824c6be4449400ec71f3c9f pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction demo sha256=4a863b4668fb5b9ffae9b8dbe09a9a9054359ecfd4d1cdde64651891fc0ca8f4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction installer_smoke sha256=fc71c0d51262da324c8299ceba700d7cc0e7246f5d5fcb4fa383d20c3fb2cf9f pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction consumer_smoke sha256=680aedf537544ea4623d17222ebef7507478c5bd15009c5dd5b92c1527940f0f pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-07
+delegation-burn-reduction upgrade sha256=1e9ca5bf4119fe21c2007c2cb5458cf3bd9db99d51f3d329d45c89cbea16b587 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction agents_md_smoke sha256=b717ecec0ba28747b505be0cc4a31be60734357ff6e86b75a41d0a3c586b2af2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
+delegation-burn-reduction native_crate sha256=becb739410c0a52ff244e1cce179e7de0a6964f930400c165fe4681c5f134c22 pass=1 fail=0 ignore=0 verdict=clean 2026-08-07
