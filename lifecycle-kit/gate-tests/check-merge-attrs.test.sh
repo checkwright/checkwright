@@ -63,6 +63,7 @@ mkdir -p "$uok"
 cat >"$uok/.gitattributes" <<'EOF'
 .workflow/WORKFLOW-STATE.txt merge=iteration-scoped
 .workflow/lesson-evidence.txt merge=iteration-scoped
+.workflow/survey-record.md merge=iteration-scoped
 .workflow/gap-inbox.md merge=union
 CHANGELOG.md merge=union
 EOF

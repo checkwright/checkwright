@@ -59,7 +59,7 @@ if [[ -n "$missing" || -n "$extra" || -n "$union_missing" ]]; then
     while IFS= read -r p; do
         [[ -n "$p" ]] && echo "  union-merge path with no merge=union attribute (a gap filed on either side of a concurrent merge would be silently dropped): $p"
     done <<<"$union_missing"
-    echo "  help: regenerate the marker block — bash lifecycle-kit/bin/install-lifecycle.sh — which writes one 'merge=iteration-scoped' line per boundary-truncated surface (LIFECYCLE_KIT_STATE_FILE, LIFECYCLE_KIT_LESSON_EVIDENCE_FILE, and each LIFECYCLE_KIT_BOUNDARY_TRUNCATE member) and one 'merge=union' line per union surface (LIFECYCLE_KIT_GAP_INBOX_FILE). Remove any hand-added merge=iteration-scoped attribute on a path outside the supersede set."
+    echo "  help: regenerate the marker block — bash lifecycle-kit/bin/install-lifecycle.sh — which writes one 'merge=iteration-scoped' line per boundary-truncated surface (LIFECYCLE_KIT_STATE_FILE, LIFECYCLE_KIT_LESSON_EVIDENCE_FILE, LIFECYCLE_KIT_SURVEY_RECORD_FILE, and each LIFECYCLE_KIT_BOUNDARY_TRUNCATE member) and one 'merge=union' line per union surface (LIFECYCLE_KIT_GAP_INBOX_FILE). Remove any hand-added merge=iteration-scoped attribute on a path outside the supersede set."
     exit 1
 fi
 
