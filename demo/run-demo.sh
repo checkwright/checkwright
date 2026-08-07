@@ -5,6 +5,8 @@ set -uo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../gate-sdk/lib/gate.sh
 source "$REPO/gate-sdk/lib/gate.sh"
+# shellcheck source=../gate-sdk/lib/consumer-smoke.sh
+source "$REPO/gate-sdk/lib/consumer-smoke.sh"
 
 # spec: CLAUDE.md §Housekeeping — DEMO_TMP_DIR is the only knob; default is the smoke harness's scratch base
 BASE="${DEMO_TMP_DIR:-${TMPDIR:-/tmp}}"
@@ -30,13 +32,15 @@ banner "ACT 1 — Vendor the kits into a fresh consumer"
 say "A new project adopts Checkwright by vendoring the kits and running each"
 say "kit's installer. No global install, no network — the kits are copied in."
 git -C "$SCRATCH" init -q
-printf '.tmp/\n' > "$SCRATCH/.gitignore"
+# spec: gate-sdk/SPEC.md §Consumer smoke — the placed binary is ignored rather than tracked, matching the other consumer-smoke callers, so a later `git clean -fd` spares it
+printf '.tmp/\n%s\n' "$(gate_native_bin)" > "$SCRATCH/.gitignore"
 git -C "$SCRATCH" add -A
 git -C "$SCRATCH" -c user.email=demo@example.invalid -c user.name=demo \
     commit -q --allow-empty -m "seed"
 for r in "${roots[@]}"; do
     cp -R "$r" "$SCRATCH/$(basename "$r")"
 done
+csmoke_place_binary "${roots[@]}" || fail "the native gate binary could not be placed in the scratch consumer"
 for r in "${roots[@]}"; do
     kit="$(basename "$r")"
     say "vendor + install: $kit"
