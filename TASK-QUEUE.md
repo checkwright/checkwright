@@ -80,57 +80,37 @@
   Filed 2026-08-06 at close, draining the gap inbox; captured 2026-08-06 at build.
   Promoted 2026-08-07 at spec, on the corrected premise above.
 
+- **payload-disclosure-claim-owner** [spec: SPEC-payload-claim.md] — two governed
+  install surfaces disagree about what a consumer receives. `installer/README.md`
+  §init claims what governs your tree afterwards is committed source you can read —
+  true of every tree that exists today, false at the first ported gate, since
+  `gate-sdk/SPEC.md` §Consumer payload rules a compiled gate's implementation source
+  does not ship. Unit **4 of 4**, last by the forced ordering: its claim is not false
+  until unit 3's descriptors land, so landing this earlier would publish prose ahead of
+  the tree.
+  **Defect class:** a disclosure claim about the vendored payload restated across
+  governed install surfaces with one owner and no oracle.
+  **The design is restored, not re-derived** — `canon-kit/SPEC-payload-claim.md`, off
+  the align-hardened revision (`git show 71c584e:…`). Its tense ruling was re-read
+  rather than adopted and **stands, on a firmer footing**: its condition was that the
+  port land in the same iteration, and the operator's build order now closes the
+  prose-ahead-of-tree window structurally rather than only by DoD.
+  **Deliverable, structural rather than prose:** a declared owner and an oracle, the
+  shape `check-install-claim` gives the primary-install-path claim — ruled a **sibling
+  gate** rather than that gate's extension, with the vocabulary as consumer config,
+  since a spelling of what a payload discloses is one project's distribution model.
+  **This corpus has now been hand-enumerated three times and mis-enumerated twice.** No
+  count belongs in this body — not the one this line replaces either. The enumeration
+  lives in the amendment, behind `check-payload-claim` assertion B, which is the only
+  completeness oracle the DoD accepts; `.workflow/survey-record.md` carries the witness
+  so build cites rather than re-measures.
+  Filed 2026-08-03 at close from the gap inbox; found by build batch 3. Amendment
+  authored 2026-08-06 at spec, demoted 2026-08-06 at build under the hold ruling,
+  restored and re-promoted 2026-08-07.
+
 ## Technical Debt
 
 ## Deferred
-
-- **payload-disclosure-claim-owner** [design-pending] — two governed install
-  surfaces disagree about what a consumer receives.
-  `installer/README.md` §init claims that what governs your tree afterwards is
-  committed source you can read — true of every tree that exists today and false at
-  the first ported gate, since `gate-sdk/SPEC.md` §Consumer payload rules that a
-  compiled gate's implementation source does not ship.
-  **Defect class:** a disclosure claim about the vendored payload restated across
-  governed install surfaces with one owner and no oracle.
-  **Demoted 2026-08-06 at build** (lifecycle-kit/SPEC.md §The state machine's hatches),
-  because the cohort held its descriptors and the §init claim therefore stayed
-  categorically true. **That ground is now answered rather than carried:** the descriptors
-  land this iteration, so the premise the demotion turned on is the premise that now
-  holds. One trap survives it — a drafted line reading "most gates are shell today" is
-  wrong until the descriptors actually land, and was wrong when drafted.
-  **The design is not lost and must not be re-derived.** `canon-kit/SPEC-payload-claim.md`
-  was authored 2026-08-06 at spec and settles both hard questions — the tense, and the
-  corpus. **Recover the align-hardened revision specifically: `git show
-  71c584e:canon-kit/SPEC-payload-claim.md`**, not the authoring one, which carries a
-  corpus align superseded. No count is restated here on purpose (above). Its tense ruling
-  is the one thing a re-promotion must re-read rather than adopt, since it was
-  written for an iteration that lands a descriptor.
-  **Deliverable, structural rather than prose:** a declared owner and an oracle, the
-  shape `check-install-claim` already gives the primary-install-path claim. The
-  amendment rules it a **sibling gate** rather than that gate's extension — one is
-  positional and install-section-scoped, the other is membership over the whole
-  governed doc set — and keeps the vocabulary as consumer config, since a spelling
-  of what a payload discloses is one project's distribution model.
-  **Promotion trigger — satisfied 2026-08-07.** It named `native-gate-cohort-descriptors`,
-  the unit that lands the held descriptors and thereby makes the claim false; the operator
-  ruled that unit into this iteration, so this entry rides with it.
-  **A scope-authored "corpus is short by one" correction was landed here 2026-08-07 and
-  retracted the same day, on spec's challenge. Recorded so it is not re-derived:** it
-  hand-tallied four→five off a base align had already superseded to **seven across three
-  documents**, and routed `docs/install.md`'s cargo-bullet release-asset claim into a
-  payload-*disclosure* class it does not belong to. The amendment forecloses the whole
-  move — "the count is not the fact worth landing, its own instability is", and its DoD
-  refuses a hand tally in favour of `check-payload-claim` assertion B. **No scope- or
-  spec-authored count belongs in this body at all**; the enumeration lives in the
-  amendment, behind the oracle. Third hand-enumeration of this corpus, which is the entry's
-  own defect class demonstrating itself once more.
-  **Cost while deferred:** none today — the claim it corrects is still true, which
-  is precisely why it was demoted. The cost begins the moment a descriptor lands:
-  from that commit four governed install surfaces overstate what a consumer
-  receives, with one owner and no oracle, on the adoption path.
-  Filed 2026-08-03 at close from the gap inbox; found by build batch 3. Amendment
-  authored 2026-08-06 at spec; demoted 2026-08-06 at build under the operator's
-  hold ruling.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   **Operator-ruled 2026-08-04, at the close of `ruling-capture-contracts`.** The drain that
