@@ -167,6 +167,25 @@ advances: both cohort members' rules ship now as compiled subcommands, proved
 byte-identical against the shell gates they replace. What waits is one two-line
 declaration per member, on a scheduled tag rather than on a further ruling.
 
+**The consent carries, and the next close cuts the tag — ruled 2026-08-07 by the
+operator.** This is a fresh ruling, not a re-reading of the one above: that close
+passed without cutting the tag, so the question of whether consent scoped to a
+named event survives the event was genuinely open, and it is the question a scope
+session escalated rather than answered for itself.
+
+The ground is the 2026-08-04 ruling's own spending clause. It says the escalation
+is spent **once that tag is cut**; no tag was cut, so nothing was spent and the
+consent on record is still the consent that governs. The `native-first-port-cohort`
+close named in the ruling above is therefore the close that *should* have cut it
+rather than the only close that *could*, and the next close discharges it.
+
+What this settles for the record, because the surfaces disagreed until now: the
+newest tag and the newest Release are both v0.21.0, and no tagged release has ever
+published a prebuilt binary. `ruling-record-condition-staleness-probe` found the
+companion ruling's condition already missed and recorded that **no surface says
+so** — this paragraph is that surface. The 2026-08-04 ruling still spends itself
+at the tag, exactly as it says, and ordinary cadence governs every tag after it.
+
 **`init-claim-stickiness` enters through the next scope's standing directive —
 ruled 2026-08-04.** It is neither left to win an undirected survey nor filed
 straight into an active section. The defect: `init`'s non-destructive re-run
