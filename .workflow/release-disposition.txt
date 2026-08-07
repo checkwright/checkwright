@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+native-cohort-activation release v0.22.0 — operator direction, recorded 2026-08-07: the first-binaries consent carries and this close cuts the tag with binaries; bump v0.22.0 is the derivable floor over v0.21.0 (check-release-bump), a minor, so no deprecation sweep is owed.

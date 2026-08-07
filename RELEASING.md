@@ -116,24 +116,34 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    simply has nothing to say, so the parity claim is silently forfeited.
    Enforcement of the split is this runbook's, not that gate's: a pre-commit gate
    cannot tell "note and drain in one commit" from "note authored while the
-   surface was already empty". Second: write the drain-and-stamp commit, push master,
+   surface was already empty". Second: write the **stamp** commit, push master,
    watch the `gates` run *for that SHA* go green, and only then tag that commit
    and push the tag. `CLAUDE.md` makes the remote oracle the authority over a
    master push, and a tag's whole purpose is to name an immutable tree other
    people fetch; tagging before the watch puts the tag on a tree only the local
    battery ever saw, inverting that authority invisibly — every gate is green
-   either way, and the only tell is which SHA the `gates` run carries. Stated,
-   this is one push and one watch.
+   either way, and the only tell is which SHA the `gates` run carries.
 
-   Tag with `git tag -a vX.Y.Z` on that commit, then push the tag to the origin.
-   The tag is also what discharges `.workflow/tightened-gates.txt`:
-   step 1 composed the note from it, so drain it here and only here — an
+   **The drain lands after the tag, and the parity gate is what forces it.** That
+   gate arms on a note whose declared version carries **no tag yet**, so while the
+   note is untagged it holds the note's Tightened-gates set equal to the surface —
+   which means draining before the tag reds it, with the whole composed set
+   reported as gates that never tightened. Push and watch the stamp commit, tag
+   it, push the tag; the note is then tagged, the gate goes dormant, and the drain
+   commits cleanly. Sequenced this way the release is one `gates` watch and one
+   `publish` watch, and the drain commit rides the next push rather than buying a
+   third run.
+
+   Tag with `git tag -a vX.Y.Z` on the stamp commit, then push the tag to the
+   origin. The tag is also what discharges `.workflow/tightened-gates.txt`:
+   step 1 composed the note from it, so drain it at the tag and only there — an
    iteration closing on `release none` or a deferral carries its declarations
    forward, which is exactly what the next release's note must inherit. Drain by
    **truncating to the header line**, never by clearing the file: it is a tracked
    checked projection whose header is required, and a whole-file clear reds
-   `check-workflow-tiering` on the release commit itself. Stamp
-   `<iteration> release vX.Y.Z — <basis>` into the disposition evidence.
+   `check-workflow-tiering` on the drain commit itself. Stamp
+   `<iteration> release vX.Y.Z — <basis>` into the disposition evidence, in the
+   commit the tag names.
 
    **The credential precondition — test the permission, not the scope.** The
    closing session runs steps 4-7 itself when it holds the credentials (the

@@ -1472,12 +1472,15 @@
   **ratchet** assertion rather than a cap — red when the surface grows against its
   committed baseline without the baseline being deliberately re-stamped — which
   needs no budget at all and makes the growth visible where it happens.
-  **Re-measured 2026-08-07: 213 lines, +41 against the same unmoved baseline.** The
-  ratchet advanced another 16 lines in the iterations since the reading above, so the
-  drift is compounding rather than settling, and the baseline is again deliberately
-  not re-stamped. This close's brevity pass returned one line, from a `native/` bullet
-  restating port history gate-sdk's SPEC owns — which is the measure of what a
-  pass-shaped fix recovers against a unit-shaped problem.
+  **The series, against the same unmoved baseline: 197 (+25) → 213 (+41) → 213 (+41).**
+  The middle reading advanced 16 lines and looked like compounding drift. The third,
+  at `native-cohort-activation`'s close, is the first that did **not** advance — and
+  the mechanism is worth more than the number: the iteration added exactly one line to
+  the surface and that close's pass recovered exactly that one line, both times from
+  the same `native/` bullet restating what gate-sdk's SPEC owns. So a pass-shaped fix
+  holds the line **only** against a pass-shaped increment. It recovered one of
+  forty-one when the growth was unit-shaped, and one of one when it was not. The
+  baseline stays unstamped through all three.
   **Cost while deferred:** compounding directly in the tier the whole methodology
   is trying to hold down, and paid by every session in this repo and every
   consumer that vendors context-kit. The detector is a close-stage read, so it is

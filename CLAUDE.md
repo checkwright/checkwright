@@ -147,11 +147,10 @@ load behind that trigger, so they are not resident here.
   live**, so `cargo build --release --manifest-path native/Cargo.toml` is a
   **commit-time** requirement in this tree and `cargo test` does not discharge it.
   It is **not a kit** — no `checks/`, no `smoke/`, the
-  predicate that makes a root directory one; `native/target/` is gitignored and
-  never committed, so its build currency is enforced rather than rostered — by
-  `check-gate-binary-fresh`, armed wherever a registered member resolves to a
-  descriptor. Dispatch, descriptor format, port criteria and the toolchain
-  floor: gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
+  predicate that makes a root directory one; `native/target/` is gitignored, and
+  `check-gate-binary-fresh` is what holds its currency. Dispatch, descriptor
+  format, port criteria and the toolchain floor:
+  gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,
   `SECURITY.md`, and `RELEASING.md` are governed repo-meta (tracked,
