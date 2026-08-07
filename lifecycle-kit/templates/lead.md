@@ -42,9 +42,11 @@ session rides — is standing dispatch policy (the ruling-config slot below):
   and dispatches scope itself as a stage session on the judgment tier, keeping
   that agent resumable afterward as the iteration's **intent oracle**. The
   lead's own turns are routing work — dispatch, result ingestion, budget
-  verdicts — and stop paying judgment-tier prices. The oracle must be a fresh
-  dispatch, never a fork: a fork inherits the dispatcher's model, which is
-  exactly the tier split this posture exists to make.
+  verdicts — and stop paying judgment-tier prices. The oracle is a fresh
+  dispatch under delegation-kit's **Never dispatch a fork to narrow a child**
+  rule (`templates/agent-execution.md`), of which this posture is the named
+  tier-split instance: the narrowing at stake here is the model tier, and a
+  fork inherits the dispatcher's.
 
 Under either posture the lead dispatches a stage session as a **background
 agent** whose prompt is that stage's ordinary skill invocation (`/build`,

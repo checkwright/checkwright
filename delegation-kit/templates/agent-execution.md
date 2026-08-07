@@ -63,6 +63,43 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   end its turn to wait — see the backgrounding rule). The ordering requirement
   is identical for both; only the waiting mechanism differs, and neither role
   may overlap two agents on a shared file or the git index.
+- **Never dispatch a fork to narrow a child.** A fork is wrong exactly when the
+  dispatch's purpose is that the child does *less* than the parent: a fork
+  inherits the parent's context, toolset and model tier whole and disclaims
+  nothing, so every narrowing survives only as a sentence in the prompt. Three
+  dispatching contexts, each with its own grounds. A **read-only audit or
+  survey** wants narrower *authority* — the fork carries the parent's full
+  reach, so the restriction is a request, and one such fork completed a whole
+  stage, commits included. A **tier-split oracle** wants narrower *cost* — the
+  fork inherits the dispatcher's model, which is exactly the split the posture
+  exists to make (a lead posture that dispatches its own oracle is the named
+  instance). A **rule-injection dispatch** wants a *different* brief — attested
+  where five sibling forks each carried a line explaining that the roster's
+  agent definitions do not carry it, so fork was chosen to inject rules the
+  types lack and every one still paid to re-materialize its parent's context.
+  The boundary, stated honestly: a fork stays correct where the child does the
+  **same job at the same authority** and only parallelism or isolation is
+  wanted. The dispatch guard blocks there too, because a hook cannot read
+  intent and no sanctioned fork use exists in this doctrine — the valve is
+  unregistering the hook, never a per-dispatch knob, which would restore the
+  honour system the rule replaced (delegation-kit/SPEC.md §The delegation
+  model). Grounds measured rather than asserted: in one audited iteration ten
+  of twenty-four dispatched agents were forks, carrying 20.90 USD of 158.70 USD
+  of priced burn.
+- **A read-only claim is made by isolation, not by sentence.** A dispatch whose
+  brief says "read-only, no edits" and whose *shape* grants write reach has made
+  no claim at all: a subagent inherits its toolset from its **type**, never from
+  the instruction text, and every type available for audit-shaped work carries
+  write tools or at least a shell that reaches `git` — so "it has no Edit tool"
+  is not the safety property it reads as. The claim is made by
+  `isolation: worktree`, whose commits and index are the child's own. Isolation
+  serves two purposes and only the first was ever written down here: an **own
+  index**, for an agent that *will* commit (the **Serialize on shared files**
+  rule above), and **write confinement**, for an agent *claimed* read-only. The
+  cost objection does not land — the harness auto-cleans a worktree left
+  unchanged, so the worktree survives **iff** the agent was not in fact
+  read-only, which makes the isolation simultaneously the confinement and the
+  detector.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —
@@ -104,13 +141,48 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   their final message — which makes the journal mechanic non-functional exactly
   when it matters (a long, interruptible run). So: for a **read-only fan-out**
   (audit, survey), the return value *is* the contract — don't rely on a journal.
-  Reserve the journal / worktree isolation for agents that **mutate files**, and
-  for those grant the journal path explicitly before dispatch rather than
-  assuming the write succeeds. A contract has two ends, though: the child owes
+  Reserve the **journal** for agents that **mutate files**, and for those grant
+  the journal path explicitly before dispatch rather than assuming the write
+  succeeds. **Worktree isolation is not reserved with it** — the two answer
+  different questions, and bundling them read as *a read-only fan-out needs no
+  isolation*, which is the reading that licensed an unreviewed commit on the
+  shared branch. A read-only fan-out takes isolation precisely *because* it is
+  claimed read-only (the **A read-only claim is made by isolation, not by
+  sentence** rule above). A contract has two ends, though: the child owes
   no journal, and the **parent** owes the durable landing of what it received
   before acting on it (next bullet). The caveat is about a backgrounded child's
   write failing silently, so it never licensed the parent — which has already
   demonstrated it can write, being the session that granted the path.
+- **A child's only upward route is a durable artifact.** Probed, not assumed: a
+  child's sends to an invented dispatcher name and to its own agent type both
+  failed, only a send addressed to the **top-level session** arrived, and
+  neither level knows its own identity or its parent's. There is therefore no
+  address a child can use to reach the agent that dispatched it, and four
+  dispositions follow. **(1) A durable artifact, for anything mid-run** — the
+  dispatcher mints a path, names it **absolute into the main checkout** in the
+  prompt, and the child writes as it goes. That is already the journal rule
+  above; it is now also the *only* upward route there is, and it is stronger
+  than a message would be, because a file survives a child that dies before
+  returning. A **stop signal takes the same shape** — a sentinel the child
+  checks — so it is cooperative by construction and a wedged child stays out of
+  reach. **(2) Return-value only, otherwise** — a fan-out needing no mid-run
+  channel needs no artifact, which is the read-only carve-out above. **(3) The
+  downward half is a dispatch-shape rule** — a dispatcher that wants control
+  over its fan-out dispatches in the background and keeps the handle; what
+  actually failed was a dispatcher blocked on a foreground dispatch, holding
+  neither the handle nor a turn. **(4) Naming the address a child should use is
+  refused** — there is none, and the refusal is stated rather than omitted
+  because it is the first thing both original filings reached for. Two
+  corollaries defeat the workarounds a reader would otherwise invent: a message
+  that does reach the top-level session is attributed to the sender's **type**,
+  so a fan-out wider than one is ambiguous at the receiving end; and a child
+  resumed by a message from its dispatcher still cannot reply, so being
+  addressed creates no return path. One live hazard rides with them: the
+  message and stop tools may be **deferred** for a dispatched agent — callable
+  only after a discovery call it has to know to make — so a child that needs to
+  escalate may not hold the channel at all. Hence the obligation, which is the
+  part that binds you: **a dispatcher handing out work that will need a mid-run
+  channel grants a durable path with it**, and reads that path itself.
 
 - **Findings you will act on are durable before you act on them.** A child's
   return value lives only in your context, and your context dies with your

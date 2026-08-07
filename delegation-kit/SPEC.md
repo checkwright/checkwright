@@ -182,6 +182,144 @@ than left out — an omitted `model:` resolves to the literal `inherit`, so
 omission spells the dispatcher's tier rather than a neutral absence, and
 `check-agent-tier-explicit` is that clause's oracle over the tracked surface.
 
+**The dispatch-shape rules are one mechanism, seen from several sides.** The template's **Never dispatch
+a fork to narrow a child**, **A read-only claim is made by isolation, not by
+sentence**, and **A child's only upward route is a durable artifact** rules are
+one defect seen from three sides: each governs the *shape of a dispatch call*,
+and each failed the same way — the prose did not reach the reader it binds.
+One attested surface per rule: a fork dispatched as a read-only audit completed
+a whole stage, commits included; four forks dispatched with prose-only
+"read-only, no edits" briefs, one of which committed unreviewed on the shared
+branch; and repeated fan-outs, across stages and across iterations, messaged the top-level
+session instead of their dispatcher, which no prompt wording could have fixed.
+
+**Why an oracle is owed here and not for the turn-ending rule.** §Operative
+residency closes on the finding that a restated rule is reachable, not obeyed,
+and owes no gate because no check can read a session's choice to end a turn —
+the act leaves no tracked artifact. A dispatch leaves no tracked artifact
+either, so the distinguishing axis is not durability but interception:
+
+> Where a rule binds an act that leaves no tracked artifact, the enforcement
+> question is whether the act passes a **chokepoint** — not whether it reaches
+> the tree. A dispatch does. A turn-end does not.
+
+**The chokepoint — what a `PreToolUse` hook can actually read.** The payload
+carries `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`,
+`hook_event_name`, `tool_name`, `tool_input`, and `tool_use_id`; and, **only
+when the hook fires inside a subagent**, `agent_id` and `agent_type`. For the
+dispatch tool, `tool_input` carries the dispatch's own parameters —
+`subagent_type`, `isolation`, `model`, `description`, `prompt`. Three
+consequences carry the guard below: the fork ban has an exact trigger
+(`tool_input.subagent_type`), the read-only claim has an exact trigger
+(`tool_input.isolation`), and depth has an exact, *documented* discriminator —
+`agent_id` is present iff the dispatching session is itself a subagent, so its
+presence means the call about to be made creates a grandchild.
+
+**Honest limit on that roster.** It is sourced from the harness's own published
+hook contract, fetched rather than recalled, and from nothing in this tree —
+the same footing as `CLAUDE_CODE_CHILD_SESSION`'s "verified, not trusted"
+treatment (lifecycle-kit/SPEC.md §bin/session-id.sh). A future harness revision
+reshaping the payload is drift this SPEC cannot self-detect; only re-reading the
+hook contract catches it.
+
+**Two depth routes ruled out**, both being the obvious move.
+`CLAUDE_CODE_CHILD_SESSION` is set in top-level sessions too, and
+`CLAUDE_CODE_SESSION_ID` carries the *root* id for a child, so a depth-1 and a
+depth-2 dispatcher are indistinguishable by environment alone — that route
+ships a rule silently mis-firing at the top level. The meta record beside a
+transcript does carry an exact spawn depth, and that route works and is
+deliberately not taken: it couples a hook to an *uncontracted* harness artifact
+to answer a question one *contracted* boolean already answers. The
+stage-economics meter accepts that same coupling (drift-kit/SPEC.md §The
+stage-economics meter, the fan-out row) because it needs the whole spawn forest
+and no contracted field supplies it; a hook needs one bit and gets it under
+contract. The axis is what the contract supplies, not appetite for risk.
+
+`templates/agent-dispatch-guard.sh` is that oracle — a second `PreToolUse` hook
+on matcher `Agent`, beside the budget guard, composed from
+`guard-kit/lib/guard.sh` primitives. It reads the payload once and runs the
+rules below, in order:
+
+| # | rule | trigger | decision |
+| --- | --- | --- | --- |
+| D1 | fork ban | `tool_input.subagent_type` is `fork` | block |
+| D2 | isolation claim | `tool_input.subagent_type` ∈ `DELEGATION_KIT_READONLY_TYPES` and `tool_input.isolation` is not `worktree` | block |
+| D3 | depth advisory | payload carries `agent_id` | advise |
+
+Order is load-bearing only between D1/D2 and D3 — a blocked dispatch needs no
+advisory, so D3 runs last. D1 precedes D2 because the fork ban is unconditional
+and its message is the more specific one for a dispatch violating both.
+
+**Why a second guard rather than more rules in the budget guard.** Four
+reasons, each independently sufficient: the budget guard blocks on a
+**transient** condition and is deliberately knob-overridable, while these block
+on a **permanent** doctrine violation that must not be per-dispatch
+overridable; the budget guard reads no stdin at all; a consumer may want either
+enforcement without the other, and hook registration is the only opt-in valve
+there is; and their test lanes take different payload grammars. The harness
+fires every hook registered on a matcher and any exit 2 blocks, so the two
+compose with no dispatcher between them.
+
+**D1 blocks unconditionally**, which the template's own boundary does not — a
+fork stays correct where the child does the same job at the same authority, and
+a hook cannot read intent. The block is ruled unconditional on the ground that
+no sanctioned fork use exists in this doctrine, and the valve is **unwiring the
+hook**, never a knob: a per-dispatch override is exactly the honour system
+these rules exist to end, and a knob would restore it under a better
+name. The block message names the two lawful alternatives, as guard-kit
+requires of every block message.
+
+**D2 is inert until configured**, by construction — the default roster is empty
+and the kit ships no agent-type names. An inert D2 reports nothing; it is a
+hook, not a gate, so there is no clean line to print. Stated here so a consumer
+does not infer coverage it has not configured.
+
+**D3 advises rather than blocks**, and both halves are deliberate. It cannot
+block: a nested dispatch is legitimate and common — a stage session's own
+read-only fan-out *is* a grandchild dispatch — so blocking would remove a
+capability rather than confine one. It must not be silent: this is the one rule
+whose bound reader provably never loads the protocol template (§One template, a
+resident pointer), so the advisory is the *only* delivery of it, which is
+§Operative residency's (a)–(c) shape applied at a hook instead of a doc. Ruled
+out for D3: keying on whether the prompt text "names a path" — that fires on
+the word and teaches dispatchers to game the wording, buying a green hook and
+no channel. The `agent_id` trigger is exact and unforgeable; the message
+carries the judgment the trigger cannot.
+
+**Degradation — fail-open, but loud**, the posture guard-kit/SPEC.md §The guard
+framework names for a deny-guard whose matcher proves the tool but whose rule
+turns on a payload field:
+
+| what is missing | behavior |
+| --- | --- |
+| `jq` absent | allow; one advisory naming the unenforced rules |
+| payload unparseable, or `tool_input` absent | allow; same advisory |
+| `subagent_type` absent from a parseable payload | D1 and D2 do not fire (nothing to match); D3 unaffected |
+| `DELEGATION_KIT_READONLY_TYPES` unset or empty | D2 inert, and silently so; D1 and D3 unaffected |
+| `DELEGATION_KIT_CONFIG_FILE` set but naming no file | allow; advisory naming D2 unenforced |
+| `guard-kit/lib/guard.sh` not vendored | the guard exits 0 before sourcing, as both shipped guards already do |
+
+Two implementation facts those rows force, recorded because the obvious build
+gets each of them wrong:
+
+- **The `jq`-absent arm cannot deliver through `guard_advise`.** That primitive
+  is itself jq-backed, and measuring it rather than assuming settles what
+  happens: with `jq` off `PATH` it writes an empty stdout and leaves a shell
+  "command not found" on stderr, which names none of the unenforced rules — the
+  silent success these rules exist to end, arriving inside the mechanism meant
+  to prevent it. The guard therefore emits the advisory envelope itself on that
+  arm, and every advisory literal it carries is kept free of the characters
+  JSON must escape, since that fallback carries no escaper.
+- **The guard does not source delegation-kit's validating config loader**, only
+  the consumer config file, for the one array it reads. The loader exits 2 on
+  any malformed knob and a hook that exits 2 blocks, so routing the fork ban
+  through a validator for `DELEGATION_KIT_FAN_WIDTH` would let an unrelated
+  typo wedge every dispatch in the consumer whose primary token lever is
+  delegation — the fail-closed posture this guard is specified against,
+  arriving through the config door. The distinction the last two table rows
+  draw is this kit's standing one: a roster **configured to nothing** is
+  silent, a roster that **could not be read** is loud.
+
 ### One template, a resident pointer
 
 `templates/agent-execution.md` is the single source for the protocol — a
@@ -220,9 +358,12 @@ has no load trigger (the load-trigger-residency doctrine), and every protocol
 bullet triggers at `Agent` dispatch **for the role that dispatches** — which
 already has a mechanical seam, the
 per-dispatch budget guard, whose block message names `/agent-execution`. The
-doctrine lives behind the trigger, not in the always-loaded file. Honest limit:
-the guard enforces budget mechanically, not protocol literacy — a session that
-dispatches without invoking the skill carries only the resident pointer.
+doctrine lives behind the trigger, not in the always-loaded file. Honest limit,
+tightened now that a second hook rides the same matcher: the guards enforce
+mechanically exactly the rules that pass a chokepoint — the budget check, and
+the dispatch-shape rules (§The delegation model) — and protocol literacy
+beyond those stays unenforced. A session that dispatches without invoking the
+skill still carries only the resident pointer for everything else.
 
 **That role qualifier is load-bearing rather than hedging.** Stated without it,
 the rationale is role-blind: a *dispatched* role fires no such trigger — it is
@@ -309,6 +450,17 @@ it: nothing in the battery would catch a *non*-compliant restatement, so (a)–(
 are review-enforced. The nearest buildable oracle detects a *consequence* rather
 than the act — `check-producer-liveness` reads a producer still running at the
 next stage's entry (evidence-kit/SPEC.md §check-producer-liveness).
+
+**A case where an oracle *was* buildable now sits beside this one, and the two
+are not each other's contradiction.** The dispatch-shape rules bind acts
+that leave no tracked artifact either, yet they are gated. The axis that
+separates them is **interception, not durability**: a dispatch passes a
+chokepoint the harness fires a hook on, and a turn-end passes none (§The
+delegation model, which owns the generalization). So "no tracked artifact" is
+why neither rule gets a *gate* over the tree, and it is not by itself a reason
+to stop looking for an oracle. Recorded here for the same reason §The
+delegation model records the durability rule beside the read-only-fan-out
+caveat: otherwise the next reader re-litigates one of the two paragraphs.
 
 ## Resume journal — agent writes, scratch reset sweeps
 
@@ -840,6 +992,7 @@ delegation-kit/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
+  templates/agent-dispatch-guard.sh       # PreToolUse(Agent) dispatch-shape guard (D1/D2/D3)
   templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar
   templates/usage-poller.sh               # poll usage.txt producer (timer-driven, fail-soft)
   templates/delegation-config.sh          # knob overrides (arrays live here)
@@ -944,6 +1097,17 @@ is the whole opt-in: unwired, the guard is inert. This repo registers it, and
 its consumer session brief (`scripts/session-context.sh`) additionally prints
 the verdict line at SessionStart for planning-time visibility — a consumer-side
 edit; the context-kit template stays uncoupled from delegation-kit.
+
+`agent-dispatch-guard.sh` is a second hook on that same matcher, registered the
+same way and **independently**: the harness fires every hook a matcher carries
+and any exit 2 blocks, so neither guard knows about the other and a consumer
+may wire either one alone (§The delegation model owns why they are two scripts
+rather than one). It resolves `guard-kit/lib/guard.sh` at its vendored path,
+overridable with `GUARD_KIT_LIB`, and reads the consumer's delegation config for
+D2's roster and nothing else. Registration is again the whole opt-in: unwired,
+it is inert — and an unwired dispatch guard is the exact failure shape it
+exists to catch, so wiring it is not optional dogfooding for a consumer that
+delegates.
 
 **An `OK` verdict is a floor, not a recommendation.** The guard answers one
 question — is there headroom in the window *right now* — and blocks only on

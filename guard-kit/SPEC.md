@@ -103,10 +103,28 @@ Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
 wakeup-guard): there, a logging or parse failure still denies.
 
-delegation-kit's `agent-budget-guard.sh` is a second framework consumer,
-composing these primitives into a `PreToolUse(Agent)` hook that blocks on a
-PAUSE budget verdict and advises otherwise (delegation-kit/SPEC.md §The
-delegation model) — cite-only; no guard-kit mechanism moves for it.
+**A third posture, fail-open-but-loud**, covers a deny-guard whose matcher
+proves the tool but whose rule turns on a **payload field**. The gap is real
+rather than a technicality: wakeup-guard's rule *is* the tool, so a parse
+failure that denies costs nothing, while a rule needing a field cannot say
+that — denying on a parse failure would wedge every call its matcher covers.
+Passing silently is the opposite failure and the worse one, since it ships an
+unenforceable claim that reports success. So the guard **allows the call and
+emits an advisory naming the rule it could not enforce**: a degraded
+enforcement is visible, never silently folded. One delivery constraint comes
+with the posture and is easy to miss — `guard_advise` is itself jq-backed, so a
+guard degrading *because* `jq` is absent cannot reach for it and must emit the
+advisory envelope directly, or the loud half is lost in exactly the case it was
+written for.
+
+delegation-kit is this framework's second and third consumer, and they do not
+cost the kit alike. `agent-budget-guard.sh` composes these primitives into a
+`PreToolUse(Agent)` hook that blocks on a PAUSE budget verdict and advises
+otherwise — cite-only; no guard-kit mechanism moves for it.
+`agent-dispatch-guard.sh` shares that matcher and enforces delegation-kit's
+dispatch-shape rules; guard-kit mechanism **does** move for that one, by
+exactly one clause — the fail-open-but-loud posture above, which it is the
+shipped instance of (delegation-kit/SPEC.md §The delegation model).
 
 ## Consumer rules
 
