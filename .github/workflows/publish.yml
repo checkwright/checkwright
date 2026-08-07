@@ -141,12 +141,30 @@ jobs:
           set -euo pipefail
           version="${TAG#v}"
 
-          # download-artifact names each directory for its artifact; the pack
-          # script reads them by target, so strip the prefix the naming added.
+          # A `pattern:` download lands each artifact in its own directory when
+          # several match and directly in `path:` when exactly one does, so the
+          # shape on disk is not something this workflow can assert. The roster
+          # is, and pack-installer.sh reads `<artifacts>/<target>/`, so normalize
+          # onto that from whichever shape arrived. The unreachable case fails
+          # loudly and prints the tree: packing a release with a binary silently
+          # missing is the one outcome worse than a red run.
+          source gate-sdk/lib/gate.sh
           art="$RUNNER_TEMP/artifact"
-          for d in "$art"/gate-binary-*; do
-            mv "$d" "$art/${d##*/gate-binary-}"
-          done
+          binary="$(gate_native_bin)"; binary="${binary##*/}"
+          while IFS= read -r target; do
+            if [ -f "$art/$target/$binary" ]; then
+              :                                   # already the layout pack reads
+            elif [ -f "$art/gate-binary-$target/$binary" ]; then
+              mv "$art/gate-binary-$target" "$art/$target"
+            elif [ -f "$art/$binary" ]; then
+              mkdir -p "$art/$target"
+              mv "$art/$binary" "$art/$binary.sha256" "$art/$target/"
+            else
+              echo "no downloaded artifact for target '$target' under $art:" >&2
+              ls -R "$art" >&2
+              exit 1
+            fi
+          done < <(gate_native_targets)
 
           # The pack step refuses a dirty worktree, so its scratch and its output
           # both live outside the checkout.
@@ -172,6 +190,20 @@ jobs:
           # host.
           ( cd "$out" && sha256sum "$(basename "$tarball")" > "$(basename "$tarball").sha256" )
           echo "packed $(basename "$tarball") at version $packed"
+
+          # The Release's per-target assets are renamed here, in the one job that
+          # holds the roster, rather than again in the job that attaches them —
+          # duplicating the normalization is how the release job came to carry
+          # this same defect unnoticed. Release assets are flat, so each carries
+          # its target in the filename; the bare filename inside each sidecar is
+          # left alone, because that is the name the file carries in the payload
+          # where the machine verification happens, and rewriting it would mint a
+          # second spelling of one published fact. A human cross-checks the hex,
+          # not the filename.
+          while IFS= read -r target; do
+            cp "$art/$target/$binary"        "$out/$binary-$target"
+            cp "$art/$target/$binary.sha256" "$out/$binary-$target.sha256"
+          done < <(gate_native_targets)
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -237,11 +269,6 @@ jobs:
           name: installer-package
           path: dist
 
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          pattern: gate-binary-*
-          path: artifact
-
       - name: attach the tarball, the gate binaries and their checksums to the Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -261,23 +288,20 @@ jobs:
           # The per-target binaries are published here so the digest an adopter's
           # installer verifies against has a source outside the payload it travels
           # in — a digest shipped only alongside its own artifact certifies nothing.
-          # Release assets are flat, so each is renamed for its target; the bare
-          # filename inside each sidecar is left alone, because that is the name the
-          # file carries in the payload where the machine verification happens, and
-          # rewriting it would mint a second spelling of one published fact. A human
-          # cross-checks the hex, not the filename.
-          for d in artifact/gate-binary-*; do
-            target="${d##*/gate-binary-}"
-            for f in "$d"/*; do
-              base="${f##*/}"
-              case "$base" in
-                *.sha256) asset="dist/${base%.sha256}-$target.sha256" ;;
-                *)        asset="dist/$base-$target" ;;
-              esac
-              cp "$f" "$asset"
-              assets+=("$asset")
-            done
+          # They arrive already renamed for their target: this job checks out
+          # nothing, so it holds no roster to normalize an artifact layout against,
+          # and pack — which does — is where that happens.
+          for f in dist/*; do
+            case "${f##*/}" in
+              "$name"|"$name.sha256") continue ;;
+              *)                      assets+=("$f") ;;
+            esac
           done
+          if [ "${#assets[@]}" -le 2 ]; then
+            echo "no per-target gate binary reached the release job:" >&2
+            ls -l dist >&2
+            exit 1
+          fi
 
           # Create the Release if the tag has none yet, so the assets are on it from
           # the moment it exists; the operator fills in the body afterwards
