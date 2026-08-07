@@ -1259,7 +1259,9 @@
 
 - **gap-bullet-premise-verification** [design-pending] — a gap-inbox bullet
   asserts mechanism under no verification bar, and a false one is paid by
-  whoever drains it. Two of the three bullets re-verified at this boundary were
+  whoever drains it.
+  recurrence: gap-bullet-premise-verification 2026-08-07
+  Two of the three bullets re-verified at this boundary were
   false at their central claim, both filed by the same close: one asserted the
   npm approval environment did not gate the `v0.18.0` publish (it gated — the
   deployment held 77 seconds and an approval is recorded), the other that
@@ -1745,6 +1747,7 @@
 - **stage-stamp-ordering-unenforced** [design-pending] — `check-stage-evidence`
   accepts a stage stamp that lands **after** commits already made under it, so
   the stamp proves invocation but not that it preceded the work it authorizes.
+  recurrence: stage-stamp-ordering-unenforced 2026-08-07
   **Observed with the battery green throughout.** This iteration's build batch 1
   stamped `.workflow/WORKFLOW-STATE.txt` as its *third* commit, after two commits
   had already landed build-stage edits under that unstamped entry. Nothing caught
@@ -1767,11 +1770,10 @@
   landed first. The consequence generalizes past ordering — **every entry-time
   assertion, assertion C's demand for a prior audit-stage stamp included, is
   satisfiable retroactively**, because the gate cannot distinguish "align ran
-  before this build" from "align's stamp exists now". Confirmed empirically at this
-  iteration's build batch 1 (gap-filing, then work, then stamp; battery green
-  throughout). It also opens a **cheaper candidate than the history assertion
-  below**: widen the two gates' couple set so a stage's own output surfaces re-fire
-  them, turning a never-ran gate into a ran-and-lenient one first.
+  before this build" from "align's stamp exists now". It also opens a **cheaper
+  candidate than the history assertion below**: widen the two gates' couple set so a
+  stage's own output surfaces re-fire them, turning a never-ran gate into a
+  ran-and-lenient one first.
   **Candidate shape to weigh at design:** assert that the commit introducing a
   stage's stamp is not preceded, within the same stage window, by commits
   touching that stage's own output surfaces — decidable from git history, though
@@ -2942,6 +2944,7 @@
 
 - **enter-stage-arg-position-silent-drop** [design-pending] — `--simulate` after the stage
   is silently dropped, and the read-only preflight runs the destructive reset instead.
+  recurrence: enter-stage-arg-position-silent-drop 2026-08-07
   `bin/enter-stage.sh` parses the flag positionally — it tests `$1` for `--simulate` and
   shifts — so `enter-stage.sh scope --simulate` leaves `$1` as the stage, never sets the
   simulate bit, and treats the flag as a trailing argument nothing reads. Nothing refuses
@@ -3547,6 +3550,140 @@
   prompting KPI on any iteration filing several long, punctuated gap descriptions, so the
   distortion lands hardest on the iterations that capture the most.
   Filed 2026-08-06 by close, from this iteration's prompt-friction triage.
+
+- **ruling-record-condition-staleness-probe** [design-pending] — a ruling conditioned on an
+  event nobody retires once the event fires.
+  `TRAJECTORY.md` carries rulings whose text is conditioned on a future event — "until the
+  first binaries tag", "at `<iteration>`'s close" — and nothing retires one when its condition
+  is met. Today obsolescence rides the unit that discharges the ruling, whose own entry names
+  the rows it removes on landing; that holds only where an author remembered to write the
+  removal in, and nothing catches the ruling whose condition was met by a unit that did not.
+  **The enforceable half is a probe, never a prune.** Retiring a recorded ruling is
+  operator-class, so a stage session may not edit one. The deliverable is a *staleness probe*
+  over condition-bearing rulings that escalates, plus whatever declaration makes a condition
+  machine-readable — a ruling stating its own discharge event is the design question, since a
+  prose condition carries no syntactic tell.
+  **Verified live at this close: one condition unfired, one already missed.** The
+  `gate-sdk/SPEC.md` rows conditioned on the first binaries tag still hold — the newest tag
+  publishes no binaries and predates the workflow steps that would build them. The companion
+  ruling naming one specific iteration's close as the tag point did *not* hold: that close
+  passed without cutting the tag, and no surface says so. That is the shape a probe catches
+  and a discharging unit cannot.
+  **Why `[design-pending]`:** the condition vocabulary is the whole design, and the
+  escalation-only boundary rules out the cheap fix.
+  **Cost while deferred:** a ruling read as live after its condition passed steers the very
+  sessions that consult the record for what is already settled, and the record's authority is
+  what makes that steer expensive to unwind.
+  Filed 2026-08-07 by close, draining the gap inbox.
+
+- **stage-economics-log-key-session-collision** [design-pending] — two sessions in one
+  (iteration, stage) overwrite each other in the trend log.
+  `drift-kit/bin/stage-economics.sh`'s `log_line` dedups on the `<iteration> <stage> <model>`
+  triple, so a batch-split stage — several sessions stamped into the same pair — appends twice
+  and the second silently replaces the first, under-reporting that stage by a whole session.
+  The session id is written as a same-line field, never into the key.
+  **Found by exercising the meter against the real sessions directory**, not by reading it:
+  one iteration's build stage had run as two sessions and only one row survived. The fan-out
+  pass folds its own rows for exactly this reason; the stage rows still race.
+  **Held out of the ruled cut deliberately** by the iteration that fixed the fan-out half, so
+  this is the named remainder rather than a regression.
+  **Why `[design-pending]`:** the two honest closes differ in kind. Folding stage rows the way
+  the fan-out pass folds keeps the key and loses per-session detail; widening the key with the
+  session id is a trend-log grammar change every existing reader inherits.
+  **Cost while deferred:** every per-stage figure for a split stage under-reports, and the
+  under-report is invisible in the log — a cross-stage comparison drawn from a split iteration
+  is not signal, and nothing in the log says so. The Split posture makes splitting routine, so
+  the defect's reach grows with the posture's adoption.
+  Filed 2026-08-07 by close, draining the gap inbox; found at build.
+
+- **guard-advise-jq-dependency** [design-pending] — the advisory primitive goes silent in
+  exactly the degradation it exists to report.
+  `guard-kit/lib/guard.sh`'s `guard_advise` pipes into `jq` with no fallback, so with `jq` off
+  PATH it writes an empty stdout and the advisory is lost, leaving only a command-not-found on
+  stderr. Measured, not inferred. Every consumer routing a degraded arm to `guard_advise`
+  therefore says nothing at the moment it most needs to.
+  **The workaround is already local.** This repo's dispatch guard hand-writes its envelope to
+  avoid the dependency, and the constraint is stated in guard-kit's SPEC, so no consumer here
+  is silent today. What is unanswered is whether the *primitive* should carry an escaper-free
+  fallback so no consumer has to know this.
+  **Why `[design-pending]`:** the call is whether a degraded advisory beats a lost one, and
+  whether a hand-rolled escaper in the lib is a cure worth its own risk.
+  **Cost while deferred:** small and bounded here, since the one consumer that mattered worked
+  around it; the cost lands on a downstream consumer that reads the primitive as safe and
+  inherits the silence without the local knowledge that avoids it.
+  Filed 2026-08-07 by close, draining the gap inbox; found at build while wiring the
+  dispatch guard's degraded arm.
+
+- **rejected-compound-commit-relabel** [design-pending] — a rejected stage-and-commit leaves
+  the index staged and the bare retry mislabels the work.
+  A hook rejection of a compound stage-and-commit invocation unstages nothing, so the natural
+  retry — a bare commit — sweeps the staged deliverable under whatever message the retry
+  carries. Observed 2026-08-07: a build batch had its compound call rejected on an expansion
+  rule, retried bare, and shipped fifteen files of feature work under a one-line stamp
+  message; the real stamp then landed as a second commit.
+  **Nothing red fires, because nothing is wrong with the content.** The work was correct and
+  gate-verified. The casualty is provenance, and it is unrecoverable once pushed: the
+  never-rewrite policy and a shared index both forbid amending, so the misdescription is
+  permanent in the history later sessions read for what happened.
+  **Note the interaction that makes this likely rather than rare.** The shared-index rule
+  advises staging and committing in one motion precisely to keep a foreign commit from landing
+  between the two — which is the very shape most likely to be rejected by a guard.
+  **Why `[design-pending]`:** the candidates sit on different surfaces. A commit-msg gate
+  asserting that a stamp-shaped message touches only the stamp path catches this case and
+  little else; guidance to reset the index after a rejected compound commit is cheaper and
+  unenforced. Which is right depends on how wide the misdescription class really is.
+  **Cost while deferred:** the history that later sessions and the economics read take for
+  ground truth can misattribute a whole deliverable, and the error is silent, permanent, and
+  likeliest on the commits a guard just fired on.
+  Filed 2026-08-07 by close, draining the gap inbox; observed against this iteration's
+  own build commits.
+
+- **survey-record-supersede-invisible** [design-pending] — the entry trigger prints a
+  superseded block beside its superseder with no visible difference.
+  `.workflow/survey-record.md`'s stage-entry read trigger advertises every block for a
+  question, so a superseded block and the block that superseded it print as two identical
+  headings. A reader cannot tell which is live from the trigger output, so the protocol's own
+  instruction — run the witness before buying this survey again — has to be run twice to find
+  out, which is the re-derivation the surface exists to remove.
+  **Observed on the surface's first real use, and again at this close.** A build session filed
+  a survey, its own commits moved the corpus, it filed a superseding block, and the next stage
+  entries each printed the pair.
+  **Why `[design-pending]`:** printing only the newest block per question is cheaper but hides
+  the history the record is append-only to keep; marking the superseded heading keeps both and
+  needs a supersede relation the record does not declare today. Either way it stays
+  append-only.
+  **Cost while deferred:** small per entry and growing with every supersede in an iteration,
+  and it lands on the reader rather than the writer — so the writer never sees it and the
+  surface's own value claim decays unobserved.
+  Filed 2026-08-07 by close, draining the gap inbox; found at build, re-observed at close.
+
+- **probe-before-assertion-doctrine** [design-pending] — the iteration's recurring failure was
+  asserting where a cheap probe was available; does that earn a durable rule?
+  Every session this iteration that *probed* found something reasoning had missed, and every
+  falsified claim was falsifiable by one command. Scope asserted twice and was falsified
+  twice; spec corrected scope and then made a softer version of the same error, which align
+  caught; build's meter batch found a row-erasure race only by running against the live
+  sessions directory; the guard batch found that a whitespace `IFS` made one of its own rules
+  never fire; the survey batch found a boundary-truncate bug by running a real entry. Close
+  added two more: a gap bullet asserted a disambiguation was missing that had landed two days
+  before it was filed, and a stamped release disposition asserted a tag that was never cut.
+  **The question is the form, not the pattern.** The pattern is attested past argument. What
+  is unsettled is whether it is already covered — `Oracle-first` covers the gate case,
+  `gap-bullet-premise-verification` covers the gap-inbox case, and rule 14's inspectable-run
+  discipline covers the spawned-component case. What none covers is the *design-time* claim
+  about the tree or the harness that a grep would settle, made at scope or spec where no
+  oracle is running.
+  **Why `[design-pending]`:** a doctrine rule owes an *Enforced by* line and this one has no
+  gate behind it, so it would ship as convention — which the doctrine does carry, but the
+  call on whether a fourth near-neighbour earns its own always-loaded line is a
+  governed-surface widening, not a close's to self-serve. The cheaper alternative worth
+  beating: widen one of the three existing rules rather than mint a fourth.
+  **Cost while deferred:** the cost is paid where it was measured — a false premise entering
+  at scope is corrected at spec or align if it is lucky, and lands in the queue as established
+  fact if it is not; the queue's own convention of dating premise corrections into bodies is
+  the standing evidence that it is often not.
+  Filed 2026-08-07 by close, as the iteration's candidate lesson; the observation came from
+  the lead, the evidence and the framing from this drain.
 
 ## Icebox
 

@@ -825,6 +825,13 @@ subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
   operator reading the trend log close-over-close, and the deferred
   `benchmark-ab-experiment` rung's measurement half, which consumes this log
   rather than rebuilding it and inherits the row with no change.
+  **No dispatch-type dimension either, and that is the answer to a question the
+  row invites.** A fork is distinguishable at the meta layer — its record carries
+  `isFork` beside an `agentType` naming the fork type, and carries no `model` —
+  but the row folds a stage's whole subtree into one line, so "what did forking
+  cost" is not a query this log answers. It is re-derived by walking
+  `parentAgentId` and pricing the fork transcripts directly, which is the honest
+  cost of leaving the dimension out until a reader for it exists.
 - **No lifecycle change.** No stamp is added, no cursor moves, no stage-skill
   template changes. The fan-out edge is *derived*, exactly as the supervision edge
   is, which is what keeps this a read-only consumption of lifecycle-kit/SPEC.md
