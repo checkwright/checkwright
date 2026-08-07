@@ -56,6 +56,30 @@
   Filed 2026-08-04 at close from the gap inbox; deliberately deferred at build;
   promoted 2026-08-07 at spec.
 
+- **native-gate-cohort-descriptors** [spec: SPEC-cohort-descriptors.md] — the first
+  cohort's two `.gate` descriptors, held back from the port that proved them, go live.
+  Unit **3 of 4**. `native-gate-binary-port` ported `check-action-pinning` and
+  `check-action-gh-repo` and proved both byte-identical, then held the declaration
+  half; the first-binaries tag is cut at this iteration's close.
+  **The held-descriptor premise was half wrong, verified by oracle at spec.** A
+  vendored `.gate` with no binary reds a consumer's battery — true. That the tag
+  clears it — false. Both binary meta-gates glob `*.gate` on disk and read no
+  registry, so `run-consumer-smoke.sh` (which installs no binary by design), unit 2's
+  omission leg, and **every adopter on `init`'s own omit path** stay red no matter what
+  is tagged. The amendment carries the correction: a descriptor on disk is a
+  declaration, and only a **registered member resolving to one** makes the binary
+  load-bearing.
+  **Deliverable:** the two descriptors (manifests verbatim, non-executable, both `.sh`
+  deleted in the same commit, which may not touch `native/`); the corrected predicate;
+  the two displaced oracle configurations relocated into fixtures; the `.gate` spelling
+  in `DELEGATION_KIT_GATE_FILES`' kit default; and the prose that turns with the tree,
+  including `docs/install.md` §Requirements' cargo bullet **entire** — its structure is
+  a contrast, so correcting one half leaves it incoherent.
+  **The corrected bullet lands ungated and the amendment rules that gap** rather than
+  passing it in silence: accepted ungated, filed with its cost and a named trigger.
+  Filed 2026-08-06 at close, draining the gap inbox; captured 2026-08-06 at build.
+  Promoted 2026-08-07 at spec, on the corrected premise above.
+
 ## Technical Debt
 
 ## Deferred
@@ -3022,55 +3046,6 @@
   pins the port exists to retire keep their hold on the toolchain floor.
   Filed 2026-08-06 at spec, under the lead's split ruling, before the head's Done-move so
   that `ROADMAP.md` never loses the commitment.
-
-- **native-gate-cohort-descriptors** [design-pending] — the first cohort's two `.gate`
-  descriptors, held back from the port that proved them.
-  `native-gate-binary-port` ported `check-action-pinning` and `check-action-gh-repo` to
-  compiled subcommands and proved both byte-identical against the shell gates they
-  replace, then held the declaration half on an operator ruling: a vendored descriptor
-  with no binary behind it reds a freshly installed consumer's battery
-  (`gate-sdk/bin/run-consumer-smoke.sh`), which gate-sdk/SPEC.md §Consumer smoke rules the
-  deliberate outcome rather than a defect, and criterion 5 of §The port-candidate criteria
-  states no adopter reaches a prebuilt binary until the first tag publishing them is cut.
-  **The precondition is the first binaries tag**, whose consent was re-ruled 2026-08-07
-  (TRAJECTORY.md §The closed rulings) after the 2026-08-06 close named for it passed
-  without cutting one.
-  **"No further ruling is owed" was false — corrected 2026-08-07 at scope, verified in
-  the gate's source.** `check-gate-binary-fresh` is clean at zero descriptors ("crate
-  unread") and **fail-closed** at one or more — "$BIN is absent or not executable, but N
-  .gate descriptor(s) dispatch to it — the check could not run; treating as failure".
-  `native/target/` is gitignored and never committed. So landing these two descriptors
-  makes a built binary a precondition of this repo's own battery at every commit, which
-  settles `native-gate-dogfood-ruling` **by implementation** — the move
-  `init-claim-stickiness` was ruled against. That entry is this one's hard prerequisite
-  and must be ruled first, not merely ranked beside it.
-  **Deliverable:** `gate-sdk/checks/check-action-{pinning,gh-repo}.gate` carrying the
-  `.sh` manifests verbatim, non-executable, with both `.sh` deleted in the same commit
-  (parity assertion A forbids coexistence); that commit may not also touch `native/`
-  (`check-gate-tamper`'s meta-path roster). Then the prose that turns with it: the
-  reference-only table emptied and what an empty table means stated, the dogfood
-  settlement in §What the dispatch seam does not settle, the two §check-action-* sections,
-  CLAUDE.md §Housekeeping's "no gate is ported today" clause, and — **added 2026-08-07,
-  absent from this list until now** — `docs/install.md` §Requirements' cargo bullet
-  **entire** (:101-110, one bullet).
-  **Why the whole bullet and not the one sentence.** This unit falsifies :104-106 ("no
-  gate dispatches to the binary today, so a commit does not require it"). Three lines
-  later the same bullet claims "every tagged release now publishes a prebuilt binary for
-  each platform" — false today and **not** fixed by the tag, since the quantifier ranges
-  over every tagged release and cutting v0.22.0 moves it from zero-of-22 to one-of-23.
-  The bullet's whole structure is a contrast — contributors need cargo, installers never
-  do — so correcting one half alone leaves it asserting both that a commit now requires
-  the binary and that every release already ships one. Routed here 2026-08-07 on spec's
-  challenge, off `payload-disclosure-claim-owner`, which owns what a consumer *receives*
-  rather than what a release has *published*. Nothing in `check-install-toolchain` reads
-  this prose — it holds the `name:min:impl` triples against `PROBE_SET` only — so the
-  corrected bullet lands ungated, and this unit owes that gap an explicit disposition
-  rather than silence.
-  **Cost while deferred:** the crate carries two rules no descriptor dispatches to, so the
-  substrate stays proved but unused; `check-gate-binary-fresh` stays dormant at zero
-  descriptors, an oracle with nothing to read; and the awk pin the port exists to retire
-  keeps its hold on the toolchain floor.
-  Filed 2026-08-06 at close, draining the gap inbox; captured 2026-08-06 at build.
 
 - **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
   a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
