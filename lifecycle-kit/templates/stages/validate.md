@@ -39,6 +39,14 @@ the work should be done ⇒ the lessons section, dispositioned at close.
 Undone work parked as a lesson evaporates; a process insight parked as a
 task rots.
 
+**Excavation that spans a corpus is a survey, not a triage.** When a red sends
+you across a whole corpus rather than into one failure, check the survey record
+before dispatching that sweep and file its finding afterwards — the next
+iteration's stages read it, and the record is discarded at the boundary anyway
+(lifecycle-kit/SPEC.md §The survey record). Keep it distinct from the evidence
+manifest below: that one records what your suites did, this one what a sweep
+found.
+
 **Record the evidence.** Append one line per suite to your per-iteration
 evidence manifest (suite, log digest, verdict, date) and commit it at validate
 completion — the evidence does not exist at the entry stamp, so it rides a

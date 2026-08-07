@@ -221,6 +221,10 @@ if staged_matches '.workflow/*' 'gate-sdk/SPEC.md' 'canon-kit/SPEC.md' 'context-
     run_gate check-close-surfaces lifecycle-kit/checks/check-close-surfaces.sh
 fi
 
+if staged_matches '.workflow/survey-record.md'; then
+    run_gate check-survey-record lifecycle-kit/checks/check-survey-record.sh
+fi
+
 if staged_matches 'TASK-QUEUE.md'; then
     run_gate check-queue-sections queue-kit/checks/check-queue-sections.sh
 fi

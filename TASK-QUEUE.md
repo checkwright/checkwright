@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **cross-stage-census-duplication** [spec: SPEC-survey-carryforward.md] — consecutive
-  stages re-derive the same census because nothing carries a fan-out's findings forward.
-  **Measured 2026-08-06.** In `native-first-port-cohort`, scope dispatched a port-candidate
-  census (8.70 USD including its two forks) and spec dispatched a port-candidate cohort
-  survey (1.83 USD) forty minutes later. Both applied all six criteria in gate-sdk/SPEC.md
-  §The port-candidate criteria to the same gate registry, and both ran
-  `check-gate-substrate-parity` as their oracle. Roughly 10.50 USD bought one roster twice.
-  **Not a discipline failure.** Each dispatch was correct in isolation: the spec session
-  needed an evidence-backed roster and had no artifact to read, because a fan-out's
-  findings live in the dispatching session's context and die with it. The stage that
-  follows inherits the commits, never the survey behind them.
-  **The filed premise is superseded and must not be rebuilt:** this entry was to inherit a
-  dispatcher-minted convention from `stage-fanout-burn-unbilled`, which refused that
-  fallback. It inherits none and is designed on its own merits.
-  **Deliverable:** a committed per-iteration surface a stage files a survey into and a
-  later stage reads, with a staleness witness. The design blocker this was filed against
-  — sizing which censuses stay true across an iteration — was dissolved rather than
-  answered: the amendment rules the question mechanical per record, not categorical per
-  kind.
-  Filed 2026-08-06 by the same operator consultation, which found this while pricing the
-  fan-out tier above. Promoted 2026-08-07 by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -3606,5 +3584,6 @@
 - fork-dispatch-prohibition
 - read-only-fanout-unenforceable
 - subagent-parent-addressing
+- cross-stage-census-duplication
 
 ## Lessons Learned

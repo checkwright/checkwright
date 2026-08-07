@@ -57,6 +57,14 @@ never a hand-picked subset, and never silence a probe's stderr — a `2>/dev/nul
 on a path grep reads a bad path as "no reader", manufacturing the false negative
 that hides a cross-component reader.
 
+**The roster you need may already have been bought.** Authoring routinely wants
+an evidence-backed roster over some corpus, and the stage before you may have
+bought exactly that one. Read the survey record first and, where a block's
+heading answers your question, run its witness — a clean corpus diff since the
+recorded rev plus an unchanged oracle verdict licenses citing the finding
+instead of re-buying it, and a moved one narrows the dispatch to the delta. File
+what you buy. The contract is lifecycle-kit/SPEC.md §The survey record.
+
 **Label every delta with its work class.** In the amendment's §What changes,
 every delta carries a **work-class** tag — either **mechanical** or
 **design-bearing**. A delta is **mechanical** when executing it demands only

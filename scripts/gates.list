@@ -49,6 +49,7 @@ check-shim-restatement
 check-lesson-disposition
 check-merge-attrs
 check-close-surfaces
+check-survey-record
 check-queue-sections
 check-queue-hygiene
 check-queue-wrap

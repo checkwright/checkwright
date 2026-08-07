@@ -69,6 +69,14 @@ widening asserted behavior, user-facing semantics) stops and surfaces to the
 user — never pick a "conservative alternative" silently. A *cross-component
 causal gap* is not a TODO: stop, resolve it this session, update the spec.
 
+**Don't re-buy the roster the stage before you already bought.** Where
+implementing a task sends you across a corpus — every call site of a helper,
+every spec citing a name — read the survey record first: a block whose heading
+answers your question, whose corpus is unmoved since its recorded rev and whose
+oracle still returns the same verdict, is cited rather than re-surveyed, and one
+whose witness fails narrows the dispatch to what moved. File the surveys you buy
+(lifecycle-kit/SPEC.md §The survey record).
+
 **Declare a gate you land or tighten, in the unit that lands it.** A unit that
 lands a new gate or makes an existing one stricter appends that gate's bare name
 to the tightened-gates declaration surface,

@@ -76,6 +76,7 @@ leaves its section absent.
 | [lifecycle-kit](lifecycle-kit/index.md) | check-lesson-disposition | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-merge-attrs | precommit |
 | [lifecycle-kit](lifecycle-kit/index.md) | check-close-surfaces | precommit |
+| [lifecycle-kit](lifecycle-kit/index.md) | check-survey-record | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-sections | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-hygiene | precommit |
 | [queue-kit](queue-kit/index.md) | check-queue-wrap | precommit |

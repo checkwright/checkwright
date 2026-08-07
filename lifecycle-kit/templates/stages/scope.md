@@ -78,6 +78,14 @@ lifecycle-kit/templates/lead.md §Economics and applied there to dispatch
 batching; scope applies the same principle one axis over, to iteration
 composition. Cite it and weigh it here; do not re-derive the economics.
 
+**Scope's censuses are the ones later stages most often re-buy, so record
+them.** A roster built by applying a criterion set to a corpus dies with this
+session's context unless it is written down, and the stage that needs it next
+has no artifact to read. File it, and read the record before dispatching a
+survey of your own: lifecycle-kit/SPEC.md §The survey record owns the block
+grammar, the two-command witness, and the rule that a carried survey is cited
+only while that witness holds.
+
 **Authoring the promoted features' amendments is scope's — unless the roster
 splits out a dedicated authoring stage.** Where it does, that stage authors the
 amendment(s) and pairs the feature entries into the queue, and scope keeps only

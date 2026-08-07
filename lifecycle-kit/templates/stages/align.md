@@ -48,6 +48,13 @@ removed, and the reasoning is unrecoverable by any later reader. Land it in the
 canonical spec the amendment merges into, and let the amendment cite it.
 Commit all spec changes in a single `chore:` commit.
 
+**A sweep is a survey — check the record before you buy one, and file the one
+you buy.** The audit fan-out above is the most expensive survey any stage
+dispatches. Before dispatching it, read the survey record and run the witness on
+any block whose heading already answers your question; afterwards, file the
+finding a later stage will want. Both halves, and what a passing witness
+licenses you to cite, are lifecycle-kit/SPEC.md §The survey record.
+
 **Audit the amendment against itself before auditing it against the tree.** Two
 defects are visible on the amendment alone and both survive a green battery. An
 author-stated count ("three things and no fourth") is an assertion about the

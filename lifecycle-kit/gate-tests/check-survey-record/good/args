@@ -1,0 +1,2 @@
+# hermetic override arg: the record file (grammar-only, no rev-existence probe)
+record.md

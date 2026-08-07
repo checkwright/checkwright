@@ -27,6 +27,13 @@ a red `check-stage-entry` at the next iteration's entry; filing to Deferred
 keeps the boundary clean (lifecycle-kit/SPEC.md §check-stage-entry owns the
 deferred-filing model for ruled-but-unpromoted work).
 
+**The survey record is not a close surface.** It carries no disposition
+obligation and blocks no boundary — the next first-stage entry truncates it,
+and that is the whole reclaim (lifecycle-kit/SPEC.md §The survey record). Close
+owes it exactly one thing: a survey close *buys* while triaging is filed like
+any other, so a finding worth an iteration's carry does not die with this
+session.
+
 1. **Process Lessons Learned** → durable rules or debt tasks, then clear the
    section. **Give each entry an explicit disposition before clearing, and
    stamp it** — one line per entry into `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`

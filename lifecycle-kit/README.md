@@ -41,6 +41,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-shim-restatement
    check-merge-attrs            # multi-operator: needs the .gitattributes step (step 4)
    check-close-surfaces
+   check-survey-record          # inert until a survey is filed (bin/file-survey.sh)
    ```
    <!-- gate-roster:end -->
 

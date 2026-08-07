@@ -51,6 +51,7 @@ declare -p LIFECYCLE_KIT_SHIM_DEDUP_CORPUS &>/dev/null || LIFECYCLE_KIT_SHIM_DED
 [[ -v LIFECYCLE_KIT_STATE_FILE ]] || LIFECYCLE_KIT_STATE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt"
 [[ -v LIFECYCLE_KIT_LESSON_EVIDENCE_FILE ]] || LIFECYCLE_KIT_LESSON_EVIDENCE_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/lesson-evidence.txt"
 [[ -v LIFECYCLE_KIT_GAP_INBOX_FILE ]] || LIFECYCLE_KIT_GAP_INBOX_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md"
+[[ -v LIFECYCLE_KIT_SURVEY_RECORD_FILE ]] || LIFECYCLE_KIT_SURVEY_RECORD_FILE="${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md"
 
 [[ -v LIFECYCLE_KIT_RECURRENCE_THRESHOLD ]] || LIFECYCLE_KIT_RECURRENCE_THRESHOLD=2
 
@@ -90,9 +91,9 @@ lifecycle_stage_known() {
     return 1
 }
 
-# spec: lifecycle-kit/SPEC.md §Multi-operator semantics — the iteration-scoped supersede set: exactly the surfaces enter-stage.sh truncates at the iteration boundary (the state file, the kit-owned lesson-evidence file, and every LIFECYCLE_KIT_BOUNDARY_TRUNCATE member). Derived here so the installer's .gitattributes block and check-merge-attrs's parity check read one set and cannot drift.
+# spec: lifecycle-kit/SPEC.md §Multi-operator semantics — the iteration-scoped supersede set: exactly the surfaces enter-stage.sh truncates at the iteration boundary (the state file, the two kit-owned built-ins, and every LIFECYCLE_KIT_BOUNDARY_TRUNCATE member). Derived here so the installer's .gitattributes block and check-merge-attrs's parity check read one set and cannot drift.
 lifecycle_supersede_set() {
-    printf '%s\n' "$LIFECYCLE_KIT_STATE_FILE" "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE"
+    printf '%s\n' "$LIFECYCLE_KIT_STATE_FILE" "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" "$LIFECYCLE_KIT_SURVEY_RECORD_FILE"
     local m
     for m in ${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]}"}; do
         printf '%s\n' "$m"
@@ -136,6 +137,7 @@ _lc_errs=()
 [[ -n "$LIFECYCLE_KIT_SKILLS_DIR" ]] || _lc_errs+=("LIFECYCLE_KIT_SKILLS_DIR is empty")
 [[ -n "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_LESSON_EVIDENCE_FILE is empty")
 [[ -n "$LIFECYCLE_KIT_GAP_INBOX_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_GAP_INBOX_FILE is empty")
+[[ -n "$LIFECYCLE_KIT_SURVEY_RECORD_FILE" ]] || _lc_errs+=("LIFECYCLE_KIT_SURVEY_RECORD_FILE is empty")
 [[ "$LIFECYCLE_KIT_SHIM_NGRAM" =~ ^[1-9][0-9]*$ ]] \
     || _lc_errs+=("LIFECYCLE_KIT_SHIM_NGRAM '$LIFECYCLE_KIT_SHIM_NGRAM' is not a positive integer")
 [[ "$LIFECYCLE_KIT_RECURRENCE_THRESHOLD" =~ ^[1-9][0-9]*$ ]] \

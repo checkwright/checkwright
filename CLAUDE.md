@@ -194,6 +194,12 @@ load behind that trigger, so they are not resident here.
   (lifecycle-kit/SPEC.md §The committed gap inbox). The sanctioned exception:
   an operator-directed filing may land in the queue directly, staged and
   committed in one motion under the shared-index rule above.
+- **Survey capture (any stage session):** bought a survey — a census, a cohort
+  sweep, a roster over a corpus — that a later stage will want? land it before
+  you act on it with
+  `bash lifecycle-kit/bin/file-survey.sh "<question>" "<corpus>" "<oracle>" "<finding>"`;
+  and before buying one, read the record and run its witness
+  (lifecycle-kit/SPEC.md §The survey record).
 - No per-user memory files: durable guidance goes in tracked manifests (this
   file, kit SPECs) or `BRIEF.local.md` (local-only private context). Harness
   auto-memory is disabled and enforced off (`check-settings-pins`,

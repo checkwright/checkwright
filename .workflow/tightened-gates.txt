@@ -8,3 +8,4 @@ check-prose-enum
 check-gate-substrate-parity
 check-producer-liveness
 check-gate-binary-fresh
+check-survey-record

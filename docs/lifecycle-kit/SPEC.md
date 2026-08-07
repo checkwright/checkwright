@@ -443,6 +443,15 @@ the clause's reader is a human or agent rather than a gate.
   `${GATE_SDK_WORKFLOW_DIR:-.workflow}/gap-inbox.md`, written by `bin/file-gap.sh`,
   its `merge=union` attribute verified by `check-merge-attrs`, drained by the
   close skill and read for emptiness by `bin/enter-stage.sh`'s boundary refusal.
+- `LIFECYCLE_KIT_SURVEY_RECORD_FILE` — the committed per-iteration survey record
+  (§The survey record); default
+  `${GATE_SDK_WORKFLOW_DIR:-.workflow}/survey-record.md`, written by
+  `bin/file-survey.sh`, asserted by `check-survey-record`, its headings printed
+  and its body truncated by `bin/enter-stage.sh` (a kit-owned boundary built-in,
+  so it does not ride `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`), and its
+  `merge=iteration-scoped` attribute verified by `check-merge-attrs`. One knob,
+  and no second one for the grammar, the witness commands, or an opt-out — each
+  of those is contract rather than layout.
 - `LIFECYCLE_KIT_RECURRENCE_THRESHOLD` — positive integer, default `2`; the
   recorded re-filing count at which a **deferred** entry enters the scope stage's
   proposed unit set regardless of the standing directive's theme (the pre-emption
@@ -520,8 +529,12 @@ side's content is per-iteration scratch the boundary doctrine already declares
 dead (git history is the permanent audit trail). The supersede set is **derived,
 never maintained**: it is exactly what `bin/enter-stage.sh` truncates at the
 iteration boundary — `LIFECYCLE_KIT_STATE_FILE`,
-`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
-members — rendered by `lifecycle_supersede_set` (§lib/stages.sh). The queue file
+`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and
+the `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
+members — rendered by `lifecycle_supersede_set` (§lib/stages.sh). The survey
+record is in the set for a reason worth stating: a carried survey describes a
+tree state the arriving iteration never had, so taking the other side would
+hand a stale finding a fresh-looking home (§The survey record). The queue file
 is deliberately *not* in the set: its body (backlog sections, lessons) is shared
 content that merges like any prose, and only its header line is iteration-scoped
 — resolved by hand to the arriving iteration, with a wrong resolution going red
@@ -701,6 +714,189 @@ body and the drain's own resolution input, and the optional recurrence marker is
 read by the filer at capture (via stderr) and by the drain as a convenience it
 does not depend on.
 
+## The survey record
+
+A stage that dispatches a survey — a census, a cohort sweep, a roster built by
+applying a criterion set to a corpus — buys a finding that lives in the
+dispatching session's context and dies with it. The next stage needing the same
+roster has no artifact to read, so it dispatches the same survey again. Neither
+session is undisciplined: each is correct in isolation, and the cost is
+structural. This surface is where the expensive half of a survey is carried
+across the stage boundary.
+
+**The decomposition that makes carrying safe.** A carried finding has a
+staleness problem a re-derivation does not: a census written at scope and read
+at build is correct only while the tree it censused holds still, and the stages
+between them are exactly when that tree moves. Sizing that window per *kind* of
+survey is not makeable — it depends on what the next stage does, which the
+author cannot know. So it is answered mechanically per record instead. A survey
+worth carrying ran an **oracle** (the oracle-first doctrine demands it), and
+that splits it in two: a **cheap, re-runnable half** — the oracle's verdict —
+and an **expensive, judgment half** — the reading laid over that verdict against
+a criterion set. The re-derivation re-buys both; this surface carries the
+expensive half and re-runs the cheap one.
+
+> **A carried survey is a citation with a falsifiable staleness witness, never a
+> substitute for the oracle. The consuming stage re-runs the oracle and diffs the
+> surveyed corpus since the recorded revision; if both hold, the recorded
+> judgment stands and is cited rather than re-bought. If either moved, the stage
+> dispatches only the delta.**
+
+A survey therefore stays true exactly as long as its witness holds, and the
+witness is checkable in two commands.
+
+**The surface.** `.workflow/survey-record.md` (knob
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, §Layout and configuration) is a committed
+per-iteration record, append-only within the iteration. Grammar: a `# contract:`
+prose header, then one block per survey:
+
+```
+## <YYYY-MM-DD> <stage> — <the one-line question this survey answered>
+- corpus: <git pathspec the survey covered>
+- oracle: <the command whose verdict grounds it, or the literal `none`>
+- rev: <full commit sha the survey was taken at>
+- finding: <the judgment, in prose>
+```
+
+Four fields, and each earns its place by being read at a named transition —
+`corpus` and `rev` by the diff, `oracle` by the re-run, `finding` by the
+consuming session. The heading is the discovery key and it states the
+*question*, because a later stage searches by the question it is about to ask,
+not by the corpus it has not yet chosen.
+
+**No field for "how long this stays true."** Deliberately absent: an author
+cannot know it, and a field carrying a guess would be read as a warrant.
+`corpus` + `rev` + `oracle` let the *reader* compute it, which is the whole
+ruling above.
+
+**Append-only within the iteration, never edited in place.** A survey that
+turned out wrong is superseded by a later block answering the same question, not
+by a correction to the old one — the record is evidence of what was believed
+when, and rewriting it destroys the only thing that makes a stale finding
+diagnosable after the fact.
+
+**The witness — the re-use protocol.** A session about to buy a survey reads the
+record first and, for any block whose heading answers its question, runs the
+witness:
+
+1. **Corpus still?** `git diff --quiet <rev>..HEAD -- <corpus>` — clean means no
+   commit since the survey touched anything it covered.
+2. **Oracle still?** Re-run `<oracle>` and compare its verdict to the one the
+   finding was written against.
+
+Both hold → **cite the record; do not re-buy the survey.** Either moved →
+**dispatch only the delta**, the dispatch prompt naming the record block and the
+diff, so the child re-surveys what changed rather than the corpus. The
+asymmetry is what makes this safe to ship: a false *stale* costs one
+re-derivation — exactly today's cost, so the mechanism's worst case is the
+status quo — while a false *fresh* would need a change touching neither the
+corpus nor the oracle's verdict, in which case the finding is in fact still
+true. The mechanism can only degrade *toward* the behavior it replaces.
+
+**The honest limit.** A survey whose grounds are *not* an oracle — a judgment
+over prose, a reading of history — records `oracle: none`, and that block is a
+**note, not a re-usable survey**: readable for orientation, re-derived before it
+is relied on. Stating that costs one line per record and is the difference
+between a mechanism and a false-assurance surface. An *empty* oracle is the
+silent form of the same thing and is refused (§check-survey-record).
+
+*Ruled out: a timestamp freshness window.* "Trust a survey under N hours old" is
+the per-kind taxonomy in disguise — wrong in both directions (a one-minute-old
+survey is stale if the tree moved; a week-old one is fine if it did not) and it
+buys nothing the two-command witness does not. *Ruled out: auto-invalidating
+every block on any commit* — too coarse to leave the mechanism any use; the
+`corpus` pathspec exists precisely to make invalidation proportionate.
+
+**The affordance.** `bin/file-survey.sh "<question>" "<corpus>" "<oracle>"
+"<finding>"` appends one block, seeding the contract header when the record does
+not yet exist. It follows `bin/file-gap.sh` exactly: repo-root cd,
+config-via-env, exit 2 on a missing or empty argument. Advisory tooling, not a
+gate — the raw append stays a legal fallback, the grammar being the surface's
+contract rather than the writer.
+
+It **stamps `rev` and the date itself and derives `<stage>` from the cursor**
+(`lifecycle_current_stage`), which is the load-bearing decision in the tool:
+`rev` is the field the entire re-use protocol turns on and exactly the field an
+author would get wrong — a short sha, the rev they *started* at, or none.
+Machine-stamping it is how the mechanism avoids failing silently when someone
+forgets, which is the failure shape that rules out author-supplied conventions
+elsewhere in this kit. A tree with no `HEAD` commit cannot ground a witness, so
+that is a refusal (exit 2) rather than a blank field; a tree with no cursor yet
+stamps the never-named `—` the queue header already uses.
+
+It **deliberately does not** inherit `file-gap.sh`'s slug resolution. A survey's
+prose routinely names queue slugs as its subject, and that resolver scans whole
+prose, so it would stamp a recurrence declaration onto the survey's subject.
+Adding no resolver here is a decision, not an omission.
+
+**How this differs from the gap inbox, which it sits beside.** The two are
+sibling committed per-iteration surfaces with deliberately *opposite* semantics
+on both axes, and a reader who meets them apart will assume symmetry and get
+both wrong:
+
+- **Merge.** The gap inbox is `merge=union` — a gap filed on either side of a
+  concurrent merge must survive. The survey record is `merge=iteration-scoped`
+  (keep-ours): a survey from the other side describes a tree state this clone
+  never had, so surviving the merge is the hazard, not the save.
+- **Boundary.** The gap inbox *refuses* the iteration boundary while it holds
+  bullets, because every gap owes a disposition. The survey record is
+  boundary-**truncated and never refuses**: a survey owes nobody a disposition,
+  being scratch whose whole lifetime was the iteration that just ended
+  (§bin/enter-stage.sh).
+
+That per-iteration lifetime is delivered by the boundary reset rather than by a
+judgment — which is precisely the window the design needed sized. The record
+resets as a **kit built-in member**, not through the consumer's
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` array, by the same rule
+`LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` follows: a defaulted bash array is
+*replaced* when a consumer assigns it, so shipping the record as a default
+member would silently lose the reset in every consumer that sets the knob for
+its own reasons.
+
+Two homes were ruled out, each on grounds that decide it alone. **The resume
+journal** (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset
+sweeps) is crash recovery for the
+*writing* session, discoverable by its per-session name — a hand-off surface
+must be discoverable by content, by a session that never knew the writer's name
+— and it lives in untracked scratch with a second reclaimer, context-kit's
+session-context hook, whose age guard is shorter than an iteration
+(context-kit/SPEC.md §The session-context hook); a scope-stage journal can be
+swept before the stage that would read it ever runs, silently and
+time-dependently. **The gap inbox** has the right tier and the wrong semantics
+on both axes above: routing surveys there would make the boundary refuse on
+residue nobody owes a disposition for.
+
+**Producers and consumers.** Producer: any session that bought a survey, via
+`bin/file-survey.sh` (the raw append the sanctioned fallback); the knob default
+makes the channel live everywhere the kit is vendored, so the deployed
+configuration that must be set is none. Consumer: the next stage session, at its
+`bin/enter-stage.sh` entry — which prints the record's headings, the questions
+and never the findings — and at the moment it is about to dispatch a survey,
+where the witness applies. Each field's reader at its transition: `corpus` and
+`rev` by the consuming session's `git diff` at the pre-dispatch check, `oracle`
+by the same session at the same transition to re-run, `finding` by that session
+only *after* the witness holds (which is why the entry report prints headings and
+not findings), the `## ` heading by `bin/enter-stage.sh` at every stage entry and
+by `check-survey-record` at commit time as the block delimiter. Third reader, at
+the iteration boundary: the first-stage truncate, which reads the surface as a
+whole and discards it.
+
+**Nothing is produced on the delegation side.** No journal contract moves, no
+dispatch shape changes, no obligation lands on a dispatched child. The producer
+is the *parent*, which is where delegation-kit's durable-before-you-act rule
+already puts the write; this surface gives that existing obligation a home for
+one shape of finding rather than adding an obligation. It is also **not** the
+durable escalation artifact delegation-kit/SPEC.md §The delegation model
+prescribes as a child's upward route: that one is mid-run, dispatcher-minted,
+per-dispatch and written by the child, where this is a hand-off, single-path,
+per-iteration and written by the parent after the child returns. Different
+writer, reader, lifetime and discovery key — they must not be collapsed.
+
+**Open, and shared with the gap inbox:** who commits an append filed by a
+session that is not the stage session. This surface inherits that question and
+does not answer it; the exposure is smaller, since a survey lost to an
+uncommitted append costs a re-derivation, which is today's cost.
+
 ## The close-surface roster
 
 Close reads a set of **inbound triage surfaces** — capture logs, harvest sinks,
@@ -819,8 +1015,9 @@ which renders the resident registration block (§bin/install-lifecycle.sh) from 
 live config so `bin/install-lifecycle.sh` and `check-lifecycle-registration`
 derive one text and cannot drift. Three more renderers follow the same
 writer/asserter shape for the merge-attribute surface: `lifecycle_supersede_set`
-prints the derived iteration-scoped supersede set (the state file, the kit-owned
-lesson-evidence file, and each `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member — exactly
+prints the derived iteration-scoped supersede set (the state file, the two
+kit-owned built-ins — the lesson-evidence file and the survey record — and each
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member: exactly
 what `bin/enter-stage.sh` truncates at the boundary); `lifecycle_union_set`
 prints the derived union-merge set (the gap inbox — §The committed gap inbox);
 and `lifecycle_merge_attrs_block` renders the supersede set as
@@ -901,10 +1098,23 @@ that vendored the cursor extraction mid-iteration heals at its next boundary
 without a migration step. `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`
 is a generic per-iteration reset knob — no consumer surface is named in
 the kit; a downstream kit whose per-iteration file must start each cycle from
-its contract header adds itself here, as evidence-kit's manifest does. The
-kit-owned `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` resets by the same rule as a
-**built-in member** — the kit owns that surface, so it does not ride the
-consumer knob (git history keeps the retired stamps).
+its contract header adds itself here, as evidence-kit's manifest does. The two
+kit-owned surfaces — `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE` and
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE` (§The survey record) — reset by the same rule
+as **built-in members**: the kit owns those surfaces, so they do not ride the
+consumer knob (git history keeps the retired stamps and the retired surveys).
+
+**What counts as the header, for the truncate.** The retained run is the
+member's leading blank and `#` **comment** lines, stopping at the first data
+line *or* at a markdown `## ` section heading, whichever comes first. The second
+half of that predicate is load-bearing rather than defensive: on a markdown
+surface whose blocks *are* `## ` headings — the survey record — a bare
+"keep every leading `#` line" rule reads the first block's heading as part of
+the header and carries one stale survey across the boundary, with the record's
+own read trigger then advertising it. The failure is silent, survives a green
+battery, and is invisible to any fixture that does not run a real boundary
+entry, which is why the boundary behavior is exercised end-to-end in
+`gate-tests/` rather than reasoned about.
 
 The boundary reset additionally **wipes the scratch dir** (`GATE_SDK_TMP_DIR`),
 deleting every member whose basename is neither `.gitkeep` nor a
@@ -959,7 +1169,20 @@ iteration, so no `[attend]` injection (queue-kit §bin/queue-index.sh) can
 outlive the iteration that filed it. It **likewise refuses while the gap inbox
 (`LIFECYCLE_KIT_GAP_INBOX_FILE`) holds bullets** — the same refusal contract, so
 a mid-iteration gap the close skill did not drain (§The committed gap inbox)
-cannot cross the boundary untriaged; an absent inbox has no bullets and passes. The boundary entry additionally **refuses
+cannot cross the boundary untriaged; an absent inbox has no bullets and passes.
+**The survey record, its neighbour in the boundary reset, deliberately does
+not refuse** (§The survey record): it is truncated like any built-in member, and
+a non-empty one is never a blocker, because a survey owes nobody a disposition —
+it is scratch whose whole lifetime was the iteration just ending. The two
+surfaces sit one line apart in this tool with opposite semantics, so the
+asymmetry is stated rather than left to be inferred. The entry additionally
+carries the record's **read trigger**: when the record is non-empty the report
+prints its `## ` headings — the questions the iteration's prior surveys answered,
+never their findings, since printing a possibly-stale judgment ahead of its
+witness is the failure the witness exists to prevent. It rides the tool every
+stage already invokes as its first step, so it adds no invocation point and no
+schedule, and it lands at the one moment a stage session is guaranteed to be
+looking. The boundary entry additionally **refuses
 when a `LIFECYCLE_KIT_BOUNDARY_REQUIRE` member lacks a disposition line for the
 closing iteration** (exit 1, nothing written, the same refusal contract): each
 member must carry a data line whose first token is the closing iteration's name,
@@ -1008,7 +1231,8 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 (`LIFECYCLE_KIT_QUEUE_FILE`, `LIFECYCLE_KIT_STATE_FILE`, `LIFECYCLE_KIT_STAGES`,
 `LIFECYCLE_KIT_FIRST_STAGE`, `LIFECYCLE_KIT_BOUNDARY_TRUNCATE`,
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
-`LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`, and
+`LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
+`LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and
 `LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
 `smoke/install.sh` — including the boundary require-check scenarios (a member
@@ -1425,7 +1649,8 @@ a git-native driver a consumer's own tracked append log legitimately carries
 (§Multi-operator semantics), so there is no smuggling to catch. A missing
 `.gitattributes` reports every derived surface as unmechanized (exit 1, the
 install remedy); an unreadable one, an empty supersede set (a lifecycle always
-owns at least its state + lesson-evidence files), or an empty union set (it
+owns at least its state file and its two kit-owned built-ins, the
+lesson-evidence file and the survey record), or an empty union set (it
 always owns at least its gap inbox), is fail-closed (exit 2).
 
 The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate model):
@@ -1445,6 +1670,54 @@ scan target (self-lint). Its `# graph:` couples `.gitattributes` and
 a reshaped `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` in the consumer config is backstopped
 by the whole-tree `run-gates.sh` battery (the `check-stage-skill-coverage`
 precedent).
+
+### check-survey-record
+
+Invariant: every block in the survey record (§The survey record) carries a whole
+witness. Over each `## ` block: all four keys present, in order, one per line
+(and no fifth key, no stray line); `corpus` non-empty; `oracle` non-empty, where
+the literal `none` is legal and is the honest form and an *empty* value is the
+silent form and is refused; and `rev` a full 40-hex sha naming a commit that
+exists — the assertion that catches the short-sha and wrong-rev cases, and the
+reason the field is machine-stamped rather than author-supplied.
+
+An absent record, and a record truncated to its header, are **clean and counted
+inert**: the surface is optional, and a consumer that never files a survey must
+not carry a red gate.
+
+Enforcement-first is why the gate ships in the same unit as the surface rather
+than as follow-up debt: a block missing its witness is *silently unusable*,
+which is the exact failure class the surface exists to close.
+
+**Bare drives the configured record with the full assertion set; an explicit
+file argument drives it hermetically — grammar only, with no rev-existence
+probe.** That split is forced by portability rather than convenience: a fixture's
+`rev` names no commit in the tree the fixture is copied into, so a pair asserting
+existence would go red in every consumer that vendored the kit. Bare also
+degrades to grammar-only outside a git repository, where there is nothing to
+resolve a sha against. The clean line names which mode ran, so a grammar-only
+pass can never be read as a verified one.
+
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
+model): the single `SURVEY-RECORD: clean` line and a `help:` remedy naming the
+grammar and `bin/file-survey.sh` on the finding path (output); exit 2 on an
+unreadable or explicitly-named-but-missing record and on a failed parse
+(fail-closed); a `good/`+`bad/` fixture pair under `gate-tests/` driven through
+the hermetic argument — the good case a two-block record including an
+`oracle: none` note, the bad case a short sha, an empty oracle and a block with
+its `oracle` line missing — plus `gate-tests/check-survey-record.test.sh` for the
+half the pair cannot hold: both arms of the rev-existence probe in a sandbox
+repo (a rev naming a real commit, and a well-formed 40-hex rev naming nothing)
+and the two inert shapes (fixture-pair); and registration in this repo's
+`gates.list`, where its scan target is this repo's own record (self-lint). Its
+`# graph:` couples the record at `tier=precommit`.
+
+*Not gated, and stated so the gate is not mistaken for more than it is:* whether
+a `finding` is **true**, and whether a session holding a fresh record actually
+read it. The first is unmechanizable; the second leaves no tracked artifact —
+the class delegation-kit/SPEC.md §Operative residency rules no gate is owed for.
+The entry report's read trigger (§bin/enter-stage.sh) is the affordance in place
+of an oracle there, and it is weaker than one by construction.
 
 ### templates/stages/
 

@@ -174,11 +174,12 @@ fi
 
 if [[ "$first" == 1 ]]; then
     mv "$tmpstate" "$STATE"
-    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit-owned lesson-evidence file resets as a built-in member (kit owns this surface); LIFECYCLE_KIT_BOUNDARY_TRUNCATE stays reserved for files the kit does not own
-    for bt in "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" ${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]}"}; do
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the two kit-owned surfaces (lesson evidence, survey record) reset as built-in members (the kit owns them); LIFECYCLE_KIT_BOUNDARY_TRUNCATE stays reserved for files the kit does not own, and a defaulted array is replaced rather than merged when a consumer assigns it, so a built-in shipped as a default member would lose its reset in every configuring consumer
+    for bt in "$LIFECYCLE_KIT_LESSON_EVIDENCE_FILE" "$LIFECYCLE_KIT_SURVEY_RECORD_FILE" ${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]+"${LIFECYCLE_KIT_BOUNDARY_TRUNCATE[@]}"}; do
         [[ -f "$bt" ]] || continue
         bttmp="$tmpdir/boundary-truncate.$$"
-        awk 'drop { next } /^#/ || /^[[:space:]]*$/ { print; next } { drop = 1 }' "$bt" > "$bttmp"
+        # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the header run stops at a markdown '## ' section heading as well as at the first data line: on a markdown surface whose blocks are '## ' headings (the survey record) a bare /^#/ predicate reads the first block's heading as part of the header and carries it across the boundary
+        awk 'drop { next } /^[[:space:]]*$/ { print; next } /^#([^#]|$)/ { print; next } { drop = 1 }' "$bt" > "$bttmp"
         mv "$bttmp" "$bt"
         truncated+=("$bt")
     done
@@ -212,4 +213,13 @@ if [[ ${#truncated[@]} -gt 0 ]]; then
 fi
 if [[ ${#wiped[@]} -gt 0 ]]; then
     echo "  note: boundary-wiped from $tmpdir: ${wiped[*]}"
+fi
+
+# spec: lifecycle-kit/SPEC.md §The survey record — the read trigger: the entry report prints the record's headings (the questions), never the findings, at the one moment a stage session is guaranteed to be looking. Findings stay behind the witness — printing them here would put a possibly-stale judgment into context ahead of the check that qualifies it. A non-empty record never refuses the boundary: unlike the gap inbox one line above, a survey owes nobody a disposition.
+if [[ -f "$LIFECYCLE_KIT_SURVEY_RECORD_FILE" ]]; then
+    mapfile -t survey_qs < <(awk '/^##[[:space:]]/ { print }' "$LIFECYCLE_KIT_SURVEY_RECORD_FILE")
+    if [[ ${#survey_qs[@]} -gt 0 ]]; then
+        echo "  note: $LIFECYCLE_KIT_SURVEY_RECORD_FILE carries ${#survey_qs[@]} survey(s) this iteration — before buying one of these again, run its witness (diff the corpus since its rev, re-run its oracle) and cite it if both hold:"
+        printf '    %s\n' "${survey_qs[@]}"
+    fi
 fi
