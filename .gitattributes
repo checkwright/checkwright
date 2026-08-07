@@ -2,6 +2,7 @@
 # lifecycle-kit:merge:begin
 .workflow/WORKFLOW-STATE.txt merge=iteration-scoped
 .workflow/lesson-evidence.txt merge=iteration-scoped
+.workflow/survey-record.md merge=iteration-scoped
 .workflow/validate-evidence.txt merge=iteration-scoped
 .workflow/release-disposition.txt merge=iteration-scoped
 .workflow/gap-inbox.md merge=union
