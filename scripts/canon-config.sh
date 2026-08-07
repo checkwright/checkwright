@@ -53,6 +53,12 @@ CANON_KIT_INSTALL_SECTION_RE='^(Quick start|Install)'
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_INSTALL_CLAIM_EXCLUDE=("docs/posts/*")
 
+# comment-tier-exempt: this repo's payload-disclosure vocabulary — a spelling of what a payload discloses is one project's distribution model, so it is consumer config for the same provenance-seam reason the transport vocabulary above is; the posts valve keeps a published dated note immutable, the same way CANON_KIT_INSTALL_CLAIM_EXCLUDE and CANON_KIT_TEMPORAL_EXEMPT_PATHS already do
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_PAYLOAD_CLAIMS_CMD="bash scripts/payload-claims.sh"
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_PAYLOAD_CLAIM_EXCLUDE=("docs/posts/*")
+
 # comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_ENUM_SETS_CMD="bash scripts/enum-sets.sh"

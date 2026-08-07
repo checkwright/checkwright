@@ -97,6 +97,9 @@ declare -p CANON_KIT_COUNT_ALLOWED_PHRASES &>/dev/null || CANON_KIT_COUNT_ALLOWE
 [[ -v CANON_KIT_INSTALL_SECTION_RE ]]     || CANON_KIT_INSTALL_SECTION_RE=""
 declare -p CANON_KIT_INSTALL_CLAIM_EXCLUDE &>/dev/null || CANON_KIT_INSTALL_CLAIM_EXCLUDE=()
 
+[[ -v CANON_KIT_PAYLOAD_CLAIMS_CMD ]] || CANON_KIT_PAYLOAD_CLAIMS_CMD=""
+declare -p CANON_KIT_PAYLOAD_CLAIM_EXCLUDE &>/dev/null || CANON_KIT_PAYLOAD_CLAIM_EXCLUDE=()
+
 declare -p CANON_KIT_COMMENT_MACHINE &>/dev/null || CANON_KIT_COMMENT_MACHINE=()
 declare -p CANON_KIT_COMMENT_REASON  &>/dev/null || CANON_KIT_COMMENT_REASON=()
 declare -p CANON_KIT_COMMENT_SURFACE &>/dev/null || CANON_KIT_COMMENT_SURFACE=()
@@ -453,23 +456,28 @@ spec_enum_sets() {
     return 0
 }
 
-# spec: canon-kit/SPEC.md §check-install-claim — run the consumer's transport command and echo its validated <transport-id><TAB><ERE> lines; a command that fails, a line that does not parse, or a duplicate id returns 2 (fail-closed), the same contract spec_enum_sets carries. Empty CANON_KIT_INSTALL_TRANSPORTS_CMD is the caller's clean-skip signal, handled before this is called.
-spec_install_transports() {
-    local out st line id ere seen=""
-    out="$(bash -c "$CANON_KIT_INSTALL_TRANSPORTS_CMD")"; st=$?
-    [[ $st -eq 0 ]] || { echo "spec_install_transports: CANON_KIT_INSTALL_TRANSPORTS_CMD exited $st" >&2; return 2; }
+# spec: canon-kit/SPEC.md §lib/spec.sh — run a consumer's claim-vocabulary command and echo its validated <id><TAB><ERE> lines; a command that fails, a line that does not parse, an id that is not slug-shaped, or a repeated id returns 2 (fail-closed), the same contract spec_enum_sets carries. $2 labels the vocabulary in every message, so a fail-closed exit says which one failed. An empty command is the caller's clean-skip signal, handled before this is called.
+spec_claim_vocabulary() {  # $1=command  $2=label naming the vocabulary in messages
+    local cmd="$1" label="$2" out st line id ere seen=""
+    out="$(bash -c "$cmd")"; st=$?
+    [[ $st -eq 0 ]] || { echo "spec_claim_vocabulary: $label exited $st" >&2; return 2; }
     while IFS= read -r line; do
         [[ -n "$line" ]] || continue
-        [[ "$line" == *$'\t'* ]] || { echo "spec_install_transports: line has no tab: '$line'" >&2; return 2; }
+        [[ "$line" == *$'\t'* ]] || { echo "spec_claim_vocabulary: $label: line has no tab: '$line'" >&2; return 2; }
         id="${line%%$'\t'*}"; ere="${line#*$'\t'}"
-        [[ -n "$id" && -n "$ere" ]] || { echo "spec_install_transports: empty id or pattern: '$line'" >&2; return 2; }
-        [[ "$ere" == *$'\t'* ]] && { echo "spec_install_transports: extra tab in line: '$line'" >&2; return 2; }
-        [[ "$id" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo "spec_install_transports: id is not slug-shaped: '$id'" >&2; return 2; }
-        [[ " $seen " == *" $id "* ]] && { echo "spec_install_transports: duplicate transport id: '$id'" >&2; return 2; }
+        [[ -n "$id" && -n "$ere" ]] || { echo "spec_claim_vocabulary: $label: empty id or pattern: '$line'" >&2; return 2; }
+        [[ "$ere" == *$'\t'* ]] && { echo "spec_claim_vocabulary: $label: extra tab in line: '$line'" >&2; return 2; }
+        [[ "$id" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo "spec_claim_vocabulary: $label: id is not slug-shaped: '$id'" >&2; return 2; }
+        [[ " $seen " == *" $id "* ]] && { echo "spec_claim_vocabulary: $label: duplicate id: '$id'" >&2; return 2; }
         seen="$seen $id"
         printf '%s\t%s\n' "$id" "$ere"
     done <<< "$out"
     return 0
+}
+
+# spec: canon-kit/SPEC.md §check-install-claim — the install-transport vocabulary, one caller of the general loader above; the fail-closed contract is that function's and is not restated here.
+spec_install_transports() {
+    spec_claim_vocabulary "$CANON_KIT_INSTALL_TRANSPORTS_CMD" CANON_KIT_INSTALL_TRANSPORTS_CMD
 }
 
 _sk_errs=()

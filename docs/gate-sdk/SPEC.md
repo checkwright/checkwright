@@ -630,7 +630,7 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so with **zero descriptors on disk it is not yet substrate-sensitive by assertion C's runtime derivation** and this row is not yet owed — which is why it is written now rather than left to be discovered. The commit that lands the first descriptor makes the gate sensitive and would red on a missing disposition, and that commit's session is the worst possible one to be learning this table exists. Same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
-| `check-docs-cmd`, `check-install-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
+| `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
 
@@ -1085,6 +1085,13 @@ that pointer binds to, its `good/`+`bad/` fixture pair, and a prebuilt,
 digest-verified binary. **Its implementation source does not ship.** A consumer
 receives everything needed to run a gate, act on its verdict, and verify it
 behaves as specified, and does not receive the rule's text.
+
+<!-- payload-discloses: predicate-withheld -->
+
+That marker is the machine tier of the rule the paragraph above states, and this
+section is its one owner. canon-kit/SPEC.md §check-payload-claim owns what binds
+the two — a governed doc asserting a different disclosure class is a red rather
+than a discrepancy a reader has to notice.
 
 This serves the objective TRAJECTORY.md §The objectives records in full — that
 opacity is a goal and not a side effect,

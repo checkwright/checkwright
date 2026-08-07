@@ -6,8 +6,10 @@ nav_order: 3
 # Install and upgrade
 
 Checkwright is distributed git-native and vendored-committed: the kit
-directories live in your repository as committed source. The gates read tracked
-files, and the audit story wants the governance layer inside the reviewed tree.
+directories live in your repository as committed source, with the one exception
+§What a gate discloses draws below — a gate whose implementation is compiled
+arrives as a verified binary instead. The gates read tracked files, and the audit
+story wants the governance layer inside the reviewed tree.
 
 The two registries stand in different relations to that, and the distinction is
 worth drawing rather than blurring:
@@ -19,9 +21,9 @@ worth drawing rather than blurring:
   payload into your tree and commits it.
 - **The same payload downloads straight off the GitHub Release**, as a tarball
   and its `.sha256`, attached to every tagged release. This strengthens the
-  doctrine rather than weakening it: a downloaded, checksummed, extracted
-  tarball you read before running it is the most auditable form of the same
-  one-shot vendoring.
+  doctrine rather than weakening it: a tarball you download, verify against its
+  published digest, and extract before anything runs is the most auditable form
+  of the same one-shot vendoring.
 
 The last two are two transports over one install model, not two products. Both
 reach the same `init`, write the same `checkwright.lock`, and leave the same
@@ -46,9 +48,9 @@ vendored keeps working, needing nothing from a registry ever again.
 
 That is what a one-shot vendoring means, and it is why the doctrine survives the
 installer rather than being repealed by it: what governs your tree is still
-committed, auditable source you read before you run it. Both properties are
-asserted rather than claimed — the consumer smoke installs from a packed
-tarball with no registry access and runs the whole path from it, and
+committed and auditable, on the terms §What a gate discloses sets out below.
+Both properties are asserted rather than claimed — the consumer smoke installs
+from a packed tarball with no registry access and runs the whole path from it, and
 `check-installer-no-deps` reds the package the moment it declares a dependency
 field or an install-time script.
 
@@ -214,10 +216,9 @@ content that makes it exactly that — so a tarball unpacked in place blocks the
 install it was downloaded for.
 
 Four commands rather than one piped into a shell is deliberate. A
-`curl … | sh` one-liner would have this page contradicting its own opening
-claim: what governs your tree is meant to be source you read before you run it,
-and an unreviewed remote script fed straight to a shell is that claim's
-counter-pattern.
+`curl … | sh` one-liner would have this page contradicting the claim its own
+intro makes about what governs your tree, since an unreviewed remote script fed
+straight to a shell is that claim's counter-pattern.
 
 The checksum is worth understanding for what it does not cover. It travels from
 the same origin over the same encrypted session as the tarball, so verifying it
@@ -296,14 +297,18 @@ runner — then add kits in the order the [kit map](index.md#the-kits) lists the
 ### What a gate discloses
 
 Worth knowing before you adopt, because it qualifies the opening claim on this
-page. Today every gate is a shell script and you read all of it. The ruled
-direction is that a gate whose implementation moves to a compiled binary ships
-four things and withholds one. It ships its declaration. It ships its `# spec:`
-pointer with the specification section behind it. It ships its `good/`+`bad/`
-fixture pair. It ships the binary itself, verified against a published digest
-before anything is written to your tree. What it does not ship is the
-implementation source. [gate-sdk/SPEC.md](gate-sdk/SPEC.md#consumer-payload) is
-where that is ruled and bounded.
+page. A gate whose implementation is a compiled binary ships four things and
+withholds one. It ships its declaration. It ships its `# spec:` pointer with the
+specification section behind it. It ships its `good/`+`bad/` fixture pair. It
+ships the binary itself, verified against a published digest before anything is
+written to your tree. What it does not ship is the implementation source.
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md#consumer-payload) is where that is ruled and
+bounded.
+
+Most of the battery is shell you can open and follow line by line. That is a
+statement about the corpus as it stands, not about the contract: what a gate
+discloses is set by the rule above, whatever the shape of the shipped set on the
+day you vendor it.
 
 The reason is narrow and worth stating as narrowly as it holds. A coding agent
 told to make your battery green will, if it can, read the gate blocking it and

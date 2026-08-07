@@ -47,6 +47,7 @@ reads the tag syntax [queue-kit](https://github.com/checkwright/checkwright/tree
    check-prose-enum             # partial enumeration of a governed set
    check-md-refs                # internal markdown links resolve
    check-install-claim          # one declared primary install transport, led with everywhere
+   check-payload-claim          # one declared payload-disclosure class, asserted nowhere else
    check-spec-fence-balance     # even fence counts, parsers never desync
    check-docs-link-convention   # needs a docs site (cite-downward links)
    check-prose-tells            # needs prose surfaces (mechanical AI-prose tells)

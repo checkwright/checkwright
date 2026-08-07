@@ -46,10 +46,15 @@ no dependency channel exists, so the code that runs is the code sitting in your
 tree. That also means adopting a kit is granting it whatever your hooks and CI
 already hold.
 
-**Vendoring is a copy you read before you run it.** Reviewing the diff at
-adoption and again at each upgrade is the trust step, and no mechanism in any
-kit substitutes for it. This is the reason the distribution model is a committed
-copy rather than a package pull: the reviewable artifact is the point.
+**Vendoring is a copy you review before you run it.** Reviewing the diff at
+adoption and again at each upgrade is the trust step for everything that ships
+as source, and no mechanism in any kit substitutes for it. What a vendored gate
+puts in front of you is ruled and bounded at
+[gate-sdk/SPEC.md](gate-sdk/SPEC.md) §Consumer payload: a gate whose
+implementation is compiled withholds that implementation, and what stands in
+for reading it is a published per-target digest verified before the artifact is
+written. This is the reason the distribution model is a committed copy rather
+than a package pull: the reviewable artifact is the point.
 
 **A gate is a consistency check on a tree, not a security boundary.** Every gate
 answers one question — does this tree agree with itself — and it answers it for

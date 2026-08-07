@@ -10,3 +10,4 @@ check-producer-liveness
 check-gate-binary-fresh
 check-survey-record
 check-gate-tamper
+check-payload-claim

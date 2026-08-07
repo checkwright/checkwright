@@ -303,6 +303,10 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'docs/*.md' 'scripts/*.sh
     run_gate check-install-claim canon-kit/checks/check-install-claim.sh
 fi
 
+if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'SECURITY.md' 'docs/*.md' 'scripts/*.sh'; then
+    run_gate check-payload-claim canon-kit/checks/check-payload-claim.sh
+fi
+
 if staged_matches 'installer/package.json'; then
     run_gate check-installer-no-deps scripts/check-installer-no-deps.sh
 fi

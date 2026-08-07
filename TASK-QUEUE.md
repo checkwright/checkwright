@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **payload-disclosure-claim-owner** [spec: SPEC-payload-claim.md] — two governed
-  install surfaces disagree about what a consumer receives. `installer/README.md`
-  §init claims what governs your tree afterwards is committed source you can read —
-  true of every tree that exists today, false at the first ported gate, since
-  `gate-sdk/SPEC.md` §Consumer payload rules a compiled gate's implementation source
-  does not ship. Unit **4 of 4**, last by the forced ordering: its claim is not false
-  until unit 3's descriptors land, so landing this earlier would publish prose ahead of
-  the tree.
-  **Defect class:** a disclosure claim about the vendored payload restated across
-  governed install surfaces with one owner and no oracle.
-  **The design is restored, not re-derived** — `canon-kit/SPEC-payload-claim.md`, off
-  the align-hardened revision (`git show 71c584e:…`). Its tense ruling was re-read
-  rather than adopted and **stands, on a firmer footing**: its condition was that the
-  port land in the same iteration, and the operator's build order now closes the
-  prose-ahead-of-tree window structurally rather than only by DoD.
-  **Deliverable, structural rather than prose:** a declared owner and an oracle, the
-  shape `check-install-claim` gives the primary-install-path claim — ruled a **sibling
-  gate** rather than that gate's extension, with the vocabulary as consumer config,
-  since a spelling of what a payload discloses is one project's distribution model.
-  **This corpus has now been hand-enumerated three times and mis-enumerated twice.** No
-  count belongs in this body — not the one this line replaces either. The enumeration
-  lives in the amendment, behind `check-payload-claim` assertion B, which is the only
-  completeness oracle the DoD accepts; `.workflow/survey-record.md` carries the witness
-  so build cites rather than re-measures.
-  Filed 2026-08-03 at close from the gap inbox; found by build batch 3. Amendment
-  authored 2026-08-06 at spec, demoted 2026-08-06 at build under the hold ruling,
-  restored and re-promoted 2026-08-07.
-
 ## Technical Debt
 
 ## Deferred
@@ -3698,5 +3670,6 @@
 - native-gate-dogfood-ruling
 - consumer-smoke-artifact-arm
 - native-gate-cohort-descriptors
+- payload-disclosure-claim-owner
 
 ## Lessons Learned

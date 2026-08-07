@@ -21,6 +21,7 @@ check-knob-default-coupling
 check-manifest-count
 check-manifest-temporal
 check-md-refs
+check-payload-claim
 check-prose-enum
 check-prose-tells
 check-spec-fence-balance

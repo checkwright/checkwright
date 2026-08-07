@@ -97,6 +97,7 @@ leaves its section absent.
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | (consumer) | check-install-toolchain | precommit |
 | [canon-kit](canon-kit/index.md) | check-install-claim | precommit |
+| [canon-kit](canon-kit/index.md) | check-payload-claim | precommit |
 | (consumer) | check-installer-no-deps | precommit |
 | (consumer) | check-release-bump | precommit |
 | (consumer) | check-release-channel-parity | precommit |

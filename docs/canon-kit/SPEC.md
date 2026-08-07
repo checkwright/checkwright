@@ -316,6 +316,15 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   kit literal (the provenance seam). This repo sets
   `bash scripts/install-transports.sh`, `^(Quick start|Install)`, and
   `("docs/posts/*")`.
+- `CANON_KIT_PAYLOAD_CLAIMS_CMD` — a consumer command emitting the payload
+  disclosure classes `check-payload-claim` holds, one `<claim-id>`⇥`<ERE>` line
+  per class, default empty ⇒ clean skip (the correct posture for a tree whose
+  payload discloses one thing only). `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` — array
+  of globs dropped from that gate's scanned set on top of
+  `CANON_KIT_MDREF_EXCLUDE`, default empty. A spelling of what a payload
+  discloses is one project's distribution model, so it is consumer config for
+  the same provenance-seam reason the transport vocabulary above is. This repo
+  sets `bash scripts/payload-claims.sh` and `("docs/posts/*")`.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
@@ -442,13 +451,21 @@ same shapes:
 - **The enum sets** arrive through the consumer's `CANON_KIT_ENUM_SETS_CMD`,
   validated and fail-closing (exit 2) on a command error or an unparsable line
   (§check-prose-enum).
-- **The install transports** arrive the same way, through
-  `CANON_KIT_INSTALL_TRANSPORTS_CMD`, and `spec_install_transports` carries the
+- **The claim vocabularies** arrive the same way, through
+  `spec_claim_vocabulary <command> <label>` — one loader for every
+  `<id>`⇥`<ERE>` vocabulary a claim gate reads, taking the command as an
+  argument rather than from one named knob so a second claim axis costs a caller
+  and not a second copy. It carries the
   same fail-closed contract its enum-set sibling does — a command error, an
-  unparsable line, an id that is not slug-shaped, or a repeated id is exit 2. The
-  duplicate check is what a bare emit grammar cannot express and the gate needs:
-  two lines claiming one id would give a transport two patterns and make its
-  match order arbitrary (§check-install-claim).
+  unparsable line, an id that is not slug-shaped, or a repeated id is exit 2 —
+  and the `<label>` it is given names the failing vocabulary in every message,
+  so a fail-closed exit still says which one failed. The duplicate check is what
+  a bare emit grammar cannot express and both gates need: two lines claiming one
+  id would give a class two patterns and make its match order arbitrary. Its
+  callers are `spec_install_transports`, over
+  `CANON_KIT_INSTALL_TRANSPORTS_CMD` (§check-install-claim), and
+  `check-payload-claim` directly, over `CANON_KIT_PAYLOAD_CLAIMS_CMD`
+  (§check-payload-claim).
 - **The comment-surface adapters:** the comment gates read *different* surfaces.
   `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
   line is an unresolvable-by-design placeholder (§check-spec-pointer);
@@ -1413,6 +1430,19 @@ per transport through `CANON_KIT_INSTALL_TRANSPORTS_CMD`, loaded by
 `spec_install_transports` (§lib/spec.sh) — because a kit literal spelling a
 transport publishes one project's distribution model as a kit fact.
 
+**Where this gate ends and §check-payload-claim begins.** The two answer
+different questions and share only the vocabulary loader. This one is
+**positional and install-section-scoped**: naming a secondary transport is
+correct prose, so what it judges is which transport a selected section *leads*
+with. Its sibling is **membership over the whole governed document**, because a
+disclosure class other than the declared one has no correct-but-secondary form —
+it is wrong wherever it appears. The scopes do not coincide either, so neither
+gate is the other's second assertion pair: an install section under this repo's
+section regex is not where the disclosure claim is ruled, and folding a
+whole-document membership rule into a section-scoped positional gate would make
+this gate's name false and give one gate two unrelated calibrations to reason
+about on a red.
+
 The scanned set is `check-md-refs`' governed doc set (the manifest set minus
 `CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_INSTALL_CLAIM_EXCLUDE`. Two
 assertions:
@@ -1474,6 +1504,84 @@ transport — beside a silent no-transport section, a heading the regex does not
 select, and a published note the path valve keeps out of the scanned set. The
 `# graph:` manifest couples the gate to the doc set and `scripts/*.sh`, so a
 transport rename re-fires it over the docs. `precommit` tier.
+
+### check-payload-claim
+
+Invariant: exactly one governed doc declares what a gate on the vendored payload
+discloses, and no scanned governed doc asserts a different disclosure class. Two
+assertions: (A) **singleton owner** — exactly one declaration exists across the
+scanned set; (B) **no contradicting assertion** — no scanned line matches the
+pattern of a class other than the declared one.
+
+The claim's machine-readable owner is a full-line
+`<!-- payload-discloses: <claim-id> -->` HTML comment, the same
+tier-beside-the-prose shape §check-install-claim uses and for the same reason:
+the reader-facing form of this claim already exists as prose and must stay prose.
+It belongs in the section that rules the fact, which in this repo is
+gate-sdk/SPEC.md §Consumer payload. The disclosure vocabulary is consumer config
+— one `<claim-id>`⇥`<ERE>` line per class through
+`CANON_KIT_PAYLOAD_CLAIMS_CMD`, loaded by `spec_claim_vocabulary` (§lib/spec.sh)
+— because a spelling of what a payload discloses is one project's distribution
+model, and a kit literal carrying one would publish it. The scanned set is
+`check-md-refs`' governed doc set (the manifest set minus
+`CANON_KIT_MDREF_EXCLUDE`) minus `CANON_KIT_PAYLOAD_CLAIM_EXCLUDE` — the same
+composition its sibling uses, so a consumer configures one scanned-set idiom
+rather than two.
+
+**Assertion A.** Zero declarations is the defect the gate exists for: nothing
+owns the claim, so an unbounded number of surfaces drift with nothing watching,
+and no reader can tell which surface is the one to believe. Two owners is that
+same defect wearing a different shape. A `<claim-id>` outside the configured
+vocabulary is **fail-closed (exit 2)** rather than a violation — with no
+resolvable declared class the gate holds nothing to compare a line against, so
+it must not run rather than pass.
+
+**Assertion B.** Across each scanned document, any line matching the pattern of a
+class other than the declared one is a violation, wherever in the document it
+sits. Membership rather than position, because a non-declared disclosure class
+has no correct secondary form. The declaration line itself is skipped, since a
+claim is not evidence for itself. Fenced content is scanned, because a quoted
+recipe is exactly where a disclosure claim shows up in passing. The report names
+the offending class, because "wrong disclosure class" alone would leave the
+reader grepping.
+
+**The declared class's own pattern is latent rather than unread.** Assertion B
+matches only the classes that are *not* declared, so the declared one's pattern
+does no work while it holds the declaration — and starts doing it the moment the
+declaration moves to another class. The vocabulary is a set of classes, not a set
+of live matchers, so a class is emitted with its pattern whether or not it is
+currently the declared one.
+
+**One claim axis rather than a claim registry.** The shape behind this gate and
+its sibling — a declared owner, an id vocabulary, a scanned corpus — invites a
+registry keyed by claim name. Refused for now, with the reason recorded so it is
+not re-derived: one axis exists, this gate and its sibling already share the only
+piece worth sharing (the vocabulary loader), and a registry would mint an
+axis-name knob and an indirection to hold a single member. The refusal is cheap to reverse — a
+second axis is the trigger, and both gates would collapse into the registry with
+their vocabularies unchanged.
+
+**Honest limits.** The gate is only as sharp as the emitted patterns, and a
+loosely-written one wins matches by accident — the same consumer-owned drift
+§check-install-claim states, since the kit contract asks for the emit grammar and
+never for the patterns. A claim phrased in a shape no emitted pattern recognizes
+is out of reach; what the gate converts is an unbounded prose corpus into a
+checkable one, not an English-language reader. And the scanned set is the
+manifest set, so a claim made on a surface the consumer has not brought into that
+set stays unheld.
+
+Producer: the maintainer editing the section that rules the fact, plus the
+consumer's disclosure command; both are live tracked configuration in this repo,
+not fixture-only. Consumer: the committing operator via the output contract, and
+both assertions read the declaration's one field — at the membership check, at
+the declared-versus-other comparison, and in the violation report.
+
+The good/bad pair covers the reintroduction path itself — one corrected sentence
+restored verbatim to its original overclaiming form — beside the near-miss
+sentences the pattern boundary must stay silent on and a published dated note the
+path valve keeps out of the scanned set. The `# graph:` manifest couples the gate
+to the governed doc set and `scripts/*.sh`, so an edit to a claim surface or to
+the vocabulary re-fires it. `precommit` tier.
 
 ### check-prose-tells
 
