@@ -31,11 +31,10 @@
   holds. One trap survives it — a drafted line reading "most gates are shell today" is
   wrong until the descriptors actually land, and was wrong when drafted.
   **The design is not lost and must not be re-derived.** `canon-kit/SPEC-payload-claim.md`
-  was authored 2026-08-06 at spec and settles both hard questions — the tense, and
-  the corpus re-measured to four claims (`installer/README.md` §init plus three
-  sentences on `docs/install.md`: its H1 preamble, its one-shot-vendoring
-  paragraph, and §What a gate discloses). Recover it from history rather than
-  rewriting it: `git log -p -- canon-kit/SPEC-payload-claim.md`. Its tense ruling
+  was authored 2026-08-06 at spec and settles both hard questions — the tense, and the
+  corpus. **Recover the align-hardened revision specifically: `git show
+  71c584e:canon-kit/SPEC-payload-claim.md`**, not the authoring one, which carries a
+  corpus align superseded. No count is restated here on purpose (above). Its tense ruling
   is the one thing a re-promotion must re-read rather than adopt, since it was
   written for an iteration that lands a descriptor.
   **Deliverable, structural rather than prose:** a declared owner and an oracle, the
@@ -47,17 +46,16 @@
   **Promotion trigger — satisfied 2026-08-07.** It named `native-gate-cohort-descriptors`,
   the unit that lands the held descriptors and thereby makes the claim false; the operator
   ruled that unit into this iteration, so this entry rides with it.
-  **The corpus is short by one, found 2026-08-07 at scope.** The four measured claims are
-  `installer/README.md` §init plus three `docs/install.md` sentences (H1 preamble,
-  one-shot-vendoring paragraph, §What a gate discloses). A **fifth** sits outside them, in
-  §Requirements' cargo bullet: "every tagged release now publishes a prebuilt binary for
-  each platform in the declared target roster". Verified against the remote — `gh release
-  view v0.21.0 --json assets` returns the tgz and its sha256 and no binary of any target,
-  so zero of 22 tagged releases satisfy it. It does **not** dissolve when the first
-  binaries tag is cut: the quantifier ranges over *every* tagged release, and v0.17.0
-  through v0.21.0 will still publish none, so cutting v0.22.0 moves it from zero-of-22 to
-  one-of-23. The sentence owes a scope correction whatever the tag does, and this entry's
-  own open tense ruling is where that call belongs.
+  **A scope-authored "corpus is short by one" correction was landed here 2026-08-07 and
+  retracted the same day, on spec's challenge. Recorded so it is not re-derived:** it
+  hand-tallied four→five off a base align had already superseded to **seven across three
+  documents**, and routed `docs/install.md`'s cargo-bullet release-asset claim into a
+  payload-*disclosure* class it does not belong to. The amendment forecloses the whole
+  move — "the count is not the fact worth landing, its own instability is", and its DoD
+  refuses a hand tally in favour of `check-payload-claim` assertion B. **No scope- or
+  spec-authored count belongs in this body at all**; the enumeration lives in the
+  amendment, behind the oracle. Third hand-enumeration of this corpus, which is the entry's
+  own defect class demonstrating itself once more.
   **Cost while deferred:** none today — the claim it corrects is still true, which
   is precisely why it was demoted. The cost begins the moment a descriptor lands:
   from that commit four governed install surfaces overstate what a consumer
@@ -3054,9 +3052,21 @@
   reference-only table emptied and what an empty table means stated, the dogfood
   settlement in §What the dispatch seam does not settle, the two §check-action-* sections,
   CLAUDE.md §Housekeeping's "no gate is ported today" clause, and — **added 2026-08-07,
-  absent from this list until now** — `docs/install.md` §Requirements' cargo bullet,
-  which states "no gate dispatches to the binary today, so a commit does not require
-  it". This unit falsifies that sentence on the published front door.
+  absent from this list until now** — `docs/install.md` §Requirements' cargo bullet
+  **entire** (:101-110, one bullet).
+  **Why the whole bullet and not the one sentence.** This unit falsifies :104-106 ("no
+  gate dispatches to the binary today, so a commit does not require it"). Three lines
+  later the same bullet claims "every tagged release now publishes a prebuilt binary for
+  each platform" — false today and **not** fixed by the tag, since the quantifier ranges
+  over every tagged release and cutting v0.22.0 moves it from zero-of-22 to one-of-23.
+  The bullet's whole structure is a contrast — contributors need cargo, installers never
+  do — so correcting one half alone leaves it asserting both that a commit now requires
+  the binary and that every release already ships one. Routed here 2026-08-07 on spec's
+  challenge, off `payload-disclosure-claim-owner`, which owns what a consumer *receives*
+  rather than what a release has *published*. Nothing in `check-install-toolchain` reads
+  this prose — it holds the `name:min:impl` triples against `PROBE_SET` only — so the
+  corrected bullet lands ungated, and this unit owes that gap an explicit disposition
+  rather than silence.
   **Cost while deferred:** the crate carries two rules no descriptor dispatches to, so the
   substrate stays proved but unused; `check-gate-binary-fresh` stays dormant at zero
   descriptors, an oracle with nothing to read; and the awk pin the port exists to retire
