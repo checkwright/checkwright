@@ -284,6 +284,40 @@ argument; it is written down here instead.
 All five are features by the new-names litmus, so `spec` authors their amendments
 and pairs them in — scope promoted none of them.
 
+**`native-cohort-activation` cuts four units, and the fourth was bought by a
+blocker rather than by ranking — ruled 2026-08-07 by the operator.** Scope
+proposed three; `spec` found the middle one unbuildable and the operator took
+its recommendation. In build order:
+
+1. `native-gate-dogfood-ruling`
+2. `consumer-smoke-artifact-arm` — **the added unit.**
+3. `native-gate-cohort-descriptors`
+4. `payload-disclosure-claim-owner`
+
+The ordering is forced at every step rather than preferred. Unit 1 before unit 3
+because landing a descriptor settles the dogfood question *by implementation*,
+and a contract change settled in code before it is settled in spec is the move
+`init-claim-stickiness` ruled against above. Unit 3 before unit 4 because unit
+4's claim is not false until a descriptor lands. And unit 2 before unit 3 for
+the reason that bought it: a vendored `.gate` with no binary behind it
+fail-closes both `check-gate-binary-fresh` and `check-gate-substrate-parity`,
+which derive their descriptor set from disk and cannot be silenced by a registry
+edit — so unit 3 would red both smoke harnesses **and every adopter on `init`'s
+own omit path**, a red the first-binaries tag does not clear.
+
+What makes unit 2 an insertion rather than a re-cut is that unit 1 *supplies the
+ruling it has been waiting on*. `consumer-smoke-artifact-arm` sat
+`[design-pending]` on one open question — whether its smoke **builds** a binary,
+"a `cargo` dependency the suite does not have today, against the toolchain
+floor", or **fabricates** a stand-in. Unit 1 rules exactly that dependency, so
+the entry's blocker is discharged by its predecessor rather than by a separate
+call.
+
+The honest limit, recorded because it is the reason this ruling exists: the
+descriptors entry asserted "no further ruling is owed" and has since yielded a
+hard blocker under each of two independent examinations. A third is not
+excluded, and the standing direction is to escalate one rather than absorb it.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
