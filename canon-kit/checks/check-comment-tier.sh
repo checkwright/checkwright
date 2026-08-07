@@ -139,6 +139,8 @@ STYLE == "hash" && hd != "" {
     flush_block(0); next
 }
 STYLE == "hash" && FNR == 1 && /^#!/ { noncomment(); next }
+# a markdown data surface's '##' section heading is structure, not a comment (MDHEAD)
+STYLE == "hash" && MDHEAD == 1 && /^[ \t]*##/ { noncomment(); next }
 STYLE == "hash" {
     if ($0 ~ /^[ \t]*#/) { b = $0; sub(/^[ \t]*#/, "", b); record(b) }
     else noncomment()
@@ -186,7 +188,10 @@ scanned=0
 for f in "${SURFACE[@]}"; do
     rel="${f#"$ROOT"/}"; rel="${rel#./}"
     spec_comment_whitelisted "$rel" && continue
+    mdhead=0
     case "$rel" in
+        # spec: canon-kit/SPEC.md §check-comment-tier — a workflow-dir markdown member's '##' headings are the surface's own block grammar, not comments; its '# contract:' header stays governed here and its tier stays governed by check-workflow-tiering
+        "${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*.md) style="hash"; bless="$TXT_BLESS"; pos=""; mdhead=1 ;;
         "${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*) style="hash"; bless="$TXT_BLESS"; pos="" ;;
         *.sh|*.bash)              style="hash";  bless="$SHELL_BLESS"; pos="$POS_RE" ;;
         *.txt)                    style="hash";  bless="$TXT_BLESS";   pos="" ;;
@@ -194,7 +199,7 @@ for f in "${SURFACE[@]}"; do
         *)                        style="hash";  bless="$SHELL_BLESS"; pos="$POS_RE" ;;
     esac
     scanned=$((scanned + 1))
-    out="$(awk -v STYLE="$style" -v BLESS="$bless" -v POS="$pos" -v CAP="$CANON_KIT_COMMENT_RUN_CAP" -v SQ="'" -v DQ='"' -v XRE="$EXEMPT_RE" -v SK_QRE="$COUNT_QRE" -v SK_RRE="$COUNT_RRE" -v SK_PHRASES="$COUNT_PHRASES" "$AWKSRC" "$f")"; st=$?
+    out="$(awk -v STYLE="$style" -v MDHEAD="$mdhead" -v BLESS="$bless" -v POS="$pos" -v CAP="$CANON_KIT_COMMENT_RUN_CAP" -v SQ="'" -v DQ='"' -v XRE="$EXEMPT_RE" -v SK_QRE="$COUNT_QRE" -v SK_RRE="$COUNT_RRE" -v SK_PHRASES="$COUNT_PHRASES" "$AWKSRC" "$f")"; st=$?
     fail_closed "$st" COMMENT-TIER "awk classifier ($rel)"
     while IFS= read -r line; do
         [[ -n "$line" ]] && errors+=("${line#"$ROOT"/}")

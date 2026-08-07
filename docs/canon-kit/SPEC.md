@@ -973,7 +973,16 @@ this gate governs them, where
 workflow directory's **tracked** members blessing only `contract:`/`see`,
 whatever their extension (the capture tier is gitignored and headerless, so
 tracking is the filter, not the suffix — gate-sdk/SPEC.md §The workflow
-directory);
+directory). On a **markdown** member of that directory a `##`-or-deeper line is
+the surface's own block grammar rather than a comment, and is read as an
+ordinary content line: a workflow surface whose records *are* `## ` blocks
+(lifecycle-kit/SPEC.md §The survey record) would otherwise have every record
+heading flagged as untagged prose, and no tagging is available that would not
+put a directive inside the data. The narrowing costs no coverage — the member's
+`# contract:` header is still classified here, and its tier and header payload
+are `check-workflow-tiering`'s (gate-sdk/SPEC.md §The workflow directory) — and
+it is deliberately extension-scoped rather than content-sniffed, so a `.txt`
+data member's `#` lines stay comments;
 slash-comment parsing (`//`, `/* */`, doc-comments, heredoc skipping) ships
 as mechanism and activates when a consumer widens `CANON_KIT_COMMENT_SURFACE`
 to a language that needs it. Positional rescue is language-agnostic — its

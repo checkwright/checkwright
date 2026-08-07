@@ -95,6 +95,26 @@ cat >"$SANDBOX/tmpl-bad/templates/narration.sh" <<'EOF'
 #YOUR_KIT_KNOB=default
 EOF
 
+# A workflow-dir markdown member whose records are '## ' blocks: the headings are
+# the surface's own block grammar and must not be read as untagged comments, while
+# a single-'#' line on the same member stays governed by the restricted roster.
+mkdir -p "$SANDBOX/wf-good/.workflow" "$SANDBOX/wf-bad/.workflow"
+cat >"$SANDBOX/wf-good/.workflow/record.md" <<'EOF'
+# contract: some/SPEC.md §record — the md roster blesses this header
+
+## 2026-01-02 scope — a block heading is structure, not a comment
+- corpus: checks/
+- finding: carried across the stage boundary
+EOF
+cat >"$SANDBOX/wf-bad/.workflow/record.md" <<'EOF'
+# contract: some/SPEC.md §record — the md roster blesses this header
+
+## 2026-01-02 scope — a block heading is structure, not a comment
+- corpus: checks/
+# this single-hash line on the md member is still an untagged comment
+EOF
+mkcfg "$SANDBOX/wfmd.sh" 'CANON_KIT_COMMENT_SURFACE=(.workflow/record.md)'
+
 check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring $5=root(default SANDBOX)
     local label="$1" cfg="$2" want="$3" sub="$4" root="${5:-$SANDBOX}" out rc
     out="$(env CANON_KIT_CONFIG_FILE="$SANDBOX/$cfg" "$GATE" "$root" 2>&1)"; rc=$?
@@ -114,6 +134,8 @@ check_case "templates-thinned-ok"  derived.sh 0 "COMMENT-TIER: clean"          "
 check_case "templates-narration-red" derived.sh 1 "the tier gate scans templates" "$SANDBOX/tmpl-bad"
 check_case "count-exempt-valve" exempt-cfg.sh 0 "COMMENT-TIER: clean"
 check_case "count-survives-positional-rescue" pos-cfg.sh 1 "restated collection total: six gates"
+check_case "workflow-md-headings-are-structure" wfmd.sh 0 "COMMENT-TIER: clean" "$SANDBOX/wf-good"
+check_case "workflow-md-single-hash-governed"   wfmd.sh 1 "still an untagged comment" "$SANDBOX/wf-bad"
 
 # The bad fixture's expect.txt asserts the count override, so the window-spill
 # half of the pair keeps its assertion here.
@@ -143,5 +165,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-comment-tier.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap)"
+echo "check-comment-tier.test.sh: clean (slash surface + positional rescue + txt restricted roster + templates/ governance + count override edges + paragraph-join wrap + workflow-dir markdown headings as structure with its single-hash lines still governed)"
 exit 0
