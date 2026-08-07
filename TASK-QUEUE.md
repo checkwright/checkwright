@@ -12,29 +12,6 @@
 
 ## New Features
 
-- **consumer-smoke-artifact-arm** [spec: SPEC-smoke-artifact.md] — the placement
-  branch never executes. `installer/consumer-smoke/run-smoke.sh` packs with no
-  `--artifacts`, so the gate binary's placement path — target resolution, pre-write
-  digest verification, the seam knob, the artifact lock record — has no automated
-  exercise; only the **omission branch** runs. What stands behind the other half is
-  dated hand-verification, and a hand-verified path under a green suite reads as
-  covered.
-  **The open question is ruled: the smoke builds** (`installer/SPEC-smoke-artifact.md`).
-  Unit **2 of 4**, inserted 2026-08-07 by the operator because unit 1 discharges this
-  entry's only stated objection to *builds* — the `cargo` dependency — and because
-  unit 3 cannot land without it.
-  **The ground the entry lacked, verified at spec:** `pack-installer.sh --artifacts`
-  iterates **every** roster target and exits 2 on the first with no artifact directory.
-  `native/targets.list` declares exactly one (`x86_64-unknown-linux-gnu`), so a host
-  build satisfies it whole with no cross-compilation. That fact is about today's
-  roster, so the amendment records the re-entry for when it grows.
-  **Binds to unit 3 in both directions:** this unit's omission leg goes red the moment
-  descriptors land, and stays green only once unit 3 teaches the two binary meta-gates
-  to read a declared omission. Neither unit is complete without the other.
-  Distinct from `installer-upgrade-smoke-arm`, which touches no artifact.
-  Filed 2026-08-04 at close from the gap inbox; deliberately deferred at build;
-  promoted 2026-08-07 at spec.
-
 - **native-gate-cohort-descriptors** [spec: SPEC-cohort-descriptors.md] — the first
   cohort's two `.gate` descriptors, held back from the port that proved them, go live.
   Unit **3 of 4**. `native-gate-binary-port` ported `check-action-pinning` and
@@ -3743,5 +3720,6 @@
 ## Done
 
 - native-gate-dogfood-ruling
+- consumer-smoke-artifact-arm
 
 ## Lessons Learned
