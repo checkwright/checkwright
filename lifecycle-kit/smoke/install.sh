@@ -12,6 +12,7 @@ check-stage-entry
 check-close-surfaces
 check-merge-attrs
 check-lifecycle-registration
+check-survey-record
 EOF
 
 if [[ ! -f TASK-QUEUE.md ]]; then
@@ -40,6 +41,15 @@ cat > .workflow/WORKFLOW-STATE.txt <<EOF
 
 — scope smoke001 $(date +%F)
 EOF
+
+# spec: lifecycle-kit/SPEC.md §check-survey-record — file a real block off the seed commit so the
+# gate's registration exercises its actual grammar + rev-existence assertions, not the absent-record
+# inert pass (the optional-surface case that gate is designed never to redden on)
+bash "$SMOKE_KIT_ROOT/bin/file-survey.sh" \
+    "smoke: does a freshly vendored install leave a survey record check-survey-record can parse" \
+    ".workflow/survey-record.md" \
+    "bash checks/check-survey-record.sh" \
+    "yes — a filed block naming the seed commit parses clean" >/dev/null
 
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
 bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null
