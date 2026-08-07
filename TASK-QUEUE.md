@@ -1967,6 +1967,13 @@
   runs unexplained, the harder it is to tell a load-side regression from
   ordinary repo growth, because there is no clean earlier baseline to compare
   against once both have moved.
+  **The trend is not monotonic — checked 2026-08-07 on the `cr` column, and this
+  discriminates between the two readings for the first time.** The draw fell
+  sharply in the iteration after its peak, to below the era's median, on an
+  iteration whose audited surface was smaller. A load-side regression cannot fall
+  that way: the always-loaded set and the skill body do not shrink between
+  iterations. So the peak reads as work-side, and "roughly doubled" in the lead
+  line above is a trend claim the series no longer supports without qualification.
   Surfaced 2026-08-01 by the `/economics` run at close as the competing
   hypothesis behind an align tier question; the tier half was ruled the same
   session and this entry re-scoped to the half that is still open.
@@ -3760,11 +3767,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- stage-fanout-burn-unbilled
-- fork-dispatch-prohibition
-- read-only-fanout-unenforceable
-- subagent-parent-addressing
-- cross-stage-census-duplication
 
 ## Lessons Learned

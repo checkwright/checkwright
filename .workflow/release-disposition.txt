@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+delegation-burn-reduction release deferred:v0.22.0 — no cadence trigger fires: v0.21.0 is six days old against the seven-day floor, the composed note derives a minor with no decommission, and no security or supply-chain fix is in range. Carried rather than earned here: the prior iteration stamped a release verdict at this same version and no tag was ever cut, so v0.22.0 is outstanding, not shipped. Cutting it is the first tag publishing binaries, whose recorded operator consent names a close that has already passed; this close does not self-authorize that tag and escalates instead. The note stays composed and current, this iteration's gate included.
