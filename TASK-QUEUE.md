@@ -3802,6 +3802,4 @@
 
 ## Done
 
-- publish-artifact-layout-contradiction
-
 ## Lessons Learned
