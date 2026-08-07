@@ -9,8 +9,11 @@ for stateless agent sessions, and token-economics-aware context management.
 
 A one-shot vendoring installer. It copies pinned kit source out of its own
 payload into your repository and commits it, then prints the commands that
-finish the setup. What governs your tree afterwards is committed, auditable
-source you read before you run it.
+finish the setup. What governs your tree afterwards is committed and auditable:
+every gate arrives with its declaration, its `# spec:` pointer and the section
+behind it, and its `good/`+`bad/` fixture pair, and a gate whose implementation
+is compiled arrives as a digest-verified binary rather than as source
+(gate-sdk/SPEC.md §Consumer payload, which rules that and bounds it).
 
 What it is not: a dependency channel. Nothing resolves at your build time,
 nothing is fetched after this package itself, and the installer writes no
@@ -52,7 +55,8 @@ with its version floors, is on the install page.
 
 `checkwright init` vendors the selected profile's kit source out of this
 package's own payload into your repository and commits it. One command, and
-what governs your tree afterwards is committed source you can read.
+what governs your tree afterwards is committed and auditable on the terms
+gate-sdk/SPEC.md §Consumer payload sets.
 
 **No selection builds.** Not "no profile that happens to carry only shell
 gates" — no selection, ever. `init` writes files and compiles nothing, so it
