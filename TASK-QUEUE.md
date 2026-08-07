@@ -24,14 +24,12 @@
   compiled gate's implementation source does not ship.
   **Defect class:** a disclosure claim about the vendored payload restated across
   governed install surfaces with one owner and no oracle.
-  **Demoted 2026-08-06 at build, by the demote ritual** (lifecycle-kit/SPEC.md
-  §The state machine's hatches) — moved back here with its tag restored and its
-  amendment deleted in the same commit. The trigger is what moved: the correction
-  was promoted on the premise that the first cohort makes the §init claim false in
-  this iteration, and the cohort **held its descriptors**, so the claim stays
-  categorically true. Correcting it now would assert a tree state that does not
-  exist — and one drafted line ("most gates are shell today") would be flatly
-  wrong, since all of them are.
+  **Demoted 2026-08-06 at build** (lifecycle-kit/SPEC.md §The state machine's hatches),
+  because the cohort held its descriptors and the §init claim therefore stayed
+  categorically true. **That ground is now answered rather than carried:** the descriptors
+  land this iteration, so the premise the demotion turned on is the premise that now
+  holds. One trap survives it — a drafted line reading "most gates are shell today" is
+  wrong until the descriptors actually land, and was wrong when drafted.
   **The design is not lost and must not be re-derived.** `canon-kit/SPEC-payload-claim.md`
   was authored 2026-08-06 at spec and settles both hard questions — the tense, and
   the corpus re-measured to four claims (`installer/README.md` §init plus three
@@ -46,9 +44,20 @@
   positional and install-section-scoped, the other is membership over the whole
   governed doc set — and keeps the vocabulary as consumer config, since a spelling
   of what a payload discloses is one project's distribution model.
-  **Promotion trigger:** re-promote **with** `native-gate-cohort-descriptors`, the
-  unit that lands the held descriptors and thereby makes the claim false. That is a
-  named expected event rather than a date, so this entry is not icebox-eligible.
+  **Promotion trigger — satisfied 2026-08-07.** It named `native-gate-cohort-descriptors`,
+  the unit that lands the held descriptors and thereby makes the claim false; the operator
+  ruled that unit into this iteration, so this entry rides with it.
+  **The corpus is short by one, found 2026-08-07 at scope.** The four measured claims are
+  `installer/README.md` §init plus three `docs/install.md` sentences (H1 preamble,
+  one-shot-vendoring paragraph, §What a gate discloses). A **fifth** sits outside them, in
+  §Requirements' cargo bullet: "every tagged release now publishes a prebuilt binary for
+  each platform in the declared target roster". Verified against the remote — `gh release
+  view v0.21.0 --json assets` returns the tgz and its sha256 and no binary of any target,
+  so zero of 22 tagged releases satisfy it. It does **not** dissolve when the first
+  binaries tag is cut: the quantifier ranges over *every* tagged release, and v0.17.0
+  through v0.21.0 will still publish none, so cutting v0.22.0 moves it from zero-of-22 to
+  one-of-23. The sentence owes a scope correction whatever the tag does, and this entry's
+  own open tense ruling is where that call belongs.
   **Cost while deferred:** none today — the claim it corrects is still true, which
   is precisely why it was demoted. The cost begins the moment a descriptor lands:
   from that commit four governed install surfaces overstate what a consumer
@@ -3026,16 +3035,28 @@
   (`gate-sdk/bin/run-consumer-smoke.sh`), which gate-sdk/SPEC.md §Consumer smoke rules the
   deliberate outcome rather than a defect, and criterion 5 of §The port-candidate criteria
   states no adopter reaches a prebuilt binary until the first tag publishing them is cut.
-  **The precondition is this close's own tag**, ruled 2026-08-06 (TRAJECTORY.md §The
-  closed rulings). Once it lands nothing stands between this entry and a scope but
-  ranking — no further ruling is owed, and no blocker tag rides this entry for that reason.
+  **The precondition is the first binaries tag**, whose consent was re-ruled 2026-08-07
+  (TRAJECTORY.md §The closed rulings) after the 2026-08-06 close named for it passed
+  without cutting one.
+  **"No further ruling is owed" was false — corrected 2026-08-07 at scope, verified in
+  the gate's source.** `check-gate-binary-fresh` is clean at zero descriptors ("crate
+  unread") and **fail-closed** at one or more — "$BIN is absent or not executable, but N
+  .gate descriptor(s) dispatch to it — the check could not run; treating as failure".
+  `native/target/` is gitignored and never committed. So landing these two descriptors
+  makes a built binary a precondition of this repo's own battery at every commit, which
+  settles `native-gate-dogfood-ruling` **by implementation** — the move
+  `init-claim-stickiness` was ruled against. That entry is this one's hard prerequisite
+  and must be ruled first, not merely ranked beside it.
   **Deliverable:** `gate-sdk/checks/check-action-{pinning,gh-repo}.gate` carrying the
   `.sh` manifests verbatim, non-executable, with both `.sh` deleted in the same commit
   (parity assertion A forbids coexistence); that commit may not also touch `native/`
   (`check-gate-tamper`'s meta-path roster). Then the prose that turns with it: the
   reference-only table emptied and what an empty table means stated, the dogfood
   settlement in §What the dispatch seam does not settle, the two §check-action-* sections,
-  and CLAUDE.md §Housekeeping's "no gate is ported today" clause, true until this lands.
+  CLAUDE.md §Housekeeping's "no gate is ported today" clause, and — **added 2026-08-07,
+  absent from this list until now** — `docs/install.md` §Requirements' cargo bullet,
+  which states "no gate dispatches to the binary today, so a commit does not require
+  it". This unit falsifies that sentence on the published front door.
   **Cost while deferred:** the crate carries two rules no descriptor dispatches to, so the
   substrate stays proved but unused; `check-gate-binary-fresh` stays dormant at zero
   descriptors, an oracle with nothing to read; and the awk pin the port exists to retire
@@ -3044,7 +3065,7 @@
 
 - **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
   a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
-  recurrence: gap-resolver-mention-overcount 2026-08-06
+  recurrence: gap-resolver-mention-overcount 2026-08-06 2026-08-07
   `bin/file-gap.sh` stamps its recurrence marker on any bounded substring match of a live
   slug in a bullet's prose, and the close drain re-resolves the same way. A bullet that
   *cites* an entry — a correction to it, a finding adjacent to it, a note that it blocks
@@ -3067,6 +3088,10 @@
   that had just completed. It was caught at capture, the first firing that was; the
   corrective is already legal, so what is missing is not a mechanism but any prompt telling
   the filer to check.
+  **Second firing 2026-08-07, on a scope session's own filing.** A gap bullet naming
+  `ruling-record-condition-staleness-probe` **in order to distinguish itself from it** —
+  three sentences arguing the two are separate findings — was stamped a recurrence of
+  exactly that entry. The predicted worst case twice running, both from the capture side.
   **One of three faces of the same bounded-substring predicate** — `recurrence-drain-input-widening`
   asks what the drain misses when no bullet exists, this asks what it over-counts, and
   `recurrence-resolver-literal-match-only` asks what it misses when a bullet exists and does
