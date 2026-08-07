@@ -43,8 +43,8 @@ trigger by itself, independently of how many amendments sit on disk
   and neither level knows its own identity or its parent's. Option (4) — "state
   the address a child uses" — is refused on that evidence and stays refused here.
 - **`stage-fanout-burn-unbilled`'s refusal of the dispatcher-minted attribution
-  key** (drift-kit/SPEC-fanout-attribution.md §The dispatcher-minted key, ruled
-  out). Nothing here revives it as an *attribution* mechanism. The durable
+  key** (drift-kit/SPEC.md §The stage-economics meter, the fan-out row).
+  Nothing here revives it as an *attribution* mechanism. The durable
   artifact this amendment prescribes is an escalation channel, not an
   attribution key, and it is chosen for the opposite reason: attribution needs a
   key that cannot be forgotten, while escalation needs a route that exists at all.
@@ -567,9 +567,8 @@ Each named with the delta that owns it.
 
 Stated here because a later author working one unit will not read the others.
 
-- **To `stage-fanout-burn-unbilled` (batch 1, already authored into its own
-  amendment file, `drift-kit/SPEC-fanout-attribution.md` — not yet merged into
-  drift-kit/SPEC.md, same as this one).** Nothing in this amendment changes the
+- **To `stage-fanout-burn-unbilled` (batch 1, merged into drift-kit/SPEC.md
+  §The stage-economics meter, the fan-out row).** Nothing in this amendment changes the
   meter, the fan-out row, or the attribution key. The relationship runs the
   other way: batch 1's fan-out row is the instrument that measures whether this
   amendment worked, so the two are measurement and treatment of one iteration.

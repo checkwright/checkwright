@@ -31,6 +31,15 @@ Compose the narrative from those two surfaces:
   bullets — never folded into them — and say plainly that per-stage figures
   exclude it. If the run's caveat named an apportionment key (one lead spanning
   several iterations), repeat the key so the reader can discount the row.
+- **Fan-out.** A stage that dispatched agents pays for their whole subtree, and
+  that subtree bills to its own suffixed row rather than into the stage's own
+  (drift-kit/SPEC.md §The stage-economics meter, the fan-out row). Report it as a
+  named line item beside that stage's figure — never folded into it — and say
+  plainly that a per-stage figure excludes its own fan-out. Where the run's notice
+  named an apportionment key or a count of transcripts that resolved no anchor,
+  repeat it so the reader can discount the row. Read the row as an **aggregate**:
+  it carries no dispatch-type dimension, so a fork's spend and a typed dispatch's
+  spend are one total in it — do not report it as the cost of forking.
 - **Overhead share.** From the overhead meter, state what fraction of the
   closing session was governance versus task work — the methodology's own cost.
 - **Posture verdict.** Weigh *<posture: the model posture this iteration ran —

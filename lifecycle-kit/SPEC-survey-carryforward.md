@@ -32,11 +32,11 @@ dispatcher-minted-path convention *"is also the convention
 `cross-stage-census-duplication` needs, which is why the two may be one design."*
 
 **That shared premise is gone.** Batch 1 refused the dispatcher-minted
-attribution key (drift-kit/SPEC-fanout-attribution.md §The dispatcher-minted key,
-ruled out) on three grounds — it fails silently when a dispatcher forgets, it
+attribution key (drift-kit/SPEC.md §The stage-economics meter, the fan-out row)
+on three grounds — it fails silently when a dispatcher forgets, it
 relocates the harness coupling rather than removing it, and it cannot reach a
-fork at all. That amendment states the consequence explicitly: this unit
-"no longer inherits one and is designed on its own merits." It is, below.
+fork at all. So this unit inherits no dispatch convention and is designed on its
+own merits. It is, below.
 
 The refusal's *reasoning* survives the inheritance and is load-bearing here in
 one specific way: **a convention that fails silently when someone forgets is not
@@ -407,9 +407,8 @@ Stated here because a later author working one unit will not read the others.
   survey record is a hand-off, single-path, per-iteration, and written by the
   *parent* after the child returns. Their readers, lifetimes, and discovery keys
   all differ. This amendment cites that one and extends nothing in it.
-- **To `stage-fanout-burn-unbilled`** (batch 1, already authored into
-  `drift-kit/SPEC-fanout-attribution.md` — not yet merged into drift-kit/SPEC.md,
-  same as this one). Its fan-out row is the instrument that
+- **To `stage-fanout-burn-unbilled`** (batch 1, merged into drift-kit/SPEC.md
+  §The stage-economics meter, the fan-out row). Its fan-out row is the instrument that
   measures whether this amendment worked — a scope-and-spec pair that stops
   double-buying a census shows up as a fall in the two stages' fan-out rows.
   Nothing in the meter changes. The premise correction runs the other way and is

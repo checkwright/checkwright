@@ -577,12 +577,21 @@ stamp**. A stage that continues in a new session (a credential swap mid-stage,
 any resume) leaves that session unstamped, so it matches no stamp and is never
 sought; its burn is invisible rather than wrong. The meter therefore counts the
 transcripts under `DRIFT_KIT_SESSIONS_DIR` that no row claimed and reports the
-count. It is an **upper bound, never an attribution**: a transcript carries no
-iteration and no stage, so nothing in the join could place it, and most
-unstamped transcripts are ordinary non-lifecycle sessions. Sizing the blind spot
-is the whole of what drift-kit can do alone — attributing a continuation would
-need the *stamp* side to record it, which is lifecycle-kit's contract and no
-part of this meter's read-only consumption of it.
+count.
+
+The bound is **tighter than the stamp side alone**, because a dispatched
+transcript *can* now be placed — through its anchor, by the fan-out row below.
+What remains in the count is the transcript that resolved **no anchor**, and for
+that residue it is still an **upper bound, never an attribution**: an unanchored
+transcript carries no iteration and no stage *and descends from no session that
+does*, so nothing in the join could place it. The reading that most of the
+residue is ordinary non-lifecycle sessions becomes **more** true rather than
+less, since the fan-out pass drains the lifecycle subtrees out of it. The one
+case the fan-out row cannot reach is the unstamped **continuation**: it is a
+resumption rather than a dispatch, so it has no parent edge to walk. Sizing that
+blind spot is the whole of what drift-kit can do alone — attributing a
+continuation would need the *stamp* side to record it, which is lifecycle-kit's
+contract and no part of this meter's read-only consumption of it.
 
 **The trend log.** One line is appended per `(iteration, stage, model)` triple to
 `DRIFT_KIT_STAGE_ECONOMICS_LOG`, grammar:
@@ -591,7 +600,10 @@ part of this meter's read-only consumption of it.
 <date> <iteration> <stage> <model> in=<tok> out=<tok> cr=<tok> cw=<tok> cost=<usd|n/a>
 ```
 
-`cr` is cache-read and `cw` is cache-creation. `cr` is the headline field: the
+`<stage>` is the **stage-or-role** column — a lifecycle stage, a cost-bearing
+role, or either of those with the fan-out suffix appended (the reserved
+`supervision` value and the fan-out row, below). `cr` is cache-read and `cw` is
+cache-creation. `cr` is the headline field: the
 motivating dig showed cache-read of accumulated context — not model choice — is
 the dominant burn (build ~73% of session cost, climbing 37M→86M cr-tokens per
 session), so the field exists to keep that lever visible close-over-close. The
@@ -631,7 +643,9 @@ skeleton); the same rule decides this.
   role**, not stage alone. A supervision row is a role that carries cost and no
   stamp — never a lifecycle stage that dropped out of the roster. The column's
   members were roster-closed until this value existed, and a reader who assumes
-  they still are would misdiagnose the row as roster drift.
+  they still are would misdiagnose the row as roster drift. The column widens
+  once more for the fan-out row below, which admits *either* member with a
+  suffix appended.
 - **The producer — derivation from the transcript path, not from a stamp.** The
   two-tier scan above already resolves a dispatched stage session at
   `<sessions-dir>/<lead-session-id>/subagents/<agent>.jsonl` while a lead sits
@@ -645,9 +659,12 @@ skeleton); the same rule decides this.
   session is *derived*, which is what keeps this a read-only consumption of
   lifecycle-kit/SPEC.md §The state machine.
 - **The attribution invariant.** A transcript's usage is attributed to exactly
-  one `(iteration, stage)` pair — the rule the session-keyed join above enforces
-  for stage rows, and the reason a lead whose own transcript already carried a
-  stage row yields no supervision row. In the ordinary case a lead supervises one
+  **one row key** — either an `(iteration, stage-or-role)` pair or that pair's
+  fan-out value. That is the rule the session-keyed join above enforces for stage
+  rows, the reason a lead whose own transcript already carried a stage row yields
+  no supervision row, and (below) the reason a dispatched transcript resolves
+  exactly one anchor. One guard serves all three: a transcript already claimed by
+  a row is never a candidate for another. In the ordinary case a lead supervises one
   iteration and its whole usage lands on that iteration's supervision row —
   exact, no key. A lead spanning two or more iterations **apportions in
   proportion to the number of stamped stage sessions it dispatched per
@@ -659,7 +676,11 @@ skeleton); the same rule decides this.
   label, the meter emits a visible notice naming `DRIFT_KIT_SUPERVISION_LABEL`
   and emits **no** supervision rows that run. It is checkable from data the meter
   already reads — its own stamps — so this adds no roster dependency and no
-  second bound to drift.
+  second bound to drift. **A suppressed anchor suppresses its fan-out**: with no
+  supervision row emitted the lead is no anchor, so its direct fan-out finds none
+  and emits nothing. A fan-out row for a role that emitted no row of its own
+  would be an orphan the reader cannot place, and the suppression is structural
+  rather than a second rule — the anchor registers only where the row did.
 - **Degradation.** A run with no nested-tier match (a stage run without a live
   lead) emits no supervision row and no notice: zero supervision burn is the
   honest reading, not a missing measurement. A lead transcript aged out of the
@@ -681,7 +702,133 @@ skeleton); the same rule decides this.
   naming, since it is the surface a hardcoded stage roster once broke; it reads
   stamps and its own `DRIFT_KIT_STAGES` roster, never this log. So a non-stage
   value in the column cannot silently fall out of a roster the way the
-  trajectory's stamps did.
+  trajectory's stamps did. The same three readers were re-verified when the
+  column widened again for the fan-out value, and the conclusion is unchanged.
+
+**The fan-out row — a stage's dispatched subtree is its own line item.** A stage
+session that dispatches agents pays for their whole subtree, yet every dispatched
+transcript carries no stamp of its own, so its burn lands in no row and each
+per-stage figure understates that stage by its entire fan-out. The meter bills the
+subtree to a row whose `<stage>` value is the **anchor's stage-or-role with
+`DRIFT_KIT_FANOUT_SUFFIX` appended** (§Layout and configuration) — `build+fanout`,
+`close+fanout`, `supervision+fanout`.
+
+- **A suffixed value rather than a bare reserved label.** A bare `fanout` label —
+  the shape `supervision` takes — would answer "what did fan-out cost this
+  iteration" and lose *which stage's* fan-out it was, the question the motivating
+  measurement asked. The suffix keeps the `(iteration, stage)` join intact and
+  sorts the subtree row adjacent to its own stage row.
+- **A separate row rather than a fold into the stage row.** Separability *is* the
+  deliverable: a folded total answers the operator's question only through a
+  stdout caveat the trend log does not carry, so the close-over-close series — the
+  log's whole purpose — would be blind to the split it was extended to show. A
+  fold would also silently redefine a value already logged, a `close` row written
+  before this change and one written after meaning different things under one
+  name, which is the drift the dedup key exists to prevent rather than to hide.
+- **What it is not: a dispatch-type breakdown.** The row carries **no
+  dispatch-type dimension** — a fork's spend and a typed dispatch's spend fold
+  into one anchor total. It is an aggregate proxy for "what this stage's
+  delegation cost", never an isolation of fork cost, and a reader who splits a
+  posture decision on fork-versus-dispatch cannot get that split from this row.
+- **The anchor set.** An anchor is a transcript that already holds a row of its
+  own: every **stamped stage session whose transcript resolved**, anchoring its
+  subtree to that stamp's `(iteration, stage)`; and every **lead that emitted a
+  supervision row**, anchoring its own direct fan-out to
+  `(iteration, DRIFT_KIT_SUPERVISION_LABEL)` — a lead's audit sweeps are as
+  unbilled as a stage's, and omitting them would fix half the tier. The two
+  conditions differ deliberately: a stage anchors on its stamp **resolving**,
+  because a stamped stage whose transcript carries no usage is still a real,
+  placeable `(iteration, stage)` for its subtree, while a supervision role that
+  emitted no row is not a role at all. A lead that already carried a stage row
+  yields no supervision row (the invariant above) and its fan-out anchors to that
+  **stage** row instead — the anchor lookup finds it and needs no special case.
+- **The producer — the parent walk, nearest anchor wins.** A dispatched
+  transcript's *path* names only the root session: a grandchild sits flat in the
+  same `<root>/subagents/` directory as a child, so the path cannot carry the
+  parent edge. The harness writes it one file over, as a `.meta.json` sibling of
+  each nested transcript, whose `parentAgentId` names the parent agent — a **bare**
+  id, resolved against `agent-<id>.jsonl` in the same directory (the bare spelling
+  `<id>.jsonl` is accepted as a fallback, so neither spelling is guessed). A record
+  with no `parentAgentId` is a direct child of the root session that names the
+  directory. For each `subagents/` transcript that is neither an anchor nor
+  already holding a row, the meter walks parents by that rule until an anchor is
+  reached and gives the **nearest** anchor the transcript's usage; intermediate
+  non-anchor agents are transparent, which is what puts a deep fork under the
+  stage session that ultimately caused it rather than under the sweep that
+  happened to spawn it. A walk reaching the root session without meeting an anchor
+  emits **no** row and the transcript stays in the under-count bound — the correct
+  reading, since an ordinary non-lifecycle session's fan-out belongs to no
+  iteration and no stage. The walk is **bounded by the transcript population and
+  by a visited set**, so a cycle or a dangling `parentAgentId` costs a counted
+  notice rather than a loop. The parent forest is read with one pass per
+  `subagents/` directory rather than one per hop; the usage itself is the same
+  last-usage-per-message-id reader the stage rows use, so the pass costs one
+  transcript parse per attributed subtree member and no second parser.
+- **Reading a harness-private artifact — why the coupling is admissible.** The
+  meta sibling is under no contract, and the meter reads it anyway on one ground:
+  it is the **same coupling class the meter already runs on**, one file over from
+  the transcript JSONL usage schema and the `<root>/subagents/` layout it already
+  depends on, and the failure mode of the shape changing is bounded to a *visible
+  no-op* rather than a wrong figure. That is the difference between coupling to a
+  shape for an **enrichment** and coupling to it for the pricing arithmetic; the
+  ruling is yes here and would be no there. The rejected alternative — taking the
+  key from a dispatcher-minted path instead — fails on the axis that decides it: a
+  convention a dispatcher can forget produces a **silent** under-count in the exact
+  tier this row exists to stop under-counting, it relocates the harness coupling
+  rather than removing it (parsing a child's first user message for a string the
+  meter must then trust), and it cannot reach a **fork** at all, since a fork
+  inherits context rather than receiving an authored prompt.
+- **Apportionment.** Where a lead spans several iterations, its fan-out
+  apportions by the **same dispatch-count key, with the same integer split**, that
+  apportions its supervision row. Reusing the key rather than minting a second one
+  is the point: two keys over one lead would let the supervision row and its
+  fan-out row disagree about which iteration the lead belonged to.
+- **Several anchors, one row — the fold, not a race.** One `(iteration, stage)`
+  can hold **several** anchors: a stage run as several sessions in one iteration
+  (a batch split) stamps once per session, and each session anchors its own
+  subtree. Their subtrees **sum into the single fan-out row** for that pair. This
+  follows from the invariant above rather than adding to it — the attribution unit
+  is the *row key*, not the anchor — and the alternative is not a second row but a
+  **lost** one: two appends under one `<iteration> <stage> <model>` triple make
+  the dedup key replace the first with the second, stranding its transcripts
+  attributed to a row the replacement erased. Apportionment happens **first and the
+  fold second**, since the dispatch-count split is a property of the anchor while
+  the row is not. The stdout caveat names the contributing anchor count where it
+  exceeds one, so a folded row is never read as one session's.
+- **Collision rule.** The default suffix is collision-proof by construction — the
+  stamp reader's stage-field alphabet is lowercase alphanumerics and hyphens, so a
+  `+` can never appear in a stamped stage name. A consumer overriding the knob can
+  break that, so the check mirrors the supervision label's: if any stamp the run
+  reads names a stage **ending in** the suffix, the meter emits a visible notice
+  naming `DRIFT_KIT_FANOUT_SUFFIX` and emits **no** fan-out rows that run. It is
+  checkable from the stamps the meter already reads, so it adds no roster
+  dependency and no second bound to drift.
+- **Degradation — the contract that bounds the coupling.** Every arm degrades to a
+  visible absence, never to a wrong figure, and never to a non-zero exit:
+
+  | what is missing | behavior |
+  | --- | --- |
+  | the meta layer entirely | no fan-out rows; one notice; every existing row unchanged — the meter's behavior before this row existed |
+  | one transcript's meta record | that transcript takes no fan-out row and stays in the under-count bound; counted in the unresolved notice |
+  | `parentAgentId` naming an agent with no transcript | same — counted, never guessed |
+  | a cycle or an over-long chain | same — the walk is bounded and the transcript counted |
+  | `jq` absent | already fatal to the whole join upstream; the fan-out pass never runs |
+  | the price table absent or missing a model row | the row's `cost` degrades to `n/a` and raises the existing incomplete-pricing caveat, exactly as a stage row's does |
+
+- **No new field.** The four token fields, `cost`, and `date` carry a fan-out row
+  exactly as they carry a supervision row; the dedup key stays the
+  `<iteration> <stage> <model>` triple and a re-measure replaces the row's line
+  like any other. The split, the transcript count, and every degradation stay
+  **stdout caveats at measurement time** — a log field with no reader is a field
+  removed, and none of these has one. The row's own named readers are the
+  `/economics` narrative's fan-out line item (§The `/economics` skill), the
+  operator reading the trend log close-over-close, and the deferred
+  `benchmark-ab-experiment` rung's measurement half, which consumes this log
+  rather than rebuilding it and inherits the row with no change.
+- **No lifecycle change.** No stamp is added, no cursor moves, no stage-skill
+  template changes. The fan-out edge is *derived*, exactly as the supervision edge
+  is, which is what keeps this a read-only consumption of lifecycle-kit/SPEC.md
+  §The state machine.
 
 ## The `/economics` skill
 
@@ -814,6 +961,17 @@ Knobs (this repo's layout as defaults):
   lifecycle roster already carries that word renames it here; a stamp naming the
   label collides and suppresses the rows for that run rather than blending two
   meanings into one column value.
+- `DRIFT_KIT_FANOUT_SUFFIX` — the suffix the stage-economics meter appends to an
+  anchor's stage-or-role value to name its dispatched subtree's row
+  (§The stage-economics meter, the fan-out row); default `+fanout`. The default is
+  collision-proof by construction (`+` is outside the stamp's stage alphabet); an
+  override that a stamped stage name ends in collides and suppresses the fan-out
+  rows for that run. Deliberately the *only* new knob: a meta-filename or
+  field-name knob would imply a portability the mechanism does not have (a
+  consumer on a different harness has a different artifact, not a differently
+  named one), and an opt-out for reading the meta layer would either default on
+  and be set by nobody or default off and ship the feature as dead code — the
+  degradation contract already gives a consumer the only thing an opt-out buys.
 - `DRIFT_KIT_STATE_FILE` — the WORKFLOW-STATE path whose *committed history and
   live content* the stage-economics join reads for stamps (§The stage-economics
   meter, history ∪ live); default `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt` (the
@@ -891,7 +1049,28 @@ asserts exactly one supervision row is emitted for the iteration carrying the
 lead transcript's own usage, that the dispatched session keeps its own stage row,
 that the row's label is `DRIFT_KIT_SUPERVISION_LABEL`'s value rather than a
 literal, and that a stamp naming the label suppresses the row with the collision
-notice. `kpi-price-table-age` is fixture-stable in the same way — it reads two
+notice. (iii) A *fan-out* fixture — a synthetic three-level tree: a flat
+`<lead>.jsonl`, and under `<lead>/subagents/` a stamped stage transcript with a
+`spawnDepth` 1 meta record, a child at `spawnDepth` 2 naming it as
+`parentAgentId`, and a grandchild at `spawnDepth` 3 naming the child; plus a
+**second session stamped into the same `(iteration, stage)`** carrying no
+assistant usage, with a child of its own — the batch-split shape, which is also
+the one that proves a stage anchors on its stamp *resolving* rather than on
+emitting a row. It asserts exactly one fan-out row for the stamped stage whose
+tokens are the **sum over the whole subtree** (so both a walk that stopped at
+depth 2 and two anchors racing under the dedup key instead of folding red), that
+the contributing anchor count is named where it exceeds one, that the stage
+row still carries only the stage session's own usage (so a fold reds), that the
+suffix comes from `DRIFT_KIT_FANOUT_SUFFIX` rather than a literal, that a stamp
+whose stage ends in the suffix raises the collision notice and suppresses the row,
+and that the under-count bound excludes every transcript the pass attributed.
+Its two **degradation** assertions are what make the coupling's bounded failure
+testable rather than asserted, and neither may be dropped for brevity: deleting
+the grandchild's meta record moves it back into the under-count bound and raises
+the counted unresolved notice while every row the pass does not own stays
+byte-identical, and deleting the whole meta layer emits zero fan-out rows plus the
+single notice with — again — every other row byte-identical.
+`kpi-price-table-age` is fixture-stable in the same way — it reads two
 dates out of a file the fixture writes — so `smoke/install.sh` drives it over
 purpose-built tables and asserts the age row, the `price <N>d` trend fragment,
 each header's absence degrading its own row independently, and — **the

@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **stage-fanout-burn-unbilled** [spec: SPEC-fanout-attribution.md] — a stage's fan-out
-  subtree bills to no economics row, and that is now where the variance lives.
-  `bin/stage-economics.sh` prices the stamped stage-session transcript only. The
-  audit-sweeps and forks that session dispatches carry no stamp, so they fall into the
-  unstamped upper-bound counter instead — declared behavior, not a defect
-  (drift-kit/SPEC.md §The stage-economics meter states it as a bound, never an
-  attribution).
-  **Measured 2026-08-06.** `native-first-port-cohort`'s close row reads 27.81 USD while
-  the close subtree — three audit-sweeps plus five spawn-depth-3 forks under the
-  release-note gather — cost 41.77 USD. That 13.96 USD gap is precisely the spike an
-  operator reading the trend log would want surfaced, and it is the largest close
-  fan-out on record: the previous seven closes ran 0.46 to 3.98 USD of fan-out against
-  7.63 to 22.26 USD of stage-session burn. Close-over-close variance has moved into the
-  tier the meter cannot price.
-  **Deliverable:** a fan-out row per (iteration, stage), the alternative fold ruled out.
-  **The attribution key is ruled and the ruling lives in the amendment**, which also
-  records the probe it rests on and why the dispatcher-minted fallback this entry
-  carried as design input was refused. One consequence reaches a sibling: this unit
-  needs no dispatch convention, so `cross-stage-census-duplication` no longer inherits
-  one and is designed on its own merits.
-  **Depth 1 is already discharged and must not be rebuilt:** the lead-from-path derivation
-  and the `supervision` row it feeds are shipped. What this entry adds is the grandchild
-  case alone.
-  Sibling: `supervision-overhead-unmeasured`, the lead's own row, which the same path
-  derivation already reaches.
-  Filed 2026-08-06 by an operator consultation, from a priced audit of the last eight
-  iterations' transcripts; promoted 2026-08-06 by spec.
-
 - **fork-dispatch-prohibition** [spec: SPEC-dispatch-shape.md] — state the never-a-fork
   rule where dispatchers read it, and arm it at the dispatch call.
   A context-inheriting fork dispatched by the align stage as a read-only audit completed
@@ -3701,5 +3673,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- stage-fanout-burn-unbilled
 
 ## Lessons Learned

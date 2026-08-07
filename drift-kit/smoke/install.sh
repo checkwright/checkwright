@@ -402,4 +402,101 @@ EOF
         || fail "a stamp naming the label did not raise the collision notice"
     [[ "$(grep -c ' supiter supervision ' "$suplog")" -eq 0 ]] \
         || fail "the collision did not suppress the supervision row"
+
+# spec: drift-kit/SPEC.md §Testing — the fan-out fixture: a three-level tree flat in one subagents dir,
+# whose grandchild is what makes the walk testable. Its own dir/state/log, same reason as above.
+    fodir="$work/fo-sessions"; mkdir -p "$fodir/folead0001dead/subagents"
+    fosub="$fodir/folead0001dead/subagents"
+    cat > "$fodir/folead0001dead.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"L1","model":"test-model","usage":{"input_tokens":2,"output_tokens":3,"cache_read_input_tokens":4,"cache_creation_input_tokens":5}}}
+EOF
+    cat > "$fosub/agent-fostage1feed.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"S1","model":"test-model","usage":{"input_tokens":10,"output_tokens":20,"cache_read_input_tokens":30,"cache_creation_input_tokens":40}}}
+EOF
+    cat > "$fosub/agent-fochild2feed.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"C1","model":"test-model","usage":{"input_tokens":1,"output_tokens":2,"cache_read_input_tokens":3,"cache_creation_input_tokens":4}}}
+EOF
+    cat > "$fosub/agent-fogrand3feed.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"G1","model":"test-model","usage":{"input_tokens":100,"output_tokens":200,"cache_read_input_tokens":300,"cache_creation_input_tokens":400}}}
+EOF
+    # spec: drift-kit/SPEC.md §Testing — the fixture's second same-stage session: no usage of its own, so
+    # it anchors without emitting a row and its child must fold rather than replace the first anchor's.
+    printf '{"type":"user","message":{"role":"user","content":"no usage here"}}\n' > "$fosub/agent-fostage4feed.jsonl"
+    cat > "$fosub/agent-fochild5feed.jsonl" <<'EOF'
+{"type":"assistant","message":{"id":"C5","model":"test-model","usage":{"input_tokens":1000,"output_tokens":2000,"cache_read_input_tokens":3000,"cache_creation_input_tokens":4000}}}
+EOF
+    printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage1feed.meta.json"
+    printf '{"agentType":"Explore","parentAgentId":"fostage1feed","spawnDepth":2}\n' > "$fosub/agent-fochild2feed.meta.json"
+    printf '{"agentType":"fork","isFork":true,"parentAgentId":"fochild2feed","spawnDepth":3}\n' > "$fosub/agent-fogrand3feed.meta.json"
+    printf '{"agentType":"stage-session","spawnDepth":1}\n' > "$fosub/agent-fostage4feed.meta.json"
+    printf '{"agentType":"Explore","parentAgentId":"fostage4feed","spawnDepth":2}\n' > "$fosub/agent-fochild5feed.meta.json"
+    printf 'foiter build fostage1 2025-01-01\nfoiter build fostage4 2025-01-01\n' > "$work/fo-state.txt"
+    folog="$work/fo-log.txt"
+    fan() {   # $1 = fan-out suffix
+        DRIFT_KIT_STATE_FILE="$work/fo-state.txt" \
+        DRIFT_KIT_SESSIONS_DIR="$fodir" \
+        DRIFT_KIT_PRICE_TABLE="$work/se-prices.tsv" \
+        DRIFT_KIT_STAGE_ECONOMICS_LOG="$folog" \
+        DRIFT_KIT_FANOUT_SUFFIX="$1" \
+        bash "$SMOKE_KIT_ROOT/bin/stage-economics.sh" 2>&1
+    }
+    set +e
+    foout="$(fan '+fanout')"; forc=$?
+    set -e
+    [[ "$forc" -eq 0 ]] || fail "stage-economics over the fan-out fixture exited $forc"
+    [[ "$(grep -c ' foiter build+fanout test-model ' "$folog")" -eq 1 ]] \
+        || fail "the three-level fixture did not yield exactly one fan-out row: $foout"
+    grep -qE ' foiter build\+fanout test-model in=1101 out=2202 cr=3303 cw=4404 cost=33030\.[0-9]+$' "$folog" \
+        || fail "the fan-out row is not the sum over the whole subtree — a walk that stopped at depth 2, or two anchors racing under the dedup key instead of folding: $(cat "$folog")"
+    grep -q ' foiter build+fanout 2 anchors ' <<<"$foout" \
+        || fail "two anchors sharing one (iteration, stage) did not fold into one row: $foout"
+    grep -qE ' foiter build test-model in=10 out=20 cr=30 cw=40 cost=300\.[0-9]+$' "$folog" \
+        || fail "the stage row lost its own usage to the subtree (the fold this row exists to refuse): $(cat "$folog")"
+    grep -q 'resolved no anchor' <<<"$foout" \
+        && fail "an intact meta layer must resolve every dispatched transcript: $foout"
+    grep -q 'match no stamp and resolved no anchor' <<<"$foout" \
+        && fail "the unstamped bound still counts transcripts the fan-out pass attributed: $foout"
+
+    : > "$folog"
+    fan '-subtree' >/dev/null
+    grep -q ' foiter build-subtree test-model ' "$folog" \
+        || fail "DRIFT_KIT_FANOUT_SUFFIX did not name the row (the suffix is not a literal)"
+
+    : > "$folog"
+    printf 'foiter build fostage1 2025-01-01\nfoiter build fostage4 2025-01-01\nfoiter build+fanout nostage1 2025-01-01\n' > "$work/fo-state.txt"
+    focol="$(fan '+fanout')"
+    grep -q 'colliding with DRIFT_KIT_FANOUT_SUFFIX' <<<"$focol" \
+        || fail "a stamp whose stage ends in the suffix did not raise the collision notice"
+    [[ "$(grep -c 'build+fanout test-model' "$folog")" -eq 0 ]] \
+        || fail "the collision did not suppress the fan-out row"
+    printf 'foiter build fostage1 2025-01-01\nfoiter build fostage4 2025-01-01\n' > "$work/fo-state.txt"
+
+    # spec: drift-kit/SPEC.md §Testing — the fan-out fixture's two degradation assertions, neither of
+    # which may be dropped for brevity: they are what make the coupling's bound testable, not asserted.
+    : > "$folog"; fan '+fanout' >/dev/null
+    grep -v 'build+fanout' "$folog" | sort > "$work/fo-intact.txt"
+    rm -f "$fosub/agent-fogrand3feed.meta.json"
+    : > "$folog"
+    fodeg="$(fan '+fanout')"
+    grep -q '1 dispatched transcript(s) resolved no anchor' <<<"$fodeg" \
+        || fail "a missing meta record must raise the counted unresolved notice: $fodeg"
+    grep -q '1 transcript(s) in the sessions dir match no stamp and resolved no anchor' <<<"$fodeg" \
+        || fail "an unresolved transcript must fall back into the unstamped bound: $fodeg"
+    grep -qE ' foiter build\+fanout test-model in=1001 out=2002 cr=3003 cw=4004 ' "$folog" \
+        || fail "the degraded run must still price every resolvable transcript, never guess the unresolved one: $(cat "$folog")"
+    grep -v 'build+fanout' "$folog" | sort > "$work/fo-degraded.txt"
+    diff -q "$work/fo-intact.txt" "$work/fo-degraded.txt" >/dev/null \
+        || fail "a degraded fan-out pass changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-degraded.txt")"
+
+    # spec: drift-kit/SPEC.md §Testing — the second arm: the whole meta layer gone.
+    rm -f "$fosub"/*.meta.json
+    : > "$folog"
+    fonone="$(fan '+fanout')"
+    grep -q 'no dispatch-attribution records beside the transcripts' <<<"$fonone" \
+        || fail "an absent meta layer must emit its single notice: $fonone"
+    [[ "$(grep -c 'build+fanout' "$folog")" -eq 0 ]] \
+        || fail "an absent meta layer must emit no fan-out row at all"
+    sort "$folog" > "$work/fo-nometa.txt"
+    diff -q "$work/fo-intact.txt" "$work/fo-nometa.txt" >/dev/null \
+        || fail "losing the meta layer changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-nometa.txt")"
 fi

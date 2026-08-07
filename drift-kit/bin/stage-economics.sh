@@ -30,6 +30,7 @@ unset _ds_cfg
 : "${DRIFT_KIT_PRICE_TABLE:=${GATE_SDK_GATES_DIR:-scripts}/price-table.tsv}"
 : "${DRIFT_KIT_STATE_FILE:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt}"
 : "${DRIFT_KIT_SUPERVISION_LABEL:=supervision}"
+: "${DRIFT_KIT_FANOUT_SUFFIX:=+fanout}"
 
 sessions_dir() {
     if [[ -n "${DRIFT_KIT_SESSIONS_DIR:-}" ]]; then
@@ -165,9 +166,15 @@ printf 'stage-economics: %s\n' "$today"
 # one (iteration, stage). The stamp pass keys on the session, not the stamp, so a session bearing
 # two stamps resolves to its last one and the yielded stamps take no row instead of a duplicate.
 declare -A STAMP_SEEN=() SESS_CHOICE=() SESS_YIELDED=() ATTRIBUTED=() DISPATCH=() LEAD_SEEN=()
+# spec: drift-kit/SPEC.md §The stage-economics meter — the fan-out row: an anchor is a transcript that
+# already holds a row, and it carries the apportionment its own row was split by, so a lead's fan-out
+# and its supervision row can never disagree about which iteration the lead belonged to.
+declare -A ANCHOR_LABEL=() ANCHOR_ITERS=() ANCHOR_COUNTS=() ANCHOR_WHO=()
 SESS_ORDER=()
 LEAD_ORDER=()
+ANCHOR_ORDER=()
 label_collision=0
+suffix_collision=0
 stamps=0
 while read -r iter stage session8 _date _rest; do
     [[ -z "$iter" || "$iter" == \#* || "$iter" == "---" ]] && continue
@@ -176,6 +183,7 @@ while read -r iter stage session8 _date _rest; do
     STAMP_SEEN["$iter/$stage/$session8"]=1
     stamps=$((stamps + 1))
     [[ "$stage" == "$DRIFT_KIT_SUPERVISION_LABEL" ]] && label_collision=1
+    [[ -n "$DRIFT_KIT_FANOUT_SUFFIX" && "$stage" == *"$DRIFT_KIT_FANOUT_SUFFIX" ]] && suffix_collision=1
     if [[ -n "${SESS_CHOICE[$session8]:-}" ]]; then
         SESS_YIELDED[$session8]="${SESS_YIELDED[$session8]:-}${SESS_CHOICE[$session8]}; "
     else
@@ -202,6 +210,16 @@ for session8 in ${SESS_ORDER[@]+"${SESS_ORDER[@]}"}; do
         continue
     fi
     ATTRIBUTED[$transcript]=1
+    # spec: drift-kit/SPEC.md §The stage-economics meter — a stage anchors on the stamp resolving, not on a
+    # row being emitted: a stamped stage whose transcript carries no usage is still a real, placeable
+    # (iteration, stage) for its subtree, where a supervision role that emitted nothing is not a role at all.
+    if [[ -z "${ANCHOR_LABEL[$transcript]:-}" ]]; then
+        ANCHOR_LABEL[$transcript]="$stage"
+        ANCHOR_ITERS[$transcript]="$iter"
+        ANCHOR_COUNTS[$transcript]="1"
+        ANCHOR_WHO[$transcript]="$session8"
+        ANCHOR_ORDER+=("$transcript")
+    fi
     # spec: drift-kit/SPEC.md §The stage-economics meter — a nested-tier transcript names its supervising lead in
     # its own path, which is what makes the supervision row derivable with no stamp and no lifecycle change.
     if [[ "$transcript" == */subagents/*.jsonl ]]; then
@@ -278,13 +296,147 @@ if [[ "$degraded" -eq 0 && ${#LEAD_ORDER[@]} -gt 0 ]]; then
                 done
             done <<< "$usage"
             ATTRIBUTED[$lead_path]=1
+            ANCHOR_LABEL[$lead_path]="$DRIFT_KIT_SUPERVISION_LABEL"
+            ANCHOR_ITERS[$lead_path]="${iters[*]}"
+            ANCHOR_COUNTS[$lead_path]="${counts[*]}"
+            ANCHOR_WHO[$lead_path]="$(normalize8 "$lead")"
+            ANCHOR_ORDER+=("$lead_path")
         done
     fi
 fi
 
+# spec: drift-kit/SPEC.md §The stage-economics meter — the fan-out row: the path cannot carry the parent
+# edge, so it comes from the harness's sibling meta record and the walk stops at the nearest anchor.
+fanout_unresolved=0
+fanout_rows=0
+fanout_no_meta=0
+if [[ "$degraded" -eq 0 && "${#ANCHOR_ORDER[@]}" -gt 0 ]]; then
+    if [[ "$suffix_collision" -eq 1 ]]; then
+        printf '  a stamp names a stage ending in "%s", colliding with DRIFT_KIT_FANOUT_SUFFIX — no fan-out rows emitted this run\n' \
+            "$DRIFT_KIT_FANOUT_SUFFIX"
+    else
+        _fo_dir="$(sessions_dir)"
+        declare -A META_PARENT=() META_HAVE=() FANOUT=()
+        FANOUT_ORDER=()
+        nested=0
+        shopt -s nullglob
+        for _fo_sub in "$_fo_dir"/*/subagents; do
+            _fo_metas=("$_fo_sub"/*.meta.json)
+            _fo_scripts=("$_fo_sub"/*.jsonl)
+            nested=$((nested + ${#_fo_scripts[@]}))
+            [[ "${#_fo_metas[@]}" -gt 0 ]] || continue
+            while IFS=$'\t' read -r _fo_mf _fo_pid; do
+                [[ -n "$_fo_mf" ]] || continue
+                _fo_t="${_fo_mf%.meta.json}.jsonl"
+                META_HAVE[$_fo_t]=1
+                if [[ -z "$_fo_pid" ]]; then
+                    META_PARENT[$_fo_t]="${_fo_sub%/subagents}.jsonl"
+                elif [[ -f "$_fo_sub/agent-$_fo_pid.jsonl" ]]; then
+                    META_PARENT[$_fo_t]="$_fo_sub/agent-$_fo_pid.jsonl"
+                elif [[ -f "$_fo_sub/$_fo_pid.jsonl" ]]; then
+                    META_PARENT[$_fo_t]="$_fo_sub/$_fo_pid.jsonl"
+                else
+                    META_PARENT[$_fo_t]=""     # named an agent with no transcript: counted, never guessed
+                fi
+            done < <(jq -r '[input_filename, (.parentAgentId // "")] | @tsv' "${_fo_metas[@]}" 2>/dev/null)
+        done
+        shopt -u nullglob
+
+        if [[ "$nested" -gt 0 && "${#META_HAVE[@]}" -eq 0 ]]; then
+            fanout_no_meta=1
+        else
+            walk_anchor() {        # $1=transcript -> WALK_ANCHOR = nearest anchor path, empty if none
+                local cur="$1" hops=0
+                local -A seen=()
+                WALK_ANCHOR=""
+                while :; do
+                    if [[ -n "${ANCHOR_LABEL[$cur]:-}" ]]; then WALK_ANCHOR="$cur"; return 0; fi
+                    hops=$((hops + 1))
+                    [[ "$hops" -le "$nested" ]] || return 1
+                    [[ -z "${seen[$cur]:-}" ]] || return 1
+                    seen[$cur]=1
+                    [[ -n "${META_HAVE[$cur]:-}" ]] || return 1
+                    [[ -n "${META_PARENT[$cur]}" ]] || return 1
+                    cur="${META_PARENT[$cur]}"
+                done
+            }
+
+            shopt -s nullglob
+            for f in "$_fo_dir"/*/subagents/*.jsonl; do
+                [[ -z "${ANCHOR_LABEL[$f]:-}" && -z "${ATTRIBUTED[$f]:-}" ]] || continue
+                if ! walk_anchor "$f"; then
+                    fanout_unresolved=$((fanout_unresolved + 1))
+                    continue
+                fi
+                ATTRIBUTED[$f]=1
+                usage="$(usage_by_model "$f")"
+                [[ -n "$usage" ]] || continue
+                while IFS=$'\t' read -r model in out cr cw; do
+                    [[ -n "$model" ]] || continue
+                    _fo_key="$WALK_ANCHOR|$model"
+                    if [[ -z "${FANOUT[$_fo_key]:-}" ]]; then
+                        FANOUT[$_fo_key]="$in $out $cr $cw"
+                        FANOUT_ORDER+=("$_fo_key")
+                    else
+                        read -r a_in a_out a_cr a_cw <<< "${FANOUT[$_fo_key]}"
+                        FANOUT[$_fo_key]="$((a_in + in)) $((a_out + out)) $((a_cr + cr)) $((a_cw + cw))"
+                    fi
+                done <<< "$usage"
+            done
+            shopt -u nullglob
+
+            # spec: drift-kit/SPEC.md §The stage-economics meter — several anchors, one row: apportion
+            # first and fold second, since the split is the anchor's property and the row is not.
+            declare -A FOROW=() FOWHO=() FOCNT=()
+            FOROW_ORDER=()
+            for _fo_key in ${FANOUT_ORDER[@]+"${FANOUT_ORDER[@]}"}; do
+                anchor="${_fo_key%|*}"; model="${_fo_key##*|}"
+                read -r in out cr cw <<< "${FANOUT[$_fo_key]}"
+                read -r -a iters <<< "${ANCHOR_ITERS[$anchor]}"
+                read -r -a counts <<< "${ANCHOR_COUNTS[$anchor]}"
+                p_in=(); p_out=(); p_cr=(); p_cw=()
+                while IFS= read -r v; do p_in+=("$v"); done < <(split_tokens "$in" "${counts[@]}")
+                while IFS= read -r v; do p_out+=("$v"); done < <(split_tokens "$out" "${counts[@]}")
+                while IFS= read -r v; do p_cr+=("$v"); done < <(split_tokens "$cr" "${counts[@]}")
+                while IFS= read -r v; do p_cw+=("$v"); done < <(split_tokens "$cw" "${counts[@]}")
+                for i in "${!iters[@]}"; do
+                    _fo_rk="${iters[$i]}|${ANCHOR_LABEL[$anchor]}|$model"
+                    if [[ -z "${FOROW[$_fo_rk]:-}" ]]; then
+                        FOROW[$_fo_rk]="${p_in[$i]} ${p_out[$i]} ${p_cr[$i]} ${p_cw[$i]}"
+                        FOWHO[$_fo_rk]="${ANCHOR_WHO[$anchor]}"
+                        FOCNT[$_fo_rk]=1
+                        FOROW_ORDER+=("$_fo_rk")
+                    else
+                        read -r a_in a_out a_cr a_cw <<< "${FOROW[$_fo_rk]}"
+                        FOROW[$_fo_rk]="$((a_in + p_in[i])) $((a_out + p_out[i])) $((a_cr + p_cr[i])) $((a_cw + p_cw[i]))"
+                        FOCNT[$_fo_rk]=$(( FOCNT[$_fo_rk] + 1 ))
+                    fi
+                done
+            done
+
+            for _fo_rk in ${FOROW_ORDER[@]+"${FOROW_ORDER[@]}"}; do
+                _fo_iter="${_fo_rk%%|*}"; _fo_rest="${_fo_rk#*|}"
+                _fo_label="${_fo_rest%|*}"; model="${_fo_rest##*|}"
+                read -r in out cr cw <<< "${FOROW[$_fo_rk]}"
+                who="${FOWHO[$_fo_rk]}"
+                [[ "${FOCNT[$_fo_rk]}" -eq 1 ]] || who="${FOCNT[$_fo_rk]} anchors"
+                emit_row "$_fo_iter" "$_fo_label$DRIFT_KIT_FANOUT_SUFFIX" "$who" \
+                    "$model" "$in" "$out" "$cr" "$cw"
+                fanout_rows=$((fanout_rows + 1))
+            done
+        fi
+    fi
+fi
+
+[[ "$fanout_no_meta" -eq 0 ]] || \
+    printf '  no dispatch-attribution records beside the transcripts — no fan-out rows this run; every other row is unchanged (degraded, not failed)\n'
+[[ "$fanout_unresolved" -eq 0 ]] || \
+    printf '  %d dispatched transcript(s) resolved no anchor (absent or dangling attribution record, or an over-long chain) — each stays in the unstamped bound below, never guessed\n' \
+        "$fanout_unresolved"
+
 # spec: drift-kit/SPEC.md §The stage-economics meter — the under-count bound: the unmatched counter reports stamps
 # with no transcript and is structurally blind to the inverse, so the inverse is counted too. A bound,
-# never an attribution — a transcript carries no iteration and no stage, so nothing could place it.
+# never an attribution — what remains is a transcript that resolved no anchor, so nothing could place it.
 unstamped=0
 if [[ "$degraded" -eq 0 ]]; then
     _se_dir="$(sessions_dir)"
@@ -301,11 +453,13 @@ fi
 [[ "$unmatched" -eq 0 ]] || \
     printf '  %d stamp(s) had no matching transcript (skipped — session transcripts age out of the sessions dir)\n' "$unmatched"
 [[ "$unstamped" -eq 0 ]] || \
-    printf '  %d transcript(s) in the sessions dir match no stamp and bill to no row — an upper bound on the unstamped-continuation under-count, not an attribution\n' "$unstamped"
+    printf '  %d transcript(s) in the sessions dir match no stamp and resolved no anchor, so they bill to no row — an upper bound on the unstamped-continuation under-count, not an attribution\n' "$unstamped"
 
 if [[ "$incomplete" -eq 1 ]]; then
     printf '  total pricing incomplete — one or more model cost cells degraded to n/a (unpriced model or absent table)\n'
 fi
-printf '  (cr=cache-read is the headline burn lever; one transcript bills to exactly one (iteration, stage) — a session bearing several stamps is attributed to its last and the yielded stamps are named above, never billed twice)\n'
+printf '  (cr=cache-read is the headline burn lever; one transcript bills to exactly one row key — an (iteration, stage-or-role) pair or that pair'"'"'s fan-out value — so a session bearing several stamps is attributed to its last and the yielded stamps are named above, never billed twice)\n'
+[[ "$fanout_rows" -eq 0 ]] || \
+    printf '  a per-stage figure above excludes its own fan-out: the subtree is the adjacent "%s" row, an aggregate over every dispatch shape (a fork and a typed dispatch fold into one total)\n' "$DRIFT_KIT_FANOUT_SUFFIX"
 printf '  logged: %s (%d row(s))\n' "$DRIFT_KIT_STAGE_ECONOMICS_LOG" "$rows"
 exit 0
