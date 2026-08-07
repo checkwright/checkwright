@@ -3770,37 +3770,6 @@
   worse than a skipped audit — the roster reads as coverage.
   Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
 
-- **publish-artifact-layout-contradiction** [design-pending] — the publish workflow implements
-  one artifact layout and documents another, and the v0.22.0 tag is public with no Release.
-  **Live front-door state, which is why this is not ordinary debt.** `v0.22.0` is tagged and
-  pushed on a tree the remote `gates` run passed, but its `publish` run failed at `pack`, so the
-  `release` and `npm` jobs never ran: no GitHub Release, no tarball, no per-target binary, no
-  sidecar. The Releases index lists a version with nothing installable behind it — the exact
-  shape a gap bullet named one release ago, arriving now by a different route.
-  **The defect, verified rather than inferred.** `pack` died on
-  `mv: cannot stat '…/artifact/gate-binary-*'`. The upload step's own comment says the artifact
-  "carries the target directory, so a **merged** download lands exactly the layout
-  `pack-installer.sh` reads" — but its `path:` ends at the target directory, making that
-  directory the common ancestor, so the artifact carries the two files flat. `gh run download`
-  of the failed run's artifact confirms it: the only `<target>`-named directory is `gh`'s own
-  per-artifact naming, and nothing inside the artifact carries the target. The download step
-  meanwhile sets `pattern:` with **no** `merge-multiple` and `pack` then renames
-  `gate-binary-<target>` → `<target>`. So the code implements the per-artifact-directory design
-  the comment says was replaced by the merged one, and `download-artifact@v8` did not produce
-  those directories.
-  **Why `[design-pending]` rather than a fix applied here.** The repair is legible — preserve
-  the target directory on upload, set `merge-multiple: true`, delete the now-dead rename loop —
-  but no local oracle reaches a GitHub Actions artifact round-trip, so it is verifiable only by
-  spending a `publish` run. And because `publish.yml` runs from the tagged ref, fixing it moves
-  the tag: an operator-class act on a public ref, not a session's call.
-  **The first release to build binaries is the first to reach this code**, so no earlier tag
-  exercised it and no gate could have — the failure lives in the interaction between two pinned
-  third-party actions, which is outside every substrate this battery covers.
-  **Cost while deferred:** an adopter following the install page to `v0.22.0` finds nothing to
-  download, and the tag that was cut to make the binary-publishing claim true instead makes a
-  second claim false.
-  Filed 2026-08-07 by close, draining its own gap-inbox filing of the failed publish run.
-
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -3832,5 +3801,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- publish-artifact-layout-contradiction
 
 ## Lessons Learned
