@@ -351,9 +351,9 @@ not.
 This is appended rather than substituted deliberately, and the reason is the
 record's own purpose. Striking the clause would destroy the evidence of what was
 believed when the unit was pulled in, which is exactly what a ruling record
-exists to preserve. Leaving it silent would let the next reader lean on a ground
-that no longer holds. A recorded ruling is closed to reversal; it is not closed
-to a correction that says which of its grounds survived contact with an oracle.
+exists to preserve. Leaving it silent would let the next reader lean on a false
+ground. A recorded ruling is closed to reversal; it is not closed to a correction
+that says which of its grounds survived contact with an oracle.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
