@@ -91,6 +91,32 @@ if ! smoke_block | grep -qF -- "- **$SMOKE_TRIMMED**"; then
     exit 1
 fi
 
+# spec: doctrine-kit/SPEC.md §install-doctrine — the --remove path's acceptor. remove_marker_block (gate-sdk/SPEC.md §lib/inject.sh) is a sourced library with no gate surface, so its removal half is exercised here through the one caller that drives it: --remove must strip the block entirely, a second --remove must be an idempotent no-op, and a reinstall afterward must restore the same steady-state block this script's own baseline expects
+bash "$SMOKE_KIT_ROOT/bin/install-doctrine.sh" --remove >/dev/null
+if smoke_block | grep -q .; then
+    echo "doctrine smoke: --remove left doctrine block content in the agent file" >&2
+    exit 1
+fi
+if grep -qF -- "$SMOKE_BEGIN" CLAUDE.md; then
+    echo "doctrine smoke: --remove left the begin marker in the agent file" >&2
+    exit 1
+fi
+
+SMOKE_REMOVED="$(cat CLAUDE.md)"
+bash "$SMOKE_KIT_ROOT/bin/install-doctrine.sh" --remove >/dev/null
+if [[ "$(cat CLAUDE.md)" != "$SMOKE_REMOVED" ]]; then
+    echo "doctrine smoke: a second --remove changed an already-clean agent file" >&2
+    exit 1
+fi
+
+bash "$SMOKE_KIT_ROOT/bin/install-doctrine.sh" >/dev/null
+if ! smoke_block | grep -q .; then
+    echo "doctrine smoke: a reinstall after --remove did not restore the doctrine block" >&2
+    exit 1
+fi
+bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
+    || { echo "doctrine smoke: check-doctrine-registration is not green after the --remove/reinstall round trip" >&2; exit 1; }
+
 cat >> scripts/gates.list <<'EOF'
 # doctrine-kit
 check-doctrine-registration

@@ -53,3 +53,28 @@ read_marker_block() {
         ' "$file"
     )
 }
+
+# spec: gate-sdk/SPEC.md §lib/inject.sh — remove_marker_block <file> <begin> <end>; deletes the marker pair and everything between it (inclusive), leaving the rest of the file byte-identical. A no-op exiting 0, printing nothing, when no begin marker is present; a begin marker without its end is malformed (exit 2), as is a missing file — the same rule its siblings take, so all three helpers agree on what a malformed target is. Echoes 'removed' when it removed a block.
+remove_marker_block() {
+    (
+        set -euo pipefail
+        file="$1"; begin="$2"; end="$3"
+        [[ -f "$file" ]] \
+            || { echo "remove_marker_block: target file not found: $file" >&2; exit 2; }
+
+        grep -qF -- "$begin" "$file" || exit 0
+        grep -qF -- "$end" "$file" \
+            || { echo "remove_marker_block: begin marker present but end marker missing in $file — refusing to guess the block bounds" >&2; exit 2; }
+
+        tmp="$(mktemp)"
+        trap 'rm -f "$tmp"' EXIT
+        awk -v b="$begin" -v e="$end" '
+            $0 == b { skip = 1; next }
+            $0 == e { skip = 0; next }
+            !skip { print }
+        ' "$file" >"$tmp"
+
+        cp "$tmp" "$file"
+        printf '%s\n' "removed"
+    )
+}

@@ -9,13 +9,29 @@ source "$KIT/lib/doctrine.sh"
 # shellcheck source=../../gate-sdk/lib/inject.sh
 source "$SDK/lib/inject.sh"
 
+BEGIN="<!-- doctrine-kit:begin -->"
+END="<!-- doctrine-kit:end -->"
+
+# spec: doctrine-kit/SPEC.md §install-doctrine — --remove: the reverse of the insert path over the same marker pair, riding gate-sdk's remove_marker_block (gate-sdk/SPEC.md §lib/inject.sh). It harvests no trims and emits no digest — a removal has nothing to carry forward — and reports what it did on the same channel (stdout) the insert path reports on. A missing agent file stays exit 2, unchanged.
+if [[ "${1:-}" == "--remove" ]]; then
+    shift
+    AGENT_FILE="${1:-$DOCTRINE_KIT_AGENT_FILE}"
+    [[ -f "$AGENT_FILE" ]] \
+        || { echo "install-doctrine: agent file not found: $AGENT_FILE — nothing to remove" >&2; exit 2; }
+
+    result="$(remove_marker_block "$AGENT_FILE" "$BEGIN" "$END")" || exit $?
+    if [[ "$result" == "removed" ]]; then
+        echo "install-doctrine: removed the doctrine reference block from $AGENT_FILE"
+    else
+        echo "install-doctrine: no doctrine reference block found in $AGENT_FILE — nothing to remove"
+    fi
+    exit 0
+fi
+
 AGENT_FILE="${1:-$DOCTRINE_KIT_AGENT_FILE}"
 DOCTRINE_FILE="${2:-$DOCTRINE_KIT_DOCTRINE_FILE}"
 [[ -f "$AGENT_FILE" ]] \
     || { echo "install-doctrine: agent file not found: $AGENT_FILE — nothing to install into" >&2; exit 2; }
-
-BEGIN="<!-- doctrine-kit:begin -->"
-END="<!-- doctrine-kit:end -->"
 
 # spec: doctrine-kit/SPEC.md §install-doctrine — the untrimmed digest: the always-loaded shape applied to the doctrine itself, a one-line-per-rule digest plus the markdown link to the doctrine file
 digest() {
