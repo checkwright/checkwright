@@ -70,10 +70,12 @@ is derived — a verb is advertised because its implementation is present under
 `--dry-run`.** `doctor` and `diff` write nothing, so neither has one and neither
 would have anything to preview. Every verb that does write has one, and it means
 the same thing in each: print the plan, write nothing, exit 0. That rule is
-asserted behaviorally rather than gated — §The consumer smoke holds each
-mutating verb's `--dry-run` to leaving the tree object unchanged, which is what
-a flag that parsed and then wrote anyway would fail and a flag that merely
-existed would pass.
+asserted behaviorally rather than gated — §The consumer smoke holds
+`uninstall --dry-run` to leaving the tree object and the worktree unchanged,
+which is what a flag that parsed and then wrote anyway would fail and a flag
+that merely existed would pass. *The honest bound:* `init`'s and `update`'s
+`--dry-run` carry the same contract and are not held to it there yet, so the
+rule is asserted on one verb and documented on the other two.
 
 **Why `diff` is a verb of its own rather than a widening of `doctor`.**
 `doctor`'s exit status has exactly one owner — the toolchain contract — and
@@ -713,8 +715,9 @@ while leaving the tree object and `git status` exactly as they were; then
 `uninstall`, after which the consumer's tree object must equal the one it had
 **before `init` ran**, the worktree must be clean, and no `checkwright.lock` may
 remain. The `--dry-run` step is where the writes/does-not-write rule in §The
-verbs is actually asserted, and asserted behaviorally: a flag that parsed and
-then wrote anyway fails it, where a flag that merely existed would pass.
+verbs is asserted for `uninstall`, and asserted behaviorally: a flag that parsed
+and then wrote anyway fails it, where a flag that merely existed would pass. It
+is the only verb this arm holds to that rule — §The verbs states the bound.
 
 **The tree-object equality is the load-bearing assertion, and it proves more
 than `uninstall`.** Nothing else here asserts that the manifest covers
