@@ -61,11 +61,19 @@ stays where it already lives — the gate's own configured knob.
 `{design-bearing}`
 `recipe_gates(kit, profile)` becomes: every `checks/` member of that kit — both
 declaration spellings, `check-*.sh` and `check-*.gate` — whose `# install:`
-disposition is `zero-config`. Nine literal gate-name lists and the arms that
-hold them go; the `lifecycle-kit) : ;;` arm goes too, and its reason survives
-where it belongs, as `on-surface` on each of that kit's seven gates. The
-profile argument E1 does not yet vary on is `profile-keyed-install`'s seam and
-stays as that amendment leaves it.
+disposition is `zero-config`. **Re-counted against the tree at align: the case
+statement holds nine arms, and seven of them are literal gate-name lists** —
+`gate-sdk`, `canon-kit`, `context-kit`, `delegation-kit`, `doctrine-kit`,
+`evidence-kit`, `queue-kit`. Those seven and the arms that hold them go; the
+`lifecycle-kit) : ;;` arm goes too, and its reason survives where it belongs,
+as `on-surface` on each of that kit's declared-in-smoke gates (`smoke/install.sh`
+registers seven of `lifecycle-kit`'s eleven `checks/` members — the other four
+are the kit's own self-auditing meta-gates over this repo's authoring
+artifacts, corroborated `never` by the existing self-declared exit-2 valve, not
+by hand declaration). The catch-all `*) : ;;` arm goes with the rest of the
+case statement, holding no list of its own. The profile argument E1 does not
+yet vary on is `profile-keyed-install`'s seam and stays as that amendment
+leaves it.
 
 **E3 — `recipe_needs_queue` and `recipe_needs_agent_file` are unchanged, and the
 non-extension is ruled.** `{design-bearing}`

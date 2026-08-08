@@ -31,10 +31,20 @@ comparing to `delegation` in neither direction.
 **D2 — `recipe_gates` takes the profile as its second argument.**
 `{mechanical}`
 `recipe_gates(kit, profile)`. Every existing arm ignores the second argument and
-is otherwise unchanged; the sole call site (`plan_gates` in
-`installer/lib/init.sh`) passes the selected profile. This is the seam: after
-it, a profile-varying roster is a change to one arm, not a change to a
-signature, its callers, and the smoke that reads them.
+is otherwise unchanged. **Corrected at align: `recipe_gates` has two call
+sites, not one** — `plan_gates` in `installer/lib/init.sh`, which passes the
+selected profile, and `installer/consumer-smoke/run-smoke.sh`'s per-kit
+omitted-gate scan (its `want_omitted` loop), which calls `recipe_gates "$k"`
+with no second argument at all. The second site is unaffected by this delta:
+it reads the per-kit zero-config candidate set to find `.gate`-only members
+with no `.sh` fallback, a query the profile does not vary today, and a missing
+positional argument is simply an empty `$2` no arm reads. Build passes the
+profile through this call site too when it wires the signature, for the same
+discipline reason every call site of a two-argument function should agree on
+its arity — but nothing in this tree depends on it doing so before the first
+profile-varying arm lands. This is the seam: after it, a profile-varying
+roster is a change to one arm, not a change to a signature and every caller
+that reads it.
 
 **D3 — `recipe_seed` and `recipe_config_seam_plan` stay profile-blind, and the
 refusal is recorded so build does not "finish" it.** `{design-bearing}`
@@ -139,6 +149,10 @@ manifest's recorded `profile`, else `starter`) and passes it through
 `plan_gates` into `profile_gates`. Named reader: `profile_gates`, at the
 transition where a profile is resolved to a gate set — once per `init` run on
 the real install path, and once per profile in the smoke's monotonicity pass.
+**`recipe_gates`'s other call site — `run-smoke.sh`'s `want_omitted` scan —
+reads no second argument and has no named reader for this field**, by D2's own
+ground: the omitted-gate query does not vary by profile, so the field is
+absent there rather than unread by an oversight.
 
 **The honest limit, stated because a reader will otherwise overclaim
 assertion 4.** Every `recipe_gates` arm ignores the profile today, so
