@@ -13,3 +13,4 @@ adopter-floor-integrity build a08229ee 2026-08-08
 adopter-floor-integrity build ac7c1db9 2026-08-08
 adopter-floor-integrity build a99c52de 2026-08-08
 adopter-floor-integrity validate ade3d538 2026-08-08
+adopter-floor-integrity close ad772dcb 2026-08-08
