@@ -11,3 +11,4 @@ adopter-floor-integrity spec ad166f21 2026-08-08
 adopter-floor-integrity align adddf515 2026-08-08
 adopter-floor-integrity build a08229ee 2026-08-08
 adopter-floor-integrity build ac7c1db9 2026-08-08
+adopter-floor-integrity build a99c52de 2026-08-08
