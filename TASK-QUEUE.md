@@ -12,7 +12,94 @@
 
 ## New Features
 
+- **profile-keyed-install** [spec: SPEC-profile-lattice.md] — the profile becomes a key.
+  Slice (a) of the `prose-profile` rung, and nothing more: no fourth profile and no
+  prose gate cohort ship here. `recipe_gates` takes the profile as its second
+  argument, `installer/lib/common/profile.sh` gains a derived order and a derived
+  per-profile gate set, and the containment contract that five surfaces assert
+  separately collapses into one bounded lattice the installer smoke computes.
+  **What the lattice replaces.** `installer/consumer-smoke/run-smoke.sh` loses its
+  bare `at most three profiles` cardinality bound and the two `contains` calls that
+  name `starter` and `delegation` as literals; after it, no profile name is a literal
+  anywhere in the smoke. `installer/profiles.list`, `installer/README.md` §Profiles
+  and §The consumer smoke state the lattice; `docs/install.md` §Quick start is a
+  ruled no-op, because today's three profiles genuinely are a chain.
+  **The assertion that earns the profile argument** is gate-roster monotonicity:
+  what an adopter experiences is the battery, not the directory list, so
+  "moving up only ever adds" is a claim about gates. Kit-set containment stops
+  implying gate-set containment the moment a roster can vary by profile. It cannot
+  fail on this tree — every arm ignores the profile today — and that is stated in
+  the amendment as its honest limit: it arms before the first profile-varying arm
+  lands, so the prose-profile iteration meets it at its own commit.
+  **Deliberately not threaded:** `recipe_seed` and `recipe_config_seam_plan` stay
+  profile-blind. The kit set is a sufficient key for what a profile *seeds* and an
+  insufficient key for what it *registers* — that asymmetry is the unit. A parameter
+  with no reader is removed, so neither gets one.
+  Promoted 2026-08-08 by spec from the operator's `install-profile-seam` cut
+  (TRAJECTORY.md §The closed rulings); unblocks `prose-profile` and
+  `companion-toolkit-profile`, which pay this bound otherwise.
+
+- **kit-owned-install-recipe** [spec: SPEC-install-disposition.md] — the roster is
+  derived from the gate.
+  A gate declares its own `# install: <disposition>` beside its `# graph:` and
+  `# spec:` directives; `recipe_gates`' nine literal gate-name lists are derived and
+  deleted. `check-install-disposition` holds three assertions — every shipped gate
+  declares one, every `zero-config` gate appears in its kit's smoke roster, and
+  `installer/lib/common/recipe.sh` carries no literal gate name.
+  **The filed mechanism was refused on evidence, and the unit is not.** The entry's
+  costed fix — a `bin/install-<kit>.sh` both callers share — rests on the premise
+  that the zero-config subset is one fact encoded twice. A census of all eleven kits
+  falsified it: the two rosters describe two different trees. The installer's arm is
+  a strict subset of the smoke's in every gated kit, the difference direction
+  "in recipe but not smoke" is empty everywhere, and the largest gaps are
+  deliberate — lifecycle-kit registers zero at install because its gates read a
+  stage attestation only a stage session writes, and all seven in smoke because the
+  smoke stamps it; site-kit is zero and five for the same reason over `docs/CNAME`.
+  One entry point returning one roster would either arm lifecycle-kit's gates on a
+  tree with no attestation or strip the smoke's coverage. The eleven-kit census
+  and the witness that re-runs it are recorded in `.workflow/survey-record.md`.
+  **The exposure is unchanged and is what the unit closes:** a kit that adds a
+  zero-config gate the installer never learns about ships to adopters unregistered
+  and silent, and nothing reds today.
+  Promoted 2026-08-08 by spec, second in the operator's `install-profile-seam` cut;
+  builds after `profile-keyed-install`, which settles the signature this relocates
+  behind.
+
 ## Technical Debt
+
+- **lock-own-file-narrowed-profile-drift** — `doctor` misreports which `gates.list`
+  it inspected on any tree whose install profile ever narrowed.
+  `installer/lib/common/lock.sh`'s `lock_own_file` resolves a consumer's own seam
+  file by suffix, then patches the ambiguity by excluding `files[]` keys prefixed
+  with a recorded `.kits` member. `files[]` outlives `.kits`: a full-to-starter
+  re-run carries every previously vendored path forward while `.kits` shrinks, the
+  retained keys stop being excluded, and jq's sorted `first` returns a vendored
+  fixture — `canon-kit/gate-tests/<case>/good/scripts/gates.list` — as the
+  consumer's real registry.
+  **Ruled debt 2026-08-08 by spec, and the ruling is why it needs no amendment.**
+  The entry offered two fixes and rejected both: narrowing `files[]` on a profile
+  change undoes the carry-forward that stops a re-run overwriting an adopter
+  silently, and widening the exclusion to every kit the payload can ship puts a
+  payload fact into a consumer-tree resolver. Both horns are refused. The manifest
+  already records the **exact repo-relative path** `init` wrote, and `GATES_DIR` is
+  a constant every verb that sources `recipe.sh` already holds — so the resolver
+  matches that path exactly instead of guessing from a suffix. No new manifest key,
+  no payload fact, no roster narrowing, no new name on any governed surface: it
+  converges behavior on what `installer/README.md` §The manifest already says
+  `files` holds. Callers pass a full relative path rather than a basename suffix.
+  **A second instance the entry did not carry, found at spec and fixed by the same
+  change:** the residual manifest `uninstall` rewrites keeps `schema` and `files`
+  only, so `.kits` is absent there and the exclusion excludes nothing at all.
+  **Enforcement-first.** No smoke arm exercises a profile change today — the upgrade
+  arm re-runs `init` at the same profile. The fix lands with an
+  `installer/consumer-smoke/run-smoke.sh` arm that installs `full`, re-runs `init`
+  at `starter`, and asserts `doctor` names the consumer's own `scripts/gates.list`;
+  the smoke is a registered validate suite, so that arm is the oracle.
+  Its stale citation is corrected in passing: `installer/README.md` §The manifest is
+  the section, not "§The manifest owns".
+  Ruled in as debt in the operator's `install-profile-seam` cut, third of three;
+  scope could not promote it while its design was still open, so it reached spec
+  with the other two and the ruling above is what discharges it.
 
 ## Deferred
 
@@ -705,42 +792,6 @@
   now documents but does not enforce.
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
-
-- **kit-owned-install-recipe** [design-pending] — a kit's **zero-config gate
-  subset** (the gates it can register in a fresh consumer with no
-  adopter-authored surface) is encoded twice, and no surface owns it: once in
-  each kit's `smoke/install.sh` for its scratch consumer, and once in
-  `installer/lib/common/recipe.sh`'s per-kit case arm for a real adopter.
-  Verified on the tree at filing: 11 kits ship `smoke/install.sh`, 9 carry a
-  `checks/` roster, and `recipe.sh` restates those rosters as literal gate-name
-  lists. The installer's copy was not derived from any spec — it was produced
-  by reading eleven smoke installs and probing a scratch battery, because
-  naive registration of every `checks/check-*.sh` reds 29 of 74 gates.
-  **The exposure, stated precisely.** The consumer smoke catches a roster that
-  names a gate which fails to *resolve*. It cannot catch the live direction of
-  drift: a kit that **adds** a zero-config gate the installer never learns
-  about. That gate then ships to adopters unregistered and silent, and nothing
-  reds.
-  **Costed fix (carried from the gap bullet, unchanged).** Push a
-  `bin/install-<kit>.sh` down into each kit as the product form of its README
-  §Install; have `smoke/install.sh` delegate to it and the installer's `init`
-  call it; add a gate asserting every kit root ships one. Roughly nine new
-  scripts, eleven smoke rewrites, a `gate-sdk/SPEC.md` contract section, and a
-  gate with a fixture pair. This is the De-literalization and Derivation-first
-  fix in one: the roster stops being prose-and-literal in two places and
-  becomes a thing each kit owns and the installer calls.
-  **Why `[design-pending]`:** it adds a kit-root structural predicate (every kit
-  ships an install entry point), which is a `gate-sdk/SPEC.md` contract change
-  across all eleven kits, not a script patch.
-  **Cost while deferred:** the two rosters drift open-loop — every kit that
-  gains a zero-config gate widens the gap silently, and the installer's copy is
-  re-derivable only by repeating the eleven-smoke read and the scratch probe
-  that produced it.
-  Filed 2026-07-26 by close (`activation-path`), draining the gap inbox; the
-  gap was ruled outside the `activation-installer` amendment's envelope as
-  cross-component across all eleven kits. The same finding was independently
-  captured as a knowledge-friction re-derivation against
-  `installer/lib/common/recipe.sh`; both converge here.
 
 - **spec-measured-count-gate** [design-pending] — a **measured count authored into a
   canonical SPEC section goes stale with no oracle**. Reproduced twice in one
@@ -3064,32 +3115,6 @@
   **Cost while deferred:** every release re-derives a settled contradiction, and re-derives it
   at the worst moment — mid-cut, with a note committed and a tag pending.
   Filed 2026-08-06 at close, on the lead's ruling, from the cut that hit it.
-
-- **lock-own-file-narrowed-profile-drift** [design-pending] — `doctor` misreports which
-  `gates.list` it inspected on any tree whose install profile ever narrowed.
-  `installer/lib/common/lock.sh:31`'s `lock_own_file` resolves a consumer's own seam file by
-  taking the `files[]` keys that end in a suffix and excluding those prefixed with a
-  recorded `.kits` member. The exclusion is only as complete as `.kits`, and `files[]`
-  outlives it: a full→starter re-run leaves every previously vendored canon-kit, site-kit
-  and drift-kit path on the roster through init's carry-forward (`installer/lib/init.sh`,
-  the refusal-path record) while `.kits` shrinks to the starter set. Those retained keys
-  stop being excluded, and the function's own documented failure mode fires —
-  `canon-kit/gate-tests/<case>/good/scripts/gates.list` matches the suffix and `doctor`
-  reports a vendored fixture as the consumer's real registry.
-  **Pre-existing and reachable today.** A profile narrowing is not the version downgrade
-  the lock refuses, so nothing blocks the path. Found by spec 2026-08-05 while verifying
-  `install-claim-contract`'s ownership rule — the amendment left it open deliberately, as
-  outside its envelope, rather than missing it.
-  **Why `[design-pending]`:** the exclusion predicate and the roster's retention rule now
-  disagree by construction, and which one yields is the design. Narrowing `files[]` on a
-  profile change would undo the carry-forward that stops a re-run overwriting an adopter
-  silently; widening the exclusion to every kit the payload can ship puts a payload fact
-  into a consumer-tree resolver. Neither is obviously right, and both touch the manifest
-  contract installer/README.md §The manifest owns.
-  **Cost while deferred:** `doctor` silently misreports the `gates.list` and
-  `gate-sdk-config.sh` it inspected on any tree that ever narrowed its profile, and a
-  diagnostic that reports the wrong file confidently is worse than one that reports none.
-  Filed 2026-08-05 by close, draining the gap inbox.
 
 - **poll-sleep-guard-steer** [design-pending] — polling to wait is the one half of the
   never-poll rule that leaves a tracked artifact, and nothing reads it.
