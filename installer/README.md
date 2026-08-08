@@ -199,10 +199,15 @@ a tree that has done nothing wrong those would red on day one, so they are
 registered when the surface exists rather than at install. Each kit's README
 names the full roster to grow into.
 
-*The honest limit.* That per-kit starting roster is `recipe_gates` in
-`lib/common/recipe.sh`, and that function is the **whole** of a fresh
+*The honest limit.* That per-kit starting roster is `recipe_gates(kit, profile)`
+in `lib/common/recipe.sh`, and that function is the **whole** of a fresh
 consumer's registry — what a tree `init` just made will run is read there, never
-inferred from a kit's full roster or from this repo's own `gates.list`. Each
+inferred from a kit's full roster or from this repo's own `gates.list`. One
+function unions it over a profile's kits, `profile_gates` in
+`lib/common/profile.sh`, and both the registry `init` writes and the smoke's
+monotonicity assertion read that one derivation. No arm varies on the profile
+today; the argument is the seam, so a roster that does vary becomes a change to
+one arm rather than to a signature and every caller of it. Each
 kit's `smoke/install.sh` holds a second encoding of the same fact for its own
 scratch consumer. The consumer smoke catches the drift that
 matters — a roster naming a gate that fails to resolve reds it — but not a
@@ -540,10 +545,18 @@ manifest: the install is still there, so disowning it would be false.
 
 ## Profiles
 
-You pick how much of the methodology to meet first. The progression is
-`starter`, then `delegation`, then `full`, and it is a containment chain rather
-than three unrelated menus: moving up a profile only ever adds, so nothing you
-already vendored is taken away or rearranged underneath you.
+You pick how much of the methodology to meet first. Today that is `starter`,
+then `delegation`, then `full` — a chain, because those three happen to nest.
+
+**The contract is the lattice underneath, not the chain.** Profiles are ordered
+by kit-set containment, and that order is derived from the rosters rather than
+declared beside them. The promise it makes, stated precisely: *moving from a
+profile to one that contains it only ever adds — to the vendored tree and to the
+battery you run — and profiles that contain neither the other are alternatives,
+not steps.* The order is bounded: exactly one profile sits below every other,
+exactly one above every other, and the one above is `full` by construction.
+So nothing you already vendored is taken away or rearranged underneath you when
+you move up, and a profile that is nobody's step is still a legitimate member.
 
 - **`starter`** is the framework — the gate SDK on its own. You get a battery,
   a generated pre-commit hook, and gates that already red on real defects in
@@ -559,7 +572,10 @@ already vendored is taken away or rearranged underneath you.
 follows from the tree — each is a judgment about what an adopter should meet
 first, and the file records the criterion behind each membership beside it.
 `full` is derived instead: it is every kit root the payload carries, resolved
-at run time, never a list to maintain.
+at run time, never a list to maintain. The **shape** is derived too — the order,
+its bounds, and the monotonicity above are computed from the rosters and the
+payload by `lib/common/profile.sh`, so a membership row and a declared parent
+can never disagree.
 
 ## The manifest
 
@@ -734,9 +750,16 @@ It packs the package, installs it **from the resulting tarball with
 `--offline`**, and drives a scratch consumer once per profile: `init`, then the
 battery must be green, then the manifest must agree with the tree it describes
 file by file, then a re-run must leave the tree object identical, then `doctor`
-must exit 0 and name the installed profile. It also asserts the profile
-invariant against the installed payload — every named kit resolves, the
-containment chain holds, and there are at most three profiles.
+must exit 0 and name the installed profile. It also asserts the profile lattice
+against the installed payload, in four parts: every named kit resolves in the
+payload; the derived order has **exactly one minimum and exactly one maximum**,
+so the lattice is bounded; that maximum is the payload-derived profile; and
+**gate rosters are monotone** — for every comparable pair, the smaller profile's
+gate set is contained in the larger's. The fourth is the one that earns
+`recipe_gates`' profile argument: what you experience is the battery, not the
+directory list, so "moving up only ever adds" is a claim about gates, and
+kit-set containment stops implying it the moment a roster varies by profile.
+Nothing here counts profiles; a fourth is admitted exactly when it fits.
 
 **The reversal arm** then runs on that same consumer, so every profile is
 installed *and* reversed. In order: `diff` must exit 0 and report the freshly

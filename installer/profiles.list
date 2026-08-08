@@ -6,10 +6,19 @@
 # a kit lands.
 #
 # The rows below are the two rosters that are not derivable, each a judgment
-# recorded with the criterion that produced it. The invariant over all three —
-# starter is contained in delegation is contained in full, every named kit
-# resolves in the payload, and no fourth profile — is asserted by the consumer
-# smoke, which runs `init` per profile against a packed tarball.
+# recorded with the criterion that produced it. That split is the whole contract
+# of this file: **membership is hand-authored and shape is derived.** A row here
+# says which kits a profile carries; nothing here says how the profiles relate,
+# because that follows from the rows.
+#
+# The shape is a bounded lattice, not a chain: profiles are partially ordered by
+# kit-set inclusion, exactly one sits below every other and exactly one above,
+# and two profiles containing neither the other are alternatives rather than
+# steps. The consumer smoke derives that order from these rows and the payload
+# and asserts it — every named kit resolves, the bounds are unique, the maximum
+# is the payload-derived profile, and moving up a comparable pair only ever adds
+# to the gate roster. A fourth profile is admitted exactly when it fits; there is
+# no count to raise here.
 
 # starter — the smallest set that reaches a green battery with a working
 # generated hook and at least one gate that reds on a real consumer defect

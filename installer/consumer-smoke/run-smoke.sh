@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → diff clean → uninstall back to the pre-init tree object) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -59,17 +59,17 @@ source "$PKG_ROOT/lib/common/recipe.sh"
 mapfile -t PAYLOAD_KITS < <(profile_payload_kits "$PKG_ROOT")
 [[ ${#PAYLOAD_KITS[@]} -gt 0 ]] || fail "the installed payload carries no kit"
 mapfile -t PROFILES < <(profile_names "$PKG_ROOT")
-[[ ${#PROFILES[@]} -le 3 ]] || fail "at most three profiles, found ${#PROFILES[@]}: ${PROFILES[*]}"
 say "profiles: ${PROFILES[*]} (${#PAYLOAD_KITS[@]} kits in the payload)"
 
 resolves() { local k; for k in "${PAYLOAD_KITS[@]}"; do [[ "$k" == "$1" ]] && return 0; done; return 1; }
-contains() {   # $1 = superset (newline list), $2 = subset name, $3 = subset (newline list)
+contains() {   # $1 = superset (newline list), $2 = the containment claim being asserted, $3 = subset (newline list)
     local m
     while IFS= read -r m; do
         [[ -n "$m" ]] || continue
-        grep -qxF "$m" <<<"$1" || fail "$2 is not contained in its successor: $m is missing"
+        grep -qxF "$m" <<<"$1" || fail "$2: $m is in the smaller set and missing from the larger"
     done <<<"$3"
 }
+# spec: installer/README.md §Profiles — assertion 1: every named kit resolves in the payload, which is what makes a roster a roster rather than a wish
 for p in "${PROFILES[@]}"; do
     mapfile -t members < <(profile_kits "$PKG_ROOT" "$p")
     [[ ${#members[@]} -gt 0 ]] || fail "profile '$p' resolves to no kit in the payload"
@@ -77,13 +77,35 @@ for p in "${PROFILES[@]}"; do
         resolves "$k" || fail "profile '$p' names $k, which the payload does not carry"
     done
 done
-# spec: installer/README.md §Profiles — the containment chain is what makes "progressive" a contract instead of a word: moving up a profile only ever adds
-STARTER="$(profile_kits "$PKG_ROOT" starter)"
-DELEGATION="$(profile_kits "$PKG_ROOT" delegation)"
-FULL="$(profile_kits "$PKG_ROOT" "$PROFILE_DERIVED")"
-contains "$DELEGATION" "starter" "$STARTER"
-contains "$FULL" "delegation" "$DELEGATION"
-say "every named kit resolves; starter ⊆ delegation ⊆ ${PROFILE_DERIVED}"
+
+# spec: installer/README.md §Profiles — assertions 2 and 3: the lattice is bounded, so it has exactly one profile below every other and exactly one above every other, and the one above is the payload-derived profile by construction. A profile comparable to nothing, a second incomparable maximum, and two profiles resolving to the same kit set are all reds here — which is the contract the deleted "at most three profiles" bound was standing in for, stated as a shape instead of a count
+mapfile -t ORDER < <(profile_order "$PKG_ROOT")
+MINIMA=(); MAXIMA=()
+for p in "${PROFILES[@]}"; do
+    below=0; above=0
+    for pair in "${ORDER[@]}"; do
+        IFS=$'\t' read -r a b <<<"$pair"
+        [[ "$a" == "$p" ]] && below=$((below + 1))
+        [[ "$b" == "$p" ]] && above=$((above + 1))
+    done
+    [[ "$below" -eq $(( ${#PROFILES[@]} - 1 )) ]] && MINIMA+=("$p")
+    [[ "$above" -eq $(( ${#PROFILES[@]} - 1 )) ]] && MAXIMA+=("$p")
+done
+[[ ${#MINIMA[@]} -eq 1 ]] \
+    || fail "the profile order has ${#MINIMA[@]} minima [${MINIMA[*]}] where a bounded lattice has exactly one"
+[[ ${#MAXIMA[@]} -eq 1 ]] \
+    || fail "the profile order has ${#MAXIMA[@]} maxima [${MAXIMA[*]}] where a bounded lattice has exactly one"
+[[ "${MAXIMA[0]}" == "$PROFILE_DERIVED" ]] \
+    || fail "the maximum profile is ${MAXIMA[0]} where the payload-derived profile $PROFILE_DERIVED is the top by construction"
+PROFILE_MIN="${MINIMA[0]}"
+say "order: ${#ORDER[@]} comparable pair(s), minimum $PROFILE_MIN, maximum $PROFILE_DERIVED"
+
+# spec: installer/README.md §Profiles — assertion 4, and it is what the profile argument on recipe_gates is for: the promise is not that a bigger profile vendors more directories but that moving up only ever adds to the battery, and kit-set containment stops implying gate-set containment the moment a roster varies by profile
+for pair in "${ORDER[@]}"; do
+    IFS=$'\t' read -r a b <<<"$pair"
+    contains "$(profile_gates "$PKG_ROOT" "$b")" "gate-roster monotonicity, $a ⊆ $b" "$(profile_gates "$PKG_ROOT" "$a")"
+done
+say "gate rosters are monotone across every comparable pair"
 
 consumer() {   # $1 = profile -> a fresh scratch consumer repo, echoed
     local c
@@ -155,7 +177,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
             while IFS= read -r m; do
                 [[ -n "$m" ]] || continue
                 [[ -f "$C/$k/checks/$m.gate" && ! -f "$C/$k/checks/$m.sh" ]] && printf '%s\n' "$m"
-            done < <(recipe_gates "$k")
+            done < <(recipe_gates "$k" "$profile")
         done | sort
     )"
     n_omitted="$(grep -c . <<<"$omitted")"
@@ -306,7 +328,7 @@ say "doctor: clean with no Rust toolchain on PATH, and silent about the members 
 assert_install "$PROFILE_DERIVED" "$C"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
-printf 'upgrade arm (two cross-version hops, starter profile)\n'
+printf 'upgrade arm (two cross-version hops, %s profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts)\n' "$PROFILE_MIN"
 next_patch() { awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }' <<<"${1%%[-+]*}"; }
 upgrade_direction() {   # $1 = from, $2 = to -> 0 iff $2 sorts strictly above $1
     [[ "$1" != "$2" && "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -n1)" == "$1" ]]
@@ -326,21 +348,21 @@ shopt -u nullglob
 ( cd "$UP" && tar -xzf "${up_tarballs[0]##*/}" ) || fail "tar could not extract the upgrade tarball"
 
 C="$(consumer upgrade)" || fail "could not build a scratch consumer for the upgrade arm"
-out="$( cd "$C" && "$CW" init --profile starter 2>&1 )" \
+out="$( cd "$C" && "$CW" init --profile "$PROFILE_MIN" 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the upgrade arm's starting install failed"; }
 LOCK="$C/checkwright.lock"
 [[ "$(jq -r '.version' "$LOCK")" == "$VERSION" ]] || fail "the upgrade arm did not start at $VERSION"
 was_kits="$(jq -r '.kits | join(" ")' "$LOCK")"
-say "installed $VERSION at the starter profile ($was_kits)"
+say "installed $VERSION at the $PROFILE_MIN profile ($was_kits)"
 
 # spec: installer/README.md §init — the adopter's edit is committed, because init refuses a dirty worktree: the case under test is a file changed since init wrote it, not an uncommitted one
 EDITED="gate-sdk/README.md"
 [[ "$(jq -r --arg f "$EDITED" '.files | has($f)' "$LOCK")" == "true" ]] \
-    || fail "the starter manifest does not record $EDITED — the arm has nothing whose adopter edit it can assert"
-# spec: installer/README.md §The manifest — the relinquish subject is chosen against a criterion, not by taste: a starter-kit payload file init records in files[] that no init step and neither generated projection reads, so dropping it from one hop's payload exercises the roster's exit condition and nothing else
+    || fail "the $PROFILE_MIN manifest does not record $EDITED — the arm has nothing whose adopter edit it can assert"
+# spec: installer/README.md §The manifest — the relinquish subject is chosen against a criterion, not by taste: a payload file the minimum profile records in files[] that no init step and neither generated projection reads, so dropping it from one hop's payload exercises the roster's exit condition and nothing else
 RELINQUISHED="gate-sdk/templates/check-skeleton.sh"
 [[ "$(jq -r --arg f "$RELINQUISHED" '.files | has($f)' "$LOCK")" == "true" ]] \
-    || fail "the starter manifest does not record $RELINQUISHED — the relinquish arm has no subject"
+    || fail "the $PROFILE_MIN manifest does not record $RELINQUISHED — the relinquish arm has no subject"
 R_INIT_HASH="$(jq -r --arg f "$RELINQUISHED" '.files[$f]' "$LOCK")"
 printf '\nAn adopter edited this line.\n' >> "$C/$EDITED"
 printf '\n# An adopter edited this line.\n' >> "$C/$RELINQUISHED"
@@ -359,8 +381,8 @@ out="$( cd "$C" && bash "$UP/package/bin/checkwright.sh" init 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the cross-version re-run of init failed — the version check did not fall through in the upgrade direction"; }
 [[ "$(jq -r '.version' "$LOCK")" == "$UP_VERSION" ]] \
     || fail "the manifest records $(jq -r '.version' "$LOCK") after upgrading to $UP_VERSION"
-[[ "$(jq -r '.profile' "$LOCK")" == "starter" ]] \
-    || fail "the upgrade was run with no --profile and did not re-read starter from the manifest"
+[[ "$(jq -r '.profile' "$LOCK")" == "$PROFILE_MIN" ]] \
+    || fail "the upgrade was run with no --profile and did not re-read $PROFILE_MIN from the manifest"
 [[ "$(jq -r '.kits | join(" ")' "$LOCK")" == "$was_kits" ]] \
     || fail "the upgrade changed the recorded kit set from '$was_kits' to '$(jq -r '.kits | join(" ")' "$LOCK")'"
 [[ "$(git hash-object -- "$C/$EDITED")" == "$EDITED_WANT" ]] \
@@ -416,18 +438,18 @@ grep -qF "$RELINQUISHED" <<<"$out" \
 say "second upgrade: $UP_VERSION -> $UP2_VERSION, $EDITED still the adopter's and still reported, $RELINQUISHED re-added and refused"
 
 # spec: installer/README.md §What init seeds — the seam arm is its own consumer, because the per-profile loop asserts the manifest agrees with the tree file by file against a freshly initialized consumer and an adopter edit inside it would break the assertion it is there to make. It reuses the already-installed package with no extra pack, and it re-runs at the same version with no flags: this class needs no upgrade and no --force, so an arm that only ran across versions would attribute it to a path it does not live on
-printf 'seam arm (same-version re-run, delegation profile)\n'
+printf 'seam arm (same-version re-run, %s profile)\n' "$PROFILE_DERIVED"
 SC="$(consumer seam)" || fail "could not build a scratch consumer for the seam arm"
-out="$( cd "$SC" && "$CW" init --profile delegation 2>&1 )" \
+out="$( cd "$SC" && "$CW" init --profile "$PROFILE_DERIVED" 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "the seam arm's install failed"; }
 say "init: $(grep -m1 '^INIT:' <<<"$out")"
 SEAM_LOCK="$SC/checkwright.lock"
-# spec: installer/README.md §What init seeds — the two surfaces init rewrites on every run: a templates/*-config.sh destination (starter is gate-sdk alone and gate-sdk ships no config template, so these are reachable from delegation up) and gate-sdk's msg-patterns.list, which reaches the starter profile and so the smallest install
+# spec: installer/README.md §What init seeds — the two surfaces init rewrites on every run: a templates/*-config.sh destination and gate-sdk's msg-patterns.list. The arm runs at the maximum profile because that is the only profile whose kit set is fixed by the payload rather than by a roster judgment, so it is where both surfaces are present by construction — a smaller profile would tie the arm to a membership row that is a judgment and may be revised
 SEAM_EDITED=(scripts/queue-config.sh scripts/msg-patterns.list)
 declare -A SEAM_INIT_HASH=() SEAM_WANT=()
 for f in "${SEAM_EDITED[@]}"; do
     [[ "$(jq -r --arg f "$f" '.files | has($f)' "$SEAM_LOCK")" == "true" ]] \
-        || fail "the delegation manifest does not record $f — the seam arm has nothing whose adopter edit it can assert"
+        || fail "the $PROFILE_DERIVED manifest does not record $f — the seam arm has nothing whose adopter edit it can assert"
     SEAM_INIT_HASH["$f"]="$(jq -r --arg f "$f" '.files[$f]' "$SEAM_LOCK")"
     printf '\n# An adopter edited this line.\n' >> "$SC/$f"
     SEAM_WANT["$f"]="$(git hash-object -- "$SC/$f")"
@@ -550,7 +572,7 @@ say "built $NATIVE_BIN for $HOST_TARGET and packed it with the sidecar this leg 
 ENTRY=(bash "$ARTP/package/bin/checkwright.sh")
 RUN_PATH="$PATH"
 C="$(consumer artifact)" || fail "could not build a scratch consumer for the artifact arm"
-assert_install starter "$C"
+assert_install "$PROFILE_MIN" "$C"
 LOCK="$C/checkwright.lock"
 # spec: installer/README.md §The gate binary — target resolution is asserted against what the toolchain says this host is, not against whatever init selected: the two derivations are independent (uname pair versus rustc's own triple) and only comparing them catches a mapping that resolves confidently to the wrong roster line
 [[ "$(jq -r '.artifact.target' "$LOCK")" == "$HOST_TARGET" ]] \
@@ -562,7 +584,7 @@ LOCK="$C/checkwright.lock"
 printf '%s\n' "other-${HOST_TARGET#*-}" > "$PAY_ART/targets.list" \
     || fail "could not narrow the payload roster off this host"
 NC="$(consumer artifact-undeclared)" || fail "could not build a scratch consumer for the undeclared-host leg"
-out="$( cd "$NC" && "${ENTRY[@]}" init --profile starter 2>&1 )" \
+out="$( cd "$NC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )" \
     || { printf '%s\n' "$out" >&2; fail "init refused a payload that simply does not commit to this platform — 'never declared' omits and declares, it does not fail the install"; }
 [[ "$(jq -r 'has("artifact")' "$NC/checkwright.lock")" == "false" ]] \
     || fail "the payload declares no artifact for this host, yet the manifest records one"
@@ -573,7 +595,7 @@ cp "$ROSTER_FILE" "$PAY_ART/targets.list" || fail "could not restore the payload
 printf 'tampered\n' >> "$PAY_ART/$HOST_TARGET/$NATIVE_BIN"
 TC="$(consumer artifact-tampered)" || fail "could not build a scratch consumer for the tampered-artifact leg"
 before="$(git -C "$TC" rev-parse 'HEAD^{tree}')"
-out="$( cd "$TC" && "${ENTRY[@]}" init --profile starter 2>&1 )"; rc=$?
+out="$( cd "$TC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
 [[ "$rc" -ne 0 ]] || { printf '%s\n' "$out" >&2; fail "init installed a gate binary whose bytes do not match the digest published beside it"; }
 [[ "$(git -C "$TC" rev-parse 'HEAD^{tree}')" == "$before" && -z "$(git -C "$TC" status --porcelain)" && ! -f "$TC/checkwright.lock" ]] \
     || fail "the digest refusal left the consumer changed — it was checked after something was written, not before"
@@ -582,7 +604,7 @@ say "tampered artifact: refused with nothing written"
 # spec: installer/README.md §The gate binary — a declared target whose artifact went missing is the outcome that must not collapse into the omission above: same host, same roster, and the only difference is the missing pair, so a run that omitted here would be reading a broken payload as a narrower one
 rm -f "$PAY_ART/$HOST_TARGET/$NATIVE_BIN" || fail "could not remove the declared target's binary"
 AC="$(consumer artifact-absent)" || fail "could not build a scratch consumer for the declared-but-absent leg"
-out="$( cd "$AC" && "${ENTRY[@]}" init --profile starter 2>&1 )"; rc=$?
+out="$( cd "$AC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
 [[ "$rc" -ne 0 ]] || { printf '%s\n' "$out" >&2; fail "the payload declares $HOST_TARGET and carries no artifact for it, and init installed anyway — a broken payload read as a narrower one"; }
 [[ ! -f "$AC/checkwright.lock" && -z "$(git -C "$AC" status --porcelain)" ]] \
     || fail "the broken-payload refusal still wrote into the consumer"

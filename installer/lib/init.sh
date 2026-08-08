@@ -200,14 +200,20 @@ GATES_LIST="$GATES_DIR/gates.list"
 if claim "$GATES_LIST"; then
     # spec: installer/README.md §The gate binary — an omitted member rides the registry rather than a new file: `# omitted: <name> <reason>` is a comment line the runner already strips from the live set, so the record sits in the consumer's tracked history where a reviewer reads it, and a re-run on a machine that has since gained a hasher converts it back into a live member with no hand edit
     plan_gates() {
-        local m
+        local kit m
+        local -a g
+        local -A pending=()
         printf '%s\n' "# Checkwright gate registry — written by 'checkwright init' (profile: $PROFILE)." \
             "# Each kit's starting subset; its README names the full roster to grow into."
+        # spec: installer/README.md §Profiles — the profile's gate set is derived once, by the same function the smoke's monotonicity assertion reads, so the registry a consumer receives and the invariant asserted over it are not two derivations of one fact. The loop below only sections that set by kit, which the registry keeps because the omission is keyed by the kit shipping the member — and a member registered by more than one kit lands once, under the first of them
+        while IFS= read -r m; do [[ -n "$m" ]] && pending["$m"]=1; done < <(profile_gates "$INSTALLER" "$PROFILE")
         for kit in "${KITS[@]}"; do
-            mapfile -t g < <(recipe_gates "$kit")
+            mapfile -t g < <(recipe_gates "$kit" "$PROFILE")
             [[ ${#g[@]} -gt 0 ]] || continue
             printf '# %s\n' "$kit"
             for m in "${g[@]}"; do
+                [[ -n "${pending[$m]:-}" ]] || continue
+                unset "pending[$m]"
                 if [[ -n "$OMIT_REASON" ]] && dispatches_to_binary "$kit" "$m"; then
                     printf '# omitted: %s %s\n' "$m" "$OMIT_REASON"
                 else

@@ -19,7 +19,8 @@ recipe_config_seam_plan() {   # $1 = kit payload dir, $2 = gates dir -> one '<sr
 }
 
 # spec: installer/README.md §What init seeds — the starting roster is the subset a fresh consumer begins with, not the kit's full roster: a gate whose subject the adopter has not authored yet (a glossary, a skills directory, a docs host) would exit 2 on their tree, so it is registered when that surface exists rather than at install
-recipe_gates() {   # $1 = kit name -> the gates it registers in a fresh consumer, none for a kit that ships no zero-config gate
+# spec: installer/README.md §Profiles — the roster is keyed by profile as well as by kit, so a roster that varies by profile becomes a change to one arm rather than a change to this signature and to every caller reading it. No arm varies on it today; the parameter is the seam, and its reader is profile_gates
+recipe_gates() {   # $1 = kit name, $2 = profile -> the gates it registers in a fresh consumer, none for a kit that ships no zero-config gate
     case "$1" in
         gate-sdk)
             printf '%s\n' check-shellcheck check-gate-output check-gate-fail-closed \
