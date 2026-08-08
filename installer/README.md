@@ -952,13 +952,21 @@ it installs the maximum profile and re-runs `init` at the minimum. Every other
 re-run holds the profile fixed, so none reaches the state where `files` outlives
 `kits` — and that state is not exotic, it is the ordinary consequence of the
 carry-forward rule, which keeps every once-vendored path on the roster while the
-recorded kit set shrinks. It asserts that both seam paths still resolve
-to the consumer's **own** file, that a `kits`-stripped copy of the same manifest —
-the residual shape — resolves them the same way, and that `doctor` names the
-consumer's own `gates.list` as the registry it inspected. It also asserts its own
-premise first: some vendored fixture path must still shadow each seam basename
-after the narrowing, or the resolver has nothing to be ambiguous about and a
-green result would mean only that the payload changed shape.
+recorded kit set shrinks. For every seam path the narrowed manifest records it
+asserts that the path still resolves to the consumer's **own** file, and that a
+`kits`-stripped copy of that same manifest — the residual shape — resolves it the
+same way; then that `doctor` names the consumer's own `gates.list` as the
+registry it inspected. It asserts its own premise too: at least one seam path
+checked, and at least one of those genuinely shadowed by a vendored fixture tree,
+or the resolver has nothing to be ambiguous about and a green result would mean
+only that the payload changed shape.
+
+*Its honest limit.* Only the recorded paths are asserted on, and the config seam
+is written on the artifact placement path alone — so on a payload carrying no
+prebuilt binary this arm resolves the registry and not the seam. The residual
+shape is what keeps it biting there: with no `kits` key, a tail match returns a
+vendored fixture for `gates.list` too. Demanding the seam unconditionally would
+fail the arm on the payload rather than on the resolver.
 
 **The artifact arm rides the per-profile post-conditions**, taking whichever of
 §The gate binary's outcomes the payload and the host actually produce. Every arm

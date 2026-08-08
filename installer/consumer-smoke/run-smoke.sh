@@ -535,30 +535,36 @@ narrow_kits="$(jq -r '.kits | length' "$NARROW_LOCK")"
 [[ "$narrow_kits" -lt "$wide_kits" ]] \
     || fail "the re-run recorded $narrow_kits kit(s) where the wide install recorded $wide_kits — the arm did not narrow anything"
 
-# spec: installer/README.md §The manifest — the arm proves its own premise before asserting on it: a vendored fixture tree carrying the same seam basename must still be on the roster after the narrowing, or the resolver has nothing to be ambiguous about and a green result would mean only that the payload changed shape
+# spec: installer/README.md §The manifest — the residual shape is the same defect with the kits key absent rather than shrunk, so it is asserted on a kits-stripped copy of this manifest rather than bought a second consumer: uninstall's residual carries schema and files only, and a resolver leaning on the recorded kit set excludes nothing at all there
+jq 'del(.kits)' "$NARROW_LOCK" > "$NC2/residual-shape.json" \
+    || fail "could not derive the residual manifest shape"
+
+# spec: installer/README.md §The manifest — only the seam paths this install actually recorded are asserted on, because the config seam is written on the artifact placement path alone: a payload carrying no prebuilt binary records none, and demanding it here would fail the arm on the payload rather than on the resolver. The arm proves its own premise instead — at least one checked path, and at least one of them genuinely shadowed by a vendored fixture tree, or a green result would mean only that the payload changed shape
+narrow_checked=0
+narrow_shadowed=0
 for f in "${SEAM_FILES[@]}"; do
-    shadow="$(jq -r --arg b "/${f##*/}" --arg own "$f" '.files | keys | map(select(endswith($b) and . != $own)) | length' "$NARROW_LOCK")"
-    [[ "$shadow" -gt 0 ]] \
-        || fail "no vendored path still shadows ${f##*/} after the narrowing — the arm would pass without asserting"
+    [[ "$(jq -r --arg f "$f" '.files | has($f)' "$NARROW_LOCK")" == "true" ]] || continue
+    narrow_checked=$((narrow_checked + 1))
+    shadow="$(jq -r --arg b "/${f##*/}" --arg own "$f" \
+        '.files | keys | map(select(endswith($b) and . != $own)) | length' "$NARROW_LOCK")"
+    [[ "$shadow" -gt 0 ]] && narrow_shadowed=$((narrow_shadowed + 1))
     got="$(lock_own_file "$NARROW_LOCK" "$f")"
     [[ "$got" == "$f" ]] \
         || fail "after narrowing, the consumer's own $f resolves to '${got:-<nothing>}' — files[] outlives kits, so a recorded-kit predicate stops excluding the dropped kits' fixture trees"
-done
-
-# spec: installer/README.md §The manifest — the residual shape is the same defect with the key absent rather than shrunk, so it is asserted here on a kits-stripped copy rather than bought a second consumer: uninstall's residual manifest carries schema and files only, and a resolver leaning on the recorded kit set excludes nothing at all there
-jq 'del(.kits)' "$NARROW_LOCK" > "$NC2/residual-shape.json" \
-    || fail "could not derive the residual manifest shape"
-for f in "${SEAM_FILES[@]}"; do
     got="$(lock_own_file "$NC2/residual-shape.json" "$f")"
     [[ "$got" == "$f" ]] \
-        || fail "on a manifest carrying no kits, the consumer's own $f resolves to '${got:-<nothing>}' — the residual shape excludes nothing"
+        || fail "on a manifest carrying no kits, the consumer's own $f resolves to '${got:-<nothing>}' — the residual shape has no kit set to exclude anything with"
 done
+[[ "$narrow_checked" -gt 0 ]] \
+    || fail "the narrowed manifest records none of [${SEAM_FILES[*]}] — the arm has no seam path to resolve"
+[[ "$narrow_shadowed" -gt 0 ]] \
+    || fail "no vendored fixture shadows any checked seam basename — the arm would pass without asserting"
 
 out="$( cd "$NC2" && "$CW" doctor 2>&1 )"; rc=$?
 [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "doctor exited $rc on the narrowed consumer"; }
 grep -q "^  registry     $GATES_DIR/gates.list\$" <<<"$out" \
     || { printf '%s\n' "$out" >&2; fail "doctor did not name the consumer's own $GATES_DIR/gates.list as the registry it inspected"; }
-say "narrowing: $wide_kits kit(s) -> $narrow_kits, ${SEAM_FILES[*]} still resolve to the consumer's own, residual shape too, doctor names the registry"
+say "narrowing: $wide_kits kit(s) -> $narrow_kits, $narrow_checked recorded seam path(s) ($narrow_shadowed shadowed) still resolve to the consumer's own on the narrowed and the residual shape, doctor names the registry"
 
 # spec: installer/README.md §The consumer smoke — the artifact arm builds the binary it packs rather than fabricating a stand-in with a matching digest: a stand-in would drive the placement path while leaving the one thing most likely to break — the real build's digest agreeing with what init verifies before writing — covered by nothing
 printf 'artifact arm (host build, placement branch and the two refusals)\n'
