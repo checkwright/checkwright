@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **published-release-channel-flag-unheld** [spec: SPEC-release-channel-host-state.md] — the
-  channel gate holds the creating invocation, and nothing holds a Release already published.
-  `.github/workflows/publish.yml` passes `--prerelease` unconditionally while the channel is
-  `preview`, so the host resolves Latest to v0.21.0 — the newest release carrying no flag, from
-  before the mechanization — and the gap widens per release. The front page and
-  `/releases/latest` therefore advertise a release predating the prebuilt gate binary, the
-  uninstall verb, and the install-claim repair. `check-release-channel-parity` holds the
-  creating step and the newest version line, and never the Releases themselves.
-  **Host-side state is out of every gate's reach, which is the class rather than the instance.**
-  Nothing in the repo is false, so nothing in the repo can red; a reader sweep across every
-  tracked `*.sh`/`*.md`/`*.yml`/`*.json`/`*.ps1` finds no in-tree reader of the Latest pointer,
-  which is why the exposure is entirely reader-side.
-  The amendment composes the two existing invariants into a per-release one — a Release's flag
-  agrees with the channel its own version line implies, so a wholly-`0.x` history has **no
-  Latest at all** — backfills the 21 unflagged Releases, and holds it on a seventh
-  `site-health.yml` arm, the tier that can see the host. Seam: the arm stays in this repo's copy,
-  since the declaration it derives from is repo-local mechanism owned by no kit.
-  **The entry's own blocker was stale:** scope's survey verified the active host account is the
-  namespace-owning one, so the `gh release edit` write is available rather than 404-blocked.
-  Ruled in by the operator 2026-08-08 as unit 2 of `adopter-floor-integrity` (TRAJECTORY.md);
-  filed 2026-08-08 by close draining the gap inbox, found at scope, promoted here by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -3967,5 +3945,6 @@
 
 - consumer-toolchain-floor-filter
 - gap-resolver-mention-overcount
+- published-release-channel-flag-unheld
 
 ## Lessons Learned

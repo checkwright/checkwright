@@ -213,6 +213,20 @@ by lifecycle-kit/SPEC.md §templates/stages/; cite it, never restate it here.
    resolves the new tag. It is sourced from the GitHub tag list, so each release
    updates it with no edit — this step is a verification, not a write.
 
+   **The repo shows no Latest badge, and that is the declared outcome — do not
+   "fix" it.** While the version line is `0.x` the channel is `preview`, so
+   every published Release carries the prerelease flag and none is Latest
+   (invariant C, docs/install.md §The release channel, which owns the rule).
+   Flipping the newest Release to non-prerelease from the web UI would look like
+   a one-click improvement and would silently revert that decision — no gate
+   sees the host, and nothing would attribute the change. It is also not all-or-
+   nothing in your favour: flipping one Release makes it Latest, and flipping it
+   back walks Latest to whichever Release is unflagged next. The badge returns on
+   its own at `v1.0.0`, when the newest tag stops being `0.x`. A flag that drifts
+   anyway is reported by `site-health.yml`'s release-channel arm, so this step
+   adds no hand check — creation already carries the flag and the monitor is the
+   backstop, and a third owner would only disagree with them.
+
 ## The publish spec
 
 The positional argument of an `npm publish` in a workflow must be unambiguously

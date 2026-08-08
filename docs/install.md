@@ -479,10 +479,17 @@ announcement is a separate, later event. The channel flips to `stable` at
 `v1.0.0`, the same deliberate cut this section calls the first stability promise —
 now with a surface that says so before a reader infers it from tag density.
 
-**Mechanized on exactly one surface.** `.github/workflows/publish.yml`'s `release`
-job creates the GitHub Release, and while the channel is `preview` that creation
-carries `--prerelease`, so every Release page states the posture without a human
-remembering to. Nothing else in the publish path changes. In particular the npm
+**Mechanized on two surfaces, on two different tiers.**
+`.github/workflows/publish.yml`'s `release` job creates the GitHub Release, and
+while the channel is `preview` that creation carries `--prerelease`, so every
+Release page states the posture without a human remembering to. That is the
+**creating** posture, held by a gate. The **accumulated** posture — the flag on
+every Release already published — is held by a monitor instead, because host
+state is out of a precommit gate's reach by construction. Neither subsumes the
+other: the creating step can be correct forever while an older Release
+contradicts it, which is exactly how the drift below went unnoticed.
+
+Nothing else in the publish path changes. In particular the npm
 publish carries no `--tag`, and its absence is **load-bearing configuration**
 rather than an omission: a non-default dist-tag would make §Quick start's
 one-command install resolve to nothing until a reader learned to append the
@@ -493,8 +500,20 @@ install, or once a stable line exists to hold `latest` while preview moves off i
 Neither holds today. Nothing forecloses the change either:
 `scripts/pack-installer.sh`'s version regex already admits a prerelease suffix.
 
-`check-release-channel-parity` (this repo's `scripts/`) holds the declaration
-against two surfaces, so it cannot become a comment:
+**The same preference decides invariant C the other way, which is why the two
+sit side by side.** Both trades weigh an honest channel signal against a reader
+who follows a default pointer, and the dist-tag lost because `npm install`'s
+default tag *is* the documented front door — §Quick start resolves it. No
+documented install path resolves the GitHub Latest pointer at all: §Quick start
+runs the installer, and every explicit download URL below names its version. The
+front door is not on that path, so the cost that declined the dist-tag change is
+absent here. Same preference, opposite outcome. That is not a reversal; the
+dist-tag's own re-entry condition above is untouched.
+
+Three invariants hold the declaration, so it cannot become a comment. The first
+two are gate-held and read files off disk; the third is monitor-held and reads
+the host, and it is stated after the gate's own contract below rather than
+inside it. `check-release-channel-parity` (this repo's `scripts/`) owns A and B:
 
 - **Invariant A — channel ⟷ publish posture.** The channel and the prerelease
   posture of the Release-creating step in `.github/workflows/publish.yml` agree:
@@ -522,6 +541,39 @@ needs. Exit 2, never a clean line, on each of:
 A repository with **no tags at all** has no version line, so B is dormant there
 while A still asserts. The gate *reports* that dormancy in its clean output, so a
 reader can tell "checked and agreeing" from "nothing to check".
+
+- **Invariant C — channel ⟷ published Release history.** Every published
+  Release's prerelease flag agrees with the channel its own version line
+  implies: a `0.x` tag carries the flag, a `1.x`-or-later tag does not.
+
+C is A and B composed rather than a new policy. B already rules that a version
+line implies a channel; A already rules that `preview` implies the flag. The flag
+on *any* Release therefore follows from that Release's own tag. B only ever got
+checked against the newest tag because the gate had one version line to read;
+C is the same statement evaluated over the whole published history. That makes
+the desired host state **derived rather than stored** — there is no tag-to-flag
+roster to maintain anywhere, and the rule keeps working across the `v1.0.0` flip
+with no edit, because at that flip the newest tag stops being `0.x` on its own.
+
+**C is held by a monitor, not by the battery** — the release-channel arm of
+`.github/workflows/site-health.yml`, which reads the Release list from the API
+on its schedule and files a `site-health` issue naming every Release whose flag
+disagrees with its own version line. A precommit gate cannot reach host state,
+and weakening the tier to reach it is the one change this design refuses; this
+is the same tier ruling `RELEASING.md` step 6 already makes for the Release
+body, over the same objects.
+
+**What this means for a reader, stated because it is what you see.** Every
+release this project has published is `0.x`, so under C **no Release is
+Latest**: the repo front page shows no green Latest badge and the releases list
+labels every entry `Pre-release`. Resolving the pointer itself yields no release
+— the API's `releases/latest` endpoint answers 404, while the browser URL
+redirects to the releases list. That is the honest presentation of a channel
+whose tags are preview-channel iteration artifacts. **Take a release from the
+releases list, or name an explicit version — never resolve the Latest
+pointer**, which advertises no release at all while the line is `0.x`. Nothing
+documented here depends on it: §Quick start runs the installer and every
+download URL below carries its own version.
 
 What earns each bump derives from the release note itself — its
 declaration-bearing sections (§The upgrade contract below) already declare

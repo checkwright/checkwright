@@ -198,5 +198,5 @@ leaves its section absent.
 
 | kit | surface |
 | --- | --- |
-| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, and release-body note pointers |
+| (consumer) | live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, and each published Release's prerelease flag against its own version line |
 

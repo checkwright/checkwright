@@ -376,6 +376,21 @@ recovery closes it. The `ALT_DOMAIN` value is a bare hostname, never a `://`
 literal, so it does not itself trip the parity gate. A `# enforce:` marker rides
 the template so that, once copied, an enforcement map projects it as a monitor.
 
+**The arm roster is a floor, not a ceiling, and "copied verbatim" describes the
+distribution model rather than forbidding an edit.** The copy is the consumer's
+file: nothing syncs it back, and no gate couples the two, so a consumer may add
+arms of its own. Which side of the seam an arm belongs on follows from what it
+asserts. An arm implementing an invariant this kit ships belongs in the template,
+where every consumer inherits it. An arm implementing a **consumer-local**
+invariant belongs in that consumer's copy and must stay out of the template —
+copied into a tree that never declared the convention it derives from, it would
+assert something no kit ships and no consumer agreed to, which is dead config
+that reads as coverage. An arm cannot be truer than the declaration it composes,
+so it lives at the widest tier that declaration is true for. A consumer-local
+arm becomes template material only if its underlying declaration becomes kit
+mechanism — and then it arrives as an optional arm on the existing
+set-the-env-or-delete-the-arm pattern, the way the release-note knobs already do.
+
 The workflow's `permissions:` block is an **allowlist, not an addition** — every
 scope it omits is `none` — so reading the tag list and the Release bodies needs
 `contents: read` declared beside `issues: write`, and the probe step needs its own

@@ -6,7 +6,7 @@
 # inside it: a failed probe opens (or updates, never duplicates) a site-health
 # issue and reds this run, never a merge. Recovery self-clears (a green run
 # closes the open issue). No README badge, by the standing ruling.
-# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, and release-body note pointers
+# enforce: class=monitor live docs-site deployment — apex/www/http HTTPS, redirects, cert expiry, release-body note pointers, and each published Release's prerelease flag against its own version line
 name: site-health
 
 on:
@@ -212,6 +212,54 @@ jobs:
           # Which zero-case a reader is in. A diagnostic, not an assertion — the
           # rulings above are what make a vacuous pass impossible.
           echo "release-body: $n_found note(s) found, $n_keyed keyed '$RELEASE_NOTE_TAG_KEY:', $n_released released of $n_tags remote tag(s), $n_checked checked"
+
+          # 7. every published Release's prerelease flag agrees with the channel
+          #    its own version line implies (invariant C, docs/install.md §The
+          #    release channel). It lives here rather than in the battery because
+          #    host state is out of a precommit gate's reach by construction —
+          #    the tier ruling RELEASING.md step 6 already makes for the Release
+          #    body, over the same objects. It stays in this repo's copy and out
+          #    of site-kit's template: the declaration it composes is repo-local
+          #    mechanism owned by no kit, so the arm cannot be truer than a
+          #    consumer's own conventions (site-kit/SPEC.md
+          #    §templates/site-health.yml). No new knob — each expectation is
+          #    derived from the tag being looked at.
+          rel_list_err="$(mktemp)"
+          # Drafts are excluded: unpublished, so they carry no channel claim yet.
+          releases="$(gh api --paginate 'repos/{owner}/{repo}/releases' \
+            --jq '.[] | select(.draft | not) | "\(.tag_name)\t\(.prerelease)"' 2>"$rel_list_err")"
+          rel_list_rc=$?
+          if [ "$rel_list_rc" -ne 0 ]; then
+            # Asserted on the call's own exit status for the tag list's reason:
+            # under `set +e` a failed call yields an empty list and a zero exit,
+            # and the arm then reads green over nothing forever.
+            failures+=("could not read the Release list (gh exit $rel_list_rc): $(tr '\n' ' ' < "$rel_list_err")")
+            releases=""
+          fi
+          rm -f "$rel_list_err"
+
+          n_rel=0
+          while IFS=$'\t' read -r rel_tag rel_flag; do
+            [ -n "$rel_tag" ] || continue
+            n_rel=$(( n_rel + 1 ))
+            major="${rel_tag#v}"; major="${major%%.*}"
+            case "$major" in
+              # Fail closed on a tag carrying no version line: it implies no
+              # channel, so letting it through is the arm asserting nothing
+              # while still reporting a clean run.
+              ''|*[!0-9]*)
+                failures+=("$rel_tag: Release tag does not parse as a version line, so the channel it implies cannot be derived")
+                continue ;;
+            esac
+            # Invariant B's rule, read per Release instead of off the newest tag:
+            # 0.x implies preview, which invariant A pairs with the flag.
+            if [ "$major" -eq 0 ]; then want_flag=true; else want_flag=false; fi
+            [ "$rel_flag" = "$want_flag" ] || failures+=("$rel_tag: prerelease=$rel_flag, but its version line implies prerelease=$want_flag")
+          done <<<"$releases"
+
+          # While the line is 0.x this reports every Release as flagged, and so
+          # no Release is Latest — the declared outcome, not a fault.
+          echo "release-channel: $n_rel published Release(s) checked against their own version lines"
 
           # DoD hook: a workflow_dispatch with force_fail=true exercises the issue
           # path on demand without waiting for a real outage.
