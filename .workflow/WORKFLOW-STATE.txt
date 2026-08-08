@@ -8,3 +8,4 @@ installer-lifecycle-verbs scope a5a85198 2026-08-08
 installer-lifecycle-verbs spec a3b15def 2026-08-08
 installer-lifecycle-verbs align abb21eb6 2026-08-08
 installer-lifecycle-verbs build a085f808 2026-08-08
+installer-lifecycle-verbs build adb62513 2026-08-08
