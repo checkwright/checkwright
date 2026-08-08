@@ -12,3 +12,4 @@ installer-lifecycle-verbs build adb62513 2026-08-08
 installer-lifecycle-verbs build ae1a1c55 2026-08-08
 installer-lifecycle-verbs build a8fd42f0 2026-08-08
 installer-lifecycle-verbs validate aa953560 2026-08-08
+installer-lifecycle-verbs close adbf1d36 2026-08-08
