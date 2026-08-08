@@ -2961,13 +2961,15 @@
   unit into an entry that had just completed. All four were caught, none by the mechanism; the
   corrective is already legal, so what is missing is not a mechanism but any prompt telling the
   filer to check.
-  **The resolver never checks the section** — the third and fourth firings named slugs resolving
-  **only** in `## Done`, which the drain contract already rules is not a recurrence at all. That
-  is the sharpest statement of the defect: the one rule here that is mechanically decidable is a
-  rule the drain applies by hand and the producer does not apply. It is a fix rather than a
-  design question, and the half a scope can take without settling the discriminator.
-  **At threshold — enters the next scope's proposed set on that basis**, whatever the theme:
-  two dates on `recurrence:` and the only entry standing there.
+  **Correction 2026-08-08, oracle-settled.** A prior revision claimed the producer never checks
+  the section, and that firings 3 and 4 resolved slugs living only in `## Done`. False on both:
+  lifecycle-kit/SPEC.md §The committed gap inbox rules the done exclusion "the substantive half",
+  `lifecycle-kit/bin/file-gap.sh` matches a **bold** slug so the bare-slug done grammar cannot
+  resolve, and `lifecycle-kit/gate-tests/file-gap-recurrence.test.sh` pins it. Those firings were
+  real over-counts on *live* slugs; only the diagnosis was wrong, and no takeable half existed.
+  **Threshold met, dispositioned 2026-08-08 by the operator:** nothing built, the discriminator
+  deferred here with its dates intact. This does **not** retire the recurrence — the next scope
+  meets the same choice with only the feature-shaped option left, a cost accepted at the ruling.
   **One of three faces of the same bounded-substring predicate** — `recurrence-drain-input-widening`
   asks what the drain misses when no bullet exists, this asks what it over-counts, and
   `recurrence-resolver-literal-match-only` asks what it misses when a bullet exists and does
