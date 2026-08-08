@@ -43,40 +43,6 @@
 
 ## Technical Debt
 
-- **lock-own-file-narrowed-profile-drift** — `doctor` misreports which `gates.list`
-  it inspected on any tree whose install profile ever narrowed.
-  `installer/lib/common/lock.sh`'s `lock_own_file` resolves a consumer's own seam
-  file by suffix, then patches the ambiguity by excluding `files[]` keys prefixed
-  with a recorded `.kits` member. `files[]` outlives `.kits`: a full-to-starter
-  re-run carries every previously vendored path forward while `.kits` shrinks, the
-  retained keys stop being excluded, and jq's sorted `first` returns a vendored
-  fixture — `canon-kit/gate-tests/<case>/good/scripts/gates.list` — as the
-  consumer's real registry.
-  **Ruled debt 2026-08-08 by spec, and the ruling is why it needs no amendment.**
-  The entry offered two fixes and rejected both: narrowing `files[]` on a profile
-  change undoes the carry-forward that stops a re-run overwriting an adopter
-  silently, and widening the exclusion to every kit the payload can ship puts a
-  payload fact into a consumer-tree resolver. Both horns are refused. The manifest
-  already records the **exact repo-relative path** `init` wrote, and `GATES_DIR` is
-  a constant every verb that sources `recipe.sh` already holds — so the resolver
-  matches that path exactly instead of guessing from a suffix. No new manifest key,
-  no payload fact, no roster narrowing, no new name on any governed surface: it
-  converges behavior on what `installer/README.md` §The manifest already says
-  `files` holds. Callers pass a full relative path rather than a basename suffix.
-  **A second instance the entry did not carry, found at spec and fixed by the same
-  change:** the residual manifest `uninstall` rewrites keeps `schema` and `files`
-  only, so `.kits` is absent there and the exclusion excludes nothing at all.
-  **Enforcement-first.** No smoke arm exercises a profile change today — the upgrade
-  arm re-runs `init` at the same profile. The fix lands with an
-  `installer/consumer-smoke/run-smoke.sh` arm that installs `full`, re-runs `init`
-  at `starter`, and asserts `doctor` names the consumer's own `scripts/gates.list`;
-  the smoke is a registered validate suite, so that arm is the oracle.
-  Its stale citation is corrected in passing: `installer/README.md` §The manifest is
-  the section, not "§The manifest owns".
-  Ruled in as debt in the operator's `install-profile-seam` cut, third of three;
-  scope could not promote it while its design was still open, so it reached spec
-  with the other two and the ruling above is what discharges it.
-
 ## Deferred
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
@@ -4134,6 +4100,7 @@
 
 ## Done
 
+- lock-own-file-narrowed-profile-drift
 - profile-keyed-install
 - kit-owned-install-recipe
 - stage-economics-log-multi-session-undercount

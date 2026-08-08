@@ -656,5 +656,5 @@ out="$( cd "$AC" && "${ENTRY[@]}" init --profile "$PROFILE_MIN" 2>&1 )"; rc=$?
     || fail "the broken-payload refusal still wrote into the consumer"
 say "declared target with no artifact: refused, not omitted"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access and each reversed back to its pre-init tree object, plus the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm and the protection branch chained onto it, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access and each reversed back to its pre-init tree object, plus the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm and the protection branch chained onto it, the narrowing arm re-running init at a smaller profile so files[] outlives kits, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
 exit 0
