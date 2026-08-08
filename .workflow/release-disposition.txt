@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
-installer-lifecycle-verbs release deferred:v0.23.0 — lead held the tag; cadence floor unmet (newest tag one day old), no major and no supply-chain trigger, and the runbook's step-4 identity defect is open on the cut path; minor earned by three new installer verbs plus changed vendored kit code, so the next qualifying note floors at v0.23.0.

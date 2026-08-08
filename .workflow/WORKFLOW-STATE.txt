@@ -4,12 +4,4 @@
 
 ---
 
-installer-lifecycle-verbs scope a5a85198 2026-08-08
-installer-lifecycle-verbs spec a3b15def 2026-08-08
-installer-lifecycle-verbs align abb21eb6 2026-08-08
-installer-lifecycle-verbs build a085f808 2026-08-08
-installer-lifecycle-verbs build adb62513 2026-08-08
-installer-lifecycle-verbs build ae1a1c55 2026-08-08
-installer-lifecycle-verbs build a8fd42f0 2026-08-08
-installer-lifecycle-verbs validate aa953560 2026-08-08
-installer-lifecycle-verbs close adbf1d36 2026-08-08
+— scope a2b789b0 2026-08-08
