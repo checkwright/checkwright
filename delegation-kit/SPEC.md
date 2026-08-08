@@ -677,7 +677,7 @@ three failure modes a raw percentage reading leaves open:
    percentage printing OK invites a dispatch the budget may not afford, which
    is what the reroute exists to prevent; a lagging *high* percentage
    suppressed into STALE waves that dispatch through, because STALE is
-   advisory and never blocks (§The staleness contract). An unconditional
+   advisory and never blocks (§usage-verdict). An unconditional
    reroute closes the first and opens the second, so it must fire on the
    non-blocking outcome only: inside the window an at-or-over reading still
    exits 1 on whichever axis fired, and an under-threshold one still exits 2.

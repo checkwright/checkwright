@@ -100,6 +100,24 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   unchanged, so the worktree survives **iff** the agent was not in fact
   read-only, which makes the isolation simultaneously the confinement and the
   detector.
+- **Isolation charges two harness costs, and paying them is the parent's job.**
+  Neither retracts the rule above — the claim is still made by the shape; these
+  are what the shape costs. **(1) The worktree is cut at a stale base, not at
+  HEAD** — observed 21 commits behind, predating the whole iteration that
+  dispatched it — so an agent reads the *pre-change* tree and can report a
+  just-fixed defect as still live. Naming a commit in the prompt does not make
+  the checkout that commit. The object store is shared, so the fix is in the
+  child: verify with `git rev-parse HEAD` and read every target with `git show
+  <rev>:<path>` against the rev the parent states. A parent that omits this owes
+  the doubt back — an audit whose reads may be stale certifies nothing, and
+  every downstream unit has to re-verify the read sites the audit was bought to
+  settle. **(2) The worktree lands inside the repo and untracked**, so an
+  in-flight isolated agent reads as a dirty tree and aborts every clean-tree
+  precondition — a consumer smoke, a packaging step, any commit. Gitignore the
+  path. That trades one signal for another and the trade is worth naming: the
+  survives-iff-it-wrote detector above stops showing up free in `git status`, so
+  it moves to an explicit `git worktree list` at the boundary where the parent
+  reaps its agents.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —

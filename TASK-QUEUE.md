@@ -386,10 +386,11 @@
   the true combined ceiling.
   **(d) Signal-quality refinement (advisory, not a bug).** the post-login
   reroute (`DELEGATION_KIT_LOGIN_WINDOW`) is correctly advisory-only — STALE
-  never blocks (delegation-kit/SPEC.md §The staleness contract, lines 62-64 and
-  207-208), so this is signal quality, not a dispatch-blocking defect. Two
+  never blocks (delegation-kit/SPEC.md §usage-verdict, which also states the
+  server lag the next point turns on), so this is signal quality, not a
+  dispatch-blocking defect. Two
   points: the window default is 600s while the SPEC's own stated server-lag is
-  "about a minute" (SPEC line 245), a ~10x margin worth tightening; and it is a
+  "about a minute", a ~10x margin worth tightening; and it is a
   **blanket** time-window where an **account-keyed** check is sharper — trust
   `usage.txt` when its `account=` matches the current credential's account AND
   `updated_at > login_at`, with a short (~90s) settling floor for the server

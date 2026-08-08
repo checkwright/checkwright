@@ -21,6 +21,10 @@ scripts/msg-patterns.local.list
 scripts/queue-config.local.sh
 # per-user permission grants stay local; the stage skills in commands/ are tracked
 .claude/settings.local.json*
+# harness-managed worktrees for isolated agents — in-repo, untracked and
+# auto-cleaned, so an in-flight agent would otherwise dirty the tree and abort
+# every clean-tree precondition (delegation-kit/templates/agent-execution.md)
+.claude/worktrees/
 # guard-kit per-iteration scratch log (cleared at close-stage triage)
 .workflow/prompt-friction.log
 # drift-kit per-iteration scratch log (cleared at close-stage knowledge-friction triage)
