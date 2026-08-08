@@ -4,4 +4,4 @@
 
 ---
 
-— scope a5a85198 2026-08-08
+installer-lifecycle-verbs scope a5a85198 2026-08-08
