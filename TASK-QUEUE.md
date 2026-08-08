@@ -3928,6 +3928,4 @@
 
 ## Done
 
-- installer-lifecycle-verbs
-
 ## Lessons Learned
