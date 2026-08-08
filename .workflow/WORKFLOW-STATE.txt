@@ -4,4 +4,4 @@
 
 ---
 
-— scope aff2267c 2026-08-08
+install-profile-seam scope aff2267c 2026-08-08
