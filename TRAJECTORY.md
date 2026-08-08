@@ -397,6 +397,55 @@ retroactively validate the dates, and `spec` must not cite them as evidence the
 design is correct. What grounds the unit is the defect's mechanism, which is
 independently verifiable — not its count, which is the thing under repair.
 
+**Pruning-on-completion is confirmed for this file — ruled 2026-08-08 by the
+operator.** The ground is stated in the ruling and is recorded with it rather
+than paraphrased: *"we cannot let TRAJECTORY continue growing unbounded."* The
+harm being ruled against is **unbounded growth of the ruling record** — not
+untidiness, and not any one section's length. A record a session cannot read
+whole is a record whose authority decays, and that authority is the only thing
+this file has.
+
+What the ruling sanctions: **git history holds obsolete changes and the
+motivation behind them**, so the file keeps only currently-relevant content and
+carries **no past-behavior restatements**. A ruling whose subject is finished is
+a candidate for removal rather than a permanent fixture, and the history is
+where a reader who needs the superseded text goes. The authoring-time half of
+this already exists here, unenforced, as *Where the grounds live* — one owner
+per fact, pointers rather than restatement; the ruling adds the completion-time
+half that section never had.
+
+**What it does not settle, deliberately: who may prune, and on what event.** The
+ruling sanctions the practice and names neither a trigger nor an authority, and
+this recording does not supply either — inventing one would be authoring a
+ruling rather than recording one. The consequence is exact and must not be read
+away: **nothing here licenses a session to prune today.** This record's standing
+stance is unchanged — retiring a recorded ruling is operator-class — so absent a
+stated trigger, a session meeting obsolete content still correctly preserves it.
+
+That design is handed to the deferred entry, not settled here. It is filed
+2026-08-08 for close to drain as a **separate** entry cross-referencing
+`ruling-record-condition-staleness-probe` rather than a widening of it: an
+escalating staleness probe over condition-bearing rulings and a
+prune-on-completion pass over the whole file are different deliverables, and
+that entry's own text rules the prune out of its scope (*the enforceable half is
+a probe, never a prune*). The work does not enter `adopter-floor-integrity`.
+
+**One input that design owes an answer to, recorded here because this file is
+where the tension is visible.** The CORRECTION appended above rules that a
+false ground is *appended to, never struck*, because "striking the clause would
+destroy the evidence of what was believed when the unit was pulled in, which is
+exactly what a ruling record exists to preserve." Prune-on-completion and
+preserve-the-believed-ground are not in conflict as stated — the first is about
+finished subjects and the second about live corrections — but the boundary
+between them is precisely what a trigger has to draw. Naming it is not
+re-opening either ruling; it is the design input the deferred entry inherits.
+
+**The honest limit.** Until that trigger and authority exist, this ruling buys
+nothing mechanically, and no gate measures the file's growth. What it buys now
+is direction: the next session designing the pass finds *whether pruning is
+wanted* already closed, and spends its judgment on the question that is actually
+open.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
