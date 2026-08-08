@@ -199,20 +199,25 @@ a tree that has done nothing wrong those would red on day one, so they are
 registered when the surface exists rather than at install. Each kit's README
 names the full roster to grow into.
 
-*The honest limit.* That per-kit starting roster is `recipe_gates(kit, profile)`
-in `lib/common/recipe.sh`, and that function is the **whole** of a fresh
-consumer's registry — what a tree `init` just made will run is read there, never
-inferred from a kit's full roster or from this repo's own `gates.list`. One
-function unions it over a profile's kits, `profile_gates` in
-`lib/common/profile.sh`, and both the registry `init` writes and the smoke's
-monotonicity assertion read that one derivation. No arm varies on the profile
-today; the argument is the seam, so a roster that does vary becomes a change to
-one arm rather than to a signature and every caller of it. Each
-kit's `smoke/install.sh` holds a second encoding of the same fact for its own
-scratch consumer. The consumer smoke catches the drift that
-matters — a roster naming a gate that fails to resolve reds it — but not a
-kit that adds a zero-config gate this roster never learns about. Collapsing the
-two into one per-kit source is filed as queued work, not papered over here.
+**The roster is derived from the gates themselves.**
+`recipe_gates(kit-payload-dir, profile)` in `lib/common/recipe.sh` is the
+**whole** of a fresh consumer's registry — what a tree `init` just made will run
+is read there, never inferred from a kit's full roster or from this repo's own
+`gates.list` — and what it reads is each shipped gate's own
+`# install: <disposition>` header line, taking every member a kit declares
+`zero-config` (gate-sdk/SPEC.md §The install disposition). It carries no gate
+name of its own, so a kit that adds a zero-config gate is picked up with no edit
+here. One function unions the result over a profile's kits, `profile_gates` in
+`lib/common/profile.sh`, and both the registry `init` writes and the consumer
+smoke's monotonicity assertion read that one derivation. No disposition varies on
+the profile today; the argument is the seam, so a roster that does vary becomes a
+change to one gate rather than to a signature and every caller of it.
+
+Each kit's `smoke/install.sh` registers a **richer** roster against the scratch
+tree that script builds and seeds — a superset of this one by contract rather
+than by coincidence, held there by `check-install-disposition`. The two describe
+two different trees, which is why the disposition is what a kit owns and the
+roster is what each caller derives.
 
 ## The gate binary
 

@@ -12,32 +12,6 @@
 
 ## New Features
 
-- **kit-owned-install-recipe** [spec: SPEC-install-disposition.md] — the roster is
-  derived from the gate.
-  A gate declares its own `# install: <disposition>` beside its `# graph:` and
-  `# spec:` directives; `recipe_gates`' nine literal gate-name lists are derived and
-  deleted. `check-install-disposition` holds three assertions — every shipped gate
-  declares one, every `zero-config` gate appears in its kit's smoke roster, and
-  `installer/lib/common/recipe.sh` carries no literal gate name.
-  **The filed mechanism was refused on evidence, and the unit is not.** The entry's
-  costed fix — a `bin/install-<kit>.sh` both callers share — rests on the premise
-  that the zero-config subset is one fact encoded twice. A census of all eleven kits
-  falsified it: the two rosters describe two different trees. The installer's arm is
-  a strict subset of the smoke's in every gated kit, the difference direction
-  "in recipe but not smoke" is empty everywhere, and the largest gaps are
-  deliberate — lifecycle-kit registers zero at install because its gates read a
-  stage attestation only a stage session writes, and all seven in smoke because the
-  smoke stamps it; site-kit is zero and five for the same reason over `docs/CNAME`.
-  One entry point returning one roster would either arm lifecycle-kit's gates on a
-  tree with no attestation or strip the smoke's coverage. The eleven-kit census
-  and the witness that re-runs it are recorded in `.workflow/survey-record.md`.
-  **The exposure is unchanged and is what the unit closes:** a kit that adds a
-  zero-config gate the installer never learns about ships to adopters unregistered
-  and silent, and nothing reds today.
-  Promoted 2026-08-08 by spec, second in the operator's `install-profile-seam` cut;
-  builds after `profile-keyed-install`, which settles the signature this relocates
-  behind.
-
 - **trajectory-prune-on-completion** [spec: SPEC-ruling-record-prune.md] — the record
   keeps only what still directs.
   `TRAJECTORY.md`'s header gains the completion-time half of its own contract — two
@@ -4161,6 +4135,7 @@
 ## Done
 
 - profile-keyed-install
+- kit-owned-install-recipe
 - stage-economics-log-multi-session-undercount
 
 ## Lessons Learned

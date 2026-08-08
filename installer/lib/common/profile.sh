@@ -86,6 +86,6 @@ profile_gates() {   # $1 = installer root, $2 = profile -> the sorted, de-duplic
     local root="$1" profile="$2" kit
     while IFS= read -r kit; do
         [[ -n "$kit" ]] || continue
-        recipe_gates "$kit" "$profile"
+        recipe_gates "$root/payload/$kit" "$profile"
     done < <(profile_kits "$root" "$profile") | LC_ALL=C sort -u
 }

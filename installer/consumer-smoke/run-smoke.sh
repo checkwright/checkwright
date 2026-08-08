@@ -177,7 +177,7 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
             while IFS= read -r m; do
                 [[ -n "$m" ]] || continue
                 [[ -f "$C/$k/checks/$m.gate" && ! -f "$C/$k/checks/$m.sh" ]] && printf '%s\n' "$m"
-            done < <(recipe_gates "$k" "$profile")
+            done < <(recipe_gates "$PKG_ROOT/payload/$k" "$profile")
         done | sort
     )"
     n_omitted="$(grep -c . <<<"$omitted")"
