@@ -109,7 +109,10 @@ gate-sdk/SPEC.md §Consumer payload sets.
 
 **No selection builds.** Not "no profile that happens to carry only shell
 gates" — no selection, ever. `init` writes files and compiles nothing, so it
-asks for no toolchain and cannot fail on one. A gate whose implementation is a
+asks for **no build toolchain** and cannot fail on one. The only toolchain it
+asks for at all is the one the battery it is vendoring will itself run, which
+is what the `doctor` precondition below checks and the whole of what can block
+an install. A gate whose implementation is a
 compiled subcommand reaches you as a prebuilt binary picked for your platform
 and checked against a published digest before it is written, which is what makes
 zero build step a property of `init` itself rather than of which profile you
@@ -126,8 +129,11 @@ a single file is written:
   actually vendored. `--no-commit` is the valve: it writes and stages the
   files and leaves the commit to you, so an operator who wants to compose the
   change themselves has taken that guarantee on deliberately.
-- **`doctor` passes.** A below-contract toolchain blocks *before* any partial
-  install, rather than halfway through one — which is why `doctor` ships in the
+- **`doctor` passes.** The contract it holds you to is the consumer-audience
+  subset of the roster — the tools the vendored battery runs, never a tool that
+  only builds Checkwright (§doctor) — so a machine with no Rust toolchain is
+  not below it. A machine that *is* below it blocks *before* any partial
+  install, rather than halfway through one, which is why `doctor` ships in the
   same phase as `init` rather than as a later convenience.
 
 It writes the selected profile's kit directories, a `gates.list` seeded with
@@ -331,6 +337,18 @@ its output: `0` meets the contract, `1` is below it. That is what lets a CI
 step or `init`'s own precondition check gate on the answer without parsing a
 report — and it is why a below-contract machine is caught before any partial
 install rather than halfway through one.
+
+**Which toolchain: the consumer-audience subset of the roster.** The roster
+carries an audience axis (context-kit/SPEC.md §bin/env-probe), and a member
+declared contributor-side is one no install path and no vendored gate reaches —
+`cargo` is the case that exists. `doctor` walks the roster through that
+predicate and a contributor-audience member is not probed, not rendered and
+cannot set the verdict. It is left out rather than reported as informational on
+purpose: `doctor` is the adopter's verb, and showing an adopter a tool they do
+not need is an invitation to install it. So **`DOCTOR: clean` is a claim about
+this machine as a consumer**, not about the machine — which is the narrowing
+that makes the exit status usable as `init`'s precondition, since what `init`
+needs to know is exactly whether the tree it is about to vendor into will run.
 
 It has two behaviors, selected by where you run it rather than by a flag. Run
 anywhere, it reports the toolchain verdict. Run inside a repository that has
@@ -774,6 +792,28 @@ because dropping every `PATH` entry carrying `node` would take `/usr/bin` with
 it wherever Node is installed there. The residue is that a payload merely
 *probing* for a Node binary still finds a name; one that *runs* it fails loudly
 and says which name it reached.
+
+**The toolchain-free arm** points that same mask at `cargo` and `rustc`, and
+drives `doctor` and then a full `init` on a consumer that has neither. It
+asserts that `doctor` exits 0 and reports clean, that it names neither masked
+tool in its report — a contributor-audience member is omitted from the adopter's
+verdict, not shown as informational (§doctor) — and then, through the same
+post-conditions every other arm runs, that `init` succeeds and the vendored
+battery is green. `doctor` is asserted before `init` as well as inside it,
+because `init` reads only its exit status: the standalone verdict is what an
+adopter meets first and what every later refusal is downstream of.
+
+That arm exists because nothing else here could see the defect it holds out.
+The smoke's own preflight *requires* `cargo` and `rustc`, legitimately — the
+artifact arm builds the crate it packs — so every arm above drives `doctor` and
+`init` on a machine that has them. **Masking is per-arm**, which is exactly what
+lets this arm exist without weakening that preflight: the host requirement is
+unchanged and the artifact arm still gets the real tools. The mechanism is the
+existing Node-free mask rather than a new facility, and it is reused rather than
+replaced by a knob for a reason: `INSTALLER_SMOKE_TMP_DIR` stays the smoke's only
+knob, a knob that suppressed a roster member would be a second, test-only
+audience axis whose production behavior no adopter ever exercises, and a masked
+`PATH` is what a machine with no Rust toolchain actually is.
 
 **The upgrade arm** drives a cross-version run, because every arm above installs
 at one version and re-runs at that same one. It packs a second tarball a patch

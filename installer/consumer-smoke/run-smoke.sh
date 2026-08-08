@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → diff clean → uninstall back to the pre-init tree object) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → diff clean → uninstall back to the pre-init tree object) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -271,6 +271,39 @@ C="$(consumer "download")" || fail "could not build a scratch consumer for the d
 SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
 assert_install "$PROFILE_DERIVED" "$C"
 assert_reversal "$PROFILE_DERIVED" "$C" "$SEED"
+
+# spec: installer/README.md §The consumer smoke — the toolchain-free arm, and the reason it uses the mask the Node-free arm already proved rather than a knob: the preflight requires cargo and rustc because the artifact arm builds the crate it packs, so every arm above drives doctor and init on a machine that has them and none could observe an install path demanding them. A masked PATH is what a machine with no Rust toolchain actually is, where a knob suppressing a roster member would be a second, test-only audience axis no adopter ever exercises
+printf 'toolchain-free arm (%s, cargo/rustc masked)\n' "$PROFILE_DERIVED"
+TOOLMASK="$SCRATCH/toolmask"
+mkdir -p "$TOOLMASK"
+for masked in cargo rustc; do
+    printf '#!/usr/bin/env bash\necho "toolchain-free arm: %s was reached — the install path is not free of the Rust toolchain" >&2\nexit 127\n' \
+        "$masked" > "$TOOLMASK/$masked"
+    chmod +x "$TOOLMASK/$masked"
+done
+
+ENTRY=("$CW")
+RUN_PATH="$TOOLMASK:$PATH"
+# spec: installer/README.md §The consumer smoke — masking is per-arm, which is what lets this arm exist without weakening the preflight the artifact arm depends on; the mask is proved rather than assumed for the same reason the Node-free one is
+for masked in cargo rustc; do
+    resolved="$( PATH="$RUN_PATH" bash -c "command -v $masked" 2>/dev/null )"
+    [[ "$resolved" == "$TOOLMASK/$masked" ]] \
+        || fail "the mask did not take: $masked resolves to '${resolved:-nothing}', not the shim at $TOOLMASK/$masked"
+done
+say "mask: cargo and rustc resolve to failing shims"
+C="$(consumer toolchain-free)" || fail "could not build a scratch consumer for the toolchain-free arm"
+# spec: installer/README.md §doctor — doctor is asserted before init as well as inside it, because init reads only its exit status: an adopter meets this verdict first, and it is the precondition every later refusal is downstream of
+out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" doctor 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] \
+    || { printf '%s\n' "$out" >&2; fail "doctor is below contract on a machine carrying no Rust toolchain — a contributor-audience roster member is reaching the adopter's verdict"; }
+grep -q '^DOCTOR: clean' <<<"$out" \
+    || { printf '%s\n' "$out" >&2; fail "doctor exited 0 on a toolchain-free machine without reporting clean"; }
+if grep -qE '^  (cargo|rustc) ' <<<"$out"; then
+    printf '%s\n' "$out" >&2
+    fail "doctor rendered a contributor-audience member to an adopter — such a member is omitted from the consumer verdict, not reported as informational"
+fi
+say "doctor: clean with no Rust toolchain on PATH, and silent about the members that need one"
+assert_install "$PROFILE_DERIVED" "$C"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
 printf 'upgrade arm (two cross-version hops, starter profile)\n'
@@ -555,5 +588,5 @@ out="$( cd "$AC" && "${ENTRY[@]}" init --profile starter 2>&1 )"; rc=$?
     || fail "the broken-payload refusal still wrote into the consumer"
 say "declared target with no artifact: refused, not omitted"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access and each reversed back to its pre-init tree object, plus the extracted-tarball arm with node/npm masked and reversed the same way, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm and the protection branch chained onto it, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access and each reversed back to its pre-init tree object, plus the extracted-tarball arm with node/npm masked and reversed the same way, the toolchain-free arm driving doctor and a full init with cargo/rustc masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm and the protection branch chained onto it, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
 exit 0

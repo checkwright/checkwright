@@ -12,8 +12,9 @@ case "${1:-}" in
     '') ;;
     -h|--help)
         printf 'usage: checkwright doctor\n\n'
-        printf 'Reports whether this machine meets the toolchain contract, and — when run\n'
-        printf 'inside a repository that has been vendored into — what is installed there.\n'
+        printf 'Reports whether this machine meets the toolchain contract it needs as a\n'
+        printf 'consumer, and — when run inside a repository that has been vendored\n'
+        printf 'into — what is installed there.\n'
         printf 'Exit status is the verdict: 0 meets the contract, 1 below it.\n'
         exit 0 ;;
     *) printf 'checkwright doctor: unknown argument: %s\n' "$1" >&2; exit 2 ;;
@@ -58,6 +59,8 @@ FAILED=0
 ARTIFACT_FINDING=""
 printf 'toolchain\n'
 for elem in "${PROBE_SET[@]}"; do
+    # spec: installer/README.md §doctor — a contributor-audience member is skipped outright rather than rendered as informational: doctor is the adopter's verb, and showing an adopter a tool the install path never reaches is an invitation to install it
+    tool_floor_consumer_side "$elem" || continue
     tool_floor_parse "$elem"
     banner="$(probe_banner "$TOOL_FLOOR_NAME")"
     FOUND_VERSION="$(tool_floor_version "$banner")"
