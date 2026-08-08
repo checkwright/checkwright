@@ -196,15 +196,21 @@
   that tool: verifying the split-lead posture's savings
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
-- **prose-profile** [design-pending] [roadmap: later/ecosystem] — a profile for non-code repos.
+- **prose-profile** [design-pending] [roadmap: next/ecosystem] — a profile for non-code repos.
   roadmap-summary: A profile for documentation repos, where there is no build to gate.
   The non-code universality rung: a third
   consumer shaped as a prose/documentation repo (no build, no test suite)
   stress-tests whether the kits govern non-code work. Core dilution is ruled
   out on record — if pursued, this is an adapter/profile delivered as
   optional consumer config, never a kit literal (the provenance seam).
-  Demand-gated: it attests only when a non-code consumer actually vendors a
-  kit and hits friction; until then this entry is the roadmap marker. Seeds:
+  **No longer demand-gated — retagged `next` 2026-08-08 by operator ruling at the
+  `adopter-floor-integrity` scope.** The 2026-08-03 trajectory pivot made this
+  step 5 of TRAJECTORY.md §PRIORITY DIRECTIVE and "the **earliest
+  external-install channel** … not post-launch polish", and step 4 closed as
+  `installer-lifecycle-verbs`. The `later` horizon it carried until now asserts
+  the opposite — ROADMAP.md defines `later` as demand-gated with "the sequencing
+  … not" written down — so the tag contradicted a ruling rather than recording
+  one. Seeds:
   gate-sdk, guard-kit, context-kit, drift-kit, and canon-kit's
   one-owner/coupling core are workflow-agnostic today; lifecycle-kit's stage
   semantics, evidence-kit's test baseline, and canon-kit's spec framing are
@@ -213,9 +219,32 @@
   launch-readiness-gate build) is the first concretely prose-shaped kit
   mechanism and the natural profile seed. Surfaced 2026-07-16 in the same
   launch triage that scoped launch-readiness-gate.
-  **Cost while deferred:** zero — the kits make no non-code claim to falsify,
-  core dilution is ruled out on record, and the named seeds stay accurate until
-  a non-code consumer vendors a kit and reports friction.
+  **Seed claim corrected 2026-08-08 at scope, re-verified against the tree — two
+  of the five named seeds arm nothing, and the survey is filed rather than
+  re-buyable.** `check-prose-tells` ships **dormant**: canon-kit's default glob is
+  empty and the gate is absent from the zero-config consumer roster, so it fires
+  in this tree only through `scripts/canon-config.sh` — it is a seed for the
+  design, not a mechanism a prose consumer receives. guard-kit and drift-kit
+  register **zero** gates in that roster. And the split above is inverted where it
+  matters most: canon-kit's workflow-agnostic one-owner core is absent from the
+  roster while its four spec-framing gates are present, so a prose consumer today
+  gets all of the software-coupled half and none of the agnostic half.
+  **Sized 2026-08-08 at scope: two to three iterations, not one.** A profile is
+  only a kit set — every recipe function in `installer/lib/common/recipe.sh` is
+  keyed by KIT and takes no profile argument — so a roster-only fourth profile
+  would install exactly what `full` installs. Profile-keyed install is the missing
+  mechanism and must precede a prose gate cohort, which must precede a
+  docs-shaped smoke consumer; the "kits govern non-code work" abstraction program
+  is separable and must not gate an installable profile. A fourth profile also
+  breaks the containment-chain contract `installer/profiles.list`,
+  `installer/README.md` and `docs/install.md` all assert, turning the profile
+  order into a lattice — and `companion-toolkit-profile` pays that same bound
+  again, which argues for settling it once. Full finding and its two-command
+  witness: `.workflow/survey-record.md`.
+  **Cost while deferred:** no longer zero. The prior reading — that the kits make
+  no non-code claim to falsify — was written before the pivot sequenced this rung;
+  what is now deferred is the preview cohort's install channel itself
+  (BRIEF-side), so the cost is the launch path rather than a stale seed list.
 - **hosted-attestation-service** [design-pending] [roadmap: later/commercial] — hosted attestation.
   roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.
   The team/paid rung: gates
@@ -3050,12 +3079,23 @@
   updated to match. The release shipped on that reading and the runbook was deliberately left
   unedited mid-release, because changing the procedure you are executing is how a cut becomes
   its own precedent.
-  **What this entry owes is the text, not the decision.** Step 4's prose still describes the
-  refused sequence, so the next release re-derives the contradiction and re-reaches a ruling
-  already made. The edit is small and the care is in what must survive it: the one-commit
-  coupling is defended by a stated parity-window reason and the watch-before-tag ordering by a
-  separate stated reason about the remote oracle, and the rewrite must keep both arguments
-  while moving only the drain.
+  **What this entry owes is the text, not the decision.** The edit is small and the care is in
+  what must survive it: the one-commit coupling is defended by a stated parity-window reason and
+  the watch-before-tag ordering by a separate stated reason about the remote oracle, and the
+  rewrite must keep both arguments while moving only the drain.
+  **Correction 2026-08-08 at scope, re-verified against HEAD — most of this entry is already
+  discharged, and the residue is one sentence.** A prior revision claimed "Step 4's prose still
+  describes the refused sequence, so the next release re-derives the contradiction". That is
+  **false**: `d64e63c` (2026-08-07, the v0.22.0 cut) already rewrote step 4 to *stamp*, push,
+  watch, tag, drain-after — `RELEASING.md:119` now reads "write the **stamp** commit", and
+  `:127-135` carries a paragraph titled "The drain lands after the tag, and the parity gate is
+  what forces it." What survives is a residual intra-step contradiction the corrective did not
+  reach: step 4's **opening** sentence (`RELEASING.md:106-109`) still bundles the drain and the
+  disposition stamp as one commit — "so the iteration's final commit is the one this step
+  creates" — while the body it introduces now splits them. So the cost-while-deferred below
+  overstates: the next release does not re-derive the contradiction, it reads one stale opening
+  sentence against a correct body. Re-cost before promoting; the design question below may no
+  longer be worth an iteration slot.
   **Why `[design-pending]`:** where the follow-up commit belongs is genuinely open. Riding the
   next iteration's push holds the two-push budget and leaves the surface undrained on the
   remote between releases; its own push buys immediacy at a cost CLAUDE.md rations. A third
@@ -3755,9 +3795,25 @@
   namespace, so following the runbook literally walks a session across the identity boundary
   the brief exists to protect.
   **Reachability, not merely wording.** Step 6 is unreachable from a session whose active
-  account is the non-owning one, which is the most likely reason the last tag's Release body
-  was never written. A close that defers its release never meets this; a close that cuts one
-  meets it mid-cut, with a note committed and a tag pending.
+  account is the non-owning one. A close that defers its release never meets this; a close that
+  cuts one meets it mid-cut, with a note committed and a tag pending.
+  **Correction 2026-08-08 at scope, oracle-settled — the class may be real, but both of the
+  concrete grounds this entry was filed on are false at HEAD.** (1) A prior revision offered the
+  unreachability above as "the most likely reason the last tag's Release body was never
+  written". The premise fails: `gh release view v0.22.0` returns a written body — a pointer to
+  the release post — and all four assets attached, the tarball, its checksum, and the one-triple
+  gate binary with its checksum. Step 6 was reached on the last cut. (2) The entry's scenario
+  needs the *active* host-CLI account to be the non-owning one; `gh api user` resolves it to the
+  namespace-owning identity, so the plural-identity 404 is **latent rather than armed**, and the
+  runbook's inference is untested here rather than demonstrated wrong. Note also that
+  `RELEASING.md:148-166` already carries the credential precondition, the permission-not-scope
+  test (`gh api repos/<owner>/<repo> --jq .permissions`), the 404-signature clause, and the
+  explicit rule "Resolve it by fixing the permission, **never by switching identity**" — so the
+  runbook is substantially further along than this body describes. The residual worth keeping is
+  narrow and unchanged in kind: where the active account is the non-owning one, "fix the
+  permission" resolves to granting push to the account the private brief rules must not hold the
+  namespace. **Re-ground this entry before `spec` authors against it** — its current evidence
+  cannot carry a design.
   **Why `[design-pending]`:** the fix is not a sentence. A runbook diagnosing across a plural
   identity has to establish which account is active and whether that account owns the namespace
   *before* it reads any status code, and where that check belongs — a preflight step, step 4's
@@ -3793,8 +3849,9 @@
   superseded release as current, on the adoption path, for as long as it stands.
   Filed 2026-08-08 by close, draining the gap inbox; found at scope.
 
-- **gate-binary-target-roster-widening** [design-pending] — the binary ships one triple, and no
-  queue unit carries widening it.
+- **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
+  binary ships one triple, and no queue unit carries widening it.
+  roadmap-summary: A prebuilt gate binary for every platform the project says it supports.
   `native/targets.list` declares exactly one target triple, so the last release published one
   binary and every adopter off that triple takes the omit-and-declare outcome. That is a
   supported result rather than a break — but it means the trajectory objective naming every
@@ -3810,8 +3867,11 @@
   between them is the unit's substance rather than a detail inside it.
   **Cost while deferred:** a published objective has no unit behind it on this axis, so the gap
   is invisible to the roadmap projection and to anyone reading that projection as a commitment.
-  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Deliberately untagged:**
-  whether this carries a curated roadmap tag, and so a public commitment, is scope's call.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Tagged
+  `next/reliability` 2026-08-08 by operator ruling** at the `adopter-floor-integrity` scope,
+  answering the call this entry deliberately left open: a published objective naming every
+  major operating system with no filed unit behind it on the artifact axis is exactly the gap
+  the roadmap projection exists to prevent, so the public commitment is taken deliberately.
 
 - **init-lifecycle-agent-block-seeding** [design-pending] — whether `init` should seed
   lifecycle-kit's agent-file block is undecided, and the exclusion carries no rationale.

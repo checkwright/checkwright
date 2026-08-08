@@ -355,6 +355,48 @@ exists to preserve. Leaving it silent would let the next reader lean on a false
 ground. A recorded ruling is closed to reversal; it is not closed to a correction
 that says which of its grounds survived contact with an oracle.
 
+**`adopter-floor-integrity` cuts three units, and one of them was ruled against
+the scope session's own recommendation — ruled 2026-08-08 by the operator.** The
+directive was undirected, so the theme is the cut rather than an input to it. In
+build order:
+
+1. The **consumer toolchain-floor filter**.
+2. `published-release-channel-flag-unheld`.
+3. `gap-resolver-mention-overcount`.
+
+All three are features by the new-names litmus, so `spec` authors their
+amendments and pairs them in — scope promoted none of them.
+
+The theme is the adopter's floor, which is where the 2026-08-06 re-ruling below
+already fixed the measurement point: *install, get value, uninstall*. Unit 1 is
+a shipped defect closing that path outright — the installer refuses to install
+on a machine with no Rust toolchain, while context-kit/SPEC.md rules `cargo` a
+contributor-side floor "never a runtime one" and no gate in a consumer's
+starting registry needs it. That is objective 5 violated verbatim against the
+preview cohort, and it had never been caught because the consumer smoke runs on
+a machine that has one. Unit 2 is the same path one step earlier: the host
+resolves Latest to a release predating the prebuilt binary, the uninstall verb,
+and the install-claim repair.
+
+**Unit 3 was taken as the feature, over the scope session's recommendation of a
+cheaper debt-shaped sliver, and the difference is a contract call rather than a
+sizing preference.** The convergent design demotes the capture-time matcher to
+advisory and makes close's drain the authoritative judge, which **retires the
+single-auditable-producer property** at lifecycle-kit/SPEC.md §The committed gap
+inbox. Two cross-kit consumers read that property — scope's own recurrence
+threshold and drift-kit's `kpi-incident-recurrence` — and the ruling puts both
+**inside the amendment's envelope** rather than out of bounds. `spec` authors
+against that, and does not treat either consumer as a fixed constraint.
+
+**The honest limit, carried deliberately rather than dropped once the work was
+ruled in.** This entry reached the promotion threshold on a `recurrence:`
+declaration carrying two dates, and both dates were produced by the resolver the
+entry indicts. Whether they represent genuine recurrences is **undetermined from
+the tree**. The operator ruled the work in regardless; that does not
+retroactively validate the dates, and `spec` must not cite them as evidence the
+design is correct. What grounds the unit is the defect's mechanism, which is
+independently verifiable — not its count, which is the thing under repair.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
