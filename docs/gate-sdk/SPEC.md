@@ -639,6 +639,14 @@ The exposure this closes is that a kit adding a zero-config gate the installer
 never learned about shipped to adopters unregistered and silent. A gate cannot
 now reach an adopter undeclared, because the declaration is enforced present.
 
+**Where the directive deliberately does not reach.** The installer's
+`recipe_needs_queue` and `recipe_needs_agent_file` stay kit-name case arms, and
+they look like the same defect this section removed. They are not: they answer
+what a kit's install must **seed**, not what it may **register**, and a seeded
+surface is a property of the kit rather than of any one gate — so a per-gate
+directive has nothing to say about it. Recorded so the boundary is found drawn
+rather than extended into a place it does not fit.
+
 ## Meta-gate conservation for the binary substrate
 
 A gate's shell file carries five different things at once: the rule, the
