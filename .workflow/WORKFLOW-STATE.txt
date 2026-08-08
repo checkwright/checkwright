@@ -7,3 +7,4 @@
 install-profile-seam scope aff2267c 2026-08-08
 install-profile-seam spec a4f46d5d 2026-08-08
 install-profile-seam spec a7d6bcf3 2026-08-08
+install-profile-seam align a6ddc2a8 2026-08-08
