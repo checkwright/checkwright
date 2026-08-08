@@ -3867,8 +3867,21 @@
   **Cost while deferred:** any amendment can argue a refusal from a claim about its own acceptance
   that no stage verifies, and the failure is silent — both readings pass every gate, and the
   divergence surfaces only as a coverage gap found after the amendment is deleted.
-  Filed 2026-08-08 by close, draining the gap inbox; found at build. The one-assertion coverage
-  half is escalated to the operator separately, as an envelope call.
+  **Closing this takes both halves, and the ruling folds the fix in here rather than into a unit
+  of its own.** Lead-ruled 2026-08-08: a separate entry for the one-assertion fix would let
+  the cheap half close on its own and quietly leave the expensive one — that the document cleared
+  both spec and align carrying the contradiction — as nobody's. Enforcement-first, applied to a
+  finding rather than a gate: the fix and what explains it land together. Closure therefore
+  requires **both** (1) the `init --dry-run` assertion in the consumer smoke — one arm, because
+  `update` execs `init`, so it covers both mutating paths the reversal arm does not — and (2)
+  removal of the stated bound now standing in `installer/README.md` §The verbs and §The consumer
+  smoke. Taking (1) without (2) leaves a published caveat naming a coverage limit that no longer
+  holds.
+  **The tree is honest today, only narrower than the refusal argued.** The capability-liveness
+  sweep at this close found zero governed surfaces still carrying the wide claim, so nothing
+  published overclaims; what is missing is the assertion, not a correction.
+  Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
+  escalated as an envelope call and folded in here on the lead's ruling the same day.
 
 - **stage-economics-log-multi-session-undercount** [design-pending] — the committed rollup keeps
   one session per stage-model pair and silently drops the rest.
