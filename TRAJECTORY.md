@@ -446,6 +446,33 @@ is direction: the next session designing the pass finds *whether pruning is
 wanted* already closed, and spends its judgment on the question that is actually
 open.
 
+**The published-Release backfill is executed by the build session — ruled
+2026-08-08 by the operator.** The one-time flip of the unflagged published
+Releases (`published-release-channel-flag-unheld`, delta 2 of its amendment) is
+unit work rather than an operator runbook step in RELEASING.md. What is recorded
+here is the **authorization**; the mechanism keeps its own home — the amendment
+while it stands, and `docs/install.md` §The release channel once it merges
+there.
+
+**The operator accepted the presentation consequence explicitly**, and that is
+the half no other surface holds. While the version line is `0.x` every published
+Release carries the prerelease flag, so **no Release is Latest**: the repo front
+page shows no Latest badge and `/releases/latest` returns 404. That is the
+consented outcome of a `preview`-channel project, not a side effect discovered
+after the fact.
+
+**Why it is worth a line.** Availability of the write is already a settled fact
+about the tree — scope's survey falsified the entry's stale 404 blocker. Consent
+to the public consequence is not a fact about the tree, so a build session
+finding no record of it would correctly re-escalate a question the operator has
+answered. The recording exists to spend that round trip once, here.
+
+**The honest limit.** This confirms the amendment rather than redirecting it:
+delta 2 is authored as build-executed work already. It waives none of the
+amendment's own verification — the host's response to the backfill is observed
+rather than predicted, and a host that resolves Latest some other way falsifies
+the amendment's premise and is an escalation, not a fix-up.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
