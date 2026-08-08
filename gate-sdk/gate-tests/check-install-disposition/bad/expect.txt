@@ -1,0 +1,1 @@
+check-delta.sh: 0 '# install:' line(s) where a gate declares exactly one

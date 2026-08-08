@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.claude/settings.json,scripts/settings-pins.conf dir=one valve=none tier=precommit
+# install: on-surface
 # spec: context-kit/SPEC.md §check-settings-pins — every pin in the pins file holds against the tracked harness settings file
 #
 # usage: check-settings-pins.sh [--fixture <dir>]

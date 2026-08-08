@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
+# install: on-surface
 # spec: lifecycle-kit/SPEC.md §check-stage-evidence — stamp grammar + name-axis agreement (staleness) between the header and every stamp; cross-stage session-id distinctness
 set -uo pipefail
 

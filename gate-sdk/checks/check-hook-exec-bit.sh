@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/git-hooks/* dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-hook-exec-bit — every tracked file in the hooks dir carries index mode 100755, or a fresh clone silently skips a non-executable hook
 #
 # usage: check-hook-exec-bit.sh [hooks-dir]

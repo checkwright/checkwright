@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh,.workflow/*.txt,TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-deprecation-task — every deprecation marker on a governed source binds task: <slug> to a live queue task
 #
 # usage: check-deprecation-task.sh [scan-root [queue-file]]

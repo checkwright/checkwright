@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:checks/*.gate,scripts/gates.list,native/* dir=one valve=none tier=precommit
+# install: never
 # spec: gate-sdk/SPEC.md §check-gate-binary-fresh — whenever a registered member resolving to a .gate descriptor makes the binary load-bearing, the binary was built from the source now in the tree
 #
 # usage: check-gate-binary-fresh.sh [gates-dir] [tree-stamp-file]

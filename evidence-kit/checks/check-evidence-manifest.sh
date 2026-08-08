@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.workflow/validate-evidence.txt,TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
+# install: zero-config
 # spec: evidence-kit/SPEC.md §check-evidence-manifest — (B) manifest grammar + current-iteration scoping; with lifecycle configured also (A) close-entry green block and (C) validate-stamp↔evidence coupling
 set -uo pipefail
 

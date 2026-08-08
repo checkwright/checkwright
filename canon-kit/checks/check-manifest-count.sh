@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-manifest-count — no bare cardinal quantifying a governed collection noun in manifest prose outside an exempt site
 set -uo pipefail
 

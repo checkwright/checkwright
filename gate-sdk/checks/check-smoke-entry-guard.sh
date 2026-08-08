@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:smoke/install.sh,kit:smoke/violation.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-smoke-entry-guard — every mutating smoke script (install.sh, violation.sh) carries the ${SMOKE_KIT_ROOT:?} entry-point guard so a bare run refuses instead of mutating the caller's tree
 #
 # usage: check-smoke-entry-guard.sh [root]

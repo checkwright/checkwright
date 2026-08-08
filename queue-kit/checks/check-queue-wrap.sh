@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: queue-kit/SPEC.md §check-queue-wrap — no queue line exceeds the wrap budget (Unicode code points), so a runaway never reflows to column 0
 #
 # usage: check-queue-wrap.sh [queue-file]

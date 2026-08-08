@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: site-kit/SPEC.md §check-docs-render-fidelity — every tracked docs markdown page, rendered through the Pages parser, leaks no code-span corruption symptom (a stray backtick or a raw non-HTML-element tag) into text, promotes no code-fenced heading, and renders no fewer tables than its source GFM table starts; a missing renderer fails closed
 #
 # usage: check-docs-render-fidelity.sh [docs-dir] [config-file]

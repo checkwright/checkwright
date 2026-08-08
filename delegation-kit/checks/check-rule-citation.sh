@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=delegation-kit/SPEC.md,delegation-kit/templates/agent-execution.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: delegation-kit/SPEC.md §One template, a resident pointer — every `the template's **<name>** rule` citation in SPEC §The delegation model resolves to a template bullet's bold lead-in (forward direction only)
 #
 # usage: check-rule-citation.sh [spec-file [template-file]]

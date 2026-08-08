@@ -125,6 +125,7 @@ acct_self=0
 acct_hand=0
 acct_bad=()
 acct_stale=()
+acct_contra=()
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting probes through gate_command's substrate-blind dispatch, so a ported gate is probed as the gate it is rather than skipped for want of a .sh; an unresolvable dispatch is the exit-2 the contract already means by "could not run"
 acct_probe() {  # acct_probe <tree> <checks-dir> <gate>
@@ -146,6 +147,11 @@ for g in "${acct_unreg[@]}"; do
         acct_probe "$HOST_TREE" "${acct_root[$kit]}/checks" "$g"
         rc_h=$?
         if [[ "$rc_h" -ne 2 ]]; then
+            # spec: gate-sdk/SPEC.md §Consumer smoke — a declaration the probe contradicts is reported rather than silently exempted: the gate declares it reads a surface a fresh install writes and the probe derived that the surface is absent, so one of the two is wrong and the arm exists so a wrong declaration is not as invisible as a missing one
+            if [[ "$(awk 'sub(/^# install:[[:space:]]+/, "") { print $1; exit }' \
+                    "$SCRATCH/$kit/checks/$g".{sh,gate} 2>/dev/null | head -n1)" == zero-config ]]; then
+                acct_contra+=("$kit ships $g declaring zero-config, yet the probe finds its surface absent in the scratch consumer")
+            fi
             acct_selfset["$g"]=1
             acct_self=$((acct_self + 1))
             continue
@@ -178,6 +184,7 @@ restore
 
 # spec: gate-sdk/SPEC.md §Consumer smoke — the registration accounting: the measured cost is reported on every run, red or green, and never cached across runs
 echo "CONSUMER-SMOKE: accounting — ${#acct_unreg[@]} unregistered gate(s) probed in ${acct_ms}ms ($acct_self self-declared, $acct_hand hand-declared, ${#acct_bad[@]} unaccounted)"
+for l in "${acct_contra[@]:-}"; do [[ -n "$l" ]] && echo "  contradicted declaration: $l"; done
 
 if [[ ${#acct_bad[@]} -gt 0 || ${#acct_stale[@]} -gt 0 ]]; then
     echo "CONSUMER-SMOKE: FAIL — the registration accounting is not satisfied"

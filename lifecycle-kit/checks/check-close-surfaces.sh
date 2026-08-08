@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.workflow/*,kit:SPEC.md,.claude/commands/*.md,.gitignore dir=one valve=none tier=precommit
+# install: on-surface
 # spec: lifecycle-kit/SPEC.md §check-close-surfaces — the derived close-surface roster is complete and moded: no undeclared capture surface, every declaration carries a mode with a well-formed forced= citation, every capture-tier declaration names a reclaim command
 #
 # usage: check-close-surfaces.sh [scan-root]   (derives through bin/close-surfaces.sh)

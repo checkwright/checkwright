@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md dir=one valve=none tier=align-only
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-spec-dod-singleton — a canonical spec carries the Definition-of-Done heading the configured number of times
 set -uo pipefail
 

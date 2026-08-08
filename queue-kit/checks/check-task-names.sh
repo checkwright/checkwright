@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: queue-kit/SPEC.md §check-task-names — task entries lead with a unique kebab slug, done entries are bare slugs, every blocked-by resolves to a live task
 #
 # usage: check-task-names.sh [queue-file]

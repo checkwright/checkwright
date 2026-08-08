@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.workflow/*,.gitignore dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §The workflow directory — every workflow-dir member is tracked or ignored, and every tracked member opens with a '# contract: ' header carrying a ruled payload
 #
 # usage: check-workflow-tiering.sh [scan-root]   (default '.')

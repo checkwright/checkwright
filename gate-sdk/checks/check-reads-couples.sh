@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:checks/*.sh,scripts/*.sh,scripts/gates.list,native/src/*.rs,native/src/gates/*.rs dir=one valve=none tier=precommit trigger=*
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-reads-couples — every statically resolvable recursive walk in a registered gate has its tracked read set covered by the gate's expanded couples; the undecidable remainder is skipped-and-counted
 set -uo pipefail
 

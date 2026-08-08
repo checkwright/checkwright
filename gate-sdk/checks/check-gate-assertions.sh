@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:SPEC.md,scripts/*.sh,kit:*.sh dir=bi valve=none tier=align-only
+# install: zero-config
 # spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion span+count to the gate code's `# assertion` markers
 #
 # usage: check-gate-assertions.sh [spec [scripts-dir]]   (defaults: kit SPEC.md set; kit checks/ dirs)

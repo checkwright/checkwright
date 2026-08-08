@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/CNAME dir=one valve=none tier=precommit trigger=*
+# install: on-surface
 # spec: site-kit/SPEC.md §check-docs-cname-parity — the docs/CNAME host is the single gated source of truth for the docs host; no tracked file names a configured host alias other than that host in a URL
 #
 # usage: check-docs-cname-parity.sh [scan-root] [cname-file] [config-file]

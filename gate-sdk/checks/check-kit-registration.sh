@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=README.md,kit:gate-tests/* dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-kit-registration — every gate_kit_roots kit is registered in the human-facing docs: a registry-doc row linking into each root, and a fixture-runner line for each root that ships gate-tests
 #
 # usage: check-kit-registration.sh [registry-doc [runner-doc]]

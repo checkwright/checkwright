@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: queue-kit/SPEC.md §check-queue-hygiene — the queue holds only tasks, tags, and structure: no HTML comments, no duplicate lines, no column-0 prose
 #
 # usage: check-queue-hygiene.sh [queue-file]

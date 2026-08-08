@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.claude/commands/*.md,lifecycle-kit/templates/stages/*.md,lifecycle-kit/templates/lead.md,lifecycle-kit/templates/release-sweep.md,lifecycle-kit/templates/upgrade.md,lifecycle-kit/templates/consult.md,delegation-kit/templates/agent-execution.md dir=one valve=none tier=precommit
+# install: never
 # spec: lifecycle-kit/SPEC.md §check-skill-binding — every binding-shim skill names an existing template and binds exactly that template's slot set
 #
 # usage: check-skill-binding.sh [skills-dir]

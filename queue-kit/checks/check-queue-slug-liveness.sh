@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,scripts/*.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: queue-kit/SPEC.md §check-queue-slug-liveness — every slug-shaped bold-code token in a configured prose surface resolves against the queue's live slug set
 #
 # usage: check-queue-slug-liveness.sh [scan-root]   (default '.')

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh,.workflow/*.txt,TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-todo-task-liveness — every TODO(task: <slug>) marker on a governed source resolves to a live queue task, stale-flagged on a done slug
 #
 # usage: check-todo-task-liveness.sh [scan-root [queue-file]]

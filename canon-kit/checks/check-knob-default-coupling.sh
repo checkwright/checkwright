@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:*.sh,kit:SPEC.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-knob-default-coupling — every literal kit-knob default in kit source agrees across its sites and with the default the owning SPEC states
 #
 # usage: check-knob-default-coupling.sh   (no args — the roster is gate_kit_roots)

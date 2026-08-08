@@ -1,0 +1,3 @@
+# graph: couples=docs/*.md dir=one valve=none tier=precommit
+# install: on-surface
+# spec: alpha-kit/SPEC.md §check-beta — a ported gate declares on the same terms; its subject is one the adopter authors later

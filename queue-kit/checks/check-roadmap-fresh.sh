@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh dir=one valve=none tier=precommit trigger=TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh
+# install: on-surface
 # spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon and track and pairs with exactly one roadmap-summary: declaration, and the projection page's marker block is the byte-fresh emission of bin/roadmap.sh
 #
 # usage: check-roadmap-fresh.sh [projection-file] [emit-file]

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:templates/*.list,kit:*/*.sh dir=bi valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-template-registry-parity — a kit's shipped `.list` registry template names exactly the artifacts of its sibling directory, both directions
 #
 # usage: check-template-registry-parity.sh [root]

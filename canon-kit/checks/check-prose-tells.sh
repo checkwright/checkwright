@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-prose-tells — the mechanical AI-prose tells over the consumer-configured prose surfaces, each threshold-gated, with the prose-tell-exempt valve
 #
 # usage: check-prose-tells.sh [scan-root]   (default '.')

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=GLOSSARY.md,VISION.md,*SPEC*.md dir=bi valve=none tier=align-only
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-surface-duplication — a non-glossary surface may not carry a glossary term's bold-lead-in definition
 set -uo pipefail
 

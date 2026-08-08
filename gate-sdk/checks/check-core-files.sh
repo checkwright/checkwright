@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/core-files.list,kit:SPEC.md,kit:README.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-core-files — every path in the core-files manifest exists in the worktree and is tracked
 #
 # usage: check-core-files.sh [manifest]

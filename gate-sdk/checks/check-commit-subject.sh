@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=gate-sdk/lib/gate.sh dir=one valve=none tier=commit-msg
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-commit-subject — the subject line parses as <type>(<scope>)?!?: <summary> with <type> in the shared roster, or matches a git-generated carve-out (the parse guarantee under trajectory.sh's feat/debt column)
 #
 # usage: check-commit-subject.sh <message-file>

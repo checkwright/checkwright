@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,.workflow/lesson-evidence.txt dir=one valve=none tier=precommit
+# install: never
 # spec: lifecycle-kit/SPEC.md §check-lesson-disposition — every Lessons entry present at HEAD and gone from the worktree leaves a well-formed disposition stamp in the evidence file
 #
 # usage: check-lesson-disposition.sh [queue-head] [queue-worktree] [evidence-file]

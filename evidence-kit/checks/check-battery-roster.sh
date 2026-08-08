@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=README.md,scripts/evidence-config.sh,gate-sdk/lib/gate.sh dir=bi valve=none tier=precommit
+# install: on-surface
 # spec: evidence-kit/SPEC.md §check-battery-roster — the runner doc's battery-roster block holds name-set parity with EVIDENCE_KIT_SUITES, both directions
 #
 # usage: check-battery-roster.sh [runner-doc]

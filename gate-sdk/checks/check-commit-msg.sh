@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/msg-patterns.list dir=one valve=none tier=commit-msg
+# install: zero-config
 # spec: gate-sdk/SPEC.md §check-commit-msg — the commit message matches no banned pattern (the leak guard for the message surface the pre-commit hook never sees)
 #
 # usage: check-commit-msg.sh <message-file> [pattern-file...]

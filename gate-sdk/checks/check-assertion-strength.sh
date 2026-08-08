@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:smoke/*.sh,kit:gate-tests/*.test.sh,kit:bin/*.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-assertion-strength — a guard over a call to a script whose declared `# exit:` header binds a verdict token to one non-zero code must not name that token in its failure message while comparing no status to that token's code
 #
 # usage: check-assertion-strength.sh [dir...]   scan the named smoke/gate-tests dir(s)

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh,TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every exception-list element carries a live until: task or permanent: reason
 #
 # usage: check-gate-exemption-tasks.sh [queue-file [dir...]]

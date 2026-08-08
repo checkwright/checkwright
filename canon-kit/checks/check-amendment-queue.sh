@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,SPEC-*.md,*/SPEC-*.md dir=bi valve=none tier=precommit
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-amendment-queue — the Task↔amendment bidirectional rule and spec-readiness
 #
 # usage: check-amendment-queue.sh [queue-file [scan-root]]

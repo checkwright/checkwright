@@ -1,0 +1,6 @@
+# Same synthetic-tree steer as good/, with one instance of each assertion:
+# check-delta ships no declaration (A), check-epsilon declares a value outside
+# the closed vocabulary (A), check-alpha declares zero-config while alpha-kit's
+# smoke registers nothing (B), and the stand-in recipe carries literal gate
+# names (C).
+.

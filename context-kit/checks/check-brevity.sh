@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=CLAUDE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: context-kit/SPEC.md §The brevity gate — over-budget bullets in the budgeted always-loaded section that cite a deeper doc
 set -uo pipefail
 

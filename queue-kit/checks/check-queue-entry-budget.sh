@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: queue-kit/SPEC.md §check-queue-entry-budget — a deferred entry is a costed filing: bounded above so it is not an inlined amendment, bounded below so it is not a flag-and-skip; an icebox entry is its lead line and nothing else
 #
 # usage: check-queue-entry-budget.sh [queue-file]

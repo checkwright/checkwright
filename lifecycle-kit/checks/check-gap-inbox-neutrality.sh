@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.workflow/gap-inbox.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — the capture surface records observations: every bullet is '- <YYYY-MM-DD> — <prose>', and no bullet's prose opens with the retired 'recurrence of `<slug>`:' verdict
 #
 # usage: check-gap-inbox-neutrality.sh [inbox-file]

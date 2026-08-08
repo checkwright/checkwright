@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/identity.conf dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-identity — every expectation in the identity manifest matches this clone's local git identity
 #
 # usage: check-identity.sh [--fixture <dir>] [manifest]

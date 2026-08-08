@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: queue-kit/SPEC.md §check-queue-sections — the queue carries each required ## section heading exactly once, the fail-closed floor under every section-scoped scanner
 #
 # usage: check-queue-sections.sh [queue-file]

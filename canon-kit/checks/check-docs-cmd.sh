@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md,scripts/*.sh,kit:*.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-docs-cmd — every fenced invoked repo-relative .sh path and every backticked/fenced kit-prefixed env knob in the governed doc set resolves against the tree
 #
 # usage: check-docs-cmd.sh [file...]

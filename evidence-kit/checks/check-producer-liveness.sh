@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.tmp/run-validate.lock dir=one valve=none tier=align-only
+# install: never
 # spec: evidence-kit/SPEC.md §check-producer-liveness — a stage entry is refused while the evidence producer's lock names a live PID
 set -uo pipefail
 

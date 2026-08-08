@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*/templates/*.sh,scripts/*.sh dir=bi valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-template-copy-parity — a kit template and its vendored consumer copy agree on their declared contract surface, with copy-side additions declared
 #
 # usage: check-template-copy-parity.sh [root]

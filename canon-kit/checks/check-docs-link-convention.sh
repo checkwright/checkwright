@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/*.md,docs/*/index.md,docs/posts/*.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-docs-link-convention — docs pages cite downward: no directory-target relative link (name the file), a kit page's back-link to its own README/SPEC carries a #section anchor, no relative link to a target resolving outside the docs root
 #
 # usage: check-docs-link-convention.sh [docs-root]   (default CANON_KIT_LINK_ROOT;

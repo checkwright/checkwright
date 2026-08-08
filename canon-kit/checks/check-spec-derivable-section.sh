@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md dir=one valve=none tier=align-only
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-spec-derivable-section — a banned-heading section may not be a fenced code dump above the density budget
 set -uo pipefail
 

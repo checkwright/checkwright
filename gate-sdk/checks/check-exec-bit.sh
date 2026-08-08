@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:checks/*.sh,kit:kpis/*.sh,kit:bin/*.sh,scripts/check-*.sh,scripts/kpi-*.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-exec-bit — every tracked *.sh matching an exec-glob carries git index mode 100755, or a by-path-invoked kit script degrades silently to a skipped check / failed plugin in a fresh clone
 #
 # usage: check-exec-bit.sh [ls-files-dump]

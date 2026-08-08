@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/git-hooks/pre-commit,scripts/CHECK-GRAPH.html,docs/check-graph.html,SPEC-*.md,*/SPEC-*.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: gate-sdk/SPEC.md §check-graph — manifest well-formedness, trigger parity, cycle valves, artifact drift, and amendment-body manifest validation (assertion G)
 set -uo pipefail
 

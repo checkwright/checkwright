@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md,.gitignore dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-tracking-claim — every fixed-vocabulary tracking claim on a governed manifest surface agrees with git
 #
 # usage: check-tracking-claim.sh [scan-root]   (default '.')

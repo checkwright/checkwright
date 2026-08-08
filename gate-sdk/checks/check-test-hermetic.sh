@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=kit:gate-tests/*.test.sh,kit:smoke/install.sh,kit:smoke/violation.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-test-hermetic — two assertions (A) every bespoke gate-tests/*.test.sh sources lib/test-hermetic.sh or carries a `# hermetic-exempt:` marker; (B) a credential-managing smoke script pins every own-kit bin call ("$SMOKE_KIT_ROOT/bin/*") to a *_CRED_FILE path so it cannot resolve the ambient ~/.claude credential
 #
 # usage: check-test-hermetic.sh [dir...]         assertion A over gate-tests dir(s)

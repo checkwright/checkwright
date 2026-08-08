@@ -586,6 +586,54 @@ The manifest grammar:
 - `gen=manual` — the gate's hook block is bespoke and round-trips verbatim
   between `# >>> manual: <gate>` / `# <<< manual: <gate>` sentinels.
 
+## The install disposition
+
+A gate declares **its own install disposition**, one `# install: <disposition>`
+line in its header block beside `# graph:` and `# spec:`, and in a `.gate`
+descriptor on the same terms — a ported gate is still a gate a kit ships, and
+the descriptor rides the payload like any other member (§Consumer payload). The
+vocabulary is closed, three values:
+
+- **`zero-config`** — the gate reads a surface `init` itself writes, so it
+  registers in a fresh consumer.
+- **`on-surface`** — the gate's subject is one the adopter authors later (a
+  glossary, a docs host, a stage attestation, their own workflows), so it arms
+  when that surface exists rather than at install.
+- **`never`** — the gate is not auto-registered on any tree, because its subject
+  cannot exist in a vendored tree at all or because it is declared
+  never-registered. This is the class §Consumer smoke's declaration valve
+  already recognises from the other side.
+
+The vocabulary names **install-time reachability**, never a path, a surface
+name, or a project's own governed-file vocabulary. That is deliberate: a
+disposition enumerating consumer paths would be a kit literal carrying one
+project's tree layout, which no kit may ship. The path a gate reads stays where
+it already lives — the gate's own configured knob.
+
+**The installer's per-kit roster is derived from these declarations, not
+maintained.** `recipe_gates` in the installer's `lib/common/recipe.sh`
+(installer/README.md §What init seeds) is every `checks/` member of a kit — both
+declaration spellings — whose disposition is `zero-config`. It carries no gate
+name of its own, which is what `check-install-disposition` assertion C holds.
+
+**Two rosters, two trees, and that is why the disposition is kit-owned rather
+than the roster.** A kit's `smoke/install.sh` registers against a scratch
+consumer *the smoke script itself builds and seeds*; `recipe_gates` registers
+against the tree `init` makes. The installer's set is a subset of the smoke's in
+every gated kit, and the difference is deliberate where it is largest:
+lifecycle-kit registers nothing at install because its gates read a stage
+attestation only a stage session can write, while its smoke stamps that
+attestation for real; site-kit registers nothing at install and five in smoke
+because the smoke writes `docs/CNAME` and a workflow template `init` never
+writes. A single entry point returning one roster could serve neither caller
+without arming gates on a tree that cannot satisfy them or stripping the smoke's
+coverage. What is kit-owned is therefore the **disposition**; each caller derives
+its own set from the tree it actually made.
+
+The exposure this closes is that a kit adding a zero-config gate the installer
+never learned about shipped to adopters unregistered and silent. A gate cannot
+now reach an adopter undeclared, because the declaration is enforced present.
+
 ## Meta-gate conservation for the binary substrate
 
 A gate's shell file carries five different things at once: the rule, the
@@ -625,6 +673,7 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so with **zero descriptors on disk it is not yet substrate-sensitive by assertion C's runtime derivation** and this row is not yet owed — which is why it is written now rather than left to be discovered. The commit that lands the first descriptor makes the gate sensitive and would red on a missing disposition, and that commit's session is the worst possible one to be learning this table exists. Same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
+| `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-prose-enum`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
@@ -1367,7 +1416,10 @@ across the roster. The
 README item of that checklist carries the register-the-gates block in
 `<!-- gate-roster:begin -->` / `<!-- gate-roster:end -->` markers, held in
 name-set parity with the kit's shipped `checks/` by `check-readme-roster`
-(§check-readme-roster) — a kit that ships checks registers them. A new gate MAY
+(§check-readme-roster) — a kit that ships checks registers them. Every gate in
+that roster carries its `# install:` declaration, one more clause of the same
+checklist and the one `check-install-disposition` holds (§The install
+disposition). A new gate MAY
 also gain a `pass` row in the held-constant validate baseline —
 evidence-kit/SPEC.md §Baseline manifest tolerates its absence (a classification
 cost only, zero enforcement loss). A new kit's
@@ -1381,7 +1433,10 @@ enforcing it.
   `scripts/gates.list`, establish the minimal governed surface its gates need
   to be green, and regenerate the hook + graph artifacts. *Which* gates it
   registers is not the author's discretion — *The registration accounting*
-  below rules on every omission. It may assume gate-sdk
+  below rules on every omission, and the installer's own narrower subset is
+  derived from the same per-gate declarations (§The install disposition) rather
+  than listed anywhere. This roster is the **superset** of that subset, held so
+  by `check-install-disposition` assertion B. It may assume gate-sdk
   is already installed (it runs first), nothing else. A non-zero exit aborts the
   harness with exit 2 (a broken installer is an environment failure, not a gate
   finding).
@@ -1448,6 +1503,18 @@ both. Removing the second probe as belt-and-braces re-opens the channel.
 
 Only the exit-2 rows reach the corroborating probe.
 
+**A declaration the probe contradicts is reported, not silently exempted.** A
+gate declaring `zero-config` (§The install disposition) asserts it reads a
+surface a fresh install writes; a probe finding that same gate surface-absent in
+the scratch consumer has derived the opposite. That is a **contradiction between
+a declaration and a derivation**, and the accounting names it as one rather than
+granting the ordinary self-declared exemption — which is the arm that keeps a
+*wrong* declaration from being as invisible as a missing one, the missing one
+already being `check-install-disposition` assertion A's. The verdict is
+informational here rather than fatal, because the scratch consumer is not the
+tree `init` makes and a `zero-config` gate is legitimately unregistered in this
+harness's roster; what it must never be is unremarked.
+
 **Probe first, reasons second.** The exemption is *derived* — recomputed from the
 tree every run, so it cannot go stale, be forgotten, or be copied wrong. That is
 its worth, and its worth is not coverage: on a real sweep the derivation justifies
@@ -1471,9 +1538,13 @@ per-gate annotations naming each gate's subject surface, so deriving
 `smoke/install.sh`'s registration from it would unify the roster and its
 reasons on paper. Declined on a boundary, not on merit: it would turn
 `smoke/install.sh` from an executable install recipe into a derivation over a
-doc, which is what `kit-owned-install-recipe` (open, design-pending) asks
-whether a kit's install-time roster should look like at all — deciding that
-shape from inside this contract would pre-empt it sideways.
+doc. What that question settled instead is §The install disposition — the
+kit-owned fact is the per-gate **disposition**, and the roster the *installer*
+starts a consumer with is derived from it, while this script stays the
+executable recipe for the smoke's own richer tree. The disposition is not added
+to the README block either: that block is prose an adopter pastes, and a
+machine-read annotation inside a pasted snippet is a second grammar in a surface
+that has one.
 
 **The declaration valve.** Where a kit author judges an exit-0 or exit-1 omission
 legitimate — a vacuous pass that is not real coverage is the honest case — that
@@ -2574,6 +2645,35 @@ members, so the battery reaches that computation on every run and the test is no
 longer the only executor. It is kept, on the narrower ground that it fails at
 `cargo test` time — inside the crate's own suite, before any binary is placed —
 where the battery's verdict arrives only once a build exists to compare against.
+
+### check-install-disposition
+
+Three assertions over every kit root in `gate_kit_roots`, holding §The install
+disposition.
+
+- **(A) Declared** — every `checks/` member, `check-*.sh` and `check-*.gate`
+  alike, carries **exactly one** `# install:` line and its value is in the closed
+  vocabulary. A gate that ships without one is red, and this is the assertion
+  that closes the live exposure: a newly added zero-config gate cannot reach an
+  adopter undeclared. Two lines are a finding for the same reason one is
+  required — a declaration surface's failure mode is disagreeing with itself.
+- **(B) Smoke superset** — every `zero-config` member of a kit appears in that
+  kit's `smoke/install.sh` roster. The direction is what the two-tree ground
+  gives: the smoke's tree is a superset of the tree `init` makes, so a gate the
+  installer registers must be registrable there too. **The converse is not
+  asserted** — a kit's smoke legitimately registers more than the installer does,
+  and asserting equality would force one of the two trees to lie about itself.
+- **(C) No second copy** — the installer's `lib/common/recipe.sh` carries no
+  literal gate name, so the de-literalization holds going forward rather than
+  only at the commit that landed it. A `§`-prefixed occurrence is a spec-section
+  citation and is stripped before the match: a section reference registers
+  nothing, and registering is the only thing this assertion is about. The file is
+  absent in a vendored consumer, which has no installer — that absence is a skip,
+  reported on the clean line, never a finding.
+
+Fail-closed on a non-repo cwd with no root argument, an unreadable gate header,
+an empty kit roster, or kit roots that enumerate no gate at all. Configuration
+reuses `GATE_SDK_KIT_DIRS`; the gate adds no knob of its own. `precommit` tier.
 
 ### check-test-hermetic
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.claude/agents/*.md dir=one valve=none tier=precommit
+# install: on-surface
 # spec: delegation-kit/SPEC.md §check-agent-tier-explicit — every agent definition under the scanned directory declares a `model:` field in its frontmatter (an explicit `inherit` passes; only omission reds)
 #
 # usage: check-agent-tier-explicit.sh [agent-dir]

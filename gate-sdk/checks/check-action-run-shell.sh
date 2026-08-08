@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.github/workflows/*.yml,.github/workflows/*.yaml,.github/ISSUE_TEMPLATE/*.yml,docs/_config.yml,kit:templates/*.yml,kit:templates/*.yaml dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-action-run-shell — every GitHub Actions `run:` literal block scalar in an Actions-shaped YAML file is ShellCheck-clean at -S warning under the dialect the step actually runs
 #
 # usage: check-action-run-shell.sh [scan-root]

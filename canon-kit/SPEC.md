@@ -901,8 +901,10 @@ topology exists). `align-only` tier.
 
 Invariant: every full-line comment on a governed source is one of — a
 machine directive (a comment a tool parses: `graph:`, `shellcheck`,
-`contract:`, `smoke-unregistered:` — the last read by
-`run-consumer-smoke.sh` off a kit's vendored `smoke/install.sh`, gate-sdk/SPEC.md
+`contract:`, `install:`, `smoke-unregistered:` — the last two read off a kit's
+vendored source, `install:` by the installer's recipe module and
+`check-install-disposition`, `smoke-unregistered:` by `run-consumer-smoke.sh`
+off `smoke/install.sh`, gate-sdk/SPEC.md §The install disposition and
 §Consumer smoke), a reason directive (a spec pointer, usage synopsis, or
 positional justification: `spec:`, `usage:`, `exception-list:`,
 `no-fixture:`, `assertion`, `permanent:`, `TODO(task:`,

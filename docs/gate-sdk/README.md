@@ -94,6 +94,7 @@ check-gate-fixture-coverage
 check-gate-assertions
 check-gate-substrate-parity
 check-gate-binary-fresh
+check-install-disposition
 check-test-hermetic
 check-assertion-strength
 check-gate-exemption-tasks

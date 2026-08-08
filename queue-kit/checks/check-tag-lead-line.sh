@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag (blocked-by/spec/design-pending/drain-exempt/roadmap in the task sections, attend + configured lesson tags in Lessons) sits on its bullet's lead line, the only line the tag readers scan
 #
 # usage: check-tag-lead-line.sh [queue-file]

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # spec: queue-kit/SPEC.md §check-queue-prose-precondition — no active entry states a forward precondition in prose without a blocked-by tag (selection trusts tags, not prose)
 #
 # usage: check-queue-prose-precondition.sh [queue-file]

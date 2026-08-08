@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md,SECURITY.md,docs/*.md,scripts/*.sh dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-payload-claim — exactly one governed doc declares what a gate on the vendored payload discloses, and no scanned governed doc asserts a different disclosure class
 #
 # usage: check-payload-claim.sh [scan-root]   (default '.')

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/gates.list,scripts/*.sh,kit:*.sh dir=one valve=none tier=precommit
+# install: zero-config
 # spec: gate-sdk/SPEC.md §check-gate-output — every gates.list member emits a machine-keyable success line and a help: remedy
 #
 # usage: check-gate-output.sh [gates-dir]

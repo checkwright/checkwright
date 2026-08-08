@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md,.workflow/WORKFLOW-STATE.txt dir=one valve=none tier=precommit
+# install: on-surface
 # spec: lifecycle-kit/SPEC.md §check-stage-entry — prior-stage invocation-stamp ordering + drain-entry queue-empty + audit-trigger signal
 set -uo pipefail
 

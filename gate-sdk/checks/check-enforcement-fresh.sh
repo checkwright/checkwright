@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/enforcement.md,scripts/gates.list,scripts/*.sh,kit:*.sh,scripts/kpis.list,.claude/settings.json,.github/workflows/*.yml dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-enforcement-fresh — docs/enforcement.md is the byte-fresh projection of enforcement-map.sh --emit
 #
 # usage: check-enforcement-fresh.sh [projection-file] [emit-file]

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=.claude/commands/*.md dir=one valve=none tier=precommit
+# install: never
 # spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the configured stage set and the skills dir cover each other: every stage has a skill, every enter-stage-invoking skill names a live stage
 #
 # usage: check-stage-skill-coverage.sh [skills-dir]

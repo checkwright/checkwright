@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh,.workflow/* dir=one valve=none tier=precommit
+# install: on-surface
 # spec: canon-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt, or justifies a positional construct
 #
 # usage: check-comment-tier.sh [scan-root]
@@ -52,7 +53,7 @@ join_alt() {  # a '|'-joined ERE alternation of bracket-escaped literals
 # spec: canon-kit/SPEC.md §check-comment-tier — the built-in kit-mechanism roster
 # (Checkwright's own directive names); the CANON_KIT_COMMENT_* knobs append a
 # consumer's extras.
-shell_colon=(graph: spec: contract: usage: exception-list: no-fixture: permanent: smoke-unregistered: comment-tier-exempt: "TODO(task:" "TODO(spec-ambiguity)")
+shell_colon=(graph: spec: contract: usage: install: exception-list: no-fixture: permanent: smoke-unregistered: comment-tier-exempt: "TODO(task:" "TODO(spec-ambiguity)")
 # shellcheck disable=SC2034  # nameref-consumed by build_bless
 shell_word=(shellcheck assertion)
 shell_colon+=("${CANON_KIT_COMMENT_MACHINE[@]}" "${CANON_KIT_COMMENT_REASON[@]}")

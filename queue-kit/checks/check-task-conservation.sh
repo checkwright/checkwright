@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: zero-config
 # no-fixture: HEAD-vs-worktree diff — a committed fixture has HEAD == worktree, so the loss case (an uncommitted deletion) has no static-fixture representation (queue-kit/SPEC.md §check-task-conservation).
 # spec: queue-kit/SPEC.md §check-task-conservation — every live slug present at HEAD is still present (live or done) in the working tree
 #

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/gates.list,kit:checks/*,gate-sdk/SPEC.md,native/*,.github/workflows/publish.yml dir=one valve=none tier=precommit
+# install: on-surface
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — one declaration per member, descriptor/subcommand parity both ways, a recorded disposition for every substrate-sensitive member, no implementation source inside the vendoring set, and one owner for the target roster the artifact path derives from
 #
 # usage: check-gate-substrate-parity.sh [gates-dir] [conservation-doc]
