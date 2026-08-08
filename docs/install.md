@@ -100,7 +100,7 @@ your `PATH`, and the note says what breaks without it:
 - `shellcheck` — the `check-shellcheck` meta-gate runs
   [ShellCheck](https://www.shellcheck.net/) over every shipped script, and a
   lint finding blocks the commit.
-- `cargo` (≥ 1.56) — a **contributor** requirement with **no install-time role at
+- `cargo` (≥ 1.56, @contributor) — a **contributor** requirement with **no install-time role at
   all**: the `native/` crate carries the gate implementations that dispatch to a
   binary subcommand, and the floor is the crate's `edition = "2021"`. Gates in
   this repo now dispatch there, so a contributor builds the binary
@@ -122,11 +122,18 @@ pin, and each pinned member names that construct above. A floor nobody's code
 forces is an aspiration, and an aspiration is what rots; the rule is what keeps
 this list honest, not a promise to revisit it.
 
+A bullet whose parenthetical carries an `@` token names the **audience** that
+floor belongs to, and `@contributor` is the only one there is: a tool nothing on
+an install path reaches, required of someone building Checkwright rather than of
+someone running it. `checkwright doctor` reads that field and leaves such a
+member out of its verdict entirely, so an unmarked bullet is the whole floor an
+adopter's machine is held to.
+
 Nor are the bullets maintained beside the code. The roster lives in
 `context-kit/lib/toolfloor.sh`; this block renders it, and
-`check-install-toolchain` holds the two in whole-element parity — floor and
-implementation token included — so the page cannot drift from what the gates
-require.
+`check-install-toolchain` holds the two in whole-element parity — floor,
+implementation token and audience included — so the page cannot drift from what
+the gates require.
 
 To see where your machine stands against it, seed a local profile with
 context-kit's env-probe — `bash context-kit/bin/env-probe.sh` writes an

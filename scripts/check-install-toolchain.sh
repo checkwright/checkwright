@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=docs/install.md,context-kit/lib/toolfloor.sh dir=bi valve=none tier=precommit
-# spec: docs/site-architecture.md §Generated projections and their freshness gates — docs/install.md's Requirements toolchain list holds whole-element parity (name, version floor, implementation token) with context-kit/lib/toolfloor.sh's PROBE_SET roster, both directions
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — docs/install.md's Requirements toolchain list holds whole-element parity (name, version floor, implementation token, audience) with context-kit/lib/toolfloor.sh's PROBE_SET roster, both directions
 #
 # usage: check-install-toolchain.sh [install-md] [roster-file]
 #   bare: parity between docs/install.md's toolchain marker block and the PROBE_SET roster.
@@ -16,20 +16,21 @@ ROSTER="${2:-context-kit/lib/toolfloor.sh}"
 BEGIN="<!-- toolchain:begin -->"
 END="<!-- toolchain:end -->"
 GE="≥"
+AT="@"
 
 [[ -f "$INSTALL_MD" ]] || { echo "check-install-toolchain: install page not found: $INSTALL_MD" >&2; exit 2; }
 [[ -f "$ROSTER" ]] || { echo "check-install-toolchain: roster file not found: $ROSTER" >&2; exit 2; }
 grep -qF -- "$BEGIN" "$INSTALL_MD" || { echo "check-install-toolchain: no toolchain marker block ($BEGIN) in $INSTALL_MD" >&2; exit 2; }
 
-# spec: docs/site-architecture.md §Generated projections and their freshness gates — the bullet's parenthetical carries the roster token verbatim, so each side normalizes to one `name:min:impl` triple and parity is a set comparison rather than a mapping table
-listed="$(awk -v b="$BEGIN" -v e="$END" -v ge="$GE" '
+# spec: docs/site-architecture.md §Generated projections and their freshness gates — the bullet's parenthetical carries the roster token verbatim, so each side normalizes to one `name:min:impl:audience` quadruple and parity is a set comparison rather than a mapping table; the audience carries a leading sigil for the same reason the floor carries one, so this positional reader cannot mistake it for an implementation token
+listed="$(awk -v b="$BEGIN" -v e="$END" -v ge="$GE" -v at="$AT" '
     $0 == b { inb = 1; next }
     $0 == e { inb = 0; next }
     inb && /^- `/ {
         if (!match($0, /`[^`]+`/)) next
         name = substr($0, RSTART + 1, RLENGTH - 2)
         rest = substr($0, RSTART + RLENGTH)
-        min = ""; impl = ""
+        min = ""; impl = ""; aud = ""
         if (match(rest, /^ \([^)]*\)/)) {
             n = split(substr(rest, RSTART + 2, RLENGTH - 3), f, ",")
             for (i = 1; i <= n; i++) {
@@ -38,10 +39,13 @@ listed="$(awk -v b="$BEGIN" -v e="$END" -v ge="$GE" '
                 if (substr(f[i], 1, length(ge)) == ge) {
                     min = substr(f[i], length(ge) + 1)
                     gsub(/^[[:space:]]+|[[:space:]]+$/, "", min)
+                } else if (substr(f[i], 1, length(at)) == at) {
+                    aud = substr(f[i], length(at) + 1)
+                    gsub(/^[[:space:]]+|[[:space:]]+$/, "", aud)
                 } else impl = f[i]
             }
         }
-        print name ":" min ":" impl
+        print name ":" min ":" impl ":" aud
     }
 ' "$INSTALL_MD")"; st=$?
 fail_closed "$st" INSTALL-TOOLCHAIN awk
@@ -60,21 +64,30 @@ for _e in "${roster_arr[@]}"; do
     _name="${_e%%:*}"
     _rest="${_e#"$_name"}"; _rest="${_rest#:}"
     _min="${_rest%%:*}"
-    _impl=""
-    if [[ "$_rest" == *:* ]]; then _rest="${_rest#*:}"; _impl="${_rest%%:*}"; fi
-    roster_by_name["$_name"]="$_name:$_min:$_impl"
+    _impl=""; _aud=""
+    if [[ "$_rest" == *:* ]]; then
+        _rest="${_rest#*:}"; _impl="${_rest%%:*}"
+        if [[ "$_rest" == *:* ]]; then _rest="${_rest#*:}"; _aud="${_rest%%:*}"; fi
+    fi
+    roster_by_name["$_name"]="$_name:$_min:$_impl:$_aud"
 done
 while IFS= read -r _el; do
     [[ -n "$_el" ]] && listed_by_name["${_el%%:*}"]="$_el"
 done <<<"$listed"
 
-render() {   # $1 = name:min:impl -> the bullet parenthetical the element demands, "(none)" when unconstrained
-    local rest min impl desc=""
-    rest="${1#*:}"; min="${rest%%:*}"; impl="${rest#*:}"
+render() {   # $1 = name:min:impl:audience -> the bullet parenthetical the element demands, "(none)" when unconstrained
+    local rest min impl aud desc=""
+    rest="${1#*:}"; min="${rest%%:*}"
+    rest="${rest#*:}"; impl="${rest%%:*}"
+    aud="${rest#*:}"
     [[ -n "$min" ]] && desc="$GE $min"
     if [[ -n "$impl" ]]; then
         [[ -n "$desc" ]] && desc+=", "
         desc+="$impl"
+    fi
+    if [[ -n "$aud" ]]; then
+        [[ -n "$desc" ]] && desc+=", "
+        desc+="$AT$aud"
     fi
     [[ -n "$desc" ]] || { printf '(none)'; return 0; }
     printf '(%s)' "$desc"
@@ -99,11 +112,11 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     echo "check-install-toolchain: $INSTALL_MD toolchain list and $ROSTER PROBE_SET disagree:"
     printf '  %s\n' "${findings[@]}"
     echo "  help: each bullet in the toolchain marker block renders its roster element"
-    echo "        verbatim — \`- \\\`tool\\\` (${GE} <min-version>, <impl-token>) — …\`, either field"
-    echo "        dropped where the element leaves it empty. Add the missing tool's"
+    echo "        verbatim — \`- \\\`tool\\\` (${GE} <min-version>, <impl-token>, ${AT}<audience>) — …\`, any"
+    echo "        field dropped where the element leaves it empty. Add the missing tool's"
     echo "        bullet, drop the stale one, or correct the parenthetical."
     exit 1
 fi
 
-echo "INSTALL-TOOLCHAIN: clean (${#roster_by_name[@]} roster element(s) in name+floor+impl parity between $INSTALL_MD and $ROSTER PROBE_SET)"
+echo "INSTALL-TOOLCHAIN: clean (${#roster_by_name[@]} roster element(s) in name+floor+impl+audience parity between $INSTALL_MD and $ROSTER PROBE_SET)"
 exit 0

@@ -65,14 +65,26 @@ for _pm in "${PM_CANDIDATES[@]}"; do
     fi
 done
 
+# spec: context-kit/SPEC.md §bin/env-probe — the audience marker, spelled once and appended by every line that names a member, so a reader tells a floor that is theirs apart from one they are not on the hook for
+audience_mark() {   # $1 = roster element -> the audience word, empty for the every-audience default
+    tool_floor_parse "$1"
+    [[ -n "$TOOL_FLOOR_AUDIENCE" ]] || return 0
+    printf '%s-only' "$TOOL_FLOOR_AUDIENCE"
+}
+
 # spec: context-kit/SPEC.md §bin/env-probe — renders the constrained member's parenthetical; an unconstrained member carries none, so the roster's optional axis stays optional on the page too
 render_floor() {   # $1 = roster element, $2 = verdict -> the trailing parenthetical, empty when the member is unconstrained
-    local desc=""
+    local desc="" mark
     tool_floor_parse "$1"
     [[ -n "$TOOL_FLOOR_MIN" ]] && desc="floor $TOOL_FLOOR_MIN"
     if [[ -n "$TOOL_FLOOR_IMPL" ]]; then
         [[ -n "$desc" ]] && desc+=", "
         desc+="requires $TOOL_FLOOR_IMPL"
+    fi
+    mark="$(audience_mark "$1")"
+    if [[ -n "$mark" ]]; then
+        [[ -n "$desc" ]] && desc+=", "
+        desc+="$mark"
     fi
     [[ -n "$desc" ]] || return 0
     case "$2" in
@@ -88,19 +100,20 @@ below=()
 for _e in "${PROBE_SET[@]}"; do
     tool_floor_parse "$_e"
     _t="$TOOL_FLOOR_NAME"
+    _mark="$(audience_mark "$_e")"
     ver="$(probe_version "$_t")" || ver=""
     verdict="$(tool_floor_check "$_e" "$ver")"
     read -r _kind _found _floor <<<"$verdict"
     case "$_kind" in
-        absent) absent+=("$_t"); continue ;;
-        below) below+=("\`$_t\` (found $_found, floor $_floor)") ;;
-        wrong-impl) below+=("\`$_t\` (found $_found, requires $TOOL_FLOOR_IMPL)") ;;
-        uncomparable) below+=("\`$_t\` (unverified against floor $TOOL_FLOOR_MIN)") ;;
+        absent) absent+=("\`$_t\`${_mark:+ ($_mark)}"); continue ;;
+        below) below+=("\`$_t\` (found $_found, floor $_floor${_mark:+, $_mark})") ;;
+        wrong-impl) below+=("\`$_t\` (found $_found, requires $TOOL_FLOOR_IMPL${_mark:+, $_mark})") ;;
+        uncomparable) below+=("\`$_t\` (unverified against floor $TOOL_FLOOR_MIN${_mark:+, $_mark})") ;;
     esac
     tool_lines+="  - \`$_t\` — $ver$(render_floor "$_e" "$verdict")"$'\n'
 done
 absent_line="none"
-[[ ${#absent[@]} -gt 0 ]] && absent_line="$(printf '`%s` ' "${absent[@]}")"
+[[ ${#absent[@]} -gt 0 ]] && absent_line="$(printf '%s ' "${absent[@]}")"
 below_line="none"
 if [[ ${#below[@]} -gt 0 ]]; then
     below_line="$(printf '%s; ' "${below[@]}")"

@@ -3,7 +3,9 @@
 # good/bad pair cannot hold. The pair covers whole-element parity and the
 # floor-divergence rejection; this covers the two name-set directions the
 # widened assertion still owns, the three spellings of an unconstrained member,
-# and the implementation-token axis diverging on its own.
+# the implementation-token axis diverging on its own, and the audience axis in
+# parity, diverging each way, and written without the sigil that tells it apart
+# from an implementation token.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -66,9 +68,31 @@ check_case "impl-token-mismatch" "$tmp/d" 1 "roster says (coreutils), page says 
 write_case "$tmp/e" '- `jq` (≥ 1.5) — parses JSON inputs.' 'jq'
 check_case "page-invents-a-floor" "$tmp/e" 1 "roster says (none), page says (≥ 1.5)"
 
+# F — the audience axis renders and reaches parity: a roster element carrying the
+# fourth field is clean only against a bullet that publishes it.
+write_case "$tmp/f" '- `cargo` (≥ 1.56, @contributor) — builds the crate.' 'cargo:1.56::contributor'
+check_case "audience-in-parity" "$tmp/f" 0 "INSTALL-TOOLCHAIN: clean"
+
+# G — the silent failure this axis makes possible, caught: a member quietly
+# marked contributor-only drops out of every consumer's floor, and the page
+# saying nothing about it is what would have hidden that.
+write_case "$tmp/g" '- `git` — reads tracked files.' 'git:::contributor'
+check_case "undeclared-audience" "$tmp/g" 1 "roster says (@contributor), page says (none)"
+
+# H — the same divergence pointing the other way: a page that demotes a member
+# the roster still holds every audience to.
+write_case "$tmp/h" '- `git` (@contributor) — reads tracked files.' 'git'
+check_case "page-invents-an-audience" "$tmp/h" 1 "roster says (none), page says (@contributor)"
+
+# I — the sigil is what keeps the positional reader honest: an audience token
+# stripped of its `@` is an implementation token, and must red as one rather
+# than being silently accepted on the axis it was meant for.
+write_case "$tmp/i" '- `cargo` (≥ 1.56, contributor) — builds the crate.' 'cargo:1.56::contributor'
+check_case "audience-without-its-sigil" "$tmp/i" 1 "page says (≥ 1.56, contributor)"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-install-toolchain.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-install-toolchain.test: ok (both name-set directions still red; a bare bullet, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own)"
+echo "check-install-toolchain.test: ok (both name-set directions still red; a bare bullet, a trailing empty field and a doubled empty field are one unconstrained member; the implementation token and an invented floor each red on their own; the audience axis reaches parity, reds in both directions, and reds again when its sigil is dropped)"
 exit 0

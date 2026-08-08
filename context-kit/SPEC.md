@@ -244,17 +244,37 @@ the array `PROBE_SET` and the predicate below and executes nothing else. It
 carries no knob, deliberately: the roster is the kit's own dependency set, and a
 consumer who could override it could only make the contract lie.
 
-A roster element reads `<name>[:<min-version>[:<impl-token>]]`. A bare name keeps
+A roster element reads `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. A
+bare name keeps
 the original meaning — must be present, no version constraint — so the floor axis
 is **per-member** rather than a number demanded of every member. The fields are
 positional, so a member constrained by implementation alone carries an empty
 min-version field (`awk::GNU`), and an empty field means what an omitted trailing
-field means: `awk`, `awk:`, and `awk::` are one unconstrained member. **A member
+field means: `awk`, `awk:`, `awk::` and `awk:::` are one unconstrained member. **A member
 gains a floor only where a construct the battery actually runs forces one**, and
 the forcing construct is recorded with it — a floor nobody's code forces is not
 pinned, which is what stops a version number from rotting into an aspiration
 (de-literalization applied to a version: the value is owned where the constraint
 is provable).
+
+**The audience axis.** The fourth field names *whose* floor a member is, because
+the roster has two kinds of reader and one flat array gated both of them on all
+of it. Its value set is closed and kit-owned exactly as the floor predicate's
+verdict set is: the only declarable value is `contributor`, meaning *a
+contributor-side floor with no install-time role*. The unmarked case is not
+spelled — declaring the complement on every other member would be a roster
+maintained against itself — so the emptiness rule above carries it: an empty or
+omitted audience means every audience. `tool_floor_consumer_side <element>`
+answers the one question a consumer-side reader asks, and exists so no such
+reader re-implements that rule against a value set it does not own. A
+consumer-side reader — `installer/lib/doctor.sh`, whose exit status is `init`'s
+last precondition — filters its roster walk through that predicate and does not
+probe, render or fail on a member the predicate excludes. A contributor-side
+reader — `bin/env-probe.sh` — walks the roster whole and marks the audience
+instead, since a contributor-side floor is exactly what it is reporting on.
+The field is a grammar axis rather than a filter in the reader that needs it,
+because a hard-coded exception is a literal de-literalization forbids and one
+that re-fires the day a second contributor-only member lands.
 
 The constrained members and what forces each:
 
@@ -282,7 +302,11 @@ The constrained members and what forces each:
   the battery at all rather than failing one gate. The representative member is
   the binary carrying a forcing construct, which is also the floor predicate's
   own comparison tool.
-- `cargo:1.56` — a **contributor-side** floor, never a runtime one, and it carries
+- `cargo:1.56::contributor` — a **contributor-side** floor, never a runtime one,
+  and that reading is now declared on the element and read by name rather than
+  left as an aside: the audience field is what the consumer-side predicate
+  above resolves, so the sentence is enforced instead of merely written. It
+  carries
   two tiers because two kinds of tree read it. Where a `.gate` descriptor is live
   it is a **commit-time** floor — `gate_command` puts the binary on the pre-commit
   path and is fail-closed on an absent one, so the battery will not run without a
@@ -324,7 +348,12 @@ not one.
 **The rendered verdict.** Each toolchain bullet carries the probed banner and,
 for a constrained member, the constraint and its verdict — `` (floor 4.3, ok) ``,
 `` (requires GNU — below contract) ``, `` (floor 4.3 — unverified) ``; an
-unconstrained member carries no parenthetical. A `**Below contract:**` line joins
+unconstrained member carries no parenthetical. A member carrying an audience
+carries it here too, as `` (floor 1.56, contributor-only, ok) ``, and every line
+that names such a member is marked the same way — the absent list and the
+below-contract list included, because those are the two lines on which *below a
+floor that is yours* and *below a floor you are not on the hook for* would
+otherwise read alike. A `**Below contract:**` line joins
 the existing `**Absent:**` line, reading `none` when clean and otherwise naming
 each failing member through the verdict's own fields: `below` and `wrong-impl`
 are distinguished because the remedies differ — upgrade versus install a
@@ -752,8 +781,13 @@ order (the shadow's output, not the shipped grammar's, is what the golden
 records). The floor predicate rides the same runner rather than a fixture pair —
 it is a sourced function, not a gate: `index-tests/toolfloor-cases.sh` sources
 `lib/toolfloor.sh` and prints one line per (element, banner) pair, so the closed
-verdict set, the three spellings of an unconstrained member, and the
+verdict set, the spellings of an unconstrained member, and the
 `uncomparable` fail-closed arm are asserted against a golden rather than assumed.
+The audience axis is pinned in a second table in the same file, printing the
+parsed field and the consumer-side predicate per element rather than a verdict,
+because no verdict reads that field: its present, empty and omitted forms are
+each a case, the emptiness rule being the part of the grammar a reader is
+likeliest to get wrong.
 The runner registers as its own evidence-kit validate suite
 (`index_tests`, the `demo` precedent): the golden the refactor leans on now
 has an automated validate-stage consumer. `footprint.sh` is advisory the same way, but its

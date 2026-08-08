@@ -12,3 +12,12 @@ sort::coreutils | present (/usr/bin/sort) -> wrong-impl present
 bash:4.0 | GNU bash, no version here -> uncomparable
 bash:4.0:GNU | GNU bash, version 5.2.37(1)-release -> ok
 bash:4.0:GNU | bosh, version 3.1 -> wrong-impl bosh,
+cargo:1.56::contributor | cargo 1.86.0 (adbf5df3f 2026-01-01) -> ok
+cargo:1.56::contributor | cargo 1.40.0 -> below 1.40.0 1.56
+cargo:1.56::contributor -> audience=contributor contributor-only
+cargo:::contributor -> audience=contributor contributor-only
+awk::GNU:contributor -> audience=contributor contributor-only
+cargo:1.56:: -> audience=<empty> consumer-side
+cargo:1.56 -> audience=<empty> consumer-side
+cargo -> audience=<empty> consumer-side
+awk::GNU -> audience=<empty> consumer-side
