@@ -52,8 +52,7 @@ PROFILE="$(lock_field "$LOCK" profile)"
 VERSION="$(lock_field "$LOCK" version)"
 KITS=()
 read -r -a KITS <<<"$(lock_field "$LOCK" kits)"
-GATES_LIST=""
-[[ ${#KITS[@]} -gt 0 ]] && GATES_LIST="$(lock_own_file "$LOCK" /gates.list)"
+GATES_LIST="$(lock_own_file "$LOCK" "$GATES_DIR/gates.list")"
 
 kits_include() {   # $1 = kit name -> 0 iff the manifest records it as vendored
     local k
@@ -84,10 +83,10 @@ if [[ -n "${KEPT_HASH[$AGENT_FILE]:-}" ]] && kits_include doctrine-kit; then
         "the doctrine block is trimmed through the kit's own installer so the removal path adds no second copy of the marker strings, and this run needs it because $AGENT_FILE is being kept. Run uninstall from an installed package rather than a source checkout."
 fi
 
-# spec: installer/README.md §uninstall — the hook opt-in is reported, not rewritten: git config is outside the ownership roster, and a core.hooksPath naming a directory that no longer exists is inert rather than breaking, so there is nothing to justify writing outside the contract. The resolver is only asked on a manifest carrying kits, because the recorded kit set is the whole of what keeps it off the vendored fixture trees' own scripts/gates.list — a residual manifest has no kits, and the run that produced one already printed this line
+# spec: installer/README.md §uninstall — the hook opt-in is reported, not rewritten: git config is outside the ownership roster, and a core.hooksPath naming a directory that no longer exists is inert rather than breaking, so there is nothing to justify writing outside the contract. The resolver needs no kits guard: it asks the manifest for the exact path init writes, which a residual manifest simply does not record
 HOOKS_LINE=""
 hooks_path="$(git -C "$ROOT" config --get core.hooksPath 2>/dev/null)"
-if [[ -n "$hooks_path" && -n "$GATES_LIST" && "$GATES_LIST" == */* && ${#KITS[@]} -gt 0 ]]; then
+if [[ -n "$hooks_path" && -n "$GATES_LIST" && "$GATES_LIST" == */* ]]; then
     gates_dir="${GATES_LIST%/*}"
     rel="${hooks_path#"$ROOT"/}"
     [[ "$rel" == "$gates_dir" || "$rel" == "$gates_dir"/* ]] \

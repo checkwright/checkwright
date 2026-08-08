@@ -381,6 +381,14 @@ reports the toolchain clean **and names the finding**, rather than signing off
 as plainly clean — a `doctor` that printed `DIGEST MISMATCH` above and `clean`
 below would be the surface teaching a reader to disbelieve the last line.
 
+**The identity block names the registry this tree's battery runs from**, beside
+the version, commit, profile and kit set. It is the one install fact the identity
+fields cannot be read off, and the one a reader most needs when the report and
+the tree seem to disagree: a `doctor` that resolved the wrong file would
+otherwise say nothing at all about which one it inspected. A recorded registry
+missing from disk is named as such, and a manifest recording none says so — both
+with the same remedy, a re-run of `init`.
+
 `doctor` defines no floor of its own. It sources the toolchain roster out of
 its own `payload/` and renders whatever verdict that roster's predicate
 returns, so the contract keeps one owner and this stays a display of it. The
@@ -506,8 +514,8 @@ file never records itself. With nothing kept, it is deleted. With any entry
 **kept**, it is rewritten over the survivors instead: deleting it
 would disown exactly the paths the hash rule just protected, and the next `init`
 would find them unrecorded, read that as *never installed*, and write straight
-through your edits. §The manifest owns that residual shape and the argument for
-it.
+through your edits. That residual shape, and the argument for it, are owned by
+§The manifest.
 
 **The agent file is the one non-whole-file removal**, because it is the one
 entry that is a span rather than a file (§The manifest). Two branches. Its hash
@@ -608,6 +616,19 @@ the shape behind it.
 | `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
 | `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path. `uninstall` walks the same roster to decide what it may remove and what it must keep, and `diff` classifies it against the tree |
 | `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
+
+**Resolving one of your own seam files is an exact-path question, not a search.**
+`doctor` and `uninstall` both need to know which `gates.list` — or which
+`gate-sdk-config.sh` — is *yours*, because the vendored kits carry fixture trees
+holding files of the same name. `files` already answers it: it records the
+repo-relative path `init` wrote, and `lib/common/recipe.sh` owns the gates-dir
+constant `init` wrote it under, so `lock_own_file` asks whether the manifest
+records that exact path and returns it or nothing. A tail match cannot answer it,
+and **no predicate over the recorded kit set repairs a tail match**: `files`
+outlives `kits` by design, so a re-run at a narrower profile leaves the dropped
+kits' fixture paths on the roster with nothing excluding them, and the residual
+manifest below carries no `kits` key at all — there, such a predicate excludes
+nothing whatever. The consumer smoke's narrowing arm is the oracle for both.
 
 **A recorded hash is what `init` last wrote at that path** — on whichever run
 last wrote it — and not the state of the tree at the end of the current run. The
@@ -893,10 +914,11 @@ exercise a different file class and stay true without covering this one. This ar
 re-runs at the **same version with no flags**, which is the whole point — the
 class needs no upgrade and no `--force`, so an arm that only ran across versions
 would attribute it to a path it does not live on. It is its own scratch consumer
-at the `delegation` profile: `starter` is gate-sdk alone and gate-sdk ships no
-config template, so the templates are reachable only from `delegation` up, and an
-adopter edit inside the per-profile loop would break the file-by-file agreement
-that loop exists to assert. After the adopter edits and commits both, the re-run
+at the **maximum** profile — the only profile whose kit set is fixed by the
+payload rather than by a roster judgment, so both surfaces it edits are present
+by construction rather than by a membership row that may be revised — and its own
+consumer because an adopter edit inside the per-profile loop would break the
+file-by-file agreement that loop exists to assert. After the adopter edits and commits both, the re-run
 must leave both byte-identical, name both as changed, and still record `init`'s
 hash for each rather than the adopter's. It reuses the already-installed package,
 so it costs no second pack.
@@ -924,6 +946,19 @@ byte for byte, so the sort reached every nesting level rather than the top one.
 Both run here because this is the one call site that ever emits the
 no-identity, no-artifact shape; the per-profile loop's fresh install already
 exercises the other writer field by field.
+
+**The narrowing arm** is the only arm that moves a consumer *down* the lattice:
+it installs the maximum profile and re-runs `init` at the minimum. Every other
+re-run holds the profile fixed, so none reaches the state where `files` outlives
+`kits` — and that state is not exotic, it is the ordinary consequence of the
+carry-forward rule, which keeps every once-vendored path on the roster while the
+recorded kit set shrinks. It asserts that both seam paths still resolve
+to the consumer's **own** file, that a `kits`-stripped copy of the same manifest —
+the residual shape — resolves them the same way, and that `doctor` names the
+consumer's own `gates.list` as the registry it inspected. It also asserts its own
+premise first: some vendored fixture path must still shadow each seam basename
+after the narrowing, or the resolver has nothing to be ambiguous about and a
+green result would mean only that the payload changed shape.
 
 **The artifact arm rides the per-profile post-conditions**, taking whichever of
 §The gate binary's outcomes the payload and the host actually produce. Every arm

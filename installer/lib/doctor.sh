@@ -29,6 +29,9 @@ esac
 source "$FLOOR"
 # shellcheck source=./common/lock.sh
 source "$INSTALLER/lib/common/lock.sh"
+# spec: installer/README.md §What init seeds — sourced for the consumer-layout names, so the seam files this verb resolves are the ones init wrote rather than a second spelling of the path
+# shellcheck source=./common/recipe.sh
+source "$INSTALLER/lib/common/recipe.sh"
 # shellcheck source=./common/digest.sh
 source "$INSTALLER/lib/common/digest.sh"
 
@@ -93,11 +96,20 @@ else
         printf '  %-12s %s\n' profile "$(lock_field "$LOCK" profile)"
         printf '  %-12s %s\n' kits "$(lock_field "$LOCK" kits)"
 
+        # spec: installer/README.md §doctor — the registry this tree's battery runs from is named rather than left implicit: it is the one install fact an adopter cannot read off the identity fields, and a report that resolved the wrong file would otherwise say nothing at all about which one it inspected
+        list="$(lock_own_file "$LOCK" "$GATES_DIR/gates.list")"
+        if [[ -n "$list" ]]; then
+            printf '  %-12s %s%s\n' registry "$list" \
+                "$([[ -f "$ROOT/$list" ]] || printf ' — recorded, but not on disk; re-run init')"
+        else
+            printf '  %-12s none recorded — re-run init\n' registry
+        fi
+
         # spec: installer/README.md §The gate binary — the recorded digest's second reader: re-verifying the binary in place is the only thing standing between a consumer and one swapped after install, and the path is resolved from the knob that owns it rather than from a copy the manifest would otherwise have to store
         artifact_target="$(jq -r '.artifact.target // ""' "$LOCK" 2>/dev/null)"
         artifact_digest="$(jq -r '.artifact.digest // ""' "$LOCK" 2>/dev/null)"
         if [[ -n "$artifact_target" ]]; then
-            seam="$(lock_own_file "$LOCK" /gate-sdk-config.sh)"
+            seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
             bin=""
             [[ -n "$seam" && -f "$ROOT/$seam" ]] \
                 && bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$ROOT/$seam" | head -n1)"
@@ -116,7 +128,6 @@ else
         fi
 
         # spec: installer/README.md §The gate binary — the omitted-member record's second reader, reported against the reason that caused it because a remedy is what an adopter comes here for
-        list="$(lock_own_file "$LOCK" /gates.list)"
         if [[ -n "$list" && -f "$ROOT/$list" ]]; then
             while read -r count reason; do
                 [[ -n "$reason" ]] || continue
