@@ -53,11 +53,10 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-_Nothing is queued under this horizon._
+- **`prose-profile`** *(ecosystem)* — A profile for documentation repos, where there is no build to gate.
 
 ### next
 
-- **`prose-profile`** *(ecosystem)* — A profile for documentation repos, where there is no build to gate.
 - **`platform-support-ci-matrix`** *(reliability)* — A CI install-smoke leg per supported platform, or an honest label.
 - **`companion-toolkit-profile`** *(ecosystem)* — Gate a tree whose specs another toolkit's workflow wrote.
 - **`gate-authoring-sdk-surface`** *(ecosystem)* — Author a gate in any language behind one substrate-neutral descriptor.

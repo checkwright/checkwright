@@ -205,7 +205,7 @@
   that tool: verifying the split-lead posture's savings
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
-- **prose-profile** [design-pending] [roadmap: next/ecosystem] — a profile for non-code repos.
+- **prose-profile** [design-pending] [roadmap: now/ecosystem] — a profile for non-code repos.
   roadmap-summary: A profile for documentation repos, where there is no build to gate.
   The non-code universality rung: a third
   consumer shaped as a prose/documentation repo (no build, no test suite)
