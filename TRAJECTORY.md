@@ -186,6 +186,24 @@ companion ruling's condition already missed and recorded that **no surface says
 so** — this paragraph is that surface. The 2026-08-04 ruling still spends itself
 at the tag, exactly as it says, and ordinary cadence governs every tag after it.
 
+**CORRECTION appended 2026-08-08 at scope, by operator ruling authorizing this
+session to write it. The ruling above stands unstruck; its dated fact does not.**
+The paragraph states that the newest tag and the newest Release are both v0.21.0
+and that no tagged release has ever published a prebuilt binary. Both were true
+when written and neither is now: **v0.22.0** is the newest tag and a published,
+non-draft Release carrying `checkwright-gates-x86_64-unknown-linux-gnu` and its
+`.sha256` beside the tarball. So the tag this ruling ordered **has been cut**,
+and the 2026-08-04 escalation is spent exactly as both rulings say it would be.
+**The decision is untouched — only its dated ground aged**, which is the
+re-verification this file's reading rule asks of a session meeting a recorded
+fact rather than the reversal that stays operator-class. Verified against
+`git tag` and `gh release view v0.22.0`.
+
+Worth one line for `ruling-record-condition-staleness-probe`, which the
+paragraph above invokes: the surface written to record *that* condition-miss has
+now gone stale itself, in under a day. The class the probe is filed against
+reaches this file's corrections, not only its conditions.
+
 **`init-claim-stickiness` enters through the next scope's standing directive —
 ruled 2026-08-04.** It is neither left to win an undirected survey nor filed
 straight into an active section. The defect: `init`'s non-destructive re-run
