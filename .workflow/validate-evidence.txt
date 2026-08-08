@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+installer-lifecycle-verbs gates sha256=c713e0e69c8ae8a07d6f5054a5c98283e6950138d5a6766d331b3f0e51cabcb9 pass=98 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs gate_sdk sha256=392f3603e1cfbf2a9256076a5f644740d76e98653096c65a93e2d185a2386a8c pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs canon_kit sha256=dd0eda66b26b3bd3c18cc292b3ea0fee2e1fb6eaf96b9c8b450e1bf19c89f262 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs guard_kit sha256=776855f49f35b5c60d574faa8e88d370bfca381233856dae1d3be50edb34502f pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs lifecycle_kit sha256=106a4469cdbf3a4ccfc3810c189ab2f1df9a79ed21b60095bab0f90af9c7f1f7 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs queue_kit sha256=0fb8ae0cd6cd3e5357ddede4d3d4f49ae48de8b22824c6be4449400ec71f3c9f pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs demo sha256=f63edb84242ae01e8057bcf4efe57eaa470a2b5724523adcfb2ed96010fed4a6 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs installer_smoke sha256=323efd756c737539ef278b3c55afd8666e46c70a8fd4d41fd4e57a98d80ff6bf pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs consumer_smoke sha256=200b98fb6fac3c16a4ae3da43ff92f7366475d9b3a53af5f683a33aa99cd1a68 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs upgrade sha256=f710946d419e21353b46a7db928b6acfe939509e51df6f0e303d831ce200326e pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs agents_md_smoke sha256=c481449c14d7ce21fede738803dd715ce65c11dfdbd41313e89efff41fab609a pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+installer-lifecycle-verbs native_crate sha256=d6954561fd0b15f15ce236b91824e0afae0701c6b242ac67546ddc4c8a831368 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
