@@ -12,33 +12,6 @@
 
 ## New Features
 
-- **profile-keyed-install** [spec: SPEC-profile-lattice.md] — the profile becomes a key.
-  Slice (a) of the `prose-profile` rung, and nothing more: no fourth profile and no
-  prose gate cohort ship here. `recipe_gates` takes the profile as its second
-  argument, `installer/lib/common/profile.sh` gains a derived order and a derived
-  per-profile gate set, and the containment contract that five surfaces assert
-  separately collapses into one bounded lattice the installer smoke computes.
-  **What the lattice replaces.** `installer/consumer-smoke/run-smoke.sh` loses its
-  bare `at most three profiles` cardinality bound and the two `contains` calls that
-  name `starter` and `delegation` as literals; after it, no profile name is a literal
-  anywhere in the smoke. `installer/profiles.list`, `installer/README.md` §Profiles
-  and §The consumer smoke state the lattice; `docs/install.md` §Quick start is a
-  ruled no-op, because today's three profiles genuinely are a chain.
-  **The assertion that earns the profile argument** is gate-roster monotonicity:
-  what an adopter experiences is the battery, not the directory list, so
-  "moving up only ever adds" is a claim about gates. Kit-set containment stops
-  implying gate-set containment the moment a roster can vary by profile. It cannot
-  fail on this tree — every arm ignores the profile today — and that is stated in
-  the amendment as its honest limit: it arms before the first profile-varying arm
-  lands, so the prose-profile iteration meets it at its own commit.
-  **Deliberately not threaded:** `recipe_seed` and `recipe_config_seam_plan` stay
-  profile-blind. The kit set is a sufficient key for what a profile *seeds* and an
-  insufficient key for what it *registers* — that asymmetry is the unit. A parameter
-  with no reader is removed, so neither gets one.
-  Promoted 2026-08-08 by spec from the operator's `install-profile-seam` cut
-  (TRAJECTORY.md §The closed rulings); unblocks `prose-profile` and
-  `companion-toolkit-profile`, which pay this bound otherwise.
-
 - **kit-owned-install-recipe** [spec: SPEC-install-disposition.md] — the roster is
   derived from the gate.
   A gate declares its own `# install: <disposition>` beside its `# graph:` and
@@ -4187,6 +4160,7 @@
 
 ## Done
 
+- profile-keyed-install
 - stage-economics-log-multi-session-undercount
 
 ## Lessons Learned
