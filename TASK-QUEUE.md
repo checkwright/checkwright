@@ -3912,6 +3912,119 @@
   its stage ran more batches.
   Filed 2026-08-08 by close, from running the meter during its own housekeeping.
 
+- **trajectory-prune-on-completion** [design-pending] — the ruling record grows unbounded and
+  nothing retires a finished row.
+  **Operator-ruled 2026-08-08**; the ruling, its sanctioned practice, its explicit
+  non-settlements and its honest limit are recorded in `TRAJECTORY.md` §The closed rulings and
+  are not restated here. The measured harm at this close: 530 lines, +76 this iteration.
+  **Filed as its own entry on the operator's stated preference, cross-referencing
+  `ruling-record-condition-staleness-probe` rather than widening it.** That entry covers only
+  *condition-bearing* rulings and rules the prune out of its own scope in its own words — the
+  enforceable half is a probe, never a prune — so no entry today covers general obsolescence
+  curation. An escalating probe and a prune-on-completion pass are different deliverables.
+  **The design question this entry owns: who may prune, and on what trigger.** The ruling names
+  neither, deliberately. One input the design owes an answer to is already recorded beside it:
+  the appended CORRECTION rules a false ground appended-to-never-struck, and the boundary
+  between *finished subject* and *live correction* is exactly what a trigger has to draw.
+  **Cost while deferred:** the ruling buys nothing mechanically until the trigger exists —
+  absent one a session correctly preserves obsolete content — so the growth continues and every
+  session consulting the record pays for rows whose subject is finished.
+  Filed 2026-08-08 by close, draining the gap inbox.
+
+- **spec-pointer-self-section-citation** [design-pending] — a bare `(§Heading)` self-citation is
+  outside every citation gate's reach.
+  `check-spec-pointer`'s prose pass fires only on a **tracked path immediately followed by the
+  section mark**, so a citation naming a section of the file it already sits in — the ordinary
+  intra-SPEC form — is never resolved against that file's headings. A dead one survives
+  indefinitely and rides the docs mirror to the public site.
+  **Found live, not hypothesized.** `delegation-kit/SPEC.md` cited `§The staleness contract`,
+  a heading no file in the tree carries; the mirrored page published it and a queue entry had
+  copied it. Repointed at this close, so the instance is gone and the class is not.
+  **Why it looks cheaper than it is.** The candidate set is large and mostly correct, so the
+  design question is the resolution rule rather than the scan: a self-citation resolves against
+  the containing file's own headings, which is a different lookup from the path-qualified form
+  the gate already does, and the two must not be conflated in one pass. It sits on the same
+  extractor the deferred `check-spec-pointer` citation entries name — sequence it with them
+  rather than building a second scanner.
+  **Cost while deferred:** a dead intra-file pointer reads as a live one, and the mirror
+  publishes it, so the failure is silent on both the governed and the public tier.
+  Filed 2026-08-08 by close, generalizing the gap it drained.
+
+- **readonly-dispatch-isolation-unbuyable** [design-pending] — the shape that makes a read-only
+  claim is the shape that poisons the read.
+  `scripts/agent-dispatch-guard.sh` refuses a `DELEGATION_KIT_READONLY_TYPES` dispatch without
+  `isolation: worktree`, which is correct — a read-only claim is made by isolation, not by
+  sentence. But the harness cuts that worktree at a **stale base**, not at HEAD, so the audit
+  the isolation was bought for reads the pre-change tree. The two rules compose into: a
+  declared read-only audit is either refused or unreliable, with no third option.
+  **Measured this iteration, on both halves.** A worktree was observed 21 commits behind,
+  predating the whole iteration; `/align` ran three isolated audit sweeps whose clean verdict
+  could not be certified, and all three build batches had to re-verify their own read sites to
+  buy the doubt out. Separately an in-flight worktree dirtied the tree and aborted the consumer
+  smoke at preflight (exit 2). The dirty-tree half is fixed — the path is gitignored — and the
+  stale-base half has only a protocol mitigation
+  (`delegation-kit/templates/agent-execution.md`): the child verifies `git rev-parse HEAD` and
+  reads targets with `git show <rev>:<path>` out of the shared object store.
+  **Why `[design-pending]`:** the mitigation is unenforced prose on the *child*, and nothing
+  holds a parent to putting it in the dispatch. The honest candidates are a guard that requires
+  the rev-discipline clause in a read-only dispatch prompt, a kit-side wrapper that injects it,
+  or a ruling that read-only fan-out reads only through the object store — the first two gate a
+  prompt's text, which is the reach question the design owes.
+  **Cost while deferred:** an isolated audit's verdict is uncertifiable, so its consumer either
+  re-verifies the same sites (paying for the audit twice) or trusts a read that may predate the
+  work under review — and this close could not dispatch its two due audits at all, running them
+  in-session instead.
+  Filed 2026-08-08 by close, from the knowledge-friction capture and the gap it drained.
+
+- **deferred-release-declaration-accumulation** [design-pending] — only one of the note's three
+  sections survives a deferred release.
+  `.workflow/tightened-gates.txt` is the accumulating declaration surface for **Tightened
+  gates** and is drained only at the tag, so that section batches correctly across any number of
+  deferrals (RELEASING.md §The procedure step 1). **Behavior changes** and **Renamed knobs** have
+  no such surface: RELEASING.md step 2 says the outstanding criteria are carried into the next
+  qualifying note, and nothing carries them. A deferral therefore drops them unless a later
+  session reconstructs them from `git log`.
+  **Already live, twice.** `installer-lifecycle-verbs` deferred on a minor earned by behavior
+  changes alone — its tightened-gates surface was empty — so its declaration exists only in the
+  basis clause of its disposition line. This close defers again with five behavior changes and
+  one tightened gate; the composed bullets are carried below so the next qualifying note
+  inherits them from a committed surface rather than from session memory.
+  **The carried Behavior-changes declarations, composed 2026-08-08.** One paragraph per bullet;
+  each opens on the changed surface's name, which the composing session bolds as the lead token
+  the grammar docs/install.md §The upgrade contract owns.
+  *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
+  bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
+  advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
+  merely cites it. The recurrence judgment moved to close's gap-inbox drain, which reads every
+  bullet and stamps the `recurrence:` declaration in the same commit that truncates the inbox.
+  Reconcile if your close skill or tooling parsed the retired prefix form.
+  *`kpi-incident-recurrence`* (drift-kit) — the counted series is **not comparable across this
+  release**. Every `recurrence:` date before it was matcher-derived; every date after is a
+  session's judgment read off a bullet's prose. Compare within a segment, never across the
+  break. For this project the break is the release carrying `gap-resolver-mention-overcount`;
+  for a consumer it is that consumer's own adoption of it.
+  *`installer/lib/doctor.sh`* — `doctor` now walks only the consumer-audience subset of the
+  toolchain roster, so a machine with no Rust toolchain installs. Reconcile if you copied the
+  roster out or relied on `doctor` failing on a contributor-side tool.
+  *`context-kit/lib/toolfloor.sh`* — a roster element gained a fourth positional field,
+  `<name>[:<min-version>[:<impl-token>[:<audience>]]]`. The only declarable audience is
+  `contributor`; empty or omitted means every audience, so existing elements are unchanged.
+  Reconcile if you carry a local roster read by a consumer-side reader of your own.
+  *`.github/workflows/site-health.yml`* — a release-channel arm was added: it reads the
+  published Release list on the schedule and files a `site-health` issue naming every Release
+  whose prerelease flag disagrees with its own version line. Reconcile if you copied the
+  workflow out.
+  Renamed knobs: None.
+  **Why `[design-pending]`:** a second accumulating file is the obvious fix and is probably
+  wrong — three surfaces to drain at one tag, two of them free prose a gate cannot hold to the
+  note the way `check-tightened-gates-note-parity` holds the first. The honest alternatives are
+  one declaration surface carrying all three sections, or making the deferral line's basis the
+  declared carrier with a gate that reads it.
+  **Cost while deferred:** each deferral loses its non-gate declarations to git history, and the
+  next qualifying note ships a Behavior-changes section that under-declares by however many
+  iterations batched into it — which is exactly the section a consumer reconciles by reading.
+  Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
