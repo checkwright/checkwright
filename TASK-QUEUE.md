@@ -4025,6 +4025,28 @@
   iterations batched into it — which is exactly the section a consumer reconciles by reading.
   Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
 
+- **always-loaded-baseline-restamp-unforced** [design-pending] — the brevity pass reacts to a
+  delta nothing keeps per-iteration.
+  `--update-baseline` is specified as a close-stage act precisely because the pass must react to
+  *growth since the iteration started* rather than to the level (context-kit/SPEC.md §The
+  always-loaded meter). Nothing forces it, and `kpi-always-loaded` is advisory, so a close that
+  skips the re-stamp silently converts the next close's delta into a cumulative one — and the
+  reading degrades further with every close that then trusts it.
+  **Measured at this close:** the baseline last moved 2026-07-19 and had gone unrefreshed
+  through roughly fifteen iterations, reporting `+41` where this iteration's own always-loaded
+  growth was zero. The inherited 40 lines were read against the brevity criterion here and kept
+  — each is a one-line-plus-pointer resident rule whose trigger is genuinely every session — so
+  the debt is the broken signal, not the surface.
+  **Why `[design-pending]`:** the obvious fix, a gate asserting the baseline commit is recent,
+  gates a *cadence* rather than a property and would red on any close that legitimately had
+  nothing to re-stamp. The honest candidates are folding the re-stamp into the same commit the
+  brevity pass already writes, or making the meter report both deltas — against the baseline and
+  against the iteration's first stamp — so a stale baseline is visible in the reading instead of
+  invisible behind it.
+  **Cost while deferred:** a cumulative delta reads as this iteration's growth, so the pass
+  either re-reads surface it already cleared or dismisses a real addition as inherited.
+  Filed 2026-08-08 by close, from running the meter during its own brevity pass.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
