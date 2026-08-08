@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **consumer-toolchain-floor-filter** [spec: SPEC-toolchain-audience.md] — the installer
-  refuses to install on a machine with no Rust toolchain.
-  `context-kit/lib/toolfloor.sh`'s `PROBE_SET` is one flat roster with no audience axis, and
-  `cargo:1.56` is in it. `installer/lib/doctor.sh` iterates the whole array and exits 1 on an
-  absent member; `installer/lib/init.sh` runs doctor as its last precondition and dies. So
-  `init` and `update` both refuse on a cargo-free machine — **objective 5 violated verbatim**
-  against the preview cohort, and a direct contradiction of `docs/install.md`'s published
-  claim that *no install path asks you for Rust*.
-  The demand is inherited rather than intended: `init` never compiles, verifies by digest,
-  places by copy, and gate-sdk's starting registry carries no `.gate` descriptor on any
-  profile — so the refusal blocks an install that would not have used the binary at all.
-  **Never caught** because the consumer smoke's own preflight requires `cargo`+`rustc` before
-  it will run, so every `init` it drives runs on a machine that has them.
-  The amendment gives the roster a fourth positional field (audience), filters `doctor` to the
-  consumer subset, publishes the declaration in the gated `docs/install.md` block, and points
-  the smoke's existing proven `PATH`-mask mechanism at `cargo`/`rustc` for a toolchain-free arm.
-  Ruled in by the operator 2026-08-08 as unit 1 of `adopter-floor-integrity` (TRAJECTORY.md);
-  authored by spec, which promoted it — scope promoted none of the iteration's three units.
-
 - **published-release-channel-flag-unheld** [spec: SPEC-release-channel-host-state.md] — the
   channel gate holds the creating invocation, and nothing holds a Release already published.
   `.github/workflows/publish.yml` passes `--prerelease` unconditionally while the channel is
@@ -4000,5 +3981,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- consumer-toolchain-floor-filter
 
 ## Lessons Learned
