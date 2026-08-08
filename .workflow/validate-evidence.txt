@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+adopter-floor-integrity gates sha256=7fe65c1001ee75c956a9c3dcc8886bf075ad26b59720b61e1bc811ab6991e1d7 pass=99 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity gate_sdk sha256=392f3603e1cfbf2a9256076a5f644740d76e98653096c65a93e2d185a2386a8c pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity canon_kit sha256=dd0eda66b26b3bd3c18cc292b3ea0fee2e1fb6eaf96b9c8b450e1bf19c89f262 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity guard_kit sha256=776855f49f35b5c60d574faa8e88d370bfca381233856dae1d3be50edb34502f pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity lifecycle_kit sha256=c976a811ca7558d686fc305442d7393ec95403568832377733d8fa8bccac516d pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity queue_kit sha256=0fb8ae0cd6cd3e5357ddede4d3d4f49ae48de8b22824c6be4449400ec71f3c9f pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity guard_tests sha256=4c5b1aca8504deed2f4140380b96fadc929a43fef9da69f72414947a74df08ff pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity demo sha256=563e6cef52a5dc28de9783714c4c49cc1fad433c83a06b5947945dc86ab075af pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity installer_smoke sha256=54d5337aa13cf2c30c1cc92b3d34a43809d793976ddb361fdb5ac95f217322be pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity consumer_smoke sha256=062af824160cf1b2fc41c1708f7a7a5b144e233c5c59f3807aa6c0cb4f38c47f pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity upgrade sha256=812e81843324642337b517387238fc484fc59e2fa0eb7e82b2f4b2aa90442533 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity agents_md_smoke sha256=1db6b428ca740a5f8723887d55e9b592859f94505809f11991e9676ea8dab0c2 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
+adopter-floor-integrity native_crate sha256=3738ea6fff2342a365b3aca010ee5e050a9baafd2f681150eff8b0411c4cb5a7 pass=1 fail=0 ignore=0 verdict=clean 2026-08-08
