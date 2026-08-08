@@ -65,6 +65,35 @@
   builds after `profile-keyed-install`, which settles the signature this relocates
   behind.
 
+- **trajectory-prune-on-completion** [spec: SPEC-ruling-record-prune.md] — the record
+  keeps only what still directs.
+  `TRAJECTORY.md`'s header gains the completion-time half of its own contract — two
+  triggers, and they are the whole rule: a ruling whose subject is finished is deleted
+  outright, and a fact that has aged is corrected where it stands rather than appended to.
+  Retirement is distinguished from reversal, which stays operator-class and unchanged, and
+  the authority to retire is made symmetric with the authority to record: neither decides
+  anything.
+  **The append-never-strike precedent is retired for resting on a false ground.** It holds
+  that striking a clause destroys the evidence of what was believed; the record refutes
+  itself on that within one section, since its own pruning ruling holds that git history
+  carries obsolete changes and the motivation behind them. No competing interest is
+  outweighed, because none was at risk.
+  **The disposition roster is the design and it is in the amendment**, ruling-by-ruling:
+  nine keep, one of them corrected in place, the rest deleted on verified tree facts.
+  This iteration's own cut record is a keep — corrected for the operator's widening to
+  four units, and given an explicit discharge event so this iteration's close deletes it
+  without re-deriving the judgment. `§PRIORITY DIRECTIVE`'s four discharged steps go while
+  three standing rules attached to them survive the renumbering.
+  **Enforcement rides an existing gate, not a new one.** `check-manifest-temporal` already
+  scans the record and its invariant is this ruling's ground verbatim; canon-kit gains a
+  `_EXTRA` merge on its marker set, following the convention two of its arrays already
+  use, and this repo configures the four idioms — measured at zero hits outside
+  `TRAJECTORY.md` across all governed manifests. The limit is stated rather than papered
+  over: it holds the idiom, not the act.
+  Promoted 2026-08-08 by spec, fourth in the operator's `install-profile-seam` cut — the
+  operator's own widening. Complementary to `ruling-record-condition-staleness-probe`,
+  which keeps the machine-readable declaration.
+
 ## Technical Debt
 
 - **lock-own-file-narrowed-profile-drift** — `doctor` misreports which `gates.list`
@@ -3462,11 +3491,15 @@
   is met. Today obsolescence rides the unit that discharges the ruling, whose own entry names
   the rows it removes on landing; that holds only where an author remembered to write the
   removal in, and nothing catches the ruling whose condition was met by a unit that did not.
-  **The enforceable half is a probe, never a prune.** Retiring a recorded ruling is
-  operator-class, so a stage session may not edit one. The deliverable is a *staleness probe*
+  **The enforceable half is a probe, never a prune — and the ground for that has moved.**
+  It rested on retirement being operator-class, so that no stage session could edit a ruling;
+  the operator's 2026-08-08 pruning directive (`trajectory-prune-on-completion`) authorizes
+  the prune, so what keeps this entry to a probe is its own deliverable rather than an
+  authority limit. Detect and act stay complementary. The deliverable is a *staleness probe*
   over condition-bearing rulings that escalates, plus whatever declaration makes a condition
   machine-readable — a ruling stating its own discharge event is the design question, since a
-  prose condition carries no syntactic tell.
+  prose condition carries no syntactic tell. That declaration is this entry's alone: the
+  pruning unit deliberately ships a prose convention and no machine-readable form.
   **Verified live at the 2026-08-06 close: one condition unfired, one already missed.** The
   `gate-sdk/SPEC.md` rows conditioned on the first binaries tag still held, and the companion
   ruling naming one specific iteration's close as the tag point did *not*: that close passed
@@ -3477,6 +3510,10 @@
   the tag rather than against this paragraph: what the entry now attests is that a *second*
   condition changed state with no probe watching, which is the recurrence the deliverable exists
   to catch rather than a fact about any one row.
+  **The class reaches the record's corrections, not only its conditions** — the surface written
+  to record the missed condition above went stale itself in under a day. Relocated here from
+  `TRAJECTORY.md` by `trajectory-prune-on-completion`, which deletes it there: it is a design
+  input to this entry, not a directive the record owes a reader.
   **Why `[design-pending]`:** the condition vocabulary is the whole design, and the
   escalation-only boundary rules out the cheap fix.
   **Cost while deferred:** a ruling read as live after its condition passed steers the very
@@ -3929,25 +3966,6 @@
   published overclaims; what is missing is the assertion, not a correction.
   Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
   escalated as an envelope call and folded in here on the lead's ruling the same day.
-
-- **trajectory-prune-on-completion** [design-pending] — the ruling record grows unbounded and
-  nothing retires a finished row.
-  **Operator-ruled 2026-08-08**; the ruling, its sanctioned practice, its explicit
-  non-settlements and its honest limit are recorded in `TRAJECTORY.md` §The closed rulings and
-  are not restated here. The measured harm at this close: 530 lines, +76 this iteration.
-  **Filed as its own entry on the operator's stated preference, cross-referencing
-  `ruling-record-condition-staleness-probe` rather than widening it.** That entry covers only
-  *condition-bearing* rulings and rules the prune out of its own scope in its own words — the
-  enforceable half is a probe, never a prune — so no entry today covers general obsolescence
-  curation. An escalating probe and a prune-on-completion pass are different deliverables.
-  **The design question this entry owns: who may prune, and on what trigger.** The ruling names
-  neither, deliberately. One input the design owes an answer to is already recorded beside it:
-  the appended CORRECTION rules a false ground appended-to-never-struck, and the boundary
-  between *finished subject* and *live correction* is exactly what a trigger has to draw.
-  **Cost while deferred:** the ruling buys nothing mechanically until the trigger exists —
-  absent one a session correctly preserves obsolete content — so the growth continues and every
-  session consulting the record pays for rows whose subject is finished.
-  Filed 2026-08-08 by close, draining the gap inbox.
 
 - **spec-pointer-self-section-citation** [design-pending] — a bare `(§Heading)` self-citation is
   outside every citation gate's reach.
