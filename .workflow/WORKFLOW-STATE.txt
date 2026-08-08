@@ -7,3 +7,4 @@
 adopter-floor-integrity scope a2b789b0 2026-08-08
 adopter-floor-integrity spec a4ad9909 2026-08-08
 adopter-floor-integrity spec a9eca64c 2026-08-08
+adopter-floor-integrity spec ad166f21 2026-08-08
