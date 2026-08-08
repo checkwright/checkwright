@@ -266,6 +266,13 @@ in-payload value can. What raises it above a self-check is that the identical
 bytes are published on the Release, so a human can cross-check the value out of
 band. The claim is **verified against a published digest**, never *reproducible*.
 
+**The gate-sdk config seam rides this path and only this path.** `init` claims
+`scripts/gate-sdk-config.sh` inside the branch that has selected an artifact
+target, and gate-sdk ships no config-seam template for the generic seam plan to
+copy. On a payload carrying no artifact that file is therefore never written and
+is not a `files` entry at all — so a verb reasoning about the surfaces `init`
+rewrites on every run must not assume it is present.
+
 **Omission is declared and counted.** An omitted member rides the registry
 rather than a new file: `init` writes `# omitted: <name> <reason>` into the
 consumer's `gates.list` in place of the member's name — a comment line the
@@ -571,6 +578,11 @@ one class: a path `init` left alone because you had edited it. That path stays i
 rather than recomputed, so the next run still has something to compare your
 content against, still finds it different, and still leaves it alone. Editing a
 file changes who may write it; it never changes whether `init` is tracking it.
+
+**`checkwright.lock` is not on its own roster.** `init` adds the manifest to what
+it has written only after emitting it, so the lock file never records itself. Any
+path that walks `files` to decide what this installer owns therefore has to
+dispose of the manifest explicitly: the roster will not name it.
 
 **One entry is a span rather than a file, and it is still an ordinary entry.**
 Everything above reads a `files` row as a whole file `init` wrote. The agent

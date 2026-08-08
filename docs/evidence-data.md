@@ -78,3 +78,4 @@
 | native-first-port-cohort | sc sp a b v c | 6f/0d | 3 · ≤0d | 23s clean | 96 |
 | delegation-burn-reduction | sc sp a b v c | 5f/3d | 3 · ≤1d | 31s 1✗ | 97 |
 | native-cohort-activation | sc sp a b v c | 8f/1d | 4 · ≤0d | 24s clean | 98 |
+| installer-lifecycle-verbs | sc sp a b v c | 5f/4d | 1 · ≤0d | 24s clean | 98 |

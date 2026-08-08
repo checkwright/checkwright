@@ -3230,6 +3230,13 @@
   bullets carried an auto-stamped recurrence prefix fired by a bare mention — one naming
   `gap-resolver-mention-overcount`, one naming `recurrence-drain-input-widening` — and both had
   to be struck by hand at the drain.
+  **First attestation in its own direction, 2026-08-08.** A mechanical scan of the live slug set
+  across the whole gap inbox matched nothing, yet one of that drain's six bullets was a genuine
+  recurrence of `dispatch-worktree-reds-the-battery`: it described the defect — the worktree the
+  dispatch guard mandates, and the battery reddening while it lives — without ever spelling the
+  slug. The drain's session-side re-resolution caught it and stamped the date; the matcher alone
+  would have filed a duplicate entry. Every prior attestation on this cluster ran the
+  over-counting way, so this is the first measurement of the direction this entry names.
   **Why `[design-pending]`:** the under-matching direction has no syntactic remedy at all. The
   over-counting sibling can at least imagine a filer-supplied flag; here the missing signal is in
   the filer's head, so the honest candidates are a required recurrence-or-new field on
@@ -3557,6 +3564,7 @@
 
 - **dispatch-worktree-reds-the-battery** [design-pending] — a live agent worktree sits inside
   the tree, is not ignored, and fails the pre-commit battery while it exists.
+  recurrence: dispatch-worktree-reds-the-battery 2026-08-08
   An isolated dispatch materialises `.claude/worktrees/agent-<id>/`, a full second copy of the
   repo. `.gitignore` covers only `.claude/settings.local.json*`, so the directory shows as
   untracked and, worse, every tree-walking gate descends into it. Measured at this close: with
@@ -3573,9 +3581,17 @@
   scanner, so the real question is whether kit scanners owe a shared exclusion root and where
   that roster lives. Relocating worktrees outside the repo would fix both at once and is the
   harness's call, not the tree's.
-  **Cost while deferred:** every isolated dispatch blocks the committing session for its
-  duration, and the failure is misattributed by construction — the red names the session's own
-  files, not the dispatch, so the natural reading is that the session broke something.
+  **Cost while deferred:** the battery is the oracle every commit in this tree requires, and it
+  is dark for the whole duration of a read-only fan-out — so delegation and verification cannot
+  overlap, and the more a stage parallelises the longer its oracle stays unavailable. That is a
+  serialization constraint on every delegating session rather than an untracked-directory nit,
+  and it cannot be dodged by declining to use worktrees: the dispatch guard mandates the shape
+  that causes it. The failure is also misattributed by construction — the red names the
+  session's own files, not the dispatch, so the natural reading is that the session broke
+  something.
+  **Re-attested 2026-08-08**, from a build batch: a 3-red battery while one audit dispatch was
+  live — comment-tier on the copy's sources, and both freshness emitters counting the
+  duplicated markers — all pure pollution, self-clearing when the harness released the worktree.
   Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches.
 
 - **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
@@ -3713,6 +3729,13 @@
   counter-evidence half done properly. Nothing in any artifact says whether an edge sum was
   taken for any candidate, so the audit can neither confirm nor fault it. An audit that cannot
   return either verdict is not un-gateable, it is unanswerable.
+  **One named alternative happened on its own, 2026-08-08.** The next iteration's scope landed
+  its ranking survey in the survey record with `bin/queue-edges.sh` named as an oracle and the
+  inbound totals written into the finding itself — per-candidate sums for the recurrence cluster
+  and for the trajectory-sequence candidates. "Folding the sum into the existing survey record"
+  is therefore a shipped instance rather than a hypothetical, and this close's `survey-engagement`
+  audit was answerable and passed on it. What stays open is that nothing *required* it: the audit
+  is unanswerable again the moment a survey omits the sums.
   **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
   becoming ceremony, a stage writing down that it did the thing rather than doing it. The
   honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
@@ -3721,6 +3744,157 @@
   **Cost while deferred:** every close restamps an audit it did not actually perform, which is
   worse than a skipped audit — the roster reads as coverage.
   Filed 2026-08-07 by close, performing the `survey-engagement` audit its roster made due.
+
+- **release-runbook-identity-diagnosis** [design-pending] — the runbook reads a 404 as a
+  permission fault on a machine where it is an identity fault.
+  `RELEASING.md` step 4 treats a 404 on a write to the repo as a permission signature and
+  prescribes fixing the permission. That inference holds only where the host CLI is
+  authenticated as exactly one account. Where it holds two and the active one lacks push, the
+  same 404 appears with the permission model already correct — and the prescribed resolution
+  points at granting push to the account the private brief rules must **not** hold the
+  namespace, so following the runbook literally walks a session across the identity boundary
+  the brief exists to protect.
+  **Reachability, not merely wording.** Step 6 is unreachable from a session whose active
+  account is the non-owning one, which is the most likely reason the last tag's Release body
+  was never written. A close that defers its release never meets this; a close that cuts one
+  meets it mid-cut, with a note committed and a tag pending.
+  **Why `[design-pending]`:** the fix is not a sentence. A runbook diagnosing across a plural
+  identity has to establish which account is active and whether that account owns the namespace
+  *before* it reads any status code, and where that check belongs — a preflight step, step 4's
+  own prose, or a probe the procedure runs — is open. Part of why the runbook never said it is
+  that the desired account state is private-ops content and cannot land on a tracked surface,
+  so the runbook can name the discriminator but not its expected value.
+  **Cost while deferred:** the outward-facing half of the release path is blocked behind a
+  diagnosis that is wrong here and reads as authoritative, and the fix it prescribes is the one
+  action the identity boundary forbids.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope. Sibling on the same step:
+  `release-drain-ordering-contradiction` covers step 4's drain/tag ordering, this its diagnosis.
+
+- **published-release-channel-flag-unheld** [design-pending] — the channel gate holds the
+  creating invocation, and nothing holds a Release already published.
+  The repo front page advertises an older tag as Latest: that tag predates the preview-channel
+  mechanization and carries no prerelease flag, while the newer one was created with
+  `--prerelease` as the channel declaration now requires, so the host still resolves Latest to
+  the older. `check-release-channel-parity` reads the Release-creating step in the publish
+  workflow and the project's version line — its two invariants — and never the flag state of
+  Releases already on the host. The site-health probe does not read it either.
+  **Host-side state is out of every gate's reach, which is the class rather than the instance.**
+  The tree can be perfectly self-consistent while the front door advertises the wrong thing;
+  nothing in the repo is false, so nothing in the repo can red. What is unheld is the gap between
+  a declared channel and the accumulated Release history that declaration was meant to govern.
+  **Blocked from an inline fix, which is why it is filed rather than fixed.** The single command
+  that would correct it is a write against a published Release — exactly the path
+  `release-runbook-identity-diagnosis` records as 404-ing on this machine.
+  **Why `[design-pending]`:** a gate would have to query the host, which makes it a network
+  probe on the site-health lineage rather than a battery member. Whether the desired flag state
+  belongs in the private ops runbook as recorded desired state, in a scheduled probe, or as a
+  backfill step in the release procedure is the open call.
+  **Cost while deferred:** the most-read reader-facing surface the project has presents a
+  superseded release as current, on the adoption path, for as long as it stands.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope.
+
+- **gate-binary-target-roster-widening** [design-pending] — the binary ships one triple, and no
+  queue unit carries widening it.
+  `native/targets.list` declares exactly one target triple, so the last release published one
+  binary and every adopter off that triple takes the omit-and-declare outcome. That is a
+  supported result rather than a break — but it means the trajectory objective naming every
+  major operating system has no filed unit behind it on the artifact axis.
+  **Distinct from the two entries a reader reaches for first, which is why it is separate.**
+  `powershell-installer-surface` covers the bash bootstrap reaching a second interpreter, and the
+  shell support-matrix CI legs cover the test matrix; neither is about which binaries the publish
+  step produces. The design work is also half done and unowned — `installer/README.md` already
+  records this design's named re-entry and its two candidate shapes, so what is missing is the
+  unit, not the thinking.
+  **Why `[design-pending]`:** the two candidate shapes differ in what they cost the publish
+  workflow and in whether cross-compilation or a matrix of runners carries it, and choosing
+  between them is the unit's substance rather than a detail inside it.
+  **Cost while deferred:** a published objective has no unit behind it on this axis, so the gap
+  is invisible to the roadmap projection and to anyone reading that projection as a commitment.
+  Filed 2026-08-08 by close, draining the gap inbox; found at scope. **Deliberately untagged:**
+  whether this carries a curated roadmap tag, and so a public commitment, is scope's call.
+
+- **init-lifecycle-agent-block-seeding** [design-pending] — whether `init` should seed
+  lifecycle-kit's agent-file block is undecided, and the exclusion carries no rationale.
+  **Filed as an open question, not as an asserted defect.** `checkwright init` seeds doctrine-kit's
+  agent-file marker block and not lifecycle-kit's. The align census settled the mechanism beyond
+  doubt: of the shared injector's five tree-wide call sites exactly one is reachable from init's
+  payload flow, doctrine-kit's, and lifecycle-kit's own installer has zero call sites anywhere
+  under the installer, so init never invokes it. What the census does not settle is whether that
+  is right.
+  **Evidence on both sides, which is what makes it a question.** The recipe's gate-registration
+  rationale scopes lifecycle-kit's install-time exclusion to gates alone — lifecycle-kit's gates
+  read an attestation only a stage session can write, so they arm at the adopter's first stamp.
+  That reasoning does not on its face reach the separate exclusion in the agent-file predicate,
+  which names two kits and carries no stated rationale of its own. `installer/README.md` §What
+  init seeds does not answer the agent-file half either: it states that the agent file is created
+  once and left alone, with no per-kit breakdown. So this is either a considered decision whose
+  rationale was never written down, or a genuine gap — undetermined from the specs alone.
+  **Why `[design-pending]`:** the two outcomes differ in kind, not in size. If it was considered,
+  the deliverable is one sentence of rationale beside the exclusion. If it is a gap, the
+  deliverable changes what every adopter's agent file contains on a first install, which is an
+  adoption-surface change. Deciding which precedes any estimate of either.
+  **Cost while deferred:** an unexplained exclusion sits beside an explained one in the same
+  predicate, so each reader who notices re-derives the question and reaches the same undetermined
+  answer.
+  Filed 2026-08-08 by close, draining the gap inbox; found at align, outside that unit's scope.
+
+- **amendment-refusal-acceptance-parity** [design-pending] — an amendment's refusal rationale can
+  claim an acceptance criterion asserts something that criterion does not say.
+  The `--dry-run` amendment refused a gate on the stated ground that the behavioral property was
+  asserted directly instead, in D8, as *each mutating verb's* `--dry-run` leaving the tree object
+  unchanged. D8's own ordered specification listed one verb, not each. Two sections of one
+  governing document said different things about what that document accepts.
+  **The contradiction, not the coverage, is what earns the entry.** A build session reading either
+  section in isolation would have been correct and would have shipped a different acceptor — the
+  wide reading builds three assertions, the narrow one builds one. Build read D8's explicit list
+  and built to it, which is the conservative call and the right one, since widening asserted
+  behavior is envelope-shaped. But which acceptor shipped turned on which section the builder
+  happened to open.
+  **It passed spec and align.** Neither stage caught a self-falsifying document, which is what
+  makes this a methodology gap rather than one amendment's typo: the acceptance section is the
+  contract, the refusal section argues *from* it, and nothing compares the two.
+  **Gap generalization — the class that should have caught it.** The nearest sibling is
+  `intra-file-pendency-contradiction-scan`, which scans one file for a slug claimed landed in one
+  section and pending in another. Same family — a governed file falsifying itself, decidable with
+  no tree comparison — on a different axis: that one is about tense, this about the scope of an
+  acceptance claim. Cited rather than folded, because collapsing them would hand one gate two
+  unrelated vocabularies.
+  **Why `[design-pending]`:** the decidable predicate is not obvious. "A refusal section citing an
+  acceptance item must quote it" is checkable but is ceremony; comparing a paraphrase against the
+  criterion it paraphrases is a judgment no scanner makes. The honest middle — a refusal may cite
+  an acceptance item by identifier and may not restate its content — is a change to the amendment
+  format, which is doctrine rather than a gate.
+  **Cost while deferred:** any amendment can argue a refusal from a claim about its own acceptance
+  that no stage verifies, and the failure is silent — both readings pass every gate, and the
+  divergence surfaces only as a coverage gap found after the amendment is deleted.
+  Filed 2026-08-08 by close, draining the gap inbox; found at build. The one-assertion coverage
+  half is escalated to the operator separately, as an envelope call.
+
+- **stage-economics-log-multi-session-undercount** [design-pending] — the committed rollup keeps
+  one session per stage-model pair and silently drops the rest.
+  `bin/stage-economics.sh`'s log writer dedupes on the iteration-stage-model triple: it filters
+  prior matching rows out of the log, then appends the new one. Where a stage ran several sessions
+  on the same model the last row wins, so the logged figure is that one session rather than the
+  stage's total. The report on stdout is per-session and correct; only the persisted rollup is
+  lossy, and it is the persisted rollup that trends.
+  **Measured this close.** This iteration's build ran four batches tiered per batch across two
+  models, two sessions on each. The log retained one row per model, so each retained row carries
+  a single batch's draw as though it were the stage's — an under-report of roughly a third on
+  both models here, with nothing in the file marking that anything was dropped.
+  **Why this is more than untidiness.** The dedupe is correct for the shape it was written for —
+  one session per stage per model, where re-running the collector must not double-count — and
+  per-batch tiering is precisely the shape that breaks it. The rollup is the surface a standing
+  model-tiering watch reads, so the number that decides whether a cheaper tier paid off is taken
+  from the column that lost the batches.
+  **Why `[design-pending]`:** summing is not obviously right either, because the collector is
+  re-runnable and a naive sum double-counts on every re-run. The honest candidates are keying the
+  log by session rather than by stage-model, or keeping the grain and making the row an explicit
+  aggregate the writer recomputes from every matching transcript — the first changes the log's
+  grain and every reader of it, the second moves the work into the writer.
+  **Cost while deferred:** a tiering decision is judged against an undercount whose size varies
+  with how many sessions a stage happened to split into, so a model looks cheaper exactly when
+  its stage ran more batches.
+  Filed 2026-08-08 by close, from running the meter during its own housekeeping.
 
 ## Icebox
 

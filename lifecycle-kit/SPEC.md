@@ -599,6 +599,8 @@ slug is queue-kit's existing in-body citation form (queue-kit/SPEC.md §The tag
 algebra), borrowed rather than re-spelled. Committed, not gitignored — a
 per-clone buffer fragments the backlog across
 operators, the finding that rules the gitignored friction log out as the channel.
+What *append-only* means on this surface is a merge property, and
+§Multi-operator semantics owns it: this is the kit's one `union`-driver surface.
 
 **The affordance.** `bin/file-gap.sh "<gap prose>"` (the `bin/kfric.sh` pattern:
 repo-root cd, config-via-env, exit 2 on an empty argument) appends one dated
