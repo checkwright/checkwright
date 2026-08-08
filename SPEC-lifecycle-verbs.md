@@ -172,9 +172,19 @@ rather than assumed:
   an absent `version` skips it — correct, since there is nothing to roll back.
 - `init` re-reads `profile` only to default it; absent, it falls through to
   `starter`, which is what a virgin tree gets and what the residue is.
-- `lock_own_file` narrows its fixture-exclusion predicate with `kits`. Its only
-  readers are `doctor` and the consumer smoke, and both branches that call it
-  need an `artifact` key or a `gates.list` a residual tree does not have.
+- `doctor`'s installed-block reads `commit` for display only
+  (`lock_field "$LOCK" commit`), which prints blank on absence — the same
+  tolerance as `version` and `profile`.
+- `lock_own_file` narrows its fixture-exclusion predicate with `kits`; absent,
+  the predicate excludes nothing rather than erroring, so it degrades to "no
+  exclusion," not to a crash. Its only readers are `doctor`'s artifact check
+  and its omitted-gates block. The premise that makes both moot on a residual
+  tree is **not** "a residual tree has no `gates.list`" — a kept `gates.list`
+  is in fact the single most plausible residue cause, an adopter-edited seam
+  file being exactly what a residual manifest exists to protect. It is instead
+  that D7 routes both call sites behind the same residue check that gates the
+  identity-field prints, so neither runs at all on a residual tree regardless
+  of which files survived.
 
 The wire key stays `checkwright-lock v1`, on §The manifest's own precedent: this
 makes previously-always-present fields optional within a shape a reader already
@@ -194,6 +204,23 @@ marker-bounded doctrine block inside it. Two branches:
   because the block is prose the adopter did not write, in the one file whose
   purpose is to steer agent sessions, pointing at a `doctrine-kit/DOCTRINE.md`
   this verb just removed. Leaving it inert is not neutral on that surface.
+
+**Scoped to what `init` recorded, and only that.** The trim touches the
+doctrine-kit span and nothing else in the file. A consumer whose agent file
+also carries a *different* tool's marker-bounded span — lifecycle-kit's own
+registration block (`<!-- lifecycle-kit:begin -->` … `<!-- lifecycle-kit:end
+-->`) is the concrete instance; this repo's own `CLAUDE.md` carries one —
+keeps that span untouched even on the hash-differs branch, because
+`checkwright init` never writes it: `installer/lib/common/recipe.sh`'s
+`recipe_needs_agent_file()` names only `context-kit` and `doctrine-kit`, and
+the `lifecycle-kit` case of `recipe_seed()` never calls
+`install-lifecycle.sh`. A block `init` never wrote is never a `files[]` entry,
+so it is never manifest-recorded — and trimming it would not close a gap, it
+would be the exact violation the acceptance shape above rules out, a removal
+reaching outside what the manifest records to touch content this verb was
+never told it owns. That is a scoping fact about this delta, not an
+incompleteness in it: nothing here claims the agent file carries only one
+tool's span, only that `uninstall` acts on the one it is responsible for.
 
 The trim runs through the *payload's* copy of `install-doctrine.sh`, exactly as
 `init`'s injection does, so it is independent of removal ordering and works when
@@ -255,29 +282,56 @@ moment that promise has to be kept rather than restated.
 
 `lock.sh` gains `lock_emit`: it reads `<path><TAB><hash>` lines on stdin, takes
 the optional top-level identity fields as `key=value` arguments and the nested
-artifact as `--artifact <target> <digest>`, and emits the sorted JSON object.
-`init`'s `manifest()` becomes a call to it — its `files_hash` carry-forward logic
-stays in `init.sh`, since which hash an entry carries is `init`'s rule, not the
-schema's — and `uninstall` calls it with the survivor lines and no identity
-fields at all.
+artifact as `--artifact <target> <digest>`, and emits **a JSON object whose
+keys are sorted at every nesting level** — the top-level object, and `files`
+and `artifact` within it alike — with no field ever emitted out of key order.
+That is the contract this delta owns; `jq -S .`, which today's `manifest()`
+already pipes its output through, is the implementation that happens to
+satisfy it, not the definition of it, so a future reimplementation is free to
+drop `jq` entirely as long as the sort property holds. The `artifact` key
+follows the existing present-only-when-supplied rule: passing `--artifact`
+emits the key, omitting the flag omits the key — never a `null` or an empty
+placeholder in its stead. `init`'s `manifest()` becomes a call to it — its
+`files_hash` carry-forward logic stays in `init.sh`, since which hash an entry
+carries is `init`'s rule, not the schema's — and `uninstall` calls it with the
+survivor lines, no identity-field arguments, and no `--artifact` flag, so the
+residual object carries `schema` and `files` only, matching §The residual
+manifest exactly.
 
 This is the delta most able to break every install if it is got wrong, which is
-why it is a delta of its own rather than a footnote to D3.
+why it is a delta of its own rather than a footnote to D3. It is also, by the
+same token, the one enforcement-first owes a gate for rather than a stated
+property alone — D8 gains the assertion that catches a divergence in either
+half of this contract.
 
 ### D7 — `installer/lib/doctor.sh` — residue and the pointer {mechanical}
 
-Two additions, both inside the block `doctor` already prints inside a vendored
-tree, and neither touching the exit status:
+A manifest carrying `files` and **no `version`** is a residue rather than an
+install — the discriminator is the absent `version`, which is the field an
+install always has and a residue never does. This is a **guard on the existing
+block, not an addition beside it**: today `doctor` unconditionally prints
+`installed` followed by the version/commit/profile/kits identity lines, then
+the artifact check, then the omitted-gates block
+(`installer/lib/doctor.sh:80-124`). A residual tree takes none of that path.
+`doctor` instead says so and names the count: no install here, N file(s)
+remain that a previous install wrote and you have since edited, they are
+yours, and a future `init` will still protect them. The identity lines, the
+artifact check, and the omitted-gates block are per-install readings with
+nothing to compute once there is no install — printing them beside the residue
+message would be exactly the mixed-verdict shape §The verb taxonomy this
+settles already rules out on `doctor`'s own surface (the reason `diff` is a
+fourth verb rather than folded in), so this amendment does not reintroduce it
+one section later. A kept `gates.list` is reported the same way as any other
+survivor — by `diff` and by `uninstall --dry-run`'s plan — never by the
+omitted-gates block, which does not run on a residue tree regardless of which
+files it kept.
 
-- A manifest carrying `files` and **no `version`** is a residue rather than an
-  install. `doctor` says so and names the count: no install here, N file(s)
-  remain that a previous install wrote and you have since edited, they are
-  yours, and a future `init` will still protect them. The discriminator is the
-  absent `version`, which is the field an install always has and a residue never
-  does.
-- One line naming `diff` as where per-file divergence is answered. Without it
-  `DOCTOR: clean` invites reading as a claim about the tree's contents, which it
-  has never been and must not become now that a verb makes that claim.
+One further, unconditional addition: a line naming `diff` as where per-file
+divergence is answered, on both the install and the residue path. Without it
+`DOCTOR: clean` invites reading as a claim about the tree's contents, which it
+has never been and must not become now that a verb makes that claim.
+
+Neither addition touches the exit status.
 
 ### D8 — `installer/consumer-smoke/run-smoke.sh` — the reversal arm {design-bearing}
 
@@ -319,6 +373,19 @@ exactly those two paths **at `init`'s hashes, not the adopter's** — the same
 apart-naming the upgrade arm already uses, and for the same reason: an entry
 dropped reads as never-installed and an entry at the adopter's hash reads as
 unchanged, and both would let the next `init` write through them.
+
+**The residual object is asserted for shape, not just for field presence** —
+D6's two-writer contract is exactly what a `lock_field`-style read cannot
+catch, since a missing key and a present-but-null key both read back as empty
+string. So this arm asserts the shape directly on the captured
+`checkwright.lock` text: `jq -e 'has("artifact") | not'` holds (the omitted
+flag left the key absent, not null), and re-piping the captured object through
+`jq -S .` reproduces it byte-for-byte (the recursive-sort property held, not
+just a top-level or accidental one). Both assertions run on this arm's
+residual object, which is the one call site — `uninstall`'s — that ever emits
+`lock_emit`'s no-identity, no-artifact shape; the per-profile loop's fresh
+install already exercises the other call site through `assert_install`'s
+existing field-by-field checks.
 
 *Cost, stated because arms are not free:* no new pack and no new scratch consumer
 — both arms extend consumers that already exist.
