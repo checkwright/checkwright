@@ -31,6 +31,28 @@
   Ruled in by the operator 2026-08-08 as unit 1 of `adopter-floor-integrity` (TRAJECTORY.md);
   authored by spec, which promoted it — scope promoted none of the iteration's three units.
 
+- **published-release-channel-flag-unheld** [spec: SPEC-release-channel-host-state.md] — the
+  channel gate holds the creating invocation, and nothing holds a Release already published.
+  `.github/workflows/publish.yml` passes `--prerelease` unconditionally while the channel is
+  `preview`, so the host resolves Latest to v0.21.0 — the newest release carrying no flag, from
+  before the mechanization — and the gap widens per release. The front page and
+  `/releases/latest` therefore advertise a release predating the prebuilt gate binary, the
+  uninstall verb, and the install-claim repair. `check-release-channel-parity` holds the
+  creating step and the newest version line, and never the Releases themselves.
+  **Host-side state is out of every gate's reach, which is the class rather than the instance.**
+  Nothing in the repo is false, so nothing in the repo can red; a reader sweep across every
+  tracked `*.sh`/`*.md`/`*.yml`/`*.json`/`*.ps1` finds no in-tree reader of the Latest pointer,
+  which is why the exposure is entirely reader-side.
+  The amendment composes the two existing invariants into a per-release one — a Release's flag
+  agrees with the channel its own version line implies, so a wholly-`0.x` history has **no
+  Latest at all** — backfills the 21 unflagged Releases, and holds it on a seventh
+  `site-health.yml` arm, the tier that can see the host. Seam: the arm stays in this repo's copy,
+  since the declaration it derives from is repo-local mechanism owned by no kit.
+  **The entry's own blocker was stale:** scope's survey verified the active host account is the
+  namespace-owning one, so the `gh release edit` write is available rather than 404-blocked.
+  Ruled in by the operator 2026-08-08 as unit 2 of `adopter-floor-integrity` (TRAJECTORY.md);
+  filed 2026-08-08 by close draining the gap inbox, found at scope, promoted here by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -3844,29 +3866,6 @@
   action the identity boundary forbids.
   Filed 2026-08-08 by close, draining the gap inbox; found at scope. Sibling on the same step:
   `release-drain-ordering-contradiction` covers step 4's drain/tag ordering, this its diagnosis.
-
-- **published-release-channel-flag-unheld** [design-pending] — the channel gate holds the
-  creating invocation, and nothing holds a Release already published.
-  The repo front page advertises an older tag as Latest: that tag predates the preview-channel
-  mechanization and carries no prerelease flag, while the newer one was created with
-  `--prerelease` as the channel declaration now requires, so the host still resolves Latest to
-  the older. `check-release-channel-parity` reads the Release-creating step in the publish
-  workflow and the project's version line — its two invariants — and never the flag state of
-  Releases already on the host. The site-health probe does not read it either.
-  **Host-side state is out of every gate's reach, which is the class rather than the instance.**
-  The tree can be perfectly self-consistent while the front door advertises the wrong thing;
-  nothing in the repo is false, so nothing in the repo can red. What is unheld is the gap between
-  a declared channel and the accumulated Release history that declaration was meant to govern.
-  **Blocked from an inline fix, which is why it is filed rather than fixed.** The single command
-  that would correct it is a write against a published Release — exactly the path
-  `release-runbook-identity-diagnosis` records as 404-ing on this machine.
-  **Why `[design-pending]`:** a gate would have to query the host, which makes it a network
-  probe on the site-health lineage rather than a battery member. Whether the desired flag state
-  belongs in the private ops runbook as recorded desired state, in a scheduled probe, or as a
-  backfill step in the release procedure is the open call.
-  **Cost while deferred:** the most-read reader-facing surface the project has presents a
-  superseded release as current, on the adoption path, for as long as it stands.
-  Filed 2026-08-08 by close, draining the gap inbox; found at scope.
 
 - **gate-binary-target-roster-widening** [design-pending] [roadmap: next/reliability] — the
   binary ships one triple, and no queue unit carries widening it.
