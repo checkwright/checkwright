@@ -78,7 +78,7 @@ elif ! lock_schema_ok "$LOCK"; then
     exit 2
 else
     version="$(lock_field "$LOCK" version)"
-    # spec: installer/README.md §The manifest — a manifest carrying `files` and no `version` is a residue rather than an install: `version` is the field an install always has and a residue never does, so its absence is the discriminator. This guards the whole installed block rather than sitting beside it — the identity lines, the artifact check and the omitted-gates block are per-install readings with nothing to compute once there is no install, and printing them beside the residue message would be the same mixed-verdict shape doctor's own exit-status carve-out already refuses
+    # spec: installer/README.md §doctor — a manifest carrying `files` and no `version` is a residue rather than an install: `version` is the field an install always has and a residue never does, so its absence is the discriminator. This guards the whole installed block rather than sitting beside it — the identity lines, the artifact check and the omitted-gates block are per-install readings with nothing to compute once there is no install, and printing them beside the residue message would be the same mixed-verdict shape doctor's own exit-status carve-out already refuses
     if [[ -z "$version" ]]; then
         n="$(jq -r '.files | length' "$LOCK" 2>/dev/null)"; [[ -n "$n" ]] || n=0
         printf '\nno install here — %d file(s) remain that a previous install wrote and you have since edited. They are yours, and a future init will still protect them.\n' \

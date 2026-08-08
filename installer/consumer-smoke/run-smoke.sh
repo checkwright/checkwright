@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a same-version seam arm over the two surfaces init rewrites every run, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → diff clean → uninstall back to the pre-init tree object) plus the profile invariant, a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -191,12 +191,49 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     say "doctor: clean, reports the installed profile"
 }
 
+# spec: installer/README.md §The consumer smoke — one encoding of the reversal, run on the same consumer assert_install just finished with, so both transports prove it and the masked arm proves diff and uninstall are Node-free at no extra pack cost. The tree-object equality against the pre-init seed is the load-bearing assertion and it proves more than uninstall: no other arm asserts that the roster covers everything init wrote — the per-profile check runs the other direction, entry against tree — so a file init wrote and failed to record survives the removal and reds here
+assert_reversal() {   # $1 = profile, $2 = scratch consumer dir, $3 = the consumer's tree object before init ran
+    local profile="$1" C="$2" seed="$3" out rc before status planned
+
+    out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" diff 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] \
+        || { printf '%s\n' "$out" >&2; fail "$profile: diff exited $rc against the tree init just wrote — a freshly installed tree is the definition of no drift"; }
+    grep -q '^DIFF: clean' <<<"$out" \
+        || { printf '%s\n' "$out" >&2; fail "$profile: diff exited 0 without reporting the tree clean"; }
+    say "diff: $(grep -m1 '^DIFF:' <<<"$out")"
+
+    # spec: installer/README.md §The consumer smoke — the --dry-run rule is asserted behaviorally rather than through a syntactic proxy: the plan must name a non-zero removal count while the tree object and the worktree are both exactly what they were, which is what a flag that parsed and then wrote anyway would fail and a flag that merely existed would pass
+    before="$(git -C "$C" rev-parse 'HEAD^{tree}')"
+    status="$(git -C "$C" status --porcelain)"
+    out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" uninstall --dry-run 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$profile: uninstall --dry-run exited $rc"; }
+    planned="$(sed -n 's/^would remove \([0-9][0-9]*\) file(s):$/\1/p' <<<"$out" | head -n1)"
+    [[ -n "$planned" && "$planned" -gt 0 ]] \
+        || { printf '%s\n' "$out" >&2; fail "$profile: uninstall --dry-run planned no removal against an install it is about to reverse"; }
+    [[ "$(git -C "$C" rev-parse 'HEAD^{tree}')" == "$before" ]] \
+        || fail "$profile: uninstall --dry-run changed the tree object"
+    [[ "$(git -C "$C" status --porcelain)" == "$status" ]] \
+        || fail "$profile: uninstall --dry-run left the worktree changed"
+    say "uninstall --dry-run: $planned file(s) planned, tree object and worktree unchanged"
+
+    out="$( cd "$C" && PATH="$RUN_PATH" "${ENTRY[@]}" uninstall 2>&1 )"; rc=$?
+    [[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "$profile: uninstall exited $rc"; }
+    [[ "$(git -C "$C" rev-parse 'HEAD^{tree}')" == "$seed" ]] \
+        || { printf '%s\n' "$out" >&2; fail "$profile: the tree after uninstall is not the tree from before init — either init wrote something it did not record, or the removal reached past the roster"; }
+    [[ -z "$(git -C "$C" status --porcelain)" ]] || fail "$profile: uninstall left the worktree dirty"
+    [[ ! -f "$C/checkwright.lock" ]] \
+        || fail "$profile: every recorded file was removed, yet a manifest survives asserting an install that is gone"
+    say "uninstall: $(sed -n 's/^UNINSTALL: //p' <<<"$out" | head -n1) tree object is back to its pre-init state"
+}
+
 ENTRY=("$CW")
 RUN_PATH="$PATH"
 for profile in "${PROFILES[@]}"; do
     printf '%s\n' "$profile"
     C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
+    SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
     assert_install "$profile" "$C"
+    assert_reversal "$profile" "$C" "$SEED"
 done
 
 # spec: installer/README.md §The consumer smoke — the download transport, asserted rather than documented: verify the digest, extract with tar rather than npm, and drive the same post-conditions with node/npm masked, so a latent Node dependency reds here instead of passing on a host that happens to carry Node
@@ -231,7 +268,9 @@ for masked in node npm npx; do
 done
 say "mask: node, npm and npx resolve to failing shims"
 C="$(consumer "download")" || fail "could not build a scratch consumer for the download arm"
+SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
 assert_install "$PROFILE_DERIVED" "$C"
+assert_reversal "$PROFILE_DERIVED" "$C" "$SEED"
 
 # spec: installer/README.md §The consumer smoke — the upgrade arm packs a second, higher version and drives the same installed tree across it, because everything above installs at one version: what only a cross-version run reaches is the manifest's version comparison falling through in the upgrade direction, the profile re-read from the lock with no flag, and claim() re-applying around a file the adopter has since edited
 printf 'upgrade arm (two cross-version hops, starter profile)\n'
@@ -376,6 +415,56 @@ done
 [[ -z "$(git -C "$SC" status --porcelain)" ]] || fail "the seam arm's re-run left the worktree dirty"
 say "seam: ${SEAM_EDITED[*]} preserved, reported and still recorded at init's hash"
 
+# spec: installer/README.md §The consumer smoke — the protection branch chains onto this arm rather than the reversal arm, because an adopter edit is exactly the case tree-object equality cannot host: this consumer already carries two edited, committed vendored files, which is the case that reaches uninstall's keep branch and the residual manifest behind it
+declare -A SEAM_KEPT=()
+for f in "${SEAM_EDITED[@]}"; do SEAM_KEPT["$f"]=1; done
+mapfile -t SEAM_ROSTER < <(jq -r '.files | keys[]' "$SEAM_LOCK")
+[[ ${#SEAM_ROSTER[@]} -gt ${#SEAM_EDITED[@]} ]] \
+    || fail "the seam manifest records ${#SEAM_ROSTER[@]} file(s), so the protection chain has nothing whose removal it can assert beside the two it keeps"
+
+out="$( cd "$SC" && "$CW" diff 2>&1 )"; rc=$?
+[[ "$rc" -eq 1 ]] \
+    || { printf '%s\n' "$out" >&2; fail "diff exited $rc on a consumer carrying two adopter-edited vendored files — the drift verdict is the exit status, and 1 is what a CI step gating on a pristine vendored tree reads"; }
+for f in "${SEAM_EDITED[@]}"; do
+    grep -qF "$f" <<<"$out" || { printf '%s\n' "$out" >&2; fail "diff reported drift without naming $f"; }
+done
+say "diff: $(grep -m1 '^DIFF:' <<<"$out"), naming ${SEAM_EDITED[*]}"
+
+out="$( cd "$SC" && "$CW" uninstall 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || { printf '%s\n' "$out" >&2; fail "uninstall exited $rc on the seam arm's consumer"; }
+for f in "${SEAM_EDITED[@]}"; do
+    [[ "$(git hash-object -- "$SC/$f")" == "${SEAM_WANT[$f]}" ]] \
+        || fail "uninstall removed or rewrote $f, which the adopter had changed since init wrote it"
+    grep -qF "$f" <<<"$out" || { printf '%s\n' "$out" >&2; fail "uninstall kept $f but did not report it"; }
+done
+for f in "${SEAM_ROSTER[@]}"; do
+    [[ -n "${SEAM_KEPT[$f]:-}" ]] && continue
+    [[ ! -e "$SC/$f" ]] \
+        || fail "uninstall left $f on the tree, which the adopter never touched — the removal stopped short of the roster it was given"
+done
+
+# spec: installer/README.md §The manifest — the survivors are still on disk, so their ownership has not ended and the roster must retain them: a manifest deleted here would disown exactly the paths the hash rule just protected, and the next init would read them as never installed and write straight through the adopter. The recorded hash is init's rather than the adopter's for the same reason the upgrade arm names the two apart
+[[ -f "$SEAM_LOCK" ]] \
+    || fail "uninstall kept ${#SEAM_EDITED[@]} file(s) and deleted the manifest — the next init would read them as never installed and write straight through them"
+got="$(jq -r 'keys | join(" ")' "$SEAM_LOCK")"
+[[ "$got" == "files schema" ]] \
+    || fail "the residual manifest carries [$got] where an install that no longer exists may assert only its schema and the files it still owns"
+got="$(jq -r '.files | keys[]' "$SEAM_LOCK")"
+want="$(printf '%s\n' "${SEAM_EDITED[@]}" | LC_ALL=C sort)"
+[[ "$got" == "$want" ]] \
+    || fail "the residual roster is [${got//$'\n'/ }] where the survivors are [${want//$'\n'/ }]"
+for f in "${SEAM_EDITED[@]}"; do
+    [[ "$(jq -r --arg f "$f" '.files[$f]' "$SEAM_LOCK")" == "${SEAM_INIT_HASH[$f]}" ]] \
+        || fail "the residual manifest records $f at a hash other than the one init wrote there — the next init would find it unchanged and claim it"
+done
+
+# spec: installer/README.md §The manifest — the residual shape is asserted on the object itself and not through an accessor, because that is the class of drift an accessor cannot catch: a missing key and a present-but-null key both read back as the empty string, so only has() tells an omitted artifact apart from a null one, and only re-sorting the captured text proves the sort reached every nesting level rather than the top one
+jq -e 'has("artifact") | not' "$SEAM_LOCK" >/dev/null \
+    || fail "the residual manifest carries an artifact key — an omitted field leaves the key absent, never null"
+jq -S . "$SEAM_LOCK" | cmp -s - "$SEAM_LOCK" \
+    || fail "the residual manifest is not byte-identical to its own recursive sort — the one writer of the wire shape emitted an order its second writer could not reproduce"
+say "protection: ${SEAM_EDITED[*]} kept and reported, $(( ${#SEAM_ROSTER[@]} - ${#SEAM_EDITED[@]} )) recorded file(s) removed, manifest narrowed to schema + the survivors at init's hashes"
+
 # spec: installer/README.md §The consumer smoke — the artifact arm builds the binary it packs rather than fabricating a stand-in with a matching digest: a stand-in would drive the placement path while leaving the one thing most likely to break — the real build's digest agreeing with what init verifies before writing — covered by nothing
 printf 'artifact arm (host build, placement branch and the two refusals)\n'
 # spec: gate-sdk/SPEC.md §Layout and configuration — the native knobs are read through gate-sdk's own accessors, from the tree under test, so the arm cannot drift from the roster or from a knob override; in a subshell because the library auto-sources a consumer config seam off the current directory and this script is not one of its consumers
@@ -466,5 +555,5 @@ out="$( cd "$AC" && "${ENTRY[@]}" init --profile starter 2>&1 )"; rc=$?
     || fail "the broken-payload refusal still wrote into the consumer"
 say "declared target with no artifact: refused, not omitted"
 
-printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access, plus the extracted-tarball arm with node/npm masked, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
+printf 'INSTALLER-SMOKE: clean (%d profile(s) installed from the packed tarball with no registry access and each reversed back to its pre-init tree object, plus the extracted-tarball arm with node/npm masked and reversed the same way, the two-hop cross-version upgrade arm carrying the relinquish and re-add, the same-version seam arm and the protection branch chained onto it, and the artifact arm packing a binary this run built)\n' "${#PROFILES[@]}"
 exit 0

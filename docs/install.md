@@ -266,6 +266,46 @@ what lets a reviewer resolve the tree in front of them to an exact upstream
 state, which is the difference between vendored source that is merely committed
 and vendored source that is auditable.
 
+## Managing an install
+
+`init` makes an install. Three more verbs manage one once it exists. Each
+answers in its **exit status** as well as its output, so a CI step can gate on
+the answer without parsing a report. What follows is what each verb is for;
+the mechanism behind it lives in the installer's own README
+(`installer/README.md` in the repository).
+
+- **`checkwright update`** brings the install here up to the version the package
+  you are running carries. One added precondition separates it from `init`:
+  `checkwright.lock` must already exist, so `update` can manage an install but
+  never make the first one. Every `init` flag stays valid, `--dry-run` included.
+  That thinness is the design — `update` names an operation `init` already
+  performs instead of reimplementing it, so the two cannot drift apart. It
+  automates phase A of §The upgrade contract below. Phase B is still yours.
+- **`checkwright diff`** tells you which of the files `init` wrote you have
+  changed. It writes nothing. Exit `0` means the tree is exactly what `init`
+  wrote; `1` means at least one file has changed or gone missing — so *is our
+  vendored tree pristine?* becomes a CI check rather than a review habit. Your
+  edits are reported, never corrected. Editing a vendored file is sanctioned,
+  and this is the verb that tells you where you have done it.
+- **`checkwright uninstall`** reverses the install.
+
+**Reversibility, stated plainly, because it is the property you are
+evaluating.** `uninstall` removes the files `init` wrote into paths you left
+untouched, then makes one commit. It reads the same per-file hashes `init`
+recorded, so a file you have edited since is **kept and reported** rather than
+removed. It never removes a file you wrote. Where anything is kept,
+`checkwright.lock` is narrowed over the survivors rather than deleted, so a
+later `init` goes on protecting them instead of writing through your edits.
+`--dry-run` prints the plan first, down to which of your own files would be left
+behind inside a vendored directory.
+
+That reversal is asserted rather than promised. The consumer smoke installs each
+profile into a scratch repository and then reverses it, holding that the
+repository's git tree object afterwards is **identical to the one it had before
+`init` ran** — so an evaluation you decide against leaves nothing behind, and a
+file the installer wrote but failed to record would fail that assertion rather
+than survive it.
+
 ## Vendoring the kits
 
 The installers above do this on your behalf; the manual path stays supported and

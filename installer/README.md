@@ -51,6 +51,53 @@ with its version floors, is on the install page.
   the source tree, so no second copy of any kit is checked in.
 - `profiles.list` — the profile rosters (below).
 
+## The verbs
+
+`init` makes an install; the rest manage one after it exists. The roster itself
+is derived — a verb is advertised because its implementation is present under
+`lib/`, so `checkwright --help` lists the directory rather than a list beside it
+— and what follows is what each verb is *for*.
+
+| verb | asks | reads |
+| --- | --- | --- |
+| `init` | vendor this profile's kits into my repository | the payload, and the manifest a previous run left |
+| `doctor` | can this machine run the battery, and what is installed here? | the toolchain, and the manifest's identity fields |
+| `diff` | which of the files `init` wrote have I changed? | the manifest's `files` hashes, against the tree |
+| `update` | bring the install here up to the version this package carries | the manifest, then everything `init` reads |
+| `uninstall` | reverse the install, keeping anything I have edited | the manifest's `files` roster, against the tree |
+
+**The classifier is writes / does not write, and it is what decides
+`--dry-run`.** `doctor` and `diff` write nothing, so neither has one and neither
+would have anything to preview. Every verb that does write has one, and it means
+the same thing in each: print the plan, write nothing, exit 0. That rule is
+asserted behaviorally rather than gated — §The consumer smoke holds each
+mutating verb's `--dry-run` to leaving the tree object unchanged, which is what
+a flag that parsed and then wrote anyway would fail and a flag that merely
+existed would pass.
+
+**Why `diff` is a verb of its own rather than a widening of `doctor`.**
+`doctor`'s exit status has exactly one owner — the toolchain contract — and
+`init` gates its own precondition on it. That ownership already forced one
+carve-out: §doctor reports an artifact finding *without* setting the status,
+because reddening there would block the `init` re-run that is the finding's own
+remedy. Drift would force the same carve-out a second time and on worse ground.
+Editing a vendored file is **sanctioned** — the whole ownership contract in §The
+manifest exists to protect it — so a folded-in drift report would be a permanent
+expected finding on the one surface that teaches a reader to skim its last line.
+And drift wants a status of its own: `0` the tree is exactly what `init` wrote,
+`1` it has diverged. That is gatable in CI, and it cannot live on `doctor`
+without colliding with the number the toolchain contract already owns.
+
+A second ground, independent of the first: `doctor` runs as `init`'s
+precondition, before every install, so per-file hashing there would make every
+`init` pay for a computation the install redoes moments later and print the
+answer twice.
+
+Nor do the two `--dry-run`s stand in for it. They answer *what would this
+payload change*, which is a different question from *what have I changed*, and
+an adopter deciding whether to uninstall needs the second without running a
+mutating verb at all.
+
 ## init
 
 `checkwright init` vendors the selected profile's kit source out of this
@@ -104,11 +151,13 @@ nothing to change says so and exits clean; an unchanged tree is the success
 case, not an error. A payload older than the recorded install is refused as a
 silent downgrade — `--force` covers that refusal too, which is what makes a
 rollback a thing you asked for rather than a thing that happened to you.
-`--force` means the same thing in both places: overwrite what `init` would
-otherwise protect.
+`--force` means the same thing in all three places it appears — the changed-file
+protection here, the downgrade refusal above, and the kept files `uninstall`
+would otherwise leave behind (§uninstall): overwrite what `init` would otherwise
+protect.
 
 `--dry-run` prints the file plan and the manifest that would be written, writes
-nothing, and exits 0. Every mutating verb has one.
+nothing, and exits 0.
 
 ## What init seeds
 
@@ -302,13 +351,165 @@ payload copy is the one it reads, never a copy in the tree it is inspecting:
 at `init` time nothing has been vendored there yet, so a tree copy would not
 exist at the moment the answer is needed.
 
-`doctor` writes nothing, so it has no `--dry-run`. Every verb that does write
-has one.
+**A residue is read apart from an install, and reported as one.** A
+`checkwright.lock` carrying `files` and no `version` is not an install — it is
+what `uninstall` leaves over files you had edited (§uninstall) — and `version`
+is the field an install always has and a residue never does, so its absence is
+the discriminator. On that reading `doctor` reports how many files remain and
+that they are yours, and prints **no** identity block, no artifact check and no
+omitted-member report: every one of those is a per-install reading with nothing
+left to describe. Blank identity fields would be uninformative rather than
+wrong, but printing them beside a residue message is the same mixed-verdict
+shape the exit-status carve-out above already refuses.
+
+On both readings `doctor` closes by naming `diff`. It reports what was
+installed, never whether the tree still matches it, and keeping the two apart is
+what stops `DOCTOR: clean` from being read as a claim about the tree's contents.
 
 A third exit status, `2`, means the question could not be answered rather than
 that the answer was bad: the package carries no payload, or the manifest
 carries a schema key this build does not know. A build refuses an unfamiliar
 manifest rather than guessing at the shape behind it.
+
+## update
+
+`checkwright update` is `init` with **one added precondition and its arguments
+forwarded verbatim**: `checkwright.lock` must already exist, so a verb named
+`update` can manage an install but never perform the first one. Every `init`
+flag stays valid — `--profile`, `--force`, `--no-commit` and `--dry-run` among
+them — because none of them is reimplemented here. `update` checks its one
+precondition and then *becomes* `init`.
+
+That is the whole of the difference, and it is deliberate. Upgrading is already
+what a second `init` does: it compares the recorded version against the
+payload's and falls through in the upgrade direction, re-reads the profile from
+the manifest when none is passed, and re-applies the payload around every file
+you have edited since. A separate implementation would be a second copy of all
+of that, free to drift from the original. So `update` is a **name**, not a
+second mechanism — one operation under two names, where the second name is the
+one an adopter looks for.
+
+It checks existence and no more. An unreadable schema, a stale downgrade, a
+below-contract toolchain — each is `init`'s own precondition, one call away, and
+repeating any of them here would be the copy this design exists to avoid. Being
+outside a git work tree is not this verb's precondition either: `init`'s own
+refusal already names the accurate remedy, so an unresolvable root falls through
+to it rather than being misreported as an absent manifest.
+
+**Residue, recorded rather than papered over.** Because the delegation is real,
+most of what you see comes from `init` and says so. The one refusal `update`
+owns is prefixed `checkwright update:`; every other refusal — not a git work
+tree, an unknown schema, a dirty worktree, a stale downgrade, a below-contract
+toolchain — arrives prefixed **`checkwright init:`**, and the success path
+reports `INIT:`, because that is literally which verb produced the line. This is
+honest rather than untidy: the prefix names the operation that actually ran, and
+renaming it cosmetically would hide exactly the delegation that makes these two
+verbs one. It is written down here so that a `checkwright init:` line answering
+a command you typed as `update` reads as the design rather than as a bug.
+
+## diff
+
+`checkwright diff` answers *which of the files `init` wrote have I changed?* It
+classifies every `files` entry against the tree with the **same hash comparison
+`init` makes** before it rewrites anything, so the report and the protection are
+never two opinions.
+
+Three classes, two of them named apart rather than pooled. **Unchanged** is
+counted only. **Changed** means the content differs from what `init` wrote — the
+sanctioned case, and the one the ownership contract exists to protect.
+**Missing** means a recorded path is not on disk, and it is separated
+because its consequence differs: §The manifest's exit rule means the next `init`
+silently drops a missing path from the roster and writes it fresh, which is
+worth a warning before it happens rather than after.
+
+**The exit status is the verdict**: `0` every recorded entry matches what `init`
+wrote, `1` at least one has changed or gone missing. That is what being a verb
+of its own buys — a CI step can gate on *is our vendored tree pristine?* without
+parsing a report, and without borrowing a status the toolchain contract owns
+(§The verbs).
+
+Its preconditions are the ones its subject requires: inside a git work tree, a
+manifest present, and a schema this build knows. It writes nothing, so it has no
+`--dry-run`.
+
+Run against a **residual** manifest, `diff` reports the survivors as `changed`.
+That is neither a special case nor a defect: they are recorded at the hashes
+`init` wrote and they carry your edits, so *changed* is exactly what they are.
+
+## uninstall
+
+`checkwright uninstall` reverses an install against the roster `init` recorded,
+and against nothing else. Install, see what it does, reverse it — that is the
+property the adoption story rests on rather than an ergonomic extra.
+
+**Preconditions**, all refusing rather than warning, and all checked before
+anything is removed, because a partial removal is the outcome none of them may
+produce: inside a git work tree; a manifest present with a schema this build
+knows, else a refusal naming `init`; and a clean worktree, for `init`'s own
+reason — one commit is made, and a dirty tree would fold your work into it.
+`--no-commit` is the same valve on the same terms.
+
+**The removal rule is the ownership contract seen from the other side.** For
+each `files` entry: hash the file, remove it while the hash still matches what
+`init` recorded, and **keep and report** it when it differs. So it removes only
+files this installer wrote and you have not touched, never a file you wrote —
+and it needs no new data to do that, because §The manifest already records every
+path at the hash `init` last wrote there. A recorded path already off the tree
+is a no-op rather than an error: it left the roster when it left the tree.
+`--force` removes what would otherwise be kept, meaning here exactly what §init
+says it means there — overwrite what `init` would otherwise protect.
+
+The gate binary needs no special case. `init` records it as an ordinary `files`
+row *and* under the separate `artifact` key; the roster walk removes it like any
+other row, because `artifact` is identity rather than ownership.
+
+**The manifest is not a `files` row, and it is disposed of explicitly.** `init`
+appends `checkwright.lock` to its written set only after emitting it, so the
+file never records itself. With nothing kept, it is deleted. With any entry
+**kept**, it is rewritten over the survivors instead: deleting it
+would disown exactly the paths the hash rule just protected, and the next `init`
+would find them unrecorded, read that as *never installed*, and write straight
+through your edits. §The manifest owns that residual shape and the argument for
+it.
+
+**The agent file is the one non-whole-file removal**, because it is the one
+entry that is a span rather than a file (§The manifest). Two branches. Its hash
+matches, meaning `init` created it and you never touched it, so it goes with
+everything else. Its hash differs, so the file is kept and the **doctrine block
+is trimmed out of it** — that block is prose you did not write, in the one file
+whose purpose is to steer agent sessions, pointing at a doctrine file this verb
+just removed, and leaving it inert there is not neutral. The trim runs through
+the payload's own copy of doctrine-kit's installer (doctrine-kit/SPEC.md
+§install-doctrine), so it adds no second copy of the marker strings and still
+works once the vendored kit is gone. It is scoped to that span alone: a
+marker-bounded block belonging to some other tool is one `init` never wrote, so
+it is never a `files` entry and never this verb's to touch. The trim is left
+**unstaged** — the rest of that file is yours to review.
+
+**Directory pruning is bottom-up and removes only what is now empty.** A
+directory still holding anything is left alone, whether that is a file you added
+or one you edited: `uninstall` removes files it owns, never directories it
+merely emptied around. A file you added inside a vendored directory is not on
+the roster, so it is never removed — and `--dry-run` names it, because a
+directory left behind holding only your own files is a surprise worth spending a
+line on before the run rather than after.
+
+**The hook opt-in is reported, not rewritten.** When `core.hooksPath` points
+inside the gates directory that was just removed, `uninstall` prints the
+`git config --unset core.hooksPath` line for you to run and does not run it. Git
+config is outside the ownership roster, and a `core.hooksPath` naming a
+directory that is not there is inert rather than breaking, so there is
+nothing here to justify writing outside the contract.
+
+`--dry-run` prints the plan — what would be removed, what would be kept and why,
+the residual manifest if there is one, and any file of yours that will be left
+behind inside a vendored directory — writes nothing, and exits 0.
+
+**The commit** is one commit naming the profile and the version, staging the
+removals and the manifest disposition. Files kept for you are never staged, on
+the same reasoning that keeps `init`'s written set and its recorded roster
+apart. A run with nothing to remove says so and exits 0 without narrowing the
+manifest: the install is still there, so disowning it would be false.
 
 ## Profiles
 
@@ -339,9 +540,12 @@ at run time, never a list to maintain.
 and that file is tracked like everything else it writes. It is JSON, read with
 `jq`, and it is the install-ownership record: what was installed, from which
 upstream state, and which files this installer owns. `lib/common/lock.sh` is
-its schema owner — the wire key, the accessors, and the hash rule live there,
-so the verb that writes the manifest and the verbs that read it cannot drift
-apart.
+its schema owner — the wire key, the accessors, the hash rule and the emitter
+live there, so the two verbs that write a manifest and the verbs that read one
+cannot drift apart. Being the single writer is what makes the shape a contract
+rather than a convention: keys are sorted at every nesting level, and a field is
+present exactly when its writer supplied one, so an omission leaves the key
+**absent** rather than null or blank.
 
 The wire key is versioned (`checkwright-lock v1`, in `CHECKWRIGHT_LOCK_SCHEMA`)
 and a build that meets a key it does not know refuses rather than guessing at
@@ -354,7 +558,7 @@ the shape behind it.
 | `commit` | the 40-hex commit the payload was assembled from | `doctor` prints it — it is what lets a reviewer resolve the vendored tree to an exact upstream state |
 | `profile` | the profile selected | a re-run of `init` re-applies the same profile without asking again |
 | `kits` | the vendored kit set | `init`'s re-run file plan, and `doctor`'s installed-set report |
-| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path |
+| `files` | `init`'s ownership roster — each path it has written, at the content hash it last wrote there, until the file leaves the tree | `init`'s changed-file detection: a file whose hash still matches is rewritten, one that has changed is reported rather than overwritten, and stays on the roster so the next run reads it the same way, whether or not the running release still ships that path. `uninstall` walks the same roster to decide what it may remove and what it must keep, and `diff` classifies it against the tree |
 | `artifact` | the gate binary's `target` and its SHA-256 `digest`, or absent | `doctor` reports the target and re-verifies the digest in place; a re-run of `init` compares the target against this host and skips the rewrite while the digest still holds |
 
 **A recorded hash is what `init` last wrote at that path** — on whichever run
@@ -385,6 +589,10 @@ moment.** `init` owns a path because it wrote the file there, so only the file's
 disappearance can end that. A release that stops shipping the path does not: the
 file is still on disk, it may carry your edits, and disowning it is exactly what
 would let a later release re-adding the same path write straight through them.
+Neither does an `uninstall` that **kept** the file: a file kept is a file `init`
+wrote that is still on disk, so its ownership has not ended and the roster must
+retain it. That is the rule the residual manifest below follows, rather than a
+carve-out from it.
 
 **A relinquished path is an ordinary entry, not a state of its own.** When a
 release stops shipping something `init` created, nothing visits that path on the
@@ -411,6 +619,30 @@ same test even more quietly — that reader's payload does not ship the path, so
 never asks whether it may write there and does nothing with the entry at all. The
 old behavior on the new data is the behavior the new meaning wants, so there is
 nothing for a version key to protect.
+
+**The residual manifest** is the second shape this file takes, and the exit rule
+above is what produces it. When `uninstall` keeps at least one file, it rewrites
+`checkwright.lock` over the survivors, and that object carries **`schema` and
+`files` only**. `version`, `commit`, `profile`, `kits` and `artifact` all
+describe an install this tree does not have, and a manifest asserting them would
+be false. The survivors are recorded at the hashes `init` wrote and never at
+yours: an entry rewritten at your hash would read as *unchanged* on the next
+install and let it write straight through you, which is the defect this shape
+exists to prevent — the same reason the roster names a dropped entry and an
+adopter-hashed entry apart.
+
+The wire key stays `checkwright-lock v1` here too, on the precedent just above:
+an identity field an install always carries is optional within a shape a reader
+already tolerates, which is a change of meaning rather than of shape. That it is
+safe is a property of the existing readers, checked rather than assumed.
+`init`'s downgrade refusal is guarded on a non-empty `version`, so an absent one
+skips it — correct, since there is nothing to roll back. `init` re-reads
+`profile` only to default it, so an absent one falls through to `starter`, which
+is what a virgin tree gets and what the residue is. `doctor` reads the identity
+fields for display, and rather than printing them blank it reads their absence
+as the residue itself (§doctor). The honest residue is that a reader built
+before this meets a residual manifest and prints blank identity fields —
+uninformative, never wrong-acting.
 
 A recorded **`files`** hash is `git hash-object`, never `sha256sum`. Not a
 portability detail worth burying: macOS ships `shasum` rather than `sha256sum`,
@@ -474,10 +706,36 @@ must exit 0 and name the installed profile. It also asserts the profile
 invariant against the installed payload — every named kit resolves, the
 containment chain holds, and there are at most three profiles.
 
+**The reversal arm** then runs on that same consumer, so every profile is
+installed *and* reversed. In order: `diff` must exit 0 and report the freshly
+installed tree clean; `uninstall --dry-run` must name a non-zero removal count
+while leaving the tree object and `git status` exactly as they were; then
+`uninstall`, after which the consumer's tree object must equal the one it had
+**before `init` ran**, the worktree must be clean, and no `checkwright.lock` may
+remain. The `--dry-run` step is where the writes/does-not-write rule in §The
+verbs is actually asserted, and asserted behaviorally: a flag that parsed and
+then wrote anyway fails it, where a flag that merely existed would pass.
+
+**The tree-object equality is the load-bearing assertion, and it proves more
+than `uninstall`.** Nothing else here asserts that the manifest covers
+*everything* `init` wrote — the per-profile check runs the other direction,
+every recorded entry against the tree. A file `init` wrote and failed to record
+survives the removal and breaks this equality, so the arm closes that hole as a
+side effect. It is also the assertion form of the claim the install page makes:
+an install an evaluator can reverse.
+
+The equality holds for a reason rather than by luck. The surfaces `init` seeds
+and then leaves alone — the queue file, the agent file, the evidence manifests,
+the workflow state — are recorded at `init`'s own hashes, and this consumer
+never edits them, so the ordinary hash rule removes them. That same rule keeps
+them on a tree where an adopter *has* grown them. No special case either way,
+which is why the arm needs none.
+
 A second arm drives the **download transport**: it verifies the packed tarball
 against a digest the smoke computes, extracts it with `tar` rather than npm,
-and runs the same `init` and the same post-conditions with `npm` and `node`
-**masked off `PATH`**. It runs against `full` alone rather than per profile —
+and runs the same `init`, the same post-conditions and the same reversal with
+`npm` and `node` **masked off `PATH`** — so `diff` and `uninstall` are proved
+Node-free by the arm that already exists, at no extra pack cost. It runs against `full` alone rather than per profile —
 what the per-profile loop proves (the payload resolves and each profile's kit
 set is present) is profile-dependent, while what this arm proves (the same
 payload reached the tree without Node) is transport-independent, and `full` is
@@ -559,6 +817,30 @@ that loop exists to assert. After the adopter edits and commits both, the re-run
 must leave both byte-identical, name both as changed, and still record `init`'s
 hash for each rather than the adopter's. It reuses the already-installed package,
 so it costs no second pack.
+
+**The protection branch chains onto that consumer** rather than onto the
+reversal arm, because an adopter edit is exactly the case tree-object equality
+cannot host — the edit is what breaks the equality. This arm already has two
+edited, committed vendored files, which is precisely the case that reaches
+`uninstall`'s keep branch. So after its own assertions it runs `diff`, which
+must exit **1** and name both files; then `uninstall`, which must keep both,
+report both, remove every other recorded file, and leave a `checkwright.lock`
+carrying `schema` and a `files` map of exactly those two paths **at `init`'s
+hashes, not the adopter's** — the same apart-naming the upgrade arm uses and for
+the same reason, since an entry dropped reads as never-installed and an entry at
+the adopter's hash reads as unchanged, and either would let the next `init`
+write through them.
+
+That residual object is asserted for **shape**, not only for field presence,
+because the single-writer contract in §The manifest is exactly what an accessor
+cannot check: a missing key and a present-but-null key both read back as the
+empty string. So the assertions run on the captured manifest text itself —
+`has("artifact")` must be false, so the omitted flag left the key absent rather
+than null, and re-piping the object through a recursive sort must reproduce it
+byte for byte, so the sort reached every nesting level rather than the top one.
+Both run here because this is the one call site that ever emits the
+no-identity, no-artifact shape; the per-profile loop's fresh install already
+exercises the other writer field by field.
 
 **The artifact arm rides the per-profile post-conditions**, taking whichever of
 §The gate binary's outcomes the payload and the host actually produce. Every arm

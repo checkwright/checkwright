@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The manifest — reverses an install against the roster init recorded and nothing else: an entry whose content is still what init wrote is removed, an entry you have edited since is kept and reported, and the manifest is narrowed over the survivors rather than deleted, so ownership of a file that is still on disk never lapses
+# spec: installer/README.md §uninstall — reverses an install against the roster init recorded and nothing else: an entry whose content is still what init wrote is removed, an entry you have edited since is kept and reported, and the manifest is narrowed over the survivors rather than deleted, so ownership of a file that is still on disk never lapses
 #
 # usage: checkwright uninstall [--dry-run] [--force] [--no-commit]
 #   Each flag is described by --help.
@@ -61,7 +61,7 @@ kits_include() {   # $1 = kit name -> 0 iff the manifest records it as vendored
     return 1
 }
 
-# spec: installer/README.md §init — the removal rule is claim() seen from the other side, and it needs no new data: init records each path at the hash it last wrote there, so a hash that still matches marks a file that is init's to remove and one that differs marks a file that is yours to keep. A recorded path already off the tree is a no-op rather than an error — it left the roster the moment it left the tree
+# spec: installer/README.md §uninstall — the removal rule is claim() seen from the other side, and it needs no new data: init records each path at the hash it last wrote there, so a hash that still matches marks a file that is init's to remove and one that differs marks a file that is yours to keep. A recorded path already off the tree is a no-op rather than an error — it left the roster the moment it left the tree
 REMOVE=(); KEEP=(); GONE=()
 declare -A KEPT_HASH=(); declare -A ROSTER=()
 while IFS=$'\t' read -r p h; do
@@ -75,7 +75,7 @@ while IFS=$'\t' read -r p h; do
     fi
 done < <(jq -r 'if (.files | type) == "object" then (.files | to_entries[] | "\(.key)\t\(.value)") else empty end' "$LOCK")
 
-# spec: installer/README.md §The manifest — the agent file is the one entry that is a span rather than a file, so the branch where it is kept still owes the doctrine block a removal: the block is prose you did not write, in the file whose purpose is to steer agent sessions, pointing at a doctrine file this verb just removed. The trim is scoped to that span alone — a marker block init never wrote is never a files[] entry, so it is never this verb's to touch
+# spec: installer/README.md §uninstall — the agent file is the one entry that is a span rather than a file, so the branch where it is kept still owes the doctrine block a removal: the block is prose you did not write, in the file whose purpose is to steer agent sessions, pointing at a doctrine file this verb just removed. The trim is scoped to that span alone — a marker block init never wrote is never a files[] entry, so it is never this verb's to touch
 TRIM_AGENT=0
 DOCTRINE_REMOVER="$PAYLOAD/doctrine-kit/bin/install-doctrine.sh"
 if [[ -n "${KEPT_HASH[$AGENT_FILE]:-}" ]] && kits_include doctrine-kit; then
@@ -84,7 +84,7 @@ if [[ -n "${KEPT_HASH[$AGENT_FILE]:-}" ]] && kits_include doctrine-kit; then
         "the doctrine block is trimmed through the kit's own installer so the removal path adds no second copy of the marker strings, and this run needs it because $AGENT_FILE is being kept. Run uninstall from an installed package rather than a source checkout."
 fi
 
-# spec: installer/README.md §The manifest — the hook opt-in is reported, not rewritten: git config is outside the ownership roster, and a core.hooksPath naming a directory that no longer exists is inert rather than breaking, so there is nothing to justify writing outside the contract. The resolver is only asked on a manifest carrying kits, because the recorded kit set is the whole of what keeps it off the vendored fixture trees' own scripts/gates.list — a residual manifest has no kits, and the run that produced one already printed this line
+# spec: installer/README.md §uninstall — the hook opt-in is reported, not rewritten: git config is outside the ownership roster, and a core.hooksPath naming a directory that no longer exists is inert rather than breaking, so there is nothing to justify writing outside the contract. The resolver is only asked on a manifest carrying kits, because the recorded kit set is the whole of what keeps it off the vendored fixture trees' own scripts/gates.list — a residual manifest has no kits, and the run that produced one already printed this line
 HOOKS_LINE=""
 hooks_path="$(git -C "$ROOT" config --get core.hooksPath 2>/dev/null)"
 if [[ -n "$hooks_path" && -n "$GATES_LIST" && "$GATES_LIST" == */* && ${#KITS[@]} -gt 0 ]]; then
@@ -105,7 +105,7 @@ ancestors() {   # $1 = repo-relative path -> each of its directories, deepest fi
     while [[ "$d" == */* ]]; do d="${d%/*}"; printf '%s\n' "$d"; done
 }
 
-# spec: installer/README.md §The manifest — a file you added inside a vendored directory is not on the roster, so it is never removed; the plan names it because a directory left behind holding only your own files is a surprise worth spending a line on before the run rather than after
+# spec: installer/README.md §uninstall — a file you added inside a vendored directory is not on the roster, so it is never removed; the plan names it because a directory left behind holding only your own files is a surprise worth spending a line on before the run rather than after
 adopter_added() {
     local kit f
     for kit in ${KITS[@]+"${KITS[@]}"}; do
@@ -121,7 +121,7 @@ by_top_dir() {   # repo-relative paths on stdin -> '<top-level dir or file> <cou
         | awk '{ printf "  %-32s %d file(s)\n", $2, $1 }'
 }
 
-# spec: installer/README.md §The manifest — a run with nothing to remove says so and exits 0: the install is still there, so narrowing the manifest here would disown an install that has not ended
+# spec: installer/README.md §uninstall — a run with nothing to remove says so and exits 0: the install is still there, so narrowing the manifest here would disown an install that has not ended
 if [[ ${#REMOVE[@]} -eq 0 ]]; then
     printf 'UNINSTALL: nothing to remove — of %d recorded file(s), %d have changed since init wrote them and %d are already gone.\n' \
         "$(( ${#KEEP[@]} + ${#GONE[@]} ))" "${#KEEP[@]}" "${#GONE[@]}"
@@ -158,7 +158,7 @@ fi
 
 for p in "${REMOVE[@]}"; do rm -f "$ROOT/$p" || die "could not remove $p"; done
 
-# spec: installer/README.md §The manifest — pruning is bottom-up and only ever removes a directory that is now empty: uninstall removes files it owns, never directories it merely emptied around, so one left holding anything at all is left alone
+# spec: installer/README.md §uninstall — pruning is bottom-up and only ever removes a directory that is now empty: uninstall removes files it owns, never directories it merely emptied around, so one left holding anything at all is left alone
 while IFS= read -r d; do
     rmdir "$ROOT/$d" 2>/dev/null
 done < <(for p in "${REMOVE[@]}"; do ancestors "$p"; done | LC_ALL=C sort -ru)
@@ -180,7 +180,7 @@ else
     die "could not rewrite $CHECKWRIGHT_LOCK_FILE over the kept file(s)"
 fi
 
-# spec: installer/README.md §The manifest — the staged set is the removals and the manifest disposition, and a kept file is never among them: staging a file left for the adopter is the same defect init's written-set/roster split exists to prevent, and it stays one when the write is a removal
+# spec: installer/README.md §uninstall — the staged set is the removals and the manifest disposition, and a kept file is never among them: staging a file left for the adopter is the same defect init's written-set/roster split exists to prevent, and it stays one when the write is a removal
 STAGE=()
 while IFS= read -r -d '' p; do STAGE+=("$p"); done < <(git -C "$ROOT" ls-files -z -- "${REMOVE[@]}")
 if [[ -f "$LOCK" ]] || git -C "$ROOT" ls-files --error-unmatch -- "$CHECKWRIGHT_LOCK_FILE" >/dev/null 2>&1; then

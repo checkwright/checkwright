@@ -1652,7 +1652,7 @@ the expected "no match"; the caller draws that line at the capture site.
 
 ### lib/inject.sh
 
-The marker-bounded span mechanics every kit's agent-file injector shares — two
+The marker-bounded span mechanics every kit's agent-file injector shares — three
 functions over one notion of a well-formed block.
 
 `inject_marker_block <file> <begin> <end>` takes the inner block content on
@@ -1668,12 +1668,23 @@ caller to report.
 existing block's inner content (markers exclusive) on stdout, prints nothing
 and exits 0 when the marker pair is absent, and refuses on the same two
 malformed targets its sibling refuses on — a begin marker without its end, and
-a missing file, both exit 2. The two agreeing on what a malformed target is, in
-one module, is the point of pairing them: a caller that reads a block before
-rewriting it must not meet two different answers to the same question.
+a missing file, both exit 2.
 
-The module owns **placement and retrieval, and nothing above them.** Block
-content *generation* stays with the caller (the lifecycle roster, the doctrine
+`remove_marker_block <file> <begin> <end>` is the third: it deletes the marker
+pair and everything between it (inclusive), leaves the rest of the file
+byte-identical, and echoes `removed` when it removed one. An **absent begin
+marker is a no-op that exits 0 and prints nothing**, not a refusal — the caller
+is a path reversing an installation, which cannot know whether the block was
+ever written there, so a second removal must be as quiet as the first. It
+refuses on the same two malformed targets its siblings refuse on, both exit 2.
+
+All three agreeing on what a malformed target is, in one module, is the point of
+keeping them together: a caller that reads a block before rewriting it, or
+removes one it may never have written, must not meet three different answers to
+the same question.
+
+The module owns **placement, retrieval and removal, and nothing above them.**
+Block content *generation* stays with the caller (the lifecycle roster, the doctrine
 digest), and so does any rule about what to *preserve* out of a block that was
 read — doctrine-kit's declared-trim round-trip (doctrine-kit/SPEC.md
 §install-doctrine) is read-compute-emit in that installer, not a preserve rule
@@ -1682,11 +1693,12 @@ one kit's marker vocabulary to every consumer of a generic injector, which is
 the provenance seam this split keeps intact; the caller-side shape is the one
 `bin/gen-pre-commit.sh` already uses for its `gen=manual` regions. So a second
 injector adds no second copy of the awk replace logic — every marker-bounded
-projection in the tree rides these two, `doctrine-kit/bin/install-doctrine.sh`
+projection in the tree rides them, `doctrine-kit/bin/install-doctrine.sh`
 and `lifecycle-kit/bin/install-lifecycle.sh` among them. A sourced library, not
 a gate: exercised end-to-end wherever an installer that rides it runs
 (doctrine-kit and lifecycle-kit `smoke/install.sh`) — doctrine-kit's covers the
-read half, through the trim round-trip its acceptor drives.
+read half through the trim round-trip its acceptor drives, and the removal half
+through a `--remove`/reinstall round trip beside it.
 
 ### lib/declaration.sh
 

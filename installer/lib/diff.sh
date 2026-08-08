@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The manifest — classifies every files[] entry against the tree using lock_hash, the same comparison claim() makes: unchanged is counted only, changed and missing are each named apart because a deletion and an edit have different remedies. Exit status is the verdict: 0 every recorded entry matches, 1 at least one is changed or missing
+# spec: installer/README.md §diff — classifies every files[] entry against the tree using lock_hash, the same comparison claim() makes: unchanged is counted only, changed and missing are each named apart because a deletion and an edit have different remedies. Exit status is the verdict: 0 every recorded entry matches, 1 at least one is changed or missing
 #
 # usage: checkwright diff
 #   No --dry-run: diff writes nothing, so it has no mutating form to guard.
@@ -33,7 +33,7 @@ LOCK="$(lock_path "$ROOT")"
 lock_schema_ok "$LOCK" || die "$CHECKWRIGHT_LOCK_FILE carries a schema this build does not know" \
     "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for."
 
-# spec: installer/README.md §The manifest — a recorded path already off the tree is reported apart from one whose content differs: init's roster exit rule means the next init would silently drop a missing path and rewrite it fresh, which is worth a warning before it happens rather than after
+# spec: installer/README.md §diff — a recorded path already off the tree is reported apart from one whose content differs: init's roster exit rule means the next init would silently drop a missing path and rewrite it fresh, which is worth a warning before it happens rather than after
 CHANGED=(); MISSING=(); SAME=0
 while IFS=$'\t' read -r p h; do
     [[ -n "$p" ]] || continue

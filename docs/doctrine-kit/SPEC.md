@@ -128,11 +128,29 @@ reworded bullet, an added line — is reverted by design, and would red
 markers is the adopter's and is never read or written. Stating the bound is what
 makes the preserved case a contract rather than an accident.
 
+**The removal mode.** `install-doctrine.sh --remove [agent-file]` is the insert
+path reversed over the same marker pair, riding gate-sdk's `remove_marker_block`
+exactly as the insert path rides its sibling — so the marker strings keep their
+one writer and a caller reversing an installation needs no copy of them. It
+harvests no trims and emits no digest: a removal has nothing to carry forward,
+which is what makes it the reverse of the round-trip above rather than a second,
+emptier pass through it. An agent file carrying **no block is not an error** —
+the run says there was nothing to remove and exits 0, so a second `--remove` is
+as quiet as the first and a caller that cannot know whether the block was ever
+written there needs no way to ask. The refusals are the insert path's, unchanged
+and the only two: a missing agent file is exit 2, and a begin marker without its
+end is exit 2 rather than a guess at the block bounds. What it removes is the
+reference block and nothing else — everything outside the markers is the
+adopter's, on the same terms the honest bound above states for a rewrite.
+
 The round-trip's acceptor is `smoke/install.sh`, per the coverage tier
 gate-sdk/SPEC.md §lib/inject.sh sets for a sourced library with no gate surface:
 it declares a trim in the block the installer just emitted, re-runs the
 installer, and holds that the marker survived in the trimmed bullet's position,
-that the bullet is gone, and that the gate is green across the re-run.
+that the bullet is gone, and that the gate is green across the re-run. The same
+acceptor covers the removal mode on that tier and for that reason: it strips the
+block, holds that a second `--remove` is an idempotent no-op, and reinstalls to
+restore the baseline.
 
 Positional overrides `install-doctrine.sh [agent-file [doctrine-file]]` let a
 smoke or a fixture point both paths at a scratch tree without touching consumer
