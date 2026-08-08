@@ -491,6 +491,51 @@ amendment's own verification — the host's response to the backfill is observed
 rather than predicted, and a host that resolves Latest some other way falsifies
 the amendment's premise and is an escalation, not a fix-up.
 
+**`install-profile-seam` cuts three units, and the sizing objection was heard and
+declined — ruled 2026-08-08 by the operator.** The directive was undirected, so
+the theme is the cut rather than an input to it. In build order:
+
+1. `profile-keyed-install` — a new slug, not yet in the queue.
+2. `kit-owned-install-recipe`.
+3. `lock-own-file-narrowed-profile-drift`.
+
+The theme is the installer's profile and roster seam, which is where steps 5 and
+6 of the PRIORITY DIRECTIVE below both stall. Steps 1–4 are discharged — verified
+against the tree at this scope, not against queue prose — so step 5 is what the
+sequence names next, and its own entry sizes it at two to three iterations with
+profile-keyed install as the first. Unit 1 is that slice and nothing more: it
+ships no prose profile and no prose gate cohort. The ground is that a profile is
+only a kit set today — every recipe function in `installer/lib/common/recipe.sh`
+is keyed by kit and takes no profile argument — so a roster-only fourth profile
+would install exactly what `full` installs, and `installer/profiles.list` carries
+an explicit *no fourth profile* invariant the consumer smoke asserts.
+
+**The declined objection is the half worth recording.** Scope offered a
+two-unit cut on the grounds that units 1 and 2 are both large. The operator took
+all three: option (b) was on the table and was not chosen, so **the double rewrite
+of `recipe.sh`'s roster layer is the cost being bought out**, deliberately. Unit 2
+re-owns the same per-kit roster that unit 1 must make profile-aware, and building
+them apart means designing that seam twice.
+
+**Scope promoted none of the three, and unit 3 is the reason worth stating.**
+Units 1 and 2 are features by the new-names litmus, so `spec` authors their
+amendments and pairs them in. Unit 3 was ruled in *as debt* and scope attempted
+the promotion — `check-amendment-queue` refused it, because the entry carries
+`[design-pending]` and that tag may not enter the active queue. The gate is right
+and the refusal was resolved at its source rather than overridden: an entry whose
+design is unsettled is not promotable, so unit 3 reaches `spec` with the other
+two. Whether it emerges as debt or as a feature is the design's to decide — both
+its candidate fixes touch the manifest contract `installer/README.md` §The
+manifest owns, and if the ruling changes what that contract guarantees a
+consumer, the litmus makes it a feature owing an amendment.
+
+**The honest limit.** The cut's ordering is argued from entry text and one
+re-verified premise, not from a build. Unit 2's own entry prices itself at roughly
+nine new scripts, eleven smoke rewrites, a `gate-sdk/SPEC.md` contract section and
+a gate with a fixture pair — so if `spec` finds units 1 and 2 cannot honestly share
+an iteration, that is a finding to escalate rather than absorb, and the declined
+option (b) is the cut already costed and waiting.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-03 by the operator.** The track sequences toward **per-profile
