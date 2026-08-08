@@ -61,7 +61,10 @@ theme**, and rides that same escalation. The directive still bounds the survey;
 what it may no longer do is silently outrank a counted recurrence. The count is
 the number of dates on the entry's `recurrence:` declaration
 (queue-kit/SPEC.md §The tag algebra) — one anchored grep over the deferred
-section, no tool and no queue-kit dependency. It is scoped to deferred entries
+section, no tool and no queue-kit dependency. Each of those dates is a **judged**
+recurrence, stamped by a session that read the grounds rather than derived from a
+string match, so a count reaching the threshold is a signal to act on rather than
+a number to sanity-check first. It is scoped to deferred entries
 because promotion is the decision it forces; an entry already active is being
 built. **The collision is decided, not resolved in the theme's favour**: the rule
 does not promote, it puts the unit in front of the authority this stage already

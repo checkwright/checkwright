@@ -34,38 +34,6 @@
   Ruled in by the operator 2026-08-08 as unit 2 of `adopter-floor-integrity` (TRAJECTORY.md);
   filed 2026-08-08 by close draining the gap inbox, found at scope, promoted here by spec.
 
-- **gap-resolver-mention-overcount** [spec: SPEC-recurrence-judgment.md] — the recurrence
-  resolver cannot tell a citation from a recurrence, so a bullet that merely mentions an entry
-  inflates it.
-  recurrence: gap-resolver-mention-overcount 2026-08-06 2026-08-07
-  `bin/file-gap.sh` stamps a ``recurrence of `<slug>`:`` verdict on any bounded substring match
-  of a live slug in a bullet's prose, and close's drain re-resolves with the same predicate — so
-  the step designed to check the marker agrees with it by construction. Two readers consume the
-  count: lifecycle-kit's scope pre-emption threshold (`LIFECYCLE_KIT_RECURRENCE_THRESHOLD`) and
-  drift-kit's `kpi-incident-recurrence`.
-  **The dates on the line above are not evidence.** The resolver this entry indicts produced
-  them, so they cannot distinguish a real recurrence from the instrument reading itself. They
-  stay for the record, unrewritten, and the design rests elsewhere.
-  **The grounding instance is a known false positive.** This iteration's last gap-inbox bullet
-  names `ruling-record-condition-staleness-probe` because its filer had already ruled the
-  finding must be a *separate* entry; the resolver labelled it a recurrence of that slug anyway,
-  and the rejection is recorded in the bullet's own text. Replaying that prose through the
-  shipped tool reproduces the stamp on a bullet whose second sentence spells out the denial —
-  and striking the marker at capture does not survive the drain's re-resolution.
-  The amendment demotes the matcher to an advisory that asks the filer, moves the claim into the
-  prose, and makes close's drain the authoritative judge — retiring the single-auditable-producer
-  property, whose sole-producer half history already falsifies (three of the nine commits that
-  stamped a recurrence date did it from outside the drain). Enforcement is a new
-  `check-gap-inbox-neutrality` over the capture surface plus the inverted
-  `file-gap-recurrence.test.sh` over the tool.
-  **Sibling premises move and no sibling is edited here:** `recurrence-resolver-literal-match-only`
-  and `recurrence-drain-input-widening` are the other two faces of the same predicate, and their
-  disposition is a queue call escalated with this stage's report rather than an amendment's to
-  make.
-  Ruled in by the operator 2026-08-08 as unit 3 of `adopter-floor-integrity` (TRAJECTORY.md),
-  feature-shaped over a narrower debt sliver; filed 2026-08-05 by close, found at scope,
-  promoted here by spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -84,6 +52,15 @@
   **Why it needed a ruling rather than a fix in place:** widening the input widens what a
   machine writer may stamp onto the queue, and the single-producer property is what makes the
   count auditable. Both halves were deliberate, so which one yields is not close's to decide.
+  **That premise moved, and this entry now owns the question it opened.**
+  `gap-resolver-mention-overcount` back-tested the sole-producer claim against history and found
+  it already false: of the nine commits that ever added a `recurrence:` date, three stamped one
+  from outside the drain with no bullet in the same commit. So the drain is the only *mechanized*
+  producer, never the only one, and the auditability the single-producer property was protecting
+  has been re-based on same-commit inspection rather than re-derivation. Whether a direct stamp
+  by a session that observed a recurrence outside the capture channel should be sanctioned,
+  forbidden, or mechanized is inherited here by name and deliberately left open there — it is
+  this entry's question, and the widening it names is now the live half of it.
   **Cost while deferred:** a recurrence observed anywhere but the capture channel misses both
   `kpi-incident-recurrence` and scope's pre-emption threshold, so the theme keeps outranking
   it silently — with the counter shipped, that silence now reads as evidence of no recurrence.
@@ -3284,8 +3261,14 @@
   **Why `[design-pending]`:** the under-matching direction has no syntactic remedy at all. The
   over-counting sibling can at least imagine a filer-supplied flag; here the missing signal is in
   the filer's head, so the honest candidates are a required recurrence-or-new field on
-  `file-gap.sh`, or accepting the drain's session-side re-resolution as the only real channel —
-  the same contract call `gap-resolver-mention-overcount` already names.
+  `file-gap.sh`, or accepting the drain's session-side judgment as the only real channel.
+  **That contract call has since been made, and this entry survives it.**
+  `gap-resolver-mention-overcount` landed the second candidate: the drain is the authoritative
+  judge, the capture-time matcher is demoted to an advisory that asks the filer, and the required
+  recurrence-or-new field is refused there with cause (it interrogates a filer who has not read
+  the queue). So the channel question is settled and this entry's is not — the shipped advisory
+  is silent exactly where this entry points, since a bullet that never spells the slug raises no
+  prompt at all, leaving the whole burden on a drain reading prose with nothing marking the match.
   **Cost while deferred:** the recurrence count under-reports in a direction nobody can audit,
   and its two readers — scope's pre-emption threshold and `kpi-incident-recurrence` — see a
   backlog that looks less repetitive than it is.
@@ -3983,5 +3966,6 @@
 ## Done
 
 - consumer-toolchain-floor-filter
+- gap-resolver-mention-overcount
 
 ## Lessons Learned

@@ -47,6 +47,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    check-merge-attrs            # multi-operator: needs the .gitattributes step (step 4)
    check-close-surfaces
    check-survey-record          # inert until a survey is filed (bin/file-survey.sh)
+   check-gap-inbox-neutrality   # inert until a gap is filed (bin/file-gap.sh)
    ```
    <!-- gate-roster:end -->
 

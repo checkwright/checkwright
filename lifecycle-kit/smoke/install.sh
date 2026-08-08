@@ -13,6 +13,7 @@ check-close-surfaces
 check-merge-attrs
 check-lifecycle-registration
 check-survey-record
+check-gap-inbox-neutrality
 EOF
 
 if [[ ! -f TASK-QUEUE.md ]]; then

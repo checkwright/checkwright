@@ -357,9 +357,12 @@ times without anyone promoting it is a governance failure, surfaced loudly rathe
 than absorbed.
 
 Unlike the `relates:` declaration refused above, no corpus needs migrating. The
-line is **machine-written** by the closing stage's gap-inbox drain
-(lifecycle-kit/SPEC.md §The committed gap inbox) and hand-read; an entry with no
-declaration is simply an entry that has not recurred.
+line is **session-written under judgment** — the closing stage's gap-inbox drain
+is its only mechanized producer, and each date records that session's ruling that
+the finding re-occurred, read off the filed prose rather than derived from it
+(lifecycle-kit/SPEC.md §The committed gap inbox owns the rule and the standard) —
+and hand-read; an entry with no declaration is simply an entry that has not
+recurred.
 
 Two tags ride **Lessons Learned** entries — a lesson is a top-level bullet
 under the fixed-spelling `## Lessons Learned` heading, and `bin/queue-index.sh`

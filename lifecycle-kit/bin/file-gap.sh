@@ -2,7 +2,7 @@
 # spec: lifecycle-kit/SPEC.md §The committed gap inbox — the capture affordance; stamps the bullet grammar, no caller-side redirect (the kfric.sh pattern)
 # usage: file-gap.sh "<gap prose>"   (required, non-empty)
 #   appends one dated bullet '- <YYYY-MM-DD> — <gap prose>' to the committed gap inbox; exit 2 on misuse
-#   a prose naming a live queue slug gains the recurrence marker: '- <date> — recurrence of `<slug>`: <prose>'
+#   a prose naming a live queue slug additionally raises a stderr advisory; the bullet is unchanged
 set -uo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -27,7 +27,7 @@ mkdir -p "$(dirname "$INBOX")" 2>/dev/null || true
 [[ -f "$INBOX" ]] \
     || printf '# contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one bullet per gap below.\n' > "$INBOX"
 
-# spec: lifecycle-kit/SPEC.md §The committed gap inbox — resolve the prose against the live slug set: every column-0 entry bullet outside the fixed-spelling Lessons section, which is active + deferred + configured icebox with done excluded by grammar (a bare-slug line) and Lessons by name (a lesson may be written in the entry shape); longest match wins, and this awk is lifecycle-kit's own rather than queue-kit's queue_live_slugs, which would close a cross-kit cycle
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — resolve the prose against the live slug set to raise the advisory, never to stamp a verdict: every column-0 entry bullet outside the fixed-spelling Lessons section, which is active + deferred + configured icebox with done excluded by grammar (a bare-slug line) and Lessons by name (a lesson may be written in the entry shape); longest match wins, and this awk is lifecycle-kit's own rather than queue-kit's queue_live_slugs, which would close a cross-kit cycle
 _fg_slug=""
 if [[ -f "$LIFECYCLE_KIT_QUEUE_FILE" ]]; then
     _fg_slug="$(awk -v prose="$1" '
@@ -58,16 +58,14 @@ if [[ -f "$LIFECYCLE_KIT_QUEUE_FILE" ]]; then
     ' "$LIFECYCLE_KIT_QUEUE_FILE" 2>/dev/null)"
 fi
 
-if [[ -n "$_fg_slug" ]]; then
-    line="- $(date +%F) — recurrence of \`$_fg_slug\`: $1"
-else
-    line="- $(date +%F) — $1"
-fi
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — one bullet shape for every filing, matching or not: the tool records the observation and never interposes a verdict
+line="- $(date +%F) — $1"
 printf '%s\n' "$line" >> "$INBOX"
 printf 'file-gap: %s\n' "$line"
 
+# spec: lifecycle-kit/SPEC.md §The committed gap inbox — the advisory asks rather than asserts: a slug in the prose is an input to the drain's judgment, so the question goes to the one party who can answer it while the finding is still in mind
 if [[ -n "$_fg_slug" ]]; then
-    printf 'file-gap: this finding is already filed under `%s` — recorded as a recurrence; the closing stage'"'"'s drain stamps the date onto that entry.\n' \
+    printf 'file-gap: this prose names live entry `%s`. If this bullet RE-FILES that finding, say so in the prose and say why; if it merely cites, corrects, or argues against that entry, say it is DISTINCT and why. The closing stage'"'"'s drain judges the recurrence and reads what you wrote — it has nothing else to go on.\n' \
         "$_fg_slug" >&2
 fi
 

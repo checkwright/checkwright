@@ -593,10 +593,11 @@ friction, and routes here.
 **The surface.** `.workflow/gap-inbox.md` (knob `LIFECYCLE_KIT_GAP_INBOX_FILE`,
 §Layout and configuration) is a committed, append-only capture buffer. Grammar:
 a `# contract:` prose header, then one `- <YYYY-MM-DD> — <gap prose>` bullet per
-gap, optionally carrying a **recurrence marker** between the date and the prose:
-``- <YYYY-MM-DD> — recurrence of `<slug>`: <gap prose>``. The single-backticked
-slug is queue-kit's existing in-body citation form (queue-kit/SPEC.md §The tag
-algebra), borrowed rather than re-spelled. Committed, not gitignored — a
+gap — **one shape for every filing**, with no structured slot between the date
+and the prose. A slug named *inside* the prose takes queue-kit's existing
+in-body citation form (queue-kit/SPEC.md §The tag algebra), single-backticked,
+borrowed rather than re-spelled; it is a citation and never a field, which is
+the whole distinction §check-gap-inbox-neutrality holds. Committed, not gitignored — a
 per-clone buffer fragments the backlog across
 operators, the finding that rules the gitignored friction log out as the channel.
 What *append-only* means on this surface is a merge property, and
@@ -610,7 +611,13 @@ line into the inbox) stays a legal fallback, the grammar being the surface's
 contract, not the writer.
 
 It also **resolves the prose against the live slug set** at capture and, on a
-match, stamps the recurrence marker into the bullet it was already writing. The
+match, raises a stderr advisory that **asks** the filer: the prose names live
+entry `<slug>` — if this bullet *re-files* that finding, say so in the prose and
+say why; if it merely cites, corrects, or argues against that entry, say it is
+*distinct* and why, because the closing stage's drain judges the recurrence and
+reads what was written. The resolution buys a prompt and nothing else: it writes
+no marker, and the bullet it accompanies is the same one shape every filing gets.
+The
 live set is every column-0 `- **<slug>** —` entry bullet in the queue file
 *outside* the fixed-spelling `## Lessons Learned` section — that is exactly
 active, deferred, and a configured icebox — and it needs **no section knob of its
@@ -620,7 +627,7 @@ entry grammar queue-kit/SPEC.md §The queue format defines. Lessons is excluded 
 name, and must be: a lesson lead line is outside that grammar for every *gate*,
 but it may legitimately be *written* in the entry shape (`- **slug** [tag] —
 prose`), so a grammar-only scan would resolve a live lesson as a queue entry and
-stamp a declaration onto something that is not one. The `## Lessons Learned`
+ask the filer about something that is not one. The `## Lessons Learned`
 literal is fixed spelling rather than config (queue-kit/SPEC.md §The tag algebra),
 and this kit already carries it — `bin/enter-stage.sh`'s boundary refusal and
 `check-lesson-disposition` both scan it.
@@ -633,6 +640,35 @@ cycle. queue-kit/SPEC.md §The queue format states that as the general rule (a k
 that cannot depend on queue-kit re-implements the predicate and both ends cite the
 owner section), and drift-kit's `kpi-deferred-age` records the same accepted
 residual.
+
+**Why the matcher prompts rather than decides, and why it survives at all.** A
+recurrence is a claim about *what a finding is*, not about *what a string
+contains*, and no syntactic tell separates "this recurred" from "this is about
+that": a bullet can spell the denial out in words and still match. So the
+predicate is not sharpened, it is **demoted** — its recall was never the defect,
+its authority was. Deleting it would delete the only thing that can produce the
+prompt, and the prompt is what reaches the one party who can answer cheaply: a
+mid-build filer routinely has not read the queue, which is why the matcher
+existed in the first place.
+
+**Its honest limit.** A bullet describing a recurrence without spelling the slug
+raises no advisory at all. That leaves no hole in this channel, because the drain
+reads **every** bullet regardless of whether the matcher spoke — which is the
+difference between a prompt and a gate, and the reason the judgment had to move
+rather than the predicate get sharper.
+
+**Three alternatives are refused, recorded so they are not re-drafted.** A
+*required* recurrence-or-new argument on the affordance turns capture into an
+interrogation, and refusing capture does not dissolve a finding — it pushes it
+back into session context, the deferred-capture antipattern this inbox exists to
+prevent; it is also asked of a party who has not read the queue. An *optional*
+`--recurrence <slug>` flag invites the drain to trust a structured claim,
+reinstating the same defect one layer up with a better provenance story. And
+*narrowing the matcher* — anchoring the slug, exempting a bullet containing a
+negation — institutionalizes the evasion: an affordance that must be phrased
+around to stay accurate is miscalibrated, and the next filer does not know to
+phrase around it. What all three trade against is prose, which the channel
+already carries and a judge already reads.
 
 **The tool writes no queue file, and that is the load-bearing constraint on the
 whole channel.** This inbox exists precisely because a gap surfaced mid-stage has
@@ -689,27 +725,52 @@ fixed inline that session, or discarded with cause in the close commit message �
 then truncates the inbox to its header; the boundary refusal reads emptiness at
 the next scope entry as the backstop.
 
-That drain step is also the **sole producer** of the `recurrence:` declaration
-(queue-kit/SPEC.md §The tag algebra): a bullet naming a live slug stamps a
-recurrence date onto that entry's declaration — creating the line when absent,
-appending the date when present — **in addition to** its ordinary disposition,
-never instead of it. It is reachable at every close with no enabling config,
-since the drain is already mandatory and the boundary refusal already forces it,
-and no mid-iteration path writes the declaration at all. The drain
-**re-resolves the prose itself** rather than trusting the capture-time marker,
-and that is what makes the channel whole: a raw append into the inbox stays a
-legal fallback, so a bullet filed without the tool carries no marker and must
-still be counted. The marker is a capture-time convenience; the drain is the
-channel. Stamping is **idempotent per (slug, date)** — two filings of one slug on
+**A `recurrence:` date records a session's judgment that a finding re-occurred,
+made by reading the bullet's prose. A slug appearing in a bullet is an input to
+that judgment and never a verdict; no mechanism produces the declaration.**
+
+That drain step is the declaration's only **mechanized** producer
+(queue-kit/SPEC.md §The tag algebra), and it is the stage that must not skip the
+judgment: on a bullet it judges a recurrence it stamps the date onto that entry's
+declaration — creating the line when absent, appending the date when present —
+**in addition to** its ordinary disposition, never instead of it. It is reachable
+at every close with no enabling config, since the drain is already mandatory and
+the boundary refusal already forces it. It is *not* the only producer in fact: a
+session that observes a recurrence outside the capture channel can stamp one
+directly, and whether that path should be sanctioned, forbidden, or mechanized is
+open. Stamping is **idempotent per (slug, date)** — two filings of one slug on
 one day record one date, the day being the only resolution the bullet's own
 grammar has, and inventing a finer one would claim precision this channel does not
 carry.
 
-Each bullet's three fields have named readers: the date feeds close's staleness
-judgment and becomes the stamped recurrence date, the prose is the disposition
-body and the drain's own resolution input, and the optional recurrence marker is
-read by the filer at capture (via stderr) and by the drain as a convenience it
-does not depend on.
+**What the judgment rule costs, and what pays for it.** The property the rule
+declines to offer is **re-derivability**: a date is *not* reproducible by
+re-running any predicate over the queue, so a reader cannot audit the count
+without trusting the session that stamped it, and claiming otherwise would be the
+dishonest half of the trade. What
+pays for it is **auditability by inspection** — the drain stamps the declaration
+in the *same commit* that truncates the inbox, so the judgment and the prose it
+was made from sit in one diff and a reader auditing a date reads that commit and
+sees the bullet the judge read. That same-commit rule is therefore **load-bearing
+rather than incidental**: it is the audit artifact. Re-running a matcher is
+replaced by reading the grounds, which is the correct trade when the thing
+recorded is a judgment.
+
+**A provenance gate was drafted here and is refused, recorded so it is not
+re-drafted.** Requiring every commit that adds a `recurrence:` date to co-stage
+the inbox looks like the enforced replacement for re-derivability. It is not: a
+back-test over this project's own history redded roughly one in three of the
+commits that had ever stamped one, and it would foreclose the direct-stamp path
+above by gating exactly the route that open question may want opened. A gate that
+reds a third of the precedent it was derived from is measuring the rule, not the
+tree.
+
+Each bullet's two fields have named readers: the date feeds close's staleness
+judgment and becomes the stamped recurrence date, and the prose is the
+disposition body, the grounds the drain judges the recurrence from, and — via the
+capture-time advisory on stderr — the field the filer is asked to write the claim
+into. There is no third field, which is the point:
+§check-gap-inbox-neutrality keeps it that way.
 
 ## The survey record
 
@@ -1715,6 +1776,55 @@ read it. The first is unmechanizable; the second leaves no tracked artifact —
 the class delegation-kit/SPEC.md §Operative residency rules no gate is owed for.
 The entry report's read trigger (§bin/enter-stage.sh) is the affordance in place
 of an oracle there, and it is weaker than one by construction.
+
+### check-gap-inbox-neutrality
+
+Invariant: the gap inbox (§The committed gap inbox) records observations, not
+conclusions. Two assertions over every non-blank line below the `# contract:`
+header:
+
+- **A — grammar.** Every line is `- <YYYY-MM-DD> — <prose>` with non-empty
+  prose. Nothing gated this before, even though the raw append is an explicitly
+  legal fallback, so a malformed bullet was found by the drain reading it an
+  iteration later.
+- **B — no interposed verdict.** No bullet's prose opens with the retired
+  ``recurrence of `<slug>`:`` form. This is the class assertion, and its value is
+  that it catches a conclusion reaching the capture surface **by any producer** —
+  a stale vendored affordance, a hand append copying an older bullet's shape —
+  rather than only the affordance this kit ships. The `help:` line teaches the
+  rule rather than the regex: say *why* you believe the bullet re-files an entry,
+  in the prose, and let the drain judge.
+
+An absent inbox is **clean, not fail-closed** — never having filed a gap is a
+legal state for a fresh consumer, unlike §check-lifecycle-registration's missing
+agent file, which is an install that did not finish. Fail-closed applies to the
+scanner's own exit status, per gate-sdk's contract.
+
+**Bare drives the configured inbox; an explicit file argument drives it
+hermetically**, the §check-survey-record precedent, which is what lets the
+fixture pair run against a copied inbox.
+
+**Why the tool-side contract is pinned separately.** This gate reads the surface
+and cannot see which producer wrote a line, so it cannot hold the affordance to
+its own contract. `gate-tests/file-gap-recurrence.test.sh` is what does that. The
+two together are the enforcement: the fixture-runner catches the producer
+regressing, the gate catches a verdict arriving by any other route.
+
+The gate satisfies the four gate-sdk contracts (gate-sdk/SPEC.md §The gate
+model): the single `GAP-INBOX-NEUTRALITY: clean` line and a `help:` remedy on the
+finding path (output); exit 2 on an unreadable or explicitly-named-but-missing
+inbox and on a failed parse (fail-closed); a `good/`+`bad/` fixture pair under
+`gate-tests/` driven through the hermetic argument — the good case a record whose
+prose both re-files and disclaims an entry in words, the bad case a retired
+marker beside two broken bullets (fixture-pair); and registration in this repo's
+`gates.list`, where its scan target is this repo's own inbox (self-lint). Its
+`# graph:` couples the inbox at `tier=precommit`.
+
+*Not gated, and stated so the gate is not mistaken for more than it is:* whether
+a bullet's prose states the recurrence claim **at all**, and whether the claim is
+**right**. Assertion B removes the one shape that pre-empts the judge; it cannot
+compel a filer to answer the advisory, and the judgment itself is the drain's
+(§templates/stages/), which is where the amendment deliberately put it.
 
 ### templates/stages/
 

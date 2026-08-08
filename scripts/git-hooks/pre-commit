@@ -225,6 +225,10 @@ if staged_matches '.workflow/survey-record.md'; then
     run_gate check-survey-record lifecycle-kit/checks/check-survey-record.sh
 fi
 
+if staged_matches '.workflow/gap-inbox.md'; then
+    run_gate check-gap-inbox-neutrality lifecycle-kit/checks/check-gap-inbox-neutrality.sh
+fi
+
 if staged_matches 'TASK-QUEUE.md'; then
     run_gate check-queue-sections queue-kit/checks/check-queue-sections.sh
 fi

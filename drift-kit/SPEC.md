@@ -214,8 +214,12 @@ Lag:
   — one owner doc, two implementations, both carrying a `spec:` line citing the
   owner. **The lag label is a measurement claim, not a priority one.** A
   recurrence nobody files is uncounted, exactly `kpi-knowledge-friction`'s
-  structure, so lag is the honest fidelity tier even though the metric is highly
-  actionable. Actionability rides lifecycle-kit's pre-emption rule and its
+  structure — and so is one no session **judged**, since each date records a
+  judgment rather than a derivation: the same lag structure, one step later in
+  the chain. So lag is the honest fidelity tier even though the metric is highly
+  actionable. **It is a judged count, so it is only comparable across a fixed
+  judging rule** — changing what counts as a recurrence breaks comparison across
+  the change, and a series spanning such a change is two series, not one. Actionability rides lifecycle-kit's pre-emption rule and its
   `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`, never this report's weighting — which is
   why the counter and the rule are two pieces and not one. A report-only signal
   would have reproduced the defect the pair exists to fix: a faithful record no
