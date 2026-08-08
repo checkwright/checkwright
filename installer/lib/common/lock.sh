@@ -22,6 +22,41 @@ lock_field() {   # $1 = manifest path, $2 = field name -> its value, arrays spac
     ' "$1" 2>/dev/null
 }
 
+# spec: installer/README.md §The manifest — the fields whose wire type is an array rather than a string, which is knowledge only the schema owner has: lock_emit space-splits exactly these, the inverse of lock_field's space-join on read, so one file holds both halves of the shell<->wire representation and a caller needs no second grammar to pass one
+CHECKWRIGHT_LOCK_ARRAY_FIELDS="kits"
+
+# spec: installer/README.md §The manifest — the single writer of the wire shape, so a second writing verb cannot drift from the first: keys are sorted at every nesting level, and an identity field or the artifact key is present exactly when the caller supplied it — never a null or an empty placeholder standing in for an omission. `jq -S` is the implementation that satisfies the sort property, not the definition of it
+lock_emit() {   # $@ = key=value identity fields and an optional '--artifact <target> <digest>'; '<path><TAB><hash>' lines on stdin -> the manifest object
+    local target="" digest="" with_artifact=0
+    local -a idents=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --artifact)
+                [[ $# -ge 3 ]] || { echo "lock_emit: --artifact takes a target and a digest" >&2; return 2; }
+                target="$2"; digest="$3"; with_artifact=1; shift 3 ;;
+            *=*) idents+=("$1"); shift ;;
+            *) echo "lock_emit: not a key=value field: $1" >&2; return 2 ;;
+        esac
+    done
+    jq -R -s -S \
+        --arg schema "$CHECKWRIGHT_LOCK_SCHEMA" \
+        --arg arrays "$CHECKWRIGHT_LOCK_ARRAY_FIELDS" \
+        --arg target "$target" \
+        --arg digest "$digest" \
+        --argjson with_artifact "$with_artifact" '
+        ($arrays | split(" ")) as $arr
+        | ( split("\n") | map(select(length > 0))
+            | map(split("\t") | {(.[0]): (.[1] // "")}) | add // {} ) as $files
+        | ( $ARGS.positional
+            | map( (index("=")) as $i
+                   | { key: .[:$i], value: .[$i + 1:] }
+                   | if (.key | IN($arr[])) then .value |= (split(" ") | map(select(length > 0))) else . end )
+            | from_entries ) as $ident
+        | { schema: $schema } + $ident + { files: $files }
+          + ( if $with_artifact == 1 then { artifact: { target: $target, digest: $digest } } else {} end )
+        ' --args ${idents[@]+"${idents[@]}"}
+}
+
 # spec: installer/README.md §The manifest — git's object hash, never sha256sum: macOS ships shasum instead, and git is already a floor-contract member, so the manifest's integrity story stays inside the toolchain the contract asserts
 lock_hash() {   # $1 = file -> the content hash a files[] entry records
     git hash-object -- "$1"

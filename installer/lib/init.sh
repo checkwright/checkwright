@@ -16,11 +16,6 @@ source "$INSTALLER/lib/common/recipe.sh"
 # shellcheck source=./common/digest.sh
 source "$INSTALLER/lib/common/digest.sh"
 
-# spec: installer/README.md §What init seeds — the consumer-layout names init writes against; they are gate-sdk's and canon-kit's own defaults, so a tree init made is the zero-config tree those kits expect
-GATES_DIR="scripts"
-AGENT_FILE="CLAUDE.md"
-QUEUE_FILE="TASK-QUEUE.md"
-
 PROFILE=""; DRY=0; FORCE=0; DO_COMMIT=1
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -328,30 +323,15 @@ files_hash() {   # $1 = repo-relative path -> the hash its files[] entry carries
     lock_hash "$ROOT/$1"
 }
 
+# spec: installer/README.md §The manifest — the wire shape has one writer and it is lock.sh's lock_emit; what stays here is init's own rule about which hash an entry carries, which is not the schema's business
 manifest() {
     local f
-    {
-        printf '{"schema":%s,"version":%s,"commit":%s,"profile":%s,"kits":' \
-            "$(jq -Rn --arg v "$CHECKWRIGHT_LOCK_SCHEMA" '$v')" \
-            "$(jq -Rn --arg v "$VERSION" '$v')" \
-            "$(jq -Rn --arg v "$COMMIT" '$v')" \
-            "$(jq -Rn --arg v "$PROFILE" '$v')"
-        printf '%s\n' "${KITS[@]}" | jq -Rn '[inputs]'
-        printf ',"files":{'
-        local first=1
-        for f in "${WRITTEN[@]}"; do
-            (( first )) || printf ','
-            first=0
-            printf '%s:%s' "$(jq -Rn --arg v "$f" '$v')" \
-                "$(jq -Rn --arg v "$(files_hash "$f")" '$v')"
-        done
-        printf '}'
-        # spec: installer/README.md §The manifest — the binary is neither vendored nor generated, so it joins as its own key rather than a files[] row: a files[] entry means hashed with git hash-object and rewritten when unmodified, and this one is hashed with SHA-256 against a published value and rewritten on a different rule. Its absence on a run that omitted the artifact is the omission's machine-readable form
-        [[ -n "$ARTIFACT_TARGET" ]] && printf ',"artifact":{"target":%s,"digest":%s}' \
-            "$(jq -Rn --arg v "$ARTIFACT_TARGET" '$v')" \
-            "$(jq -Rn --arg v "$ARTIFACT_DIGEST" '$v')"
-        printf '}'
-    } | jq -S .
+    # spec: installer/README.md §The manifest — the binary is neither vendored nor generated, so it joins as its own key rather than a files[] row: a files[] entry means hashed with git hash-object and rewritten when unmodified, and this one is hashed with SHA-256 against a published value and rewritten on a different rule. Its absence on a run that omitted the artifact is the omission's machine-readable form, which is why the flag is passed only when a target was selected
+    local -a args=(version="$VERSION" commit="$COMMIT" profile="$PROFILE" kits="${KITS[*]}")
+    [[ -n "$ARTIFACT_TARGET" ]] && args+=(--artifact "$ARTIFACT_TARGET" "$ARTIFACT_DIGEST")
+    for f in "${WRITTEN[@]}"; do
+        printf '%s\t%s\n' "$f" "$(files_hash "$f")"
+    done | lock_emit "${args[@]}"
 }
 
 if (( DRY )); then

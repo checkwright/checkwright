@@ -1,6 +1,12 @@
 # shellcheck shell=bash
 # spec: installer/README.md §What init seeds — sourceable owner of the per-kit install recipe: the starting gate roster a kit registers in a fresh consumer, and the seam surfaces it needs before those gates can run. Two output channels, and the difference is who writes the file: a bare repo-relative path is one this module seeded itself and init need only claim for the roster, while a '<src>\t<dest>' pair is a plan init performs through copy_in. Both feed the manifest's files[]
 
+# shellcheck disable=SC2034  # QUEUE_FILE is read by this module's callers, not by the module
+# spec: installer/README.md §What init seeds — the consumer-layout names init writes against; they are gate-sdk's and canon-kit's own defaults, so a tree init made is the zero-config tree those kits expect. They live here rather than in one verb because uninstall must trim the doctrine span out of the same agent file init wrote it into: doctrine-kit's own DOCTRINE_KIT_AGENT_FILE knob cannot answer that, since an adopter override would not change the path init actually used, so the name needs one writer both verbs read
+GATES_DIR="scripts"
+AGENT_FILE="CLAUDE.md"
+QUEUE_FILE="TASK-QUEUE.md"
+
 # spec: installer/README.md §What init seeds — the config seam is derived, never listed: a kit's consumer config is whatever `templates/*-config.sh` it ships, and the destination is always the gates dir under the file's own name. It plans and writes nothing, because the seam is rewritten on every run and is the file class whose whole purpose is to be edited: a copy landing before claim() hashes the tree destroys the very evidence the refusal is computed from, so the write belongs to copy_in
 recipe_config_seam_plan() {   # $1 = kit payload dir, $2 = gates dir -> one '<src><TAB><dest>' line per config template
     local t base
