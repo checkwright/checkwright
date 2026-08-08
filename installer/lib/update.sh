@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §init — update is init with one added precondition and its argv forwarded verbatim: checkwright.lock must already exist and carry a known schema, so a verb named update can manage an install but never perform the first one. Every init flag stays valid, including --profile, --force, --no-commit and --dry-run, so the mutating-verb --dry-run obligation is discharged by delegation rather than a second implementation that could drift from it
+# spec: installer/README.md §init — update is init with one added precondition and its argv forwarded verbatim: checkwright.lock must already exist, so a verb named update can manage an install but never perform the first one. Every init flag stays valid, including --profile, --force, --no-commit and --dry-run, so the mutating-verb --dry-run obligation is discharged by delegation rather than a second implementation that could drift from it
 #
 # usage: checkwright update [--profile <name>] [--dry-run] [--force] [--no-commit]
 #   Every init flag stays valid; see 'checkwright init --help' for what each one does.
@@ -23,14 +23,12 @@ done
 
 die() { printf 'checkwright update: %s\n' "$1" >&2; [[ -n "${2:-}" ]] && printf '  help: %s\n' "$2" >&2; exit "${3:-2}"; }
 
-# spec: installer/README.md §The manifest — the one added precondition: checkwright.lock must exist at the repository root and carry a known schema before update ever delegates to init, so a verb named update cannot perform a first install. Not being inside a git work tree at all reads the same way as an absent manifest — either way there is no existing install here for update to manage
+# spec: installer/README.md §The manifest — the one added precondition, and the whole behavioral difference from init: checkwright.lock must already exist at the repository root, so a verb named update never performs a first install. It checks existence only and no more — a present-but-unreadable schema, a stale downgrade, a below-contract toolchain, and every other init precondition are init's own checks, one call away, and repeating any of them here would be a second copy that could drift from the original. Not being inside a git work tree at all is not this verb's precondition to own either: init's own "not inside a git work tree" refusal already exists and already names the accurate remedy, so an unresolvable root here just falls through to it rather than being reported as an absent manifest
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-LOCK=""
-[[ -n "$ROOT" ]] && LOCK="$(lock_path "$ROOT")"
-[[ -n "$LOCK" && -f "$LOCK" ]] || die "no $CHECKWRIGHT_LOCK_FILE here" \
-    "update manages an install init already made; there isn't one yet. Run 'checkwright init' first."
-lock_schema_ok "$LOCK" || die "$CHECKWRIGHT_LOCK_FILE carries a schema this build does not know" \
-    "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for."
+if [[ -n "$ROOT" ]] && [[ ! -f "$(lock_path "$ROOT")" ]]; then
+    die "no $CHECKWRIGHT_LOCK_FILE at $ROOT" \
+        "update manages an install init already made; there isn't one yet. Run 'checkwright init' first."
+fi
 
-# spec: installer/README.md §init — the whole behavioral difference from init ends at the precondition above; everything else, including --dry-run, --force and --no-commit, is init's own contract, unchanged and unrepeated here
+# spec: installer/README.md §init — everything else, including --dry-run, --force and --no-commit, is init's own contract, unrepeated here
 exec bash "$INSTALLER/lib/init.sh" "$@"
