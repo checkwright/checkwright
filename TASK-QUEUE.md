@@ -12,38 +12,6 @@
 
 ## New Features
 
-- **installer-lifecycle-verbs** [spec: SPEC-lifecycle-verbs.md] [roadmap: next/adoption] —
-  update, diff and uninstall: the verbs that manage an install after `init` has made one.
-  roadmap-summary: update, diff and uninstall, so an install can be managed after init.
-  Phase 2 of the installer; phase 1 shipped in `activation-path`. Promoted 2026-08-08 at
-  spec, which ruled the question the 2026-07-26 filing predated because it predates
-  `doctor`: **`diff` is a fourth verb, not a widening of `doctor`** — `doctor`'s exit status
-  is owned by the toolchain contract `init` gates its own precondition on, and an adopter
-  editing a vendored file is sanctioned, so folded-in drift would be a permanent expected
-  finding on a verdict surface. The grounds, the refused alternatives and the taxonomy the
-  three verbs settle are in the amendment; they are not re-derived here.
-  **Deliverable — twelve work-class-labelled deltas (D1–D12) in `SPEC-lifecycle-verbs.md`:**
-  the three verb files; `remove_marker_block` in gate-sdk's shared injector and `--remove` on
-  doctrine-kit's `install-doctrine.sh`, which the agent file's marker-bounded span needs;
-  `lock_emit` in `lib/common/lock.sh`, so the second manifest writer arriving keeps the
-  schema's one owner; `doctor`'s residue reading and its `diff` pointer; the smoke's reversal
-  arm; and the prose and generated projections that turn with them.
-  **Acceptance:** `uninstall` removes only manifest-recorded files still at `init`'s recorded
-  hash — never a file the adopter wrote — and rewrites the manifest over any survivors rather
-  than disowning them; `diff` exits 0 on a pristine tree and 1 on a diverged one; every
-  mutating verb carries `--dry-run`; and `installer/consumer-smoke/run-smoke.sh` asserts the
-  reversal per profile against the consumer's pre-`init` tree object, which also closes the
-  untested direction of the manifest-agreement check — that the roster covers everything
-  `init` wrote.
-  **Couples to `plugin-marketplace`, in both directions.** That entry must package against
-  `checkwright.lock` as its install-ownership contract, and the sequencing risk it flags is a
-  second install model with no upgrade or uninstall story. This entry is that story.
-  **`uninstall` is the critical half, not the ergonomic one:** install → see value →
-  uninstall is the reversibility the adoption story rests on, and it is the one real
-  capability gap — the other two verbs are discoverability and reporting over data that
-  already exists.
-  Filed 2026-07-26 by build on the lead's ruling at the `activation-installer` merge.
-
 ## Technical Debt
 
 ## Deferred
@@ -3785,5 +3753,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- installer-lifecycle-verbs
 
 ## Lessons Learned
