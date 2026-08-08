@@ -4057,8 +4057,4 @@
 
 ## Done
 
-- consumer-toolchain-floor-filter
-- gap-resolver-mention-overcount
-- published-release-channel-flag-unheld
-
 ## Lessons Learned

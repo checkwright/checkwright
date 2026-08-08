@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+adopter-floor-integrity release deferred:v0.23.0 — the runbook determines this, not judgment: no cadence trigger fired, since the newest tag v0.22.0 is one day old against a seven-day floor and the batch carries no decommission, no supply-chain fix and no operator direction. A minor is earned — one tightened gate plus five behavior changes — so the deferral floors the next qualifying note at v0.23.0, joining installer-lifecycle-verbs' outstanding deferral at the same version rather than raising it. The two iterations' declarations now batch into one note; the non-gate half of them is carried in deferred-release-declaration-accumulation because no surface accumulates it.
