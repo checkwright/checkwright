@@ -10,3 +10,4 @@ installer-lifecycle-verbs align abb21eb6 2026-08-08
 installer-lifecycle-verbs build a085f808 2026-08-08
 installer-lifecycle-verbs build adb62513 2026-08-08
 installer-lifecycle-verbs build ae1a1c55 2026-08-08
+installer-lifecycle-verbs build a8fd42f0 2026-08-08
