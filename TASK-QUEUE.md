@@ -53,6 +53,38 @@
   Ruled in by the operator 2026-08-08 as unit 2 of `adopter-floor-integrity` (TRAJECTORY.md);
   filed 2026-08-08 by close draining the gap inbox, found at scope, promoted here by spec.
 
+- **gap-resolver-mention-overcount** [spec: SPEC-recurrence-judgment.md] — the recurrence
+  resolver cannot tell a citation from a recurrence, so a bullet that merely mentions an entry
+  inflates it.
+  recurrence: gap-resolver-mention-overcount 2026-08-06 2026-08-07
+  `bin/file-gap.sh` stamps a ``recurrence of `<slug>`:`` verdict on any bounded substring match
+  of a live slug in a bullet's prose, and close's drain re-resolves with the same predicate — so
+  the step designed to check the marker agrees with it by construction. Two readers consume the
+  count: lifecycle-kit's scope pre-emption threshold (`LIFECYCLE_KIT_RECURRENCE_THRESHOLD`) and
+  drift-kit's `kpi-incident-recurrence`.
+  **The dates on the line above are not evidence.** The resolver this entry indicts produced
+  them, so they cannot distinguish a real recurrence from the instrument reading itself. They
+  stay for the record, unrewritten, and the design rests elsewhere.
+  **The grounding instance is a known false positive.** This iteration's last gap-inbox bullet
+  names `ruling-record-condition-staleness-probe` because its filer had already ruled the
+  finding must be a *separate* entry; the resolver labelled it a recurrence of that slug anyway,
+  and the rejection is recorded in the bullet's own text. Replaying that prose through the
+  shipped tool reproduces the stamp on a bullet whose second sentence spells out the denial —
+  and striking the marker at capture does not survive the drain's re-resolution.
+  The amendment demotes the matcher to an advisory that asks the filer, moves the claim into the
+  prose, and makes close's drain the authoritative judge — retiring the single-auditable-producer
+  property, whose sole-producer half history already falsifies (three of the nine commits that
+  stamped a recurrence date did it from outside the drain). Enforcement is a new
+  `check-gap-inbox-neutrality` over the capture surface plus the inverted
+  `file-gap-recurrence.test.sh` over the tool.
+  **Sibling premises move and no sibling is edited here:** `recurrence-resolver-literal-match-only`
+  and `recurrence-drain-input-widening` are the other two faces of the same predicate, and their
+  disposition is a queue call escalated with this stage's report rather than an amendment's to
+  make.
+  Ruled in by the operator 2026-08-08 as unit 3 of `adopter-floor-integrity` (TRAJECTORY.md),
+  feature-shaped over a narrower debt sliver; filed 2026-08-05 by close, found at scope,
+  promoted here by spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -2955,56 +2987,6 @@
   pins the port exists to retire keep their hold on the toolchain floor.
   Filed 2026-08-06 at spec, under the lead's split ruling, before the head's Done-move so
   that `ROADMAP.md` never loses the commitment.
-
-- **gap-resolver-mention-overcount** [design-pending] — the recurrence resolver cannot tell
-  a citation from a recurrence, so a bullet that merely mentions an entry inflates it.
-  recurrence: gap-resolver-mention-overcount 2026-08-06 2026-08-07
-  `bin/file-gap.sh` stamps its recurrence marker on any bounded substring match of a live
-  slug in a bullet's prose, and the close drain re-resolves the same way. A bullet that
-  *cites* an entry — a correction to it, a finding adjacent to it, a note that it blocks
-  something — is counted as that entry re-occurring.
-  **Two readers consume the count**, which is what makes an inflated one expensive rather
-  than untidy: lifecycle-kit's scope pre-emption threshold
-  (`LIFECYCLE_KIT_RECURRENCE_THRESHOLD`) and drift-kit's `kpi-incident-recurrence`. An
-  inflated count promotes an entry that never recurred, and spends the pre-emption budget
-  the threshold exists to ration.
-  **The filing is its own evidence.** The bullet behind this entry had to be phrased around
-  the resolver to avoid a false stamp. A capture affordance that must be evaded to stay
-  accurate is miscalibrated, and evasion is not a property the channel can rely on — the
-  next author does not know to evade, which is precisely when the count goes wrong.
-  **The heuristic is most wrong exactly where filing matters most, and that is settled by
-  four attestations rather than argued** (2026-08-06, and three on 2026-08-07). The
-  highest-value citations are the ones that name their parent — a successor, a remainder, a
-  correction, or a bullet arguing it is *distinct* from the entry it names — and every firing
-  was one of those. The routing consequence is the expensive half: a recurrence tells close to
-  stamp a date onto an existing entry, so uncorrected the first would have absorbed a follow-up
-  unit into an entry that had just completed. All four were caught, none by the mechanism; the
-  corrective is already legal, so what is missing is not a mechanism but any prompt telling the
-  filer to check.
-  **Correction 2026-08-08, oracle-settled.** A prior revision claimed the producer never checks
-  the section, and that firings 3 and 4 resolved slugs living only in `## Done`. False on both:
-  lifecycle-kit/SPEC.md §The committed gap inbox rules the done exclusion "the substantive half",
-  `lifecycle-kit/bin/file-gap.sh` matches a **bold** slug so the bare-slug done grammar cannot
-  resolve, and `lifecycle-kit/gate-tests/file-gap-recurrence.test.sh` pins it. Those firings were
-  real over-counts on *live* slugs; only the diagnosis was wrong, and no takeable half existed.
-  **Threshold met, dispositioned 2026-08-08 by the operator:** nothing built, the discriminator
-  deferred here with its dates intact. This does **not** retire the recurrence — the next scope
-  meets the same choice with only the feature-shaped option left, a cost accepted at the ruling.
-  **One of three faces of the same bounded-substring predicate** — `recurrence-drain-input-widening`
-  asks what the drain misses when no bullet exists, this asks what it over-counts, and
-  `recurrence-resolver-literal-match-only` asks what it misses when a bullet exists and does
-  not spell the slug. All three are questions about the same declaration's input, so a scope
-  taking any one should cost the other two; taking one alone risks fixing the count in one
-  direction while it stays wrong in the others.
-  **Why `[design-pending]`:** the discriminator is the whole design. Prose distinguishing
-  "this recurred" from "this is about that" carries no syntactic tell, so the honest answers
-  run from a filer-supplied flag to dropping automatic resolution entirely and leaving the
-  drain's session-side re-resolution as the sole channel — and that last one changes
-  lifecycle-kit's single-auditable-producer property, a contract call rather than a fix.
-  **Cost while deferred:** every citing bullet silently over-counts, the two readers above
-  cannot tell an inflated count from a real one, and this count is the only aggregated
-  recurrence signal the project has.
-  Filed 2026-08-05 by close, draining the gap inbox; found 2026-08-05 at scope.
 
 - **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
   live entry reads exactly like one that does, and nothing names the difference.
