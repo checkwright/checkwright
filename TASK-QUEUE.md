@@ -12,6 +12,38 @@
 
 ## New Features
 
+- **installer-lifecycle-verbs** [spec: SPEC-lifecycle-verbs.md] [roadmap: next/adoption] —
+  update, diff and uninstall: the verbs that manage an install after `init` has made one.
+  roadmap-summary: update, diff and uninstall, so an install can be managed after init.
+  Phase 2 of the installer; phase 1 shipped in `activation-path`. Promoted 2026-08-08 at
+  spec, which ruled the question the 2026-07-26 filing predated because it predates
+  `doctor`: **`diff` is a fourth verb, not a widening of `doctor`** — `doctor`'s exit status
+  is owned by the toolchain contract `init` gates its own precondition on, and an adopter
+  editing a vendored file is sanctioned, so folded-in drift would be a permanent expected
+  finding on a verdict surface. The grounds, the refused alternatives and the taxonomy the
+  three verbs settle are in the amendment; they are not re-derived here.
+  **Deliverable — twelve work-class-labelled deltas (D1–D12) in `SPEC-lifecycle-verbs.md`:**
+  the three verb files; `remove_marker_block` in gate-sdk's shared injector and `--remove` on
+  doctrine-kit's `install-doctrine.sh`, which the agent file's marker-bounded span needs;
+  `lock_emit` in `lib/common/lock.sh`, so the second manifest writer arriving keeps the
+  schema's one owner; `doctor`'s residue reading and its `diff` pointer; the smoke's reversal
+  arm; and the prose and generated projections that turn with them.
+  **Acceptance:** `uninstall` removes only manifest-recorded files still at `init`'s recorded
+  hash — never a file the adopter wrote — and rewrites the manifest over any survivors rather
+  than disowning them; `diff` exits 0 on a pristine tree and 1 on a diverged one; every
+  mutating verb carries `--dry-run`; and `installer/consumer-smoke/run-smoke.sh` asserts the
+  reversal per profile against the consumer's pre-`init` tree object, which also closes the
+  untested direction of the manifest-agreement check — that the roster covers everything
+  `init` wrote.
+  **Couples to `plugin-marketplace`, in both directions.** That entry must package against
+  `checkwright.lock` as its install-ownership contract, and the sequencing risk it flags is a
+  second install model with no upgrade or uninstall story. This entry is that story.
+  **`uninstall` is the critical half, not the ergonomic one:** install → see value →
+  uninstall is the reversibility the adoption story rests on, and it is the one real
+  capability gap — the other two verbs are discoverability and reporting over data that
+  already exists.
+  Filed 2026-07-26 by build on the lead's ruling at the `activation-installer` merge.
+
 ## Technical Debt
 
 ## Deferred
@@ -641,56 +673,6 @@
   Filed 2026-07-26 by build, on the lead's ruling during the `activation-path`
   doctor + manifest batch, after measuring both the glob behavior and the
   gate's runtime.
-
-- **installer-lifecycle-verbs** [design-pending] [roadmap: next/adoption] — update, diff, uninstall.
-  roadmap-summary: update, diff and uninstall, so an install can be managed after init.
-  The installer's second phase: `update`, `diff`, and `uninstall`, the verbs that
-  manage an install after `init` has made one. Phase 1 shipped in
-  `activation-path`; this phase was ruled a separate build unit at promotion and
-  is filed here so it survives the amendment that governed it.
-  **The manifest is already the contract, and that is what makes this additive.**
-  All six `checkwright.lock` fields — `schema`, `version`, `commit`, `profile`,
-  `kits`, `files` — carry a phase-1 reader today (installer/README.md §The
-  manifest), and **no field exists whose only reader arrives in this phase**. A
-  seventh field proposed for `update`'s benefit alone was deferred with it. So
-  these verbs are second readers of a schema that already exists rather than a
-  schema revision, and a `/spec` pass should not re-derive that off
-  `installer/lib/common/lock.sh`.
-  **Acceptance shape:** `uninstall` removes only manifest-recorded files — never a
-  file the adopter wrote, which the per-file hash makes true now that
-  `install-claim-contract` has landed; `diff` reports drift between the recorded
-  hashes and the tree; and `installer/consumer-smoke/run-smoke.sh` covers
-  install → update → uninstall per profile, extending the suite it already runs
-  rather than standing up a second one. Every mutating verb carries `--dry-run`,
-  the rule installer/README.md already states.
-  **Couples to `plugin-marketplace`, in both directions.** That entry must
-  package against `checkwright.lock` as its install-ownership contract, and the
-  sequencing risk it flags is a second install model with **no upgrade or
-  uninstall story**. This entry is that story. A marketplace design that lands
-  first would either wait on these verbs or duplicate them.
-  **Cost while deferred — corrected 2026-07-26 against `installer/lib/init.sh`;
-  the prior text overstated it, claiming no upgrade path at all.** Verified
-  against the source, the deferred cost is three narrower things:
-  1. **`uninstall` is the one real capability gap.** Backing out means deleting
-     files by hand against the manifest. Mechanical, since `files` records every
-     path with its hash — but manual, with no verb.
-  2. **Discoverability, not capability, on upgrade.** Upgrade *is* supported
-     today and is spelled `npx checkwright@<newer> init`: the re-run refusal
-     narrows to the downgrade direction only, an upgrade falls straight through,
-     the profile is re-read from the lock, and only files whose hashes still
-     match the manifest are rewritten — anything the adopter edited is reported
-     and preserved. So `--force` is not the upgrade path and never needed to be.
-     What it costs to have no `update` verb is that nobody guesses `init`.
-  3. **The cross-version upgrade is implemented but not smoke-covered** — carved
-     out as `installer-upgrade-smoke-arm`, which does not need these verbs.
-  `--dry-run` already covers most of what a deferred `diff` would add: it
-  prints the file plan and the manifest that would be written. Non-rotting, and
-  bounded by the manifest being correct and complete meanwhile — the data an
-  upgrade needs is recorded from day one, which is why deferring costs
-  capability rather than fidelity.
-  Filed 2026-07-26 by build on the lead's ruling at the `activation-installer`
-  merge, from scope the amendment governed and its deletion would otherwise
-  have dropped.
 
 - **gate-file-coverage-closure** [design-pending] — the missing check class behind a
   hole this close fixed inline: nothing asserts that every gate script in the
