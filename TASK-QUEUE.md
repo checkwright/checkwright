@@ -3470,14 +3470,33 @@
   pass folds its own rows for exactly this reason; the stage rows still race.
   **Held out of the ruled cut deliberately** by the iteration that fixed the fan-out half, so
   this is the named remainder rather than a regression.
-  **Why `[design-pending]`:** the two honest closes differ in kind. Folding stage rows the way
-  the fan-out pass folds keeps the key and loses per-session detail; widening the key with the
-  session id is a trend-log grammar change every existing reader inherits.
+  **Re-measured 2026-08-08 at close, on a second independent instance.** That iteration's build
+  ran four batches tiered per batch across two models, two sessions each; the log retained one
+  row per model, so each retained row carries a single batch's draw as though it were the
+  stage's — an under-report of roughly a third on both models, with nothing in the file marking
+  that anything was dropped. Two refinements that instance adds to the diagnosis above: the
+  per-session report on **stdout is correct**, so only the persisted rollup is lossy and it is
+  the persisted rollup that trends; and **per-batch model tiering is precisely the shape that
+  breaks the dedupe**, which was written for one session per stage per model, where re-running
+  the collector must not double-count.
+  **Why `[design-pending]`:** the honest closes differ in kind, and there are three. Folding
+  stage rows the way the fan-out pass folds keeps the key and loses per-session detail; widening
+  the key with the session id is a trend-log grammar change every existing reader inherits; and
+  making the row an explicit aggregate the writer recomputes from every matching transcript
+  keeps the grain but moves the work into the writer. Naive summing is ruled out on its own —
+  the collector is re-runnable, so a sum double-counts on every re-run.
   **Cost while deferred:** every per-stage figure for a split stage under-reports, and the
   under-report is invisible in the log — a cross-stage comparison drawn from a split iteration
   is not signal, and nothing in the log says so. The Split posture makes splitting routine, so
-  the defect's reach grows with the posture's adoption.
-  Filed 2026-08-07 by close, draining the gap inbox; found at build.
+  the defect's reach grows with the posture's adoption. Sharper under model tiering: the rollup
+  is the surface a standing tiering watch reads, so a model looks cheaper exactly when its stage
+  ran more batches.
+  Filed 2026-08-07 by close, draining the gap inbox; found at build. **Merged 2026-08-08 at
+  scope by lead ruling** with `stage-economics-log-multi-session-undercount` (filed 2026-08-08
+  by close), which was the same defect re-found: identical `log_line` dedupe on the
+  iteration/stage/model triple, verified against the source. That entry's premise that the work
+  was unfiled is false; its measurement and its third design candidate are folded in above and
+  the duplicate slug is dropped.
 
 - **guard-advise-jq-dependency** [design-pending] — the advisory primitive goes silent in
   exactly the degradation it exists to report.
@@ -3886,32 +3905,6 @@
   Filed 2026-08-08 by close, draining the gap inbox; found at build. The coverage half was
   escalated as an envelope call and folded in here on the lead's ruling the same day.
 
-- **stage-economics-log-multi-session-undercount** [design-pending] — the committed rollup keeps
-  one session per stage-model pair and silently drops the rest.
-  `bin/stage-economics.sh`'s log writer dedupes on the iteration-stage-model triple: it filters
-  prior matching rows out of the log, then appends the new one. Where a stage ran several sessions
-  on the same model the last row wins, so the logged figure is that one session rather than the
-  stage's total. The report on stdout is per-session and correct; only the persisted rollup is
-  lossy, and it is the persisted rollup that trends.
-  **Measured this close.** This iteration's build ran four batches tiered per batch across two
-  models, two sessions on each. The log retained one row per model, so each retained row carries
-  a single batch's draw as though it were the stage's — an under-report of roughly a third on
-  both models here, with nothing in the file marking that anything was dropped.
-  **Why this is more than untidiness.** The dedupe is correct for the shape it was written for —
-  one session per stage per model, where re-running the collector must not double-count — and
-  per-batch tiering is precisely the shape that breaks it. The rollup is the surface a standing
-  model-tiering watch reads, so the number that decides whether a cheaper tier paid off is taken
-  from the column that lost the batches.
-  **Why `[design-pending]`:** summing is not obviously right either, because the collector is
-  re-runnable and a naive sum double-counts on every re-run. The honest candidates are keying the
-  log by session rather than by stage-model, or keeping the grain and making the row an explicit
-  aggregate the writer recomputes from every matching transcript — the first changes the log's
-  grain and every reader of it, the second moves the work into the writer.
-  **Cost while deferred:** a tiering decision is judged against an undercount whose size varies
-  with how many sessions a stage happened to split into, so a model looks cheaper exactly when
-  its stage ran more batches.
-  Filed 2026-08-08 by close, from running the meter during its own housekeeping.
-
 - **trajectory-prune-on-completion** [design-pending] — the ruling record grows unbounded and
   nothing retires a finished row.
   **Operator-ruled 2026-08-08**; the ruling, its sanctioned practice, its explicit
@@ -4047,6 +4040,78 @@
   either re-reads surface it already cleared or dismisses a real addition as inherited.
   Filed 2026-08-08 by close, from running the meter during its own brevity pass.
 
+- **drift-baseline-unnamed-iteration** [design-pending] — every since-iteration-start KPI
+  baselines on an ancient commit for the whole of scope, silently.
+  `drift-kit/bin/drift-report.sh`'s `iteration_start()` reads the queue header's iteration name
+  and runs `git log -S"<iteration> scope " -- .workflow/WORKFLOW-STATE.txt | tail -1`. While the
+  header carries the unnamed-iteration sentinel — which is every scope stage, from the boundary
+  reset until the stage names the iteration — the pickaxe matches the *sentinel* rather than a
+  name, and `tail -1` then returns the **oldest** sentinel-bearing commit in the whole history
+  instead of this iteration's.
+  **Probed at filing, not inferred.** The report printed `[iteration start 718ab4e]`, a commit
+  dated 2026-07-10 — four weeks stale — and the pickaxe's own tail confirms it resolves to the
+  first sentinel-bearing commit rather than the newest. The numbers it produced that day:
+  `queue net delta +111 (126 filed, 15 drained)` and `queue carry weight +3759 lines`, where the
+  true delta for the last full iteration, measured directly off boundary commits
+  (`bf641b4` 3805 lines to `dbc9c1b` 4082), is roughly **+280**.
+  **Why `[design-pending]`:** reporting `n/a` while the sentinel is live is honest and goes
+  blank at exactly the stage that wanted the reading; resolving the baseline from the newest
+  boundary-reset commit instead of from the header name keeps the reading but changes what
+  "iteration start" means for every KPI that reads it. Which one is right is not the reporter's
+  call to make in passing.
+  **Cost while deferred:** it fails silent behind a plausible sha and worsens with age, and the
+  stage it misleads is the one stage that reads the trend to pick units — a scope session sees a
+  month of cumulative drift presented as this iteration's growth. Distinct from
+  `always-loaded-baseline-restamp-unforced`, which is the always-loaded meter's re-stamp cadence
+  rather than this resolver.
+  Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey.
+
+- **survey-citation-outlives-its-record** [design-pending] — a permanent surface cites a
+  boundary-truncated one, so the citation dies on schedule.
+  The `prose-profile` entry above ends "Full finding and its two-command witness:
+  `.workflow/survey-record.md`". That record is per-iteration scratch, boundary-truncated by
+  design (lifecycle-kit/SPEC.md §The survey record), and `enter-stage.sh scope` truncated it at
+  the very next boundary — so the citation resolved to nothing **one iteration** after it was
+  written, and the finding survives only in the evicting commit.
+  A live instance of `dead-queue-citation-report`'s class, distinguished by cause and worth
+  separating for it: the target was not deleted by mistake or by a rename, it was deleted **on
+  schedule by its own surface's contract**, so no liveness scan over authored links would have
+  predicted it and no author error produced it.
+  **Why `[design-pending]`:** three honest closes, and they trade against each other. The citing
+  entry inlines what it needs at filing — cheapest, and it loses the two-command witness that
+  makes a carried survey re-usable. The citation becomes commit-pinned (`git show <rev>:...`) —
+  keeps the witness, and pins a reader to a rev the tree has moved past. Or the record grows a
+  promotion path for a block a permanent surface cites — which re-opens the per-iteration
+  lifetime the record's whole design turns on.
+  **Cost while deferred:** the expensive judgment half of a survey is precisely what the record
+  exists to carry across a boundary, and a queue entry is the surface most likely to want it
+  *after* one. Every such citation is a silent one-iteration fuse.
+  Filed 2026-08-08 at scope on the lead's ruling, found by following the citation and hitting
+  the truncation this session's own boundary reset had just performed.
+
+- **guard-glyph-match-context-blind** [design-pending] — the guard matches its trigger glyphs
+  inside quoted and heredoc bodies, so writing *about* the guard is refused by it.
+  `scripts/bash-guard.sh` tests the whole command string, so a `$(...)`, a brace expansion or the
+  repo-root absolute path appearing inside a **heredoc body** — journal prose, a queue entry
+  being appended, a commit message — trips the same refusal as the executable form. The refusal
+  is correct about the glyph and wrong about the command.
+  **Measured this session, which is the whole of why it is filed rather than felt:** 8 refusals
+  in roughly 25 bash calls. Two of the 8 were this class (prose inside a heredoc, once for a
+  brace glyph and once for an absolute path quoted while describing an earlier refusal); two more
+  were `exit-echo-decoration-guard-vs-habit` firing twice in one session.
+  **Why `[design-pending]`:** quote- and heredoc-aware matching in a PreToolUse hook is a shell
+  parser, and the cheap approximations are wrong in both directions — skipping everything after a
+  `<<` opener blinds the guard to real commands in a heredoc-bearing call, while matching only
+  outside single quotes still refuses a double-quoted mention.
+  **Cost while deferred:** a round trip per refusal on every session that documents its own
+  tooling, and it lands hardest on the sessions writing the queue and the journals. The wider
+  cost is the one the SWOT names: false positives on a blocking guard are the mechanism by which
+  enforcement converts into bypass and distrust.
+  Filed 2026-08-08 at scope on the lead's ruling, from this session's own refusal count. It
+  duplicates neither `guard-command-prefix-wrapper` (transparent prefixes, measured at ~32% of
+  prompting calls) nor `exit-echo-decoration-guard-vs-habit` (decoration on an allowlisted
+  command); this is the guard refusing a string that was never going to be executed.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4078,5 +4143,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- stage-economics-log-multi-session-undercount
 
 ## Lessons Learned
