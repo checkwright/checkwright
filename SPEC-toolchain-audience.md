@@ -164,16 +164,18 @@ declaration that could disagree.
 
 ## Existing sections updated
 
-- **`context-kit/SPEC.md` §bin/env-probe** — owns the roster grammar and the
-  floor predicate. Gains the fourth field, its emptiness rule, the closed
-  audience value set, and `tool_floor_consumer_side`. *(Owns deltas 1, 4.)*
-- **`context-kit/SPEC.md` §Layout and configuration** — carries the per-member
-  roster notes, and its `cargo` note is where *a contributor-side floor, never a
-  runtime one* is already ruled, along with the two-tier commit-time reading and
-  the observation that a consumer tree receives a prebuilt binary and never a
-  crate. That note becomes the grammar's rationale rather than an unenforced
-  aside: it gains the sentence that the reading is now declared on the element
-  and read by name. *(Owns delta 2.)*
+- **`context-kit/SPEC.md` §bin/env-probe** — owns the roster grammar, the floor
+  predicate, and the per-member roster notes (align correction: the amendment as
+  drafted misattributed the per-member notes to §Layout and configuration, which
+  carries only a directory tree and a knob roster with no per-member prose; the
+  `cargo` note is under this section, at the roster's constrained-members list).
+  Gains the fourth field, its emptiness rule, the closed audience value set, and
+  `tool_floor_consumer_side` (deltas 1, 4). The `cargo` note — already the place
+  *a contributor-side floor, never a runtime one* is ruled, along with the
+  two-tier commit-time reading and the observation that a consumer tree receives
+  a prebuilt binary and never a crate — becomes the grammar's rationale rather
+  than an unenforced aside: it gains the sentence that the reading is now
+  declared on the element and read by name (delta 2). *(Owns deltas 1, 2, 4.)*
 - **`installer/README.md` §doctor** — describes the verdict as the toolchain
   contract. Updated to say which toolchain: the consumer-audience subset, and
   that `DOCTOR: clean` is a claim about the machine as a consumer.

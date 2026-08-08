@@ -248,9 +248,12 @@ host, rather than by weakening the gate's tier.
   registry's source for this monitor. Its summary gains the release-channel
   assertion. *(Owns deltas 3, 8.)*
 
-The **queue entry itself** carries a stated ground that delta 2 falsifies (the
-write is available, not blocked); build corrects it when the entry is closed
-rather than leaving a false blocker in the record.
+The **queue entry itself** carried a stated ground that delta 2 falsifies (the
+write is available, not blocked). Align correction: that correction already
+landed — in this amendment's own authoring commit, which paired the entry into
+the queue with the corrected ground per the bidirectional rule — rather than
+waiting on build, so no false blocker survives in the record for build to
+find.
 
 No section is listed here that no delta claims. In particular
 `scripts/check-release-channel-parity.sh` is **not** updated: invariants A and B
