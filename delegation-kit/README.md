@@ -49,9 +49,9 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    verdict call refreshes the snapshot on demand (or wire the same poller under
    a timer), keeping it fresh while a supervising session sits static, or
    have any producer honour the snapshot contract (SPEC §The usage.txt contract).
-   The statusline producer also renders a status bar (context + both rate windows +
-   iteration@stage); the three mandatory snapshot lines are the floor, and
-   supplying the optional weekly keys arms the second (7-day) pause axis.
+   The statusline producer also renders a status bar, whose field set is
+   SPEC §The statusline template's; the three mandatory snapshot lines are the
+   floor, and supplying the optional weekly keys arms the second (7-day) pause axis.
 
 4. Optional — wire the Agent budget guard: copy `templates/agent-budget-guard.sh`
    into your gates dir and register it under `PreToolUse` matcher `Agent` in

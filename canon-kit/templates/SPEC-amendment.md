@@ -28,7 +28,10 @@
      — Consumer: the component that receives it, by what mechanism.
      — Every field has a named reader: for each field on a new message, the
        consumer that reads it and the transition where it is read (a field with
-       no reader is removed). -->
+       no reader is removed).
+     — Narrowing a corpus? name each reader's RED CONDITION, not its subject:
+       only a monotone verdict is clearable by inspection (SPEC §The
+       causal-completeness check, point 5). -->
 
 ## Existing sections updated
 

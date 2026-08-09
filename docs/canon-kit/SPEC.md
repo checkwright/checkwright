@@ -114,7 +114,7 @@ so the litmus runs at filing time, in the scope skill's triage.
 ### The causal-completeness check
 
 Before an amendment is ready, every new state, event, and interface it
-introduces passes four points:
+introduces passes five points:
 
 1. **Producer named and reachable** — what code path, call, or timer
    triggers it; a named producer whose enabling config no deployed
@@ -127,6 +127,18 @@ introduces passes four points:
    name the consumer that reads it and the transition where it is read; a
    field with no reader is removed, and a field read at one transition is
    not populated at others.
+5. **Each reader's red condition named, not merely its subject** — binding
+   on a delta that *narrows* a corpus (a prune, a tighter glob, a dropped
+   file). A reader is safe to clear **by inspection** under a narrowing only
+   if its verdict is monotone in the violation set, and three ordinary shapes
+   are not: a reader that reds on *finding none*, one asserting an exact
+   count, and one holding a minimum or a coverage floor. So enumerate what
+   makes each reader **red**, never what it is about, and inspect only the
+   monotone ones. Attested: pruning the file that held a declaration's sole
+   instance flips `checks/check-install-claim.sh` green to red, because its
+   red condition is a zero count — the narrowing *added* a violation.
+   "A narrower corpus can only remove violations" is false, and it is the
+   first argument a narrowing delta reaches for.
 
 A cross-component causal gap that surfaces during build is not a deferred
 TODO: stop, resolve it that session, update the spec before resuming.

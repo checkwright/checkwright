@@ -17,6 +17,7 @@
 ## Deferred
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
+  recurrence: recurrence-drain-input-widening 2026-08-09
   **Operator-ruled 2026-08-04, at the close of `ruling-capture-contracts`.** The drain that
   stamps the `recurrence:` declaration takes gap-inbox bullets as its sole input, which the
   amendment made the mechanism's single auditable producer. The open question is whether it
@@ -49,19 +50,19 @@
   a gap bullet, so neither entry's count moved. Recorded here as prose rather than stamped,
   which is the deferral behaving exactly as written and is why this reads as evidence rather
   than as a workaround.
-  **Third close attesting, 2026-08-09 (`install-profile-seam`), and the first carrying an
-  aggregate: THREE recurrences judged out of channel, ZERO in it.**
-  `spec-measured-count-gate` re-occurred five times in one iteration — its own cost field
-  predicts exactly that ("detection is by hand at align if at all") — and arrived as **lead
-  dispatch prose**. `survey-edge-aggregation-residue` was observed while performing a rostered
-  close audit, and `dispatch-worktree-reds-the-battery` as a battery red during the close's own
-  commit. All three were declined a stamp on this entry's open question and recorded as prose,
-  per its own rule. So a drain reading only bullets would have reported a clean recurrence
-  count for an iteration carrying three — not a shortfall in the count, but the count reporting
-  the opposite of the truth. Three iterations running, every recurrence the mechanism has
-  actually seen is one it cannot count, and they have now arrived by four distinct channels
-  (dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red) — which is the argument
-  that the gap is the *sole-input* shape rather than any one missing channel.
+  **Third close attesting, 2026-08-09 (`install-profile-seam`): THREE recurrences judged out of
+  channel, ZERO in it.** `spec-measured-count-gate` re-occurred five times in one iteration — its
+  own cost field predicts exactly that — and arrived as **lead dispatch prose**;
+  `survey-edge-aggregation-residue` came out of a rostered close audit, `dispatch-worktree-reds-
+  the-battery` out of a battery red during the close's own commit. All three were declined a stamp
+  per this entry's own rule, so a drain reading only bullets would have reported a clean count for
+  an iteration carrying three — the count reporting the opposite of the truth.
+  **Fourth close attesting, 2026-08-09 (`prose-profile-activation`), and the first whose
+  in-channel half is non-zero: THREE stamped off bullets, THREE more declined out of channel** —
+  `poll-sleep-guard-steer`, `cat-read-steer-guard`, `dispatch-cited-evidence-unverified`, each
+  observed by close itself. So the sole-input shape does work when a filer routes through it, and
+  what it still cannot reach is six attested channels: dispatch prose, `bin/kfric.sh`, a rostered
+  audit, a battery red, close's friction triage, a lead's relayed figure. That shape is the gap.
   Filed by the lead on operator direction under the direct-filing exception; the operator ruled
   file-a-unit over both keep-as-is and next-iteration-priority.
 
@@ -671,44 +672,44 @@
 
 - **spec-measured-count-gate** [design-pending] — a **measured count or extent claim
   authored into governed prose goes stale with no oracle**.
-  **Eight instances. Three before 2026-08-09:** the align audit found
-  `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six;
-  the tree carried eight), slated for `gate-sdk/SPEC.md` where a sibling unit falsified
-  it on the next commit; and a third landed in a **binding shim**,
-  `.claude/commands/close.md`'s release-policy slot deriving the bump off the note's "two
-  sections" where the cited owner fixes three, read by a close while deriving a bump.
-  Each was corrected by hand — the Enforcement-first shape the doctrine bars, the fix
-  landing without the gate that catches the next one.
+  recurrence: spec-measured-count-gate 2026-08-09
+  **Twelve instances. Three before 2026-08-09:** the align audit found
+  `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six; the
+  tree carried eight); and a third landed in a **binding shim**, `.claude/commands/close.md`'s
+  release-policy slot deriving a bump off the note's "two sections" where the cited owner
+  fixes three. Each was corrected by hand — the Enforcement-first shape the doctrine bars.
   **Gap generalization — the check class that should have caught them.** `check-prose-enum`
   reads governed-set membership, not numerals; `check-spec-derivable-section` reads
   fenced-dump density; `check-shim-restatement` holds *copy shape*, and a restatement that
   is **wrong** has diverged from its owner's wording, which is what makes it not a copy. So
   the scanner must range over SPEC sections and binding shims alike.
-  **Widened 2026-08-09, and the widening answers both grounds this entry left open.**
-  Five more instances in one iteration (`install-profile-seam`), split by whether a
-  cardinal-based scanner reaches them. **Three do:** nine gate-name lists that were seven,
-  a "sole call site" that was two, seven marker hits that were eight. **Two do not,
-  carrying no cardinal at all:** a five-line finding generalized to a whole-file claim,
-  and an audit stamping "the kit SPECs came back clean" over a SPEC holding two live
-  counter-instances. Those are *extent* claims and they fail identically — stated wider
-  than the measurement behind them.
-  **Answered: the unreachable axis is the one that costs.** Seven of the eight instances
-  were caught downstream by hand at no cost beyond the re-measurement. The eighth — an
-  extent claim — was caught by **nobody** for two iterations and shipped a false sentence
-  into a published SPEC and its public docs mirror. A cardinal-only trigger catches the
-  free half and misses the paid half.
-  **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01
-  at scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over governed
+  **Widened 2026-08-09 (`install-profile-seam`): five more in one iteration, split by whether
+  a cardinal-based scanner reaches them. Three do** — nine gate-name lists that were seven, a
+  "sole call site" that was two, seven marker hits that were eight. **Two do not, carrying no
+  cardinal at all:** a five-line finding generalized to a whole-file claim, and an audit
+  stamping "the kit SPECs came back clean" over a SPEC holding two counter-instances. Those
+  are *extent* claims, stated wider than the measurement behind them.
+  **Four more 2026-08-09 (`prose-profile-activation`), all cardinal-axis, and the density is now
+  the argument.** A pointer count of 1774 where the gate reports 902, sitting in a *cost field a
+  ranking scope reads*; "five deltas" over an amendment carrying six; a smoke-registration
+  "20 of 22" where it is 21; "the one on-surface queue-kit gate" where four are. Three were
+  caught by the align consistency audit, one reached a committed scope surface uncaught.
+  **In every one the ruling did not depend on the number** — so none reddened anything, which is
+  luck not design, and a human-scale read of six amendments is not a mechanism that scales.
+  **Answered: the unreachable axis is the one that costs.** Eleven instances were caught
+  downstream by hand at no cost beyond the re-measurement. The twelfth — an extent claim —
+  was caught by **nobody** for two iterations and shipped a false sentence into a published
+  SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
+  **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
+  scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over governed
   collection nouns and takes an extensible `CANON_KIT_COUNT_NOUNS` list, so a `couples=`
-  widening (its globs never reach `.claude/commands/*.md`) plus a noun override looked
-  like a discharge. It cannot be: banning cardinals cannot reach a claim carrying none.
-  Worth taking for the cardinal axis; it does not close this entry.
-  **Why `[design-pending]`:** the false-positive surface *is* the design, and the extent
-  axis sharpens it rather than settling it. "Bare cardinal near a roster noun" over-matches
-  legitimate prose ("the four contracts", "both halves"); "extent claim over a corpus" has
-  no syntactic tell at all. Both instance sets argue for an opt-in `measured:`-style marker
-  the author applies over a scanner inferring intent — a smaller gate bought with a larger
-  authoring contract, and that trade is the unit's to rule.
+  widening (its globs never reach `.claude/commands/*.md`) plus a noun override looked like a
+  discharge. It cannot be: banning cardinals cannot reach a claim carrying none.
+  **Why `[design-pending]`:** the false-positive surface *is* the design. "Bare cardinal near
+  a roster noun" over-matches legitimate prose ("the four contracts", "both halves"); "extent
+  claim over a corpus" has no syntactic tell at all. Both instance sets argue for an opt-in
+  `measured:`-style marker the author applies over a scanner inferring intent — a smaller gate
+  bought with a larger authoring contract, and that trade is the unit's to rule.
   **Cost while deferred:** compounding and silent — this recurs at **every amendment that
   measures the tree**, and the failure mode is a canonical doc asserting a false number.
   Detection is by hand at align if at all, and that phrasing is itself a claim about the
@@ -2787,29 +2788,41 @@
   boundary, which is exactly when the state is most valuable and least reconstructible.
   Filed 2026-08-04 at close, from the close session's own misfire.
 
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: next/reliability] —
-  the battery beyond the first cohort.
-  roadmap-summary: The rest of the battery onto the native binary, cohort by cohort.
-  Successor to `native-gate-binary-port`, which the lead scoped to the first cohort
-  2026-08-06 so that the head could complete without the public roadmap commitment
-  lapsing. This entry carries the remainder of the corpus and inherits the head's
-  grounds rather than restating them: gate-sdk/SPEC.md §Porting a gate to the binary
-  substrate owns the criteria, §Consumer payload the payload rule, and TRAJECTORY.md
-  §The objectives the direction all three serve.
-  **What the first cohort leaves settled, so this entry does not re-derive it:** the
-  seven port-candidate criteria including the external-program screen the cohort paid
-  for, the parity procedure (compare while both implementations still exist), the
-  two-commit sequencing `check-gate-tamper` forces, and the next-cohort selection rule
-  — the largest set of criteria-clearing gates sharing one corpus derivation.
-  **What is genuinely open here.** Whether the criterion-4 corpus is large enough to
-  finish without relaxing it, and TRAJECTORY.md's named re-entry condition for that
-  relaxation — the criterion-clearing corpus exhausted *and* the parity oracle held off
-  the shell substrate. Neither holds today, so this is the entry that will meet it.
-  **Cost while deferred:** every new gate adds shell to the eventual port, the
-  silent-failure classes stay reachable across the unported corpus, and the GNU-userland
-  pins the port exists to retire keep their hold on the toolchain floor.
-  Filed 2026-08-06 at spec, under the lead's split ruling, before the head's Done-move so
-  that `ROADMAP.md` never loses the commitment.
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
+  the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
+  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
+  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
+  **pre-compiled binary or build from source, their choice**; both paths ship.
+  **The known irreducible, named so nobody reads it as non-compliance.** Something has to run
+  before the binary exists on the machine, and fetching-and-executing the first artifact cannot
+  itself be that artifact. So the **bootstrap** — in shell, or absorbed by the transport, since
+  the payload already ships as an npm package and a Release tarball and npm can carry
+  per-platform binaries — is the one place shell may be unavoidable in the strict sense. Naming
+  it is not designing it; the design is this unit's.
+  **Measured 2026-08-09, and the two numbers size two different benefits.** The port stands at
+  **2 of 100** — `scripts/gates.list` carries 100 registered gates, `native/src/gates/mod.rs`
+  registers two. Wall-clock is the **weaker** argument and should not be leaned on: validate is
+  ~536s of which the entire gate battery is ~31s (under 6%), while `installer_smoke` alone is
+  227s (42%). What timing win exists comes from retiring shell *sources* that `demo`'s
+  shellcheck pass and the payload carry, not from faster gate execution.
+  **This also answers the toolchain-free objection** raised against porting: the installer
+  smoke's toolchain-free arm is satisfied by the pre-compiled path, not by retaining shell
+  gates. `powershell-installer-surface`'s premise moves with it — a binary is one
+  implementation across platforms, so what PowerShell must still cover shrinks to the bootstrap.
+  **Cost while deferred:** large and known — 98 gates plus the runners and the install-lifecycle
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a
+  single-iteration delta; scope owns the decomposition, and the criterion-4 relaxation question
+  the prior scoping left open is subsumed by a ruling that ports everything.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception.
 
 - **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
   live entry reads exactly like one that does, and nothing names the difference.
@@ -4078,6 +4091,158 @@
   written. Read the numbers off the oracle, never off this line.**
   Filed 2026-08-09 by close (`install-profile-seam`), from its own miswritten citation.
 
+- **capture-affordance-help-flag** [design-pending] — `lifecycle-kit/bin/file-gap.sh` takes
+  exactly one free-text argument, so a **flag** satisfies its arity check and is filed as a gap.
+  recurrence: capture-affordance-help-flag 2026-08-09
+  **Returned from the icebox by its own re-occurrence.** The eviction criterion was that no
+  named event waited to promote it; a witnessed re-occurrence is that event.
+  **First seen 2026-07-28** with `--help`. **Re-occurred at the 2026-08-09 scope boundary**:
+  `bash lifecycle-kit/bin/file-gap.sh --list` filed the bullet `- 2026-08-09 - --list` at
+  **exit 0**, reverted uncommitted. The re-occurrence widens the class from `--help` to any
+  flag-shaped argument — the tool validates argument *count* and emptiness, never shape.
+  The blast radius is larger than a typo because the inbox is boundary-blocking: a spurious
+  bullet refuses the next scope entry.
+  **Deliverable:** flag handling on the single-free-text-argument capture affordances — `-h`
+  and `--help` reaching the `usage()` the script already has, and a refusal for any
+  unrecognized leading `-` — plus a decision on whether the convention becomes a gate-sdk
+  authoring rule for `bin/` tools generally. Sibling `drift-kit/bin/kfric.sh` is safe only by
+  accident: it takes two arguments, so a lone flag fails arity rather than being captured.
+  **Cost while deferred:** low per firing, recurring, and self-concealing — the failure writes
+  a committed record that *looks like* a filing, and the next scope entry is what trips over
+  it. Two firings inside two weeks is the measured rate.
+  Filed 2026-07-28 at close (`front-door-readiness`); iceboxed, then returned 2026-08-09 by the
+  gap-inbox drain that judged its recurrence.
+
+- **install-lifecycle-reversibility** [design-pending] — `install-lifecycle.sh` writes three
+  things and removes none, so lifecycle governance cannot be armed at install.
+  **The declined branch of `init-lifecycle-agent-block-seeding`, recorded with its cost.**
+  `SPEC-agent-block.md` ruled that exclusion **correct on the merits** — seeding follows the
+  gate, not the kit — so nothing here reverses it. This is the prerequisite a *later* iteration
+  would have to buy first, and it is a unit rather than a clause.
+  **The reversibility gap, concretely.** `install-lifecycle.sh` performs three writes: the
+  marker-bounded lifecycle-kit agent block; a `.gitattributes` block it **mints when absent**;
+  and a per-clone `git config merge.iteration-scoped.driver`. It ships
+  no `--remove` mode where `install-doctrine.sh` has one, and `installer/lib/uninstall.sh`
+  hardcodes both the doctrine-kit membership test and the doctrine remover's payload path.
+  **Why the consumer smoke would not catch the residue.** The smoke asserts the consumer's tree
+  object equals the one it had before `init` ran — and the git-config write lives *outside*
+  that tree object, so its residue is silent by construction rather than by oversight.
+  **Deliverable:** a `--remove` mode, a second uninstall branch, a disposition for a minted
+  `.gitattributes` block, and an answer for the per-clone config.
+  **Cost while deferred:** nothing rots — the ruling stands on its own and the manual step is
+  documented in `lifecycle-kit/README.md`. The cost is optionality alone: any future iteration
+  wanting lifecycle governance armed at install pays this first, and discovers it then.
+  Filed 2026-08-09 by close, draining the bullet the build stage filed beside its ruling.
+
+- **docs-link-red-remedy-first** [design-pending] — `check-docs-link-convention` reds on the
+  most ordinary thing a docs subpage author writes, and leads with the diagnosis.
+  **Measured 2026-08-09 at spec on a real `init` consumer.** A `docs/` tree whose `index.md`
+  carries a `[project README](../README.md)` link reds with "off-root relative link … resolves
+  outside docs/".
+  **The rule is correct, and changing it is not what this asks for.** For a site served from
+  `docs/` alone such a link 404s, and the gate already offers a remedy — the absolute self-repo
+  blob form, or a `docs-link-exempt:` comment. It stays on-surface deliberately
+  (`SPEC-prose.md` keeps it there), so nothing is broken today.
+  **The gap is first contact.** The gate's whole subject is a docs host, so the adopter most
+  likely to register it is the adopter most likely to write that link — and they meet a red
+  before they meet the remedy, having adopted the battery minutes earlier.
+  **The buyable half is probably narrower than a rule change:** the failure text could lead
+  with the remedy rather than the diagnosis. That is a message edit plus its fixture, not a
+  predicate change, and it should be costed before any widening of the rule is.
+  **Cost while deferred:** paid once per docs adopter, at exactly the moment they are deciding
+  whether the battery is worth keeping — the worst moment this project has to spend a
+  false-feeling red.
+  Filed 2026-08-09 by close, draining the bullet spec filed under scope-gated intake.
+
+- **template-out-of-tree-copy-obligation** [design-pending] — a kit template with a known
+  out-of-tree consumer copy is invisible to every gate by construction.
+  **Distinct from `statusline-queue-section-counts`, which shipped this iteration** — that
+  unit's scope was the in-tree template, and no delta of it touches this.
+  **The witnessed instance.** The user-level statusline under the harness's per-user config
+  directory is a drifted ancestor of `delegation-kit/templates/statusline-usage.sh`: untracked,
+  ungoverned, out of tree. It still cites a `scripts/SPEC.md` section path that no longer
+  exists, and it reads the stage from the `TASK-QUEUE.md` bracket-stage header — a cursor
+  source `CLAUDE.md` retired in favour of `.workflow/WORKFLOW-STATE.txt`. Outside this repo it
+  therefore renders a stage from a retired source.
+  **Inside this repo nothing is wrong, which is what makes the class hard to see.** Project
+  settings outrank user settings, so the live statusline here is the template itself.
+  **The question a unit answers:** does a kit template owe anything at all to a copy a consumer
+  made outside the tree? `check-template-copy-parity` governs in-tree copies only, and no gate
+  can reach a file it cannot see. Candidate answers run from "nothing, and the SPEC says so",
+  through a version stamp the template emits, to a `doctor` arm that notices a drifted ancestor
+  at a conventional path — and "nothing" is a permitted outcome.
+  **Cost while deferred:** low-probability and unbounded — every out-of-tree copy ages
+  silently, and the failure is a wrong readout rather than a red. Exactly one instance is
+  known, which is also the argument for answering it cheaply rather than mechanizing it.
+  Filed 2026-08-09 by close, draining the bullet spec filed while ruling the counters unit.
+
+- **init-dry-run-plan-parity** [design-pending] — `init --dry-run` is a hand-maintained second
+  spelling of the seeds it predicts, and three of its four remaining arms already diverge.
+  **The queue arm was exactly this defect, and `install-queue-template-unreachable` removed it**
+  this iteration — one predicate, the write alone guarded by `(( DRY ))`. The four sibling arms
+  in the same `case` statement were left as they were.
+  **Measured divergences, 2026-08-09 at build.** *(a) evidence-kit* — the real arm writes
+  `.workflow/validate-baseline.txt` and `.workflow/validate-evidence.txt` only when absent; the
+  dry arm prints both unconditionally. *(b) lifecycle-kit* — the real arm returns early when
+  `.workflow/WORKFLOW-STATE.txt` exists; the dry arm prints it unconditionally. So `--dry-run`
+  on an already-installed consumer names files the run would not write. *(c) the agent-file
+  seed* — `init.sh`'s own `printf`, guarded by `recipe_needs_agent_file`, is predicted by **no
+  arm at all**. The doctrine-kit arm predicts the doctrine *block*, and the two coincide only
+  because every profile carrying context-kit also carries doctrine-kit. That is the same
+  coincidence-of-rosters that hid the queue defect, and it stops holding the day a profile
+  carries context-kit alone.
+  **Nothing catches any of it**, which is the half that makes this a unit rather than a patch:
+  the consumer smoke asserts `uninstall --dry-run` behaviorally and never compares `init`'s dry
+  plan against the run it predicts.
+  **Deliverable:** give each seed the one-predicate form the queue arm now has, and add the
+  missing acceptor — a dry plan diffed against the set the real run records.
+  **Cost while deferred:** a `--dry-run` is a promise about what will happen, so a wrong one is
+  worse than none — and it is the first command a cautious adopter runs, which is the same
+  first-contact surface the profile work is being bought to improve.
+  Filed 2026-08-09 by close, draining the build stage's bullet.
+
+- **queue-entry-grammar-single-owner** [design-pending] — queue-kit has two entry grammars, and
+  they disagree about whether an indented bold-slug bullet is an entry.
+  **The disagreement.** `lib/queue.sh`'s `queue_live_slugs` matches an optionally-indented
+  bold-slug bullet and counts it as a live entry, while `bin/queue-index.sh` and
+  `bin/queue-counts.sh` match a column-0 `- ` and treat the same line as body.
+  **Latent today, and verified so.** `TASK-QUEUE.md` carries no indented bold-slug bullet, so
+  both readers return the same total. A single such bullet would make the index, the counters
+  and the slug-uniqueness/liveness gates disagree about what an entry *is*.
+  **Found at build 2026-08-09** while writing `queue-counts.test.sh`, whose fixture carries the
+  decoy deliberately — so the divergence is pinned by a test even though no gate reds on it.
+  **Deliverable:** one grammar owns the entry and the other cites it. *Which* one owns it is the
+  design question and it is not obvious: the permissive form is what admits a sub-task nested
+  under its parent, and the strict form is what the counters and the index already report.
+  **Cost while deferred:** zero until the first nested bold-slug bullet, then a silent
+  disagreement between a gate and a counter over one file — the shape hardest to debug, because
+  each reader is individually correct and neither reds.
+  Filed 2026-08-09 by close, draining the bullet the build stage filed against its own fixture.
+
+- **kfric-capture-unverified-assertion** [design-pending] — the knowledge-friction channel has
+  no oracle, so it captures whatever a session asserts and the next reader reads it as measured.
+  **Self-witnessed this iteration, with both halves in the log at once.** A build batch stamped
+  the consumer smoke's cost as "~50-60 minutes" and reasoned from it that the run serializes
+  against all tracked editing for that window. Validate measured it twice independently at
+  **227s** and superseded the entry in place rather than deleting it, so the log now carries the
+  mis-derivation beside its correction — which is what makes this filable rather than anecdotal.
+  **The mis-derivation is the more interesting artifact.** The figure was disprovable from
+  evidence already in front of every reader: the reporting batch's own total session runtime
+  was ~26 minutes, so a 50-60 minute sub-step could not have fitted inside it. It was relayed
+  onward unchecked and shaped two sessions' scheduling before validate measured it.
+  **Distinct from `kfric-empty-log-ambiguity`**, which is about an *empty* log's two readings;
+  this is about a populated one whose entries carry no distinction between a measurement and an
+  estimate. Adjacent to `dispatch-cited-evidence-unverified`, which covers what a dispatched
+  sweep *cites*; this covers what a session captures about its own work.
+  **Deliverable, and the design question that makes it `[design-pending]`:** whether the
+  affordance should carry a measured-vs-estimated distinction at all. The whole value of
+  `bin/kfric.sh` is that stamping is cheaper than deferring, so a field that slows capture buys
+  accuracy with the capture rate the loop depends on. A convention may beat a flag.
+  **Cost while deferred:** an unverified assertion in the log is indistinguishable from a
+  measurement, and close's own triage is chartered to promote it into a doc-owner edit — which
+  is the channel by which a wrong number reaches a canonical surface with a citation on it.
+  Filed 2026-08-09 by close, from its own knowledge-friction triage.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4106,7 +4271,6 @@
 - **tarball-build-attestation** [design-pending] — The checksum proves transfer only; docs agree.
 - **action-run-shell-scan-predicate** [design-pending] — No consumer seam on a correct gate.
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
-- **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
 
