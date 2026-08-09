@@ -54,6 +54,23 @@ delegation	context-kit
 delegation	guard-kit
 delegation	doctrine-kit
 
+# prose — the smallest set that governs a repository whose artifacts are prose,
+# on a git-only floor. gate-sdk is forced in for the same reason it is forced in
+# starter: no runner, no hook generator, no registry. canon-kit is the kit whose
+# subject is authored documents; every other kit's subject is either the agent
+# session — which is delegation's criterion, and why these two are alternatives
+# rather than steps — or a deployed site.
+#
+# What the adopter actually receives, stated here because a criterion that
+# overpromises is worse than none: link, claim, staleness and pointer governance
+# over every README.md at any depth plus the agent file, which is real for a
+# documentation repository since a docs tree is usually a tree of READMEs. It is
+# not governance over `docs/*.md` — neither the manifest set nor the comment
+# surface reads that path, and widening to it is the adopter's own
+# CANON_KIT_PROSE_SURFACE_GLOBS edit in the config seam init already delivers.
+prose	gate-sdk
+prose	canon-kit
+
 # What `full` adds on top of delegation is the set whose subject is something
 # other than a session: canon-kit governs authored documents, drift-kit reports
 # trends advisorily and registers no gates, site-kit governs a deployed docs

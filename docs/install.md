@@ -251,12 +251,15 @@ operator who wants to stage the vendoring themselves. And the toolchain must
 meet the contract — which `checkwright doctor` decides *before* any partial
 install, rather than halfway through one.
 
-You pick how much to meet first. `starter` is the framework — the gate SDK on
-its own. `delegation` adds the kits whose subject is the agent session itself.
-`full` is everything. Today those three nest, but the contract promises kit-set
-containment rather than that chain. Moving to a profile that contains yours only
-ever adds. A profile that contains neither the other is an alternative rather
-than a step.
+You pick how much to meet first, and which part. `starter` is the framework:
+the gate SDK on its own. `delegation` adds the kits whose subject is the agent
+session itself. `prose` adds canon-kit instead, for a repository whose artifacts
+are documents. Its battery reads every `README.md` at any depth plus your agent
+file; widening it to the rest of your docs tree is one line in the canon-kit
+config seam. `full` is everything. The contract is kit-set containment rather
+than a chain, so moving to a profile that contains yours only ever adds. Two
+profiles containing neither the other, as `delegation` and `prose` do, are
+alternatives rather than steps.
 
 Re-running is idempotent and non-destructive: it reads the per-file hash
 recorded in `checkwright.lock`, rewrites what still matches, and **reports

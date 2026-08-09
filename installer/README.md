@@ -213,6 +213,31 @@ smoke's monotonicity assertion read that one derivation. No disposition varies o
 the profile today; the argument is the seam, so a roster that does vary becomes a
 change to one gate rather than to a signature and every caller of it.
 
+**What the seam can and cannot express, measured rather than assumed**, because
+the obvious use of it is the one thing it does not do. `full` is the
+payload-derived maximum, so every profile's kit set is contained in it, and the
+smoke's monotonicity assertion therefore means *anything a profile registers,
+`full` must register too* — a gate armed "for one profile only" is not
+expressible, since the moment it is armed anywhere it is owed to `full`, and
+once it is owed to `full` it is simply `zero-config`. `starter` sits below every
+profile for the mirror reason, so no profile may **drop** a gate-sdk
+`zero-config` member either; and subtraction in the band between them has
+nothing to derive from, because §The consumer smoke's own rule forbids
+`lib/common/recipe.sh` a literal gate name and no gate declares
+profile-varying reachability. So the parameter is **additively inert** and
+subtractively undeclarable, which is why a cohort of gates a narrow profile
+should receive arrives as a disposition correction on each gate instead. The
+argument stays the seam for the future in which a gate does declare that
+reachability; nothing declares it today.
+
+**A disposition change reaches trees that are already installed.** `init` on an
+existing consumer rewrites `gates.list` from this derivation, so a gate moving
+`on-surface` → `zero-config` joins their battery on their next run, on content
+they wrote before the gate existed. Their *edits* to the file are protected —
+`gates.list` is claimed before it is written, like any rewritten surface — but
+the roster growing is the intended behavior rather than a claim violation, and a
+release carrying such a move owes them the sentence in its note.
+
 Each kit's `smoke/install.sh` registers a **richer** roster against the scratch
 tree that script builds and seeds — a superset of this one by contract rather
 than by coincidence, held there by `check-install-disposition`. The two describe
@@ -558,10 +583,12 @@ manifest: the install is still there, so disowning it would be false.
 
 ## Profiles
 
-You pick how much of the methodology to meet first. Today that is `starter`,
-then `delegation`, then `full` — a chain, because those three happen to nest.
+You pick how much of the methodology to meet first, and *which part* of it —
+`starter`, `delegation`, `prose`, `full`. Those are not four rungs on one ladder:
+`delegation` and `prose` contain neither the other, because they answer different
+questions about what your repository is.
 
-**The contract is the lattice underneath, not the chain.** Profiles are ordered
+**The contract is the lattice, and it always was.** Profiles are ordered
 by kit-set containment, and that order is derived from the rosters rather than
 declared beside them. The promise it makes, stated precisely: *moving from a
 profile to one that contains it only ever adds — to the vendored tree and to the
@@ -579,9 +606,17 @@ you move up, and a profile that is nobody's step is still a legitimate member.
   evidence a stage produces before it can close, the protocol it follows when
   it spawns, the context budget it runs inside, the permission surface it acts
   through, and the delivery doctrine it follows.
+- **`prose`** adds canon-kit instead: the kit whose subject is authored
+  documents, for a repository whose artifacts are prose rather than code. What
+  arrives armed is link, claim, staleness and pointer governance over every
+  `README.md` at any depth and your agent file — real for a documentation repo,
+  since a docs tree is usually a tree of READMEs. It is deliberately **not**
+  governance over `docs/*.md`: no kit spells one project's prose layout, so
+  widening the corpus is your own `CANON_KIT_PROSE_SURFACE_GLOBS` line in the
+  canon-kit config seam `init` already writes into your gates directory.
 - **`full`** is everything in the payload.
 
-`starter` and `delegation` are rosters in `profiles.list`, because neither
+`starter`, `delegation` and `prose` are rosters in `profiles.list`, because none
 follows from the tree — each is a judgment about what an adopter should meet
 first, and the file records the criterion behind each membership beside it.
 `full` is derived instead: it is every kit root the payload carries, resolved
@@ -776,7 +811,30 @@ It packs the package, installs it **from the resulting tarball with
 `--offline`**, and drives a scratch consumer once per profile: `init`, then the
 battery must be green, then the manifest must agree with the tree it describes
 file by file, then a re-run must leave the tree object identical, then `doctor`
-must exit 0 and name the installed profile. It also asserts the profile lattice
+must exit 0 and name the installed profile, and then the **value arm** — the
+consumer authors one page of markdown carrying one real defect, a mistyped
+relative link in a `README.md`, and the battery's verdict on it is recorded
+before the link is corrected and the battery must be green again. The fix is the
+link and never the corpus: the tree the second run sees is byte-identical to the
+first apart from the typo, so the green is the defect being gone rather than the
+scan having narrowed, and a profile green on the first run must still be green
+on the second. The arm restores the consumer to the commit it found, so the
+reversal below still runs against the tree `init` wrote.
+
+**The value claim is asserted over the loop, not inside it**, and it is two
+sentences: some profile catches the defect at all, and some profile *below* the
+payload-derived maximum catches it. The second is the load-bearing one — a
+defect only `full` catches is not value an adopter can choose, it is value they
+have to take everything for. Neither sentence names a gate: naming one would be
+a second roster to maintain beside `recipe_gates`, and the claim is about the
+battery rather than about a member of it. Nor does either name a profile, for
+the same reason the lattice assertions do not — which profiles catch a prose
+defect follows from the rosters, and spelling it here would be that derivation
+copied out. What the arm turns from a claim into an assertion is the one the
+install page makes hardest to check: an install that is green, idempotent and
+reversible is still worth nothing until it catches something.
+
+It also asserts the profile lattice
 against the installed payload, in four parts: every named kit resolves in the
 payload; the derived order has **exactly one minimum and exactly one maximum**,
 so the lattice is bounded; that maximum is the payload-derived profile; and

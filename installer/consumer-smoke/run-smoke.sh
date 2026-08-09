@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -215,6 +215,34 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     say "doctor: clean, reports the installed profile"
 }
 
+# spec: installer/README.md §The consumer smoke — the value post-condition: an install that is green, idempotent and reversible is still worth nothing if it never catches anything, so each profile's battery is put in front of one real defect in adopter-authored prose — a mistyped relative link in a README, on a consumer whose own content is markdown and nothing else. Which gate delivers the red is deliberately not asserted: naming one would be a second roster to maintain beside recipe_gates, and the claim is about the battery rather than about a member of it. The arm restores the consumer to the commit it found, so the reversal that follows still asserts against the tree init wrote
+assert_value() {   # $1 = profile, $2 = scratch consumer dir -> echoes 'red' or 'green' for the defect
+    local profile="$1" C="$2" out rc head verdict
+    head="$(git -C "$C" rev-parse HEAD)"
+    mkdir -p "$C/docs"
+    printf '# Handbook\n\nStart with [the style guide](style-guid.md).\n' > "$C/docs/README.md"
+    printf '# Style guide\n\nWrite plainly, and link what you cite.\n' > "$C/docs/style-guide.md"
+    git -C "$C" add -A && git -C "$C" commit -q -m "handbook" \
+        || fail "$profile: could not commit the prose consumer's own content"
+
+    out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
+    if [[ "$rc" -eq 0 ]]; then verdict=green; else verdict=red; fi
+
+    # spec: installer/README.md §The consumer smoke — the fix is the link and never the corpus
+    printf '# Handbook\n\nStart with [the style guide](style-guide.md).\n' > "$C/docs/README.md"
+    git -C "$C" commit -qam "fix the link" || fail "$profile: could not commit the fix"
+    out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
+    if [[ "$rc" -ne 0 ]] || ! grep -qE 'All [0-9]+ gates passed' <<<"$out"; then
+        printf '%s\n' "$out"
+        fail "$profile: the battery is still not green on prose whose only defect was fixed"
+    fi
+    say "value: the planted prose defect is $verdict on this profile, green once fixed"
+
+    git -C "$C" reset -q --hard "$head" && git -C "$C" clean -qfd \
+        || fail "$profile: could not restore the consumer after the value arm"
+    printf '%s' "$verdict"
+}
+
 # spec: installer/README.md §The consumer smoke — one encoding of the reversal, run on the same consumer assert_install just finished with, so both transports prove it and the masked arm proves diff and uninstall are Node-free at no extra pack cost. The tree-object equality against the pre-init seed is the load-bearing assertion and it proves more than uninstall: no other arm asserts that the roster covers everything init wrote — the per-profile check runs the other direction, entry against tree — so a file init wrote and failed to record survives the removal and reds here
 assert_reversal() {   # $1 = profile, $2 = scratch consumer dir, $3 = the consumer's tree object before init ran
     local profile="$1" C="$2" seed="$3" out rc before status planned
@@ -252,13 +280,24 @@ assert_reversal() {   # $1 = profile, $2 = scratch consumer dir, $3 = the consum
 
 ENTRY=("$CW")
 RUN_PATH="$PATH"
+VALUE_RED=()
 for profile in "${PROFILES[@]}"; do
     printf '%s\n' "$profile"
     C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
     SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
     assert_install "$profile" "$C"
+    [[ "$(assert_value "$profile" "$C")" == red ]] && VALUE_RED+=("$profile")
     assert_reversal "$profile" "$C" "$SEED"
 done
+
+# spec: installer/README.md §The consumer smoke — the value assertion is over the whole loop rather than inside it, because which profiles catch a prose defect is derived from the rosters and asserting it per profile would be that derivation copied out. Two claims: some profile catches it at all, and some profile *below the maximum* does — the second is the one that matters, since a defect only the payload-derived profile catches is not value an adopter can choose, it is value they have to take everything for
+[[ ${#VALUE_RED[@]} -gt 0 ]] \
+    || fail "no profile's battery caught the planted prose defect — the install is green, idempotent and reversible, and worth nothing on a document"
+value_below_max=0
+for p in "${VALUE_RED[@]}"; do [[ "$p" != "$PROFILE_DERIVED" ]] && value_below_max=1; done
+[[ "$value_below_max" -eq 1 ]] \
+    || fail "only $PROFILE_DERIVED caught the planted prose defect — no profile short of everything delivers value on prose"
+say "value: caught by ${VALUE_RED[*]}, at least one of them below $PROFILE_DERIVED"
 
 # spec: installer/README.md §The consumer smoke — the download transport, asserted rather than documented: verify the digest, extract with tar rather than npm, and drive the same post-conditions with node/npm masked, so a latent Node dependency reds here instead of passing on a host that happens to carry Node
 printf 'download arm (%s, node/npm masked)\n' "$PROFILE_DERIVED"
