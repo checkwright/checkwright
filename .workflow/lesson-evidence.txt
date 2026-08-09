@@ -2,4 +2,3 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
-prose-profile-activation lesson rule lifecycle-kit/templates/lead.md — a running session is asked, never instructed: the lead-to-stage dispatch lesson (destructive re-run instruction, status-only turn misread as stalled, unmeasured duration framing, unverified subagent figure)
