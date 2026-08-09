@@ -237,8 +237,16 @@ gate-sdk) holds the brand-token side honest tree-wide: every slash- or
 line-anchored `<name>-kit` / `gate-sdk` path segment must name a
 `gate_kit_roots` dir, and every live-prefix kit knob must resolve to a tracked
 kit knob (check-docs-cmd's resolver, reused so the non-uniform knob-prefix map
-has one home). It valves the surfaces that legitimately name design-ahead or
-frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the generated
+has one home). **A knob resolves through a family stem in either direction**: a
+scanned `<FAMILY>_` stem resolves when kit source defines any member under it,
+and a scanned member resolves when kit source defines the stem. The second
+direction is what a **dispatch-composed** knob name needs — gate-sdk's
+`GATE_SDK_KNOB_<NAME>` bridge builds the full name at runtime from the knob it
+is carrying (gate-sdk/SPEC.md §lib/gate.sh), so kit source contains the stem and
+never the members. Spelling the members out to satisfy an exact match would be a
+hardcoded roster of consumer knob names in a kit literal, which is the one shape
+that crosses the provenance seam here. It valves the surfaces that legitimately
+name design-ahead or frozen brands — `gate-tests/` fixture bodies, `docs/posts/*`, the generated
 trajectory data, `SPEC-*.md` amendments, and the queue — so a rename cannot
 leave a dangle without turning a gate red.
 

@@ -37,12 +37,20 @@ run_case() {
         echo "  HARNESS: $gate resolves in none of: ${GATE_DIRS[*]}"
         return 2
     fi
-    if [[ ! -x "${argv[0]}" ]]; then
-        echo "  HARNESS: ${argv[0]} is not executable"
+    # spec: gate-sdk/SPEC.md §run-gate-tests — a bridged argv leads with `env` and its
+    # NAME=VALUE elements, so the dispatch executable is the first element that is neither,
+    # and it is that element the executability check and the absolutization take
+    local x=0
+    if [[ "${argv[0]}" == env ]]; then
+        x=1
+        while [[ "$x" -lt "${#argv[@]}" && "${argv[$x]}" == [A-Za-z_]*=* ]]; do x=$((x + 1)); done
+    fi
+    if [[ "$x" -ge "${#argv[@]}" || ! -x "${argv[$x]}" ]]; then
+        echo "  HARNESS: ${argv[$x]:-<no dispatch executable in argv>} is not executable"
         return 2
     fi
-    if [[ "${argv[0]}" != /* ]]; then
-        argv[0]="$(cd "$(dirname "${argv[0]}")" && pwd)/$(basename "${argv[0]}")"
+    if [[ "${argv[$x]}" != /* ]]; then
+        argv[$x]="$(cd "$(dirname "${argv[$x]}")" && pwd)/$(basename "${argv[$x]}")"
     fi
 
     local -a args=()

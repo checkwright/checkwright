@@ -8,24 +8,50 @@ pub type GateFn = fn(&[String]) -> i32;
 // spec: gate-sdk/SPEC.md §check-reads-couples — the third element is the member's declared
 // walk roots, the data `--reads` prints. A member added without them fails to compile, so
 // the declaration cannot be silently omitted.
-pub const REGISTRY: &[(&str, GateFn, &[&str])] = &[
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the fourth element is the member's declared knob
+// reads, the data `--knobs` prints and the config bridge resolves. Un-omittable by the same
+// construction, so no member can read a knob the bridge was never asked to carry.
+pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because each member's scan root is
     // its own first argument with a default, the same variable-first-argument shape the
     // shell parser calls undecidable and skips-and-counts.
-    ("check-action-pinning", action_pinning::run, &["?"]),
-    ("check-action-gh-repo", action_gh_repo::run, &["?"]),
+    (
+        "check-action-pinning",
+        action_pinning::run,
+        &["?"],
+        &["GATE_PRUNE_DIRS"],
+    ),
+    (
+        "check-action-gh-repo",
+        action_gh_repo::run,
+        &["?"],
+        &["GATE_PRUNE_DIRS"],
+    ),
 ];
 
 pub fn lookup(name: &str) -> Option<GateFn> {
-    REGISTRY.iter().find(|(n, _, _)| *n == name).map(|(_, f, _)| *f)
+    REGISTRY
+        .iter()
+        .find(|(n, _, _, _)| *n == name)
+        .map(|(_, f, _, _)| *f)
 }
 
 pub fn roots(name: &str) -> Option<&'static [&'static str]> {
-    REGISTRY.iter().find(|(n, _, _)| *n == name).map(|(_, _, r)| *r)
+    REGISTRY
+        .iter()
+        .find(|(n, _, _, _)| *n == name)
+        .map(|(_, _, r, _)| *r)
+}
+
+pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
+    REGISTRY
+        .iter()
+        .find(|(n, _, _, _)| *n == name)
+        .map(|(_, _, _, k)| *k)
 }
 
 pub fn names() -> Vec<&'static str> {
-    REGISTRY.iter().map(|(n, _, _)| *n).collect()
+    REGISTRY.iter().map(|(n, _, _, _)| *n).collect()
 }
 
 // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — each `?`
@@ -79,9 +105,10 @@ mod tests {
     #[test]
     fn every_registry_member_declares_the_roots_it_walks() {
         assert!(!REGISTRY.is_empty(), "no member to assert over");
+        walk::bridge_declared_knobs();
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
-        for (name, f, declared) in REGISTRY {
+        for (name, f, declared, _knobs) in REGISTRY {
             for case in walk::fixture_case_dirs(name) {
                 let args = case_args(&case);
                 let prev = std::env::current_dir().expect("cannot read cwd");

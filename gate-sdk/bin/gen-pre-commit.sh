@@ -30,14 +30,34 @@ resolve_rel() {
     gate_resolve "$1" "${REL_DIRS[@]}"
 }
 
+# spec: gate-sdk/SPEC.md §gen-pre-commit — quote one emitted argv element: shell-inert
+# verbatim, anything else bash ANSI-C ($'…'). Not printf %q, whose spelling varies by
+# bash version where the committed hook must be byte-identical across clones.
+quote_elem() {
+    local s="$1"
+    if [[ -n "$s" && "$s" != *[!A-Za-z0-9_./:=+,@%-]* ]]; then
+        printf '%s' "$s"
+        return 0
+    fi
+    s="${s//\\/\\\\}"
+    s="${s//\'/\\\'}"
+    s="${s//$'\t'/\\t}"
+    s="${s//$'\n'/\\n}"
+    printf "\$'%s'" "$s"
+}
+
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the hook is a persisted consumer of the
-# invocation argv, so it emits `<binary> <name>` for a ported member; the knob's
-# relative default is what keeps the tracked hook byte-identical across clones
+# invocation argv, so it emits `<binary> <name>` for a ported member, prefixed by that
+# member's resolved `env` elements
 command_rel() {
     local -a argv=()
     mapfile -t argv < <(gate_command "$1" "${REL_DIRS[@]}") || return 1
     [[ ${#argv[@]} -gt 0 ]] || return 1
-    printf '%s' "${argv[*]}"
+    local out="" a
+    for a in "${argv[@]}"; do
+        out+="${out:+ }$(quote_elem "$a")"
+    done
+    printf '%s' "$out"
 }
 
 declare -A MANUAL=()

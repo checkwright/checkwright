@@ -134,9 +134,74 @@ got="$(GATE_SDK_NATIVE_BIN="$sandbox/fakebin" gate_command check-ported "$sandbo
 [[ "$?" -eq 2 ]] \
     || { echo "  FAIL: gate_command did not exit 2 on a non-executable native binary"; fails=$((fails + 1)); }
 
+# --- the array-knob config bridge ---------------------------------------------
+# A stand-in binary reporting whatever knob the case declares, and a stand-in kit
+# whose library defines those knobs: the bridge's own refusals are unreachable
+# through the live members, whose one knob is well formed by construction.
+cat > "$sandbox/knobbin" <<'FAKE'
+#!/usr/bin/env bash
+[[ "$1" == --knobs ]] && { [[ -n "${PROBE_KNOB:-}" ]] && printf '%s\n' "$PROBE_KNOB"; exit 0; }
+exit 0
+FAKE
+chmod +x "$sandbox/knobbin"
+mkdir -p "$sandbox/probe-kit/lib" "$sandbox/probe-kit/checks"
+cat > "$sandbox/probe-kit/lib/probe.sh" <<'PROBE'
+# shellcheck shell=bash
+PROBE_KIT_SPACED=(alpha "two words")
+PROBE_KIT_SCALAR=solo
+PROBE_KIT_TABBED=($'has\ttab')
+PROBE_KIT_NEWLINED=($'has\nnewline')
+PROBE
+knob_argv() {
+    PROBE_KNOB="$1" GATE_SDK_KIT_DIRS="$sandbox/probe-kit" \
+        GATE_SDK_NATIVE_BIN="$sandbox/knobbin" \
+        gate_command check-ported "$sandbox/a" "$sandbox/b" 2>&1
+}
+
+# whitespace inside an element survives, which is the whole reason the serialization
+# is tab-joined rather than the space-separated scalar shape it sits beside
+got="$(knob_argv PROBE_KIT_SPACED | paste -sd'|' -)"
+want="env|GATE_SDK_KNOB_PROBE_KIT_SPACED=alpha"$'\t'"two words|$sandbox/knobbin|check-ported"
+[[ "$got" == "$want" ]] \
+    || { echo "  FAIL: bridged argv was '$got' (want '$want')"; fails=$((fails + 1)); }
+
+# a scalar knob is a one-element array — the two cases share one grammar
+got="$(knob_argv PROBE_KIT_SCALAR | paste -sd'|' -)"
+[[ "$got" == "env|GATE_SDK_KNOB_PROBE_KIT_SCALAR=solo|$sandbox/knobbin|check-ported" ]] \
+    || { echo "  FAIL: scalar knob argv was '$got'"; fails=$((fails + 1)); }
+
+# a member declaring no knob emits the two-element argv exactly as before the bridge
+got="$(PROBE_KNOB="" GATE_SDK_KIT_DIRS="$sandbox/probe-kit" GATE_SDK_NATIVE_BIN="$sandbox/knobbin" \
+    gate_command check-ported "$sandbox/a" "$sandbox/b" | paste -sd'|' -)"
+[[ "$got" == "$sandbox/knobbin|check-ported" ]] \
+    || { echo "  FAIL: knobless argv gained an env prefix: '$got'"; fails=$((fails + 1)); }
+
+# a knob matching no kit's <KIT>_ prefix resolves to gate-sdk itself, the kit every
+# .gate dispatch already runs inside — GATE_PRUNE_DIRS is exactly that case, and the
+# expected value is read from this process rather than restated as a second literal
+want_prune="$(IFS=$'\t'; printf '%s' "${GATE_PRUNE_DIRS[*]}")"
+got="$(knob_argv GATE_PRUNE_DIRS | sed -n '2p')"
+[[ "$got" == "GATE_SDK_KNOB_GATE_PRUNE_DIRS=$want_prune" ]] \
+    || { echo "  FAIL: prefixless knob did not fall back to gate-sdk: '$got'"; fails=$((fails + 1)); }
+
+# the three refusals, each exit 2 naming the knob
+for probe in TABBED:tab NEWLINED:newline; do
+    knob="PROBE_KIT_${probe%%:*}"; what="${probe##*:}"
+    out="$(knob_argv "$knob")"; rc=$?
+    [[ "$rc" -eq 2 ]] \
+        || { echo "  FAIL: a $what in a knob element exited $rc, want 2"; fails=$((fails + 1)); }
+    grep -qF -- "knob $knob" <<<"$out" \
+        || { echo "  FAIL: the $what refusal did not name $knob: $out"; fails=$((fails + 1)); }
+done
+out="$(knob_argv PROBE_KIT_ABSENT)"; rc=$?
+[[ "$rc" -eq 2 ]] \
+    || { echo "  FAIL: a knob no kit library defines exited $rc, want 2"; fails=$((fails + 1)); }
+grep -qF -- 'PROBE_KIT_ABSENT' <<<"$out" \
+    || { echo "  FAIL: the undeclared-knob refusal did not name the knob: $out"; fails=$((fails + 1)); }
+
 if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals)"
 exit 0

@@ -25,7 +25,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --source-stamp | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | <gate-name> [args...]");
             exit(2);
         }
     };
@@ -62,6 +62,31 @@ fn main() {
             Some(roots) => {
                 for r in roots {
                     println!("{}", r);
+                }
+                exit(0);
+            }
+            None => no_such_gate(name),
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — one line per declared knob name and nothing else;
+    // gate_command reads this to decide which GATE_SDK_KNOB_* elements to resolve into the
+    // emitted argv. A top-level flag, outside `--list`'s roster for the reason `--reads` and
+    // `--source-stamp` are: check-gate-substrate-parity assertion B equates the descriptor set
+    // with that roster, so a flag inside it would read as a subcommand nothing declares.
+    if first == "--knobs" {
+        let name = match argv.get(1) {
+            Some(n) => n.as_str(),
+            None => {
+                eprintln!("checkwright-gates: --knobs needs a gate name — the config bridge could not report; treating as failure (not clean)");
+                eprintln!("  usage: checkwright-gates --knobs <gate-name>");
+                exit(2);
+            }
+        };
+        match gates::knobs(name) {
+            Some(knobs) => {
+                for k in knobs {
+                    println!("{}", k);
                 }
                 exit(0);
             }

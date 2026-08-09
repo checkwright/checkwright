@@ -132,7 +132,9 @@ recoverable:
   tag edit. Never hand-edited.
 - **The graph artifact** — `docs/check-graph.html` and the generated `pre-commit`
   and `commit-msg` hooks are one set with one trigger, a gate's `# graph:`
-  manifest: one command emits both hooks
+  manifest — plus, for the hooks, the resolved knob values a ported member's
+  invocation bakes into them (gate-sdk/SPEC.md §gen-pre-commit), so a kit-config
+  edit stales them too: one command emits both hooks
   (`bash gate-sdk/bin/gen-pre-commit.sh --write`), then the artifact
   (`bash gate-sdk/checks/check-graph.sh --emit > docs/check-graph.html`), which
   `check-graph` asserts fresh together. The hooks are never hand-edited;

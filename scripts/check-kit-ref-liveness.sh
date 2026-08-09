@@ -34,12 +34,19 @@ while IFS= read -r name; do
     [[ -n "$name" ]] && defined["$name"]=1
 done < <(printf '%s\n' "$hits" | grep -oE "($pfxalt)[A-Z0-9_]*" || true)
 
-knob_ok() {  # $1=knob token — exact code occurrence, or (family stem ending '_') any name under it
+bare_prefix() {  # $1=token — exactly a kit prefix, so a stem of it names the kit's whole family
+    local t="$1" p
+    for p in "${prefixes[@]}"; do [[ "$t" == "$p" ]] && return 0; done
+    return 1
+}
+
+knob_ok() {  # $1=knob token — exact occurrence, or either side of a family-stem match
     local t="$1" k
     [[ -n "${defined[$t]:-}" ]] && return 0
-    if [[ "$t" == *_ ]]; then
-        for k in "${!defined[@]}"; do [[ "$k" == "$t"* ]] && return 0; done
-    fi
+    for k in "${!defined[@]}"; do
+        [[ "$t" == *_ && "$k" == "$t"* ]] && return 0    # a stem naming defined members
+        [[ "$k" == *_ && "$t" == "$k"* ]] && ! bare_prefix "$k" && return 0   # a member of a defined stem
+    done
     return 1
 }
 

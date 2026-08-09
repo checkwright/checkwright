@@ -1,1 +1,3 @@
 path segment <spec-kit> names no live kit root
+kit knob <CANON_KIT_BOGUS_KNOB> resolves to no tracked kit knob
+kit knob <GATE_SDK_BOGUS_KNOB> resolves to no tracked kit knob

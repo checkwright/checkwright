@@ -125,7 +125,15 @@ nothing about what implements a ported gate). And `GATE_SDK_NATIVE_CRATE`
 (default `native`; the crate root that owns the build manifest, held outside
 every kit root by §check-gate-substrate-parity assertion E, and the tree whose
 tracked source §check-gate-binary-fresh hashes into the stamp it compares. Read
-through `gate_native_crate`, its one shell home — §lib/gate.sh). The two native
+through `gate_native_crate`, its one shell home — §lib/gate.sh). `GATE_SDK_KNOB_<NAME>` joins this roster as the one entry that is **not a
+consumer knob**: it is a *dispatch-time convention*, written by `gate_command`
+into the argv it emits and read by the binary's knob reader (§lib/gate.sh, the
+array-knob config bridge). **No consumer sets it, and saying so is what stops it
+being documented as one** — it has no default, it is not read from the config
+seam, and a value found in a consumer's environment is overwritten by the
+dispatch that emits it. It adds no configuration surface: the bridge carries
+whatever the consumer's own library resolved for a knob the consumer already
+owns. The two native
 path knobs stay distinct because they answer different questions:
 `GATE_SDK_NATIVE_SRC` names the implementation tree a gate's rule lives in,
 `GATE_SDK_NATIVE_CRATE` the root that would carry that tree with it if it moved,
@@ -684,7 +692,7 @@ one recorded disposition below, and a member the section does not name is red.
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk `spec_comment_surface` hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. |
-| `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it therefore cannot reach — the crate's prune-dir default against `lib/gate.sh`'s — is closed by an **executed** assertion instead: a unit test in the crate reads the shell library and compares the two literals, failing on drift. Recorded this way because a disposition that names a mechanism which cannot fire is the same defect as no disposition. |
+| `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. |
 | `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first cohort's descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent — unbound by the first cohort, since neither ported gate carries an exemption list. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
@@ -876,13 +884,37 @@ design time; the last three were paid for, and each is named with what it cost.
    The qualification the clause carries — *unless the duplication the port
    creates is machine-held* — is what admits a shared-library corpus call like
    `gate_find`, and the distinction is not the presence of a shared call but
-   whether a machine notices when the two sides diverge. The crate's single
-   sanctioned walk is the binary-side counterpart and its prune-dir default is
-   held against `lib/gate.sh`'s by an **executed** unit test (§Meta-gate
-   conservation for the binary substrate, the `check-knob-default-coupling`
-   row). `check-spec-fence-balance`, the counter-example the criterion was
-   written against, is a *config-driven* derivation with nothing holding its two
-   copies together at all.
+   whether a machine notices when the two sides diverge.
+   `check-spec-fence-balance`, the counter-example the criterion was written
+   against, is a *config-driven* derivation with nothing holding its two copies
+   together at all.
+
+   **For a bridged knob the criterion is discharged by construction, which is
+   stronger than the qualification asks.** The config bridge (§lib/gate.sh)
+   carries the *resolved* value of a kit knob across the dispatch seam, so there
+   is exactly **one** place that value is computed — the kit's shell library —
+   and the binary holds no default to drift. The qualification is satisfied in
+   its strongest form: the duplication is not machine-held, it is *absent*. That
+   is why the crate's prune-dir default and the unit test holding it equal to
+   `lib/gate.sh`'s were deleted rather than extended when the bridge landed
+   (§Meta-gate conservation for the binary substrate, the
+   `check-knob-default-coupling` row). The departure from the ruling that framed
+   this as "a parity discharge holding the Rust default to the shell default" is
+   recorded rather than quietly taken, because it is an improvement and a later
+   reader must not restore the parity test as a missing piece.
+
+   **Glob semantics, committed once here rather than re-decided per port.** The
+   bridge transports strings and interprets nothing — it has no glob matcher,
+   because bridging a knob is not deriving a corpus from one. The commitment is
+   for the reader that will interpret them: a Rust glob matcher over a bridged
+   knob is **`**`-capable (globstar semantics)**, matching the `shopt -s
+   globstar` the shell side enables in `canon-kit/lib/spec.sh`. The evidence and
+   its limit: this consumer's arrays use no `**` today, so plain-glob semantics
+   would pass here — but the shell side enables `globstar`, so the config
+   surface *permits* one, and a plain-glob reader would silently mis-scan the
+   first consumer who writes one. Committing to the wider semantics costs
+   nothing today and closes a silent-divergence class; a porting unit inherits
+   the commitment rather than re-deciding it.
 7. **Its rule invokes no external program the payload does not carry.** *Found
    at first-cohort selection.* `check-action-run-shell` clears all six above and
    still cannot port as written: it requires `shellcheck` on `PATH`, refusing
@@ -1745,9 +1777,83 @@ same answer:
   name is ambiguous dispatch and is red (§check-gate-substrate-parity assertion
   A), never resolved by ordering.
 - `gate_command` returns the **invocation argv**, one element per line: the
-  one-element `<dir>/<name>.sh`, or the two-element `<binary> <name>`. Its
+  one-element `<dir>/<name>.sh`, or the two-element `<binary> <name>` —
+  prefixed, when the member declares knobs, by the config bridge below. Its
   callers are the execution sites — §run-gates, §run-gate-tests, and
   §gen-pre-commit, which does not execute the argv but *emits* it into the hook.
+
+**The array-knob config bridge.** A consumer's kit knobs are bash arrays
+resolved by a shell library that is sourced *in-process by each shell gate*,
+after it is already the exec'd process. A compiled gate never runs that source,
+so without a bridge it sees none of them — and `GATE_SDK_PRUNE_DIRS`, a
+whitespace-separated scalar, is the one precedent that does not generalize.
+`gate_command` prints argv and every call site captures it in a subshell, so it
+cannot export into its caller; the bridge therefore rides the argv it already
+emits. For a `.gate` member declaring knobs the emitted argv becomes
+
+```
+env
+GATE_SDK_KNOB_<NAME>=<tab-joined values>
+…
+<binary>
+<name>
+```
+
+one element per line, the existing protocol unchanged. **A member declaring no
+knob emits the two-element argv exactly as before**, so the bridge is inert for
+a member that reads no config. The declaration is the crate's, not the
+descriptor's: the binary answers `--knobs <name>` with one knob name per line
+off registry data a member cannot compile without, and `gate_command` asks it
+for every `.gate` member before emitting argv. That is the same
+*registry-data-held-to-executed-behavior* shape as `--reads`, and it is what
+makes an unread bridged knob impossible — the crate declares only the knobs its
+own code reads.
+
+Resolution, per declared knob:
+
+- **The owning kit comes from the knob's own `<KIT>_<KNOB>` prefix**, mapped to
+  a kit root through `gate_kit_roots`: each root's basename, hyphens to
+  underscores and upper-cased, is tried as a `<KIT>_` prefix. A knob matching no
+  root's prefix resolves to **gate-sdk itself** — never a parse error and never
+  a third kit guessed at. That fallback is not a second rule bolted on: gate-sdk
+  is the one kit every `.gate` dispatch already runs inside, so *no other kit
+  claimed it* and *it is gate-sdk's own* are the same fact. `GATE_PRUNE_DIRS` is
+  exactly that case, and the reason it exists: it is gate-sdk's *resolved*
+  library global, deliberately distinct from the `GATE_SDK_`-prefixed consumer
+  overrides that feed it, so it carries no `GATE_SDK_` prefix of its own.
+  Derivation-first — no roster of knob→kit pairs is maintained, so none can rot.
+- That kit's `lib/*.sh` is sourced **in a subshell**, in glob order, so a kit
+  library's globals cannot leak into the dispatcher or across members. The value
+  is read after every library has been sourced, so a kit whose knob is resolved
+  by one library and consumed by another is carried correctly.
+- The resolved array is serialized **tab-joined**. Whitespace is preserved
+  inside an element, which is exactly why the whitespace-separated scalar shape
+  cannot serve — `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` contains `Out of scope`. A
+  scalar knob is a one-element array; the two cases share one grammar.
+- **Three refusals, each exit 2 naming the knob** (§Fail-closed contract): an
+  element containing a **newline**, which would break the line-per-element argv
+  protocol; an element containing a **tab**, which would break the
+  serialization; and a knob the owning kit's library **does not define**, since
+  serializing that as empty would hand the reader an empty set — a fail-open
+  dressed as a default, and for a prune set a silently *larger* walk. An
+  element-less knob is not that case: a resolved-empty array serializes to the
+  empty string and is carried, so *absent* and *empty* part company on the
+  reading side too.
+
+The `GATE_SDK_KNOB_` prefix is deliberately **not** the knob's own name: reusing
+`CANON_KIT_MANIFEST_FILES` as an env scalar would collide with the existing
+whitespace-scalar override convention (`GATE_SDK_PRUNE_DIRS` is exactly such a
+knob), and one name meaning two grammars is the defect the prefix avoids.
+
+`env` is an external program in the dispatch path, sanctioned here because the
+dispatcher is already bash — this adds no dependency any caller did not have —
+and because the alternative, a shell wrapper per gate, would add a bash hop to
+every invocation and contradict the port's own purpose. **Its cost is borne by
+the callers, and is stated here rather than left for each to rediscover**: a
+bridged argv begins with `env`, not with the dispatch executable, so a caller
+that needs *the executable* rather than *the command* takes the first element
+that is neither `env` nor a `NAME=VALUE` assignment. §run-gate-tests is the one caller that
+needs it, and it is named there.
 
 The binary's path is the knob `GATE_SDK_NATIVE_BIN` (§Layout and configuration),
 never a literal. An **absent or non-executable** binary when a registry member
@@ -1759,7 +1865,10 @@ this exactly as it is and makes it unreachable in a correctly installed tree —
 a member arrives either with its verified artifact or not at all, omitted from
 `gates.list` and recorded there (§Porting a gate to the binary substrate,
 criterion 5) — so exit 2 is the backstop for a tree whose binary was deleted or
-replaced, never the path an unsupported platform takes.
+replaced, never the path an unsupported platform takes. A binary that is
+executable but **cannot report its knobs** — a non-zero `--knobs` — is the same
+harness error for the same reason: a bridge that quietly carried nothing would
+hand every declared reader an unset variable.
 
 `fail_closed` must be passed *only* a status that genuinely means the check
 could not execute (an awk/jq/parser crash) — never `grep`'s exit 1, which is
@@ -1985,8 +2094,17 @@ rather than a shell-only one — `check-gate-fixture-coverage` asserts a pair
 *exists* and never runs it, so without this the pair would be an unrun
 assertion the moment a gate ported. The ordering is binding: a ported gate's
 pair passes against the subcommand **before** the script it replaces is
-deleted, never after. argv[0] is absolutized before the `cd`, because the binary
-knob's default is deliberately a repo-relative path.
+deleted, never after.
+
+The runner is the **one caller that needs the dispatch executable rather than
+the whole command**, so it is the one the config bridge's argv shape reaches
+(§lib/gate.sh). It takes the first element that is neither `env` nor a
+`NAME=VALUE` assignment, and applies both the executable guard and the
+absolutization to *that* element. Both halves matter: `env` is a PATH lookup
+with no directory to resolve, so guarding argv[0] would reject every bridged
+member; and the binary knob's default is deliberately a repo-relative path, so
+the element that is not absolutized before the `cd` is resolved against the case
+dir and vanishes.
 
 **The output contract is asserted here, at runtime** (§Output contract). A
 `good/` case must emit the canonical `^<NAME>: clean (<parenthetical>)$` line
@@ -2201,7 +2319,40 @@ pre-commit hook to stdout and `--emit-commit-msg` the commit-msg hook
 and `commit-msg` only when a `tier=commit-msg` gate is registered. Adding a
 gate to either hook is manifest-only — there is no second hand-wiring step to
 drift. The emission is deterministic (no timestamps) so the committed hooks are
-byte-stable. Both emitted hooks carry the quiet-green wrapper in their
+byte-stable.
+
+**The hook bakes a ported member's resolved knob values**, because it resolves
+argv through `gate_command` at *generation* time and the bridge's `env` elements
+are part of that argv (§lib/gate.sh). So a kit-config edit stales the hook. That
+is the established property here rather than a new hazard: the hook already
+bakes a knob-derived value — the resolved `GATE_SDK_NATIVE_BIN` path sits
+literally in each ported member's `run_gate` line — and the hook's currency is
+held by regeneration plus `check-graph`'s byte-freshness assertion. The bridge
+widens the set of knobs that stale the hook; it does not invent the property.
+
+**No trigger widening is owed for it, and that is verified rather than assumed.**
+`check-graph`'s `couples=` already carries `scripts/*.sh` and `kit:*.sh`, and
+the hook's `staged_matches` uses bash `[[ ]]` globs in which `*` spans `/` — so
+both surfaces a bridged knob's value can come from, the consumer's
+`<gates-dir>/*-config.sh` and the owning kit's `lib/*.sh`, are already inside
+the trigger. Adding a narrower glob would restate live coverage rather than add
+any, which is why none was added. Recorded so a later reader does not read the
+absence as a forgotten widening and re-attempt it.
+
+**The alternative weighed and refused: a generated knob projection.** A shell
+tool dumping every resolved array into a tracked artifact, byte-compared by a
+freshness gate, is the shape this repo already uses for the hook, the graph
+artifact and the docs mirror, and it would keep values out of the hook. It is
+refused because the fixture runner `cd`s into each case dir, so every fixture
+case would need its own generated projection — a per-fixture generated artifact
+is a maintenance surface far larger than the staleness it avoids.
+
+Emitted argv elements are quoted **deterministically**: an element made only of
+shell-inert characters is emitted verbatim, and anything else — a bridged value
+carrying the tab separator, or an element carrying spaces — becomes bash ANSI-C
+`$'…'`. `printf %q` is deliberately not used, because its spelling varies across
+bash versions and the committed hook must be byte-identical across clones for
+the freshness comparison to mean anything. Both emitted hooks carry the quiet-green wrapper in their
 generated header (§run-gates owns the contract): each gate invocation's output
 is captured and reprinted only when that invocation fails (then the uniform
 failure report as before) or when `GATE_SDK_VERBOSE` is set, and a fully green
@@ -2363,12 +2514,15 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   to read, so the assertion counts zero and says so in its clean line. Demanding
   a build artifact from every reader would re-import, into the auditor, the
   build-time coupling the revert removed. **The roster is over subcommands
-  alone**: the binary's top-level flags (`--list`, `--reads`, `--source-stamp`)
-  are outside it by construction, handled in the top-level dispatch and never
-  entering the gate registry. Stated because the assertion's behavior does not
-  change but a reader adding a fourth flag needs to know it is not a parity
-  violation — a flag that *leaked* into `--list` would read here as a subcommand
-  with no descriptor and red as a stranded implementation.
+  alone**: the binary's top-level flags (`--list`, `--reads`, `--source-stamp`,
+  `--knobs`) are outside it by construction, handled in the top-level dispatch
+  and never entering the gate registry. Stated because the assertion's behavior
+  does not change but a reader adding a further flag needs to know it is not a
+  parity violation — a flag that *leaked* into `--list` would read here as a
+  subcommand with no descriptor and red as a stranded implementation.
+  `--knobs` is the fourth, added by the config bridge (§lib/gate.sh), and it is
+  named here rather than left to be re-derived: it was written against exactly
+  this paragraph's invitation to the next author.
 - **assertion C — disposition coverage.** Every substrate-sensitive member
   carries a disposition line in §Meta-gate conservation for the binary
   substrate. The set is **derived at runtime** — a member whose expanded

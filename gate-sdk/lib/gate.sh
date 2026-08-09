@@ -87,7 +87,55 @@ gate_resolve() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one. Emits one argv element per line. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the owning kit of a bridged knob, derived from the knob's own `<KIT>_` prefix rather than from a maintained knob→kit roster: each gate_kit_roots member's basename, hyphens to underscores and upper-cased, is tried as a prefix. A knob matching no other kit's prefix is gate-sdk's own — the one kit every `.gate` dispatch already runs inside — never a parse error and never a third kit guessed at.
+_gate_knob_owning_kit() {
+    local knob="$1" kit base prefix
+    while IFS= read -r kit; do
+        kit="${kit%/}"
+        [[ -n "$kit" ]] || continue
+        base="${kit##*/}"
+        prefix="${base^^}"; prefix="${prefix//-/_}_"
+        [[ "$knob" == "$prefix"* ]] && { printf '%s\n' "$kit"; return 0; }
+    done < <(gate_kit_roots)
+    gate_sdk_root
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve one declared knob to its tab-joined value by sourcing the owning kit's lib/*.sh in a subshell, so a kit library's globals cannot leak into the dispatcher or across members. Emits the joined value on stdout; returns non-zero having named the knob on stderr for each of the three refusals (undeclared knob, tab in an element, newline in an element).
+_gate_knob_value() {
+    local knob="$1" gate="$2" kit
+    kit="$(_gate_knob_owning_kit "$knob")"
+    (
+        shopt -s nullglob
+        local _gkv_f
+        for _gkv_f in "$kit"/lib/*.sh; do
+            # shellcheck disable=SC1090  # the owning kit's library, resolved by prefix
+            source "$_gkv_f"
+        done
+        if ! declare -p "$knob" >/dev/null 2>&1; then
+            printf 'gate_command: %s declares knob %s, but %s/lib defines no such knob — ' "$gate" "$knob" "$kit" >&2
+            printf 'the config bridge could not resolve it; treating as failure (not clean)\n' >&2
+            exit 2
+        fi
+        local -n _gkv_val="$knob"
+        local _gkv_e
+        for _gkv_e in "${_gkv_val[@]+"${_gkv_val[@]}"}"; do
+            case "$_gkv_e" in
+                *$'\n'*)
+                    printf 'gate_command: knob %s has an element containing a newline: %s — ' "$knob" "$_gkv_e" >&2
+                    printf 'the argv protocol is one element per line; treating as failure (not clean)\n' >&2
+                    exit 2 ;;
+                *$'\t'*)
+                    printf 'gate_command: knob %s has an element containing a tab: %s — ' "$knob" "$_gkv_e" >&2
+                    printf 'tab separates the serialized elements; treating as failure (not clean)\n' >&2
+                    exit 2 ;;
+            esac
+        done
+        local IFS=$'\t'
+        printf '%s' "${_gkv_val[*]+"${_gkv_val[*]}"}"
+    )
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, the execution counterpart of gate_resolve's declaration path: one element `<dir>/<name>.sh` for a shell gate, two elements `<binary> <name>` for a `.gate`-dispatched one — prefixed, when that member declares knobs, by `env` and one `GATE_SDK_KNOB_<NAME>=<tab-joined>` element per knob. Emits one argv element per line, so a caller looking for the dispatch executable takes the first element that is neither `env` nor an assignment. An absent or non-executable binary when a member dispatches to it is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract): a skip would let the battery silently stop running a gate whenever a build is missing. A binary that cannot report its knobs, and each of the three knob-resolution refusals, exit 2 by the same contract.
 gate_command() {
     local g="$1" d bin
     shift
@@ -103,6 +151,23 @@ gate_command() {
                 printf 'absent or not executable — the gate could not run; treating as ' >&2
                 printf 'failure (not clean). Build it: cargo build --release --manifest-path native/Cargo.toml\n' >&2
                 exit 2
+            fi
+            local knob_names knob_status knob value
+            knob_names="$("$bin" --knobs "$g" 2>&1)"; knob_status=$?
+            if [[ "$knob_status" -ne 0 ]]; then
+                printf 'gate_command: %s --knobs %s exited %s — the config bridge could not ' "$bin" "$g" "$knob_status" >&2
+                printf 'report what %s reads; treating as failure (not clean)\n%s\n' "$g" "$knob_names" >&2
+                exit 2
+            fi
+            local -a env_elems=()
+            while IFS= read -r knob; do
+                [[ -n "$knob" ]] || continue
+                value="$(_gate_knob_value "$knob" "$g")" || exit 2
+                env_elems+=("GATE_SDK_KNOB_$knob=$value")
+            done <<<"$knob_names"
+            if [[ ${#env_elems[@]} -gt 0 ]]; then
+                printf 'env\n'
+                printf '%s\n' "${env_elems[@]}"
             fi
             printf '%s\n%s\n' "$bin" "$g"
             return 0

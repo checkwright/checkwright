@@ -9,6 +9,10 @@ CANON_KIT_CONFIG_FILE
 GATE_SDK_ROOT
 LIFECYCLE_KIT_CONFIG_FILE
 
+A dispatch-composed name resolves through the family stem kit source defines,
+since the members are built at runtime and appear in no kit literal:
+GATE_SDK_KNOB_SOME_BRIDGED_KNOB
+
 Out of scope, never flagged — prose compounds and non-brand namespaces:
 a per-kit note, check-kit-registration, and the SMOKE_KIT_ROOT harness var
 (a KIT_ token whose stem names no gate_kit_roots dir).

@@ -12,24 +12,6 @@
 
 ## New Features
 
-- **native-knob-bridge** [spec: SPEC-knob-bridge.md] — a compiled gate cannot see the bash
-  arrays that decide what it scans.
-  **Split out and ruled 2026-08-09 by the operator at spec**, re-scoping this iteration's port
-  unit. A consumer's kit knobs are bash arrays resolved by a shell library sourced *in-process
-  by each shell gate*, after it is already the exec'd process; `gate_command`'s `.gate` branch
-  exec's `[<binary>, <name>]` directly, so a compiled gate sees none of them. Nothing is in
-  scope to export and no bridge exists — `walk.rs`'s `GATE_SDK_PRUNE_DIRS` precedent does not
-  generalize, that knob being a whitespace scalar.
-  **Every candidate cohort owes this**, which is what makes it shared substrate rather than one
-  cohort's local cost: cohort A scores 0 of 10 on criterion 6 and the runner-up 5 of 7. The
-  parent `native-gate-port-remaining-corpus` keeps the port itself and its deferred cohort
-  selection.
-  **This unit ports zero gates, by ruling** — not a shortfall, and no token port is added to
-  show motion. Its live reader is the duplication it retires: `native/src/walk.rs` carries its
-  own copy of `lib/gate.sh`'s prune-dir default plus a unit test holding the two equal, and
-  both are deleted when the bridge feeds the resolved value across instead.
-  Filed 2026-08-09 at spec under the operator-directed filing exception.
-
 - **cargo-grant-committed-vs-overlay** [spec: SPEC-native-build.md] — the
   commit-time requirement is granted only by an untracked file.
   The dogfood ruling made `cargo build --release --manifest-path native/Cargo.toml` a
@@ -4308,5 +4290,6 @@
 ## Done
 
 - gate-tamper-roster-native-reach
+- native-knob-bridge
 
 ## Lessons Learned

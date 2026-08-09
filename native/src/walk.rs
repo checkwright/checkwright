@@ -1,23 +1,22 @@
-// spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned
-// walk, reading the same GATE_SDK_PRUNE_DIRS and GATE_SDK_PRUNE_EXTRA_DIRS knobs so
-// the two substrates cannot scan different trees
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned walk,
+// reading across the config bridge the value gate_find's own GATE_PRUNE_DIRS array already
+// resolved, so one computation of the set serves both substrates
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub const PRUNE_DIRS_DEFAULT: &str = "target .git node_modules .tmp gate-tests worktrees";
-
-pub fn prune_dirs() -> Vec<String> {
-    let mut dirs: Vec<String> = match std::env::var("GATE_SDK_PRUNE_DIRS") {
-        Ok(v) if !v.trim().is_empty() => v.split_whitespace().map(String::from).collect(),
-        _ => PRUNE_DIRS_DEFAULT
-            .split_whitespace()
-            .map(String::from)
-            .collect(),
-    };
-    if let Ok(extra) = std::env::var("GATE_SDK_PRUNE_EXTRA_DIRS") {
-        dirs.extend(extra.split_whitespace().map(String::from));
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged value, tab-split. The crate holds no
+// default for a bridged knob, so an absent variable is an error rather than a fallback;
+// an empty one is a resolved-empty set, which is why the two part company here.
+pub fn prune_dirs() -> Result<Vec<String>, String> {
+    let raw = std::env::var("GATE_SDK_KNOB_GATE_PRUNE_DIRS").map_err(|_| {
+        "GATE_SDK_KNOB_GATE_PRUNE_DIRS is unset — the gate was invoked without the config \
+         bridge gate_command emits, so the prune set could not be resolved"
+            .to_string()
+    })?;
+    if raw.is_empty() {
+        return Ok(Vec::new());
     }
-    dirs
+    Ok(raw.split('\t').map(String::from).collect())
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a directory that cannot be read is
@@ -28,7 +27,7 @@ pub fn find_files(root: &Path, exts: &[&str]) -> Result<Vec<PathBuf>, String> {
     // this one line is what makes unit test A's observation complete.
     #[cfg(test)]
     recorder::note(&root.display().to_string());
-    let prune = prune_dirs();
+    let prune = prune_dirs()?;
     let mut out = Vec::new();
     let mut stack = vec![root.to_path_buf()];
     while let Some(dir) = stack.pop() {
@@ -94,6 +93,36 @@ pub mod recorder {
     }
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the unit tests reach find_files without going through
+// gate_command, so they stand in for the bridge by asking its one owner, the kit's shell
+// library, for the resolved value; a literal here would restore the deleted second default
+#[cfg(test)]
+pub fn bridge_declared_knobs() {
+    use std::sync::Once;
+    static ONCE: Once = Once::new();
+    ONCE.call_once(|| {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        let out = std::process::Command::new("bash")
+            .arg("-c")
+            .arg("source gate-sdk/lib/gate.sh; IFS=$'\\t'; printf '%s' \"${GATE_PRUNE_DIRS[*]}\"")
+            .current_dir(&root)
+            .output()
+            .expect("cannot run the shell library's knob resolution");
+        assert!(
+            out.status.success(),
+            "gate-sdk/lib/gate.sh could not resolve GATE_PRUNE_DIRS: {}",
+            String::from_utf8_lossy(&out.stderr).trim()
+        );
+        let value = String::from_utf8_lossy(&out.stdout).to_string();
+        assert!(
+            !value.is_empty(),
+            "the shell library resolved GATE_PRUNE_DIRS to nothing — the tests would walk an \
+             unpruned tree and observe roots no production invocation reaches"
+        );
+        std::env::set_var("GATE_SDK_KNOB_GATE_PRUNE_DIRS", value);
+    });
+}
+
 // spec: gate-sdk/SPEC.md §check-reads-couples — unit test A's case-dir lookup lives here
 // rather than beside the registry so that the directory scan it needs obeys test B instead
 // of being excused from it.
@@ -130,6 +159,7 @@ mod tests {
 
     #[test]
     fn no_module_outside_this_one_walks_the_filesystem() {
+        bridge_declared_knobs();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = find_files(&src, &["rs"]).expect("cannot enumerate the crate's sources");
         assert!(!files.is_empty(), "no crate source found to scan");
@@ -183,33 +213,6 @@ mod tests {
              confirm the new dependency performs no filesystem walk, then widen this test \
              deliberately rather than deleting it",
             declared
-        );
-    }
-
-    // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — the
-    // executed coupling for the one knob default this crate duplicates, which
-    // check-knob-default-coupling cannot reach (shell idioms, kit roots only)
-    #[test]
-    fn prune_default_equals_the_shell_libraries() {
-        let lib = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../gate-sdk/lib/gate.sh");
-        let text = fs::read_to_string(&lib)
-            .unwrap_or_else(|e| panic!("cannot read {}: {}", lib.display(), e));
-        let line = text
-            .lines()
-            .find(|l| l.trim_start().starts_with("GATE_PRUNE_DIRS=("))
-            .expect("no GATE_PRUNE_DIRS=(…) default in gate-sdk/lib/gate.sh");
-        let inner = line
-            .split_once('(')
-            .and_then(|(_, r)| r.split_once(')'))
-            .map(|(v, _)| v)
-            .expect("malformed GATE_PRUNE_DIRS array literal");
-        let shell: Vec<&str> = inner.split_whitespace().collect();
-        let rust: Vec<&str> = PRUNE_DIRS_DEFAULT.split_whitespace().collect();
-        assert_eq!(
-            rust, shell,
-            "the native prune-dir default has drifted from the shell library's; \
-             the two substrates would scan different trees"
         );
     }
 }
