@@ -4,11 +4,4 @@
 
 ---
 
-install-profile-seam scope aff2267c 2026-08-08
-install-profile-seam spec a4f46d5d 2026-08-08
-install-profile-seam spec a7d6bcf3 2026-08-08
-install-profile-seam align a6ddc2a8 2026-08-08
-install-profile-seam build a13ba187 2026-08-08
-install-profile-seam build a83a5c2e 2026-08-09
-install-profile-seam validate a558eca8 2026-08-09
-install-profile-seam close a37a2acd 2026-08-09
+— scope aa7c9297 2026-08-09
