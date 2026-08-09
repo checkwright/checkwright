@@ -209,11 +209,29 @@ nothing in the battery `init` registers would say so.
 The **starting gate roster** is the subset a fresh consumer begins with, not
 the kit's full roster — the same distinction gate-sdk's own README draws. A
 gate whose subject you have not authored yet has nothing to read: canon-kit's
-duplication gate wants a glossary, site-kit's wants a docs host, and
-lifecycle-kit's two want a stage attestation only a stage session can write. On
-a tree that has done nothing wrong those would red on day one, so they are
-registered when the surface exists rather than at install. Each kit's README
-names the full roster to grow into.
+duplication gate wants a glossary, and site-kit's wants a docs host. On a tree
+that has done nothing wrong those would red on day one, so they are registered
+when the surface exists rather than at install. Each kit's README names the full
+roster to grow into. **No lifecycle-kit gate is `zero-config`**, and the reasons
+differ across its roster rather than being one reason: some read a stage
+attestation only a stage session can write, others read surfaces a stage session
+authors, and two — `check-lifecycle-registration` and `check-merge-attrs` — read
+what `lifecycle-kit/bin/install-lifecycle.sh` writes, which is the adopter's own
+step and not a stage's. The posture is kit-wide; the reason is per gate.
+
+**A kit's agent-file block is seeded at install iff a gate registered at install
+reads it.** Seeding follows the gate, not the kit — the agent-file half of the
+rule above, extended to the one other thing `init` writes on a kit's behalf.
+doctrine-kit's block is seeded because `check-doctrine-registration` declares
+`zero-config`, so the reader of the block is in the registry `init` writes and
+the block is read on day one rather than sitting resident. lifecycle-kit's is
+not, because nothing `init` registers would read it: seeding it would put
+always-loaded instruction for a stage machine into your agent file and charge
+every session's context for machinery nothing yet enforces. The rule is also
+what keeps `recipe_needs_agent_file` from being a seeding roster — the predicate
+asks whether the agent file must *exist* for a kit's starting gates, which
+context-kit answers yes to while writing nothing into it; the seeding arms ask
+the narrower question of which kit writes into it.
 
 **The roster is derived from the gates themselves.**
 `recipe_gates(kit-payload-dir, profile)` in `lib/common/recipe.sh` is the

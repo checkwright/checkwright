@@ -64,6 +64,7 @@ recipe_write_queue() {   # $1 = the source recipe_queue_source resolved, $2 = co
         > "$2/$3"
 }
 
+# spec: installer/README.md §What init seeds — this asks whether the agent file must *exist* for a kit's starting gates, which is a narrower question than which kit writes into it: a kit answering yes here and shipping no seed arm is the ordinary case, and reading this membership as the seeding roster is the conflation the section's rule exists to settle
 recipe_needs_agent_file() {   # $1 = kit name -> 0 iff one of its starting gates reads the always-loaded agent file
     case "$1" in context-kit|doctrine-kit) return 0 ;; *) return 1 ;; esac
 }
@@ -96,6 +97,7 @@ recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root; pri
                 "" "---" "" > "$root/.workflow/WORKFLOW-STATE.txt" || return 1
             printf '%s\n' ".workflow/WORKFLOW-STATE.txt" ;;
         doctrine-kit)
+            # spec: installer/README.md §What init seeds — this kit has an arm because a gate init registers reads the block it writes; that is the whole test, and it is why no lifecycle-kit arm sits beside this one
             # spec: doctrine-kit/SPEC.md §install-doctrine — the reference block is the kit's own installer's to write, so init calls it rather than restating the block it emits
             ( cd "$root" && bash "$pay/bin/install-doctrine.sh" "$AGENT_FILE" "doctrine-kit/DOCTRINE.md" ) >/dev/null || return 1
             printf '%s\n' "$AGENT_FILE" ;;

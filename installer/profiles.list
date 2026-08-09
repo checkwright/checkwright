@@ -41,10 +41,12 @@ starter	gate-sdk
 #
 # The honest consequence of the starting-subset rule, stated where the roster is
 # read rather than only on the install page: lifecycle-kit registers **no gate**
-# at install, because its gates read a stage attestation only a stage session can
-# write. So an adopter who picks this profile *for* lifecycle governance gets the
-# stage machinery vendored and nothing enforcing it until their first stage
-# stamp arms those gates. Vendored is not yet enforced.
+# at install, because none of its gates is `zero-config` — for reasons that
+# differ across the roster rather than one reason covering it
+# (installer/README.md §What init seeds). So an adopter who picks this profile
+# *for* lifecycle governance gets the stage machinery vendored and nothing
+# enforcing it until the surface each gate reads exists — a stage stamp for
+# most, the kit's own installer for two. Vendored is not yet enforced.
 delegation	gate-sdk
 delegation	lifecycle-kit
 delegation	queue-kit

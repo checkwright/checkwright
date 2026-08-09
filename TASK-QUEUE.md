@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **init-lifecycle-agent-block-seeding** [spec: SPEC-agent-block.md] — the agent-block rule.
-  This entry asked whether `init` should seed lifecycle-kit's agent-file block, and said deciding
-  which of its two outcomes held preceded any estimate. `SPEC-agent-block.md` decides it: the
-  exclusion was considered, and the seeding is correct as it stands.
-  The rule it states — **a kit's agent-file block is seeded at install iff a gate registered at
-  install reads it** — derives both halves. doctrine-kit is seeded because
-  `check-doctrine-registration` is `zero-config`; lifecycle-kit is not because no lifecycle-kit
-  gate is, so the block would be resident always-loaded instruction for a stage machine the
-  adopter has not adopted.
-  So the deliverable is the small one: state the rule, cite it from the two producers, and
-  correct `installer/README.md`, which offers a true statement about two gates as the reason for
-  a posture covering eleven. The declined branch is costed in the gap inbox — seeding the block
-  would owe a `--remove` mode `install-lifecycle.sh` does not have.
-  Filed 2026-08-08 by close; promoted 2026-08-09 at spec.
 - **dispatch-worktree-reds-the-battery** [spec: SPEC-worktree-prune.md] — one word.
   recurrence: dispatch-worktree-reds-the-battery 2026-08-08
   A live agent worktree under `.claude/worktrees/` is a full second copy of the repo that every
@@ -4188,5 +4174,6 @@
 
 - prose-profile
 - install-queue-template-unreachable
+- init-lifecycle-agent-block-seeding
 
 ## Lessons Learned
