@@ -61,6 +61,67 @@
   a posture covering eleven. The declined branch is costed in the gap inbox — seeding the block
   would owe a `--remove` mode `install-lifecycle.sh` does not have.
   Filed 2026-08-08 by close; promoted 2026-08-09 at spec.
+- **dispatch-worktree-reds-the-battery** [spec: SPEC-worktree-prune.md] — one word.
+  recurrence: dispatch-worktree-reds-the-battery 2026-08-08
+  A live agent worktree under `.claude/worktrees/` is a full second copy of the repo that every
+  tree-walking gate descends into, so the battery — the oracle every commit here requires — is
+  dark for the whole duration of a read-only fan-out. Attested four times, at build, close and
+  boundary stages alike, and unavoidable: the dispatch guard mandates the shape that causes it.
+  `SPEC-worktree-prune.md` refutes this entry's own stated blocker by measurement. With a real
+  worktree live the battery is 3 of 100 red; adding the basename `worktrees` to
+  `GATE_SDK_PRUNE_DIRS` makes it 100 of 100 with the worktree still live. The entry reasoned
+  that the prune could not name `.claude/worktrees` without taking `.claude/commands` and
+  `.claude/agents` too — true of the parent, but the prune matches the **leaf**, and `worktrees`
+  selects that directory and nothing else.
+  Pruning `.claude` also passes 100 of 100, which is the trap the amendment records: that
+  variant loses coverage silently rather than reddening, because the governed `.claude` markdown
+  surfaces are read by explicit globs no prune touches.
+  The real blocker was never named here: the knob **replaces** the default set with no additive
+  form, so consumer config cannot express "the default plus one" without maintaining a copy that
+  drifts. Hence four deltas — the default gains the member, the SPEC gains the reason and the
+  coverage caveat, `lib-gate.test.sh` gains the discriminating case, and a
+  `GATE_SDK_PRUNE_EXTRA_DIRS` append knob makes the placement ruling honest.
+  Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches;
+  promoted 2026-08-09 at spec.
+- **statusline-queue-section-counts** [spec: SPEC-queue-counts.md] — counters, one surface.
+  Operator request: `TASK-QUEUE.md` section counts in the statusline as compact single-letter
+  counters, the deferred one explicitly wanted.
+  `SPEC-queue-counts.md` finds the requested set is *derivable* rather than a list — features,
+  debt, deferred and icebox are exactly queue-kit's task sections, the set `lib/queue.sh`
+  already composes for `QUEUE_TASK_RE`. So the counter enumerates nothing and the seam
+  constraint this entry insisted on is satisfied by construction, not by discipline.
+  Two nearer homes are refused with reasons. A further `bin/queue-index.sh` mode is refused by
+  the owning spec itself, which fixes that tool's modes and rejects folding jobs together.
+  Sourcing `lib/queue.sh` into the statusline is refused on measurement: the lib **exits 2 at
+  source time** on malformed config, which would take down the entire status bar for a fault in
+  a component contributing four characters. So the counter is a new one-job
+  `queue-kit/bin/queue-counts.sh` the statusline calls as a subprocess.
+  This entry's "two surfaces" premise is falsified. `.claude/settings.json` points `statusLine`
+  at the template itself and project settings outrank user settings, so inside this repo the
+  operator's live statusline **is** the template: one edit delivers the ask. The real second
+  surface is the user-level copy, which is out of tree, ungoverned, already drifted, and runs
+  only where there is no queue to count — filed to the gap inbox, not fixed here.
+  Surfaced 2026-07-31, operator request; promoted 2026-08-09 at spec.
+- **workflow-state-direct-edit-guard** [spec: SPEC-state-guard.md] — the uncommitted window.
+  An uncommitted hand-edit to `.workflow/WORKFLOW-STATE.txt` moves the stage cursor for a whole
+  session, while every gate that would catch it fires only at commit. This entry's four findings
+  stand; it was held for design on two unsettled points, and `SPEC-state-guard.md` resolves
+  both from the governing specs rather than by preference.
+  **Ownership**: guard-kit's SPEC has already broken this tie for its own consumers — the kit
+  owning the *rule* ships the guard and rides `lib/guard.sh`, and guard-kit mechanism moves only
+  where the lib lacks a primitive. So lifecycle-kit ships the guard as the framework's fourth
+  consumer, and guard-kit moves by exactly one clause: `guard_read_command` reads
+  `.tool_input.command`, and a Write/Edit call carries `.tool_input.file_path`.
+  **The settings surface is not pinned**, contrary to this entry: the pin roster carries two
+  memory keys and never reads `.hooks`. What governs the block is a derivation — the enforcement
+  map reads `.hooks.PreToolUse` to emit its Guards section and the value rollup joins that page
+  — so registering the hook reds two freshness gates until both projections regenerate. That is
+  a build instruction where "pinned" would have said do-not-touch.
+  Seven deltas, and the amendment is cross-component: guard-kit, lifecycle-kit, and the repo's
+  harness settings plus two generated projections.
+  Surfaced 2026-07-31 by the close-entry refusal the same day, where `enter-stage`'s own refusal
+  text openly offered a deliberate hand-stamp and the session declined on judgment alone — which
+  is what this request wants to stop relying on; promoted 2026-08-09 at spec.
 
 ## Technical Debt
 
@@ -951,27 +1012,6 @@
   on the wrong side of a distinction the tree makes in practice and states nowhere.
   Surfaced 2026-07-31, operator-directed; drained from the gap inbox by close.
 
-- **statusline-queue-section-counts** [design-pending] — operator request: surface
-  `TASK-QUEUE.md` section counts in the statusline in a compact layout — features,
-  debt, deferred, icebox as single-letter counters, the deferred counter explicitly
-  wanted. Needed for the operator's own statusline at minimum; extending
-  `delegation-kit/templates/statusline-usage.sh` for consumers is welcome if the
-  mechanism carries. That template already opens the queue (for the iteration name)
-  and the lifecycle state file (for the stage), so counts add no new file access
-  and no new dependency.
-  **The design question that must not be assumed away:** section names are consumer
-  config — `QUEUE_KIT_ICEBOX_SECTION` and its canon-kit and drift-kit counterparts
-  — so the counter must resolve **configured** section names. Hardcoding this
-  repo's four headings would put one consumer's layout into a kit literal, which is
-  the provenance seam.
-  **Two surfaces, separate edits:** the kit template is a consumer-copy producer,
-  so the operator's live statusline is a copy and will not update from a template
-  change.
-  **Cost while deferred:** low and non-rotting; the residue is that queue shape is
-  invisible at a glance and re-derived by running the queue index or opening the
-  file.
-  Surfaced 2026-07-31, operator request; drained from the gap inbox by close.
-
 - **contributor-writeback-disposition** [design-pending] — operator-directed: every
   GitHub boundary-sweep disposition must write back to the contributor, and the
   comment must be appreciative — explicitly **including** the discard cases. A
@@ -1071,40 +1111,6 @@
   timing stays a judgment call made by the one party that cannot see the number.
   Surfaced 2026-07-31, operator request superseding the lead's own first sketch;
   drained from the gap inbox by close.
-
-- **workflow-state-direct-edit-guard** [design-pending] — operator question, worth a
-  unit: can a direct edit to the lifecycle state file that bypasses
-  `lifecycle-kit/bin/enter-stage.sh` be blocked? Findings, verified rather than
-  assumed.
-  **(1) Content-based detection is impossible and should not be attempted** — a
-  hand-written stamp is byte-identical to an `enter-stage` one by design, and any
-  marker `enter-stage` adds is equally writable by whoever is hand-editing.
-  **(2) Much of the bypass is already closed**, which was not obvious:
-  `check-evidence-manifest`, `check-stage-entry` and `check-stage-evidence` are all
-  registered gates, and the manifest check reads the cursor out of the state file
-  itself — so a hand-stamped `close` entry reds at the offender's first commit on
-  the same assertion that refused the entry. The entry preflight and the pre-commit
-  gate are the same code reading the same cursor.
-  **(3) The missing lever** is a `PreToolUse` matcher on Write|Edit denying the
-  state file; today `PreToolUse` matches only Bash and Agent, and guard-kit's
-  bash-guard is the established precedent for exactly this shape.
-  **(4) The actual hole is neither** — the cursor is the **worktree** file's last
-  stamp and every reader reads the working tree, while gates fire only at commit.
-  An uncommitted hand-edit moves the cursor immediately for the whole session, and
-  a session that never commits its stamp is never caught at all. That window is
-  ungated by construction and a Write/Edit guard is the only thing that reaches it.
-  Residual and unclosable in-repo: `--no-verify`, and a human editing outside the
-  agent tooling.
-  **Why `[design-pending]`:** which kit owns a Write/Edit-side guard is unsettled —
-  guard-kit owns the tool-call guard mechanism while lifecycle-kit owns the state
-  file — and the settings hooks are a pinned surface, so the unit changes one.
-  **Cost while deferred:** low today and non-rotting, but it is the integrity floor
-  under every lifecycle claim the repo makes, so the exposure is reputational
-  rather than mechanical.
-  Surfaced 2026-07-31 by the close-entry refusal the same day, where `enter-stage`'s
-  own refusal text openly offered a deliberate hand-stamp and the session declined
-  on the close ritual's rule — i.e. the current control is the agent's judgment,
-  which is what this request wants to stop relying on. Drained by close.
 
 - **readme-roster-enum-coverage** [design-pending] — a kit README enumerating a
   **derivable** set is outside every parity gate, so it drifts silently while the
@@ -3572,55 +3578,6 @@
   the standing evidence that it is often not.
   Filed 2026-08-07 by close, as the iteration's candidate lesson; the observation came from
   the lead, the evidence and the framing from this drain.
-
-- **dispatch-worktree-reds-the-battery** [design-pending] — a live agent worktree sits inside
-  the tree, is not ignored, and fails the pre-commit battery while it exists.
-  recurrence: dispatch-worktree-reds-the-battery 2026-08-08
-  An isolated dispatch materialises `.claude/worktrees/agent-<id>/`, a full second copy of the
-  repo. `.gitignore` covers only `.claude/settings.local.json*`, so the directory shows as
-  untracked and, worse, every tree-walking gate descends into it. Measured at this close: with
-  one worktree live the battery went red on `check-comment-tier` (the whitelist is
-  path-scoped, so the copy's files dodge the match), and both `check-value-rollup-fresh` and
-  `check-enforcement-fresh` went stale because their emitters counted the duplicated `smoke/`
-  and workflow files. The same battery passed 97 of 97 the moment the worktree was released.
-  **This is now on the sanctioned path, which is what makes it worth filing.** The dispatch
-  guard landed this iteration *requires* `isolation: worktree` for a read-only agent type, so
-  the collision is no longer exotic: any session that dispatches a read-only audit the way the
-  guard demands cannot commit until that audit finishes. It cost two rejected commits here.
-  **Why `[design-pending]`:** ignoring the path is one line and clearly right for `git status`,
-  but it does **not** fix the gates — a gitignored directory is still walked by a `find`-based
-  scanner, so the real question is whether kit scanners owe a shared exclusion root and where
-  that roster lives. Relocating worktrees outside the repo would fix both at once and is the
-  harness's call, not the tree's.
-  **Cost while deferred:** the battery is the oracle every commit in this tree requires, and it
-  is dark for the whole duration of a read-only fan-out — so delegation and verification cannot
-  overlap, and the more a stage parallelises the longer its oracle stays unavailable. That is a
-  serialization constraint on every delegating session rather than an untracked-directory nit,
-  and it cannot be dodged by declining to use worktrees: the dispatch guard mandates the shape
-  that causes it. The failure is also misattributed by construction — the red names the
-  session's own files, not the dispatch, so the natural reading is that the session broke
-  something.
-  **Re-attested 2026-08-08**, from a build batch: a 3-red battery while one audit dispatch was
-  live — comment-tier on the copy's sources, and both freshness emitters counting the
-  duplicated markers — all pure pollution, self-clearing when the harness released the worktree.
-  **Third and fourth attestations, both 2026-08-09, both confirming this entry's own prediction
-  against the fix that shipped.** `.claude/worktrees/` was gitignored at the 2026-08-08 close;
-  this entry had already said that would not reach the gates, and it did not. `check-comment-tier`
-  reddened a close commit, and then a scope commit at the next boundary, on the same
-  `reserve/crates/src/lib.rs` inside live worktree copies — the scope one inside two worktrees the
-  dispatch guard had itself mandated for the read-only sweeps that stage needed. So the
-  serialization cost above is attested at build, close and boundary stages alike. The mechanism is
-  pinned rather than inferred: `gate_find` prunes by directory **basename**
-  (`GATE_SDK_PRUNE_DIRS`, default `target .git node_modules .tmp gate-tests`), so no prune entry
-  can name `.claude/worktrees` without also pruning `.claude/commands` and `.claude/agents`,
-  which are governed surfaces. A shared exclusion root would have to be path-shaped, not
-  name-shaped — which sharpens the design question above into a concrete blocker.
-  **On the count:** the third stamped no `recurrence:` date, observed directly by a close rather
-  than through the capture channel, the same decline that close applied to its two other
-  out-of-channel recurrences. The fourth was filed through `bin/file-gap.sh`, so the drain stamps
-  the declaration rather than a session stamping it by hand — the sanctioned writer, and it leaves
-  `recurrence-drain-input-widening`'s open question open.
-  Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches.
 
 - **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
   a `.txt` and read like an `.md`, and the convention does not resolve the hybrid.
