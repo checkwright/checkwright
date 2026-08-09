@@ -227,40 +227,33 @@
   **Not demand-gated — retagged by operator ruling 2026-08-08, and carried at `now` since
   the seam it waited on shipped.** The 2026-08-03 trajectory pivot makes this the step
   TRAJECTORY.md §PRIORITY DIRECTIVE names next and "the **earliest external-install
-  channel** … not post-launch polish", with everything ahead of it discharged. Seeds:
-  gate-sdk, guard-kit, context-kit, drift-kit, and canon-kit's
-  one-owner/coupling core are workflow-agnostic today; lifecycle-kit's stage
-  semantics, evidence-kit's test baseline, and canon-kit's spec framing are
-  software-coupled — the abstraction axis is "code + spec" artifacts
-  generalizing to "governed surface". `check-prose-tells` (the
-  launch-readiness-gate build) is the first concretely prose-shaped kit
-  mechanism and the natural profile seed. Surfaced 2026-07-16 in the same
-  launch triage that scoped launch-readiness-gate.
-  **Seed claim corrected 2026-08-08 at scope, re-verified against the tree — two
-  of the five named seeds arm nothing, and the survey is filed rather than
-  re-buyable.** `check-prose-tells` ships **dormant**: canon-kit's default glob is
-  empty and the gate is absent from the zero-config consumer roster, so it fires
-  in this tree only through `scripts/canon-config.sh` — it is a seed for the
-  design, not a mechanism a prose consumer receives. guard-kit and drift-kit
-  register **zero** gates in that roster. And the split above is inverted where it
-  matters most: canon-kit's workflow-agnostic one-owner core is absent from the
-  roster while its four spec-framing gates are present, so a prose consumer today
-  gets all of the software-coupled half and none of the agnostic half.
-  **Sized 2026-08-08 at scope at two to three iterations, and `install-profile-seam` has
-  since PAID the first.** All three facts that bound rested on are now false: recipe
-  functions were keyed by kit and took no profile argument (`recipe_gates` now takes the
-  profile); profile-keyed install was the missing mechanism (`profile-keyed-install`,
-  `kit-owned-install-recipe`, `lock-own-file-narrowed-profile-drift` all shipped 2026-08-09);
-  and a fourth profile would break a containment-chain contract (the chain gave way to the
-  lattice — `installer/profiles.list` now states "A fourth profile is admitted exactly when it
-  fits; there is no count to raise here"). The installer no longer resists a fourth profile,
-  and `companion-toolkit-profile` no longer re-pays that bound either. What remains is the
-  always-separable part: a prose gate cohort, then a docs-shaped smoke consumer, with the
-  "kits govern non-code work" abstraction program still separable from an installable profile.
-  Corrected in place at the 2026-08-09 close's premise-rot review; the re-sizing is scope's,
-  and it matters because this is `[roadmap: now]` and TRAJECTORY.md's sequence names it next,
-  so an over-costed entry here distorts the selection it feeds. Full finding and its
-  two-command witness: `.workflow/survey-record.md`.
+  channel** … not post-launch polish", with everything ahead of it discharged. The abstraction
+  axis is "code + spec" artifacts generalizing to "governed surface". Surfaced 2026-07-16 in
+  the launch triage that scoped launch-readiness-gate.
+  **What a prose consumer actually receives, measured rather than assumed** — the seed list
+  corrected 2026-08-08 at scope and re-verified TRUE at the 2026-08-09 boundary.
+  `check-prose-tells` ships **dormant**: canon-kit's default glob is empty and the gate is
+  `on-surface`, so it fires here only through `scripts/canon-config.sh`. guard-kit and drift-kit
+  ship no `checks/` at all. And the split is inverted where it matters most — canon-kit's
+  workflow-agnostic document-governance core is `on-surface` while its four spec-framing gates
+  are `zero-config`, so a prose consumer gets the software-coupled half and none of the other.
+  **Sized 2026-08-08 at two to three iterations; `install-profile-seam` PAID the first**, and an
+  over-costed entry at `[roadmap: now]` distorts the selection it feeds, so the re-sizing is
+  scope's. All three facts that bound rested on are now false: `recipe_gates` takes the profile;
+  profile-keyed install shipped (`profile-keyed-install`, `kit-owned-install-recipe`,
+  `lock-own-file-narrowed-profile-drift`, 2026-08-09); and the containment chain gave way to a
+  lattice whose roster states "A fourth profile is admitted exactly when it fits; there is no
+  count to raise here". The installer no longer resists a fourth profile, and
+  `companion-toolkit-profile` no longer re-pays that bound either.
+  **What remains, sharpened at the 2026-08-09 boundary:** a prose gate cohort, then a
+  docs-shaped smoke consumer — none exists — with the "kits govern non-code work" abstraction
+  program still separable from an installable profile. The cohort largely exists already as
+  canon-kit gates dispositioned `on-surface`, so the profile may be membership rows plus the
+  first use of the profile parameter `install-profile-seam` left unexercised in
+  `installer/lib/common/recipe.sh`, whose directive there says the parameter is the seam and no
+  disposition varies on it yet. Full survey and its two-command witness:
+  `.workflow/survey-record.md` — re-bought at this boundary, because the reset truncated the
+  block this line used to cite.
   **Cost while deferred:** no longer zero. The prior reading — that the kits make
   no non-code claim to falsify — was written before the pivot sequenced this rung;
   what is now deferred is the preview cohort's install channel itself
@@ -4248,10 +4241,12 @@
   approximations are term-overlap heuristics between the citing sentence and the target
   section, whose false-positive surface is the same one `spec-measured-count-gate` is stuck on,
   and a term-overlap red on a correct citation is worse than silence on a wrong one.
-  **Cost while deferred:** broad and unmeasured — `check-spec-pointer` currently reports 1774
-  directive pointers and 246 prose citations, and the ownership of every one of them is
+  **Cost while deferred:** broad and unmeasured — `check-spec-pointer` reports 902 directive
+  pointers and 247 prose citations, and the ownership of every one of them is
   unverified. The cost is not that they are wrong; it is that the gate's green is read as
-  saying they are right.
+  saying they are right. **Both figures re-measured 2026-08-09 at scope by re-running the gate:
+  the directive count filed here was 1774, wrong by roughly a factor of two on the day it was
+  written. Read the numbers off the oracle, never off this line.**
   Filed 2026-08-09 by close (`install-profile-seam`), from its own miswritten citation.
 
 ## Icebox
