@@ -241,15 +241,17 @@ the technical problems those criteria name — self-referential parity, a rule
 depending on an external program — are engineering work the port owes, not
 exclusions it may take.
 
-**One half of the ruling is escalated and deliberately not recorded here yet.**
-The direction as relayed also has adopters **install a pre-compiled binary or
-compile from source, their choice**. That second path cannot be recorded without
-reversing §The objectives' objective 3 and the closed ruling below it that voids
-building from vendored crate source at install time — and reversing a stated
-objective is operator-class, not a stage's or a lead's call. So it is escalated
-rather than written, and every surface asserting the payload withholds a gate's
-implementation source is left standing until it is answered. Read the silence as
-an open question, never as either answer.
+**Both install paths ship, and the disclosure boundary is untouched.** An adopter
+takes a **pre-compiled binary**, or builds from source — where *from source*
+means a developer clones the **public repository** and builds it there. Source
+does not enter the installer payload. Objective 3 therefore stands, so does the
+closed ruling below it voiding a build from vendored crate source at install
+time, and so does `check-gate-substrate-parity` assertion E, which structurally
+refuses an implementation source inside a vendoring kit root. **Operator-answered
+2026-08-09**, against the reading that the second path reopens any of the three:
+it reopens none, because what a developer builds from is the artifact that is
+public already. Recorded because the question is worth asking once and expensive
+to ask twice — the two paths sound like a disclosure change and are not one.
 
 What the sequence names next, after the port: `companion-toolkit-profile`.
 

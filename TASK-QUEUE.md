@@ -2800,7 +2800,9 @@
   **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
   install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
   a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship.
+  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
+  means a developer clones the **public repository** — source never enters the payload, so the
+  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
   **The known irreducible, named so nobody reads it as non-compliance.** Something has to run
   before the binary exists on the machine, and fetching-and-executing the first artifact cannot
   itself be that artifact. So the **bootstrap** — in shell, or absorbed by the transport, since
@@ -3815,10 +3817,9 @@
   The 2026-08-08 close deferred again with five behavior changes; its bullets are carried below
   so the next qualifying note inherits them from a committed surface, not from session memory.
   **The carried declarations, composed 2026-08-08**, to the grammar docs/install.md §The upgrade
-  contract owns. **2026-08-09: the carrier hit `check-queue-entry-budget`'s cap** — this entry's
-  own predicted failure arriving as a hard stop rather than a slow loss. A third deferral's
-  declarations could not land here at all and ride its disposition line's basis instead, which
-  is the second alternative below, chosen by the cap rather than by design.
+  contract owns. **2026-08-09: the carrier hit `check-queue-entry-budget`'s cap.** A third
+  deferral's declarations could not land here at all and ride its disposition line's basis
+  instead — the second alternative below, chosen by the cap rather than by design.
   *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
   bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
   advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
@@ -3842,14 +3843,15 @@
   whose prerelease flag disagrees with its own version line. Reconcile if you copied the
   workflow out.
   Renamed knobs: None.
-  **Why `[design-pending]`:** a second accumulating file is the obvious fix and is probably
-  wrong — three surfaces to drain at one tag, two of them free prose a gate cannot hold to the
-  note the way `check-tightened-gates-note-parity` holds the first. The honest alternatives are
-  one declaration surface carrying all three sections, or making the deferral line's basis the
-  declared carrier with a gate that reads it.
-  **Cost while deferred:** each deferral loses its non-gate declarations to git history, and the
-  next qualifying note ships a Behavior-changes section that under-declares by however many
-  iterations batched into it — which is exactly the section a consumer reconciles by reading.
+  **Why `[design-pending]`:** a second accumulating file is the obvious fix and is probably wrong
+  — three surfaces to drain at one tag, two of them free prose no gate can hold to the note the
+  way `check-tightened-gates-note-parity` holds the first. The honest alternatives: one surface
+  carrying all three sections, or the deferral line's basis as declared carrier with a gate on it.
+  **Cost while deferred — and the prediction has graduated from slow loss to hard stop.** Each
+  deferral loses its non-gate declarations to git history, so the next qualifying note
+  under-declares by however many iterations batched into it, which is the one section a consumer
+  reconciles by reading. At the third deferral the carrier was capped and took nothing at all,
+  so the evidence this entry needed is complete: the next scope ranks it on a closed case.
   Filed 2026-08-08 by close, from the release-note obligation its own drain could not discharge.
 
 - **always-loaded-baseline-restamp-unforced** [design-pending] — the brevity pass reacts to a
