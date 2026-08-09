@@ -222,6 +222,42 @@ channel it is meant to keep reading for the rest of the unit. It is swept with
 the rest of the scratch dir at the iteration boundary
 (delegation-kit/SPEC.md §Resume journal — agent writes, scratch reset sweeps).
 
+## A running session is asked, never instructed
+
+A dispatched stage session is not a tool call the lead may re-issue. Three rules
+bind the lead here and each was paid for; the root cause under all three is one
+habit, stated last.
+
+**An instruction to run something is destructive when the answer is "already
+did".** §The lead model already forbids the lead *itself* re-running the evidence
+producer; this is the same harm through the other actor. When the lead does not
+know what a session has run, the message is a **question** — *what have you run,
+and what did it report?* — never a command. Attested: a stage whose oracle had
+completed and written its evidence rows was told to run it again; the runner
+truncates its artifact on start, the rows were uncommitted, and they were lost
+and had to be regenerated. A question costs one turn and destroys nothing.
+
+**A status-only turn is not evidence that a session is stuck.** Content-free
+turns are what a long foreground call looks like from outside, so reading two of
+them as a stall is reading the channel rather than the work. Read the artifact
+the work writes — the evidence file, the log, the lock — which answers in one
+call what any number of further turns will not.
+
+**A dispatch prompt carries no duration estimate or long-run caution unless it
+is measured.** An invented cost framing does not merely mislead: it makes the
+receiving session plan around a run that needs no planning, and it primes the
+lead to misread that session's ordinary turns as a stall. An oracle run that
+fits one foreground call is dispatched as exactly that — a plain foreground
+invocation, no backgrounding, no monitor, no pipe or redirect — and the dispatch
+says nothing about how long it takes.
+
+**The root cause: a duration or a count reported by a subagent is checkable, so
+it is checked before anything is spent on it.** It is checkable against the tree,
+or against the reporting session's own metadata — a claimed sub-step longer than
+the whole session that reported it is disproved by arithmetic the lead already
+holds. Relaying an unverified figure into a dispatch is what converts one
+session's guess into standing instruction for every session after it.
+
 ## Policy is config, not prose
 
 All *standing* dispatch policy — everything true of every dispatch, not the
