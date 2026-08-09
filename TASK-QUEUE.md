@@ -12,25 +12,6 @@
 
 ## New Features
 
-- **statusline-queue-section-counts** [spec: SPEC-queue-counts.md] — counters, one surface.
-  Operator request: `TASK-QUEUE.md` section counts in the statusline as compact single-letter
-  counters, the deferred one explicitly wanted.
-  `SPEC-queue-counts.md` finds the requested set is *derivable* rather than a list — features,
-  debt, deferred and icebox are exactly queue-kit's task sections, the set `lib/queue.sh`
-  already composes for `QUEUE_TASK_RE`. So the counter enumerates nothing and the seam
-  constraint this entry insisted on is satisfied by construction, not by discipline.
-  Two nearer homes are refused with reasons. A further `bin/queue-index.sh` mode is refused by
-  the owning spec itself, which fixes that tool's modes and rejects folding jobs together.
-  Sourcing `lib/queue.sh` into the statusline is refused on measurement: the lib **exits 2 at
-  source time** on malformed config, which would take down the entire status bar for a fault in
-  a component contributing four characters. So the counter is a new one-job
-  `queue-kit/bin/queue-counts.sh` the statusline calls as a subprocess.
-  This entry's "two surfaces" premise is falsified. `.claude/settings.json` points `statusLine`
-  at the template itself and project settings outrank user settings, so inside this repo the
-  operator's live statusline **is** the template: one edit delivers the ask. The real second
-  surface is the user-level copy, which is out of tree, ungoverned, already drifted, and runs
-  only where there is no queue to count — filed to the gap inbox, not fixed here.
-  Surfaced 2026-07-31, operator request; promoted 2026-08-09 at spec.
 - **workflow-state-direct-edit-guard** [spec: SPEC-state-guard.md] — the uncommitted window.
   An uncommitted hand-edit to `.workflow/WORKFLOW-STATE.txt` moves the stage cursor for a whole
   session, while every gate that would catch it fires only at commit. This entry's four findings
@@ -4154,5 +4135,6 @@
 - install-queue-template-unreachable
 - init-lifecycle-agent-block-seeding
 - dispatch-worktree-reds-the-battery
+- statusline-queue-section-counts
 
 ## Lessons Learned

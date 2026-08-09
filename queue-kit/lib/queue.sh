@@ -76,12 +76,12 @@ QUEUE_DEFERRED_RE="^## ${QUEUE_KIT_DEFERRED_SECTION}[[:space:]]*$"
 QUEUE_ICEBOX_RE="${QUEUE_KIT_ICEBOX_SECTION:+^## ${QUEUE_KIT_ICEBOX_SECTION}[[:space:]]*$}"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 QUEUE_DONE_RE="^## ${QUEUE_KIT_DONE_SECTION}[[:space:]]*$"
-_qk_task_sections=("${QUEUE_KIT_ACTIVE_SECTIONS[@]}" "$QUEUE_KIT_DEFERRED_SECTION")
+# spec: queue-kit/SPEC.md §lib/queue.sh — the task-section set in configured order, the one composition the task regex and every per-section reader share
+QUEUE_TASK_SECTIONS=("${QUEUE_KIT_ACTIVE_SECTIONS[@]}" "$QUEUE_KIT_DEFERRED_SECTION")
 # spec: queue-kit/SPEC.md §The icebox tier — the icebox is a *live* task section: joining the shared task regex is what makes eviction a conserved move and carries slug uniqueness, blocker resolution, the living-prose contract and the lead-line guard onto the tier with no gate edit
-[[ -n "$QUEUE_KIT_ICEBOX_SECTION" ]] && _qk_task_sections+=("$QUEUE_KIT_ICEBOX_SECTION")
+[[ -n "$QUEUE_KIT_ICEBOX_SECTION" ]] && QUEUE_TASK_SECTIONS+=("$QUEUE_KIT_ICEBOX_SECTION")
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
-QUEUE_TASK_RE="^## ($(queue_alt "${_qk_task_sections[@]}"))[[:space:]]*$"
-unset _qk_task_sections
+QUEUE_TASK_RE="^## ($(queue_alt "${QUEUE_TASK_SECTIONS[@]}"))[[:space:]]*$"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 QUEUE_SECTION_RE="^## "
 # spec: queue-kit/SPEC.md §The tag algebra — the Lessons heading is fixed spelling (a required-sections default), read by queue-index + check-tag-lead-line; no knob

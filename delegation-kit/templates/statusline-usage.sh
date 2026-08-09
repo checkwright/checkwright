@@ -42,7 +42,24 @@ _remaining() {
   else                      printf '%dh%dm' "$hours" "$minutes"; fi
 }
 
-ITER=""; STAGE=""
+# spec: delegation-kit/SPEC.md §The statusline template — the section vocabulary is the counter tool's, never this template's: each label is the initial of a name the tool returned, widened to two characters for every counter as soon as two returned names share one, so a colliding pair stays readable and the group stays aligned
+_counters() {
+  local name n labels=() nums=() dup=0 out="" i j w=1
+  while IFS=$'\t' read -r name n; do
+    [ -n "$name" ] && { labels+=("$name"); nums+=("$n"); }
+  done <<< "$1"
+  [ "${#labels[@]}" -gt 0 ] || return
+  for (( i = 0; i < ${#labels[@]}; i++ )); do
+    for (( j = i + 1; j < ${#labels[@]}; j++ )); do
+      [ "${labels[i]:0:1}" = "${labels[j]:0:1}" ] && dup=1
+    done
+  done
+  [ "$dup" -eq 1 ] && w=2
+  for (( i = 0; i < ${#labels[@]}; i++ )); do out+="${out:+ }${labels[i]:0:$w}${nums[i]}"; done
+  printf '%s' "$out"
+}
+
+ITER=""; STAGE=""; COUNTS=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ -n "$ROOT" ] && [ -f "$ROOT/TASK-QUEUE.md" ]; then
   HEADER=$(grep -m1 '^## Iteration:' "$ROOT/TASK-QUEUE.md")
@@ -51,6 +68,10 @@ fi
 # spec: delegation-kit/SPEC.md §The statusline template — the stage is the state file's last data line, so an absent file or one with no data line leaves STAGE empty and the render drops the @stage suffix rather than printing a partial parse
 if [ -n "$ROOT" ] && [ -f "$ROOT/.workflow/WORKFLOW-STATE.txt" ]; then
   STAGE=$(awk '/^---[[:space:]]*$/ { f = 1; next } f && NF { l = $2 } END { print l }' "$ROOT/.workflow/WORKFLOW-STATE.txt")
+fi
+# spec: delegation-kit/SPEC.md §The statusline template — a subprocess and never a source: the counter's library exits 2 at source time on a malformed queue config, which in this shell would take the whole status bar down for a component worth four characters
+if [ -n "$ROOT" ] && [ -x "$ROOT/queue-kit/bin/queue-counts.sh" ]; then
+  COUNTS=$(bash "$ROOT/queue-kit/bin/queue-counts.sh" 2>/dev/null) || COUNTS=""
 fi
 
 USAGE_FILE="${DELEGATION_KIT_USAGE_FILE:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}/usage.txt}"
@@ -76,4 +97,5 @@ SB="[${MODEL:-?}${EFFORT:+-$EFFORT}]·ctx $(_gauge "$CTX")"
 SB="$SB·5h $(_gauge "${FIVE_H:-0}")"; [ -n "$FIVE_H_RESETS" ] && SB="$SB $(_remaining "$FIVE_H_RESETS")"
 [ -n "$SEVEN_D" ] && { SB="$SB·7d $(_gauge "$SEVEN_D")"; [ -n "$SEVEN_D_RESETS" ] && SB="$SB $(_remaining "$SEVEN_D_RESETS")"; }
 [ -n "$ITER" ] && SB="$SB·⟳ ${ITER}${STAGE:+@$STAGE}"
+[ -n "$COUNTS" ] && { GROUP=$(_counters "$COUNTS"); [ -n "$GROUP" ] && SB="$SB·$GROUP"; }
 printf '%s\n' "$SB"

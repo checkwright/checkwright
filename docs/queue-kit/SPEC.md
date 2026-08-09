@@ -502,6 +502,14 @@ The icebox is *derived* here rather than configured twice: a non-empty
 required-sections set, and when it is empty every icebox regex is the empty
 string so each reader degrades to "no icebox" rather than to "every section".
 
+`QUEUE_TASK_SECTIONS` is that composition itself — the active sections, the
+deferred section, and a configured icebox, in configured order — exposed rather
+than consumed and discarded. `QUEUE_TASK_RE` is built from it, and a reader that
+needs the sections *individually* rather than as one alternation
+(§bin/queue-counts.sh) reads the array. One composition, two shapes of the same
+answer: a second reader recomposing the set from the three knobs is the drift
+axis a shared adapter exists to remove.
+
 `queue_roadmap_entries <queue-file>` is the single `[roadmap:]` and
 `roadmap-summary:` parse, shared by `bin/roadmap.sh` and `check-roadmap-fresh` so
 the emitter and the gate can never disagree about what an entry claims — the same
@@ -591,6 +599,43 @@ This is a *task-selection* surface, walking bullet lead lines. Its sibling
 different question over the same file (§bin/queue-edges.sh). They stay two
 tools rather than one tool with a fourth mode, because folding them would give
 one tool two jobs and two output grammars.
+
+### bin/queue-counts.sh
+
+One job: the size of each **task section**, for a caller that wants the shape of
+the queue rather than its contents. It emits one `<section-name><TAB><count>`
+line per task section, in configured order, and nothing else — no flags, no
+modes, one output grammar.
+
+The section set is **derived, never listed**: it is `QUEUE_TASK_SECTIONS`, the
+same composition `QUEUE_TASK_RE` is built from (§lib/queue.sh). So
+`QUEUE_KIT_DONE_SECTION` is out because Done is not a task section, a configured
+`QUEUE_KIT_ICEBOX_SECTION` is in because the icebox is a live one, and a consumer
+who renamed their sections gets their own names back. Nothing here enumerates a
+section name, which is what keeps the vocabulary inside this kit when a caller
+outside it renders the numbers.
+
+The counted unit is the **top-level entry bullet** — the same unit
+§bin/queue-index.sh lists, so the index and the counters cannot report different
+sizes for one queue. Not lines, and not bullets: an indented bullet inside an
+entry body is body.
+
+**Why a second tool rather than a fourth mode on `bin/queue-index.sh`.** That
+tool's modes are fixed at `index`, `extent` and `icebox-candidates`
+(§bin/queue-index.sh), on the stated grounds that folding jobs together gives one
+tool two output grammars — the same refusal that keeps `bin/queue-edges.sh`
+separate. A tally keyed by section name is a different job with a different
+grammar, so it lands beside the index rather than inside it. Recorded here
+because the next reader meeting two queue tools would otherwise read the split as
+an oversight and merge them.
+
+**It is invoked as a subprocess, never sourced.** `lib/queue.sh` exits 2 at
+source time on a missing `QUEUE_KIT_CONFIG_FILE` and on any malformed-config
+assertion — correct for a gate, and fatal for a long-lived caller that sourced
+it. A subprocess turns that contract into a non-zero exit and empty stdout, which
+a caller degrades on. The caller this was built for is delegation-kit's
+statusline template, whose own contract records the degradation
+(delegation-kit/SPEC.md §The statusline template).
 
 ### bin/queue-edges.sh
 

@@ -869,17 +869,9 @@ overridable via `DELEGATION_KIT_CRED_FILE` / `DELEGATION_KIT_ACCOUNT_CONFIG`).
 It ships no `tokens_in` / `tokens_out` producer: this harness's payload
 carries no cumulative token count, so under the dead-producer rule the keys
 stay defined here for third-party producers but no dead producer is shipped.
-Beyond the snapshot write it renders a status bar — model/effort, a context
-gauge, the 5h and 7d windows with reset countdowns, and an `iteration@stage`
-readout whose two halves come from two surfaces: the iteration from the queue
-header, the stage from the lifecycle evidence file's **last data line**. Both
-are repo-root-relative reads in the template's existing hardcode style — a
-consumer-owned template adds no knob. With no cursor to read (no evidence file,
-or one truncated to its preamble at an iteration boundary) the readout degrades
-to the iteration alone rather than printing a dangling separator or a partial
-parse — self-contained ANSI, no external asset
-(§Out of scope). The snapshot write is the contract; the bar is
-reference UX a consumer may restyle or discard. The source is pluggable
+Beyond the snapshot write it renders a status bar (§The statusline template).
+The snapshot write is the contract; the bar is reference UX a consumer may
+restyle or discard. The source is pluggable
 (`DELEGATION_KIT_USAGE_FILE`), so no
 single-operator `CLAUDE_CONFIG_DIR` assumption is baked in.
 
@@ -942,6 +934,50 @@ append-only (the tmp-prune / boundary-truncate conventions own cleanup), and
 carries operator-local account identifiers, so it lives under the gitignored
 measurement dir and never reaches a tracked file.
 
+### The statusline template
+
+`templates/statusline-usage.sh` renders model/effort, a context gauge, the 5h
+and 7d windows with reset countdowns, an `iteration@stage` readout, and a queue
+counter group. Self-contained ANSI, no external asset (§Out of scope).
+
+The `iteration@stage` readout's two halves come from two surfaces: the iteration
+from the queue header, the stage from the lifecycle evidence file's **last data
+line**. Both are repo-root-relative reads in the template's existing hardcode
+style — a consumer-owned template adds no knob. With no cursor to read (no
+evidence file, or one truncated to its preamble at an iteration boundary) the
+readout degrades to the iteration alone rather than printing a dangling
+separator or a partial parse.
+
+**The counter group** is a compact `N12 T3 D48 I7` tally of the queue's task
+sections, appended last. The template does not know how many sections exist,
+what they are called, or which tiers the set contains: it runs
+queue-kit's `bin/queue-counts.sh` and renders whatever
+`<section-name><TAB><count>` lines come back, labelling each with the initial of
+the name it was handed (queue-kit/SPEC.md §bin/queue-counts.sh). The section
+vocabulary therefore stays entirely inside the kit that owns it — there is
+nothing here for a later editor to hardcode. As soon as two returned names share
+an initial, **every** label widens to two characters, so a colliding pair stays
+distinguishable and the group stays aligned rather than only the collision
+changing width.
+
+**It is a subprocess call, and that is the contract, not an implementation
+detail.** The counter's library exits 2 at *source* time on a malformed queue
+config; sourced into this shell it would take the whole status bar down — model,
+context gauge, both rate-limit gauges — over a component worth four characters.
+As a subprocess the same fault is a non-zero exit the render absorbs. An absent
+or non-executable counter, a non-zero exit, and empty output all drop the group
+and change nothing else about the bar, matching the two degradations the
+template already performs (an absent queue file drops the iteration; an absent
+evidence file drops the `@stage` suffix). The existence guard is kept even
+though every installer profile carrying this template also carries queue-kit,
+because a future profile pairing differently would otherwise turn a roster fact
+into a broken status bar.
+
+The render cost is one subprocess per statusline fire, which is the kit's most
+frequent trigger by a wide margin (§The usage.txt contract). A full scan of a
+~3,600-line queue measures in single-digit milliseconds, so the group needs no
+cache — recorded so a later session does not add one on suspicion.
+
 ## Trend reporter
 
 `bin/usage-trend.sh` reads the history log and reports how the footprint
@@ -1000,7 +1036,7 @@ delegation-kit/
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/agent-budget-guard.sh         # PreToolUse(Agent) budget guard
   templates/agent-dispatch-guard.sh       # PreToolUse(Agent) dispatch-shape guard (D1/D2/D3)
-  templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar
+  templates/statusline-usage.sh           # push usage.txt producer (statusline hook) + status bar incl. the queue counter group
   templates/usage-poller.sh               # poll usage.txt producer (timer-driven, fail-soft)
   templates/delegation-config.sh          # knob overrides (arrays live here)
   smoke/install.sh

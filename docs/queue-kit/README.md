@@ -11,7 +11,8 @@ square-bracket tags (`[blocked-by:]`, `[design-pending]`, `[spec:]`,
 `[drain-exempt:]`, `[roadmap:]`, `[precondition-ok:]`, plus the Lessons Learned
 channel's `[attend]` and the consumer-named harvest tags) are the state machine.
 Gates hold the grammar a coding agent selects work by, a
-`queue-index.sh` tool renders the compact selection surface, a `queue-edges.sh`
+`queue-index.sh` tool renders the compact selection surface, a `queue-counts.sh`
+tool tallies each task section for a status readout, a `queue-edges.sh`
 tool sums the citations pointing *at* an entry, and a `roadmap.sh`
 tool projects the entries curated with `[roadmap:]` onto a generated public page.
 
@@ -68,6 +69,7 @@ bash queue-kit/bin/queue-index.sh                       # header + active (• r
 bash queue-kit/bin/queue-index.sh --collapse-deferred   # deferred as a per-### tally
 bash queue-kit/bin/queue-index.sh --extent <slug>       # inclusive line range of one entry's subtree
 bash queue-kit/bin/queue-index.sh --icebox-candidates   # the closing stage's eviction worklist
+bash queue-kit/bin/queue-counts.sh                      # "<section><TAB><count>" per task section, in configured order
 bash queue-kit/bin/queue-edges.sh                       # every live slug with inbound citations, and the entries citing it
 bash queue-kit/bin/queue-edges.sh --inbound <slug>      # one slug's inbound set, each edge with its citing line verbatim
 bash queue-kit/bin/lesson-sink.sh <tag>                 # route a harvested lesson body to its configured sink
