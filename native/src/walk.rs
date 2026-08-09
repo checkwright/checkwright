@@ -1,19 +1,23 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the Rust counterpart of gate_find's pruned
-// walk, reading the same GATE_SDK_PRUNE_DIRS knob so the two substrates cannot
-// scan different trees
+// walk, reading the same GATE_SDK_PRUNE_DIRS and GATE_SDK_PRUNE_EXTRA_DIRS knobs so
+// the two substrates cannot scan different trees
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub const PRUNE_DIRS_DEFAULT: &str = "target .git node_modules .tmp gate-tests";
+pub const PRUNE_DIRS_DEFAULT: &str = "target .git node_modules .tmp gate-tests worktrees";
 
 pub fn prune_dirs() -> Vec<String> {
-    match std::env::var("GATE_SDK_PRUNE_DIRS") {
+    let mut dirs: Vec<String> = match std::env::var("GATE_SDK_PRUNE_DIRS") {
         Ok(v) if !v.trim().is_empty() => v.split_whitespace().map(String::from).collect(),
         _ => PRUNE_DIRS_DEFAULT
             .split_whitespace()
             .map(String::from)
             .collect(),
+    };
+    if let Ok(extra) = std::env::var("GATE_SDK_PRUNE_EXTRA_DIRS") {
+        dirs.extend(extra.split_whitespace().map(String::from));
     }
+    dirs
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a directory that cannot be read is
