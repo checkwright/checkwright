@@ -204,7 +204,7 @@ spec_amendments() { gate_find "$1" -name "$CANON_KIT_AMENDMENT_GLOB" -type f 2>/
 #   lifecycle-kit/SPEC.md §templates/stages/ owns), no `CONSUMER BINDING` header.
 _spec_slot_free() { ! grep -qE '\*<[a-z][a-z0-9-]*:|^CONSUMER BINDING' -- "$1"; }
 
-# spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs (kit-root pruned per CANON_KIT_SCAN_KIT_ROOTS) plus README.md at any depth and CLAUDE.md; explicit globs when CANON_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change. Slot-free CANON_KIT_PROSE_SURFACE_GLOBS candidates join the set (canon-kit/SPEC.md §check-spec-pointer).
+# spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set shared by the manifest-narration gate family: canonical specs and README.md at any depth (both kit-root pruned per CANON_KIT_SCAN_KIT_ROOTS — a vendored kit's own README is its documentation, not the consumer's governed content) plus CLAUDE.md; explicit globs when CANON_KIT_MANIFEST_FILES is set. Amendments are excluded by construction — a transition artifact describes change. Slot-free CANON_KIT_PROSE_SURFACE_GLOBS candidates join the set (canon-kit/SPEC.md §check-spec-pointer).
 spec_manifest_files() {
     local root="${1:-.}" g f
     if [[ ${#CANON_KIT_MANIFEST_FILES[@]} -gt 0 ]]; then
@@ -215,7 +215,7 @@ spec_manifest_files() {
         shopt -u nullglob globstar
     else
         spec_canonical_specs "$root"
-        gate_find "$root" -name 'README.md' -type f 2>/dev/null | grep -v '/templates/' || true
+        gate_find "$root" -name 'README.md' -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" || true
         gate_find "$root" -name 'CLAUDE.md' -type f 2>/dev/null || true
     fi
     if [[ ${#CANON_KIT_PROSE_SURFACE_GLOBS[@]} -gt 0 ]]; then

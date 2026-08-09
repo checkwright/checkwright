@@ -249,11 +249,12 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   `CANON_KIT_DOD_MODE` — `exactly-one` (the default) or `at-most-one`
   (a reference-spec corpus like this repo's kits carries no DoD).
 - `CANON_KIT_SCAN_KIT_ROOTS` — `0` (default) or `1`. At `0` the shared finders
-  skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` is
-  a dependency's documentation, not governed content, so the `exactly-one`
-  default holds out of the box on a tree that merely vendored the kits beside
-  gate-sdk. Set `1` when the kit SPECs are the consumer's own first-party
-  content (this repo does, and keeps `at-most-one` for them).
+  skip vendored kit roots (`gate_kit_roots`): a kit's `SPEC.md`/`SPEC-*.md` and
+  its `README.md` alike are a dependency's documentation, not governed content,
+  so the `exactly-one` default holds out of the box on a tree that merely
+  vendored the kits beside gate-sdk and no consumer is asked to answer for a
+  dependency's own internal links. Set `1` when the kit docs are the consumer's
+  own first-party content (this repo does, and keeps `at-most-one` for them).
 - `CANON_KIT_BANNED_HEADINGS` — array, default
   `("Directory Structure" "Public API" "Cargo.toml Dependencies")`;
   `CANON_KIT_DERIVABLE_DENSITY` — default `60` (percent fenced);
@@ -428,13 +429,19 @@ same shapes:
   grammar lifecycle-kit/SPEC.md §templates/stages/ owns) and no
   `CONSUMER BINDING` header. A slot-bearing candidate is silently excluded — a template still
   awaiting binding is a placeholder, not finished prose, and its coverage stays
-  the shim/binding gates (§Layout and configuration states the knob). The
-  canonical-spec / amendment finders skip a
-  `templates/` skeleton (a copyable stub, not governed content — the same
-  rationale as the gate-tests prune) and, unless `CANON_KIT_SCAN_KIT_ROOTS=1`,
-  any vendored kit root under the scan root (a dependency's docs; an ancestor
-  kit root — the case when a kit's own fixture dir is the scan root — never
-  prunes).
+  the shim/binding gates (§Layout and configuration states the knob). All three
+  markdown finders — canonical specs, amendments, and the manifest set's
+  `README.md` half — skip a `templates/` skeleton (a copyable stub, not governed
+  content, the same rationale as the gate-tests prune) and, unless
+  `CANON_KIT_SCAN_KIT_ROOTS=1`, any vendored kit root under the scan root. The
+  kit-root prune reaches the README because the knob's rationale turns on whose
+  documentation a file is, not on which filename carries it: a vendored kit's
+  `README.md` is a dependency's docs exactly as its `SPEC.md` is, and pruning
+  one while governing the other reds a consumer on a dependency's own internal
+  links — measured, on a profile that vendors canon-kit without queue-kit, where
+  `canon-kit/README.md`'s `../queue-kit/` link dangles on a bare install tree.
+  An ancestor kit root — the case when a kit's own fixture dir is the scan
+  root — never prunes.
 - **The count adapter** the restated-total gates share, so a consumer's
   `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
   matches the same total shapes — including a total whose cardinal and noun
@@ -1260,7 +1267,8 @@ tracked file, or a directory holding tracked files; a `#anchor` — alone
 (same-file) or trailing a path — must match the GitHub heading slug of a
 heading in the target file. External URLs (`scheme://`, `mailto:`) are out of
 scope: the network is not a gate dependency. The doc set is the manifest set
-(kit READMEs and CLAUDE.md included) minus the `CANON_KIT_MDREF_EXCLUDE` globs
+(`CLAUDE.md` included; a vendored kit's own `README.md` only where
+`CANON_KIT_SCAN_KIT_ROOTS` re-includes it) minus the `CANON_KIT_MDREF_EXCLUDE` globs
 (default empty, for a consumer's generated docs); the scan runs over tracked
 sources only, so an untracked local-only file (`BRIEF.local.md`) is a legitimate
 link *source* that is never scanned and, being git-ignored-and-present, a
@@ -1296,6 +1304,21 @@ literal because it is a policy choice, not a derived fact — the site is living
 documentation of the current tree, so a reference link pins to the default
 branch (this repo's `master`), and a tag-pinned reference copy would buy
 staleness, not stability.
+
+**Coverage the good/bad pair cannot hold**, and where it lives:
+`gate-tests/check-md-refs.test.sh`. The harness resolves exactly one `good/` and
+one `bad/` case dir per gate, and this gate's pair is spent on the core
+link-resolution logic, so two behaviors ride a bespoke test instead. The
+self-repo pass is the first: each case builds a throwaway repo with a controlled
+`origin`, which a case dir run inside this repo cannot do. The kit-root prune on
+the manifest set's README half is the second, and the two cases differ only in
+`CANON_KIT_SCAN_KIT_ROOTS` over one tree — a shape the pair's
+one-tree-per-verdict form cannot express even with a slot free. That second half
+is the **only** executable oracle the prune has: this repo sets the knob, so its
+battery is a no-op on it, and a consumer's knob is `0` either way, so no
+consumer-smoke run distinguishes a knob-gated prune from an unconditional one.
+The sibling `gate-tests/check-spec-dod-singleton.test.sh` carries the same
+prune's canonical-spec half for the same reason.
 
 ### The reference-link grammar
 
