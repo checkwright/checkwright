@@ -12,20 +12,6 @@
 
 ## New Features
 
-- **install-queue-template-unreachable** [spec: SPEC-queue-seed.md] — the queue seed's owner.
-  `queue-kit/templates/TASK-QUEUE.md` is unreachable at install by construction, and re-verified
-  so for every profile that exists: `full` reaches canon-kit first and `delegation` reaches
-  lifecycle-kit first, and neither ships the template.
-  `SPEC-queue-seed.md` refuses both closes this entry offered. Deleting the template is now
-  clearly worse rather than "not obviously worse", and an explicit owner declaration is new
-  mechanism where a derivation is available: a kit that ships the template has already declared
-  itself the format's owner. The arm stops selecting by kit and the seed hoists out of the
-  per-kit loop, so payload order decides nothing here.
-  The fact that refuses both is one neither close anticipated: the inline skeleton an adopter
-  actually receives omits `## Lessons Learned`, which `QUEUE_KIT_REQUIRED_SECTIONS` requires by
-  default — and `check-queue-sections`, the fail-closed floor under every section-scoped
-  scanner, is one of four queue-kit gates not registered at install, so nothing says so.
-  Filed 2026-08-09 by close (`install-profile-seam`); promoted 2026-08-09 at spec.
 - **init-lifecycle-agent-block-seeding** [spec: SPEC-agent-block.md] — the agent-block rule.
   This entry asked whether `init` should seed lifecycle-kit's agent-file block, and said deciding
   which of its two outcomes held preceded any estimate. `SPEC-agent-block.md` decides it: the
@@ -4201,5 +4187,6 @@
 ## Done
 
 - prose-profile
+- install-queue-template-unreachable
 
 ## Lessons Learned

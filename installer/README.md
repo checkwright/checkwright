@@ -190,6 +190,22 @@ destroy the very evidence the comparison is made from, and these are precisely
 the files whose whole purpose is to be edited by you — which is why the ordering
 is stated here rather than left to each recipe.
 
+**The queue file's source is derived too, and resolved once per install rather
+than once per kit.** A kit declares itself the queue format's owner by shipping
+`templates/TASK-QUEUE.md`; `init` seeds from the template of the first kit in
+the resolved profile's set that ships one, and writes a minimal inline skeleton
+only when **no** kit in that set does. Resolving over the whole set is the
+point: while the choice was made inside the per-kit loop, the first kit reached
+decided it, so a kit that reads the queue and ships no template pre-empted one
+that does — and the kit shipping the template was reachable in no profile at
+all. Nothing declares an owner, because shipping the artifact already does. The
+inline skeleton carries every `QUEUE_KIT_REQUIRED_SECTIONS` heading at that
+knob's default, since it is a path a shipping profile takes rather than
+defensive symmetry: a profile whose kit set reads the queue and carries no
+kit shipping the template — `prose` is that shape — receives exactly that file,
+and the section gate that would catch a missing heading is `on-surface`, so
+nothing in the battery `init` registers would say so.
+
 The **starting gate roster** is the subset a fresh consumer begins with, not
 the kit's full roster — the same distinction gate-sdk's own README draws. A
 gate whose subject you have not authored yet has nothing to read: canon-kit's
@@ -810,7 +826,10 @@ you not to make.
 It packs the package, installs it **from the resulting tarball with
 `--offline`**, and drives a scratch consumer once per profile: `init`, then the
 battery must be green, then the manifest must agree with the tree it describes
-file by file, then a re-run must leave the tree object identical, then `doctor`
+file by file, then the **queue post-condition** — a profile whose kit set reads
+the queue file must have one, satisfying `check-queue-sections`, and a profile
+whose kit set does not must have none — then a re-run must leave the tree object
+identical, then `doctor`
 must exit 0 and name the installed profile, and then the **value arm** — the
 consumer authors one page of markdown carrying one real defect, a mistyped
 relative link in a `README.md`, and the battery's verdict on it is recorded

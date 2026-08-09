@@ -1017,6 +1017,14 @@ starter-template conformance contract owned by gate-sdk/SPEC.md §Consumer smoke
 — and carries lifecycle-kit's iteration header as inert scaffold so a
 combined-tree copy clears the stage gates too.
 
+Shipping this file is also what makes this kit the queue format's owner as far
+as an adopter's install is concerned: `checkwright init` seeds their queue from
+the template of the first kit in their profile that ships one, and falls back to
+an inline skeleton only when none does (installer/README.md §What init seeds).
+The declaration is the artifact rather than a roster naming this kit. Until that
+selection was resolved over the whole profile at once, no profile reached this
+kit first and no adopter ever received the file.
+
 ## Out of scope
 
 <!-- prose-enum-exempt: names the two amendment-lifecycle tags specifically; [blocked-by:] is a dependency tag outside that lifecycle, not a dropped task-tag member -->

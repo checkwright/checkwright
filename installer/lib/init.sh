@@ -240,7 +240,6 @@ for kit in "${KITS[@]}"; do
         # spec: installer/README.md §init — --dry-run resolves the same seam plan the real run would, out of the same enumerator rather than a second spelling of the glob: copy_in already writes nothing under --dry-run, so the plan needs no dry variant and cannot drift from the run it predicts
         recipe_config_seam_plan "$PAYLOAD/$kit" "$GATES_DIR"
         if (( DRY )); then
-            recipe_needs_queue "$kit" && [[ ! -f "$ROOT/$QUEUE_FILE" ]] && printf '%s\n' "$QUEUE_FILE"
             case "$kit" in
                 gate-sdk)      printf '%s/msg-patterns.list\n' "$GATES_DIR" ;;
                 evidence-kit)  printf '%s\n' .workflow/validate-baseline.txt .workflow/validate-evidence.txt ;;
@@ -257,10 +256,17 @@ for kit in "${KITS[@]}"; do
                     > "$ROOT/$AGENT_FILE" || die "could not seed $AGENT_FILE"
                 printf '%s\n' "$AGENT_FILE"
             fi
-            recipe_seed "$kit" "$PAYLOAD/$kit" "$ROOT" "$QUEUE_FILE" || die "could not seed $kit"
+            recipe_seed "$kit" "$PAYLOAD/$kit" "$ROOT" || die "could not seed $kit"
         fi
     )
 done
+
+# spec: installer/README.md §What init seeds — the queue seed runs here, once, over the resolved kit set: inside the loop above the first kit reached decided the source before any kit shipping a template got a turn. It runs in the parent shell for the reason that loop's own directive gives — a record() inside the process substitution is discarded — and the resolver below is the single predicate the dry plan and the run share, so the prediction cannot drift from the write it predicts
+QUEUE_SRC="$(recipe_queue_source "$PAYLOAD" "${KITS[@]}")"
+if [[ -n "$QUEUE_SRC" && ! -f "$ROOT/$QUEUE_FILE" ]]; then
+    (( DRY )) || recipe_write_queue "$QUEUE_SRC" "$ROOT" "$QUEUE_FILE" || die "could not seed $QUEUE_FILE"
+    claim "$QUEUE_FILE" && record "$QUEUE_FILE"
+fi
 
 # spec: installer/README.md §The gate binary — the write comes after every config seam is in place and before the hook is generated, because the generator resolves each member's invocation argv and a `.gate` member resolves to this binary: the knob must name it and the file must be there, or the generator reports a dispatch it cannot make
 SEAM="$GATES_DIR/gate-sdk-config.sh"

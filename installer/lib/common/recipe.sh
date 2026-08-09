@@ -41,24 +41,36 @@ recipe_needs_queue() {   # $1 = kit name -> 0 iff one of its starting gates read
     case "$1" in canon-kit|lifecycle-kit|queue-kit) return 0 ;; *) return 1 ;; esac
 }
 
+# spec: installer/README.md §What init seeds — the queue source is resolved once over the profile's whole kit set, never inside a per-kit call that cannot see the other kits: a kit declares itself the queue format's owner by shipping templates/TASK-QUEUE.md, so the selection reads that fact off the payload and needs no second surface to state it
+recipe_queue_source() {   # $1 = payload root, $2.. = the profile's resolved kit set -> the template to seed from, '-' for the inline fallback, nothing when no kit in the set reads the queue file
+    local pay="$1" kit tpl="" needs=1
+    shift
+    for kit in "$@"; do
+        recipe_needs_queue "$kit" && needs=0
+        [[ -z "$tpl" && -f "$pay/$kit/templates/TASK-QUEUE.md" ]] && tpl="$pay/$kit/templates/TASK-QUEUE.md"
+    done
+    (( needs )) && return 0
+    printf '%s\n' "${tpl:--}"
+}
+
+# spec: installer/README.md §What init seeds — the fallback carries every QUEUE_KIT_REQUIRED_SECTIONS heading at that knob's default because it is a path a shipping profile takes rather than defensive symmetry: the section floor is not registered at install, so a skeleton missing a heading would pass open here and red on the adopter's own file the day they register it
+recipe_write_queue() {   # $1 = the source recipe_queue_source resolved, $2 = consumer root, $3 = queue file
+    if [[ "$1" != - ]]; then
+        cp "$1" "$2/$3"
+        return
+    fi
+    printf '%s\n' "# $3" "" "## Iteration: —" "" "---" "" \
+        "## New Features" "" "## Technical Debt" "" "## Deferred" "" "## Done" "" "## Lessons Learned" \
+        > "$2/$3"
+}
+
 recipe_needs_agent_file() {   # $1 = kit name -> 0 iff one of its starting gates reads the always-loaded agent file
     case "$1" in context-kit|doctrine-kit) return 0 ;; *) return 1 ;; esac
 }
 
 # spec: installer/README.md §What init seeds — seed what is absent, plan what must be claimed. A surface init creates once and then leaves alone is written here only when it is absent, which is what keeps a re-run non-destructive on a tree that has grown since; a surface init rewrites on every run is never written here at all but planned for copy_in, because only claim() can compare the adopter's content before the overwrite lands. The two disciplines are not interchangeable and each arm below takes the one its surface needs
-recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root, $4 = queue file; prints seeded paths and '<src><TAB><dest>' plans
-    local kit="$1" pay="$2" root="$3" queue="$4"
-
-    if recipe_needs_queue "$kit" && [[ ! -f "$root/$queue" ]]; then
-        if [[ -f "$pay/templates/TASK-QUEUE.md" ]]; then
-            cp "$pay/templates/TASK-QUEUE.md" "$root/$queue" || return 1
-        else
-            printf '%s\n' "# $queue" "" "## Iteration: —" "" "---" "" \
-                "## New Features" "" "## Technical Debt" "" "## Deferred" "" "## Done" \
-                > "$root/$queue" || return 1
-        fi
-        printf '%s\n' "$queue"
-    fi
+recipe_seed() {   # $1 = kit name, $2 = kit payload dir, $3 = consumer root; prints seeded paths and '<src><TAB><dest>' plans
+    local kit="$1" pay="$2" root="$3"
 
     case "$kit" in
         gate-sdk)

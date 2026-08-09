@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
+# spec: installer/README.md §The consumer smoke — packs the package, installs it from the resulting tarball with no registry access, and drives init through a scratch consumer once per profile; exit 0 asserts the whole activation path (install → green battery → manifest agrees with the tree → the seeded queue satisfies queue-kit's section contract, or none is seeded where none is owed → idempotent re-run → doctor clean → a planted prose defect caught and cleared → diff clean → uninstall back to the pre-init tree object) plus the four profile-lattice assertions and the value assertion over the loop (some profile below the maximum catches that defect) (every named kit resolves, exactly one minimum and one maximum, the maximum is the payload-derived profile, and gate rosters are monotone across every comparable pair), a two-hop cross-version upgrade that also relinquishes a payload path on one hop and re-adds it on the next, a toolchain-free arm driving doctor and a full init with cargo and rustc masked off PATH, a same-version seam arm over the two surfaces init rewrites every run and the protection branch chained onto it, a narrowing arm re-running init at a smaller profile so files[] outlives kits, and an artifact arm that builds the gate binary, packs it, and drives both selection branches — placement, omit-and-declare, and the two refusals between them; the evidence-kit 'installer_smoke' validate suite each validate stage re-runs.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -158,6 +158,20 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     [[ "${lock_kits[*]}" == "${want_kits[*]}" ]] \
         || fail "$profile: manifest kits (${lock_kits[*]}) differ from the profile roster (${want_kits[*]})"
     say "manifest: $checked file(s) agree with the tree, ${#lock_kits[@]} kit(s) recorded"
+
+    # spec: installer/README.md §What init seeds — the queue file is the one surface init seeds whose *content* has a format contract, and whether a profile gets one at all is a property of its kit set: the arm asks the same resolver init used rather than naming a profile, and asserts the same contract for both of its outcomes, since which arm wrote the file is exactly what the selection rule makes irrelevant. The section floor is on-surface, so it is absent from the battery just asserted above and is run here out of the installed payload — the only spelling that reaches a profile whose kit set reads the queue and carries no queue-kit
+    if [[ -n "$(recipe_queue_source "$PKG_ROOT/payload" "${want_kits[@]}")" ]]; then
+        [[ -f "$C/$QUEUE_FILE" ]] \
+            || fail "$profile: its kit set reads the queue file and init seeded none"
+        out="$( cd "$C" && PATH="$RUN_PATH" bash "$PKG_ROOT/payload/queue-kit/checks/check-queue-sections.sh" "$QUEUE_FILE" 2>&1 )"; rc=$?
+        [[ "$rc" -eq 0 ]] \
+            || { printf '%s\n' "$out" >&2; fail "$profile: the queue file init seeded does not satisfy the section contract queue-kit's own gate reads"; }
+        say "queue: $(grep -m1 '^QUEUE-SECTIONS:' <<<"$out")"
+    else
+        [[ ! -f "$C/$QUEUE_FILE" ]] \
+            || fail "$profile: no kit in its set reads the queue file, yet init seeded one"
+        say "queue: none seeded, and none is owed to this kit set"
+    fi
 
     # spec: installer/README.md §init — idempotence is a property of the tree, so the assertion is on the tree object and not on what the re-run printed
     before="$(git -C "$C" rev-parse 'HEAD^{tree}')"
