@@ -97,9 +97,9 @@ do not read.
   live for every future narrow profile.
 
   This repo sets `CANON_KIT_SCAN_KIT_ROOTS=1`, so D2 is a no-op here and a fix
-  for vendored consumers — which means this tree's own battery cannot be the
-  oracle for it. Named as an honest limit, not worked around: the oracle is the
-  consumer smoke.
+  for vendored consumers — which means **this tree's own battery cannot be the
+  oracle for it, and neither can the consumer smoke**. D6 is D2's oracle, and the
+  reasoning is in that delta; D2 does not land without it.
 
 - **(D3) Eleven canon-kit gates move `on-surface` → `zero-config`.**
   `check-md-refs`, `check-comment-tier`, `check-docs-cmd`, `check-knob-citation`,
@@ -144,6 +144,41 @@ do not read.
   the contract already promises becomes the thing to say. **mechanical** — both
   surfaces already state the lattice contract beside the chain, so the edit
   deletes a stale aside rather than authoring a claim.
+
+- **(D6) D2's oracle — `canon-kit/gate-tests/check-md-refs.test.sh`.** Two cases
+  over one scratch tree containing a vendored kit root whose `README.md` carries a
+  dangling relative link, plus one ordinary consumer doc so the gate has a corpus
+  and prints its clean line: at the **default** (`CANON_KIT_SCAN_KIT_ROOTS` unset
+  ⇒ `0`) the kit root's README is pruned and the run is clean; with the **knob at
+  `1`** it is re-included and the dangling link reds. **mechanical** — the
+  judgment is spent naming the oracle, and the execution copies a shipped sibling.
+
+  **Why a bespoke test and not the `good/`+`bad/` pair the fixture contract would
+  normally own.** Two harness facts, both checked rather than assumed.
+  `run-gate-tests.sh` resolves exactly one `good/` and one `bad/` case dir per
+  gate, so a second pair is unexpressible — and check-md-refs' existing pair is
+  already spent on its core link-resolution logic, which must keep its coverage.
+  And the two cases D2 needs differ only in a knob value over the *same* tree,
+  which the pair's one-tree-per-verdict shape cannot express even if a slot were
+  free.
+
+  **The precedent is not analogous, it is the same prune's other half.**
+  `canon-kit/gate-tests/check-spec-dod-singleton.test.sh` exists for exactly this
+  reason and says so in its own header — a behavioral test of the vendored-kit-root
+  prune "the one-pair good/bad harness cannot hold" — with the same two cases,
+  default-prune and knob-on-re-include, over a scratch tree with a
+  `GATE_SDK_KIT_DIRS`-declared kit root. That test proves the prune on the
+  **canonical-spec finder**. D2 widens the same prune to the **README finder**
+  beside it, so the obligation is the sibling's, and D6 is that test's mirror
+  rather than a new pattern. It sources `lib/test-hermetic.sh` as its sibling does,
+  which is also what `check-test-hermetic` assertion A requires.
+
+  **What each case discriminates**, which is the whole point of naming it: with D2
+  absent the default case reds where clean is expected; with D2 applied
+  *unconditionally* — ignoring the knob, the plausible wrong implementation — the
+  knob-on case goes clean where a red is expected. Neither failure is visible to a
+  green battery in this repo or to any consumer-smoke run, which is precisely the
+  gap this delta closes.
 
 ## The seam
 
@@ -196,6 +231,9 @@ a prose adopter learns the knob exists.
   `check-spec-pointer`, `check-install-claim`, `check-prose-enum`,
   `check-surface-duplication`. Every one of them is a named reader of the change;
   build verifies each rather than assuming the shared finder makes them uniform.
+  D6 is where `check-md-refs`' half of that verification lands, and it is the only
+  **executable** evidence D2 has; the other ten are verified by inspection against
+  this list, which is weaker and is stated as such rather than implied equivalent.
 - **Changed state: eleven install dispositions (D3).** *Producer* — the
   `# install:` header line on each gate. *Consumer* — `recipe_install_disposition`
   → `recipe_gates` → `profile_gates` → the registry `init` writes, and
@@ -229,6 +267,10 @@ a prose adopter learns the knob exists.
   dependency's documentation"); D2 widens what that rationale governs.
 - `installer/README.md` §The consumer smoke — D4's arm joins the ordered
   post-conditions that section states.
+- `canon-kit/gate-tests/` — D6's new sibling test. `canon-kit/SPEC.md`
+  §check-md-refs gains the sentence naming it, the way a gate section names the
+  coverage its pair does not carry; the kit's own README gate roster is unchanged,
+  since D6 adds a test rather than a gate.
 - `installer/profiles.list` — D1's rows and criterion; the file's own header
   already anticipates this ("A fourth profile is admitted exactly when it fits;
   there is no count to raise here"), so nothing there needs relaxing.
@@ -253,8 +295,20 @@ a prose adopter learns the knob exists.
       debt tasks (a build-time causal gap is resolved that session, not
       deferred). `check-docs-link-convention`'s hostile-first-contact finding is
       already in the gap inbox, filed 2026-08-09 at this amendment's authoring.
-- [ ] **The acceptance oracle is the consumer smoke, run for every profile** —
-      not this tree's battery. D2 is a no-op here and D3's effect is a property of
-      the tree `init` makes, so a green battery in this repo proves neither. The
-      unmeasured case build must not assume: `check-md-refs` on a bare `full`
-      consumer, which no run has yet covered.
+- [ ] **The acceptance oracles are named per delta, and none of them is this
+      tree's battery.** A green battery here proves nothing about D2 or D3: D2 is
+      a no-op at this repo's `CANON_KIT_SCAN_KIT_ROOTS=1`, and D3's effect is a
+      property of the tree `init` makes. Two oracles, and they are not
+      interchangeable:
+      - **D1, D3, D4, D5** — `installer/consumer-smoke/run-smoke.sh`, run for
+        every profile. The unmeasured case build must not assume:
+        `check-md-refs` on a bare `full` consumer, which no run has yet covered.
+      - **D2** — D6's bespoke test, and *only* D6. The smoke would catch D2 being
+        absent, but only as a side effect of D3 arming `check-md-refs` on the new
+        profile, and it cannot distinguish a knob-gated prune from an
+        unconditional one: both leave a consumer green, because a consumer's knob
+        is `0` either way. The half D2 turns on is the half no smoke run
+        discriminates.
+- [ ] **D2 and D6 land in the same commit.** A corpus-widening change whose
+      oracle arrives later is a change that was never verified — D6 is not
+      follow-up work, it is the evidence D2 is asserted on.
