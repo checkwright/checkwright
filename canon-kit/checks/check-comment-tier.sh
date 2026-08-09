@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=scripts/*.sh,kit:*.sh,.workflow/* dir=one valve=none tier=precommit
-# install: on-surface
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt, or justifies a positional construct
 #
 # usage: check-comment-tier.sh [scan-root]

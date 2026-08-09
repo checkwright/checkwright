@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md dir=one valve=none tier=precommit
-# install: on-surface
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-knob-citation — no kit knob stated with its value in manifest prose outside the owning kit's SPEC
 set -uo pipefail
 

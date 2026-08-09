@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md dir=one valve=none tier=precommit
-# install: on-surface
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-manifest-temporal — no temporal-narration marker in governed manifest prose outside an exempt site
 set -uo pipefail
 

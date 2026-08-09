@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # graph: couples=*SPEC*.md,*README.md,CLAUDE.md,TASK-QUEUE.md dir=one valve=none tier=precommit
-# install: on-surface
+# install: zero-config
 # spec: canon-kit/SPEC.md §check-spec-fence-balance — every governed markdown file has an even fence-delimiter count, so the fence-skipping parsers never desync and fail open
 #
 # usage: check-spec-fence-balance.sh [file...]
