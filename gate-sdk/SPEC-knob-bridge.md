@@ -177,6 +177,25 @@ writes one. Committing to the wider semantics costs nothing today and closes a
 silent-divergence class; the porting unit inherits this commitment rather than
 re-deciding it.
 
+### The seam
+
+Stated explicitly, because a bridge that carries consumer configuration is
+exactly where the provenance seam gets crossed by accident.
+
+- **Kit mechanism**: the `--knobs` arm, the `GATE_SDK_KNOB_<NAME>` convention,
+  the tab serialization and its refusals, the prefix→kit derivation, and the
+  crate's knob reader. All of it is content-blind — it transports whatever the
+  consumer's library resolved and interprets none of it.
+- **Consumer config**: every knob *value*. The bridge adds no knob and no
+  default of its own, so it introduces no new configuration surface at all; the
+  one env convention it defines is dispatch-time plumbing no consumer sets.
+- **Private rule content**: none crosses. The bridge never enumerates knob
+  names in a kit literal — the crate declares only the knobs its own code reads,
+  and the kit mapping is derived from the `<KIT>_<KNOB>` prefix rather than from
+  a list. A hardcoded roster of consumer knob names is the one shape that would
+  cross the seam here, and the derivation is what makes it impossible rather
+  than merely discouraged.
+
 ## Producers and consumers
 
 **New interface 1 — `--knobs <name>`.** *Producer*: the crate's top-level
