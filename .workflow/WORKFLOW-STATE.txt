@@ -5,3 +5,4 @@
 ---
 
 native-port-cadence scope a57932f5 2026-08-09
+native-port-cadence spec ae9be0e8 2026-08-09
