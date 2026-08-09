@@ -12,6 +12,24 @@
 
 ## New Features
 
+- **native-knob-bridge** [spec: SPEC-knob-bridge.md] — a compiled gate cannot see the bash
+  arrays that decide what it scans.
+  **Split out and ruled 2026-08-09 by the operator at spec**, re-scoping this iteration's port
+  unit. A consumer's kit knobs are bash arrays resolved by a shell library sourced *in-process
+  by each shell gate*, after it is already the exec'd process; `gate_command`'s `.gate` branch
+  exec's `[<binary>, <name>]` directly, so a compiled gate sees none of them. Nothing is in
+  scope to export and no bridge exists — `walk.rs`'s `GATE_SDK_PRUNE_DIRS` precedent does not
+  generalize, that knob being a whitespace scalar.
+  **Every candidate cohort owes this**, which is what makes it shared substrate rather than one
+  cohort's local cost: cohort A scores 0 of 10 on criterion 6 and the runner-up 5 of 7. The
+  parent `native-gate-port-remaining-corpus` keeps the port itself and its deferred cohort
+  selection.
+  **This unit ports zero gates, by ruling** — not a shortfall, and no token port is added to
+  show motion. Its live reader is the duplication it retires: `native/src/walk.rs` carries its
+  own copy of `lib/gate.sh`'s prune-dir default plus a unit test holding the two equal, and
+  both are deleted when the bridge feeds the resolved value across instead.
+  Filed 2026-08-09 at spec under the operator-directed filing exception.
+
 - **cargo-grant-committed-vs-overlay** [spec: SPEC-native-build.md] — the
   commit-time requirement is granted only by an untracked file.
   The dogfood ruling made `cargo build --release --manifest-path native/Cargo.toml` a
@@ -2866,14 +2884,14 @@
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a
   single-iteration delta; scope owns the decomposition, and the criterion-4 relaxation question
   the prior scoping left open is subsumed by a ruling that ports everything.
-  **The next cohort is ruled — cohort A, 2026-08-09 by the operator at this scope**, off the
-  census filed at this boundary: the ten-member `spec_manifest_files` family in canon-kit, which
-  is what §The first cohort's literal selector picks. The three shared pieces it owes —
-  basename-glob list matching beside the crate's extension filter, a Rust `gate_kit_roots`, and
-  a criterion-6 default-parity discharge against `canon-kit/lib/spec.sh` — are **inside this
-  unit's envelope**, as the fixed cost the ten-way reuse amortizes rather than a separable
-  earlier unit. The member list, the seven-member runner-up cohort, and the criterion-7
-  blockers the SPEC does not name are in the survey record; read it rather than re-deriving it.
+  **Cohort A was ruled at this scope and retired by the operator the same day**, because the
+  census it rested on never scored criterion 6 — the selector's own term. Scored there, cohort A
+  is 0 of 10 and the runner-up 5 of 7: every candidate cohort owes the array-knob config bridge,
+  so the bridge is the shared substrate work and is split out as `native-knob-bridge`.
+  **Cohort selection is deferred to a later iteration** on a scoring covering every criterion,
+  including the 47 singleton-corpus gates the census never scored per-criterion. The corrected
+  census, both unscored limits and the family groupings are in the survey record; read it
+  rather than re-deriving it.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception.
 
