@@ -102,6 +102,19 @@ canon-kit without queue-kit is exactly that shape. So the fallback is not dead
 code kept for symmetry, and D2 is not hygiene: it is the path a profile shipping
 this iteration will take. The two amendments touch one file for one reason.
 
+## The seam
+
+Nothing here is private rule content, and the change **removes** the one thing on
+this path that leaned toward a kit literal rather than adding one. Today the
+installer decides which kit's queue template wins; after D1 the kit decides, by
+shipping one, and the installer only asks. `templates/TASK-QUEUE.md` stays kit
+mechanism — queue-kit owns the queue format and the artifact that teaches it. The
+installer keeps only the generic consumer-layout name it already declares
+(`QUEUE_FILE`), and the adopter keeps the file itself, which `init` writes once
+and then never touches. `recipe_needs_queue`'s three-kit membership is not
+touched here; it names kits in the installer's own payload, which is the
+installer's to know, and it is the subject of no ruling in this amendment.
+
 ## Producers and consumers
 
 The change introduces no new message or field. It relocates one producer and adds

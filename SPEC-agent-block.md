@@ -100,6 +100,17 @@ That is a unit, not a clause. It is **filed to the gap inbox at this amendment's
 authoring**, with the cost above, so the declined branch is costed and filed
 rather than flagged and skipped.
 
+## The seam
+
+The rule D1 states is generic mechanism and names no kit: it is a predicate over
+a gate's own declared disposition, which is the same shape `recipe_gates` already
+uses and the same reason that function carries no gate name of its own. That is
+the seam point rather than an aesthetic one — the alternative D1 rejects is a
+sentence explaining *lifecycle-kit's* case, which would put one kit's name in the
+installer's rationale and leave the next kit's case unanswered. Nothing here is
+consumer config: an adopter chooses which kits to install, and the rule then
+decides the seeding for them, so there is no knob to add and none is proposed.
+
 ## Producers and consumers
 
 This amendment introduces no state, event, message, or interface — it states a

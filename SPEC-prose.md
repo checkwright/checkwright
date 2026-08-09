@@ -145,6 +145,21 @@ do not read.
   surfaces already state the lattice contract beside the chain, so the edit
   deletes a stale aside rather than authoring a claim.
 
+## The seam
+
+**Kit mechanism:** the disposition declarations D3 moves and the manifest-set
+prune D2 applies — both are properties of a gate or of canon-kit's own finder,
+carrying no consumer's vocabulary. **Installer mechanism, not a kit literal:**
+D1's rows live in `installer/profiles.list`, which is repo-root-governed and
+already the hand-authored home for exactly this judgment; no kit learns that a
+`prose` profile exists, and no gate names it. **Consumer config, deliberately
+left as such:** the corpus. `CANON_KIT_PROSE_SURFACE_GLOBS` and
+`CANON_KIT_MANIFEST_FILES` both stay default-empty, and the profile does not set
+them, because a kit literal spelling `docs/**.md` would ship one project's prose
+layout as everyone's. This is the same ruling this entry has carried since it was
+filed — an adapter delivered as optional consumer config, never a kit literal —
+now discharged against a specific knob rather than held as a posture.
+
 ## What this amendment does not claim
 
 It does not claim the kits govern non-code work. That abstraction program is
