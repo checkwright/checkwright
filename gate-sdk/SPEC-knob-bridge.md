@@ -40,10 +40,12 @@ answer. A flag that leaked into `--list` would red as a stranded implementation.
 
 *Work class: **design-bearing***.
 
-`gate_command` **prints argv**; it is called in a command substitution, so it
-runs in a subshell and cannot export into its caller. The bridge therefore rides
-the argv it already emits: for a `.gate` member declaring knobs, the emitted
-argv becomes
+`gate_command` **prints argv**; every call site captures it through a subshell
+— command substitution at `run-gates.sh`, process substitution via `mapfile <
+<(…)` at the other two (§Producers and consumers below) — so in every case it
+runs in a subshell and cannot export into its caller. The bridge therefore
+rides the argv it already emits: for a `.gate` member declaring knobs, the
+emitted argv becomes
 
 ```
 env
@@ -61,8 +63,18 @@ Resolution, per declared knob:
 
 - The owning kit comes from the knob's own `<KIT>_<KNOB>` prefix — the
   convention CLAUDE.md §Conventions established in gate-sdk already states —
-  mapped to a kit root through `gate_kit_roots`. Derivation-first: no roster of
-  knob→kit pairs is maintained, so none can rot.
+  mapped to a kit root through `gate_kit_roots`: each root's own name, hyphens
+  turned to underscores and upper-cased, is tried as a `<KIT>_` prefix of the
+  knob name. **`GATE_PRUNE_DIRS`, this delta's own worked example, matches
+  none of them** — it is `gate-sdk`'s resolved library global, deliberately
+  distinct from the `GATE_SDK_`-prefixed consumer overrides that feed it (the
+  paragraph below), so it does not itself carry gate-sdk's `GATE_SDK_` prefix.
+  A knob whose name matches no other kit's prefix therefore resolves to
+  **gate-sdk itself**, the dispatcher's own kit — never a parse error and
+  never a third kit guessed at. This is not a second rule bolted on: gate-sdk
+  is the one kit every `.gate` dispatch already runs inside, so "no other kit
+  claimed it" and "it is gate-sdk's own" are the same fact. Derivation-first:
+  no roster of knob→kit pairs is maintained, so none can rot.
 - That kit's `lib/*.sh` is sourced **in a subshell**, so a kit library's globals
   cannot leak into the dispatcher or across members.
 - The resolved array is serialized **tab-joined**. Whitespace is preserved

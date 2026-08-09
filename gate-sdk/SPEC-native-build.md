@@ -202,15 +202,18 @@ is a costed filing, not a silent regrowth.
   Delta 2.
 - **gate-sdk/SPEC.md §check-gate-binary-fresh** — its remediation prose names
   the script. Owned by Delta 2.
-- **gate-sdk/SPEC.md §Layout and configuration** — no new knob joins the
-  roster; recorded as a deliberate non-update so a reader does not go looking
-  for one.
 - **gate-sdk/README.md** — one bullet in the `bin/` list. Owned by Delta 4.
 - **CLAUDE.md §Housekeeping** — the `native/` bullet's commit-time requirement
   is the script; the "and `cargo test` does not discharge it" clause stands
   unchanged. Owned by Delta 2.
 - **CONTRIBUTING.md**, **docs/install.md** — the longhand becomes the script.
   Owned by Delta 2.
+
+**Deliberate non-update, recorded so a reader does not go looking.**
+`gate-sdk/SPEC.md` §Layout and configuration is unchanged: the script resolves
+the crate through the existing `gate_native_crate` accessor and adds no new
+knob, so no delta owns an edit there — an entry with no owning delta is the
+orphan-signal §Existing sections updated exists to avoid (canon-kit/templates/SPEC-amendment.md).
 
 ## Definition of Done
 
