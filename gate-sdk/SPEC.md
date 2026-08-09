@@ -839,10 +839,15 @@ design time; the last three were paid for, and each is named with what it cost.
    (§Consumer payload). The placing half is **built** too: `init` resolves the host
    to a target, refuses on a digest mismatch rather than warning, and
    omits-and-declares a member whose platform the roster carries no artifact for
-   (`native-artifact-install-path`). Both halves of the model therefore ship. What a
-   second port waits on is not a build: the first tag publishing binaries as Release
-   assets is the operator's call (TRAJECTORY.md), so no adopter can reach a prebuilt
-   binary until it is cut. The placement branch does not wait on that tag for its
+   (`native-artifact-install-path`). Both halves of the model therefore ship, **and
+   the criterion is met rather than merely ruled**: `v0.22.0` published the binary
+   and its digest sidecar as Release assets, so a vendored consumer whose host the
+   roster carries an artifact for resolves, verifies and runs the ported member.
+   The criterion is satisfied **per target, not globally** — one declared triple has
+   a published artifact today, and a host with none is omitted-and-declared rather
+   than dispatched into an absent binary, which is the branch that keeps a freshly
+   vendored battery alive on an uncovered platform.
+   The placement branch never waited on that tag for its
    evidence — `consumer-smoke-artifact-arm` gave the consumer smoke a leg that builds
    the binary and packs it, so every invocation drives selection, pre-write digest
    verification and placement against a real artifact
@@ -1002,18 +1007,18 @@ Neither prerequisite is outstanding, and the second port has since been **built
 and proved**: every member of the first cohort ships its rule as a compiled
 subcommand, byte-identical to the shell gate it reproduces.
 
-**What stands between that port and an adopter is narrower than it was read to
-be, and getting the boundary right is what let the descriptors land.** The
-operator-gated first tag that publishes binaries as Release assets
-(TRAJECTORY.md) is a prerequisite to an adopter **dispatching** to the binary: a
-`.gate` descriptor vendors and the binary does not, so a consumer that
-*registers* a ported member before that tag has a member that cannot run
-(§Consumer smoke). It is not a prerequisite to *declaring*, which is what the
-cohort's hold was resting on. A vendored descriptor no consumer registry names
-dispatches to nothing, and the load-bearing predicate
-(§check-gate-binary-fresh) is what makes that distinction machine-held rather
-than merely stated. So the descriptors are live and the tag governs the narrower
-thing it always governed.
+**What stood between that port and an adopter was narrower than it was read to
+be, and getting the boundary right is what let the descriptors land.** The first
+tag publishing binaries as Release assets was a prerequisite to an adopter
+**dispatching** to the binary: a `.gate` descriptor vendors and the binary does
+not, so a consumer that *registered* a ported member before that tag held a
+member that could not run (§Consumer smoke). It was never a prerequisite to
+*declaring*, which is what the cohort's hold was resting on. A vendored
+descriptor no consumer registry names dispatches to nothing, and the
+load-bearing predicate (§check-gate-binary-fresh) is what makes that distinction
+machine-held rather than merely stated. **That tag is cut** — `v0.22.0` — so the
+prerequisite is discharged and the distinction is recorded for the boundary it
+draws rather than as a live constraint.
 
 **What a landing descriptor *carries* is the freshness oracle — and it was already
 in the tree.** A dispatch is what makes the binary load-bearing, and the moment
