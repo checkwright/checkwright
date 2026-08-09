@@ -48,8 +48,15 @@
   as the residency gap underneath it — and it reached close through `bin/kfric.sh` rather than
   a gap bullet, so neither entry's count moved. Recorded here as prose rather than stamped,
   which is the deferral behaving exactly as written and is why this reads as evidence rather
-  than as a workaround: two iterations running, the only recurrences the mechanism has
-  actually seen are the two it cannot count.
+  than as a workaround.
+  **Third attested instance, 2026-08-09 at the `install-profile-seam` close.**
+  `spec-measured-count-gate` re-occurred five times in one iteration — its own cost field
+  predicts exactly this ("detection is by hand at align if at all") — and the finding reached
+  close as **lead dispatch prose**, a third channel distinct from both prior ones. No bullet,
+  so no stamp; recorded in that entry as a widening and here as prose, per this entry's own
+  rule. Three iterations running, every recurrence the mechanism has actually seen is one it
+  cannot count, and they have now arrived by three different channels — which is the argument
+  that the gap is the *sole-input* shape rather than any one missing channel.
   Filed by the lead on operator direction under the direct-filing exception; the operator ruled
   file-a-unit over both keep-as-is and next-iteration-priority.
 
@@ -706,52 +713,53 @@
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
 
-- **spec-measured-count-gate** [design-pending] — a **measured count authored into a
-  canonical SPEC section goes stale with no oracle**. Reproduced twice in one
-  iteration: the align audit found `gate-sdk/SPEC-action-run-shell.md` B2's block
-  count wrong twice over (five, then six; the tree carried eight) and, worse,
-  slated for `gate-sdk/SPEC.md` — where this same iteration's sibling unit
-  falsifies it on the next commit. It was corrected by hand (the canonical
-  section now carries the **derivation**, never the count), which is exactly the
-  shape CLAUDE.md's Enforcement-first rule bars: the fix landed without the gate
-  that catches the next one.
-  **Gap generalization — the check class that should have caught it.** Neither
-  existing gate covers it: `check-prose-enum` reads governed-set membership, not
-  numerals; `check-spec-derivable-section` reads fenced-dump density. The
-  candidate is narrow — a **bare cardinal qualifying a derived roster** in a SPEC
-  section whose subject is a `gate_find`-derived set — and it is filed here
-  rather than left as prose, per the Gap-disposition rule.
-  **Why `[design-pending]`:** the false-positive surface *is* the design. "Bare
-  cardinal near a roster noun" over-matches legitimate prose (a contract that
-  genuinely fixes a count — "the four contracts", "both halves"), so the gate
-  needs a principled trigger, and the honest outcome may be an opt-in
-  `measured:`-style marker the author applies rather than a scanner that infers
-  intent.
-  **Widened 2026-08-01: the surface set is not SPEC sections alone.** A third
-  instance landed in a **binding shim** — `.claude/commands/close.md`'s
-  release-policy slot said to derive the bump off the note's "two sections" and
-  called a no-bump iteration "both-None", where the cited owner fixes three; a
-  close read it against a three-section note at the moment it was deriving a
-  bump. `check-shim-restatement` cannot reach it by construction: it holds *copy
-  shape* (an n-gram shared with the corpus), and a restatement that is **wrong**
-  has diverged from its owner's wording, which is precisely what makes it not a
-  copy. So the scanner this entry designs must range over binding shims too, and
-  the instance argues for the opt-in-marker outcome over the inferring one.
-  Fixed at source by deleting the cardinal rather than correcting it, so the trap
-  is disarmed rather than re-armed.
-  **Cost while deferred:** compounding and silent — this recurs at **every
-  amendment that measures the tree**, the failure mode is a canonical doc
-  asserting a false number, and detection is by hand at align if at all.
-  **Cost reduction found 2026-08-01 at scope — weigh it before building a gate.**
-  `canon-kit/checks/check-manifest-count.sh` already bans bare cardinals over
-  governed collection nouns and takes an extensible `CANON_KIT_COUNT_NOUNS` list.
-  It misses the cited instances for configuration reasons, not design ones: its
-  `couples=` (`*SPEC*.md,*README.md,CLAUDE.md`) never reaches
-  `.claude/commands/*.md` where the third landed, and its default nouns lack
-  "sections"/"blocks" with `scripts/canon-config.sh` setting no override. So this
-  may discharge as a `couples=` widening plus a noun override. Not equivalent to
-  the design above, though: the widening buys coverage on the *inferring* side,
-  the side this entry doubted — so the cheaper answer may still be the wrong one.
+- **spec-measured-count-gate** [design-pending] — a **measured count or extent claim
+  authored into governed prose goes stale with no oracle**.
+  **Eight instances. Three before 2026-08-09:** the align audit found
+  `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six;
+  the tree carried eight), slated for `gate-sdk/SPEC.md` where a sibling unit falsified
+  it on the next commit; and a third landed in a **binding shim**,
+  `.claude/commands/close.md`'s release-policy slot deriving the bump off the note's "two
+  sections" where the cited owner fixes three, read by a close while deriving a bump.
+  Each was corrected by hand — the Enforcement-first shape the doctrine bars, the fix
+  landing without the gate that catches the next one.
+  **Gap generalization — the check class that should have caught them.** `check-prose-enum`
+  reads governed-set membership, not numerals; `check-spec-derivable-section` reads
+  fenced-dump density; `check-shim-restatement` holds *copy shape*, and a restatement that
+  is **wrong** has diverged from its owner's wording, which is what makes it not a copy. So
+  the scanner must range over SPEC sections and binding shims alike.
+  **Widened 2026-08-09, and the widening answers both grounds this entry left open.**
+  Five more instances in one iteration (`install-profile-seam`), split by whether a
+  cardinal-based scanner reaches them. **Three do:** nine gate-name lists that were seven,
+  a "sole call site" that was two, seven marker hits that were eight. **Two do not,
+  carrying no cardinal at all:** a five-line finding generalized to a whole-file claim,
+  and an audit stamping "the kit SPECs came back clean" over a SPEC holding two live
+  counter-instances. Those are *extent* claims and they fail identically — stated wider
+  than the measurement behind them.
+  **Answered: the unreachable axis is the one that costs.** Seven of the eight instances
+  were caught downstream by hand at no cost beyond the re-measurement. The eighth — an
+  extent claim — was caught by **nobody** for two iterations and shipped a false sentence
+  into a published SPEC and its public docs mirror. A cardinal-only trigger catches the
+  free half and misses the paid half.
+  **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01
+  at scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over governed
+  collection nouns and takes an extensible `CANON_KIT_COUNT_NOUNS` list, so a `couples=`
+  widening (its globs never reach `.claude/commands/*.md`) plus a noun override looked
+  like a discharge. It cannot be: banning cardinals cannot reach a claim carrying none.
+  Worth taking for the cardinal axis; it does not close this entry.
+  **Why `[design-pending]`:** the false-positive surface *is* the design, and the extent
+  axis sharpens it rather than settling it. "Bare cardinal near a roster noun" over-matches
+  legitimate prose ("the four contracts", "both halves"); "extent claim over a corpus" has
+  no syntactic tell at all. Both instance sets argue for an opt-in `measured:`-style marker
+  the author applies over a scanner inferring intent — a smaller gate bought with a larger
+  authoring contract, and that trade is the unit's to rule.
+  **Cost while deferred:** compounding and silent — this recurs at **every amendment that
+  measures the tree**, and the failure mode is a canonical doc asserting a false number.
+  Detection is by hand at align if at all, and that phrasing is itself a claim about the
+  *caught* set, which is what a survivorship count cannot see past.
+  The session-act half is `audit-class-corpus-attestation`, deliberately not folded in:
+  that entry designs a **stamp** obliging a sweep to record the corpus it read, making an
+  extent claim falsifiable when written; this designs a **scanner** over authored prose.
   Filed 2026-07-26 by close (`release-path-hardening`), draining the
   stale-measured-count bullet; costed at roughly one small unit.
 
@@ -2325,10 +2333,17 @@
   tree parses it, and `kpi-gate-runtime` reads a single live timings file rather
   than a baseline-versus-current pair, though `DRIFT_KIT_TIMINGS_FILE` shows the
   seam where a comparer would attach.
-  **Why that is not merely "not yet".** The comparison moment is the second port,
-  which waits on the operator-gated first tag publishing binaries — not on
-  `native-artifact-publish-path`, which landed 2026-08-03 — and may be far off,
-  while the baseline's own validity conditions decay meanwhile. Two already have,
+  **Why that is not merely "not yet" — and the premise has since expired, which
+  raises it rather than settling it.** The comparison moment is the second port. It
+  was argued here as far off, on the ground that it waited on the operator-gated
+  first tag publishing binaries. **Both halves of that ground are discharged:** the
+  tag was cut at `v0.22.0` (2026-08-07) and the second port is built and proved
+  (gate-sdk/SPEC.md §What the dispatch seam does not settle — every member of the
+  first cohort ships its rule as a compiled subcommand). So the moment this entry
+  says the baseline "must be ruled before" has **arrived**, and the entry is now
+  overdue rather than parked. Corrected in place at the 2026-08-09 close's
+  premise-rot review; the re-disposition is scope's to make, not close's.
+  Meanwhile the baseline's own validity conditions decay. Two already have,
   measured at close the same iteration the file landed: the header pins a
   `gates.list` sha256 that no longer matches (the 95th gate landed after capture),
   and the header's environment line pins a kernel, bash build and CPU count that a
@@ -3370,39 +3385,52 @@
 
 - **ruling-record-condition-staleness-probe** [design-pending] — a ruling conditioned on an
   event nobody retires once the event fires.
-  `TRAJECTORY.md` carries rulings whose text is conditioned on a future event — "until the
-  first binaries tag", "at `<iteration>`'s close" — and nothing retires one when its condition
-  is met. Today obsolescence rides the unit that discharges the ruling, whose own entry names
-  the rows it removes on landing; that holds only where an author remembered to write the
-  removal in, and nothing catches the ruling whose condition was met by a unit that did not.
-  **The enforceable half is a probe, never a prune — and the ground for that has moved.**
-  It rested on retirement being operator-class, so that no stage session could edit a ruling;
-  the operator's 2026-08-08 pruning directive (`trajectory-prune-on-completion`) authorizes
-  the prune, so what keeps this entry to a probe is its own deliverable rather than an
-  authority limit. Detect and act stay complementary. The deliverable is a *staleness probe*
-  over condition-bearing rulings that escalates, plus whatever declaration makes a condition
-  machine-readable — a ruling stating its own discharge event is the design question, since a
-  prose condition carries no syntactic tell. That declaration is this entry's alone: the
-  pruning unit deliberately ships a prose convention and no machine-readable form.
-  **Verified live at the 2026-08-06 close: one condition unfired, one already missed.** The
-  `gate-sdk/SPEC.md` rows conditioned on the first binaries tag still held, and the companion
-  ruling naming one specific iteration's close as the tag point did *not*: that close passed
-  without cutting the tag, and no surface said so. That is the shape a probe catches and a
-  discharging unit cannot.
-  **The unfired condition fired at the 2026-08-07 close** — v0.22.0 is the first tag publishing
-  binaries, so every row conditioned on it discharged in one event. Re-read those rows against
-  the tag rather than against this paragraph: what the entry now attests is that a *second*
-  condition changed state with no probe watching, which is the recurrence the deliverable exists
-  to catch rather than a fact about any one row.
-  **The class reaches the record's corrections, not only its conditions** — the surface written
-  to record the missed condition above went stale itself in under a day. Relocated here from
-  `TRAJECTORY.md` by `trajectory-prune-on-completion`, which deletes it there: it is a design
-  input to this entry, not a directive the record owes a reader.
+  `TRAJECTORY.md` carries rulings whose text is conditioned on a future event — "at
+  `<iteration>`'s close" is the surviving example, and "until the first binaries tag" was the
+  other until the prune deleted every ruling carrying it — and nothing retires one when its
+  condition is met. Today obsolescence rides the unit that discharges the ruling, whose own
+  entry names the rows it removes on landing; that holds only where an author remembered to
+  write the removal in, and nothing catches the ruling whose condition a unit met silently.
+  **The enforceable half is a probe, never a prune — and the ground for that has moved.** It
+  rested on retirement being operator-class; the operator's 2026-08-08 pruning directive
+  (`trajectory-prune-on-completion`) authorizes the prune, so what keeps this entry to a probe
+  is its own deliverable rather than an authority limit; detect and act stay complementary.
+  The deliverable is a *staleness probe* over condition-bearing rulings that escalates, plus
+  whatever declaration makes a condition machine-readable — a ruling stating its own discharge
+  event is the design question, since a prose condition carries no syntactic tell. That
+  declaration is this entry's alone: the pruning unit ships prose convention, not form.
+  **Both attested conditions have now fired, which settles the recurrence and not the
+  deliverable.** At the 2026-08-06 close one was unfired and one already missed — a companion
+  ruling naming a specific iteration's close as the tag point, which passed without cutting
+  the tag and no surface said so. The unfired one fired 2026-08-07 (v0.22.0), discharging
+  every row conditioned on it at once. Two state changes, no probe watching either.
+  **The class reaches the record's corrections, not only its conditions** — the surface
+  written to record the missed condition went stale itself in under a day (relocated here
+  from `TRAJECTORY.md` by `trajectory-prune-on-completion`, which deletes it there).
+  **Widened 2026-08-09 by the first post-prune close: the inbound half, and it is the mirror
+  of what `SPEC-ruling-record-prune` D9 refused.** D9 weighed slug-liveness *over* the record
+  — the record citing dead slugs — and correctly ruled it a no-op. The other direction was
+  never considered: **another governed surface citing a ruling the record no longer carries.**
+  The pointer names the surviving *section*, so it resolves and the battery reports clean over
+  it. Now that pruning is licensed, every prune manufactures this exposure. Three instances
+  were verified individually at that close, each having survived a full green battery: two in
+  `gate-sdk/SPEC.md` (§The port-candidate criteria criterion 5, and its "What stands between
+  that port and an adopter" paragraph) and one in this entry's own body above; all fixed
+  there. **No denominator is stated on purpose** — two sweeps of the citation corpus returned
+  counts that do not reconcile under differing exclusion sets, which is precisely what
+  `spec-measured-count-gate` names.
+  **The design input worth more than the instances, because a probe would miss it.** A fourth
+  instance — `gate-timing-baseline-comparability`, corrected at the same close — cites the
+  deleted ruling **by its distinctive phrasing, naming no file at all**, so no probe scoped to
+  file-name citations reaches it; and it was the highest-consequence of the four, a deferral
+  argument resting on the expired premise rather than stale narration. So the condition
+  vocabulary must be readable from the *citing* side, not only the record's.
   **Why `[design-pending]`:** the condition vocabulary is the whole design, and the
   escalation-only boundary rules out the cheap fix.
   **Cost while deferred:** a ruling read as live after its condition passed steers the very
-  sessions that consult the record for what is already settled, and the record's authority is
-  what makes that steer expensive to unwind.
+  sessions that consult the record for what is settled, and the record's authority makes that
+  steer expensive to unwind. The widening adds the sharper cost: the citing surfaces are
+  *published* — a kit SPEC and its docs mirror — so the blast radius reaches adopters.
   Filed 2026-08-07 by close, draining the gap inbox.
 
 - **stage-economics-log-key-session-collision** [design-pending] — two sessions in one
@@ -4038,6 +4066,134 @@
   duplicates neither `guard-command-prefix-wrapper` (transparent prefixes, measured at ~32% of
   prompting calls) nor `exit-echo-decoration-guard-vs-habit` (decoration on an allowlisted
   command); this is the guard refusing a string that was never going to be executed.
+
+- **audit-class-corpus-attestation** [design-pending] — an un-gateable-class audit stamps a
+  **verdict**, not the corpus it read, so a false negative is indistinguishable from a clean tree.
+  `.workflow/audit-roster.txt` rows carry `due:` and `last:` and nothing else, so the close that
+  performs one records *that* it swept and reports its finding count in prose. "Came back clean"
+  is unfalsifiable at the time it is written and un-re-runnable afterwards.
+  **Measured harm, and it is not hypothetical — a two-for-two false negative on consecutive
+  closes.** `capability-pendency-after-landing`'s trigger fired when `native-cohort-activation`
+  cut v0.22.0 (`.workflow/release-disposition.txt`, `git show d64e63c0`), the first tag publishing
+  gate binaries as Release assets. Both that close and the next swept the class and stamped it
+  performed: `ad8d4a31` recorded "the kit SPECs came back clean" and `9b2aec20` recorded "zero
+  findings". `gate-sdk/SPEC.md` carried the discharged-blocker claim in **two** places throughout
+  (§The port-candidate criteria criterion 5, and the paragraph opening "What stands between that
+  port and an adopter"). Both survived both sweeps and shipped to the published SPEC and its
+  public docs mirror, where validate found one of them two iterations later.
+  **The deliverable is a stamp grammar, not a scanner** — which is what makes it buildable against
+  a class the roster's own text calls un-gateable. A row's `last:` gains the corpus command the
+  sweep ran and the hit count it triaged, so the next close re-runs the predecessor's own oracle
+  instead of re-inventing a corpus, and a sweep that read nothing cannot stamp a verdict. What
+  stays un-gateable is the *judgment* on each hit; what stops being un-gateable is whether a
+  corpus was read at all.
+  **Why `[design-pending]`:** three classes on the roster have no single-command corpus (a
+  capability's "instances" are the tree set a scanner cannot infer — the reason they are on this
+  roster), so the unit must rule what a row with no derivable corpus stamps instead of a command,
+  and an honest "these rows stamp a named surface list" may be the answer for some of them.
+  **Cost while deferred:** compounding and paid at the boundary the roster exists to hold — every
+  close re-derives each class's corpus from scratch, and the roster's whole value is a cadence
+  claim it currently cannot evidence. The two closes above are the attested instances.
+  Filed 2026-08-09 by close (`install-profile-seam`), draining the criterion-5 staleness bullet:
+  the bullet's own finding is fixed in this close, and this entry is the mechanism half of it.
+  It is the generalization `spec-measured-count-gate` names as the scope-claim axis it cannot
+  reach, and is cross-referenced there rather than folded into it — that entry designs a scanner
+  over authored prose, this one designs a stamp over a session act.
+
+- **absorbed-duplicate-disposition** [design-pending] — the queue has **no third state between
+  live and done** for a slug merged away as a duplicate, so an absorbed entry is counted as a
+  shipped deliverable.
+  `check-task-conservation` diffs the live slug set and its own help sanctions moving a renamed
+  slug to Done, so an absorbed duplicate has nowhere else to go. But Done means completed:
+  `stage-economics-log-multi-session-undercount` shipped nothing and its content survives under
+  `stage-economics-log-key-session-collision`, which is untouched and still live. `kpi-task-split`
+  reads Done, so this iteration's feat/debt split inherits a row nothing built.
+  **Distinct from the icebox tier**, which is the deferred pool's exit and holds *unbuilt* work
+  that stays promotable; an absorbed duplicate is not dormant, it is redundant, and putting it
+  back in a live section would re-open the namespace collision the merge closed.
+  **Why `[design-pending]`:** every cheap answer costs something the conservation gate is holding.
+  A fourth section re-opens the section-order contract queue-kit/SPEC.md §The icebox tier already
+  records as gate-unenforced; an `[absorbed-by: <slug>]` tag keeps one section and obliges the
+  KPI readers to learn it; and letting the slug simply vanish is the sanctioned disappearance the
+  icebox tier's design explicitly declined to invent.
+  **Cost while deferred:** low per instance and silent — every merge inflates the delivered-unit
+  count by one and no reader of the KPI can tell. It recurs whenever a scope survey merges a
+  filed duplicate, which the deferred pool's intake asymmetry makes routine.
+  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet this iteration's own
+  scope session filed against its own economics merge. This close dispositions the standing
+  instance as an absorbed duplicate rather than as a deliverable, in its Done-clearing commit.
+
+- **install-queue-template-unreachable** [design-pending] — `queue-kit/templates/TASK-QUEUE.md`
+  is unreachable at install **by construction**, so no adopter has ever received it.
+  `recipe_seed`'s queue arm fires for the first of canon-kit, lifecycle-kit and queue-kit in
+  payload order; canon-kit sorts first and ships no such template, so every adopter receives the
+  minimal inline skeleton instead and the kit-owned template is dead weight in the payload.
+  **Why `[design-pending]`:** the ordering is load-bearing elsewhere, so the fix is a ruling on
+  what the arm selects by — first-in-payload-order is a cheap proxy for *which kit owns the queue
+  format*, and the honest answer may be an explicit owner declaration rather than a sort accident.
+  Deleting the unreachable template is the other honest close and is not obviously worse.
+  **Cost while deferred:** low and non-corrupting — adopters get a working skeleton, so nothing
+  is broken; what is wrong is that a kit ships a surface it cannot deliver, which is the shape
+  the consumer smoke exists to catch and does not.
+  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet spec filed 2026-08-08
+  while surveying the roster seam; it was outside `profile-keyed-install`'s envelope.
+
+- **dispatch-cited-evidence-unverified** [design-pending] — a dispatched sweep's **quoted
+  evidence** is covered by no verification rule, and one returned an attributed quotation that
+  exists in no revision of the file it named.
+  delegation-kit's shipped verify-after-commit set covers what a sweep *writes*; nothing covers
+  what it *cites*. The class matters more than a wrong line number or a stale fact because
+  quotation-with-attribution is precisely the signal a reader uses to decide a claim has already
+  been checked, so it defeats normal trust rather than merely being wrong.
+  **Caught 2026-08-08 at spec only by re-reading every load-bearing fact by hand against the named
+  file** — a property of that session, not of the mechanism.
+  **Candidate rule, stated where agent-execution binds:** a dispatched sweep's quoted evidence is
+  a pointer to verify at the source, never evidence in itself. **Why `[design-pending]`:** stated
+  that way it is an authoring contract with no oracle, and the buyable half may be narrower — a
+  dispatch that must quote can be required to return file:line for every quotation, which makes
+  the check mechanical for the dispatcher even though no gate can run it.
+  **Cost while deferred:** compounding, and it lands on exactly the dispatches delegation is
+  pre-authorized for. Every read-heavy audit this repo runs returns prose the dispatcher is
+  expected to act on without re-reading the corpus — which is the whole economic point of the
+  dispatch, and the reason an unverifiable quotation inside one is worth more than it looks.
+  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet spec filed under
+  scope-gated intake. It is filed here rather than left in the survey record for the reason the
+  bullet itself gives: the record is boundary-truncated, so the finding would be erased at the
+  next scope boundary.
+
+- **icebox-worklist-roadmap-blind** [design-pending] — `queue-index.sh --icebox-candidates`
+  filters on age and cost class only, so it offers candidates the icebox tier's own eligibility
+  rule categorically excludes.
+  queue-kit/SPEC.md §The icebox tier states that a roadmap-tagged entry is not
+  icebox-eligible — a hard rule, not a judgment. The worklist does not read the tag.
+  **Measured this close: 3 of 3 offered candidates carried a roadmap tag**
+  (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`), so the
+  worklist's precision was zero and every row was resolved by re-deriving the same exclusion.
+  **The tool is honest about being advisory** — its own `spec:` comment says the age filter
+  "only bounds how much close must look at" — so this is not a correctness defect, and that is
+  why it is filed rather than fixed in place. The question the unit owes is whether a
+  *categorical* eligibility rule belongs in the bound at all, given the tier deliberately keeps
+  judgment out of the tool.
+  **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
+  one rule re-derived per iteration, forever, against a one-predicate fix.
+  Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step.
+
+- **cat-read-steer-guard** [design-pending] — `cat <file>` is the top prompting pattern and the
+  guard steers `sed` reads but not `cat` ones.
+  **Measured this close by `scan-prompts.sh`: 29 of 81 prompting calls across 25 patterns** —
+  more than a third of the friction, and 5x the next pattern. `scripts/bash-guard.sh` already
+  carries the precedent shape for `sed` ("don't read a file through 'sed' — use the Read tool"),
+  with a pipe carve-out, and `cat` has neither a guard rule nor an allowlist entry.
+  **Allowlisting is the wrong disposition and the triage criterion says so:** the form to
+  reinforce is the Read tool, so a `Bash(cat *)` grant would mask the steering opportunity rather
+  than take it. **Why `[design-pending]`:** the carve-out is the design — `cat file |` feeding a
+  filter is legitimate and must not be refused, and the sed rule's own text shows the boundary
+  is expressible; what the unit owes is a decision-table row plus its fixture pair, which is
+  build-shaped rather than close-shaped.
+  **Cost while deferred:** low per instance, high in aggregate — a round trip on roughly a third
+  of all prompting calls, paid by every session, and it trains the habit the harness's own
+  guidance already discourages.
+  Filed 2026-08-09 by close (`install-profile-seam`) from its prompt-friction triage.
 
 ## Icebox
 
