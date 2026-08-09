@@ -216,8 +216,9 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
 }
 
 # spec: installer/README.md §The consumer smoke — the value post-condition: an install that is green, idempotent and reversible is still worth nothing if it never catches anything, so each profile's battery is put in front of one real defect in adopter-authored prose — a mistyped relative link in a README, on a consumer whose own content is markdown and nothing else. Which gate delivers the red is deliberately not asserted: naming one would be a second roster to maintain beside recipe_gates, and the claim is about the battery rather than about a member of it. The arm restores the consumer to the commit it found, so the reversal that follows still asserts against the tree init wrote
-assert_value() {   # $1 = profile, $2 = scratch consumer dir -> echoes 'red' or 'green' for the defect
-    local profile="$1" C="$2" out rc head verdict
+assert_value() {   # $1 = profile, $2 = scratch consumer dir -> sets VALUE_VERDICT to 'red' or 'green' for the defect
+    local profile="$1" C="$2" out rc head
+    VALUE_VERDICT=
     head="$(git -C "$C" rev-parse HEAD)"
     mkdir -p "$C/docs"
     printf '# Handbook\n\nStart with [the style guide](style-guid.md).\n' > "$C/docs/README.md"
@@ -226,7 +227,7 @@ assert_value() {   # $1 = profile, $2 = scratch consumer dir -> echoes 'red' or 
         || fail "$profile: could not commit the prose consumer's own content"
 
     out="$( cd "$C" && PATH="$RUN_PATH" bash gate-sdk/bin/run-gates.sh 2>&1 )"; rc=$?
-    if [[ "$rc" -eq 0 ]]; then verdict=green; else verdict=red; fi
+    if [[ "$rc" -eq 0 ]]; then VALUE_VERDICT=green; else VALUE_VERDICT=red; fi
 
     # spec: installer/README.md §The consumer smoke — the fix is the link and never the corpus
     printf '# Handbook\n\nStart with [the style guide](style-guide.md).\n' > "$C/docs/README.md"
@@ -236,11 +237,10 @@ assert_value() {   # $1 = profile, $2 = scratch consumer dir -> echoes 'red' or 
         printf '%s\n' "$out"
         fail "$profile: the battery is still not green on prose whose only defect was fixed"
     fi
-    say "value: the planted prose defect is $verdict on this profile, green once fixed"
+    say "value: the planted prose defect is $VALUE_VERDICT on this profile, green once fixed"
 
     git -C "$C" reset -q --hard "$head" && git -C "$C" clean -qfd \
         || fail "$profile: could not restore the consumer after the value arm"
-    printf '%s' "$verdict"
 }
 
 # spec: installer/README.md §The consumer smoke — one encoding of the reversal, run on the same consumer assert_install just finished with, so both transports prove it and the masked arm proves diff and uninstall are Node-free at no extra pack cost. The tree-object equality against the pre-init seed is the load-bearing assertion and it proves more than uninstall: no other arm asserts that the roster covers everything init wrote — the per-profile check runs the other direction, entry against tree — so a file init wrote and failed to record survives the removal and reds here
@@ -286,7 +286,8 @@ for profile in "${PROFILES[@]}"; do
     C="$(consumer "$profile")" || fail "could not build a scratch consumer for $profile"
     SEED="$(git -C "$C" rev-parse 'HEAD^{tree}')"
     assert_install "$profile" "$C"
-    [[ "$(assert_value "$profile" "$C")" == red ]] && VALUE_RED+=("$profile")
+    assert_value "$profile" "$C"
+    [[ "$VALUE_VERDICT" == red ]] && VALUE_RED+=("$profile")
     assert_reversal "$profile" "$C" "$SEED"
 done
 
