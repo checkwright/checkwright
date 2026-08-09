@@ -49,13 +49,18 @@
   a gap bullet, so neither entry's count moved. Recorded here as prose rather than stamped,
   which is the deferral behaving exactly as written and is why this reads as evidence rather
   than as a workaround.
-  **Third attested instance, 2026-08-09 at the `install-profile-seam` close.**
+  **Third close attesting, 2026-08-09 (`install-profile-seam`), and the first carrying an
+  aggregate: THREE recurrences judged out of channel, ZERO in it.**
   `spec-measured-count-gate` re-occurred five times in one iteration — its own cost field
-  predicts exactly this ("detection is by hand at align if at all") — and the finding reached
-  close as **lead dispatch prose**, a third channel distinct from both prior ones. No bullet,
-  so no stamp; recorded in that entry as a widening and here as prose, per this entry's own
-  rule. Three iterations running, every recurrence the mechanism has actually seen is one it
-  cannot count, and they have now arrived by three different channels — which is the argument
+  predicts exactly that ("detection is by hand at align if at all") — and arrived as **lead
+  dispatch prose**. `survey-edge-aggregation-residue` was observed while performing a rostered
+  close audit, and `dispatch-worktree-reds-the-battery` as a battery red during the close's own
+  commit. All three were declined a stamp on this entry's open question and recorded as prose,
+  per its own rule. So a drain reading only bullets would have reported a clean recurrence
+  count for an iteration carrying three — not a shortfall in the count, but the count reporting
+  the opposite of the truth. Three iterations running, every recurrence the mechanism has
+  actually seen is one it cannot count, and they have now arrived by four distinct channels
+  (dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red) — which is the argument
   that the gap is the *sole-input* shape rather than any one missing channel.
   Filed by the lead on operator direction under the direct-filing exception; the operator ruled
   file-a-unit over both keep-as-is and next-iteration-priority.
@@ -219,14 +224,10 @@
   stress-tests whether the kits govern non-code work. Core dilution is ruled
   out on record — if pursued, this is an adapter/profile delivered as
   optional consumer config, never a kit literal (the provenance seam).
-  **No longer demand-gated — retagged `next` 2026-08-08 by operator ruling at the
-  `adopter-floor-integrity` scope.** The 2026-08-03 trajectory pivot makes this
-  the step TRAJECTORY.md §PRIORITY DIRECTIVE names next and "the **earliest
-  external-install channel** … not post-launch polish", with everything ahead of
-  it discharged. The `later` horizon it carried until now asserts
-  the opposite — ROADMAP.md defines `later` as demand-gated with "the sequencing
-  … not" written down — so the tag contradicted a ruling rather than recording
-  one. Seeds:
+  **Not demand-gated — retagged by operator ruling 2026-08-08, and carried at `now` since
+  the seam it waited on shipped.** The 2026-08-03 trajectory pivot makes this the step
+  TRAJECTORY.md §PRIORITY DIRECTIVE names next and "the **earliest external-install
+  channel** … not post-launch polish", with everything ahead of it discharged. Seeds:
   gate-sdk, guard-kit, context-kit, drift-kit, and canon-kit's
   one-owner/coupling core are workflow-agnostic today; lifecycle-kit's stage
   semantics, evidence-kit's test baseline, and canon-kit's spec framing are
@@ -245,18 +246,21 @@
   matters most: canon-kit's workflow-agnostic one-owner core is absent from the
   roster while its four spec-framing gates are present, so a prose consumer today
   gets all of the software-coupled half and none of the agnostic half.
-  **Sized 2026-08-08 at scope: two to three iterations, not one.** A profile is
-  only a kit set — every recipe function in `installer/lib/common/recipe.sh` is
-  keyed by KIT and takes no profile argument — so a roster-only fourth profile
-  would install exactly what `full` installs. Profile-keyed install is the missing
-  mechanism and must precede a prose gate cohort, which must precede a
-  docs-shaped smoke consumer; the "kits govern non-code work" abstraction program
-  is separable and must not gate an installable profile. A fourth profile also
-  breaks the containment-chain contract `installer/profiles.list`,
-  `installer/README.md` and `docs/install.md` all assert, turning the profile
-  order into a lattice — and `companion-toolkit-profile` pays that same bound
-  again, which argues for settling it once. Full finding and its two-command
-  witness: `.workflow/survey-record.md`.
+  **Sized 2026-08-08 at scope at two to three iterations, and `install-profile-seam` has
+  since PAID the first.** All three facts that bound rested on are now false: recipe
+  functions were keyed by kit and took no profile argument (`recipe_gates` now takes the
+  profile); profile-keyed install was the missing mechanism (`profile-keyed-install`,
+  `kit-owned-install-recipe`, `lock-own-file-narrowed-profile-drift` all shipped 2026-08-09);
+  and a fourth profile would break a containment-chain contract (the chain gave way to the
+  lattice — `installer/profiles.list` now states "A fourth profile is admitted exactly when it
+  fits; there is no count to raise here"). The installer no longer resists a fourth profile,
+  and `companion-toolkit-profile` no longer re-pays that bound either. What remains is the
+  always-separable part: a prose gate cohort, then a docs-shaped smoke consumer, with the
+  "kits govern non-code work" abstraction program still separable from an installable profile.
+  Corrected in place at the 2026-08-09 close's premise-rot review; the re-sizing is scope's,
+  and it matters because this is `[roadmap: now]` and TRAJECTORY.md's sequence names it next,
+  so an over-costed entry here distorts the selection it feeds. Full finding and its
+  two-command witness: `.workflow/survey-record.md`.
   **Cost while deferred:** no longer zero. The prior reading — that the kits make
   no non-code claim to falsify — was written before the pivot sequenced this rung;
   what is now deferred is the preview cohort's install channel itself
@@ -2338,8 +2342,8 @@
   was argued here as far off, on the ground that it waited on the operator-gated
   first tag publishing binaries. **Both halves of that ground are discharged:** the
   tag was cut at `v0.22.0` (2026-08-07) and the second port is built and proved
-  (gate-sdk/SPEC.md §What the dispatch seam does not settle — every member of the
-  first cohort ships its rule as a compiled subcommand). So the moment this entry
+  (gate-sdk/SPEC.md §What is retained, and where the second port stands — every
+  member of the first cohort ships its rule as a compiled subcommand). So the moment this entry
   says the baseline "must be ruled before" has **arrived**, and the entry is now
   overdue rather than parked. Corrected in place at the 2026-08-09 close's
   premise-rot review; the re-disposition is scope's to make, not close's.
@@ -3591,6 +3595,17 @@
   **Re-attested 2026-08-08**, from a build batch: a 3-red battery while one audit dispatch was
   live — comment-tier on the copy's sources, and both freshness emitters counting the
   duplicated markers — all pure pollution, self-clearing when the harness released the worktree.
+  **Third attestation 2026-08-09, and it confirms the entry's own prediction against the fix
+  that shipped.** `.claude/worktrees/` was gitignored at the 2026-08-08 close; this entry had
+  already said that would not fix the gates, and it did not. `check-comment-tier` reddened a
+  close commit on `reserve/crates/src/lib.rs` inside a live worktree copy. The mechanism is now
+  pinned rather than inferred: `gate_find` prunes by directory **basename**
+  (`GATE_SDK_PRUNE_DIRS`, default `target .git node_modules .tmp gate-tests`), so no prune entry
+  can name `.claude/worktrees` without also pruning `.claude/commands` and `.claude/agents`,
+  which are governed surfaces. A shared exclusion root would have to be path-shaped, not
+  name-shaped — which sharpens the design question above into a concrete blocker.
+  No `recurrence:` date is stamped: observed directly by a close rather than through the capture
+  channel, the same decline this close applied to its two other out-of-channel recurrences.
   Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches.
 
 - **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
@@ -4208,6 +4223,36 @@
   of all prompting calls, paid by every session, and it trains the habit the harness's own
   guidance already discourages.
   Filed 2026-08-09 by close (`install-profile-seam`) from its prompt-friction triage.
+
+- **qualified-pointer-section-ownership** [design-pending] — `check-spec-pointer` asserts a
+  cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
+  fully-qualified pointer aimed at the wrong section resolves and reds nothing.
+  **Self-witnessed 2026-08-09, which is why it is filed rather than theorised.** This close,
+  correcting another entry's expired premise, cited `gate-sdk/SPEC.md §What the dispatch seam
+  does not settle` for a claim owned by §What is retained, and where the second port stands.
+  Both sections exist. The gate passed — "every target file tracked and named §heading present"
+  is its own verdict text, and presence is the whole of what it checks. Caught only by reading
+  the file to confirm the sentence was there.
+  **It is the mechanism under this iteration's headline class.** The inbound half of
+  `ruling-record-condition-staleness-probe` — a citation surviving the deletion of the ruling
+  it names — and this are one defect seen from two sides: a pointer is verified against the
+  section's *existence*, so nothing notices when the section stops carrying the claim, whether
+  because the claim was pruned out of it or because the wrong section was named to begin with.
+  **Distinct from the three sibling entries in this cluster**, which are all about citations
+  that resolve to *nothing*: `unqualified-section-citation-liveness` (a bare `§Heading` with no
+  path), `spec-pointer-self-section-citation` (the self-citing form), and
+  `prose-filename-citation-liveness`. This one resolves successfully and is wrong anyway, which
+  is the harder half — the reader's trust is higher precisely because the pointer works.
+  **Why `[design-pending]`, and an honest "not buildable" is a permitted outcome.** Deciding
+  whether a section *supports* a sentence is comprehension, not scanning. The only mechanical
+  approximations are term-overlap heuristics between the citing sentence and the target
+  section, whose false-positive surface is the same one `spec-measured-count-gate` is stuck on,
+  and a term-overlap red on a correct citation is worse than silence on a wrong one.
+  **Cost while deferred:** broad and unmeasured — `check-spec-pointer` currently reports 1774
+  directive pointers and 246 prose citations, and the ownership of every one of them is
+  unverified. The cost is not that they are wrong; it is that the gate's green is read as
+  saying they are right.
+  Filed 2026-08-09 by close (`install-profile-seam`), from its own miswritten citation.
 
 ## Icebox
 

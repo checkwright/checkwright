@@ -316,7 +316,7 @@ The constrained members and what forces each:
   it is a **commit-time** floor — `gate_command` puts the binary on the pre-commit
   path and is fail-closed on an absent one, so the battery will not run without a
   built crate (gate-sdk/SPEC.md §What the dispatch seam does not settle); that is
-  this repo, once its first cohort lands. Everywhere else it stays the weaker
+  this repo today, its first cohort having landed. Everywhere else it stays the weaker
   **contributor/build** floor: a consumer tree receives a prebuilt binary and never
   a crate, so nothing there compiles at commit time. Both tiers rest on the same
   forcing fact —

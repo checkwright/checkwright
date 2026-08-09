@@ -253,8 +253,10 @@ install, rather than halfway through one.
 
 You pick how much to meet first. `starter` is the framework — the gate SDK on
 its own. `delegation` adds the kits whose subject is the agent session itself.
-`full` is everything. The progression is a containment chain, so moving up only
-ever adds.
+`full` is everything. Today those three nest, but the contract promises kit-set
+containment rather than that chain. Moving to a profile that contains yours only
+ever adds. A profile that contains neither the other is an alternative rather
+than a step.
 
 Re-running is idempotent and non-destructive: it reads the per-file hash
 recorded in `checkwright.lock`, rewrites what still matches, and **reports
