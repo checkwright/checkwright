@@ -53,7 +53,7 @@ everything else to
 <!-- roadmap:begin -->
 ### now
 
-- **`prose-profile`** *(ecosystem)* — A profile for documentation repos, where there is no build to gate.
+_Nothing is queued under this horizon._
 
 ### next
 

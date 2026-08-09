@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **prose-profile** [spec: SPEC-prose.md] [roadmap: now/ecosystem] — the fourth profile.
-  roadmap-summary: A profile for documentation repos, where there is no build to gate.
-  The `prose` profile — gate-sdk plus canon-kit — and what a first prose adopter meets at
-  install. TRAJECTORY.md §PRIORITY DIRECTIVE sequences this next and fixes where its coherence
-  is measured: at the adopter's floor, install then value then uninstall.
-  Two premises this entry rested on are falsified by measurement, and `SPEC-prose.md` carries
-  both with their witnesses. The profile parameter on `recipe_gates` is **not** the lever: `full`
-  is the payload-derived maximum, so every profile is contained in it and anything a profile
-  registers `full` must register too — a gate armed for one profile alone is not expressible,
-  and the additive half is a disposition correction instead. And the cohort is not where the
-  value is: 16 of canon-kit's 18 `on-surface` gates already pass on a bare install tree, but 12
-  pass vacuously, because the manifest set is READMEs, canonical specs and the agent file and
-  never `docs/*.md`.
-  Six deltas: the profile rows and their criterion; a prune fix so a consumer's manifest set
-  stops governing its dependencies' READMEs; eleven canon-kit gates moving to `zero-config` and
-  seven staying put with reasons; a prose-shaped consumer that takes a real red; the install
-  prose that still describes three nesting profiles; and the prune fix's own oracle, since
-  neither this tree's battery nor the consumer smoke can serve as one.
-  The acceptance oracle is the consumer smoke run for every profile, never this tree's battery —
-  the prune is a no-op here, since this repo sets `CANON_KIT_SCAN_KIT_ROOTS=1`.
-  Surfaced 2026-07-16 in the launch triage that scoped launch-readiness-gate; promoted
-  2026-08-09 at spec.
 - **install-queue-template-unreachable** [spec: SPEC-queue-seed.md] — the queue seed's owner.
   `queue-kit/templates/TASK-QUEUE.md` is unreachable at install by construction, and re-verified
   so for every profile that exists: `full` reaches canon-kit first and `delegation` reaches
@@ -4000,7 +3978,8 @@
 
 - **survey-citation-outlives-its-record** [design-pending] — a permanent surface cites a
   boundary-truncated one, so the citation dies on schedule.
-  The `prose-profile` entry above ends "Full finding and its two-command witness:
+  The motivating instance, recorded here because the entry it describes has since shipped and
+  moved to Done: `prose-profile` ended "Full finding and its two-command witness:
   `.workflow/survey-record.md`". That record is per-iteration scratch, boundary-truncated by
   design (lifecycle-kit/SPEC.md §The survey record), and `enter-stage.sh scope` truncated it at
   the very next boundary — so the citation resolved to nothing **one iteration** after it was
@@ -4220,5 +4199,7 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
+
+- prose-profile
 
 ## Lessons Learned
