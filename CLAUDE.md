@@ -149,7 +149,7 @@ load behind that trigger, so they are not resident here.
   It is **not a kit** — no `checks/`, no `smoke/`, the
   predicate that makes a root directory one; `native/target/` is gitignored, and
   `check-gate-binary-fresh` is what holds its currency. Dispatch, descriptor
-  format, port criteria and the toolchain floor:
+  format, port sequencing and the toolchain floor:
   gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
 - `CONTRIBUTING.md` + the `.github/` issue/PR templates, `CODE_OF_CONDUCT.md`,

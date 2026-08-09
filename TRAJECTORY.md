@@ -203,28 +203,55 @@ paragraph declines to automate.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
-**Ruled 2026-08-03 by the operator, and re-ruled 2026-08-06.** The track
-sequences toward **per-profile coherence, not whole-corpus completion**, and the
-2026-08-06 half settles **where that coherence is measured: at the adopter's
-floor — install, get value, uninstall, on the dependency floor objective 1
-names — and never at a roster substrate census.** One profile coherent at that
-floor beats a partial port spread across every profile. This governs the whole
-track rather than any one step of it, and other rulings cite it.
+**Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
+the native gate port, ASAP.** Everything portable ports — the gates, the runners
+and the install-lifecycle scripts alike. Surviving shell is **residue justified
+case by case, never a protected category**, so "it is orchestration" is not by
+itself an answer for a script that stays.
 
-What the sequence names next, in order:
+**Two grounds, and the second is the stronger one.** First, permanent dual
+maintenance: two spellings of every gate is a cost with no end date, and a
+cross-substrate parity gate earns its keep during a *transition* while as a
+steady state it only protects a duplicate that should not exist. Second,
+**cross-platform cost** — a shell dependency means Windows support is bought by
+maintaining PowerShell duplicates, the same dual-maintenance tax paid again
+along a different axis, where a native binary is one implementation across every
+platform. The second ground is load-bearing precisely because it does not depend
+on any timing measurement being right: the port's wall-clock win is small, and
+`native-gate-port-remaining-corpus` records it measured rather than assumed.
 
-1. `prose-profile` completion — the **earliest external-install channel** under
-   the re-ruled preview cohort, not post-launch polish. Which cohort that is
-   stays in the operator's local brief; this file records only that the
-   sequence turns on it.
-2. `companion-toolkit-profile`.
+**The known irreducible, recorded so it is not mistaken for non-compliance.**
+Something has to run before the binary exists on the machine, and fetching and
+executing the first artifact cannot itself be that artifact. So the **bootstrap**
+— in shell, or absorbed by the transport, since the payload already ships as an
+npm package and a Release tarball and npm can carry per-platform binaries — is
+the one place a shell dependency may be unavoidable in the strict sense. This
+records the residue; designing it is the unit's work, not this file's.
 
-**Criterion 4 of the port-candidate criteria
-(gate-sdk/SPEC.md §The port-candidate criteria) may be relaxed only on a named
-condition, and both halves must hold:** the criterion-clearing corpus exhausted
-*and* the parity oracle held off the shell substrate. Criterion 4 is what stops
-the parity proof being self-referential, so a cohort that has not met both
-halves does not get to weaken the oracle.
+**What this supersedes, and why the supersession is principled rather than a
+change of mind.** The 2026-08-03 sequencing rule and its 2026-08-06 re-ruling —
+that the track runs toward per-profile coherence rather than whole-corpus
+completion, measured at the adopter's floor and never at a roster substrate
+census — is superseded for the port's scope. What that rule refused was a
+*roster-census* justification: completing a substrate tally for its own sake.
+The case that carries now is different in kind, the elimination of a permanent
+duplicate. **No port-candidate criterion survives as an eligibility gate on
+which gates may be ported** (gate-sdk/SPEC.md §The port-candidate criteria):
+the technical problems those criteria name — self-referential parity, a rule
+depending on an external program — are engineering work the port owes, not
+exclusions it may take.
+
+**One half of the ruling is escalated and deliberately not recorded here yet.**
+The direction as relayed also has adopters **install a pre-compiled binary or
+compile from source, their choice**. That second path cannot be recorded without
+reversing §The objectives' objective 3 and the closed ruling below it that voids
+building from vendored crate source at install time — and reversing a stated
+objective is operator-class, not a stage's or a lead's call. So it is escalated
+rather than written, and every surface asserting the payload withholds a gate's
+implementation source is left standing until it is answered. Read the silence as
+an open question, never as either answer.
+
+What the sequence names next, after the port: `companion-toolkit-profile`.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,
 per its own queue entry. Surge-channel launch stays gated behind the private

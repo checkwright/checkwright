@@ -816,7 +816,13 @@ re-deciding, and only the operator reopens a closed ruling.
 
 ### The port-candidate criteria
 
-A gate is a candidate only if **all seven** hold. The first four were stated at
+**These seven are an engineering roster and an ordering signal, never an
+eligibility screen.** The operator ruling of 2026-08-09 (TRAJECTORY.md §PRIORITY
+DIRECTIVE — the port track's sequence) ports the whole corpus, so none of them
+excludes a gate from the port. Each does two jobs instead: it **names an
+engineering problem the port owes** for the gates that fail it, and it **orders
+the work** — a gate clearing all seven is cheap to port today, a gate failing one
+carries exactly the cost the criterion describes. The first four were stated at
 design time; the last three were paid for, and each is named with what it cost.
 
 1. **Registered** in `gates.list` — an unregistered gate proves no dispatch.
@@ -879,15 +885,18 @@ design time; the last three were paid for, and each is named with what it cost.
    copies together at all.
 7. **Its rule invokes no external program the payload does not carry.** *Found
    at first-cohort selection.* `check-action-run-shell` clears all six above and
-   is still unportable: it requires `shellcheck` on `PATH`, refusing when it is
-   absent and invoking it per extracted block, so a compiled form would move a
-   toolchain requirement from this repo's contributors onto every adopter — the
-   dependency floor TRAJECTORY.md objective 1 exists to collapse, against an
-   adopter objective 5 admits who will not install a toolchain. git is the one
-   sanctioned exception, because it is the floor. Recorded rather than left as a
-   silent skip, because every mechanical screen puts that gate *in*: it shares
-   the cohort's corpus family and its walk and reads no knob, and the fact that
-   excludes it is one none of the six criteria sees.
+   still cannot port as written: it requires `shellcheck` on `PATH`, refusing
+   when it is absent and invoking it per extracted block, so a compiled form
+   would move a toolchain requirement from this repo's contributors onto every
+   adopter — the dependency floor TRAJECTORY.md objective 1 exists to collapse,
+   against an adopter objective 5 admits who will not install a toolchain. git
+   is the one sanctioned exception, because it is the floor. Under the 2026-08-09
+   ruling this is **the largest named piece of port work**, not a permitted
+   exclusion: the dependency is designed away — embedded, replaced, or the rule
+   itself changed — and that design is the porting session's, not this section's.
+   Recorded rather than left as a silent skip, because every mechanical screen
+   puts that gate *in*: it shares the cohort's corpus family and its walk and
+   reads no knob, and the fact that stops it is one none of the six criteria sees.
 
 ### The first cohort, and the rule that selects the next
 
@@ -913,16 +922,15 @@ leave the stronger one unwritten.) `check-action-run-shell` is the near miss and
 is criterion 7's own case, above.
 
 **The next cohort is the largest set of criteria-clearing gates sharing one
-corpus derivation.** Shared derivation is the axis because it is what made this
-cohort cheap — the walk is ported once and proved N times, and the parity
-comparison is over one corpus shape rather than N. Selecting by kit, by profile,
-or by whatever is easiest next all re-import work this cohort only paid once. Two
-standing bounds the criteria do not carry: **criterion 4 is not relaxed** —
-TRAJECTORY.md admits relaxing it only on a named condition, both halves of which
-must hold (the criterion-clearing corpus exhausted *and* the parity oracle held
-off the shell substrate), and neither does; and **criterion 7 binds** — a gate whose
-rule shells out to anything but git is out until its dependency is designed away,
-never ported and patched later.
+corpus derivation** — an ordering rule, not a bound: the 2026-08-09 ruling ports
+every gate. Shared derivation is the axis because it is what made this cohort
+cheap: the walk is ported once and proved N times, and the parity comparison is
+over one corpus shape rather than N. Selecting by kit, by profile, or by whatever
+is easiest next all re-import work this cohort only paid once. The gates failing
+criterion 4 or 7 are **sequenced last and budgeted for**, because each carries a
+design problem — a self-referential parity oracle, an external program on `PATH`
+— that the port owes an answer to rather than a waiver. Neither is ported and
+patched later; both are designed, then ported.
 
 **What this cohort landed.** Both rules ship as
 compiled subcommands, proved byte-identical against the shell gates on each
