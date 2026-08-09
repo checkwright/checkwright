@@ -62,7 +62,14 @@ predicate look like the seeding roster it is not.
 
 - **(D3) Correct `installer/README.md`'s stated reason for lifecycle-kit's
   install-time silence.** The sentence today reads that "lifecycle-kit's **two**
-  want a stage attestation only a stage session can write". Eleven lifecycle-kit
+  want a stage attestation only a stage session can write". A second site carries
+  the same overclaim in a blunter form and is corrected alongside it:
+  `installer/profiles.list`'s `delegation` comment block states, unqualified,
+  that lifecycle-kit registers no gate "because **its gates** read a stage
+  attestation only a stage session can write" — which is even less accurate than
+  README's "two", since it names the reason for all seven `on-surface` gates
+  rather than two. The posture it states (no gate registered) is correct and
+  stays; only the blanket reason is corrected, to the same restatement below. Eleven lifecycle-kit
   gates ship: four declare `never`, seven declare `on-surface`. Two of the seven
   read the stage attestation the sentence names; three more read surfaces a stage
   session writes, so the phrasing reaches them; and **two —
@@ -144,6 +151,11 @@ rather than skipped; D3 removes a claim rather than adding one.
 - `installer/README.md` §What init seeds — D1 adds the rule paragraph; D3
   corrects the starting-gate paragraph's lifecycle-kit sentence. Both land in the
   section that already describes this flow.
+- `installer/profiles.list` §delegation comment block — D3's second site; the
+  "because its gates read a stage attestation..." clause is restated on the same
+  terms as the README correction, without touching the surrounding roster rows or
+  the "Vendored is not yet enforced" sentence, which is unaffected by this
+  ruling.
 - `installer/lib/common/recipe.sh` — D2's two `spec:` directives. Directives, not
   prose: the section D1 writes owns the content.
 - No lifecycle-kit surface changes. `lifecycle-kit/SPEC.md` §bin/install-lifecycle.sh

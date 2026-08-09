@@ -229,17 +229,26 @@ a prose adopter learns the knob exists.
   `check-md-refs`, `check-docs-cmd`, `check-knob-citation`, `check-manifest-count`,
   `check-manifest-temporal`, `check-tracking-claim`, `check-spec-fence-balance`,
   `check-spec-pointer`, `check-install-claim`, `check-prose-enum`,
-  `check-surface-duplication`. Every one of them is a named reader of the change;
-  build verifies each rather than assuming the shared finder makes them uniform.
-  D6 is where `check-md-refs`' half of that verification lands, and it is the only
-  **executable** evidence D2 has; the other ten are verified by inspection against
-  this list, which is weaker and is stated as such rather than implied equivalent.
+  `check-payload-claim`. Every one of them is a named reader of the change, checked at
+  the read site rather than gestured at: each sources `canon-kit/lib/spec.sh` and calls
+  `spec_manifest_files` directly (`grep -l spec_manifest_files canon-kit/checks/*.sh`
+  returns exactly these eleven). `check-surface-duplication` does not belong on this
+  list — verified at its read site, it calls `spec_canonical_specs`, the finder D2 does
+  not touch, so it is unaffected by this delta regardless of `CANON_KIT_SCAN_KIT_ROOTS`;
+  its `on-surface` disposition in D3 rests on its own reason (wanting an
+  adopter-authored `GLOSSARY.md`), not on anything D2 changes. D6 is where
+  `check-md-refs`' half of the eleven's verification lands, and it is the only
+  **executable** evidence D2 has; the other ten — including `check-payload-claim`,
+  whose vocabulary knob is unset by default so the widened corpus changes nothing it
+  matches — are verified by inspection against this list, which is weaker and is
+  stated as such rather than implied equivalent.
 - **Changed state: eleven install dispositions (D3).** *Producer* — the
   `# install:` header line on each gate. *Consumer* — `recipe_install_disposition`
   → `recipe_gates` → `profile_gates` → the registry `init` writes, and
   `check-install-disposition` assertions A and B. **Assertion B is already
-  satisfied for all eleven**: canon-kit's `smoke/install.sh` registers 20 of its
-  22 gates and omits only `check-surface-duplication`, which stays `on-surface`.
+  satisfied for all eleven**: canon-kit's `smoke/install.sh` registers 21 of its
+  22 gates (counted at its own heredoc, `canon-kit/smoke/install.sh` lines 10–30)
+  and omits only `check-surface-duplication`, which stays `on-surface`.
   So the move costs no smoke-roster edit — checked, not assumed.
 - **The reader who is not a gate.** An existing adopter's `init` re-run rewrites
   `gates.list`, so D3 adds eleven gates to trees already installed. Named because

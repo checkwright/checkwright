@@ -26,9 +26,11 @@ default section contract.**
 
 `QUEUE_KIT_REQUIRED_SECTIONS` defaults to a six-heading set including
 `Lessons Learned`. The inline skeleton writes five headings and omits it.
-`check-queue-sections` is the gate that would say so, and it is the one queue-kit
-gate declared `on-surface` — so it is not in the registry `init` writes, and
-nothing catches the miss. That is not a cosmetic gap: §check-queue-sections
+`check-queue-sections` is the gate that would say so, and it is one of four
+queue-kit gates declared `on-surface` (with `check-roadmap-fresh`,
+`check-queue-slug-liveness` and `check-queue-entry-budget`, verified against
+every `# install:` line in `queue-kit/checks/`) — so, like its three siblings,
+it is not in the registry `init` writes, and nothing catches the miss. That is not a cosmetic gap: §check-queue-sections
 states that this gate is the fail-closed floor under every section-scoped scanner,
 and `check-amendment-queue`, `check-task-names` and `check-task-conservation` —
 all `zero-config`, all registered on that tree — **pass open** on a dropped
@@ -161,7 +163,7 @@ the producer's old position is named and moved with it.
   absent, never claim-and-copy).
 - `installer/README.md` §The consumer smoke — D3's per-profile assertion joins
   the ordered list of post-conditions that section states.
-- `queue-kit/SPEC.md` §templates/ — the template's contract paragraph is
+- `queue-kit/SPEC.md` §templates/ — D1's clause. The template's contract paragraph is
   **correct and stays**, but it describes an artifact that was undeliverable; a
   clause recording that the installer now selects it by its existence belongs
   beside it, so the kit's own doc stops implying a delivery it did not get.

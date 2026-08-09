@@ -25,10 +25,11 @@
   value is: 16 of canon-kit's 18 `on-surface` gates already pass on a bare install tree, but 12
   pass vacuously, because the manifest set is READMEs, canonical specs and the agent file and
   never `docs/*.md`.
-  Five deltas: the profile rows and their criterion; a prune fix so a consumer's manifest set
+  Six deltas: the profile rows and their criterion; a prune fix so a consumer's manifest set
   stops governing its dependencies' READMEs; eleven canon-kit gates moving to `zero-config` and
-  seven staying put with reasons; a prose-shaped consumer that takes a real red; and the install
-  prose that still describes three nesting profiles.
+  seven staying put with reasons; a prose-shaped consumer that takes a real red; the install
+  prose that still describes three nesting profiles; and the prune fix's own oracle, since
+  neither this tree's battery nor the consumer smoke can serve as one.
   The acceptance oracle is the consumer smoke run for every profile, never this tree's battery —
   the prune is a no-op here, since this repo sets `CANON_KIT_SCAN_KIT_ROOTS=1`.
   Surfaced 2026-07-16 in the launch triage that scoped launch-readiness-gate; promoted
@@ -45,7 +46,7 @@
   The fact that refuses both is one neither close anticipated: the inline skeleton an adopter
   actually receives omits `## Lessons Learned`, which `QUEUE_KIT_REQUIRED_SECTIONS` requires by
   default — and `check-queue-sections`, the fail-closed floor under every section-scoped
-  scanner, is the one queue-kit gate not registered at install, so nothing says so.
+  scanner, is one of four queue-kit gates not registered at install, so nothing says so.
   Filed 2026-08-09 by close (`install-profile-seam`); promoted 2026-08-09 at spec.
 - **init-lifecycle-agent-block-seeding** [spec: SPEC-agent-block.md] — the agent-block rule.
   This entry asked whether `init` should seed lifecycle-kit's agent-file block, and said deciding

@@ -107,9 +107,14 @@ below is what lets such a consumer opt out without re-copying the set.
   it, a consumer disagreeing with D1 has no move but to copy the default. Named
   on the house pattern already in this repo's own gate-sdk config,
   `GATE_SDK_LINT_EXTRA_DIRS`. Default empty, so no behavior changes for anyone
-  who does not set it. **design-bearing** — an additive-versus-replacing knob pair
-  is a config contract, and its interaction with the replacing knob has to be
-  specified rather than left to the reader.
+  who does not set it. It is registered as its own entry in
+  `gate-sdk/SPEC.md` §Layout and configuration's knob-roster paragraph, beside
+  `GATE_SDK_PRUNE_DIRS` and `GATE_SDK_LINT_EXTRA_DIRS` — every kit's SPEC.md owns
+  its knob roster and default values (CLAUDE.md §Conventions established in
+  gate-sdk), and a public knob with no roster entry is a defect the amendment
+  cannot see from inside itself. **design-bearing** — an additive-versus-replacing
+  knob pair is a config contract, and its interaction with the replacing knob has
+  to be specified rather than left to the reader.
 
 ## What this amendment deliberately does not do
 
@@ -176,7 +181,11 @@ existing default (D1). No new state, event, or message.
 Two further SPEC sites mention the knob (§Layout and configuration's default
 listing, and §check-graph's sanctioned-walk clause). The default listing carries
 the value and is updated by D2; the check-graph clause cites the knob by name
-without restating members and needs no edit.
+without restating members and needs no edit. `gate-sdk/SPEC.md` §Layout and
+configuration's knob-roster paragraph gains a new entry for D4's
+`GATE_SDK_PRUNE_EXTRA_DIRS` — a new public knob and not an edit to prose
+describing a prior flow, so it is named here rather than assumed covered by the
+`GATE_SDK_PRUNE_DIRS` default-listing update above, which is a different knob.
 
 No new field is added to any record or artifact, so the every-field-has-a-reader
 obligation is vacuous here rather than skipped.
@@ -192,8 +201,11 @@ obligation is vacuous here rather than skipped.
       because a basename matcher cannot match a slash. D4: an assertion in the
       same test that a set from `GATE_SDK_PRUNE_EXTRA_DIRS` appends to the default
       *and* to an explicit `GATE_SDK_PRUNE_DIRS`, which is the interaction D4's
-      contract turns on and the only one a single-knob test would miss. D2: no
-      oracle beyond the doc gates; stated as such rather than implied covered.
+      contract turns on and the only one a single-knob test would miss. D2 and
+      D4's roster-registration half: no oracle beyond the doc gates — verified
+      at authoring that `check-knob-citation` does not fill this gap (it flags a
+      knob *value* restated outside its owning SPEC, not a knob missing from it) —
+      stated as such rather than implied covered.
 - [ ] **The end-to-end witness, run once at build**: create a worktree under
       `.claude/worktrees/`, run the full battery, see 100 of 100 with it live.
       This is the defect's own reproduction and it is not a substitute for D3 —

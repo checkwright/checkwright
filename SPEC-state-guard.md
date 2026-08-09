@@ -170,10 +170,10 @@ resolution and the rule has no threshold.
   reader D7 has to reach, and the request is precisely to stop relying on it.
 
 **Existing integration prose describing the prior flow**: `guard-kit/SPEC.md`
-§The guard framework's consumer paragraph (D2) and its lib component contract,
-which lists the primitives and must list `guard_read_path` beside
+§The guard framework's consumer paragraph (D2) and its lib component contract
+(D1), which lists the primitives and must list `guard_read_path` beside
 `guard_read_command`; `guard-kit/README.md`'s guard roster if it enumerates the
-shipped guards; `lifecycle-kit/SPEC.md` §check-stage-evidence (D7).
+shipped guards (D3, the new guard); `lifecycle-kit/SPEC.md` §check-stage-evidence (D7).
 
 No new persistent field or record is created — the guard emits a verdict and keeps
 no state — so the every-field-has-a-reader obligation applies only to D1's read
