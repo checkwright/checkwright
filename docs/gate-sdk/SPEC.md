@@ -78,7 +78,14 @@ kit-seeded mermaid import — a consumer whose theme chrome links absolute URLs
 lists their prefixes here — see §check-graph), `GATE_SDK_CORE_FILES_FILE` (default
 `<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default
 `<gates-dir>/identity.conf`), `GATE_SDK_PRUNE_DIRS` (default
-`target .git node_modules .tmp gate-tests`), `GATE_SDK_GRAPH_VOCAB` (default
+`target .git node_modules .tmp gate-tests worktrees`; it **replaces** the default
+set rather than extending it — see §lib/gate.sh for the members' rationale),
+`GATE_SDK_PRUNE_EXTRA_DIRS` (default empty; space-separated directory basenames
+appended to the resolved prune set, whether that set came from the default or
+from `GATE_SDK_PRUNE_DIRS` — the additive counterpart that lets a consumer add a
+member without maintaining a copy of the kit default that drifts; *removing* a
+default member is still the replacing knob's job, because an append cannot
+subtract — see §lib/gate.sh), `GATE_SDK_GRAPH_VOCAB` (default
 `<gates-dir>/graph-vocab.sh`), `GATE_SDK_KIT_DIRS` (default: gate-sdk + its
 siblings holding a `checks/` or a `smoke/`), `GATE_SDK_ROOT` (default: the
 vendored `gate-sdk/` resolved beside the sourcing script — the root a
@@ -1656,7 +1663,7 @@ disambiguation of exit 2, which the contract deliberately leaves general.
 The family's single sourced library — values + adapters, never gate structure.
 It gives a gate author the fail-closed guard `fail_closed`, the walk adapters
 (`gate_find` / `GATE_GREP_EXCLUDES` / `gate_path_pruned` over the dirs
-`GATE_SDK_PRUNE_DIRS` names),
+`GATE_SDK_PRUNE_DIRS` names, plus whatever `GATE_SDK_PRUNE_EXTRA_DIRS` appends),
 the registry helpers that resolve a check consumer-first across kit dirs
 (`gate_resolve`, `gate_kit_roots` / `gate_kit_roots_rel`, `gate_check_dirs` —
 the multi-kit resolution path other kits' gates ride), and the `# graph:`
@@ -1664,6 +1671,26 @@ manifest readers (`gate_expand_couples` and its siblings §The `# graph:`
 manifest). How each derives its result lives in the source; the invariants a
 reader needs outlive the refactor that renames a helper:
 
+- **The prune set is one array, read by all three walk adapters**, which is why a
+  member added to it needs no per-gate edit. Its members are directories that are
+  never a consumer's source: third-party build and dependency output (`target`,
+  `node_modules`), git's own store (`.git`), this methodology's scratch (`.tmp`),
+  fixture corpora a gate must not judge as tree content (`gate-tests`), and
+  `worktrees` — the leaf under which an agent harness materializes a **second full
+  copy of the repo**. That copy is the reason the member is a kit default rather
+  than consumer config: every tree-walking gate descends into it, so a live
+  isolated dispatch reddens the battery with findings that name the session's own
+  files, and every consumer running isolated dispatch hits it identically. The
+  match is on the **leaf basename**, so `worktrees` selects that directory and
+  nothing else — the parent is not named and its siblings are not taken.
+  **The caveat a green battery cannot tell you**: pruning the parent instead also
+  passes, because that parent typically holds only markdown and JSON, which the
+  shell/Rust walk never collects — but the governed markdown surfaces under it are
+  read by *explicit globs* no prune touches, so the blunt variant loses coverage
+  silently rather than reddening. Prune the leaf. The same silence is the residual
+  risk of the member itself: a consumer whose own source lives under a directory
+  named `worktrees` (or `target`, or `.tmp`) loses coverage with no red, and
+  reaches for `GATE_SDK_PRUNE_DIRS` to restate the set without it.
 - The commit-surface value adapters (`gate_msg_pattern_files`,
   `gate_commit_types`) are the single home of the banned-pattern set and the
   commit-type roster, each documented at its gate (§check-commit-msg,
@@ -3029,7 +3056,10 @@ differs** — a shell parse for a `.sh` member, the substrate's own report for a
 `.gate` one. Two calibrations follow from what a binary does *not* report, and both
 err toward demanding more coverage rather than less. A reported root is filtered by
 the prune list exactly as a `gate_find` walk is, because the crate's single
-sanctioned walk prunes on the same `GATE_SDK_PRUNE_DIRS` knob (§lib/gate.sh). And
+sanctioned walk resolves its set from the same two knobs, `GATE_SDK_PRUNE_DIRS`
+and `GATE_SDK_PRUNE_EXTRA_DIRS` (§lib/gate.sh) — both, because a substrate
+honoring only one of an additive pair would scan a different tree than the shell
+for any consumer who set the other. And
 no literal `-name` primary is extractable from a binary, so the enumeration is
 unfiltered — the same answer the shell arm already gives a walk whose pattern is a
 variable. A ported gate therefore narrows by declaring a tighter root, never by

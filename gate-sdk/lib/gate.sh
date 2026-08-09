@@ -32,8 +32,11 @@ fail_closed() {
 if [[ -n "${GATE_SDK_PRUNE_DIRS:-}" ]]; then
     read -r -a GATE_PRUNE_DIRS <<<"$GATE_SDK_PRUNE_DIRS"
 else
-    GATE_PRUNE_DIRS=(target .git node_modules .tmp gate-tests)
+    GATE_PRUNE_DIRS=(target .git node_modules .tmp gate-tests worktrees)
 fi
+# spec: gate-sdk/SPEC.md §lib/gate.sh — GATE_SDK_PRUNE_EXTRA_DIRS appends to the resolved set whichever branch produced it, so a consumer adds one directory without copying the default
+for _gpx in ${GATE_SDK_PRUNE_EXTRA_DIRS:-}; do GATE_PRUNE_DIRS+=("$_gpx"); done
+unset _gpx
 
 gate_find() {
     local prune=() d

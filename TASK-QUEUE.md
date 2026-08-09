@@ -12,28 +12,6 @@
 
 ## New Features
 
-- **dispatch-worktree-reds-the-battery** [spec: SPEC-worktree-prune.md] — one word.
-  recurrence: dispatch-worktree-reds-the-battery 2026-08-08
-  A live agent worktree under `.claude/worktrees/` is a full second copy of the repo that every
-  tree-walking gate descends into, so the battery — the oracle every commit here requires — is
-  dark for the whole duration of a read-only fan-out. Attested four times, at build, close and
-  boundary stages alike, and unavoidable: the dispatch guard mandates the shape that causes it.
-  `SPEC-worktree-prune.md` refutes this entry's own stated blocker by measurement. With a real
-  worktree live the battery is 3 of 100 red; adding the basename `worktrees` to
-  `GATE_SDK_PRUNE_DIRS` makes it 100 of 100 with the worktree still live. The entry reasoned
-  that the prune could not name `.claude/worktrees` without taking `.claude/commands` and
-  `.claude/agents` too — true of the parent, but the prune matches the **leaf**, and `worktrees`
-  selects that directory and nothing else.
-  Pruning `.claude` also passes 100 of 100, which is the trap the amendment records: that
-  variant loses coverage silently rather than reddening, because the governed `.claude` markdown
-  surfaces are read by explicit globs no prune touches.
-  The real blocker was never named here: the knob **replaces** the default set with no additive
-  form, so consumer config cannot express "the default plus one" without maintaining a copy that
-  drifts. Hence four deltas — the default gains the member, the SPEC gains the reason and the
-  coverage caveat, `lib-gate.test.sh` gains the discriminating case, and a
-  `GATE_SDK_PRUNE_EXTRA_DIRS` append knob makes the placement ruling honest.
-  Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches;
-  promoted 2026-08-09 at spec.
 - **statusline-queue-section-counts** [spec: SPEC-queue-counts.md] — counters, one surface.
   Operator request: `TASK-QUEUE.md` section counts in the statusline as compact single-letter
   counters, the deferred one explicitly wanted.
@@ -4175,5 +4153,6 @@
 - prose-profile
 - install-queue-template-unreachable
 - init-lifecycle-agent-block-seeding
+- dispatch-worktree-reds-the-battery
 
 ## Lessons Learned

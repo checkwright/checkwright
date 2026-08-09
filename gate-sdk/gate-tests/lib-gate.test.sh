@@ -55,6 +55,30 @@ got="$(gate_find "$sandbox" -name '*.proto' | sed "s#^$sandbox/##" | sort | past
 [[ "$got" == 'a.proto,sub/b.proto' ]] \
     || { echo "  FAIL: gate_find returned '$got' (want 'a.proto,sub/b.proto')"; fails=$((fails + 1)); }
 
+# --- a live agent worktree is out of the walk -------------------------------
+# The default carries the leaf basename `worktrees`, not the path `.claude/worktrees`:
+# a basename matcher cannot match a slash, so the path spelling would silently
+# restore the second-copy-of-the-repo the member exists to exclude.
+mkdir -p "$sandbox/.claude/worktrees/agent-x" "$sandbox/.claude/commands"
+: >"$sandbox/.claude/worktrees/agent-x/f.proto"; : >"$sandbox/.claude/commands/g.proto"
+got="$(gate_find "$sandbox" -name '*.proto' | sed "s#^$sandbox/##" | sort | paste -sd, -)"
+[[ "$got" == '.claude/commands/g.proto,a.proto,sub/b.proto' ]] \
+    || { echo "  FAIL: worktree prune returned '$got' (want '.claude/commands/g.proto,a.proto,sub/b.proto')"; fails=$((fails + 1)); }
+
+# --- GATE_SDK_PRUNE_EXTRA_DIRS appends to whichever set was resolved ---------
+# Both branches, because the interaction with the replacing knob is the contract:
+# an implementation appending only to the default passes the first case alone.
+extra_probe() {
+    # shellcheck source=../lib/gate.sh
+    ( source "$DIR/lib/gate.sh"; printf '%s\n' "${GATE_PRUNE_DIRS[@]}" | paste -sd, - )
+}
+got="$(GATE_SDK_PRUNE_EXTRA_DIRS='vendor' extra_probe)"
+[[ ",$got," == *",target,"* && ",$got," == *",vendor,"* ]] \
+    || { echo "  FAIL: EXTRA_DIRS did not append to the default set (got '$got')"; fails=$((fails + 1)); }
+got="$(GATE_SDK_PRUNE_DIRS='only' GATE_SDK_PRUNE_EXTRA_DIRS='vendor' extra_probe)"
+[[ "$got" == 'only,vendor' ]] \
+    || { echo "  FAIL: EXTRA_DIRS did not append to an explicit PRUNE_DIRS (got '$got', want 'only,vendor')"; fails=$((fails + 1)); }
+
 # --- registry + resolution (gate-sdk additions) -------------------------------
 list="$sandbox/gates.list"
 printf '# comment\n\ncheck-one\ncheck-two\n' > "$list"
@@ -114,5 +138,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune; registry + resolution; .gate declaration/argv split + dispatch fail-closed)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed)"
 exit 0
