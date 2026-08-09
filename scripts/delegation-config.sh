@@ -24,8 +24,8 @@ DELEGATION_KIT_GATE_FILES=(
     "gate-sdk/bin/run-gate-tests.sh"
 )
 
-# comment-tier-exempt: the kit roots are auto-unioned by delegation.sh (a vendored kit's edits are meta-layer by definition), so only the non-kit prefixes are declared here
+# comment-tier-exempt: the kit roots are auto-unioned by delegation.sh (a vendored kit's edits are meta-layer by definition), so only the non-kit prefixes are declared here; native/ is declared explicitly because it ships no checks/ or smoke/ and so is never a kit root by gate_kit_roots's predicate, despite carrying ported gates' Rust implementations (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate, check-gate-tamper row)
 # shellcheck disable=SC2034  # consumed by delegation-kit/lib/delegation.sh after sourcing
 DELEGATION_KIT_META_PATHS=(
-    scripts/ .workflow/ .claude/ docs/ .github/
+    scripts/ .workflow/ .claude/ docs/ .github/ native/
 )

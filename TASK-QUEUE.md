@@ -60,28 +60,6 @@
 
 ## Technical Debt
 
-- **gate-tamper-roster-native-reach** — `check-gate-tamper`'s meta-layer roster does not
-  reach `native/`, so a commit editing a ported gate's implementation alongside any gate
-  file is **refused** and every port pays a two-commit sequencing tax.
-  **Promoted 2026-08-09 by operator ruling at this scope, narrowed to the roster half:**
-  `native/` joins `DELEGATION_KIT_META_PATHS`. The exemption-reader half is split out as
-  `gate-tamper-exemption-reader-substrate` and stays deferred.
-  **The entry's own cost premise was verified false at this scope and is corrected here
-  rather than left standing beside its correction.** It read "zero today (no live `.gate`
-  dispatch)", which rested on there being no live descriptor. Both first-cohort
-  descriptors are live and registered, so the tax is being paid **now** and once per
-  remaining port — this entry's own *worse per port* clause arriving, with 98 gates still
-  to port behind it.
-  Verified 2026-08-09: the roster is `scripts/delegation-config.sh`'s
-  `DELEGATION_KIT_META_PATHS` unioned with the kit roots; `native/` is in neither, and it
-  is not a kit root because it ships no `checks/` and no `smoke/`. gate-sdk/SPEC.md
-  §Meta-gate conservation for the binary substrate states the same limit independently in
-  its `check-gate-tamper` row.
-  **Debt rather than a feature by the new-names litmus:** it changes one consumer-config
-  array's value on a knob the specs already carry, and adds no name to a governed surface.
-  Filed 2026-08-02 at close from the gap inbox; found by build. Split from
-  `native-gate-meta-layer-reach` 2026-08-02 at scope; narrowed and promoted 2026-08-09.
-
 ## Deferred
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
@@ -4328,5 +4306,7 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- gate-tamper-roster-native-reach
 
 ## Lessons Learned
