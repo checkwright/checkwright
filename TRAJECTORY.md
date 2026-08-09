@@ -62,6 +62,17 @@ One authoring convention follows, and it is what makes the next application
 cheap: **a ruling able to name its own discharge event says so in its own
 text**, so the session that meets the event deletes rather than judges.
 
+**A retirement's blast radius is derived, never rostered**, and stating that here
+is what stops each retiring session re-discovering it. No surface owns a list of
+what cites this file and none should — a maintained roster would be one more copy
+to stale — so a retirement greps for its own citations. Two properties make the
+grep non-obvious enough to write down. `docs/` is a **generated mirror**, so every
+kit-SPEC citation appears twice and only the source is editable; regenerate rather
+than hand-edit the second. And a citation naming a surviving **section** still
+resolves after the ruling inside it is deleted, so the grep finds the pointer
+while no gate finds the staleness — the inbound half of the class, whose design
+lives in `ruling-record-condition-staleness-probe`.
+
 ## The objectives
 
 **Ruled 2026-08-03 by the operator as a project-trajectory pivot.** This
@@ -189,47 +200,6 @@ that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` a
 `v1.0.0` reopens it rather than inheriting it. Nothing here narrows the operator
 direction trigger, which remains available for exactly the urgent case this
 paragraph declines to automate.
-
-**`install-profile-seam` cuts four units, and the sizing objection was heard and
-declined — ruled 2026-08-08 by the operator.** The directive was undirected, so
-the theme is the cut rather than an input to it. In build order:
-
-1. `profile-keyed-install`.
-2. `kit-owned-install-recipe`.
-3. `lock-own-file-narrowed-profile-drift`.
-4. `trajectory-prune-on-completion` — the operator's own widening of the cut,
-   ruled after the first three.
-
-The theme is the installer's profile and roster seam, which is where both
-remaining steps of the PRIORITY DIRECTIVE below stall. `prose-profile` is what
-the sequence names next, and its own entry sizes it at two to three iterations
-with profile-keyed install as the first. Unit 1 is that slice and nothing more:
-it ships no prose profile and no prose gate cohort.
-
-**The declined objection is the half worth recording.** Scope offered a
-two-unit cut on the grounds that units 1 and 2 are both large. The operator took
-all three of scope's units: option (b) was on the table and was not chosen, so
-**the double rewrite of `recipe.sh`'s roster layer is the cost being bought
-out**, deliberately. Unit 2 re-owns the same per-kit roster that unit 1 must
-make profile-aware, and building them apart means designing that seam twice.
-
-**Scope promoted none of units 1–3, and unit 3 is the reason worth stating.**
-Units 1 and 2 are features by the new-names litmus, so `spec` authors their
-amendments and pairs them in. Unit 3 was ruled in *as debt* and scope attempted
-the promotion — `check-amendment-queue` refused it, because the entry carries
-`[design-pending]` and that tag may not enter the active queue. The gate is right
-and the refusal was resolved at its source rather than overridden: an entry whose
-design is unsettled is not promotable, so unit 3 reaches `spec` with the other
-two. `spec` ruled it **debt**, and that ruling and its grounds live in its own
-queue entry.
-
-**The honest limit.** The cut's ordering is argued from entry text and one
-re-verified premise, not from a build. Unit 2's own entry prices itself at
-roughly nine new scripts, eleven smoke rewrites, a `gate-sdk/SPEC.md` contract
-section and a gate with a fixture pair.
-
-**This ruling names its own discharge event: `install-profile-seam`'s close.**
-That close deletes it here, without re-deriving the judgment.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
