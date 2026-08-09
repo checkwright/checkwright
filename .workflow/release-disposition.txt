@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+install-profile-seam release deferred:v0.23.0 — the cadence criteria decide this, not judgment: the newest tag v0.22.0 is two days old against a seven-day floor, and the batch carries no decommission, no security or supply-chain fix and no operator direction, so no trigger fires. A minor is earned — check-install-disposition joins check-gap-inbox-neutrality on the tightened-gates surface, two accumulated declarations since the tag — so the deferral floors the next qualifying note at v0.23.0, joining the adopter-floor-integrity and installer-lifecycle-verbs deferrals already outstanding at that version rather than raising it. check-release-bump confirms v0.22.0 still holds the derivable floor and already inherits v0.23.0 as the outstanding deferral. Three iterations now batch into one note.

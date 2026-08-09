@@ -3735,6 +3735,20 @@
   is therefore a shipped instance rather than a hypothetical, and this close's `survey-engagement`
   audit was answerable and passed on it. What stays open is that nothing *required* it: the audit
   is unanswerable again the moment a survey omits the sums.
+  **That moment arrived at the very next iteration, 2026-08-09 — the entry predicted its own
+  recurrence and the prediction held one iteration later.** `install-profile-seam`'s scope ran
+  three surveys; the ranking one ("Which Deferred entries cluster onto a shared surface and
+  mechanism") censused 129 Deferred entries and produced the seven-cluster ranking the cut was
+  argued from, naming `bin/queue-index.sh` as its oracle and **not** `queue-edges.sh`. Its
+  counter-evidence work is entirely premise-falsification (it lists five stale premises); no
+  inbound sum appears for any candidate. So `survey-engagement` was answerable in one
+  iteration and unanswerable in the next, on the same roster line, with nothing changed but
+  the survey — which is the strongest available argument that the requirement is real and the
+  residue is not. **No `recurrence:` date is stamped, and the decline is deliberate:** this
+  was observed by a rostered close audit rather than through the gap-inbox capture channel,
+  and whether such an observation may stamp directly is the open question
+  `recurrence-drain-input-widening` holds. Attested here as prose, consistently with the two
+  other out-of-channel recurrences that close recorded the same way.
   **Why `[design-pending]`:** the cheap fix — have the survey cite its edge sums — risks
   becoming ceremony, a stage writing down that it did the thing rather than doing it. The
   honest alternatives are a survey artifact the sum lands in, folding the sum into the existing
@@ -4226,11 +4240,5 @@
 - **capture-affordance-help-flag** [design-pending] — file-gap.sh files --help as a gap.
 
 ## Done
-
-- lock-own-file-narrowed-profile-drift
-- profile-keyed-install
-- kit-owned-install-recipe
-- stage-economics-log-multi-session-undercount
-- trajectory-prune-on-completion
 
 ## Lessons Learned
