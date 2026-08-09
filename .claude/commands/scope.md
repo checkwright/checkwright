@@ -21,8 +21,8 @@ disposable scratch (CLAUDE.md §Housekeeping — persistent trends live in
 **ritual** — read `BRIEF.local.md` (local-only brief) and the tracked ruling
 record this survey ranks against, TRAJECTORY.md §The objectives plus
 TRAJECTORY.md §The closed rulings and its sequence directive; **a recorded
-operator ruling is closed — re-verify facts, never rulings; only the operator
-reopens one.** Then run the GitHub
+operator ruling is closed — never re-litigate one; only the operator reopens
+one.** Then run the GitHub
 boundary sweep (below); decide the unit's
 layout, config surface, and worklist; name the iteration after the unit. Hold
 the provenance seam per CLAUDE.md §The provenance seam (never cross it) and

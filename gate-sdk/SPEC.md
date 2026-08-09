@@ -905,9 +905,9 @@ cohort cheap — the walk is ported once and proved N times, and the parity
 comparison is over one corpus shape rather than N. Selecting by kit, by profile,
 or by whatever is easiest next all re-import work this cohort only paid once. Two
 standing bounds the criteria do not carry: **criterion 4 is not relaxed** —
-TRAJECTORY.md refuses that for the first cohort with a named re-entry condition
-(the criterion-clearing corpus exhausted *and* the parity oracle held off the
-shell substrate), and neither holds; and **criterion 7 binds** — a gate whose
+TRAJECTORY.md admits relaxing it only on a named condition, both halves of which
+must hold (the criterion-clearing corpus exhausted *and* the parity oracle held
+off the shell substrate), and neither does; and **criterion 7 binds** — a gate whose
 rule shells out to anything but git is out until its dependency is designed away,
 never ported and patched later.
 
@@ -1036,8 +1036,8 @@ compression once.
 **Dogfooding is ruled, not deferred: this repo runs built artifacts.** It is
 recorded here rather than left to the first live port because making a compiled
 toolchain a precondition of this repo's own battery is a change to what the
-contract *means*, and settling one in code first is the move
-`init-claim-stickiness` ruled against (TRAJECTORY.md §The closed rulings). Both
+contract *means*, and a contract change settled by implementation is settled in
+the wrong place. Both
 halves hold at once — a port is what *determines* the answer, and the answer is
 written down before the port lands.
 

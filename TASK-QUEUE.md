@@ -12,35 +12,6 @@
 
 ## New Features
 
-- **trajectory-prune-on-completion** [spec: SPEC-ruling-record-prune.md] — the record
-  keeps only what still directs.
-  `TRAJECTORY.md`'s header gains the completion-time half of its own contract — two
-  triggers, and they are the whole rule: a ruling whose subject is finished is deleted
-  outright, and a fact that has aged is corrected where it stands rather than appended to.
-  Retirement is distinguished from reversal, which stays operator-class and unchanged, and
-  the authority to retire is made symmetric with the authority to record: neither decides
-  anything.
-  **The append-never-strike precedent is retired for resting on a false ground.** It holds
-  that striking a clause destroys the evidence of what was believed; the record refutes
-  itself on that within one section, since its own pruning ruling holds that git history
-  carries obsolete changes and the motivation behind them. No competing interest is
-  outweighed, because none was at risk.
-  **The disposition roster is the design and it is in the amendment**, ruling-by-ruling:
-  nine keep, one of them corrected in place, the rest deleted on verified tree facts.
-  This iteration's own cut record is a keep — corrected for the operator's widening to
-  four units, and given an explicit discharge event so this iteration's close deletes it
-  without re-deriving the judgment. `§PRIORITY DIRECTIVE`'s four discharged steps go while
-  three standing rules attached to them survive the renumbering.
-  **Enforcement rides an existing gate, not a new one.** `check-manifest-temporal` already
-  scans the record and its invariant is this ruling's ground verbatim; canon-kit gains a
-  `_EXTRA` merge on its marker set, following the convention two of its arrays already
-  use, and this repo configures the four idioms — measured at zero hits outside
-  `TRAJECTORY.md` across all governed manifests. The limit is stated rather than papered
-  over: it holds the idiom, not the act.
-  Promoted 2026-08-08 by spec, fourth in the operator's `install-profile-seam` cut — the
-  operator's own widening. Complementary to `ruling-record-condition-staleness-probe`,
-  which keeps the machine-readable declaration.
-
 ## Technical Debt
 
 ## Deferred
@@ -242,10 +213,10 @@
   out on record — if pursued, this is an adapter/profile delivered as
   optional consumer config, never a kit literal (the provenance seam).
   **No longer demand-gated — retagged `next` 2026-08-08 by operator ruling at the
-  `adopter-floor-integrity` scope.** The 2026-08-03 trajectory pivot made this
-  step 5 of TRAJECTORY.md §PRIORITY DIRECTIVE and "the **earliest
-  external-install channel** … not post-launch polish", and step 4 closed as
-  `installer-lifecycle-verbs`. The `later` horizon it carried until now asserts
+  `adopter-floor-integrity` scope.** The 2026-08-03 trajectory pivot makes this
+  the step TRAJECTORY.md §PRIORITY DIRECTIVE names next and "the **earliest
+  external-install channel** … not post-launch polish", with everything ahead of
+  it discharged. The `later` horizon it carried until now asserts
   the opposite — ROADMAP.md defines `later` as demand-gated with "the sequencing
   … not" written down — so the tag contradicted a ruling rather than recording
   one. Seeds:
@@ -4104,5 +4075,6 @@
 - profile-keyed-install
 - kit-owned-install-recipe
 - stage-economics-log-multi-session-undercount
+- trajectory-prune-on-completion
 
 ## Lessons Learned

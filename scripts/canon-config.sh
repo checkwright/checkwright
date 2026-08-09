@@ -41,6 +41,15 @@ CANON_KIT_MANIFEST_FILES=(
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_TEMPORAL_EXEMPT_PATHS=("docs/posts/*")
 
+# comment-tier-exempt: this repo's ruling-record idiom, extending the bundled marker set rather than replacing it — a spelling of one project's ruling-record dialect is consumer config for the same provenance-seam reason the transport and payload-disclosure vocabularies below are; the first three catch the appended-correction shape TRAJECTORY.md's completion-time contract retires, and the fourth catches a ruling labelled finished and kept as a fixture, which is the failure that contract exists to end; the broader 'is spent' was measured safe and narrowed anyway, because a marker that constrains how the rule itself may be written is a marker that will be valved
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_TEMPORAL_MARKERS_EXTRA=(
+    "correction appended"
+    "stands unstruck"
+    "when written"
+    "the ruling is spent"
+)
+
 # comment-tier-exempt: reserve/ is the crates.io name-reservation placeholder, not developed in (CLAUDE.md §Housekeeping) — its lib.rs carries the registry blurb crates.io renders, which is the file's whole purpose and answers to no SPEC section
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_COMMENT_WHITELIST=("reserve/*")

@@ -280,7 +280,8 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   This repo sets `("*/templates/*.md" ".claude/agents/*.md")`.
   `CANON_KIT_TEMPORAL_MARKERS` — the temporal-narration marker set scanned by
   `check-manifest-temporal`, default a generic-English list (`previously`,
-  `formerly`, `renamed from`, …), matched case-insensitively;
+  `formerly`, `renamed from`, …), matched case-insensitively and extended
+  through `CANON_KIT_TEMPORAL_MARKERS_EXTRA` under the `_EXTRA` semantics below;
   `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` — array of heading names whose whole
   section is exempt, default empty (this repo sets `Out of scope`).
 - `CANON_KIT_MDREF_EXCLUDE` — array of globs, default empty: manifest-set docs
@@ -350,10 +351,12 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   phrases matched case-insensitively, default a bundled generic-English set
   (`It's worth noting`, `That said`, …); `CANON_KIT_PROSE_TELL_ABBR_ALLOW` —
   array of abbreviations exempt from the undefined-abbreviation tell, default a
-  bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends either
-  array with its own vocabulary through the matching `_EXTRA` knob —
-  `CANON_KIT_PROSE_TELL_PHRASES_EXTRA` and
-  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA`, both default empty — which the lib
+  bundled universal set (`API`, `CLI`, `URL`, …). A consumer extends any
+  bundled vocabulary — these two and `CANON_KIT_TEMPORAL_MARKERS` above — with
+  its own through the matching `_EXTRA` knob:
+  `CANON_KIT_PROSE_TELL_PHRASES_EXTRA`,
+  `CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA` and
+  `CANON_KIT_TEMPORAL_MARKERS_EXTRA`, all default empty, which the lib
   unions onto the base after the base defaults resolve: the effective set is
   base plus extra. Extension therefore costs one token, never a restatement of
   the bundled default that would silently diverge from it. Assigning a base
@@ -561,7 +564,9 @@ narration-marker KPI is superseded by this gate (drift-kit/SPEC.md
 The scanned set is the shared `spec_manifest_files` finder (§lib/spec.sh):
 canonical specs, `README.md` at any depth, and `CLAUDE.md`; amendments are
 excluded by construction (a transition artifact describes change — that is its
-nature). Markers are `CANON_KIT_TEMPORAL_MARKERS`, matched case-insensitively;
+nature). Markers are `CANON_KIT_TEMPORAL_MARKERS`, the base array merged with
+`CANON_KIT_TEMPORAL_MARKERS_EXTRA` (§Layout and configuration), matched
+case-insensitively;
 fenced code blocks are skipped and a marker inside an inline-code span is a
 meta-reference, not narration — so a gate-output example or this section's own
 vocabulary may name one. Three valves suppress a legitimately past line: a
