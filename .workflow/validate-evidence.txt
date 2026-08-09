@@ -17,9 +17,9 @@ install-profile-seam budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d2
 install-profile-seam dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
 install-profile-seam trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
 install-profile-seam demo sha256=0d896f322e18edcf65dafb4d9f87e04d0d427c42fc5625e9f3f6e1263bc066bc pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
-install-profile-seam installer_smoke sha256=60cac3022b91c3783a1455264b635c6eac95c817ad3eb112606a7ddc71b0830a pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-09
 install-profile-seam consumer_smoke sha256=467205ab886b8d5aa04887d6c11b95004e710ef72be1e82207f1a1ba3592c37c pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
 install-profile-seam upgrade sha256=20a8f03498a646487a104ffd6c23b9fdad9e29b7eb9a3a767a47930b733d89b9 pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
 install-profile-seam agents_md_smoke sha256=0ea13cefacd6765762d5b16b768792c64f5cbd8e41f5be66d8a8e6b92888d458 pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
 install-profile-seam index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
 install-profile-seam native_crate sha256=867752e26a060cb79bdf02afb3e7b140b7db3a988c8e964e59736f292733bf41 pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
+install-profile-seam installer_smoke sha256=b7b0b370ec7f81a47920421bae02377a501308d587576f7b3a98f1882868136c pass=1 fail=0 ignore=0 verdict=clean 2026-08-09
