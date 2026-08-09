@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-port-cadence
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,28 @@
 ## New Features
 
 ## Technical Debt
+
+- **gate-tamper-roster-native-reach** — `check-gate-tamper`'s meta-layer roster does not
+  reach `native/`, so a commit editing a ported gate's implementation alongside any gate
+  file is **refused** and every port pays a two-commit sequencing tax.
+  **Promoted 2026-08-09 by operator ruling at this scope, narrowed to the roster half:**
+  `native/` joins `DELEGATION_KIT_META_PATHS`. The exemption-reader half is split out as
+  `gate-tamper-exemption-reader-substrate` and stays deferred.
+  **The entry's own cost premise was verified false at this scope and is corrected here
+  rather than left standing beside its correction.** It read "zero today (no live `.gate`
+  dispatch)", which rested on there being no live descriptor. Both first-cohort
+  descriptors are live and registered, so the tax is being paid **now** and once per
+  remaining port — this entry's own *worse per port* clause arriving, with 98 gates still
+  to port behind it.
+  Verified 2026-08-09: the roster is `scripts/delegation-config.sh`'s
+  `DELEGATION_KIT_META_PATHS` unioned with the kit roots; `native/` is in neither, and it
+  is not a kit root because it ships no `checks/` and no `smoke/`. gate-sdk/SPEC.md
+  §Meta-gate conservation for the binary substrate states the same limit independently in
+  its `check-gate-tamper` row.
+  **Debt rather than a feature by the new-names litmus:** it changes one consumer-config
+  array's value on a knob the specs already carry, and adds no name to a governed surface.
+  Filed 2026-08-02 at close from the gap inbox; found by build. Split from
+  `native-gate-meta-layer-reach` 2026-08-02 at scope; narrowed and promoted 2026-08-09.
 
 ## Deferred
 
@@ -2203,32 +2225,25 @@
   evidence-submission mechanism and it was declined in favour of boxed entries; this
   narrower shape is the ground for revisiting that ruling.
 
-- **gate-tamper-roster-native-reach** [design-pending] — `check-gate-tamper` does not
-  reach a ported gate's implementation. Split 2026-08-02 at scope from
-  `native-gate-meta-layer-reach` by operator ruling, when that entry narrowed to its
-  `check-reads-couples` half; this is the tamper half, unchanged in substance.
-  **The roster excludes `native/`,** so a commit editing a ported gate's
-  implementation alongside any gate file is **refused**. Discovered at commit time
-  during `native-gate-dispatch-seam` build: the crate and a gate widening could not
-  land together. Slice 1 sequenced around it — implementation in one commit,
-  descriptor in another — and the conservation table records it, but the constraint
-  gets *worse per port*, because the natural unit "edit the gate's rule and its
-  declaration together" is precisely what the roster forbids. Verified 2026-08-02 at
-  scope: the roster is `scripts/delegation-config.sh`'s `DELEGATION_KIT_META_PATHS`
-  unioned with the kit roots, and `native/` is in neither. Same gate, second hole:
-  `extract_exemptions()` parses a shell `# exception-list:` array literal and has no
-  implementation-side equivalent.
+- **gate-tamper-exemption-reader-substrate** [design-pending] — `check-gate-tamper`'s
+  exemption reader has no implementation-side equivalent.
+  Split 2026-08-09 at scope by operator ruling from `gate-tamper-roster-native-reach`,
+  when that entry narrowed to its meta-path-roster half and promoted; this is the
+  exemption half, unchanged in substance. That entry was itself split 2026-08-02 from
+  `native-gate-meta-layer-reach`, so this is the second narrowing of one original gap.
+  `extract_exemptions()` parses a shell `# exception-list:` array literal, so a ported
+  gate's Rust module can carry no exemption the gate is able to read.
   **Why `[design-pending]`:** it wants the ruling `gate-authoring-sdk-surface` holds
   — whether a meta-gate reads a substrate-neutral descriptor or learns each
   substrate — and that entry is horizon-set to ecosystem work, so this one waits.
-  **Why it did not ride the narrowing:** it is commit ergonomics, not a correctness
-  block. gate-sdk/SPEC.md §Porting a gate to the binary substrate names only the
-  `check-reads-couples` half as a second-port prerequisite; this half was sequenced
-  around once already and can be again.
-  **Cost while deferred:** zero today (no live `.gate` dispatch); from the second
-  port on, the natural commit unit is forbidden and every port pays the same
-  two-commit sequencing tax.
-  Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-02
+  **The coupling was checked at the split rather than inherited.** It is true of this
+  half and was not true of the roster half: which paths a tamper roster covers is
+  configuration, where how a meta-gate reads an exemption across substrates is exactly
+  the substrate-neutrality question the SDK entry holds.
+  **Cost while deferred:** zero until a ported gate needs an exemption; no first-cohort
+  member carries an exemption list, which gate-sdk/SPEC.md §Meta-gate conservation for
+  the binary substrate records in its `check-gate-tamper` row.
+  Filed 2026-08-02 at close from the gap inbox; found by build. Split out 2026-08-09
   at scope.
 
 - **gate-timing-baseline-comparability** [design-pending] — a baseline with no
@@ -2823,6 +2838,14 @@
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a
   single-iteration delta; scope owns the decomposition, and the criterion-4 relaxation question
   the prior scoping left open is subsumed by a ruling that ports everything.
+  **The next cohort is ruled — cohort A, 2026-08-09 by the operator at this scope**, off the
+  census filed at this boundary: the ten-member `spec_manifest_files` family in canon-kit, which
+  is what §The first cohort's literal selector picks. The three shared pieces it owes —
+  basename-glob list matching beside the crate's extension filter, a Rust `gate_kit_roots`, and
+  a criterion-6 default-parity discharge against `canon-kit/lib/spec.sh` — are **inside this
+  unit's envelope**, as the fixed cost the ten-way reuse amortizes rather than a separable
+  earlier unit. The member list, the seven-member runner-up cohort, and the criterion-7
+  blockers the SPEC does not name are in the survey record; read it rather than re-deriving it.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception.
 
@@ -3566,12 +3589,20 @@
   six calls granted only by the overlay. A fresh clone that installs the hooks therefore prompts
   on the command the hook effectively requires, and the grant that makes the tree workable is
   the one thing a clone does not receive.
-  **Why `[design-pending]`:** widening the committed allowlist is the consumer's call, not a
-  session's (guard-kit/SPEC.md §The triage criterion), and the honest options differ in breadth —
-  a glob over all `cargo build`, an exact grant of the one manifest-pinned command, or routing
-  the build through a tracked `bin/` script that is granted by path like every other kit tool.
+  **Shape ruled 2026-08-09 by the operator at this scope**, closing the open choice: route the
+  build through a **tracked `bin/` script granted by path**, like every other kit tool. The
+  glob over all `cargo build` and the exact grant of the one manifest-pinned command are both
+  refused — the glob is the widest grant for the least thought, and the exact command is
+  brittle against a manifest path that moves.
+  **Re-triaged at that scope: this is a feature, not debt.** The ruled shape adds a new script,
+  which is a name on a governed surface, so the new-names litmus makes it feature work however
+  small the diff. Its amendment is the `spec` stage's to author, and it is promoted by the
+  pairing that amendment carries rather than by scope.
+  Premise re-verified 2026-08-09: still no `cargo` grant in the committed
+  `.claude/settings.json`, and the three grants sit only in the gitignored overlay.
   **Cost while deferred:** the friction lands hardest on a first-time contributor, who meets it
-  before any of the tooling that would explain it.
+  before any of the tooling that would explain it — and the port track is about to make this
+  the most-run command in the tree.
   Filed 2026-08-07 by close, from its own prompt-friction triage.
 
 - **align-checklist-fanout-calibration** [design-pending] — align converges at zero divergence
