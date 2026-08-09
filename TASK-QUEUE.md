@@ -3811,13 +3811,14 @@
   qualifying note, and nothing carries them. A deferral therefore drops them unless a later
   session reconstructs them from `git log`.
   **Already live, twice.** `installer-lifecycle-verbs` deferred on a minor earned by behavior
-  changes alone — its tightened-gates surface was empty — so its declaration exists only in the
-  basis clause of its disposition line. This close defers again with five behavior changes and
-  one tightened gate; the composed bullets are carried below so the next qualifying note
-  inherits them from a committed surface rather than from session memory.
-  **The carried Behavior-changes declarations, composed 2026-08-08.** One paragraph per bullet;
-  each opens on the changed surface's name, which the composing session bolds as the lead token
-  the grammar docs/install.md §The upgrade contract owns.
+  changes alone, so its declaration exists only in the basis clause of its disposition line.
+  The 2026-08-08 close deferred again with five behavior changes; its bullets are carried below
+  so the next qualifying note inherits them from a committed surface, not from session memory.
+  **The carried declarations, composed 2026-08-08**, to the grammar docs/install.md §The upgrade
+  contract owns. **2026-08-09: the carrier hit `check-queue-entry-budget`'s cap** — this entry's
+  own predicted failure arriving as a hard stop rather than a slow loss. A third deferral's
+  declarations could not land here at all and ride its disposition line's basis instead, which
+  is the second alternative below, chosen by the cap rather than by design.
   *`lifecycle-kit/bin/file-gap.sh`* — the slug matcher no longer writes a verdict onto the
   bullet it files. Every filing gets one bullet shape; on a match the tool raises a stderr
   advisory *asking* the filer to say in the prose whether the bullet re-files the named entry or
@@ -4273,12 +4274,5 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- prose-profile
-- install-queue-template-unreachable
-- init-lifecycle-agent-block-seeding
-- dispatch-worktree-reds-the-battery
-- statusline-queue-section-counts
-- workflow-state-direct-edit-guard
 
 ## Lessons Learned
