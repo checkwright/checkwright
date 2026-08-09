@@ -159,6 +159,7 @@ leaves its section absent.
 | (consumer) | scripts/bash-guard.sh | Bash |
 | (consumer) | scripts/agent-budget-guard.sh | Agent |
 | (consumer) | scripts/agent-dispatch-guard.sh | Agent |
+| (consumer) | scripts/workflow-state-guard.sh | Write\|Edit |
 
 ## Session warnings
 

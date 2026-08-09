@@ -97,7 +97,15 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    driver needs no such step). `check-merge-attrs` (step 1) holds the block in
    parity with the derived supersede and union sets.
 
-5. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
+5. Optional — narrow the hand-edit window: copy
+   `templates/workflow-state-guard.sh` into your gates dir and register it as a
+   `PreToolUse(Write|Edit)` hook (guard-kit's `templates/settings-hooks.json`
+   carries the block). It refuses an agent write to the stage-stamp file, whose
+   only sanctioned writer is `bin/enter-stage.sh` — the gates that would catch a
+   hand-stamp all fire at commit, and an uncommitted one moves the cursor for a
+   whole session (SPEC.md §check-stage-evidence). Requires guard-kit vendored.
+
+6. Optional — reshape the machine: copy `templates/lifecycle-config.sh` into
    your gates dir and override stages, predecessors, drain/audit stages,
    section names, or file paths. Defaults are this repo's own lifecycle.
 

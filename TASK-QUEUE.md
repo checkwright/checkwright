@@ -12,27 +12,6 @@
 
 ## New Features
 
-- **workflow-state-direct-edit-guard** [spec: SPEC-state-guard.md] — the uncommitted window.
-  An uncommitted hand-edit to `.workflow/WORKFLOW-STATE.txt` moves the stage cursor for a whole
-  session, while every gate that would catch it fires only at commit. This entry's four findings
-  stand; it was held for design on two unsettled points, and `SPEC-state-guard.md` resolves
-  both from the governing specs rather than by preference.
-  **Ownership**: guard-kit's SPEC has already broken this tie for its own consumers — the kit
-  owning the *rule* ships the guard and rides `lib/guard.sh`, and guard-kit mechanism moves only
-  where the lib lacks a primitive. So lifecycle-kit ships the guard as the framework's fourth
-  consumer, and guard-kit moves by exactly one clause: `guard_read_command` reads
-  `.tool_input.command`, and a Write/Edit call carries `.tool_input.file_path`.
-  **The settings surface is not pinned**, contrary to this entry: the pin roster carries two
-  memory keys and never reads `.hooks`. What governs the block is a derivation — the enforcement
-  map reads `.hooks.PreToolUse` to emit its Guards section and the value rollup joins that page
-  — so registering the hook reds two freshness gates until both projections regenerate. That is
-  a build instruction where "pinned" would have said do-not-touch.
-  Seven deltas, and the amendment is cross-component: guard-kit, lifecycle-kit, and the repo's
-  harness settings plus two generated projections.
-  Surfaced 2026-07-31 by the close-entry refusal the same day, where `enter-stage`'s own refusal
-  text openly offered a deliberate hand-stamp and the session declined on judgment alone — which
-  is what this request wants to stop relying on; promoted 2026-08-09 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -4136,5 +4115,6 @@
 - init-lifecycle-agent-block-seeding
 - dispatch-worktree-reds-the-battery
 - statusline-queue-section-counts
+- workflow-state-direct-edit-guard
 
 ## Lessons Learned

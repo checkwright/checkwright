@@ -1498,6 +1498,37 @@ evidence manifest (a suite verdict per line) and, via the optional
 `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` integration, couples a close entry to
 the full green block.
 
+**The uncommitted window, and what closes it.** This gate — and every other one
+that would catch a hand-written stamp — fires at *commit*. The cursor, though, is
+the working tree's last stamp, and every reader reads the working tree. So a
+session that hand-edits the state file and simply never commits moves the stage
+cursor for its entire life and is caught by nothing. Content-based detection
+cannot help: a hand-written stamp is byte-identical to `bin/enter-stage.sh`'s by
+design.
+
+`templates/workflow-state-guard.sh` closes the part of that window an agent
+tooling actually passes through. It is a `PreToolUse(Write|Edit)` hook (register
+it on the alternation matcher; guard-kit's wiring template carries the block) that
+refuses a write whose target **resolves** to the state file, naming
+`bin/enter-stage.sh` as the sanctioned writer. Resolved, not textual: an absolute
+path, a `./` prefix and a route through a symlinked directory are one file, and a
+textual comparison catches only the spelling it was written against. It reads the
+path through guard-kit's `guard_read_path` and rides `lib/guard.sh` on the
+`GUARD_KIT_LIB` indirection, so lifecycle-kit ships the rule and guard-kit ships
+the mechanism (guard-kit/SPEC.md §The guard framework). The
+`GATE_SDK_WORKFLOW_DIR` indirection is honored, so a consumer who relocated the
+workflow directory gets a guard that follows it. No knob is added: there is no
+value to configure.
+
+The residual is stated because an unstated residual reads as a closed hole. The
+guard reaches agent `Write`/`Edit` tool calls and nothing else — not a `Bash`
+redirect, not `--no-verify` at the commit that would have caught the result, not a
+human editing the file outside the agent tooling, and not any future writer that
+is not one of those tool calls. It narrows the window to the writers the harness
+routes through a hook; it does not close it. And it is inert until wired: shipping
+the template without the settings block yields a file that enforces nothing while
+looking like it does.
+
 ### check-stage-entry
 
 Invariant: the stage being *entered* re-verifies its prior stage's static

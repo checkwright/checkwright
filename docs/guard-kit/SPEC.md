@@ -77,6 +77,14 @@ Primitives a consumer guard composes; each emits the harness's
 - `guard_read_command` — parse the hook JSON on stdin, emit the command;
   **fail-open** on any parse problem (exit 0) so a guard can never wedge
   the agent.
+- `guard_read_path` — the same accessor for `.tool_input.file_path`, the field a
+  path-bearing tool call carries where a Bash call carries a command. It returns
+  **non-zero, emitting nothing**, when the field is absent, empty, or the payload
+  will not parse — so a matcher covering a call without one falls through instead
+  of blocking. That return contract is the whole design: an accessor returning
+  success on a missing field passes every happy path and wedges every other call
+  its matcher covers. Generic over any path-bearing tool; it names no path and no
+  rule, which is what keeps the rule in the kit that owns the file.
 - `guard_block <msg>` — exit 2 with the message on stderr. Every block
   message is self-describing: it names the offending pattern *and* the
   corrective form, so the why of a rule rides to the agent in the rejection
@@ -130,6 +138,18 @@ otherwise — cite-only; no guard-kit mechanism moves for it.
 dispatch-shape rules; guard-kit mechanism **does** move for that one, by
 exactly one clause — the fail-open-but-loud posture above, which it is the
 shipped instance of (delegation-kit/SPEC.md §The delegation model).
+
+lifecycle-kit is the fourth consumer, on the same axis: its
+`templates/workflow-state-guard.sh` is a `PreToolUse(Write|Edit)` hook refusing a
+direct write to the lifecycle state file, and guard-kit mechanism **does** move
+for it, again by exactly one clause — `guard_read_path` above. Nothing else was
+missing: `guard_block` and `guard_advise` never read a command, so they were
+already tool-agnostic. This is the rule the three consumers now make explicit —
+**the kit owning the rule ships the guard**, riding `lib/guard.sh` through the
+`GUARD_KIT_LIB` indirection, and guard-kit moves only where the lib lacks a
+primitive. The state file's path lives with lifecycle-kit, never here, so
+guard-kit gains no dependency on a kit it does not otherwise know about
+(lifecycle-kit/SPEC.md §check-stage-evidence).
 
 ## Consumer rules
 

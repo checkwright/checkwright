@@ -163,6 +163,15 @@
             "command": "bash scripts/agent-dispatch-guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/workflow-state-guard.sh"
+          }
+        ]
       }
     ]
   }

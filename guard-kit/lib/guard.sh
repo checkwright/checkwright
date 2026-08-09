@@ -38,6 +38,15 @@ guard_read_command() {
     printf '%s' "$cmd"
 }
 
+# spec: guard-kit/SPEC.md §The guard framework — the path counterpart of guard_read_command; a call carrying no file_path returns non-zero so a matcher covering it falls through instead of blocking
+guard_read_path() {
+    local input path
+    input="$(cat 2>/dev/null)" || return 1
+    path="$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)" || return 1
+    [[ -z "$path" ]] && return 1
+    printf '%s' "$path"
+}
+
 guard_block() {
     printf '%s\n' "${GUARD_NAME:-guard}: $1" >&2
     exit 2

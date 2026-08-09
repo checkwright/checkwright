@@ -3163,7 +3163,11 @@ from the same name-resolution walk the runner uses (a consumer-dir gate groups
 as the consumer's); **advisory KPIs** from the drift-kit `kpis.list` registry
 (`DRIFT_KIT_KPIS_FILE`); **guards** and **session warnings** from the
 `PreToolUse` / `SessionStart` command hooks in the tracked harness settings file
-(`CONTEXT_KIT_SETTINGS_FILE`, parsed with `jq`); **validate suites** from
+(`CONTEXT_KIT_SETTINGS_FILE`, parsed with `jq`) — a guard row's *intercepts* cell
+carries the harness matcher verbatim, so its `|` alternation is escaped on the way
+into the table, a case a freshness gate can never report because it compares the
+emitter against the page and both would carry the same broken row; **validate
+suites** from
 evidence-kit's suite config (`EVIDENCE_KIT_CONFIG_FILE`); and **monitors** — the
 one class with no parseable registry — from a line-start
 `# enforce: class=monitor <free-text>` marker a non-gate surface declares itself

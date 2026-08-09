@@ -149,7 +149,8 @@ hook_rows() {
         [[ -n "$cmd" ]] || continue
         path="$(command_path "$cmd")"
         if [[ "$kind" == guard ]]; then
-            rows+=("| $(kit_cell "$(attribute_kit "$path")") | $path | $matcher |")
+            # spec: gate-sdk/SPEC.md §enforcement-map — an alternation matcher is the harness's own spelling, and a bare '|' inside a cell opens a fourth column: escape it so the emitted row survives the rendered page as one row of three
+            rows+=("| $(kit_cell "$(attribute_kit "$path")") | $path | ${matcher//|/\\|} |")
         else
             rows+=("| $(kit_cell "$(attribute_kit "$path")") | $path |")
         fi

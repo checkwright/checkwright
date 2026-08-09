@@ -42,7 +42,9 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
 
 2. Wire the hooks — merge `templates/settings-hooks.json` into
    `.claude/settings.json` (the `bash-guard` on `PreToolUse(Bash)`; the optional
-   `wakeup-guard` on `ScheduleWakeup|CronCreate`).
+   `wakeup-guard` on `ScheduleWakeup|CronCreate`; and an optional third block
+   showing the path-shaped shape a consumer kit's own guard registers under —
+   lifecycle-kit's `workflow-state-guard` is the shipped instance).
 
 3. Gitignore the two scratch logs (`.workflow/prompt-friction.log`,
    `.workflow/wakeup-attempts.log`) — both are per-iteration, cleared at close.

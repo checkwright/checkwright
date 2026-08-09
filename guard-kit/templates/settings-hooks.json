@@ -1,5 +1,5 @@
 {
-  "//": "guard-kit hook wiring — merge into .claude/settings.json. The bash-guard is the PreToolUse(Bash) hook; the wakeup-guard is optional (drop the second block to skip it). Paths assume the guards were copied into scripts/.",
+  "//": "guard-kit hook wiring — merge into .claude/settings.json. The bash-guard is the PreToolUse(Bash) hook; the wakeup-guard and the path-guard block are optional (drop a block to skip it). The third block shows the path-shaped guard shape guard_read_path serves — lifecycle-kit's workflow-state-guard is the shipped instance. Paths assume the guards were copied into scripts/.",
   "hooks": {
     "PreToolUse": [
       {
@@ -12,6 +12,12 @@
         "matcher": "ScheduleWakeup|CronCreate",
         "hooks": [
           { "type": "command", "command": "bash scripts/wakeup-guard.sh" }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "bash scripts/workflow-state-guard.sh" }
         ]
       }
     ]
