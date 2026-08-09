@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: prose-profile-activation
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -1984,11 +1984,17 @@
   time. Surfaced 2026-08-02 at close, intake pass over the review's unfiled half.
 
 - **design-partner-preview** [design-pending] — a narrow external preview before
-  any broad announcement: five-to-ten teams already delegating multi-step agent
-  work, installs observed live rather than by written feedback, instrumented for
+  any broad announcement: a narrow external preview cohort, its composition ruled
+  in the operator's brief, installs observed live rather than by written feedback,
+  instrumented for
   time-to-first-green, first useful red, false-positive dispositions, and 7/30-day
   retention per kit. It is the first rung on this queue whose deliverable is
   **evidence from outside this tree** rather than a tree change.
+  **The cohort was a named population here until 2026-08-09 and is deliberately no
+  longer one.** The composition it stated had since been re-ruled, so the sentence
+  contradicted the ruling it was meant to carry; the fix is to name the owner rather
+  than to re-state a ruling this file does not hold. The rung's own sequencing is
+  unchanged, and it now depends on `prose-profile` shipping.
   **Sequencing is the load-bearing part.** The preview runs *before*
   `benchmark-ab-experiment`, so pilot findings shape that experiment's task
   classes and metrics rather than being retrofitted to them; per-gate
@@ -3588,17 +3594,23 @@
   **Re-attested 2026-08-08**, from a build batch: a 3-red battery while one audit dispatch was
   live — comment-tier on the copy's sources, and both freshness emitters counting the
   duplicated markers — all pure pollution, self-clearing when the harness released the worktree.
-  **Third attestation 2026-08-09, and it confirms the entry's own prediction against the fix
-  that shipped.** `.claude/worktrees/` was gitignored at the 2026-08-08 close; this entry had
-  already said that would not fix the gates, and it did not. `check-comment-tier` reddened a
-  close commit on `reserve/crates/src/lib.rs` inside a live worktree copy. The mechanism is now
+  **Third and fourth attestations, both 2026-08-09, both confirming this entry's own prediction
+  against the fix that shipped.** `.claude/worktrees/` was gitignored at the 2026-08-08 close;
+  this entry had already said that would not reach the gates, and it did not. `check-comment-tier`
+  reddened a close commit, and then a scope commit at the next boundary, on the same
+  `reserve/crates/src/lib.rs` inside live worktree copies — the scope one inside two worktrees the
+  dispatch guard had itself mandated for the read-only sweeps that stage needed. So the
+  serialization cost above is attested at build, close and boundary stages alike. The mechanism is
   pinned rather than inferred: `gate_find` prunes by directory **basename**
   (`GATE_SDK_PRUNE_DIRS`, default `target .git node_modules .tmp gate-tests`), so no prune entry
   can name `.claude/worktrees` without also pruning `.claude/commands` and `.claude/agents`,
   which are governed surfaces. A shared exclusion root would have to be path-shaped, not
   name-shaped — which sharpens the design question above into a concrete blocker.
-  No `recurrence:` date is stamped: observed directly by a close rather than through the capture
-  channel, the same decline this close applied to its two other out-of-channel recurrences.
+  **On the count:** the third stamped no `recurrence:` date, observed directly by a close rather
+  than through the capture channel, the same decline that close applied to its two other
+  out-of-channel recurrences. The fourth was filed through `bin/file-gap.sh`, so the drain stamps
+  the declaration rather than a session stamping it by hand — the sanctioned writer, and it leaves
+  `recurrence-drain-input-widening`'s open question open.
   Filed 2026-08-07 by close, from two rejected commits during its own audit dispatches.
 
 - **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
