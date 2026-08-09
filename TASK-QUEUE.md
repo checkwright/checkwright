@@ -12,6 +12,56 @@
 
 ## New Features
 
+- **prose-profile** [spec: SPEC-prose.md] [roadmap: now/ecosystem] — the fourth profile.
+  roadmap-summary: A profile for documentation repos, where there is no build to gate.
+  The `prose` profile — gate-sdk plus canon-kit — and what a first prose adopter meets at
+  install. TRAJECTORY.md §PRIORITY DIRECTIVE sequences this next and fixes where its coherence
+  is measured: at the adopter's floor, install then value then uninstall.
+  Two premises this entry rested on are falsified by measurement, and `SPEC-prose.md` carries
+  both with their witnesses. The profile parameter on `recipe_gates` is **not** the lever: `full`
+  is the payload-derived maximum, so every profile is contained in it and anything a profile
+  registers `full` must register too — a gate armed for one profile alone is not expressible,
+  and the additive half is a disposition correction instead. And the cohort is not where the
+  value is: 16 of canon-kit's 18 `on-surface` gates already pass on a bare install tree, but 12
+  pass vacuously, because the manifest set is READMEs, canonical specs and the agent file and
+  never `docs/*.md`.
+  Five deltas: the profile rows and their criterion; a prune fix so a consumer's manifest set
+  stops governing its dependencies' READMEs; eleven canon-kit gates moving to `zero-config` and
+  seven staying put with reasons; a prose-shaped consumer that takes a real red; and the install
+  prose that still describes three nesting profiles.
+  The acceptance oracle is the consumer smoke run for every profile, never this tree's battery —
+  the prune is a no-op here, since this repo sets `CANON_KIT_SCAN_KIT_ROOTS=1`.
+  Surfaced 2026-07-16 in the launch triage that scoped launch-readiness-gate; promoted
+  2026-08-09 at spec.
+- **install-queue-template-unreachable** [spec: SPEC-queue-seed.md] — the queue seed's owner.
+  `queue-kit/templates/TASK-QUEUE.md` is unreachable at install by construction, and re-verified
+  so for every profile that exists: `full` reaches canon-kit first and `delegation` reaches
+  lifecycle-kit first, and neither ships the template.
+  `SPEC-queue-seed.md` refuses both closes this entry offered. Deleting the template is now
+  clearly worse rather than "not obviously worse", and an explicit owner declaration is new
+  mechanism where a derivation is available: a kit that ships the template has already declared
+  itself the format's owner. The arm stops selecting by kit and the seed hoists out of the
+  per-kit loop, so payload order decides nothing here.
+  The fact that refuses both is one neither close anticipated: the inline skeleton an adopter
+  actually receives omits `## Lessons Learned`, which `QUEUE_KIT_REQUIRED_SECTIONS` requires by
+  default — and `check-queue-sections`, the fail-closed floor under every section-scoped
+  scanner, is the one queue-kit gate not registered at install, so nothing says so.
+  Filed 2026-08-09 by close (`install-profile-seam`); promoted 2026-08-09 at spec.
+- **init-lifecycle-agent-block-seeding** [spec: SPEC-agent-block.md] — the agent-block rule.
+  This entry asked whether `init` should seed lifecycle-kit's agent-file block, and said deciding
+  which of its two outcomes held preceded any estimate. `SPEC-agent-block.md` decides it: the
+  exclusion was considered, and the seeding is correct as it stands.
+  The rule it states — **a kit's agent-file block is seeded at install iff a gate registered at
+  install reads it** — derives both halves. doctrine-kit is seeded because
+  `check-doctrine-registration` is `zero-config`; lifecycle-kit is not because no lifecycle-kit
+  gate is, so the block would be resident always-loaded instruction for a stage machine the
+  adopter has not adopted.
+  So the deliverable is the small one: state the rule, cite it from the two producers, and
+  correct `installer/README.md`, which offers a true statement about two gates as the reason for
+  a posture covering eleven. The declined branch is costed in the gap inbox — seeding the block
+  would owe a `--remove` mode `install-lifecycle.sh` does not have.
+  Filed 2026-08-08 by close; promoted 2026-08-09 at spec.
+
 ## Technical Debt
 
 ## Deferred
@@ -217,47 +267,6 @@
   that tool: verifying the split-lead posture's savings
   (lifecycle-kit/templates/lead.md §Economics). Surfaced 2026-07-15 by the
   per-stage budget analysis that motivated that posture.
-- **prose-profile** [design-pending] [roadmap: now/ecosystem] — a profile for non-code repos.
-  roadmap-summary: A profile for documentation repos, where there is no build to gate.
-  The non-code universality rung: a third
-  consumer shaped as a prose/documentation repo (no build, no test suite)
-  stress-tests whether the kits govern non-code work. Core dilution is ruled
-  out on record — if pursued, this is an adapter/profile delivered as
-  optional consumer config, never a kit literal (the provenance seam).
-  **Not demand-gated — retagged by operator ruling 2026-08-08, and carried at `now` since
-  the seam it waited on shipped.** The 2026-08-03 trajectory pivot makes this the step
-  TRAJECTORY.md §PRIORITY DIRECTIVE names next and "the **earliest external-install
-  channel** … not post-launch polish", with everything ahead of it discharged. The abstraction
-  axis is "code + spec" artifacts generalizing to "governed surface". Surfaced 2026-07-16 in
-  the launch triage that scoped launch-readiness-gate.
-  **What a prose consumer actually receives, measured rather than assumed** — the seed list
-  corrected 2026-08-08 at scope and re-verified TRUE at the 2026-08-09 boundary.
-  `check-prose-tells` ships **dormant**: canon-kit's default glob is empty and the gate is
-  `on-surface`, so it fires here only through `scripts/canon-config.sh`. guard-kit and drift-kit
-  ship no `checks/` at all. And the split is inverted where it matters most — canon-kit's
-  workflow-agnostic document-governance core is `on-surface` while its four spec-framing gates
-  are `zero-config`, so a prose consumer gets the software-coupled half and none of the other.
-  **Sized 2026-08-08 at two to three iterations; `install-profile-seam` PAID the first**, and an
-  over-costed entry at `[roadmap: now]` distorts the selection it feeds, so the re-sizing is
-  scope's. All three facts that bound rested on are now false: `recipe_gates` takes the profile;
-  profile-keyed install shipped (`profile-keyed-install`, `kit-owned-install-recipe`,
-  `lock-own-file-narrowed-profile-drift`, 2026-08-09); and the containment chain gave way to a
-  lattice whose roster states "A fourth profile is admitted exactly when it fits; there is no
-  count to raise here". The installer no longer resists a fourth profile, and
-  `companion-toolkit-profile` no longer re-pays that bound either.
-  **What remains, sharpened at the 2026-08-09 boundary:** a prose gate cohort, then a
-  docs-shaped smoke consumer — none exists — with the "kits govern non-code work" abstraction
-  program still separable from an installable profile. The cohort largely exists already as
-  canon-kit gates dispositioned `on-surface`, so the profile may be membership rows plus the
-  first use of the profile parameter `install-profile-seam` left unexercised in
-  `installer/lib/common/recipe.sh`, whose directive there says the parameter is the seam and no
-  disposition varies on it yet. Full survey and its two-command witness:
-  `.workflow/survey-record.md` — re-bought at this boundary, because the reset truncated the
-  block this line used to cite.
-  **Cost while deferred:** no longer zero. The prior reading — that the kits make
-  no non-code claim to falsify — was written before the pivot sequenced this rung;
-  what is now deferred is the preview cohort's install channel itself
-  (BRIEF-side), so the cost is the launch path rather than a stale seed list.
 - **hosted-attestation-service** [design-pending] [roadmap: later/commercial] — hosted attestation.
   roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.
   The team/paid rung: gates
@@ -3843,30 +3852,6 @@
   major operating system with no filed unit behind it on the artifact axis is exactly the gap
   the roadmap projection exists to prevent, so the public commitment is taken deliberately.
 
-- **init-lifecycle-agent-block-seeding** [design-pending] — whether `init` should seed
-  lifecycle-kit's agent-file block is undecided, and the exclusion carries no rationale.
-  **Filed as an open question, not as an asserted defect.** `checkwright init` seeds doctrine-kit's
-  agent-file marker block and not lifecycle-kit's. The align census settled the mechanism beyond
-  doubt: of the shared injector's five tree-wide call sites exactly one is reachable from init's
-  payload flow, doctrine-kit's, and lifecycle-kit's own installer has zero call sites anywhere
-  under the installer, so init never invokes it. What the census does not settle is whether that
-  is right.
-  **Evidence on both sides, which is what makes it a question.** The recipe's gate-registration
-  rationale scopes lifecycle-kit's install-time exclusion to gates alone — lifecycle-kit's gates
-  read an attestation only a stage session can write, so they arm at the adopter's first stamp.
-  That reasoning does not on its face reach the separate exclusion in the agent-file predicate,
-  which names two kits and carries no stated rationale of its own. `installer/README.md` §What
-  init seeds does not answer the agent-file half either: it states that the agent file is created
-  once and left alone, with no per-kit breakdown. So this is either a considered decision whose
-  rationale was never written down, or a genuine gap — undetermined from the specs alone.
-  **Why `[design-pending]`:** the two outcomes differ in kind, not in size. If it was considered,
-  the deliverable is one sentence of rationale beside the exclusion. If it is a gap, the
-  deliverable changes what every adopter's agent file contains on a first install, which is an
-  adoption-surface change. Deciding which precedes any estimate of either.
-  **Cost while deferred:** an unexplained exclusion sits beside an explained one in the same
-  predicate, so each reader who notices re-derives the question and reaches the same undetermined
-  answer.
-  Filed 2026-08-08 by close, draining the gap inbox; found at align, outside that unit's scope.
 
 - **amendment-refusal-acceptance-parity** [design-pending] — an amendment's refusal rationale can
   claim an acceptance criterion asserts something that criterion does not say.
@@ -4156,21 +4141,6 @@
   Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet this iteration's own
   scope session filed against its own economics merge. This close dispositions the standing
   instance as an absorbed duplicate rather than as a deliverable, in its Done-clearing commit.
-
-- **install-queue-template-unreachable** [design-pending] — `queue-kit/templates/TASK-QUEUE.md`
-  is unreachable at install **by construction**, so no adopter has ever received it.
-  `recipe_seed`'s queue arm fires for the first of canon-kit, lifecycle-kit and queue-kit in
-  payload order; canon-kit sorts first and ships no such template, so every adopter receives the
-  minimal inline skeleton instead and the kit-owned template is dead weight in the payload.
-  **Why `[design-pending]`:** the ordering is load-bearing elsewhere, so the fix is a ruling on
-  what the arm selects by — first-in-payload-order is a cheap proxy for *which kit owns the queue
-  format*, and the honest answer may be an explicit owner declaration rather than a sort accident.
-  Deleting the unreachable template is the other honest close and is not obviously worse.
-  **Cost while deferred:** low and non-corrupting — adopters get a working skeleton, so nothing
-  is broken; what is wrong is that a kit ships a surface it cannot deliver, which is the shape
-  the consumer smoke exists to catch and does not.
-  Filed 2026-08-09 by close (`install-profile-seam`), draining the bullet spec filed 2026-08-08
-  while surveying the roster seam; it was outside `profile-keyed-install`'s envelope.
 
 - **dispatch-cited-evidence-unverified** [design-pending] — a dispatched sweep's **quoted
   evidence** is covered by no verification rule, and one returned an attributed quotation that
