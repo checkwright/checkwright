@@ -2383,9 +2383,9 @@ The one spelling of the crate build. Invoked as
 `cargo build --release --manifest-path <crate>/Cargo.toml` with any trailing
 arguments appended, so a per-target build supplies `--target <triple>` and still
 uses one spelling rather than a second copy of the literal. The crate comes from
-the existing `gate_native_crate`
-accessor (§Layout and configuration) — **no new knob**, per the config-via-env
-convention: a knob default gains readers without gaining spellings.
+the existing `gate_native_crate` accessor (§Layout and configuration) — **no new
+knob**, per the config-via-env convention: a knob default gains readers without
+gaining spellings.
 
 **It resolves the crate relative to cwd, never off its own location.** That is
 what lets a caller running from a scratch tree — the consumer smoke's build leg —
@@ -2422,10 +2422,10 @@ the stronger half of enforcement-first, and why no gate accompanies it. Nothing
 stops a future session from writing a fresh longhand
 `cargo build --release --manifest-path …` into a new file: no existing gate's
 corpus or predicate reaches that, and inventing one would mean a banned-literal
-gate whose pattern
-list is one repo's own build command. The recurrence is not yet attested — the
-duplication removed here accumulated because there was no owner to cite, and this
-section is that owner. A recurrence is a costed filing, not a silent regrowth.
+gate whose pattern list is one repo's own build command. The recurrence is not
+yet attested — the duplication removed here accumulated because there was no
+owner to cite, and this section is that owner. A recurrence is a costed filing,
+not a silent regrowth.
 
 ### check-shellcheck
 
