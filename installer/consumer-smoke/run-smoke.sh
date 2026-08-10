@@ -642,7 +642,7 @@ HOST_TARGET="$(rustc -vV 2>/dev/null | awk '/^host:/{print $2}')"
 
 ART="$SCRATCH/artifacts/$HOST_TARGET"
 mkdir -p "$ART"
-build_out="$(cargo build --release --manifest-path "$REPO/$NATIVE_CRATE/Cargo.toml" 2>&1)" \
+build_out="$(cd "$REPO" && bash gate-sdk/bin/build-native.sh 2>&1)" \
     || { printf '%s\n' "$build_out" >&2; blocked "the crate would not compile for $HOST_TARGET."; }
 BUILT="$REPO/$NATIVE_CRATE/target/release/$NATIVE_BIN"
 [[ -x "$BUILT" ]] || blocked "cargo reported success but there is no executable at $BUILT."
