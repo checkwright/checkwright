@@ -17,7 +17,7 @@ STAMP_FILE="${2:-}"
 LIST="$GATES_DIR/gates.list"
 BIN="$(gate_native_bin)"
 CRATE="$(gate_native_crate)"
-REBUILD="cargo build --release --manifest-path $CRATE/Cargo.toml"
+REBUILD="bash gate-sdk/bin/build-native.sh"
 
 RESOLVE_DIRS=("$GATES_DIR")
 while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots_rel)

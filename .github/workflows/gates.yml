@@ -35,7 +35,7 @@ jobs:
       # `run:` on the runner's preinstalled cargo (no setup-rust action) to keep the
       # checkout+bash tamper floor the kramdown step above states.
       - name: build the native gate binary
-        run: cargo build --release --manifest-path native/Cargo.toml
+        run: bash gate-sdk/bin/build-native.sh
       - name: native crate lint + unit tests
         run: |
           cargo clippy --release --manifest-path native/Cargo.toml --all-targets -- -D warnings

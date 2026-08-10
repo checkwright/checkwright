@@ -146,7 +146,7 @@ for src in "${sources[@]+"${sources[@]}"}"; do
             echo "check-reads-couples: $src dispatches to the native binary, but $bin is absent" >&2
             echo "or not executable — the declared read set cannot be read, so the coverage" >&2
             echo "assertion could not run; treating as failure (not clean)." >&2
-            echo "  help: build it (cargo build --release --manifest-path native/Cargo.toml), or" >&2
+            echo "  help: build it (bash gate-sdk/bin/build-native.sh), or" >&2
             echo "        install the prebuilt artifact, then re-run." >&2
             exit 2
         fi

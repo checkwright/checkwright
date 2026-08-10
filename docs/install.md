@@ -104,7 +104,7 @@ your `PATH`, and the note says what breaks without it:
   all**: the `native/` crate carries the gate implementations that dispatch to a
   binary subcommand, and the floor is the crate's `edition = "2021"`. Gates in
   this repo now dispatch there, so a contributor builds the binary
-  (`cargo build --release --manifest-path native/Cargo.toml`) **before
+  (`bash gate-sdk/bin/build-native.sh`) **before
   committing** — `cargo test` compiles a different artifact and does not
   discharge it; CI builds, lints and tests the crate every run. Installing
   Checkwright never builds it and never will. The binary reaches an adopter as a

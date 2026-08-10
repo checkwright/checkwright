@@ -99,7 +99,7 @@ jobs:
           binary="${binary##*/}"
 
           rustup target add "$TARGET"
-          cargo build --release --target "$TARGET" --manifest-path "$crate/Cargo.toml"
+          bash gate-sdk/bin/build-native.sh --target "$TARGET"
 
           # The one digest computation for this artifact anywhere in the release.
           # Every later hop moves this file; nothing re-derives its contents, so

@@ -149,7 +149,7 @@ gate_command() {
             if [[ ! -x "$bin" ]]; then
                 printf 'gate_command: %s dispatches to the native binary, but %s is ' "$g" "$bin" >&2
                 printf 'absent or not executable — the gate could not run; treating as ' >&2
-                printf 'failure (not clean). Build it: cargo build --release --manifest-path native/Cargo.toml\n' >&2
+                printf 'failure (not clean). Build it: bash gate-sdk/bin/build-native.sh\n' >&2
                 exit 2
             fi
             local knob_names knob_status knob value

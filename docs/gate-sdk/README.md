@@ -31,6 +31,10 @@ honest:
   `commit-msg` hooks *generated* from per-gate `# graph:` coupling manifests
   (`tier=precommit` vs `tier=commit-msg`); adding a gate to a hook is
   manifest-only, so hook membership cannot drift.
+- `bin/build-native.sh` — the one spelling of the crate build for the binary
+  substrate: resolves the crate from `GATE_SDK_NATIVE_CRATE`, passes trailing
+  arguments to cargo (so a per-target build reuses it), and returns cargo's own
+  exit code. Every reader of that command cites this script rather than copying it.
 - `checks/` — the meta-gates that hold the family to its own standard:
   ShellCheck self-lint, the output contract, the fail-closed contract, fixture
   coverage, SPEC↔code assertion coupling, exemption-list hygiene, and manifest

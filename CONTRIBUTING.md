@@ -55,7 +55,7 @@ left linked-but-unqueued: the queue is the only place work waits.
 ## Pull requests
 
 - **Build the gate binary before you commit.** Gates in this tree dispatch to a
-  compiled subcommand, so `cargo build --release --manifest-path native/Cargo.toml`
+  compiled subcommand, so `bash gate-sdk/bin/build-native.sh`
   is its own step and **`cargo test` does not discharge it** — the test harness is
   a different artifact from the binary the battery runs, so a full green test run
   leaves `check-gate-binary-fresh` red on a stale build

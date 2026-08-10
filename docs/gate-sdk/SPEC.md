@@ -1113,7 +1113,7 @@ is registered and resolves to a `.gate` descriptor, so **gates in `gates.list`
 dispatch to the binary and `cargo` is required to commit here.** The toolchain floor pin
 (context-kit/SPEC.md §bin/env-probe) has therefore sharpened from its
 build-and-CI tier to the **commit-time** tier, and a fresh clone cannot commit
-until it has run `cargo build --release --manifest-path native/Cargo.toml` once —
+until it has run `bash gate-sdk/bin/build-native.sh` once —
 which `cargo test` does not do (§check-gate-binary-fresh). CI still builds,
 clippies and tests the crate, and `check-gate-substrate-parity` still reads the
 binary's `--list` roster whenever it is built; what changed is that those are no
@@ -2381,6 +2381,57 @@ the fresh clone learns of a wrong-identity or wrong-remote mapping before its
 first commit — the moment the push-identity half is cheapest to fix — and the
 gate's exit status surfaces through this script's.
 
+### build-native
+
+The one spelling of the crate build. Invoked as
+`bash gate-sdk/bin/build-native.sh [cargo-arg…]` from the repo root, it runs
+`cargo build --release --manifest-path <crate>/Cargo.toml` with any trailing
+arguments appended, so a per-target build supplies `--target <triple>` and still
+uses one spelling rather than a second copy of the literal. The crate comes from
+the existing `gate_native_crate`
+accessor (§Layout and configuration) — **no new knob**, per the config-via-env
+convention: a knob default gains readers without gaining spellings.
+
+**It resolves the crate relative to cwd, never off its own location.** That is
+what lets a caller running from a scratch tree — the consumer smoke's build leg —
+set cwd and get that tree's crate, and it is why the contract says "from the repo
+root" rather than leaving the working directory unstated.
+
+cargo's exit code passes through unmodified and both streams pass through
+untouched, so a caller capturing build output keeps working.
+
+Fail-closed (§Fail-closed contract), each **exit 2 with cause** rather than a
+silent success or a skip:
+
+- `cargo` not on `PATH` — the message names the contributor-side toolchain floor
+  (context-kit/SPEC.md §bin/env-probe) instead of leaving a bare
+  command-not-found to be interpreted.
+- The resolved crate directory carrying no `Cargo.toml`. This message names the
+  **consumer case explicitly**: a consumer receives a prebuilt, digest-verified
+  binary per declared target and never the crate source (§Consumer payload), so a
+  consumer tree that reaches this script has found a misuse, not a missing build.
+  Saying so is what keeps a vendored tool from reading as a broken one.
+
+It is a tool, not a gate: no `# graph:` manifest, no `# install:` header, no
+fixture pair — the same distinction `queue-kit/bin/roadmap.sh` carries. It is
+`100755` in the index like every other `*/bin/*.sh` (§check-exec-bit).
+
+**Why this is generic kit mechanism and vendors with the rest of gate-sdk.** It
+builds *the configured crate* and carries no repo-specific path, no product
+constant, and no private vocabulary; `native/` reaches it only as
+`GATE_SDK_NATIVE_CRATE`'s existing default.
+
+**The residual, stated rather than gated.** Every reader of the build command
+cites this script, which removes the duplication outright rather than gating it —
+the stronger half of enforcement-first, and why no gate accompanies it. Nothing
+stops a future session from writing a fresh longhand
+`cargo build --release --manifest-path …` into a new file: no existing gate's
+corpus or predicate reaches that, and inventing one would mean a banned-literal
+gate whose pattern
+list is one repo's own build command. The recurrence is not yet attested — the
+duplication removed here accumulated because there was no owner to cite, and this
+section is that owner. A recurrence is a costed filing, not a silent regrowth.
+
 ### check-shellcheck
 
 Invariant: every `*.sh` directly under the consumer gates dir, each
@@ -2773,9 +2824,9 @@ artifact from the binary `GATE_SDK_NATIVE_BIN` names, which is what this gate
 reads. A full `cargo test --release` can pass every test in the crate, including
 the one proving both substrates compute the source stamp identically, and leave
 this gate red on the stamp baked into a stale binary. So the obligation is
-`cargo build --release` as **its own named step**: a tree with a live descriptor
-must build the binary before it commits, and a contributor routine that states a
-`cargo test` line has not stated that step. Recorded here because the omission is
+`bash gate-sdk/bin/build-native.sh` (§build-native) as **its own named step**: a
+tree with a live descriptor must build the binary before it commits, and a
+contributor routine that states a `cargo test` line has not stated that step. Recorded here because the omission is
 invisible from a green test run — the exact shape of vacuous green the section
 above exists to refuse.
 

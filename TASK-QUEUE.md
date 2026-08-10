@@ -12,34 +12,6 @@
 
 ## New Features
 
-- **cargo-grant-committed-vs-overlay** [spec: SPEC-native-build.md] — the
-  commit-time requirement is granted only by an untracked file.
-  The dogfood ruling made `cargo build --release --manifest-path native/Cargo.toml` a
-  **commit-time** requirement in this tree (CLAUDE.md §Housekeeping), so every session now runs
-  it — yet `Bash(cargo build *)` and `Bash(cargo test *)` live in the gitignored
-  `.claude/settings.local.json` and not in the committed allowlist. Measured this iteration:
-  six calls granted only by the overlay. A fresh clone that installs the hooks therefore prompts
-  on the command the hook effectively requires, and the grant that makes the tree workable is
-  the one thing a clone does not receive.
-  **Shape ruled 2026-08-09 by the operator at this scope**, closing the open choice: route the
-  build through a **tracked `bin/` script granted by path**, like every other kit tool. The
-  glob over all `cargo build` and the exact grant of the one manifest-pinned command are both
-  refused — the glob is the widest grant for the least thought, and the exact command is
-  brittle against a manifest path that moves.
-  **Re-triaged at that scope: this is a feature, not debt.** The ruled shape adds a new script,
-  which is a name on a governed surface, so the new-names litmus makes it feature work however
-  small the diff. Its amendment is the `spec` stage's to author, and it is promoted by the
-  pairing that amendment carries rather than by scope.
-  Premise re-verified 2026-08-09: still no `cargo` grant in the committed
-  `.claude/settings.json`, and the three grants sit only in the gitignored overlay.
-  The friction lands hardest on a first-time contributor, who meets it before any of the
-  tooling that would explain it — and the port track is about to make this the most-run
-  command in the tree.
-  **Promoted 2026-08-09 at spec**, paired with `SPEC-native-build.md`: the ruled script is
-  `gate-sdk/bin/build-native.sh`, reading the existing `GATE_SDK_NATIVE_CRATE` accessor and
-  adding no knob, with every repo-side call site of the longhand command routed through it.
-  Filed 2026-08-07 by close, from its own prompt-friction triage.
-
 ## Technical Debt
 
 ## Deferred
@@ -4291,5 +4263,6 @@
 
 - gate-tamper-roster-native-reach
 - native-knob-bridge
+- cargo-grant-committed-vs-overlay
 
 ## Lessons Learned

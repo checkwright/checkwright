@@ -16,7 +16,7 @@ csmoke_place_binary() {
 
     [[ -x "$host/$bin" ]] || {
         echo "csmoke: $descriptors vendored .gate descriptor(s) need the gate binary, but $host/$bin is absent or not executable" >&2
-        echo "  help: build it — cargo build --release --manifest-path native/Cargo.toml — then re-run." >&2
+        echo "  help: build it — bash gate-sdk/bin/build-native.sh — then re-run." >&2
         return 2
     }
     mkdir -p "$SCRATCH/${bin%/*}" || return 2

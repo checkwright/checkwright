@@ -86,7 +86,7 @@ roster_read=0
 # predicate: descriptors nothing registered dispatches to leave the binary not load-bearing
 if [[ "$dispatching" -gt 0 && ! -x "$BIN" ]]; then
     echo "check-gate-substrate-parity: $BIN is absent or not executable, but $dispatching registered member(s) dispatch to it — the check could not run; treating as failure (not clean)" >&2
-    echo "  help: build it — cargo build --release --manifest-path native/Cargo.toml" >&2
+    echo "  help: build it — bash gate-sdk/bin/build-native.sh" >&2
     exit 2
 fi
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the roster half is gated on a
