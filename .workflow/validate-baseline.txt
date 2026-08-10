@@ -91,6 +91,6 @@ budget_guard_tests budget_guard_tests pass
 trend_tests trend_tests pass
 demo demo pass
 consumer_smoke consumer_smoke pass
-upgrade upgrade pass
+upgrade upgrade fail upgrade-smoke-from-binary-pairing
 agents_md_smoke agents_md_smoke pass
 index_tests index_tests pass

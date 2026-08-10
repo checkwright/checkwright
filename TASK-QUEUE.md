@@ -4230,6 +4230,44 @@
   is the channel by which a wrong number reaches a canonical surface with a citation on it.
   Filed 2026-08-09 by close, from its own knowledge-friction triage.
 
+- **upgrade-smoke-from-binary-pairing** [design-pending] — phase 1's FROM
+  self-consistency claim is untestable for every `.gate`-dispatched gate.
+  `gate-sdk/bin/upgrade-smoke.sh` never places a FROM-appropriate binary at
+  either phase. `gate-sdk/lib/consumer-smoke.sh`'s `csmoke_place_binary` copies
+  the **current** tree's freshly-built binary once, at FROM-phase setup, and
+  phase A's TO-side kit swap (`upgrade-smoke.sh` L75-91, a bare `cp -R` of kit
+  directories) never touches `native/` or re-invokes it. `native/` is not a kit
+  — no `checks/`, no `smoke/` — so it is never vendored per-tag, and the harness
+  has no mechanism to build or select a FROM-appropriate binary at all. The same
+  current-tree binary therefore runs under both phase 1 (the FROM
+  self-consistency check) and phase 2 (the TO check).
+  **What breaks is phase 1's claim** — "the FROM tag alone is healthy under zero
+  config" — not any actual old/new pairing transition.
+  **Concretely, this iteration:** `a5ef6e19` added `gate_command`'s `--knobs`
+  query/bridge in `gate-sdk/lib/gate.sh` and tightened `native/src/walk.rs` to
+  hard-require `GATE_SDK_KNOB_GATE_PRUNE_DIRS`. `v0.22.0`'s own `gate_command`
+  carries no knob query at all, so phase 1 running FROM=v0.22.0's vendored shell
+  against the current binary never supplies the knob the binary now requires —
+  `check-action-pinning` and `check-action-gh-repo` exit 2 under zero config.
+  **Not a live end-user hazard:** `installer/lib/update.sh` exec's into
+  `init.sh`, which writes vendored shell and the digest-verified binary from one
+  release payload in one pass, so a real `checkwright update` cannot produce
+  this pairing. The live-path sibling is `installer-artifact-omission-residue`.
+  **Deliverable, and why `[design-pending]`:** either give phase 1 a FROM-built
+  binary (archive and build FROM's own `native/` when present at that tag), or
+  narrow phase 1's assertion to exclude `.gate`-dispatched gates explicitly
+  rather than mis-testing them silently. The first buys a per-tag Rust build
+  inside the smoke; the second shrinks what the smoke proves exactly as the port
+  widens what dispatches through the binary. Picking between them is the work.
+  **Cost while deferred:** the `upgrade` suite is baseline-held `fail` against
+  this slug, so phase 1 proves nothing for any `.gate`-dispatched gate until it
+  is fixed — and that held red is re-earned every iteration the port widens the
+  dispatched set.
+  Found 2026-08-10 at validate; root cause corrected the same day after review
+  caught the original framing implying a real old/new binary transition. Filed
+  2026-08-10 by close under the operator-directed filing exception, because the
+  baseline mark that unblocks the close entry requires a live slug to point at.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
