@@ -228,9 +228,36 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The state machine) — and the
    filed form rides the queue's Deferred section.
 
+12. **Probe-before-assertion.** A claim about the tree, the harness, or a tool's
+    behavior that one cheap command would settle is probed before it is
+    asserted, and what the probe returned travels with the claim. The bar is
+    *availability, not confidence*: a claim is unprobed if a command that would
+    have settled it was there to run and was not, however well-reasoned the
+    assertion. This is Oracle-first's design-time sibling and the two divide
+    cleanly — that rule governs the claim a gate already decides and says run the
+    gate; this one governs the claim made at scope, at spec, in a survey, or in a
+    dispatch, where no oracle is running and standing one up costs a grep. It
+    binds a *relayed* claim as hard as an authored one: forwarding an unverified
+    premise is asserting it, and the forwarder owns the probe the originator
+    skipped.
+    *Under agent work:* an agent's prose reads identically whether it was
+    measured or inferred, so an unprobed premise enters the record
+    indistinguishable from a verified one and is inherited downstream as settled
+    fact. Each hand-off raises its apparent authority without adding evidence,
+    and the correction cost lands on whichever later session finally runs the
+    command — by which point the claim has shaped the work built on it.
+    *Enforced by:* judgment with a capture mechanism, not a gate — whether a
+    claim was probed is not machine-decidable (the Enforcement-first
+    false-positive carve-out, on Gap disposition's model). Its capture surfaces
+    are the survey record's witness discipline and the queue's practice of
+    dating premise corrections into entry bodies
+    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The survey record);
+    `probe-before-assertion-doctrine` in the queue holds the open question of
+    whether any slice of the class is mechanizable.
+
 ## Engineering-craft rules
 
-12. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
+13. **Spec-invariant test naming.** A test of a spec-mandated invariant encodes
    that invariant in its *name*; the SPEC's test-requirement section owns which
    invariants a test must cover. A spec-clause *comment* on the test is not a
    substitute — it duplicates what the name should carry and rots silently when
@@ -244,7 +271,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    carry the invariant.
    *Stages:* build, validate
 
-13. **Test from the real consumer's runtime.** Verify a contract from the runtime
+14. **Test from the real consumer's runtime.** Verify a contract from the runtime
    of its real consumer, never a more lenient stand-in; a failure at a higher
    test layer with no failing test at the layer below is a coverage gap in the
    lower layer, closed there first.
@@ -257,7 +284,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    baseline turns a dropped layer into a red validate.
    *Stages:* build, validate
 
-14. **Inspectable-run discipline.** A component a test or an automation spawns
+15. **Inspectable-run discipline.** A component a test or an automation spawns
     must emit a readable log to an inspectable path — never a muted sink; on a
     failure, read that evidence before theorizing. A run you cannot inspect
     barely beats a guess.
@@ -270,7 +297,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     trusting its self-report.
     *Stages:* build, validate
 
-15. **Rename is a full-surface sweep.** A rename sweeps every surface in
+16. **Rename is a full-surface sweep.** A rename sweeps every surface in
     lockstep — prose, fixtures, and docs, not only the compiler-checked
     identifiers; the done-gate is a text-level completeness check, not the
     type-checker, and an in-progress rename is verified by a completeness scan
@@ -285,7 +312,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     vocabulary stays with the consumer.
     *Stages:* build
 
-16. **Config edits are merges, not rewrites.** Edit a config or settings file
+17. **Config edits are merges, not rewrites.** Edit a config or settings file
     with targeted, string-scoped edits, never a full-file write reconstructed
     from a partial read — a whole-file write built from part of the file
     silently drops everything the write did not carry. And validate an
@@ -302,7 +329,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     gate asserts a given edit was a merge rather than a rewrite.
     *Stages:* build
 
-17. **Re-verify volatile state before a git history rewrite.** Verify HEAD
+18. **Re-verify volatile state before a git history rewrite.** Verify HEAD
     (`git log --oneline -3`) before an amend or squash; after a `git reset
     --soft`, re-stage and verify the staged content (`git show :<path>`) before
     committing — the soft reset keeps the old index snapshot; write any `git
@@ -320,7 +347,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     because each command is legitimate.
     *Stages:* build, close
 
-18. **Entering another repo's tree, read its governance first.** A cross-repo
+19. **Entering another repo's tree, read its governance first.** A cross-repo
     edit re-reads that repo's agent file and README and checks its branch
     freshness every time — a second repo's model drifts independently of this
     one's, so a remembered version of its rules is a stale premise.
@@ -332,7 +359,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     governance was reread.
     *Stages:* build
 
-19. **Naming: drop the qualifier the context supplies — only when every consumer
+20. **Naming: drop the qualifier the context supplies — only when every consumer
     has that context.** A name that travels into a flat namespace keeps its
     qualifier; default to the shorter form and reject the vacuous one, but a
     name that loses the context which disambiguated it must carry the qualifier
@@ -347,7 +374,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     is its written form.
     *Stages:* scope, build
 
-20. **Reuse a co-located consumer's data before designing a new path.** For an
+21. **Reuse a co-located consumer's data before designing a new path.** For an
     embedded or co-located actor, first ask whether it can read a co-located
     consumer's already-fetched data before minting a new stream, grant, or
     fetch — a "which path" framing can hide a "no path needed" answer.
@@ -360,7 +387,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     reaching for an existing owner before minting a second source.
     *Stages:* scope, build
 
-21. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
+22. **A resolver gate's flagged key is a fork, not a verdict.** A name-resolution
     gate that finds a silent drop has found either dead config to remove *or*
     promised-but-unwired config to build — one signature, opposite fixes; only
     the owning SPEC distinguishes them, so verify intent against the SPEC before
@@ -376,7 +403,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     never which way it should be closed.
     *Stages:* build
 
-22. **Quiet green, loud red.** A batch runner's success is one summary line
+23. **Quiet green, loud red.** A batch runner's success is one summary line
     carrying its scope counts (the count doubling as the roster-collapse
     tripwire); failure output is verbatim and never quiets. Per-item success
     banners are an opt-in reading, not the default — the red path is the
@@ -390,7 +417,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     ([gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §run-gates).
     *Stages:* build
 
-23. **An assertion reports the size of the set it ranged over.** A verification a
+24. **An assertion reports the size of the set it ranged over.** A verification a
     session writes — a scan, a probe, a predicate under edit — whose subject is a
     set prints that set's size beside its verdict, because an exit code cannot
     distinguish *asserted and held* from *asserted nothing*: both are zero

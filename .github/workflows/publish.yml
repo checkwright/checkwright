@@ -94,7 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           source gate-sdk/lib/gate.sh
-          crate="${GATE_SDK_NATIVE_CRATE:-native}"
+          crate="$(gate_native_crate)"
           binary="$(gate_native_bin)"
           binary="${binary##*/}"
 

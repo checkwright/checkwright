@@ -141,7 +141,7 @@ for src in "${sources[@]+"${sources[@]}"}"; do
     # this shell parser, so the substrate reports them instead: `--reads` answers what the
     # binary walks and the coverage assertion below is unchanged.
     if [[ "$src" == *.gate ]]; then
-        bin="${GATE_SDK_NATIVE_BIN:-native/target/release/checkwright-gates}"
+        bin="$(gate_native_bin)"
         if [[ ! -x "$bin" ]]; then
             echo "check-reads-couples: $src dispatches to the native binary, but $bin is absent" >&2
             echo "or not executable — the declared read set cannot be read, so the coverage" >&2

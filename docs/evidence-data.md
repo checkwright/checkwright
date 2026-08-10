@@ -82,3 +82,4 @@
 | adopter-floor-integrity | sc sp a b v c | 6f/1d | 3 · ≤0d | 24s clean | 99 |
 | install-profile-seam | sc sp a b v c | 6f/3d | 3 · ≤1d | 25s 1✗ | 100 |
 | prose-profile-activation | sc sp a b v c | 6f/7d | 6 · ≤0d | 24s clean | 100 |
+| native-port-cadence | sc sp a b v c | 4f/1d | 2 · ≤1d | 25s 2✗ | 100 |

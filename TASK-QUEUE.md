@@ -23,46 +23,46 @@
   amendment made the mechanism's single auditable producer. The open question is whether it
   should also stamp a recurrence the closing stage resolves for itself.
   **Grounds, from the iteration that built the mechanism:** `amendment-landing-citation-assertions`
-  genuinely re-occurred — a build session found a false citation in an amendment the audit
-  stage had passed as zero-divergence, which is that entry's own assertion (2) case and what
-  its cost field predicted. It reached close as dispatch prose rather than a bullet, so close
-  recorded dated prose evidence and no declaration. Faithfully captured, aggregated nowhere —
-  the exact failure the counter exists to end, one channel over.
-  **Why it needed a ruling rather than a fix in place:** widening the input widens what a
-  machine writer may stamp onto the queue, and the single-producer property is what makes the
-  count auditable. Both halves were deliberate, so which one yields is not close's to decide.
-  **That premise moved, and this entry now owns the question it opened.**
-  `gap-resolver-mention-overcount` back-tested the sole-producer claim against history and found
-  it already false: of the nine commits that ever added a `recurrence:` date, three stamped one
-  from outside the drain with no bullet in the same commit. So the drain is the only *mechanized*
-  producer, never the only one, and the auditability the single-producer property was protecting
-  has been re-based on same-commit inspection rather than re-derivation. Whether a direct stamp
-  by a session that observed a recurrence outside the capture channel should be sanctioned,
-  forbidden, or mechanized is inherited here by name and deliberately left open there — it is
-  this entry's question, and the widening it names is now the live half of it.
+  genuinely re-occurred — a build session found a false citation in an amendment the audit stage
+  had passed as zero-divergence, that entry's own assertion (2) case. It reached close as dispatch
+  prose, so close recorded dated prose and no declaration: faithfully captured, aggregated
+  nowhere, the exact failure the counter exists to end, one channel over.
+  **The ground that held it open is now ANSWERED.** The ruling turned on single-producer
+  auditability — widening the input widens what a machine writer may stamp — but
+  `gap-resolver-mention-overcount` back-tested that claim and found it already false: of the nine
+  commits that ever added a `recurrence:` date, three stamped one from outside the drain with no
+  bullet. The drain is the only *mechanized* producer, never the only one, and auditability has
+  since been re-based on same-commit inspection rather than re-derivation. So the objection to
+  widening no longer stands on its original footing.
+  **What remains open** is only whether a direct stamp by a session observing a recurrence out of
+  channel should be sanctioned, forbidden, or mechanized — inherited here by name, and the live
+  half of this entry.
   **Cost while deferred:** a recurrence observed anywhere but the capture channel misses both
   `kpi-incident-recurrence` and scope's pre-emption threshold, so the theme keeps outranking
   it silently — with the counter shipped, that silence now reads as evidence of no recurrence.
-  **Second attested instance, 2026-08-05 at the `install-claim-contract` close.** The validate
-  session ended its turn with `run-validate.sh` still running — a live re-occurrence of
-  `validate-producer-liveness-unobservable`, with `dispatched-session-waiting-rule-residency`
-  as the residency gap underneath it — and it reached close through `bin/kfric.sh` rather than
-  a gap bullet, so neither entry's count moved. Recorded here as prose rather than stamped,
-  which is the deferral behaving exactly as written and is why this reads as evidence rather
-  than as a workaround.
-  **Third close attesting, 2026-08-09 (`install-profile-seam`): THREE recurrences judged out of
-  channel, ZERO in it.** `spec-measured-count-gate` re-occurred five times in one iteration — its
-  own cost field predicts exactly that — and arrived as **lead dispatch prose**;
-  `survey-edge-aggregation-residue` came out of a rostered close audit, `dispatch-worktree-reds-
-  the-battery` out of a battery red during the close's own commit. All three were declined a stamp
-  per this entry's own rule, so a drain reading only bullets would have reported a clean count for
-  an iteration carrying three — the count reporting the opposite of the truth.
-  **Fourth close attesting, 2026-08-09 (`prose-profile-activation`), and the first whose
-  in-channel half is non-zero: THREE stamped off bullets, THREE more declined out of channel** —
-  `poll-sleep-guard-steer`, `cat-read-steer-guard`, `dispatch-cited-evidence-unverified`, each
-  observed by close itself. So the sole-input shape does work when a filer routes through it, and
-  what it still cannot reach is six attested channels: dispatch prose, `bin/kfric.sh`, a rostered
-  audit, a battery red, close's friction triage, a lead's relayed figure. That shape is the gap.
+  **Attestings 2-5, each an iteration's close, all declining stamps per this entry's own rule.**
+  2 (2026-08-05, `install-claim-contract`): a validate turn ended with `run-validate.sh` live,
+  reaching close via `bin/kfric.sh`, so neither `validate-producer-liveness-unobservable` nor
+  `dispatched-session-waiting-rule-residency` moved. 3 (2026-08-09, `install-profile-seam`):
+  THREE out of channel, ZERO in it — `spec-measured-count-gate` (lead dispatch prose, five
+  firings in one iteration, as its cost field predicts), `survey-edge-aggregation-residue` (a
+  rostered audit), `dispatch-worktree-reds-the-battery` (a battery red in close's own commit);
+  a bullet-only drain would have reported clean for an iteration carrying three. 4 (2026-08-09,
+  `prose-profile-activation`), first with a non-zero in-channel half: THREE stamped off bullets,
+  THREE declined — `poll-sleep-guard-steer`, `cat-read-steer-guard`,
+  `dispatch-cited-evidence-unverified` — so the sole-input shape *does* work when a filer routes
+  through it. 5 (2026-08-10, `native-port-cadence`), first with the closing session as subject:
+  `exit-echo-decoration-guard-vs-habit` fired twice inside close itself, the guard blocking a
+  decorated `overhead-meter.sh` and `close-surfaces.sh`.
+  **The answered ground: the unreachable set is now enumerated, not open-ended.** Seven attested
+  channels — dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red, close's friction
+  triage, a lead's relayed figure, and the closing session's own tool use. The last is the one
+  that generalizes: close observes recurrences it can never have filed a bullet for, because it
+  is downstream of the drain. So the fix is not a wider filer habit but a second input, and
+  `close-generated-finding-route` owns the same shape one altitude up.
+  **A budget note this attesting bought:** the entry hit its 50-line cap, so attestings 2-5 were
+  compressed to fit. An entry whose function is accumulating dated evidence cannot accumulate
+  past a cap that exists to keep entries costed.
   Filed by the lead on operator direction under the direct-filing exception; the operator ruled
   file-a-unit over both keep-as-is and next-iteration-priority.
 
@@ -3058,6 +3058,21 @@
   **Cost while deferred:** every dispatch to a type whose definition omits the clause is
   unprotected, and a backgrounded producer under a session with no live lead is lost
   silently — the sixth firing cost nothing only because a lead happened to be watching.
+  **Seventh firing, 2026-08-10 (`native-port-cadence` validate) — and it cuts against this
+  entry's own hypothesis, which is why it is recorded here rather than only cited.** The
+  validate session ended a turn to wait on a monitor notification with **zero live children**,
+  having loaded a carrier that states the rule explicitly (the `stage-session` definition's
+  turn-end-is-session-end clause, plus the standing dispatch policy naming the in-turn wait).
+  So reach was **present** and the rule still failed.
+  **What it evidences, stated against this entry's interest.** Firings five and six were about
+  carriers omitting the clause; this one is not, so it is not more of the same. It is direct
+  evidence for the sibling framing — `waiting-rule-fourth-firing-post-fix`'s prose-versus-
+  enforcement question — that a rule present in loaded context is still not obeyed at the
+  moment of temptation. Kept here because the two entries decide together and split evidence
+  is how a decider sees half of it.
+  **The ground this answers:** if reach is not the binding constraint, widening carriers — both
+  candidate homes above — buys less than it appears to, and the two entries likely resolve to
+  one enforcement-shaped answer rather than two prose-shaped ones.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
@@ -3466,23 +3481,37 @@
   never fire; the survey batch found a boundary-truncate bug by running a real entry. Close
   added two more: a gap bullet asserted a disambiguation was missing that had landed two days
   before it was filed, and a stamped release disposition asserted a tag that was never cut.
-  **The question is the form, not the pattern.** The pattern is attested past argument. What
-  is unsettled is whether it is already covered — `Oracle-first` covers the gate case,
-  `gap-bullet-premise-verification` covers the gap-inbox case, and rule 14's inspectable-run
-  discipline covers the spawned-component case. What none covers is the *design-time* claim
-  about the tree or the harness that a grep would settle, made at scope or spec where no
-  oracle is running.
-  **Why `[design-pending]`:** a doctrine rule owes an *Enforced by* line and this one has no
-  gate behind it, so it would ship as convention — which the doctrine does carry, but the
-  call on whether a fourth near-neighbour earns its own always-loaded line is a
-  governed-surface widening, not a close's to self-serve. The cheaper alternative worth
-  beating: widen one of the three existing rules rather than mint a fourth.
+  **The form question is now CLOSED — operator-ruled 2026-08-10 at the `native-port-cadence`
+  close.** The rule ships as an always-loaded one-line entry in CLAUDE.md's delivery doctrine
+  with its mechanism behind the doctrine-kit link: `Probe-before-assertion`,
+  doctrine-kit/DOCTRINE.md rule 12, in the methodology-maintenance register. The three
+  near-neighbours it was weighed against stay distinct and are named in the rule itself —
+  `Oracle-first` covers the gate case, `gap-bullet-premise-verification` the gap-inbox case,
+  and rule 15's inspectable-run discipline the spawned-component case; none covered the
+  design-time claim made where no oracle is running, which is what the new rule owns.
+  **What remains, and why this stays `[design-pending]`:** the rule shipped with *Enforced by:
+  judgment with a capture mechanism*, so the open work is whether any slice of the class is
+  mechanizable at all — a scanner for an unprobed claim is the thing nobody has designed, and
+  the honest default is that the class is natural-language and stays convention.
+  **Sixth-firing evidence, `native-port-cadence` (the iteration that earned the rule).** Scope's
+  cohort census scored 4 of 7 criteria and carried "clears criteria 2/3/4/7" forward as if it
+  answered the selector's actual term, so the operator's cohort ruling failed on both terms.
+  `.workflow/survey-record.md` was wrong twice in one iteration. Validate asserted "not a live
+  end-user hazard" and was sent back to verify it. Validate then declined the evidence baseline
+  mark on a false premise about what baseline-marking means, which blocked the close entry.
+  Each was caught by a *different* reviewer and none by the author.
+  **The firing that decided the register.** The lead's own dispatch relaying this pattern
+  carried an unverified citation — `scripts/gen-pre-commit.sh:38`, a file that does not exist —
+  passed on without opening it. A pattern that fires inside the dispatch *about* the pattern is
+  the argument for a resident line rather than a link: the reviewers who caught the other five
+  had all loaded the material, and it still went through. Hence the rule's relay clause.
   **Cost while deferred:** the cost is paid where it was measured — a false premise entering
   at scope is corrected at spec or align if it is lucky, and lands in the queue as established
   fact if it is not; the queue's own convention of dating premise corrections into bodies is
   the standing evidence that it is often not.
   Filed 2026-08-07 by close, as the iteration's candidate lesson; the observation came from
-  the lead, the evidence and the framing from this drain.
+  the lead, the evidence and the framing from this drain. Form ruled and the rule landed
+  2026-08-10 by close on operator direction; scope narrowed here to the mechanizability half.
 
 - **survey-record-extension-tier-hybrid** [design-pending] — the record is machine-parsed like
   a `.txt` and read like an `.md`, and the convention does not resolve the hybrid.
@@ -4268,6 +4297,264 @@
   2026-08-10 by close under the operator-directed filing exception, because the
   baseline mark that unblocks the close entry requires a live slug to point at.
 
+- **installer-artifact-omission-residue** [design-pending] — a live `checkwright
+  update` can leave a stale, now-untracked gate binary that `doctor` cannot see.
+  `installer/lib/init.sh`'s binary-write block (L273-302) and the `--artifact`
+  argument to `manifest()` (L343) are both gated on `ARTIFACT_TARGET` being
+  non-empty **this run**. When `select_artifact()` (L112-145) newly sets
+  `OMIT_REASON` for a platform that had a working binary before — `digest_hasher`
+  regressed locally, or a release drops or loses the target — that whole block is
+  skipped: the binary file, the `gate-sdk-config.sh` `GATE_SDK_NATIVE_BIN` seam
+  line, and the lock's own `artifact.target`/`artifact.digest` record all stay
+  untouched, while the vendored kit shell updates normally (the `copy_in` loop,
+  L184-196, is unconditional). Old binary, new shell — on the live path.
+  **Why `doctor` cannot report it.** `installer/lib/doctor.sh`'s consistency check
+  (L109-128) reads `artifact_target` from the *current* lock and is itself gated
+  on it being non-empty (L111) — and on an omission update the new lock carries no
+  artifact key at all. So doctor prints only the omitted-gates line (L130-144) and
+  never a residue warning. The stale file is invisible to the one tool chartered
+  to see it.
+  **What limits the blast radius, and what does not.** The battery is shielded:
+  `plan_gates()` (L200-227) re-marks affected `.gate` members
+  `# omitted: <name> <reason>` in the regenerated `gates.list` every run, so
+  `run-gates.sh` will not dispatch through the stale binary. What is *not*
+  shielded is anything reaching `gate_command` directly rather than through the
+  omission-filtered roster — a hand-run of a single gate, or future tooling that
+  trusts the seam without cross-checking `gates.list`'s omission comments.
+  **Deliverable, and why `[design-pending]`:** three defensible shapes and the
+  choice is real — remove the stale binary and the seam line on an omission
+  update; keep writing the lock's artifact record with an explicit omitted state
+  so doctor can see and report the residue; or leave the file and have doctor
+  warn off the seam rather than off the lock. They differ in whether a later
+  re-install can recover the old binary and in how much the lock grammar moves.
+  **Cost while deferred:** low probability, high confusion — a stale binary that
+  no surface admits exists, on a path a user reaches with a supported command.
+  Verified 2026-08-10 at validate by reading `init.sh` L95-145, L200-227,
+  L271-302, L339-347 and `doctor.sh` L108-128; **not reproduced live**, which is
+  the first thing the fixing session should do. Sibling of the harness-only
+  `upgrade-smoke-from-binary-pairing`; this is the one reachable without a test
+  harness. Filed 2026-08-10 by close, draining the gap inbox.
+
+- **close-entry-baseline-bootstrap-deadlock** [design-pending] — a validate that
+  ends on an accepted red cannot be closed without an operator carve-out.
+  Attested end to end at this iteration's close, which is what makes it filable.
+  The close entry preflight (`scripts/lifecycle-config.sh`'s
+  `LIFECYCLE_KIT_ENTRY_PREFLIGHT`) refuses until every suite carries a clean
+  evidence line. The sanctioned way to make a known red clean is a baseline `fail`
+  row carrying a blocking slug, and `check-evidence-baseline.sh` L68-75 requires
+  that slug to resolve to a **live queue task**. But the stage chartered to file
+  that task is close — which cannot enter until the preflight the mark would
+  clear passes. Validate cannot pre-empt it either: a mid-iteration queue edit is
+  exactly what the gap inbox exists to prevent.
+  **So the machine has no in-contract path** for its own "validate ends with an
+  accepted red" case. This close escaped only by the operator-directed filing
+  exception (CLAUDE.md §Housekeeping), which is a carve-out, not a mechanism.
+  **Deliverable, and why `[design-pending]`:** the candidates trade off against
+  real properties. Let validate file a baseline slug against a gap-inbox bullet
+  rather than a queue task — cheap, but weakens the liveness check that makes the
+  mark self-retiring. Give the preflight a documented one-shot valve — honest, but
+  a valve that will be reached for whenever close is inconvenient. Or let a
+  configured permanent marker cover the transitional case — smallest change,
+  worst semantics, since the whole point is that the red is *not* permanent.
+  **Cost while deferred:** paid only when validate ends non-clean, but paid as a
+  full stop that costs an operator round-trip at the boundary, in the exact
+  situation where the tree is already known to be imperfect.
+  Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
+  the evidence.
+
+- **knob-default-accessor-singularity** [design-pending] — the missing check class
+  behind two knob-default re-spellings drained this iteration.
+  `check-knob-default-coupling` asserts that every literal site for one knob
+  carries the **same** literal (canon-kit/checks/check-knob-default-coupling.sh
+  L103-113) — an *agreement* assertion. Two identical spellings agree, so they
+  pass, and the gate has no *singularity* assertion at all. That is why both
+  `.github/workflows/publish.yml:97` (`GATE_SDK_NATIVE_CRATE`) and
+  `gate-sdk/checks/check-reads-couples.sh:144` (`GATE_SDK_NATIVE_BIN`) sat green
+  while open-coding a default whose accessor exists and whose `# spec:` comment
+  calls itself "the one home" of it. Both are fixed; the class is not.
+  **The check is buildable, which is why this is filed rather than argued away.**
+  When a knob has a designated accessor — a function whose body is the sole
+  `${KNOB:-…}` — any other literal default site for that knob is a defect even
+  when it agrees. The accessor set is derivable from `lib/*.sh` rather than
+  listed, so the gate ships no term list and the provenance seam holds.
+  **Why `[design-pending]`:** the scan corpus is the open question, not the
+  predicate. The existing gate walks `*.sh` under kit roots only, which is exactly
+  why the `publish.yml` site was unreachable to it; widening to workflow YAML and
+  other non-kit consumers is a corpus decision with its own false-positive
+  profile, and a consumer legitimately reading a knob with a fallback where no
+  accessor is in scope must not red.
+  **Cost while deferred:** every new reader of a knob that already has an accessor
+  can re-spell its default and stay green — and the two found this iteration were
+  both introduced by the port work that is still widening.
+  Filed 2026-08-10 by close as the gap-generalization owed by fixing the two
+  instances inline during the drain.
+
+- **doctrine-rule-number-citation-liveness** [design-pending] — a `rule N`
+  citation into DOCTRINE.md has no liveness check and stales on any renumber.
+  Landing `Probe-before-assertion` as methodology rule 12 pushed the twelve
+  engineering-craft rules from 12-23 to 13-24, staling every prose citation of a
+  craft rule by number. One existed (`TASK-QUEUE.md`, `rule 14's inspectable-run
+  discipline`) and was found only by a hand grep; nothing would have reddened had
+  it been missed.
+  **The near-miss that makes this sharper than it looks.** `guard-kit/SPEC.md`
+  carries ~15 `rule N` citations that are *not* DOCTRINE citations — they name
+  guard-kit's own bash-guard ruleset, which renumbers on its own schedule
+  (that SPEC says so at its own §rule 15). So the corpus a naive scanner would
+  flag is dominated by correct citations of a different ruleset, and telling the
+  two apart is the actual work.
+  **Deliverable, and why `[design-pending]`:** either a gate that resolves a
+  DOCTRINE-scoped `rule N` citation to a real rule and holds its bold name in
+  lockstep — which needs a citation form that names its ruleset, so it is a
+  grammar change before it is a gate — or a convention that drops numbers from
+  cross-references entirely and cites the bold rule name, which is already what
+  DOCTRINE.md does internally (it carries zero self-citations by number).
+  The second is cheaper and may need no gate at all, which is the stronger form
+  under Enforcement-first.
+  **Cost while deferred:** low frequency, silent failure — a renumber is rare, but
+  when it happens every stale citation points confidently at the wrong rule, and
+  the reader has no signal that it moved.
+  Filed 2026-08-10 by close, as the gap-generalization owed by the renumber it
+  performed.
+
+- **port-criterion-7-roster-understated** [design-pending] — the SPEC's
+  external-program port blockers name one gate; the real set is at least five.
+  gate-sdk/SPEC.md's port-candidate criterion 7 (an external program the payload
+  does not carry) names only `check-action-run-shell`'s `shellcheck`. The census
+  at this iteration's scope boundary found `check-docs-render-fidelity` invoking
+  `ruby` as its default `SITE_KIT_RENDERER`, and a `jq` trio —
+  `check-installer-no-deps`, `check-settings-pins`, `check-memory-off` — none of
+  them named in the SPEC. So the sequenced-last roster the port owes a design to
+  is materially wider than the governing document states.
+  **Why it matters beyond bookkeeping:** criterion 7 is what defers a gate to the
+  end of the port sequence, so an understated roster makes the remaining port work
+  look smaller than it is, and a cohort selection that trusts the SPEC's list will
+  mis-sequence.
+  **Deliverable:** derive the criterion-7 set rather than listing it — the
+  external-program dependency of a gate is readable from its source and its
+  configured default renderer/command knobs — or, if derivation proves noisy,
+  state the full roster once at the SPEC with a freshness gate. Deriving is
+  preferred and is why this is not a one-line doc fix.
+  **Cost while deferred:** the port sequence's own input is wrong, and every
+  future cohort census re-derives the same correction; this one already cost a
+  scope boundary's census to find.
+  Filed 2026-08-10 by close, from the gap bullet the scope-boundary census filed.
+
+- **scope-rename-guard-deadlock** [design-pending] — scope's naming step has no
+  unblocked path; two guards steer into each other.
+  The scope template mandates renaming the iteration on the existing `scope` stamp
+  in `.workflow/WORKFLOW-STATE.txt`. `enter-stage.sh` owns no rename mode,
+  `workflow-state-guard` blocks the Edit tool on that file, and `bash-guard` blocks
+  `sed -i` while steering back to Edit. Each guard steers to the other, so every
+  scope session must route around one of them to complete its own contract — the
+  `native-port-cadence` scope finished by a literal `printf` rewrite.
+  **The guards are not wrong, their scope is.** `workflow-state-guard`'s stated
+  rationale is hand-*stamping*, which moves the stage cursor. A rename leaves the
+  stage token untouched and is not that, so the guard is firing on a case its own
+  justification does not cover.
+  **Deliverable, and why `[design-pending]`:** either `enter-stage.sh` gains a
+  rename mode — the mechanized path, consistent with stamping never being done by
+  hand — or the guard exempts an edit that changes no stage token, which needs a
+  predicate over the edit's *content* rather than its path and is the harder
+  guard to write correctly. The first is likelier right; the second is what makes
+  it a design call rather than a chore.
+  **Cost while deferred:** every scope session performs a documented contract by
+  working around a guard, which is precisely the habit guards exist to prevent —
+  and the workaround is re-invented each iteration rather than inherited.
+  Filed 2026-08-10 by close, from the bullet this iteration's own scope session filed.
+
+- **amendment-commit-shape-red-conditions** [design-pending] — the amendment
+  template's red-conditions prompt has no class for commit-shape gates.
+  An amendment whose deltas touch both a gate file and a product path predictably
+  collides with `check-gate-tamper`'s commit-shape rule, forcing a commit split
+  that build discovers rather than plans. `SPEC-native-build.md` enumerated its
+  readers' red conditions carefully and still missed it — not through
+  carelessness, but because the tamper gate is not a *reader* of any changed
+  string. It is a gate on **commit composition**, a class the prompt does not ask
+  about.
+  **Deliverable:** decide whether the red-conditions prompt should ask about
+  commit-shape gates as a distinct class from reader gates, and if so what the
+  amendment owes — a planned commit split is a real deliverable an amendment can
+  state up front.
+  **Cost while deferred:** each such amendment buys the same surprise at build
+  time, where a split is more expensive to perform than to have planned.
+  Filed 2026-08-10 by close, from the bullet build filed against its own amendment.
+
+- **survey-record-claim-reliability** [design-pending] — the survey record carries
+  unwitnessed mechanism claims and was wrong three times in one iteration.
+  `.workflow/survey-record.md` exists so a later stage need not re-derive a survey,
+  and its findings are cited on that authority. This iteration it was wrong three
+  times: the scope block's cohort claim (corrected at spec by operator ruling),
+  its criterion-7 verdict (contested and re-framed), and the spec block's claim
+  that the generated pre-commit hook "never calls `gate_command`" — false at HEAD,
+  `gate-sdk/bin/gen-pre-commit.sh:54`. The third was corrected in place at this
+  close; the first two carry their corrections inline.
+  **What makes this a surface problem, not three line problems.** The record's own
+  contract is a `finding` free-text field a later session "judges before citing",
+  with no bar on the mechanism claims inside it. `check-survey-record` parses the
+  block's *shape* — key order, non-empty `corpus`/`oracle`, a real `rev` — and
+  asserts nothing about whether the finding was verified. So a confident wrong
+  claim is perfectly grammatical.
+  **Interaction with boundary truncation, which cuts both ways.** The record is
+  truncated at the next first-stage entry, so a wrong claim cannot rot for long —
+  which is the argument that this needs no fix. Against that: the whole *point* of
+  the record is to be cited within the iteration, and all three errors did their
+  damage well inside the truncation window.
+  **Deliverable, and why `[design-pending]`:** the honest options are a
+  witness-on-cite discipline (already gestured at by `enter-stage.sh`'s reminder,
+  but advisory), a `verified:`/`inferred:` split inside the finding field, or
+  accepting the surface as lossy and demoting how findings may be cited. The
+  middle option is the one `kfric-capture-unverified-assertion` is separately
+  weighing for the friction log, and the two should probably be decided together.
+  **Cost while deferred:** a wrong finding is cited with the record's authority by
+  the exact sessions it was written to save work for.
+  Filed 2026-08-10 by close, on operator direction after the third error.
+
+- **kit-ref-liveness-stem-token-hole** [design-pending] — a typo'd knob name under
+  a defined stem resolves and passes unchecked.
+  Build batch 2 widened `check-kit-ref-liveness` so that a dispatch-composed knob
+  name resolves against its defined *stem* rather than requiring a full literal
+  match — the right fix, since names like `GATE_SDK_KNOB_<GATE>_<KNOB>` are
+  composed at dispatch and no full literal exists to match. The residual: any
+  token under a defined stem now resolves, so a misspelling such as
+  `GATE_SDK_KNOB_PRUNE_DIRZ` passes.
+  **Inherent to the shape, not a defect in the fix** — which is why it is filed
+  rather than reverted. A composed name has no enumerable literal set, so tightening
+  means reconstructing the composition rule inside the gate.
+  **Deliverable, and why `[design-pending]`:** the candidates are to have the
+  binary answer the question (`--knobs` already reports a gate's knob set, so the
+  gate could resolve a composed token against the live answer rather than a stem)
+  or to constrain the tail to a declared per-gate knob roster. The first is
+  stronger and reuses a seam this iteration just built; it also makes the gate
+  depend on a built binary, which is the trade to weigh.
+  **Cost while deferred:** a typo'd knob reference reads as governed and checked
+  while binding nothing — the failure mode is a knob silently never applied, which
+  surfaces as behavior, not as a red.
+  Filed 2026-08-10 by close, from the residual batch 2 identified and did not file.
+
+- **amendment-correction-density** [design-pending] — one amendment took five
+  corrections across three stages; nothing measures or bounds that.
+  `SPEC-native-build.md` was corrected three times by align and twice more by build
+  batch 2. Every correction was found by a reviewer, none by the author, and the
+  amendment passed its own align gate between the two rounds — so "align passed
+  it" is not evidence an amendment is correct, which is the property the stage is
+  relied on for.
+  **Why this is not just `probe-before-assertion` again.** That rule governs the
+  individual unverified claim. This is about *density*: an amendment accumulating
+  five corrections is a signal about the authoring step — its inputs, its length,
+  or the review bar it was written against — that no surface currently reads,
+  because each correction is landed and forgotten individually.
+  **Deliverable, and why `[design-pending]`:** it is not obvious a count is even
+  the right instrument. Candidates: stamp per-amendment correction counts as a
+  drift-kit measurement and let a threshold prompt a re-author rather than another
+  patch; or treat correction density as a review-time judgment with no counter,
+  on the ground that a long amendment legitimately attracts more corrections than
+  a short one and a raw count would punish thoroughness. Normalising by amendment
+  size is the obvious refinement and the obvious way to game it.
+  **Cost while deferred:** an amendment that needed re-authoring gets patched
+  five times instead, and the cost lands on the stages downstream of it — which is
+  where all five corrections were in fact paid this iteration.
+  Filed 2026-08-10 by close, as the iteration's second candidate lesson.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4298,9 +4585,5 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- gate-tamper-roster-native-reach
-- native-knob-bridge
-- cargo-grant-committed-vs-overlay
 
 ## Lessons Learned
