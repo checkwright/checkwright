@@ -52,8 +52,8 @@
   THREE declined — `poll-sleep-guard-steer`, `cat-read-steer-guard`,
   `dispatch-cited-evidence-unverified` — so the sole-input shape *does* work when a filer routes
   through it. 5 (2026-08-10, `native-port-cadence`), first with the closing session as subject:
-  `exit-echo-decoration-guard-vs-habit` fired twice inside close itself, the guard blocking a
-  decorated `overhead-meter.sh` and `close-surfaces.sh`.
+  `exit-echo-decoration-guard-vs-habit` fired three times inside close itself, the guard blocking
+  a decorated `overhead-meter.sh`, `close-surfaces.sh` and `run-gates.sh`.
   **The answered ground: the unreachable set is now enumerated, not open-ended.** Seven attested
   channels — dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red, close's friction
   triage, a lead's relayed figure, and the closing session's own tool use. The last is the one
