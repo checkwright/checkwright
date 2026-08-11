@@ -1021,6 +1021,19 @@ exit (nothing to compare is not a violation). Clearing the done section is
 safe: only HEAD's *live* slugs are conserved. A rename intentionally fires —
 move the old slug to done, sweep refs.
 
+**The gate is a binary subcommand, and the `no-fixture:` reason survived the
+port intact — what it does not excuse is parity.** The reason is structural
+rather than a stopgap, so it stays true on either substrate; but a member with
+no pair still owes the proof that both implementations agree, and it is paid by
+the constructed scenario gate-sdk/SPEC.md §The port-candidate criteria specifies
+for exactly this shape: throwaway repositories, the worktree mutated without
+committing, both implementations run over the same case and compared byte for
+byte. `git` is the one external program the gate invokes — the sanctioned floor
+exception — and the branch that reports a clean exit when there is no repository
+at all is part of what the scenario covers. The same absence of a fixture case
+is why gate-sdk/SPEC.md §check-gate-output reads this member's output contract
+off its implementation module rather than off its descriptor.
+
 ### check-queue-prose-precondition
 
 Invariant: no active-section entry states a forward precondition in prose

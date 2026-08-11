@@ -258,7 +258,7 @@ if staged_matches 'TASK-QUEUE.md'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-task-conservation queue-kit/checks/check-task-conservation.sh
+    run_gate check-task-conservation env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md $'GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS=New Features\tTechnical Debt' GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION=Deferred GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION=Icebox GATE_SDK_KNOB_QUEUE_KIT_DONE_SECTION=Done native/target/release/checkwright-gates check-task-conservation
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then

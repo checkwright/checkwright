@@ -682,8 +682,8 @@ one recorded disposition below, and a member the section does not name is red.
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
-| `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. |
-| `check-gate-fail-closed` | **Retired with cause** — the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable once a fallible call returns a `Result` that cannot be ignored. A real substrate win, stated as one. |
+| `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
+| `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — but for a subprocess-spawning member the property is held by review and by the port's parity scenario rather than by a gate, and saying so is what keeps the retirement honest. The gap that would close it machine-side is filed rather than built. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API or vendors a walker, because a direct walk would be invisible to the recorder and unverify A. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
@@ -837,6 +837,20 @@ design time; the last three were paid for, and each is named with what it cost.
 1. **Registered** in `gates.list` — an unregistered gate proves no dispatch.
 2. **Carries a fixture pair** — parity between substrates is proved by running
    both against the same cases, never asserted.
+
+   **A `# no-fixture:` member satisfies this by a constructed scenario, not by
+   an exemption.** Where the state under test has no static representation — a
+   HEAD-vs-worktree diff, whose committed fixture has HEAD == worktree — the
+   pair is unavailable but the criterion's actual demand is not: *the same
+   cases, both substrates, while both implementations exist*. The port
+   therefore stands the state up in a throwaway tree, runs both implementations
+   over it, and compares bytes and exit codes. That is a **stronger** oracle
+   than the pair it replaces, not a weaker one, because the scenario reaches
+   branches a committed case cannot — the loss case itself, and the
+   no-repository branch most parity harnesses skip. It is bought once, at port
+   time, with delta (9)'s standing limit: it proves the two agree then, and
+   nothing machine-held keeps them agreeing after, which is why the shell
+   original is deleted for a ported member rather than left running beside it.
 3. **`tier=precommit`** — it lands in the generated hook, so a green
    `check-graph` after the port is end-to-end proof the manifest survived the
    substrate change.
@@ -2490,6 +2504,42 @@ success emission and a `help:` remedy line (the static half of the output
 contract). Presence is checked, not correctness — whether the clean line
 actually fires is the `good/`-fixture job; whether the remedy text is accurate
 is human review.
+
+**A `.gate`-dispatched `# no-fixture:` member resolves both its corpus and its
+emitter alternation off the declaration's substrate.** The static half runs only
+for a member no fixture case can reach (§Output contract), and for a ported one
+the descriptor it resolves to *cannot* hold the strings — the field roster is
+closed and the rule lives elsewhere (§The `# graph:` manifest). So the corpus
+follows the rule to the **implementation module**, at
+`<GATE_SDK_NATIVE_CRATE>/src/gates/<name>.rs` where `<name>` is the gate name
+less its `check-` prefix with `-`→`_`. The mapping is **derived from the name
+that already identifies the gate**, by `lib/gate.sh`'s `gate_native_module`, for
+the reason the descriptor carries no dispatch field: a second registry is a name
+that can drift from the thing it names.
+
+The alternation moves with it, and that half is easy to miss: the shell idiom is
+`echo`/`printf` and the Rust one is `println!`/`eprintln!`/`write!`. **`printf`
+is not a substring of `println`**, so a corpus that moved while the alternation
+stayed would match nothing and report the member clean — a false green, not a
+missed check, and precisely the vacuity moving the corpus was meant to close.
+
+**Where the crate is absent the member is declared out of reach, and that is the
+consumer's ordinary case rather than an escape hatch.** `native/` is not a kit
+root and the payload vendors kit roots, so a consumer receives the descriptor
+and never the module (§Meta-gate conservation for the binary substrate, *Where
+that verification runs, and where it does not* — the same division already ruled
+for the crate's unit tests, and stated there as making the division explicit
+rather than weakening it). The gate therefore branches on the **crate
+directory**, not on the module: no crate in this tree ⇒ the member is counted
+and **named** in the success line as out of reach, never dropped from the
+accounting, because a count that quietly shrank is indistinguishable from a
+member that stopped being checked. A crate that *is* present with no module for
+a dispatching member is a **half-landed port and reds** — which is the branch
+that matters, since upstream the crate always exists. The fixture pair proves
+the module-grep arm in both directions; the out-of-reach branch has its own unit
+test (`gate-tests/check-gate-output.test.sh`), because both fixture cases must
+ship a crate to prove the arm they exist for and so neither can stand up the
+tree where it is missing.
 
 ### check-gate-fail-closed
 

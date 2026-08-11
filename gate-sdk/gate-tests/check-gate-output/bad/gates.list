@@ -1,2 +1,3 @@
 # Fixture registry: names one member that passes silently — must be REJECTED.
 check-sample
+check-native-sample

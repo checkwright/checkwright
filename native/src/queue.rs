@@ -232,6 +232,45 @@ pub fn live_slugs(text: &str, sec: &Sections) -> Vec<String> {
     out
 }
 
+// spec: queue-kit/SPEC.md §check-task-conservation — a done entry is a bare `- <slug>` line and
+// nothing else (awk's `^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$`), so an entry
+// carried into the done section with its live shape intact matches neither grammar
+pub fn bare_bullet_slug(line: &str) -> Option<&str> {
+    let rest = strip_bullet_lead(line)?;
+    let trimmed = rest.trim_end_matches(|c: char| c == ' ' || c == '\t');
+    let b = trimmed.as_bytes();
+    if b.is_empty() || !is_slug_head(b[0]) {
+        return None;
+    }
+    if !b.iter().all(|c| is_slug_byte(*c)) {
+        return None;
+    }
+    Some(trimmed)
+}
+
+// spec: queue-kit/SPEC.md §lib/queue.sh — queue_done_slugs: every bare bullet slug in the done
+// section, in file order
+pub fn done_slugs(text: &str, sec: &Sections) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut ind = false;
+    for line in text.lines() {
+        if sec.is_done(line) {
+            ind = true;
+            continue;
+        }
+        if is_section_line(line) {
+            ind = false;
+        }
+        if !ind {
+            continue;
+        }
+        if let Some(s) = bare_bullet_slug(line) {
+            out.push(s.to_string());
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -283,5 +322,31 @@ mod tests {
         };
         let text = "## New Features\n- **a** x\n## Done\n- b\n## Deferred\n- **c** y\n";
         assert_eq!(live_slugs(text, &sec), vec!["a".to_string(), "c".to_string()]);
+    }
+
+    // spec: queue-kit/SPEC.md §check-task-conservation — the done grammar is bare-slug-only, so
+    // an entry relocated with its live shape intact lands in neither set and reds as a loss
+    #[test]
+    fn a_done_slug_is_a_bare_bullet_and_nothing_else() {
+        assert_eq!(bare_bullet_slug("- the-slug"), Some("the-slug"));
+        assert_eq!(bare_bullet_slug("  -   a1  "), Some("a1"));
+        assert_eq!(bare_bullet_slug("- **the-slug**"), None);
+        assert_eq!(bare_bullet_slug("- the-slug — prose"), None);
+        assert_eq!(bare_bullet_slug("- the-slug [tag]"), None);
+        assert_eq!(bare_bullet_slug("- -leading-dash"), None);
+        assert_eq!(bare_bullet_slug("-nospace"), None);
+        assert_eq!(bare_bullet_slug("- "), None);
+    }
+
+    #[test]
+    fn done_slugs_are_scoped_to_the_done_section() {
+        let sec = Sections {
+            active: vec!["New Features".into()],
+            deferred: "Deferred".into(),
+            icebox: String::new(),
+            done: "Done".into(),
+        };
+        let text = "## Done\n- a\n- b\n## New Features\n- c\n- **d** x\n";
+        assert_eq!(done_slugs(text, &sec), vec!["a".to_string(), "b".to_string()]);
     }
 }

@@ -8,6 +8,7 @@ pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
 pub mod tag_lead_line;
+pub mod task_conservation;
 pub mod task_names;
 
 pub type GateFn = fn(&[String]) -> i32;
@@ -92,6 +93,21 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_ACTIVE_SECTIONS",
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
+        ],
+    ),
+    // spec: gate-sdk/SPEC-queue-cohort.md — the HEAD side comes out of the git object store
+    // rather than off the filesystem, so this member walks nothing and declares the same empty
+    // set its file-reading siblings above declare
+    (
+        "check-task-conservation",
+        task_conservation::run,
+        &[],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_DONE_SECTION",
         ],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's

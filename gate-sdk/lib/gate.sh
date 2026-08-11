@@ -187,6 +187,12 @@ gate_native_crate() {
     printf '%s\n' "${crate%/}"
 }
 
+# spec: gate-sdk/SPEC.md §check-gate-output — the implementation module a .gate-dispatched member's rule lives in, derived from the gate name by the crate's own convention (drop the `check-` prefix, `-`→`_`) rather than held in a second registry that could drift from it
+gate_native_module() {
+    local g="${1#check-}"
+    printf '%s/src/gates/%s.rs\n' "$(gate_native_crate)" "${g//-/_}"
+}
+
 # spec: gate-sdk/SPEC.md §Layout and configuration — GATE_SDK_NATIVE_TARGETS_FILE, defaulted off GATE_SDK_NATIVE_CRATE so the crate's location keeps one owner
 gate_native_targets_file() {
     local crate

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Direct unit test of check-gate-output's out-of-reach branch — the one verdict its
+# fixture pair cannot hold. Both cases of that pair ship a crate dir (they must: the
+# pair's whole job is proving the module-grep arm accepts and rejects), so neither can
+# also stand up the tree where the crate is absent. That tree is not hypothetical: it
+# is every consumer, because native/ is not a kit root and the payload vendors kit
+# roots only, so a vendored .gate member's implementation module is never delivered.
+#
+# Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
+set -uo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
+
+SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+GATE="$SDK/checks/check-gate-output.sh"
+
+fails=0
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+# A consumer-shaped tree: the descriptor vendors, the crate does not exist.
+mkdir -p "$TMP/consumer"
+printf 'check-vendored-sample\n' > "$TMP/consumer/gates.list"
+cat > "$TMP/consumer/check-vendored-sample.gate" <<'EOF'
+# graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# no-fixture: a .gate-dispatched no-fixture member whose implementation module this tree does not carry
+# spec: gate-sdk/SPEC.md §check-gate-output — the out-of-reach branch
+EOF
+
+out="$(cd "$TMP/consumer" && GATE_SDK_KIT_DIRS="$SDK" bash "$GATE" . 2>&1)"; rc=$?
+if [[ "$rc" -ne 0 ]]; then
+    echo "  FAIL: a member whose crate is absent reddened (exit $rc) — every consumer's battery"
+    printf '    %s\n' "$out"
+    fails=$((fails + 1))
+fi
+if ! grep -q 'declared out of reach' <<<"$out"; then
+    echo "  FAIL: the omission was not declared in the success line — a silently shrinking count"
+    printf '    %s\n' "$out"
+    fails=$((fails + 1))
+fi
+if ! grep -q 'check-vendored-sample' <<<"$out"; then
+    echo "  FAIL: the out-of-reach member was not named, so the declaration says nothing"
+    printf '    %s\n' "$out"
+    fails=$((fails + 1))
+fi
+if ! grep -q '0 source-grepped as no-fixture members' <<<"$out"; then
+    echo "  FAIL: an out-of-reach member was still counted as source-grepped"
+    printf '    %s\n' "$out"
+    fails=$((fails + 1))
+fi
+
+# The same tree WITH a crate present and the module missing is the half-landed port,
+# and it must red — this is what keeps the branch above from being an escape hatch.
+cp -R "$TMP/consumer" "$TMP/upstream"
+mkdir -p "$TMP/upstream/native/src/gates"
+out="$(cd "$TMP/upstream" && GATE_SDK_KIT_DIRS="$SDK" bash "$GATE" . 2>&1)"; rc=$?
+if [[ "$rc" -ne 1 ]]; then
+    echo "  FAIL: a crate present with no module for a dispatching member did not red (exit $rc)"
+    printf '    %s\n' "$out"
+    fails=$((fails + 1))
+fi
+if ! grep -q 'no module at native/src/gates/vendored_sample.rs' <<<"$out"; then
+    echo "  FAIL: the red did not name the module path the name convention derives"
+    printf '    %s\n' "$out"
+    fails=$((fails + 1))
+fi
+
+if [[ "$fails" -gt 0 ]]; then
+    echo "check-gate-output.test: $fails assertion(s) failed"
+    exit 1
+fi
+echo "check-gate-output.test: ok (out-of-reach declared, missing-module red)"
+exit 0

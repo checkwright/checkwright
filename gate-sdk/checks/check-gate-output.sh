@@ -20,8 +20,11 @@ members="$(gates_list_members "$LIST")"
 RESOLVE_DIRS=("$DIR")
 while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
 
+CRATE="$(gate_native_crate)"
+
 missing=()
 no_help=()
+out_of_reach=()
 total=0
 runtime=0
 while IFS= read -r m; do
@@ -38,10 +41,27 @@ while IFS= read -r m; do
         runtime=$((runtime + 1))
         continue
     fi
-    if ! grep -Eq '(echo|printf).*: clean' "$src"; then
+    # spec: gate-sdk/SPEC.md §check-gate-output — corpus and emitter alternation both
+    # follow the declaration's substrate: a descriptor cannot hold the strings, and the
+    # shell alternation matches nothing in a Rust module, so a fixed one passes vacuously
+    corpus="$src"
+    emit='(echo|printf)'
+    if [[ "$src" == *.gate ]]; then
+        corpus="$(gate_native_module "$m")"
+        emit='(println!|eprintln!|print!|eprint!|writeln!|write!)'
+        if [[ ! -d "$CRATE" ]]; then
+            out_of_reach+=("$m")
+            continue
+        fi
+        if [[ ! -f "$corpus" ]]; then
+            missing+=("$m (dispatches to a subcommand with no module at $corpus)")
+            continue
+        fi
+    fi
+    if ! grep -Eq "$emit.*: clean" "$corpus"; then
         missing+=("$m (no '<NAME>: clean (…)' success line)")
     fi
-    if ! grep -Eq '(echo|printf).*help:' "$src"; then
+    if ! grep -Eq "$emit.*help:" "$corpus"; then
         no_help+=("$m (no 'help:' remedy line on the failure path)")
     fi
 done <<< "$members"
@@ -70,5 +90,12 @@ if [[ ${#missing[@]} -gt 0 || ${#no_help[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "GATE-OUTPUT: clean ($total gates.list member(s): $((total - runtime)) source-grepped as no-fixture members, $runtime asserted on real output by run-gate-tests)"
+# spec: gate-sdk/SPEC.md §check-gate-output — an out-of-reach member is named in the
+# success line, never silently dropped from the accounting: a count that quietly shrank
+# is indistinguishable from a member that stopped being checked
+declared=""
+if [[ ${#out_of_reach[@]} -gt 0 ]]; then
+    declared=", ${#out_of_reach[@]} declared out of reach with no crate at $CRATE — ${out_of_reach[*]}"
+fi
+echo "GATE-OUTPUT: clean ($total gates.list member(s): $((total - runtime - ${#out_of_reach[@]})) source-grepped as no-fixture members, $runtime asserted on real output by run-gate-tests$declared)"
 exit 0

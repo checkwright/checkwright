@@ -1,0 +1,3 @@
+# graph: couples=TASK-QUEUE.md dir=one valve=none tier=precommit
+# no-fixture: fixture descriptor (scanned as text): a .gate-dispatched no-fixture member, whose output contract lives in its implementation module rather than in this file
+# spec: gate-sdk/SPEC.md §check-gate-output — the corpus follows the rule to the implementation module
