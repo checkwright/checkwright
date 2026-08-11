@@ -4875,8 +4875,10 @@
   numerals have a reason, the answer is partly yes: canon-kit/SPEC.md §check-manifest-count
   documents a cardinal grammar — *"digit sequences and the spelled `two`…`twelve`,
   case-insensitive; `one` is deliberately outside it"* — implemented as `SPEC_COUNT_CARDINAL_RE`
-  in canon-kit/lib/spec.sh. A word-number table is **not future work; it ships**. A grep for
-  "spelling" rules misses it because the rule is spelled "cardinal".
+  in canon-kit/lib/spec.sh. A word-number table is **not future work; it ships** — and the sweep
+  that costed shipped code as future work searched the **right** term: `digit` matches the
+  dispositive line (canon-kit/SPEC.md:642), but `grep -rn … | head -10` cut the output before
+  canon-kit was reached (queue-kit/SPEC.md supplied 11 of 25). **Truncated, not mis-queried.**
   **Discontinuity 1, magnitude.** The word branch stops at `twelve`; the digit branch
   (`[0-9]+`) does not stop. So `13 gates` is matched and `thirteen gates` is not. The SPEC states
   the ceiling without justifying it. Conventional English style — spell through twelve, digits
