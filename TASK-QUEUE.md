@@ -722,8 +722,8 @@
 
 - **spec-measured-count-gate** [design-pending] — a **measured count or extent claim
   authored into governed prose goes stale with no oracle**.
-  recurrence: spec-measured-count-gate 2026-08-09
-  **Twelve instances. Three before 2026-08-09:** the align audit found
+  recurrence: spec-measured-count-gate 2026-08-09 2026-08-11
+  **Thirteen instances. Three before 2026-08-09:** the align audit found
   `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six; the
   tree carried eight); and a third landed in a **binding shim**, `.claude/commands/close.md`'s
   release-policy slot deriving a bump off the note's "two sections" where the cited owner
@@ -750,6 +750,7 @@
   downstream by hand at no cost beyond the re-measurement. The twelfth — an extent claim —
   was caught by **nobody** for two iterations and shipped a false sentence into a published
   SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
+  **Thirteenth, 2026-08-11:** a stale-count escalation itself carried one (98→90; it is 91).
   **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
   scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over governed
   collection nouns and takes an extensible `CANON_KIT_COUNT_NOUNS` list, so a `couples=`
@@ -764,11 +765,10 @@
   measures the tree**, and the failure mode is a canonical doc asserting a false number.
   Detection is by hand at align if at all, and that phrasing is itself a claim about the
   *caught* set, which is what a survivorship count cannot see past.
-  The session-act half is `audit-class-corpus-attestation`, deliberately not folded in:
-  that entry designs a **stamp** obliging a sweep to record the corpus it read, making an
-  extent claim falsifiable when written; this designs a **scanner** over authored prose.
-  Filed 2026-07-26 by close (`release-path-hardening`), draining the
-  stale-measured-count bullet; costed at roughly one small unit.
+  The session-act half is `audit-class-corpus-attestation`, deliberately not folded in: it
+  designs a **stamp** obliging a sweep to record the corpus it read; this designs a
+  **scanner** over authored prose.
+  Filed 2026-07-26 by close (`release-path-hardening`); roughly one small unit.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
@@ -3032,14 +3032,13 @@
 
 - **waiting-rule-carrier-reach** [design-pending] — the residency rule reaches the sessions
   whose definitions name it, and both firings this iteration were outside that set.
-  **Fifth firing — a carrier that names the rule nowhere.** Scope dispatched an `audit-sweep`
-  agent for the port-candidate census; it ended its turn on a live child fork after roughly
-  14.5 minutes of tool work, returning "still waiting on the batch-2 fork's resend" and no
-  census, and had to be resumed by message. The four firings
-  `waiting-rule-fourth-firing-post-fix` records all ran through carriers that *do* name the
-  rule — the `stage-session` definition, a dispatch prompt. The `audit-sweep` definition
-  carries no residency clause at all, so this is evidence about the rule's **reach** rather
-  than about prose-versus-enforcement strength.
+  recurrence: waiting-rule-carrier-reach 2026-08-11
+  **Fifth firing — a carrier that names the rule nowhere.** Scope's `audit-sweep` for the
+  port-candidate census ended its turn on a live child fork with no census, and had to be
+  resumed by message. The four firings `waiting-rule-fourth-firing-post-fix` records all ran
+  through carriers that *do* name the rule; the `audit-sweep` definition carries no residency
+  clause at all, so this is evidence about the rule's **reach** rather than about
+  prose-versus-enforcement strength.
   **Sixth firing — a second carrier class, and the more dangerous one.** The validate session
   backgrounded its own `run-validate.sh` and ended the turn in order to wait on it. For a
   dispatched session a turn end is a session end, so the observer died while the shell child
@@ -3074,9 +3073,11 @@
   enforcement question — that a rule present in loaded context is still not obeyed at the
   moment of temptation. Kept here because the two entries decide together and split evidence
   is how a decider sees half of it.
+  **Eighth firing, 2026-08-11:** rule loaded, named and restated back — and broken anyway.
   **The ground this answers:** if reach is not the binding constraint, widening carriers — both
   candidate homes above — buys less than it appears to, and the two entries likely resolve to
-  one enforcement-shaped answer rather than two prose-shaped ones.
+  one enforcement-shaped answer rather than two prose-shaped ones. Eight firings, the last two
+  with the rule provably in context, is now the argument rather than a hypothesis.
   Filed 2026-08-06 by close, draining the gap inbox and the lead's separately held incident.
 
 - **amendment-dod-sibling-dependence** [design-pending] — an amendment's DoD is written as if
@@ -3797,6 +3798,7 @@
 
 - **readonly-dispatch-isolation-unbuyable** [design-pending] — the shape that makes a read-only
   claim is the shape that poisons the read.
+  recurrence: readonly-dispatch-isolation-unbuyable 2026-08-11
   `scripts/agent-dispatch-guard.sh` refuses a `DELEGATION_KIT_READONLY_TYPES` dispatch without
   `isolation: worktree`, which is correct — a read-only claim is made by isolation, not by
   sentence. But the harness cuts that worktree at a **stale base**, not at HEAD, so the audit
@@ -3815,10 +3817,22 @@
   the rev-discipline clause in a read-only dispatch prompt, a kit-side wrapper that injects it,
   or a ruling that read-only fan-out reads only through the object store — the first two gate a
   prompt's text, which is the reach question the design owes.
+  **Four firings at `native-cohort-queue-kit`, all handed the IDENTICAL rev `47965229`** from
+  dispatchers at `f67e0388`, `32c009ca` and `465ea869`. A base that does not move with the
+  dispatcher is **cached, not raced**, so the defect is deterministic — "may be stale" above
+  understates it. The protocol mitigation is now exercised three times and works: told to
+  verify HEAD and check out the named rev, each child did, and said so. That moves the first
+  two candidates from plausible to attested; what is unbuilt is the *enforcement*.
+  **Second half found this close: isolation cannot see untracked state at all.** A sweep sent
+  to triage `.workflow/prompt-friction.log` (gitignored, worktree-local) read an empty file
+  and reported the corpus absent; `compare-settings-allow.sh` likewise saw no overlay, since
+  `.claude/settings.local.json` is uncommitted. So **a close-surface sweep over an untracked
+  capture surface cannot be delegated to a worktree at all**, and naming the rev does not fix
+  it — three rostered close-surface rows are untracked.
   **Cost while deferred:** an isolated audit's verdict is uncertifiable, so its consumer either
   re-verifies the same sites (paying for the audit twice) or trusts a read that may predate the
-  work under review — and this close could not dispatch its two due audits at all, running them
-  in-session instead.
+  work under review. Widened by the untracked half: such a sweep returns a confident "nothing
+  there", indistinguishable from a clean triage, which is the worse failure of the two.
   Filed 2026-08-08 by close, from the knowledge-friction capture and the gap it drained.
 
 - **deferred-release-declaration-accumulation** [design-pending] — only one of the note's three
@@ -4381,6 +4395,7 @@
 
 - **scope-rename-guard-deadlock** [design-pending] — scope's naming step has no
   unblocked path; two guards steer into each other.
+  recurrence: scope-rename-guard-deadlock 2026-08-11
   The scope template mandates renaming the iteration on the existing `scope` stamp
   in `.workflow/WORKFLOW-STATE.txt`. `enter-stage.sh` owns no rename mode,
   `workflow-state-guard` blocks the Edit tool on that file, and `bash-guard` blocks
@@ -4397,6 +4412,10 @@
   predicate over the edit's *content* rather than its path and is the harder
   guard to write correctly. The first is likelier right; the second is what makes
   it a design call rather than a chore.
+  **Second consecutive scope, 2026-08-11 (`native-cohort-queue-kit`).** The
+  `printf` workaround was re-invented, not inherited — the cost field's own
+  prediction, now attested rather than forecast. Two scopes in a row have
+  completed a documented contract by routing around a guard.
   **Cost while deferred:** every scope session performs a documented contract by
   working around a guard, which is precisely the habit guards exist to prevent —
   and the workaround is re-invented each iteration rather than inherited.
@@ -4495,6 +4514,256 @@
   where all five corrections were in fact paid this iteration.
   Filed 2026-08-10 by close, as the iteration's second candidate lesson.
 
+- **probe-evidence-sufficiency** [design-pending] — rule 12 is discharged by the *act* of
+  consulting a source and says nothing about whether what you consulted supports the claim.
+  `Probe-before-assertion` (doctrine-kit/DOCTRINE.md rule 12) reads as satisfied whenever a
+  command was run or a file was opened. Both failures below ran a probe and read a real
+  surface, and both still produced a false disposition — so the rule was *green* over each.
+  That is the hole: the rule constrains whether evidence was gathered, never whether the
+  evidence gathered is evidence **for this claim**.
+  **Sub-case (a), attribution — the probe's output does not carry its subject.** At spec,
+  `grep -h` over ten filenames returned bare lines and the fifth line was attributed to the
+  fifth argument. Positional mapping is inference, not evidence; it overrode corroborating
+  prose already read in gate-sdk/SPEC.md's conservation table and survived into a committed
+  "correction" of a survey that was right — two wrong commits and a reversal. Candidate
+  clause: a probe whose output does not carry its own subject (`grep -h`, `sort -u` over
+  several files, a bare count) is not evidence for a per-subject claim; ask for the label
+  (`grep -H`, per-file invocation) or do not make the per-subject claim.
+  **Sub-case (b), authority — the surface read is not the one that owns the question.** At
+  build batch 2 the tightened-gates entry was declared unowed from `build.md`'s restatement
+  of the scoping rule, which is accurate *for scoping* and silent on cost; the sentence that
+  decides it (`red ⊆ declared, so a declared gate that never reds is inert`,
+  gate-sdk/SPEC.md §upgrade-smoke) lives only in the owner. The call was not made *against*
+  the clause, it was made **without** it. The lead's own port-criteria error the same
+  iteration has the identical shape, against §The port-candidate criteria.
+  **Why (b) is a hazard this repo manufactures rather than inherits.** Content-tiering,
+  Always-loaded shape and Load-trigger residency deliberately compress each rule to a
+  resident one-liner with the mechanism behind a pointer. That is the right trade for cost,
+  and its by-product is a surface that is *accurate, authoritative-looking, and not
+  dispositive* — a reader cannot tell from the line whether it settles their question. So
+  the more disciplined the tiering, the sharper this edge.
+  **Deliverable, and why `[design-pending]`:** the cheap close is one clause on rule 12
+  covering both sub-cases ("a probe is evidence only for the claim its subject and its owner
+  support"). The open question is whether that is one clause or two, since the remedies
+  diverge — (a) is a property of how a probe is *invoked* and is plausibly lintable, while
+  (b) is a property of which surface was *opened* and has no mechanical residue at all. A
+  third candidate reaches only (b): make the always-loaded tier declare its own status, so a
+  resident line routes and never decides. That is an authoring contract across every kit's
+  digest, which is why it is not obviously cheaper than the clause.
+  **Relationship to `probe-before-assertion-doctrine`:** that entry owns whether *any* slice
+  of the assert-without-probing class is mechanizable and is scoped to that question. This
+  one is the complement — the probe ran, and it was the wrong probe. They decide together
+  and should be read together; kept separate because a mechanizability answer for one says
+  nothing about the other.
+  **Cost while deferred:** paid at the moment of decision by whichever session is closest to
+  the work, and invisible in the diff — a judgement made from an accurate-but-silent surface
+  shows up as an *absence*, and nobody reviews an absence. Four instances this iteration; the
+  two clean ones cost a correction round each, and both were caught only because the deciding
+  session reported its call as reversible rather than landing it quietly.
+  Filed 2026-08-12 by close, draining the rule-12 gap bullet and the lead's handed-over
+  candidate rule; the two were folded into one entry because both amend the same clause.
+
+- **queue-lib-dual-implementation-parity** [design-pending] — the queue-cohort port leaves two
+  helpers and eight derived globals implemented twice with nothing machine-holding the pair.
+  `queue-kit/lib/queue.sh` survives the port as a live shell library for five non-cohort
+  scripts (`bin/queue-index.sh`, `bin/queue-counts.sh`, `bin/queue-edges.sh`, `bin/roadmap.sh`,
+  `bin/lesson-sink.sh` all source it), while the ported gates gain an independent Rust
+  implementation of `queue_live_slugs` and `queue_roadmap_entries`. The eight derived globals
+  reach wider still: every one is read directly by at least one `bin/` script's awk.
+  **This is criterion 6's own qualification firing** — gate-sdk/SPEC.md §The port-candidate
+  criteria permits the duplication a port creates *"unless the duplication the port creates is
+  machine-held"*, and here it is not. The amendment's parity proof is one-time, at port; it
+  does not survive the next edit to either side, because the shell original is not deleted —
+  a `bin/` script still calls it.
+  **Deliverable:** a golden-value cross-implementation test — canned queue-file input, both
+  implementations' output compared — wired into `run-gate-tests.sh` or a dedicated fixture.
+  The fuller close is collapsing the `bin/` scripts onto the same Rust core via a thin
+  subcommand, which was explicitly out of the cohort's scope.
+  **Cost while deferred:** a future change to queue-kit's section-matching or its
+  slug/roadmap-entry grammar edited on only one side silently diverges the gate's verdict from
+  the `bin/` tool's output, with no gate to catch it — and the divergence surfaces as a wrong
+  answer rather than a red.
+  Filed 2026-08-12 by close, draining the bullet align filed against the cohort amendment.
+
+- **cohort-held-members-port-prerequisites** [design-pending] — two queue-kit gates were held
+  on shell by the 2026-08-11 operator ruling, each owing a named prerequisite nothing tracks.
+  Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
+  by denying the seven are an eligibility screen, and criterion 7's worked example
+  (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
+  rather than a permitted exclusion. Both holds are recorded in canonical prose at
+  gate-sdk/SPEC.md §The first cohort; what no queue entry carries is the work owed.
+  **`check-roadmap-fresh` owes a criterion-7 design.** It runs `bash bin/roadmap.sh --emit`,
+  so the gate shells out to a kit shell script the port does not touch. Its fixture pair
+  cannot catch this — both `args` files pass `projection.txt emit.txt`, steering the assertion
+  off the live emitter onto pre-baked files, so a ported member's pair would go green over an
+  arm with no implementation. The three candidates are all unattractive and none is ruled:
+  shell out (bash plus a kit script path back under the binary), reimplement the emission
+  format in Rust (criterion-6 duplication), or collapse `bin/roadmap.sh` itself onto the
+  binary (wider than the gate). Worth preserving in the design: the hold keeps
+  `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the
+  gate can never disagree" guarantee survives intact and is **not** part of the dual-
+  implementation debt above.
+  **`check-queue-prose-precondition` owes a POSIX ERE engine.** `QUEUE_KIT_PRECONDITION_REGEX`
+  is consumer config carrying an arbitrary ERE the gate *interprets* rather than transports
+  across the knob bridge, and the same awk runs two `gsub`s with alternation, groups and
+  negated classes. The crate vendors nothing — asserted by `native/src/walk.rs`'s own test,
+  which fails the build on a non-empty `[dependencies]` — so a port hand-writes an ERE engine
+  plus awk `gsub` semantics. Sizing a subset to this repo's one configured regex is
+  **foreclosed, not merely dispreferred**: the same section makes exactly that argument for
+  globs, where a narrow reader would silently mis-scan the first consumer who writes one.
+  No other queue-kit member needs the engine.
+  **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
+  undifferentiated gate-count, so these two read as two more of ninety-one when one of them is
+  a compiler-shaped sub-project. A later cohort discovers the sizing at implementation time,
+  which is the failure mode criterion 7 exists to prevent — designed first, then ported, never
+  ported and patched.
+  Filed 2026-08-12 by close, draining the two hold bullets build filed.
+
+- **crate-ci-arm-unheld-at-commit-time** [design-pending] — nothing runs the crate's test or
+  lint arms at commit time, and a green battery reads as if something did.
+  `.github/workflows/gates.yml` runs `cargo clippy --release -D warnings` and `cargo test
+  --release` on every push, but `scripts/gates.list` has no member that runs either and
+  `gate-sdk/bin/build-native.sh` only builds. CLAUDE.md states the asymmetry in one direction
+  only ("`cargo test` does not discharge `build-native.sh`") and nothing states the other, so a
+  contributor who runs the full battery **plus** `build-native.sh` has satisfied every
+  documented commit-time obligation and can still push a red CI.
+  **Attested, not hypothetical.** Verified in a detached worktree that both arms were already
+  red at `af5b9ffd` — a commit accepted on a 100/100 battery. `cargo test` failed on the unit
+  test asserting every registry member declares the roots it walks, which panicked on the first
+  bridged member, so the machine-held half of the `check-reads-couples` conservation
+  disposition held nothing **for any member** while the conservation table still claimed it;
+  clippy failed on two findings in the same commit's new code.
+  **Deliverable:** register a gate running `clippy -D warnings` and `cargo test` over
+  `GATE_SDK_NATIVE_CRATE` when cargo is on PATH, tier=precommit, degrading to a declared skip
+  where cargo is absent — the same omit-and-declare shape criterion 5 rules for a missing
+  artifact — so it never blocks a consumer with no toolchain. The doc-only close is one
+  CLAUDE.md line, which is the shape Enforcement-first ranks below the gate.
+  **Cost while deferred:** the port lands member by member with its one machine-held read-set
+  assertion able to die silently, and the breakage surfaces at the iteration's single budgeted
+  push — the worst possible moment, on the largest commit. The defect found this way was
+  repaired at `9d94f834`; the missing enforcement is what this files.
+  Filed 2026-08-12 by close, draining the bullet build filed after the lead's verify set
+  proved incomplete.
+
+- **gate-subprocess-fail-closed-unheld** [design-pending] — the conservation table retires
+  `check-gate-fail-closed` for ported members, and no mechanism holds the property for one
+  that spawns a subprocess.
+  gate-sdk/SPEC.md's conservation table retires the gate for `.gate`-dispatched members because
+  the defect is *"unrepresentable once a fallible call returns a `Result` that cannot be
+  ignored"*. This iteration narrowed the **ground** rather than the disposition: that is
+  genuinely true for a file-reading member, but `check-task-conservation` is the first ported
+  gate to spawn a process, and for `Command::output()` an `Ok` means the **spawn** succeeded,
+  not that git did — so reading `stdout` while ignoring `status` reproduces the
+  captured-emptiness false-green exactly.
+  **Un-retiring the gate is not the close** — its corpus is `check-*.sh` and it cannot parse a
+  Rust module either way, so the disposition stands on its own terms. What is unheld is the
+  *property*, currently carried by review plus a port-time parity scenario, neither of which
+  survives the next edit to the module.
+  **Deliverable:** a crate-side unit test asserting that every `std::process::Command`
+  construction under `native/src/gates/` is followed by a status check — the same shape as
+  `walk.rs`'s existing test asserting a spelling roster absent from every module outside its
+  own, and it would live beside it. The fuller close is a typed wrapper the gate modules must
+  call instead of `Command` directly, which makes the defect unrepresentable again and is what
+  the retired row's ground actually claims; that is new shared crate mechanism, outside what
+  the cohort needed.
+  **Cost while deferred:** the port's whole case rests on the conservation table being
+  exhaustive, and this is the **second** row this cohort found whose stated ground was wider
+  than the truth — the first being the held members' eligibility framing. Each ported gate that
+  shells out re-buys the same unheld property with nothing accumulating.
+  Filed 2026-08-12 by close, draining the bullet build filed at batch 2.
+
+- **scratch-citation-skill-surface-reach** [design-pending] — the permanent-surface class most
+  likely to carry stage-owned pointers is the one `check-scratch-citation` does not scan.
+  The gate ships scanning `TASK-QUEUE.md` and `*/SPEC.md` only
+  (`LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`), and `.claude/commands/*.md` — a permanent,
+  untruncated surface — is deliberately uncovered. The concrete blocker, probed at build and
+  re-probed independently: `.workflow/release-disposition.txt` is a `lifecycle_supersede_set`
+  member and `.claude/commands/close.md` introduces it with a colon, so widening the glob array
+  by one config line would red on it **legitimately** under the gate's form (b).
+  **It is not a citation defect**, which is what makes this a rule decision rather than
+  effort: `close.md` is a stage naming the surface it operates on, the subject case
+  lifecycle-kit/SPEC.md §The survey record already carves out ("naming the record as a subject
+  is unaffected").
+  **Deliverable, and why `[design-pending]`:** decide whether the subject case earns a
+  carve-out in the red condition itself — the gate learns to tell a retrieval promise from an
+  operand — or an exempt tag at each such site, leaving the rule blunt and the author
+  declaring. Deciding this disposes of a second thing at no extra cost: the
+  `scratch-citation-exempt:` tag shipped in the same batch with **no live user in the tree**,
+  and the exempt-tag branch is exactly where it would earn one.
+  **Cost while deferred:** a real retrieval pointer written into a skill file goes uncaught,
+  and the class grows with every skill file added — while a shipped tag with no user reads as
+  dead mechanism to the next session that finds it.
+  Filed 2026-08-12 by close, draining the bullet build filed at batch 3.
+
+- **settings-content-pin-report-absent** [design-pending] — the close-triage template names
+  three overlay dispositions and its tool implements two.
+  guard-kit/templates/close-triage.md step 4 tells close to disposition the local overlay by
+  **redundant**, **too broad**, and **not content-pinned**, the last with a full procedure — an
+  entry naming a *script path* rather than a fixed command grants whatever that file says at
+  run time, and a path under the gitignored scratch dir is rewritable by any session, so the
+  run routes through `bin/scratch-run.sh` and the direct-path grant is removed.
+  `guard-kit/bin/compare-settings-allow.sh` builds only `redundant` and `too_broad`; it has no
+  content-pin arm and prints no such section, so that disposition is hand-executed every close
+  against an unbounded surface, with the template's own wording ("Read the shape, not the
+  literal") as the only method.
+  **It found a live instance immediately, which is the argument.** This close read the overlay
+  by hand and found `Bash(python3 .tmp/*)` — not a pinned scratch path but a **glob over the
+  scratch directory**, granting execution of any Python file any session can write there. The
+  tool was silent on it. Removed this close; the next one is re-armed exactly as the template
+  warns ("Removing instances without applying this criterion re-arms for the next one").
+  **A second, smaller arm gap found alongside it:** redundancy is computed local-vs-committed
+  only, so a local entry subsumed by another *local* entry is never reported —
+  `Bash(git checkout -b *)` sat under `Bash(git checkout *)` unflagged.
+  **Deliverable, and why `[design-pending]`:** the predicate is the design. "Entry names a
+  writable path" is cheap and catches the scratch-glob case; "entry names any path whose
+  content is not fixed" reaches a script under `scripts/` that a commit can change, which is
+  most of the useful allowlist and would over-match badly. Ruling where the line sits is the
+  unit; the scan itself is an afternoon, and the local-vs-local redundancy arm is a one-line
+  widening of an existing loop.
+  **Cost while deferred:** paid once per close as an unbounded hand-read whose miss is silent,
+  and the thing missed is an auto-allow grant over attacker- or accident-writable content —
+  the one allowlist class whose whole point is that it does not look dangerous.
+  Filed 2026-08-12 by close, from its own overlay triage.
+
+- **entry-cap-displaces-mandated-writes** [design-pending] — the per-entry cap silently
+  chooses what a governed mechanism is allowed to record, and it bites hardest where the
+  record matters most.
+  `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three reliefs:
+  compress by answering, evict to the icebox, or relocate grounds to a linked entry — the
+  last **authorization-gated, not self-served**. So a session facing a full entry and holding
+  a *mandatory* one-line write has no self-served move that preserves the record.
+  **Second instance of a class already recorded once.**
+  `deferred-release-declaration-accumulation` documents the first: at the 2026-08-09 close a
+  third deferral's declarations "could not land here at all and ride its disposition line's
+  basis instead — the second alternative below, **chosen by the cap rather than by design**".
+  **This close is the second, and it is sharper because the displaced write is obligatory.**
+  The gap-inbox drain (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a
+  `recurrence:` date in the same commit that truncates the inbox — that commit is the audit
+  artifact, so the write is not optional and is not deferrable. Measured at `465ea869`:
+  `spec-measured-count-gate` stood at **exactly 50 lines**, `waiting-rule-carrier-reach` at
+  **49**. The stamp is one line. So the stamp alone put the first entry over cap and consumed
+  the second's entire headroom, and this close had to compress **peer-authored grounds** — 3
+  lines and 2 lines — purely to make room for a one-line mechanical stamp it was obliged to
+  write. The firing's own evidence went to the commit message instead of the entry.
+  **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
+  so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
+  recurrence most needs recording. The cap therefore goes blind first on the highest-signal
+  findings, and the blindness reads as silence rather than as a red.
+  **Deliverable, and why `[design-pending]`:** the candidates trade off and none is obviously
+  right. Exempt the `recurrence:` line from the count (cheapest, and defensible since it is
+  machine-written and fixed-width, but it exempts the one line that grows without bound as
+  dates accumulate). Make an at-cap entry with a fresh recurrence an automatic *promotion*
+  signal rather than a compression prompt — arguably the honest reading, since thirteen
+  instances is a unit asking to be scheduled, not an entry asking to be trimmed. Or let the
+  drain relocate grounds to a linked entry under a standing authorization, which is the relief
+  the gate names and the one currently unavailable to the session that needs it.
+  **Cost while deferred:** paid every close that drains a recurrence onto a mature entry, and
+  paid as a *quiet* loss — the stamp lands, the gate goes green, and the grounds that would
+  have justified promoting the entry are the thing that got cut. Both instances so far were
+  resolved by displacing content into a commit message or a disposition line, i.e. out of the
+  surface a ranking scope actually reads.
+  Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -4525,9 +4794,5 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- cat-read-steer-guard
-- port-criterion-7-roster-understated
-- survey-citation-outlives-its-record
 
 ## Lessons Learned
