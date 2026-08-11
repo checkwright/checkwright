@@ -15,12 +15,28 @@ warns in the same paragraph that *"selecting by kit, by profile, or by whatever
 is easiest next all re-import work this cohort only paid once."* The operator's
 ruling selects by kit. **The two select the same set here**, and recording why is
 what keeps the ordering rule usable rather than quietly overridden: queue-kit's
-gates are the kit whose corpus derivation *is* the queue file. Nine of the ten
-couple `TASK-QUEUE.md` and nothing else; `check-roadmap-fresh` adds `ROADMAP.md`
-and `scripts/queue-config.sh`, both fixed paths. The kit boundary and the corpus
-boundary coincide, so the by-kit ruling buys the by-corpus economy rather than
-trading it away. A later selector must not read this as licence to take a kit
-whose gates share nothing.
+gates are the kit whose corpus derivation *is* the queue file.
+
+Read off the ten `# graph:` manifests directly: **eight couple `TASK-QUEUE.md`
+alone**; `check-queue-slug-liveness` couples
+`TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh` and carries an explicit
+`trigger=` field; `check-roadmap-fresh` couples `TASK-QUEUE.md,scripts/*.sh`,
+where the glob is a **reverse trigger** — the conservation table already records
+that shape for this family (*"names `scripts/*.sh` in `couples=` only so that a
+script change re-runs it"*). All ten are `dir=one valve=none tier=precommit`, so
+**criterion 3 is clear across the cohort** and a green `check-graph` after the
+port is end-to-end proof the manifest survived the substrate change.
+
+The kit boundary and the corpus boundary therefore coincide, so the by-kit ruling
+buys the by-corpus economy rather than trading it away. A later selector must not
+read this as licence to take a kit whose gates share nothing.
+
+*Correction, recorded because a carried block says otherwise.* The scope survey
+attributes `ROADMAP.md,scripts/queue-config.sh` to `check-roadmap-fresh`. Probed
+at HEAD, that couples line is **`check-queue-slug-liveness`'s**. These two are
+also the cohort's odd members on the axes below, which is exactly how the swap
+survives a reading — a later session citing that block takes this paragraph over
+it.
 
 ## The two independent nine-of-ten splits
 
@@ -76,9 +92,9 @@ Each member declares its knob reads in its registry tuple's fourth element, so a
 knob the bridge was never asked to carry cannot be read.
 
 **(4) `gates.list` is unchanged.** [mechanical] A port swaps a member's
-declaration spelling, never its name; the registry is untouched, which is what
-makes a green `check-graph` after the port end-to-end proof the manifest survived
-the substrate change (criterion 3 — all ten are `tier=precommit`).
+declaration spelling, never its name, so the registry is untouched — which is
+what makes the `check-graph` proof above a proof of the *manifest* rather than of
+a rewritten registration.
 
 ### `check-queue-slug-liveness` — the walker
 
