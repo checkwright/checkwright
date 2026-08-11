@@ -1977,7 +1977,17 @@ Resolution, per declared knob:
 - The resolved array is serialized **tab-joined**. Whitespace is preserved
   inside an element, which is exactly why the whitespace-separated scalar shape
   cannot serve — `CANON_KIT_TEMPORAL_EXEMPT_SECTIONS` contains `Out of scope`. A
-  scalar knob is a one-element array; the two cases share one grammar.
+  scalar knob is a one-element array; the two cases share one grammar. **Those
+  two are the whole domain: the bridge carries scalars and indexed arrays and
+  cannot carry an associative array**, because the serialization has no key
+  channel — `<name>=<tab-joined elements>` transports elements only, so keys
+  would have to be smuggled into element text and re-parsed. A `declare -A` knob
+  is therefore not portable across the bridge as it stands, and a gate that reads
+  one is not a port candidate until the wire format grows keys.
+  `QUEUE_KIT_LESSON_SINKS` is the live instance and is **not** a blocker: no gate
+  reads it, only `bin/lesson-sink.sh` does, so the queue-kit cohort ported with
+  the limit unexercised. Stated here because a later kit's port would otherwise
+  discover it at implementation time.
 - **Three refusals, each exit 2 naming the knob** (§Fail-closed contract): an
   element containing a **newline**, which would break the line-per-element argv
   protocol; an element containing a **tab**, which would break the
