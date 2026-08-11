@@ -12,6 +12,103 @@
 
 ## New Features
 
+- **native-gate-port-remaining-corpus** [spec: SPEC-queue-cohort.md] [roadmap: now/reliability] —
+  the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
+  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
+  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
+  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
+  means a developer clones the **public repository** — source never enters the payload, so the
+  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
+  **The known irreducible, named so nobody reads it as non-compliance.** Something has to run
+  before the binary exists on the machine, and fetching-and-executing the first artifact cannot
+  itself be that artifact. So the **bootstrap** — in shell, or absorbed by the transport, since
+  the payload already ships as an npm package and a Release tarball and npm can carry
+  per-platform binaries — is the one place shell may be unavoidable in the strict sense. Naming
+  it is not designing it; the design is this unit's.
+  **Measured 2026-08-09, and the two numbers size two different benefits.** The port stands at
+  **2 of 100** — `scripts/gates.list` carries 100 registered gates, `native/src/gates/mod.rs`
+  registers two. Wall-clock is the **weaker** argument and should not be leaned on: validate is
+  ~536s of which the entire gate battery is ~31s (under 6%), while `installer_smoke` alone is
+  227s (42%). What timing win exists comes from retiring shell *sources* that `demo`'s
+  shellcheck pass and the payload carry, not from faster gate execution.
+  **This also answers the toolchain-free objection** raised against porting: the installer
+  smoke's toolchain-free arm is satisfied by the pre-compiled path, not by retaining shell
+  gates. `powershell-installer-surface`'s premise moves with it — a binary is one
+  implementation across platforms, so what PowerShell must still cover shrinks to the bootstrap.
+  **Cost while deferred:** large and known — 98 gates plus the runners and the install-lifecycle
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  **Cohort ruled 2026-08-11 by the operator: queue-kit, taken as a whole kit.** The array-knob
+  bridge is spent substrate — it landed and ported zero gates by ruling — and queue-kit's only
+  recorded blocker was criterion 6 on two array knobs (`check-queue-hygiene` reads
+  `QUEUE_KIT_PROSE_LEADS`, `check-queue-sections` reads `QUEUE_KIT_REQUIRED_SECTIONS`), which is
+  exactly what that bridge discharges. The canon-kit `spec_manifest_files` cohort still owes two
+  further shared mechanisms — basename-glob list matching beside walk.rs's extension filter, and a
+  Rust `gate_kit_roots` — so taking it first buys another substrate iteration before a gate lands.
+  **The cohort is 9 of queue-kit's 10, probed at scope 2026-08-11 — carry this number, not the
+  census's 7:** `check-task-conservation` and `check-roadmap-fresh` are file-only too (the census
+  excluded the first only for a missing fixture pair); only `check-queue-slug-liveness` walks,
+  scanning `QUEUE_KIT_PROSE_SURFACE_GLOBS`. `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohort ruled 2026-08-11 at scope.
+
+- **port-criterion-7-roster-understated** [spec: SPEC-port-needs.md] — the SPEC's
+  external-program port blockers name one gate; the real set is at least five.
+  gate-sdk/SPEC.md's port-candidate criterion 7 (an external program the payload
+  does not carry) names only `check-action-run-shell`'s `shellcheck`. The census
+  at this iteration's scope boundary found `check-docs-render-fidelity` invoking
+  `ruby` as its default `SITE_KIT_RENDERER`, and a `jq` trio —
+  `check-installer-no-deps`, `check-settings-pins`, `check-memory-off` — none of
+  them named in the SPEC. So the sequenced-last roster the port owes a design to
+  is materially wider than the governing document states.
+  **Why it matters beyond bookkeeping:** criterion 7 is what defers a gate to the
+  end of the port sequence, so an understated roster makes the remaining port work
+  look smaller than it is, and a cohort selection that trusts the SPEC's list will
+  mis-sequence.
+  **Deliverable:** derive the criterion-7 set rather than listing it — the
+  external-program dependency of a gate is readable from its source and its
+  configured default renderer/command knobs — or, if derivation proves noisy,
+  state the full roster once at the SPEC with a freshness gate. Deriving is
+  preferred and is why this is not a one-line doc fix.
+  **Cost while deferred:** the port sequence's own input is wrong, and every
+  future cohort census re-derives the same correction; this one already cost a
+  scope boundary's census to find.
+  Filed 2026-08-10 by close, from the gap bullet the scope-boundary census filed.
+
+- **survey-citation-outlives-its-record** [spec: SPEC-survey-cite.md] — a permanent surface cites a
+  boundary-truncated one, so the citation dies on schedule.
+  The motivating instance, recorded here because the entry it describes has since shipped and
+  moved to Done: `prose-profile` ended "Full finding and its two-command witness:
+  `.workflow/survey-record.md`". That record is per-iteration scratch, boundary-truncated by
+  design (lifecycle-kit/SPEC.md §The survey record), and `enter-stage.sh scope` truncated it at
+  the very next boundary — so the citation resolved to nothing **one iteration** after it was
+  written, and the finding survives only in the evicting commit.
+  A live instance of `dead-queue-citation-report`'s class, distinguished by cause and worth
+  separating for it: the target was not deleted by mistake or by a rename, it was deleted **on
+  schedule by its own surface's contract**, so no liveness scan over authored links would have
+  predicted it and no author error produced it.
+  **Why this needed design:** three honest closes, and they trade against each other. The citing
+  entry inlines what it needs at filing — cheapest, and it loses the two-command witness that
+  makes a carried survey re-usable. The citation becomes commit-pinned (`git show <rev>:...`) —
+  keeps the witness, and pins a reader to a rev the tree has moved past. Or the record grows a
+  promotion path for a block a permanent surface cites — which re-opens the per-iteration
+  lifetime the record's whole design turns on.
+  **Cost while deferred:** the expensive judgment half of a survey is precisely what the record
+  exists to carry across a boundary, and a queue entry is the surface most likely to want it
+  *after* one. Every such citation is a silent one-iteration fuse.
+  Filed 2026-08-08 at scope on the lead's ruling, found by following the citation and hitting
+  the truncation this session's own boundary reset had just performed.
+
 ## Technical Debt
 
 ## Deferred
@@ -2781,56 +2878,6 @@
   boundary, which is exactly when the state is most valuable and least reconstructible.
   Filed 2026-08-04 at close, from the close session's own misfire.
 
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
-  the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
-  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
-  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
-  means a developer clones the **public repository** — source never enters the payload, so the
-  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something has to run
-  before the binary exists on the machine, and fetching-and-executing the first artifact cannot
-  itself be that artifact. So the **bootstrap** — in shell, or absorbed by the transport, since
-  the payload already ships as an npm package and a Release tarball and npm can carry
-  per-platform binaries — is the one place shell may be unavoidable in the strict sense. Naming
-  it is not designing it; the design is this unit's.
-  **Measured 2026-08-09, and the two numbers size two different benefits.** The port stands at
-  **2 of 100** — `scripts/gates.list` carries 100 registered gates, `native/src/gates/mod.rs`
-  registers two. Wall-clock is the **weaker** argument and should not be leaned on: validate is
-  ~536s of which the entire gate battery is ~31s (under 6%), while `installer_smoke` alone is
-  227s (42%). What timing win exists comes from retiring shell *sources* that `demo`'s
-  shellcheck pass and the payload carry, not from faster gate execution.
-  **This also answers the toolchain-free objection** raised against porting: the installer
-  smoke's toolchain-free arm is satisfied by the pre-compiled path, not by retaining shell
-  gates. `powershell-installer-surface`'s premise moves with it — a binary is one
-  implementation across platforms, so what PowerShell must still cover shrinks to the bootstrap.
-  **Cost while deferred:** large and known — 98 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  **Cohort ruled 2026-08-11 by the operator: queue-kit, taken as a whole kit.** The array-knob
-  bridge is spent substrate — it landed and ported zero gates by ruling — and queue-kit's only
-  recorded blocker was criterion 6 on two array knobs (`check-queue-hygiene` reads
-  `QUEUE_KIT_PROSE_LEADS`, `check-queue-sections` reads `QUEUE_KIT_REQUIRED_SECTIONS`), which is
-  exactly what that bridge discharges. The canon-kit `spec_manifest_files` cohort still owes two
-  further shared mechanisms — basename-glob list matching beside walk.rs's extension filter, and a
-  Rust `gate_kit_roots` — so taking it first buys another substrate iteration before a gate lands.
-  **The cohort is 9 of queue-kit's 10, probed at scope 2026-08-11 — carry this number, not the
-  census's 7:** `check-task-conservation` and `check-roadmap-fresh` are file-only too (the census
-  excluded the first only for a missing fixture pair); only `check-queue-slug-liveness` walks,
-  scanning `QUEUE_KIT_PROSE_SURFACE_GLOBS`. `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohort ruled 2026-08-11 at scope.
-
 - **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
   live entry reads exactly like one that does, and nothing names the difference.
   queue-kit/SPEC.md §The tag algebra rules the in-body single-backtick slug a *reference*
@@ -3919,30 +3966,6 @@
   rather than this resolver.
   Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey.
 
-- **survey-citation-outlives-its-record** [design-pending] — a permanent surface cites a
-  boundary-truncated one, so the citation dies on schedule.
-  The motivating instance, recorded here because the entry it describes has since shipped and
-  moved to Done: `prose-profile` ended "Full finding and its two-command witness:
-  `.workflow/survey-record.md`". That record is per-iteration scratch, boundary-truncated by
-  design (lifecycle-kit/SPEC.md §The survey record), and `enter-stage.sh scope` truncated it at
-  the very next boundary — so the citation resolved to nothing **one iteration** after it was
-  written, and the finding survives only in the evicting commit.
-  A live instance of `dead-queue-citation-report`'s class, distinguished by cause and worth
-  separating for it: the target was not deleted by mistake or by a rename, it was deleted **on
-  schedule by its own surface's contract**, so no liveness scan over authored links would have
-  predicted it and no author error produced it.
-  **Why `[design-pending]`:** three honest closes, and they trade against each other. The citing
-  entry inlines what it needs at filing — cheapest, and it loses the two-command witness that
-  makes a carried survey re-usable. The citation becomes commit-pinned (`git show <rev>:...`) —
-  keeps the witness, and pins a reader to a rev the tree has moved past. Or the record grows a
-  promotion path for a block a permanent surface cites — which re-opens the per-iteration
-  lifetime the record's whole design turns on.
-  **Cost while deferred:** the expensive judgment half of a survey is precisely what the record
-  exists to carry across a boundary, and a queue entry is the surface most likely to want it
-  *after* one. Every such citation is a silent one-iteration fuse.
-  Filed 2026-08-08 at scope on the lead's ruling, found by following the citation and hitting
-  the truncation this session's own boundary reset had just performed.
-
 - **guard-glyph-match-context-blind** [design-pending] — the guard matches its trigger glyphs
   inside quoted and heredoc bodies, so writing *about* the guard is refused by it.
   `scripts/bash-guard.sh` tests the whole command string, so a `$(...)`, a brace expansion or the
@@ -4402,29 +4425,6 @@
   the reader has no signal that it moved.
   Filed 2026-08-10 by close, as the gap-generalization owed by the renumber it
   performed.
-
-- **port-criterion-7-roster-understated** [design-pending] — the SPEC's
-  external-program port blockers name one gate; the real set is at least five.
-  gate-sdk/SPEC.md's port-candidate criterion 7 (an external program the payload
-  does not carry) names only `check-action-run-shell`'s `shellcheck`. The census
-  at this iteration's scope boundary found `check-docs-render-fidelity` invoking
-  `ruby` as its default `SITE_KIT_RENDERER`, and a `jq` trio —
-  `check-installer-no-deps`, `check-settings-pins`, `check-memory-off` — none of
-  them named in the SPEC. So the sequenced-last roster the port owes a design to
-  is materially wider than the governing document states.
-  **Why it matters beyond bookkeeping:** criterion 7 is what defers a gate to the
-  end of the port sequence, so an understated roster makes the remaining port work
-  look smaller than it is, and a cohort selection that trusts the SPEC's list will
-  mis-sequence.
-  **Deliverable:** derive the criterion-7 set rather than listing it — the
-  external-program dependency of a gate is readable from its source and its
-  configured default renderer/command knobs — or, if derivation proves noisy,
-  state the full roster once at the SPEC with a freshness gate. Deriving is
-  preferred and is why this is not a one-line doc fix.
-  **Cost while deferred:** the port sequence's own input is wrong, and every
-  future cohort census re-derives the same correction; this one already cost a
-  scope boundary's census to find.
-  Filed 2026-08-10 by close, from the gap bullet the scope-boundary census filed.
 
 - **scope-rename-guard-deadlock** [design-pending] — scope's naming step has no
   unblocked path; two guards steer into each other.
