@@ -4868,6 +4868,54 @@
   Filed 2026-08-12 by close, from the operator's observation of this session's own scratch tool —
   and demonstrated by that tool inside the same session.
 
+- **cardinal-notation-splits-gate-reach** [design-pending] — whether a written count is
+  enforceable depends on how it is spelled and how large it is, and the queue sits outside the
+  scanning corpus entirely.
+  **The premise that prompted this is falsified, and that is the finding.** Asked whether spelled
+  numerals have a reason, the answer is partly yes: canon-kit/SPEC.md §check-manifest-count
+  documents a cardinal grammar — *"digit sequences and the spelled `two`…`twelve`,
+  case-insensitive; `one` is deliberately outside it"* — implemented as `SPEC_COUNT_CARDINAL_RE`
+  in canon-kit/lib/spec.sh. A word-number table is **not future work; it ships**. A grep for
+  "spelling" rules misses it because the rule is spelled "cardinal".
+  **Discontinuity 1, magnitude.** The word branch stops at `twelve`; the digit branch
+  (`[0-9]+`) does not stop. So `13 gates` is matched and `thirteen gates` is not. The SPEC states
+  the ceiling without justifying it. Conventional English style — spell through twelve, digits
+  above — is the likely reason and is **unrecorded**, so no reader can tell a deliberate ceiling
+  from an unfinished list, and neither can decide whether to extend it.
+  **Discontinuity 2, corpus.** `CANON_KIT_MANIFEST_FILES` does not include `TASK-QUEUE.md`, so
+  none of this reaches the queue. Its 206 spelled numerals from *three* through *fifty*
+  (counted independently here, matching the filer) are outside every count gate, at any
+  magnitude, in either notation.
+  **The worked example is this close's own edit.** `spec-measured-count-gate` moved from "Twelve
+  instances" to "Thirteen instances" here. In the manifest corpus that single word would have
+  moved the claim from **inside** the matcher's reach to **outside** it — the entry about counts
+  going unenforced, crossing the enforcement boundary, in the act of recording its own thirteenth
+  instance. It happened in the queue, which no count gate scans, so nothing could have caught it
+  either way. That is the two discontinuities composing.
+  **DISTINCT from `spec-measured-count-gate`, deliberately not folded into it as grounds.** That
+  entry's thesis is that measured counts **go stale** because nothing derives them; this is that
+  notation and corpus decide whether an existing oracle **reaches** a claim at all. A count can be
+  perfectly current and unreachable, or stale and reachable, so neither closes the other. What is
+  true and kept: a digits convention is a genuine **precondition** that makes that entry's gate
+  cheaper to build, since matching a digit run is trivial where matching spelled compounds is
+  not. Recorded here rather than lost — but a precondition is not the same defect.
+  **Compaction is the weak half, and is stated as weak.** 206 spelled numerals at roughly 4-5
+  characters against a 100-column wrap is on the order of 9 lines file-wide, and a fraction of a
+  line inside any single entry. Real, and not the reason to act.
+  **The framing that decides it:** `TASK-QUEUE.md` reads like prose but is a gated data surface
+  with a line cap, a wrap gate, a tag grammar and slug liveness. Applying a human style guide to
+  it optimizes for a reader it does not have.
+  **Deliverable, and why `[design-pending]` — three separable calls, and only one is mechanical.**
+  (a) Is the `twelve` ceiling deliberate? Record the reason or extend the table. (b) Should
+  `TASK-QUEUE.md` join the manifest corpus? That is a widening with its own false-positive
+  surface, and the entry-cap and wrap gates already treat the file as data. (c) Should the queue
+  adopt digits as convention? **(c) is mechanical and can land alone; (a) and (b) are design.**
+  **Cost while deferred:** every count written in the queue is unreachable by any oracle, and in
+  the manifest corpus a count's enforceability turns on a spelling choice no author is told
+  about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
+  Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
+  falsified by probing the count gate's own matcher rather than by grepping for a style rule.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
