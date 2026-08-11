@@ -25,6 +25,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    ground truth. One owner means one thing to keep true.
    *Enforced by:* the anti-restatement gate family — the comment-tier and
    manifest/prose gates in [canon-kit/SPEC.md](../canon-kit/SPEC.md).
+   *Digest:* one content tier per surface; point, never restate.
 
 2. **Enforcement-first.** On any fix or redundancy finding, name the defect
    class *and* the mechanism that catches it, and land both in one unit; a green
@@ -57,6 +58,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    a gate is the only carrier of intent that survives a fresh context window.
    *Enforced by:* the meta-gate contracts every gate must satisfy —
    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md).
+   *Digest:* the fix and the gate that catches it land in one unit; removing the duplication outranks gating it.
 
 3. **De-literalization.** Prose cites names; code or the owning SPEC owns values.
    Knob defaults, shared constants, and derivable rosters are stated once at
@@ -83,6 +85,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    `internal-identifier-restatement` seed member of the close-stage audit
    roster (`.workflow/audit-roster.txt`), a stated authoring duty due on
    heavy-SPEC contract edits and at release prep.
+   *Digest:* prose cites names; code or the owning SPEC owns values.
 
 4. **Derivation-first.** A fact a tool can derive from the tree is derived at
    use time, never maintained as its own surface. The ladder: derive; else
@@ -104,6 +107,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) §check-graph, and the
    bare-cardinal gate in [canon-kit/SPEC.md](../canon-kit/SPEC.md)
    §check-manifest-count.
+   *Digest:* derive the derivable (a roster, a count), never maintain it; a needed copy is generated and freshness-gated.
 
 5. **Always-loaded shape.** A rule in the always-loaded agent file is one line —
    the convention plus a pointer; its mechanism, rosters, and defaults live
@@ -113,6 +117,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    task; a one-line pointer pays once and loads the detail only when needed.
    *Enforced by:* the brevity budget in
    [context-kit/SPEC.md](../context-kit/SPEC.md) §The brevity gate.
+   *Digest:* one line per rule here; the mechanism behind the pointer.
 
 6. **Load-trigger residency.** The always-loaded file earns a rule only when no
    stage, skill, or tool-call trigger exists to load it; anything a trigger can
@@ -124,6 +129,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) and the tool-call hook seam in
    [guard-kit/SPEC.md](../guard-kit/SPEC.md), which give every triggered rule a home
    that loads on demand.
+   *Digest:* resident only when no stage, skill, or tool loads it.
 
 7. **Widest-true-tier placement.** A fact lands at the widest tier where it holds
    for every reader of that tier: kit-shipped surface when true for every
@@ -136,6 +142,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    *Enforced by:* the binding-slot grammar in
    [lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §check-skill-binding, the seam
    marker between kit-shipped and consumer-tracked tiers.
+   *Digest:* the widest tier true for every reader of it.
 
 8. **Oracle-first.** A check's output is its interface: run the gate instead of
    emulating it, and treat a red run — including a red commit attempt, where the
@@ -160,6 +167,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    [gate-sdk/SPEC.md](../gate-sdk/SPEC.md) — the `clean` and `help:` lines are
    written to be that interface — and the targeted-run resolver reachable through
    the generated hook.
+   *Digest:* run the gate, never emulate it; a red run is the feedback channel.
 
 9. **Spec-over-precedent.** A gate-enforced doc is ground truth: read the
    owner, never mine git history or a prior session's artifacts for how to do
@@ -176,6 +184,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    a fact with no owner gets one, shrinking the space where history is the
    only oracle. No scanner sees *how* a session derived a choice; this rule
    is judgment with a capture mechanism, not a gate.
+   *Digest:* the owner doc is ground truth; history answers what happened, never what is correct.
 
 10. **Gap disposition.** A gap a session surfaces but will not close this
    session — a coverage hole, a design defect, an escaping class — is *costed*,
@@ -198,6 +207,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    queue's Deferred section for design gaps and the knowledge-friction log
    ([drift-kit/SPEC.md](../drift-kit/SPEC.md) §The knowledge-friction loop) for
    fact gaps.
+   *Digest:* a gap you defer is costed and filed, never flagged-and-skipped.
 
 11. **Scope-gated intake.** Delivery work enters only through the scope gate. A
    new initiative raised mid-session — an operator or lead feature request, a
@@ -222,6 +232,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
    intake it names is scope's — the survey that bounds an iteration's units
    ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The state machine) — and the
    filed form rides the queue's Deferred section.
+   *Digest:* a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope.
 
 12. **Probe-before-assertion.** A claim about the tree, the harness, or a tool's
     behavior that one cheap command would settle is probed before it is
@@ -249,6 +260,7 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     ([lifecycle-kit/SPEC.md](../lifecycle-kit/SPEC.md) §The survey record);
     `probe-before-assertion-doctrine` in the queue holds the open question of
     whether any slice of the class is mechanizable.
+    *Digest:* a claim one cheap command would settle is probed before it is asserted; relaying an unverified premise is asserting it.
 
 ## Engineering-craft rules
 

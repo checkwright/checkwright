@@ -5,7 +5,8 @@
 # harness admits one bad/ dir, so this drives the digest-extra-line case
 # (assertion C), the declared-trim case (assertion B satisfied by a trim marker),
 # the link-absent case (assertion A), the craft-trailer cases (assertion D:
-# untagged and malformed), and the four fail-closed exits.
+# untagged and malformed), the digest-trailer cases (assertion E: untrailered,
+# doubled and empty), and the four fail-closed exits.
 #
 # Run by run-gate-tests.sh (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -39,8 +40,11 @@ write_doctrine() {  # $1=dir
 ## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
 2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
 3. **De-literalization.** Prose cites names; code owns values.
+   *Digest:* prose cites names.
 
 ## Engineering-craft rules
 
@@ -160,8 +164,11 @@ cat >"$u/DOCTRINE.md" <<'EOF'
 ## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
 2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
 3. **De-literalization.** Prose cites names; code owns values.
+   *Digest:* prose cites names.
 
 ## Engineering-craft rules
 
@@ -177,8 +184,11 @@ cat >"$f/DOCTRINE.md" <<'EOF'
 ## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
 2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
 3. **De-literalization.** Prose cites names; code owns values.
+   *Digest:* prose cites names.
 
 ## Engineering-craft rules
 
@@ -195,14 +205,84 @@ cat >"$c/DOCTRINE.md" <<'EOF'
 ## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
 2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
 3. **De-literalization.** Prose cites names; code owns values.
+   *Digest:* prose cites names.
 EOF
 check_case "craft-section-missing-failclosed" "$c" 2 "Engineering-craft rules"
+
+# --- meth-untrailered: a methodology rule with no *Digest:* trailer (assertion E) ---
+# The defect this assertion exists for: the rule reaches the doctrine, the digest
+# has nothing to generate its bullet from, and every fresh install ships one short.
+n="$SANDBOX/untrailered"; mkdir -p "$n"; write_full_agent "$n"
+cat >"$n/DOCTRINE.md" <<'EOF'
+# DOCTRINE.md — fixture doctrine
+
+## Methodology-maintenance rules
+
+1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
+2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
+3. **De-literalization.** Untrailered — no *Digest:* line.
+
+## Engineering-craft rules
+
+4. **Rename is a full-surface sweep.** Behind the link — never digested.
+   *Stages:* build
+EOF
+check_case "meth-untrailered" "$n" 1 "carries 0 *Digest:* trailer(s)"
+
+# --- meth-double-trailer: two *Digest:* trailers on one rule (assertion E) ---
+# Two trailers is not a harmless duplicate: the installer would silently pick one
+# and the rule's digest line would stop being decidable from the doctrine.
+w="$SANDBOX/doubled"; mkdir -p "$w"; write_full_agent "$w"
+cat >"$w/DOCTRINE.md" <<'EOF'
+# DOCTRINE.md — fixture doctrine
+
+## Methodology-maintenance rules
+
+1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
+2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
+3. **De-literalization.** Two trailers, so the bullet is undecidable.
+   *Digest:* prose cites names.
+   *Digest:* code owns values.
+
+## Engineering-craft rules
+
+4. **Rename is a full-surface sweep.** Behind the link — never digested.
+   *Stages:* build
+EOF
+check_case "meth-double-trailer" "$w" 1 "carries 2 *Digest:* trailer(s)"
+
+# --- meth-empty-trailer: a *Digest:* trailer with no summary (assertion E) ---
+e="$SANDBOX/emptytrailer"; mkdir -p "$e"; write_full_agent "$e"
+cat >"$e/DOCTRINE.md" <<'EOF'
+# DOCTRINE.md — fixture doctrine
+
+## Methodology-maintenance rules
+
+1. **Content-tiering / SSOT.** One content tier per surface.
+   *Digest:* one tier per surface.
+2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* fix and gate in one unit.
+3. **De-literalization.** Present but empty — a bullet with no summary.
+   *Digest:*
+
+## Engineering-craft rules
+
+4. **Rename is a full-surface sweep.** Behind the link — never digested.
+   *Stages:* build
+EOF
+check_case "meth-empty-trailer" "$e" 1 "*Digest:* value is empty"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-doctrine-registration.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-doctrine-registration.test.sh: clean (extra-line + declared-trim + link-absent + craft-untagged + craft-malformed + 4 fail-closed, 9 cases)"
+echo "check-doctrine-registration.test.sh: clean (extra-line + declared-trim + link-absent + craft-untagged + craft-malformed + meth-untrailered + meth-double-trailer + meth-empty-trailer + 4 fail-closed, 12 cases)"
 exit 0

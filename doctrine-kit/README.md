@@ -13,12 +13,16 @@ doctrine upgrade. See [SPEC.md](SPEC.md#the-doctrine-deliverable) for why that
 reference-not-copy boundary is the mechanism.
 
 The installer — `bin/install-doctrine.sh` — inserts or replaces the reference
-block between fixed markers, idempotently. The gate —
+block between fixed markers, idempotently. It does not carry the digest: each
+bullet is derived from the summary its rule states in a `*Digest:*` trailer, so
+the digest names every methodology rule by construction and a rule cannot land
+in the doctrine but miss the block every consumer installs. The gate —
 `check-doctrine-registration` — holds the block honest: it asserts the
 always-loaded file carries the markdown link *and* keeps its methodology-rule
 digest in per-rule lockstep with the doctrine (each rule digested or declared
-trimmed, no digest bullet orphaned), and every engineering-craft rule carries a
-well-formed `*Stages:*` routing trailer, fail-closed when a scanned file or
+trimmed, no digest bullet orphaned), and that each rule carries its one
+well-formed per-rule trailer — `*Stages:*` routing on the craft register,
+`*Digest:*` on the methodology register — fail-closed when a scanned file or
 heading is missing.
 
 The emitter — `bin/stage-rules.sh <stage>` — reads those trailers and prints the

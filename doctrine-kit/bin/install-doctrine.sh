@@ -33,6 +33,70 @@ DOCTRINE_FILE="${2:-$DOCTRINE_KIT_DOCTRINE_FILE}"
 [[ -f "$AGENT_FILE" ]] \
     || { echo "install-doctrine: agent file not found: $AGENT_FILE — nothing to install into" >&2; exit 2; }
 
+# spec: doctrine-kit/SPEC.md §check-doctrine-registration — the doctrine-side section heading is kit mechanism (the kit ships DOCTRINE.md), never config
+METH_SECTION="## Methodology-maintenance rules"
+
+[[ -f "$DOCTRINE_FILE" ]] \
+    || { echo "install-doctrine: doctrine file not found: $DOCTRINE_FILE — nothing to derive the digest from" >&2; exit 2; }
+
+# spec: doctrine-kit/SPEC.md §install-doctrine — the rule walk: name read exactly as check-doctrine-registration assertion C reads it, summary read from the rule's own *Digest:* trailer exactly as assertion E counts it
+read -r -d '' DIGEST_WALK <<'AWK' || true
+function hlevel(line,   n) {
+    if (line !~ /^#+[[:space:]]/) return 0
+    n = 0
+    while (substr(line, n + 1, 1) == "#") n++
+    return n
+}
+function flush() {
+    if (have) print cur_name "\t" dcount "\t" summary
+}
+!insec {
+    if (hlevel($0) > 0 && substr($0, 1, length(section)) == section) {
+        insec = 1; seen = 1; start_lvl = hlevel($0)
+    }
+    next
+}
+insec && hlevel($0) > 0 && hlevel($0) <= start_lvl { flush(); insec = 0; have = 0; next }
+insec {
+    if ($0 ~ /^[0-9]+\.[[:space:]]+\*\*/) {
+        flush()
+        name = $0
+        sub(/^[0-9]+\.[[:space:]]+\*\*/, "", name)
+        sub(/\*\*.*/, "", name)
+        sub(/\.$/, "", name)
+        cur_name = name; have = 1; dcount = 0; summary = ""
+    } else if ($0 ~ /^[[:space:]]*\*Digest:\*/) {
+        dcount++
+        val = $0
+        sub(/^[[:space:]]*\*Digest:\*[[:space:]]*/, "", val)
+        sub(/[[:space:]]+$/, "", val)
+        if (dcount == 1) summary = val
+    }
+    next
+}
+END { flush(); if (!seen) print "@@NOSECTION" }
+AWK
+
+# spec: doctrine-kit/SPEC.md §install-doctrine — derived once at top level, never inside digest(): digest() is read through process substitution, where an exit would end the subshell and let a malformed doctrine through as a silently short digest
+WALK_OUT="$(awk -v section="$METH_SECTION" "$DIGEST_WALK" "$DOCTRINE_FILE")" \
+    || { echo "install-doctrine: awk failed reading $DOCTRINE_FILE" >&2; exit 2; }
+if [[ "$WALK_OUT" == "@@NOSECTION" ]]; then
+    echo "install-doctrine: no '$METH_SECTION' section in $DOCTRINE_FILE — cannot derive the digest from an unreadable rule set" >&2
+    exit 2
+fi
+
+BULLETS=()
+while IFS=$'\t' read -r rname dcount summary; do
+    [[ -n "$rname" ]] || continue
+    if [[ "$dcount" != 1 ]]; then
+        echo "install-doctrine: methodology rule '$rname' carries $dcount *Digest:* trailer(s) in $DOCTRINE_FILE, want exactly one — refusing to emit a digest missing or double-sourcing its bullet" >&2
+        exit 2
+    fi
+    BULLETS+=("- **$rname** — $summary")
+done <<< "$WALK_OUT"
+[[ ${#BULLETS[@]} -gt 0 ]] \
+    || { echo "install-doctrine: no methodology rules found under '$METH_SECTION' in $DOCTRINE_FILE — refusing to install an empty digest" >&2; exit 2; }
+
 # spec: doctrine-kit/SPEC.md §install-doctrine — the untrimmed digest: the always-loaded shape applied to the doctrine itself, a one-line-per-rule digest plus the markdown link to the doctrine file
 digest() {
     cat <<EOF
@@ -42,18 +106,8 @@ The cross-kit delivery rules live in [$DOCTRINE_FILE]($DOCTRINE_FILE) — re-ven
 to upgrade. The always-loaded maintenance rules, one line each; the doctrine adds
 an engineering-craft section behind the link:
 
-- **Content-tiering / SSOT** — one content tier per surface; point, never restate.
-- **Enforcement-first** — the fix and the gate that catches it land in one unit; removing the duplication outranks gating it.
-- **De-literalization** — prose cites names; code or the owning SPEC owns values.
-- **Derivation-first** — derive the derivable (a roster, a count), never maintain it; a needed copy is generated and freshness-gated.
-- **Always-loaded shape** — one line per rule here; the mechanism behind the pointer.
-- **Load-trigger residency** — resident only when no stage, skill, or tool loads it.
-- **Widest-true-tier placement** — the widest tier true for every reader of it.
-- **Oracle-first** — run the gate, never emulate it; a red run is the feedback channel.
-- **Spec-over-precedent** — the owner doc is ground truth; history answers what happened, never what is correct.
-- **Gap disposition** — a gap you defer is costed and filed, never flagged-and-skipped.
-- **Scope-gated intake** — a mid-session initiative is filed as a costed Deferred entry by default, never started; work enters only through scope.
 EOF
+    printf '%s\n' "${BULLETS[@]}"
 }
 
 # spec: doctrine-kit/SPEC.md §install-doctrine — a digest bullet's rule name, extracted exactly as check-doctrine-registration extracts it (assertion C), so the substitution keys on the same string the gate keys on

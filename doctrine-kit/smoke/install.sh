@@ -117,6 +117,70 @@ fi
 bash "$SMOKE_KIT_ROOT/checks/check-doctrine-registration.sh" >/dev/null \
     || { echo "doctrine smoke: check-doctrine-registration is not green after the --remove/reinstall round trip" >&2; exit 1; }
 
+# spec: doctrine-kit/SPEC.md §install-doctrine — the derivation's refusals. The digest is derived from DOCTRINE.md's *Digest:* trailers, so a rule carrying none (or two) leaves its bullet undecidable; the installer must refuse rather than emit a digest silently one rule short, which is the exact defect the derivation replaced. Driven through the positional overrides so the refusal is *run*, not inspected
+mkdir -p .doctrine-refusal
+cat > .doctrine-refusal/AGENT.md <<'EOF'
+# CLAUDE.md — refusal fixture
+
+<!-- doctrine-kit:begin -->
+sentinel
+<!-- doctrine-kit:end -->
+EOF
+SMOKE_SENTINEL="$(cat .doctrine-refusal/AGENT.md)"
+
+smoke_refusal() {   # $1=label  $2=stderr substring; the scratch doctrine on stdin
+    local rc=0 err
+    cat > .doctrine-refusal/DOCTRINE.md
+    err="$(bash "$SMOKE_KIT_ROOT/bin/install-doctrine.sh" \
+        .doctrine-refusal/AGENT.md .doctrine-refusal/DOCTRINE.md 2>&1 >/dev/null)" || rc=$?
+    if [[ "$rc" -ne 2 ]]; then
+        echo "doctrine smoke: $1 — the installer exited $rc, want 2; a digest it cannot derive must fail closed, not ship short" >&2
+        exit 1
+    fi
+    case "$err" in
+        *"$2"*) : ;;
+        *) echo "doctrine smoke: $1 — the refusal never named the offending rule (stderr was: $err)" >&2; exit 1 ;;
+    esac
+    if [[ "$(cat .doctrine-refusal/AGENT.md)" != "$SMOKE_SENTINEL" ]]; then
+        echo "doctrine smoke: $1 — the installer refused but still wrote the agent file; a refusal must leave the block untouched" >&2
+        exit 1
+    fi
+}
+
+smoke_refusal "untrailered rule" "Untrailered" <<'EOF'
+# DOCTRINE.md — refusal fixture
+
+## Methodology-maintenance rules
+
+1. **Kept.** Has a trailer.
+   *Digest:* kept.
+2. **Untrailered.** The rule that would ship a digest one bullet short.
+
+## Engineering-craft rules
+
+3. **Craft.** Behind the link.
+   *Stages:* build
+EOF
+
+smoke_refusal "doubled trailer" "Doubled" <<'EOF'
+# DOCTRINE.md — refusal fixture
+
+## Methodology-maintenance rules
+
+1. **Kept.** Has a trailer.
+   *Digest:* kept.
+2. **Doubled.** Two trailers, so the bullet is undecidable.
+   *Digest:* first.
+   *Digest:* second.
+
+## Engineering-craft rules
+
+3. **Craft.** Behind the link.
+   *Stages:* build
+EOF
+
+rm -rf .doctrine-refusal
+
 cat >> scripts/gates.list <<'EOF'
 # doctrine-kit
 check-doctrine-registration

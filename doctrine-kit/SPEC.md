@@ -62,15 +62,64 @@ The block is the always-loaded shape applied to the doctrine itself: a one-line
 digest of the methodology-maintenance rules plus a markdown link to the doctrine
 file. The engineering-craft register is not digested — it is load-triggered and
 reached through the link, so the always-loaded surface carries only what bears
-on every edit. The installer is the single source of the block text, so a manual
-insertion for a harness-less consumer copies what the tool would emit; the README
-documents that manual path. The installed digest names every methodology rule,
-so a fresh consumer is in per-rule lockstep out of the box (installer and gate
-agree on the `## Delivery doctrine` heading — that agreement is part of
+on every edit. The installer is the single source of the block *text* — the
+heading, the link paragraph, the bullet shape — so a manual insertion for a
+harness-less consumer copies what the tool would emit; the README documents that
+manual path. It is not the source of the block's *content*: the rule bullets are
+derived from `DOCTRINE.md` (below), so the installed digest names every
+methodology rule by construction rather than by an author remembering to, and a
+fresh consumer is in per-rule lockstep out of the box (installer and gate agree
+on the `## Delivery doctrine` heading — that agreement is part of
 check-doctrine-registration's contract). Trimming a rule the consumer does not
 keep resident stays legal, but rides a declared-trim marker rather than a silent
 deletion: the gate asserts name-lockstep modulo declared trims (§check-doctrine-registration
 assertion B).
+
+**The digest is derived from the doctrine, one bullet per rule.** Each
+methodology rule carries a `*Digest:* <one-line summary>` trailer, and the
+installer emits that rule's bullet as `- **<name>** — <summary>`: the name read
+exactly as §check-doctrine-registration assertion C reads it, the summary taken
+from the trailer verbatim. The bullet roster is therefore the rule roster, and
+the two cannot come to differ in count — the drift axis is removed rather than
+watched, which is what Derivation-first asks for before Enforcement-first is
+even consulted. A hand-maintained bullet list is what this replaces, and its
+failure mode was not hypothetical: a rule that landed in `DOCTRINE.md` and in
+this repo's own agent file never reached the installer's list, so every fresh
+install vendored a digest one rule short while the consumer-side gate stayed
+green — the skew is invisible from the tree that has both copies right.
+
+*Why a trailer and not the rule's own prose.* The obvious cheaper design is to
+extract the summary from the rule body's opening sentence and add no format at
+all. It was measured rather than assumed, and it does not hold: of the twelve
+bullets the digest shipped, **none** occurs as contiguous text anywhere in
+`DOCTRINE.md`. The digest register is deliberately terser and more imperative
+than the doctrine's statement register — the rule states the convention and its
+scope, the bullet is what survives in a file read in full at every session start
+— so extraction would either degrade the doctrine's own prose into digest
+shorthand or invent a summary the author never wrote. The trailer is the
+authoring surface that makes derivation honest: the summary is authored once,
+beside the rule it summarizes, and read from there by everything that needs it.
+
+**The derivation's refusals.** A rule carrying no `*Digest:*` trailer, or two,
+leaves its bullet undecidable, and the installer exits 2 naming the rule rather
+than emitting a digest silently short — the exact defect the derivation
+replaced, so failing closed is the point rather than a courtesy. A missing
+doctrine file and a methodology section that resolves to nothing are exit 2 on
+the same ground: the digest cannot be certified against an unreadable rule set.
+The derivation runs **once, at top level**, before the block is composed —
+`digest()` is read through process substitution, where an exit would end only
+the subshell and let the malformed doctrine through as a short digest, which is
+the failure mode being guarded. §check-doctrine-registration assertion E is the
+tree-side half of the same guard, so an untrailered rule reds at commit time
+instead of waiting for a consumer install to discover it.
+
+**What this asks of a consumer.** Nothing, for a consumer who re-vendors
+`DOCTRINE.md` unchanged — the kit ships it, and its rules ship trailered. A
+consumer who *appends a local rule* to their vendored copy now owes that rule a
+`*Digest:*` trailer. That is a real obligation and worth stating rather than
+claiming zero impact, but it replaces a larger one: assertion B already required
+such a rule to be reflected in the digest, and the trailer is what makes its
+bullet generate rather than have to be hand-written and kept in step.
 
 **The declared-trim round-trip.** A generated block that is unconditionally
 rewritten would revoke that right on the next run — and revoke it *silently*,
@@ -129,12 +178,15 @@ exactly as the insert path rides its sibling — so the marker strings keep thei
 one writer and a caller reversing an installation needs no copy of them. It
 harvests no trims and emits no digest: a removal has nothing to carry forward,
 which is what makes it the reverse of the round-trip above rather than a second,
-emptier pass through it. An agent file carrying **no block is not an error** —
+emptier pass through it — and, for the same reason, it reads no doctrine file
+and so none of the derivation's refusals can arise on this path. An agent file
+carrying **no block is not an error** —
 the run says there was nothing to remove and exits 0, so a second `--remove` is
 as quiet as the first and a caller that cannot know whether the block was ever
-written there needs no way to ask. The refusals are the insert path's, unchanged
-and the only two: a missing agent file is exit 2, and a begin marker without its
-end is exit 2 rather than a guess at the block bounds. What it removes is the
+written there needs no way to ask. Its refusals are the two the insert path
+holds before it reads any doctrine, unchanged and the only two on this path: a
+missing agent file is exit 2, and a begin marker without its end is exit 2
+rather than a guess at the block bounds. What it removes is the
 reference block and nothing else — everything outside the markers is the
 adopter's, on the same terms the honest bound above states for a rewrite.
 
@@ -145,7 +197,14 @@ installer, and holds that the marker survived in the trimmed bullet's position,
 that the bullet is gone, and that the gate is green across the re-run. The same
 acceptor covers the removal mode on that tier and for that reason: it strips the
 block, holds that a second `--remove` is an idempotent no-op, and reinstalls to
-restore the baseline.
+restore the baseline. It also drives the derivation's refusals, on the same tier
+and for a further reason: a refusal is the installer's behavior rather than the
+gate's, so no gate fixture can reach it. Pointed by the positional overrides at
+a scratch doctrine whose second rule carries no `*Digest:*` trailer — and again
+at one whose second rule carries two — it holds that the run exits 2, that the
+message names the offending rule, and that the agent file is byte-unchanged.
+That last assertion is the one worth having: an installer that refuses after
+writing has failed closed in its exit status only.
 
 Positional overrides `install-doctrine.sh [agent-file [doctrine-file]]` let a
 smoke or a fixture point both paths at a scratch tree without touching consumer
@@ -153,10 +212,12 @@ config; unset, they fall to the knob defaults.
 
 ## check-doctrine-registration
 
-Invariant, in four assertions: the configured agent file (A) carries a markdown
+Invariant, in five assertions: the configured agent file (A) carries a markdown
 link to the configured doctrine file and (B, C) holds its methodology-rule digest
-in per-rule lockstep with the doctrine, and the doctrine's craft register (D)
-tags every rule with exactly one stage-routing trailer. The digest is the surface the
+in per-rule lockstep with the doctrine, and the doctrine's two registers tag
+every rule with exactly one per-rule trailer — the craft register with a
+stage-routing trailer (D), the methodology register with the digest trailer its
+bullet is generated from (E). The digest is the surface the
 always-loaded-shape rule requires, and a re-vendored `DOCTRINE.md` that adds or
 renames a methodology-maintenance rule staling every consumer's digest *by
 construction* — on the exact path the kit advertises as its upgrade story — is
@@ -197,6 +258,20 @@ already couples the agent file and the doctrine file).
   unasserted — doctrine-kit does not depend on lifecycle-kit's stage config, and
   the emitter's empty-output posture already covers an unknown stage; the gate
   holds only that the trailer is present and well-formed.
+- **Assertion E (digest-trailer coverage).** Every numbered rule under the
+  doctrine's `## Methodology-maintenance rules` section carries exactly one
+  `*Digest:*` trailer with a non-empty value. This is D's sibling one register
+  over, and the sentence D is argued from transposes exactly: a re-vendored
+  `DOCTRINE.md` that adds an untrailered methodology rule reddens here instead of
+  silently dropping out of the digest the installer derives (§install-doctrine).
+  Zero trailers and two are both findings, for the reason they are on D — a rule
+  with two has no decidable bullet, and picking one silently is exactly the guess
+  a gate exists to refuse. The value is graded only for emptiness: what makes a
+  one-line summary *good* is not machine-decidable, and a check that pretended
+  otherwise would be the noisy gate the Enforcement-first carve-out warns
+  against. D and E run one walk over a register's numbered rules, parameterized
+  by the trailer name and by how its value is graded, so the two registers cannot
+  drift apart in how a rule is read.
 
 Section resolution fails closed. The digest section is the agent-file heading
 named by `DOCTRINE_KIT_DIGEST_SECTION` (Layout and configuration); a configured

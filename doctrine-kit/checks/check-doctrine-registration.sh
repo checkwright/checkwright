@@ -85,8 +85,8 @@ insec {
 END { if (!seen) print "@@NOSECTION" }
 AWK
 
-# spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertion D: every craft rule carries exactly one *Stages:* trailer matching the grammar (comma list of lowercase stages, or —)
-read -r -d '' CRAFT_WALK <<'AWK' || true
+# spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertions D and E share one walk over a register's numbered rules, counting a named per-rule trailer and grading its value: D is `Stages` over the craft register, E is `Digest` over the methodology register
+read -r -d '' TRAILER_WALK <<'AWK' || true
 function hlevel(line,   n) {
     if (line !~ /^#+[[:space:]]/) return 0
     n = 0
@@ -94,7 +94,11 @@ function hlevel(line,   n) {
     return n
 }
 function flush() {
-    if (have) print "C\t" cur_name "\t" scount "\t" bad
+    if (have) print "C\t" cur_name "\t" tcount "\t" bad
+}
+BEGIN {
+    mark = "^[[:space:]]*\\*" trailer ":\\*"
+    strip = mark "[[:space:]]*"
 }
 !insec {
     if (hlevel($0) > 0 && substr($0, 1, length(section)) == section) {
@@ -110,13 +114,15 @@ insec {
         sub(/^[0-9]+\.[[:space:]]+\*\*/, "", name)
         sub(/\*\*.*/, "", name)
         sub(/\.$/, "", name)
-        cur_name = name; have = 1; scount = 0; bad = 0
-    } else if ($0 ~ /^[[:space:]]*\*Stages:\*/) {
-        scount++
+        cur_name = name; have = 1; tcount = 0; bad = 0
+    } else if ($0 ~ mark) {
+        tcount++
         val = $0
-        sub(/^[[:space:]]*\*Stages:\*[[:space:]]*/, "", val)
+        sub(strip, "", val)
         sub(/[[:space:]]+$/, "", val)
-        if (val != "—" && val !~ /^[a-z]+(,[[:space:]]+[a-z]+)*$/) bad = 1
+        if (grammar == "stages") {
+            if (val != "—" && val !~ /^[a-z]+(,[[:space:]]+[a-z]+)*$/) bad = 1
+        } else if (val == "") bad = 1
     }
     next
 }
@@ -140,7 +146,7 @@ if [[ "$digest_out" == "@@NOSECTION" ]]; then
     exit 2  # exit 2: fail-closed
 fi
 
-craft_out="$(awk -v section="$CRAFT_SECTION" "$CRAFT_WALK" "$DOCTRINE_FILE")"; st=$?
+craft_out="$(awk -v section="$CRAFT_SECTION" -v trailer=Stages -v grammar=stages "$TRAILER_WALK" "$DOCTRINE_FILE")"; st=$?
 fail_closed "$st" check-doctrine-registration awk
 if [[ "$craft_out" == "@@NOSECTION" ]]; then
     echo "check-doctrine-registration: no '$CRAFT_SECTION' section in $DOCTRINE_FILE — cannot certify the stage-routing trailers against an unreadable rule set" >&2
@@ -159,6 +165,20 @@ while IFS=$'\t' read -r kind name scount bad; do
         craft_findings+=("craft rule's *Stages:* value is malformed (want a comma list of lowercase stages, or —): $name")
     fi
 done <<< "$craft_out"
+
+# spec: doctrine-kit/SPEC.md §check-doctrine-registration — assertion E: every methodology rule carries exactly one non-empty *Digest:* trailer, the surface install-doctrine derives its bullet from
+meth_out="$(awk -v section="$METH_SECTION" -v trailer=Digest -v grammar=digest "$TRAILER_WALK" "$DOCTRINE_FILE")"; st=$?
+fail_closed "$st" check-doctrine-registration awk
+
+digest_findings=()
+while IFS=$'\t' read -r kind name dcount bad; do
+    [[ "$kind" == C ]] || continue
+    if [[ "$dcount" -ne 1 ]]; then
+        digest_findings+=("methodology rule carries $dcount *Digest:* trailer(s), want exactly one: $name")
+    elif [[ "$bad" == 1 ]]; then
+        digest_findings+=("methodology rule's *Digest:* value is empty: $name")
+    fi
+done <<< "$meth_out"
 
 declare -A in_digest in_trim in_doctrine
 digest_names=()
@@ -187,7 +207,7 @@ for name in "${digest_names[@]+"${digest_names[@]}"}"; do
     [[ -z "${in_doctrine[$name]:-}" ]] && orphans+=("$name")
 done
 
-if [[ ${#missing[@]} -gt 0 || ${#orphans[@]} -gt 0 || ${#craft_findings[@]} -gt 0 ]]; then
+if [[ ${#missing[@]} -gt 0 || ${#orphans[@]} -gt 0 || ${#craft_findings[@]} -gt 0 || ${#digest_findings[@]} -gt 0 ]]; then
     if [[ ${#missing[@]} -gt 0 || ${#orphans[@]} -gt 0 ]]; then
         echo "check-doctrine-registration: the digest and the doctrine are out of lockstep in $AGENT_FILE:"
         for name in "${missing[@]+"${missing[@]}"}"; do
@@ -210,8 +230,17 @@ if [[ ${#missing[@]} -gt 0 || ${#orphans[@]} -gt 0 || ${#craft_findings[@]} -gt 
         echo "        trailer ('*Stages:* —' for none) so a re-vendored DOCTRINE.md that adds an"
         echo "        untagged craft rule reddens instead of silently dropping out of stage routing."
     fi
+    if [[ ${#digest_findings[@]} -gt 0 ]]; then
+        echo "check-doctrine-registration: the digest trailers are out of grammar in $DOCTRINE_FILE:"
+        for f in "${digest_findings[@]}"; do
+            echo "  $f"
+        done
+        echo "  help: every methodology rule owns exactly one non-empty '*Digest:* <one-line summary>'"
+        echo "        trailer — install-doctrine.sh derives that rule's digest bullet from it, so an"
+        echo "        untrailered rule would ship every consumer a digest one rule short."
+    fi
     exit 1
 fi
 
-echo "DOCTRINE-REGISTRATION: clean ($AGENT_FILE links $DOCTRINE_FILE; $rule_count methodology rule(s) in per-rule digest lockstep, $trim_count declared trim(s); $craft_count craft rule(s) each carry one *Stages:* trailer)"
+echo "DOCTRINE-REGISTRATION: clean ($AGENT_FILE links $DOCTRINE_FILE; $rule_count methodology rule(s) in per-rule digest lockstep, $trim_count declared trim(s), each carrying one *Digest:* trailer; $craft_count craft rule(s) each carry one *Stages:* trailer)"
 exit 0

@@ -3,8 +3,11 @@
 ## Methodology-maintenance rules
 
 1. **Content-tiering / SSOT.** One content tier per surface; point, never restate.
+   *Digest:* one content tier per surface; point, never restate.
 2. **Enforcement-first.** The fix and the gate land in one unit.
+   *Digest:* the fix and the gate land in one unit.
 3. **De-literalization.** Prose cites names; code owns values.
+   *Digest:* prose cites names; code owns values.
 
 ## Engineering-craft rules
 
