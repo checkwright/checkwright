@@ -163,10 +163,24 @@ assert_install() {   # $1 = profile, $2 = scratch consumer dir
     if [[ -n "$(recipe_queue_source "$PKG_ROOT/payload" "${want_kits[@]}")" ]]; then
         [[ -f "$C/$QUEUE_FILE" ]] \
             || fail "$profile: its kit set reads the queue file and init seeded none"
-        out="$( cd "$C" && PATH="$RUN_PATH" bash "$PKG_ROOT/payload/queue-kit/checks/check-queue-sections.sh" "$QUEUE_FILE" 2>&1 )"; rc=$?
-        [[ "$rc" -eq 0 ]] \
-            || { printf '%s\n' "$out" >&2; fail "$profile: the queue file init seeded does not satisfy the section contract queue-kit's own gate reads"; }
-        say "queue: $(grep -m1 '^QUEUE-SECTIONS:' <<<"$out")"
+        # spec: installer/README.md §The gate binary — the section floor ported to the binary substrate, so this arm resolves it through gate_command out of the payload exactly as a battery would, rather than naming a script path that no longer exists; the knobs resolve against the consumer's own config because the dispatch runs with the consumer as cwd
+        q_seam="$(lock_own_file "$LOCK" "$GATES_DIR/gate-sdk-config.sh")"
+        q_bin=""
+        [[ -n "$q_seam" && -f "$C/$q_seam" ]] \
+            && q_bin="$(sed -n 's/^GATE_SDK_NATIVE_BIN=//p' "$C/$q_seam" | head -n1)"
+        if [[ -n "$q_bin" && -x "$C/$q_bin" ]]; then
+            out="$( cd "$C" && PATH="$RUN_PATH" GATE_SDK_NATIVE_BIN="$C/$q_bin" bash -c '
+                source "$1/payload/gate-sdk/lib/gate.sh"
+                mapfile -t argv < <(gate_command check-queue-sections "$1/payload/queue-kit/checks") || exit 2
+                [[ ${#argv[@]} -gt 0 ]] || exit 2
+                exec "${argv[@]}" "$2"' _ "$PKG_ROOT" "$QUEUE_FILE" 2>&1 )"; rc=$?
+            [[ "$rc" -eq 0 ]] \
+                || { printf '%s\n' "$out" >&2; fail "$profile: the queue file init seeded does not satisfy the section contract queue-kit's own gate reads"; }
+            say "queue: $(grep -m1 '^QUEUE-SECTIONS:' <<<"$out")"
+        else
+            # spec: installer/README.md §The gate binary — a host the payload carries no artifact for has this member omitted-and-declared by the same selection the artifact arm above asserts, so the install carries no gate to read the contract with; the seeded file is still asserted to exist, and the omission is recorded rather than passed over silently
+            say "queue: seeded; the section floor dispatches to a binary this payload carries none of, so it is omitted-and-declared and asserts nothing here"
+        fi
     else
         [[ ! -f "$C/$QUEUE_FILE" ]] \
             || fail "$profile: no kit in its set reads the queue file, yet init seeded one"

@@ -4,13 +4,12 @@ set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# spec: canon-kit/SPEC.md §check-prose-enum — the tag vocabulary is queue-kit's own parse surface: the class table check-tag-lead-line derives both its match literal and its arr[] key from — the gate's one quoted-literal split() — read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing
-mapfile -t _splits < <(grep -oE 'split\("[^"]+"' "$REPO/queue-kit/checks/check-tag-lead-line.sh")
-(( ${#_splits[@]} == 1 )) || { echo "enum-sets: check-tag-lead-line.sh holds ${#_splits[@]} quoted-literal split() calls, not the one class table this derivation reads; anchor the read on the class table rather than on position" >&2; exit 2; }
-_tagtable="$(printf '%s\n' "${_splits[0]}" | sed -E 's/^split\("//; s/"$//')"
-# shellcheck disable=SC2086  # the table is a space-separated token list; word splitting is the parse
-mapfile -t alltags < <(printf '%s\n' $_tagtable | sed -E 's/[]:]$//' | sort -u)
-[[ ${#alltags[@]} -gt 0 ]] || { echo "enum-sets: no tags parsed from check-tag-lead-line.sh" >&2; exit 2; }
+# spec: canon-kit/SPEC.md §check-prose-enum — the tag vocabulary is queue-kit's own parse surface: the class table check-tag-lead-line derives both its match literal and its arr[] key from, read from the gate rather than re-listed here so a rename cannot leave the two spellings disagreeing. The member ported to the binary substrate, so the corpus follows the rule to its implementation module — the same extension the conservation table makes for every other reader of a ported gate's content
+_clstable="$REPO/native/src/gates/tag_lead_line.rs"
+_nclass="$(grep -cE '^const CLASSES: &\[&str\] = &\[$' "$_clstable")"
+(( _nclass == 1 )) || { echo "enum-sets: $_clstable holds $_nclass CLASSES tables, not the one class table this derivation reads; anchor the read on the class table rather than on position" >&2; exit 2; }
+mapfile -t alltags < <(awk '/^const CLASSES: &\[&str\] = &\[$/ { inb = 1; next } inb && /^\];$/ { exit } inb' "$_clstable" | grep -oE '"[^"]+"' | sed -E 's/^"//; s/"$//; s/[]:]$//' | sort -u)
+[[ ${#alltags[@]} -gt 0 ]] || { echo "enum-sets: no tags parsed from $_clstable" >&2; exit 2; }
 
 # spec: canon-kit/SPEC.md §check-prose-enum — the Lessons channel: [attend] (queue-kit/SPEC.md §The Lessons Learned channel) plus this repo's configured harvest tags; the rest are task/selection tags
 QUEUE_KIT_LESSON_TAGS=()

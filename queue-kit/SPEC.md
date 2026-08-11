@@ -525,6 +525,20 @@ lives in `bin/queue-edges.sh`, which sources this library for the section
 regexes and `queue_live_slugs` it does share. A second reader of body-position
 slug tokens is what would promote the scan into this roster.
 
+**The one-adapter guarantee is now split for `queue_live_slugs`, and holds for
+everything else here.** The gates that read the queue ported to the binary
+substrate (gate-sdk/SPEC.md §Porting a gate to the binary substrate), so
+`check-queue-slug-liveness` and `check-task-conservation` call a Rust
+reimplementation of that helper while `bin/queue-edges.sh` keeps calling this
+one, and nothing machine-held holds the two equal — they were proved
+byte-identical at port time and are edited independently from there. The same is
+true of the section regexes, every one of which a `bin/` script still reads
+directly. The risk is filed as debt rather than closed here, because an ongoing
+cross-implementation check is scope the port did not need in order to prove the
+members it ported. `queue_roadmap_entries` is **not** in that split: its only two
+consumers are `bin/roadmap.sh` and `check-roadmap-fresh`, and the gate was held
+on shell, so the emitter and the gate still cannot disagree.
+
 The loader sources the consumer config, then a `<config>.local.sh` overlay
 beside it when present — last write wins. This is the tracked-name /
 gitignored-value split (the `msg-patterns.local.list` precedent): a private

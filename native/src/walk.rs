@@ -64,6 +64,185 @@ pub fn find_files(root: &Path, exts: &[&str]) -> Result<Vec<PathBuf>, String> {
     Ok(out)
 }
 
+// spec: gate-sdk/SPEC.md §The port-candidate criteria — one glob component, matched as bash
+// matches a pathname component: `*` and `?` never cross `/`, and a leading `.` is literal
+// unless the pattern spells it
+fn match_component(pat: &str, name: &str) -> bool {
+    if name.starts_with('.') && !pat.starts_with('.') {
+        return false;
+    }
+    glob_here(pat.as_bytes(), name.as_bytes())
+}
+
+fn glob_here(p: &[u8], s: &[u8]) -> bool {
+    let (mut pi, mut si) = (0usize, 0usize);
+    let (mut star_p, mut star_s) = (usize::MAX, 0usize);
+    while si < s.len() {
+        if pi < p.len() {
+            match p[pi] {
+                b'*' => {
+                    star_p = pi;
+                    pi += 1;
+                    star_s = si;
+                    continue;
+                }
+                b'?' => {
+                    pi += 1;
+                    si += 1;
+                    continue;
+                }
+                b'[' => {
+                    if let Some((ok, next)) = bracket(p, pi, s[si]) {
+                        if ok {
+                            pi = next;
+                            si += 1;
+                            continue;
+                        }
+                    } else if p[pi] == s[si] {
+                        pi += 1;
+                        si += 1;
+                        continue;
+                    }
+                }
+                c => {
+                    if c == s[si] {
+                        pi += 1;
+                        si += 1;
+                        continue;
+                    }
+                }
+            }
+        }
+        if star_p != usize::MAX {
+            star_s += 1;
+            si = star_s;
+            pi = star_p + 1;
+            continue;
+        }
+        return false;
+    }
+    while pi < p.len() && p[pi] == b'*' {
+        pi += 1;
+    }
+    pi == p.len()
+}
+
+// spec: gate-sdk/SPEC.md §The port-candidate criteria — a bracket expression with `!`/`^`
+// negation and `a-z` ranges; an unterminated `[` is a literal, as the shell reads it
+fn bracket(p: &[u8], at: usize, c: u8) -> Option<(bool, usize)> {
+    let mut i = at + 1;
+    let neg = matches!(p.get(i), Some(&b'!') | Some(&b'^'));
+    if neg {
+        i += 1;
+    }
+    let mut matched = false;
+    let mut first = true;
+    while i < p.len() {
+        if p[i] == b']' && !first {
+            return Some((matched != neg, i + 1));
+        }
+        first = false;
+        if i + 2 < p.len() && p[i + 1] == b'-' && p[i + 2] != b']' {
+            if p[i] <= c && c <= p[i + 2] {
+                matched = true;
+            }
+            i += 3;
+            continue;
+        }
+        if p[i] == c {
+            matched = true;
+        }
+        i += 1;
+    }
+    None
+}
+
+fn has_meta(s: &str) -> bool {
+    s.bytes().any(|b| b == b'*' || b == b'?' || b == b'[')
+}
+
+// spec: gate-sdk/SPEC.md §The port-candidate criteria — `**`-capable list matching over a
+// bridged glob array, the semantics committed once there rather than re-decided per port.
+// Bash-faithful: no prune set applies, because pathname expansion has none.
+pub fn glob_files(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String> {
+    #[cfg(test)]
+    recorder::note(&root.display().to_string());
+    let mut out = Vec::new();
+    for g in globs {
+        let comps: Vec<&str> = g.split('/').filter(|c| !c.is_empty()).collect();
+        let mut hits: Vec<PathBuf> = Vec::new();
+        expand(&root.to_path_buf(), &comps, &mut hits)?;
+        hits.sort();
+        out.extend(hits);
+    }
+    Ok(out)
+}
+
+fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), String> {
+    if comps.is_empty() {
+        if base.is_file() {
+            out.push(base.to_path_buf());
+        }
+        return Ok(());
+    }
+    let (head, rest) = (comps[0], &comps[1..]);
+    if head == "**" {
+        expand(base, rest, out)?;
+        for d in subdirs(base)? {
+            expand(&d, comps, out)?;
+        }
+        return Ok(());
+    }
+    if !has_meta(head) {
+        return expand(&base.join(head), rest, out);
+    }
+    let rd = match fs::read_dir(base) {
+        Ok(r) => r,
+        Err(_) => return Ok(()),
+    };
+    let mut names: Vec<PathBuf> = Vec::new();
+    for ent in rd {
+        let ent = ent.map_err(|e| format!("cannot read entry in {}: {}", base.display(), e))?;
+        names.push(ent.path());
+    }
+    names.sort();
+    for p in names {
+        let name = match p.file_name().and_then(|n| n.to_str()) {
+            Some(n) => n,
+            None => continue,
+        };
+        if match_component(head, name) {
+            expand(&p, rest, out)?;
+        }
+    }
+    Ok(())
+}
+
+fn subdirs(base: &Path) -> Result<Vec<PathBuf>, String> {
+    let rd = match fs::read_dir(base) {
+        Ok(r) => r,
+        Err(_) => return Ok(Vec::new()),
+    };
+    let mut out = Vec::new();
+    for ent in rd {
+        let ent = ent.map_err(|e| format!("cannot read entry in {}: {}", base.display(), e))?;
+        let p = ent.path();
+        let meta = fs::symlink_metadata(&p).map_err(|e| format!("cannot stat {}: {}", p.display(), e))?;
+        if meta.is_dir() {
+            let hidden = p
+                .file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| n.starts_with('.'))
+                .unwrap_or(false);
+            if !hidden {
+                out.push(p);
+            }
+        }
+    }
+    out.sort();
+    Ok(out)
+}
+
 // spec: gate-sdk/SPEC.md §check-reads-couples — the recorder unit test A observes through.
 // Test-scoped deliberately: a production recorder would be state with no reader.
 #[cfg(test)]

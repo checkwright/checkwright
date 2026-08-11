@@ -2,6 +2,13 @@
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
 pub mod action_pinning;
+pub mod queue_entry_budget;
+pub mod queue_hygiene;
+pub mod queue_sections;
+pub mod queue_slug_liveness;
+pub mod queue_wrap;
+pub mod tag_lead_line;
+pub mod task_names;
 
 pub type GateFn = fn(&[String]) -> i32;
 
@@ -26,6 +33,81 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
         action_gh_repo::run,
         &["?"],
         &["GATE_PRUNE_DIRS"],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the queue-kit cohort reads named files
+    // rather than walking a tree, so each member declares an empty walk-root set: there is no
+    // root for the recorder to observe, and unit test A holds that to executed behavior.
+    (
+        "check-queue-sections",
+        queue_sections::run,
+        &[],
+        &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_REQUIRED_SECTIONS"],
+    ),
+    (
+        "check-queue-wrap",
+        queue_wrap::run,
+        &[],
+        &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_WRAP_BUDGET"],
+    ),
+    (
+        "check-queue-hygiene",
+        queue_hygiene::run,
+        &[],
+        &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_PROSE_LEADS"],
+    ),
+    // spec: gate-sdk/SPEC-queue-cohort.md — a member reading a derived section matcher declares
+    // every knob that matcher is computed from, since the Rust side derives them from the
+    // bridged values exactly as lib/queue.sh derives its regexes
+    (
+        "check-tag-lead-line",
+        tag_lead_line::run,
+        &[],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_LESSON_TAGS",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
+    ),
+    (
+        "check-task-names",
+        task_names::run,
+        &[],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+            "QUEUE_KIT_DONE_SECTION",
+        ],
+    ),
+    (
+        "check-queue-entry-budget",
+        queue_entry_budget::run,
+        &[],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_ENTRY_LINE_CAP",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's
+    // own first argument with a default, the variable-first-argument shape the shell parser
+    // calls undecidable
+    (
+        "check-queue-slug-liveness",
+        queue_slug_liveness::run,
+        &["?"],
+        &[
+            "QUEUE_KIT_QUEUE_FILE",
+            "QUEUE_KIT_PROSE_SURFACE_GLOBS",
+            "QUEUE_KIT_ACTIVE_SECTIONS",
+            "QUEUE_KIT_DEFERRED_SECTION",
+            "QUEUE_KIT_ICEBOX_SECTION",
+        ],
     ),
 ];
 

@@ -73,7 +73,7 @@ nine-of-ten**, and it lands on a **different member**:
 
 | axis | the nine | the one |
 |---|---|---|
-| corpus shape (criterion 6) | walk-free, fixed-path reads | `check-queue-slug-liveness` walks `QUEUE_KIT_PROSE_SURFACE_GLOBS` (queue-kit/checks/check-queue-slug-liveness.sh:21) |
+| corpus shape (criterion 6) | walk-free, fixed-path reads | `check-queue-slug-liveness` walks `QUEUE_KIT_PROSE_SURFACE_GLOBS` (`native/src/gates/queue_slug_liveness.rs` since the port; the shell original read it at `check-queue-slug-liveness.sh:21`) |
 | fixture pair (criterion 2) | `good/`+`bad/` under `queue-kit/gate-tests/` | `check-task-conservation` — the kit's sole `# no-fixture:` member (queue-kit/checks/check-task-conservation.sh:4) |
 
 Evidence: `find queue-kit/gate-tests -maxdepth 2 -type d -name good -o -name bad`

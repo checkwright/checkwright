@@ -2,6 +2,7 @@
 // a .gate-declared registry member to; `--list` reports the subcommand roster
 // check-gate-substrate-parity assertion B compares against the descriptors on disk
 mod gates;
+mod queue;
 mod walk;
 
 use std::process::exit;

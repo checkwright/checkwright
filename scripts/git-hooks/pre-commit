@@ -234,27 +234,27 @@ if staged_matches '.workflow/gap-inbox.md'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-queue-sections queue-kit/checks/check-queue-sections.sh
+    run_gate check-queue-sections env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md $'GATE_SDK_KNOB_QUEUE_KIT_REQUIRED_SECTIONS=Iteration:\tNew Features\tTechnical Debt\tDeferred\tDone\tLessons Learned\tIcebox' native/target/release/checkwright-gates check-queue-sections
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-queue-hygiene queue-kit/checks/check-queue-hygiene.sh
+    run_gate check-queue-hygiene env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_QUEUE_KIT_PROSE_LEADS=Protocol: native/target/release/checkwright-gates check-queue-hygiene
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-queue-wrap queue-kit/checks/check-queue-wrap.sh
+    run_gate check-queue-wrap env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_QUEUE_KIT_WRAP_BUDGET=100 native/target/release/checkwright-gates check-queue-wrap
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-tag-lead-line queue-kit/checks/check-tag-lead-line.sh
+    run_gate check-tag-lead-line env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_QUEUE_KIT_LESSON_TAGS=essay $'GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS=New Features\tTechnical Debt' GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION=Deferred GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION=Icebox native/target/release/checkwright-gates check-tag-lead-line
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-queue-entry-budget queue-kit/checks/check-queue-entry-budget.sh
+    run_gate check-queue-entry-budget env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md GATE_SDK_KNOB_QUEUE_KIT_ENTRY_LINE_CAP=50 $'GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS=New Features\tTechnical Debt' GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION=Deferred GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION=Icebox native/target/release/checkwright-gates check-queue-entry-budget
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
-    run_gate check-task-names queue-kit/checks/check-task-names.sh
+    run_gate check-task-names env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md $'GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS=New Features\tTechnical Debt' GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION=Deferred GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION=Icebox GATE_SDK_KNOB_QUEUE_KIT_DONE_SECTION=Done native/target/release/checkwright-gates check-task-names
 fi
 
 if staged_matches 'TASK-QUEUE.md'; then
@@ -266,7 +266,7 @@ if staged_matches 'TASK-QUEUE.md'; then
 fi
 
 if staged_matches 'TASK-QUEUE.md' 'scripts/*.sh'; then
-    run_gate check-queue-slug-liveness queue-kit/checks/check-queue-slug-liveness.sh
+    run_gate check-queue-slug-liveness env GATE_SDK_KNOB_QUEUE_KIT_QUEUE_FILE=TASK-QUEUE.md $'GATE_SDK_KNOB_QUEUE_KIT_PROSE_SURFACE_GLOBS=docs/*.md\t*.local.md' $'GATE_SDK_KNOB_QUEUE_KIT_ACTIVE_SECTIONS=New Features\tTechnical Debt' GATE_SDK_KNOB_QUEUE_KIT_DEFERRED_SECTION=Deferred GATE_SDK_KNOB_QUEUE_KIT_ICEBOX_SECTION=Icebox native/target/release/checkwright-gates check-queue-slug-liveness
 fi
 
 if staged_matches 'TASK-QUEUE.md' 'ROADMAP.md' 'scripts/queue-config.sh'; then
