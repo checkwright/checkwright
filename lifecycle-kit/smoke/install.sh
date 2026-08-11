@@ -14,6 +14,7 @@ check-merge-attrs
 check-lifecycle-registration
 check-survey-record
 check-gap-inbox-neutrality
+check-scratch-citation
 EOF
 
 if [[ ! -f TASK-QUEUE.md ]]; then

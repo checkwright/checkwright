@@ -2709,17 +2709,42 @@ root and the payload vendors kit roots, so a consumer receives the descriptor
 and never the module (§Meta-gate conservation for the binary substrate, *Where
 that verification runs, and where it does not* — the same division already ruled
 for the crate's unit tests, and stated there as making the division explicit
-rather than weakening it). The gate therefore branches on the **crate
-directory**, not on the module: no crate in this tree ⇒ the member is counted
-and **named** in the success line as out of reach, never dropped from the
-accounting, because a count that quietly shrank is indistinguishable from a
-member that stopped being checked. A crate that *is* present with no module for
-a dispatching member is a **half-landed port and reds** — which is the branch
-that matters, since upstream the crate always exists. The fixture pair proves
-the module-grep arm in both directions; the out-of-reach branch has its own unit
-test (`gate-tests/check-gate-output.test.sh`), because both fixture cases must
-ship a crate to prove the arm they exist for and so neither can stand up the
-tree where it is missing.
+rather than weakening it). The gate therefore branches on the **crate manifest**,
+`<GATE_SDK_NATIVE_CRATE>/Cargo.toml`, not on the module: no crate in this tree ⇒
+the member is counted and **named** in the success line as out of reach, never
+dropped from the accounting, because a count that quietly shrank is
+indistinguishable from a member that stopped being checked. A crate that *is*
+present with no module for a dispatching member is a **half-landed port and
+reds** — which is the branch that matters, since upstream the crate always
+exists.
+
+**Why the manifest and not the directory.** The predicate was once
+directory-presence, and that was wrong for a reason worth keeping written down:
+the crate path is also where build artifacts land. `GATE_SDK_NATIVE_BIN`
+defaults inside it, so *anything* that places the binary at its default —
+`csmoke_place_binary` seeding a scratch consumer (§Consumer smoke), or an
+adopter who hand-vendors and copies the artifact to that deliberately stable
+relative path — creates the directory while delivering no crate at all. Under
+directory-presence the out-of-reach branch could then never fire for exactly the
+consumer it was written for, and the gate demanded a source module that tree was
+never meant to receive. Directory-presence was never crate-presence; the
+manifest is the file that only a crate has.
+
+**Why not the gates module directory either.** `<crate>/src/gates/` would also
+distinguish the consumer case, and it is the wrong probe in the more dangerous
+direction: it conflates *crate present* with *ports landed*. A tree whose gates
+module was deleted would go out of reach **silently**, converting the
+half-landed-port red directly above into a green — the one verdict this branch
+must never manufacture. The manifest cannot: a crate whose modules all vanished
+still has its `Cargo.toml`, so that tree stays red where it belongs.
+
+The fixture pair proves the module-grep arm in both directions; the out-of-reach
+branch has its own unit test (`gate-tests/check-gate-output.test.sh`), because
+both fixture cases must ship a crate to prove the arm they exist for and so
+neither can stand up the tree where it is missing. That test carries the
+regression case for the paragraph above — a tree holding the binary at its
+default path and no manifest is out of reach — since the defect it fixes was
+invisible from any tree that has a real crate, which upstream always does.
 
 ### check-gate-fail-closed
 

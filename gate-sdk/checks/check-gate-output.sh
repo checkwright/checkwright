@@ -21,6 +21,8 @@ RESOLVE_DIRS=("$DIR")
 while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots)
 
 CRATE="$(gate_native_crate)"
+# spec: gate-sdk/SPEC.md §check-gate-output — crate presence is the manifest, never the directory: anything that writes a build artifact under the crate path creates the directory, so a consumer holding only the binary would otherwise be read as carrying the crate
+CRATE_MANIFEST="$CRATE/Cargo.toml"
 
 missing=()
 no_help=()
@@ -49,7 +51,7 @@ while IFS= read -r m; do
     if [[ "$src" == *.gate ]]; then
         corpus="$(gate_native_module "$m")"
         emit='(println!|eprintln!|print!|eprint!|writeln!|write!)'
-        if [[ ! -d "$CRATE" ]]; then
+        if [[ ! -f "$CRATE_MANIFEST" ]]; then
             out_of_reach+=("$m")
             continue
         fi
@@ -95,7 +97,7 @@ fi
 # is indistinguishable from a member that stopped being checked
 declared=""
 if [[ ${#out_of_reach[@]} -gt 0 ]]; then
-    declared=", ${#out_of_reach[@]} declared out of reach with no crate at $CRATE — ${out_of_reach[*]}"
+    declared=", ${#out_of_reach[@]} declared out of reach with no crate at $CRATE_MANIFEST — ${out_of_reach[*]}"
 fi
 echo "GATE-OUTPUT: clean ($total gates.list member(s): $((total - runtime - ${#out_of_reach[@]})) source-grepped as no-fixture members, $runtime asserted on real output by run-gate-tests$declared)"
 exit 0
