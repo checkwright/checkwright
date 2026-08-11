@@ -74,22 +74,78 @@ axis as the cohort's difficulty is the mis-sizing this section exists to prevent
 each rule is re-implemented, and byte-identical parity over its fixture pair is
 the acceptance oracle, not a formality.
 
-**(2) The shared queue library ports once.** [design-bearing]
-`queue-kit/lib/queue.sh` is 193 lines carrying four helpers — `queue_alt`,
-`queue_live_slugs`, `queue_done_slugs`, `queue_roadmap_entries` — and the cohort's
-members call into them. They are re-implemented **once**, as a Rust module the
-cohort's gates share, which is the same "ported once and proved N times" economy
-§The first cohort names. Porting them per-gate is the failure mode to refuse.
+**(2) The shared queue library ports once — and it carries more than helpers.**
+[design-bearing] `queue-kit/lib/queue.sh` is 193 lines and the cohort's members
+source it. Three distinct things live in it, and only the first is what "shared
+library" suggests:
 
-**(3) Knob bridge, no new substrate.** [mechanical] The cohort reads five scalars
-(`QUEUE_KIT_QUEUE_FILE`, `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_LINE_CAP`,
-`QUEUE_KIT_PRECONDITION_REGEX`, `QUEUE_KIT_DEFERRED_SECTION`) and three arrays
-(`QUEUE_KIT_PROSE_LEADS`, `QUEUE_KIT_REQUIRED_SECTIONS`,
-`QUEUE_KIT_LESSON_TAGS`). Every one is carried by the existing config bridge —
-this is the substrate that landed last iteration and ported zero gates by ruling,
-and discharging criterion 6 for these arrays is exactly what it was built for.
-Each member declares its knob reads in its registry tuple's fourth element, so a
-knob the bridge was never asked to carry cannot be read.
+- **Four helpers** — `queue_alt` (:68), `queue_live_slugs` (:91),
+  `queue_done_slugs` (:102), `queue_roadmap_entries` (:116). Re-implemented
+  **once**, as a Rust module the cohort's gates share — the "ported once and
+  proved N times" economy §The first cohort names. Porting them per-gate is the
+  failure mode to refuse.
+- **Derived globals** — `QUEUE_ACTIVE_RE`, `QUEUE_DEFERRED_RE`,
+  `QUEUE_ICEBOX_RE`, `QUEUE_DONE_RE`, `QUEUE_TASK_SECTIONS` (:71-82), computed
+  from the knobs at source time. These are **not knobs**, so the bridge does not
+  carry them; the Rust side derives them from the bridged knob values by the same
+  rules. Naming them matters because a port that bridges only the knobs and looks
+  for the regexes will not find them declared anywhere.
+- **A fail-closed config validation** (:164-192) that `exit 2`s with *"queue-kit:
+  malformed queue config — the gates cannot run"*, covering emptiness, integer
+  shape, an icebox/deferred name collision, and a **cross-knob** rule that
+  `QUEUE_KIT_HORIZONS` and `QUEUE_KIT_TRACKS` are configured as a pair.
+
+**The validation survives the port at no cost, and the reason is worth
+recording.** `_gate_knob_value` resolves each declared knob by **sourcing the
+owning kit's `lib/*.sh` in a subshell** (gate-sdk/lib/gate.sh:104-113), so
+`queue.sh` is sourced at dispatch and its validation block runs there. Its
+`exit 2` propagates out of the subshell, through `_gate_knob_value`'s non-zero
+return, into `gate_command`'s `|| exit 2` — the §Fail-closed contract, preserved
+without re-implementing a line of it. This is criterion 6's *"the duplication is
+not machine-held, it is absent"* argument extending from knob **defaults** to
+knob **validation**, which is what makes a thirteen-knob cohort tractable at all.
+
+**Its honest limit, stated rather than discovered.** That only holds for a member
+declaring **at least one** knob; a member declaring none never causes the library
+to be sourced and would silently skip validation. Every one of the ten reads at
+least `QUEUE_KIT_QUEUE_FILE`, so the limit is not live in this cohort — but it is
+a property of the bridge rather than of this cohort, and the next port meets it
+again.
+
+**(3) Knob bridge, no new substrate — and the count is larger than carried.**
+[design-bearing] Probed at HEAD (`grep -ohE 'QUEUE_KIT_[A-Z_]+' queue-kit/checks/*.sh`),
+the cohort's gates name **thirteen** knobs, not the eight the scope survey lists:
+
+- **Seven scalars** — `QUEUE_KIT_QUEUE_FILE`, `QUEUE_KIT_DEFERRED_SECTION`,
+  `QUEUE_KIT_WRAP_BUDGET`, `QUEUE_KIT_ENTRY_LINE_CAP`,
+  `QUEUE_KIT_PRECONDITION_REGEX`, `QUEUE_KIT_ROADMAP_FILE`,
+  `QUEUE_KIT_ROADMAP_MARKER`.
+- **Six arrays** — `QUEUE_KIT_REQUIRED_SECTIONS`, `QUEUE_KIT_PROSE_LEADS`,
+  `QUEUE_KIT_PROSE_SURFACE_GLOBS`, `QUEUE_KIT_LESSON_TAGS`,
+  `QUEUE_KIT_HORIZONS`, `QUEUE_KIT_TRACKS`.
+
+The survey omits `ROADMAP_FILE`, `ROADMAP_MARKER`, `PROSE_SURFACE_GLOBS`,
+`HORIZONS` and `TRACKS` — the roadmap family, the same family its couples
+attribution swapped. Sourcing the library reaches five more
+(`QUEUE_KIT_ACTIVE_SECTIONS`, `QUEUE_KIT_DONE_SECTION`,
+`QUEUE_KIT_ICEBOX_SECTION`, `QUEUE_KIT_ICEBOX_AGE_DAYS`,
+`QUEUE_KIT_ATTEND_CAP`), which the validation above reads whether or not a member
+declares them.
+
+Every one of the thirteen is carried by the existing config bridge — the
+substrate that landed last iteration and ported zero gates by ruling, and
+discharging criterion 6 for these arrays is exactly what it was built for. Each
+member declares its knob reads in its registry tuple's fourth element, so a knob
+the bridge was never asked to carry cannot be read.
+
+**One knob shape the bridge cannot carry, found here and clear here.**
+`QUEUE_KIT_LESSON_SINKS` is a `declare -A` associative array (queue-kit/lib/queue.sh:56).
+The bridge's wire format is **tab-joined elements with no key channel**
+(§lib/gate.sh), so an associative array has no serialization in it. **No cohort
+member reads it** — it is `bin/lesson-sink.sh`'s — so this cohort is unaffected.
+It is recorded because it is a property of the bridge that the next kit's port
+will meet, and meeting it at implementation time rather than at design time is
+the expensive order.
 
 **(4) `gates.list` is unchanged.** [mechanical] A port swaps a member's
 declaration spelling, never its name, so the registry is untouched — which is
