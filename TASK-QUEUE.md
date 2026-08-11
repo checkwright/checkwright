@@ -4778,6 +4778,96 @@
   surface a ranking scope actually reads.
   Filed 2026-08-12 by close, from the cap it hit while discharging its own drain contract.
 
+- **throughput-and-wait-time-unmeasured** [design-pending] — nothing splits session wall-clock
+  into waiting-on-model versus local execution, and nothing measures per-model throughput.
+  **What exists, and what each misses.** `.tmp/gate-timings.txt` measures local gate runtime;
+  `.metric/stage-economics-log.txt` carries per-stage tokens and cost with **no time field**;
+  `overhead-log.txt` measures context composition; `usage-history.log` has timestamps but no
+  durations. Nothing measures round-trip latency, time-to-first-token or tokens per second, and
+  nothing **joins** the two halves that would answer the question.
+  **Why it is cheap: the substrate exists unjoined.** Every completion notification carries
+  `duration_ms`, `tool_uses` and a token count; waiting ≈ duration minus measured local cost.
+  **The claim is per-stage, not per-session, and that distinction is the finding.** Six visible
+  dispatches this iteration totalled roughly 6300s of agent wall-clock against a battery of
+  roughly 33s (the filer's figures, at their precision). Build and close are **inference-bound**
+  — one close ran ~40 minutes against that battery — while validate is the exception, its spine
+  being minutes of real local execution. A session ratio averages away the one stage where
+  machine resources matter.
+  **Second half, larger consequence: per-provider and per-model throughput is a decision input
+  nothing can supply.** Responsiveness is a first-order reason to prefer a backend, and this tree
+  can measure neither an incumbent's nor a candidate's, so the comparison would rest on
+  impression. It is also what makes the standing tiering rulings **falsifiable**.
+  **One blocking unknown, stated first because it must not be resolved by assumption.** The
+  notification token field's semantics are **unverified** — cumulative across resumes or not,
+  input-plus-output or output-only. One resumed agent reported 141301 then 196021 across two
+  runs, which *reads* cumulative but was never probed. Dividing an unprobed field by a duration
+  manufactures a confident number on an unchecked premise, which is why **no throughput figure
+  appears here**. Settled by one dispatch whose token count is known independently.
+  **Consumers, verified here rather than assumed.** `heterogeneous-agent-delegation` owns a
+  routing *decision*; this owns the *instrument* it needs, and closing either advances the other
+  not at all. Nearer and already live: `build-stage-tier-economics` exists to stop a tier flip
+  "on intuition" and `supervision-overhead-unmeasured` is priced burn — **neither carries a time
+  axis**. Adjacent, not blocking: `gate-timing-baseline-comparability` owns the *baseline* file's
+  missing reader; the subtraction here uses the live file `kpi-gate-runtime` reads. DISTINCT from
+  `probe-evidence-sufficiency`, cited in passing: that names a reasoning failure mode.
+  **Cost while deferred:** the standing tiering rulings are invisible to current instrumentation
+  — per-batch build tiering, the align departure kept on the cost-rate column and the split
+  posture are judged on tokens and price, so a tier cheaper per token but doubling round-trips
+  reads as a **win** while costing wall-clock, undetectably. Live rather than hypothetical:
+  tiering is re-judged whenever the model roster churns, and it compounds the moment a second
+  backend is in play — which is the routing decision above.
+  **Cheapest close:** add `duration_ms` and `tool_uses` as columns beside the existing per-stage
+  token row, written by the writer that already records it, keep the model identifier that row
+  carries, and subtract local execution to split the total. The joined, per-model-grouped
+  **view** is the deliverable, not a new collector.
+  Filed 2026-08-12 by close, draining the operator-directed bullet the lead filed after a close
+  question — intake by direction, not a finding gone looking for.
+
+- **entry-headroom-unexposed** [design-pending] — the cap is enforced by a gate and exposed by
+  nothing, so every session sizing an edit hand-rolls the measurement it then trusts.
+  `check-queue-entry-budget` computes each entry's line count in order to enforce
+  `QUEUE_KIT_ENTRY_LINE_CAP` (default 50). Headroom is that computation one output away, so what
+  is missing is **exposure, not capability** — and the gap is narrower still than that, because
+  `queue-index.sh --extent <slug>` already returns the entry's start and end. What no tool
+  supplies is the last step: subtracting that span from the knob.
+  **Three defects in the hand-rolled substitute, and the third is attested.**
+  (1) It re-spells a knob default. A scratch probe hardcoding `50` is a second spelling of
+  `QUEUE_KIT_ENTRY_LINE_CAP`, which de-literalization forbids, and any consumer who retunes the
+  knob gets a probe that lies to them — the class `knob-default-accessor-singularity` names,
+  reached by no gate here because scratch is gitignored.
+  (2) It re-implements the parse. The enforcing member is a `.gate` in the binary, so a shell
+  probe is a second implementation of one entry-boundary rule, and it is the copy a session
+  trusts when deciding how much prose to cut.
+  (3) **It was wrong, in this session, and nothing went red.** The probe terminated an entry at
+  the next `- **` line. For the *last* entry in `## Deferred` that terminator is the first
+  **Icebox** entry, so it swallowed the `## Icebox` heading and its five-line preamble and
+  over-counted by **8**. Measured against `--extent`, the entry above stood at 42 lines while the
+  probe reported 50. **Three of five compression rounds on it were therefore unnecessary**, and
+  the failure presented as an ordinary cap overrun rather than as an error.
+  **Scoped honestly: no peer prose was harmed by it.** The four peer entries compressed earlier
+  sit mid-list, where that terminator is correct, and the first three were sized off
+  `check-queue-entry-budget`'s own output rather than the probe. The damage was confined to the
+  author's own new entry — which is luck of placement, not a property of the instrument.
+  **It is also an oracle-first miss.** `--extent` shipped before this session and would have
+  given the boundary correctly; the probe was written anyway. Same shape as reaching for a
+  `pgrep` loop where `check-producer-liveness` already answers the question.
+  **DISTINCT from `entry-cap-displaces-mandated-writes`, and deliberately not folded into it as a
+  cheapest close.** That entry owns the *displacement*; this owns the *instrument that decides
+  how much to displace*. Exposing headroom does not reduce displacement by one line, so it
+  cannot close that entry — but the two **compound**: a faulty instrument plus a cap that forces
+  cutting produces prose cut that never needed cutting, which is the worst cell of the matrix and
+  is what happened here.
+  **Cheapest close:** a `--headroom <slug>` mode on `queue-index.sh` that reads the knob through
+  the library rather than a literal, beside the five tools of this shape `queue-kit/bin/` already
+  carries; or have the gate print per-entry headroom in its clean output, which costs no new
+  surface at all. Either removes the reason to hand-roll.
+  **Cost while deferred:** paid by every session that edits a mature entry, and paid silently —
+  an over-counting probe makes an unnecessary cut *look* necessary, and there is no red anywhere
+  in the tree to contradict it. Same quiet-instead-of-red shape as a vacuous fixture pair or an
+  isolated sweep reading an empty file: the check runs, reports a number, and the number is wrong.
+  Filed 2026-08-12 by close, from the operator's observation of this session's own scratch tool —
+  and demonstrated by that tool inside the same session.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
