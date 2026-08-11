@@ -17,26 +17,28 @@ ruling selects by kit. **The two select the same set here**, and recording why i
 what keeps the ordering rule usable rather than quietly overridden: queue-kit's
 gates are the kit whose corpus derivation *is* the queue file.
 
-Read off the ten `# graph:` manifests directly: **eight couple `TASK-QUEUE.md`
-alone**; `check-queue-slug-liveness` couples
-`TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh` and carries an explicit
-`trigger=` field; `check-roadmap-fresh` couples `TASK-QUEUE.md,scripts/*.sh`,
-where the glob is a **reverse trigger** — the conservation table already records
-that shape for this family (*"names `scripts/*.sh` in `couples=` only so that a
-script change re-runs it"*). All ten are `dir=one valve=none tier=precommit`, so
-**criterion 3 is clear across the cohort** and a green `check-graph` after the
-port is end-to-end proof the manifest survived the substrate change.
+Read off the ten `# graph:` manifests: **eight couple `TASK-QUEUE.md` alone**;
+`check-roadmap-fresh` couples `TASK-QUEUE.md,ROADMAP.md,scripts/queue-config.sh`
+and carries an explicit `trigger=` naming the same three; `check-queue-slug-liveness`
+couples `TASK-QUEUE.md,scripts/*.sh`, where the glob is a **reverse trigger** —
+the conservation table already records that shape for this family (*"names
+`scripts/*.sh` in `couples=` only so that a script change re-runs it"*), and
+`check-queue-slug-liveness` is named in that very row. All ten are
+`dir=one valve=none tier=precommit`, so **criterion 3 is clear across the
+cohort** and a green `check-graph` after the port is end-to-end proof the
+manifest survived the substrate change.
+
+**Criterion 7 is clear too, and this is the cohort's quiet advantage.** Across
+all ten gates the only external program invoked is **`git`** — `git rev-parse`
+and `git show` in `check-task-conservation` — and `git` is the one sanctioned
+exception, *"because it is the floor"*. No `jq`, no `ruby`, no `shellcheck`
+anywhere in the kit. The cohort therefore avoids the criterion that
+`SPEC-port-needs.md` shows is materially wider than the SPEC states, which is a
+real reason to take this cohort before one whose members carry a dependency.
 
 The kit boundary and the corpus boundary therefore coincide, so the by-kit ruling
 buys the by-corpus economy rather than trading it away. A later selector must not
 read this as licence to take a kit whose gates share nothing.
-
-*Correction, recorded because a carried block says otherwise.* The scope survey
-attributes `ROADMAP.md,scripts/queue-config.sh` to `check-roadmap-fresh`. Probed
-at HEAD, that couples line is **`check-queue-slug-liveness`'s**. These two are
-also the cohort's odd members on the axes below, which is exactly how the swap
-survives a reading — a later session citing that block takes this paragraph over
-it.
 
 ## The two independent nine-of-ten splits
 
@@ -84,12 +86,21 @@ library" suggests:
   **once**, as a Rust module the cohort's gates share — the "ported once and
   proved N times" economy §The first cohort names. Porting them per-gate is the
   failure mode to refuse.
-- **Derived globals** — `QUEUE_ACTIVE_RE`, `QUEUE_DEFERRED_RE`,
-  `QUEUE_ICEBOX_RE`, `QUEUE_DONE_RE`, `QUEUE_TASK_SECTIONS` (:71-82), computed
-  from the knobs at source time. These are **not knobs**, so the bridge does not
-  carry them; the Rust side derives them from the bridged knob values by the same
-  rules. Naming them matters because a port that bridges only the knobs and looks
-  for the regexes will not find them declared anywhere.
+- **Eight derived globals** — `QUEUE_ACTIVE_RE` (:71), `QUEUE_DEFERRED_RE`
+  (:73), `QUEUE_ICEBOX_RE` (:76), `QUEUE_DONE_RE` (:78), `QUEUE_TASK_SECTIONS`
+  (:80), `QUEUE_TASK_RE` (:84), `QUEUE_SECTION_RE` (:86), `QUEUE_LESSONS_RE`
+  (:89) — computed from the knobs at source time and consumed **directly** by the
+  gates' awk programs. These are **not knobs**, so the bridge does not carry
+  them; the Rust side derives them from the bridged knob values by the same
+  rules. Naming them matters because a port that bridges only the knobs and then
+  looks for the regexes will not find them declared anywhere — they are the
+  cohort's largest piece of shared surface after the helpers, and the piece most
+  easily missed by a per-gate reading.
+
+  `QUEUE_LESSONS_RE` is worth one line of its own: it hard-codes the literal
+  `^## Lessons Learned`, where its siblings derive from a knob. The port
+  reproduces it as-is; noticing the asymmetry and "fixing" it into a knob would
+  be a behavior change smuggled in under a substrate change.
 - **A fail-closed config validation** (:164-192) that `exit 2`s with *"queue-kit:
   malformed queue config — the gates cannot run"*, covering emptiness, integer
   shape, an icebox/deferred name collision, and a **cross-knob** rule that
@@ -125,8 +136,9 @@ the cohort's gates name **thirteen** knobs, not the eight the scope survey lists
   `QUEUE_KIT_HORIZONS`, `QUEUE_KIT_TRACKS`.
 
 The survey omits `ROADMAP_FILE`, `ROADMAP_MARKER`, `PROSE_SURFACE_GLOBS`,
-`HORIZONS` and `TRACKS` — the roadmap family, the same family its couples
-attribution swapped. Sourcing the library reaches five more
+`HORIZONS` and `TRACKS` — four of the five belong to `check-roadmap-fresh`,
+which the survey reached late as one of the two members it added to the census's
+original seven. Sourcing the library reaches five more
 (`QUEUE_KIT_ACTIVE_SECTIONS`, `QUEUE_KIT_DONE_SECTION`,
 `QUEUE_KIT_ICEBOX_SECTION`, `QUEUE_KIT_ICEBOX_AGE_DAYS`,
 `QUEUE_KIT_ATTEND_CAP`), which the validation above reads whether or not a member
