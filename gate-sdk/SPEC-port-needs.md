@@ -197,9 +197,9 @@ what makes it **red**, not by its subject):
   `GATE_SDK_PROGRAM_FLOOR` to the knob roster with its default.
 - **gate-sdk/SPEC.md §lib/gate.sh** — owned by delta (4), the home of the default.
 - **gate-sdk/README.md** — `bin/` tool roster, owned by delta (6).
-- **site-kit/SPEC.md §lib/site.sh** — owned by the second-reader note above:
-  `SITE_KIT_RENDERER`'s section records that its value is a port blocker, so the
-  coupling is written where the knob lives rather than only where it is derived.
+- **site-kit/SPEC.md §lib/site.sh** — owned by delta (1): `SITE_KIT_RENDERER`'s
+  section records that its value is a port blocker, so the coupling is written
+  where the knob lives rather than only where it is derived.
 
 ## Definition of Done
 

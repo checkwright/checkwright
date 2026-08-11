@@ -85,6 +85,27 @@ a `scratch-citation-exempt:` tag on the preceding line, the repo's established
 opt-out shape, for a surface that must quote a dead citation verbatim — which
 this amendment's own queue entry does.
 
+**The scan joins a bullet's wrapped continuation lines before testing form (b),
+or it misses its own worked example.** `TASK-QUEUE.md` wraps prose to
+`QUEUE_KIT_WRAP_BUDGET`, so a colon and the path it introduces routinely land on
+different physical lines — the attested instance does exactly this: this
+amendment's own queue entry (`survey-citation-outlives-its-record`) ends one line
+in `witness:` and opens the next with `` `.workflow/survey-record.md` ``, so the
+path's line has no colon-terminated text before it *on that line*. A scanner
+reading physical lines in isolation would clear this entry with no tag needed,
+contradicting delta (3)'s own claim that it is where the exempt tag first lands.
+The join is not new design: `canon-kit/checks/check-spec-pointer.sh`'s
+`PROSE_EXTRACT` already solves this for a citation-liveness scan — *"the
+blank-line paragraph join"* (:69), which concatenates a paragraph's lines
+(`flush()`, :72-84) before matching and maps a hit back to its physical line via
+per-line start offsets. `check-scratch-citation` adopts the same join over each
+bullet's lines rather than re-deciding the shape. The `bad/` fixture case must
+include a wrapped instance (mirroring the live one) alongside the single-line
+`prose-profile` and markdown-link forms — the calibration protocol's own rule,
+"a regex that reds any of the four is wrong, and the fixture is what says so,"
+applies equally to a scan that is right on an unwrapped fixture and silently
+blind on the wrapped case it was written for.
+
 **Calibration is the fixture pair's job, and both cases already exist in the
 tree.** Four live queue entries name the record path descriptively and must stay
 clean — `survey-record-supersede-invisible`,

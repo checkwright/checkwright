@@ -123,6 +123,50 @@ least `QUEUE_KIT_QUEUE_FILE`, so the limit is not live in this cohort — but it
 a property of the bridge rather than of this cohort, and the next port meets it
 again.
 
+**`lib/queue.sh` is not retired, and two of its four helpers keep two live
+implementations after this port.** [design-bearing] The shell library is not
+exclusive to the cohort: `bin/queue-index.sh`, `bin/queue-counts.sh`,
+`bin/queue-edges.sh`, `bin/roadmap.sh` and `bin/lesson-sink.sh` all `source` it
+(queue-kit/SPEC.md §Per-component contracts documents each as a consumer), and
+none of the five is a `gates.list` member, so none is in this cohort and none
+moves to Rust. `queue-kit/lib/queue.sh` therefore stays on disk, unmodified, as
+their library — this delta adds a Rust module beside it, it does not replace it.
+
+Two of the four helpers are consequently **dual-consumed**: `queue_live_slugs`
+(shared today by `bin/queue-edges.sh:25`, `check-queue-slug-liveness` and
+`check-task-conservation`, per queue-kit/SPEC.md §lib/queue.sh — *"[bin/queue-
+edges.sh] sources this library for the section regexes and `queue_live_slugs` it
+does share"*) and `queue_roadmap_entries` (shared by `bin/roadmap.sh:32` and
+`check-roadmap-fresh`, under that same section's stated guarantee: *"the emitter
+and the gate can never disagree about what an entry claims"*). Once
+`check-queue-slug-liveness`, `check-task-conservation` and `check-roadmap-fresh`
+port, that guarantee is exactly what stops being true for the ported half: the
+gate calls the Rust reimplementation, the `bin/` script keeps calling the shell
+original, and the two are edited independently from here on. The eight derived
+globals (:71-89) are the same shape at a wider fan-out — every one is also read
+directly by at least one `bin/` script's `awk` invocation
+(`queue-counts.sh:25`, `queue-edges.sh:32`, `queue-index.sh:53,93-96`), so the
+Rust side's re-derivation duplicates section-matching rules a `bin/` script still
+runs in shell.
+
+**This is criterion 6's own qualification, not a new rule.** *"Unless the
+duplication the port creates is machine-held"* (§The port-candidate criteria) is
+written for exactly this shape, and unlike a bridged knob — discharged by
+construction because the binary holds no default to drift — a re-derived regex
+or a re-implemented helper is logic, not a value, and nothing this delta builds
+makes the two sides' agreement machine-held. Delta (9)'s one-time parity proof
+(both implementations compared on the fixture pair, the live tree and an edge
+tree) closes the gap **at port time**; it does not survive the next edit to
+either side, because the shell original is not deleted for these two helpers and
+the eight globals — it keeps running, for a caller outside this cohort.
+**Not closed here**, and the reason is scope rather than oversight: an ongoing
+cross-implementation check is new scope this cohort does not need in order to
+clear criterion 6 for the *gates it ports* — their own parity is proved and
+their `.sh` is deleted, which is what the criterion actually asks for a ported
+member. Filed as debt rather than built (`.workflow/gap-inbox.md`), because the
+risk it names is real and outlives this session without being this cohort's to
+close.
+
 **(3) Knob bridge, no new substrate — and the count is larger than carried.**
 [design-bearing] Probed at HEAD (`grep -ohE 'QUEUE_KIT_[A-Z_]+' queue-kit/checks/*.sh`),
 the cohort's gates name **thirteen** knobs, not the eight the scope survey lists:
@@ -345,28 +389,39 @@ reaches for and is false):
 ## Existing sections updated
 
 - **gate-sdk/SPEC.md §The first cohort, and the rule that selects the next** —
-  owned by the reconciliation section above. Records that the by-kit ruling and
-  the shared-corpus ordering rule select the same set here, and why that is not a
-  precedent for taking any kit. Also updates its statement of Cohort A's
-  outstanding shared mechanisms, since delta (5) discharges one of the two.
+  owned by delta (1), which executes the by-kit selection this section's
+  reconciliation explains, and delta (5), which discharges one of Cohort A's two
+  outstanding shared mechanisms. Records that the by-kit ruling and the
+  shared-corpus ordering rule select the same set here, and why that is not a
+  precedent for taking any kit, and updates the section's statement of Cohort A's
+  outstanding shared mechanisms accordingly.
 - **gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate** — owned
   by deltas (7) and (8). The `check-gate-output` row is rewritten: its "one
   member outside the fixtured corpus" is a ported member, and the row states the
   implementation-module corpus rather than a source-grep over a descriptor. The
   `check-queue-slug-liveness` row is re-read as describing a `.gate`-declared
   gate.
-- **gate-sdk/SPEC.md §The port-candidate criteria** — owned by the two-splits
-  section. Criterion 2 gains the constructed-scenario form as the parity oracle
+- **gate-sdk/SPEC.md §The port-candidate criteria** — owned by delta (6).
+  Criterion 2 gains the constructed-scenario form as the parity oracle
   for a `# no-fixture:` member, which criterion 2 as written does not contemplate.
 - **gate-sdk/SPEC.md §check-gate-output** — owned by delta (7): the per-member
   corpus resolution for a `.gate`-dispatched `# no-fixture:` member.
-- **queue-kit/SPEC.md** — every per-gate contract section whose prose says the
-  gate is a shell script or cites its `.sh` path; and
-  **§check-task-conservation**, which owns the `# no-fixture:` reasoning delta (6)
-  extends to parity.
-- **queue-kit/README.md** — gate roster, ten names, `.sh` → `.gate`.
-- **native/src/gates/mod.rs** — the registry, and the module-per-gate comment
-  whose "one module per ported gate" claim now spans twelve members.
+- **queue-kit/SPEC.md** — owned by deltas (1), (5) and (6): every per-gate
+  contract section whose prose says the gate is a shell script or cites its
+  `.sh` path; and **§check-task-conservation**, which owns the `# no-fixture:`
+  reasoning delta (6) extends to parity.
+- **queue-kit/SPEC.md §lib/queue.sh** — owned by delta (2). Its "one-adapter,
+  can't disagree" guarantee for `queue_roadmap_entries` (shared with
+  `bin/roadmap.sh`) and `queue_live_slugs` (shared with `bin/queue-edges.sh`) no
+  longer holds once `check-roadmap-fresh`, `check-queue-slug-liveness` and
+  `check-task-conservation` read the Rust reimplementation instead; the section
+  records the split and points at the filed gap rather than asserting the old
+  guarantee unchanged.
+- **queue-kit/README.md** — owned by deltas (1), (5) and (6): gate roster, ten
+  names, `.sh` → `.gate`.
+- **native/src/gates/mod.rs** — owned by deltas (1), (5) and (6): the registry,
+  and the module-per-gate comment whose "one module per ported gate" claim now
+  spans twelve members.
 
 ## Definition of Done
 
