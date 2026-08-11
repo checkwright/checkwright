@@ -57,6 +57,10 @@ declare -p LIFECYCLE_KIT_SHIM_DEDUP_CORPUS &>/dev/null || LIFECYCLE_KIT_SHIM_DED
 
 declare -p LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS &>/dev/null || LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS=("*/SPEC.md")
 
+# spec: lifecycle-kit/SPEC.md §The survey record — the surfaces held to the no-retrieval-pointer rule; the queue file alone by default because it is the one permanent surface this kit owns and where both attested firings landed, so the default is non-vacuous in every consumer and over-reaches in none
+declare -p LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS &>/dev/null \
+    || LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS=("$LIFECYCLE_KIT_QUEUE_FILE")
+
 declare -p LIFECYCLE_KIT_BOUNDARY_TRUNCATE &>/dev/null || LIFECYCLE_KIT_BOUNDARY_TRUNCATE=()
 
 declare -p LIFECYCLE_KIT_BOUNDARY_REQUIRE &>/dev/null || LIFECYCLE_KIT_BOUNDARY_REQUIRE=()

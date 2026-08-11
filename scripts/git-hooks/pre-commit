@@ -229,6 +229,10 @@ if staged_matches '.workflow/survey-record.md'; then
     run_gate check-survey-record lifecycle-kit/checks/check-survey-record.sh
 fi
 
+if staged_matches 'TASK-QUEUE.md' '*/SPEC.md' 'gate-sdk/lib/stages.sh' 'canon-kit/lib/stages.sh' 'context-kit/lib/stages.sh' 'delegation-kit/lib/stages.sh' 'doctrine-kit/lib/stages.sh' 'drift-kit/lib/stages.sh' 'evidence-kit/lib/stages.sh' 'guard-kit/lib/stages.sh' 'lifecycle-kit/lib/stages.sh' 'queue-kit/lib/stages.sh' 'site-kit/lib/stages.sh'; then
+    run_gate check-scratch-citation lifecycle-kit/checks/check-scratch-citation.sh
+fi
+
 if staged_matches '.workflow/gap-inbox.md'; then
     run_gate check-gap-inbox-neutrality lifecycle-kit/checks/check-gap-inbox-neutrality.sh
 fi

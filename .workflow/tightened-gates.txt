@@ -2,3 +2,4 @@
 check-gap-inbox-neutrality
 check-install-disposition
 check-gate-output
+check-scratch-citation

@@ -471,8 +471,17 @@ the clause's reader is a human or agent rather than a gate.
   declaration vocabulary is kit-owned and carries no consumer content; the roster
   is derived, never a kit literal — a kit shipping the *names* of a consumer's
   inbound surfaces would publish that consumer's private workflow.
+- `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — array of path globs for the surfaces
+  held to the no-retrieval-pointer rule (§check-scratch-citation); default the
+  queue file alone (`LIFECYCLE_KIT_QUEUE_FILE`). That default is the one permanent
+  surface this kit owns and where both attested firings landed, so it is
+  non-vacuous in every consumer and over-reaches in none. The roster is consumer
+  config and the forbidden targets are derived from the consumer's own truncate
+  configuration, so no kit literal names any surface a consumer happens to have.
 - `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` — extra files reset to their header at the
-  iteration boundary; default empty.
+  iteration boundary; default empty. Adding a member also widens
+  `check-scratch-citation`'s forbidden-target set, because both read
+  `lifecycle_supersede_set`.
 - `LIFECYCLE_KIT_BOUNDARY_PRESERVE` — keep-list of scratch-dir **basenames** the
   iteration-boundary wipe spares (§bin/enter-stage.sh); default empty, so an
   unset-knob consumer gets a clean wipe of an already-disposable surface.
@@ -847,6 +856,12 @@ witness:
 2. **Oracle still?** Re-run `<oracle>` and compare its verdict to the one the
    finding was written against.
 
+**The witness is four strings, and that is what makes a finding portable.** It is
+not a property of the record file: the protocol's whole input is `corpus`,
+`oracle`, `rev` and `finding`, each a short string, and both commands run from
+HEAD. Copied onto another surface the witness is *more* durable than it is here,
+because the copy is not truncated.
+
 Both hold → **cite the record; do not re-buy the survey.** Either moved →
 **dispatch only the delta**, the dispatch prompt naming the record block and the
 diff, so the child re-surveys what changed rather than the corpus. The
@@ -891,6 +906,40 @@ It **deliberately does not** inherit `file-gap.sh`'s slug resolution. A survey's
 prose routinely names queue slugs as its subject, and that resolver scans whole
 prose, so it would stamp a recurrence declaration onto the survey's subject.
 Adding no resolver here is a decision, not an omission.
+
+**A permanent surface carries the finding, never a pointer into here.** A surface
+outside the boundary-truncated set — a queue entry, a SPEC section — must not
+promise a reader retrievable content in this record: the boundary reset below
+empties it, so the pointer resolves to nothing one iteration after it is written,
+and the finding survives only in the evicting commit. It inlines the finding
+together with the block's four witness fields instead, which is what keeps the
+finding *re-usable* rather than merely readable. Naming this record as a
+**subject** is unaffected — "the survey record is per-iteration scratch" promises
+nobody a retrieval — and that distinction is exactly what
+§check-scratch-citation's red condition is calibrated against.
+
+**Commit-pinning the citation is wrong by construction, not merely awkward**, and
+it is the close a reader reaches for first. `bin/file-survey.sh` stamps `rev` as
+HEAD *at filing time*, which precedes the commit that lands the block — so
+`git show <rev>:<record>` reads a blob that does not contain the block being
+cited, and it fails silently by printing a record without it. The sha a pin would
+need is the *landing* commit, which no field carries and which is precisely the
+class of value this section already rules an author gets wrong.
+
+**The affordance that makes inlining one command.** `bin/cite-survey.sh
+"<heading-substring>"` selects the one block whose `## ` heading contains the
+substring and writes it to stdout as an inline-ready snippet — the heading and all
+four fields. It refuses (exit 2) on no match, on an ambiguous match, and on a
+record with no blocks, rather than guessing: the author asked for one finding, and
+a silently-chosen sibling would be pasted onto a permanent surface as if it were
+the one they read. It follows `bin/file-survey.sh` exactly — repo-root cd,
+config-via-env, exit 2 on a missing or empty argument — and is advisory tooling,
+not a gate, the same disposition its sibling carries.
+
+It deliberately does **not** rewrite the citing surface. The author chooses where
+the finding belongs and how much of the `finding` prose to carry; a tool that
+spliced would need a marker block, which would make a hand-written citation a
+second-class form of the very thing this rule is trying to make ordinary.
 
 **How this differs from the gap inbox, which it sits beside.** The two are
 sibling committed per-iteration surfaces with deliberately *opposite* semantics
@@ -1086,7 +1135,11 @@ prints the derived union-merge set (the gap inbox — §The committed gap inbox)
 and `lifecycle_merge_attrs_block` renders the supersede set as
 `<path> merge=iteration-scoped` lines and the union set as `<path> merge=union`
 lines, so `bin/install-lifecycle.sh` (writer) and `check-merge-attrs` (asserter)
-read one set (§Multi-operator semantics). Values and adapters only, never
+read one set (§Multi-operator semantics). `lifecycle_supersede_set` has a **third
+reader**, `check-scratch-citation`, which forbids a permanent surface pointing a
+retriever at any of its members — so a consumer adding a
+`LIFECYCLE_KIT_BOUNDARY_TRUNCATE` member gets citation enforcement over it with no
+second roster to keep in step. Values and adapters only, never
 gate structure (gate-sdk's `lib/gate.sh` rule).
 
 ### bin/session-id.sh
@@ -1812,6 +1865,66 @@ read it. The first is unmechanizable; the second leaves no tracked artifact —
 the class delegation-kit/SPEC.md §Operative residency rules no gate is owed for.
 The entry report's read trigger (§bin/enter-stage.sh) is the affordance in place
 of an oracle there, and it is weaker than one by construction.
+
+### check-scratch-citation
+
+Invariant: no surface in `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` carries a
+**retrieval pointer** to a path in the derived boundary-truncated set. The rule
+and why inlining is the right close are §The survey record's; this section owns
+the red condition.
+
+**The forbidden-target set is derived, never maintained** — it is
+`lifecycle_supersede_set` (§lib/stages.sh), already the single derivation behind
+the installer's `.gitattributes` block and `check-merge-attrs`'s parity check.
+This gate is its third reader, which is why a consumer widening its truncate
+configuration gets citation enforcement for free.
+
+**Retrieval-pointer position, stated as the red condition.** A supersede-set path
+that is either **(a)** in markdown link-target position — the parenthesized half
+of a `[text]`-plus-parentheses pair — or **(b)** preceded
+by a colon and whitespace and followed by nothing but a closing quote, comma,
+period, bracket or end of paragraph — the attested form, *"Full finding and its
+two-command witness"* followed by the path. A bare path elsewhere in prose is a
+**mention** and is clean; that is the whole calibration, and it is why this is
+specified as a position rather than as a pattern.
+
+**The scan joins a paragraph's wrapped continuation lines before testing (b), or
+it is blind on its own worked example.** A queue file wraps prose to a budget, so
+a colon and the path it introduces routinely land on different physical lines —
+which is exactly what the attested instance did. The join is
+`canon-kit/checks/check-spec-pointer.sh`'s `PROSE_EXTRACT` shape, adopted rather
+than re-decided: concatenate a blank-line-delimited paragraph, match over the
+join, and map a hit back to its physical line through per-line start offsets. A
+scanner that is right on an unwrapped fixture and silently blind on the wrapped
+case it was written for is the failure this forecloses, which is why the `bad/`
+case carries a wrapped instance beside the single-line and markdown-link forms.
+
+**Per-line escape hatch:** a `scratch-citation-exempt:` tag on the line above the
+hit, this repo's established opt-out shape, for a surface that must quote a dead
+citation verbatim in order to describe it. Its reader is this gate's scanner, at
+the transition where it has matched a pointer and is deciding whether to record a
+finding. *Stated so it is not mistaken for more than it is:* the class is real and
+permanent — any entry documenting a citation defect must quote one — but the tree
+carries no live user today, because the entry that motivated the tag completed and
+its prose left the queue with it. The `bad/`+`good/` fixture pair is where the
+hatch is exercised.
+
+The gate satisfies the four gate-sdk contracts: the single
+`SCRATCH-CITATION: clean` line naming how many surfaces were scanned, and a
+`help:` remedy naming `bin/cite-survey.sh` and the exempt tag on the finding path
+(output); exit 2 on an empty derived target set and on a failed parse
+(fail-closed); a `good/`+`bad/` pair whose good case copies the mention forms live
+entries actually use — a path opening a wrapped line after a full stop, a
+prepositional mention, a colon-introduced pointer at a **non**-member path, and a
+tagged dead citation — because a rule that reds any of those is wrong and the
+fixture is what says so (fixture-pair); and registration in this repo's
+`gates.list`, where its surfaces are this repo's own queue and spec set
+(self-lint).
+
+*Not gated:* whether an inlined finding is faithful to the block it came from.
+Nothing tracked relates the two once the record is truncated, and inventing a
+provenance field would re-open the per-iteration lifetime the record's design
+turns on.
 
 ### check-gap-inbox-neutrality
 

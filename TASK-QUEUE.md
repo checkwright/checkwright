@@ -62,30 +62,6 @@
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohort ruled 2026-08-11 at scope.
 
-- **survey-citation-outlives-its-record** [spec: SPEC-survey-cite.md] — a permanent surface cites a
-  boundary-truncated one, so the citation dies on schedule.
-  The motivating instance, recorded here because the entry it describes has since shipped and
-  moved to Done: `prose-profile` ended "Full finding and its two-command witness:
-  `.workflow/survey-record.md`". That record is per-iteration scratch, boundary-truncated by
-  design (lifecycle-kit/SPEC.md §The survey record), and `enter-stage.sh scope` truncated it at
-  the very next boundary — so the citation resolved to nothing **one iteration** after it was
-  written, and the finding survives only in the evicting commit.
-  A live instance of `dead-queue-citation-report`'s class, distinguished by cause and worth
-  separating for it: the target was not deleted by mistake or by a rename, it was deleted **on
-  schedule by its own surface's contract**, so no liveness scan over authored links would have
-  predicted it and no author error produced it.
-  **Why this needed design:** three honest closes, and they trade against each other. The citing
-  entry inlines what it needs at filing — cheapest, and it loses the two-command witness that
-  makes a carried survey re-usable. The citation becomes commit-pinned (`git show <rev>:...`) —
-  keeps the witness, and pins a reader to a rev the tree has moved past. Or the record grows a
-  promotion path for a block a permanent surface cites — which re-opens the per-iteration
-  lifetime the record's whole design turns on.
-  **Cost while deferred:** the expensive judgment half of a survey is precisely what the record
-  exists to carry across a boundary, and a queue entry is the surface most likely to want it
-  *after* one. Every such citation is a silent one-iteration fuse.
-  Filed 2026-08-08 at scope on the lead's ruling, found by following the citation and hitting
-  the truncation this session's own boundary reset had just performed.
-
 ## Technical Debt
 
 ## Deferred
@@ -4552,5 +4528,6 @@
 
 - cat-read-steer-guard
 - port-criterion-7-roster-understated
+- survey-citation-outlives-its-record
 
 ## Lessons Learned
