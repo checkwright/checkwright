@@ -190,9 +190,13 @@ mod tests {
         walk::bridge_declared_knobs();
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
-        for (name, f, declared, _knobs) in REGISTRY {
+        for (name, f, declared, knobs) in REGISTRY {
             for case in walk::fixture_case_dirs(name) {
                 let args = case_args(&case);
+                // spec: gate-sdk/SPEC.md §run-gate-tests — the member's knobs are bridged from
+                // the case dir before it runs, or a bridged member exits 2 on an unresolved
+                // knob and this test asserts over a run that never reached its rule
+                walk::bridge_case_knobs(&case, name, knobs);
                 let prev = std::env::current_dir().expect("cannot read cwd");
                 // spec: gate-sdk/SPEC.md §check-reads-couples — the case is entered exactly
                 // as run-gate-tests.sh enters it, so an observed root is the same string the

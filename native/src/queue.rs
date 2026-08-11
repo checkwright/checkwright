@@ -67,7 +67,7 @@ impl Sections {
 
     pub fn is_task(&self, line: &str) -> bool {
         match heading_name(line) {
-            Some(n) => self.task_sections().iter().any(|s| *s == n),
+            Some(n) => self.task_sections().contains(&n),
             None => false,
         }
     }

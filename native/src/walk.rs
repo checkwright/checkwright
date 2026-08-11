@@ -171,7 +171,7 @@ pub fn glob_files(root: &Path, globs: &[String]) -> Result<Vec<PathBuf>, String>
     for g in globs {
         let comps: Vec<&str> = g.split('/').filter(|c| !c.is_empty()).collect();
         let mut hits: Vec<PathBuf> = Vec::new();
-        expand(&root.to_path_buf(), &comps, &mut hits)?;
+        expand(root, &comps, &mut hits)?;
         hits.sort();
         out.extend(hits);
     }
@@ -300,6 +300,48 @@ pub fn bridge_declared_knobs() {
         );
         std::env::set_var("GATE_SDK_KNOB_GATE_PRUNE_DIRS", value);
     });
+}
+
+// spec: gate-sdk/SPEC.md §run-gate-tests — a bridged member's knob values resolve inside the
+// case dir, so this asks the one owner from the cwd the runner uses; resolving at the repo
+// root would make the crate's case runner the second oracle that section was repaired for
+#[cfg(test)]
+pub fn bridge_case_knobs(case: &Path, gate: &str, knobs: &[&str]) {
+    if knobs.is_empty() {
+        return;
+    }
+    let lib = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join("gate-sdk/lib/gate.sh");
+    let script = "source \"$1\"; g=\"$2\"; shift 2; \
+                  for k in \"$@\"; do v=\"$(_gate_knob_value \"$k\" \"$g\")\" || exit 2; \
+                  printf '%s=%s\\n' \"$k\" \"$v\"; done";
+    let out = std::process::Command::new("bash")
+        .arg("-c")
+        .arg(script)
+        .arg("bash")
+        .arg(&lib)
+        .arg(gate)
+        .args(knobs)
+        .current_dir(case)
+        .output()
+        .expect("cannot run the shell library's knob resolution");
+    assert!(
+        out.status.success(),
+        "the config bridge could not resolve {}'s knobs in {}: {}",
+        gate,
+        case.display(),
+        String::from_utf8_lossy(&out.stderr).trim()
+    );
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the wire format is one tab-joined value per knob
+    // and the library refuses an element carrying a newline, so one line is one knob and the
+    // first `=` is its only separator
+    for line in String::from_utf8_lossy(&out.stdout).lines() {
+        let (name, value) = line
+            .split_once('=')
+            .unwrap_or_else(|| panic!("unparseable knob line from the bridge: {}", line));
+        std::env::set_var(format!("GATE_SDK_KNOB_{}", name), value);
+    }
 }
 
 // spec: gate-sdk/SPEC.md §check-reads-couples — unit test A's case-dir lookup lives here
