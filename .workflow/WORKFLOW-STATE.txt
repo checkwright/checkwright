@@ -4,11 +4,4 @@
 
 ---
 
-native-port-cadence scope a57932f5 2026-08-09
-native-port-cadence spec ae9be0e8 2026-08-09
-native-port-cadence align a91f2117 2026-08-09
-native-port-cadence build ae5a9d1d 2026-08-09
-native-port-cadence build a81dc7df 2026-08-09
-native-port-cadence build a52bcdeb 2026-08-10
-native-port-cadence validate af63c495 2026-08-10
-native-port-cadence close a467a779 2026-08-10
+— scope aaadd10f 2026-08-11
