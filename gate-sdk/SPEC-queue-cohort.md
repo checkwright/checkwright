@@ -28,10 +28,10 @@ the conservation table already records that shape for this family (*"names
 cohort** and a green `check-graph` after the port is end-to-end proof the
 manifest survived the substrate change.
 
-**Criterion 7 is clear for nine of the ten, and the tenth is why the cohort is
-nine ported rather than ten.** This paragraph previously read that *"across all
-ten gates the only external program invoked is `git`"* and cited that as a real
-reason to take this cohort. **That claim was false, and it was load-bearing.**
+**Criterion 7 is clear for nine of the ten, and the tenth is sequenced later for
+it.** This paragraph previously read that *"across all ten gates the only
+external program invoked is `git`"* and cited that as a real reason to take this
+cohort. **That claim was false, and it was load-bearing.**
 Probed at build: `check-roadmap-fresh` invokes **`bash` on a kit shell script** —
 `GEN="$KIT/bin/roadmap.sh"`, `emitted="$(bash "$GEN" --emit)"`
 (queue-kit/checks/check-roadmap-fresh.sh:97-99). `bin/roadmap.sh` is one of the
@@ -45,20 +45,52 @@ live emitter onto pre-baked fixture files."* A ported member's pair would
 therefore go **green over an arm with no implementation**, the same vacuity
 shape delta (7) exists to close, arriving through a different door.
 
-**Operator-ruled 2026-08-11: `check-roadmap-fresh` is held on shell this
-cohort.** The whole-kit ruling was made on the premise that all ten members
-cleared the criteria; that premise is false for exactly this one. Criteria 6 and
-7 are the governed selection rule, so **the member fails selection rather than
-the cohort failing** — its `.sh` stays unmodified, and the design question it
-owes (shell-out to `bin/roadmap.sh`, a Rust reimplementation of the emission
-format, or collapsing `bin/roadmap.sh` itself onto the binary) is filed for a
-later unit rather than answered here.
+**Operator-ruled 2026-08-11: `check-roadmap-fresh` is held for a later cohort.**
+The whole-kit ruling was made on the premise that all ten members cleared the
+criteria; that premise is false for exactly this one.
+
+**The ground is sequencing, not exclusion — recorded precisely because an earlier
+draft of this paragraph got it wrong.** That draft said criteria 6 and 7 are "the
+governed selection rule" and that the member "fails selection". §The
+port-candidate criteria denies exactly that in its opening sentence, and
+criterion 7's own worked example — `check-action-run-shell` and `shellcheck` —
+names such a member *the largest piece of port work rather than a permitted
+exclusion*. A criterion a member fails **orders the work**; the 2026-08-09
+directive ports the whole corpus **over time**, so holding a member for a later
+cohort is the sequencing those criteria prescribe. The outcome the operator ruled
+is unchanged and correct; only the ground it was recorded under was wrong, and a
+later reader must not cite this hold as precedent for an eligibility screen.
+
+So: the member is **held with its port work named and owed**, its `.sh` stays
+unmodified, and the design it owes — shell-out to `bin/roadmap.sh`, a Rust
+reimplementation of the emission format, or collapsing `bin/roadmap.sh` itself
+onto the binary — is filed for the cohort that takes it rather than answered
+here.
 
 What remains true, and is still a real reason to take this cohort: across the
 other nine the only external program is **`git`** — `git rev-parse` and
 `git show` in `check-task-conservation` — the one sanctioned exception,
 *"because it is the floor"*. No `jq`, no `ruby`, no `shellcheck` anywhere in the
-kit. The corrected shape is **nine ported of ten**.
+kit.
+
+**A second member is held on the same reading, for a different mechanism.**
+`check-queue-prose-precondition` does not merely *transport*
+`QUEUE_KIT_PRECONDITION_REGEX` across the bridge — it **interprets** it
+(`check-queue-prose-precondition.sh:21,27`, `b ~ trig`), and the knob is consumer
+config carrying an arbitrary POSIX ERE. Its awk also runs two `gsub`es with
+alternation, groups and negated classes. The crate **vendors nothing** — that is
+asserted, not assumed, by `walk.rs`'s
+`the_crate_vendors_no_walker_because_it_vendors_nothing` — so porting it means
+hand-writing an ERE engine plus awk `gsub` semantics. Sizing a subset to this
+repo's one regex is foreclosed by the glob commitment §The port-candidate
+criteria already makes for exactly this shape: the config surface permits what
+this consumer happens not to write, and a narrow reader would silently mis-scan
+the first consumer who writes it. **Operator-ruled 2026-08-11**, on the
+sequencing ground above rather than an eligibility one: held for a later cohort,
+`.sh` unmodified, with the ERE engine named and owed as a prerequisite that
+cohort inherits — the same shape criterion 7 gives `shellcheck`.
+
+The corrected shape is **eight ported of ten**.
 
 The kit boundary and the corpus boundary therefore coincide, so the by-kit ruling
 buys the by-corpus economy rather than trading it away. A later selector must not
@@ -81,16 +113,22 @@ returns pairs for exactly nine names, and `grep -rn '^# no-fixture:'
 queue-kit/checks/` returns exactly one line. All ten are registered in
 `scripts/gates.list` (lines 55-64), so criterion 1 is clear across the cohort.
 
-**The consequence is the cohort's real shape: seven cheap, two designed, one
-held.** Seven members clear every criterion the existing substrate answers and
+**The consequence is the cohort's real shape: six cheap, two designed, two
+held.** Six members clear every criterion the existing substrate answers and
 port on the bridge alone — **once delta (12) repairs the harness the bridge is
-proved through**. Two carry one named engineering problem each, they are
-*different* problems, and neither is discharged by the other's work. The tenth,
-`check-roadmap-fresh`, fails criterion 7 and is held on shell by the 2026-08-11
-operator ruling above. Reading "9 of 10" on one axis as the cohort's difficulty
+proved through**. Two carry a named engineering problem this cohort answers:
+`check-queue-slug-liveness` needs delta (5)'s basename-glob matcher, and
+`check-task-conservation` needs delta (6)'s constructed parity scenario and delta
+(7)'s `check-gate-output` repair. Two more — `check-roadmap-fresh` and
+`check-queue-prose-precondition` — carry one each that it does not, and are held
+for a later cohort by the 2026-08-11 operator rulings above, each with its port
+work named and owed. All four problems are *different*, and none is discharged
+by another's work. Reading "9 of 10" on one axis as the cohort's difficulty
 is the mis-sizing this section exists to prevent — and both of this section's
-nine-of-ten splits were drawn before the criterion-7 probe, so neither axis
-predicted the member that actually dropped out.
+nine-of-ten splits were drawn before the criterion-7 and ERE probes, so **neither
+axis predicted either member that was actually held**. A third and a fourth axis
+existed and nobody had looked down them; that, rather than the arithmetic, is
+this section's transferable lesson.
 
 ## What changes
 
@@ -142,10 +180,10 @@ count level, since identical counts could mask a moved value:
 `GATE_PRUNE_DIRS` resolves to `target|.git|node_modules|.tmp|gate-tests|worktrees`
 from the invoker's root and from a case dir alike.
 
-### The cheap seven
+### The cheap six
 
-**(1) Port the seven criteria-clearing members.** [design-bearing]
-`check-queue-entry-budget`, `check-queue-hygiene`, `check-queue-prose-precondition`,
+**(1) Port the six criteria-clearing members.** [design-bearing]
+`check-queue-entry-budget`, `check-queue-hygiene`,
 `check-queue-sections`, `check-queue-wrap`,
 `check-tag-lead-line`, `check-task-names` — each becomes a module under
 `native/src/gates/` and a 4-tuple in `REGISTRY`, its `.sh` deleted and its
@@ -378,7 +416,7 @@ are designed, then ported."*
 **(8) Disposition coverage is re-derived, not assumed.** [design-bearing]
 `check-gate-substrate-parity` assertion C derives the substrate-sensitive set at
 runtime — a member whose expanded `couples=` covers a registry member's
-declaration path — and reds any member without a disposition line. Nine new
+declaration path — and reds any member without a disposition line. Eight new
 descriptors change which members that derivation selects, so the table is
 re-checked against the derivation after the port rather than assumed complete.
 **The re-derivation is not deferrable to the cohort's end**: the selection
@@ -399,8 +437,8 @@ pair (or delta (6)'s scenario), the live tree, and an edge tree.
 
 **(10) The commit-time obligations this repo already carries.** [mechanical]
 `bash gate-sdk/bin/build-native.sh` before each commit, and the generated
-projections regenerated per docs/site-architecture.md §Generated projections. Nine
-descriptors and nine deleted scripts move the footprint and value rollup, the
+projections regenerated per docs/site-architecture.md §Generated projections. Eight
+descriptors and eight deleted scripts move the footprint and value rollup, the
 graph artifact, the enforcement map and the docs mirror.
 
 **(11) Two deferred entries become closure candidates as this lands.**
@@ -410,7 +448,7 @@ close, not built.
 
 ## Producers and consumers
 
-**New interface: nine `.gate` descriptors under `queue-kit/checks/`.**
+**New interface: eight `.gate` descriptors under `queue-kit/checks/`.**
 - *Producer* — this port; the descriptor's existence **is** the dispatch
   declaration, with no dispatch field and no mapping table (§The `.gate`
   descriptor).
@@ -425,7 +463,7 @@ close, not built.
   `check-gate-fixture-coverage` **and**, per delta (7), by `check-gate-output`.
   No field is added to the closed roster.
 
-**New interface: nine `REGISTRY` tuples in `native/src/gates/mod.rs`.**
+**New interface: eight `REGISTRY` tuples in `native/src/gates/mod.rs`.**
 - *Producer* — the crate, at compile time; a member added without its declared
   read roots and knob reads fails to compile.
 - *Consumers* — `lookup` (dispatch), `roots` (`--reads`, consumed by
@@ -452,7 +490,7 @@ close, not built.
   in the gate module, or the walk becomes invisible to the recorder.
 
 **Red conditions of the readers this change touches** (§The causal-completeness
-check, point 5 — the port **narrows** a corpus by deleting nine `.sh` files, and
+check, point 5 — the port **narrows** a corpus by deleting eight `.sh` files, and
 "a narrower corpus can only remove violations" is the first argument this delta
 reaches for and is false):
 - `check-gate-output` — red on a **zero count** of a matching `: clean` / `help:`
@@ -471,17 +509,18 @@ reaches for and is false):
   shell parser finds nothing in a binary gate; the `--reads` consumption is what
   keeps it from printing `clean` vacuously over the ported members.
 - `check-readme-roster` — red in **both** directions, so queue-kit's README must
-  move nine of its ten `.sh` names to `.gate` names rather than gaining them;
-  `check-roadmap-fresh` keeps its `.sh` spelling.
+  move eight of its ten `.sh` names to `.gate` names rather than gaining them;
+  `check-roadmap-fresh` and `check-queue-prose-precondition` keep their `.sh`
+  spelling.
 - `check-shellcheck`, `check-comment-tier`, `check-spec-pointer`,
-  `check-todo-task-liveness`, `check-deprecation-task` — each loses nine shell
-  files from its corpus and gains nine descriptors plus nine Rust modules; the
+  `check-todo-task-liveness`, `check-deprecation-task` — each loses eight shell
+  files from its corpus and gains eight descriptors plus eight Rust modules; the
   comment-surface arms for `*.gate` and `*.rs` already exist, so these are
   monotone here and clearable by inspection.
 - `check-gate-binary-fresh` — red on a stale binary once a member dispatches;
-  already armed, and nine more dispatches do not change its predicate.
+  already armed, and eight more dispatches do not change its predicate.
 - `check-docs-cmd` — red on a doc fencing a path that no longer runs: real signal
-  after nine `.sh` deletions, and the reason the docs mirror is in delta (10).
+  after eight `.sh` deletions, and the reason the docs mirror is in delta (10).
 
 ## Existing sections updated
 
@@ -521,11 +560,11 @@ reaches for and is false):
   intact** — holding `check-roadmap-fresh` on shell leaves `bin/roadmap.sh` and
   that gate as its only two consumers, both still calling the one adapter, so the
   emitter and the gate still cannot disagree about what an entry claims.
-- **queue-kit/README.md** — owned by deltas (1), (5) and (6): gate roster, nine
+- **queue-kit/README.md** — owned by deltas (1), (5) and (6): gate roster, eight
   of ten names `.sh` → `.gate`.
 - **native/src/gates/mod.rs** — owned by deltas (1), (5) and (6): the registry,
   and the module-per-gate comment whose "one module per ported gate" claim now
-  spans eleven members.
+  spans ten members.
 
 ## Definition of Done
 
