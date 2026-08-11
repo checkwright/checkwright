@@ -47,7 +47,7 @@
   smoke's toolchain-free arm is satisfied by the pre-compiled path, not by retaining shell
   gates. `powershell-installer-surface`'s premise moves with it — a binary is one
   implementation across platforms, so what PowerShell must still cover shrinks to the bootstrap.
-  **Cost while deferred:** large and known — 98 gates plus the runners and the install-lifecycle
+  **Cost while deferred:** large and known — 91 gates plus the runners and the install-lifecycle
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
