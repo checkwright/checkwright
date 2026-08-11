@@ -4759,6 +4759,13 @@
   generated content — precisely backwards. **Three displacements in this one session:** the two
   recurrence stamps, and an operator-ruled correction to `native-gate-port-remaining-corpus` at
   headroom **zero** — one of them incurred in order to file this entry.
+  **Widened 2026-08-12 twice more, and the second is the sharper one.** First, the class reaches a
+  **fresh** entry, not only a mature one: a four-line factual correction to a two-hour-old entry
+  (`cardinal-notation-splits-gate-reach`) consumed its whole remaining budget, landing it at
+  exactly 50. Second, **the cap now blocks a cross-reference rather than content** — that entry
+  and `probe-evidence-sufficiency` each stand at exactly 50, so neither can name the other and a
+  finding recorded in one is unreachable from the other. Linkage is what makes a fragmented record
+  navigable, so the cap has stopped merely shortening entries and started disconnecting them.
   **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
   so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
   recurrence most needs recording. The cap therefore goes blind first on the highest-signal
@@ -4917,6 +4924,43 @@
   about. Both failures are silent — the gate runs, reports clean, and never saw the claim.
   Filed 2026-08-12 by close, from an operator observation; the "no reason exists" premise was
   falsified by probing the count gate's own matcher rather than by grepping for a style rule.
+
+- **headroom-check-ordering-unruled** [design-pending] — nothing says *when* a capped surface's
+  headroom is read, and reading it first lets a resource limit quietly perform a judgment.
+  A session editing a capped surface (`check-queue-entry-budget`, 50 lines per deferred entry)
+  must at some point learn how much room it has. Whether that read happens **before** or
+  **after** the disposition is reached is unruled — this close did it after, by habit rather
+  than by contract.
+  **The failure it prevents is invisible by construction, which is the whole argument.** A
+  ruling shaped by available space presents exactly like a ruling shaped by merit: same prose,
+  same confidence, no diff that distinguishes them, and no gate that reds. Every other defect
+  this queue tracks leaves *something* — a stale figure, a vacuous fixture, an absent entry.
+  This one leaves a well-argued disposition that happens to coincide with what fitted.
+  **Worked instance from this close.** `cardinal-notation-splits-gate-reach` was ruled its own
+  entry rather than grounds on `spec-measured-count-gate`. That entry stands at exactly 50
+  lines, so the grounds ruling would have required compressing peer prose to land. Had the
+  headroom been read first, the ruling that avoided the compression would also have been the
+  ruling that fitted — and would have read as principled either way. The order is what kept the
+  two questions separable.
+  **Deliverable:** one line in lifecycle-kit/templates/stages/close.md placing the headroom read
+  after the disposition, with the reason attached — a bare ordering instruction with no rationale
+  is the kind of rule a later session optimizes away.
+  **Why `[design-pending]` and why it was NOT landed inline.** Scope-gated intake decides it: a
+  mid-session initiative is filed by default and never started. Close's own contract does sanction
+  landing a stage-local procedure in the stage skill file, which is exactly why this needed a
+  ruling rather than an assumption — and the ruling went the other way, because
+  `lifecycle-kit/templates/stages/close.md` is a **kit surface with adopter reach**, so every
+  consumer inherits the line. That earns scope, spec and align rather than a tail-end edit by the
+  session that thought of it. Two open questions the unit owns: whether the rule generalizes past
+  close to any session editing a capped surface, and whether it wants a companion where the cap
+  itself is specified (queue-kit/SPEC.md §check-queue-entry-budget) rather than only in the stage
+  template that happens to hit it most.
+  **Cost while deferred:** each close either re-derives the ordering or does not, and a session
+  that gets it wrong leaves **no trace to audit** — so the class cannot be measured after the
+  fact, only prevented. That also means its instance count will read as zero however often it
+  fires, which is the reverse of every recurrence-tracked entry here.
+  Filed 2026-08-12 by close on the lead's ruling, from a practice the lead named at this
+  session's end; recorded rather than landed, per scope-gated intake.
 
 ## Icebox
 
