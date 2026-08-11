@@ -85,12 +85,24 @@ a `scratch-citation-exempt:` tag on the preceding line, the repo's established
 opt-out shape, for a surface that must quote a dead citation verbatim — which
 this amendment's own queue entry does.
 
-**Calibration is the fixture pair's job, and the cases already exist.** The
-`good/` case carries the five current descriptive mentions of the record path in
-`TASK-QUEUE.md` (lines 3461, 3503, 3524, 3926, 4471 at the time of writing —
-copied into the fixture, not cited live); the `bad/` case carries the attested
-`prose-profile` form and a markdown-link form. A regex that reds any of the five
-is wrong, and the fixture is what says so.
+**Calibration is the fixture pair's job, and both cases already exist in the
+tree.** Four live queue entries name the record path descriptively and must stay
+clean — `survey-record-supersede-invisible`,
+`probe-before-assertion-doctrine`, `survey-record-extension-tier-hybrid`, and
+`survey-record-claim-reliability`. They are cited by slug rather than by line
+number deliberately: an amendment read at build outlives the line numbers, as
+this iteration's own promotion proved by moving every one of them.
+
+Copy their lines into the `good/` case; the `bad/` case carries the attested
+`prose-profile` form and a markdown-link form. **A regex that reds any of the
+four is wrong, and the fixture is what says so** — that is the whole calibration
+protocol, and it is why delta (3) specifies a red condition rather than a regex.
+
+The fifth occurrence is the interesting one: this amendment's **own queue entry**
+quotes the dead citation verbatim in order to describe it. That is precisely the
+case the `scratch-citation-exempt:` tag exists for, and the entry is the first
+place it lands — so the escape hatch ships with a real user rather than a
+hypothetical one.
 
 **(4) The knob.** [mechanical] `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS` — glob
 array of surfaces held to the rule. Kit default is the queue file alone
