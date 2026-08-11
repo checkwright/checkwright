@@ -19,6 +19,16 @@ for d in "${GATE_DIRS[@]}"; do
 done
 GATE_DIRS=("${resolved[@]+"${resolved[@]}"}")
 
+# spec: gate-sdk/SPEC.md §run-gate-tests — the binary is absolutized here, at the invoker's
+# root, because gate_command runs in the case dir below and the knob's default is
+# deliberately repo-relative; the gate dirs above are absolutized for the same reason.
+_rgt_bin="$(gate_native_bin)"
+if [[ "$_rgt_bin" != /* && -e "$_rgt_bin" ]]; then
+    GATE_SDK_NATIVE_BIN="$(cd "$(dirname "$_rgt_bin")" && pwd)/$(basename "$_rgt_bin")"
+    export GATE_SDK_NATIVE_BIN
+fi
+unset _rgt_bin
+
 [[ -d "$TESTS_DIR" ]] || { echo "run-gate-tests: no fixture tree at $TESTS_DIR" >&2; exit 2; }
 
 pairs=0
@@ -29,7 +39,10 @@ harness_fail=0
 run_case() {
     local gate="$1" casedir="$2" want="$3" expect="$4"
     local -a argv=()
-    if ! mapfile -t argv < <(gate_command "$gate" "${GATE_DIRS[@]+"${GATE_DIRS[@]}"}"); then
+    # spec: gate-sdk/SPEC.md §run-gate-tests — resolved from inside the case dir, so a bridged
+    # member's knob values come off the case's own cwd-relative config exactly as a shell
+    # member's do
+    if ! mapfile -t argv < <(cd "$casedir" && gate_command "$gate" "${GATE_DIRS[@]+"${GATE_DIRS[@]}"}"); then
         echo "  HARNESS: $gate resolves in none of: ${GATE_DIRS[*]}"
         return 2
     fi

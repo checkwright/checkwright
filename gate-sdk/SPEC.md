@@ -2106,6 +2106,19 @@ member; and the binary knob's default is deliberately a repo-relative path, so
 the element that is not absolutized before the `cd` is resolved against the case
 dir and vanishes.
 
+**The same split governs where a bridged member's knob *values* come from, and
+it lands on the other side.** The dispatch executable and the gate dirs are
+resolved at the invoker's root; the **knob values are resolved inside the case
+dir**, because a kit library resolves its `<KIT>_CONFIG_FILE` cwd-relative and
+the case's own config is what the shell substrate reads. Resolving them at the
+invoker's root instead hands the binary *this repo's consumer config* while the
+script beside it reads the fixture's — which is not one oracle over two
+substrates but two oracles, and it silently contradicts the hermeticity clause
+below. So `gate_command` is invoked from within the case dir, and only the
+config lookup moves: the binary is absolutized before it, for the reason the
+paragraph above gives. A member declaring no knob is unaffected by construction,
+the bridge emitting no `env` prefix for it at all.
+
 **The output contract is asserted here, at runtime** (§Output contract). A
 `good/` case must emit the canonical `^<NAME>: clean (<parenthetical>)$` line
 and a `bad/` case must emit a `help:` remedy line — on top of exit code and
