@@ -70,6 +70,14 @@ told to load but cannot find. Knobs:
   `SITE_KIT_RENDERER_BATCH` is empty: one of the gate's two renderer contracts,
   and the fallback of the pair. A consumer whose Pages stack differs points this
   at its own renderer; an unresolvable one fails the gate closed.
+  **Its value is also a port blocker, and repointing it moves one.** The first
+  element of whatever this knob holds is an external program
+  `check-docs-render-fidelity` requires, which is what gate-sdk's criterion 7
+  screens for and what `gate-sdk/bin/port-blockers.sh` derives by resolving this
+  knob (gate-sdk/SPEC.md §port-blockers). The dependency is spelled nowhere in the
+  gate's own source, so it is recorded here, where the knob lives: a consumer who
+  points this at a renderer their payload already carries removes that blocker,
+  and one who points it at a heavier toolchain deepens it.
 - `SITE_KIT_RENDERER_BATCH` — array, **optional**: a command rendering N
   documents over one stream, `NUL`-terminated in both directions and
   count-preserving, the framing specified in §check-docs-render-fidelity. Setting

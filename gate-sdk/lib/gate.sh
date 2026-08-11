@@ -50,6 +50,12 @@ GATE_GREP_EXCLUDES=()
 for _gpd in "${GATE_PRUNE_DIRS[@]}"; do GATE_GREP_EXCLUDES+=(--exclude-dir="$_gpd"); done
 unset _gpd
 
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the programs the payload is entitled to assume present, so a command-position word in this set is not a criterion-7 requirement; git is on it because §The port-candidate criteria already rules it the one sanctioned exception, "because it is the floor"
+declare -p GATE_SDK_PROGRAM_FLOOR &>/dev/null \
+    || GATE_SDK_PROGRAM_FLOOR=(awk basename bash cat cd chmod cmp comm cp cut date diff dirname
+        env find git grep head ln ls mkdir mktemp mv printf pwd realpath rm sed sh sort tail tee
+        touch tr uniq wc xargs)
+
 gate_path_pruned() {
     local p="$1" d
     for d in "${GATE_PRUNE_DIRS[@]}"; do

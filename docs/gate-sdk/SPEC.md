@@ -109,7 +109,12 @@ the path segments whose subtrees `check-exec-bit` exempts — see there), `GATE_
 monitor-marker scan root — see §enforcement-map), and
 `GATE_SDK_LINT_EXTRA_DIRS` (default empty; space-separated directories whose
 direct `*.sh` members join `check-shellcheck`'s derived scan set — the seam for
-a shipped script that sits under no kit root — see §check-shellcheck), and
+a shipped script that sits under no kit root — see §check-shellcheck),
+`GATE_SDK_PROGRAM_FLOOR` (array, default the POSIX/coreutils set the battery
+already rests on plus `bash`, `sh` and `git`; the programs the payload is
+entitled to assume present, so a command-position word among them is not a
+criterion-7 requirement — the default is written once in `lib/gate.sh`, see
+there and §port-blockers), and
 `GATE_SDK_NATIVE_BIN` (default `native/target/release/checkwright-gates`; the
 multi-call binary `gate_command` dispatches a `.gate`-declared member to — see
 §lib/gate.sh; also the binary §check-gate-binary-fresh asks for its baked source
@@ -487,13 +492,17 @@ every field on it has a named reader — `# graph:` by the manifest readers belo
 §check-gate-fixture-coverage. The descriptor carries no field that lacks one,
 reserving nothing against a future reader.
 
-**One field is refused rather than merely absent, and the refusal is the design.**
-A `# reads:` line declaring the gate's walk roots is the obvious cheap way to
-answer §check-reads-couples, and it is rejected: nothing would hold it to the
-implementation, so it is the removed `# reads-couples-exempt:` opt-out with more
-words — a self-declaration whose would-be reader could not verify what it read.
-The read set lives in the crate's registry instead, where a unit test runs the
-member and compares the declaration against the roots it actually walked. This is
+**Two fields are refused rather than merely absent, and the refusal is the
+design.** A `# reads:` line declaring the gate's walk roots is the obvious cheap
+way to answer §check-reads-couples, and it is rejected: nothing would hold it to
+the implementation, so it is the removed `# reads-couples-exempt:` opt-out with
+more words — a self-declaration whose would-be reader could not verify what it
+read. A `# needs:` line declaring the member's external programs (§The
+port-candidate criteria, criterion 7) earns the identical refusal on the identical
+ground, and is recorded here so a later author does not re-propose it as the cheap
+answer to `port-blockers.sh`'s undecidable count. Both sets live in the crate's
+registry instead, where a unit test runs the member and compares the declaration
+against what it actually did. This is
 also why §check-gate-substrate-parity assertion D's manifest-class partition is
 left unchanged deliberately: a roots declaration is *implementation data*, not
 manifest-class, so it belongs in the implementation and not in the build-free
@@ -501,7 +510,17 @@ surface.
 
 **The interface that answers is substrate-neutral; its placement is not settled
 here.** The contract is *a declaration path's substrate answers what it reads* —
-shell answers by parse, the binary answers by `--reads`. Whether a later authoring
+shell answers by parse, the binary answers by `--reads`. It generalizes to
+requirements the same way: **shell answers by parse, the binary answers by
+`--needs`** — a fifth top-level flag beside `--list` / `--reads` / `--knobs` /
+`--source-stamp`, backed by a fifth registry-tuple element and held to behavior by
+a crate unit test in the shape of the `--reads` one. **`--needs` is sequenced, not
+shipped**, and the reason is a decision rather than an omission: no ported member
+requires an external program today, so the arm would land with no named reader,
+which the amendment contract removes rather than reserves. The first port of a
+member carrying an external requirement builds it. Until then `port-blockers.sh`
+reports every `.gate` member as undecidable rather than clean, so the hole is
+counted rather than silent. Whether a later authoring
 SDK relocates that contract to a substrate-neutral surface stays
 `gate-authoring-sdk-surface`'s question, narrowed by this and deliberately not
 answered: one substrate's answer is added without adding a shape that would have to
@@ -936,19 +955,46 @@ design time; the last three were paid for, and each is named with what it cost.
    nothing today and closes a silent-divergence class; a porting unit inherits
    the commitment rather than re-deciding it.
 7. **Its rule invokes no external program the payload does not carry.** *Found
-   at first-cohort selection.* `check-action-run-shell` clears all six above and
-   still cannot port as written: it requires `shellcheck` on `PATH`, refusing
-   when it is absent and invoking it per extracted block, so a compiled form
-   would move a toolchain requirement from this repo's contributors onto every
-   adopter — the dependency floor TRAJECTORY.md objective 1 exists to collapse,
-   against an adopter objective 5 admits who will not install a toolchain. git
-   is the one sanctioned exception, because it is the floor. Under the 2026-08-09
-   ruling this is **the largest named piece of port work**, not a permitted
+   at first-cohort selection.* The programs the payload is entitled to assume are
+   `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh); git is on it as the one sanctioned
+   exception, because it is the floor. Under the 2026-08-09 ruling a gate that
+   fails this carries **the largest named piece of port work**, not a permitted
    exclusion: the dependency is designed away — embedded, replaced, or the rule
    itself changed — and that design is the porting session's, not this section's.
-   Recorded rather than left as a silent skip, because every mechanical screen
-   puts that gate *in*: it shares the cohort's corpus family and its walk and
-   reads no knob, and the fact that stops it is one none of the six criteria sees.
+   A *blocker* here is therefore work the port owes, in the sense the roster's
+   opening paragraph fixes for all seven; it never reads on whether a gate ports.
+
+   **The roster is derived and lives in no document, including this one** —
+   `bash gate-sdk/bin/port-blockers.sh` reports it against the tree at the moment
+   a session sequences a cohort. That is a correctness requirement, not a
+   preference for freshness. A gate's requirement need not be spelled in its
+   source at all: `check-docs-render-fidelity`'s is the first element of
+   `SITE_KIT_RENDERER`'s default (site-kit/SPEC.md §lib/site.sh), and because that
+   knob is consumer config, a consumer who repoints it changes which external
+   program that gate requires. **No literal roster is true for every consumer**,
+   so a freshness-gated copy here would be gated against *this* repo's
+   configuration while reading as a general claim — a defect a stale-roster gate
+   could not detect, which is why none is shipped.
+
+   `check-action-run-shell` is named as the **worked example** rather than as the
+   roster. It clears all six criteria above and still cannot port as written: it
+   requires `shellcheck` on `PATH`, refusing when it is absent and invoking it per
+   extracted block, so a compiled form would move a toolchain requirement from this
+   repo's contributors onto every adopter — the dependency floor TRAJECTORY.md
+   objective 1 exists to collapse, against an adopter objective 5 admits who will
+   not install a toolchain. Recorded rather than left as a silent skip, because
+   every mechanical screen puts that gate *in*: it shares the cohort's corpus
+   family and its walk and reads no knob, and the fact that stops it is one none
+   of the six criteria sees.
+
+   **The report's honest bound is its undecidable count, and that count grows with
+   the port.** A member declaring through a `.gate` descriptor has no shell rule to
+   parse and no `--needs` answer yet (§The `.gate` descriptor), so it is counted
+   undecidable rather than reported clean — the §check-reads-couples precedent, a
+   root the tool cannot bound declares `?` rather than guessing. The count is the
+   share of the corpus the report cannot speak for, and every port moves a member
+   into it until the binary answers `--needs`. That is the pressure the sequencing
+   below rests on, and it is why the arm is scheduled rather than left open.
 
 ### The first cohort, and the rule that selects the next
 
@@ -1759,6 +1805,15 @@ reader needs outlive the refactor that renames a helper:
   so adding a kit enrols its fixtures with no hand-list to drift.
 - `gate_kit_roots_rel` emits the roots repo-root-relative — the anchor the
   couples globs share.
+- **`GATE_SDK_PROGRAM_FLOOR` is the one home of the payload's assumed-program
+  set**, read by §port-blockers at the transition where a command-position word is
+  classified as a criterion-7 requirement or discarded. It is a kit default rather
+  than a literal in the tool for the reason every other knob is: a consumer
+  shipping a different floor — a stripped container, a busybox userland — repoints
+  it instead of patching the derivation. `git` is a member because §The
+  port-candidate criteria already rules it the sanctioned exception, *"because it
+  is the floor"*, and the set is written here rather than restated in the SPEC
+  prose that cites it.
 - `gate_native_targets` is the **target roster's single reader**: one Rust target
   triple per live line, `#`-comments and blank lines stripped by the same
   `gates_list_members` grammar `scripts/gates.list` uses. An absent roster emits
@@ -2459,6 +2514,53 @@ gate whose pattern list is one repo's own build command. The recurrence is not
 yet attested — the duplication removed here accumulated because there was no
 owner to cite, and this section is that owner. A recurrence is a costed filing,
 not a silent regrowth.
+
+### port-blockers
+
+The criterion-7 roster, derived at each invocation. Run
+`bash gate-sdk/bin/port-blockers.sh` from the repo root: for every `gates.list`
+member it resolves the declaration path and reports the external programs the
+rule requires beyond `GATE_SDK_PROGRAM_FLOOR`, one
+`<member><TAB><program><TAB><file:line>` row each, then a trailing line counting
+members scanned and members carrying a requirement it could not decide. **Why the
+roster is derived rather than written down** is §The port-candidate criteria's,
+criterion 7; this section owns how.
+
+**Three derivation inputs, in descending confidence.** The `command -v <prog>`
+guard, already this tree's convention for announcing exactly this dependency — a
+guarded program is a requirement with no inference. **Command position** — a word
+at the head of a simple command, which is what excludes the attested false
+positives without a per-case exception list: an element of an array literal, a
+word inside a string, and an awk-internal token are all non-command-position, so
+positional analysis removes them as a class. And **knob resolution for a
+command-position expansion**: a `"${KNOB[@]}"` or `"$KNOB"` at the head of a
+command resolves through `lib/gate.sh`'s own bridge resolver, the single place a
+knob default is read anywhere, so this report cannot disagree with the value a
+dispatched binary is handed.
+
+Two **negative** inputs keep the positive ones honest, and both are derived from
+the tree rather than listed. Keyword and builtin status is asked of the
+interpreter (`type -t`), a property of bash rather than a roster to maintain. And
+`declare -F <name>` — this tree's convention for dispatching an optional shell
+hook — marks a name a function however the scan would otherwise classify it, the
+exact mirror of the `command -v` guard.
+
+**Undecidable is reported, never guessed**, adopting §check-reads-couples'
+precedent: a command-position expansion whose default cannot be resolved prints
+`?`, and so does a member declaring through a `.gate` descriptor, whose rule is a
+binary subcommand with no `--needs` to ask (§The `# graph:` manifest). A tool that
+reported nothing for an unresolvable knob would reproduce the very false negative
+the derivation exists to close — the dependency that is never spelled in the
+gate's source at all.
+
+It is a tool, not a gate: no `# graph:` manifest, no fixture pair, and nothing
+machine-parses its output — the report is read by the session choosing a cohort,
+which is the transition where the answer is needed. **No freshness gate
+accompanies it, and that is enforcement-first rather than an omission**: a gate
+would have to compare the derivation against a stored expectation, which is the
+maintained roster re-entering by the back door, wrong for every consumer whose
+configuration differs. Removing the duplication outranks gating it, and criterion
+7 states no roster for a freshness gate to hold.
 
 ### check-shellcheck
 

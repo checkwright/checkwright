@@ -62,29 +62,6 @@
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohort ruled 2026-08-11 at scope.
 
-- **port-criterion-7-roster-understated** [spec: SPEC-port-needs.md] — the SPEC's
-  external-program port blockers name one gate; the real set is at least five.
-  gate-sdk/SPEC.md's port-candidate criterion 7 (an external program the payload
-  does not carry) names only `check-action-run-shell`'s `shellcheck`. The census
-  at this iteration's scope boundary found `check-docs-render-fidelity` invoking
-  `ruby` as its default `SITE_KIT_RENDERER`, and a `jq` trio —
-  `check-installer-no-deps`, `check-settings-pins`, `check-memory-off` — none of
-  them named in the SPEC. So the sequenced-last roster the port owes a design to
-  is materially wider than the governing document states.
-  **Why it matters beyond bookkeeping:** criterion 7 is what defers a gate to the
-  end of the port sequence, so an understated roster makes the remaining port work
-  look smaller than it is, and a cohort selection that trusts the SPEC's list will
-  mis-sequence.
-  **Deliverable:** derive the criterion-7 set rather than listing it — the
-  external-program dependency of a gate is readable from its source and its
-  configured default renderer/command knobs — or, if derivation proves noisy,
-  state the full roster once at the SPEC with a freshness gate. Deriving is
-  preferred and is why this is not a one-line doc fix.
-  **Cost while deferred:** the port sequence's own input is wrong, and every
-  future cohort census re-derives the same correction; this one already cost a
-  scope boundary's census to find.
-  Filed 2026-08-10 by close, from the gap bullet the scope-boundary census filed.
-
 - **survey-citation-outlives-its-record** [spec: SPEC-survey-cite.md] — a permanent surface cites a
   boundary-truncated one, so the citation dies on schedule.
   The motivating instance, recorded here because the entry it describes has since shipped and
@@ -4574,5 +4551,6 @@
 ## Done
 
 - cat-read-steer-guard
+- port-criterion-7-roster-understated
 
 ## Lessons Learned
