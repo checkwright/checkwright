@@ -4766,6 +4766,7 @@
   and `probe-evidence-sufficiency` each stand at exactly 50, so neither can name the other and a
   finding recorded in one is unreachable from the other. Linkage is what makes a fragmented record
   navigable, so the cap has stopped merely shortening entries and started disconnecting them.
+  **Owed:** truncation sub-case `cardinal-notation-splits-gate-reach`→`probe-evidence-sufficiency`.
   **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
   so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
   recurrence most needs recording. The cap therefore goes blind first on the highest-signal
