@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-cohort-queue-kit
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -2813,19 +2813,23 @@
   gates. `powershell-installer-surface`'s premise moves with it — a binary is one
   implementation across platforms, so what PowerShell must still cover shrinks to the bootstrap.
   **Cost while deferred:** large and known — 98 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a
-  single-iteration delta; scope owns the decomposition, and the criterion-4 relaxation question
-  the prior scoping left open is subsumed by a ruling that ports everything.
-  **Cohort A was ruled at this scope and retired by the operator the same day**, because the
-  census it rested on never scored criterion 6 — the selector's own term. Scored there, cohort A
-  is 0 of 10 and the runner-up 5 of 7: every candidate cohort owes the array-knob config bridge,
-  so the bridge is the shared substrate work and is split out as `native-knob-bridge`.
-  **Cohort selection is deferred to a later iteration** on a scoring covering every criterion,
-  including the 47 singleton-corpus gates the census never scored per-criterion. The corrected
-  census, both unscored limits and the family groupings are in the survey record; read it
-  rather than re-deriving it.
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  **Cohort ruled 2026-08-11 by the operator: queue-kit, taken as a whole kit.** The array-knob
+  bridge is spent substrate — it landed and ported zero gates by ruling — and queue-kit's only
+  recorded blocker was criterion 6 on two array knobs (`check-queue-hygiene` reads
+  `QUEUE_KIT_PROSE_LEADS`, `check-queue-sections` reads `QUEUE_KIT_REQUIRED_SECTIONS`), which is
+  exactly what that bridge discharges. The canon-kit `spec_manifest_files` cohort still owes two
+  further shared mechanisms — basename-glob list matching beside walk.rs's extension filter, and a
+  Rust `gate_kit_roots` — so taking it first buys another substrate iteration before a gate lands.
+  **The cohort is 9 of queue-kit's 10, probed at scope 2026-08-11 — carry this number, not the
+  census's 7:** `check-task-conservation` and `check-roadmap-fresh` are file-only too (the census
+  excluded the first only for a missing fixture pair); only `check-queue-slug-liveness` walks,
+  scanning `QUEUE_KIT_PROSE_SURFACE_GLOBS`. `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception.
+  direct-filing exception; cohort ruled 2026-08-11 at scope.
 
 - **dead-queue-citation-report** [design-pending] — an in-body citation that resolves to no
   live entry reads exactly like one that does, and nothing names the difference.
@@ -4058,23 +4062,6 @@
   one rule re-derived per iteration, forever, against a one-predicate fix.
   Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step.
 
-- **cat-read-steer-guard** [design-pending] — `cat <file>` is the top prompting pattern and the
-  guard steers `sed` reads but not `cat` ones.
-  **Measured this close by `scan-prompts.sh`: 29 of 81 prompting calls across 25 patterns** —
-  more than a third of the friction, and 5x the next pattern. `scripts/bash-guard.sh` already
-  carries the precedent shape for `sed` ("don't read a file through 'sed' — use the Read tool"),
-  with a pipe carve-out, and `cat` has neither a guard rule nor an allowlist entry.
-  **Allowlisting is the wrong disposition and the triage criterion says so:** the form to
-  reinforce is the Read tool, so a `Bash(cat *)` grant would mask the steering opportunity rather
-  than take it. **Why `[design-pending]`:** the carve-out is the design — `cat file |` feeding a
-  filter is legitimate and must not be refused, and the sed rule's own text shows the boundary
-  is expressible; what the unit owes is a decision-table row plus its fixture pair, which is
-  build-shaped rather than close-shaped.
-  **Cost while deferred:** low per instance, high in aggregate — a round trip on roughly a third
-  of all prompting calls, paid by every session, and it trains the habit the harness's own
-  guidance already discourages.
-  Filed 2026-08-09 by close (`install-profile-seam`) from its prompt-friction triage.
-
 - **qualified-pointer-section-ownership** [design-pending] — `check-spec-pointer` asserts a
   cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
   fully-qualified pointer aimed at the wrong section resolves and reds nothing.
@@ -4585,5 +4572,7 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- cat-read-steer-guard
 
 ## Lessons Learned
