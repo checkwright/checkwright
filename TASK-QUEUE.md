@@ -4596,10 +4596,9 @@
   so the gate shells out to a kit shell script the port does not touch. Its fixture pair
   cannot catch this — both `args` files pass `projection.txt emit.txt`, steering the assertion
   off the live emitter onto pre-baked files, so a ported member's pair would go green over an
-  arm with no implementation. The three candidates are all unattractive and none is ruled:
-  shell out (bash plus a kit script path back under the binary), reimplement the emission
-  format in Rust (criterion-6 duplication), or collapse `bin/roadmap.sh` itself onto the
-  binary (wider than the gate). Worth preserving in the design: the hold keeps
+  arm with no implementation. The three candidate designs are stated once, by their owner —
+  gate-sdk/SPEC.md §The first cohort — and are deliberately not repeated here; none is ruled.
+  Worth preserving in the design: the hold keeps
   `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the
   gate can never disagree" guarantee survives intact and is **not** part of the dual-
   implementation debt above.
