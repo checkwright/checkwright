@@ -3817,12 +3817,20 @@
   the rev-discipline clause in a read-only dispatch prompt, a kit-side wrapper that injects it,
   or a ruling that read-only fan-out reads only through the object store — the first two gate a
   prompt's text, which is the reach question the design owes.
-  **Four firings at `native-cohort-queue-kit`, all handed the IDENTICAL rev `47965229`** from
-  dispatchers at `f67e0388`, `32c009ca` and `465ea869`. A base that does not move with the
-  dispatcher is **cached, not raced**, so the defect is deterministic — "may be stale" above
-  understates it. The protocol mitigation is now exercised three times and works: told to
-  verify HEAD and check out the named rev, each child did, and said so. That moves the first
-  two candidates from plausible to attested; what is unbuilt is the *enforcement*.
+  **Six firings at `native-cohort-queue-kit`, all handed the IDENTICAL rev `47965229`** from
+  dispatchers at `f67e0388`, `32c009ca` and `465ea869`. **The cause is now known, not merely
+  inferred:** that rev was `origin/master`, and this close's push reported the range
+  `47965229..a9e701e6`. **The worktree is cut from the remote tracking ref, not from the
+  dispatcher's HEAD** — so staleness equals exactly the unpushed backlog, which under this
+  repo's one-push-per-iteration budget is an entire iteration by design. The two rules compose
+  worse than recorded above: the push budget *causes* the staleness. It is deterministic and
+  predictable rather than a race, and it is also cheaply testable — a dispatcher can compute
+  its own exposure as `git log origin/master..HEAD`.
+  **A consequence worth stating because it inverts a candidate:** pushing before dispatching
+  would fix it outright, but that trades against the push budget, so the honest options are
+  the rev-naming mitigation (now exercised six times, works every time — each child reported
+  the handed rev and the one it ended on) or teaching the dispatch to pass `origin/master..HEAD`
+  as the child's required checkout. What is unbuilt is the *enforcement*, not the technique.
   **Second half found this close: isolation cannot see untracked state at all.** A sweep sent
   to triage `.workflow/prompt-friction.log` (gitignored, worktree-local) read an empty file
   and reported the corpus absent; `compare-settings-allow.sh` likewise saw no overlay, since
