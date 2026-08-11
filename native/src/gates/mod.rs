@@ -56,7 +56,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_PROSE_LEADS"],
     ),
-    // spec: gate-sdk/SPEC-queue-cohort.md — a member reading a derived section matcher declares
+    // spec: queue-kit/SPEC.md §lib/queue.sh — a member reading a derived section matcher declares
     // every knob that matcher is computed from, since the Rust side derives them from the
     // bridged values exactly as lib/queue.sh derives its regexes
     (
@@ -95,7 +95,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
     ),
-    // spec: gate-sdk/SPEC-queue-cohort.md — the HEAD side comes out of the git object store
+    // spec: queue-kit/SPEC.md §check-task-conservation — the HEAD side comes out of the git object store
     // rather than off the filesystem, so this member walks nothing and declares the same empty
     // set its file-reading siblings above declare
     (

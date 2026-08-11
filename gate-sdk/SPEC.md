@@ -1065,6 +1065,84 @@ because a consumer tree does not verify a build it did not make. A port that
 lands descriptors checks both halves: which trees *declare*, and which trees
 *register*.
 
+**The second cohort was ruled by kit, and both selectors picked the same set** —
+recording why is what keeps the ordering rule above usable rather than quietly
+overridden. The operator ruled 2026-08-11 that the next cohort is **queue-kit,
+taken as a whole kit**, under TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence.
+The rule above warns in the same breath that selecting by kit re-imports work a
+cohort only pays once. It does not here, because queue-kit is the kit whose corpus derivation *is*
+the queue file: read off the `# graph:` manifests, its members couple
+`TASK-QUEUE.md` alone but for two — `check-roadmap-fresh`, which adds the roadmap
+projection and the queue config its own `trigger=` names, and
+`check-queue-slug-liveness`, which names `kit:*.sh` only as a reverse trigger, the
+shape the disposition table already records for it (§Meta-gate conservation for
+the binary substrate). Every member is `dir=one valve=none tier=precommit`, so
+criterion 3 is clear kit-wide and a green `check-graph` after the port is
+end-to-end proof the manifest survived the substrate change. The kit boundary and
+the corpus boundary coincide **here**; a later selector must not read this as
+licence to take a kit whose gates share nothing.
+
+**Two members are held on shell, and the ground is sequencing rather than
+exclusion.** The whole-kit ruling was made on the premise that every member
+cleared the criteria the existing substrate answers, and that premise turned out
+false for two — each ruled held by the operator the same day, `.sh` unmodified,
+with its port work named and owed:
+
+- **`check-roadmap-fresh` — criterion 7.** It invokes `bash` on
+  `queue-kit/bin/roadmap.sh --emit`, one of the `lib/queue.sh` consumers this port
+  does not touch (queue-kit/SPEC.md §lib/queue.sh), so nothing in the cohort ports
+  the emitter it shells out to. The design it owes — shell out to the emitter,
+  reimplement the emission format in Rust against criterion 6, or collapse the
+  emitter itself onto the binary — is the cohort that takes it to answer.
+- **`check-queue-prose-precondition` — an ERE engine.** It does not *transport*
+  `QUEUE_KIT_PRECONDITION_REGEX` across the bridge, it **interprets** it, and the
+  knob is consumer config carrying an arbitrary POSIX ERE; its `awk` also runs
+  `gsub` with alternation, groups and negated classes. The crate vendors nothing —
+  asserted rather than assumed, by the unit test that fails the build on a
+  non-empty dependency list — so porting it means hand-writing an ERE engine plus
+  `gsub` semantics. Sizing a subset to this consumer's one configured regex is
+  **foreclosed** by the argument criterion 6 already makes for globs: the config
+  surface permits what this consumer happens not to write, and a narrow reader
+  would silently mis-scan the first consumer who writes it.
+
+Neither hold is an eligibility screen, and citing it as one inverts the rule §The
+port-candidate criteria denies in its opening sentence and TRAJECTORY.md restates.
+A criterion a member fails **orders** the work; the 2026-08-09 directive ports the
+whole corpus over time, so holding a member for a later cohort is the sequencing
+those criteria prescribe — the same treatment criterion 7's own worked example
+gives `check-action-run-shell`, which it names the largest piece of port work
+rather than a permitted exclusion.
+
+**The criterion-7 claim that helped select this cohort was false, and its fixture
+pair could not have caught it.** The cohort was taken partly on the reading that
+`git` is the only external program across the kit; the `roadmap.sh` shell-out
+above falsifies that, and it survived design review because
+`check-roadmap-fresh`'s `good/` and `bad/` cases both pass pre-baked files that
+steer the assertion off the live emitter. A ported member's pair would therefore
+have gone **green over an arm with no implementation** — the same vacuity the
+`check-gate-output` disposition exists to close, arriving through a different
+door. A cohort is sized off what its members *execute*, never off what their
+fixtures reach.
+
+**Two orthogonal nine-of-ten splits existed and neither predicted a held member.**
+One is the walk axis — every member reads fixed paths but `check-queue-slug-liveness`,
+which walks a bridged glob array. The other is the fixture axis —
+every member carries a `good/`+`bad/` pair but `check-task-conservation`, whose
+`# no-fixture:` reason is structural (queue-kit/SPEC.md §check-task-conservation).
+Both were drawn before the criterion-7 and ERE probes, and both land on members
+that **did** port. The transferable lesson is not the arithmetic: a third and a
+fourth axis existed and nobody had looked down them, so a nine-of-ten on any one
+axis is not a difficulty estimate.
+
+**One shared mechanism this port discharges for a later cohort.** The canon-kit
+`spec_manifest_files` callers owed two: basename-glob list matching beside the
+crate walker's extension filter, and a Rust `gate_kit_roots`.
+`check-queue-slug-liveness` needed the first and it is now built, inside the
+crate's single sanctioned walk implementation so the recorder still observes it
+(§Meta-gate conservation for the binary substrate). That cohort's remaining
+shared debt is the second alone — recorded so the next selector reads its cost
+correctly rather than re-deriving it.
+
 ### What the reverted port established
 
 Not nothing, and worth separating from what it broke:

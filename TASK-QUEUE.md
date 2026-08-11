@@ -12,7 +12,11 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-queue-cohort.md] [roadmap: now/reliability] —
+## Technical Debt
+
+## Deferred
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
   the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -61,10 +65,6 @@
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohort ruled 2026-08-11 at scope.
-
-## Technical Debt
-
-## Deferred
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09

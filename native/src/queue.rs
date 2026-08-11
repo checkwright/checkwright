@@ -1,4 +1,4 @@
-// spec: gate-sdk/SPEC-queue-cohort.md — the Rust counterpart of queue-kit/lib/queue.sh's
+// spec: queue-kit/SPEC.md §lib/queue.sh — the Rust counterpart of queue-kit/lib/queue.sh's
 // shared surface: the derived section matchers and the slug adapters. The shell library is
 // not retired, so this module sits beside it rather than replacing it
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged value, tab-split. The crate holds no

@@ -542,7 +542,8 @@ directly. The risk is filed as debt rather than closed here, because an ongoing
 cross-implementation check is scope the port did not need in order to prove the
 members it ported. `queue_roadmap_entries` is **not** in that split: its only two
 consumers are `bin/roadmap.sh` and `check-roadmap-fresh`, and the gate was held
-on shell, so the emitter and the gate still cannot disagree.
+on shell by the cohort's own ruling (gate-sdk/SPEC.md §The first cohort, and the
+rule that selects the next), so the emitter and the gate still cannot disagree.
 
 The loader sources the consumer config, then a `<config>.local.sh` overlay
 beside it when present — last write wins. This is the tracked-name /
