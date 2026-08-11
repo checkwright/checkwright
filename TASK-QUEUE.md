@@ -31,22 +31,17 @@
   **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
   means a developer clones the **public repository** — source never enters the payload, so the
   disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something has to run
-  before the binary exists on the machine, and fetching-and-executing the first artifact cannot
-  itself be that artifact. So the **bootstrap** — in shell, or absorbed by the transport, since
-  the payload already ships as an npm package and a Release tarball and npm can carry
-  per-platform binaries — is the one place shell may be unavoidable in the strict sense. Naming
-  it is not designing it; the design is this unit's.
-  **Measured 2026-08-09, and the two numbers size two different benefits.** The port stands at
-  **2 of 100** — `scripts/gates.list` carries 100 registered gates, `native/src/gates/mod.rs`
-  registers two. Wall-clock is the **weaker** argument and should not be leaned on: validate is
-  ~536s of which the entire gate battery is ~31s (under 6%), while `installer_smoke` alone is
-  227s (42%). What timing win exists comes from retiring shell *sources* that `demo`'s
-  shellcheck pass and the payload carry, not from faster gate execution.
-  **This also answers the toolchain-free objection** raised against porting: the installer
-  smoke's toolchain-free arm is satisfied by the pre-compiled path, not by retaining shell
-  gates. `powershell-installer-surface`'s premise moves with it — a binary is one
-  implementation across platforms, so what PowerShell must still cover shrinks to the bootstrap.
+  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
+  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
+  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
+  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
+  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
+  **Measured 2026-08-09: the port stands at 2 of 100** (`scripts/gates.list` 100 registered,
+  `mod.rs` two). **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
+  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
+  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
+  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
   **Cost while deferred:** large and known — 91 gates plus the runners and the install-lifecycle
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
@@ -61,7 +56,12 @@
   **The cohort is 9 of queue-kit's 10, probed at scope 2026-08-11 — carry this number, not the
   census's 7:** `check-task-conservation` and `check-roadmap-fresh` are file-only too (the census
   excluded the first only for a missing fixture pair); only `check-queue-slug-liveness` walks,
-  scanning `QUEUE_KIT_PROSE_SURFACE_GLOBS`. `gate-battery-parallel-execution` and
+  scanning `QUEUE_KIT_PROSE_SURFACE_GLOBS`.
+  **DELIVERED 8 of 10, not 9 — read this before acting on the number above.** The operator ruled
+  2026-08-11 to hold `check-roadmap-fresh` and `check-queue-prose-precondition` on shell, as
+  **sequencing with port work owed, never exclusion**; gate-sdk/SPEC.md §The first cohort is
+  canonical and `cohort-held-members-port-prerequisites` carries what each still owes.
+  `gate-battery-parallel-execution` and
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohort ruled 2026-08-11 at scope.
@@ -3818,25 +3818,28 @@
   or a ruling that read-only fan-out reads only through the object store — the first two gate a
   prompt's text, which is the reach question the design owes.
   **Six firings at `native-cohort-queue-kit`, all handed the IDENTICAL rev `47965229`** from
-  dispatchers at `f67e0388`, `32c009ca` and `465ea869`. **The cause is now known, not merely
-  inferred:** that rev was `origin/master`, and this close's push reported the range
-  `47965229..a9e701e6`. **The worktree is cut from the remote tracking ref, not from the
-  dispatcher's HEAD** — so staleness equals exactly the unpushed backlog, which under this
-  repo's one-push-per-iteration budget is an entire iteration by design. The two rules compose
-  worse than recorded above: the push budget *causes* the staleness. It is deterministic and
-  predictable rather than a race, and it is also cheaply testable — a dispatcher can compute
-  its own exposure as `git log origin/master..HEAD`.
-  **A consequence worth stating because it inverts a candidate:** pushing before dispatching
-  would fix it outright, but that trades against the push budget, so the honest options are
-  the rev-naming mitigation (now exercised six times, works every time — each child reported
-  the handed rev and the one it ended on) or teaching the dispatch to pass `origin/master..HEAD`
-  as the child's required checkout. What is unbuilt is the *enforcement*, not the technique.
-  **Second half found this close: isolation cannot see untracked state at all.** A sweep sent
-  to triage `.workflow/prompt-friction.log` (gitignored, worktree-local) read an empty file
-  and reported the corpus absent; `compare-settings-allow.sh` likewise saw no overlay, since
-  `.claude/settings.local.json` is uncommitted. So **a close-surface sweep over an untracked
-  capture surface cannot be delegated to a worktree at all**, and naming the rev does not fix
-  it — three rostered close-surface rows are untracked.
+  dispatchers at `f67e0388`, `32c009ca` and `465ea869`. That rev **was** `origin/master`: this
+  close's push reported the range `47965229..a9e701e6`.
+  **Leading hypothesis — the worktree is cut from the remote tracking ref, not the dispatcher's
+  HEAD.** If so, staleness equals the unpushed backlog exactly, this repo's one-to-two-push
+  budget *causes* it rather than merely coexisting with it, and a dispatcher can read its own
+  exposure as `git log origin/master..HEAD`.
+  **Stated at its real strength: strong correlation over six sweeps and three dispatcher HEADs,
+  not a demonstration.** The experiment that would settle it is free, because the next sweep is
+  the witness — `origin/master` is `a9e701e6` while local HEAD is `188c8c69`, so the hypothesis
+  predicts the next worktree sweep reports `a9e701e6`, one commit stale, the remote ref again
+  rather than its dispatcher's HEAD. A sweep reporting `188c8c69` falsifies it outright.
+  **It also inverts a candidate:** pushing before dispatching would fix it but spends the budget
+  the repo conserves, so the live options are the rev-naming mitigation (six for six) or handing
+  the child its required checkout. What is unbuilt is the *enforcement*, not the technique.
+  **Second half found this close: isolation cannot see untracked state at all.** A sweep sent to
+  triage `.workflow/prompt-friction.log` (gitignored, worktree-local) read an empty file and
+  reported the 621-line corpus absent; `compare-settings-allow.sh` likewise saw no overlay,
+  `.claude/settings.local.json` being uncommitted. So **a close-surface sweep over an untracked
+  capture surface cannot be delegated to a worktree**, and naming the rev does not fix it: three
+  of the six rows in lifecycle-kit/SPEC.md §The close-surface roster are untracked. This is a
+  **false negative from an isolation mechanism** — the same shape as this iteration's vacuous
+  fixture pair, where the check runs, reports clean, and proves nothing.
   **Cost while deferred:** an isolated audit's verdict is uncertifiable, so its consumer either
   re-verifies the same sites (paying for the audit twice) or trusts a read that may predate the
   work under review. Widened by the untracked half: such a sweep returns a confident "nothing
@@ -4525,18 +4528,16 @@
 - **probe-evidence-sufficiency** [design-pending] — rule 12 is discharged by the *act* of
   consulting a source and says nothing about whether what you consulted supports the claim.
   `Probe-before-assertion` (doctrine-kit/DOCTRINE.md rule 12) reads as satisfied whenever a
-  command was run or a file was opened. Both failures below ran a probe and read a real
-  surface, and both still produced a false disposition — so the rule was *green* over each.
-  That is the hole: the rule constrains whether evidence was gathered, never whether the
-  evidence gathered is evidence **for this claim**.
-  **Sub-case (a), attribution — the probe's output does not carry its subject.** At spec,
-  `grep -h` over ten filenames returned bare lines and the fifth line was attributed to the
-  fifth argument. Positional mapping is inference, not evidence; it overrode corroborating
-  prose already read in gate-sdk/SPEC.md's conservation table and survived into a committed
-  "correction" of a survey that was right — two wrong commits and a reversal. Candidate
-  clause: a probe whose output does not carry its own subject (`grep -h`, `sort -u` over
-  several files, a bare count) is not evidence for a per-subject claim; ask for the label
-  (`grep -H`, per-file invocation) or do not make the per-subject claim.
+  command was run or a file opened. Every failure below ran a probe and read a real surface and
+  still produced a false disposition, so the rule was **green** over each: it constrains whether
+  evidence was gathered, never whether what was gathered is evidence **for this claim**.
+  **Sub-case (a), attribution — the probe's output does not carry its subject.** At spec, `grep
+  -h` over ten filenames returned bare lines and the fifth was attributed to the fifth argument.
+  Positional mapping is inference, not evidence; it overrode corroborating prose already read in
+  gate-sdk/SPEC.md's conservation table and survived into a committed "correction" of a survey
+  that was right — two wrong commits and a reversal. Candidate clause: a probe whose output does
+  not carry its own subject (`grep -h`, `sort -u` over several files, a bare count) is not
+  evidence for a per-subject claim; ask for the label or do not make the claim.
   **Sub-case (b), authority — the surface read is not the one that owns the question.** At
   build batch 2 the tightened-gates entry was declared unowed from `build.md`'s restatement
   of the scoping rule, which is accurate *for scoping* and silent on cost; the sentence that
@@ -4545,29 +4546,32 @@
   the clause, it was made **without** it. The lead's own port-criteria error the same
   iteration has the identical shape, against §The port-candidate criteria.
   **Why (b) is a hazard this repo manufactures rather than inherits.** Content-tiering,
-  Always-loaded shape and Load-trigger residency deliberately compress each rule to a
-  resident one-liner with the mechanism behind a pointer. That is the right trade for cost,
-  and its by-product is a surface that is *accurate, authoritative-looking, and not
-  dispositive* — a reader cannot tell from the line whether it settles their question. So
-  the more disciplined the tiering, the sharper this edge.
-  **Deliverable, and why `[design-pending]`:** the cheap close is one clause on rule 12
-  covering both sub-cases ("a probe is evidence only for the claim its subject and its owner
-  support"). The open question is whether that is one clause or two, since the remedies
-  diverge — (a) is a property of how a probe is *invoked* and is plausibly lintable, while
-  (b) is a property of which surface was *opened* and has no mechanical residue at all. A
-  third candidate reaches only (b): make the always-loaded tier declare its own status, so a
-  resident line routes and never decides. That is an authoring contract across every kit's
-  digest, which is why it is not obviously cheaper than the clause.
-  **Relationship to `probe-before-assertion-doctrine`:** that entry owns whether *any* slice
-  of the assert-without-probing class is mechanizable and is scoped to that question. This
-  one is the complement — the probe ran, and it was the wrong probe. They decide together
-  and should be read together; kept separate because a mechanizability answer for one says
-  nothing about the other.
-  **Cost while deferred:** paid at the moment of decision by whichever session is closest to
-  the work, and invisible in the diff — a judgement made from an accurate-but-silent surface
-  shows up as an *absence*, and nobody reviews an absence. Four instances this iteration; the
-  two clean ones cost a correction round each, and both were caught only because the deciding
-  session reported its call as reversible rather than landing it quietly.
+  always-loaded shape and load-trigger residency deliberately compress each rule to a resident
+  one-liner. The by-product is a surface that is *accurate, authoritative-looking and not
+  dispositive*: a reader cannot tell from the line whether it settles their question. The more
+  disciplined the tiering, the sharper the edge.
+  **Deliverable, and why `[design-pending]`:** the cheap close is one clause on rule 12 covering
+  both sub-cases ("a probe is evidence only for the claim its subject and its owner support").
+  Open: one clause or two, since the remedies diverge — (a) is a property of how a probe is
+  *invoked* and is plausibly lintable, (b) of which surface was *opened*, with no mechanical
+  residue at all. A third reaches only (b): make the always-loaded tier declare its own status,
+  so a resident line routes and never decides — an authoring contract across every kit's digest,
+  which is why it is not obviously cheaper.
+  **Sub-case (a) again, 2026-08-12 — by the session filing this entry.** Dispatching the
+  prompt-friction triage I told a sweep to separate entries "using the log's own dates"; the log
+  carries none, and I had not opened it. The same dispatch asserted a 621-line corpus to a
+  worktree that could not see it, and I then reported an unpushed commit as `a1f1a5b0` — a sha
+  resolving to nothing, asserted rather than read back from `git log`. **Three in one session,
+  by the author, while authoring the rule against them.** That is the entry's strongest evidence
+  and the argument it must win to earn a gate: an instance produced by the session with maximal
+  attention on the hazard is what separates a structural defect from a lapse of care.
+  **Relationship to `probe-before-assertion-doctrine`:** that entry owns whether *any* slice of
+  the assert-*without*-probing class is mechanizable; this is the complement — the probe ran and
+  was the wrong probe. Separate because either answer leaves the other open.
+  **Cost while deferred:** paid at the moment of decision by the session closest to the work and
+  invisible in the diff — a judgement made from an accurate-but-silent surface shows up as an
+  *absence*, and nobody reviews an absence. Seven instances now; the two caught cheaply were
+  caught only because the deciding session marked its call reversible instead of landing it.
   Filed 2026-08-12 by close, draining the rule-12 gap bullet and the lead's handed-over
   candidate rule; the two were folded into one entry because both amend the same clause.
 
@@ -4732,26 +4736,29 @@
   the one allowlist class whose whole point is that it does not look dangerous.
   Filed 2026-08-12 by close, from its own overlay triage.
 
-- **entry-cap-displaces-mandated-writes** [design-pending] — the per-entry cap silently
-  chooses what a governed mechanism is allowed to record, and it bites hardest where the
-  record matters most.
-  `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three reliefs:
-  compress by answering, evict to the icebox, or relocate grounds to a linked entry — the
-  last **authorization-gated, not self-served**. So a session facing a full entry and holding
-  a *mandatory* one-line write has no self-served move that preserves the record.
-  **Second instance of a class already recorded once.**
-  `deferred-release-declaration-accumulation` documents the first: at the 2026-08-09 close a
-  third deferral's declarations "could not land here at all and ride its disposition line's
-  basis instead — the second alternative below, **chosen by the cap rather than by design**".
+- **entry-cap-displaces-mandated-writes** [design-pending] — the per-entry cap silently chooses
+  what a governed mechanism may record, and bites hardest where the record matters most.
+  `check-queue-entry-budget` caps a deferred entry at 50 lines and offers three reliefs: compress
+  by answering, evict to the icebox, or relocate grounds to a linked entry — the last
+  **authorization-gated, not self-served**. So a session facing a full entry and holding a
+  *mandatory* one-line write has no self-served move that preserves the record.
+  **Second instance of a class already recorded once:**
+  `deferred-release-declaration-accumulation` documents a 2026-08-09 deferral whose declarations
+  "could not land here at all", riding a disposition line instead — **"chosen by the cap rather
+  than by design"**.
   **This close is the second, and it is sharper because the displaced write is obligatory.**
   The gap-inbox drain (lifecycle-kit/SPEC.md §The committed gap inbox) *must* append a
   `recurrence:` date in the same commit that truncates the inbox — that commit is the audit
   artifact, so the write is not optional and is not deferrable. Measured at `465ea869`:
   `spec-measured-count-gate` stood at **exactly 50 lines**, `waiting-rule-carrier-reach` at
-  **49**. The stamp is one line. So the stamp alone put the first entry over cap and consumed
-  the second's entire headroom, and this close had to compress **peer-authored grounds** — 3
-  lines and 2 lines — purely to make room for a one-line mechanical stamp it was obliged to
-  write. The firing's own evidence went to the commit message instead of the entry.
+  **49**. The stamp is one line, so it alone put the first entry over cap and consumed the
+  second's whole headroom; each firing's own evidence went to the commit message instead.
+  **The ordering is the defect, and a line count will not reconstruct it.** What got compressed
+  was *peer-authored grounds*; what it made room for was a *mechanical, fixed-width stamp*. The
+  cap cannot tell those apart, so under pressure it always spends argued content to seat
+  generated content — precisely backwards. **Three displacements in this one session:** the two
+  recurrence stamps, and an operator-ruled correction to `native-gate-port-remaining-corpus` at
+  headroom **zero** — one of them incurred in order to file this entry.
   **The structural shape:** an entry accrues evidence in proportion to how often it recurs,
   so the entries nearest the cap are the most-recurring ones — exactly the entries whose next
   recurrence most needs recording. The cap therefore goes blind first on the highest-signal
