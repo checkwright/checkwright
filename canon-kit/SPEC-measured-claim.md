@@ -55,12 +55,23 @@ its measured value.** [design-bearing]
 ```
 
 placed on the line **immediately above** the claim it binds, matching the
-line-or-line-above placement convention every canon-kit marker already uses. The
-shape deliberately imitates `check-install-claim`'s
-`<!-- install-primary: <id> -->` rather than the `-exempt:` family: those are
-suppression valves, and this is an *attachment* — the SPEC's own reason for that
-form applies unchanged, that the reader-facing claim already exists as prose and
-must stay prose, so the marker is the tier beside it rather than a replacement.
+line-or-line-above placement convention every canon-kit marker already uses.
+
+**It joins an existing family of two rather than inventing a form**, and the
+family is exact: `<!-- install-primary: <transport-id> -->` (§check-install-claim)
+and `<!-- payload-discloses: <claim-id> -->` (§check-payload-claim). Both are
+full-line HTML comments binding a prose claim to a machine-readable id, and both
+pair that id with a **consumer-owned vocabulary** loaded through a `*_CMD` knob —
+which is the same pairing delta (2) reaches for, so this marker and its oracle are
+one shape the kit already ships twice, not two new ones. The stated reason
+transfers unchanged: the marker is *"a marker rather than a visible sentence,
+because the reader-facing form of this claim already exists as prose and must stay
+prose; the marker is the tier beside it, not a replacement."*
+
+This is deliberately **not** the `-exempt:` family, which is the other marker
+vocabulary in the tree: those are suppression valves that make a gate look away,
+and this is an *attachment* that gives a gate something to check. Delta (5) is
+where that distinction pays.
 
 **(2) The oracle: a consumer-owned emitter behind a `*_CMD` knob.**
 [design-bearing] `CANON_KIT_MEASURED_CLAIMS_CMD` names a command emitting one
@@ -129,11 +140,33 @@ widening over time.
 `CANON_KIT_MEASURED_SURFACE_GLOBS` (array, default empty) is the scanned surface.
 The entry requires it: one of the thirteen landed in `.claude/commands/close.md`,
 a **binding shim**, and *"the scanner must range over SPEC sections and binding
-shims alike"* — while `scripts/canon-config.sh:75` deliberately keeps shims out of
-`CANON_KIT_MANIFEST_FILES` because they are consumer bindings governed by other
-gates. So the surfaces genuinely differ, and reusing the manifest set would
-under-scan by exactly the instance that motivated widening the class. This repo
-sets the knob to the manifest globs plus `.claude/commands/*.md`.
+shims alike"*.
+
+**Neither existing surface reaches a shim, and the two exclude it for different
+reasons — one of which is not written down.** Stated precisely, because the
+distinction is the whole argument for a third knob:
+
+- `CANON_KIT_MANIFEST_FILES` (`scripts/canon-config.sh:22-38`) excludes shims **by
+  omission**. The array simply does not list `.claude/commands/`, and its comment
+  says nothing about them. No documented rationale exists — this amendment does not
+  manufacture one, and a reader should not infer a deliberate ruling from a silent
+  absence. What would create one is a sentence on that array's own comment; whether
+  it is worth writing is that knob's question, not this gate's.
+- `CANON_KIT_PROSE_SURFACE_GLOBS` (`scripts/canon-config.sh:75`) excludes them **by
+  a documented decision**, and the reason is the load-bearing one: *"the stage-skill
+  shims under `.claude/commands/` stay out (they are consumer bindings, governed by
+  check-skill-binding/check-shim-restatement)"*. That is an argument about which
+  gate **owns** a shim, not a claim that a shim carries no governed prose.
+
+The second is what licenses a third surface rather than a widening of either. A
+shim is excluded from the prose surface because other gates govern its *copy
+shape* — and `check-shim-restatement` holds copy shape, which the queue entry
+already records is exactly what a **wrong** restatement escapes, since a
+restatement that is wrong has diverged from its owner's wording and is therefore
+not a copy. So the ownership that keeps shims out of the prose surface is
+ownership this gate's rule is not covered by. Reusing either existing surface
+would under-scan by exactly the instance that motivated widening the class. This
+repo sets the new knob to the manifest globs plus `.claude/commands/*.md`.
 
 **(7) The gate is born native, and this is the first one. Operator-ruled
 2026-08-12 at spec, with the criterion-5 cost below in view and accepted.**
