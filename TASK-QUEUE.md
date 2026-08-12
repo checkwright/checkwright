@@ -105,7 +105,7 @@
   SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
   **Thirteenth, 2026-08-11:** a stale-count escalation itself carried one (98→90; it is 91).
   **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
-  scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over the governed
+  scope.** `check-manifest-count` bans bare cardinals over the governed
   plurals in `CANON_KIT_COUNT_COLLECTIONS` (corrected 2026-08-12; the knob named here before
   did not exist), so a `couples=` widening — its globs never reach `.claude/commands/*.md` —
   plus an override looked like a discharge. It cannot be: banning cardinals cannot reach a
@@ -2515,7 +2515,7 @@
   the remedy the help line offers is the exemption tag — which would bless a non-violation
   permanently and corrupt the exemption's meaning for every later reader. A low-FP-contract
   violation that converts into a corrupted exemption set.
-  **Deliverable, and the machinery already exists:** `check-manifest-count.sh` already
+  **Deliverable, and the machinery already exists:** `check-manifest-count` already
   carries a wrapped-paragraph hook beside the line hook, so the paragraph-joined text is
   available at the match site. Test the partitive prefix against the joined paragraph
   rather than the raw line, or carry a one-line lookback for the prefix window. The fix
