@@ -60,8 +60,29 @@ points at one stated rule plus behavioral coverage rather than a static scanner.
 
 ### (2) The member roster, including the two the queue entry did not name — **mechanical**
 
-Measured at HEAD by grepping every kit's `bin/` for its argument validation, not
-by reasoning from the entry:
+**The scoping this census ran under was wrong, and that is worth stating before
+the count it produced.** The table below was built from the survey record's
+2026-08-12 `spec` census, whose own corpus line reads "every kit's `bin/`
+directory across all **seven** vendored kits, plus `scripts/`." The repo carries
+ten `*/bin/` directories; nine of them belong to kits — `installer/` is the
+tenth and is not one, by the same no-`checks/`-no-`smoke/` predicate CLAUDE.md
+states for `native/` and repeats for `installer/`. Seven undercounts the
+kit-owning set by two. **Any other census carrying this survey's seven-kit
+scoping forward is suspect on the same ground** and should be re-run against the
+full nine before being trusted.
+
+The miss this undercount produced is not academic: align's audit found a sixth
+member the census table below does not carry, `gate-sdk/bin/run-gate-tests.sh`
+— free-text `TESTS_DIR="${1:-…}"` and `GATE_DIRS=("${@:2}")`, gated by `$# -gt 1`
+alone, no `-h`/`--help` anywhere in the file. **The deliverable stays at five** —
+operator-ruled scope-gated intake's default files a mid-iteration finding as a
+costed Deferred entry rather than starting it, and widening this amendment's
+roster is exactly that starting. The sixth member is filed, not folded in:
+`.workflow/survey-record.md`'s 2026-08-12 `align` block and the matching
+`.workflow/gap-inbox.md` bullet carry it for a future cohort.
+
+The five below were re-verified at the read site during align, independent of
+the seven-kit census that first produced them, and hold:
 
 | tool | today | class |
 | --- | --- | --- |
