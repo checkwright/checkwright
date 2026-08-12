@@ -59,33 +59,6 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
   demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec.
 
-- **port-criterion-cohort-cost-form** [spec: SPEC-port-criteria.md] — criterion 5 is
-  stated per member and the cost it measures is cohort-level.
-  Half (1) of the split `port-criterion-aggregate-cost-blindness` ruled by the operator at this
-  iteration's scope; that entry keeps the baseline slug, carries half (2), and owns the finding
-  and its evidence — read it there rather than here, which states only what this half delivers.
-  **The deliverable:** give criterion 5 a form that can price a **cohort** rather than only a
-  member. The amendment rules the aggregate **measured rather than reasoned** — the oracle
-  already exists as `installer_smoke`'s value arm — and rules that N members each individually
-  runnable is not a discharge. It is a price, not a screen: TRAJECTORY.md §PRIORITY DIRECTIVE
-  forbids reading any criterion as an eligibility gate, so a cohort emptying a value class still
-  lands, carrying a designed answer in its own amendment.
-  **It changes no coverage**, which is the whole reason the halves split cleanly:
-  `installer_smoke` stays held `fail` against half (2)'s slug, and this half neither widens nor
-  repairs the markdown-link hole.
-  **NOT a re-litigation of any operator ruling.** The operator accepted criterion 5's platform
-  cost knowingly for the born-native `check-measured-claim` — a single member. This says the
-  criterion cannot *express* an aggregate. Different object; no reversal is proposed.
-  **Rides with two siblings in one SPEC section**, `port-criterion-transitive-binding-reach`
-  (criterion 4) and `cohort-hold-criterion-label-defect` (criterion 7 and the relabel); all
-  three point at one amendment because three amendments would each restate the section's
-  structure to place their own clause. They land in one build batch.
-  **Known limit, carried rather than hidden:** nothing forces a future cohort to take the
-  measurement — a gate for it would have to know what a cohort is, which the gate layer does
-  not carry. Filed as a gap by the authoring session.
-  Split from its baseline slug and promoted 2026-08-12 at spec, on the operator ruling
-  recorded on that entry.
-
 - **substrate-parity-partial-vendor-scope** [spec: SPEC-parity-scope.md] —
   `check-gate-substrate-parity` assertion B equates a whole-binary roster against a
   partially-vendored descriptor set.
@@ -121,70 +94,6 @@
   readers to discount it — and it blocks using the consumer smoke as an oracle for the port.
   Filed 2026-08-12 by close, draining the gap inbox; found and probed at build, ruled
   non-blocking for this iteration by the lead; promoted 2026-08-12 at spec.
-
-- **port-criterion-transitive-binding-reach** [spec: SPEC-port-criteria.md] —
-  the born-native criterion states a direct-naming test, and the gate that motivated it binds
-  transitively.
-  gate-sdk/SPEC.md §The port-candidate criteria, bullet 4, says criterion 4 does not bind where
-  `couples=` names no registry member's declaration path and the gate takes no conservation-table
-  row. `check-measured-claim` earns a conservation-table row anyway, through an **indirect**
-  relationship: its `couples=` names `scripts/*.sh` (an emitter), and that emitter — not the
-  `couples=` glob itself — treats declaration paths as a set. The row's own prose records that the
-  landing design predicted no row here on exactly bullet 4's literal premise, and that the premise
-  was falsified by the emitter coupling.
-  **Judged a legibility gap rather than a correctness defect.** The two passages are technically
-  reconcilable — bullet 4 is conditional and this gate fails the condition — so nothing is wrong.
-  What is wrong is that a SPEC should be self-consistent without asking a reader to reconcile a
-  criterion against a table row's prose, and a future reader applying bullet 4 literally to the
-  next born-native candidate risks repeating the original misprediction.
-  **Ruled at spec, and the ruling is wider than the entry asked for because the section needed
-  it to be:** criterion 4 borrows the term *substrate-sensitive* from assertion C, which defines
-  it over a gate's re-run **trigger**, while criterion 4's own hazard is about the gate's
-  **assertion target**. The clause separates the two, so a conservation row and a criterion-4
-  hold become independent facts — which dissolves this misprediction rather than patching it.
-  The over-binding direction has a live instance: `check-template-registry-parity`, which the
-  same amendment's cohort takes.
-  **DISTINCT from `port-criterion-cohort-cost-form`**, which is criterion **5** stated per
-  member while the cost it measures is cohort-level, and from `cohort-hold-criterion-label-defect`
-  on criterion 7. Same SPEC section, three criteria, three defects, one amendment and one batch.
-  **Cost while deferred:** low and bounded, paid once per born-native candidate as a wrong
-  prediction about whether criterion 4 binds — which is cheap to correct when caught and silent
-  when not.
-  Filed 2026-08-12 by close, draining the gap inbox; found at validate; promoted 2026-08-12 at
-  spec.
-
-- **cohort-hold-criterion-label-defect** [spec: SPEC-port-criteria.md] —
-  a cohort hold is labelled with a criterion whose own text disclaims the question the hold
-  turns on.
-  **The operator ruling this discharges is recorded** at TRAJECTORY.md §The closed rulings
-  (2026-08-12): a hold is **per-member**, keyed on *is this gate's emitter ported?*, and the
-  criterion-7 label on `check-roadmap-fresh` is a spec defect to correct. This entry is the
-  correction; it does not restate the ruling's grounds.
-  **What made it look like a contradiction, recorded so the next reader does not re-derive it.**
-  `bin/port-blockers.sh` clears the `bash <emitter> --emit` shape, because `bash` is on
-  `GATE_SDK_PROGRAM_FLOOR`, and gate-sdk/SPEC.md makes that report authoritative for the blocker
-  test — probed at scope 2026-08-12 by running it, which reports none of the six generated-
-  projection freshness gates. Meanwhile the cohort section holds `check-roadmap-fresh` naming
-  criterion 7. The two test different things: criterion 7's closing sentence says a blocker
-  "never reads on whether a gate ports", which is exactly what the hold turns on.
-  **NOT a reversal, and the write-up must not read as one.** The 2026-08-11 hold stands on its
-  stated ground — nothing in the cohort ports the emitter it shells out to — and is relabelled.
-  **Deliverable:** at gate-sdk/SPEC.md §The first cohort, and the rule that selects the next,
-  relabel the hold off criterion 7 and onto cohort composition; give criterion 7 a clause saying
-  it does not adjudicate whether a spawned target is itself ported. The per-member derivation is
-  **made** and lands with the relabel.
-  **What the derivation found, 2026-08-12 at spec:** none of the six emitters is ported, so on
-  the key as ruled the key clears **none** — the cost field's guess of four is corrected. What
-  differs per member is what clearing costs, and the cheap cohort is the six **emitters**, not
-  the six gates. A carried claim is corrected with it: only **five** of the six steer their
-  fixture pairs off the live emitter, `check-docs-mirror-fresh` having no such arm.
-  **DISTINCT from `port-criterion-transitive-binding-reach` (criterion 4's binding test) and
-  `port-criterion-cohort-cost-form` (criterion 5 priced per member).** Same SPEC section,
-  three criteria, three defects, one amendment and one build batch.
-  **Cost while deferred:** low and bounded, but it misprices the second-cheapest cohort in the
-  tree — the freshness family reads as six held members on a label rather than on a derivation.
-  Filed 2026-08-12 at scope, on the operator ruling that reframed the apparent contradiction;
-  promoted 2026-08-12 at spec.
 
 - **capture-affordance-help-flag** [spec: SPEC-bin-argv.md] — a `bin/` tool that validates
   argument *count* accepts a flag as its free text, and a capture affordance files it.
@@ -4718,10 +4627,10 @@
   stated there is cited here and never restated.
   Re-measured 2026-08-12 at build: three, then six — the canon-kit cohort added its own trio,
   and the count is the roster's, never a fixed number.
-  **`check-roadmap-fresh` owes a criterion-7 design.** It shells out to `bin/roadmap.sh
-  --emit`, a kit script the port does not touch, and its fixture pair steers off the live
-  emitter, so a ported member's pair would go green over an arm with no implementation. The
-  three candidate designs are stated once by their owner; none is ruled.
+  **`check-roadmap-fresh` owes an emitter design; the label is cohort composition** — relabelled
+  off criterion 7 at build 2026-08-12, ground unchanged. It is canonical, with the whole
+  family's per-member cost derivation, at gate-sdk/SPEC.md §The first cohort. Three candidate
+  designs are stated once by their owner; none is ruled.
   Worth preserving in the design: the hold keeps
   `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the
   gate can never disagree" guarantee survives intact and is **not** part of the dual-
@@ -5165,6 +5074,9 @@
 ## Done
 
 - gate-dispatch-stderr-becomes-argv
+- port-criterion-cohort-cost-form
+- port-criterion-transitive-binding-reach
+- cohort-hold-criterion-label-defect
 
 ## Lessons Learned
 
