@@ -752,8 +752,8 @@ answering a question assertion C never asked.
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
-| `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. `check-queue-slug-liveness` is itself a ported member since the queue-kit cohort, so this row now describes a `.gate`-declared gate; the reasoning is unaffected, because what it scans is the governed-doc set rather than any gate's content. |
-| `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. |
+| `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. `check-queue-slug-liveness` is itself a ported member since the queue-kit cohort, and `check-docs-cmd` since the canon-kit one, so this row now describes `.gate`-declared gates for both; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. `check-install-claim` and `check-payload-claim` are still shell, so their half of the row still describes scripts. |
+| `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
 
@@ -1179,14 +1179,46 @@ that **did** port. The transferable lesson is not the arithmetic: a third and a
 fourth axis existed and nobody had looked down them, so a nine-of-ten on any one
 axis is not a difficulty estimate.
 
-**One shared mechanism this port discharges for a later cohort.** The canon-kit
-`spec_manifest_files` callers owed two: basename-glob list matching beside the
-crate walker's extension filter, and a Rust `gate_kit_roots`.
-`check-queue-slug-liveness` needed the first and it is now built, inside the
-crate's single sanctioned walk implementation so the recorder still observes it
-(§Meta-gate conservation for the binary substrate). That cohort's remaining
-shared debt is the second alone — recorded so the next selector reads its cost
-correctly rather than re-deriving it.
+**One shared mechanism this port discharged for a later cohort, and that debt is
+now closed.** The canon-kit `spec_manifest_files` callers owed two: basename-glob
+list matching beside the crate walker's extension filter, and a Rust
+`gate_kit_roots`. `check-queue-slug-liveness` needed the first and it landed here,
+inside the crate's single sanctioned walk implementation so the recorder still
+observes it (§Meta-gate conservation for the binary substrate). **The second
+landed with the canon-kit cohort itself** — as a bridged resolved value rather
+than a re-derivation, since the fallback predicate is anchored at the shell
+library's own location and a binary the installer copies elsewhere cannot recover
+it (§lib/gate.sh). Neither is owed by a later selector.
+
+### The canon-kit `spec_manifest_files` cohort
+
+**The shared derivation is compiled.** `native/src/spec.rs` carries all three
+branches of `spec_manifest_files`, the kit-root path prune, the manifest-prose
+walk driver and the count grammar, so the derivation was ported once and is
+proved by every member that calls it — the same economy the first cohort's
+pairing bought, at seven members instead of two.
+
+**Parity was bought against the branches this repo does not run, and that is the
+transferable half.** This tree sets `CANON_KIT_MANIFEST_FILES`, and sets
+`CANON_KIT_SCAN_KIT_ROOTS` to the value that disables pruning
+(canon-kit/SPEC.md §Layout and configuration owns both), so every live
+invocation takes the explicit-glob branch and the kit-root prune is a no-op here. A live-tree comparison therefore
+proves nothing about the default walk or the prune — and *the live tree is the
+oracle a session trusts most*. The port stood up a differential edge tree with
+both knobs at their defaults, carrying each of `SPEC.md`, `README.md` and
+`CLAUDE.md` twice — once under `templates/`, once at a vendored kit root — plus
+the ancestor-root case and a kit root that is not a descendant of the scan root.
+It caught a prune that never ran: a scan root of `.` was being absolutised to a
+`.` component appended to the cwd, so every path-prefix test failed silently.
+**No fixture pair and no live-tree run could have surfaced that**, which is the
+lesson `check-roadmap-fresh` taught one cohort earlier arriving through the
+configuration rather than through a fixture.
+
+One difference the port takes deliberately: the default walk's `find(1)` order
+is a filesystem artifact, and the Rust walk sorts. Every member reaching its
+corpus through `sort -u` stays byte-identical; the one that prints its corpus
+unsorted is set-identical with a different line order, asserted as such rather
+than normalised away.
 
 ### What the reverted port established
 
@@ -2015,6 +2047,32 @@ Resolution, per declared knob:
   library global, deliberately distinct from the `GATE_SDK_`-prefixed consumer
   overrides that feed it, so it carries no `GATE_SDK_` prefix of its own.
   Derivation-first — no roster of knob→kit pairs is maintained, so none can rot.
+
+  **The configured set is consulted first, then the shipped one, and the order
+  is load-bearing.** `GATE_SDK_KIT_DIRS` narrows which kits a battery *scans*;
+  reading it as the set of kits that *exist* leaves a narrowed run unable to
+  attribute another kit's knob, so it falls through to gate-sdk and fail-closes
+  on every member that declares one. A narrowed run is not a hypothetical — it
+  is how the kit-root prune is exercised at all, since a prune only bites on a
+  kit root below the scan root. So the lookup tries `gate_kit_roots`, then the
+  shipped set the `checks/`-or-`smoke/` predicate derives, then gate-sdk.
+- **A bridged value may not carry an absolute path.** The resolved argv is baked
+  **verbatim** into the generated pre-commit hook, which is tracked, so an
+  absolute value commits one machine's checkout path to a public file. That is a
+  constraint on what a knob may hold, not on the bridge: `gate_kit_roots`
+  therefore crosses as `GATE_KIT_ROOTS_HERE`, each root spelled relative to the
+  invoking directory, which the binary re-absolutises against its own cwd to
+  recover exactly the path the shell compares. `GATE_KIT_ROOTS_REL` is the other
+  spelling — anchored at the kits' parent, which is what a repo-relative
+  pathspec or a knob-prefix owner needs — and the two are separate knobs because
+  the anchor relating them is not recoverable from either alone once an override
+  is in play.
+- **`GATE_SDK_RESOLVING_KNOB` names the knob under resolution**, exported into
+  the subshell before the kit's libraries are sourced. A knob whose value is a
+  consumer *command's output* costs a subprocess to compute, and a library is
+  sourced once per declared knob per gate, so a library that resolved every such
+  knob on every source would multiply that cost by the declared-knob count. A
+  library with no expensive knob ignores it and is unaffected.
 - That kit's `lib/*.sh` is sourced **in a subshell**, in glob order, so a kit
   library's globals cannot leak into the dispatcher or across members. The value
   is read after every library has been sourced, so a kit whose knob is resolved
@@ -2298,6 +2356,17 @@ rather than a shell-only one — `check-gate-fixture-coverage` asserts a pair
 assertion the moment a gate ported. The ordering is binding: a ported gate's
 pair passes against the subcommand **before** the script it replaces is
 deleted, never after.
+
+**A bespoke `*.test.sh` reaches its gate the same way, through `gate_run`**
+(`lib/test-hermetic.sh`): it names a gate and a checks dir, never a script path,
+so a member's port leaves its behavioral tests untouched. Two mechanics make
+that work where a `"$GATE"` path did not. The binary is pinned absolute, because
+these tests run their gate from a sandbox cwd where the knob's repo-relative
+default resolves to nothing. And a case's environment is applied with `gate_env`
+inside the command substitution rather than with `env`, because `env` cannot
+invoke a shell function and — more to the point — a bridged knob is resolved
+when the **argv** is built, so an override set around the binary would arrive
+after the value it was meant to change had already been read.
 
 The runner is the **one caller that needs the dispatch executable rather than
 the whole command**, so it is the one the config bridge's argv shape reaches

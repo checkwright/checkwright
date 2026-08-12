@@ -462,6 +462,38 @@ same shapes:
   `canon-kit/README.md`'s `../queue-kit/` link dangles on a bare install tree.
   An ancestor kit root — the case when a kit's own fixture dir is the scan
   root — never prunes.
+
+  **One asymmetry inside the manifest set, written down because a port that
+  tidies it changes the corpus.** The canonical-spec half and the `README.md`
+  half are both `templates/`-filtered and kit-root pruned; the **`CLAUDE.md`
+  half is neither**. A consumer's agent manifest is governed content wherever it
+  sits, including inside a vendored kit root and inside a `templates/`
+  skeleton — so regularizing the three finders into one loop silently drops two
+  files that belong in the set. The rule is the asymmetry, not the tidy form.
+
+  **Which primitive is on which substrate.** `spec_manifest_files` has a Rust
+  implementation (`native/src/spec.rs`) carrying all three branches — explicit
+  globs, the default walk, and the prose-surface fold — plus the kit-root path
+  prune, because its family is partly compiled; the shell form stays, since
+  members outside that family still call it. `spec_comment_surface` is **shell
+  only**, and so are all four of its callers
+  (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next).
+  The two implementations of the manifest finder are held together by the config
+  bridge rather than by a copied default: every knob either reads crosses it as
+  a resolved value, so there is exactly one place each is computed
+  (gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
+- **The emitter-backed vocabularies** — the enum sets, the install transports
+  and the payload-disclosure classes a consumer supplies as a *command*. For a
+  compiled member the command's **output** is the interface, never the command:
+  the library runs the emitter at knob-resolution time and the binary receives
+  data, so no compiled gate spawns an interpreter to read consumer config and no
+  spelling of a consumer's vocabulary becomes a kit literal. A pair rides two
+  index-aligned arrays (`CANON_KIT_ENUM_SET_NAMES` / `..._MEMBERS`) because the
+  bridge's wire format separates elements with a tab and refuses one inside an
+  element, so a `<name>`⇥`<member>` line cannot cross as a single string. The
+  resolution is gated on `GATE_SDK_RESOLVING_KNOB` (gate-sdk/SPEC.md
+  §lib/gate.sh), because it costs a subprocess and this library is sourced once
+  per declared knob per gate.
 - **The count adapter** the restated-total gates share, so a consumer's
   `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
   matches the same total shapes — including a total whose cardinal and noun
