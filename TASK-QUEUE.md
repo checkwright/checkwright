@@ -75,13 +75,10 @@
   had passed as zero-divergence, that entry's own assertion (2) case. It reached close as dispatch
   prose, so close recorded dated prose and no declaration: faithfully captured, aggregated
   nowhere, the exact failure the counter exists to end, one channel over.
-  **The ground that held it open is now ANSWERED.** The ruling turned on single-producer
-  auditability — widening the input widens what a machine writer may stamp — but
-  `gap-resolver-mention-overcount` back-tested that claim and found it already false: of the nine
-  commits that ever added a `recurrence:` date, three stamped one from outside the drain with no
-  bullet. The drain is the only *mechanized* producer, never the only one, and auditability has
-  since been re-based on same-commit inspection rather than re-derivation. So the objection to
-  widening no longer stands on its original footing.
+  **The ground that held it open is ANSWERED.** The ruling turned on single-producer
+  auditability, which `gap-resolver-mention-overcount` back-tested and found already false —
+  three of the nine commits that ever added a `recurrence:` date stamped one outside the drain.
+  The drain is the only *mechanized* producer, and auditability now rests on same-commit reading.
   **What remains open** is only whether a direct stamp by a session observing a recurrence out of
   channel should be sanctioned, forbidden, or mechanized — inherited here by name, and the live
   half of this entry.
@@ -102,15 +99,18 @@
   through it. 5 (2026-08-10, `native-port-cadence`), first with the closing session as subject:
   `exit-echo-decoration-guard-vs-habit` fired three times inside close itself, the guard blocking
   a decorated `overhead-meter.sh`, `close-surfaces.sh` and `run-gates.sh`.
-  **The answered ground: the unreachable set is now enumerated, not open-ended.** Seven attested
-  channels — dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red, close's friction
-  triage, a lead's relayed figure, and the closing session's own tool use. The last is the one
-  that generalizes: close observes recurrences it can never have filed a bullet for, because it
-  is downstream of the drain. So the fix is not a wider filer habit but a second input, and
-  `close-generated-finding-route` owns the same shape one altitude up.
-  **A budget note this attesting bought:** the entry hit its 50-line cap, so attestings 2-5 were
-  compressed to fit. An entry whose function is accumulating dated evidence cannot accumulate
-  past a cap that exists to keep entries costed.
+  **Answered: the unreachable set is enumerated, not open-ended.** Seven attested channels —
+  dispatch prose, `bin/kfric.sh`, a rostered audit, a battery red, close's friction triage, a
+  lead's relayed figure, and the closing session's own tool use. The last generalizes: close is
+  downstream of the drain, so the fix is a second input rather than a wider filer habit —
+  `close-generated-finding-route` owns that shape one altitude up.
+  **Attesting 6 (2026-08-12, `native-cohort-canon-kit`): TWO declined, ZERO in channel** — the
+  poll-to-wait pattern surfaced by close's own friction triage, and `icebox-worklist-roadmap-blind`
+  re-deriving the identical 3-of-3 roadmap exclusion its cost field predicts. Both declined on
+  this entry's own rule, so both are uncounted.
+  **The budget note is now twice-attested:** this entry sits at its cap, so 6 rides a substitution
+  over that very note — paid by compressing two grounds already marked answered, never by dropping
+  one. `entry-cap-displaces-mandated-writes` owns the class; this is its worked instance.
   Filed by the lead on operator direction under the direct-filing exception; the operator ruled
   file-a-unit over both keep-as-is and next-iteration-priority.
 
@@ -504,10 +504,9 @@
   table exists, the meter prices instead of reporting `cost=n/a`, and
   `stage-economics-honesty` landed the one-transcript-one-row attribution fix on
   2026-08-01, so this task is **unblocked** and self-labelled Debt below. What
-  stands: the
-  metric must be **net delivered-work cost** — price-weighted tokens + rework
-  round-trips + the supervisor's by-eye gate-diff burden + escalation load
-  shifted onto the Opus lead — not single-pass token price; a cheaper builder
+  stands: the metric must be **net delivered-work cost** — price-weighted tokens
+  + rework round-trips + the supervisor's by-eye gate-diff burden + escalation
+  load shifted onto the Opus lead — not single-pass token price; a cheaper builder
   that fails the battery or emits a subtly-wrong gate the supervisor must catch
   can invert the saving.
   **Design direction:** a deliberate A/B on representative *low-judgment* builds
@@ -519,12 +518,13 @@
   `benchmark-ab-experiment` (which holds model constant and varies governance —
   this holds stage constant and varies model). Debt/analysis: settles a
   ruling-config tier by data, adds no governed name.
-  **Datum, `native-cohort-activation` (2026-08-07): the per-batch lever paid nothing.** Every
-  delta of all four units was classed before dispatch; each unit carried at least one
-  design-bearing delta, so no batch was downgradeable and all four rode Opus. That is evidence
-  *for* the per-build-class rule above — the classification was cheap and correctly returned
-  *no* — but it warns that a whole iteration can be design-bearing, so the lever's expected
-  value depends on the mix a scope cuts, which the A/B must sample rather than assume.
+  **Datum, twice now: the per-batch lever paid nothing.** `native-cohort-activation` (2026-08-07,
+  four units) and `native-cohort-canon-kit` (2026-08-12, three batches) each classed every delta
+  before dispatch and found every unit design-bearing, so none was downgradeable and all rode Opus.
+  Evidence *for* the per-build-class rule (classification is cheap and correctly returns *no*), and
+  a warning that a whole iteration can be design-bearing, so the lever's value tracks the mix scope
+  cuts. **Not yet measurable either:** the log keys on (iteration, stage), so a batch-split build's
+  single stamp hides per-batch cost — `batch-split-stamp-ownership` owns that fix.
   **Cost while deferred:** low and non-rotting — validate's adopted downgrade
   already banks the affordable half of this lever, and the prerequisite that
   made the rows provisional has now landed; the residue is that
@@ -4966,6 +4966,15 @@
   **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
   which revision a child *starts* from, this is about worktrees never being *reclaimed* after the
   child ends. Neither implies the other and fixing either leaves the other standing.
+  **The auto-clean's documented precondition is met and it still did not fire — probed, not
+  assumed.** Two of the five survivors report a clean `git status --porcelain`, so they are
+  exactly the unchanged case the reclaim is documented to cover. The discriminator arrived in the
+  same session: this close dispatched two read-only sweeps and **both** worktrees auto-cleaned on
+  completion. So the mechanism works on a fresh dispatch and left five behind anyway, which points
+  at reclamation being tied to the *dispatching session's* lifetime rather than the child's — a
+  session that ends abnormally, or ends while a child's directory is still held, strands it. That
+  is the hypothesis a fixing session should falsify first, and it is cheap: dispatch, kill the
+  parent, look.
   **Cost:** each is a full checkout of the tree, so the disk cost is linear in dispatch count with
   no ceiling. The sharper cost is correctness — a stale worktree is a second live copy of every
   governed file, which a later `grep -r`, a gate walk, or an audit sweep can reach and read as the
@@ -5129,9 +5138,5 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
-
-- gate-subprocess-fail-closed-unheld
-- crate-ci-arm-unheld-at-commit-time
-- spec-measured-count-gate
 
 ## Lessons Learned
