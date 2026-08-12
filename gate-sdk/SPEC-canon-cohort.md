@@ -215,15 +215,19 @@ the edge tree is the acceptance oracle. Two carry named sub-problems:
 **(6) `check-tracking-claim` and `check-md-refs` spawn git, and the spawn
 discipline is not theirs to invent.** [design-bearing] Four callers spawn git —
 these two plus `check-docs-cmd`, and `check-spec-pointer`, which delta (10) holds;
-so **three ported members spawn git**. The crate's existing spawn site folds a
-failed spawn and a non-zero exit into one `None`
-(`native/src/gates/task_conservation.rs:10-16`), which is the live instance behind
-the `gate-subprocess-fail-closed-unheld` debt riding this iteration. That entry
-owns the mechanism; this delta owns the dependency: **the three ported members call
-whatever the debt member lands**, and they port after it. Naming the ordering here
-is what keeps three new spawn sites from being written against the defective shape
-first and repaired second — and the held member is a fourth that will need it, so
-the debt member's shape must not be sized to this cohort alone.
+so **three ported members spawn git**. The crate's one spawn site folded a failed
+spawn and a non-zero exit into a single `None`, which was the live instance behind
+the `gate-subprocess-fail-closed-unheld` debt riding this iteration. **That debt
+has since landed**, so the dependency this delta owns is now concrete rather than
+forward-looking: the mechanism is `native/src/proc.rs` (gate-sdk/SPEC.md
+§Fail-closed contract), whose `run` makes a spawn failure the `Err` arm and hands
+out stdout only through an accessor that has already read the exit status. **The
+three ported members call `proc::run`** rather than constructing a `Command`, and
+a crate unit test holds that over every module under `native/src/gates/`. They
+port after it, which is what kept three new spawn sites from being written against
+the defective shape first and repaired second — and the held member is a fourth
+that will need it, which is why the landed shape was sized past this cohort rather
+than to it.
 
 ### The four substrate-sensitive members
 

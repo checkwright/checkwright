@@ -145,8 +145,9 @@ load behind that trigger, so they are not resident here.
   in it (the npm name is the `installer/` package below).
 - `native/` is the Rust crate for gate implementations off the shell substrate —
   one multi-call binary, one subcommand per ported gate. **The first cohort is
-  live**, so `bash gate-sdk/bin/build-native.sh` is a **commit-time** requirement
-  in this tree and `cargo test` does not discharge it.
+  live**, so the commit-time obligation in this tree is the battery — which now
+  runs the crate's lint and test arms through `check-crate-arms` — **plus**
+  `bash gate-sdk/bin/build-native.sh`, and neither discharges the other.
   It is **not a kit** — no `checks/`, no `smoke/`, the
   predicate that makes a root directory one; `native/target/` is gitignored, and
   `check-gate-binary-fresh` is what holds its currency. Dispatch, descriptor

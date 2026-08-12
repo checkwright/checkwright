@@ -162,7 +162,14 @@ the workflow are **consumer config, never kit literals**: the knob, the line
 grammar and the assertions are gate-sdk mechanism, while *which* platforms a
 project commits to is that project's own support commitment — a kit literal
 spelling one project's would ship it as everyone's (CLAUDE.md §The provenance
-seam). Paths are
+seam). And `GATE_SDK_CARGO_TARGET_DIR` (default **derived** from
+`GATE_SDK_NATIVE_CRATE` as `<crate>/target`, cargo's own placement, so the
+warm cache `bin/build-native.sh` fills is the one §check-crate-arms reuses).
+Its only non-default reader is that gate's fixture pair, which redirects it out
+of the tree so a fixture run leaves no build products beside a fixture manifest;
+defaulting it to scratch instead is refused, because it would cold-build the real
+crate on every battery run to buy a hermeticity the real tree does not need.
+Paths are
 repo-root-relative; every entry point `cd`s to `git rev-parse --show-toplevel`
 before resolving them.
 
@@ -723,6 +730,14 @@ under a resolve dir: `scripts/queue-config.sh` sits in the gates dir and is not
 a gate, and matching it would over-report.) Every derived member takes exactly
 one recorded disposition below, and a member the section does not name is red.
 
+**`check-crate-arms` couples the crate and is still outside that derivation**,
+stated here so its absence from the table reads as a verdict rather than an
+omission. The test is whether a member's expanded `couples=` covers a registry
+member's **declaration path**; `native/src/gates/*.rs` is where a ported gate's
+rule is *implemented*, never where one is declared, so the derivation does not
+select it and no disposition row is owed. A later reader adding one would be
+answering a question assertion C never asked.
+
 | Meta-gate | Disposition for a `.gate`-dispatched member |
 |---|---|
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
@@ -1006,6 +1021,16 @@ design time; the last three were paid for, and each is named with what it cost.
    every mechanical screen puts that gate *in*: it shares the cohort's corpus
    family and its walk and reads no knob, and the fact that stops it is one none
    of the six criteria sees.
+
+   **`check-crate-arms` is a different case under the same criterion, and it is
+   named so no later cohort reads it as owed work.** Its rule is an invocation of
+   `cargo`, so criterion 7 blocks it — but unlike the worked example above, the
+   dependency cannot be designed away, because criterion 4 forbids the port
+   independently: a gate that runs `cargo test` over the crate cannot live inside
+   the crate it tests, or the artifact under test would be the artifact asserting.
+   It is a member the port **does not take**, which is a verdict this roster can
+   record without contradicting its opening claim that a blocker is never an
+   eligibility screen (§check-crate-arms).
 
    **The report's honest bound is its undecidable count, and that count grows with
    the port.** A member declaring through a `.gate` descriptor has no shell rule to
@@ -3203,6 +3228,89 @@ members, so the battery reaches that computation on every run and the test is no
 longer the only executor. It is kept, on the narrower ground that it fails at
 `cargo test` time — inside the crate's own suite, before any binary is placed —
 where the battery's verdict arrives only once a build exists to compare against.
+
+### check-crate-arms
+
+The crate's **lint and test arms** run at commit time, as a registered member of
+the battery:
+
+```bash
+cargo clippy --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_DIR" --all-targets -- -D warnings
+cargo test --release --manifest-path "$CRATE/Cargo.toml" --target-dir "$TARGET_DIR"
+```
+
+`$CRATE` is `gate_native_crate` (§Layout and configuration) and `$TARGET_DIR` is
+`GATE_SDK_CARGO_TARGET_DIR`. Both arms run even when the first fails, so one
+commit-time report carries what a CI run would have said in two.
+
+**The gap it closes was attested, not hypothetical.** Nothing in `gates.list` ran
+either arm and `bin/build-native.sh` only builds, so a contributor who ran the
+full battery **plus** `build-native.sh` had satisfied every documented commit-time
+obligation and could still push a red CI — and did: both arms were already red at
+a commit accepted on a green battery, one of them the unit test holding
+§check-reads-couples' machine-side read-set assertion, which therefore held
+nothing for any member while the conservation table still claimed it. The lesson
+the shape encodes is that a *nearly* identical command is the same hole one flag
+narrower, so **there is now one spelling of the arms and it is this gate**. The CI
+workflow's own lint-and-test step is deleted rather than kept in step with it:
+two copies of a command held equal by nobody is the defect, and enforcement-first
+ranks removing the duplication above gating it. The workflow's preceding
+build-the-binary step stays — §check-gate-binary-fresh still needs the artifact,
+and that step duplicates nothing.
+
+**The predicate is the crate's presence, not cargo's**, and that is what keeps the
+gate simple:
+
+- **No `$CRATE/Cargo.toml`** — no corpus, so **clean at exit 0**, the
+  parenthetical naming the absent crate so the green is legible. §Consumer payload
+  keeps the crate outside every kit root, so what a consumer tree lacks is the
+  subject, not the toolchain. This is §check-gate-binary-fresh's zero-dispatch
+  branch applied to a corpus: a gate with nothing to check reports clean rather
+  than declaring a skip.
+- **Crate present, `cargo` absent** — a contributor holding the crate without the
+  toolchain. **Exit 2** naming the floor, the same shape `bin/build-native.sh`
+  already uses (§Fail-closed contract). No adopter reaches it, and a session
+  committing to a tree that carries the crate needs cargo before this gate runs.
+
+Reading a runtime `command -v` skip into §The port-candidate criteria's criterion
+5 is a misreading worth naming, because the queue entry that filed this gate made
+it: criterion 5 omits a member from the *consumer's* registry at vendor time, a
+decision `init` makes once before any gate runs, and no gate in this tree branches
+on a missing program at run time — both existing cases fail closed.
+
+Its `# install:` disposition is `never`, for §check-gate-binary-fresh's reason
+exactly: the subject cannot exist in a vendored tree, so the consumer smoke's
+accounting derives the exemption every run rather than accepting a written one.
+
+**Tier is `precommit`**, by §The `# graph:` manifest's discriminator: a clippy
+finding or a failing unit test is introduced and repaired inside the single commit
+that perturbs it. The honest counter-pressure is wall clock, since `--all-targets`
+compiles the test targets and clippy keeps a cache separate from the
+`cargo build --release` `bin/build-native.sh` warms; on a warm tree the added
+battery time is well inside the battery's existing dominant member, which is what
+settles it. Should that stop holding, the ruled fallback is `align-only` rather
+than a reopened design round: an arm that runs in the full battery and in CI still
+closes the attested defect, which was a *push* on a green battery, and only the
+pre-commit convenience is lost.
+
+**The fixture pair and the build products it must not leave behind.** The pair is
+two minimal crates, `good/` clean and `bad/` carrying one clippy finding and one
+failing test, each `args`-free and pointed at its own crate through its case-dir
+`gate-sdk-config.sh`. They build with no network because they vendor nothing —
+the property the real crate's own suite asserts and these inherit by
+construction. Cargo writes a `target/` beside whatever manifest it is given, which
+would put build products under a fixture directory, so each case redirects
+`GATE_SDK_CARGO_TARGET_DIR` out of the tree; the `Cargo.lock` cargo writes beside
+the manifest is gitignored on the same terms as the real crate's.
+
+**The gate stays shell, permanently, and that is a verdict rather than unported
+work.** TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence — makes
+surviving shell residue justified case by case, and this member has two
+independent justifications. Criterion 7 in
+its plainest form: the rule *is* an invocation of `cargo`, a program the payload
+does not carry. And criterion 4 at its purest: a gate that runs `cargo test` over
+the crate cannot live **inside** the crate it tests, because the artifact under
+test would be the artifact asserting.
 
 ### check-install-disposition
 

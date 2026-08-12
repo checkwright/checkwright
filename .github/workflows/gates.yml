@@ -36,10 +36,6 @@ jobs:
       # checkout+bash tamper floor the kramdown step above states.
       - name: build the native gate binary
         run: bash gate-sdk/bin/build-native.sh
-      - name: native crate lint + unit tests
-        run: |
-          cargo clippy --release --manifest-path native/Cargo.toml --all-targets -- -D warnings
-          cargo test --release --manifest-path native/Cargo.toml
       - name: full battery
         run: bash gate-sdk/bin/run-gates.sh
       - name: fixture suites (derived from */gate-tests)

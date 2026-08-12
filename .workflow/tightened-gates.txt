@@ -5,3 +5,4 @@ check-gate-output
 check-scratch-citation
 check-doctrine-registration
 check-task-conservation
+check-crate-arms

@@ -125,35 +125,6 @@
   Filed 2026-07-26 by close (`release-path-hardening`); roughly one small unit; promoted
   2026-08-12 at spec.
 
-- **crate-ci-arm-unheld-at-commit-time** [spec: SPEC-crate-arms.md] — nothing runs the
-  crate's test or lint arms at commit time, and a green battery reads as if something did.
-  `.github/workflows/gates.yml` runs `cargo clippy --release -D warnings` and `cargo test
-  --release` on every push, but `scripts/gates.list` has no member that runs either and
-  `gate-sdk/bin/build-native.sh` only builds. CLAUDE.md states the asymmetry in one direction
-  only ("`cargo test` does not discharge `build-native.sh`") and nothing states the other, so a
-  contributor who runs the full battery **plus** `build-native.sh` has satisfied every
-  documented commit-time obligation and can still push a red CI.
-  **Attested, not hypothetical.** Verified in a detached worktree that both arms were already
-  red at `af5b9ffd` — a commit accepted on a 100/100 battery. `cargo test` failed on the unit
-  test asserting every registry member declares the roots it walks, which panicked on the first
-  bridged member, so the machine-held half of the `check-reads-couples` conservation
-  disposition held nothing **for any member** while the conservation table still claimed it;
-  clippy failed on two findings in the same commit's new code.
-  **Deliverable:** register a gate running `clippy -D warnings` and `cargo test` over
-  `GATE_SDK_NATIVE_CRATE`, tier=precommit. **The filed shape was corrected 2026-08-12 at
-  spec:** the entry asked for a runtime skip where cargo is absent, citing criterion 5's
-  omit-and-declare — but no gate in this tree skips on a missing program (both existing cases
-  fail closed), and criterion 5 omits a member at vendor time rather than branching at run
-  time. The amendment rules the predicate to be the crate's presence, not cargo's, which
-  removes the invented mechanism; it also deletes the workflow's duplicate cargo step, since
-  two copies of the command held equal by nobody is the defect being closed.
-  **Cost while deferred:** the port lands member by member with its one machine-held read-set
-  assertion able to die silently, and the breakage surfaces at the iteration's single budgeted
-  push — the worst possible moment, on the largest commit. The defect found this way was
-  repaired at `9d94f834`; the missing enforcement is what this files.
-  Filed 2026-08-12 by close, draining the bullet build filed after the lead's verify set
-  proved incomplete; promoted 2026-08-12 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -5011,5 +4982,6 @@
 ## Done
 
 - gate-subprocess-fail-closed-unheld
+- crate-ci-arm-unheld-at-commit-time
 
 ## Lessons Learned
