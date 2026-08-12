@@ -5,3 +5,4 @@
 ---
 
 port-oracles-and-kit-roots scope adaf2805 2026-08-12
+port-oracles-and-kit-roots spec a430dde0 2026-08-12
