@@ -12,20 +12,15 @@
 
 ## New Features
 
-## Technical Debt
-
-## Deferred
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
+- **native-gate-port-remaining-corpus** [spec: SPEC-kit-roots.md] [roadmap: now/reliability] —
   the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  **Demoted 2026-08-12 at build, and the cause is arithmetic rather than a change of mind.**
-  The canon-kit cohort delivered **seven of ten** and the entry returned here rather than to
-  `## Done`, because this entry is the **whole corpus** and 85 of 103 registered gates remain
-  unported (`checkwright-gates --list` against `scripts/gates.list`). A Done move would have
-  asserted a finished port and, since the roadmap projection reads `[roadmap:]` tags off live
-  entries, silently dropped the port from a **public** surface. The `[roadmap:]` tag is kept
-  here for exactly that reason. The next cohort re-promotes with a fresh amendment.
+  **Promoted 2026-08-12 at spec for the five-member `gate_kit_roots` cohort** —
+  `check-kit-registration`, `check-smoke-entry-guard`, `check-test-hermetic`,
+  `check-assertion-strength`, `check-template-registry-parity`. The entry returns here on
+  completion rather than to `## Done`: this entry is the **whole corpus**, 85 of 103 registered
+  gates remain unported, and a Done move would assert a finished port and silently drop it from
+  the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
   supersession of the 2026-08-06 measurement-locus clause are recorded in
   [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
@@ -48,12 +43,12 @@
   **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
   satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
   moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Two cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for both** — the
+  **Three cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
   members, the holds and their grounds live there, so this entry counts rather than restates.
   Queue-kit closed 2026-08-11 delivering 8 of 10; canon-kit closed 2026-08-12 delivering 7 of
   10. Every held member is **sequencing with port work owed, never exclusion**, and what each
   owes is on `cohort-held-members-port-prerequisites` — where a POSIX ERE engine is now owed by
-  four members across both kits, which is the largest single piece of work the port has named.
+  nine members across three kits, which is the largest single piece of work the port has named.
   **Cost while deferred:** large and known — 85 gates plus the runners and the install-lifecycle
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
@@ -61,8 +56,184 @@
   `gate-battery-parallel-execution` and
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted
-  2026-08-12 at spec and demoted 2026-08-12 at build for the canon-kit cohort.
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
+  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec.
+
+- **port-criterion-cohort-cost-form** [spec: SPEC-port-criteria.md] — criterion 5 is
+  stated per member and the cost it measures is cohort-level.
+  Half (1) of the split `port-criterion-aggregate-cost-blindness` ruled by the operator at this
+  iteration's scope; that entry keeps the baseline slug, carries half (2), and owns the finding
+  and its evidence — read it there rather than here, which states only what this half delivers.
+  **The deliverable:** give criterion 5 a form that can price a **cohort** rather than only a
+  member. The amendment rules the aggregate **measured rather than reasoned** — the oracle
+  already exists as `installer_smoke`'s value arm — and rules that N members each individually
+  runnable is not a discharge. It is a price, not a screen: TRAJECTORY.md §PRIORITY DIRECTIVE
+  forbids reading any criterion as an eligibility gate, so a cohort emptying a value class still
+  lands, carrying a designed answer in its own amendment.
+  **It changes no coverage**, which is the whole reason the halves split cleanly:
+  `installer_smoke` stays held `fail` against half (2)'s slug, and this half neither widens nor
+  repairs the markdown-link hole.
+  **NOT a re-litigation of any operator ruling.** The operator accepted criterion 5's platform
+  cost knowingly for the born-native `check-measured-claim` — a single member. This says the
+  criterion cannot *express* an aggregate. Different object; no reversal is proposed.
+  **Rides with two siblings in one SPEC section**, `port-criterion-transitive-binding-reach`
+  (criterion 4) and `cohort-hold-criterion-label-defect` (criterion 7 and the relabel); all
+  three point at one amendment because three amendments would each restate the section's
+  structure to place their own clause. They land in one build batch.
+  **Known limit, carried rather than hidden:** nothing forces a future cohort to take the
+  measurement — a gate for it would have to know what a cohort is, which the gate layer does
+  not carry. Filed as a gap by the authoring session.
+  Split from its baseline slug and promoted 2026-08-12 at spec, on the operator ruling
+  recorded on that entry.
+
+- **substrate-parity-partial-vendor-scope** [spec: SPEC-parity-scope.md] —
+  `check-gate-substrate-parity` assertion B equates a whole-binary roster against a
+  partially-vendored descriptor set.
+  Red in gate-sdk's consumer smoke, and **pre-existing rather than this iteration's** — probed in
+  a detached worktree at `37c6969b` and `5f8066d5`, same verdict at both. The scratch consumer
+  vendors gate-sdk alone, so it receives the multi-call binary (which carries every ported kit's
+  subcommands) but only gate-sdk's descriptors; assertion B equates the binary's `--list` roster
+  with the descriptors on disk and reds naming `check-task-names` — a queue-kit gate — as a
+  subcommand nothing declares.
+  **Re-probed at HEAD 2026-08-12 at spec, and the mechanism is confirmed directly:** `--list`
+  reports 18 subcommands across three kits and the on-disk descriptor set matches it, so a
+  gate-sdk-only vendoring leaves sixteen unexplained. The default smoke run vendors every kit
+  and is green, which is why `.workflow/validate-baseline.txt` holds `consumer_smoke pass`
+  while the subset invocation reds — the two are consistent and the baseline is not stale.
+  **The equality cannot hold in any consumer that vendors a subset of the kits whose gates the
+  shared binary carries**, which is every consumer once a second kit ports. So it grows with the
+  port rather than staying one kit's problem, and that is what makes it worth a unit now.
+  **Not caught by the commit-time battery:** the consumer smoke is not in README's per-kit
+  fixture-runner battery, so nothing at commit time or in CI runs it. That is why it survived two
+  iterations unnoticed and is a second, separable finding inside this one.
+  **Ruled at spec:** assertion B's roster half restricts to the vendored kits, the owning kit
+  comes off `--list` as a second column held to the tree by a crate unit test, and the subset
+  configuration gets a commit-time oracle in the bespoke gate test rather than a second smoke
+  leg. Building the binary per-vendoring is refused — criterion 5's closed install model ships
+  one prebuilt artifact per declared *target*, and a per-subset build is that set times every
+  kit combination.
+  **SAME SHAPE as `consumer-smoke-subset-accounting-verdict`, and not a duplicate of it.** That
+  entry is the *registration accounting* assertion reddening under a kit subset; this is
+  *substrate parity*. Different assertion, different fix — weighed at spec and deliberately not
+  unified, since the two derive scope from different inputs; the shared predicate is recorded in
+  the amendment for whoever takes the sibling.
+  **Cost while deferred:** a standing red in a suite nothing runs automatically, which trains
+  readers to discount it — and it blocks using the consumer smoke as an oracle for the port.
+  Filed 2026-08-12 by close, draining the gap inbox; found and probed at build, ruled
+  non-blocking for this iteration by the lead; promoted 2026-08-12 at spec.
+
+- **port-criterion-transitive-binding-reach** [spec: SPEC-port-criteria.md] —
+  the born-native criterion states a direct-naming test, and the gate that motivated it binds
+  transitively.
+  gate-sdk/SPEC.md §The port-candidate criteria, bullet 4, says criterion 4 does not bind where
+  `couples=` names no registry member's declaration path and the gate takes no conservation-table
+  row. `check-measured-claim` earns a conservation-table row anyway, through an **indirect**
+  relationship: its `couples=` names `scripts/*.sh` (an emitter), and that emitter — not the
+  `couples=` glob itself — treats declaration paths as a set. The row's own prose records that the
+  landing design predicted no row here on exactly bullet 4's literal premise, and that the premise
+  was falsified by the emitter coupling.
+  **Judged a legibility gap rather than a correctness defect.** The two passages are technically
+  reconcilable — bullet 4 is conditional and this gate fails the condition — so nothing is wrong.
+  What is wrong is that a SPEC should be self-consistent without asking a reader to reconcile a
+  criterion against a table row's prose, and a future reader applying bullet 4 literally to the
+  next born-native candidate risks repeating the original misprediction.
+  **Ruled at spec, and the ruling is wider than the entry asked for because the section needed
+  it to be:** criterion 4 borrows the term *substrate-sensitive* from assertion C, which defines
+  it over a gate's re-run **trigger**, while criterion 4's own hazard is about the gate's
+  **assertion target**. The clause separates the two, so a conservation row and a criterion-4
+  hold become independent facts — which dissolves this misprediction rather than patching it.
+  The over-binding direction has a live instance: `check-template-registry-parity`, which the
+  same amendment's cohort takes.
+  **DISTINCT from `port-criterion-cohort-cost-form`**, which is criterion **5** stated per
+  member while the cost it measures is cohort-level, and from `cohort-hold-criterion-label-defect`
+  on criterion 7. Same SPEC section, three criteria, three defects, one amendment and one batch.
+  **Cost while deferred:** low and bounded, paid once per born-native candidate as a wrong
+  prediction about whether criterion 4 binds — which is cheap to correct when caught and silent
+  when not.
+  Filed 2026-08-12 by close, draining the gap inbox; found at validate; promoted 2026-08-12 at
+  spec.
+
+- **cohort-hold-criterion-label-defect** [spec: SPEC-port-criteria.md] —
+  a cohort hold is labelled with a criterion whose own text disclaims the question the hold
+  turns on.
+  **The operator ruling this discharges is recorded** at TRAJECTORY.md §The closed rulings
+  (2026-08-12): a hold is **per-member**, keyed on *is this gate's emitter ported?*, and the
+  criterion-7 label on `check-roadmap-fresh` is a spec defect to correct. This entry is the
+  correction; it does not restate the ruling's grounds.
+  **What made it look like a contradiction, recorded so the next reader does not re-derive it.**
+  `bin/port-blockers.sh` clears the `bash <emitter> --emit` shape, because `bash` is on
+  `GATE_SDK_PROGRAM_FLOOR`, and gate-sdk/SPEC.md makes that report authoritative for the blocker
+  test — probed at scope 2026-08-12 by running it, which reports none of the six generated-
+  projection freshness gates. Meanwhile the cohort section holds `check-roadmap-fresh` naming
+  criterion 7. The two test different things: criterion 7's closing sentence says a blocker
+  "never reads on whether a gate ports", which is exactly what the hold turns on.
+  **NOT a reversal, and the write-up must not read as one.** The 2026-08-11 hold stands on its
+  stated ground — nothing in the cohort ports the emitter it shells out to — and is relabelled.
+  **Deliverable:** at gate-sdk/SPEC.md §The first cohort, and the rule that selects the next,
+  relabel the hold off criterion 7 and onto cohort composition; give criterion 7 a clause saying
+  it does not adjudicate whether a spawned target is itself ported. The per-member derivation is
+  **made** and lands with the relabel.
+  **What the derivation found, 2026-08-12 at spec:** none of the six emitters is ported, so on
+  the key as ruled the key clears **none** — the cost field's guess of four is corrected. What
+  differs per member is what clearing costs, and the cheap cohort is the six **emitters**, not
+  the six gates. A carried claim is corrected with it: only **five** of the six steer their
+  fixture pairs off the live emitter, `check-docs-mirror-fresh` having no such arm.
+  **DISTINCT from `port-criterion-transitive-binding-reach` (criterion 4's binding test) and
+  `port-criterion-cohort-cost-form` (criterion 5 priced per member).** Same SPEC section,
+  three criteria, three defects, one amendment and one build batch.
+  **Cost while deferred:** low and bounded, but it misprices the second-cheapest cohort in the
+  tree — the freshness family reads as six held members on a label rather than on a derivation.
+  Filed 2026-08-12 at scope, on the operator ruling that reframed the apparent contradiction;
+  promoted 2026-08-12 at spec.
+
+
+## Technical Debt
+
+## Deferred
+
+- **port-criterion-aggregate-cost-blindness** [design-pending] — markdown-link liveness is
+  binary-gated, and the criteria priced it per member.
+  **The finding, and it is not the smoke assertion.** `installer_smoke`'s value arm now fails on
+  every profile, and the first reading — "a stale assertion needs updating" — sends scope after
+  the wrong object. The arm plants a mistyped relative link in an adopter's own README
+  (`installer/consumer-smoke/run-smoke.sh:246-268`), and its spec comment states that *which*
+  gate catches it is deliberately unasserted: "the claim is about the battery rather than about
+  a member of it." The assertion did exactly its job — it detected that a binary-less install's
+  battery now catches nothing on adopter prose of that class. It is not stale and it did not rot.
+  **How it happened.** Batch B ported seven `spec_manifest_files` members at once (`f602642d`);
+  each individually passes criterion 5's per-member reading, and the aggregate emptied a value
+  class for any consumer whose payload carries no gate binary, because `.gate` members are
+  omitted-and-declared there.
+  **The precise scope, because the first phrasing overstated it.** The hole is **markdown-link
+  liveness**, not prose generally: `check-md-refs` is now a `.gate`, while `check-prose-tells`,
+  `check-docs-link-convention`, `check-comment-tier` and `check-spec-pointer` survive as shell
+  and still run. Validate's own commit message got this right where its gap bullet did not. The
+  conclusion stands on the strongest ground either way: the smoke run **is** the oracle, and no
+  profile caught the defect.
+  **The mitigation is real, and lowers severity without closing the gap.** Omission is declared
+  and counted — `init` writes `# omitted: <name> <reason>` into the consumer's registry
+  (installer/README.md:351-352), so an adopter is *informed*, never silently degraded.
+  **Where it becomes blocking: release-sweep**, not close. Close cuts no release — release-sweep
+  is a boundary skill rather than a stage (lifecycle-kit/SPEC.md §templates/release-sweep.md) —
+  so this blocked no stage of `native-cohort-canon-kit`. It must block a release, so that a
+  future publish cannot ship the hole unnoticed.
+  **This entry is now half (2) alone, and it carries the baseline slug because it is the half
+  that retires the red.** Restore markdown-link coverage for binary-less payloads — build the
+  main loop's pack with the crate's own binary, redesign the value assertion off
+  binary-dispatched gates, or accept and document that the coverage is binary-gated.
+  **Half (1) promoted 2026-08-12 at spec as `port-criterion-cohort-cost-form`**, which gives
+  criterion 5 a form that can price a cohort; it changes no coverage, so `installer_smoke` stays
+  held `fail` on this slug and the split is invisible to the baseline row.
+  Re-measured live at HEAD on 2026-08-12 rather than read off the baseline row: the suite fails
+  on **all four** profiles and prints the count each cohort increments —
+  `artifact: none packed — N member(s) omitted and declared`, N = 0/5/6/11 across the profiles.
+  **Cost while deferred:** the suite is held `fail` on the baseline, so its other assertions
+  still run and this one is tracked rather than lost — and every further cohort ported widens
+  the same hole, now against a criterion that can at least see it.
+  Filed 2026-08-12 by close, draining the gap inbox, under CLAUDE.md §Housekeeping's
+  operator-directed filing exception; found at validate, reframed by the lead; split
+  2026-08-12 at spec on the operator ruling, half (1) promoted and this half deferred.
+
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -4917,56 +5088,6 @@
   Filed 2026-08-12 by close on the lead's ruling, from a practice the lead named at this
   session's end; recorded rather than landed, per scope-gated intake.
 
-- **port-criterion-aggregate-cost-blindness** [design-pending] — the port-candidate criteria
-  price platform cost per member, and the cost they measure is cohort-level.
-  **The finding, and it is not the smoke assertion.** `installer_smoke`'s value arm now fails on
-  every profile, and the first reading — "a stale assertion needs updating" — sends scope after
-  the wrong object. The arm plants a mistyped relative link in an adopter's own README
-  (`installer/consumer-smoke/run-smoke.sh:246-268`), and its spec comment states that *which*
-  gate catches it is deliberately unasserted: "the claim is about the battery rather than about
-  a member of it." The assertion did exactly its job — it detected that a binary-less install's
-  battery now catches nothing on adopter prose of that class. It is not stale and it did not rot.
-  **What the criteria cannot express.** gate-sdk/SPEC.md §The port-candidate criteria states
-  criterion 5 (platform cost) **per member**. Batch B ported seven `spec_manifest_files` members
-  at once (`f602642d`); each individually passes criterion 5's per-member reading. The aggregate
-  emptied a value class for any consumer whose payload carries no gate binary, because `.gate`
-  members are omitted-and-declared there. Criterion 5's *form* has no way to say that, and that
-  is the object a future scope must price.
-  **NOT a re-litigation of any operator ruling.** The operator accepted criterion 5's platform
-  cost knowingly for the born-native `check-measured-claim` — a single member. This entry says
-  the criterion cannot *express* an aggregate. Different object; no reversal is proposed.
-  **The precise scope, because the first phrasing overstated it.** The hole is **markdown-link
-  liveness**, not prose generally: `check-md-refs` is now a `.gate`, while `check-prose-tells`,
-  `check-docs-link-convention`, `check-comment-tier` and `check-spec-pointer` survive as shell
-  and still run. Validate's own commit message got this right where its gap bullet did not. The
-  conclusion stands on the strongest ground either way: the smoke run **is** the oracle, and no
-  profile caught the defect.
-  **The mitigation is real, and lowers severity without closing the gap.** Omission is declared
-  and counted — `init` writes `# omitted: <name> <reason>` into the consumer's registry
-  (installer/README.md:351-352), so an adopter is *informed*, never silently degraded.
-  **Where it becomes blocking: release-sweep**, not close. Close cuts no release — release-sweep
-  is a boundary skill rather than a stage (lifecycle-kit/SPEC.md §templates/release-sweep.md) —
-  so this blocked no stage of `native-cohort-canon-kit`. It must block a release, so that a
-  future publish cannot ship the hole unnoticed.
-  **Deliverable, in two halves, and the second carries the baseline slug.** (1) Give criterion 5
-  a form that can price a cohort rather than only a member. (2) Restore markdown-link coverage
-  for binary-less payloads — build the main loop's pack with the crate's own binary, redesign the
-  value assertion off binary-dispatched gates, or accept and document that the coverage is
-  binary-gated. Half (2) is what retires the red, so it is the half `installer_smoke`'s baseline
-  row is held against; a later scope may split the halves, but the baseline slug must follow
-  half (2).
-  **Split 2026-08-12 by operator ruling at the `port-oracles-and-kit-roots` scope: half (1) rides
-  that iteration, half (2) defers, costed.** The baseline slug stays on half (2), so
-  `installer_smoke` stays held `fail` another iteration and the hole widens by whatever the
-  kit-roots cohort omits. Re-measured live at HEAD that day rather than read off the baseline
-  row: the suite fails on **all four** profiles and prints the count each cohort increments —
-  `artifact: none packed — N member(s) omitted and declared`, N = 0/5/6/11 across the profiles.
-  **Cost while deferred:** the suite is held `fail` on the baseline, so its other assertions
-  still run and this one is tracked rather than lost — and every further cohort ported widens
-  the same hole before anyone has priced it.
-  Filed 2026-08-12 by close, draining the gap inbox, under CLAUDE.md §Housekeeping's
-  operator-directed filing exception; found at validate, reframed by the lead.
-
 - **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
   unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
   Five worktrees from prior sessions were still on disk under `.claude/worktrees/` at four stale
@@ -5028,34 +5149,6 @@
   and it is invisible by construction — the artifact is a clean report.
   Filed 2026-08-12 by close, draining the gap inbox; found at align.
 
-- **substrate-parity-partial-vendor-scope** [design-pending] — `check-gate-substrate-parity`
-  assertion B equates a whole-binary roster against a partially-vendored descriptor set.
-  Red in gate-sdk's consumer smoke, and **pre-existing rather than this iteration's** — probed in
-  a detached worktree at `37c6969b` and `5f8066d5`, same verdict at both. The scratch consumer
-  vendors gate-sdk alone, so it receives the multi-call binary (which carries every ported kit's
-  subcommands) but only gate-sdk's descriptors; assertion B equates the binary's `--list` roster
-  with the descriptors on disk and reds naming `check-task-names` — a queue-kit gate — as a
-  subcommand nothing declares.
-  **The equality cannot hold in any consumer that vendors a subset of the kits whose gates the
-  shared binary carries**, which is every consumer once a second kit ports. So it grows with the
-  port rather than staying one kit's problem, and that is what makes it worth a unit now.
-  **Not caught by the commit-time battery:** the consumer smoke is not in README's per-kit
-  fixture-runner battery, so nothing at commit time or in CI runs it. That is why it survived two
-  iterations unnoticed and is a second, separable finding inside this one.
-  **Deliverable, and why `[design-pending]`:** most likely assertion B should equate the binary's
-  roster **restricted to the vendored kits' descriptors** — but the alternative, that the binary
-  should be built per-vendoring rather than shipped whole, is a genuinely different answer with
-  different payload consequences, and choosing between them is the unit's substance.
-  **SAME SHAPE as `consumer-smoke-subset-accounting-verdict`, and not a duplicate of it.** That
-  entry is the *registration accounting* assertion reddening under a kit subset; this is
-  *substrate parity*. Different assertion, different fix — but one shared root (a consumer-smoke
-  assertion equating a whole-roster fact in a subset-vendored tree), so whoever takes either
-  should weigh unifying the rule rather than patching two assertions.
-  **Cost while deferred:** a standing red in a suite nothing runs automatically, which trains
-  readers to discount it — and it blocks using the consumer smoke as an oracle for the port.
-  Filed 2026-08-12 by close, draining the gap inbox; found and probed at build, ruled
-  non-blocking for this iteration by the lead.
-
 - **queue-write-side-verb** [design-pending] — `TASK-QUEUE.md` has four read-side callers and no
   write-side verb, so every stage session that restructures an entry hand-rolls a throwaway script.
   Measured against this iteration's `.tmp/` before the boundary wipe, at `fde9db3f`: five scripts,
@@ -5089,68 +5182,6 @@
   loss only after the fact.
   Filed 2026-08-12 by close, draining the gap inbox; raised by the operator mid-iteration off
   noticing `done-move.py`, and verified against the tree rather than taken from the observation.
-
-- **port-criterion-transitive-binding-reach** [design-pending] — the born-native criterion states
-  a direct-naming test, and the gate that motivated it binds transitively.
-  gate-sdk/SPEC.md §The port-candidate criteria, bullet 4, says criterion 4 does not bind where
-  `couples=` names no registry member's declaration path and the gate takes no conservation-table
-  row. `check-measured-claim` earns a conservation-table row anyway, through an **indirect**
-  relationship: its `couples=` names `scripts/*.sh` (an emitter), and that emitter — not the
-  `couples=` glob itself — treats declaration paths as a set. The row's own prose records that the
-  landing design predicted no row here on exactly bullet 4's literal premise, and that the premise
-  was falsified by the emitter coupling.
-  **Judged a legibility gap rather than a correctness defect.** The two passages are technically
-  reconcilable — bullet 4 is conditional and this gate fails the condition — so nothing is wrong.
-  What is wrong is that a SPEC should be self-consistent without asking a reader to reconcile a
-  criterion against a table row's prose, and a future reader applying bullet 4 literally to the
-  next born-native candidate risks repeating the original misprediction.
-  **Deliverable:** one clause on bullet 4 (or a cross-reference to the `check-measured-claim` row)
-  stating that a `couples=` reaching a declaration-path-processing **oracle** counts as binding
-  transitively, not only on a direct literal match.
-  **DISTINCT from `port-criterion-aggregate-cost-blindness`**, which is about criterion **5**
-  being stated per-member while the cost it measures is cohort-level. Same SPEC section, different
-  criterion, different defect — but a session fixing either should read both, since the section
-  now has two known expressiveness gaps and one edit pass could carry both.
-  **Cost while deferred:** low and bounded, paid once per born-native candidate as a wrong
-  prediction about whether criterion 4 binds — which is cheap to correct when caught and silent
-  when not.
-  Filed 2026-08-12 by close, draining the gap inbox; found at validate.
-
-- **cohort-hold-criterion-label-defect** [design-pending] — a cohort hold is labelled with a
-  criterion whose own text disclaims the question the hold turns on.
-  **The operator ruling this discharges is recorded** at TRAJECTORY.md §The closed rulings
-  (2026-08-12): a hold is **per-member**, keyed on *is this gate's emitter ported?*, and the
-  criterion-7 label on `check-roadmap-fresh` is a spec defect to correct. This entry is the
-  correction; it does not restate the ruling's grounds.
-  **What made it look like a contradiction, recorded so the next reader does not re-derive it.**
-  `bin/port-blockers.sh` clears the `bash <emitter> --emit` shape, because `bash` is on
-  `GATE_SDK_PROGRAM_FLOOR`, and gate-sdk/SPEC.md makes that report authoritative for the blocker
-  test — probed at scope 2026-08-12 by running it, which reports none of the six generated-
-  projection freshness gates. Meanwhile the cohort section holds `check-roadmap-fresh` naming
-  criterion 7. The two test different things: criterion 7's closing sentence says a blocker
-  "never reads on whether a gate ports", which is exactly what the hold turns on.
-  **NOT a reversal, and the write-up must not read as one.** The 2026-08-11 hold stands on its
-  stated ground — nothing in the cohort ports the emitter it shells out to — and is relabelled.
-  **Deliverable:** at gate-sdk/SPEC.md §The first cohort, and the rule that selects the next,
-  relabel the hold off criterion 7 and onto cohort composition; give criterion 7 a clause saying
-  it does not adjudicate whether a spawned target is itself ported. Then derive, per member,
-  which of the six the key clears.
-  **Why `[design-pending]`:** the per-member derivation is the substance and no ruling shortcuts
-  it. Standing trap the derivation must respect: all six steer their `good/`+`bad/` pairs off the
-  live emitter through the `EMIT_SRC` positional arm, so a ported member's pair would go green
-  over an arm with no implementation — size on what a member **executes**, never on what its
-  fixtures reach. That is the vacuity the queue-kit cohort already paid for once.
-  **DISTINCT from `port-criterion-transitive-binding-reach` (criterion 4's binding test) and
-  `port-criterion-aggregate-cost-blindness` (criterion 5 priced per member).** Same SPEC section,
-  three different criteria, three different defects — the section now has three known
-  expressiveness gaps, and a session taking any of them should read all three.
-  **Deliberately filed rather than folded into either sibling:** folding would widen the
-  `port-oracles-and-kit-roots` unit set past what the operator ruled, and scope-gated intake files
-  by default rather than starting.
-  **Cost while deferred:** low and bounded, but it misprices the second-cheapest cohort in the
-  tree — the freshness family reads as six held members when the key may clear four, so a
-  selector skips a cheap cohort on a label rather than on a derivation.
-  Filed 2026-08-12 at scope, on the operator ruling that reframed the apparent contradiction.
 
 ## Icebox
 
