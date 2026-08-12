@@ -2,7 +2,9 @@
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
 pub mod action_pinning;
+pub mod assertion_strength;
 pub mod docs_cmd;
+pub mod kit_registration;
 pub mod knob_citation;
 pub mod manifest_count;
 pub mod md_refs;
@@ -13,10 +15,13 @@ pub mod queue_hygiene;
 pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
+pub mod smoke_entry_guard;
 pub mod spec_fence_balance;
 pub mod tag_lead_line;
 pub mod task_conservation;
 pub mod task_names;
+pub mod template_registry_parity;
+pub mod test_hermetic;
 pub mod tracking_claim;
 
 pub type GateFn = fn(&[String]) -> i32;
@@ -299,6 +304,57 @@ pub const REGISTRY: &[GateEntry] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
         "queue-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The kit-roots `gate_kit_roots` cohort — five members sharing one
+    // corpus derivation, `GATE_KIT_ROOTS_HERE`/`_REL`, so each declares the bridged spelling its
+    // own rule reads and nothing more
+    // spec: gate-sdk/SPEC.md §check-reads-couples — an empty walk-root set for the two members
+    // that probe fixed literal paths rather than listing a directory: there is no root for the
+    // recorder to observe, the shape the queue-kit cohort's file readers already declare.
+    (
+        "check-kit-registration",
+        kit_registration::run,
+        &[],
+        &[
+            "GATE_KIT_ROOTS_REL",
+            "GATE_SDK_REGISTRY_DOC",
+            "GATE_SDK_RUNNER_DOC",
+        ],
+        "gate-sdk",
+    ),
+    (
+        "check-smoke-entry-guard",
+        smoke_entry_guard::run,
+        &[],
+        &["GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the listed directory set is the
+    // member's own positional arguments with a kit-root-derived default: neither the count nor
+    // the paths are statically bounded, which is the undecidable answer this line kind exists for
+    (
+        "check-test-hermetic",
+        test_hermetic::run,
+        &["?"],
+        &["GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    (
+        "check-assertion-strength",
+        assertion_strength::run,
+        &["?"],
+        &["GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — one `?` and not one per kit: the whole
+    // `templates/*.list` listing goes through a single walk anchored at the scan root, which is
+    // the member's own first argument with a default
+    (
+        "check-template-registry-parity",
+        template_registry_parity::run,
+        &["?"],
+        &["GATE_KIT_ROOTS_HERE"],
+        "gate-sdk",
     ),
 ];
 

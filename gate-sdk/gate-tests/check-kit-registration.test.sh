@@ -12,7 +12,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-kit-registration.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -38,8 +37,9 @@ git -C "$SANDBOX" -c user.email=t@e -c user.name=t commit -qm init
 run() {  # $1=label $2=want-rc $3=want-substring $4=runner-doc-body
     local label="$1" want="$2" sub="$3" body="$4" out rc
     printf '%s' "$body" >"$SANDBOX/RUNNER.md"
-    out="$(cd "$SANDBOX" && env GATE_SDK_KIT_DIRS="alpha-kit beta-kit" \
-        GATE_SDK_ROOT="$DIR" "$GATE" README.md RUNNER.md 2>&1)"; rc=$?
+    out="$(cd "$SANDBOX" \
+        && gate_env GATE_SDK_KIT_DIRS="alpha-kit beta-kit" GATE_SDK_ROOT="$DIR" \
+        && gate_run check-kit-registration "$DIR/checks" README.md RUNNER.md 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -61,8 +61,9 @@ run "b-owed-satisfied" 0 "(2 kit root(s) each carry a registry row; 1 shipping g
 run "b-missing" 1 "alpha-kit" "no fixture-runner lines here"
 
 # Fail-closed: a configured runner doc that does not exist is exit 2, not a pass.
-out="$(cd "$SANDBOX" && env GATE_SDK_KIT_DIRS="alpha-kit beta-kit" GATE_SDK_ROOT="$DIR" \
-    "$GATE" README.md no-such-doc.md 2>&1)"; rc=$?
+out="$(cd "$SANDBOX" \
+    && gate_env GATE_SDK_KIT_DIRS="alpha-kit beta-kit" GATE_SDK_ROOT="$DIR" \
+    && gate_run check-kit-registration "$DIR/checks" README.md no-such-doc.md 2>&1)"; rc=$?
 if [[ "$rc" -ne 2 ]]; then
     echo "  FAIL [missing-doc]: want exit 2, got $rc -- $out"; fails=$((fails + 1))
 fi

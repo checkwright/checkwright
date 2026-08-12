@@ -790,7 +790,10 @@ identically to one `cargo` produced.
 Gates whose corpus is kit directories, smoke scripts or hooks
 (`check-kit-registration`, `check-smoke-entry-guard`, `check-hook-exec-bit`,
 `check-test-hermetic`, `check-assertion-strength`) are not substrate-sensitive
-by the derivation above and are untouched.
+by the derivation above and owe no disposition row. Four of them have since
+ported (§The kit-roots `gate_kit_roots` cohort) and the claim is unchanged by
+that: this table is about whose *assertion* a port could end, never about which
+members are on which substrate.
 
 **Reference-only implementations.** The section carries one further disposition,
 in the other direction: an implementation the binary carries that **no descriptor
@@ -1419,7 +1422,106 @@ implementation:
 These holds are sequencing rather than exclusion under the rule §The
 port-candidate criteria fixes and this section restates for the queue-kit pair
 above; what each owes is filed on `cohort-held-members-port-prerequisites`,
-where the ERE engine is now owed by four members rather than one.
+where the ERE engine is now owed by nine members rather than one. The roster and
+its kits live on that entry and are not restated here, because a count copied
+into prose is the drift this correction is itself repairing.
+
+### The kit-roots `gate_kit_roots` cohort
+
+**Five members, and the axis is the corpus derivation rather than the kit:**
+`check-kit-registration`, `check-smoke-entry-guard`, `check-test-hermetic`,
+`check-assertion-strength`, `check-template-registry-parity`. All five derive
+their corpus from `gate_kit_roots` and nothing else structural — a sweep of the
+kit roots, then a fixed literal sub-path under each (`smoke/install.sh`,
+`smoke/violation.sh`, `gate-tests/*.test.sh`, `smoke/*.sh`, `bin/*.sh`,
+`templates/*.list`). That derivation was **already compiled**: `walk::kit_roots`
+and `walk::kit_roots_rel` are bridged resolved values landed with the canon-kit
+cohort, so the axis that made the first cohort cheap was paid for before this one
+started. What each member adds on top is a per-file text test, which is the whole
+of its rule — the first cohort's economy at five members instead of two.
+
+**The fifth member ports under criterion 4's own predicate, and the ground is
+the second over-selection path rather than the first.** Assertion C's runtime
+derivation reports `check-template-registry-parity` substrate-sensitive: its
+`couples=` carries `kit:*/*.sh`, which expands to `gate-sdk/*/*.sh` and covers
+`gate-sdk/checks/check-shellcheck.sh`. It is **not** a reverse-trigger couple —
+the gate really does read `*.sh` names as content, through
+`git ls-files -- '*.sh'`. It is a **content couple wider than the walk**: the
+names it reads are only those under a `<kit>/<name>/` directory that a sibling
+`<kit>/templates/<name>.list` registers, and no kit ships a template registering
+`checks/`. Against this tree that walk reaches one live registry, `drift-kit/kpis/`,
+with `gate-sdk/templates/msg-patterns.list` skipped for want of a sibling. The
+port therefore changes nothing the gate reads and the parity proof is not
+self-referential. Recorded at this length because every mechanical screen puts
+this member *out*, and because the amendment that proposed the cohort argued it
+on the reverse-trigger clause — a ground that does not cover it, corrected here
+against the predicate §The port-candidate criteria actually states.
+
+**One library move was bought before the first gate, and it is the class
+criterion 7's worked example exists to surface.** `check-kit-registration`
+resolved `GATE_SDK_REGISTRY_DOC` and `GATE_SDK_RUNNER_DOC` inline, so
+`lib/gate.sh` defined neither and the config bridge's does-not-define refusal
+would have fired on every invocation of the compiled member. Both defaults moved
+into the library, under the **consumer knob names** rather than renamed the way
+`GATE_PRUNE_DIRS` is: that rename buys a distinct spelling because a whitespace
+scalar feeds an array, and a scalar-in/scalar-out knob has no such collision to
+avoid (§lib/gate.sh). No consumer configuration changed.
+
+**Three deliberate differences, asserted rather than normalised away**, in the
+shape the canon-kit cohort's sort-order note set:
+
+- `check-assertion-strength`'s token→code map came out of `awk` in hash order and
+  comes out of the crate sorted. Set-identical, ordering different, and it reaches
+  output only through a multi-finding message.
+- `check-template-registry-parity`'s two `comm` arms are computed by set
+  membership. `sort`'s collation is locale-dependent and a set difference is not,
+  so the port implements the rule the contract states rather than the mechanism
+  the shell reached for.
+- A member taking a positional root resolves its **relative** kit roots against
+  that root, exactly as the shell did — but the bridge spells *every* root
+  relative, so where the shell would have had an absolute root and ignored the
+  argument, the port honours it. The two agree whenever the positional root is
+  the invoking directory, which is every documented use: the argument exists to
+  steer a fixture tree whose `gate-sdk-config.sh` names relative kit roots.
+
+**Parity was proved on 34 cases while both implementations existed** — each
+member's `good/` and `bad/` case, the live tree, every arm each member carries,
+and a constructed differential tree for the branches neither reaches:
+`check-kit-registration`'s assertion B alone and both assertions together (the
+blank line between the two finding blocks fires only there),
+`check-test-hermetic`'s credential-leak assertion and its exempt-marker escape,
+`check-assertion-strength`'s window cut short by a following invocation and its
+own exempt marker, and every fail-closed refusal. Byte-identical, exit codes
+included, on all of them.
+
+**Two readers of the narrowed corpus were missed by the amendment's enumeration
+and found by the battery**, which is worth recording because the enumeration was
+the delta that claimed to be exhaustive:
+
+- `check-gate-assertions` resolved a gate name to its declaration and looked for
+  `# assertion` markers there. A `.gate` descriptor carries none and cannot — the
+  field roster is closed — so three members with enumerating contracts read as a
+  retrofit obligation. Repaired by the resolution §check-gate-output already owns:
+  a `.gate` member's markers are looked for in its implementation module, and the
+  marker grammar accepts either comment leader, because the leader is the
+  substrate's and the marker is a code marker either way.
+- `check-docs-kit-parity` is a consumer gate that **wraps** `check-kit-registration`
+  by executing its path. It now reaches it through `gate_command`, the argv being
+  the one spelling that survives either substrate. Recorded because a wrapper is
+  a consumer of a ported member that no kit-side roster names.
+
+**The aggregate price is measured, not reasoned, and the reasoning is written
+first so the measurement has something to falsify.** All five members assert over
+**kit-authored** files — a vendored kit's own `smoke/`, `gate-tests/`,
+`templates/` and registry rows — never over adopter-authored content, so a
+binary-less consumer losing the five should lose no class `installer_smoke`'s
+value arm measures, and the aggregate price should be zero on that oracle. The
+oracle refuses a dirty worktree, so the run is taken on the committed cohort and
+its verdict lands here at that commit rather than being asserted from the
+prediction. The held `installer_smoke fail` row in
+`.workflow/validate-baseline.txt` is **not** this cohort's price: it records the
+markdown-link hole `port-criterion-aggregate-cost-blindness` half (2) owns, which
+this cohort neither widens nor repairs.
 
 ### What the reverted port established
 
@@ -3769,6 +3871,13 @@ mode the fixture pair drives); `--smoke [dir...]` scans the named smoke dir(s)
 `kit:smoke/install.sh`, and `kit:smoke/violation.sh` (`dir=one`, a one-way audit
 over the test and smoke trees).
 
+**Its implementation is a compiled subcommand**, on §check-action-pinning's
+terms — declaration path `check-test-hermetic.gate`, rule out of the gate
+binary, proved parity-identical before the shell gate was deleted
+(§The kit-roots `gate_kit_roots` cohort). Its two `# assertion` markers moved
+with the rule to the implementation module, which is where §check-gate-assertions
+now looks for a `.gate`-declared member's.
+
 ### check-assertion-strength
 
 Invariant: **an assertion is at least as strong as its own failure message.** In
@@ -3842,6 +3951,14 @@ drives. Tier `precommit`, matching its sibling; the `# graph:` couples
 one-way audit — an edit to a scanned script *or* to a declaring header re-fires
 it). Configuration adds **no new knob**: the scan roots come from the existing
 kit-roots derivation, as `check-test-hermetic`'s do.
+
+**Its implementation is a compiled subcommand**, on §check-action-pinning's
+terms — declaration path `check-assertion-strength.gate`, rule out of the gate
+binary, proved parity-identical before the shell gate was deleted
+(§The kit-roots `gate_kit_roots` cohort). The three bounded matchers and the
+`# exit:` line grammar are hand-written kit literals, not an interpreted
+consumer pattern, so this member owes none of the ERE-engine work its held
+siblings do.
 
 ### check-gate-exemption-tasks
 
@@ -4310,6 +4427,14 @@ consumer keeping no prose registry opts out by not registering the gate in its
 "does the kit table still reflect the kit set?" staleness check, narrowing that
 step to the un-gated remainder (row descriptions, per-kit READMEs).
 
+**Its implementation is a compiled subcommand**, on §check-action-pinning's
+terms — declaration path `check-kit-registration.gate`, rule out of the gate
+binary, proved parity-identical before the shell gate was deleted
+(§The kit-roots `gate_kit_roots` cohort). A **wrapper** re-scoping this
+invariant onto another registry doc reaches it through `gate_command`'s argv
+rather than by executing a path, which is the only spelling that survives the
+move; this consumer's `check-docs-kit-parity` is the live instance.
+
 ### check-readme-roster
 
 Invariant: every kit README's register-the-gates block holds name-set parity
@@ -4370,13 +4495,18 @@ Sweep: kit roots come from `gate_kit_roots` (the `GATE_SDK_KIT_DIRS` knob —
 §Layout and configuration), the sibling roster meta-gates' shape; a kit root
 without a `smoke/` dir is skipped, and `violation.sh` is checked only where it
 exists (it is optional — §Consumer smoke). Config reuses `GATE_SDK_KIT_DIRS`;
-no new knob. Positional form `check-smoke-entry-guard.sh [root]` resolves
+no new knob. Positional form `check-smoke-entry-guard [root]` resolves
 relative kit roots against a fixture tree (the case dir's `gate-sdk-config.sh`
 names the fixture kits); bare, it sweeps against the git toplevel. Fail-closed:
 a non-repo cwd with no root argument, an empty roster, or an unreadable smoke
 script is exit 2, never a false clean. The `# graph:` couples the mutating
 smoke scripts (`kit:smoke/install.sh,kit:smoke/violation.sh`, `dir=one`,
 `tier=precommit`), so editing one re-fires the gate.
+
+**Its implementation is a compiled subcommand**, on §check-action-pinning's
+terms — declaration path `check-smoke-entry-guard.gate`, rule out of the gate
+binary, proved parity-identical before the shell gate was deleted
+(§The kit-roots `gate_kit_roots` cohort).
 
 ### check-core-files
 
@@ -5152,7 +5282,7 @@ the sibling directory's contents and nothing else.
 
 Sweep: kit roots come from `gate_kit_roots` (the `GATE_SDK_KIT_DIRS` knob —
 §Layout and configuration), the sibling roster meta-gates' shape; config adds
-**no new knob**. Positional form `check-template-registry-parity.sh [root]`
+**no new knob**. Positional form `check-template-registry-parity [root]`
 resolves relative kit roots against a fixture tree (the case dir's
 `gate-sdk-config.sh` names the fixture kits); bare, it sweeps against the git
 toplevel. Fail-closed: a non-repo cwd with no root argument, an empty kit
@@ -5163,6 +5293,12 @@ fixture pair synthesizes both sides at once: `good/` proves green on a registry
 in parity while carrying both structural exclusions (a `.list` with no sibling,
 and a non-`.list` template), and `bad/` proves a registry that is one-sided in
 each direction at the same time.
+
+**Its implementation is a compiled subcommand**, on §check-action-pinning's
+terms — declaration path `check-template-registry-parity.gate`, rule out of the
+gate binary, proved parity-identical before the shell gate was deleted
+(§The kit-roots `gate_kit_roots` cohort), which records the criterion-4 finding
+this member carries. The finding changed nothing above.
 
 ### templates/check-skeleton.sh
 

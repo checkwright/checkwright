@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Direct unit test of check-test-hermetic.sh assertion (B) via the --smoke mode.
+# Direct unit test of check-test-hermetic assertion (B) via the --smoke mode.
 # The good/bad fixture pair stays on assertion (A) (the gate-tests bootstrap
 # scan), so the smoke credential-pin rule needs its own test: a
 # credential-managing smoke script whose own-kit bin call carries no *_CRED_FILE
@@ -12,7 +12,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # gate-sdk/
-GATE="$DIR/checks/check-test-hermetic.sh"
 
 fails=0
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
@@ -56,7 +55,7 @@ DEMO_KIT_CRED_FILE="$pp/creds.json" bash "$SMOKE_KIT_ROOT/bin/poller.sh"
 bash "$SMOKE_KIT_ROOT/bin/verdict.sh" "$snap"
 EOF
 
-run() { out="$("$GATE" --smoke "$1" 2>&1)"; rc=$?; }
+run() { out="$(gate_run check-test-hermetic "$DIR/checks" --smoke "$1" 2>&1)"; rc=$?; }
 
 run "$tmp/good"
 [[ "$rc" -eq 0 ]] \

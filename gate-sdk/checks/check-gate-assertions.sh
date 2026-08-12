@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# graph: couples=kit:SPEC.md,scripts/*.sh,kit:*.sh dir=bi valve=none tier=align-only
+# graph: couples=kit:SPEC.md,scripts/*.sh,kit:*.sh,native/src/gates/*.rs dir=bi valve=none tier=align-only
 # install: zero-config
 # spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion span+count to the gate code's `# assertion` markers
 #
@@ -62,14 +62,21 @@ extract_contracts() { awk '
   }
 ' "$1"; }
 
+# spec: gate-sdk/SPEC.md §check-gate-assertions — a `.gate`-declared member carries its rule in
+# the implementation module, so the markers are looked for there: the same follow-the-rule-to-the-
+# module resolution §check-gate-output already owns, arriving here with the kit-roots cohort
 resolve_gate_file() {
     if [[ -n "$SCRIPTS_DIR" ]]; then
         [[ -f "$SCRIPTS_DIR/$1.sh" ]] && { printf '%s\n' "$SCRIPTS_DIR/$1.sh"; return 0; }
         return 1
     fi
     local -a dirs
+    local decl
     mapfile -t dirs < <(gate_check_dirs)
-    gate_resolve "$1" "${dirs[@]}"
+    decl="$(gate_resolve "$1" "${dirs[@]}")" || return 1
+    [[ "$decl" == *.gate ]] && decl="$(gate_native_module "$1")"
+    [[ -f "$decl" ]] || return 1
+    printf '%s\n' "$decl"
 }
 
 findings=()
@@ -92,8 +99,10 @@ for spec in "${SPECS[@]}"; do
             continue
         fi
 
-        markers="$(grep -oE '#[[:space:]]*assertion[[:space:]]+[A-Za-z0-9]+:' "$file" \
-            | sed -E 's/#[[:space:]]*assertion[[:space:]]+([A-Za-z0-9]+):/\1/' | sort -u | paste -sd, -)"
+        # spec: gate-sdk/SPEC.md §check-gate-assertions — the comment leader is the substrate's,
+        # so both spellings are read: a marker is a code marker either way
+        markers="$(grep -oE '(#|//)[[:space:]]*assertion[[:space:]]+[A-Za-z0-9]+:' "$file" \
+            | sed -E 's/^.*assertion[[:space:]]+([A-Za-z0-9]+):$/\1/' | sort -u | paste -sd, -)"
 
         if [[ -z "$markers" ]]; then
             findings+=("$spec §$gate: contract enumerates [$labels] but $file carries zero \`# assertion\` markers (retrofit obligation)")

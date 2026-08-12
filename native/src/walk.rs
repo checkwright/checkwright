@@ -51,6 +51,68 @@ pub fn kit_roots_rel() -> Result<Vec<String>, String> {
     bridged_array("GATE_KIT_ROOTS_REL")
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one scalar knob. A scalar is a
+// one-element array in the wire format, so this is `bridged_array`'s single-value face and an
+// absent variable is the same error for the same reason: the crate holds no default.
+pub fn knob_scalar(knob: &str) -> Result<String, String> {
+    let var = format!("GATE_SDK_KNOB_{}", knob);
+    std::env::var(&var).map_err(|_| {
+        format!(
+            "{} is unset — the gate was invoked without the config bridge gate_command \
+             emits, so {} could not be resolved",
+            var, knob
+        )
+    })
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a bridged root crosses spelled relative to the invoking
+// directory, and re-absolutising it against the binary's own cwd is how the reader recovers
+// exactly the path the shell library computed
+pub fn kit_roots_abs() -> Result<Vec<String>, String> {
+    let here = cwd()?;
+    Ok(kit_roots()?
+        .into_iter()
+        .filter(|r| !r.is_empty())
+        .map(|r| abs_against(&here, r.trim_end_matches('/')))
+        .collect())
+}
+
+fn cwd() -> Result<String, String> {
+    Ok(std::env::current_dir()
+        .map_err(|e| format!("cannot read the current directory: {}", e))?
+        .display()
+        .to_string()
+        .trim_end_matches('/')
+        .to_string())
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — a relative bridged root may climb out with `..`, so the
+// join is normalised rather than concatenated: an unnormalised `..` component makes every later
+// path-prefix comparison fail silently, the defect the canon-kit cohort's edge tree caught.
+fn abs_against(here: &str, p: &str) -> String {
+    if p.starts_with('/') {
+        return normalize_abs(p);
+    }
+    if p == "." {
+        return here.to_string();
+    }
+    normalize_abs(&format!("{}/{}", here, p.strip_prefix("./").unwrap_or(p)))
+}
+
+pub fn normalize_abs(abs: &str) -> String {
+    let mut stack: Vec<&str> = Vec::new();
+    for seg in abs.split('/') {
+        match seg {
+            "" | "." => {}
+            ".." => {
+                stack.pop();
+            }
+            s => stack.push(s),
+        }
+    }
+    format!("/{}", stack.join("/"))
+}
+
 // spec: gate-sdk/SPEC.md §The port-candidate criteria — bash's `[[ str == pat ]]`: whole
 // string, no pathname semantics, so `*` and `?` cross `/`. `glob_files`' per-component
 // matcher is the pathname-expansion counterpart, and is a different rule from this one.
@@ -282,6 +344,13 @@ fn expand(base: &Path, comps: &[&str], out: &mut Vec<PathBuf>) -> Result<(), Str
         }
     }
     Ok(())
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — bash's `[[ -r "$d" && -x "$d" ]]` on a
+// directory, answered by attempting the open. It enumerates nothing into a corpus, so it is
+// deliberately not noted to the recorder unit test A observes through.
+pub fn dir_readable(p: &Path) -> bool {
+    fs::read_dir(p).is_ok()
 }
 
 fn subdirs(base: &Path) -> Result<Vec<PathBuf>, String> {

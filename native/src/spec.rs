@@ -222,18 +222,11 @@ pub fn relative_to_cwd(p: &str) -> String {
     }
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — one normaliser, in the module that owns the bridged
+// root spelling this rule exists for; a second copy here would be the drift the kit-roots
+// cohort's own criterion-6 discharge argues against
 fn normalize(abs: &str) -> String {
-    let mut stack: Vec<&str> = Vec::new();
-    for seg in abs.split('/') {
-        match seg {
-            "" | "." => {}
-            ".." => {
-                stack.pop();
-            }
-            s => stack.push(s),
-        }
-    }
-    format!("/{}", stack.join("/"))
+    walk::normalize_abs(abs)
 }
 
 pub fn knob_pub(name: &str) -> Result<String, String> {

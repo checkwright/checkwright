@@ -7,12 +7,19 @@
 set -uo pipefail
 
 SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
-WRAPPED="$SDK/checks/check-kit-registration.sh"
-[[ -x "$WRAPPED" ]] || { echo "check-docs-kit-parity: wrapped gate not found: $WRAPPED" >&2; exit 2; }
+# shellcheck source=../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the wrapped member is reached through gate_command, not by
+# executing a path: it dispatches to a compiled subcommand, and an argv is the one spelling that
+# survives either substrate
+mapfile -t _dkp_dirs < <(gate_check_dirs)
+mapfile -t WRAPPED < <(gate_command check-kit-registration "${_dkp_dirs[@]}")
+[[ ${#WRAPPED[@]} -gt 0 ]] || { echo "check-docs-kit-parity: wrapped gate does not resolve: check-kit-registration" >&2; exit 2; }
 
 REG="${1:-docs/kits.md}"
 
-out="$("$WRAPPED" "$REG" 2>&1)"; rc=$?
+out="$("${WRAPPED[@]}" "$REG" 2>&1)"; rc=$?
 if [[ "$rc" -eq 2 ]]; then
     printf '%s\n' "$out" >&2
     exit 2
