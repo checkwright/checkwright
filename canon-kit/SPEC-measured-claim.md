@@ -135,7 +135,9 @@ gates. So the surfaces genuinely differ, and reusing the manifest set would
 under-scan by exactly the instance that motivated widening the class. This repo
 sets the knob to the manifest globs plus `.claude/commands/*.md`.
 
-**(7) The gate is born native, and this is the first one.** [design-bearing]
+**(7) The gate is born native, and this is the first one. Operator-ruled
+2026-08-12 at spec, with the criterion-5 cost below in view and accepted.**
+[design-bearing]
 TRAJECTORY.md §The objectives' sixth shrinks the interpreter surface to the
 unavoidable, and `native-gate-port-remaining-corpus` records that *"every gate
 landed meanwhile adds shell to the eventual port"* — so a new shell gate is debt
@@ -154,14 +156,16 @@ that, and three things make it cheap rather than ambitious:
   no registry member's declaration path, so it is outside assertion C's derivation
   and takes no conservation-table row.
 
-**The honest cost, stated rather than discovered:** by criterion 5 a
+**The honest cost, accepted rather than merely disclosed:** by criterion 5 a
 `.gate`-declared member is omitted from the `gates.list` of a consumer whose host
 the release publishes no artifact for, so on an uncovered platform this gate does
 not run where a shell gate would have. That is the port's standing cost, already
 accepted for ten members whose shell forms were deleted; it adds no new class of
-cost, and it is why the omit-and-declare path exists. It is not free, and a reader
-weighing a fourth born-native gate should weigh it again rather than cite this
-one as settled precedent.
+cost, and it is why the omit-and-declare path exists. **The operator ruled with
+this cost stated, so it is a paid price and not an open risk** — a later reader
+must not re-open the ruling on it. What stays open is only its reach: this settles
+*this* gate, and a reader weighing a second born-native gate weighs the cost again
+rather than citing this one as blanket precedent.
 
 **(8) Registration and the new-gate fan-out.** [mechanical]
 `check-measured-claim` joins `scripts/gates.list`, canon-kit's README gate-roster

@@ -1,12 +1,23 @@
 # SPEC amendment: canon-cohort
 
 The third gate cohort of the native port: **canon-kit's `spec_manifest_files`
-family, eleven gates**, ruled by the operator 2026-08-12 under
+family, ten gates**, ruled by the operator 2026-08-12 under
 TRAJECTORY.md §PRIORITY DIRECTIVE — the port track's sequence. This amendment
 designs that port. It does not restate the porting procedure
 (§Porting a gate to the binary substrate), the conservation contract
 (§Meta-gate conservation for the binary substrate), the criteria roster
 (§The port-candidate criteria), or the directive's grounds.
+
+**Ten and not eleven, and the arithmetic is a re-measurement rather than a
+narrowing of the ruling.** What the operator ruled is the **selector** — the
+`spec_manifest_files` family, chosen by §The first cohort's own rule as the
+largest set of criteria-clearing gates sharing one corpus derivation. Eleven
+scripts call that derivation, but `check-spec-pointer` **fails criterion 6**
+(delta 10), so it was never inside the set that selector defines; the eleven was
+scope's count of callers, not a count of the ruled cohort. Correcting it is the
+same class of correction as the three below, and it is **held, not excluded** —
+the sequencing §The port-candidate criteria prescribes and the queue-kit cohort's
+own two holds already set as precedent. Operator-ruled 2026-08-12 at spec.
 
 ## Three premises this cohort was ruled on are wrong, and each changes the work
 
@@ -31,17 +42,19 @@ right and the queue entry is the stale copy. **The one owed mechanism is a Rust
 `gate_kit_roots`**; a recursive grep for kit-root logic under `native/src`
 returns nothing.
 
-**(ii) Five of the eleven are substrate-sensitive, not none.** The survey records
-*"all 11 clear criteria 4 and 7"*. Criterion 4 is the half that fails. Assertion
-C's derivation makes a member substrate-sensitive when its expanded `couples=`
-covers a **registry member's declaration path**, and thirteen gates resolve under
-`scripts/`, so a `couples=scripts/*.sh` reaches declaration paths just as
-`kit:*.sh` does. Read off the manifests: `check-spec-pointer`, `check-docs-cmd`,
-`check-prose-enum` (all three carry both spellings), `check-install-claim` and
-`check-payload-claim` are sensitive; `check-manifest-count`,
-`check-manifest-temporal`, `check-knob-citation`, `check-spec-fence-balance`,
-`check-tracking-claim` and `check-md-refs` are not. The gate reports 30
-dispositioned sensitive members at HEAD; this port hands it five more.
+**(ii) Five of the eleven callers are substrate-sensitive, not none.** The survey
+records *"all 11 clear criteria 4 and 7"*. Criterion 4 is the half that fails.
+Assertion C's derivation makes a member substrate-sensitive when its expanded
+`couples=` covers a **registry member's declaration path**, and thirteen gates
+resolve under `scripts/`, so a `couples=scripts/*.sh` reaches declaration paths
+just as `kit:*.sh` does. Read off the manifests: `check-spec-pointer`,
+`check-docs-cmd`, `check-prose-enum` (all three carry both spellings),
+`check-install-claim` and `check-payload-claim` are sensitive;
+`check-manifest-count`, `check-manifest-temporal`, `check-knob-citation`,
+`check-spec-fence-balance`, `check-tracking-claim` and `check-md-refs` are not.
+One of the five — `check-spec-pointer` — is held by delta (10), so the gate
+reports 30 dispositioned sensitive members at HEAD and **this port hands it four
+more**.
 
 **(iii) Three members shell out to a consumer-supplied command, which no
 selection input mentions.** `check-install-claim` and `check-payload-claim` reach
@@ -54,11 +67,13 @@ a consumer's shell command carries the interpreter back into the binary,
 against TRAJECTORY.md §The objectives' sixth. Delta (7) is the answer; it is
 named here rather than discovered at build.
 
-**What the criteria do clear, verified rather than assumed.** All eleven are
-registered in `scripts/gates.list` (criterion 1), all carry a `good/`+`bad/`
+**What the criteria do clear, verified rather than assumed.** All eleven callers
+are registered in `scripts/gates.list` (criterion 1), all carry a `good/`+`bad/`
 fixture pair with no `# no-fixture:` member among them (criterion 2), and all
-declare `tier=precommit` (criterion 3), so a green `check-graph` after the port is
-end-to-end proof the manifest survived the substrate change.
+declare `tier=precommit` (criterion 3) — the held member included, which is what
+makes its hold a criterion-6 verdict rather than a general unfitness. So a green
+`check-graph` after the port is end-to-end proof the manifest survived the
+substrate change.
 
 ## The corpus derivation, and the two branches this repo never executes
 
@@ -128,7 +143,7 @@ not a strict descendant, which is what keeps a kit's own fixture dir from prunin
 itself. Its `CANON_KIT_SCAN_KIT_ROOTS` short-circuit is a bridged scalar.
 
 **(3) The manifest-set derivation ports once, as a shared crate module.**
-[design-bearing] All three branches, in one place the eleven members call — the
+[design-bearing] All three branches, in one place the ten members call — the
 same "ported once and proved N times" economy §The first cohort names, and the
 same shape `native/src/queue.rs` already has for queue-kit. Porting it per gate is
 the failure mode to refuse. The knob reads (`CANON_KIT_MANIFEST_FILES`,
@@ -148,7 +163,7 @@ member whose state has no static representation, applied here to a *branch* rath
 than a member. Without it the port ships a `gate_kit_roots` that nothing ever
 executed.
 
-### The eleven members
+### The ten members
 
 **(5) Port the six criterion-4-clear members.** [design-bearing]
 `check-manifest-count`, `check-manifest-temporal`, `check-knob-citation`,
@@ -170,17 +185,19 @@ the edge tree is the acceptance oracle. Two carry named sub-problems:
   Rust form is a shared function rather than a private helper.
 
 **(6) `check-tracking-claim` and `check-md-refs` spawn git, and the spawn
-discipline is not theirs to invent.** [design-bearing] Four members spawn git —
-these two plus `check-spec-pointer` and `check-docs-cmd`. The crate's existing
-spawn site folds a failed spawn and a non-zero exit into one `None`
+discipline is not theirs to invent.** [design-bearing] Four callers spawn git —
+these two plus `check-docs-cmd`, and `check-spec-pointer`, which delta (10) holds;
+so **three ported members spawn git**. The crate's existing spawn site folds a
+failed spawn and a non-zero exit into one `None`
 (`native/src/gates/task_conservation.rs:10-16`), which is the live instance behind
 the `gate-subprocess-fail-closed-unheld` debt riding this iteration. That entry
-owns the mechanism; this delta owns the dependency: **the four ported members call
+owns the mechanism; this delta owns the dependency: **the three ported members call
 whatever the debt member lands**, and they port after it. Naming the ordering here
-is what keeps four new spawn sites from being written against the defective shape
-first and repaired second.
+is what keeps three new spawn sites from being written against the defective shape
+first and repaired second — and the held member is a fourth that will need it, so
+the debt member's shape must not be sized to this cohort alone.
 
-### The five substrate-sensitive members
+### The four substrate-sensitive members
 
 **(7) The consumer-command spawn is redesigned, not transliterated.**
 [design-bearing] `check-install-claim`, `check-payload-claim` and
@@ -201,9 +218,9 @@ emit and is the first thing to verify against `scripts/enum-sets.sh`,
 `scripts/install-transports.sh` and `scripts/payload-claims.sh`.
 
 **(8) `check-prose-enum` is the criterion-4 hazard in its real form, and it ports
-last.** [design-bearing] Four of the five sensitive members are sensitive only as
-**reverse triggers** — the conservation table records that their scanned corpus is
-the governed-doc set and none reads a gate script's content
+last.** [design-bearing] Three of the four ported sensitive members are sensitive
+only as **reverse triggers** — the conservation table records that their scanned
+corpus is the governed-doc set and none reads a gate script's content
 (§Meta-gate conservation for the binary substrate). `check-prose-enum` is the
 exception the table itself already carved out: its enum derivation reads the queue
 tag vocabulary out of another gate's own class table, so *"deleting that gate's
@@ -213,30 +230,48 @@ a gate's content into a gate that is itself gate content. It ports after deltas
 a ported member.
 
 **(9) The conservation table is re-derived against the new sensitive set.**
-[mechanical] Five new descriptors change which members assertion C's runtime
-derivation selects. Each of the five already has a table row —
-`check-docs-cmd`, `check-install-claim` and `check-payload-claim` under the
-reverse-trigger row, `check-prose-enum` under its own, `check-spec-pointer` under
-the comment-surface widening row — and each row must now read correctly as
-describing a `.gate`-declared gate rather than a shell script. The
-`check-spec-pointer` row is the one to read twice, per delta (10).
+[mechanical] Four new descriptors change which members assertion C's runtime
+derivation selects. Each of the four already has a table row — `check-docs-cmd`,
+`check-install-claim` and `check-payload-claim` under the reverse-trigger row and
+`check-prose-enum` under its own — and each must now read correctly as describing
+a `.gate`-declared gate rather than a shell script. `check-spec-pointer`'s row is
+**not** touched by this delta, because delta (10) holds the member on shell; it is
+touched by delta (10) instead, which records why.
 
-**(10) `check-spec-pointer` straddles both of canon-kit's corpus primitives, and
-only one of them ports.** [design-bearing] The library carries two:
-`spec_manifest_files`, which this cohort ports, and `spec_comment_surface`
-(`spec.sh:264/266`), whose callers are `check-comment-tier`,
+**(10) `check-spec-pointer` is HELD on shell — criterion 6, sequencing not
+exclusion.** [design-bearing] **Operator-ruled 2026-08-12 at spec.** The library
+carries two corpus primitives: `spec_manifest_files`, which this cohort ports, and
+`spec_comment_surface` (`spec.sh:264/266`), whose callers are `check-comment-tier`,
 `check-deprecation-task`, `check-todo-task-liveness` — **and
-`check-spec-pointer`**. So porting this member requires the comment-surface
-derivation in Rust too, while three shell callers keep the shell one: a duplication
-across substrates with nothing holding the copies together, which is criterion 6's
-red condition rather than its discharge, because this primitive's inputs are not
-all bridged knobs. Two answers are available and the cohort must pick one rather
-than discover the fork: **hold `check-spec-pointer` for a later cohort** that takes
-the comment-surface family whole, or **port both primitives now** and carry the
-remaining three shell callers against a bridged derivation. The first is the
-sequencing the criteria prescribe and the smaller unit; the second buys the whole
-library at once. This is the delta most likely to want a ruling — it changes what
-"eleven gates" means.
+`check-spec-pointer`**, the only member calling both. Porting it would require the
+comment-surface derivation in Rust while three shell callers kept the shell one: a
+duplication across substrates with **nothing holding the copies together**, since
+this primitive's inputs are not all bridged knobs. That is criterion 6's red
+condition rather than its discharge, and it is the same shape criterion 6 was
+originally written against.
+
+**The member was therefore never inside the ruled selector**, which is why the
+cohort is ten. The ground is the one §The port-candidate criteria fixes in its
+opening sentence and TRAJECTORY.md restates: a criterion a member fails **orders**
+the work, and citing this hold as an eligibility screen inverts the rule. The
+2026-08-09 directive ports the whole corpus; this member ports later, not never.
+
+**What it owes, recorded so a later cohort inherits it rather than re-deriving
+it.** `check-spec-pointer` ports with the **`spec_comment_surface` family taken
+whole** — itself plus `check-comment-tier`, `check-deprecation-task` and
+`check-todo-task-liveness` — so the second primitive ports once and is proved four
+times, which is the same shared-derivation economy §The first cohort applies to
+this cohort's own. Porting it alone re-imports work that cohort would pay once,
+and porting it with the manifest family strands three shell callers against a
+Rust twin. The hold is also filed on `cohort-held-members-port-prerequisites`,
+beside the two queue-kit holds, because **a hold nobody can find later is an
+exclusion**.
+
+**One consequence to carry forward:** the conservation table's
+`check-spec-pointer` row states that its corpus depends on the shared
+comment-surface widening. That row is **unchanged** by this port and must be left
+alone — the member stays a shell gate, and editing its row to describe a
+`.gate`-declared gate would make the table describe a port that did not happen.
 
 ### Standing obligations
 
@@ -248,8 +283,8 @@ member: the fixture pair, the live tree, and delta (4)'s edge tree.
 
 **(12) The commit-time obligations this repo already carries.** [mechanical]
 `bash gate-sdk/bin/build-native.sh` before each commit, plus the regenerated
-projections per docs/site-architecture.md §Generated projections. Eleven
-descriptors and eleven deleted scripts move the graph artifact, the enforcement
+projections per docs/site-architecture.md §Generated projections. Ten
+descriptors and ten deleted scripts move the graph artifact, the enforcement
 map, the footprint and value rollups and the docs mirror.
 
 **(13) Two deferred entries advance toward closure.** [mechanical]
@@ -258,7 +293,7 @@ port subsumes them. They are dispositioned at close, not built.
 
 ## Producers and consumers
 
-**New interface: eleven `.gate` descriptors under `canon-kit/checks/`.**
+**New interface: ten `.gate` descriptors under `canon-kit/checks/`.**
 - *Producer* — this port; the descriptor's existence **is** the dispatch
   declaration (§The `.gate` descriptor).
 - *Consumers* — `gate_resolve` (declaration path) and `gate_command` (argv),
@@ -268,10 +303,10 @@ port subsumes them. They are dispositioned at close, not built.
 - *Every field has a named reader* — `# graph:` by `check-graph`,
   `gen-pre-commit.sh`, `enforcement-map.sh` and `footprint.sh`; `# spec:` by
   `check-spec-pointer`; `# install:` by `check-install-disposition`. No field is
-  added to the closed roster, and no member takes `# no-fixture:` — all eleven
+  added to the closed roster, and no member takes `# no-fixture:` — all ten
   carry pairs.
 
-**New interface: eleven `REGISTRY` tuples in `native/src/gates/mod.rs`.**
+**New interface: ten `REGISTRY` tuples in `native/src/gates/mod.rs`.**
 - *Producer* — the crate at compile time; a member added without its declared read
   roots and knob reads fails to compile.
 - *Consumers* — `lookup` (dispatch), `roots` (`--reads`, consumed by
@@ -306,12 +341,12 @@ port subsumes them. They are dispositioned at close, not built.
   builds its vocabulary set, before its first corpus line is scanned.
 
 **Red conditions of the readers this change touches** (§The causal-completeness
-check, point 5 — the port **narrows** a corpus by deleting eleven `.sh` files, and
+check, point 5 — the port **narrows** a corpus by deleting ten `.sh` files, and
 "a narrower corpus can only remove violations" is the first argument this delta
 reaches for and is false):
 
 - `check-gate-output` — red on a **zero count** of a `: clean` / `help:` line.
-  Non-monotone. All eleven are fixtured, so each falls to the runtime arm rather
+  Non-monotone. All ten are fixtured, so each falls to the runtime arm rather
   than the source-grep, and the `check-task-conservation` branch is untouched.
 - `check-gate-fixture-coverage` — red on a member with **neither** a pair **nor**
   an opt-out: a zero-count reader, cleared because every pair moves with its member.
@@ -322,16 +357,17 @@ reaches for and is false):
   delta (9) is the discharge.
 - `check-reads-couples` — red on a walk outside the declared couples; its shell
   parser finds nothing in a binary gate, so the `--reads` consumption is what keeps
-  it from printing `clean` vacuously over eleven members.
+  it from printing `clean` vacuously over ten members.
 - `check-readme-roster` — red in **both** directions, so canon-kit's README moves
-  from eleven `.sh` names to eleven `.gate` names rather than gaining them.
+  from ten `.sh` names to ten `.gate` names rather than gaining them.
 - `check-comment-tier`, `check-spec-pointer`, `check-todo-task-liveness`,
-  `check-deprecation-task` — each loses eleven shell files and gains eleven
-  descriptors plus eleven Rust modules. The `*.gate` and `*.rs` arms already exist
-  on the shared primitive (canon-kit/SPEC.md §lib/spec.sh), so these are monotone
-  here and clearable by inspection — **except** where delta (10) ports
-  `check-spec-pointer` itself, which is why that delta is a fork rather than a step.
-- `check-shellcheck` — loses eleven files from its corpus; monotone, and the
+  `check-deprecation-task` — each loses ten shell files and gains ten descriptors
+  plus ten Rust modules. The `*.gate` and `*.rs` arms already exist on the shared
+  primitive (canon-kit/SPEC.md §lib/spec.sh), so these are monotone here and
+  clearable by inspection. All four **stay shell** under delta (10)'s hold, which
+  is what keeps this bullet a plain corpus shift rather than a member-level
+  question: the comment-surface family is untouched by this port.
+- `check-shellcheck` — loses ten files from its corpus; monotone, and the
   substrate equivalent is `cargo clippy`, which `check-crate-arms` brings to commit
   time this same iteration.
 - `check-knob-default-coupling` — **deliberately not extended**, and it is a
@@ -340,9 +376,9 @@ reaches for and is false):
   `gate_kit_roots` but not a kit root, so this gate's verdict is unchanged. Stated
   because the coincidence of names invites the wrong edit.
 - `check-gate-binary-fresh` — red on a stale binary once a member dispatches;
-  already armed, and eleven more dispatches do not change its predicate.
+  already armed, and ten more dispatches do not change its predicate.
 - `check-docs-cmd` — red on a doc fencing a path that no longer runs: real signal
-  after eleven `.sh` deletions, and the reason the docs mirror is in delta (12).
+  after ten `.sh` deletions, and the reason the docs mirror is in delta (12).
   It is also a cohort member, so it audits the consequences of its own port.
 - `check-prose-enum` — red when a paragraph names ≥2 members of a declared set and
   omits one; any prose enumerating canon-kit's gate roster must move with the port.
@@ -357,7 +393,10 @@ reaches for and is false):
   claiming it outstanding. Gains the by-corpus/by-kit reconciliation for this
   cohort — the operator ruled by *family*, which is the corpus axis the ordering
   rule names, so the two selectors agree here without the by-kit caveat the queue
-  cohort needed.
+  cohort needed. **Also gains the `check-spec-pointer` hold**, written in the same
+  form the section already uses for the two queue-kit holds: the member, the
+  criterion it fails, and the work it owes. That subsection is the canonical home
+  for a held member, so this is where the hold survives the amendment's deletion.
 - **gate-sdk/SPEC.md §The port-candidate criteria** — owned by premise (ii),
   premise (iii) and delta (5). Criterion 4 gains the reverse-trigger distinction:
   a member sensitive only because its `couples=` re-triggers it is not the
@@ -367,9 +406,10 @@ reaches for and is false):
   consumer-command case — floor-clear yet objective-6-adverse — as a second worked
   example beside `check-action-run-shell`.
 - **gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate** — owned by
-  deltas (9) and (10): five rows re-read as describing `.gate`-declared gates, and
-  the `check-spec-pointer` row rewritten to say which of canon-kit's two corpus
-  primitives ported and which did not.
+  delta (9): four rows re-read as describing `.gate`-declared gates. The
+  `check-spec-pointer` row is **left unchanged** by delta (10), and the list says so
+  rather than omitting it, because an untouched row and an overlooked row look
+  identical in a diff.
 - **gate-sdk/SPEC.md §lib/gate.sh** — owned by deltas (1) and (7): `gate_kit_roots`
   gains a binary-side equivalent, and the knob bridge gains the claim vocabularies
   as resolved values, with its tab/newline constraint stated as a bound on what a
@@ -377,17 +417,24 @@ reaches for and is false):
 - **canon-kit/SPEC.md §lib/spec.sh** — owned by deltas (2), (3) and (10): the
   manifest-set finder's three branches and the kit-root prune now have a Rust
   implementation, and the section states which of the two corpus primitives is
-  which substrate. The `CLAUDE.md` asymmetry is written down rather than left
-  implicit in the code.
-- **canon-kit/SPEC.md, the eleven per-gate contract sections** — each whose prose
+  which substrate — `spec_manifest_files` ported, `spec_comment_surface` still
+  shell with all four of its callers. The `CLAUDE.md` asymmetry is written down
+  rather than left implicit in the code.
+- **canon-kit/SPEC.md, the ten per-gate contract sections** — each whose prose
   says the gate is a shell script or cites its `.sh` path; and
   **§check-prose-enum**, which owns the reads-a-gate's-content reasoning delta (8)
   extends.
-- **canon-kit/README.md** — gate roster, eleven names, `.sh` → `.gate`.
+- **canon-kit/README.md** — gate roster, ten names, `.sh` → `.gate`.
 - **native/src/gates/mod.rs** — the registry, and the module-per-gate comment whose
   member count changes.
 - **TASK-QUEUE.md `native-gate-port-remaining-corpus`** — owned by premise (i):
-  the "two Rust mechanisms" line is one mechanism.
+  the "two Rust mechanisms" line is one mechanism; and by the header ruling: the
+  cohort is ten, `check-spec-pointer` held.
+- **TASK-QUEUE.md `cohort-held-members-port-prerequisites`** — owned by delta (10):
+  the entry that exists because *"what no queue entry carries is the work owed"*
+  gains a third held member beside the two queue-kit ones. Landed at spec rather
+  than deferred to the merge, since a hold recorded only in an amendment vanishes
+  when the amendment is deleted.
 
 ## Definition of Done
 
