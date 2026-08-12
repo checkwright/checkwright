@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: native-cohort-canon-kit
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -13,6 +13,38 @@
 ## New Features
 
 ## Technical Debt
+
+- **gate-subprocess-fail-closed-unheld** — the conservation table retires
+  `check-gate-fail-closed` for ported members, and no mechanism holds the property for one
+  that spawns a subprocess.
+  gate-sdk/SPEC.md's conservation table retires the gate for `.gate`-dispatched members because
+  the defect is *"unrepresentable once a fallible call returns a `Result` that cannot be
+  ignored"*. The queue-kit cohort narrowed the **ground** rather than the disposition: that is
+  genuinely true for a file-reading member, but `check-task-conservation` is the first ported
+  gate to spawn a process, and for `Command::output()` an `Ok` means the **spawn** succeeded,
+  not that git did — so reading `stdout` while ignoring `status` reproduces the
+  captured-emptiness false-green exactly.
+  **Un-retiring the gate is not the close** — its corpus is `check-*.sh` and it cannot parse a
+  Rust module either way, so the disposition stands on its own terms. What is unheld is the
+  *property*, currently carried by review plus a port-time parity scenario, neither of which
+  survives the next edit to the module.
+  **Deliverable:** a crate-side unit test asserting that every `std::process::Command`
+  construction under `native/src/gates/` is followed by a status check — the same shape as
+  `walk.rs`'s existing test asserting a spelling roster absent from every module outside its
+  own, and it would live beside it. The fuller close is a typed wrapper the gate modules must
+  call instead of `Command` directly, which makes the defect unrepresentable again and is what
+  the retired row's ground actually claims; that is new shared crate mechanism, outside what
+  the queue-kit cohort needed.
+  **Why it rides this cohort:** the port's whole case rests on the conservation table being
+  exhaustive, and this was the **second** row the queue-kit cohort found whose stated ground was
+  wider than the truth — the first being the held members' eligibility framing. Each ported gate
+  that shells out re-buys the same unheld property with nothing accumulating, and **four of the
+  eleven canon-kit members ruled into this iteration spawn git** (`check-docs-cmd`,
+  `check-tracking-claim`, `check-spec-pointer`, `check-md-refs`), so the re-buy is immediate
+  rather than eventual. Debt, not a feature: the deliverable converges the crate onto a property
+  gate-sdk/SPEC.md's conservation table already claims, adding no governed name.
+  Filed 2026-08-12 by close, draining the bullet build filed at batch 2; promoted 2026-08-12 at
+  scope on the operator's cohort ruling.
 
 ## Deferred
 
@@ -36,8 +68,10 @@
   artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
   ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
   one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
-  **Measured 2026-08-09: the port stands at 2 of 100** (`scripts/gates.list` 100 registered,
-  `mod.rs` two). **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  **Re-measured 2026-08-12 at scope: 10 of 101, so 91 remain** (`scripts/gates.list` 101
+  non-comment lines, `mod.rs` ten). This supersedes the 2026-08-09 "2 of 100" figure, whose
+  own arithmetic never agreed with the 91 it stated below itself.
+  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
   of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
   **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
   satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
@@ -46,25 +80,21 @@
   layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
   delta; scope owns the decomposition, and the criterion-relaxation question is closed at
   gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  **Cohort ruled 2026-08-11 by the operator: queue-kit, taken as a whole kit.** The array-knob
-  bridge is spent substrate — it landed and ported zero gates by ruling — and queue-kit's only
-  recorded blocker was criterion 6 on two array knobs (`check-queue-hygiene` reads
-  `QUEUE_KIT_PROSE_LEADS`, `check-queue-sections` reads `QUEUE_KIT_REQUIRED_SECTIONS`), which is
-  exactly what that bridge discharges. The canon-kit `spec_manifest_files` cohort still owes two
-  further shared mechanisms — basename-glob list matching beside walk.rs's extension filter, and a
-  Rust `gate_kit_roots` — so taking it first buys another substrate iteration before a gate lands.
-  **The cohort is 9 of queue-kit's 10, probed at scope 2026-08-11 — carry this number, not the
-  census's 7:** `check-task-conservation` and `check-roadmap-fresh` are file-only too (the census
-  excluded the first only for a missing fixture pair); only `check-queue-slug-liveness` walks,
-  scanning `QUEUE_KIT_PROSE_SURFACE_GLOBS`.
-  **DELIVERED 8 of 10, not 9 — read this before acting on the number above.** The operator ruled
-  2026-08-11 to hold `check-roadmap-fresh` and `check-queue-prose-precondition` on shell, as
-  **sequencing with port work owed, never exclusion**; gate-sdk/SPEC.md §The first cohort is
-  canonical and `cohort-held-members-port-prerequisites` carries what each still owes.
+  **Queue-kit cohort, closed 2026-08-11: delivered 8 of 10.** `check-roadmap-fresh` and
+  `check-queue-prose-precondition` stayed on shell by operator ruling, as **sequencing with
+  port work owed, never exclusion**; `cohort-held-members-port-prerequisites` carries what each
+  still owes, and gate-sdk/SPEC.md §The first cohort is canonical.
+  **Cohort ruled 2026-08-12 by the operator: canon-kit's `spec_manifest_files` family, 11
+  gates** — selected by gate-sdk/SPEC.md §The first cohort's own rule, the largest set sharing
+  one corpus derivation, rather than by kit, which that section names as re-importing paid work.
+  Probed at scope: all 11 clear criteria 4 and 7, and four spawn git, which is why
+  `gate-subprocess-fail-closed-unheld` rides the same iteration. It owes two Rust mechanisms
+  `native/src` lacks — basename-glob matching beside walk.rs's extension filter, and
+  `gate_kit_roots` — while the array-knob bridge queue-kit bought is reused, not rebuilt.
   `gate-battery-parallel-execution` and
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohort ruled 2026-08-11 at scope.
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -752,19 +782,19 @@
   SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
   **Thirteenth, 2026-08-11:** a stale-count escalation itself carried one (98→90; it is 91).
   **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
-  scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over governed
-  collection nouns and takes an extensible `CANON_KIT_COUNT_NOUNS` list, so a `couples=`
-  widening (its globs never reach `.claude/commands/*.md`) plus a noun override looked like a
-  discharge. It cannot be: banning cardinals cannot reach a claim carrying none.
+  scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over the governed
+  plurals in `CANON_KIT_COUNT_COLLECTIONS` (corrected 2026-08-12; the knob named here before
+  did not exist), so a `couples=` widening — its globs never reach `.claude/commands/*.md` —
+  plus an override looked like a discharge. It cannot be: banning cardinals cannot reach a
+  claim carrying none.
   **Why `[design-pending]`:** the false-positive surface *is* the design. "Bare cardinal near
   a roster noun" over-matches legitimate prose ("the four contracts", "both halves"); "extent
   claim over a corpus" has no syntactic tell at all. Both instance sets argue for an opt-in
   `measured:`-style marker the author applies over a scanner inferring intent — a smaller gate
   bought with a larger authoring contract, and that trade is the unit's to rule.
   **Cost while deferred:** compounding and silent — this recurs at **every amendment that
-  measures the tree**, and the failure mode is a canonical doc asserting a false number.
-  Detection is by hand at align if at all, and that phrasing is itself a claim about the
-  *caught* set, which is what a survivorship count cannot see past.
+  measures the tree**, the failure mode is a canonical doc asserting a false number, and
+  detection is by hand at align if at all — itself a survivorship claim about the *caught* set.
   The session-act half is `audit-class-corpus-attestation`, deliberately not folded in: it
   designs a **stamp** obliging a sweep to record the corpus it read; this designs a
   **scanner** over authored prose.
@@ -4655,33 +4685,6 @@
   repaired at `9d94f834`; the missing enforcement is what this files.
   Filed 2026-08-12 by close, draining the bullet build filed after the lead's verify set
   proved incomplete.
-
-- **gate-subprocess-fail-closed-unheld** [design-pending] — the conservation table retires
-  `check-gate-fail-closed` for ported members, and no mechanism holds the property for one
-  that spawns a subprocess.
-  gate-sdk/SPEC.md's conservation table retires the gate for `.gate`-dispatched members because
-  the defect is *"unrepresentable once a fallible call returns a `Result` that cannot be
-  ignored"*. This iteration narrowed the **ground** rather than the disposition: that is
-  genuinely true for a file-reading member, but `check-task-conservation` is the first ported
-  gate to spawn a process, and for `Command::output()` an `Ok` means the **spawn** succeeded,
-  not that git did — so reading `stdout` while ignoring `status` reproduces the
-  captured-emptiness false-green exactly.
-  **Un-retiring the gate is not the close** — its corpus is `check-*.sh` and it cannot parse a
-  Rust module either way, so the disposition stands on its own terms. What is unheld is the
-  *property*, currently carried by review plus a port-time parity scenario, neither of which
-  survives the next edit to the module.
-  **Deliverable:** a crate-side unit test asserting that every `std::process::Command`
-  construction under `native/src/gates/` is followed by a status check — the same shape as
-  `walk.rs`'s existing test asserting a spelling roster absent from every module outside its
-  own, and it would live beside it. The fuller close is a typed wrapper the gate modules must
-  call instead of `Command` directly, which makes the defect unrepresentable again and is what
-  the retired row's ground actually claims; that is new shared crate mechanism, outside what
-  the cohort needed.
-  **Cost while deferred:** the port's whole case rests on the conservation table being
-  exhaustive, and this is the **second** row this cohort found whose stated ground was wider
-  than the truth — the first being the held members' eligibility framing. Each ported gate that
-  shells out re-buys the same unheld property with nothing accumulating.
-  Filed 2026-08-12 by close, draining the bullet build filed at batch 2.
 
 - **scratch-citation-skill-surface-reach** [design-pending] — the permanent-surface class most
   likely to carry stage-owned pointers is the one `check-scratch-citation` does not scan.
