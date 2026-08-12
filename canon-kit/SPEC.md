@@ -160,6 +160,18 @@ supplies the checklist they invoke and the gate behind the promotion rule.
 4. Move the queue entry to `## Done`, dropping its `[spec:]` tag — the
    amendment it referenced is gone, and `check-amendment-queue` requires
    every `[spec:]` ref to resolve to a file on disk.
+   **Unless the entry outlives the amendment.** Where an entry's deliverable is a
+   *corpus* and the amendment delivered one **increment** of it, the terminal move
+   is a **demotion** rather than a Done move: drop the `[spec:]` tag and return the
+   entry to the deferred section under its design-pending tag, so the next
+   increment re-promotes with a fresh amendment. A Done move there asserts a
+   finished deliverable that is not finished. It also costs a second thing that is
+   easy to miss: a done entry is a bare slug, so **every** tag the entry carried
+   goes with it — including any tag a generated public projection reads, which
+   silently drops the item from that projection while the work remains outstanding.
+   This is the branch to state explicitly because it is the uncatchable one — the
+   Done-move contract has no gate behind either half, so the wrong terminal move
+   reds nothing and is found only by a later reader.
 5. Propagate removals (grep every spec for names the change retired), file
    discovered gaps as debt tasks, and commit the merge with the work.
 

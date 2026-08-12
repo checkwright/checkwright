@@ -102,16 +102,23 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   detector.
 - **Isolation charges two harness costs, and paying them is the parent's job.**
   Neither retracts the rule above — the claim is still made by the shape; these
-  are what the shape costs. **(1) The worktree is cut at a stale base, not at
-  HEAD** — observed 21 commits behind, predating the whole iteration that
-  dispatched it — so an agent reads the *pre-change* tree and can report a
-  just-fixed defect as still live. Naming a commit in the prompt does not make
-  the checkout that commit. The object store is shared, so the fix is in the
-  child: verify with `git rev-parse HEAD` and read every target with `git show
-  <rev>:<path>` against the rev the parent states. A parent that omits this owes
-  the doubt back — an audit whose reads may be stale certifies nothing, and
-  every downstream unit has to re-verify the read sites the audit was bought to
-  settle. **(2) The worktree lands inside the repo and untracked**, so an
+  are what the shape costs. **(1) The worktree is cut at the remote tracking ref,
+  not at HEAD** — measured rather than inferred: sweeps dispatched from several
+  different local HEADs all came up at `origin/master` exactly. So the staleness
+  *equals the unpushed backlog*, which makes it predictable instead of mysterious:
+  a parent reads its own exposure with `git log origin/master..HEAD` before
+  dispatching, and a parent that pushes first has none. Until then an agent reads
+  the *pre-change* tree and can report a just-fixed defect as still live. Naming a
+  commit in the prompt does not make the checkout that commit. The object store is
+  shared, so the fix is in the child: verify with `git rev-parse HEAD` and read
+  every target with `git show <rev>:<path>` against the rev the parent states. A
+  parent that omits this owes the doubt back — an audit whose reads may be stale
+  certifies nothing, and every downstream unit has to re-verify the read sites the
+  audit was bought to settle. **A child whose target is unreadable at that rev
+  stops and says so**, and never falls back to the dispatch prompt's own
+  paraphrase of it — that returns the parent's words as a finding, which is
+  indistinguishable in shape from a clean audit and is therefore worse than a
+  refusal. **(2) The worktree lands inside the repo and untracked**, so an
   in-flight isolated agent reads as a dirty tree and aborts every clean-tree
   precondition — a consumer smoke, a packaging step, any commit. Gitignore the
   path. That trades one signal for another and the trade is worth naming: the
@@ -238,6 +245,17 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   semantic weakening inside a legitimate scripts-only commit, so the by-eye diff
   review remains your duty (delegation-kit/SPEC.md §Verify after every agent
   commit — the honest limit).
+- **A child's citation is a pointer to verify, never evidence in itself.** A
+  returned `file:line` is not checked by confirming the range resolves: that
+  catches a wrong number and misses a wrong spelling, a moved passage, and a
+  sibling instance the sweep never reported. **Re-read the passage** in the parent
+  before acting on it. Both halves are attested here — a census that fabricated a
+  `file:line` and a negative claim, both false; and a re-verification of nineteen
+  agent-sourced cites that found no bad ranges yet still surfaced a marker cited
+  under a spelling the tree does not use, plus an entire family member the census
+  never mentioned. Quotation with attribution is precisely the signal a reader uses
+  to decide a claim has already been checked, so an unverified one defeats normal
+  trust rather than merely being wrong.
 - **Budget-check before *each* dispatch in a fan-out**, not once at the start.
   `bash delegation-kit/bin/usage-verdict.sh` (verdict exit 0/1/2 from `usage.txt` —
   it folds in the reading-age and window-validity checks so a dead-window pct
