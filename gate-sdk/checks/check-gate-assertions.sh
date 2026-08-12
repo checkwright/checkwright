@@ -65,6 +65,8 @@ extract_contracts() { awk '
 # spec: gate-sdk/SPEC.md §check-gate-assertions — a `.gate`-declared member carries its rule in
 # the implementation module, so the markers are looked for there: the same follow-the-rule-to-the-
 # module resolution §check-gate-output already owns, arriving here with the kit-roots cohort
+# spec: gate-sdk/SPEC.md §check-gate-assertions — crate presence is the manifest, never the directory, for the reason §check-gate-output states: a build artifact creates the directory. Exit 3 means the member declares a compiled rule this tree does not carry — a vendored consumer's normal state, since no consumer receives the crate — and is skipped-and-counted rather than red, because a marker set that is not in the tree is not one this gate can assert over.
+CRATE_MANIFEST="$(gate_native_crate)/Cargo.toml"
 resolve_gate_file() {
     if [[ -n "$SCRIPTS_DIR" ]]; then
         [[ -f "$SCRIPTS_DIR/$1.sh" ]] && { printf '%s\n' "$SCRIPTS_DIR/$1.sh"; return 0; }
@@ -74,12 +76,16 @@ resolve_gate_file() {
     local decl
     mapfile -t dirs < <(gate_check_dirs)
     decl="$(gate_resolve "$1" "${dirs[@]}")" || return 1
-    [[ "$decl" == *.gate ]] && decl="$(gate_native_module "$1")"
+    if [[ "$decl" == *.gate ]]; then
+        [[ -f "$CRATE_MANIFEST" ]] || return 3
+        decl="$(gate_native_module "$1")"
+    fi
     [[ -f "$decl" ]] || return 1
     printf '%s\n' "$decl"
 }
 
 findings=()
+out_of_reach=()
 coupled=0
 for spec in "${SPECS[@]}"; do
     contracts="$(extract_contracts "$spec")"; st=$?
@@ -94,7 +100,12 @@ for spec in "${SPECS[@]}"; do
             findings+=("$spec §$gate: count-word says $n but the (X) span enumerates $lcount label(s) [$labels] — the contract is internally inconsistent")
         fi
 
-        if ! file="$(resolve_gate_file "$gate")"; then
+        file="$(resolve_gate_file "$gate")"; rst=$?
+        if [[ "$rst" -eq 3 ]]; then
+            out_of_reach+=("$gate")
+            continue
+        fi
+        if [[ "$rst" -ne 0 ]]; then
             findings+=("$spec §$gate: enumerated contract but no gate code resolves for '$gate' (heading must name the script)")
             continue
         fi
@@ -129,5 +140,9 @@ if [[ ${#findings[@]} -gt 0 ]]; then
     exit 1
 fi
 
-echo "GATE-ASSERTIONS: clean ($coupled enumerated contract(s) coupled)"
+declared=""
+if [[ ${#out_of_reach[@]} -gt 0 ]]; then
+    declared=", ${#out_of_reach[@]} declared out of reach with no crate at $CRATE_MANIFEST — ${out_of_reach[*]}"
+fi
+echo "GATE-ASSERTIONS: clean ($((coupled - ${#out_of_reach[@]})) of $coupled enumerated contract(s) coupled$declared)"
 exit 0

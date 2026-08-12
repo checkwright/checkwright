@@ -1504,7 +1504,13 @@ the delta that claimed to be exhaustive:
   retrofit obligation. Repaired by the resolution §check-gate-output already owns:
   a `.gate` member's markers are looked for in its implementation module, and the
   marker grammar accepts either comment leader, because the leader is the
-  substrate's and the marker is a code marker either way.
+  substrate's and the marker is a code marker either way. **The repair was itself
+  incomplete in this repo and only the aggregate-price oracle showed it**: a
+  vendored consumer receives the descriptor and never the crate, so the module
+  path resolved to nothing and every adopter's battery reded. Those members are
+  now skipped-and-counted with no crate present. Recorded because the sequence is
+  the lesson — a tree-green repair is not a consumer-green one, and criterion 5's
+  measurement is what distinguishes them.
 - `check-docs-kit-parity` is a consumer gate that **wraps** `check-kit-registration`
   by executing its path. It now reaches it through `gate_command`, the argv being
   the one spelling that survives either substrate. Recorded because a wrapper is
@@ -3266,7 +3272,23 @@ single-char `(X)` label — four filters that exclude sibling-gate mentions,
 follow-on sentences, hierarchical axis/sub-rule contracts, and count-words
 with non-enumeration nouns. With no spec argument the gate scans
 `<gates-dir>/SPEC.md` when present plus each vendored kit's own `SPEC.md`;
-each matched heading resolves to its gate source through the registry path. Honest residual: the marker catches editing one
+each matched heading resolves to its gate source through the registry path.
+
+**A `.gate`-declared member's markers live with its rule, in the implementation
+module** — the follow-the-rule-to-the-module resolution §check-gate-output owns,
+arriving here with the kit-roots cohort, because a descriptor's field roster is
+closed and cannot carry them. The marker grammar accepts either comment leader
+(`#` or `//`): the leader is the substrate's and the marker is a code marker
+either way. **A tree with no crate skips those members and counts them**, in the
+clean line, exactly as §check-gate-output declares them out of reach — a vendored
+consumer receives the descriptor and never the crate (assertion E holds the crate
+outside every kit root), so a marker set that is not in the tree is not one this
+gate can assert over, and reding on it would red every adopter. Crate presence is
+the **manifest**, never the directory, for the reason §check-gate-output states.
+The skip's executed oracle is `installer_smoke`, which runs the battery on a
+freshly vendored consumer and is what found the red this branch answers.
+
+Honest residual: the marker catches editing one
 side without the other, but not adding an assertion while forgetting *both*
 its marker and the contract. A first paragraph that embeds the literal pattern
 in example prose self-matches — the failure is loud (a false positive forcing
