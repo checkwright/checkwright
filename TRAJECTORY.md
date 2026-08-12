@@ -201,6 +201,26 @@ that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` a
 direction trigger, which remains available for exactly the urgent case this
 paragraph declines to automate.
 
+**A cohort hold is per-member, and criterion 7 does not adjudicate it — ruled
+2026-08-12.** Two passages appeared to contradict each other on the
+`bash <emitter> --emit` shape: `bin/port-blockers.sh` clears it, because `bash` is
+on the program floor, while `check-roadmap-fresh` stands held with criterion 7
+named as its ground. They test different things. The blocker report stays
+authoritative for the blocker test; the hold rests on **cohort composition** —
+*is this gate's emitter ported?* — which criterion 7's own closing sentence
+excludes from its reach, saying a blocker "never reads on whether a gate ports".
+So the hold is keyed per member on its emitter, and **the criterion-7 label on it
+is a spec defect to correct** — the hold and its grounds are owned by
+gate-sdk/SPEC.md §The first cohort, and the rule that selects the next.
+
+This **does not reverse** the 2026-08-11 hold. That ruling stands on its stated
+ground and is relabelled, not lifted — a session writing it up as a reversal has
+mis-read it. Which of the freshness family the per-member key actually clears is
+a derivation no ruling can shortcut, and it is the taking stage's to make; the
+standing trap is that all six steer their fixture pairs off the live emitter, so
+size on what a member executes, never on what its fixtures reach. This ruling
+discharges when the relabel lands.
+
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete

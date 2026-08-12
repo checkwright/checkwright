@@ -1,6 +1,6 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: port-oracles-and-kit-roots
 
   The lifecycle-kit gates read this header's iteration name and the stage
   cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt`
@@ -4605,35 +4605,37 @@
   `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the
   gate can never disagree" guarantee survives intact and is **not** part of the dual-
   implementation debt above.
-  **A POSIX ERE engine is owed by four members, which makes it one payment for four.**
-  `check-queue-prose-precondition` (queue-kit), plus `check-install-claim`,
-  `check-payload-claim` and `check-manifest-temporal` (canon-kit, held 2026-08-12 at build):
-  each *interprets* consumer-configured EREs rather than transporting them. The crate vendors
-  nothing — asserted by `native/src/walk.rs`'s own test, which fails the build on a non-empty
-  `[dependencies]` — so a port hand-writes the engine. Build it in whichever cohort takes the
-  four, never per member: a member-at-a-time port pays once and re-imports three times. The
-  canon trio's vocabularies already cross the bridge as resolved data (canon-kit/SPEC.md
-  §lib/spec.sh), leaving the matcher alone.
-  **The four do not need the same surface, and that is the sizing risk.** `gsub` semantics are
-  the queue-kit member's alone — the canon trio only ever *tests* a pattern against a line, so
-  an engine sized to the trio ships without substitution and strands the fourth on the very
-  cohort meant to discharge it. Scope to the union, or the fourth does not port.
+  **A POSIX ERE engine is owed by NINE members, which makes it one payment for nine.**
+  Re-censused 2026-08-12 at scope over all 85 remaining shell gates: four was an undercount,
+  not a stale roster. `check-queue-prose-precondition` (queue-kit); `check-install-claim`,
+  `check-payload-claim`, `check-manifest-temporal`, `check-spec-derivable-section`,
+  `check-deprecation-task` (canon-kit); `check-tree-terms`, `check-commit-msg` (gate-sdk); plus
+  `check-brevity` marginally — each *interprets* a consumer-configured ERE rather than
+  transporting one. The crate vendors nothing — asserted by `native/src/walk.rs`'s own test,
+  which fails the build on a non-empty `[dependencies]` — so a port hand-writes the engine.
+  Build it in whichever cohort takes them, never per member. `check-comment-tier` was screened
+  and is **out**: `join_alt` bracket-escapes every knob element to a literal.
+  **They do not need the same surface, and that is the sizing risk.** `gsub` is
+  `check-queue-prose-precondition`'s alone and `check-deprecation-task` needs span extraction,
+  while the rest only *test* a pattern against a line — so an engine sized to the testers
+  strands both. Scope to the union, or they do not port. The gate-sdk pair is widest: `grep
+  -EnHf` over consumer patterns with no kit ceiling, `check-tree-terms` on every tracked file.
   **`check-spec-pointer` owes the `spec_comment_surface` family** — held 2026-08-12 at spec on
   criterion 6, as the only member calling both of canon-kit's corpus primitives.
-  **The work owed is a cohort, not a member:** port it with `check-comment-tier`,
-  `check-deprecation-task` and `check-todo-task-liveness`, so the second primitive ports once
-  and is proved four times. Porting it alone re-imports work that cohort pays once; porting it
-  with the manifest family strands three shell callers against a Rust twin.
-  Worth preserving in the design: the primitive already carries `*.sh`, `*.gate` and `*.rs`
-  arms (canon-kit/SPEC.md §lib/spec.sh), so the corpus half is done and what is owed is the
-  derivation, not the file-set widening.
+  **The cohort prescribed here is NOT clean, corrected 2026-08-12 at scope:** all four members —
+  it, `check-comment-tier`, `check-deprecation-task`, `check-todo-task-liveness` — also fail
+  **criterion 4**, since the primitive's set spans `*.rs` (canon-kit/SPEC.md §lib/spec.sh) and so
+  scans the crate's own gate modules, making the parity oracle self-referential. Taking them on
+  criterion 6 alone discovers a hold mid-port. Read off the conservation table and each gate's
+  assertion target, **not** machine-checked against `check-gate-substrate-parity`'s runtime
+  derivation — so the taking session runs that derivation first.
   **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
   undifferentiated gate-count, so these six read as six more of eighty-five when two of them
   are compiler-shaped sub-projects. A later cohort discovers the sizing at implementation
   time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
   never ported and patched.
-  Filed 2026-08-12 by close, draining the two hold bullets build filed; widened 2026-08-12 at
-  build with the canon-kit trio.
+  Filed 2026-08-12 by close; widened at build with the canon-kit trio; engine count and cohort
+  cleanliness corrected 2026-08-12 at scope from an 85-gate census, on operator direction.
 
 - **scratch-citation-skill-surface-reach** [design-pending] — the permanent-surface class most
   likely to carry stage-owned pointers is the one `check-scratch-citation` does not scan.
@@ -4953,6 +4955,12 @@
   binary-gated. Half (2) is what retires the red, so it is the half `installer_smoke`'s baseline
   row is held against; a later scope may split the halves, but the baseline slug must follow
   half (2).
+  **Split 2026-08-12 by operator ruling at the `port-oracles-and-kit-roots` scope: half (1) rides
+  that iteration, half (2) defers, costed.** The baseline slug stays on half (2), so
+  `installer_smoke` stays held `fail` another iteration and the hole widens by whatever the
+  kit-roots cohort omits. Re-measured live at HEAD that day rather than read off the baseline
+  row: the suite fails on **all four** profiles and prints the count each cohort increments —
+  `artifact: none packed — N member(s) omitted and declared`, N = 0/5/6/11 across the profiles.
   **Cost while deferred:** the suite is held `fail` on the baseline, so its other assertions
   still run and this one is tracked rather than lost — and every further cohort ported widens
   the same hole before anyone has priced it.
@@ -5107,6 +5115,42 @@
   prediction about whether criterion 4 binds — which is cheap to correct when caught and silent
   when not.
   Filed 2026-08-12 by close, draining the gap inbox; found at validate.
+
+- **cohort-hold-criterion-label-defect** [design-pending] — a cohort hold is labelled with a
+  criterion whose own text disclaims the question the hold turns on.
+  **The operator ruling this discharges is recorded** at TRAJECTORY.md §The closed rulings
+  (2026-08-12): a hold is **per-member**, keyed on *is this gate's emitter ported?*, and the
+  criterion-7 label on `check-roadmap-fresh` is a spec defect to correct. This entry is the
+  correction; it does not restate the ruling's grounds.
+  **What made it look like a contradiction, recorded so the next reader does not re-derive it.**
+  `bin/port-blockers.sh` clears the `bash <emitter> --emit` shape, because `bash` is on
+  `GATE_SDK_PROGRAM_FLOOR`, and gate-sdk/SPEC.md makes that report authoritative for the blocker
+  test — probed at scope 2026-08-12 by running it, which reports none of the six generated-
+  projection freshness gates. Meanwhile the cohort section holds `check-roadmap-fresh` naming
+  criterion 7. The two test different things: criterion 7's closing sentence says a blocker
+  "never reads on whether a gate ports", which is exactly what the hold turns on.
+  **NOT a reversal, and the write-up must not read as one.** The 2026-08-11 hold stands on its
+  stated ground — nothing in the cohort ports the emitter it shells out to — and is relabelled.
+  **Deliverable:** at gate-sdk/SPEC.md §The first cohort, and the rule that selects the next,
+  relabel the hold off criterion 7 and onto cohort composition; give criterion 7 a clause saying
+  it does not adjudicate whether a spawned target is itself ported. Then derive, per member,
+  which of the six the key clears.
+  **Why `[design-pending]`:** the per-member derivation is the substance and no ruling shortcuts
+  it. Standing trap the derivation must respect: all six steer their `good/`+`bad/` pairs off the
+  live emitter through the `EMIT_SRC` positional arm, so a ported member's pair would go green
+  over an arm with no implementation — size on what a member **executes**, never on what its
+  fixtures reach. That is the vacuity the queue-kit cohort already paid for once.
+  **DISTINCT from `port-criterion-transitive-binding-reach` (criterion 4's binding test) and
+  `port-criterion-aggregate-cost-blindness` (criterion 5 priced per member).** Same SPEC section,
+  three different criteria, three different defects — the section now has three known
+  expressiveness gaps, and a session taking any of them should read all three.
+  **Deliberately filed rather than folded into either sibling:** folding would widen the
+  `port-oracles-and-kit-roots` unit set past what the operator ruled, and scope-gated intake files
+  by default rather than starting.
+  **Cost while deferred:** low and bounded, but it misprices the second-cheapest cohort in the
+  tree — the freshness family reads as six held members when the key may clear four, so a
+  selector skips a cheap cohort on a label rather than on a derivation.
+  Filed 2026-08-12 at scope, on the operator ruling that reframed the apparent contradiction.
 
 ## Icebox
 
