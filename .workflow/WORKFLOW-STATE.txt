@@ -6,3 +6,4 @@
 
 native-cohort-canon-kit scope a56e09b1 2026-08-12
 native-cohort-canon-kit spec a83327c3 2026-08-12
+native-cohort-canon-kit align addeab7e 2026-08-12
