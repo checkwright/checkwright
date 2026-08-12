@@ -12,43 +12,7 @@
 
 ## New Features
 
-## Technical Debt
-
-- **gate-subprocess-fail-closed-unheld** — the conservation table retires
-  `check-gate-fail-closed` for ported members, and no mechanism holds the property for one
-  that spawns a subprocess.
-  gate-sdk/SPEC.md's conservation table retires the gate for `.gate`-dispatched members because
-  the defect is *"unrepresentable once a fallible call returns a `Result` that cannot be
-  ignored"*. The queue-kit cohort narrowed the **ground** rather than the disposition: that is
-  genuinely true for a file-reading member, but `check-task-conservation` is the first ported
-  gate to spawn a process, and for `Command::output()` an `Ok` means the **spawn** succeeded,
-  not that git did — so reading `stdout` while ignoring `status` reproduces the
-  captured-emptiness false-green exactly.
-  **Un-retiring the gate is not the close** — its corpus is `check-*.sh` and it cannot parse a
-  Rust module either way, so the disposition stands on its own terms. What is unheld is the
-  *property*, currently carried by review plus a port-time parity scenario, neither of which
-  survives the next edit to the module.
-  **Deliverable:** a crate-side unit test asserting that every `std::process::Command`
-  construction under `native/src/gates/` is followed by a status check — the same shape as
-  `walk.rs`'s existing test asserting a spelling roster absent from every module outside its
-  own, and it would live beside it. The fuller close is a typed wrapper the gate modules must
-  call instead of `Command` directly, which makes the defect unrepresentable again and is what
-  the retired row's ground actually claims; that is new shared crate mechanism, outside what
-  the queue-kit cohort needed.
-  **Why it rides this cohort:** the port's whole case rests on the conservation table being
-  exhaustive, and this was the **second** row the queue-kit cohort found whose stated ground was
-  wider than the truth — the first being the held members' eligibility framing. Each ported gate
-  that shells out re-buys the same unheld property with nothing accumulating, and **four of the
-  eleven canon-kit members ruled into this iteration spawn git** (`check-docs-cmd`,
-  `check-tracking-claim`, `check-spec-pointer`, `check-md-refs`), so the re-buy is immediate
-  rather than eventual. Debt, not a feature: the deliverable converges the crate onto a property
-  gate-sdk/SPEC.md's conservation table already claims, adding no governed name.
-  Filed 2026-08-12 by close, draining the bullet build filed at batch 2; promoted 2026-08-12 at
-  scope on the operator's cohort ruling.
-
-## Deferred
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
+- **native-gate-port-remaining-corpus** [spec: SPEC-canon-cohort.md] [roadmap: now/reliability] —
   the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
@@ -89,12 +53,133 @@
   one corpus derivation, rather than by kit, which that section names as re-importing paid work.
   Probed at scope: all 11 clear criteria 4 and 7, and four spawn git, which is why
   `gate-subprocess-fail-closed-unheld` rides the same iteration. It owes two Rust mechanisms
-  `native/src` lacks — basename-glob matching beside walk.rs's extension filter, and
-  `gate_kit_roots` — while the array-knob bridge queue-kit bought is reused, not rebuilt.
+  `native/src` lacked. **Corrected 2026-08-12 at spec: it is one, not two.** The
+  basename-glob matcher landed with the queue-kit cohort (`walk.rs`'s `glob_files` is
+  component-wise and globstar-capable, in production via `queue_slug_liveness`), exactly as
+  gate-sdk/SPEC.md §The first cohort already records; only a Rust `gate_kit_roots` remains.
+  The array-knob bridge queue-kit bought is reused, not rebuilt.
   `gate-battery-parallel-execution` and
   `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope.
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted
+  2026-08-12 at spec for the canon-kit cohort.
+
+- **spec-measured-count-gate** [spec: SPEC-measured-claim.md] — a **measured count or extent
+  claim authored into governed prose goes stale with no oracle**.
+  recurrence: spec-measured-count-gate 2026-08-09 2026-08-11
+  **Thirteen instances. Three before 2026-08-09:** the align audit found
+  `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six; the
+  tree carried eight); and a third landed in a **binding shim**, `.claude/commands/close.md`'s
+  release-policy slot deriving a bump off the note's "two sections" where the cited owner
+  fixes three. Each was corrected by hand — the Enforcement-first shape the doctrine bars.
+  **Gap generalization — the check class that should have caught them.** `check-prose-enum`
+  reads governed-set membership, not numerals; `check-spec-derivable-section` reads
+  fenced-dump density; `check-shim-restatement` holds *copy shape*, and a restatement that
+  is **wrong** has diverged from its owner's wording, which is what makes it not a copy. So
+  the scanner must range over SPEC sections and binding shims alike.
+  **Widened 2026-08-09 (`install-profile-seam`): five more in one iteration, split by whether
+  a cardinal-based scanner reaches them. Three do** — nine gate-name lists that were seven, a
+  "sole call site" that was two, seven marker hits that were eight. **Two do not, carrying no
+  cardinal at all:** a five-line finding generalized to a whole-file claim, and an audit
+  stamping "the kit SPECs came back clean" over a SPEC holding two counter-instances. Those
+  are *extent* claims, stated wider than the measurement behind them.
+  **Four more 2026-08-09 (`prose-profile-activation`), all cardinal-axis, and the density is now
+  the argument.** A pointer count of 1774 where the gate reports 902, sitting in a *cost field a
+  ranking scope reads*; "five deltas" over an amendment carrying six; a smoke-registration
+  "20 of 22" where it is 21; "the one on-surface queue-kit gate" where four are. Three were
+  caught by the align consistency audit, one reached a committed scope surface uncaught.
+  **In every one the ruling did not depend on the number** — so none reddened anything, which is
+  luck not design, and a human-scale read of six amendments is not a mechanism that scales.
+  **Answered: the unreachable axis is the one that costs.** Eleven instances were caught
+  downstream by hand at no cost beyond the re-measurement. The twelfth — an extent claim —
+  was caught by **nobody** for two iterations and shipped a false sentence into a published
+  SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
+  **Thirteenth, 2026-08-11:** a stale-count escalation itself carried one (98→90; it is 91).
+  **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
+  scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over the governed
+  plurals in `CANON_KIT_COUNT_COLLECTIONS` (corrected 2026-08-12; the knob named here before
+  did not exist), so a `couples=` widening — its globs never reach `.claude/commands/*.md` —
+  plus an override looked like a discharge. It cannot be: banning cardinals cannot reach a
+  claim carrying none.
+  **The design question, and it is now ruled.** The false-positive surface *was* the design:
+  "bare cardinal near a roster noun" over-matches legitimate prose ("the four contracts",
+  "both halves"), and "extent claim over a corpus" has no syntactic tell at all. The trade
+  this entry held open — an opt-in `measured:` marker over a scanner inferring intent — is
+  ruled for the marker at spec 2026-08-12; the grounds, the three arms and the coverage
+  limit are the amendment's, not restated here.
+  **Cost while deferred:** compounding and silent — this recurs at **every amendment that
+  measures the tree**, the failure mode is a canonical doc asserting a false number, and
+  detection is by hand at align if at all — itself a survivorship claim about the *caught* set.
+  The session-act half is `audit-class-corpus-attestation`, deliberately not folded in: it
+  designs a **stamp** obliging a sweep to record the corpus it read; this designs a
+  **scanner** over authored prose.
+  Filed 2026-07-26 by close (`release-path-hardening`); roughly one small unit; promoted
+  2026-08-12 at spec.
+
+- **crate-ci-arm-unheld-at-commit-time** [spec: SPEC-crate-arms.md] — nothing runs the
+  crate's test or lint arms at commit time, and a green battery reads as if something did.
+  `.github/workflows/gates.yml` runs `cargo clippy --release -D warnings` and `cargo test
+  --release` on every push, but `scripts/gates.list` has no member that runs either and
+  `gate-sdk/bin/build-native.sh` only builds. CLAUDE.md states the asymmetry in one direction
+  only ("`cargo test` does not discharge `build-native.sh`") and nothing states the other, so a
+  contributor who runs the full battery **plus** `build-native.sh` has satisfied every
+  documented commit-time obligation and can still push a red CI.
+  **Attested, not hypothetical.** Verified in a detached worktree that both arms were already
+  red at `af5b9ffd` — a commit accepted on a 100/100 battery. `cargo test` failed on the unit
+  test asserting every registry member declares the roots it walks, which panicked on the first
+  bridged member, so the machine-held half of the `check-reads-couples` conservation
+  disposition held nothing **for any member** while the conservation table still claimed it;
+  clippy failed on two findings in the same commit's new code.
+  **Deliverable:** register a gate running `clippy -D warnings` and `cargo test` over
+  `GATE_SDK_NATIVE_CRATE`, tier=precommit. **The filed shape was corrected 2026-08-12 at
+  spec:** the entry asked for a runtime skip where cargo is absent, citing criterion 5's
+  omit-and-declare — but no gate in this tree skips on a missing program (both existing cases
+  fail closed), and criterion 5 omits a member at vendor time rather than branching at run
+  time. The amendment rules the predicate to be the crate's presence, not cargo's, which
+  removes the invented mechanism; it also deletes the workflow's duplicate cargo step, since
+  two copies of the command held equal by nobody is the defect being closed.
+  **Cost while deferred:** the port lands member by member with its one machine-held read-set
+  assertion able to die silently, and the breakage surfaces at the iteration's single budgeted
+  push — the worst possible moment, on the largest commit. The defect found this way was
+  repaired at `9d94f834`; the missing enforcement is what this files.
+  Filed 2026-08-12 by close, draining the bullet build filed after the lead's verify set
+  proved incomplete; promoted 2026-08-12 at spec.
+
+## Technical Debt
+
+- **gate-subprocess-fail-closed-unheld** — the conservation table retires
+  `check-gate-fail-closed` for ported members, and no mechanism holds the property for one
+  that spawns a subprocess.
+  gate-sdk/SPEC.md's conservation table retires the gate for `.gate`-dispatched members because
+  the defect is *"unrepresentable once a fallible call returns a `Result` that cannot be
+  ignored"*. The queue-kit cohort narrowed the **ground** rather than the disposition: that is
+  genuinely true for a file-reading member, but `check-task-conservation` is the first ported
+  gate to spawn a process, and for `Command::output()` an `Ok` means the **spawn** succeeded,
+  not that git did — so reading `stdout` while ignoring `status` reproduces the
+  captured-emptiness false-green exactly.
+  **Un-retiring the gate is not the close** — its corpus is `check-*.sh` and it cannot parse a
+  Rust module either way, so the disposition stands on its own terms. What is unheld is the
+  *property*, currently carried by review plus a port-time parity scenario, neither of which
+  survives the next edit to the module.
+  **Deliverable:** a crate-side unit test asserting that every `std::process::Command`
+  construction under `native/src/gates/` is followed by a status check — the same shape as
+  `walk.rs`'s existing test asserting a spelling roster absent from every module outside its
+  own, and it would live beside it. The fuller close is a typed wrapper the gate modules must
+  call instead of `Command` directly, which makes the defect unrepresentable again and is what
+  the retired row's ground actually claims; that is new shared crate mechanism, outside what
+  the queue-kit cohort needed.
+  **Why it rides this cohort:** the port's whole case rests on the conservation table being
+  exhaustive, and this was the **second** row the queue-kit cohort found whose stated ground was
+  wider than the truth — the first being the held members' eligibility framing. Each ported gate
+  that shells out re-buys the same unheld property with nothing accumulating, and **four of the
+  eleven canon-kit members ruled into this iteration spawn git** (`check-docs-cmd`,
+  `check-tracking-claim`, `check-spec-pointer`, `check-md-refs`), so the re-buy is immediate
+  rather than eventual. Debt, not a feature: the deliverable converges the crate onto a property
+  gate-sdk/SPEC.md's conservation table already claims, adding no governed name.
+  Filed 2026-08-12 by close, draining the bullet build filed at batch 2; promoted 2026-08-12 at
+  scope on the operator's cohort ruling.
+
+## Deferred
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -749,56 +834,6 @@
   now documents but does not enforce.
   Filed 2026-07-26 by close (`activation-path`), generalizing the
   knowledge-friction captures that surfaced the replace-vs-extend semantics.
-
-- **spec-measured-count-gate** [design-pending] — a **measured count or extent claim
-  authored into governed prose goes stale with no oracle**.
-  recurrence: spec-measured-count-gate 2026-08-09 2026-08-11
-  **Thirteen instances. Three before 2026-08-09:** the align audit found
-  `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six; the
-  tree carried eight); and a third landed in a **binding shim**, `.claude/commands/close.md`'s
-  release-policy slot deriving a bump off the note's "two sections" where the cited owner
-  fixes three. Each was corrected by hand — the Enforcement-first shape the doctrine bars.
-  **Gap generalization — the check class that should have caught them.** `check-prose-enum`
-  reads governed-set membership, not numerals; `check-spec-derivable-section` reads
-  fenced-dump density; `check-shim-restatement` holds *copy shape*, and a restatement that
-  is **wrong** has diverged from its owner's wording, which is what makes it not a copy. So
-  the scanner must range over SPEC sections and binding shims alike.
-  **Widened 2026-08-09 (`install-profile-seam`): five more in one iteration, split by whether
-  a cardinal-based scanner reaches them. Three do** — nine gate-name lists that were seven, a
-  "sole call site" that was two, seven marker hits that were eight. **Two do not, carrying no
-  cardinal at all:** a five-line finding generalized to a whole-file claim, and an audit
-  stamping "the kit SPECs came back clean" over a SPEC holding two counter-instances. Those
-  are *extent* claims, stated wider than the measurement behind them.
-  **Four more 2026-08-09 (`prose-profile-activation`), all cardinal-axis, and the density is now
-  the argument.** A pointer count of 1774 where the gate reports 902, sitting in a *cost field a
-  ranking scope reads*; "five deltas" over an amendment carrying six; a smoke-registration
-  "20 of 22" where it is 21; "the one on-surface queue-kit gate" where four are. Three were
-  caught by the align consistency audit, one reached a committed scope surface uncaught.
-  **In every one the ruling did not depend on the number** — so none reddened anything, which is
-  luck not design, and a human-scale read of six amendments is not a mechanism that scales.
-  **Answered: the unreachable axis is the one that costs.** Eleven instances were caught
-  downstream by hand at no cost beyond the re-measurement. The twelfth — an extent claim —
-  was caught by **nobody** for two iterations and shipped a false sentence into a published
-  SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
-  **Thirteenth, 2026-08-11:** a stale-count escalation itself carried one (98→90; it is 91).
-  **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
-  scope.** `canon-kit/checks/check-manifest-count.sh` bans bare cardinals over the governed
-  plurals in `CANON_KIT_COUNT_COLLECTIONS` (corrected 2026-08-12; the knob named here before
-  did not exist), so a `couples=` widening — its globs never reach `.claude/commands/*.md` —
-  plus an override looked like a discharge. It cannot be: banning cardinals cannot reach a
-  claim carrying none.
-  **Why `[design-pending]`:** the false-positive surface *is* the design. "Bare cardinal near
-  a roster noun" over-matches legitimate prose ("the four contracts", "both halves"); "extent
-  claim over a corpus" has no syntactic tell at all. Both instance sets argue for an opt-in
-  `measured:`-style marker the author applies over a scanner inferring intent — a smaller gate
-  bought with a larger authoring contract, and that trade is the unit's to rule.
-  **Cost while deferred:** compounding and silent — this recurs at **every amendment that
-  measures the tree**, the failure mode is a canonical doc asserting a false number, and
-  detection is by hand at align if at all — itself a survivorship claim about the *caught* set.
-  The session-act half is `audit-class-corpus-attestation`, deliberately not folded in: it
-  designs a **stamp** obliging a sweep to record the corpus it read; this designs a
-  **scanner** over authored prose.
-  Filed 2026-07-26 by close (`release-path-hardening`); roughly one small unit.
 
 - **gate-battery-parallel-execution** [design-pending] — `run-gates.sh` runs the battery
   serially: no `xargs`, no `&`, no `wait`. Measured after the spawn-hoist unit
@@ -4659,32 +4694,6 @@
   which is the failure mode criterion 7 exists to prevent — designed first, then ported, never
   ported and patched.
   Filed 2026-08-12 by close, draining the two hold bullets build filed.
-
-- **crate-ci-arm-unheld-at-commit-time** [design-pending] — nothing runs the crate's test or
-  lint arms at commit time, and a green battery reads as if something did.
-  `.github/workflows/gates.yml` runs `cargo clippy --release -D warnings` and `cargo test
-  --release` on every push, but `scripts/gates.list` has no member that runs either and
-  `gate-sdk/bin/build-native.sh` only builds. CLAUDE.md states the asymmetry in one direction
-  only ("`cargo test` does not discharge `build-native.sh`") and nothing states the other, so a
-  contributor who runs the full battery **plus** `build-native.sh` has satisfied every
-  documented commit-time obligation and can still push a red CI.
-  **Attested, not hypothetical.** Verified in a detached worktree that both arms were already
-  red at `af5b9ffd` — a commit accepted on a 100/100 battery. `cargo test` failed on the unit
-  test asserting every registry member declares the roots it walks, which panicked on the first
-  bridged member, so the machine-held half of the `check-reads-couples` conservation
-  disposition held nothing **for any member** while the conservation table still claimed it;
-  clippy failed on two findings in the same commit's new code.
-  **Deliverable:** register a gate running `clippy -D warnings` and `cargo test` over
-  `GATE_SDK_NATIVE_CRATE` when cargo is on PATH, tier=precommit, degrading to a declared skip
-  where cargo is absent — the same omit-and-declare shape criterion 5 rules for a missing
-  artifact — so it never blocks a consumer with no toolchain. The doc-only close is one
-  CLAUDE.md line, which is the shape Enforcement-first ranks below the gate.
-  **Cost while deferred:** the port lands member by member with its one machine-held read-set
-  assertion able to die silently, and the breakage surfaces at the iteration's single budgeted
-  push — the worst possible moment, on the largest commit. The defect found this way was
-  repaired at `9d94f834`; the missing enforcement is what this files.
-  Filed 2026-08-12 by close, draining the bullet build filed after the lead's verify set
-  proved incomplete.
 
 - **scratch-citation-skill-surface-reach** [design-pending] — the permanent-surface class most
   likely to carry stage-owned pointers is the one `check-scratch-citation` does not scan.
