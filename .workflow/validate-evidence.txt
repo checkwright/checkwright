@@ -1,5 +1,5 @@
 # contract: evidence-manifest v1
-native-cohort-canon-kit gates sha256=a3698b16a211508054b7d2ee9296bb0a7361b49b9ed962903ee453712df0f606 pass=103 fail=0 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit gates sha256=d2f98990031c20883e97d959ff1c73e4908485bcac6832200dd0f89a794b34b8 pass=103 fail=0 ignore=0 verdict=clean 2026-08-12
 native-cohort-canon-kit gate_sdk sha256=2629c8d5292efbb4ef236626cbfc7fc5c4261a47e8bc1bcc1a3b9ef66b2ec0b4 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
 native-cohort-canon-kit canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
 native-cohort-canon-kit context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
@@ -16,10 +16,10 @@ native-cohort-canon-kit usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33a
 native-cohort-canon-kit budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
 native-cohort-canon-kit dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
 native-cohort-canon-kit trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
-native-cohort-canon-kit demo sha256=057179a5d719e9e2ebc2091f7c007b656cb899b9f04723654a4604c52a1fc506 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
-native-cohort-canon-kit installer_smoke sha256=5e7a16410bb07ce5147d57a31f46d4219732ef0b85b004cefb9870d5f9ab8cf5 pass=0 fail=1 ignore=0 verdict=new-failures 2026-08-12
-native-cohort-canon-kit consumer_smoke sha256=de40657288f712ee611ee41a77267191f4361c0a9f6d9f0995b26bf15d801be3 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
-native-cohort-canon-kit upgrade sha256=20006314e0c0d096b2efd074e9d33b6590f52a8d80fd0de65194f94f3eaf7685 pass=0 fail=1 ignore=0 verdict=clean 2026-08-12
-native-cohort-canon-kit agents_md_smoke sha256=5733945ad62d85c0e9761733feeb6332371717301391b94690c33d533d04b876 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit demo sha256=44add34c3c052a890ae2f20bf41288a8399f505daf10cbff48b1b7cac21aa1db pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit installer_smoke sha256=5e2564a6b75a8cc9888351361c17acd3d62bd7c892f8f97f6331161935c9108a pass=0 fail=1 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit consumer_smoke sha256=893f9d14e394abf6fa9a1d096895f9d9810e799749169e194860b09b68205497 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit upgrade sha256=f18f8c0f24210d3374196513e8bc8779101e9b6ae415a7a3fde1aba6cf84f757 pass=0 fail=1 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit agents_md_smoke sha256=73de5cafc85ce9fe8bd0426b66a7f0a6deaf3eb2d8cb55683a5baf5864476c01 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
 native-cohort-canon-kit index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
-native-cohort-canon-kit native_crate sha256=7003c8e1ed55a06152d525f8db05bc7379678e87024caf3e85ac61e1701d44b8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
+native-cohort-canon-kit native_crate sha256=414673fa9fc0efa28b21fc9acfe8ccd25f9e5a11b64a433422bf4eef855040f1 pass=1 fail=0 ignore=0 verdict=clean 2026-08-12
