@@ -226,8 +226,19 @@ three ported members call `proc::run`** rather than constructing a `Command`, an
 a crate unit test holds that over every module under `native/src/gates/`. They
 port after it, which is what kept three new spawn sites from being written against
 the defective shape first and repaired second — and the held member is a fourth
-that will need it, which is why the landed shape was sized past this cohort rather
-than to it.
+that will need it, which is why the **ban and the single-spawn-site discipline**
+were sized past this cohort rather than to it.
+
+**The accessor set was not, and reading this delta as "the substrate is complete"
+is the error it now forecloses.** `run()` and `stdout()` are the whole shipped
+API, minimal because `-D dead-code` rejected the speculative accessors that were
+written beside them. A member needing something they do not carry — this cohort's
+`check-docs-cmd` needs `git grep`'s exit *code*, where 1 is no-match and ≥2 is an
+error — **widens `proc.rs`**, and that is the sanctioned move rather than a
+symptom of an under-built substrate: the ban test's own failure message prescribes
+it in those words (*"widen proc.rs if the call needs something proc::run does not
+carry"*). Constructing a `Command` in the gate module to get around it is what the
+ban exists to stop.
 
 ### The four substrate-sensitive members
 
