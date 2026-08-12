@@ -23,7 +23,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-md-refs.sh"
 
 fails=0
 
@@ -46,7 +45,7 @@ check_case() {  # $1=label $2=origin $3=link $4=want-rc $5=want-substring $6..=e
     local label="$1" origin="$2" link="$3" want="$4" sub="$5"; shift 5
     local sb out rc
     sb="$(make_repo "$origin" "$link")"
-    out="$(cd "$sb" && env "$@" "$GATE" doc.md 2>&1)"; rc=$?
+    out="$(cd "$sb" && gate_env "$@" && gate_run check-md-refs "$DIR/checks" doc.md 2>&1)"; rc=$?
     rm -rf "$sb"
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
@@ -105,7 +104,7 @@ git -C "$PRUNE_SB" add -A
 prune_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
     local label="$1" want="$2" sub="$3"; shift 3
     local out rc
-    out="$(cd "$PRUNE_SB" && env "$@" "$GATE" 2>&1)"; rc=$?
+    out="$(cd "$PRUNE_SB" && gate_env "$@" && gate_run check-md-refs "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi

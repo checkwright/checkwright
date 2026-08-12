@@ -4,6 +4,7 @@
 mod gates;
 mod proc;
 mod queue;
+mod spec;
 mod walk;
 
 use std::process::exit;

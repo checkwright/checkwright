@@ -13,7 +13,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-tracking-claim.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -21,7 +20,7 @@ fails=0
 
 check_case() {  # $1=label  $2=dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$("$GATE" "$2" 2>&1)"; rc=$?
+    out="$(gate_run check-tracking-claim "$DIR/checks" "$2" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

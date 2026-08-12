@@ -21,6 +21,13 @@ impl Completed {
             None
         }
     }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the exit code for a caller whose child
+    // grades its own outcome by it: `git grep` says 1 for no-match and ≥2 for an error, and
+    // folding both into `None` makes an unreadable corpus read as a clean one
+    pub fn code(&self) -> Option<i32> {
+        self.status.code()
+    }
 }
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `Err` is a *spawn* failure and nothing

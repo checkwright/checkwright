@@ -515,3 +515,23 @@ if [[ ${#_sk_errs[@]} -gt 0 ]]; then
     exit 2
 fi
 unset _sk_errs
+
+# spec: canon-kit/SPEC.md §lib/spec.sh — the emitter-backed vocabularies as bridgeable
+# variables, so a compiled member receives the consumer command's *output* and never spawns
+# an interpreter to read consumer config
+# spec: gate-sdk/SPEC.md §lib/gate.sh — index-aligned arrays because the wire format's own
+# separator is the tab, and gated on GATE_SDK_RESOLVING_KNOB because resolution runs a
+# subprocess and this library is sourced once per declared knob per gate
+declare -p CANON_KIT_ENUM_SET_NAMES &>/dev/null   || CANON_KIT_ENUM_SET_NAMES=()
+declare -p CANON_KIT_ENUM_SET_MEMBERS &>/dev/null || CANON_KIT_ENUM_SET_MEMBERS=()
+if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_ENUM_SET_NAMES \
+   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_ENUM_SET_MEMBERS ]] \
+   && [[ -n "$CANON_KIT_ENUM_SETS_CMD" ]]; then
+    _sk_sets="$(spec_enum_sets)" || exit 2
+    while IFS=$'\t' read -r _sk_n _sk_m; do
+        [[ -n "$_sk_n" ]] || continue
+        CANON_KIT_ENUM_SET_NAMES+=("$_sk_n")
+        CANON_KIT_ENUM_SET_MEMBERS+=("$_sk_m")
+    done <<<"$_sk_sets"
+    unset _sk_sets _sk_n _sk_m
+fi

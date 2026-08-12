@@ -126,13 +126,28 @@ reproduced, not tidied.
 [design-bearing] The shell function (`gate-sdk/lib/gate.sh:237-254`) returns the
 `GATE_SDK_KIT_DIRS` override when set, else the gate-sdk root plus every sibling
 directory holding a `checks/` or `smoke/` — that pair being the predicate that
-makes a directory a kit. The Rust form takes the override across the existing
-config bridge as an ordinary bridged knob, which discharges criterion 6 in its
-strongest form (§The port-candidate criteria: for a bridged knob *"the duplication
-is not machine-held, it is absent"*), and derives the fallback by the same
-predicate. It lives in `walk.rs` beside `find_files`/`glob_files`, not in a gate
-module, because it enumerates directories and unit test B reds a filesystem-walk
-API named outside that module (`walk.rs:381-407`).
+makes a directory a kit. The bridge carries the **resolved root set**, discharging
+criterion 6 in its strongest form (§The port-candidate criteria: for a bridged knob
+*"the duplication is not machine-held, it is absent"*).
+
+**Bridging the override instead, and deriving the fallback binary-side, is not
+available — probed at build rather than assumed.** Two independent reasons: the
+override `GATE_SDK_KIT_DIRS` is an *environment* knob no kit library assigns, so
+`_gate_knob_value`'s `declare -p` finds nothing after sourcing `gate-sdk/lib` and
+fail-closes at exit 2 for every tree that does not set it — which is every tree.
+And the fallback predicate is anchored at the **library's own location**
+(`gate_sdk_root` is `${BASH_SOURCE[0]%/*}/..`), which a binary the installer copies
+to an arbitrary path has no way to recover; a binary-side derivation would have to
+guess the vendored kits' parent directory. So `lib/gate.sh` resolves the set into
+two eager arrays beside `GATE_PRUNE_DIRS` — `GATE_KIT_ROOTS` (absolute, what the
+path-prefix prune in delta (2) compares against) and `GATE_KIT_ROOTS_REL` (the
+anchored spelling `check-knob-citation` and `check-docs-cmd` need) — and the binary
+interprets neither. Both are needed because the anchor rule that relates them is
+not recoverable from the absolute set once an override is in play.
+
+The Rust reader lives in `walk.rs` beside `find_files`/`glob_files`, not in a gate
+module, because the fallback's kit-root enumeration is a directory walk and unit
+test B reds a filesystem-walk API named outside that module (`walk.rs:381-407`).
 
 **(2) `_spec_prune_kit_roots`'s path-prefix semantics port with it.**
 [design-bearing] Distinct work from (1) and easy to fold in by mistake:
@@ -185,6 +200,21 @@ The verdicts in the table are the shell's current behavior, written down to make
 the cells legible; the oracle itself stays **differential**, so a divergence
 surfaces as a byte difference between the two implementations rather than as a
 hand-maintained expectation that could itself go stale.
+
+**One qualification the differential carries on this branch, and it is a
+difference the port takes deliberately.** The default walk's three `gate_find`
+calls emit in `find(1)`'s readdir order, which is a filesystem artifact rather
+than a rule: the same tree on another filesystem gives another order. The Rust
+walk sorts, as `walk::find_files` already does for the landed cohort, so its
+output is reproducible. Every member that reaches its corpus through
+`… | sort -u` is therefore byte-identical on this branch as on the others, and
+the single member that prints its corpus unsorted —
+`check-spec-fence-balance`, whose bad-file list is emitted in derivation order —
+is **set-identical with a different line order**. The differential asserts that
+explicitly rather than normalising it away: exit codes compare strictly, output
+compares strictly, and only that one member is compared as a set, so an ordering
+artifact can never mask a corpus difference. No rule reads the order, and the
+explicit-glob branch this repo actually runs is unaffected.
 
 This is the constructed-scenario form criterion 2 already sanctions for a
 member whose state has no static representation, applied here to a *branch* rather

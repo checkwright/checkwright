@@ -12,7 +12,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-prose-enum.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -21,7 +20,7 @@ fails=0
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
     local label="$1" want="$2" sub="$3"; shift 3
     local out rc
-    out="$(cd "$SANDBOX" && env "$@" "$GATE" 2>&1)"; rc=$?
+    out="$(cd "$SANDBOX" && gate_env "$@" && gate_run check-prose-enum "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -88,7 +87,8 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 The colors red, green are complete; the signals alpha, beta drop one.
 EOF
 check_case "multiset-only-drifted-trips" 1 "set 'sig' lists 2 of 3" CANON_KIT_CONFIG_FILE="$SANDBOX/two.sh"
-out="$(cd "$SANDBOX" && env CANON_KIT_CONFIG_FILE="$SANDBOX/two.sh" "$GATE" 2>&1)"
+out="$(cd "$SANDBOX" && gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/two.sh" \
+    && gate_run check-prose-enum "$DIR/checks" 2>&1)"
 if grep -qF -- "set 'col'" <<<"$out"; then
     echo "  FAIL [multiset-complete-quiet]: the complete 'col' set was flagged:"
     printf '    %s\n' "$out"; fails=$((fails + 1))

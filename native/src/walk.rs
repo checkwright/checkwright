@@ -19,10 +19,80 @@ pub fn prune_dirs() -> Result<Vec<String>, String> {
     Ok(raw.split('\t').map(String::from).collect())
 }
 
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the bridged read of one tab-joined array knob,
+// the shape `prune_dirs` above has; an absent variable is an error because the crate holds
+// no default for a bridged knob, and an empty one is a resolved-empty set.
+fn bridged_array(knob: &str) -> Result<Vec<String>, String> {
+    let var = format!("GATE_SDK_KNOB_{}", knob);
+    let raw = std::env::var(&var).map_err(|_| {
+        format!(
+            "{} is unset — the gate was invoked without the config bridge gate_command \
+             emits, so {} could not be resolved",
+            var, knob
+        )
+    })?;
+    if raw.is_empty() {
+        return Ok(Vec::new());
+    }
+    Ok(raw.split('\t').map(String::from).collect())
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — the binary side of `gate_kit_roots`: transported,
+// never re-derived, because the fallback predicate is anchored at the shell library's own
+// location and a binary the installer copies elsewhere cannot recover it
+pub fn kit_roots() -> Result<Vec<String>, String> {
+    bridged_array("GATE_KIT_ROOTS_HERE")
+}
+
+// spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_kit_roots_rel`'s value, bridged rather than
+// derived from `kit_roots` above: the anchor relating the two spellings is not recoverable
+// from the absolute set once GATE_SDK_KIT_DIRS overrides it.
+pub fn kit_roots_rel() -> Result<Vec<String>, String> {
+    bridged_array("GATE_KIT_ROOTS_REL")
+}
+
+// spec: gate-sdk/SPEC.md §The port-candidate criteria — bash's `[[ str == pat ]]`: whole
+// string, no pathname semantics, so `*` and `?` cross `/`. `glob_files`' per-component
+// matcher is the pathname-expansion counterpart, and is a different rule from this one.
+pub fn pattern_match(pat: &str, s: &str) -> bool {
+    glob_here(pat.as_bytes(), s.as_bytes())
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the walk `gate_find <root> -name <n> -type f`
+// performs, for a finder selecting by whole filename rather than by extension
+pub fn find_named(root: &Path, names: &[&str]) -> Result<Vec<PathBuf>, String> {
+    let all = find_any(root)?;
+    Ok(all
+        .into_iter()
+        .filter(|p| {
+            p.file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| names.contains(&n))
+                .unwrap_or(false)
+        })
+        .collect())
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a directory that cannot be read is
 // an error the caller must surface, never a silently smaller corpus: an unreadable
 // tree reported as clean is the vacuity the substrate port exists not to introduce.
 pub fn find_files(root: &Path, exts: &[&str]) -> Result<Vec<PathBuf>, String> {
+    let all = find_any(root)?;
+    Ok(all
+        .into_iter()
+        .filter(|p| {
+            p.extension()
+                .and_then(|e| e.to_str())
+                .map(|e| exts.contains(&e))
+                .unwrap_or(false)
+        })
+        .collect())
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the pruned walk itself, with no selection:
+// the extension filter and the filename filter are both applied by their callers above, so
+// one traversal serves both and the recorder still observes every walk at one line.
+fn find_any(root: &Path) -> Result<Vec<PathBuf>, String> {
     // spec: gate-sdk/SPEC.md §check-reads-couples — every walk passes here, so recording at
     // this one line is what makes unit test A's observation complete.
     #[cfg(test)]
@@ -52,11 +122,7 @@ pub fn find_files(root: &Path, exts: &[&str]) -> Result<Vec<PathBuf>, String> {
                 }
                 stack.push(p);
             } else if meta.is_file() {
-                if let Some(ext) = p.extension().and_then(|e| e.to_str()) {
-                    if exts.contains(&ext) {
-                        out.push(p);
-                    }
-                }
+                out.push(p);
             }
         }
     }

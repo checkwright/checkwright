@@ -2,14 +2,21 @@
 // subcommand name is the gate name, so no mapping table exists to drift
 pub mod action_gh_repo;
 pub mod action_pinning;
+pub mod docs_cmd;
+pub mod knob_citation;
+pub mod manifest_count;
+pub mod md_refs;
+pub mod prose_enum;
 pub mod queue_entry_budget;
 pub mod queue_hygiene;
 pub mod queue_sections;
 pub mod queue_slug_liveness;
 pub mod queue_wrap;
+pub mod spec_fence_balance;
 pub mod tag_lead_line;
 pub mod task_conservation;
 pub mod task_names;
+pub mod tracking_claim;
 
 pub type GateFn = fn(&[String]) -> i32;
 
@@ -108,6 +115,129 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_DONE_SECTION",
+        ],
+    ),
+    // spec: canon-kit/SPEC.md §lib/spec.sh — the canon-kit cohort's members all derive their
+    // corpus from `spec::manifest_files`, so each declares that derivation's whole knob set
+    // beside its own: the bridge carries what the shared derivation reads, not what the
+    // member's own rule reads.
+    (
+        "check-manifest-count",
+        manifest_count::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_COUNT_COLLECTIONS",
+            "CANON_KIT_COUNT_WEDGE_WORDS",
+            "CANON_KIT_COUNT_ALLOWED_PHRASES",
+        ],
+    ),
+    // spec: canon-kit/SPEC.md §check-prose-enum — the vocabulary is a bridged *value*, two
+    // index-aligned arrays because the wire format's own separator is the tab; the command
+    // knob rides too, telling "none configured" from "configured, declared nothing"
+    (
+        "check-prose-enum",
+        prose_enum::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_ENUM_SETS_CMD",
+            "CANON_KIT_ENUM_SET_NAMES",
+            "CANON_KIT_ENUM_SET_MEMBERS",
+        ],
+    ),
+    // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — a
+    // substrate-sensitive member by reverse trigger only: its `couples=` reaches gate
+    // declaration paths, but the corpus it scans is the governed-doc set
+    (
+        "check-docs-cmd",
+        docs_cmd::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_KIT_ROOTS_REL",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_MDREF_EXCLUDE",
+        ],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for the reason spelled out at
+    // check-spec-fence-balance below: the walk root does not bound the read set
+    (
+        "check-md-refs",
+        md_refs::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_MDREF_EXCLUDE",
+            "CANON_KIT_DOCS_BLOB_REF",
+        ],
+    ),
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a git-spawning member, reaching its
+    // child through `proc::run` alone
+    (
+        "check-tracking-claim",
+        tracking_claim::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+        ],
+    ),
+    // spec: canon-kit/SPEC.md §check-knob-citation — the second consumer of the kit-root
+    // mechanism inside this cohort: it calls it directly for its prefix roster, not only
+    // through the manifest derivation, which is why the Rust form is a shared function
+    (
+        "check-knob-citation",
+        knob_citation::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_KIT_ROOTS_REL",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+        ],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` rather than the literal `.` the walk
+    // starts from: a concrete root asserts the member's `couples=` covers every tracked file
+    // under it, and these members read a filtered subset the root does not bound
+    (
+        "check-spec-fence-balance",
+        spec_fence_balance::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_QUEUE_FILE",
         ],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's

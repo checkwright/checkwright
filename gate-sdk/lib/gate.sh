@@ -94,6 +94,7 @@ gate_resolve() {
 }
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the owning kit of a bridged knob, derived from the knob's own `<KIT>_` prefix rather than from a maintained knob→kit roster: each gate_kit_roots member's basename, hyphens to underscores and upper-cased, is tried as a prefix. A knob matching no other kit's prefix is gate-sdk's own — the one kit every `.gate` dispatch already runs inside — never a parse error and never a third kit guessed at.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the configured set is consulted first, then the shipped one: GATE_SDK_KIT_DIRS narrows which kits a battery *scans*, and reading it as the set of kits that *exist* would leave a narrowed run unable to attribute another kit's knob and fail-close on every member that declares one
 _gate_knob_owning_kit() {
     local knob="$1" kit base prefix
     while IFS= read -r kit; do
@@ -102,7 +103,7 @@ _gate_knob_owning_kit() {
         base="${kit##*/}"
         prefix="${base^^}"; prefix="${prefix//-/_}_"
         [[ "$knob" == "$prefix"* ]] && { printf '%s\n' "$kit"; return 0; }
-    done < <(gate_kit_roots)
+    done < <(gate_kit_roots; [[ -n "${GATE_SDK_KIT_DIRS:-}" ]] && _gate_kit_roots_derived)
     gate_sdk_root
 }
 
@@ -112,6 +113,10 @@ _gate_knob_value() {
     kit="$(_gate_knob_owning_kit "$knob")"
     (
         shopt -s nullglob
+        # spec: gate-sdk/SPEC.md §lib/gate.sh — the knob under resolution, published to the
+        # kit library being sourced, so a library whose knob costs a subprocess resolves
+        # that one rather than all of them on every source
+        export GATE_SDK_RESOLVING_KNOB="$knob"
         local _gkv_f
         for _gkv_f in "$kit"/lib/*.sh; do
             # shellcheck disable=SC1090  # the owning kit's library, resolved by prefix
@@ -234,13 +239,9 @@ gate_native_targets() {
     gates_list_members "$f"
 }
 
-gate_kit_roots() {
-    local d kit
-    if [[ -n "${GATE_SDK_KIT_DIRS:-}" ]]; then
-        for d in $GATE_SDK_KIT_DIRS; do printf '%s\n' "$d"; done
-        return 0
-    fi
-    local sdk parent
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the shipped kit set, by the checks/-or-smoke/ predicate alone: what a tree *contains*, before GATE_SDK_KIT_DIRS narrows what a battery scans
+_gate_kit_roots_derived() {
+    local d kit sdk parent
     sdk="$(gate_sdk_root)"
     printf '%s\n' "$sdk"
     parent="${sdk%/*}"
@@ -252,6 +253,30 @@ gate_kit_roots() {
     done
     return 0
 }
+
+gate_kit_roots() {
+    local d
+    if [[ -n "${GATE_SDK_KIT_DIRS:-}" ]]; then
+        for d in $GATE_SDK_KIT_DIRS; do printf '%s\n' "$d"; done
+        return 0
+    fi
+    _gate_kit_roots_derived
+}
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the resolved kit-root set as a bridgeable variable, the shape GATE_PRUNE_DIRS already has: GATE_SDK_KIT_DIRS is an override a consumer sets in the environment, so `declare -p` cannot find it and the config bridge cannot carry it. Resolving it here gives the value one computation serving both substrates, which is criterion 6's discharge-by-construction rather than a Rust twin of the predicate.
+# spec: gate-sdk/SPEC.md §lib/gate.sh — spelled relative to the *current directory*, because a bridged value is baked verbatim into the generated pre-commit hook: an absolute root would commit one machine's checkout path to a tracked file. Resolving each root against the invoking directory keeps the path-prefix comparison exact on the binary side while nothing environment-specific crosses.
+GATE_KIT_ROOTS_HERE=()
+while IFS= read -r _gkr; do
+    [[ -n "$_gkr" ]] || continue
+    if [[ "$_gkr" == "$PWD"/* ]]; then
+        GATE_KIT_ROOTS_HERE+=("${_gkr#"$PWD"/}")
+    elif [[ "$_gkr" == /* ]]; then
+        GATE_KIT_ROOTS_HERE+=("$(realpath --relative-to="$PWD" "$_gkr" 2>/dev/null || printf '%s' "$_gkr")")
+    else
+        GATE_KIT_ROOTS_HERE+=("$_gkr")
+    fi
+done < <(gate_kit_roots)
+unset _gkr
 
 gate_check_dirs() {
     gate_sdk_gates_dir
@@ -284,7 +309,12 @@ _gate_kit_roots_rel_ensure_cache() {
     anchor="${GATE_SDK_ROOT:-$(gate_sdk_root)}"; anchor="${anchor%/*}"
     _gate_kit_roots_rel_cache=()
     while IFS= read -r root; do
-        if [[ "$root" == /* ]]; then
+        # spec: gate-sdk/SPEC.md §lib/gate.sh — a root already under the anchor is the
+        # common case and its relative form is the string remainder, so the realpath fork
+        # is paid only for the exotic root that is not
+        if [[ "$root" == "$anchor"/* ]]; then
+            root="${root#"$anchor"/}"
+        elif [[ "$root" == /* ]]; then
             root="$(realpath --relative-to="$anchor" "$root" 2>/dev/null || printf '%s' "$root")"
         fi
         _gate_kit_roots_rel_cache+=("$root")
@@ -297,6 +327,11 @@ gate_kit_roots_rel() {
     _gate_kit_roots_rel_ensure_cache
     printf '%s\n' "${_gate_kit_roots_rel_cache[@]}"
 }
+
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the anchored spelling as a bridgeable variable, GATE_KIT_ROOTS' counterpart: a binary-side member needing repo-relative roots (a pathspec, a knob-prefix owner) reads this rather than re-deriving the anchor rule, which an override makes underivable from the absolute set alone
+_gate_kit_roots_rel_ensure_cache
+# shellcheck disable=SC2034  # read across the dispatch seam, never in this shell: the config bridge resolves it by name for a member that declares it
+GATE_KIT_ROOTS_REL=("${_gate_kit_roots_rel_cache[@]}")
 
 # spec: gate-sdk/SPEC.md §check-graph — expand each kit:<glob> token in a comma-joined couples/trigger field to <kit-root>/<glob> for every gate_kit_roots_rel member; non-kit tokens pass through verbatim. Assigns into the caller's <outvar> by nameref rather than printing, so a per-manifest-line loop calls this directly (no `$(...)` fork) and the whole loop shares one _gate_kit_roots_rel_ensure_cache fill instead of paying it — and forking — once per line. gate_expand_couples below is the same expansion for a caller that still wants the stdout form.
 gate_expand_couples_var() {

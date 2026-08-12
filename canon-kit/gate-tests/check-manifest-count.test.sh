@@ -18,7 +18,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-manifest-count.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -40,7 +39,7 @@ EOF
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
     local label="$1" want="$2" sub="$3"; shift 3
     local out rc
-    out="$(cd "$SANDBOX" && env "$@" "$GATE" 2>&1)"; rc=$?
+    out="$(cd "$SANDBOX" && gate_env "$@" && gate_run check-manifest-count "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -55,7 +54,8 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
 # on the growing total and its message never names the allowlisted phrase.
 check_case "governed-noun-trips" 1 "six contracts" CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
 
-out="$(cd "$SANDBOX" && env CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" "$GATE" 2>&1)"
+out="$(cd "$SANDBOX" && gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" \
+    && gate_run check-manifest-count "$DIR/checks" 2>&1)"
 if grep -qF -- "four contracts" <<<"$out"; then
     echo "  FAIL [allowlist-exempt]: allowlisted 'the four contracts' was flagged:"
     printf '    %s\n' "$out"; fails=$((fails + 1))
@@ -76,7 +76,7 @@ Prose that pins a total across the
 wrap: this suite ships two
 governed gates today.
 EOF
-out="$(cd "$SANDBOX/wrap" && "$GATE" 2>&1)"; rc=$?
+out="$(cd "$SANDBOX/wrap" && gate_run check-manifest-count "$DIR/checks" 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL [wrap-flagged]: want exit 1, got $rc -- $out"; fails=$((fails + 1))
 elif ! grep -qF -- "SPEC.md:4  restated collection total: two" <<<"$out"; then

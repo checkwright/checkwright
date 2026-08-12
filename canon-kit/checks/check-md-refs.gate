@@ -1,0 +1,3 @@
+# graph: couples=*SPEC*.md,*README.md,CLAUDE.md dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-md-refs — every internal markdown link in the governed doc set resolves (relative path to a tracked file/dir, #anchor to a heading slug)
