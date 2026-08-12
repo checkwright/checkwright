@@ -4,3 +4,4 @@ check-install-disposition
 check-gate-output
 check-scratch-citation
 check-doctrine-registration
+check-task-conservation

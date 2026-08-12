@@ -156,43 +156,6 @@
 
 ## Technical Debt
 
-- **gate-subprocess-fail-closed-unheld** — the conservation table retires
-  `check-gate-fail-closed` for ported members, and no mechanism holds the property for one
-  that spawns a subprocess.
-  gate-sdk/SPEC.md's conservation table retires the gate for `.gate`-dispatched members because
-  the defect is *"unrepresentable once a fallible call returns a `Result` that cannot be
-  ignored"*. The queue-kit cohort narrowed the **ground** rather than the disposition: that is
-  genuinely true for a file-reading member, but `check-task-conservation` is the first ported
-  gate to spawn a process, and for `Command::output()` an `Ok` means the **spawn** succeeded,
-  not that git did — so reading `stdout` while ignoring `status` reproduces the
-  captured-emptiness false-green exactly.
-  **Un-retiring the gate is not the close** — its corpus is `check-*.sh` and it cannot parse a
-  Rust module either way, so the disposition stands on its own terms. What is unheld is the
-  *property*, currently carried by review plus a port-time parity scenario, neither of which
-  survives the next edit to the module.
-  **Deliverable:** a crate-side unit test asserting that every `std::process::Command`
-  construction under `native/src/gates/` is followed by a status check — the same shape as
-  `walk.rs`'s existing test asserting a spelling roster absent from every module outside its
-  own, and it would live beside it. The fuller close is a typed wrapper the gate modules must
-  call instead of `Command` directly, which makes the defect unrepresentable again and is what
-  the retired row's ground actually claims; that is new shared crate mechanism, outside what
-  the queue-kit cohort needed.
-  **Why it rides this cohort:** the port's whole case rests on the conservation table being
-  exhaustive, and this was the **second** row the queue-kit cohort found whose stated ground was
-  wider than the truth — the first being the held members' eligibility framing. Each ported gate
-  that shells out re-buys the same unheld property with nothing accumulating, and **three of the
-  eleven canon-kit members ported this iteration spawn git** (`check-docs-cmd`,
-  `check-tracking-claim`, `check-md-refs`), so the re-buy is immediate rather than eventual.
-  [Corrected 2026-08-12 at align: the count read four here, folding in `check-spec-pointer` as an
-  immediate re-buyer. SPEC-canon-cohort.md delta (10) holds that member on shell this iteration
-  (criterion 6), so it is a fourth git-spawning caller but a **future** consumer of the
-  deliverable, not a current one — "the held member is a fourth that will need it," in the
-  amendment's own words. What it owes is tracked on `cohort-held-members-port-prerequisites`,
-  not re-bought here.] Debt, not a feature: the deliverable converges the crate onto a property
-  gate-sdk/SPEC.md's conservation table already claims, adding no governed name.
-  Filed 2026-08-12 by close, draining the bullet build filed at batch 2; promoted 2026-08-12 at
-  scope on the operator's cohort ruling.
-
 ## Deferred
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
@@ -5046,5 +5009,7 @@
 - **scratch-execution-allowlist-bar** [design-pending] — Each close re-derives this standing bar.
 
 ## Done
+
+- gate-subprocess-fail-closed-unheld
 
 ## Lessons Learned

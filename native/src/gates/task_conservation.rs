@@ -1,18 +1,14 @@
 // spec: queue-kit/SPEC.md §check-task-conservation — every live slug present at HEAD is still
 // present (live or done) in the working tree; the absence class diff-review misses
+use crate::proc;
 use crate::queue;
 use std::collections::HashSet;
-use std::process::Command;
 
-// spec: gate-sdk/SPEC.md §Fail-closed contract — `Ok` from `output()` means the spawn
-// succeeded, never that git did, so the branch keys on the exit status: this is the one shape
-// in which the captured-emptiness false-green survives the port to a compiled substrate
-fn git_capture(args: &[&str]) -> Option<Vec<u8>> {
-    let out = Command::new("git").args(args).output().ok()?;
-    if !out.status.success() {
-        return None;
-    }
-    Some(out.stdout)
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the two failures stay apart: a git that
+// could not be spawned is `Err` and reaches the caller's exit 2, while `Ok(None)` is a git
+// that ran and said no. Folding them is how "no repository" comes to mean "no git".
+fn git_capture(args: &[&str]) -> Result<Option<Vec<u8>>, String> {
+    Ok(proc::run("git", args)?.stdout().map(<[u8]>::to_vec))
 }
 
 // spec: queue-kit/SPEC.md §check-task-conservation — the rule itself, taken apart from git so
@@ -52,14 +48,25 @@ pub fn run(args: &[String]) -> i32 {
         },
     };
 
-    if git_capture(&["rev-parse", "--git-dir"]).is_none() {
-        println!("TASK-CONSERVATION: clean (no git repository — no HEAD baseline to compare)");
-        return 0;
+    match git_capture(&["rev-parse", "--git-dir"]) {
+        Err(e) => {
+            eprintln!("check-task-conservation: {}", e);
+            return 2;
+        }
+        Ok(None) => {
+            println!("TASK-CONSERVATION: clean (no git repository — no HEAD baseline to compare)");
+            return 0;
+        }
+        Ok(Some(_)) => {}
     }
 
     let head = match git_capture(&["show", &format!("HEAD:{}", file)]) {
-        Some(b) => String::from_utf8_lossy(&b).into_owned(),
-        None => {
+        Err(e) => {
+            eprintln!("check-task-conservation: {}", e);
+            return 2;
+        }
+        Ok(Some(b)) => String::from_utf8_lossy(&b).into_owned(),
+        Ok(None) => {
             println!(
                 "TASK-CONSERVATION: clean ({} not at HEAD — no prior live slugs to conserve)",
                 file

@@ -330,6 +330,26 @@ above it. The helper itself is tested directly by
 `gate-tests/lib-gate.test.sh` (a per-gate input fixture cannot prove it — a
 well-formed `awk` cannot be crashed on present input).
 
+**On the binary substrate the defect is closed by construction, not by review.**
+A ported member spawns nothing itself: the crate's one spawn site is
+`native/src/proc.rs`, whose `run` returns `Err` for a **spawn** failure — in the
+same "could not run" words above — and a `Completed` otherwise, and `Completed`
+hands out stdout only through an accessor that has already read the exit status.
+So "capture `stdout`, ignore `status`" has no spelling, and a program that could
+not be run is an exit-2 refusal rather than an empty capture read as clean.
+The wrapper is proved the way the shell helper is, directly rather than through a
+member's fixture pair: unit tests over a spawn that never happened, a child that
+exited non-zero, and one that succeeded. A further test holds the routing — the
+`Command` spelling is asserted absent from every module under
+`native/src/gates/`, the roster shape §check-reads-couples' unit test B uses for
+filesystem walks — so each new spawning member inherits the property instead of
+re-buying it. That corpus is the gate modules and stops there: the `#[cfg(test)]`
+helpers bridging to the shell library from `walk.rs` and `main.rs` check their
+own status already, and pulling them in would make the production wrapper carry
+a cwd and an env nothing in production reads. Widening `proc.rs` is how a member
+that needs more of the child's result gets it; building its own `Command` is what
+the test refuses.
+
 ### Fixture-pair discipline
 
 When a gate is written or edited, it ships with — or updates — its
@@ -707,7 +727,7 @@ one recorded disposition below, and a member the section does not name is red.
 |---|---|
 | `check-shellcheck` | **Retired with cause** — no shell exists to lint. `cargo clippy` at deny-warnings is the substrate equivalent and runs in CI, not as a gate. |
 | `check-gate-output` | **Ported and strengthened for the fixtured corpus; source-grep retained for the one member outside it, over the corpus that member's rule now lives in.** The source-grep for `: clean`/`help:` was always a proxy for behavior; for the fixtured members the assertion now runs in `run-gate-tests.sh` (§run-gate-tests) against the case's real output, on **shell gates too**. The remaining member, `check-task-conservation` (`# no-fixture:` per queue-kit/SPEC.md §check-task-conservation — a HEAD-vs-worktree diff has no static-fixture representation), has no case for a runtime assertion to reach, so the source-grep stays its only oracle. Retiring the static half outright would zero out that member's output-contract coverage — the exact vacuity this table exists to close. **That member has since ported**, which is why this row is not "unchanged": its declaration path is now a descriptor, which by the closed field roster cannot hold the strings, so corpus *and* emitter alternation follow the rule to the implementation module, and a tree carrying no crate declares the member out of reach rather than reddening (§check-gate-output owns the resolution and its two branches). |
-| `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — but for a subprocess-spawning member the property is held by review and by the port's parity scenario rather than by a gate, and saying so is what keeps the retirement honest. The gap that would close it machine-side is filed rather than built. |
+| `check-gate-fail-closed` | **Retired with cause, and the cause is narrower than it first read.** For a member that reads files, the defect (branching on a captured value's emptiness when the subprocess died) is unrepresentable: there is no subprocess, and a fallible read returns a `Result` that cannot be ignored. A real substrate win, stated as one. **It is representable for a member that spawns one**, and the queue-kit cohort landed the first: `Command::output()` returning `Ok` means the *spawn* succeeded, never that the program did, so reading `stdout` while ignoring `status` reproduces the defect exactly. The disposition is unchanged — this gate's corpus is `check-*.sh` and it could not scan a Rust module either way — and the property is held crate-side rather than by review: the spawn wrapper and its unit tests (§Fail-closed contract) leave a gate module unable to construct a `Command` at all, and unable to reach stdout without the status having been read. Machine-held rather than remembered, which is the same answer the `check-reads-couples` row below gives to the same problem, and what keeps this retirement honest. |
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API or vendors a walker, because a direct walk would be invisible to the recorder and unverify A. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
