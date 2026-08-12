@@ -235,15 +235,17 @@ as a single commit.
   owned by delta (5).
 - **`.claude/settings.json`** and **`scripts/settings-pins.conf`** — owned by
   delta (4), one commit.
-- **context-kit/SPEC.md §check-settings-pins** — nothing changes. Its
+- **context-kit/SPEC.md §check-settings-pins** — nothing changes (delta 4). Its
   "this consumer's first pins hold the auto-memory-disabling keys" sentence
   remains true of the *first* pins and the section already states the mechanism
   is general. Recorded as a target considered and not claimed, so build does not
   adopt it as an orphan.
-- **CLAUDE.md §Agent execution** — nothing changes. It names the trigger, not the
-  doctrine's content, which is the load-trigger residency rule working correctly.
+- **CLAUDE.md §Agent execution** — nothing changes (deltas 1–3). It names the
+  trigger, not the doctrine's content, which is the load-trigger residency rule
+  working correctly.
 - **TASK-QUEUE.md** — the entry's body is rewritten at promotion rather than at
-  merge, because its recorded diagnosis is what a reader would otherwise act on.
+  merge (delta 6), because its recorded diagnosis is what a reader would
+  otherwise act on.
 
 ## Definition of Done
 

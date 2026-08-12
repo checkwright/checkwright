@@ -249,8 +249,9 @@ clears it by inspection.
 - **guard-kit/SPEC.md §The guard framework** — nothing changes; recorded here as
   a target *considered and not claimed*, because the guard's framework contract is
   untouched and only lifecycle-kit's instance's message text moves (delta 4).
-- **CLAUDE.md §Housekeeping** — nothing changes. The capture-affordance bullets
-  name the tools and their arguments, not their flag handling, and remain true.
+- **CLAUDE.md §Housekeeping** — nothing changes (delta 2). The capture-affordance
+  bullets name the tools and their arguments, not their flag handling, and remain
+  true.
 
 ## Definition of Done
 

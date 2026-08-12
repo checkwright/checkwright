@@ -193,16 +193,16 @@ causal-completeness check, point 5):
   gains the scope rule, the owner column, the fallback and its residual (deltas
   2–3); the "why those configurations are held in fixtures" paragraph gains the
   new bespoke case (delta 4); the clean-line description gains the two counts and
-  the fallback word.
+  the fallback word (delta 2).
 - **gate-sdk/SPEC.md §Consumer smoke** — the subset invocation is recorded as a
-  configuration the bespoke test now covers, so a later reader does not read the
-  smoke's silence on it as coverage.
+  configuration the bespoke test now covers (delta 4), so a later reader does not
+  read the smoke's silence on it as coverage.
 - **gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate** — the
   `check-gate-substrate-parity` row's *retained by construction* disposition is
-  unchanged and verified so; the new crate unit test is named beside the `--reads`
-  tests in the paragraph that states where they run.
+  unchanged and verified so; the new crate unit test (delta 3) is named beside the
+  `--reads` tests in the paragraph that states where they run.
 - **`native/src/main.rs`'s `--list` arm and `native/src/gates/mod.rs`'s registry**
-  are implementation, not spec surface, and are named here only as the delta's
+  are implementation, not spec surface, and are named here only as delta (3)'s
   producer.
 
 No section outside `gate-sdk/SPEC.md` changes. `consumer-smoke-subset-accounting-verdict`
