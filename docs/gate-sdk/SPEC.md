@@ -1225,6 +1225,39 @@ corpus through `sort -u` stays byte-identical; the one that prints its corpus
 unsorted is set-identical with a different line order, asserted as such rather
 than normalised away.
 
+**Seven of ten, and three more members are held on shell — the same sequencing,
+found the same way.** The cohort was ruled at ten on a design that removed the
+`bash` spawn from the three members reading a consumer-supplied *command*. That
+design reached only half the problem, and the other half was found at
+implementation:
+
+- **`check-install-claim`, `check-payload-claim` and `check-manifest-temporal` —
+  an ERE engine.** Each **interprets** a consumer-configured POSIX ERE rather
+  than transporting one: the first against `CANON_KIT_INSTALL_SECTION_RE` and one
+  pattern per transport, the second one pattern per disclosure class, the third
+  every `CANON_KIT_TEMPORAL_MARKERS` entry. Bridging the vocabulary as *data*
+  removes the interpreter the binary would have spawned; it does not remove the
+  regex the binary must then apply. The crate vendors nothing — asserted by
+  `native/src/walk.rs`'s own test, which fails the build on a non-empty
+  `[dependencies]` — so a port hand-writes the engine. Sizing one to this
+  consumer's patterns is **foreclosed** by the argument this section already
+  makes for `check-queue-prose-precondition` and criterion 6 makes for globs.
+  **Operator-ruled 2026-08-12 at build.**
+
+  `check-manifest-temporal` is worth naming separately, because every mechanical
+  screen puts it *in*: it clears criterion 4, spawns nothing, and reads its
+  corpus through the very derivation this cohort compiled. What stops it is that
+  its marker set is consumer config the rule applies as a pattern — and the
+  **shipped kit default** already carries an alternation, so the engine is
+  load-bearing for a consumer who overrides nothing at all. A cohort sized on
+  "clears criterion 4" would have taken it and discovered the engine mid-port,
+  which is the failure mode criterion 7 exists to prevent.
+
+These holds are sequencing rather than exclusion under the rule §The
+port-candidate criteria fixes and this section restates for the queue-kit pair
+above; what each owes is filed on `cohort-held-members-port-prerequisites`,
+where the ERE engine is now owed by four members rather than one.
+
 ### What the reverted port established
 
 Not nothing, and worth separating from what it broke:

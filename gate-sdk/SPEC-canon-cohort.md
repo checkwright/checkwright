@@ -8,6 +8,21 @@ designs that port. It does not restate the porting procedure
 (§Meta-gate conservation for the binary substrate), the criteria roster
 (§The port-candidate criteria), or the directive's grounds.
 
+**Seven delivered, and the arithmetic is a re-measurement rather than a
+narrowing of the ruling — twice over now.** The ruled cohort was ten (below);
+three of those ten were held at build, on a ground the design below states and
+then fails to apply to them. `check-install-claim`, `check-payload-claim` and
+`check-manifest-temporal` do not *transport* a consumer's config, they
+**interpret** it as a POSIX ERE — the condition §The first cohort already holds
+`check-queue-prose-precondition` on, and which delta (7) removes only the
+interpreter *spawn* for, never the regex the binary must still apply. Delta (5)
+below therefore mis-groups `check-manifest-temporal`: it is criterion-4-clear, as
+stated, and the error is equating criterion-4-clear with portable-now. **Held,
+not excluded, operator-ruled 2026-08-12 at build**; what the three owe is on
+`cohort-held-members-port-prerequisites`, where the engine is owed by four
+members rather than one. Read every "ten" below as the *ruled* cohort and every
+"six" in delta (5) as five.
+
 **Ten and not eleven, and the arithmetic is a re-measurement rather than a
 narrowing of the ruling.** What the operator ruled is the **selector** — the
 `spec_manifest_files` family, chosen by §The first cohort's own rule as the
@@ -223,8 +238,8 @@ executed.
 
 ### The ten members
 
-**(5) Port the six criterion-4-clear members.** [design-bearing]
-`check-manifest-count`, `check-manifest-temporal`, `check-knob-citation`,
+**(5) Port the criterion-4-clear members — five of the six, not six.**
+[design-bearing] `check-manifest-count`, `check-knob-citation`,
 `check-spec-fence-balance`, `check-tracking-claim`, `check-md-refs` — each becomes
 a module under `native/src/gates/` and a 4-tuple in `REGISTRY`, its `.sh` deleted
 and its `.gate` descriptor landed in one motion. Design-bearing: each rule is

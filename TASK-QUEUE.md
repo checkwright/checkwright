@@ -51,17 +51,28 @@
   **Cohort ruled 2026-08-12 by the operator: canon-kit's `spec_manifest_files` family** —
   selected by gate-sdk/SPEC.md §The first cohort's own rule, the largest set sharing
   one corpus derivation, rather than by kit, which that section names as re-importing paid work.
-  **Ten gates, re-measured 2026-08-12 at spec and operator-ruled the same day.** Eleven scripts
+  **Ten gates ruled 2026-08-12 at spec; seven delivered 2026-08-12 at build.** Eleven scripts
   call the derivation; `check-spec-pointer` fails criterion 6 and is **held, not excluded** —
   what it owes is on `cohort-held-members-port-prerequisites`. The 11 was scope's caller count,
   never a count of the ruled set.
+  **Three of the ten held at build, operator-ruled the same day, and the ground is the one
+  the amendment named and did not apply to them.** `check-install-claim`,
+  `check-payload-claim` and `check-manifest-temporal` **interpret** a consumer-configured
+  POSIX ERE rather than transporting one, so each owes the engine
+  `check-queue-prose-precondition` already owes — one payment for four, filed on
+  `cohort-held-members-port-prerequisites`. Bridging a vocabulary as data removes the
+  interpreter a compiled gate would spawn; it does not remove the regex it must then apply.
+  `check-manifest-temporal` is the one no mechanical screen catches: criterion-4-clear,
+  spawning nothing, and its marker set carries an alternation in the **shipped kit default**.
   Two further scope premises corrected at spec. **Criterion 4:** "all 11 clear criteria 4
   and 7" is wrong — five callers are substrate-sensitive (`check-spec-pointer`,
   `check-docs-cmd`, `check-prose-enum`, `check-install-claim`, `check-payload-claim`), so the
-  port hands assertion C four more members. **Three members spawn a consumer-supplied
+  port hands assertion C two more members, the two of those five that shipped.
+  **Three members spawn a consumer-supplied
   `bash -c`**, which no selection input recorded; floor-clear, objective-6-adverse, designed
-  away in the amendment. Three ported members spawn git, which is why
-  `gate-subprocess-fail-closed-unheld` rides the same iteration.
+  away in the amendment — correctly for `check-prose-enum`, which shipped, and only halfway
+  for the other two, which is what the build hold found. Three ported members spawn git, which
+  is why `gate-subprocess-fail-closed-unheld` rides the same iteration.
   **Owed mechanisms: one, not two.** The basename-glob matcher landed with the queue-kit
   cohort (`walk.rs`'s `glob_files` is component-wise and globstar-capable, in production via
   `queue_slug_liveness`), exactly as gate-sdk/SPEC.md §The first cohort already records; only
@@ -4621,54 +4632,53 @@
   answer rather than a red.
   Filed 2026-08-12 by close, draining the bullet align filed against the cohort amendment.
 
-- **cohort-held-members-port-prerequisites** [design-pending] — three gates are held on shell
+- **cohort-held-members-port-prerequisites** [design-pending] — six gates are held on shell
   by operator ruling, each owing a named prerequisite nothing else tracks.
   Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
   by denying the seven are an eligibility screen, and criterion 7's worked example
   (`check-action-run-shell` / `shellcheck`) names such a member the largest piece of port work
-  rather than a permitted exclusion. Both holds are recorded in canonical prose at
-  gate-sdk/SPEC.md §The first cohort; what no queue entry carries is the work owed.
-  **`check-roadmap-fresh` owes a criterion-7 design.** It runs `bash bin/roadmap.sh --emit`,
-  so the gate shells out to a kit shell script the port does not touch. Its fixture pair
-  cannot catch this — both `args` files pass `projection.txt emit.txt`, steering the assertion
-  off the live emitter onto pre-baked files, so a ported member's pair would go green over an
-  arm with no implementation. The three candidate designs are stated once, by their owner —
-  gate-sdk/SPEC.md §The first cohort — and are deliberately not repeated here; none is ruled.
+  rather than a permitted exclusion. Every hold **and its grounds** are canonical at
+  gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
+  stated there is cited here and never restated.
+  Re-measured 2026-08-12 at build: three, then six — the canon-kit cohort added its own trio,
+  and the count is the roster's, never a fixed number.
+  **`check-roadmap-fresh` owes a criterion-7 design.** It shells out to `bin/roadmap.sh
+  --emit`, a kit script the port does not touch, and its fixture pair steers off the live
+  emitter, so a ported member's pair would go green over an arm with no implementation. The
+  three candidate designs are stated once by their owner; none is ruled.
   Worth preserving in the design: the hold keeps
   `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the
   gate can never disagree" guarantee survives intact and is **not** part of the dual-
   implementation debt above.
-  **`check-queue-prose-precondition` owes a POSIX ERE engine.** `QUEUE_KIT_PRECONDITION_REGEX`
-  is consumer config carrying an arbitrary ERE the gate *interprets* rather than transports
-  across the knob bridge, and the same awk runs two `gsub`s with alternation, groups and
-  negated classes. The crate vendors nothing — asserted by `native/src/walk.rs`'s own test,
-  which fails the build on a non-empty `[dependencies]` — so a port hand-writes an ERE engine
-  plus awk `gsub` semantics. Sizing a subset to this repo's one configured regex is
-  **foreclosed, not merely dispreferred**: the same section makes exactly that argument for
-  globs, where a narrow reader would silently mis-scan the first consumer who writes one.
-  No other queue-kit member needs the engine.
-  **`check-spec-pointer` owes the `spec_comment_surface` family — held 2026-08-12 by the
-  operator at spec, on criterion 6.** Third held member, and the first from outside queue-kit.
-  canon-kit's `lib/spec.sh` carries **two** corpus primitives; the canon-kit cohort ports
-  `spec_manifest_files`, and `spec_comment_surface` stays shell with `check-comment-tier`,
-  `check-deprecation-task` and `check-todo-task-liveness`. `check-spec-pointer` is the only
-  member calling **both**, so porting it alone would leave the second primitive duplicated
-  across substrates with nothing holding the copies together — criterion 6's red condition,
-  not its discharge, since that primitive's inputs are not all bridged knobs.
-  **The work owed is a cohort, not a member:** port `check-spec-pointer` together with the
-  three other `spec_comment_surface` callers, so the second primitive ports once and is proved
-  four times — the shared-derivation economy gate-sdk/SPEC.md §The first cohort applies to
-  every cohort. Porting it alone re-imports work that cohort pays once; porting it with the
-  manifest family strands three shell callers against a Rust twin.
+  **A POSIX ERE engine is owed by four members, which makes it one payment for four.**
+  `check-queue-prose-precondition` (queue-kit), plus `check-install-claim`,
+  `check-payload-claim` and `check-manifest-temporal` (canon-kit, held 2026-08-12 at build):
+  each *interprets* consumer-configured EREs rather than transporting them. The crate vendors
+  nothing — asserted by `native/src/walk.rs`'s own test, which fails the build on a non-empty
+  `[dependencies]` — so a port hand-writes the engine. Build it in whichever cohort takes the
+  four, never per member: a member-at-a-time port pays once and re-imports three times. The
+  canon trio's vocabularies already cross the bridge as resolved data (canon-kit/SPEC.md
+  §lib/spec.sh), leaving the matcher alone.
+  **The four do not need the same surface, and that is the sizing risk.** `gsub` semantics are
+  the queue-kit member's alone — the canon trio only ever *tests* a pattern against a line, so
+  an engine sized to the trio ships without substitution and strands the fourth on the very
+  cohort meant to discharge it. Scope to the union, or the fourth does not port.
+  **`check-spec-pointer` owes the `spec_comment_surface` family** — held 2026-08-12 at spec on
+  criterion 6, as the only member calling both of canon-kit's corpus primitives.
+  **The work owed is a cohort, not a member:** port it with `check-comment-tier`,
+  `check-deprecation-task` and `check-todo-task-liveness`, so the second primitive ports once
+  and is proved four times. Porting it alone re-imports work that cohort pays once; porting it
+  with the manifest family strands three shell callers against a Rust twin.
   Worth preserving in the design: the primitive already carries `*.sh`, `*.gate` and `*.rs`
   arms (canon-kit/SPEC.md §lib/spec.sh), so the corpus half is done and what is owed is the
   derivation, not the file-set widening.
   **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so these two read as two more of ninety-one when one of them is
-  a compiler-shaped sub-project. A later cohort discovers the sizing at implementation time,
-  which is the failure mode criterion 7 exists to prevent — designed first, then ported, never
-  ported and patched.
-  Filed 2026-08-12 by close, draining the two hold bullets build filed.
+  undifferentiated gate-count, so these six read as six more of eighty-five when two of them
+  are compiler-shaped sub-projects. A later cohort discovers the sizing at implementation
+  time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
+  never ported and patched.
+  Filed 2026-08-12 by close, draining the two hold bullets build filed; widened 2026-08-12 at
+  build with the canon-kit trio.
 
 - **scratch-citation-skill-surface-reach** [design-pending] — the permanent-surface class most
   likely to carry stage-owned pointers is the one `check-scratch-citation` does not scan.
