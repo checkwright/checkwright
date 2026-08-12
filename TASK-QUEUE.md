@@ -5108,6 +5108,49 @@
   when not.
   Filed 2026-08-12 by close, draining the gap inbox; found at validate.
 
+- **gate-dispatch-stderr-becomes-argv** [design-pending] — a broken-pipe diagnostic on
+  `gate_command`'s stderr becomes the command the runner executes; **master is red on it**.
+  **Reproduced by CI, diagnosed from source, every link read.** Run `31621275185` on `0f0b34d0`
+  failed 8 of 103 gates at **exit 127** — all eight `.gate`-declared members and nothing else
+  (`check-spec-fence-balance`, `check-md-refs`, `check-docs-cmd`, `check-manifest-count`,
+  `check-measured-claim`, `check-tracking-claim`, `check-prose-enum`, `check-knob-citation`).
+  The printed "command" was the literal text
+  `gate-sdk/lib/gate.sh: line 252: printf: write error: Broken pipe`.
+  **The chain, link by link.** (1) `_gate_knob_owning_kit` (gate-sdk/lib/gate.sh:105) returns
+  early on its first prefix match, abandoning the process substitution feeding its `while read`
+  at :106. (2) `_gate_kit_roots_derived` (:252) is still `printf`-ing kit roots into that closed
+  pipe, so bash emits a `write error: Broken pipe` diagnostic on **stderr**. (3) That runs inside
+  `gate_command`'s `.gate` branch, via `_gate_knob_value` (:176). (4)
+  `gate-sdk/bin/run-gates.sh:121` captures `gate_command ... 2>&1`, folding the diagnostic into
+  `argv_out` while `cstatus` stays **0**. (5) `mapfile` makes that text `argv[0]`, and exec fails
+  127. Only `.gate` members are hit because only they take the knob-bridge path.
+  **Why it is intermittent and CI-only:** it is a race. With roughly a dozen kit roots the writer
+  normally finishes before the reader's early return closes the pipe, so the local battery is
+  green — it was green here immediately before the push, across the full battery, every fixture
+  suite and the whole validate spine. A slower or more loaded runner loses the race.
+  **Latent and pre-existing, not the port's doing — but the port is what made it bite.** The
+  `2>&1` and the early return both predate this iteration; what changed is that eight gates now
+  dispatch through the knob bridge, so a path taken rarely is now taken on every battery run.
+  Expect it to worsen monotonically as the port proceeds.
+  **Why `[design-pending]`: two correct fixes at different layers, and the choice is real.**
+  (a) At the capture site — stop folding stderr into argv, keeping it only for the exit-2
+  diagnostic branch that actually reads it. Strictly correct, kills the whole stderr-becomes-argv
+  class, and does not remove the broken pipe. (b) At the source — have `_gate_knob_owning_kit`
+  drain its producer rather than return early. Removes the pipe error but leaves the runner still
+  willing to execute stderr text as a command. They are different invariants rather than
+  alternatives, and doing only (b) leaves the trap armed for the next producer that writes to
+  stderr. Deciding which layer owns "argv is stdout, never stderr" is the unit's substance, and it
+  sits in gate-sdk's dispatch core — the substrate every ported gate now runs on — which is why a
+  close session filed it rather than patching it.
+  **Cost while deferred: high, rising, and being paid now.** Master is red; the failure mode is a
+  *wrong command executed* rather than a clean refusal; and because the race is load-dependent it
+  will read as flakiness and train readers to re-run rather than investigate.
+  **Reproduction note:** the local battery will not show it. Force the race — widen the kit-root
+  producer — or assert directly that `gate_command`'s **stdout** carries no stderr text for a
+  `.gate` member, which is the property (a) restores and is fixture-able without depending on
+  timing.
+  Filed 2026-08-12 by close, from its own post-push remote verification.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
