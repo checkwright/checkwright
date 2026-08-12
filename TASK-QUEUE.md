@@ -4176,7 +4176,7 @@
 
 - **capture-affordance-help-flag** [design-pending] — `lifecycle-kit/bin/file-gap.sh` takes
   exactly one free-text argument, so a **flag** satisfies its arity check and is filed as a gap.
-  recurrence: capture-affordance-help-flag 2026-08-09
+  recurrence: capture-affordance-help-flag 2026-08-09 2026-08-12
   **Returned from the icebox by its own re-occurrence.** The eviction criterion was that no
   named event waited to promote it; a witnessed re-occurrence is that event.
   **First seen 2026-07-28** with `--help`. **Re-occurred at the 2026-08-09 scope boundary**:
@@ -4185,6 +4185,16 @@
   flag-shaped argument — the tool validates argument *count* and emptiness, never shape.
   The blast radius is larger than a typo because the inbox is boundary-blocking: a spurious
   bullet refuses the next scope entry.
+  **Third occurrence, 2026-08-12 during align.** `bash lifecycle-kit/bin/file-gap.sh --help`,
+  run only to check usage before filing a real gap, was captured as gap prose at exit 0 exactly
+  as the class predicts — `--help` again, the original flag. **Worse blast radius than either
+  prior instance:** the second occurrence exited 0 and was reverted before it risked a commit;
+  this one sat as an uncommitted modification to the tracked inbox file until a routine
+  pre-commit `git diff` on an unrelated, later, genuine gap filing caught it by chance — one
+  commit away from landing a permanent bogus entry in a committed, boundary-blocking file, not
+  a harmless stderr message. Found and reverted with Edit before that commit; the real filing
+  landed clean in the same commit. Three firings across three sessions now (2026-07-28,
+  2026-08-09, 2026-08-12) is the measured rate, not two.
   **Deliverable:** flag handling on the single-free-text-argument capture affordances — `-h`
   and `--help` reaching the `usage()` the script already has, and a refusal for any
   unrecognized leading `-` — plus a decision on whether the convention becomes a gate-sdk
@@ -4192,7 +4202,8 @@
   accident: it takes two arguments, so a lone flag fails arity rather than being captured.
   **Cost while deferred:** low per firing, recurring, and self-concealing — the failure writes
   a committed record that *looks like* a filing, and the next scope entry is what trips over
-  it. Two firings inside two weeks is the measured rate.
+  it. Three firings inside two and a half weeks is the measured rate, and the third came closer
+  to landing than either prior one.
   Filed 2026-07-28 at close (`front-door-readiness`); iceboxed, then returned 2026-08-09 by the
   gap-inbox drain that judged its recurrence.
 
