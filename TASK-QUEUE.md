@@ -4286,6 +4286,7 @@
 
 - **close-entry-baseline-bootstrap-deadlock** [design-pending] — a validate that
   ends on an accepted red cannot be closed without an operator carve-out.
+  recurrence: close-entry-baseline-bootstrap-deadlock 2026-08-12
   Attested end to end at this iteration's close, which is what makes it filable.
   The close entry preflight (`scripts/lifecycle-config.sh`'s
   `LIFECYCLE_KIT_ENTRY_PREFLIGHT`) refuses until every suite carries a clean
@@ -4308,8 +4309,17 @@
   **Cost while deferred:** paid only when validate ends non-clean, but paid as a
   full stop that costs an operator round-trip at the boundary, in the exact
   situation where the tree is already known to be imperfect.
+  **Second attested firing, 2026-08-12 — and the repeat is the argument.** The
+  `native-cohort-canon-kit` close hit the identical wall on `installer_smoke`, and
+  escaped by the identical route: an operator-directed filing relayed by the lead.
+  Two consecutive closes have now needed an **operator interrupt to get past their
+  own entry gate**, on unrelated suites and unrelated defects. One occurrence reads
+  as an unlucky iteration; two by the same route reads as **structural**, which is
+  the case for fixing the bootstrap rather than continuing to pay the interrupt.
+  The cost is now measured rather than predicted: one full stop and one operator
+  round-trip per close that ends non-clean.
   Filed 2026-08-10 by close, from its own blocked entry; the escape it needed is
-  the evidence.
+  the evidence. Re-attested 2026-08-12 by close, again from its own blocked entry.
 
 - **knob-default-accessor-singularity** [design-pending] — the missing check class
   behind two knob-default re-spellings drained this iteration.
@@ -4885,6 +4895,50 @@
   fires, which is the reverse of every recurrence-tracked entry here.
   Filed 2026-08-12 by close on the lead's ruling, from a practice the lead named at this
   session's end; recorded rather than landed, per scope-gated intake.
+
+- **port-criterion-aggregate-cost-blindness** [design-pending] — the port-candidate criteria
+  price platform cost per member, and the cost they measure is cohort-level.
+  **The finding, and it is not the smoke assertion.** `installer_smoke`'s value arm now fails on
+  every profile, and the first reading — "a stale assertion needs updating" — sends scope after
+  the wrong object. The arm plants a mistyped relative link in an adopter's own README
+  (`installer/consumer-smoke/run-smoke.sh:246-268`), and its spec comment states that *which*
+  gate catches it is deliberately unasserted: "the claim is about the battery rather than about
+  a member of it." The assertion did exactly its job — it detected that a binary-less install's
+  battery now catches nothing on adopter prose of that class. It is not stale and it did not rot.
+  **What the criteria cannot express.** gate-sdk/SPEC.md §The port-candidate criteria states
+  criterion 5 (platform cost) **per member**. Batch B ported seven `spec_manifest_files` members
+  at once (`f602642d`); each individually passes criterion 5's per-member reading. The aggregate
+  emptied a value class for any consumer whose payload carries no gate binary, because `.gate`
+  members are omitted-and-declared there. Criterion 5's *form* has no way to say that, and that
+  is the object a future scope must price.
+  **NOT a re-litigation of any operator ruling.** The operator accepted criterion 5's platform
+  cost knowingly for the born-native `check-measured-claim` — a single member. This entry says
+  the criterion cannot *express* an aggregate. Different object; no reversal is proposed.
+  **The precise scope, because the first phrasing overstated it.** The hole is **markdown-link
+  liveness**, not prose generally: `check-md-refs` is now a `.gate`, while `check-prose-tells`,
+  `check-docs-link-convention`, `check-comment-tier` and `check-spec-pointer` survive as shell
+  and still run. Validate's own commit message got this right where its gap bullet did not. The
+  conclusion stands on the strongest ground either way: the smoke run **is** the oracle, and no
+  profile caught the defect.
+  **The mitigation is real, and lowers severity without closing the gap.** Omission is declared
+  and counted — `init` writes `# omitted: <name> <reason>` into the consumer's registry
+  (installer/README.md:351-352), so an adopter is *informed*, never silently degraded.
+  **Where it becomes blocking: release-sweep**, not close. Close cuts no release — release-sweep
+  is a boundary skill rather than a stage (lifecycle-kit/SPEC.md §templates/release-sweep.md) —
+  so this blocked no stage of `native-cohort-canon-kit`. It must block a release, so that a
+  future publish cannot ship the hole unnoticed.
+  **Deliverable, in two halves, and the second carries the baseline slug.** (1) Give criterion 5
+  a form that can price a cohort rather than only a member. (2) Restore markdown-link coverage
+  for binary-less payloads — build the main loop's pack with the crate's own binary, redesign the
+  value assertion off binary-dispatched gates, or accept and document that the coverage is
+  binary-gated. Half (2) is what retires the red, so it is the half `installer_smoke`'s baseline
+  row is held against; a later scope may split the halves, but the baseline slug must follow
+  half (2).
+  **Cost while deferred:** the suite is held `fail` on the baseline, so its other assertions
+  still run and this one is tracked rather than lost — and every further cohort ported widens
+  the same hole before anyone has priced it.
+  Filed 2026-08-12 by close, draining the gap inbox, under CLAUDE.md §Housekeeping's
+  operator-directed filing exception; found at validate, reframed by the lead.
 
 ## Icebox
 

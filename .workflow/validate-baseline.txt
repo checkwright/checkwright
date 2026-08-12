@@ -90,6 +90,7 @@ usage_tests usage_tests pass
 budget_guard_tests budget_guard_tests pass
 trend_tests trend_tests pass
 demo demo pass
+installer_smoke installer_smoke fail port-criterion-aggregate-cost-blindness
 consumer_smoke consumer_smoke pass
 upgrade upgrade fail upgrade-smoke-from-binary-pairing
 agents_md_smoke agents_md_smoke pass
