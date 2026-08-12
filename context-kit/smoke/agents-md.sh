@@ -74,6 +74,17 @@ battery_env=(
     CANON_KIT_CONFIG_FILE="scripts/canon-config.sh"
 )
 
+# spec: gate-sdk/SPEC.md §gen-pre-commit — each kit's own install.sh already wrote the hook
+# and CHECK-GRAPH.html, but that write ran before canon-config.sh existed, so the baked
+# '# graph:' derivation used canon-kit's bare default rather than the AGENTS.md-widened
+# manifest set battery_env now carries. Regenerate under the same env the battery runs
+# with, or check-graph reds the AGENTS.md consumer on a hook stale by construction.
+( cd "$SCRATCH" && env "${battery_env[@]}" bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null )
+( cd "$SCRATCH" && env "${battery_env[@]}" bash gate-sdk/checks/check-graph.sh --emit > scripts/CHECK-GRAPH.html )
+git -C "$SCRATCH" add -A
+git -C "$SCRATCH" -c user.email=smoke@example.invalid -c user.name=smoke \
+    commit -q --no-verify -m "regenerate the hook + graph artifact under the AGENTS.md config"
+
 run_battery() { ( cd "$SCRATCH" && env "${battery_env[@]}" bash gate-sdk/bin/run-gates.sh ) 2>&1; }
 
 out="$(run_battery)"; rc=$?

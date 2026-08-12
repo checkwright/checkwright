@@ -16,6 +16,7 @@ check-gate-fixture-coverage
 check-gate-exemption-tasks
 check-gate-assertions
 check-gate-substrate-parity
+check-crate-arms
 check-install-disposition
 check-graph
 check-commit-msg
