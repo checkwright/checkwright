@@ -1521,10 +1521,19 @@ first so the measurement has something to falsify.** All five members assert ove
 **kit-authored** files — a vendored kit's own `smoke/`, `gate-tests/`,
 `templates/` and registry rows — never over adopter-authored content, so a
 binary-less consumer losing the five should lose no class `installer_smoke`'s
-value arm measures, and the aggregate price should be zero on that oracle. The
-oracle refuses a dirty worktree, so the run is taken on the committed cohort and
-its verdict lands here at that commit rather than being asserted from the
-prediction. The held `installer_smoke fail` row in
+value arm measures, and the aggregate price should be zero on that oracle.
+
+**The run agrees, and the price is zero.** Against the post-cohort registry every
+profile's battery is green on a freshly vendored consumer, with the ported
+members omitted-and-declared exactly where the payload carries no binary — the
+arm that asserts that equality is the suite's own, so no roster is transcribed
+here — and the value arm reports the same
+verdict on every profile it reported before: the planted defect is green, and
+green once fixed. The suite's only failure is the markdown-link class the held
+row already owns, so no class this cohort could have emptied changed hands. The
+falsifier was available and did not fire: a newly lost class would have shown as
+a value-arm class this consumer used to catch, or as a red battery, and neither
+appeared. The held `installer_smoke fail` row in
 `.workflow/validate-baseline.txt` is **not** this cohort's price: it records the
 markdown-link hole `port-criterion-aggregate-cost-blindness` half (2) owns, which
 this cohort neither widens nor repairs.
