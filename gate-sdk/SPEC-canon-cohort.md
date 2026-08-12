@@ -155,10 +155,38 @@ bridge was never asked to carry cannot be read.
 [design-bearing] Because of the configuration finding above, the acceptance oracle
 for deltas (1)-(3) is **not** the live tree and **not** the stock fixture pairs.
 The port stands up a throwaway tree with `CANON_KIT_MANIFEST_FILES` unset and
-`CANON_KIT_SCAN_KIT_ROOTS` unset, containing a vendored kit root with its own
-`SPEC.md`, `README.md` and `CLAUDE.md`, plus a `templates/` skeleton and an
-ancestor-root case, and runs both implementations over it comparing bytes and exit
-codes. This is the constructed-scenario form criterion 2 already sanctions for a
+`CANON_KIT_SCAN_KIT_ROOTS` unset, and runs both implementations over it comparing
+bytes and exit codes.
+
+**Its composition is specified here rather than left to the build session**, because
+this scenario is the sole oracle for the asymmetry above, and a tree that merely
+"has a `templates/` skeleton" can pass while proving nothing about it. The three
+finds differ across **two independent filters**, so the tree carries all six cells
+— each of `SPEC.md` (whatever `CANON_KIT_SPEC_NAME` names), `README.md` and
+`CLAUDE.md`, once under a `templates/` directory and once at the root of a vendored
+kit:
+
+| file | under `templates/` | at a vendored kit root |
+|---|---|---|
+| `SPEC.md` | filtered out | pruned out |
+| `README.md` | filtered out | pruned out |
+| `CLAUDE.md` | **kept** | **kept** |
+
+**The two `CLAUDE.md` cells are load-bearing and are the easiest to omit.** They are
+the only cells that distinguish the real asymmetry from a regularized
+three-finds-in-one-loop implementation — which would drop both, and still pass a
+tree built from the first two rows alone. That is exactly the regression the
+fidelity landmine above names, so a scenario missing them leaves this amendment's
+one prohibition ("the asymmetry is reproduced, not tidied") with no oracle behind
+it. Plus the **ancestor-root case**: the scan root sitting *inside* a kit root,
+which `spec.sh:183` requires never to prune.
+
+The verdicts in the table are the shell's current behavior, written down to make
+the cells legible; the oracle itself stays **differential**, so a divergence
+surfaces as a byte difference between the two implementations rather than as a
+hand-maintained expectation that could itself go stale.
+
+This is the constructed-scenario form criterion 2 already sanctions for a
 member whose state has no static representation, applied here to a *branch* rather
 than a member. Without it the port ships a `gate_kit_roots` that nothing ever
 executed.
