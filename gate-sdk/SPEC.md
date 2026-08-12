@@ -87,7 +87,9 @@ vendored `gate-sdk/` resolved beside the sourcing script — the root a
 consumer-copied gate sources `lib/gate.sh` from and the anchor kit roots
 relativize against), `GATE_SDK_ROOT_ALLOWLIST` (default
 `<gates-dir>/root-allowlist.list`), `GATE_SDK_REGISTRY_DOC` (default `README.md`)
-and `GATE_SDK_RUNNER_DOC` (default `README.md`) for `check-kit-registration`,
+and `GATE_SDK_RUNNER_DOC` (default `README.md`) for `check-kit-registration`
+— both resolved in `lib/gate.sh` rather than inline in the check, so the config
+bridge can carry them to the compiled member (see there),
 `GATE_SDK_MSG_PATTERN_FILES` (default
 `<gates-dir>/msg-patterns.list`; space-separated, each tracked and required —
 fail-closed when missing), `GATE_SDK_MSG_PATTERN_FILES_LOCAL` (default
@@ -2256,6 +2258,19 @@ Resolution, per declared knob:
   overrides that feed it, so it carries no `GATE_SDK_` prefix of its own.
   Derivation-first — no roster of knob→kit pairs is maintained, so none can rot.
 
+  **A distinct spelling is what a grammar change buys, and nothing else, so a
+  gate-sdk knob that changes no grammar keeps its own name.** `GATE_SDK_PRUNE_DIRS`
+  is a whitespace-separated scalar feeding an *array*, and one name meaning two
+  grammars is the defect the closing paragraph of this subsection names. A
+  scalar-in/scalar-out knob has no such collision, so it is resolved in
+  `lib/gate.sh` under the consumer's own knob name and bridged under it — the
+  shape every `QUEUE_KIT_`-prefixed knob already crosses in. `GATE_SDK_REGISTRY_DOC`
+  and `GATE_SDK_RUNNER_DOC` are the live instances: resolved here so the bridge's
+  does-not-define refusal cannot fire on them (§check-kit-registration), with the
+  prefix rule reaching them through gate-sdk's *own* prefix rather than through
+  the no-kit-claimed-it fallback. Both routes land on the same kit, which is why
+  either spelling resolves and why the choice is a naming one.
+
   **The configured set is consulted first, then the shipped one, and the order
   is load-bearing.** `GATE_SDK_KIT_DIRS` narrows which kits a battery *scans*;
   reading it as the set of kits that *exist* leaves a narrowed run unable to
@@ -4283,7 +4298,11 @@ finding, not a contradiction.
 Config, the standard kit shape: `GATE_SDK_REGISTRY_DOC` (default `README.md`)
 is A's doc, `GATE_SDK_RUNNER_DOC` (default `README.md`) is B's; both resolve
 relative to the git toplevel, and an explicit positional argument
-(`[registry-doc [runner-doc]]`) overrides. Fail-closed: a configured doc that
+(`[registry-doc [runner-doc]]`) overrides. **Both defaults are resolved in
+`lib/gate.sh`, not inline here**, because the config bridge refuses a knob the
+owning kit's library does not define (§lib/gate.sh) — an inline default is
+invisible to it, so a compiled member declaring either knob would fail-close on
+every invocation. Fail-closed: a configured doc that
 does not exist is a misconfiguration (exit 2, like `check-kit-enum`'s missing
 registry), as is a non-repo cwd or empty roster — never a false clean. A
 consumer keeping no prose registry opts out by not registering the gate in its

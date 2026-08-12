@@ -4,8 +4,8 @@
 # spec: gate-sdk/SPEC.md §check-kit-registration — every gate_kit_roots kit is registered in the human-facing docs: a registry-doc row linking into each root, and a fixture-runner line for each root that ships gate-tests
 #
 # usage: check-kit-registration.sh [registry-doc [runner-doc]]
-#   docs resolve relative to the git toplevel; defaults README.md / README.md,
-#   overridable via GATE_SDK_REGISTRY_DOC / GATE_SDK_RUNNER_DOC.
+#   docs resolve relative to the git toplevel; GATE_SDK_REGISTRY_DOC /
+#   GATE_SDK_RUNNER_DOC carry the defaults, resolved in lib/gate.sh.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -15,8 +15,8 @@ source "$SDK/lib/gate.sh"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" \
     || { echo "check-kit-registration: not a git repository — cannot test tracked kit files" >&2; exit 2; }
 
-REGISTRY_DOC="${1:-${GATE_SDK_REGISTRY_DOC:-README.md}}"
-RUNNER_DOC="${2:-${GATE_SDK_RUNNER_DOC:-README.md}}"
+REGISTRY_DOC="${1:-$GATE_SDK_REGISTRY_DOC}"
+RUNNER_DOC="${2:-$GATE_SDK_RUNNER_DOC}"
 [[ "$REGISTRY_DOC" == /* ]] || REGISTRY_DOC="$REPO_ROOT/$REGISTRY_DOC"
 [[ "$RUNNER_DOC" == /* ]]   || RUNNER_DOC="$REPO_ROOT/$RUNNER_DOC"
 [[ -f "$REGISTRY_DOC" ]] || { echo "check-kit-registration: registry doc not found: $REGISTRY_DOC" >&2; exit 2; }
