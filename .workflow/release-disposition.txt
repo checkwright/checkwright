@@ -2,4 +2,3 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
-native-cohort-canon-kit release deferred:v0.23.0 — criteria met, cadence not: Tightened gates carries 8 declarations since v0.22.0 (check-task-conservation, check-crate-arms, check-measured-claim this iteration), which floors a minor over the newest released note v0.22.0; held back because no cadence trigger fired — newest tag v0.22.0 is 5 days old against the 7-day floor, the canon-kit port is a substrate change rather than a decommission so no major, no security or supply-chain fix in the batch, and no operator direction to release; the declarations ride the next qualifying note, which check-release-bump floors at v0.23.0.
