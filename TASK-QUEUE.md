@@ -180,10 +180,15 @@
   **Why it rides this cohort:** the port's whole case rests on the conservation table being
   exhaustive, and this was the **second** row the queue-kit cohort found whose stated ground was
   wider than the truth — the first being the held members' eligibility framing. Each ported gate
-  that shells out re-buys the same unheld property with nothing accumulating, and **four of the
-  eleven canon-kit members ruled into this iteration spawn git** (`check-docs-cmd`,
-  `check-tracking-claim`, `check-spec-pointer`, `check-md-refs`), so the re-buy is immediate
-  rather than eventual. Debt, not a feature: the deliverable converges the crate onto a property
+  that shells out re-buys the same unheld property with nothing accumulating, and **three of the
+  eleven canon-kit members ported this iteration spawn git** (`check-docs-cmd`,
+  `check-tracking-claim`, `check-md-refs`), so the re-buy is immediate rather than eventual.
+  [Corrected 2026-08-12 at align: the count read four here, folding in `check-spec-pointer` as an
+  immediate re-buyer. SPEC-canon-cohort.md delta (10) holds that member on shell this iteration
+  (criterion 6), so it is a fourth git-spawning caller but a **future** consumer of the
+  deliverable, not a current one — "the held member is a fourth that will need it," in the
+  amendment's own words. What it owes is tracked on `cohort-held-members-port-prerequisites`,
+  not re-bought here.] Debt, not a feature: the deliverable converges the crate onto a property
   gate-sdk/SPEC.md's conservation table already claims, adding no governed name.
   Filed 2026-08-12 by close, draining the bullet build filed at batch 2; promoted 2026-08-12 at
   scope on the operator's cohort ruling.
