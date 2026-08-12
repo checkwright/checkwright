@@ -199,9 +199,30 @@ out="$(knob_argv PROBE_KIT_ABSENT)"; rc=$?
 grep -qF -- 'PROBE_KIT_ABSENT' <<<"$out" \
     || { echo "  FAIL: the undeclared-knob refusal did not name the knob: $out"; fails=$((fails + 1)); }
 
+# --- the knob-owner lookup drains its producer --------------------------------
+# The candidate roots are read to EOF *before* the match loop, so an early prefix
+# hit never leaves the producer writing into a closed pipe. The oracle is SIGPIPE
+# *ignored* — the disposition a CI runner inherits from its supervisor — under
+# which the abandoned write fails EPIPE and bash reports it on stderr. Under the
+# default disposition the producer dies silently and the identical defect shows
+# nothing, which is precisely why a green local battery could not see it; the
+# `trap '' PIPE` is what makes this deterministic rather than environmental.
+many="$sandbox/probe-kit"
+for ((_i = 0; _i < 200; _i++)); do many="$many $sandbox/pad-kit"; done
+owner_probe() {
+    ( trap '' PIPE
+      GATE_SDK_KIT_DIRS="$many" _gate_knob_owning_kit PROBE_KIT_SPACED "$@" )
+}
+got="$(owner_probe 2>&1 1>/dev/null)"
+[[ -z "$got" ]] \
+    || { echo "  FAIL: _gate_knob_owning_kit abandoned its producer: $got"; fails=$((fails + 1)); }
+got="$(owner_probe 2>/dev/null)"
+[[ "$got" == "$sandbox/probe-kit" ]] \
+    || { echo "  FAIL: knob owner was '$got' (want '$sandbox/probe-kit')"; fails=$((fails + 1)); }
+
 if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals)"
+echo "lib-gate.test: ok (fail_closed branches; gate_path_pruned; GATE_GREP_EXCLUDES; gate_find prune incl. the worktrees leaf; PRUNE_EXTRA_DIRS append over both branches; registry + resolution; .gate declaration/argv split + dispatch fail-closed; the knob bridge's serialization, scalar/knobless/prefixless arms and its three refusals; the knob-owner lookup draining its producer on an early match under SIGPIPE-ignored)"
 exit 0

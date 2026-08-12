@@ -95,15 +95,18 @@ gate_resolve() {
 
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the owning kit of a bridged knob, derived from the knob's own `<KIT>_` prefix rather than from a maintained knob→kit roster: each gate_kit_roots member's basename, hyphens to underscores and upper-cased, is tried as a prefix. A knob matching no other kit's prefix is gate-sdk's own — the one kit every `.gate` dispatch already runs inside — never a parse error and never a third kit guessed at.
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the configured set is consulted first, then the shipped one: GATE_SDK_KIT_DIRS narrows which kits a battery *scans*, and reading it as the set of kits that *exist* would leave a narrowed run unable to attribute another kit's knob and fail-close on every member that declares one
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the candidates are read to EOF *before* the match loop, never streamed through a `while read` the first prefix hit returns out of: this runs under a stdout capture, so a producer left writing into a closed pipe reports the write error on stderr wherever SIGPIPE is ignored, which §run-gates' capture is what makes dispatch-fatal
 _gate_knob_owning_kit() {
     local knob="$1" kit base prefix
-    while IFS= read -r kit; do
+    local -a kits=()
+    mapfile -t kits < <(gate_kit_roots; [[ -n "${GATE_SDK_KIT_DIRS:-}" ]] && _gate_kit_roots_derived)
+    for kit in ${kits[@]+"${kits[@]}"}; do
         kit="${kit%/}"
         [[ -n "$kit" ]] || continue
         base="${kit##*/}"
         prefix="${base^^}"; prefix="${prefix//-/_}_"
         [[ "$knob" == "$prefix"* ]] && { printf '%s\n' "$kit"; return 0; }
-    done < <(gate_kit_roots; [[ -n "${GATE_SDK_KIT_DIRS:-}" ]] && _gate_kit_roots_derived)
+    done
     gate_sdk_root
 }
 

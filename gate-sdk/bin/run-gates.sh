@@ -105,6 +105,9 @@ fi
 failed=()
 TIMINGS="${GATE_SDK_TMP_DIR:-.tmp}/gate-timings.txt"
 mkdir -p "$(dirname "$TIMINGS")" && : > "$TIMINGS"
+# spec: gate-sdk/SPEC.md §run-gates — where gate_command's stderr is held apart from
+# the argv its stdout carries; rewritten per member, read only on a dispatch error
+DISPATCH_ERR="${GATE_SDK_TMP_DIR:-.tmp}/gate-dispatch-stderr.txt"
 total_ms=0
 VERBOSE="${GATE_SDK_VERBOSE:-}"
 for i in "${!RUN_MEMBERS[@]}"; do
@@ -118,7 +121,10 @@ for i in "${!RUN_MEMBERS[@]}"; do
     # spec: gate-sdk/SPEC.md §lib/gate.sh — execute the invocation argv, keeping
     # gate_command's exit 2 (dispatch harness error) distinct from its exit 1
     # (nothing declares this member)
-    argv_out="$(gate_command "$c" "${RESOLVE_DIRS[@]}" 2>&1)"; cstatus=$?
+    # spec: gate-sdk/SPEC.md §run-gates — the two streams are captured apart, never
+    # merged: argv is stdout alone, so a diagnostic any successful call writes to
+    # stderr cannot become argv[0] and be exec'd
+    argv_out="$(gate_command "$c" "${RESOLVE_DIRS[@]}" 2>"$DISPATCH_ERR")"; cstatus=$?
     argv=()
     [[ -n "$argv_out" && "$cstatus" -eq 0 ]] && mapfile -t argv <<<"$argv_out"
     if [[ "$cstatus" -eq 0 && ${#argv[@]} -gt 0 ]]; then
@@ -129,7 +135,7 @@ for i in "${!RUN_MEMBERS[@]}"; do
         fi
     elif [[ "$cstatus" -eq 2 ]]; then
         ok=0
-        out="$argv_out"
+        out="$(<"$DISPATCH_ERR")"
         tail="  FAIL: $c (dispatch harness error, exit 2)"
         failed+=("$c")
     else

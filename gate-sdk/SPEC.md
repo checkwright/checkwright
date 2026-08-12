@@ -2117,6 +2117,12 @@ Resolution, per declared knob:
   is how the kit-root prune is exercised at all, since a prune only bites on a
   kit root below the scan root. So the lookup tries `gate_kit_roots`, then the
   shipped set the `checks/`-or-`smoke/` predicate derives, then gate-sdk.
+
+  **Those candidates are read to EOF before the match loop runs**, never
+  streamed through a `while read` the first prefix hit returns out of. The
+  lookup runs under a stdout capture, so an early hit that abandons the producer
+  leaves it writing into a closed pipe; §run-gates gives the consequence, and
+  why the environment that shows it is not the one a battery is usually run in.
 - **A bridged value may not carry an absolute path.** The resolved argv is baked
   **verbatim** into the generated pre-commit hook, which is tracked, so an
   absolute value commits one machine's checkout path to a public file. That is a
@@ -2363,6 +2369,28 @@ convention: one mechanism serves the interactive run, the generated hooks, and
 any CI wrapper without an argv contract change. Gates themselves are untouched —
 each still prints its single clean line per the output contract (§Output
 contract); the runner captures it.
+
+**The dispatch capture holds the two streams apart.** `gate_command`'s stdout
+*is* the invocation argv, one element per line; its stderr is diagnostic text.
+Merging them makes any stderr a successful call emits the **first argv element**,
+which the runner then execs — a 127 naming the diagnostic instead of running the
+gate, and a `cstatus` of 0 throughout, so nothing upstream reads as an error. So
+stdout is captured into the argv value and stderr into
+`<tmp-dir>/gate-dispatch-stderr.txt`, which is read only as the body of the
+exit-2 (dispatch harness error) report — the reuse the merge existed to serve,
+and the reason the fix is a split rather than a deletion of the capture.
+
+The failure this closes was neither theoretical nor a race: a helper that
+abandoned a pipe producer mid-write emitted a broken-pipe diagnostic on **every**
+run wherever SIGPIPE is ignored — a CI runner inherits `SIG_IGN` from its
+supervisor, so the write returns `EPIPE` and bash reports it — while a shell at
+the default disposition loses the producer silently and shows nothing at all. An
+environment-determined defect a green local battery cannot see is exactly what
+this capture must be structural against, rather than left to each producer's
+discipline: the runner execs whatever stdout carries, so *no* producer may be
+trusted to keep stderr clean. Reproducing it locally means restoring the
+runner's signal environment (`trap '' PIPE`), which is what makes the
+`lib-gate.test.sh` arm deterministic instead of environmental.
 
 `run-gates.sh --for <path> [<path>...]` is the path-scoped selector, the
 agent-callable half of the oracle-first rule: it resolves the registry exactly
