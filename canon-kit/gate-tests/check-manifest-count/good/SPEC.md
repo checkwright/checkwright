@@ -35,3 +35,7 @@ contracts reads clean.
 
 <!-- manifest-count-exempt: this line legitimately fixes the historical total -->
 The pilot shipped with six gates before the registry existed.
+
+<!-- measured: gate-total=7 -->
+The registry holds 7 gates today — the sanctioned discharge, because the
+objection the ban encodes is answered by an oracle rather than suppressed.

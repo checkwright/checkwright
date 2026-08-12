@@ -6,3 +6,4 @@ check-scratch-citation
 check-doctrine-registration
 check-task-conservation
 check-crate-arms
+check-measured-claim

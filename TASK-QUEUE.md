@@ -12,58 +12,6 @@
 
 ## New Features
 
-- **spec-measured-count-gate** [spec: SPEC-measured-claim.md] — a **measured count or extent
-  claim authored into governed prose goes stale with no oracle**.
-  recurrence: spec-measured-count-gate 2026-08-09 2026-08-11
-  **Thirteen instances. Three before 2026-08-09:** the align audit found
-  `gate-sdk/SPEC-action-run-shell.md` B2's block count wrong twice over (five, then six; the
-  tree carried eight); and a third landed in a **binding shim**, `.claude/commands/close.md`'s
-  release-policy slot deriving a bump off the note's "two sections" where the cited owner
-  fixes three. Each was corrected by hand — the Enforcement-first shape the doctrine bars.
-  **Gap generalization — the check class that should have caught them.** `check-prose-enum`
-  reads governed-set membership, not numerals; `check-spec-derivable-section` reads
-  fenced-dump density; `check-shim-restatement` holds *copy shape*, and a restatement that
-  is **wrong** has diverged from its owner's wording, which is what makes it not a copy. So
-  the scanner must range over SPEC sections and binding shims alike.
-  **Widened 2026-08-09 (`install-profile-seam`): five more in one iteration, split by whether
-  a cardinal-based scanner reaches them. Three do** — nine gate-name lists that were seven, a
-  "sole call site" that was two, seven marker hits that were eight. **Two do not, carrying no
-  cardinal at all:** a five-line finding generalized to a whole-file claim, and an audit
-  stamping "the kit SPECs came back clean" over a SPEC holding two counter-instances. Those
-  are *extent* claims, stated wider than the measurement behind them.
-  **Four more 2026-08-09 (`prose-profile-activation`), all cardinal-axis, and the density is now
-  the argument.** A pointer count of 1774 where the gate reports 902, sitting in a *cost field a
-  ranking scope reads*; "five deltas" over an amendment carrying six; a smoke-registration
-  "20 of 22" where it is 21; "the one on-surface queue-kit gate" where four are. Three were
-  caught by the align consistency audit, one reached a committed scope surface uncaught.
-  **In every one the ruling did not depend on the number** — so none reddened anything, which is
-  luck not design, and a human-scale read of six amendments is not a mechanism that scales.
-  **Answered: the unreachable axis is the one that costs.** Eleven instances were caught
-  downstream by hand at no cost beyond the re-measurement. The twelfth — an extent claim —
-  was caught by **nobody** for two iterations and shipped a false sentence into a published
-  SPEC and its docs mirror. A cardinal-only trigger catches the free half, misses the paid one.
-  **Thirteenth, 2026-08-11:** a stale-count escalation itself carried one (98→90; it is 91).
-  **Answered: the cheap discharge is insufficient, closing the ground raised 2026-08-01 at
-  scope.** `check-manifest-count` bans bare cardinals over the governed
-  plurals in `CANON_KIT_COUNT_COLLECTIONS` (corrected 2026-08-12; the knob named here before
-  did not exist), so a `couples=` widening — its globs never reach `.claude/commands/*.md` —
-  plus an override looked like a discharge. It cannot be: banning cardinals cannot reach a
-  claim carrying none.
-  **The design question, and it is now ruled.** The false-positive surface *was* the design:
-  "bare cardinal near a roster noun" over-matches legitimate prose ("the four contracts",
-  "both halves"), and "extent claim over a corpus" has no syntactic tell at all. The trade
-  this entry held open — an opt-in `measured:` marker over a scanner inferring intent — is
-  ruled for the marker at spec 2026-08-12; the grounds, the three arms and the coverage
-  limit are the amendment's, not restated here.
-  **Cost while deferred:** compounding and silent — this recurs at **every amendment that
-  measures the tree**, the failure mode is a canonical doc asserting a false number, and
-  detection is by hand at align if at all — itself a survivorship claim about the *caught* set.
-  The session-act half is `audit-class-corpus-attestation`, deliberately not folded in: it
-  designs a **stamp** obliging a sweep to record the corpus it read; this designs a
-  **scanner** over authored prose.
-  Filed 2026-07-26 by close (`release-path-hardening`); roughly one small unit; promoted
-  2026-08-12 at spec.
-
 ## Technical Debt
 
 ## Deferred
@@ -73,7 +21,7 @@
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
   **Demoted 2026-08-12 at build, and the cause is arithmetic rather than a change of mind.**
   The canon-kit cohort delivered **seven of ten** and the entry returned here rather than to
-  `## Done`, because this entry is the **whole corpus** and 85 of 102 registered gates remain
+  `## Done`, because this entry is the **whole corpus** and 85 of 103 registered gates remain
   unported (`checkwright-gates --list` against `scripts/gates.list`). A Done move would have
   asserted a finished port and, since the roadmap projection reads `[roadmap:]` tags off live
   entries, silently dropped the port from a **public** surface. The `[roadmap:]` tag is kept
@@ -4085,8 +4033,10 @@
   **Why `[design-pending]`, and an honest "not buildable" is a permitted outcome.** Deciding
   whether a section *supports* a sentence is comprehension, not scanning. The only mechanical
   approximations are term-overlap heuristics between the citing sentence and the target
-  section, whose false-positive surface is the same one `spec-measured-count-gate` is stuck on,
-  and a term-overlap red on a correct citation is worse than silence on a wrong one.
+  section, whose false-positive surface is the one `spec-measured-count-gate` escaped by ruling
+  for an author-applied marker — an escape closed here, because that gate needs the author only
+  to *declare* what was measured while this one must judge a citation nobody annotated.
+  A term-overlap red on a correct citation is worse than silence on a wrong one.
   **Cost while deferred:** broad and unmeasured — `check-spec-pointer` reports 902 directive
   pointers and 247 prose citations, and the ownership of every one of them is
   unverified. The cost is not that they are wrong; it is that the gate's green is read as
@@ -4969,5 +4919,6 @@
 
 - gate-subprocess-fail-closed-unheld
 - crate-ci-arm-unheld-at-commit-time
+- spec-measured-count-gate
 
 ## Lessons Learned

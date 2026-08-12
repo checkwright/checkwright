@@ -49,7 +49,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         grammar: spec::CountGrammar::resolve()?,
         out: Vec::new(),
     };
-    spec::walk_prose(&manifests, "manifest-count-exempt:", &mut sink)?;
+    // spec: canon-kit/SPEC.md §check-manifest-count — the second sanctioned discharge, riding
+    // the same per-site window the exempt tag opens
+    spec::walk_prose_multi(
+        &manifests,
+        &["manifest-count-exempt:", spec::MEASURED_MARKER],
+        &mut sink,
+    )?;
     let out = sink.out;
 
     if !out.is_empty() {
@@ -58,7 +64,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for l in &out {
             println!("{}", l);
         }
-        println!("  help: reword to cite the owning collection (e.g. 'the gates in gates.list') rather than pin a total; a genuinely fixed named set joins CANON_KIT_COUNT_ALLOWED_PHRASES; a threshold/rate/partition/proportion is already exempt; else add a 'manifest-count-exempt: <reason>' comment on the line or the one above");
+        println!("  help: reword to cite the owning collection (e.g. 'the gates in gates.list') rather than pin a total; a total worth keeping takes a '<!-- measured: <key>=<value> -->' marker on the line above, which binds it to an oracle check-measured-claim re-runs; a genuinely fixed named set joins CANON_KIT_COUNT_ALLOWED_PHRASES; a threshold/rate/partition/proportion is already exempt; else add a 'manifest-count-exempt: <reason>' comment on the line or the one above");
         return Ok(1);
     }
     println!("MANIFEST-COUNT: clean ({} manifest file(s); no bare cardinal quantifying a governed collection in prose outside an exempt site)", manifests.len());

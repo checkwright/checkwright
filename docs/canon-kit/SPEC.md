@@ -192,7 +192,12 @@ own instance); the kit's rules are the topology itself:
   instead (`check-manifest-count` bans a bare cardinal quantifying a
   governed collection in a manifest — the collection is the count's owner).
   A literal stays verbatim only when load-bearing, and then only
-  gate-coupled. A **user-facing** claim takes the same treatment when a reader
+  gate-coupled — and `check-measured-claim` is the mechanism that clause names:
+  a `measured:` marker binds the literal to an oracle the gate re-runs, which
+  turns a transcribed number into a generated, freshness-gated copy and is the
+  second remedy this bullet offers beside citing the owner. Prefer citing the
+  owner where the number need not be stated; mark it where a reader is served by
+  reading it. A **user-facing** claim takes the same treatment when a reader
   acts on it: `check-install-claim` gives the primary-install-path claim one
   declared owner and holds every governed install section to it, so the topology
   reaches beyond the internal facts the rules above are stated over.
@@ -347,6 +352,16 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   discloses is one project's distribution model, so it is consumer config for
   the same provenance-seam reason the transport vocabulary above is. This repo
   sets `bash scripts/payload-claims.sh` and `("docs/posts/*")`.
+- `CANON_KIT_MEASURED_CLAIMS_CMD` — a consumer command emitting the oracle
+  `check-measured-claim` re-runs, one `<key>`⇥`<value>` line per measurable fact,
+  default empty ⇒ clean skip (no oracle, so no marker has anything to disagree
+  with). `CANON_KIT_MEASURED_SURFACE_GLOBS` — array of globs naming the scanned
+  surface, default empty ⇒ empty corpus and a clean gate; the two are set
+  together or not at all. What a project measures is that project's vocabulary,
+  so no key ships as a kit literal (the provenance seam). This repo sets
+  `bash scripts/measured-claims.sh` and the `CANON_KIT_MANIFEST_FILES` globs plus
+  `.claude/commands/*.md` — the shims the manifest set omits and the prose surface
+  excludes on a copy-shape ownership this rule is not covered by.
 - `CANON_KIT_COMMENT_MACHINE` / `CANON_KIT_COMMENT_REASON` — arrays, default
   empty: extra directive prefixes appended to the built-in kit-mechanism
   roster (a consumer's product vocabulary). `CANON_KIT_COMMENT_SURFACE` —
@@ -409,8 +424,8 @@ and no oracle sees whole: `check-comment-tier.test.sh`,
 `check-deprecation-task.test.sh`, `check-docs-link-convention.test.sh`,
 `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`,
 `check-manifest-count.test.sh`, `check-md-refs.test.sh`,
-`check-prose-enum.test.sh`, `check-spec-dod-singleton.test.sh` and
-`check-tracking-claim.test.sh`.
+`check-measured-claim.test.sh`, `check-prose-enum.test.sh`,
+`check-spec-dod-singleton.test.sh` and `check-tracking-claim.test.sh`.
 
 ### lib/spec.sh
 
@@ -525,9 +540,12 @@ same shapes:
   a bare emit grammar cannot express and both gates need: two lines claiming one
   id would give a class two patterns and make its match order arbitrary. Its
   callers are `spec_install_transports`, over
-  `CANON_KIT_INSTALL_TRANSPORTS_CMD` (§check-install-claim), and
+  `CANON_KIT_INSTALL_TRANSPORTS_CMD` (§check-install-claim);
   `check-payload-claim` directly, over `CANON_KIT_PAYLOAD_CLAIMS_CMD`
-  (§check-payload-claim).
+  (§check-payload-claim); and `spec_measured_claims`, over
+  `CANON_KIT_MEASURED_CLAIMS_CMD` (§check-measured-claim) — whose second field is
+  a measured value rather than an ERE, which the loader neither interprets nor
+  needs to, since every check it makes is on the line's shape.
 - **The comment-surface adapters:** the comment gates read *different* surfaces.
   `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
   line is an unresolvable-by-design placeholder (§check-spec-pointer);
@@ -700,6 +718,19 @@ the consumer governs); and the per-site `manifest-count-exempt: <reason>` marker
 on the line or the one above. The exact operator and phrase tokens each context
 recognizes are the check's own regex, generic-English mechanism rather than
 config.
+
+**The sanctioned discharge is the `measured:` marker** (§check-measured-claim),
+and it is the only one of the four that *answers* the ban rather than stepping
+around it: the objection this invariant encodes is a transcribed total with no
+owner, and a marker binds the total to an oracle a gate re-runs. So a cardinal
+under a `<!-- measured: <key>=<value> -->` line satisfies the ban the way a
+generated copy satisfies derivation-first, which strictly shrinks this gate's
+violation set. It rides the same per-site window the exempt marker does — the
+marker line and the claim below it — so the two discharges are one behavior with
+two spellings rather than a second walk. Rewording to cite the owning collection
+stays preferred where the total is not worth stating at all; the exempt tag drops
+to a genuine last resort, because "deliberately unchecked" is now the one thing
+it means.
 Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the
 committing operator via the output contract; each hit read at the single scan
 transition (file, line, matched span in the message), no persistent state.
@@ -712,8 +743,122 @@ extend `CANON_KIT_COUNT_ALLOWED_PHRASES` (a genuinely fixed set), or site-exempt
 with reason. The good/bad pair covers every match shape and the mechanical
 exemptions;
 `check-manifest-count.test.sh` covers the config-driven paths (a consumer-governed
-noun and the allowlist containment) the stock defaults cannot reach. `precommit`
-tier.
+noun and the allowlist containment) the stock defaults cannot reach, and the
+measured-marker discharge's *window* — that the marked claim is exempt and the
+next paragraph is not, which a pair cannot spell because a fixture file either
+trips or does not. `precommit` tier.
+
+### check-measured-claim
+
+Invariant: a measured count or extent claim that names an oracle agrees with it.
+The class this closes is a claim authored into governed prose with **no** oracle
+at all — a total, a corpus size, a swept set — which goes stale the moment the
+thing it measured moves, and whose detection is a human re-measuring by hand at
+review time if at all. The sibling ban (§check-manifest-count) reaches the
+tractable slice of that class by refusing a bare cardinal over a governed
+collection; it cannot reach a claim carrying no cardinal, and an *extent* claim
+("the kit SPECs came back clean") is exactly that shape. Both halves need the
+author to say what was measured, so this is a **marker** an author applies rather
+than a scanner inferring intent: a scanner triggers on a numeral, and the claims
+that cost the most carry none.
+
+**The marker binds a claim to an oracle key and its measured value**, as a
+full-line HTML comment on the line immediately above the claim:
+
+```
+<!-- measured: <key>=<value> -->
+```
+
+It joins the family `install-primary:` (§check-install-claim) and
+`payload-discloses:` (§check-payload-claim) rather than inventing a form — a
+full-line comment pairing a prose claim with a machine-readable id drawn from a
+consumer-owned vocabulary behind a `*_CMD` knob. It is deliberately **not** the
+`-exempt:` family: those are suppression valves that make a gate look away, and
+this is an attachment that gives a gate something to check. The reader-facing
+form of the claim stays prose; the marker is the tier beside it.
+
+**The oracle is consumer-owned.** `CANON_KIT_MEASURED_CLAIMS_CMD` names a command
+emitting one `<key>`⇥`<value>` line per measurable fact, loaded through
+`spec_claim_vocabulary` (§lib/spec.sh) and so carrying that loader's fail-closed
+contract. The marker grammar and the comparison are kit mechanism; every key,
+every oracle command and every measured fact is consumer config, because a kit
+literal enumerating what a project measures would publish that project's
+vocabulary. An unset knob means the gate has no oracle and reports clean — the
+inactive-by-default posture its `*_CMD` siblings take.
+
+**Three arms.**
+
+- **A — the oracle disagrees.** Red when the emitter's current value for `<key>`
+  differs from the marker's `<value>`. This is the point: the number in the
+  document is now checked against the tree.
+- **B — the key is unknown.** Fail closed (exit 2) when `<key>` is absent from
+  the emitter's roster. A marker naming a key nobody emits is a claim with no
+  oracle wearing the costume of one, which is worse than an unmarked claim. A
+  marker that does not parse fails closed for the same reason.
+- **C — the marker drifted off its own sentence.** When `<value>` is a bare
+  cardinal, red unless that cardinal appears as a token in the claim the marker
+  binds. Without arm C the marker and the prose can disagree while the marker and
+  the oracle agree, and the gate would go green over a false sentence — the exact
+  failure being closed.
+
+Arm C's cardinal grammar is §check-manifest-count's, read as a value: a digit run
+or a spelled `two`…`twelve` normalized to digits, so a marker's `12` and a
+sentence's "twelve" are one cardinal rather than two. The claim a marker binds is
+the paragraph below it, ending at a blank line, a fence, a second marker or the
+end of file. **The authoring contract arm C prices:** a bound claim carrying more
+than one distinct cardinal is ambiguous, and the gate fails closed rather than
+guessing which one the marker holds — the remedy in the help line is to split the
+sentence or move the marker onto the clause that carries the measurement. That
+cost is bounded: it applies only to sentences an author chose to mark.
+
+**Extent claims are covered by arms A and B alone, and that is the design rather
+than a gap.** An extent claim carries no cardinal, so arm C does not apply and arm
+A does the work, with `<value>` whatever the author declares the extent to be and
+the emitter recomputes: a corpus size, a sorted membership list, a digest over
+the swept set. This is the axis no scanner reaches and it costs nothing extra —
+the same arms, with a set-valued rather than integer-valued oracle. Because the
+config bridge refuses an element containing a tab and tab is this protocol's own
+field separator, a set-valued oracle joins its members with something else.
+
+**The known limit, stated rather than hidden: a claim nobody marks is uncaught
+here.** What narrows it is §check-manifest-count's discharge, which makes marking
+pressured rather than voluntary wherever the ban already bites.
+
+The scanned surface is its own glob knob, `CANON_KIT_MEASURED_SURFACE_GLOBS`,
+**not** the manifest set. The motivating class ranges over SPEC sections and
+binding shims alike, and neither existing surface reaches a shim: the manifest set
+excludes them by omission, with no documented rationale (a reader should not infer
+a ruling from a silent absence), and the prose surface (§lib/spec.sh) excludes them
+by a documented decision about which gate *owns* a shim — `check-shim-restatement`,
+which holds copy shape. That ownership is not this rule's: a restatement that is
+**wrong** has diverged from its owner's wording and is therefore not a copy. So
+reusing either surface would under-scan by exactly the instance that motivated the
+class. Fenced blocks are skipped (a fence is grammar being shown, not a claim being
+made), and a per-site `measured-claim-exempt: <reason>` marker on the line or the
+one above suppresses a marker a document is exhibiting rather than asserting.
+
+Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committing
+operator via the output contract; each marker read at the single scan transition
+(file, line, key, value), no persistent state. `precommit` tier.
+
+**Born native, and this is the first gate with no shell original** — operator-ruled
+2026-08-12 with the cost below in view. TRAJECTORY.md §The objectives' sixth
+shrinks the interpreter surface to the unavoidable, so a new shell gate is debt
+created knowingly; landing it as a Rust module plus a `.gate` descriptor avoids
+that, and it needs no unbuilt substrate (its glob corpus is served by the walker
+already in production, which is why the corpus was designed as its own surface
+rather than a union with the manifest set). The port criteria govern *ports*, so a
+gate with one implementation has no second substrate to prove parity against: its
+oracle is its `good/`+`bad/` pair, exactly like any new shell gate's, with
+`check-measured-claim.test.sh` holding the fail-closed arms a pair cannot spell.
+**The accepted cost:** a `.gate`-declared member is omitted from the `gates.list` of
+a consumer whose host the release publishes no artifact for, so on an uncovered
+platform this gate does not run where a shell gate would have. That is the port's
+standing cost, already accepted for the members whose shell forms were deleted, and
+it is why the omit-and-declare path exists — a paid price, not an open risk. What
+stays open is only its reach: this settles *this* gate, and a reader weighing a
+second born-native gate weighs the cost again rather than citing this one as
+blanket precedent.
 
 ### check-prose-enum
 

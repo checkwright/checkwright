@@ -98,9 +98,31 @@ gates own their own totals, per `gates.list`.
 EOF
 check_case "paragraph-break-no-join" 0 "MANIFEST-COUNT: clean"
 
+# The measured-marker discharge is a *window*, not a whole-file valve: the marker
+# line and the claim below it are exempt, and the very next paragraph is not — a
+# pair cannot spell that, because one file either trips or does not.
+cat >"$SANDBOX/wrap/SPEC.md" <<'EOF'
+# wrap — SPEC
+
+<!-- measured: gate-total=7 -->
+The registry holds 7 gates today, bound to an oracle rather than transcribed.
+
+The registry holds 7 gates today, said again with nothing bound to it.
+EOF
+out="$(cd "$SANDBOX/wrap" && gate_run check-manifest-count "$DIR/checks" 2>&1)"; rc=$?
+if [[ "$rc" -ne 1 ]]; then
+    echo "  FAIL [measured-window]: want exit 1, got $rc -- $out"; fails=$((fails + 1))
+elif [[ "$(grep -c 'restated collection total' <<<"$out")" -ne 1 ]]; then
+    echo "  FAIL [measured-window]: the discharge did not bound itself to the marked claim:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+elif ! grep -qF -- "SPEC.md:6  restated collection total: 7 gates" <<<"$out"; then
+    echo "  FAIL [measured-window]: the unmarked restatement was not the one reported:"
+    printf '    %s\n' "$out"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-manifest-count.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-manifest-count.test.sh: clean (governed-noun trip + allowlist containment + ungoverned-noun clean + wrapped-total first-line report + paragraph-break non-join)"
+echo "check-manifest-count.test.sh: clean (governed-noun trip + allowlist containment + ungoverned-noun clean + wrapped-total first-line report + paragraph-break non-join + measured-marker discharge window)"
 exit 0

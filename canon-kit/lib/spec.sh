@@ -100,6 +100,9 @@ declare -p CANON_KIT_INSTALL_CLAIM_EXCLUDE &>/dev/null || CANON_KIT_INSTALL_CLAI
 [[ -v CANON_KIT_PAYLOAD_CLAIMS_CMD ]] || CANON_KIT_PAYLOAD_CLAIMS_CMD=""
 declare -p CANON_KIT_PAYLOAD_CLAIM_EXCLUDE &>/dev/null || CANON_KIT_PAYLOAD_CLAIM_EXCLUDE=()
 
+[[ -v CANON_KIT_MEASURED_CLAIMS_CMD ]] || CANON_KIT_MEASURED_CLAIMS_CMD=""
+declare -p CANON_KIT_MEASURED_SURFACE_GLOBS &>/dev/null || CANON_KIT_MEASURED_SURFACE_GLOBS=()
+
 declare -p CANON_KIT_COMMENT_MACHINE &>/dev/null || CANON_KIT_COMMENT_MACHINE=()
 declare -p CANON_KIT_COMMENT_REASON  &>/dev/null || CANON_KIT_COMMENT_REASON=()
 declare -p CANON_KIT_COMMENT_SURFACE &>/dev/null || CANON_KIT_COMMENT_SURFACE=()
@@ -482,6 +485,11 @@ spec_install_transports() {
     spec_claim_vocabulary "$CANON_KIT_INSTALL_TRANSPORTS_CMD" CANON_KIT_INSTALL_TRANSPORTS_CMD
 }
 
+# spec: canon-kit/SPEC.md §check-measured-claim — the measured-claim oracle's roster, the third caller of the general loader above; a key is slug-shaped and a value is one non-empty tab-free field, which is that function's contract rather than a second one here.
+spec_measured_claims() {
+    spec_claim_vocabulary "$CANON_KIT_MEASURED_CLAIMS_CMD" CANON_KIT_MEASURED_CLAIMS_CMD
+}
+
 _sk_errs=()
 [[ -n "$CANON_KIT_SPEC_NAME" ]]      || _sk_errs+=("CANON_KIT_SPEC_NAME is empty")
 [[ -n "$CANON_KIT_AMENDMENT_GLOB" ]] || _sk_errs+=("CANON_KIT_AMENDMENT_GLOB is empty")
@@ -534,4 +542,18 @@ if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_ENUM_SET_NAMES \
         CANON_KIT_ENUM_SET_MEMBERS+=("$_sk_m")
     done <<<"$_sk_sets"
     unset _sk_sets _sk_n _sk_m
+fi
+
+declare -p CANON_KIT_MEASURED_KEYS &>/dev/null   || CANON_KIT_MEASURED_KEYS=()
+declare -p CANON_KIT_MEASURED_VALUES &>/dev/null || CANON_KIT_MEASURED_VALUES=()
+if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_MEASURED_KEYS \
+   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_MEASURED_VALUES ]] \
+   && [[ -n "$CANON_KIT_MEASURED_CLAIMS_CMD" ]]; then
+    _sk_meas="$(spec_measured_claims)" || exit 2
+    while IFS=$'\t' read -r _sk_k _sk_v; do
+        [[ -n "$_sk_k" ]] || continue
+        CANON_KIT_MEASURED_KEYS+=("$_sk_k")
+        CANON_KIT_MEASURED_VALUES+=("$_sk_v")
+    done <<<"$_sk_meas"
+    unset _sk_meas _sk_k _sk_v
 fi

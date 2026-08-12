@@ -1,0 +1,3 @@
+# graph: couples=*.md,scripts/*.sh,kit:*.sh dir=one valve=none tier=precommit
+# install: on-surface
+# spec: canon-kit/SPEC.md §check-measured-claim — a `measured:` marker binds a prose claim to an oracle key, and the gate re-runs the oracle: an unknown key or an ambiguous claim fails closed, a value the oracle no longer reports or a cardinal missing from the sentence is red

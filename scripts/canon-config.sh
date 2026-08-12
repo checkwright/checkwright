@@ -68,6 +68,12 @@ CANON_KIT_PAYLOAD_CLAIMS_CMD="bash scripts/payload-claims.sh"
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_PAYLOAD_CLAIM_EXCLUDE=("docs/posts/*")
 
+# comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs)
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_MEASURED_CLAIMS_CMD="bash scripts/measured-claims.sh"
+# shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
+CANON_KIT_MEASURED_SURFACE_GLOBS=("${CANON_KIT_MANIFEST_FILES[@]}" ".claude/commands/*.md")
+
 # comment-tier-exempt: the enum-set emitter derives the queue-tag set from queue-kit's own tag parser plus this repo's lesson tags, so a prose enumeration of the tag vocabulary that drops a member is caught rather than trusted
 # shellcheck disable=SC2034  # consumed by canon-kit/lib/spec.sh after sourcing
 CANON_KIT_ENUM_SETS_CMD="bash scripts/enum-sets.sh"

@@ -6,6 +6,7 @@ pub mod docs_cmd;
 pub mod knob_citation;
 pub mod manifest_count;
 pub mod md_refs;
+pub mod measured_claim;
 pub mod prose_enum;
 pub mod queue_entry_budget;
 pub mod queue_hygiene;
@@ -154,6 +155,20 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_ENUM_SETS_CMD",
             "CANON_KIT_ENUM_SET_NAMES",
             "CANON_KIT_ENUM_SET_MEMBERS",
+        ],
+    ),
+    // spec: canon-kit/SPEC.md §check-measured-claim — born native, so it derives its corpus
+    // from its own glob surface rather than from `spec::manifest_files`: the knob set is its
+    // two knobs plus the two bridged arrays the emitter's roster crosses as
+    (
+        "check-measured-claim",
+        measured_claim::run,
+        &["?"],
+        &[
+            "CANON_KIT_MEASURED_CLAIMS_CMD",
+            "CANON_KIT_MEASURED_SURFACE_GLOBS",
+            "CANON_KIT_MEASURED_KEYS",
+            "CANON_KIT_MEASURED_VALUES",
         ],
     ),
     // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — a

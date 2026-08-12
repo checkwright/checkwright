@@ -297,6 +297,18 @@ pub fn walk_prose(
     exempt: &str,
     sink: &mut dyn ProseSink,
 ) -> Result<(), String> {
+    walk_prose_multi(files, &[exempt], sink)
+}
+
+// spec: canon-kit/SPEC.md §check-manifest-count — the same walk over more than one per-site
+// marker, so a member whose ban has a second sanctioned discharge names both windows rather
+// than carrying a second walk of its own
+pub fn walk_prose_multi(
+    files: &[String],
+    exempts: &[&str],
+    sink: &mut dyn ProseSink,
+) -> Result<(), String> {
+    let marked = |s: &str| exempts.iter().any(|e| s.contains(e));
     let mut para = Para::default();
     let mut curfile = String::new();
     for f in files {
@@ -323,7 +335,7 @@ pub fn walk_prose(
                 prev = raw.to_string();
                 continue;
             }
-            if fence || raw.contains(exempt) || prev.contains(exempt) || is_blank(raw) {
+            if fence || marked(raw) || marked(&prev) || is_blank(raw) {
                 sink.on_pflush(&curfile, &para);
                 para.reset();
                 prev = raw.to_string();
@@ -362,6 +374,20 @@ fn lstrip_space(b: &[u8]) -> &[u8] {
 const CARDINAL_WORDS: &[&str] = &[
     "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
 ];
+
+// spec: canon-kit/SPEC.md §check-measured-claim — the same alternation read as a value, so
+// arm C's "does this cardinal appear in the claim" and check-manifest-count's "is there a
+// cardinal here" are one grammar with one spelling
+pub fn cardinal_word_value(w: &str) -> Option<String> {
+    CARDINAL_WORDS
+        .iter()
+        .position(|c| *c == w)
+        .map(|i| (i + 2).to_string())
+}
+
+// spec: canon-kit/SPEC.md §check-measured-claim — the marker's opening literal, shared by the
+// gate that reads it and by check-manifest-count, whose ban the marker discharges
+pub const MEASURED_MARKER: &str = "<!-- measured:";
 
 pub struct CountGrammar {
     nouns: Vec<String>,

@@ -754,6 +754,7 @@ answering a question assertion C never asked.
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
 | `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. `check-queue-slug-liveness` is itself a ported member since the queue-kit cohort, and `check-docs-cmd` since the canon-kit one, so this row now describes `.gate`-declared gates for both; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. `check-install-claim` and `check-payload-claim` are still shell, so their half of the row still describes scripts. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
+| `check-measured-claim` | **Retained, and sensitive through its oracle rather than its corpus — the first born-native member to take a row.** What it scans is the governed-prose surface, so by corpus it is a reverse trigger like the row above. What makes it substrate-sensitive is the consumer oracle behind `CANON_KIT_MEASURED_CLAIMS_CMD`, which its `couples=` reaches through `scripts/*.sh`: this repo's emitter counts how much of the registry resolves to a `.gate` descriptor, so it reads declaration paths **as a set**, the shape `check-gate-binary-fresh` has. A port therefore *moves its value*, which is the mechanism working rather than a blind spot — the number a marked sentence states is about the port, and the sentence reddens when the port advances without it. The design that landed the gate predicted no row here, on the premise that its `couples=` named no declaration path; the emitter coupling the same design requires falsifies that premise, and the row is recorded rather than the coupling dropped, because dropping it would leave the oracle's own source outside the trigger set. |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
 
@@ -1035,6 +1036,33 @@ design time; the last three were paid for, and each is named with what it cost.
    share of the corpus the report cannot speak for, and every port moves a member
    into it until the binary answers `--needs`. That is the pressure the sequencing
    below rests on, and it is why the arm is scheduled rather than left open.
+
+**A born-native gate is the first member these criteria do not describe, and only
+some of them bind on it.** The roster is stated over *ports* — a gate that exists
+in shell and is being moved — so a gate landed as a Rust module and a `.gate`
+descriptor with no shell original (canon-kit/SPEC.md §check-measured-claim is the
+first, operator-ruled 2026-08-12) reads them as follows, and a later reader must
+not apply the parity criterion to a member that has no second substrate:
+
+- **1 and 3 bind unchanged.** It registers in `gates.list` and it lands in the
+  generated hook, so `check-graph` proves its manifest the same way.
+- **2 does not bind.** Parity is *between substrates*, and a gate with one
+  implementation has none to prove against. Its `good/`+`bad/` pair is its whole
+  oracle, exactly as it would be for a new shell gate — which is a weaker
+  guarantee than a ported member's parity run, and the reason a born-native gate
+  is a design ruling rather than a default.
+- **4 does not bind** where the gate's corpus is not the gate corpus: a member
+  whose `couples=` names no registry member's declaration path is outside the
+  substrate-sensitive derivation and takes no conservation-table row.
+- **5 binds hardest, and it is the price.** A `.gate`-declared member is omitted
+  from the `gates.list` of a consumer whose host the roster carries no artifact
+  for, so on an uncovered platform a born-native gate does not run *where a shell
+  gate would have*. For a port that trade is neutral — the shell form is deleted
+  either way; for a born-native gate it is a real subtraction against the
+  alternative of shipping shell, and it is what the operator ruling weighs.
+- **6 and 7 bind unchanged**, and a born-native gate is designed to clear them at
+  authoring time rather than owing the work afterwards, which is most of why it is
+  cheap: the substrate it needs already exists or it is not born native.
 
 ### The first cohort, and the rule that selects the next
 

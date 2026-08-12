@@ -1,0 +1,3 @@
+key 'gate-total' is marked '6' but the oracle now reports '7'
+key 'supported-hosts' is marked 'linux' but the oracle now reports 'linux,macos'
+appears nowhere in the claim it binds

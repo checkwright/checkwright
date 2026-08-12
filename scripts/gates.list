@@ -85,6 +85,7 @@ check-tightened-gates-note-parity
 check-npm-publish-spec
 check-manifest-temporal
 check-manifest-count
+check-measured-claim
 check-tracking-claim
 check-prose-enum
 check-prose-tells
