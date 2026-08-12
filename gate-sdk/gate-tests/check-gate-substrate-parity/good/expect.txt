@@ -1,5 +1,5 @@
 GATE-SUBSTRATE-PARITY: clean
-1 descriptor(s) in parity with the 2-subcommand roster, 1 reference-only
+1 descriptor(s) in parity with the 2-subcommand roster (2 in scope, 0 owned by a kit this tree did not vendor, owner column unavailable), 1 reference-only
 1 substrate-sensitive member(s) all dispositioned
 1 implementation source(s) free of manifest-class annotation
 1 kit root(s) scanned for an implementation sibling, crate root crate outside every kit root

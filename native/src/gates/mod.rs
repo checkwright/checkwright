@@ -27,7 +27,19 @@ pub type GateFn = fn(&[String]) -> i32;
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the fourth element is the member's declared knob
 // reads, the data `--knobs` prints and the config bridge resolves. Un-omittable by the same
 // construction, so no member can read a knob the bridge was never asked to carry.
-pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fifth element is the owning kit's
+// directory basename, `--list`'s second column, by which assertion B scopes its roster half to
+// the kits a consumer vendored. Un-omittable by the same construction, and held to the tree by
+// the unit test below rather than trusted as a self-declaration.
+pub type GateEntry = (
+    &'static str,
+    GateFn,
+    &'static [&'static str],
+    &'static [&'static str],
+    &'static str,
+);
+
+pub const REGISTRY: &[GateEntry] = &[
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because each member's scan root is
     // its own first argument with a default, the same variable-first-argument shape the
     // shell parser calls undecidable and skips-and-counts.
@@ -36,12 +48,14 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
         action_pinning::run,
         &["?"],
         &["GATE_PRUNE_DIRS"],
+        "gate-sdk",
     ),
     (
         "check-action-gh-repo",
         action_gh_repo::run,
         &["?"],
         &["GATE_PRUNE_DIRS"],
+        "gate-sdk",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — the queue-kit cohort reads named files
     // rather than walking a tree, so each member declares an empty walk-root set: there is no
@@ -51,18 +65,21 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
         queue_sections::run,
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_REQUIRED_SECTIONS"],
+        "queue-kit",
     ),
     (
         "check-queue-wrap",
         queue_wrap::run,
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_WRAP_BUDGET"],
+        "queue-kit",
     ),
     (
         "check-queue-hygiene",
         queue_hygiene::run,
         &[],
         &["QUEUE_KIT_QUEUE_FILE", "QUEUE_KIT_PROSE_LEADS"],
+        "queue-kit",
     ),
     // spec: queue-kit/SPEC.md §lib/queue.sh — a member reading a derived section matcher declares
     // every knob that matcher is computed from, since the Rust side derives them from the
@@ -78,6 +95,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
+        "queue-kit",
     ),
     (
         "check-task-names",
@@ -90,6 +108,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_DONE_SECTION",
         ],
+        "queue-kit",
     ),
     (
         "check-queue-entry-budget",
@@ -102,6 +121,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
+        "queue-kit",
     ),
     // spec: queue-kit/SPEC.md §check-task-conservation — the HEAD side comes out of the git object store
     // rather than off the filesystem, so this member walks nothing and declares the same empty
@@ -117,6 +137,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_ICEBOX_SECTION",
             "QUEUE_KIT_DONE_SECTION",
         ],
+        "queue-kit",
     ),
     // spec: canon-kit/SPEC.md §lib/spec.sh — the canon-kit cohort's members all derive their
     // corpus from `spec::manifest_files`, so each declares that derivation's whole knob set
@@ -137,6 +158,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_COUNT_WEDGE_WORDS",
             "CANON_KIT_COUNT_ALLOWED_PHRASES",
         ],
+        "canon-kit",
     ),
     // spec: canon-kit/SPEC.md §check-prose-enum — the vocabulary is a bridged *value*, two
     // index-aligned arrays because the wire format's own separator is the tab; the command
@@ -156,6 +178,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_ENUM_SET_NAMES",
             "CANON_KIT_ENUM_SET_MEMBERS",
         ],
+        "canon-kit",
     ),
     // spec: canon-kit/SPEC.md §check-measured-claim — born native, so it derives its corpus
     // from its own glob surface rather than from `spec::manifest_files`: the knob set is its
@@ -170,6 +193,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_MEASURED_KEYS",
             "CANON_KIT_MEASURED_VALUES",
         ],
+        "canon-kit",
     ),
     // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — a
     // substrate-sensitive member by reverse trigger only: its `couples=` reaches gate
@@ -188,6 +212,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_MDREF_EXCLUDE",
         ],
+        "canon-kit",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` for the reason spelled out at
     // check-spec-fence-balance below: the walk root does not bound the read set
@@ -205,6 +230,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_MDREF_EXCLUDE",
             "CANON_KIT_DOCS_BLOB_REF",
         ],
+        "canon-kit",
     ),
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a git-spawning member, reaching its
     // child through `proc::run` alone
@@ -220,6 +246,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
+        "canon-kit",
     ),
     // spec: canon-kit/SPEC.md §check-knob-citation — the second consumer of the kit-root
     // mechanism inside this cohort: it calls it directly for its prefix roster, not only
@@ -237,6 +264,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
         ],
+        "canon-kit",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` rather than the literal `.` the walk
     // starts from: a concrete root asserts the member's `couples=` covers every tracked file
@@ -254,6 +282,7 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_QUEUE_FILE",
         ],
+        "canon-kit",
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the scan root is the member's
     // own first argument with a default, the variable-first-argument shape the shell parser
@@ -269,32 +298,36 @@ pub const REGISTRY: &[(&str, GateFn, &[&str], &[&str])] = &[
             "QUEUE_KIT_DEFERRED_SECTION",
             "QUEUE_KIT_ICEBOX_SECTION",
         ],
+        "queue-kit",
     ),
 ];
 
 pub fn lookup(name: &str) -> Option<GateFn> {
     REGISTRY
         .iter()
-        .find(|(n, _, _, _)| *n == name)
-        .map(|(_, f, _, _)| *f)
+        .find(|(n, _, _, _, _)| *n == name)
+        .map(|(_, f, _, _, _)| *f)
 }
 
 pub fn roots(name: &str) -> Option<&'static [&'static str]> {
     REGISTRY
         .iter()
-        .find(|(n, _, _, _)| *n == name)
-        .map(|(_, _, r, _)| *r)
+        .find(|(n, _, _, _, _)| *n == name)
+        .map(|(_, _, r, _, _)| *r)
 }
 
 pub fn knobs(name: &str) -> Option<&'static [&'static str]> {
     REGISTRY
         .iter()
-        .find(|(n, _, _, _)| *n == name)
-        .map(|(_, _, _, k)| *k)
+        .find(|(n, _, _, _, _)| *n == name)
+        .map(|(_, _, _, k, _)| *k)
 }
 
-pub fn names() -> Vec<&'static str> {
-    REGISTRY.iter().map(|(n, _, _, _)| *n).collect()
+// spec: gate-sdk/SPEC.md §check-gate-substrate-parity — `--list`'s two columns, the second
+// naming the kit whose `checks/` declares the member. Emitted together because a consumer
+// reading the roster needs the owner to know whether it vendored the member at all.
+pub fn names_with_owners() -> Vec<(&'static str, &'static str)> {
+    REGISTRY.iter().map(|(n, _, _, _, o)| (*n, *o)).collect()
 }
 
 // spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — each `?`
@@ -342,6 +375,25 @@ mod tests {
         assert!(declaration_covers(&["corpus", "?"], &["corpus".into(), "x".into()]).is_ok());
     }
 
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the owner column is registry data
+    // held to executed behavior: a declared owner must be the kit whose `checks/` carries the
+    // descriptor.
+    #[test]
+    fn every_registry_member_declares_the_kit_that_carries_its_descriptor() {
+        assert!(!REGISTRY.is_empty(), "no member to assert over");
+        let repo = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        for (name, _, _, _, owner) in REGISTRY {
+            let declared = repo.join(owner).join("checks").join(format!("{}.gate", name));
+            assert!(
+                declared.is_file(),
+                "{} declares owner {}, but {} is not a file",
+                name,
+                owner,
+                declared.display()
+            );
+        }
+    }
+
     // spec: gate-sdk/SPEC.md §check-reads-couples — unit test A: the declared roots are
     // held to what the code does, by running each member over its own fixture cases with
     // the walk recorder on. Nothing else makes a self-declared read set trustworthy.
@@ -351,7 +403,7 @@ mod tests {
         walk::bridge_declared_knobs();
         let mut cases_run = 0usize;
         let mut roots_observed = 0usize;
-        for (name, f, declared, knobs) in REGISTRY {
+        for (name, f, declared, knobs, _) in REGISTRY {
             for case in walk::fixture_case_dirs(name) {
                 let args = case_args(&case);
                 // spec: gate-sdk/SPEC.md §run-gate-tests — the member's knobs are bridged from

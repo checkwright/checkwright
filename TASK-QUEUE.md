@@ -59,42 +59,6 @@
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
   demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec.
 
-- **substrate-parity-partial-vendor-scope** [spec: SPEC-parity-scope.md] —
-  `check-gate-substrate-parity` assertion B equates a whole-binary roster against a
-  partially-vendored descriptor set.
-  Red in gate-sdk's consumer smoke, and **pre-existing rather than this iteration's** — probed in
-  a detached worktree at `37c6969b` and `5f8066d5`, same verdict at both. The scratch consumer
-  vendors gate-sdk alone, so it receives the multi-call binary (which carries every ported kit's
-  subcommands) but only gate-sdk's descriptors; assertion B equates the binary's `--list` roster
-  with the descriptors on disk and reds naming `check-task-names` — a queue-kit gate — as a
-  subcommand nothing declares.
-  **Re-probed at HEAD 2026-08-12 at spec, and the mechanism is confirmed directly:** `--list`
-  reports 18 subcommands across three kits and the on-disk descriptor set matches it, so a
-  gate-sdk-only vendoring leaves sixteen unexplained. The default smoke run vendors every kit
-  and is green, which is why `.workflow/validate-baseline.txt` holds `consumer_smoke pass`
-  while the subset invocation reds — the two are consistent and the baseline is not stale.
-  **The equality cannot hold in any consumer that vendors a subset of the kits whose gates the
-  shared binary carries**, which is every consumer once a second kit ports. So it grows with the
-  port rather than staying one kit's problem, and that is what makes it worth a unit now.
-  **Not caught by the commit-time battery:** the consumer smoke is not in README's per-kit
-  fixture-runner battery, so nothing at commit time or in CI runs it. That is why it survived two
-  iterations unnoticed and is a second, separable finding inside this one.
-  **Ruled at spec:** assertion B's roster half restricts to the vendored kits, the owning kit
-  comes off `--list` as a second column held to the tree by a crate unit test, and the subset
-  configuration gets a commit-time oracle in the bespoke gate test rather than a second smoke
-  leg. Building the binary per-vendoring is refused — criterion 5's closed install model ships
-  one prebuilt artifact per declared *target*, and a per-subset build is that set times every
-  kit combination.
-  **SAME SHAPE as `consumer-smoke-subset-accounting-verdict`, and not a duplicate of it.** That
-  entry is the *registration accounting* assertion reddening under a kit subset; this is
-  *substrate parity*. Different assertion, different fix — weighed at spec and deliberately not
-  unified, since the two derive scope from different inputs; the shared predicate is recorded in
-  the amendment for whoever takes the sibling.
-  **Cost while deferred:** a standing red in a suite nothing runs automatically, which trains
-  readers to discount it — and it blocks using the consumer smoke as an oracle for the port.
-  Filed 2026-08-12 by close, draining the gap inbox; found and probed at build, ruled
-  non-blocking for this iteration by the lead; promoted 2026-08-12 at spec.
-
 - **capture-affordance-help-flag** [spec: SPEC-bin-argv.md] — a `bin/` tool that validates
   argument *count* accepts a flag as its free text, and a capture affordance files it.
   recurrence: capture-affordance-help-flag 2026-08-09 2026-08-12
@@ -4304,6 +4268,11 @@
   carries no knob query at all, so phase 1 running FROM=v0.22.0's vendored shell
   against the current binary never supplies the knob the binary now requires —
   `check-action-pinning` and `check-action-gh-repo` exit 2 under zero config.
+  **Second instance, measured 2026-08-12 at build:** `--list` gained an owning-kit
+  column, so `v0.22.0`'s vendored `check-gate-substrate-parity.sh` parses each
+  two-column row as a subcommand name and reds — a third FROM gate on the same
+  pairing, and the cost field below firing on a widened binary *interface* rather
+  than on a widened dispatch set.
   **Not a live end-user hazard:** `installer/lib/update.sh` exec's into
   `init.sh`, which writes vendored shell and the digest-verified binary from one
   release payload in one pass, so a real `checkwright update` cannot produce
@@ -5077,6 +5046,7 @@
 - port-criterion-cohort-cost-form
 - port-criterion-transitive-binding-reach
 - cohort-hold-criterion-label-defect
+- substrate-parity-partial-vendor-scope
 
 ## Lessons Learned
 

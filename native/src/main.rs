@@ -17,7 +17,8 @@ fn no_such_gate(name: &str) -> ! {
         "checkwright-gates: no such gate subcommand: {} — the check could not run; treating as failure (not clean)",
         name
     );
-    eprintln!("  help: this binary carries: {}", gates::names().join(", "));
+    let carried: Vec<&str> = gates::names_with_owners().iter().map(|(n, _)| *n).collect();
+    eprintln!("  help: this binary carries: {}", carried.join(", "));
     exit(2);
 }
 
@@ -42,9 +43,12 @@ fn main() {
         exit(0);
     }
 
+    // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — two tab-separated columns,
+    // `<subcommand>\t<owning-kit>`; a column rather than a fifth flag, because a column an
+    // older binary does not print degrades where an unknown flag exits 2.
     if first == "--list" {
-        for n in gates::names() {
-            println!("{}", n);
+        for (n, owner) in gates::names_with_owners() {
+            println!("{}\t{}", n, owner);
         }
         exit(0);
     }

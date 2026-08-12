@@ -774,8 +774,11 @@ instead of trusting it as empty. Test A holds a `?` to its arity, not to nothing
 each one absorbs a single unmatched observed root, so a second undeclared walk still
 reds.
 
-**Where that verification runs, and where it does not.** Both unit tests are
-`cargo test`, so they run in this repo and in CI and **never in a consumer tree**:
+**Where that verification runs, and where it does not.** Those unit tests are
+`cargo test` — and so is the third registry-data test, the one holding each
+member's declared owning kit to the descriptor that kit's `checks/` actually
+carries (§check-gate-substrate-parity, assertion B's owner column) — so they run
+in this repo and in CI and **never in a consumer tree**:
 `native/` ships no `checks/` and no `smoke/`, so it is not a kit root and no
 consumer ever receives the crate source — there is nothing there to run them
 against and nothing there to edit. That is not a weakening; it makes the division
@@ -1810,6 +1813,15 @@ consumer config**. Proving the *install* path is the installer's own smoke
 and runs `init` against it. The two harnesses must not blur: this one answers
 *do the kits work when vendored*, that one answers *does the installer deliver
 them*.
+
+**Its default run vendors every kit, so its silence on a subset vendoring is not
+coverage.** `run-consumer-smoke.sh` takes kit roots as arguments, and the
+subset invocation — vendoring one kit while the shared binary carries every
+ported kit's subcommands — is a real configuration this harness can be put in and
+is not put in by any scheduled run. That configuration is covered instead by the
+bespoke `check-gate-substrate-parity` test, which reaches it in a sandbox at
+commit time (§check-gate-substrate-parity); recorded here so a later reader does
+not read the default run's green as an answer about the subset.
 
 **It does place the gate binary, and the rule is stated rather than left as an
 exception, because a reader will otherwise lean on the older
@@ -3162,13 +3174,76 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   `gate_resolve`'s within-dir precedence: that precedence exists so a consumer
   can *shadow* a kit's gate, and using it to paper over a half-finished port
   would hide the state a port passes through.
-- **assertion B — subcommand parity, both directions.** The set of `.gate`
+- **assertion B — subcommand parity, both directions, over the kits this tree
+  vendored.** The set of `.gate`
   descriptors across the resolve dirs equals the binary's reported subcommand
   roster (`--list`). A descriptor naming no subcommand is a gate that cannot
   run; a subcommand with no descriptor is a gate nothing declares — unless the
   conservation section dispositions it `reference-only`, the one allowance and
   the reason it is recorded there rather than in the crate (§Meta-gate
-  conservation for the binary substrate). With the binary **load-bearing** and
+  conservation for the binary substrate).
+  **The roster half is scoped to the vendored kits, because the unscoped
+  equality is unsatisfiable in any consumer that vendors a subset of the kits
+  the shared binary carries** — which is every consumer once a second kit ports,
+  so the gap grows by the size of each cohort rather than staying one kit's
+  problem. The rule: *for each subcommand, if its owning kit is present in
+  `gate_kit_roots`, a descriptor for it must exist*; a subcommand whose owning
+  kit is absent is **out of scope, counted, and declared on the clean line**. The
+  equality was always meant to catch a **stranded implementation** — a subcommand
+  no descriptor dispatches to, dead code or the residue of a half-finished port —
+  and a subcommand belonging to a kit the consumer never took is neither.
+  Three properties are held deliberately. **The other direction stays
+  unrestricted**: a descriptor the resolve dirs carry with no subcommand behind
+  it is red whatever kit owns it, because a vendored descriptor is in scope by
+  definition and that direction is what catches a gate that cannot run. **The
+  `reference-only` allowance is untouched** and composes — an in-scope subcommand
+  with no descriptor is still checked against the conservation section exactly as
+  before. **The half does not go dark**: it still runs whenever the binary is
+  readable, never gated on descriptor count or on the registry, which is the
+  correction the reverted port paid for; out-of-scope subcommands are counted and
+  printed, so an emptied scope is visible rather than silent, in the shape the
+  zero-descriptor clean line already uses.
+  **The owner is registry data held to executed behavior, not a self-declaration.**
+  `--list` prints two tab-separated columns, `<subcommand>` and the owning kit's
+  directory basename as it appears under `gate_kit_roots`; the descriptor that
+  would otherwise answer this is precisely what a subset vendoring lacks. The
+  declaration lives in the crate's dispatch registry beside each member's walk
+  roots and knobs — an entry a member cannot compile without — the same shape
+  `--reads` and `--knobs` have, and a crate unit test holds it to the tree: for
+  every registered subcommand, `<owner>/checks/<name>.gate` exists.
+  **A second column rather than a fifth flag, and the reason is version skew.**
+  The gate ships in a kit and the binary ships in the payload, and the two version
+  independently — `init` places a released binary while a consumer may vendor a
+  newer kit, and the upgrade smoke drives exactly that across two hops. A fifth
+  top-level flag an older binary does not recognise answers non-zero, which
+  §Fail-closed contract makes exit 2: every such consumer's battery would die on a
+  flag rather than on a finding. A column degrades instead: an older binary prints
+  one, the gate reads no owner, and the assertion **falls back to the unrestricted
+  equality**, declaring on its clean line that the restriction was unavailable.
+  That is a return to the pre-column behavior, never a false green — proved by a
+  run, since the bespoke test drives the identical subset roster through a
+  one-column binary and it still reds. One row without the column drops the whole
+  roster to the fallback rather than scoping part of it, because a partly-scoped
+  roster would speak for kits it could not place. The **stated residual**: a real
+  adopter on a subset vendoring with a pre-column binary still reds until the
+  binary is upgraded. It does not reach the consumer smoke, which builds the
+  binary from the crate on every run, and it is bounded by a version rather than
+  open-ended.
+  **Building the binary per vendoring is refused, and the refusal is recorded
+  because the option reads attractive and costs a session to re-cost.** Criterion
+  5's install model is closed (§The port-candidate criteria): the payload carries a
+  prebuilt binary per declared *target*, built by the release and never from a
+  working tree. A per-vendoring binary makes the artifact set the product of
+  targets and kit subsets — every combination of kits an adopter might choose —
+  which no release can enumerate and no digest roster can own, and it re-imports
+  the build-time coupling the reverted port removed.
+  **The predicate this shares with the registration-accounting assertion, stated
+  once here so the sibling cites rather than re-derives it:** *an assertion over a
+  whole-roster fact states its scope in terms of what the tree vendored.* The two
+  were weighed and deliberately **not** unified — they derive scope from different
+  inputs, this one from a subcommand's owning kit as the binary reports it, that
+  one from the vendored kits' `checks/` directories it already reads, so a shared
+  rule would be parameterised over both and become a third thing to keep true. With the binary **load-bearing** and
   absent or non-executable the gate exits 2, never 0 — the §Fail-closed
   contract, since "cannot verify" and "verified equal" must not share an exit
   code. Load-bearing is the predicate §check-gate-binary-fresh states: a
@@ -3195,7 +3270,9 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   subcommand with no descriptor and red as a stranded implementation.
   `--knobs` is the fourth, added by the config bridge (§lib/gate.sh), and it is
   named here rather than left to be re-derived: it was written against exactly
-  this paragraph's invitation to the next author.
+  this paragraph's invitation to the next author. The owner column adds no fifth:
+  it is roster **data** on a line the roster already carries, which is the whole
+  reason it was taken instead of a flag.
 - **assertion C — disposition coverage.** Every substrate-sensitive member
   carries a disposition line in §Meta-gate conservation for the binary
   substrate. The set is **derived at runtime** — a member whose expanded
@@ -3296,7 +3373,20 @@ cohort's descriptors ship, where the fail-closed arm *and* assertion F's
 missing-roster arm must both stay quiet; and the near miss, **a registered member
 resolving to a descriptor with no binary**, which must still exit 2. The last two
 are the corrected predicate's own boundary, and a too-loose predicate passes the
-`good/` case and reds only there.
+`good/` case and reds only there. Four further cases hold the vendor scope, and
+they are in the bespoke test rather than in a second consumer-smoke leg because
+that suite vendors, installs and drives a whole scratch tree and buying it twice
+to reach one assertion is the cost this split exists to avoid: **descriptors for
+one kit and a binary reporting a second kit's subcommands too**, where the gate
+must run clean; **the near miss**, the same sandbox with the in-scope kit missing
+a descriptor, which must red; **the same subset roster from a one-column binary**,
+which must red as it does without the column, so the fallback is run rather
+than asserted; and **a vendored descriptor naming no subcommand under the scoped
+path**, because the obvious implementation restricts one loop and accidentally
+restricts both. That test is in the per-kit fixture-runner battery, so the subset
+configuration acquires a commit-time oracle at no measurable cost — it had none
+at commit time or in CI, which is how a standing red in it goes unnoticed across
+iterations.
 
 **Why those configurations are held in fixtures rather than assigned to live
 trees.** A coverage claim naming a tree is only as durable as that tree's

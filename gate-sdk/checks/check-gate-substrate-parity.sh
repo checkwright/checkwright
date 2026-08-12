@@ -23,7 +23,14 @@ mapfile -t MEMBERS < <(gates_list_members "$LIST")
 [[ ${#MEMBERS[@]} -gt 0 ]] || { echo "check-gate-substrate-parity: $LIST names no gates" >&2; exit 2; }
 
 RESOLVE_DIRS=("$GATES_DIR")
-while IFS= read -r k; do RESOLVE_DIRS+=("$k/checks"); done < <(gate_kit_roots_rel)
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion B's roster half scopes to the
+# kits this tree vendored, so the same walk that builds the resolve dirs records their names
+KIT_NAMES=()
+while IFS= read -r k; do
+    RESOLVE_DIRS+=("$k/checks")
+    k="${k%/}"
+    KIT_NAMES+=("${k##*/}")
+done < <(gate_kit_roots_rel)
 
 # spec: gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate — the one
 # disposition surface, read by assertion B's reference-only allowance and assertion C
@@ -82,6 +89,12 @@ BIN="$(gate_native_bin)"
 subcommands=()
 refonly=0
 roster_read=0
+in_scope=0
+out_of_scope=0
+# spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fallback state is printed as its own
+# word: a binary predating the owner column cannot answer which kit owns a subcommand, and the
+# honest verdict there is today's unrestricted equality, declared rather than assumed
+owner_state=scoped
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the fail-closed arm is on the corrected
 # predicate: descriptors nothing registered dispatches to leave the binary not load-bearing
 if [[ "$dispatching" -gt 0 && ! -x "$BIN" ]]; then
@@ -95,12 +108,29 @@ if [[ -x "$BIN" ]]; then
     roster_read=1
     listing="$("$BIN" --list)"; st=$?
     fail_closed "$st" check-gate-substrate-parity "$BIN --list"
-    mapfile -t subcommands < <(printf '%s\n' "$listing" | grep -v '^$' | sort -u)
+    mapfile -t rows < <(printf '%s\n' "$listing" | grep -v '^$' | sort -u)
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — `<subcommand>\t<owning-kit>`; one
+    # row without the column drops the whole roster to the unrestricted equality, because a
+    # partly-scoped roster would speak for kits it could not place
+    owners=()
+    for row in "${rows[@]+"${rows[@]}"}"; do
+        subcommands+=("${row%%$'\t'*}")
+        if [[ "$row" == *$'\t'* ]]; then owners+=("${row#*$'\t'}"); else owners+=(""); owner_state=unavailable; fi
+    done
     for g in "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}"; do
         printf '%s\n' "${subcommands[@]}" | grep -qx -- "$g" \
             || findings+=("descriptor names no subcommand: $g.gate declares a gate the binary does not carry")
     done
-    for s in "${subcommands[@]}"; do
+    # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the roster half speaks only for the
+    # kits this tree vendored: a subcommand whose owning kit is absent is neither dead code nor
+    # a half-finished port, it is out of scope, and it is counted rather than dropped silently
+    for i in "${!subcommands[@]}"; do
+        s="${subcommands[$i]}"
+        if [[ "$owner_state" == scoped ]] && ! printf '%s\n' "${KIT_NAMES[@]+"${KIT_NAMES[@]}"}" | grep -qx -- "${owners[$i]}"; then
+            out_of_scope=$((out_of_scope + 1))
+            continue
+        fi
+        in_scope=$((in_scope + 1))
         printf '%s\n' "${DESCRIPTORS[@]+"${DESCRIPTORS[@]}"}" | grep -qx -- "$s" && continue
         if grep -F -- "\`$s\`" <<<"$section" | grep -qi -- 'reference-only'; then
             refonly=$((refonly + 1))
@@ -295,7 +325,7 @@ if [[ ${#findings[@]} -gt 0 ]]; then
 fi
 
 if [[ "$roster_read" == 1 ]]; then
-    roster="${#DESCRIPTORS[@]} descriptor(s) in parity with the ${#subcommands[@]}-subcommand roster, $refonly reference-only"
+    roster="${#DESCRIPTORS[@]} descriptor(s) in parity with the ${#subcommands[@]}-subcommand roster ($in_scope in scope, $out_of_scope owned by a kit this tree did not vendor, owner column $owner_state), $refonly reference-only"
 else
     roster="${#DESCRIPTORS[@]} descriptor(s), no binary at $BIN so no subcommand roster to compare"
 fi
