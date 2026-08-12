@@ -186,6 +186,86 @@
   Filed 2026-08-12 at scope, on the operator ruling that reframed the apparent contradiction;
   promoted 2026-08-12 at spec.
 
+- **capture-affordance-help-flag** [spec: SPEC-bin-argv.md] — a `bin/` tool that validates
+  argument *count* accepts a flag as its free text, and a capture affordance files it.
+  recurrence: capture-affordance-help-flag 2026-08-09 2026-08-12
+  **Three firings, three sessions** (2026-07-28 `--help`, 2026-08-09 `--list`, 2026-08-12
+  `--help` again), each writing a bullet to the committed, boundary-blocking gap inbox at exit
+  0. The third sat as an uncommitted modification until a routine pre-commit `git diff` on an
+  unrelated filing caught it by chance — one commit from a permanent bogus entry.
+  **Promoted 2026-08-12 at spec, with the class re-measured rather than inherited.** A grep of
+  every kit's `bin/` for its argument validation finds **five** members, not the one the entry
+  named: `file-gap.sh` and `cite-survey.sh` share the `$# -ne 1` shape; `file-survey.sh` and
+  `kfric.sh` are safe only by arity, which a flag in any slot defeats; `enter-stage.sh`
+  validates argument *shape* and so needs no refusal — but has no help handler either, which is
+  the measured harm below. `cite-survey.sh` and `enter-stage.sh` are census finds, not firings.
+  **Batched with `scope-rename-guard-deadlock` because one caused the other.** The rename
+  entry's third firing ran `enter-stage.sh --help` looking for a rename mode and got
+  `'--help' is not a lifecycle stage`; the missing help handler is what sent that session three
+  guards deep. One surface, one amendment.
+  **The gate-sdk decision the deliverable owed is ruled: yes, with a narrowed predicate** — a
+  `bin/` tool whose positional arguments are free text validates their shape, `--` ends options
+  — and **no new gate**, on the `--simulate` precedent (behavioral coverage in `smoke/`,
+  lifecycle-kit/SPEC.md §bin/enter-stage.sh) rather than a static scanner that would pass a tool
+  printing usage while still capturing `--list`.
+  Filed 2026-07-28 at close (`front-door-readiness`); iceboxed, returned 2026-08-09 by the
+  gap-inbox drain that judged its recurrence; promoted 2026-08-12 at spec.
+
+- **scope-rename-guard-deadlock** [spec: SPEC-bin-argv.md] — scope's naming step has no
+  unblocked path; two guards steer into each other.
+  recurrence: scope-rename-guard-deadlock 2026-08-11 2026-08-12
+  The scope template mandates renaming the iteration on the existing `scope` stamp in
+  `.workflow/WORKFLOW-STATE.txt`. `enter-stage.sh` owns no rename mode, `workflow-state-guard`
+  blocks Edit on that file, and `bash-guard` blocks `sed -i` while steering back to Edit. Three
+  consecutive scopes completed a documented contract by routing around a guard, each
+  re-inventing the workaround rather than inheriting it.
+  **The guards are not wrong, their scope is.** `workflow-state-guard`'s stated rationale is
+  hand-*stamping*, which moves the stage cursor. A rename leaves the stage token untouched.
+  **The recipe the third firing found, preserved:** an awk rewrite of column 1 only, guarded by
+  an `md5sum` comparison of columns 2-4 before and after so the stage/id/date columns are
+  *proved* unchanged, run via `guard-kit/bin/scratch-run.sh`.
+  **Ruled at spec: option one, `enter-stage.sh --rename <name>`.** The recipe above is the
+  content predicate applied by the **writer**, which is where it is cheap and exact; a hook
+  would have to reconstruct the pre-edit file to compute the same thing with less information.
+  A separate `rename-iteration.sh` is ruled out — it would add a second sanctioned writer of the
+  state file, and one-writer is the property the guard's own message asserts.
+  **The mode writes both surfaces**, header and every stamp, because the naming step was always
+  a two-surface write `check-stage-evidence` requires to agree — so the "they ride in one
+  commit" coordination scope.md states as prose becomes a property of the writer.
+  Filed 2026-08-10 by close, from the bullet that iteration's scope session filed; promoted
+  2026-08-12 at spec.
+
+- **readonly-dispatch-isolation-unbuyable** [spec: SPEC-isolation-base-ref.md] — an isolated
+  agent's base ref is a harness setting; only the untracked half was ever a design problem.
+  recurrence: readonly-dispatch-isolation-unbuyable 2026-08-11 2026-08-12
+  **Promoted 2026-08-12 at spec, with its diagnosis corrected.** Seven attestations recorded a
+  worktree cut at `origin/master` rather than the dispatcher's HEAD, and this entry read them as
+  a harness defect worth four authored design candidates. `worktree.baseRef` (enum `fresh` |
+  `head`) is a supported setting whose shipped schema description says it applies to agent
+  isolation, and `fresh` — the default every attestation ran under — is the
+  `origin/<default-branch>` mode. **Confirmed by dispatch, not by reading:** under `head` a
+  child came up at the dispatcher's HEAD `4ed57685` while `origin/master` stood seven commits
+  back at `b8f27d8e`. Every prior attestation records correctly-applied configured behavior, so
+  no defect is written up. No upstream filing is owed either — the mechanism and its
+  discoverability harm are already filed as anthropics/claude-code #77671 and #82955.
+  **The half that survives, and it is the worse one.** An isolated child cannot read untracked
+  or gitignored files at all: they are in no commit, so no base ref reaches them and naming a
+  rev does not help. Attested — a sweep over `.workflow/prompt-friction.log` read an empty file
+  and reported the 621-line corpus absent; `compare-settings-allow.sh` saw no overlay because
+  `.claude/settings.local.json` is uncommitted. This is where this entry's original lead line is
+  true and only here: a read-only claim is made by isolation, and isolation blinds that read, so
+  such a sweep has no correct form and must not be dispatched.
+  **What the amendment lands:** the false universal corrected in the shipped, public template
+  `delegation-kit/templates/agent-execution.md`; the untracked blindness written there for the
+  first time; the child-side rev discipline kept as defence in depth with its reason stated; and
+  the repo-level pin (`.claude/settings.json` plus `scripts/settings-pins.conf`, one commit,
+  because a pin naming an absent key is exit 2). No new gate — `check-settings-pins` is already
+  the general mechanism and holds memory-off by the same means.
+  **The 2026-08-12 gap-inbox bullet re-filing this entry is superseded, not withdrawn:** its
+  observation holds, its cause does not. Close drains it against the amendment.
+  Filed 2026-08-08 by close, from the knowledge-friction capture and the gap it drained;
+  promoted 2026-08-12 at spec on a corrected premise.
+
 
 ## Technical Debt
 
@@ -3915,56 +3995,6 @@
   publishes it, so the failure is silent on both the governed and the public tier.
   Filed 2026-08-08 by close, generalizing the gap it drained.
 
-- **readonly-dispatch-isolation-unbuyable** [design-pending] — the shape that makes a read-only
-  claim is the shape that poisons the read.
-  recurrence: readonly-dispatch-isolation-unbuyable 2026-08-11 2026-08-12
-  `scripts/agent-dispatch-guard.sh` refuses a `DELEGATION_KIT_READONLY_TYPES` dispatch without
-  `isolation: worktree`, which is correct — a read-only claim is made by isolation, not by
-  sentence. But the harness cuts that worktree at a **stale base**, not at HEAD, so the audit
-  the isolation was bought for reads the pre-change tree. The two rules compose into: a
-  declared read-only audit is either refused or unreliable, with no third option.
-  **Measured this iteration, on both halves.** A worktree was observed 21 commits behind,
-  predating the whole iteration; `/align` ran three isolated audit sweeps whose clean verdict
-  could not be certified, and all three build batches had to re-verify their own read sites to
-  buy the doubt out. Separately an in-flight worktree dirtied the tree and aborted the consumer
-  smoke at preflight (exit 2). The dirty-tree half is fixed — the path is gitignored — and the
-  stale-base half has only a protocol mitigation
-  (`delegation-kit/templates/agent-execution.md`): the child verifies `git rev-parse HEAD` and
-  reads targets with `git show <rev>:<path>` out of the shared object store.
-  **Why `[design-pending]`:** the mitigation is unenforced prose on the *child*, and nothing
-  holds a parent to putting it in the dispatch. The honest candidates are a guard that requires
-  the rev-discipline clause in a read-only dispatch prompt, a kit-side wrapper that injects it,
-  or a ruling that read-only fan-out reads only through the object store — the first two gate a
-  prompt's text, which is the reach question the design owes.
-  **Six firings at `native-cohort-queue-kit`, all handed the IDENTICAL rev `47965229`** from
-  dispatchers at `f67e0388`, `32c009ca` and `465ea869`. That rev **was** `origin/master`: this
-  close's push reported the range `47965229..a9e701e6`.
-  **Leading hypothesis — the worktree is cut from the remote tracking ref, not the dispatcher's
-  HEAD.** If so, staleness equals the unpushed backlog exactly, this repo's one-to-two-push
-  budget *causes* it rather than merely coexisting with it, and a dispatcher can read its own
-  exposure as `git log origin/master..HEAD`.
-  **CONFIRMED 2026-08-12 — the predicted witness ran and returned the predicted value.** This
-  entry set up a free experiment: the next sweep was it. A scope survey's worktree came up at
-  `a9e701e6`, and `git rev-parse origin/master` still resolves to exactly that commit (distance
-  0). So the hypothesis is **demonstrated, not correlated**: the worktree is cut from the remote
-  tracking ref, staleness equals the unpushed backlog, and `git log origin/master..HEAD` reads it.
-  **It also inverts a candidate:** pushing before dispatching would fix it but spends the budget
-  the repo conserves, so the live options are the rev-naming mitigation (six for six) or handing
-  the child its required checkout. What is unbuilt is the *enforcement*, not the technique.
-  **Second half found this close: isolation cannot see untracked state at all.** A sweep sent to
-  triage `.workflow/prompt-friction.log` (gitignored, worktree-local) read an empty file and
-  reported the 621-line corpus absent; `compare-settings-allow.sh` likewise saw no overlay,
-  `.claude/settings.local.json` being uncommitted. So **a close-surface sweep over an untracked
-  capture surface cannot be delegated to a worktree**, and naming the rev does not fix it: three
-  of the six rows in lifecycle-kit/SPEC.md §The close-surface roster are untracked. This is a
-  **false negative from an isolation mechanism** — the same shape as this iteration's vacuous
-  fixture pair, where the check runs, reports clean, and proves nothing.
-  **Cost while deferred:** an isolated audit's verdict is uncertifiable, so its consumer either
-  re-verifies the same sites (paying for the audit twice) or trusts a read that may predate the
-  work under review. Widened by the untracked half: such a sweep returns a confident "nothing
-  there", indistinguishable from a clean triage, which is the worse failure of the two.
-  Filed 2026-08-08 by close, from the knowledge-friction capture and the gap it drained.
-
 - **deferred-release-declaration-accumulation** [design-pending] — only one of the note's three
   sections survives a deferred release.
   `.workflow/tightened-gates.txt` is the accumulating declaration surface for **Tightened
@@ -4215,39 +4245,6 @@
   the directive count filed here was 1774, wrong by roughly a factor of two on the day it was
   written. Read the numbers off the oracle, never off this line.**
   Filed 2026-08-09 by close (`install-profile-seam`), from its own miswritten citation.
-
-- **capture-affordance-help-flag** [design-pending] — `lifecycle-kit/bin/file-gap.sh` takes
-  exactly one free-text argument, so a **flag** satisfies its arity check and is filed as a gap.
-  recurrence: capture-affordance-help-flag 2026-08-09 2026-08-12
-  **Returned from the icebox by its own re-occurrence.** The eviction criterion was that no
-  named event waited to promote it; a witnessed re-occurrence is that event.
-  **First seen 2026-07-28** with `--help`. **Re-occurred at the 2026-08-09 scope boundary**:
-  `bash lifecycle-kit/bin/file-gap.sh --list` filed the bullet `- 2026-08-09 - --list` at
-  **exit 0**, reverted uncommitted. The re-occurrence widens the class from `--help` to any
-  flag-shaped argument — the tool validates argument *count* and emptiness, never shape.
-  The blast radius is larger than a typo because the inbox is boundary-blocking: a spurious
-  bullet refuses the next scope entry.
-  **Third occurrence, 2026-08-12 during align.** `bash lifecycle-kit/bin/file-gap.sh --help`,
-  run only to check usage before filing a real gap, was captured as gap prose at exit 0 exactly
-  as the class predicts — `--help` again, the original flag. **Worse blast radius than either
-  prior instance:** the second occurrence exited 0 and was reverted before it risked a commit;
-  this one sat as an uncommitted modification to the tracked inbox file until a routine
-  pre-commit `git diff` on an unrelated, later, genuine gap filing caught it by chance — one
-  commit away from landing a permanent bogus entry in a committed, boundary-blocking file, not
-  a harmless stderr message. Found and reverted with Edit before that commit; the real filing
-  landed clean in the same commit. Three firings across three sessions now (2026-07-28,
-  2026-08-09, 2026-08-12) is the measured rate, not two.
-  **Deliverable:** flag handling on the single-free-text-argument capture affordances — `-h`
-  and `--help` reaching the `usage()` the script already has, and a refusal for any
-  unrecognized leading `-` — plus a decision on whether the convention becomes a gate-sdk
-  authoring rule for `bin/` tools generally. Sibling `drift-kit/bin/kfric.sh` is safe only by
-  accident: it takes two arguments, so a lone flag fails arity rather than being captured.
-  **Cost while deferred:** low per firing, recurring, and self-concealing — the failure writes
-  a committed record that *looks like* a filing, and the next scope entry is what trips over
-  it. Three firings inside two and a half weeks is the measured rate, and the third came closer
-  to landing than either prior one.
-  Filed 2026-07-28 at close (`front-door-readiness`); iceboxed, then returned 2026-08-09 by the
-  gap-inbox drain that judged its recurrence.
 
 - **install-lifecycle-reversibility** [design-pending] — `install-lifecycle.sh` writes three
   things and removes none, so lifecycle governance cannot be armed at install.
@@ -4545,53 +4542,6 @@
   the reader has no signal that it moved.
   Filed 2026-08-10 by close, as the gap-generalization owed by the renumber it
   performed.
-
-- **scope-rename-guard-deadlock** [design-pending] — scope's naming step has no
-  unblocked path; two guards steer into each other.
-  recurrence: scope-rename-guard-deadlock 2026-08-11 2026-08-12
-  The scope template mandates renaming the iteration on the existing `scope` stamp
-  in `.workflow/WORKFLOW-STATE.txt`. `enter-stage.sh` owns no rename mode,
-  `workflow-state-guard` blocks the Edit tool on that file, and `bash-guard` blocks
-  `sed -i` while steering back to Edit. Each guard steers to the other, so every
-  scope session must route around one of them to complete its own contract — the
-  `native-port-cadence` scope finished by a literal `printf` rewrite.
-  **The guards are not wrong, their scope is.** `workflow-state-guard`'s stated
-  rationale is hand-*stamping*, which moves the stage cursor. A rename leaves the
-  stage token untouched and is not that, so the guard is firing on a case its own
-  justification does not cover.
-  **Deliverable, and why `[design-pending]`:** either `enter-stage.sh` gains a
-  rename mode — the mechanized path, consistent with stamping never being done by
-  hand — or the guard exempts an edit that changes no stage token, which needs a
-  predicate over the edit's *content* rather than its path and is the harder
-  guard to write correctly. The first is likelier right; the second is what makes
-  it a design call rather than a chore.
-  **Second consecutive scope, 2026-08-11 (`native-cohort-queue-kit`).** The
-  `printf` workaround was re-invented, not inherited — the cost field's own
-  prediction, now attested rather than forecast. Two scopes in a row have
-  completed a documented contract by routing around a guard.
-  **THIRD consecutive scope, 2026-08-12 (`native-cohort-canon-kit`) — and this firing
-  found the unblocked path.** The session re-invented the workaround before finding
-  this entry, which is the prediction attested a third time. Sequence: Edit blocked by
-  `workflow-state-guard`; `enter-stage.sh --help` confirms no rename mode; a scratch
-  script at the harness scratchpad path blocked by `bash-guard`; the same script under
-  `.tmp/` blocked again, steering to `guard-kit/bin/scratch-run.sh`, which ran it. So a
-  sanctioned path **does exist**, three guards deep and named by neither of the first
-  two — `scratch-run-steer-rule` is the discoverability half of that.
-  **The recipe, so a fourth scope inherits rather than re-derives:** an awk rewrite of
-  column 1 only on the stamp line, guarded by an `md5sum` comparison of columns 2-4
-  before and after so the stage/id/date columns are *proved* unchanged, run as
-  `bash guard-kit/bin/scratch-run.sh .tmp/rename-iteration.sh <state-file> OLD NEW`.
-  **This re-weighs the deliverable above.** The guarded rewrite is exactly the
-  content predicate option two calls the harder guard to write — applied by the
-  *writer* rather than the guard, which is cheaper and available today. It does not
-  close the entry, since the contract still routes every scope around a guard, but a
-  rename mode is now measured against a working alternative rather than against nothing.
-  **At two recorded re-filings this entry meets `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`**,
-  so the next scope takes it into its proposed unit set regardless of theme.
-  **Cost while deferred:** every scope session performs a documented contract by
-  working around a guard, which is precisely the habit guards exist to prevent —
-  and the workaround is re-invented each iteration rather than inherited.
-  Filed 2026-08-10 by close, from the bullet this iteration's own scope session filed.
 
 - **amendment-commit-shape-red-conditions** [design-pending] — the amendment
   template's red-conditions prompt has no class for commit-shape gates.
@@ -5217,3 +5167,35 @@
 - gate-dispatch-stderr-becomes-argv
 
 ## Lessons Learned
+
+- **third-party-behavior-is-config-first** — repeated confirmation of a *behavior* is not
+  evidence about its *mutability*, and a rising attestation count pushes confidence the wrong
+  way.
+  **The measurement was right and the conclusion was wrong.** Isolated agents coming up at
+  `origin/master` rather than the dispatcher's HEAD was observed seven times across four
+  iterations, promoted from "leading hypothesis" to "demonstrated, not correlated", written into
+  **shipped public kit doctrine** as measured fact, hand-mitigated in every dispatch, and parked
+  as design-pending with four authored design candidates. One `gh search issues` and one grep of
+  the vendor binary's settings schema settled it: `worktree.baseRef` is a documented, supported
+  knob whose own description says it applies to agent isolation. Two commands against seven
+  sessions of hand mitigation, a false paragraph in a public kit, and four design candidates.
+  **Why `probe-before-assertion` did not catch it.** That rule governs *unverified* claims, and
+  this claim was heavily verified — about the wrong proposition. Every attestation was symptom
+  evidence, and symptom evidence accumulates without ever bearing on whether the symptom is
+  configurable. Each re-filing made the mechanism feel more settled precisely because it was
+  re-confirmed, so the evidence that should have triggered the config probe is what suppressed
+  it. The failure mode is invisible from inside: nothing about the seventh attestation looks
+  different from the first.
+  **The rule this earns.** A third-party tool's behavior is a **configuration question first**
+  and a design question only after. Before designing any mitigation around a tool you do not
+  control, probe its configuration surface and its issue tracker. Both are cheap and neither was
+  run in seven attestations.
+  **Second signal, independently useful.** A mitigation that keeps *growing* — four candidates,
+  unenforceable prose, hand-payment per dispatch — is itself evidence of solving the wrong
+  problem. A correct fix converges; this one accreted. When the workaround outgrows the thing it
+  works around, stop and re-probe the premise.
+  **Carries no attention tag, deliberately:** the audience is future design sessions, not this
+  iteration's build batches, which already carry the ruling in
+  `delegation-kit/SPEC-isolation-base-ref.md`.
+  Filed 2026-08-12 at spec, operator-directed, from the probe that collapsed
+  `readonly-dispatch-isolation-unbuyable` from four design candidates to a two-line config pin.
