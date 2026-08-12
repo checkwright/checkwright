@@ -123,21 +123,26 @@ The gate's `# graph:` manifest already couples the two paths (`couples=
 .claude/settings.json,scripts/settings-pins.conf dir=one`), so the coupling is
 declared, not discovered.
 
-**Pinning at the repo level is the durable half.** Project settings are the
-repo's own tracked config, so the guarantee stops depending on an operator's
-global `~/.claude/settings.json` — which is untracked, per-machine, and outside
-any gate's reach. The pin also inherits a second reader for free:
-`check-memory-off`'s overlay condition reds when `.claude/settings.local.json`
-sets **any** pinned key to a value other than its pin, so a local override back
-to `fresh` is caught by a gate already registered.
+**Pinning at the repo level is the durable half, and the precedence was probed
+rather than assumed.** The harness resolves settings in five tiers — managed,
+command line, `.claude/settings.local.json`, `.claude/settings.json`,
+`~/.claude/settings.json` — and objects deep-merge, with the documented
+merge-instead-of-override exceptions being permissions arrays, MCP servers, HTTP
+hook URLs and fallback-model chains. `worktree` is on none of those lists. So the
+repo's tracked project value **overrides** an operator's global value, and the
+guarantee stops depending on whichever machine dispatches. Probing this before
+relying on it is the same discipline the rest of this amendment exists to
+record.
 
-**The honest residual, stated rather than assumed:** this closes the
-project-and-overlay surface. Whether a project-level value overrides a
-user-level one for this key is a precedence question about the harness's
-settings merge; where it does not, the pin still documents intent and still
-reds a local override, and the delta (2) discipline is what carries the
-remainder. That residual is the reason delta (2) is a ruling and not a
-courtesy.
+The two tiers that outrank the project file are both covered or out of scope.
+`.claude/settings.local.json` is caught: `check-memory-off`'s overlay condition
+reds when the local file sets **any** pinned key to a value other than its pin,
+so a local override back to `fresh` fails a gate already registered — the pin
+buys that reader for free. A managed/enterprise tier and a command-line override
+outrank everything by design and are outside any repo's reach; that is the whole
+residual, and delta (2)'s discipline is what covers it. Delta (2) is a ruling
+rather than a courtesy for that reason and for the vendoring-consumer reason
+above.
 
 ### (5) The consumer-side recommendation, in the kit — **mechanical**
 
