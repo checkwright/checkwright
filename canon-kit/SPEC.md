@@ -832,6 +832,16 @@ class. Fenced blocks are skipped (a fence is grammar being shown, not a claim be
 made), and a per-site `measured-claim-exempt: <reason>` marker on the line or the
 one above suppresses a marker a document is exhibiting rather than asserting.
 
+**The valve stays, and its zero live uses are not evidence against it** (ruled at
+the `native-cohort-canon-kit` close, on a filed observation that it shipped unused).
+The use count was taken over *this* tree, which is the wrong corpus: canon-kit is a
+kit, so the valve's readers are adopters whose prose this repo cannot see. It is a
+fail-safe for an author who must exhibit a full-line marker outside a fence, and a
+fail-safe carrying live uses would mean the fence-and-inline escapes had already
+failed. It stands beside the family boundary drawn above rather than against it —
+that boundary rules what the `measured:` marker *is*, not whether a suppression
+valve may accompany it.
+
 Producer: the generated pre-commit hook / `run-gates.sh`; consumer: the committing
 operator via the output contract; each marker read at the single scan transition
 (file, line, key, value), no persistent state. `precommit` tier.

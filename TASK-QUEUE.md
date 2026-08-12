@@ -3746,7 +3746,7 @@
 
 - **readonly-dispatch-isolation-unbuyable** [design-pending] — the shape that makes a read-only
   claim is the shape that poisons the read.
-  recurrence: readonly-dispatch-isolation-unbuyable 2026-08-11
+  recurrence: readonly-dispatch-isolation-unbuyable 2026-08-11 2026-08-12
   `scripts/agent-dispatch-guard.sh` refuses a `DELEGATION_KIT_READONLY_TYPES` dispatch without
   `isolation: worktree`, which is correct — a read-only claim is made by isolation, not by
   sentence. But the harness cuts that worktree at a **stale base**, not at HEAD, so the audit
@@ -3772,11 +3772,11 @@
   HEAD.** If so, staleness equals the unpushed backlog exactly, this repo's one-to-two-push
   budget *causes* it rather than merely coexisting with it, and a dispatcher can read its own
   exposure as `git log origin/master..HEAD`.
-  **Stated at its real strength: strong correlation over six sweeps and three dispatcher HEADs,
-  not a demonstration.** The experiment that would settle it is free, because the next sweep is
-  the witness — `origin/master` is `a9e701e6` while local HEAD is `188c8c69`, so the hypothesis
-  predicts the next worktree sweep reports `a9e701e6`, one commit stale, the remote ref again
-  rather than its dispatcher's HEAD. A sweep reporting `188c8c69` falsifies it outright.
+  **CONFIRMED 2026-08-12 — the predicted witness ran and returned the predicted value.** This
+  entry set up a free experiment: the next sweep was it. A scope survey's worktree came up at
+  `a9e701e6`, and `git rev-parse origin/master` still resolves to exactly that commit (distance
+  0). So the hypothesis is **demonstrated, not correlated**: the worktree is cut from the remote
+  tracking ref, staleness equals the unpushed backlog, and `git log origin/master..HEAD` reads it.
   **It also inverts a candidate:** pushing before dispatching would fix it but spends the budget
   the repo conserves, so the live options are the rev-naming mitigation (six for six) or handing
   the child its required checkout. What is unbuilt is the *enforcement*, not the technique.
@@ -4377,7 +4377,7 @@
 
 - **scope-rename-guard-deadlock** [design-pending] — scope's naming step has no
   unblocked path; two guards steer into each other.
-  recurrence: scope-rename-guard-deadlock 2026-08-11
+  recurrence: scope-rename-guard-deadlock 2026-08-11 2026-08-12
   The scope template mandates renaming the iteration on the existing `scope` stamp
   in `.workflow/WORKFLOW-STATE.txt`. `enter-stage.sh` owns no rename mode,
   `workflow-state-guard` blocks the Edit tool on that file, and `bash-guard` blocks
@@ -4398,6 +4398,25 @@
   `printf` workaround was re-invented, not inherited — the cost field's own
   prediction, now attested rather than forecast. Two scopes in a row have
   completed a documented contract by routing around a guard.
+  **THIRD consecutive scope, 2026-08-12 (`native-cohort-canon-kit`) — and this firing
+  found the unblocked path.** The session re-invented the workaround before finding
+  this entry, which is the prediction attested a third time. Sequence: Edit blocked by
+  `workflow-state-guard`; `enter-stage.sh --help` confirms no rename mode; a scratch
+  script at the harness scratchpad path blocked by `bash-guard`; the same script under
+  `.tmp/` blocked again, steering to `guard-kit/bin/scratch-run.sh`, which ran it. So a
+  sanctioned path **does exist**, three guards deep and named by neither of the first
+  two — `scratch-run-steer-rule` is the discoverability half of that.
+  **The recipe, so a fourth scope inherits rather than re-derives:** an awk rewrite of
+  column 1 only on the stamp line, guarded by an `md5sum` comparison of columns 2-4
+  before and after so the stage/id/date columns are *proved* unchanged, run as
+  `bash guard-kit/bin/scratch-run.sh .tmp/rename-iteration.sh <state-file> OLD NEW`.
+  **This re-weighs the deliverable above.** The guarded rewrite is exactly the
+  content predicate option two calls the harder guard to write — applied by the
+  *writer* rather than the guard, which is cheaper and available today. It does not
+  close the entry, since the contract still routes every scope around a guard, but a
+  rename mode is now measured against a working alternative rather than against nothing.
+  **At two recorded re-filings this entry meets `LIFECYCLE_KIT_RECURRENCE_THRESHOLD`**,
+  so the next scope takes it into its proposed unit set regardless of theme.
   **Cost while deferred:** every scope session performs a documented contract by
   working around a guard, which is precisely the habit guards exist to prevent —
   and the workaround is re-invented each iteration rather than inherited.
@@ -4939,6 +4958,146 @@
   the same hole before anyone has priced it.
   Filed 2026-08-12 by close, draining the gap inbox, under CLAUDE.md §Housekeeping's
   operator-directed filing exception; found at validate, reframed by the lead.
+
+- **agent-worktree-reclamation-unenforced** [design-pending] — the documented auto-clean for an
+  unchanged read-only agent worktree does not fire, and nothing sweeps the residue.
+  Five worktrees from prior sessions were still on disk under `.claude/worktrees/` at four stale
+  revisions (`c0d652f5` twice, `465ea869` twice, `32c009ca`), verified by `git worktree list`.
+  **DISTINCT from `readonly-dispatch-isolation-unbuyable`**, deliberately: that entry is about
+  which revision a child *starts* from, this is about worktrees never being *reclaimed* after the
+  child ends. Neither implies the other and fixing either leaves the other standing.
+  **Cost:** each is a full checkout of the tree, so the disk cost is linear in dispatch count with
+  no ceiling. The sharper cost is correctness — a stale worktree is a second live copy of every
+  governed file, which a later `grep -r`, a gate walk, or an audit sweep can reach and read as the
+  tree. Several gates walk globs from the repo root, and the exclusion of `.claude/worktrees/` is
+  per-caller rather than central, so the protection is a habit rather than a property.
+  **Deliverable, and why `[design-pending]`:** the choice is real — a reclaim step in the close
+  stage's runtime-artifact check (cheap, late, and misses long-running sessions), a guard-side
+  sweep at dispatch time (earlier, but the guard would own lifecycle it does not today), or a
+  central ignore that makes the second copy unreachable to every walker rather than to the
+  careful ones. The third fixes the correctness half without touching the disk half.
+  **Cost while deferred:** grows monotonically with every read-only dispatch, and this repo
+  pre-authorizes delegation for read-heavy audits, so the accumulation rate is the working rate.
+  Filed 2026-08-12 by close, draining the gap inbox; found at scope, re-verified here.
+
+- **dispatch-unreadable-target-fallback** [design-pending] — a dispatched sweep whose target is
+  unreadable validates against the **dispatch prompt's paraphrase** and returns PASS.
+  Attested at this iteration's align, first round: three `isolation: worktree` children auditing
+  three SPEC amendments, each worktree pinned to a base several commits behind HEAD. One child
+  reported its target (`canon-kit/SPEC-measured-claim.md`) absent from its worktree and returned a
+  full PASS/DIVERGENCE verdict set **anyway**, including PASS on an item checking a citation in
+  `scripts/canon-config.sh`. A second round under an explicit pinned-rev protocol caught what the
+  first missed on that exact item: the cited line documents a different knob
+  (`CANON_KIT_PROSE_SURFACE_GLOBS`, not `CANON_KIT_MANIFEST_FILES`), corroborated by direct read.
+  **The failure shape is the point.** The first pass's PASS was not verification — it was the
+  dispatcher's own prompt reflected back as a report, and it is **indistinguishable in shape from
+  a genuine clean audit**. A dispatcher cannot tell the two apart from the return value, which is
+  what makes this worse than a wrong answer.
+  **DISTINCT from the two entries a reader reaches for first.**
+  `readonly-dispatch-isolation-unbuyable` is about which revision a child starts from — a
+  stale-but-present file giving wrong numbers. `dispatch-cited-evidence-unverified` is about a
+  *quotation* that cannot be traced. This is neither: it is **zero access** to the real target,
+  and a child that substitutes prose for the file rather than stopping.
+  **Deliverable, and why `[design-pending]`:** the pinned-rev protocol (state HEAD as a literal
+  sha, require `git rev-parse HEAD` back, read every target via `git show <rev>:<path>`, and
+  forbid falling back to the prompt when a target is unreadable) closes the instance and is
+  **unenforced prose on the child** — the same enforcement gap its sibling names for the
+  stale-base half. What is genuinely open is whether the buyable half is a required
+  *unreadable-target refusal* in the agent contract, or a dispatch-side wrapper that injects the
+  protocol so a parent cannot omit it. This session's own first round is the argument for the
+  second: the hazard was named in the dispatching lead's brief and the mechanics were not in the
+  prompt, so it recurred anyway.
+  **Cost while deferred:** paid as false confidence on exactly the audits delegation exists for,
+  and it is invisible by construction — the artifact is a clean report.
+  Filed 2026-08-12 by close, draining the gap inbox; found at align.
+
+- **substrate-parity-partial-vendor-scope** [design-pending] — `check-gate-substrate-parity`
+  assertion B equates a whole-binary roster against a partially-vendored descriptor set.
+  Red in gate-sdk's consumer smoke, and **pre-existing rather than this iteration's** — probed in
+  a detached worktree at `37c6969b` and `5f8066d5`, same verdict at both. The scratch consumer
+  vendors gate-sdk alone, so it receives the multi-call binary (which carries every ported kit's
+  subcommands) but only gate-sdk's descriptors; assertion B equates the binary's `--list` roster
+  with the descriptors on disk and reds naming `check-task-names` — a queue-kit gate — as a
+  subcommand nothing declares.
+  **The equality cannot hold in any consumer that vendors a subset of the kits whose gates the
+  shared binary carries**, which is every consumer once a second kit ports. So it grows with the
+  port rather than staying one kit's problem, and that is what makes it worth a unit now.
+  **Not caught by the commit-time battery:** the consumer smoke is not in README's per-kit
+  fixture-runner battery, so nothing at commit time or in CI runs it. That is why it survived two
+  iterations unnoticed and is a second, separable finding inside this one.
+  **Deliverable, and why `[design-pending]`:** most likely assertion B should equate the binary's
+  roster **restricted to the vendored kits' descriptors** — but the alternative, that the binary
+  should be built per-vendoring rather than shipped whole, is a genuinely different answer with
+  different payload consequences, and choosing between them is the unit's substance.
+  **SAME SHAPE as `consumer-smoke-subset-accounting-verdict`, and not a duplicate of it.** That
+  entry is the *registration accounting* assertion reddening under a kit subset; this is
+  *substrate parity*. Different assertion, different fix — but one shared root (a consumer-smoke
+  assertion equating a whole-roster fact in a subset-vendored tree), so whoever takes either
+  should weigh unifying the rule rather than patching two assertions.
+  **Cost while deferred:** a standing red in a suite nothing runs automatically, which trains
+  readers to discount it — and it blocks using the consumer smoke as an oracle for the port.
+  Filed 2026-08-12 by close, draining the gap inbox; found and probed at build, ruled
+  non-blocking for this iteration by the lead.
+
+- **queue-write-side-verb** [design-pending] — `TASK-QUEUE.md` has four read-side callers and no
+  write-side verb, so every stage session that restructures an entry hand-rolls a throwaway script.
+  Measured against this iteration's `.tmp/` before the boundary wipe, at `fde9db3f`: five scripts,
+  three of them mutating governed surfaces — `promote.py` (excise two deferred entries, patch a
+  premise inside one body, re-emit all three under `## New Features` carrying spec-ready tags),
+  `done-move.py` (excise the active entry, append its bare slug under `## Done`), and `countfix.py`
+  (a cardinal substitution below a hardcoded line offset) — plus `rename-iteration.sh` (the
+  `scope-rename-guard-deadlock` workaround) and `verify.py` (a read-only citation-range printer,
+  a different missing utility).
+  **Each of the three re-derives the same primitives** — locate an entry by slug, excise its body,
+  re-insert it elsewhere — and each re-derives the section grammar from scratch, guarded only by
+  hand-written asserts over raw list-slice arithmetic.
+  **queue-kit already parses that grammar**: `queue_live_slugs` plus the section classifier behind
+  `check-queue-sections` and `check-task-conservation`, with `bin/` shipping `queue-counts`,
+  `queue-edges`, `queue-index` and `roadmap` over it. The write side is not missing knowledge,
+  only a caller — **the grammar has one reader and N ad-hoc writers**.
+  **This is a correctness argument, not a convenience one.** `check-task-conservation` exists
+  because entries get lost in exactly these moves, so gating the damage after a hand-rolled
+  `del lines[start:end+2]` is the enforcement-first inversion: removing the duplication outranks
+  gating it.
+  **Deliverable, and why `[design-pending]`:** a slug-addressed `queue-kit/bin/queue-edit.sh` with
+  promote/done/defer/icebox verbs reusing queue-kit's own classifier and running the conservation
+  check over its own output before writing — the write-side counterpart to `queue-index.sh`. What
+  is open is which grammar it writes against, since `queue-entry-grammar-single-owner` records
+  that queue-kit carries two and a verb must pick a side.
+  **RELATED, NOT DUPLICATE:** `amendment-done-move-assertions` designs a *gate* for the Done-move
+  contract a verb would make unreachable; `scope-rename-guard-deadlock` is this same missing-verb
+  shape on `.workflow/WORKFLOW-STATE.txt`.
+  **Cost while deferred:** every stage session that restructures the queue writes and debugs a
+  one-off mutator against a grammar it does not own, under a conservation gate that catches the
+  loss only after the fact.
+  Filed 2026-08-12 by close, draining the gap inbox; raised by the operator mid-iteration off
+  noticing `done-move.py`, and verified against the tree rather than taken from the observation.
+
+- **port-criterion-transitive-binding-reach** [design-pending] — the born-native criterion states
+  a direct-naming test, and the gate that motivated it binds transitively.
+  gate-sdk/SPEC.md §The port-candidate criteria, bullet 4, says criterion 4 does not bind where
+  `couples=` names no registry member's declaration path and the gate takes no conservation-table
+  row. `check-measured-claim` earns a conservation-table row anyway, through an **indirect**
+  relationship: its `couples=` names `scripts/*.sh` (an emitter), and that emitter — not the
+  `couples=` glob itself — treats declaration paths as a set. The row's own prose records that the
+  landing design predicted no row here on exactly bullet 4's literal premise, and that the premise
+  was falsified by the emitter coupling.
+  **Judged a legibility gap rather than a correctness defect.** The two passages are technically
+  reconcilable — bullet 4 is conditional and this gate fails the condition — so nothing is wrong.
+  What is wrong is that a SPEC should be self-consistent without asking a reader to reconcile a
+  criterion against a table row's prose, and a future reader applying bullet 4 literally to the
+  next born-native candidate risks repeating the original misprediction.
+  **Deliverable:** one clause on bullet 4 (or a cross-reference to the `check-measured-claim` row)
+  stating that a `couples=` reaching a declaration-path-processing **oracle** counts as binding
+  transitively, not only on a direct literal match.
+  **DISTINCT from `port-criterion-aggregate-cost-blindness`**, which is about criterion **5**
+  being stated per-member while the cost it measures is cohort-level. Same SPEC section, different
+  criterion, different defect — but a session fixing either should read both, since the section
+  now has two known expressiveness gaps and one edit pass could carry both.
+  **Cost while deferred:** low and bounded, paid once per born-native candidate as a wrong
+  prediction about whether criterion 4 binds — which is cheap to correct when caught and silent
+  when not.
+  Filed 2026-08-12 by close, draining the gap inbox; found at validate.
 
 ## Icebox
 
