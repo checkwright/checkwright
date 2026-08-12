@@ -1,0 +1,5 @@
+check-crate-arms: cargo clippy failed
+unused variable: `unread`
+check-crate-arms: cargo test failed
+doubling_is_doubling
+help: fix the finding above

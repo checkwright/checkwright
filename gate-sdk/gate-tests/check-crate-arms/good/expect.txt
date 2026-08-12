@@ -1,0 +1,2 @@
+CRATE-ARMS: clean
+cargo clippy --all-targets at -D warnings and cargo test
