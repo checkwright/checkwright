@@ -111,6 +111,28 @@ the opposite of the disposition the same criterion earns on
 consumers. Two units, one criterion, two dispositions — recorded in both
 amendments so neither reads as the general rule.
 
+## The seam, ruled rather than assumed
+
+The three-way split this cohort has to hold, stated once so no delta re-decides
+it:
+
+- **Kit mechanism** — the corpus derivation itself, the four gates' rules, the
+  descriptors, the widened fixture arms, and the couples tokens delta (4) adds.
+  Every one is generic: a token naming `native/` would publish this repo's crate
+  layout into a kit file and be false for every consumer besides, which is why
+  delta (4)'s additions are bare globs matching the derivation.
+- **Consumer config** — every vocabulary these gates interpret, unchanged by the
+  port and unchanged in kind: the directive rosters, the whitelist and surface
+  globs, the count collections, the deprecation-marker vocabulary, the queue
+  file's location. Each crosses the bridge as a **resolved value**, so no
+  spelling of a consumer's vocabulary becomes a kit literal and no compiled
+  member spawns an interpreter to read consumer config.
+- **Private rule content** — **none is in play, and saying so is the ruling.**
+  This cohort ports mechanism whose every input is already either kit-generic or
+  consumer-supplied; it introduces no term list, coupling vocabulary or product
+  constant. The one place the seam could have been crossed is delta (4), and it
+  is the one place this amendment refuses a literal.
+
 ## What changes
 
 ### The parity oracle, which is what this cohort exists to buy
