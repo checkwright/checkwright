@@ -281,13 +281,19 @@ is unaffected. `check-manifest-temporal` gains **no** row — premise (i).
 **(11) The cohort's criterion-5 price is measured, and its measurement has a
 dependency inside this same iteration.** [mechanical] Criterion 5 is priced per
 member and **paid per cohort**: the amendment records the binary-less residual
-against the post-cohort registry, and `installer_smoke`'s value arm is the oracle.
-That arm is currently held `fail` on the baseline against
-`port-criterion-aggregate-cost-blindness`, which rides this same iteration.
-**This cohort's price is therefore measured after that entry's amendment lands**,
-not before, or the measurement reads a red that is not this cohort's. Recorded as
-an ordering constraint on the build batches rather than left for a batch to
-discover.
+against the post-cohort registry. That residual's oracle is
+`installer/SPEC-value-arm.md`'s own subject — the omitted roster and its
+completeness assertion, not `installer_smoke`'s value-arm verdict, which that
+amendment corrects §The port-candidate criteria, criterion 5 to stop calling the
+oracle. The instrument that prints the roster, the named binary-less `prose` leg,
+does not exist until that amendment lands; before it, every profile is the
+accidental no-artifact case the amendment retires, which is indistinguishable
+from a deliberate measurement. That arm is currently held `fail` on the baseline
+against `port-criterion-aggregate-cost-blindness`, which rides this same
+iteration. **This cohort's price is therefore measured after that entry's
+amendment lands**, not before, or the measurement reads a residual that is not
+this cohort's own. Recorded as an ordering constraint on the build batches rather
+than left for a batch to discover.
 
 **(12) `cohort-held-members-port-prerequisites` is compressed by answering, not
 by dropping.** [mechanical] That entry stands at 49 lines against a 50-line cap,
@@ -441,8 +447,9 @@ differential corpus.
   knobs join the roster with their defaults, beside the enum-set pair.
 - **canon-kit/README.md** — owned by deltas (7)-(9): three roster names, `.sh` →
   `.gate` (lines 41, 45, 46).
-- **native/src/gates/mod.rs** — the registry, and the module-per-gate comment whose
-  member count changes.
+- **native/src/gates/mod.rs** — owned by deltas (7)-(9): the registry gains the
+  three members' tuples, and the module-per-gate comment whose member count
+  changes.
 - **TASK-QUEUE.md `cohort-held-members-port-prerequisites`** — owned by delta (12).
 
 ## Definition of Done
