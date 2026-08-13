@@ -6,3 +6,4 @@
 
 native-lifecycle-cohort-and-guard-friction scope a95dae87 2026-08-13
 native-lifecycle-cohort-and-guard-friction spec af01157a 2026-08-13
+native-lifecycle-cohort-and-guard-friction align a96813ac 2026-08-13
