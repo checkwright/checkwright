@@ -102,38 +102,52 @@
   incompatible stripping dialects with no gate holding them in agreement.
 
 - **exit-echo-decoration-guard-vs-habit** [spec: SPEC-guard-context-matching.md] — the guard
-  blocks or fails to grant benign read-only decoration on an otherwise allowlisted command.
+  blocks a benign command, and the block's own corrective cannot be followed.
   recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06 2026-08-13
-  Stage sessions join independent read-only calls — `grep`, `find`, `cat`, `ls`, `echo`, git
-  subcommands — into one multi-statement `Bash` call, or pipe an allowlisted script into a
-  reducer, and the whole probe either falls off the allowlist match path or meets a guard block.
-  Both resolve to guard-kit design; the amendment is `guard-kit/SPEC-guard-context-matching.md`.
-  **Three of this entry's original grounds were falsified at spec, by running the guard rather
-  than reading it, and are corrected here rather than annotated.** `sort` **is** in
-  `GUARD_KIT_RO_BINS`' default roster and has been since before the friction-kit rename, so
-  `find … | sort` auto-allows today and only the `xargs` half of the second-contributor claim
-  stands. A newline-joined compound **is** segmented — `guard_split_compound` emits lines and
-  every consumer reads lines, so a pre-existing newline is already a boundary — and the
-  grep/find/cat/ls blob class is therefore substantially resolved already. And `$?` is **not**
-  matched by the expansion rule's pattern, so the `; echo EXIT:$?` shape falls through silently
-  and the triage argument built on it does not hold.
+  **Re-scoped 2026-08-13 by the operator to the blocking framing.** The subject is a guard
+  **block** on a command that is fine as written — not a harness permission prompt, which is
+  what this entry asserted for two iterations. The design does not move: the mechanism is
+  identical under both readings and the operator ruled knowing that. The amendment is
+  `guard-kit/SPEC-guard-context-matching.md`. The slug predates the reframe, and its `exit-echo`
+  and `vs-habit` halves both name grounds this re-scope retires.
+  **Three original grounds were falsified at spec by running the guard, and are corrected here
+  rather than annotated.** `sort` **is** in `GUARD_KIT_RO_BINS`' default roster and has been
+  since before the friction-kit rename, so `find … | sort` auto-allows today and only the
+  `xargs` half of the second-contributor claim stands. A newline-joined compound **is**
+  segmented — `guard_split_compound` emits lines and every consumer reads lines, so a
+  pre-existing newline is already a boundary — and the grep/find/cat/ls blob class is therefore
+  substantially resolved already. And `$?` is **not** matched by the expansion rule's pattern,
+  so the `; echo EXIT:$?` shape falls through silently and the argument built on it does not hold.
   **The sizing moved with them.** `bash guard-kit/bin/scan-prompts.sh` at spec reports 23
-  prompting calls across 15 patterns from 111 logged fall-throughs, against this entry's
-  2026-08-06 headline of roughly 78 of 106 with read blobs dominant. The read-blob class is
-  absent from the current profile.
-  **What survives is a different failure mode, and it is the live one.** The spec session met
-  the guard four times in one session and every one was a **guard block on a benign command**,
-  not a harness prompt — including `bash guard-kit/bin/scan-prompts.sh | head`, an allowlisted
-  script decorated only by a read-only reduction of its own output. The residue the amendment
-  addresses is exactly three things: `xargs` absent from the roster, the read-only pipeline rule
-  lacking the banner tolerance its two neighbours have, and that rule's lead predicate admitting
-  only a roster binary where a bare committed allow entry is equally reviewed.
-  **Cost while deferred:** paid once per refusal on exactly the read-heavy stages the delegation
-  doctrine wants cheap, and it is now a *blocking* cost rather than a prompting one, which is the
-  bypass-and-distrust direction rather than the round-trip one.
+  prompting calls across 15 patterns from 111 fall-throughs, against the 2026-08-06 headline of
+  roughly 78 of 106 with read blobs dominant. The read-blob class is absent from the profile.
+  **Two sessions attested the blocking half separately, same day.** The spec session met five
+  blocks and no prompt, including `bash guard-kit/bin/scan-prompts.sh | head` — an allowlisted
+  script decorated only by a read-only reduction of its own output. The lead session met three,
+  including a decoration refusal on an already allowlisted command.
+  **Not every block is a defect, and the criterion turns on the difference.** A bare-`find`
+  refusal is `guard_rule_find_glob` working as designed: a deliberate steer to the Glob tool,
+  with a corrective the caller can follow. In scope is a block whose **corrective is
+  inapplicable** — *write out the brace expansion* against a POSIX quantifier that has no
+  members — or whose **subject is not the executable command**, a glyph inside a heredoc body or
+  a single-quoted mention. A criterion counting blocks as such would sweep in every deliberate
+  steer and make this "the guard refuses too much", which is neither what was ruled nor what the
+  amendment builds.
+  **Success criterion, measurable with an instrument that exists.** Not `scan-prompts`:
+  `guard_block` exits 2 before `guard_log_fallthrough` runs, so a blocked command never reaches
+  `GUARD_KIT_LOG` and that report is **structurally blind to this entry's subject**. The
+  instrument is the decision table `guard-kit/guard-tests/cases.tsv`, which asserts a per-command
+  verdict and already sees blocks. Done is: a case for each in-scope shape — a double-quoted
+  quantifier, a heredoc-body glyph, a single-quoted absolute-path mention, an allowlisted lead
+  piped into a roster binary, a banner between read segments, an `xargs` pipeline — each
+  asserting allow, and every re-derived existing verdict still green.
+  **Cost while deferred:** a blocking cost rather than a round-trip one, which is the
+  bypass-and-distrust direction the SWOT names rather than the latency direction. Paid on exactly
+  the read-heavy stages the delegation doctrine wants cheap.
   Filed 2026-07-25 by close, operator-reported; iceboxed 2026-08-05; evicted back to Deferred
   2026-08-06 by close on attested recurrence (queue-kit/SPEC.md §The icebox tier); grounds
-  corrected and re-sized 2026-08-13 at spec.
+  corrected and re-sized 2026-08-13 at spec; re-scoped to the blocking framing 2026-08-13 by the
+  operator.
 
 ## Technical Debt
 
