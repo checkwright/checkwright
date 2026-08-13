@@ -339,7 +339,8 @@ someone else's.
   rationale gains the sentence explaining why the grant lives in 13.
 - **guard-kit/SPEC.md §Layout and configuration** — owned by delta (4), the
   `GUARD_KIT_RO_BINS` default.
-- **guard-kit/SPEC.md §Testing** — owned by the fixture obligations above.
+- **guard-kit/SPEC.md §Testing** — owned by deltas (3), (5) and (6), the
+  fixture obligations above.
 - **TASK-QUEUE.md `exit-echo-decoration-guard-vs-habit`** and
   **`guard-glyph-match-context-blind`** — owned by delta (8).
 

@@ -437,8 +437,15 @@ so both are monotone and clear by inspection.
 - **lifecycle-kit/SPEC.md §bin/enter-stage.sh** — owned by delta (4). The
   preflight's dispatch changes from a script path to the resolved command, and
   the kit's `bin/` layer gains its stated gate-sdk dependency.
-- **lifecycle-kit/SPEC.md §Testing** — owned by delta (3), the scenario runners'
-  dispatch convention.
+- **lifecycle-kit/SPEC.md, new §Testing section** — owned by delta (3). No
+  section by that name exists today (`grep -c '^## Testing' lifecycle-kit/SPEC.md`
+  is 0); each `### check-<name>` subsection cites its own `gate-tests/*.test.sh`
+  inline instead, and dispatch mechanism is never stated as a kit-wide fact. The
+  scenario runners' dispatch convention — nine runners, seven converting from a
+  script path to `gate_run` — is a kit-wide property no single gate's subsection
+  owns, so it lands in a new top-level section rather than seven duplicated
+  sentences, following guard-kit/SPEC.md §Testing's precedent for a kit whose
+  test dispatch departs from the plain fixture-pair default.
 - **TASK-QUEUE.md `cohort-held-members-port-prerequisites`** — owned by delta
   (2), the shared associative-bridge prerequisite spanning two kits.
 - **TASK-QUEUE.md `native-gate-port-remaining-corpus`** — owned by delta (13),
