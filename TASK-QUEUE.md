@@ -4934,6 +4934,121 @@
   Filed 2026-08-12 by close, draining the gap inbox; raised by the operator mid-iteration off
   noticing `done-move.py`, and verified against the tree rather than taken from the observation.
 
+- **bin-argv-shape-residual-member** [design-pending] — one `bin/` tool was left outside the
+  argument-shape contract this iteration landed, and it is the only member of its own class.
+  `SPEC-bin-argv.md` shipped the contract against a five-member census;
+  `gate-sdk/bin/run-gate-tests.sh` is a sixth with the same arity-only-not-shape defect, found at
+  align and **deliberately not folded in** — expanding a pending amendment's member count mid-align
+  widens its asserted deliverable past align's stage contract.
+  **The defect, re-verified at close rather than carried:** `TESTS_DIR=${1:-…}` and
+  `GATE_DIRS=(${@:2})` take free-text positional directory paths gated only by `$# -gt 1`, with no
+  `-h`/`--help` handling anywhere in the file. Witness: `bash gate-sdk/bin/run-gate-tests.sh --help`
+  prints `no fixture tree at --help` — a misleading nonexistent-directory error where the contract
+  wants usage text.
+  **Milder than the amendment's five, and the difference is what makes it deferrable**: it writes
+  nothing durable, so a bad argument fails a `-d` existence check rather than corrupting a governed
+  surface. That is severity, not correctness — the contract still does not hold across the roster it
+  claims.
+  **Deliverable, and why `[design-pending]`:** apply the shipped contract to the sixth member, then
+  decide whether the roster is closed. The census that found five and the sweep that found the sixth
+  used different screens, so what is open is whether `bin/` membership is derivable — a roster gate
+  over every kit's `bin/` — or stays a hand-curated set that the next tool added silently escapes.
+  **Cost while deferred:** the contract reads as roster-complete while one member fails it, which is
+  the shape a later session trusts rather than re-screens.
+  Filed 2026-08-13 by close, draining the gap inbox; found at align 2026-08-12, escalated to the
+  lead in the same session, and corroborated by a survey filed that session.
+
+- **instruction-motivation-owner** [design-pending] — the what-vs-why rule for instruction
+  surfaces has an owner for *restatements* and no owner for original motivation.
+  **Two halves of this were already answered and this entry does not re-ask them**, corrected at
+  close 2026-08-13 against the source: the general rule is delegation-kit/SPEC.md §Operative
+  residency — (a) unreachable trigger, (b) imperative only, (c) adjacent citation — and that same
+  SPEC already **rules it owes no gate**, with the structural reason stated so a later session does
+  not try to build one that cannot exist.
+  **The residual is a reach gap, verified by reading the rule's own scope.** §Operative residency
+  opens *"A rule may be restated as an imperative in a surface that does not own it"*, so it
+  presupposes an owner elsewhere. Original motivation authored **in** a surface that owns no rule
+  falls outside it: there is nothing being restated, and (b)'s "the reasoning stays with the owner"
+  has no owner to name. That is the exact shape operator ruling 2026-08-13 corrected by hand in
+  `delegation-kit/templates/agent-execution.md`, where the fix was to *create* the owner
+  (delegation-kit/SPEC.md §The delegation model) and then point at it.
+  **Nothing applies (b)/(c) at authoring time either.** Both conditions are read by an author or a
+  reviewer, and no stage, template or roster puts that read in front of anyone authoring a template
+  surface — so the conditions are correct and unfired.
+  **Deliverable, and why `[design-pending]`:** widen the rule to reach original motivation, or state
+  in the SPEC why the two cases stay separate, and give (b)/(c) an authoring-time reader. What is
+  open is which surface owns the widened rule, since the failure spans kits while §Operative
+  residency is delegation-kit's.
+  **No gate is owed and that is settled, not deferred** — the line above rules it, and this entry
+  inherits the ruling rather than reopening it.
+  **Cost while deferred:** every template surface authored keeps accreting motivation the owning
+  SPEC should hold, and the corrected instance is one file out of a corpus of twenty.
+  Filed 2026-08-13 by close, draining the gap inbox; the bullet's own claim that the rule and its
+  gateability were unfiled is false on both halves and is corrected here rather than inherited.
+
+- **instruction-surface-sweep** [design-pending] [blocked-by: instruction-motivation-owner]
+  — one full pass applying the what-vs-why rule across the instruction-file corpus, once.
+  **Operator-ruled 2026-08-13**, and deliberately moved out of that session's scope into close's
+  filing rather than started mid-iteration.
+  **The corpus is derived, never carried:** `git ls-files "*/templates/*.md" ".claude/agents/*.md"`
+  minus the `gate-tests` fixture copies — **20 files, 2020 lines** at 2026-08-13, re-derived at
+  filing time. Re-derive it at promotion; the command is the roster, the numbers are a dated
+  measurement.
+  **What the sweep applies** is the rule as ruled: an instruction surface carries the operative
+  instruction, not the reasoning that justified it. The already-worked example is commit `bdfaed3e`
+  on `agent-execution.md`, which is the calibration for how much a section loses — lead-ins,
+  dispositions and commands stay; the grounds move to the owning SPEC.
+  **The move is relocation, not deletion, and not annotation.** Grounds go to the surface that owns
+  the mechanism; a `spec:` or exempt tag that keeps the prose in place blesses the restatement,
+  which is itself the defect (CLAUDE.md §This repo is governed by its own kits).
+  **Deliverable:** every one of the twenty read against the rule, each violation either relocated to
+  a named owning section or explicitly ruled compliant, with the compliant calls stated so the next
+  differential sweep inherits a baseline rather than re-deciding.
+  **Cost while deferred:** the rule is ruled and applied to one file, so the corpus is nineteen
+  files of unswept prose under a rule that already binds it.
+  Filed 2026-08-13 by close, on operator direction; blocked on the reach question above, because a
+  sweep for violations of a rule whose scope does not reach the corpus has no stated predicate.
+
+- **close-differential-instruction-sweep** [design-pending] [blocked-by: instruction-surface-sweep]
+  — after the full sweep, close keeps the corpus swept differentially instead of re-reading it
+  whole.
+  **Operator-ruled 2026-08-13** as the second half of the sweep shape: one full pass, then close
+  runs differential passes in future iterations.
+  **The worklist is mechanically derivable and the judgment is not**, and naming that split is the
+  point — no gate is claimed over the what-vs-why call, only the set of files to look at:
+  `git diff --stat <prev-close>..HEAD -- '*/templates/*.md' '.claude/agents/*.md'`. This does not
+  contradict the standing ruling that the rule owes no gate, because a derived worklist is not an
+  oracle over the judgment applied to it.
+  **It self-applies, which constrains the deliverable's own shape.** The obligation lands in
+  `lifecycle-kit/templates/stages/close.md`, itself one of the governed surfaces, so the paragraph
+  installing it must be imperative-only with a pointer to the owning SPEC or it fails the rule it
+  installs.
+  **Deliverable, and why `[design-pending]`:** the close-stage step, plus its `<prev-close>`
+  resolution. What is open is where that ref comes from — the stamp file carries stage history, so
+  the previous close's commit is derivable, but which surface owns the derivation is not settled.
+  **Cost while deferred:** the full sweep's result decays from the next template edit onward, so a
+  one-time pass with no differential successor buys a baseline that expires.
+  Filed 2026-08-13 by close, on operator direction.
+
+- **close-red-push-ownership** [design-pending] — the state machine has no owner for a close blocked
+  by a red remote push.
+  lifecycle-kit/SPEC.md never mentions the push at all — the push-to-green rule lives only in
+  CLAUDE.md — so the two remedy shapes the SPEC does define, §Reopen after close and §The
+  interstitial mitigation, are keyed to a **post-close defect** rather than to close's own
+  verification failing at the remote.
+  **Unspecified, all three:** whether a close stamp written before the push is valid while the
+  remote is red, what re-verification close owes after an interstitial fix lands, and whether the
+  fix rides close's iteration range or the next one.
+  **Instance:** `gate-dispatch-stderr-becomes-argv`, where the fix commits landed after the close
+  commit — the sequence the SPEC has no words for.
+  **Deliverable:** a SPEC section, **not a gate.** The remedy mechanism already exists and needs no
+  new tooling, stamp grammar, or tag; the missing half is the trigger and the stamp-validity ruling.
+  The debt-vs-feature litmus and the refusal of a parallel hotfix track are already settled and are
+  inputs here, not questions.
+  **Cost while deferred:** each close that hits it improvises the protocol under time pressure, at
+  the one boundary where an improvised state write is least recoverable.
+  Filed 2026-08-13 by close, draining the gap inbox; filed by the lead mid-iteration 2026-08-13.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
