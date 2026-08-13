@@ -12,6 +12,112 @@
 
 ## New Features
 
+- **native-gate-port-remaining-corpus** [spec: SPEC-ere-cohort.md] [roadmap: now/reliability] —
+  the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  **This iteration's cohort is the ERE trio**, operator-ruled 2026-08-13 and designed at
+  gate-sdk/SPEC-ere-cohort.md: `check-install-claim`, `check-payload-claim`,
+  `check-manifest-temporal`, paying the POSIX ERE engine once for the nine members that owe it.
+  A five-member clean-group alternative and an eight-member superset were both declined.
+  Two premises the amendment corrects rather than inherits: criterion 4 binds on **none** of the
+  three (verdict taken by running `check-gate-substrate-parity`'s derivation at the cohort cut,
+  not read off manifests), and the owed engine is a **matcher with span reporting and no
+  substitution engine** — smaller than every prior sizing.
+  **The five-member `gate_kit_roots` cohort landed 2026-08-13 at build** —
+  `check-kit-registration`, `check-smoke-entry-guard`, `check-test-hermetic`,
+  `check-assertion-strength`, `check-template-registry-parity`. The entry returns here on
+  completion rather than to `## Done`: this entry is the **whole corpus**, 80 of 103 registered
+  gates remain unported, and a Done move would assert a finished port and silently drop it from
+  the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
+  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
+  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
+  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
+  means a developer clones the **public repository** — source never enters the payload, so the
+  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
+  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
+  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
+  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
+  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
+  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
+  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
+  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
+  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
+  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
+  **Four cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
+  members, the holds and their grounds live there, so this entry counts rather than restates.
+  Queue-kit closed 2026-08-11 delivering 8 of 10; canon-kit closed 2026-08-12 delivering 7 of
+  10; kit-roots closed 2026-08-13 delivering 5 of 5. Every held member is **sequencing with port
+  work owed, never exclusion**, and what each owes is on
+  `cohort-held-members-port-prerequisites` — where a POSIX ERE engine is owed by nine members,
+  the largest single piece of work the port has named. That entry owns the roster and the kits
+  it spans; a kit count copied here would be a second one to drift, and was.
+  **Cost while deferred:** large and known — 80 gates plus the runners and the install-lifecycle
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
+  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
+  2026-08-13 at build for the kit-roots cohort.
+
+- **upgrade-smoke-from-binary-pairing** [spec: SPEC-from-binary.md] — phase 1's FROM
+  self-consistency claim is untestable for every `.gate`-dispatched gate.
+  **Ruled 2026-08-13 at spec** (gate-sdk/SPEC-from-binary.md): pair each phase with its own
+  ref's binary rather than narrowing phase 1, because narrowing shrinks to nothing as the port
+  completes. The per-tag build was priced and is ~0.6s (35ms worktree add + 546ms cold release
+  build, zero dependencies at every tag) — but it must come from a **detached worktree**, never
+  an archive: `native/build.rs` runs `git ls-files` and panics outside a checkout, which is what
+  makes the obvious archive-and-build shape fail. FROM's own binary is self-consistent with
+  FROM's shell, so all three phase-1 reds are pairing artifacts and the "broken tag" message
+  mis-attributes them.
+  `gate-sdk/bin/upgrade-smoke.sh` never places a FROM-appropriate binary at
+  either phase. `gate-sdk/lib/consumer-smoke.sh`'s `csmoke_place_binary` copies
+  the **current** tree's freshly-built binary once, at FROM-phase setup, and
+  phase A's TO-side kit swap (`upgrade-smoke.sh` L75-91, a bare `cp -R` of kit
+  directories) never touches `native/` or re-invokes it. `native/` is not a kit
+  — no `checks/`, no `smoke/` — so it is never vendored per-tag, and the harness
+  has no mechanism to build or select a FROM-appropriate binary at all. The same
+  current-tree binary therefore runs under both phase 1 (the FROM
+  self-consistency check) and phase 2 (the TO check).
+  **What breaks is phase 1's claim** — "the FROM tag alone is healthy under zero
+  config" — not any actual old/new pairing transition.
+  **Concretely, this iteration:** `a5ef6e19` added `gate_command`'s `--knobs`
+  query/bridge in `gate-sdk/lib/gate.sh` and tightened `native/src/walk.rs` to
+  hard-require `GATE_SDK_KNOB_GATE_PRUNE_DIRS`. `v0.22.0`'s own `gate_command`
+  carries no knob query at all, so phase 1 running FROM=v0.22.0's vendored shell
+  against the current binary never supplies the knob the binary now requires —
+  `check-action-pinning` and `check-action-gh-repo` exit 2 under zero config.
+  **Second instance, measured 2026-08-12 at build:** `--list` gained an owning-kit
+  column, so `v0.22.0`'s vendored `check-gate-substrate-parity.sh` parses each
+  two-column row as a subcommand name and reds — a third FROM gate on the same
+  pairing, and the cost field below firing on a widened binary *interface* rather
+  than on a widened dispatch set.
+  **Not a live end-user hazard:** `installer/lib/update.sh` exec's into
+  `init.sh`, which writes vendored shell and the digest-verified binary from one
+  release payload in one pass, so a real `checkwright update` cannot produce
+  this pairing. The live-path sibling is `installer-artifact-omission-residue`.
+  **The two candidate shapes, now ruled** — give phase 1 a FROM-built binary, or narrow phase
+  1's assertion to exclude `.gate`-dispatched gates. The first is taken; the second is refused
+  because it shrinks to nothing as the port completes. The amendment carries the design.
+  **Cost while it was deferred:** the `upgrade` suite is baseline-held `fail` against
+  this slug, so phase 1 proves nothing for any `.gate`-dispatched gate until it
+  is fixed — and that held red is re-earned every iteration the port widens the
+  dispatched set.
+  Found 2026-08-10 at validate; root cause corrected the same day after review
+  caught the original framing implying a real old/new binary transition. Filed
+  2026-08-10 by close under the operator-directed filing exception, because the
+  baseline mark that unblocks the close entry requires a live slug to point at.
+
 
 ## Technical Debt
 
@@ -76,55 +182,6 @@
 
 ## Deferred
 
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
-  the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  **The five-member `gate_kit_roots` cohort landed 2026-08-13 at build** —
-  `check-kit-registration`, `check-smoke-entry-guard`, `check-test-hermetic`,
-  `check-assertion-strength`, `check-template-registry-parity`. The entry returns here on
-  completion rather than to `## Done`: this entry is the **whole corpus**, 80 of 103 registered
-  gates remain unported, and a Done move would assert a finished port and silently drop it from
-  the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
-  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
-  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
-  means a developer clones the **public repository** — source never enters the payload, so the
-  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
-  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
-  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
-  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
-  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
-  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
-  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
-  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
-  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
-  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Four cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
-  members, the holds and their grounds live there, so this entry counts rather than restates.
-  Queue-kit closed 2026-08-11 delivering 8 of 10; canon-kit closed 2026-08-12 delivering 7 of
-  10; kit-roots closed 2026-08-13 delivering 5 of 5. Every held member is **sequencing with port
-  work owed, never exclusion**, and what each owes is on
-  `cohort-held-members-port-prerequisites` — where a POSIX ERE engine is owed by nine members,
-  the largest single piece of work the port has named. That entry owns the roster and the kits
-  it spans; a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 80 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
-  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
-  2026-08-13 at build for the kit-roots cohort.
 
 - **port-criterion-aggregate-cost-blindness** [design-pending] — markdown-link liveness is
   binary-gated, and the criteria priced it per member.
@@ -4195,48 +4252,6 @@
   is the channel by which a wrong number reaches a canonical surface with a citation on it.
   Filed 2026-08-09 by close, from its own knowledge-friction triage.
 
-- **upgrade-smoke-from-binary-pairing** [design-pending] — phase 1's FROM
-  self-consistency claim is untestable for every `.gate`-dispatched gate.
-  `gate-sdk/bin/upgrade-smoke.sh` never places a FROM-appropriate binary at
-  either phase. `gate-sdk/lib/consumer-smoke.sh`'s `csmoke_place_binary` copies
-  the **current** tree's freshly-built binary once, at FROM-phase setup, and
-  phase A's TO-side kit swap (`upgrade-smoke.sh` L75-91, a bare `cp -R` of kit
-  directories) never touches `native/` or re-invokes it. `native/` is not a kit
-  — no `checks/`, no `smoke/` — so it is never vendored per-tag, and the harness
-  has no mechanism to build or select a FROM-appropriate binary at all. The same
-  current-tree binary therefore runs under both phase 1 (the FROM
-  self-consistency check) and phase 2 (the TO check).
-  **What breaks is phase 1's claim** — "the FROM tag alone is healthy under zero
-  config" — not any actual old/new pairing transition.
-  **Concretely, this iteration:** `a5ef6e19` added `gate_command`'s `--knobs`
-  query/bridge in `gate-sdk/lib/gate.sh` and tightened `native/src/walk.rs` to
-  hard-require `GATE_SDK_KNOB_GATE_PRUNE_DIRS`. `v0.22.0`'s own `gate_command`
-  carries no knob query at all, so phase 1 running FROM=v0.22.0's vendored shell
-  against the current binary never supplies the knob the binary now requires —
-  `check-action-pinning` and `check-action-gh-repo` exit 2 under zero config.
-  **Second instance, measured 2026-08-12 at build:** `--list` gained an owning-kit
-  column, so `v0.22.0`'s vendored `check-gate-substrate-parity.sh` parses each
-  two-column row as a subcommand name and reds — a third FROM gate on the same
-  pairing, and the cost field below firing on a widened binary *interface* rather
-  than on a widened dispatch set.
-  **Not a live end-user hazard:** `installer/lib/update.sh` exec's into
-  `init.sh`, which writes vendored shell and the digest-verified binary from one
-  release payload in one pass, so a real `checkwright update` cannot produce
-  this pairing. The live-path sibling is `installer-artifact-omission-residue`.
-  **Deliverable, and why `[design-pending]`:** either give phase 1 a FROM-built
-  binary (archive and build FROM's own `native/` when present at that tag), or
-  narrow phase 1's assertion to exclude `.gate`-dispatched gates explicitly
-  rather than mis-testing them silently. The first buys a per-tag Rust build
-  inside the smoke; the second shrinks what the smoke proves exactly as the port
-  widens what dispatches through the binary. Picking between them is the work.
-  **Cost while deferred:** the `upgrade` suite is baseline-held `fail` against
-  this slug, so phase 1 proves nothing for any `.gate`-dispatched gate until it
-  is fixed — and that held red is re-earned every iteration the port widens the
-  dispatched set.
-  Found 2026-08-10 at validate; root cause corrected the same day after review
-  caught the original framing implying a real old/new binary transition. Filed
-  2026-08-10 by close under the operator-directed filing exception, because the
-  baseline mark that unblocks the close entry requires a live slug to point at.
 
 - **installer-artifact-omission-residue** [design-pending] — a live `checkwright
   update` can leave a stale, now-untracked gate binary that `doctor` cannot see.
