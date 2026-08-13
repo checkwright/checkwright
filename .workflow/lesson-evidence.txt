@@ -2,3 +2,4 @@
 # lesson-disposition v1 — one line per dispositioned Lessons entry, close-triage-written:
 # <iteration> lesson <rule <file> | task <slug> | harvest <tag> | discard <reason>> — <lead-line prefix>
 
+port-oracles-and-kit-roots lesson rule doctrine-kit/DOCTRINE.md — **third-party-behavior-is-config-first**

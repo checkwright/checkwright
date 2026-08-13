@@ -85,3 +85,4 @@
 | native-port-cadence | sc sp a b v c | 4f/1d | 2 · ≤1d | 25s 2✗ | 100 |
 | native-cohort-queue-kit | sc sp a b v c | 6f/8d | 3 · ≤0d | 48s 6✗ | 101 |
 | native-cohort-canon-kit | sc sp a b v c | 6f/4d | 3 · ≤0d | 31s 4✗ | 103 |
+| port-oracles-and-kit-roots | sc sp a b v c | 4f/7d | 5 · ≤1d | 24s 2✗ | 103 |

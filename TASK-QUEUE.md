@@ -4976,34 +4976,4 @@
 
 ## Lessons Learned
 
-- **third-party-behavior-is-config-first** — repeated confirmation of a *behavior* is not
-  evidence about its *mutability*, and a rising attestation count pushes confidence the wrong
-  way.
-  **The measurement was right and the conclusion was wrong.** Isolated agents coming up at
-  `origin/master` rather than the dispatcher's HEAD was observed seven times across four
-  iterations, promoted from "leading hypothesis" to "demonstrated, not correlated", written into
-  **shipped public kit doctrine** as measured fact, hand-mitigated in every dispatch, and parked
-  as design-pending with four authored design candidates. One `gh search issues` and one grep of
-  the vendor binary's settings schema settled it: `worktree.baseRef` is a documented, supported
-  knob whose own description says it applies to agent isolation. Two commands against seven
-  sessions of hand mitigation, a false paragraph in a public kit, and four design candidates.
-  **Why `probe-before-assertion` did not catch it.** That rule governs *unverified* claims, and
-  this claim was heavily verified — about the wrong proposition. Every attestation was symptom
-  evidence, and symptom evidence accumulates without ever bearing on whether the symptom is
-  configurable. Each re-filing made the mechanism feel more settled precisely because it was
-  re-confirmed, so the evidence that should have triggered the config probe is what suppressed
-  it. The failure mode is invisible from inside: nothing about the seventh attestation looks
-  different from the first.
-  **The rule this earns.** A third-party tool's behavior is a **configuration question first**
-  and a design question only after. Before designing any mitigation around a tool you do not
-  control, probe its configuration surface and its issue tracker. Both are cheap and neither was
-  run in seven attestations.
-  **Second signal, independently useful.** A mitigation that keeps *growing* — four candidates,
-  unenforceable prose, hand-payment per dispatch — is itself evidence of solving the wrong
-  problem. A correct fix converges; this one accreted. When the workaround outgrows the thing it
-  works around, stop and re-probe the premise.
-  **Carries no attention tag, deliberately:** the audience is future design sessions, not this
-  iteration's build batches, which already carry the ruling in
-  `delegation-kit/SPEC-isolation-base-ref.md`.
-  Filed 2026-08-12 at spec, operator-directed, from the probe that collapsed
-  `readonly-dispatch-isolation-unbuyable` from four design candidates to a two-line config pin.
+

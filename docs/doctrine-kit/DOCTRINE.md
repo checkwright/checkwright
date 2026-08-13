@@ -455,3 +455,29 @@ link — an application of the load-trigger residency rule to the doctrine itsel
     something its assertion ranges over is a property of a session act that
     leaves no residue in the tree, so that third stays judgment.
     *Stages:* build, validate
+
+25. **A third-party tool's behavior is a configuration question first.** Before
+    designing any mitigation around a tool you do not control, probe its
+    configuration surface and its issue tracker; a design question is what is
+    left after both come back empty. Repeated confirmation of a *behavior* is
+    evidence about the behavior and none at all about its *mutability*, so an
+    attestation count pushes confidence the wrong way — each re-confirmation
+    makes the mechanism feel settled and suppresses the config probe that would
+    retire it. The corollary reads the mitigation rather than the tool: a
+    workaround that keeps *growing* — more candidates, more unenforceable prose,
+    a hand payment per use — is itself evidence of solving the wrong problem,
+    because a correct fix converges and this shape accretes. When the workaround
+    outgrows the thing it works around, stop and re-probe the premise.
+    *Under agent work:* an agent inherits a prior session's symptom evidence as a
+    settled mechanism and designs against it, and symptom evidence accumulates
+    across sessions without any hand-off ever bearing on whether the symptom is
+    configurable — so the premise hardens exactly as the sessions that could
+    cheaply falsify it multiply.
+    *Enforced by:* judgment, not a gate, and for the reason Probe-before-assertion
+    states — whether a session probed a vendor's settings schema leaves no residue
+    in the tree. The two divide by *target*: that rule governs a claim about the
+    tree or the harness that a local command settles; this one governs a claim
+    about an external tool, where the probe leaves the tree entirely. Its capture
+    surface is the queue's design-pending tier, where a mitigation's growing
+    candidate list is the readable signal the corollary names.
+    *Stages:* scope, spec, build
