@@ -1,19 +1,29 @@
 # shellcheck shell=bash
 # spec: gate-sdk/SPEC.md §Consumer smoke — the shared scratch-consumer builder both smoke harnesses vendor through (run-consumer-smoke.sh and context-kit/smoke/agents-md.sh)
 
-# spec: gate-sdk/SPEC.md §Consumer smoke — csmoke_place_binary: the vendored kit roots' descriptor set decides whether the scratch consumer needs the gate binary, and the invoking repo's already-built artifact is what it receives. Derived, so a kit set with no ported gate asks for nothing.
-csmoke_place_binary() {
-    local host bin descriptors=0 r
-    host="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-    bin="$(gate_native_bin)"
-
+# spec: gate-sdk/SPEC.md §Consumer smoke — csmoke_gate_descriptors: the one derivation of whether a kit set needs the binary at all, so a caller that must produce one before it can name a source tree asks the same question the placement asks
+csmoke_gate_descriptors() {   # $@ = vendorable kit roots -> the number of .gate descriptors under them
+    local n=0 r
     shopt -s nullglob
     for r in "$@"; do
-        for _ in "$r"/checks/*.gate; do descriptors=$((descriptors + 1)); done
+        for _ in "$r"/checks/*.gate; do n=$((n + 1)); done
     done
     shopt -u nullglob
+    printf '%s\n' "$n"
+}
+
+# spec: gate-sdk/SPEC.md §Consumer smoke — csmoke_place_binary: the vendored kit roots' descriptor set decides whether the scratch consumer needs the gate binary, and the caller names the checkout whose artifact it receives — a library resolving that from its own location hands every caller the invoking tree's binary, which is the pairing defect that made upgrade-smoke run one ref's shell against another's binary. Derived, so a kit set with no ported gate asks for nothing.
+csmoke_place_binary() {   # $1 = the checkout whose native/ was built, $2.. = vendorable kit roots
+    local host="$1" bin descriptors
+    shift
+    bin="$(gate_native_bin)"
+    descriptors="$(csmoke_gate_descriptors "$@")"
     [[ "$descriptors" -gt 0 ]] || return 0
 
+    [[ -n "$host" ]] || {
+        echo "csmoke: $descriptors vendored .gate descriptor(s) need the gate binary and the caller named no checkout to take one from" >&2
+        return 2
+    }
     [[ -x "$host/$bin" ]] || {
         echo "csmoke: $descriptors vendored .gate descriptor(s) need the gate binary, but $host/$bin is absent or not executable" >&2
         echo "  help: build it — bash gate-sdk/bin/build-native.sh — then re-run." >&2
@@ -23,9 +33,11 @@ csmoke_place_binary() {
     cp "$host/$bin" "$SCRATCH/$bin" || return 2
 }
 
-# spec: gate-sdk/SPEC.md §Consumer smoke — csmoke_vendor_and_install: from the kit roots (gate-sdk first) sets SCRATCH + CSMOKE_INSTALLED; returns 2 on an environment failure; the caller owns cleanup and every post-baseline assertion
-csmoke_vendor_and_install() {
-    local roots=("$@") r kit
+# spec: gate-sdk/SPEC.md §Consumer smoke — csmoke_vendor_and_install: from the binary's source checkout and the kit roots (gate-sdk first) sets SCRATCH + CSMOKE_INSTALLED; returns 2 on an environment failure; the caller owns cleanup and every post-baseline assertion
+csmoke_vendor_and_install() {   # $1 = the checkout whose native/ was built, $2.. = kit roots
+    local host="$1" roots r kit
+    shift
+    roots=("$@")
     SCRATCH="$(mktemp -d "${TMPDIR:-/tmp}/consumer-smoke.XXXXXX")" || return 2
 
     git -C "$SCRATCH" init -q
@@ -39,7 +51,7 @@ csmoke_vendor_and_install() {
         cp -R "$r" "$SCRATCH/$(basename "$r")"
     done
 
-    csmoke_place_binary "${roots[@]}" || return 2
+    csmoke_place_binary "$host" "${roots[@]}" || return 2
 
     CSMOKE_INSTALLED=0
     for r in "${roots[@]}"; do

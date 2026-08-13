@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof on the consumer-smoke mechanics; the 'upgrade' validate suite each validate stage re-runs, and (TO=HEAD, the default) the standing pre-release assertion that the working tree upgrades cleanly from the last tag. Harness-less: bare bash + git, never the network.
+# spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof on the consumer-smoke mechanics; the 'upgrade' validate suite each validate stage re-runs, and (TO=HEAD, the default) the standing pre-release assertion that the working tree upgrades cleanly from the last tag. Each phase runs its own ref's gate binary, built from a detached worktree at that ref. Harness-less: bare bash + git + cargo, never the network.
 set -uo pipefail
 
 SDK="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -32,7 +32,15 @@ BASE="$(cd "$BASE" && pwd)"
 export TMPDIR="$BASE"   # csmoke_vendor_and_install mktemps the consumer under TMPDIR — pin it to the knob
 WORK="$(mktemp -d "$BASE/upgrade-smoke.XXXXXX")" || exit 2
 SCRATCH=""              # csmoke_vendor_and_install sets this to the consumer dir
-cleanup() { rm -rf "$WORK" "$SCRATCH"; }
+# spec: gate-sdk/SPEC.md §upgrade-smoke — a per-ref worktree outlives the run if the trap does not take it, and the repo's worktree-prune mechanism should not have to collect after a validate suite
+WORKTREES=()
+cleanup() {
+    local w
+    for w in "${WORKTREES[@]+"${WORKTREES[@]}"}"; do
+        git -C "$REPO" worktree remove --force "$w" >/dev/null 2>&1
+    done
+    rm -rf "$WORK" "$SCRATCH"
+}
 trap cleanup EXIT
 
 FROM_TREE="$WORK/from"; TO_TREE="$WORK/to"
@@ -58,8 +66,41 @@ mapfile -t toroots < <(kit_dirs_in "$TO_TREE")
 [[ ${#fromroots[@]} -gt 0 ]] || { echo "upgrade-smoke: no vendorable kits at FROM ($FROM)" >&2; exit 2; }
 [[ ${#toroots[@]} -gt 0 ]] || { echo "upgrade-smoke: no vendorable kits at TO ($TO)" >&2; exit 2; }
 
-# spec: gate-sdk/SPEC.md §upgrade-smoke — step 1: vendor + install + baseline at FROM via the shared scratch-consumer builder, then run the battery (a red FROM baseline is a broken tag: exit 2, not an upgrade finding)
-csmoke_vendor_and_install "${fromroots[@]}" \
+# spec: gate-sdk/SPEC.md §upgrade-smoke — a ref's binary is built from a detached worktree at that ref, never from the archive tree its kits come from: native/build.rs stamps its source with `git ls-files` and panics outside a checkout, so an archive build dies in the build script and reads as a broken tag. The build lands in the worktree's own native/target/, which is already under the scratch base — so the host's build output is untouched and gate_native_bin's relative path still resolves against the checkout this names
+REF_TREE=""
+ref_binary_tree() {   # $1 = ref, $2 = phase label -> sets REF_TREE to a checkout whose native/ is built
+    local ref="$1" label="$2" wt out
+    REF_TREE=""
+    command -v cargo >/dev/null 2>&1 || {
+        echo "upgrade-smoke: FAIL(env) — the $label ref ($ref) dispatches gate(s) to the binary and cargo is not on PATH; this suite builds one binary per ref" >&2
+        return 2
+    }
+    wt="$WORK/checkout-$label"
+    git -C "$REPO" worktree add --detach -q "$wt" "$ref" >/dev/null 2>&1 || {
+        echo "upgrade-smoke: FAIL(env) — could not add a detached worktree at the $label ref ($ref)" >&2
+        return 2
+    }
+    WORKTREES+=("$wt")
+    # spec: gate-sdk/SPEC.md §upgrade-smoke — a ref dispatching to a binary it carries no crate for is a tag fact, and the one thing this must not do is fall back to the host's binary, which is the present behavior wearing a fallback's clothes
+    [[ -d "$wt/native" ]] || {
+        echo "upgrade-smoke: FAIL(env) — the $label ref ($ref) dispatches gate(s) to the binary and carries no crate to build one from; a broken tag, not an upgrade finding" >&2
+        return 2
+    }
+    out="$( cd "$wt/native" && cargo build --release 2>&1 )" || {
+        echo "upgrade-smoke: FAIL(env) — the $label ref ($ref) will not build its gate binary under this toolchain; an environment or tag fact, never an upgrade finding" >&2
+        printf '%s\n' "$out" >&2
+        return 2
+    }
+    REF_TREE="$wt"
+}
+
+# spec: gate-sdk/SPEC.md §upgrade-smoke — step 1: vendor + install + baseline at FROM via the shared scratch-consumer builder, paired with FROM's own binary so phase 1's claim is about FROM alone, then run the battery (a red FROM baseline is a broken tag: exit 2, not an upgrade finding)
+FROM_BIN=""
+if [[ "$(csmoke_gate_descriptors "${fromroots[@]}")" -gt 0 ]]; then
+    ref_binary_tree "$FROM" from || exit 2
+    FROM_BIN="$REF_TREE"
+fi
+csmoke_vendor_and_install "$FROM_BIN" "${fromroots[@]}" \
     || { echo "upgrade-smoke: vendoring the FROM baseline ($FROM) failed — a broken tag, not an upgrade finding" >&2; exit 2; }
 CONS="$SCRATCH"
 
@@ -80,6 +121,13 @@ for r in "${toroots[@]}"; do
     cp -R "$r" "$CONS/$k"
 done
 for r in "${fromroots[@]}"; do kitname_seen["$(basename "$r")"]=1; done
+
+# spec: gate-sdk/SPEC.md §upgrade-smoke — the binary is re-placed in the same motion that swaps the kit directories, because that swap is the upgrade transition: phase B's claim — TO's shell against TO's binary — then holds by construction rather than by the host tree happening to be TO
+if [[ "$(csmoke_gate_descriptors "${toroots[@]}")" -gt 0 ]]; then
+    ref_binary_tree "$TO" to || exit 2
+    csmoke_place_binary "$REF_TREE" "${toroots[@]}" \
+        || { echo "upgrade-smoke: FAIL(env) — could not place TO ($TO)'s gate binary in the scratch consumer" >&2; exit 2; }
+fi
 
 ( cd "$CONS" && bash gate-sdk/bin/gen-pre-commit.sh --write >/dev/null ) \
     || { echo "upgrade-smoke: phase A gen-pre-commit failed at TO ($TO)" >&2; exit 2; }

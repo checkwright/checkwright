@@ -70,54 +70,6 @@
   demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
   2026-08-13 at build for the kit-roots cohort.
 
-- **upgrade-smoke-from-binary-pairing** [spec: SPEC-from-binary.md] — phase 1's FROM
-  self-consistency claim is untestable for every `.gate`-dispatched gate.
-  **Ruled 2026-08-13 at spec** (gate-sdk/SPEC-from-binary.md): pair each phase with its own
-  ref's binary rather than narrowing phase 1, because narrowing shrinks to nothing as the port
-  completes. The per-tag build was priced and is ~0.6s (35ms worktree add + 546ms cold release
-  build, zero dependencies at every tag) — but it must come from a **detached worktree**, never
-  an archive: `native/build.rs` runs `git ls-files` and panics outside a checkout, which is what
-  makes the obvious archive-and-build shape fail. FROM's own binary is self-consistent with
-  FROM's shell, so all three phase-1 reds are pairing artifacts and the "broken tag" message
-  mis-attributes them.
-  `gate-sdk/bin/upgrade-smoke.sh` never places a FROM-appropriate binary at
-  either phase. `gate-sdk/lib/consumer-smoke.sh`'s `csmoke_place_binary` copies
-  the **current** tree's freshly-built binary once, at FROM-phase setup, and
-  phase A's TO-side kit swap (`upgrade-smoke.sh` L75-91, a bare `cp -R` of kit
-  directories) never touches `native/` or re-invokes it. `native/` is not a kit
-  — no `checks/`, no `smoke/` — so it is never vendored per-tag, and the harness
-  has no mechanism to build or select a FROM-appropriate binary at all. The same
-  current-tree binary therefore runs under both phase 1 (the FROM
-  self-consistency check) and phase 2 (the TO check).
-  **What breaks is phase 1's claim** — "the FROM tag alone is healthy under zero
-  config" — not any actual old/new pairing transition.
-  **Concretely, this iteration:** `a5ef6e19` added `gate_command`'s `--knobs`
-  query/bridge in `gate-sdk/lib/gate.sh` and tightened `native/src/walk.rs` to
-  hard-require `GATE_SDK_KNOB_GATE_PRUNE_DIRS`. `v0.22.0`'s own `gate_command`
-  carries no knob query at all, so phase 1 running FROM=v0.22.0's vendored shell
-  against the current binary never supplies the knob the binary now requires —
-  `check-action-pinning` and `check-action-gh-repo` exit 2 under zero config.
-  **Second instance, measured 2026-08-12 at build:** `--list` gained an owning-kit
-  column, so `v0.22.0`'s vendored `check-gate-substrate-parity.sh` parses each
-  two-column row as a subcommand name and reds — a third FROM gate on the same
-  pairing, and the cost field below firing on a widened binary *interface* rather
-  than on a widened dispatch set.
-  **Not a live end-user hazard:** `installer/lib/update.sh` exec's into
-  `init.sh`, which writes vendored shell and the digest-verified binary from one
-  release payload in one pass, so a real `checkwright update` cannot produce
-  this pairing. The live-path sibling is `installer-artifact-omission-residue`.
-  **The two candidate shapes, now ruled** — give phase 1 a FROM-built binary, or narrow phase
-  1's assertion to exclude `.gate`-dispatched gates. The first is taken; the second is refused
-  because it shrinks to nothing as the port completes. The amendment carries the design.
-  **Cost while it was deferred:** the `upgrade` suite is baseline-held `fail` against
-  this slug, so phase 1 proves nothing for any `.gate`-dispatched gate until it
-  is fixed — and that held red is re-earned every iteration the port widens the
-  dispatched set.
-  Found 2026-08-10 at validate; root cause corrected the same day after review
-  caught the original framing implying a real old/new binary transition. Filed
-  2026-08-10 by close under the operator-directed filing exception, because the
-  baseline mark that unblocks the close entry requires a live slug to point at.
-
 
 ## Technical Debt
 
@@ -5230,6 +5182,7 @@
 ## Done
 
 - port-criterion-aggregate-cost-blindness
+- upgrade-smoke-from-binary-pairing
 
 ## Lessons Learned
 

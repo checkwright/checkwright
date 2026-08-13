@@ -92,6 +92,6 @@ trend_tests trend_tests pass
 demo demo pass
 installer_smoke installer_smoke pass
 consumer_smoke consumer_smoke pass
-upgrade upgrade fail upgrade-smoke-from-binary-pairing
+upgrade upgrade pass
 agents_md_smoke agents_md_smoke pass
 index_tests index_tests pass

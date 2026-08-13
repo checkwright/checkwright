@@ -40,7 +40,7 @@ git -C "$SCRATCH" -c user.email=demo@example.invalid -c user.name=demo \
 for r in "${roots[@]}"; do
     cp -R "$r" "$SCRATCH/$(basename "$r")"
 done
-csmoke_place_binary "${roots[@]}" || fail "the native gate binary could not be placed in the scratch consumer"
+csmoke_place_binary "$REPO" "${roots[@]}" || fail "the native gate binary could not be placed in the scratch consumer"
 for r in "${roots[@]}"; do
     kit="$(basename "$r")"
     say "vendor + install: $kit"

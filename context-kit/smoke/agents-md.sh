@@ -36,7 +36,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-csmoke_vendor_and_install "${roots[@]}" || exit 2
+csmoke_vendor_and_install "$(dirname "$SDK")" "${roots[@]}" || exit 2
 
 # comment-tier-exempt: the installers write the consumer's agent file as CLAUDE.md; the smoke converts it to AGENTS.md and points each kit's agent-file knob at it, as an AGENTS.md adopter would
 [[ -f "$SCRATCH/CLAUDE.md" ]] || fail "the installed baseline wrote no CLAUDE.md to convert"

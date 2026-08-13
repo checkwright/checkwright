@@ -1009,7 +1009,10 @@ design time; the last three were paid for, and each is named with what it cost.
 5. **Its vendored form stays runnable.** *Measured, not reasoned.* A `.gate`
    descriptor under a vendoring kit root reaches every consumer; the binary does
    not, because `native/` ships no `checks/` or `smoke/` and that predicate is
-   what makes a root directory a kit. `gate_command` is fail-closed on an absent
+   what makes a root directory a kit. That asymmetry has a second worked
+   consequence beside the vendored-consumer one: a **harness** that vendors kits
+   per ref cannot vendor the binary per ref either, so it must build one itself or
+   silently pair one ref's shell with another's artifact (§upgrade-smoke). `gate_command` is fail-closed on an absent
    binary and its exit 2 is a **dispatch-harness** error, so it takes down the
    *calling battery*, not just its own member. A freshly vendored consumer's
    pre-commit battery therefore died on invocation. **The condition that
@@ -2030,8 +2033,9 @@ not read the default run's green as an answer about the subset.
 **It does place the gate binary, and the rule is stated rather than left as an
 exception, because a reader will otherwise lean on the older
 no-binary-by-design sentence and find it gone.** The rule: **a vendored member
-that dispatches must be able to run, so the scratch consumer receives the
-invoking repo's already-built artifact** (`csmoke_place_binary`, §lib/consumer-smoke.sh).
+that dispatches must be able to run, so the scratch consumer receives an
+already-built artifact out of a checkout the caller names**
+(`csmoke_place_binary`, §lib/consumer-smoke.sh).
 The ground is that a kit root vendoring a `.gate` descriptor is now the ordinary
 case — the first cohort ships two (§The first cohort, and the rule that selects
 the next) — and a kit's `smoke/install.sh` may legitimately register a ported
@@ -2042,10 +2046,26 @@ under *The registration accounting* below. Refusing the binary would have made
 that registration permanently red and forced the coverage out, which is the
 opposite of what this harness exists for.
 
+**Whose artifact it is, is the caller's to name.** The checkout whose `native/`
+was built is the function's first argument. It was once resolved from the
+library's own `BASH_SOURCE`, and a shared library deciding from its own location
+whose artifact a caller receives is a defect that stays invisible until some
+caller wants a different one. `upgrade-smoke` is that caller: it runs two refs'
+vendored shell against one scratch consumer, and under the old resolution both got
+the *invoking* tree's binary — so FROM's shell ran against TO's binary and the
+mismatch was reported as a broken tag (§upgrade-smoke). `run-consumer-smoke.sh`
+and context-kit's `smoke/agents-md.sh` pass the invoking repo and behave exactly
+as they did. Whether a binary is wanted at all is `csmoke_gate_descriptors`,
+factored out of the placement so a caller that must *produce* one can ask the same
+question a step earlier rather than keep a second copy of the predicate.
+
 Three constraints keep the placement from becoming a second install path. It is
 a **copy, never a build** — the artifact comes from `GATE_SDK_NATIVE_BIN` in the
-invoking tree, which is already obliged to be current there
-(§check-gate-binary-fresh), so the harness acquires no toolchain of its own. It
+named checkout, which for the in-repo callers is already obliged to be current
+(§check-gate-binary-fresh), so this harness acquires no toolchain of its own.
+That a caller may have built the checkout it names does not change the rule here:
+`upgrade-smoke` builds one binary per ref before calling, and that requirement is
+its own and stated there (§upgrade-smoke). It
 lands at the **kit default** path and writes **no consumer config**, deliberately
 unlike `init`, which places the artifact in the gates dir and points the knob at
 it — that is the install path and it belongs to the other harness. And it is
@@ -2941,25 +2961,78 @@ the `upgrade` validate suite running it (scripts/evidence-config.sh) is its
 evidence, at ~2× run-consumer-smoke's cost since it runs the battery twice in
 scratch (accepted as validate-stage cost, never pre-commit).
 
+**Each phase runs against its own ref's gate binary**, and that pairing is what
+makes phase 1's claim true as written. A `.gate` member dispatches to a binary
+that does not travel with the kits: `native/` ships no `checks/` or `smoke/`, so
+it is not a vendorable kit root and the phase-A swap never reaches it. A harness
+placing one binary once therefore runs FROM's *shell* against it as well — and a
+FROM tag whose own shell predates a widened binary interface reds under a pairing
+that never shipped, while phase 1's message calls the tag broken. So the suite
+builds **one binary per ref**: FROM's before phase 1, TO's in the same motion that
+swaps the kit directories, because that swap *is* the upgrade transition. Phase
+B's claim — TO's shell against TO's binary — then holds by construction rather
+than by the host tree happening to be TO.
+
+**A ref's binary comes from a detached worktree at that ref, never from the
+archive its kits come from.** `native/build.rs` stamps the crate's source by
+running `git ls-files` and panics where that fails, saying why: the crate builds
+inside its own git checkout by construction and is never vendored. An
+archive-and-build therefore dies in the build script rather than in the compiler —
+a failure mode that reads as a broken tag if it is met at implementation time
+instead of ruled here. The worktree is added under the scratch base and
+trap-removed, so its `native/target/` is scratch as well and the host's build
+output — what `check-gate-binary-fresh` judges — is untouched. The cost is not
+what it looks like: the crate declares no dependencies at any tag, so a cold
+release build is a few hundred milliseconds against a suite that vendors,
+installs and runs the whole battery twice.
+
+**A ref carrying no crate is a branch, not a special case.** Whether a binary is
+needed at all comes from `csmoke_gate_descriptors` (§Consumer smoke) — the same
+derivation the placement itself uses, asked one step earlier because a builder
+must decide before it can name a source tree. A ref whose vendored kits carry no
+`*.gate` needs none, so no worktree is added and no build runs: that is every tag
+before the first one shipping `native/`, any of which a consumer may name in
+`GATE_SDK_UPGRADE_FROM`. A ref that *does* dispatch and carries no crate, or whose
+crate will not compile under the current toolchain, is **exit 2 under phase 1's
+existing rule** — an environment or tag fact, never an upgrade finding — reported
+with the ref named and the build's own stderr. The one thing it must not do is
+fall back to the host's binary, which is the behavior this delta replaced wearing
+a fallback's clothes.
+
+**Both sides of the comparison are committed at their ref, and that is a second
+inconsistency the same pairing closes.** Phase A archives TO, so the kits under
+test were always TO's *committed* content while the binary was the host's
+*working-tree* build — a dirty tree tested committed kits against an uncommitted
+binary. It is named as its own consequence because a reader who sees only the
+FROM half will restore the host-binary shortcut for TO on the ground that TO is
+usually `HEAD`.
+
 **What it does not cover.** The transition it proves is the *vendored kit
 directories* moving FROM→TO — phase A replaces them wholesale, in tree. It never
 re-runs an installer, so a consumer's **cross-version init path** is outside its
 reach entirely: a green `upgrade` suite is evidence about kit contents, not about
 whatever activation surface a consumer ships to deliver them. State it here
 rather than leaving it inferable from the phase-A step list, since the suite's
-name invites the wider reading.
+name invites the wider reading. What left this paragraph is the **gate binary
+alone**, and only for the phases the suite pairs: each runs its own ref's
+artifact, so a dispatched member's FROM-vs-TO behavior is covered. The
+vendored-kit-only reach still holds for the installer path.
 
-**The gate binary sits on the far side of that same limit**, and it is recorded
-here rather than quietly folded into the determinism assertion. That assertion
-covers changes under the kit roots plus the two regenerated artifacts; phase A
-replaces the vendored directories in tree and never runs an installer, so the
-artifact write is outside its reach entirely and an installed binary is neither
-a determinism finding nor a determinism exemption. Widening the assertion to
-name it would claim coverage this tool cannot have. The install path's own
-idempotence proof is the installer's smoke (installer/README.md §The consumer
-smoke), which does re-run `init`, and the rule that satisfies it is the
-manifest's: an on-disk artifact that still verifies against the recorded digest
-is not rewritten (installer/README.md §The manifest).
+**The gate binary is placed by the harness, and still sits outside the
+determinism assertion.** That assertion covers changes under the kit roots plus
+the two regenerated artifacts; phase A replaces the vendored directories in tree
+and never runs an installer, so a consumer's *install* path for the artifact is
+outside its reach entirely and an installed binary is neither a determinism
+finding nor a determinism exemption. Widening the assertion to name it would
+claim coverage this tool cannot have. Re-placing the binary at phase A does not
+disturb that, and the reason is mechanical rather than argued: the scratch
+consumer's `.gitignore` carries `gate_native_bin`'s path (§Consumer smoke), so
+the placed artifact never enters the `git status` the assertion reads, and no
+allow-set entry is added. The ruling stands unchanged and is cited here, not
+amended. The install path's own idempotence proof is the installer's smoke
+(installer/README.md §The consumer smoke), which does re-run `init`, and the rule
+that satisfies it is the manifest's: an on-disk artifact that still verifies
+against the recorded digest is not rewritten (installer/README.md §The manifest).
 
 **The declaration resolves on two arms, both over §lib/declaration.sh's one
 token predicate.** A **tagged TO** resolves its version from the `v*` tag
@@ -3021,8 +3094,17 @@ each read exactly once at the resolve step:
 - `GATE_SDK_UPGRADE_FROM` — the FROM ref (default: the source repo's newest
   `v*` tag; none resolvable is exit 2, not a skip).
 - `GATE_SDK_UPGRADE_TO` — the TO ref (default: `HEAD`).
-- Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees and
-  the consumer are `mktemp`-created under it and trap-removed.
+- Scratch base is the existing `GATE_SDK_TMP_DIR` knob; the extracted trees, the
+  per-ref worktrees and the consumer are created under it and trap-removed.
+
+**`cargo` on `PATH` is a requirement on this suite, not on an adopter**, and it
+binds only for a ref that dispatches a member to the binary. `upgrade-smoke` is a
+validate-stage tool in the kit-source repo, whose contributors already need the
+toolchain for `check-crate-arms` and `bin/build-native.sh`. It reaches no consumer
+and does not touch `GATE_SDK_PROGRAM_FLOOR`, which bounds what a *gate rule* may
+invoke — stated because a reader meeting a new `cargo` dependency will reasonably
+ask whether §The port-candidate criteria's criterion 7 binds here, and it does
+not.
 
 Producers and consumers: the smoke's verdict (exit code + assertion output) is
 produced by the `upgrade` suite each validate stage, or by a consumer invoking

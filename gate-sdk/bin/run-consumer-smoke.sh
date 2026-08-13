@@ -54,7 +54,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-csmoke_vendor_and_install "${roots[@]}" || exit 2
+csmoke_vendor_and_install "$(dirname "$SDK")" "${roots[@]}" || exit 2
 installed="$CSMOKE_INSTALLED"
 
 run_battery() { ( cd "$SCRATCH" && bash gate-sdk/bin/run-gates.sh ) 2>&1; }
