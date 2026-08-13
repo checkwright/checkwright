@@ -81,35 +81,201 @@ guard_allow_match() {
     [[ "$s" == $glob ]]
 }
 
-# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/14/16, the read-compound carve-out, scan-prompts), fed a quote-stripped skeleton so the harness's per-segment boundary set never drifts
+# spec: guard-kit/SPEC.md §The guard framework — the one context-aware normalizer; a rule names the classes inert for it and every lexical view in the file comes from here
+guard_skeleton() {
+    local cmd="$1"
+    shift
+    local c want_sq=0 want_dq=0 want_hd=0
+    for c in "$@"; do
+        case "$c" in
+            sq) want_sq=1 ;;
+            dq) want_dq=1 ;;
+            hd) want_hd=1 ;;
+        esac
+    done
+
+    # comment-tier-exempt: measured local fact — jumping between significant characters rather than stepping per character took a 355-char command from 2.3ms to 0.17ms, at fourteen call sites per guarded call
+    local nl=$'\n'
+    local live_class="[\"'\\\\<${nl}]*" dq_class="[\"\\\\]*"
+    local n=${#cmd} i=0 out='' span='' state=none ch rest chunk line term body
+    local -a pending=()
+    while ((i < n)); do
+        rest="${cmd:i}"
+        if [[ "$state" == sq ]]; then
+            chunk="${rest%%\'*}"
+            if [[ "$chunk" == "$rest" ]]; then
+                span+="$rest"
+                i=$n
+                continue
+            fi
+            span+="$chunk'"
+            ((i += ${#chunk} + 1))
+            if ((want_sq)); then out+='SQ'; else out+="$span"; fi
+            span=''
+            state=none
+            continue
+        fi
+        if [[ "$state" == dq ]]; then
+            chunk="${rest%%$dq_class}"
+            span+="$chunk"
+            ((i += ${#chunk}))
+            if ((i >= n)); then continue; fi
+            if [[ "${cmd:i:1}" == '\' ]]; then
+                span+="${cmd:i:2}"
+                ((i += 2))
+                continue
+            fi
+            span+='"'
+            ((i++))
+            if ((want_dq)); then out+='DQ'; else out+="$span"; fi
+            span=''
+            state=none
+            continue
+        fi
+        chunk="${rest%%$live_class}"
+        if [[ -n "$chunk" ]]; then
+            out+="$chunk"
+            ((i += ${#chunk}))
+            ((i >= n)) && continue
+        fi
+        ch="${cmd:i:1}"
+        case "$ch" in
+            "'")
+                state=sq
+                span="'"
+                ((i++))
+                continue ;;
+            '"')
+                state=dq
+                span='"'
+                ((i++))
+                continue ;;
+            '\')
+                out+="${cmd:i:2}"
+                ((i += 2))
+                continue ;;
+            '<')
+                if [[ "${cmd:i:3}" == '<<<' ]]; then
+                    out+='<<<'
+                    ((i += 3))
+                    continue
+                fi
+                if [[ "${cmd:i}" =~ ^\<\<-?[[:space:]]*(\"[^\"]*\"|\'[^\']*\'|[A-Za-z_][A-Za-z0-9_]*) ]]; then
+                    out+="${BASH_REMATCH[0]}"
+                    ((i += ${#BASH_REMATCH[0]}))
+                    term="${BASH_REMATCH[1]}"
+                    term="${term#[\"\']}"
+                    term="${term%[\"\']}"
+                    pending+=("$term")
+                    continue
+                fi
+                ;;
+            $'\n')
+                out+=$'\n'
+                ((i++))
+                while ((${#pending[@]} > 0)); do
+                    term="${pending[0]}"
+                    pending=("${pending[@]:1}")
+                    body=''
+                    while ((i < n)); do
+                        rest="${cmd:i}"
+                        line="${rest%%$'\n'*}"
+                        [[ "${line#"${line%%[![:space:]]*}"}" == "$term" ]] && break
+                        body+="$line"$'\n'
+                        ((i += ${#line} + 1))
+                        ((i > n)) && i=$n
+                    done
+                    if [[ -n "$body" ]]; then
+                        if ((want_hd)); then out+='HD'$'\n'; else out+="$body"; fi
+                    fi
+                    if ((i < n)); then
+                        rest="${cmd:i}"
+                        line="${rest%%$'\n'*}"
+                        out+="$line"
+                        ((i += ${#line}))
+                        if ((i < n)); then
+                            out+=$'\n'
+                            ((i++))
+                        fi
+                    fi
+                done
+                continue ;;
+        esac
+        out+="$ch"
+        ((i++))
+    done
+    [[ -n "$span" ]] && out+="$span"
+    printf '%s' "$out"
+}
+
+# spec: guard-kit/SPEC.md §The guard framework — one splitter for every consumer that reasons per compound segment (rules 8/13/14/16, the read-compound carve-out, scan-prompts), fed a guard_skeleton view so the harness's per-segment boundary set never drifts
 guard_split_compound() {
     sed -E 's/\|\||&&|;|\|/\n/g' <<<"$1"
 }
 
+# spec: guard-kit/SPEC.md §The generic ruleset — the committed Bash(...) allow inners, one per line; the fail-open read rules 13 and 14 share, so a missing jq or settings file emits nothing and every reader declines
+_guard_allow_inners() {
+    command -v jq >/dev/null 2>&1 || return 0
+    [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
+    local e inner
+    while IFS= read -r e; do
+        case "$e" in
+            Bash\(*\)) inner="${e#Bash(}"; inner="${inner%)}" ;;
+            *) continue ;;
+        esac
+        [[ -n "$inner" ]] && printf '%s\n' "$inner"
+    done < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null)
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — a segment with its redirects removed and trimmed: what rules 13 and 14 compare against a committed bare allow entry
+_guard_segment_core() {
+    local seg
+    seg="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$1")"
+    seg="${seg#"${seg%%[![:space:]]*}"}"
+    seg="${seg%"${seg##*[![:space:]]}"}"
+    printf '%s' "$seg"
+}
+
+# spec: guard-kit/SPEC.md §The generic ruleset — true when the segment exactly matches a committed *bare* allow entry (no glob): the reviewed-lead half of rule 13's predicate and rule 14's lead test
+_guard_is_bare_allow() {
+    local core bl
+    core="$(_guard_segment_core "$1")"
+    [[ -n "$core" ]] || return 1
+    while IFS= read -r bl; do
+        case "$bl" in *'*'*) continue ;; esac
+        [[ "$core" == "$bl" ]] && return 0
+    done < <(_guard_allow_inners)
+    return 1
+}
+
 # spec: guard-kit/SPEC.md §The generic ruleset — the guard_rule_* run below; order is load-bearing
 guard_rule_cd_compound() {
-    local cmd="$1"
+    local cmd
+    cmd="$(guard_skeleton "$1" sq dq hd)"
     if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then
         guard_block "don't use 'cd' in a compound command (cwd drift, and the allowlist can't match the compound — the call costs an out-of-band permission decision). Pass absolute paths, or 'git -C <dir>' for git."
     fi
 }
 
 guard_rule_git_c_root() {
-    local cmd="$1"
+    local cmd
+    cmd="$(guard_skeleton "$1" sq dq hd)"
     if grep -qF "git -C $PWD " <<<"$cmd"; then
         guard_block "drop 'git -C $PWD ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and resolves on the match; the absolute '-C' spelling matches nothing and costs an out-of-band permission decision. Reserve 'git -C <dir>' for a different repo."
     fi
 }
 
 guard_rule_scratch_redirect() {
-    local cmd="$1"
+    local cmd
+    cmd="$(guard_skeleton "$1" sq dq hd)"
     if grep -qE '(^|[[:space:]])([0-9]*|&)>>?[[:space:]]*[^[:space:]/|&]+\.(err|out|log)([[:space:]]|$)' <<<"$cmd"; then
         guard_block "don't redirect scratch to a bare repo-root filename (e.g. 2> op.err) — it pollutes cwd and risks a 'git add -A'. Send it to a gitignored scratch dir (e.g. ${GUARD_KIT_SCRATCH_DIRS[0]}/<name>.err)."
     fi
 }
 
 guard_rule_abs_script() {
-    local cmd="$1" rest base g relcmd
+    local raw="$1" cmd rest base g relcmd
+    cmd="$(guard_skeleton "$raw" sq dq hd)"
     case "$cmd" in
         "bash $PWD/"*) rest="${cmd#bash "$PWD/"}" ;;
         "$PWD/"*)      rest="${cmd#"$PWD/"}" ;;
@@ -118,7 +284,7 @@ guard_rule_abs_script() {
     rest="${rest%%[[:space:]]*}"            # first token = repo-relative script path
     case "$rest" in *.sh) ;; *) return 0 ;; esac   # only .sh scripts; rule 5 handles the rest
     base="${rest##*/}"
-    relcmd="${cmd//"$PWD/"/}"               # strip every repo-root prefix
+    relcmd="${raw//"$PWD/"/}"               # the rewrite carries the real command, not its skeleton
     for g in "${GUARD_KIT_RO_SCRIPTS[@]}"; do
         # shellcheck disable=SC2053  # intentional glob match: $g is a pattern, not a literal
         if [[ "$base" == $g || "$rest" == $g ]]; then
@@ -129,7 +295,8 @@ guard_rule_abs_script() {
 }
 
 guard_rule_abs_prefix() {
-    local cmd="$1"
+    local cmd
+    cmd="$(guard_skeleton "$1" sq dq hd)"
     [[ "$cmd" == git\ * ]] && return 0
     if grep -qF "$PWD/" <<<"$cmd"; then
         guard_block "drop the repo-root absolute prefix '$PWD/' — cwd is the repo root, so the repo-relative path is allowlisted and resolves on the match; the absolute spelling matches nothing and costs an out-of-band permission decision. If you truly need the absolute path, run it yourself with !<command>."
@@ -138,11 +305,13 @@ guard_rule_abs_prefix() {
 
 guard_rule_expansion() {
     local cmd="$1" sqexp expn
-    sqexp="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
+    # spec: guard-kit/SPEC.md §The generic ruleset — 'sq' only: a double-quoted "$x" still
+    # expands, and an unquoted-delimiter heredoc body expands too, so both stay live here.
+    sqexp="$(guard_skeleton "$cmd" sq)"
     if grep -qE '\$\{|\$\(|<\(|\$[A-Za-z_]' <<<"$sqexp"; then
         guard_block "avoid shell variables/expansions (\$VAR, \${...}, \$(...), <(...)) — the harness's matcher refuses every expansion, so no allowlist entry can match the command and it costs an out-of-band permission decision. Inline the literal path, use a relative path, or 'git -C <dir>'. If you genuinely need the expansion, run it yourself with !<command>."
     fi
-    expn="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    expn="$(guard_skeleton "$cmd" sq dq)"
     if grep -qE '(^|[;(]|&&|\|\|)[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=[^[:space:];|&]*[[:space:]]*($|;)' <<<"$expn"; then
         guard_block "avoid shell variable assignments (NAME=value; ... \$NAME) — they defeat allowlist matching, so the call costs an out-of-band permission decision no allowlist entry can pre-empt. Inline the literal value/path at each use site, or 'git -C <dir>'. If you genuinely need it, run it yourself with !<command>."
     fi
@@ -150,7 +319,9 @@ guard_rule_expansion() {
 
 guard_rule_brace_glyph() {
     local cmd="$1" sqstripped resid ph='{}' q="'{}'"
-    sqstripped="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
+    # spec: guard-kit/SPEC.md §The generic ruleset — 'sq dq hd': '{' is a matcher glyph, not a
+    # shell expansion, so rule 6's reason to keep double-quoted spans live does not carry here.
+    sqstripped="$(guard_skeleton "$cmd" sq dq hd)"
     case "$sqstripped" in *'{'*) ;; *) return 0 ;; esac
     resid="${sqstripped//"$ph"/}"
     case "$resid" in
@@ -164,7 +335,7 @@ guard_rule_brace_glyph() {
     if grep -qE '\{[^}]*(,|\.\.)[^}]*\}' <<<"$sqstripped"; then
         guard_block "write out the brace expansion '{a,b}'/'{a..b}' — the harness's matcher refuses the '{' glyph and no allowlist entry can match around it, so the call costs an out-of-band permission decision. Spell the members (e.g. 'mkdir -p a/b a/c') or use a loop for a long range."
     fi
-    guard_block "single-quote the '{' if it's literal (an awk/sed program in double quotes), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band."
+    guard_block "quote the '{' if it's literal (an unquoted awk/sed program), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band. A brace inside quotes of either kind, or in a heredoc body, is already inert and never reaches this block."
 }
 
 _guard_sed_segment() {
@@ -196,7 +367,7 @@ _guard_sed_segment() {
 
 guard_rule_sed_file() {
     local cmd="$1" s seg
-    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    s="$(guard_skeleton "$cmd" sq dq hd)"
     while IFS= read -r seg; do
         seg="${seg#"${seg%%[![:space:]]*}"}"
         case "$seg" in
@@ -251,7 +422,7 @@ guard_rule_find_glob() {
     local cmd="$1" s
     grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
     case "$cmd" in *'`'*) return 0 ;; esac
-    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    s="$(guard_skeleton "$cmd" sq dq hd)"
     grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
     _guard_is_read_batch "$s" _guard_is_find_listing || return 0
     guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>."
@@ -261,7 +432,7 @@ guard_rule_cat_file() {
     local cmd="$1" s
     grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
     case "$cmd" in *'`'*) return 0 ;; esac
-    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    s="$(guard_skeleton "$cmd" sq dq hd)"
     grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
     _guard_is_read_batch "$s" _guard_is_cat_read || return 0
     guard_block "don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, and needs no permission decision at all. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>."
@@ -271,7 +442,7 @@ guard_rule_git_grep() {
     local cmd="$1" s tok i n positionals=0 want_arg=0 pat_opt=0 working_tree=0
     grep -qE '\$\(|<\(|>\(' <<<"$cmd" && return 0
     case "$cmd" in *'`'*) return 0 ;; esac
-    s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
+    s="$(guard_skeleton "$cmd" sq dq hd)"
     grep -qE '(&&|\|\||;|\||&|<|>)' <<<"$s" && return 0
     local -a toks
     read -ra toks <<<"$s"
@@ -300,7 +471,8 @@ guard_rule_git_grep() {
 }
 
 guard_rule_truncate_scratch() {
-    local cmd="$1"
+    local cmd
+    cmd="$(guard_skeleton "$1" sq dq hd)"
     if [[ "$cmd" =~ ^[[:space:]]*:([[:space:]]+[0-9]*\>\>?[[:space:]]*[^[:space:]\&\|\;\<]+)+[[:space:]]*$ ]]; then
         local all_ignored=1 tgt
         while read -r tgt; do
@@ -316,10 +488,11 @@ guard_rule_truncate_scratch() {
 
 guard_rule_ro_pipeline() {
     local raw="$1"
+    # spec: guard-kit/SPEC.md §The guard framework — the raw-command carve-out these two tests take
     grep -qE '\$\(|<\(|>\(' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
     local s
-    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$raw")"
+    s="$(guard_skeleton "$raw" sq dq hd)"
     grep -q "['\"]" <<<"$s" && return 0
     grep -qE '(&&|\|\||;|&)' <<<"$s" && return 0
     local tgt
@@ -329,47 +502,48 @@ guard_rule_ro_pipeline() {
             /dev/null | '&'[0-9]*) ;;
             *) return 0 ;;
         esac
-    done < <(grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|]+' <<<"$s" \
+    done < <(grep -oE '[0-9]*>>?[[:space:]]*[^[:space:]|;&]+' <<<"$s" \
         | sed -E 's/^[0-9]*>>?[[:space:]]*//')
     if grep -qE '(^|[[:space:]])find([[:space:]]|$)' <<<"$s" \
         && grep -qE '\-(exec|execdir|ok|delete)\b' <<<"$s"; then
         return 0
     fi
-    local seg first b matched
-    while IFS= read -r seg; do
+    local -a segs
+    mapfile -t segs < <(guard_split_compound "$s")
+    local seg first b i matched reads=0
+    for ((i = 0; i < ${#segs[@]}; i++)); do
+        seg="${segs[i]}"
         seg="${seg#"${seg%%[![:space:]]*}"}"
         [[ -z "$seg" ]] && continue
+        _guard_is_banner "$seg" && continue
         first="${seg%%[[:space:]]*}"
         matched=0
         for b in "${GUARD_KIT_RO_BINS[@]}"; do
             [[ "$first" == "$b" ]] && { matched=1; break; }
         done
-        [[ "$matched" == 1 ]] || return 0
-    done < <(tr '|' '\n' <<<"$s")
+        if [[ "$matched" == 0 ]]; then
+            # spec: guard-kit/SPEC.md §The generic ruleset — rule 13's widened lead: a bare
+            # committed allow entry qualifies, but only where something decorates it
+            [[ "$i" == 0 && "${#segs[@]}" -gt 1 ]] || return 0
+            _guard_is_bare_allow "$seg" || return 0
+        fi
+        reads=$((reads + 1))
+    done
+    [[ "$reads" -ge 1 ]] || return 0
     guard_allow "read-only search pipeline (${GUARD_NAME:-guard} auto-allow)"
 }
 
 guard_rule_allowlist_chain() {
-    local cmd="$1"
-    command -v jq >/dev/null 2>&1 || return 0
-    [[ -f "$GUARD_KIT_SETTINGS" ]] || return 0
-
-    local -a allow_entries
-    mapfile -t allow_entries < <(jq -r '.permissions.allow[]?' "$GUARD_KIT_SETTINGS" 2>/dev/null) || return 0
-    [[ ${#allow_entries[@]} -gt 0 ]] || return 0
-
-    local e inner
-    local -a bare_leads pattern_inners
-    for e in "${allow_entries[@]}"; do
-        case "$e" in Bash\(*\)) inner="${e#Bash(}"; inner="${inner%)}" ;; *) continue ;; esac
-        [[ -z "$inner" ]] && continue
+    local cmd="$1" inner
+    local -a bare_leads=() pattern_inners=()
+    while IFS= read -r inner; do
         pattern_inners+=("$inner")
         case "$inner" in *'*'*) ;; *) bare_leads+=("$inner") ;; esac
-    done
+    done < <(_guard_allow_inners)
     [[ ${#bare_leads[@]} -gt 0 ]] || return 0
 
     local skel
-    skel="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    skel="$(guard_skeleton "$cmd" sq dq hd)"
 
     local -a segs
     mapfile -t segs < <(guard_split_compound "$skel")
@@ -378,8 +552,7 @@ guard_rule_allowlist_chain() {
     lead="${lead#"${lead%%[![:space:]]*}"}"; lead="${lead%"${lead##*[![:space:]]}"}"
 
     local lead_core
-    lead_core="$(sed -E 's/[[:space:]]*[0-9]*(>>?|<)[[:space:]]*(&?[0-9-]+|[^[:space:]]+)?//g' <<<"$lead")"
-    lead_core="${lead_core#"${lead_core%%[![:space:]]*}"}"; lead_core="${lead_core%"${lead_core##*[![:space:]]}"}"
+    lead_core="$(_guard_segment_core "$lead")"
 
     local bl matched_lead=0
     for bl in "${bare_leads[@]}"; do
@@ -409,7 +582,7 @@ guard_rule_allowlist_chain() {
 
 guard_rule_git_rewrite() {
     local cmd="$1" s
-    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
+    s="$(guard_skeleton "$cmd" sq dq hd)"
     if { grep -qE '(^|[[:space:]])git[[:space:]]+commit([[:space:]]|$)' <<<"$s" \
         && grep -qE '(^|[[:space:]])(-F|--file|--amend)\b' <<<"$s"; } \
         || { grep -qE '(^|[[:space:]])git[[:space:]]+reset([[:space:]]|$)' <<<"$s" \
@@ -422,7 +595,7 @@ guard_rule_rm_tracked() {
     local raw="$1" s
     grep -qE '\$\(|<\(|>\(|\$\{|\$[A-Za-z_]' <<<"$raw" && return 0
     case "$raw" in *'`'*) return 0 ;; esac
-    s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$raw")"
+    s="$(guard_skeleton "$raw" sq dq hd)"
     local seg lead arg
     while IFS= read -r seg; do
         seg="${seg#"${seg%%[![:space:]]*}"}"

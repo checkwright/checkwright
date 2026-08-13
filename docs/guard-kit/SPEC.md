@@ -139,15 +139,56 @@ Primitives a consumer guard composes; each emits the harness's
   hook primitive — a shared helper, one implementation behind
   compare-settings-allow's redundancy detection and rule 14's silent-grant
   guard so the two never drift.
+- `guard_skeleton <cmd> <inert-class>…` — the context-aware normalizer, and the
+  only place a rule learns what part of a command is live. It returns the command
+  with every region of the named inert classes replaced by a placeholder token,
+  leaving everything else byte-identical. Three classes, which is the whole
+  domain: **`sq`** (single-quoted spans), **`dq`** (double-quoted spans), and
+  **`hd`** (heredoc bodies, from the line after an opener to its terminator
+  line). Each rule names the classes inert **for it**, in one argument, at one
+  call site — the classes were never the disagreement, since every rule agrees
+  that *some* regions are inert; the disagreement was that each decided privately
+  and none recorded why. Not a hook primitive, and a pure function of its
+  arguments: no config read, no subprocess, no global.
 - `guard_split_compound <skeleton>` — the compound splitter: emits one segment
   per line, splitting on the harness's statement separators (`;`, `&&`, `||`,
   `|`). Also not a hook primitive — the single implementation every consumer
-  that reasons *per segment* shares (rules 8/14/16, the read-compound carve-out
-  of rules 9/10, and scan-prompts' `allowed()`), so the harness's per-segment
-  matching surface is modelled in exactly one place and cannot drift between
-  them. Fed a quote-stripped skeleton (`'…'`/`"…"` regions already neutralized
-  by the caller, as every rule does), so a separator inside a quoted argument is
-  never mistaken for a statement break.
+  that reasons *per segment* shares (rules 8/13/14/16, the read-compound
+  carve-out of rules 9/10, and scan-prompts' `allowed()`), so the harness's
+  per-segment matching surface is modelled in exactly one place and cannot drift
+  between them. Fed a `guard_skeleton` view, so a separator inside a quoted
+  argument is never mistaken for a statement break. Its separator class carries
+  **no newline**, and it does not need one: it *emits* segments as lines and
+  every consumer reads lines, so a newline already present in the input is
+  already a boundary before the substitution runs.
+
+**Placeholder, never deletion, and this is a correctness point rather than
+taste.** Deleting an inert span **fuses adjacent tokens**: a pattern glued to its
+flag loses the boundary between them and the residue reads as one word that was
+never in the command. The normalizer substitutes, so the skeleton has the same
+token count and the same statement structure as the command it models.
+
+**The heredoc class marks the body extent only.** The opener line and everything
+after the terminator stay fully live, so a heredoc-bearing call is still matched
+on its executable text — neither blanking everything after a `<<` (which blinds
+the guard to real commands in the same call) nor stripping quotes alone (which
+still refuses a double-quoted mention). The extent is decidable without a shell
+parser because the terminator is a literal token alone on its line, which is the
+property the class rests on.
+
+**Two bounds, stated rather than discovered later.** A heredoc with an
+**unquoted** delimiter does expand, so `hd` is not inert for the expansion rule
+even though it is inert for every glyph rule — which is why classes are declared
+per rule and not fixed per region. And the normalizer models **quoting, not
+shell semantics**: a construct that survives its scan and is not one of the three
+classes is treated as live, the fail-toward-matching direction and the one a
+guard should err in. That bound is why the command/process-substitution and
+backtick tests in rules 9, 10, 11, 13 and 16 read the **raw** command rather than
+a skeleton and must keep doing so — a `"$(…)"` inside double quotes still
+executes, so a rule that declared `dq` inert for *that* test would hand an
+auto-allow to a command substitution it could not see. Those tests are
+conservative declines, not verdict matching; every rule that reaches a verdict
+reaches it off a skeleton.
 
 **The payload carries the live permission mode, and no accessor above reads it.**
 `PreToolUse` delivers `permission_mode` alongside the fields
@@ -240,16 +281,31 @@ load-bearing where noted.
    the literal repo-root prefix is steered to the repo-relative spelling.
    `git` is excluded — rule 2 already owns its `-C` handling.
 6. **Shell expansion / assignment** — a residual `${…}`/`$(…)`/`<(…)`/
-   `$NAME` after single-quoted regions are stripped is blocked (the harness's
-   matcher refuses every expansion before allowlist matching). Only
-   *single*-quoted regions are stripped: inside single quotes `$` is
-   literal (`awk '$1'`), but a double-quoted `"$x"` still expands and must
-   stay visible. A standalone `NAME=value` assignment is caught separately,
-   since the expansion check only sees a *used* `$VAR`.
+   `$NAME` in the skeleton is blocked (the harness's matcher refuses every
+   expansion before allowlist matching). **Declares `sq`** for the expansion
+   check and **`sq dq`** for the assignment check, and both halves of that are
+   deliberate rather than inherited. Only *single*-quoted regions are inert for
+   the expansion check: inside single quotes `$` is literal (`awk '$1'`), but a
+   double-quoted `"$x"` still expands and must stay visible — and by the same
+   argument `hd` is **not** declared here, since an unquoted-delimiter heredoc
+   body expands too. The assignment check adds `dq` because a `NAME="value"`
+   assigns whatever the quotes hold. A standalone `NAME=value` assignment is
+   caught separately, since the expansion check only sees a *used* `$VAR`.
 7. **Unquoted brace glyph** — the harness's matcher refuses the bare `{` glyph
    before allowlist matching, the same behavior class rule 6 pre-empts for
-   `$`-expansions, so a `{` surviving rule 6's single-quote strip is handled
-   by shape. A **bare `{}` placeholder** (`find … -exec cmd {} +`,
+   `$`-expansions, so a `{` surviving in the skeleton is handled by shape.
+   **Declares `sq dq hd`, and the difference from rule 6 is the point rather
+   than an accident of two adjacent lines.** Rule 6's reason to keep
+   double-quoted spans live does not carry here: `{` is a **matcher glyph, not a
+   shell expansion**, so a double-quoted brace is exactly as inert as a
+   single-quoted one, and a heredoc-body brace is inert whatever the delimiter.
+   This is what stops a working POSIX quantifier (`grep -rnE "^[a-z]{2,}"`)
+   being refused, and it is equally what stops the **wrong corrective**: a block
+   message owes the offending pattern *and* the corrective form, and *write out
+   the brace expansion, spell the members* is inapplicable to a quantifier that
+   has no members and to a heredoc body that has nothing to respell. A block
+   whose corrective cannot be followed fails that contract however right its
+   verdict. A **bare `{}` placeholder** (`find … -exec cmd {} +`,
    `xargs -I{}`), when every residual brace is exactly `{}`, is rewritten
    via `guard_rewrite` — each `{}` single-quoted to `'{}'`,
    behavior-preserving (the shell passes a literal `{}` either way) and
@@ -258,12 +314,12 @@ load-bearing where noted.
    git-ref shorthand (`@{u}`, `@{-n}`, `<ref>@{n}`) names the explicit
    spelling (`origin/<branch>..HEAD`, or the resolved ref/hash);
    list/range (`{a,b}`, `{a..b}`) names the spelled-out members or a loop;
-   any other residual `{` gets the generic corrective (single-quote if
-   literal — an awk/sed program in double quotes — write it out if it
-   expands). There is no legitimate brace-glob convenience to preserve:
+   any other residual `{` gets the generic corrective (quote it if literal —
+   an unquoted awk/sed program — write it out if it expands). There is no
+   legitimate brace-glob convenience to preserve:
    since every bare `{` already costs an out-of-band decision no allowlist entry
-   can suppress, block-and-steer strictly dominates; only single-quoted
-   (literal) braces pass untouched. **Placed before both auto-allow rules**
+   can suppress, block-and-steer strictly dominates; a brace in any inert region
+   passes untouched. **Placed before both auto-allow rules**
    so their literal-target premise holds for braces as well.
 8. **`sed` reading or rewriting a file** — blocked with the steer to the
    harness's file tools: `sed -i` (or any short bundle carrying `i`) to the
@@ -341,10 +397,33 @@ load-bearing where noted.
 13. **Auto-allow read-only pipeline** — granted silently when every pipe
     segment leads with a roster binary (`GUARD_KIT_RO_BINS`, default the
     grep/head/cat/find/jq family) and every redirect target is `/dev/null`
-    or an fd-dup. Conservative by construction: command/process
-    substitution, a leftover quote after stripping, any statement separator,
-    a non-`/dev/null` redirect, or a `find` with a write action all refuse
-    and fall through.
+    or an fd-dup. Declares `sq dq hd`. Conservative by construction:
+    command/process substitution, a leftover quote after normalization, any
+    statement separator, a non-`/dev/null` redirect, or a `find` with a write
+    action all refuse and fall through. Two carve-outs widen the grant, and
+    neither widens it past what the segment-by-segment safety argument already
+    covers:
+    - **A literal `echo`/`printf` banner segment is skipped**, the tolerance
+      rules 9 and 10 already carry on the stated ground that a banner is the
+      natural separator of a batched read; `_guard_is_banner` is shared and this
+      is its third caller. The asymmetry was the accident, not the tolerance. At
+      least one non-banner roster segment must remain, so a banner-only pipeline
+      is not granted.
+    - **The lead segment may instead be a bare committed allow entry** — an
+      exact `Bash(<cmd>)` with no glob, on rule 14's own reasoning that a
+      glob-headed family coexists with allowlisted decorators and would admit
+      far more than the reviewed command. The shape this repairs is an
+      allowlisted script piped into `head`: the lead is statically allowlisted,
+      so it was reviewed; every tail segment leads with a roster binary, so it
+      is read-only. The widened lead applies **only where something decorates
+      it** (more than one segment): an undecorated allowlisted command already
+      resolves on the static match, and intercepting it here would take it off
+      the friction log for no gain. Reads `GUARD_KIT_SETTINGS`, and the
+      **fail-open contract travels with the read**: no `jq`, no settings file,
+      or a parse error and the lead-widening silently declines, leaving the rule
+      exactly as it behaves without it. A grant that depends on a settings read
+      must never turn a missing settings file into a grant, and declining is the
+      only direction that cannot.
 14. **Decorated allowlisted command** — the leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
@@ -366,7 +445,15 @@ load-bearing where noted.
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
     parse error and the rule silently declines and falls through. Placed after
     the auto-allow rules (12, 13) so a silently granted read-only pipeline never
-    reaches it.
+    reaches it — which is also **why the allowlisted-lead grant lives in rule 13
+    and not here**. Grant, not fall-through, is what removes the friction of an
+    allowlisted command decorated only by a read-only reduction of its own
+    output, and this rule's own text refuses to grant, correctly: granting here
+    would bless segments the allowlist never reviewed. Rule 13 is already the
+    sanctioned place for a grant of exactly that shape and is already ordered
+    ahead of this rule, so a granted pipeline never arrives and nothing
+    ungranted becomes granted that either half would not have granted alone.
+    Declares `sq dq hd`.
 15. **Git history-rewrite advisory** — a `git commit` carrying `--amend`, `-F`,
     or `--file`, or a `git reset --soft`, gets a `guard_advise` steer carrying
     the checklist from DOCTRINE.md's *Re-verify volatile state before a git
@@ -412,9 +499,11 @@ steering rule must precede the broader rule that would catch the same
 command less precisely. A third, on the match surface: a substring rule
 sees the entire tool input, heredoc bodies included, so prose that merely
 *names* a guarded command — a `git commit -F -` message describing one —
-false-blocks. Match against a quote-stripped copy of the command (quoted
-spans may then name anything), and keep longer prose out of the match
-surface via a quoted `-m` span or a `-F <file>` the hook never reads.
+false-blocks. Match against a `guard_skeleton` view naming the classes inert
+for the rule (`sq dq hd` for any rule that does not itself test for an
+expansion), which neutralizes quoted spans and heredoc bodies alike, and keep
+longer prose out of the match surface via a quoted `-m` span or a `-F <file>`
+the hook never reads.
 
 ## scratch-run
 
@@ -689,7 +778,24 @@ decision (`block`/`advise`/`allow`/`rewrite`/`fallthrough`) with a command;
 `bin/run-guard-tests.sh` feeds each through the template guard as hook JSON
 on stdin and asserts the exit code and output class, failing on any
 mismatch. Every generic rule carries at least one firing and one
-non-firing case (the fixture-pair discipline, transplanted).
+non-firing case (the fixture-pair discipline, transplanted). Two substitutions
+make a command expressible in one tab-separated cell: `@ROOT@` becomes the git
+sandbox root, and `@NL@` becomes a newline — without the second a heredoc case
+cannot be written at all, and the heredoc class would ship untested.
+
+**The decision table is the instrument for any change to what the guard
+refuses, and its red condition is not monotone.** A change that *narrows*
+refusal cannot be cleared by inspection, because the table fails on a verdict
+mismatch **in either direction** rather than on a violation count: every
+existing case whose command carries a double-quoted brace, a heredoc, a banner
+segment, or an allowlisted lead with a read-only tail must have its expected
+column **re-derived**, never assumed still correct. `bin/scan-prompts.sh` cannot
+substitute for it, and the reason is structural rather than a matter of
+precision: `guard_block` exits 2 before `guard_log_fallthrough` runs, so a
+blocked command never reaches `GUARD_KIT_LOG` and that report is blind to every
+block the guard makes. A change converting a block into a grant therefore reads
+as a pure improvement on the scan and as nothing at all — which is why the
+table, not the scan, is what a narrowing change is measured on.
 
 The same runner drives the escalation-guard from a second table,
 `guard-tests/escalation-cases.tsv` (`<decision> <TAB> <to> <TAB> <message>`),

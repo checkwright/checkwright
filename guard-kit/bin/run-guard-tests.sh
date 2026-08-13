@@ -57,6 +57,7 @@ while IFS=$'\t' read -r want cmd; do
     [[ -z "${want// }" ]] && continue
     [[ "$want" == \#* ]] && continue
     cmd="${cmd//@ROOT@/$SANDBOX}"
+    cmd="${cmd//@NL@/$'\n'}"
     json="$(jq -nc --arg c "$cmd" '{tool_input:{command:$c}}')"
     out="$(cd "$SANDBOX" && printf '%s' "$json" \
         | GUARD_KIT_LIB="$LIB" GUARD_KIT_LOG="$LOG" bash "$BASH_GUARD" 2>/dev/null)"

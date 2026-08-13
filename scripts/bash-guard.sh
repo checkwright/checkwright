@@ -13,8 +13,10 @@ cmd="$(guard_read_command)" || exit 0
 
 # spec: guard-kit/SPEC.md §Consumer rules — project block/steer/allow rules go here, before the generic ruleset
 # copy-divergence: guard_block — the template ships the allow/steer skeleton only; this repo's project rules are blocking ones, so the copy calls guard_block where the template calls neither
-# spec: CLAUDE.md §This repo is governed by its own kits — a hook bypass is a one-off with cause, so it must stay visible: the allowlisted 'git commit -m *' glob would otherwise auto-allow a trailing bypass flag; quoted spans are stripped first so a commit message merely naming the flag passes
-cmd_unquoted="$(printf '%s' "$cmd" | sed "s/'[^']*'//g;"' s/"[^"]*"//g')"
+# copy-divergence: guard_skeleton — the template ships no project rule, so it needs no lexical view of its own; every rule this copy adds matches on one, and taking it from the normalizer is what keeps the copy off a sixth private stripping dialect
+# spec: guard-kit/SPEC.md §The guard framework — the project rules take their lexical view from the one normalizer, declaring 'sq dq hd': none of them tests for an expansion, and a heredoc body naming a bypass flag or a scratchpad path is prose, not the executable command
+cmd_unquoted="$(guard_skeleton "$cmd" sq dq hd)"
+# spec: CLAUDE.md §This repo is governed by its own kits — a hook bypass is a one-off with cause, so it must stay visible: the allowlisted 'git commit -m *' glob would otherwise auto-allow a trailing bypass flag
 case " $cmd_unquoted " in
     *" git commit "*"--no-verify"*|*" git commit -n "*)
         guard_block "a hook bypass (--no-verify/-n) is a one-off with cause, never auto-allowed — fix the red gate instead, or run the bypass yourself with !<command> so the cause is on record."

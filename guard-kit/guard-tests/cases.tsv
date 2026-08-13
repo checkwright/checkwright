@@ -1,7 +1,8 @@
 # guard-kit guard decision table — <expected-decision><TAB><command>.
-# @ROOT@ is substituted with the git-sandbox root at run time. Every generic
-# rule (guard-kit/SPEC.md §The generic ruleset) has a firing + a non-firing
-# case. Columns are tab-separated; # and blank lines are ignored.
+# @ROOT@ is substituted with the git-sandbox root at run time and @NL@ with a
+# newline (a heredoc-bearing command is multi-line, and a cell cannot hold one).
+# Every generic rule (guard-kit/SPEC.md §The generic ruleset) has a firing + a
+# non-firing case. Columns are tab-separated; # and blank lines are ignored.
 
 # rule 1 — cd in a compound command
 block	cd deploy && ls
@@ -20,22 +21,36 @@ rewrite	bash @ROOT@/scripts/check-foo.sh
 rewrite	@ROOT@/scripts/check-env.sh --list
 block	bash @ROOT@/scripts/gen-configs.sh
 
-# rule 5 — repo-root absolute prefix (non-script) steered; foreign path untouched
+# rule 5 — repo-root absolute prefix (non-script) steered; foreign path untouched.
+#          The rule declares 'sq dq hd', so a path merely *named* — quoted either
+#          way, or sitting in a heredoc body — is not the executable command.
 block	python3 @ROOT@/tools/report.py
 fallthrough	python3 /other/repo/tools/report.py
+fallthrough	printf '%s' 'the path @ROOT@/tools/report.py is steered'
+fallthrough	printf '%s' "the path @ROOT@/tools/report.py is steered"
+fallthrough	cat <<'EOF' > .tmp/note.md@NL@the path @ROOT@/tools/report.py is steered@NL@EOF
 
-# rule 6 — shell expansion / assignment; single-quoted $ stays literal
+# rule 6 — shell expansion / assignment; single-quoted $ stays literal.
+#          'sq' only: a double-quoted "$x" expands, and so does an
+#          unquoted-delimiter heredoc body — the stated bound on the hd class.
 block	echo $(pwd)
 block	P=/tmp/x
 fallthrough	awk '$1' data.txt
+block	cat <<EOF > .tmp/n.md@NL@value is $(date)@NL@EOF
 
-# rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked
+# rule 7 — unquoted brace glyph: bare {} placeholder rewritten, expansions blocked.
+#          'sq dq hd': '{' is a matcher glyph, not an expansion, so a
+#          double-quoted quantifier and a heredoc-body brace are both inert —
+#          the corrective (spell the members) is inapplicable to either.
 rewrite	find . -exec rm {} \;
 block	git log @{u}..
 block	echo {1..5}
 block	mkdir -p a/{b,c}
 fallthrough	awk '{print $1}'
 fallthrough	find . -exec grep foo '{}' +
+allow	grep -rnE "^[a-z]{2,}" src
+fallthrough	cat <<'EOF' > .tmp/note.md@NL@a brace {a,b} in prose@NL@EOF
+block	cat <<'EOF' > a/{b,c}/note.md@NL@prose@NL@EOF
 
 # rule 8 — sed reading or rewriting a file directly; a piped-into sed is a filter
 block	sed -n '1,60p' TASK-QUEUE.md
@@ -85,6 +100,16 @@ fallthrough	: > tracked.txt
 # rule 13 — read-only pipeline auto-allow; a non-roster segment falls through
 allow	grep -rn foo src | head
 fallthrough	grep foo file | awk '{print}'
+# banner tolerance (rules 9 and 10's, third caller): a literal echo/printf
+# segment is skipped, but at least one roster read must remain
+allow	echo === | grep foo src
+fallthrough	echo a | echo b
+# widened lead: a bare committed allow entry may lead, since it was reviewed —
+# but only where something decorates it, so the undecorated form (rule 14's
+# 'fallthrough git status' below) is still never intercepted here
+allow	git status | head
+allow	git status | head -20
+block	git status | awk '{print}'
 
 # rule 14 — decorated allowlisted bare lead with an unmatched segment blocked;
 #           chaining steer, redirect steer, and the untouched non-firing cases
