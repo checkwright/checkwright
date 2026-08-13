@@ -5399,10 +5399,6 @@
 
 ## Done
 
-- guard-glyph-match-context-blind
-- exit-echo-decoration-guard-vs-habit
-- spent-ruling-retirement
-- icebox-candidate-roadmap-filter
 
 ## Lessons Learned
 
