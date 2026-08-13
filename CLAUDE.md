@@ -149,8 +149,8 @@ load behind that trigger, so they are not resident here.
   the crate's lint and test arms through `check-crate-arms` — **plus**
   `bash gate-sdk/bin/build-native.sh`, and neither discharges the other.
   It is **not a kit** — no `checks/`, no `smoke/`, the
-  predicate that makes a root directory one; `native/target/` is gitignored, and
-  `check-gate-binary-fresh` is what holds its currency. Dispatch, descriptor
+  predicate that makes a root directory one; `check-gate-binary-fresh` holds the
+  binary's currency. Dispatch, descriptor
   format, port sequencing and the toolchain floor:
   gate-sdk/SPEC.md §Porting a gate to the binary substrate; the shipped
   install behavior: installer/README.md §The gate binary.
