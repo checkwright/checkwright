@@ -1138,8 +1138,7 @@ pair cannot hold live in `gate-tests/*.test.sh` scenario runners. What departs
 from the plain fixture-pair default, and what no single gate's subsection below
 can own, is how those runners **reach** their gate.
 
-Nine of the runners drive a gate rather than a `bin/` tool, and a runner names a
-gate, never a substrate: it resolves through
+A runner that drives a gate names that gate, never a substrate: it resolves through
 `gate_run <name> <checks-dir> <args>` (gate-sdk/SPEC.md §run-gate-tests), which
 dispatches through `gate_command` exactly as the fixture harness does. A member
 that ports to a compiled subcommand therefore leaves its scenario coverage
@@ -1149,17 +1148,16 @@ descriptor. For a case that differs by a knob rather than by argv, `gate_env
 NAME=VALUE` sets that one case's environment in the caller's subshell;
 `check-stage-evidence`'s session-boundary posture cases are the worked instance.
 
-Two of the nine still hold a script path: `check-close-surfaces`, which no
-cohort has sized, and `check-stage-entry`, which is held on shell
+Two gate-driving runners still hold a script path: `check-close-surfaces`, which
+no cohort has sized, and `check-stage-entry`, which is held on shell
 (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). Both
 keep a `.sh` for as long as those
 dispositions hold, so their runners resolve; naming them here records the
 residue rather than leaving the convention looking like it has unexplained
 exceptions.
 
-The remaining five runners exercise `bin/` tools — the rename mode, the boundary
-scratch wipe, the state-file guard, `file-gap.sh`'s recurrence and
-`file-survey.sh`'s entry — which are advisory tooling with no gate to dispatch.
+The rest exercise `bin/` tools, which are advisory tooling with no gate to
+dispatch and so have nothing to say about reach.
 
 ## Per-component contracts
 

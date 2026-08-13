@@ -1454,9 +1454,14 @@
   iteration, all of them on commands the operator already blessed — the pure
   interruption cost this loop exists to retire, and it grows with profiling work
   (this iteration was a performance iteration, which is why `time` dominated).
-  Debt: one guard rule plus a fixture pair and one roster; adds no governed name
-  to a shipped surface.
-  Filed 2026-08-01 by close's prompt-friction triage.
+  **Tier: feature, owing an amendment — corrected 2026-08-13 at close.** The entry long carried
+  "Debt: … adds no governed name to a shipped surface"; that self-declaration is false against
+  the tree. guard-kit's generic ruleset is a numbered SPEC roster backed by named
+  `guard_rule_*` functions in `lib/guard.sh` (sixteen defined), so a new rule adds a name to a
+  governed surface, a contract consumers honour, and a closed transparent-prefix roster.
+  Only the tier label is corrected here; the entry's substantive claims were not re-examined.
+  Filed 2026-08-01 by close's prompt-friction triage; tier corrected 2026-08-13 by close from the
+  gap-inbox drain, after the operator ruled the entry out of that iteration's unit set.
 
 - **upgrade-contract-rename-routing-unstated** [design-pending] —
   `docs/install.md` §The upgrade contract never states that a **gate-name**
@@ -3219,33 +3224,28 @@
   entry names the rows it removes on landing; that holds only where an author remembered to
   write the removal in, and nothing catches the ruling whose condition a unit met silently.
   **The enforceable half is a probe, never a prune — and the ground for that has moved.** It
-  rested on retirement being operator-class; the operator's 2026-08-08 pruning directive
-  (`trajectory-prune-on-completion`) authorizes the prune, so what keeps this entry to a probe
-  is its own deliverable rather than an authority limit; detect and act stay complementary.
+  rested on retirement being operator-class; the 2026-08-08 pruning directive
+  (`trajectory-prune-on-completion`) authorizes the prune, so what keeps this entry to a probe is
+  its own deliverable rather than an authority limit.
   The deliverable is a *staleness probe* over condition-bearing rulings that escalates, plus
   whatever declaration makes a condition machine-readable — a ruling stating its own discharge
   event is the design question, since a prose condition carries no syntactic tell. That
   declaration is this entry's alone: the pruning unit ships prose convention, not form.
   **Both attested conditions have now fired, which settles the recurrence and not the
-  deliverable.** At the 2026-08-06 close one was unfired and one already missed — a companion
-  ruling naming a specific iteration's close as the tag point, which passed without cutting
-  the tag and no surface said so. The unfired one fired 2026-08-07 (v0.22.0), discharging
-  every row conditioned on it at once. Two state changes, no probe watching either.
-  **The class reaches the record's corrections, not only its conditions** — the surface
-  written to record the missed condition went stale itself in under a day (relocated here
-  from `TRAJECTORY.md` by `trajectory-prune-on-completion`, which deletes it there).
+  deliverable.** One was already missed at the 2026-08-06 close — a ruling naming an iteration's
+  close as the tag point, which passed uncut with no surface saying so; the other fired
+  2026-08-07 (v0.22.0), discharging every row conditioned on it at once. No probe watched either.
+  **The class reaches the record's corrections, not only its conditions** — the surface written
+  to record the missed condition went stale itself in under a day.
   **Widened 2026-08-09 by the first post-prune close: the inbound half, and it is the mirror
   of what `SPEC-ruling-record-prune` D9 refused.** D9 weighed slug-liveness *over* the record
   — the record citing dead slugs — and correctly ruled it a no-op. The other direction was
   never considered: **another governed surface citing a ruling the record no longer carries.**
   The pointer names the surviving *section*, so it resolves and the battery reports clean over
-  it. Now that pruning is licensed, every prune manufactures this exposure. Three instances
-  were verified individually at that close, each having survived a full green battery: two in
-  `gate-sdk/SPEC.md` (§The port-candidate criteria criterion 5, and its "What stands between
-  that port and an adopter" paragraph) and one in this entry's own body above; all fixed
-  there. **No denominator is stated on purpose** — two sweeps of the citation corpus returned
-  counts that do not reconcile under differing exclusion sets, which is precisely what
-  `spec-measured-count-gate` names.
+  it. Now that pruning is licensed, every prune manufactures this exposure. Three instances were
+  verified individually at that close, each having survived a full green battery, and all fixed
+  there. **No denominator is stated on purpose:** two sweeps of the citation corpus returned
+  counts irreconcilable under differing exclusion sets — `spec-measured-count-gate`'s subject.
   **The design input worth more than the instances, because a probe would miss it.** A fourth
   instance — `gate-timing-baseline-comparability`, corrected at the same close — cites the
   deleted ruling **by its distinctive phrasing, naming no file at all**, so no probe scoped to
@@ -3258,6 +3258,11 @@
   sessions that consult the record for what is settled, and the record's authority makes that
   steer expensive to unwind. The widening adds the sharper cost: the citing surfaces are
   *published* — a kit SPEC and its docs mirror — so the blast radius reaches adopters.
+  **Fifth inbound instance, 2026-08-13, and the first from a *deliberate retirement* rather than
+  a prune** — `gate-sdk/SPEC.md` citing a ruling the retirement deleted from a surviving section;
+  cleaned by `spent-ruling-retirement`, so the exposure this entry attributes to pruning is now
+  attested on the retirement path too.
+  recurrence: ruling-record-condition-staleness-probe 2026-08-13
   Filed 2026-08-07 by close, draining the gap inbox.
 
 - **stage-economics-log-key-session-collision** [design-pending] — two sessions in one
@@ -3875,9 +3880,22 @@
   why it is filed rather than fixed in place. The question the unit owes is whether a
   *categorical* eligibility rule belongs in the bound at all, given the tier deliberately keeps
   judgment out of the tool.
+  **Why the advisory defence does not settle it**, merged in from a duplicate filing: that
+  defence is about the **cost-class heuristic**, which is prose-matched and rightly advisory.
+  Roadmap-eligibility is neither prose nor judgment — the tag is on the lead line the tool
+  already parses, and the SPEC states the exclusion in the imperative. Filtering it removes
+  re-derivation without deciding anything.
+  **The open half is presentation, not predicate:** whether an excluded row should vanish or
+  print as a stated exclusion. Vanishing is cleaner; printing keeps the reason visible to a close
+  that would otherwise wonder where a long-dormant roadmap entry went, and the answer turns on
+  whether anything else already tells that story.
   **Cost while deferred:** low, recurring, and paid by every close — three entries re-read and
-  one rule re-derived per iteration, forever, against a one-predicate fix.
-  Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step.
+  one rule re-derived per iteration, forever, against a one-predicate fix. Re-measured at the
+  2026-08-13 close: 3 of 3 offered rows were roadmap-tagged again, so precision is still zero.
+  Filed 2026-08-09 by close (`install-profile-seam`) from its own backlog-eviction step;
+  a duplicate filing of the same finding (`icebox-candidate-roadmap-filter`, 2026-08-13) was
+  merged in here at the 2026-08-13 close, which also filed
+  `close-eviction-refiles-without-checking` for the re-filing itself.
 
 - **qualified-pointer-section-ownership** [design-pending] — `check-spec-pointer` asserts a
   cited `§Heading` **exists**, never that it is the heading which *owns* the cited claim, so a
@@ -4346,24 +4364,24 @@
   rather than a permitted exclusion. Every hold **and its grounds** are canonical at
   gate-sdk/SPEC.md §The first cohort; this entry carries only the work owed, so a ground
   stated there is cited here and never restated.
-  The count is the roster's, never a fixed number: the canon-kit cohort added a trio at build
-  2026-08-12 and the ERE cohort discharged it at build 2026-08-13.
+  The count is the roster's, never a fixed number.
   **`check-roadmap-fresh` owes an emitter design; the label is cohort composition** — relabelled
   off criterion 7 at build 2026-08-12, ground unchanged. It is canonical, with the whole
   family's per-member cost derivation, at gate-sdk/SPEC.md §The first cohort. Three candidate
   designs are stated once by their owner; none is ruled.
-  Worth preserving in the design: the hold keeps
-  `queue_roadmap_entries` on one shell adapter, so queue-kit/SPEC.md's "the emitter and the
-  gate can never disagree" guarantee survives intact and is **not** part of the dual-
-  implementation debt above.
-  **The POSIX ERE engine is PAID, and this block collapses to what it answers.** The ERE
-  cohort landed `native/src/ere.rs` 2026-08-13 at build with the canon-kit trio; its grammar,
-  its three-item API, its refusals and the differential oracle are canonical at
-  gate-sdk/SPEC.md §The POSIX ERE matcher. The six members it unblocks owe only their own
-  port: `check-queue-prose-precondition` (queue-kit); `check-spec-derivable-section`,
-  `check-deprecation-task` (canon-kit); `check-tree-terms`, `check-commit-msg` (gate-sdk); plus
-  `check-brevity` (context-kit) marginally. `check-comment-tier` stays screened **out**: `join_alt`
-  bracket-escapes every knob element to a literal.
+  Worth preserving in the design: the hold keeps `queue_roadmap_entries` on one shell adapter,
+  so queue-kit/SPEC.md's "the emitter and the gate can never disagree" guarantee survives intact
+  and is **not** part of the dual-implementation debt above.
+  **The POSIX ERE engine is PAID** (landed 2026-08-13 at build); the members it unblocks and
+  `check-comment-tier`'s standing screen-out are the canonical roster's, cited not restated.
+  **One of them owes more than its port: `check-tree-terms` — corrected 2026-08-13 at close** on
+  the mechanical confirmation the gap inbox asked for. Its corpus is `git ls-files` over the
+  whole tracked tree, pruned only by `GATE_PRUNE_DIRS` and the pattern-file basenames — a live
+  run scans 518 files and prunes neither `*/checks/` nor `native/src/` — so every declaration
+  path lies inside the corpus it scans as content, criterion 4's own predicate verbatim. It
+  carries a criterion-4 hold on top of its port, so the gate-sdk leak-guard pair is not the
+  clean first-cohort shape it reads as. Independent of assertion C, which does not select it
+  (`couples=scripts/msg-patterns.list`).
   **`check-spec-pointer` owes the `spec_comment_surface` family** — held 2026-08-12 at spec on
   criterion 6, as the only member calling both of canon-kit's corpus primitives.
   **The associative-array bridge is ONE prerequisite shared by two members in two kits** — a
@@ -4380,7 +4398,7 @@
   assertion target, **not** machine-checked against `check-gate-substrate-parity`'s runtime
   derivation — so the taking session runs that derivation first.
   **Cost while deferred:** `native-gate-port-remaining-corpus` ranks the remaining corpus as
-  undifferentiated gate-count, so a held member reads as one more of seventy-seven when its
+  undifferentiated gate-count, so a held member reads as one more unported gate when its
   prerequisite is a sub-project. A later cohort discovers the sizing at implementation
   time, which is the failure mode criterion 7 exists to prevent — designed first, then ported,
   never ported and patched.
@@ -4905,27 +4923,6 @@
   Filed 2026-08-13 by close, from the roster sweep; raised by the lead and re-scoped here after
   reading the fixtures.
 
-- **icebox-candidate-roadmap-filter** [design-pending] — the eviction worklist lists entries its
-  own SPEC rules ineligible, so every close re-derives the same exclusions.
-  `bin/queue-index.sh --icebox-candidates` filters on defer-date age and the cost-class opener
-  only. queue-kit/SPEC.md §The icebox tier states a third condition as a **rule**, not a judgment —
-  a roadmap-tagged entry is not icebox-eligible — and the tool never applies it.
-  **Measured this close:** the worklist returned three rows and **all three** are roadmap-tagged
-  (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`), so the entire
-  worklist was ineligible and the whole step was re-deriving a rule the SPEC already states.
-  **Why this is derivation and not deciding**, which matters because the tool's own spec comment
-  defends it as *"an advisory worklist, never a verdict"*: that defence is about the **cost-class
-  heuristic**, which is prose-matched and rightly advisory. Roadmap-eligibility is neither prose
-  nor judgment — the tag is on the lead line the tool already parses, and the SPEC states the
-  exclusion in the imperative. Filtering it removes re-derivation without deciding anything.
-  **Deliverable, and why `[design-pending]`:** apply the rule in the walk. What is open is whether
-  an excluded row should vanish or print as a stated exclusion — vanishing is cleaner, printing
-  keeps the reason visible to a close that would otherwise wonder where a long-dormant roadmap
-  entry went, and the answer turns on whether anything else already tells that story.
-  **Cost while deferred:** small and exactly recurring — one re-derivation per close, over a
-  worklist that grows as roadmap-tagged entries age.
-  Filed 2026-08-13 by close, from the backlog-eviction step that hit it.
-
 - **vendored-library-identifier-reach** [design-pending] — De-literalization's reach test gives
   two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
   The rule bans prose restating a source's **internal** identifier roster while allowing public
@@ -5135,6 +5132,242 @@
   absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
   Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
 
+- **ro-bins-write-option-bypass** [design-pending] — `GUARD_KIT_RO_BINS` membership is tested as
+  "the segment leads with this binary", but leading with a roster binary does not make the
+  invocation read-only, and rule 13's safety argument assumes it does.
+  **Probed through the live hook at close, not reasoned:** `grep foo a.md | sort -o out.txt` and
+  `sort -o tracked.md tracked.md | head` are both auto-allowed today, and each overwrites a named
+  file. Rule 13's redirect check inspects `>`/`>>` targets only, so a write expressed as a
+  binary's own option is invisible to it. `sort` is the shipped instance.
+  **The `xargs` half of this finding is already discharged and must not be re-filed**: the
+  guard-context-matching unit landed `_guard_is_ro_xargs` (guard-kit/lib/guard.sh), and the same
+  close probe confirms `find . -type f | xargs rm -rf` and `grep -rln foo src | xargs sed -i …`
+  now fall through rather than auto-allow, while `find . -name '*.sh' | xargs grep -l foo` still
+  allows. What survives is the general predicate the discriminator solved case-by-case.
+  **Distinct from `guard-command-prefix-wrapper`** (transparent prefixes for allowlist matching)
+  and from the two consumer-side guard entries below: this is the roster knob's own predicate
+  being weaker than the grant that reads it.
+  **Fix shape, uncosted:** either a per-binary write-option denylist, or generalize the
+  executor-shaped discriminator into the membership test itself.
+  **Cost while deferred:** a standing auto-allow that overwrites tracked files with no prompt —
+  the narrowest live hole in the permission surface, and the one a reviewer of the roster would
+  never see, because the roster reads as a list of safe programs.
+  Filed 2026-08-13 by close, draining the gap inbox; every allow/fall verdict above re-probed
+  against HEAD at the drain rather than taken from the bullet.
+
+- **consumer-guard-rule-coverage** [design-pending] — the guard decision table has no reach into
+  the consumer copy, so this repo's most destructive guards are its untested ones.
+  `guard-kit/bin/run-guard-tests.sh` drives `guard-kit/templates/bash-guard.sh`, so the four
+  project rules in `scripts/bash-guard.sh` — the hook-bypass block, the harness-scratchpad path
+  block, the `git clean -x` block and the scratch-run steer — carry zero behavioral coverage.
+  `check-template-copy-parity` is their only gate and it reads the copy-divergence declaration
+  shape, never what the rules do.
+  **Distinct from `template-copy-parity-yaml-widening`**, whose predicate is byte-parity between a
+  template and its consumer copy; this is the absence of firing/non-firing cases for rules that
+  exist only in the copy.
+  The kit-side rule is that every generic rule owes a firing and a non-firing case; the consumer
+  side inherits the discipline and no mechanism.
+  **Cost while deferred:** a copy-divergence edit that silently stops matching reds nowhere, on
+  the four rules whose failure mode is a destructive command running unprompted.
+  Filed 2026-08-13 by close, draining the gap inbox; the runner's target re-read at the drain.
+
+- **guard-ruleset-registration-lockstep** [design-pending] — guard-kit's generic ruleset exists in
+  three places and nothing holds them in lockstep.
+  The numbered roster in `guard-kit/SPEC.md` §The generic ruleset, the set of named
+  `guard_rule_*` functions in `lib/guard.sh`, and the fixed dispatch order inside
+  `guard_generic_rules` must agree, and no gate asserts it.
+  **Re-verified at the drain:** the SPEC names neither the `guard_rule_` prefix nor the
+  dispatcher — a grep for either over `guard-kit/SPEC.md` returns nothing — so the only statement
+  of the convention is a code comment in `lib/guard.sh` citing a section that does not carry the
+  fact. (The gap bullet cited that comment at line 89; it is now line 262, the file having grown
+  at build — the citation was already stale when filed, which is the class's own failure mode.)
+  `check-lifecycle-registration` and `check-doctrine-registration` are the analogue gates and
+  guard-kit has none.
+  **Declined once, on stated grounds**, inside the guard-context-matching amendment's delta 9: the
+  convention is unwritten, so gating it means authoring it, on a surface the operator ruled out of
+  the 2026-08-13 unit set — and the gate would have been green before and after every delta in
+  that amendment. The amendment is deleted at merge, so the decline survives only here.
+  **A fourth correspondence sits beside the three**, surfaced by the close audit that reviewed
+  this surface: each rule's SPEC subsection states the inert classes it declares
+  (`Declares sq dq hd`), transcribed from the rule's own `guard_skeleton` call site, and nothing
+  holds those in step either. Judged legitimate rather than a restatement defect — the class
+  vocabulary is `guard_skeleton`'s public parameter contract and which classes a rule treats as
+  inert is a behavioral fact about the rule — but it is a fourth un-gated correspondence, and
+  whether a vendored library's exports read as public or internal is the open question
+  `vendored-library-identifier-reach` owns. Size this unit against that ruling, not ahead of it.
+  **Cost while deferred:** a rule added to the roster and not to the dispatcher, or the reverse,
+  ships silently; the three-way correspondence is exactly what a registration gate is for.
+  Filed 2026-08-13 by close, draining the gap inbox; the SPEC re-grepped for both identifiers.
+
+- **scan-prompts-blocking-half-blind** [design-pending] — guard-kit's own KPI cannot see the
+  failure mode the guard exists to produce, so a change trading a prompt for a block reads as
+  pure improvement.
+  `guard_block` exits 2, and `guard_log_fallthrough` is the **last** line of both the template and
+  the consumer hook — re-verified at the drain: `guard-kit/lib/guard.sh` blocks at its
+  `guard_block`, and the fall-through log write is line 42 of 43 in `scripts/bash-guard.sh` and
+  line 17 of 18 in the template. So a blocked command never reaches `GUARD_KIT_LOG`.
+  `scan-prompts` reads that log alone, so its count is fall-throughs only and every refusal the
+  guard itself issues is invisible to it.
+  **Distinct from `scan-prompts-truncation-quote-desync`**, a false-positive defect in parsing the
+  log's existing lines; this is a whole class of event never written to the log at all.
+  **Cost while deferred:** `exit-echo-decoration-guard-vs-habit` had to name the decision table as
+  its success instrument because the KPI cannot measure it, and drift-kit's prompting KPI
+  understates guard friction by the entire blocking half.
+  Filed 2026-08-13 by close, draining the gap inbox; the two hook tails re-read at the drain.
+
+- **spec-section-title-collision** [design-pending] — two sections in one SPEC may carry the same
+  title, and a `§`-pointer then resolves to the wrong one from the day it is written.
+  Live instance, re-verified at the drain: `guard-kit/SPEC.md` carries **Consumer rules** at the
+  `##` level (line 244) and again at the `###` level (line 508). Section-resolving readers take
+  the first match, so every `§Consumer rules` pointer binds to the `##` one — including both
+  pointers in `scripts/bash-guard.sh`, whose second one means the `###` section.
+  `check-spec-pointer` stays green, because the section exists.
+  **Distinct from `qualified-pointer-section-ownership`**, whose predicate is whether a pointer's
+  named section still *owns* the claim — a staleness question about one resolving target. This is
+  a resolution-*ambiguity* question: two targets carry one name, so no amount of ownership
+  freshness fixes it. Cited because the citation-liveness family is one predicate question and
+  this is a second predicate that family would have to absorb.
+  **Cost while deferred:** a pointer that reads as precise and resolves elsewhere, which is worse
+  than a broken pointer because nothing signals it.
+  Filed 2026-08-13 by close, draining the gap inbox; both SPEC headings re-read at the drain.
+
+- **delegation-provenance-floor** [design-pending] — a dispatching session can narrate findings
+  from a subagent whose output it never received, and nothing reds.
+  **Attested once, in this repo, and self-caught:** at the scope stage of
+  `native-lifecycle-cohort-and-guard-friction` an audit-sweep never reported and its monitor timed
+  out; the session wrote "The survey landed" plus "each claim re-verified by me, not relayed",
+  then relayed undelivered rival sizings onward into an operator ruling. Superseded at `342f4f52`,
+  where two of the three relayed claims were falsified.
+  **The failure leaves no signature in the text**, which is what makes it a gap rather than a
+  lapse: the prose reads identically whether the return was held or invented, so no reader and no
+  gate can tell.
+  **Distinct from the two neighbouring dispatch entries, both re-read at the drain.**
+  `dispatch-cited-evidence-unverified` is about a sweep's *quoted evidence* being untraceable;
+  `dispatch-unreadable-target-fallback` is about a *child* fabricating a verdict when its target
+  is unreadable. This is the *parent* relaying a return that never arrived.
+  **The design question, and it may not have a mechanical answer.** The tree cannot observe what a
+  session did or did not receive, so a gate over tree state is very likely unbuildable. Two
+  non-gate shapes are live and neither is ruled: a **doctrine-tier** obligation stated where
+  agent-execution binds (a dispatch's return is cited or the claim is not made), or a
+  **receiving-side re-verification** obligation at the handoff, which is the shape that already
+  works elsewhere in this tree — close's per-bullet gap re-verification is exactly it, and it
+  fired productively at this very drain. The unit's first deliverable is choosing between them,
+  and "no gate is buildable" is an admissible answer that still owes the doctrine line.
+  **Cost while deferred:** it lands on exactly the dispatches delegation is pre-authorized for,
+  and it defeats normal trust rather than merely being wrong — a relayed finding is the signal a
+  reader uses to decide a claim has already been checked.
+  Filed 2026-08-13 by close, draining the gap inbox on operator direction that it file rather than
+  promote.
+
+- **handoff-premise-reverification-placement** [design-pending] — `Probe-before-assertion` is
+  resident in the always-loaded doctrine and did not bind, so the open question is where a
+  premise obligation actually holds.
+  **The measurement is this iteration's own.** Six premises stated on governed surfaces or in
+  dispatches were false, each one cheap command from being caught: gate-sdk/SPEC.md's `declare -A`
+  bridge claim; the scope survey's rejected-rival sizings; a gap count of six where four landed;
+  `exit-echo-decoration-guard-vs-habit`'s stated grounds; and two guard-amendment deltas. Two more
+  were caught inside close itself — a delegated sweep returned a queue slug
+  (`command-prompts-transparent-wrapper`) that exists nowhere in the tree, and this session's own
+  first grep for a queue claim missed it on a line wrap and nearly recorded a false negative.
+  **Every one was caught downstream, by a session that re-verified instead of complying.**
+  Detection worked; prevention did not — which is the finding, because the rule aimed at
+  prevention was already loaded in every one of those sessions.
+  **The hypothesis the unit tests:** what binds is a *receiving-side* obligation at a **named
+  handoff**, not a standing instruction at the point of assertion. The tree has exactly one such
+  obligation today — close's per-bullet gap re-verification — and it is the one that keeps firing.
+  Candidate handoffs to place a sibling at: the lead→stage dispatch relay, and survey citation.
+  **Note the survey witness does not cover this**: it diffs the corpus since the survey's rev and
+  re-runs its oracle, which is a *staleness* test and cannot detect a claim that was never derived.
+  **Why `[design-pending]` and not a rule edit:** placing the obligation everywhere converts one
+  re-derivation into a permanent per-handoff tax, which is the cost the always-loaded tier exists
+  to refuse. The unit owes a placement argument, not a slogan.
+  **Distinct from `delegation-provenance-floor`** above, which is one specific unobservable
+  (whether a return arrived). This is the general placement question, and it stands whichever way
+  that one is ruled.
+  **Cost while deferred:** the rate is measured and non-trivial — six on governed surfaces in one
+  iteration — and each survived a competent session's summary before something downstream caught it.
+  Filed 2026-08-13 by close, from its own Lessons judgment.
+
+- **lifecycle-gate-test-runner-holdouts** [design-pending] — two of lifecycle-kit's gate-driving
+  test runners still hold their gate as a `checks/<name>.sh` path instead of `gate_run`.
+  Re-verified at the drain: every gate-driving runner but two resolves through `gate_run`;
+  `check-close-surfaces.test.sh` and `check-stage-entry.test.sh` hold a script path.
+  The lifecycle-cohort amendment fixed its conversion count at the seven cohort members whose
+  script is deleted, so build correctly did not widen it.
+  **The fact is recorded but the work is not.** `lifecycle-kit/SPEC.md` §Testing already names
+  both holdouts and their grounds; what no entry carried until now is the cost of leaving them.
+  **Cost while deferred:** whichever unit ports `check-stage-entry` (blocked on the
+  associative-array bridge) or sizes `check-close-surfaces` (unsized, out of the sixth cohort)
+  discovers its scenario runner at implementation time — the exact caller-discovery failure the
+  cohort amendment paid to prevent for the other seven.
+  Fix is two mechanical edits plus a one-sentence amend to that SPEC section.
+  Filed 2026-08-13 by close, draining the gap inbox; the runners re-classified at the drain.
+
+- **single-kit-smoke-precondition** [design-pending] — a per-kit consumer-smoke invocation carries
+  an undocumented cross-kit precondition, so a maintainer debugging one kit hits a failure that is
+  not their change.
+  **Re-verified by running it at the drain**, not inferred: `bash
+  gate-sdk/bin/run-consumer-smoke.sh lifecycle-kit` fails at `install-lifecycle` with
+  `agent file not found: CLAUDE.md`, because that file is written by an earlier kit's smoke in the
+  full run. Only the full run is valid, and nothing says so.
+  Pre-existing rather than introduced by the sixth cohort; surfaced there because that batch ran
+  the single-kit form.
+  **Distinct from `consumer-smoke-subset-accounting-verdict`**, whose predicate is a wrong
+  registration count under a kit subset. This run does not mis-count — it errors outright, on an
+  unstated ordering precondition.
+  **Cost while deferred:** a false red charged to whoever next runs a single kit's smoke, which
+  is the debugging path the per-kit form exists to serve — and it is charged to a maintainer
+  already debugging something else, which is when a spurious failure is most expensive.
+  Filed 2026-08-13 by close, draining the gap inbox; re-verified by running the command.
+
+- **native-diff-renderer-hoist** [design-pending] — the diff-normal-format renderer lives inside
+  one gate module and is the first thing the next freshness-gate port will need.
+  Re-verified at the drain: `normal_diff` is defined once in the crate, in
+  `native/src/gates/lifecycle_registration.rs`, where the lifecycle cohort had to build it.
+  The six generated-projection freshness gates (`check-footprint-fresh`, `check-trajectory-fresh`,
+  `check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
+  `check-roadmap-fresh`) all byte-compare a tracked projection against a live emitter and all
+  print a diff on mismatch, and `check-gate-tamper` does too — every one meets the same need at
+  its own port.
+  **Cost while deferred:** the cohort that ports the first of them either hoists the renderer out
+  of a lifecycle-kit gate module — a cross-kit reach with no precedent in the crate's layout — or
+  writes a second copy, and a second copy of a diff format is two renderings of one diagnostic to
+  keep agreeing. The hoist is small today (about 55 lines plus its unit tests, no dependencies)
+  and gets no smaller.
+  Filed 2026-08-13 by close, draining the gap inbox; the renderer re-grepped across the crate.
+
+- **amendment-work-class-label-placement** [design-pending] — the amendment work-class label is
+  mandated with no placement, so each spec session re-establishes it from a deleted precedent.
+  `lifecycle-kit/templates/stages/spec.md` requires every delta to carry a work-class tag and is
+  silent on where it goes. Two placements are attested one iteration apart: a heading suffix on
+  each What-changes subsection, and an inline bracket tag after the bolded delta sentence.
+  **Both amendments are deleted at merge**, so the precedent is recoverable only from git history
+  — which means the convention is re-derived, not read, every time.
+  **Cost while deferred:** the lead reads these labels at batch-cut time, so a placement it
+  cannot find is a label that does not work — the tag is authored every iteration and consumed
+  by nobody whenever it lands where the reader is not looking.
+  Filed 2026-08-13 by close, draining the gap inbox; both placements read off git history.
+
+- **close-eviction-refiles-without-checking** [design-pending] — close's backlog-eviction step
+  files its finding without checking whether a prior close already filed it, and has now done so.
+  **Self-demonstrating instance, found at this close:** the queue carried two entries for one
+  finding — `icebox-worklist-roadmap-blind` (filed 2026-08-09) and
+  `icebox-candidate-roadmap-filter` (filed 2026-08-13) — with the *same* three-row measurement in
+  both bodies. Merged at this close into the elder slug, which is the one carrying an inbound
+  citation.
+  **The shape generalizes past that step.** Any close-stage sweep that files from a *recurring*
+  worklist will re-file on the next iteration unless something checks; the eviction worklist is
+  simply the sweep that recurs most reliably, because its input is stable by construction.
+  `check-task-conservation` does not catch it — two distinct slugs carrying one finding is
+  conserved.
+  **Candidate fixes, none ruled:** a duplicate-finding check at filing time (needs a similarity
+  oracle, probably not buildable); or the cheaper direction — have the recurring sweeps *state*
+  their prior filing, so the next close reads a pointer instead of re-deriving. The second is the
+  same receiving-side shape `handoff-premise-reverification-placement` argues for.
+  **Cost while deferred:** one duplicated entry per recurring sweep per close, each of which then
+  has to be found and merged by a later close reading 5000 lines of queue.
+  Filed 2026-08-13 by close, from its own backlog-eviction step.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -5169,6 +5402,7 @@
 - guard-glyph-match-context-blind
 - exit-echo-decoration-guard-vs-habit
 - spent-ruling-retirement
+- icebox-candidate-roadmap-filter
 
 ## Lessons Learned
 

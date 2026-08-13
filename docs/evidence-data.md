@@ -87,3 +87,4 @@
 | native-cohort-canon-kit | sc sp a b v c | 6f/4d | 3 · ≤0d | 31s 4✗ | 103 |
 | port-oracles-and-kit-roots | sc sp a b v c | 4f/7d | 5 · ≤1d | 24s 2✗ | 103 |
 | native-ere-matcher-and-held-suites | sc sp a b v c | 6f/2d | 3 · ≤0d | 24s clean | 103 |
+| native-lifecycle-cohort-and-guard-friction | sc sp a b v c | 6f/1d | 2 · ≤0d | 24s clean | 103 |
