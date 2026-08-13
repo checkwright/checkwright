@@ -7,3 +7,6 @@ check-doctrine-registration
 check-task-conservation
 check-crate-arms
 check-measured-claim
+check-install-claim
+check-payload-claim
+check-manifest-temporal

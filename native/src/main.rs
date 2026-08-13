@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the multi-call binary gate_command dispatches
 // a .gate-declared registry member to; `--list` reports the subcommand roster
 // check-gate-substrate-parity assertion B compares against the descriptors on disk
+mod ere;
 mod gates;
 mod proc;
 mod queue;

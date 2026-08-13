@@ -233,12 +233,140 @@ pub fn knob_pub(name: &str) -> Result<String, String> {
     knob(name)
 }
 
+// spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the one shape a member turns an `EreError`
+// into: exit 2 naming the offending pattern and the knob it came from, so a consumer whose
+// vocabulary uses a construct the compiled substrate refuses is told which knob to fix
+pub fn compile_pattern(pattern: &str, knob: &str) -> Result<crate::ere::Ere, String> {
+    crate::ere::Ere::compile(pattern).map_err(|e| {
+        format!(
+            "the pattern '{}' from {} does not compile: {} — treating as failure (not clean)",
+            pattern, knob, e
+        )
+    })
+}
+
 pub fn knob_array_pub(name: &str) -> Result<Vec<String>, String> {
     knob_array(name)
 }
 
 pub fn strip_dot_slash(s: &str) -> String {
     s.strip_prefix("./").unwrap_or(s).to_string()
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the claim-gate primitives the two members share:
+// the declaration grammar, the declaration roster, the governed-doc set behind its two
+// exclude valves, and the bridged vocabulary
+pub fn declared_id(line: &str, tag: &str) -> Option<String> {
+    let b = line.as_bytes();
+    let mut i = skip_space(b, 0);
+    if !b[i..].starts_with(b"<!--") {
+        return None;
+    }
+    i = skip_space(b, i + 4);
+    if !b[i..].starts_with(tag.as_bytes()) {
+        return None;
+    }
+    i = skip_space(b, i + tag.len());
+    let s = i;
+    if i >= b.len() || !(b[i].is_ascii_lowercase() || b[i].is_ascii_digit()) {
+        return None;
+    }
+    i += 1;
+    while i < b.len() && (b[i].is_ascii_lowercase() || b[i].is_ascii_digit() || b[i] == b'-') {
+        i += 1;
+    }
+    // spec: canon-kit/SPEC.md §check-install-claim — the id run and the `-->` terminator share
+    // the hyphen, so the greedy run gives it back until the terminator matches: one grammar,
+    // where the shell carried a detecting regex and a weaker extracting one that disagreed
+    let mut end = i;
+    loop {
+        let j = skip_space(b, end);
+        if b[j..].starts_with(b"-->") && skip_space(b, j + 3) == b.len() {
+            return Some(String::from_utf8_lossy(&b[s..end]).into_owned());
+        }
+        if end > s + 1 && b[end - 1] == b'-' {
+            end -= 1;
+        } else {
+            return None;
+        }
+    }
+}
+
+pub fn skip_space(b: &[u8], mut i: usize) -> usize {
+    while i < b.len() && is_space(b[i]) {
+        i += 1;
+    }
+    i
+}
+
+pub struct Decl {
+    pub file: String,
+    pub line: usize,
+    pub text: String,
+    pub id: String,
+}
+
+pub fn declarations(files: &[String], tag: &str) -> Result<Vec<Decl>, String> {
+    let mut out: Vec<Decl> = Vec::new();
+    for f in files {
+        let text = read_text(Path::new(f))?;
+        for (idx, raw) in text.lines().enumerate() {
+            if let Some(id) = declared_id(raw, tag) {
+                out.push(Decl {
+                    file: f.clone(),
+                    line: idx + 1,
+                    text: raw.to_string(),
+                    id,
+                });
+            }
+        }
+    }
+    Ok(out)
+}
+
+pub fn governed_docs(root: &str, own_exclude: &str) -> Result<Vec<String>, String> {
+    let mut ex = knob_array(CANON_MDREF_EXCLUDE)?;
+    ex.extend(knob_array(own_exclude)?);
+    let mut v: Vec<String> = manifest_files(root)?
+        .into_iter()
+        .map(|p| p.display().to_string())
+        .collect();
+    v.sort();
+    v.dedup();
+    let prefix = format!("{}/", root);
+    Ok(v.into_iter()
+        .filter(|f| {
+            let rel = strip_dot_slash(f);
+            let rel = rel.strip_prefix(&prefix).unwrap_or(&rel);
+            !ex.iter().any(|g| walk::pattern_match(g, rel))
+        })
+        .collect())
+}
+
+const CANON_MDREF_EXCLUDE: &str = "CANON_KIT_MDREF_EXCLUDE";
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — the two index-aligned halves of a bridged claim
+// vocabulary, refused as a pair rather than read half-resolved, and every pattern compiled
+// before the first corpus line is read
+pub fn claim_vocabulary(
+    ids_knob: &str,
+    pats_knob: &str,
+) -> Result<Vec<(String, crate::ere::Ere)>, String> {
+    let ids = knob_array(ids_knob)?;
+    let pats = knob_array(pats_knob)?;
+    if ids.len() != pats.len() {
+        return Err(format!(
+            "the bridged claim vocabulary is not index-aligned: {} id(s) against {} pattern(s) \
+             — the config bridge could not carry it; treating as failure (not clean)",
+            ids.len(),
+            pats.len()
+        ));
+    }
+    let mut out: Vec<(String, crate::ere::Ere)> = Vec::new();
+    for (id, p) in ids.iter().zip(pats.iter()) {
+        out.push((id.clone(), compile_pattern(p, pats_knob)?));
+    }
+    Ok(out)
 }
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — the paragraph accumulator: physical lines in,

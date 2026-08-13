@@ -354,7 +354,11 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   vocabulary is one project's distribution model, so no spelling of it ships as a
   kit literal (the provenance seam). This repo sets
   `bash scripts/install-transports.sh`, `^(Quick start|Install)`, and
-  `("docs/posts/*")`.
+  `("docs/posts/*")`. `CANON_KIT_INSTALL_TRANSPORT_IDS` /
+  `CANON_KIT_INSTALL_TRANSPORT_PATTERNS` — the index-aligned halves of that
+  command's parsed output, default empty arrays, filled by this kit's library only
+  while one of the two is the knob under resolution; they are the bridged form the
+  compiled member reads and are not a consumer-authored knob (§lib/spec.sh).
 - `CANON_KIT_PAYLOAD_CLAIMS_CMD` — a consumer command emitting the payload
   disclosure classes `check-payload-claim` holds, one `<claim-id>`⇥`<ERE>` line
   per class, default empty ⇒ clean skip (the correct posture for a tree whose
@@ -364,6 +368,9 @@ unset, and the loader exits 2 on a malformed config. Knobs:
   discloses is one project's distribution model, so it is consumer config for
   the same provenance-seam reason the transport vocabulary above is. This repo
   sets `bash scripts/payload-claims.sh` and `("docs/posts/*")`.
+  `CANON_KIT_PAYLOAD_CLAIM_IDS` / `CANON_KIT_PAYLOAD_CLAIM_PATTERNS` — that
+  command's parsed output in the same bridged, index-aligned shape as the
+  transport pair above, default empty arrays.
 - `CANON_KIT_MEASURED_CLAIMS_CMD` — a consumer command emitting the oracle
   `check-measured-claim` re-runs, one `<key>`⇥`<value>` line per measurable fact,
   default empty ⇒ clean skip (no oracle, so no marker has anything to disagree
@@ -507,8 +514,12 @@ same shapes:
   implementation (`native/src/spec.rs`) carrying all three branches — explicit
   globs, the default walk, and the prose-surface fold — plus the kit-root path
   prune, because its family is partly compiled; the shell form stays, since
-  members outside that family still call it. `spec_comment_surface` is **shell
-  only**, and so are all four of its callers
+  members outside that family still call it. That module carries the claim-gate
+  primitives too: the declaration grammar, the declaration roster, the
+  governed-doc set behind its two exclude valves, and the bridged vocabulary
+  loader. The shell kept a copy of the last two per member; the compiled form has
+  one, ported once and proved by each member that calls it. `spec_comment_surface`
+  is **shell only**, and so are all four of its callers
   (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next).
   The two implementations of the manifest finder are held together by the config
   bridge rather than by a copied default: every knob either reads crosses it as
@@ -525,7 +536,14 @@ same shapes:
   element, so a `<name>`⇥`<member>` line cannot cross as a single string. The
   resolution is gated on `GATE_SDK_RESOLVING_KNOB` (gate-sdk/SPEC.md
   §lib/gate.sh), because it costs a subprocess and this library is sourced once
-  per declared knob per gate.
+  per declared knob per gate. Three vocabularies ride that shape, one pair each:
+  the enum sets, `CANON_KIT_INSTALL_TRANSPORT_IDS` / `..._PATTERNS`, and
+  `CANON_KIT_PAYLOAD_CLAIM_IDS` / `..._PATTERNS` (§Layout and configuration). The
+  emitting **command** knob is bridged beside each pair, because it is what tells
+  *none configured* from *configured, and it declared nothing* — the two clean
+  skips a claim gate reports apart. The tab a POSIX ERE may legitimately carry
+  cannot reach the bridge: `spec_claim_vocabulary` below rejects a line with an
+  extra tab before the value is ever serialized.
 - **The count adapter** the restated-total gates share, so a consumer's
   `CANON_KIT_COUNT_COLLECTIONS` vocabulary enters once and every such gate
   matches the same total shapes — including a total whose cardinal and noun
@@ -676,6 +694,17 @@ narration governance). Producer: the generated pre-commit hook /
 `run-gates.sh`; consumer: the committing operator via the output contract; each
 marker hit is read at the single scan transition (file, line, marker in the
 message), no persistent state. Fail-closed on an unreadable manifest.
+
+The rule is a **compiled subcommand** (gate-sdk/SPEC.md §The POSIX ERE matcher):
+each marker is a consumer-supplied ERE, compiled through the crate's matcher
+before the first corpus line is read, so a pattern outside the POSIX grammar
+exits 2 naming the pattern and the knob rather than scanning past what it meant.
+Two fidelity points a transliteration loses, recorded because both are invisible
+in a green run: the marker test runs against a **case-folded subject** and the
+pattern is not folded, so a marker written with an upper-case letter matches
+nothing; and `CANON_KIT_TEMPORAL_MARKERS_EXTRA` unions onto the base array inside
+this kit's library *before* the bridge reads it, so the compiled member declares
+the base knob alone and a second `_EXTRA` knob would double every added marker.
 
 Calibration: the marker set is tuned against this repo as the FP corpus — bare
 `used to` is excluded (it collides with instrumental "used to build/filter").
@@ -1712,6 +1741,25 @@ assertions:
   exactly where a transport shows, but a fenced line is never read as a heading;
   the declaration line is skipped, since a claim is not evidence for itself.
 
+**The rule is a compiled subcommand, and one piece of it is load-bearing beyond
+this gate.** The section regex and every transport pattern are consumer EREs
+compiled through the crate's matcher (gate-sdk/SPEC.md §The POSIX ERE matcher);
+the `install-primary:` declaration grammar and the `^#{2,6}[[:space:]]+` heading
+grammar are kit literals. The heading one goes through the matcher anyway, and
+deliberately: taking a heading's text is a **span** read, so routing it through
+`find` gives the matcher's leftmost-longest span API a production reader on every
+invocation of a precommit-tier gate, rather than one alive only in unit tests.
+
+**One declaration grammar, where two spellings once disagreed.** The declaration
+is detected and its id extracted by the same grammar, so the terminator is part
+of it: an id run and the `-->` that closes the comment share the hyphen, and the
+run gives hyphens back until the terminator matches. A space-less
+`<!--install-primary:tarball-->` therefore declares `tarball`, and the rule runs.
+The compiled form is the single spelling; a detecting pattern that required the
+terminator beside an extracting one that did not made that same line read as a
+declaration of `tarball--` and fail-closed on a vocabulary it was never checked
+against.
+
 Assertion B is the answer to the leading-versus-mentioning question: naming a
 secondary transport is correct prose and must stay green, so the rule is
 positional. **The scope in which "leading" is well-defined is the install
@@ -1793,6 +1841,12 @@ claim is not evidence for itself. Fenced content is scanned, because a quoted
 recipe is exactly where a disclosure claim shows up in passing. The report names
 the offending class, because "wrong disclosure class" alone would leave the
 reader grepping.
+
+The rule is a **compiled subcommand** — structurally the simplest consumer of the
+crate's matcher, membership over the whole document rather than position inside a
+section, so the engine and the vocabulary bridge were both proved by its two
+cohort siblings before it landed. It shares the declaration grammar
+§check-install-claim states, including that section's single-spelling rule.
 
 **The declared class's own pattern is latent rather than unread.** Assertion B
 matches only the classes that are *not* declared, so the declared one's pattern

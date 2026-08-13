@@ -804,7 +804,7 @@ answering a question assertion C never asked.
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
 | `check-install-disposition` | **Retained, and substrate-blind by construction** — it reads both declaration spellings as text, taking the `# install:` header line off a `.gate` descriptor exactly as off a `.sh` implementation, because a ported gate is still a gate a kit ships and its disposition is a property of the gate rather than of its substrate (§The install disposition). A port therefore moves nothing here: the declaration travels with the descriptor, which is the same file the installer's payload already carries. It stays a shell gate for the reason the sibling auditors do — the assertion that a gate declares itself must not depend on the substrate the declaration might name. |
-| `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. `check-queue-slug-liveness` is itself a ported member since the queue-kit cohort, and `check-docs-cmd` since the canon-kit one, so this row now describes `.gate`-declared gates for both; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. `check-install-claim` and `check-payload-claim` are still shell, so their half of the row still describes scripts. |
+| `check-docs-cmd`, `check-install-claim`, `check-payload-claim`, `check-queue-slug-liveness` | **Survive unchanged — reverse triggers.** Each names `scripts/*.sh`/`kit:*.sh` in `couples=` only so that a script change re-runs it; the corpus each actually scans is the governed-doc set, and none reads a gate script's *content* as its assertion target. `check-docs-cmd` is worth naming: it will correctly — not vacuously — red on a doc still fencing a deleted `.sh` path after a port. That is real signal. Every member of this row is a ported one — `check-queue-slug-liveness` since the queue-kit cohort, `check-docs-cmd` since the canon-kit one, and the remaining pair since the ERE cohort — so the row describes `.gate`-declared gates throughout; the reasoning is unaffected, because what they scan is the governed-doc set rather than any gate's content. |
 | `check-prose-enum` | **Corpus extended to the Rust module — it was never a pure reverse trigger.** This gate was grouped with the reverse triggers above on the ground that none of them reads a gate's *content*; that ground was **false for this one**, and the queue-kit port is what exposed it. Its enum derivation (`scripts/enum-sets.sh`) reads the queue tag vocabulary out of `check-tag-lead-line`'s own class table, deliberately — *"read from the gate rather than re-listed here, so a rename cannot leave the two spellings disagreeing"* — so deleting that gate's script broke the derivation and the gate exited 2 rather than passing vacuously, which is the fail-closed behavior working. The corpus follows the rule to where it now lives, `native/src/gates/tag_lead_line.rs`'s `CLASSES` table, keeping the read-from-the-owner property and its one-table fail-closed anchor. **The gate is itself a ported member since the canon-kit cohort**, so a gate whose input is a gate's content is now gate content — and its own derivation crosses the bridge as *data*, which is what keeps the compiled form from spawning the emitter it reads. |
 | `check-measured-claim` | **Retained, and sensitive through its oracle rather than its corpus — the first born-native member to take a row.** What it scans is the governed-prose surface, so by corpus it is a reverse trigger like the row above. What makes it substrate-sensitive is the consumer oracle behind `CANON_KIT_MEASURED_CLAIMS_CMD`, which its `couples=` reaches through `scripts/*.sh`: this repo's emitter counts how much of the registry resolves to a `.gate` descriptor, so it reads declaration paths **as a set**, the shape `check-gate-binary-fresh` has. A port therefore *moves its value*, which is the mechanism working rather than a blind spot — the number a marked sentence states is about the port, and the sentence reddens when the port advances without it. The design that landed the gate predicted no row here, on the premise that its `couples=` named no declaration path; the emitter coupling the same design requires falsifies that premise, and the row is recorded rather than the coupling dropped, because dropping it would leave the oracle's own source outside the trigger set. **The row and criterion 4 are independent facts, and this is the case that proved it**: the criterion binds on a gate's assertion target, this gate's is the governed-prose surface, so it clears — while the transitive reach through its emitter is precisely what assertion C is shaped to see (§The port-candidate criteria, criterion 4). |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
@@ -1006,6 +1006,16 @@ design time; the last three were paid for, and each is named with what it cost.
    read off this paragraph: a consumer whose kit ships `templates/checks.list`
    beside its `checks/` would put declaration paths inside that walk, and there
    criterion 4 would bind.
+
+   **The second machine-derived instance is the other over-selection kind**, so
+   both now have one. Run at the ERE cohort's cut, assertion C reports
+   `check-install-claim` and `check-payload-claim` substrate-sensitive through a
+   `couples=` glob `scripts/*.sh` that covers a consumer's gate wrapper. That
+   couple is a **reverse trigger**: it exists so an edit to the consumer's
+   transport and disclosure emitters re-runs the gate consuming them, and neither
+   gate reads a declaration path as content — what both scan is the governed
+   markdown set. Criterion 4 binds on neither, and both carry the conservation row
+   the reverse-trigger case earns.
 5. **Its vendored form stays runnable.** *Measured, not reasoned.* A `.gate`
    descriptor under a vendoring kit root reaches every consumer; the binary does
    not, because `native/` ships no `checks/` or `smoke/` and that predicate is
@@ -1065,6 +1075,15 @@ design time; the last three were paid for, and each is named with what it cost.
    whether that roster is acceptable. **N members each individually runnable is
    not a discharge**, and citing the per-member reading as one is the defect this
    half exists to name.
+
+   **When the instrument rides the same iteration as the cohort, the measurement
+   waits for it.** The binary-less leg is what prints the roster, so a cohort
+   landing in an iteration that is also repairing that leg measures its price
+   **after** the repairing entry's amendment lands. Measuring before it reads a
+   residual that is not the cohort's own: an artifact-free profile is then the
+   accidental no-artifact case rather than a deliberate measurement, and the two
+   are indistinguishable from the outside. A build session batching such an
+   iteration inherits the ordering rather than discovering it.
 
    **What the value arm is, and what it is not.** It plants a real defect in
    adopter-authored prose and asserts that some profile below the maximum catches
@@ -1258,7 +1277,9 @@ is criterion 7's own case, above.
 
 **The next cohort is the largest set of criteria-clearing gates sharing one
 corpus derivation** — an ordering rule, not a bound: the 2026-08-09 ruling ports
-every gate. Shared derivation is the axis because it is what made this cohort
+every gate. A cohort that retires a **blocker** several later cohorts are queued
+behind outranks a larger one that retires none, which is the exception §The POSIX
+ERE matcher works and `check-roadmap-fresh`'s hold worked before it. Shared derivation is the axis because it is what made this cohort
 cheap: the walk is ported once and proved N times, and the parity comparison is
 over one corpus shape rather than N. Selecting by kit, by profile, or by whatever
 is easiest next all re-import work this cohort only paid once. The gates failing
@@ -1349,11 +1370,14 @@ with its port work named and owed:
   knob is consumer config carrying an arbitrary POSIX ERE; its `awk` also runs
   `gsub` with alternation, groups and negated classes. The crate vendors nothing —
   asserted rather than assumed, by the unit test that fails the build on a
-  non-empty dependency list — so porting it means hand-writing an ERE engine plus
-  `gsub` semantics. Sizing a subset to this consumer's one configured regex is
-  **foreclosed** by the argument criterion 6 already makes for globs: the config
-  surface permits what this consumer happens not to write, and a narrow reader
-  would silently mis-scan the first consumer who writes it.
+  non-empty dependency list — so porting it means hand-writing an ERE engine. Its
+  own `gsub` runs over a pattern baked literally into awk source, which a port
+  hand-compiles, so the substitution engine an earlier sizing put inside this hold
+  is outside it (§The POSIX ERE matcher). Sizing a subset to this consumer's one
+  configured regex is **foreclosed** by the argument criterion 6 already makes for
+  globs: the config surface permits what this consumer happens not to write, and a
+  narrow reader would silently mis-scan the first consumer who writes it. The
+  engine has landed, so what this member is held on is its own port.
 
 Neither hold is an eligibility screen, and citing it as one inverts the rule §The
 port-candidate criteria denies in its opening sentence and TRAJECTORY.md restates.
@@ -1466,11 +1490,11 @@ corpus through `sort -u` stays byte-identical; the one that prints its corpus
 unsorted is set-identical with a different line order, asserted as such rather
 than normalised away.
 
-**Seven of ten, and three more members are held on shell — the same sequencing,
-found the same way.** The cohort was ruled at ten on a design that removed the
-`bash` spawn from the three members reading a consumer-supplied *command*. That
-design reached only half the problem, and the other half was found at
-implementation:
+**Seven of ten at the cohort's own cut, with three members sequenced behind an
+ERE engine — the same sequencing, found the same way.** The cohort was ruled at
+ten on a design that removed the `bash` spawn from the three members reading a
+consumer-supplied *command*. That design reached only half the problem, and the
+other half was found at implementation:
 
 - **`check-install-claim`, `check-payload-claim` and `check-manifest-temporal` —
   an ERE engine.** Each **interprets** a consumer-configured POSIX ERE rather
@@ -1482,8 +1506,12 @@ implementation:
   `native/src/walk.rs`'s own test, which fails the build on a non-empty
   `[dependencies]` — so a port hand-writes the engine. Sizing one to this
   consumer's patterns is **foreclosed** by the argument this section already
-  makes for `check-queue-prose-precondition` and criterion 6 makes for globs.
-  **Operator-ruled 2026-08-12 at build.**
+  makes for `check-queue-prose-precondition` and criterion 6 makes for globs;
+  that foreclosure binds the pattern **grammar** the engine accepts and not its
+  **API**, and §The POSIX ERE matcher owns the distinction. **Operator-ruled
+  2026-08-12 at build.** The engine is paid and those three members ship
+  compiled: §The POSIX ERE matcher is their contract, and this cohort's ten are
+  all ported.
 
   `check-manifest-temporal` is worth naming separately, because every mechanical
   screen puts it *in*: it clears criterion 4, spawns nothing, and reads its
@@ -1507,10 +1535,10 @@ implementation:
 
 These holds are sequencing rather than exclusion under the rule §The
 port-candidate criteria fixes and this section restates for the queue-kit pair
-above; what each owes is filed on `cohort-held-members-port-prerequisites`,
-where the ERE engine is now owed by nine members rather than one. The roster and
-its kits live on that entry and are not restated here, because a count copied
-into prose is the drift this correction is itself repairing.
+above; what each remaining member owes is filed on
+`cohort-held-members-port-prerequisites`. The roster and its kits live on that
+entry and are not restated here, because a count copied into prose is the drift
+this correction is itself repairing.
 
 ### The kit-roots `gate_kit_roots` cohort
 
@@ -1626,6 +1654,146 @@ appeared. The held `installer_smoke fail` row in
 `.workflow/validate-baseline.txt` is **not** this cohort's price: it records the
 markdown-link hole `port-criterion-aggregate-cost-blindness` half (2) owns, which
 this cohort neither widens nor repairs.
+
+### The POSIX ERE matcher
+
+**Three members, and the engine is what the cohort buys.**
+`check-install-claim`, `check-payload-claim` and `check-manifest-temporal` — the
+members §The canon-kit `spec_manifest_files` cohort held on an ERE engine — port
+together, operator-ruled 2026-08-13. A five-member clean-group alternative and an
+eight-member superset were both offered and declined, so the cohort does not
+widen. Three is the smallest cohort since the first, and on member count alone
+the selection rule above picks elsewhere. What it buys is the engine: a POSIX ERE
+matcher is owed by **nine** members across the kits
+`cohort-held-members-port-prerequisites` rosters, and it is the largest single
+piece of work the port has named. Paying it against three members retires the
+blocker for all nine, which is the second worked exception to the largest-set
+selection rule, beside `check-roadmap-fresh`'s.
+
+**Criterion 4 binds on none of the three, and the verdict was taken by running
+the derivation at the cohort cut.** Assertion C selects `check-install-claim` and
+`check-payload-claim` as substrate-sensitive through their `couples=` glob
+`scripts/*.sh`, which covers a gate declaration path. Both selections are the
+**reverse-trigger** over-selection criterion 4 already names: that couple exists
+so an edit to this repo's transport and disclosure emitters re-runs the gate that
+consumes them, and neither gate reads a declaration path as content. What all
+three scan is `spec_manifest_files`, the governed markdown set, inside which no
+gate declaration lies. Both sensitive members carry a conservation row (§Meta-gate
+conservation for the binary substrate); `check-manifest-temporal` earns none.
+
+**The owed engine is a matcher, and that correction is the sizing.** Sizing the
+engine as *"an ERE engine plus `gsub` semantics"* puts a substitution engine
+inside the owed work, and it is wrong in the direction that costs the most.
+**Eight of the nine members apply their consumer pattern only as a match test**;
+`check-deprecation-task` alone extracts a span from one, and every `gsub`/`sub`
+in the whole set runs over a pattern baked literally into awk source, which a
+port hand-compiles. That is the same ground that correctly screened
+`check-comment-tier` out of the roster. The owed engine is therefore **a POSIX
+ERE matcher with leftmost-longest span reporting, and no substitution engine or
+capture-group replacement**.
+
+**"Sizing is foreclosed" binds the pattern language, not the API surface.** The
+foreclosure §The canon-kit `spec_manifest_files` cohort states, on criterion 6's
+globs argument, binds the **grammar** the engine accepts: the config surface
+permits what this consumer happens not to write, and a narrow reader silently
+mis-scans the first consumer who writes one. What the sizing correction above
+touches is the **API** — what the members *do* with a pattern once it matches —
+which is fixed by their own source rather than by what a consumer may write, so
+no future consumer can turn a match test into a substitution. Reading the
+foreclosure across both axes would buy a `gsub` implementation with no caller in
+the corpus that justifies the engine.
+
+**The contract.** `native/src/ere.rs` accepts **POSIX ERE in full**: alternation,
+concatenation, `*` `+` `?`, intervals `{n}` `{n,}` `{n,m}`, grouping, `.`,
+anchors `^` `$`, bracket expressions with ranges, negation and the POSIX
+character classes, and backslash escaping of every special. Its public surface is
+three items and no more:
+
+- `Ere::compile(pattern) -> Result<Ere, EreError>`
+- `Ere::is_match(&self, hay: &str) -> bool` — awk's `$0 ~ p`
+- `Ere::find(&self, hay: &str) -> Option<(usize, usize)>` — the
+  **leftmost-longest** span as byte offsets, the `RSTART`/`RLENGTH` pair awk
+  reports
+
+There is no `replace`, no `replace_all`, and no capture-group accessor; adding
+one is a design decision with its own reader rather than an omission to fill in.
+The engine is **byte-wise**, the C-locale semantics the span arithmetic of its
+callers assumes: `find`'s offsets are handed to byte-indexed slicing, and a
+char-wise engine shifts every one of them on a multi-byte glyph. Interval bounds
+are capped at the POSIX `RE_DUP_MAX`, and the compiled program at a fixed
+instruction count, because an interval expands by copying its operand.
+
+**Leftmost-longest is the semantics, not an implementation detail.** POSIX ERE
+alternation is leftmost-**longest** and a backtracking matcher gives
+leftmost-**first**. The two agree on every `is_match` answer and disagree on
+spans, so a boolean-only engine can be built on the wrong semantics and never
+show it, until `check-deprecation-task` ports and extracts the wrong marker from
+`(deprecated|deprecated-since)`.
+
+**An unsupported construct is a fail-closed refusal, never a silent mis-parse.**
+awk on the shell side is GNU awk, whose ERE dialect carries extensions POSIX does
+not: `\y` `\<` `\>` `\B` `\w` `\s` and the backreference forms. `compile` returns
+`EreError` for any escape or construct outside the POSIX ERE grammar, and each
+member turns that into **exit 2** naming the offending pattern, the knob it came
+from, and the extension. Three constructs are refused for the same reason rather
+than resolved by picking a dialect: a backslash *inside* a bracket expression
+(POSIX reads a literal, GNU an escape), a collating-symbol or equivalence-class
+bracket, and any escape outside the specials list. This is §Fail-closed contract
+applied to a parser rather than to a subprocess, and the failure it guards
+against is observable: a marker knob spelled `\yformerly\y` makes GNU awk warn on
+stderr, treat `\y` as a plain `y`, and report a **clean** verdict off a scan that
+never matched what the consumer meant. The live vocabularies use no extension, so
+the refusal is a guard for consumers rather than a change to this tree.
+
+**The acceptance oracle is a differential run against the shell's own awk.** A
+hand-written regex engine is the one component where authoring the tests and the
+implementation from the same understanding proves nothing, so `ere.rs`'s unit
+arm stands up a throwaway corpus and compares `is_match` against `awk '$0 ~ p'`
+and `find` against `awk 'match($0,p){print RSTART, RLENGTH}'`, byte for byte,
+over a generated pattern-and-subject cross product. The pattern crosses through
+`ENVIRON` rather than `-v`, so awk's own string-escape pass never rewrites it
+before its regex compiler sees it, and the oracle runs at `LC_ALL=C` to hold both
+sides to the same byte semantics. The generator covers the constructs this tree's
+vocabularies never exercise — intervals, nested alternation under a quantifier,
+negated bracket ranges, anchors inside groups, the character classes — because
+those are exactly the branches no fixture pair and no live-tree run reaches. It
+is criterion 2's constructed-scenario form applied to a *mechanism*, the same
+move the canon-kit cohort made for the default walk. The arm runs under
+`check-crate-arms`, so a divergence is a commit-time red.
+
+**The boundary the cohort applies: a pattern the kit owns is hand-compiled; a
+pattern a consumer supplies goes through the engine.** The prefix strip and the
+inline-code stripper `check-manifest-temporal` applies are substitutions over kit
+literals and port as direct code, which is why the API owes no `replace`. One
+deliberate exception buys the span path a production reader:
+`check-install-claim`'s heading extraction routes through `find` rather than a
+second hand-written scanner, so a precommit-tier gate exercises the span API on
+every invocation instead of leaving it alive only in unit tests.
+
+**The provenance seam, ruled, because this cohort is where it bites.**
+`native/src/ere.rs` carries **no vocabulary whatever**: not a transport id, not a
+disclosure class, not a temporal marker. An engine sized to a grammar rather than
+to a corpus cannot encode one project's terms, and the pressure to shrink it
+toward the patterns this tree happens to configure is exactly the pressure that
+would. The transport vocabulary, the disclosure vocabulary and the temporal
+marker set stay consumer config; the bridged arrays below change the *transport*
+of two of them and not their ownership. The declaration regexes, the heading and
+fence patterns and the inline-code stripper are grammar the kit owns, carry no
+project term, and are the kit literals the boundary above leaves hand-compiled.
+The check this reduces to: a `grep` for any transport or disclosure id across
+`native/src/` returns nothing.
+
+**Parity, proved while both implementations existed.** Assertion A forbids a
+`<name>.sh` and a `<name>.gate` in one resolve dir, so each comparison ran with
+the shell gate in place and the descriptor staged elsewhere, and the descriptor
+landed as the script was deleted in one motion. Per member: the fixture pair, the
+live tree, and a constructed differential corpus for the arms neither reaches —
+both clean skips per claim member, an empty governed-doc set, zero and two
+declarations, an id outside the vocabulary, `~~~` fences, a heading inside a
+fence, earliest-match-wins-per-section, the declaration line as non-evidence,
+path-exempt and section-exempt windows, inline-code stripping, and marker
+patterns using intervals, anchors and character classes. Byte-identical, exit
+codes included.
 
 ### What the reverted port established
 
@@ -2528,7 +2696,12 @@ Resolution, per declared knob:
   consumer *command's output* costs a subprocess to compute, and a library is
   sourced once per declared knob per gate, so a library that resolved every such
   knob on every source would multiply that cost by the declared-knob count. A
-  library with no expensive knob ignores it and is unaffected.
+  library with no expensive knob ignores it and is unaffected. The install
+  transport and payload disclosure vocabularies cross this way as index-aligned
+  id/pattern pairs (canon-kit/SPEC.md §lib/spec.sh), so a compiled member receives
+  the consumer command's *output* and spawns no interpreter of its own. Their
+  ownership is untouched: what changes is the transport, not who writes the
+  vocabulary.
 - That kit's `lib/*.sh` is sourced **in a subshell**, in glob order, so a kit
   library's globals cannot leak into the dispatcher or across members. The value
   is read after every library has been sourced, so a kit whose knob is resolved
@@ -2556,6 +2729,14 @@ Resolution, per declared knob:
   element-less knob is not that case: a resolved-empty array serializes to the
   empty string and is carried, so *absent* and *empty* part company on the
   reading side too.
+
+  **The tab refusal is discharged upstream for a consumer-supplied ERE**, which is
+  worth recording rather than re-checking per port. A POSIX ERE legitimately may
+  contain a literal tab, so a claim vocabulary looks like a knob that could trip
+  the refusal; `spec_claim_vocabulary` already rejects a vocabulary line carrying
+  an extra tab and its line-oriented read forecloses a newline, so no value
+  reaching those knobs can violate the bridge. The constraint is that loader's,
+  not a new bound this bridge imposes on consumers.
 
 The `GATE_SDK_KNOB_` prefix is deliberately **not** the knob's own name: reusing
 `CANON_KIT_MANIFEST_FILES` as an env scalar would collide with the existing

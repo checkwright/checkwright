@@ -316,11 +316,11 @@ if staged_matches 'docs/install.md' 'context-kit/lib/toolfloor.sh'; then
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'docs/*.md' 'scripts/*.sh'; then
-    run_gate check-install-claim canon-kit/checks/check-install-claim.sh
+    run_gate check-install-claim env $'GATE_SDK_KNOB_GATE_PRUNE_DIRS=target\t.git\tnode_modules\t.tmp\tgate-tests\tworktrees' $'GATE_SDK_KNOB_GATE_KIT_ROOTS_HERE=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' GATE_SDK_KNOB_CANON_KIT_SPEC_NAME=SPEC.md GATE_SDK_KNOB_CANON_KIT_SCAN_KIT_ROOTS=1 $'GATE_SDK_KNOB_CANON_KIT_MANIFEST_FILES=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md' $'GATE_SDK_KNOB_CANON_KIT_PROSE_SURFACE_GLOBS=*/templates/*.md\t.claude/agents/*.md' GATE_SDK_KNOB_CANON_KIT_MDREF_EXCLUDE= $'GATE_SDK_KNOB_CANON_KIT_INSTALL_CLAIM_EXCLUDE=docs/posts/*' $'GATE_SDK_KNOB_CANON_KIT_INSTALL_TRANSPORTS_CMD=bash scripts/install-transports.sh' $'GATE_SDK_KNOB_CANON_KIT_INSTALL_SECTION_RE=^(Quick start|Install)' $'GATE_SDK_KNOB_CANON_KIT_INSTALL_TRANSPORT_IDS=tarball\tnpm' $'GATE_SDK_KNOB_CANON_KIT_INSTALL_TRANSPORT_PATTERNS=releases/download/|[Rr]elease tarball|tarball is the primary\tnpx( -y)? checkwright|npm (install|i)( -g)? checkwright' native/target/release/checkwright-gates check-install-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' 'SECURITY.md' 'docs/*.md' 'scripts/*.sh'; then
-    run_gate check-payload-claim canon-kit/checks/check-payload-claim.sh
+    run_gate check-payload-claim env $'GATE_SDK_KNOB_GATE_PRUNE_DIRS=target\t.git\tnode_modules\t.tmp\tgate-tests\tworktrees' $'GATE_SDK_KNOB_GATE_KIT_ROOTS_HERE=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' GATE_SDK_KNOB_CANON_KIT_SPEC_NAME=SPEC.md GATE_SDK_KNOB_CANON_KIT_SCAN_KIT_ROOTS=1 $'GATE_SDK_KNOB_CANON_KIT_MANIFEST_FILES=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md' $'GATE_SDK_KNOB_CANON_KIT_PROSE_SURFACE_GLOBS=*/templates/*.md\t.claude/agents/*.md' GATE_SDK_KNOB_CANON_KIT_MDREF_EXCLUDE= $'GATE_SDK_KNOB_CANON_KIT_PAYLOAD_CLAIM_EXCLUDE=docs/posts/*' $'GATE_SDK_KNOB_CANON_KIT_PAYLOAD_CLAIMS_CMD=bash scripts/payload-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_PAYLOAD_CLAIM_IDS=predicate-withheld\tall-source' $'GATE_SDK_KNOB_CANON_KIT_PAYLOAD_CLAIM_PATTERNS=implementation source does not ship|withholds the predicate|predicate withheld|verified against a published digest|digest-verified binary\tyou read (before|all of it)|(source|copy) you can read' native/target/release/checkwright-gates check-payload-claim
 fi
 
 if staged_matches 'installer/package.json'; then
@@ -348,7 +348,7 @@ if staged_matches '.github/workflows/*.yml' '.github/workflows/*.yaml'; then
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
-    run_gate check-manifest-temporal canon-kit/checks/check-manifest-temporal.sh
+    run_gate check-manifest-temporal env $'GATE_SDK_KNOB_GATE_PRUNE_DIRS=target\t.git\tnode_modules\t.tmp\tgate-tests\tworktrees' $'GATE_SDK_KNOB_GATE_KIT_ROOTS_HERE=gate-sdk\tcanon-kit\tcontext-kit\tdelegation-kit\tdoctrine-kit\tdrift-kit\tevidence-kit\tguard-kit\tlifecycle-kit\tqueue-kit\tsite-kit' GATE_SDK_KNOB_CANON_KIT_SPEC_NAME=SPEC.md GATE_SDK_KNOB_CANON_KIT_SCAN_KIT_ROOTS=1 $'GATE_SDK_KNOB_CANON_KIT_MANIFEST_FILES=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md' $'GATE_SDK_KNOB_CANON_KIT_PROSE_SURFACE_GLOBS=*/templates/*.md\t.claude/agents/*.md' $'GATE_SDK_KNOB_CANON_KIT_TEMPORAL_MARKERS=previously\tformerly\trenamed from\tno longer\tused to be\twas (retired|removed|renamed|replaced)\tcorrection appended\tstands unstruck\twhen written\tthe ruling is spent' $'GATE_SDK_KNOB_CANON_KIT_TEMPORAL_EXEMPT_SECTIONS=Out of scope' $'GATE_SDK_KNOB_CANON_KIT_TEMPORAL_EXEMPT_PATHS=docs/posts/*' native/target/release/checkwright-gates check-manifest-temporal
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
@@ -356,7 +356,7 @@ if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md'; then
 fi
 
 if staged_matches '*.md' 'scripts/*.sh' 'gate-sdk/*.sh' 'canon-kit/*.sh' 'context-kit/*.sh' 'delegation-kit/*.sh' 'doctrine-kit/*.sh' 'drift-kit/*.sh' 'evidence-kit/*.sh' 'guard-kit/*.sh' 'lifecycle-kit/*.sh' 'queue-kit/*.sh' 'site-kit/*.sh'; then
-    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=23 native/target/release/checkwright-gates check-measured-claim
+    run_gate check-measured-claim env $'GATE_SDK_KNOB_CANON_KIT_MEASURED_CLAIMS_CMD=bash scripts/measured-claims.sh' $'GATE_SDK_KNOB_CANON_KIT_MEASURED_SURFACE_GLOBS=CLAUDE.md\tREADME.md\tCONTRIBUTING.md\tCODE_OF_CONDUCT.md\tSECURITY.md\tRELEASING.md\tROADMAP.md\tTRAJECTORY.md\t*/SPEC.md\t*/README.md\treserve/*/README.md\tdoctrine-kit/DOCTRINE.md\tdocs/*.md\tdocs/*/index.md\tdocs/posts/*.md\t.claude/commands/*.md' GATE_SDK_KNOB_CANON_KIT_MEASURED_KEYS=ported-gate-members GATE_SDK_KNOB_CANON_KIT_MEASURED_VALUES=26 native/target/release/checkwright-gates check-measured-claim
 fi
 
 if staged_matches '*SPEC*.md' '*README.md' 'CLAUDE.md' '.gitignore'; then

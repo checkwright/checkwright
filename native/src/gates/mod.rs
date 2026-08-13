@@ -4,11 +4,14 @@ pub mod action_gh_repo;
 pub mod action_pinning;
 pub mod assertion_strength;
 pub mod docs_cmd;
+pub mod install_claim;
 pub mod kit_registration;
 pub mod knob_citation;
 pub mod manifest_count;
+pub mod manifest_temporal;
 pub mod md_refs;
 pub mod measured_claim;
+pub mod payload_claim;
 pub mod prose_enum;
 pub mod queue_entry_budget;
 pub mod queue_hygiene;
@@ -197,6 +200,68 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MEASURED_SURFACE_GLOBS",
             "CANON_KIT_MEASURED_KEYS",
             "CANON_KIT_MEASURED_VALUES",
+        ],
+        "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the ERE cohort: the marker vocabulary
+    // is a consumer ERE array, so this member declares it beside the shared corpus
+    // derivation's own knob set and compiles every pattern through the engine
+    (
+        "check-manifest-temporal",
+        manifest_temporal::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_TEMPORAL_MARKERS",
+            "CANON_KIT_TEMPORAL_EXEMPT_SECTIONS",
+            "CANON_KIT_TEMPORAL_EXEMPT_PATHS",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §lib/spec.sh — the emitter-backed vocabularies ride as bridged
+    // id/pattern pairs, and the command knob rides too: it is what tells "none configured"
+    // from "configured, declared nothing", the two clean skips this member reports apart
+    (
+        "check-install-claim",
+        install_claim::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_MDREF_EXCLUDE",
+            "CANON_KIT_INSTALL_CLAIM_EXCLUDE",
+            "CANON_KIT_INSTALL_TRANSPORTS_CMD",
+            "CANON_KIT_INSTALL_SECTION_RE",
+            "CANON_KIT_INSTALL_TRANSPORT_IDS",
+            "CANON_KIT_INSTALL_TRANSPORT_PATTERNS",
+        ],
+        "canon-kit",
+    ),
+    (
+        "check-payload-claim",
+        payload_claim::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_MDREF_EXCLUDE",
+            "CANON_KIT_PAYLOAD_CLAIM_EXCLUDE",
+            "CANON_KIT_PAYLOAD_CLAIMS_CMD",
+            "CANON_KIT_PAYLOAD_CLAIM_IDS",
+            "CANON_KIT_PAYLOAD_CLAIM_PATTERNS",
         ],
         "canon-kit",
     ),

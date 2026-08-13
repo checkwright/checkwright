@@ -557,3 +557,31 @@ if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_MEASURED_KEYS \
     done <<<"$_sk_meas"
     unset _sk_meas _sk_k _sk_v
 fi
+
+declare -p CANON_KIT_INSTALL_TRANSPORT_IDS &>/dev/null      || CANON_KIT_INSTALL_TRANSPORT_IDS=()
+declare -p CANON_KIT_INSTALL_TRANSPORT_PATTERNS &>/dev/null || CANON_KIT_INSTALL_TRANSPORT_PATTERNS=()
+if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_INSTALL_TRANSPORT_IDS \
+   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_INSTALL_TRANSPORT_PATTERNS ]] \
+   && [[ -n "$CANON_KIT_INSTALL_TRANSPORTS_CMD" ]]; then
+    _sk_tr="$(spec_install_transports)" || exit 2
+    while IFS=$'\t' read -r _sk_i _sk_p; do
+        [[ -n "$_sk_i" ]] || continue
+        CANON_KIT_INSTALL_TRANSPORT_IDS+=("$_sk_i")
+        CANON_KIT_INSTALL_TRANSPORT_PATTERNS+=("$_sk_p")
+    done <<<"$_sk_tr"
+    unset _sk_tr _sk_i _sk_p
+fi
+
+declare -p CANON_KIT_PAYLOAD_CLAIM_IDS &>/dev/null      || CANON_KIT_PAYLOAD_CLAIM_IDS=()
+declare -p CANON_KIT_PAYLOAD_CLAIM_PATTERNS &>/dev/null || CANON_KIT_PAYLOAD_CLAIM_PATTERNS=()
+if [[ "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_PAYLOAD_CLAIM_IDS \
+   || "${GATE_SDK_RESOLVING_KNOB:-}" == CANON_KIT_PAYLOAD_CLAIM_PATTERNS ]] \
+   && [[ -n "$CANON_KIT_PAYLOAD_CLAIMS_CMD" ]]; then
+    _sk_pc="$(spec_claim_vocabulary "$CANON_KIT_PAYLOAD_CLAIMS_CMD" CANON_KIT_PAYLOAD_CLAIMS_CMD)" || exit 2
+    while IFS=$'\t' read -r _sk_c _sk_r; do
+        [[ -n "$_sk_c" ]] || continue
+        CANON_KIT_PAYLOAD_CLAIM_IDS+=("$_sk_c")
+        CANON_KIT_PAYLOAD_CLAIM_PATTERNS+=("$_sk_r")
+    done <<<"$_sk_pc"
+    unset _sk_pc _sk_c _sk_r
+fi

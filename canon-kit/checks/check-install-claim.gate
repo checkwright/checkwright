@@ -1,0 +1,3 @@
+# graph: couples=*SPEC*.md,*README.md,CLAUDE.md,docs/*.md,scripts/*.sh dir=one valve=none tier=precommit
+# install: on-surface
+# spec: canon-kit/SPEC.md §check-install-claim — exactly one governed doc declares the primary install transport, and no scanned install section leads with a different one
