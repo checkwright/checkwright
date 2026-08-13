@@ -1619,7 +1619,10 @@ owed (the enforcement-first weighing). The freshness posture is
 
 A missing block is a finding with the install remedy; a block present but out
 of lockstep is a finding printing the diff and the regenerate remedy (both
-exit 1). Resolution fails closed: a missing agent file, a begin marker without
+exit 1). The stale-block report prints **every** hunk: the format and the
+uncapped contract are the crate renderer's, whose home is
+gate-sdk/SPEC.md §The diff renderer since it stopped being this gate's private
+mechanism, and this gate is its one live consumer. Resolution fails closed: a missing agent file, a begin marker without
 its end, or an errored awk capture is exit 2 — a half-written or unreadable
 target must not pass as clean. The gate satisfies the four gate-sdk contracts
 (gate-sdk/SPEC.md §The gate model): the single `LIFECYCLE-REGISTRATION: clean`

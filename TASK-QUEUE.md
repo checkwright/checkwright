@@ -12,24 +12,6 @@
 
 ## New Features
 
-- **native-diff-renderer-hoist** [spec: SPEC-diff-renderer.md]
-  — the diff-normal-format renderer lives inside one gate module and is the first thing the
-  next freshness-gate port will need.
-  Re-verified at the drain: `normal_diff` is defined once in the crate, in
-  `native/src/gates/lifecycle_registration.rs`, where the lifecycle cohort had to build it.
-  The six generated-projection freshness gates (`check-footprint-fresh`, `check-trajectory-fresh`,
-  `check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
-  `check-roadmap-fresh`) all byte-compare a tracked projection against a live emitter and all
-  print a diff on mismatch, and `check-gate-tamper` does too — every one meets the same need at
-  its own port.
-  **Cost while deferred:** the cohort that ports the first of them either hoists the renderer out
-  of a lifecycle-kit gate module — a cross-kit reach with no precedent in the crate's layout — or
-  writes a second copy, and a second copy of a diff format is two renderings of one diagnostic to
-  keep agreeing. The hoist is small today (about 55 lines plus its unit tests, no dependencies)
-  and gets no smaller.
-  Filed 2026-08-13 by close, draining the gap inbox; the renderer re-grepped across the crate.
-  Promoted 2026-08-13 at spec.
-
 - **queue-lib-dual-implementation-parity** [spec: SPEC-lib-parity.md]
   — the queue-cohort port left a shell library and its compiled twin with nothing holding
   the pair.
@@ -5436,6 +5418,7 @@
 
 ## Done
 
+- native-diff-renderer-hoist
 
 ## Lessons Learned
 

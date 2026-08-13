@@ -1561,6 +1561,11 @@ clearing the hold *costs*:
 | `check-docs-mirror-fresh` | an orphan sweep, its own walk over `<root>/docs` | the walk (the crate already carries it) **and** a fail-closed repair: the sweep silences stderr, so an unreadable tree reads as no orphans |
 | `check-roadmap-fresh` | a second assertion over `TASK-QUEUE.md` through `queue_roadmap_entries` | a **criterion 6** answer — `bin/roadmap.sh` calls that same adapter, which is what makes queue-kit/SPEC.md's *"the emitter and the gate can never disagree"* true; porting the gate alone duplicates it with nothing machine-held |
 
+**Whichever member of this family ports first owes the report cap, and it is
+settled rather than left to that session** — the renderer the crate carries is
+uncapped and the `head -20` above is the caller's, so the cap lands as one crate
+constant with its first reader in that same commit (§The diff renderer).
+
 **The transferable conclusion re-points the ordering rule.** The cheap cohort in
 this family is **the emitters, not the gates**: a ported byte-comparator
 spawning a shell emitter removes no shell, so it buys nothing against the
@@ -2086,6 +2091,56 @@ fence, earliest-match-wins-per-section, the declaration line as non-evidence,
 path-exempt and section-exempt windows, inline-code stripping, and marker
 patterns using intervals, anchors and character classes. Byte-identical, exit
 codes included.
+
+### The diff renderer
+
+**The crate's one rendering of `diff`'s normal format.** `native/src/diff.rs`
+carries `normal_diff`: a pure function over two line slices returning the
+normal-format hunk sequence — the `NcM` / `NdM` / `NaM` range headers and the
+`<` / `---` / `>` body lines the external `diff` prints with no options. It was
+`check-lifecycle-registration`'s private mechanism until the generated-projection
+freshness members that will each need one at their own port made it shared, and it
+is a module ahead of its second consumer for exactly that reason: what
+justifies it is the cross-kit reach it removes from a later port's path, not
+generality claimed on its behalf.
+
+**It carries no vocabulary and no report policy**, the §The POSIX ERE matcher
+scoping applied to a renderer. It reads no knob, takes no path, and knows nothing
+about what the two slices it is handed represent.
+
+**The renderer is uncapped; the cap belongs to the caller.** `normal_diff`
+returns every hunk. A renderer that truncates is a reporter, and the two roles are
+separated because the crate's one live caller
+(`native/src/gates/lifecycle_registration.rs`, its only consumer today) wants the
+whole sequence while the shell gates a later port replaces legitimately do not.
+
+**The cap's value is the shell family's, and a port carries it rather than picking
+it.** Every generated-projection freshness gate that renders a diff at all caps
+its stale report at one literal, `diff <(...) | head -20`, and that literal is the
+value's only live owner.
+Criterion 2 proves a ported member byte-identical to its shell original, so a port
+that re-picks the cap — or drops it, taking the uncapped return straight to
+stdout — diverges on precisely the cases a fixture does not build: a planted `bad/`
+difference is small, and the live tree is where a report first exceeds the cap. The
+rule: **the first freshness member to port lands the cap as one crate constant with
+its first reader in the same commit**, and every later member of the family reads
+that constant instead of repeating the literal.
+
+That constant is deliberately **not** landed ahead of its reader, and the omission
+is a rule rather than an oversight. `check-crate-arms` runs clippy at `-D warnings`,
+where a constant no code reads is `dead_code` in this bin crate; the only ways to
+hold one early are a lint suppression the crate has never used or a caller invented
+to read it, and both are worse than stating the contract here and landing the value
+at the port that first needs it.
+
+**The renderer never spawns, and that is a contract rather than an accident.**
+`diff` is on `GATE_SDK_PROGRAM_FLOOR` (§lib/gate.sh), so criterion 7 clears a
+ported form reaching for `Command::new("diff")` and a session under parity pressure
+has every reason to reach for it. It is refused: `native/src/proc.rs` is the
+crate's one sanctioned spawn site, an LCS walk needs none, and a spawned renderer
+would reinstate per member exactly the external-program dependency
+TRAJECTORY.md objective 1 exists to collapse. Stated here so the cheapest wrong
+implementation is refused by a rule rather than by whoever reviews that port.
 
 ### What the reverted port established
 
