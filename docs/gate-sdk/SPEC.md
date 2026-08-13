@@ -1394,8 +1394,7 @@ with its port work named and owed:
   `queue-kit/bin/roadmap.sh --emit`, one of the `lib/queue.sh` consumers this port
   does not touch (queue-kit/SPEC.md §lib/queue.sh), so nothing in the cohort ports
   the emitter it shells out to. **The 2026-08-11 hold stands on that ground and is
-  relabelled, never lifted**
-  (operator-ruled 2026-08-12, TRAJECTORY.md §The closed rulings):
+  relabelled, never lifted** (operator-ruled 2026-08-12):
   the label read `criterion 7`, and criterion 7 clears here — `bash` is
   on `GATE_SDK_PROGRAM_FLOOR`, which is why `bin/port-blockers.sh` reports none of
   the generated-projection freshness gates — while what the hold actually turns on

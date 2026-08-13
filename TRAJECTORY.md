@@ -201,26 +201,6 @@ that grounds it: the ruling is stated *for* `preview`, so the flip to `stable` a
 direction trigger, which remains available for exactly the urgent case this
 paragraph declines to automate.
 
-**A cohort hold is per-member, and criterion 7 does not adjudicate it — ruled
-2026-08-12.** Two passages appeared to contradict each other on the
-`bash <emitter> --emit` shape: `bin/port-blockers.sh` clears it, because `bash` is
-on the program floor, while `check-roadmap-fresh` stands held with criterion 7
-named as its ground. They test different things. The blocker report stays
-authoritative for the blocker test; the hold rests on **cohort composition** —
-*is this gate's emitter ported?* — which criterion 7's own closing sentence
-excludes from its reach, saying a blocker "never reads on whether a gate ports".
-So the hold is keyed per member on its emitter, and **the criterion-7 label on it
-was a spec defect, corrected** — the hold and its grounds are owned by
-gate-sdk/SPEC.md §The first cohort, and the rule that selects the next.
-
-This **does not reverse** the 2026-08-11 hold. That ruling stands on its stated
-ground and is relabelled, not lifted — a session writing it up as a reversal has
-mis-read it. Which of the freshness family the per-member key actually clears is
-a derivation no ruling can shortcut, and it is the taking stage's to make; the
-standing trap is that all six steer their fixture pairs off the live emitter, so
-size on what a member executes, never on what its fixtures reach. This ruling
-discharged 2026-08-13, the relabel having landed in `port-oracles-and-kit-roots`.
-
 ## PRIORITY DIRECTIVE — the port track's sequence
 
 **Ruled 2026-08-09 by the operator, and it is the track's top priority: complete
@@ -272,22 +252,6 @@ refuses an implementation source inside a vendoring kit root. **Operator-answere
 it reopens none, because what a developer builds from is the artifact that is
 public already. Recorded because the question is worth asking once and expensive
 to ask twice — the two paths sound like a disclosure change and are not one.
-
-**The fifth cohort is the ERE-matcher trio — ruled 2026-08-13 by the operator.**
-`check-install-claim`, `check-payload-claim` and `check-manifest-temporal`: the
-three `spec_manifest_files` members held out of the canon-kit cohort on the ERE
-engine, taken now by paying that engine once. Two alternatives were put and
-declined — the gates sitting in blocker-free groups (a `docs/posts` trio and the
-stage-stamp pair), and a set combining those with this trio — so **the cohort is
-not to be widened**. The ground for preferring the harder set: those groups are
-the last blocker-free multi-member ones, so taking them first defers the hard
-core that sets the completion date rather than moving it. The two
-baseline-held suites ride with the cohort — `installer_smoke` and `upgrade`,
-each attributed to a port-created hole that every further cohort widens, and
-neither entry citing the other, so the sum was invisible until it was summed.
-Cohort composition itself is owned by gate-sdk/SPEC.md §The first cohort, and
-the rule that selects the next; this records the ruling, not the design.
-**Discharged 2026-08-13, the trio having landed in `native-ere-matcher-and-held-suites`.**
 
 What the sequence names next, after the port: `companion-toolkit-profile`.
 

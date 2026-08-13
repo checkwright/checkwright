@@ -14,36 +14,6 @@
 
 ## Technical Debt
 
-- **spent-ruling-retirement** — TRAJECTORY.md carries two rulings annotated as discharged
-  where its own contract says deleted, and the deletion has an inbound half nothing catches.
-  **Ruled in 2026-08-13 by the operator.** Debt by the new-names litmus: it converges the
-  record on the contract TRAJECTORY.md §How to read a ruling recorded here already states —
-  *"a ruling whose subject is finished is deleted outright. Not distilled to a line, and not
-  annotated as finished"* — and adds no name to any governed surface.
-  **The two, and both subjects verified landed at scope rather than taken on the annotation's
-  word.** The cohort-hold relabel, whose relabel is on `gate-sdk/SPEC.md`; and the
-  fifth-cohort ERE-trio ruling, whose three members each carry a `.gate` descriptor in
-  `canon-kit/checks/` (`bash gate-sdk/bin/port-blockers.sh` is the oracle). Retirement is
-  **not reversal** and is session-class by that same section, so nothing here is
-  operator-class — what the ruling above settled is that the work is worth an iteration slot,
-  not that a session may retire.
-  **The inbound half is the work, and it is why this is not a two-line deletion.**
-  A retirement's blast radius is derived, never rostered, so the deliverable greps for the
-  retired rulings' own citations. One is already known: `gate-sdk/SPEC.md` cites
-  `(operator-ruled 2026-08-12, TRAJECTORY.md §The closed rulings)`, a pointer at a
-  **surviving section** that stops carrying the claim once the ruling inside it goes — so it
-  resolves, `check-spec-pointer` stays green, and no gate sees the staleness. Two properties
-  of the grep are stated on that same section and bind here: `docs/` is a generated mirror,
-  so every kit-SPEC citation appears twice and only the source is editable; and a citation
-  naming a surviving section resolves anyway, which is the whole exposure.
-  **Adjacent, not duplicated:** `ruling-record-condition-staleness-probe` designs the *probe*
-  for this class and owns the inbound half's design. This is the live instance to clean, and
-  cleaning it neither builds that probe nor discharges that entry.
-  **Definition of done:** both rulings deleted, every inbound citation of either repaired at
-  its source, the docs mirror regenerated rather than hand-edited, battery green.
-  Surfaced 2026-08-13 at scope, from the ritual read of the ruling record; filed to the gap
-  inbox in the same session and promoted here on the operator's ruling.
-
 ## Deferred
 
 
@@ -5198,6 +5168,7 @@
 
 - guard-glyph-match-context-blind
 - exit-echo-decoration-guard-vs-habit
+- spent-ruling-retirement
 
 ## Lessons Learned
 
