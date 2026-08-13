@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-skill-binding.sh — the scenarios the one-pair
+# Behavioral test of check-skill-binding — the scenarios the one-pair
 # good/bad harness cannot hold. The good/bad fixture pair covers the unbound-slot
 # case; the harness admits one bad/ dir, so this drives the orphan-binding case,
 # the missing-template case, and the two skip cases (a skill with no binding
@@ -10,7 +10,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-skill-binding.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -18,7 +17,7 @@ fails=0
 
 check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$(cd "$2" && "$GATE" commands 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-skill-binding "$DIR/checks" commands 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-merge-attrs.sh — the scenarios the one-pair
+# Behavioral test of check-merge-attrs — the scenarios the one-pair
 # good/bad harness cannot hold. The good/bad fixture pair (run-gate-tests.sh)
 # covers the reverse-direction safety edge (a merge=iteration-scoped attribute
 # on a path outside the derived set); this file covers the forward direction (a
@@ -14,7 +14,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-merge-attrs.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -22,7 +21,7 @@ fails=0
 
 check_case() {  # $1=label  $2=dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$(cd "$2" && "$GATE" 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-merge-attrs "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

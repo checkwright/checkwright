@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-survey-record.sh — the scenarios the one-pair
+# Behavioral test of check-survey-record — the scenarios the one-pair
 # good/bad harness cannot hold. The fixture pair drives the gate through its
 # hermetic file argument, which asserts grammar only, because a fixture's rev
 # names no commit in the tree the fixture was copied into. This file covers the
@@ -13,7 +13,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-survey-record.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -21,7 +20,7 @@ fails=0
 
 check_case() {  # $1=label  $2=dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$(cd "$2" && "$GATE" 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-survey-record "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

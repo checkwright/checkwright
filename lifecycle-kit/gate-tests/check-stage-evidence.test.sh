@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-stage-evidence.sh — the sentinel-scoping
+# Behavioral test of check-stage-evidence — the sentinel-scoping
 # guards the one-pair good/bad harness cannot hold ('—' legal only at the
 # first stage; a '—' stamp legal only while the header is also unnamed), plus
 # the waiver-token grammar allowance. The regression lives in the interplay of
@@ -11,7 +11,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-stage-evidence.sh"
 
 fails=0
 tmp="$(mktemp -d)"
@@ -22,7 +21,8 @@ case_run() {
     local name="$1" hdr="$2" stamp="$3" want="$4" expect="$5" out rc
     printf '%s\n' "$hdr" >"$tmp/TASK-QUEUE.md"
     printf 'header prose\n---\n%b' "$stamp" >"$tmp/WORKFLOW-STATE.txt"
-    out="$("$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
+    out="$(gate_run check-stage-evidence "$DIR/checks" \
+        "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL: $name expected exit $want, got $rc: $out"; fails=$((fails + 1)); return
     fi
@@ -94,7 +94,9 @@ case_run "no-cursor-unstamped-state" \
 #     skips only the cross-stage distinctness map (attribution still stamps).
 printf '%s\n' '## Iteration: demo-iteration' >"$tmp/TASK-QUEUE.md"
 printf 'header prose\n---\ndemo-iteration scope s1 2026-06-12\ndemo-iteration build s1 2026-06-13\n' >"$tmp/WORKFLOW-STATE.txt"
-out="$(LIFECYCLE_KIT_SESSION_BOUNDARY=iteration "$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
+out="$(gate_env LIFECYCLE_KIT_SESSION_BOUNDARY=iteration
+       gate_run check-stage-evidence "$DIR/checks" \
+           "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
 if [[ "$rc" -ne 0 ]] || ! grep -qF "clean" <<<"$out"; then
     echo "  FAIL: shared-session-iteration-posture expected clean exit 0, got $rc: $out"; fails=$((fails + 1))
 fi
@@ -102,7 +104,9 @@ fi
 # I — a bad posture value must exit 2 (the loader's fail-closed machine check).
 printf '%s\n' '## Iteration: demo-iteration' >"$tmp/TASK-QUEUE.md"
 printf 'header prose\n---\ndemo-iteration build s1 2026-06-13\n' >"$tmp/WORKFLOW-STATE.txt"
-out="$(LIFECYCLE_KIT_SESSION_BOUNDARY=bogus "$GATE" "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
+out="$(gate_env LIFECYCLE_KIT_SESSION_BOUNDARY=bogus
+       gate_run check-stage-evidence "$DIR/checks" \
+           "$tmp/TASK-QUEUE.md" "$tmp/WORKFLOW-STATE.txt" 2>&1)"; rc=$?
 if [[ "$rc" -ne 2 ]] || ! grep -qF "neither 'stage' nor 'iteration'" <<<"$out"; then
     echo "  FAIL: bogus-posture expected exit 2 with the loader finding, got $rc: $out"; fails=$((fails + 1))
 fi

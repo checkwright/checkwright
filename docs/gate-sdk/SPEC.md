@@ -2750,10 +2750,16 @@ Resolution, per declared knob:
   would have to be smuggled into element text and re-parsed. A `declare -A` knob
   is therefore not portable across the bridge as it stands, and a gate that reads
   one is not a port candidate until the wire format grows keys.
-  `QUEUE_KIT_LESSON_SINKS` is the live instance and is **not** a blocker: no gate
-  reads it, only `bin/lesson-sink.sh` does, so the queue-kit cohort ported with
-  the limit unexercised. Stated here because a later kit's port would otherwise
-  discover it at implementation time.
+  Three knob-shaped instances exist, and they part company on whether a gate
+  reads them. `QUEUE_KIT_LESSON_SINKS` has no gate reader — only
+  `queue-kit/bin/lesson-sink.sh` reads it — so the queue-kit cohort ported with
+  the limit untouched. `EVIDENCE_KIT_SCENARIO_GLOBS` and
+  `LIFECYCLE_KIT_PREDECESSOR` are each read **by key** by a registered gate,
+  `check-evidence-baseline` and `check-stage-entry` respectively, so the rule
+  above holds those two members off the substrate. The limit is therefore
+  **exercised**, in evidence-kit and in lifecycle-kit, rather than a curiosity
+  carried forward by cohorts that never met it. Stated here because a later
+  kit's port would otherwise discover it at implementation time.
 - **Three refusals, each exit 2 naming the knob** (§Fail-closed contract): an
   element containing a **newline**, which would break the line-per-element argv
   protocol; an element containing a **tab**, which would break the

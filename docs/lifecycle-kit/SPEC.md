@@ -1131,6 +1131,36 @@ triage attention and were ranked against each other by nothing — and the roste
 answers it directly: both appear on one derived roster, with modes, which is what
 "ranked against each other" needs. Merging the files was the proxy, not the thing.
 
+## Testing
+
+Every gate ships the ordinary `good/`+`bad/` fixture pair, and the scenarios one
+pair cannot hold live in `gate-tests/*.test.sh` scenario runners. What departs
+from the plain fixture-pair default, and what no single gate's subsection below
+can own, is how those runners **reach** their gate.
+
+Nine of the runners drive a gate rather than a `bin/` tool, and a runner names a
+gate, never a substrate: it resolves through
+`gate_run <name> <checks-dir> <args>` (gate-sdk/SPEC.md §run-gate-tests), which
+dispatches through `gate_command` exactly as the fixture harness does. A member
+that ports to a compiled subcommand therefore leaves its scenario coverage
+running unchanged — the property a path-named runner does not have, since the
+`checks/<name>.sh` it holds stops existing in the motion that lands the
+descriptor. For a case that differs by a knob rather than by argv, `gate_env
+NAME=VALUE` sets that one case's environment in the caller's subshell;
+`check-stage-evidence`'s session-boundary posture cases are the worked instance.
+
+Two of the nine still hold a script path: `check-close-surfaces`, which no
+cohort has sized, and `check-stage-entry`, which is held on shell
+(gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). Both
+keep a `.sh` for as long as those
+dispositions hold, so their runners resolve; naming them here records the
+residue rather than leaving the convention looking like it has unexplained
+exceptions.
+
+The remaining five runners exercise `bin/` tools — the rename mode, the boundary
+scratch wipe, the state-file guard, `file-gap.sh`'s recurrence and
+`file-survey.sh`'s entry — which are advisory tooling with no gate to dispatch.
+
 ## Per-component contracts
 
 ### lib/stages.sh
@@ -1406,7 +1436,16 @@ pre-edit file and diffing field-wise inside a hook — the same computation with
 less information and no way to refuse cleanly. **Pre-flight, the same contract as
 the stamp path:** the candidate header and candidate state file are built as
 temporaries, `check-stage-evidence` runs against them, and a non-zero exit
-refuses with the gate's output relayed and nothing written. **Refusals** (exit 2,
+refuses with the gate's output relayed and nothing written. That gate is
+resolved through gate-sdk's `gate_command` rather than named by script path, so
+the arm names a gate and never a substrate: the resolved argv is prefix-shaped,
+so the two positionals ride it unchanged, and an argv the bridge refused to build
+is exit 2 — the dispatcher's own verdict — never a rename pre-flighted by a check
+that did not run. The built-in `check-stage-entry` pre-flight above keeps its
+script path because that member is held on shell (gate-sdk/SPEC.md §The first
+cohort, and the rule that selects the next), so the two arms of this tool
+resolve differently and the difference is the member's substrate, not a
+convention gap. **Refusals** (exit 2,
 nothing written): `<name>` empty; `<name>` equal to the unnamed placeholder,
 which only the boundary reset may write — checked ahead of the grammar that would
 also reject it, so the message names the owning writer instead of reporting a
@@ -1446,7 +1485,18 @@ re-runs its entry step safely. It reads the `lib/stages.sh` knobs
 `LIFECYCLE_KIT_BOUNDARY_PRESERVE`,
 `LIFECYCLE_KIT_BOUNDARY_REQUIRE`, `LIFECYCLE_KIT_LESSON_EVIDENCE_FILE`,
 `LIFECYCLE_KIT_SURVEY_RECORD_FILE`, and
-`LIFECYCLE_KIT_ENTRY_PREFLIGHT`). Advisory tooling,
+`LIFECYCLE_KIT_ENTRY_PREFLIGHT`).
+
+**This tool depends on `gate-sdk/lib/gate.sh`, and the dependency is stated
+rather than absorbed.** It is sourced at load — from `GATE_SDK_ROOT`, defaulting
+to the sibling `../gate-sdk` — not inside the one arm that dispatches a gate,
+because a missing library that surfaces halfway through a rename is worse than
+one that surfaces before the tool does anything. The dependency is precedented
+inside the kit, where every `checks/` member sources exactly that library, but it
+is new in `bin/`: a tree that vendored lifecycle-kit without gate-sdk cannot run
+the stamp writer at all. The alternative — a second
+dispatch resolver written into `bin/` — is the duplicate the shared substrate
+exists to remove, so the dependency is taken. Advisory tooling,
 not a gate: no fixture pair is owed; it is exercised end-to-end in
 `smoke/install.sh` — including the boundary require-check scenarios (a member
 naming the closing iteration passes; a member missing the line, a member absent

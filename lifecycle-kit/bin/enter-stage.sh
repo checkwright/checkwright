@@ -5,6 +5,10 @@ set -uo pipefail
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=../lib/stages.sh
 source "$KIT/lib/stages.sh"
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the kit's bin/ layer depends on gate-sdk, declared at load rather than inside the one arm that dispatches a gate: this tool resolves check-stage-evidence through gate_command instead of by script path, and writing a second dispatch resolver here is the duplicate the substrate exists to remove
+SDK="${GATE_SDK_ROOT:-$KIT/../gate-sdk}"
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
 
 # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the unnamed-iteration placeholder, resolved once: the boundary reset's header rewrite and bootstrap stamp, the boundary-require skip, and --rename's refusal to write it all read this rather than repeating the glyph
 UNNAMED="—"
@@ -94,7 +98,13 @@ if [[ "${1:-}" == "--rename" ]]; then
         exit 2
     fi
 
-    if ! rn_pre="$(bash "$KIT/checks/check-stage-evidence.sh" "$rn_tmpqueue" "$rn_tmpstate" 2>&1)"; then
+    # spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the rename pre-flight names the gate and never a substrate: gate_command yields the shell script's one-element argv or the binary's, prefixed by its bridged knobs, and the two positional arguments ride unchanged because that argv is prefix-shaped. An argv the bridge refused to build is exit 2 — the verdict the dispatcher gives it — never a rename that proceeds unchecked.
+    mapfile -t rn_argv < <(gate_command check-stage-evidence "$KIT/checks")
+    if [[ ${#rn_argv[@]} -eq 0 ]]; then
+        echo "enter-stage: check-stage-evidence could not be dispatched (see above) — the rename could not be pre-flighted; nothing written." >&2
+        exit 2
+    fi
+    if ! rn_pre="$("${rn_argv[@]}" "$rn_tmpqueue" "$rn_tmpstate" 2>&1)"; then
         if [[ "$sim" == 1 ]]; then
             echo "enter-stage (simulate): check-stage-evidence would refuse the rename to '$rn_name':" >&2
             sim_relay "$rn_pre" >&2

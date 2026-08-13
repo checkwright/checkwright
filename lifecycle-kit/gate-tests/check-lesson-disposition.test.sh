@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-lesson-disposition.sh — the scenarios the one
+# Behavioral test of check-lesson-disposition — the scenarios the one
 # good/bad pair cannot hold: (A) a malformed disposition line reds on grammar;
 # (B) a Lessons entry still present in the worktree is not a removal, so it
 # needs no stamp; (C) a stored prefix matches a longer lead line (prefix join).
@@ -9,7 +9,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-lesson-disposition.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -17,7 +16,7 @@ fails=0
 
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=head  $5=work  $6=evid
     local out rc
-    out="$("$GATE" "$4" "$5" "$6" 2>&1)"; rc=$?
+    out="$(gate_run check-lesson-disposition "$DIR/checks" "$4" "$5" "$6" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$2" ]]; then
         echo "  FAIL [$1]: want exit $2, got $rc -- $out"; fails=$((fails + 1)); return
     fi

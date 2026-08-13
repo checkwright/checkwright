@@ -4,6 +4,25 @@
 set -euo pipefail
 : "${SMOKE_KIT_ROOT:?run via run-consumer-smoke.sh}"
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the smoke resolves a kit gate through gate_command, the way
+# a consumer's own battery does: this is the one context where a ported member's `.sh` is genuinely
+# absent, and an absent binary is exit 2 — never a skip, never a pass, never an invented fallback.
+# shellcheck source=../../gate-sdk/lib/gate.sh
+source "$SDK/lib/gate.sh"
+# spec: gate-sdk/SPEC.md §lib/gate.sh — the binary pinned absolute off its own default spelling,
+# because two of the dispatches below run from a sandbox cwd where the knob's repo-relative
+# default resolves to nothing (the rule lib/test-hermetic.sh already applies in the test lane)
+smoke_bin="$(gate_native_bin)"
+[[ "$smoke_bin" == /* ]] || export GATE_SDK_NATIVE_BIN="$PWD/$smoke_bin"
+unset smoke_bin
+
+kit_gate() {   # $1=gate-name  $2.. = gate args — dispatch a vendored lifecycle-kit gate by name
+    local g="$1"; shift
+    local -a argv=()
+    mapfile -t argv < <(gate_command "$g" "$SMOKE_KIT_ROOT/checks")
+    [[ ${#argv[@]} -gt 0 ]] || return 2
+    "${argv[@]}" "$@"
+}
 
 cat >> scripts/gates.list <<'EOF'
 # lifecycle-kit
@@ -50,7 +69,7 @@ EOF
 bash "$SMOKE_KIT_ROOT/bin/file-survey.sh" \
     "smoke: does a freshly vendored install leave a survey record check-survey-record can parse" \
     ".workflow/survey-record.md" \
-    "bash checks/check-survey-record.sh" \
+    "bash gate-sdk/bin/run-gates.sh --for .workflow/survey-record.md" \
     "yes — a filed block naming the seed commit parses clean" >/dev/null
 
 # spec: lifecycle-kit/README.md §Install — step 4 points the consumer's own always-loaded agent file at the machine; run it on the consumer, not only on a scratch copy, or check-lifecycle-registration has nothing to hold
@@ -233,7 +252,7 @@ cat > "$il/CLAUDE.md" <<'EOF'
 Resident context the consumer keeps.
 EOF
 il_run() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" "$@"; }
-il_gate() { LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md" bash "$SMOKE_KIT_ROOT/checks/check-lifecycle-registration.sh" "$@"; }
+il_gate() { ( export LIFECYCLE_KIT_AGENT_FILE="$il/CLAUDE.md"; kit_gate check-lifecycle-registration "$@" ); }
 
 il_run >/dev/null
 grep -q "<!-- lifecycle-kit:begin -->" "$il/CLAUDE.md" || { echo "smoke(install-lifecycle): block not injected" >&2; exit 1; }
@@ -254,14 +273,14 @@ printf '# Scratch agent file\n' > "$ma/CLAUDE.md"
 grep -q "^# lifecycle-kit:merge:begin\$" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): merge-attribute block not injected into .gitattributes" >&2; exit 1; }
 grep -q "^\.workflow/WORKFLOW-STATE.txt merge=iteration-scoped\$" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): state-file merge attribute missing" >&2; exit 1; }
 [[ "$(git -C "$ma" config --get merge.iteration-scoped.driver)" == "true" ]] || { echo "smoke(install-lifecycle): keep-ours driver not registered in git config" >&2; exit 1; }
-( cd "$ma" && bash "$SMOKE_KIT_ROOT/checks/check-merge-attrs.sh" >/dev/null ) || { echo "smoke(install-lifecycle): a freshly installed .gitattributes should pass the parity gate" >&2; exit 1; }
+( cd "$ma" && kit_gate check-merge-attrs >/dev/null ) || { echo "smoke(install-lifecycle): a freshly installed .gitattributes should pass the parity gate" >&2; exit 1; }
 
 cp "$ma/.gitattributes" "$ma/before"
 ( cd "$ma" && bash "$SMOKE_KIT_ROOT/bin/install-lifecycle.sh" >/dev/null )
 cmp -s "$ma/before" "$ma/.gitattributes" || { echo "smoke(install-lifecycle): merge-attribute re-run was not idempotent" >&2; exit 1; }
 
 printf 'README.md merge=iteration-scoped\n' >> "$ma/.gitattributes"   # smuggled reverse-edge line
-if ( cd "$ma" && bash "$SMOKE_KIT_ROOT/checks/check-merge-attrs.sh" >/dev/null 2>&1 ); then
+if ( cd "$ma" && kit_gate check-merge-attrs >/dev/null 2>&1 ); then
     echo "smoke(install-lifecycle): a smuggled out-of-set merge attribute should redden the parity gate" >&2; exit 1
 fi
 

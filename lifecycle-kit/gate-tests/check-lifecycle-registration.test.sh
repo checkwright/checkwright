@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-lifecycle-registration.sh — the scenarios the
+# Behavioral test of check-lifecycle-registration — the scenarios the
 # one-pair good/bad harness cannot hold. The good/bad fixture pair covers the
 # byte-lockstep-clean case and the stale-block case; this drives the
 # block-absent finding, the unpaired-marker fail-closed, and the
@@ -10,7 +10,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-lifecycle-registration.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -18,7 +17,7 @@ fails=0
 
 check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$(cd "$2" && "$GATE" AGENT.md 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-lifecycle-registration "$DIR/checks" AGENT.md 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi

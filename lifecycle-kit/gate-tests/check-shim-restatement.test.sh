@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavioral test of checks/check-shim-restatement.sh — the scenarios the one
+# Behavioral test of check-shim-restatement — the scenarios the one
 # good/bad pair cannot hold. The pair covers the plain restatement/clean split;
 # this drives: a shim with no binding directive is skipped (not a shim), a
 # resolved corpus that yields no n-grams is fail-closed (never a false clean —
@@ -11,7 +11,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-shim-restatement.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -20,7 +19,7 @@ fails=0
 check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring  $5..=gate args
     local label="$1" dir="$2" want="$3" sub="$4"; shift 4
     local out rc
-    out="$(cd "$dir" && "$GATE" "$@" 2>&1)"; rc=$?
+    out="$(cd "$dir" && gate_run check-shim-restatement "$DIR/checks" "$@" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
