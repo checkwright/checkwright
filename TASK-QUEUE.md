@@ -12,93 +12,6 @@
 
 ## New Features
 
-- **guard-glyph-match-context-blind** [spec: SPEC-guard-context-matching.md] — the guard matches
-  its trigger glyphs inside quoted and heredoc bodies, so writing *about* the guard is refused.
-  recurrence: guard-glyph-match-context-blind 2026-08-13
-  `scripts/bash-guard.sh` tests the whole command string, so a `$(...)`, a brace expansion or the
-  repo-root absolute path appearing inside a **heredoc body** — journal prose, a queue entry
-  being appended, a commit message — trips the same refusal as the executable form. The refusal
-  is correct about the glyph and wrong about the command.
-  **Measured at filing:** 8 refusals in roughly 25 bash calls. Two of the 8 were this class
-  (prose inside a heredoc, once for a brace glyph and once for an absolute path quoted while
-  describing an earlier refusal).
-  **Why it needed design:** quote- and heredoc-aware matching in a PreToolUse hook is a shell
-  parser, and the cheap approximations are wrong in both directions — skipping everything after a
-  `<<` opener blinds the guard to real commands in a heredoc-bearing call, while matching only
-  outside single quotes still refuses a double-quoted mention. Both are answered by
-  `guard-kit/SPEC-guard-context-matching.md`'s normalizer, which marks a heredoc **body extent**
-  inert and leaves the rest of the call live.
-  **Cost while deferred:** a round trip per refusal on every session that documents its own
-  tooling, and it lands hardest on the sessions writing the queue and the journals. The wider
-  cost is the one the SWOT names: false positives on a blocking guard are the mechanism by which
-  enforcement converts into bypass and distrust.
-  Filed 2026-08-08 at scope on the lead's ruling, from that session's own refusal count. It
-  duplicates neither `guard-command-prefix-wrapper` (transparent prefixes) nor
-  `exit-echo-decoration-guard-vs-habit` (decoration on an allowlisted command), though it shares
-  one amendment with the second — one root, so one design.
-  **2026-08-13 widens the shape past "a string never going to be executed", and that widening
-  raises the cost rather than restating it.** A *working* command — a double-quoted POSIX regex
-  quantifier in a grep pattern — trips the same brace-expansion block: re-probed at the drain
-  against `scripts/bash-guard.sh` itself, the double-quoted form exits 2 and the single-quoted
-  respelling auto-allows. Same mechanism the design note already names (`guard_rule_brace_glyph`
-  strips only single-quoted spans before matching), but a quantifier in a live command cannot be
-  avoided by writing the sentence differently, so the deferred cost is no longer bounded by
-  sessions that document their own tooling.
-  **Widened again 2026-08-13 at spec, from running the guard rather than reading it.**
-  `guard_rule_abs_prefix` strips **nothing at all** — it greps the raw command — so for the
-  absolute-path third of this entry the single-quote respelling escape does not exist either. A
-  `printf` that only echoes prose, with the path single-quoted and never executed, is blocked;
-  reproduced live. Four other rules also match the raw string, and the file carries five
-  incompatible stripping dialects with no gate holding them in agreement.
-
-- **exit-echo-decoration-guard-vs-habit** [spec: SPEC-guard-context-matching.md] — the guard
-  blocks a benign command, and the block's own corrective cannot be followed.
-  recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06 2026-08-13
-  **Re-scoped 2026-08-13 by the operator to the blocking framing.** The subject is a guard
-  **block** on a command that is fine as written — not a harness permission prompt, which is
-  what this entry asserted for two iterations. The design does not move: the mechanism is
-  identical under both readings and the operator ruled knowing that. The amendment is
-  `guard-kit/SPEC-guard-context-matching.md`. The slug predates the reframe, and its `exit-echo`
-  and `vs-habit` halves both name grounds this re-scope retires.
-  **Three original grounds were falsified at spec by running the guard, and are corrected here
-  rather than annotated.** `sort` **is** in `GUARD_KIT_RO_BINS`' default roster and has been
-  since before the friction-kit rename, so `find … | sort` auto-allows today and only the
-  `xargs` half of the second-contributor claim stands. A newline-joined compound **is**
-  segmented — `guard_split_compound` emits lines and every consumer reads lines, so a
-  pre-existing newline is already a boundary — and the grep/find/cat/ls blob class is therefore
-  substantially resolved already. And `$?` is **not** matched by the expansion rule's pattern,
-  so the `; echo EXIT:$?` shape falls through silently and the argument built on it does not hold.
-  **The sizing moved with them.** `bash guard-kit/bin/scan-prompts.sh` at spec reports 23
-  prompting calls across 15 patterns from 111 fall-throughs, against the 2026-08-06 headline of
-  roughly 78 of 106 with read blobs dominant. The read-blob class is absent from the profile.
-  **Two sessions attested the blocking half separately, same day.** The spec session met five
-  blocks and no prompt, including `bash guard-kit/bin/scan-prompts.sh | head` — an allowlisted
-  script decorated only by a read-only reduction of its own output. The lead session met three,
-  including a decoration refusal on an already allowlisted command.
-  **Not every block is a defect, and the criterion turns on the difference.** A bare-`find`
-  refusal is `guard_rule_find_glob` working as designed: a deliberate steer to the Glob tool,
-  with a corrective the caller can follow. In scope is a block whose **corrective is
-  inapplicable** — *write out the brace expansion* against a POSIX quantifier that has no
-  members — or whose **subject is not the executable command**, a glyph inside a heredoc body or
-  a single-quoted mention. A criterion counting blocks as such would sweep in every deliberate
-  steer and make this "the guard refuses too much", which is neither what was ruled nor what the
-  amendment builds.
-  **Success criterion, measurable with an instrument that exists.** Not `scan-prompts`:
-  `guard_block` exits 2 before `guard_log_fallthrough` runs, so a blocked command never reaches
-  `GUARD_KIT_LOG` and that report is **structurally blind to this entry's subject**. The
-  instrument is the decision table `guard-kit/guard-tests/cases.tsv`, which asserts a per-command
-  verdict and already sees blocks. Done is: a case for each in-scope shape — a double-quoted
-  quantifier, a heredoc-body glyph, a single-quoted absolute-path mention, an allowlisted lead
-  piped into a roster binary, a banner between read segments, an `xargs` pipeline — each
-  asserting allow, and every re-derived existing verdict still green.
-  **Cost while deferred:** a blocking cost rather than a round-trip one, which is the
-  bypass-and-distrust direction the SWOT names rather than the latency direction. Paid on exactly
-  the read-heavy stages the delegation doctrine wants cheap.
-  Filed 2026-07-25 by close, operator-reported; iceboxed 2026-08-05; evicted back to Deferred
-  2026-08-06 by close on attested recurrence (queue-kit/SPEC.md §The icebox tier); grounds
-  corrected and re-sized 2026-08-13 at spec; re-scoped to the blocking framing 2026-08-13 by the
-  operator.
-
 ## Technical Debt
 
 - **spent-ruling-retirement** — TRAJECTORY.md carries two rulings annotated as discharged
@@ -5283,6 +5196,8 @@
 
 ## Done
 
+- guard-glyph-match-context-blind
+- exit-echo-decoration-guard-vs-habit
 
 ## Lessons Learned
 
