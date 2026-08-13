@@ -1143,13 +1143,11 @@ descriptor. For a case that differs by a knob rather than by argv, `gate_env
 NAME=VALUE` sets that one case's environment in the caller's subshell;
 `check-stage-evidence`'s session-boundary posture cases are the worked instance.
 
-Two gate-driving runners still hold a script path: `check-close-surfaces`, which
-no cohort has sized, and `check-stage-entry`, which is held on shell
-(gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). Both
-keep a `.sh` for as long as those
-dispositions hold, so their runners resolve; naming them here records the
-residue rather than leaving the convention looking like it has unexplained
-exceptions.
+Every gate-driving runner in this kit, including `check-close-surfaces` and
+`check-stage-entry` — whose gates themselves remain shell (`check-close-surfaces`
+unsized by any cohort, `check-stage-entry` held on shell — gate-sdk/SPEC.md
+§The first cohort, and the rule that selects the next) — now resolves through
+`gate_run` rather than a held `checks/<name>.sh` path.
 
 The rest exercise `bin/` tools, which are advisory tooling with no gate to
 dispatch and so have nothing to say about reach.

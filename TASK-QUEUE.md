@@ -14,28 +14,6 @@
 
 ## Technical Debt
 
-- **lifecycle-gate-test-runner-holdouts** — two of lifecycle-kit's gate-driving test
-  runners still hold their gate as a `checks/<name>.sh` path instead of `gate_run`.
-  Re-verified at this scope, not inherited: `check-stage-entry.test.sh:18` and
-  `check-close-surfaces.test.sh:15` each still set `GATE="$DIR/checks/<name>.sh"`;
-  every other gate-driving runner resolves through `gate_run`.
-  The lifecycle-cohort amendment fixed its conversion count at the seven cohort members
-  whose script is deleted, so build correctly did not widen it.
-  **The fact is recorded but the work is not.** `lifecycle-kit/SPEC.md` §Testing already
-  names both holdouts and their grounds; what no entry carried until now is the cost of
-  leaving them.
-  **Deliverable:** convert both runners to `gate_run <name> <checks-dir> <args>`, plus a
-  one-sentence amend to that SPEC section so it records the convention rather than the
-  residue. No new name — `gate_run` is already the spec's own term
-  (gate-sdk/lib/test-hermetic.sh:26), which is what makes this debt rather than a feature.
-  **Cost of leaving it:** whichever unit ports `check-stage-entry` (held on the
-  associative-array bridge) or sizes `check-close-surfaces` (unsized, out of the sixth
-  cohort) discovers its scenario runner at implementation time — the exact
-  caller-discovery failure the cohort amendment paid to prevent for the other seven.
-  Filed 2026-08-13 by close, draining the gap inbox; the runners re-classified at the
-  drain. Promoted 2026-08-13 at scope, operator-ruled with the
-  `native-comment-surface-cohort-and-port-residue` unit set.
-
 ## Deferred
 
 
@@ -5393,6 +5371,7 @@
 
 - native-diff-renderer-hoist
 - queue-lib-dual-implementation-parity
+- lifecycle-gate-test-runner-holdouts
 
 ## Lessons Learned
 

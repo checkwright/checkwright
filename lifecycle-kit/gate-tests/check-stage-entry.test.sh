@@ -15,7 +15,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # lifecycle-kit/
-GATE="$DIR/checks/check-stage-entry.sh"
 SANDBOX="$(mktemp -d)"
 mkdir -p "$SANDBOX/.workflow"
 trap 'rm -rf "$SANDBOX"' EXIT
@@ -46,7 +45,7 @@ demo-iteration build bbbbbbbb 2026-06-02
 demo-iteration validate cccccccc 2026-06-03
 EOF
 
-out="$(cd "$SANDBOX" && "$GATE" 2>&1)"; rc=$?
+out="$(cd "$SANDBOX" && gate_run check-stage-entry "$DIR/checks" 2>&1)"; rc=$?
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL [validate-non-empty-queue]: want exit 1, got $rc -- $out"
     fails=$((fails + 1))
@@ -71,7 +70,7 @@ EOF
 
 check_case() {  # $1=label  $2=sandbox-dir  $3=want-rc  $4=want-substring
     local out rc
-    out="$(cd "$2" && "$GATE" 2>&1)"; rc=$?
+    out="$(cd "$2" && gate_run check-stage-entry "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$3" ]]; then
         echo "  FAIL [$1]: want exit $3, got $rc -- $out"; fails=$((fails + 1)); return
     fi
