@@ -283,8 +283,10 @@ The constrained members and what forces each:
   (gate-sdk, guard-kit, delegation-kit, evidence-kit checks), `mapfile` (across
   the kits), the `${x,,}` case expansion (canon-kit's `lib/spec.sh` and checks, a
   delegation-kit template) — but the **nameref** (`local -n`, bash 4.3) outranks
-  them: `gate-sdk/lib/gate.sh`'s couples expander, which every gate sources, and
-  `canon-kit/checks/check-comment-tier.sh`. The nameref in the shared gate
+  them: `gate-sdk/lib/gate.sh`'s couples expander, which every gate sources. The
+  leaf gate that carried the second instance, `check-comment-tier`, has since
+  ported to the binary substrate and its script is gone — which changes nothing
+  about the floor, because the nameref in the shared gate
   library makes 4.3 universal rather than one leaf gate's requirement, so a
   consumer below it cannot run the battery at all. Recorded here because the
   earlier `4.0` was a fail-open: `env-probe` reported `ok` on a 4.2 box the

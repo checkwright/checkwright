@@ -455,25 +455,35 @@ same shapes:
   plus a configured icebox, built as one regex so the tag rule and the walk can
   never disagree on the set — and a done slug for a bare-slug bullet outside
   them; the single grammar `check-todo-task-liveness`
-  and `check-deprecation-task` resolve a `task: <slug>` binding through (each
-  caller builds its own live/done map and fail-closes on the walk status). That
-  walk's bullet lead-line predicate is re-implemented here rather than sourced,
-  making canon-kit one of the format's independent holders under the
+  and `check-deprecation-task` resolve a `task: <slug>` binding through. **The
+  walk is `native/src/spec.rs`'s `queue_slugs` and the section builders are the
+  shell library's**: both members compile, so the shell walk went with its last
+  caller, while `check-amendment-queue` still reads `SPEC_ACTIVE_RE` and its
+  siblings here. That walk's bullet lead-line predicate is written again in the
+  crate rather than pointed at `native/src/queue.rs`'s adapters, which keeps
+  canon-kit one of the format's independent holders under the
   re-implement-and-cite-from-both-ends rule
-  (queue-kit/SPEC.md §The queue format); the holder census and the residue it
+  (queue-kit/SPEC.md §The queue format) — two modules in one crate are still two
+  holders where one shared function is not; the holder census and the residue it
   leaves live at gate-sdk/SPEC.md §check-gate-exemption-tasks.
-- **The governed comment surface:** `spec_comment_surface` and
-  `spec_comment_surface_with_templates` — the one corpus primitive
-  `check-spec-pointer`, `check-comment-tier`, `check-todo-task-liveness` and
-  `check-deprecation-task` all call, the pair differing only in whether
-  `templates/` sources are pruned. Its file set spans **both gate declaration
-  spellings and the ported implementation**: `*.sh`, the `*.gate` descriptor,
-  and `*.rs`. Stated once here rather than at each of the four callers, since a
-  gate whose rule became a compiled subcommand must not have its `# spec:`
-  pointer, its comment tier, or a `TODO(task:)` marker silently drop out of
-  coverage — the widening is made at the shared primitive so no caller can
-  inherit a narrower corpus than its siblings
-  (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate).
+- **The governed comment surface:** `comment_surface` in `native/src/spec.rs` —
+  the one corpus primitive `check-spec-pointer`, `check-comment-tier`,
+  `check-todo-task-liveness` and `check-deprecation-task` all call, its single
+  parameter deciding whether `templates/` sources are pruned. Its file set spans
+  **both gate declaration spellings, the ported implementation, and the workflow
+  directory's tracked tier**: `*.sh`, the `*.gate` descriptor, `*.rs`, and every
+  tracked member of `GATE_SDK_WORKFLOW_DIR` whatever its extension. Stated once
+  here rather than at each of the four callers, since a gate whose rule became a
+  compiled subcommand must not have its `# spec:` pointer, its comment tier, or a
+  `TODO(task:)` marker silently drop out of coverage — the widening is made at the
+  shared primitive so no caller can inherit a narrower corpus than its siblings
+  (gate-sdk/SPEC.md §Meta-gate conservation for the binary substrate). The shell
+  forms are **deleted rather than duplicated**: all four callers compiled in one
+  cohort, so criterion 6 is satisfied in the form it calls strongest — the
+  duplication is absent rather than machine-held. A consumer whose own gate called
+  `spec_comment_surface`, `spec_comment_surface_with_templates` or
+  `spec_comment_whitelisted` shadows the gate, which is the answer this section
+  already gives for the finder-choice question below.
 - **Finders:** the canonical-spec / amendment finders the spec-scanning gates
   share, and the manifest-set finder the narration-gate family shares —
   canonical specs plus `README.md`/`CLAUDE.md`, amendments excluded — so its
@@ -513,9 +523,12 @@ same shapes:
   primitives too: the declaration grammar, the declaration roster, the
   governed-doc set behind its two exclude valves, and the bridged vocabulary
   loader. The shell kept a copy of the last two per member; the compiled form has
-  one, ported once and proved by each member that calls it. `spec_comment_surface`
-  is **shell only**, and so are all four of its callers
-  (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next).
+  one, ported once and proved by each member that calls it. `comment_surface` and
+  `queue_slugs` are **compiled only**, and so are all four of their callers
+  (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next): where
+  the manifest finder is dual because members outside its family still call it,
+  these two emptied their caller sets in one cohort and their shell forms were
+  removed in the same commit.
   The two implementations of the manifest finder are held together by the config
   bridge rather than by a copied default: every knob either reads crosses it as
   a resolved value, so there is exactly one place each is computed
@@ -571,7 +584,8 @@ same shapes:
   `CANON_KIT_MEASURED_CLAIMS_CMD` (§check-measured-claim) — whose second field is
   a measured value rather than an ERE, which the loader neither interprets nor
   needs to, since every check it makes is on the line's shape.
-- **The comment-surface adapters:** the comment gates read *different* surfaces.
+- **The comment-surface adapters:** the comment gates read *different* surfaces,
+  which is the one thing the primitive's parameter decides.
   `check-spec-pointer` scans the template-pruned surface — a template's `spec:`
   line is an unresolvable-by-design placeholder (§check-spec-pointer);
   `check-comment-tier` scans the with-templates surface — a copied-out
@@ -1191,7 +1205,7 @@ directive for a genuinely-local fact below SPEC altitude that neither tier
 owns.
 
 The governed-source corpus reaches the **implementation of a ported gate**, not
-just shell — `spec_comment_surface_with_templates` (§lib/spec.sh), which owns
+just shell — `comment_surface` with templates kept (§lib/spec.sh), which owns
 the file set. This is the load-bearing half of the reader
 partition gate-sdk/SPEC.md §The `# graph:` manifest states — locality-class
 directives bind to a line of implementation and therefore stay there, so the
@@ -1269,6 +1283,18 @@ sources ride `CANON_KIT_COMMENT_WHITELIST` (its array tagged
 `# exception-list:`, each `# until:` a live drain task per
 `check-gate-exemption-tasks`), draining kit by kit. `precommit` tier.
 
+**Declared by `check-comment-tier.gate`, dispatching to the binary**, with the
+four members of this family ported as one cohort
+(gate-sdk/SPEC.md §The first cohort, and the rule that selects the next). Its
+`couples=` carries `*.gate` and `*.rs` as **bare globs** beside the shell and
+workflow spellings: the corpus scans both declaration forms and the ported
+implementation, and a token naming this repo's crate directory would publish one
+consumer's layout into a kit file (CLAUDE.md §The provenance seam) and be false
+for every other. The gate reads no regex engine — its blessing roster is a set of
+literal directive tokens, matched as a substring for a `keyword:` and
+non-alphanumeric-bounded for a bare word, which is joining rather than
+interpreting (gate-sdk/SPEC.md §The POSIX ERE matcher).
+
 ### check-spec-pointer
 
 Invariant, two passes, forward direction only: every `spec:` / `contract:`
@@ -1326,9 +1352,9 @@ no inbound pointer as uncovered code — needs a "what counts as a requirement"
 notion that risks false positives against the cheap-and-FP-free bar, so it is
 ruled out (a separate task with its own ruling if ever wanted; this gate
 reserves no syntax for it). Configuration is shared with `check-comment-tier` —
-the `spec_comment_whitelisted` adapter in `lib/spec.sh` and the same
+the whitelist predicate and the same
 `CANON_KIT_COMMENT_*` knobs, so no new config knob — but this gate scans
-`spec_comment_surface`, which prunes `templates/` shell sources where
+the **pruned** comment surface, which drops `templates/` sources where
 `check-comment-tier` keeps them. The split is by design, not a "SPECs don't
 travel" claim: a template's `spec: <your SPEC> §check-<area>` line is a
 placeholder the consumer fills in, unresolvable *by design* in the kit's own
@@ -1350,6 +1376,13 @@ pointer buys nothing: the gloss is already capped at the one-line binding
 under that doctrine, not re-gated here. Dropping the slot would also orphan
 the citation coverage the convention carries — the reason a dedicated
 script↔doc citation gate stays unbuilt.
+
+**Declared by `check-spec-pointer.gate`, dispatching to the binary**, with its
+`couples=` widened to `*.gate`, `*.rs` and every tracked workflow member on the
+same terms `check-comment-tier`'s is. The gate that reads a `# spec:` directive
+is now itself declared by one, so a member of this family reads its own cohort's
+descriptors — which is why the fixture pair carries a descriptor arm rather than
+resting on the live tree to exercise it.
 
 ### check-todo-task-liveness
 
@@ -1377,10 +1410,10 @@ separate ruling if the need attests.
 
 Placement: the marker is a comment directive on the governed comment surface, so
 it is canon-kit's, not queue-kit's (which disclaims source-file conventions in
-its Out of scope). The gate scans `spec_comment_surface`, pruning `templates/`
+its Out of scope). The gate scans the pruned comment surface, dropping `templates/`
 as placeholders-by-design like `check-spec-pointer`, and reads the queue through
 `CANON_KIT_QUEUE_FILE` with no new knob — the live/done split is the shared
-`spec_queue_slugs` adapter (§lib/spec.sh), one queue walk reading a bare-slug
+`queue_slugs` adapter (§lib/spec.sh), one queue walk reading a bare-slug
 bullet outside the active and deferred sections as the queue's done shape. That
 `task: <slug>` binding grammar — a `task:` key naming a slug that must resolve
 to a live queue entry — is one grammar both liveness gates share:
@@ -1388,7 +1421,10 @@ to a live queue entry — is one grammar both liveness gates share:
 deprecation marker through the same adapter (§check-deprecation-task). Latent at landing: no such marker exists in
 the tree yet — the gate ships before the first one, so a future `TODO(task:)`
 cannot outlive its task silently. A queue-read failure is fail-closed (exit 2).
-`precommit` tier.
+`precommit` tier. **Declared by `check-todo-task-liveness.gate`, dispatching to
+the binary**, its `couples=` widened to `*.gate` and `*.rs` and its
+`.workflow/*.txt` spelling corrected to `.workflow/*`, which is the tier the
+corpus actually takes.
 
 ### check-deprecation-task
 
@@ -1409,12 +1445,25 @@ A marker line carrying no `task: <slug>` is **unbound**; a bound slug sitting in
 slug absent from the queue is **unresolved**. All three redden — each finding
 names the file, the line, the matched marker, and the offending slug. The
 binding grammar and the queue-resolution pass are `check-todo-task-liveness`'s:
-the same `task: <slug>` key over the same `spec_queue_slugs` adapter
+the same `task: <slug>` key over the same `queue_slugs` adapter
 (§check-todo-task-liveness, §lib/spec.sh), one grammar both liveness gates
-share. The gate scans `spec_comment_surface` (templates pruned as
+share. The gate scans the pruned comment surface (templates dropped as
 placeholders-by-design) and reads the queue through `CANON_KIT_QUEUE_FILE`, no
 new knob beyond the roster. An unreadable queue or source is fail-closed
 (exit 2); an empty roster is the clean skip, not an error.
+
+**Declared by `check-deprecation-task.gate`, dispatching to the binary**, with
+the same widened `couples=` its twin carries. The roster is where this member
+parts from its three siblings: it is a consumer array joined into one alternation
+and **interpreted**, so the compiled form compiles it through the crate's POSIX
+ERE matcher (gate-sdk/SPEC.md §The POSIX ERE matcher) and reports the offending
+knob by name on a pattern the engine refuses. One shell defect went with the
+port, found by widening the fixture pair rather than by review: the unbound
+finding named the marker as `''`, because the record carried an empty slug field
+*between* two populated ones and `IFS=$'\t' read` collapses a tab run. It was
+repaired in the shell before the port, so the parity run proves the repaired
+message on both substrates rather than freezing the defect into the compiled
+form.
 
 This repo sets no roster, so the gate clean-skips here — the good/bad fixture
 pair and `check-deprecation-task.test.sh` carry the resolved and reddened paths

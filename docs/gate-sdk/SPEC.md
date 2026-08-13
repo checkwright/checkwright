@@ -60,7 +60,12 @@ Environment overrides, all optional: `GATE_SDK_GATES_DIR` (default `scripts`),
 `GATE_SDK_TESTS_DIR` (default `<gates-dir>/gate-tests`), `GATE_SDK_HOOKS_DIR`
 (default `<gates-dir>/git-hooks`), `GATE_SDK_WORKFLOW_DIR` (default
 `.workflow`; the directory's two-tier membership rule, header form, and
-extension rule are §The workflow directory), `GATE_SDK_GRAPH_ARTIFACT` (default
+extension rule are §The workflow directory — resolved in `lib/gate.sh` rather
+than inline at its readers, for the same reason the two `check-kit-registration`
+document knobs below are: the governed-comment corpus takes this directory's
+tracked tier, and a knob the owning kit's library does not define is the config
+bridge's third refusal, so a compiled member declaring it would fail-close on
+every invocation), `GATE_SDK_GRAPH_ARTIFACT` (default
 `<gates-dir>/CHECK-GRAPH.html`; the emitted coupling-graph artifact's path,
 read by `check-graph` assertion E — set it to republish the artifact elsewhere,
 e.g. a served docs page), `GATE_SDK_TMP_DIR` (default `.tmp`), `GATE_SDK_VERBOSE`
@@ -458,6 +463,31 @@ the pair is the consumer's only parity oracle for a binary they cannot read;
 withholding it would spend the trust story to buy marginal opacity, since the
 help text and the SPEC section ship regardless.
 
+**A ported member's pair exercises every arm of the corpus derivation it ports,
+not merely the arm the gate's own sources happen to be written in.** A pair
+covering one arm in four proves one branch and ships the rest proved by nothing,
+and the failure is invisible: the uncovered arms still run on the live tree,
+where they are green because the tree is clean. The rule is stated here because
+the widening is the *parity instrument* rather than extra coverage — the pair is
+the only oracle whose corpus is **inert under a port**. `gate-tests` is a member
+of `GATE_PRUNE_DIRS` (§lib/gate.sh), so nothing inside a case dir is reachable
+from a live-tree walk, nothing there is a registry member, and no port can add or
+remove a file in one. A corpus carrying every arm that the port cannot move is
+exactly what criterion 4 says a self-referential port must design and does not
+say how to build (§The port-candidate criteria, criterion 4).
+
+Two properties make the widening worth its cost rather than ceremony. Its
+**planted violations are standing guards**: a `bad/` case whose only violation
+lives in an arm reds forever if an edit later drops that arm from the walk — for
+a gate-source auditor that is the difference between a caught regression and a
+family of gates quietly printing `clean` over a corpus it stopped reading. And a
+widened case tightens the crate-side read-set verification for free, because unit
+test A observes each member running over its own cases (§Meta-gate conservation
+for the binary substrate). The discipline that keeps the widening honest is the
+existing one, applied per arm: **the named reader of every arm is the case's own
+`expect.txt`** — an arm whose planted violation no `expect.txt` names has no
+reader and is removed rather than added.
+
 ### Self-lint
 
 Every script in the family — the consumer's gates and the kit's own `lib/`,
@@ -798,11 +828,11 @@ answering a question assertion C never asked.
 | `check-reads-couples` | **Retained, with a binary-side equivalent.** Its shell parser finds no walks in a binary gate and would print `clean` — the single worst vacuity available here — so the substrate answers instead of the parser: the binary carries a `--reads <name>` arm printing one line per walk root, a repo-relative path or `?`, and the gate consumes that report into its existing coverage assertion (§check-reads-couples). The declaration is **registry data held to executed behavior**, which is what separates it from the unbound self-declaration this gate exists to refuse: each gate's roots are declared beside its dispatch entry in the crate's registry (an entry added without them fails to compile), the crate's single sanctioned walk implementation records the roots it is invoked with, and two unit tests close the loop — **A**, every member run over its own `gate-tests/<name>/{good,bad}/` cases with recording on, observed roots a subset of declared; **B**, no module outside that walk implementation names a filesystem-walk API or vendors a walker, because a direct walk would be invisible to the recorder and unverify A. The precedent is the `check-knob-default-coupling` row below: an executed assertion is the answer where a static gate would be vacuous. The refusal survives only where the gate still cannot see — an absent or non-executable binary, and a non-zero `--reads` — and there is deliberately no descriptor-level opt-out, which the consumption path does not reinstate: a port ends this assertion by answering it (§check-reads-couples). |
 | `check-gate-assertions` | **Retained, corpus extended** to the gate's Rust module; the `# assertion` marker matches on its token, independent of the comment leader. |
 | `check-gate-exemption-tasks` | **Retained, corpus extended** the same way. |
-| `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: `canon-kit/lib/spec.sh`'s `spec_comment_surface_with_templates` gains `*.gate` **and `*.rs`** arms — the shared primitive, widened once (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. |
-| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared `spec_comment_surface` in `canon-kit/lib/spec.sh`; absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. Once the primitive gains the `.gate` and `*.rs` arms its own probe logic needs no change. |
+| `check-comment-tier` | **Retained, corpus extended** to the implementation module and the `.gate` descriptor, whose own lines are directives by construction. Mechanism: the shared primitive `comment_surface` carries `*.gate` **and `*.rs`** arms — widened once, for every caller (see the `check-spec-pointer` row). The implementation arm is the load-bearing one: locality-class directives stay in the implementation by the reader partition (§The `# graph:` manifest), so without it they would go dark exactly where they still apply. **This member is itself `.gate`-dispatched** since the seventh cohort, so it now audits its own declaration — which is why its trigger names `*.gate` and `*.rs` and why its fixture pair, not the live tree, is what proves those arms. |
+| `check-spec-pointer` | **Retained, and its corpus depends on the same widening** — not "unchanged" in mechanism, only in assertion logic. It calls the *same* shared primitive, `comment_surface` in `native/src/spec.rs` since the seventh cohort ported both it and all four of its callers (canon-kit/SPEC.md §lib/spec.sh); absent that one shared fix a ported gate's `# spec:` line would silently stop being checked in both places it can live — the descriptor and the implementation. With the primitive carrying the `.gate` and `*.rs` arms its own probe logic needs no change. |
 | `check-readme-roster` | **Retained, glob widened** to `*.sh` + `*.gate`. Without it a ported gate silently drops out of its kit README's roster in both directions. |
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
-| `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk `spec_comment_surface` hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. |
+| `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk the shared comment surface hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. Both are `.gate`-dispatched since the seventh cohort, on the same terms as the two rows above. |
 | `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. |
 | `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first cohort's descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent. Stated against the live ported set rather than the cohort that first raised it, since the binding condition is a property of the roster and moves with every cohort: the limit is unbound while no ported member carries an exemption list, and the three holders in the tree are all still shell. The cohort that ports one of them owes the Rust-source reader. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
@@ -814,6 +844,29 @@ answering a question assertion C never asked.
 | `check-measured-claim` | **Retained, and sensitive through its oracle rather than its corpus — the first born-native member to take a row.** What it scans is the governed-prose surface, so by corpus it is a reverse trigger like the row above. What makes it substrate-sensitive is the consumer oracle behind `CANON_KIT_MEASURED_CLAIMS_CMD`, which its `couples=` reaches through `scripts/*.sh`: this repo's emitter counts how much of the registry resolves to a `.gate` descriptor, so it reads declaration paths **as a set**, the shape `check-gate-binary-fresh` has. A port therefore *moves its value*, which is the mechanism working rather than a blind spot — the number a marked sentence states is about the port, and the sentence reddens when the port advances without it. The design that landed the gate predicted no row here, on the premise that its `couples=` named no declaration path; the emitter coupling the same design requires falsifies that premise, and the row is recorded rather than the coupling dropped, because dropping it would leave the oracle's own source outside the trigger set. **The row and criterion 4 are independent facts, and this is the case that proved it**: the criterion binds on a gate's assertion target, this gate's is the governed-prose surface, so it clears — while the transitive reach through its emitter is precisely what assertion C is shaped to see (§The port-candidate criteria, criterion 4). |
 | `check-spec-embedded-source` | **Survives unchanged — reverse trigger of the same shape.** Its `couples=` extension list (`*.rs`, `*.sh`, `*.toml`, …) is the roster of **languages it recognizes inside fenced blocks**, not a reference to gate declarations; its scanned corpus is the canonical specs and amendments. It already carries `*.rs`, so a ported gate's Rust module is inside its trigger set with no widening. |
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged** — their corpus is kit templates and the template registry, not gate declarations; a gate's substrate does not reach either. |
+
+**What *the auditor never depends on the substrate it audits* scopes to, ruled
+because a mechanical reading of it holds the wrong members.** Two rows above keep
+a gate on shell for that reason — `check-gate-substrate-parity` and
+`check-install-disposition` — and a selector applying the sentence to every gate
+that reads gate source would have held the whole `spec_comment_surface` family
+too, where the operator ruling did not. The distinction is exact rather than a
+judgment call. Those two adjudicate the **declaration and dispatch relation**:
+whether a gate declares itself, whether a descriptor and a subcommand agree. A
+compiled form of either could pass *itself* with a broken binary, and that is a
+**false green** — the one failure mode this table exists to prevent. A gate
+adjudicating **comment content** on governed sources has a different failure mode
+on a tree with no working binary: it is omitted from the registry and declared
+there (§The install disposition, §check-gate-binary-fresh), so what a consumer
+loses is *declared coverage*, never a silent pass. The rule is therefore: a gate
+whose assertion is about the dispatch mechanism stays shell; a gate that merely
+*reads* declaration paths as content may port, and pays criterion 4's price for
+the parity oracle instead. The residual that distinction leaves is real and is
+answered rather than absorbed — after such a port a corpus-walk regression
+silences those gates over the crate's own sources with no shell auditor left to
+see it, and the answer is the widened `bad/` fixture cases, which red on exactly
+that edit and which a consumer receives and can run without the crate
+(§Fixture-pair discipline).
 
 **The declared read set's honest limit, stated rather than discovered.** Unit test
 A's coverage is the fixture corpus. That is bounded by a contract rather than by
@@ -976,6 +1029,34 @@ design time; the last three were paid for, and each is named with what it cost.
    sources makes the parity proof self-referential: the corpus the
    cross-substrate comparison runs over is changed by the very port being
    compared.
+
+   **The discharge is the fixture corpus, and it is general rather than one
+   cohort's trick.** A member failing this criterion still ports; what it owes is
+   an oracle the port cannot invalidate, and the pair is the only corpus with that
+   property — `gate-tests` is pruned from every live-tree walk, so no port can add
+   or remove a file inside it (§Fixture-pair discipline, which owns the widening
+   rule and its `expect.txt` discipline). The condition is that the pair carry
+   **every arm of the derivation being ported**: a gate-source auditor whose cases
+   are all `.sh` proves the `.sh` branch and leaves the descriptor and
+   implementation branches resting on a live tree that is green because it is
+   clean. Widen first, then port — a port answering only the criterion's sentence
+   ships the hole the sentence was pointing at.
+
+   **The live-tree arm is demoted from proof to smoke for such a member, and the
+   demotion is recorded here so the next gate-source cohort inherits it.** Earlier
+   cohorts proved parity on the fixture pairs, the live tree and the edge roots and
+   treated the three as one oracle. For a member whose assertion target is gate
+   source the live-tree arm *cannot* be a proof: assertion A forbids a descriptor
+   and a script coexisting in one resolve dir, so the comparison necessarily runs
+   on the pre-descriptor tree — a corpus the port then changes, with no second
+   implementation left to notice a disagreement. The arm is retained, because it is
+   cheap and it finds real disagreements; its verdict is recorded as **no
+   disagreement found on the pre-descriptor tree**, never as *parity proved*. The
+   edge-root arm keeps its own separate value and the comment cohort is the worked
+   case: it disagreed, and the compiled side was the correct one — a `..` scan root
+   made the shell's kit-root prune compare an unnormalised file path against a
+   normalised root and prune nothing at all. A disagreement is a finding to
+   adjudicate against the rule, never a defect in whichever side moved.
 
    **This is not §Meta-gate conservation's *substrate-sensitive* set, and reading
    the two as one term is the defect this wording exists to close.** That set is
@@ -1145,6 +1226,31 @@ design time; the last three were paid for, and each is named with what it cost.
    profile-scoped limit reached through a different door, and it is what a cohort
    of `on-surface` members should expect to read: a zero here is a real
    measurement about `init`, never a claim that the members are free.
+
+   **And a cohort can grow it, which the comment cohort is the first to do — the
+   same instrument, the opposite reading, and the install disposition again what
+   explains the number.** Measured against the post-cohort registry from a clean
+   checkout of that cohort's own commit, the binary-less leg reports **ten**
+   omitted members where the two cohorts before it reported seven. The growth is
+   **three** against four ported members, and the missing fourth is not an
+   accounting error: `check-deprecation-task` is `on-surface`, so no `init` seeds
+   it and no artifact-free `init` can lose it, while its three `zero-config`
+   siblings are seeded and therefore lost. A cohort's growth is the count of its
+   **seeded** members rather than of its members — the same predicate that made the
+   lifecycle cohort's growth zero, read in the direction that grows.
+
+   The **judgment** that cohort's amendment owed is ruled **accept and declare**.
+   On an uncovered platform an adopter loses the governed comment surface
+   entirely — the comment tier, the pointer resolution and the `TODO(task:)`
+   liveness together — and receives that omission declared in its own `gates.list`
+   rather than as a broken battery. The two rivals are refused with cause:
+   restoring the class shell-side reinstates the exact duplication the cohort's
+   criterion-6 discharge deletes, which enforcement-first ranks below removal, and
+   a binary-gated declaration is what the omit path already is. The honest limit
+   rides with the ruling rather than behind it — this is a real subtraction for an
+   uncovered host, it lands because the 2026-08-09 directive ports the whole
+   corpus, and it shrinks as targets are published rather than being repaired by
+   the cohort that caused it.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives
@@ -1580,6 +1686,56 @@ shell defect this cohort found, is **dissolved rather than repaired**: the
 compiled member reaches no subprocess at that site, so the failure mode is absent
 by construction. Recorded so the port is not read as having silently dropped an
 assertion, and so nobody opens a repair against an absent file.
+
+**The seventh cohort is the `spec_comment_surface` family — four members on one
+corpus primitive, operator-ruled 2026-08-13 and delivered whole.**
+`check-comment-tier`, `check-spec-pointer`, `check-todo-task-liveness` and
+`check-deprecation-task` ship as descriptors dispatching to the binary; the four
+shell scripts they replace are deleted. It is the first cohort ruled **knowing it
+was design-then-port rather than cheap**: all four fail criterion 4 — they audit
+comment content on governed sources, and a governed source is what a gate
+declaration is — and that criterion's remedy is a designed answer rather than a
+waiver. The design is recorded where it generalises rather than here:
+§Fixture-pair discipline owns the widened-corpus rule and criterion 4 owns the
+discharge and the live-tree demotion that comes with it.
+
+**What the cohort paid, and it is the corpus rather than the rules.** The four
+members' `good/`+`bad/` pairs carried `.sh` and `.md` sources and nothing else,
+across all eight case dirs, while the primitive spans four arms — `*.sh`, the
+`*.gate` descriptor, `*.rs`, and the workflow directory's tracked tier. The
+parity instrument therefore covered **one arm in four**, and the three it missed
+were precisely the three that make criterion 4 bind. Widening the pairs came
+first and the port second; the same vacuity shape this section already recorded
+once — *"a ported member's pair would therefore have gone green over an arm with
+no implementation"* — is what it was bought against.
+
+**Criterion 6 is discharged in its strongest form, and this is the cohort that
+empties a primitive.** `spec_comment_surface`, its `_with_templates` twin, the
+whitelist predicate and `spec_queue_slugs` had exactly these four members as
+their callers, so the shell forms are **deleted rather than duplicated** — the
+duplication is absent rather than machine-held, the same disposition the config
+bridge earned and for the same reason. That is the opposite verdict the same
+criterion earns on a library with live consumers, and both are recorded so
+neither reads as the general rule (canon-kit/SPEC.md §lib/spec.sh states the
+price: three documented names a consumer's own gate could have called, answered
+by shadowing the gate). `check-spec-pointer`'s criterion-6 hold is discharged by
+that removal; `spec_manifest_files` stays dual, because members outside this
+family still call it, which is the pre-existing duplication the canon-kit cohort
+accepted and this one does not re-open.
+
+**A trigger gap the earlier widening left behind is repaired in the same unit.**
+The primitive gained its `*.gate` and `*.rs` arms when the conservation contract
+landed and **no member's `couples=` followed it**: against this tree that left
+every descriptor and every crate implementation source inside the corpus and
+outside the trigger, so staging an edit to a ported gate's descriptor or module
+re-ran none of the four gates that read it — and the port makes it worse in the
+one way that matters, by moving the four members' own declarations into that
+class. All four manifests gain `*.gate` and `*.rs`, and two spellings widen from
+`.workflow/*.txt` to `.workflow/*`. Both added tokens are **bare globs**: a token
+naming this repo's crate directory would publish one consumer's layout into a kit
+file and be false for every other (CLAUDE.md §The provenance seam), where the
+bare glob matches the corpus derivation exactly and over-selection in a
+trigger-shaped set is cheap by design.
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -4548,8 +4704,10 @@ redefine it could redefine it back into the fail-open this closes.
 
 **The honest cost, stated with its size: eight independent holders now carry
 that predicate and no gate enforces their agreement** — `queue_live_slugs` and
-`queue_roadmap_entries` (queue-kit/lib/queue.sh), `spec_queue_slugs`
-(canon-kit/lib/spec.sh), the inline scans in queue-kit's `check-task-names` and
+`queue_roadmap_entries` (queue-kit/lib/queue.sh), `queue_slugs`
+(native/src/spec.rs — canon-kit's holder, which moved substrate with the seventh
+cohort and is deliberately not pointed at the crate's own queue module, since one
+shared function would end the arrangement this count prices), the inline scans in queue-kit's `check-task-names` and
 `check-queue-entry-budget`, `bin/queue-index.sh` (which carries it twice, in the
 `--extent` and `--icebox-candidates` walks), the section-pool builder inside
 drift-kit's `kpi-queue-net-delta`, and this gate. Only the public
