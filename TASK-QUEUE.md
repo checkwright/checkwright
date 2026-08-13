@@ -12,52 +12,13 @@
 
 ## New Features
 
-
-
-## Technical Debt
-
-- **spent-ruling-retirement** — TRAJECTORY.md carries two rulings annotated as discharged
-  where its own contract says deleted, and the deletion has an inbound half nothing catches.
-  **Ruled in 2026-08-13 by the operator.** Debt by the new-names litmus: it converges the
-  record on the contract TRAJECTORY.md §How to read a ruling recorded here already states —
-  *"a ruling whose subject is finished is deleted outright. Not distilled to a line, and not
-  annotated as finished"* — and adds no name to any governed surface.
-  **The two, and both subjects verified landed at scope rather than taken on the annotation's
-  word.** The cohort-hold relabel, whose relabel is on `gate-sdk/SPEC.md`; and the
-  fifth-cohort ERE-trio ruling, whose three members each carry a `.gate` descriptor in
-  `canon-kit/checks/` (`bash gate-sdk/bin/port-blockers.sh` is the oracle). Retirement is
-  **not reversal** and is session-class by that same section, so nothing here is
-  operator-class — what the ruling above settled is that the work is worth an iteration slot,
-  not that a session may retire.
-  **The inbound half is the work, and it is why this is not a two-line deletion.**
-  A retirement's blast radius is derived, never rostered, so the deliverable greps for the
-  retired rulings' own citations. One is already known: `gate-sdk/SPEC.md` cites
-  `(operator-ruled 2026-08-12, TRAJECTORY.md §The closed rulings)`, a pointer at a
-  **surviving section** that stops carrying the claim once the ruling inside it goes — so it
-  resolves, `check-spec-pointer` stays green, and no gate sees the staleness. Two properties
-  of the grep are stated on that same section and bind here: `docs/` is a generated mirror,
-  so every kit-SPEC citation appears twice and only the source is editable; and a citation
-  naming a surviving section resolves anyway, which is the whole exposure.
-  **Adjacent, not duplicated:** `ruling-record-condition-staleness-probe` designs the *probe*
-  for this class and owns the inbound half's design. This is the live instance to clean, and
-  cleaning it neither builds that probe nor discharges that entry.
-  **Definition of done:** both rulings deleted, every inbound citation of either repaired at
-  its source, the docs mirror regenerated rather than hand-edited, battery green.
-  Surfaced 2026-08-13 at scope, from the ritual read of the ruling record; filed to the gap
-  inbox in the same session and promoted here on the operator's ruling.
-
-## Deferred
-
-
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability] —
-  the whole battery onto the binary, and the shell surface down to its residue.
+- **native-gate-port-remaining-corpus** [spec: SPEC-lifecycle-cohort.md] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  **The ERE cohort landed 2026-08-13 at build** — `check-install-claim`,
-  `check-payload-claim`, `check-manifest-temporal` — paying the POSIX ERE matcher once for the
-  members that owed it; the engine, its refusals, its differential oracle, the declined
-  alternatives and the two premises it corrected are canonical at gate-sdk/SPEC.md §The POSIX
-  ERE matcher. The entry returns here on
+  **The sixth cohort is lifecycle-kit as a near-whole kit** — ten members on the `lib/stages.sh`
+  derivation, `check-stage-entry` held on the associative-array bridge, `check-close-surfaces`
+  out rather than held. Operator-ruled 2026-08-13 and not to be widened; the design is
+  `gate-sdk/SPEC-lifecycle-cohort.md`. The entry returns to the deferred section on
   completion rather than to `## Done`: this entry is the **whole corpus**, 77 of 103 registered
   gates remain unported, and a Done move would assert a finished port and silently drop it from
   the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
@@ -98,7 +59,117 @@
   Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
   direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
   demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
-  2026-08-13 at build for the kit-roots cohort, and again for the ERE cohort.
+  2026-08-13 at build for the kit-roots cohort, and again for the ERE cohort; re-promoted
+  2026-08-13 at spec for the lifecycle-kit cohort.
+
+- **guard-glyph-match-context-blind** [spec: SPEC-guard-context-matching.md] — the guard matches
+  its trigger glyphs inside quoted and heredoc bodies, so writing *about* the guard is refused.
+  recurrence: guard-glyph-match-context-blind 2026-08-13
+  `scripts/bash-guard.sh` tests the whole command string, so a `$(...)`, a brace expansion or the
+  repo-root absolute path appearing inside a **heredoc body** — journal prose, a queue entry
+  being appended, a commit message — trips the same refusal as the executable form. The refusal
+  is correct about the glyph and wrong about the command.
+  **Measured at filing:** 8 refusals in roughly 25 bash calls. Two of the 8 were this class
+  (prose inside a heredoc, once for a brace glyph and once for an absolute path quoted while
+  describing an earlier refusal).
+  **Why it needed design:** quote- and heredoc-aware matching in a PreToolUse hook is a shell
+  parser, and the cheap approximations are wrong in both directions — skipping everything after a
+  `<<` opener blinds the guard to real commands in a heredoc-bearing call, while matching only
+  outside single quotes still refuses a double-quoted mention. Both are answered by
+  `guard-kit/SPEC-guard-context-matching.md`'s normalizer, which marks a heredoc **body extent**
+  inert and leaves the rest of the call live.
+  **Cost while deferred:** a round trip per refusal on every session that documents its own
+  tooling, and it lands hardest on the sessions writing the queue and the journals. The wider
+  cost is the one the SWOT names: false positives on a blocking guard are the mechanism by which
+  enforcement converts into bypass and distrust.
+  Filed 2026-08-08 at scope on the lead's ruling, from that session's own refusal count. It
+  duplicates neither `guard-command-prefix-wrapper` (transparent prefixes) nor
+  `exit-echo-decoration-guard-vs-habit` (decoration on an allowlisted command), though it shares
+  one amendment with the second — one root, so one design.
+  **2026-08-13 widens the shape past "a string never going to be executed", and that widening
+  raises the cost rather than restating it.** A *working* command — a double-quoted POSIX regex
+  quantifier in a grep pattern — trips the same brace-expansion block: re-probed at the drain
+  against `scripts/bash-guard.sh` itself, the double-quoted form exits 2 and the single-quoted
+  respelling auto-allows. Same mechanism the design note already names (`guard_rule_brace_glyph`
+  strips only single-quoted spans before matching), but a quantifier in a live command cannot be
+  avoided by writing the sentence differently, so the deferred cost is no longer bounded by
+  sessions that document their own tooling.
+  **Widened again 2026-08-13 at spec, from running the guard rather than reading it.**
+  `guard_rule_abs_prefix` strips **nothing at all** — it greps the raw command — so for the
+  absolute-path third of this entry the single-quote respelling escape does not exist either. A
+  `printf` that only echoes prose, with the path single-quoted and never executed, is blocked;
+  reproduced live. Four other rules also match the raw string, and the file carries five
+  incompatible stripping dialects with no gate holding them in agreement.
+
+- **exit-echo-decoration-guard-vs-habit** [spec: SPEC-guard-context-matching.md] — the guard
+  blocks or fails to grant benign read-only decoration on an otherwise allowlisted command.
+  recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06 2026-08-13
+  Stage sessions join independent read-only calls — `grep`, `find`, `cat`, `ls`, `echo`, git
+  subcommands — into one multi-statement `Bash` call, or pipe an allowlisted script into a
+  reducer, and the whole probe either falls off the allowlist match path or meets a guard block.
+  Both resolve to guard-kit design; the amendment is `guard-kit/SPEC-guard-context-matching.md`.
+  **Three of this entry's original grounds were falsified at spec, by running the guard rather
+  than reading it, and are corrected here rather than annotated.** `sort` **is** in
+  `GUARD_KIT_RO_BINS`' default roster and has been since before the friction-kit rename, so
+  `find … | sort` auto-allows today and only the `xargs` half of the second-contributor claim
+  stands. A newline-joined compound **is** segmented — `guard_split_compound` emits lines and
+  every consumer reads lines, so a pre-existing newline is already a boundary — and the
+  grep/find/cat/ls blob class is therefore substantially resolved already. And `$?` is **not**
+  matched by the expansion rule's pattern, so the `; echo EXIT:$?` shape falls through silently
+  and the triage argument built on it does not hold.
+  **The sizing moved with them.** `bash guard-kit/bin/scan-prompts.sh` at spec reports 23
+  prompting calls across 15 patterns from 111 logged fall-throughs, against this entry's
+  2026-08-06 headline of roughly 78 of 106 with read blobs dominant. The read-blob class is
+  absent from the current profile.
+  **What survives is a different failure mode, and it is the live one.** The spec session met
+  the guard four times in one session and every one was a **guard block on a benign command**,
+  not a harness prompt — including `bash guard-kit/bin/scan-prompts.sh | head`, an allowlisted
+  script decorated only by a read-only reduction of its own output. The residue the amendment
+  addresses is exactly three things: `xargs` absent from the roster, the read-only pipeline rule
+  lacking the banner tolerance its two neighbours have, and that rule's lead predicate admitting
+  only a roster binary where a bare committed allow entry is equally reviewed.
+  **Cost while deferred:** paid once per refusal on exactly the read-heavy stages the delegation
+  doctrine wants cheap, and it is now a *blocking* cost rather than a prompting one, which is the
+  bypass-and-distrust direction rather than the round-trip one.
+  Filed 2026-07-25 by close, operator-reported; iceboxed 2026-08-05; evicted back to Deferred
+  2026-08-06 by close on attested recurrence (queue-kit/SPEC.md §The icebox tier); grounds
+  corrected and re-sized 2026-08-13 at spec.
+
+## Technical Debt
+
+- **spent-ruling-retirement** — TRAJECTORY.md carries two rulings annotated as discharged
+  where its own contract says deleted, and the deletion has an inbound half nothing catches.
+  **Ruled in 2026-08-13 by the operator.** Debt by the new-names litmus: it converges the
+  record on the contract TRAJECTORY.md §How to read a ruling recorded here already states —
+  *"a ruling whose subject is finished is deleted outright. Not distilled to a line, and not
+  annotated as finished"* — and adds no name to any governed surface.
+  **The two, and both subjects verified landed at scope rather than taken on the annotation's
+  word.** The cohort-hold relabel, whose relabel is on `gate-sdk/SPEC.md`; and the
+  fifth-cohort ERE-trio ruling, whose three members each carry a `.gate` descriptor in
+  `canon-kit/checks/` (`bash gate-sdk/bin/port-blockers.sh` is the oracle). Retirement is
+  **not reversal** and is session-class by that same section, so nothing here is
+  operator-class — what the ruling above settled is that the work is worth an iteration slot,
+  not that a session may retire.
+  **The inbound half is the work, and it is why this is not a two-line deletion.**
+  A retirement's blast radius is derived, never rostered, so the deliverable greps for the
+  retired rulings' own citations. One is already known: `gate-sdk/SPEC.md` cites
+  `(operator-ruled 2026-08-12, TRAJECTORY.md §The closed rulings)`, a pointer at a
+  **surviving section** that stops carrying the claim once the ruling inside it goes — so it
+  resolves, `check-spec-pointer` stays green, and no gate sees the staleness. Two properties
+  of the grep are stated on that same section and bind here: `docs/` is a generated mirror,
+  so every kit-SPEC citation appears twice and only the source is editable; and a citation
+  naming a surviving section resolves anyway, which is the whole exposure.
+  **Adjacent, not duplicated:** `ruling-record-condition-staleness-probe` designs the *probe*
+  for this class and owns the inbound half's design. This is the live instance to clean, and
+  cleaning it neither builds that probe nor discharges that entry.
+  **Definition of done:** both rulings deleted, every inbound citation of either repaired at
+  its source, the docs mirror regenerated rather than hand-edited, battery green.
+  Surfaced 2026-08-13 at scope, from the ritual read of the ruling record; filed to the gap
+  inbox in the same session and promoted here on the operator's ruling.
+
+## Deferred
+
+
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -3218,39 +3289,6 @@
   Filed 2026-08-06 by close from the gap inbox; both instances reached `## Done`, so the class is
   all that survives.
 
-- **exit-echo-decoration-guard-vs-habit** [design-pending] — an agent chains otherwise
-  allowlisted read-only commands into one probe, and the whole probe prompts.
-  recurrence: exit-echo-decoration-guard-vs-habit 2026-08-06 2026-08-13
-  Stage sessions join independent read-only calls — `grep`, `find`, `cat`, `ls`, `echo`, git
-  subcommands — into one multi-statement `Bash` call, which resolves to no single allowlist
-  glob and prompts every time; the trailing `; echo EXIT:$?` decoration is one shape of the
-  same root. The `$?` is a shell *expansion*, and bash-guard's own banner states no allowlist
-  entry can suppress an expansion, so guard-kit/SPEC.md §The triage criterion **cannot**
-  resolve this to (a) allowlist. It resolves to either a **guard steer** that recognises the
-  benign shape and rewrites toward the per-statement form, or a **habit change** for stage
-  sessions. Both are guard-kit design decisions.
-  **Evicted to the icebox 2026-08-05, recurred 2026-08-06 at dominant scale**, which is the
-  icebox tier's own re-entry condition. `scan-prompts.sh` ranked 20 `grep`, 18 `find`, 9
-  `cat`, 8 `ls`, 4 `echo` and a long tail of single leading tokens as prompting — roughly 78
-  of this iteration's 106 prompting calls. The majority were verified by inspection to be
-  several statements joined by a **literal newline**, never by `;` or `&&`, which is the only
-  separator `guard_split_compound` segments on: every statement would match a glob alone, and
-  the blob matches nothing.
-  **Second contributor, newly identified:** correctly piped diagnostics fail too —
-  `find … | xargs …` and `find … | sort` segment fine but `xargs` and `sort` are absent from
-  `GUARD_KIT_RO_BINS`' default roster, and nothing grants a bare `find` or `xargs`. So the
-  fix has at least two independent halves, which is new information the icebox line could not
-  carry.
-  **Why `[design-pending]`:** a steer has to recognise the benign multi-statement shape
-  without widening the expansion-suppression hole the banner warns about, and the choice
-  between a narrowly-shaped steer and a documented habit change is the design.
-  **Cost while deferred:** the dominant prompting pattern in two consecutive iterations, paid
-  once per call on exactly the read-heavy stages the delegation doctrine wants cheap. No gate
-  reds and nothing degrades, which is why it iceboxed the first time — but the carry is no
-  longer low.
-  Filed 2026-07-25 by close, operator-reported; iceboxed 2026-08-05; evicted back to Deferred
-  2026-08-06 by close on attested recurrence (queue-kit/SPEC.md §The icebox tier).
-
 - **scan-prompts-truncation-quote-desync** [design-pending] — the friction log's own truncation
   can make `scan-prompts` misreport an already-allowlisted command as prompting.
   `guard_log_fallthrough`'s 500-character log truncation can land inside an unclosed
@@ -3851,38 +3889,6 @@
   rather than this resolver.
   Filed 2026-08-08 at scope on the lead's ruling, from running the report during its own survey.
 
-- **guard-glyph-match-context-blind** [design-pending] — the guard matches its trigger glyphs
-  inside quoted and heredoc bodies, so writing *about* the guard is refused by it.
-  recurrence: guard-glyph-match-context-blind 2026-08-13
-  `scripts/bash-guard.sh` tests the whole command string, so a `$(...)`, a brace expansion or the
-  repo-root absolute path appearing inside a **heredoc body** — journal prose, a queue entry
-  being appended, a commit message — trips the same refusal as the executable form. The refusal
-  is correct about the glyph and wrong about the command.
-  **Measured this session, which is the whole of why it is filed rather than felt:** 8 refusals
-  in roughly 25 bash calls. Two of the 8 were this class (prose inside a heredoc, once for a
-  brace glyph and once for an absolute path quoted while describing an earlier refusal); two more
-  were `exit-echo-decoration-guard-vs-habit` firing twice in one session.
-  **Why `[design-pending]`:** quote- and heredoc-aware matching in a PreToolUse hook is a shell
-  parser, and the cheap approximations are wrong in both directions — skipping everything after a
-  `<<` opener blinds the guard to real commands in a heredoc-bearing call, while matching only
-  outside single quotes still refuses a double-quoted mention.
-  **Cost while deferred:** a round trip per refusal on every session that documents its own
-  tooling, and it lands hardest on the sessions writing the queue and the journals. The wider
-  cost is the one the SWOT names: false positives on a blocking guard are the mechanism by which
-  enforcement converts into bypass and distrust.
-  Filed 2026-08-08 at scope on the lead's ruling, from this session's own refusal count. It
-  duplicates neither `guard-command-prefix-wrapper` (transparent prefixes, measured at ~32% of
-  prompting calls) nor `exit-echo-decoration-guard-vs-habit` (decoration on an allowlisted
-  command).
-  **2026-08-13 widens the shape past "a string never going to be executed", and that widening
-  raises the cost rather than restating it.** A *working* command — a double-quoted POSIX regex
-  quantifier in a grep pattern — trips the same brace-expansion block: re-probed at the drain
-  against `scripts/bash-guard.sh` itself, the double-quoted form exits 2 and the single-quoted
-  respelling auto-allows. Same mechanism the design note already names (`guard_rule_brace_glyph`
-  strips only single-quoted spans before matching), but a quantifier in a live command cannot be
-  avoided by writing the sentence differently, so the deferred cost is no longer bounded by
-  sessions that document their own tooling.
-
 - **audit-class-corpus-attestation** [design-pending] — an un-gateable-class audit stamps a
   **verdict**, not the corpus it read, so a false negative is indistinguishable from a clean tree.
   `.workflow/audit-roster.txt` rows carry `due:` and `last:` and nothing else, so the close that
@@ -4466,6 +4472,12 @@
   bracket-escapes every knob element to a literal.
   **`check-spec-pointer` owes the `spec_comment_surface` family** — held 2026-08-12 at spec on
   criterion 6, as the only member calling both of canon-kit's corpus primitives.
+  **The associative-array bridge is ONE prerequisite shared by two members in two kits** — a
+  shape no per-member line expresses. `check-stage-entry` (lifecycle-kit) and
+  `check-evidence-baseline` (evidence-kit) each read a `declare -A` knob **by key**, and the
+  bridge's wire carries elements with no key channel. Both wait on that one wire-format change
+  and owe nothing else, so a selector reaching either kit finds one prerequisite rather than
+  re-deriving it twice. Held 2026-08-13 at spec with the sixth cohort.
   **The cohort prescribed here is NOT clean, corrected 2026-08-12 at scope:** all four members —
   it, `check-comment-tier`, `check-deprecation-task`, `check-todo-task-liveness` — also fail
   **criterion 4**, since the primitive's set spans `*.rs` (canon-kit/SPEC.md §lib/spec.sh) and so
