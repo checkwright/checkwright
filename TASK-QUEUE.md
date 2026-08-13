@@ -1129,13 +1129,22 @@
 - **gap-bullet-premise-verification** [design-pending] — a gap-inbox bullet
   asserts mechanism under no verification bar, and a false one is paid by
   whoever drains it.
-  recurrence: gap-bullet-premise-verification 2026-08-07
+  recurrence: gap-bullet-premise-verification 2026-08-07 2026-08-13
   Two of the three bullets re-verified at this boundary were
   false at their central claim, both filed by the same close: one asserted the
   npm approval environment did not gate the `v0.18.0` publish (it gated — the
   deployment held 77 seconds and an approval is recorded), the other that
   `check-graph` prints no regeneration command on a red verdict (it prints both,
   with resolved knob paths). Each was falsified by a single command.
+  **Third instance, 2026-08-13, and the first that argues for the cheap fix.** One bullet
+  carried two false premises at once: an inferred mechanism — that auto mode drops a
+  verb-scoped allow rule — read off a category description instead of the enumeration
+  under it, and a motivating symptom, that a breadth finding re-reports at every close,
+  which four probes at the drain contradicted. The inference was caught by the filer
+  re-reading the source before the drain; the symptom was not, and only the draining
+  session's probes found it. That split is evidence for the candidate shape this entry
+  already calls the one to beat: the failure mode is not filers who never check, it is
+  that nothing *asks*, and the step that reliably ran was the drain.
   **Why this is not `close-generated-finding-route`'s ground.** That entry owns
   *when* a close-generated finding gets drained; this one owns whether its
   factual claims were ever checked. A correctly-routed bullet carrying a false
@@ -5124,6 +5133,90 @@
   **Cost while deferred:** every run of that rostered audit re-derives the same fork over the
   same two libraries, and two auditors can reach opposite verdicts on identical prose.
   Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it.
+
+- **settings-allow-intended-breadth-declaration** [design-pending] — `compare-settings-allow`
+  offers the operator two dispositions and ships a mechanism for one.
+  guard-kit/SPEC.md §compare-settings-allow states the pair — narrow the glob, **or record
+  that the breadth is intended** — but only narrowing is expressible, so a glob ruled intended
+  re-reports at every close and the ruling survives only in a session's memory or a commit
+  message, the surface spec-over-precedent says is not ground truth.
+  **Deliverable:** an intended-breadth declaration knob beside `GUARD_KIT_BREADTH_PROBES`
+  (guard-kit/SPEC.md §Layout and configuration), default empty, so a declared glob prints as
+  declared rather than as a finding. Consumer config, never a kit literal — every string
+  naming a command is the consumer's vocabulary (CLAUDE.md §The provenance seam), the seam
+  that already makes the probe set config. Cost: one knob, one branch in
+  `bin/compare-settings-allow.sh`, one bespoke unit-test case; the tool is advisory rather
+  than a gate, so no fixture pair is owed.
+  **The motivating instance is gone; the gap is not.** The filing bullet described a standing
+  finding over two broad globs. Four probes at the drain say otherwise as of 2026-08-13: the
+  local overlay carries neither `Bash(git *)` nor `Bash(git checkout *)`, the breadth section
+  prints no over-broad entries, `permissions.defaultMode` is already `auto` in the *user*
+  settings file with no git allow entries there, and both settings files were written minutes
+  after the bullet was filed. Nothing re-reports today, so this is filed on the general gap —
+  a stated disposition no mechanism can express — and not on the instance.
+  **The operator question this asks and does not answer.** The 2026-08-13 ruling that those
+  globs are intended stands; nothing here reverses, demotes or re-scopes it, which is
+  operator-class (TRAJECTORY.md §How to read a ruling recorded here). Two corrections are
+  recorded for the operator's re-judgment, both read off the vendor permission-modes page
+  rather than inferred from it. First, the ruling's stated premise — fewer blocking prompts is
+  the point — does not survive that page: auto mode removes routine prompts via a classifier,
+  becomes the default for new Pro, Max and Team sessions on 2026-08-14, and must live in the
+  user settings file, since v2.1.142 and later ignore `auto` from a repository's own settings.
+  Second, the correction runs the *other* way from the one first drafted: the dropped-on-entry
+  set enumerates blanket `Bash(*)`, wildcarded interpreters, package-manager run commands and
+  `Agent` rules, a verb-scoped `Bash(git *)` is in none of them, and an allow match
+  short-circuits the classifier outright — so a surviving broad rule *saves* model calls rather
+  than buying nothing. The page settles that enumeration and not the boundary: its narrow-rule
+  example is the literal `Bash(npm test)`, leaving a wildcarded verb rule between the two
+  examples and unruled. The case for narrowing is therefore **security alone** — keeping
+  `reset --hard`, `clean`, `push --force` and bare `checkout --` out of blanket approval.
+  **Why `[design-pending]`:** the ruling decides whether the knob is built at all — reaffirm
+  the breadth and the declaration is a stated disposition's missing half, narrow it and there
+  is nothing to declare. Two shape questions ride behind it: whether a declaration reaches the
+  committed settings file as well as the local overlay, a policy question about the consumer's
+  own file and the same fork `path-pinned-allow-entry-oracle` is stuck on; and whether it is a
+  bare glob list or a glob-plus-reason pair, since a bare list re-loses at the next close the
+  reason it exists to keep.
+  **Cost while deferred:** zero in reports, non-zero in attention. With the instance gone
+  nothing re-prints, so the carry is that the next intended-broad glob reproduces the whole
+  cycle — close finding, escalation, operator ruling, nowhere to put it — the cycle this
+  filing just paid for once.
+  Filed 2026-08-13 by close from its own gap-inbox drain; the instance-vs-gap split and both
+  premise corrections are the drain's.
+
+- **bash-guard-auto-mode-rationale** [design-pending] — the guard's messages assert a
+  consequence the harness no longer produces. Its steering messages say a decorated command
+  "forces a permission prompt no allowlist entry suppresses"; under auto mode a decorated
+  command does not prompt, it routes to a classifier model.
+  **The mechanism, verified at this drain against the vendor permission-modes page** rather
+  than inferred from it: the decision order is (1) an allow, ask or deny match resolves
+  immediately, (2) read-only actions and working-directory edits auto-approve, (3) everything
+  else goes to the classifier. A match short-circuits the classifier entirely — no model call
+  — with writes to protected paths the sole exception, which route to the classifier even on
+  a match.
+  **The guard still earns its keep, for a reason other than the one it states.** Steering a
+  command into its bare allowlisted form keeps it at step 1 rather than step 3, which is
+  cheaper in latency and tokens and needs no peer model. A second rationale is untouched by
+  any of this: the tool-hygiene rules — Read over `cat`/`sed`, the repo scratch dir over
+  `/tmp` — hold in every permission mode, and they are why the guard is not merely a
+  prompt-avoidance device.
+  **Deliverable, three parts:** re-word the messages that name a prompt as the consequence;
+  decide whether the serialization cost is still worth paying now that the consequence is a
+  model call rather than a block; and re-derive which allowlist entries are worth keeping,
+  given that it is the match that buys the short-circuit. Cost: prose in guard-kit's message
+  set plus its decision-table cases; no new gate, and the guard's mechanism is unchanged.
+  **Why `[design-pending]`:** only the first part is an edit, and even it has a hard
+  constraint — a session may run in any permission mode, so a message re-pinned to auto is as
+  wrong as the one it replaces, and the wording must be true under all modes without naming
+  one. The second part is an economics call over a cost this repo does not currently measure.
+  The third changes what the repo grants, which is the operator-intent surface
+  `settings-allow-intended-breadth-declaration` turns on, so it sequences after that entry's
+  breadth ruling.
+  **Cost while deferred:** paid per firing by every session the guard steers, and rising —
+  auto mode becomes the default for new Pro, Max and Team sessions on 2026-08-14, so the
+  stated rationale is wrong for the mode most readers will be in. Non-rotting otherwise:
+  nothing in the tree degrades while it sits, and the guard keeps working throughout.
+  Filed 2026-08-13 by close from its own gap-inbox drain.
 
 ## Icebox
 
