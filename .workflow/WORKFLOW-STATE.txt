@@ -4,11 +4,4 @@
 
 ---
 
-port-oracles-and-kit-roots scope adaf2805 2026-08-12
-port-oracles-and-kit-roots spec a430dde0 2026-08-12
-port-oracles-and-kit-roots spec a42c8bc6 2026-08-12
-port-oracles-and-kit-roots align ae209bf1 2026-08-12
-port-oracles-and-kit-roots build a28ba9de 2026-08-12
-port-oracles-and-kit-roots validate adc3e151 2026-08-13
-port-oracles-and-kit-roots close ab90980c 2026-08-13
-port-oracles-and-kit-roots close a736f8d2 2026-08-13
+— scope a93e0da2 2026-08-13
