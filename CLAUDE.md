@@ -30,9 +30,8 @@ and the touched kit's fixture suite:
 bash gate-sdk/bin/run-gates.sh   # full battery
 ```
 
-The per-kit fixture-runner battery — one `run-gate-tests.sh` line per kit, the
-consumer-gate fixtures, the guard-kit decision table — lives in
-[README.md](README.md) §This repo, governed.
+The per-kit fixture-runner battery lives in [README.md](README.md) §This repo,
+governed.
 
 The git index is shared with any concurrent session: check `git status` for a
 foreign staged path before `git add`, or stage and commit in one motion.
@@ -102,9 +101,6 @@ an engineering-craft section behind the link:
 <!-- doctrine-kit:end -->
 
 ## Conventions established in gate-sdk (keep every kit consistent)
-
-One-line rule per convention; mechanism, knob rosters, and default values
-live in the owning SPEC section — cited, never restated.
 
 - **Registry, not array:** gates register by name in `gates.list`, resolving consumer-first with kit shadowing — resolution order and the kit-dirs knob: gate-sdk/SPEC.md §Layout and configuration.
 - **Config via env:** every kit takes `<KIT>_<KNOB>` with this repo's layout as the defaults; each kit's SPEC owns its knob roster and values.
