@@ -13,11 +13,30 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 1
 
 usage() {
-    printf 'usage: %s "<gap prose>"\n' "$(basename "$0")" >&2
+    printf 'usage: %s [-h|--help] [--] "<gap prose>"\n' "$(basename "$0")"
+    printf '  appends one dated bullet to %s; "--" files prose beginning with "-"\n' \
+        "$LIFECYCLE_KIT_GAP_INBOX_FILE"
 }
 
-if [[ $# -ne 1 || -z "${1:-}" ]]; then
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — free-text positionals validate shape, not only arity: help is stdout at exit 0, an unrecognized leading '-' is refused, '--' ends option processing
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     usage
+    exit 0
+fi
+if [[ "${1:-}" == "--" ]]; then
+    shift
+else
+    for _fg_arg in "$@"; do
+        [[ "$_fg_arg" == -* ]] || continue
+        printf '%s: unrecognized option: %s — prose beginning with "-" is filed after a "--" separator\n' \
+            "$(basename "$0")" "$_fg_arg" >&2
+        usage >&2
+        exit 2
+    done
+fi
+
+if [[ $# -ne 1 || -z "${1:-}" ]]; then
+    usage >&2
     exit 2
 fi
 

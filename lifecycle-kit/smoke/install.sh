@@ -183,6 +183,48 @@ fi
 cmp -s "$es/s.before" "$ess" || { echo "smoke(enter-stage): --simulate wrote state" >&2; exit 1; }
 cmp -s "$es/q.before" "$esq" || { echo "smoke(enter-stage): --simulate wrote queue" >&2; exit 1; }
 
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — behavioral coverage, one member at a time: help on stdout at exit 0, an unrecognized leading '-' refused on stderr at exit 2, and the capture members' durable surface byte-unchanged after both (a test reading exit codes alone passes the bug)
+av="$es/argv"; mkdir -p "$av"
+printf '# contract: seeded\n- 2026-01-01 — a real bullet\n' > "$av/inbox.md"
+printf '# contract: seeded\n\n## 2026-01-01 scope — a seeded survey\n- corpus: x\n- oracle: y\n- rev: z\n- finding: w\n' > "$av/record.md"
+cp "$av/inbox.md" "$av/inbox.before"; cp "$av/record.md" "$av/record.before"
+
+av_run() {
+    local tool="$1"; shift
+    env LIFECYCLE_KIT_GAP_INBOX_FILE="$av/inbox.md" \
+        LIFECYCLE_KIT_SURVEY_RECORD_FILE="$av/record.md" \
+        bash "$SMOKE_KIT_ROOT/bin/$tool" "$@"
+}
+
+for t in file-gap.sh file-survey.sh cite-survey.sh enter-stage.sh; do
+    out="$(av_run "$t" --help 2>/dev/null)" \
+        || { echo "smoke(argv): $t --help should exit 0" >&2; exit 1; }
+    grep -q '^usage: ' <<<"$out" \
+        || { echo "smoke(argv): $t --help wrote no usage to stdout: $out" >&2; exit 1; }
+    out="$(av_run "$t" -h 2>/dev/null)" || { echo "smoke(argv): $t -h should exit 0" >&2; exit 1; }
+    grep -q '^usage: ' <<<"$out" || { echo "smoke(argv): $t -h wrote no usage to stdout" >&2; exit 1; }
+done
+
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — enter-stage is exempt from the refusal half (its positionals are membership-validated), the three free-text members are not; file-survey.sh's refusal scans every positional because four slots make arity no protection
+for t in file-gap.sh file-survey.sh cite-survey.sh; do
+    rc=0; av_run "$t" --list >/dev/null 2>&1 || rc=$?
+    [[ "$rc" -eq 2 ]] || { echo "smoke(argv): $t refused --list with exit $rc, want 2" >&2; exit 1; }
+    so="$(av_run "$t" --list 2>/dev/null)" || true
+    [[ -z "$so" ]] || { echo "smoke(argv): $t wrote usage to stdout on a refusal: $so" >&2; exit 1; }
+done
+rc=0; av_run file-survey.sh q c o --finding >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 2 ]] || { echo "smoke(argv): file-survey.sh took a flag in its fourth slot (exit $rc)" >&2; exit 1; }
+
+cmp -s "$av/inbox.before" "$av/inbox.md" \
+    || { echo "smoke(argv): file-gap.sh wrote the gap inbox on a help or refusal path" >&2; exit 1; }
+cmp -s "$av/record.before" "$av/record.md" \
+    || { echo "smoke(argv): file-survey.sh wrote the survey record on a help or refusal path" >&2; exit 1; }
+
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — '--' ends option processing, so the refusal never makes a legitimate filing unfileable
+av_run file-gap.sh -- "--list is captured at exit 0" >/dev/null
+grep -q -- '— --list is captured at exit 0$' "$av/inbox.md" \
+    || { echo "smoke(argv): file-gap.sh -- did not file prose beginning with a dash" >&2; exit 1; }
+
 # spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — exercise the injector + check-lifecycle-registration end-to-end under .tmp (advisory tool, no fixture pair)
 il="$es/agent"; mkdir -p "$il"
 cat > "$il/CLAUDE.md" <<'EOF'

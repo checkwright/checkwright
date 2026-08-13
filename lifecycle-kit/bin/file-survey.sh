@@ -13,11 +13,30 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 1
 
 usage() {
-    printf 'usage: %s "<question>" "<corpus>" "<oracle>" "<finding>"\n' "$(basename "$0")" >&2
+    printf 'usage: %s [-h|--help] [--] "<question>" "<corpus>" "<oracle>" "<finding>"\n' "$(basename "$0")"
+    printf '  appends one dated block to %s; "--" files a field beginning with "-"\n' \
+        "$LIFECYCLE_KIT_SURVEY_RECORD_FILE"
 }
 
-if [[ $# -ne 4 || -z "${1:-}" || -z "${2:-}" || -z "${3:-}" || -z "${4:-}" ]]; then
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — free-text positionals validate shape, not only arity: the refusal scans every positional, since arity alone leaves a flag safe in no slot but the first
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     usage
+    exit 0
+fi
+if [[ "${1:-}" == "--" ]]; then
+    shift
+else
+    for _fs_arg in "$@"; do
+        [[ "$_fs_arg" == -* ]] || continue
+        printf '%s: unrecognized option: %s — a field beginning with "-" is filed after a "--" separator\n' \
+            "$(basename "$0")" "$_fs_arg" >&2
+        usage >&2
+        exit 2
+    done
+fi
+
+if [[ $# -ne 4 || -z "${1:-}" || -z "${2:-}" || -z "${3:-}" || -z "${4:-}" ]]; then
+    usage >&2
     exit 2
 fi
 

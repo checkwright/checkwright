@@ -122,9 +122,11 @@ splitting an entry is safe only against that total: a split scatters an entry's
 weight across siblings, and the sum is what puts it back together.
 
 When done, **set the iteration name without waiting for confirmation** and
-inform the user: replace the `—` placeholder in the queue header AND update
-the WORKFLOW-STATE scope stamp to match (`check-stage-evidence` requires
-every stamp's iteration to match the header's, so they ride in one commit).
+inform the user: run `bash lifecycle-kit/bin/enter-stage.sh --rename <name>`,
+which writes both surfaces — the queue header and column 1 of every stamp — in
+one motion and names them for the one commit they ride in. Never edit either by
+hand: `check-stage-evidence` requires every stamp's iteration to match the
+header's, and the state file has one sanctioned writer.
 The header carries the *name axis alone* — there is no stage field to set, and
 no stage field to advance. The *arriving* stage's skill moves the cursor by
 stamping, as that skill's first step. Invoking the next skill is the

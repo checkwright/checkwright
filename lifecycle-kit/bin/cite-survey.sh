@@ -13,11 +13,30 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" 2>/dev/null || exit 1
 
 usage() {
-    printf 'usage: %s "<heading-substring>"\n' "$(basename "$0")" >&2
+    printf 'usage: %s [-h|--help] [--] "<heading-substring>"\n' "$(basename "$0")"
+    printf '  emits the one matching block of %s as an inline-ready snippet\n' \
+        "$LIFECYCLE_KIT_SURVEY_RECORD_FILE"
 }
 
-if [[ $# -ne 1 || -z "${1:-}" ]]; then
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — free-text positionals validate shape, not only arity: help is stdout at exit 0, an unrecognized leading '-' is refused, '--' ends option processing
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     usage
+    exit 0
+fi
+if [[ "${1:-}" == "--" ]]; then
+    shift
+else
+    for _cs_arg in "$@"; do
+        [[ "$_cs_arg" == -* ]] || continue
+        printf '%s: unrecognized option: %s — a substring beginning with "-" is passed after a "--" separator\n' \
+            "$(basename "$0")" "$_cs_arg" >&2
+        usage >&2
+        exit 2
+    done
+fi
+
+if [[ $# -ne 1 || -z "${1:-}" ]]; then
+    usage >&2
     exit 2
 fi
 

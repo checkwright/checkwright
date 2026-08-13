@@ -280,6 +280,56 @@ governed comment/pointer surface admits a workflow member iff it is tracked,
 whatever its extension, and blesses only `contract:`/`see` there
 (canon-kit/SPEC.md §check-comment-tier).
 
+## The bin/-tool contract
+
+A kit's `bin/` tools are shipped executables that are explicitly **not gates**:
+they take caller-supplied arguments, and several of them *capture* — appending
+what they were handed to a durable, committed surface. The gate model below
+governs none of them, so the one authoring rule every kit's tools share is
+stated here, beside §check-exec-bit's tree-wide `*/bin/*.sh` invariant.
+
+**A `bin/` tool whose positional arguments are free text validates their shape,
+not only their arity.** Free text is an uninterpreted caller-supplied string; an
+argument drawn from a known set is not free text, because validating membership
+already validates shape. Three behaviors:
+
+- `-h` / `--help` as the first argument prints the tool's usage on **stdout**
+  and exits **0**. Usage on a successful help request is output, not a
+  diagnostic.
+- A positional argument beginning with `-` that is not a recognized option is a
+  **refusal** — usage on stderr, exit 2.
+- `--` ends option processing, so every remaining argument is taken as free text
+  however it is spelled.
+
+An arity check is not a shape check. A tool taking exactly one free-text
+argument accepts `--help` *as* that argument, and a tool taking two accepts a
+flag in either slot; arity makes the single-argument case worst and the others
+merely quieter, never safe. A tool that captures turns the defect into a written
+record that reads like a real filing — attested three times across three
+sessions, each writing a flag into a committed, boundary-blocking inbox at exit
+0 — so the rule binds hardest there. But it binds on every free-text tool,
+because the help half is discoverability and its cost is measured too: a session
+hunting for a mode ran a stage writer with `--help`, got `'--help' is not a
+lifecycle stage` in place of usage, and went three guards deep working around a
+contract the usage text would have told it did not exist.
+
+The `--` escape is not decoration: without it the refusal makes a legitimate
+filing unfileable, and this rule's own subject matter is the instance — recording
+that a `--list` argument was captured takes
+`bash lifecycle-kit/bin/file-gap.sh -- "--list is captured at exit 0"`.
+
+**No gate reads this rule, and that is ruled rather than deferred.**
+§check-exec-bit's corpus is the whole `*/bin/*.sh` set, and a gate over it could
+assert only the weak static shape — does the file contain a `--help` branch —
+which passes a tool that prints usage and captures `--list` anyway. The
+predicate that matters is behavioral, and the precedent for behavioral coverage
+of a `bin/` tool is already ruled and shipped: lifecycle-kit/SPEC.md
+§bin/enter-stage.sh rules `--simulate` advisory tooling owed no fixture pair and
+exercises it end-to-end in `smoke/`. Each member's coverage follows it, and
+enforcement-first's own clause — removing the duplication outranks gating it —
+points at one stated rule plus behavioral coverage rather than a static scanner
+that would green the case it was bought for.
+
 ## The gate model
 
 A gate family imposes test-grade rigor on prose and config surfaces, but a gate

@@ -248,10 +248,14 @@ derivation. The loop mirrors guard-kit's, with capture moved to convention:
    gitignored per-iteration scratch, the prompt-friction.log pattern):
    `<date> <fact re-derived> ← <surface it was read from>`. One line,
    written at the moment of re-derivation — deferred capture is no capture.
-   The affordance is `bin/kfric.sh "<fact>" "<surface>"`: it stamps that
+   The affordance is `bin/kfric.sh [--] "<fact>" "<surface>"`: it stamps that
    grammar (date from `date +%F`) into `DRIFT_KIT_KNOWLEDGE_LOG`, creating
    the log's parent dir if missing, and refuses with a usage message and
-   exit 2 unless both arguments are present and non-empty. It exists so
+   exit 2 unless both arguments are present and non-empty. Both are free text,
+   so it also validates their **shape** — see
+   gate-sdk/SPEC.md §The bin/-tool contract —
+   scanning every positional rather than the first, two slots making arity
+   safe in neither. It exists so
    capture is prompt-free — the raw form is a shell redirect
    (`printf … >> <log>`) that no allowlist glob suppresses safely (a
    mid-pattern wildcard is the command-injection shape the bash guard

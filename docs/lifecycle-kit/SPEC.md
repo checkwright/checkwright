@@ -617,9 +617,13 @@ operators, the finding that rules the gitignored friction log out as the channel
 What *append-only* means on this surface is a merge property, and
 §Multi-operator semantics owns it: this is the kit's one `union`-driver surface.
 
-**The affordance.** `bin/file-gap.sh "<gap prose>"` (the `bin/kfric.sh` pattern:
-repo-root cd, config-via-env, exit 2 on an empty argument) appends one dated
-bullet, seeding the contract header when the inbox does not yet exist. It is
+**The affordance.** `bin/file-gap.sh [--] "<gap prose>"` (the `bin/kfric.sh`
+pattern: repo-root cd, config-via-env, exit 2 on an empty argument) appends one
+dated bullet, seeding the contract header when the inbox does not yet exist. Its
+one positional is free text, so it validates that argument's **shape** to
+gate-sdk/SPEC.md §The bin/-tool contract — help on stdout at exit 0, an
+unrecognized leading `-` refused, `--` ending option processing — which is the
+rule this capture affordance's own three attested firings bought. It is
 advisory tooling, not a gate — no fixture pair is owed; the raw append (a bullet
 line into the inbox) stays a legal fallback, the grammar being the surface's
 contract, not the writer.
@@ -885,10 +889,13 @@ buys nothing the two-command witness does not. *Ruled out: auto-invalidating
 every block on any commit* — too coarse to leave the mechanism any use; the
 `corpus` pathspec exists precisely to make invalidation proportionate.
 
-**The affordance.** `bin/file-survey.sh "<question>" "<corpus>" "<oracle>"
+**The affordance.** `bin/file-survey.sh [--] "<question>" "<corpus>" "<oracle>"
 "<finding>"` appends one block, seeding the contract header when the record does
 not yet exist. It follows `bin/file-gap.sh` exactly: repo-root cd,
-config-via-env, exit 2 on a missing or empty argument. Advisory tooling, not a
+config-via-env, exit 2 on a missing or empty argument, and the free-text
+argument-shape contract of gate-sdk/SPEC.md §The bin/-tool contract — whose
+refusal here scans **every** positional, since four slots make arity no
+protection at all. Advisory tooling, not a
 gate — the raw append stays a legal fallback, the grammar being the surface's
 contract rather than the writer.
 
@@ -926,15 +933,20 @@ cited, and it fails silently by printing a record without it. The sha a pin woul
 need is the *landing* commit, which no field carries and which is precisely the
 class of value this section already rules an author gets wrong.
 
-**The affordance that makes inlining one command.** `bin/cite-survey.sh
+**The affordance that makes inlining one command.** `bin/cite-survey.sh [--]
 "<heading-substring>"` selects the one block whose `## ` heading contains the
 substring and writes it to stdout as an inline-ready snippet — the heading and all
 four fields. It refuses (exit 2) on no match, on an ambiguous match, and on a
 record with no blocks, rather than guessing: the author asked for one finding, and
 a silently-chosen sibling would be pasted onto a permanent surface as if it were
 the one they read. It follows `bin/file-survey.sh` exactly — repo-root cd,
-config-via-env, exit 2 on a missing or empty argument — and is advisory tooling,
-not a gate, the same disposition its sibling carries.
+config-via-env, exit 2 on a missing or empty argument, and — per
+gate-sdk/SPEC.md §The bin/-tool contract — the shape contract for its one
+free-text positional. It is advisory tooling,
+not a gate, the same disposition its sibling carries. It is a census find rather
+than a firing on that last point: it carries `file-gap.sh`'s exact single-argument
+shape and has simply not been run with a flag yet, and while it writes nothing,
+its help behavior was the same misleading error.
 
 It deliberately does **not** rewrite the citing surface. The author chooses where
 the finding belongs and how much of the `finding` prose to carry; a tool that
@@ -1202,6 +1214,13 @@ The deterministic writer for a stage transition: `enter-stage.sh <stage>`
 appends the invocation stamp, reading `session-id.sh` for
 the id — never an argument, so the no-hand-picking rule rides into the tool.
 `<stage>` must be a configured stage; anything else is a usage error (exit 2).
+Its positionals are membership-validated rather than free text, so it owes no
+leading-`-` refusal (gate-sdk/SPEC.md §The bin/-tool contract) — but it owes the
+help half, and `-h`/`--help` as the first argument prints usage on stdout and
+exits 0. The measured cost of not owing it is in this tool's own history: a
+session hunting for the rename mode below ran `--help`, got
+`'--help' is not a lifecycle stage`, and worked around a contract for three
+sessions that the usage text would have settled in one command.
 An ordinary stage **writes the evidence file only** — the appended stamp *is*
 the transition, since the last stamp is the cursor, so the queue file is not
 touched and need not be committed. The first stage
@@ -1340,7 +1359,63 @@ a stamp. Exit 0 = the real entry would proceed (or no-op); exit 1 = it would
 refuse, with the refusing check's output relayed line-by-line; exit 2 =
 usage/config error, as a real entry. Not a gate — exercised in `smoke/`
 beside the existing enter-stage coverage (would-pass, would-refuse,
-would-no-op, nothing written). **Idempotent:** if the
+would-no-op, nothing written).
+
+**`--rename <name>` — the mechanized iteration rename.** Naming an iteration is
+a **two-surface** write — the queue header's placeholder and column 1 of the
+first stage's stamp — which `check-stage-evidence` requires to agree, so it rides
+this writer rather than a second tool. `[--simulate] --rename <name>` sets the
+header to `## Iteration: <name>` and rewrites column 1 of **every** data line in
+the state file. Every line rather than only the last is correct by the boundary
+invariant, not by convenience: the first-stage entry truncates the state file, so
+every line below the separator belongs to the current iteration by construction —
+which is exactly what `check-stage-evidence` asserts — and the whole-file rewrite
+therefore also heals a half-landed hand-rename. **It is not stage motion**: no
+stamp is appended and no stage token is written, so the cursor is untouched and
+"stage motion never writes the queue" is unweakened. The precedent for this tool
+writing the queue header at all is the boundary reset, which already does.
+
+Before writing, the mode asserts its **columns-2-4 witness** — fields 2 through
+4 of every data line (stage, session id, date) identical before and after. This
+is the content predicate applied by the **writer**, where it is cheap and exact,
+rather than by the `Write`/`Edit` guard: a `PreToolUse` hook sees only *proposed*
+content, so proving "no stage token moved" there means reconstructing the
+pre-edit file and diffing field-wise inside a hook — the same computation with
+less information and no way to refuse cleanly. **Pre-flight, the same contract as
+the stamp path:** the candidate header and candidate state file are built as
+temporaries, `check-stage-evidence` runs against them, and a non-zero exit
+refuses with the gate's output relayed and nothing written. **Refusals** (exit 2,
+nothing written): `<name>` empty; `<name>` equal to the unnamed placeholder,
+which only the boundary reset may write — checked ahead of the grammar that would
+also reject it, so the message names the owning writer instead of reporting a
+malformed name; and `<name>` outside the queue slug grammar `[a-z0-9][a-z0-9-]*`,
+where whitespace is the corrupting case, since column 1 is whitespace-delimited
+and a two-word name silently shifts every field of every stamp.
+**Idempotent** in the stamp path's sense: a header and every column 1 already
+reading `<name>` reports and exits 0 without writing. `--simulate --rename`
+relays what would change, prefixed `enter-stage (simulate):`, and writes nothing.
+The report names both written files and says to commit them together, which makes
+the one-commit coupling a property of the writer instead of a line of prose in
+the calling stage template.
+
+One reader is **invalidated** by a rename rather than served by it, and it is the
+reason the placeholder refusal exists: `LIFECYCLE_KIT_BOUNDARY_REQUIRE`'s check
+matches the closing iteration's name against the first token of a disposition
+line and reds on finding *none*, so a rename landing after the close stage has
+stamped its disposition reds the next boundary. Renaming an iteration that has
+already been dispositioned is a rename to redo at the disposition surface too;
+un-naming one is refused outright.
+
+**Ruled out: a separate `rename-iteration.sh` tool.** It would add a second
+sanctioned writer of the state file, and one-writer is the property the
+`Write`/`Edit` guard's own block message asserts and the whole reason that guard
+exists. Advisory tooling like `--simulate`, so no fixture pair is owed; the
+hermetic cases — both surfaces rewritten, fields 2-4 proved unchanged, the
+half-landed heal, each refusal, the idempotent no-op, and `--simulate --rename`
+writing nothing — live in `gate-tests/`, because a rename cannot be exercised
+against a live checkout's own queue the way `smoke/` exercises the stamp path.
+
+**Idempotent:** if the
 state file already ends with a stamp for the same `<iteration> <stage> <id>`,
 it reports and exits 0 without appending, so a crashed-and-resumed session
 re-runs its entry step safely. It reads the `lib/stages.sh` knobs

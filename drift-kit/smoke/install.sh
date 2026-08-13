@@ -500,3 +500,31 @@ EOF
     diff -q "$work/fo-intact.txt" "$work/fo-nometa.txt" >/dev/null \
         || fail "losing the meta layer changed a row it does not own: $(diff "$work/fo-intact.txt" "$work/fo-nometa.txt")"
 fi
+
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — kfric.sh's two positionals are free text, so it
+# validates their shape: help on stdout at exit 0, an unrecognized leading '-' refused on stderr at
+# exit 2 in either slot, and the knowledge log byte-unchanged after both.
+kflog="$work/kfric-argv.log"
+printf '2026-01-01 a real fact ← a real surface\n' > "$kflog"
+cp "$kflog" "$work/kfric-argv.before"
+kf() { DRIFT_KIT_KNOWLEDGE_LOG="$kflog" bash "$SMOKE_KIT_ROOT/bin/kfric.sh" "$@"; }
+
+for f in --help -h; do
+    kfout="$(kf "$f" 2>/dev/null)" || fail "kfric.sh $f should exit 0"
+    grep -q '^usage: ' <<<"$kfout" || fail "kfric.sh $f wrote no usage to stdout: $kfout"
+done
+
+for a in "--list" "second"; do
+    kfrc=0
+    if [[ "$a" == "--list" ]]; then kf --list a >/dev/null 2>&1 || kfrc=$?
+    else kf "$a" --list >/dev/null 2>&1 || kfrc=$?; fi
+    [[ "$kfrc" -eq 2 ]] || fail "kfric.sh refused a flag with exit $kfrc, want 2 (slot: $a)"
+done
+kfso="$(kf a --list 2>/dev/null)" || true
+[[ -z "$kfso" ]] || fail "kfric.sh wrote usage to stdout on a refusal: $kfso"
+cmp -s "$work/kfric-argv.before" "$kflog" \
+    || fail "kfric.sh wrote the knowledge log on a help or refusal path"
+
+kf -- "--list is captured at exit 0" "a surface" >/dev/null
+grep -q -- '--list is captured at exit 0 ← a surface$' "$kflog" \
+    || fail "kfric.sh -- did not file a fact beginning with a dash"

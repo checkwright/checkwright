@@ -12,55 +12,6 @@
 
 ## New Features
 
-- **capture-affordance-help-flag** [spec: SPEC-bin-argv.md] — a `bin/` tool that validates
-  argument *count* accepts a flag as its free text, and a capture affordance files it.
-  recurrence: capture-affordance-help-flag 2026-08-09 2026-08-12
-  **Three firings, three sessions** (2026-07-28 `--help`, 2026-08-09 `--list`, 2026-08-12
-  `--help` again), each writing a bullet to the committed, boundary-blocking gap inbox at exit
-  0. The third sat as an uncommitted modification until a routine pre-commit `git diff` on an
-  unrelated filing caught it by chance — one commit from a permanent bogus entry.
-  **Promoted 2026-08-12 at spec, with the class re-measured rather than inherited.** A grep of
-  every kit's `bin/` for its argument validation finds **five** members, not the one the entry
-  named: `file-gap.sh` and `cite-survey.sh` share the `$# -ne 1` shape; `file-survey.sh` and
-  `kfric.sh` are safe only by arity, which a flag in any slot defeats; `enter-stage.sh`
-  validates argument *shape* and so needs no refusal — but has no help handler either, which is
-  the measured harm below. `cite-survey.sh` and `enter-stage.sh` are census finds, not firings.
-  **Batched with `scope-rename-guard-deadlock` because one caused the other.** The rename
-  entry's third firing ran `enter-stage.sh --help` looking for a rename mode and got
-  `'--help' is not a lifecycle stage`; the missing help handler is what sent that session three
-  guards deep. One surface, one amendment.
-  **The gate-sdk decision the deliverable owed is ruled: yes, with a narrowed predicate** — a
-  `bin/` tool whose positional arguments are free text validates their shape, `--` ends options
-  — and **no new gate**, on the `--simulate` precedent (behavioral coverage in `smoke/`,
-  lifecycle-kit/SPEC.md §bin/enter-stage.sh) rather than a static scanner that would pass a tool
-  printing usage while still capturing `--list`.
-  Filed 2026-07-28 at close (`front-door-readiness`); iceboxed, returned 2026-08-09 by the
-  gap-inbox drain that judged its recurrence; promoted 2026-08-12 at spec.
-
-- **scope-rename-guard-deadlock** [spec: SPEC-bin-argv.md] — scope's naming step has no
-  unblocked path; two guards steer into each other.
-  recurrence: scope-rename-guard-deadlock 2026-08-11 2026-08-12
-  The scope template mandates renaming the iteration on the existing `scope` stamp in
-  `.workflow/WORKFLOW-STATE.txt`. `enter-stage.sh` owns no rename mode, `workflow-state-guard`
-  blocks Edit on that file, and `bash-guard` blocks `sed -i` while steering back to Edit. Three
-  consecutive scopes completed a documented contract by routing around a guard, each
-  re-inventing the workaround rather than inheriting it.
-  **The guards are not wrong, their scope is.** `workflow-state-guard`'s stated rationale is
-  hand-*stamping*, which moves the stage cursor. A rename leaves the stage token untouched.
-  **The recipe the third firing found, preserved:** an awk rewrite of column 1 only, guarded by
-  an `md5sum` comparison of columns 2-4 before and after so the stage/id/date columns are
-  *proved* unchanged, run via `guard-kit/bin/scratch-run.sh`.
-  **Ruled at spec: option one, `enter-stage.sh --rename <name>`.** The recipe above is the
-  content predicate applied by the **writer**, which is where it is cheap and exact; a hook
-  would have to reconstruct the pre-edit file to compute the same thing with less information.
-  A separate `rename-iteration.sh` is ruled out — it would add a second sanctioned writer of the
-  state file, and one-writer is the property the guard's own message asserts.
-  **The mode writes both surfaces**, header and every stamp, because the naming step was always
-  a two-surface write `check-stage-evidence` requires to agree — so the "they ride in one
-  commit" coordination scope.md states as prose becomes a property of the writer.
-  Filed 2026-08-10 by close, from the bullet that iteration's scope session filed; promoted
-  2026-08-12 at spec.
-
 
 ## Technical Debt
 
@@ -5020,6 +4971,8 @@
 - cohort-hold-criterion-label-defect
 - substrate-parity-partial-vendor-scope
 - readonly-dispatch-isolation-unbuyable
+- capture-affordance-help-flag
+- scope-rename-guard-deadlock
 
 ## Lessons Learned
 

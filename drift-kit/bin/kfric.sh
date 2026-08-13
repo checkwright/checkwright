@@ -28,11 +28,30 @@ unset _ds_cfg
 : "${DRIFT_KIT_KNOWLEDGE_LOG:=${GATE_SDK_WORKFLOW_DIR:-.workflow}/knowledge-friction.log}"
 
 usage() {
-    printf 'usage: %s "<fact re-derived>" "<surface it was read from>"\n' "$(basename "$0")" >&2
+    printf 'usage: %s [-h|--help] [--] "<fact re-derived>" "<surface it was read from>"\n' "$(basename "$0")"
+    printf '  appends one dated line to %s; "--" files a field beginning with "-"\n' \
+        "$DRIFT_KIT_KNOWLEDGE_LOG"
 }
 
-if [[ $# -ne 2 || -z "$1" || -z "$2" ]]; then
+# spec: gate-sdk/SPEC.md §The bin/-tool contract — free-text positionals validate shape, not only arity: the refusal scans every positional, since arity alone leaves a flag safe in no slot but the first
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
     usage
+    exit 0
+fi
+if [[ "${1:-}" == "--" ]]; then
+    shift
+else
+    for _kf_arg in "$@"; do
+        [[ "$_kf_arg" == -* ]] || continue
+        printf '%s: unrecognized option: %s — a field beginning with "-" is filed after a "--" separator\n' \
+            "$(basename "$0")" "$_kf_arg" >&2
+        usage >&2
+        exit 2
+    done
+fi
+
+if [[ $# -ne 2 || -z "$1" || -z "$2" ]]; then
+    usage >&2
     exit 2
 fi
 
