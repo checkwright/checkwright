@@ -5094,6 +5094,37 @@
   worklist that grows as roadmap-tagged entries age.
   Filed 2026-08-13 by close, from the backlog-eviction step that hit it.
 
+- **vendored-library-identifier-reach** [design-pending] — De-literalization's reach test gives
+  two answers for a vendored `lib/*.sh` function, and the corpus holds both populations.
+  The rule bans prose restating a source's **internal** identifier roster while allowing public
+  contract names. Two readings of "internal" are both defensible and they disagree:
+  **file-level** — a shipped vendored library is a public contract by construction, so its
+  owning `§lib/*.sh` section may name its exports — or **kit-level**, the reach test an audit
+  actually applies: nothing outside the kit calls it, so it is internal.
+  **Both populations exist, which is why no reading can be adopted silently.**
+  `gate-sdk/lib/gate.sh`, `guard-kit/lib/guard.sh` and `gate-sdk/lib/declaration.sh` have
+  verified callers in other kits and in `scripts/` — public on either reading, so they decide
+  nothing. `canon-kit/lib/spec.sh` (`spec_manifest_files`, `spec_queue_slugs` and seven more) and
+  `evidence-kit/lib/evidence.sh` (eleven adapters, inventoried in one sentence at
+  evidence-kit/SPEC.md §lib/evidence.sh) have **zero callers outside their own kit**: public
+  under the first reading, and textbook "a SPEC subsection that inventories internal helpers"
+  under the second.
+  **What turns on it:** the kit-level reading makes those two inventories findings and buys a
+  large corrective across two SPECs; the file-level reading clears them and matches the
+  doctrine's own carve-out for a SPEC naming public functions as contracts.
+  **Deliverable:** rule it in doctrine-kit/DOCTRINE.md's De-literalization rule so the reach test
+  is stated rather than re-derived per audit, then sweep whichever population the ruling makes
+  findings.
+  **Why `[design-pending]` and not simply decided:** the governing docs do not resolve it and
+  only precedent would, which is the case the spec-over-precedent rule says not to settle from
+  history. Escalated to the lead at this close alongside filing.
+  **Not blocking the audit it came from:** all seven findings that close's
+  `internal-identifier-restatement` sweep fixed fail **both** readings, so the ruling changes
+  nothing already landed.
+  **Cost while deferred:** every run of that rostered audit re-derives the same fork over the
+  same two libraries, and two auditors can reach opposite verdicts on identical prose.
+  Filed 2026-08-13 by close, raised by the delegated identifier sweep, which declined to rule it.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
