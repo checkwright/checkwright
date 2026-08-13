@@ -16,34 +16,6 @@
 
 ## Technical Debt
 
-- **gap-bullet-premise-verification** — a gap-inbox bullet asserts mechanism under no
-  verification bar, and a false one is paid by whoever drains it.
-  **Shape ruled 2026-08-13 by the operator, and it is the one this entry already named as
-  the one to beat:** re-verification becomes a **named step of the close drain**, and the
-  capture-time affordance is untouched. `bin/file-gap.sh` gains no prompt and no grammar,
-  so the inbox's founding reason — deferred capture is no capture — is not traded away to
-  fix a different failure mode. The two rejected shapes are recorded so the choice is not
-  re-litigated: a filing-time prompt for the establishing command, and a grammar separating
-  observation from inferred mechanism. Both add friction at the moment the inbox exists to
-  keep cheap.
-  **Why the drain is where it works, from three firings.** Two of the three bullets
-  re-verified at the 2026-08-07 boundary were false at their central claim, both filed by
-  one close: one asserted the npm approval environment did not gate the `v0.18.0` publish
-  (it gated — the deployment held 77 seconds and an approval is recorded), the other that
-  `check-graph` prints no regeneration command on a red verdict (it prints both, with
-  resolved knob paths). Each fell to a single command. The 2026-08-13 instance carried two
-  false premises at once and is the one that settles the shape: its inferred mechanism was
-  caught by the filer re-reading the source before the drain, while its motivating symptom
-  was caught only by the draining session's four probes. **The step that reliably ran was
-  the drain.**
-  **Deliverable:** the close template's drain step names re-verification explicitly — per
-  bullet, the claim and the command that establishes it — and the drain's output records
-  which bullets were re-verified and what fell. Adds no governed name.
-  **Distinct from `close-generated-finding-route`**, which owns *when* a close-generated
-  finding is drained; this owns whether its factual claims were ever checked.
-  Filed 2026-07-31 at scope; recurrence stamped 2026-08-07 and 2026-08-13; promoted
-  2026-08-13 at scope on the counted-recurrence rule, the operator ruling the shape.
-
 - **bash-guard-auto-mode-rationale** — the guard's messages assert a consequence the
   harness no longer produces. They say a decorated command "forces a permission prompt no
   allowlist entry suppresses"; under auto mode a decorated command does not prompt, it
@@ -5170,6 +5142,7 @@
 
 - port-criterion-aggregate-cost-blindness
 - upgrade-smoke-from-binary-pairing
+- gap-bullet-premise-verification
 
 ## Lessons Learned
 

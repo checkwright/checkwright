@@ -75,7 +75,19 @@ session.
    feeds the staleness read (an aged bullet is a signal, not a free pass).
    Draining is not deleting: a bullet naming a concrete unfixed gap must become a
    task or a fix, not evaporate — the same clearing-is-not-processing rule as
-   Lessons. The next iteration's scope entry refuses a non-empty inbox
+   Lessons.
+   **Re-verify before dispositioning.** A bullet's prose is the filer's claim, not
+   an established fact: capture is deliberately frictionless, so nothing upstream
+   checked it and a bullet can assert a mechanism its filer inferred rather than
+   ran. Per bullet, name the claim the disposition turns on and the command that
+   establishes it, run that command, and disposition against what it returned.
+   Record the outcome in the close commit message beside the bullet's disposition
+   — which bullets were re-verified and what fell — so a corrected premise is
+   visible rather than silently absorbed. A claim no cheap command settles is
+   dispositioned *as a claim*: say so, and let the promoted entry carry the
+   unverified premise openly (§The committed gap inbox rules why this sits at the
+   drain and not at filing time).
+   The next iteration's scope entry refuses a non-empty inbox
    (§bin/enter-stage.sh), so an undrained gap blocks the boundary rather than
    crossing it silently.
    **Judge the recurrence, in addition to the disposition — you are the judge,

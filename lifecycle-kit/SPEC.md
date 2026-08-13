@@ -700,6 +700,28 @@ warning and not a refusal deliberately: refusing capture does not dissolve a
 real finding, it pushes it back into session context — the deferred-capture
 antipattern this inbox exists to prevent.
 
+**The drain re-verifies; capture does not.** A bullet's prose is a claim made at
+capture speed, and this channel is built to keep capture cheap, so nothing
+upstream established it — a bullet can assert a mechanism its filer inferred
+rather than ran, and a false premise is paid by whoever drains it. The drain
+therefore names, per bullet, the claim its disposition turns on and the command
+that establishes it, runs that command, and records in the same commit which
+bullets were re-verified and what fell (§templates/stages/ carries the step). The
+grounds are attested rather than argued: of the bullets re-verified at one
+boundary, two were false at their central claim and each fell to a single
+command, and a later bullet carried two false premises at once — one caught by
+the filer re-reading the source before the drain, the other only by the draining
+session's own probes. The step that reliably ran was the drain.
+
+**Two capture-time shapes are refused, recorded so they are not re-drafted.** A
+filing-time prompt for the establishing command, and a grammar separating
+observed fact from inferred mechanism, both add friction at the moment this inbox
+exists to keep cheap, and both bill it to the party least able to pay — the
+mid-stage filer whose finding otherwise stays in session context. That is the
+deferred-capture antipattern the channel was built against, and it is not traded
+away to fix a different failure mode. The affordance gains no prompt and no
+grammar; §check-gap-inbox-neutrality keeps the bullet's fields at two.
+
 **Merge semantics.** The inbox carries `merge=union` (git-native, so no per-clone
 driver registration), not the keep-ours `merge=iteration-scoped` the
 boundary-truncated surfaces carry: an iteration-scoped surface is per-iteration
@@ -780,9 +802,9 @@ tree.
 
 Each bullet's two fields have named readers: the date feeds close's staleness
 judgment and becomes the stamped recurrence date, and the prose is the
-disposition body, the grounds the drain judges the recurrence from, and — via the
-capture-time advisory on stderr — the field the filer is asked to write the claim
-into. There is no third field, which is the point:
+disposition body, the grounds the drain judges the recurrence from, the claim the
+drain re-verifies, and — via the capture-time advisory on stderr — the field the
+filer is asked to write the claim into. There is no third field, which is the point:
 §check-gap-inbox-neutrality keeps it that way.
 
 ## The survey record
