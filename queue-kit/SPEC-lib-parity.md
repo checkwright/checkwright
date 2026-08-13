@@ -240,7 +240,7 @@ red only on findings, so both are monotone and clear by inspection.
 - **queue-kit/SPEC.md §The queue format** — owned by delta (2), one line: the
   parity subject between holders is classification behavior over a corpus, never
   the derived literals, because holders do not share a representation.
-- **gate-sdk/SPEC.md §The port-candidate criteria** — owned by the framing above,
+- **gate-sdk/SPEC.md §The port-candidate criteria** — owned by deltas (2)-(4),
   criterion 6's qualification gaining its **machine-held** worked case beside the
   duplication-absent one the same iteration's cohort supplies. Two dispositions,
   one criterion, stated together so neither reads as the general rule.
