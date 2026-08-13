@@ -3,6 +3,8 @@
 pub mod action_gh_repo;
 pub mod action_pinning;
 pub mod assertion_strength;
+pub mod comment_tier;
+pub mod deprecation_task;
 pub mod docs_cmd;
 pub mod gap_inbox_neutrality;
 pub mod install_claim;
@@ -27,11 +29,13 @@ pub mod shim_restatement;
 pub mod skill_binding;
 pub mod smoke_entry_guard;
 pub mod spec_fence_balance;
+pub mod spec_pointer;
 pub mod stage_evidence;
 pub mod stage_skill_coverage;
 pub mod survey_record;
 pub mod tag_lead_line;
 pub mod task_conservation;
+pub mod todo_task_liveness;
 pub mod task_names;
 pub mod template_registry_parity;
 pub mod test_hermetic;
@@ -361,6 +365,91 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_MANIFEST_FILES",
             "CANON_KIT_PROSE_SURFACE_GLOBS",
             "CANON_KIT_QUEUE_FILE",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §lib/spec.sh — the `spec_comment_surface` cohort: four members on
+    // one corpus derivation, so each declares that derivation's whole knob set beside its own,
+    // `GATE_SDK_WORKFLOW_DIR` among them because the corpus takes that directory's tracked tier
+    // spec: gate-sdk/SPEC.md §check-reads-couples — one `?` for the derivation's two walk call
+    // sites: both are anchored at the member's own first argument, so the recorder observes one
+    (
+        "check-comment-tier",
+        comment_tier::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_WORKFLOW_DIR",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_COMMENT_MACHINE",
+            "CANON_KIT_COMMENT_REASON",
+            "CANON_KIT_COMMENT_POSITIONAL",
+            "CANON_KIT_COMMENT_WHITELIST",
+            "CANON_KIT_COMMENT_RUN_CAP",
+            "CANON_KIT_COUNT_COLLECTIONS",
+            "CANON_KIT_COUNT_WEDGE_WORDS",
+            "CANON_KIT_COUNT_ALLOWED_PHRASES",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §check-spec-pointer — the second corpus this member derives is the
+    // manifest set, so both derivations' knob sets ride together
+    (
+        "check-spec-pointer",
+        spec_pointer::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_WORKFLOW_DIR",
+            "CANON_KIT_SPEC_NAME",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_MANIFEST_FILES",
+            "CANON_KIT_PROSE_SURFACE_GLOBS",
+            "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_COMMENT_WHITELIST",
+        ],
+        "canon-kit",
+    ),
+    // spec: canon-kit/SPEC.md §lib/spec.sh — the queue-resolution pass both liveness members
+    // read is a second shared derivation, so each declares the section vocabulary it is
+    // computed from beside the corpus knobs
+    (
+        "check-todo-task-liveness",
+        todo_task_liveness::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_WORKFLOW_DIR",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_QUEUE_FILE",
+            "CANON_KIT_ACTIVE_SECTIONS",
+            "CANON_KIT_DEFERRED_SECTION",
+            "CANON_KIT_ICEBOX_SECTION",
+        ],
+        "canon-kit",
+    ),
+    // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the marker vocabulary is a consumer array
+    // joined into an alternation and interpreted, so this member compiles it through the engine
+    (
+        "check-deprecation-task",
+        deprecation_task::run,
+        &["?"],
+        &[
+            "GATE_PRUNE_DIRS",
+            "GATE_KIT_ROOTS_HERE",
+            "GATE_SDK_WORKFLOW_DIR",
+            "CANON_KIT_SCAN_KIT_ROOTS",
+            "CANON_KIT_COMMENT_SURFACE",
+            "CANON_KIT_DEPRECATION_MARKERS",
+            "CANON_KIT_QUEUE_FILE",
+            "CANON_KIT_ACTIVE_SECTIONS",
+            "CANON_KIT_DEFERRED_SECTION",
+            "CANON_KIT_ICEBOX_SECTION",
         ],
         "canon-kit",
     ),

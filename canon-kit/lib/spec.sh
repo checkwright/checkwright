@@ -151,21 +151,6 @@ unset _sk_dp
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 SPEC_SECTION_RE="^## "
 
-# spec: canon-kit/SPEC.md §lib/spec.sh — the queue-resolution pass both liveness gates read: one walk emits "<live|done>\t<slug>", live for a bold lead-in bullet in an active/deferred section and done for a bare-slug bullet outside them (the queue-kit format). Each caller builds its own live/done map and fail-closes on the awk status.
-spec_queue_slugs() {  # $1=queue-file
-    awk -v activere="$SPEC_ACTIVE_RE" -v defre="$SPEC_DEFERRED_RE" -v sectre="$SPEC_SECTION_RE" '
-        $0 ~ sectre { active = ($0 ~ activere || $0 ~ defre); next }
-        active && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
-            match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
-            printf "live\t%s\n", substr($0, RSTART + 2, RLENGTH - 4); next
-        }
-        !active && $0 ~ /^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$/ {
-            line = $0; sub(/^[[:space:]]*-[[:space:]]+/, "", line); sub(/[[:space:]]*$/, "", line)
-            printf "done\t%s\n", line
-        }
-    ' "$1"
-}
-
 # spec: canon-kit/SPEC.md §lib/spec.sh — finders skip templates/ stubs and vendored kit roots under the scan root (an ancestor kit root never prunes)
 _spec_prune_kit_roots() {
     if [[ "$CANON_KIT_SCAN_KIT_ROOTS" == "1" ]]; then cat; return 0; fi
@@ -230,51 +215,6 @@ spec_manifest_files() {
         done
         shopt -u nullglob globstar
     fi
-}
-
-# spec: canon-kit/SPEC.md §lib/spec.sh — the two governed comment surfaces: the
-#   tier gate scans _with_templates, the pointer gate scans the pruned surface
-#   (templates exempt as placeholders-by-design).
-_spec_comment_surface() {  # $1=root  $2=1 keeps templates/ shell sources, else prunes them
-    local root="${1:-.}" incl="${2:-0}" g f
-    if [[ ${#CANON_KIT_COMMENT_SURFACE[@]} -gt 0 ]]; then
-        shopt -s nullglob globstar
-        for g in "${CANON_KIT_COMMENT_SURFACE[@]}"; do
-            for f in "$root"/$g; do [[ -f "$f" ]] && printf '%s\n' "$f"; done
-        done
-        shopt -u nullglob globstar
-    else
-        # spec: canon-kit/SPEC.md §lib/spec.sh — the governed-source corpus spans
-        #   both gate declaration spellings and the ported implementation
-        if [[ "$incl" == "1" ]]; then
-            gate_find "$root" \( -name '*.sh' -o -name '*.gate' -o -name '*.rs' \) -type f 2>/dev/null | _spec_prune_kit_roots "$root" | sort
-        else
-            gate_find "$root" \( -name '*.sh' -o -name '*.gate' -o -name '*.rs' \) -type f 2>/dev/null | grep -v '/templates/' | _spec_prune_kit_roots "$root" | sort
-        fi
-        # spec: canon-kit/SPEC.md §check-spec-pointer — the workflow directory's
-        #   tracked tier, whatever the extension: the capture tier is gitignored
-        #   and carries no header (gate-sdk/SPEC.md §The workflow directory).
-        shopt -s nullglob
-        for f in "$root/${GATE_SDK_WORKFLOW_DIR:-.workflow}"/*; do
-            [[ -f "$f" ]] || continue
-            git -C "$root" ls-files --error-unmatch -- "${f#"$root"/}" >/dev/null 2>&1 || continue
-            printf '%s\n' "$f"
-        done
-        shopt -u nullglob
-    fi
-}
-
-spec_comment_surface() { _spec_comment_surface "$1" 0; }
-
-spec_comment_surface_with_templates() { _spec_comment_surface "$1" 1; }
-
-spec_comment_whitelisted() {  # $1=root-relative path — true when it matches a consumer whitelist glob
-    local rel="$1" g
-    for g in "${CANON_KIT_COMMENT_WHITELIST[@]}"; do
-        # shellcheck disable=SC2053  # intentional glob match: $g is a pattern
-        [[ "$rel" == $g ]] && return 0
-    done
-    return 1
 }
 
 # spec: canon-kit/SPEC.md §lib/spec.sh — the count grammar the restated-total gate family shares: one cardinal alternation, one consumer noun vocabulary, two match shapes

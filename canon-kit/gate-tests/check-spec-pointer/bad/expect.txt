@@ -1,2 +1,5 @@
 §heading not found in SPEC-target.md
 target file not found: widget-manifest
+bad.gate:2: §heading not found in SPEC-widget.md
+bad.rs:1: target file not found: no-such-file.md
+.workflow/fixture-state.txt:1: §heading not found in SPEC-target.md

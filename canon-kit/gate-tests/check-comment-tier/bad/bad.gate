@@ -1,0 +1,4 @@
+# graph: couples=X dir=one valve=none tier=precommit
+# install: zero-config
+
+# this descriptor comment cites no owning section and carries no directive

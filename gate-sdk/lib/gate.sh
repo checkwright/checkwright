@@ -41,6 +41,8 @@ unset _gpx
 # spec: gate-sdk/SPEC.md §lib/gate.sh — check-kit-registration's two document knobs, resolved here rather than inline in the check so the config bridge can carry them: a knob the owning kit's library does not define is the bridge's third refusal, so a compiled member declaring either would fail-close on every invocation. Resolved under their own consumer names (the queue-kit shape) rather than renamed the way GATE_PRUNE_DIRS is: that rename exists because a whitespace scalar feeds an array and one name would mean two grammars, and these are scalars in and scalars out.
 [[ -v GATE_SDK_REGISTRY_DOC ]] || GATE_SDK_REGISTRY_DOC="README.md"
 [[ -v GATE_SDK_RUNNER_DOC ]] || GATE_SDK_RUNNER_DOC="README.md"
+# spec: gate-sdk/SPEC.md §The workflow directory — the same resolution for the workflow directory, and for the same reason: the governed-comment corpus takes its tracked tier, so a compiled member reading that corpus declares this knob and the bridge can only carry a value some kit library defines
+[[ -v GATE_SDK_WORKFLOW_DIR ]] || GATE_SDK_WORKFLOW_DIR=".workflow"
 
 gate_find() {
     local prune=() d

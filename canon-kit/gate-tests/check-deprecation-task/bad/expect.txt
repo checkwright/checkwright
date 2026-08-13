@@ -1,1 +1,4 @@
 task: old-shipped-thing is done
+bad.gate:2: deprecation marker '@deprecated' → task: old-shipped-thing is done
+bad.rs:1: deprecation marker '@deprecated' — no 'task: <slug>' binding on the line
+.workflow/fixture-state.txt:2: deprecation marker '@deprecated' → no live task 'never-filed'

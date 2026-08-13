@@ -1,0 +1,2 @@
+# contract: SPEC-target.md §The landed heading — the workflow tier's tracked member
+fixture data line

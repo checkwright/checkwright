@@ -1,0 +1,3 @@
+# graph: couples=scripts/*.sh,kit:*.sh,*.gate,*.rs,.workflow/* dir=one valve=none tier=precommit
+# install: zero-config
+# spec: canon-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt, or justifies a positional construct

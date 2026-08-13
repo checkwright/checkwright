@@ -14,7 +14,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-deprecation-task.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -59,7 +58,9 @@ EOF
 check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4..=env assignments
     local label="$1" want="$2" sub="$3"; shift 3
     local out rc
-    out="$(cd "$SANDBOX" && env "$@" "$GATE" 2>&1)"; rc=$?
+    # spec: gate-sdk/SPEC.md §run-gate-tests — the gate is named, never spelled as a script
+    #   path: gate_run resolves whichever substrate declares it, under this case's own env
+    out="$(cd "$SANDBOX" && gate_env "$@" && gate_run check-deprecation-task "$DIR/checks" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi
@@ -80,7 +81,7 @@ check_case "absent-slug"      1 "no live task 'ghost-teardown'"     CANON_KIT_CO
 check_case "unbound-marker"   1 "no 'task: <slug>' binding"         CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh"
 
 # The live-bound marker never appears in the findings — a resolved slug is clean.
-out="$(cd "$SANDBOX" && env CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" "$GATE" 2>&1)"
+out="$(cd "$SANDBOX" && gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/cfg.sh" && gate_run check-deprecation-task "$DIR/checks" 2>&1)"
 if grep -qF -- "live-teardown" <<<"$out"; then
     echo "  FAIL [live-bound-clean]: a resolved marker was flagged:"; printf '    %s\n' "$out"
     fails=$((fails + 1))

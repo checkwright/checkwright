@@ -1,1 +1,1 @@
-DEPRECATION-TASK: clean
+DEPRECATION-TASK: clean (5 governed source(s)

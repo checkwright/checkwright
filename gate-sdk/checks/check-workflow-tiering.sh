@@ -15,7 +15,7 @@ ROOT="${1:-.}"
 git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1 || {
     echo "check-workflow-tiering: $ROOT is not a git repository — the tracked/ignored partition is unreadable" >&2; exit 2; }
 
-WF="${GATE_SDK_WORKFLOW_DIR:-.workflow}"
+WF="$GATE_SDK_WORKFLOW_DIR"
 [[ -d "$ROOT/$WF" ]] || {
     echo "check-workflow-tiering: workflow directory not found: $ROOT/$WF" >&2; exit 2; }
 

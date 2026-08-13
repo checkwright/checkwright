@@ -1,0 +1,3 @@
+# contract: fixture-state v1
+# @deprecated task: never-filed — the workflow tier's binding resolves to nothing
+fixture data line

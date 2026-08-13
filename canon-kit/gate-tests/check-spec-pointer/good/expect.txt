@@ -1,1 +1,1 @@
-SPEC-POINTER: clean
+SPEC-POINTER: clean (5 directive pointer(s) across 5 governed source(s)

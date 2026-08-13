@@ -1,0 +1,4 @@
+# contract: some/SPEC.md §thing — the blessed header form
+
+# this workflow-tier comment is prose the txt surface never blesses
+fixture data line

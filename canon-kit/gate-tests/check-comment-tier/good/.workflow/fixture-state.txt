@@ -1,0 +1,3 @@
+# contract: some/SPEC.md §thing — the workflow tier blesses a header directive
+# comment-tier-exempt: and the universal escape, and nothing else
+fixture data line

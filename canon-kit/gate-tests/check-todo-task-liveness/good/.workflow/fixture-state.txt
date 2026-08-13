@@ -1,0 +1,3 @@
+# contract: fixture-state v1
+# TODO(task: wire-the-widget) the workflow tier's tracked member resolves
+fixture data line

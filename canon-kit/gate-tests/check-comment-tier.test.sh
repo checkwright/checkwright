@@ -19,7 +19,6 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"   # canon-kit/
-GATE="$DIR/checks/check-comment-tier.sh"
 SANDBOX="$(mktemp -d)"
 trap 'rm -rf "$SANDBOX"' EXIT
 
@@ -117,7 +116,9 @@ mkcfg "$SANDBOX/wfmd.sh" 'CANON_KIT_COMMENT_SURFACE=(.workflow/record.md)'
 
 check_case() {  # $1=label $2=cfg $3=want-rc $4=want-substring $5=root(default SANDBOX)
     local label="$1" cfg="$2" want="$3" sub="$4" root="${5:-$SANDBOX}" out rc
-    out="$(env CANON_KIT_CONFIG_FILE="$SANDBOX/$cfg" "$GATE" "$root" 2>&1)"; rc=$?
+    # spec: gate-sdk/SPEC.md §run-gate-tests — the gate is named, never spelled as a script
+    #   path: gate_run resolves whichever substrate declares it, under this case's own env
+    out="$(gate_env CANON_KIT_CONFIG_FILE="$SANDBOX/$cfg" && gate_run check-comment-tier "$DIR/checks" "$root" 2>&1)"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL [$label]: want exit $want, got $rc -- $out"; fails=$((fails + 1)); return
     fi

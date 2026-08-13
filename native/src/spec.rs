@@ -95,11 +95,14 @@ fn root_to_abs(p: &str) -> String {
     normalize(abs.trim_end_matches('/'))
 }
 
+// spec: canon-kit/SPEC.md §lib/spec.sh — normalised on the same terms the scan root already is:
+// a walk anchored at a `..` root emits files carrying that `..`, and comparing one unnormalised
+// against a normalised kit root matches the invoking directory's own prefix, pruning everything
 fn file_to_abs(p: &str) -> String {
     if p.starts_with('/') {
-        return p.to_string();
+        return normalize(p);
     }
-    format!("{}/{}", cwd(), p.strip_prefix("./").unwrap_or(p))
+    normalize(&format!("{}/{}", cwd(), p.strip_prefix("./").unwrap_or(p)))
 }
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — `_spec_prune_kit_roots`: exclude a file whose
@@ -170,6 +173,167 @@ pub fn manifest_files(root: &str) -> Result<Vec<PathBuf>, String> {
         }
     }
     Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `_spec_comment_surface`: the governed-source corpus
+// across all four of its arms, with `templates/` kept for the tier gate and pruned for the
+// three members that read it as placeholder-by-design
+pub fn comment_surface(root: &str, with_templates: bool) -> Result<Vec<String>, String> {
+    let rootp = Path::new(root);
+    let globs = knob_array("CANON_KIT_COMMENT_SURFACE")?;
+    if !globs.is_empty() {
+        return Ok(walk::glob_files(rootp, &globs)?
+            .into_iter()
+            .filter(|f| f.is_file())
+            .map(|f| f.display().to_string())
+            .collect());
+    }
+    let found: Vec<PathBuf> = walk::find_files(rootp, &["sh", "gate", "rs"])?
+        .into_iter()
+        .filter(|p| with_templates || !under_templates(&p.display().to_string()))
+        .collect();
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a byte sort where the shell pipes through `sort`:
+    // the kit-roots cohort's ruling that the compiled form implements the contract's set
+    // semantics rather than a locale's collation
+    let mut out: Vec<String> = prune_kit_roots(root, found)?
+        .into_iter()
+        .map(|p| p.display().to_string())
+        .collect();
+    out.sort();
+    out.extend(workflow_tier(root)?);
+    Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §check-spec-pointer — the workflow directory's tracked tier,
+// whatever the extension. A `git` that cannot answer leaves the tier empty exactly as the
+// shell's per-file `|| continue` does; the arm is reproduced rather than tightened here.
+fn workflow_tier(root: &str) -> Result<Vec<String>, String> {
+    let wf = knob("GATE_SDK_WORKFLOW_DIR")?;
+    let tracked = crate::proc::run("git", &["-C", root, "ls-files", "--", &wf])?;
+    let listing = match tracked.stdout() {
+        Some(o) => String::from_utf8_lossy(o).into_owned(),
+        None => return Ok(Vec::new()),
+    };
+    let members: Vec<&str> = listing.lines().collect();
+    let prefix = format!("{}/", root);
+    let mut out: Vec<String> = Vec::new();
+    for f in walk::glob_files(Path::new(root), &[format!("{}/*", wf)])? {
+        let p = f.display().to_string();
+        if !f.is_file() {
+            continue;
+        }
+        let rel = strip_dot_slash(p.strip_prefix(&prefix).unwrap_or(&p));
+        if members.iter().any(|m| *m == rel) {
+            out.push(p);
+        }
+    }
+    Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_comment_whitelisted`: bash's `[[ rel == $g ]]`,
+// whose `*` crosses `/` because it has no pathname semantics
+pub fn comment_whitelisted(rel: &str, whitelist: &[String]) -> bool {
+    whitelist.iter().any(|g| walk::pattern_match(g, rel))
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `spec_queue_slugs`: one walk emitting live for a
+// bold lead-in bullet in an active or deferred section and done for a bare-slug bullet
+// outside them
+// spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the format is written again here
+// rather than `crate::queue`'s adapters called: canon-kit is one of its independent holders,
+// and two modules in one crate are still two holders where one shared function is not
+pub struct QueueSlugs {
+    pub live: Vec<String>,
+    pub done: Vec<String>,
+}
+
+pub fn queue_slugs(path: &Path) -> Result<QueueSlugs, String> {
+    let active_names = knob_array("CANON_KIT_ACTIVE_SECTIONS")?;
+    let deferred = knob("CANON_KIT_DEFERRED_SECTION")?;
+    let icebox = knob("CANON_KIT_ICEBOX_SECTION")?;
+    let text = read_text(path)?;
+    let mut out = QueueSlugs {
+        live: Vec::new(),
+        done: Vec::new(),
+    };
+    let mut active = false;
+    for raw in text.lines() {
+        if let Some(head) = raw.strip_prefix("## ") {
+            let name = trim_posix_end(head);
+            active = active_names.iter().any(|n| n == name)
+                || name == deferred
+                || (!icebox.is_empty() && name == icebox);
+            continue;
+        }
+        if active {
+            if let Some(rest) = bullet_lead(raw) {
+                if let Some(s) = bold_slug_at_start(rest) {
+                    out.live.push(s);
+                }
+            }
+            continue;
+        }
+        if let Some(rest) = bullet_lead(raw) {
+            let body = trim_posix_end(rest);
+            if is_slug(body) {
+                out.done.push(body.to_string());
+            }
+        }
+    }
+    Ok(out)
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `^[[:space:]]*-[[:space:]]+`, returning what follows
+fn bullet_lead(line: &str) -> Option<&str> {
+    let b = line.as_bytes();
+    let mut i = skip_space(b, 0);
+    if b.get(i) != Some(&b'-') {
+        return None;
+    }
+    i += 1;
+    let after = skip_space(b, i);
+    if after == i {
+        return None;
+    }
+    Some(&line[after..])
+}
+
+fn trim_posix_end(s: &str) -> &str {
+    let b = s.as_bytes();
+    let mut e = b.len();
+    while e > 0 && is_space(b[e - 1]) {
+        e -= 1;
+    }
+    &s[..e]
+}
+
+fn is_slug(s: &str) -> bool {
+    let b = s.as_bytes();
+    if b.is_empty() || !(b[0].is_ascii_lowercase() || b[0].is_ascii_digit()) {
+        return false;
+    }
+    b.iter()
+        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || *c == b'-')
+}
+
+// spec: canon-kit/SPEC.md §lib/spec.sh — `\*\*[a-z0-9][a-z0-9-]*\*\*` at the bullet's lead-in,
+// which is where the guard regex already required it, so awk's leftmost match is this one
+fn bold_slug_at_start(rest: &str) -> Option<String> {
+    let b = rest.as_bytes();
+    if b.len() < 5 || b[0] != b'*' || b[1] != b'*' {
+        return None;
+    }
+    if !(b[2].is_ascii_lowercase() || b[2].is_ascii_digit()) {
+        return None;
+    }
+    let mut j = 3usize;
+    while j < b.len() && (b[j].is_ascii_lowercase() || b[j].is_ascii_digit() || b[j] == b'-') {
+        j += 1;
+    }
+    if j + 1 < b.len() && b[j] == b'*' && b[j + 1] == b'*' {
+        return Some(String::from_utf8_lossy(&b[2..j]).into_owned());
+    }
+    None
 }
 
 // spec: canon-kit/SPEC.md §lib/spec.sh — the manifest set as the members that sort it read
@@ -378,11 +542,13 @@ pub struct Para {
 }
 
 impl Para {
-    fn reset(&mut self) {
+    // spec: canon-kit/SPEC.md §lib/spec.sh — both walk drivers fill this accumulator, the
+    // shared prose one below and check-comment-tier's caller-owned comment walk
+    pub fn reset(&mut self) {
         self.fnr.clear();
         self.line.clear();
     }
-    fn add(&mut self, fnr: usize, text: &str) {
+    pub fn add(&mut self, fnr: usize, text: &str) {
         self.fnr.push(fnr);
         self.line.push(text.to_string());
     }

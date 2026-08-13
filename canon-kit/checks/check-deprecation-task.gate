@@ -1,0 +1,3 @@
+# graph: couples=scripts/*.sh,kit:*.sh,*.gate,*.rs,.workflow/*,TASK-QUEUE.md dir=one valve=none tier=precommit
+# install: on-surface
+# spec: canon-kit/SPEC.md §check-deprecation-task — every deprecation marker on a governed source binds task: <slug> to a live queue task

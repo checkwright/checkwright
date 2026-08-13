@@ -1,0 +1,3 @@
+# contract: fixture-state v1
+# @deprecated task: retire-legacy-widget — the workflow tier's binding is live
+fixture data line

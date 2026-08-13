@@ -1,0 +1,2 @@
+# contract: SPEC-target.md §The heading that drifted away — the workflow tier's dangling member
+fixture data line

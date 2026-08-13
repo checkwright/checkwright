@@ -18,3 +18,7 @@ check-stage-evidence
 check-lesson-disposition
 check-survey-record
 check-shim-restatement
+check-comment-tier
+check-spec-pointer
+check-todo-task-liveness
+check-deprecation-task
