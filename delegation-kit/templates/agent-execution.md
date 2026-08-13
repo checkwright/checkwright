@@ -91,7 +91,8 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   **type**, never from the instruction text. The claim is made by
   `isolation: worktree`. Take it for an agent that *will* commit — an **own
   index**, the **Serialize on shared files** rule above — and for any agent
-  *claimed* read-only, as **write confinement**.
+  *claimed* read-only, as **write confinement**. Grounds for this rule and the
+  next: delegation-kit/SPEC.md §The delegation model.
 - **Isolation charges three harness costs, and paying them is the parent's job.**
   **(1) The worktree's base is configuration, and the default is not HEAD.**
   `worktree.baseRef` selects it: `fresh` (the default) branches from
