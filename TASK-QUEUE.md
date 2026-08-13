@@ -5049,6 +5049,53 @@
   the one boundary where an improvised state write is least recoverable.
   Filed 2026-08-13 by close, draining the gap inbox; filed by the lead mid-iteration 2026-08-13.
 
+- **settings-pins-live-suite-coverage** [design-pending] — `check-settings-pins` is exercised by
+  its fixtures and by no live suite, so the vendored path is unproven end to end.
+  **Scoped against the tree rather than taken from the report that raised it.** The fixture pair
+  does cover the real branches: `context-kit/gate-tests/check-settings-pins/{good,bad}/` each ship
+  a `settings-pins.conf` and a `settings.json`, so the pass and the legible-violation dispositions
+  both run. The claim that the gate only ever reaches its trivial branch is true of the **live**
+  suites and false of the fixture suite, and the difference is the whole entry.
+  **What no live suite reaches:** grepping `CONTEXT_KIT_SETTINGS_PINS` and `settings-pins.conf`
+  across the tree returns the two checks and one gate-test and nothing else — no installer profile,
+  no consumer smoke, no upgrade suite ever writes a pins file. So in every consumer tree the
+  battery exercises only the absent-pins-file clean skip, and a vendoring defect that broke the
+  gate against a real settings file would ship green.
+  **This is the craft rule's own shape** (doctrine-kit/DOCTRINE.md, *Test from the real consumer's
+  runtime*): the lower layer is covered and the higher one is not, which is the inverse of the
+  usual finding and is why it reads as adequate coverage at a glance.
+  **Deliverable, and why `[design-pending]`:** have a smoke profile pin a key and assert the gate
+  bites on a violated pin. What is open is which profile owns it — a pin is consumer config, so the
+  suite must author one without asserting that any particular key is pinnable, or it re-couples the
+  kit to this repo's own pin set and breaks the provenance seam.
+  **This iteration added a pin**, which is what made the hole visible; the pin is correct and
+  independently fixture-covered, so nothing here is a red.
+  **Cost while deferred:** a green battery in an adopter's tree carries no evidence that this gate
+  ran against anything.
+  Filed 2026-08-13 by close, from the roster sweep; raised by the lead and re-scoped here after
+  reading the fixtures.
+
+- **icebox-candidate-roadmap-filter** [design-pending] — the eviction worklist lists entries its
+  own SPEC rules ineligible, so every close re-derives the same exclusions.
+  `bin/queue-index.sh --icebox-candidates` filters on defer-date age and the cost-class opener
+  only. queue-kit/SPEC.md §The icebox tier states a third condition as a **rule**, not a judgment —
+  a roadmap-tagged entry is not icebox-eligible — and the tool never applies it.
+  **Measured this close:** the worklist returned three rows and **all three** are roadmap-tagged
+  (`plugin-marketplace`, `benchmark-ab-experiment`, `hosted-attestation-service`), so the entire
+  worklist was ineligible and the whole step was re-deriving a rule the SPEC already states.
+  **Why this is derivation and not deciding**, which matters because the tool's own spec comment
+  defends it as *"an advisory worklist, never a verdict"*: that defence is about the **cost-class
+  heuristic**, which is prose-matched and rightly advisory. Roadmap-eligibility is neither prose
+  nor judgment — the tag is on the lead line the tool already parses, and the SPEC states the
+  exclusion in the imperative. Filtering it removes re-derivation without deciding anything.
+  **Deliverable, and why `[design-pending]`:** apply the rule in the walk. What is open is whether
+  an excluded row should vanish or print as a stated exclusion — vanishing is cleaner, printing
+  keeps the reason visible to a close that would otherwise wonder where a long-dormant roadmap
+  entry went, and the answer turns on whether anything else already tells that story.
+  **Cost while deferred:** small and exactly recurring — one re-derivation per close, over a
+  worklist that grows as roadmap-tagged entries age.
+  Filed 2026-08-13 by close, from the backlog-eviction step that hit it.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no

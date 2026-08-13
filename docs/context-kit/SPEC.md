@@ -617,6 +617,21 @@ legible drift a red is for. Absent pins file: the opt-in-off state, a clean
 skip. Ships a `good/`+`bad/` fixture pair and registers in the consumer's
 `gates.list` (this repo's included).
 
+**What a pin is worth depends on which tiers can outrank the file it pins**, and
+the gate reads exactly one tier. The harness resolves settings across five, in
+order: managed policy, then command-line, then the untracked local settings file,
+then the tracked settings file this gate reads, then the operator's user-level
+file. Objects deep-merge; the exceptions that merge rather than override are the
+permissions arrays, MCP servers, HTTP hook URLs and `fallbackModel` chains. Two
+consequences the gate's own verdict does not carry. A pin **does** beat the
+operator's user-level file, which is what makes a tracked pin meaningful at all
+rather than a suggestion the machine can quietly ignore. And a pin is **beaten**
+by three tiers above it, of which `check-memory-off` covers one — the local
+settings overlay — leaving managed policy and command-line flags outside any
+gate's reach. That residue is unclosable here rather than merely unbuilt: neither
+tier leaves an artifact in the tree, and the command line does not exist until
+the session starts.
+
 ## check-memory-off
 
 `checks/check-memory-off.sh` (local-environment class, the check-identity
