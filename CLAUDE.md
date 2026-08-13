@@ -106,18 +106,10 @@ an engineering-craft section behind the link:
 One-line rule per convention; mechanism, knob rosters, and default values
 live in the owning SPEC section — cited, never restated.
 
-- **Registry, not array:** gates register by name in `gates.list` and resolve
-  consumer-first with kit shadowing — resolution order and the kit-dirs knob:
-  gate-sdk/SPEC.md §Layout and configuration.
-- **Config via env:** every kit follows the same `<KIT>_<KNOB>` shape with
-  this repo's layout as the defaults; each kit's SPEC owns its knob roster
-  and default values.
-- **Self-contained artifacts:** emitted HTML inlines its CSS; no kit output may
-  reference an asset outside the kit — the one sanctioned exception and its
-  honest limit: gate-sdk/SPEC.md §check-graph.
-- **Kit-landing checklist:** README + SPEC.md, fixtures for every shipped
-  gate, `smoke/`, and registration in this repo's `gates.list` where
-  applicable — gate-sdk/SPEC.md §Consumer smoke owns the checklist.
+- **Registry, not array:** gates register by name in `gates.list`, resolving consumer-first with kit shadowing — resolution order and the kit-dirs knob: gate-sdk/SPEC.md §Layout and configuration.
+- **Config via env:** every kit takes `<KIT>_<KNOB>` with this repo's layout as the defaults; each kit's SPEC owns its knob roster and values.
+- **Self-contained artifacts:** emitted HTML inlines its CSS and no kit output references an asset outside the kit — the one sanctioned exception and its honest limit: gate-sdk/SPEC.md §check-graph.
+- **Kit-landing checklist:** README + SPEC.md, fixtures for every shipped gate, `smoke/`, and `gates.list` registration where applicable — gate-sdk/SPEC.md §Consumer smoke owns it.
 
 ## Agent execution (all stages)
 
