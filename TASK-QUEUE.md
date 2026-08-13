@@ -12,6 +12,99 @@
 
 ## New Features
 
+- **native-diff-renderer-hoist** [spec: SPEC-diff-renderer.md]
+  — the diff-normal-format renderer lives inside one gate module and is the first thing the
+  next freshness-gate port will need.
+  Re-verified at the drain: `normal_diff` is defined once in the crate, in
+  `native/src/gates/lifecycle_registration.rs`, where the lifecycle cohort had to build it.
+  The six generated-projection freshness gates (`check-footprint-fresh`, `check-trajectory-fresh`,
+  `check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
+  `check-roadmap-fresh`) all byte-compare a tracked projection against a live emitter and all
+  print a diff on mismatch, and `check-gate-tamper` does too — every one meets the same need at
+  its own port.
+  **Cost while deferred:** the cohort that ports the first of them either hoists the renderer out
+  of a lifecycle-kit gate module — a cross-kit reach with no precedent in the crate's layout — or
+  writes a second copy, and a second copy of a diff format is two renderings of one diagnostic to
+  keep agreeing. The hoist is small today (about 55 lines plus its unit tests, no dependencies)
+  and gets no smaller.
+  Filed 2026-08-13 by close, draining the gap inbox; the renderer re-grepped across the crate.
+  Promoted 2026-08-13 at spec.
+
+- **queue-lib-dual-implementation-parity** [spec: SPEC-lib-parity.md]
+  — the queue-cohort port left a shell library and its compiled twin with nothing holding
+  the pair.
+  `queue-kit/lib/queue.sh` survives the port as a live shell library for **seven** consumers —
+  five `bin/` scripts plus `check-roadmap-fresh` and `check-queue-prose-precondition`, both
+  still shell — while the ported gates gain an independent Rust implementation of
+  `queue_live_slugs` and `queue_done_slugs`. Corrected at spec 2026-08-13 against the tree:
+  this entry read *five* consumers and named `queue_roadmap_entries` as split, which
+  queue-kit/SPEC.md §lib/queue.sh already denies; the split twin it missed is the dead one.
+  Seven of the eight derived globals are read directly by a `bin/` script's awk —
+  `QUEUE_DONE_RE` is read only inside `queue_done_slugs`, which nothing calls.
+  **This is criterion 6's own qualification firing** — gate-sdk/SPEC.md §The port-candidate
+  criteria permits the duplication a port creates *"unless the duplication the port creates is
+  machine-held"*, and here it is not. The amendment's parity proof is one-time, at port; it
+  does not survive the next edit to either side, because the shell original is not deleted —
+  a `bin/` script still calls it.
+  **Deliverable:** a golden-value cross-implementation test — canned queue-file input, both
+  implementations' output compared — wired into `run-gate-tests.sh` or a dedicated fixture.
+  The fuller close is collapsing the `bin/` scripts onto the same Rust core via a thin
+  subcommand, which was explicitly out of the cohort's scope.
+  **Cost while deferred:** a future change to queue-kit's section-matching or its
+  slug/roadmap-entry grammar edited on only one side silently diverges the gate's verdict from
+  the `bin/` tool's output, with no gate to catch it — and the divergence surfaces as a wrong
+  answer rather than a red.
+  Filed 2026-08-12 by close, draining the bullet align filed against the cohort amendment.
+  Promoted 2026-08-13 at spec, with three of the entry's own claims corrected at the amendment.
+
+- **native-gate-port-remaining-corpus** [spec: SPEC-comment-cohort.md] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 67 of
+  103 registered gates remain unported, and a Done move would assert a finished port and
+  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
+  live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
+  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
+  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
+  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
+  means a developer clones the **public repository** — source never enters the payload, so the
+  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
+  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
+  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
+  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
+  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
+  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
+  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
+  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
+  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
+  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
+  **Six cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
+  members, each cohort's delivered count, the holds and their grounds live there, so this entry
+  states what remains rather than restating them. Every held member is **sequencing with port
+  work owed, never exclusion**, and what each owes is on
+  `cohort-held-members-port-prerequisites`, which owns the roster and the kits
+  it spans; a kit count copied here would be a second one to drift, and was.
+  **Cost while deferred:** large and known — 67 gates plus the runners and the install-lifecycle
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
+  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
+  2026-08-13 at build for the kit-roots cohort, again for the ERE cohort, and again for the
+  lifecycle-kit cohort; re-promoted 2026-08-13 at spec between the last two, and again the
+  same day at spec for the comment-surface cohort.
+
 ## Technical Debt
 
 - **lifecycle-gate-test-runner-holdouts** — two of lifecycle-kit's gate-driving test
@@ -69,53 +162,6 @@
   own selection rule as written.
   Filed 2026-08-13 at scope on lead disposition, under scope-gated intake: filed as costed
   work, not started.
-
-- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 67 of
-  103 registered gates remain unported, and a Done move would assert a finished port and
-  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
-  live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
-  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
-  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
-  means a developer clones the **public repository** — source never enters the payload, so the
-  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
-  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
-  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
-  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
-  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
-  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
-  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
-  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
-  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
-  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Six cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
-  members, each cohort's delivered count, the holds and their grounds live there, so this entry
-  states what remains rather than restating them. Every held member is **sequencing with port
-  work owed, never exclusion**, and what each owes is on
-  `cohort-held-members-port-prerequisites`, which owns the roster and the kits
-  it spans; a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 67 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
-  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
-  2026-08-13 at build for the kit-roots cohort, again for the ERE cohort, and again for the
-  lifecycle-kit cohort; re-promoted 2026-08-13 at spec between the last two.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
@@ -4386,28 +4432,6 @@
   Filed 2026-08-12 by close, draining the rule-12 gap bullet and the lead's handed-over
   candidate rule; the two were folded into one entry because both amend the same clause.
 
-- **queue-lib-dual-implementation-parity** [design-pending] — the queue-cohort port leaves two
-  helpers and eight derived globals implemented twice with nothing machine-holding the pair.
-  `queue-kit/lib/queue.sh` survives the port as a live shell library for five non-cohort
-  scripts (`bin/queue-index.sh`, `bin/queue-counts.sh`, `bin/queue-edges.sh`, `bin/roadmap.sh`,
-  `bin/lesson-sink.sh` all source it), while the ported gates gain an independent Rust
-  implementation of `queue_live_slugs` and `queue_roadmap_entries`. The eight derived globals
-  reach wider still: every one is read directly by at least one `bin/` script's awk.
-  **This is criterion 6's own qualification firing** — gate-sdk/SPEC.md §The port-candidate
-  criteria permits the duplication a port creates *"unless the duplication the port creates is
-  machine-held"*, and here it is not. The amendment's parity proof is one-time, at port; it
-  does not survive the next edit to either side, because the shell original is not deleted —
-  a `bin/` script still calls it.
-  **Deliverable:** a golden-value cross-implementation test — canned queue-file input, both
-  implementations' output compared — wired into `run-gate-tests.sh` or a dedicated fixture.
-  The fuller close is collapsing the `bin/` scripts onto the same Rust core via a thin
-  subcommand, which was explicitly out of the cohort's scope.
-  **Cost while deferred:** a future change to queue-kit's section-matching or its
-  slug/roadmap-entry grammar edited on only one side silently diverges the gate's verdict from
-  the `bin/` tool's output, with no gate to catch it — and the divergence surfaces as a wrong
-  answer rather than a red.
-  Filed 2026-08-12 by close, draining the bullet align filed against the cohort amendment.
-
 - **cohort-held-members-port-prerequisites** [design-pending] — three gates are held on shell
   by operator ruling, each owing a named prerequisite nothing else tracks.
   Ground is **sequencing, not exclusion**: gate-sdk/SPEC.md §The port-candidate criteria opens
@@ -5356,22 +5380,6 @@
   is the debugging path the per-kit form exists to serve — and it is charged to a maintainer
   already debugging something else, which is when a spurious failure is most expensive.
   Filed 2026-08-13 by close, draining the gap inbox; re-verified by running the command.
-
-- **native-diff-renderer-hoist** [design-pending] — the diff-normal-format renderer lives inside
-  one gate module and is the first thing the next freshness-gate port will need.
-  Re-verified at the drain: `normal_diff` is defined once in the crate, in
-  `native/src/gates/lifecycle_registration.rs`, where the lifecycle cohort had to build it.
-  The six generated-projection freshness gates (`check-footprint-fresh`, `check-trajectory-fresh`,
-  `check-enforcement-fresh`, `check-value-rollup-fresh`, `check-docs-mirror-fresh`,
-  `check-roadmap-fresh`) all byte-compare a tracked projection against a live emitter and all
-  print a diff on mismatch, and `check-gate-tamper` does too — every one meets the same need at
-  its own port.
-  **Cost while deferred:** the cohort that ports the first of them either hoists the renderer out
-  of a lifecycle-kit gate module — a cross-kit reach with no precedent in the crate's layout — or
-  writes a second copy, and a second copy of a diff format is two renderings of one diagnostic to
-  keep agreeing. The hoist is small today (about 55 lines plus its unit tests, no dependencies)
-  and gets no smaller.
-  Filed 2026-08-13 by close, draining the gap inbox; the renderer re-grepped across the crate.
 
 - **amendment-work-class-label-placement** [design-pending] — the amendment work-class label is
   mandated with no placement, so each spec session re-establishes it from a deleted precedent.
