@@ -61,37 +61,6 @@
   Filed 2026-08-10 by close, from the bullet that iteration's scope session filed; promoted
   2026-08-12 at spec.
 
-- **readonly-dispatch-isolation-unbuyable** [spec: SPEC-isolation-base-ref.md] — an isolated
-  agent's base ref is a harness setting; only the untracked half was ever a design problem.
-  recurrence: readonly-dispatch-isolation-unbuyable 2026-08-11 2026-08-12
-  **Promoted 2026-08-12 at spec, with its diagnosis corrected.** Seven attestations recorded a
-  worktree cut at `origin/master` rather than the dispatcher's HEAD, and this entry read them as
-  a harness defect worth four authored design candidates. `worktree.baseRef` (enum `fresh` |
-  `head`) is a supported setting whose shipped schema description says it applies to agent
-  isolation, and `fresh` — the default every attestation ran under — is the
-  `origin/<default-branch>` mode. **Confirmed by dispatch, not by reading:** under `head` a
-  child came up at the dispatcher's HEAD `4ed57685` while `origin/master` stood seven commits
-  back at `b8f27d8e`. Every prior attestation records correctly-applied configured behavior, so
-  no defect is written up. No upstream filing is owed either — the mechanism and its
-  discoverability harm are already filed as anthropics/claude-code #77671 and #82955.
-  **The half that survives, and it is the worse one.** An isolated child cannot read untracked
-  or gitignored files at all: they are in no commit, so no base ref reaches them and naming a
-  rev does not help. Attested — a sweep over `.workflow/prompt-friction.log` read an empty file
-  and reported the 621-line corpus absent; `compare-settings-allow.sh` saw no overlay because
-  `.claude/settings.local.json` is uncommitted. This is where this entry's original lead line is
-  true and only here: a read-only claim is made by isolation, and isolation blinds that read, so
-  such a sweep has no correct form and must not be dispatched.
-  **What the amendment lands:** the false universal corrected in the shipped, public template
-  `delegation-kit/templates/agent-execution.md`; the untracked blindness written there for the
-  first time; the child-side rev discipline kept as defence in depth with its reason stated; and
-  the repo-level pin (`.claude/settings.json` plus `scripts/settings-pins.conf`, one commit,
-  because a pin naming an absent key is exit 2). No new gate — `check-settings-pins` is already
-  the general mechanism and holds memory-off by the same means.
-  **The 2026-08-12 gap-inbox bullet re-filing this entry is superseded, not withdrawn:** its
-  observation holds, its cause does not. Close drains it against the amendment.
-  Filed 2026-08-08 by close, from the knowledge-friction capture and the gap it drained;
-  promoted 2026-08-12 at spec on a corrected premise.
-
 
 ## Technical Debt
 
@@ -5050,6 +5019,7 @@
 - port-criterion-transitive-binding-reach
 - cohort-hold-criterion-label-defect
 - substrate-parity-partial-vendor-scope
+- readonly-dispatch-isolation-unbuyable
 
 ## Lessons Learned
 

@@ -100,31 +100,45 @@ drift: do not delete it on sight, and when either rule changes here, propagate.
   unchanged, so the worktree survives **iff** the agent was not in fact
   read-only, which makes the isolation simultaneously the confinement and the
   detector.
-- **Isolation charges two harness costs, and paying them is the parent's job.**
-  Neither retracts the rule above — the claim is still made by the shape; these
-  are what the shape costs. **(1) The worktree is cut at the remote tracking ref,
-  not at HEAD** — measured rather than inferred: sweeps dispatched from several
-  different local HEADs all came up at `origin/master` exactly. So the staleness
-  *equals the unpushed backlog*, which makes it predictable instead of mysterious:
-  a parent reads its own exposure with `git log origin/master..HEAD` before
-  dispatching, and a parent that pushes first has none. Until then an agent reads
-  the *pre-change* tree and can report a just-fixed defect as still live. Naming a
-  commit in the prompt does not make the checkout that commit. The object store is
-  shared, so the fix is in the child: verify with `git rev-parse HEAD` and read
-  every target with `git show <rev>:<path>` against the rev the parent states. A
-  parent that omits this owes the doubt back — an audit whose reads may be stale
-  certifies nothing, and every downstream unit has to re-verify the read sites the
-  audit was bought to settle. **A child whose target is unreadable at that rev
-  stops and says so**, and never falls back to the dispatch prompt's own
-  paraphrase of it — that returns the parent's words as a finding, which is
-  indistinguishable in shape from a clean audit and is therefore worse than a
-  refusal. **(2) The worktree lands inside the repo and untracked**, so an
-  in-flight isolated agent reads as a dirty tree and aborts every clean-tree
-  precondition — a consumer smoke, a packaging step, any commit. Gitignore the
-  path. That trades one signal for another and the trade is worth naming: the
-  survives-iff-it-wrote detector above stops showing up free in `git status`, so
-  it moves to an explicit `git worktree list` at the boundary where the parent
-  reaps its agents.
+- **Isolation charges three harness costs, and paying them is the parent's job.**
+  None of them retracts the rule above — the claim is still made by the shape;
+  these are what the shape costs. **(1) The worktree's base is configuration, and
+  the default is not HEAD.** `worktree.baseRef` selects it: `fresh` (the default)
+  branches from `origin/<default-branch>`, `head` from the dispatcher's local
+  HEAD. Under the default a child reads the *pre-change* tree — it can report a
+  just-fixed defect as still live — and the staleness equals the unpushed backlog
+  exactly, which a parent reads as `git log origin/<default-branch>..HEAD` and a
+  parent that pushes first has none of; under `head` neither sentence holds.
+  **Set it before you design around it** — and pin it, so the guarantee does not
+  depend on whichever machine happens to dispatch. Naming a commit in the prompt
+  does not make the checkout that commit, and the parent cannot read the child's
+  *effective* setting: `baseRef` resolves on the dispatching machine's merged
+  settings, nothing in the dispatch payload carries it and nothing returns it. So
+  the child-side rev discipline stays, now as defence in depth rather than as a
+  workaround: the object store is shared, so the child verifies with `git
+  rev-parse HEAD` and reads every target with `git show <rev>:<path>` against the
+  rev the parent states. It costs one command whose output *is* the evidence, and
+  it degrades from load-bearing to a cheap assertion once the knob is pinned —
+  which is the right shape, because a consumer that has not set the knob has
+  nothing else. **A child whose target is unreadable at that rev stops and says
+  so**, and never falls back to the dispatch prompt's own paraphrase of it — that
+  returns the parent's words as a finding, which is indistinguishable in shape
+  from a clean audit and is therefore worse than a refusal. **(2) The worktree
+  lands inside the repo and untracked**, so an in-flight isolated agent reads as a
+  dirty tree and aborts every clean-tree precondition — a consumer smoke, a
+  packaging step, any commit. Gitignore the path. That trades one signal for
+  another and the trade is worth naming: the survives-iff-it-wrote detector above
+  stops showing up free in `git status`, so it moves to an explicit `git worktree
+  list` at the boundary where the parent reaps its agents. **(3) An isolated child
+  sees only committed state.** Untracked and gitignored files are in no commit, so
+  no base ref reaches them and naming a rev does not help. A sweep whose corpus
+  includes an untracked surface returns a confident "nothing there" —
+  indistinguishable in shape from a clean result, which makes it the worse of the
+  two failures. **Such a sweep is not delegable to an isolated agent**: the parent
+  reads that surface itself, or passes its content in the prompt. Note the bind
+  this creates with the read-only rule above — a read-only claim is made by
+  isolation, and isolation is what blinds the read — so a claimed-read-only sweep
+  over an untracked corpus has no correct form and must not be dispatched.
 - **One commit per unit, sized to finish within budget.** Each unit gets its own
   commit (+ a `[blocked-by: prior]` tag where ordered). A unit that investigates
   long before its first commit is the only thing an interrupt can destroy —

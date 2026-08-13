@@ -182,6 +182,21 @@ than left out — an omitted `model:` resolves to the literal `inherit`, so
 omission spells the dispatcher's tier rather than a neutral absence, and
 `check-agent-tier-explicit` is that clause's oracle over the tracked surface.
 
+**`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
+job.** The template's **Isolation charges three harness costs, and paying them
+is the parent's job** rule names the knob and both of its values rather than a
+choice, because a vendoring consumer
+inherits the template and never a settings file. A consumer that dispatches
+isolated agents therefore sets the knob deliberately instead of inheriting the
+default, and — where its harness config is gated — pins it, through the general
+settings-pin mechanism (context-kit/SPEC.md §check-settings-pins) rather than
+anything this kit ships. What is ruled is that the value be *chosen*, never which
+value: a consumer wanting a clean tree per dispatch is right to stay on the
+default. No knob joins delegation-kit's own roster for it (§Layout and
+configuration) — this is harness configuration, not kit configuration, and a kit
+knob shadowing a vendor setting would be a second source for one value. Recorded
+so a later reader does not read the omission as an oversight and close it.
+
 **The dispatch-shape rules are one mechanism, seen from several sides.** The template's **Never dispatch
 a fork to narrow a child**, **A read-only claim is made by isolation, not by
 sentence**, and **A child's only upward route is a durable artifact** rules are
