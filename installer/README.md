@@ -393,10 +393,14 @@ member's invocation argv and a `.gate` member resolves to this binary. A hook
 generated first would resolve a dispatch it cannot make.
 
 Every row of the table above runs under an oracle rather than a
-hand-verification with a date on it: §The consumer smoke's artifact arm builds a
-binary, packs it, and drives each outcome on every invocation. Nothing here
-changes for that — the behavior this section specifies is what the arm asserts,
-not something it added.
+hand-verification with a date on it, and the rows are split across §The consumer
+smoke's arms by which install can show them. The **verify-then-write** row is the
+main loop's, on every profile, because the payload it packs carries a binary this
+run built; the **omit-and-declare** row is the binary-less leg's and the artifact
+arm's undeclared-host leg's; the **refusal** row is the artifact arm's alone,
+against a payload it mutated after extraction. Nothing here changes for that —
+the behavior this section specifies is what those arms assert, not something they
+added.
 
 ## doctor
 
@@ -841,7 +845,8 @@ resolution of the disagreement: today nothing detects it, and a version that
 refuses on a mismatch would refuse exactly the invocations this sentence tells
 you not to make.
 
-It packs the package, installs it **from the resulting tarball with
+It builds the host gate binary, packs the package around it, installs it **from
+the resulting tarball with
 `--offline`**, and drives a scratch consumer once per profile: `init`, then the
 battery must be green, then the manifest must agree with the tree it describes
 file by file, then the **queue post-condition** — a profile whose kit set reads
@@ -858,6 +863,25 @@ scan having narrowed, and a profile green on the first run must still be green
 on the second. The arm restores the consumer to the commit it found, so the
 reversal below still runs against the tree `init` wrote.
 
+**The payload every profile installs carries a real gate binary**, because the
+value claim is a claim about the product an adopter receives. The smoke compiles
+the crate for the host target, emits the digest sidecar beside it and hands the
+pair to `pack-installer.sh --artifacts` before the loop starts, so each profile's
+battery is the battery a covered platform actually gets. It was not always so,
+and the accident is worth naming rather than quietly fixed: a main loop packing
+no artifact makes *every* profile an uncovered-platform install, so a value
+verdict measured there is a verdict about the omitted battery wearing the
+shipped one's name. It costs no new dependency — the preflight already requires
+`cargo` and `rustc`.
+
+*A host-built artifact is a harness stand-in, and is labelled one where the rule
+it stands beside is cited.* gate-sdk/SPEC.md §Consumer payload rules that the
+payload carries a prebuilt binary per declared target, *built by the release and
+never from a working tree*. The smoke builds from a working tree because it has
+no Release to draw on. That is a liberty this harness takes, not the payload rule
+relaxing: the publishing path still cannot build, and `pack-installer.sh` is
+still handed a directory it did not produce.
+
 **The value claim is asserted over the loop, not inside it**, and it is two
 sentences: some profile catches the defect at all, and some profile *below* the
 payload-derived maximum catches it. The second is the load-bearing one — a
@@ -870,6 +894,28 @@ defect follows from the rosters, and spelling it here would be that derivation
 copied out. What the arm turns from a claim into an assertion is the one the
 install page makes hardest to check: an install that is green, idempotent and
 reversible is still worth nothing until it catches something.
+
+That is the **coverage** claim, and it speaks only for a covered platform. What
+an adopter on an uncovered one gets is a different claim — **disclosure** — and
+it has its own leg, because folding the two into one verdict is what let a cohort
+of ports pass per member while emptying a value class for every binary-less
+install.
+
+**The binary-less leg** installs one profile from a payload packed with no
+artifact, and asserts that every member the install loses is recorded
+`# omitted: <name> <reason>` in the consumer's own `gates.list` — against the set
+that payload dispatches to a binary, derived rather than spelled — and that the
+count is **non-zero**. The count is the half that matters: without it the
+completeness assertion passes vacuously on a payload that dispatches nothing,
+which is exactly the reading under which N individually runnable members
+discharged a cohort that left such a consumer with no markdown-link governance at
+all (gate-sdk/SPEC.md §The port-candidate criteria, criterion 5). The leg
+deliberately does **not** assert that the planted defect goes uncaught: pinning a
+missing capability as expected behavior would make the hole permanent the moment
+it closes. It names a profile where the value claim above names none, and the
+difference is real — this is a scoping choice about which install to run, not a
+derivation of which profiles catch what. The profile it names is the one whose
+roster criterion the binary-gated class empties.
 
 It also asserts the profile lattice
 against the installed payload, in four parts: every named kit resolves in the
@@ -948,11 +994,15 @@ because `init` reads only its exit status: the standalone verdict is what an
 adopter meets first and what every later refusal is downstream of.
 
 That arm exists because nothing else here could see the defect it holds out.
-The smoke's own preflight *requires* `cargo` and `rustc`, legitimately — the
-artifact arm builds the crate it packs — so every arm above drives `doctor` and
+The smoke's own preflight *requires* `cargo` and `rustc`, legitimately — it
+builds the binary the payload carries — so every arm above drives `doctor` and
 `init` on a machine that has them. **Masking is per-arm**, which is exactly what
 lets this arm exist without weakening that preflight: the host requirement is
-unchanged and the artifact arm still gets the real tools. The mechanism is the
+unchanged and the build step still gets the real tools. What the arm asserts is
+sharpened by that payload rather than compromised by it — it installs a
+*prebuilt* artifact with no toolchain on `PATH`, which is the claim the port
+directive rests on: an adopter takes the pre-compiled path, and nothing on it
+compiles. The mechanism is the
 existing Node-free mask rather than a new facility, and it is reused rather than
 replaced by a knob for a reason: `INSTALLER_SMOKE_TMP_DIR` stays the smoke's only
 knob, a knob that suppressed a roster member would be a second, test-only
@@ -1058,37 +1108,43 @@ only that the payload changed shape.
 
 *Its honest limit.* Only the recorded paths are asserted on, and the config seam
 is written on the artifact placement path alone — so on a payload carrying no
-prebuilt binary this arm resolves the registry and not the seam. The residual
-shape is what keeps it biting there: with no `kits` key, a tail match returns a
-vendored fixture for `gates.list` too. Demanding the seam unconditionally would
-fail the arm on the payload rather than on the resolver.
+prebuilt binary the arm would resolve the registry and not the seam. It runs
+against the main payload, which carries one, so both are checked today; what the
+arm still refuses to do is *demand* the seam, because that would fail it on the
+payload rather than on the resolver. The residual shape is what keeps it biting
+either way: with no `kits` key, a tail match returns a vendored fixture for
+`gates.list` too.
 
-**The artifact arm rides the per-profile post-conditions**, taking whichever of
-§The gate binary's outcomes the payload and the host actually produce. Every arm
-above packs with no artifacts, so each takes the **omission** outcome: no binary
-is written, no `artifact` key reaches the manifest, and the members recorded as
-`# omitted:` are exactly the ones the consumer's own vendored tree implements as
-a binary subcommand. That set is derived rather than spelled, which is what keeps
-the assertion alive: a literal would read as green on a tree where nothing has
-ported and stop asserting on the first tree where something has.
+**Every arm above rides §The gate binary's placement outcome**, because the
+payload they install carries this run's artifact: the binary is written, an
+`artifact` key reaches the manifest, nothing is omitted, and each profile's
+battery dispatches its `.gate` members through the placed path. The **omission**
+outcome is not thereby lost — it is what the binary-less leg above is for, and
+there the members recorded `# omitted:` are exactly the ones the consumer's own
+vendored tree implements as a binary subcommand. That set is derived rather than
+spelled, which is what keeps the assertion alive: a literal would read as green
+on a tree where nothing has ported and stop asserting on the first tree where
+something has.
 
-**The placement branch is exercised by a leg that builds the binary it packs.**
-The arm compiles the crate for the host target, emits the digest sidecar beside
-it, and hands the pair to `pack-installer.sh --artifacts`, so `init` meets a real
-artifact from the real producer. A fabricated stand-in with a matching digest
-would drive the same placement code while leaving the one thing most likely to
-break — the build's own digest agreeing with what `init` verifies before
-writing — covered by nothing. Against that pack the arm asserts the target
-`init` selected against what `rustc` independently reports this host to be, the
-recorded digest against the one the build leg emitted, the binary executable at
-the path the config seam names, and both that path and the seam on the manifest
-roster. It then drives the outcomes a single install cannot show, each against a
-payload mutated in the extracted package rather than through a flag on the
-publishing path: a host **off** the roster omits and declares and exits clean, a
-**tampered** artifact refuses with the consumer's tree object unchanged and no
-manifest written, and a **declared** target whose artifact is gone refuses rather
-than omitting. The last two are what keep the three outcomes of §The gate
-binary's table from collapsing into each other.
+**The binary is built rather than fabricated**, which is what makes the placement
+branch worth exercising at all. A stand-in with a matching digest would drive the
+same code while leaving the one thing most likely to break — the real build's
+digest agreeing with what `init` verifies before writing — covered by nothing. So
+the smoke asserts the target `init` selected against what `rustc` independently
+reports this host to be, the recorded digest against the one the build step
+emitted, the binary executable at the path the config seam names, and both that
+path and the seam on the manifest roster.
+
+**The artifact arm is what remains once the main payload carries the binary**:
+the outcomes a single install cannot show. It takes its own extraction of that
+same tarball and mutates the copy, rather than packing a second time — a host
+**off** the roster omits and declares and exits clean, a **tampered** artifact
+refuses with the consumer's tree object unchanged and no manifest written, and a
+**declared** target whose artifact is gone refuses rather than omitting. The last
+two are what keep the three outcomes of §The gate binary's table from collapsing
+into each other. Mutating an extracted package rather than adding a flag to the
+publishing path is deliberate: it leaves the publisher no way to ship a payload
+with a hole in it.
 
 `pack-installer.sh` gains nothing from this: the **smoke** builds and hands it a
 directory, while the publishing path still never builds, so a locally built
@@ -1099,11 +1155,14 @@ than a property of the design.* A single host build satisfies `--artifacts` only
 while `native/targets.list` declares this host alone — pack refuses a roster
 target no leg built, and refusing is right, because a payload missing a declared
 target is broken rather than narrower. The moment the roster declares a second
-target the arm blocks rather than passing, naming its own re-entry: steer the
-arm's pack at a narrowed roster through `GATE_SDK_NATIVE_TARGETS_FILE`
+target the build step blocks rather than passing, naming its own re-entry: steer
+its pack at a narrowed roster through `GATE_SDK_NATIVE_TARGETS_FILE`
 (gate-sdk/SPEC.md §Layout and configuration) so the smoke commits to the host
-alone while the published payload still commits to all of them, or give the leg
-a cross-compiling build. Neither is built ahead of the second target.
+alone while the published payload still commits to all of them, or give the step
+a cross-compiling build. Neither is built ahead of the second target. Note where
+that block now falls: the build precedes the main pack, so a second declared
+target stops the whole smoke rather than only its last arm — which is the honest
+consequence of the main payload carrying the artifact, not a regression.
 
 Its only knob is `INSTALLER_SMOKE_TMP_DIR`, and it writes nothing inside the
 worktree: the crate's build output lands in gitignored build space and the

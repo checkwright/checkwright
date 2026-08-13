@@ -1037,7 +1037,9 @@ design time; the last three were paid for, and each is named with what it cost.
    The placement branch never waited on that tag for its
    evidence — `consumer-smoke-artifact-arm` gave the consumer smoke a leg that builds
    the binary and packs it, so every invocation drives selection, pre-write digest
-   verification and placement against a real artifact
+   verification and placement against a real artifact; since
+   `port-criterion-aggregate-cost-blindness` that artifact rides the **main**
+   payload, so every profile the smoke installs takes the placement branch
    (installer/README.md §The consumer smoke).
 
    **The criterion is priced per member and paid per cohort**, because the
@@ -1046,14 +1048,32 @@ design time; the last three were paid for, and each is named with what it cost.
    payload carries no artifact for its host still catches once every member of the
    cohort is a descriptor. Seven `spec_manifest_files` members ported in one batch
    (`f602642d`) each passed the per-member reading, and the aggregate left such a
-   consumer with no gate asserting markdown-link liveness at all. That residual is
-   **measured, never reasoned** — the oracle exists and is `installer_smoke`'s
-   value arm, which plants a real defect in adopter-authored prose and asserts
-   that some profile below the maximum catches it
-   (installer/README.md §The consumer smoke). A cohort records that verdict in its
-   own amendment, against the post-cohort registry. **N members each individually runnable is not a
-   discharge**, and citing the per-member reading as one is the defect this half
-   exists to name.
+   consumer with no gate asserting markdown-link liveness at all.
+
+   **The residual is the omitted roster and its count, and that is what a cohort
+   records.** It is **measured, never reasoned**, and the instrument is
+   `installer_smoke`'s binary-less leg: it installs a profile from an
+   artifact-free payload, derives the set that payload dispatches to a binary from
+   the consumer's own vendored tree, and asserts the consumer's `gates.list`
+   declares exactly that set, at a **non-zero** count
+   (installer/README.md §The consumer smoke). The quantity is therefore
+   machine-derived and machine-asserted-complete, and a cohort records **the
+   roster it grew**, against the post-cohort registry, with its amendment ruling
+   whether that roster is acceptable. **N members each individually runnable is
+   not a discharge**, and citing the per-member reading as one is the defect this
+   half exists to name.
+
+   **What the value arm is, and what it is not.** It plants a real defect in
+   adopter-authored prose and asserts that some profile below the maximum catches
+   it. That is a claim about **the product an adopter installs** — not about the
+   residual — and this criterion once named it the residual's oracle. It read as
+   one only while the smoke's main loop packed no artifact: every profile was then
+   an uncovered-platform install by accident of the harness, and the accident was
+   borrowed as a contract. The cost is on record. A cohort satisfied this
+   criterion per member, the aggregate emptied a class, and the assertion that
+   noticed was the one about the product — which then read as broken rather than
+   as reporting (`port-criterion-aggregate-cost-blindness`). Two claims, two arms,
+   and neither feeds the other's verdict.
 
    The verdict is a **price, not a screen** — the roster's opening paragraph and
    the ruling it rests on
@@ -1065,13 +1085,15 @@ design time; the last three were paid for, and each is named with what it cost.
    What a cohort may not do is land **unpriced**, and while an aggregate price
    stands unpaid the held `installer_smoke fail` row in
    `.workflow/validate-baseline.txt` is what keeps it visible — a machine-held
-   record of an unpaid price, and the only enforcement this half carries.
+   record of an unpaid price.
 
-   **Its honest limit, stated rather than left to be discovered.** Nothing
-   *forces* a future cohort to take the measurement: the obligation is prose on
-   the porting session, because a gate that checked it would have to know what a
-   cohort is, and a cohort is a queue-and-amendment concept the gate layer does
-   not carry.
+   **Its honest limit, narrowed rather than deleted.** The *number* is
+   machine-derived and its completeness is machine-asserted, so a cohort can no
+   longer record a residual it never measured. What stays prose is the
+   **judgment**: nothing forces a cohort to decide that the roster it grew is
+   acceptable, because a gate that checked that would have to know what a cohort
+   is, and a cohort is a queue-and-amendment concept the gate layer does not
+   carry.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives
@@ -1860,7 +1882,11 @@ roster line plus one runner mapping, never a workflow rewrite.
 the artifacts are never produced from a working tree: the pack step takes them
 from the run artifacts the build legs uploaded and builds nothing itself, so a
 locally-built binary can never substitute for a released one — the same reasoning
-the vendoring ruling applied to the crate source, arriving one layer out. The
+the vendoring ruling applied to the crate source, arriving one layer out. **The
+consumer smoke's host-built artifact is a harness stand-in, not this rule
+relaxing**: it builds from a working tree because it has no Release to draw on,
+and hands `pack-installer.sh` a directory it did not produce, exactly as a build
+leg would (installer/README.md §The consumer smoke). The
 one-payload shape is ruled on the numbers: the *installed* footprint is one
 binary either way, since the installer writes only the matching target, so the
 difference against a per-target payload is download size alone and is bounded by
