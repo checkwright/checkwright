@@ -182,20 +182,72 @@ than left out — an omitted `model:` resolves to the literal `inherit`, so
 omission spells the dispatcher's tier rather than a neutral absence, and
 `check-agent-tier-explicit` is that clause's oracle over the tracked surface.
 
+**Isolation's second purpose, and why the cost objection does not land.** The
+template's **A read-only claim is made by isolation, not by sentence** rule
+states the disposition and carries none of its grounds, which are these. "It has
+no Edit tool" is not the safety property it reads as: every agent type available
+for audit-shaped work carries write tools, or at least a shell that reaches
+`git`, so a toolset is never narrowed by the brief describing it. And the
+isolation is not purely a cost — the harness auto-cleans a worktree left
+unchanged, so the worktree survives **iff** the agent was not in fact read-only,
+which makes one mechanism both the confinement and its own detector. Gitignoring
+the worktree path trades that free `git status` signal away, which is why the
+rule's second cost sends the parent to an explicit `git worktree list` at the
+reaping boundary instead.
+
 **`worktree.baseRef` is vendor configuration, and choosing it is the consumer's
 job.** The template's **Isolation charges three harness costs, and paying them
 is the parent's job** rule names the knob and both of its values rather than a
-choice, because a vendoring consumer
-inherits the template and never a settings file. A consumer that dispatches
-isolated agents therefore sets the knob deliberately instead of inheriting the
-default, and — where its harness config is gated — pins it, through the general
-settings-pin mechanism (context-kit/SPEC.md §check-settings-pins) rather than
-anything this kit ships. What is ruled is that the value be *chosen*, never which
-value: a consumer wanting a clean tree per dispatch is right to stay on the
-default. No knob joins delegation-kit's own roster for it (§Layout and
-configuration) — this is harness configuration, not kit configuration, and a kit
-knob shadowing a vendor setting would be a second source for one value. Recorded
-so a later reader does not read the omission as an oversight and close it.
+choice, because a vendoring consumer inherits the template and never a settings
+file. A consumer that dispatches isolated agents therefore sets the knob
+deliberately instead of inheriting the default, and — where its harness config is
+gated — pins it, through the general settings-pin mechanism (context-kit/SPEC.md
+§check-settings-pins) rather than anything this kit ships. What is ruled is that
+the value be *chosen*, never which value: a consumer wanting a clean tree per
+dispatch is right to stay on the default. No knob joins delegation-kit's own
+roster for it (§Layout and configuration) — this is harness configuration, not
+kit configuration, and a kit knob shadowing a vendor setting would be a second
+source for one value. Recorded so a later reader does not read the omission as an
+oversight and close it.
+
+**Why that cost names a knob and not a measurement.** "The worktree is cut at
+the remote tracking ref, so staleness equals the unpushed backlog" describes the
+`fresh` value alone; stated as universal it is false, and it reached shipped,
+consumer-facing doctrine on seven attestations — every one taken under that
+default, not one of them bearing on whether the behavior was configurable.
+Repeated confirmation of a behavior is not evidence about its mutability, and
+each re-confirmation made the mechanism feel more settled and so suppressed the
+configuration probe that would have settled it. Hence the rule's shape: name the
+knob and both values, and leave any measurement attributed to the configuration
+it was taken under. It follows that no parent "owes the doubt back" for a
+structural defect here — there is none, and the discipline below costs one line
+in a prompt.
+
+**The child-side rev discipline is kept as defence in depth, and the first
+ground alone is sufficient.** The parent cannot read the child's *effective*
+setting — `baseRef` resolves on the dispatching machine's merged settings,
+nothing in the dispatch payload carries it and nothing returns it — so a parent
+assuming either value is asserting an unverified premise about a third-party
+tool, which is the move that produced the false doctrine above. Second, a
+vendoring consumer inherits the template and not a settings file, so for every
+consumer that has not set the knob the discipline is the whole protection. Third,
+even a repo that pins the knob is not covered end to end: a managed tier and a
+command-line override outrank a project settings file and lie outside any repo's
+reach. It is also nearly free and self-verifying — one command whose output *is*
+the evidence — so under a holding pin it degrades from load-bearing to a cheap
+assertion rather than becoming dead weight.
+
+**The untracked half reaches no configuration at all, and its disposition is
+refusal.** An isolated child sees only committed state, so the third cost is a
+ruling rather than a mitigation: no value of the knob helps and naming a rev does
+not either. Attested twice — a sweep sent to triage an untracked capture log read
+an empty file and reported its corpus absent, and a settings-overlay comparison
+saw no overlay because the local settings file is uncommitted. Both returned a
+confident "nothing there", indistinguishable in shape from a clean result, which
+makes it the worse of the two failure modes. It binds *against* the read-only
+rule rather than beside it: a read-only claim is made by isolation, and isolation
+is what blinds the read, so a claimed-read-only sweep over an untracked corpus
+has no correct form at all.
 
 **The dispatch-shape rules are one mechanism, seen from several sides.** The template's **Never dispatch
 a fork to narrow a child**, **A read-only claim is made by isolation, not by

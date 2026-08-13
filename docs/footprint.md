@@ -43,7 +43,7 @@ host repository's residue.
 | --- | --- | --- |
 | canon-kit | — | 62l · ~824t |
 | context-kit | — | 30l · ~493t |
-| delegation-kit | — | 402l · ~7144t |
+| delegation-kit | — | 375l · ~6586t |
 | doctrine-kit | 18l · ~385t | — |
 | drift-kit | — | 78l · ~1303t |
 | evidence-kit | — | — |
@@ -52,4 +52,4 @@ host repository's residue.
 | lifecycle-kit | 5l · ~76t | 1229l · ~19620t |
 | queue-kit | — | 46l · ~423t |
 | site-kit | — | — |
-| **total** | 23l · ~461t | 1906l · ~30763t |
+| **total** | 23l · ~461t | 1879l · ~30204t |
