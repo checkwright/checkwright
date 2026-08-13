@@ -99,6 +99,37 @@ this section exists to prevent — it would buy a `gsub` implementation with no
 caller in the corpus that justifies the engine, which is a field with no reader
 in the sense §The causal-completeness check point 4 forbids.
 
+## The provenance seam, ruled
+
+This cohort is the one place in the iteration where the seam actually bites, so
+the three-way split is stated rather than left to the implementation.
+
+- **Kit mechanism** — `native/src/ere.rs` in full. It is a general POSIX ERE
+  engine and carries **no vocabulary whatever**: not a transport id, not a
+  disclosure class, not a temporal marker. Premise (iii)'s language/API split is
+  what keeps it that way — an engine sized to a grammar rather than to a corpus
+  cannot encode one project's terms, and the pressure to shrink it toward this
+  tree's five live patterns is exactly the pressure that would.
+- **Consumer config, unchanged** — the transport vocabulary, the disclosure
+  vocabulary and the temporal marker set. Two arrive through consumer *commands*
+  (`CANON_KIT_INSTALL_TRANSPORTS_CMD`, `CANON_KIT_PAYLOAD_CLAIMS_CMD`), which is
+  the `check-graph` / `scripts/graph-vocab.sh` pattern the seam rule names; the
+  third is a consumer array over a generic-English kit default. **Delta (6) moves
+  none of them across the seam** — it changes the *transport* (a bridged resolved
+  value instead of an in-gate subprocess) and not the *ownership*. A port that
+  compiled this repo's five patterns into the crate to avoid writing an engine
+  would publish one project's distribution model in a public kit, which is the
+  privacy boundary before it is a design one.
+- **Kit literal, and legitimately so** — the `install-primary:` and
+  `payload-discloses:` declaration regexes, the heading and fence patterns, the
+  inline-code stripper. These are *grammar the kit owns*, carry no project term,
+  and are the patterns delta (1)'s boundary rule leaves hand-compiled.
+
+The tell that the seam is held: `native/src/ere.rs` and the three ported modules
+should be readable by an adopter with no knowledge of this repo's install
+transports, and a `grep` for any transport or disclosure id across `native/src/`
+returns nothing after the port. That is the build-time check this ruling reduces to.
+
 ## What changes
 
 ### The engine
