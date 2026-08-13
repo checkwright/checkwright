@@ -2815,9 +2815,10 @@
   A tool that silently discards what it cannot parse fails open on exactly the input a user
   got wrong.
   **Why `[design-pending]`:** whether the refusal belongs in this script alone or as a shared
-  argument contract across `lifecycle-kit/bin/` is the open call — `file-gap.sh` already has
-  a filed sibling symptom (`capture-affordance-help-flag`, icebox: it files `--help` as a
-  gap), which says the class is the kit's argument handling and not this one script.
+  argument contract across `lifecycle-kit/bin/` is the open call — and the class reading is the
+  one that held: `file-gap.sh` had the same symptom (`capture-affordance-help-flag`, it filed
+  `--help` as a gap), and that closed 2026-08-13 as a shared `bin/` argument-shape contract over
+  five tools rather than as a fix to one script.
   Related and worth reading together: `enter-stage-simulate-no-write-fixture` (icebox) pins
   the no-write guard with a fixture, and would **not** have caught this — a fixture written
   the documented way puts the flag first and passes.
@@ -4922,8 +4923,9 @@
   is open is which grammar it writes against, since `queue-entry-grammar-single-owner` records
   that queue-kit carries two and a verb must pick a side.
   **RELATED, NOT DUPLICATE:** `amendment-done-move-assertions` designs a *gate* for the Done-move
-  contract a verb would make unreachable; `scope-rename-guard-deadlock` is this same missing-verb
-  shape on `.workflow/WORKFLOW-STATE.txt`.
+  contract a verb would make unreachable; `scope-rename-guard-deadlock` was this same missing-verb
+  shape on `.workflow/WORKFLOW-STATE.txt`, and it closed 2026-08-13 with `enter-stage.sh --rename`
+  — worked precedent for the verb this entry wants, on the sibling surface.
   **Cost while deferred:** every stage session that restructures the queue writes and debugs a
   one-off mutator against a grammar it does not own, under a conservation gate that catches the
   loss only after the fact.
@@ -5123,14 +5125,6 @@
 
 ## Done
 
-- gate-dispatch-stderr-becomes-argv
-- port-criterion-cohort-cost-form
-- port-criterion-transitive-binding-reach
-- cohort-hold-criterion-label-defect
-- substrate-parity-partial-vendor-scope
-- readonly-dispatch-isolation-unbuyable
-- capture-affordance-help-flag
-- scope-rename-guard-deadlock
 
 ## Lessons Learned
 

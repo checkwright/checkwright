@@ -1502,7 +1502,7 @@ declaration names a reclaim command**.
 Assertion B is shape-only, and resolution is somebody else's job already:
 `check-spec-pointer`'s prose pass resolves a `forced=` citation on any manifest
 surface (§The close-surface roster). Taking the presence-and-shape half here is
-not a preference — `heading_present` is defined *inside*
+not a preference — canon-kit's heading resolver is defined *inside*
 `canon-kit/checks/check-spec-pointer.sh`, not exported from a library, so there
 is no resolver a second gate could call. Reaching it would mean either copying
 the resolver, which canon-kit's own tiering rule bans, or making lifecycle-kit
@@ -1967,7 +1967,7 @@ specified as a position rather than as a pattern.
 it is blind on its own worked example.** A queue file wraps prose to a budget, so
 a colon and the path it introduces routinely land on different physical lines —
 which is exactly what the attested instance did. The join is
-`canon-kit/checks/check-spec-pointer.sh`'s `PROSE_EXTRACT` shape, adopted rather
+`canon-kit/checks/check-spec-pointer.sh`'s prose-extraction shape, adopted rather
 than re-decided: concatenate a blank-line-delimited paragraph, match over the
 join, and map a hit back to its physical line through per-line start offsets. A
 scanner that is right on an unwrapped fixture and silently blind on the wrapped

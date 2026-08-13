@@ -804,7 +804,7 @@ answering a question assertion C never asked.
 | `check-exec-bit` | **Retained, extended**: a `.gate` descriptor must be **non**-executable. Stated as an assertion so "not executable" cannot read as "not covered". |
 | `check-todo-task-liveness`, `check-deprecation-task` | **Retained, corpus extended** to the Rust module and the descriptor, the same shape as `check-comment-tier`: both walk `spec_comment_surface` hunting `TODO(task:)`/deprecation markers, so a marker left in a ported gate's Rust source would otherwise stop being tracked. |
 | `check-knob-default-coupling` | **Retained unchanged, and deliberately *not* corpus-extended** — the extension the shape of this table invites would be vacuous. Its two default idioms are shell (`${KNOB:-v}`, the guarded assignment) and its knob prefixes derive from `gate_kit_roots` members; `native/` is not a kit root and a Rust `const` matches neither idiom, so pointing it at `*.rs` would scan files whose grammar it cannot parse and add zero assertions while reading as coverage. The duplication it could not reach — the crate's prune-dir default against `lib/gate.sh`'s — **is now absent rather than test-held**: the config bridge (§lib/gate.sh) leaves exactly one place a knob's value is computed, the kit's shell library, and the crate carries no default for a bridged knob to drift from. The crate carries no unit test comparing the two literals, because it carries only one: that assertion is **deleted with the duplication it gated** — enforcement-first ranks removing the duplication above gating it, and a citation left behind would point this table at an absent mechanism, the exact defect its own prose calls out. Its verdict on `lib/gate.sh` is unchanged: the shell default stays exactly where it is, as the sole one. |
-| `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first cohort's descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent — unbound by the first cohort, since neither ported gate carries an exemption list. |
+| `check-gate-tamper` | **Retained, extended — and the extension is partly discharged.** The gate-file roster it recognises (`DELEGATION_KIT_GATE_FILES`) carries the `.gate` spelling on the **kit default** as of the first cohort's descriptors, or a consumer on that default would receive a ported gate whose edits escape the isolation rule (delegation-kit/SPEC.md §Layout and configuration). This repo's own config carried both spellings ahead of the port, which is exactly why the kit default had to be checked separately rather than inferred from a green battery here. Its meta-layer path roster (`DELEGATION_KIT_META_PATHS`) is fixed **in this repo's consumer config**: `native/` is declared there (`scripts/delegation-config.sh`), so a commit editing a ported gate's Rust implementation alongside its descriptor is meta-isolated rather than refused. The kit default and any other consumer on it still lack the prefix — `native/` is never auto-unioned by the kit-root scan (`gate_kit_roots`'s predicate requires `checks/` or `smoke/`, which the crate ships neither of), so the fix is consumer config, not a kit-default change. One known limit stands: its exemption reader parses a shell `# exception-list:` array literal and has no Rust-source equivalent. Stated against the live ported set rather than the cohort that first raised it, since the binding condition is a property of the roster and moves with every cohort: the limit is unbound while no ported member carries an exemption list, and the three holders in the tree are all still shell. The cohort that ports one of them owes the Rust-source reader. |
 | `check-graph`, `check-kit-enum`, `check-gate-fixture-coverage`, `check-enforcement-fresh`, `check-value-rollup-fresh` | **Survive unchanged** — all five read the declaration path as text (directly, or through `enforcement-map.sh`/`footprint.sh`, which do), which the descriptor still is. |
 | `check-gate-binary-fresh` | **Retained by construction — and recorded here before the derivation reaches it, deliberately.** It reads declaration paths as a *set*, to decide whether the binary is load-bearing, and never reads a gate's source, so a port is its trigger rather than its blind spot: a ported member is exactly the case that switches it on. Its couples name `kit:checks/*.gate` specifically, so it was **not yet substrate-sensitive** by assertion C's runtime derivation when this row was written, with zero descriptors then on disk, and the row was not yet owed — it was written ahead of the trigger rather than left to be discovered. The first cohort's descriptors have since landed, so the gate is sensitive and the row is owed; the commit that landed them would have reddened on a missing disposition, and that commit's session was the worst possible one to be learning this table exists. That is the foresight paying, and it is the same reasoning as the gate itself: the oracle ahead of the hole (§check-gate-binary-fresh). |
 | `check-gate-substrate-parity` | **Retained by construction** — it is substrate-sensitive by the same derivation it performs, and it reads declaration paths both as text and as a *set*, which is precisely what it exists to see. It stays a shell gate (§check-gate-substrate-parity), so the auditor never depends on the substrate it audits. Its own row is written out rather than left to the section's prose mention: assertion C is satisfied by any occurrence of a member's name in this section, and a gate passing its own assertion by being *discussed* is a coincidence, not a disposition. |
@@ -1386,8 +1386,8 @@ Recorded as a worked limit on that rule, not as a change to it.
 
 **And a carried claim about their fixtures is corrected here, because a later
 selector would inherit it.** The vacuity above was generalised as *all six steer
-their pairs off the live emitter through the `EMIT_SRC` positional arm*; it is
-true of **five**. `check-docs-mirror-fresh` carries no `EMIT_SRC` arm — its single
+their pairs off the live emitter through the emit-source positional*; it is
+true of **five**. `check-docs-mirror-fresh` takes no emit-source argument — its single
 positional is `[root]`, both case arg files are `.`, and it executes the live
 `gen-docs-mirror.sh` against the synthetic case tree, so its pair already proves
 the emitter-executing arm and the warning does not apply to it. For the other five
@@ -1500,9 +1500,9 @@ into prose is the drift this correction is itself repairing.
 their corpus from `gate_kit_roots` and nothing else structural — a sweep of the
 kit roots, then a fixed literal sub-path under each (`smoke/install.sh`,
 `smoke/violation.sh`, `gate-tests/*.test.sh`, `smoke/*.sh`, `bin/*.sh`,
-`templates/*.list`). That derivation was **already compiled**: `walk::kit_roots`
-and `walk::kit_roots_rel` are bridged resolved values landed with the canon-kit
-cohort, so the axis that made the first cohort cheap was paid for before this one
+`templates/*.list`). That derivation was **already compiled**: `gate_kit_roots`
+and `gate_kit_roots_rel` cross the bridge as resolved values, landed with the
+canon-kit cohort, so the axis that made the first cohort cheap was paid for before this one
 started. What each member adds on top is a per-file text test, which is the whole
 of its rule — the first cohort's economy at five members instead of two.
 
@@ -2600,8 +2600,8 @@ through a `--remove`/reinstall round trip beside it.
 ### lib/declaration.sh
 
 The tightened-gates declaration grammar — **two container arms over one token
-predicate**, sourced by three callers. The token predicate is a bare gate name
-(`DECL_TOKEN_RE`); the container is the only thing that differs between the arms,
+predicate**, sourced by three callers. The token predicate is a bare gate name;
+the container is the only thing that differs between the arms,
 which is what keeps two surfaces from re-opening the same defect from opposite
 directions.
 
@@ -2639,7 +2639,7 @@ Callers, all four named: `bin/upgrade-smoke.sh` at its declaration-resolve step
 uses both arms (§upgrade-smoke); this repo's `check-tightened-gates-grammar`
 uses the markdown arm's verdict at each note it walks; `scripts/check-tightened-gates-note-parity.sh`
 also uses both arms, comparing a note's `Tightened gates` section
-(`decl_section_tokens`) against its `DECL_FILE` argument's record set
+(`decl_section_tokens`) against its declaration-file argument's record set
 (`decl_record_tokens`); and `scripts/check-release-bump.sh` uses the markdown
 arm's *container* alone, counting bullets across the note's declaration-bearing
 sections. That last caller is why the container and the token predicate are
@@ -2653,7 +2653,7 @@ a gate, so it owes no `good/`+`bad/` pair; its runtime lock-in is
 `gate-tests/lib-declaration.test.sh`. The record arm is also exercised through
 `scripts/gate-tests/check-tightened-gates-note-parity`'s own `good/`+`bad/`
 pair, whose `tightened-gates.txt` fixture drives `decl_record_tokens` via the
-gate's `DECL_FILE` argument. The direct unit test keeps its place — it is
+gate's declaration-file argument. The direct unit test keeps its place — it is
 still the arm's runtime lock-in — standing on its own rather than on an
 absence that is not there.
 
@@ -4190,7 +4190,7 @@ statically resolvable slice of that parity is carried by its sibling
 `check-reads-couples` (§check-reads-couples); the undecidable remainder stays
 the author's duty under §The `# graph:` manifest.
 
-Theme seam (`emit_graph`): the emitted HTML artifact bypasses the consumer's
+Theme seam: the emitted HTML artifact bypasses the consumer's
 site generator, so it renders foreign beside the rest of a docs host unless the
 host theme is inlined — and the theme is consumer-specific, so the emitter must
 not hardcode it. `GATE_SDK_GRAPH_THEME` (default `<gates-dir>/graph-theme.sh`,
@@ -4211,7 +4211,7 @@ assertion is red — the existing gate already polices the link-the-site-stylesh
 shortcut into inlining. Its complement is the **external-ref assertion**, over
 the same in-memory emission: every absolute (`://`-carrying) `href`/`src`
 attribute value and every ESM `import` specifier must prefix-match the allowed
-set, or the gate reds naming the URL. The set is seeded with `emit_graph`'s own
+set, or the gate reds naming the URL. The set is seeded with the emitter's own
 pinned-major mermaid ESM import from the jsdelivr CDN — the one sanctioned
 external reference the kit itself emits (the diagram renderer is client-side, and
 inlining a megabyte-scale library into a byte-compared artifact is the worse

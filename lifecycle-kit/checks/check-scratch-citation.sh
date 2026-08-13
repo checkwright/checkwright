@@ -40,7 +40,7 @@ if [[ "${#files[@]}" -eq 0 ]]; then
     exit 0
 fi
 
-# spec: lifecycle-kit/SPEC.md §check-scratch-citation — the blank-line paragraph join canon-kit/checks/check-spec-pointer.sh's PROSE_EXTRACT already uses for a citation-liveness scan: a wrapped bullet routinely splits the colon from the path it introduces, so a scanner reading physical lines in isolation is silently blind on exactly the case this gate was written for. Per-line start offsets map a hit back to its physical line.
+# spec: lifecycle-kit/SPEC.md §check-scratch-citation — the blank-line paragraph join canon-kit/checks/check-spec-pointer.sh already uses for a citation-liveness scan: a wrapped bullet routinely splits the colon from the path it introduces, so a scanner reading physical lines in isolation is silently blind on exactly the case this gate was written for. Per-line start offsets map a hit back to its physical line.
 read -r -d '' SCAN <<'AWK' || true
 function flush(   i, joined, mstart, mend, li, s, t, pre, before, after, hitline) {
     if (np == 0) return
