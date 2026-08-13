@@ -5,3 +5,4 @@
 ---
 
 native-ere-matcher-and-held-suites scope a93e0da2 2026-08-13
+native-ere-matcher-and-held-suites spec ac6ea34e 2026-08-13
