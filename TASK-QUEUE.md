@@ -14,9 +14,61 @@
 
 ## Technical Debt
 
+- **lifecycle-gate-test-runner-holdouts** — two of lifecycle-kit's gate-driving test
+  runners still hold their gate as a `checks/<name>.sh` path instead of `gate_run`.
+  Re-verified at this scope, not inherited: `check-stage-entry.test.sh:18` and
+  `check-close-surfaces.test.sh:15` each still set `GATE="$DIR/checks/<name>.sh"`;
+  every other gate-driving runner resolves through `gate_run`.
+  The lifecycle-cohort amendment fixed its conversion count at the seven cohort members
+  whose script is deleted, so build correctly did not widen it.
+  **The fact is recorded but the work is not.** `lifecycle-kit/SPEC.md` §Testing already
+  names both holdouts and their grounds; what no entry carried until now is the cost of
+  leaving them.
+  **Deliverable:** convert both runners to `gate_run <name> <checks-dir> <args>`, plus a
+  one-sentence amend to that SPEC section so it records the convention rather than the
+  residue. No new name — `gate_run` is already the spec's own term
+  (gate-sdk/lib/test-hermetic.sh:26), which is what makes this debt rather than a feature.
+  **Cost of leaving it:** whichever unit ports `check-stage-entry` (held on the
+  associative-array bridge) or sizes `check-close-surfaces` (unsized, out of the sixth
+  cohort) discovers its scenario runner at implementation time — the exact
+  caller-discovery failure the cohort amendment paid to prevent for the other seven.
+  Filed 2026-08-13 by close, draining the gap inbox; the runners re-classified at the
+  drain. Promoted 2026-08-13 at scope, operator-ruled with the
+  `native-comment-surface-cohort-and-port-residue` unit set.
+
 ## Deferred
 
 
+
+- **port-corpus-grouping-census-unbought** [design-pending] — the remaining corpus has never
+  been grouped by shared corpus derivation, and two dispatches failed to buy it.
+  The cohort selection rule is "the largest set of criteria-clearing gates sharing one corpus
+  derivation" (gate-sdk/SPEC.md §The first cohort, and the rule that selects the next), so a
+  selector needs that grouping over the whole remaining set. It does not exist. The two
+  largest blocks — gate-sdk's 26 still-shell gates and `scripts/`' 13 — have **never** been
+  grouped, so every cohort ruling to date has been taken against candidates surfaced by
+  reading rather than against a complete partition.
+  **Why `[design-pending]`:** the open question is what shape of work settles it, not how to
+  run one more sweep. Three candidates, none ruled: derive the grouping mechanically from the
+  `# graph:` `couples=` manifests plus each gate's corpus primitive call (cheap, machine-
+  checkable, but `couples=` is trigger-shaped and over-selects — the same term confusion
+  criterion 4 already warns about); extend `bin/port-blockers.sh` with a `--group` arm so the
+  grouping becomes a maintained tool output rather than a survey (derivation-first, and the
+  tool already walks the registry); or accept that the residue is small enough to rule
+  per-cohort and retire the rule's whole-corpus premise.
+  **What was tried, so a third attempt is not re-bought blind.** Two delegated read-only
+  sweeps over the 67-member set. The first never returned inside ~50 minutes and could not be
+  stopped by its dispatcher; the second time-boxed itself and returned partial — a verified
+  hold table and six of the nine ERE-roster members, with the gate-sdk-26 and `scripts/`-13
+  grouping explicitly unfinished. The failure mode is the corpus size against a per-gate read:
+  67 gates each needing a manifest read plus enough body to name a derivation is not a
+  single-agent sweep, which is the finding a third identical dispatch would buy again.
+  **Cost while deferred:** each cohort ruling is taken against an incomplete rival set, so the
+  ordering rule's "largest" is unverifiable and a genuinely larger clean group inside those 39
+  gates would stay invisible — the port could run to completion having never once applied its
+  own selection rule as written.
+  Filed 2026-08-13 at scope on lead disposition, under scope-gated intake: filed as costed
+  work, not started.
 
 - **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
   — the whole battery onto the binary, and the shell surface down to its residue.
@@ -5287,21 +5339,6 @@
   **Cost while deferred:** the rate is measured and non-trivial — six on governed surfaces in one
   iteration — and each survived a competent session's summary before something downstream caught it.
   Filed 2026-08-13 by close, from its own Lessons judgment.
-
-- **lifecycle-gate-test-runner-holdouts** [design-pending] — two of lifecycle-kit's gate-driving
-  test runners still hold their gate as a `checks/<name>.sh` path instead of `gate_run`.
-  Re-verified at the drain: every gate-driving runner but two resolves through `gate_run`;
-  `check-close-surfaces.test.sh` and `check-stage-entry.test.sh` hold a script path.
-  The lifecycle-cohort amendment fixed its conversion count at the seven cohort members whose
-  script is deleted, so build correctly did not widen it.
-  **The fact is recorded but the work is not.** `lifecycle-kit/SPEC.md` §Testing already names
-  both holdouts and their grounds; what no entry carried until now is the cost of leaving them.
-  **Cost while deferred:** whichever unit ports `check-stage-entry` (blocked on the
-  associative-array bridge) or sizes `check-close-surfaces` (unsized, out of the sixth cohort)
-  discovers its scenario runner at implementation time — the exact caller-discovery failure the
-  cohort amendment paid to prevent for the other seven.
-  Fix is two mechanical edits plus a one-sentence amend to that SPEC section.
-  Filed 2026-08-13 by close, draining the gap inbox; the runners re-classified at the drain.
 
 - **single-kit-smoke-precondition** [design-pending] — a per-kit consumer-smoke invocation carries
   an undocumented cross-kit precondition, so a maintainer debugging one kit hits a failure that is
