@@ -289,20 +289,6 @@ Cohort composition itself is owned by gate-sdk/SPEC.md §The first cohort, and
 the rule that selects the next; this records the ruling, not the design.
 **Discharged 2026-08-13, the trio having landed in `native-ere-matcher-and-held-suites`.**
 
-**The sixth cohort is lifecycle-kit taken as a near-whole kit — ruled 2026-08-13
-by the operator.** Ten members on the `lib/stages.sh` derivation, which is the
-ordinary largest-shared-derivation selector rather than either worked exception,
-and the second time the kit boundary and the corpus boundary have coincided.
-`check-stage-entry` is **held**: it reads its predecessor map by key, and the
-bridge carries no associative array. `check-close-surfaces` is **out rather than
-held** — it sources no `lib/stages.sh` at all, so it is unsized, not deferred, and
-a later selector owes it a sizing rather than a hold. A `check-spec-derivable-section`
-ride-along was offered at zero marginal derivation cost and **declined**, so
-**the cohort is not to be widened**. Cohort composition itself is owned by
-gate-sdk/SPEC.md §The first cohort, and the rule that selects the next; this
-records the ruling, not the design. **The session that lands the cohort deletes
-this ruling.**
-
 What the sequence names next, after the port: `companion-toolkit-profile`.
 
 `instruction-surface-bash-focus` unblocks on a threshold rather than a date,

@@ -1125,6 +1125,26 @@ design time; the last three were paid for, and each is named with what it cost.
    acceptable, because a gate that checked that would have to know what a cohort
    is, and a cohort is a queue-and-amendment concept the gate layer does not
    carry.
+
+   **A cohort can grow the roster by zero, and the lifecycle-kit cohort is the
+   worked case — recorded here because the reason is a property of the criterion
+   rather than of that cohort.** Measured against the post-cohort registry from a
+   clean checkout of the cohort's own commit, the binary-less leg reports the same
+   **seven** omitted members the ERE cohort recorded, and none of the ten new
+   descriptors is among them. The reason is the **install disposition**, not the
+   narrowness of the profile the leg installs: every member of that cohort is
+   `never` or `on-surface`, and neither is seeded into a freshly initialised
+   consumer's registry (§The install disposition). A member no `init` registers
+   cannot be a member an artifact-free `init` loses, so the leg — whose assertion
+   is over the set *that payload dispatches to a binary* in the consumer's own
+   registry — correctly reports no growth. The judgment the criterion leaves to
+   the cohort: acceptable, and with its limit stated rather than banked. The
+   instrument measures the **install-time** roster, so an adopter who later brings
+   an `on-surface` member's surface into existence on a binary-less host does lose
+   it, and receives it declared. That is the same shape as the ERE cohort's
+   profile-scoped limit reached through a different door, and it is what a cohort
+   of `on-surface` members should expect to read: a zero here is a real
+   measurement about `init`, never a claim that the members are free.
 6. **Its corpus derivation is self-contained**, unless the duplication the port
    creates is machine-held. Found at re-selection, one step earlier than
    criterion 5: `check-spec-fence-balance`, which the amendment named, derives
@@ -1478,6 +1498,89 @@ landed with the canon-kit cohort itself** — as a bridged resolved value rather
 than a re-derivation, since the fallback predicate is anchored at the shell
 library's own location and a binary the installer copies elsewhere cannot recover
 it (§lib/gate.sh). Neither is owed by a later selector.
+
+**The sixth cohort is lifecycle-kit taken as a near-whole kit — ten members on
+the `lib/stages.sh` derivation, operator-ruled 2026-08-13 and delivered whole.**
+`check-stage-skill-coverage`, `check-skill-binding`, `check-lifecycle-registration`,
+`check-gap-inbox-neutrality`, `check-merge-attrs`, `check-stage-evidence`,
+`check-lesson-disposition`, `check-survey-record`, `check-shim-restatement` and
+`check-scratch-citation` ship as descriptors dispatching to the binary; the ten
+shell scripts they replace are deleted. Two members stay shell and their grounds
+differ in kind. **`check-stage-entry` is held**: it reads `LIFECYCLE_KIT_PREDECESSOR`
+by key, and the bridge carries scalars and indexed arrays only, so the hold clears
+when the wire format grows keys — a prerequisite it now shares with
+`check-evidence-baseline`, which is why the queue holds one entry for it rather
+than one per member. **`check-close-surfaces` is out rather than held**: it sources
+no `lib/stages.sh` at all, so it is *unsized*, and a later selector owes it a
+sizing rather than inheriting a hold whose ground was never established.
+
+**The kit and corpus boundaries coincide again, and the sharing claim is weaker
+than queue-kit's — stated so a later selector does not inherit an overstated
+precedent.** Only five of the ten call a `lifecycle_*` function; the other five
+source `lib/stages.sh` **for its knobs alone**. What the ten share is therefore
+the **config surface**, not a corpus walk. That is still the right axis, and the
+reason is criterion 6: all fifteen knobs the ten read are defined by
+`lib/stages.sh`, each crosses the bridge as a value the shell library computed
+once, and the crate holds no default for any of them to drift from — so the
+substrate work is paid once and discharged ten times **by construction** rather
+than by ten parity tests. The library's own load-time config validation rides the
+same way: it runs shell-side during knob resolution, so a compiled member inherits
+the malformed-config refusal without a Rust twin. A selector reading the by-kit
+warning above should read this as its second worked exception, on a config surface
+where queue-kit's was on a corpus.
+
+**What this cohort paid that no previous one did is not the gates. It is their
+callers**, and that is the transferable part. Five cohorts deleted a
+`checks/<name>.sh` and left every caller undisturbed, because every caller was the
+fixture harness and that harness has resolved substrate-agnostically since the
+first cohort. lifecycle-kit is the first kit whose **scenario runners**, whose own
+**`bin/`** and whose own **`smoke/`** name their gates by script path — including
+`bin/enter-stage.sh`, the stamp mechanism every stage entry in a consumer running
+the lifecycle goes through. Sizing such a cohort as N gate ports and meeting the
+callers at implementation time is exactly the failure criterion 7 exists to
+prevent, so a selector reaching a kit that ships `bin/` or `smoke/` enumerates the
+callers **before** the cohort is cut. The conversions themselves are
+lifecycle-kit/SPEC.md's — §Testing for the runners, §bin/enter-stage.sh for the
+tool layer.
+
+**`check-lifecycle-registration` is a freshness gate in miniature, and the
+freshness family's hold key does not reach it.** It byte-compares tracked text in
+the agent file against a live derivation, which is structurally what the six
+generated-projection members above do — and those are held per member on *is this
+gate's emitter ported?*. The difference is exact rather than a judgment call: the
+family's members shell out to `bash <emitter>`, while this member's emitter is
+`lifecycle_registration_block`, a **library function it sources directly**, and
+that library is the derivation this cohort compiles. The emitter therefore ports
+*in this cohort*, in the same motion as the gate that reads it, so the hold's
+condition is satisfied rather than waived. Written out because a selector applying
+the family's rule mechanically would hold this member, and the ruling did not.
+
+**Two knobs this repo's own configuration hides from a live-tree parity run**, and
+the canon-kit cohort's lesson — the live tree is the oracle a session trusts most
+and it proves nothing about a branch it does not execute — applies twice here.
+`LIFECYCLE_KIT_SESSION_BOUNDARY` is set to `iteration`, which disables
+`check-stage-evidence`'s cross-stage session-id distinctness map, so every
+live-tree run takes the disabled branch. `LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS`
+carries no `**`, so `check-scratch-citation`'s globstar path is never exercised
+live even though criterion 6's glob commitment binds the compiled reader to it.
+Both were proved by constructed scenario instead, and a third property narrows
+every parity run in this tree without being a branch at all: this repo runs a
+six-stage machine, so `LIFECYCLE_KIT_STAGES` and `LIFECYCLE_KIT_PREDECESSOR` are
+both overridden and no run here reads the kit default.
+
+**One rule was implemented rather than transliterated, and one diagnostic had to
+be built.** `check-merge-attrs`'s shell form reaches for three `comm` invocations
+over six process substitutions; the compiled form implements the **set difference**
+the contract states, which is not locale-dependent where `sort`'s collation is —
+the kit-roots cohort's general ruling, applied verbatim.
+`check-lifecycle-registration`'s stale-block report is `diff`'s **normal format**,
+which no previous cohort had needed: it is an LCS walk inside the member, because
+the crate's one-spawn-site rule (§Fail-closed contract) leaves no way to shell out
+for a diagnostic. `check-stage-evidence`'s missing `fail_closed` guard, the one
+shell defect this cohort found, is **dissolved rather than repaired**: the
+compiled member reaches no subprocess at that site, so the failure mode is absent
+by construction. Recorded so the port is not read as having silently dropped an
+assertion, and so nobody opens a repair against an absent file.
 
 ### The canon-kit `spec_manifest_files` cohort
 
@@ -2643,8 +2746,14 @@ same answer:
 - `gate_command` returns the **invocation argv**, one element per line: the
   one-element `<dir>/<name>.sh`, or the two-element `<binary> <name>` —
   prefixed, when the member declares knobs, by the config bridge below. Its
-  callers are the execution sites — §run-gates, §run-gate-tests, and
-  §gen-pre-commit, which does not execute the argv but *emits* it into the hook.
+  callers are the execution sites: gate-sdk's own — §run-gates, §run-gate-tests,
+  and §gen-pre-commit, which does not execute the argv but *emits* it into the
+  hook — and, since the lifecycle-kit cohort, **a kit's own `bin/` and `smoke/`**,
+  which reach it for the same reason and are the first callers outside the test
+  lane. The contract they read is the one already stated here, with one asymmetry
+  worth naming where the argv is: a caller that resolves and executes from
+  different directories must pin `GATE_SDK_NATIVE_BIN` absolute, because the
+  default is repo-relative (§Layout and configuration).
 
 **The array-knob config bridge.** A consumer's kit knobs are bash arrays
 resolved by a shell library that is sourced *in-process by each shell gate*,

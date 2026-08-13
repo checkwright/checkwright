@@ -12,56 +12,6 @@
 
 ## New Features
 
-- **native-gate-port-remaining-corpus** [spec: SPEC-lifecycle-cohort.md] [roadmap: now/reliability]
-  — the whole battery onto the binary, and the shell surface down to its residue.
-  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
-  **The sixth cohort is lifecycle-kit as a near-whole kit** — ten members on the `lib/stages.sh`
-  derivation, `check-stage-entry` held on the associative-array bridge, `check-close-surfaces`
-  out rather than held. Operator-ruled 2026-08-13 and not to be widened; the design is
-  `gate-sdk/SPEC-lifecycle-cohort.md`. The entry returns to the deferred section on
-  completion rather than to `## Done`: this entry is the **whole corpus**, 77 of 103 registered
-  gates remain unported, and a Done move would assert a finished port and silently drop it from
-  the **public** roadmap projection, which reads `[roadmap:]` tags off live entries.
-  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
-  supersession of the 2026-08-06 measurement-locus clause are recorded in
-  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
-  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
-  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
-  rule.
-  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
-  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
-  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
-  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
-  means a developer clones the **public repository** — source never enters the payload, so the
-  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
-  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
-  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
-  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
-  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
-  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
-  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
-  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
-  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
-  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
-  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
-  **Five cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
-  members, each cohort's delivered count, the holds and their grounds live there, so this entry
-  states what remains rather than restating them. Every held member is **sequencing with port
-  work owed, never exclusion**, and what each owes is on
-  `cohort-held-members-port-prerequisites`, which owns the roster and the kits
-  it spans; a kit count copied here would be a second one to drift, and was.
-  **Cost while deferred:** large and known — 77 gates plus the runners and the install-lifecycle
-  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
-  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
-  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
-  `gate-battery-parallel-execution` and
-  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
-  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
-  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
-  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
-  2026-08-13 at build for the kit-roots cohort, and again for the ERE cohort; re-promoted
-  2026-08-13 at spec for the lifecycle-kit cohort.
-
 - **guard-glyph-match-context-blind** [spec: SPEC-guard-context-matching.md] — the guard matches
   its trigger glyphs inside quoted and heredoc bodies, so writing *about* the guard is refused.
   recurrence: guard-glyph-match-context-blind 2026-08-13
@@ -184,6 +134,53 @@
 ## Deferred
 
 
+
+- **native-gate-port-remaining-corpus** [design-pending] [roadmap: now/reliability]
+  — the whole battery onto the binary, and the shell surface down to its residue.
+  roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
+  The entry stays deferred rather than moving to `## Done`: it is the **whole corpus**, 67 of
+  103 registered gates remain unported, and a Done move would assert a finished port and
+  silently drop it from the **public** roadmap projection, which reads `[roadmap:]` tags off
+  live entries.
+  **Operator-ruled 2026-08-09: complete the port, ASAP.** The ruling, its grounds and its
+  supersession of the 2026-08-06 measurement-locus clause are recorded in
+  [TRAJECTORY.md](TRAJECTORY.md) §PRIORITY DIRECTIVE — the port track's sequence. This entry is
+  the work, and does not restate them. What it inherits unchanged: gate-sdk/SPEC.md §Porting a
+  gate to the binary substrate for the porting procedure, §Consumer payload for the payload
+  rule.
+  **The scope the ruling fixes.** Everything portable ports — the gates, the runners, and the
+  install-lifecycle scripts alike. Surviving shell is **residue justified case by case**, never
+  a protected category, so "it is orchestration" is not by itself an answer. Adopters install a
+  **pre-compiled binary or build from source, their choice**; both paths ship. *From source*
+  means a developer clones the **public repository** — source never enters the payload, so the
+  disclosure boundary is untouched and assertion E still binds (operator-answered 2026-08-09).
+  **The known irreducible, named so nobody reads it as non-compliance.** Something must run
+  before the binary exists, and fetching-and-executing the first artifact cannot itself be that
+  artifact. So the **bootstrap** — in shell, or absorbed by the transport, since the payload
+  ships as an npm package and a Release tarball and npm can carry per-platform binaries — is the
+  one place shell may be unavoidable. Naming it is not designing it; the design is this unit's.
+  **Wall-clock is the weaker argument and is answered:** the battery is under 6%
+  of validate, so the win is retiring shell *sources* the payload carries, not faster execution.
+  **This answers the toolchain-free objection:** the installer smoke's toolchain-free arm is
+  satisfied by the pre-compiled path, not by retaining shell gates. `powershell-installer-surface`
+  moves with it — one implementation across platforms shrinks its cover to the bootstrap.
+  **Six cohorts closed, and gate-sdk/SPEC.md §The first cohort is canonical for all** — the
+  members, each cohort's delivered count, the holds and their grounds live there, so this entry
+  states what remains rather than restating them. Every held member is **sequencing with port
+  work owed, never exclusion**, and what each owes is on
+  `cohort-held-members-port-prerequisites`, which owns the roster and the kits
+  it spans; a kit count copied here would be a second one to drift, and was.
+  **Cost while deferred:** large and known — 67 gates plus the runners and the install-lifecycle
+  layer, and every gate landed meanwhile adds shell to the eventual port. Not a single-iteration
+  delta; scope owns the decomposition, and the criterion-relaxation question is closed at
+  gate-sdk/SPEC.md §The port-candidate criteria — an ordering signal, never an eligibility screen.
+  `gate-battery-parallel-execution` and
+  `gate-battery-result-cache` say the port subsumes them: closure candidates as it lands.
+  Filed 2026-08-06 at spec; re-scoped 2026-08-09 by close on operator direction, under the
+  direct-filing exception; cohorts ruled 2026-08-11 and 2026-08-12 at scope; promoted and
+  demoted 2026-08-12 for the canon-kit cohort; re-promoted 2026-08-12 at spec; demoted again
+  2026-08-13 at build for the kit-roots cohort, again for the ERE cohort, and again for the
+  lifecycle-kit cohort; re-promoted 2026-08-13 at spec between the last two.
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
   recurrence: recurrence-drain-input-widening 2026-08-09
