@@ -12,6 +12,63 @@
 
 ## New Features
 
+- **port-criterion-aggregate-cost-blindness** [spec: SPEC-value-arm.md] — markdown-link
+  liveness is binary-gated, and the criteria priced it per member.
+  **Ruled 2026-08-13 at spec** (installer/SPEC-value-arm.md), on a live four-profile run at
+  `143988ad` rather than on the baseline row. The framing below is one degree off and the
+  correction decides the design: the failing sentence is *some profile catches it at all*, not
+  *some profile below the maximum* — **`full` does not catch it either**, so no shell gate
+  anywhere in the payload reds on this class and "redesign the assertion off binary-dispatched
+  gates" has nothing to redesign onto. Omitted counts are unchanged at 0/5/6/11.
+  The deeper find: the value arm was never the residual oracle criterion 5 calls it. It asserts
+  a claim about the **product**; it reads as a residual oracle only because the main loop packs
+  no artifact. Two claims, two arms — the main loop packs a real binary, and a named
+  binary-less `prose` leg asserts **disclosure** (every lost member omitted-and-declared, count
+  non-zero) rather than catching.
+  **The finding, and it is not the smoke assertion.** `installer_smoke`'s value arm now fails on
+  every profile, and the first reading — "a stale assertion needs updating" — sends scope after
+  the wrong object. The arm plants a mistyped relative link in an adopter's own README
+  (`installer/consumer-smoke/run-smoke.sh:246-268`), and its spec comment states that *which*
+  gate catches it is deliberately unasserted: "the claim is about the battery rather than about
+  a member of it." The assertion did exactly its job — it detected that a binary-less install's
+  battery now catches nothing on adopter prose of that class. It is not stale and it did not rot.
+  **How it happened.** Batch B ported seven `spec_manifest_files` members at once (`f602642d`);
+  each individually passes criterion 5's per-member reading, and the aggregate emptied a value
+  class for any consumer whose payload carries no gate binary, because `.gate` members are
+  omitted-and-declared there.
+  **The precise scope, because the first phrasing overstated it.** The hole is **markdown-link
+  liveness**, not prose generally: `check-md-refs` is now a `.gate`, while `check-prose-tells`,
+  `check-docs-link-convention`, `check-comment-tier` and `check-spec-pointer` survive as shell
+  and still run. Validate's own commit message got this right where its gap bullet did not. The
+  conclusion stands on the strongest ground either way: the smoke run **is** the oracle, and no
+  profile caught the defect.
+  **The mitigation is real, and lowers severity without closing the gap.** Omission is declared
+  and counted — `init` writes `# omitted: <name> <reason>` into the consumer's registry
+  (installer/README.md:351-352), so an adopter is *informed*, never silently degraded.
+  **Where it becomes blocking: release-sweep**, not close. Close cuts no release — release-sweep
+  is a boundary skill rather than a stage (lifecycle-kit/SPEC.md §templates/release-sweep.md) —
+  so this blocked no stage of `native-cohort-canon-kit`. It must block a release, so that a
+  future publish cannot ship the hole unnoticed.
+  **This entry is now half (2) alone, and it carries the baseline slug because it is the half
+  that retires the red.** Restore markdown-link coverage for binary-less payloads — build the
+  main loop's pack with the crate's own binary, redesign the value assertion off
+  binary-dispatched gates, or accept and document that the coverage is binary-gated.
+  **The first is taken.** The second is refuted by the live run above; the third would leave the
+  `prose` profile's own roster criterion — link governance over every README.md at any depth —
+  unmet at every profile, so it is refused rather than deferred.
+  **Half (1) promoted 2026-08-12 at spec as `port-criterion-cohort-cost-form`**, which gives
+  criterion 5 a form that can price a cohort; it changes no coverage, so `installer_smoke` stays
+  held `fail` on this slug and the split is invisible to the baseline row.
+  Re-measured live at HEAD on 2026-08-12 rather than read off the baseline row: the suite fails
+  on **all four** profiles and prints the count each cohort increments —
+  `artifact: none packed — N member(s) omitted and declared`, N = 0/5/6/11 across the profiles.
+  **Cost while deferred:** the suite is held `fail` on the baseline, so its other assertions
+  still run and this one is tracked rather than lost — and every further cohort ported widens
+  the same hole, now against a criterion that can at least see it.
+  Filed 2026-08-12 by close, draining the gap inbox, under CLAUDE.md §Housekeeping's
+  operator-directed filing exception; found at validate, reframed by the lead; split
+  2026-08-12 at spec on the operator ruling, half (1) promoted and this half deferred.
+
 - **native-gate-port-remaining-corpus** [spec: SPEC-ere-cohort.md] [roadmap: now/reliability] —
   the whole battery onto the binary, and the shell surface down to its residue.
   roadmap-summary: The gate battery becomes a native binary — precompiled, or built from source.
@@ -182,49 +239,6 @@
 
 ## Deferred
 
-
-- **port-criterion-aggregate-cost-blindness** [design-pending] — markdown-link liveness is
-  binary-gated, and the criteria priced it per member.
-  **The finding, and it is not the smoke assertion.** `installer_smoke`'s value arm now fails on
-  every profile, and the first reading — "a stale assertion needs updating" — sends scope after
-  the wrong object. The arm plants a mistyped relative link in an adopter's own README
-  (`installer/consumer-smoke/run-smoke.sh:246-268`), and its spec comment states that *which*
-  gate catches it is deliberately unasserted: "the claim is about the battery rather than about
-  a member of it." The assertion did exactly its job — it detected that a binary-less install's
-  battery now catches nothing on adopter prose of that class. It is not stale and it did not rot.
-  **How it happened.** Batch B ported seven `spec_manifest_files` members at once (`f602642d`);
-  each individually passes criterion 5's per-member reading, and the aggregate emptied a value
-  class for any consumer whose payload carries no gate binary, because `.gate` members are
-  omitted-and-declared there.
-  **The precise scope, because the first phrasing overstated it.** The hole is **markdown-link
-  liveness**, not prose generally: `check-md-refs` is now a `.gate`, while `check-prose-tells`,
-  `check-docs-link-convention`, `check-comment-tier` and `check-spec-pointer` survive as shell
-  and still run. Validate's own commit message got this right where its gap bullet did not. The
-  conclusion stands on the strongest ground either way: the smoke run **is** the oracle, and no
-  profile caught the defect.
-  **The mitigation is real, and lowers severity without closing the gap.** Omission is declared
-  and counted — `init` writes `# omitted: <name> <reason>` into the consumer's registry
-  (installer/README.md:351-352), so an adopter is *informed*, never silently degraded.
-  **Where it becomes blocking: release-sweep**, not close. Close cuts no release — release-sweep
-  is a boundary skill rather than a stage (lifecycle-kit/SPEC.md §templates/release-sweep.md) —
-  so this blocked no stage of `native-cohort-canon-kit`. It must block a release, so that a
-  future publish cannot ship the hole unnoticed.
-  **This entry is now half (2) alone, and it carries the baseline slug because it is the half
-  that retires the red.** Restore markdown-link coverage for binary-less payloads — build the
-  main loop's pack with the crate's own binary, redesign the value assertion off
-  binary-dispatched gates, or accept and document that the coverage is binary-gated.
-  **Half (1) promoted 2026-08-12 at spec as `port-criterion-cohort-cost-form`**, which gives
-  criterion 5 a form that can price a cohort; it changes no coverage, so `installer_smoke` stays
-  held `fail` on this slug and the split is invisible to the baseline row.
-  Re-measured live at HEAD on 2026-08-12 rather than read off the baseline row: the suite fails
-  on **all four** profiles and prints the count each cohort increments —
-  `artifact: none packed — N member(s) omitted and declared`, N = 0/5/6/11 across the profiles.
-  **Cost while deferred:** the suite is held `fail` on the baseline, so its other assertions
-  still run and this one is tracked rather than lost — and every further cohort ported widens
-  the same hole, now against a criterion that can at least see it.
-  Filed 2026-08-12 by close, draining the gap inbox, under CLAUDE.md §Housekeeping's
-  operator-directed filing exception; found at validate, reframed by the lead; split
-  2026-08-12 at spec on the operator ruling, half (1) promoted and this half deferred.
 
 
 - **recurrence-drain-input-widening** [design-pending] — a recurrence with no bullet is uncounted.
