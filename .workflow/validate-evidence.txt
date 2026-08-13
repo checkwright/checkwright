@@ -1,1 +1,25 @@
 # contract: evidence-manifest v1
+native-lifecycle-cohort-and-guard-friction gates sha256=3d22166418eaf619a8757d9fb97277873471039299f7bb5987556a2d0669c290 pass=103 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction gate_sdk sha256=dec37390320f3a3563ff11f817b0a2f160aaf1dfd9aacaafd6e5a0fcfbbffaab pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction canon_kit sha256=c13b2442a2898fd4c5c30c9175f74b8e6d20ec43199ed0c9c7001203352040ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction context_kit sha256=50d2ebcd879c6feb0295ba607a3970da17c448c580e0f55b20cfdd8dcd39c1df pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction delegation_kit sha256=d62b93b71c449eeafd8ab0e055be5b31cf98730a0c632aef78114119053c4727 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction evidence_kit sha256=b9a84e84d67dad5a63ae7ce34aecdc472ffbe13d06d01cc02f04bfca5b5de2ae pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction guard_kit sha256=0d5bfe0b92c08f178b4fee3a0b91ba29b6001f42c0222ff3254e86a5561ad0ec pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction lifecycle_kit sha256=68eaa631e5e5438312c15d4ac93bb1f36ab2533290eb94ae5aeb4af4821ab7e0 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction queue_kit sha256=e62b9b948f7300a26dd318872ab6f7d2f7193451f7d6fc6f86101326711a4245 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction site_kit sha256=07f7139ea31865677de58ea44b43f7c98ae6c40c8f3fe57e8975e8d65794be35 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction scripts sha256=28b2b32bbd297a46b82dfd6915ad92a325eb579b3f56acc6e30bcd2dbe5af279 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction guard_tests sha256=14f95e98aaa918b39d05046c086f4f164a5a7d6571e6ededa5a2f4ffe5089e6d pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction usage_tests sha256=04968d303b3e4ec54f3f8033f0e7e00d4b33ae90fd7507b48347cab56d0bc26d pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction budget_guard_tests sha256=94bbe0c41f3993e3c748a492d29e2a0d22139825b8c53bbae6a528500a8ce402 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction dispatch_guard_tests sha256=6018943502411c07fe57162c0dae2ac37af304eccc0d0a9a6e0ec4fd733a1daf pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction trend_tests sha256=acdbfef4eab851fca00ca747245b6ac4a4f804b05989f9cd3acd014bb56ac330 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction demo sha256=a8c0c37c758694dfc3d4754002c7ffd5f3b81b1b931f0a2dbce0267a65dfd199 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction installer_smoke sha256=933c7cce2154c5b736a68e778656c066f374aa2737dca4fef33a53aedbabf07f pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction consumer_smoke sha256=459e8f738b449ed2b0a21f05ceb09001fd1fa76d26742e36d3d9e630be692b82 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction upgrade sha256=6e20f647bdb063f211c282f831c58e9c407d19428e4ffd2d3a66611709a7f3e8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction agents_md_smoke sha256=ae6f7e8dbd68cf92e37cfe45d5b260e3585ae49f2dc43b227e7bd6d9daf87064 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction index_tests sha256=e14e152466dc5be0296b1e20575bf3d587e1e0a127e7c63ad57671dbcaeaddb8 pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
+native-lifecycle-cohort-and-guard-friction native_crate sha256=e4d73725f8ec18865807a06eeb11909f54f157be0cc123f906c82bc0cc88d73f pass=1 fail=0 ignore=0 verdict=clean 2026-08-13
