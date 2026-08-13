@@ -90,14 +90,14 @@ guard_split_compound() {
 guard_rule_cd_compound() {
     local cmd="$1"
     if grep -qE '(^|[;&|(])[[:space:]]*cd[[:space:]]' <<<"$cmd" && grep -qE '[;&|]' <<<"$cmd"; then
-        guard_block "don't use 'cd' in a compound command (permission prompts / cwd drift). Pass absolute paths, or 'git -C <dir>' for git."
+        guard_block "don't use 'cd' in a compound command (cwd drift, and the allowlist can't match the compound — the call costs an out-of-band permission decision). Pass absolute paths, or 'git -C <dir>' for git."
     fi
 }
 
 guard_rule_git_c_root() {
     local cmd="$1"
     if grep -qF "git -C $PWD " <<<"$cmd"; then
-        guard_block "drop 'git -C $PWD ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and won't re-prompt. Reserve 'git -C <dir>' for a different repo."
+        guard_block "drop 'git -C $PWD ' — cwd is the repo root, so the bare 'git <subcommand>' form is allowlisted and resolves on the match; the absolute '-C' spelling matches nothing and costs an out-of-band permission decision. Reserve 'git -C <dir>' for a different repo."
     fi
 }
 
@@ -125,14 +125,14 @@ guard_rule_abs_script() {
             guard_rewrite "$relcmd" "abs repo read-only script normalized to relative (${GUARD_NAME:-guard})"
         fi
     done
-    guard_block "use the repo-relative form '$rest' (cwd is the repo root) — it's allowlisted and won't re-prompt; the absolute spelling isn't. If you truly need the absolute path, run it yourself with !<command>."
+    guard_block "use the repo-relative form '$rest' (cwd is the repo root) — it's allowlisted and resolves on the match; the absolute spelling matches nothing and costs an out-of-band permission decision. If you truly need the absolute path, run it yourself with !<command>."
 }
 
 guard_rule_abs_prefix() {
     local cmd="$1"
     [[ "$cmd" == git\ * ]] && return 0
     if grep -qF "$PWD/" <<<"$cmd"; then
-        guard_block "drop the repo-root absolute prefix '$PWD/' — cwd is the repo root, so the repo-relative path is allowlisted and won't re-prompt; the absolute spelling isn't. If you truly need the absolute path, run it yourself with !<command>."
+        guard_block "drop the repo-root absolute prefix '$PWD/' — cwd is the repo root, so the repo-relative path is allowlisted and resolves on the match; the absolute spelling matches nothing and costs an out-of-band permission decision. If you truly need the absolute path, run it yourself with !<command>."
     fi
 }
 
@@ -140,11 +140,11 @@ guard_rule_expansion() {
     local cmd="$1" sqexp expn
     sqexp="$(sed -E "s/'[^']*'//g" <<<"$cmd")"
     if grep -qE '\$\{|\$\(|<\(|\$[A-Za-z_]' <<<"$sqexp"; then
-        guard_block "avoid shell variables/expansions (\$VAR, \${...}, \$(...), <(...)) — the harness prompts on every expansion and no allowlist entry can suppress it. Inline the literal path, use a relative path, or 'git -C <dir>'. If you genuinely need the expansion, run it yourself with !<command>."
+        guard_block "avoid shell variables/expansions (\$VAR, \${...}, \$(...), <(...)) — the harness's matcher refuses every expansion, so no allowlist entry can match the command and it costs an out-of-band permission decision. Inline the literal path, use a relative path, or 'git -C <dir>'. If you genuinely need the expansion, run it yourself with !<command>."
     fi
     expn="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
     if grep -qE '(^|[;(]|&&|\|\|)[[:space:]]*[A-Za-z_][A-Za-z0-9_]*=[^[:space:];|&]*[[:space:]]*($|;)' <<<"$expn"; then
-        guard_block "avoid shell variable assignments (NAME=value; ... \$NAME) — they force a permission prompt that can't be allowlisted. Inline the literal value/path at each use site, or 'git -C <dir>'. If you genuinely need it, run it yourself with !<command>."
+        guard_block "avoid shell variable assignments (NAME=value; ... \$NAME) — they defeat allowlist matching, so the call costs an out-of-band permission decision no allowlist entry can pre-empt. Inline the literal value/path at each use site, or 'git -C <dir>'. If you genuinely need it, run it yourself with !<command>."
     fi
 }
 
@@ -159,12 +159,12 @@ guard_rule_brace_glyph() {
                "bare {} placeholder single-quoted so the harness matcher passes it (${GUARD_NAME:-guard})" ;;
     esac
     if grep -qF '@{' <<<"$sqstripped"; then
-        guard_block "spell out the git-ref shorthand '@{...}' — the harness prompts on the '{' glyph. Use 'origin/<branch>..HEAD' for '@{u}..', or the resolved ref/hash for a reflog form."
+        guard_block "spell out the git-ref shorthand '@{...}' — the harness's matcher refuses the '{' glyph, so the call costs an out-of-band permission decision. Use 'origin/<branch>..HEAD' for '@{u}..', or the resolved ref/hash for a reflog form."
     fi
     if grep -qE '\{[^}]*(,|\.\.)[^}]*\}' <<<"$sqstripped"; then
-        guard_block "write out the brace expansion '{a,b}'/'{a..b}' — the harness prompts on the '{' glyph and no allowlist entry suppresses it. Spell the members (e.g. 'mkdir -p a/b a/c') or use a loop for a long range."
+        guard_block "write out the brace expansion '{a,b}'/'{a..b}' — the harness's matcher refuses the '{' glyph and no allowlist entry can match around it, so the call costs an out-of-band permission decision. Spell the members (e.g. 'mkdir -p a/b a/c') or use a loop for a long range."
     fi
-    guard_block "single-quote the '{' if it's literal (an awk/sed program in double quotes), or write it out if it expands — the harness prompts on every bare '{' glyph before allowlist matching."
+    guard_block "single-quote the '{' if it's literal (an awk/sed program in double quotes), or write it out if it expands — the harness's matcher refuses every bare '{' glyph before allowlist matching, so the call is decided out of band."
 }
 
 _guard_sed_segment() {
@@ -254,7 +254,7 @@ guard_rule_find_glob() {
     s="$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<<"$cmd")"
     grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
     _guard_is_read_batch "$s" _guard_is_find_listing || return 0
-    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) with no shell prompt. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>."
+    guard_block "don't list files with a bare 'find' — use the Glob tool: it returns matching paths (registered for a later Read) and needs no permission decision at all. This fires on a lone listing and on a ';'-sequence of them (a literal echo/printf banner between them is fine); a 'find' carrying an action predicate (-exec/-delete/…), piped into a consumer, or redirected is untouched. If you genuinely need find, run it yourself with !<command>."
 }
 
 guard_rule_cat_file() {
@@ -264,7 +264,7 @@ guard_rule_cat_file() {
     s="$(sed -E "s/'[^']*'/SQ/g; s/\"[^\"]*\"/DQ/g" <<<"$cmd")"
     grep -qE '(&&|\|\||\||&|<|>)' <<<"$s" && return 0
     _guard_is_read_batch "$s" _guard_is_cat_read || return 0
-    guard_block "don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, with no shell prompt. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>."
+    guard_block "don't read files with a bare 'cat' — use the Read tool: it returns numbered lines registered for a later Edit, and needs no permission decision at all. This fires on a lone 'cat <file>' and on a ';'-sequence of them (a literal echo/printf banner between reads is fine — batch them into one Read); a 'cat' feeding a pipe or heredoc, redirecting, or concatenating multiple files in one command is composition and untouched. If you genuinely need cat, run it yourself with !<command>."
 }
 
 guard_rule_git_grep() {
@@ -296,7 +296,7 @@ guard_rule_git_grep() {
         [[ "$positionals" == 1 ]] && working_tree=1
     fi
     [[ "$working_tree" == 1 ]] || return 0
-    guard_block "don't search with 'git grep' over the working tree — use the Grep tool: it returns matching lines (files registered for a later Read) with no shell prompt. A 'git grep' naming a revision, searching the index (--cached), or piped into a consumer is untouched — those reach beyond the working tree the Grep tool sees. If you genuinely need git grep, run it yourself with !<command>."
+    guard_block "don't search with 'git grep' over the working tree — use the Grep tool: it returns matching lines (files registered for a later Read) and needs no permission decision at all. A 'git grep' naming a revision, searching the index (--cached), or piped into a consumer is untouched — those reach beyond the working tree the Grep tool sees. If you genuinely need git grep, run it yourself with !<command>."
 }
 
 guard_rule_truncate_scratch() {
@@ -387,7 +387,7 @@ guard_rule_allowlist_chain() {
     done
     [[ "$matched_lead" == 1 ]] || return 0
 
-    local steer="run '$lead_core' bare — it's a statically allowlisted command, but the decoration (chaining or a redirect) forces a permission prompt no allowlist entry suppresses. Run the allowlisted command on its own; issue the rest as separate calls."
+    local steer="run '$lead_core' bare — it's a statically allowlisted command, but the decoration (chaining or a redirect) leaves a segment nothing grants, so the whole call falls off the match path and costs an out-of-band permission decision. Run the allowlisted command on its own; issue the rest as separate calls."
 
     [[ "$lead" != "$lead_core" ]] && guard_block "$steer"
 

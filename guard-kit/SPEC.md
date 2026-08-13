@@ -1,9 +1,12 @@
 # guard-kit — permission-friction reduction for agent sessions
 
-A permission prompt the human approves is invisible to the agent — nothing
-about it lands in the transcript, so the agent cannot notice, count, or fix
-the friction it causes. The cost lands on the operator, silently and
-per-prompt, and compounds as the command surface grows. The kit closes the
+A command no allowlist entry matches is not refused — it is decided **out of
+band**, by whatever a harness does when nothing matches: interrupt a human, or
+run a model to judge the call. Either way that decision is invisible to the
+agent — nothing about it lands in the transcript, so the agent cannot notice,
+count, or fix the friction it causes — and either way it is paid per call, out
+of the operator's attention or out of latency and tokens, compounding as the
+command surface grows. The kit closes the
 loop: a `PreToolUse` guard decides at call time (block with a corrective
 message, steer to a better form, auto-allow the provably safe, log every
 fall-through), a scanner ranks the logged prompt sources, a curation pass
@@ -24,9 +27,9 @@ conventions without depending on its registry.
 1. **Call time** — the consumer's `bash-guard.sh` (copied from
    `templates/`, wired as the `PreToolUse(Bash)` hook) inspects each
    command: block, steer, rewrite, auto-allow, or fall through. Every
-   fall-through — exactly the set of commands that may have prompted — is
-   appended to the friction log. An *approved* prompt is invisible to the
-   agent, so this log is the only record.
+   fall-through — exactly the set of commands whose decision was made out of
+   band — is appended to the friction log. That decision is invisible to the
+   agent whichever way it went, so this log is the only record.
 2. **Close time** — `bin/scan-prompts.sh` filters the log against the
    committed allowlist and ranks what survives (§scan-prompts states the
    local-overlay upper bound), grouped by command
@@ -39,6 +42,40 @@ conventions without depending on its registry.
    `settings.json` carries every durable pattern (reviewable, shared), the
    local `settings.local.json` stays near-empty, and the guard encodes the
    steering rules no static glob can express.
+
+### What the steering is buying
+
+The guard's blocks **serialize**: a compound the agent wanted as one call becomes
+several, and a convenient spelling becomes a written-out one. That cost is real
+and paid every session, so the rationale is stated here rather than assumed — and
+it is not "the agent would otherwise be interrupted". Steering does not stop a
+decision from being *made*; it moves the call onto the path where the decision is
+already made, the static match, and off the path where something else must decide.
+Three things pay for the serialization, and none of them turns on *which* thing
+decides:
+
+- **The match short-circuits everything downstream.** An allow/ask/deny match
+  resolves the call there. Whatever a harness does with an unmatched command, the
+  matched form skips it — so the bare spelling is the cheaper one on every axis a
+  harness charges, without knowing which axis that is.
+- **The match verdict is deterministic; the out-of-band one is not.** A steered
+  command's outcome is a property of a reviewed settings file, stable across
+  sessions and auditable without running anything. An unmatched command's outcome
+  is a judgment made per call. This is the half of the win that survives a harness
+  getting cheap at deciding.
+- **The tool-hygiene rules are untouched by any of it.** Read over `cat`, Glob
+  over `find`, Grep over a working-tree `git grep`, `git rm` over `rm`, a scratch
+  dir over the repo root — each steers to a better tool or a safer form, and would
+  earn the guard's keep with no permission mechanism in the picture at all.
+
+**The honest limit.** None of this is measured. Whether N matched calls beat one
+unmatched call in wall-clock is an empirical question the kit does not answer, and
+a harness whose unmatched path is cheap narrows the first bullet toward nothing.
+The ruling therefore rests on the second and third, which do not turn on cost: the
+guard is worth its serialization because it makes the outcome deterministic and
+the tool choice better — not because it dodges an interrupt. A message that names
+one harness's consequence is wrong in the same way whichever consequence it names,
+which is why none of them do.
 
 ### The triage criterion
 
@@ -59,7 +96,7 @@ exists, steer to it in the guard rather than permitting the worse one.
 Note: the harness matches the allowlist **per segment** of a compound
 command, so a glob on the core command does not cover the `echo` banners,
 `wc`, redirects, or `;`-chained diagnostics wrapped around it — one
-unmatched segment re-prompts the whole line. The read-only banner/diagnostic
+unmatched segment takes the whole line off the match path. The read-only banner/diagnostic
 tools an agent habitually chains (`echo`, `wc`, `grep`, `ls`, `command -v`)
 are therefore themselves legitimate allowlist entries; allowlist them, or
 run the core command bare.
@@ -166,12 +203,12 @@ Rules that encode **harness behavior**, not any project's toolchain —
 shipped as `lib/guard.sh` functions the template guard invokes. Order is
 load-bearing where noted.
 
-1. **`cd` in a compound command** — blocked: cwd drift plus a permission
-   prompt no allowlist entry suppresses. Corrective form: absolute paths,
-   or `git -C <dir>` for git.
+1. **`cd` in a compound command** — blocked: cwd drift, plus a compound the
+   allowlist cannot match, so the call is decided out of band. Corrective form:
+   absolute paths, or `git -C <dir>` for git.
 2. **`git -C <repo-root>` when cwd is the root** — blocked: the absolute
-   `-C` target matches no allowlist entry and re-prompts, while the bare
-   `git` form is allowlisted. Pinned with a trailing space to the exact
+   `-C` target matches no allowlist entry and falls off the match path, while
+   the bare `git` form is allowlisted and resolves on it. Pinned with a trailing space to the exact
    root, so `git -C <root>/subdir` and a foreign-repo `-C` are untouched.
 3. **Bare-name scratch redirect** — a `>`/`>>` to a slash-free
    `*.err`/`*.out`/`*.log` target is blocked (it lands in the tracked tree
@@ -188,13 +225,13 @@ load-bearing where noted.
    the literal repo-root prefix is steered to the repo-relative spelling.
    `git` is excluded — rule 2 already owns its `-C` handling.
 6. **Shell expansion / assignment** — a residual `${…}`/`$(…)`/`<(…)`/
-   `$NAME` after single-quoted regions are stripped is blocked (the harness
-   prompts on every expansion before allowlist matching). Only
+   `$NAME` after single-quoted regions are stripped is blocked (the harness's
+   matcher refuses every expansion before allowlist matching). Only
    *single*-quoted regions are stripped: inside single quotes `$` is
    literal (`awk '$1'`), but a double-quoted `"$x"` still expands and must
    stay visible. A standalone `NAME=value` assignment is caught separately,
    since the expansion check only sees a *used* `$VAR`.
-7. **Unquoted brace glyph** — the harness prompts on the bare `{` glyph
+7. **Unquoted brace glyph** — the harness's matcher refuses the bare `{` glyph
    before allowlist matching, the same behavior class rule 6 pre-empts for
    `$`-expansions, so a `{` surviving rule 6's single-quote strip is handled
    by shape. A **bare `{}` placeholder** (`find … -exec cmd {} +`,
@@ -209,7 +246,7 @@ load-bearing where noted.
    any other residual `{` gets the generic corrective (single-quote if
    literal — an awk/sed program in double quotes — write it out if it
    expands). There is no legitimate brace-glob convenience to preserve:
-   since every bare `{` already costs an operator prompt no allowlist entry
+   since every bare `{` already costs an out-of-band decision no allowlist entry
    can suppress, block-and-steer strictly dominates; only single-quoted
    (literal) braces pass untouched. **Placed before both auto-allow rules**
    so their literal-target premise holds for braces as well.
@@ -280,10 +317,10 @@ load-bearing where noted.
     unrecognized option-with-argument or a glued pattern flag biases toward
     passing, never a false steer of a history search.
 12. **Auto-allow `: > file` truncation** — a leading `:` plus redirect
-    defeats the permission matcher, so it always prompts. Granted silently
-    when the command is *only* `:` followed by redirects and every target is
+    defeats the permission matcher, so it is always decided out of band. Granted
+    silently when the command is *only* `:` followed by redirects and every target is
     gitignored (`git check-ignore`): truncating scratch is safe; a tracked
-    file must still prompt. The `git` subprocess is gated behind the rare
+    file must still take that decision. The `git` subprocess is gated behind the rare
     `:`-redirect match; expansions (rule 6) and brace forms (rule 7) are
     already blocked, so a surviving target is a literal path.
 13. **Auto-allow read-only pipeline** — granted silently when every pipe
@@ -296,18 +333,19 @@ load-bearing where noted.
 14. **Decorated allowlisted command** — the leading command exactly matches a
     committed **bare** allow entry (a `Bash(<cmd>)` with no `:*`/`*` glob) but
     the command decorates it — `&&`/`;`/`|` chaining, a trailing redirect, or
-    `2>&1` — which forces a permission prompt no allowlist entry suppresses.
+    `2>&1` — which leaves a segment nothing grants, so the whole call falls off
+    the match path and is decided out of band, and no allowlist entry pre-empts that.
     **Blocked** with the steer *run it bare — the bare form is statically
-    allowed; the decoration forces a prompt.* Block, not advise: the rule fires
-    only on commands that would prompt anyway, so blocking converts the prompt
-    into a durable steer at no extra interrupt, and an advise would *grant* the
+    allowed; the decoration is what costs the decision.* Block, not advise: the rule fires
+    only on commands that were going to be decided out of band anyway, so blocking
+    converts that decision into a durable steer at no extra cost, and an advise would *grant* the
     decorated command (its extra segments the allowlist never reviewed).
     **Bare leads only:** a glob-headed family (`Bash(git log:*)`) coexists with
     allowlisted decorators, so only an exact bare entry qualifies as the lead;
     widening to glob leads is possible later without a new name. **Never
     intercepts a silent grant:** the harness matches per segment, so a compound
-    whose every segment matches the committed allowlist is granted without a
-    prompt and blocking it would regress — the rule therefore fires only when a
+    whose every segment matches the committed allowlist resolves on the match
+    and blocking it would regress — the rule therefore fires only when a
     non-leading segment (or a redirect on the lead) fails to match any committed
     allow entry, reusing `guard_allow_match`'s shell-glob semantics. Reads
     `GUARD_KIT_SETTINGS`; **fail-open** — no `jq`, no settings file, or a
@@ -336,8 +374,8 @@ load-bearing where noted.
     lands only via a later `git add -A` — the form the shared-index discipline
     warns against, since it sweeps a concurrent session's foreign path into the
     commit. Block, not advise, on rule 14's reasoning: no consumer allowlist is
-    presumed to grant `rm`, so the rule fires on a command that would prompt
-    anyway and converts the prompt into a durable steer. Fires per statement
+    presumed to grant `rm`, so the rule fires on a command that would be decided
+    out of band anyway and converts that decision into a durable steer. Fires per statement
     (`;`/`&&`/`||`/`|` split), so a decorated form steers on the same premise as
     the bare one. Conservative by construction: expansions and backticks decline
     outright (rule 6 already blocks them), option words are skipped, and a
@@ -369,7 +407,7 @@ surface via a quoted `-m` span or a `-F <file>` the hook never reads.
 themselves open. The generic ruleset pushes probes and multi-line sweeps
 into the consumer's gitignored scratch dir (`GATE_SDK_TMP_DIR`) and refuses
 the harness scratchpad by name — yet nothing allowlists *executing* what
-lands there, so every run of a steered-to script prompts, forever. The
+lands there, so every run of a steered-to script is decided out of band, forever. The
 runner is the fixed, allowlistable path that ends it: given a target inside
 the scratch dir it **echoes the script's contents to stdout** (a header
 naming the path, then the body), then **executes it**, passing stdout,
@@ -379,7 +417,7 @@ without interpreting them.
 The echo is the point, not a convenience. A bare scratch-glob allowlist
 would auto-approve executing any script at that path with its contents
 visible only in an earlier write call — turning a visible command into a
-silent *and* opaque one, the opposite of what the prompt was buying.
+silent *and* opaque one, the opposite of what the permission decision was buying.
 Echo-at-execution makes the silent run **self-documenting**: the executed
 lines land in the transcript at the moment they run, which is the evidence
 surface a supervisor's post-commit review reads. Steering the agent to
@@ -396,14 +434,14 @@ as a convenience: the generic rules that would refuse an expansion-bearing
 one-liner do not reach the same code once it sits inside a scratch file.
 The echoed body is the **compensating control**, and it relocates review
 rather than removing it — from *before* execution, where the permission
-prompt put it, to *after*, in the transcript a supervisor reads. That is
+decision put it, to *after*, in the transcript a supervisor reads. That is
 the actual posture of the entry, and a consumer unwilling to move review
-downstream should simply not add it: the tool still runs without it, and
-still prompts.
+downstream should simply not add it: the tool still runs without it, and its
+runs still take that decision.
 
 **Fail-closed on reach.** A target resolving outside the scratch dir is
 refused before any echo or execution, so the tool cannot become a general
-"run this arbitrary path without a prompt" bypass: its reach is exactly the
+"run this arbitrary path unreviewed" bypass: its reach is exactly the
 scratch surface the guard already steers into. The test reads the
 *resolved* path, never the spelling, so a traversal out of the dir refuses
 like any other outsider. Refusal, an absent target, and a missing argument
@@ -416,7 +454,7 @@ path is that consumer's settings, never a kit literal.
 
 ## scan-prompts
 
-Advisory: surfaces recurring permission-prompt sources from the friction
+Advisory: surfaces recurring permission-friction sources from the friction
 log, filtering against **both** settings files (`GUARD_KIT_SETTINGS` and
 `GUARD_KIT_SETTINGS_LOCAL`) and the harness's built-in read-only git/docker
 auto-allows. Matching is **per compound segment**, the same surface the
@@ -425,6 +463,13 @@ command is granted only when *every* segment is, so a whole-string glob that
 spans a compound the harness would split and refuse — `Bash(git status:*)`
 against `git status && rm -rf x` — does not read as allowed and is counted as
 prompting.
+
+**What "prompting" names in this tool's output.** The word is the tool's shipped
+vocabulary and stays as it is; what it counts is the set of calls **nothing in the
+allowlist grants**, whose decision the harness therefore made out of band. On a
+harness that interrupts, that set is literally the prompts; on one that decides
+another way, it is the same set under an inherited name. The count is the same
+number either way, and it is the number the triage criterion reads.
 
 The friction log's fall-throughs split three ways:
 - **Committed-covered** — every segment matches the committed allowlist or a

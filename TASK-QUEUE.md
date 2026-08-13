@@ -16,37 +16,6 @@
 
 ## Technical Debt
 
-- **bash-guard-auto-mode-rationale** — the guard's messages assert a consequence the
-  harness no longer produces. They say a decorated command "forces a permission prompt no
-  allowlist entry suppresses"; under auto mode a decorated command does not prompt, it
-  routes to a classifier model.
-  **Scoped by operator ruling 2026-08-13 to parts (1) and (2). Part (3) is not in this
-  entry** — `guard-grant-review` carries it, blocked until the breadth direction arrives.
-  **The mechanism, verified at the 2026-08-13 drain against the vendor permission-modes
-  page** rather than inferred from it: an allow, ask or deny match resolves immediately;
-  read-only actions and working-directory edits auto-approve; everything else goes to the
-  classifier. A match short-circuits the classifier entirely — no model call — with writes
-  to protected paths the sole exception.
-  **The guard still earns its keep, for a reason other than the one it states.** Steering a
-  command into its bare allowlisted form keeps it at the match step rather than the
-  classifier, which is cheaper in latency and tokens and needs no peer model. A second
-  rationale is untouched by any of this: the tool-hygiene rules — Read over `cat`/`sed`, the
-  repo scratch dir over `/tmp` — hold in every permission mode, and they are why the guard
-  is not merely a prompt-avoidance device.
-  **Deliverable (1):** re-word every message naming a prompt as the consequence. Hard
-  constraint: a session may run in any permission mode, so a message re-pinned to auto is as
-  wrong as the one it replaces — the wording must be true under all modes without naming one.
-  **Deliverable (2):** rule whether the serialization cost is still worth paying now that
-  the consequence is a model call rather than a block. An economics call over a cost this
-  repo does not measure, so it is answered with a stated rationale rather than a number.
-  Scope: prose in guard-kit's message set plus its decision-table cases. No new gate, and
-  the guard's mechanism is unchanged.
-  **Live evidence from the promoting session:** four refusals in roughly twelve bash calls
-  at scope 2026-08-13, including a shape the entry had not measured — a POSIX regex
-  quantifier inside a *quoted* grep pattern tripping the brace-expansion refusal.
-  Filed 2026-08-13 by close from its own gap-inbox drain; promoted and scoped 2026-08-13 at
-  scope on the operator ruling.
-
 ## Deferred
 
 
@@ -5143,6 +5112,7 @@
 - port-criterion-aggregate-cost-blindness
 - upgrade-smoke-from-binary-pairing
 - gap-bullet-premise-verification
+- bash-guard-auto-mode-rationale
 
 ## Lessons Learned
 

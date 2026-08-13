@@ -8,17 +8,18 @@ generated: true
 Permission-friction reduction for coding-agent sessions. A `PreToolUse` guard
 decides at call time — **block** with a corrective message, **steer** to a
 better form, **rewrite** to the allowlisted spelling, **auto-allow** the
-provably safe, or log the fall-through — a scanner ranks what actually
-prompted, a curation tool finds the redundant local overrides, and a
+provably safe, or log the fall-through — a scanner ranks what the allowlist
+failed to cover, a curation tool finds the redundant local overrides, and a
 close-stage triage step makes the whole loop a habit.
 
-Why: a permission prompt the human approves is invisible to the agent — nothing
-lands in the transcript, so the agent cannot notice, count, or fix the friction
-it causes. The cost lands on the operator, silently and per-prompt, and
-compounds as the command surface grows. The kit closes the loop by making the
-fall-through set — exactly the commands that may have prompted — the one thing
-that *is* recorded. See [SPEC.md](SPEC.md) for the framework, the generic
-ruleset, and the triage criterion.
+Why: a command no allowlist entry matches is decided **out of band** — by
+interrupting a human, or by a model asked to judge the call — and that decision
+is invisible to the agent either way, so it cannot notice, count, or fix the
+friction it causes. The cost is paid per call, out of the operator's attention or
+out of latency and tokens, and compounds as the command surface grows. The kit
+closes the loop by making the fall-through set — exactly the commands nothing
+granted — the one thing that *is* recorded. See [SPEC.md](SPEC.md) for the
+framework, the generic ruleset, what the steering buys, and the triage criterion.
 
 Unlike the other kits, guard-kit registers **no gates**: its surfaces are
 hooks and advisory `bin/` tools, so nothing joins `gates.list`. It follows
@@ -61,7 +62,7 @@ its contents are your project's vocabulary, not the kit's.
 ## Use
 
 ```bash
-bash guard-kit/bin/scan-prompts.sh                  # rank what prompted, filtered by the allowlist
+bash guard-kit/bin/scan-prompts.sh                  # rank what nothing granted, filtered by the allowlist
 bash guard-kit/bin/scan-prompts.sh --count          # <patterns>/<occurrences> token (drift KPI)
 bash guard-kit/bin/compare-settings-allow.sh        # local-overlay entries a committed glob already grants, and those a probe proves too broad
 ```

@@ -2,7 +2,7 @@
 permission-friction loop a habit, not a one-off cleanup. Splice this in place
 of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 
-1. **Rank what prompted.** Run `bash guard-kit/bin/scan-prompts.sh` — it
+1. **Rank what nothing granted.** Run `bash guard-kit/bin/scan-prompts.sh` — it
    filters the friction log against the committed allowlist and the harness's
    built-in read-only auto-allows, then ranks the survivors by command pattern.
 2. **Resolve each recurring pattern by the triage criterion** — never default
@@ -16,8 +16,8 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
    blessing a form, confirm it is the one to reinforce.
    **Diagnose before you reach for the allowlist.** A pattern can rank high while
    already being granted: an allowlist entry matches a *bare* command, so a call
-   that chains (`&&`, `;`), redirects, or expands breaks the match and prompts
-   anyway. Check a ranked pattern against the committed allowlist first — if it is
+   that chains (`&&`, `;`), redirects, or expands breaks the match and is decided
+   out of band anyway. Check a ranked pattern against the committed allowlist first — if it is
    already there, the finding is (c) habit change, and adding coverage buys
    nothing while reading as a fix.
 3. **Review the wakeup log** if the wakeup-guard is wired: read
@@ -51,8 +51,8 @@ of lifecycle-kit's `tooling-friction triage` placeholder (close skill, step 2).
 5. **Clear the friction log** — its named reclaim path:
    `: > .workflow/prompt-friction.log`. Run each clear as its own bare command:
    the allowlist entry is an exact string, so compounding it (`&&`, `;`, a
-   trailing `echo`/`wc`) breaks the match and forces the very prompt this step
-   just triaged away.
+   trailing `echo`/`wc`) breaks the match and buys the very out-of-band decision
+   this step just triaged away.
 
 Goal: the local set stays small, every durable pattern lives in the
 committed, reviewable allowlist, and no local glob auto-allows a command you
