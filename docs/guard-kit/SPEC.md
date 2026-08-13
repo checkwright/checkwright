@@ -149,6 +149,16 @@ Primitives a consumer guard composes; each emits the harness's
   by the caller, as every rule does), so a separator inside a quoted argument is
   never mistaken for a statement break.
 
+**The payload carries the live permission mode, and no accessor above reads it.**
+`PreToolUse` delivers `permission_mode` alongside the fields
+`guard_read_command` and `guard_read_path` pick off, so a rule whose rationale is
+mode-*conditional* — "no allowlist entry can suppress this prompt" is false under
+an auto-approving mode and true under the others — currently asserts a mode
+rather than reading one. Recorded here because it is a fact about this framework's
+own inputs: without it, each session re-establishes it from the vendor hook
+reference. Whether a guard *should* read the mode is a consumer decision and is
+not settled here.
+
 Fail-open is the default posture. The one sanctioned fail-closed shape is a
 deny-guard whose hook *matcher* already proves the tool identity (see
 wakeup-guard): there, a logging or parse failure still denies.

@@ -4432,7 +4432,7 @@
   gate-sdk/SPEC.md §The POSIX ERE matcher. The six members it unblocks owe only their own
   port: `check-queue-prose-precondition` (queue-kit); `check-spec-derivable-section`,
   `check-deprecation-task` (canon-kit); `check-tree-terms`, `check-commit-msg` (gate-sdk); plus
-  `check-brevity` marginally. `check-comment-tier` stays screened **out**: `join_alt`
+  `check-brevity` (context-kit) marginally. `check-comment-tier` stays screened **out**: `join_alt`
   bracket-escapes every knob element to a literal.
   **`check-spec-pointer` owes the `spec_comment_surface` family** — held 2026-08-12 at spec on
   criterion 6, as the only member calling both of canon-kit's corpus primitives.
@@ -5176,6 +5176,29 @@
   Filed 2026-08-13 by close, draining the gap inbox; a lead filing, re-verified at the drain by
   reading the template end to end, the search an absence claim needs.
 
+- **scratch-execution-control-is-bash-only** [design-pending] — the scratch-run steer and the
+  runner it steers to are both bash-only, so a non-bash scratch script executes with no
+  compensating control at all.
+  `scripts/bash-guard.sh` blocks a direct scratch run by matching `^bash[[:space:]]+\.tmp/`, and
+  `guard-kit/bin/scratch-run.sh` executes its target with a hardcoded `bash`. Neither reaches a
+  script run under another interpreter. Probed at the 2026-08-13 close against the guard itself:
+  a `python3 .tmp/<script>.py` payload exits **0** — no block, no steer, no advice.
+  **Measured, not hypothetical:** this iteration's own friction log ranks three distinct
+  `python3 .tmp/*.py` invocations, all mechanical queue edits. Each was decided out of band and
+  none went through the echo-at-execution that guard-kit/SPEC.md §scratch-run names as the
+  compensating control for exactly this class of run. The control was designed for the shape and
+  missed every instance of it.
+  **Why `[design-pending]`:** the two halves want different answers. Widening the guard's match to
+  a set of interpreters is a roster that rots; widening the runner needs it to either dispatch on
+  extension or take the interpreter as an argument, and the second re-opens what the runner is
+  allowed to execute. There is also a live third option — rule that scratch execution is
+  bash-only and have the guard say so — which is cheaper and narrows what sessions may do.
+  Distinct from the icebox entry `scratch-execution-allowlist-bar`, which is about the standing
+  allowlist bar for scratch execution rather than about which interpreters the control covers.
+  **Cost while deferred:** the control reads as complete and is not, which is worse than an
+  absent control — a reviewer seeing the rule and the runner has no reason to check its reach.
+  Filed 2026-08-13 by close, from its own tooling-friction triage; probed at source before filing.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no
@@ -5207,10 +5230,6 @@
 
 ## Done
 
-- port-criterion-aggregate-cost-blindness
-- upgrade-smoke-from-binary-pairing
-- gap-bullet-premise-verification
-- bash-guard-auto-mode-rationale
 
 ## Lessons Learned
 

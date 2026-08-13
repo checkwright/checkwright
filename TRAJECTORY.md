@@ -287,7 +287,7 @@ each attributed to a port-created hole that every further cohort widens, and
 neither entry citing the other, so the sum was invisible until it was summed.
 Cohort composition itself is owned by gate-sdk/SPEC.md §The first cohort, and
 the rule that selects the next; this records the ruling, not the design.
-**Discharged when the trio lands.**
+**Discharged 2026-08-13, the trio having landed in `native-ere-matcher-and-held-suites`.**
 
 What the sequence names next, after the port: `companion-toolkit-profile`.
 

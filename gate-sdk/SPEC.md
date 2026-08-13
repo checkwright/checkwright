@@ -1292,6 +1292,16 @@ design problem — a self-referential parity oracle, an external program on `PAT
 — that the port owes an answer to rather than a waiver. Neither is ported and
 patched later; both are designed, then ported.
 
+**A primitive's *remaining* consumers are derived, never recorded here.** Each
+cohort section below records the members it landed, which answers what was ported
+and not what is left — and the leftover is the number a session sizing the next
+cohort actually needs. It is one command, because a ported gate leaves a `.gate`
+descriptor beside its former script: the still-shell consumers of a shared
+derivation are the `*/checks/*.sh` files naming it that have **no** sibling
+`.gate`. Deriving it beats a roster that would rot at every cohort
+(derivation-first), and stating the command once is what stops each sizing
+session re-inventing it.
+
 **What this cohort landed.** Both rules ship as
 compiled subcommands, proved byte-identical against the shell gates on each
 fixture pair, the live tree and the edge roots — the comparison run **while both

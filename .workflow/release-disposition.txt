@@ -2,3 +2,4 @@
 # One line per iteration at its release boundary, close-written; the line
 # grammar is lifecycle-kit/SPEC.md §templates/stages/'s, not restated here.
 
+native-ere-matcher-and-held-suites release deferred:v0.23.0 — minor earned (Tightened gates non-empty: 11 accumulated declarations, 3 added this iteration — check-install-claim, check-payload-claim, check-manifest-temporal), no decommission so not a major; held on the cadence floor, newest tag v0.22.0 dated 2026-08-07 is 6 days old against a 7-day floor, and no major, security/supply-chain fix or operator direction fired the override. Carries the prior deferral forward at the same version.
