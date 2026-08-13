@@ -210,7 +210,7 @@ authoritative for the blocker test; the hold rests on **cohort composition** —
 *is this gate's emitter ported?* — which criterion 7's own closing sentence
 excludes from its reach, saying a blocker "never reads on whether a gate ports".
 So the hold is keyed per member on its emitter, and **the criterion-7 label on it
-is a spec defect to correct** — the hold and its grounds are owned by
+was a spec defect, corrected** — the hold and its grounds are owned by
 gate-sdk/SPEC.md §The first cohort, and the rule that selects the next.
 
 This **does not reverse** the 2026-08-11 hold. That ruling stands on its stated
@@ -219,7 +219,7 @@ mis-read it. Which of the freshness family the per-member key actually clears is
 a derivation no ruling can shortcut, and it is the taking stage's to make; the
 standing trap is that all six steer their fixture pairs off the live emitter, so
 size on what a member executes, never on what its fixtures reach. This ruling
-discharges when the relabel lands.
+discharged 2026-08-13, the relabel having landed in `port-oracles-and-kit-roots`.
 
 ## PRIORITY DIRECTIVE — the port track's sequence
 
