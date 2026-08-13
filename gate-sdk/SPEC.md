@@ -1469,6 +1469,17 @@ implementation:
   "clears criterion 4" would have taken it and discovered the engine mid-port,
   which is the failure mode criterion 7 exists to prevent.
 
+  **It is a class with two members, not a one-off**, which is why the shape is
+  named here rather than the gate. `check-spec-derivable-section` sits in the
+  identical position: `CANON_KIT_DERIVABLE_POINTER_REGEX`'s shipped default
+  (canon-kit/SPEC.md §lib/spec.sh) is an alternation too, so the same
+  override-nothing consumer makes the same engine load-bearing. Both are on the
+  nine-member roster `cohort-held-members-port-prerequisites` carries, so a
+  selector reading that roster is already warned; what a second instance adds is
+  the screen to run before trusting a mechanical one — **read the kit default,
+  not only the knob**, because a knob documented as consumer config is exactly
+  where a mechanical screen stops looking.
+
 These holds are sequencing rather than exclusion under the rule §The
 port-candidate criteria fixes and this section restates for the queue-kit pair
 above; what each owes is filed on `cohort-held-members-port-prerequisites`,
