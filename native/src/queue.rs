@@ -231,8 +231,9 @@ pub fn bare_bullet_slug(line: &str) -> Option<&str> {
     Some(trimmed)
 }
 
-// spec: queue-kit/SPEC.md §lib/queue.sh — queue_done_slugs: every bare bullet slug in the done
-// section, in file order
+// spec: queue-kit/SPEC.md §check-task-conservation — every bare bullet slug in the done
+// section, in file order; the shell library carries no counterpart, its dead one having been
+// deleted rather than held in parity (§lib/queue.sh)
 pub fn done_slugs(text: &str, sec: &Sections) -> Vec<String> {
     let mut out = Vec::new();
     let mut ind = false;
@@ -250,6 +251,62 @@ pub fn done_slugs(text: &str, sec: &Sections) -> Vec<String> {
         if let Some(s) = bare_bullet_slug(line) {
             out.push(s.to_string());
         }
+    }
+    out
+}
+
+// spec: queue-kit/SPEC.md §The queue format — the parity subject between this module and
+// queue-kit/lib/queue.sh: what each side *classifies* one queue file as, never the derived
+// literals. Its one consumer is gate-tests/queue-lib-parity.test.sh, which reads every field
+pub fn parity_report(text: &str, sec: &Sections) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut head = String::from("task-sections");
+    for s in sec.task_sections() {
+        head.push('\t');
+        head.push_str(s);
+    }
+    out.push(head);
+    for (i, line) in text.lines().enumerate() {
+        let mut v: Vec<&str> = Vec::new();
+        if is_section_line(line) {
+            v.push("section");
+        }
+        // spec: queue-kit/SPEC.md §lib/queue.sh — QUEUE_ACTIVE_RE's counterpart is composed from
+        // the live matchers rather than added as an accessor the runner would be the only reader
+        // of: the task set is the active sections plus the deferred one plus a configured icebox
+        if sec.is_task(line) && !sec.is_deferred(line) && !sec.is_icebox(line) {
+            v.push("active");
+        }
+        if sec.is_deferred(line) {
+            v.push("deferred");
+        }
+        if sec.is_icebox(line) {
+            v.push("icebox");
+        }
+        if sec.is_task(line) {
+            v.push("task");
+        }
+        if is_lessons_line(line) {
+            v.push("lessons");
+        }
+        // spec: queue-kit/SPEC.md §lib/queue.sh — queue_live_slugs' own two-step: the anchored
+        // bullet grammar guards, and the leftmost bold slug is what it prints
+        let bullet = match bullet_slug(line) {
+            Some(_) => first_bold_slug(line).unwrap_or("-"),
+            None => "-",
+        };
+        if v.is_empty() && bullet == "-" {
+            continue;
+        }
+        let verdicts = if v.is_empty() {
+            "-".to_string()
+        } else {
+            v.join(",")
+        };
+        out.push(format!("line\t{}\t{}\t{}", i + 1, verdicts, bullet));
+    }
+    for s in live_slugs(text, sec) {
+        out.push(format!("live\t{}", s));
     }
     out
 }

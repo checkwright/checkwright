@@ -64,6 +64,19 @@ the one that prompted the change is likely to get it.
 - Any other section (an iteration header, a lessons section) is outside the
   grammar and ignored by every gate except the file-wide hygiene axes.
 
+**Where this format has two holders, what is compared between them is
+classification over a corpus, never the derived literals.** The shell library
+exposes ERE strings and an array; its compiled counterpart exposes a section
+value and free predicates over it, so there is no value either could hand the
+other — comparing them would compare nothing, or force one side to grow an
+accessor whose only reader is the test. The comparable question is the one this
+section defines: given the same queue file, do both agree on which lines are
+section boundaries, which are task bullets, which is the lessons line, which
+slugs are live? Two witnesses held to each other over a golden *corpus*, with no
+committed expected file — a maintained golden is a third copy to drift, and the
+failure the comparison exists to catch is one side edited without the other,
+which it catches directly (§lib/queue.sh names the holder).
+
 An entry is a column-0 `- **slug** — prose…` bullet; continuation lines are
 indented, never column 0. An *indented* bullet with a bold lead-in is a
 sub-task (same grammar); with a plain or italic lead-in it is a prose note
@@ -525,20 +538,34 @@ lives in `bin/queue-edges.sh`, which sources this library for the section
 regexes and `queue_live_slugs` it does share. A second reader of body-position
 slug tokens is what would promote the scan into this roster.
 
-**The one-adapter guarantee is now split for `queue_live_slugs`, and holds for
-everything else here.** The gates that read the queue ported to the binary
-substrate (gate-sdk/SPEC.md §Porting a gate to the binary substrate), so
-`check-queue-slug-liveness` and `check-task-conservation` call a Rust
-reimplementation of that helper while `bin/queue-edges.sh` keeps calling this
-one, and nothing machine-held holds the two equal — they were proved
-byte-identical at port time and are edited independently from there. The same is
-true of the section regexes, every one of which a `bin/` script still reads
-directly. The risk is filed as debt rather than closed here, because an ongoing
-cross-implementation check is scope the port did not need in order to prove the
-members it ported. `queue_roadmap_entries` is **not** in that split: its only two
-consumers are `bin/roadmap.sh` and `check-roadmap-fresh`, and the gate was held
-on shell by the cohort's own ruling (gate-sdk/SPEC.md §The first cohort, and the
-rule that selects the next), so the emitter and the gate still cannot disagree.
+**The one-adapter guarantee is split for `queue_live_slugs` and the section
+regexes, and the split is machine-held rather than filed as debt.** The gates
+that read the queue ported to the binary substrate (gate-sdk/SPEC.md §Porting a
+gate to the binary substrate), so `check-queue-slug-liveness` and
+`check-task-conservation` call a Rust reimplementation of that helper while
+`bin/queue-edges.sh` keeps calling this one; the same is true of the section
+regexes, every one of which a `bin/` script still reads directly. The split is
+**permanent** — seven consumers still source this library, five `bin/` scripts
+plus `check-roadmap-fresh` and `check-queue-prose-precondition` — so the shell
+form cannot be deleted the way a ported primitive's is, and a port-time
+byte-identity proof would expire at the next edit to either side. What holds the
+two equal from here is `gate-tests/queue-lib-parity.test.sh`: it feeds one canned
+corpus to both and compares their **classification** of it byte for byte
+(§The queue format owns why classification is the comparable thing), which is
+criterion 6's *machine-held* disposition rather than its duplication-absent one
+(gate-sdk/SPEC.md §The port-candidate criteria, criterion 6).
+
+The obligation covers **one helper and seven globals**, and nothing else is owed
+one. The crate's `done_slugs` has no counterpart here and needs none: a shell
+twin with no caller is a duplication removal disposes of, which enforcement-first
+ranks above gating it, and the bound on that disposition is undocumented surface
+— no section named it, which is what separates it from the section regexes, every
+one of which is documented and load-bearing.
+`queue_roadmap_entries` is **not** in the split
+either, for the opposite reason: its only two consumers are `bin/roadmap.sh` and
+`check-roadmap-fresh`, and the gate was held on shell by the cohort's own ruling
+(gate-sdk/SPEC.md §The first cohort, and the rule that selects the next), so the
+emitter and the gate still cannot disagree.
 
 The loader sources the consumer config, then a `<config>.local.sh` overlay
 beside it when present — last write wins. This is the tracked-name /

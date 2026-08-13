@@ -12,33 +12,6 @@
 
 ## New Features
 
-- **queue-lib-dual-implementation-parity** [spec: SPEC-lib-parity.md]
-  — the queue-cohort port left a shell library and its compiled twin with nothing holding
-  the pair.
-  `queue-kit/lib/queue.sh` survives the port as a live shell library for **seven** consumers —
-  five `bin/` scripts plus `check-roadmap-fresh` and `check-queue-prose-precondition`, both
-  still shell — while the ported gates gain an independent Rust implementation of
-  `queue_live_slugs` and `queue_done_slugs`. Corrected at spec 2026-08-13 against the tree:
-  this entry read *five* consumers and named `queue_roadmap_entries` as split, which
-  queue-kit/SPEC.md §lib/queue.sh already denies; the split twin it missed is the dead one.
-  Seven of the eight derived globals are read directly by a `bin/` script's awk —
-  `QUEUE_DONE_RE` is read only inside `queue_done_slugs`, which nothing calls.
-  **This is criterion 6's own qualification firing** — gate-sdk/SPEC.md §The port-candidate
-  criteria permits the duplication a port creates *"unless the duplication the port creates is
-  machine-held"*, and here it is not. The amendment's parity proof is one-time, at port; it
-  does not survive the next edit to either side, because the shell original is not deleted —
-  a `bin/` script still calls it.
-  **Deliverable:** a golden-value cross-implementation test — canned queue-file input, both
-  implementations' output compared — wired into `run-gate-tests.sh` or a dedicated fixture.
-  The fuller close is collapsing the `bin/` scripts onto the same Rust core via a thin
-  subcommand, which was explicitly out of the cohort's scope.
-  **Cost while deferred:** a future change to queue-kit's section-matching or its
-  slug/roadmap-entry grammar edited on only one side silently diverges the gate's verdict from
-  the `bin/` tool's output, with no gate to catch it — and the divergence surfaces as a wrong
-  answer rather than a red.
-  Filed 2026-08-12 by close, draining the bullet align filed against the cohort amendment.
-  Promoted 2026-08-13 at spec, with three of the entry's own claims corrected at the amendment.
-
 ## Technical Debt
 
 - **lifecycle-gate-test-runner-holdouts** — two of lifecycle-kit's gate-driving test
@@ -5419,6 +5392,7 @@
 ## Done
 
 - native-diff-renderer-hoist
+- queue-lib-dual-implementation-parity
 
 ## Lessons Learned
 

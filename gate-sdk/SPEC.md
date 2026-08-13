@@ -1275,6 +1275,31 @@ design time; the last three were paid for, and each is named with what it cost.
    recorded rather than quietly taken, because it is an improvement and a later
    reader must not restore the parity test as a missing piece.
 
+   **The qualification's *other* disposition, worked — and the two are stated
+   together so neither reads as the general rule.** The bridged-knob case above
+   satisfies the clause in its strongest form, by making the duplication *absent*;
+   the `spec_comment_surface` cohort reached the same form by the other road, its
+   primitive's caller set emptying at the port so the shell original was deleted.
+   Neither road is available where **live shell consumers survive the port**:
+   queue-kit's `lib/queue.sh` still has seven, so its `queue_live_slugs` and its
+   section regexes are permanently dual-implemented and the criterion's *unless*
+   is what admits them. What discharges it there is an executed cross-substrate
+   comparison rather than a deletion — one canned corpus fed to both holders, their
+   classification of it compared byte for byte, run by the owning kit's scenario
+   runner (queue-kit/SPEC.md §lib/queue.sh). Two facts a later port should read off
+   this pair: the disposition is chosen by **whether the shell caller set empties**,
+   not by taste; and *machine-held* means a standing oracle, so a parity proof taken
+   once at port time satisfies criterion 2 and never this one — it expires at the
+   next edit to either side, which is precisely the failure the clause names.
+
+   **A dead twin is deleted, not held**, and the same enforcement-first ordering
+   decides it: where a shell helper has no caller and its compiled counterpart is
+   live and tested, a standing parity obligation gates a duplication that removal
+   disposes of. That is why queue-kit's done-slug helper lives only in the crate
+   (queue-kit/SPEC.md §lib/queue.sh). The bound is **undocumented surface** — a
+   helper no SPEC section names — which is what separates such a helper from the
+   documented globals beside it, none of which this disposition reaches.
+
    **Glob semantics, committed once here rather than re-decided per port.** The
    bridge transports strings and interprets nothing — it has no glob matcher,
    because bridging a knob is not deriving a corpus from one. The commitment is
@@ -3381,6 +3406,29 @@ invoke a shell function and — more to the point — a bridged knob is resolved
 when the **argv** is built, so an override set around the binary would arrive
 after the value it was meant to change had already been read.
 
+**A `*.test.sh` may also be a *scenario* runner rather than a gate driver, and
+one that compares substrates asserts exactly where a dispatch exists.** A bespoke
+test whose subject is a shared derivation held on both substrates — queue-kit's
+parity harness is the first (queue-kit/SPEC.md §lib/queue.sh) — reaches the
+compiled side through `gate_native_bin` rather than a gate name, since the arm it
+interrogates is a binary-level flag and dispatches no gate
+(§check-gate-substrate-parity). Its skip predicate is
+`check-gate-binary-fresh`'s **a declaration is not a dispatch**, applied one layer
+up: where the binary is absent or non-executable — a consumer on an uncovered
+platform, vendoring the shell library with no artifact behind it — the comparison
+has nothing to compare and **skips, saying so on its clean line**, in the
+reporting shape the port's omitted-member roster uses, so a reader can tell *no
+binary here* from *parity holds*. A silent skip would be the same vacuity the
+fixture pair exists to end, arriving in the test layer. Two boundaries keep the
+skip narrow. A binary that is **present** and refuses the arm is a stale binary,
+not an absent one, so it fails rather than skips and §check-gate-binary-fresh is
+what names it — with the same bounded version-skew residual assertion B states,
+an adopter vendoring a kit newer than its installed binary reding until the binary
+is upgraded. And the runner asserts that its **corpus still reaches the branches
+the comparison was bought for**: an agreement over a corpus that classifies
+nothing is a pass with no content, which is the skip's failure mode wearing a
+clean line.
+
 The runner is the **one caller that needs the dispatch executable rather than
 the whole command**, so it is the one the config bridge's argv shape reaches
 (§lib/gate.sh). It takes the first element that is neither `env` nor a
@@ -4061,6 +4109,16 @@ steers the fixture pair onto hermetic copies of each surface. Six assertions.
   roots and knobs — an entry a member cannot compile without — the same shape
   `--reads` and `--knobs` have, and a crate unit test holds it to the tree: for
   every registered subcommand, `<owner>/checks/<name>.gate` exists.
+  **An introspection arm is therefore a *flag* arm, and this assertion is why.**
+  Something that needs to ask the binary a question directly — a cross-substrate
+  parity harness reaching a primitive no gate exposes — cannot land as a new
+  subcommand: this assertion reds a subcommand no descriptor dispatches to, and the
+  one allowance is the `reference-only` disposition, intended for an implementation
+  held ahead of its port rather than for an arm nothing will ever dispatch. So it
+  joins `--list`, `--reads`, `--knobs` and `--source-stamp` at the binary level,
+  outside the roster this assertion equates. Recorded because the assertion is
+  unchanged by it and the consequence is otherwise rediscovered by reddening it
+  (queue-kit/SPEC.md §lib/queue.sh is the first such arm's consumer).
   **A second column rather than a fifth flag, and the reason is version skew.**
   The gate ships in a kit and the binary ships in the payload, and the two version
   independently — `init` places a released binary while a consumer may vendor a

@@ -74,8 +74,6 @@ QUEUE_DEFERRED_RE="^## ${QUEUE_KIT_DEFERRED_SECTION}[[:space:]]*$"
 # spec: queue-kit/SPEC.md §The icebox tier — an unset knob leaves a regex nothing can match, so every icebox reader degrades to "no icebox" rather than to "every section"
 # shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
 QUEUE_ICEBOX_RE="${QUEUE_KIT_ICEBOX_SECTION:+^## ${QUEUE_KIT_ICEBOX_SECTION}[[:space:]]*$}"
-# shellcheck disable=SC2034  # consumed by sourcing gates, never within this lib
-QUEUE_DONE_RE="^## ${QUEUE_KIT_DONE_SECTION}[[:space:]]*$"
 # spec: queue-kit/SPEC.md §lib/queue.sh — the task-section set in configured order, the one composition the task regex and every per-section reader share
 QUEUE_TASK_SECTIONS=("${QUEUE_KIT_ACTIVE_SECTIONS[@]}" "$QUEUE_KIT_DEFERRED_SECTION")
 # spec: queue-kit/SPEC.md §The icebox tier — the icebox is a *live* task section: joining the shared task regex is what makes eviction a conserved move and carries slug uniqueness, blocker resolution, the living-prose contract and the lead-line guard onto the tier with no gate edit
@@ -95,19 +93,6 @@ queue_live_slugs() {
         inq && $0 ~ /^[[:space:]]*-[[:space:]]+\*\*[a-z0-9][a-z0-9-]*\*\*/ {
             match($0, /\*\*[a-z0-9][a-z0-9-]*\*\*/)
             print substr($0, RSTART + 2, RLENGTH - 4)
-        }
-    ' "$1"
-}
-
-queue_done_slugs() {
-    awk -v donere="$QUEUE_DONE_RE" -v sectre="$QUEUE_SECTION_RE" '
-        $0 ~ donere { ind = 1; next }
-        $0 ~ sectre { ind = 0 }
-        ind && $0 ~ /^[[:space:]]*-[[:space:]]+[a-z0-9][a-z0-9-]*[[:space:]]*$/ {
-            line = $0
-            sub(/^[[:space:]]*-[[:space:]]+/, "", line)
-            sub(/[[:space:]]*$/, "", line)
-            print line
         }
     ' "$1"
 }

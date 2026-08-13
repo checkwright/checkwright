@@ -32,7 +32,7 @@ fn main() {
         Some(a) => a.as_str(),
         None => {
             eprintln!("checkwright-gates: no subcommand given");
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --knobs <gate-name> | --source-stamp | --queue-parity <queue-file> | <gate-name> [args...]");
             exit(2);
         }
     };
@@ -52,6 +52,40 @@ fn main() {
     if first == "--list" {
         for (n, owner) in gates::names_with_owners() {
             println!("{}\t{}", n, owner);
+        }
+        exit(0);
+    }
+
+    // spec: queue-kit/SPEC.md §lib/queue.sh — the introspection arm the shell/compiled parity
+    // harness reads: this module's classification of one queue file, one record per line. A
+    // top-level flag rather than a subcommand, for the reason the three around it are:
+    // check-gate-substrate-parity assertion B reds a subcommand no descriptor dispatches to,
+    // and no gate dispatches here (gate-sdk/SPEC.md §check-gate-substrate-parity).
+    if first == "--queue-parity" {
+        let file = match argv.get(1) {
+            Some(f) => f.as_str(),
+            None => {
+                eprintln!("checkwright-gates: --queue-parity needs a queue file — the classification could not be reported; treating as failure (not clean)");
+                eprintln!("  usage: checkwright-gates --queue-parity <queue-file>");
+                exit(2);
+            }
+        };
+        let text = match std::fs::read_to_string(file) {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("checkwright-gates: cannot read {}: {} — the classification could not be reported; treating as failure (not clean)", file, e);
+                exit(2);
+            }
+        };
+        let sec = match queue::Sections::active_and_deferred() {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("checkwright-gates: {} — treating as failure (not clean)", e);
+                exit(2);
+            }
+        };
+        for rec in queue::parity_report(&text, &sec) {
+            println!("{}", rec);
         }
         exit(0);
     }
