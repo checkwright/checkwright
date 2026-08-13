@@ -130,7 +130,7 @@ introduces passes five points:
    count, and one holding a minimum or a coverage floor. So enumerate what
    makes each reader **red**, never what it is about, and inspect only the
    monotone ones. Attested: pruning the file that held a declaration's sole
-   instance flips `checks/check-install-claim.sh` green to red, because its
+   instance flips `check-install-claim` green to red, because its
    red condition is a zero count — the narrowing *added* a violation.
    "A narrower corpus can only remove violations" is false, and it is the
    first argument a narrowing delta reaches for.

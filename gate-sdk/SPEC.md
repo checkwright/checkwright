@@ -1083,7 +1083,11 @@ design time; the last three were paid for, and each is named with what it cost.
    residual that is not the cohort's own: an artifact-free profile is then the
    accidental no-artifact case rather than a deliberate measurement, and the two
    are indistinguishable from the outside. A build session batching such an
-   iteration inherits the ordering rather than discovering it.
+   iteration inherits the ordering rather than discovering it. A second ordering
+   rides with it: the instrument packs a payload stamped with a commit, so it
+   refuses a dirty worktree and the measurement runs **after** the cohort's own
+   commit — from a clean checkout of it when a concurrent session holds the tree
+   dirty.
 
    **What the value arm is, and what it is not.** It plants a real defect in
    adopter-authored prose and asserts that some profile below the maximum catches
@@ -1782,6 +1786,21 @@ fence patterns and the inline-code stripper are grammar the kit owns, carry no
 project term, and are the kit literals the boundary above leaves hand-compiled.
 The check this reduces to: a `grep` for any transport or disclosure id across
 `native/src/` returns nothing.
+
+**The criterion-5 price, measured against the post-cohort registry.** The
+binary-less leg installs the `prose` profile from an artifact-free payload and
+reports the roster that profile loses with the binary: **seven members**,
+declared in the consumer's own registry, against six before this cohort. The
+roster grew by exactly one — `check-manifest-temporal`. Its two cohort siblings
+are absent from that profile's registered set, because a gate is registered
+**where its surface exists** and this profile configures neither a transport
+vocabulary nor a disclosure one. That is the measurement's honest limit rather
+than a discount: a consumer who configures either surface registers the matching
+member and loses it too, so the priced roster is this profile's and not every
+consumer's. The judgment the criterion leaves to a cohort: the roster is
+acceptable, because all three members assert over governed **markdown prose**
+whose other readers stay shell-side, and no class of adopter-authored content
+goes unheld by their omission.
 
 **Parity, proved while both implementations existed.** Assertion A forbids a
 `<name>.sh` and a `<name>.gate` in one resolve dir, so each comparison ran with
